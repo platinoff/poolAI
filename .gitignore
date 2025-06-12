@@ -10,3 +10,15 @@ target/
 *.user
 *.cache
 Cargo.lock
+   /admin
+   /ai-env
+   /book
+   /catcodes.txt
+   /cursor-sync.service
+   /cursor.promt
+   /errorfeedack.txt
+   /errorfeedback.txt
+   /poolAI_concept.txt
+   /Pop_OS!.txt
+   /rustbook_link.txt
+   /uutils.txt
