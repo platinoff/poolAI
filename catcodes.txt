@@ -1,0 +1,3951 @@
+use std::sync::Arc;
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use tokio::net::TcpListener;
+use tokio::task::JoinHandle;
+use log::{info, warn, error};
+use serde::{Serialize, Deserialize};
+use std::time::{Duration, Instant};
+use solana_sdk::pubkey::Pubkey;
+use std::str::FromStr;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VmConfig {
+    pub id: String,
+    pub name: String,
+    pub cpu_cores: u32,
+    pub memory_mb: u32,
+    pub disk_gb: u32,
+    pub image: String,
+    pub status: VmStatus,
+    pub ports: Vec<PortMapping>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum VmStatus {
+    Stopped,
+    Running,
+    Paused,
+    Error(String),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PortMapping {
+    pub host_port: u16,
+    pub vm_port: u16,
+    pub protocol: String,
+    pub description: String,
+}
+
+pub struct VmManager {
+    vms: Arc<RwLock<HashMap<String, VmConfig>>>,
+}
+
+impl VmManager {
+    pub fn new() -> Self {
+        Self {
+            vms: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    pub fn create_vm(&self, config: VmConfig) -> Result<(), String> {
+        let mut vms = self.vms.write();
+        if vms.contains_key(&config.id) {
+            return Err(format!("VM with id {} already exists", config.id));
+        }
+        vms.insert(config.id.clone(), config);
+        info!("Created new VM: {}", config.id);
+        Ok(())
+    }
+
+    pub fn start_vm(&self, id: &str) -> Result<(), String> {
+        let mut vms = self.vms.write();
+        if let Some(vm) = vms.get_mut(id) {
+            vm.status = VmStatus::Running;
+            info!("Started VM: {}", id);
+            Ok(())
+        } else {
+            Err(format!("VM with id {} not found", id))
+        }
+    }
+
+    pub fn stop_vm(&self, id: &str) -> Result<(), String> {
+        let mut vms = self.vms.write();
+        if let Some(vm) = vms.get_mut(id) {
+            vm.status = VmStatus::Stopped;
+            info!("Stopped VM: {}", id);
+            Ok(())
+        } else {
+            Err(format!("VM with id {} not found", id))
+        }
+    }
+
+    pub fn get_vm(&self, id: &str) -> Option<VmConfig> {
+        self.vms.read().get(id).cloned()
+    }
+
+    pub fn list_vms(&self) -> Vec<VmConfig> {
+        self.vms.read().values().cloned().collect()
+    }
+
+    pub fn add_port_mapping(&self, id: &str, mapping: PortMapping) -> Result<(), String> {
+        let mut vms = self.vms.write();
+        if let Some(vm) = vms.get_mut(id) {
+            vm.ports.push(mapping);
+            info!("Added port mapping for VM: {}", id);
+            Ok(())
+        } else {
+            Err(format!("VM with id {} not found", id))
+        }
+    }
+
+    pub fn remove_port_mapping(&self, id: &str, host_port: u16) -> Result<(), String> {
+        let mut vms = self.vms.write();
+        if let Some(vm) = vms.get_mut(id) {
+            vm.ports.retain(|m| m.host_port != host_port);
+            info!("Removed port mapping for VM: {}", id);
+            Ok(())
+        } else {
+            Err(format!("VM with id {} not found", id))
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vm_creation() {
+        let manager = VmManager::new();
+        let config = VmConfig {
+            id: "test".to_string(),
+            name: "Test VM".to_string(),
+            cpu_cores: 2,
+            memory_mb: 2048,
+            disk_gb: 20,
+            image: "ubuntu:latest".to_string(),
+            status: VmStatus::Stopped,
+            ports: Vec::new(),
+        };
+        assert!(manager.create_vm(config).is_ok());
+    }
+
+    #[test]
+    fn test_vm_start_stop() {
+        let manager = VmManager::new();
+        let config = VmConfig {
+            id: "test".to_string(),
+            name: "Test VM".to_string(),
+            cpu_cores: 2,
+            memory_mb: 2048,
+            disk_gb: 20,
+            image: "ubuntu:latest".to_string(),
+            status: VmStatus::Stopped,
+            ports: Vec::new(),
+        };
+        manager.create_vm(config).unwrap();
+        assert!(manager.start_vm("test").is_ok());
+        assert_eq!(manager.get_vm("test").unwrap().status, VmStatus::Running);
+        assert!(manager.stop_vm("test").is_ok());
+        assert_eq!(manager.get_vm("test").unwrap().status, VmStatus::Stopped);
+    }
+} use solana_sdk::{
+    pubkey::Pubkey,
+    instruction::AccountMeta,
+    signature::Signature,
+    transaction::Transaction,
+};
+use std::str::FromStr;
+use thiserror::Error;
+use log::info;
+use std::sync::Arc;
+use parking_lot::RwLock;
+use ring::rand::SecureRandom;
+use ring::rand::SystemRandom;
+use std::sync::Mutex;
+
+#[derive(Error, Debug)]
+pub enum SolanaAddressError {
+    #[error("Invalid address format: {0}")]
+    InvalidFormat(String),
+    #[error("Address validation failed: {0}")]
+    ValidationError(String),
+    #[error("Keypair generation failed")]
+    KeypairError,
+    #[error("Secure random generation failed")]
+    RandomError,
+}
+
+pub struct SolanaAddressManager {
+    keypairs: Arc<RwLock<std::collections::HashMap<String, Keypair>>>,
+    pubkey: Pubkey,
+    rng: Mutex<SystemRandom>,
+}
+
+impl SolanaAddressManager {
+    pub fn new() -> Self {
+        Self {
+            keypairs: Arc::new(RwLock::new(std::collections::HashMap::new())),
+            pubkey: Pubkey::new_unique(),
+            rng: Mutex::new(SystemRandom::new()),
+        }
+    }
+
+    pub fn generate_new_address(&self, label: String) -> Result<Pubkey, SolanaAddressError> {
+        let mut rng = self.rng.lock().map_err(|_| SolanaAddressError::RandomError)?;
+        let mut seed = [0u8; 32];
+        rng.fill(&mut seed).map_err(|_| SolanaAddressError::RandomError)?;
+        
+        let keypair = Keypair::from_bytes(&seed)
+            .map_err(|_| SolanaAddressError::KeypairError)?;
+        let pubkey = keypair.pubkey();
+        
+        self.keypairs.write()
+            .map_err(|_| SolanaAddressError::KeypairError)?
+            .insert(label, keypair);
+            
+        info!("Generated new Solana address: {}", pubkey);
+        Ok(pubkey)
+    }
+
+    pub fn import_address(&self, label: String, private_key: &[u8]) -> Result<Pubkey, SolanaAddressError> {
+        let keypair = Keypair::from_bytes(private_key)
+            .map_err(|_| SolanaAddressError::KeypairError)?;
+        let pubkey = keypair.pubkey();
+        
+        self.keypairs.write()
+            .map_err(|_| SolanaAddressError::KeypairError)?
+            .insert(label, keypair);
+            
+        info!("Imported Solana address: {}", pubkey);
+        Ok(pubkey)
+    }
+
+    pub fn get_address(&self, label: &str) -> Option<Pubkey> {
+        self.keypairs.read()
+            .ok()
+            .and_then(|keypairs| keypairs.get(label).map(|kp| kp.pubkey()))
+    }
+
+    pub fn validate_address(address: &str) -> Result<Pubkey, SolanaAddressError> {
+        Pubkey::from_str(address)
+            .map_err(|e| SolanaAddressError::InvalidFormat(e.to_string()))
+    }
+
+    pub fn sign_transaction(&self, label: &str, transaction: &mut Transaction) -> Result<(), SolanaAddressError> {
+        let keypairs = self.keypairs.read()
+            .map_err(|_| SolanaAddressError::KeypairError)?;
+            
+        let keypair = keypairs.get(label)
+            .ok_or_else(|| SolanaAddressError::ValidationError("Keypair not found".to_string()))?;
+            
+        transaction.sign(&[keypair], transaction.message.recent_blockhash);
+        info!("Signed transaction for address: {}", keypair.pubkey());
+        Ok(())
+    }
+
+    pub fn create_transfer_instruction(
+        &self,
+        from_label: &str,
+        to_pubkey: &Pubkey,
+        lamports: u64,
+    ) -> Result<system_instruction::SystemInstruction, SolanaAddressError> {
+        let from_pubkey = self.get_address(from_label)
+            .ok_or_else(|| SolanaAddressError::ValidationError("From address not found".to_string()))?;
+            
+        Ok(system_instruction::transfer(&from_pubkey, to_pubkey, lamports))
+    }
+
+    pub fn export_private_key(&self, label: &str) -> Result<Vec<u8>, SolanaAddressError> {
+        let keypairs = self.keypairs.read()
+            .map_err(|_| SolanaAddressError::KeypairError)?;
+            
+        let keypair = keypairs.get(label)
+            .ok_or_else(|| SolanaAddressError::ValidationError("Keypair not found".to_string()))?;
+            
+        Ok(keypair.to_bytes().to_vec())
+    }
+
+    pub fn remove_address(&self, label: &str) -> Result<(), SolanaAddressError> {
+        self.keypairs.write()
+            .map_err(|_| SolanaAddressError::KeypairError)?
+            .remove(label);
+            
+        info!("Removed Solana address: {}", label);
+        Ok(())
+    }
+
+    pub fn transfer(&self, to: &Pubkey, amount: f64) -> Result<system_instruction::SystemInstruction, SolanaAddressError> {
+        let lamports = (amount * 1_000_000_000.0) as u64;
+        let from_pubkey = self.pubkey;
+        Ok(system_instruction::transfer(&from_pubkey, to, lamports))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_address_generation() {
+        let manager = SolanaAddressManager::new();
+        let pubkey = manager.generate_new_address("test".to_string()).unwrap();
+        assert_eq!(manager.get_address("test"), Some(pubkey));
+    }
+
+    #[test]
+    fn test_address_validation() {
+        let valid_address = "11111111111111111111111111111111";
+        let invalid_address = "invalid";
+        
+        assert!(SolanaAddressManager::validate_address(valid_address).is_ok());
+        assert!(SolanaAddressManager::validate_address(invalid_address).is_err());
+    }
+} use log::info;
+
+pub struct MiningModel {
+    difficulty_factor: f32,
+    last_update: std::time::Instant,
+}
+
+impl MiningModel {
+    pub fn new() -> Self {
+        Self {
+            difficulty_factor: 1.0,
+            last_update: std::time::Instant::now(),
+        }
+    }
+
+    pub fn process_data(&self, input: &[f32]) -> Result<Vec<f32>, String> {
+        // Простая линейная трансформация
+        let output: Vec<f32> = input.iter()
+            .map(|&x| x * self.difficulty_factor)
+            .collect();
+        Ok(output)
+    }
+
+    pub fn train(&self, _inputs: &[f32], _targets: &[f32], _epochs: i64) -> Result<(), String> {
+        // Простая симуляция обучения
+        info!("Training model...");
+        Ok(())
+    }
+
+    pub fn save_model(&self, _path: &str) -> Result<(), String> {
+        // Простая симуляция сохранения
+        info!("Saving model...");
+        Ok(())
+    }
+
+    pub fn load_model(&self, _path: &str) -> Result<(), String> {
+        // Простая симуляция загрузки
+        info!("Loading model...");
+        Ok(())
+    }
+
+    pub fn predict_mining_difficulty(&self, worker_stats: &[f32]) -> Result<f32, String> {
+        // Простое предсказание сложности на основе статистики воркеров
+        let avg_load = worker_stats.iter().sum::<f32>() / worker_stats.len() as f32;
+        Ok(avg_load * self.difficulty_factor)
+    }
+
+    pub fn update_difficulty(&mut self, new_factor: f32) {
+        self.difficulty_factor = new_factor;
+        self.last_update = std::time::Instant::now();
+        info!("Updated difficulty factor to: {}", new_factor);
+    }
+}
+
+pub fn create_model() -> Result<MiningModel, String> {
+    Ok(MiningModel::new())
+}
+
+pub fn get_available_devices() -> Vec<String> {
+    vec!["cpu".to_string()]
+} use std::sync::Arc;
+use parking_lot::{RwLock, Mutex};
+use std::collections::HashMap;
+use solana_sdk::pubkey::Pubkey;
+use crate::model::MiningModel;
+
+pub struct Worker {
+    pub id: String,
+    pub solana_address: Pubkey,
+    pub mining_power: f64,
+}
+
+pub struct RaidNode {
+    pub last_heartbeat: std::time::Instant,
+    pub status: NodeStatus,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum NodeStatus {
+    Active,
+    Degraded,
+    Failed,
+}
+
+pub struct AppState {
+    pub workers: RwLock<HashMap<String, Worker>>,
+    pub raid_status: Mutex<HashMap<Pubkey, RaidNode>>,
+    pub model: Arc<Mutex<MiningModel>>,
+}
+
+impl AppState {
+    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        Ok(Self {
+            workers: RwLock::new(HashMap::new()),
+            raid_status: Mutex::new(HashMap::new()),
+            model: Arc::new(Mutex::new(MiningModel::new())),
+        })
+    }
+
+    pub fn add_worker(&self, worker: Worker) {
+        self.workers.write().insert(worker.id.clone(), worker);
+    }
+
+    pub fn update_raid_status(&self, node_id: Pubkey, status: NodeStatus) {
+        let mut raid_status = self.raid_status.lock();
+        if let Some(node) = raid_status.get_mut(&node_id) {
+            node.status = status;
+            node.last_heartbeat = std::time::Instant::now();
+        }
+    }
+} use std::sync::Arc;
+use parking_lot::RwLock;
+use serde::{Serialize, Deserialize};
+use std::collections::{HashMap, HashSet};
+use log::info;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Neuron {
+    pub id: String,
+    pub connections: Vec<String>,
+    pub memory_map: HashMap<String, f64>, // Map of memory regions to availability scores
+    pub seeds: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SmallWorld {
+    neurons: Arc<RwLock<HashMap<String, Neuron>>>,
+    k: usize, // Number of nearest neighbors
+    p: f64,  // Rewiring probability
+}
+
+impl SmallWorld {
+    pub fn new(k: usize, p: f64) -> Self {
+        Self {
+            neurons: Arc::new(RwLock::new(HashMap::new())),
+            k,
+            p,
+        }
+    }
+
+    pub fn add_neuron(&self, id: String, seeds: Vec<String>) {
+        let mut neurons = self.neurons.write();
+        let mut connections = Vec::new();
+        
+        // Connect to k nearest neighbors
+        for i in 1..=self.k {
+            let prev_id = format!("{}-{}", id, i);
+            let next_id = format!("{}+{}", id, i);
+            
+            if neurons.contains_key(&prev_id) {
+                connections.push(prev_id);
+            }
+            if neurons.contains_key(&next_id) {
+                connections.push(next_id);
+            }
+        }
+        
+        // Random rewiring
+        for i in 0..connections.len() {
+            if rand::random::<f64>() < self.p {
+                if let Some(random_neuron) = neurons.keys().choose(&mut rand::thread_rng()) {
+                    connections[i] = random_neuron.clone();
+                }
+            }
+        }
+        
+        let neuron = Neuron {
+            id: id.clone(),
+            connections,
+            memory_map: HashMap::new(),
+            seeds,
+        };
+        
+        neurons.insert(id, neuron);
+    }
+
+    pub fn update_memory_map(&self, neuron_id: &str, region: String, availability: f64) {
+        let mut neurons = self.neurons.write();
+        if let Some(neuron) = neurons.get_mut(neuron_id) {
+            neuron.memory_map.insert(region, availability);
+        }
+    }
+
+    pub fn get_available_memory(&self, neuron_id: &str) -> Vec<(String, f64)> {
+        let neurons = self.neurons.read();
+        if let Some(neuron) = neurons.get(neuron_id) {
+            let mut regions: Vec<_> = neuron.memory_map.iter()
+                .map(|(region, &score)| (region.clone(), score))
+                .collect();
+            regions.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+            regions
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn propagate_memory_info(&self, start_id: &str, depth: usize) {
+        let mut visited = HashSet::new();
+        let mut to_visit = Vec::new();
+        to_visit.push((start_id.to_string(), 0));
+        
+        while let Some((current_id, current_depth)) = to_visit.pop() {
+            if current_depth > depth || visited.contains(&current_id) {
+                continue;
+            }
+            
+            visited.insert(current_id.clone());
+            
+            let neurons = self.neurons.read();
+            if let Some(neuron) = neurons.get(&current_id) {
+                // Propagate memory information to connected neurons
+                for connected_id in &neuron.connections {
+                    if !visited.contains(connected_id) {
+                        to_visit.push((connected_id.clone(), current_depth + 1));
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn visualize(&self) -> String {
+        let neurons = self.neurons.read();
+        serde_json::to_string_pretty(&*neurons).unwrap()
+    }
+
+    pub fn get_optimal_path(&self, start_id: &str, target_region: &str) -> Option<Vec<String>> {
+        let neurons = self.neurons.read();
+        let mut visited = HashSet::new();
+        let mut queue = std::collections::VecDeque::new();
+        let mut paths = HashMap::new();
+        
+        queue.push_back(start_id.to_string());
+        paths.insert(start_id.to_string(), vec![start_id.to_string()]);
+        
+        while let Some(current_id) = queue.pop_front() {
+            if visited.contains(&current_id) {
+                continue;
+            }
+            
+            visited.insert(current_id.clone());
+            
+            if let Some(neuron) = neurons.get(&current_id) {
+                if neuron.memory_map.contains_key(target_region) {
+                    return paths.get(&current_id).cloned();
+                }
+                
+                for connected_id in &neuron.connections {
+                    if !visited.contains(connected_id) {
+                        let mut new_path = paths[&current_id].clone();
+                        new_path.push(connected_id.clone());
+                        paths.insert(connected_id.clone(), new_path);
+                        queue.push_back(connected_id.clone());
+                    }
+                }
+            }
+        }
+        
+        None
+    }
+
+    pub fn generate_network(&self) -> Vec<Vec<usize>> {
+        let mut network = vec![vec![]; self.k];
+        for i in 1..=self.k {
+            // ... existing code ...
+        }
+        for i in 0..self.k {
+            for j in (i + 1)..self.k {
+                if rand::random::<f64>() < self.p {
+                    // ... existing code ...
+                }
+            }
+        }
+        network
+    }
+} use std::sync::Arc;
+use parking_lot::RwLock;
+use log::info;
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
+use tokio::sync::Semaphore;
+use thiserror::Error;
+use crate::lmrouter::{ModelConfig, ModelStats};
+use uuid::Uuid;
+
+#[derive(Error, Debug)]
+pub enum LoadBalancerError {
+    #[error("Failed to acquire model: {0}")]
+    AcquisitionError(String),
+    #[error("Model not found: {0}")]
+    ModelNotFound(String),
+    #[error("Rate limit exceeded")]
+    RateLimitExceeded,
+    #[error("Internal error: {0}")]
+    InternalError(String),
+    #[error("Failed to acquire permit")]
+    AcquireError,
+}
+
+pub struct LoadBalancer {
+    models: Arc<RwLock<HashMap<String, ModelConfig>>>,
+    stats: Arc<RwLock<HashMap<String, ModelStats>>>,
+    rate_limits: Arc<RwLock<HashMap<String, (Semaphore, Instant)>>>,
+    max_retries: u32,
+    retry_delay: Duration,
+    max_requests_per_minute: usize,
+}
+
+impl LoadBalancer {
+    pub fn new(max_retries: u32, retry_delay_ms: u64, max_requests_per_minute: usize) -> Self {
+        Self {
+            models: Arc::new(RwLock::new(HashMap::new())),
+            stats: Arc::new(RwLock::new(HashMap::new())),
+            rate_limits: Arc::new(RwLock::new(HashMap::new())),
+            max_retries,
+            retry_delay: Duration::from_millis(retry_delay_ms),
+            max_requests_per_minute,
+        }
+    }
+
+    pub async fn register_model(&self, model_id: String, config: ModelConfig) -> Result<(), LoadBalancerError> {
+        self.models.write()
+            .insert(model_id.clone(), config.clone());
+            
+        self.stats.write()
+            .insert(model_id.clone(), ModelStats {
+                total_requests: 0,
+                successful_requests: 0,
+                failed_requests: 0,
+                average_response_time: 0.0,
+                last_updated: chrono::Utc::now().timestamp(),
+            });
+            
+        self.rate_limits.write()
+            .insert(model_id.clone(), (
+                Semaphore::new(config.max_requests_per_minute as usize),
+                Instant::now()
+            ));
+            
+        info!("Registered model in load balancer: {}", model_id);
+        Ok(())
+    }
+
+    pub async fn acquire_permit(&self, model_id: &str) -> Result<(), LoadBalancerError> {
+        let mut rate_limits = self.rate_limits.write();
+        if let Some((semaphore, last_reset)) = rate_limits.get(model_id).cloned() {
+            if last_reset.elapsed() >= Duration::from_secs(60) {
+                let new_semaphore = Arc::new(Semaphore::new(self.max_requests_per_minute));
+                rate_limits.insert(model_id.to_string(), (new_semaphore.clone(), Instant::now()));
+                drop(rate_limits);
+                new_semaphore.acquire().await.map_err(|_| LoadBalancerError::AcquireError)?;
+            } else {
+                drop(rate_limits);
+                semaphore.acquire().await.map_err(|_| LoadBalancerError::AcquireError)?;
+            }
+        } else {
+            let semaphore = Arc::new(Semaphore::new(self.max_requests_per_minute));
+            rate_limits.insert(model_id.to_string(), (semaphore.clone(), Instant::now()));
+            drop(rate_limits);
+            semaphore.acquire().await.map_err(|_| LoadBalancerError::AcquireError)?;
+        }
+        Ok(())
+    }
+
+    pub async fn update_model_stats(&self, model_id: &str, success: bool, response_time: f64) -> Result<(), LoadBalancerError> {
+        if let Some(stats) = self.stats.write().get_mut(model_id) {
+            stats.total_requests += 1;
+            if success {
+                stats.successful_requests += 1;
+            } else {
+                stats.failed_requests += 1;
+            }
+            stats.average_response_time = (stats.average_response_time * (stats.total_requests - 1) as f64 + response_time) / stats.total_requests as f64;
+            stats.last_updated = chrono::Utc::now().timestamp();
+            info!("Updated load balancer stats for model {}: {:?}", model_id, stats);
+            Ok(())
+        } else {
+            Err(LoadBalancerError::ModelNotFound(model_id.to_string()))
+        }
+    }
+
+    pub async fn get_available_model(&self, requirements: &crate::lmrouter::ModelRequirements) -> Result<(String, ModelConfig), LoadBalancerError> {
+        let models = self.models.read();
+        let stats = self.stats.read();
+
+        for (model_id, config) in models.iter() {
+            if config.max_tokens >= requirements.min_tokens && 
+               config.priority >= requirements.min_priority {
+                if let Ok(_) = self.acquire_permit(model_id).await {
+                    let model_stats = stats.get(model_id).unwrap_or(&ModelStats {
+                        total_requests: 0,
+                        successful_requests: 0,
+                        failed_requests: 0,
+                        average_response_time: 0.0,
+                        last_updated: 0,
+                    });
+                    
+                    let success_rate = if model_stats.total_requests > 0 {
+                        model_stats.successful_requests as f64 / model_stats.total_requests as f64
+                    } else {
+                        1.0
+                    };
+
+                    if success_rate > 0.9 {
+                        return Ok((model_id.clone(), config.clone()));
+                    }
+                }
+            }
+        }
+        Err(LoadBalancerError::AcquisitionError("No available model found".to_string()))
+    }
+
+    pub fn get_model_stats(&self, model_id: &str) -> Result<ModelStats, LoadBalancerError> {
+        self.stats.read()
+            .get(model_id)
+            .cloned()
+            .ok_or_else(|| LoadBalancerError::ModelNotFound(model_id.to_string()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_model_registration() {
+        let balancer = LoadBalancer::new(3, 1000, 60);
+        let config = ModelConfig {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            endpoint: "https://test.com".to_string(),
+            max_tokens: 1000,
+            max_requests_per_minute: 60,
+            priority: 1,
+        };
+        
+        assert!(balancer.register_model("test_model".to_string(), config).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_model_acquisition() {
+        let balancer = LoadBalancer::new(3, 1000, 60);
+        let config = ModelConfig {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            endpoint: "https://test.com".to_string(),
+            max_tokens: 1000,
+            max_requests_per_minute: 60,
+            priority: 1,
+        };
+        
+        balancer.register_model("test_model".to_string(), config).await.unwrap();
+        
+        let requirements = crate::lmrouter::ModelRequirements {
+            min_tokens: 500,
+            min_priority: 1,
+        };
+        
+        assert!(balancer.get_available_model(&requirements).await.is_ok());
+    }
+} use std::sync::Arc;
+use std::time::{Duration, Instant};
+use crate::state::{AppState, NodeStatus};
+use tokio::time::sleep;
+use log::{info, warn, error};
+use std::path::Path;
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use std::fs;
+use std::io;
+use thiserror::Error;
+use tokio::sync::mpsc;
+use tokio::fs as tokio_fs;
+use std::io::Write;
+use sha2::{Sha256, Digest};
+
+const HEALTH_CHECK_INTERVAL: Duration = Duration::from_secs(10);
+const NODE_TIMEOUT: Duration = Duration::from_secs(30);
+
+#[derive(Error, Debug)]
+pub enum BurstRaidError {
+    #[error("RAID initialization error: {0}")]
+    RaidInitError(String),
+    #[error("Disk error: {0}")]
+    DiskError(String),
+    #[error("Worker error: {0}")]
+    WorkerError(String),
+    #[error("Seed error: {0}")]
+    SeedError(String),
+    #[error("IO error: {0}")]
+    IoError(#[from] io::Error),
+}
+
+#[derive(Debug, Clone)]
+pub struct RaidConfig {
+    pub raid_level: u8,
+    pub min_disks: usize,
+    pub stripe_size: usize,
+    pub redundancy: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct DiskInfo {
+    pub path: String,
+    pub size: u64,
+    pub status: DiskStatus,
+    pub last_seen: Instant,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum DiskStatus {
+    Active,
+    Degraded,
+    Failed,
+    Rebuilding,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeedInfo {
+    pub worker_id: String,
+    pub path: String,
+    pub size: u64,
+    pub last_accessed: Instant,
+    pub status: SeedStatus,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SeedStatus {
+    Available,
+    Unavailable,
+    Migrating,
+}
+
+pub struct BurstRaidManager {
+    config: RaidConfig,
+    disks: Arc<RwLock<HashMap<String, DiskInfo>>>,
+    seeds: Arc<RwLock<HashMap<String, SeedInfo>>>,
+    model_pool: Arc<RwLock<HashMap<String, String>>>, // model_id -> raid_path
+    health_check_tx: mpsc::Sender<()>,
+}
+
+impl BurstRaidManager {
+    pub fn new(config: RaidConfig) -> Result<Self, BurstRaidError> {
+        let (health_check_tx, _) = mpsc::channel(1);
+        
+        let manager = Self {
+            config,
+            disks: Arc::new(RwLock::new(HashMap::new())),
+            seeds: Arc::new(RwLock::new(HashMap::new())),
+            model_pool: Arc::new(RwLock::new(HashMap::new())),
+            health_check_tx,
+        };
+
+        // Create data directory if it doesn't exist
+        fs::create_dir_all("data")?;
+        
+        Ok(manager)
+    }
+
+    pub async fn initialize_raid(&self) -> Result<(), BurstRaidError> {
+        info!("Initializing RAID array with level {}", self.config.raid_level);
+        
+        // Check if we have enough disks
+        let disks = self.disks.read();
+        if disks.len() < self.config.min_disks {
+            return Err(BurstRaidError::RaidInitError(
+                format!("Not enough disks. Required: {}, Available: {}", 
+                        self.config.min_disks, disks.len())
+            ));
+        }
+
+        // Create RAID structure
+        for (disk_id, disk) in disks.iter() {
+            let raid_path = format!("data/raid/{}", disk_id);
+            fs::create_dir_all(&raid_path)?;
+            
+            info!("Initialized disk {} at {}", disk_id, raid_path);
+        }
+
+        Ok(())
+    }
+
+    pub async fn add_disk(&self, disk_id: String, path: String, size: u64) -> Result<(), BurstRaidError> {
+        let mut disks = self.disks.write();
+        
+        disks.insert(disk_id.clone(), DiskInfo {
+            path,
+            size,
+            status: DiskStatus::Active,
+            last_seen: Instant::now(),
+        });
+
+        info!("Added disk {} to RAID array", disk_id);
+        Ok(())
+    }
+
+    pub async fn register_seed(&self, worker_id: String, seed_path: String, size: u64) -> Result<(), BurstRaidError> {
+        let mut seeds = self.seeds.write();
+        
+        seeds.insert(worker_id.clone(), SeedInfo {
+            worker_id: worker_id.clone(),
+            path: seed_path,
+            size,
+            last_accessed: Instant::now(),
+            status: SeedStatus::Available,
+        });
+
+        info!("Registered seed from worker {}", worker_id);
+        Ok(())
+    }
+
+    pub async fn load_model(&self, model_id: String, model_path: String) -> Result<(), BurstRaidError> {
+        let mut model_pool = self.model_pool.write();
+        
+        // Calculate required space based on model size
+        let model_size = fs::metadata(&model_path)?.len();
+        let required_disks = (model_size as f64 / self.config.stripe_size as f64).ceil() as usize;
+        
+        // Check if we have enough disks
+        let disks = self.disks.read();
+        if disks.len() < required_disks {
+            return Err(BurstRaidError::RaidInitError(
+                format!("Not enough disks for model. Required: {}, Available: {}", 
+                        required_disks, disks.len())
+            ));
+        }
+
+        // Distribute model across RAID
+        let raid_path = format!("data/raid/models/{}", model_id);
+        fs::create_dir_all(&raid_path)?;
+        
+        // Copy model to RAID with striping
+        // Implementation depends on specific RAID level
+        match self.config.raid_level {
+            0 => self.strip_model(&model_path, &raid_path, model_size).await?,
+            1 => self.mirror_model(&model_path, &raid_path, model_size).await?,
+            _ => return Err(BurstRaidError::RaidInitError(
+                format!("Unsupported RAID level: {}", self.config.raid_level)
+            )),
+        }
+
+        model_pool.insert(model_id, raid_path);
+        info!("Loaded model into RAID array");
+        Ok(())
+    }
+
+    async fn strip_model(&self, source: &str, target: &str, size: u64) -> Result<(), BurstRaidError> {
+        let stripe_size = self.config.stripe_size as u64;
+        let mut offset = 0;
+        let mut disk_index = 0;
+        
+        // Calculate checksum of source file
+        let source_checksum = self.calculate_checksum(source).await?;
+        
+        while offset < size {
+            let current_stripe = std::cmp::min(stripe_size, size - offset);
+            
+            // Get next available disk
+            let disks = self.disks.read();
+            let disk_ids: Vec<_> = disks.keys().collect();
+            if disk_ids.is_empty() {
+                return Err(BurstRaidError::DiskError("No disks available".to_string()));
+            }
+            
+            let disk_id = disk_ids[disk_index % disk_ids.len()];
+            let disk = disks.get(disk_id).unwrap();
+            
+            // Create stripe file
+            let stripe_path = format!("{}/stripe_{}", disk.path, offset);
+            let mut stripe_file = tokio_fs::File::create(&stripe_path).await?;
+            
+            // Read and write stripe
+            let mut source_file = tokio_fs::File::open(source).await?;
+            source_file.seek(io::SeekFrom::Start(offset)).await?;
+            
+            let mut buffer = vec![0; current_stripe as usize];
+            source_file.read_exact(&mut buffer).await?;
+            stripe_file.write_all(&buffer).await?;
+            
+            // Verify stripe checksum
+            let stripe_checksum = self.calculate_checksum(&stripe_path).await?;
+            if stripe_checksum != source_checksum {
+                return Err(BurstRaidError::DiskError(
+                    format!("Checksum mismatch for stripe at offset {}", offset)
+                ));
+            }
+            
+            offset += current_stripe;
+            disk_index += 1;
+        }
+        
+        Ok(())
+    }
+
+    async fn mirror_model(&self, source: &str, target: &str, size: u64) -> Result<(), BurstRaidError> {
+        // Calculate source checksum
+        let source_checksum = self.calculate_checksum(source).await?;
+        
+        // Get all active disks
+        let disks = self.disks.read();
+        let active_disks: Vec<_> = disks.iter()
+            .filter(|(_, disk)| disk.status == DiskStatus::Active)
+            .collect();
+            
+        if active_disks.is_empty() {
+            return Err(BurstRaidError::DiskError("No active disks available".to_string()));
+        }
+        
+        // Copy to each disk
+        for (disk_id, disk) in active_disks {
+            let mirror_path = format!("{}/{}", target, disk_id);
+            tokio_fs::create_dir_all(&mirror_path).await?;
+            
+            // Copy file
+            tokio_fs::copy(source, &mirror_path).await?;
+            
+            // Verify checksum
+            let mirror_checksum = self.calculate_checksum(&mirror_path).await?;
+            if mirror_checksum != source_checksum {
+                return Err(BurstRaidError::DiskError(
+                    format!("Checksum mismatch for mirror on disk {}", disk_id)
+                ));
+            }
+        }
+        
+        Ok(())
+    }
+
+    async fn calculate_checksum(&self, path: &str) -> Result<String, BurstRaidError> {
+        let mut file = tokio_fs::File::open(path).await?;
+        let mut hasher = Sha256::new();
+        let mut buffer = vec![0; 1024 * 1024]; // 1MB buffer
+        
+        loop {
+            let n = file.read(&mut buffer).await?;
+            if n == 0 {
+                break;
+            }
+            hasher.update(&buffer[..n]);
+        }
+        
+        Ok(format!("{:x}", hasher.finalize()))
+    }
+
+    pub async fn handle_worker_failure(&self, worker_id: String) -> Result<(), BurstRaidError> {
+        let mut seeds = self.seeds.write();
+        
+        if let Some(seed) = seeds.get_mut(&worker_id) {
+            seed.status = SeedStatus::Unavailable;
+            warn!("Worker {} failed, marking seed as unavailable", worker_id);
+            
+            // Start migration process if needed
+            self.migrate_seed(worker_id).await?;
+        }
+        
+        Ok(())
+    }
+
+    async fn migrate_seed(&self, worker_id: String) -> Result<(), BurstRaidError> {
+        let mut seeds = self.seeds.write();
+        
+        if let Some(seed) = seeds.get_mut(&worker_id) {
+            seed.status = SeedStatus::Migrating;
+            
+            // Find available worker with enough space
+            let available_workers: Vec<_> = seeds.iter()
+                .filter(|(id, s)| 
+                    id != &worker_id && 
+                    s.status == SeedStatus::Available &&
+                    s.size >= seed.size
+                )
+                .collect();
+                
+            if available_workers.is_empty() {
+                return Err(BurstRaidError::WorkerError(
+                    "No available workers for migration".to_string()
+                ));
+            }
+            
+            // Choose worker with most free space
+            let target_worker = available_workers.iter()
+                .max_by_key(|(_, s)| s.size)
+                .unwrap();
+                
+            // Copy seed data
+            let target_path = format!("{}/migrated_{}", target_worker.1.path, worker_id);
+            tokio_fs::copy(&seed.path, &target_path).await?;
+            
+            // Verify checksum
+            let source_checksum = self.calculate_checksum(&seed.path).await?;
+            let target_checksum = self.calculate_checksum(&target_path).await?;
+            
+            if source_checksum != target_checksum {
+                return Err(BurstRaidError::SeedError(
+                    "Checksum mismatch during migration".to_string()
+                ));
+            }
+            
+            // Update seed info
+            seed.path = target_path;
+            seed.status = SeedStatus::Available;
+            info!("Successfully migrated seed from worker {}", worker_id);
+        }
+        
+        Ok(())
+    }
+
+    pub async fn monitor_health(&self) {
+        loop {
+            tokio::time::sleep(Duration::from_secs(60)).await;
+            
+            let disks = self.disks.read();
+            let seeds = self.seeds.read();
+            
+            // Check disk health
+            for (disk_id, disk) in disks.iter() {
+                if disk.last_seen.elapsed() > Duration::from_secs(300) {
+                    warn!("Disk {} has not been seen for 5 minutes", disk_id);
+                }
+            }
+            
+            // Check seed health
+            for (worker_id, seed) in seeds.iter() {
+                if seed.last_accessed.elapsed() > Duration::from_secs(300) {
+                    warn!("Seed from worker {} has not been accessed for 5 minutes", worker_id);
+                }
+            }
+        }
+    }
+
+    pub async fn verify_data_integrity(&self) -> Result<(), BurstRaidError> {
+        let disks = self.disks.read();
+        let model_pool = self.model_pool.read();
+        
+        for (model_id, raid_path) in model_pool.iter() {
+            info!("Verifying integrity for model {}", model_id);
+            
+            match self.config.raid_level {
+                0 => {
+                    // Verify all stripes
+                    let mut offset = 0;
+                    while let Ok(stripe_path) = tokio_fs::read_dir(&raid_path).await {
+                        let mut entries = stripe_path.into_iter();
+                        while let Some(entry) = entries.next().await {
+                            let entry = entry?;
+                            let stripe_checksum = self.calculate_checksum(entry.path().to_str().unwrap()).await?;
+                            // Compare with original checksum
+                            // Implementation depends on how checksums are stored
+                        }
+                    }
+                },
+                1 => {
+                    // Verify all mirrors
+                    for (disk_id, _) in disks.iter() {
+                        let mirror_path = format!("{}/{}", raid_path, disk_id);
+                        let mirror_checksum = self.calculate_checksum(&mirror_path).await?;
+                        // Compare with original checksum
+                        // Implementation depends on how checksums are stored
+                    }
+                },
+                _ => return Err(BurstRaidError::RaidInitError(
+                    format!("Unsupported RAID level: {}", self.config.raid_level)
+                )),
+            }
+        }
+        
+        Ok(())
+    }
+}
+
+pub async fn monitor_health(app_state: Arc<AppState>) {
+    info!("Starting RAID health monitoring");
+    
+    loop {
+        let now = Instant::now();
+        let mut failed_nodes = Vec::new();
+        
+        // Check all nodes
+        {
+            let raid_status = app_state.raid_status.lock();
+            for (node_id, node) in raid_status.iter() {
+                if now.duration_since(node.last_heartbeat) > NODE_TIMEOUT {
+                    warn!("Node {} has timed out", node_id);
+                    failed_nodes.push(*node_id);
+                }
+            }
+        }
+        
+        // Update status for failed nodes
+        for node_id in failed_nodes {
+            app_state.update_raid_status(node_id, NodeStatus::Failed);
+            // TODO: Implement resource redistribution logic
+        }
+        
+        sleep(HEALTH_CHECK_INTERVAL).await;
+    }
+}
+
+pub fn redistribute_resources(app_state: &Arc<AppState>, failed_node: solana_sdk::pubkey::Pubkey) {
+    // Get all active nodes
+    let active_nodes: Vec<_> = {
+        let raid_status = app_state.raid_status.lock();
+        raid_status.iter()
+            .filter(|(_, node)| node.status == NodeStatus::Active)
+            .map(|(id, _)| *id)
+            .collect()
+    };
+    
+    if active_nodes.is_empty() {
+        error!("No active nodes available for resource redistribution");
+        return;
+    }
+    
+    // Calculate new resource distribution
+    let resources_per_node = 1.0 / active_nodes.len() as f64;
+    
+    // Update resource allocation
+    for node_id in active_nodes {
+        // TODO: Implement actual resource redistribution logic
+        info!("Redistributing resources to node {}", node_id);
+    }
+}
+
+pub async fn handle_node_failure(app_state: Arc<AppState>, node_id: solana_sdk::pubkey::Pubkey) {
+    warn!("Handling failure for node {}", node_id);
+    
+    // Update node status
+    app_state.update_raid_status(node_id, NodeStatus::Failed);
+    
+    // Redistribute resources
+    redistribute_resources(&app_state, node_id);
+    
+    // TODO: Implement recovery procedures
+    info!("Node failure handling completed for {}", node_id);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_raid_initialization() {
+        let config = RaidConfig {
+            raid_level: 1,
+            min_disks: 2,
+            stripe_size: 1024 * 1024, // 1MB
+            redundancy: 1,
+        };
+        
+        let manager = BurstRaidManager::new(config).unwrap();
+        
+        // Add test disks
+        manager.add_disk("disk1".to_string(), "data/disk1".to_string(), 1024 * 1024 * 1024).await.unwrap();
+        manager.add_disk("disk2".to_string(), "data/disk2".to_string(), 1024 * 1024 * 1024).await.unwrap();
+        
+        assert!(manager.initialize_raid().await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_seed_registration() {
+        let config = RaidConfig {
+            raid_level: 1,
+            min_disks: 2,
+            stripe_size: 1024 * 1024,
+            redundancy: 1,
+        };
+        
+        let manager = BurstRaidManager::new(config).unwrap();
+        
+        assert!(manager.register_seed(
+            "worker1".to_string(),
+            "data/seeds/worker1".to_string(),
+            1024 * 1024
+        ).await.is_ok());
+    }
+} use std::sync::mpsc;
+use solana_sdk::pubkey::Pubkey;
+use crate::state::AppState;
+use std::time::Duration;
+use tokio::time::sleep;
+use std::sync::Arc;
+
+#[derive(Debug)]
+pub enum Task {
+    Mining(u64),
+    DataProcessing,
+    SyncSeeds,
+    Stop,
+}
+
+pub struct Worker {
+    pub id: String,
+    pub solana_address: Pubkey,
+    pub mining_power: f64,
+    pub task_sender: mpsc::Sender<Task>,
+}
+
+impl Worker {
+    pub fn new(id: String, solana_address: Pubkey, mining_power: f64) -> Self {
+        let (tx, rx) = mpsc::channel();
+        
+        // Start worker task
+        let worker_id = id.clone();
+        tokio::spawn(async move {
+            Worker::run(worker_id, rx).await;
+        });
+
+        Self {
+            id,
+            solana_address,
+            mining_power,
+            task_sender: tx,
+        }
+    }
+
+    async fn run(id: String, receiver: mpsc::Receiver<Task>) {
+        log::info!("Worker {} started", id);
+        
+        while let Ok(task) = receiver.recv() {
+            match task {
+                Task::Mining(difficulty) => {
+                    log::info!("Worker {} starting mining task with difficulty {}", id, difficulty);
+                    // Implement mining logic here
+                }
+                Task::DataProcessing => {
+                    log::info!("Worker {} starting data processing task", id);
+                    // Implement data processing logic here
+                }
+                Task::SyncSeeds => {
+                    log::info!("Worker {} syncing seeds", id);
+                    // Implement seed synchronization logic here
+                }
+                Task::Stop => {
+                    log::info!("Worker {} received stop command", id);
+                    break;
+                }
+            }
+        }
+        
+        log::info!("Worker {} stopped", id);
+    }
+
+    pub fn stop(&self) {
+        let _ = self.task_sender.send(Task::Stop);
+    }
+}
+
+pub async fn monitor_workers(app_state: Arc<AppState>) {
+    loop {
+        let workers = app_state.workers.read();
+        for (id, worker) in workers.iter() {
+            log::info!("Worker {} status: power={}", id, worker.mining_power);
+        }
+        sleep(Duration::from_secs(10)).await;
+    }
+} use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum NotFoundError {
+    #[error("Resource not found: {0}")]
+    ResourceNotFound(String),
+    #[error("Model not found: {0}")]
+    ModelNotFound(String),
+    #[error("Worker not found: {0}")]
+    WorkerNotFound(String),
+} use std::sync::Arc;
+use parking_lot::RwLock;
+use serde::{Serialize, Deserialize};
+use log::info;
+use solana_sdk::pubkey::Pubkey;
+use std::collections::HashMap;
+use uuid::Uuid;
+use chrono;
+use thiserror::Error;
+use url::Url;
+
+/// Ошибки, которые могут возникнуть при работе с мостами
+#[derive(Error, Debug)]
+pub enum BridgeError {
+    #[error("Bridge configuration not found: {0}")]
+    ConfigNotFound(String),
+    #[error("Amount below minimum: {0}")]
+    AmountTooLow(f64),
+    #[error("Amount above maximum: {0}")]
+    AmountTooHigh(f64),
+    #[error("Transaction not found: {0}")]
+    TransactionNotFound(String),
+    #[error("Invalid status transition: {0} -> {1}")]
+    InvalidStatusTransition(BridgeStatus, BridgeStatus),
+    #[error("Internal error: {0}")]
+    InternalError(String),
+    #[error("Invalid network URL: {0}")]
+    InvalidNetworkUrl(String),
+}
+
+/// Конфигурация моста между сетями
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BridgeConfig {
+    /// Исходная сеть
+    pub source_network: String,
+    /// Целевая сеть
+    pub target_network: String,
+    /// Процент комиссии
+    pub fee_percentage: f64,
+    /// Минимальная сумма для перевода
+    pub min_amount: f64,
+    /// Максимальная сумма для перевода
+    pub max_amount: f64,
+    /// URL исходной сети
+    pub source_network_url: String,
+    /// URL целевой сети
+    pub target_network_url: String,
+}
+
+impl BridgeConfig {
+    pub fn validate_urls(&self) -> Result<(), BridgeError> {
+        let source_url = Url::parse(&self.source_network_url)
+            .map_err(|e| BridgeError::InvalidNetworkUrl(format!("Source network URL: {}", e)))?;
+        
+        let target_url = Url::parse(&self.target_network_url)
+            .map_err(|e| BridgeError::InvalidNetworkUrl(format!("Target network URL: {}", e)))?;
+        
+        if source_url.scheme() != "https" || target_url.scheme() != "https" {
+            return Err(BridgeError::InvalidNetworkUrl("URLs must use HTTPS".to_string()));
+        }
+        
+        Ok(())
+    }
+}
+
+/// Транзакция моста
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BridgeTransaction {
+    /// Уникальный идентификатор транзакции
+    pub id: String,
+    /// Адрес отправителя
+    pub source_address: Pubkey,
+    /// Адрес получателя
+    pub target_address: Pubkey,
+    /// Сумма перевода
+    pub amount: f64,
+    /// Текущий статус транзакции
+    pub status: BridgeStatus,
+    /// Временная метка создания транзакции
+    pub timestamp: i64,
+}
+
+/// Статус транзакции моста
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum BridgeStatus {
+    /// Транзакция ожидает обработки
+    Pending,
+    /// Транзакция в процессе обработки
+    Processing,
+    /// Транзакция успешно завершена
+    Completed,
+    /// Транзакция завершилась с ошибкой
+    Failed(String),
+}
+
+/// Менеджер мостов, управляющий конфигурациями и транзакциями
+pub struct BridgeManager {
+    configs: Arc<RwLock<HashMap<String, BridgeConfig>>>,
+    transactions: Arc<RwLock<HashMap<String, BridgeTransaction>>>,
+}
+
+impl BridgeManager {
+    /// Создает новый экземпляр менеджера мостов
+    pub fn new() -> Self {
+        Self {
+            configs: Arc::new(RwLock::new(HashMap::new())),
+            transactions: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    /// Добавляет новую конфигурацию моста
+    pub fn add_bridge(&self, id: String, config: BridgeConfig) -> Result<(), BridgeError> {
+        if self.configs.read().contains_key(&id) {
+            return Err(BridgeError::InternalError(format!("Bridge with id {} already exists", id)));
+        }
+        
+        config.validate_urls()?;
+        
+        self.configs.write().insert(id.clone(), config.clone());
+        info!("Added new bridge configuration: {:?}", config);
+        Ok(())
+    }
+
+    /// Инициирует перевод через мост
+    pub fn initiate_transfer(
+        &self,
+        source_address: Pubkey,
+        target_address: Pubkey,
+        amount: f64,
+        bridge_id: &str,
+    ) -> Result<String, BridgeError> {
+        let configs = self.configs.read();
+        if let Some(config) = configs.get(bridge_id) {
+            if amount < config.min_amount {
+                return Err(BridgeError::AmountTooLow(config.min_amount));
+            }
+            if amount > config.max_amount {
+                return Err(BridgeError::AmountTooHigh(config.max_amount));
+            }
+
+            let transaction = BridgeTransaction {
+                id: Uuid::new_v4().to_string(),
+                source_address,
+                target_address,
+                amount,
+                status: BridgeStatus::Pending,
+                timestamp: chrono::Utc::now().timestamp(),
+            };
+
+            self.transactions.write().insert(transaction.id.clone(), transaction.clone());
+            info!("Initiated bridge transfer: {:?}", transaction);
+            Ok(transaction.id)
+        } else {
+            Err(BridgeError::ConfigNotFound(bridge_id.to_string()))
+        }
+    }
+
+    /// Обновляет статус транзакции
+    pub fn update_transaction_status(
+        &self,
+        transaction_id: &str,
+        new_status: BridgeStatus,
+    ) -> Result<(), BridgeError> {
+        let mut transactions = self.transactions.write();
+        if let Some(transaction) = transactions.get_mut(transaction_id) {
+            // Проверяем допустимость перехода статуса
+            if !is_valid_status_transition(&transaction.status, &new_status) {
+                return Err(BridgeError::InvalidStatusTransition(
+                    transaction.status.clone(),
+                    new_status,
+                ));
+            }
+
+            transaction.status = new_status.clone();
+            info!("Updated transaction status: {:?}", transaction);
+            Ok(())
+        } else {
+            Err(BridgeError::TransactionNotFound(transaction_id.to_string()))
+        }
+    }
+
+    /// Получает информацию о транзакции
+    pub fn get_transaction(&self, transaction_id: &str) -> Result<BridgeTransaction, BridgeError> {
+        self.transactions
+            .read()
+            .get(transaction_id)
+            .cloned()
+            .ok_or_else(|| BridgeError::TransactionNotFound(transaction_id.to_string()))
+    }
+
+    /// Получает конфигурацию моста
+    pub fn get_bridge_config(&self, bridge_id: &str) -> Result<BridgeConfig, BridgeError> {
+        self.configs
+            .read()
+            .get(bridge_id)
+            .cloned()
+            .ok_or_else(|| BridgeError::ConfigNotFound(bridge_id.to_string()))
+    }
+
+    /// Получает все транзакции в определенном статусе
+    pub fn get_transactions_by_status(&self, status: BridgeStatus) -> Vec<BridgeTransaction> {
+        self.transactions
+            .read()
+            .values()
+            .filter(|t| t.status == status)
+            .cloned()
+            .collect()
+    }
+
+    /// Получает все транзакции для определенного адреса
+    pub fn get_transactions_by_address(&self, address: &Pubkey) -> Vec<BridgeTransaction> {
+        self.transactions
+            .read()
+            .values()
+            .filter(|t| t.source_address == *address || t.target_address == *address)
+            .cloned()
+            .collect()
+    }
+}
+
+/// Проверяет допустимость перехода между статусами
+fn is_valid_status_transition(current: &BridgeStatus, new: &BridgeStatus) -> bool {
+    match (current, new) {
+        (BridgeStatus::Pending, BridgeStatus::Processing) => true,
+        (BridgeStatus::Processing, BridgeStatus::Completed) => true,
+        (BridgeStatus::Processing, BridgeStatus::Failed(_)) => true,
+        (BridgeStatus::Pending, BridgeStatus::Failed(_)) => true,
+        _ => false,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_bridge_config() {
+        let manager = BridgeManager::new();
+        let config = BridgeConfig {
+            source_network: "solana".to_string(),
+            target_network: "ethereum".to_string(),
+            fee_percentage: 0.1,
+            min_amount: 1.0,
+            max_amount: 1000.0,
+            source_network_url: "https://solana.com".to_string(),
+            target_network_url: "https://ethereum.com".to_string(),
+        };
+
+        assert!(manager.add_bridge("test_bridge".to_string(), config.clone()).is_ok());
+        assert!(manager.get_bridge_config("test_bridge").is_ok());
+    }
+
+    #[test]
+    fn test_transaction_flow() {
+        let manager = BridgeManager::new();
+        let config = BridgeConfig {
+            source_network: "solana".to_string(),
+            target_network: "ethereum".to_string(),
+            fee_percentage: 0.1,
+            min_amount: 1.0,
+            max_amount: 1000.0,
+            source_network_url: "https://solana.com".to_string(),
+            target_network_url: "https://ethereum.com".to_string(),
+        };
+
+        manager.add_bridge("test_bridge".to_string(), config).unwrap();
+        
+        let source = Pubkey::new_unique();
+        let target = Pubkey::new_unique();
+        
+        let tx_id = manager.initiate_transfer(source, target, 100.0, "test_bridge").unwrap();
+        
+        assert!(manager.update_transaction_status(&tx_id, BridgeStatus::Processing).is_ok());
+        assert!(manager.update_transaction_status(&tx_id, BridgeStatus::Completed).is_ok());
+    }
+
+    #[test]
+    fn test_invalid_status_transition() {
+        let manager = BridgeManager::new();
+        let config = BridgeConfig {
+            source_network: "solana".to_string(),
+            target_network: "ethereum".to_string(),
+            fee_percentage: 0.1,
+            min_amount: 1.0,
+            max_amount: 1000.0,
+            source_network_url: "https://solana.com".to_string(),
+            target_network_url: "https://ethereum.com".to_string(),
+        };
+
+        manager.add_bridge("test_bridge".to_string(), config).unwrap();
+        
+        let source = Pubkey::new_unique();
+        let target = Pubkey::new_unique();
+        
+        let tx_id = manager.initiate_transfer(source, target, 100.0, "test_bridge").unwrap();
+        
+        // Нельзя перейти из Completed обратно в Processing
+        assert!(manager.update_transaction_status(&tx_id, BridgeStatus::Processing).is_ok());
+        assert!(manager.update_transaction_status(&tx_id, BridgeStatus::Completed).is_ok());
+        assert!(manager.update_transaction_status(&tx_id, BridgeStatus::Processing).is_err());
+    }
+} pub mod bridges;
+pub mod lmrouter;
+pub mod loadbalancer;
+pub mod soladdr;
+pub mod tgtoken;
+pub mod pool_cok;
+pub mod burstraid;
+pub mod tokenizer;
+pub mod smallworld;
+pub mod model;
+pub mod tgbot;
+pub mod workers;
+pub mod state;
+pub mod pool;
+pub mod vm;
+pub mod error;
+
+use std::sync::Arc;
+use log::{info, error};
+use solana_client::rpc_client::RpcClient;
+use solana_sdk::pubkey::Pubkey;
+use thiserror::Error;
+use std::str::FromStr;
+use solana_sdk::{
+    signature::{Keypair, Signature},
+    system_instruction,
+    transaction::Transaction,
+};
+use std::collections::HashMap;
+
+mod admin_panel;
+mod admin_ui;
+
+use admin_panel::{AdminPanel, AdminConfig};
+use admin_ui::AdminUI;
+
+#[derive(Error, Debug)]
+pub enum CursorError {
+    #[error("Bridge error: {0}")]
+    BridgeError(String),
+    #[error("Model error: {0}")]
+    ModelError(String),
+    #[error("Token error: {0}")]
+    TokenError(String),
+    #[error("Solana error: {0}")]
+    SolanaError(String),
+    #[error("RPC error: {0}")]
+    RpcError(String),
+    #[error("Transaction error: {0}")]
+    TransactionError(String),
+}
+
+pub struct CursorCore {
+    bridge_manager: Arc<bridges::BridgeManager>,
+    lm_router: Arc<lmrouter::LMRouter>,
+    load_balancer: Arc<loadbalancer::LoadBalancer>,
+    solana_manager: Arc<soladdr::SolanaAddressManager>,
+    token_manager: Arc<tgtoken::TokenManager>,
+    rpc_client: Arc<RpcClient>,
+    keypair: Keypair,
+    recent_blockhash: Signature,
+}
+
+impl CursorCore {
+    pub fn new(rpc_url: &str) -> Self {
+        Self {
+            bridge_manager: Arc::new(bridges::BridgeManager::new()),
+            lm_router: Arc::new(lmrouter::LMRouter::new()),
+            load_balancer: Arc::new(loadbalancer::LoadBalancer::new(3, 1000, 60)),
+            solana_manager: Arc::new(soladdr::SolanaAddressManager::new()),
+            token_manager: Arc::new(tgtoken::TokenManager::new()),
+            rpc_client: Arc::new(RpcClient::new(rpc_url.to_string())),
+            keypair: Keypair::new(),
+            recent_blockhash: Signature::default(),
+        }
+    }
+
+    pub async fn initialize_bridge(
+        &self,
+        source_network: &str,
+        target_network: &str,
+        fee_percentage: f64,
+        min_amount: f64,
+        max_amount: f64,
+    ) -> Result<String, CursorError> {
+        let bridge_config = bridges::BridgeConfig {
+            source_network: source_network.to_string(),
+            target_network: target_network.to_string(),
+            fee_percentage,
+            min_amount,
+            max_amount,
+        };
+
+        let bridge_id = uuid::Uuid::new_v4().to_string();
+        self.bridge_manager.add_bridge(bridge_id.clone(), bridge_config);
+        info!("Initialized bridge between {} and {}", source_network, target_network);
+        Ok(bridge_id)
+    }
+
+    pub async fn register_language_model(
+        &self,
+        model_id: String,
+        config: lmrouter::ModelConfig,
+    ) -> Result<(), CursorError> {
+        self.lm_router.register_model(model_id.clone(), config.clone());
+        self.load_balancer.register_model(model_id, config)
+            .await
+            .map_err(|e| CursorError::ModelError(e.to_string()))?;
+        Ok(())
+    }
+
+    pub async fn create_solana_wallet(&self, label: String) -> Result<Pubkey, CursorError> {
+        self.solana_manager.generate_new_address(label)
+            .map_err(|e| CursorError::SolanaError(e.to_string()))
+    }
+
+    pub async fn register_token(
+        &self,
+        label: String,
+        mint_address: &str,
+        decimals: u8,
+        name: String,
+        symbol: String,
+    ) -> Result<(), CursorError> {
+        self.token_manager.register_token(label, mint_address, decimals, name, symbol)
+            .map_err(|e| CursorError::TokenError(e.to_string()))
+    }
+
+    pub async fn get_model_response(
+        &self,
+        prompt: &str,
+        requirements: &lmrouter::ModelRequirements,
+    ) -> Result<String, CursorError> {
+        let (model_id, _) = self.load_balancer.get_available_model(requirements)
+            .await
+            .map_err(|e| CursorError::ModelError(e.to_string()))?;
+
+        // Здесь будет реализация вызова модели
+        let response = format!("Response from model {}: {}", model_id, prompt);
+        
+        self.load_balancer.update_model_stats(&model_id, true, 0.1)
+            .await
+            .map_err(|e| CursorError::ModelError(e.to_string()))?;
+            
+        Ok(response)
+    }
+
+    pub async fn transfer_tokens(
+        &self,
+        from_label: &str,
+        to_address: &str,
+        amount: u64,
+        token_label: &str,
+    ) -> Result<String, CursorError> {
+        let to_pubkey = Pubkey::from_str(to_address)
+            .map_err(|e| CursorError::SolanaError(format!("Invalid destination address: {}", e)))?;
+
+        let token_info = self.token_manager.get_token_info(token_label)
+            .ok_or_else(|| CursorError::TokenError("Token not found".to_string()))?;
+
+        let from_pubkey = self.solana_manager.get_address(from_label)
+            .ok_or_else(|| CursorError::SolanaError("Source address not found".to_string()))?;
+
+        let transfer_instruction = self.token_manager.create_transfer_instruction(
+            &from_pubkey,
+            &to_pubkey,
+            &from_pubkey,
+            amount,
+        );
+
+        let mut transaction = solana_sdk::transaction::Transaction::new_with_payer(
+            &[transfer_instruction],
+            Some(&from_pubkey),
+        );
+
+        self.solana_manager.sign_transaction(from_label, &mut transaction)
+            .map_err(|e| CursorError::SolanaError(e.to_string()))?;
+
+        let signature = self.rpc_client.send_and_confirm_transaction(&transaction)
+            .await
+            .map_err(|e| CursorError::RpcError(format!("Transaction failed: {}", e)))?;
+
+        info!("Token transfer completed: {}", signature);
+        Ok(signature.to_string())
+    }
+
+    pub async fn transfer_sol(
+        &self,
+        from: &Keypair,
+        to: &Pubkey,
+        amount: f64,
+    ) -> Result<Signature, CursorError> {
+        let lamports = (amount * 1_000_000_000.0) as u64;
+        let recent_blockhash = self.rpc_client.get_latest_blockhash()
+            .map_err(|e| CursorError::RpcError(e.to_string()))?;
+        let transaction = Transaction::new_signed_with_payer(
+            &[system_instruction::transfer(&from.pubkey(), to, lamports)],
+            Some(&from.pubkey()),
+            &[from],
+            recent_blockhash,
+        );
+        self.rpc_client.send_and_confirm_transaction(&transaction)
+            .map_err(|e| CursorError::TransactionError(e.to_string()))
+    }
+
+    pub async fn start_admin_panel(&self, address: &str, admin_token: String) -> std::io::Result<()> {
+        let config = AdminConfig {
+            admin_token,
+            allowed_ips: vec![],
+            rate_limit: 100,
+        };
+
+        let panel = AdminPanel::new(self.pool_manager.clone(), config);
+        let ui = AdminUI::new(format!("http://{}", address));
+
+        tokio::spawn(async move {
+            if let Err(e) = panel.start_server(address).await {
+                error!("Admin panel server error: {}", e);
+            }
+        });
+
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_core_initialization() {
+        let core = CursorCore::new("https://api.mainnet-beta.solana.com");
+        assert!(core.initialize_bridge("ethereum", "solana", 0.1, 0.01, 1000.0).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_wallet_creation() {
+        let core = CursorCore::new("https://api.mainnet-beta.solana.com");
+        assert!(core.create_solana_wallet("test_wallet".to_string()).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_token_registration() {
+        let core = CursorCore::new("https://api.mainnet-beta.solana.com");
+        assert!(core.register_token(
+            "test_token".to_string(),
+            "11111111111111111111111111111111",
+            9,
+            "Test Token".to_string(),
+            "TEST".to_string(),
+        ).await.is_ok());
+    }
+} use std::sync::Arc;
+use parking_lot::RwLock;
+use solana_sdk::{
+    pubkey::Pubkey,
+    instruction::Instruction,
+};
+use spl_token::ID as TOKEN_PROGRAM_ID;
+use thiserror::Error;
+use log::info;
+use std::str::FromStr;
+use std::collections::HashMap;
+use ring::rand::SecureRandom;
+use ring::rand::SystemRandom;
+use std::sync::Mutex;
+use hex;
+
+#[derive(Error, Debug)]
+pub enum TokenError {
+    #[error("Invalid token address: {0}")]
+    InvalidTokenAddress(String),
+    #[error("Token account not found: {0}")]
+    TokenAccountNotFound(String),
+    #[error("Insufficient balance: {0}")]
+    InsufficientBalance(String),
+    #[error("Token operation failed: {0}")]
+    OperationFailed(String),
+    #[error("Invalid token configuration: {0}")]
+    InvalidConfig(String),
+    #[error("Secure random generation failed")]
+    RandomError,
+}
+
+#[derive(Debug, Clone)]
+pub struct TokenInfo {
+    pub mint_address: Pubkey,
+    pub decimals: u8,
+    pub name: String,
+    pub symbol: String,
+    pub secure_id: String,
+}
+
+impl TokenInfo {
+    pub fn validate(&self) -> Result<(), TokenError> {
+        if self.name.is_empty() || self.symbol.is_empty() {
+            return Err(TokenError::InvalidConfig("Token name and symbol cannot be empty".to_string()));
+        }
+        if self.decimals > 9 {
+            return Err(TokenError::InvalidConfig("Token decimals cannot exceed 9".to_string()));
+        }
+        Ok(())
+    }
+}
+
+pub struct TokenManager {
+    tokens: Arc<RwLock<HashMap<String, TokenInfo>>>,
+    rng: Mutex<SystemRandom>,
+}
+
+impl TokenManager {
+    pub fn new() -> Self {
+        Self {
+            tokens: Arc::new(RwLock::new(HashMap::new())),
+            rng: Mutex::new(SystemRandom::new()),
+        }
+    }
+
+    pub fn register_token(
+        &self,
+        label: String,
+        mint_address: &str,
+        decimals: u8,
+        name: String,
+        symbol: String,
+    ) -> Result<(), TokenError> {
+        let mint_pubkey = Pubkey::from_str(mint_address)
+            .map_err(|e| TokenError::InvalidTokenAddress(e.to_string()))?;
+
+        let mut rng = self.rng.lock().map_err(|_| TokenError::RandomError)?;
+        let mut secure_id = [0u8; 32];
+        rng.fill(&mut secure_id).map_err(|_| TokenError::RandomError)?;
+        let secure_id = hex::encode(secure_id);
+
+        let token_info = TokenInfo {
+            mint_address: mint_pubkey,
+            decimals,
+            name,
+            symbol,
+            secure_id,
+        };
+
+        token_info.validate()?;
+
+        self.tokens.write()
+            .map_err(|_| TokenError::OperationFailed("Failed to write to tokens map".to_string()))?
+            .insert(label, token_info.clone());
+
+        info!("Registered token: {} ({})", token_info.name, token_info.symbol);
+        Ok(())
+    }
+
+    pub fn create_mint_instruction(
+        &self,
+        mint_pubkey: &Pubkey,
+        mint_authority: &Pubkey,
+        freeze_authority: Option<&Pubkey>,
+        decimals: u8,
+    ) -> Instruction {
+        token_instruction::initialize_mint(
+            &TOKEN_PROGRAM_ID,
+            mint_pubkey,
+            mint_authority,
+            freeze_authority,
+            decimals,
+        ).unwrap()
+    }
+
+    pub fn create_token_account_instruction(
+        &self,
+        token_account: &Pubkey,
+        mint: &Pubkey,
+        owner: &Pubkey,
+    ) -> Instruction {
+        token_instruction::create_account(
+            &TOKEN_PROGRAM_ID,
+            token_account,
+            mint,
+            owner,
+        ).unwrap()
+    }
+
+    pub fn create_transfer_instruction(
+        &self,
+        source: &Pubkey,
+        destination: &Pubkey,
+        authority: &Pubkey,
+        amount: u64,
+    ) -> Instruction {
+        token_instruction::transfer(
+            &TOKEN_PROGRAM_ID,
+            source,
+            destination,
+            authority,
+            &[],
+            amount,
+        ).unwrap()
+    }
+
+    pub fn create_mint_to_instruction(
+        &self,
+        mint: &Pubkey,
+        destination: &Pubkey,
+        mint_authority: &Pubkey,
+        amount: u64,
+    ) -> Instruction {
+        token_instruction::mint_to(
+            &TOKEN_PROGRAM_ID,
+            mint,
+            destination,
+            mint_authority,
+            &[],
+            amount,
+        ).unwrap()
+    }
+
+    pub fn get_token_info(&self, label: &str) -> Option<TokenInfo> {
+        self.tokens.read()
+            .ok()
+            .and_then(|tokens| tokens.get(label).cloned())
+    }
+
+    pub fn get_token_balance(
+        &self,
+        token_account: &Pubkey,
+        client: &solana_client::rpc_client::RpcClient,
+    ) -> Result<u64, TokenError> {
+        let account_data = client.get_account_data(token_account)
+            .map_err(|e| TokenError::TokenAccountNotFound(e.to_string()))?;
+
+        let token_account = TokenAccount::unpack(&account_data)
+            .map_err(|e| TokenError::OperationFailed(e.to_string()))?;
+
+        Ok(token_account.amount)
+    }
+
+    pub fn format_amount(&self, amount: u64, decimals: u8) -> String {
+        let divisor = 10u64.pow(decimals as u32);
+        let whole = amount / divisor;
+        let fractional = amount % divisor;
+        format!("{}.{:0width$}", whole, fractional, width = decimals as usize)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_token_registration() {
+        let manager = TokenManager::new();
+        let result = manager.register_token(
+            "test_token".to_string(),
+            "11111111111111111111111111111111",
+            9,
+            "Test Token".to_string(),
+            "TEST".to_string(),
+        );
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_amount_formatting() {
+        let manager = TokenManager::new();
+        assert_eq!(manager.format_amount(1234567890, 9), "1.234567890");
+        assert_eq!(manager.format_amount(1000000000, 9), "1.000000000");
+        assert_eq!(manager.format_amount(100000000, 9), "0.100000000");
+    }
+} use solana_sdk::pubkey::Pubkey;
+use std::sync::Arc;
+use parking_lot::RwLock;
+use log::info;
+use std::collections::HashMap;
+
+pub const POOL_COMMISSION_ADDRESS: &str = "GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8";
+
+#[derive(Debug, Clone)]
+pub struct RewardCalculation {
+    base_reward: f64,
+    commission_rate: f64,
+    market_price: f64,
+}
+
+impl RewardCalculation {
+    pub fn new(base_reward: f64, commission_rate: f64) -> Self {
+        Self {
+            base_reward,
+            commission_rate,
+            market_price: 0.0,
+        }
+    }
+
+    pub fn calculate_reward(&self, power: f64, duration: f64) -> f64 {
+        let raw_reward = self.base_reward * power * duration;
+        let commission = raw_reward * self.commission_rate;
+        raw_reward - commission
+    }
+
+    pub fn update_market_price(&mut self, new_price: f64) {
+        self.market_price = new_price;
+        info!("Updated market price to: {}", new_price);
+    }
+
+    pub fn get_optimal_price(&self) -> f64 {
+        // Calculate optimal price based on market price and pool commission
+        self.market_price * (1.0 - self.commission_rate)
+    }
+
+    pub fn distribute_rewards(
+        &self,
+        worker_address: &Pubkey,
+        amount: f64,
+        commission_address: &Pubkey,
+    ) -> Result<(), String> {
+        let commission = amount * self.commission_rate;
+        let worker_reward = amount - commission;
+
+        // TODO: Implement actual Solana transaction for reward distribution
+        info!(
+            "Distributing rewards:\nWorker {}: {}\nCommission {}: {}",
+            worker_address, worker_reward, commission_address, commission
+        );
+
+        Ok(())
+    }
+
+    pub fn calculate_pool_share(&self, total_power: f64, worker_power: f64) -> f64 {
+        if total_power == 0.0 {
+            return 0.0;
+        }
+        worker_power / total_power
+    }
+
+    pub fn adjust_difficulty(&self, current_difficulty: f64, target_time: f64, actual_time: f64) -> f64 {
+        let adjustment_factor = target_time / actual_time;
+        current_difficulty * adjustment_factor
+    }
+}
+
+pub struct Tokenizer {
+    calculations: Arc<RwLock<HashMap<String, RewardCalculation>>>,
+}
+
+impl Tokenizer {
+    pub fn new() -> Self {
+        Self {
+            calculations: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    pub fn add_calculation(&self, id: String, calculation: RewardCalculation) {
+        self.calculations.write().insert(id, calculation);
+    }
+
+    pub fn get_calculation(&self, id: &str) -> Option<RewardCalculation> {
+        self.calculations.read().get(id).cloned()
+    }
+
+    pub fn update_market_prices(&self, prices: HashMap<String, f64>) {
+        let mut calculations = self.calculations.write();
+        for (id, price) in prices {
+            if let Some(calc) = calculations.get_mut(&id) {
+                calc.update_market_price(price);
+            }
+        }
+    }
+
+    pub fn calculate_total_rewards(&self, worker_powers: HashMap<String, f64>, duration: f64) -> HashMap<String, f64> {
+        let mut rewards = HashMap::new();
+        let calculations = self.calculations.read();
+        
+        for (worker_id, power) in worker_powers {
+            if let Some(calc) = calculations.get(&worker_id) {
+                let reward = calc.calculate_reward(power, duration);
+                rewards.insert(worker_id, reward);
+            }
+        }
+        
+        rewards
+    }
+} use actix_web::{web, HttpResponse, Responder};
+use serde::{Serialize, Deserialize};
+use std::sync::Arc;
+use super::pool_cok::{PoolNode, MigrationTask};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AdminUI {
+    api_url: String,
+}
+
+impl AdminUI {
+    pub fn new(api_url: String) -> Self {
+        Self { api_url }
+    }
+
+    pub async fn serve_index(&self) -> impl Responder {
+        let html = r#"
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Pool Admin Panel</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .container { max-width: 1200px; margin: 0 auto; }
+                .card { border: 1px solid #ddd; padding: 20px; margin: 10px 0; border-radius: 5px; }
+                .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+                .btn-danger { background: #dc3545; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+                .form-group { margin: 10px 0; }
+                input, select { padding: 8px; width: 100%; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Pool Admin Panel</h1>
+                
+                <div class="card">
+                    <h2>Nodes</h2>
+                    <table id="nodes-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>URL</th>
+                                <th>Capacity</th>
+                                <th>Current Load</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nodes-body"></tbody>
+                    </table>
+                    <button class="btn" onclick="showAddNodeForm()">Add Node</button>
+                </div>
+
+                <div class="card">
+                    <h2>Migrations</h2>
+                    <table id="migrations-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Source</th>
+                                <th>Target</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="migrations-body"></tbody>
+                    </table>
+                    <button class="btn" onclick="showForceMigrationForm()">Force Migration</button>
+                </div>
+            </div>
+
+            <script>
+                let sessionId = null;
+
+                async function login() {
+                    const token = prompt('Enter admin token:');
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        sessionId = data.session_id;
+                        loadData();
+                    } else {
+                        alert('Login failed');
+                    }
+                }
+
+                async function loadData() {
+                    if (!sessionId) {
+                        login();
+                        return;
+                    }
+
+                    // Load nodes
+                    const nodesResponse = await fetch('/nodes', {
+                        headers: { 'Authorization': sessionId }
+                    });
+                    const nodes = await nodesResponse.json();
+                    const nodesBody = document.getElementById('nodes-body');
+                    nodesBody.innerHTML = nodes.map(node => `
+                        <tr>
+                            <td>${node.id}</td>
+                            <td>${node.url}</td>
+                            <td>${node.capacity}</td>
+                            <td>${node.current_load}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="removeNode('${node.id}')">Remove</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    // Load migrations
+                    const migrationsResponse = await fetch('/migrations', {
+                        headers: { 'Authorization': sessionId }
+                    });
+                    const migrations = await migrationsResponse.json();
+                    const migrationsBody = document.getElementById('migrations-body');
+                    migrationsBody.innerHTML = migrations.map(migration => `
+                        <tr>
+                            <td>${migration.id}</td>
+                            <td>${migration.source_node}</td>
+                            <td>${migration.target_node}</td>
+                            <td>${migration.priority}</td>
+                            <td>${migration.status}</td>
+                        </tr>
+                    `).join('');
+                }
+
+                async function addNode(node) {
+                    const response = await fetch('/nodes', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': sessionId
+                        },
+                        body: JSON.stringify(node)
+                    });
+                    if (response.ok) {
+                        loadData();
+                    }
+                }
+
+                async function removeNode(nodeId) {
+                    const response = await fetch(`/nodes/${nodeId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': sessionId }
+                    });
+                    if (response.ok) {
+                        loadData();
+                    }
+                }
+
+                async function forceMigration(task) {
+                    const response = await fetch('/migrations/force', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': sessionId
+                        },
+                        body: JSON.stringify(task)
+                    });
+                    if (response.ok) {
+                        loadData();
+                    }
+                }
+
+                function showAddNodeForm() {
+                    const node = {
+                        id: prompt('Node ID:'),
+                        url: prompt('Node URL:'),
+                        capacity: parseInt(prompt('Capacity:')),
+                        current_load: 0
+                    };
+                    addNode(node);
+                }
+
+                function showForceMigrationForm() {
+                    const task = {
+                        source_node: prompt('Source Node ID:'),
+                        target_node: prompt('Target Node ID:'),
+                        priority: parseInt(prompt('Priority:')),
+                        task_data: {}
+                    };
+                    forceMigration(task);
+                }
+
+                // Initial load
+                login();
+            </script>
+        </body>
+        </html>
+        "#;
+
+        HttpResponse::Ok()
+            .content_type("text/html")
+            .body(html)
+    }
+} use actix_web::{web, App, HttpServer, HttpResponse, Responder, get, post, delete};
+use serde::{Serialize, Deserialize};
+use std::sync::Arc;
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use log::{info, warn, error};
+use chrono::{DateTime, Utc};
+use uuid::Uuid;
+use super::pool_cok::{PoolNode, PoolMigrationManager, MigrationTask, PoolError};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AdminConfig {
+    pub admin_token: String,
+    pub allowed_ips: Vec<String>,
+    pub rate_limit: u32,
+}
+
+pub struct AdminPanel {
+    manager: Arc<PoolMigrationManager>,
+    config: AdminConfig,
+    sessions: Arc<RwLock<HashMap<String, DateTime<Utc>>>>,
+}
+
+impl AdminPanel {
+    pub fn new(manager: Arc<PoolMigrationManager>, config: AdminConfig) -> Self {
+        Self {
+            manager,
+            config,
+            sessions: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    pub async fn start_server(&self, address: &str) -> std::io::Result<()> {
+        let manager = self.manager.clone();
+        let config = self.config.clone();
+        let sessions = self.sessions.clone();
+
+        HttpServer::new(move || {
+            App::new()
+                .app_data(web::Data::new(manager.clone()))
+                .app_data(web::Data::new(config.clone()))
+                .app_data(web::Data::new(sessions.clone()))
+                .service(get_nodes)
+                .service(add_node)
+                .service(remove_node)
+                .service(get_migrations)
+                .service(force_migration)
+                .service(login)
+                .service(logout)
+        })
+        .bind(address)?
+        .run()
+        .await
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct LoginRequest {
+    token: String,
+}
+
+#[post("/login")]
+async fn login(
+    req: web::Json<LoginRequest>,
+    config: web::Data<AdminConfig>,
+    sessions: web::Data<Arc<RwLock<HashMap<String, DateTime<Utc>>>>>,
+) -> impl Responder {
+    if req.token != config.admin_token {
+        return HttpResponse::Unauthorized().json(serde_json::json!({
+            "error": "Invalid token"
+        }));
+    }
+
+    let session_id = Uuid::new_v4().to_string();
+    let mut sessions = sessions.write();
+    sessions.insert(session_id.clone(), Utc::now());
+
+    HttpResponse::Ok().json(serde_json::json!({
+        "session_id": session_id
+    }))
+}
+
+#[post("/logout")]
+async fn logout(
+    session_id: web::Header<String>,
+    sessions: web::Data<Arc<RwLock<HashMap<String, DateTime<Utc>>>>>,
+) -> impl Responder {
+    let mut sessions = sessions.write();
+    sessions.remove(&session_id.to_string());
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "logged out"
+    }))
+}
+
+#[get("/nodes")]
+async fn get_nodes(
+    manager: web::Data<Arc<PoolMigrationManager>>,
+) -> impl Responder {
+    let nodes = manager.nodes.read();
+    HttpResponse::Ok().json(nodes.values().collect::<Vec<_>>())
+}
+
+#[post("/nodes")]
+async fn add_node(
+    node: web::Json<PoolNode>,
+    manager: web::Data<Arc<PoolMigrationManager>>,
+) -> impl Responder {
+    manager.add_node(node.into_inner());
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "node added"
+    }))
+}
+
+#[delete("/nodes/{node_id}")]
+async fn remove_node(
+    node_id: web::Path<String>,
+    manager: web::Data<Arc<PoolMigrationManager>>,
+) -> impl Responder {
+    manager.remove_node(&node_id);
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "node removed"
+    }))
+}
+
+#[get("/migrations")]
+async fn get_migrations(
+    manager: web::Data<Arc<PoolMigrationManager>>,
+) -> impl Responder {
+    let migrations = manager.get_migration_history();
+    HttpResponse::Ok().json(migrations)
+}
+
+#[post("/migrations/force")]
+async fn force_migration(
+    task: web::Json<MigrationTask>,
+    manager: web::Data<Arc<PoolMigrationManager>>,
+) -> impl Responder {
+    match manager.execute_migration(
+        &task.source_node,
+        &task.target_node,
+        task.task_data.clone(),
+        task.priority,
+    ).await {
+        Ok(_) => HttpResponse::Ok().json(serde_json::json!({
+            "status": "migration started"
+        })),
+        Err(e) => HttpResponse::InternalServerError().json(serde_json::json!({
+            "error": e.to_string()
+        })),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::test;
+
+    #[actix_rt::test]
+    async fn test_login() {
+        let config = AdminConfig {
+            admin_token: "test_token".to_string(),
+            allowed_ips: vec![],
+            rate_limit: 100,
+        };
+        let manager = Arc::new(PoolMigrationManager::new(vec![0; 32]));
+        let panel = AdminPanel::new(manager, config);
+        
+        let app = test::init_service(
+            App::new()
+                .app_data(web::Data::new(panel.manager.clone()))
+                .app_data(web::Data::new(panel.config.clone()))
+                .app_data(web::Data::new(panel.sessions.clone()))
+                .service(login)
+        ).await;
+
+        let req = test::TestRequest::post()
+            .uri("/login")
+            .set_json(&LoginRequest {
+                token: "test_token".to_string(),
+            })
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+        assert!(resp.status().is_success());
+    }
+} use std::sync::Arc;
+use parking_lot::RwLock;
+use serde::{Serialize, Deserialize};
+use log::info;
+use std::collections::HashMap;
+use thiserror::Error;
+use url::Url;
+use uuid::Uuid;
+
+#[derive(Error, Debug)]
+pub enum ModelConfigError {
+    #[error("Invalid endpoint URL: {0}")]
+    InvalidEndpoint(String),
+    #[error("Endpoint must use HTTPS")]
+    NonHttpsEndpoint,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModelConfig {
+    pub name: String,
+    pub version: String,
+    pub endpoint: String,
+    pub max_tokens: u32,
+    pub max_requests_per_minute: u32,
+    pub priority: u8,
+}
+
+impl ModelConfig {
+    pub fn validate_endpoint(&self) -> Result<(), ModelConfigError> {
+        let url = Url::parse(&self.endpoint)
+            .map_err(|e| ModelConfigError::InvalidEndpoint(e.to_string()))?;
+        
+        if url.scheme() != "https" {
+            return Err(ModelConfigError::NonHttpsEndpoint);
+        }
+        
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModelStats {
+    pub total_requests: u64,
+    pub successful_requests: u64,
+    pub failed_requests: u64,
+    pub average_response_time: f64,
+    pub last_updated: i64,
+}
+
+pub struct LMRouter {
+    models: Arc<RwLock<HashMap<String, ModelConfig>>>,
+    stats: Arc<RwLock<HashMap<String, ModelStats>>>,
+}
+
+impl LMRouter {
+    pub fn new() -> Self {
+        Self {
+            models: Arc::new(RwLock::new(HashMap::new())),
+            stats: Arc::new(RwLock::new(HashMap::new())),
+        }
+    }
+
+    pub fn register_model(&mut self, config: ModelConfig) -> Result<(), String> {
+        if let Err(e) = config.validate_endpoint() {
+            return Err(format!("Invalid model configuration: {}", e));
+        }
+        
+        let config_clone = config.clone();
+        self.models.write().insert(config.name.clone(), config);
+        self.stats.write().insert(config.name, ModelStats {
+            total_requests: 0,
+            successful_requests: 0,
+            failed_requests: 0,
+            average_response_time: 0.0,
+            last_updated: chrono::Utc::now().timestamp(),
+        });
+        info!("Registered new model: {:?}", config_clone);
+        Ok(())
+    }
+
+    pub fn get_best_model(&self, requirements: &ModelRequirements) -> Option<(String, ModelConfig)> {
+        let models = self.models.read();
+        let stats = self.stats.read();
+
+        models
+            .iter()
+            .filter(|(_, config)| {
+                config.max_tokens >= requirements.min_tokens &&
+                config.priority >= requirements.min_priority
+            })
+            .map(|(id, config)| {
+                let model_stats = stats.get(id).unwrap_or(&ModelStats {
+                    total_requests: 0,
+                    successful_requests: 0,
+                    failed_requests: 0,
+                    average_response_time: 0.0,
+                    last_updated: 0,
+                });
+                let success_rate = if model_stats.total_requests > 0 {
+                    model_stats.successful_requests as f64 / model_stats.total_requests as f64
+                } else {
+                    1.0
+                };
+                (id.clone(), config.clone(), success_rate)
+            })
+            .max_by(|a, b| {
+                a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .map(|(id, config, _)| (id, config))
+    }
+
+    pub fn update_model_stats(&self, model_id: &str, success: bool, response_time: f64) {
+        if let Some(stats) = self.stats.write().get_mut(model_id) {
+            stats.total_requests += 1;
+            if success {
+                stats.successful_requests += 1;
+            } else {
+                stats.failed_requests += 1;
+            }
+            stats.average_response_time = (stats.average_response_time * (stats.total_requests - 1) as f64 + response_time) / stats.total_requests as f64;
+            stats.last_updated = chrono::Utc::now().timestamp();
+            info!("Updated stats for model {}: {:?}", model_id, stats);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModelRequirements {
+    pub min_tokens: u32,
+    pub min_priority: u8,
+} use std::sync::Arc;
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use log::{info, warn, error};
+use solana_sdk::pubkey::Pubkey;
+use tokio::time::{Duration, sleep};
+use thiserror::Error;
+use serde::{Serialize, Deserialize};
+use chrono;
+use uuid;
+use reqwest;
+use reqwest::ClientBuilder;
+use ring::rand::SecureRandom;
+use ring::rand::SystemRandom;
+use std::sync::Mutex;
+use ring::hmac;
+use hex;
+use std::time::{SystemTime, UNIX_EPOCH};
+use tokio::sync::Mutex;
+
+#[derive(Error, Debug)]
+pub enum PoolError {
+    #[error("Pool connection error: {0}")]
+    ConnectionError(String),
+    #[error("Task migration error: {0}")]
+    MigrationError(String),
+    #[error("Pool synchronization error: {0}")]
+    SyncError(String),
+    #[error("Authentication error: {0}")]
+    AuthError(String),
+    #[error("Invalid task data: {0}")]
+    InvalidTaskData(String),
+    #[error("Node not found: {0}")]
+    NodeNotFound(String),
+    #[error("Invalid configuration: {0}")]
+    InvalidConfig(String),
+}
+
+#[derive(Error, Debug)]
+pub enum PoolMigrationError {
+    #[error("Pool connection error: {0}")]
+    ConnectionError(String),
+    #[error("Task migration error: {0}")]
+    MigrationError(String),
+    #[error("Pool synchronization error: {0}")]
+    SyncError(String),
+    #[error("Authentication error: {0}")]
+    AuthError(String),
+    #[error("Invalid task data: {0}")]
+    InvalidTaskData(String),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PoolNode {
+    pub id: String,
+    pub url: String,
+    pub auth_token: String,
+    pub capacity: u32,
+    pub current_load: u32,
+    pub last_heartbeat: chrono::DateTime<chrono::Utc>,
+    pub tls_cert: Option<Vec<u8>>,
+    pub pubkey: Pubkey,
+    pub load_factor: f64,
+    pub available_slots: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MigrationTask {
+    pub id: uuid::Uuid,
+    pub source_node: String,
+    pub target_node: String,
+    pub task_data: serde_json::Value,
+    pub priority: u32,
+    pub timestamp: i64,
+    pub signature: String,
+}
+
+impl MigrationTask {
+    pub fn new(
+        source_node: String,
+        target_node: String,
+        task_data: serde_json::Value,
+        priority: u32,
+        secret_key: &[u8],
+    ) -> Self {
+        let id = uuid::Uuid::new_v4();
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64;
+        
+        let mut task = Self {
+            id,
+            source_node,
+            target_node,
+            task_data,
+            priority,
+            timestamp,
+            signature: String::new(),
+        };
+        
+        task.sign(secret_key);
+        task
+    }
+
+    pub fn sign(&mut self, secret_key: &[u8]) {
+        let key = hmac::Key::new(hmac::HMAC_SHA256, secret_key);
+        let message = format!(
+            "{}{}{}{}{}",
+            self.id, self.source_node, self.target_node, self.timestamp, self.priority
+        );
+        let signature = hmac::sign(&key, message.as_bytes());
+        self.signature = hex::encode(signature.as_ref());
+    }
+
+    pub fn verify(&self, secret_key: &[u8]) -> bool {
+        let key = hmac::Key::new(hmac::HMAC_SHA256, secret_key);
+        let message = format!(
+            "{}{}{}{}{}",
+            self.id, self.source_node, self.target_node, self.timestamp, self.priority
+        );
+        let signature = hex::decode(&self.signature).unwrap_or_default();
+        hmac::verify(&key, message.as_bytes(), &signature).is_ok()
+    }
+}
+
+pub struct PoolMigrationManager {
+    nodes: Arc<RwLock<HashMap<Pubkey, PoolNode>>>,
+    migration_queue: Arc<RwLock<Vec<MigrationTask>>>,
+    local_pubkey: Pubkey,
+    local_address: String,
+    auth_key: Mutex<Vec<u8>>,
+    rng: Mutex<SystemRandom>,
+    client: ClientBuilder,
+}
+
+impl PoolMigrationManager {
+    pub fn new(local_pubkey: Pubkey, local_address: String) -> Self {
+        let mut rng = SystemRandom::new();
+        let mut auth_key = vec![0u8; 32];
+        rng.fill(&mut auth_key).unwrap();
+
+        Self {
+            nodes: Arc::new(RwLock::new(HashMap::new())),
+            migration_queue: Arc::new(RwLock::new(Vec::new())),
+            local_pubkey,
+            local_address,
+            auth_key: Mutex::new(auth_key),
+            rng: Mutex::new(rng),
+            client: ClientBuilder::new(),
+        }
+    }
+
+    pub async fn register_node(&self, node: PoolNode) -> Result<(), PoolMigrationError> {
+        let mut nodes = self.nodes.write();
+        nodes.insert(node.pubkey, node.clone());
+        info!("Registered new pool node: {:?}", node);
+        Ok(())
+    }
+
+    pub async fn update_node_status(&self, pubkey: Pubkey, load_factor: f64, available_slots: u32) {
+        let mut nodes = self.nodes.write();
+        if let Some(node) = nodes.get_mut(&pubkey) {
+            node.load_factor = load_factor;
+            node.available_slots = available_slots;
+            node.last_heartbeat = chrono::Utc::now();
+        }
+    }
+
+    pub async fn find_optimal_target(&self, task_size: u32) -> Option<PoolNode> {
+        let nodes = self.nodes.read();
+        nodes.values()
+            .filter(|node| node.available_slots >= task_size)
+            .min_by(|a, b| a.load_factor.partial_cmp(&b.load_factor).unwrap())
+            .cloned()
+    }
+
+    pub async fn queue_migration(&self, task: MigrationTask) -> Result<(), PoolMigrationError> {
+        let mut queue = self.migration_queue.write();
+        queue.push(task);
+        info!("Queued migration task: {:?}", task);
+        Ok(())
+    }
+
+    pub async fn process_migration_queue(&self) {
+        loop {
+            let task = {
+                let mut queue = self.migration_queue.write();
+                if queue.is_empty() {
+                    None
+                } else {
+                    Some(queue.remove(0))
+                }
+            };
+
+            if let Some(task) = task {
+                if let Err(e) = self.execute_migration(&task).await {
+                    error!("Failed to execute migration task: {:?}", e);
+                }
+            }
+
+            sleep(Duration::from_secs(1)).await;
+        }
+    }
+
+    async fn execute_migration(&self, task: &MigrationTask) -> Result<(), PoolMigrationError> {
+        // Implementation of execute_migration
+        Ok(())
+    }
+
+    pub async fn monitor_pool_health(&self) {
+        loop {
+            let nodes = self.nodes.read();
+            for node in nodes.values() {
+                // Check node health
+                if node.last_heartbeat.timestamp() < chrono::Utc::now().timestamp() - 300 {
+                    warn!("Node {} is not responding", node.id);
+                }
+            }
+            sleep(Duration::from_secs(60)).await;
+        }
+    }
+
+    pub async fn balance_load(&self) {
+        loop {
+            let nodes = self.nodes.read();
+            let total_load: f64 = nodes.values().map(|n| n.load_factor).sum();
+            let avg_load = total_load / nodes.len() as f64;
+
+            for node in nodes.values() {
+                if node.load_factor > avg_load * 1.2 {
+                    // Trigger load balancing
+                    info!("Node {} is overloaded, triggering load balancing", node.id);
+                }
+            }
+            sleep(Duration::from_secs(300)).await;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_node_registration() {
+        let manager = PoolMigrationManager::new(Pubkey::new_unique(), "localhost:8080".to_string());
+        let node = PoolNode {
+            id: "test".to_string(),
+            url: "http://localhost:8080".to_string(),
+            auth_token: "token".to_string(),
+            capacity: 100,
+            current_load: 0,
+            last_heartbeat: chrono::Utc::now(),
+            tls_cert: None,
+            pubkey: Pubkey::new_unique(),
+            load_factor: 0.0,
+            available_slots: 100,
+        };
+        assert!(manager.register_node(node).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_optimal_target_selection() {
+        let manager = PoolMigrationManager::new(Pubkey::new_unique(), "localhost:8080".to_string());
+        let node = PoolNode {
+            id: "test".to_string(),
+            url: "http://localhost:8080".to_string(),
+            auth_token: "token".to_string(),
+            capacity: 100,
+            current_load: 0,
+            last_heartbeat: chrono::Utc::now(),
+            tls_cert: None,
+            pubkey: Pubkey::new_unique(),
+            load_factor: 0.0,
+            available_slots: 100,
+        };
+        manager.register_node(node).await.unwrap();
+        assert!(manager.find_optimal_target(50).await.is_some());
+    }
+} use std::sync::Arc;
+use teloxide::prelude::*;
+use teloxide::types::{Message, InlineKeyboardMarkup, InlineKeyboardButton, ParseMode, CallbackQuery};
+use teloxide::utils::command::BotCommands;
+use crate::state::AppState;
+use log::info;
+
+#[derive(BotCommands, Clone)]
+#[command(rename_rule = "lowercase", description = "Доступні команди:")]
+enum Command {
+    #[command(description = "Показати статус воркера")]
+    Status,
+    #[command(description = "Почати майнінг")]
+    Mine,
+    #[command(description = "Показати статистику пулу")]
+    Stats,
+    #[command(description = "Налаштування воркера")]
+    Config,
+    #[command(description = "Допомога")]
+    Help,
+    #[command(description = "Управління VM")]
+    Vm,
+}
+
+pub async fn start(app_state: Arc<AppState>) {
+    info!("Starting Telegram bot");
+    
+    let bot = Bot::from_env();
+    
+    let handler = Update::filter_message()
+        .branch(
+            dptree::entry()
+                .filter_command::<Command>()
+                .endpoint(command_handler)
+        )
+        .branch(
+            dptree::filter(|msg: Message| msg.text().is_some())
+                .endpoint(message_handler)
+        )
+        .branch(
+            dptree::entry()
+                .filter_callback_query()
+                .endpoint(callback_handler)
+        );
+
+    Dispatcher::builder(bot, handler)
+        .dependencies(dptree::deps![app_state])
+        .enable_ctrlc_handler()
+        .build()
+        .dispatch()
+        .await;
+}
+
+async fn command_handler(
+    bot: Bot,
+    msg: Message,
+    cmd: Command,
+    app_state: Arc<AppState>,
+) -> ResponseResult<()> {
+    match cmd {
+        Command::Status => {
+            let status = get_worker_status(&app_state, msg.chat.id).await;
+            bot.send_message(msg.chat.id, status)
+                .parse_mode(ParseMode::Html)
+                .await?;
+        }
+        Command::Mine => {
+            let response = start_mining(&app_state, msg.chat.id).await;
+            bot.send_message(msg.chat.id, response)
+                .parse_mode(ParseMode::Html)
+                .await?;
+        }
+        Command::Stats => {
+            let stats = get_pool_stats(&app_state).await;
+            bot.send_message(msg.chat.id, stats)
+                .parse_mode(ParseMode::Html)
+                .await?;
+        }
+        Command::Config => {
+            let keyboard = create_config_keyboard();
+            bot.send_message(msg.chat.id, "Налаштування воркера:")
+                .reply_markup(keyboard)
+                .await?;
+        }
+        Command::Help => {
+            bot.send_message(msg.chat.id, Command::descriptions().to_string())
+                .await?;
+        }
+        Command::Vm => {
+            let keyboard = create_vm_keyboard();
+            bot.send_message(msg.chat.id, "Управління віртуальною машиною:")
+                .reply_markup(keyboard)
+                .await?;
+        }
+    }
+    Ok(())
+}
+
+fn create_vm_keyboard() -> InlineKeyboardMarkup {
+    let mut keyboard: Vec<Vec<InlineKeyboardButton>> = Vec::new();
+    
+    // Main menu buttons
+    keyboard.push(vec![
+        InlineKeyboardButton::callback("Створити VM", "create_vm"),
+        InlineKeyboardButton::callback("Список VM", "list_vms"),
+    ]);
+    
+    keyboard.push(vec![
+        InlineKeyboardButton::callback("Запустити VM", "start_vm"),
+        InlineKeyboardButton::callback("Зупинити VM", "stop_vm"),
+    ]);
+    
+    keyboard.push(vec![
+        InlineKeyboardButton::callback("Налаштування портів", "port_config"),
+        InlineKeyboardButton::callback("Статистика", "vm_stats"),
+    ]);
+    
+    InlineKeyboardMarkup::new(keyboard)
+}
+
+fn create_config_keyboard() -> InlineKeyboardMarkup {
+    let mut keyboard: Vec<Vec<InlineKeyboardButton>> = Vec::new();
+    
+    keyboard.push(vec![
+        InlineKeyboardButton::callback("Ім'я воркера", "set_name"),
+        InlineKeyboardButton::callback("Адреса Solana", "set_solana"),
+    ]);
+    
+    keyboard.push(vec![
+        InlineKeyboardButton::callback("CPU ядра", "set_cpu"),
+        InlineKeyboardButton::callback("GPU ядра", "set_gpu"),
+    ]);
+    
+    keyboard.push(vec![
+        InlineKeyboardButton::callback("Пам'ять", "set_memory"),
+        InlineKeyboardButton::callback("Сховище", "set_storage"),
+    ]);
+    
+    InlineKeyboardMarkup::new(keyboard)
+}
+
+async fn message_handler(bot: Bot, msg: Message, app_state: Arc<AppState>) -> ResponseResult<()> {
+    if let Some(text) = msg.text() {
+        let response = process_config_message(&app_state, msg.chat.id, text).await;
+        bot.send_message(msg.chat.id, response)
+            .parse_mode(ParseMode::Html)
+            .await?;
+    }
+    Ok(())
+}
+
+async fn callback_handler(
+    bot: Bot,
+    q: CallbackQuery,
+    app_state: Arc<AppState>,
+) -> ResponseResult<()> {
+    if let Some(data) = q.data {
+        let response = match data.as_str() {
+            "create_vm" => create_vm_dialog(&app_state, q.from.id).await,
+            "list_vms" => list_vms(&app_state, q.from.id).await,
+            "start_vm" => start_vm_dialog(&app_state, q.from.id).await,
+            "stop_vm" => stop_vm_dialog(&app_state, q.from.id).await,
+            "port_config" => port_config_dialog(&app_state, q.from.id).await,
+            "vm_stats" => get_vm_stats(&app_state, q.from.id).await,
+            _ => "Невідома команда".to_string(),
+        };
+
+        if let Some(msg) = q.message {
+            bot.edit_message_text(msg.chat.id, msg.id, response)
+                .parse_mode(ParseMode::Html)
+                .await?;
+        }
+    }
+    Ok(())
+}
+
+async fn create_vm_dialog(app_state: &Arc<AppState>, user_id: i64) -> String {
+    let keyboard = InlineKeyboardMarkup::new(vec![vec![
+        InlineKeyboardButton::callback("Налаштувати", "vm_config"),
+        InlineKeyboardButton::callback("Скасувати", "cancel"),
+    ]]);
+
+    "Створення нової VM:\n\nВведіть параметри:\n1. Ім'я VM\n2. Кількість CPU ядер\n3. Кількість GPU ядер\n4. Обсяг пам'яті (GB)\n5. Обсяг сховища (GB)\n\nПісля введення натисніть 'Налаштувати'"
+        .to_string()
+}
+
+async fn list_vms(app_state: &Arc<AppState>, user_id: i64) -> String {
+    let vms = app_state.vm_manager.list_vms().await;
+    if vms.is_empty() {
+        "Немає активних VM".to_string()
+    } else {
+        let mut response = "Список VM:\n\n".to_string();
+        for vm in vms {
+            response.push_str(&format!(
+                "VM: {}\nСтатус: {}\nCPU: {} ядер\nGPU: {} ядер\nПам'ять: {} GB\n\n",
+                vm.name, if vm.is_running { "Запущено" } else { "Зупинено" },
+                vm.cpu_cores, vm.gpu_cores, vm.memory_gb
+            ));
+        }
+        response
+    }
+}
+
+async fn start_vm_dialog(app_state: &Arc<AppState>, user_id: i64) -> String {
+    let vms = app_state.vm_manager.list_vms().await;
+    if vms.is_empty() {
+        "Немає доступних VM для запуску".to_string()
+    } else {
+        let mut keyboard: Vec<Vec<InlineKeyboardButton>> = Vec::new();
+        for vm in vms {
+            if !vm.is_running {
+                keyboard.push(vec![InlineKeyboardButton::callback(
+                    format!("Запустити {}", vm.name),
+                    format!("start_vm_{}", vm.name)
+                )]);
+            }
+        }
+        keyboard.push(vec![InlineKeyboardButton::callback("Назад", "vm_menu")]);
+        
+        "Виберіть VM для запуску:".to_string()
+    }
+}
+
+async fn stop_vm_dialog(app_state: &Arc<AppState>, user_id: i64) -> String {
+    let vms = app_state.vm_manager.list_vms().await;
+    if vms.is_empty() {
+        "Немає запущених VM".to_string()
+    } else {
+        let mut keyboard: Vec<Vec<InlineKeyboardButton>> = Vec::new();
+        for vm in vms {
+            if vm.is_running {
+                keyboard.push(vec![InlineKeyboardButton::callback(
+                    format!("Зупинити {}", vm.name),
+                    format!("stop_vm_{}", vm.name)
+                )]);
+            }
+        }
+        keyboard.push(vec![InlineKeyboardButton::callback("Назад", "vm_menu")]);
+        
+        "Виберіть VM для зупинки:".to_string()
+    }
+}
+
+async fn port_config_dialog(app_state: &Arc<AppState>, user_id: i64) -> String {
+    let vms = app_state.vm_manager.list_vms().await;
+    if vms.is_empty() {
+        "Немає доступних VM для налаштування портів".to_string()
+    } else {
+        let mut keyboard: Vec<Vec<InlineKeyboardButton>> = Vec::new();
+        for vm in vms {
+            keyboard.push(vec![InlineKeyboardButton::callback(
+                format!("Налаштувати порти для {}", vm.name),
+                format!("config_ports_{}", vm.name)
+            )]);
+        }
+        keyboard.push(vec![InlineKeyboardButton::callback("Назад", "vm_menu")]);
+        
+        "Виберіть VM для налаштування портів:".to_string()
+    }
+}
+
+async fn get_vm_stats(app_state: &Arc<AppState>, user_id: i64) -> String {
+    let vms = app_state.vm_manager.list_vms().await;
+    if vms.is_empty() {
+        "Немає активних VM для відображення статистики".to_string()
+    } else {
+        let mut response = "Статистика VM:\n\n".to_string();
+        for vm in vms {
+            let stats = app_state.vm_manager.get_vm_status(&vm.name).await;
+            response.push_str(&format!(
+                "VM: {}\nCPU використання: {}%\nGPU використання: {}%\nПам'ять: {}%\nПорти: {}\n\n",
+                vm.name,
+                stats.cpu_usage,
+                stats.gpu_usage,
+                stats.memory_usage,
+                stats.forwarded_ports.join(", ")
+            ));
+        }
+        response
+    }
+}
+
+async fn get_worker_status(app_state: &Arc<AppState>, chat_id: i64) -> String {
+    // TODO: Implement actual worker status
+    format!("Статус воркера {}:\nCPU: 0%\nGPU: 0%\nПам'ять: 0%", chat_id)
+}
+
+async fn start_mining(app_state: &Arc<AppState>, chat_id: i64) -> String {
+    // TODO: Implement actual mining start
+    format!("Майнінг запущено для воркера {}", chat_id)
+}
+
+async fn get_pool_stats(app_state: &Arc<AppState>) -> String {
+    // TODO: Implement actual pool stats
+    "Статистика пулу:\nАктивних воркерів: 0\nЗагальна потужність: 0".to_string()
+}
+
+async fn process_config_message(app_state: &Arc<AppState>, chat_id: i64, text: &str) -> String {
+    // TODO: Implement actual config processing
+    format!("Налаштування оновлено для воркера {}: {}", chat_id, text)
+} use actix_web::{web, App, HttpServer};
+use std::sync::Arc;
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use cursor_codes::CursorCore;
+use cursor_codes::burstraid::{BurstRaidManager, RaidConfig};
+use log::{info, error, LevelFilter};
+use env_logger::Builder;
+use std::str::FromStr;
+use tokio::signal;
+use std::process;
+use std::fs::File;
+use std::io::BufReader;
+use rustls::{ServerConfig, Certificate, PrivateKey};
+use rustls_pemfile::{certs, pkcs8_private_keys};
+use actix_web::middleware::Logger;
+
+mod state;
+mod workers;
+mod burstraid;
+mod tgbot;
+mod model;
+mod smallworld;
+mod tokenizer;
+mod pool_web;
+mod bridges;
+mod lmrouter;
+mod loadbalancer;
+mod pool_cok;
+
+use state::AppState;
+
+fn init_logging() {
+    Builder::new()
+        .filter_level(LevelFilter::Info)
+        .format_timestamp_millis()
+        .init();
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("Failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    info!("Shutting down gracefully...");
+}
+
+fn load_rustls_config() -> Result<ServerConfig, Box<dyn std::error::Error>> {
+    // Загрузка сертификатов
+    let cert_file = &mut BufReader::new(File::open("cert.pem")?);
+    let key_file = &mut BufReader::new(File::open("key.pem")?);
+
+    let cert_chain = certs(cert_file)?
+        .into_iter()
+        .map(Certificate)
+        .collect();
+    
+    let mut keys = pkcs8_private_keys(key_file)?;
+    let key = PrivateKey(keys.remove(0));
+
+    let config = ServerConfig::builder()
+        .with_safe_defaults()
+        .with_no_client_auth()
+        .with_single_cert(cert_chain, key)?;
+
+    Ok(config)
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    init_logging();
+    info!("Starting Cursor Core...");
+
+    // Initialize RAID manager
+    let raid_config = RaidConfig {
+        raid_level: 1, // RAID 1 for mirroring
+        min_disks: 2,
+        stripe_size: 1024 * 1024, // 1MB stripes
+        redundancy: 1,
+    };
+
+    let raid_manager = match BurstRaidManager::new(raid_config) {
+        Ok(manager) => manager,
+        Err(e) => {
+            error!("Failed to initialize RAID manager: {}", e);
+            process::exit(1);
+        }
+    };
+
+    // Start RAID health monitoring
+    let raid_manager_clone = Arc::new(raid_manager);
+    let raid_monitor = raid_manager_clone.clone();
+    tokio::spawn(async move {
+        raid_monitor.monitor_health().await;
+    });
+
+    let core = match CursorCore::new("https://api.mainnet-beta.solana.com") {
+        Ok(core) => core,
+        Err(e) => {
+            error!("Failed to initialize CursorCore: {}", e);
+            process::exit(1);
+        }
+    };
+
+    // Initialize bridge
+    match core.initialize_bridge("ethereum", "solana", 0.1, 0.01, 1000.0).await {
+        Ok(bridge_id) => info!("Bridge initialized with ID: {}", bridge_id),
+        Err(e) => {
+            error!("Failed to initialize bridge: {}", e);
+            process::exit(1);
+        }
+    }
+
+    // Загрузка конфигурации HTTPS
+    let rustls_config = match load_rustls_config() {
+        Ok(config) => config,
+        Err(e) => {
+            error!("Failed to load TLS configuration: {}", e);
+            process::exit(1);
+        }
+    };
+
+    // Создание состояния приложения
+    let app_state = web::Data::new(AppState {
+        core: Arc::new(core),
+        raid_manager: raid_manager_clone,
+    });
+
+    // Запуск HTTP и HTTPS серверов
+    let http_server = HttpServer::new(move || {
+        App::new()
+            .wrap(Logger::default())
+            .app_data(app_state.clone())
+            .service(web::resource("/health").to(|| async { "OK" }))
+    })
+    .bind("0.0.0.0:8080")?;
+
+    let https_server = HttpServer::new(move || {
+        App::new()
+            .wrap(Logger::default())
+            .app_data(app_state.clone())
+            .service(web::resource("/health").to(|| async { "OK" }))
+    })
+    .bind_rustls("0.0.0.0:8443", rustls_config)?;
+
+    info!("Starting HTTP server on port 8080");
+    info!("Starting HTTPS server on port 8443");
+
+    // Запуск обоих серверов
+    let http_future = http_server.run();
+    let https_future = https_server.run();
+
+    // Ожидание завершения работы
+    tokio::select! {
+        _ = http_future => {},
+        _ = https_future => {},
+        _ = shutdown_signal() => {
+            info!("Shutdown signal received");
+        }
+    }
+
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_main_flow() {
+        init_logging();
+        let core = CursorCore::new("https://api.mainnet-beta.solana.com").unwrap();
+
+        // Test bridge initialization
+        assert!(core.initialize_bridge("ethereum", "solana", 0.1, 0.01, 1000.0).await.is_ok());
+
+        // Test model registration
+        let model_config = cursor_codes::lmrouter::ModelConfig {
+            name: "test-model".to_string(),
+            version: "1.0".to_string(),
+            endpoint: "http://test.com".to_string(),
+            max_tokens: 1000,
+            max_requests_per_minute: 60,
+            priority: 1,
+        };
+        assert!(core.register_language_model("test-model".to_string(), model_config).await.is_ok());
+
+        // Test wallet creation
+        assert!(core.create_solana_wallet("test_wallet".to_string()).await.is_ok());
+    }
+} use actix_web::{web, HttpResponse, Responder, error};
+use std::sync::Arc;
+use crate::state::AppState;
+use log::info;
+use crate::error::NotFoundError;
+
+mod home;
+mod login;
+mod playground;
+
+pub fn routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/pool")
+            .route("/health", web::get().to(health_check))
+            .route("/home", web::get().to(home::home))
+            .route("/login", web::post().to(login::login))
+            .route("/playground", web::get().to(playground::playground))
+    );
+}
+
+async fn health_check() -> impl Responder {
+    info!("Health check requested");
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "ok",
+        "version": env!("CARGO_PKG_VERSION"),
+        "timestamp": chrono::Utc::now().to_rfc3339()
+    }))
+}
+
+pub fn error_handlers() -> actix_web::middleware::ErrorHandlers<actix_web::body::BoxBody> {
+    actix_web::middleware::ErrorHandlers::new()
+        .handler(
+            actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            |err: error::InternalError<_>| async move {
+                error::InternalError::from_response(
+                    err,
+                    HttpResponse::InternalServerError().json(serde_json::json!({
+                        "error": "Internal server error",
+                        "message": err.to_string()
+                    }))
+                )
+            },
+        )
+        .handler(
+            actix_web::http::StatusCode::NOT_FOUND,
+            |err: NotFoundError| async move {
+                error::InternalError::from_response(
+                    err,
+                    HttpResponse::NotFound().json(serde_json::json!({
+                        "error": "Not found",
+                        "message": err.to_string()
+                    }))
+                )
+            },
+        )
+}
+
+pub async fn handle_error(err: NotFoundError) -> HttpResponse {
+    // ... existing code ...
+} use actix_web::{web, HttpResponse, Responder, error};
+use std::sync::Arc;
+use crate::state::AppState;
+use serde::{Deserialize, Serialize};
+use log::{info, warn, error};
+use jsonwebtoken::{encode, decode, Header, EncodingKey, DecodingKey, Validation};
+use chrono::{Utc, Duration};
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use std::time::{Duration as StdDuration, Instant};
+use ring::rand::SecureRandom;
+use ring::digest;
+use actix_web::error::ErrorUnauthorized;
+use ring::pbkdf2::{derive, PBKDF2_HMAC_SHA256};
+
+lazy_static::lazy_static! {
+    static ref LOGIN_ATTEMPTS: RwLock<HashMap<String, (u32, Instant)>> = RwLock::new(HashMap::new());
+}
+
+const MAX_LOGIN_ATTEMPTS: u32 = 5;
+const LOGIN_TIMEOUT: StdDuration = StdDuration::from_secs(300);
+const JWT_SECRET: &[u8] = b"your-secret-key"; // In production, use environment variable
+const JWT_EXPIRATION: i64 = 3600; // 1 hour
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Claims {
+    sub: String,
+    exp: i64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct LoginRequest {
+    username: String,
+    password: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct LoginResponse {
+    token: String,
+    expires_in: u64,
+}
+
+pub fn hash_password(password: &str, salt: &[u8]) -> Vec<u8> {
+    let mut hash = vec![0; 32];
+    derive(
+        PBKDF2_HMAC_SHA256,
+        std::num::NonZeroU32::new(100_000).unwrap(),
+        salt,
+        password.as_bytes(),
+        &mut hash,
+    );
+    hash
+}
+
+pub async fn login(
+    app_state: web::Data<Arc<AppState>>,
+    login_data: web::Json<LoginRequest>,
+) -> Result<HttpResponse, actix_web::Error> {
+    // Check rate limiting
+    let mut attempts = LOGIN_ATTEMPTS.write();
+    if let Some((count, timestamp)) = attempts.get(&login_data.username) {
+        if *count >= MAX_LOGIN_ATTEMPTS && timestamp.elapsed() < LOGIN_TIMEOUT {
+            warn!("Too many login attempts for user: {}", login_data.username);
+            return Err(ErrorUnauthorized("Too many login attempts. Please try again later."));
+        }
+    }
+
+    // TODO: Replace with proper user database lookup
+    let hashed_password = hash_password(&login_data.password, b"");
+    if login_data.username == "admin" && hashed_password == hash_password("admin", b"") {
+        info!("Successful login for user: {}", login_data.username);
+        
+        // Reset login attempts
+        attempts.remove(&login_data.username);
+        
+        // Generate JWT token
+        let expiration = Utc::now() + Duration::seconds(JWT_EXPIRATION);
+        let claims = Claims {
+            sub: login_data.username.clone(),
+            exp: expiration.timestamp(),
+        };
+        
+        let token = encode(
+            &Header::default(),
+            &claims,
+            &EncodingKey::from_secret(JWT_SECRET),
+        ).map_err(|e| {
+            error!("Failed to generate token: {}", e);
+            actix_web::error::ErrorInternalServerError("Failed to generate token")
+        })?;
+        
+        let response = LoginResponse {
+            token,
+            expires_in: JWT_EXPIRATION as u64,
+        };
+        
+        Ok(HttpResponse::Ok().json(response))
+    } else {
+        // Increment failed attempts
+        let count = attempts.entry(login_data.username.clone())
+            .or_insert((0, Instant::now()));
+        count.0 += 1;
+        count.1 = Instant::now();
+        
+        warn!("Failed login attempt for user: {}", login_data.username);
+        Err(ErrorUnauthorized("Invalid credentials"))
+    }
+} use actix_web::{web, HttpResponse, Responder, error};
+use std::sync::Arc;
+use crate::state::AppState;
+use serde::{Deserialize, Serialize};
+use log::{info, warn, error};
+use parking_lot::RwLock;
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
+use jsonwebtoken::{decode, DecodingKey, Validation};
+use actix_web::error::ErrorUnauthorized;
+use crate::pool::login::Claims;
+
+lazy_static::lazy_static! {
+    static ref CACHED_RESULTS: RwLock<HashMap<String, (ModelTestResponse, Instant)>> = RwLock::new(HashMap::new());
+}
+
+const MAX_INPUT_SIZE: usize = 1024 * 1024; // 1MB
+const CACHE_DURATION: Duration = Duration::from_secs(300);
+const JWT_SECRET: &[u8] = b"your-secret-key"; // Should match login.rs
+
+#[derive(Debug, Deserialize)]
+pub struct ModelTestRequest {
+    model_name: String,
+    input_data: Vec<f32>,
+    token: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct ModelTestResponse {
+    output: Vec<f32>,
+    processing_time: f64,
+    cache_hit: bool,
+}
+
+fn validate_token(token: &str) -> Result<String, actix_web::Error> {
+    let token_data = decode::<Claims>(
+        token,
+        &DecodingKey::from_secret(JWT_SECRET),
+        &Validation::default(),
+    ).map_err(|e| {
+        error!("Invalid token: {}", e);
+        ErrorUnauthorized("Invalid token")
+    })?;
+    
+    Ok(token_data.claims.sub)
+}
+
+fn validate_input(input: &[f32]) -> Result<(), actix_web::Error> {
+    if input.is_empty() {
+        return Err(error::ErrorBadRequest("Input data cannot be empty"));
+    }
+    
+    if input.len() > MAX_INPUT_SIZE {
+        return Err(error::ErrorBadRequest("Input data too large"));
+    }
+    
+    if !input.iter().all(|&x| x.is_finite()) {
+        return Err(error::ErrorBadRequest("Input data contains invalid values"));
+    }
+    
+    Ok(())
+}
+
+pub async fn playground(
+    app_state: web::Data<Arc<AppState>>,
+    test_data: web::Json<ModelTestRequest>,
+) -> Result<HttpResponse, actix_web::Error> {
+    // Validate token
+    let username = validate_token(&test_data.token)?;
+    
+    // Validate input
+    validate_input(&test_data.input_data)?;
+    
+    // Check cache
+    let cache_key = format!("{}-{:?}", test_data.model_name, test_data.input_data);
+    let mut cache = CACHED_RESULTS.write();
+    if let Some((cached_result, timestamp)) = cache.get(&cache_key) {
+        if timestamp.elapsed() < CACHE_DURATION {
+            info!("Cache hit for model {} by user {}", test_data.model_name, username);
+            let mut response = cached_result.clone();
+            response.cache_hit = true;
+            return Ok(HttpResponse::Ok().json(response));
+        }
+    }
+    
+    let start_time = Instant::now();
+    
+    let models = app_state.models.read();
+    if let Some(model) = models.get(&test_data.model_name) {
+        match model.process_data(&test_data.input_data) {
+            Ok(output) => {
+                let processing_time = start_time.elapsed().as_secs_f64();
+                info!(
+                    "Model {} processed data in {} seconds for user {}",
+                    test_data.model_name, processing_time, username
+                );
+                
+                let response = ModelTestResponse {
+                    output,
+                    processing_time,
+                    cache_hit: false,
+                };
+                
+                // Update cache
+                cache.insert(cache_key, (response.clone(), Instant::now()));
+                
+                Ok(HttpResponse::Ok().json(response))
+            }
+            Err(e) => {
+                error!(
+                    "Model {} processing failed for user {}: {}",
+                    test_data.model_name, username, e
+                );
+                Err(error::ErrorInternalServerError(format!(
+                    "Model processing failed: {}",
+                    e
+                )))
+            }
+        }
+    } else {
+        warn!(
+            "Model {} not found for user {}",
+            test_data.model_name, username
+        );
+        Err(error::ErrorNotFound(format!(
+            "Model {} not found",
+            test_data.model_name
+        )))
+    }
+}
+
+pub async fn verify_token(token: &str) -> Result<Claims, String> {
+    let token_data = decode::<Claims>(
+        token,
+        &DecodingKey::from_secret(JWT_SECRET),
+        &Validation::default(),
+    ).map_err(|e| {
+        error!("Invalid token: {}", e);
+        ErrorUnauthorized("Invalid token")
+    })?;
+    
+    Ok(token_data.claims)
+} use actix_web::{web, HttpResponse, Responder};
+use std::sync::Arc;
+use crate::state::AppState;
+use serde_json::json;
+use log::{info, error};
+use std::time::{Duration, Instant};
+use parking_lot::RwLock;
+use std::collections::HashMap;
+
+lazy_static::lazy_static! {
+    static ref UPTIME_START: Instant = Instant::now();
+    static ref CACHED_STATS: RwLock<HashMap<String, serde_json::Value>> = RwLock::new(HashMap::new());
+    static ref CACHE_TIMESTAMP: RwLock<Instant> = RwLock::new(Instant::now());
+}
+
+const CACHE_DURATION: Duration = Duration::from_secs(30);
+
+pub async fn home(app_state: web::Data<Arc<AppState>>) -> impl Responder {
+    // Check cache first
+    let cache_timestamp = CACHE_TIMESTAMP.read();
+    if cache_timestamp.elapsed() < CACHE_DURATION {
+        if let Some(cached) = CACHED_STATS.read().get("home") {
+            return HttpResponse::Ok().json(cached.clone());
+        }
+    }
+
+    let workers = match app_state.workers.try_read() {
+        Ok(workers) => workers,
+        Err(e) => {
+            error!("Failed to read workers: {}", e);
+            return HttpResponse::InternalServerError().json(json!({
+                "error": "Failed to read workers state"
+            }));
+        }
+    };
+
+    let total_power: f64 = workers.values().map(|w| w.mining_power).sum();
+    let active_workers = workers.len();
+    
+    let raid_status = match app_state.raid_status.try_lock() {
+        Ok(status) => status,
+        Err(e) => {
+            error!("Failed to read raid status: {}", e);
+            return HttpResponse::InternalServerError().json(json!({
+                "error": "Failed to read raid status"
+            }));
+        }
+    };
+
+    let active_nodes = raid_status.values()
+        .filter(|node| node.status == crate::state::NodeStatus::Active)
+        .count();
+
+    // Calculate actual uptime
+    let uptime_seconds = UPTIME_START.elapsed().as_secs();
+    let uptime_percentage = if uptime_seconds > 0 {
+        let total_seconds = uptime_seconds as f64;
+        let active_seconds = active_nodes as f64 * total_seconds;
+        (active_seconds / total_seconds) * 100.0
+    } else {
+        100.0
+    };
+    
+    let response = json!({
+        "status": "ok",
+        "pool_stats": {
+            "total_power": total_power,
+            "active_workers": active_workers,
+            "active_nodes": active_nodes,
+            "uptime": format!("{:.2}%", uptime_percentage),
+            "start_time": UPTIME_START.elapsed().as_secs(),
+        },
+        "workers": workers.values().map(|w| {
+            json!({
+                "id": w.id,
+                "power": w.mining_power,
+                "address": w.solana_address.to_string(),
+                "last_active": w.last_active.to_rfc3339(),
+            })
+        }).collect::<Vec<_>>(),
+    });
+
+    // Update cache
+    let mut cache = CACHED_STATS.write();
+    cache.insert("home".to_string(), response.clone());
+    *CACHE_TIMESTAMP.write() = Instant::now();
+    
+    HttpResponse::Ok().json(response)
+} 
