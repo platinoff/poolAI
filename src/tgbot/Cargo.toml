@@ -1,0 +1,25 @@
+[package]
+name = "cursor-tgbot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Telegram bot
+teloxide = { version = "0.12", features = ["macros"] }
+dptree = "0.3"
+
+# Async runtime
+tokio = { version = "1.36", features = ["full"] }
+futures = "0.3"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0" 
