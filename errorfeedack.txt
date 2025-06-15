@@ -1,0 +1,36 @@
+rust@pop-os:~$ git@github.com:platinoff/poolAI.git
+-bash: git@github.com:platinoff/poolAI.git: No such file or directory
+rust@pop-os:~$ git clone https://github.com/platinoff/poolAI.git
+Cloning into 'poolAI'...
+remote: Enumerating objects: 1711, done.
+remote: Counting objects: 100% (1711/1711), done.
+remote: Compressing objects: 100% (1526/1526), done.
+remote: Total 1711 (delta 175), reused 1709 (delta 173), pack-reused 0 (from 0)
+Receiving objects: 100% (1711/1711), 5.40 MiB | 4.81 MiB/s, done.
+Resolving deltas: 100% (175/175), done.
+rust@pop-os:~$ ls
+Desktop  dist  Documents  Downloads  libtorch  Music  Pictures  poolAI  Public  read_test.0.0  rust-ai-web  Templates  Videos  write_test.0.0
+rust@pop-os:~$ cd poolAI/
+rust@pop-os:~/poolAI$ ls
+cursor_codes
+rust@pop-os:~/poolAI$ cd cursor_codes/
+rust@pop-os:~/poolAI/cursor_codes$ ls
+Cargo.toml  src
+rust@pop-os:~/poolAI/cursor_codes$ cargo run
+    Updating crates.io index
+error: failed to get `cursor-core` as a dependency of package `cursor_codes v0.1.0 (/home/rust/poolAI/cursor_codes)`
+
+Caused by:
+  failed to load source for dependency `cursor-core`
+
+Caused by:
+  Unable to update /home/rust/poolAI/cursor_codes/cursor-core
+
+Caused by:
+  failed to read `/home/rust/poolAI/cursor_codes/cursor-core/Cargo.toml`
+
+Caused by:
+  No such file or directory (os error 2)
+rust@pop-os:~/poolAI/cursor_codes$ uname -a
+Linux pop-os 6.12.10-76061203-generic #202412060638~1748542656~22.04~663e4dc SMP PREEMPT_DYNAMIC Thu M x86_64 x86_64 x86_64 GNU/Linux
+rust@pop-os:~/poolAI/cursor_codes$
