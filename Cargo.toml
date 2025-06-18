@@ -1,9 +1,13 @@
 [package]
-name = "cursor_codes"
-version = "0.1.0"
+name = "poolai"
+version = "0.2.0-beta.bolvanka_v1"
 edition = "2021"
 authors = ["Platinov <platinovubuntu@gmail.com>"]
-description = "A high-performance distributed system for language model routing and token management"
+description = "PoolAI - Система управления пулом майнинга с интеграцией генеративных моделей (Beta Bolvanka v1)"
+license = "MIT"
+repository = "https://github.com/platinoff/poolAI"
+keywords = ["ai", "mining", "pool", "gpu", "machine-learning", "rust"]
+categories = ["ai", "system", "web-programming"]
 
 [dependencies]
 # Core dependencies
