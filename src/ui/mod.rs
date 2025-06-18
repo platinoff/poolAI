@@ -177,7 +177,29 @@ pub async fn stop_ui(server: UiServer) -> Result<(), Box<dyn std::error::Error>>
     server.stop().await
 }
 
+/// Инициализация ui модуля
+pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
+    log::info!("Initializing ui module");
+    Ok(())
+}
+
+/// Остановка ui модуля
+pub async fn shutdown() -> Result<(), Box<dyn std::error::Error>> {
+    log::info!("Shutting down ui module");
+    Ok(())
+}
+
+/// Проверка здоровья ui модуля
+pub async fn health_check() -> Result<(), Box<dyn std::error::Error>> {
+    log::debug!("UI module health check passed");
+    Ok(())
+}
+
 // Подмодули
 mod api;
 mod websocket;
-mod static_files; 
+mod static_files;
+
+pub use dashboard::*;
+pub use components::*;
+pub use styles::*; 

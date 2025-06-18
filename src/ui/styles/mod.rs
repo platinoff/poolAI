@@ -11,6 +11,95 @@ pub mod components;
 
 use serde::{Deserialize, Serialize};
 
+/// Theme configuration for the UI
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Theme {
+    pub name: String,
+    pub primary_color: String,
+    pub secondary_color: String,
+    pub background_color: String,
+    pub text_color: String,
+    pub accent_color: String,
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Self {
+            name: "PoolAI Dark".to_string(),
+            primary_color: "#1a1a1a".to_string(),
+            secondary_color: "#2d2d2d".to_string(),
+            background_color: "#0d0d0d".to_string(),
+            text_color: "#ffffff".to_string(),
+            accent_color: "#00ff88".to_string(),
+        }
+    }
+}
+
+/// Layout configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Layout {
+    pub sidebar_width: u32,
+    pub header_height: u32,
+    pub content_padding: u32,
+    pub card_radius: u32,
+}
+
+impl Default for Layout {
+    fn default() -> Self {
+        Self {
+            sidebar_width: 250,
+            header_height: 60,
+            content_padding: 20,
+            card_radius: 8,
+        }
+    }
+}
+
+/// UI Configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UiConfig {
+    pub theme: Theme,
+    pub layout: Layout,
+    pub animations_enabled: bool,
+    pub responsive_design: bool,
+}
+
+impl Default for UiConfig {
+    fn default() -> Self {
+        Self {
+            theme: Theme::default(),
+            layout: Layout::default(),
+            animations_enabled: true,
+            responsive_design: true,
+        }
+    }
+}
+
+/// Get default UI configuration
+pub fn get_default_config() -> UiConfig {
+    UiConfig::default()
+}
+
+/// Apply theme to UI
+pub fn apply_theme(theme: &Theme) -> String {
+    format!(
+        r#"
+        :root {{
+            --primary-color: {};
+            --secondary-color: {};
+            --background-color: {};
+            --text-color: {};
+            --accent-color: {};
+        }}
+        "#,
+        theme.primary_color,
+        theme.secondary_color,
+        theme.background_color,
+        theme.text_color,
+        theme.accent_color
+    )
+}
+
 /// Основная тема приложения
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppTheme {

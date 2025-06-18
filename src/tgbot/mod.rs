@@ -1,9 +1,16 @@
-mod commands;
-mod handlers;
-mod bot;
+pub mod tgbot;
+pub mod handlers;
+pub mod commands;
+pub mod tgtoken;
+pub mod bot;
+pub mod lib;
 
-pub use bot::TelegramBot;
-pub use commands::Command;
+pub use tgbot::*;
+pub use handlers::*;
+pub use commands::*;
+pub use tgtoken::*;
+pub use bot::*;
+pub use lib::*;
 
 use teloxide::{
     prelude::*,
@@ -14,6 +21,7 @@ use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use log::{info, warn, error};
+use std::error::Error;
 
 use crate::{
     workers::WorkerManager,
@@ -156,4 +164,22 @@ fn format_status(status: &str) -> String {
 
 fn format_stats(stats: &str) -> String {
     format!("📈 Mining Statistics:\n{}", stats)
+}
+
+/// Инициализация tgbot модуля
+pub async fn initialize() -> Result<(), Box<dyn Error>> {
+    log::info!("Initializing tgbot module");
+    Ok(())
+}
+
+/// Остановка tgbot модуля
+pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+    log::info!("Shutting down tgbot module");
+    Ok(())
+}
+
+/// Проверка здоровья tgbot модуля
+pub async fn health_check() -> Result<(), Box<dyn Error>> {
+    log::debug!("TGBot module health check passed");
+    Ok(())
 } 

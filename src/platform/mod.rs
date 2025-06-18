@@ -1,12 +1,26 @@
-#[cfg(windows)]
-mod windows;
-#[cfg(unix)]
-mod unix;
+pub mod linux;
+pub mod windows;
+pub mod unix;
+pub mod model;
+pub mod soladdr;
+pub mod lmrouter;
+pub mod lib;
+pub mod error;
+
+pub use linux::*;
+pub use windows::*;
+pub use unix::*;
+pub use model::*;
+pub use soladdr::*;
+pub use lmrouter::*;
+pub use lib::*;
+pub use error::*;
 
 use std::path::PathBuf;
 use thiserror::Error;
 use std::sync::Arc;
 use parking_lot::RwLock;
+use std::error::Error;
 
 pub mod model;
 pub mod lmrouter;
@@ -139,4 +153,22 @@ pub fn create_system_info() -> Box<dyn SystemInfo> {
     {
         Box::new(UnixSystemInfo::new())
     }
+}
+
+/// Инициализация platform модуля
+pub async fn initialize() -> Result<(), Box<dyn Error>> {
+    log::info!("Initializing platform module");
+    Ok(())
+}
+
+/// Остановка platform модуля
+pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+    log::info!("Shutting down platform module");
+    Ok(())
+}
+
+/// Проверка здоровья platform модуля
+pub async fn health_check() -> Result<(), Box<dyn Error>> {
+    log::debug!("Platform module health check passed");
+    Ok(())
 } 

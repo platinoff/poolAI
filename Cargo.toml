@@ -1,6 +1,6 @@
 [package]
 name = "poolai"
-version = "0.2.0-beta.bolvanka_v1"
+version = "0.2.0-beta.bolvanka-v1"
 edition = "2021"
 authors = ["Platinov <platinovubuntu@gmail.com>"]
 description = "PoolAI - Система управления пулом майнинга с интеграцией генеративных моделей (Beta Bolvanka v1)"
@@ -10,11 +10,6 @@ keywords = ["ai", "mining", "pool", "gpu", "machine-learning", "rust"]
 categories = ["ai", "system", "web-programming"]
 
 [dependencies]
-# Core dependencies
-cursor-core = { path = "./cursor-core" }
-cursor-tgbot = { path = "./src/tgbot" }
-cursor-raid = { path = "./src/raid" }
-
 # Async runtime
 tokio = { version = "1.36", features = ["full"] }
 futures = "0.3"
