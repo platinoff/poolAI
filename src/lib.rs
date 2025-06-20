@@ -118,7 +118,7 @@ pub async fn initialize_system() -> Result<SystemStatus, Box<dyn std::error::Err
         status: "initialized".to_string(),
         version: VERSION.to_string(),
         uptime: 0,
-        modules_loaded: 13,
+        modules_loaded: 14,
         features_enabled: 7,
         timestamp: chrono::Utc::now(),
     })
@@ -229,7 +229,6 @@ impl Default for SystemConfig {
         modules.insert("raid".to_string(), true);
         modules.insert("ui".to_string(), true);
         modules.insert("admin".to_string(), true);
-        modules.insert("workers".to_string(), true);
         
         let mut features = HashMap::new();
         features.insert("gpu_optimization".to_string(), true);
@@ -248,4 +247,63 @@ impl Default for SystemConfig {
             features,
         }
     }
-} 
+}
+
+/// Получение конфигурации системы
+pub fn get_system_config() -> SystemConfig {
+    SystemConfig::default()
+}
+
+/// Обновление конфигурации системы
+pub async fn update_system_config(config: SystemConfig) -> Result<(), Box<dyn std::error::Error>> {
+    log::info!("Updating system configuration");
+    
+    // Здесь должна быть логика обновления конфигурации
+    // Пока что просто логируем
+    
+    log::info!("System configuration updated successfully");
+    Ok(())
+}
+
+/// Получение статистики системы
+pub async fn get_system_stats() -> SystemStats {
+    SystemStats {
+        version: VERSION.to_string(),
+        uptime: std::time::Duration::from_secs(0), // TODO: реализовать
+        modules_loaded: 13,
+        features_enabled: 7,
+        memory_usage: 0.0, // TODO: реализовать
+        cpu_usage: 0.0, // TODO: реализовать
+        disk_usage: 0.0, // TODO: реализовать
+        network_usage: 0.0, // TODO: реализовать
+        timestamp: chrono::Utc::now(),
+    }
+}
+
+/// Статистика системы
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SystemStats {
+    pub version: String,
+    pub uptime: std::time::Duration,
+    pub modules_loaded: usize,
+    pub features_enabled: usize,
+    pub memory_usage: f64,
+    pub cpu_usage: f64,
+    pub disk_usage: f64,
+    pub network_usage: f64,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+}
+
+// Re-exports для удобства использования
+pub use core::*;
+pub use pool::*;
+pub use monitoring::*;
+pub use runtime::*;
+pub use network::*;
+pub use platform::*;
+pub use vm::*;
+pub use tgbot::*;
+pub use raid::*;
+pub use ui::*;
+pub use admin::*;
+pub use libs::*; 

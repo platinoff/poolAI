@@ -9,23 +9,13 @@ repository = "https://github.com/platinoff/poolAI"
 keywords = ["ai", "mining", "pool", "gpu", "machine-learning", "rust"]
 categories = ["ai", "system", "web-programming"]
 
-[workspace]
-members = [
-    "src/tgbot",
-    "src/raid"
-]
-
 [dependencies]
-# Local workspace dependencies
-cursor-tgbot = { path = "./src/tgbot" }
-cursor-raid = { path = "./src/raid" }
-
 # Async runtime
 tokio = { version = "1.36", features = ["full"] }
 futures = "0.3"
 
 # Web framework
-actix-web = { version = "4.4", optional = true }
+actix-web = { version = "4.4", features = ["macros"] }
 actix-rt = "2.8"
 rustls = "0.22"
 tokio-rustls = "0.24"

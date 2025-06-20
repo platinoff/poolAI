@@ -1,0 +1,1 @@
+{"rustc":12200708597866198150,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[8081351675046095464,"build_script_build",false,8057059847113914578]],"local":[{"RerunIfChanged":{"output":"debug\\build\\lock_api-c921e97dfec41a08\\output","paths":["build.rs"]}}],"rustflags":["-C","link-arg=-Wl,-rpath,/home/rust/libtorch/lib"],"config":0,"compile_kind":0}
