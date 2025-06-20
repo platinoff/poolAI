@@ -1,15 +1,26 @@
-mod error;
-mod device;
-mod usb;
-mod pcie;
+pub mod vm;
+pub mod gpu;
+pub mod device;
+pub mod pcie;
+pub mod usb;
+pub mod tuning;
+pub mod endorphin;
+pub mod telegram;
+pub mod error;
 
-pub use error::VmError;
-pub use device::{Device, DeviceType};
-pub use usb::{UsbDevice, UsbPassthrough};
-pub use pcie::{PcieDevice, PciePassthrough};
+pub use vm::*;
+pub use gpu::*;
+pub use device::*;
+pub use pcie::*;
+pub use usb::*;
+pub use tuning::*;
+pub use endorphin::*;
+pub use telegram::*;
+pub use error::*;
 
 use std::collections::HashMap;
 use async_trait::async_trait;
+use std::error::Error;
 
 pub mod endorphin;
 pub mod tuning;
@@ -71,4 +82,22 @@ pub fn create_vm_manager() -> Box<dyn VmManager> {
     {
         Box::new(UnixVmManager::new())
     }
+}
+
+/// Инициализация vm модуля
+pub async fn initialize() -> Result<(), Box<dyn Error>> {
+    log::info!("Initializing vm module");
+    Ok(())
+}
+
+/// Остановка vm модуля
+pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+    log::info!("Shutting down vm module");
+    Ok(())
+}
+
+/// Проверка здоровья vm модуля
+pub async fn health_check() -> Result<(), Box<dyn Error>> {
+    log::debug!("VM module health check passed");
+    Ok(())
 } 

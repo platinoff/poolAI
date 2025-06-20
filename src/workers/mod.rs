@@ -1,18 +1,13 @@
-mod workers;
+pub mod workers;
 
-pub use workers::{
-    WorkerConfig,
-    WorkerStats,
-    WorkerMetrics,
-    PerformanceMetrics,
-    WorkerManager,
-};
+pub use workers::*;
 
 use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use log::{info, warn, error};
 use chrono::{DateTime, Utc};
+use std::error::Error;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerConfig {
@@ -141,4 +136,22 @@ impl WorkerManager {
             .find(|w| w.config.name == name)
             .map(|w| w.performance.clone())
     }
+}
+
+/// Инициализация workers модуля
+pub async fn initialize() -> Result<(), Box<dyn Error>> {
+    log::info!("Initializing workers module");
+    Ok(())
+}
+
+/// Остановка workers модуля
+pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+    log::info!("Shutting down workers module");
+    Ok(())
+}
+
+/// Проверка здоровья workers модуля
+pub async fn health_check() -> Result<(), Box<dyn Error>> {
+    log::debug!("Workers module health check passed");
+    Ok(())
 } 

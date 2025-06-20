@@ -11,27 +11,25 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use parking_lot::RwLock;
+use std::error::Error;
 
-mod pool_cok;
-mod home;
-mod login;
-mod playground;
-mod bridges;
+pub mod pool;
+pub mod pool_cok;
+pub mod miner;
+pub mod reward_system;
+pub mod bridges;
+pub mod home;
+pub mod login;
+pub mod playground;
 
-pub use pool_cok::{
-    PoolError,
-    PoolMigrationError,
-    PoolNode,
-    MigrationTask,
-    FileMirrorTask,
-    PoolMigrationManager,
-};
-
-pub use home::HomePage;
-pub use login::LoginPage;
-pub use playground::PlaygroundPage;
-
-pub use bridges::{BridgeManager, BridgeConfig, BridgeTransaction};
+pub use pool::*;
+pub use pool_cok::*;
+pub use miner::*;
+pub use reward_system::*;
+pub use bridges::*;
+pub use home::*;
+pub use login::*;
+pub use playground::*;
 
 pub fn routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -43,13 +41,22 @@ pub fn routes(cfg: &mut web::ServiceConfig) {
     );
 }
 
-async fn health_check() -> impl Responder {
-    info!("Health check requested");
-    HttpResponse::Ok().json(serde_json::json!({
-        "status": "ok",
-        "version": env!("CARGO_PKG_VERSION"),
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }))
+/// Инициализация pool модуля
+pub async fn initialize() -> Result<(), Box<dyn Error>> {
+    log::info!("Initializing pool module");
+    Ok(())
+}
+
+/// Остановка pool модуля
+pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+    log::info!("Shutting down pool module");
+    Ok(())
+}
+
+/// Проверка здоровья pool модуля
+pub async fn health_check() -> Result<(), Box<dyn Error>> {
+    log::debug!("Pool module health check passed");
+    Ok(())
 }
 
 pub fn error_handlers() -> actix_web::middleware::ErrorHandlers<actix_web::body::BoxBody> {

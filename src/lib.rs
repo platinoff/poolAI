@@ -22,6 +22,7 @@ pub mod raid;
 pub mod ui;
 pub mod admin;
 pub mod workers;
+pub mod version;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -69,6 +70,7 @@ impl Default for SystemInfo {
                 "ui".to_string(),
                 "admin".to_string(),
                 "workers".to_string(),
+                "version".to_string(),
             ],
             build_date: env!("VERGEN_BUILD_TIMESTAMP").to_string(),
         }

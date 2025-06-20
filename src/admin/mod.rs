@@ -3,6 +3,7 @@ use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use log::{info, warn, error};
+use std::error::Error;
 
 use crate::{
     workers::WorkerManager,
@@ -191,4 +192,22 @@ pub async fn get_tuning_metrics(data: web::Data<Arc<AdminPanel>>) -> impl Respon
 pub async fn get_vm_status(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
     let status = data.get_vm_status().await;
     HttpResponse::Ok().json(status)
+}
+
+/// Инициализация admin модуля
+pub async fn initialize() -> Result<(), Box<dyn Error>> {
+    log::info!("Initializing admin module");
+    Ok(())
+}
+
+/// Остановка admin модуля
+pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+    log::info!("Shutting down admin module");
+    Ok(())
+}
+
+/// Проверка здоровья admin модуля
+pub async fn health_check() -> Result<(), Box<dyn Error>> {
+    log::debug!("Admin module health check passed");
+    Ok(())
 } 

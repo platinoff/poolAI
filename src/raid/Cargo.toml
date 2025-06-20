@@ -3,11 +3,9 @@ name = "cursor-raid"
 version = "0.1.0"
 edition = "2021"
 authors = ["Platinov <platinovubuntu@gmail.com>"]
-description = "RAID functionality for the cursor_codes project"
+description = "RAID functionality for the PoolAI project"
 
 [dependencies]
-cursor-core = { path = "../../cursor-core" }
-
 # Async runtime
 tokio = { version = "1.36", features = ["full"] }
 futures = "0.3"
