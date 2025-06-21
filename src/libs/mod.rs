@@ -3,12 +3,14 @@ pub mod tokenizer;
 pub mod file_mirror;
 pub mod gpu;
 pub mod model;
+pub mod tuning;
 
 pub use lib_manager::*;
 pub use tokenizer::*;
 pub use file_mirror::*;
 pub use gpu::*;
 pub use model::*;
+pub use tuning::*;
 
 use std::error::Error;
 

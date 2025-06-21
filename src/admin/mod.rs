@@ -1,213 +1,164 @@
-use actix_web::{web, HttpResponse, Responder};
-use serde::{Serialize, Deserialize};
-use std::sync::Arc;
-use tokio::sync::Mutex;
-use log::{info, warn, error};
-use std::error::Error;
+//! Admin Module - Административные функции системы
+//! 
+//! Этот модуль предоставляет:
+//! - Управление системой
+//! - Мониторинг состояния
+//! - Настройку конфигурации
+//! - Административные функции
 
-use crate::{
-    workers::WorkerManager,
-    reward_system::RewardSystem,
-    vm::VMManager,
-    tuning::TuningSystem,
-};
-
-pub mod admin;
-pub mod admin_ui;
 pub mod admin_panel;
+pub mod system_manager;
+pub mod config_manager;
 
-pub use admin::*;
-pub use admin_ui::*;
-pub use admin_panel::*;
+use crate::core::state::AppState;
+use crate::pool::pool::PoolManager;
+use crate::monitoring::metrics::SystemMetrics;
+use crate::network::api::ApiServer;
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tokio::sync::RwLock;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AdminConfig {
-    pub maintenance_mode: bool,
-    pub max_workers: u32,
-    pub min_memory_gb: u32,
-    pub max_memory_gb: u32,
-    pub allowed_gpu_models: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PoolStats {
-    pub total_workers: u32,
-    pub active_workers: u32,
-    pub total_rewards: f64,
-    pub average_performance: f32,
-    pub system_load: f32,
-}
-
+/// Административная панель
 pub struct AdminPanel {
-    config: Arc<Mutex<AdminConfig>>,
-    worker_manager: Arc<WorkerManager>,
-    reward_system: Arc<RewardSystem>,
-    vm_manager: Arc<Mutex<VMManager>>,
-    tuning_system: Arc<TuningSystem>,
+    state: Arc<AppState>,
+    pool_manager: Arc<PoolManager>,
+    metrics: Arc<RwLock<SystemMetrics>>,
+    api_server: Arc<ApiServer>,
 }
 
 impl AdminPanel {
+    /// Создает новую административную панель
     pub fn new(
-        config: AdminConfig,
-        worker_manager: Arc<WorkerManager>,
-        reward_system: Arc<RewardSystem>,
-        vm_manager: Arc<Mutex<VMManager>>,
-        tuning_system: Arc<TuningSystem>,
+        state: Arc<AppState>,
+        pool_manager: Arc<PoolManager>,
+        metrics: Arc<RwLock<SystemMetrics>>,
+        api_server: Arc<ApiServer>,
     ) -> Self {
         Self {
-            config: Arc::new(Mutex::new(config)),
-            worker_manager,
-            reward_system,
-            vm_manager,
-            tuning_system,
+            state,
+            pool_manager,
+            metrics,
+            api_server,
         }
     }
 
-    pub async fn get_pool_stats(&self) -> PoolStats {
-        let workers = self.worker_manager.get_all_workers().await;
-        let active_workers = self.worker_manager.get_active_workers().await;
+    /// Получает статистику системы
+    pub async fn get_system_stats(&self) -> SystemStats {
+        let metrics = self.metrics.read().await;
         
-        PoolStats {
-            total_workers: workers.len() as u32,
-            active_workers: active_workers.len() as u32,
-            total_rewards: self.reward_system.get_total_rewards(),
-            average_performance: self.calculate_average_performance(&workers),
-            system_load: self.calculate_system_load().await,
+        SystemStats {
+            total_workers: self.pool_manager.get_worker_count(),
+            active_workers: self.pool_manager.get_active_worker_count(),
+            total_hashrate: self.pool_manager.get_total_hashrate(),
+            system_load: metrics.system_load,
+            memory_usage: metrics.memory_usage,
+            cpu_usage: metrics.cpu_usage,
+            uptime: metrics.uptime,
         }
     }
 
-    pub async fn toggle_maintenance_mode(&self) -> Result<(), String> {
-        let mut config = self.config.lock().await;
-        config.maintenance_mode = !config.maintenance_mode;
+    /// Получает статус пула
+    pub async fn get_pool_status(&self) -> PoolStatus {
+        PoolStatus {
+            is_running: self.pool_manager.is_running(),
+            worker_count: self.pool_manager.get_worker_count(),
+            active_tasks: self.pool_manager.get_active_task_count(),
+            queue_size: self.pool_manager.get_queue_size(),
+            last_block: self.pool_manager.get_last_block_hash(),
+        }
+    }
+
+    /// Перезапускает систему
+    pub async fn restart_system(&self) -> Result<(), Box<dyn std::error::Error>> {
+        log::info!("Admin: Restarting system");
         
-        if config.maintenance_mode {
-            // Gracefully stop all workers
-            let workers = self.worker_manager.get_active_workers().await;
-            for worker in workers {
-                if let Err(e) = self.worker_manager.remove_worker(&worker.config.name).await {
-                    error!("Failed to stop worker {}: {}", worker.config.name, e);
-                }
+        // Остановка компонентов
+        self.pool_manager.stop().await?;
+        self.api_server.stop().await?;
+        
+        // Запуск компонентов
+        self.pool_manager.start().await?;
+        self.api_server.start().await?;
+        
+        log::info!("Admin: System restarted successfully");
+        Ok(())
+    }
+
+    /// Включает режим обслуживания
+    pub async fn enable_maintenance_mode(&self) -> Result<(), Box<dyn std::error::Error>> {
+        log::info!("Admin: Enabling maintenance mode");
+        self.state.set_maintenance_mode(true).await;
+        Ok(())
+    }
+
+    /// Выключает режим обслуживания
+    pub async fn disable_maintenance_mode(&self) -> Result<(), Box<dyn std::error::Error>> {
+        log::info!("Admin: Disabling maintenance mode");
+        self.state.set_maintenance_mode(false).await;
+        Ok(())
+    }
+
+    /// Получает логи системы
+    pub async fn get_system_logs(&self, limit: usize) -> Vec<LogEntry> {
+        // Здесь должна быть логика получения логов
+        vec![
+            LogEntry {
+                timestamp: chrono::Utc::now(),
+                level: "INFO".to_string(),
+                message: "System logs requested".to_string(),
             }
-        }
-        
-        Ok(())
-    }
-
-    pub async fn update_config(&self, new_config: AdminConfig) -> Result<(), String> {
-        let mut config = self.config.lock().await;
-        *config = new_config;
-        Ok(())
-    }
-
-    pub async fn get_worker_metrics(&self, name: &str) -> Option<crate::workers::WorkerMetrics> {
-        self.worker_manager.get_worker_metrics(name).await
-    }
-
-    pub async fn get_all_workers(&self) -> Vec<crate::workers::WorkerMetrics> {
-        self.worker_manager.get_all_workers().await
-    }
-
-    pub async fn get_reward_stats(&self) -> crate::reward_system::RewardMetrics {
-        self.reward_system.get_metrics()
-    }
-
-    pub async fn get_tuning_metrics(&self) -> crate::tuning::TuningMetrics {
-        self.tuning_system.get_metrics()
-    }
-
-    pub async fn get_vm_status(&self) -> crate::vm::VMStatus {
-        let vm_manager = self.vm_manager.lock().await;
-        vm_manager.get_status().clone()
-    }
-
-    fn calculate_average_performance(&self, workers: &[crate::workers::WorkerMetrics]) -> f32 {
-        if workers.is_empty() {
-            return 0.0;
-        }
-
-        let total_performance: f32 = workers.iter()
-            .map(|w| w.performance.success_rate)
-            .sum();
-
-        total_performance / workers.len() as f32
-    }
-
-    async fn calculate_system_load(&self) -> f32 {
-        let vm_manager = self.vm_manager.lock().await;
-        let status = vm_manager.get_status();
-        
-        // Combine CPU and memory usage
-        (status.cpu_usage + (status.memory_usage as f32 / 100.0)) / 2.0
+        ]
     }
 }
 
-// API Handlers
-pub async fn get_pool_stats(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
-    let stats = data.get_pool_stats().await;
-    HttpResponse::Ok().json(stats)
+/// Статистика системы
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SystemStats {
+    pub total_workers: usize,
+    pub active_workers: usize,
+    pub total_hashrate: f64,
+    pub system_load: f64,
+    pub memory_usage: f64,
+    pub cpu_usage: f64,
+    pub uptime: std::time::Duration,
 }
 
-pub async fn toggle_maintenance(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
-    match data.toggle_maintenance_mode().await {
-        Ok(_) => HttpResponse::Ok().json("Maintenance mode toggled"),
-        Err(e) => HttpResponse::InternalServerError().json(e),
-    }
+/// Статус пула
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PoolStatus {
+    pub is_running: bool,
+    pub worker_count: usize,
+    pub active_tasks: usize,
+    pub queue_size: usize,
+    pub last_block: String,
 }
 
-pub async fn update_config(
-    data: web::Data<Arc<AdminPanel>>,
-    config: web::Json<AdminConfig>,
-) -> impl Responder {
-    match data.update_config(config.into_inner()).await {
-        Ok(_) => HttpResponse::Ok().json("Config updated"),
-        Err(e) => HttpResponse::InternalServerError().json(e),
-    }
-}
-
-pub async fn get_worker_metrics(
-    data: web::Data<Arc<AdminPanel>>,
-    name: web::Path<String>,
-) -> impl Responder {
-    match data.get_worker_metrics(&name).await {
-        Some(metrics) => HttpResponse::Ok().json(metrics),
-        None => HttpResponse::NotFound().json("Worker not found"),
-    }
-}
-
-pub async fn get_all_workers(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
-    let workers = data.get_all_workers().await;
-    HttpResponse::Ok().json(workers)
-}
-
-pub async fn get_reward_stats(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
-    let stats = data.get_reward_stats().await;
-    HttpResponse::Ok().json(stats)
-}
-
-pub async fn get_tuning_metrics(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
-    let metrics = data.get_tuning_metrics().await;
-    HttpResponse::Ok().json(metrics)
-}
-
-pub async fn get_vm_status(data: web::Data<Arc<AdminPanel>>) -> impl Responder {
-    let status = data.get_vm_status().await;
-    HttpResponse::Ok().json(status)
+/// Запись лога
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LogEntry {
+    pub timestamp: chrono::DateTime<chrono::Utc>,
+    pub level: String,
+    pub message: String,
 }
 
 /// Инициализация admin модуля
-pub async fn initialize() -> Result<(), Box<dyn Error>> {
+pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Initializing admin module");
     Ok(())
 }
 
 /// Остановка admin модуля
-pub async fn shutdown() -> Result<(), Box<dyn Error>> {
+pub async fn shutdown() -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Shutting down admin module");
     Ok(())
 }
 
 /// Проверка здоровья admin модуля
-pub async fn health_check() -> Result<(), Box<dyn Error>> {
+pub async fn health_check() -> Result<(), Box<dyn std::error::Error>> {
     log::debug!("Admin module health check passed");
     Ok(())
-} 
+}
+
+pub use admin_panel::*;
+pub use system_manager::*;
+pub use config_manager::*; 

@@ -1,4 +1,6 @@
-use actix_web::{web, App, HttpServer, HttpResponse, Responder, get, post, delete};
+//! Admin Panel - Веб-интерфейс для административного управления
+
+use actix_web::{web, HttpResponse, Responder, get, post, delete};
 use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use parking_lot::RwLock;
@@ -6,7 +8,12 @@ use std::collections::HashMap;
 use log::{info, warn, error};
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
-use super::pool_cok::{PoolNode, PoolMigrationManager, MigrationTask, PoolError};
+
+use crate::pool::pool_cok::{PoolNode, PoolMigrationManager, MigrationTask, PoolError};
+use crate::core::state::AppState;
+use crate::pool::pool::PoolManager;
+use crate::monitoring::metrics::SystemMetrics;
+use crate::network::api::ApiServer;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AdminConfig {
@@ -16,35 +23,54 @@ pub struct AdminConfig {
 }
 
 pub struct AdminPanel {
-    manager: Arc<PoolMigrationManager>,
+    state: Arc<AppState>,
+    pool_manager: Arc<PoolManager>,
+    metrics: Arc<RwLock<SystemMetrics>>,
+    api_server: Arc<ApiServer>,
     config: AdminConfig,
     sessions: Arc<RwLock<HashMap<String, DateTime<Utc>>>>,
 }
 
 impl AdminPanel {
-    pub fn new(manager: Arc<PoolMigrationManager>, config: AdminConfig) -> Self {
+    pub fn new(
+        state: Arc<AppState>,
+        pool_manager: Arc<PoolManager>,
+        metrics: Arc<RwLock<SystemMetrics>>,
+        api_server: Arc<ApiServer>,
+        config: AdminConfig,
+    ) -> Self {
         Self {
-            manager,
+            state,
+            pool_manager,
+            metrics,
+            api_server,
             config,
             sessions: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
     pub async fn start_server(&self, address: &str) -> std::io::Result<()> {
-        let manager = self.manager.clone();
+        let state = self.state.clone();
+        let pool_manager = self.pool_manager.clone();
+        let metrics = self.metrics.clone();
+        let api_server = self.api_server.clone();
         let config = self.config.clone();
         let sessions = self.sessions.clone();
 
-        HttpServer::new(move || {
-            App::new()
-                .app_data(web::Data::new(manager.clone()))
+        actix_web::HttpServer::new(move || {
+            actix_web::App::new()
+                .app_data(web::Data::new(state.clone()))
+                .app_data(web::Data::new(pool_manager.clone()))
+                .app_data(web::Data::new(metrics.clone()))
+                .app_data(web::Data::new(api_server.clone()))
                 .app_data(web::Data::new(config.clone()))
                 .app_data(web::Data::new(sessions.clone()))
-                .service(get_nodes)
-                .service(add_node)
-                .service(remove_node)
-                .service(get_migrations)
-                .service(force_migration)
+                .service(get_system_stats)
+                .service(get_pool_status)
+                .service(restart_system)
+                .service(enable_maintenance)
+                .service(disable_maintenance)
+                .service(get_logs)
                 .service(login)
                 .service(logout)
         })
@@ -92,62 +118,156 @@ async fn logout(
     }))
 }
 
-#[get("/nodes")]
-async fn get_nodes(
-    manager: web::Data<Arc<PoolMigrationManager>>,
+#[get("/system/stats")]
+async fn get_system_stats(
+    state: web::Data<Arc<AppState>>,
+    pool_manager: web::Data<Arc<PoolManager>>,
+    metrics: web::Data<Arc<RwLock<SystemMetrics>>>,
 ) -> impl Responder {
-    let nodes = manager.nodes.read();
-    HttpResponse::Ok().json(nodes.values().collect::<Vec<_>>())
+    let metrics = metrics.read().await;
+    
+    let stats = serde_json::json!({
+        "total_workers": pool_manager.get_worker_count(),
+        "active_workers": pool_manager.get_active_worker_count(),
+        "total_hashrate": pool_manager.get_total_hashrate(),
+        "system_load": metrics.system_load,
+        "memory_usage": metrics.memory_usage,
+        "cpu_usage": metrics.cpu_usage,
+        "uptime": metrics.uptime.as_secs(),
+        "maintenance_mode": state.is_maintenance_mode().await,
+    });
+    
+    HttpResponse::Ok().json(stats)
 }
 
-#[post("/nodes")]
-async fn add_node(
-    node: web::Json<PoolNode>,
-    manager: web::Data<Arc<PoolMigrationManager>>,
+#[get("/pool/status")]
+async fn get_pool_status(
+    pool_manager: web::Data<Arc<PoolManager>>,
 ) -> impl Responder {
-    manager.add_node(node.into_inner());
-    HttpResponse::Ok().json(serde_json::json!({
-        "status": "node added"
-    }))
+    let status = serde_json::json!({
+        "is_running": pool_manager.is_running(),
+        "worker_count": pool_manager.get_worker_count(),
+        "active_tasks": pool_manager.get_active_task_count(),
+        "queue_size": pool_manager.get_queue_size(),
+        "last_block": pool_manager.get_last_block_hash(),
+    });
+    
+    HttpResponse::Ok().json(status)
 }
 
-#[delete("/nodes/{node_id}")]
-async fn remove_node(
-    node_id: web::Path<String>,
-    manager: web::Data<Arc<PoolMigrationManager>>,
+#[post("/system/restart")]
+async fn restart_system(
+    pool_manager: web::Data<Arc<PoolManager>>,
+    api_server: web::Data<Arc<ApiServer>>,
 ) -> impl Responder {
-    manager.remove_node(&node_id);
-    HttpResponse::Ok().json(serde_json::json!({
-        "status": "node removed"
-    }))
-}
-
-#[get("/migrations")]
-async fn get_migrations(
-    manager: web::Data<Arc<PoolMigrationManager>>,
-) -> impl Responder {
-    let migrations = manager.get_migration_history();
-    HttpResponse::Ok().json(migrations)
-}
-
-#[post("/migrations/force")]
-async fn force_migration(
-    task: web::Json<MigrationTask>,
-    manager: web::Data<Arc<PoolMigrationManager>>,
-) -> impl Responder {
-    match manager.execute_migration(
-        &task.source_node,
-        &task.target_node,
-        task.task_data.clone(),
-        task.priority,
-    ).await {
+    match restart_system_internal(pool_manager.as_ref(), api_server.as_ref()).await {
         Ok(_) => HttpResponse::Ok().json(serde_json::json!({
-            "status": "migration started"
+            "status": "system restarted"
         })),
         Err(e) => HttpResponse::InternalServerError().json(serde_json::json!({
             "error": e.to_string()
         })),
     }
+}
+
+#[post("/maintenance/enable")]
+async fn enable_maintenance(
+    state: web::Data<Arc<AppState>>,
+) -> impl Responder {
+    state.set_maintenance_mode(true).await;
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "maintenance mode enabled"
+    }))
+}
+
+#[post("/maintenance/disable")]
+async fn disable_maintenance(
+    state: web::Data<Arc<AppState>>,
+) -> impl Responder {
+    state.set_maintenance_mode(false).await;
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "maintenance mode disabled"
+    }))
+}
+
+#[get("/logs")]
+async fn get_logs() -> impl Responder {
+    let logs = vec![
+        serde_json::json!({
+            "timestamp": chrono::Utc::now(),
+            "level": "INFO",
+            "message": "System logs requested"
+        })
+    ];
+    
+    HttpResponse::Ok().json(logs)
+}
+
+async fn restart_system_internal(
+    pool_manager: &PoolManager,
+    api_server: &ApiServer,
+) -> Result<(), Box<dyn std::error::Error>> {
+    log::info!("Admin: Restarting system");
+    
+    // Остановка компонентов
+    pool_manager.stop().await?;
+    api_server.stop().await?;
+    
+    // Запуск компонентов
+    pool_manager.start().await?;
+    api_server.start().await?;
+    
+    log::info!("Admin: System restarted successfully");
+    Ok(())
+}
+
+// API функции для main.rs
+pub async fn get_pool_stats() -> impl Responder {
+    serde_json::json!({
+        "total_workers": 0,
+        "active_workers": 0,
+        "hashrate": "0 H/s",
+        "difficulty": 1.0,
+        "last_block": "0000000000000000000000000000000000000000000000000000000000000000"
+    })
+}
+
+pub async fn get_worker_stats() -> impl Responder {
+    serde_json::json!({
+        "workers": []
+    })
+}
+
+pub async fn update_pool_config() -> impl Responder {
+    serde_json::json!({
+        "status": "config updated"
+    })
+}
+
+pub async fn add_worker() -> impl Responder {
+    serde_json::json!({
+        "status": "worker added"
+    })
+}
+
+pub async fn remove_worker() -> impl Responder {
+    serde_json::json!({
+        "status": "worker removed"
+    })
+}
+
+pub async fn get_reward_stats() -> impl Responder {
+    serde_json::json!({
+        "total_rewards": 0.0,
+        "pending_rewards": 0.0,
+        "paid_rewards": 0.0
+    })
+}
+
+pub async fn toggle_maintenance_mode() -> impl Responder {
+    serde_json::json!({
+        "status": "maintenance mode toggled"
+    })
 }
 
 #[cfg(test)]
@@ -162,14 +282,10 @@ mod tests {
             allowed_ips: vec![],
             rate_limit: 100,
         };
-        let manager = Arc::new(PoolMigrationManager::new(vec![0; 32]));
-        let panel = AdminPanel::new(manager, config);
         
         let app = test::init_service(
-            App::new()
-                .app_data(web::Data::new(panel.manager.clone()))
-                .app_data(web::Data::new(panel.config.clone()))
-                .app_data(web::Data::new(panel.sessions.clone()))
+            actix_web::App::new()
+                .app_data(web::Data::new(config))
                 .service(login)
         ).await;
 

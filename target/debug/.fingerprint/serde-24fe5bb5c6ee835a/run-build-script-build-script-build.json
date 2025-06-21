@@ -1,0 +1,1 @@
+{"rustc":12200708597866198150,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[9689903380558560274,"build_script_build",false,12977331770715844297]],"local":[{"RerunIfChanged":{"output":"debug\\build\\serde-24fe5bb5c6ee835a\\output","paths":["build.rs"]}}],"rustflags":["-C","link-arg=-Wl,-rpath,/home/rust/libtorch/lib"],"config":0,"compile_kind":0}
