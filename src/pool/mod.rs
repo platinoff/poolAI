@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse, Responder, error};
 use std::sync::Arc;
-use cursor_codes::core::state::AppState;
+use crate::core::state::AppState;
 use log::info;
-use cursor_codes::core::error::NotFoundError;
+use crate::core::error::NotFoundError;
 use serde::{Serialize, Deserialize};
 use tokio::sync::Mutex;
 use actix_web::middleware::Logger;

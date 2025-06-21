@@ -42,7 +42,7 @@ pub struct LibraryConfig {
 
 pub struct LibraryManager {
     libraries: Arc<RwLock<HashMap<String, LibraryInfo>>>,
-    config: Arc<Mutex<LibraryConfig>>,
+    config: Arc<Mutex<HashMap<String, LibraryConfig>>>,
     download_path: PathBuf,
     status: Arc<Mutex<LibraryStatus>>,
 }
@@ -66,7 +66,7 @@ impl LibraryManager {
 
         Self {
             libraries: Arc::new(RwLock::new(HashMap::new())),
-            config: Arc::new(Mutex::new(config.get("libtorch").cloned().unwrap())),
+            config: Arc::new(Mutex::new(config)),
             download_path,
             status: Arc::new(Mutex::new(LibraryStatus::NotInstalled)),
         }
@@ -218,22 +218,13 @@ impl LibraryManager {
             .ok_or_else(|| "LibTorch configuration not found".to_string())?;
 
         // Set environment variables
-        std::env::set_var("TORCH_LIBRARY_PATH", libtorch_config.path.join("lib").to_string_lossy());
-        std::env::set_var("TORCH_INCLUDE_PATH", libtorch_config.path.join("include").to_string_lossy());
+        std::env::set_var("TORCH_HOME", libtorch_config.path.to_string_lossy());
+        std::env::set_var("LD_LIBRARY_PATH", format!("{}:{}", 
+            libtorch_config.path.join("lib").to_string_lossy(),
+            std::env::var("LD_LIBRARY_PATH").unwrap_or_default()
+        ));
 
-        // Update library path
-        if let Ok(path) = std::env::var("LD_LIBRARY_PATH") {
-            let new_path = format!("{}:{}", 
-                libtorch_config.path.join("lib").to_string_lossy(),
-                path
-            );
-            std::env::set_var("LD_LIBRARY_PATH", new_path);
-        } else {
-            std::env::set_var("LD_LIBRARY_PATH", 
-                libtorch_config.path.join("lib").to_string_lossy()
-            );
-        }
-
+        info!("Environment variables set for LibTorch");
         Ok(())
     }
 
@@ -242,68 +233,61 @@ impl LibraryManager {
     }
 
     pub async fn update_library(&self) -> Result<(), String> {
-        let config = self.config.lock().await;
-        let library_config = config.get("libtorch")
-            .ok_or_else(|| format!("Library {} not found", "libtorch"))?;
-
-        match self.check_libtorch().await {
-            Ok(LibraryStatus::Installed) => self.download_libtorch().await,
-            Ok(LibraryStatus::NotInstalled) => self.download_libtorch().await,
-            Ok(LibraryStatus::Downloading) => Err("Library is already being downloaded".to_string()),
-            Err(e) => Err(e),
+        // Check current version and update if needed
+        let current_status = self.check_libtorch().await?;
+        
+        match current_status {
+            LibraryStatus::NotInstalled => {
+                self.download_libtorch().await?;
+            }
+            LibraryStatus::Failed(_) => {
+                warn!("LibTorch installation is corrupted, reinstalling...");
+                self.download_libtorch().await?;
+            }
+            LibraryStatus::Installed => {
+                info!("LibTorch is already installed and up to date");
+            }
+            LibraryStatus::Downloading => {
+                return Err("LibTorch is currently being downloaded".to_string());
+            }
         }
+
+        Ok(())
     }
 
     pub async fn load_library(&self) -> Result<(), String> {
-        let mut status = self.status.lock().await;
         let config = self.config.lock().await;
-
-        if status.loaded {
-            return Err("Library is already loaded".to_string());
-        }
+        let libtorch_config = config.get("libtorch")
+            .ok_or_else(|| "LibTorch configuration not found".to_string())?;
 
         // Check dependencies
-        self.check_dependencies(&config).await?;
+        self.check_dependencies(libtorch_config).await?;
 
-        // Load library
-        match self.load_libtorch(&config).await {
-            Ok(_) => {
-                status.loaded = true;
-                status.last_loaded = chrono::Utc::now();
-                status.error_count = 0;
-                info!("Library {} loaded successfully", config.name);
-                Ok(())
-            }
-            Err(e) => {
-                status.error_count += 1;
-                error!("Failed to load library {}: {}", config.name, e);
-                Err(e)
-            }
-        }
+        // Load LibTorch
+        self.load_libtorch(libtorch_config).await?;
+
+        // Update status
+        let mut status = self.status.lock().await;
+        *status = LibraryStatus::Installed;
+
+        info!("LibTorch library loaded successfully");
+        Ok(())
     }
 
     pub async fn unload_library(&self) -> Result<(), String> {
-        let mut status = self.status.lock().await;
         let config = self.config.lock().await;
+        let libtorch_config = config.get("libtorch")
+            .ok_or_else(|| "LibTorch configuration not found".to_string())?;
 
-        if !status.loaded {
-            return Err("Library is not loaded".to_string());
-        }
+        // Unload LibTorch
+        self.unload_libtorch(libtorch_config).await?;
 
-        // Unload library
-        match self.unload_libtorch(&config).await {
-            Ok(_) => {
-                status.loaded = false;
-                status.memory_usage = 0;
-                status.gpu_memory_usage = None;
-                info!("Library {} unloaded successfully", config.name);
-                Ok(())
-            }
-            Err(e) => {
-                error!("Failed to unload library {}: {}", config.name, e);
-                Err(e)
-            }
-        }
+        // Update status
+        let mut status = self.status.lock().await;
+        *status = LibraryStatus::NotInstalled;
+
+        info!("LibTorch library unloaded successfully");
+        Ok(())
     }
 
     pub async fn get_status(&self) -> LibraryStatus {
@@ -316,24 +300,51 @@ impl LibraryManager {
     }
 
     async fn check_dependencies(&self, config: &LibraryConfig) -> Result<(), String> {
-        // Check if CUDA is available
+        // Check GPU requirements
         if config.gpu_required {
-            // TODO: Implement CUDA availability check
+            // Check CUDA availability
+            let cuda_check = Command::new("nvidia-smi")
+                .output()
+                .map_err(|_| "CUDA not available".to_string())?;
+
+            if !cuda_check.status.success() {
+                return Err("CUDA is required but not available".to_string());
+            }
         }
 
-        // Check if enough memory is available
-        // TODO: Implement memory check
+        // Check memory requirements
+        let available_memory = sysinfo::System::new_all().total_memory() * 1024; // Convert to bytes
+        if available_memory < config.memory_required {
+            return Err(format!(
+                "Insufficient memory. Required: {}GB, Available: {}GB",
+                config.memory_required / (1024 * 1024 * 1024),
+                available_memory / (1024 * 1024 * 1024)
+            ));
+        }
 
         Ok(())
     }
 
     async fn load_libtorch(&self, config: &LibraryConfig) -> Result<(), String> {
-        // TODO: Implement libtorch loading
+        // Set up environment variables
+        self.setup_environment().await?;
+
+        // Verify installation
+        if !self.verify_libtorch().await? {
+            return Err("LibTorch installation verification failed".to_string());
+        }
+
         Ok(())
     }
 
-    async fn unload_libtorch(&self, config: &LibraryConfig) -> Result<(), String> {
-        // TODO: Implement libtorch unloading
+    async fn unload_libtorch(&self, _config: &LibraryConfig) -> Result<(), String> {
+        // Clear environment variables
+        std::env::remove_var("TORCH_HOME");
+        
+        // Note: LD_LIBRARY_PATH modification is more complex and should be handled carefully
+        // For now, we'll just log the action
+        info!("LibTorch environment variables cleared");
+        
         Ok(())
     }
 } 

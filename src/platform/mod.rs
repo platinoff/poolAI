@@ -22,14 +22,6 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 use std::error::Error;
 
-pub mod model;
-pub mod lmrouter;
-pub mod soladdr;
-
-pub use model::*;
-pub use lmrouter::*;
-pub use soladdr::*;
-
 #[derive(Error, Debug)]
 pub enum PlatformError {
     #[error("Failed to create service: {0}")]
