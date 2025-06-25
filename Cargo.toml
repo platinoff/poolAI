@@ -96,12 +96,9 @@ tch = "0.14.0"
 crossterm = "0.26"
 
 # Platform-specific dependencies
-[target.'cfg(windows)'.dependencies]
 windows-service = { version = "0.6", optional = true }
 winapi = { version = "0.3", features = ["winsvc"], optional = true }
-
-[target.'cfg(unix)'.dependencies]
-daemonize = "0.5"
+daemonize = { version = "0.5", optional = true }
 libc = "0.2"
 nix = { version = "0.26", optional = true }
 
@@ -109,13 +106,13 @@ nix = { version = "0.26", optional = true }
 [features]
 test = ["mockall"]
 default = ["web-ui"]
-web-ui = ["actix-web", "actix-rt", "reqwest/json"]
+web-ui = ["dep:actix-web", "dep:actix-rt", "dep:reqwest"]
 metrics = ["dep:prometheus", "dep:metrics"]
 monitoring = ["metrics", "tracing"]
-cli = ["clap", "dialoguer"]
-gui = ["eframe", "egui"]
-windows = ["windows-service", "winapi"]
-unix = ["nix"]
+cli = ["dep:clap", "dep:dialoguer"]
+gui = ["dep:eframe", "dep:egui"]
+windows = ["dep:windows-service", "dep:winapi"]
+unix = ["dep:nix"]
 
 # Development dependencies
 [dev-dependencies]
