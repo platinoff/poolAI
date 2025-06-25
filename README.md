@@ -1,340 +1,317 @@
 # PoolAI - AI Mining Pool Management System
 
-**Version: Beta_bolvanka_v1**  
-**Build Date: 2024-12-19**
+PoolAI is a comprehensive distributed system for managing AI mining pools with integration of generative models, GPU optimization, and automated resource management.
 
-[![Rust](https://img.shields.io/badge/Rust-1.70+-orange.svg)](https://www.rust-lang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-Beta_bolvanka_v1-blue.svg)](https://github.com/platinoff/poolAI)
+## 🚀 Features
 
-PoolAI - это инновационная система управления майнинг пулами с интеграцией генеративных AI моделей. Система оптимизирует использование GPU, ASIC и CPU ресурсов для максимальной эффективности майнинга и AI вычислений.
+### Core Features
+- **Model Integration**: Support for multiple generative models (GPT, BERT, T5, LLaMA)
+- **GPU Management**: Advanced GPU resource allocation and optimization
+- **Distributed Computing**: Scalable pool management with load balancing
+- **Real-time Monitoring**: Comprehensive metrics and health monitoring
+- **Web Interface**: Modern dashboard for system management
+- **API Support**: RESTful API and WebSocket endpoints
+- **Telegram Bot**: Remote management via Telegram
 
-## 🚀 Основные возможности
+### Advanced Features
+- **Virtual Machine Management**: VM creation and GPU passthrough
+- **RAID Management**: Storage optimization and redundancy
+- **Library Management**: Dynamic model library loading
+- **Platform Abstraction**: Cross-platform support (Linux, Windows)
+- **Auto-scaling**: Intelligent resource scaling based on demand
+- **Fault Tolerance**: Automatic recovery and redundancy
 
-### 🤖 AI Интеграция
-- **Генеративные модели**: Поддержка GPT, BERT, T5 и других моделей
-- **Автоматическая оптимизация**: AI-управляемая настройка параметров майнинга
-- **Модель-ассистированный майнинг**: Использование AI для улучшения алгоритмов
+## 📋 Requirements
 
-### ⚡ Оптимизация ресурсов
-- **GPU Optimization**: Автоматическая настройка CUDA/OpenCL параметров
-- **ASIC Management**: Управление ASIC устройствами и их настройками
-- **CPU Tuning**: Оптимизация CPU для майнинга и AI задач
-- **Memory Management**: Умное управление памятью между майнингом и AI
+### System Requirements
+- **OS**: Linux (Ubuntu 20.04+) or Windows 10+
+- **CPU**: 4+ cores recommended
+- **RAM**: 8GB+ recommended
+- **Storage**: 50GB+ available space
+- **GPU**: NVIDIA GPU with CUDA support (optional)
 
-### 📱 Управление
-- **Telegram Bot**: Полное управление системой через Telegram
-- **Web Dashboard**: Современный веб-интерфейс для мониторинга
-- **REST API**: Программный доступ к функциям системы
-- **Admin Panel**: Панель администратора с расширенными возможностями
+### Software Requirements
+- **Rust**: 1.70+ (latest stable)
+- **Docker**: 20.10+ (optional, for containerization)
+- **CUDA**: 11.0+ (optional, for GPU support)
 
-### 🛡️ Надежность
-- **RAID System**: Отказоустойчивость и репликация данных
-- **Monitoring**: Комплексный мониторинг системы
-- **Alerting**: Система оповещений о проблемах
-- **Auto-recovery**: Автоматическое восстановление после сбоев
+## 🛠️ Installation
 
-### 🎯 Система наград
-- **Fair Distribution**: Справедливое распределение наград
-- **Activity Tracking**: Отслеживание активности воркеров
-- **Performance Metrics**: Метрики производительности
-- **Reward Optimization**: Оптимизация наград на основе AI
+### Quick Start
 
-## 🏗️ Архитектура
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/poolai/poolai.git
+   cd poolai
+   ```
 
-```
-PoolAI/
-├── src/
-│   ├── core/           # Базовые интерфейсы и трейты
-│   ├── libs/           # Управление моделями и GPU
-│   ├── pool/           # Управление пулом и воркерами
-│   ├── monitoring/     # Мониторинг и метрики
-│   ├── runtime/        # Управление экземплярами
-│   ├── network/        # Сетевая инфраструктура
-│   ├── platform/       # Платформенная абстракция
-│   ├── vm/            # Виртуализация и passthrough
-│   ├── tgbot/         # Telegram бот
-│   ├── raid/          # RAID система
-│   ├── ui/            # Веб-интерфейс
-│   ├── admin/         # Панель администратора
-│   └── workers/       # Управление воркерами
-├── cursor-core/       # Основная библиотека
-├── src/tgbot/         # Telegram бот модуль
-└── src/raid/          # RAID модуль
-```
+2. **Install Rust** (if not already installed)
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   source ~/.cargo/env
+   ```
 
-## 📦 Установка
+3. **Build the project**
+   ```bash
+   cargo build --release
+   ```
 
-### Требования
+4. **Run PoolAI**
+   ```bash
+   ./target/release/poolai
+   ```
 
-- **ОС**: Windows 10+, Linux (Ubuntu 20.04+), macOS 10.15+
-- **Rust**: 1.70+ ([установка](https://rustup.rs/))
-- **RAM**: 8GB+ (рекомендуется 16GB+)
-- **GPU**: NVIDIA RTX 4090+ или эквивалент
-- **ASIC**: Поддержка основных ASIC устройств
-- **Сеть**: Стабильное интернет-соединение
-
-### Быстрая установка
+### Docker Installation
 
 ```bash
-# Клонирование репозитория
-git clone https://github.com/platinoff/poolAI.git
-cd poolAI
+# Build Docker image
+docker build -t poolai .
 
-# Сборка проекта
-cargo build --release
+# Run with GPU support
+docker run --gpus all -p 8080:8080 -p 3000:3000 poolai
 
-# Запуск
-cargo run --release
+# Run without GPU
+docker run -p 8080:8080 -p 3000:3000 poolai
 ```
 
-### Docker установка
+## 🏗️ Architecture
 
-```bash
-# Сборка образа
-docker build -t poolai:beta-bolvanka-v1 .
+### Core Modules
 
-# Запуск контейнера
-docker run -d \
-  --name poolai \
-  --gpus all \
-  -p 8080:8080 \
-  -v /path/to/config:/app/config \
-  poolai:beta-bolvanka-v1
+```
+poolai/
+├── core/           # Core functionality and interfaces
+├── pool/           # Pool management and load balancing
+├── runtime/        # Model runtime and instance management
+├── monitoring/     # Metrics collection and health monitoring
+├── network/        # API and network communication
+├── platform/       # Platform-specific optimizations
+├── ui/             # Web interface and dashboard
+├── libs/           # Model library management
+├── vm/             # Virtual machine management
+├── raid/           # Storage and RAID management
+└── tgbot/          # Telegram bot integration
 ```
 
-## ⚙️ Конфигурация
+### Key Components
 
-Создайте файл `config.toml` в корне проекта:
+- **Model Interface**: Unified interface for all AI models
+- **Resource Manager**: Intelligent resource allocation
+- **Load Balancer**: Request distribution across workers
+- **Health Monitor**: Real-time system health tracking
+- **API Gateway**: RESTful API and WebSocket endpoints
+
+## 🔧 Configuration
+
+### Basic Configuration
+
+Create `config.toml` in the project root:
 
 ```toml
-[system]
-version = "Beta_bolvanka_v1"
-debug = false
-log_level = "info"
-
-[gpu]
-enabled = true
-optimization = true
-memory_limit = 16384  # MB
-cuda_version = "12.0"
-
-[models]
-default_model = "gpt-3.5-turbo"
-max_models = 10
-auto_load = true
-model_path = "./models"
-
 [pool]
-name = "PoolAI Beta"
-description = "AI-powered mining pool"
-max_workers = 1000
-reward_algorithm = "ai_optimized"
+max_workers = 10
+max_queue_size = 1000
+auto_scaling = true
+scaling_threshold = 0.8
 
-[telegram]
-enabled = true
-token = "YOUR_BOT_TOKEN"
-admin_users = ["your_telegram_id"]
-
-[web]
-enabled = true
+[network]
 host = "127.0.0.1"
 port = 8080
-tls_enabled = false
+enable_ssl = false
+
+[ui]
+host = "127.0.0.1"
+port = 3000
+theme = "dark"
 
 [monitoring]
-enabled = true
-metrics_port = 9090
-alert_email = "admin@poolai.com"
+enable_metrics = true
+metrics_interval = 30
 
-[raid]
-enabled = true
-replication_factor = 3
-auto_repair = true
+[gpu]
+enable_gpu_passthrough = true
+max_gpu_memory = 8192
 ```
 
-## 🚀 Использование
-
-### Запуск системы
+### Environment Variables
 
 ```bash
-# Запуск с конфигурацией
-cargo run --release -- --config config.toml
-
-# Запуск в фоновом режиме
-nohup cargo run --release > poolai.log 2>&1 &
-
-# Запуск с отладкой
-RUST_LOG=debug cargo run --release
+export POOLAI_LOG_LEVEL=info
+export POOLAI_CONFIG_PATH=./config.toml
+export POOLAI_DATA_DIR=./data
 ```
 
-### Telegram бот
+## 📊 Usage
 
-После настройки токена в конфигурации:
+### Starting the System
 
+```bash
+# Basic startup
+cargo run
+
+# With specific config
+POOLAI_CONFIG_PATH=./custom_config.toml cargo run
+
+# With logging
+RUST_LOG=debug cargo run
 ```
-/start - Запуск бота
-/status - Статус системы
-/pool_stats - Статистика пула
-/worker_stats - Статистика воркеров
-/gpu_status - Статус GPU
-/ai_models - Список AI моделей
-/restart - Перезапуск системы
-```
-
-### Веб-интерфейс
-
-Откройте браузер и перейдите на `http://localhost:8080`
-
-- **Dashboard**: Общий обзор системы
-- **Pool Management**: Управление пулом
-- **Worker Management**: Управление воркерами
-- **AI Models**: Управление AI моделями
-- **Monitoring**: Мониторинг и метрики
-- **Admin Panel**: Панель администратора
 
 ### API Endpoints
 
-```bash
-# Статус системы
-curl http://localhost:8080/api/v1/status
+- **Health Check**: `GET /api/v1/health`
+- **System Status**: `GET /api/v1/status`
+- **Model List**: `GET /api/v1/models`
+- **Generate Text**: `POST /api/v1/models/{model}/generate`
+- **Metrics**: `GET /api/v1/metrics`
 
-# Статистика пула
-curl http://localhost:8080/api/v1/pool/stats
+### Web Interface
 
-# Статистика воркеров
-curl http://localhost:8080/api/v1/workers/stats
+Access the dashboard at `http://localhost:3000`
 
-# Добавление воркера
-curl -X POST http://localhost:8080/api/v1/workers/add \
-  -H "Content-Type: application/json" \
-  -d '{"name": "worker1", "gpu": "RTX4090"}'
+### Telegram Bot
+
+Configure your bot token in the config and use commands:
+- `/start` - Start the bot
+- `/status` - Get system status
+- `/metrics` - Get system metrics
+- `/help` - Show available commands
+
+## 🔍 Monitoring
+
+### Metrics Available
+
+- **System Metrics**: CPU, Memory, Disk, Network
+- **GPU Metrics**: Utilization, Memory, Temperature
+- **Model Metrics**: Throughput, Latency, Accuracy
+- **Pool Metrics**: Active workers, Queue size, Success rate
+
+### Dashboard Features
+
+- Real-time system monitoring
+- Interactive charts and graphs
+- Alert management
+- Resource utilization tracking
+- Performance analytics
+
+## 🚀 Deployment
+
+### Production Deployment
+
+1. **Build for production**
+   ```bash
+   cargo build --release --features full
+   ```
+
+2. **Set up systemd service**
+   ```bash
+   sudo cp poolai.service /etc/systemd/system/
+   sudo systemctl enable poolai
+   sudo systemctl start poolai
+   ```
+
+3. **Configure reverse proxy** (Nginx example)
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com;
+       
+       location / {
+           proxy_pass http://127.0.0.1:3000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+       
+       location /api {
+           proxy_pass http://127.0.0.1:8080;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+   }
+   ```
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  poolai:
+    build: .
+    ports:
+      - "8080:8080"
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./config.toml:/app/config.toml
+    environment:
+      - RUST_LOG=info
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 ```
 
-## 🔧 Разработка
+## 🧪 Testing
 
-### Структура проекта
-
-```bash
-# Основные модули
-src/core/          # Базовые интерфейсы
-src/libs/          # AI модели и GPU
-src/pool/          # Управление пулом
-src/monitoring/    # Мониторинг
-src/runtime/       # Runtime системы
-src/network/       # Сеть и API
-src/platform/      # Платформы
-src/vm/           # Виртуализация
-src/tgbot/        # Telegram бот
-src/raid/         # RAID система
-src/ui/           # Веб-интерфейс
-src/admin/        # Админ панель
-src/workers/      # Воркеры
-
-# Зависимости
-cursor-core/       # Основная библиотека
-src/tgbot/        # Telegram модуль
-src/raid/         # RAID модуль
-```
-
-### Сборка для разработки
+### Unit Tests
 
 ```bash
-# Установка зависимостей
-cargo build
-
-# Запуск тестов
 cargo test
-
-# Проверка кода
-cargo clippy
-cargo fmt
-
-# Документация
-cargo doc --open
 ```
 
-### Добавление новых функций
+### Integration Tests
 
-1. Создайте новый модуль в соответствующей директории
-2. Добавьте модуль в `lib.rs`
-3. Реализуйте необходимые трейты
-4. Добавьте тесты
-5. Обновите документацию
+```bash
+cargo test --test integration
+```
 
-## 📊 Мониторинг
+### Performance Tests
 
-### Метрики
+```bash
+cargo bench
+```
 
-Система предоставляет метрики в формате Prometheus:
+## 🤝 Contributing
 
-- **pool_workers_total**: Общее количество воркеров
-- **pool_hashrate**: Общий хешрейт пула
-- **gpu_utilization**: Утилизация GPU
-- **ai_model_requests**: Запросы к AI моделям
-- **system_memory_usage**: Использование памяти
-- **network_connections**: Сетевые соединения
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Алерты
+### Development Setup
 
-Настраиваемые алерты для:
+```bash
+# Install development dependencies
+cargo install cargo-watch
+cargo install cargo-audit
 
-- Низкий хешрейт
-- Высокая температура GPU
-- Проблемы с AI моделями
-- Сетевые проблемы
-- Недостаток памяти
+# Run with hot reload
+cargo watch -x run
 
-## 🤝 Вклад в проект
+# Check for security vulnerabilities
+cargo audit
+```
 
-Мы приветствуем вклад в развитие PoolAI!
+## 📄 License
 
-1. **Fork** репозитория
-2. Создайте **feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit** изменения (`git commit -m 'Add amazing feature'`)
-4. **Push** в branch (`git push origin feature/amazing-feature`)
-5. Откройте **Pull Request**
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Руководство по стилю
+## 🆘 Support
 
-- Следуйте [Rust Style Guide](https://doc.rust-lang.org/1.0.0/style/style/naming/README.html)
-- Используйте `cargo fmt` для форматирования
-- Добавляйте тесты для новых функций
-- Обновляйте документацию
+- **Documentation**: [docs.poolai.dev](https://docs.poolai.dev)
+- **Issues**: [GitHub Issues](https://github.com/poolai/poolai/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/poolai/poolai/discussions)
+- **Email**: support@poolai.dev
 
-## 📄 Лицензия
+## 🙏 Acknowledgments
 
-Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для деталей.
-
-## 🆘 Поддержка
-
-- **GitHub Issues**: [Создать issue](https://github.com/platinoff/poolAI/issues)
-- **Discussions**: [Обсуждения](https://github.com/platinoff/poolAI/discussions)
-- **Email**: platinovubuntu@gmail.com
-- **Telegram**: @platinov
-
-## 🙏 Благодарности
-
-- **Rust Community** за отличный язык программирования
-- **Tokio Team** за асинхронную runtime
-- **Actix Team** за веб-фреймворк
-- **PyTorch Team** за ML библиотеки
-- **Telegram Team** за Bot API
-
-## 📈 Roadmap
-
-### Beta_bolvanka_v2 (Планируется)
-- Улучшенная GPU оптимизация
-- Поддержка новых AI моделей
-- Расширенная аналитика
-- Cloud интеграция
-
-### Release_stable_v1 (Планируется)
-- Production-ready версия
-- Enterprise функции
-- Расширенная документация
-- Коммерческая поддержка
+- Rust community for the excellent ecosystem
+- NVIDIA for CUDA and GPU computing tools
+- All contributors and users of PoolAI
 
 ---
 
-**PoolAI Beta_bolvanka_v1** - Инновационное решение для AI-powered майнинга! 🚀 
+**PoolAI** - Empowering AI with distributed computing 🚀 

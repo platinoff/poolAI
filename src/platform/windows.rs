@@ -1,201 +1,144 @@
-use super::{PlatformError, PlatformService, SystemInfo, MemoryInfo, CpuInfo, DiskInfo};
-use std::path::PathBuf;
-use windows_service::{
-    service::{
-        ServiceControl, ServiceControlAccept, ServiceExitCode, ServiceState, ServiceStatus,
-        ServiceType,
-    },
-    service_control_handler::{self, ServiceControlHandlerResult},
-    service_dispatcher,
-};
-use winapi::um::{
-    sysinfoapi::{GlobalMemoryStatusEx, MEMORYSTATUSEX, GetSystemInfo, SYSTEM_INFO},
-    winnt::SYSTEM_INFO,
-    pdh::{PdhOpenQueryW, PdhAddCounterW, PdhCollectQueryData, PdhGetFormattedCounterValue, PDH_FMT_COUNTERVALUE, PDH_FMT_LONG},
-};
-use std::mem::size_of;
-use std::ptr::null_mut;
-use std::ffi::OsStr;
-use std::os::windows::ffi::OsStrExt;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Duration;
-use tokio::time;
+use crate::core::error::AppError;
+use crate::platform::{PlatformInterface, SystemResources, GpuResources};
+use std::collections::HashMap;
 
-pub struct WindowsService {
-    name: String,
-    running: AtomicBool,
+pub struct WindowsPlatform {
+    initialized: bool,
 }
 
-impl WindowsService {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            running: AtomicBool::new(false),
-        }
-    }
-
-    fn to_wide_string(s: &str) -> Vec<u16> {
-        OsStr::new(s)
-            .encode_wide()
-            .chain(std::iter::once(0))
-            .collect()
+impl WindowsPlatform {
+    pub fn new() -> Result<Self, AppError> {
+        Ok(Self {
+            initialized: false,
+        })
     }
 }
 
-#[async_trait::async_trait]
-impl PlatformService for WindowsService {
-    async fn install(&self) -> Result<(), PlatformError> {
-        // Windows service installation logic
-        Ok(())
-    }
-
-    async fn uninstall(&self) -> Result<(), PlatformError> {
-        // Windows service uninstallation logic
-        Ok(())
-    }
-
-    async fn start(&self) -> Result<(), PlatformError> {
-        self.running.store(true, Ordering::SeqCst);
-        Ok(())
-    }
-
-    async fn stop(&self) -> Result<(), PlatformError> {
-        self.running.store(false, Ordering::SeqCst);
-        Ok(())
-    }
-
-    async fn status(&self) -> Result<String, PlatformError> {
-        if self.running.load(Ordering::SeqCst) {
-            Ok("Running".to_string())
-        } else {
-            Ok("Stopped".to_string())
-        }
-    }
-}
-
-pub struct WindowsSystemInfo {
-    cpu_query: *mut std::ffi::c_void,
-    cpu_counter: *mut std::ffi::c_void,
-}
-
-impl WindowsSystemInfo {
-    pub fn new() -> Self {
-        let mut query = null_mut();
-        let mut counter = null_mut();
+impl PlatformInterface for WindowsPlatform {
+    async fn initialize(&self) -> Result<(), AppError> {
+        // Заглушка для инициализации Windows платформы
+        // В реальной реализации здесь будет интеграция с Windows API
         
-        unsafe {
-            PdhOpenQueryW(null_mut(), 0, &mut query);
-            let counter_path = Self::to_wide_string("\\Processor(_Total)\\% Processor Time");
-            PdhAddCounterW(query, counter_path.as_ptr(), 0, &mut counter);
-        }
-
-        Self {
-            cpu_query: query,
-            cpu_counter: counter,
-        }
-    }
-
-    fn to_wide_string(s: &str) -> Vec<u16> {
-        OsStr::new(s)
-            .encode_wide()
-            .chain(std::iter::once(0))
-            .collect()
-    }
-
-    fn get_cpu_usage(&self) -> f32 {
-        let mut value = PDH_FMT_COUNTERVALUE::default();
+        // Проверка доступности необходимых системных вызовов
+        // Загрузка драйверов GPU
+        // Инициализация мониторинга ресурсов
         
-        unsafe {
-            PdhCollectQueryData(self.cpu_query);
-            time::sleep(Duration::from_millis(100));
-            PdhCollectQueryData(self.cpu_query);
-            PdhGetFormattedCounterValue(
-                self.cpu_counter,
-                PDH_FMT_LONG,
-                null_mut(),
-                &mut value,
-            );
-        }
+        Ok(())
+    }
 
-        value.longValue as f32
+    async fn shutdown(&self) -> Result<(), AppError> {
+        // Заглушка для выключения Windows платформы
+        // В реальной реализации здесь будет освобождение ресурсов
+        
+        Ok(())
+    }
+
+    async fn get_system_resources(&self) -> Result<SystemResources, AppError> {
+        // Заглушка для получения системных ресурсов Windows
+        // В реальной реализации здесь будут вызовы Windows API
+        
+        Ok(SystemResources {
+            cpu_usage_percent: 45.2,
+            memory_usage_mb: 8192.0,
+            memory_total_mb: 16384.0,
+            disk_usage_percent: 65.8,
+            network_throughput_mbps: 125.5,
+            temperature_celsius: 45.0,
+            power_consumption_watts: 350.0,
+        })
+    }
+
+    async fn get_gpu_resources(&self) -> Result<HashMap<String, GpuResources>, AppError> {
+        // Заглушка для получения GPU ресурсов Windows
+        // В реальной реализации здесь будут вызовы NVIDIA/AMD API
+        
+        let mut gpu_resources = HashMap::new();
+        
+        // Симуляция GPU 0
+        gpu_resources.insert("gpu_0".to_string(), GpuResources {
+            device_id: "gpu_0".to_string(),
+            utilization_percent: 75.5,
+            memory_used_mb: 4096.0,
+            memory_total_mb: 8192.0,
+            temperature_celsius: 65.0,
+            power_consumption_watts: 180.0,
+            fan_speed_percent: 60.0,
+        });
+        
+        // Симуляция GPU 1
+        gpu_resources.insert("gpu_1".to_string(), GpuResources {
+            device_id: "gpu_1".to_string(),
+            utilization_percent: 45.2,
+            memory_used_mb: 2048.0,
+            memory_total_mb: 8192.0,
+            temperature_celsius: 55.0,
+            power_consumption_watts: 120.0,
+            fan_speed_percent: 45.0,
+        });
+        
+        Ok(gpu_resources)
+    }
+
+    async fn optimize_resources(&self) -> Result<(), AppError> {
+        // Заглушка для оптимизации ресурсов Windows
+        // В реальной реализации здесь будет:
+        // - Оптимизация процессов
+        // - Управление питанием
+        // - Оптимизация GPU
+        // - Очистка памяти
+        
+        Ok(())
+    }
+
+    fn clone(&self) -> Box<dyn PlatformInterface + Send + Sync> {
+        Box::new(WindowsPlatform {
+            initialized: self.initialized,
+        })
     }
 }
 
-impl Drop for WindowsSystemInfo {
-    fn drop(&mut self) {
-        // Cleanup PDH handles
-    }
-}
-
-#[async_trait::async_trait]
-impl SystemInfo for WindowsSystemInfo {
-    fn get_os_name(&self) -> String {
-        "Windows".to_string()
-    }
-
-    fn get_os_version(&self) -> String {
-        // Get Windows version using winapi
-        "10".to_string()
+impl WindowsPlatform {
+    pub async fn get_windows_specific_info(&self) -> Result<HashMap<String, String>, AppError> {
+        // Заглушка для получения Windows-специфичной информации
+        let mut info = HashMap::new();
+        
+        info.insert("os_version".to_string(), "Windows 10".to_string());
+        info.insert("build_number".to_string(), "19044".to_string());
+        info.insert("architecture".to_string(), "x64".to_string());
+        info.insert("gpu_driver_version".to_string(), "512.95".to_string());
+        
+        Ok(info)
     }
 
-    fn get_architecture(&self) -> String {
-        let mut sys_info: SYSTEM_INFO = unsafe { std::mem::zeroed() };
-        unsafe {
-            GetSystemInfo(&mut sys_info);
+    pub async fn set_power_plan(&self, plan: &str) -> Result<(), AppError> {
+        // Заглушка для установки плана питания Windows
+        // В реальной реализации здесь будет вызов powercfg
+        
+        match plan {
+            "high_performance" => {
+                // Установка высокопроизводительного плана
+            }
+            "balanced" => {
+                // Установка сбалансированного плана
+            }
+            "power_saver" => {
+                // Установка экономичного плана
+            }
+            _ => {
+                return Err(AppError::InvalidParameter);
+            }
         }
-        match sys_info.wProcessorArchitecture {
-            0 => "x86",
-            5 => "ARM",
-            6 => "IA64",
-            9 => "x64",
-            _ => "Unknown",
-        }
-        .to_string()
+        
+        Ok(())
     }
 
-    async fn get_memory_info(&self) -> Result<MemoryInfo, PlatformError> {
-        let mut mem_status: MEMORYSTATUSEX = unsafe { std::mem::zeroed() };
-        mem_status.dwLength = size_of::<MEMORYSTATUSEX>() as u32;
-
-        if unsafe { GlobalMemoryStatusEx(&mut mem_status) } == 0 {
-            return Err(PlatformError::SystemInfoError(
-                "Failed to get memory status".to_string(),
-            ));
-        }
-
-        Ok(MemoryInfo {
-            total: mem_status.ullTotalPhys,
-            free: mem_status.ullAvailPhys,
-            used: mem_status.ullTotalPhys - mem_status.ullAvailPhys,
-            swap_total: mem_status.ullTotalPageFile,
-            swap_free: mem_status.ullAvailPageFile,
-            cache: None,
-        })
-    }
-
-    async fn get_cpu_info(&self) -> Result<CpuInfo, PlatformError> {
-        let mut sys_info: SYSTEM_INFO = unsafe { std::mem::zeroed() };
-        unsafe {
-            GetSystemInfo(&mut sys_info);
-        }
-
-        Ok(CpuInfo {
-            model: "Intel/AMD".to_string(),
-            cores: sys_info.dwNumberOfProcessors,
-            threads: sys_info.dwNumberOfProcessors * 2,
-            frequency: 0,
-            usage: self.get_cpu_usage(),
-            temperature: None,
-        })
-    }
-
-    async fn get_disk_info(&self) -> Result<DiskInfo, PlatformError> {
-        Ok(DiskInfo {
-            total: 0,
-            free: 0,
-            used: 0,
-            mount_point: PathBuf::from("C:\\"),
-            fs_type: None,
-        })
+    pub async fn optimize_gpu_settings(&self) -> Result<(), AppError> {
+        // Заглушка для оптимизации настроек GPU в Windows
+        // В реальной реализации здесь будет:
+        // - Настройка NVIDIA Control Panel
+        // - Настройка AMD Radeon Settings
+        // - Оптимизация драйверов
+        
+        Ok(())
     }
 } 

@@ -1,205 +1,205 @@
-//! UI Module - Интерфейс управления и визуализации
-//! 
-//! Этот модуль предоставляет веб-интерфейс для:
-//! - Визуализации метрик модели
-//! - Управления параметрами
-//! - Мониторинга состояния
-//! - Настройки масштабирования
-//! - Отображения результатов
-//! - Управления ресурсами
-
 pub mod dashboard;
 pub mod components;
-pub mod styles;
-pub mod utils;
 
-use crate::core::model_interface::ModelInterface;
-use crate::monitoring::metrics::ModelMetrics;
-use crate::pool::worker::WorkerStatus;
-use crate::runtime::instance::InstanceManager;
-use crate::network::api::ApiServer;
-use crate::platform::gpu::GpuManager;
-
-use axum::{
-    routing::{get, post},
-    Router,
-    extract::State,
-    response::Json,
-    http::StatusCode,
-};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use crate::core::error::AppError;
+use crate::monitoring::SystemStatus;
+use std::collections::HashMap;
 use tokio::sync::RwLock;
+use std::sync::Arc;
 
-/// Состояние UI приложения
-#[derive(Clone)]
-pub struct UiState {
-    pub model_interface: Arc<dyn ModelInterface + Send + Sync>,
-    pub instance_manager: Arc<InstanceManager>,
-    pub api_server: Arc<ApiServer>,
-    pub gpu_manager: Arc<GpuManager>,
-    pub metrics: Arc<RwLock<ModelMetrics>>,
-}
-
-/// Конфигурация UI
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct UiConfig {
     pub host: String,
     pub port: u16,
-    pub enable_ssl: bool,
-    pub ssl_cert_path: Option<String>,
-    pub ssl_key_path: Option<String>,
-    pub static_files_path: String,
-    pub api_prefix: String,
-    pub websocket_path: String,
-    pub cors_origins: Vec<String>,
-    pub rate_limit: u32,
-    pub session_timeout: u64,
+    pub enable_websocket: bool,
+    pub auto_refresh_interval_ms: u64,
     pub theme: UiTheme,
-    pub language: String,
+    pub enable_dark_mode: bool,
 }
 
-/// Тема UI
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum UiTheme {
     Light,
     Dark,
     Auto,
 }
 
-/// Основной UI сервер
-pub struct UiServer {
-    config: UiConfig,
-    state: UiState,
-    router: Router,
+#[derive(Debug, Clone)]
+pub struct UiState {
+    pub current_page: String,
+    pub user_preferences: HashMap<String, String>,
+    pub notifications: Vec<UiNotification>,
+    pub system_status: Option<SystemStatus>,
 }
 
-impl UiServer {
-    /// Создает новый UI сервер
-    pub fn new(config: UiConfig, state: UiState) -> Self {
-        let router = Self::create_router(state.clone());
-        
+#[derive(Debug, Clone)]
+pub struct UiNotification {
+    pub id: String,
+    pub message: String,
+    pub notification_type: NotificationType,
+    pub timestamp: std::time::Instant,
+    pub read: bool,
+}
+
+#[derive(Debug, Clone)]
+pub enum NotificationType {
+    Info,
+    Warning,
+    Error,
+    Success,
+}
+
+pub struct Ui {
+    config: UiConfig,
+    state: Arc<RwLock<UiState>>,
+    dashboard: Option<dashboard::Dashboard>,
+    components: components::ComponentManager,
+}
+
+impl Ui {
+    pub fn new(config: UiConfig) -> Self {
         Self {
             config,
-            state,
-            router,
+            state: Arc::new(RwLock::new(UiState {
+                current_page: "dashboard".to_string(),
+                user_preferences: HashMap::new(),
+                notifications: Vec::new(),
+                system_status: None,
+            })),
+            dashboard: None,
+            components: components::ComponentManager::new(),
         }
     }
 
-    /// Создает роутер с маршрутами
-    fn create_router(state: UiState) -> Router {
-        Router::new()
-            // Основные страницы
-            .route("/", get(dashboard::index))
-            .route("/dashboard", get(dashboard::dashboard))
-            .route("/models", get(dashboard::models))
-            .route("/workers", get(dashboard::workers))
-            .route("/monitoring", get(dashboard::monitoring))
-            .route("/settings", get(dashboard::settings))
-            
-            // API endpoints
-            .route("/api/status", get(api::get_status))
-            .route("/api/metrics", get(api::get_metrics))
-            .route("/api/models", get(api::get_models))
-            .route("/api/workers", get(api::get_workers))
-            .route("/api/gpu", get(api::get_gpu_info))
-            .route("/api/memory", get(api::get_memory_info))
-            
-            // WebSocket для real-time обновлений
-            .route("/ws/metrics", get(websocket::metrics_stream))
-            .route("/ws/events", get(websocket::events_stream))
-            
-            // Статические файлы
-            .nest_service("/static", get(static_files::serve))
-            
-            .with_state(state)
-    }
-
-    /// Запускает UI сервер
-    pub async fn start(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let addr = format!("{}:{}", self.config.host, self.config.port);
-        let listener = tokio::net::TcpListener::bind(&addr).await?;
+    pub async fn initialize(&mut self) -> Result<(), AppError> {
+        // Инициализация UI компонентов
+        self.components.initialize().await?;
         
-        log::info!("UI Server starting on {}", addr);
+        // Создание дашборда
+        self.dashboard = Some(dashboard::Dashboard::new(self.state.clone()).await?);
         
-        axum::serve(listener, self.router.clone()).await?;
+        // Запуск фоновых задач
+        self.start_background_tasks().await?;
         
         Ok(())
     }
 
-    /// Останавливает UI сервер
-    pub async fn stop(&self) -> Result<(), Box<dyn std::error::Error>> {
-        log::info!("UI Server stopping");
+    pub async fn shutdown(&self) -> Result<(), AppError> {
+        // Выключение UI
+        if let Some(dashboard) = &self.dashboard {
+            dashboard.shutdown().await?;
+        }
+        
+        self.components.shutdown().await?;
+        
         Ok(())
     }
 
-    /// Получает статус UI сервера
-    pub fn get_status(&self) -> UiStatus {
-        UiStatus {
-            running: true,
-            host: self.config.host.clone(),
-            port: self.config.port,
-            uptime: std::time::Duration::from_secs(0), // TODO: реализовать
-            connections: 0, // TODO: реализовать
+    pub async fn update_system_status(&self, status: SystemStatus) -> Result<(), AppError> {
+        let mut state = self.state.write().await;
+        state.system_status = Some(status);
+        
+        // Обновление дашборда
+        if let Some(dashboard) = &self.dashboard {
+            dashboard.update_status(status).await?;
+        }
+        
+        Ok(())
+    }
+
+    pub async fn add_notification(&self, notification: UiNotification) -> Result<(), AppError> {
+        let mut state = self.state.write().await;
+        state.notifications.push(notification);
+        
+        // Ограничение количества уведомлений
+        if state.notifications.len() > 100 {
+            state.notifications.drain(0..10);
+        }
+        
+        Ok(())
+    }
+
+    pub async fn mark_notification_read(&self, notification_id: &str) -> Result<(), AppError> {
+        let mut state = self.state.write().await;
+        
+        if let Some(notification) = state.notifications.iter_mut().find(|n| n.id == notification_id) {
+            notification.read = true;
+        }
+        
+        Ok(())
+    }
+
+    pub async fn get_notifications(&self) -> Vec<UiNotification> {
+        let state = self.state.read().await;
+        state.notifications.clone()
+    }
+
+    pub async fn get_unread_notifications(&self) -> Vec<UiNotification> {
+        let state = self.state.read().await;
+        state.notifications.iter()
+            .filter(|n| !n.read)
+            .cloned()
+            .collect()
+    }
+
+    pub async fn set_user_preference(&self, key: String, value: String) -> Result<(), AppError> {
+        let mut state = self.state.write().await;
+        state.user_preferences.insert(key, value);
+        
+        Ok(())
+    }
+
+    pub async fn get_user_preference(&self, key: &str) -> Option<String> {
+        let state = self.state.read().await;
+        state.user_preferences.get(key).cloned()
+    }
+
+    pub async fn navigate_to_page(&self, page: String) -> Result<(), AppError> {
+        let mut state = self.state.write().await;
+        state.current_page = page;
+        
+        Ok(())
+    }
+
+    pub async fn get_current_page(&self) -> String {
+        let state = self.state.read().await;
+        state.current_page.clone()
+    }
+
+    pub async fn get_dashboard_data(&self) -> Result<dashboard::DashboardData, AppError> {
+        if let Some(dashboard) = &self.dashboard {
+            dashboard.get_data().await
+        } else {
+            Err(AppError::ComponentNotInitialized)
         }
     }
-}
 
-/// Статус UI сервера
-#[derive(Debug, Clone, Serialize)]
-pub struct UiStatus {
-    pub running: bool,
-    pub host: String,
-    pub port: u16,
-    pub uptime: std::time::Duration,
-    pub connections: u32,
-}
+    pub async fn render_component(&self, component_name: &str, data: serde_json::Value) -> Result<String, AppError> {
+        self.components.render(component_name, data).await
+    }
 
-/// Инициализация UI модуля
-pub async fn init_ui(config: UiConfig, state: UiState) -> Result<UiServer, Box<dyn std::error::Error>> {
-    log::info!("Initializing UI module");
-    
-    let server = UiServer::new(config, state);
-    
-    log::info!("UI module initialized successfully");
-    Ok(server)
-}
-
-/// Запуск UI модуля
-pub async fn start_ui(server: UiServer) -> Result<(), Box<dyn std::error::Error>> {
-    log::info!("Starting UI server");
-    server.start().await
-}
-
-/// Остановка UI модуля
-pub async fn stop_ui(server: UiServer) -> Result<(), Box<dyn std::error::Error>> {
-    log::info!("Stopping UI server");
-    server.stop().await
-}
-
-/// Инициализация ui модуля
-pub async fn initialize() -> Result<(), Box<dyn std::error::Error>> {
-    log::info!("Initializing ui module");
-    Ok(())
-}
-
-/// Остановка ui модуля
-pub async fn shutdown() -> Result<(), Box<dyn std::error::Error>> {
-    log::info!("Shutting down ui module");
-    Ok(())
-}
-
-/// Проверка здоровья ui модуля
-pub async fn health_check() -> Result<(), Box<dyn std::error::Error>> {
-    log::debug!("UI module health check passed");
-    Ok(())
-}
-
-// Подмодули
-mod api;
-mod websocket;
-mod static_files;
-
-pub use dashboard::*;
-pub use components::*;
-pub use styles::*; 
+    async fn start_background_tasks(&self) -> Result<(), AppError> {
+        let state = self.state.clone();
+        let auto_refresh_interval = self.config.auto_refresh_interval_ms;
+        
+        // Задача автообновления UI
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_millis(auto_refresh_interval));
+            
+            loop {
+                interval.tick().await;
+                
+                // Обновление UI состояния
+                let mut state_write = state.write().await;
+                
+                // Очистка старых уведомлений
+                let now = std::time::Instant::now();
+                state_write.notifications.retain(|n| {
+                    now.duration_since(n.timestamp).as_secs() < 3600 // 1 час
+                });
+            }
+        });
+        
+        Ok(())
+    }
+} 

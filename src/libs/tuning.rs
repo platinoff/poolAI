@@ -1,453 +1,273 @@
-//! Model Tuning - Настройка и оптимизация моделей
-//! 
-//! Этот модуль предоставляет:
-//! - Настройку гиперпараметров
-//! - Оптимизацию производительности
-//! - Адаптивную настройку
-//! - Мониторинг качества
-
 use crate::core::error::AppError;
-use serde::{Deserialize, Serialize};
+use crate::libs::{ModelLibrary, OptimizationLevel};
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::sync::RwLock;
-use std::time::Instant;
+use std::sync::Arc;
 
-/// Настройщик моделей
-pub struct ModelTuner {
-    tuning_config: Arc<RwLock<TuningConfig>>,
-    performance_history: Arc<RwLock<Vec<PerformanceRecord>>>,
-    optimization_rules: Arc<RwLock<Vec<OptimizationRule>>>,
+#[derive(Debug, Clone)]
+pub struct TuningConfig {
+    pub target_accuracy: f32,
+    pub target_latency_ms: f64,
+    pub target_memory_mb: f32,
+    pub max_iterations: usize,
+    pub optimization_timeout_minutes: u64,
+    pub enable_auto_tuning: bool,
 }
 
-impl ModelTuner {
-    /// Создает новый настройщик моделей
-    pub fn new() -> Self {
-        Self {
-            tuning_config: Arc::new(RwLock::new(TuningConfig::default())),
-            performance_history: Arc::new(RwLock::new(Vec::new())),
-            optimization_rules: Arc::new(RwLock::new(Vec::new())),
-        }
+#[derive(Debug, Clone)]
+pub struct TuningResult {
+    pub success: bool,
+    pub optimized_config: HashMap<String, serde_json::Value>,
+    pub accuracy: f32,
+    pub latency_ms: f64,
+    pub memory_mb: f32,
+    pub optimization_time_seconds: f64,
+    pub iterations_performed: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct HyperparameterSpace {
+    pub learning_rate: (f32, f32), // min, max
+    pub batch_size: Vec<usize>,
+    pub optimizer: Vec<String>,
+    pub weight_decay: (f32, f32),
+    pub dropout_rate: (f32, f32),
+    pub num_epochs: (usize, usize),
+}
+
+pub struct ModelOptimizer {
+    model_library: ModelLibrary,
+    optimization_level: OptimizationLevel,
+    config: TuningConfig,
+    hyperparameter_space: HyperparameterSpace,
+    tuning_history: Arc<RwLock<Vec<TuningResult>>>,
+}
+
+impl ModelOptimizer {
+    pub fn new(model_library: ModelLibrary, optimization_level: OptimizationLevel) -> Result<Self, AppError> {
+        let config = TuningConfig {
+            target_accuracy: 0.95,
+            target_latency_ms: 100.0,
+            target_memory_mb: 2048.0,
+            max_iterations: 100,
+            optimization_timeout_minutes: 60,
+            enable_auto_tuning: true,
+        };
+        
+        let hyperparameter_space = HyperparameterSpace {
+            learning_rate: (1e-5, 1e-2),
+            batch_size: vec![8, 16, 32, 64, 128],
+            optimizer: vec!["adam".to_string(), "sgd".to_string(), "adamw".to_string()],
+            weight_decay: (1e-6, 1e-3),
+            dropout_rate: (0.1, 0.5),
+            num_epochs: (5, 50),
+        };
+        
+        Ok(Self {
+            model_library,
+            optimization_level,
+            config,
+            hyperparameter_space,
+            tuning_history: Arc::new(RwLock::new(Vec::new())),
+        })
     }
 
-    /// Инициализирует настройщик
-    pub async fn initialize(&self) -> Result<(), AppError> {
-        log::info!("Initializing model tuner");
+    pub async fn optimize(&self) -> Result<TuningResult, AppError> {
+        let start_time = std::time::Instant::now();
+        let mut best_result = None;
+        let mut iterations = 0;
         
-        // Загружаем базовые правила оптимизации
-        self.load_default_rules().await?;
-        
-        // Инициализируем конфигурацию
-        self.initialize_config().await?;
-        
-        log::info!("Model tuner initialized successfully");
-        Ok(())
-    }
-
-    /// Останавливает настройщик
-    pub async fn shutdown(&self) -> Result<(), AppError> {
-        log::info!("Shutting down model tuner");
-        
-        // Сохраняем историю производительности
-        self.save_performance_history().await?;
-        
-        log::info!("Model tuner shut down successfully");
-        Ok(())
-    }
-
-    /// Настраивает модель для оптимальной производительности
-    pub async fn tune_model(&self, model_config: &mut ModelTuningConfig) -> Result<(), AppError> {
-        let start_time = Instant::now();
-        
-        // Анализируем текущую производительность
-        let current_performance = self.analyze_performance().await?;
-        
-        // Генерируем рекомендации по настройке
-        let recommendations = self.generate_recommendations(&current_performance).await?;
-        
-        // Применяем рекомендации
-        self.apply_recommendations(model_config, &recommendations).await?;
-        
-        // Тестируем новую конфигурацию
-        let new_performance = self.test_configuration(model_config).await?;
-        
-        // Сохраняем результаты
-        self.record_performance(new_performance, start_time.elapsed()).await;
-        
-        Ok(())
-    }
-
-    /// Оптимизирует гиперпараметры
-    pub async fn optimize_hyperparameters(&self, config: &mut HyperparameterConfig) -> Result<(), AppError> {
-        // Используем байесовскую оптимизацию
-        self.bayesian_optimization(config).await?;
-        
-        // Применяем градиентную оптимизацию
-        self.gradient_optimization(config).await?;
-        
-        // Валидируем результаты
-        self.validate_hyperparameters(config).await?;
-        
-        Ok(())
-    }
-
-    /// Адаптивная настройка на основе производительности
-    pub async fn adaptive_tuning(&self, model_config: &mut ModelTuningConfig) -> Result<(), AppError> {
-        let performance = self.get_current_performance().await?;
-        
-        // Анализируем тренды производительности
-        let trends = self.analyze_performance_trends().await?;
-        
-        // Применяем адаптивные корректировки
-        self.apply_adaptive_adjustments(model_config, &trends).await?;
-        
-        Ok(())
-    }
-
-    /// Получает рекомендации по оптимизации
-    pub async fn get_optimization_recommendations(&self) -> Result<Vec<OptimizationRecommendation>, AppError> {
-        let performance = self.get_current_performance().await?;
-        let mut recommendations = Vec::new();
-
-        // Анализируем использование памяти
-        if performance.memory_usage > 0.9 {
-            recommendations.push(OptimizationRecommendation {
-                category: "memory".to_string(),
-                priority: Priority::High,
-                description: "High memory usage detected".to_string(),
-                action: "Reduce batch size or enable memory optimization".to_string(),
-                expected_improvement: 0.15,
-            });
-        }
-
-        // Анализируем производительность GPU
-        if performance.gpu_utilization < 0.7 {
-            recommendations.push(OptimizationRecommendation {
-                category: "performance".to_string(),
-                priority: Priority::Medium,
-                description: "Low GPU utilization".to_string(),
-                action: "Increase batch size or enable parallel processing".to_string(),
-                expected_improvement: 0.25,
-            });
-        }
-
-        // Анализируем латентность
-        if performance.average_latency > 100.0 {
-            recommendations.push(OptimizationRecommendation {
-                category: "latency".to_string(),
-                priority: Priority::High,
-                description: "High latency detected".to_string(),
-                action: "Enable caching or reduce model complexity".to_string(),
-                expected_improvement: 0.3,
-            });
-        }
-
-        Ok(recommendations)
-    }
-
-    /// Применяет рекомендации
-    pub async fn apply_recommendations(&self, config: &mut ModelTuningConfig, recommendations: &[OptimizationRecommendation]) -> Result<(), AppError> {
-        for recommendation in recommendations {
-            match recommendation.category.as_str() {
-                "memory" => {
-                    self.apply_memory_optimization(config, recommendation).await?;
-                }
-                "performance" => {
-                    self.apply_performance_optimization(config, recommendation).await?;
-                }
-                "latency" => {
-                    self.apply_latency_optimization(config, recommendation).await?;
-                }
-                _ => {
-                    log::warn!("Unknown optimization category: {}", recommendation.category);
+        while iterations < self.config.max_iterations {
+            // Проверка таймаута
+            if start_time.elapsed().as_secs() > self.config.optimization_timeout_minutes * 60 {
+                break;
+            }
+            
+            // Генерация конфигурации
+            let config = self.generate_configuration().await?;
+            
+            // Выполнение оптимизации
+            let result = self.run_optimization_trial(&config).await?;
+            
+            // Обновление лучшего результата
+            if result.success && (best_result.is_none() || self.is_better_result(&result, best_result.as_ref().unwrap())) {
+                best_result = Some(result.clone());
+            }
+            
+            // Сохранение в историю
+            self.tuning_history.write().await.push(result);
+            
+            iterations += 1;
+            
+            // Проверка достижения целей
+            if let Some(ref best) = best_result {
+                if best.accuracy >= self.config.target_accuracy &&
+                   best.latency_ms <= self.config.target_latency_ms &&
+                   best.memory_mb <= self.config.target_memory_mb {
+                    break;
                 }
             }
         }
-        Ok(())
-    }
-
-    // Приватные методы
-
-    async fn load_default_rules(&self) -> Result<(), AppError> {
-        let mut rules = self.optimization_rules.write().await;
         
-        rules.push(OptimizationRule {
-            name: "memory_optimization".to_string(),
-            condition: "memory_usage > 0.8".to_string(),
-            action: "reduce_batch_size".to_string(),
-            priority: Priority::High,
-        });
-
-        rules.push(OptimizationRule {
-            name: "performance_optimization".to_string(),
-            condition: "gpu_utilization < 0.6".to_string(),
-            action: "increase_batch_size".to_string(),
-            priority: Priority::Medium,
-        });
-
-        rules.push(OptimizationRule {
-            name: "latency_optimization".to_string(),
-            condition: "average_latency > 50.0".to_string(),
-            action: "enable_caching".to_string(),
-            priority: Priority::High,
-        });
-
-        Ok(())
-    }
-
-    async fn initialize_config(&self) -> Result<(), AppError> {
-        let mut config = self.tuning_config.write().await;
-        config.enable_adaptive_tuning = true;
-        config.optimization_interval = 300; // 5 minutes
-        config.performance_threshold = 0.8;
-        config.memory_threshold = 0.9;
-        config.latency_threshold = 100.0;
-        Ok(())
-    }
-
-    async fn analyze_performance(&self) -> Result<PerformanceMetrics, AppError> {
-        // Здесь должна быть реальная реализация анализа производительности
-        Ok(PerformanceMetrics {
-            gpu_utilization: 0.75,
-            memory_usage: 0.65,
-            average_latency: 45.0,
-            throughput: 100.0,
-            error_rate: 0.01,
-            cache_hit_rate: 0.85,
-        })
-    }
-
-    async fn generate_recommendations(&self, performance: &PerformanceMetrics) -> Result<Vec<OptimizationRecommendation>, AppError> {
-        let mut recommendations = Vec::new();
-
-        if performance.memory_usage > 0.8 {
-            recommendations.push(OptimizationRecommendation {
-                category: "memory".to_string(),
-                priority: Priority::High,
-                description: "Memory usage is high".to_string(),
-                action: "Reduce batch size".to_string(),
-                expected_improvement: 0.2,
-            });
-        }
-
-        if performance.gpu_utilization < 0.7 {
-            recommendations.push(OptimizationRecommendation {
-                category: "performance".to_string(),
-                priority: Priority::Medium,
-                description: "GPU utilization is low".to_string(),
-                action: "Increase batch size".to_string(),
-                expected_improvement: 0.15,
-            });
-        }
-
-        Ok(recommendations)
-    }
-
-    async fn test_configuration(&self, _config: &ModelTuningConfig) -> Result<PerformanceMetrics, AppError> {
-        // Симуляция тестирования конфигурации
-        Ok(PerformanceMetrics {
-            gpu_utilization: 0.85,
-            memory_usage: 0.7,
-            average_latency: 40.0,
-            throughput: 120.0,
-            error_rate: 0.005,
-            cache_hit_rate: 0.9,
-        })
-    }
-
-    async fn record_performance(&self, performance: PerformanceMetrics, duration: std::time::Duration) {
-        let mut history = self.performance_history.write().await;
-        history.push(PerformanceRecord {
-            timestamp: std::time::SystemTime::now(),
-            metrics: performance,
-            duration: duration.as_secs_f64(),
-        });
-
-        // Ограничиваем размер истории
-        if history.len() > 1000 {
-            history.remove(0);
-        }
-    }
-
-    async fn bayesian_optimization(&self, _config: &mut HyperparameterConfig) -> Result<(), AppError> {
-        // Реализация байесовской оптимизации
-        log::info!("Applying Bayesian optimization");
-        Ok(())
-    }
-
-    async fn gradient_optimization(&self, _config: &mut HyperparameterConfig) -> Result<(), AppError> {
-        // Реализация градиентной оптимизации
-        log::info!("Applying gradient optimization");
-        Ok(())
-    }
-
-    async fn validate_hyperparameters(&self, _config: &HyperparameterConfig) -> Result<(), AppError> {
-        // Валидация гиперпараметров
-        log::info!("Validating hyperparameters");
-        Ok(())
-    }
-
-    async fn get_current_performance(&self) -> Result<PerformanceMetrics, AppError> {
-        self.analyze_performance().await
-    }
-
-    async fn analyze_performance_trends(&self) -> Result<PerformanceTrends, AppError> {
-        let history = self.performance_history.read().await;
+        let optimization_time = start_time.elapsed().as_secs_f64();
         
-        if history.len() < 2 {
-            return Ok(PerformanceTrends::default());
+        if let Some(mut result) = best_result {
+            result.optimization_time_seconds = optimization_time;
+            result.iterations_performed = iterations;
+            Ok(result)
+        } else {
+            Err(AppError::OptimizationFailed)
         }
+    }
 
-        // Анализируем тренды
-        let recent = &history[history.len().saturating_sub(10)..];
-        let older = &history[..history.len().saturating_sub(10)];
-
-        if recent.is_empty() || older.is_empty() {
-            return Ok(PerformanceTrends::default());
+    async fn generate_configuration(&self) -> Result<HashMap<String, serde_json::Value>, AppError> {
+        let mut config = HashMap::new();
+        
+        // Генерация гиперпараметров в зависимости от уровня оптимизации
+        match self.optimization_level {
+            OptimizationLevel::None => {
+                // Базовые параметры
+                config.insert("learning_rate".to_string(), serde_json::json!(1e-3));
+                config.insert("batch_size".to_string(), serde_json::json!(32));
+                config.insert("optimizer".to_string(), serde_json::json!("adam"));
+                config.insert("weight_decay".to_string(), serde_json::json!(1e-4));
+                config.insert("dropout_rate".to_string(), serde_json::json!(0.1));
+                config.insert("num_epochs".to_string(), serde_json::json!(10));
+            }
+            OptimizationLevel::Basic => {
+                // Базовые оптимизации
+                config.insert("learning_rate".to_string(), serde_json::json!(5e-4));
+                config.insert("batch_size".to_string(), serde_json::json!(64));
+                config.insert("optimizer".to_string(), serde_json::json!("adamw"));
+                config.insert("weight_decay".to_string(), serde_json::json!(1e-5));
+                config.insert("dropout_rate".to_string(), serde_json::json!(0.2));
+                config.insert("num_epochs".to_string(), serde_json::json!(20));
+            }
+            OptimizationLevel::Advanced => {
+                // Продвинутые оптимизации
+                config.insert("learning_rate".to_string(), serde_json::json!(2e-4));
+                config.insert("batch_size".to_string(), serde_json::json!(128));
+                config.insert("optimizer".to_string(), serde_json::json!("adamw"));
+                config.insert("weight_decay".to_string(), serde_json::json!(5e-6));
+                config.insert("dropout_rate".to_string(), serde_json::json!(0.3));
+                config.insert("num_epochs".to_string(), serde_json::json!(30));
+                config.insert("gradient_clipping".to_string(), serde_json::json!(1.0));
+                config.insert("learning_rate_scheduler".to_string(), serde_json::json!("cosine"));
+            }
+            OptimizationLevel::Maximum => {
+                // Максимальные оптимизации
+                config.insert("learning_rate".to_string(), serde_json::json!(1e-4));
+                config.insert("batch_size".to_string(), serde_json::json!(256));
+                config.insert("optimizer".to_string(), serde_json::json!("adamw"));
+                config.insert("weight_decay".to_string(), serde_json::json!(1e-6));
+                config.insert("dropout_rate".to_string(), serde_json::json!(0.4));
+                config.insert("num_epochs".to_string(), serde_json::json!(50));
+                config.insert("gradient_clipping".to_string(), serde_json::json!(0.5));
+                config.insert("learning_rate_scheduler".to_string(), serde_json::json!("cosine"));
+                config.insert("mixed_precision".to_string(), serde_json::json!(true));
+                config.insert("gradient_accumulation_steps".to_string(), serde_json::json!(4));
+            }
         }
+        
+        // Добавление специфичных для модели параметров
+        config.insert("model_type".to_string(), serde_json::json!(self.model_library.model_type));
+        config.insert("optimization_level".to_string(), serde_json::json!(self.optimization_level));
+        
+        Ok(config)
+    }
 
-        let recent_avg = recent.iter().map(|r| r.metrics.gpu_utilization).sum::<f64>() / recent.len() as f64;
-        let older_avg = older.iter().map(|r| r.metrics.gpu_utilization).sum::<f64>() / older.len() as f64;
-
-        Ok(PerformanceTrends {
-            gpu_utilization_trend: recent_avg - older_avg,
-            memory_usage_trend: 0.0,
-            latency_trend: 0.0,
-            throughput_trend: 0.0,
+    async fn run_optimization_trial(&self, config: &HashMap<String, serde_json::Value>) -> Result<TuningResult, AppError> {
+        let start_time = std::time::Instant::now();
+        
+        // Заглушка для выполнения оптимизации
+        // В реальной реализации здесь будет:
+        // - Загрузка модели
+        // - Применение конфигурации
+        // - Обучение/финтюнинг
+        // - Оценка производительности
+        
+        // Симуляция оптимизации
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+        
+        let optimization_time = start_time.elapsed().as_secs_f64();
+        
+        // Симуляция результатов
+        let accuracy = 0.92 + (rand::random::<f32>() * 0.06); // 0.92 - 0.98
+        let latency = 80.0 + (rand::random::<f64>() * 40.0); // 80 - 120 ms
+        let memory = 1800.0 + (rand::random::<f32>() * 400.0); // 1800 - 2200 MB
+        
+        let success = accuracy >= 0.9 && latency <= 150.0 && memory <= 2500.0;
+        
+        Ok(TuningResult {
+            success,
+            optimized_config: config.clone(),
+            accuracy,
+            latency_ms: latency,
+            memory_mb: memory,
+            optimization_time_seconds: optimization_time,
+            iterations_performed: 1,
         })
     }
 
-    async fn apply_adaptive_adjustments(&self, _config: &mut ModelTuningConfig, _trends: &PerformanceTrends) -> Result<(), AppError> {
-        // Применение адаптивных корректировок
-        log::info!("Applying adaptive adjustments");
-        Ok(())
+    fn is_better_result(&self, new_result: &TuningResult, best_result: &TuningResult) -> bool {
+        // Функция оценки качества результата
+        let new_score = self.calculate_score(new_result);
+        let best_score = self.calculate_score(best_result);
+        
+        new_score > best_score
     }
 
-    async fn apply_memory_optimization(&self, config: &mut ModelTuningConfig, _recommendation: &OptimizationRecommendation) -> Result<(), AppError> {
-        config.batch_size = (config.batch_size as f64 * 0.8) as u32;
-        config.enable_memory_optimization = true;
-        Ok(())
-    }
-
-    async fn apply_performance_optimization(&self, config: &mut ModelTuningConfig, _recommendation: &OptimizationRecommendation) -> Result<(), AppError> {
-        config.batch_size = (config.batch_size as f64 * 1.2) as u32;
-        config.enable_parallel_processing = true;
-        Ok(())
-    }
-
-    async fn apply_latency_optimization(&self, config: &mut ModelTuningConfig, _recommendation: &OptimizationRecommendation) -> Result<(), AppError> {
-        config.enable_caching = true;
-        config.cache_size = config.cache_size * 2;
-        Ok(())
-    }
-
-    async fn save_performance_history(&self) -> Result<(), AppError> {
-        // Сохранение истории производительности
-        log::info!("Saving performance history");
-        Ok(())
-    }
-}
-
-// Структуры данных
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TuningConfig {
-    pub enable_adaptive_tuning: bool,
-    pub optimization_interval: u64,
-    pub performance_threshold: f64,
-    pub memory_threshold: f64,
-    pub latency_threshold: f64,
-}
-
-impl Default for TuningConfig {
-    fn default() -> Self {
-        Self {
-            enable_adaptive_tuning: true,
-            optimization_interval: 300,
-            performance_threshold: 0.8,
-            memory_threshold: 0.9,
-            latency_threshold: 100.0,
+    fn calculate_score(&self, result: &TuningResult) -> f64 {
+        if !result.success {
+            return 0.0;
         }
+        
+        // Взвешенная оценка по нескольким критериям
+        let accuracy_score = result.accuracy as f64;
+        let latency_score = 1.0 / (1.0 + result.latency_ms / 100.0);
+        let memory_score = 1.0 / (1.0 + result.memory_mb / 2000.0);
+        
+        // Веса для разных критериев
+        let accuracy_weight = 0.5;
+        let latency_weight = 0.3;
+        let memory_weight = 0.2;
+        
+        accuracy_score * accuracy_weight + 
+        latency_score * latency_weight + 
+        memory_score * memory_weight
     }
-}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ModelTuningConfig {
-    pub batch_size: u32,
-    pub learning_rate: f64,
-    pub enable_memory_optimization: bool,
-    pub enable_parallel_processing: bool,
-    pub enable_caching: bool,
-    pub cache_size: usize,
-    pub quantization_level: u8,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HyperparameterConfig {
-    pub learning_rate: f64,
-    pub batch_size: u32,
-    pub epochs: u32,
-    pub optimizer: String,
-    pub loss_function: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PerformanceMetrics {
-    pub gpu_utilization: f64,
-    pub memory_usage: f64,
-    pub average_latency: f64,
-    pub throughput: f64,
-    pub error_rate: f64,
-    pub cache_hit_rate: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PerformanceRecord {
-    pub timestamp: std::time::SystemTime,
-    pub metrics: PerformanceMetrics,
-    pub duration: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PerformanceTrends {
-    pub gpu_utilization_trend: f64,
-    pub memory_usage_trend: f64,
-    pub latency_trend: f64,
-    pub throughput_trend: f64,
-}
-
-impl Default for PerformanceTrends {
-    fn default() -> Self {
-        Self {
-            gpu_utilization_trend: 0.0,
-            memory_usage_trend: 0.0,
-            latency_trend: 0.0,
-            throughput_trend: 0.0,
-        }
+    pub async fn get_tuning_history(&self) -> Vec<TuningResult> {
+        self.tuning_history.read().await.clone()
     }
-}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OptimizationRecommendation {
-    pub category: String,
-    pub priority: Priority,
-    pub description: String,
-    pub action: String,
-    pub expected_improvement: f64,
-}
+    pub async fn get_best_result(&self) -> Option<TuningResult> {
+        let history = self.tuning_history.read().await;
+        
+        history.iter()
+            .filter(|result| result.success)
+            .max_by(|a, b| {
+                let score_a = self.calculate_score(a);
+                let score_b = self.calculate_score(b);
+                score_a.partial_cmp(&score_b).unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .cloned()
+    }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OptimizationRule {
-    pub name: String,
-    pub condition: String,
-    pub action: String,
-    pub priority: Priority,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum Priority {
-    Low,
-    Medium,
-    High,
-    Critical,
+    pub async fn export_optimization_report(&self) -> Result<String, AppError> {
+        let history = self.tuning_history.read().await;
+        let best_result = self.get_best_result().await;
+        
+        let report = serde_json::json!({
+            "model_name": self.model_library.name,
+            "optimization_level": self.optimization_level,
+            "total_trials": history.len(),
+            "successful_trials": history.iter().filter(|r| r.success).count(),
+            "best_result": best_result,
+            "config": self.config,
+            "history": history.as_slice(),
+        });
+        
+        Ok(serde_json::to_string_pretty(&report)?)
+    }
 } 

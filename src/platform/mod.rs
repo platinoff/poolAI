@@ -1,166 +1,241 @@
-pub mod linux;
 pub mod windows;
-pub mod unix;
-pub mod model;
-pub mod soladdr;
-pub mod lmrouter;
-pub mod lib;
-pub mod error;
+pub mod linux;
 
-pub use linux::*;
-pub use windows::*;
-pub use unix::*;
-pub use model::*;
-pub use soladdr::*;
-pub use lmrouter::*;
-pub use lib::*;
-pub use error::*;
-
-use std::path::PathBuf;
-use thiserror::Error;
+use crate::core::error::AppError;
+use std::collections::HashMap;
+use tokio::sync::RwLock;
 use std::sync::Arc;
-use parking_lot::RwLock;
-use std::error::Error;
 
-#[derive(Error, Debug)]
-pub enum PlatformError {
-    #[error("Failed to create service: {0}")]
-    ServiceCreationError(String),
-    #[error("Failed to start service: {0}")]
-    ServiceStartError(String),
-    #[error("Failed to stop service: {0}")]
-    ServiceStopError(String),
-    #[error("Failed to get service status: {0}")]
-    ServiceStatusError(String),
-    #[error("Failed to create daemon: {0}")]
-    DaemonCreationError(String),
-    #[error("Failed to get system info: {0}")]
-    SystemInfoError(String),
+#[derive(Debug, Clone)]
+pub struct PlatformConfig {
+    pub platform_type: PlatformType,
+    pub gpu_devices: Vec<GpuDevice>,
+    pub cpu_cores: usize,
+    pub memory_gb: f32,
+    pub enable_power_management: bool,
+    pub temperature_threshold_celsius: f32,
 }
 
-#[async_trait::async_trait]
-pub trait PlatformService: Send + Sync {
-    async fn install(&self) -> Result<(), PlatformError>;
-    async fn uninstall(&self) -> Result<(), PlatformError>;
-    async fn start(&self) -> Result<(), PlatformError>;
-    async fn stop(&self) -> Result<(), PlatformError>;
-    async fn status(&self) -> Result<String, PlatformError>;
+#[derive(Debug, Clone)]
+pub enum PlatformType {
+    Windows,
+    Linux,
+    MacOS,
+    Unknown,
 }
 
-#[async_trait::async_trait]
-pub trait SystemInfo: Send + Sync {
-    fn get_os_name(&self) -> String;
-    fn get_os_version(&self) -> String;
-    fn get_architecture(&self) -> String;
-    async fn get_memory_info(&self) -> Result<MemoryInfo, PlatformError>;
-    async fn get_cpu_info(&self) -> Result<CpuInfo, PlatformError>;
-    async fn get_disk_info(&self) -> Result<DiskInfo, PlatformError>;
+#[derive(Debug, Clone)]
+pub struct GpuDevice {
+    pub device_id: String,
+    pub name: String,
+    pub memory_mb: f32,
+    pub compute_capability: String,
+    pub driver_version: String,
+    pub is_available: bool,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct MemoryInfo {
-    pub total: u64,
-    pub free: u64,
-    pub used: u64,
-    pub swap_total: u64,
-    pub swap_free: u64,
-    #[serde(skip)]
-    pub cache: Option<u64>,
+#[derive(Debug, Clone)]
+pub struct SystemResources {
+    pub cpu_usage_percent: f32,
+    pub memory_usage_mb: f32,
+    pub memory_total_mb: f32,
+    pub disk_usage_percent: f32,
+    pub network_throughput_mbps: f32,
+    pub temperature_celsius: f32,
+    pub power_consumption_watts: f32,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct CpuInfo {
-    pub model: String,
-    pub cores: u32,
-    pub threads: u32,
-    pub frequency: u64,
-    pub usage: f32,
-    #[serde(skip)]
-    pub temperature: Option<f32>,
+#[derive(Debug, Clone)]
+pub struct GpuResources {
+    pub device_id: String,
+    pub utilization_percent: f32,
+    pub memory_used_mb: f32,
+    pub memory_total_mb: f32,
+    pub temperature_celsius: f32,
+    pub power_consumption_watts: f32,
+    pub fan_speed_percent: f32,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-pub struct DiskInfo {
-    pub total: u64,
-    pub free: u64,
-    pub used: u64,
-    pub mount_point: PathBuf,
-    #[serde(skip)]
-    pub fs_type: Option<String>,
+pub struct Platform {
+    config: PlatformConfig,
+    system_resources: Arc<RwLock<SystemResources>>,
+    gpu_resources: Arc<RwLock<HashMap<String, GpuResources>>>,
+    platform_impl: Box<dyn PlatformInterface + Send + Sync>,
 }
 
-#[cfg(windows)]
-pub use windows::{WindowsService, WindowsSystemInfo};
+impl Platform {
+    pub fn new(config: PlatformConfig) -> Result<Self, AppError> {
+        let platform_impl: Box<dyn PlatformInterface + Send + Sync> = match config.platform_type {
+            PlatformType::Windows => Box::new(windows::WindowsPlatform::new()?),
+            PlatformType::Linux => Box::new(linux::LinuxPlatform::new()?),
+            PlatformType::MacOS => {
+                return Err(AppError::UnsupportedPlatform);
+            }
+            PlatformType::Unknown => {
+                return Err(AppError::UnsupportedPlatform);
+            }
+        };
+        
+        let system_resources = SystemResources {
+            cpu_usage_percent: 0.0,
+            memory_usage_mb: 0.0,
+            memory_total_mb: config.memory_gb * 1024.0,
+            disk_usage_percent: 0.0,
+            network_throughput_mbps: 0.0,
+            temperature_celsius: 0.0,
+            power_consumption_watts: 0.0,
+        };
+        
+        let mut gpu_resources = HashMap::new();
+        for gpu in &config.gpu_devices {
+            gpu_resources.insert(gpu.device_id.clone(), GpuResources {
+                device_id: gpu.device_id.clone(),
+                utilization_percent: 0.0,
+                memory_used_mb: 0.0,
+                memory_total_mb: gpu.memory_mb,
+                temperature_celsius: 0.0,
+                power_consumption_watts: 0.0,
+                fan_speed_percent: 0.0,
+            });
+        }
+        
+        Ok(Self {
+            config,
+            system_resources: Arc::new(RwLock::new(system_resources)),
+            gpu_resources: Arc::new(RwLock::new(gpu_resources)),
+            platform_impl,
+        })
+    }
 
-#[cfg(unix)]
-pub use unix::{UnixService, UnixSystemInfo};
+    pub async fn initialize(&self) -> Result<(), AppError> {
+        // Инициализация платформы
+        self.platform_impl.initialize().await?;
+        
+        // Запуск мониторинга ресурсов
+        self.start_resource_monitoring().await?;
+        
+        Ok(())
+    }
 
-pub struct PlatformManager {
-    service: Arc<RwLock<Box<dyn PlatformService>>>,
-    system_info: Arc<RwLock<Box<dyn SystemInfo>>>,
-}
+    pub async fn shutdown(&self) -> Result<(), AppError> {
+        // Выключение платформы
+        self.platform_impl.shutdown().await?;
+        
+        Ok(())
+    }
 
-impl PlatformManager {
-    pub fn new() -> Self {
-        Self {
-            service: Arc::new(RwLock::new(create_service("cursor-service"))),
-            system_info: Arc::new(RwLock::new(create_system_info())),
+    pub async fn get_system_resources(&self) -> SystemResources {
+        self.system_resources.read().await.clone()
+    }
+
+    pub async fn get_gpu_resources(&self, device_id: &str) -> Option<GpuResources> {
+        let gpu_resources = self.gpu_resources.read().await;
+        gpu_resources.get(device_id).cloned()
+    }
+
+    pub async fn get_all_gpu_resources(&self) -> Vec<GpuResources> {
+        let gpu_resources = self.gpu_resources.read().await;
+        gpu_resources.values().cloned().collect()
+    }
+
+    pub async fn allocate_gpu_memory(&self, device_id: &str, size_mb: f32) -> Result<(), AppError> {
+        let mut gpu_resources = self.gpu_resources.write().await;
+        
+        if let Some(gpu) = gpu_resources.get_mut(device_id) {
+            let available_memory = gpu.memory_total_mb - gpu.memory_used_mb;
+            
+            if available_memory >= size_mb {
+                gpu.memory_used_mb += size_mb;
+                Ok(())
+            } else {
+                Err(AppError::InsufficientResources)
+            }
+        } else {
+            Err(AppError::DeviceNotFound)
         }
     }
 
-    pub async fn get_service_status(&self) -> Result<String, PlatformError> {
-        self.service.read().status().await
+    pub async fn release_gpu_memory(&self, device_id: &str, size_mb: f32) -> Result<(), AppError> {
+        let mut gpu_resources = self.gpu_resources.write().await;
+        
+        if let Some(gpu) = gpu_resources.get_mut(device_id) {
+            gpu.memory_used_mb = gpu.memory_used_mb.saturating_sub(size_mb);
+            Ok(())
+        } else {
+            Err(AppError::DeviceNotFound)
+        }
     }
 
-    pub async fn get_memory_info(&self) -> Result<MemoryInfo, PlatformError> {
-        self.system_info.read().get_memory_info().await
+    pub async fn optimize_resources(&self) -> Result<(), AppError> {
+        // Оптимизация ресурсов
+        self.platform_impl.optimize_resources().await?;
+        
+        Ok(())
     }
 
-    pub async fn get_cpu_info(&self) -> Result<CpuInfo, PlatformError> {
-        self.system_info.read().get_cpu_info().await
+    pub async fn check_temperature(&self) -> Result<bool, AppError> {
+        let system_resources = self.system_resources.read().await;
+        let gpu_resources = self.gpu_resources.read().await;
+        
+        // Проверка температуры системы
+        if system_resources.temperature_celsius > self.config.temperature_threshold_celsius {
+            return Ok(false);
+        }
+        
+        // Проверка температуры GPU
+        for gpu in gpu_resources.values() {
+            if gpu.temperature_celsius > self.config.temperature_threshold_celsius {
+                return Ok(false);
+            }
+        }
+        
+        Ok(true)
     }
 
-    pub async fn get_disk_info(&self) -> Result<DiskInfo, PlatformError> {
-        self.system_info.read().get_disk_info().await
+    pub async fn get_available_gpus(&self) -> Vec<GpuDevice> {
+        self.config.gpu_devices
+            .iter()
+            .filter(|gpu| gpu.is_available)
+            .cloned()
+            .collect()
+    }
+
+    async fn start_resource_monitoring(&self) -> Result<(), AppError> {
+        let system_resources = self.system_resources.clone();
+        let gpu_resources = self.gpu_resources.clone();
+        let platform_impl = self.platform_impl.clone();
+        
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(5));
+            
+            loop {
+                interval.tick().await;
+                
+                // Обновление системных ресурсов
+                if let Ok(resources) = platform_impl.get_system_resources().await {
+                    let mut sys_res = system_resources.write().await;
+                    *sys_res = resources;
+                }
+                
+                // Обновление GPU ресурсов
+                if let Ok(gpu_res) = platform_impl.get_gpu_resources().await {
+                    let mut gpu_resources_write = gpu_resources.write().await;
+                    for (device_id, resources) in gpu_res {
+                        gpu_resources_write.insert(device_id, resources);
+                    }
+                }
+            }
+        });
+        
+        Ok(())
     }
 }
 
-pub fn create_service(name: &str) -> Box<dyn PlatformService> {
-    #[cfg(windows)]
-    {
-        Box::new(WindowsService::new(name))
-    }
-    #[cfg(unix)]
-    {
-        Box::new(UnixService::new(name))
-    }
-}
-
-pub fn create_system_info() -> Box<dyn SystemInfo> {
-    #[cfg(windows)]
-    {
-        Box::new(WindowsSystemInfo::new())
-    }
-    #[cfg(unix)]
-    {
-        Box::new(UnixSystemInfo::new())
-    }
-}
-
-/// Инициализация platform модуля
-pub async fn initialize() -> Result<(), Box<dyn Error>> {
-    log::info!("Initializing platform module");
-    Ok(())
-}
-
-/// Остановка platform модуля
-pub async fn shutdown() -> Result<(), Box<dyn Error>> {
-    log::info!("Shutting down platform module");
-    Ok(())
-}
-
-/// Проверка здоровья platform модуля
-pub async fn health_check() -> Result<(), Box<dyn Error>> {
-    log::debug!("Platform module health check passed");
-    Ok(())
+pub trait PlatformInterface {
+    async fn initialize(&self) -> Result<(), AppError>;
+    async fn shutdown(&self) -> Result<(), AppError>;
+    async fn get_system_resources(&self) -> Result<SystemResources, AppError>;
+    async fn get_gpu_resources(&self) -> Result<HashMap<String, GpuResources>, AppError>;
+    async fn optimize_resources(&self) -> Result<(), AppError>;
+    fn clone(&self) -> Box<dyn PlatformInterface + Send + Sync>;
 } 

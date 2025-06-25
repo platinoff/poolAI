@@ -1,245 +1,214 @@
-use serde::{Serialize, Deserialize};
-use std::sync::Arc;
-use tokio::sync::Mutex;
-use log::{info, warn, error};
+use crate::core::error::AppError;
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
-use std::time::Duration;
-use cursor_codes::core::error::CursorError;
-use cursor_codes::monitoring::logger::LoggerSystem;
+use std::time::{Duration, Instant};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MetricConfig {
-    pub id: String,
-    pub name: String,
-    pub description: String,
-    pub metric_type: String,
-    pub unit: String,
-    pub aggregation: String,
-    pub retention: Duration,
-    pub active: bool,
+#[derive(Debug, Clone)]
+pub struct Metrics {
+    pub timestamp: Instant,
+    pub gpu_utilization: f32,
+    pub memory_usage_mb: f32,
+    pub cpu_usage_percent: f32,
+    pub disk_usage_percent: f32,
+    pub network_throughput_mbps: f32,
+    pub average_response_time_ms: f64,
+    pub requests_per_second: f64,
+    pub error_rate: f32,
+    pub active_connections: usize,
+    pub queue_size: usize,
+    pub model_specific_metrics: HashMap<String, f64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MetricStats {
-    pub total_samples: u64,
-    pub current_value: f64,
-    pub min_value: f64,
-    pub max_value: f64,
-    pub sum_value: f64,
-    pub average_value: f64,
-    pub last_sample_time: Option<DateTime<Utc>>,
-    pub last_error: Option<String>,
+#[derive(Debug, Clone)]
+pub struct ModelMetrics {
+    pub model_name: String,
+    pub processing_time_ms: u64,
+    pub tokens_generated: usize,
+    pub tokens_per_second: f32,
+    pub gpu_memory_usage_mb: f32,
+    pub gpu_utilization: f32,
+    pub cache_hit_rate: f32,
+    pub error_count: u64,
+    pub success_count: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MetricMetrics {
-    pub config: MetricConfig,
-    pub stats: MetricStats,
+#[derive(Debug, Clone)]
+pub struct ResourceMetrics {
+    pub gpu_count: usize,
+    pub total_gpu_memory_mb: f32,
+    pub available_gpu_memory_mb: f32,
+    pub cpu_cores: usize,
+    pub total_ram_mb: f32,
+    pub available_ram_mb: f32,
+    pub disk_space_gb: f64,
+    pub available_disk_space_gb: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Sample {
-    pub id: String,
-    pub metric_id: String,
-    pub timestamp: DateTime<Utc>,
-    pub value: f64,
-    pub labels: HashMap<String, String>,
+pub struct MetricsCollector {
+    last_collection: Instant,
+    historical_metrics: Vec<Metrics>,
+    model_metrics: HashMap<String, ModelMetrics>,
+    resource_metrics: ResourceMetrics,
 }
 
-pub struct MetricsSystem {
-    metrics: Arc<Mutex<HashMap<String, MetricMetrics>>>,
-    samples: Arc<Mutex<HashMap<String, Sample>>>,
-}
-
-impl MetricsSystem {
+impl MetricsCollector {
     pub fn new() -> Self {
         Self {
-            metrics: Arc::new(Mutex::new(HashMap::new())),
-            samples: Arc::new(Mutex::new(HashMap::new())),
-        }
-    }
-
-    pub async fn add_metric(&self, config: MetricConfig) -> Result<(), String> {
-        let mut metrics = self.metrics.lock().await;
-        
-        if metrics.contains_key(&config.id) {
-            return Err(format!("Metric '{}' already exists", config.id));
-        }
-
-        let metrics_data = MetricMetrics {
-            config,
-            stats: MetricStats {
-                total_samples: 0,
-                current_value: 0.0,
-                min_value: f64::MAX,
-                max_value: f64::MIN,
-                sum_value: 0.0,
-                average_value: 0.0,
-                last_sample_time: None,
-                last_error: None,
+            last_collection: Instant::now(),
+            historical_metrics: Vec::new(),
+            model_metrics: HashMap::new(),
+            resource_metrics: ResourceMetrics {
+                gpu_count: 0,
+                total_gpu_memory_mb: 0.0,
+                available_gpu_memory_mb: 0.0,
+                cpu_cores: 0,
+                total_ram_mb: 0.0,
+                available_ram_mb: 0.0,
+                disk_space_gb: 0.0,
+                available_disk_space_gb: 0.0,
             },
-        };
-
-        metrics.insert(metrics_data.config.id.clone(), metrics_data);
-        info!("Added new metric: {}", metrics_data.config.id);
-        Ok(())
-    }
-
-    pub async fn remove_metric(&self, id: &str) -> Result<(), String> {
-        let mut metrics = self.metrics.lock().await;
-        let mut samples = self.samples.lock().await;
-        
-        if !metrics.contains_key(id) {
-            return Err(format!("Metric '{}' not found", id));
         }
-
-        // Remove associated samples
-        samples.retain(|_, s| s.metric_id != id);
-        
-        metrics.remove(id);
-        info!("Removed metric: {}", id);
-        Ok(())
     }
 
-    pub async fn record_sample(
-        &self,
-        metric_id: &str,
-        value: f64,
-        labels: HashMap<String, String>,
-    ) -> Result<String, String> {
-        let mut metrics = self.metrics.lock().await;
-        let mut samples = self.samples.lock().await;
+    pub async fn collect(&self) -> Result<Metrics, AppError> {
+        let timestamp = Instant::now();
         
-        let metric = metrics
-            .get_mut(metric_id)
-            .ok_or_else(|| format!("Metric '{}' not found", metric_id))?;
-
-        if !metric.config.active {
-            return Err("Metric is not active".to_string());
-        }
-
-        let sample = Sample {
-            id: uuid::Uuid::new_v4().to_string(),
-            metric_id: metric_id.to_string(),
-            timestamp: Utc::now(),
-            value,
-            labels,
+        // Сбор системных метрик
+        let gpu_utilization = self.collect_gpu_utilization().await?;
+        let memory_usage_mb = self.collect_memory_usage().await?;
+        let cpu_usage_percent = self.collect_cpu_usage().await?;
+        let disk_usage_percent = self.collect_disk_usage().await?;
+        let network_throughput_mbps = self.collect_network_metrics().await?;
+        
+        // Сбор метрик производительности
+        let average_response_time_ms = self.calculate_average_response_time().await?;
+        let requests_per_second = self.calculate_requests_per_second().await?;
+        let error_rate = self.calculate_error_rate().await?;
+        let active_connections = self.get_active_connections().await?;
+        let queue_size = self.get_queue_size().await?;
+        
+        // Сбор специфичных метрик моделей
+        let model_specific_metrics = self.collect_model_specific_metrics().await?;
+        
+        let metrics = Metrics {
+            timestamp,
+            gpu_utilization,
+            memory_usage_mb,
+            cpu_usage_percent,
+            disk_usage_percent,
+            network_throughput_mbps,
+            average_response_time_ms,
+            requests_per_second,
+            error_rate,
+            active_connections,
+            queue_size,
+            model_specific_metrics,
         };
-
-        samples.insert(sample.id.clone(), sample.clone());
-        metric.stats.total_samples += 1;
-        metric.stats.current_value = value;
-        metric.stats.min_value = metric.stats.min_value.min(value);
-        metric.stats.max_value = metric.stats.max_value.max(value);
-        metric.stats.sum_value += value;
-        metric.stats.average_value = metric.stats.sum_value / metric.stats.total_samples as f64;
-        metric.stats.last_sample_time = Some(sample.timestamp);
-
-        info!(
-            "Recorded sample: {} for metric: {} (value: {})",
-            sample.id, metric_id, value
-        );
-        Ok(sample.id)
-    }
-
-    pub async fn get_metric(&self, id: &str) -> Result<MetricMetrics, String> {
-        let metrics = self.metrics.lock().await;
         
-        metrics
-            .get(id)
-            .cloned()
-            .ok_or_else(|| format!("Metric '{}' not found", id))
+        Ok(metrics)
     }
 
-    pub async fn get_all_metrics(&self) -> Vec<MetricMetrics> {
-        let metrics = self.metrics.lock().await;
-        metrics.values().cloned().collect()
+    async fn collect_gpu_utilization(&self) -> Result<f32, AppError> {
+        // Заглушка для сбора GPU метрик
+        // В реальной реализации здесь будет интеграция с GPU драйверами
+        Ok(75.5)
     }
 
-    pub async fn get_active_metrics(&self) -> Vec<MetricMetrics> {
-        let metrics = self.metrics.lock().await;
-        metrics
-            .values()
-            .filter(|m| m.config.active)
+    async fn collect_memory_usage(&self) -> Result<f32, AppError> {
+        // Заглушка для сбора метрик памяти
+        // В реальной реализации здесь будет системный вызов
+        Ok(4096.0)
+    }
+
+    async fn collect_cpu_usage(&self) -> Result<f32, AppError> {
+        // Заглушка для сбора CPU метрик
+        // В реальной реализации здесь будет системный вызов
+        Ok(45.2)
+    }
+
+    async fn collect_disk_usage(&self) -> Result<f32, AppError> {
+        // Заглушка для сбора метрик диска
+        // В реальной реализации здесь будет системный вызов
+        Ok(65.8)
+    }
+
+    async fn collect_network_metrics(&self) -> Result<f32, AppError> {
+        // Заглушка для сетевых метрик
+        // В реальной реализации здесь будет системный вызов
+        Ok(125.5)
+    }
+
+    async fn calculate_average_response_time(&self) -> Result<f64, AppError> {
+        // Заглушка для расчета среднего времени ответа
+        // В реальной реализации здесь будет анализ исторических данных
+        Ok(250.0)
+    }
+
+    async fn calculate_requests_per_second(&self) -> Result<f64, AppError> {
+        // Заглушка для расчета RPS
+        // В реальной реализации здесь будет анализ исторических данных
+        Ok(45.2)
+    }
+
+    async fn calculate_error_rate(&self) -> Result<f32, AppError> {
+        // Заглушка для расчета ошибок
+        // В реальной реализации здесь будет анализ исторических данных
+        Ok(0.02)
+    }
+
+    async fn get_active_connections(&self) -> Result<usize, AppError> {
+        // Заглушка для получения активных соединений
+        // В реальной реализации здесь будет интеграция с сетевой подсистемой
+        Ok(12)
+    }
+
+    async fn get_queue_size(&self) -> Result<usize, AppError> {
+        // Заглушка для получения размера очереди
+        // В реальной реализации здесь будет интеграция с пулом
+        Ok(5)
+    }
+
+    async fn collect_model_specific_metrics(&self) -> Result<HashMap<String, f64>, AppError> {
+        // Заглушка для специфичных метрик моделей
+        // В реальной реализации здесь будет интеграция с моделями
+        let mut metrics = HashMap::new();
+        metrics.insert("model_1_throughput".to_string(), 1250.5);
+        metrics.insert("model_2_throughput".to_string(), 980.3);
+        metrics.insert("cache_hit_rate".to_string(), 0.85);
+        Ok(metrics)
+    }
+
+    pub async fn update_model_metrics(&mut self, model_name: String, metrics: ModelMetrics) {
+        self.model_metrics.insert(model_name, metrics);
+    }
+
+    pub async fn get_model_metrics(&self, model_name: &str) -> Option<ModelMetrics> {
+        self.model_metrics.get(model_name).cloned()
+    }
+
+    pub async fn update_resource_metrics(&mut self, metrics: ResourceMetrics) {
+        self.resource_metrics = metrics;
+    }
+
+    pub async fn get_resource_metrics(&self) -> ResourceMetrics {
+        self.resource_metrics.clone()
+    }
+
+    pub async fn get_historical_metrics(&self, duration: Duration) -> Vec<Metrics> {
+        let cutoff_time = Instant::now() - duration;
+        
+        self.historical_metrics
+            .iter()
+            .filter(|metrics| metrics.timestamp >= cutoff_time)
             .cloned()
             .collect()
     }
 
-    pub async fn get_samples(
-        &self,
-        metric_id: &str,
-        start_time: Option<DateTime<Utc>>,
-        end_time: Option<DateTime<Utc>>,
-    ) -> Vec<Sample> {
-        let samples = self.samples.lock().await;
-        samples
-            .values()
-            .filter(|s| {
-                s.metric_id == metric_id
-                    && start_time.map_or(true, |t| s.timestamp >= t)
-                    && end_time.map_or(true, |t| s.timestamp <= t)
-            })
-            .cloned()
-            .collect()
-    }
-
-    pub async fn set_metric_active(&self, id: &str, active: bool) -> Result<(), String> {
-        let mut metrics = self.metrics.lock().await;
+    pub async fn add_metrics_to_history(&mut self, metrics: Metrics) {
+        self.historical_metrics.push(metrics);
         
-        let metric = metrics
-            .get_mut(id)
-            .ok_or_else(|| format!("Metric '{}' not found", id))?;
-
-        metric.config.active = active;
-        info!(
-            "Metric '{}' {}",
-            id,
-            if active { "activated" } else { "deactivated" }
-        );
-        Ok(())
-    }
-
-    pub async fn update_metric_config(&self, id: &str, new_config: MetricConfig) -> Result<(), String> {
-        let mut metrics = self.metrics.lock().await;
-        
-        let metric = metrics
-            .get_mut(id)
-            .ok_or_else(|| format!("Metric '{}' not found", id))?;
-
-        metric.config = new_config;
-        info!("Updated metric configuration: {}", id);
-        Ok(())
-    }
-
-    pub async fn aggregate_metric(
-        &self,
-        metric_id: &str,
-        start_time: DateTime<Utc>,
-        end_time: DateTime<Utc>,
-    ) -> Result<HashMap<String, f64>, String> {
-        let samples = self.get_samples(metric_id, Some(start_time), Some(end_time)).await;
-        
-        if samples.is_empty() {
-            return Err("No samples found for the specified time range".to_string());
+        // Ограничение размера истории
+        if self.historical_metrics.len() > 10000 {
+            self.historical_metrics.drain(0..1000);
         }
-
-        let mut result = HashMap::new();
-        result.insert("count".to_string(), samples.len() as f64);
-        result.insert("sum".to_string(), samples.iter().map(|s| s.value).sum());
-        result.insert(
-            "average".to_string(),
-            samples.iter().map(|s| s.value).sum::<f64>() / samples.len() as f64,
-        );
-        result.insert(
-            "min".to_string(),
-            samples.iter().map(|s| s.value).fold(f64::MAX, f64::min),
-        );
-        result.insert(
-            "max".to_string(),
-            samples.iter().map(|s| s.value).fold(f64::MIN, f64::max),
-        );
-
-        Ok(result)
     }
 } 

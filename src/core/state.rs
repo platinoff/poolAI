@@ -1,116 +1,128 @@
 use std::sync::Arc;
 use parking_lot::{RwLock, Mutex};
 use std::collections::HashMap;
-use solana_sdk::pubkey::Pubkey;
-use crate::model::MiningModel;
-use crate::core::CursorCore;
-use crate::core::burstraid::BurstRaidManager;
-use crate::core::vobe_dancing::VobeDancer;
-use crate::core::vibe::VibeManager;
-use crate::core::reward_system::RewardSystem;
-use tokio::sync::Mutex as TokioMutex;
-use crate::pool::PoolManager;
-use crate::core::lib_manager::LibraryManager;
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
-use crate::pool::{PoolConfig, PoolStats};
 use crate::core::error::CursorError;
 use crate::core::config::AppConfig;
-use crate::monitoring::metrics::MetricsSystem;
-use crate::monitoring::logger::LoggerSystem;
-use crate::monitoring::alert::AlertSystem;
-use crate::runtime::worker::WorkerManager;
-use crate::runtime::scheduler::SchedulerSystem;
-use crate::runtime::queue::QueueSystem;
-use crate::runtime::cache::CacheSystem;
-use crate::runtime::storage::StorageSystem;
-use crate::network::network::NetworkSystem;
-use crate::platform::model::ModelSystem;
 
-use crate::{
-    tls::TLSConfig,
-    bridges::Bridge,
-    lmrouter::LMRouter,
-    lib_manager::LibManager,
-    vm::VMManager,
-    tgbot::MiningBot,
-    workers::WorkerManager,
-    admin::AdminPanel,
-    tuning::TuningSystem,
-    pool::PoolMigrationManager,
-    loadbalancer::LoadBalancer,
-    burstraid::BurstRaid,
-    tokenizer::Tokenizer,
-    smallworld::SmallWorld,
-};
-
+/// Worker information
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Worker {
     pub id: String,
-    pub solana_address: Pubkey,
+    pub address: String,
     pub mining_power: f64,
+    pub status: WorkerStatus,
+    pub last_seen: DateTime<Utc>,
 }
 
-pub struct RaidNode {
-    pub last_heartbeat: std::time::Instant,
-    pub status: NodeStatus,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum WorkerStatus {
+    Active,
+    Inactive,
+    Error,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+/// Node status for distributed systems
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum NodeStatus {
     Active,
     Degraded,
     Failed,
 }
 
+/// Main application state
 pub struct AppState {
-    pub workers: RwLock<HashMap<String, Worker>>,
-    pub raid_status: Mutex<HashMap<Pubkey, RaidNode>>,
-    pub model: Arc<Mutex<MiningModel>>,
-    pub core: Arc<CursorCore>,
-    pub raid_manager: Arc<BurstRaidManager>,
-    pub vobe_dancer: Arc<RwLock<VobeDancer>>,
-    pub vibe_manager: Arc<RwLock<VibeManager>>,
-    pub reward_system: Arc<RwLock<RewardSystem>>,
-    pub lib_manager: Arc<RwLock<LibraryManager>>,
-    pub worker_manager: Arc<WorkerManager>,
-    pub pool_manager: Arc<RwLock<PoolManager>>,
-    pub burst_raid: Arc<RwLock<BurstRaidManager>>,
+    pub workers: Arc<RwLock<HashMap<String, Worker>>>,
+    pub config: Arc<RwLock<AppConfig>>,
+    pub start_time: DateTime<Utc>,
+    pub is_initialized: Arc<RwLock<bool>>,
 }
 
 impl AppState {
-    pub fn new(
-        reward_system: RewardSystem,
-        lib_manager: LibraryManager,
-        worker_manager: WorkerManager,
-        pool_manager: PoolManager,
-        model: MiningModel,
-        burst_raid: BurstRaidManager,
-    ) -> Self {
+    pub fn new() -> Self {
         Self {
-            workers: RwLock::new(HashMap::new()),
-            raid_status: Mutex::new(HashMap::new()),
-            model: Arc::new(Mutex::new(model)),
-            core: Arc::new(CursorCore::new()),
-            raid_manager: Arc::new(BurstRaidManager::new()),
-            vobe_dancer: Arc::new(RwLock::new(VobeDancer::new())),
-            vibe_manager: Arc::new(RwLock::new(VibeManager::new())),
-            reward_system: Arc::new(RwLock::new(reward_system)),
-            lib_manager: Arc::new(RwLock::new(lib_manager)),
-            worker_manager: Arc::new(worker_manager),
-            pool_manager: Arc::new(RwLock::new(pool_manager)),
-            burst_raid: Arc::new(RwLock::new(burst_raid)),
+            workers: Arc::new(RwLock::new(HashMap::new())),
+            config: Arc::new(RwLock::new(AppConfig::default())),
+            start_time: Utc::now(),
+            is_initialized: Arc::new(RwLock::new(false)),
         }
     }
 
-    pub fn add_worker(&self, worker: Worker) {
-        self.workers.write().insert(worker.id.clone(), worker);
+    pub async fn initialize(&self) -> Result<(), CursorError> {
+        let mut initialized = self.is_initialized.write();
+        if *initialized {
+            return Ok(());
+        }
+
+        // Initialize state
+        log::info!("Initializing application state...");
+        
+        // Load configuration
+        let config = AppConfig::load()?;
+        *self.config.write() = config;
+        
+        *initialized = true;
+        log::info!("Application state initialized successfully");
+        Ok(())
     }
 
-    pub fn update_raid_status(&self, node_id: Pubkey, status: NodeStatus) {
-        let mut raid_status = self.raid_status.lock();
-        if let Some(node) = raid_status.get_mut(&node_id) {
-            node.status = status;
-            node.last_heartbeat = std::time::Instant::now();
+    pub async fn cleanup(&self) -> Result<(), CursorError> {
+        log::info!("Cleaning up application state...");
+        
+        // Clear workers
+        self.workers.write().clear();
+        
+        // Mark as not initialized
+        *self.is_initialized.write() = false;
+        
+        log::info!("Application state cleanup complete");
+        Ok(())
+    }
+
+    pub fn add_worker(&self, worker: Worker) -> Result<(), CursorError> {
+        let mut workers = self.workers.write();
+        workers.insert(worker.id.clone(), worker);
+        log::info!("Added worker: {}", worker.id);
+        Ok(())
+    }
+
+    pub fn remove_worker(&self, worker_id: &str) -> Result<(), CursorError> {
+        let mut workers = self.workers.write();
+        if workers.remove(worker_id).is_some() {
+            log::info!("Removed worker: {}", worker_id);
+            Ok(())
+        } else {
+            Err(CursorError::NotFound(format!("Worker '{}' not found", worker_id)))
         }
+    }
+
+    pub fn get_worker(&self, worker_id: &str) -> Option<Worker> {
+        self.workers.read().get(worker_id).cloned()
+    }
+
+    pub fn get_all_workers(&self) -> Vec<Worker> {
+        self.workers.read().values().cloned().collect()
+    }
+
+    pub fn update_worker_status(&self, worker_id: &str, status: WorkerStatus) -> Result<(), CursorError> {
+        let mut workers = self.workers.write();
+        if let Some(worker) = workers.get_mut(worker_id) {
+            worker.status = status;
+            worker.last_seen = Utc::now();
+            log::info!("Updated worker {} status to {:?}", worker_id, status);
+            Ok(())
+        } else {
+            Err(CursorError::NotFound(format!("Worker '{}' not found", worker_id)))
+        }
+    }
+
+    pub fn get_uptime(&self) -> std::time::Duration {
+        let now = Utc::now();
+        (now - self.start_time).to_std().unwrap_or_default()
+    }
+
+    pub fn is_ready(&self) -> bool {
+        *self.is_initialized.read()
     }
 } 

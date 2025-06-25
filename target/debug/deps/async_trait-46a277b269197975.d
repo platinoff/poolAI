@@ -1,0 +1,12 @@
+S:\rust\poolAI\target\debug\deps\async_trait-46a277b269197975.dll: C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\lib.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\args.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\bound.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\expand.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\lifetime.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\parse.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\receiver.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\verbatim.rs
+
+S:\rust\poolAI\target\debug\deps\async_trait-46a277b269197975.d: C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\lib.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\args.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\bound.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\expand.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\lifetime.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\parse.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\receiver.rs C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\verbatim.rs
+
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\lib.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\args.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\bound.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\expand.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\lifetime.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\parse.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\receiver.rs:
+C:\Users\plati\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\async-trait-0.1.88\src\verbatim.rs:

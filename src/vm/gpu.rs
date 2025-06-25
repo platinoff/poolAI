@@ -1,412 +1,343 @@
-//! GPU Passthrough - GPU passthrough для виртуальных машин
-//! 
-//! Этот модуль предоставляет:
-//! - GPU passthrough
-//! - Ресурсы GPU
-//! - Оптимизация
-//! - Мониторинг
-
-use crate::platform::gpu::GpuInfo;
 use crate::core::error::AppError;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::sync::RwLock;
+use std::sync::Arc;
 
-/// GPU Passthrough менеджер
-pub struct GpuPassthrough {
-    gpu_devices: Arc<RwLock<HashMap<String, GpuDevice>>>,
-    vm_allocations: Arc<RwLock<HashMap<String, GpuAllocation>>>,
-    config: GpuPassthroughConfig,
+#[derive(Debug, Clone)]
+pub struct GPUDevice {
+    pub device_id: String,
+    pub name: String,
+    pub memory_mb: f32,
+    pub compute_capability: String,
+    pub driver_version: String,
+    pub is_available: bool,
+    pub is_passthrough_enabled: bool,
+    pub assigned_vm: Option<String>,
 }
 
-impl GpuPassthrough {
-    /// Создает новый GPU Passthrough менеджер
-    pub fn new(config: GpuPassthroughConfig) -> Self {
-        Self {
+#[derive(Debug, Clone)]
+pub struct GPUMetrics {
+    pub device_id: String,
+    pub utilization_percent: f32,
+    pub memory_used_mb: f32,
+    pub memory_total_mb: f32,
+    pub temperature_celsius: f32,
+    pub power_consumption_watts: f32,
+    pub fan_speed_percent: f32,
+    pub clock_speed_mhz: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct ASICDevice {
+    pub device_id: String,
+    pub name: String,
+    pub hash_rate_th: f32,
+    pub power_consumption_watts: f32,
+    pub is_available: bool,
+    pub assigned_vm: Option<String>,
+}
+
+pub struct GPUManager {
+    gpu_devices: Arc<RwLock<HashMap<String, GPUDevice>>>,
+    asic_devices: Arc<RwLock<HashMap<String, ASICDevice>>>,
+    gpu_metrics: Arc<RwLock<HashMap<String, GPUMetrics>>>,
+}
+
+impl GPUManager {
+    pub fn new() -> Result<Self, AppError> {
+        Ok(Self {
             gpu_devices: Arc::new(RwLock::new(HashMap::new())),
-            vm_allocations: Arc::new(RwLock::new(HashMap::new())),
-            config,
-        }
-    }
-
-    /// Инициализирует GPU passthrough
-    pub async fn initialize(&self) -> Result<(), AppError> {
-        log::info!("Initializing GPU passthrough");
-        
-        // Обнаруживаем доступные GPU устройства
-        self.detect_gpu_devices().await?;
-        
-        // Настраиваем IOMMU
-        self.setup_iommu().await?;
-        
-        // Включаем VFIO драйверы
-        self.enable_vfio_drivers().await?;
-        
-        log::info!("GPU passthrough initialized successfully");
-        Ok(())
-    }
-
-    /// Останавливает GPU passthrough
-    pub async fn shutdown(&self) -> Result<(), AppError> {
-        log::info!("Shutting down GPU passthrough");
-        
-        // Освобождаем все выделенные GPU
-        self.release_all_gpus().await?;
-        
-        // Отключаем VFIO драйверы
-        self.disable_vfio_drivers().await?;
-        
-        log::info!("GPU passthrough shut down successfully");
-        Ok(())
-    }
-
-    /// Выделяет GPU для VM
-    pub async fn allocate_gpu(&self, vm_id: &str, gpu_id: &str) -> Result<GpuAllocation, AppError> {
-        let mut gpu_devices = self.gpu_devices.write().await;
-        let mut vm_allocations = self.vm_allocations.write().await;
-        
-        // Проверяем, доступен ли GPU
-        let gpu_device = gpu_devices.get(gpu_id)
-            .ok_or_else(|| AppError::NotFound(format!("GPU {} not found", gpu_id)))?;
-        
-        if !gpu_device.is_available {
-            return Err(AppError::ResourceUnavailable(format!("GPU {} is not available", gpu_id)));
-        }
-        
-        // Создаем выделение
-        let allocation = GpuAllocation {
-            vm_id: vm_id.to_string(),
-            gpu_id: gpu_id.to_string(),
-            allocation_time: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            status: AllocationStatus::Active,
-        };
-        
-        // Помечаем GPU как занятый
-        if let Some(gpu) = gpu_devices.get_mut(gpu_id) {
-            gpu.is_available = false;
-            gpu.allocated_to = Some(vm_id.to_string());
-        }
-        
-        // Сохраняем выделение
-        vm_allocations.insert(vm_id.to_string(), allocation.clone());
-        
-        log::info!("Allocated GPU {} to VM {}", gpu_id, vm_id);
-        Ok(allocation)
-    }
-
-    /// Освобождает GPU
-    pub async fn release_gpu(&self, vm_id: &str) -> Result<(), AppError> {
-        let mut gpu_devices = self.gpu_devices.write().await;
-        let mut vm_allocations = self.vm_allocations.write().await;
-        
-        // Находим выделение
-        let allocation = vm_allocations.remove(vm_id)
-            .ok_or_else(|| AppError::NotFound(format!("No GPU allocation found for VM {}", vm_id)))?;
-        
-        // Освобождаем GPU
-        if let Some(gpu) = gpu_devices.get_mut(&allocation.gpu_id) {
-            gpu.is_available = true;
-            gpu.allocated_to = None;
-        }
-        
-        log::info!("Released GPU {} from VM {}", allocation.gpu_id, vm_id);
-        Ok(())
-    }
-
-    /// Получает список доступных GPU
-    pub async fn get_available_gpus(&self) -> Result<Vec<GpuDevice>, AppError> {
-        let gpu_devices = self.gpu_devices.read().await;
-        let available_gpus: Vec<GpuDevice> = gpu_devices.values()
-            .filter(|gpu| gpu.is_available)
-            .cloned()
-            .collect();
-        
-        Ok(available_gpus)
-    }
-
-    /// Получает информацию о выделении GPU
-    pub async fn get_gpu_allocation(&self, vm_id: &str) -> Result<Option<GpuAllocation>, AppError> {
-        let vm_allocations = self.vm_allocations.read().await;
-        Ok(vm_allocations.get(vm_id).cloned())
-    }
-
-    /// Получает статус GPU passthrough
-    pub async fn get_status(&self) -> Result<GpuPassthroughStatus, AppError> {
-        let gpu_devices = self.gpu_devices.read().await;
-        let vm_allocations = self.vm_allocations.read().await;
-        
-        let total_gpus = gpu_devices.len();
-        let available_gpus = gpu_devices.values().filter(|gpu| gpu.is_available).count();
-        let allocated_gpus = total_gpus - available_gpus;
-        
-        Ok(GpuPassthroughStatus {
-            enabled: self.config.enabled,
-            total_gpus,
-            available_gpus,
-            allocated_gpus,
-            iommu_enabled: self.config.iommu_enabled,
-            vfio_enabled: self.config.vfio_enabled,
+            asic_devices: Arc::new(RwLock::new(HashMap::new())),
+            gpu_metrics: Arc::new(RwLock::new(HashMap::new())),
         })
     }
 
-    /// Настраивает GPU для passthrough
-    pub async fn configure_gpu_for_passthrough(&self, gpu_id: &str) -> Result<(), AppError> {
+    pub async fn initialize(&self) -> Result<(), AppError> {
+        // Сканирование доступных GPU
+        self.scan_gpu_devices().await?;
+        
+        // Сканирование доступных ASIC
+        self.scan_asic_devices().await?;
+        
+        // Запуск мониторинга GPU
+        self.start_gpu_monitoring().await?;
+        
+        Ok(())
+    }
+
+    pub async fn shutdown(&self) -> Result<(), AppError> {
+        // Освобождение всех GPU
+        self.release_all_gpus().await?;
+        
+        // Остановка мониторинга
+        Ok(())
+    }
+
+    pub async fn is_gpu_available(&self, device_id: &str) -> Result<bool, AppError> {
+        let gpu_devices = self.gpu_devices.read().await;
+        
+        if let Some(gpu) = gpu_devices.get(device_id) {
+            Ok(gpu.is_available && gpu.assigned_vm.is_none())
+        } else {
+            Ok(false)
+        }
+    }
+
+    pub async fn assign_gpu_to_vm(&self, device_id: &str, vm_id: &str) -> Result<(), AppError> {
         let mut gpu_devices = self.gpu_devices.write().await;
         
-        if let Some(gpu) = gpu_devices.get_mut(gpu_id) {
-            // Отключаем GPU от хоста
-            self.unbind_gpu_from_host(gpu_id).await?;
+        if let Some(gpu) = gpu_devices.get_mut(device_id) {
+            if !gpu.is_available {
+                return Err(AppError::DeviceNotAvailable);
+            }
             
-            // Привязываем к VFIO
-            self.bind_gpu_to_vfio(gpu_id).await?;
+            if gpu.assigned_vm.is_some() {
+                return Err(AppError::DeviceAlreadyAssigned);
+            }
             
-            // Настраиваем IOMMU группы
-            self.configure_iommu_group(gpu_id).await?;
-            
-            gpu.passthrough_configured = true;
-            
-            log::info!("Configured GPU {} for passthrough", gpu_id);
+            gpu.assigned_vm = Some(vm_id.to_string());
+        } else {
+            return Err(AppError::DeviceNotFound);
         }
         
         Ok(())
     }
 
-    /// Восстанавливает GPU для хоста
-    pub async fn restore_gpu_for_host(&self, gpu_id: &str) -> Result<(), AppError> {
+    pub async fn release_gpu_from_vm(&self, device_id: &str) -> Result<(), AppError> {
         let mut gpu_devices = self.gpu_devices.write().await;
         
-        if let Some(gpu) = gpu_devices.get_mut(gpu_id) {
-            // Отключаем от VFIO
-            self.unbind_gpu_from_vfio(gpu_id).await?;
-            
-            // Привязываем обратно к хосту
-            self.bind_gpu_to_host(gpu_id).await?;
-            
-            gpu.passthrough_configured = false;
-            
-            log::info!("Restored GPU {} for host", gpu_id);
+        if let Some(gpu) = gpu_devices.get_mut(device_id) {
+            gpu.assigned_vm = None;
         }
         
         Ok(())
     }
 
-    // Приватные методы
+    pub async fn get_gpu_info(&self, device_id: &str) -> Option<GPUDevice> {
+        let gpu_devices = self.gpu_devices.read().await;
+        gpu_devices.get(device_id).cloned()
+    }
 
-    async fn detect_gpu_devices(&self) -> Result<(), AppError> {
-        log::info!("Detecting GPU devices");
-        
-        // Симуляция обнаружения GPU устройств
+    pub async fn get_gpu_metrics(&self, device_id: &str) -> Option<GPUMetrics> {
+        let gpu_metrics = self.gpu_metrics.read().await;
+        gpu_metrics.get(device_id).cloned()
+    }
+
+    pub async fn list_available_gpus(&self) -> Vec<GPUDevice> {
+        let gpu_devices = self.gpu_devices.read().await;
+        gpu_devices.values()
+            .filter(|gpu| gpu.is_available && gpu.assigned_vm.is_none())
+            .cloned()
+            .collect()
+    }
+
+    pub async fn list_all_gpus(&self) -> Vec<GPUDevice> {
+        let gpu_devices = self.gpu_devices.read().await;
+        gpu_devices.values().cloned().collect()
+    }
+
+    pub async fn enable_gpu_passthrough(&self, device_id: &str) -> Result<(), AppError> {
         let mut gpu_devices = self.gpu_devices.write().await;
         
-        let devices = vec![
-            GpuDevice {
-                id: "gpu_001".to_string(),
-                name: "NVIDIA RTX 4090".to_string(),
-                pci_address: "0000:01:00.0".to_string(),
-                memory_size: 24 * 1024 * 1024 * 1024, // 24GB
-                is_available: true,
-                allocated_to: None,
-                passthrough_configured: false,
-                iommu_group: 1,
-                driver: "nvidia".to_string(),
-            },
-            GpuDevice {
-                id: "gpu_002".to_string(),
-                name: "NVIDIA RTX 4080".to_string(),
-                pci_address: "0000:02:00.0".to_string(),
-                memory_size: 16 * 1024 * 1024 * 1024, // 16GB
-                is_available: true,
-                allocated_to: None,
-                passthrough_configured: false,
-                iommu_group: 2,
-                driver: "nvidia".to_string(),
-            },
-        ];
-        
-        for device in devices {
-            gpu_devices.insert(device.id.clone(), device);
+        if let Some(gpu) = gpu_devices.get_mut(device_id) {
+            // Заглушка для включения GPU passthrough
+            // В реальной реализации здесь будет:
+            // - Отключение GPU от хоста
+            // - Настройка IOMMU
+            // - Подготовка для passthrough
+            
+            gpu.is_passthrough_enabled = true;
+        } else {
+            return Err(AppError::DeviceNotFound);
         }
         
-        log::info!("Detected {} GPU devices", gpu_devices.len());
         Ok(())
     }
 
-    async fn setup_iommu(&self) -> Result<(), AppError> {
-        log::info!("Setting up IOMMU");
+    pub async fn disable_gpu_passthrough(&self, device_id: &str) -> Result<(), AppError> {
+        let mut gpu_devices = self.gpu_devices.write().await;
         
-        // Включаем IOMMU в BIOS/UEFI
-        self.enable_iommu_in_bios().await?;
-        
-        // Настраиваем параметры загрузки
-        self.configure_boot_parameters().await?;
-        
-        // Проверяем, что IOMMU работает
-        self.verify_iommu().await?;
+        if let Some(gpu) = gpu_devices.get_mut(device_id) {
+            // Заглушка для отключения GPU passthrough
+            // В реальной реализации здесь будет:
+            // - Возврат GPU хосту
+            // - Восстановление драйверов
+            
+            gpu.is_passthrough_enabled = false;
+        } else {
+            return Err(AppError::DeviceNotFound);
+        }
         
         Ok(())
     }
 
-    async fn enable_vfio_drivers(&self) -> Result<(), AppError> {
-        log::info!("Enabling VFIO drivers");
+    pub async fn get_asic_info(&self, device_id: &str) -> Option<ASICDevice> {
+        let asic_devices = self.asic_devices.read().await;
+        asic_devices.get(device_id).cloned()
+    }
+
+    pub async fn list_available_asics(&self) -> Vec<ASICDevice> {
+        let asic_devices = self.asic_devices.read().await;
+        asic_devices.values()
+            .filter(|asic| asic.is_available && asic.assigned_vm.is_none())
+            .cloned()
+            .collect()
+    }
+
+    pub async fn assign_asic_to_vm(&self, device_id: &str, vm_id: &str) -> Result<(), AppError> {
+        let mut asic_devices = self.asic_devices.write().await;
         
-        // Загружаем VFIO модули
-        self.load_vfio_modules().await?;
+        if let Some(asic) = asic_devices.get_mut(device_id) {
+            if !asic.is_available {
+                return Err(AppError::DeviceNotAvailable);
+            }
+            
+            if asic.assigned_vm.is_some() {
+                return Err(AppError::DeviceAlreadyAssigned);
+            }
+            
+            asic.assigned_vm = Some(vm_id.to_string());
+        } else {
+            return Err(AppError::DeviceNotFound);
+        }
         
-        // Настраиваем VFIO группы
-        self.configure_vfio_groups().await?;
+        Ok(())
+    }
+
+    pub async fn release_asic_from_vm(&self, device_id: &str) -> Result<(), AppError> {
+        let mut asic_devices = self.asic_devices.write().await;
+        
+        if let Some(asic) = asic_devices.get_mut(device_id) {
+            asic.assigned_vm = None;
+        }
+        
+        Ok(())
+    }
+
+    async fn scan_gpu_devices(&self) -> Result<(), AppError> {
+        // Заглушка для сканирования GPU устройств
+        // В реальной реализации здесь будет:
+        // - Сканирование PCI устройств
+        // - Определение GPU через lspci или аналогичные утилиты
+        // - Получение информации о драйверах
+        
+        let mut gpu_devices = self.gpu_devices.write().await;
+        
+        // Симуляция найденных GPU
+        gpu_devices.insert("gpu_0".to_string(), GPUDevice {
+            device_id: "gpu_0".to_string(),
+            name: "NVIDIA GeForce RTX 4090".to_string(),
+            memory_mb: 24576.0,
+            compute_capability: "8.9".to_string(),
+            driver_version: "535.98".to_string(),
+            is_available: true,
+            is_passthrough_enabled: false,
+            assigned_vm: None,
+        });
+        
+        gpu_devices.insert("gpu_1".to_string(), GPUDevice {
+            device_id: "gpu_1".to_string(),
+            name: "NVIDIA GeForce RTX 4080".to_string(),
+            memory_mb: 16384.0,
+            compute_capability: "8.9".to_string(),
+            driver_version: "535.98".to_string(),
+            is_available: true,
+            is_passthrough_enabled: false,
+            assigned_vm: None,
+        });
+        
+        gpu_devices.insert("gpu_2".to_string(), GPUDevice {
+            device_id: "gpu_2".to_string(),
+            name: "AMD Radeon RX 7900 XTX".to_string(),
+            memory_mb: 24576.0,
+            compute_capability: "GFX11".to_string(),
+            driver_version: "23.3.2".to_string(),
+            is_available: true,
+            is_passthrough_enabled: false,
+            assigned_vm: None,
+        });
+        
+        Ok(())
+    }
+
+    async fn scan_asic_devices(&self) -> Result<(), AppError> {
+        // Заглушка для сканирования ASIC устройств
+        // В реальной реализации здесь будет:
+        // - Сканирование USB устройств
+        // - Определение ASIC майнеров
+        // - Получение информации о прошивках
+        
+        let mut asic_devices = self.asic_devices.write().await;
+        
+        // Симуляция найденных ASIC
+        asic_devices.insert("asic_0".to_string(), ASICDevice {
+            device_id: "asic_0".to_string(),
+            name: "Antminer S19 XP".to_string(),
+            hash_rate_th: 140.0,
+            power_consumption_watts: 3010.0,
+            is_available: true,
+            assigned_vm: None,
+        });
+        
+        asic_devices.insert("asic_1".to_string(), ASICDevice {
+            device_id: "asic_1".to_string(),
+            name: "Whatsminer M50".to_string(),
+            hash_rate_th: 126.0,
+            power_consumption_watts: 3276.0,
+            is_available: true,
+            assigned_vm: None,
+        });
+        
+        Ok(())
+    }
+
+    async fn start_gpu_monitoring(&self) -> Result<(), AppError> {
+        let gpu_devices = self.gpu_devices.clone();
+        let gpu_metrics = self.gpu_metrics.clone();
+        
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(5));
+            
+            loop {
+                interval.tick().await;
+                
+                // Обновление метрик GPU
+                let devices = gpu_devices.read().await;
+                let mut metrics = gpu_metrics.write().await;
+                
+                for (device_id, _) in devices.iter() {
+                    // Заглушка для получения метрик GPU
+                    // В реальной реализации здесь будет:
+                    // - Вызов nvidia-smi для NVIDIA GPU
+                    // - Вызов rocm-smi для AMD GPU
+                    // - Чтение системных файлов для Linux
+                    
+                    let gpu_metric = GPUMetrics {
+                        device_id: device_id.clone(),
+                        utilization_percent: rand::random::<f32>() * 100.0,
+                        memory_used_mb: rand::random::<f32>() * 8000.0,
+                        memory_total_mb: 24576.0,
+                        temperature_celsius: 45.0 + rand::random::<f32>() * 30.0,
+                        power_consumption_watts: 150.0 + rand::random::<f32>() * 200.0,
+                        fan_speed_percent: 50.0 + rand::random::<f32>() * 50.0,
+                        clock_speed_mhz: 1800.0 + rand::random::<f32>() * 400.0,
+                    };
+                    
+                    metrics.insert(device_id.clone(), gpu_metric);
+                }
+            }
+        });
         
         Ok(())
     }
 
     async fn release_all_gpus(&self) -> Result<(), AppError> {
         let mut gpu_devices = self.gpu_devices.write().await;
-        let mut vm_allocations = self.vm_allocations.write().await;
         
-        // Освобождаем все GPU
         for gpu in gpu_devices.values_mut() {
-            gpu.is_available = true;
-            gpu.allocated_to = None;
+            gpu.assigned_vm = None;
         }
         
-        // Очищаем выделения
-        vm_allocations.clear();
-        
         Ok(())
-    }
-
-    async fn disable_vfio_drivers(&self) -> Result<(), AppError> {
-        log::info!("Disabling VFIO drivers");
-        
-        // Выгружаем VFIO модули
-        self.unload_vfio_modules().await?;
-        
-        Ok(())
-    }
-
-    async fn unbind_gpu_from_host(&self, gpu_id: &str) -> Result<(), AppError> {
-        log::info!("Unbinding GPU {} from host", gpu_id);
-        Ok(())
-    }
-
-    async fn bind_gpu_to_vfio(&self, gpu_id: &str) -> Result<(), AppError> {
-        log::info!("Binding GPU {} to VFIO", gpu_id);
-        Ok(())
-    }
-
-    async fn configure_iommu_group(&self, gpu_id: &str) -> Result<(), AppError> {
-        log::info!("Configuring IOMMU group for GPU {}", gpu_id);
-        Ok(())
-    }
-
-    async fn unbind_gpu_from_vfio(&self, gpu_id: &str) -> Result<(), AppError> {
-        log::info!("Unbinding GPU {} from VFIO", gpu_id);
-        Ok(())
-    }
-
-    async fn bind_gpu_to_host(&self, gpu_id: &str) -> Result<(), AppError> {
-        log::info!("Binding GPU {} to host", gpu_id);
-        Ok(())
-    }
-
-    async fn enable_iommu_in_bios(&self) -> Result<(), AppError> {
-        log::info!("Enabling IOMMU in BIOS/UEFI");
-        Ok(())
-    }
-
-    async fn configure_boot_parameters(&self) -> Result<(), AppError> {
-        log::info!("Configuring boot parameters");
-        Ok(())
-    }
-
-    async fn verify_iommu(&self) -> Result<(), AppError> {
-        log::info!("Verifying IOMMU functionality");
-        Ok(())
-    }
-
-    async fn load_vfio_modules(&self) -> Result<(), AppError> {
-        log::info!("Loading VFIO modules");
-        Ok(())
-    }
-
-    async fn configure_vfio_groups(&self) -> Result<(), AppError> {
-        log::info!("Configuring VFIO groups");
-        Ok(())
-    }
-
-    async fn unload_vfio_modules(&self) -> Result<(), AppError> {
-        log::info!("Unloading VFIO modules");
-        Ok(())
-    }
-}
-
-/// GPU устройство
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GpuDevice {
-    pub id: String,
-    pub name: String,
-    pub pci_address: String,
-    pub memory_size: u64,
-    pub is_available: bool,
-    pub allocated_to: Option<String>,
-    pub passthrough_configured: bool,
-    pub iommu_group: u32,
-    pub driver: String,
-}
-
-/// Выделение GPU
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GpuAllocation {
-    pub vm_id: String,
-    pub gpu_id: String,
-    pub allocation_time: u64,
-    pub status: AllocationStatus,
-}
-
-/// Статус выделения
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum AllocationStatus {
-    Active,
-    Suspended,
-    Terminated,
-}
-
-/// Статус GPU passthrough
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GpuPassthroughStatus {
-    pub enabled: bool,
-    pub total_gpus: usize,
-    pub available_gpus: usize,
-    pub allocated_gpus: usize,
-    pub iommu_enabled: bool,
-    pub vfio_enabled: bool,
-}
-
-/// Конфигурация GPU passthrough
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GpuPassthroughConfig {
-    pub enabled: bool,
-    pub iommu_enabled: bool,
-    pub vfio_enabled: bool,
-    pub auto_configure: bool,
-    pub max_gpus_per_vm: u32,
-    pub enable_monitoring: bool,
-    pub enable_optimization: bool,
-}
-
-impl Default for GpuPassthroughConfig {
-    fn default() -> Self {
-        Self {
-            enabled: true,
-            iommu_enabled: true,
-            vfio_enabled: true,
-            auto_configure: false,
-            max_gpus_per_vm: 4,
-            enable_monitoring: true,
-            enable_optimization: true,
-        }
     }
 } 

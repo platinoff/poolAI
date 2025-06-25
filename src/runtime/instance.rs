@@ -1,601 +1,295 @@
-//! Instance Management - Управление экземплярами моделей
-//! 
-//! Этот модуль предоставляет:
-//! - Управление экземплярами моделей
-//! - Мониторинг состояния
-//! - Обработка запросов
-//! - Метрики
-
-use crate::core::model_interface::{
-    ModelInterface, ModelRequest, ModelResponse, ModelInfo, ModelConfig, ModelMetrics, ModelHealth
-};
 use crate::core::error::AppError;
-use crate::monitoring::metrics::InstanceMetrics;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use crate::core::model_interface::{ModelRequest, ModelResponse, ModelConfig, ModelInterface};
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use std::time::{Instant, Duration};
+use std::time::Instant;
 
-/// Менеджер экземпляров моделей
-pub struct InstanceManager {
-    instances: Arc<RwLock<HashMap<String, ModelInstance>>>,
-    config: InstanceManagerConfig,
-    metrics: Arc<RwLock<InstanceMetrics>>,
+#[derive(Debug, Clone)]
+pub struct InstanceConfig {
+    pub instance_id: String,
+    pub model_config: ModelConfig,
+    pub max_concurrent_requests: usize,
+    pub request_timeout_ms: u64,
+    pub enable_caching: bool,
+    pub cache_size: usize,
 }
 
-impl InstanceManager {
-    /// Создает новый менеджер экземпляров
-    pub fn new(config: InstanceManagerConfig) -> Self {
-        Self {
-            instances: Arc::new(RwLock::new(HashMap::new())),
-            config,
-            metrics: Arc::new(RwLock::new(InstanceMetrics::default())),
-        }
-    }
+#[derive(Debug, Clone)]
+pub struct InstanceMetrics {
+    pub total_requests: u64,
+    pub successful_requests: u64,
+    pub failed_requests: u64,
+    pub average_response_time_ms: f64,
+    pub current_load: f32,
+    pub memory_usage_mb: f32,
+    pub gpu_utilization: f32,
+}
 
-    /// Инициализирует менеджер экземпляров
-    pub async fn initialize(&self) -> Result<(), AppError> {
-        log::info!("Initializing instance manager");
-        
-        // Создаем пул экземпляров
-        self.create_instance_pool().await?;
-        
-        // Запускаем мониторинг
-        self.start_monitoring().await?;
-        
-        log::info!("Instance manager initialized successfully");
-        Ok(())
-    }
+#[derive(Debug, Clone)]
+pub enum InstanceStatus {
+    Initializing,
+    Ready,
+    Busy,
+    Error,
+    ShuttingDown,
+}
 
-    /// Останавливает менеджер экземпляров
-    pub async fn shutdown(&self) -> Result<(), AppError> {
-        log::info!("Shutting down instance manager");
-        
-        // Останавливаем все экземпляры
-        self.stop_all_instances().await?;
-        
-        // Останавливаем мониторинг
-        self.stop_monitoring().await?;
-        
-        log::info!("Instance manager shut down successfully");
-        Ok(())
-    }
+pub struct Instance {
+    config: InstanceConfig,
+    model_interface: Option<Arc<dyn ModelInterface + Send + Sync>>,
+    status: Arc<RwLock<InstanceStatus>>,
+    metrics: Arc<RwLock<InstanceMetrics>>,
+    active_requests: Arc<RwLock<usize>>,
+    cache: Arc<RwLock<std::collections::HashMap<String, ModelResponse>>>,
+    created_at: Instant,
+}
 
-    /// Создает новый экземпляр модели
-    pub async fn create_instance(
-        &self,
-        model_name: String,
-        model: Arc<dyn ModelInterface + Send + Sync>,
-        config: ModelConfig,
-    ) -> Result<String, AppError> {
-        let instance_id = self.generate_instance_id(&model_name);
-        
-        let instance = ModelInstance {
-            id: instance_id.clone(),
-            model_name,
-            model,
-            config,
-            status: InstanceStatus::Starting,
-            created_at: Instant::now(),
-            last_used: Instant::now(),
-            metrics: Arc::new(RwLock::new(InstanceMetrics::default())),
+impl Instance {
+    pub async fn new(instance_id: String, model_config: ModelConfig) -> Result<Self, AppError> {
+        let config = InstanceConfig {
+            instance_id,
+            model_config,
+            max_concurrent_requests: 10,
+            request_timeout_ms: 30000,
+            enable_caching: true,
+            cache_size: 1000,
         };
         
-        // Инициализируем экземпляр
-        instance.initialize().await?;
+        let instance = Self {
+            config,
+            model_interface: None,
+            status: Arc::new(RwLock::new(InstanceStatus::Initializing)),
+            metrics: Arc::new(RwLock::new(InstanceMetrics {
+                total_requests: 0,
+                successful_requests: 0,
+                failed_requests: 0,
+                average_response_time_ms: 0.0,
+                current_load: 0.0,
+                memory_usage_mb: 0.0,
+                gpu_utilization: 0.0,
+            })),
+            active_requests: Arc::new(RwLock::new(0)),
+            cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
+            created_at: Instant::now(),
+        };
         
-        // Добавляем в менеджер
-        let mut instances = self.instances.write().await;
-        instances.insert(instance_id.clone(), instance);
+        // Инициализация модели
+        instance.initialize_model().await?;
         
-        log::info!("Created model instance: {}", instance_id);
-        Ok(instance_id)
+        Ok(instance)
     }
 
-    /// Получает экземпляр по ID
-    pub async fn get_instance(&self, instance_id: &str) -> Option<Arc<ModelInstance>> {
-        let instances = self.instances.read().await;
-        instances.get(instance_id).map(|instance| Arc::new(instance.clone()))
-    }
-
-    /// Удаляет экземпляр
-    pub async fn remove_instance(&self, instance_id: &str) -> Result<(), AppError> {
-        let mut instances = self.instances.write().await;
+    async fn initialize_model(&self) -> Result<(), AppError> {
+        // Заглушка для инициализации модели
+        // В реальной реализации здесь будет загрузка модели
         
-        if let Some(instance) = instances.remove(instance_id) {
-            instance.shutdown().await?;
-            log::info!("Removed model instance: {}", instance_id);
+        // Симуляция загрузки
+        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+        
+        // Обновление статуса
+        {
+            let mut status = self.status.write().await;
+            *status = InstanceStatus::Ready;
         }
         
         Ok(())
     }
 
-    /// Получает список всех экземпляров
-    pub async fn list_instances(&self) -> Vec<InstanceInfo> {
-        let instances = self.instances.read().await;
-        instances.values()
-            .map(|instance| instance.get_info())
-            .collect()
-    }
-
-    /// Обрабатывает запрос через экземпляр
-    pub async fn process_request(
-        &self,
-        instance_id: &str,
-        request: ModelRequest,
-    ) -> Result<ModelResponse, AppError> {
-        let instance = self.get_instance(instance_id).await
-            .ok_or_else(|| AppError::NotFound(format!("Instance {} not found", instance_id)))?;
-        
-        instance.process_request(request).await
-    }
-
-    /// Получает экземпляр с наименьшей нагрузкой
-    pub async fn get_least_loaded_instance(&self, model_name: &str) -> Option<String> {
-        let instances = self.instances.read().await;
-        
-        let model_instances: Vec<_> = instances.values()
-            .filter(|instance| instance.model_name == model_name)
-            .collect();
-        
-        if model_instances.is_empty() {
-            return None;
-        }
-        
-        // Находим экземпляр с наименьшей нагрузкой
-        let least_loaded = model_instances.iter()
-            .min_by_key(|instance| {
-                let metrics = instance.metrics.try_read().unwrap_or_default();
-                metrics.active_requests
-            })?;
-        
-        Some(least_loaded.id.clone())
-    }
-
-    /// Масштабирует экземпляры
-    pub async fn scale_instances(&self, model_name: &str, target_count: u32) -> Result<(), AppError> {
-        let instances = self.instances.read().await;
-        let current_count = instances.values()
-            .filter(|instance| instance.model_name == model_name)
-            .count() as u32;
-        
-        if current_count < target_count {
-            // Создаем новые экземпляры
-            let to_create = target_count - current_count;
-            self.create_instances_for_model(model_name, to_create).await?;
-        } else if current_count > target_count {
-            // Удаляем лишние экземпляры
-            let to_remove = current_count - target_count;
-            self.remove_instances_for_model(model_name, to_remove).await?;
-        }
-        
-        Ok(())
-    }
-
-    /// Получает метрики всех экземпляров
-    pub async fn get_all_metrics(&self) -> HashMap<String, InstanceMetrics> {
-        let instances = self.instances.read().await;
-        let mut metrics = HashMap::new();
-        
-        for (id, instance) in instances.iter() {
-            let instance_metrics = instance.metrics.read().await.clone();
-            metrics.insert(id.clone(), instance_metrics);
-        }
-        
-        metrics
-    }
-
-    /// Проверяет здоровье всех экземпляров
-    pub async fn health_check_all(&self) -> HashMap<String, InstanceHealth> {
-        let instances = self.instances.read().await;
-        let mut health = HashMap::new();
-        
-        for (id, instance) in instances.iter() {
-            let instance_health = instance.health_check().await.unwrap_or_else(|_| {
-                InstanceHealth {
-                    status: "unhealthy".to_string(),
-                    message: "Health check failed".to_string(),
-                    last_check: std::time::SystemTime::now()
-                        .duration_since(std::time::UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs(),
+    pub async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
+        // Проверка статуса
+        {
+            let status = self.status.read().await;
+            match *status {
+                InstanceStatus::Ready => {}
+                InstanceStatus::Busy => {
+                    if *self.active_requests.read().await >= self.config.max_concurrent_requests {
+                        return Err(AppError::InstanceOverloaded);
+                    }
                 }
-            });
-            health.insert(id.clone(), instance_health);
-        }
-        
-        health
-    }
-
-    // Приватные методы
-
-    async fn create_instance_pool(&self) -> Result<(), AppError> {
-        log::info!("Creating instance pool");
-        
-        // Создаем начальные экземпляры для каждой модели
-        for model_config in &self.config.initial_models {
-            self.create_instances_for_model(&model_config.name, model_config.count).await?;
-        }
-        
-        Ok(())
-    }
-
-    async fn create_instances_for_model(&self, model_name: &str, count: u32) -> Result<(), AppError> {
-        log::info!("Creating {} instances for model {}", count, model_name);
-        
-        // В реальной реализации здесь должна быть логика создания моделей
-        for i in 0..count {
-            let instance_id = format!("{}_{}", model_name, i);
-            
-            // Создаем заглушку экземпляра
-            let instance = ModelInstance {
-                id: instance_id.clone(),
-                model_name: model_name.to_string(),
-                model: Arc::new(DummyModel::new()),
-                config: ModelConfig {
-                    model_path: Some(format!("/models/{}", model_name)),
-                    device: crate::core::model_interface::DeviceConfig {
-                        device_type: crate::core::model_interface::DeviceType::GPU,
-                        device_id: Some(0),
-                        memory_fraction: 0.8,
-                        allow_growth: true,
-                    },
-                    performance: crate::core::model_interface::PerformanceConfig {
-                        batch_size: 16,
-                        max_concurrent_requests: 32,
-                        timeout_seconds: 30,
-                        retry_attempts: 3,
-                        enable_caching: true,
-                        cache_size: 1024 * 1024 * 1024,
-                    },
-                    memory: crate::core::model_interface::MemoryConfig {
-                        max_memory_usage: 16384,
-                        memory_pool_size: 8192,
-                        enable_memory_optimization: true,
-                        garbage_collection_threshold: 0.8,
-                    },
-                    inference: crate::core::model_interface::InferenceConfig {
-                        default_temperature: 0.7,
-                        default_max_tokens: 100,
-                        default_top_p: 0.9,
-                        enable_sampling: true,
-                        enable_beam_search: false,
-                        beam_width: 5,
-                    },
-                    optimization: crate::core::model_interface::OptimizationConfig {
-                        enable_quantization: true,
-                        quantization_type: Some(crate::core::model_interface::Precision::FP16),
-                        enable_pruning: false,
-                        enable_distillation: false,
-                        enable_compilation: true,
-                        optimization_level: crate::core::model_interface::OptimizationLevel::Advanced,
-                    },
-                },
-                status: InstanceStatus::Running,
-                created_at: Instant::now(),
-                last_used: Instant::now(),
-                metrics: Arc::new(RwLock::new(InstanceMetrics::default())),
-            };
-            
-            let mut instances = self.instances.write().await;
-            instances.insert(instance_id, instance);
-        }
-        
-        Ok(())
-    }
-
-    async fn remove_instances_for_model(&self, model_name: &str, count: u32) -> Result<(), AppError> {
-        log::info!("Removing {} instances for model {}", count, model_name);
-        
-        let mut instances = self.instances.write().await;
-        let model_instances: Vec<_> = instances.keys()
-            .filter(|id| id.starts_with(model_name))
-            .cloned()
-            .collect();
-        
-        let to_remove = model_instances.iter().take(count as usize);
-        for instance_id in to_remove {
-            if let Some(instance) = instances.remove(instance_id) {
-                instance.shutdown().await?;
+                InstanceStatus::Error | InstanceStatus::ShuttingDown => {
+                    return Err(AppError::InstanceUnavailable);
+                }
+                InstanceStatus::Initializing => {
+                    return Err(AppError::InstanceNotReady);
+                }
             }
         }
         
-        Ok(())
-    }
-
-    async fn stop_all_instances(&self) -> Result<(), AppError> {
-        let mut instances = self.instances.write().await;
-        
-        for instance in instances.values() {
-            instance.shutdown().await?;
+        // Увеличение счетчика активных запросов
+        {
+            let mut active_requests = self.active_requests.write().await;
+            *active_requests += 1;
+            
+            if *active_requests >= self.config.max_concurrent_requests {
+                let mut status = self.status.write().await;
+                *status = InstanceStatus::Busy;
+            }
         }
         
-        instances.clear();
-        Ok(())
-    }
-
-    fn generate_instance_id(&self, model_name: &str) -> String {
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis();
+        // Проверка кэша
+        if self.config.enable_caching {
+            if let Some(cached_response) = self.check_cache(&request).await {
+                self.decrement_active_requests().await;
+                return Ok(cached_response);
+            }
+        }
         
-        format!("{}_{}", model_name, timestamp)
-    }
-
-    async fn start_monitoring(&self) -> Result<(), AppError> {
-        log::info!("Starting instance monitoring");
-        Ok(())
-    }
-
-    async fn stop_monitoring(&self) -> Result<(), AppError> {
-        log::info!("Stopping instance monitoring");
-        Ok(())
-    }
-}
-
-/// Экземпляр модели
-#[derive(Clone)]
-pub struct ModelInstance {
-    pub id: String,
-    pub model_name: String,
-    pub model: Arc<dyn ModelInterface + Send + Sync>,
-    pub config: ModelConfig,
-    pub status: InstanceStatus,
-    pub created_at: Instant,
-    pub last_used: Instant,
-    pub metrics: Arc<RwLock<InstanceMetrics>>,
-}
-
-impl ModelInstance {
-    /// Инициализирует экземпляр
-    pub async fn initialize(&self) -> Result<(), AppError> {
-        log::info!("Initializing model instance: {}", self.id);
-        
-        // Инициализируем модель
-        self.model.initialize().await?;
-        
-        // Обновляем статус
-        let mut status = self.status.clone();
-        status = InstanceStatus::Running;
-        
-        log::info!("Model instance initialized: {}", self.id);
-        Ok(())
-    }
-
-    /// Останавливает экземпляр
-    pub async fn shutdown(&self) -> Result<(), AppError> {
-        log::info!("Shutting down model instance: {}", self.id);
-        
-        // Останавливаем модель
-        self.model.shutdown().await?;
-        
-        log::info!("Model instance shut down: {}", self.id);
-        Ok(())
-    }
-
-    /// Обрабатывает запрос
-    pub async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
+        // Обработка запроса
         let start_time = Instant::now();
+        let response = self.process_model_request(request.clone()).await?;
+        let processing_time = start_time.elapsed();
         
-        // Обновляем метрики
-        {
-            let mut metrics = self.metrics.write().await;
-            metrics.active_requests += 1;
-            metrics.total_requests += 1;
+        // Кэширование результата
+        if self.config.enable_caching {
+            self.cache_response(&request, &response).await;
         }
         
-        // Обрабатываем запрос
-        let response = self.model.process_request(request).await?;
+        // Обновление метрик
+        self.update_metrics(processing_time, true).await;
         
-        // Обновляем метрики
-        {
-            let mut metrics = self.metrics.write().await;
-            metrics.active_requests -= 1;
-            metrics.total_processing_time += start_time.elapsed().as_secs_f64();
-            metrics.average_response_time = metrics.total_processing_time / metrics.total_requests as f64;
-        }
-        
-        // Обновляем время последнего использования
-        let mut last_used = self.last_used;
-        last_used = Instant::now();
+        // Уменьшение счетчика активных запросов
+        self.decrement_active_requests().await;
         
         Ok(response)
     }
 
-    /// Получает информацию об экземпляре
-    pub fn get_info(&self) -> InstanceInfo {
-        InstanceInfo {
-            id: self.id.clone(),
-            model_name: self.model_name.clone(),
-            status: self.status.clone(),
-            created_at: self.created_at.elapsed().as_secs(),
-            last_used: self.last_used.elapsed().as_secs(),
-        }
-    }
-
-    /// Проверяет здоровье экземпляра
-    pub async fn health_check(&self) -> Result<InstanceHealth, AppError> {
-        let model_health = self.model.health_check().await?;
+    async fn process_model_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
+        // Заглушка для обработки запроса модели
+        // В реальной реализации здесь будет вызов модели
         
-        let status = match model_health.status {
-            crate::core::model_interface::HealthStatus::Healthy => "healthy",
-            crate::core::model_interface::HealthStatus::Warning => "warning",
-            crate::core::model_interface::HealthStatus::Critical => "critical",
-            crate::core::model_interface::HealthStatus::Offline => "offline",
+        // Симуляция обработки
+        tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
+        
+        // Создание ответа
+        let response = ModelResponse {
+            output: format!("Response to: {}", request.input),
+            metrics: crate::core::model_interface::ModelMetrics {
+                processing_time_ms: 50,
+                tokens_generated: request.input.len(),
+                gpu_utilization: 75.5,
+                memory_usage_mb: 2048.0,
+                throughput_tokens_per_sec: 1000.0,
+            },
+            session_id: request.session_id,
         };
         
-        Ok(InstanceHealth {
-            status: status.to_string(),
-            message: model_health.message,
-            last_check: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-        })
+        Ok(response)
     }
-}
 
-/// Статус экземпляра
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum InstanceStatus {
-    Starting,
-    Running,
-    Stopping,
-    Stopped,
-    Error,
-}
+    async fn check_cache(&self, request: &ModelRequest) -> Option<ModelResponse> {
+        let cache_key = self.generate_cache_key(request);
+        let cache = self.cache.read().await;
+        cache.get(&cache_key).cloned()
+    }
 
-/// Информация об экземпляре
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InstanceInfo {
-    pub id: String,
-    pub model_name: String,
-    pub status: InstanceStatus,
-    pub created_at: u64,
-    pub last_used: u64,
-}
+    async fn cache_response(&self, request: &ModelRequest, response: &ModelResponse) {
+        let cache_key = self.generate_cache_key(request);
+        let mut cache = self.cache.write().await;
+        
+        // Проверка размера кэша
+        if cache.len() >= self.config.cache_size {
+            // Удаление самого старого элемента
+            if let Some((oldest_key, _)) = cache.iter().next() {
+                let oldest_key = oldest_key.clone();
+                cache.remove(&oldest_key);
+            }
+        }
+        
+        cache.insert(cache_key, response.clone());
+    }
 
-/// Здоровье экземпляра
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InstanceHealth {
-    pub status: String,
-    pub message: String,
-    pub last_check: u64,
-}
+    fn generate_cache_key(&self, request: &ModelRequest) -> String {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        
+        let mut hasher = DefaultHasher::new();
+        request.input.hash(&mut hasher);
+        request.parameters.temperature.to_bits().hash(&mut hasher);
+        request.parameters.max_tokens.hash(&mut hasher);
+        request.parameters.top_p.to_bits().hash(&mut hasher);
+        
+        format!("{:x}", hasher.finish())
+    }
 
-/// Конфигурация менеджера экземпляров
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InstanceManagerConfig {
-    pub max_instances: u32,
-    pub min_instances_per_model: u32,
-    pub max_instances_per_model: u32,
-    pub auto_scaling: bool,
-    pub scaling_threshold: f64,
-    pub health_check_interval: u64,
-    pub instance_timeout: u64,
-    pub initial_models: Vec<InitialModelConfig>,
-}
+    async fn update_metrics(&self, processing_time: std::time::Duration, success: bool) {
+        let mut metrics = self.metrics.write().await;
+        
+        metrics.total_requests += 1;
+        if success {
+            metrics.successful_requests += 1;
+        } else {
+            metrics.failed_requests += 1;
+        }
+        
+        let processing_time_ms = processing_time.as_millis() as f64;
+        let total_requests = metrics.total_requests as f64;
+        metrics.average_response_time_ms = 
+            (metrics.average_response_time_ms * (total_requests - 1.0) + processing_time_ms) / total_requests;
+        
+        // Обновление нагрузки
+        let active_requests = *self.active_requests.read().await;
+        metrics.current_load = active_requests as f32 / self.config.max_concurrent_requests as f32;
+    }
 
-/// Конфигурация начальной модели
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InitialModelConfig {
-    pub name: String,
-    pub count: u32,
-}
-
-impl Default for InstanceManagerConfig {
-    fn default() -> Self {
-        Self {
-            max_instances: 100,
-            min_instances_per_model: 1,
-            max_instances_per_model: 10,
-            auto_scaling: true,
-            scaling_threshold: 0.8,
-            health_check_interval: 30,
-            instance_timeout: 300,
-            initial_models: vec![
-                InitialModelConfig {
-                    name: "gpt-3.5-turbo".to_string(),
-                    count: 2,
-                }
-            ],
+    async fn decrement_active_requests(&self) {
+        let mut active_requests = self.active_requests.write().await;
+        *active_requests = active_requests.saturating_sub(1);
+        
+        // Обновление статуса если нагрузка снизилась
+        if *active_requests < self.config.max_concurrent_requests {
+            let mut status = self.status.write().await;
+            if let InstanceStatus::Busy = *status {
+                *status = InstanceStatus::Ready;
+            }
         }
     }
-}
 
-/// Заглушка модели для тестирования
-struct DummyModel;
-
-impl DummyModel {
-    fn new() -> Self {
-        Self
-    }
-}
-
-#[async_trait::async_trait]
-impl ModelInterface for DummyModel {
-    async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
-        Ok(ModelResponse {
-            text: format!("Dummy response to: {}", request.prompt),
-            tokens_used: request.prompt.len() as u32,
-            finish_reason: Some("stop".to_string()),
-            model_name: "dummy".to_string(),
-            processing_time: 0.1,
-            confidence: Some(0.95),
-            metadata: request.metadata,
-        })
+    pub async fn health_check(&self) -> Result<bool, AppError> {
+        let status = self.status.read().await;
+        
+        match *status {
+            InstanceStatus::Ready | InstanceStatus::Busy => Ok(true),
+            InstanceStatus::Error | InstanceStatus::ShuttingDown => Ok(false),
+            InstanceStatus::Initializing => {
+                // Проверка времени инициализации
+                if self.created_at.elapsed().as_secs() > 60 {
+                    Ok(false)
+                } else {
+                    Ok(true)
+                }
+            }
+        }
     }
 
-    async fn get_model_info(&self) -> Result<ModelInfo, AppError> {
-        Ok(ModelInfo {
-            name: "dummy".to_string(),
-            version: "1.0.0".to_string(),
-            description: "Dummy model for testing".to_string(),
-            model_type: crate::core::model_interface::ModelType::LanguageModel,
-            parameters: 1_000_000,
-            context_length: 1024,
-            supported_features: vec![crate::core::model_interface::ModelFeature::TextGeneration],
-            hardware_requirements: crate::core::model_interface::HardwareRequirements {
-                min_gpu_memory: 1024,
-                recommended_gpu_memory: 2048,
-                min_ram: 2048,
-                recommended_ram: 4096,
-                min_cpu_cores: 2,
-                recommended_cpu_cores: 4,
-                gpu_types: vec!["Any".to_string()],
-                supported_precisions: vec![crate::core::model_interface::Precision::FP32],
-            },
-            license: Some("MIT".to_string()),
-            author: Some("PoolAI".to_string()),
-        })
+    pub async fn get_metrics(&self) -> InstanceMetrics {
+        self.metrics.read().await.clone()
     }
 
-    async fn update_config(&self, _config: ModelConfig) -> Result<(), AppError> {
+    pub async fn shutdown(&self) -> Result<(), AppError> {
+        // Установка статуса выключения
+        {
+            let mut status = self.status.write().await;
+            *status = InstanceStatus::ShuttingDown;
+        }
+        
+        // Ожидание завершения активных запросов
+        let mut attempts = 0;
+        while *self.active_requests.read().await > 0 && attempts < 30 {
+            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+            attempts += 1;
+        }
+        
+        // Очистка кэша
+        self.cache.write().await.clear();
+        
         Ok(())
     }
 
-    async fn get_metrics(&self) -> Result<ModelMetrics, AppError> {
-        Ok(ModelMetrics {
-            requests_processed: 0,
-            requests_per_second: 0.0,
-            average_response_time: 0.0,
-            tokens_generated: 0,
-            tokens_per_second: 0.0,
-            memory_usage: 0,
-            gpu_usage: 0.0,
-            cpu_usage: 0.0,
-            error_rate: 0.0,
-            cache_hit_rate: 0.0,
-            active_sessions: 0,
-            queue_length: 0,
-            last_updated: 0,
-        })
+    pub fn get_instance_id(&self) -> &str {
+        &self.config.instance_id
     }
 
-    async fn initialize(&self) -> Result<(), AppError> {
-        Ok(())
-    }
-
-    async fn shutdown(&self) -> Result<(), AppError> {
-        Ok(())
-    }
-
-    async fn health_check(&self) -> Result<crate::core::model_interface::ModelHealth, AppError> {
-        Ok(crate::core::model_interface::ModelHealth {
-            status: crate::core::model_interface::HealthStatus::Healthy,
-            message: "Dummy model is healthy".to_string(),
-            last_check: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
-            uptime: 0,
-            memory_usage: 0,
-            gpu_usage: 0.0,
-            error_count: 0,
-            warning_count: 0,
-        })
+    pub async fn get_status(&self) -> InstanceStatus {
+        self.status.read().await.clone()
     }
 } 

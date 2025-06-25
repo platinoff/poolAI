@@ -1,426 +1,317 @@
-//! Dashboard Module - Дашборд моделей и визуализация метрик
-//! 
-//! Этот модуль предоставляет:
-//! - Дашборд моделей
-//! - Графики метрик
-//! - Статус системы
-//! - Управление
-
-use crate::core::model_interface::ModelInterface;
-use crate::monitoring::metrics::ModelMetrics;
-use crate::pool::worker::WorkerStatus;
-use crate::runtime::instance::InstanceManager;
-use crate::platform::gpu::GpuManager;
-
-use axum::{
-    extract::State,
-    response::{Html, Json},
-    http::StatusCode,
-};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
+use crate::core::error::AppError;
+use crate::monitoring::SystemStatus;
 use tokio::sync::RwLock;
+use std::sync::Arc;
 
-use super::UiState;
-
-/// Главная страница дашборда
-pub async fn index(State(state): State<UiState>) -> Html<String> {
-    let html = r#"
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PoolAI Dashboard</title>
-        <link rel="stylesheet" href="/static/css/dashboard.css">
-    </head>
-    <body>
-        <div id="app">
-            <header class="dashboard-header">
-                <h1>PoolAI Dashboard</h1>
-                <nav class="dashboard-nav">
-                    <a href="/dashboard" class="active">Dashboard</a>
-                    <a href="/models">Models</a>
-                    <a href="/workers">Workers</a>
-                    <a href="/monitoring">Monitoring</a>
-                    <a href="/settings">Settings</a>
-                </nav>
-            </header>
-            
-            <main class="dashboard-main">
-                <div class="dashboard-grid">
-                    <div class="card">
-                        <h3>System Status</h3>
-                        <div id="system-status">Loading...</div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>GPU Usage</h3>
-                        <div id="gpu-usage">Loading...</div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Memory Usage</h3>
-                        <div id="memory-usage">Loading...</div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Active Models</h3>
-                        <div id="active-models">Loading...</div>
-                    </div>
-                </div>
-                
-                <div class="dashboard-charts">
-                    <div class="chart-container">
-                        <h3>Performance Metrics</h3>
-                        <canvas id="performance-chart"></canvas>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>Resource Usage</h3>
-                        <canvas id="resource-chart"></canvas>
-                    </div>
-                </div>
-            </main>
-        </div>
-        
-        <script src="/static/js/dashboard.js"></script>
-    </body>
-    </html>
-    "#;
-    
-    Html(html.to_string())
-}
-
-/// Дашборд с метриками
-pub async fn dashboard(State(state): State<UiState>) -> Html<String> {
-    let metrics = state.metrics.read().await;
-    let gpu_info = state.gpu_manager.get_gpu_info().await.unwrap_or_default();
-    
-    let html = format!(r#"
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PoolAI - Dashboard</title>
-        <link rel="stylesheet" href="/static/css/dashboard.css">
-    </head>
-    <body>
-        <div id="app">
-            <header class="dashboard-header">
-                <h1>PoolAI Dashboard</h1>
-                <div class="status-indicator">
-                    <span class="status-dot active"></span>
-                    <span>System Online</span>
-                </div>
-            </header>
-            
-            <main class="dashboard-main">
-                <div class="metrics-overview">
-                    <div class="metric-card">
-                        <h3>GPU Usage</h3>
-                        <div class="metric-value">{:.1}%</div>
-                        <div class="metric-label">Current GPU utilization</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h3>Memory Usage</h3>
-                        <div class="metric-value">{:.1}%</div>
-                        <div class="metric-label">Current memory usage</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h3>Active Models</h3>
-                        <div class="metric-value">{}</div>
-                        <div class="metric-label">Currently running models</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h3>Requests/sec</h3>
-                        <div class="metric-value">{:.1}</div>
-                        <div class="metric-label">Requests per second</div>
-                    </div>
-                </div>
-                
-                <div class="charts-section">
-                    <div class="chart-card">
-                        <h3>Performance Over Time</h3>
-                        <canvas id="performance-chart"></canvas>
-                    </div>
-                    
-                    <div class="chart-card">
-                        <h3>Resource Usage</h3>
-                        <canvas id="resource-chart"></canvas>
-                    </div>
-                </div>
-            </main>
-        </div>
-        
-        <script>
-            // Передаем данные в JavaScript
-            window.dashboardData = {{
-                gpuUsage: {:.1},
-                memoryUsage: {:.1},
-                activeModels: {},
-                requestsPerSec: {:.1},
-                metrics: {:?}
-            }};
-        </script>
-        <script src="/static/js/dashboard.js"></script>
-    </body>
-    </html>
-    "#, 
-    gpu_info.usage.unwrap_or(0.0),
-    metrics.memory_usage.unwrap_or(0.0),
-    metrics.active_models,
-    metrics.requests_per_sec.unwrap_or(0.0),
-    gpu_info.usage.unwrap_or(0.0),
-    metrics.memory_usage.unwrap_or(0.0),
-    metrics.active_models,
-    metrics.requests_per_sec.unwrap_or(0.0),
-    metrics
-    );
-    
-    Html(html)
-}
-
-/// Страница моделей
-pub async fn models(State(state): State<UiState>) -> Html<String> {
-    let html = r#"
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PoolAI - Models</title>
-        <link rel="stylesheet" href="/static/css/models.css">
-    </head>
-    <body>
-        <div id="app">
-            <header class="models-header">
-                <h1>Model Management</h1>
-                <button class="btn-primary" onclick="loadModel()">Load Model</button>
-            </header>
-            
-            <main class="models-main">
-                <div class="models-grid" id="models-grid">
-                    <!-- Models will be loaded here -->
-                </div>
-            </main>
-        </div>
-        
-        <script src="/static/js/models.js"></script>
-    </body>
-    </html>
-    "#;
-    
-    Html(html.to_string())
-}
-
-/// Страница воркеров
-pub async fn workers(State(state): State<UiState>) -> Html<String> {
-    let html = r#"
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PoolAI - Workers</title>
-        <link rel="stylesheet" href="/static/css/workers.css">
-    </head>
-    <body>
-        <div id="app">
-            <header class="workers-header">
-                <h1>Worker Management</h1>
-                <button class="btn-primary" onclick="addWorker()">Add Worker</button>
-            </header>
-            
-            <main class="workers-main">
-                <div class="workers-grid" id="workers-grid">
-                    <!-- Workers will be loaded here -->
-                </div>
-            </main>
-        </div>
-        
-        <script src="/static/js/workers.js"></script>
-    </body>
-    </html>
-    "#;
-    
-    Html(html.to_string())
-}
-
-/// Страница мониторинга
-pub async fn monitoring(State(state): State<UiState>) -> Html<String> {
-    let html = r#"
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PoolAI - Monitoring</title>
-        <link rel="stylesheet" href="/static/css/monitoring.css">
-    </head>
-    <body>
-        <div id="app">
-            <header class="monitoring-header">
-                <h1>System Monitoring</h1>
-                <div class="monitoring-controls">
-                    <button class="btn-secondary" onclick="refreshMetrics()">Refresh</button>
-                    <button class="btn-secondary" onclick="exportMetrics()">Export</button>
-                </div>
-            </header>
-            
-            <main class="monitoring-main">
-                <div class="monitoring-grid">
-                    <div class="monitoring-card">
-                        <h3>System Metrics</h3>
-                        <div id="system-metrics">Loading...</div>
-                    </div>
-                    
-                    <div class="monitoring-card">
-                        <h3>Performance Metrics</h3>
-                        <div id="performance-metrics">Loading...</div>
-                    </div>
-                    
-                    <div class="monitoring-card">
-                        <h3>Error Logs</h3>
-                        <div id="error-logs">Loading...</div>
-                    </div>
-                </div>
-            </main>
-        </div>
-        
-        <script src="/static/js/monitoring.js"></script>
-    </body>
-    </html>
-    "#;
-    
-    Html(html.to_string())
-}
-
-/// Страница настроек
-pub async fn settings(State(state): State<UiState>) -> Html<String> {
-    let html = r#"
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>PoolAI - Settings</title>
-        <link rel="stylesheet" href="/static/css/settings.css">
-    </head>
-    <body>
-        <div id="app">
-            <header class="settings-header">
-                <h1>System Settings</h1>
-                <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
-            </header>
-            
-            <main class="settings-main">
-                <div class="settings-grid">
-                    <div class="settings-card">
-                        <h3>General Settings</h3>
-                        <form id="general-settings">
-                            <div class="form-group">
-                                <label>System Name</label>
-                                <input type="text" name="system_name" value="PoolAI">
-                            </div>
-                            <div class="form-group">
-                                <label>Log Level</label>
-                                <select name="log_level">
-                                    <option value="debug">Debug</option>
-                                    <option value="info" selected>Info</option>
-                                    <option value="warn">Warning</option>
-                                    <option value="error">Error</option>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="settings-card">
-                        <h3>GPU Settings</h3>
-                        <form id="gpu-settings">
-                            <div class="form-group">
-                                <label>Memory Limit (MB)</label>
-                                <input type="number" name="gpu_memory_limit" value="8192">
-                            </div>
-                            <div class="form-group">
-                                <label>Temperature Limit (°C)</label>
-                                <input type="number" name="gpu_temp_limit" value="85">
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="settings-card">
-                        <h3>Model Settings</h3>
-                        <form id="model-settings">
-                            <div class="form-group">
-                                <label>Default Batch Size</label>
-                                <input type="number" name="default_batch_size" value="16">
-                            </div>
-                            <div class="form-group">
-                                <label>Max Concurrent Models</label>
-                                <input type="number" name="max_concurrent_models" value="4">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </main>
-        </div>
-        
-        <script src="/static/js/settings.js"></script>
-    </body>
-    </html>
-    "#;
-    
-    Html(html.to_string())
-}
-
-/// Данные для дашборда
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub struct DashboardData {
-    pub system_status: SystemStatus,
-    pub gpu_metrics: GpuMetrics,
-    pub memory_metrics: MemoryMetrics,
-    pub model_metrics: ModelMetrics,
-    pub worker_metrics: WorkerMetrics,
+    pub system_status: Option<SystemStatus>,
+    pub metrics: DashboardMetrics,
+    pub alerts: Vec<DashboardAlert>,
+    pub recent_activity: Vec<DashboardActivity>,
 }
 
-/// Статус системы
-#[derive(Debug, Clone, Serialize)]
-pub struct SystemStatus {
-    pub online: bool,
-    pub uptime: u64,
-    pub version: String,
-    pub last_update: u64,
+#[derive(Debug, Clone)]
+pub struct DashboardMetrics {
+    pub total_requests: u64,
+    pub successful_requests: u64,
+    pub failed_requests: u64,
+    pub average_response_time_ms: f64,
+    pub active_workers: usize,
+    pub gpu_utilization: f32,
+    pub memory_usage_mb: f32,
+    pub cpu_usage_percent: f32,
 }
 
-/// GPU метрики
-#[derive(Debug, Clone, Serialize)]
-pub struct GpuMetrics {
-    pub usage: f64,
-    pub memory_used: u64,
-    pub memory_total: u64,
-    pub temperature: f64,
-    pub power_usage: f64,
+#[derive(Debug, Clone)]
+pub struct DashboardAlert {
+    pub id: String,
+    pub severity: AlertSeverity,
+    pub message: String,
+    pub timestamp: std::time::Instant,
+    pub resolved: bool,
 }
 
-/// Метрики памяти
-#[derive(Debug, Clone, Serialize)]
-pub struct MemoryMetrics {
-    pub used: u64,
-    pub total: u64,
-    pub available: u64,
-    pub usage_percent: f64,
+#[derive(Debug, Clone)]
+pub enum AlertSeverity {
+    Info,
+    Warning,
+    Error,
+    Critical,
 }
 
-/// Метрики воркеров
-#[derive(Debug, Clone, Serialize)]
-pub struct WorkerMetrics {
-    pub total_workers: u32,
-    pub active_workers: u32,
-    pub idle_workers: u32,
-    pub failed_workers: u32,
+#[derive(Debug, Clone)]
+pub struct DashboardActivity {
+    pub id: String,
+    pub activity_type: ActivityType,
+    pub description: String,
+    pub timestamp: std::time::Instant,
+    pub user: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub enum ActivityType {
+    ModelRequest,
+    WorkerStarted,
+    WorkerStopped,
+    AlertTriggered,
+    SystemUpdate,
+    UserAction,
+}
+
+pub struct Dashboard {
+    state: Arc<RwLock<UiState>>,
+    metrics: Arc<RwLock<DashboardMetrics>>,
+    alerts: Arc<RwLock<Vec<DashboardAlert>>>,
+    activities: Arc<RwLock<Vec<DashboardActivity>>>,
+}
+
+#[derive(Debug, Clone)]
+struct UiState {
+    current_page: String,
+    user_preferences: std::collections::HashMap<String, String>,
+    notifications: Vec<crate::ui::UiNotification>,
+    system_status: Option<SystemStatus>,
+}
+
+impl Dashboard {
+    pub async fn new(state: Arc<RwLock<UiState>>) -> Result<Self, AppError> {
+        let metrics = DashboardMetrics {
+            total_requests: 0,
+            successful_requests: 0,
+            failed_requests: 0,
+            average_response_time_ms: 0.0,
+            active_workers: 0,
+            gpu_utilization: 0.0,
+            memory_usage_mb: 0.0,
+            cpu_usage_percent: 0.0,
+        };
+        
+        Ok(Self {
+            state,
+            metrics: Arc::new(RwLock::new(metrics)),
+            alerts: Arc::new(RwLock::new(Vec::new())),
+            activities: Arc::new(RwLock::new(Vec::new())),
+        })
+    }
+
+    pub async fn update_status(&self, status: SystemStatus) -> Result<(), AppError> {
+        // Обновление метрик на основе системного статуса
+        let mut metrics = self.metrics.write().await;
+        metrics.gpu_utilization = status.gpu_utilization;
+        metrics.memory_usage_mb = status.memory_usage_mb;
+        metrics.cpu_usage_percent = status.error_rate * 100.0; // Упрощенная логика
+        
+        // Добавление активности
+        self.add_activity(ActivityType::SystemUpdate, "System status updated".to_string(), None).await;
+        
+        Ok(())
+    }
+
+    pub async fn get_data(&self) -> Result<DashboardData, AppError> {
+        let system_status = {
+            let state = self.state.read().await;
+            state.system_status.clone()
+        };
+        
+        let metrics = self.metrics.read().await.clone();
+        let alerts = self.alerts.read().await.clone();
+        let activities = self.activities.read().await.clone();
+        
+        // Ограничение количества активностей
+        let recent_activities = activities.into_iter()
+            .take(50)
+            .collect();
+        
+        Ok(DashboardData {
+            system_status,
+            metrics,
+            alerts,
+            recent_activity: recent_activities,
+        })
+    }
+
+    pub async fn add_alert(&self, alert: DashboardAlert) -> Result<(), AppError> {
+        let mut alerts = self.alerts.write().await;
+        alerts.push(alert);
+        
+        // Ограничение количества алертов
+        if alerts.len() > 100 {
+            alerts.drain(0..10);
+        }
+        
+        // Добавление активности
+        self.add_activity(
+            ActivityType::AlertTriggered,
+            format!("Alert triggered: {}", alert.message),
+            None
+        ).await;
+        
+        Ok(())
+    }
+
+    pub async fn resolve_alert(&self, alert_id: &str) -> Result<(), AppError> {
+        let mut alerts = self.alerts.write().await;
+        
+        if let Some(alert) = alerts.iter_mut().find(|a| a.id == alert_id) {
+            alert.resolved = true;
+            
+            // Добавление активности
+            self.add_activity(
+                ActivityType::AlertTriggered,
+                format!("Alert resolved: {}", alert.message),
+                None
+            ).await;
+        }
+        
+        Ok(())
+    }
+
+    pub async fn update_metrics(&self, new_metrics: DashboardMetrics) -> Result<(), AppError> {
+        let mut metrics = self.metrics.write().await;
+        *metrics = new_metrics;
+        
+        Ok(())
+    }
+
+    pub async fn add_activity(&self, activity_type: ActivityType, description: String, user: Option<String>) {
+        let activity = DashboardActivity {
+            id: self.generate_activity_id(),
+            activity_type,
+            description,
+            timestamp: std::time::Instant::now(),
+            user,
+        };
+        
+        let mut activities = self.activities.write().await;
+        activities.push(activity);
+        
+        // Ограничение количества активностей
+        if activities.len() > 1000 {
+            activities.drain(0..100);
+        }
+    }
+
+    pub async fn get_metrics_summary(&self) -> Result<serde_json::Value, AppError> {
+        let metrics = self.metrics.read().await;
+        let system_status = {
+            let state = self.state.read().await;
+            state.system_status.clone()
+        };
+        
+        let summary = serde_json::json!({
+            "metrics": {
+                "total_requests": metrics.total_requests,
+                "successful_requests": metrics.successful_requests,
+                "failed_requests": metrics.failed_requests,
+                "success_rate": if metrics.total_requests > 0 {
+                    metrics.successful_requests as f64 / metrics.total_requests as f64
+                } else {
+                    0.0
+                },
+                "average_response_time_ms": metrics.average_response_time_ms,
+                "active_workers": metrics.active_workers,
+            },
+            "system": {
+                "gpu_utilization": metrics.gpu_utilization,
+                "memory_usage_mb": metrics.memory_usage_mb,
+                "cpu_usage_percent": metrics.cpu_usage_percent,
+                "overall_health": system_status.map(|s| s.overall_health).unwrap_or(0.0),
+            },
+            "alerts": {
+                "total": self.alerts.read().await.len(),
+                "unresolved": self.alerts.read().await.iter().filter(|a| !a.resolved).count(),
+            },
+            "activities": {
+                "total": self.activities.read().await.len(),
+                "recent": self.activities.read().await.iter()
+                    .filter(|a| a.timestamp.elapsed().as_secs() < 3600)
+                    .count(),
+            }
+        });
+        
+        Ok(summary)
+    }
+
+    pub async fn get_chart_data(&self, chart_type: &str) -> Result<serde_json::Value, AppError> {
+        match chart_type {
+            "requests_over_time" => {
+                // Заглушка для данных запросов по времени
+                let data = serde_json::json!({
+                    "labels": ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00"],
+                    "datasets": [{
+                        "label": "Requests",
+                        "data": [120, 150, 180, 200, 160, 140],
+                        "borderColor": "rgb(75, 192, 192)",
+                        "backgroundColor": "rgba(75, 192, 192, 0.2)"
+                    }]
+                });
+                Ok(data)
+            }
+            "gpu_utilization" => {
+                // Заглушка для данных GPU
+                let data = serde_json::json!({
+                    "labels": ["GPU 0", "GPU 1", "GPU 2", "GPU 3"],
+                    "datasets": [{
+                        "label": "Utilization %",
+                        "data": [75, 45, 60, 30],
+                        "backgroundColor": [
+                            "rgba(255, 99, 132, 0.8)",
+                            "rgba(54, 162, 235, 0.8)",
+                            "rgba(255, 205, 86, 0.8)",
+                            "rgba(75, 192, 192, 0.8)"
+                        ]
+                    }]
+                });
+                Ok(data)
+            }
+            "memory_usage" => {
+                // Заглушка для данных памяти
+                let data = serde_json::json!({
+                    "labels": ["Used", "Available"],
+                    "datasets": [{
+                        "label": "Memory (GB)",
+                        "data": [8.5, 5.5],
+                        "backgroundColor": [
+                            "rgba(255, 99, 132, 0.8)",
+                            "rgba(54, 162, 235, 0.8)"
+                        ]
+                    }]
+                });
+                Ok(data)
+            }
+            _ => Err(AppError::InvalidParameter),
+        }
+    }
+
+    pub async fn shutdown(&self) -> Result<(), AppError> {
+        // Очистка данных дашборда
+        self.metrics.write().await = DashboardMetrics {
+            total_requests: 0,
+            successful_requests: 0,
+            failed_requests: 0,
+            average_response_time_ms: 0.0,
+            active_workers: 0,
+            gpu_utilization: 0.0,
+            memory_usage_mb: 0.0,
+            cpu_usage_percent: 0.0,
+        };
+        
+        self.alerts.write().await.clear();
+        self.activities.write().await.clear();
+        
+        Ok(())
+    }
+
+    fn generate_activity_id(&self) -> String {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        use std::time::{SystemTime, UNIX_EPOCH};
+        
+        let mut hasher = DefaultHasher::new();
+        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos().hash(&mut hasher);
+        rand::random::<u64>().hash(&mut hasher);
+        
+        format!("activity_{:x}", hasher.finish())
+    }
 } 
