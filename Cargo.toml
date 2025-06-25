@@ -9,7 +9,15 @@ repository = "https://github.com/platinoff/poolAI"
 keywords = ["ai", "mining", "pool", "gpu", "machine-learning", "rust"]
 categories = ["ai", "system", "web-programming"]
 
-[dependencies]
+[[bin]]
+name = "poolai"
+path = "src/main.rs"
+
+[lib]
+name = "poolai"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
 # Async runtime
 tokio = { version = "1.36", features = ["full"] }
 futures = "0.3"
