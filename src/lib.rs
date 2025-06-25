@@ -2,7 +2,16 @@
 //! Version: Beta_bolvanka_v1
 
 pub mod core;
-pub mod version;
+pub mod pool;
+pub mod monitoring;
+pub mod runtime;
+pub mod network;
+pub mod platform;
+pub mod ui;
+pub mod libs;
+pub mod vm;
+pub mod raid;
+pub mod tgbot;
 
 use serde::{Deserialize, Serialize};
 
@@ -28,14 +37,29 @@ impl Default for SystemInfo {
             description: "Система управления пулом майнинга с интеграцией генеративных моделей".to_string(),
             features: vec![
                 "Core system".to_string(),
-                "State management".to_string(),
-                "Configuration".to_string(),
-                "Error handling".to_string(),
-                "Utilities".to_string(),
+                "Pool management".to_string(),
+                "Monitoring".to_string(),
+                "Runtime".to_string(),
+                "Network API".to_string(),
+                "Platform abstraction".to_string(),
+                "UI components".to_string(),
+                "Library management".to_string(),
+                "VM management".to_string(),
+                "RAID management".to_string(),
+                "Telegram bot".to_string(),
             ],
             modules: vec![
                 "core".to_string(),
-                "version".to_string(),
+                "pool".to_string(),
+                "monitoring".to_string(),
+                "runtime".to_string(),
+                "network".to_string(),
+                "platform".to_string(),
+                "ui".to_string(),
+                "libs".to_string(),
+                "vm".to_string(),
+                "raid".to_string(),
+                "tgbot".to_string(),
             ],
             build_date: "2024-01-01T00:00:00Z".to_string(),
         }

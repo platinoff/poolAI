@@ -45,16 +45,16 @@ impl LibManager {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Создание директории библиотек если не существует
+        // Create libraries directory if it doesn't exist
         let libs_path = Path::new(&self.config.libs_directory);
         if !libs_path.exists() {
             std::fs::create_dir_all(libs_path)?;
         }
         
-        // Сканирование и загрузка метаданных
+        // Scan and load metadata
         self.scan_library_metadata().await?;
         
-        // Инициализация кэша
+        // Initialize cache
         if self.config.enable_caching {
             self.initialize_cache().await?;
         }
@@ -63,7 +63,7 @@ impl LibManager {
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Выгрузка всех библиотек
+        // Unload all libraries
         let loaded_libs = self.loaded_libraries.read().await;
         let lib_names: Vec<String> = loaded_libs.keys().cloned().collect();
         
@@ -71,7 +71,7 @@ impl LibManager {
             self.unload_library(&lib_name).await?;
         }
         
-        // Очистка кэша
+        // Clear cache
         self.cache.write().await.clear();
         
         Ok(())
@@ -80,7 +80,7 @@ impl LibManager {
     pub async fn load_library(&self, path: &str) -> Result<(), AppError> {
         let lib_name = self.extract_library_name(path);
         
-        // Проверка, не загружена ли уже библиотека
+        // Check if library is already loaded
         {
             let loaded_libs = self.loaded_libraries.read().await;
             if let Some(status) = loaded_libs.get(&lib_name) {
@@ -90,24 +90,24 @@ impl LibManager {
             }
         }
         
-        // Проверка существования файла
+        // Check if file exists
         if !Path::new(path).exists() {
-            return Err(AppError::FileNotFound);
+            return Err(AppError::Model(format!("Library file '{}' not found", path)));
         }
         
-        // Загрузка библиотеки
+        // Load library
         let load_start = std::time::Instant::now();
         
-        // Заглушка для загрузки библиотеки
-        // В реальной реализации здесь будет:
-        // - Проверка зависимостей
-        // - Загрузка в память
-        // - Инициализация символов
-        // - Проверка совместимости
+        // Stub for library loading
+        // In real implementation, this would include:
+        // - Dependency checking
+        // - Memory loading
+        // - Symbol initialization
+        // - Compatibility checking
         
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
         
-        // Обновление статуса
+        // Update status
         let mut loaded_libs = self.loaded_libraries.write().await;
         loaded_libs.insert(lib_name.clone(), LibraryStatus {
             is_loaded: true,
@@ -123,7 +123,7 @@ impl LibManager {
     pub async fn unload_library(&self, path: &str) -> Result<(), AppError> {
         let lib_name = self.extract_library_name(path);
         
-        // Проверка, загружена ли библиотека
+        // Check if library is loaded
         {
             let loaded_libs = self.loaded_libraries.read().await;
             if let Some(status) = loaded_libs.get(&lib_name) {
@@ -133,14 +133,14 @@ impl LibManager {
             }
         }
         
-        // Выгрузка библиотеки
-        // Заглушка для выгрузки библиотеки
-        // В реальной реализации здесь будет:
-        // - Освобождение ресурсов
-        // - Выгрузка символов
-        // - Очистка памяти
+        // Unload library
+        // Stub for library unloading
+        // In real implementation, this would include:
+        // - Resource cleanup
+        // - Symbol unloading
+        // - Memory cleanup
         
-        // Обновление статуса
+        // Update status
         let mut loaded_libs = self.loaded_libraries.write().await;
         if let Some(status) = loaded_libs.get_mut(&lib_name) {
             status.is_loaded = false;
@@ -151,25 +151,25 @@ impl LibManager {
     }
 
     pub async fn check_for_updates(&self, library_name: &str) -> Result<bool, AppError> {
-        // Заглушка для проверки обновлений
-        // В реальной реализации здесь будет:
-        // - Проверка версии в репозитории
-        // - Сравнение с локальной версией
-        // - Проверка совместимости
+        // Stub for update checking
+        // In real implementation, this would include:
+        // - Version checking in repository
+        // - Comparison with local version
+        // - Compatibility checking
         
-        // Симуляция проверки обновлений
+        // Simulate update check
         let has_update = rand::random::<bool>();
         
         Ok(has_update)
     }
 
     pub async fn update_library(&self, library_name: &str) -> Result<(), AppError> {
-        // Заглушка для обновления библиотеки
-        // В реальной реализации здесь будет:
-        // - Скачивание новой версии
-        // - Проверка целостности
-        // - Замена старой версии
-        // - Обновление метаданных
+        // Stub for library updating
+        // In real implementation, this would include:
+        // - Downloading new version
+        // - Integrity checking
+        // - Replacing old version
+        // - Updating metadata
         
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
         
@@ -214,22 +214,24 @@ impl LibManager {
             let entry = entry?;
             let path = entry.path();
             
-            if path.is_file() && self.is_library_file(&path) {
-                let lib_name = self.extract_library_name(&path.to_string_lossy());
+            if self.is_library_file(&path) {
+                let name = self.extract_library_name(&path.to_string_lossy());
+                let checksum = self.calculate_checksum(&path).await?;
+                let file_metadata = path.metadata()?;
                 
                 let lib_metadata = LibraryMetadata {
-                    name: lib_name.clone(),
-                    version: "1.0.0".to_string(), // Будет извлечено из файла
-                    description: format!("Library: {}", lib_name),
+                    name: name.clone(),
+                    version: "1.0.0".to_string(),
+                    description: format!("Library {}", name),
                     author: "Unknown".to_string(),
                     license: "MIT".to_string(),
-                    dependencies: Vec::new(), // Будет извлечено из файла
-                    size_bytes: path.metadata()?.len(),
-                    checksum: self.calculate_checksum(&path).await?,
-                    build_date: "2024-01-01".to_string(),
+                    dependencies: Vec::new(),
+                    size_bytes: file_metadata.len(),
+                    checksum,
+                    build_date: chrono::Utc::now().to_rfc3339(),
                 };
                 
-                metadata.insert(lib_name, lib_metadata);
+                metadata.insert(name, lib_metadata);
             }
         }
         
@@ -237,12 +239,8 @@ impl LibManager {
     }
 
     async fn initialize_cache(&self) -> Result<(), AppError> {
-        // Инициализация кэша библиотек
-        // В реальной реализации здесь будет:
-        // - Загрузка часто используемых библиотек в кэш
-        // - Предварительная компиляция
-        // - Оптимизация загрузки
-        
+        // Initialize library cache
+        log::info!("Initializing library cache with size: {} MB", self.config.cache_size_mb);
         Ok(())
     }
 
@@ -256,25 +254,25 @@ impl LibManager {
 
     fn is_library_file(&self, path: &Path) -> bool {
         if let Some(extension) = path.extension() {
-            let ext = extension.to_string_lossy().to_lowercase();
-            matches!(ext.as_str(), "so" | "dll" | "dylib")
+            extension == "so" || extension == "dll" || extension == "dylib"
         } else {
             false
         }
     }
 
     async fn calculate_library_memory_usage(&self, path: &str) -> Result<f32, AppError> {
-        // Простая оценка использования памяти
         let metadata = std::fs::metadata(path)?;
-        let size_mb = metadata.len() as f32 / (1024.0 * 1024.0);
-        
-        // Примерная оценка дополнительной памяти для загрузки
-        Ok(size_mb * 2.0)
+        Ok(metadata.len() as f32 / 1024.0 / 1024.0)
     }
 
     async fn calculate_checksum(&self, path: &Path) -> Result<String, AppError> {
-        // Заглушка для расчета контрольной суммы
-        // В реальной реализации здесь будет SHA256 или MD5
-        Ok("dummy_checksum".to_string())
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        
+        let mut hasher = DefaultHasher::new();
+        let content = std::fs::read(path)?;
+        content.hash(&mut hasher);
+        
+        Ok(format!("{:x}", hasher.finish()))
     }
 } 

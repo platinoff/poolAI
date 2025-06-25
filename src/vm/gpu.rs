@@ -53,23 +53,23 @@ impl GPUManager {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Сканирование доступных GPU
+        // Scan available GPUs
         self.scan_gpu_devices().await?;
         
-        // Сканирование доступных ASIC
+        // Scan available ASICs
         self.scan_asic_devices().await?;
         
-        // Запуск мониторинга GPU
+        // Start GPU monitoring
         self.start_gpu_monitoring().await?;
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Освобождение всех GPU
+        // Release all GPUs
         self.release_all_gpus().await?;
         
-        // Остановка мониторинга
+        // Stop monitoring
         Ok(())
     }
 
@@ -88,16 +88,16 @@ impl GPUManager {
         
         if let Some(gpu) = gpu_devices.get_mut(device_id) {
             if !gpu.is_available {
-                return Err(AppError::DeviceNotAvailable);
+                return Err(AppError::Model("GPU not available".to_string()));
             }
             
             if gpu.assigned_vm.is_some() {
-                return Err(AppError::DeviceAlreadyAssigned);
+                return Err(AppError::Model("GPU already assigned".to_string()));
             }
             
             gpu.assigned_vm = Some(vm_id.to_string());
         } else {
-            return Err(AppError::DeviceNotFound);
+            return Err(AppError::Model(format!("GPU device '{}' not found", device_id)));
         }
         
         Ok(())
@@ -140,15 +140,15 @@ impl GPUManager {
         let mut gpu_devices = self.gpu_devices.write().await;
         
         if let Some(gpu) = gpu_devices.get_mut(device_id) {
-            // Заглушка для включения GPU passthrough
-            // В реальной реализации здесь будет:
-            // - Отключение GPU от хоста
-            // - Настройка IOMMU
-            // - Подготовка для passthrough
+            // Stub for enabling GPU passthrough
+            // In real implementation, this would include:
+            // - Detaching GPU from host
+            // - Configuring IOMMU
+            // - Preparing for passthrough
             
             gpu.is_passthrough_enabled = true;
         } else {
-            return Err(AppError::DeviceNotFound);
+            return Err(AppError::Model(format!("GPU device '{}' not found", device_id)));
         }
         
         Ok(())
@@ -158,14 +158,14 @@ impl GPUManager {
         let mut gpu_devices = self.gpu_devices.write().await;
         
         if let Some(gpu) = gpu_devices.get_mut(device_id) {
-            // Заглушка для отключения GPU passthrough
-            // В реальной реализации здесь будет:
-            // - Возврат GPU хосту
-            // - Восстановление драйверов
+            // Stub for disabling GPU passthrough
+            // In real implementation, this would include:
+            // - Returning GPU to host
+            // - Restoring drivers
             
             gpu.is_passthrough_enabled = false;
         } else {
-            return Err(AppError::DeviceNotFound);
+            return Err(AppError::Model(format!("GPU device '{}' not found", device_id)));
         }
         
         Ok(())
@@ -189,16 +189,16 @@ impl GPUManager {
         
         if let Some(asic) = asic_devices.get_mut(device_id) {
             if !asic.is_available {
-                return Err(AppError::DeviceNotAvailable);
+                return Err(AppError::Model("ASIC not available".to_string()));
             }
             
             if asic.assigned_vm.is_some() {
-                return Err(AppError::DeviceAlreadyAssigned);
+                return Err(AppError::Model("ASIC already assigned".to_string()));
             }
             
             asic.assigned_vm = Some(vm_id.to_string());
         } else {
-            return Err(AppError::DeviceNotFound);
+            return Err(AppError::Model(format!("ASIC device '{}' not found", device_id)));
         }
         
         Ok(())
@@ -214,16 +214,35 @@ impl GPUManager {
         Ok(())
     }
 
+    pub async fn attach_to_vm(&self, device_id: &str, vm_id: &str) -> Result<(), AppError> {
+        // Try GPU first, then ASIC
+        if let Some(_) = self.get_gpu_info(device_id).await {
+            self.assign_gpu_to_vm(device_id, vm_id).await
+        } else if let Some(_) = self.get_asic_info(device_id).await {
+            self.assign_asic_to_vm(device_id, vm_id).await
+        } else {
+            Err(AppError::Model(format!("Device '{}' not found", device_id)))
+        }
+    }
+
+    pub async fn detach_from_vm(&self, device_id: &str, vm_id: &str) -> Result<(), AppError> {
+        // Try GPU first, then ASIC
+        if let Some(_) = self.get_gpu_info(device_id).await {
+            self.release_gpu_from_vm(device_id).await
+        } else if let Some(_) = self.get_asic_info(device_id).await {
+            self.release_asic_from_vm(device_id).await
+        } else {
+            Err(AppError::Model(format!("Device '{}' not found", device_id)))
+        }
+    }
+
     async fn scan_gpu_devices(&self) -> Result<(), AppError> {
-        // Заглушка для сканирования GPU устройств
-        // В реальной реализации здесь будет:
-        // - Сканирование PCI устройств
-        // - Определение GPU через lspci или аналогичные утилиты
-        // - Получение информации о драйверах
-        
         let mut gpu_devices = self.gpu_devices.write().await;
         
-        // Симуляция найденных GPU
+        // Simulate GPU scanning
+        // In real implementation, this would scan system for GPUs
+        
+        // Add some simulated GPUs
         gpu_devices.insert("gpu_0".to_string(), GPUDevice {
             device_id: "gpu_0".to_string(),
             name: "NVIDIA GeForce RTX 4090".to_string(),
@@ -246,44 +265,21 @@ impl GPUManager {
             assigned_vm: None,
         });
         
-        gpu_devices.insert("gpu_2".to_string(), GPUDevice {
-            device_id: "gpu_2".to_string(),
-            name: "AMD Radeon RX 7900 XTX".to_string(),
-            memory_mb: 24576.0,
-            compute_capability: "GFX11".to_string(),
-            driver_version: "23.3.2".to_string(),
-            is_available: true,
-            is_passthrough_enabled: false,
-            assigned_vm: None,
-        });
-        
         Ok(())
     }
 
     async fn scan_asic_devices(&self) -> Result<(), AppError> {
-        // Заглушка для сканирования ASIC устройств
-        // В реальной реализации здесь будет:
-        // - Сканирование USB устройств
-        // - Определение ASIC майнеров
-        // - Получение информации о прошивках
-        
         let mut asic_devices = self.asic_devices.write().await;
         
-        // Симуляция найденных ASIC
+        // Simulate ASIC scanning
+        // In real implementation, this would scan system for ASICs
+        
+        // Add some simulated ASICs
         asic_devices.insert("asic_0".to_string(), ASICDevice {
             device_id: "asic_0".to_string(),
-            name: "Antminer S19 XP".to_string(),
+            name: "Bitmain Antminer S19 XP".to_string(),
             hash_rate_th: 140.0,
             power_consumption_watts: 3010.0,
-            is_available: true,
-            assigned_vm: None,
-        });
-        
-        asic_devices.insert("asic_1".to_string(), ASICDevice {
-            device_id: "asic_1".to_string(),
-            name: "Whatsminer M50".to_string(),
-            hash_rate_th: 126.0,
-            power_consumption_watts: 3276.0,
             is_available: true,
             assigned_vm: None,
         });
@@ -296,31 +292,25 @@ impl GPUManager {
         let gpu_metrics = self.gpu_metrics.clone();
         
         tokio::spawn(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(5));
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(30));
             
             loop {
                 interval.tick().await;
                 
-                // Обновление метрик GPU
                 let devices = gpu_devices.read().await;
                 let mut metrics = gpu_metrics.write().await;
                 
                 for (device_id, _) in devices.iter() {
-                    // Заглушка для получения метрик GPU
-                    // В реальной реализации здесь будет:
-                    // - Вызов nvidia-smi для NVIDIA GPU
-                    // - Вызов rocm-smi для AMD GPU
-                    // - Чтение системных файлов для Linux
-                    
+                    // Simulate GPU metrics
                     let gpu_metric = GPUMetrics {
                         device_id: device_id.clone(),
                         utilization_percent: rand::random::<f32>() * 100.0,
-                        memory_used_mb: rand::random::<f32>() * 8000.0,
+                        memory_used_mb: rand::random::<f32>() * 8192.0,
                         memory_total_mb: 24576.0,
                         temperature_celsius: 45.0 + rand::random::<f32>() * 30.0,
-                        power_consumption_watts: 150.0 + rand::random::<f32>() * 200.0,
+                        power_consumption_watts: 200.0 + rand::random::<f32>() * 150.0,
                         fan_speed_percent: 50.0 + rand::random::<f32>() * 50.0,
-                        clock_speed_mhz: 1800.0 + rand::random::<f32>() * 400.0,
+                        clock_speed_mhz: 1800.0 + rand::random::<f32>() * 200.0,
                     };
                     
                     metrics.insert(device_id.clone(), gpu_metric);
@@ -333,9 +323,16 @@ impl GPUManager {
 
     async fn release_all_gpus(&self) -> Result<(), AppError> {
         let mut gpu_devices = self.gpu_devices.write().await;
+        let mut asic_devices = self.asic_devices.write().await;
         
+        // Release all GPUs
         for gpu in gpu_devices.values_mut() {
             gpu.assigned_vm = None;
+        }
+        
+        // Release all ASICs
+        for asic in asic_devices.values_mut() {
+            asic.assigned_vm = None;
         }
         
         Ok(())

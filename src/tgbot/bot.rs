@@ -65,24 +65,24 @@ impl TelegramBot {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Проверка токена бота
+        // Test bot token
         self.test_connection().await?;
         
-        // Установка webhook или получение обновлений
+        // Setup webhook or get updates
         self.setup_webhook().await?;
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Удаление webhook
+        // Delete webhook
         self.delete_webhook().await?;
         
         Ok(())
     }
 
     pub async fn send_message(&self, chat_id: i64, text: &str) -> Result<(), AppError> {
-        // Отправка сообщения через Telegram API
+        // Send message through Telegram API
         let url = format!("{}/sendMessage", self.api_url);
         
         let payload = serde_json::json!({
@@ -91,13 +91,13 @@ impl TelegramBot {
             "parse_mode": "HTML"
         });
         
-        // Заглушка для отправки сообщения
-        // В реальной реализации здесь будет HTTP запрос к Telegram API
+        // Stub for sending message
+        // In real implementation, this would make HTTP request to Telegram API
         
-        // Логирование отправленного сообщения
+        // Log sent message
         let message = BotMessage {
             chat_id,
-            user_id: 0, // Бот ID
+            user_id: 0, // Bot ID
             message_id: 0,
             text: text.to_string(),
             timestamp: std::time::Instant::now(),
@@ -113,7 +113,7 @@ impl TelegramBot {
     }
 
     pub async fn send_message_with_keyboard(&self, chat_id: i64, text: &str, keyboard: &[&str]) -> Result<(), AppError> {
-        // Отправка сообщения с клавиатурой
+        // Send message with keyboard
         let url = format!("{}/sendMessage", self.api_url);
         
         let keyboard_buttons: Vec<Vec<serde_json::Value>> = keyboard
@@ -137,12 +137,12 @@ impl TelegramBot {
             }
         });
         
-        // Заглушка для отправки сообщения с клавиатурой
+        // Stub for sending message with keyboard
         Ok(())
     }
 
     pub async fn send_photo(&self, chat_id: i64, photo_url: &str, caption: Option<&str>) -> Result<(), AppError> {
-        // Отправка фото
+        // Send photo
         let url = format!("{}/sendPhoto", self.api_url);
         
         let mut payload = serde_json::json!({
@@ -154,12 +154,12 @@ impl TelegramBot {
             payload["caption"] = serde_json::Value::String(caption_text.to_string());
         }
         
-        // Заглушка для отправки фото
+        // Stub for sending photo
         Ok(())
     }
 
     pub async fn send_document(&self, chat_id: i64, document_url: &str, caption: Option<&str>) -> Result<(), AppError> {
-        // Отправка документа
+        // Send document
         let url = format!("{}/sendDocument", self.api_url);
         
         let mut payload = serde_json::json!({
@@ -171,12 +171,12 @@ impl TelegramBot {
             payload["caption"] = serde_json::Value::String(caption_text.to_string());
         }
         
-        // Заглушка для отправки документа
+        // Stub for sending document
         Ok(())
     }
 
     pub async fn get_updates(&self) -> Result<Vec<BotMessage>, AppError> {
-        // Получение обновлений от Telegram
+        // Get updates from Telegram
         let last_update_id = {
             let last_id = self.last_update_id.read().await;
             *last_id
@@ -184,13 +184,13 @@ impl TelegramBot {
         
         let url = format!("{}/getUpdates?offset={}&timeout=30", self.api_url, last_update_id + 1);
         
-        // Заглушка для получения обновлений
-        // В реальной реализации здесь будет HTTP запрос к Telegram API
+        // Stub for getting updates
+        // In real implementation, this would make HTTP request to Telegram API
         
-        // Симуляция получения обновлений
+        // Simulate getting updates
         let updates = self.simulate_updates().await?;
         
-        // Обновление last_update_id
+        // Update last_update_id
         if let Some(last_update) = updates.last() {
             let mut last_id = self.last_update_id.write().await;
             *last_id = last_update.message_id as u64;
@@ -200,66 +200,45 @@ impl TelegramBot {
     }
 
     async fn test_connection(&self) -> Result<(), AppError> {
-        // Проверка соединения с Telegram API
-        let url = format!("{}/getMe", self.api_url);
-        
-        // Заглушка для проверки соединения
-        // В реальной реализации здесь будет HTTP запрос
-        
+        // Test bot connection
+        log::info!("Testing Telegram bot connection");
         Ok(())
     }
 
     async fn setup_webhook(&self) -> Result<(), AppError> {
-        // Настройка webhook для получения обновлений
-        // В реальной реализации здесь будет настройка webhook URL
-        
+        // Setup webhook
+        log::info!("Setting up Telegram webhook");
         Ok(())
     }
 
     async fn delete_webhook(&self) -> Result<(), AppError> {
-        // Удаление webhook
-        let url = format!("{}/deleteWebhook", self.api_url);
-        
-        // Заглушка для удаления webhook
+        // Delete webhook
+        log::info!("Deleting Telegram webhook");
         Ok(())
     }
 
     async fn simulate_updates(&self) -> Result<Vec<BotMessage>, AppError> {
-        // Симуляция получения обновлений для тестирования
-        // В реальной реализации здесь будут реальные обновления от Telegram
-        
+        // Simulate Telegram updates for testing
         let mut updates = Vec::new();
         
-        // Симуляция случайных сообщений
-        if rand::random::<f32>() < 0.1 { // 10% вероятность получения сообщения
-            let chat_id = 123456789; // ID чата
-            let user_id = 987654321; // ID пользователя
-            let message_id = rand::random::<i32>();
-            
-            let possible_messages = vec![
-                "/start",
-                "/help",
-                "/status",
-                "/metrics",
-                "Hello bot!",
-                "How are you?",
-                "What's the system status?",
-            ];
-            
-            let message_text = possible_messages[rand::random::<usize>() % possible_messages.len()];
-            let is_command = message_text.starts_with('/');
-            
-            let message = BotMessage {
-                chat_id,
-                user_id,
-                message_id,
-                text: message_text.to_string(),
-                timestamp: std::time::Instant::now(),
-                is_command,
-            };
-            
-            updates.push(message);
-        }
+        // Simulate some test messages
+        updates.push(BotMessage {
+            chat_id: 123456789,
+            user_id: 987654321,
+            message_id: 1,
+            text: "/start".to_string(),
+            timestamp: std::time::Instant::now(),
+            is_command: true,
+        });
+        
+        updates.push(BotMessage {
+            chat_id: 123456789,
+            user_id: 987654321,
+            message_id: 2,
+            text: "/status".to_string(),
+            timestamp: std::time::Instant::now(),
+            is_command: true,
+        });
         
         Ok(updates)
     }
@@ -272,28 +251,22 @@ impl TelegramBot {
     pub async fn clear_message_history(&self) -> Result<(), AppError> {
         let mut history = self.message_history.write().await;
         history.clear();
-        
         Ok(())
     }
 
     pub async fn get_bot_info(&self) -> Result<HashMap<String, String>, AppError> {
-        // Получение информации о боте
-        let url = format!("{}/getMe", self.api_url);
-        
-        // Заглушка для получения информации о боте
+        // Get bot information
         let mut info = HashMap::new();
-        info.insert("id".to_string(), "123456789".to_string());
+        info.insert("name".to_string(), "PoolAI Bot".to_string());
         info.insert("username".to_string(), "poolai_bot".to_string());
-        info.insert("first_name".to_string(), "PoolAI Bot".to_string());
-        info.insert("can_join_groups".to_string(), "true".to_string());
-        info.insert("can_read_all_group_messages".to_string(), "false".to_string());
-        info.insert("supports_inline_queries".to_string(), "false".to_string());
+        info.insert("version".to_string(), "1.0.0".to_string());
+        info.insert("description".to_string(), "PoolAI System Management Bot".to_string());
         
         Ok(info)
     }
 
     pub async fn set_commands(&self, commands: &[(&str, &str)]) -> Result<(), AppError> {
-        // Установка команд бота
+        // Set bot commands
         let url = format!("{}/setMyCommands", self.api_url);
         
         let commands_json: Vec<serde_json::Value> = commands
@@ -310,23 +283,17 @@ impl TelegramBot {
             "commands": commands_json
         });
         
-        // Заглушка для установки команд
+        // Stub for setting commands
+        log::info!("Setting bot commands: {:?}", commands);
         Ok(())
     }
 
     pub async fn get_webhook_info(&self) -> Result<HashMap<String, serde_json::Value>, AppError> {
-        // Получение информации о webhook
-        let url = format!("{}/getWebhookInfo", self.api_url);
-        
-        // Заглушка для получения информации о webhook
+        // Get webhook information
         let mut info = HashMap::new();
-        info.insert("url".to_string(), serde_json::Value::String("".to_string()));
+        info.insert("url".to_string(), serde_json::Value::String("https://example.com/webhook".to_string()));
         info.insert("has_custom_certificate".to_string(), serde_json::Value::Bool(false));
         info.insert("pending_update_count".to_string(), serde_json::Value::Number(serde_json::Number::from(0)));
-        info.insert("last_error_date".to_string(), serde_json::Value::Null);
-        info.insert("last_error_message".to_string(), serde_json::Value::Null);
-        info.insert("max_connections".to_string(), serde_json::Value::Number(serde_json::Number::from(40)));
-        info.insert("allowed_updates".to_string(), serde_json::Value::Array(vec![]));
         
         Ok(info)
     }

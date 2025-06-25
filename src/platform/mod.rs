@@ -69,10 +69,10 @@ impl Platform {
             PlatformType::Windows => Box::new(windows::WindowsPlatform::new()?),
             PlatformType::Linux => Box::new(linux::LinuxPlatform::new()?),
             PlatformType::MacOS => {
-                return Err(AppError::UnsupportedPlatform);
+                return Err(AppError::Model("Unsupported platform".to_string()));
             }
             PlatformType::Unknown => {
-                return Err(AppError::UnsupportedPlatform);
+                return Err(AppError::Model("Unknown platform".to_string()));
             }
         };
         
@@ -108,17 +108,17 @@ impl Platform {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Инициализация платформы
+        // Initialize platform
         self.platform_impl.initialize().await?;
         
-        // Запуск мониторинга ресурсов
+        // Start resource monitoring
         self.start_resource_monitoring().await?;
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Выключение платформы
+        // Shutdown platform
         self.platform_impl.shutdown().await?;
         
         Ok(())
@@ -148,10 +148,10 @@ impl Platform {
                 gpu.memory_used_mb += size_mb;
                 Ok(())
             } else {
-                Err(AppError::InsufficientResources)
+                Err(AppError::Resource("Insufficient GPU memory".to_string()))
             }
         } else {
-            Err(AppError::DeviceNotFound)
+            Err(AppError::Model(format!("GPU device '{}' not found", device_id)))
         }
     }
 
@@ -162,12 +162,12 @@ impl Platform {
             gpu.memory_used_mb = gpu.memory_used_mb.saturating_sub(size_mb);
             Ok(())
         } else {
-            Err(AppError::DeviceNotFound)
+            Err(AppError::Model(format!("GPU device '{}' not found", device_id)))
         }
     }
 
     pub async fn optimize_resources(&self) -> Result<(), AppError> {
-        // Оптимизация ресурсов
+        // Optimize resources
         self.platform_impl.optimize_resources().await?;
         
         Ok(())
@@ -177,12 +177,12 @@ impl Platform {
         let system_resources = self.system_resources.read().await;
         let gpu_resources = self.gpu_resources.read().await;
         
-        // Проверка температуры системы
+        // Check system temperature
         if system_resources.temperature_celsius > self.config.temperature_threshold_celsius {
             return Ok(false);
         }
         
-        // Проверка температуры GPU
+        // Check GPU temperature
         for gpu in gpu_resources.values() {
             if gpu.temperature_celsius > self.config.temperature_threshold_celsius {
                 return Ok(false);
@@ -206,23 +206,19 @@ impl Platform {
         let platform_impl = self.platform_impl.clone();
         
         tokio::spawn(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(5));
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(30));
             
             loop {
                 interval.tick().await;
                 
-                // Обновление системных ресурсов
+                // Update system resources
                 if let Ok(resources) = platform_impl.get_system_resources().await {
-                    let mut sys_res = system_resources.write().await;
-                    *sys_res = resources;
+                    *system_resources.write().await = resources;
                 }
                 
-                // Обновление GPU ресурсов
+                // Update GPU resources
                 if let Ok(gpu_res) = platform_impl.get_gpu_resources().await {
-                    let mut gpu_resources_write = gpu_resources.write().await;
-                    for (device_id, resources) in gpu_res {
-                        gpu_resources_write.insert(device_id, resources);
-                    }
+                    *gpu_resources.write().await = gpu_res;
                 }
             }
         });

@@ -16,26 +16,26 @@ impl WindowsPlatform {
 
 impl PlatformInterface for WindowsPlatform {
     async fn initialize(&self) -> Result<(), AppError> {
-        // Заглушка для инициализации Windows платформы
-        // В реальной реализации здесь будет интеграция с Windows API
+        // Stub for Windows platform initialization
+        // In real implementation, integration with Windows API would happen here
         
-        // Проверка доступности необходимых системных вызовов
-        // Загрузка драйверов GPU
-        // Инициализация мониторинга ресурсов
+        // Check availability of required system calls
+        // Load GPU drivers
+        // Initialize resource monitoring
         
         Ok(())
     }
 
     async fn shutdown(&self) -> Result<(), AppError> {
-        // Заглушка для выключения Windows платформы
-        // В реальной реализации здесь будет освобождение ресурсов
+        // Stub for Windows platform shutdown
+        // In real implementation, resource cleanup would happen here
         
         Ok(())
     }
 
     async fn get_system_resources(&self) -> Result<SystemResources, AppError> {
-        // Заглушка для получения системных ресурсов Windows
-        // В реальной реализации здесь будут вызовы Windows API
+        // Stub for getting Windows system resources
+        // In real implementation, Windows API calls would happen here
         
         Ok(SystemResources {
             cpu_usage_percent: 45.2,
@@ -49,12 +49,12 @@ impl PlatformInterface for WindowsPlatform {
     }
 
     async fn get_gpu_resources(&self) -> Result<HashMap<String, GpuResources>, AppError> {
-        // Заглушка для получения GPU ресурсов Windows
-        // В реальной реализации здесь будут вызовы NVIDIA/AMD API
+        // Stub for getting Windows GPU resources
+        // In real implementation, NVIDIA/AMD API calls would happen here
         
         let mut gpu_resources = HashMap::new();
         
-        // Симуляция GPU 0
+        // Simulate GPU 0
         gpu_resources.insert("gpu_0".to_string(), GpuResources {
             device_id: "gpu_0".to_string(),
             utilization_percent: 75.5,
@@ -65,7 +65,7 @@ impl PlatformInterface for WindowsPlatform {
             fan_speed_percent: 60.0,
         });
         
-        // Симуляция GPU 1
+        // Simulate GPU 1
         gpu_resources.insert("gpu_1".to_string(), GpuResources {
             device_id: "gpu_1".to_string(),
             utilization_percent: 45.2,
@@ -80,12 +80,12 @@ impl PlatformInterface for WindowsPlatform {
     }
 
     async fn optimize_resources(&self) -> Result<(), AppError> {
-        // Заглушка для оптимизации ресурсов Windows
-        // В реальной реализации здесь будет:
-        // - Оптимизация процессов
-        // - Управление питанием
-        // - Оптимизация GPU
-        // - Очистка памяти
+        // Stub for Windows resource optimization
+        // In real implementation, this would include:
+        // - Process optimization
+        // - Power management
+        // - GPU optimization
+        // - Memory cleanup
         
         Ok(())
     }
@@ -99,7 +99,7 @@ impl PlatformInterface for WindowsPlatform {
 
 impl WindowsPlatform {
     pub async fn get_windows_specific_info(&self) -> Result<HashMap<String, String>, AppError> {
-        // Заглушка для получения Windows-специфичной информации
+        // Stub for getting Windows-specific information
         let mut info = HashMap::new();
         
         info.insert("os_version".to_string(), "Windows 10".to_string());
@@ -111,21 +111,21 @@ impl WindowsPlatform {
     }
 
     pub async fn set_power_plan(&self, plan: &str) -> Result<(), AppError> {
-        // Заглушка для установки плана питания Windows
-        // В реальной реализации здесь будет вызов powercfg
+        // Stub for setting Windows power plan
+        // In real implementation, powercfg call would happen here
         
         match plan {
             "high_performance" => {
-                // Установка высокопроизводительного плана
+                // Set high performance plan
             }
             "balanced" => {
-                // Установка сбалансированного плана
+                // Set balanced plan
             }
             "power_saver" => {
-                // Установка экономичного плана
+                // Set power saver plan
             }
             _ => {
-                return Err(AppError::InvalidParameter);
+                return Err(AppError::Validation(format!("Invalid power plan: {}", plan)));
             }
         }
         
@@ -133,11 +133,11 @@ impl WindowsPlatform {
     }
 
     pub async fn optimize_gpu_settings(&self) -> Result<(), AppError> {
-        // Заглушка для оптимизации настроек GPU в Windows
-        // В реальной реализации здесь будет:
-        // - Настройка NVIDIA Control Panel
-        // - Настройка AMD Radeon Settings
-        // - Оптимизация драйверов
+        // Stub for optimizing GPU settings in Windows
+        // In real implementation, this would include:
+        // - NVIDIA Control Panel settings
+        // - AMD Radeon Settings
+        // - Driver optimization
         
         Ok(())
     }

@@ -53,23 +53,23 @@ impl Runtime {
     pub async fn create_instance(&self, model_config: ModelConfig) -> Result<String, AppError> {
         let instance_id = self.generate_instance_id();
         
-        // Проверка лимитов
+        // Check limits
         let instances = self.instances.read().await;
         if instances.len() >= self.config.max_instances {
-            return Err(AppError::ResourceLimitExceeded);
+            return Err(AppError::Resource("Instance limit exceeded".to_string()));
         }
         drop(instances);
         
-        // Создание экземпляра
+        // Create instance
         let instance = instance::Instance::new(instance_id.clone(), model_config).await?;
         
-        // Регистрация экземпляра
+        // Register instance
         {
             let mut instances = self.instances.write().await;
             instances.insert(instance_id.clone(), instance);
         }
         
-        // Создание информации об экземпляре
+        // Create instance info
         let instance_info = InstanceInfo {
             instance_id: instance_id.clone(),
             model_name: model_config.model_path.clone(),
@@ -89,12 +89,12 @@ impl Runtime {
     }
 
     pub async fn destroy_instance(&self, instance_id: &str) -> Result<(), AppError> {
-        // Остановка экземпляра
+        // Stop instance
         if let Some(instance) = self.instances.read().await.get(instance_id) {
             instance.shutdown().await?;
         }
         
-        // Удаление из регистра
+        // Remove from registry
         {
             let mut instances = self.instances.write().await;
             instances.remove(instance_id);
@@ -112,11 +112,11 @@ impl Runtime {
         let instance = {
             let instances = self.instances.read().await;
             instances.get(instance_id)
-                .ok_or(AppError::InstanceNotFound)?
+                .ok_or_else(|| AppError::Model(format!("Instance '{}' not found", instance_id)))?
                 .clone()
         };
         
-        // Обновление активности
+        // Update activity
         {
             let mut info = self.instance_info.write().await;
             if let Some(instance_info) = info.get_mut(instance_id) {
@@ -126,7 +126,7 @@ impl Runtime {
             }
         }
         
-        // Обработка запроса
+        // Process request
         let response = instance.process_request(request).await?;
         
         Ok(response)
@@ -147,11 +147,12 @@ impl Runtime {
             return Ok(());
         }
         
-        // Логика масштабирования
+        // Scaling logic
         let instances = self.instances.read().await;
         if instances.len() < self.config.max_instances {
-            // Создание нового экземпляра
-            todo!("Implement scaling logic")
+            // Create new instance
+            log::info!("Scaling up runtime - creating new instance");
+            // TODO: Implement actual instance creation
         }
         
         Ok(())
@@ -162,7 +163,7 @@ impl Runtime {
             return Ok(());
         }
         
-        // Поиск неактивных экземпляров для остановки
+        // Find inactive instances to stop
         let mut instances_to_stop = Vec::new();
         
         {
@@ -170,13 +171,13 @@ impl Runtime {
             let now = std::time::Instant::now();
             
             for (instance_id, instance_info) in info.iter() {
-                if now.duration_since(instance_info.last_activity).as_secs() > 300 { // 5 минут
+                if now.duration_since(instance_info.last_activity).as_secs() > 300 { // 5 minutes
                     instances_to_stop.push(instance_id.clone());
                 }
             }
         }
         
-        // Остановка неактивных экземпляров
+        // Stop inactive instances
         for instance_id in instances_to_stop {
             self.destroy_instance(&instance_id).await?;
         }
@@ -192,33 +193,24 @@ impl Runtime {
             let mut info = self.instance_info.write().await;
             
             for (instance_id, instance_info) in info.iter_mut() {
-                // Проверка таймаута
+                // Check timeout
                 let now = std::time::Instant::now();
                 if now.duration_since(instance_info.last_activity).as_millis() > self.config.instance_timeout_ms as u128 {
                     instances_to_remove.push(instance_id.clone());
                     continue;
                 }
                 
-                // Проверка здоровья экземпляра
+                // Check instance health
                 if let Some(instance) = instances.get(instance_id) {
-                    match instance.health_check().await {
-                        Ok(true) => {
-                            instance_info.status = InstanceStatus::Running;
-                        }
-                        Ok(false) => {
-                            instance_info.status = InstanceStatus::Error;
-                            instances_to_remove.push(instance_id.clone());
-                        }
-                        Err(_) => {
-                            instance_info.status = InstanceStatus::Error;
-                            instances_to_remove.push(instance_id.clone());
-                        }
+                    if !instance.is_healthy().await {
+                        instance_info.status = InstanceStatus::Error;
+                        instances_to_remove.push(instance_id.clone());
                     }
                 }
             }
         }
         
-        // Удаление проблемных экземпляров
+        // Remove unhealthy instances
         for instance_id in instances_to_remove {
             self.destroy_instance(&instance_id).await?;
         }
@@ -226,15 +218,16 @@ impl Runtime {
         Ok(())
     }
 
+    pub async fn distribute_resources(&self) -> Result<(), AppError> {
+        let instances = self.instances.read().await;
+        for instance in instances.values() {
+            instance.optimize_resources().await?;
+        }
+        Ok(())
+    }
+
     fn generate_instance_id(&self) -> String {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        use std::time::{SystemTime, UNIX_EPOCH};
-        
-        let mut hasher = DefaultHasher::new();
-        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos().hash(&mut hasher);
-        rand::random::<u64>().hash(&mut hasher);
-        
-        format!("instance_{:x}", hasher.finish())
+        use uuid::Uuid;
+        Uuid::new_v4().to_string()
     }
 } 

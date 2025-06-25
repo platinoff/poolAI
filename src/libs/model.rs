@@ -86,19 +86,19 @@ impl Model {
             return Ok(());
         }
         
-        // Заглушка для загрузки модели
-        // В реальной реализации здесь будет:
-        // - Загрузка файлов модели
-        // - Инициализация GPU памяти
-        // - Загрузка весов
-        // - Компиляция графа
+        // Stub for model loading
+        // In real implementation, this would include:
+        // - Loading model files
+        // - Initializing GPU memory
+        // - Loading weights
+        // - Compiling graph
         
-        // Симуляция загрузки
+        // Simulate loading
         tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
         
         self.is_loaded = true;
         
-        // Обновление метрик
+        // Update metrics
         let mut metrics = self.metrics.write().await;
         metrics.memory_usage_mb = self.estimate_memory_usage().await;
         
@@ -110,15 +110,15 @@ impl Model {
             return Ok(());
         }
         
-        // Заглушка для выгрузки модели
-        // В реальной реализации здесь будет:
-        // - Освобождение GPU памяти
-        // - Выгрузка весов
-        // - Очистка ресурсов
+        // Stub for model unloading
+        // In real implementation, this would include:
+        // - Freeing GPU memory
+        // - Unloading weights
+        // - Cleaning up resources
         
         self.is_loaded = false;
         
-        // Сброс метрик
+        // Reset metrics
         let mut metrics = self.metrics.write().await;
         *metrics = ModelMetrics {
             inference_time_ms: 0.0,
@@ -135,13 +135,13 @@ impl Model {
 
     pub async fn optimize(&mut self, optimization_config: ModelOptimization) -> Result<(), AppError> {
         if !self.is_loaded {
-            return Err(AppError::ModelNotLoaded);
+            return Err(AppError::Model("Model not loaded".to_string()));
         }
         
-        // Применение оптимизаций
+        // Apply optimizations
         self.optimization = optimization_config;
         
-        // Выполнение оптимизации
+        // Perform optimization
         if self.optimization.quantization_enabled {
             self.apply_quantization().await?;
         }
@@ -160,7 +160,7 @@ impl Model {
         
         self.is_optimized = true;
         
-        // Обновление метрик после оптимизации
+        // Update metrics after optimization
         self.update_optimization_metrics().await?;
         
         Ok(())
@@ -168,24 +168,24 @@ impl Model {
 
     pub async fn inference(&self, input: &str) -> Result<String, AppError> {
         if !self.is_loaded {
-            return Err(AppError::ModelNotLoaded);
+            return Err(AppError::Model("Model not loaded".to_string()));
         }
         
         let start_time = std::time::Instant::now();
         
-        // Заглушка для инференса
-        // В реальной реализации здесь будет:
-        // - Токенизация входных данных
-        // - Выполнение forward pass
-        // - Детокенизация выходных данных
+        // Stub for inference
+        // In real implementation, this would include:
+        // - Tokenizing input data
+        // - Performing forward pass
+        // - Detokenizing output data
         
-        // Симуляция инференса
+        // Simulate inference
         tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
         
         let inference_time = start_time.elapsed();
         let output = format!("Generated response for: {}", input);
         
-        // Обновление метрик
+        // Update metrics
         self.update_inference_metrics(inference_time).await;
         
         Ok(output)
@@ -208,83 +208,62 @@ impl Model {
     }
 
     async fn estimate_memory_usage(&self) -> f32 {
-        // Простая оценка использования памяти
-        let base_memory = self.config.parameters_count as f32 * 4.0 / (1024.0 * 1024.0); // 4 bytes per parameter
-        let activation_memory = self.config.max_sequence_length as f32 * self.config.embedding_dimension as f32 * 4.0 / (1024.0 * 1024.0);
-        
-        base_memory + activation_memory
+        // Estimate memory usage based on model parameters
+        let params_mb = self.config.parameters_count as f32 * 4.0 / 1024.0 / 1024.0; // 4 bytes per parameter
+        let activation_mb = self.config.max_sequence_length as f32 * self.config.embedding_dimension as f32 * 4.0 / 1024.0 / 1024.0;
+        params_mb + activation_mb
     }
 
     async fn apply_quantization(&self) -> Result<(), AppError> {
-        // Заглушка для квантизации
-        // В реальной реализации здесь будет:
-        // - Анализ распределения весов
-        // - Применение квантизации
-        // - Калибровка
-        
-        tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
-        
+        // Stub for quantization
+        // In real implementation, this would quantize model weights
+        log::info!("Applying quantization to model {}", self.config.name);
         Ok(())
     }
 
     async fn apply_pruning(&self) -> Result<(), AppError> {
-        // Заглушка для прунинга
-        // В реальной реализации здесь будет:
-        // - Анализ важности весов
-        // - Удаление неважных связей
-        // - Переобучение
-        
-        tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
-        
+        // Stub for pruning
+        // In real implementation, this would prune model weights
+        log::info!("Applying pruning to model {}", self.config.name);
         Ok(())
     }
 
     async fn apply_mixed_precision(&self) -> Result<(), AppError> {
-        // Заглушка для mixed precision
-        // В реальной реализации здесь будет:
-        // - Анализ численной стабильности
-        // - Применение FP16 для подходящих операций
-        // - Градиент scaling
-        
-        tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
-        
+        // Stub for mixed precision
+        // In real implementation, this would enable mixed precision training/inference
+        log::info!("Applying mixed precision to model {}", self.config.name);
         Ok(())
     }
 
     async fn apply_graph_optimization(&self) -> Result<(), AppError> {
-        // Заглушка для оптимизации графа
-        // В реальной реализации здесь будет:
-        // - Fusion операций
-        // - Удаление мертвого кода
-        // - Оптимизация памяти
-        
-        tokio::time::sleep(tokio::time::Duration::from_millis(400)).await;
-        
+        // Stub for graph optimization
+        // In real implementation, this would optimize the computation graph
+        log::info!("Applying graph optimization to model {}", self.config.name);
         Ok(())
     }
 
     async fn update_inference_metrics(&self, inference_time: std::time::Duration) {
         let mut metrics = self.metrics.write().await;
         
+        // Update inference time
         metrics.inference_time_ms = inference_time.as_millis() as f64;
-        metrics.throughput_tokens_per_sec = 1000.0 / metrics.inference_time_ms as f32;
         
-        // Обновление latency percentiles (упрощенная логика)
-        if metrics.inference_time_ms > metrics.latency_p95_ms {
-            metrics.latency_p95_ms = metrics.inference_time_ms;
-        }
-        if metrics.inference_time_ms > metrics.latency_p99_ms {
-            metrics.latency_p99_ms = metrics.inference_time_ms;
-        }
+        // Update throughput (simplified calculation)
+        let tokens_generated = 10; // Simplified
+        metrics.throughput_tokens_per_sec = tokens_generated as f32 / (inference_time.as_millis() as f32 / 1000.0);
+        
+        // Update latency percentiles (simplified)
+        metrics.latency_p95_ms = metrics.inference_time_ms * 1.1;
+        metrics.latency_p99_ms = metrics.inference_time_ms * 1.2;
     }
 
     async fn update_optimization_metrics(&self) -> Result<(), AppError> {
         let mut metrics = self.metrics.write().await;
         
-        // Обновление метрик после оптимизации
+        // Update metrics after optimization
         if self.optimization.quantization_enabled {
-            metrics.memory_usage_mb *= 0.5; // Примерное сокращение памяти
-            metrics.inference_time_ms *= 0.8; // Примерное ускорение
+            metrics.memory_usage_mb *= 0.5; // Reduce memory usage
+            metrics.inference_time_ms *= 0.8; // Improve speed
         }
         
         if self.optimization.pruning_enabled {
@@ -294,6 +273,7 @@ impl Model {
         
         if self.optimization.mixed_precision {
             metrics.inference_time_ms *= 0.7;
+            metrics.memory_usage_mb *= 0.75;
         }
         
         Ok(())

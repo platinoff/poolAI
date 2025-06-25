@@ -1,5 +1,5 @@
 use crate::core::error::AppError;
-use crate::core::model_interface::{ModelRequest, ModelResponse, ModelConfig, ModelInterface};
+use crate::core::model_interface::{ModelRequest, ModelResponse, ModelConfig};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use std::time::Instant;
@@ -36,7 +36,6 @@ pub enum InstanceStatus {
 
 pub struct Instance {
     config: InstanceConfig,
-    model_interface: Option<Arc<dyn ModelInterface + Send + Sync>>,
     status: Arc<RwLock<InstanceStatus>>,
     metrics: Arc<RwLock<InstanceMetrics>>,
     active_requests: Arc<RwLock<usize>>,
@@ -57,7 +56,6 @@ impl Instance {
         
         let instance = Self {
             config,
-            model_interface: None,
             status: Arc::new(RwLock::new(InstanceStatus::Initializing)),
             metrics: Arc::new(RwLock::new(InstanceMetrics {
                 total_requests: 0,
@@ -73,20 +71,20 @@ impl Instance {
             created_at: Instant::now(),
         };
         
-        // Инициализация модели
+        // Initialize model
         instance.initialize_model().await?;
         
         Ok(instance)
     }
 
     async fn initialize_model(&self) -> Result<(), AppError> {
-        // Заглушка для инициализации модели
-        // В реальной реализации здесь будет загрузка модели
+        // Stub for model initialization
+        // In real implementation, model loading would happen here
         
-        // Симуляция загрузки
+        // Simulate loading
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
         
-        // Обновление статуса
+        // Update status
         {
             let mut status = self.status.write().await;
             *status = InstanceStatus::Ready;
@@ -96,26 +94,26 @@ impl Instance {
     }
 
     pub async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
-        // Проверка статуса
+        // Check status
         {
             let status = self.status.read().await;
             match *status {
                 InstanceStatus::Ready => {}
                 InstanceStatus::Busy => {
                     if *self.active_requests.read().await >= self.config.max_concurrent_requests {
-                        return Err(AppError::InstanceOverloaded);
+                        return Err(AppError::Resource("Instance overloaded".to_string()));
                     }
                 }
                 InstanceStatus::Error | InstanceStatus::ShuttingDown => {
-                    return Err(AppError::InstanceUnavailable);
+                    return Err(AppError::Model("Instance unavailable".to_string()));
                 }
                 InstanceStatus::Initializing => {
-                    return Err(AppError::InstanceNotReady);
+                    return Err(AppError::Model("Instance not ready".to_string()));
                 }
             }
         }
         
-        // Увеличение счетчика активных запросов
+        // Increment active requests counter
         {
             let mut active_requests = self.active_requests.write().await;
             *active_requests += 1;
@@ -126,7 +124,7 @@ impl Instance {
             }
         }
         
-        // Проверка кэша
+        // Check cache
         if self.config.enable_caching {
             if let Some(cached_response) = self.check_cache(&request).await {
                 self.decrement_active_requests().await;
@@ -134,33 +132,33 @@ impl Instance {
             }
         }
         
-        // Обработка запроса
+        // Process request
         let start_time = Instant::now();
         let response = self.process_model_request(request.clone()).await?;
         let processing_time = start_time.elapsed();
         
-        // Кэширование результата
+        // Cache result
         if self.config.enable_caching {
             self.cache_response(&request, &response).await;
         }
         
-        // Обновление метрик
+        // Update metrics
         self.update_metrics(processing_time, true).await;
         
-        // Уменьшение счетчика активных запросов
+        // Decrement active requests counter
         self.decrement_active_requests().await;
         
         Ok(response)
     }
 
     async fn process_model_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
-        // Заглушка для обработки запроса модели
-        // В реальной реализации здесь будет вызов модели
+        // Stub for model request processing
+        // In real implementation, model call would happen here
         
-        // Симуляция обработки
+        // Simulate processing
         tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
         
-        // Создание ответа
+        // Create response
         let response = ModelResponse {
             output: format!("Response to: {}", request.input),
             metrics: crate::core::model_interface::ModelMetrics {
@@ -186,9 +184,9 @@ impl Instance {
         let cache_key = self.generate_cache_key(request);
         let mut cache = self.cache.write().await;
         
-        // Проверка размера кэша
+        // Check cache size
         if cache.len() >= self.config.cache_size {
-            // Удаление самого старого элемента
+            // Remove oldest item
             if let Some((oldest_key, _)) = cache.iter().next() {
                 let oldest_key = oldest_key.clone();
                 cache.remove(&oldest_key);
@@ -213,20 +211,20 @@ impl Instance {
 
     async fn update_metrics(&self, processing_time: std::time::Duration, success: bool) {
         let mut metrics = self.metrics.write().await;
-        
         metrics.total_requests += 1;
+        
         if success {
             metrics.successful_requests += 1;
         } else {
             metrics.failed_requests += 1;
         }
         
-        let processing_time_ms = processing_time.as_millis() as f64;
         let total_requests = metrics.total_requests as f64;
-        metrics.average_response_time_ms = 
-            (metrics.average_response_time_ms * (total_requests - 1.0) + processing_time_ms) / total_requests;
+        let current_avg = metrics.average_response_time_ms;
+        let new_avg = (current_avg * (total_requests - 1.0) + processing_time.as_millis() as f64) / total_requests;
+        metrics.average_response_time_ms = new_avg;
         
-        // Обновление нагрузки
+        // Update current load
         let active_requests = *self.active_requests.read().await;
         metrics.current_load = active_requests as f32 / self.config.max_concurrent_requests as f32;
     }
@@ -235,10 +233,9 @@ impl Instance {
         let mut active_requests = self.active_requests.write().await;
         *active_requests = active_requests.saturating_sub(1);
         
-        // Обновление статуса если нагрузка снизилась
         if *active_requests < self.config.max_concurrent_requests {
             let mut status = self.status.write().await;
-            if let InstanceStatus::Busy = *status {
+            if matches!(*status, InstanceStatus::Busy) {
                 *status = InstanceStatus::Ready;
             }
         }
@@ -246,42 +243,44 @@ impl Instance {
 
     pub async fn health_check(&self) -> Result<bool, AppError> {
         let status = self.status.read().await;
-        
         match *status {
             InstanceStatus::Ready | InstanceStatus::Busy => Ok(true),
-            InstanceStatus::Error | InstanceStatus::ShuttingDown => Ok(false),
-            InstanceStatus::Initializing => {
-                // Проверка времени инициализации
-                if self.created_at.elapsed().as_secs() > 60 {
-                    Ok(false)
-                } else {
-                    Ok(true)
-                }
-            }
+            InstanceStatus::Error | InstanceStatus::ShuttingDown | InstanceStatus::Initializing => Ok(false),
         }
+    }
+
+    pub async fn is_healthy(&self) -> bool {
+        self.health_check().await.unwrap_or(false)
     }
 
     pub async fn get_metrics(&self) -> InstanceMetrics {
         self.metrics.read().await.clone()
     }
 
+    pub async fn optimize_resources(&self) -> Result<(), AppError> {
+        // Resource optimization logic
+        log::info!("Optimizing resources for instance {}", self.config.instance_id);
+        Ok(())
+    }
+
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Установка статуса выключения
+        // Update status
         {
             let mut status = self.status.write().await;
             *status = InstanceStatus::ShuttingDown;
         }
         
-        // Ожидание завершения активных запросов
+        // Wait for active requests to complete
         let mut attempts = 0;
-        while *self.active_requests.read().await > 0 && attempts < 30 {
+        while *self.active_requests.read().await > 0 && attempts < 10 {
             tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
             attempts += 1;
         }
         
-        // Очистка кэша
+        // Clear cache
         self.cache.write().await.clear();
         
+        log::info!("Instance {} shutdown complete", self.config.instance_id);
         Ok(())
     }
 

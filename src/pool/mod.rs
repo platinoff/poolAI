@@ -23,7 +23,7 @@ pub enum LoadBalancingStrategy {
     Random,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PoolMetrics {
     pub active_workers: usize,
     pub queue_size: usize,
@@ -62,23 +62,34 @@ impl Pool {
     pub async fn add_worker(&self, worker_id: String, worker: worker::Worker) -> Result<(), AppError> {
         let mut workers = self.workers.write().await;
         workers.insert(worker_id, worker);
+        
+        // Update metrics
+        let mut metrics = self.metrics.write().await;
+        metrics.active_workers = workers.len();
+        
         Ok(())
     }
 
     pub async fn remove_worker(&self, worker_id: &str) -> Result<(), AppError> {
         let mut workers = self.workers.write().await;
-        workers.remove(worker_id);
-        Ok(())
+        if workers.remove(worker_id).is_some() {
+            // Update metrics
+            let mut metrics = self.metrics.write().await;
+            metrics.active_workers = workers.len();
+            Ok(())
+        } else {
+            Err(AppError::Model(format!("Worker '{}' not found", worker_id)))
+        }
     }
 
     pub async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
-        // Выбор воркера согласно стратегии балансировки
+        // Select worker according to load balancing strategy
         let worker = self.select_worker().await?;
         
-        // Обработка запроса
+        // Process request
         let response = worker.process_request(request).await?;
         
-        // Обновление метрик
+        // Update metrics
         self.update_metrics(&response).await;
         
         Ok(response)
@@ -87,36 +98,40 @@ impl Pool {
     async fn select_worker(&self) -> Result<worker::Worker, AppError> {
         let workers = self.workers.read().await;
         
+        if workers.is_empty() {
+            return Err(AppError::Resource("No workers available".to_string()));
+        }
+        
         match self.config.load_balancing_strategy {
             LoadBalancingStrategy::RoundRobin => {
-                // Простая реализация round-robin
+                // Simple round-robin implementation
                 if let Some((_, worker)) = workers.iter().next() {
                     Ok(worker.clone())
                 } else {
-                    Err(AppError::NoWorkersAvailable)
+                    Err(AppError::Resource("No workers available".to_string()))
                 }
             }
             LoadBalancingStrategy::LeastConnections => {
-                // Выбор воркера с наименьшим количеством соединений
+                // Select worker with least connections
                 workers.iter()
                     .min_by_key(|(_, worker)| worker.get_active_connections())
                     .map(|(_, worker)| worker.clone())
-                    .ok_or(AppError::NoWorkersAvailable)
+                    .ok_or_else(|| AppError::Resource("No workers available".to_string()))
             }
             LoadBalancingStrategy::Weighted => {
-                // Взвешенный выбор на основе метрик
+                // Weighted selection based on metrics
                 workers.iter()
                     .max_by_key(|(_, worker)| worker.get_health_score())
                     .map(|(_, worker)| worker.clone())
-                    .ok_or(AppError::NoWorkersAvailable)
+                    .ok_or_else(|| AppError::Resource("No workers available".to_string()))
             }
             LoadBalancingStrategy::Random => {
-                // Случайный выбор
+                // Random selection
                 use rand::seq::SliceRandom;
                 let worker_list: Vec<_> = workers.values().collect();
                 worker_list.choose(&mut rand::thread_rng())
                     .map(|worker| (*worker).clone())
-                    .ok_or(AppError::NoWorkersAvailable)
+                    .ok_or_else(|| AppError::Resource("No workers available".to_string()))
             }
         }
     }
@@ -136,16 +151,32 @@ impl Pool {
 
     pub async fn scale_up(&self) -> Result<(), AppError> {
         if self.config.auto_scaling {
-            // Логика масштабирования
-            todo!("Implement scaling logic")
+            let workers = self.workers.read().await;
+            if workers.len() < self.config.max_workers {
+                // Add new worker logic
+                log::info!("Scaling up pool - adding new worker");
+                // TODO: Implement actual worker creation
+            }
         }
         Ok(())
     }
 
     pub async fn scale_down(&self) -> Result<(), AppError> {
         if self.config.auto_scaling {
-            // Логика уменьшения масштаба
-            todo!("Implement downscaling logic")
+            let workers = self.workers.read().await;
+            if workers.len() > 1 {
+                // Remove worker logic
+                log::info!("Scaling down pool - removing worker");
+                // TODO: Implement actual worker removal
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn distribute_resources(&self) -> Result<(), AppError> {
+        let workers = self.workers.read().await;
+        for worker in workers.values() {
+            worker.optimize_resources().await?;
         }
         Ok(())
     }

@@ -34,37 +34,37 @@ impl RAIDManager {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Инициализация RAID подсистемы
-        // В реальной реализации здесь будет:
-        // - Загрузка модулей ядра (md, raid)
-        // - Проверка доступности mdadm
-        // - Инициализация мониторинга
+        // Initialize RAID subsystem
+        // In real implementation, this would include:
+        // - Loading kernel modules (md, raid)
+        // - Checking mdadm availability
+        // - Initializing monitoring
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Выключение RAID подсистемы
-        // В реальной реализации здесь будет:
-        // - Остановка всех массивов
-        // - Выгрузка модулей
+        // Shutdown RAID subsystem
+        // In real implementation, this would include:
+        // - Stopping all arrays
+        // - Unloading modules
         
         Ok(())
     }
 
     pub async fn create_array(&self, name: &str, config: &RAIDConfig) -> Result<(), AppError> {
-        // Создание RAID массива
+        // Create RAID array
         let raid_level_str = self.raid_level_to_string(&config.raid_level);
         let devices_str = config.devices.join(" ");
         
-        // Заглушка для создания RAID массива
-        // В реальной реализации здесь будет вызов mdadm:
+        // Stub for creating RAID array
+        // In real implementation, this would call mdadm:
         // mdadm --create /dev/md/{name} --level={level} --raid-devices={count} {devices}
         
-        // Симуляция создания массива
+        // Simulate array creation
         tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
         
-        // Создание информации о массиве
+        // Create array info
         let array_info = RAIDArrayInfo {
             name: name.to_string(),
             raid_level: config.raid_level.clone(),
@@ -78,7 +78,7 @@ impl RAIDManager {
             spare_devices: config.spare_devices.len(),
         };
         
-        // Регистрация массива
+        // Register array
         {
             let mut arrays = self.arrays.write().await;
             arrays.insert(name.to_string(), array_info);
@@ -88,14 +88,14 @@ impl RAIDManager {
     }
 
     pub async fn destroy_array(&self, name: &str) -> Result<(), AppError> {
-        // Уничтожение RAID массива
-        // В реальной реализации здесь будет вызов mdadm:
+        // Destroy RAID array
+        // In real implementation, this would call mdadm:
         // mdadm --stop /dev/md/{name}
         
-        // Симуляция уничтожения массива
+        // Simulate array destruction
         tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
         
-        // Удаление информации о массиве
+        // Remove array info
         {
             let mut arrays = self.arrays.write().await;
             arrays.remove(name);
@@ -110,14 +110,14 @@ impl RAIDManager {
     }
 
     pub async fn add_device(&self, array_name: &str, device_path: &str) -> Result<(), AppError> {
-        // Добавление устройства в RAID массив
-        // В реальной реализации здесь будет вызов mdadm:
+        // Add device to RAID array
+        // In real implementation, this would call mdadm:
         // mdadm --add /dev/md/{array_name} {device_path}
         
-        // Симуляция добавления устройства
+        // Simulate adding device
         tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
         
-        // Обновление информации о массиве
+        // Update array info
         {
             let mut arrays = self.arrays.write().await;
             if let Some(array) = arrays.get_mut(array_name) {
@@ -131,14 +131,14 @@ impl RAIDManager {
     }
 
     pub async fn remove_device(&self, array_name: &str, device_path: &str) -> Result<(), AppError> {
-        // Удаление устройства из RAID массива
-        // В реальной реализации здесь будет вызов mdadm:
+        // Remove device from RAID array
+        // In real implementation, this would call mdadm:
         // mdadm --remove /dev/md/{array_name} {device_path}
         
-        // Симуляция удаления устройства
+        // Simulate removing device
         tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
         
-        // Обновление информации о массиве
+        // Update array info
         {
             let mut arrays = self.arrays.write().await;
             if let Some(array) = arrays.get_mut(array_name) {
@@ -152,18 +152,18 @@ impl RAIDManager {
     }
 
     pub async fn start_rebuild(&self, array_name: &str) -> Result<(), AppError> {
-        // Запуск перестроения RAID массива
-        // В реальной реализации здесь будет:
-        // - Проверка наличия spare устройств
-        // - Запуск процесса перестроения
+        // Start RAID array rebuild
+        // In real implementation, this would include:
+        // - Checking for spare devices
+        // - Starting rebuild process
         
-        // Симуляция запуска перестроения
+        // Simulate starting rebuild
         {
             let mut rebuild_progress = self.rebuild_progress.write().await;
             rebuild_progress.insert(array_name.to_string(), 0.0);
         }
         
-        // Запуск фонового процесса перестроения
+        // Start background rebuild process
         let array_name = array_name.to_string();
         let rebuild_progress = self.rebuild_progress.clone();
         
@@ -191,35 +191,32 @@ impl RAIDManager {
     }
 
     pub async fn check_health(&self, array_name: &str) -> Result<f32, AppError> {
-        // Проверка здоровья RAID массива
+        // Check RAID array health
         let arrays = self.arrays.read().await;
         
         if let Some(array) = arrays.get(array_name) {
             let total_devices = array.device_count as f32;
             let working_devices = array.working_devices as f32;
             
-            if total_devices > 0.0 {
-                Ok((working_devices / total_devices) * 100.0)
-            } else {
-                Ok(0.0)
-            }
+            // Calculate health percentage
+            let health_percentage = (working_devices / total_devices) * 100.0;
+            Ok(health_percentage)
         } else {
-            Err(AppError::ArrayNotFound)
+            Err(AppError::Model(format!("RAID array '{}' not found", array_name)))
         }
     }
 
     pub async fn get_metrics(&self, array_name: &str) -> Result<RAIDMetrics, AppError> {
-        // Получение метрик RAID массива
-        // В реальной реализации здесь будет чтение /proc/mdstat и /sys/block/md*/stat
+        // Get RAID array metrics
+        // In real implementation, this would read from /proc/mdstat or similar
         
-        // Симуляция метрик
         Ok(RAIDMetrics {
             array_name: array_name.to_string(),
-            read_throughput_mbps: 150.5 + rand::random::<f32>() * 50.0,
-            write_throughput_mbps: 80.2 + rand::random::<f32>() * 30.0,
-            io_operations_per_sec: 1250.0 + rand::random::<f64>() * 500.0,
-            average_response_time_ms: 2.5 + rand::random::<f64>() * 1.5,
-            error_count: rand::random::<u64>() % 10,
+            read_throughput_mbps: 150.5,
+            write_throughput_mbps: 75.2,
+            io_operations_per_sec: 1250.0,
+            average_response_time_ms: 2.5,
+            error_count: 0,
             rebuild_progress_percent: self.get_rebuild_progress(array_name).await.unwrap_or(0.0),
         })
     }
@@ -235,22 +232,20 @@ impl RAIDManager {
     }
 
     async fn calculate_array_size(&self, raid_level: &RAIDLevel, devices: &[String]) -> Result<u64, AppError> {
-        // Простая оценка размера массива
-        // В реальной реализации здесь будет получение реальных размеров устройств
+        // Calculate RAID array size based on level and devices
+        let device_count = devices.len();
+        let device_size_gb = 1000; // Assume 1TB per device for simulation
         
-        let device_count = devices.len() as u64;
-        let device_size = 1000 * 1024 * 1024 * 1024; // 1TB per device
-        
-        let total_size = match raid_level {
-            RAIDLevel::RAID0 => device_count * device_size,
-            RAIDLevel::RAID1 => device_size,
-            RAIDLevel::RAID5 => (device_count - 1) * device_size,
-            RAIDLevel::RAID6 => (device_count - 2) * device_size,
-            RAIDLevel::RAID10 => (device_count / 2) * device_size,
-            RAIDLevel::JBOD => device_count * device_size,
+        let total_size_gb = match raid_level {
+            RAIDLevel::RAID0 => device_count * device_size_gb,
+            RAIDLevel::RAID1 => device_size_gb, // Mirroring
+            RAIDLevel::RAID5 => (device_count - 1) * device_size_gb,
+            RAIDLevel::RAID6 => (device_count - 2) * device_size_gb,
+            RAIDLevel::RAID10 => (device_count / 2) * device_size_gb,
+            RAIDLevel::JBOD => device_count * device_size_gb,
         };
         
-        Ok(total_size)
+        Ok(total_size_gb as u64 * 1024 * 1024 * 1024) // Convert to bytes
     }
 
     fn raid_level_to_string(&self, raid_level: &RAIDLevel) -> String {

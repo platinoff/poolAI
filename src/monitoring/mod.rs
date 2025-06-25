@@ -77,7 +77,7 @@ impl Monitoring {
         let mut alerts = self.alerts.write().await;
         alerts.push(alert);
         
-        // Проверка лимитов алертов
+        // Check alert limits
         if alerts.len() > 1000 {
             alerts.retain(|a| !a.resolved);
         }
@@ -89,17 +89,17 @@ impl Monitoring {
         let mut current_status = self.status.write().await;
         *current_status = status;
         
-        // Сохранение исторических данных
+        // Save historical data
         let historical_entry = HistoricalData {
             timestamp: Instant::now(),
-            metrics: HashMap::new(), // Будет заполнено из метрик
+            metrics: HashMap::new(), // Will be filled from metrics
             alerts: self.alerts.read().await.clone(),
         };
         
         let mut historical_data = self.historical_data.write().await;
         historical_data.push(historical_entry);
         
-        // Ограничение размера исторических данных
+        // Limit historical data size
         if historical_data.len() > 10000 {
             historical_data.drain(0..1000);
         }
@@ -135,7 +135,7 @@ impl Monitoring {
             alert.resolved = true;
             Ok(())
         } else {
-            Err(AppError::AlertNotFound)
+            Err(AppError::Model(format!("Alert '{}' not found", alert_id)))
         }
     }
 
@@ -144,7 +144,7 @@ impl Monitoring {
     }
 
     pub async fn start_monitoring(&self) -> Result<(), AppError> {
-        // Запуск фонового мониторинга
+        // Start background monitoring
         let metrics_collector = self.metrics_collector.clone();
         let status = self.status.clone();
         
@@ -154,15 +154,15 @@ impl Monitoring {
             loop {
                 interval.tick().await;
                 
-                // Сбор метрик
+                // Collect metrics
                 if let Ok(metrics) = metrics_collector.collect().await {
-                    // Обновление статуса на основе метрик
+                    // Update status based on metrics
                     let mut current_status = status.write().await;
                     current_status.gpu_utilization = metrics.gpu_utilization;
                     current_status.memory_usage_mb = metrics.memory_usage_mb;
                     current_status.average_response_time_ms = metrics.average_response_time_ms;
                     
-                    // Расчет общего здоровья системы
+                    // Calculate overall system health
                     let health_score = Self::calculate_health_score(&metrics);
                     current_status.overall_health = health_score;
                 }
@@ -173,9 +173,9 @@ impl Monitoring {
     }
 
     fn calculate_health_score(metrics: &metrics::Metrics) -> f32 {
-        let mut score = 100.0;
+        let mut score: f32 = 100.0;
         
-        // Штрафы за различные проблемы
+        // Penalties for various issues
         if metrics.gpu_utilization > 90.0 {
             score -= 20.0;
         }

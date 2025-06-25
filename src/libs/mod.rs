@@ -75,23 +75,23 @@ impl Libs {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Инициализация менеджера библиотек
+        // Initialize library manager
         self.lib_manager.initialize().await?;
         
-        // Сканирование доступных библиотек
+        // Scan available libraries
         self.scan_libraries().await?;
         
-        // Загрузка стандартных библиотек
+        // Load standard libraries
         self.load_standard_libraries().await?;
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Выгрузка всех библиотек
+        // Unload all libraries
         self.unload_all_libraries().await?;
         
-        // Выключение менеджера
+        // Shutdown manager
         self.lib_manager.shutdown().await?;
         
         Ok(())
@@ -105,17 +105,17 @@ impl Libs {
         
         if let Some(library) = library_info {
             if !library.is_loaded {
-                // Загрузка библиотеки через менеджер
+                // Load library through manager
                 self.lib_manager.load_library(&library.path).await?;
                 
-                // Обновление статуса
+                // Update status
                 let mut libraries = self.libraries.write().await;
                 if let Some(lib) = libraries.get_mut(name) {
                     lib.is_loaded = true;
                 }
             }
         } else {
-            return Err(AppError::LibraryNotFound);
+            return Err(AppError::Model(format!("Library '{}' not found", name)));
         }
         
         Ok(())
@@ -129,17 +129,17 @@ impl Libs {
         
         if let Some(library) = library_info {
             if library.is_loaded {
-                // Выгрузка библиотеки через менеджер
+                // Unload library through manager
                 self.lib_manager.unload_library(&library.path).await?;
                 
-                // Обновление статуса
+                // Update status
                 let mut libraries = self.libraries.write().await;
                 if let Some(lib) = libraries.get_mut(name) {
                     lib.is_loaded = false;
                 }
             }
         } else {
-            return Err(AppError::LibraryNotFound);
+            return Err(AppError::Model(format!("Library '{}' not found", name)));
         }
         
         Ok(())
@@ -173,37 +173,37 @@ impl Libs {
     }
 
     pub async fn optimize_model(&self, model_name: &str, optimization_level: OptimizationLevel) -> Result<(), AppError> {
-        // Получение модели
+        // Get model
         let model_library = {
             let model_libraries = self.model_libraries.read().await;
             model_libraries.get(model_name).cloned()
         };
         
         if let Some(model_lib) = model_library {
-            // Создание оптимизатора
+            // Create optimizer
             let optimizer = tuning::ModelOptimizer::new(model_lib, optimization_level)?;
             
-            // Выполнение оптимизации
+            // Perform optimization
             optimizer.optimize().await?;
         } else {
-            return Err(AppError::ModelNotFound);
+            return Err(AppError::Model(format!("Model '{}' not found", model_name)));
         }
         
         Ok(())
     }
 
     pub async fn update_library(&self, name: &str) -> Result<(), AppError> {
-        // Проверка обновлений через менеджер
+        // Check for updates through manager
         let has_update = self.lib_manager.check_for_updates(name).await?;
         
         if has_update {
-            // Выгрузка старой версии
+            // Unload old version
             self.unload_library(name).await?;
             
-            // Обновление библиотеки
+            // Download and install new version
             self.lib_manager.update_library(name).await?;
             
-            // Загрузка новой версии
+            // Load new version
             self.load_library(name).await?;
         }
         
@@ -219,32 +219,31 @@ impl Libs {
         if let Some(library) = library_info {
             Ok(library.dependencies)
         } else {
-            Err(AppError::LibraryNotFound)
+            Err(AppError::Model(format!("Library '{}' not found", library_name)))
         }
     }
 
     async fn scan_libraries(&self) -> Result<(), AppError> {
-        // Сканирование директории библиотек
-        let libs_path = std::path::Path::new(&self.config.libs_directory);
+        // Scan libraries directory
+        let libs_dir = std::path::Path::new(&self.config.libs_directory);
         
-        if !libs_path.exists() {
-            std::fs::create_dir_all(libs_path)?;
+        if !libs_dir.exists() {
+            std::fs::create_dir_all(libs_dir)?;
         }
         
-        // Сканирование файлов библиотек
-        for entry in std::fs::read_dir(libs_path)? {
+        // Scan for library files
+        for entry in std::fs::read_dir(libs_dir)? {
             let entry = entry?;
             let path = entry.path();
             
             if path.is_file() && path.extension().map_or(false, |ext| ext == "so" || ext == "dll") {
                 let name = path.file_stem().unwrap().to_string_lossy().to_string();
-                
                 let library_info = LibraryInfo {
                     name: name.clone(),
-                    version: "1.0.0".to_string(), // Будет извлечено из метаданных
+                    version: "1.0.0".to_string(),
                     path: path.to_string_lossy().to_string(),
-                    size_mb: path.metadata()?.len() as f32 / (1024.0 * 1024.0),
-                    dependencies: Vec::new(), // Будет заполнено из метаданных
+                    size_mb: path.metadata()?.len() as f32 / 1024.0 / 1024.0,
+                    dependencies: Vec::new(),
                     is_loaded: false,
                     last_updated: std::time::Instant::now(),
                 };
@@ -258,19 +257,12 @@ impl Libs {
     }
 
     async fn load_standard_libraries(&self) -> Result<(), AppError> {
-        // Загрузка стандартных библиотек
-        let standard_libs = vec![
-            "cuda",
-            "cudnn",
-            "tensorrt",
-            "onnxruntime",
-        ];
+        // Load essential libraries
+        let standard_libs = vec!["core", "utils", "math"];
         
         for lib_name in standard_libs {
-            if let Some(library) = self.get_library_info(lib_name).await {
-                if !library.is_loaded {
-                    self.load_library(lib_name).await?;
-                }
+            if let Some(_) = self.get_library_info(lib_name).await {
+                self.load_library(lib_name).await?;
             }
         }
         
@@ -279,13 +271,12 @@ impl Libs {
 
     async fn unload_all_libraries(&self) -> Result<(), AppError> {
         let libraries = self.libraries.read().await;
-        let loaded_libraries: Vec<String> = libraries
-            .iter()
+        let loaded_libs: Vec<String> = libraries.iter()
             .filter(|(_, lib)| lib.is_loaded)
             .map(|(name, _)| name.clone())
             .collect();
         
-        for lib_name in loaded_libraries {
+        for lib_name in loaded_libs {
             self.unload_library(&lib_name).await?;
         }
         

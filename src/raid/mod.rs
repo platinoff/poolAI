@@ -94,18 +94,18 @@ impl RAID {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Инициализация RAID менеджера
+        // Initialize RAID manager
         self.raid_manager.initialize().await?;
         
-        // Сканирование существующих RAID массивов
+        // Scan existing RAID arrays
         self.scan_existing_arrays().await?;
         
-        // Создание RAID массива если указаны устройства
+        // Create RAID array if devices are specified
         if !self.config.devices.is_empty() {
             self.create_raid_array("poolai_raid", self.config.clone()).await?;
         }
         
-        // Запуск мониторинга
+        // Start monitoring
         if self.config.enable_monitoring {
             self.start_monitoring().await?;
         }
@@ -114,23 +114,23 @@ impl RAID {
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Остановка мониторинга
-        // Выключение RAID менеджера
+        // Stop monitoring
+        // Shutdown RAID manager
         self.raid_manager.shutdown().await?;
         
         Ok(())
     }
 
     pub async fn create_raid_array(&self, name: &str, config: RAIDConfig) -> Result<(), AppError> {
-        // Создание RAID массива через менеджер
+        // Create RAID array through manager
         self.raid_manager.create_array(name, &config).await?;
         
-        // Создание записи массива
+        // Create array record
         let devices: Vec<RAIDDevice> = config.devices.iter().map(|device_path| {
             RAIDDevice {
                 device_path: device_path.clone(),
                 status: DeviceStatus::Online,
-                capacity_gb: 1000.0, // Будет получено из системы
+                capacity_gb: 1000.0, // Will be obtained from system
                 health_percent: 100.0,
                 last_error: None,
             }
@@ -148,13 +148,13 @@ impl RAID {
             created_at: std::time::Instant::now(),
         };
         
-        // Регистрация массива
+        // Register array
         {
             let mut arrays = self.arrays.write().await;
             arrays.insert(name.to_string(), raid_array);
         }
         
-        // Инициализация метрик
+        // Initialize metrics
         {
             let mut metrics = self.metrics.write().await;
             metrics.insert(name.to_string(), RAIDMetrics {
@@ -172,16 +172,16 @@ impl RAID {
     }
 
     pub async fn destroy_raid_array(&self, name: &str) -> Result<(), AppError> {
-        // Уничтожение RAID массива через менеджер
+        // Destroy RAID array through manager
         self.raid_manager.destroy_array(name).await?;
         
-        // Удаление записи массива
+        // Remove array record
         {
             let mut arrays = self.arrays.write().await;
             arrays.remove(name);
         }
         
-        // Удаление метрик
+        // Remove metrics
         {
             let mut metrics = self.metrics.write().await;
             metrics.remove(name);
@@ -206,24 +206,23 @@ impl RAID {
     }
 
     pub async fn add_device(&self, array_name: &str, device_path: &str) -> Result<(), AppError> {
-        // Добавление устройства в RAID массив
+        // Add device through manager
         self.raid_manager.add_device(array_name, device_path).await?;
         
-        // Обновление записи массива
+        // Update array record
         {
             let mut arrays = self.arrays.write().await;
             if let Some(array) = arrays.get_mut(array_name) {
                 let new_device = RAIDDevice {
                     device_path: device_path.to_string(),
                     status: DeviceStatus::Online,
-                    capacity_gb: 1000.0, // Будет получено из системы
+                    capacity_gb: 1000.0,
                     health_percent: 100.0,
                     last_error: None,
                 };
-                
                 array.devices.push(new_device);
                 
-                // Пересчет общей емкости
+                // Recalculate total capacity
                 array.total_capacity_gb = self.calculate_total_capacity(&array.raid_level, &array.devices);
             }
         }
@@ -232,16 +231,16 @@ impl RAID {
     }
 
     pub async fn remove_device(&self, array_name: &str, device_path: &str) -> Result<(), AppError> {
-        // Удаление устройства из RAID массива
+        // Remove device through manager
         self.raid_manager.remove_device(array_name, device_path).await?;
         
-        // Обновление записи массива
+        // Update array record
         {
             let mut arrays = self.arrays.write().await;
             if let Some(array) = arrays.get_mut(array_name) {
                 array.devices.retain(|device| device.device_path != device_path);
                 
-                // Пересчет общей емкости
+                // Recalculate total capacity
                 array.total_capacity_gb = self.calculate_total_capacity(&array.raid_level, &array.devices);
             }
         }
@@ -250,10 +249,10 @@ impl RAID {
     }
 
     pub async fn start_rebuild(&self, array_name: &str) -> Result<(), AppError> {
-        // Запуск перестроения RAID массива
+        // Start rebuild through manager
         self.raid_manager.start_rebuild(array_name).await?;
         
-        // Обновление статуса
+        // Update array status
         {
             let mut arrays = self.arrays.write().await;
             if let Some(array) = arrays.get_mut(array_name) {
@@ -265,22 +264,17 @@ impl RAID {
     }
 
     pub async fn get_rebuild_progress(&self, array_name: &str) -> Result<f32, AppError> {
-        // Получение прогресса перестроения
         self.raid_manager.get_rebuild_progress(array_name).await
     }
 
     pub async fn check_health(&self, array_name: &str) -> Result<f32, AppError> {
-        // Проверка здоровья RAID массива
         self.raid_manager.check_health(array_name).await
     }
 
     async fn scan_existing_arrays(&self) -> Result<(), AppError> {
-        // Сканирование существующих RAID массивов
-        // В реальной реализации здесь будет:
-        // - Чтение /proc/mdstat
-        // - Анализ mdadm --detail
-        // - Восстановление информации о массивах
-        
+        // Scan existing RAID arrays
+        // In real implementation, this would scan system for existing arrays
+        log::info!("Scanning existing RAID arrays");
         Ok(())
     }
 
@@ -290,27 +284,34 @@ impl RAID {
         let raid_manager = self.raid_manager.clone();
         
         tokio::spawn(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(30));
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(60));
             
             loop {
                 interval.tick().await;
                 
-                // Обновление метрик для всех массивов
                 let array_names: Vec<String> = {
-                    let arrays_read = arrays.read().await;
-                    arrays_read.keys().cloned().collect()
+                    let arrays = arrays.read().await;
+                    arrays.keys().cloned().collect()
                 };
                 
                 for array_name in array_names {
+                    // Update metrics
                     if let Ok(array_metrics) = raid_manager.get_metrics(&array_name).await {
-                        let mut metrics_write = metrics.write().await;
-                        if let Some(metric) = metrics_write.get_mut(&array_name) {
-                            metric.read_throughput_mbps = array_metrics.read_throughput_mbps;
-                            metric.write_throughput_mbps = array_metrics.write_throughput_mbps;
-                            metric.io_operations_per_sec = array_metrics.io_operations_per_sec;
-                            metric.average_response_time_ms = array_metrics.average_response_time_ms;
-                            metric.error_count = array_metrics.error_count;
-                            metric.rebuild_progress_percent = array_metrics.rebuild_progress_percent;
+                        let mut metrics = metrics.write().await;
+                        if let Some(existing_metrics) = metrics.get_mut(&array_name) {
+                            existing_metrics.read_throughput_mbps = array_metrics.read_throughput_mbps;
+                            existing_metrics.write_throughput_mbps = array_metrics.write_throughput_mbps;
+                            existing_metrics.io_operations_per_sec = array_metrics.io_operations_per_sec;
+                            existing_metrics.average_response_time_ms = array_metrics.average_response_time_ms;
+                            existing_metrics.error_count = array_metrics.error_count;
+                            existing_metrics.rebuild_progress_percent = array_metrics.rebuild_progress_percent;
+                        }
+                    }
+                    
+                    // Check health
+                    if let Ok(health) = raid_manager.check_health(&array_name).await {
+                        if health < 50.0 {
+                            log::warn!("RAID array {} health is low: {}%", array_name, health);
                         }
                     }
                 }
@@ -321,16 +322,15 @@ impl RAID {
     }
 
     fn calculate_total_capacity(&self, raid_level: &RAIDLevel, devices: &[RAIDDevice]) -> f32 {
-        let total_devices = devices.len() as f32;
-        let device_capacity = devices.iter().map(|d| d.capacity_gb).sum::<f32>();
+        let total_capacity: f32 = devices.iter().map(|d| d.capacity_gb).sum();
         
         match raid_level {
-            RAIDLevel::RAID0 => device_capacity,
-            RAIDLevel::RAID1 => device_capacity / total_devices,
-            RAIDLevel::RAID5 => device_capacity * (total_devices - 1.0) / total_devices,
-            RAIDLevel::RAID6 => device_capacity * (total_devices - 2.0) / total_devices,
-            RAIDLevel::RAID10 => device_capacity / 2.0,
-            RAIDLevel::JBOD => device_capacity,
+            RAIDLevel::RAID0 => total_capacity,
+            RAIDLevel::RAID1 => total_capacity / 2.0,
+            RAIDLevel::RAID5 => total_capacity * (devices.len() as f32 - 1.0) / devices.len() as f32,
+            RAIDLevel::RAID6 => total_capacity * (devices.len() as f32 - 2.0) / devices.len() as f32,
+            RAIDLevel::RAID10 => total_capacity / 2.0,
+            RAIDLevel::JBOD => total_capacity,
         }
     }
 } 

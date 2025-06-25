@@ -53,7 +53,7 @@ impl Network {
     }
 
     pub async fn start(&mut self) -> Result<(), AppError> {
-        // Создание и запуск API сервера
+        // Create and start API server
         let api_server = api::ApiServer::new(
             self.config.clone(),
             self.connections.clone(),
@@ -62,7 +62,7 @@ impl Network {
         
         self.api_server = Some(api_server);
         
-        // Запуск фоновых задач
+        // Start background tasks
         self.start_background_tasks().await?;
         
         Ok(())
@@ -73,7 +73,7 @@ impl Network {
             api_server.shutdown().await?;
         }
         
-        // Закрытие всех соединений
+        // Close all connections
         self.connections.write().await.clear();
         self.rate_limits.write().await.clear();
         
@@ -81,20 +81,20 @@ impl Network {
     }
 
     pub async fn process_request(&self, request: ModelRequest, client_ip: &str) -> Result<ModelResponse, AppError> {
-        // Проверка rate limit
+        // Check rate limit
         self.check_rate_limit(client_ip).await?;
         
-        // Проверка аутентификации
+        // Check authentication
         self.check_authentication(client_ip).await?;
         
-        // Обновление активности соединения
+        // Update connection activity
         self.update_connection_activity(client_ip).await?;
         
-        // Обработка запроса через API
+        // Process request through API
         if let Some(api_server) = &self.api_server {
             api_server.process_model_request(request).await
         } else {
-            Err(AppError::ServiceUnavailable)
+            Err(AppError::Network("Service unavailable".to_string()))
         }
     }
 
@@ -103,22 +103,22 @@ impl Network {
         let now = Instant::now();
         
         if let Some(rate_limit) = rate_limits.get_mut(client_ip) {
-            // Проверка окна времени
+            // Check time window
             if now.duration_since(rate_limit.window_start) > Duration::from_secs(60) {
-                // Сброс счетчика для нового окна
+                // Reset counter for new window
                 rate_limit.requests_in_window = 1;
                 rate_limit.window_start = now;
             } else {
-                // Увеличение счетчика
+                // Increment counter
                 rate_limit.requests_in_window += 1;
                 
-                // Проверка лимита
+                // Check limit
                 if rate_limit.requests_in_window > self.config.rate_limit_requests_per_minute {
-                    return Err(AppError::RateLimitExceeded);
+                    return Err(AppError::Network("Rate limit exceeded".to_string()));
                 }
             }
         } else {
-            // Создание новой записи
+            // Create new entry
             rate_limits.insert(client_ip.to_string(), RateLimitInfo {
                 client_ip: client_ip.to_string(),
                 requests_in_window: 1,
@@ -134,10 +134,10 @@ impl Network {
         
         if let Some(connection) = connections.get(client_ip) {
             if !connection.is_authenticated {
-                return Err(AppError::AuthenticationRequired);
+                return Err(AppError::Network("Authentication required".to_string()));
             }
         } else {
-            return Err(AppError::ConnectionNotFound);
+            return Err(AppError::Network("Connection not found".to_string()));
         }
         
         Ok(())
@@ -157,9 +157,9 @@ impl Network {
     pub async fn add_connection(&self, connection_info: ConnectionInfo) -> Result<(), AppError> {
         let mut connections = self.connections.write().await;
         
-        // Проверка лимита соединений
+        // Check connection limit
         if connections.len() >= self.config.max_connections {
-            return Err(AppError::ConnectionLimitExceeded);
+            return Err(AppError::Network("Connection limit exceeded".to_string()));
         }
         
         connections.insert(connection_info.connection_id.clone(), connection_info);
@@ -185,13 +185,13 @@ impl Network {
     }
 
     pub async fn authenticate_connection(&self, connection_id: &str, token: &str) -> Result<bool, AppError> {
-        // Заглушка для аутентификации
-        // В реальной реализации здесь будет проверка токена
+        // Stub for authentication
+        // In real implementation, token verification would happen here
         
         let mut connections = self.connections.write().await;
         
         if let Some(connection) = connections.get_mut(connection_id) {
-            // Простая проверка токена
+            // Simple token check
             if token == "valid_token" {
                 connection.is_authenticated = true;
                 Ok(true)
@@ -199,53 +199,28 @@ impl Network {
                 Ok(false)
             }
         } else {
-            Err(AppError::ConnectionNotFound)
+            Err(AppError::Network("Connection not found".to_string()))
         }
     }
 
     async fn start_background_tasks(&self) -> Result<(), AppError> {
+        // Start connection cleanup task
         let connections = self.connections.clone();
-        let rate_limits = self.rate_limits.clone();
-        let connection_timeout = Duration::from_millis(self.config.connection_timeout_ms);
+        let config = self.config.clone();
         
-        // Задача очистки неактивных соединений
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(Duration::from_secs(60));
             
             loop {
                 interval.tick().await;
                 
+                let mut connections = connections.write().await;
                 let now = Instant::now();
-                let mut connections_to_remove = Vec::new();
-                let mut rate_limits_to_remove = Vec::new();
+                let timeout = Duration::from_millis(config.connection_timeout_ms);
                 
-                // Очистка неактивных соединений
-                {
-                    let mut conns = connections.write().await;
-                    for (connection_id, connection) in conns.iter() {
-                        if now.duration_since(connection.last_activity) > connection_timeout {
-                            connections_to_remove.push(connection_id.clone());
-                        }
-                    }
-                    
-                    for connection_id in connections_to_remove {
-                        conns.remove(&connection_id);
-                    }
-                }
-                
-                // Очистка устаревших rate limits
-                {
-                    let mut rate_lims = rate_limits.write().await;
-                    for (client_ip, rate_limit) in rate_lims.iter() {
-                        if now.duration_since(rate_limit.window_start) > Duration::from_secs(120) {
-                            rate_limits_to_remove.push(client_ip.clone());
-                        }
-                    }
-                    
-                    for client_ip in rate_limits_to_remove {
-                        rate_lims.remove(&client_ip);
-                    }
-                }
+                connections.retain(|_, connection| {
+                    now.duration_since(connection.last_activity) < timeout
+                });
             }
         });
         

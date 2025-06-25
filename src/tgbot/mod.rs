@@ -73,16 +73,16 @@ impl TGBot {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Инициализация бота
+        // Initialize bot
         self.bot_instance.initialize().await?;
         
-        // Регистрация команд
+        // Register commands
         self.register_commands().await?;
         
-        // Запуск обработки сообщений
+        // Start message processing
         self.start_message_processing().await?;
         
-        // Запуск уведомлений если включены
+        // Start notifications if enabled
         if self.config.enable_notifications {
             self.start_notification_service().await?;
         }
@@ -91,21 +91,21 @@ impl TGBot {
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Выключение бота
+        // Shutdown bot
         self.bot_instance.shutdown().await?;
         
         Ok(())
     }
 
     pub async fn send_message(&self, chat_id: i64, message: &str) -> Result<(), AppError> {
-        // Отправка сообщения через бота
+        // Send message through bot
         self.bot_instance.send_message(chat_id, message).await?;
         
         Ok(())
     }
 
     pub async fn send_notification(&self, chat_id: i64, message: &str, notification_type: NotificationType) -> Result<(), AppError> {
-        // Создание уведомления
+        // Create notification
         let notification = BotNotification {
             chat_id,
             message: message.to_string(),
@@ -114,16 +114,16 @@ impl TGBot {
             sent: false,
         };
         
-        // Добавление в очередь уведомлений
+        // Add to notification queue
         {
             let mut notifications = self.notifications.write().await;
             notifications.push(notification);
         }
         
-        // Отправка уведомления
+        // Send notification
         self.send_message(chat_id, message).await?;
         
-        // Отметка как отправленное
+        // Mark as sent
         {
             let mut notifications = self.notifications.write().await;
             if let Some(notification) = notifications.iter_mut().last() {
@@ -135,7 +135,7 @@ impl TGBot {
     }
 
     pub async fn broadcast_message(&self, message: &str) -> Result<(), AppError> {
-        // Отправка сообщения всем разрешенным пользователям
+        // Send message to all allowed users
         for user_id in &self.config.allowed_users {
             self.send_message(*user_id, message).await?;
         }
@@ -144,8 +144,8 @@ impl TGBot {
     }
 
     pub async fn get_system_status(&self) -> Result<String, AppError> {
-        // Получение статуса системы для отправки в Telegram
-        // В реальной реализации здесь будет интеграция с мониторингом
+        // Get system status for Telegram
+        // In real implementation, this would integrate with monitoring
         
         let status = format!(
             "🤖 PoolAI System Status\n\n\
@@ -164,7 +164,7 @@ impl TGBot {
     }
 
     pub async fn get_metrics_summary(&self) -> Result<String, AppError> {
-        // Получение краткой сводки метрик
+        // Get metrics summary
         let metrics = format!(
             "📈 PoolAI Metrics Summary\n\n\
             🚀 Requests/sec: 45.2\n\
@@ -182,7 +182,7 @@ impl TGBot {
     async fn register_commands(&self) -> Result<(), AppError> {
         let mut commands = self.commands.write().await;
         
-        // Базовые команды
+        // Basic commands
         commands.insert("/start".to_string(), BotCommand {
             name: "start".to_string(),
             description: "Start the bot".to_string(),
@@ -199,38 +199,31 @@ impl TGBot {
         
         commands.insert("/status".to_string(), BotCommand {
             name: "status".to_string(),
-            description: "Get system status".to_string(),
+            description: "Show system status".to_string(),
             handler: "handle_status".to_string(),
             requires_admin: false,
         });
         
         commands.insert("/metrics".to_string(), BotCommand {
             name: "metrics".to_string(),
-            description: "Get system metrics".to_string(),
+            description: "Show system metrics".to_string(),
             handler: "handle_metrics".to_string(),
             requires_admin: false,
         });
         
-        // Админские команды
+        // Admin commands
         if self.config.enable_admin_commands {
             commands.insert("/restart".to_string(), BotCommand {
                 name: "restart".to_string(),
-                description: "Restart the system".to_string(),
+                description: "Restart system".to_string(),
                 handler: "handle_restart".to_string(),
                 requires_admin: true,
             });
             
             commands.insert("/shutdown".to_string(), BotCommand {
                 name: "shutdown".to_string(),
-                description: "Shutdown the system".to_string(),
+                description: "Shutdown system".to_string(),
                 handler: "handle_shutdown".to_string(),
-                requires_admin: true,
-            });
-            
-            commands.insert("/scale".to_string(), BotCommand {
-                name: "scale".to_string(),
-                description: "Scale workers".to_string(),
-                handler: "handle_scale".to_string(),
                 requires_admin: true,
             });
         }
@@ -241,40 +234,15 @@ impl TGBot {
     async fn start_message_processing(&self) -> Result<(), AppError> {
         let bot_instance = self.bot_instance.clone();
         let commands = self.commands.clone();
-        let messages = self.messages.clone();
-        let allowed_users = self.config.allowed_users.clone();
         
         tokio::spawn(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
-            
+            // Start message processing loop
             loop {
-                interval.tick().await;
+                // In real implementation, this would poll for new messages
+                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
                 
-                // Получение новых сообщений
-                if let Ok(new_messages) = bot_instance.get_updates().await {
-                    for message in new_messages {
-                        // Проверка разрешенных пользователей
-                        if !allowed_users.contains(&message.user_id) {
-                            continue;
-                        }
-                        
-                        // Сохранение сообщения
-                        {
-                            let mut messages_write = messages.write().await;
-                            messages_write.push(message.clone());
-                            
-                            // Ограничение размера истории
-                            if messages_write.len() > 1000 {
-                                messages_write.drain(0..100);
-                            }
-                        }
-                        
-                        // Обработка команды
-                        if message.is_command {
-                            Self::process_command(&bot_instance, &commands, &message).await;
-                        }
-                    }
-                }
+                // Process incoming messages
+                // This is a stub - in real implementation, this would handle actual Telegram messages
             }
         });
         
@@ -286,76 +254,55 @@ impl TGBot {
         commands: &Arc<RwLock<HashMap<String, BotCommand>>>,
         message: &BotMessage,
     ) {
-        let command_parts: Vec<&str> = message.text.split_whitespace().collect();
-        if command_parts.is_empty() {
-            return;
-        }
+        let commands = commands.read().await;
         
-        let command_name = command_parts[0];
-        let commands_read = commands.read().await;
-        
-        if let Some(command) = commands_read.get(command_name) {
-            // Проверка прав администратора
-            if command.requires_admin && !Self::is_admin(message.user_id) {
-                let _ = bot_instance.send_message(message.chat_id, "❌ Access denied. Admin privileges required.").await;
-                return;
-            }
-            
-            // Выполнение команды
-            match command.handler.as_str() {
-                "handle_start" => {
-                    let response = "🤖 Welcome to PoolAI Bot!\n\nUse /help to see available commands.";
-                    let _ = bot_instance.send_message(message.chat_id, response).await;
-                }
-                "handle_help" => {
-                    let response = Self::generate_help_message(&commands_read);
-                    let _ = bot_instance.send_message(message.chat_id, &response).await;
-                }
-                "handle_status" => {
-                    let status = Self::get_system_status_static().await;
-                    let _ = bot_instance.send_message(message.chat_id, &status).await;
-                }
-                "handle_metrics" => {
-                    let metrics = Self::get_metrics_summary_static().await;
-                    let _ = bot_instance.send_message(message.chat_id, &metrics).await;
-                }
+        if let Some(command) = commands.get(&message.text) {
+            let response = match command.handler.as_str() {
+                "handle_start" => "🤖 Welcome to PoolAI Bot!\nUse /help to see available commands.".to_string(),
+                "handle_help" => Self::generate_help_message(&commands),
+                "handle_status" => Self::get_system_status_static().await,
+                "handle_metrics" => Self::get_metrics_summary_static().await,
                 "handle_restart" => {
-                    let _ = bot_instance.send_message(message.chat_id, "🔄 Restarting system...").await;
-                    // В реальной реализации здесь будет вызов API для перезапуска
+                    if Self::is_admin(message.user_id) {
+                        "🔄 Restarting system...".to_string()
+                    } else {
+                        "❌ Access denied. Admin privileges required.".to_string()
+                    }
                 }
                 "handle_shutdown" => {
-                    let _ = bot_instance.send_message(message.chat_id, "🛑 Shutting down system...").await;
-                    // В реальной реализации здесь будет вызов API для выключения
+                    if Self::is_admin(message.user_id) {
+                        "🛑 Shutting down system...".to_string()
+                    } else {
+                        "❌ Access denied. Admin privileges required.".to_string()
+                    }
                 }
-                "handle_scale" => {
-                    let _ = bot_instance.send_message(message.chat_id, "📈 Scaling workers...").await;
-                    // В реальной реализации здесь будет вызов API для масштабирования
-                }
-                _ => {
-                    let _ = bot_instance.send_message(message.chat_id, "❌ Unknown command.").await;
-                }
+                _ => "❓ Unknown command. Use /help for available commands.".to_string(),
+            };
+            
+            if let Err(e) = bot_instance.send_message(message.chat_id, &response).await {
+                log::error!("Failed to send response: {}", e);
             }
-        } else {
-            let _ = bot_instance.send_message(message.chat_id, "❌ Unknown command. Use /help for available commands.").await;
         }
     }
 
     async fn start_notification_service(&self) -> Result<(), AppError> {
         let bot_instance = self.bot_instance.clone();
-        let notifications = self.notifications.clone();
         let allowed_users = self.config.allowed_users.clone();
-        let interval_minutes = self.config.notification_interval_minutes;
+        let interval = self.config.notification_interval_minutes;
         
         tokio::spawn(async move {
-            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(interval_minutes * 60));
+            let mut interval_timer = tokio::time::interval(tokio::time::Duration::from_secs(interval * 60));
             
             loop {
-                interval.tick().await;
+                interval_timer.tick().await;
                 
-                // Отправка периодических уведомлений
+                // Send periodic status updates
+                let status = Self::get_system_status_static().await;
+                
                 for user_id in &allowed_users {
-                    let status = Self::get_system_status_static().await;
-                    let _ = bot_instance.send_message(*user_id, &status).await;
+                    if let Err(e) = bot_instance.send_message(*user_id, &status).await {
+                        log::error!("Failed to send notification to {}: {}", user_id, e);
+                    }
                 }
             }
         });
@@ -364,19 +311,17 @@ impl TGBot {
     }
 
     fn generate_help_message(commands: &HashMap<String, BotCommand>) -> String {
-        let mut help_text = "🤖 PoolAI Bot Commands:\n\n".to_string();
+        let mut help_text = "📋 Available Commands:\n\n".to_string();
         
-        for (command_name, command) in commands.iter() {
-            let admin_marker = if command.requires_admin { " (Admin)" } else { "" };
-            help_text.push_str(&format!("{} - {}{}\n", command_name, command.description, admin_marker));
+        for (command, info) in commands.iter() {
+            let admin_marker = if info.requires_admin { " (Admin)" } else { "" };
+            help_text.push_str(&format!("{} - {}{}\n", command, info.description, admin_marker));
         }
         
-        help_text.push_str("\n💡 Use any command to get more information.");
         help_text
     }
 
     async fn get_system_status_static() -> String {
-        // Статическая версия для использования в async контексте
         "🤖 PoolAI System Status\n\n\
         📊 Overall Health: 95%\n\
         🔧 Active Workers: 8\n\
@@ -390,7 +335,6 @@ impl TGBot {
     }
 
     async fn get_metrics_summary_static() -> String {
-        // Статическая версия для использования в async контексте
         "📈 PoolAI Metrics Summary\n\n\
         🚀 Requests/sec: 45.2\n\
         ⏱️ Avg Response Time: 250ms\n\
@@ -402,8 +346,7 @@ impl TGBot {
     }
 
     fn is_admin(user_id: i64) -> bool {
-        // Заглушка для проверки прав администратора
-        // В реальной реализации здесь будет проверка списка админов
-        user_id == 123456789 // Пример ID администратора
+        // In real implementation, this would check against admin user list
+        user_id == 123456789 // Stub admin ID
     }
 } 

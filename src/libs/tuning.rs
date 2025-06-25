@@ -78,28 +78,28 @@ impl ModelOptimizer {
         let mut iterations = 0;
         
         while iterations < self.config.max_iterations {
-            // Проверка таймаута
+            // Check timeout
             if start_time.elapsed().as_secs() > self.config.optimization_timeout_minutes * 60 {
                 break;
             }
             
-            // Генерация конфигурации
+            // Generate configuration
             let config = self.generate_configuration().await?;
             
-            // Выполнение оптимизации
+            // Run optimization trial
             let result = self.run_optimization_trial(&config).await?;
             
-            // Обновление лучшего результата
+            // Update best result
             if result.success && (best_result.is_none() || self.is_better_result(&result, best_result.as_ref().unwrap())) {
                 best_result = Some(result.clone());
             }
             
-            // Сохранение в историю
+            // Save to history
             self.tuning_history.write().await.push(result);
             
             iterations += 1;
             
-            // Проверка достижения целей
+            // Check if targets are met
             if let Some(ref best) = best_result {
                 if best.accuracy >= self.config.target_accuracy &&
                    best.latency_ms <= self.config.target_latency_ms &&
@@ -116,17 +116,17 @@ impl ModelOptimizer {
             result.iterations_performed = iterations;
             Ok(result)
         } else {
-            Err(AppError::OptimizationFailed)
+            Err(AppError::Model("Optimization failed".to_string()))
         }
     }
 
     async fn generate_configuration(&self) -> Result<HashMap<String, serde_json::Value>, AppError> {
         let mut config = HashMap::new();
         
-        // Генерация гиперпараметров в зависимости от уровня оптимизации
+        // Generate hyperparameters based on optimization level
         match self.optimization_level {
             OptimizationLevel::None => {
-                // Базовые параметры
+                // Basic parameters
                 config.insert("learning_rate".to_string(), serde_json::json!(1e-3));
                 config.insert("batch_size".to_string(), serde_json::json!(32));
                 config.insert("optimizer".to_string(), serde_json::json!("adam"));
@@ -135,7 +135,7 @@ impl ModelOptimizer {
                 config.insert("num_epochs".to_string(), serde_json::json!(10));
             }
             OptimizationLevel::Basic => {
-                // Базовые оптимизации
+                // Basic optimizations
                 config.insert("learning_rate".to_string(), serde_json::json!(5e-4));
                 config.insert("batch_size".to_string(), serde_json::json!(64));
                 config.insert("optimizer".to_string(), serde_json::json!("adamw"));
@@ -144,7 +144,7 @@ impl ModelOptimizer {
                 config.insert("num_epochs".to_string(), serde_json::json!(20));
             }
             OptimizationLevel::Advanced => {
-                // Продвинутые оптимизации
+                // Advanced optimizations
                 config.insert("learning_rate".to_string(), serde_json::json!(2e-4));
                 config.insert("batch_size".to_string(), serde_json::json!(128));
                 config.insert("optimizer".to_string(), serde_json::json!("adamw"));
@@ -155,7 +155,7 @@ impl ModelOptimizer {
                 config.insert("learning_rate_scheduler".to_string(), serde_json::json!("cosine"));
             }
             OptimizationLevel::Maximum => {
-                // Максимальные оптимизации
+                // Maximum optimizations
                 config.insert("learning_rate".to_string(), serde_json::json!(1e-4));
                 config.insert("batch_size".to_string(), serde_json::json!(256));
                 config.insert("optimizer".to_string(), serde_json::json!("adamw"));
@@ -169,7 +169,7 @@ impl ModelOptimizer {
             }
         }
         
-        // Добавление специфичных для модели параметров
+        // Add model-specific parameters
         config.insert("model_type".to_string(), serde_json::json!(self.model_library.model_type));
         config.insert("optimization_level".to_string(), serde_json::json!(self.optimization_level));
         
@@ -179,19 +179,19 @@ impl ModelOptimizer {
     async fn run_optimization_trial(&self, config: &HashMap<String, serde_json::Value>) -> Result<TuningResult, AppError> {
         let start_time = std::time::Instant::now();
         
-        // Заглушка для выполнения оптимизации
-        // В реальной реализации здесь будет:
-        // - Загрузка модели
-        // - Применение конфигурации
-        // - Обучение/финтюнинг
-        // - Оценка производительности
+        // Stub for optimization execution
+        // In real implementation, this would include:
+        // - Loading model
+        // - Applying configuration
+        // - Training/fine-tuning
+        // - Performance evaluation
         
-        // Симуляция оптимизации
+        // Simulate optimization
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
         
         let optimization_time = start_time.elapsed().as_secs_f64();
         
-        // Симуляция результатов
+        // Simulate results
         let accuracy = 0.92 + (rand::random::<f32>() * 0.06); // 0.92 - 0.98
         let latency = 80.0 + (rand::random::<f64>() * 40.0); // 80 - 120 ms
         let memory = 1800.0 + (rand::random::<f32>() * 400.0); // 1800 - 2200 MB
@@ -210,10 +210,8 @@ impl ModelOptimizer {
     }
 
     fn is_better_result(&self, new_result: &TuningResult, best_result: &TuningResult) -> bool {
-        // Функция оценки качества результата
         let new_score = self.calculate_score(new_result);
         let best_score = self.calculate_score(best_result);
-        
         new_score > best_score
     }
 
@@ -222,19 +220,13 @@ impl ModelOptimizer {
             return 0.0;
         }
         
-        // Взвешенная оценка по нескольким критериям
+        // Weighted score based on accuracy, latency, and memory
         let accuracy_score = result.accuracy as f64;
-        let latency_score = 1.0 / (1.0 + result.latency_ms / 100.0);
-        let memory_score = 1.0 / (1.0 + result.memory_mb / 2000.0);
+        let latency_score = 1.0 - (result.latency_ms / 1000.0).min(1.0); // Normalize to 0-1
+        let memory_score = 1.0 - (result.memory_mb / 4096.0).min(1.0); // Normalize to 0-1
         
-        // Веса для разных критериев
-        let accuracy_weight = 0.5;
-        let latency_weight = 0.3;
-        let memory_weight = 0.2;
-        
-        accuracy_score * accuracy_weight + 
-        latency_score * latency_weight + 
-        memory_score * memory_weight
+        // Weighted combination
+        0.5 * accuracy_score + 0.3 * latency_score + 0.2 * memory_score
     }
 
     pub async fn get_tuning_history(&self) -> Vec<TuningResult> {
@@ -243,7 +235,6 @@ impl ModelOptimizer {
 
     pub async fn get_best_result(&self) -> Option<TuningResult> {
         let history = self.tuning_history.read().await;
-        
         history.iter()
             .filter(|result| result.success)
             .max_by(|a, b| {
@@ -264,8 +255,8 @@ impl ModelOptimizer {
             "total_trials": history.len(),
             "successful_trials": history.iter().filter(|r| r.success).count(),
             "best_result": best_result,
-            "config": self.config,
-            "history": history.as_slice(),
+            "tuning_history": history,
+            "timestamp": chrono::Utc::now().to_rfc3339(),
         });
         
         Ok(serde_json::to_string_pretty(&report)?)

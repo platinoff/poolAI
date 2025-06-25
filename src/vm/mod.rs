@@ -90,20 +90,20 @@ impl VM {
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
-        // Инициализация VM менеджера
+        // Initialize VM manager
         self.vm_manager.initialize().await?;
         
-        // Инициализация GPU менеджера
+        // Initialize GPU manager
         self.gpu_manager.initialize().await?;
         
-        // Восстановление существующих VM
+        // Restore existing VMs
         self.restore_vm_instances().await?;
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Остановка всех VM
+        // Stop all VMs
         let instances = self.instances.read().await;
         let vm_ids: Vec<String> = instances.keys().cloned().collect();
         
@@ -111,7 +111,7 @@ impl VM {
             self.stop_vm(&vm_id).await?;
         }
         
-        // Выключение менеджеров
+        // Shutdown managers
         self.vm_manager.shutdown().await?;
         self.gpu_manager.shutdown().await?;
         
@@ -119,20 +119,20 @@ impl VM {
     }
 
     pub async fn create_vm(&self, name: String, config: VMInstanceConfig) -> Result<String, AppError> {
-        // Проверка лимитов
+        // Check limits
         let instances = self.instances.read().await;
         if instances.len() >= self.config.max_vms {
-            return Err(AppError::ResourceLimitExceeded);
+            return Err(AppError::Resource("VM limit exceeded".to_string()));
         }
         drop(instances);
         
-        // Генерация ID VM
+        // Generate VM ID
         let vm_id = self.generate_vm_id();
         
-        // Создание VM через менеджер
+        // Create VM through manager
         self.vm_manager.create_vm(&vm_id, &name, &config).await?;
         
-        // Создание записи VM
+        // Create VM record
         let vm_instance = VMInstance {
             id: vm_id.clone(),
             name,
@@ -151,23 +151,23 @@ impl VM {
             last_activity: std::time::Instant::now(),
         };
         
-        // Регистрация VM
+        // Register VM
         {
             let mut instances = self.instances.write().await;
             instances.insert(vm_id.clone(), vm_instance);
         }
         
-        // Запуск VM
+        // Start VM
         self.start_vm(&vm_id).await?;
         
         Ok(vm_id)
     }
 
     pub async fn start_vm(&self, vm_id: &str) -> Result<(), AppError> {
-        // Запуск VM через менеджер
+        // Start VM through manager
         self.vm_manager.start_vm(vm_id).await?;
         
-        // Обновление статуса
+        // Update status
         {
             let mut instances = self.instances.write().await;
             if let Some(instance) = instances.get_mut(vm_id) {
@@ -180,10 +180,10 @@ impl VM {
     }
 
     pub async fn stop_vm(&self, vm_id: &str) -> Result<(), AppError> {
-        // Остановка VM через менеджер
+        // Stop VM through manager
         self.vm_manager.stop_vm(vm_id).await?;
         
-        // Обновление статуса
+        // Update status
         {
             let mut instances = self.instances.write().await;
             if let Some(instance) = instances.get_mut(vm_id) {
@@ -195,7 +195,7 @@ impl VM {
     }
 
     pub async fn destroy_vm(&self, vm_id: &str) -> Result<(), AppError> {
-        // Остановка VM если запущена
+        // Stop VM if running
         {
             let instances = self.instances.read().await;
             if let Some(instance) = instances.get(vm_id) {
@@ -205,10 +205,10 @@ impl VM {
             }
         }
         
-        // Уничтожение VM через менеджер
+        // Destroy VM through manager
         self.vm_manager.destroy_vm(vm_id).await?;
         
-        // Удаление записи
+        // Remove from instances
         {
             let mut instances = self.instances.write().await;
             instances.remove(vm_id);
@@ -233,21 +233,21 @@ impl VM {
         if let Some(instance) = instances.get_mut(vm_id) {
             instance.resources = resources;
             instance.last_activity = std::time::Instant::now();
+            Ok(())
+        } else {
+            Err(AppError::Model(format!("VM '{}' not found", vm_id)))
         }
-        
-        Ok(())
     }
 
     pub async fn attach_gpu(&self, vm_id: &str, gpu_device: &str) -> Result<(), AppError> {
-        // Проверка доступности GPU
-        if !self.gpu_manager.is_gpu_available(gpu_device).await? {
-            return Err(AppError::DeviceNotAvailable);
+        if !self.config.enable_gpu_passthrough {
+            return Err(AppError::Model("GPU passthrough not enabled".to_string()));
         }
         
-        // Присоединение GPU к VM
-        self.vm_manager.attach_gpu(vm_id, gpu_device).await?;
+        // Attach GPU through GPU manager
+        self.gpu_manager.attach_to_vm(gpu_device, vm_id).await?;
         
-        // Обновление конфигурации VM
+        // Update VM config
         {
             let mut instances = self.instances.write().await;
             if let Some(instance) = instances.get_mut(vm_id) {
@@ -261,10 +261,10 @@ impl VM {
     }
 
     pub async fn detach_gpu(&self, vm_id: &str, gpu_device: &str) -> Result<(), AppError> {
-        // Отсоединение GPU от VM
-        self.vm_manager.detach_gpu(vm_id, gpu_device).await?;
+        // Detach GPU through GPU manager
+        self.gpu_manager.detach_from_vm(gpu_device, vm_id).await?;
         
-        // Обновление конфигурации VM
+        // Update VM config
         {
             let mut instances = self.instances.write().await;
             if let Some(instance) = instances.get_mut(vm_id) {
@@ -276,34 +276,24 @@ impl VM {
     }
 
     pub async fn get_vm_metrics(&self, vm_id: &str) -> Result<VMResources, AppError> {
-        // Получение метрик VM через менеджер
-        let resources = self.vm_manager.get_vm_resources(vm_id).await?;
+        let instances = self.instances.read().await;
         
-        // Обновление локальных данных
-        self.update_vm_resources(vm_id, resources.clone()).await?;
-        
-        Ok(resources)
+        if let Some(instance) = instances.get(vm_id) {
+            Ok(instance.resources.clone())
+        } else {
+            Err(AppError::Model(format!("VM '{}' not found", vm_id)))
+        }
     }
 
     async fn restore_vm_instances(&self) -> Result<(), AppError> {
-        // Восстановление VM из сохраненного состояния
-        // В реальной реализации здесь будет:
-        // - Чтение конфигураций VM
-        // - Восстановление состояния
-        // - Запуск VM если необходимо
-        
+        // Restore VM instances from storage
+        // In real implementation, this would load VM state from disk
+        log::info!("Restoring VM instances");
         Ok(())
     }
 
     fn generate_vm_id(&self) -> String {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        use std::time::{SystemTime, UNIX_EPOCH};
-        
-        let mut hasher = DefaultHasher::new();
-        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos().hash(&mut hasher);
-        rand::random::<u64>().hash(&mut hasher);
-        
-        format!("vm_{:x}", hasher.finish())
+        use uuid::Uuid;
+        format!("vm-{}", Uuid::new_v4().to_string().split('-').next().unwrap())
     }
 } 

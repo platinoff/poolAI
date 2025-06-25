@@ -72,20 +72,20 @@ impl Ui {
     }
 
     pub async fn initialize(&mut self) -> Result<(), AppError> {
-        // Инициализация UI компонентов
+        // Initialize UI components
         self.components.initialize().await?;
         
-        // Создание дашборда
+        // Create dashboard
         self.dashboard = Some(dashboard::Dashboard::new(self.state.clone()).await?);
         
-        // Запуск фоновых задач
+        // Start background tasks
         self.start_background_tasks().await?;
         
         Ok(())
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Выключение UI
+        // Shutdown UI
         if let Some(dashboard) = &self.dashboard {
             dashboard.shutdown().await?;
         }
@@ -99,7 +99,7 @@ impl Ui {
         let mut state = self.state.write().await;
         state.system_status = Some(status);
         
-        // Обновление дашборда
+        // Update dashboard
         if let Some(dashboard) = &self.dashboard {
             dashboard.update_status(status).await?;
         }
@@ -111,7 +111,7 @@ impl Ui {
         let mut state = self.state.write().await;
         state.notifications.push(notification);
         
-        // Ограничение количества уведомлений
+        // Limit number of notifications
         if state.notifications.len() > 100 {
             state.notifications.drain(0..10);
         }
@@ -170,7 +170,7 @@ impl Ui {
         if let Some(dashboard) = &self.dashboard {
             dashboard.get_data().await
         } else {
-            Err(AppError::ComponentNotInitialized)
+            Err(AppError::Model("Dashboard not initialized".to_string()))
         }
     }
 
@@ -182,20 +182,20 @@ impl Ui {
         let state = self.state.clone();
         let auto_refresh_interval = self.config.auto_refresh_interval_ms;
         
-        // Задача автообновления UI
+        // Auto-refresh UI task
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_millis(auto_refresh_interval));
             
             loop {
                 interval.tick().await;
                 
-                // Обновление UI состояния
+                // Update UI state
                 let mut state_write = state.write().await;
                 
-                // Очистка старых уведомлений
+                // Clean old notifications
                 let now = std::time::Instant::now();
                 state_write.notifications.retain(|n| {
-                    now.duration_since(n.timestamp).as_secs() < 3600 // 1 час
+                    now.duration_since(n.timestamp).as_secs() < 3600 // 1 hour
                 });
             }
         });

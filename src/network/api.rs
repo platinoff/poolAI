@@ -38,7 +38,7 @@ impl ApiServer {
     ) -> Result<Self, AppError> {
         let mut endpoints = Vec::new();
         
-        // Регистрация API endpoints
+        // Register API endpoints
         endpoints.push(ApiEndpoint {
             path: "/api/v1/models".to_string(),
             method: "GET".to_string(),
@@ -81,13 +81,13 @@ impl ApiServer {
     }
 
     pub async fn process_model_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
-        // Заглушка для обработки запроса модели
-        // В реальной реализации здесь будет интеграция с пулом и runtime
+        // Stub for model request processing
+        // In real implementation, integration with pool and runtime would happen here
         
-        // Симуляция обработки
+        // Simulate processing
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
         
-        // Создание ответа
+        // Create response
         let response = ModelResponse {
             output: format!("API Response: {}", request.input),
             metrics: crate::core::model_interface::ModelMetrics {
@@ -104,21 +104,21 @@ impl ApiServer {
     }
 
     pub async fn handle_request(&self, path: &str, method: &str, body: &str, client_ip: &str) -> Result<ApiResponse, AppError> {
-        // Поиск подходящего endpoint
+        // Find matching endpoint
         let endpoint = self.find_endpoint(path, method)?;
         
-        // Проверка аутентификации
+        // Check authentication
         if endpoint.requires_auth {
             self.check_authentication(client_ip).await?;
         }
         
-        // Обработка запроса
+        // Process request
         match endpoint.handler.as_str() {
             "list_models" => self.handle_list_models().await,
             "generate_text" => self.handle_generate_text(body).await,
             "health_check" => self.handle_health_check().await,
             "get_metrics" => self.handle_get_metrics().await,
-            _ => Err(AppError::EndpointNotFound),
+            _ => Err(AppError::Network("Endpoint not found".to_string())),
         }
     }
 
@@ -128,12 +128,12 @@ impl ApiServer {
                 return Ok(endpoint);
             }
         }
-        Err(AppError::EndpointNotFound)
+        Err(AppError::Network("Endpoint not found".to_string()))
     }
 
     fn path_matches(&self, pattern: &str, path: &str) -> bool {
-        // Простая проверка соответствия пути
-        // В реальной реализации здесь будет более сложная логика
+        // Simple path matching
+        // In real implementation, more complex logic would be here
         pattern == path || pattern.replace("{model_id}", ".*") == path
     }
 
@@ -142,17 +142,17 @@ impl ApiServer {
         
         if let Some(connection) = connections.get(client_ip) {
             if !connection.is_authenticated {
-                return Err(AppError::AuthenticationRequired);
+                return Err(AppError::Network("Authentication required".to_string()));
             }
         } else {
-            return Err(AppError::ConnectionNotFound);
+            return Err(AppError::Network("Connection not found".to_string()));
         }
         
         Ok(())
     }
 
     async fn handle_list_models(&self) -> Result<ApiResponse, AppError> {
-        // Заглушка для списка моделей
+        // Stub for model list
         let models = vec![
             "gpt-3.5-turbo",
             "gpt-4",
@@ -174,11 +174,11 @@ impl ApiServer {
     }
 
     async fn handle_generate_text(&self, body: &str) -> Result<ApiResponse, AppError> {
-        // Парсинг запроса
+        // Parse request
         let request: serde_json::Value = serde_json::from_str(body)
-            .map_err(|_| AppError::InvalidRequest)?;
+            .map_err(|_| AppError::Validation("Invalid JSON".to_string()))?;
         
-        // Создание ModelRequest
+        // Create ModelRequest
         let model_request = ModelRequest {
             input: request["prompt"].as_str().unwrap_or("").to_string(),
             parameters: crate::core::model_interface::ModelParameters {
@@ -191,7 +191,7 @@ impl ApiServer {
             session_id: request["session_id"].as_str().map(|s| s.to_string()),
         };
         
-        // Обработка запроса
+        // Process request
         let response = self.process_model_request(model_request).await?;
         
         let response_body = serde_json::json!({
@@ -204,7 +204,6 @@ impl ApiServer {
                 "throughput_tokens_per_sec": response.metrics.throughput_tokens_per_sec,
             },
             "session_id": response.session_id,
-            "timestamp": chrono::Utc::now().to_rfc3339(),
         });
         
         Ok(ApiResponse {
@@ -215,13 +214,10 @@ impl ApiServer {
     }
 
     async fn handle_health_check(&self) -> Result<ApiResponse, AppError> {
-        let uptime = self.started_at.elapsed();
-        
         let response_body = serde_json::json!({
             "status": "healthy",
-            "uptime_seconds": uptime.as_secs(),
+            "uptime": self.started_at.elapsed().as_secs(),
             "timestamp": chrono::Utc::now().to_rfc3339(),
-            "version": env!("CARGO_PKG_VERSION"),
         });
         
         Ok(ApiResponse {
@@ -232,21 +228,13 @@ impl ApiServer {
     }
 
     async fn handle_get_metrics(&self) -> Result<ApiResponse, AppError> {
-        // Заглушка для метрик
+        // Stub for metrics
         let response_body = serde_json::json!({
-            "connections": {
-                "active": self.connections.read().await.len(),
-                "total": 0, // Будет заполнено из реальных метрик
-            },
-            "rate_limits": {
-                "active": self.rate_limits.read().await.len(),
-            },
-            "system": {
-                "uptime_seconds": self.started_at.elapsed().as_secs(),
-                "memory_usage_mb": 4096.0,
-                "cpu_usage_percent": 25.5,
-            },
-            "timestamp": chrono::Utc::now().to_rfc3339(),
+            "active_connections": self.connections.read().await.len(),
+            "total_requests": 0,
+            "average_response_time_ms": 0.0,
+            "gpu_utilization": 0.0,
+            "memory_usage_mb": 0.0,
         });
         
         Ok(ApiResponse {
@@ -257,8 +245,7 @@ impl ApiServer {
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // Заглушка для выключения API сервера
-        // В реальной реализации здесь будет остановка HTTP сервера
+        log::info!("Shutting down API server");
         Ok(())
     }
 
