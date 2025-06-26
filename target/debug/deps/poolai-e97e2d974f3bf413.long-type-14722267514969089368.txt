@@ -1,0 +1,2 @@
+(string::String, impl future::future::Future<Output = worker::WorkerStatus>)
+(std::string::String, impl std::future::Future<Output = worker::WorkerStatus>)

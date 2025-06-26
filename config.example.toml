@@ -1,0 +1,61 @@
+# PoolAI Configuration Example
+# Copy this file to config.toml and modify as needed
+
+[system]
+name = "PoolAI"
+version = "MVP_v1"
+log_level = "info"
+max_workers = 8
+queue_size = 1000
+metrics_interval = 5
+
+[gpu]
+enabled = true
+memory_limit = 8192  # MB
+temperature_limit = 85  # Celsius
+power_limit = 200  # Watts
+gpu_count = 1
+
+[pool]
+max_workers = 8
+queue_size = 1000
+auto_scaling = true
+scaling_threshold = 0.8
+request_timeout = 30
+
+[monitoring]
+metrics_interval = 5  # seconds
+alert_threshold = 0.9
+retention_days = 30
+detailed_logging = true
+
+# Model configurations
+[[models]]
+name = "gpt-3.5-turbo"
+path = "./models/gpt-3.5-turbo"
+max_batch_size = 16
+memory_limit = 4096
+temperature = 0.7
+max_tokens = 100
+enable_cache = true
+cache_size = 1024
+
+[[models]]
+name = "bert-base"
+path = "./models/bert-base"
+max_batch_size = 32
+memory_limit = 2048
+temperature = 0.5
+max_tokens = 512
+enable_cache = true
+cache_size = 512
+
+[[models]]
+name = "t5-small"
+path = "./models/t5-small"
+max_batch_size = 24
+memory_limit = 3072
+temperature = 0.6
+max_tokens = 256
+enable_cache = true
+cache_size = 768 

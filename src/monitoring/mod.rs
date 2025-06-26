@@ -135,7 +135,7 @@ impl Monitoring {
             alert.resolved = true;
             Ok(())
         } else {
-            Err(AppError::Model(format!("Alert '{}' not found", alert_id)))
+            Err(AppError::MonitoringError(format!("Alert '{}' not found", alert_id)))
         }
     }
 
@@ -241,7 +241,7 @@ pub async fn health_check() -> Result<(), AppError> {
     // Check if global monitoring exists
     unsafe {
         if GLOBAL_MONITORING.is_none() {
-            return Err(AppError::Resource("Global monitoring not initialized".to_string()));
+            return Err(AppError::MonitoringError("Global monitoring not initialized".to_string()));
         }
     }
     

@@ -19,6 +19,7 @@ serde_json = "1.0"
 
 # Error handling - MVP КРИТИЧНО
 thiserror = "1.0"
+async-trait = "0.1"
 
 # Logging - MVP КРИТИЧНО
 tracing = "0.1"
@@ -26,6 +27,7 @@ tracing-subscriber = "0.3"
 
 # Configuration - MVP КРИТИЧНО
 config = "0.13"
+toml = "0.8"
 
 # Time handling
 chrono = { version = "0.4", features = ["serde"] }
@@ -38,6 +40,9 @@ sysinfo = "0.29"
 
 # UUID generation
 uuid = { version = "1.0", features = ["v4"] }
+
+# Synchronization primitives
+parking_lot = "0.12"
 
 # Command line arguments
 clap = { version = "4.0", features = ["derive"] }

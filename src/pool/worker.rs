@@ -24,6 +24,7 @@ pub struct WorkerStatus {
     pub average_response_time_ms: f64,
 }
 
+#[derive(Debug, Clone)]
 pub struct Worker {
     config: WorkerConfig,
     status: Arc<RwLock<WorkerStatus>>,
@@ -99,8 +100,15 @@ impl Worker {
                 gpu_utilization: 0.5,
                 memory_usage_mb: 512.0,
                 throughput_tokens_per_sec: 1000.0,
+                cpu_utilization: 0.3,
+                gpu_temperature: 65.0,
+                gpu_power_watts: 150.0,
+                queue_length: 0,
+                average_latency_ms: 100.0,
             },
             session_id: request.session_id.clone(),
+            status: crate::core::model_interface::ResponseStatus::Success,
+            errors: vec![],
         })
     }
 
@@ -190,7 +198,7 @@ impl Worker {
 
     pub async fn optimize_resources(&self) -> Result<(), AppError> {
         // Resource optimization logic
-        log::info!("Optimizing resources for worker {}", self.config.worker_id);
+        tracing::info!("Optimizing resources for worker {}", self.config.worker_id);
         Ok(())
     }
 
@@ -199,7 +207,7 @@ impl Worker {
         self.request_queue.write().await.clear();
         self.cache.write().await.clear();
         
-        log::info!("Worker {} shutdown complete", self.config.worker_id);
+        tracing::info!("Worker {} shutdown complete", self.config.worker_id);
         Ok(())
     }
 } 

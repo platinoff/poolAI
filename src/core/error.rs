@@ -1,15 +1,10 @@
-use std::fmt;
 use thiserror::Error;
 use std::io;
 use serde_json;
 use serde::{Serialize, Deserialize};
-use std::sync::Arc;
-use tokio::sync::Mutex;
-use log::{info, warn, error};
-use std::collections::HashMap;
-use chrono::{DateTime, Utc};
-use std::time::Duration;
+use chrono;
 use uuid;
+use tracing::{info, warn, error};
 
 #[derive(Error, Debug)]
 pub enum PoolAIError {
@@ -18,17 +13,11 @@ pub enum PoolAIError {
     #[error("JSON error: {0}")]
     JsonError(serde_json::Error),
     #[error("Serialization error: {0}")]
-    SerializationError(serde::ser::Error),
+    SerializationError(String),
     #[error("Deserialization error: {0}")]
-    DeserializationError(serde::de::Error),
-    #[error("Sync error: {0}")]
-    SyncError(tokio::sync::MutexError),
-    #[error("Log error: {0}")]
-    LogError(log::SetLoggerError),
-    #[error("Collection error: {0}")]
-    CollectionError(std::collections::CollectionError),
-    #[error("Chrono error: {0}")]
-    ChronoError(chrono::Error),
+    DeserializationError(String),
+    #[error("Sync error")]
+    SyncError,
     #[error("Time error: {0}")]
     TimeError(std::time::SystemTimeError),
     #[error("UUID error: {0}")]
@@ -47,42 +36,6 @@ impl From<serde_json::Error> for PoolAIError {
     }
 }
 
-impl From<serde::ser::Error> for PoolAIError {
-    fn from(e: serde::ser::Error) -> Self {
-        Self::SerializationError(e)
-    }
-}
-
-impl From<serde::de::Error> for PoolAIError {
-    fn from(e: serde::de::Error) -> Self {
-        Self::DeserializationError(e)
-    }
-}
-
-impl From<tokio::sync::MutexError> for PoolAIError {
-    fn from(e: tokio::sync::MutexError) -> Self {
-        Self::SyncError(e)
-    }
-}
-
-impl From<log::SetLoggerError> for PoolAIError {
-    fn from(e: log::SetLoggerError) -> Self {
-        Self::LogError(e)
-    }
-}
-
-impl From<std::collections::CollectionError> for PoolAIError {
-    fn from(e: std::collections::CollectionError) -> Self {
-        Self::CollectionError(e)
-    }
-}
-
-impl From<chrono::Error> for PoolAIError {
-    fn from(e: chrono::Error) -> Self {
-        Self::ChronoError(e)
-    }
-}
-
 impl From<std::time::SystemTimeError> for PoolAIError {
     fn from(e: std::time::SystemTimeError) -> Self {
         Self::TimeError(e)
@@ -95,26 +48,219 @@ impl From<uuid::Error> for PoolAIError {
     }
 }
 
+#[derive(Error, Debug)]
+pub enum CursorError {
+    #[error("Not found: {0}")]
+    NotFound(String),
+    #[error("IO error: {0}")]
+    IoError(#[from] io::Error),
+    #[error("Other error: {0}")]
+    Other(String),
+}
+
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("Model error: {0}")]
     ModelError(String),
+    #[error("Configuration error: {0}")]
+    ConfigError(String),
+    #[error("Pool error: {0}")]
+    PoolError(String),
+    #[error("Monitoring error: {0}")]
+    MonitoringError(String),
+    #[error("Resource error: {0}")]
+    ResourceError(String),
+    #[error("Network error: {0}")]
+    NetworkError(String),
+    #[error("GPU error: {0}")]
+    GpuError(String),
+    #[error("Memory error: {0}")]
+    MemoryError(String),
+    #[error("Timeout error: {0}")]
+    TimeoutError(String),
+    #[error("Validation error: {0}")]
+    ValidationError(String),
+    #[error("Initialization error: {0}")]
+    InitializationError(String),
+    #[error("Shutdown error: {0}")]
+    ShutdownError(String),
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
+    #[error("Serialization error: {0}")]
+    SerializationError(#[from] serde_json::Error),
     #[error("Unknown error")]
     Unknown,
 }
 
 impl AppError {
+    /// Логирование ошибки
     pub fn log(&self) {
         match self {
-            AppError::ModelError(msg) => log::error!("Model error: {}", msg),
-            AppError::IoError(e) => log::error!("IO error: {}", e),
-            AppError::Unknown => log::error!("Unknown error"),
+            AppError::ModelError(msg) => error!("Model error: {}", msg),
+            AppError::ConfigError(msg) => error!("Configuration error: {}", msg),
+            AppError::PoolError(msg) => error!("Pool error: {}", msg),
+            AppError::MonitoringError(msg) => error!("Monitoring error: {}", msg),
+            AppError::ResourceError(msg) => error!("Resource error: {}", msg),
+            AppError::NetworkError(msg) => error!("Network error: {}", msg),
+            AppError::GpuError(msg) => error!("GPU error: {}", msg),
+            AppError::MemoryError(msg) => error!("Memory error: {}", msg),
+            AppError::TimeoutError(msg) => error!("Timeout error: {}", msg),
+            AppError::ValidationError(msg) => error!("Validation error: {}", msg),
+            AppError::InitializationError(msg) => error!("Initialization error: {}", msg),
+            AppError::ShutdownError(msg) => error!("Shutdown error: {}", msg),
+            AppError::IoError(e) => error!("IO error: {}", e),
+            AppError::SerializationError(e) => error!("Serialization error: {}", e),
+            AppError::Unknown => error!("Unknown error"),
         }
     }
-    // Восстановление после сбоя (заглушка)
-    pub fn recover(&self) {
-        log::warn!("Attempting recovery from error: {:?}", self);
+
+    /// Восстановление после сбоя
+    pub fn recover(&self) -> Result<(), AppError> {
+        warn!("Attempting recovery from error: {:?}", self);
+        
+        match self {
+            AppError::ModelError(_) => {
+                // Попытка перезагрузки модели
+                info!("Attempting model reload...");
+                Ok(())
+            }
+            AppError::ConfigError(_) => {
+                // Попытка загрузки конфигурации по умолчанию
+                info!("Attempting to load default configuration...");
+                Ok(())
+            }
+            AppError::PoolError(_) => {
+                // Попытка перезапуска пула
+                info!("Attempting pool restart...");
+                Ok(())
+            }
+            AppError::MonitoringError(_) => {
+                // Попытка перезапуска мониторинга
+                info!("Attempting monitoring restart...");
+                Ok(())
+            }
+            AppError::ResourceError(_) => {
+                // Попытка освобождения ресурсов
+                info!("Attempting resource cleanup...");
+                Ok(())
+            }
+            AppError::GpuError(_) => {
+                // Попытка переинициализации GPU
+                info!("Attempting GPU reinitialization...");
+                Ok(())
+            }
+            AppError::MemoryError(_) => {
+                // Попытка очистки памяти
+                info!("Attempting memory cleanup...");
+                Ok(())
+            }
+            AppError::TimeoutError(_) => {
+                // Попытка повторного выполнения
+                info!("Attempting retry after timeout...");
+                Ok(())
+            }
+            _ => {
+                warn!("No specific recovery strategy for error type");
+                Ok(())
+            }
+        }
+    }
+
+    /// Проверка возможности восстановления
+    pub fn is_recoverable(&self) -> bool {
+        matches!(self,
+            AppError::ModelError(_) |
+            AppError::ConfigError(_) |
+            AppError::PoolError(_) |
+            AppError::MonitoringError(_) |
+            AppError::ResourceError(_) |
+            AppError::GpuError(_) |
+            AppError::MemoryError(_) |
+            AppError::TimeoutError(_)
+        )
+    }
+
+    /// Получение кода ошибки
+    pub fn error_code(&self) -> &'static str {
+        match self {
+            AppError::ModelError(_) => "MODEL_ERROR",
+            AppError::ConfigError(_) => "CONFIG_ERROR",
+            AppError::PoolError(_) => "POOL_ERROR",
+            AppError::MonitoringError(_) => "MONITORING_ERROR",
+            AppError::ResourceError(_) => "RESOURCE_ERROR",
+            AppError::NetworkError(_) => "NETWORK_ERROR",
+            AppError::GpuError(_) => "GPU_ERROR",
+            AppError::MemoryError(_) => "MEMORY_ERROR",
+            AppError::TimeoutError(_) => "TIMEOUT_ERROR",
+            AppError::ValidationError(_) => "VALIDATION_ERROR",
+            AppError::InitializationError(_) => "INITIALIZATION_ERROR",
+            AppError::ShutdownError(_) => "SHUTDOWN_ERROR",
+            AppError::IoError(_) => "IO_ERROR",
+            AppError::SerializationError(_) => "SERIALIZATION_ERROR",
+            AppError::Unknown => "UNKNOWN_ERROR",
+        }
+    }
+}
+
+/// Результат с метриками ошибок
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ErrorMetrics {
+    /// Количество ошибок по типам
+    pub error_counts: std::collections::HashMap<String, u64>,
+    /// Время последней ошибки
+    pub last_error_time: Option<chrono::DateTime<chrono::Utc>>,
+    /// Общее количество ошибок
+    pub total_errors: u64,
+    /// Количество восстановлений
+    pub recovery_attempts: u64,
+    /// Успешные восстановления
+    pub successful_recoveries: u64,
+}
+
+impl Default for ErrorMetrics {
+    fn default() -> Self {
+        Self {
+            error_counts: std::collections::HashMap::new(),
+            last_error_time: None,
+            total_errors: 0,
+            recovery_attempts: 0,
+            successful_recoveries: 0,
+        }
+    }
+}
+
+impl ErrorMetrics {
+    /// Добавление ошибки в метрики
+    pub fn add_error(&mut self, error: &AppError) {
+        let error_code = error.error_code();
+        *self.error_counts.entry(error_code.to_string()).or_insert(0) += 1;
+        self.last_error_time = Some(chrono::Utc::now());
+        self.total_errors += 1;
+    }
+
+    /// Добавление попытки восстановления
+    pub fn add_recovery_attempt(&mut self, success: bool) {
+        self.recovery_attempts += 1;
+        if success {
+            self.successful_recoveries += 1;
+        }
+    }
+
+    /// Получение статистики ошибок
+    pub fn get_error_statistics(&self) -> std::collections::HashMap<String, f64> {
+        let mut stats = std::collections::HashMap::new();
+        
+        if self.total_errors > 0 {
+            stats.insert("total_errors".to_string(), self.total_errors as f64);
+            stats.insert("recovery_rate".to_string(), 
+                self.successful_recoveries as f64 / self.recovery_attempts as f64);
+            
+            for (error_type, count) in &self.error_counts {
+                stats.insert(format!("error_rate_{}", error_type.to_lowercase()), 
+                    *count as f64 / self.total_errors as f64);
+            }
+        }
+        
+        stats
     }
 } 

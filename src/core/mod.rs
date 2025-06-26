@@ -7,24 +7,65 @@ pub mod config;
 pub mod state;
 
 use self::error::AppError;
+use self::config::{PoolAIConfig, initialize_config, get_config};
+use tracing::{info, error};
 
 /// Initialize core module
 pub async fn initialize() -> Result<(), AppError> {
-    log::info!("Initializing core module");
-    // Initialize core components
+    info!("Initializing core module");
+    
+    // Initialize with default configuration
+    let config = PoolAIConfig::default();
+    initialize_config(config)?;
+    
+    info!("Core module initialized successfully");
+    Ok(())
+}
+
+/// Initialize core module with custom configuration
+pub async fn initialize_with_config(config: PoolAIConfig) -> Result<(), AppError> {
+    info!("Initializing core module with custom configuration");
+    
+    // Validate and initialize configuration
+    config.validate()?;
+    initialize_config(config)?;
+    
+    info!("Core module initialized with custom configuration successfully");
     Ok(())
 }
 
 /// Shutdown core module
 pub async fn shutdown() -> Result<(), AppError> {
-    log::info!("Shutting down core module");
+    info!("Shutting down core module");
+    
     // Cleanup core components
+    // Note: Global config cleanup is handled automatically
+    
+    info!("Core module shutdown completed");
     Ok(())
 }
 
 /// Health check for core module
 pub async fn health_check() -> Result<(), AppError> {
-    log::info!("Core module health check");
+    info!("Core module health check");
+    
+    // Check if configuration is available
+    let _config = get_config()?;
+    
     // Check core components health
+    info!("Core module health check passed");
+    Ok(())
+}
+
+/// Get system configuration
+pub fn get_system_config() -> Result<PoolAIConfig, AppError> {
+    get_config()
+}
+
+/// Update system configuration
+pub fn update_system_config(config: PoolAIConfig) -> Result<(), AppError> {
+    config.validate()?;
+    self::config::update_config(config)?;
+    info!("System configuration updated successfully");
     Ok(())
 } 
