@@ -1,46 +1,47 @@
 use poolai::{initialize_system, shutdown_system, health_check, get_system_info};
 use std::process;
 use tokio;
+use tracing::{info, error};
 
 #[tokio::main]
 async fn main() {
-    // Настройка логирования
-    env_logger::init();
+    // Initialize tracing
+    tracing_subscriber::fmt::init();
 
-    println!("🚀 Starting PoolAI - AI Mining Pool Management System");
+    info!("🚀 Starting PoolAI - AI Mining Pool Management System");
+    
     let info = get_system_info();
-    println!("Version: {}", info.version);
-    println!("Build: {}", info.name);
-    println!("Description: {}", info.description);
-    println!("Features: {:?}", info.features);
-    println!("Modules: {:?}", info.modules);
+    info!("Version: {}", info.version);
+    info!("Build: {}", info.name);
+    info!("Description: {}", info.description);
+    info!("MVP Modules: {:?}", info.mvp_modules);
 
-    // Инициализация системы
-    println!("🔧 Initializing PoolAI system...");
+    // Initialize system
+    info!("🔧 Initializing PoolAI MVP system...");
     if let Err(e) = initialize_system().await {
-        eprintln!("❌ Failed to initialize PoolAI: {}", e);
+        error!("❌ Failed to initialize PoolAI: {}", e);
         process::exit(1);
     }
-    println!("✅ PoolAI system initialized successfully!");
+    info!("✅ PoolAI MVP system initialized successfully!");
 
-    // Проверка здоровья системы
+    // Health check
     if let Err(e) = health_check().await {
-        eprintln!("❌ Health check failed: {}", e);
+        error!("❌ Health check failed: {}", e);
         process::exit(1);
     } else {
-        println!("📈 System health check passed.");
+        info!("📈 System health check passed.");
     }
 
-    // Ожидание сигнала завершения
-    println!("🔄 PoolAI is running. Press Ctrl+C to stop...");
+    // Wait for shutdown signal
+    info!("🔄 PoolAI MVP is running. Press Ctrl+C to stop...");
     tokio::signal::ctrl_c().await.expect("Failed to listen for Ctrl+C");
-    println!("🛑 Received shutdown signal...");
+    info!("🛑 Received shutdown signal...");
 
-    // Корректное выключение системы
-    println!("🔧 Shutting down PoolAI system...");
+    // Graceful shutdown
+    info!("🔧 Shutting down PoolAI MVP system...");
     if let Err(e) = shutdown_system().await {
-        eprintln!("❌ Error during shutdown: {}", e);
+        error!("❌ Error during shutdown: {}", e);
         process::exit(1);
     }
-    println!("✅ PoolAI system shutdown completed successfully!");
-} 
+    info!("✅ PoolAI MVP system shutdown completed successfully!");
+}

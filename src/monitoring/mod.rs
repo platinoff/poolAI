@@ -194,4 +194,57 @@ impl Monitoring {
         
         score.max(0.0)
     }
-} 
+}
+
+// Global monitoring instance
+static mut GLOBAL_MONITORING: Option<Monitoring> = None;
+
+/// Initialize monitoring module
+pub async fn initialize() -> Result<(), AppError> {
+    tracing::info!("Initializing monitoring module");
+    
+    let monitoring = Monitoring::new();
+    
+    // Store global instance
+    unsafe {
+        GLOBAL_MONITORING = Some(monitoring);
+    }
+    
+    // Start background monitoring
+    unsafe {
+        if let Some(monitoring) = &GLOBAL_MONITORING {
+            monitoring.start_monitoring().await?;
+        }
+    }
+    
+    tracing::info!("Monitoring module initialized successfully");
+    Ok(())
+}
+
+/// Shutdown monitoring module
+pub async fn shutdown() -> Result<(), AppError> {
+    tracing::info!("Shutting down monitoring module");
+    
+    // Cleanup global monitoring
+    unsafe {
+        GLOBAL_MONITORING = None;
+    }
+    
+    tracing::info!("Monitoring module shut down successfully");
+    Ok(())
+}
+
+/// Health check for monitoring module
+pub async fn health_check() -> Result<(), AppError> {
+    tracing::info!("Monitoring module health check");
+    
+    // Check if global monitoring exists
+    unsafe {
+        if GLOBAL_MONITORING.is_none() {
+            return Err(AppError::Resource("Global monitoring not initialized".to_string()));
+        }
+    }
+    
+    tracing::info!("Monitoring module health check passed");
+    Ok(())
+}

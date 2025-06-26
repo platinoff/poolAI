@@ -154,7 +154,7 @@ impl Pool {
             let workers = self.workers.read().await;
             if workers.len() < self.config.max_workers {
                 // Add new worker logic
-                log::info!("Scaling up pool - adding new worker");
+                tracing::info!("Scaling up pool - adding new worker");
                 // TODO: Implement actual worker creation
             }
         }
@@ -166,7 +166,7 @@ impl Pool {
             let workers = self.workers.read().await;
             if workers.len() > 1 {
                 // Remove worker logic
-                log::info!("Scaling down pool - removing worker");
+                tracing::info!("Scaling down pool - removing worker");
                 // TODO: Implement actual worker removal
             }
         }
@@ -180,4 +180,59 @@ impl Pool {
         }
         Ok(())
     }
-} 
+}
+
+// Global pool instance
+static mut GLOBAL_POOL: Option<Pool> = None;
+
+/// Initialize pool module
+pub async fn initialize() -> Result<(), AppError> {
+    tracing::info!("Initializing pool module");
+    
+    // Create default pool configuration
+    let config = PoolConfig {
+        max_workers: 10,
+        max_queue_size: 1000,
+        load_balancing_strategy: LoadBalancingStrategy::RoundRobin,
+        auto_scaling: true,
+        scaling_threshold: 0.8,
+    };
+    
+    let pool = Pool::new(config);
+    
+    // Store global instance
+    unsafe {
+        GLOBAL_POOL = Some(pool);
+    }
+    
+    tracing::info!("Pool module initialized successfully");
+    Ok(())
+}
+
+/// Shutdown pool module
+pub async fn shutdown() -> Result<(), AppError> {
+    tracing::info!("Shutting down pool module");
+    
+    // Cleanup global pool
+    unsafe {
+        GLOBAL_POOL = None;
+    }
+    
+    tracing::info!("Pool module shut down successfully");
+    Ok(())
+}
+
+/// Health check for pool module
+pub async fn health_check() -> Result<(), AppError> {
+    tracing::info!("Pool module health check");
+    
+    // Check if global pool exists
+    unsafe {
+        if GLOBAL_POOL.is_none() {
+            return Err(AppError::Resource("Global pool not initialized".to_string()));
+        }
+    }
+    
+    tracing::info!("Pool module health check passed");
+    Ok(())
+}

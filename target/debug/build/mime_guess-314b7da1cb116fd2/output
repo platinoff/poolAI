@@ -1,1 +1,0 @@
-cargo:rustc-env=MIME_TYPES_GENERATED_PATH=S:\rust\poolAI\target\debug\build\mime_guess-314b7da1cb116fd2\out\mime_types_generated.rs
