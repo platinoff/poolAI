@@ -8,9 +8,9 @@ pub mod monitoring;
 
 // Stage 2 Modules - PRIORITY 2 (future)
 #[cfg(feature = "stage2")]
-pub mod network;
-#[cfg(feature = "stage2")]
 pub mod platform;
+#[cfg(feature = "stage2")]
+pub mod network;
 #[cfg(feature = "stage2")]
 pub mod tgbot;
 
@@ -111,3 +111,43 @@ pub async fn health_check() -> Result<(), Box<dyn std::error::Error>> {
     
     Ok(())
 }
+
+// Re-exports for convenience
+pub use core::{
+    config::PoolAIConfig,
+    error::{AppError, PoolAIError},
+    model_interface::{ModelInterface, ModelRequest, ModelResponse},
+    state::AppState,
+};
+
+pub use pool::{
+    Pool,
+    worker::Worker,
+    PoolConfig,
+    PoolMetrics,
+    LoadBalancingStrategy,
+};
+
+pub use monitoring::{
+    metrics::Metrics,
+    metrics::MetricsCollector,
+    Monitoring,
+    SystemStatus,
+};
+
+#[cfg(feature = "stage2")]
+pub use platform::{
+    GpuInfo,
+    get_gpu_info,
+};
+
+#[cfg(feature = "stage2")]
+pub use network::{
+    start_server,
+};
+
+#[cfg(feature = "stage2")]
+pub use tgbot::{
+    start_bot,
+    send_notification,
+};

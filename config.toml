@@ -1,0 +1,30 @@
+# PoolAI Configuration Example
+# Copy this file to config.toml and modify as needed
+
+[system]
+name = "PoolAI"
+version = "MVP_v1"
+log_level = "info"
+max_workers = 8
+queue_size = 1000
+metrics_interval = 5
+
+[gpu]
+enabled = true
+memory_limit = 8192  # MB
+temperature_limit = 85  # Celsius
+power_limit = 200  # Watts
+gpu_count = 1
+
+[pool]
+max_workers = 8
+queue_size = 1000
+auto_scaling = true
+scaling_threshold = 0.8
+request_timeout = 30
+
+[monitoring]
+metrics_interval = 5  # seconds
+alert_threshold = 0.9
+retention_days = 30
+detailed_logging = true 

@@ -94,8 +94,6 @@ pub struct PoolAIConfig {
     pub pool: PoolConfig,
     /// Конфигурация мониторинга
     pub monitoring: MonitoringConfig,
-    /// Конфигурации моделей
-    pub models: HashMap<String, ModelConfig>,
 }
 
 impl Default for PoolAIConfig {
@@ -129,7 +127,6 @@ impl Default for PoolAIConfig {
                 retention_days: 30,
                 detailed_logging: true,
             },
-            models: HashMap::new(),
         }
     }
 }
@@ -159,17 +156,17 @@ impl PoolAIConfig {
 
     /// Получение конфигурации модели
     pub fn get_model_config(&self, model_name: &str) -> Option<&ModelConfig> {
-        self.models.get(model_name)
+        None
     }
 
     /// Добавление конфигурации модели
     pub fn add_model_config(&mut self, config: ModelConfig) {
-        self.models.insert(config.name.clone(), config);
+        // This method is not used in the MVP
     }
 
     /// Удаление конфигурации модели
     pub fn remove_model_config(&mut self, model_name: &str) -> Option<ModelConfig> {
-        self.models.remove(model_name)
+        None
     }
 
     /// Валидация конфигурации

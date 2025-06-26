@@ -11,7 +11,7 @@ categories = ["distributed-computing", "ai", "blockchain"]
 
 [dependencies]
 # Async runtime - MVP КРИТИЧНО
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.36", features = ["full"] }
 
 # Serialization - MVP КРИТИЧНО
 serde = { version = "1.0", features = ["derive"] }
@@ -20,6 +20,7 @@ serde_json = "1.0"
 # Error handling - MVP КРИТИЧНО
 thiserror = "1.0"
 async-trait = "0.1"
+anyhow = "1.0"
 
 # Logging - MVP КРИТИЧНО
 tracing = "0.1"
@@ -39,7 +40,7 @@ rand = "0.8"
 sysinfo = "0.29"
 
 # UUID generation
-uuid = { version = "1.0", features = ["v4"] }
+uuid = { version = "1.7", features = ["v4"] }
 
 # Synchronization primitives
 parking_lot = "0.12"
@@ -47,11 +48,16 @@ parking_lot = "0.12"
 # Command line arguments
 clap = { version = "4.0", features = ["derive"] }
 
+# Network dependencies - Stage 2
+axum = { version = "0.7", features = ["ws", "macros"] }
+tower = "0.4"
+tokio-tungstenite = "0.20"
+futures = "0.3"
+
 [features]
-default = ["mvp"]
-mvp = []
-stage2 = ["network", "platform", "tgbot"]
-stage3 = ["runtime", "libs", "vm", "raid", "ui"]
+default = []
+stage2 = []
+stage3 = ["network", "platform", "tgbot"]
 
 # Stage 2 features (future)
 network = []

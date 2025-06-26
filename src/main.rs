@@ -1,112 +1,68 @@
-use poolai::{initialize_system, shutdown_system, health_check, get_system_info};
-use poolai::core::get_system_config;
-use std::process;
-use tokio;
-use tracing::{info, error, warn};
-use clap::Parser;
-
-#[derive(Parser)]
-#[command(name = "poolai")]
-#[command(about = "PoolAI - AI Mining Pool Management System")]
-struct Cli {
-    /// Configuration file path
-    #[arg(short, long, default_value = "config.toml")]
-    config: String,
-    
-    /// Log level
-    #[arg(short, long, default_value = "info")]
-    log_level: String,
-    
-    /// Initialize with default configuration
-    #[arg(long)]
-    init_default: bool,
-}
+use poolai::{
+    PoolAIConfig,
+    AppState,
+    Pool,
+    PoolConfig,
+    LoadBalancingStrategy,
+    MetricsCollector,
+};
+#[cfg(feature = "stage2")]
+use poolai::network::start_server;
+#[cfg(feature = "stage2")]
+use poolai::tgbot::start_bot;
+use std::net::SocketAddr;
+use tracing::{info, error};
 
 #[tokio::main]
-async fn main() {
-    // Parse command line arguments
-    let cli = Cli::parse();
-
-    // Initialize tracing with specified log level
-    let subscriber = tracing_subscriber::fmt()
-        .with_target(false)
-        .with_thread_ids(true)
-        .with_thread_names(true)
-        .with_file(true)
-        .with_line_number(true)
-        .init();
-
-    info!("🚀 Starting PoolAI - AI Mining Pool Management System");
-    
-    let info = get_system_info();
-    info!("Version: {}", info.version);
-    info!("Build: {}", info.name);
-    info!("Description: {}", info.description);
-    info!("MVP Modules: {:?}", info.mvp_modules);
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize logging
+    tracing_subscriber::fmt::init();
+    info!("Starting PoolAI...");
 
     // Load configuration
-    if cli.init_default {
-        info!("🔧 Initializing with default configuration...");
-        if let Err(e) = initialize_system().await {
-            error!("❌ Failed to initialize PoolAI with default config: {}", e);
-            process::exit(1);
-        }
-    } else {
-        info!("🔧 Loading configuration from: {}", cli.config);
-        match poolai::core::config::PoolAIConfig::from_file(&cli.config) {
-            Ok(config) => {
-                info!("✅ Configuration loaded successfully");
-                if let Err(e) = poolai::core::initialize_with_config(config).await {
-                    error!("❌ Failed to initialize PoolAI with config: {}", e);
-                    process::exit(1);
-                }
-            }
-            Err(e) => {
-                warn!("⚠️ Failed to load configuration file: {}", e);
-                info!("🔧 Falling back to default configuration...");
-                if let Err(e) = initialize_system().await {
-                    error!("❌ Failed to initialize PoolAI with default config: {}", e);
-                    process::exit(1);
-                }
-            }
-        }
+    let config = PoolAIConfig::from_file("config.toml")?;
+    info!("Configuration loaded successfully");
+
+    // Initialize global state
+    let state = AppState::new();
+    info!("Application state initialized");
+
+    // Initialize pool
+    let pool_config = PoolConfig {
+        max_workers: config.pool.max_workers,
+        max_queue_size: config.pool.queue_size,
+        load_balancing_strategy: LoadBalancingStrategy::RoundRobin,
+        auto_scaling: config.pool.auto_scaling,
+        scaling_threshold: config.pool.scaling_threshold,
+        request_timeout: config.pool.request_timeout,
+    };
+    let pool = Pool::new(pool_config);
+    info!("Worker pool initialized with {} workers", config.pool.max_workers);
+
+    // Initialize monitoring
+    let metrics = MetricsCollector::new();
+    info!("Metrics collector initialized");
+
+    // Stage 2: Network server
+    #[cfg(feature = "stage2")]
+    {
+        let addr: SocketAddr = "127.0.0.1:8080".parse()?;
+        info!("Starting network server on {}", addr);
+        start_server(addr).await;
     }
 
-    info!("✅ PoolAI MVP system initialized successfully!");
-
-    // Health check
-    info!("📈 Running system health check...");
-    if let Err(e) = health_check().await {
-        error!("❌ Health check failed: {}", e);
-        process::exit(1);
-    } else {
-        info!("📈 System health check passed.");
+    // Stage 2: Telegram bot
+    #[cfg(feature = "stage2")]
+    {
+        let bot_token = "your_bot_token_here"; // TODO: Load from config
+        info!("Starting Telegram bot");
+        start_bot(bot_token).await;
     }
 
-    // Display system configuration
-    if let Ok(config) = get_system_config() {
-        info!("🔧 System Configuration:");
-        info!("  - System: {} v{}", config.system.name, config.system.version);
-        info!("  - GPU: {} ({} MB memory)", 
-            if config.gpu.enabled { "Enabled" } else { "Disabled" }, 
-            config.gpu.memory_limit);
-        info!("  - Pool: {} workers, {} queue size", 
-            config.pool.max_workers, config.pool.queue_size);
-        info!("  - Monitoring: {}s interval, {} threshold", 
-            config.monitoring.metrics_interval, config.monitoring.alert_threshold);
-        info!("  - Models: {} configured", config.models.len());
+    // Start monitoring loop
+    info!("Starting monitoring loop");
+    loop {
+        let _ = metrics.collect().await;
+        tokio::time::sleep(tokio::time::Duration::from_secs(30)).await;
     }
-
-    // Wait for shutdown signal
-    info!("🔄 PoolAI MVP is running. Press Ctrl+C to stop...");
-    tokio::signal::ctrl_c().await.expect("Failed to listen for Ctrl+C");
-    info!("🛑 Received shutdown signal...");
-
-    // Graceful shutdown
-    info!("🔧 Shutting down PoolAI MVP system...");
-    if let Err(e) = shutdown_system().await {
-        error!("❌ Error during shutdown: {}", e);
-        process::exit(1);
-    }
-    info!("✅ PoolAI MVP system shutdown completed successfully!");
 }
