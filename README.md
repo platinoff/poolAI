@@ -4,6 +4,50 @@
 
 PoolAI is a comprehensive distributed system for managing AI mining pools with integration of generative models, GPU optimization, and automated resource management.
 
+## ⚡️ Architectural Improvement Plan (2025)
+
+1. **Healthcheck endpoint** — /api/v1/health for CI/CD and monitoring
+2. **Global version/uptime state** — implemented via `version.rs` module (read-only, no global mutable static, Rust Book best practices)
+3. **Public API exported only from lib.rs** — all internals private, rustdoc for public traits/structs
+4. **JWT & RBAC** — middleware for token and role checks (admin/operator/viewer)
+5. **Endpoint access restriction** — /metrics, /workers, /shutdown only for authorized users
+6. **CI/CD** — GitHub Actions workflow for tests and builds
+7. **Swagger/OpenAPI** — API spec generation and publication
+8. **Documentation** — Quick Start, curl examples, security section
+9. **Live metrics (WebSocket)** — /ws/metrics for real-time monitoring
+10. **UI/UX** — Copy buttons, security links, favicon/logo, status page improvements
+
+---
+
+## Example version.rs
+```rust
+pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const BUILD_TIME: &str = option_env!("BUILD_TIME").unwrap_or("unknown");
+```
+
+## Example rustdoc for public trait
+```rust
+/// Interface for all models (trait-based OOP)
+pub trait ModelInterface: Send + Sync {
+    fn process(&self, input: &ModelInput) -> ModelOutput;
+    fn info(&self) -> ModelInfo;
+}
+```
+
+---
+
+## Roadmap (updated)
+
+- **MVP**: core, pool, monitoring
+- **Stage 2**: network (REST+WebSocket+HTTPS), platform, tgbot, security (CORS, rate limiting)
+- **Stage 2.1**: Healthcheck endpoint, global version/uptime state
+- **Stage 2.2**: JWT+RBAC, endpoint access restriction
+- **Stage 2.3**: CI/CD, Swagger/OpenAPI, documentation improvements
+- **Stage 2.4**: Live metrics (WebSocket), UI/UX improvements
+- **Stage 3**: runtime, libs, vm, raid, ui (web interface)
+
+---
+
 ## 🎯 Development Status
 
 **Current Phase: MVP Development**  
