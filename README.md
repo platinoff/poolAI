@@ -1,5 +1,7 @@
 # PoolAI - AI Mining Pool Management System
 
+> 🇺🇦 Ukrainian version available: [README.uk.md](../README.md)
+
 PoolAI is a comprehensive distributed system for managing AI mining pools with integration of generative models, GPU optimization, and automated resource management.
 
 ## 🎯 Development Status

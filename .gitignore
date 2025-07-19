@@ -1,3 +1,12 @@
+# SSL certificates and private keys
+certs/*.pem
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+
 # Rust build artifacts
 /target/
 **/*.rs.bk

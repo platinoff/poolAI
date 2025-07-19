@@ -55,7 +55,7 @@ tokio-tungstenite = "0.20"
 futures = "0.3"
 
 # HTTPS/TLS dependencies - Stage 2
-axum-server = "0.6"
+axum-server = { version = "0.6", features = ["tls-rustls"] }
 rustls = "0.21"
 rustls-pemfile = "1.0"
 tokio-rustls = "0.24"
@@ -64,6 +64,7 @@ tower-http = { version = "0.5", features = ["cors", "trace"] }
 
 [features]
 default = []
+https = []
 stage2 = []
 stage3 = ["network", "platform", "tgbot"]
 
