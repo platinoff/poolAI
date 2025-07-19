@@ -83,6 +83,17 @@ pub struct MonitoringConfig {
     pub detailed_logging: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VersionConfig {
+    pub app_version: String,
+    pub build_time: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HealthConfig {
+    pub expected_workers: usize,
+}
+
 /// Основная конфигурация PoolAI
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoolAIConfig {
@@ -94,6 +105,10 @@ pub struct PoolAIConfig {
     pub pool: PoolConfig,
     /// Конфигурация мониторинга
     pub monitoring: MonitoringConfig,
+    /// Конфигурация версии
+    pub version: VersionConfig,
+    /// Конфигурация healthcheck
+    pub health: HealthConfig,
 }
 
 impl Default for PoolAIConfig {
@@ -126,6 +141,13 @@ impl Default for PoolAIConfig {
                 alert_threshold: 0.9,
                 retention_days: 30,
                 detailed_logging: true,
+            },
+            version: VersionConfig {
+                app_version: "0.1.0".to_string(),
+                build_time: "2023-10-27T10:00:00Z".to_string(),
+            },
+            health: HealthConfig {
+                expected_workers: 8,
             },
         }
     }

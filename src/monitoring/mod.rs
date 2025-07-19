@@ -196,6 +196,8 @@ impl Monitoring {
     }
 }
 
+pub use crate::monitoring::metrics::MetricsCollector;
+
 // Global monitoring instance
 static mut GLOBAL_MONITORING: Option<Monitoring> = None;
 

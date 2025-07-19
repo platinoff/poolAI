@@ -6,6 +6,19 @@ name = "PoolAI"
 version = "0.1.0"
 log_level = "info"
 
+# =====================
+# Version & Build Info
+# =====================
+[version]
+app_version = "0.1.0"           # Автоматически подставляется при сборке
+build_time = "2025-07-19T12:00:00Z" # Автоматически подставляется при CI/CD
+
+# =============
+# Healthcheck
+# =============
+[health]
+expected_workers = 8              # Сколько воркеров должно быть в пуле
+
 [pool]
 max_workers = 10
 max_queue_size = 1000

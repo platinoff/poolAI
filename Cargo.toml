@@ -105,3 +105,6 @@ members = ["."]
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
+
+[build-dependencies]
+chrono = "0.4"
