@@ -1,0 +1,163 @@
+# PoolAI HTTPS Configuration Examples
+# Copy this file to config.toml and modify according to your needs
+
+[system]
+name = "PoolAI"
+version = "0.1.0"
+log_level = "info"
+
+[pool]
+max_workers = 10
+max_queue_size = 1000
+auto_scaling = true
+scaling_threshold = 0.8
+
+[monitoring]
+enable_metrics = true
+metrics_interval = 30
+retention_days = 30
+
+[gpu]
+enable_gpu_passthrough = true
+max_gpu_memory = 8192
+temperature_limit = 85
+power_limit = 200
+
+# =============================================================================
+# HTTPS/TLS CONFIGURATION
+# =============================================================================
+
+[security]
+# Основные настройки HTTPS
+enable_https = true
+redirect_http_to_https = true
+
+# Пути к сертификатам
+# Для разработки: используйте self-signed сертификаты
+# Для production: используйте Let's Encrypt или другие CA
+cert_path = "/etc/poolai/certs/cert.pem"
+key_path = "/etc/poolai/certs/key.pem"
+
+# Настройки TLS
+tls_version = "1.3"
+cipher_suites = ["TLS_AES_256_GCM_SHA384", "TLS_CHACHA20_POLY1305_SHA256"]
+
+# Аутентификация и авторизация
+jwt_secret = "your-super-secret-key-change-in-production"
+jwt_expiration = 3600  # 1 час
+jwt_refresh_expiration = 604800  # 7 дней
+
+# Rate limiting
+rate_limit_requests = 100  # запросов в минуту
+rate_limit_window = 60  # секунд
+rate_limit_burst = 200  # burst requests
+
+# CORS настройки
+cors_origins = [
+    "http://localhost:3000",
+    "http://localhost:8080", 
+    "https://poolai.example.com",
+    "https://admin.poolai.example.com"
+]
+cors_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+cors_headers = ["Authorization", "Content-Type", "X-Requested-With"]
+cors_credentials = true
+cors_max_age = 86400  # 24 часа
+
+# Security headers
+security_headers = true
+hsts_max_age = 31536000  # 1 год
+hsts_include_subdomains = true
+hsts_preload = false
+content_security_policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+x_frame_options = "DENY"
+x_content_type_options = "nosniff"
+referrer_policy = "strict-origin-when-cross-origin"
+
+# WebSocket security
+websocket_heartbeat_interval = 30  # секунд
+websocket_max_connections = 1000
+websocket_rate_limit = 50  # сообщений в минуту
+
+[network]
+# HTTP/HTTPS сервер
+http_host = "0.0.0.0"
+http_port = 8080
+https_port = 8443
+
+# WebSocket
+websocket_path = "/ws"
+websocket_max_message_size = 1048576  # 1MB
+
+# API
+api_prefix = "/api/v1"
+api_rate_limit = 1000  # запросов в минуту
+
+# =============================================================================
+# КОНФИГУРАЦИИ ДЛЯ РАЗНЫХ СРЕД
+# =============================================================================
+
+# Для разработки (development)
+[development]
+inherit = "security"
+enable_https = false
+cors_origins = ["http://localhost:3000", "http://localhost:8080"]
+log_level = "debug"
+
+# Для тестирования (staging)
+[staging]
+inherit = "security"
+enable_https = true
+cert_path = "/etc/poolai/staging/cert.pem"
+key_path = "/etc/poolai/staging/key.pem"
+cors_origins = ["https://staging.poolai.example.com"]
+log_level = "info"
+
+# Для production
+[production]
+inherit = "security"
+enable_https = true
+cert_path = "/etc/letsencrypt/live/poolai.example.com/fullchain.pem"
+key_path = "/etc/letsencrypt/live/poolai.example.com/privkey.pem"
+cors_origins = ["https://poolai.example.com"]
+log_level = "warn"
+rate_limit_requests = 1000
+rate_limit_burst = 2000
+
+# =============================================================================
+# ПРИМЕРЫ КОМАНД ДЛЯ ГЕНЕРАЦИИ СЕРТИФИКАТОВ
+# =============================================================================
+
+# Self-signed сертификат для разработки:
+# openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+
+# Let's Encrypt для production:
+# certbot certonly --standalone -d poolai.example.com -d www.poolai.example.com
+
+# =============================================================================
+# ПРИМЕРЫ НАСТРОЕК NGINX (для reverse proxy)
+# =============================================================================
+
+# server {
+#     listen 443 ssl http2;
+#     server_name poolai.example.com;
+#     
+#     ssl_certificate /etc/letsencrypt/live/poolai.example.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/poolai.example.com/privkey.pem;
+#     
+#     location / {
+#         proxy_pass http://127.0.0.1:8080;
+#         proxy_set_header Host $host;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#     }
+#     
+#     location /ws {
+#         proxy_pass http://127.0.0.1:8080;
+#         proxy_http_version 1.1;
+#         proxy_set_header Upgrade $http_upgrade;
+#         proxy_set_header Connection "upgrade";
+#         proxy_set_header Host $host;
+#     }
+# } 

@@ -15,9 +15,10 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 - ⏳ **Monitoring Module** - Basic metrics and monitoring
 
 #### Stage 2 (Weeks 4-9) - PRIORITY 2
-- **Network Module** - REST API and WebSocket
+- **Network Module** - REST API and WebSocket with HTTPS/TLS support
 - **Platform Module** - GPU management and optimization
 - **TGBot Module** - Telegram bot for management
+- **Security Module** - JWT authentication, rate limiting, and certificate management
 
 #### Stage 3 (Weeks 10+) - PRIORITY 3
 - **Runtime Module** - Lifecycle management
@@ -39,6 +40,8 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 - **Rust**: 1.70+ (latest stable)
 - **MSYS2** (Windows): For native dependencies
 - **CUDA**: 11.0+ (optional, for GPU support)
+- **OpenSSL**: 1.1.1+ (for HTTPS/TLS support)
+- **Certbot**: For Let's Encrypt certificates (production)
 
 ## 🛠️ Installation
 
@@ -131,6 +134,24 @@ metrics_interval = 30
 [gpu]
 enable_gpu_passthrough = true
 max_gpu_memory = 8192
+
+[security]
+# HTTPS/TLS Configuration (Stage 2+)
+enable_https = false  # Set to true for production
+cert_path = "/etc/poolai/certs/cert.pem"
+key_path = "/etc/poolai/certs/key.pem"
+redirect_http_to_https = true
+
+# Authentication
+jwt_secret = "your-super-secret-key-change-in-production"
+jwt_expiration = 3600
+rate_limit_requests = 100
+rate_limit_window = 60
+
+# CORS Settings
+cors_origins = ["http://localhost:3000", "https://poolai.example.com"]
+cors_methods = ["GET", "POST", "PUT", "DELETE"]
+cors_headers = ["Authorization", "Content-Type"]
 ```
 
 ### Environment Variables
@@ -167,9 +188,65 @@ RUST_LOG=debug cargo run
 
 - **REST API**: Full API endpoints for model management
 - **WebSocket**: Real-time updates and communication
+- **HTTPS/TLS**: Secure communication with automatic certificate management
 - **Telegram Bot**: Remote management via Telegram
 - **Web Interface**: Modern dashboard for system management
 - **Advanced Monitoring**: Comprehensive metrics and analytics
+
+## 🔒 Security & HTTPS
+
+### Security Architecture
+
+PoolAI implements a comprehensive security model with multiple deployment options:
+
+#### Development Mode (HTTP)
+- HTTP on localhost for development
+- Basic authentication
+- CORS enabled for local development
+
+#### Production Mode (HTTPS)
+- TLS 1.3 encryption for all communications
+- Automatic certificate management with Let's Encrypt
+- HSTS headers for enhanced security
+- Rate limiting and DDoS protection
+
+### Deployment Options
+
+#### Option A: Built-in HTTPS (Recommended)
+```
+Internet → PoolAI (HTTPS:443) → Internal Services
+```
+- TLS termination within PoolAI
+- Automatic certificate renewal
+- Simplified deployment
+
+#### Option B: Reverse Proxy (Enterprise)
+```
+Internet → Nginx/Apache (HTTPS:443) → PoolAI (HTTP:8080)
+```
+- Centralized certificate management
+- Additional security layers
+- Load balancing capabilities
+
+### Security Features
+
+- **Authentication**: JWT-based API authentication
+- **Authorization**: Role-based access control (Admin, Operator, Viewer)
+- **Encryption**: TLS 1.3 for transport, AES-256 for data at rest
+- **Rate Limiting**: Configurable request limits
+- **CORS**: Configurable cross-origin resource sharing
+- **Security Headers**: HSTS, CSP, X-Frame-Options
+- **WebSocket Security**: WSS with JWT authentication
+
+### Certificate Management
+
+```bash
+# Generate self-signed certificate for development
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+
+# Let's Encrypt automatic setup (production)
+# PoolAI will automatically handle certificate renewal
+```
 
 ## 🧪 Testing
 
@@ -183,6 +260,19 @@ cargo test
 
 ```bash
 cargo test --test integration
+```
+
+### Security Tests
+
+```bash
+# Run security audit
+cargo audit
+
+# Test HTTPS endpoints
+curl -k https://localhost:8080/api/v1/status
+
+# Test WebSocket secure connection
+wscat -c wss://localhost:8080/ws/metrics
 ```
 
 ### Development Setup

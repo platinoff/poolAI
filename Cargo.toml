@@ -54,6 +54,14 @@ tower = "0.4"
 tokio-tungstenite = "0.20"
 futures = "0.3"
 
+# HTTPS/TLS dependencies - Stage 2
+axum-server = "0.6"
+rustls = "0.21"
+rustls-pemfile = "1.0"
+tokio-rustls = "0.24"
+jsonwebtoken = "9.0"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
 [features]
 default = []
 stage2 = []
