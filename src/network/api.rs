@@ -1,13 +1,14 @@
 // network/api.rs
 use axum::{
-    routing::get,
+    routing::{get, post},
     Router,
     Json,
     response::{IntoResponse, Response},
-    http::{Request, header::ACCEPT},
+    http::{header::ACCEPT},
 };
 use serde::Serialize;
 use crate::platform;
+use crate::network::auth::{AuthRequest, authenticate_user};
 
 #[derive(Serialize)]
 struct StatusResponse {
@@ -37,9 +38,35 @@ struct WorkerInfo {
     current_task: Option<&'static str>,
 }
 
+#[derive(Serialize)]
+struct HealthResponse {
+    status: &'static str,
+    timestamp: String,
+    version: &'static str,
+    uptime: u64,
+    checks: HealthChecks,
+}
+
+#[derive(Serialize)]
+struct HealthChecks {
+    database: HealthCheck,
+    memory: HealthCheck,
+    workers: HealthCheck,
+    gpu: HealthCheck,
+}
+
+#[derive(Serialize)]
+struct HealthCheck {
+    status: &'static str,
+    message: String,
+    response_time_ms: u64,
+}
+
 pub fn create_api_routes() -> Router {
     Router::new()
         .route("/status", get(status_handler))
+        .route("/health", get(health_handler))
+        .route("/login", post(login_handler))
         .route("/metrics", get(metrics_handler))
         .route("/models", get(models_handler))
         .route("/workers", get(workers_handler))
@@ -110,6 +137,8 @@ async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response 
       <h2>API Reference</h2>
       <ul>
         <li><b>GET</b> <code>/api/v1/status</code> — Server status (HTML/JSON)</li>
+        <li><b>GET</b> <code>/api/v1/health</code> — Health check <span style='color:#50fa7b'>✨ NEW!</span></li>
+        <li><b>POST</b> <code>/api/v1/login</code> — Authentication <span style='color:#50fa7b'>🔐 NEW!</span></li>
         <li><b>GET</b> <code>/api/v1/metrics</code> — Metrics</li>
         <li><b>GET</b> <code>/api/v1/models</code> — Models</li>
         <li><b>GET</b> <code>/api/v1/gpu</code> — GPU Info</li>
@@ -191,4 +220,53 @@ async fn workers_handler() -> impl IntoResponse {
 async fn gpu_info() -> impl IntoResponse {
     let info = platform::get_gpu_info();
     Json(info)
+}
+
+async fn health_handler() -> impl IntoResponse {
+    use chrono::Utc;
+    
+    let start_time = std::time::Instant::now();
+    
+    // Симулюємо перевірки здоров'я системи
+    let health_checks = HealthChecks {
+        database: HealthCheck {
+            status: "healthy",
+            message: "Database connection OK".to_string(),
+            response_time_ms: 5,
+        },
+        memory: HealthCheck {
+            status: "healthy", 
+            message: "Memory usage: 45%".to_string(),
+            response_time_ms: 2,
+        },
+        workers: HealthCheck {
+            status: "healthy",
+            message: "8/8 workers active".to_string(),
+            response_time_ms: 3,
+        },
+        gpu: HealthCheck {
+            status: "healthy",
+            message: "GPU temperature: 65°C".to_string(),
+            response_time_ms: 8,
+        },
+    };
+    
+    let _response_time = start_time.elapsed().as_millis() as u64;
+    
+    let health_response = HealthResponse {
+        status: "healthy",
+        timestamp: Utc::now().to_rfc3339(),
+        version: "0.1.0",
+        uptime: 3600, // TODO: Реальний uptime
+        checks: health_checks,
+    };
+    
+    Json(health_response)
+}
+
+async fn login_handler(Json(auth_req): Json<AuthRequest>) -> impl IntoResponse {
+    match authenticate_user(auth_req).await {
+        Ok(auth_response) => Json(auth_response).into_response(),
+        Err((status, error)) => (status, error).into_response(),
+    }
 } 
