@@ -7,6 +7,7 @@ pub mod network;
 pub mod tgbot;
 mod platform;
 mod version;
+mod rewards;
 
 // Публичные интерфейсы (экспортируем только то, что нужно)
 

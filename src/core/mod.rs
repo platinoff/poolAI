@@ -8,7 +8,7 @@ pub mod state;
 
 use self::error::AppError;
 use self::config::{PoolAIConfig, initialize_config, get_config};
-use tracing::{info, error};
+use tracing::info;
 
 /// Initialize core module
 pub async fn initialize() -> Result<(), AppError> {

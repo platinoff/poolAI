@@ -9,6 +9,8 @@ use axum::{
 use serde::Serialize;
 use crate::platform;
 use crate::network::auth::{AuthRequest, authenticate_user};
+use crate::network::ws::websocket_handler;
+use crate::rewards::{get_user_rewards, get_user_progress, get_reward_statistics, get_top_users};
 
 #[derive(Serialize)]
 struct StatusResponse {
@@ -71,6 +73,12 @@ pub fn create_api_routes() -> Router {
         .route("/models", get(models_handler))
         .route("/workers", get(workers_handler))
         .route("/gpu", get(gpu_info))
+        .route("/ws/metrics", get(websocket_handler))
+        .route("/rewards", get(rewards_handler))
+        .route("/rewards/:user_id", get(user_rewards_handler))
+        .route("/rewards/progress/:user_id", get(user_progress_handler))
+        .route("/rewards/statistics", get(rewards_statistics_handler))
+        .route("/rewards/top", get(top_users_handler))
 }
 
 async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response {
@@ -142,8 +150,13 @@ async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response 
         <li><b>GET</b> <code>/api/v1/metrics</code> — Metrics</li>
         <li><b>GET</b> <code>/api/v1/models</code> — Models</li>
         <li><b>GET</b> <code>/api/v1/gpu</code> — GPU Info</li>
-        <li><b>GET</b> <code>/api/v1/workers</code> — Workers</li>
-        <li><b>WS</b> <code>/ws/metrics</code> — Live metrics (WebSocket, planned)</li>
+                 <li><b>GET</b> <code>/api/v1/workers</code> — Workers</li>
+         <li><b>WS</b> <code>/ws/metrics</code> — Live metrics (WebSocket) <span style='color:#50fa7b'>✨ NEW!</span></li>
+         <li><b>GET</b> <code>/api/v1/rewards</code> — Rewards system <span style='color:#ffb86c'>🎁 NEW!</span></li>
+         <li><b>GET</b> <code>/api/v1/rewards/:user_id</code> — User rewards</li>
+         <li><b>GET</b> <code>/api/v1/rewards/progress/:user_id</code> — User progress</li>
+         <li><b>GET</b> <code>/api/v1/rewards/statistics</code> — Rewards statistics</li>
+         <li><b>GET</b> <code>/api/v1/rewards/top</code> — Top users</li>
       </ul>
       <div class='curl-block'>
         <b>Example (curl):</b><br>
@@ -269,4 +282,39 @@ async fn login_handler(Json(auth_req): Json<AuthRequest>) -> impl IntoResponse {
         Ok(auth_response) => Json(auth_response).into_response(),
         Err((status, error)) => (status, error).into_response(),
     }
+}
+
+// Отримання всіх нагород
+async fn rewards_handler() -> impl IntoResponse {
+    let rewards = get_reward_statistics().await;
+    Json(rewards)
+}
+
+// Отримання нагород конкретного користувача
+async fn user_rewards_handler(axum::extract::Path(user_id): axum::extract::Path<String>) -> impl IntoResponse {
+    let rewards = get_user_rewards(&user_id).await;
+    Json(rewards)
+}
+
+// Отримання прогресу користувача
+async fn user_progress_handler(axum::extract::Path(user_id): axum::extract::Path<String>) -> impl IntoResponse {
+    let progress = get_user_progress(&user_id).await;
+    match progress {
+        Some(progress) => Json(progress).into_response(),
+        None => (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
+            "error": "User not found"
+        }))).into_response(),
+    }
+}
+
+// Отримання статистики нагород
+async fn rewards_statistics_handler() -> impl IntoResponse {
+    let stats = get_reward_statistics().await;
+    Json(stats)
+}
+
+// Отримання топ користувачів
+async fn top_users_handler() -> impl IntoResponse {
+    let top_users = get_top_users(10).await;
+    Json(top_users)
 } 

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+// use std::collections::HashMap; // Not used in MVP
 use crate::core::error::AppError;
 
 /// Конфигурация системы PoolAI
@@ -177,17 +177,17 @@ impl PoolAIConfig {
     }
 
     /// Получение конфигурации модели
-    pub fn get_model_config(&self, model_name: &str) -> Option<&ModelConfig> {
+    pub fn get_model_config(&self, _model_name: &str) -> Option<&ModelConfig> {
         None
     }
 
     /// Добавление конфигурации модели
-    pub fn add_model_config(&mut self, config: ModelConfig) {
+    pub fn add_model_config(&mut self, _config: ModelConfig) {
         // This method is not used in the MVP
     }
 
     /// Удаление конфигурации модели
-    pub fn remove_model_config(&mut self, model_name: &str) -> Option<ModelConfig> {
+    pub fn remove_model_config(&mut self, _model_name: &str) -> Option<ModelConfig> {
         None
     }
 

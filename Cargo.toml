@@ -44,6 +44,7 @@ uuid = { version = "1.7", features = ["v4"] }
 
 # Synchronization primitives
 parking_lot = "0.12"
+lazy_static = "1.4"
 
 # Command line arguments
 clap = { version = "4.0", features = ["derive"] }
@@ -53,6 +54,7 @@ axum = { version = "0.7", features = ["ws", "macros"] }
 tower = "0.4"
 tokio-tungstenite = "0.20"
 futures = "0.3"
+futures-util = "0.3"
 
 # HTTPS/TLS dependencies - Stage 2
 axum-server = { version = "0.6", features = ["tls-rustls"] }

@@ -2,7 +2,7 @@ pub mod worker;
 
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelRequest, ModelResponse};
-use crate::core::config::PoolAIConfig;
+// use crate::core::config::PoolAIConfig; // Not used in MVP
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 use std::sync::Arc;

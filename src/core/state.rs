@@ -5,8 +5,8 @@ use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
 use crate::core::error::AppError;
 use crate::core::config::PoolAIConfig;
-use crate::core::model_interface::{ModelState, ModelStatus, ModelMetrics};
-use tracing::{info, warn, error};
+use crate::core::model_interface::{ModelState, ModelStatus};
+use tracing::info;
 
 /// Состояние воркера
 #[derive(Debug, Clone, Serialize, Deserialize)]
