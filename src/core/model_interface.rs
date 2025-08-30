@@ -3,37 +3,37 @@ use crate::core::config::ModelConfig as ConfigModelConfig;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-/// Запрос к модели
+/// Model request
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelRequest {
-    /// Входные данные (промпт)
+    /// Input (prompt)
     pub input: String,
-    /// Параметры генерации
+    /// Generation parameters
     pub parameters: ModelParameters,
-    /// ID сессии для кэширования
+    /// Session ID for caching
     pub session_id: Option<String>,
-    /// Приоритет запроса (1-10, где 10 - высший)
+    /// Request priority (1-10, 10 is the highest)
     pub priority: u8,
-    /// Таймаут запроса (секунды)
+    /// Request timeout (seconds)
     pub timeout: Option<u64>,
 }
 
-/// Ответ модели
+/// Model response
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelResponse {
-    /// Сгенерированный текст
+    /// Generated text
     pub output: String,
-    /// Метрики обработки
+    /// Processing metrics
     pub metrics: ModelMetrics,
-    /// ID сессии
+    /// Session ID
     pub session_id: Option<String>,
-    /// Статус обработки
+    /// Processing status
     pub status: ResponseStatus,
-    /// Ошибки (если есть)
+    /// Errors (if any)
     pub errors: Vec<String>,
 }
 
-/// Статус ответа
+/// Response status
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ResponseStatus {
     Success,
@@ -42,12 +42,12 @@ pub enum ResponseStatus {
     Timeout,
 }
 
-/// Параметры модели
+/// Model parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelParameters {
-    /// Температура генерации (0.0-2.0)
+    /// Sampling temperature (0.0-2.0)
     pub temperature: f32,
-    /// Максимальное количество токенов
+    /// Maximum tokens
     pub max_tokens: usize,
     /// Top-p sampling (0.0-1.0)
     pub top_p: f32,
@@ -57,7 +57,7 @@ pub struct ModelParameters {
     pub presence_penalty: f32,
     /// Stop sequences
     pub stop_sequences: Vec<String>,
-    /// Seed для воспроизводимости
+    /// Seed for reproducibility
     pub seed: Option<u64>,
 }
 
@@ -75,83 +75,83 @@ impl Default for ModelParameters {
     }
 }
 
-/// Информация о модели
+/// Model information
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelInfo {
-    /// Название модели
+    /// Model name
     pub name: String,
-    /// Версия модели
+    /// Model version
     pub version: String,
-    /// Возможности модели
+    /// Model capabilities
     pub capabilities: Vec<String>,
-    /// Максимальное количество токенов
+    /// Maximum tokens
     pub max_tokens: usize,
-    /// Поддерживаемые параметры
+    /// Supported parameters
     pub supported_parameters: Vec<String>,
-    /// Размер модели (MB)
+    /// Model size (MB)
     pub model_size_mb: u64,
-    /// Поддерживаемые языки
+    /// Supported languages
     pub supported_languages: Vec<String>,
-    /// Требования к GPU
+    /// GPU requirements
     pub gpu_requirements: GpuRequirements,
 }
 
-/// Требования к GPU
+/// GPU requirements
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GpuRequirements {
-    /// Минимальная память GPU (MB)
+    /// Minimum GPU memory (MB)
     pub min_memory_mb: u64,
-    /// Рекомендуемая память GPU (MB)
+    /// Recommended GPU memory (MB)
     pub recommended_memory_mb: u64,
-    /// Поддерживаемые архитектуры GPU
+    /// Supported GPU architectures
     pub supported_architectures: Vec<String>,
-    /// Требуется CUDA
+    /// Requires CUDA
     pub requires_cuda: bool,
 }
 
-/// Метрики модели
+/// Model metrics
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelMetrics {
-    /// Время обработки (мс)
+    /// Processing time (ms)
     pub processing_time_ms: u64,
-    /// Количество сгенерированных токенов
+    /// Number of generated tokens
     pub tokens_generated: usize,
-    /// Утилизация GPU (%)
+    /// GPU utilization (%)
     pub gpu_utilization: f32,
-    /// Использование памяти (MB)
+    /// Memory usage (MB)
     pub memory_usage_mb: f32,
-    /// Пропускная способность (токенов/сек)
+    /// Throughput (tokens/sec)
     pub throughput_tokens_per_sec: f32,
-    /// Загрузка CPU (%)
+    /// CPU utilization (%)
     pub cpu_utilization: f32,
-    /// Температура GPU (°C)
+    /// GPU temperature (°C)
     pub gpu_temperature: f32,
-    /// Мощность GPU (Watts)
+    /// GPU power (Watts)
     pub gpu_power_watts: f32,
-    /// Количество запросов в очереди
+    /// Number of requests in queue
     pub queue_length: usize,
-    /// Средняя задержка (мс)
+    /// Average latency (ms)
     pub average_latency_ms: f32,
 }
 
-/// Состояние модели
+/// Model state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelState {
-    /// Статус модели
+    /// Model status
     pub status: ModelStatus,
-    /// Количество активных запросов
+    /// Active requests count
     pub active_requests: usize,
-    /// Общее количество обработанных запросов
+    /// Total processed requests
     pub total_requests: u64,
-    /// Время последней активности
+    /// Last activity time
     pub last_activity: chrono::DateTime<chrono::Utc>,
-    /// Ошибки (если есть)
+    /// Errors (if any)
     pub errors: Vec<String>,
-    /// Метрики производительности
+    /// Performance metrics
     pub metrics: ModelMetrics,
 }
 
-/// Статус модели
+/// Model status
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ModelStatus {
     Initializing,
@@ -161,82 +161,82 @@ pub enum ModelStatus {
     Shutdown,
 }
 
-/// Конфигурация модели (для интерфейса)
+/// Model configuration (for the interface)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelConfig {
-    /// Путь к модели
+    /// Model path
     pub model_path: String,
-    /// GPU устройство
+    /// GPU device
     pub gpu_device: Option<usize>,
-    /// Максимальный размер батча
+    /// Maximum batch size
     pub max_batch_size: usize,
-    /// Лимит памяти (MB)
+    /// Memory limit (MB)
     pub memory_limit_mb: usize,
-    /// Включить кэширование
+    /// Enable caching
     pub enable_caching: bool,
-    /// Размер кэша (MB)
+    /// Cache size (MB)
     pub cache_size_mb: usize,
-    /// Параметры по умолчанию
+    /// Default parameters
     pub default_parameters: ModelParameters,
-    /// Настройки производительности
+    /// Performance settings
     pub performance_settings: PerformanceSettings,
 }
 
-/// Настройки производительности
+/// Performance settings
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PerformanceSettings {
-    /// Количество потоков
+    /// Number of threads
     pub num_threads: usize,
-    /// Использовать GPU
+    /// Use GPU
     pub use_gpu: bool,
-    /// Оптимизация памяти
+    /// Memory optimization
     pub memory_optimization: bool,
-    /// Параллельная обработка
+    /// Parallel processing
     pub parallel_processing: bool,
 }
 
-/// Основной интерфейс модели согласно концепту MVP
+/// Primary model interface according to the MVP concept
 #[async_trait::async_trait]
 pub trait ModelInterface {
-    /// Обработка запроса к модели
+    /// Process a request with the model
     async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError>;
     
-    /// Получение информации о модели
+    /// Get model information
     async fn get_model_info(&self) -> Result<ModelInfo, AppError>;
     
-    /// Обновление конфигурации модели
+    /// Update model configuration
     async fn update_config(&self, config: ModelConfig) -> Result<(), AppError>;
     
-    /// Получение метрик модели
+    /// Get model metrics
     async fn get_metrics(&self) -> Result<ModelMetrics, AppError>;
     
-    /// Получение состояния модели
+    /// Get model state
     async fn get_state(&self) -> Result<ModelState, AppError>;
     
-    /// Инициализация модели
+    /// Initialize the model
     async fn initialize(&self) -> Result<(), AppError>;
     
-    /// Остановка модели
+    /// Shutdown the model
     async fn shutdown(&self) -> Result<(), AppError>;
     
-    /// Проверка здоровья модели
+    /// Health check for the model
     async fn health_check(&self) -> Result<(), AppError>;
     
-    /// Очистка кэша
+    /// Clear cache
     async fn clear_cache(&self) -> Result<(), AppError>;
     
-    /// Получение статистики
+    /// Get statistics
     async fn get_statistics(&self) -> Result<HashMap<String, f64>, AppError>;
 }
 
-/// Менеджер моделей для MVP
+/// Model manager for MVP
 pub struct ModelManager {
     models: HashMap<String, Box<dyn ModelInterface + Send + Sync>>,
     config: ConfigModelConfig,
 }
 
 impl ModelManager {
-    /// Создание нового менеджера моделей
+    /// Create a new model manager
     pub fn new(config: ConfigModelConfig) -> Self {
         Self {
             models: HashMap::new(),
@@ -244,23 +244,23 @@ impl ModelManager {
         }
     }
 
-    /// Регистрация модели
+    /// Register a model
     pub async fn register_model(
         &mut self,
         name: String,
         model: Box<dyn ModelInterface + Send + Sync>,
     ) -> Result<(), AppError> {
-        // Инициализация модели
+        // Model initialization
         model.initialize().await?;
         
-        // Проверка здоровья
+        // Health check
         model.health_check().await?;
         
         self.models.insert(name, model);
         Ok(())
     }
 
-    /// Удаление модели
+    /// Unregister a model
     pub async fn unregister_model(&mut self, name: &str) -> Result<(), AppError> {
         if let Some(model) = self.models.remove(name) {
             model.shutdown().await?;
@@ -268,17 +268,17 @@ impl ModelManager {
         Ok(())
     }
 
-    /// Получение модели
+    /// Get a model by name
     pub fn get_model(&self, name: &str) -> Option<&Box<dyn ModelInterface + Send + Sync>> {
         self.models.get(name)
     }
 
-    /// Получение всех моделей
+    /// Get all models
     pub fn get_all_models(&self) -> &HashMap<String, Box<dyn ModelInterface + Send + Sync>> {
         &self.models
     }
 
-    /// Обработка запроса через конкретную модель
+    /// Process a request via a specific model
     pub async fn process_request(
         &self,
         model_name: &str,
@@ -292,7 +292,7 @@ impl ModelManager {
         model.process_request(request).await
     }
 
-    /// Получение метрик всех моделей
+    /// Get metrics for all models
     pub async fn get_all_metrics(&self) -> Result<HashMap<String, ModelMetrics>, AppError> {
         let mut metrics = HashMap::new();
         
@@ -304,7 +304,7 @@ impl ModelManager {
         Ok(metrics)
     }
 
-    /// Получение состояния всех моделей
+    /// Get states for all models
     pub async fn get_all_states(&self) -> Result<HashMap<String, ModelState>, AppError> {
         let mut states = HashMap::new();
         

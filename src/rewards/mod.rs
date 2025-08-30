@@ -1,5 +1,5 @@
 // rewards/mod.rs
-// Система нагород для Stage 3 (ендорфін-базировані нагороди)
+// Reward system for Stage 3 (endorphin-based rewards)
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -7,28 +7,28 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use chrono::{DateTime, Utc};
 
-// Типи нагород
+// Reward types
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum RewardType {
-    Performance,    // За високу продуктивність
-    Efficiency,     // За ефективність використання ресурсів
-    Quality,        // За якість результатів
-    Innovation,     // За інноваційні рішення
-    Collaboration,  // За співпрацю
-    Maintenance,    // За обслуговування системи
+    Performance,    // For high performance
+    Efficiency,     // For efficient resource usage
+    Quality,        // For result quality
+    Innovation,     // For innovative solutions
+    Collaboration,  // For collaboration
+    Maintenance,    // For system maintenance
 }
 
-// Рівні нагород
+// Reward levels
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum RewardLevel {
-    Bronze = 1,    // 1x базова нагорода
-    Silver = 2,    // 2x базова нагорода
-    Gold = 3,      // 3x базова нагорода
-    Platinum = 4,  // 4x базова нагорода
-    Diamond = 5,   // 5x базова нагорода
+    Bronze = 1,    // 1x base reward
+    Silver = 2,    // 2x base reward
+    Gold = 3,      // 3x base reward
+    Platinum = 4,  // 4x base reward
+    Diamond = 5,   // 5x base reward
 }
 
-// Структура нагороди
+// Reward structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Reward {
     pub id: String,
@@ -41,7 +41,7 @@ pub struct Reward {
     pub metadata: HashMap<String, String>,
 }
 
-// Структура прогресу користувача
+// User progress structure
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserProgress {
     pub user_id: String,
@@ -55,7 +55,7 @@ pub struct UserProgress {
     pub experience: u64,
 }
 
-// Система нагород
+// Reward system
 pub struct RewardSystem {
     rewards: Arc<RwLock<HashMap<String, Reward>>>,
     user_progress: Arc<RwLock<HashMap<String, UserProgress>>>,
@@ -79,7 +79,7 @@ impl RewardSystem {
         }
     }
 
-    // Створення нової нагороди
+    // Create a new reward
     pub async fn create_reward(
         &self,
         user_id: String,
@@ -103,23 +103,23 @@ impl RewardSystem {
             metadata,
         };
 
-        // Зберігаємо нагороду
+        // Save the reward
         let mut rewards = self.rewards.write().await;
         rewards.insert(reward.id.clone(), reward.clone());
 
-        // Оновлюємо прогрес користувача
+        // Update user progress
         self.update_user_progress(&user_id, &reward).await;
 
         reward
     }
 
-    // Отримання множника нагороди
+    // Get reward multiplier
     async fn get_reward_multiplier(&self, reward_type: &RewardType) -> f64 {
         let multipliers = self.reward_multipliers.read().await;
         *multipliers.get(reward_type).unwrap_or(&1.0)
     }
 
-    // Оновлення прогресу користувача
+    // Update user progress
     async fn update_user_progress(&self, user_id: &str, reward: &Reward) {
         let mut progress_map = self.user_progress.write().await;
         
@@ -135,11 +135,11 @@ impl RewardSystem {
             experience: 0,
         });
 
-        // Оновлюємо загальну суму та кількість нагород
+        // Update total amount and reward count
         progress.total_rewards += reward.amount;
         progress.reward_count += 1;
 
-        // Оновлюємо streak
+        // Update streak
         let now = Utc::now();
         if let Some(last_date) = progress.last_reward_date {
             let days_diff = (now - last_date).num_days();
@@ -157,19 +157,19 @@ impl RewardSystem {
 
         progress.last_reward_date = Some(now);
 
-        // Оновлюємо досвід та рівень
+        // Update experience and level
         progress.experience += (reward.amount * 100.0) as u64;
         progress.level = (progress.experience / 1000) as u32 + 1;
 
-        // Перевіряємо досягнення
+        // Check achievements
         self.check_achievements(progress).await;
     }
 
-    // Перевірка досягнень
+    // Check achievements
     async fn check_achievements(&self, progress: &mut UserProgress) {
         let mut new_achievements = Vec::new();
 
-        // Досягнення за кількість нагород
+        // Achievements for reward count
         if progress.reward_count >= 10 && !progress.achievements.contains(&"First Decade".to_string()) {
             new_achievements.push("First Decade".to_string());
         }
@@ -180,7 +180,7 @@ impl RewardSystem {
             new_achievements.push("Century".to_string());
         }
 
-        // Досягнення за streak
+        // Achievements for streak
         if progress.current_streak >= 7 && !progress.achievements.contains(&"Week Warrior".to_string()) {
             new_achievements.push("Week Warrior".to_string());
         }
@@ -188,19 +188,19 @@ impl RewardSystem {
             new_achievements.push("Monthly Master".to_string());
         }
 
-        // Досягнення за рівень
-        if progress.level >= 5 && !progress.achievements.contains(&"Level 5".to_string()) {
+        // Achievements for level
+        if progress.level >= 5 && !progress.achievements.contains(&"Level 10".to_string()) {
             new_achievements.push("Level 5".to_string());
         }
         if progress.level >= 10 && !progress.achievements.contains(&"Level 10".to_string()) {
             new_achievements.push("Level 10".to_string());
         }
 
-        // Додаємо нові досягнення
+        // Add new achievements
         progress.achievements.extend(new_achievements);
     }
 
-    // Отримання нагород користувача
+    // Get user rewards
     pub async fn get_user_rewards(&self, user_id: &str) -> Vec<Reward> {
         let rewards = self.rewards.read().await;
         rewards
@@ -210,13 +210,13 @@ impl RewardSystem {
             .collect()
     }
 
-    // Отримання прогресу користувача
+    // Get user progress
     pub async fn get_user_progress(&self, user_id: &str) -> Option<UserProgress> {
         let progress = self.user_progress.read().await;
         progress.get(user_id).cloned()
     }
 
-    // Отримання статистики нагород
+    // Get reward statistics
     pub async fn get_reward_statistics(&self) -> HashMap<String, f64> {
         let rewards = self.rewards.read().await;
         let mut stats = HashMap::new();
@@ -229,7 +229,7 @@ impl RewardSystem {
         stats
     }
 
-    // Отримання топ користувачів
+    // Get top users
     pub async fn get_top_users(&self, limit: usize) -> Vec<(String, f64)> {
         let progress = self.user_progress.read().await;
         let mut users: Vec<(String, f64)> = progress
@@ -242,7 +242,7 @@ impl RewardSystem {
         users
     }
 
-    // Очищення старих нагород
+    // Clean up old rewards
     pub async fn cleanup_old_rewards(&self, days_old: i64) {
         let cutoff_date = Utc::now() - chrono::Duration::days(days_old);
         let mut rewards = self.rewards.write().await;
@@ -251,12 +251,12 @@ impl RewardSystem {
     }
 }
 
-// Глобальний екземпляр системи нагород
+// Global instance of the reward system
 lazy_static::lazy_static! {
     static ref REWARD_SYSTEM: RewardSystem = RewardSystem::new();
 }
 
-// Публічні функції для доступу до системи нагород
+// Public functions for accessing the reward system
 pub async fn create_reward(
     user_id: String,
     reward_type: RewardType,
@@ -284,7 +284,7 @@ pub async fn get_top_users(limit: usize) -> Vec<(String, f64)> {
     REWARD_SYSTEM.get_top_users(limit).await
 }
 
-// Функція для автоматичного нагородження за продуктивність
+// Function for automatic performance bonus awarding
 pub async fn award_performance_bonus(user_id: String, performance_score: f64) {
     if performance_score >= 0.9 {
         let metadata = HashMap::new();

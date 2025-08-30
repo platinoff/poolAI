@@ -87,7 +87,7 @@ async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response 
         version: "0.1.0",
         uptime: 3600,
     };
-    // Проверяем Accept header
+    // Check the Accept header
     let want_html = req
         .headers()
         .get(ACCEPT)
@@ -240,7 +240,7 @@ async fn health_handler() -> impl IntoResponse {
     
     let start_time = std::time::Instant::now();
     
-    // Симулюємо перевірки здоров'я системи
+    // Simulated system health checks
     let health_checks = HealthChecks {
         database: HealthCheck {
             status: "healthy",
@@ -270,7 +270,7 @@ async fn health_handler() -> impl IntoResponse {
         status: "healthy",
         timestamp: Utc::now().to_rfc3339(),
         version: "0.1.0",
-        uptime: 3600, // TODO: Реальний uptime
+        uptime: 3600, // TODO: Actual uptime
         checks: health_checks,
     };
     
@@ -284,19 +284,19 @@ async fn login_handler(Json(auth_req): Json<AuthRequest>) -> impl IntoResponse {
     }
 }
 
-// Отримання всіх нагород
+// Retrieve all rewards
 async fn rewards_handler() -> impl IntoResponse {
     let rewards = get_reward_statistics().await;
     Json(rewards)
 }
 
-// Отримання нагород конкретного користувача
+// Retrieve rewards for a specific user
 async fn user_rewards_handler(axum::extract::Path(user_id): axum::extract::Path<String>) -> impl IntoResponse {
     let rewards = get_user_rewards(&user_id).await;
     Json(rewards)
 }
 
-// Отримання прогресу користувача
+// Retrieve user progress
 async fn user_progress_handler(axum::extract::Path(user_id): axum::extract::Path<String>) -> impl IntoResponse {
     let progress = get_user_progress(&user_id).await;
     match progress {
@@ -307,13 +307,13 @@ async fn user_progress_handler(axum::extract::Path(user_id): axum::extract::Path
     }
 }
 
-// Отримання статистики нагород
+// Retrieve rewards statistics
 async fn rewards_statistics_handler() -> impl IntoResponse {
     let stats = get_reward_statistics().await;
     Json(stats)
 }
 
-// Отримання топ користувачів
+// Retrieve top users
 async fn top_users_handler() -> impl IntoResponse {
     let top_users = get_top_users(10).await;
     Json(top_users)
