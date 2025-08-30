@@ -258,3 +258,4 @@ curl -k https://localhost:8080/api/v1/rewards
 **PoolAI** - Надаємо AI можливості розподіленого обчислення 🚀  
 **Статус**: Stage 3 ЗАВЕРШЕНО! 🎯  
 **Наступна ціль**: Stage 4 - Enterprise функції та Cloud інтеграція 🚀
+

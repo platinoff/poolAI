@@ -3,8 +3,10 @@ use crate::core::model_interface::{ModelRequest, ModelResponse, ModelMetrics};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use std::collections::VecDeque;
+use serde::{Deserialize, Serialize};
+use tracing::info;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerConfig {
     pub worker_id: String,
     pub max_concurrent_requests: usize,
@@ -12,16 +14,28 @@ pub struct WorkerConfig {
     pub health_check_interval_ms: u64,
     pub enable_caching: bool,
     pub cache_size: usize,
+    // Stage 4.1: Runtime capabilities
+    pub max_memory_mb: usize,
+    pub cpu_priority: u8,
+    pub gpu_device: Option<usize>,
+    pub auto_restart: bool,
+    pub resource_monitoring: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerStatus {
     pub is_healthy: bool,
     pub active_connections: usize,
     pub queue_size: usize,
-    pub last_health_check: std::time::Instant,
+    pub last_health_check: chrono::DateTime<chrono::Utc>,
     pub total_requests_processed: u64,
     pub average_response_time_ms: f64,
+    // Stage 4.1: Enhanced metrics
+    pub cpu_usage: f32,
+    pub memory_usage_mb: f32,
+    pub gpu_usage: Option<f32>,
+    pub process_id: Option<u32>,
+    pub uptime_seconds: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -40,9 +54,15 @@ impl Worker {
                 is_healthy: true,
                 active_connections: 0,
                 queue_size: 0,
-                last_health_check: std::time::Instant::now(),
+                last_health_check: chrono::Utc::now(),
                 total_requests_processed: 0,
                 average_response_time_ms: 0.0,
+                // Stage 4.1: Initialize enhanced metrics
+                cpu_usage: 0.0,
+                memory_usage_mb: 0.0,
+                gpu_usage: None,
+                process_id: None,
+                uptime_seconds: 0,
             })),
             request_queue: Arc::new(RwLock::new(VecDeque::new())),
             cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
@@ -156,7 +176,7 @@ impl Worker {
     }
 
     pub async fn health_check(&self) -> Result<bool, AppError> {
-        let start_time = std::time::Instant::now();
+        let start_time = chrono::Utc::now();
         
         // Simple health check
         let mut status = self.status.write().await;
