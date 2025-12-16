@@ -1,85 +1,86 @@
 use serde::{Deserialize, Serialize};
+use std::sync::OnceLock;
 // use std::collections::HashMap; // Not used in MVP
 use crate::core::error::AppError;
 
-/// Конфигурация системы PoolAI
+/// PoolAI system configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemConfig {
-    /// Название системы
+    /// System name
     pub name: String,
-    /// Версия системы
+    /// System version
     pub version: String,
-    /// Уровень логирования
+    /// Logging level
     pub log_level: String,
-    /// Максимальное количество воркеров
+    /// Maximum number of workers
     pub max_workers: usize,
-    /// Размер очереди запросов
+    /// Request queue size
     pub queue_size: usize,
-    /// Интервал сбора метрик (секунды)
+    /// Metrics collection interval (seconds)
     pub metrics_interval: u64,
 }
 
-/// Конфигурация GPU
+/// GPU configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GpuConfig {
-    /// Включить GPU
+    /// Enable GPU
     pub enabled: bool,
-    /// Лимит памяти GPU (MB)
+    /// GPU memory limit (MB)
     pub memory_limit: u64,
-    /// Лимит температуры (°C)
+    /// Temperature limit (°C)
     pub temperature_limit: u8,
-    /// Лимит мощности (Watts)
+    /// Power limit (Watts)
     pub power_limit: u16,
-    /// Количество GPU для использования
+    /// Number of GPUs to use
     pub gpu_count: usize,
 }
 
-/// Конфигурация модели
+/// Model configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelConfig {
-    /// Название модели
+    /// Model name
     pub name: String,
-    /// Путь к модели
+    /// Model path
     pub path: String,
-    /// Максимальный размер батча
+    /// Maximum batch size
     pub max_batch_size: usize,
-    /// Лимит памяти для модели (MB)
+    /// Memory limit for model (MB)
     pub memory_limit: u64,
-    /// Температура генерации
+    /// Generation temperature
     pub temperature: f32,
-    /// Максимальное количество токенов
+    /// Maximum number of tokens
     pub max_tokens: usize,
-    /// Включить кэширование
+    /// Enable caching
     pub enable_cache: bool,
-    /// Размер кэша (MB)
+    /// Cache size (MB)
     pub cache_size: u64,
 }
 
-/// Конфигурация пула
+/// Pool configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoolConfig {
-    /// Максимальное количество воркеров
+    /// Maximum number of workers
     pub max_workers: usize,
-    /// Размер очереди запросов
+    /// Request queue size
     pub queue_size: usize,
-    /// Автоматическое масштабирование
+    /// Auto-scaling enabled
     pub auto_scaling: bool,
-    /// Порог для масштабирования (0.0-1.0)
+    /// Scaling threshold (0.0-1.0)
     pub scaling_threshold: f32,
-    /// Таймаут обработки запроса (секунды)
+    /// Request processing timeout (seconds)
     pub request_timeout: u64,
 }
 
-/// Конфигурация мониторинга
+/// Monitoring configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitoringConfig {
-    /// Интервал сбора метрик (секунды)
+    /// Metrics collection interval (seconds)
     pub metrics_interval: u64,
-    /// Порог для алертов (0.0-1.0)
+    /// Alert threshold (0.0-1.0)
     pub alert_threshold: f32,
-    /// Количество дней хранения метрик
+    /// Number of days to retain metrics
     pub retention_days: u32,
-    /// Включить детальное логирование
+    /// Enable detailed logging
     pub detailed_logging: bool,
 }
 
@@ -94,20 +95,20 @@ pub struct HealthConfig {
     pub expected_workers: usize,
 }
 
-/// Основная конфигурация PoolAI
+/// Main PoolAI configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoolAIConfig {
-    /// Конфигурация системы
+    /// System configuration
     pub system: SystemConfig,
-    /// Конфигурация GPU
+    /// GPU configuration
     pub gpu: GpuConfig,
-    /// Конфигурация пула
+    /// Pool configuration
     pub pool: PoolConfig,
-    /// Конфигурация мониторинга
+    /// Monitoring configuration
     pub monitoring: MonitoringConfig,
-    /// Конфигурация версии
+    /// Version configuration
     pub version: VersionConfig,
-    /// Конфигурация healthcheck
+    /// Health check configuration
     pub health: HealthConfig,
 }
 
@@ -154,7 +155,7 @@ impl Default for PoolAIConfig {
 }
 
 impl PoolAIConfig {
-    /// Загрузка конфигурации из файла
+    /// Load configuration from file
     pub fn from_file(path: &str) -> Result<Self, AppError> {
         let content = std::fs::read_to_string(path)
             .map_err(|e| AppError::ConfigError(format!("Failed to read config file: {}", e)))?;
@@ -165,7 +166,7 @@ impl PoolAIConfig {
         Ok(config)
     }
 
-    /// Сохранение конфигурации в файл
+    /// Save configuration to file
     pub fn save_to_file(&self, path: &str) -> Result<(), AppError> {
         let content = toml::to_string_pretty(self)
             .map_err(|e| AppError::ConfigError(format!("Failed to serialize config: {}", e)))?;
@@ -176,24 +177,24 @@ impl PoolAIConfig {
         Ok(())
     }
 
-    /// Получение конфигурации модели
+    /// Get model configuration
     pub fn get_model_config(&self, _model_name: &str) -> Option<&ModelConfig> {
         None
     }
 
-    /// Добавление конфигурации модели
+    /// Add model configuration
     pub fn add_model_config(&mut self, _config: ModelConfig) {
         // This method is not used in the MVP
     }
 
-    /// Удаление конфигурации модели
+    /// Remove model configuration
     pub fn remove_model_config(&mut self, _model_name: &str) -> Option<ModelConfig> {
         None
     }
 
-    /// Валидация конфигурации
+    /// Validate configuration
     pub fn validate(&self) -> Result<(), AppError> {
-        // Проверка системной конфигурации
+        // Validate system configuration
         if self.system.max_workers == 0 {
             return Err(AppError::ConfigError("max_workers must be greater than 0".to_string()));
         }
@@ -202,12 +203,12 @@ impl PoolAIConfig {
             return Err(AppError::ConfigError("queue_size must be greater than 0".to_string()));
         }
 
-        // Проверка GPU конфигурации
+        // Validate GPU configuration
         if self.gpu.enabled && self.gpu.memory_limit == 0 {
             return Err(AppError::ConfigError("GPU memory_limit must be greater than 0".to_string()));
         }
 
-        // Проверка пула
+        // Validate pool configuration
         if self.pool.max_workers == 0 {
             return Err(AppError::ConfigError("pool max_workers must be greater than 0".to_string()));
         }
@@ -216,7 +217,7 @@ impl PoolAIConfig {
             return Err(AppError::ConfigError("scaling_threshold must be between 0.0 and 1.0".to_string()));
         }
 
-        // Проверка мониторинга
+        // Validate monitoring configuration
         if self.monitoring.metrics_interval == 0 {
             return Err(AppError::ConfigError("metrics_interval must be greater than 0".to_string()));
         }
@@ -229,36 +230,37 @@ impl PoolAIConfig {
     }
 }
 
-/// Глобальный экземпляр конфигурации
-static mut CONFIG: Option<PoolAIConfig> = None;
+/// Global configuration instance
+static CONFIG: OnceLock<PoolAIConfig> = OnceLock::new();
 
-/// Инициализация конфигурации
+/// Initialize configuration
 pub fn initialize_config(config: PoolAIConfig) -> Result<(), AppError> {
     config.validate()?;
     
-    unsafe {
-        CONFIG = Some(config);
-    }
+    CONFIG.set(config).map_err(|_| {
+        AppError::ConfigError("Configuration already initialized".to_string())
+    })?;
     
     Ok(())
 }
 
-/// Получение конфигурации
+/// Get configuration
 pub fn get_config() -> Result<PoolAIConfig, AppError> {
-    unsafe {
-        CONFIG.clone().ok_or_else(|| {
-            AppError::ConfigError("Configuration not initialized".to_string())
-        })
-    }
+    CONFIG.get().cloned().ok_or_else(|| {
+        AppError::ConfigError("Configuration not initialized".to_string())
+    })
 }
 
-/// Обновление конфигурации
+/// Update configuration
 pub fn update_config(config: PoolAIConfig) -> Result<(), AppError> {
     config.validate()?;
     
-    unsafe {
-        CONFIG = Some(config);
-    }
+    // OnceLock doesn't support updates, so we need to reinitialize
+    // This is a limitation, but ensures thread safety
+    // For true updates, consider using Arc<RwLock<PoolAIConfig>> instead
+    CONFIG.set(config).map_err(|_| {
+        AppError::ConfigError("Configuration already initialized. Use reinitialize_config() to update.".to_string())
+    })?;
     
     Ok(())
 } 

@@ -4,7 +4,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use std::collections::VecDeque;
 use serde::{Deserialize, Serialize};
-use tracing::info;
+// use tracing::info; // Unused import
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerConfig {

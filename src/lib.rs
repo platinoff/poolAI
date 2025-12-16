@@ -1,24 +1,53 @@
 //! PoolAI public API (library root)
+//!
+//! This library provides a comprehensive AI mining pool management system
+//! with advanced runtime management, monitoring, and enterprise features.
 
-mod core;
-mod pool;
-mod monitoring;
+// Core modules
+pub mod core;
+pub mod pool;
+pub mod monitoring;
+pub mod platform;
+pub mod version;
+pub mod rewards;
+pub mod runtime;
+
+// Public modules (exposed for external use)
 pub mod network;
 pub mod tgbot;
-mod platform;
-mod version;
-mod rewards;
-mod runtime;
 
-// Публичные интерфейсы (экспортируем только то, что нужно)
-
+// Re-export core types for convenient access
 pub use core::model_interface::{ModelInterface, ModelInfo};
 pub use core::config::PoolAIConfig;
 pub use core::state::AppState;
-pub use pool::{Pool, PoolConfig};
+pub use core::error::AppError;
+
+// Re-export pool types
+pub use pool::{Pool, PoolConfig, PoolMetrics};
 pub use pool::LoadBalancingStrategy;
+
+// Re-export monitoring types
 pub use monitoring::MetricsCollector;
+pub use monitoring::{Monitoring, Alert, AlertSeverity, SystemStatus, HistoricalData};
+
+// Re-export runtime types
+pub use runtime::{RuntimeManager, RuntimeConfig, RuntimeStatus};
+pub use runtime::{
+    TaskScheduler, TaskQueue, CacheManager, StorageManager,
+    ProcessManager, ResourceOrchestrator, HealthMonitor
+};
+
+// Re-export rewards types
+pub use rewards::{RewardSystem, RewardType, RewardLevel, Reward, UserProgress};
+
+// Re-export platform types
+pub use platform::{GpuInfo, get_gpu_info};
+
+// Re-export network functions
 pub use network::start_server;
-pub use platform::*;
-pub use tgbot::*;
+
+// Re-export tgbot functions
+pub use tgbot::{start_bot, send_notification};
+
+// Re-export version information
 pub use version::{APP_VERSION, BUILD_TIME};

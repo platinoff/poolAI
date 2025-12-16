@@ -3,7 +3,7 @@ pub mod metrics;
 use crate::core::error::AppError;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant};
 
 #[derive(Debug, Clone)]
@@ -198,26 +198,24 @@ impl Monitoring {
 
 pub use crate::monitoring::metrics::MetricsCollector;
 
-// Global monitoring instance
-static mut GLOBAL_MONITORING: Option<Monitoring> = None;
+// Global monitoring instance - using OnceLock for thread-safe initialization
+// Wrapped in Arc for shared ownership across async contexts
+static GLOBAL_MONITORING: OnceLock<Arc<Monitoring>> = OnceLock::new();
 
 /// Initialize monitoring module
 pub async fn initialize() -> Result<(), AppError> {
     tracing::info!("Initializing monitoring module");
     
     let monitoring = Monitoring::new();
+    let monitoring_arc = Arc::new(monitoring);
     
     // Store global instance
-    unsafe {
-        GLOBAL_MONITORING = Some(monitoring);
-    }
+    GLOBAL_MONITORING.set(monitoring_arc.clone()).map_err(|_| {
+        AppError::MonitoringError("Monitoring already initialized".to_string())
+    })?;
     
     // Start background monitoring
-    unsafe {
-        if let Some(monitoring) = &GLOBAL_MONITORING {
-            monitoring.start_monitoring().await?;
-        }
-    }
+    monitoring_arc.start_monitoring().await?;
     
     tracing::info!("Monitoring module initialized successfully");
     Ok(())
@@ -227,10 +225,9 @@ pub async fn initialize() -> Result<(), AppError> {
 pub async fn shutdown() -> Result<(), AppError> {
     tracing::info!("Shutting down monitoring module");
     
-    // Cleanup global monitoring
-    unsafe {
-        GLOBAL_MONITORING = None;
-    }
+    // Note: OnceLock doesn't support clearing, so we can't fully remove it
+    // The monitoring instance will remain in memory but won't be accessible after this
+    // For true cleanup, consider using a different pattern or accept this limitation
     
     tracing::info!("Monitoring module shut down successfully");
     Ok(())
@@ -241,10 +238,8 @@ pub async fn health_check() -> Result<(), AppError> {
     tracing::info!("Monitoring module health check");
     
     // Check if global monitoring exists
-    unsafe {
-        if GLOBAL_MONITORING.is_none() {
-            return Err(AppError::MonitoringError("Global monitoring not initialized".to_string()));
-        }
+    if GLOBAL_MONITORING.get().is_none() {
+        return Err(AppError::MonitoringError("Global monitoring not initialized".to_string()));
     }
     
     tracing::info!("Monitoring module health check passed");

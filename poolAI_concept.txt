@@ -254,84 +254,301 @@ content_security_policy = "default-src 'self'"
 - Эффективное использование ресурсов
 - Автоматизация процессов
 
+## 9.5 Архитектурные принципы Rust
+
+### 9.5.1 Zero-Cost Abstractions
+- Trait-based полиморфизм без накладных расходов времени выполнения
+- Компилятор оптимизирует абстракции до нативного кода
+- Zero-copy операции где возможно
+
+### 9.5.2 Безопасность памяти без GC
+- Ownership и Borrowing для безопасного управления памятью
+- Arc<RwLock<T>> для разделяемого изменяемого состояния
+- Lifetimes предотвращают висячие указатели
+
+### 9.5.3 Concurrency-First Design
+- Async/await для неблокирующих операций
+- Tokio runtime для многопоточности
+- Actor model для изоляции состояния
+
+### 9.5.4 Type Safety
+- Строгая типизация предотвращает ошибки времени выполнения
+- Pattern matching для исчерпывающей обработки
+- Option<T> и Result<T, E> для обработки ошибок
+
+## 9.6 Архитектурные паттерны
+
+### 9.6.1 Actor Model
+```rust
+pub struct ModuleActor {
+    state: Arc<RwLock<ModuleState>>,
+    message_queue: mpsc::UnboundedReceiver<Message>,
+}
+```
+
+### 9.6.2 Repository Pattern
+```rust
+pub trait Repository<T> {
+    async fn get(&self, id: &str) -> Result<Option<T>, AppError>;
+    async fn save(&self, entity: T) -> Result<(), AppError>;
+    async fn delete(&self, id: &str) -> Result<(), AppError>;
+}
+```
+
+### 9.6.3 CQRS Pattern
+```rust
+pub trait Command {
+    async fn execute(&self) -> Result<(), AppError>;
+}
+
+pub trait Query {
+    type Result;
+    async fn execute(&self) -> Result<Self::Result, AppError>;
+}
+```
+
+## 9.7 Rust Best Practices
+
+### 9.7.1 Организация модулей
+- Каждый модуль имеет файл `mod.rs` как точку входа
+- Подмодули объявляются в `mod.rs` и реализуются в отдельных `.rs` файлах
+- Публичный API реэкспортируется через `pub use` statements
+- Детали реализации хранятся в подмодулях
+
+### 9.7.2 Обработка ошибок
+- Все функции, которые могут завершиться ошибкой, возвращают `Result<T, AppError>`
+- Типы ошибок определены в модуле `core::error`
+- Ошибки распространяются с помощью оператора `?`
+- Panic используется только для невосстановимых ошибок
+
+### 9.7.3 Concurrency
+- Разделяемое состояние использует `Arc<RwLock<T>>` для потокобезопасного доступа
+- Async функции используют `tokio::sync::RwLock` для async контекстов
+- Передача сообщений через каналы (`mpsc`, `oneshot`) для коммуникации
+- Фоновые задачи запускаются с `tokio::spawn`
+
+### 9.7.4 Управление памятью
+- Ownership явный и проверяется на этапе компиляции
+- Borrowing используется для временного доступа
+- `Arc` используется для разделяемого владения между потоками
+- Lifetimes предотвращают висячие ссылки
+
+### 9.7.5 Тестирование
+- Unit тесты в `#[cfg(test)]` модулях
+- Integration тесты в директории `tests/`
+- Mocking для внешних зависимостей
+- Property-based тестирование с `proptest`
+
+## 9.8 Производительность
+
+### 9.8.1 Управление памятью
+- Zero-copy десериализация с `serde`
+- Object pooling для часто создаваемых объектов
+- Lazy loading для больших ресурсов
+
+### 9.8.2 Concurrency
+- Async/await для I/O bound операций
+- Rayon для CPU bound операций
+- Lock-free структуры данных где возможно
+
+### 9.8.3 Кэширование
+- Многоуровневое кэширование (L1, L2, L3)
+- LRU политика вытеснения
+- Стратегии прогрева кэша
+
 ## 10. Структура проекта
 
-### 10.1 Основные компоненты (core/)
-- main.rs - Точка входа в приложение
-- lib.rs - Основные библиотечные функции
-- state.rs - Управление состоянием
-- config.rs - Конфигурация системы
-- error.rs - Обработка ошибок
-- utils.rs - Вспомогательные функции
+### 10.1 Корневая структура
+```
+poolAI/
+├── src/
+│   ├── main.rs              # Точка входа в приложение
+│   ├── lib.rs               # Основные библиотечные функции и re-exports
+│   └── version.rs           # Информация о версии и времени сборки
+├── .vscode/
+│   ├── settings.json        # Настройки терминала MSYS2 UCRT64
+│   └── README_TERMINAL.md   # Инструкции по настройке
+├── .cargo/
+│   └── config.toml         # Конфигурация linker для GNU toolchain
+├── Cargo.toml              # Зависимости проекта
+└── build.rs                # Скрипт сборки для генерации build_time.rs
+```
 
-### 10.2 Управление пулами (pool/)
-- pool.rs - Основная логика пулов
-- pool_cok.rs - Управление состоянием пулов
-- miner.rs - Логика майнинга
-- reward_system.rs - Система наград
-- bridges.rs - Мосты для интеграции
-- home.rs - Домашняя страница
-- login.rs - Аутентификация
-- playground.rs - Тестовая среда
+### 10.2 Основные компоненты (core/)
+**Реализовано:**
+- `mod.rs` - Инициализация и управление core модулем
+- `config.rs` - Конфигурация системы (SystemConfig, GpuConfig, PoolConfig, MonitoringConfig)
+- `error.rs` - Централизованная обработка ошибок (AppError, ErrorMetrics)
+- `state.rs` - Управление состоянием приложения (AppState, Worker, SystemState)
+- `model_interface.rs` - Интерфейс для работы с моделями (ModelInterface trait, ModelManager)
 
-### 10.3 RAID система (raid/)
-- burstraid.rs - Основная логика RAID
-- smallworld.rs - Распределенная система
-- lib.rs - Библиотечные функции
-- admin.rs - Административные функции
-- vm.rs - Управление виртуальными машинами
-- worker_interface.rs - Интерфейс воркеров
-- config.rs - Конфигурация RAID
-- network.rs - Сетевое взаимодействие
-- storage.rs - Управление хранилищем
-- worker.rs - Логика воркеров
-- mount.rs - Монтирование ресурсов
+**Статус:** ✅ COMPLETED
 
-### 10.4 Выполнение (runtime/)
-- worker.rs - Управление воркерами
-- scheduler.rs - Планировщик задач
-- queue.rs - Очереди задач
-- cache.rs - Кэширование
-- storage.rs - Управление хранилищем
+### 10.3 Управление пулами (pool/)
+**Реализовано:**
+- `mod.rs` - Основная логика пулов (Pool, PoolConfig, PoolMetrics, LoadBalancingStrategy)
+- `worker.rs` - Управление воркерами (Worker, WorkerConfig, WorkerMetrics, WorkerStatus)
 
-### 10.5 Мониторинг (monitoring/)
-- alert.rs - Система оповещений
-- metrics.rs - Метрики
-- logger.rs - Логирование
-- monitor.rs - Мониторинг
+**Статус:** ✅ COMPLETED
 
-### 10.6 Сеть (network/)
-- network.rs - Сетевое взаимодействие
-- bridges.rs - Мосты
-- loadbalancer.rs - Балансировщик нагрузки
-- tls.rs - Безопасность
+### 10.4 Мониторинг (monitoring/)
+**Реализовано:**
+- `mod.rs` - Система мониторинга (Monitoring, Alert, AlertSeverity, SystemStatus, HistoricalData)
+- `metrics.rs` - Сбор метрик (Metrics, ModelMetrics, ResourceMetrics, MetricsCollector)
 
-### 10.7 Виртуальные машины (vm/)
+**Статус:** ✅ COMPLETED
+
+### 10.5 Сеть (network/)
+**Реализовано:**
+- `mod.rs` - Инициализация сетевого сервера (HTTP/HTTPS)
+- `api.rs` - REST API endpoints (67+ endpoints)
+- `auth.rs` - Аутентификация и авторизация (JWT, RBAC)
+- `ws.rs` - WebSocket соединения для real-time обновлений
+
+**Статус:** ✅ COMPLETED
+
+### 10.6 Выполнение (runtime/)
+**Реализовано:**
+- `mod.rs` - Главный менеджер runtime (RuntimeManager, RuntimeConfig, RuntimeStatus)
+- `worker.rs` - Управление воркерами runtime
+- `scheduler.rs` - Планировщик задач с приоритетами
+- `queue.rs` - Очереди задач
+- `cache.rs` - Многоуровневое кэширование
+- `storage.rs` - Управление хранилищем
+- `process.rs` - Управление процессами
+- `orchestrator.rs` - Оркестрация ресурсов
+- `health.rs` - Мониторинг здоровья системы
+
+**Статус:** ✅ COMPLETED (Stage 4.1)
+
+### 10.7 Система наград (rewards/)
+**Реализовано:**
+- `mod.rs` - Система наград (RewardSystem, RewardType, RewardLevel, Reward, UserProgress)
+
+**Статус:** ✅ COMPLETED
+
+### 10.8 Платформа (platform/)
+**Реализовано:**
+- `mod.rs` - Кросс-платформенная информация о GPU (GpuInfo, get_gpu_info)
+- `windows.rs` - Специфичные для Windows функции
+- `linux.rs` - Специфичные для Linux функции
+
+**Статус:** ✅ COMPLETED
+
+### 10.9 Telegram бот (tgbot/)
+**Реализовано:**
+- `mod.rs` - Базовая структура Telegram бота (start_bot, send_notification)
+
+**Статус:** ✅ COMPLETED (базовая реализация)
+
+### 10.10 Планируемые модули (PLANNED)
+**RAID система (raid/)** - 🔄 PLANNED
+- BurstRAID логика
+- SmallWorld распределенная система
+- Административное управление
 - Управление виртуальными машинами
-- Оптимизация ресурсов
-- Мониторинг состояния
 
-### 10.8 Администрирование (admin/)
-- Управление системой
-- Мониторинг
-- Настройка
-
-### 10.9 Библиотеки (libs/)
+**Управление библиотеками (libs/)** - 🔄 PLANNED
+- Автоматическая загрузка libtorch
 - Управление зависимостями
-- Оптимизация
-- Версионирование
+- Версионирование библиотек
 
-### 10.10 Платформа (platform/)
-- Основные компоненты платформы
-- Интеграция
-- API
+**Виртуальные машины (vm/)** - 🔄 PLANNED
+- Управление VM инстансами
+- Изоляция и безопасность
+- Оптимизация ресурсов
 
-### 10.11 Воркеры (workers/)
-- Управление воркерами
-- Распределение задач
-- Мониторинг
+**Пользовательский интерфейс (ui/)** - 🔄 PLANNED
+- Web dashboard
+- Компоненты UI
+- Темы и layouts
 
-### 10.12 Telegram бот (tgbot/)
-- Управление через Telegram
-- Уведомления
-- Статистика
+## 11. Среда разработки и сборка
+
+### 11.1 Требования к окружению
+
+#### 11.1.1 Windows (Рекомендуется)
+- **MSYS2 UCRT64** - основная среда разработки и компиляции
+- **Rust toolchain**: `stable-x86_64-pc-windows-gnu` (GNU toolchain)
+- **MSYS2 UCRT64 shell** - автоматически используется в Cursor/VS Code терминале
+- **GCC/MinGW-w64** - предоставляется MSYS2 UCRT64
+
+#### 11.1.2 Конфигурация терминала
+Проект настроен для автоматического использования MSYS2 UCRT64 оболочки:
+- Файл `.vscode/settings.json` содержит настройки терминала
+- Терминал автоматически запускается в MSYS2 UCRT64 при открытии нового терминала
+- Переменные окружения `MSYSTEM=UCRT64` и `CHERE_INVOKING=1` установлены автоматически
+
+#### 11.1.3 Rust Toolchain Setup
+
+**Если Rust не найден в MSYS2 UCRT64** (`cargo: command not found`):
+
+1. **Добавить Rust в PATH** (если Rust уже установлен в Windows):
+```bash
+# Добавить в ~/.bashrc или ~/.bash_profile
+echo 'export PATH="/c/Users/$USER/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+2. **Или установить Rust через rustup в MSYS2**:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+3. **Установка GNU toolchain**:
+```bash
+# Установка GNU toolchain для MSYS2
+rustup default stable-x86_64-pc-windows-gnu
+
+# Или для конкретного проекта
+rustup override set stable-x86_64-pc-windows-gnu
+```
+
+4. **Проверка установки**:
+```bash
+cargo --version
+rustc --version
+rustup show
+```
+
+### 11.2 Сборка проекта
+
+#### 11.2.1 Компиляция через MSYS2 UCRT64
+```bash
+# В MSYS2 UCRT64 терминале
+cargo build
+cargo run
+cargo check
+cargo test
+```
+
+#### 11.2.2 Конфигурация Cargo
+Файл `.cargo/config.toml` настроен для GNU toolchain:
+```toml
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+```
+
+### 11.3 Преимущества MSYS2 UCRT64
+- **Совместимость**: Полная совместимость с Windows API через UCRT (Universal C Runtime)
+- **Производительность**: Оптимизированные бинарники для Windows
+- **Библиотеки**: Легкий доступ к библиотекам через pacman (менеджер пакетов MSYS2)
+- **Интеграция**: Плавная интеграция с современными инструментами разработки
+- **Отладка**: Поддержка GDB и других инструментов отладки
+
+### 11.4 Альтернативные окружения
+- **Linux**: Нативная компиляция через стандартный Rust toolchain
+- **WSL**: Можно использовать, но рекомендуется MSYS2 UCRT64 для Windows
+- **MSVC**: Не рекомендуется из-за проблем с зависимостями (ring, gcc.exe)
+
+### 11.5 Структура конфигурации
+```
+poolAI/
+├── .vscode/
+│   ├── settings.json          # Настройки терминала MSYS2 UCRT64
+│   └── README_TERMINAL.md     # Инструкции по настройке
+├── .cargo/
+│   └── config.toml            # Конфигурация linker для GNU toolchain
+└── Cargo.toml                 # Зависимости проекта
+```

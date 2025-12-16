@@ -93,7 +93,7 @@ pub enum AppError {
 }
 
 impl AppError {
-    /// Логирование ошибки
+    /// Log the error with appropriate severity level
     pub fn log(&self) {
         match self {
             AppError::ModelError(msg) => error!("Model error: {}", msg),
@@ -114,48 +114,48 @@ impl AppError {
         }
     }
 
-    /// Восстановление после сбоя
+    /// Attempt to recover from the error
     pub fn recover(&self) -> Result<(), AppError> {
         warn!("Attempting recovery from error: {:?}", self);
         
         match self {
             AppError::ModelError(_) => {
-                // Попытка перезагрузки модели
+                // Attempt to reload the model
                 info!("Attempting model reload...");
                 Ok(())
             }
             AppError::ConfigError(_) => {
-                // Попытка загрузки конфигурации по умолчанию
+                // Attempt to load default configuration
                 info!("Attempting to load default configuration...");
                 Ok(())
             }
             AppError::PoolError(_) => {
-                // Попытка перезапуска пула
+                // Attempt to restart the pool
                 info!("Attempting pool restart...");
                 Ok(())
             }
             AppError::MonitoringError(_) => {
-                // Попытка перезапуска мониторинга
+                // Attempt to restart monitoring
                 info!("Attempting monitoring restart...");
                 Ok(())
             }
             AppError::ResourceError(_) => {
-                // Попытка освобождения ресурсов
+                // Attempt to free resources
                 info!("Attempting resource cleanup...");
                 Ok(())
             }
             AppError::GpuError(_) => {
-                // Попытка переинициализации GPU
+                // Attempt to reinitialize GPU
                 info!("Attempting GPU reinitialization...");
                 Ok(())
             }
             AppError::MemoryError(_) => {
-                // Попытка очистки памяти
+                // Attempt to clean up memory
                 info!("Attempting memory cleanup...");
                 Ok(())
             }
             AppError::TimeoutError(_) => {
-                // Попытка повторного выполнения
+                // Attempt to retry after timeout
                 info!("Attempting retry after timeout...");
                 Ok(())
             }
@@ -166,7 +166,7 @@ impl AppError {
         }
     }
 
-    /// Проверка возможности восстановления
+    /// Check if the error is recoverable
     pub fn is_recoverable(&self) -> bool {
         matches!(self,
             AppError::ModelError(_) |
@@ -180,7 +180,7 @@ impl AppError {
         )
     }
 
-    /// Получение кода ошибки
+    /// Get error code string
     pub fn error_code(&self) -> &'static str {
         match self {
             AppError::ModelError(_) => "MODEL_ERROR",
@@ -202,16 +202,16 @@ impl AppError {
     }
 }
 
-/// Результат с метриками ошибок
+/// Error metrics result
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ErrorMetrics {
-    /// Количество ошибок по типам
+    /// Error counts by type
     pub error_counts: std::collections::HashMap<String, u64>,
-    /// Время последней ошибки
+    /// Last error time
     pub last_error_time: Option<chrono::DateTime<chrono::Utc>>,
-    /// Общее количество ошибок
+    /// Total error count
     pub total_errors: u64,
-    /// Количество восстановлений
+    /// Recovery count
     pub recovery_attempts: u64,
     /// Успешные восстановления
     pub successful_recoveries: u64,

@@ -1,6 +1,11 @@
-// platform/mod.rs
+//! Platform module for cross-platform GPU and system information
+//!
+//! Provides platform-specific implementations for Windows and Linux
+//! with a unified interface for GPU information and system resources.
+
 pub mod windows;
 pub mod linux;
+
 use serde::Serialize;
 
 #[derive(Serialize, Clone)]
@@ -21,7 +26,7 @@ pub fn get_gpu_info() -> GpuInfo {
     {
         println!("[platform] {}", linux::get_linux_gpu_info());
     }
-    // TODO: Реализовать реальные вызовы для каждой платформы
+    // TODO: Implement real platform-specific calls for each OS
     GpuInfo {
         device: "NVIDIA RTX 4090",
         memory_total: 24576,
