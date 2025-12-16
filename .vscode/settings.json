@@ -1,0 +1,34 @@
+{
+  // Terminal configuration for MSYS2 UCRT64
+  "terminal.integrated.defaultProfile.windows": "MSYS2 UCRT64",
+  "terminal.integrated.profiles.windows": {
+    "MSYS2 UCRT64": {
+      "path": "C:\\msys64\\usr\\bin\\bash.exe",
+      "args": [
+        "-l"
+      ],
+      "env": {
+        "MSYSTEM": "UCRT64",
+        "CHERE_INVOKING": "1"
+      },
+      "icon": "terminal-bash"
+    },
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    }
+  },
+  
+  // Rust toolchain configuration
+  "rust-analyzer.rustc.source": "discover",
+  "rust-analyzer.cargo.buildScripts.enable": true,
+  
+  // Build configuration
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  
+  // Auto-detect MSYS2 environment
+  "terminal.integrated.env.windows": {
+    "PATH": "${env:PATH};C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;C:\\Users\\${env:USERNAME}\\.cargo\\bin"
+  }
+}
+

@@ -8,6 +8,7 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
+use futures_util::{StreamExt, SinkExt};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -340,6 +341,3 @@ fn extract_token_from_request(req: &Request<axum::body::Body>) -> Option<String>
             }
         })
 }
-
-// Імпорт для async stream
-use futures_util::{StreamExt, SinkExt};

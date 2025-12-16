@@ -10,103 +10,56 @@ keywords = ["ai", "mining", "pool", "gpu", "blockchain", "distributed"]
 categories = ["distributed-computing", "ai", "blockchain"]
 
 [dependencies]
-# Async runtime - MVP КРИТИЧНО
-tokio = { version = "1.36", features = ["full"] }
-
-# Serialization - MVP КРИТИЧНО
+# Serialization
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-
-# Error handling - MVP КРИТИЧНО
-thiserror = "1.0"
-async-trait = "0.1"
-anyhow = "1.0"
-
-# Logging - MVP КРИТИЧНО
-tracing = "0.1"
-tracing-subscriber = "0.3"
-
-# Configuration - MVP КРИТИЧНО
-config = "0.13"
 toml = "0.8"
 
-# Time handling
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Web framework
+axum = { version = "0.7", features = ["ws"] }  # WebSocket support
+# axum-server = "0.6"  # Temporarily disabled - requires ring/gcc
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# WebSocket support
+futures-util = "0.3"
+
+# JWT authentication (temporarily disabled - requires ring/gcc)
+# jsonwebtoken = "9.3"  # Uncomment after installing gcc
+# Using base64 for temporary token encoding (dev only)
+base64 = { version = "0.22", features = ["alloc"] }
+
+# Error handling
+thiserror = "1.0"
+
+# Date and time
 chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Async traits
+async-trait = "0.1"
+
+# Lazy static initialization
+lazy_static = "1.4"
 
 # Random number generation
 rand = "0.8"
 
-# System information
-sysinfo = "0.29"
-
-# UUID generation
-uuid = { version = "1.7", features = ["v4"] }
-
-# Synchronization primitives
+# Lock-free data structures
 parking_lot = "0.12"
-lazy_static = "1.4"
 
-# Command line arguments
-clap = { version = "4.0", features = ["derive"] }
-
-# Network dependencies - Stage 2
-axum = { version = "0.7", features = ["ws", "macros"] }
-tower = "0.4"
-tokio-tungstenite = "0.20"
-futures = "0.3"
-futures-util = "0.3"
-
-# HTTPS/TLS dependencies - Stage 2
-axum-server = { version = "0.6", features = ["tls-rustls"] }
-rustls = "0.21"
-rustls-pemfile = "1.0"
-tokio-rustls = "0.24"
-jsonwebtoken = "9.0"
-tower-http = { version = "0.5", features = ["cors", "trace"] }
+# Build script dependencies
+[build-dependencies]
 
 [features]
 default = []
-https = []
-stage2 = []
-stage3 = ["network", "platform", "tgbot"]
-
-# Stage 2 features (future)
-network = []
-platform = []
-tgbot = []
-
-# Stage 3 features (future)
-runtime = []
-libs = []
-vm = []
-raid = []
-ui = []
-
-[profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
-
-[profile.dev]
-opt-level = 0
-debug = true
-
-[[bin]]
-name = "poolai"
-path = "src/main.rs"
-
-[lib]
-name = "poolai"
-path = "src/lib.rs"
-
-[workspace]
-members = ["."]
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-
-[build-dependencies]
-chrono = "0.4"
+# https = ["axum-server/rustls"]  # Temporarily disabled - requires ring/gcc

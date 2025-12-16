@@ -1,68 +1,102 @@
+//! PoolAI main application entry point
+//!
+//! This module initializes all system components and starts the HTTP/HTTPS server
+//! according to the PoolAI architecture concept.
+
 use poolai::{
-    PoolAIConfig,
-    AppState,
-    Pool,
-    PoolConfig,
-    LoadBalancingStrategy,
-    MetricsCollector,
+    core,
+    monitoring,
+    network,
+    pool,
+    runtime::{self, RuntimeConfig},
+    version::{APP_VERSION, BUILD_TIME},
+    AppState,  // Re-exported from core::state
 };
-#[cfg(feature = "stage2")]
-use poolai::network::start_server;
-#[cfg(feature = "stage2")]
-use poolai::tgbot::start_bot;
 use std::net::SocketAddr;
 use tracing::{info, error};
+use tokio::signal;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize logging
-    tracing_subscriber::fmt::init();
-    info!("Starting PoolAI...");
+    // Initialize tracing subscriber for logging
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
 
-    // Load configuration
-    let config = PoolAIConfig::from_file("config.toml")?;
-    info!("Configuration loaded successfully");
+    info!("🚀 Starting PoolAI v{}", APP_VERSION);
+    info!("📅 Build time: {}", BUILD_TIME);
 
-    // Initialize global state
-    let state = AppState::new();
-    info!("Application state initialized");
+    // Initialize core module
+    info!("Initializing core module...");
+    core::initialize().await?;
+    info!("✅ Core module initialized");
 
-    // Initialize pool
-    let pool_config = PoolConfig {
-        max_workers: config.pool.max_workers,
-        max_queue_size: config.pool.queue_size,
-        load_balancing_strategy: LoadBalancingStrategy::RoundRobin,
-        auto_scaling: config.pool.auto_scaling,
-        scaling_threshold: config.pool.scaling_threshold,
-        request_timeout: config.pool.request_timeout,
-    };
-    let pool = Pool::new(pool_config);
-    info!("Worker pool initialized with {} workers", config.pool.max_workers);
+    // Initialize application state
+    let app_state = AppState::new();
+    app_state.initialize().await?;
+    info!("✅ Application state initialized");
 
-    // Initialize monitoring
-    let metrics = MetricsCollector::new();
-    info!("Metrics collector initialized");
+    // Initialize monitoring module
+    info!("Initializing monitoring module...");
+    monitoring::initialize().await?;
+    info!("✅ Monitoring module initialized");
 
-    // Stage 2: Network server
-    #[cfg(feature = "stage2")]
-    {
-        let addr: SocketAddr = "127.0.0.1:8080".parse()?;
-        info!("Starting network server on {}", addr);
-        start_server(addr).await;
+    // Initialize pool module
+    info!("Initializing pool module...");
+    pool::initialize().await?;
+    info!("✅ Pool module initialized");
+
+    // Initialize runtime module
+    info!("Initializing runtime module...");
+    let runtime_config = RuntimeConfig::default();
+    let _runtime_manager = runtime::initialize_runtime(runtime_config).await?;
+    info!("✅ Runtime module initialized");
+
+    // Initialize rewards system (already initialized via lazy_static)
+    info!("✅ Rewards system ready");
+
+    // Start network server
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    info!("🌐 Starting network server on {}", addr);
+
+    // Spawn server task
+    let server_handle = tokio::spawn(async move {
+        network::start_server(addr).await;
+    });
+
+    info!("✅ PoolAI started successfully!");
+    info!("📊 System ready to accept requests");
+    info!("🔗 API available at http://{}", addr);
+
+    // Wait for shutdown signal
+    match signal::ctrl_c().await {
+        Ok(()) => {
+            info!("🛑 Shutdown signal received");
+        }
+        Err(err) => {
+            error!("Failed to listen for shutdown signal: {}", err);
+        }
     }
 
-    // Stage 2: Telegram bot
-    #[cfg(feature = "stage2")]
-    {
-        let bot_token = "your_bot_token_here"; // TODO: Load from config
-        info!("Starting Telegram bot");
-        start_bot(bot_token).await;
-    }
+    // Graceful shutdown
+    info!("🔄 Shutting down gracefully...");
 
-    // Start monitoring loop
-    info!("Starting monitoring loop");
-    loop {
-        let _ = metrics.collect().await;
-        tokio::time::sleep(tokio::time::Duration::from_secs(30)).await;
-    }
+    // Shutdown modules in reverse order
+    info!("Shutting down runtime module...");
+    // Runtime manager is dropped automatically
+
+    info!("Shutting down pool module...");
+    pool::shutdown().await?;
+
+    info!("Shutting down monitoring module...");
+    monitoring::shutdown().await?;
+
+    info!("Shutting down core module...");
+    core::shutdown().await?;
+
+    // Cancel server task
+    server_handle.abort();
+
+    info!("✅ PoolAI shutdown complete");
+    Ok(())
 }

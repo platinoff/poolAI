@@ -1,3 +1,11 @@
+//! Pool module for worker pool management
+//!
+//! This module provides:
+//! - Worker pool management with load balancing
+//! - Task distribution across workers
+//! - Pool metrics and monitoring
+//! - Auto-scaling capabilities
+
 pub mod worker;
 
 use crate::core::error::AppError;
@@ -5,8 +13,10 @@ use crate::core::model_interface::{ModelRequest, ModelResponse};
 // use crate::core::config::PoolAIConfig; // Not used in MVP
 use std::collections::HashMap;
 use tokio::sync::RwLock;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tracing::{info, warn};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 
 #[derive(Debug, Clone)]
 pub struct PoolConfig {
@@ -61,7 +71,7 @@ pub struct Pool {
     config: PoolConfig,
     workers: Arc<RwLock<HashMap<String, worker::Worker>>>,
     metrics: Arc<RwLock<PoolMetrics>>,
-    current_worker_index: Arc<RwLock<usize>>,
+    _current_worker_index: Arc<RwLock<usize>>,
 }
 
 impl Pool {
@@ -70,7 +80,7 @@ impl Pool {
             config,
             workers: Arc::new(RwLock::new(HashMap::new())),
             metrics: Arc::new(RwLock::new(PoolMetrics::default())),
-            current_worker_index: Arc::new(RwLock::new(0)),
+            _current_worker_index: Arc::new(RwLock::new(0)),
         }
     }
 
@@ -147,9 +157,8 @@ impl Pool {
             }
             LoadBalancingStrategy::Random => {
                 // Random selection
-                use rand::seq::SliceRandom;
                 let worker_list: Vec<_> = workers.values().collect();
-                worker_list.choose(&mut rand::thread_rng())
+                worker_list.choose(&mut thread_rng())
                     .map(|worker| (*worker).clone())
                     .ok_or_else(|| AppError::PoolError("No workers available".to_string()))
             }
@@ -248,8 +257,9 @@ impl Pool {
     }
 }
 
-// Global pool instance
-static mut GLOBAL_POOL: Option<Pool> = None;
+// Global pool instance - using OnceLock for thread-safe initialization
+// Wrapped in Arc<RwLock<>> for shared mutable access across async contexts
+static GLOBAL_POOL: OnceLock<Arc<RwLock<Pool>>> = OnceLock::new();
 
 /// Initialize pool module
 pub async fn initialize() -> Result<(), AppError> {
@@ -267,10 +277,10 @@ pub async fn initialize() -> Result<(), AppError> {
     
     let pool = Pool::new(config);
     
-    // Store global instance
-    unsafe {
-        GLOBAL_POOL = Some(pool);
-    }
+    // Store global instance wrapped in Arc<RwLock<>>
+    GLOBAL_POOL.set(Arc::new(RwLock::new(pool))).map_err(|_| {
+        AppError::PoolError("Pool already initialized".to_string())
+    })?;
     
     info!("Pool module initialized successfully");
     Ok(())
@@ -282,10 +292,10 @@ pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> 
     
     let pool = Pool::new(config);
     
-    // Store global instance
-    unsafe {
-        GLOBAL_POOL = Some(pool);
-    }
+    // Store global instance wrapped in Arc<RwLock<>>
+    GLOBAL_POOL.set(Arc::new(RwLock::new(pool))).map_err(|_| {
+        AppError::PoolError("Pool already initialized".to_string())
+    })?;
     
     info!("Pool module initialized with custom configuration successfully");
     Ok(())
@@ -295,10 +305,9 @@ pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> 
 pub async fn shutdown() -> Result<(), AppError> {
     info!("Shutting down pool module");
     
-    // Cleanup global pool
-    unsafe {
-        GLOBAL_POOL = None;
-    }
+    // Note: OnceLock doesn't support clearing, so we can't fully remove it
+    // The pool will remain in memory but won't be accessible after this
+    // For true cleanup, consider using a different pattern or accept this limitation
     
     info!("Pool module shut down successfully");
     Ok(())
@@ -309,10 +318,8 @@ pub async fn health_check() -> Result<(), AppError> {
     info!("Pool module health check");
     
     // Check if global pool exists
-    unsafe {
-        if GLOBAL_POOL.is_none() {
-            return Err(AppError::PoolError("Global pool not initialized".to_string()));
-        }
+    if GLOBAL_POOL.get().is_none() {
+        return Err(AppError::PoolError("Global pool not initialized".to_string()));
     }
     
     info!("Pool module health check passed");
@@ -320,8 +327,7 @@ pub async fn health_check() -> Result<(), AppError> {
 }
 
 /// Get global pool instance
-pub fn get_global_pool() -> Option<&'static Pool> {
-    unsafe {
-        GLOBAL_POOL.as_ref()
-    }
+/// Returns a reference to Arc<RwLock<Pool>> for async-safe access
+pub fn get_global_pool() -> Option<&'static Arc<RwLock<Pool>>> {
+    GLOBAL_POOL.get()
 }

@@ -1,5 +1,10 @@
-// rewards/mod.rs
-// Reward system for Stage 3 (endorphin-based rewards)
+//! Rewards module for Stage 3 - Endorphin-based reward system
+//!
+//! This module provides:
+//! - Reward system with multiple reward types
+//! - User progress tracking
+//! - Achievement-based rewards
+//! - Reward history and statistics
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -59,7 +64,7 @@ pub struct UserProgress {
 pub struct RewardSystem {
     rewards: Arc<RwLock<HashMap<String, Reward>>>,
     user_progress: Arc<RwLock<HashMap<String, UserProgress>>>,
-    reward_multipliers: Arc<RwLock<HashMap<RewardType, f64>>>,
+    _reward_multipliers: Arc<RwLock<HashMap<RewardType, f64>>>,
 }
 
 impl RewardSystem {
@@ -75,7 +80,7 @@ impl RewardSystem {
         Self {
             rewards: Arc::new(RwLock::new(HashMap::new())),
             user_progress: Arc::new(RwLock::new(HashMap::new())),
-            reward_multipliers: Arc::new(RwLock::new(multipliers)),
+            _reward_multipliers: Arc::new(RwLock::new(multipliers)),
         }
     }
 
@@ -115,7 +120,7 @@ impl RewardSystem {
 
     // Get reward multiplier
     async fn get_reward_multiplier(&self, reward_type: &RewardType) -> f64 {
-        let multipliers = self.reward_multipliers.read().await;
+        let multipliers = self._reward_multipliers.read().await;
         *multipliers.get(reward_type).unwrap_or(&1.0)
     }
 

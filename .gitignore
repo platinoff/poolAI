@@ -1,19 +1,16 @@
-# SSL certificates and private keys
-certs/*.pem
-*.pem
-*.key
-*.crt
-*.csr
-*.p12
-*.pfx
+# Temporary build files
+Cargo.minimal.toml
+Cargo.std.toml
 
-# Rust build artifacts
-/target/
-**/*.rs.bk
-*.pdb
+# Temporary files
+*.tmp
+*.bak
+*~
 
-# IDE files
-.vscode/
+# IDE files (but keep important configs)
+.vscode/*
+!.vscode/settings.json
+!.vscode/README_TERMINAL.md
 .idea/
 *.swp
 *.swo
@@ -22,12 +19,6 @@ certs/*.pem
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-
-# Environment files
-.env
-.env.local
-
-# Config files with sensitive data
-config.local.toml 
+# Build artifacts (if not already in .gitignore)
+target/
+**/*.pdb

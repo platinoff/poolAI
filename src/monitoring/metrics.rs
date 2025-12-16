@@ -44,7 +44,7 @@ pub struct ResourceMetrics {
 }
 
 pub struct MetricsCollector {
-    last_collection: Instant,
+    _last_collection: Instant,
     historical_metrics: Vec<Metrics>,
     model_metrics: HashMap<String, ModelMetrics>,
     resource_metrics: ResourceMetrics,
@@ -53,7 +53,7 @@ pub struct MetricsCollector {
 impl MetricsCollector {
     pub fn new() -> Self {
         Self {
-            last_collection: Instant::now(),
+            _last_collection: Instant::now(),
             historical_metrics: Vec::new(),
             model_metrics: HashMap::new(),
             resource_metrics: ResourceMetrics {

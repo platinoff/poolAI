@@ -8,41 +8,41 @@ use crate::core::config::PoolAIConfig;
 use crate::core::model_interface::{ModelState, ModelStatus};
 use tracing::info;
 
-/// Состояние воркера
+/// Worker state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Worker {
-    /// Уникальный ID воркера
+    /// Unique worker ID
     pub id: String,
-    /// Адрес воркера
+    /// Worker address
     pub address: String,
-    /// Вычислительная мощность
+    /// Computational power
     pub mining_power: f64,
-    /// Статус воркера
+    /// Worker status
     pub status: WorkerStatus,
-    /// Время последней активности
+    /// Last activity time
     pub last_seen: DateTime<Utc>,
-    /// Метрики производительности
+    /// Performance metrics
     pub metrics: WorkerMetrics,
-    /// Обрабатываемые модели
+    /// Active models being processed
     pub active_models: Vec<String>,
 }
 
-/// Метрики воркера
+/// Worker metrics
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerMetrics {
-    /// Загрузка CPU (%)
+    /// CPU utilization (%)
     pub cpu_utilization: f32,
-    /// Использование памяти (MB)
+    /// Memory usage (MB)
     pub memory_usage_mb: f32,
-    /// Утилизация GPU (%)
+    /// GPU utilization (%)
     pub gpu_utilization: f32,
-    /// Температура GPU (°C)
+    /// GPU temperature (°C)
     pub gpu_temperature: f32,
-    /// Количество обработанных запросов
+    /// Number of processed requests
     pub requests_processed: u64,
-    /// Среднее время обработки (мс)
+    /// Average processing time (ms)
     pub avg_processing_time_ms: f32,
-    /// Количество ошибок
+    /// Error count
     pub error_count: u64,
 }
 
@@ -60,7 +60,7 @@ impl Default for WorkerMetrics {
     }
 }
 
-/// Статус воркера
+/// Worker status
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum WorkerStatus {
     Active,
@@ -70,7 +70,7 @@ pub enum WorkerStatus {
     Shutdown,
 }
 
-/// Статус узла для распределенных систем
+/// Node status for distributed systems
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum NodeStatus {
     Active,
@@ -79,26 +79,26 @@ pub enum NodeStatus {
     Maintenance,
 }
 
-/// Состояние системы
+/// System state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemState {
-    /// Статус системы
+    /// System status
     pub status: SystemStatus,
-    /// Время запуска
+    /// Start time
     pub start_time: DateTime<Utc>,
-    /// Время последней активности
+    /// Last activity time
     pub last_activity: DateTime<Utc>,
-    /// Количество активных воркеров
+    /// Number of active workers
     pub active_workers: usize,
-    /// Общее количество воркеров
+    /// Total number of workers
     pub total_workers: usize,
-    /// Количество активных моделей
+    /// Number of active models
     pub active_models: usize,
-    /// Метрики системы
+    /// System metrics
     pub system_metrics: SystemMetrics,
 }
 
-/// Статус системы
+/// System status
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SystemStatus {
     Initializing,
@@ -109,22 +109,22 @@ pub enum SystemStatus {
     Maintenance,
 }
 
-/// Метрики системы
+/// System metrics
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemMetrics {
-    /// Общая загрузка CPU (%)
+    /// Total CPU utilization (%)
     pub total_cpu_utilization: f32,
-    /// Общее использование памяти (MB)
+    /// Total memory usage (MB)
     pub total_memory_usage_mb: f32,
-    /// Общая утилизация GPU (%)
+    /// Total GPU utilization (%)
     pub total_gpu_utilization: f32,
-    /// Общее количество запросов
+    /// Total number of requests
     pub total_requests: u64,
-    /// Средняя задержка (мс)
+    /// Average latency (ms)
     pub avg_latency_ms: f32,
-    /// Пропускная способность (запросов/сек)
+    /// Throughput (requests/sec)
     pub throughput_rps: f32,
-    /// Количество ошибок
+    /// Error count
     pub error_count: u64,
 }
 
@@ -142,24 +142,24 @@ impl Default for SystemMetrics {
     }
 }
 
-/// Основное состояние приложения
+/// Main application state
 pub struct AppState {
-    /// Воркеры
+    /// Workers
     pub workers: Arc<RwLock<HashMap<String, Worker>>>,
-    /// Конфигурация
+    /// Configuration
     pub config: Arc<RwLock<PoolAIConfig>>,
-    /// Состояние системы
+    /// System state
     pub system_state: Arc<RwLock<SystemState>>,
-    /// Состояния моделей
+    /// Model states
     pub model_states: Arc<RwLock<HashMap<String, ModelState>>>,
-    /// Флаг инициализации
+    /// Initialization flag
     pub is_initialized: Arc<RwLock<bool>>,
-    /// Мьютекс для синхронизации
+    /// Mutex for synchronization
     pub state_mutex: Arc<Mutex<()>>,
 }
 
 impl AppState {
-    /// Создание нового состояния приложения
+    /// Create new application state
     pub fn new() -> Self {
         Self {
             workers: Arc::new(RwLock::new(HashMap::new())),
@@ -179,7 +179,7 @@ impl AppState {
         }
     }
 
-    /// Инициализация состояния
+    /// Initialize state
     pub async fn initialize(&self) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut initialized = self.is_initialized.write();
@@ -190,11 +190,11 @@ impl AppState {
 
         info!("Initializing application state...");
         
-        // Загрузка конфигурации
+        // Load configuration
         let config = PoolAIConfig::default();
         *self.config.write() = config;
         
-        // Обновление состояния системы
+        // Update system state
         let mut system_state = self.system_state.write();
         system_state.status = SystemStatus::Running;
         system_state.last_activity = Utc::now();
@@ -204,32 +204,32 @@ impl AppState {
         Ok(())
     }
 
-    /// Очистка состояния
+    /// Cleanup state
     pub async fn cleanup(&self) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         info!("Cleaning up application state...");
         
-        // Очистка воркеров
+        // Clear workers
         self.workers.write().clear();
         
-        // Очистка состояний моделей
+        // Clear model states
         self.model_states.write().clear();
         
-        // Обновление состояния системы
+        // Update system state
         let mut system_state = self.system_state.write();
         system_state.status = SystemStatus::Shutdown;
         system_state.active_workers = 0;
         system_state.total_workers = 0;
         system_state.active_models = 0;
         
-        // Сброс флага инициализации
+        // Reset initialization flag
         *self.is_initialized.write() = false;
         
         info!("Application state cleanup complete");
         Ok(())
     }
 
-    /// Добавление воркера
+    /// Add worker
     pub fn add_worker(&self, worker: Worker) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut workers = self.workers.write();
@@ -248,7 +248,7 @@ impl AppState {
         Ok(())
     }
 
-    /// Удаление воркера
+    /// Remove worker
     pub fn remove_worker(&self, worker_id: &str) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut workers = self.workers.write();
@@ -270,17 +270,17 @@ impl AppState {
         }
     }
 
-    /// Получение воркера
+    /// Get worker
     pub fn get_worker(&self, worker_id: &str) -> Option<Worker> {
         self.workers.read().get(worker_id).cloned()
     }
 
-    /// Получение всех воркеров
+    /// Get all workers
     pub fn get_all_workers(&self) -> Vec<Worker> {
         self.workers.read().values().cloned().collect()
     }
 
-    /// Обновление статуса воркера
+    /// Update worker status
     pub fn update_worker_status(&self, worker_id: &str, status: WorkerStatus) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut workers = self.workers.write();
@@ -293,7 +293,7 @@ impl AppState {
             worker.status = status.clone();
             worker.last_seen = Utc::now();
             
-            // Обновление счетчиков активных воркеров
+            // Update active worker counters
             if was_active && !is_active {
                 system_state.active_workers = system_state.active_workers.saturating_sub(1);
             } else if !was_active && is_active {
@@ -309,7 +309,7 @@ impl AppState {
         }
     }
 
-    /// Обновление метрик воркера
+    /// Update worker metrics
     pub fn update_worker_metrics(&self, worker_id: &str, metrics: WorkerMetrics) -> Result<(), AppError> {
         let mut workers = self.workers.write();
         
@@ -322,7 +322,7 @@ impl AppState {
         }
     }
 
-    /// Добавление состояния модели
+    /// Add model state
     pub fn add_model_state(&self, model_name: String, state: ModelState) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut model_states = self.model_states.write();
@@ -340,7 +340,7 @@ impl AppState {
         Ok(())
     }
 
-    /// Обновление состояния модели
+    /// Update model state
     pub fn update_model_state(&self, model_name: &str, state: ModelState) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut model_states = self.model_states.write();
@@ -350,7 +350,7 @@ impl AppState {
             let was_ready = matches!(existing_state.status, ModelStatus::Ready);
             let is_ready = matches!(state.status, ModelStatus::Ready);
             
-            // Обновление счетчиков активных моделей
+            // Update active model counters
             if was_ready && !is_ready {
                 system_state.active_models = system_state.active_models.saturating_sub(1);
             } else if !was_ready && is_ready {
@@ -365,34 +365,34 @@ impl AppState {
         Ok(())
     }
 
-    /// Получение состояния модели
+    /// Get model state
     pub fn get_model_state(&self, model_name: &str) -> Option<ModelState> {
         self.model_states.read().get(model_name).cloned()
     }
 
-    /// Получение всех состояний моделей
+    /// Get all model states
     pub fn get_all_model_states(&self) -> HashMap<String, ModelState> {
         self.model_states.read().clone()
     }
 
-    /// Получение времени работы
+    /// Get uptime
     pub fn get_uptime(&self) -> std::time::Duration {
         let system_state = self.system_state.read();
         let now = Utc::now();
         (now - system_state.start_time).to_std().unwrap_or_default()
     }
 
-    /// Проверка готовности системы
+    /// Check if system is ready
     pub fn is_ready(&self) -> bool {
         *self.is_initialized.read()
     }
 
-    /// Получение состояния системы
+    /// Get system state
     pub fn get_system_state(&self) -> SystemState {
         self.system_state.read().clone()
     }
 
-    /// Обновление метрик системы
+    /// Update system metrics
     pub fn update_system_metrics(&self, metrics: SystemMetrics) -> Result<(), AppError> {
         let mut system_state = self.system_state.write();
         system_state.system_metrics = metrics;
