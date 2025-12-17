@@ -441,27 +441,35 @@ poolAI/
 
 **Статус:** ✅ COMPLETED (базовая реализация)
 
-### 10.10 Планируемые модули (PLANNED)
-**RAID система (raid/)** - 🔄 PLANNED
-- BurstRAID логика
-- SmallWorld распределенная система
-- Административное управление
-- Управление виртуальными машинами
+### 10.10 Модули в разработке и планируемые
 
-**Управление библиотеками (libs/)** - 🔄 PLANNED
-- Автоматическая загрузка libtorch
-- Управление зависимостями
-- Версионирование библиотек
+**Управление библиотеками (libs/)** - 🚧 В РАЗРАБОТКЕ
+- ✅ Базовая структура модуля реализована
+- ✅ LibraryManager для управления жизненным циклом
+- ✅ LibraryRegistry для реестра библиотек
+- ✅ VersionManager для управления версиями
+- ✅ DependencyResolver для разрешения зависимостей
+- ✅ API endpoints интегрированы
+- 🔄 Загрузка библиотек (stub реализация)
+- 🔄 Полное разрешение зависимостей (базовая реализация)
 
-**Виртуальные машины (vm/)** - 🔄 PLANNED
-- Управление VM инстансами
-- Изоляция и безопасность
-- Оптимизация ресурсов
+**RAID система (raid/)** - 🚧 IN PROGRESS (basic scaffold)
+- ✅ `raid/mod.rs` - RaidManager + local artifact storage (`/raid/artifacts`)
+- ✅ Node registry primitives (register/list)
+- 🔄 BurstRAID logic (planned)
+- 🔄 SmallWorld distributed system (planned)
+- 🔄 Administrative control plane (planned)
 
-**Пользовательский интерфейс (ui/)** - 🔄 PLANNED
-- Web dashboard
-- Компоненты UI
-- Темы и layouts
+**Виртуальные машины (vm/)** - 🚧 IN PROGRESS (basic scaffold)
+- ✅ `vm/mod.rs` - VmManager + in-memory instance lifecycle
+- ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
+- 🔄 Isolation/security enforcement (planned)
+- 🔄 Resource optimization and scheduling integration (planned)
+
+**Пользовательский интерфейс (ui/)** - 🚧 IN PROGRESS (basic scaffold)
+- ✅ `ui/mod.rs` - Minimal web dashboard routes (mounted at `/ui/`)
+- 🔄 UI components (planned)
+- 🔄 Themes/layouts (planned)
 
 ## 11. Среда разработки и сборка
 

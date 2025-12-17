@@ -12,6 +12,8 @@ use crate::network::auth::{AuthRequest, authenticate_user};
 use crate::network::ws::websocket_handler;
 use crate::rewards::{get_user_rewards, get_user_progress, get_reward_statistics, get_top_users};
 use crate::libs::{get_global_manager, LibraryType};
+use crate::vm;
+use crate::raid;
 
 #[derive(Serialize)]
 struct StatusResponse {
@@ -85,6 +87,20 @@ pub fn create_api_routes() -> Router {
         .route("/libraries/:name/install", post(library_install_handler))
         .route("/libraries/:name/uninstall", post(library_uninstall_handler))
         .route("/libraries/:name/update", post(library_update_handler))
+        .route("/vm/instances", get(vm_instances_handler))
+        .route("/raid/nodes", get(raid_nodes_handler))
+}
+
+async fn vm_instances_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let instances = manager.list_instances().await;
+    Json(instances)
+}
+
+async fn raid_nodes_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let nodes = manager.list_nodes().await;
+    Json(nodes)
 }
 
 async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response {

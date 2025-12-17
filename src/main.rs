@@ -9,8 +9,11 @@ use poolai::{
     monitoring,
     network,
     pool,
+    raid,
     runtime::{self, RuntimeConfig},
+    ui,
     version::{APP_VERSION, BUILD_TIME},
+    vm,
     AppState,  // Re-exported from core::state
 };
 use std::net::SocketAddr;
@@ -58,6 +61,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _runtime_manager = runtime::initialize_runtime(runtime_config).await?;
     info!("✅ Runtime module initialized");
 
+    // Initialize VM module
+    info!("Initializing VM module...");
+    vm::initialize().await?;
+    info!("✅ VM module initialized");
+
+    // Initialize RAID module
+    info!("Initializing RAID module...");
+    raid::initialize().await?;
+    info!("✅ RAID module initialized");
+
+    // Initialize UI module
+    info!("Initializing UI module...");
+    ui::initialize().await?;
+    info!("✅ UI module initialized");
+
     // Initialize rewards system (already initialized via lazy_static)
     info!("✅ Rewards system ready");
 
@@ -90,6 +108,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Shutdown modules in reverse order
     info!("Shutting down runtime module...");
     // Runtime manager is dropped automatically
+
+    info!("Shutting down UI module...");
+    ui::shutdown().await?;
+
+    info!("Shutting down RAID module...");
+    raid::shutdown().await?;
+
+    info!("Shutting down VM module...");
+    vm::shutdown().await?;
 
     info!("Shutting down pool module...");
     pool::shutdown().await?;

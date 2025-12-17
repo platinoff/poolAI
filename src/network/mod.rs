@@ -13,6 +13,7 @@ pub mod auth;
 use axum::Router;
 use std::net::SocketAddr;
 use tracing::info;
+use crate::ui;
 // use axum_server::Server;  // Temporarily disabled - requires ring/gcc
 
 // #[cfg(feature = "https")]
@@ -28,7 +29,8 @@ use tracing::info;
 /// TODO: Read HTTPS configuration from config file
 pub async fn start_server(addr: SocketAddr) {
     let app = Router::new()
-        .nest("/api/v1", api::create_api_routes());
+        .nest("/api/v1", api::create_api_routes())
+        .nest("/ui", ui::create_ui_routes());
 
     // TODO: Read from configuration file
     // HTTPS temporarily disabled - requires gcc for ring crate

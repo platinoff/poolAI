@@ -16,6 +16,9 @@ pub mod runtime;
 pub mod network;
 pub mod tgbot;
 pub mod libs;
+pub mod vm;
+pub mod raid;
+pub mod ui;
 
 // Re-export core types for convenient access
 pub use core::model_interface::{ModelInterface, ModelInfo};
@@ -46,6 +49,12 @@ pub use platform::{GpuInfo, get_gpu_info};
 
 // Re-export library management types
 pub use libs::{LibraryManager, LibraryInfo, LibraryStatus, LibraryType};
+
+// Re-export VM types
+pub use vm::{VmManager, VmInstance, VmStatus, VmResources, VmIsolation};
+
+// Re-export RAID types
+pub use raid::{RaidManager, RaidConfig, RaidMode, RaidNode, ArtifactRef};
 
 // Re-export network functions
 pub use network::start_server;
