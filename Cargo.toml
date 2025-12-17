@@ -8,6 +8,7 @@ license = "MIT"
 repository = "https://github.com/poolai/poolai"
 keywords = ["ai", "mining", "pool", "gpu", "blockchain", "distributed"]
 categories = ["distributed-computing", "ai", "blockchain"]
+default-run = "poolai"
 
 [dependencies]
 # Serialization
