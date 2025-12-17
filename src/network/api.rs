@@ -11,6 +11,9 @@ use crate::platform;
 use crate::network::auth::{AuthRequest, authenticate_user};
 use crate::network::ws::websocket_handler;
 use crate::rewards::{get_user_rewards, get_user_progress, get_reward_statistics, get_top_users};
+use crate::libs::{get_global_manager, LibraryType};
+use crate::vm;
+use crate::raid;
 
 #[derive(Serialize)]
 struct StatusResponse {
@@ -79,6 +82,25 @@ pub fn create_api_routes() -> Router {
         .route("/rewards/progress/:user_id", get(user_progress_handler))
         .route("/rewards/statistics", get(rewards_statistics_handler))
         .route("/rewards/top", get(top_users_handler))
+        .route("/libraries", get(libraries_list_handler))
+        .route("/libraries/:name", get(library_info_handler))
+        .route("/libraries/:name/install", post(library_install_handler))
+        .route("/libraries/:name/uninstall", post(library_uninstall_handler))
+        .route("/libraries/:name/update", post(library_update_handler))
+        .route("/vm/instances", get(vm_instances_handler))
+        .route("/raid/nodes", get(raid_nodes_handler))
+}
+
+async fn vm_instances_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let instances = manager.list_instances().await;
+    Json(instances)
+}
+
+async fn raid_nodes_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let nodes = manager.list_nodes().await;
+    Json(nodes)
 }
 
 async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response {
@@ -317,4 +339,102 @@ async fn rewards_statistics_handler() -> impl IntoResponse {
 async fn top_users_handler() -> impl IntoResponse {
     let top_users = get_top_users(10).await;
     Json(top_users)
+}
+
+// Library management handlers
+
+// List all installed libraries
+async fn libraries_list_handler() -> impl IntoResponse {
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        let libraries = manager.list_libraries().await;
+        Json(libraries).into_response()
+    } else {
+        (axum::http::StatusCode::SERVICE_UNAVAILABLE, Json(serde_json::json!({
+            "error": "Library manager not initialized"
+        }))).into_response()
+    }
+}
+
+// Get library information
+async fn library_info_handler(
+    axum::extract::Path(name): axum::extract::Path<String>
+) -> impl IntoResponse {
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        match manager.get_library(&name).await {
+            Some(lib) => Json(lib).into_response(),
+            None => (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
+                "error": format!("Library {} not found", name)
+            }))).into_response(),
+        }
+    } else {
+        (axum::http::StatusCode::SERVICE_UNAVAILABLE, Json(serde_json::json!({
+            "error": "Library manager not initialized"
+        }))).into_response()
+    }
+}
+
+// Install library
+async fn library_install_handler(
+    axum::extract::Path(name): axum::extract::Path<String>,
+    Json(payload): Json<serde_json::Value>,
+) -> impl IntoResponse {
+    let version = payload.get("version")
+        .and_then(|v| v.as_str())
+        .unwrap_or("latest");
+    
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        match manager.install_library(&name, version, LibraryType::ModelLibrary).await {
+            Ok(lib) => Json(lib).into_response(),
+            Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to install library: {}", e)
+            }))).into_response(),
+        }
+    } else {
+        (axum::http::StatusCode::SERVICE_UNAVAILABLE, Json(serde_json::json!({
+            "error": "Library manager not initialized"
+        }))).into_response()
+    }
+}
+
+// Uninstall library
+async fn library_uninstall_handler(
+    axum::extract::Path(name): axum::extract::Path<String>
+) -> impl IntoResponse {
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        match manager.uninstall_library(&name).await {
+            Ok(_) => Json(serde_json::json!({
+                "message": format!("Library {} uninstalled successfully", name)
+            })).into_response(),
+            Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to uninstall library: {}", e)
+            }))).into_response(),
+        }
+    } else {
+        (axum::http::StatusCode::SERVICE_UNAVAILABLE, Json(serde_json::json!({
+            "error": "Library manager not initialized"
+        }))).into_response()
+    }
+}
+
+// Update library
+async fn library_update_handler(
+    axum::extract::Path(name): axum::extract::Path<String>
+) -> impl IntoResponse {
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        match manager.update_library(&name).await {
+            Ok(lib) => Json(lib).into_response(),
+            Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to update library: {}", e)
+            }))).into_response(),
+        }
+    } else {
+        (axum::http::StatusCode::SERVICE_UNAVAILABLE, Json(serde_json::json!({
+            "error": "Library manager not initialized"
+        }))).into_response()
+    }
 } 

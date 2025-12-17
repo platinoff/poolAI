@@ -1,6 +1,7 @@
 //! Cache Manager for Stage 4.1 Runtime (Stub)
 
 pub struct CacheManager {
+    #[allow(dead_code)] // Will be used for size limits in future
     size_mb: usize,
 }
 

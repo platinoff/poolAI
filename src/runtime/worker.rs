@@ -11,6 +11,7 @@ use tokio::sync::{RwLock, mpsc};
 use tokio::process::{Child, Command};
 use serde::{Deserialize, Serialize};
 use tracing::{info, warn};
+use std::io::ErrorKind;
 
 /// Worker status enumeration
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -65,6 +66,7 @@ pub struct Worker {
     status: Arc<RwLock<WorkerStatus>>,
     metrics: Arc<RwLock<WorkerMetrics>>,
     process: Option<Child>,
+    #[allow(dead_code)] // Will be used for task distribution in future
     task_channel: mpsc::Sender<WorkerTask>,
     health_monitor: tokio::task::JoinHandle<()>,
 }
@@ -171,7 +173,39 @@ impl Worker {
 
     /// Spawn worker process
     async fn spawn_process(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        let mut command = Command::new("poolai-worker");
+        // Prefer spawning the sibling worker binary located next to the current executable.
+        // This avoids relying on PATH (common source of `ErrorKind::NotFound` on Windows/MSYS).
+        let worker_exe = match std::env::current_exe() {
+            Ok(exe) => {
+                #[cfg(target_os = "windows")]
+                let name = "poolai-worker.exe";
+                #[cfg(not(target_os = "windows"))]
+                let name = "poolai-worker";
+                exe.with_file_name(name)
+            }
+            Err(_) => {
+                #[cfg(target_os = "windows")]
+                let name = "poolai-worker.exe";
+                #[cfg(not(target_os = "windows"))]
+                let name = "poolai-worker";
+                std::path::PathBuf::from(name)
+            }
+        };
+
+        let mut command = if worker_exe.exists() {
+            Command::new(worker_exe)
+        } else {
+            // Fallback to PATH lookup for custom deployments.
+            #[cfg(target_os = "windows")]
+            let name = "poolai-worker.exe";
+            #[cfg(not(target_os = "windows"))]
+            let name = "poolai-worker";
+            Command::new(name)
+        };
+
+        // Ensure the child process is terminated when the parent drops the handle (graceful shutdown path).
+        // This prevents orphaned `poolai-worker` processes during development and normal Ctrl+C shutdown.
+        command.kill_on_drop(true);
         
                             // Set process priority (Windows-specific code commented out for now)
                     #[cfg(target_os = "windows")]
@@ -181,12 +215,24 @@ impl Worker {
                     }
         
         // Spawn process
-        let child = command
+        let child = match command
             .arg("--worker-id")
             .arg(&self.config.id)
             .arg("--max-memory")
             .arg(self.config.max_memory_mb.to_string())
-            .spawn()?;
+            .spawn()
+        {
+            Ok(child) => child,
+            Err(e) if e.kind() == ErrorKind::NotFound => {
+                warn!(
+                    "Worker binary not found; continuing without external worker process (id={}). \
+                     Build/run `poolai-worker` or ensure it is next to the main executable.",
+                    self.config.id
+                );
+                return Ok(());
+            }
+            Err(e) => return Err(e.into()),
+        };
         
         self.process = Some(child);
         Ok(())

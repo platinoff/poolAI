@@ -8,6 +8,7 @@ license = "MIT"
 repository = "https://github.com/poolai/poolai"
 keywords = ["ai", "mining", "pool", "gpu", "blockchain", "distributed"]
 categories = ["distributed-computing", "ai", "blockchain"]
+default-run = "poolai"
 
 [dependencies]
 # Serialization
@@ -56,6 +57,21 @@ rand = "0.8"
 
 # Lock-free data structures
 parking_lot = "0.12"
+
+# HTTP client for library downloads
+# Using default features without native-tls to avoid zstd-sys compilation issues
+reqwest = { version = "0.11", features = ["stream"], default-features = false }
+
+# Archive extraction
+flate2 = "1.0"
+tar = "0.4"
+# zip default features enable bzip2 + zstd, which require a C toolchain (gcc.exe) on windows-gnu.
+# Keep it minimal/pure-Rust for now.
+zip = { version = "0.6", default-features = false, features = ["deflate", "time"] }
+
+# Checksum verification
+sha2 = "0.10"
+hex = "0.4"
 
 # Build script dependencies
 [build-dependencies]
