@@ -10,8 +10,9 @@ use crate::libs::{
     LibraryInfo, LibraryMetadata, LibraryStatus, LibraryType,
     registry::LibraryRegistry,
     versioning::VersionManager,
-    dependencies::DependencyResolver,
+    dependencies::{DependencyResolver, ResolvedDependency},
     download::{download_library, extract_archive},
+    manifest::InstalledLibrariesManifest,
 };
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -19,6 +20,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 use chrono::Utc;
+use uuid::Uuid;
 
 /// Library Manager - Main interface for managing libraries
 pub struct LibraryManager {
@@ -84,9 +86,25 @@ impl LibraryManager {
 
     /// Load existing libraries from disk
     async fn load_existing_libraries(&self) -> Result<(), AppError> {
-        // Scan library directory and load metadata
+        // Prefer loading from manifest (production-min persistence).
+        let manifest_path = self.manifest_path();
+        if let Some(manifest) = InstalledLibrariesManifest::load(&manifest_path).await? {
+            let mut libraries = self.libraries.write().await;
+            libraries.clear();
+
+            // Keep only entries that still exist on disk.
+            for (name, info) in manifest.libraries {
+                if info.path.exists() {
+                    libraries.insert(name, info);
+                }
+            }
+
+            return Ok(());
+        }
+
+        // Fallback: scan library directory and load metadata (legacy).
         if !self.base_path.exists() {
-            return Ok(()); // Directory doesn't exist yet, nothing to load
+            return Ok(());
         }
         
         let mut entries = tokio::fs::read_dir(&self.base_path).await
@@ -146,6 +164,16 @@ impl LibraryManager {
         Ok(())
     }
 
+    fn manifest_path(&self) -> PathBuf {
+        self.base_path.join("manifest.json")
+    }
+
+    async fn persist_manifest(&self) -> Result<(), AppError> {
+        let libraries = self.libraries.read().await;
+        let manifest = InstalledLibrariesManifest::new(libraries.clone());
+        manifest.save_atomic(&self.manifest_path()).await
+    }
+
     /// Install a library
     pub async fn install_library(
         &self,
@@ -153,35 +181,49 @@ impl LibraryManager {
         version: &str,
         library_type: LibraryType,
     ) -> Result<LibraryInfo, AppError> {
-        info!("Installing library: {} v{}", name, version);
+        // Resolve version "latest" (production-min behavior).
+        let resolved_version = if version == "latest" {
+            let registry = self.registry.read().await;
+            registry.get_latest_version(name).unwrap_or_else(|| "latest".to_string())
+        } else {
+            version.to_string()
+        };
+
+        info!("Installing library: {} v{}", name, resolved_version);
         
         // Check if already installed
         {
             let libraries = self.libraries.read().await;
             if let Some(lib) = libraries.get(name) {
-                if lib.version == version {
-                    info!("Library {} v{} already installed", name, version);
+                if lib.version == resolved_version {
+                    info!("Library {} v{} already installed", name, resolved_version);
                     return Ok(lib.clone());
                 }
             }
         }
         
-        // Resolve dependencies
-        let dependencies = self.dependency_resolver.read().await
-            .resolve(name, version).await?;
+        // Resolve dependencies + choose versions using registry (production-min).
+        let dep_plan: Vec<ResolvedDependency> = {
+            let resolver = self.dependency_resolver.read().await;
+            let registry = self.registry.read().await;
+            resolver.resolve_versions(name, &resolved_version, &registry)?
+        };
         
         // Install dependencies first (using Box::pin for recursive async call)
-        for dep in &dependencies {
-            Box::pin(self.install_library(dep, "latest", library_type)).await?;
+        for dep in &dep_plan {
+            Box::pin(self.install_library(&dep.name, &dep.version, library_type)).await?;
         }
         
         // Download and install library
-        let library_path = self.download_and_install(name, version, library_type).await?;
+        let library_path = self
+            .download_and_install(name, &resolved_version, library_type)
+            .await?;
         
         // Create library info
+        let dependencies = dep_plan.iter().map(|d| d.name.clone()).collect();
         let library_info = LibraryInfo {
             name: name.to_string(),
-            version: version.to_string(),
+            version: resolved_version.clone(),
             path: library_path,
             dependencies,
             metadata: LibraryMetadata {
@@ -198,9 +240,12 @@ impl LibraryManager {
         
         // Register in version manager
         self.version_manager.write().await
-            .register_version(name, version, &library_info.path).await?;
+            .register_version(name, &resolved_version, &library_info.path).await?;
+
+        // Persist manifest after successful install.
+        self.persist_manifest().await?;
         
-        info!("Library {} v{} installed successfully", name, version);
+        info!("Library {} v{} installed successfully", name, resolved_version);
         Ok(library_info)
     }
 
@@ -213,9 +258,9 @@ impl LibraryManager {
     ) -> Result<PathBuf, AppError> {
         info!("Downloading and installing library: {} v{}", name, version);
         
-        // Create library directory
         let library_dir = self.base_path.join(name).join(version);
-        tokio::fs::create_dir_all(&library_dir).await
+        let library_parent = self.base_path.join(name);
+        tokio::fs::create_dir_all(&library_parent).await
             .map_err(|e| AppError::ConfigError(format!("Failed to create library directory: {}", e)))?;
         
         // Get download URL from registry (for now, use placeholder)
@@ -223,34 +268,55 @@ impl LibraryManager {
         let download_url = self.get_download_url(name, version).await?;
         
         if let Some(url) = download_url {
-            // Create temporary download path
-            let temp_dir = self.base_path.join(".tmp");
-            tokio::fs::create_dir_all(&temp_dir).await
+            // Production-min atomic install: download+extract to temp, then rename into place.
+            let tmp_root = self.base_path.join(".tmp");
+            tokio::fs::create_dir_all(&tmp_root).await
                 .map_err(|e| AppError::ConfigError(format!("Failed to create temp directory: {}", e)))?;
-            
-            let archive_name = format!("{}-{}.tar.gz", name, version);
-            let archive_path = temp_dir.join(&archive_name);
-            
-            // Download library
+
+            let session_dir = tmp_root.join(format!("{}-{}-{}", name, version, Uuid::new_v4()));
+            tokio::fs::create_dir_all(&session_dir).await
+                .map_err(|e| AppError::ConfigError(format!("Failed to create temp session directory: {}", e)))?;
+
+            let archive_path = session_dir.join("archive");
+            let extract_dir = session_dir.join("extract");
+
+            // Optional expected checksum from registry metadata
+            let expected_checksum = {
+                let registry = self.registry.read().await;
+                registry
+                    .get_metadata(name, version)
+                    .and_then(|m| m.metadata.checksum.as_deref())
+                    .map(|s| s.to_string())
+            };
+
             info!("Downloading from: {}", url);
-            download_library(&url, &archive_path, None).await?;
-            
-            // Extract archive
-            info!("Extracting archive to: {:?}", library_dir);
-            extract_archive(&archive_path, &library_dir).await?;
-            
-            // Clean up temporary file
-            if let Err(e) = tokio::fs::remove_file(&archive_path).await {
-                warn!("Failed to remove temporary file: {}", e);
+            download_library(&url, &archive_path, expected_checksum.as_deref()).await?;
+
+            info!("Extracting archive to: {:?}", extract_dir);
+            extract_archive(&archive_path, &extract_dir).await?;
+
+            self.verify_installation(&extract_dir, name).await?;
+
+            // Replace existing target if present (update/reinstall)
+            if library_dir.exists() {
+                tokio::fs::remove_dir_all(&library_dir).await
+                    .map_err(|e| AppError::ConfigError(format!("Failed to remove existing library dir: {}", e)))?;
             }
-            
-            // Verify installation
-            self.verify_installation(&library_dir, name).await?;
-            
-            info!("Library {} v{} installed successfully", name, version);
+
+            tokio::fs::rename(&extract_dir, &library_dir).await
+                .map_err(|e| AppError::ConfigError(format!("Failed to finalize install (rename): {}", e)))?;
+
+            // Cleanup temp session (archive + empty session dir)
+            if let Err(e) = tokio::fs::remove_dir_all(&session_dir).await {
+                warn!("Failed to remove temp session dir: {}", e);
+            }
+
+            info!("Library {} v{} installed successfully (atomic)", name, version);
         } else {
             // No download URL, create placeholder structure
             info!("No download URL found, creating placeholder structure");
+            tokio::fs::create_dir_all(&library_dir).await
+                .map_err(|e| AppError::ConfigError(format!("Failed to create library directory: {}", e)))?;
             let lib_file = library_dir.join("lib").join(format!("lib{}.so", name));
             if let Some(parent) = lib_file.parent() {
                 tokio::fs::create_dir_all(parent).await
@@ -330,6 +396,9 @@ impl LibraryManager {
             // Unregister from version manager
             self.version_manager.write().await
                 .unregister_version(name).await?;
+
+            // Persist manifest after uninstall.
+            self.persist_manifest().await?;
             
             info!("Library {} uninstalled successfully", name);
             Ok(())

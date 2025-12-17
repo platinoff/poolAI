@@ -14,6 +14,7 @@ pub mod dependencies;
 pub mod download;
 pub mod constraints;
 pub mod integration;
+pub mod manifest;
 
 // Re-export main types for convenient access
 pub use manager::LibraryManager;

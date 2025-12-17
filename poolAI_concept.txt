@@ -450,8 +450,9 @@ poolAI/
 - ✅ VersionManager для управления версиями
 - ✅ DependencyResolver для разрешения зависимостей
 - ✅ API endpoints интегрированы
-- 🔄 Загрузка библиотек (stub реализация)
-- 🔄 Полное разрешение зависимостей (базовая реализация)
+- ✅ Загрузка/распаковка (HTTP stream + tar/zip) реализована
+- 🚧 Atomic install + manifest (production-min) — в работе
+- 🚧 Разрешение зависимостей с constraints + выбор версии — в работе
 
 **RAID система (raid/)** - 🚧 IN PROGRESS (basic scaffold)
 - ✅ `raid/mod.rs` - RaidManager + local artifact storage (`/raid/artifacts`)

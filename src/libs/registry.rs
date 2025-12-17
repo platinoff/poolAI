@@ -9,6 +9,7 @@ use crate::core::error::AppError;
 use crate::libs::LibraryInfo;
 use std::collections::HashMap;
 use tracing::info;
+use std::cmp::Ordering;
 
 /// Library Registry - Manages registry of available libraries
 pub struct LibraryRegistry {
@@ -51,7 +52,8 @@ impl LibraryRegistry {
         
         if !versions.contains(&version.to_string()) {
             versions.push(version.to_string());
-            versions.sort(); // Keep versions sorted
+            // Keep versions sorted (basic semver: MAJOR.MINOR.PATCH)
+            versions.sort_by(|a, b| semver_cmp(a, b));
         }
         
         let key = format!("{}:{}", name, version);
@@ -101,6 +103,22 @@ impl LibraryRegistry {
         let key = format!("{}:{}", name, version);
         self.metadata.get(&key)
     }
+}
+
+fn semver_cmp(a: &str, b: &str) -> Ordering {
+    let a_parts: Vec<u32> = a.split('.').filter_map(|s| s.parse::<u32>().ok()).collect();
+    let b_parts: Vec<u32> = b.split('.').filter_map(|s| s.parse::<u32>().ok()).collect();
+
+    for i in 0..3 {
+        let av = a_parts.get(i).copied().unwrap_or(0);
+        let bv = b_parts.get(i).copied().unwrap_or(0);
+        match av.cmp(&bv) {
+            Ordering::Equal => continue,
+            other => return other,
+        }
+    }
+
+    a.cmp(b)
 }
 
 impl Default for LibraryRegistry {

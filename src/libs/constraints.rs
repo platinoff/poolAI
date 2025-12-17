@@ -192,3 +192,39 @@ pub fn satisfies_all(version: &str, constraints: &[VersionConstraint]) -> Result
     Ok(true)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_and_satisfy_basic() {
+        let c = VersionConstraint::parse(">=1.2.3").unwrap();
+        assert!(c.satisfies("1.2.3").unwrap());
+        assert!(c.satisfies("1.9.0").unwrap());
+        assert!(!c.satisfies("1.2.2").unwrap());
+    }
+
+    #[test]
+    fn compatible_range() {
+        let c = VersionConstraint::parse("~1.2.3").unwrap();
+        assert!(c.satisfies("1.2.3").unwrap());
+        assert!(c.satisfies("1.2.9").unwrap());
+        assert!(!c.satisfies("1.3.0").unwrap());
+    }
+
+    #[test]
+    fn caret_range() {
+        let c = VersionConstraint::parse("^1.2.3").unwrap();
+        assert!(c.satisfies("1.2.3").unwrap());
+        assert!(c.satisfies("1.9.9").unwrap());
+        assert!(!c.satisfies("2.0.0").unwrap());
+    }
+
+    #[test]
+    fn satisfies_all_multiple() {
+        let cs = parse_constraints(">=1.2.0,<2.0.0").unwrap();
+        assert!(satisfies_all("1.5.0", &cs).unwrap());
+        assert!(!satisfies_all("2.0.0", &cs).unwrap());
+    }
+}
+

@@ -149,3 +149,28 @@ fn compare_versions(a: &str, b: &str) -> std::cmp::Ordering {
     a.cmp(b)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn register_and_get_active_version() {
+        let mut vm = VersionManager::new();
+        let p1 = PathBuf::from("C:\\tmp\\lib\\1.0.0");
+        let p2 = PathBuf::from("C:\\tmp\\lib\\1.1.0");
+
+        vm.register_version("lib", "1.0.0", &p1).await.unwrap();
+        assert_eq!(vm.get_active_version("lib").unwrap().version, "1.0.0");
+
+        vm.register_version("lib", "1.1.0", &p2).await.unwrap();
+        assert_eq!(vm.get_active_version("lib").unwrap().version, "1.1.0");
+    }
+
+    #[test]
+    fn compare_versions_semver() {
+        assert_eq!(compare_versions("1.2.3", "1.2.3"), std::cmp::Ordering::Equal);
+        assert_eq!(compare_versions("1.2.3", "1.2.4"), std::cmp::Ordering::Less);
+        assert_eq!(compare_versions("2.0.0", "1.9.9"), std::cmp::Ordering::Greater);
+    }
+}
+
