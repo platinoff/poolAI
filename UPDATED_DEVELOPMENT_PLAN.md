@@ -35,7 +35,7 @@
 
 - 🚧 **VM Module** - Instance lifecycle scaffold (in-memory) + API (read-only)
 - 🚧 **RAID Module** - Local artifact storage scaffold + node registry primitives
-- 🚧 **UI Module** - Minimal dashboard scaffold (mounted at `/ui/`)
+- 🚧 **UI Module** - Read-only dashboard (mounted at `/ui`, `/ui/` redirects to `/ui`)
 
 ---
 

@@ -1,3 +1,37 @@
+# 🚀 Development Plan Update (Rust Architect)
+
+**Date**: 2025-12-17  
+**Branch (recommended)**: `stage3/ui-readonly-runtime-hardening`  
+**Status**: 🚧 Stage 3 progress checkpoint
+
+## ✅ What’s done since the previous plan
+- **UI (read-only dashboard)** implemented and accessible under `/ui`
+  - Pages: `/ui`, `/ui/status`, `/ui/health`, `/ui/metrics`, `/ui/workers`, `/ui/libs`, `/ui/vm`, `/ui/raid`
+  - Auto-refresh polling (5s), no write actions from UI
+- **Runtime hardening**
+  - Introduced `poolai-worker` as a real binary (`src/bin/poolai-worker.rs`)
+  - Worker spawning uses sibling-binary path (no PATH dependency) + safe fallback
+  - `default-run = "poolai"` to keep `cargo run` working
+  - Prevent dev exe locking via `kill_on_drop(true)` on worker process handle
+- **Stage 3 scaffolds**
+  - `vm/` + `raid/` skeleton modules wired into `main` and API (read-only)
+- **Windows-gnu stability**
+  - Avoid native deps by disabling `zip` default-features (no zstd/bzip2) to prevent `gcc.exe` blockers
+
+## 🎯 Next focus (per UPDATED_DEVELOPMENT_PLAN.md)
+1. **Libs production-min**
+   - atomic install (tmp → rename)
+   - manifest/metadata on disk
+   - constraints + conflict reporting
+   - minimal unit/integration tests (fixtures)
+2. **RAID local reliable store**
+   - artifact manifest + GC/quota
+   - integrate libs → raid artifacts
+3. **VM process runner**
+   - integrate VmManager with `runtime/process` lifecycle + logs/timeouts
+
+---
+
 # 🚀 Оновлений план розробки - Libs Module Implementation
 
 **Дата**: 2025-12-05  
