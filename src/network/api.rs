@@ -89,6 +89,7 @@ pub fn create_api_routes() -> Router {
         .route("/libraries/:name/update", post(library_update_handler))
         .route("/vm/instances", get(vm_instances_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
+        .route("/raid/artifacts", get(raid_artifacts_handler))
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {
@@ -101,6 +102,12 @@ async fn raid_nodes_handler() -> impl IntoResponse {
     let manager = raid::get_global_manager();
     let nodes = manager.list_nodes().await;
     Json(nodes)
+}
+
+async fn raid_artifacts_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let artifacts = manager.list_artifacts().await;
+    Json(artifacts)
 }
 
 async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response {

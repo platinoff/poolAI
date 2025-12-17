@@ -7,6 +7,7 @@
 //! - Artifact storage for libraries/models (local implementation)
 
 use crate::core::error::AppError;
+use crate::raid::manifest::ArtifactManifest;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -15,6 +16,8 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::RwLock;
 use tracing::info;
 use uuid::Uuid;
+
+pub mod manifest;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RaidMode {
@@ -66,6 +69,7 @@ pub struct ArtifactRef {
 pub struct RaidManager {
     config: Arc<RwLock<RaidConfig>>,
     nodes: Arc<RwLock<Vec<RaidNode>>>,
+    artifacts: Arc<RwLock<ArtifactManifest>>,
 }
 
 impl RaidManager {
@@ -73,6 +77,7 @@ impl RaidManager {
         Self {
             config: Arc::new(RwLock::new(config)),
             nodes: Arc::new(RwLock::new(Vec::new())),
+            artifacts: Arc::new(RwLock::new(ArtifactManifest::new())),
         }
     }
 
@@ -82,6 +87,14 @@ impl RaidManager {
         tokio::fs::create_dir_all(&cfg.base_path)
             .await
             .map_err(|e| AppError::ConfigError(format!("Failed to create RAID base directory: {}", e)))?;
+
+        // Load manifest (if exists), prune missing files and persist.
+        let manifest_path = self.manifest_path_inner(&cfg.base_path);
+        if let Some(mut m) = ArtifactManifest::load(&manifest_path).await? {
+            m.prune_missing_files();
+            *self.artifacts.write().await = m;
+            self.persist_manifest().await?;
+        }
         Ok(())
     }
 
@@ -128,12 +141,22 @@ impl RaidManager {
             .await
             .map_err(|e| AppError::ConfigError(format!("Failed to sync artifact file: {}", e)))?;
 
-        Ok(ArtifactRef {
+        let artifact = ArtifactRef {
             id,
             name: name.to_string(),
             stored_at: Utc::now(),
             path,
-        })
+        };
+
+        // Update manifest
+        {
+            let mut m = self.artifacts.write().await;
+            m.artifacts.insert(id, artifact.clone());
+            m.updated_at = Utc::now();
+        }
+        self.persist_manifest().await?;
+
+        Ok(artifact)
     }
 
     /// Read an artifact from local storage.
@@ -148,10 +171,51 @@ impl RaidManager {
         Ok(buf)
     }
 
+    pub async fn list_artifacts(&self) -> Vec<ArtifactRef> {
+        self.artifacts
+            .read()
+            .await
+            .artifacts
+            .values()
+            .cloned()
+            .collect()
+    }
+
+    pub async fn delete_artifact(&self, id: Uuid) -> Result<(), AppError> {
+        let artifact = {
+            let mut m = self.artifacts.write().await;
+            let a = m
+                .artifacts
+                .remove(&id)
+                .ok_or_else(|| AppError::ConfigError(format!("Artifact {} not found", id)))?;
+            m.updated_at = Utc::now();
+            a
+        };
+
+        if artifact.path.exists() {
+            tokio::fs::remove_file(&artifact.path)
+                .await
+                .map_err(|e| AppError::ConfigError(format!("Failed to remove artifact file: {}", e)))?;
+        }
+        self.persist_manifest().await?;
+        Ok(())
+    }
+
     /// Placeholder: rebalancing would run for distributed modes.
     #[allow(dead_code)]
     pub async fn rebalance(&self) -> Result<(), AppError> {
         Ok(())
+    }
+
+    fn manifest_path_inner(&self, base: &Path) -> PathBuf {
+        base.join("artifacts").join("manifest.json")
+    }
+
+    async fn persist_manifest(&self) -> Result<(), AppError> {
+        let base = self.config.read().await.base_path.clone();
+        let path = self.manifest_path_inner(&base);
+        let m = self.artifacts.read().await.clone();
+        m.save_atomic(&path).await
     }
 }
 
