@@ -50,6 +50,9 @@
 - **Windows-gnu friendly**: уникати `zstd-sys/bzip2-sys/ring` за замовчуванням.
 - **Контроль features**: `zip` без default-features; `reqwest` без native-tls.
 - **Ціль**: `cargo check` завжди зелений.
+ - **Runtime external deps**: все, що викликається через `Command` (воркери/утиліти), має мати
+   - sibling-binary path (поруч з `poolai.exe`) або
+   - чіткий fallback/warn без падіння всього процесу.
 
 ### Пріоритет 1: UI Module (read-only dashboard) — найшвидший value
 **Мета**: дати оператору “скло” для огляду системи без ризиків запису.
@@ -58,8 +61,8 @@
 - Без нових важких залежностей
 
 **Критерій готовності**
-- [ ] UI показує стан системи і ключові списки (libs/vm/raid/workers)
-- [ ] Немає write-операцій з UI (тільки read)
+- [x] UI показує стан системи і ключові списки (libs/vm/raid/workers)
+- [x] Немає write-операцій з UI (тільки read)
 
 ### Пріоритет 2: Libs Module (production-min)
 **Мета**: зробити інсталяцію бібліотек безпечною і відтворюваною.

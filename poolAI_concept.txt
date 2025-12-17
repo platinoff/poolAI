@@ -466,8 +466,11 @@ poolAI/
 - 🔄 Isolation/security enforcement (planned)
 - 🔄 Resource optimization and scheduling integration (planned)
 
-**Пользовательский интерфейс (ui/)** - 🚧 IN PROGRESS (basic scaffold)
-- ✅ `ui/mod.rs` - Minimal web dashboard routes (mounted at `/ui/`)
+**Пользовательский интерфейс (ui/)** - 🚧 IN PROGRESS (read-only dashboard implemented)
+- ✅ `ui/mod.rs` - Read-only dashboard pages (mounted at `/ui`)
+  - `/ui` (Home)
+  - `/ui/status`, `/ui/health`, `/ui/metrics`
+  - `/ui/workers`, `/ui/libs`, `/ui/vm`, `/ui/raid`
 - 🔄 UI components (planned)
 - 🔄 Themes/layouts (planned)
 
