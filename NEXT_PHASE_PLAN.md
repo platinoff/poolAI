@@ -1,14 +1,22 @@
 # 🚀 План наступної фази розвитку
 
 **Як Rust архітектор**  
-**Дата**: 2025-12-05  
-**Поточний статус**: Stage 4.1 Completed, Stage 3 Partially Completed
+**Дата**: 2025-12-17  
+**Поточний статус**: Stage 4.1 Completed, Stage 3 In Progress (Libs + VM/RAID/UI scaffolds)
 
 ---
 
 ## 🎯 Стратегічна мета
 
 Завершити Stage 3 (Libs, VM, RAID, UI модулі) та підготувати основу для Stage 4.2 (Enterprise Features).
+
+**Порядок виконання (від простого до складного):**
+1. UI (read-only dashboard)
+2. Libs (production-min: atomic install + manifest + constraints + tests)
+3. RAID (local reliable artifact store)
+4. VM (process runner → isolation)
+5. Security (JWT/HTTPS) під feature flags
+6. Distributed RAID (BurstRAID/SmallWorld)
 
 ---
 

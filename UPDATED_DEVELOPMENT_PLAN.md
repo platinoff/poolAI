@@ -1,8 +1,8 @@
 # 🏗️ Оновлений план розробки - Rust Architect Perspective
 
-**Дата**: 2025-12-05  
+**Дата**: 2025-12-17  
 **Статус**: 🚧 **АКТИВНА РОЗРОБКА**  
-**Поточний етап**: Stage 3 - Libs Module (60% готово)
+**Поточний етап**: Stage 3 - Completion & Stabilization (Libs + VM/RAID/UI scaffolds)
 
 ---
 
@@ -21,203 +21,78 @@
 
 ### 🚧 В розробці
 
-- 🚧 **Libs Module** (60% готово)
+- 🚧 **Libs Module** (~80% готово)
   - ✅ Базова структура (mod.rs, manager.rs, registry.rs, versioning.rs, dependencies.rs)
   - ✅ API endpoints інтегровані
   - ✅ Semantic versioning
   - ✅ Dependency resolution (базова реалізація)
-  - 🔄 Завантаження бібліотек (stub реалізація)
-  - 🔄 Повна інтеграція з model_interface
-  - 🔄 Тестування
+  - ✅ Завантаження/розпакування (HTTP stream, tar/zip, sha256)
+  - 🔄 Atomic install + manifest (production-min)
+  - 🔄 Повна інтеграція з model_interface (compat checks, auto-update policy)
+  - 🔄 Тестування (unit + integration)
 
-### 🔄 Заплановані модулі (Stage 3)
+### 🚧 Модулі Stage 3 (базові скелети реалізовано)
 
-- 🔄 **VM Module** - Virtualization and isolation
-- 🔄 **RAID Module** - Fault tolerance and replication
-- 🔄 **UI Module** - Web interface
-
----
-
-## 🎯 Стратегічний план розробки
-
-### Пріоритет 1: Завершити Libs Module (1-2 тижні)
-
-#### Поточні завдання
-
-1. **Покращити завантаження бібліотек** 🔄
-   - Реалізувати HTTP client для завантаження
-   - Розпакування архівів (tar, zip)
-   - Перевірка checksum
-   - Прогрес завантаження
-
-2. **Покращити dependency resolution** 🔄
-   - Повна реалізація алгоритму SAT solver
-   - Version constraints (>=, <=, ~, ^)
-   - Conflict resolution strategies
-   - Dependency graph visualization
-
-3. **Інтеграція з model_interface** 🔄
-   - Автоматичне завантаження libtorch
-   - Перевірка сумісності версій
-   - Автоматичне оновлення бібліотек
-
-4. **Тестування** 🔄
-   - Unit tests для кожного компонента
-   - Integration tests для API
-   - Mock implementations для завантаження
-
-#### Критерії готовності
-
-- [ ] Завантаження бібліотек працює
-- [ ] Dependency resolution повністю реалізовано
-- [ ] Інтеграція з model_interface
-- [ ] Тести покривають >80% коду
-- [ ] Документація Rustdoc готова
+- 🚧 **VM Module** - Instance lifecycle scaffold (in-memory) + API (read-only)
+- 🚧 **RAID Module** - Local artifact storage scaffold + node registry primitives
+- 🚧 **UI Module** - Minimal dashboard scaffold (mounted at `/ui/`)
 
 ---
 
-### Пріоритет 2: VM Module (3-4 тижні)
+## 🎯 Стратегічний план (від менш складного до більш складного)
 
-**Мета**: Забезпечити ізоляцію та віртуалізацію для безпечного виконання моделей.
+### Принципи виконання
+- **Нульова регресія збірки**: `cargo check` має проходити на Windows GNU (MSYS2 UCRT64) без native toolchain surprises.
+- **Мінімальний, але завершений вертикальний slice**: спочатку “read-only visibility”, потім “safe write paths”.
+- **Feature flags для важких залежностей**: JWT/HTTPS повертаємо тільки коли toolchain стабільний.
 
-#### Архітектурний дизайн
+### Пріоритет 0: Build & Toolchain Stability (постійно)
+- **Windows-gnu friendly**: уникати `zstd-sys/bzip2-sys/ring` за замовчуванням.
+- **Контроль features**: `zip` без default-features; `reqwest` без native-tls.
+- **Ціль**: `cargo check` завжди зелений.
 
-```rust
-// src/vm/mod.rs
-pub mod manager;
-pub mod instance;
-pub mod template;
-pub mod networking;
+### Пріоритет 1: UI Module (read-only dashboard) — найшвидший value
+**Мета**: дати оператору “скло” для огляду системи без ризиків запису.
+- Сторінки `/ui/`: status/health/metrics/workers/libs/vm/raid
+- Авто-оновлення (простий JS polling)
+- Без нових важких залежностей
 
-pub use manager::VMManager;
-pub use instance::VMInstance;
-pub use template::VMTemplate;
-pub use networking::VMNetworking;
-```
+**Критерій готовності**
+- [ ] UI показує стан системи і ключові списки (libs/vm/raid/workers)
+- [ ] Немає write-операцій з UI (тільки read)
 
-#### Ключові компоненти
+### Пріоритет 2: Libs Module (production-min)
+**Мета**: зробити інсталяцію бібліотек безпечною і відтворюваною.
+- Atomic install (tmp dir → rename)
+- Manifest/metadata (installed versions, checksum, source URL, installed_at)
+- Version constraints: повний парсинг + перевірка (без SAT solver на цьому етапі)
+- Інтеграція з `model_interface`: ensure_libtorch + compat checks policy
+- Тести: unit (constraints/versioning) + integration (download/extract via local fixtures)
 
-1. **VMManager** (`src/vm/manager.rs`)
-   - Управління VM instances
-   - Resource allocation (CPU, memory, GPU)
-   - Lifecycle management (create, start, stop, destroy)
-   - Thread-safe через `Arc<RwLock<>>`
+**Критерій готовності**
+- [ ] Install/Uninstall/Update працюють і є атомарними
+- [ ] Manifest збережений на диску
+- [ ] Мінімальні тести для критичних шляхів
 
-2. **VMInstance** (`src/vm/instance.rs`)
-   - Конкретний VM instance
-   - State management (Running, Stopped, Paused, Error)
-   - Resource monitoring
-   - Process isolation
+### Пріоритет 3: RAID Module (local → reliable)
+**Мета**: надійний локальний artifact store для libs/models.
+- CRUD артефактів + індекс (manifest)
+- GC/cleanup + quota
+- Інтеграція: libs зберігає завантажене як artifact, runtime читає артефакти
 
-3. **VMTemplate** (`src/vm/template.rs`)
-   - VM templates для швидкого створення
-   - Configuration management
-   - Template registry
-   - Snapshot management
+### Пріоритет 4: VM Module (process-runner → isolation)
+**Мета**: контроль запуску воркерів/моделей з життєвим циклом і базовими лімітами.
+- Спочатку “process runner” на базі `runtime/process.rs` (+ статус/логи/таймаути)
+- Потім ресурси (CPU/mem/gpu scheduling policy)
+- Потім isolation (sandbox/containers/real VM) — окрема підфаза
 
-4. **VMNetworking** (`src/vm/networking.rs`)
-   - Мережева ізоляція
-   - Network policies
-   - Firewall rules
-   - Port forwarding
+### Пріоритет 5: Security (JWT/HTTPS) — складніше через toolchain
+- Повернути `jsonwebtoken`/`axum-server` під feature flags
+- Рекомендований шлях: або MSVC target, або гарантована наявність gcc/dlltool
 
-#### Архітектурні принципи
-
-- **Actor Model**: Кожен VM instance - окремий actor
-- **Resource Limits**: Platform-specific APIs (cgroups, containers)
-- **Async Process Management**: Tokio для управління процесами
-- **Type-Safe Configuration**: Strong typing для конфігурації
-
-#### Інтеграція
-
-- Інтеграція з `runtime/process.rs` для process management
-- Інтеграція з `platform/` для resource limits
-- API endpoints в `network/api.rs`
-- Monitoring через `monitoring/mod.rs`
-
----
-
-### Пріоритет 3: RAID Module (2-3 тижні)
-
-**Мета**: Забезпечити відмовостійкість та реплікацію даних.
-
-#### Архітектурний дизайн
-
-```rust
-// src/raid/mod.rs
-pub mod manager;
-pub mod replication;
-pub mod failover;
-pub mod storage;
-
-pub use manager::RAIDManager;
-pub use replication::ReplicationEngine;
-pub use failover::FailoverManager;
-pub use storage::RAIDStorage;
-```
-
-#### Ключові компоненти
-
-1. **RAIDManager** (`src/raid/manager.rs`)
-   - Координація реплікації
-   - Health monitoring
-   - Recovery procedures
-   - Distributed consensus
-
-2. **ReplicationEngine** (`src/raid/replication.rs`)
-   - Data replication
-   - Consistency guarantees (strong, eventual)
-   - Conflict resolution
-   - Replication strategies
-
-3. **FailoverManager** (`src/raid/failover.rs`)
-   - Automatic failover
-   - Health checks
-   - Recovery procedures
-   - Circuit breaker pattern
-
-4. **RAIDStorage** (`src/raid/storage.rs`)
-   - Distributed storage
-   - Data sharding
-   - Consistency protocols
-   - Storage backends
-
-#### Архітектурні принципи
-
-- **Distributed Consensus**: Raft algorithm для consensus
-- **Event Sourcing**: Event-driven architecture
-- **Idempotent Operations**: Всі операції idempotent
-- **Circuit Breaker**: Захист від каскадних збоїв
-
----
-
-### Пріоритет 4: UI Module (3-4 тижні)
-
-**Мета**: Створити сучасний веб-інтерфейс для управління системою.
-
-#### Архітектурний дизайн
-
-```rust
-// src/ui/mod.rs
-pub mod manager;
-pub mod dashboard;
-pub mod components;
-pub mod api;
-
-pub use manager::UIManager;
-pub use dashboard::Dashboard;
-pub use components::UIComponents;
-pub use api::UIApi;
-```
-
-#### Технологічний стек
-
-- **Server-side**: Static files або server-side rendering
-- **WebSocket**: Real-time updates через `network/ws.rs`
-- **RESTful API**: Інтеграція з `network/api.rs`
-- **Authentication**: JWT через `network/auth.rs`
-
----
+### Пріоритет 6: Distributed RAID (BurstRAID/SmallWorld) — найскладніше
+- Протокол, інваріанти, тест-стратегія, fault-tolerance
+- Планувати як окремий етап з окремим ADR/design doc
 
 ## 🔧 Виправлення попереджень
 
@@ -236,27 +111,26 @@ pub use api::UIApi;
 
 ---
 
-## 📅 Timeline
+## 📅 Timeline (оновлено: від простого до складного)
 
-### Тиждень 1-2: Завершення Libs Module
-- Покращення завантаження бібліотек
-- Покращення dependency resolution
-- Інтеграція з model_interface
-- Тестування
+### Тиждень 1: UI read-only
+- Дашборд сторінки + навігація + авто-оновлення
 
-### Тиждень 3-6: VM Module
-- Тиждень 3-4: VMManager та VMInstance
-- Тиждень 5: VMTemplate та Networking
-- Тиждень 6: Інтеграція та тестування
+### Тиждень 2-3: Libs production-min
+- Atomic install + manifest
+- Constraint checking + conflict reporting
+- Базові тести + fixtures
 
-### Тиждень 7-9: RAID Module
-- Тиждень 7-8: RAIDManager та Replication
-- Тиждень 9: Failover та Storage
+### Тиждень 4: RAID local reliable store
+- Artifact manifest + GC/quota
+- Інтеграція libs → raid
 
-### Тиждень 10-13: UI Module
-- Тиждень 10-11: UIManager та Dashboard
-- Тиждень 12: Components та API
-- Тиждень 13: Polish та документація
+### Тиждень 5-6: VM process runner
+- VmManager ↔ runtime/process + lifecycle
+- Базові ліміти/таймаути/логи
+
+### Далі: Security (JWT/HTTPS) → Distributed RAID
+- Виноситься в окрему фазу через toolchain/складність
 
 ---
 
@@ -316,20 +190,21 @@ pub use api::UIApi;
 
 ## 🎯 Наступні кроки (Негайні)
 
-1. **Завершити Libs Module**
-   - Покращити завантаження бібліотек
-   - Покращити dependency resolution
-   - Додати тести
+1. **UI (read-only)**
+   - Додати сторінки для libs/vm/raid/workers/metrics
+   - Поліпшити UX (шаблон, навігація, авто-оновлення)
 
-2. **Підготовка до VM Module**
-   - Створити детальний дизайн API
-   - Підготувати тестові дані
-   - Створити базову структуру модуля
+2. **Libs (production-min)**
+   - Atomic install + manifest
+   - Constraint checking + conflict reporting
+   - Тести для constraints/versioning/download (fixtures)
 
-3. **Продовжити розробку**
-   - Ітеративна розробка з тестами
-   - Code review
-   - Документація
+3. **RAID (local reliable store)**
+   - Artifact manifest + GC/quota
+   - Інтеграція libs → raid artifacts
+
+4. **VM (process runner)**
+   - В’язка VmManager ↔ runtime/process + lifecycle events
 
 ---
 
