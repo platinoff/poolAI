@@ -65,6 +65,7 @@ pub struct Worker {
     status: Arc<RwLock<WorkerStatus>>,
     metrics: Arc<RwLock<WorkerMetrics>>,
     process: Option<Child>,
+    #[allow(dead_code)] // Will be used for task distribution in future
     task_channel: mpsc::Sender<WorkerTask>,
     health_monitor: tokio::task::JoinHandle<()>,
 }

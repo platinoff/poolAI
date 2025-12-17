@@ -1,6 +1,7 @@
 //! Task Queue for Stage 4.1 Runtime (Stub)
 
 pub struct TaskQueue {
+    #[allow(dead_code)] // Will be used for capacity checks in future
     capacity: usize,
 }
 

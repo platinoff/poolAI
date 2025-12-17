@@ -5,6 +5,7 @@
 
 use poolai::{
     core,
+    libs,
     monitoring,
     network,
     pool,
@@ -45,6 +46,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Initializing pool module...");
     pool::initialize().await?;
     info!("✅ Pool module initialized");
+
+    // Initialize library management module
+    info!("Initializing library management module...");
+    libs::initialize().await?;
+    info!("✅ Library management module initialized");
 
     // Initialize runtime module
     info!("Initializing runtime module...");
@@ -87,6 +93,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Shutting down pool module...");
     pool::shutdown().await?;
+
+    info!("Shutting down library management module...");
+    libs::shutdown().await?;
 
     info!("Shutting down monitoring module...");
     monitoring::shutdown().await?;

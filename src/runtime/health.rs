@@ -1,6 +1,7 @@
 //! Health Monitor for Stage 4.1 Runtime (Stub)
 
 pub struct HealthMonitor {
+    #[allow(dead_code)] // Will be used for health check scheduling in future
     interval: u64,
 }
 

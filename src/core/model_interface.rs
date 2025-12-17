@@ -232,6 +232,7 @@ pub trait ModelInterface {
 /// Model manager for MVP
 pub struct ModelManager {
     models: HashMap<String, Box<dyn ModelInterface + Send + Sync>>,
+    #[allow(dead_code)] // Will be used for model configuration in future
     config: ConfigModelConfig,
 }
 

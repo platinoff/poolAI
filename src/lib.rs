@@ -15,6 +15,7 @@ pub mod runtime;
 // Public modules (exposed for external use)
 pub mod network;
 pub mod tgbot;
+pub mod libs;
 
 // Re-export core types for convenient access
 pub use core::model_interface::{ModelInterface, ModelInfo};
@@ -42,6 +43,9 @@ pub use rewards::{RewardSystem, RewardType, RewardLevel, Reward, UserProgress};
 
 // Re-export platform types
 pub use platform::{GpuInfo, get_gpu_info};
+
+// Re-export library management types
+pub use libs::{LibraryManager, LibraryInfo, LibraryStatus, LibraryType};
 
 // Re-export network functions
 pub use network::start_server;

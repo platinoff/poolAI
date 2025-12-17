@@ -58,6 +58,7 @@ impl Default for RuntimeConfig {
 
 /// Main runtime manager for Stage 4.1
 pub struct RuntimeManager {
+    #[allow(dead_code)] // Configuration stored for future use (reconfiguration, etc.)
     config: RuntimeConfig,
     worker_manager: Worker,
     scheduler: TaskScheduler,
