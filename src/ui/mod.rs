@@ -315,9 +315,20 @@ async fn vm_page() -> Html<String> {
 async fn raid_page() -> Html<String> {
     layout(
         "RAID",
-        r#"<div class="muted">Source: <code>/api/v1/raid/nodes</code></div><div id="data"></div>"#,
+        r#"
+<div class="grid">
+  <div class="item">
+    <div class="muted">Nodes: <code>/api/v1/raid/nodes</code></div>
+    <div id="nodes"></div>
+  </div>
+  <div class="item">
+    <div class="muted">Artifacts: <code>/api/v1/raid/artifacts</code></div>
+    <div id="artifacts"></div>
+  </div>
+</div>
+"#,
         &format!(
-            "{}\nasync function refresh(){{ await poll('/api/v1/raid/nodes', renderTable, 'data'); }}\nrefresh(); setInterval(refresh, 5000);",
+            "{}\nasync function refresh(){{ await poll('/api/v1/raid/nodes', renderTable, 'nodes'); await poll('/api/v1/raid/artifacts', renderTable, 'artifacts'); }}\nrefresh(); setInterval(refresh, 5000);",
             common_js()
         ),
     )

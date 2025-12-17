@@ -457,6 +457,7 @@ poolAI/
 **RAID система (raid/)** - 🚧 IN PROGRESS (basic scaffold)
 - ✅ `raid/mod.rs` - RaidManager + local artifact storage (`/raid/artifacts`)
 - ✅ Node registry primitives (register/list)
+- ✅ Artifact manifest persistence (atomic write) + list/delete APIs
 - 🔄 BurstRAID logic (planned)
 - 🔄 SmallWorld distributed system (planned)
 - 🔄 Administrative control plane (planned)
