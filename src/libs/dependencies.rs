@@ -6,7 +6,8 @@
 //! - Dependency graph
 
 use crate::core::error::AppError;
-use crate::libs::constraints::{VersionConstraint, parse_constraints};
+use crate::libs::constraints::{VersionConstraint, parse_constraints, satisfies_all};
+use crate::libs::registry::LibraryRegistry;
 use std::collections::{HashMap, HashSet};
 use tracing::info;
 
@@ -20,6 +21,13 @@ pub struct DependencySpec {
 /// Dependency Resolver - Resolves library dependencies
 pub struct DependencyResolver {
     dependency_graph: HashMap<String, Vec<DependencySpec>>, // name -> dependencies with constraints
+}
+
+/// Resolved dependency with selected version.
+#[derive(Debug, Clone)]
+pub struct ResolvedDependency {
+    pub name: String,
+    pub version: String,
 }
 
 impl DependencyResolver {
@@ -54,6 +62,52 @@ impl DependencyResolver {
         } else {
             Ok(Vec::new())
         }
+    }
+
+    /// Resolve dependencies and select versions using the registry (production-min).
+    pub fn resolve_versions(
+        &self,
+        name: &str,
+        version: &str,
+        registry: &LibraryRegistry,
+    ) -> Result<Vec<ResolvedDependency>, AppError> {
+        info!("Resolving dependency versions for {} v{}", name, version);
+
+        let Some(deps) = self.dependency_graph.get(name) else {
+            return Ok(Vec::new());
+        };
+
+        let mut resolved = Vec::new();
+        for dep_spec in deps {
+            let versions = registry
+                .get_versions(&dep_spec.name)
+                .ok_or_else(|| AppError::ConfigError(format!("No versions available for dependency {}", dep_spec.name)))?;
+
+            // choose latest version that satisfies constraints (versions are sorted in registry)
+            let mut chosen: Option<String> = None;
+            for v in versions.iter().rev() {
+                let ok = satisfies_all(v, &dep_spec.constraints)?;
+                if ok {
+                    chosen = Some(v.clone());
+                    break;
+                }
+            }
+
+            let version = chosen.ok_or_else(|| {
+                AppError::ConfigError(format!(
+                    "No compatible version for dependency {} (constraints: {})",
+                    dep_spec.name,
+                    constraints_to_string(&dep_spec.constraints)
+                ))
+            })?;
+
+            resolved.push(ResolvedDependency {
+                name: dep_spec.name.clone(),
+                version,
+            });
+        }
+
+        Ok(resolved)
     }
     
     /// Add dependency with version constraints
@@ -170,6 +224,17 @@ impl DependencyResolver {
         result.push(node.to_string());
         Ok(())
     }
+}
+
+fn constraints_to_string(constraints: &[VersionConstraint]) -> String {
+    if constraints.is_empty() {
+        return "(none)".to_string();
+    }
+    constraints
+        .iter()
+        .map(|c| format!("{:?}{}", c.operator, c.version))
+        .collect::<Vec<_>>()
+        .join(",")
 }
 
 impl Default for DependencyResolver {
