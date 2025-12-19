@@ -477,15 +477,19 @@ poolAI/
 - 🔄 SmallWorld distributed system (planned, отдельная фаза)
 - 🔄 Administrative control plane (planned)
 
-**Виртуальные машины (vm/)** - ✅ ~60% ЗАВЕРШЕНО (process runner ready)
+**Виртуальные машины (vm/)** - ✅ ~70% ЗАВЕРШЕНО (process runner + health checks ready)
 - ✅ `vm/mod.rs` - VmManager + in-memory instance lifecycle
 - ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
 - ✅ **Process Runner Integration** — интеграция с runtime/process.rs — ЗАВЕРШЕНО
 - ✅ **Process Lifecycle** — spawn, stop, logs, timeouts — ЗАВЕРШЕНО
 - ✅ **API Endpoints** — GET /api/v1/vm/instances/:id/logs, GET /api/v1/vm/instances/:id/process-status — ЗАВЕРШЕНО
+- ✅ **Health Checks Integration** — интеграция с HealthMonitor — ЗАВЕРШЕНО
+- ✅ **Periodic Health Checks** — автоматические проверки каждые 30 секунд — ЗАВЕРШЕНО
+- ✅ **Auto-restart on Failure** — автоматический перезапуск после max_failures — ЗАВЕРШЕНО
+- ✅ **API Endpoint** — GET /api/v1/vm/instances/:id/health — ЗАВЕРШЕНО
 - ✅ Integration tests (5 tests для process runner)
+- 🔄 Integration tests для health checks — planned
 - 🔄 Resource limits enforcement (CPU/memory/GPU) — planned
-- 🔄 Health checks integration — planned
 - 🔄 Isolation/security enforcement (planned)
 - 🔄 Resource optimization and scheduling integration (planned)
 

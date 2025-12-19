@@ -10,7 +10,7 @@
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок  
 **Статус тестів**: ✅ 24 tests passing (6 unit + 18 integration)  
-**Поточний branch**: `stage3/raid-libs-integration` ✅
+**Поточний branch**: `stage3/vm-health-checks` ✅
 
 ---
 
@@ -27,11 +27,12 @@
   - `stage3/raid-gc-quota` ✅
   - `stage3/ui-readonly-runtime-hardening` ✅
   - `stage3/vm-process-runner` ✅
-  - `stage3/raid-libs-integration` ✅ (поточна)
+  - `stage3/raid-libs-integration` ✅
+  - `stage3/vm-health-checks` ✅ (поточна)
 
 ### Codebase Statistics
 - **Модулів реалізовано**: 12 основних модулів
-- **API endpoints**: 27+ REST endpoints + WebSocket
+- **API endpoints**: 28+ REST endpoints + WebSocket
 - **Unit tests**: 6 passing (libs constraints/versioning)
 - **Integration tests**: 18 passing
   - 4 libs (manifest persistence)
@@ -102,7 +103,7 @@
 
 ---
 
-### 11. VM Module (`src/vm/`) — ✅ ~60% COMPLETED
+### 11. VM Module (`src/vm/`) — ✅ ~70% COMPLETED
 **Файли**: 1 (mod.rs)
 
 **Функціональність**:
@@ -111,12 +112,16 @@
 - ✅ **Process Runner Integration** — інтеграція з runtime/process.rs
 - ✅ **Process Lifecycle** — spawn, stop, logs, timeouts
 - ✅ **API Endpoints** — GET /api/v1/vm/instances/:id/logs, GET /api/v1/vm/instances/:id/process-status
+- ✅ **Health Checks Integration** — інтеграція з HealthMonitor
+- ✅ **Periodic Health Checks** — автоматичні перевірки кожні 30 секунд
+- ✅ **Auto-restart on Failure** — автоматичний перезапуск після max_failures
+- ✅ **API Endpoint** — GET /api/v1/vm/instances/:id/health
 - ✅ Integration tests (5 tests passing)
+- 🔄 Integration tests для health checks
 - 🔄 Resource limits enforcement (CPU/memory/GPU)
-- 🔄 Health checks integration
 - 🔄 Isolation (sandbox/containers/real VM) — окрема підфаза
 
-**Статус**: ✅ **~60% COMPLETED** (process runner готовий)
+**Статус**: ✅ **~70% COMPLETED** (process runner + health checks готові)
 
 ---
 
@@ -161,6 +166,12 @@
 - ✅ Logs/timeouts management
 - ✅ Integration tests (5 tests passing)
 
+### VM Health Checks (2025-12-19)
+- ✅ Інтеграція з HealthMonitor
+- ✅ Periodic health checks (30s interval)
+- ✅ Auto-restart on failure
+- ✅ Health status API endpoint
+
 ---
 
 ## 🔄 Поточні гілки та статус
@@ -175,21 +186,21 @@
 7. ✅ `stage3/raid-libs-integration` — **поточна, завершено**
 
 ### Останні коміти:
+- `c89733d` - fix(vm): remove unused variable hm in should_restart block
+- `6f71130` - fix(vm): remove last compiler warning (unused variable hm)
+- `cc267d0` - fix(vm): remove compiler warnings
+- `6d0d564` - feat(vm): health checks integration with HealthMonitor
 - `94272fa` - feat(raid-libs): runtime integration + integration tests
-- `5a7b294` - feat(raid-libs): integrate Libs with RAID for artifact storage
-- `36906df` - docs: dependency analysis + reorder plan
-- `8c6f6f2` - fix(vm): compiler warnings + add VM integration tests
-- `6588b63` - feat(vm): process runner integration with runtime/process
 
 ---
 
 ## 🎯 Наступні кроки (від простого до складного)
 
 ### Phase 1: Завершення базових інтеграцій
-1. **Health Checks Integration (VM)** — 1 тиждень
-   - Інтеграція VM instances з HealthMonitor
-   - Periodic health checks
-   - Auto-restart on failure
+1. ✅ **Health Checks Integration (VM)** — ЗАВЕРШЕНО
+   - ✅ Інтеграція VM instances з HealthMonitor
+   - ✅ Periodic health checks
+   - ✅ Auto-restart on failure
 
 2. **Resource Limits Enforcement (VM)** — 2-3 тижні
    - CPU limits (cgroups/Job Objects)
