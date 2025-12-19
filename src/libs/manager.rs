@@ -526,6 +526,91 @@ impl LibraryManager {
     pub async fn get_library_path(&self, name: &str) -> Option<PathBuf> {
         self.get_library(name).await.map(|lib| lib.path)
     }
+
+    /// Get library path, loading from RAID if needed
+    /// This is the runtime integration point - if library is stored as artifact in RAID
+    /// and local path doesn't exist, it will be extracted from RAID
+    pub async fn get_library_path_or_load_from_raid(&self, name: &str) -> Result<Option<PathBuf>, AppError> {
+        let lib_info = self.get_library(name).await;
+        
+        match lib_info {
+            Some(lib) => {
+                // Check if local path exists
+                if lib.path.exists() {
+                    return Ok(Some(lib.path));
+                }
+                
+                // If path doesn't exist but we have artifact_ref, load from RAID
+                if let Some(ref artifact_ref) = lib.artifact_ref {
+                    info!("Library {} not found at local path, loading from RAID artifact {}", name, artifact_ref.id);
+                    return self.load_library_from_raid(&lib, artifact_ref).await;
+                }
+                
+                // No artifact_ref, return None
+                warn!("Library {} path doesn't exist and no artifact_ref available", name);
+                Ok(None)
+            }
+            None => Ok(None)
+        }
+    }
+
+    /// Load library from RAID artifact
+    async fn load_library_from_raid(
+        &self,
+        lib_info: &LibraryInfo,
+        artifact_ref: &crate::raid::ArtifactRef,
+    ) -> Result<Option<PathBuf>, AppError> {
+        use crate::libs::download::extract_archive;
+        
+        // Get artifact from RAID using artifact_ref.path
+        let raid_manager = crate::raid::get_global_manager();
+        let artifact_bytes = raid_manager.get_artifact(&artifact_ref.path).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to get artifact from RAID: {}", e)))?;
+        
+        // Create temp directory for extraction
+        let tmp_root = self.base_path.join(".tmp");
+        tokio::fs::create_dir_all(&tmp_root).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to create temp directory: {}", e)))?;
+
+        let session_dir = tmp_root.join(format!("{}-{}-{}", lib_info.name, lib_info.version, Uuid::new_v4()));
+        tokio::fs::create_dir_all(&session_dir).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to create temp session directory: {}", e)))?;
+
+        // Write artifact bytes to temp file
+        let artifact_archive = session_dir.join("artifact.tar.gz");
+        tokio::fs::write(&artifact_archive, &artifact_bytes).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to write artifact archive: {}", e)))?;
+
+        // Extract archive
+        let extract_dir = session_dir.join("extract");
+        extract_archive(&artifact_archive, &extract_dir).await?;
+
+        // Verify extraction
+        self.verify_installation(&extract_dir, &lib_info.name).await?;
+
+        // Move extracted library to final location (atomic)
+        if lib_info.path.exists() {
+            tokio::fs::remove_dir_all(&lib_info.path).await
+                .map_err(|e| AppError::ConfigError(format!("Failed to remove existing library dir: {}", e)))?;
+        }
+
+        // Create parent directory if needed
+        if let Some(parent) = lib_info.path.parent() {
+            tokio::fs::create_dir_all(parent).await
+                .map_err(|e| AppError::ConfigError(format!("Failed to create library parent directory: {}", e)))?;
+        }
+
+        tokio::fs::rename(&extract_dir, &lib_info.path).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to finalize library load from RAID: {}", e)))?;
+
+        // Cleanup temp session
+        if let Err(e) = tokio::fs::remove_dir_all(&session_dir).await {
+            warn!("Failed to remove temp session dir: {}", e);
+        }
+
+        info!("Library {} v{} loaded from RAID artifact successfully", lib_info.name, lib_info.version);
+        Ok(Some(lib_info.path.clone()))
+    }
 }
 
 impl Default for LibraryManager {
