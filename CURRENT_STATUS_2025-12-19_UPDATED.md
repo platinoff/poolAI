@@ -9,7 +9,7 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок  
-**Статус тестів**: ✅ 24 tests passing (6 unit + 18 integration)  
+**Статус тестів**: ✅ 30 tests passing (6 unit + 24 integration)  
 **Поточний branch**: `stage3/vm-health-checks` ✅
 
 ---
@@ -34,11 +34,12 @@
 - **Модулів реалізовано**: 12 основних модулів
 - **API endpoints**: 28+ REST endpoints + WebSocket
 - **Unit tests**: 6 passing (libs constraints/versioning)
-- **Integration tests**: 18 passing
+- **Integration tests**: 24 passing
   - 4 libs (manifest persistence)
   - 4 raid (GC/quota)
   - 5 vm (process runner)
   - 5 raid-libs (integration)
+  - 6 vm-health (health checks)
 - **Бінарних цілей**: 2 (poolai, poolai-worker)
 
 ---
@@ -171,6 +172,7 @@
 - ✅ Periodic health checks (30s interval)
 - ✅ Auto-restart on failure
 - ✅ Health status API endpoint
+- ✅ Integration tests (6 tests passing)
 
 ---
 

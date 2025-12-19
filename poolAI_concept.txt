@@ -488,7 +488,7 @@ poolAI/
 - ✅ **Auto-restart on Failure** — автоматический перезапуск после max_failures — ЗАВЕРШЕНО
 - ✅ **API Endpoint** — GET /api/v1/vm/instances/:id/health — ЗАВЕРШЕНО
 - ✅ Integration tests (5 tests для process runner)
-- 🔄 Integration tests для health checks — planned
+- ✅ Integration tests для health checks (6 tests) — ЗАВЕРШЕНО
 - 🔄 Resource limits enforcement (CPU/memory/GPU) — planned
 - 🔄 Isolation/security enforcement (planned)
 - 🔄 Resource optimization and scheduling integration (planned)
