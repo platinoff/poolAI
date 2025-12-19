@@ -92,7 +92,6 @@ pub fn create_api_routes() -> Router {
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
         .route("/raid/gc", post(raid_gc_handler))
-        .route("/raid/artifacts", get(raid_artifacts_handler))
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {
