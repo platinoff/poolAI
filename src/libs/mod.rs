@@ -38,6 +38,8 @@ pub struct LibraryInfo {
     pub path: PathBuf,
     pub dependencies: Vec<String>,
     pub metadata: LibraryMetadata,
+    /// Artifact reference in RAID (if stored as artifact)
+    pub artifact_ref: Option<crate::raid::ArtifactRef>,
 }
 
 /// Library metadata
