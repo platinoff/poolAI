@@ -6,12 +6,14 @@
 //! - Resource optimization primitives (basic)
 
 use crate::core::error::AppError;
+use crate::runtime::ProcessManager;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
 use uuid::Uuid;
 
 /// VM lifecycle status.
@@ -59,17 +61,27 @@ pub struct VmInstance {
     pub status: VmStatus,
     pub resources: VmResources,
     pub isolation: VmIsolation,
+    /// Process ID from ProcessManager (if running)
+    pub process_id: Option<Uuid>,
+    /// Command to execute when starting
+    pub command: Option<String>,
+    /// Command arguments
+    pub args: Vec<String>,
+    /// Working directory
+    pub working_dir: Option<PathBuf>,
 }
 
 /// VM Manager - central orchestrator for VM instances.
 pub struct VmManager {
     instances: Arc<RwLock<HashMap<Uuid, VmInstance>>>,
+    process_manager: Arc<RwLock<ProcessManager>>,
 }
 
 impl VmManager {
     pub fn new() -> Self {
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
+            process_manager: Arc::new(RwLock::new(ProcessManager::new())),
         }
     }
 
@@ -88,18 +100,26 @@ impl VmManager {
         name: String,
         resources: VmResources,
         isolation: VmIsolation,
+        command: Option<String>,
+        args: Vec<String>,
+        working_dir: Option<PathBuf>,
     ) -> Result<VmInstance, AppError> {
         let id = Uuid::new_v4();
         let instance = VmInstance {
             id,
-            name,
+            name: name.clone(),
             created_at: Utc::now(),
             status: VmStatus::Creating,
             resources,
             isolation,
+            process_id: None,
+            command,
+            args,
+            working_dir,
         };
 
         self.instances.write().await.insert(id, instance.clone());
+        info!("Created VM instance {}: {}", id, name);
         Ok(instance)
     }
 
@@ -117,23 +137,108 @@ impl VmManager {
     }
 
     pub async fn start_instance(&self, id: Uuid) -> Result<(), AppError> {
-        let mut instances = self.instances.write().await;
-        let inst = instances
-            .get_mut(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+        // Get command and args before spawning process
+        let (command, args, working_dir, memory_mb) = {
+            let instances = self.instances.read().await;
+            let inst = instances
+                .get(&id)
+                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            
+            (inst.command.clone(), inst.args.clone(), inst.working_dir.clone(), inst.resources.memory_mb)
+        };
 
-        inst.status = VmStatus::Running;
+        // If instance has a command, spawn it via ProcessManager
+        if let Some(cmd) = command {
+            let config = crate::runtime::ProcessConfig {
+                command: cmd,
+                args,
+                working_dir,
+                env: HashMap::new(), // TODO: Add environment variables support
+                timeout_seconds: Some(3600), // 1 hour default timeout
+                cpu_limit_percent: None, // TODO: Map from resources.cpu_cores
+                memory_limit_mb: Some(memory_mb),
+                capture_logs: true,
+            };
+
+            let process_id = {
+                let mut pm = self.process_manager.write().await;
+                pm.spawn_process(config).await?
+            };
+
+            // Update instance with process_id
+            let mut instances = self.instances.write().await;
+            let inst = instances.get_mut(&id).unwrap();
+            inst.process_id = Some(process_id);
+            inst.status = VmStatus::Running;
+            info!("Started VM instance {} with process {}", id, process_id);
+        } else {
+            // No command specified, just mark as running
+            let mut instances = self.instances.write().await;
+            let inst = instances.get_mut(&id).unwrap();
+            inst.status = VmStatus::Running;
+            info!("Started VM instance {} (no command)", id);
+        }
+
         Ok(())
     }
 
     pub async fn stop_instance(&self, id: Uuid) -> Result<(), AppError> {
+        // Get process_id before stopping
+        let process_id = {
+            let instances = self.instances.read().await;
+            let inst = instances
+                .get(&id)
+                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            inst.process_id
+        };
+
+        // Stop process if running
+        if let Some(pid) = process_id {
+            let mut pm = self.process_manager.write().await;
+            if let Err(e) = pm.stop_process(pid).await {
+                warn!("Failed to stop process {} for VM {}: {}", pid, id, e);
+            }
+        }
+
+        // Update instance status
         let mut instances = self.instances.write().await;
+        let inst = instances.get_mut(&id).unwrap();
+        inst.process_id = None;
+        inst.status = VmStatus::Stopped;
+        info!("Stopped VM instance {}", id);
+        Ok(())
+    }
+
+    /// Get process logs for a VM instance
+    pub async fn get_instance_logs(&self, id: Uuid) -> Result<crate::runtime::ProcessLogs, AppError> {
+        let instances = self.instances.read().await;
         let inst = instances
-            .get_mut(&id)
+            .get(&id)
             .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
 
-        inst.status = VmStatus::Stopped;
-        Ok(())
+        let process_id = inst.process_id
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
+
+        drop(instances); // Release lock before async call
+
+        let pm = self.process_manager.read().await;
+        pm.get_process_logs(process_id).await
+    }
+
+    /// Get process status for a VM instance
+    pub async fn get_instance_process_status(&self, id: Uuid) -> Result<crate::runtime::ProcessStatus, AppError> {
+        let instances = self.instances.read().await;
+        let inst = instances
+            .get(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+
+        let process_id = inst.process_id
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
+
+        drop(instances); // Release lock before async call
+
+        let pm = self.process_manager.read().await;
+        pm.get_process_status(process_id).await
     }
 }
 

@@ -88,6 +88,8 @@ pub fn create_api_routes() -> Router {
         .route("/libraries/:name/uninstall", post(library_uninstall_handler))
         .route("/libraries/:name/update", post(library_update_handler))
         .route("/vm/instances", get(vm_instances_handler))
+        .route("/vm/instances/:id/logs", get(vm_instance_logs_handler))
+        .route("/vm/instances/:id/process-status", get(vm_instance_process_status_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
@@ -98,6 +100,52 @@ async fn vm_instances_handler() -> impl IntoResponse {
     let manager = vm::get_global_manager();
     let instances = manager.list_instances().await;
     Json(instances)
+}
+
+async fn vm_instance_logs_handler(
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.get_instance_logs(uuid).await {
+        Ok(logs) => Json(logs).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
+                "error": format!("{}", e)
+            }))).into_response()
+        }
+    }
+}
+
+async fn vm_instance_process_status_handler(
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.get_instance_process_status(uuid).await {
+        Ok(status) => Json(status).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
+                "error": format!("{}", e)
+            }))).into_response()
+        }
+    }
 }
 
 async fn raid_nodes_handler() -> impl IntoResponse {

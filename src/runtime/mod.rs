@@ -22,7 +22,7 @@ pub use scheduler::TaskScheduler;
 pub use queue::TaskQueue;
 pub use cache::CacheManager;
 pub use storage::StorageManager;
-pub use process::ProcessManager;
+pub use process::{ProcessManager, ProcessConfig, ProcessStatus, ProcessLogs};
 pub use orchestrator::ResourceOrchestrator;
 pub use health::HealthMonitor;
 
