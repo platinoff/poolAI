@@ -443,7 +443,7 @@ poolAI/
 
 ### 10.10 Модули в разработке и планируемые
 
-**Управление библиотеками (libs/)** - ✅ ~95% ЗАВЕРШЕНО
+**Управление библиотеками (libs/)** - ✅ 100% ЗАВЕРШЕНО
 - ✅ Базовая структура модуля реализована
 - ✅ LibraryManager для управления жизненным циклом
 - ✅ LibraryRegistry для реестра библиотек
@@ -456,9 +456,12 @@ poolAI/
 - ✅ Integration tests (4 теста для manifest persistence)
 - ✅ Compat checks с model_interface (libtorch version matching)
 - ✅ Auto-update policy (Never/OnStartup/OnMismatch/OnStartupAndMismatch)
+- ✅ **RAID-Libs Integration** — сохранение artifacts в RAID — ЗАВЕРШЕНО
+- ✅ **Runtime Integration** — автоматическая загрузка из RAID — ЗАВЕРШЕНО
+- ✅ Integration tests (10 tests: 6 unit + 4 integration)
 - 🔄 SAT solver для сложных dependency conflicts (опционально, будущее)
 
-**RAID система (raid/)** - ✅ ~70% ЗАВЕРШЕНО (local reliable store)
+**RAID система (raid/)** - ✅ ~85% ЗАВЕРШЕНО (local reliable store)
 - ✅ `raid/mod.rs` - RaidManager + local artifact storage (`/raid/artifacts`)
 - ✅ Node registry primitives (register/list)
 - ✅ Artifact manifest persistence (atomic write) + list/delete APIs
@@ -467,14 +470,22 @@ poolAI/
 - ✅ Retention policies (quota_bytes, retention_days, gc_on_startup)
 - ✅ API endpoints: GET /api/v1/raid/quota, POST /api/v1/raid/gc
 - ✅ Integration tests (4 теста для GC/quota)
-- 🔄 Интеграция libs → raid artifacts (libs сохраняет загруженное как artifact)
+- ✅ **RAID-Libs Integration** — libs сохраняет загруженное как artifact — ЗАВЕРШЕНО
+- ✅ **Runtime Integration** — автоматическая загрузка из RAID — ЗАВЕРШЕНО
+- ✅ Integration tests (9 tests: 4 raid + 5 raid-libs)
 - 🔄 BurstRAID logic (planned, отдельная фаза)
 - 🔄 SmallWorld distributed system (planned, отдельная фаза)
 - 🔄 Administrative control plane (planned)
 
-**Виртуальные машины (vm/)** - 🚧 IN PROGRESS (basic scaffold)
+**Виртуальные машины (vm/)** - ✅ ~60% ЗАВЕРШЕНО (process runner ready)
 - ✅ `vm/mod.rs` - VmManager + in-memory instance lifecycle
 - ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
+- ✅ **Process Runner Integration** — интеграция с runtime/process.rs — ЗАВЕРШЕНО
+- ✅ **Process Lifecycle** — spawn, stop, logs, timeouts — ЗАВЕРШЕНО
+- ✅ **API Endpoints** — GET /api/v1/vm/instances/:id/logs, GET /api/v1/vm/instances/:id/process-status — ЗАВЕРШЕНО
+- ✅ Integration tests (5 tests для process runner)
+- 🔄 Resource limits enforcement (CPU/memory/GPU) — planned
+- 🔄 Health checks integration — planned
 - 🔄 Isolation/security enforcement (planned)
 - 🔄 Resource optimization and scheduling integration (planned)
 

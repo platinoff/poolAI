@@ -1,8 +1,8 @@
 # 🏗️ Оновлений план розробки - Rust Architect Perspective
 
-**Дата**: 2025-12-19  
+**Дата**: 2025-12-19 (Updated)  
 **Статус**: 🚧 **АКТИВНА РОЗРОБКА**  
-**Поточний етап**: Stage 3 - Completion & Stabilization (Libs ~95%, RAID ~70%, VM scaffold)
+**Поточний етап**: Stage 3 - Completion & Stabilization (Libs 100%, RAID ~85%, VM ~60%, UI ~80%)
 
 ---
 
@@ -21,7 +21,7 @@
 
 ### 🚧 В розробці
 
-- ✅ **Libs Module** (~95% готово) - **MAJOR PROGRESS**
+- ✅ **Libs Module** (100% готово) - **COMPLETED**
   - ✅ Базова структура (mod.rs, manager.rs, registry.rs, versioning.rs, dependencies.rs, constraints.rs, download.rs, manifest.rs, integration.rs)
   - ✅ API endpoints інтегровані (5 endpoints)
   - ✅ Semantic versioning
@@ -30,9 +30,11 @@
   - ✅ Atomic install + manifest persistence (production-min) — **ЗАВЕРШЕНО**
   - ✅ Повна інтеграція з model_interface (compat checks, auto-update policy) — **ЗАВЕРШЕНО**
   - ✅ Тестування (6 unit + 4 integration = 10 tests passing)
+  - ✅ **RAID-Libs Integration** — збереження artifacts в RAID — **ЗАВЕРШЕНО**
+  - ✅ **Runtime Integration** — автоматичне завантаження з RAID — **ЗАВЕРШЕНО**
   - 🔄 SAT solver для складних dependency conflicts (опціонально)
 
-- ✅ **RAID Module** (~70% готово) - **MAJOR PROGRESS**
+- ✅ **RAID Module** (~85% готово) - **MAJOR PROGRESS**
   - ✅ Local artifact storage (`/raid/artifacts`)
   - ✅ Node registry primitives (register/list)
   - ✅ Artifact manifest persistence (atomic write) + list/delete APIs
@@ -41,17 +43,22 @@
   - ✅ Retention policies (quota_bytes, retention_days, gc_on_startup) — **ЗАВЕРШЕНО**
   - ✅ API endpoints: GET /api/v1/raid/quota, POST /api/v1/raid/gc — **ЗАВЕРШЕНО**
   - ✅ Integration tests (4 tests passing)
-  - 🔄 Інтеграція libs → raid artifacts (libs зберігає завантажене як artifact)
+  - ✅ **RAID-Libs Integration** — libs зберігає завантажене як artifact — **ЗАВЕРШЕНО**
+  - ✅ **Runtime Integration** — автоматичне завантаження з RAID — **ЗАВЕРШЕНО**
+  - ✅ Integration tests (9 tests: 4 raid + 5 raid-libs)
   - 🔄 BurstRAID/SmallWorld distributed (окрема фаза)
 
 ### 🚧 Модулі Stage 3 (базові скелети реалізовано)
 
-- 🚧 **VM Module** - Instance lifecycle scaffold (in-memory) + API (read-only)
+- ✅ **VM Module** (~60% готово) - **MAJOR PROGRESS**
   - ✅ Basic instance management (create, start, stop, delete)
   - ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
-  - 🔄 Process runner інтеграція з `runtime/process.rs`
-  - 🔄 Resource limits enforcement
-  - 🔄 Logs/timeouts management
+  - ✅ **Process Runner Integration** — інтеграція з runtime/process.rs — **ЗАВЕРШЕНО**
+  - ✅ **Process Lifecycle** — spawn, stop, logs, timeouts — **ЗАВЕРШЕНО**
+  - ✅ **API Endpoints** — GET /api/v1/vm/instances/:id/logs, GET /api/v1/vm/instances/:id/process-status — **ЗАВЕРШЕНО**
+  - ✅ Integration tests (5 tests passing)
+  - 🔄 Resource limits enforcement (CPU/memory/GPU)
+  - 🔄 Health checks integration
 
 - ✅ **UI Module** - Read-only dashboard (mounted at `/ui`)
   - ✅ 8 pages з auto-refresh (status, health, metrics, workers, libs, vm, raid)
