@@ -15,12 +15,13 @@ use crate::libs::{
     manifest::InstalledLibrariesManifest,
 };
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
-use chrono::Utc;
 use uuid::Uuid;
+use flate2::Compression;
+use flate2::write::GzEncoder;
 
 /// Library Manager - Main interface for managing libraries
 pub struct LibraryManager {
@@ -136,20 +137,10 @@ impl LibraryManager {
                                     path: version_path.clone(),
                                     dependencies: Vec::new(),
                                     metadata: LibraryMetadata {
-                                        installed_at: version_entry.metadata().await
-                                            .ok()
-                                            .and_then(|m| m.modified().ok())
-                                            .map(|t| {
-                                                // Convert SystemTime to chrono::DateTime using chrono 0.4 API
-                                                let duration = t.duration_since(std::time::UNIX_EPOCH)
-                                                    .unwrap_or_default();
-                                                let secs = duration.as_secs() as i64;
-                                                let nsecs = duration.subsec_nanos();
-                                                chrono::DateTime::<Utc>::from_timestamp(secs, nsecs)
-                                                    .unwrap_or_else(|| Utc::now())
-                                            }),
+                                        installed_at: Some(chrono::Utc::now()),
                                         ..Default::default()
                                     },
+                                    artifact_ref: None, // Not stored in RAID for loaded libraries
                                 };
                                 
                                 libraries.insert(name.to_string(), library_info);
@@ -215,10 +206,10 @@ impl LibraryManager {
         }
         
         // Download and install library
-        let library_path = self
+        let (library_path, artifact_ref) = self
             .download_and_install(name, &resolved_version, library_type)
             .await?;
-        
+
         // Create library info
         let dependencies = dep_plan.iter().map(|d| d.name.clone()).collect();
         let library_info = LibraryInfo {
@@ -230,6 +221,7 @@ impl LibraryManager {
                 installed_at: Some(chrono::Utc::now()),
                 ..Default::default()
             },
+            artifact_ref,
         };
         
         // Register library
@@ -250,12 +242,13 @@ impl LibraryManager {
     }
 
     /// Download and install library
+    /// Returns (library_path, artifact_ref)
     async fn download_and_install(
         &self,
         name: &str,
         version: &str,
         _library_type: LibraryType,
-    ) -> Result<PathBuf, AppError> {
+    ) -> Result<(PathBuf, Option<crate::raid::ArtifactRef>), AppError> {
         info!("Downloading and installing library: {} v{}", name, version);
         
         let library_dir = self.base_path.join(name).join(version);
@@ -297,6 +290,23 @@ impl LibraryManager {
 
             self.verify_installation(&extract_dir, name).await?;
 
+            // Store extracted library as artifact in RAID before finalizing install
+            let artifact_ref = {
+                // Create a tar.gz archive of the extracted library for storage
+                let artifact_archive = session_dir.join("artifact.tar.gz");
+                self.create_artifact_archive(&extract_dir, &artifact_archive).await?;
+                
+                // Read archive bytes
+                let artifact_bytes = tokio::fs::read(&artifact_archive).await
+                    .map_err(|e| AppError::ConfigError(format!("Failed to read artifact archive: {}", e)))?;
+                
+                // Store in RAID
+                let raid_manager = crate::raid::get_global_manager();
+                let artifact_name = format!("{}-{}.tar.gz", name, version);
+                raid_manager.put_artifact(&artifact_name, &artifact_bytes).await
+                    .map_err(|e| AppError::ConfigError(format!("Failed to store artifact in RAID: {}", e)))?
+            };
+
             // Replace existing target if present (update/reinstall)
             if library_dir.exists() {
                 tokio::fs::remove_dir_all(&library_dir).await
@@ -311,7 +321,8 @@ impl LibraryManager {
                 warn!("Failed to remove temp session dir: {}", e);
             }
 
-            info!("Library {} v{} installed successfully (atomic)", name, version);
+            info!("Library {} v{} installed successfully (atomic) and stored as artifact in RAID", name, version);
+            Ok((library_dir, Some(artifact_ref)))
         } else {
             // No download URL, create placeholder structure
             info!("No download URL found, creating placeholder structure");
@@ -322,9 +333,63 @@ impl LibraryManager {
                 tokio::fs::create_dir_all(parent).await
                     .map_err(|e| AppError::ConfigError(format!("Failed to create lib directory: {}", e)))?;
             }
+            Ok((library_dir, None))
         }
-        
-        Ok(library_dir)
+    }
+
+    /// Create artifact archive (tar.gz) from extracted library directory
+    /// Uses spawn_blocking for CPU-intensive tar creation
+    async fn create_artifact_archive(
+        &self,
+        source_dir: &Path,
+        output_path: &Path,
+    ) -> Result<(), AppError> {
+        use std::fs::File;
+        use std::io::BufWriter;
+
+        let source_dir = source_dir.to_path_buf();
+        let output_path = output_path.to_path_buf();
+
+        // Use spawn_blocking for CPU-intensive tar creation
+        tokio::task::spawn_blocking(move || -> Result<(), AppError> {
+            let file = File::create(&output_path)
+                .map_err(|e| AppError::ConfigError(format!("Failed to create artifact archive: {}", e)))?;
+            let gz = GzEncoder::new(BufWriter::new(file), Compression::default());
+            let mut tar = tar::Builder::new(gz);
+
+            // Recursively add all files from source_dir to tar archive
+            fn add_dir_to_tar(tar: &mut tar::Builder<GzEncoder<BufWriter<File>>>, dir: &Path, base: &Path) -> Result<(), AppError> {
+                let entries = std::fs::read_dir(dir)
+                    .map_err(|e| AppError::ConfigError(format!("Failed to read directory {:?}: {}", dir, e)))?;
+
+                for entry in entries {
+                    let entry = entry.map_err(|e| AppError::ConfigError(format!("Failed to read directory entry: {}", e)))?;
+                    let path = entry.path();
+                    let relative_path = path.strip_prefix(base)
+                        .map_err(|e| AppError::ConfigError(format!("Failed to get relative path: {}", e)))?;
+
+                    if path.is_file() {
+                        let mut file = File::open(&path)
+                            .map_err(|e| AppError::ConfigError(format!("Failed to open file {:?}: {}", path, e)))?;
+                        tar.append_file(relative_path, &mut file)
+                            .map_err(|e| AppError::ConfigError(format!("Failed to add file to tar: {}", e)))?;
+                    } else if path.is_dir() {
+                        tar.append_dir_all(relative_path, &path)
+                            .map_err(|e| AppError::ConfigError(format!("Failed to add directory to tar: {}", e)))?;
+                        add_dir_to_tar(tar, &path, base)?;
+                    }
+                }
+                Ok(())
+            }
+
+            add_dir_to_tar(&mut tar, &source_dir, &source_dir)?;
+            tar.finish()
+                .map_err(|e| AppError::ConfigError(format!("Failed to finish tar archive: {}", e)))?;
+
+            Ok(())
+        })
+        .await
+        .map_err(|e| AppError::ConfigError(format!("Task join error: {}", e)))?
     }
     
     /// Get download URL for library

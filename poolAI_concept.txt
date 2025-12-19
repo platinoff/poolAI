@@ -443,23 +443,33 @@ poolAI/
 
 ### 10.10 Модули в разработке и планируемые
 
-**Управление библиотеками (libs/)** - 🚧 В РАЗРАБОТКЕ
+**Управление библиотеками (libs/)** - ✅ ~95% ЗАВЕРШЕНО
 - ✅ Базовая структура модуля реализована
 - ✅ LibraryManager для управления жизненным циклом
 - ✅ LibraryRegistry для реестра библиотек
 - ✅ VersionManager для управления версиями
 - ✅ DependencyResolver для разрешения зависимостей
 - ✅ API endpoints интегрированы
-- ✅ Загрузка/распаковка (HTTP stream + tar/zip) реализована
-- 🚧 Atomic install + manifest (production-min) — в работе
-- 🚧 Разрешение зависимостей с constraints + выбор версии — в работе
+- ✅ Загрузка/распаковка (HTTP stream + tar/zip, sha256 checksum) реализована
+- ✅ Atomic install + manifest persistence (production-min) — ЗАВЕРШЕНО
+- ✅ Разрешение зависимостей с constraints + выбор версии — ЗАВЕРШЕНО
+- ✅ Integration tests (4 теста для manifest persistence)
+- ✅ Compat checks с model_interface (libtorch version matching)
+- ✅ Auto-update policy (Never/OnStartup/OnMismatch/OnStartupAndMismatch)
+- 🔄 SAT solver для сложных dependency conflicts (опционально, будущее)
 
-**RAID система (raid/)** - 🚧 IN PROGRESS (basic scaffold)
+**RAID система (raid/)** - ✅ ~70% ЗАВЕРШЕНО (local reliable store)
 - ✅ `raid/mod.rs` - RaidManager + local artifact storage (`/raid/artifacts`)
 - ✅ Node registry primitives (register/list)
 - ✅ Artifact manifest persistence (atomic write) + list/delete APIs
-- 🔄 BurstRAID logic (planned)
-- 🔄 SmallWorld distributed system (planned)
+- ✅ GC (garbage collection) для старых artifacts на основе retention_days
+- ✅ Quota management (size-based limits) с автоматической очисткой
+- ✅ Retention policies (quota_bytes, retention_days, gc_on_startup)
+- ✅ API endpoints: GET /api/v1/raid/quota, POST /api/v1/raid/gc
+- ✅ Integration tests (4 теста для GC/quota)
+- 🔄 Интеграция libs → raid artifacts (libs сохраняет загруженное как artifact)
+- 🔄 BurstRAID logic (planned, отдельная фаза)
+- 🔄 SmallWorld distributed system (planned, отдельная фаза)
 - 🔄 Administrative control plane (planned)
 
 **Виртуальные машины (vm/)** - 🚧 IN PROGRESS (basic scaffold)
