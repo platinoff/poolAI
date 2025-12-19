@@ -15,7 +15,7 @@ use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
 use tokio::sync::RwLock;
-use tokio::time::{timeout, Duration};
+use tokio::time::Duration;
 use tracing::{info, warn, error};
 use uuid::Uuid;
 
@@ -152,7 +152,6 @@ impl ProcessManager {
         if config.capture_logs {
             let logs_stdout = Arc::clone(&logs);
             let logs_stderr = Arc::clone(&logs);
-            let status_clone = Arc::clone(&status);
 
             if let Some(stdout) = child.stdout.take() {
                 let reader = BufReader::new(stdout);

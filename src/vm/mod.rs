@@ -161,7 +161,7 @@ impl VmManager {
             };
 
             let process_id = {
-                let mut pm = self.process_manager.write().await;
+                let pm = self.process_manager.write().await;
                 pm.spawn_process(config).await?
             };
 
@@ -194,7 +194,7 @@ impl VmManager {
 
         // Stop process if running
         if let Some(pid) = process_id {
-            let mut pm = self.process_manager.write().await;
+            let pm = self.process_manager.write().await;
             if let Err(e) = pm.stop_process(pid).await {
                 warn!("Failed to stop process {} for VM {}: {}", pid, id, e);
             }
