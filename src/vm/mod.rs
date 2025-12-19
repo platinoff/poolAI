@@ -262,8 +262,8 @@ impl VmManager {
     
     /// Get health status for a VM instance
     pub async fn get_instance_health(&self, id: Uuid) -> Result<Option<HealthStatus>, AppError> {
-        let hm = self.health_monitor.read().await;
-        Ok(hm.get_health_status(id).await)
+        let health_monitor = self.health_monitor.read().await;
+        Ok(health_monitor.get_health_status(id).await)
     }
     
     /// Perform manual health check for a VM instance
