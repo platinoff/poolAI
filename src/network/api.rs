@@ -90,6 +90,9 @@ pub fn create_api_routes() -> Router {
         .route("/vm/instances", get(vm_instances_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
+        .route("/raid/quota", get(raid_quota_handler))
+        .route("/raid/gc", post(raid_gc_handler))
+        .route("/raid/artifacts", get(raid_artifacts_handler))
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {
@@ -108,6 +111,57 @@ async fn raid_artifacts_handler() -> impl IntoResponse {
     let manager = raid::get_global_manager();
     let artifacts = manager.list_artifacts().await;
     Json(artifacts)
+}
+
+#[derive(serde::Serialize)]
+struct RaidQuotaResponse {
+    total_size_bytes: u64,
+    quota_bytes: Option<u64>,
+    usage_percent: Option<f64>,
+    artifact_count: usize,
+}
+
+async fn raid_quota_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let total_size = manager.get_total_size().await.unwrap_or(0);
+    let artifacts = manager.list_artifacts().await;
+    let artifact_count = artifacts.len();
+
+    // Get quota from config (would need to expose it from RaidManager)
+    let quota_bytes = None; // TODO: expose from config
+
+    let usage_percent = quota_bytes.map(|quota| {
+        if quota > 0 {
+            (total_size as f64 / quota as f64) * 100.0
+        } else {
+            0.0
+        }
+    });
+
+    Json(RaidQuotaResponse {
+        total_size_bytes: total_size,
+        quota_bytes,
+        usage_percent,
+        artifact_count,
+    })
+}
+
+#[derive(serde::Serialize)]
+struct RaidGcResponse {
+    removed_count: usize,
+}
+
+async fn raid_gc_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    match manager.gc_old_artifacts().await {
+        Ok(removed) => Json(RaidGcResponse { removed_count: removed }).into_response(),
+        Err(e) => {
+            let error_response = serde_json::json!({
+                "error": format!("GC failed: {}", e)
+            });
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(error_response)).into_response()
+        }
+    }
 }
 
 async fn status_handler(req: axum::http::Request<axum::body::Body>) -> Response {

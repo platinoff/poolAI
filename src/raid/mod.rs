@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
 use uuid::Uuid;
 
 pub mod manifest;
@@ -33,6 +33,12 @@ pub enum RaidMode {
 pub struct RaidConfig {
     pub mode: RaidMode,
     pub base_path: PathBuf,
+    /// Maximum total size of artifacts in bytes (None = unlimited)
+    pub quota_bytes: Option<u64>,
+    /// Retention policy: artifacts older than this will be eligible for GC
+    pub retention_days: Option<u32>,
+    /// Enable automatic GC on startup
+    pub gc_on_startup: bool,
 }
 
 impl RaidConfig {
@@ -47,6 +53,9 @@ impl RaidConfig {
         Self {
             mode: RaidMode::Local,
             base_path,
+            quota_bytes: Some(10 * 1024 * 1024 * 1024), // 10 GB default
+            retention_days: Some(30), // 30 days default
+            gc_on_startup: true,
         }
     }
 }
@@ -95,6 +104,18 @@ impl RaidManager {
             *self.artifacts.write().await = m;
             self.persist_manifest().await?;
         }
+
+        // Run GC on startup if enabled
+        if cfg.gc_on_startup {
+            info!("Running GC on startup");
+            self.gc_old_artifacts().await?;
+        }
+
+        // Enforce quota if configured
+        if cfg.quota_bytes.is_some() {
+            self.enforce_quota().await?;
+        }
+
         Ok(())
     }
 
@@ -199,6 +220,129 @@ impl RaidManager {
         }
         self.persist_manifest().await?;
         Ok(())
+    }
+
+    /// Garbage collection: remove old artifacts based on retention policy
+    pub async fn gc_old_artifacts(&self) -> Result<usize, AppError> {
+        let cfg = self.config.read().await;
+        let retention_days = match cfg.retention_days {
+            Some(days) => days,
+            None => {
+                info!("GC skipped: no retention policy configured");
+                return Ok(0);
+            }
+        };
+
+        let cutoff = Utc::now() - chrono::Duration::days(retention_days as i64);
+        let mut removed = 0;
+
+        let artifacts_to_remove: Vec<Uuid> = {
+            let artifacts = self.artifacts.read().await;
+            artifacts
+                .artifacts
+                .values()
+                .filter(|a| a.stored_at < cutoff)
+                .map(|a| a.id)
+                .collect()
+        };
+
+        for id in artifacts_to_remove {
+            if let Err(e) = self.delete_artifact(id).await {
+                warn!("Failed to delete artifact {} during GC: {}", id, e);
+            } else {
+                removed += 1;
+            }
+        }
+
+        if removed > 0 {
+            info!("GC removed {} old artifacts (retention: {} days)", removed, retention_days);
+        }
+        Ok(removed)
+    }
+
+    /// Enforce quota: remove oldest artifacts if quota is exceeded
+    pub async fn enforce_quota(&self) -> Result<usize, AppError> {
+        let quota_bytes = {
+            let cfg = self.config.read().await;
+            match cfg.quota_bytes {
+                Some(quota) => quota,
+                None => {
+                    info!("Quota enforcement skipped: no quota configured");
+                    return Ok(0);
+                }
+            }
+        };
+
+        let total_size = self.get_total_size().await?;
+        if total_size <= quota_bytes {
+            info!("Quota OK: {} / {} bytes", total_size, quota_bytes);
+            return Ok(0);
+        }
+
+        let excess = total_size - quota_bytes;
+        info!("Quota exceeded: {} / {} bytes (excess: {} bytes)", total_size, quota_bytes, excess);
+
+        // Sort artifacts by age (oldest first) and remove until quota is met
+        let mut artifacts_by_age: Vec<(Uuid, DateTime<Utc>, u64)> = {
+            let artifacts = self.artifacts.read().await;
+            artifacts
+                .artifacts
+                .values()
+                .filter_map(|a| {
+                    if a.path.exists() {
+                        if let Ok(metadata) = std::fs::metadata(&a.path) {
+                            Some((a.id, a.stored_at, metadata.len()))
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        };
+
+        artifacts_by_age.sort_by_key(|(_, stored_at, _)| *stored_at);
+
+        let mut removed = 0;
+        let mut freed_bytes = 0u64;
+
+        for (id, _, size) in artifacts_by_age {
+            if freed_bytes >= excess {
+                break;
+            }
+
+            if let Err(e) = self.delete_artifact(id).await {
+                warn!("Failed to delete artifact {} during quota enforcement: {}", id, e);
+            } else {
+                removed += 1;
+                freed_bytes += size;
+            }
+        }
+
+        if removed > 0 {
+            info!("Quota enforcement removed {} artifacts, freed {} bytes", removed, freed_bytes);
+        }
+        Ok(removed)
+    }
+
+    /// Get total size of all artifacts in bytes
+    pub async fn get_total_size(&self) -> Result<u64, AppError> {
+        let artifacts = self.artifacts.read().await;
+        let mut total = 0u64;
+
+        for artifact in artifacts.artifacts.values() {
+            if artifact.path.exists() {
+                match std::fs::metadata(&artifact.path) {
+                    Ok(metadata) => total += metadata.len(),
+                    Err(e) => {
+                        warn!("Failed to get metadata for artifact {}: {}", artifact.id, e);
+                    }
+                }
+            }
+        }
+
+        Ok(total)
     }
 
     /// Placeholder: rebalancing would run for distributed modes.
