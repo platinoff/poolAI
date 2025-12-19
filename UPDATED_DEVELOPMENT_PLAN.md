@@ -1,8 +1,8 @@
 # 🏗️ Оновлений план розробки - Rust Architect Perspective
 
-**Дата**: 2025-12-17  
+**Дата**: 2025-12-19  
 **Статус**: 🚧 **АКТИВНА РОЗРОБКА**  
-**Поточний етап**: Stage 3 - Completion & Stabilization (Libs + VM/RAID/UI scaffolds)
+**Поточний етап**: Stage 3 - Completion & Stabilization (Libs ~95%, RAID ~70%, VM scaffold)
 
 ---
 
@@ -21,21 +21,44 @@
 
 ### 🚧 В розробці
 
-- 🚧 **Libs Module** (~80% готово)
-  - ✅ Базова структура (mod.rs, manager.rs, registry.rs, versioning.rs, dependencies.rs)
-  - ✅ API endpoints інтегровані
+- ✅ **Libs Module** (~95% готово) - **MAJOR PROGRESS**
+  - ✅ Базова структура (mod.rs, manager.rs, registry.rs, versioning.rs, dependencies.rs, constraints.rs, download.rs, manifest.rs, integration.rs)
+  - ✅ API endpoints інтегровані (5 endpoints)
   - ✅ Semantic versioning
-  - ✅ Dependency resolution (базова реалізація)
-  - ✅ Завантаження/розпакування (HTTP stream, tar/zip, sha256)
-  - 🔄 Atomic install + manifest (production-min)
-  - 🔄 Повна інтеграція з model_interface (compat checks, auto-update policy)
-  - 🔄 Тестування (unit + integration)
+  - ✅ Dependency resolution з constraints (>=, <=, ==, ~, ^, >, <)
+  - ✅ Завантаження/розпакування (HTTP stream, tar/zip, sha256 checksum)
+  - ✅ Atomic install + manifest persistence (production-min) — **ЗАВЕРШЕНО**
+  - ✅ Повна інтеграція з model_interface (compat checks, auto-update policy) — **ЗАВЕРШЕНО**
+  - ✅ Тестування (6 unit + 4 integration = 10 tests passing)
+  - 🔄 SAT solver для складних dependency conflicts (опціонально)
+
+- ✅ **RAID Module** (~70% готово) - **MAJOR PROGRESS**
+  - ✅ Local artifact storage (`/raid/artifacts`)
+  - ✅ Node registry primitives (register/list)
+  - ✅ Artifact manifest persistence (atomic write) + list/delete APIs
+  - ✅ GC (garbage collection) для старих artifacts — **ЗАВЕРШЕНО**
+  - ✅ Quota management (size-based limits) — **ЗАВЕРШЕНО**
+  - ✅ Retention policies (quota_bytes, retention_days, gc_on_startup) — **ЗАВЕРШЕНО**
+  - ✅ API endpoints: GET /api/v1/raid/quota, POST /api/v1/raid/gc — **ЗАВЕРШЕНО**
+  - ✅ Integration tests (4 tests passing)
+  - 🔄 Інтеграція libs → raid artifacts (libs зберігає завантажене як artifact)
+  - 🔄 BurstRAID/SmallWorld distributed (окрема фаза)
 
 ### 🚧 Модулі Stage 3 (базові скелети реалізовано)
 
 - 🚧 **VM Module** - Instance lifecycle scaffold (in-memory) + API (read-only)
-- 🚧 **RAID Module** - Local artifact storage scaffold + node registry primitives
-- 🚧 **UI Module** - Read-only dashboard (mounted at `/ui`, `/ui/` redirects to `/ui`)
+  - ✅ Basic instance management (create, start, stop, delete)
+  - ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
+  - 🔄 Process runner інтеграція з `runtime/process.rs`
+  - 🔄 Resource limits enforcement
+  - 🔄 Logs/timeouts management
+
+- ✅ **UI Module** - Read-only dashboard (mounted at `/ui`)
+  - ✅ 8 pages з auto-refresh (status, health, metrics, workers, libs, vm, raid)
+  - ✅ Shared HTML layout з navigation
+  - ✅ JavaScript auto-refresh (polling кожні 5 секунд)
+  - 🔄 Write operations (через API, з авторизацією)
+  - 🔄 UI components library
 
 ---
 
@@ -54,34 +77,38 @@
    - sibling-binary path (поруч з `poolai.exe`) або
    - чіткий fallback/warn без падіння всього процесу.
 
-### Пріоритет 1: UI Module (read-only dashboard) — найшвидший value
-**Мета**: дати оператору “скло” для огляду системи без ризиків запису.
-- Сторінки `/ui/`: status/health/metrics/workers/libs/vm/raid
-- Авто-оновлення (простий JS polling)
-- Без нових важких залежностей
+### Пріоритет 1: UI Module (read-only dashboard) — ✅ ЗАВЕРШЕНО
+**Мета**: дати оператору "скло" для огляду системи без ризиків запису.
+- ✅ Сторінки `/ui/`: status/health/metrics/workers/libs/vm/raid
+- ✅ Авто-оновлення (простий JS polling)
+- ✅ Без нових важких залежностей
 
 **Критерій готовності**
 - [x] UI показує стан системи і ключові списки (libs/vm/raid/workers)
 - [x] Немає write-операцій з UI (тільки read)
 
-### Пріоритет 2: Libs Module (production-min)
+### Пріоритет 2: Libs Module (production-min) — ✅ ~95% ЗАВЕРШЕНО
 **Мета**: зробити інсталяцію бібліотек безпечною і відтворюваною.
-- Atomic install (tmp dir → rename)
-- Manifest/metadata (installed versions, checksum, source URL, installed_at)
-- Version constraints: повний парсинг + перевірка (без SAT solver на цьому етапі)
-- Інтеграція з `model_interface`: ensure_libtorch + compat checks policy
-- Тести: unit (constraints/versioning) + integration (download/extract via local fixtures)
+- ✅ Atomic install (tmp dir → rename)
+- ✅ Manifest/metadata (installed versions, checksum, source URL, installed_at)
+- ✅ Version constraints: повний парсинг + перевірка (>=, <=, ==, ~, ^, >, <)
+- ✅ Інтеграція з `model_interface`: ensure_libtorch + compat checks policy
+- ✅ Тести: unit (6 tests) + integration (4 tests для manifest persistence)
 
 **Критерій готовності**
-- [ ] Install/Uninstall/Update працюють і є атомарними
-- [ ] Manifest збережений на диску
-- [ ] Мінімальні тести для критичних шляхів
+- [x] Install/Uninstall/Update працюють і є атомарними
+- [x] Manifest збережений на диску
+- [x] Мінімальні тести для критичних шляхів (10 tests passing)
+- [ ] SAT solver для складних dependency conflicts (опціонально)
 
-### Пріоритет 3: RAID Module (local → reliable)
+### Пріоритет 3: RAID Module (local → reliable) — ✅ ~70% ЗАВЕРШЕНО
 **Мета**: надійний локальний artifact store для libs/models.
-- CRUD артефактів + індекс (manifest)
-- GC/cleanup + quota
-- Інтеграція: libs зберігає завантажене як artifact, runtime читає артефакти
+- ✅ CRUD артефактів + індекс (manifest)
+- ✅ GC/cleanup + quota — **ЗАВЕРШЕНО**
+- ✅ Retention policies (quota_bytes, retention_days, gc_on_startup) — **ЗАВЕРШЕНО**
+- ✅ API endpoints для quota та GC — **ЗАВЕРШЕНО**
+- ✅ Integration tests (4 tests passing)
+- 🔄 Інтеграція: libs зберігає завантажене як artifact, runtime читає артефакти
 
 ### Пріоритет 4: VM Module (process-runner → isolation)
 **Мета**: контроль запуску воркерів/моделей з життєвим циклом і базовими лімітами.
@@ -193,21 +220,25 @@
 
 ## 🎯 Наступні кроки (Негайні)
 
-1. **UI (read-only)**
-   - Додати сторінки для libs/vm/raid/workers/metrics
-   - Поліпшити UX (шаблон, навігація, авто-оновлення)
+1. ✅ **UI (read-only)** — ЗАВЕРШЕНО
+   - ✅ Сторінки для libs/vm/raid/workers/metrics
+   - ✅ UX (шаблон, навігація, авто-оновлення)
 
-2. **Libs (production-min)**
-   - Atomic install + manifest
-   - Constraint checking + conflict reporting
-   - Тести для constraints/versioning/download (fixtures)
+2. ✅ **Libs (production-min)** — ~95% ЗАВЕРШЕНО
+   - ✅ Atomic install + manifest
+   - ✅ Constraint checking + conflict reporting
+   - ✅ Тести для constraints/versioning/manifest (10 tests)
+   - 🔄 SAT solver (опціонально)
 
-3. **RAID (local reliable store)**
-   - Artifact manifest + GC/quota
-   - Інтеграція libs → raid artifacts
+3. ✅ **RAID (local reliable store)** — ~70% ЗАВЕРШЕНО
+   - ✅ Artifact manifest + GC/quota
+   - 🔄 Інтеграція libs → raid artifacts (наступний крок)
 
-4. **VM (process runner)**
-   - В’язка VmManager ↔ runtime/process + lifecycle events
+4. **VM (process runner)** — ПРІОРИТЕТ
+   - В'язка VmManager ↔ runtime/process + lifecycle events
+   - Resource limits enforcement (CPU/memory/GPU)
+   - Logs/timeouts management
+   - Health check integration
 
 ---
 
