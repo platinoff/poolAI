@@ -6,13 +6,13 @@
 //! - Resource optimization primitives (basic)
 
 use crate::core::error::AppError;
-use crate::runtime::health::{HealthMonitor, HealthStatus, HealthCheckConfig};
+use crate::runtime::health::{HealthMonitor, HealthStatus};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
-use tokio::time::{Duration, Interval};
+use tokio::time::Duration;
 use tracing::{info, warn};
 use uuid::Uuid;
 
@@ -223,19 +223,19 @@ impl VmManager {
     }
 
     pub async fn start_instance(&self, id: Uuid) -> Result<(), AppError> {
-        let (name, status) = {
+        let name = {
             let mut instances = self.instances.write().await;
             let inst = instances
                 .get_mut(&id)
                 .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
 
             inst.status = VmStatus::Running;
-            (inst.name.clone(), inst.status.clone())
+            inst.name.clone()
         };
         
         // Register health check for this instance
         {
-            let mut hm = self.health_monitor.write().await;
+            let hm = self.health_monitor.write().await;
             hm.register_check(id, name).await;
         }
         
@@ -246,7 +246,7 @@ impl VmManager {
     pub async fn stop_instance(&self, id: Uuid) -> Result<(), AppError> {
         // Unregister health check
         {
-            let mut hm = self.health_monitor.write().await;
+            let hm = self.health_monitor.write().await;
             hm.unregister_check(id).await;
         }
         
