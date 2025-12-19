@@ -147,12 +147,9 @@ impl VmManager {
                         warn!("VM instance {} ({}) health check failed", id, name);
                         
                         // Auto-restart if configured
-                        let should_restart = {
-                            let hm = health_monitor.read().await;
-                            // Check failure count and auto-restart config
-                            // For now, we'll restart after 3 failures
-                            true // TODO: Get from config
-                        };
+                        // Check failure count and auto-restart config
+                        // For now, we'll restart after 3 failures
+                        let should_restart = true; // TODO: Get from config
                         
                         if should_restart {
                             warn!("Auto-restarting VM instance {} ({})", id, name);
