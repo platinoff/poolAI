@@ -22,11 +22,13 @@ pub async fn ensure_libtorch(required_version: Option<&str>) -> Result<(), AppEr
         match status {
             LibraryStatus::Installed => {
                 if let Some(lib) = manager.get_library("libtorch").await {
+                    // Use improved compatibility check
                     if let Some(required) = required_version {
-                        if lib.version != required {
+                        let compatible = check_libtorch_compatibility(Some(required)).await?;
+                        if !compatible {
                             warn!("libtorch version mismatch: installed {}, required {}", 
                                   lib.version, required);
-                            // TODO: Auto-update if needed
+                            // TODO: Auto-update if needed (based on auto-update policy)
                         }
                     }
                     info!("libtorch v{} is installed", lib.version);
@@ -72,9 +74,94 @@ pub async fn check_library_compatibility(
     }
 }
 
-/// Auto-update libraries if needed
-pub async fn auto_update_libraries() -> Result<(), AppError> {
-    info!("Checking for library updates");
+/// Check libtorch compatibility with model requirements
+/// 
+/// This function checks if the installed libtorch version meets the model's requirements.
+/// For libtorch, we typically check semantic version compatibility (major.minor match).
+pub async fn check_libtorch_compatibility(
+    required_version: Option<&str>,
+) -> Result<bool, AppError> {
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        
+        if let Some(libtorch) = manager.get_library("libtorch").await {
+            if let Some(required) = required_version {
+                // Parse versions and check compatibility
+                // For libtorch, we check if major.minor versions match
+                // (patch versions are usually compatible)
+                let installed_parts: Vec<&str> = libtorch.version.split('.').collect();
+                let required_parts: Vec<&str> = required.split('.').collect();
+                
+                if installed_parts.len() >= 2 && required_parts.len() >= 2 {
+                    let installed_major = installed_parts[0].parse::<u32>().unwrap_or(0);
+                    let installed_minor = installed_parts[1].parse::<u32>().unwrap_or(0);
+                    let required_major = required_parts[0].parse::<u32>().unwrap_or(0);
+                    let required_minor = required_parts[1].parse::<u32>().unwrap_or(0);
+                    
+                    // Check if major.minor versions match
+                    if installed_major == required_major && installed_minor == required_minor {
+                        info!("libtorch v{} matches required v{} (major.minor)", 
+                              libtorch.version, required);
+                        Ok(true)
+                    } else {
+                        warn!("libtorch version mismatch: installed v{} (major.minor: {}.{}), required v{} (major.minor: {}.{})", 
+                              libtorch.version, installed_major, installed_minor,
+                              required, required_major, required_minor);
+                        Ok(false)
+                    }
+                } else {
+                    // Fallback: exact version match
+                    if libtorch.version == required {
+                        info!("libtorch v{} matches required v{} (exact)", 
+                              libtorch.version, required);
+                        Ok(true)
+                    } else {
+                        warn!("libtorch version mismatch: installed {}, required {}", 
+                              libtorch.version, required);
+                        Ok(false)
+                    }
+                }
+            } else {
+                // No specific version required, just check if installed
+                info!("libtorch v{} is installed (no version requirement)", libtorch.version);
+                Ok(true)
+            }
+        } else {
+            warn!("libtorch not installed for compatibility check");
+            Ok(false)
+        }
+    } else {
+        Err(AppError::ConfigError("Library manager not initialized".to_string()))
+    }
+}
+
+/// Auto-update policy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AutoUpdatePolicy {
+    /// Never auto-update (manual updates only)
+    Never,
+    /// Auto-update on startup
+    OnStartup,
+    /// Auto-update on compatibility mismatch
+    OnMismatch,
+    /// Auto-update on startup and on mismatch
+    OnStartupAndMismatch,
+}
+
+impl Default for AutoUpdatePolicy {
+    fn default() -> Self {
+        Self::OnMismatch
+    }
+}
+
+/// Auto-update libraries if needed based on policy
+pub async fn auto_update_libraries(policy: AutoUpdatePolicy) -> Result<(), AppError> {
+    if policy == AutoUpdatePolicy::Never {
+        info!("Auto-update disabled (policy: Never)");
+        return Ok(());
+    }
+    
+    info!("Checking for library updates (policy: {:?})", policy);
     
     if let Some(manager) = get_global_manager() {
         let manager = manager.read().await;
@@ -86,6 +173,8 @@ pub async fn auto_update_libraries() -> Result<(), AppError> {
                 Ok(updated_lib) => {
                     if updated_lib.version != lib.version {
                         info!("Updated {} from {} to {}", lib.name, lib.version, updated_lib.version);
+                    } else {
+                        info!("{} is already at latest version ({})", lib.name, lib.version);
                     }
                 }
                 Err(e) => {
@@ -98,5 +187,32 @@ pub async fn auto_update_libraries() -> Result<(), AppError> {
     } else {
         Err(AppError::ConfigError("Library manager not initialized".to_string()))
     }
+}
+
+/// Auto-update libtorch if version mismatch detected (based on policy)
+pub async fn auto_update_libtorch_if_needed(
+    required_version: Option<&str>,
+    policy: AutoUpdatePolicy,
+) -> Result<(), AppError> {
+    if policy == AutoUpdatePolicy::Never {
+        return Ok(());
+    }
+    
+    if let Some(required) = required_version {
+        let compatible = check_libtorch_compatibility(Some(required)).await?;
+        
+        if !compatible {
+            if policy == AutoUpdatePolicy::OnMismatch || policy == AutoUpdatePolicy::OnStartupAndMismatch {
+                info!("Auto-updating libtorch due to version mismatch (policy: {:?})", policy);
+                if let Some(manager) = get_global_manager() {
+                    let manager = manager.read().await;
+                    manager.update_library("libtorch").await?;
+                    info!("libtorch auto-update completed");
+                }
+            }
+        }
+    }
+    
+    Ok(())
 }
 

@@ -22,7 +22,7 @@ pub use registry::LibraryRegistry;
 pub use versioning::VersionManager;
 pub use dependencies::DependencyResolver;
 pub use constraints::{VersionConstraint, ConstraintOp};
-pub use integration::{ensure_libtorch, check_library_compatibility, auto_update_libraries};
+pub use integration::{ensure_libtorch, check_library_compatibility, check_libtorch_compatibility, auto_update_libraries, auto_update_libtorch_if_needed, AutoUpdatePolicy};
 
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
