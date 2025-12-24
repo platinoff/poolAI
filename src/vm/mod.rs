@@ -321,7 +321,7 @@ impl VmManager {
         instance_id: Uuid,
     ) -> Result<ResourceUsage, AppError> {
         let instances = self.instances.read().await;
-        let instance = instances
+        let _instance = instances
             .get(&instance_id)
             .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", instance_id)))?;
         

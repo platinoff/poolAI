@@ -7,9 +7,7 @@
 
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 use tokio::process::Command;
-use tracing::warn;
 
 /// Resource limits configuration for a VM instance
 #[derive(Debug, Clone, Serialize, Deserialize)]
