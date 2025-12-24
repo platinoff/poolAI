@@ -95,7 +95,7 @@
 
 ---
 
-### 11. RAID Module (`src/raid/`) — ✅ ~70% COMPLETED
+### 11. RAID Module (`src/raid/`) — ✅ ~75% COMPLETED
 **Файли**: 2 (mod.rs, manifest.rs)
 
 **Реалізовано**:
@@ -109,6 +109,10 @@
 - ✅ **Quota management** (size-based limits) з автоматичною очисткою
 - ✅ **Retention policies** (quota_bytes, retention_days, gc_on_startup)
 - ✅ Integration tests (4 tests для GC/quota)
+- ✅ **Інтеграція libs → raid artifacts** — **ЗАВЕРШЕНО (Week 1)** 🎉
+  - ✅ Libs зберігає завантажене як artifact в RAID
+  - ✅ Runtime читає artifacts з RAID через `get_library_path_or_load_from_raid()`
+  - ✅ Integration tests (5 tests passing)
 
 **API Endpoints**:
 - ✅ `GET /api/v1/raid/nodes` - список nodes
@@ -129,6 +133,7 @@
 **Git Branches**:
 - `stage3/raid-local-artifacts` ✅
 - `stage3/raid-gc-quota` ✅
+- `stage3/raid-libs-integration` ✅ (Week 1)
 
 ---
 
@@ -341,7 +346,7 @@
 
 3. **Тестування**
    - ✅ Unit tests для libs (6 tests)
-   - ✅ Integration tests для libs, raid, security, vm (16 tests)
+   - ✅ Integration tests для libs, raid, security, vm, raid-libs (21 tests)
    - 🔄 Performance benchmarks (плануються)
 
 4. **Документація**
