@@ -4,9 +4,13 @@
 //! - VM instance management (planned in `poolAI_concept.txt`)
 //! - Isolation/security hooks (stubbed)
 //! - Resource optimization primitives (basic)
+//! - Resource limits enforcement (Week 2+)
 
 use crate::core::error::AppError;
 use crate::runtime::ProcessManager;
+
+pub mod resources;
+pub use resources::{ResourceLimits, ResourceUsage, ResourceLimiter};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -75,6 +79,7 @@ pub struct VmInstance {
 pub struct VmManager {
     instances: Arc<RwLock<HashMap<Uuid, VmInstance>>>,
     process_manager: Arc<RwLock<ProcessManager>>,
+    resource_limiter: Arc<dyn ResourceLimiter + Send + Sync>,
 }
 
 impl VmManager {
@@ -82,6 +87,7 @@ impl VmManager {
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
             process_manager: Arc::new(RwLock::new(ProcessManager::new())),
+            resource_limiter: Arc::new(resources::PlatformResourceLimiter::new()) as Arc<dyn ResourceLimiter + Send + Sync>,
         }
     }
 
@@ -165,6 +171,20 @@ impl VmManager {
                 pm.spawn_process(config).await?
             };
 
+            // Apply resource limits after process is spawned
+            {
+                let instances = self.instances.read().await;
+                let inst = instances.get(&id).ok_or_else(|| {
+                    AppError::ValidationError(format!("VM instance {} not found after spawn", id))
+                })?;
+                
+                let limits = ResourceLimits::from(inst.resources.clone());
+                if let Err(e) = self.resource_limiter.apply_limits(process_id, &limits).await {
+                    warn!("Failed to apply resource limits to process {}: {}", process_id, e);
+                    // Continue anyway - limits are not critical for basic operation
+                }
+            }
+
             // Update instance with process_id
             let mut instances = self.instances.write().await;
             let inst = instances.get_mut(&id).unwrap();
@@ -239,6 +259,41 @@ impl VmManager {
 
         let pm = self.process_manager.read().await;
         pm.get_process_status(process_id).await
+    }
+
+    /// Apply resource limits to a VM instance
+    pub async fn apply_resource_limits(&self, id: Uuid, limits: ResourceLimits) -> Result<(), AppError> {
+        let instances = self.instances.read().await;
+        let inst = instances
+            .get(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+
+        let process_id = inst.process_id
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
+
+        drop(instances); // Release lock before async call
+
+        self.resource_limiter.apply_limits(process_id, &limits).await
+    }
+
+    /// Get resource usage for a VM instance
+    pub async fn get_instance_resource_usage(&self, id: Uuid) -> Result<ResourceUsage, AppError> {
+        let instances = self.instances.read().await;
+        let inst = instances
+            .get(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+
+        let process_id = inst.process_id
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
+
+        drop(instances); // Release lock before async call
+
+        self.resource_limiter.get_usage(process_id).await
+    }
+
+    /// Check if resource limits are supported on this platform
+    pub fn is_resource_limits_supported(&self) -> bool {
+        self.resource_limiter.is_supported()
     }
 }
 

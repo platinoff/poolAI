@@ -90,6 +90,8 @@ pub fn create_api_routes() -> Router {
         .route("/vm/instances", get(vm_instances_handler))
         .route("/vm/instances/:id/logs", get(vm_instance_logs_handler))
         .route("/vm/instances/:id/process-status", get(vm_instance_process_status_handler))
+        .route("/vm/instances/:id/resources", get(vm_instance_resources_handler))
+        .route("/vm/resource-limits-supported", get(vm_resource_limits_supported_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
@@ -545,4 +547,45 @@ async fn library_update_handler(
             "error": "Library manager not initialized"
         }))).into_response()
     }
+}
+
+async fn vm_instance_resources_handler(
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+    
+    match manager.get_instance_resource_usage(uuid).await {
+        Ok(usage) => Json(usage).into_response(),
+        Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+            "error": format!("Failed to get resource usage: {}", e)
+        }))).into_response(),
+    }
+}
+
+async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let supported = manager.is_resource_limits_supported();
+    
+    let platform_os = if cfg!(target_os = "linux") {
+        "linux"
+    } else if cfg!(target_os = "windows") {
+        "windows"
+    } else {
+        "unknown"
+    };
+    
+    Json(serde_json::json!({
+        "supported": supported,
+        "platform": {
+            "os": platform_os
+        }
+    }))
 } 
