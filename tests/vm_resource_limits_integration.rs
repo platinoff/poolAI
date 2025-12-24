@@ -76,9 +76,25 @@ async fn test_resource_limits_support_detection() {
     let manager = VmManager::new();
     let supported = manager.is_resource_limits_supported();
     
-    // Currently returns false (placeholder implementation)
-    // Will return true once platform-specific implementation is complete (Week 3-4)
-    assert_eq!(supported, false);
+    // On Linux, returns true if cgroups are available
+    // On Windows, returns true if Job Objects are available
+    // On other platforms, returns false
+    #[cfg(target_os = "linux")]
+    {
+        // On Linux, depends on cgroups availability
+        let _ = supported; // Just verify it doesn't panic
+    }
+    
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, depends on Job Objects availability
+        let _ = supported; // Just verify it doesn't panic
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    {
+        assert!(!supported);
+    }
 }
 
 #[tokio::test]
