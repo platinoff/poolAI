@@ -173,15 +173,32 @@ impl VmManager {
 
             // Apply resource limits after process is spawned
             {
-                let instances = self.instances.read().await;
-                let inst = instances.get(&id).ok_or_else(|| {
-                    AppError::ValidationError(format!("VM instance {} not found after spawn", id))
-                })?;
-                
-                let limits = ResourceLimits::from(inst.resources.clone());
-                if let Err(e) = self.resource_limiter.apply_limits(process_id, &limits).await {
-                    warn!("Failed to apply resource limits to process {}: {}", process_id, e);
-                    // Continue anyway - limits are not critical for basic operation
+                // Get PID from ProcessManager and register it
+                let pid = {
+                    let pm = self.process_manager.read().await;
+                    pm.get_process_pid(process_id).await.ok().flatten()
+                };
+
+                if let Some(pid) = pid {
+                    // Register PID in resource limiter (needed for Linux cgroups)
+                    self.resource_limiter.register_process_pid(process_id, pid).await;
+                    
+                    // Get limits and apply them
+                    let instances = self.instances.read().await;
+                    let inst = instances.get(&id).ok_or_else(|| {
+                        AppError::ValidationError(format!("VM instance {} not found after spawn", id))
+                    })?;
+                    
+                    let limits = ResourceLimits::from(inst.resources.clone());
+                    drop(instances); // Release lock before async call
+                    
+                    // Apply limits (PID is now registered)
+                    if let Err(e) = self.resource_limiter.apply_limits(process_id, &limits).await {
+                        warn!("Failed to apply resource limits to process {}: {}", process_id, e);
+                        // Continue anyway - limits are not critical for basic operation
+                    }
+                } else {
+                    warn!("Could not get PID for process {}, skipping resource limits", process_id);
                 }
             }
 

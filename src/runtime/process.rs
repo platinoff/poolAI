@@ -70,6 +70,8 @@ pub struct ProcessInfo {
     pub logs: Arc<RwLock<ProcessLogs>>,
     pub started_at: chrono::DateTime<chrono::Utc>,
     pub process: Option<Child>,
+    /// Process ID (PID) - platform-specific
+    pub pid: Option<u32>,
 }
 
 /// Process Manager
@@ -204,6 +206,9 @@ impl ProcessManager {
             });
         }
 
+        // Get PID from child process
+        let pid = child.id();
+
         // Store process info
         let process_info = ProcessInfo {
             id,
@@ -212,6 +217,7 @@ impl ProcessManager {
             logs,
             started_at: chrono::Utc::now(),
             process: Some(child),
+            pid,
         };
 
         self.processes.write().await.insert(id, process_info);
@@ -275,5 +281,15 @@ impl ProcessManager {
     /// List all processes
     pub async fn list_processes(&self) -> Vec<Uuid> {
         self.processes.read().await.keys().cloned().collect()
+    }
+
+    /// Get process PID
+    pub async fn get_process_pid(&self, id: Uuid) -> Result<Option<u32>, AppError> {
+        let processes = self.processes.read().await;
+        let info = processes
+            .get(&id)
+            .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
+        
+        Ok(info.pid)
     }
 }

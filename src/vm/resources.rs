@@ -6,6 +6,9 @@
 //! - Platform-specific resource limiting (trait-based)
 //! - Integration with VM Manager
 
+#[cfg(target_os = "linux")]
+mod linux;
+
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -110,6 +113,17 @@ pub trait ResourceLimiter: Send + Sync {
     /// Current resource usage, or `Err` if unable to retrieve
     async fn get_usage(&self, process_id: Uuid) -> Result<ResourceUsage, AppError>;
     
+    /// Register a process PID (optional - only needed for some platforms like Linux)
+    /// 
+    /// # Arguments
+    /// * `process_id` - Process ID (UUID)
+    /// * `pid` - Platform-specific process ID (PID)
+    /// 
+    /// Default implementation does nothing (for platforms that don't need PID registration)
+    async fn register_process_pid(&self, _process_id: Uuid, _pid: u32) {
+        // Default: no-op (for platforms that don't need PID registration)
+    }
+    
     /// Check if resource limiting is supported on this platform
     /// 
     /// # Returns
@@ -126,6 +140,12 @@ pub struct PlatformResourceLimiter {
     /// Platform-specific implementation state
     #[allow(dead_code)]
     platform: PlatformType,
+    /// Linux cgroup limiter (only on Linux)
+    #[cfg(target_os = "linux")]
+    linux_limiter: Option<linux::LinuxCgroupLimiter>,
+    /// Mapping from process_id (Uuid) to PID
+    /// This is needed because apply_limits only receives process_id, not PID
+    process_pid_map: std::sync::Arc<tokio::sync::RwLock<std::collections::HashMap<Uuid, u32>>>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -146,47 +166,126 @@ impl PlatformResourceLimiter {
             PlatformType::Unknown
         };
         
-        Self { platform }
+        #[cfg(target_os = "linux")]
+        let linux_limiter: Option<linux::LinuxCgroupLimiter> = linux::LinuxCgroupLimiter::new().ok();
+        
+        #[cfg(not(target_os = "linux"))]
+        #[allow(dead_code)]
+        let linux_limiter: Option<()> = None;
+        
+        Self {
+            platform,
+            #[cfg(target_os = "linux")]
+            linux_limiter,
+            process_pid_map: std::sync::Arc::new(tokio::sync::RwLock::new(std::collections::HashMap::new())),
+        }
+    }
+
+
+    /// Get PID for a process
+    #[allow(dead_code)]
+    async fn get_pid_for_process(&self, process_id: Uuid) -> Option<u32> {
+        let map = self.process_pid_map.read().await;
+        map.get(&process_id).copied()
     }
 }
 
 #[async_trait::async_trait]
 impl ResourceLimiter for PlatformResourceLimiter {
-    async fn apply_limits(&self, _process_id: Uuid, limits: &ResourceLimits) -> Result<(), AppError> {
+    async fn register_process_pid(&self, process_id: Uuid, pid: u32) {
+        let mut map = self.process_pid_map.write().await;
+        map.insert(process_id, pid);
+    }
+    async fn apply_limits(&self, process_id: Uuid, limits: &ResourceLimits) -> Result<(), AppError> {
         // Validate limits first
         limits.validate()?;
         
-        // Placeholder implementation - will be implemented in Week 3-4
-        // For now, just log the limits
-        tracing::info!(
-            "Resource limits requested (not yet enforced): cpu={:?}, memory={:?}MB, gpu={:?}",
-            limits.cpu_cores,
-            limits.memory_mb,
-            limits.gpu_device
-        );
-        
-        // TODO: Week 3-4 - Implement platform-specific resource limiting
-        // Linux: Use cgroups
-        // Windows: Use Job Objects
+        // Platform-specific implementation
+        #[cfg(target_os = "linux")]
+        {
+            // Get PID for this process
+            let pid = self.get_pid_for_process(process_id).await
+                .ok_or_else(|| AppError::ResourceError(
+                    format!("PID not found for process {}", process_id)
+                ))?;
+
+            if let Some(ref limiter) = self.linux_limiter {
+                limiter.apply_limits(process_id, pid, limits).await?;
+                tracing::info!(
+                    "Applied Linux cgroup limits to process {} (PID {}): cpu={:?}, memory={:?}MB",
+                    process_id, pid, limits.cpu_cores, limits.memory_mb
+                );
+            } else {
+                tracing::warn!(
+                    "Linux cgroup limiter not available, limits not enforced for process {}",
+                    process_id
+                );
+            }
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            // TODO: Week 4 - Windows Job Objects implementation
+            // Suppress unused variable warning
+            let _ = process_id;
+            tracing::info!(
+                "Resource limits requested (Windows not yet implemented): cpu={:?}, memory={:?}MB, gpu={:?}",
+                limits.cpu_cores,
+                limits.memory_mb,
+                limits.gpu_device
+            );
+        }
+
+        #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+        {
+            // Suppress unused variable warning
+            let _ = process_id;
+            tracing::warn!(
+                "Resource limits not supported on this platform"
+            );
+        }
         
         Ok(())
     }
     
-    async fn get_usage(&self, _process_id: Uuid) -> Result<ResourceUsage, AppError> {
-        // Placeholder implementation - will be implemented in Week 3-4
-        // For now, return default (zero usage)
-        
-        // TODO: Week 3-4 - Implement platform-specific resource usage monitoring
-        // Linux: Read from /proc or cgroup stats
-        // Windows: Use performance counters or WMI
-        
+    async fn get_usage(&self, process_id: Uuid) -> Result<ResourceUsage, AppError> {
+        #[cfg(target_os = "linux")]
+        {
+            if let Some(ref limiter) = self.linux_limiter {
+                return limiter.get_usage(process_id).await;
+            }
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            // TODO: Week 4 - Windows performance counters
+            let _ = process_id;
+        }
+
+        #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+        {
+            let _ = process_id;
+        }
+
         Ok(ResourceUsage::default())
     }
     
     fn is_supported(&self) -> bool {
-        // Will return true once platform-specific implementation is complete (Week 3-4)
-        // For now, return false to indicate it's not yet implemented
-        false
+        #[cfg(target_os = "linux")]
+        {
+            return self.linux_limiter.is_some();
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            // TODO: Week 4 - return true once Windows implementation is complete
+            return false;
+        }
+
+        #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+        {
+            return false;
+        }
     }
 }
 
