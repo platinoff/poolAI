@@ -170,8 +170,7 @@ impl PlatformResourceLimiter {
         let linux_limiter: Option<linux::LinuxCgroupLimiter> = linux::LinuxCgroupLimiter::new().ok();
         
         #[cfg(not(target_os = "linux"))]
-        #[allow(dead_code)]
-        let linux_limiter: Option<()> = None;
+        let _linux_limiter: Option<()> = None;
         
         Self {
             platform,
