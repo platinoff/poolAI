@@ -9,7 +9,7 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок  
-**Статус тестів**: ✅ 30 tests passing (6 unit + 24 integration)  
+**Статус тестів**: ✅ 37 tests passing (6 unit + 31 integration)  
 **Поточний branch**: `stage3/vm-health-checks` ✅
 
 ---
@@ -34,12 +34,13 @@
 - **Модулів реалізовано**: 12 основних модулів
 - **API endpoints**: 28+ REST endpoints + WebSocket
 - **Unit tests**: 6 passing (libs constraints/versioning)
-- **Integration tests**: 24 passing
+- **Integration tests**: 31 passing
   - 4 libs (manifest persistence)
   - 4 raid (GC/quota)
   - 5 vm (process runner)
   - 5 raid-libs (integration)
   - 6 vm-health (health checks)
+  - 7 vm-resource-limits (resource limits)
 - **Бінарних цілей**: 2 (poolai, poolai-worker)
 
 ---
@@ -173,6 +174,15 @@
 - ✅ Auto-restart on failure
 - ✅ Health status API endpoint
 - ✅ Integration tests (6 tests passing)
+
+### VM Resource Limits Enforcement (2025-12-19)
+- ✅ ResourceLimits struct (CPU/memory/GPU)
+- ✅ ResourceLimiter trait для platform-specific implementations
+- ✅ PlatformResourceLimiter з Windows/Linux stubs
+- ✅ Інтеграція з VmManager
+- ✅ API endpoints: GET /vm/instances/:id/resources, GET /vm/resource-limits-supported
+- ✅ Integration tests (7 tests passing)
+- 🔄 Actual enforcement (Job Objects/cgroups) - planned
 
 ---
 
