@@ -6,8 +6,9 @@ use axum::{
     response::Response,
     Json,
 };
-// Temporarily disabled - requires ring/gcc
-// use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+// JWT support (optional - enabled with feature "jwt")
+#[cfg(feature = "jwt")]
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 use base64::Engine;
@@ -119,30 +120,45 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
 }
 
 // Функція для валідації JWT токена
-// Temporarily disabled - requires ring/gcc
 pub fn validate_token(token: &str) -> Result<Claims, String> {
-    // TODO: Re-enable after installing gcc
-    // For now, simple validation (NOT SECURE - for development only)
-    if !token.starts_with("dev_token_") {
-        return Err("Invalid token format".to_string());
+    #[cfg(feature = "jwt")]
+    {
+        // Real JWT token validation
+        let config = JwtConfig::default();
+        use jsonwebtoken::{decode, DecodingKey, Validation};
+        let key = DecodingKey::from_secret(config.secret.as_ref());
+        let validation = Validation::default();
+        
+        decode::<Claims>(token, &key, &validation)
+            .map(|data| data.claims)
+            .map_err(|e| format!("Token validation failed: {}", e))
     }
     
-    let token_data = &token[10..]; // Skip "dev_token_"
-    let decoded = base64::engine::general_purpose::STANDARD.decode(token_data).map_err(|e| format!("Decode error: {}", e))?;
-    let claims: Claims = serde_json::from_slice(&decoded)
-        .map_err(|e| format!("Parse error: {}", e))?;
-    
-    // Check expiration
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as usize;
-    
-    if claims.exp < now {
-        return Err("Token expired".to_string());
+    #[cfg(not(feature = "jwt"))]
+    {
+        // Fallback: Simple validation (NOT SECURE - for development only)
+        if !token.starts_with("dev_token_") {
+            return Err("Invalid token format".to_string());
+        }
+        
+        let token_data = &token[10..]; // Skip "dev_token_"
+        let decoded = base64::engine::general_purpose::STANDARD.decode(token_data)
+            .map_err(|e| format!("Decode error: {}", e))?;
+        let claims: Claims = serde_json::from_slice(&decoded)
+            .map_err(|e| format!("Parse error: {}", e))?;
+        
+        // Check expiration
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as usize;
+        
+        if claims.exp < now {
+            return Err("Token expired".to_string());
+        }
+        
+        Ok(claims)
     }
-    
-    Ok(claims)
 }
 
 // Middleware для аутентифікації

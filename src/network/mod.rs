@@ -16,10 +16,9 @@ use axum::response::Redirect;
 use std::net::SocketAddr;
 use tracing::info;
 use crate::ui;
-// use axum_server::Server;  // Temporarily disabled - requires ring/gcc
 
-// #[cfg(feature = "https")]
-// use axum_server::tls_rustls::RustlsConfig;  // Temporarily disabled
+#[cfg(feature = "https")]
+use axum_server::tls_rustls::RustlsConfig;
 
 /// Start the network server (HTTP or HTTPS)
 ///
@@ -37,31 +36,42 @@ pub async fn start_server(addr: SocketAddr) {
         .nest("/ui", ui::create_ui_routes());
 
     // TODO: Read from configuration file
-    // HTTPS temporarily disabled - requires gcc for ring crate
-    // let _enable_https = true; // Temporary for testing
-    // let _cert_path = "certs/cert.pem";
-    // let _key_path = "certs/key.pem";
-
-    // Temporarily disabled HTTPS due to gcc.exe issue
-    // if enable_https {
-    //     #[cfg(feature = "https")]
-    //     {
-    //         let config = RustlsConfig::from_pem_file(_cert_path, _key_path).await.expect("Failed to load certs");
-    //         info!("Starting HTTPS server on {}", addr);
-    //         axum_server::bind_rustls(addr, config)
-    //             .serve(app.into_make_service())
-    //             .await
-    //             .unwrap();
-    //     }
-    //     #[cfg(not(feature = "https"))]
-    //     {
-    //         panic!("HTTPS feature not enabled. Rebuild with --features https");
-    //     }
-    // } else {
+    // HTTPS support is optional and requires feature "https"
+    // For production, use: cargo build --features https
+    // Note: Requires native toolchain (gcc/dlltool on Windows GNU)
+    
+    #[cfg(feature = "https")]
+    {
+        // HTTPS mode - requires certificates
+        // TODO: Read cert paths from config
+        use tracing::warn;
+        let cert_path = std::env::var("HTTPS_CERT_PATH").unwrap_or_else(|_| "certs/cert.pem".to_string());
+        let key_path = std::env::var("HTTPS_KEY_PATH").unwrap_or_else(|_| "certs/key.pem".to_string());
+        
+        match RustlsConfig::from_pem_file(&cert_path, &key_path).await {
+            Ok(config) => {
+                info!("Starting HTTPS server on {}", addr);
+                axum_server::bind_rustls(addr, config)
+                    .serve(app.into_make_service())
+                    .await
+                    .unwrap();
+            }
+            Err(e) => {
+                warn!("Failed to load HTTPS certificates ({}): {}. Falling back to HTTP.", cert_path, e);
+                info!("Starting HTTP server on {}", addr);
+                let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+                info!("Server listening on {}", addr);
+                axum::serve(listener, app).await.unwrap();
+            }
+        }
+    }
+    
+    #[cfg(not(feature = "https"))]
+    {
+        // HTTP mode (default)
         info!("Starting HTTP server on {}", addr);
-        // Use axum's built-in server instead of axum-server
         let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
         info!("Server listening on {}", addr);
         axum::serve(listener, app).await.unwrap();
-    // }
+    }
 } 

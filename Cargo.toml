@@ -25,16 +25,24 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
 # Web framework
 axum = { version = "0.7", features = ["ws"] }  # WebSocket support
-# axum-server = "0.6"  # Temporarily disabled - requires ring/gcc
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
 # WebSocket support
 futures-util = "0.3"
 
-# JWT authentication (temporarily disabled - requires ring/gcc)
-# jsonwebtoken = "9.3"  # Uncomment after installing gcc
-# Using base64 for temporary token encoding (dev only)
+# JWT authentication (optional - enabled with feature "jwt")
+# Use: cargo build --features jwt
+# Note: Requires native toolchain (gcc/dlltool on Windows GNU)
+# Without this feature, uses fallback base64 encoding (dev only, NOT SECURE)
+jsonwebtoken = { version = "9.3", optional = true }
+
+# HTTPS/TLS support (optional - enabled with feature "https")
+# Use: cargo build --features https
+# Note: Requires native toolchain (gcc/dlltool on Windows GNU)
+axum-server = { version = "0.6", optional = true, features = ["rustls"] }
+
+# Using base64 for temporary token encoding (dev only or fallback)
 base64 = { version = "0.22", features = ["alloc"] }
 
 # Error handling
@@ -82,4 +90,13 @@ tempfile = "3.8"
 
 [features]
 default = []
-# https = ["axum-server/rustls"]  # Temporarily disabled - requires ring/gcc
+# JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)
+# Use: cargo build --features jwt
+# Note: Without this feature, uses fallback base64 encoding (dev only, NOT SECURE)
+jwt = ["jsonwebtoken"]
+# HTTPS/TLS support (optional - requires native toolchain: gcc/dlltool on Windows GNU)
+# Use: cargo build --features https
+# Note: Without this feature, server runs in HTTP mode
+https = ["axum-server"]
+# Full security features (when both jwt and https are available)
+# security = ["jwt", "https"]
