@@ -72,9 +72,17 @@ async fn test_register_process_pid() {
         let _ = result;
     }
     
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "windows")]
     {
-        // On non-Linux, should succeed (just logs)
+        // On Windows, if Job Objects are available and PID is registered, should succeed
+        // If Job Objects are not available, might fail
+        // We just verify it doesn't panic
+        let _ = result;
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    {
+        // On non-Linux/Windows, should succeed (just logs)
         assert!(result.is_ok());
     }
 }
@@ -100,9 +108,15 @@ async fn test_apply_limits_without_pid() {
         assert!(result.is_err());
     }
     
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "windows")]
     {
-        // On non-Linux, should succeed (just logs)
+        // On Windows, should fail because PID is not registered
+        assert!(result.is_err());
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    {
+        // On non-Linux/Windows, should succeed (just logs)
         assert!(result.is_ok());
     }
 }
