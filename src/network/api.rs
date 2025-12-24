@@ -88,6 +88,9 @@ pub fn create_api_routes() -> Router {
         .route("/libraries/:name/uninstall", post(library_uninstall_handler))
         .route("/libraries/:name/update", post(library_update_handler))
         .route("/vm/instances", get(vm_instances_handler))
+        .route("/vm/instances/:id/health", get(vm_instance_health_handler))
+        .route("/vm/instances/:id/resources", get(vm_instance_resources_handler))
+        .route("/vm/resource-limits-supported", get(vm_resource_limits_supported_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
@@ -98,6 +101,85 @@ async fn vm_instances_handler() -> impl IntoResponse {
     let manager = vm::get_global_manager();
     let instances = manager.list_instances().await;
     Json(instances)
+}
+
+async fn vm_instance_resources_handler(
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.get_instance_resource_usage(uuid).await {
+        Ok(usage) => Json(usage).into_response(),
+        Err(e) => {
+            let error_response = serde_json::json!({
+                "error": e.to_string()
+            });
+            (axum::http::StatusCode::NOT_FOUND, Json(error_response)).into_response()
+        }
+    }
+}
+
+async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let supported = manager.is_resource_limits_supported();
+    Json(serde_json::json!({
+        "supported": supported
+    }))
+}
+
+async fn vm_instance_health_handler(
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.get_instance_health(uuid).await {
+        Ok(Some(status)) => {
+            match status {
+                crate::runtime::health::HealthStatus::Healthy => {
+                    Json(serde_json::json!({
+                        "status": "healthy"
+                    })).into_response()
+                }
+                crate::runtime::health::HealthStatus::Unhealthy(reason) => {
+                    Json(serde_json::json!({
+                        "status": "unhealthy",
+                        "reason": reason
+                    })).into_response()
+                }
+                crate::runtime::health::HealthStatus::Unknown => {
+                    Json(serde_json::json!({
+                        "status": "unknown"
+                    })).into_response()
+                }
+            }
+        }
+        Ok(None) => {
+            (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
+                "error": "Health check not registered for this instance"
+            }))).into_response()
+        }
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("{}", e)
+            }))).into_response()
+        }
+    }
 }
 
 async fn raid_nodes_handler() -> impl IntoResponse {
