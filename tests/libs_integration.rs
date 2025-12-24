@@ -94,6 +94,7 @@ async fn test_manifest_multiple_libraries() {
                 path: PathBuf::from(format!("/test/path/{}", i)),
                 dependencies: vec![],
                 metadata: LibraryMetadata::default(),
+                artifact_ref: None,
             },
         );
     }
