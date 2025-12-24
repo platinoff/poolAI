@@ -7,9 +7,7 @@
 
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 use tokio::process::Command;
-use tracing::warn;
 
 /// Resource limits configuration for a VM instance
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -97,9 +95,7 @@ impl ResourceLimiter for PlatformResourceLimiter {
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         {
             // Fallback: basic validation only
-            if limits.cpu_cores > 0 || limits.memory_mb > 0 {
-                warn!("Resource limits not supported on this platform, only validation will be performed");
-            }
+            // Resource limits not supported on this platform, only validation will be performed
             Ok(())
         }
     }
