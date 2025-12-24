@@ -5,6 +5,9 @@
 //! - Isolation/security hooks (stubbed)
 //! - Resource optimization primitives (basic)
 
+mod resources;
+pub use resources::{ResourceLimits, ResourceLimiter, ResourceUsage, PlatformResourceLimiter};
+
 use crate::core::error::AppError;
 use crate::runtime::health::{HealthMonitor, HealthStatus};
 use chrono::{DateTime, Utc};
@@ -69,16 +72,19 @@ pub struct VmManager {
     health_monitor: Arc<RwLock<HealthMonitor>>,
     #[allow(dead_code)] // Used for periodic health checks
     health_check_task: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
+    resource_limiter: Arc<dyn ResourceLimiter>,
 }
 
 impl VmManager {
     pub fn new() -> Self {
         let health_monitor = Arc::new(RwLock::new(HealthMonitor::new(30))); // 30 second interval
+        let resource_limiter: Arc<dyn ResourceLimiter> = Arc::new(PlatformResourceLimiter::new());
         
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
             health_monitor,
             health_check_task: Arc::new(RwLock::new(None)),
+            resource_limiter,
         }
     }
 
@@ -292,6 +298,43 @@ impl VmManager {
         };
         
         Ok(status)
+    }
+    
+    /// Apply resource limits to a command (for future process spawning)
+    pub async fn apply_resource_limits(
+        &self,
+        command: &mut tokio::process::Command,
+        instance_id: Uuid,
+    ) -> Result<(), AppError> {
+        let instances = self.instances.read().await;
+        let instance = instances
+            .get(&instance_id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", instance_id)))?;
+        
+        let limits = ResourceLimits::from(instance.resources.clone());
+        self.resource_limiter.apply_limits(command, &limits).await
+    }
+    
+    /// Get resource usage for a VM instance
+    pub async fn get_instance_resource_usage(
+        &self,
+        instance_id: Uuid,
+    ) -> Result<ResourceUsage, AppError> {
+        let instances = self.instances.read().await;
+        let instance = instances
+            .get(&instance_id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", instance_id)))?;
+        
+        // TODO: Get actual process_id from instance when process spawning is implemented
+        // For now, return placeholder
+        Err(AppError::ConfigError(
+            "Process ID not available - process spawning not yet implemented".to_string(),
+        ))
+    }
+    
+    /// Check if resource limits are supported on this platform
+    pub fn is_resource_limits_supported(&self) -> bool {
+        self.resource_limiter.is_supported()
     }
 }
 
