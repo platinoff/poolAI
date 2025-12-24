@@ -1,8 +1,8 @@
 # 🏗️ Оновлений план розробки - Rust Architect Perspective
 
-**Дата**: 2025-12-19 (Updated)  
+**Дата**: 2025-12-23 (Updated)  
 **Статус**: 🚧 **АКТИВНА РОЗРОБКА**  
-**Поточний етап**: Stage 3 - Completion & Stabilization (Libs 100%, RAID ~85%, VM ~60%, UI ~80%)
+**Поточний етап**: Stage 3 - Completion & Stabilization (Libs 100%, RAID ~85%, VM ~75%, UI ~80%)
 
 ---
 
@@ -50,15 +50,20 @@
 
 ### 🚧 Модулі Stage 3 (базові скелети реалізовано)
 
-- ✅ **VM Module** (~60% готово) - **MAJOR PROGRESS**
+- ✅ **VM Module** (~75% готово) - **MAJOR PROGRESS**
   - ✅ Basic instance management (create, start, stop, delete)
   - ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
   - ✅ **Process Runner Integration** — інтеграція з runtime/process.rs — **ЗАВЕРШЕНО**
   - ✅ **Process Lifecycle** — spawn, stop, logs, timeouts — **ЗАВЕРШЕНО**
   - ✅ **API Endpoints** — GET /api/v1/vm/instances/:id/logs, GET /api/v1/vm/instances/:id/process-status — **ЗАВЕРШЕНО**
-  - ✅ Integration tests (5 tests passing)
-  - 🔄 Resource limits enforcement (CPU/memory/GPU)
-  - 🔄 Health checks integration
+  - ✅ **Resource Limits Enforcement** — platform-specific implementations — **ЗАВЕРШЕНО (Week 2-4)**
+    - ✅ Linux cgroups v1/v2 (CPU/memory limits)
+    - ✅ Windows Job Objects (CPU/memory limits)
+    - ✅ ResourceLimiter trait з platform dispatch
+    - ✅ API endpoints (GET /api/v1/vm/instances/:id/resources, GET /api/v1/vm/resource-limits-supported)
+    - ✅ Integration tests (20 tests: 8 general + 6 linux + 6 windows)
+  - ✅ Integration tests (31 tests: 5 process + 8 resource-limits + 6 linux + 6 windows + 6 health)
+  - 🔄 Health checks integration (Week 5)
 
 - ✅ **UI Module** - Read-only dashboard (mounted at `/ui`)
   - ✅ 8 pages з auto-refresh (status, health, metrics, workers, libs, vm, raid)
@@ -117,11 +122,15 @@
 - ✅ Integration tests (4 tests passing)
 - 🔄 Інтеграція: libs зберігає завантажене як artifact, runtime читає артефакти
 
-### Пріоритет 4: VM Module (process-runner → isolation)
+### Пріоритет 4: VM Module (process-runner → isolation) — ✅ ~75% ЗАВЕРШЕНО
 **Мета**: контроль запуску воркерів/моделей з життєвим циклом і базовими лімітами.
-- Спочатку “process runner” на базі `runtime/process.rs` (+ статус/логи/таймаути)
-- Потім ресурси (CPU/mem/gpu scheduling policy)
-- Потім isolation (sandbox/containers/real VM) — окрема підфаза
+- ✅ "process runner" на базі `runtime/process.rs` (+ статус/логи/таймаути) — **ЗАВЕРШЕНО**
+- ✅ Ресурси (CPU/mem limits) — **ЗАВЕРШЕНО (Week 2-4)**
+  - ✅ Linux cgroups v1/v2
+  - ✅ Windows Job Objects
+- 🔄 Health checks integration (Week 5)
+- 🔄 GPU scheduling policy (advanced)
+- 🔄 Isolation (sandbox/containers/real VM) — окрема підфаза
 
 ### Пріоритет 5: Security (JWT/HTTPS) — складніше через toolchain
 - Повернути `jsonwebtoken`/`axum-server` під feature flags

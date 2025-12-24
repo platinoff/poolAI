@@ -172,3 +172,37 @@ async fn test_get_health_status_api() {
     }
 }
 
+#[tokio::test]
+async fn test_restart_instance() {
+    let manager = VmManager::new();
+    manager.initialize().await.unwrap();
+
+    let resources = VmResources::default();
+    let instance = manager
+        .create_instance(
+            "test-vm".to_string(),
+            resources,
+            VmIsolation::ProcessSandbox,
+        )
+        .await
+        .unwrap();
+
+    // Start instance
+    manager.start_instance(instance.id).await.unwrap();
+    
+    // Verify instance is running
+    let inst_before = manager.get_instance(instance.id).await.unwrap();
+    assert!(matches!(inst_before.status, poolai::vm::VmStatus::Running));
+
+    // Restart instance
+    manager.restart_instance(instance.id).await.unwrap();
+    
+    // Verify instance is still running after restart
+    let inst_after = manager.get_instance(instance.id).await.unwrap();
+    assert!(matches!(inst_after.status, poolai::vm::VmStatus::Running));
+    
+    // Health check should still be registered
+    let health = manager.get_instance_health(instance.id).await.unwrap();
+    assert!(health.is_some(), "Health check should still be registered after restart");
+}
+

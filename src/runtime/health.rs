@@ -176,4 +176,15 @@ impl HealthMonitor {
             .map(|e| (e.id, e.name.clone(), e.status.clone()))
             .collect()
     }
+    
+    /// Get failure count for a registered check
+    pub async fn get_failure_count(&self, id: Uuid) -> Option<u32> {
+        let checks = self.checks.read().await;
+        checks.get(&id).map(|e| e.failure_count)
+    }
+    
+    /// Get health check configuration
+    pub fn get_config(&self) -> &HealthCheckConfig {
+        &self.config
+    }
 }

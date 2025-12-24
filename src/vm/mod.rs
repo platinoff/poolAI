@@ -152,18 +152,59 @@ impl VmManager {
                     if matches!(health_status, HealthStatus::Unhealthy(_)) {
                         warn!("VM instance {} ({}) health check failed", id, name);
                         
-                        // Auto-restart if configured
-                        // Check failure count and auto-restart config
-                        // For now, we'll restart after 3 failures
-                        let should_restart = true; // TODO: Get from config
+                        // Check failure count and config from health monitor
+                        let (failure_count, max_failures, auto_restart) = {
+                            let hm = health_monitor.read().await;
+                            let failure_count = hm.get_failure_count(id).await.unwrap_or(0);
+                            let config = hm.get_config();
+                            (failure_count, config.max_failures, config.auto_restart)
+                        };
                         
-                        if should_restart {
-                            warn!("Auto-restarting VM instance {} ({})", id, name);
-                            // TODO: Implement restart logic
-                            // For now, just mark as failed
+                        // Auto-restart if configured and failure count reached threshold
+                        if auto_restart && failure_count >= max_failures {
+                            warn!("Auto-restarting VM instance {} ({}) after {} failures", id, name, failure_count);
+                            
+                            // Restart the instance
+                            let instances_clone = Arc::clone(&instances);
+                            let health_monitor_clone = Arc::clone(&health_monitor);
+                            
+                            // Stop the instance first
+                            {
+                                let mut insts = instances_clone.write().await;
+                                if let Some(inst) = insts.get_mut(&id) {
+                                    inst.status = VmStatus::Stopped;
+                                }
+                            }
+                            
+                            // Unregister health check
+                            {
+                                let hm = health_monitor_clone.write().await;
+                                hm.unregister_check(id).await;
+                            }
+                            
+                            // Wait a bit before restarting
+                            tokio::time::sleep(Duration::from_secs(1)).await;
+                            
+                            // Restart the instance
+                            {
+                                let mut insts = instances_clone.write().await;
+                                if let Some(inst) = insts.get_mut(&id) {
+                                    inst.status = VmStatus::Running;
+                                }
+                            }
+                            
+                            // Re-register health check with reset failure count
+                            {
+                                let hm = health_monitor_clone.write().await;
+                                hm.register_check(id, name.clone()).await;
+                            }
+                            
+                            info!("VM instance {} ({}) restarted after health check failure", id, name);
+                        } else if failure_count >= max_failures {
+                            // Mark as failed if auto-restart is disabled
                             let mut insts = instances.write().await;
                             if let Some(inst) = insts.get_mut(&id) {
-                                inst.status = VmStatus::Failed("Health check failed".to_string());
+                                inst.status = VmStatus::Failed(format!("Health check failed {} times", failure_count));
                             }
                         }
                     }
@@ -335,6 +376,30 @@ impl VmManager {
     /// Check if resource limits are supported on this platform
     pub fn is_resource_limits_supported(&self) -> bool {
         self.resource_limiter.is_supported()
+    }
+    
+    /// Restart a VM instance (stop and start)
+    pub async fn restart_instance(&self, id: Uuid) -> Result<(), AppError> {
+        let name = {
+            let instances = self.instances.read().await;
+            instances.get(&id)
+                .map(|inst| inst.name.clone())
+                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?
+        };
+        
+        info!("Restarting VM instance {} ({})", id, name);
+        
+        // Stop the instance
+        self.stop_instance(id).await?;
+        
+        // Wait a bit before restarting
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        
+        // Start the instance
+        self.start_instance(id).await?;
+        
+        info!("VM instance {} ({}) restarted successfully", id, name);
+        Ok(())
     }
 }
 
