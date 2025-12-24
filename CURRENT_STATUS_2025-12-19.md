@@ -9,8 +9,8 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок  
-**Статус тестів**: ✅ **41+ tests passing** (6 unit + 35+ integration)  
-**Останній коміт**: `ae0faed` - fix: remove unused imports and variables (compiler warnings)
+**Статус тестів**: ✅ **42+ tests passing** (6 unit + 36+ integration)  
+**Останній коміт**: `6160d48` - feat(vm): Health Checks Integration with auto-restart - Week 5 complete
 
 ---
 
@@ -33,7 +33,7 @@
 - **Модулів реалізовано**: 12 основних модулів
 - **API endpoints**: 30+ REST endpoints + WebSocket
 - **Unit tests**: 6 passing (libs constraints/versioning)
-- **Integration tests**: 35+ passing (4 libs + 4 raid + 9 security + 5 vm + 5 raid-libs + 8 resource-limits + 6 linux-limits + 6 windows-limits + 6 health)
+- **Integration tests**: 36+ passing (4 libs + 4 raid + 9 security + 5 vm + 5 raid-libs + 8 resource-limits + 6 linux-limits + 6 windows-limits + 7 health)
 - **Бінарних цілей**: 2 (poolai, poolai-worker)
 
 ---
@@ -137,7 +137,7 @@
 
 ---
 
-### 12. VM Module (`src/vm/`) — ✅ ~75% COMPLETED
+### 12. VM Module (`src/vm/`) — ✅ ~85% COMPLETED
 **Файли**: 3 (mod.rs, resources.rs, resources/linux.rs, resources/windows.rs)
 
 **Реалізовано**:
@@ -165,7 +165,13 @@
     - ✅ Resource usage monitoring (placeholder)
   - ✅ PID registration та mapping (process_id → native PID)
   - ✅ Integration з VmManager (автоматичне застосування limits при старті)
-- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 6 для health = 31 tests)
+- ✅ **Health Checks Integration** — **ЗАВЕРШЕНО (Week 5)** 🎉
+  - ✅ Auto-restart logic при health check failure
+  - ✅ Periodic health checks з правильним обробленням failure count
+  - ✅ `restart_instance()` method для manual restart
+  - ✅ HealthMonitor enhancements (get_failure_count, get_config)
+  - ✅ Integration tests (7 tests для health checks)
+- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health = 32 tests)
 
 **API Endpoints**:
 - ✅ `GET /api/v1/vm/instances` - список instances
@@ -175,7 +181,7 @@
 - ✅ `GET /api/v1/vm/resource-limits-supported` - перевірка підтримки resource limits
 
 **Залишилось**:
-- 🔄 Health checks integration з HealthMonitor (Week 5)
+- ✅ **Health Checks Integration** — **ЗАВЕРШЕНО (Week 5)** 🎉
 - 🔄 Isolation/security enforcement (sandbox/containers)
 - 🔄 GPU scheduling policy (advanced)
 
@@ -247,18 +253,20 @@
 
 ---
 
-### Пріоритет 3: Health Checks Integration (VM)
+### Пріоритет 3: Health Checks Integration (VM) — ✅ ЗАВЕРШЕНО (Week 5)
 **Мета**: Інтеграція VM instances з HealthMonitor для auto-restart
 
 **Залежності**: VM Process Runner (✅), Health Monitor (✅)
 
 **Завдання**:
-- [ ] Інтеграція VM instances з HealthMonitor
-- [ ] Periodic health checks для running VM processes
-- [ ] Auto-restart on health check failure
-- [ ] API endpoint для health status
+- [x] Інтеграція VM instances з HealthMonitor
+- [x] Periodic health checks для running VM processes
+- [x] Auto-restart on health check failure
+- [x] API endpoint для health status
+- [x] Restart instance method
+- [x] Integration tests (7 tests)
 
-**Оцінка**: 1 тиждень
+**Оцінка**: ✅ ЗАВЕРШЕНО (1 день замість 1 тижня - 7x прискорення)
 
 ---
 
@@ -440,10 +448,11 @@
    - ✅ API endpoints для resource limits
    - ✅ Integration tests (20 tests passing)
 
-3. **Health Checks Integration (VM)** — ⭐ ПРІОРИТЕТ (Week 5)
-   - HealthMonitor integration
-   - Auto-restart logic
-   - Health status API endpoint
+3. ✅ **Health Checks Integration (VM)** — ЗАВЕРШЕНО (Week 5)
+   - ✅ HealthMonitor integration
+   - ✅ Auto-restart logic
+   - ✅ Health status API endpoint
+   - ✅ Restart instance method
 
 4. **UI Write Operations** — Week 6-7
    - JWT authentication в UI
@@ -469,6 +478,11 @@
   - ✅ Windows Job Objects implementation
   - ✅ Platform-agnostic ResourceLimiter trait
   - ✅ 20 integration tests passing
+- ✅ **Health Checks Integration завершено (Week 5)** 🎉
+  - ✅ Auto-restart logic при health check failure
+  - ✅ Periodic health checks з правильним обробленням failure count
+  - ✅ Restart instance method
+  - ✅ 7 integration tests passing
 
 ### Виклики
 - 🔄 Health Checks Integration потребує реалізації (Week 5)
@@ -477,11 +491,11 @@
 ### Рекомендації
 1. ✅ **Пріоритет 1**: RAID-Libs Integration — ЗАВЕРШЕНО (Week 1)
 2. ✅ **Пріоритет 2**: Resource Limits Enforcement (VM) — ЗАВЕРШЕНО (Week 2-4)
-3. **Пріоритет 3**: Health Checks Integration (VM) - інтеграція з HealthMonitor (Week 5)
+3. ✅ **Пріоритет 3**: Health Checks Integration (VM) — ЗАВЕРШЕНО (Week 5)
 4. **Пріоритет 4**: UI Write Operations - тепер можна реалізувати (Security готовий) (Week 6-7)
 
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата**: 2025-12-23 (Updated after Week 1-4 completion)  
-**Версія**: 5.0
+**Дата**: 2025-12-23 (Updated after Week 1-5 completion)  
+**Версія**: 6.0
