@@ -30,7 +30,13 @@ async fn test_platform_resource_limiter_creation() {
         assert!(supported || !supported); // Always true, just checking it works
     }
     
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, depends on Job Objects availability
+        let _ = supported; // Just verify it doesn't panic
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
         assert!(!limiter.is_supported());
     }
@@ -162,7 +168,13 @@ async fn test_vm_manager_with_resource_limits() {
         let _ = supported; // Just verify it doesn't panic
     }
     
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, depends on Job Objects availability
+        let _ = supported; // Just verify it doesn't panic
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
         assert!(!supported);
     }
