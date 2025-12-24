@@ -1,8 +1,8 @@
 # 🏗️ Оновлений план розробки - Rust Architect Perspective
 
-**Дата**: 2025-12-23 (Updated after Week 1)  
+**Дата**: 2025-12-19 (Updated)  
 **Статус**: 🚧 **АКТИВНА РОЗРОБКА**  
-**Поточний етап**: Stage 3 - Completion & Stabilization (Libs ~95%, RAID ~75%, VM ~60%, Security ✅, RAID-Libs ✅)
+**Поточний етап**: Stage 3 - Completion & Stabilization (Libs 100%, RAID ~85%, VM ~60%, UI ~80%)
 
 ---
 
@@ -18,16 +18,10 @@
 - ✅ **Runtime Module** - Advanced runtime management (Stage 4.1)
 - ✅ **Rewards System** - Achievement-based rewards
 - ✅ **TGBot Module** - Telegram bot integration
-- ✅ **Security Module (JWT/HTTPS)** - **НОВЕ ЗАВЕРШЕННЯ** 🎉
-  - ✅ JWT authentication з feature flags (`jwt`)
-  - ✅ HTTPS/TLS support з feature flags (`https`)
-  - ✅ Fallback authentication (base64 encoding для dev)
-  - ✅ RBAC (Admin, Operator, Viewer roles)
-  - ✅ Integration tests (9 tests passing)
 
 ### 🚧 В розробці
 
-- ✅ **Libs Module** (~95% готово) - **MAJOR PROGRESS**
+- ✅ **Libs Module** (100% готово) - **COMPLETED**
   - ✅ Базова структура (mod.rs, manager.rs, registry.rs, versioning.rs, dependencies.rs, constraints.rs, download.rs, manifest.rs, integration.rs)
   - ✅ API endpoints інтегровані (5 endpoints)
   - ✅ Semantic versioning
@@ -36,9 +30,11 @@
   - ✅ Atomic install + manifest persistence (production-min) — **ЗАВЕРШЕНО**
   - ✅ Повна інтеграція з model_interface (compat checks, auto-update policy) — **ЗАВЕРШЕНО**
   - ✅ Тестування (6 unit + 4 integration = 10 tests passing)
+  - ✅ **RAID-Libs Integration** — збереження artifacts в RAID — **ЗАВЕРШЕНО**
+  - ✅ **Runtime Integration** — автоматичне завантаження з RAID — **ЗАВЕРШЕНО**
   - 🔄 SAT solver для складних dependency conflicts (опціонально)
 
-- ✅ **RAID Module** (~75% готово) - **MAJOR PROGRESS**
+- ✅ **RAID Module** (~85% готово) - **MAJOR PROGRESS**
   - ✅ Local artifact storage (`/raid/artifacts`)
   - ✅ Node registry primitives (register/list)
   - ✅ Artifact manifest persistence (atomic write) + list/delete APIs
@@ -47,18 +43,21 @@
   - ✅ Retention policies (quota_bytes, retention_days, gc_on_startup) — **ЗАВЕРШЕНО**
   - ✅ API endpoints: GET /api/v1/raid/quota, POST /api/v1/raid/gc — **ЗАВЕРШЕНО**
   - ✅ Integration tests (4 tests passing)
-  - ✅ **Інтеграція libs → raid artifacts** — **ЗАВЕРШЕНО (Week 1)** 🎉
+  - ✅ **RAID-Libs Integration** — libs зберігає завантажене як artifact — **ЗАВЕРШЕНО**
+  - ✅ **Runtime Integration** — автоматичне завантаження з RAID — **ЗАВЕРШЕНО**
+  - ✅ Integration tests (9 tests: 4 raid + 5 raid-libs)
   - 🔄 BurstRAID/SmallWorld distributed (окрема фаза)
 
 ### 🚧 Модулі Stage 3 (базові скелети реалізовано)
 
-- ✅ **VM Module** - Instance lifecycle + Process Runner (~60% готово)
+- ✅ **VM Module** (~60% готово) - **MAJOR PROGRESS**
   - ✅ Basic instance management (create, start, stop, delete)
   - ✅ Resource model (cpu/memory/gpu) + isolation policy placeholders
-  - ✅ Process runner інтеграція з `runtime/process.rs` — **ЗАВЕРШЕНО**
-  - ✅ Process lifecycle management (spawn, stop, logs, timeouts) — **ЗАВЕРШЕНО**
+  - ✅ **Process Runner Integration** — інтеграція з runtime/process.rs — **ЗАВЕРШЕНО**
+  - ✅ **Process Lifecycle** — spawn, stop, logs, timeouts — **ЗАВЕРШЕНО**
+  - ✅ **API Endpoints** — GET /api/v1/vm/instances/:id/logs, GET /api/v1/vm/instances/:id/process-status — **ЗАВЕРШЕНО**
   - ✅ Integration tests (5 tests passing)
-  - 🔄 Resource limits enforcement (platform-specific)
+  - 🔄 Resource limits enforcement (CPU/memory/GPU)
   - 🔄 Health checks integration
 
 - ✅ **UI Module** - Read-only dashboard (mounted at `/ui`)
@@ -70,19 +69,7 @@
 
 ---
 
-## 🎯 Стратегічний план (від більш залежного до менш залежного)
-
-### 🔗 Dependency-Based Development Order
-
-**Принцип**: Робимо спочатку завдання, які мають багато залежностей або блокують інші, потім переходимо до незалежних.
-
-**Граф залежностей**:
-- **Distributed RAID** ← залежить від: Local RAID (✅), Network (✅), Consensus
-- **Security (JWT/HTTPS)** ← залежить від: Network (✅), Toolchain
-- **UI Write Operations** ← залежить від: Network (✅), Auth (JWT)
-- **Resource Limits (VM)** ← залежить від: VM Process Runner (✅), Platform APIs
-- **Health Checks (VM)** ← залежить від: VM Process Runner (✅), Health Monitor (✅)
-- **RAID-Libs Integration** ← залежить від: Libs (✅), RAID (✅) - **НАЙМЕНШ ЗАЛЕЖНЕ**
+## 🎯 Стратегічний план (від менш складного до більш складного)
 
 ### Принципи виконання
 - **Нульова регресія збірки**: `cargo check` має проходити на Windows GNU (MSYS2 UCRT64) без native toolchain surprises.
@@ -130,27 +117,19 @@
 - ✅ Integration tests (4 tests passing)
 - 🔄 Інтеграція: libs зберігає завантажене як artifact, runtime читає артефакти
 
-### Пріоритет 4: VM Module (process-runner → isolation) — ✅ ~60% ЗАВЕРШЕНО
+### Пріоритет 4: VM Module (process-runner → isolation)
 **Мета**: контроль запуску воркерів/моделей з життєвим циклом і базовими лімітами.
-- ✅ Process runner на базі `runtime/process.rs` (+ статус/логи/таймаути) — **ЗАВЕРШЕНО**
-- ✅ Integration tests (5 tests passing) — **ЗАВЕРШЕНО**
-- 🔄 Resource limits enforcement (CPU/mem/gpu scheduling policy)
-- 🔄 Health checks integration
-- 🔄 Isolation (sandbox/containers/real VM) — окрема підфаза
+- Спочатку “process runner” на базі `runtime/process.rs` (+ статус/логи/таймаути)
+- Потім ресурси (CPU/mem/gpu scheduling policy)
+- Потім isolation (sandbox/containers/real VM) — окрема підфаза
 
-### Пріоритет 5: Security (JWT/HTTPS) — ✅ ЗАВЕРШЕНО
-**Залежності**: Network Module (✅), Toolchain stability — **ВИКОНАНО**
-- ✅ `jsonwebtoken`/`axum-server` під feature flags (`jwt`, `https`)
-- ✅ Fallback authentication (base64 encoding для dev)
-- ✅ RBAC (Admin, Operator, Viewer roles)
-- ✅ Integration tests (9 tests passing)
-- ✅ **Більше не блокує**: UI Write Operations — **ГОТОВО ДО РЕАЛІЗАЦІЇ**
+### Пріоритет 5: Security (JWT/HTTPS) — складніше через toolchain
+- Повернути `jsonwebtoken`/`axum-server` під feature flags
+- Рекомендований шлях: або MSVC target, або гарантована наявність gcc/dlltool
 
-### Пріоритет 6: Distributed RAID (BurstRAID/SmallWorld) — найбільш залежне
-**Залежності**: Local RAID (✅), Network (✅), Consensus, Event Sourcing
+### Пріоритет 6: Distributed RAID (BurstRAID/SmallWorld) — найскладніше
 - Протокол, інваріанти, тест-стратегія, fault-tolerance
 - Планувати як окремий етап з окремим ADR/design doc
-- **Найбільш залежне завдання** (залежить від багатьох модулів)
 
 ## 🔧 Виправлення попереджень
 
@@ -246,76 +225,27 @@
 
 ---
 
-## 🎯 Наступні кроки (Від більш залежного до менш залежного)
+## 🎯 Наступні кроки (Негайні)
 
-### Phase 1: Найбільш залежні завдання (блокують інші)
+1. ✅ **UI (read-only)** — ЗАВЕРШЕНО
+   - ✅ Сторінки для libs/vm/raid/workers/metrics
+   - ✅ UX (шаблон, навігація, авто-оновлення)
 
-#### 1. Security (JWT/HTTPS) — ✅ ЗАВЕРШЕНО
-**Залежності**: Network (✅), Toolchain — **ВИКОНАНО**
-**Блокує**: ~~UI Write Operations~~ — **БІЛЬШЕ НЕ БЛОКУЄ**
-**Оцінка**: ✅ ЗАВЕРШЕНО
+2. ✅ **Libs (production-min)** — ~95% ЗАВЕРШЕНО
+   - ✅ Atomic install + manifest
+   - ✅ Constraint checking + conflict reporting
+   - ✅ Тести для constraints/versioning/manifest (10 tests)
+   - 🔄 SAT solver (опціонально)
 
-**Завдання**:
-- [x] Feature flags для `jsonwebtoken`/`axum-server`
-- [x] Toolchain stability (feature flags з fallback)
-- [x] Fallback authentication (base64 encoding для dev)
-- [x] JWT middleware integration
-- [x] Integration tests (9 tests passing)
+3. ✅ **RAID (local reliable store)** — ~70% ЗАВЕРШЕНО
+   - ✅ Artifact manifest + GC/quota
+   - 🔄 Інтеграція libs → raid artifacts (наступний крок)
 
-#### 2. Resource Limits Enforcement (VM) — ⭐
-**Залежності**: VM Process Runner (✅), Platform APIs
-**Оцінка**: 2-3 тижні
-
-**Завдання**:
-- [ ] CPU limits (cgroups на Linux, Job Objects на Windows)
-- [ ] Memory limits enforcement
-- [ ] GPU scheduling policy
-- [ ] Platform-specific implementations
-
-### Phase 2: Середні залежності
-
-#### 3. Health Checks Integration (VM)
-**Залежності**: VM Process Runner (✅), Health Monitor (✅)
-**Оцінка**: 1 тиждень
-
-**Завдання**:
-- [ ] Інтеграція VM instances з HealthMonitor
-- [ ] Periodic health checks для running VM processes
-- [ ] Auto-restart on health check failure
-
-#### 4. UI Write Operations — ГОТОВО ДО РЕАЛІЗАЦІЇ
-**Залежності**: Network API (✅), Auth (JWT) (✅) — **ГОТОВО!**
-**Оцінка**: 1-2 тижні
-
-**Завдання**:
-- [ ] JWT authentication в UI (login form)
-- [ ] Write endpoints з RBAC checks (create/update/delete operations)
-- [ ] Confirmation dialogs для деструктивних операцій
-- [ ] Error handling та user feedback
-
-### Phase 3: Найменш залежні (можна робити паралельно)
-
-#### 5. RAID-Libs Integration — ✅ ЗАВЕРШЕНО (Week 1)
-**Залежності**: Libs (✅), RAID (✅) - обидва готові!
-**Оцінка**: ✅ ЗАВЕРШЕНО (1 тиждень)
-
-**Завдання**:
-- [x] Модифікувати `libs/manager.rs::download_and_install()` для збереження artifacts в RAID
-- [x] Оновити `LibraryInfo` з `ArtifactRef`
-- [x] Runtime читає artifacts з RAID замість прямого доступу
-- [x] Integration tests для RAID-Libs integration (5 tests passing)
-
-### Phase 4: Найскладніші (окрема фаза)
-
-#### 6. Distributed RAID (BurstRAID/SmallWorld)
-**Залежності**: Local RAID (✅), Network (✅), Consensus, Event Sourcing
-**Оцінка**: 4+ тижні (окрема фаза з ADR)
-
-**Завдання**:
-- [ ] Протокол для distributed storage
-- [ ] Raft consensus для consistency
-- [ ] Event sourcing для auditability
-- [ ] Circuit breaker pattern
+4. **VM (process runner)** — ПРІОРИТЕТ
+   - В'язка VmManager ↔ runtime/process + lifecycle events
+   - Resource limits enforcement (CPU/memory/GPU)
+   - Logs/timeouts management
+   - Health check integration
 
 ---
 

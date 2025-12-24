@@ -51,8 +51,7 @@ pub use platform::{GpuInfo, get_gpu_info};
 pub use libs::{LibraryManager, LibraryInfo, LibraryStatus, LibraryType};
 
 // Re-export VM types
-pub use vm::{VmManager, VmInstance, VmStatus, VmResources, VmIsolation};
-pub use vm::resources::{ResourceLimits, ResourceUsage};
+pub use vm::{VmManager, VmInstance, VmStatus, VmResources, VmIsolation, ResourceLimits, ResourceUsage};
 
 // Re-export RAID types
 pub use raid::{RaidManager, RaidConfig, RaidMode, RaidNode, ArtifactRef};

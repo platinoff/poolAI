@@ -88,8 +88,7 @@ pub fn create_api_routes() -> Router {
         .route("/libraries/:name/uninstall", post(library_uninstall_handler))
         .route("/libraries/:name/update", post(library_update_handler))
         .route("/vm/instances", get(vm_instances_handler))
-        .route("/vm/instances/:id/logs", get(vm_instance_logs_handler))
-        .route("/vm/instances/:id/process-status", get(vm_instance_process_status_handler))
+        .route("/vm/instances/:id/health", get(vm_instance_health_handler))
         .route("/vm/instances/:id/resources", get(vm_instance_resources_handler))
         .route("/vm/resource-limits-supported", get(vm_resource_limits_supported_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
@@ -104,7 +103,7 @@ async fn vm_instances_handler() -> impl IntoResponse {
     Json(instances)
 }
 
-async fn vm_instance_logs_handler(
+async fn vm_instance_resources_handler(
     axum::extract::Path(id): axum::extract::Path<String>,
 ) -> impl IntoResponse {
     let manager = vm::get_global_manager();
@@ -117,17 +116,26 @@ async fn vm_instance_logs_handler(
         }
     };
 
-    match manager.get_instance_logs(uuid).await {
-        Ok(logs) => Json(logs).into_response(),
+    match manager.get_instance_resource_usage(uuid).await {
+        Ok(usage) => Json(usage).into_response(),
         Err(e) => {
-            (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
-                "error": format!("{}", e)
-            }))).into_response()
+            let error_response = serde_json::json!({
+                "error": e.to_string()
+            });
+            (axum::http::StatusCode::NOT_FOUND, Json(error_response)).into_response()
         }
     }
 }
 
-async fn vm_instance_process_status_handler(
+async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let supported = manager.is_resource_limits_supported();
+    Json(serde_json::json!({
+        "supported": supported
+    }))
+}
+
+async fn vm_instance_health_handler(
     axum::extract::Path(id): axum::extract::Path<String>,
 ) -> impl IntoResponse {
     let manager = vm::get_global_manager();
@@ -140,10 +148,34 @@ async fn vm_instance_process_status_handler(
         }
     };
 
-    match manager.get_instance_process_status(uuid).await {
-        Ok(status) => Json(status).into_response(),
-        Err(e) => {
+    match manager.get_instance_health(uuid).await {
+        Ok(Some(status)) => {
+            match status {
+                crate::runtime::health::HealthStatus::Healthy => {
+                    Json(serde_json::json!({
+                        "status": "healthy"
+                    })).into_response()
+                }
+                crate::runtime::health::HealthStatus::Unhealthy(reason) => {
+                    Json(serde_json::json!({
+                        "status": "unhealthy",
+                        "reason": reason
+                    })).into_response()
+                }
+                crate::runtime::health::HealthStatus::Unknown => {
+                    Json(serde_json::json!({
+                        "status": "unknown"
+                    })).into_response()
+                }
+            }
+        }
+        Ok(None) => {
             (axum::http::StatusCode::NOT_FOUND, Json(serde_json::json!({
+                "error": "Health check not registered for this instance"
+            }))).into_response()
+        }
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
                 "error": format!("{}", e)
             }))).into_response()
         }
@@ -547,45 +579,4 @@ async fn library_update_handler(
             "error": "Library manager not initialized"
         }))).into_response()
     }
-}
-
-async fn vm_instance_resources_handler(
-    axum::extract::Path(id): axum::extract::Path<String>,
-) -> impl IntoResponse {
-    let manager = vm::get_global_manager();
-    let uuid = match uuid::Uuid::parse_str(&id) {
-        Ok(u) => u,
-        Err(_) => {
-            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
-                "error": "Invalid UUID format"
-            }))).into_response();
-        }
-    };
-    
-    match manager.get_instance_resource_usage(uuid).await {
-        Ok(usage) => Json(usage).into_response(),
-        Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
-            "error": format!("Failed to get resource usage: {}", e)
-        }))).into_response(),
-    }
-}
-
-async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
-    let manager = vm::get_global_manager();
-    let supported = manager.is_resource_limits_supported();
-    
-    let platform_os = if cfg!(target_os = "linux") {
-        "linux"
-    } else if cfg!(target_os = "windows") {
-        "windows"
-    } else {
-        "unknown"
-    };
-    
-    Json(serde_json::json!({
-        "supported": supported,
-        "platform": {
-            "os": platform_os
-        }
-    }))
 } 

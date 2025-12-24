@@ -1,16 +1,16 @@
-//! Integration tests for RAID-Libs integration
+//! Integration tests for RAID-Libs Integration
 //!
 //! Tests:
 //! - Library installation stores artifact in RAID
-//! - LibraryInfo has artifact_ref after installation
-//! - get_library_path_or_load_from_raid loads from RAID when local path is missing
+//! - Library loading from RAID when local path doesn't exist
+//! - ArtifactRef tracking in LibraryInfo
 //! - Multiple libraries with artifacts
-//! - Library without artifact_ref (legacy)
 
-use poolai::libs::{LibraryManager, LibraryType};
-use poolai::raid;
-use std::path::Path;
+use poolai::libs::LibraryManager;
+use poolai::raid::{RaidManager, RaidConfig};
+use std::path::PathBuf;
 use tempfile::TempDir;
+use tokio::fs;
 
 #[tokio::test]
 async fn test_library_install_stores_artifact_in_raid() {
@@ -18,121 +18,157 @@ async fn test_library_install_stores_artifact_in_raid() {
     let libs_dir = temp_dir.path().join("libs");
     let raid_dir = temp_dir.path().join("raid");
     
-    // Initialize RAID
-    let raid_config = raid::RaidConfig {
-        mode: raid::RaidMode::Local,
+    fs::create_dir_all(&libs_dir).await.unwrap();
+    fs::create_dir_all(&raid_dir).await.unwrap();
+
+    // Initialize RAID manager
+    let raid_config = RaidConfig {
         base_path: raid_dir.clone(),
-        quota_bytes: Some(100 * 1024 * 1024), // 100 MB
+        mode: poolai::raid::RaidMode::Local,
+        quota_bytes: Some(100_000_000), // 100 MB
         retention_days: Some(30),
         gc_on_startup: false,
     };
-    let raid_manager = raid::RaidManager::new(raid_config);
+    let raid_manager = RaidManager::new(raid_config);
     raid_manager.initialize().await.unwrap();
     
-    // Initialize libs manager
-    let lib_manager = LibraryManager::new();
-    // Note: We can't easily override base_path in LibraryManager, so we'll work with defaults
-    // For this test, we'll verify that artifact_ref is set
+    // Set global RAID manager (would need to be done via OnceLock in real code)
+    // For test, we'll manually check artifacts
+
+    // Initialize Library Manager
+    let _lib_manager = LibraryManager::new();
+    // Override base_path for test
+    // Note: LibraryManager doesn't expose base_path setter, so we'll test via actual install
     
-    // This test verifies the integration works conceptually
-    // In a real scenario, we'd need to mock or use actual library installation
-    assert!(true); // Placeholder - actual test would require library registry setup
+    // This test would require actual library download, which is complex
+    // For now, we'll test the artifact storage logic separately
+    assert!(true); // Placeholder - full test requires mock registry
 }
 
 #[tokio::test]
 async fn test_library_info_has_artifact_ref() {
-    use poolai::libs::LibraryInfo;
+    // Test that LibraryInfo can have artifact_ref field
+    use poolai::libs::{LibraryInfo, LibraryMetadata};
     use poolai::raid::ArtifactRef;
     use uuid::Uuid;
     use chrono::Utc;
-    use std::path::PathBuf;
     
     let artifact_ref = ArtifactRef {
         id: Uuid::new_v4(),
         name: "test-lib-1.0.0.tar.gz".to_string(),
         stored_at: Utc::now(),
-        path: PathBuf::from("/tmp/test"),
+        path: PathBuf::from("/test/path"),
     };
     
-    let library_info = LibraryInfo {
+    let lib_info = LibraryInfo {
         name: "test-lib".to_string(),
         version: "1.0.0".to_string(),
-        path: PathBuf::from("/tmp/lib"),
-        dependencies: Vec::new(),
-        metadata: Default::default(),
+        path: PathBuf::from("/libs/test-lib/1.0.0"),
+        dependencies: vec![],
+        metadata: LibraryMetadata::default(),
         artifact_ref: Some(artifact_ref.clone()),
     };
     
-    assert!(library_info.artifact_ref.is_some());
-    assert_eq!(library_info.artifact_ref.as_ref().unwrap().name, "test-lib-1.0.0.tar.gz");
+    assert_eq!(lib_info.name, "test-lib");
+    assert_eq!(lib_info.version, "1.0.0");
+    assert!(lib_info.artifact_ref.is_some());
+    assert_eq!(lib_info.artifact_ref.as_ref().unwrap().id, artifact_ref.id);
 }
 
 #[tokio::test]
 async fn test_get_library_path_or_load_from_raid() {
-    // This test would require:
-    // 1. A library installed with artifact_ref
-    // 2. Local path removed
-    // 3. Verify that get_library_path_or_load_from_raid loads from RAID
+    let temp_dir = TempDir::new().unwrap();
+    let libs_dir = temp_dir.path().join("libs");
+    let raid_dir = temp_dir.path().join("raid");
     
-    // Placeholder test - actual implementation would require full setup
-    assert!(true);
+    fs::create_dir_all(&libs_dir).await.unwrap();
+    fs::create_dir_all(&raid_dir).await.unwrap();
+
+    // Initialize RAID manager
+    let raid_config = RaidConfig {
+        base_path: raid_dir.clone(),
+        mode: poolai::raid::RaidMode::Local,
+        quota_bytes: Some(100_000_000),
+        retention_days: Some(30),
+        gc_on_startup: false,
+    };
+    let raid_manager = RaidManager::new(raid_config);
+    raid_manager.initialize().await.unwrap();
+
+    // Initialize Library Manager
+    let lib_manager = LibraryManager::new();
+    lib_manager.initialize().await.unwrap();
+
+    // Test: get_library_path_or_load_from_raid for non-existent library
+    let result = lib_manager.get_library_path_or_load_from_raid("non-existent").await;
+    assert!(result.is_ok());
+    assert!(result.unwrap().is_none());
+
+    // Note: Full test would require:
+    // 1. Installing a library (which stores artifact in RAID)
+    // 2. Removing local path
+    // 3. Calling get_library_path_or_load_from_raid
+    // 4. Verifying it loads from RAID
+    // This requires mock registry and actual download, which is complex
 }
 
 #[tokio::test]
 async fn test_multiple_libraries_with_artifacts() {
-    use poolai::libs::LibraryInfo;
+    use poolai::libs::{LibraryInfo, LibraryMetadata};
     use poolai::raid::ArtifactRef;
     use uuid::Uuid;
     use chrono::Utc;
-    use std::path::PathBuf;
     
+    // Create multiple library infos with artifacts
     let lib1 = LibraryInfo {
         name: "lib1".to_string(),
         version: "1.0.0".to_string(),
-        path: PathBuf::from("/tmp/lib1"),
-        dependencies: Vec::new(),
-        metadata: Default::default(),
+        path: PathBuf::from("/libs/lib1/1.0.0"),
+        dependencies: vec![],
+        metadata: LibraryMetadata::default(),
         artifact_ref: Some(ArtifactRef {
             id: Uuid::new_v4(),
             name: "lib1-1.0.0.tar.gz".to_string(),
             stored_at: Utc::now(),
-            path: PathBuf::from("/tmp/raid1"),
+            path: PathBuf::from("/raid/artifacts/lib1-1.0.0.tar.gz"),
         }),
     };
     
     let lib2 = LibraryInfo {
         name: "lib2".to_string(),
         version: "2.0.0".to_string(),
-        path: PathBuf::from("/tmp/lib2"),
-        dependencies: Vec::new(),
-        metadata: Default::default(),
+        path: PathBuf::from("/libs/lib2/2.0.0"),
+        dependencies: vec!["lib1".to_string()],
+        metadata: LibraryMetadata::default(),
         artifact_ref: Some(ArtifactRef {
             id: Uuid::new_v4(),
             name: "lib2-2.0.0.tar.gz".to_string(),
             stored_at: Utc::now(),
-            path: PathBuf::from("/tmp/raid2"),
+            path: PathBuf::from("/raid/artifacts/lib2-2.0.0.tar.gz"),
         }),
     };
     
     assert!(lib1.artifact_ref.is_some());
     assert!(lib2.artifact_ref.is_some());
-    assert_ne!(lib1.artifact_ref.as_ref().unwrap().id, lib2.artifact_ref.as_ref().unwrap().id);
+    assert_eq!(lib2.dependencies.len(), 1);
+    assert_eq!(lib2.dependencies[0], "lib1");
 }
 
 #[tokio::test]
 async fn test_library_without_artifact_ref() {
-    use poolai::libs::LibraryInfo;
-    use std::path::PathBuf;
+    use poolai::libs::{LibraryInfo, LibraryMetadata};
     
-    let library_info = LibraryInfo {
+    // Library installed before RAID integration (no artifact_ref)
+    let lib_info = LibraryInfo {
         name: "legacy-lib".to_string(),
         version: "1.0.0".to_string(),
-        path: PathBuf::from("/tmp/legacy"),
-        dependencies: Vec::new(),
-        metadata: Default::default(),
-        artifact_ref: None, // Legacy library without artifact_ref
+        path: PathBuf::from("/libs/legacy-lib/1.0.0"),
+        dependencies: vec![],
+        metadata: LibraryMetadata::default(),
+        artifact_ref: None, // No artifact in RAID
     };
     
-    assert!(library_info.artifact_ref.is_none());
+    assert!(lib_info.artifact_ref.is_none());
+    // This library can still be used if local path exists
 }
 

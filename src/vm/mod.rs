@@ -4,19 +4,18 @@
 //! - VM instance management (planned in `poolAI_concept.txt`)
 //! - Isolation/security hooks (stubbed)
 //! - Resource optimization primitives (basic)
-//! - Resource limits enforcement (Week 2+)
+
+mod resources;
+pub use resources::{ResourceLimits, ResourceLimiter, ResourceUsage, PlatformResourceLimiter};
 
 use crate::core::error::AppError;
-use crate::runtime::ProcessManager;
-
-pub mod resources;
-pub use resources::{ResourceLimits, ResourceUsage, ResourceLimiter};
+use crate::runtime::health::{HealthMonitor, HealthStatus};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
+use tokio::time::Duration;
 use tracing::{info, warn};
 use uuid::Uuid;
 
@@ -65,39 +64,131 @@ pub struct VmInstance {
     pub status: VmStatus,
     pub resources: VmResources,
     pub isolation: VmIsolation,
-    /// Process ID from ProcessManager (if running)
-    pub process_id: Option<Uuid>,
-    /// Command to execute when starting
-    pub command: Option<String>,
-    /// Command arguments
-    pub args: Vec<String>,
-    /// Working directory
-    pub working_dir: Option<PathBuf>,
 }
 
 /// VM Manager - central orchestrator for VM instances.
 pub struct VmManager {
     instances: Arc<RwLock<HashMap<Uuid, VmInstance>>>,
-    process_manager: Arc<RwLock<ProcessManager>>,
-    resource_limiter: Arc<dyn ResourceLimiter + Send + Sync>,
+    health_monitor: Arc<RwLock<HealthMonitor>>,
+    #[allow(dead_code)] // Used for periodic health checks
+    health_check_task: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
+    resource_limiter: Arc<dyn ResourceLimiter>,
 }
 
 impl VmManager {
     pub fn new() -> Self {
+        let health_monitor = Arc::new(RwLock::new(HealthMonitor::new(30))); // 30 second interval
+        let resource_limiter: Arc<dyn ResourceLimiter> = Arc::new(PlatformResourceLimiter::new());
+        
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
-            process_manager: Arc::new(RwLock::new(ProcessManager::new())),
-            resource_limiter: Arc::new(resources::PlatformResourceLimiter::new()) as Arc<dyn ResourceLimiter + Send + Sync>,
+            health_monitor,
+            health_check_task: Arc::new(RwLock::new(None)),
+            resource_limiter,
         }
     }
 
     pub async fn initialize(&self) -> Result<(), AppError> {
         info!("Initializing VM manager");
+        
+        // Initialize health monitor
+        {
+            let mut hm = self.health_monitor.write().await;
+            hm.initialize().await
+                .map_err(|e| AppError::ConfigError(format!("Failed to initialize health monitor: {}", e)))?;
+            hm.start().await
+                .map_err(|e| AppError::ConfigError(format!("Failed to start health monitor: {}", e)))?;
+        }
+        
+        // Start periodic health checks for running VM instances
+        self.start_periodic_health_checks().await;
+        
         Ok(())
+    }
+    
+    /// Start periodic health checks for running VM instances
+    async fn start_periodic_health_checks(&self) {
+        let instances = Arc::clone(&self.instances);
+        let health_monitor = Arc::clone(&self.health_monitor);
+        
+        let task = tokio::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(30));
+            
+            loop {
+                interval.tick().await;
+                
+                // Get all running instances
+                let running_instances: Vec<(Uuid, String)> = {
+                    let insts = instances.read().await;
+                    insts.values()
+                        .filter(|inst| matches!(inst.status, VmStatus::Running))
+                        .map(|inst| (inst.id, inst.name.clone()))
+                        .collect()
+                };
+                
+                // Perform health check for each running instance
+                for (id, name) in running_instances {
+                    let instances_clone = Arc::clone(&instances);
+                    let health_status = {
+                        let hm = health_monitor.read().await;
+                        hm.check_process_health(id, move || {
+                            let instances = Arc::clone(&instances_clone);
+                            Box::pin(async move {
+                                // Check if instance is still running
+                                let insts = instances.read().await;
+                                match insts.get(&id) {
+                                    Some(inst) if matches!(inst.status, VmStatus::Running) => {
+                                        Ok(())
+                                    }
+                                    _ => {
+                                        Err(AppError::ValidationError(format!("VM instance {} is not running", id)))
+                                    }
+                                }
+                            })
+                        }).await
+                    };
+                    
+                    // Handle unhealthy status
+                    if matches!(health_status, HealthStatus::Unhealthy(_)) {
+                        warn!("VM instance {} ({}) health check failed", id, name);
+                        
+                        // Auto-restart if configured
+                        // Check failure count and auto-restart config
+                        // For now, we'll restart after 3 failures
+                        let should_restart = true; // TODO: Get from config
+                        
+                        if should_restart {
+                            warn!("Auto-restarting VM instance {} ({})", id, name);
+                            // TODO: Implement restart logic
+                            // For now, just mark as failed
+                            let mut insts = instances.write().await;
+                            if let Some(inst) = insts.get_mut(&id) {
+                                inst.status = VmStatus::Failed("Health check failed".to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        *self.health_check_task.write().await = Some(task);
     }
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
         info!("Shutting down VM manager");
+        
+        // Stop health check task
+        if let Some(task) = self.health_check_task.write().await.take() {
+            task.abort();
+        }
+        
+        // Shutdown health monitor
+        {
+            let mut hm = self.health_monitor.write().await;
+            hm.shutdown().await
+                .map_err(|e| AppError::ConfigError(format!("Failed to shutdown health monitor: {}", e)))?;
+        }
+        
         Ok(())
     }
 
@@ -106,26 +197,18 @@ impl VmManager {
         name: String,
         resources: VmResources,
         isolation: VmIsolation,
-        command: Option<String>,
-        args: Vec<String>,
-        working_dir: Option<PathBuf>,
     ) -> Result<VmInstance, AppError> {
         let id = Uuid::new_v4();
         let instance = VmInstance {
             id,
-            name: name.clone(),
+            name,
             created_at: Utc::now(),
             status: VmStatus::Creating,
             resources,
             isolation,
-            process_id: None,
-            command,
-            args,
-            working_dir,
         };
 
         self.instances.write().await.insert(id, instance.clone());
-        info!("Created VM instance {}: {}", id, name);
         Ok(instance)
     }
 
@@ -143,171 +226,112 @@ impl VmManager {
     }
 
     pub async fn start_instance(&self, id: Uuid) -> Result<(), AppError> {
-        // Get command and args before spawning process
-        let (command, args, working_dir, memory_mb) = {
-            let instances = self.instances.read().await;
+        let name = {
+            let mut instances = self.instances.write().await;
             let inst = instances
-                .get(&id)
+                .get_mut(&id)
                 .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-            
-            (inst.command.clone(), inst.args.clone(), inst.working_dir.clone(), inst.resources.memory_mb)
+
+            inst.status = VmStatus::Running;
+            inst.name.clone()
         };
-
-        // If instance has a command, spawn it via ProcessManager
-        if let Some(cmd) = command {
-            let config = crate::runtime::ProcessConfig {
-                command: cmd,
-                args,
-                working_dir,
-                env: HashMap::new(), // TODO: Add environment variables support
-                timeout_seconds: Some(3600), // 1 hour default timeout
-                cpu_limit_percent: None, // TODO: Map from resources.cpu_cores
-                memory_limit_mb: Some(memory_mb),
-                capture_logs: true,
-            };
-
-            let process_id = {
-                let pm = self.process_manager.write().await;
-                pm.spawn_process(config).await?
-            };
-
-            // Apply resource limits after process is spawned
-            {
-                // Get PID from ProcessManager and register it
-                let pid = {
-                    let pm = self.process_manager.read().await;
-                    pm.get_process_pid(process_id).await.ok().flatten()
-                };
-
-                if let Some(pid) = pid {
-                    // Register PID in resource limiter (needed for Linux cgroups)
-                    self.resource_limiter.register_process_pid(process_id, pid).await;
-                    
-                    // Get limits and apply them
-                    let instances = self.instances.read().await;
-                    let inst = instances.get(&id).ok_or_else(|| {
-                        AppError::ValidationError(format!("VM instance {} not found after spawn", id))
-                    })?;
-                    
-                    let limits = ResourceLimits::from(inst.resources.clone());
-                    drop(instances); // Release lock before async call
-                    
-                    // Apply limits (PID is now registered)
-                    if let Err(e) = self.resource_limiter.apply_limits(process_id, &limits).await {
-                        warn!("Failed to apply resource limits to process {}: {}", process_id, e);
-                        // Continue anyway - limits are not critical for basic operation
-                    }
-                } else {
-                    warn!("Could not get PID for process {}, skipping resource limits", process_id);
-                }
-            }
-
-            // Update instance with process_id
-            let mut instances = self.instances.write().await;
-            let inst = instances.get_mut(&id).unwrap();
-            inst.process_id = Some(process_id);
-            inst.status = VmStatus::Running;
-            info!("Started VM instance {} with process {}", id, process_id);
-        } else {
-            // No command specified, just mark as running
-            let mut instances = self.instances.write().await;
-            let inst = instances.get_mut(&id).unwrap();
-            inst.status = VmStatus::Running;
-            info!("Started VM instance {} (no command)", id);
+        
+        // Register health check for this instance
+        {
+            let hm = self.health_monitor.write().await;
+            hm.register_check(id, name).await;
         }
-
+        
+        info!("VM instance {} started and registered for health checks", id);
         Ok(())
     }
 
     pub async fn stop_instance(&self, id: Uuid) -> Result<(), AppError> {
-        // Get process_id before stopping
-        let process_id = {
-            let instances = self.instances.read().await;
-            let inst = instances
-                .get(&id)
-                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-            inst.process_id
-        };
-
-        // Stop process if running
-        if let Some(pid) = process_id {
-            let pm = self.process_manager.write().await;
-            if let Err(e) = pm.stop_process(pid).await {
-                warn!("Failed to stop process {} for VM {}: {}", pid, id, e);
-            }
+        // Unregister health check
+        {
+            let hm = self.health_monitor.write().await;
+            hm.unregister_check(id).await;
         }
-
-        // Update instance status
+        
         let mut instances = self.instances.write().await;
-        let inst = instances.get_mut(&id).unwrap();
-        inst.process_id = None;
+        let inst = instances
+            .get_mut(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+
         inst.status = VmStatus::Stopped;
-        info!("Stopped VM instance {}", id);
+        info!("VM instance {} stopped and unregistered from health checks", id);
         Ok(())
     }
-
-    /// Get process logs for a VM instance
-    pub async fn get_instance_logs(&self, id: Uuid) -> Result<crate::runtime::ProcessLogs, AppError> {
-        let instances = self.instances.read().await;
-        let inst = instances
-            .get(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-
-        let process_id = inst.process_id
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
-
-        drop(instances); // Release lock before async call
-
-        let pm = self.process_manager.read().await;
-        pm.get_process_logs(process_id).await
+    
+    /// Get health status for a VM instance
+    pub async fn get_instance_health(&self, id: Uuid) -> Result<Option<HealthStatus>, AppError> {
+        let health_monitor = self.health_monitor.read().await;
+        Ok(health_monitor.get_health_status(id).await)
     }
-
-    /// Get process status for a VM instance
-    pub async fn get_instance_process_status(&self, id: Uuid) -> Result<crate::runtime::ProcessStatus, AppError> {
-        let instances = self.instances.read().await;
-        let inst = instances
-            .get(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-
-        let process_id = inst.process_id
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
-
-        drop(instances); // Release lock before async call
-
-        let pm = self.process_manager.read().await;
-        pm.get_process_status(process_id).await
+    
+    /// Perform manual health check for a VM instance
+    pub async fn check_instance_health(&self, id: Uuid) -> Result<HealthStatus, AppError> {
+        let instances = Arc::clone(&self.instances);
+        let health_monitor = Arc::clone(&self.health_monitor);
+        
+        let status = {
+            let hm = health_monitor.read().await;
+            let instances_clone = Arc::clone(&instances);
+            hm.check_process_health(id, move || {
+                let instances = Arc::clone(&instances_clone);
+                Box::pin(async move {
+                    // Check if instance is still running
+                    let insts = instances.read().await;
+                    match insts.get(&id) {
+                        Some(inst) if matches!(inst.status, VmStatus::Running) => {
+                            Ok(())
+                        }
+                        Some(_) => {
+                            Err(AppError::ValidationError(format!("VM instance {} is not running", id)))
+                        }
+                        None => {
+                            Err(AppError::ValidationError(format!("VM instance {} not found", id)))
+                        }
+                    }
+                })
+            }).await
+        };
+        
+        Ok(status)
     }
-
-    /// Apply resource limits to a VM instance
-    pub async fn apply_resource_limits(&self, id: Uuid, limits: ResourceLimits) -> Result<(), AppError> {
+    
+    /// Apply resource limits to a command (for future process spawning)
+    pub async fn apply_resource_limits(
+        &self,
+        command: &mut tokio::process::Command,
+        instance_id: Uuid,
+    ) -> Result<(), AppError> {
         let instances = self.instances.read().await;
-        let inst = instances
-            .get(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-
-        let process_id = inst.process_id
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
-
-        drop(instances); // Release lock before async call
-
-        self.resource_limiter.apply_limits(process_id, &limits).await
+        let instance = instances
+            .get(&instance_id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", instance_id)))?;
+        
+        let limits = ResourceLimits::from(instance.resources.clone());
+        self.resource_limiter.apply_limits(command, &limits).await
     }
-
+    
     /// Get resource usage for a VM instance
-    pub async fn get_instance_resource_usage(&self, id: Uuid) -> Result<ResourceUsage, AppError> {
+    pub async fn get_instance_resource_usage(
+        &self,
+        instance_id: Uuid,
+    ) -> Result<ResourceUsage, AppError> {
         let instances = self.instances.read().await;
-        let inst = instances
-            .get(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-
-        let process_id = inst.process_id
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} has no process", id)))?;
-
-        drop(instances); // Release lock before async call
-
-        self.resource_limiter.get_usage(process_id).await
+        let instance = instances
+            .get(&instance_id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", instance_id)))?;
+        
+        // TODO: Get actual process_id from instance when process spawning is implemented
+        // For now, return placeholder
+        Err(AppError::ConfigError(
+            "Process ID not available - process spawning not yet implemented".to_string(),
+        ))
     }
-
+    
     /// Check if resource limits are supported on this platform
     pub fn is_resource_limits_supported(&self) -> bool {
         self.resource_limiter.is_supported()

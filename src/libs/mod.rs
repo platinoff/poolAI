@@ -25,7 +25,6 @@ pub use constraints::{VersionConstraint, ConstraintOp};
 pub use integration::{ensure_libtorch, check_library_compatibility, check_libtorch_compatibility, auto_update_libraries, auto_update_libtorch_if_needed, AutoUpdatePolicy};
 
 use crate::core::error::AppError;
-use crate::raid::ArtifactRef;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
@@ -39,9 +38,8 @@ pub struct LibraryInfo {
     pub path: PathBuf,
     pub dependencies: Vec<String>,
     pub metadata: LibraryMetadata,
-    /// Reference to artifact stored in RAID (if available)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub artifact_ref: Option<ArtifactRef>,
+    /// Artifact reference in RAID (if stored as artifact)
+    pub artifact_ref: Option<crate::raid::ArtifactRef>,
 }
 
 /// Library metadata
