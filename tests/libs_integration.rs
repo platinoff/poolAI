@@ -28,6 +28,7 @@ async fn test_manifest_load_save_atomic() {
             path: PathBuf::from("/test/path"),
             dependencies: vec![],
             metadata: LibraryMetadata::default(),
+            artifact_ref: None,
         },
     );
 

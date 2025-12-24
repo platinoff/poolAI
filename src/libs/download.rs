@@ -257,3 +257,48 @@ pub async fn calculate_checksum(file_path: &Path) -> Result<String, AppError> {
     Ok(format!("{:x}", hasher.finalize()))
 }
 
+/// Create a tar.gz archive from a directory
+pub async fn create_artifact_archive(
+    source_dir: &Path,
+    archive_path: &Path,
+) -> Result<PathBuf, AppError> {
+    info!("Creating artifact archive from {:?} to {:?}", source_dir, archive_path);
+    
+    // Ensure parent directory exists
+    if let Some(parent) = archive_path.parent() {
+        tokio::fs::create_dir_all(parent).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to create archive parent directory: {}", e)))?;
+    }
+    
+    let source_dir = source_dir.to_path_buf();
+    let archive_path = archive_path.to_path_buf();
+    
+    let archive_path_clone = archive_path.clone();
+    
+    // Run blocking I/O in spawn_blocking
+    tokio::task::spawn_blocking(move || {
+        use flate2::Compression;
+        use flate2::write::GzEncoder;
+        use std::fs::File;
+        
+        let file = File::create(&archive_path)
+            .map_err(|e| AppError::ConfigError(format!("Failed to create archive file: {}", e)))?;
+        
+        let gz = GzEncoder::new(file, Compression::default());
+        let mut tar = tar::Builder::new(gz);
+        
+        tar.append_dir_all(".", &source_dir)
+            .map_err(|e| AppError::ConfigError(format!("Failed to add directory to archive: {}", e)))?;
+        
+        tar.finish()
+            .map_err(|e| AppError::ConfigError(format!("Failed to finish archive: {}", e)))?;
+        
+        Ok::<PathBuf, AppError>(archive_path)
+    })
+    .await
+    .map_err(|e| AppError::ConfigError(format!("Task join error: {}", e)))??;
+    
+    info!("Artifact archive created successfully: {:?}", archive_path_clone);
+    Ok(archive_path_clone)
+}
+

@@ -11,9 +11,10 @@ use crate::libs::{
     registry::LibraryRegistry,
     versioning::VersionManager,
     dependencies::{DependencyResolver, ResolvedDependency},
-    download::{download_library, extract_archive},
+    download::{download_library, extract_archive, create_artifact_archive},
     manifest::InstalledLibrariesManifest,
 };
+use crate::raid;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -150,6 +151,7 @@ impl LibraryManager {
                                             }),
                                         ..Default::default()
                                     },
+                                    artifact_ref: None, // Legacy libraries don't have artifact_ref
                                 };
                                 
                                 libraries.insert(name.to_string(), library_info);
@@ -215,7 +217,7 @@ impl LibraryManager {
         }
         
         // Download and install library
-        let library_path = self
+        let (library_path, artifact_ref) = self
             .download_and_install(name, &resolved_version, library_type)
             .await?;
         
@@ -230,6 +232,7 @@ impl LibraryManager {
                 installed_at: Some(chrono::Utc::now()),
                 ..Default::default()
             },
+            artifact_ref,
         };
         
         // Register library
@@ -250,12 +253,13 @@ impl LibraryManager {
     }
 
     /// Download and install library
+    /// Returns (library_path, artifact_ref)
     async fn download_and_install(
         &self,
         name: &str,
         version: &str,
         _library_type: LibraryType,
-    ) -> Result<PathBuf, AppError> {
+    ) -> Result<(PathBuf, Option<crate::raid::ArtifactRef>), AppError> {
         info!("Downloading and installing library: {} v{}", name, version);
         
         let library_dir = self.base_path.join(name).join(version);
@@ -306,12 +310,43 @@ impl LibraryManager {
             tokio::fs::rename(&extract_dir, &library_dir).await
                 .map_err(|e| AppError::ConfigError(format!("Failed to finalize install (rename): {}", e)))?;
 
+            // Create artifact archive and store in RAID
+            let artifact_name = format!("{}-{}.tar.gz", name, version);
+            let artifact_archive_path = session_dir.join(&artifact_name);
+            
+            let artifact_ref = if let Err(e) = create_artifact_archive(&library_dir, &artifact_archive_path).await {
+                warn!("Failed to create artifact archive for {}: {}, continuing without RAID storage", name, e);
+                None
+            } else {
+                // Read archive bytes and store in RAID
+                match tokio::fs::read(&artifact_archive_path).await {
+                    Ok(archive_bytes) => {
+                        let raid_manager = raid::get_global_manager();
+                        match raid_manager.put_artifact(&artifact_name, &archive_bytes).await {
+                            Ok(artifact_ref) => {
+                                info!("Stored library {} v{} as artifact in RAID: {}", name, version, artifact_ref.id);
+                                Some(artifact_ref)
+                            }
+                            Err(e) => {
+                                warn!("Failed to store artifact in RAID for {}: {}", name, e);
+                                None
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        warn!("Failed to read artifact archive for {}: {}", name, e);
+                        None
+                    }
+                }
+            };
+
             // Cleanup temp session (archive + empty session dir)
             if let Err(e) = tokio::fs::remove_dir_all(&session_dir).await {
                 warn!("Failed to remove temp session dir: {}", e);
             }
 
             info!("Library {} v{} installed successfully (atomic)", name, version);
+            Ok((library_dir, artifact_ref))
         } else {
             // No download URL, create placeholder structure
             info!("No download URL found, creating placeholder structure");
@@ -322,9 +357,8 @@ impl LibraryManager {
                 tokio::fs::create_dir_all(parent).await
                     .map_err(|e| AppError::ConfigError(format!("Failed to create lib directory: {}", e)))?;
             }
+            Ok((library_dir, None))
         }
-        
-        Ok(library_dir)
     }
     
     /// Get download URL for library
@@ -460,6 +494,69 @@ impl LibraryManager {
     /// Get library path
     pub async fn get_library_path(&self, name: &str) -> Option<PathBuf> {
         self.get_library(name).await.map(|lib| lib.path)
+    }
+
+    /// Get library path, loading from RAID if local path is missing
+    pub async fn get_library_path_or_load_from_raid(&self, name: &str) -> Result<Option<PathBuf>, AppError> {
+        if let Some(lib) = self.get_library(name).await {
+            // Check if local path exists
+            if lib.path.exists() {
+                return Ok(Some(lib.path));
+            }
+            
+            // Try to load from RAID if artifact_ref is available
+            if let Some(artifact_ref) = &lib.artifact_ref {
+                return self.load_library_from_raid(name, artifact_ref).await;
+            }
+        }
+        
+        Ok(None)
+    }
+
+    /// Load library from RAID artifact
+    async fn load_library_from_raid(
+        &self,
+        name: &str,
+        artifact_ref: &crate::raid::ArtifactRef,
+    ) -> Result<Option<PathBuf>, AppError> {
+        info!("Loading library {} from RAID artifact {}", name, artifact_ref.id);
+        
+        let raid_manager = raid::get_global_manager();
+        
+        // Read artifact from RAID
+        let archive_bytes = raid_manager.get_artifact(&artifact_ref.path).await?;
+        
+        // Extract to library directory
+        let library_dir = self.base_path.join(name).join(&artifact_ref.name.replace(".tar.gz", ""));
+        
+        // Create temp directory for extraction
+        let tmp_root = self.base_path.join(".tmp");
+        tokio::fs::create_dir_all(&tmp_root).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to create temp directory: {}", e)))?;
+        
+        let tmp_archive = tmp_root.join(format!("{}-{}", name, uuid::Uuid::new_v4()));
+        tokio::fs::write(&tmp_archive, &archive_bytes).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to write temp archive: {}", e)))?;
+        
+        let tmp_extract = tmp_root.join(format!("{}-extract-{}", name, uuid::Uuid::new_v4()));
+        
+        // Extract archive
+        extract_archive(&tmp_archive, &tmp_extract).await?;
+        
+        // Move extracted directory to final location
+        if library_dir.exists() {
+            tokio::fs::remove_dir_all(&library_dir).await
+                .map_err(|e| AppError::ConfigError(format!("Failed to remove existing library dir: {}", e)))?;
+        }
+        
+        tokio::fs::rename(&tmp_extract, &library_dir).await
+            .map_err(|e| AppError::ConfigError(format!("Failed to finalize library load: {}", e)))?;
+        
+        // Cleanup temp files
+        let _ = tokio::fs::remove_file(&tmp_archive).await;
+        
+        info!("Library {} loaded from RAID successfully to {:?}", name, library_dir);
+        Ok(Some(library_dir))
     }
 }
 
