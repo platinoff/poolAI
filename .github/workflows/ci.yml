@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, stage3/* ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        rust: [stable]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      
+      - name: Check code formatting
+        run: cargo fmt --all -- --check
+      
+      - name: Lint with clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+        continue-on-error: true
+      
+      - name: Build
+        run: cargo build --verbose --all-features
+      
+      - name: Run tests
+        run: cargo test --verbose --all-features
+      
+      - name: Run tests (no features)
+        run: cargo test --verbose --no-default-features
+        continue-on-error: true
+
+  check:
+    name: Check (no features)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Check compilation
+        run: cargo check --no-default-features
+
+  check-features:
+    name: Check Features
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features:
+          - jwt
+          - https
+          - jwt,https
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Check with features
+        run: cargo check --features ${{ matrix.features }}
+

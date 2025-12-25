@@ -1,0 +1,1216 @@
+openapi: 3.0.3
+info:
+  title: PoolAI API
+  description: |
+    AI Mining Pool Management System with Generative Model Integration
+    
+    ## Authentication
+    Most endpoints require JWT authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <token>
+    ```
+    
+    ## Roles and Permissions
+    - **Admin**: Full access to all operations
+    - **Operator**: Can perform write operations on VM instances and libraries
+    - **Viewer**: Read-only access
+    
+    ## Base URL
+    - Development: `http://localhost:8080/api/v1`
+    - Production: `https://your-domain.com/api/v1`
+  version: 0.1.0
+  contact:
+    name: PoolAI Team
+    url: https://github.com/poolai/poolai
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+  - url: https://your-domain.com/api/v1
+    description: Production server
+
+tags:
+  - name: System
+    description: System status and health checks
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Metrics
+    description: System metrics and monitoring
+  - name: Workers
+    description: Worker pool management
+  - name: GPU
+    description: GPU information and management
+  - name: Rewards
+    description: Rewards system endpoints
+  - name: Libraries
+    description: Model library management
+  - name: VM
+    description: Virtual machine instance management
+  - name: RAID
+    description: Distributed storage management
+  - name: WebSocket
+    description: Real-time WebSocket endpoints
+
+paths:
+  /status:
+    get:
+      tags:
+        - System
+      summary: Get server status
+      description: Returns server status, version, and uptime
+      operationId: getStatus
+      responses:
+        '200':
+          description: Server status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+            text/html:
+              schema:
+                type: string
+                description: HTML status page
+
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check endpoint
+      description: Returns detailed health status for CI/CD and monitoring
+      operationId: getHealth
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: Authenticate user and receive JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /metrics:
+    get:
+      tags:
+        - Metrics
+      summary: Get system metrics
+      description: Returns current system metrics
+      operationId: getMetrics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+
+  /models:
+    get:
+      tags:
+        - Metrics
+      summary: Get model information
+      description: Returns information about loaded models
+      operationId: getModels
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Model information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModelInfo'
+
+  /workers:
+    get:
+      tags:
+        - Workers
+      summary: Get worker information
+      description: Returns information about worker pool
+      operationId: getWorkers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Worker information
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkerInfo'
+
+  /gpu:
+    get:
+      tags:
+        - GPU
+      summary: Get GPU information
+      description: Returns GPU hardware information
+      operationId: getGpuInfo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: GPU information
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rewards:
+    get:
+      tags:
+        - Rewards
+      summary: Get rewards statistics
+      description: Returns overall rewards system statistics
+      operationId: getRewards
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rewards statistics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rewards/{user_id}:
+    get:
+      tags:
+        - Rewards
+      summary: Get user rewards
+      description: Returns rewards for a specific user
+      operationId: getUserRewards
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User rewards
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rewards/progress/{user_id}:
+    get:
+      tags:
+        - Rewards
+      summary: Get user progress
+      description: Returns progress information for a specific user
+      operationId: getUserProgress
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User progress
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rewards/statistics:
+    get:
+      tags:
+        - Rewards
+      summary: Get rewards statistics
+      description: Returns detailed rewards statistics
+      operationId: getRewardsStatistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rewards statistics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rewards/top:
+    get:
+      tags:
+        - Rewards
+      summary: Get top users
+      description: Returns top users by rewards
+      operationId: getTopUsers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Top users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /libraries:
+    get:
+      tags:
+        - Libraries
+      summary: List libraries
+      description: Returns list of all available libraries
+      operationId: listLibraries
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of libraries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /libraries/{name}:
+    get:
+      tags:
+        - Libraries
+      summary: Get library information
+      description: Returns detailed information about a specific library
+      operationId: getLibraryInfo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Library information
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Library not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /libraries/{name}/install:
+    post:
+      tags:
+        - Libraries
+      summary: Install library
+      description: Install a library (requires Operator or Admin role)
+      operationId: installLibrary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                version:
+                  type: string
+                  description: Optional version to install
+      responses:
+        '200':
+          description: Library installed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /libraries/{name}/uninstall:
+    post:
+      tags:
+        - Libraries
+      summary: Uninstall library
+      description: Uninstall a library (requires Operator or Admin role)
+      operationId: uninstallLibrary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Library uninstalled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /libraries/{name}/update:
+    post:
+      tags:
+        - Libraries
+      summary: Update library
+      description: Update a library to the latest version (requires Operator or Admin role)
+      operationId: updateLibrary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Library updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances:
+    get:
+      tags:
+        - VM
+      summary: List VM instances
+      description: Returns list of all VM instances
+      operationId: listVmInstances
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of VM instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VmInstance'
+    post:
+      tags:
+        - VM
+      summary: Create VM instance
+      description: Create a new VM instance (requires Operator or Admin role)
+      operationId: createVmInstance
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VmCreateRequest'
+      responses:
+        '200':
+          description: VM instance created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VmInstance'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances/{id}:
+    put:
+      tags:
+        - VM
+      summary: Update VM instance
+      description: Update an existing VM instance (requires Operator or Admin role)
+      operationId: updateVmInstance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VmUpdateRequest'
+      responses:
+        '200':
+          description: VM instance updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VmInstance'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - VM
+      summary: Delete VM instance
+      description: Delete a VM instance (requires Operator or Admin role)
+      operationId: deleteVmInstance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: VM instance deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances/{id}/start:
+    post:
+      tags:
+        - VM
+      summary: Start VM instance
+      description: Start a VM instance (requires Operator or Admin role)
+      operationId: startVmInstance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: VM instance started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances/{id}/stop:
+    post:
+      tags:
+        - VM
+      summary: Stop VM instance
+      description: Stop a VM instance (requires Operator or Admin role)
+      operationId: stopVmInstance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: VM instance stopped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances/{id}/restart:
+    post:
+      tags:
+        - VM
+      summary: Restart VM instance
+      description: Restart a VM instance (requires Operator or Admin role)
+      operationId: restartVmInstance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: VM instance restarted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances/{id}/health:
+    get:
+      tags:
+        - VM
+      summary: Get VM instance health
+      description: Returns health status of a VM instance
+      operationId: getVmInstanceHealth
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: VM instance health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, unhealthy, unknown]
+                  reason:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: VM instance not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/instances/{id}/resources:
+    get:
+      tags:
+        - VM
+      summary: Get VM instance resource usage
+      description: Returns current resource usage for a VM instance
+      operationId: getVmInstanceResources
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Resource usage
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceUsage'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: VM instance not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vm/resource-limits-supported:
+    get:
+      tags:
+        - VM
+      summary: Check resource limits support
+      description: Returns whether resource limits are supported on the current platform
+      operationId: checkResourceLimitsSupported
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Resource limits support status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  supported:
+                    type: boolean
+
+  /raid/nodes:
+    get:
+      tags:
+        - RAID
+      summary: List RAID nodes
+      description: Returns list of all RAID storage nodes
+      operationId: listRaidNodes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of RAID nodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /raid/artifacts:
+    get:
+      tags:
+        - RAID
+      summary: List RAID artifacts
+      description: Returns list of all stored artifacts
+      operationId: listRaidArtifacts
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of artifacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /raid/quota:
+    get:
+      tags:
+        - RAID
+      summary: Get RAID quota information
+      description: Returns quota and usage information for RAID storage
+      operationId: getRaidQuota
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Quota information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RaidQuotaResponse'
+
+  /raid/gc:
+    post:
+      tags:
+        - RAID
+      summary: Run garbage collection
+      description: Run garbage collection on RAID storage (requires Operator or Admin role)
+      operationId: runRaidGc
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Garbage collection completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RaidGcResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ws/metrics:
+    get:
+      tags:
+        - WebSocket
+      summary: WebSocket metrics stream
+      description: Real-time metrics stream via WebSocket
+      operationId: websocketMetrics
+      security:
+        - bearerAuth: []
+      responses:
+        '101':
+          description: Switching protocols to WebSocket
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /login endpoint
+
+  schemas:
+    StatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: running
+        version:
+          type: string
+          example: "0.1.0"
+        uptime:
+          type: integer
+          format: int64
+          example: 3600
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "0.1.0"
+        uptime:
+          type: integer
+          format: int64
+          example: 3600
+        checks:
+          type: object
+          properties:
+            database:
+              $ref: '#/components/schemas/HealthCheck'
+            memory:
+              $ref: '#/components/schemas/HealthCheck'
+            workers:
+              $ref: '#/components/schemas/HealthCheck'
+            gpu:
+              $ref: '#/components/schemas/HealthCheck'
+
+    HealthCheck:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        message:
+          type: string
+          example: "Database connection OK"
+        response_time_ms:
+          type: integer
+          example: 5
+
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          format: password
+          example: password123
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+        role:
+          type: string
+          enum: [Admin, Operator, Viewer]
+          example: Admin
+
+    MetricsResponse:
+      type: object
+      properties:
+        active_workers:
+          type: integer
+          example: 8
+        total_requests:
+          type: integer
+          format: int64
+          example: 12345
+        avg_response_time:
+          type: number
+          format: float
+          example: 12.5
+
+    ModelInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: gpt-4
+        status:
+          type: string
+          example: loaded
+        memory_usage:
+          type: integer
+          format: int64
+          example: 8192
+
+    WorkerInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: worker-1
+        status:
+          type: string
+          example: active
+        current_task:
+          type: string
+          nullable: true
+          example: task-123
+
+    VmInstance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          example: "my-vm-instance"
+        created_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [Creating, Running, Stopped, Failed]
+          example: Running
+        resources:
+          $ref: '#/components/schemas/VmResources'
+        isolation:
+          $ref: '#/components/schemas/VmIsolation'
+
+    VmResources:
+      type: object
+      required:
+        - cpu_cores
+        - memory_mb
+        - gpu_required
+      properties:
+        cpu_cores:
+          type: integer
+          minimum: 1
+          example: 4
+        memory_mb:
+          type: integer
+          minimum: 1
+          example: 8192
+        gpu_required:
+          type: boolean
+          example: true
+
+    VmIsolation:
+      type: string
+      enum: [ProcessSandbox, HardwareVm]
+      example: ProcessSandbox
+
+    VmCreateRequest:
+      type: object
+      required:
+        - name
+        - resources
+      properties:
+        name:
+          type: string
+          example: "my-vm-instance"
+        resources:
+          $ref: '#/components/schemas/VmResources'
+        isolation:
+          $ref: '#/components/schemas/VmIsolation'
+
+    VmUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "updated-vm-instance"
+        resources:
+          $ref: '#/components/schemas/VmResources'
+        isolation:
+          $ref: '#/components/schemas/VmIsolation'
+
+    ResourceUsage:
+      type: object
+      properties:
+        cpu_percent:
+          type: number
+          format: float
+          example: 45.5
+        memory_mb:
+          type: integer
+          example: 4096
+        gpu_utilization:
+          type: number
+          format: float
+          nullable: true
+          example: 78.2
+
+    RaidQuotaResponse:
+      type: object
+      properties:
+        total_size_bytes:
+          type: integer
+          format: int64
+          example: 107374182400
+        quota_bytes:
+          type: integer
+          format: int64
+          nullable: true
+          example: 107374182400
+        usage_percent:
+          type: number
+          format: float
+          nullable: true
+          example: 65.5
+
+    RaidGcResponse:
+      type: object
+      properties:
+        removed_count:
+          type: integer
+          example: 42
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid request"
+        required:
+          type: string
+          nullable: true
+          example: "write:all"
+        user_permissions:
+          type: array
+          items:
+            type: string
+          nullable: true
+          example: ["read:all"]
+

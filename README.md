@@ -18,8 +18,8 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 3. **Public API exported only from lib.rs** — all internals private, rustdoc for public traits/structs ✅ **COMPLETED**
 4. **JWT & RBAC** — middleware for token and role checks (admin/operator/viewer) ✅ **COMPLETED**
 5. **Endpoint access restriction** — /metrics, /workers, /shutdown only for authorized users ✅ **COMPLETED**
-6. **CI/CD** — GitHub Actions workflow for tests and builds 🔄 **PLANNED**
-7. **Swagger/OpenAPI** — API spec generation and publication 🔄 **PLANNED**
+6. **CI/CD** — GitHub Actions workflow for tests and builds ✅ **COMPLETED**
+7. **Swagger/OpenAPI** — API spec generation and publication ✅ **COMPLETED**
 8. **Documentation** — Quick Start, curl examples, security section ✅ **COMPLETED**
 9. **Live metrics (WebSocket)** — /ws/metrics for real-time monitoring ✅ **COMPLETED**
 10. **UI/UX** — Copy buttons, security links, favicon/logo, status page improvements ✅ **BASIC COMPLETED**
