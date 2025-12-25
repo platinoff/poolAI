@@ -6,7 +6,6 @@
 use crate::core::error::AppError;
 use crate::raid::protocol::*;
 use reqwest::Client;
-use serde_json::json;
 use std::time::Duration;
 use tracing::info;
 
@@ -15,6 +14,7 @@ pub struct ProtocolClient {
     client: Client,
     base_url: String,
     node_id: String,
+    #[allow(dead_code)] // Reserved for future use
     timeout: Duration,
 }
 
