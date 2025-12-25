@@ -271,7 +271,7 @@
 
 ---
 
-### Пріоритет 4: UI Write Operations — 🚧 В РОЗРОБЦІ (Week 6-7)
+### Пріоритет 4: UI Write Operations — ✅ Week 6 ЗАВЕРШЕНО, Week 7 В РОЗРОБЦІ
 **Мета**: Write endpoints з JWT authentication та RBAC checks
 
 **Залежності**: Network API (✅), Auth (JWT) (✅) — **ГОТОВО!**
@@ -284,12 +284,17 @@
   - [x] User info management (getUser, setUser)
   - [x] UI updates based on auth status
   - [x] Logout functionality
-- [ ] Protected routes middleware (Week 6, частина 2)
+- [x] Protected routes middleware — **ЗАВЕРШЕНО (Week 6, частина 2)**
+  - [x] Token validation (`validateToken`)
+  - [x] Token refresh logic (`refreshToken`)
+  - [x] Protected route checks (`requireAuth`)
+  - [x] Automatic redirect to login if not authenticated
+  - [x] Role-based route access (role hierarchy: Viewer < Operator < Admin)
 - [ ] Write endpoints з RBAC checks (create/update/delete operations) (Week 7)
 - [ ] Confirmation dialogs для деструктивних операцій
 - [ ] Error handling та user feedback
 
-**Оцінка**: 1-2 тижні (Week 6-7)
+**Оцінка**: Week 6 ✅ ЗАВЕРШЕНО, Week 7 в розробці
 
 ---
 

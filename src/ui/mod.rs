@@ -147,6 +147,7 @@ function removeToken() {
   localStorage.removeItem('poolai_token');
   localStorage.removeItem('poolai_user');
   localStorage.removeItem('poolai_role');
+  localStorage.removeItem('poolai_token_exp');
 }
 
 function getUser() {
@@ -187,6 +188,104 @@ function getAuthHeaders() {
   return headers;
 }
 
+// Token validation and refresh
+async function validateToken() {
+  const token = getToken();
+  if (!token) return false;
+  
+  try {
+    // Decode token to check expiration (simple base64 decode for dev tokens)
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      // Real JWT format
+      const payload = JSON.parse(atob(parts[1]));
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp < now) {
+        // Token expired, try to refresh
+        return await refreshToken();
+      }
+      return true;
+    } else if (token.startsWith('dev_token_')) {
+      // Dev token format - check expiration from localStorage
+      const tokenData = localStorage.getItem('poolai_token_exp');
+      if (tokenData) {
+        const exp = parseInt(tokenData, 10);
+        const now = Math.floor(Date.now() / 1000);
+        if (exp && exp < now) {
+          return await refreshToken();
+        }
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Token validation error:', e);
+    return false;
+  }
+}
+
+async function refreshToken() {
+  try {
+    const token = getToken();
+    if (!token) return false;
+    
+    // Try to refresh token via API (if endpoint exists)
+    const res = await fetch('/api/v1/refresh', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      setToken(data.token);
+      if (data.role) {
+        const user = getUser();
+        if (user) setUser(user.username, data.role);
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Token refresh error:', e);
+    return false;
+  }
+}
+
+// Protected route check
+async function requireAuth(requiredRole = null) {
+  const user = getUser();
+  if (!user) {
+    if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
+      window.location.href = '/ui/auth';
+    }
+    return false;
+  }
+  
+  const isValid = await validateToken();
+  if (!isValid) {
+    removeToken();
+    updateUI();
+    if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
+      window.location.href = '/ui/auth';
+    }
+    return false;
+  }
+  
+  if (requiredRole) {
+    const roleHierarchy = { 'Viewer': 1, 'Operator': 2, 'Admin': 3 };
+    const userLevel = roleHierarchy[user.role] || 0;
+    const requiredLevel = roleHierarchy[requiredRole] || 0;
+    
+    if (userLevel < requiredLevel) {
+      alert('Insufficient permissions. Required role: ' + requiredRole);
+      window.location.href = '/ui';
+      return false;
+    }
+  }
+  
+  return true;
+}
+
 async function fetchJson(url, options = {}) {
   const headers = getAuthHeaders();
   if (options.headers) {
@@ -194,12 +293,28 @@ async function fetchJson(url, options = {}) {
   }
   const res = await fetch(url, { ...options, headers });
   if (res.status === 401) {
-    removeToken();
-    updateUI();
-    if (window.location.pathname !== '/ui/login') {
-      window.location.href = '/ui/auth';
+    const refreshed = await refreshToken();
+    if (!refreshed) {
+      removeToken();
+      updateUI();
+      if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
+        window.location.href = '/ui/auth';
+      }
+      throw new Error('Unauthorized');
     }
-    throw new Error('Unauthorized');
+    // Retry with new token
+    headers['authorization'] = 'Bearer ' + getToken();
+    const retryRes = await fetch(url, { ...options, headers });
+    if (retryRes.status === 401) {
+      removeToken();
+      updateUI();
+      if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
+        window.location.href = '/ui/auth';
+      }
+      throw new Error('Unauthorized');
+    }
+    if (!retryRes.ok) throw new Error('HTTP ' + retryRes.status);
+    return await retryRes.json();
   }
   if (!res.ok) throw new Error('HTTP ' + res.status);
   return await res.json();
@@ -283,11 +398,125 @@ async function poll(url, renderFn, containerId) {
   }
 }
 
+// Token validation and refresh
+async function validateToken() {
+  const token = getToken();
+  if (!token) return false;
+  
+  try {
+    // Decode token to check expiration (simple base64 decode for dev tokens)
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      // Real JWT format
+      const payload = JSON.parse(atob(parts[1]));
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp < now) {
+        // Token expired, try to refresh
+        return await refreshToken();
+      }
+      return true;
+    } else if (token.startsWith('dev_token_')) {
+      // Dev token format - check expiration from localStorage
+      const tokenData = localStorage.getItem('poolai_token_exp');
+      if (tokenData) {
+        const exp = parseInt(tokenData, 10);
+        const now = Math.floor(Date.now() / 1000);
+        if (exp && exp < now) {
+          return await refreshToken();
+        }
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Token validation error:', e);
+    return false;
+  }
+}
+
+async function refreshToken() {
+  try {
+    const token = getToken();
+    if (!token) return false;
+    
+    // Try to refresh token via API (if endpoint exists)
+    const res = await fetch('/api/v1/refresh', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      setToken(data.token);
+      if (data.role) {
+        const user = getUser();
+        if (user) setUser(user.username, data.role);
+      }
+      if (data.expires_in) {
+        const exp = Math.floor(Date.now() / 1000) + data.expires_in;
+        localStorage.setItem('poolai_token_exp', exp.toString());
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Token refresh error:', e);
+    return false;
+  }
+}
+
+// Protected route check
+async function requireAuth(requiredRole = null) {
+  const user = getUser();
+  if (!user) {
+    if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
+      window.location.href = '/ui/auth';
+    }
+    return false;
+  }
+  
+  const isValid = await validateToken();
+  if (!isValid) {
+    removeToken();
+    updateUI();
+    if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
+      window.location.href = '/ui/auth';
+    }
+    return false;
+  }
+  
+  if (requiredRole) {
+    const roleHierarchy = { 'Viewer': 1, 'Operator': 2, 'Admin': 3 };
+    const userLevel = roleHierarchy[user.role] || 0;
+    const requiredLevel = roleHierarchy[requiredRole] || 0;
+    
+    if (userLevel < requiredLevel) {
+      alert('Insufficient permissions. Required role: ' + requiredRole);
+      window.location.href = '/ui';
+      return false;
+    }
+  }
+  
+  return true;
+}
+
 // Initialize UI on page load
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', updateUI);
+  document.addEventListener('DOMContentLoaded', async function() {
+    updateUI();
+    // Check auth for protected routes (except login/auth pages)
+    const path = window.location.pathname;
+    if (path !== '/ui/auth' && path !== '/ui/login' && !path.endsWith('/auth') && !path.endsWith('/login')) {
+      await requireAuth();
+    }
+  });
 } else {
   updateUI();
+  // Check auth for protected routes
+  const path = window.location.pathname;
+  if (path !== '/ui/auth' && path !== '/ui/login' && !path.endsWith('/auth') && !path.endsWith('/login')) {
+    requireAuth();
+  }
 }
 
 // Setup logout link
@@ -346,6 +575,13 @@ async fn login_page() -> Html<String> {
         const data = await res.json();
         setToken(data.token);
         setUser(username, data.role);
+        
+        // Store token expiration time
+        if (data.expires_in) {
+          const exp = Math.floor(Date.now() / 1000) + data.expires_in;
+          localStorage.setItem('poolai_token_exp', exp.toString());
+        }
+        
         updateUI();
         
         window.location.href = '/ui';
@@ -424,6 +660,16 @@ async fn login_page() -> Html<String> {
 }
 
 async fn home_handler() -> Html<String> {
+    let script = format!(
+        r#"{}
+// Protected route check for home
+(async function() {{
+  await requireAuth();
+  setUpdated();
+}})();
+"#,
+        common_js()
+    );
     layout(
         "Home",
         r#"
@@ -454,7 +700,7 @@ async fn home_handler() -> Html<String> {
   </div>
 </div>
 "#,
-        &format!("{}\n{}", common_js(), "setUpdated();"),
+        &script,
     )
 }
 
