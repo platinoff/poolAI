@@ -29,6 +29,8 @@ impl UiManager {
 pub fn create_ui_routes() -> Router {
     Router::new()
         .route("/", get(home_handler))
+        .route("/auth", get(login_page))
+        .route("/login", get(login_page))
         .route("/status", get(status_page))
         .route("/health", get(health_page))
         .route("/metrics", get(metrics_page))
@@ -65,6 +67,9 @@ const BASE_CSS: &str = r#"
 "#;
 
 fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
+    let auth_url = "/ui/auth";
+    let nav_auth_link = format!(r#"<a href="{}" id="authLoginBtn">Login</a>"#, auth_url);
+    let user_info_html = "<div class=\"user-info\" id=\"userInfo\" style=\"display:none;\">\n          <span class=\"role\" id=\"userRole\"></span>\n          <a href=\"#\" id=\"logoutBtn\">Logout</a>\n        </div>";
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -92,6 +97,8 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         <a href="/ui/libs">Libs</a>
         <a href="/ui/vm">VM</a>
         <a href="/ui/raid">RAID</a>
+        {user_info_html}
+        {nav_auth_link}
       </div>
     </div>
 
@@ -117,7 +124,9 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         title = title,
         css = BASE_CSS,
         body = body_html,
-        script = script_js
+        script = script_js,
+        nav_auth_link = nav_auth_link,
+        user_info_html = user_info_html
     );
 
     Html(html)
@@ -125,6 +134,77 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
 
 fn common_js() -> &'static str {
     r#"
+// Token management
+function getToken() {
+  return localStorage.getItem('poolai_token');
+}
+
+function setToken(token) {
+  localStorage.setItem('poolai_token', token);
+}
+
+function removeToken() {
+  localStorage.removeItem('poolai_token');
+  localStorage.removeItem('poolai_user');
+  localStorage.removeItem('poolai_role');
+}
+
+function getUser() {
+  const user = localStorage.getItem('poolai_user');
+  const role = localStorage.getItem('poolai_role');
+  return user ? { username: user, role: role || 'Viewer' } : null;
+}
+
+function setUser(username, role) {
+  localStorage.setItem('poolai_user', username);
+  localStorage.setItem('poolai_role', role);
+}
+
+function updateUI() {
+  const user = getUser();
+  const userInfo = document.getElementById('userInfo');
+  const loginLinkEl = document.getElementById('authLoginBtn');
+  const userRole = document.getElementById('userRole');
+  
+  if (user) {
+    if (userInfo) {
+      userInfo.style.display = 'flex';
+      if (userRole) userRole.textContent = user.role;
+    }
+    if (loginLinkEl) loginLinkEl.style.display = 'none';
+  } else {
+    if (userInfo) userInfo.style.display = 'none';
+    if (loginLinkEl) loginLinkEl.style.display = 'inline';
+  }
+}
+
+function getAuthHeaders() {
+  const token = getToken();
+  const headers = { 'accept': 'application/json', 'content-type': 'application/json' };
+  if (token) {
+    headers['authorization'] = 'Bearer ' + token;
+  }
+  return headers;
+}
+
+async function fetchJson(url, options = {}) {
+  const headers = getAuthHeaders();
+  if (options.headers) {
+    Object.assign(headers, options.headers);
+  }
+  const res = await fetch(url, { ...options, headers });
+  if (res.status === 401) {
+    removeToken();
+    updateUI();
+    if (window.location.pathname !== '/ui/login') {
+      window.location.href = '/ui/auth';
+    }
+    throw new Error('Unauthorized');
+  }
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
+
 function setUpdated() {
   const el = document.getElementById('last_updated');
   if (el) el.textContent = 'Updated: ' + new Date().toLocaleTimeString();
@@ -192,12 +272,6 @@ function renderTable(containerId, data) {
   el.appendChild(table);
 }
 
-async function fetchJson(url) {
-  const res = await fetch(url, { headers: { 'accept': 'application/json' } });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return await res.json();
-}
-
 async function poll(url, renderFn, containerId) {
   try {
     const data = await fetchJson(url);
@@ -208,7 +282,145 @@ async function poll(url, renderFn, containerId) {
     if (el) el.innerHTML = '<pre>' + String(e) + '</pre>';
   }
 }
+
+// Initialize UI on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', updateUI);
+} else {
+  updateUI();
+}
+
+// Setup logout link
+document.addEventListener('DOMContentLoaded', function() {
+  const logoutLink = document.getElementById('logoutBtn');
+  if (logoutLink) {
+    logoutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      removeToken();
+      updateUI();
+      window.location.href = '/ui/auth';
+    });
+  }
+});
 "#
+}
+
+async fn login_page() -> Html<String> {
+    let login_js = r#"
+    function showAlert(message, type = 'error') {
+      const alert = document.getElementById('alert');
+      if (!alert) return;
+      alert.className = 'alert alert-' + type;
+      alert.textContent = message;
+      alert.style.display = 'block';
+    }
+    
+    function hideAlert() {
+      const alert = document.getElementById('alert');
+      if (alert) alert.style.display = 'none';
+    }
+    
+    async function handleLogin(event) {
+      event.preventDefault();
+      hideAlert();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('loginBtn');
+      
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+      
+      try {
+        const res = await fetch('/api/v1/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Login failed');
+        }
+        
+        const data = await res.json();
+        setToken(data.token);
+        setUser(username, data.role);
+        updateUI();
+        
+        window.location.href = '/ui';
+      } catch (e) {
+        showAlert(e.message || 'Login failed', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
+      }
+    }
+    
+    function logout() {
+      removeToken();
+      updateUI();
+      window.location.href = '/ui/auth';
+    }
+    
+    if (getUser()) {
+      window.location.href = '/ui';
+    }
+    
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    "#;
+    
+    let html = format!(
+        r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - PoolAI</title>
+  <style>{css}</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <h1>PoolAI</h1>
+      </div>
+    </div>
+    <div class="content">
+      <div class="card" style="max-width: 400px; margin: 40px auto;">
+        <h2 style="margin:0 0 20px">Login</h2>
+        <div id="alert"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn" id="loginBtn">Login</button>
+        </form>
+        <div style="margin-top: 20px; font-size: 0.9em; color:#a8b0bf;">
+          <div><strong>Test accounts:</strong></div>
+          <div>Admin: admin / admin123</div>
+          <div>Operator: operator / op123</div>
+          <div>Viewer: viewer / view123</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    {common_js}
+    {login_js}
+  </script>
+</body>
+</html>"#,
+        css = BASE_CSS,
+        common_js = common_js(),
+        login_js = login_js
+    );
+    Html(html)
 }
 
 async fn home_handler() -> Html<String> {
@@ -238,7 +450,7 @@ async fn home_handler() -> Html<String> {
   </div></div>
   <div class="item">
     <div><b>Notes</b></div>
-    <div class="muted">This UI is intentionally read-only for safety. Write operations remain API-only for now.</div>
+          <div class="muted">Write operations are available for authenticated users with appropriate permissions.</div>
   </div>
 </div>
 "#,

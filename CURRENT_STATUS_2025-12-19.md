@@ -209,7 +209,8 @@
 - ✅ Responsive design
 
 **Залишилось**:
-- 🔄 Write operations (через API, з JWT авторизацією) — **ГОТОВО ДО РЕАЛІЗАЦІЇ**
+- 🔄 Protected routes middleware (Week 6, частина 2)
+- 🔄 Write operations (через API, з JWT авторизацією) (Week 7)
 - 🔄 UI components library
 - 🔄 Themes/layouts customization
 
@@ -270,18 +271,25 @@
 
 ---
 
-### Пріоритет 4: UI Write Operations — ГОТОВО ДО РЕАЛІЗАЦІЇ
+### Пріоритет 4: UI Write Operations — 🚧 В РОЗРОБЦІ (Week 6-7)
 **Мета**: Write endpoints з JWT authentication та RBAC checks
 
 **Залежності**: Network API (✅), Auth (JWT) (✅) — **ГОТОВО!**
 
 **Завдання**:
-- [ ] JWT authentication в UI (login form)
-- [ ] Write endpoints з RBAC checks (create/update/delete operations)
+- [x] JWT authentication в UI (login form) — **ЗАВЕРШЕНО (Week 6, частина 1)**
+  - [x] Login page (`/ui/auth`, `/ui/login`)
+  - [x] Token storage (localStorage)
+  - [x] Token management functions (getToken, setToken, removeToken)
+  - [x] User info management (getUser, setUser)
+  - [x] UI updates based on auth status
+  - [x] Logout functionality
+- [ ] Protected routes middleware (Week 6, частина 2)
+- [ ] Write endpoints з RBAC checks (create/update/delete operations) (Week 7)
 - [ ] Confirmation dialogs для деструктивних операцій
 - [ ] Error handling та user feedback
 
-**Оцінка**: 1-2 тижні
+**Оцінка**: 1-2 тижні (Week 6-7)
 
 ---
 
