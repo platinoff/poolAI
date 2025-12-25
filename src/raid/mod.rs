@@ -18,6 +18,8 @@ use tracing::{info, warn};
 use uuid::Uuid;
 
 pub mod manifest;
+pub mod protocol;
+pub mod client;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RaidMode {
