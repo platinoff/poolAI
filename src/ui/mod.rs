@@ -63,6 +63,26 @@ const BASE_CSS: &str = r#"
   th, td { border:1px solid #262b36; padding: 8px; text-align:left; vertical-align: top; }
   th { background:#0f1216; color:#cfe3ff; }
   .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; background:#0f1216; border:1px solid #262b36; color:#a8b0bf; font-size: 0.9em; }
+  .btn { padding: 8px 16px; border:1px solid #262b36; border-radius: 8px; background:#171b22; color:#e8e8e8; cursor:pointer; font-size: 0.95em; }
+  .btn:hover { background:#1e2329; border-color:#44475a; }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .btn-primary { background:#50fa7b; color:#0f1216; border-color:#50fa7b; }
+  .btn-primary:hover { background:#67e480; }
+  .btn-danger { background:#ff5555; color:#fff; border-color:#ff5555; }
+  .btn-danger:hover { background:#ff6e6e; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display:block; margin-bottom: 6px; color:#cfe3ff; font-size: 0.9em; }
+  .form-group input, .form-group select { width:100%; padding: 8px 12px; border:1px solid #262b36; border-radius: 8px; background:#0f1216; color:#e8e8e8; font-size: 0.95em; }
+  .form-group input:focus, .form-group select:focus { outline:none; border-color:#50fa7b; }
+  .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+  .modal.active { display:flex; }
+  .modal-content { background:#171b22; border:1px solid #262b36; border-radius:14px; padding:24px; max-width:500px; width:90%; max-height:90vh; overflow-y:auto; }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .modal-header h3 { margin:0; color:#67e480; }
+  .modal-close { background:none; border:none; color:#a8b0bf; font-size:24px; cursor:pointer; padding:0; width:30px; height:30px; }
+  .modal-close:hover { color:#e8e8e8; }
+  .modal-footer { display:flex; gap:12px; justify-content:flex-end; margin-top:20px; }
+  .action-buttons { display:flex; gap:8px; flex-wrap:wrap; }
   @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
   @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
@@ -87,7 +107,7 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
       <div class="brand">
         <div>
           <h1>PoolAI UI</h1>
-          <div class="muted">Read-only dashboard (Stage 3)</div>
+          <div class="muted">Dashboard with Write Operations (Stage 3)</div>
         </div>
       </div>
       <div class="nav">
@@ -109,7 +129,7 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         <div class="row">
           <div>
             <h2 style="margin:0 0 6px">{title}</h2>
-            <div class="muted">Auto-refresh is enabled (5s). This UI does not perform write operations.</div>
+            <div class="muted">Auto-refresh is enabled (5s). Write operations available for authenticated users with appropriate permissions.</div>
           </div>
           <div class="pill" id="last_updated">—</div>
         </div>
@@ -327,6 +347,69 @@ function hideLoading(elementId) {
   }
 }
 
+// Modal dialog functions
+function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('active');
+  }
+}
+
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function confirmAction(message, onConfirm) {
+  if (confirm(message)) {
+    onConfirm();
+  }
+}
+
+// Enhanced confirmation dialog
+function showConfirmDialog(message, onConfirm, onCancel = null) {
+  const dialogId = 'confirmDialog';
+  let dialog = document.getElementById(dialogId);
+  
+  if (!dialog) {
+    dialog = document.createElement('div');
+    dialog.id = dialogId;
+    dialog.className = 'modal';
+    dialog.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Confirm Action</h3>
+          <button class="modal-close" onclick="hideModal('${dialogId}')">&times;</button>
+        </div>
+        <div id="confirmMessage" style="margin-bottom:20px; color:#e8e8e8;"></div>
+        <div class="modal-footer">
+          <button class="btn" onclick="hideModal('${dialogId}')">Cancel</button>
+          <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(dialog);
+  }
+  
+  document.getElementById('confirmMessage').textContent = message;
+  const confirmBtn = document.getElementById('confirmBtn');
+  const oldHandler = confirmBtn.onclick;
+  confirmBtn.onclick = function() {
+    hideModal(dialogId);
+    if (onConfirm) onConfirm();
+  };
+  
+  const closeBtn = dialog.querySelector('.modal-close');
+  closeBtn.onclick = function() {
+    hideModal(dialogId);
+    if (onCancel) onCancel();
+  };
+  
+  showModal(dialogId);
+}
+
 async function fetchJson(url, options = {}) {
   const headers = getAuthHeaders();
   if (options.headers) {
@@ -428,10 +511,157 @@ function renderTable(containerId, data) {
       td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
       tr.appendChild(td);
     });
+    
+    // Add action buttons for VM instances
+    if (row && row.id && window.location.pathname.includes('/vm')) {
+      const actionsTd = document.createElement('td');
+      actionsTd.className = 'action-buttons';
+      actionsTd.style.cssText = 'white-space: nowrap;';
+      
+      const instanceId = row.id;
+      const status = row.status || '';
+      
+      // Start button
+      if (status !== 'Running') {
+        const startBtn = document.createElement('button');
+        startBtn.className = 'btn btn-primary';
+        startBtn.textContent = 'Start';
+        startBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+        startBtn.onclick = () => handleVmAction(instanceId, 'start');
+        actionsTd.appendChild(startBtn);
+      }
+      
+      // Stop button
+      if (status === 'Running') {
+        const stopBtn = document.createElement('button');
+        stopBtn.className = 'btn';
+        stopBtn.textContent = 'Stop';
+        stopBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+        stopBtn.onclick = () => handleVmAction(instanceId, 'stop');
+        actionsTd.appendChild(stopBtn);
+      }
+      
+      // Restart button
+      if (status === 'Running') {
+        const restartBtn = document.createElement('button');
+        restartBtn.className = 'btn';
+        restartBtn.textContent = 'Restart';
+        restartBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+        restartBtn.onclick = () => handleVmAction(instanceId, 'restart');
+        actionsTd.appendChild(restartBtn);
+      }
+      
+      // Delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-danger';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+      deleteBtn.onclick = () => handleVmDelete(instanceId, row.name || instanceId);
+      actionsTd.appendChild(deleteBtn);
+      
+      tr.appendChild(actionsTd);
+    }
+    
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
   el.appendChild(table);
+}
+
+// Form validation
+function validateForm(formId) {
+  const form = document.getElementById(formId);
+  if (!form) return false;
+  
+  const inputs = form.querySelectorAll('input[required], select[required]');
+  let isValid = true;
+  
+  inputs.forEach(input => {
+    if (!input.value.trim()) {
+      isValid = false;
+      input.style.borderColor = '#ff5555';
+      setTimeout(() => {
+        input.style.borderColor = '';
+      }, 2000);
+    } else {
+      input.style.borderColor = '';
+    }
+    
+    // Number validation
+    if (input.type === 'number') {
+      const min = input.getAttribute('min');
+      const max = input.getAttribute('max');
+      const value = parseInt(input.value, 10);
+      
+      if (min && value < parseInt(min, 10)) {
+        isValid = false;
+        input.style.borderColor = '#ff5555';
+        showNotification(`Value must be at least ${min}`, 'error');
+      } else if (max && value > parseInt(max, 10)) {
+        isValid = false;
+        input.style.borderColor = '#ff5555';
+        showNotification(`Value must be at most ${max}`, 'error');
+      }
+    }
+  });
+  
+  return isValid;
+}
+
+// VM action handlers
+async function handleVmAction(instanceId, action) {
+  const user = getUser();
+  if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+    showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+    return;
+  }
+  
+  try {
+    showLoading('data', `${action.charAt(0).toUpperCase() + action.slice(1)}ing VM instance...`);
+    
+    const res = await fetchJson(`/api/v1/vm/instances/${instanceId}/${action}`, {
+      method: 'POST'
+    });
+    
+    showNotification(res.message || `VM instance ${action}ed successfully`, 'success');
+    setTimeout(() => {
+      const refreshFn = window.refreshVmInstances || (() => location.reload());
+      refreshFn();
+    }, 1000);
+  } catch (e) {
+    showNotification('Error: ' + e.message, 'error');
+    hideLoading('data');
+  }
+}
+
+async function handleVmDelete(instanceId, instanceName) {
+  const user = getUser();
+  if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+    showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+    return;
+  }
+  
+  showConfirmDialog(
+    `Are you sure you want to delete VM instance "${instanceName}" (${instanceId})? This action cannot be undone.`,
+    async () => {
+      try {
+        showLoading('data', 'Deleting VM instance...');
+        
+        await fetchJson(`/api/v1/vm/instances/${instanceId}`, {
+          method: 'DELETE'
+        });
+        
+        showNotification('VM instance deleted successfully', 'success');
+        setTimeout(() => {
+          const refreshFn = window.refreshVmInstances || (() => location.reload());
+          refreshFn();
+        }, 1000);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+        hideLoading('data');
+      }
+    }
+  );
 }
 
 async function poll(url, renderFn, containerId) {
@@ -799,24 +1029,358 @@ async fn workers_page() -> Html<String> {
 }
 
 async fn libs_page() -> Html<String> {
+    let libs_js = r#"
+    window.refreshLibraries = async function() {
+      await poll('/api/v1/libraries', renderLibrariesTable, 'data');
+    };
+    
+    function renderLibrariesTable(containerId, data) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = '';
+      
+      if (!Array.isArray(data)) {
+        renderJsonPre(containerId, data);
+        return;
+      }
+      
+      if (data.length === 0) {
+        el.innerHTML = '<div class="muted">No libraries installed.</div>';
+        return;
+      }
+      
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const hr = document.createElement('tr');
+      ['name', 'version', 'type', 'status', 'actions'].forEach(k => {
+        const th = document.createElement('th');
+        th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+        hr.appendChild(th);
+      });
+      thead.appendChild(hr);
+      table.appendChild(thead);
+      
+      const tbody = document.createElement('tbody');
+      for (const lib of data) {
+        const tr = document.createElement('tr');
+        
+        ['name', 'version', 'type', 'status'].forEach(k => {
+          const td = document.createElement('td');
+          const v = lib ? lib[k] : null;
+          td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
+          tr.appendChild(td);
+        });
+        
+        // Action buttons
+        const actionsTd = document.createElement('td');
+        actionsTd.className = 'action-buttons';
+        actionsTd.style.cssText = 'white-space: nowrap;';
+        
+        const libName = lib.name;
+        const user = getUser();
+        const canWrite = user && (user.role === 'Admin' || user.role === 'Operator');
+        
+        if (canWrite) {
+          // Update button
+          const updateBtn = document.createElement('button');
+          updateBtn.className = 'btn';
+          updateBtn.textContent = 'Update';
+          updateBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+          updateBtn.onclick = () => handleLibraryAction(libName, 'update');
+          actionsTd.appendChild(updateBtn);
+          
+          // Uninstall button
+          const uninstallBtn = document.createElement('button');
+          uninstallBtn.className = 'btn btn-danger';
+          uninstallBtn.textContent = 'Uninstall';
+          uninstallBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+          uninstallBtn.onclick = () => handleLibraryUninstall(libName);
+          actionsTd.appendChild(uninstallBtn);
+        }
+        
+        tr.appendChild(actionsTd);
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      el.appendChild(table);
+    }
+    
+    async function showInstallLibraryModal() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      showModal('installLibraryModal');
+    }
+    
+    async function handleInstallLibrary(event) {
+      event.preventDefault();
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      if (!validateForm('installLibraryForm')) {
+        showNotification('Please fill in all required fields correctly.', 'error');
+        return;
+      }
+      
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      
+      btn.disabled = true;
+      btn.textContent = 'Installing...';
+      
+      try {
+        const libName = document.getElementById('libName').value;
+        const version = document.getElementById('libVersion').value || 'latest';
+        
+        const result = await fetchJson(`/api/v1/libraries/${libName}/install`, {
+          method: 'POST',
+          body: JSON.stringify({ version })
+        });
+        
+        showNotification('Library installed successfully', 'success');
+        hideModal('installLibraryModal');
+        form.reset();
+        
+        setTimeout(() => {
+          window.refreshLibraries();
+        }, 500);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+    
+    async function handleLibraryAction(libName, action) {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      try {
+        showLoading('data', `${action.charAt(0).toUpperCase() + action.slice(1)}ing library...`);
+        
+        const result = await fetchJson(`/api/v1/libraries/${libName}/${action}`, {
+          method: 'POST'
+        });
+        
+        showNotification(result.message || `Library ${action}d successfully`, 'success');
+        setTimeout(() => {
+          window.refreshLibraries();
+        }, 1000);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+        hideLoading('data');
+      }
+    }
+    
+    async function handleLibraryUninstall(libName) {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      showConfirmDialog(
+        `Are you sure you want to uninstall library "${libName}"? This action cannot be undone.`,
+        async () => {
+          try {
+            showLoading('data', 'Uninstalling library...');
+            
+            await fetchJson(`/api/v1/libraries/${libName}/uninstall`, {
+              method: 'POST'
+            });
+            
+            showNotification('Library uninstalled successfully', 'success');
+            setTimeout(() => {
+              window.refreshLibraries();
+            }, 1000);
+          } catch (e) {
+            showNotification('Error: ' + e.message, 'error');
+            hideLoading('data');
+          }
+        }
+      );
+    }
+    
+    async function refresh() {
+      await window.refreshLibraries();
+    }
+    
+    refresh();
+    setInterval(refresh, 5000);
+    "#;
+    
     layout(
-        "Libs",
-        r#"<div class="muted">Source: <code>/api/v1/libraries</code></div><div id="data"></div>"#,
-        &format!(
-            "{}\nasync function refresh(){{ await poll('/api/v1/libraries', renderTable, 'data'); }}\nrefresh(); setInterval(refresh, 5000);",
-            common_js()
-        ),
+        "Libraries",
+        r#"
+<div class="row" style="margin-bottom:16px;">
+  <div class="muted">Source: <code>/api/v1/libraries</code></div>
+  <button class="btn btn-primary" onclick="showInstallLibraryModal()">Install Library</button>
+</div>
+<div id="data"></div>
+
+<!-- Install Library Modal -->
+<div id="installLibraryModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Install Library</h3>
+      <button class="modal-close" onclick="hideModal('installLibraryModal')">&times;</button>
+    </div>
+    <form id="installLibraryForm" onsubmit="handleInstallLibrary(event)">
+      <div class="form-group">
+        <label for="libName">Library Name</label>
+        <input type="text" id="libName" name="name" required placeholder="libtorch" />
+      </div>
+      <div class="form-group">
+        <label for="libVersion">Version (optional, defaults to latest)</label>
+        <input type="text" id="libVersion" name="version" placeholder="1.13.0" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="hideModal('installLibraryModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Install</button>
+      </div>
+    </form>
+  </div>
+</div>
+"#,
+        &format!("{}\n{}", common_js(), libs_js),
     )
 }
 
 async fn vm_page() -> Html<String> {
+    let vm_js = r#"
+    window.refreshVmInstances = async function() {
+      await poll('/api/v1/vm/instances', renderTable, 'data');
+    };
+    
+    async function showCreateVmModal() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      showModal('createVmModal');
+    }
+    
+    async function handleCreateVm(event) {
+      event.preventDefault();
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      if (!validateForm('createVmForm')) {
+        showNotification('Please fill in all required fields correctly.', 'error');
+        return;
+      }
+      
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+      
+      try {
+        const payload = {
+          name: document.getElementById('vmName').value,
+          resources: {
+            cpu_cores: parseInt(document.getElementById('vmCpuCores').value, 10),
+            memory_mb: parseInt(document.getElementById('vmMemoryMb').value, 10),
+            gpu_required: document.getElementById('vmGpuRequired').checked
+          },
+          isolation: document.getElementById('vmIsolation').value
+        };
+        
+        const result = await fetchJson('/api/v1/vm/instances', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        
+        showNotification('VM instance created successfully', 'success');
+        hideModal('createVmModal');
+        form.reset();
+        
+        setTimeout(() => {
+          window.refreshVmInstances();
+        }, 500);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+    
+    async function refresh() {
+      await window.refreshVmInstances();
+    }
+    
+    refresh();
+    setInterval(refresh, 5000);
+    "#;
+    
     layout(
-        "VM",
-        r#"<div class="muted">Source: <code>/api/v1/vm/instances</code></div><div id="data"></div>"#,
-        &format!(
-            "{}\nasync function refresh(){{ await poll('/api/v1/vm/instances', renderTable, 'data'); }}\nrefresh(); setInterval(refresh, 5000);",
-            common_js()
-        ),
+        "VM Instances",
+        r#"
+<div class="row" style="margin-bottom:16px;">
+  <div class="muted">Source: <code>/api/v1/vm/instances</code></div>
+  <button class="btn btn-primary" onclick="showCreateVmModal()">Create VM Instance</button>
+</div>
+<div id="data"></div>
+
+<!-- Create VM Modal -->
+<div id="createVmModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create VM Instance</h3>
+      <button class="modal-close" onclick="hideModal('createVmModal')">&times;</button>
+    </div>
+    <form id="createVmForm" onsubmit="handleCreateVm(event)">
+      <div class="form-group">
+        <label for="vmName">Instance Name</label>
+        <input type="text" id="vmName" name="name" required placeholder="my-vm-instance" />
+      </div>
+      <div class="form-group">
+        <label for="vmCpuCores">CPU Cores</label>
+        <input type="number" id="vmCpuCores" name="cpu_cores" required min="1" max="64" value="2" />
+      </div>
+      <div class="form-group">
+        <label for="vmMemoryMb">Memory (MB)</label>
+        <input type="number" id="vmMemoryMb" name="memory_mb" required min="256" max="131072" value="2048" />
+      </div>
+      <div class="form-group">
+        <label for="vmGpuRequired">
+          <input type="checkbox" id="vmGpuRequired" name="gpu_required" />
+          GPU Required
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="vmIsolation">Isolation Type</label>
+        <select id="vmIsolation" name="isolation" required>
+          <option value="ProcessSandbox">Process Sandbox</option>
+          <option value="HardwareVm">Hardware VM</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="hideModal('createVmModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+"#,
+        &format!("{}\n{}", common_js(), vm_js),
     )
 }
 
