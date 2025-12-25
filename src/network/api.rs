@@ -1,14 +1,16 @@
 // network/api.rs
 use axum::{
-    routing::{get, post},
+    routing::{get, post, put, delete},
     Router,
     Json,
     response::{IntoResponse, Response},
     http::{header::ACCEPT},
+    middleware,
 };
 use serde::Serialize;
 use crate::platform;
-use crate::network::auth::{AuthRequest, authenticate_user};
+use crate::network::auth::{AuthRequest, authenticate_user, Claims, auth_middleware};
+use axum::extract::Extension;
 use crate::network::ws::websocket_handler;
 use crate::rewards::{get_user_rewards, get_user_progress, get_reward_statistics, get_top_users};
 use crate::libs::{get_global_manager, LibraryType};
@@ -84,17 +86,24 @@ pub fn create_api_routes() -> Router {
         .route("/rewards/top", get(top_users_handler))
         .route("/libraries", get(libraries_list_handler))
         .route("/libraries/:name", get(library_info_handler))
-        .route("/libraries/:name/install", post(library_install_handler))
-        .route("/libraries/:name/uninstall", post(library_uninstall_handler))
-        .route("/libraries/:name/update", post(library_update_handler))
+        // Write endpoints with auth middleware
+        .route("/libraries/:name/install", post(library_install_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/libraries/:name/uninstall", post(library_uninstall_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/libraries/:name/update", post(library_update_handler).layer(middleware::from_fn(auth_middleware)))
         .route("/vm/instances", get(vm_instances_handler))
+        .route("/vm/instances", post(vm_instance_create_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/vm/instances/:id", put(vm_instance_update_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/vm/instances/:id", delete(vm_instance_delete_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/vm/instances/:id/start", post(vm_instance_start_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/vm/instances/:id/stop", post(vm_instance_stop_handler).layer(middleware::from_fn(auth_middleware)))
+        .route("/vm/instances/:id/restart", post(vm_instance_restart_handler).layer(middleware::from_fn(auth_middleware)))
         .route("/vm/instances/:id/health", get(vm_instance_health_handler))
         .route("/vm/instances/:id/resources", get(vm_instance_resources_handler))
         .route("/vm/resource-limits-supported", get(vm_resource_limits_supported_handler))
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
-        .route("/raid/gc", post(raid_gc_handler))
+        .route("/raid/gc", post(raid_gc_handler).layer(middleware::from_fn(auth_middleware)))
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {
@@ -133,6 +142,219 @@ async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
     Json(serde_json::json!({
         "supported": supported
     }))
+}
+
+// Helper function to check RBAC permissions
+fn check_permission(claims: &Claims, required_permission: &str) -> Result<(), (axum::http::StatusCode, Json<serde_json::Value>)> {
+    if !claims.permissions.contains(&required_permission.to_string()) {
+        return Err((
+            axum::http::StatusCode::FORBIDDEN,
+            Json(serde_json::json!({
+                "error": "Insufficient permissions",
+                "required": required_permission,
+                "user_permissions": claims.permissions
+            })),
+        ));
+    }
+    Ok(())
+}
+
+// VM instance write operations with RBAC
+
+#[derive(serde::Deserialize)]
+struct VmCreateRequest {
+    name: String,
+    resources: vm::VmResources,
+    isolation: Option<vm::VmIsolation>,
+}
+
+async fn vm_instance_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(payload): Json<VmCreateRequest>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:vm
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:vm")) {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let isolation = payload.isolation.unwrap_or(vm::VmIsolation::ProcessSandbox);
+    
+    match manager.create_instance(payload.name, payload.resources, isolation).await {
+        Ok(instance) => Json(instance).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to create VM instance: {}", e)
+            }))).into_response()
+        }
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct VmUpdateRequest {
+    name: Option<String>,
+    resources: Option<vm::VmResources>,
+    isolation: Option<vm::VmIsolation>,
+}
+
+async fn vm_instance_update_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+    Json(payload): Json<VmUpdateRequest>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:vm
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:vm")) {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.update_instance(uuid, payload.name, payload.resources, payload.isolation).await {
+        Ok(instance) => Json(instance).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to update VM instance: {}", e)
+            }))).into_response()
+        }
+    }
+}
+
+async fn vm_instance_delete_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    // Check permission: delete:all or write:vm
+    if let Err(err) = check_permission(&claims, "delete:all")
+        .or_else(|_| check_permission(&claims, "write:vm")) {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.delete_instance(uuid).await {
+        Ok(_) => Json(serde_json::json!({
+            "message": format!("VM instance {} deleted successfully", id)
+        })).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to delete VM instance: {}", e)
+            }))).into_response()
+        }
+    }
+}
+
+async fn vm_instance_start_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:vm
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:vm")) {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.start_instance(uuid).await {
+        Ok(_) => Json(serde_json::json!({
+            "message": format!("VM instance {} started successfully", id)
+        })).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to start VM instance: {}", e)
+            }))).into_response()
+        }
+    }
+}
+
+async fn vm_instance_stop_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:vm
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:vm")) {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.stop_instance(uuid).await {
+        Ok(_) => Json(serde_json::json!({
+            "message": format!("VM instance {} stopped successfully", id)
+        })).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to stop VM instance: {}", e)
+            }))).into_response()
+        }
+    }
+}
+
+async fn vm_instance_restart_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:vm
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:vm")) {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (axum::http::StatusCode::BAD_REQUEST, Json(serde_json::json!({
+                "error": "Invalid UUID format"
+            }))).into_response();
+        }
+    };
+
+    match manager.restart_instance(uuid).await {
+        Ok(_) => Json(serde_json::json!({
+            "message": format!("VM instance {} restarted successfully", id)
+        })).into_response(),
+        Err(e) => {
+            (axum::http::StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({
+                "error": format!("Failed to restart VM instance: {}", e)
+            }))).into_response()
+        }
+    }
 }
 
 async fn vm_instance_health_handler(
@@ -232,7 +454,14 @@ struct RaidGcResponse {
     removed_count: usize,
 }
 
-async fn raid_gc_handler() -> impl IntoResponse {
+async fn raid_gc_handler(
+    Extension(claims): Extension<Claims>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:raid
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:raid")) {
+        return err.into_response();
+    }
     let manager = raid::get_global_manager();
     match manager.gc_old_artifacts().await {
         Ok(removed) => Json(RaidGcResponse { removed_count: removed }).into_response(),
@@ -541,10 +770,16 @@ async fn library_install_handler(
     }
 }
 
-// Uninstall library
+// Uninstall library (with RBAC check)
 async fn library_uninstall_handler(
+    Extension(claims): Extension<Claims>,
     axum::extract::Path(name): axum::extract::Path<String>
 ) -> impl IntoResponse {
+    // Check permission: write:all or write:libs
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:libs")) {
+        return err.into_response();
+    }
     if let Some(manager) = get_global_manager() {
         let manager = manager.read().await;
         match manager.uninstall_library(&name).await {
@@ -562,10 +797,16 @@ async fn library_uninstall_handler(
     }
 }
 
-// Update library
+// Update library (with RBAC check)
 async fn library_update_handler(
+    Extension(claims): Extension<Claims>,
     axum::extract::Path(name): axum::extract::Path<String>
 ) -> impl IntoResponse {
+    // Check permission: write:all or write:libs
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:libs")) {
+        return err.into_response();
+    }
     if let Some(manager) = get_global_manager() {
         let manager = manager.read().await;
         match manager.update_library(&name).await {

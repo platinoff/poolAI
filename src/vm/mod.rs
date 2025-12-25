@@ -250,7 +250,58 @@ impl VmManager {
         };
 
         self.instances.write().await.insert(id, instance.clone());
+        info!("VM instance {} ({}) created", id, instance.name);
         Ok(instance)
+    }
+
+    pub async fn update_instance(
+        &self,
+        id: Uuid,
+        name: Option<String>,
+        resources: Option<VmResources>,
+        isolation: Option<VmIsolation>,
+    ) -> Result<VmInstance, AppError> {
+        let mut instances = self.instances.write().await;
+        let inst = instances
+            .get_mut(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+
+        if let Some(new_name) = name {
+            inst.name = new_name;
+        }
+        if let Some(new_resources) = resources {
+            inst.resources = new_resources;
+        }
+        if let Some(new_isolation) = isolation {
+            inst.isolation = new_isolation;
+        }
+
+        let updated = inst.clone();
+        info!("VM instance {} updated", id);
+        Ok(updated)
+    }
+
+    pub async fn delete_instance(&self, id: Uuid) -> Result<(), AppError> {
+        // Stop instance if running
+        if let Some(inst) = self.get_instance(id).await {
+            if matches!(inst.status, VmStatus::Running) {
+                self.stop_instance(id).await?;
+            }
+        }
+
+        // Unregister health check
+        {
+            let hm = self.health_monitor.write().await;
+            hm.unregister_check(id).await;
+        }
+
+        // Remove from HashMap
+        let mut instances = self.instances.write().await;
+        instances.remove(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+
+        info!("VM instance {} deleted", id);
+        Ok(())
     }
 
     pub async fn list_instances(&self) -> Vec<VmInstance> {

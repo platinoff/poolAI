@@ -63,6 +63,8 @@ const BASE_CSS: &str = r#"
   th, td { border:1px solid #262b36; padding: 8px; text-align:left; vertical-align: top; }
   th { background:#0f1216; color:#cfe3ff; }
   .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; background:#0f1216; border:1px solid #262b36; color:#a8b0bf; font-size: 0.9em; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
 "#;
 
@@ -286,6 +288,45 @@ async function requireAuth(requiredRole = null) {
   return true;
 }
 
+// User feedback functions
+function showNotification(message, type = 'info', duration = 3000) {
+  // Remove existing notification if any
+  const existing = document.getElementById('globalNotification');
+  if (existing) existing.remove();
+  
+  const notification = document.createElement('div');
+  notification.id = 'globalNotification';
+  notification.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 10000;
+    padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    background: ${type === 'success' ? '#50fa7b' : type === 'error' ? '#ff5555' : '#8be9fd'};
+    color: ${type === 'error' ? '#fff' : '#0f1216'};
+    font-weight: 500; max-width: 400px; word-wrap: break-word;
+    animation: slideIn 0.3s ease-out;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => notification.remove(), 300);
+  }, duration);
+}
+
+function showLoading(elementId, message = 'Loading...') {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.dataset.loading = 'true';
+  el.innerHTML = `<div style="text-align:center; padding:20px; color:#a8b0bf;">${message}</div>`;
+}
+
+function hideLoading(elementId) {
+  const el = document.getElementById(elementId);
+  if (el && el.dataset.loading === 'true') {
+    el.dataset.loading = 'false';
+  }
+}
+
 async function fetchJson(url, options = {}) {
   const headers = getAuthHeaders();
   if (options.headers) {
@@ -313,10 +354,16 @@ async function fetchJson(url, options = {}) {
       }
       throw new Error('Unauthorized');
     }
-    if (!retryRes.ok) throw new Error('HTTP ' + retryRes.status);
+    if (!retryRes.ok) {
+      const errorData = await retryRes.json().catch(() => ({}));
+      throw new Error(errorData.error || 'HTTP ' + retryRes.status);
+    }
     return await retryRes.json();
   }
-  if (!res.ok) throw new Error('HTTP ' + res.status);
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'HTTP ' + res.status);
+  }
   return await res.json();
 }
 
@@ -394,7 +441,10 @@ async function poll(url, renderFn, containerId) {
     setUpdated();
   } catch (e) {
     const el = document.getElementById(containerId);
-    if (el) el.innerHTML = '<pre>' + String(e) + '</pre>';
+    if (el) {
+      el.innerHTML = '<div style="color:#ff5555; padding:12px; border:1px solid #ff5555; border-radius:8px;">Error: ' + String(e) + '</div>';
+    }
+    console.error('Poll error:', e);
   }
 }
 
