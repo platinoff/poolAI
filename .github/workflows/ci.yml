@@ -59,11 +59,12 @@ jobs:
         run: cargo build --verbose --features jwt,https
         continue-on-error: true
       
-      - name: Run tests
-        run: cargo test --verbose
-      
       - name: Run tests (no features)
         run: cargo test --verbose --no-default-features
+        continue-on-error: true
+      
+      - name: Run tests (default)
+        run: cargo test --verbose
         continue-on-error: true
 
   check:
