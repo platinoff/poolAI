@@ -171,7 +171,13 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [x] Create Raft transport module (HTTP/HTTPS)
 - [x] Define Raft state machine structures
 - [x] Basic Raft node setup
-- [ ] Integrate Raft consensus with RaidManager
+- [x] Create RaidRaftStorage structure
+- [x] Create RaidRaftStateMachine with apply_operation
+- [x] Update RaidRaftNode with full integration (storage, state_machine, transport)
+- [x] Integrate state machine with RaidManager
+- [ ] Implement RaftStorage trait (awaiting async-raft 0.6.1 API verification)
+- [ ] Implement RaftNetwork trait (awaiting async-raft 0.6.1 API verification)
+- [ ] Initialize Raft instance in RaidRaftNode
 - [ ] Implement leader election
 - [ ] Log replication
 - [ ] Integration tests

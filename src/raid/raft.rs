@@ -244,20 +244,39 @@ impl RaidRaftNode {
 
     /// Check if this node is the leader
     pub async fn is_leader(&self) -> bool {
-        // TODO: Check Raft leader status
+        // TODO: Check Raft leader status after initializing Raft instance
+        // Example: self.raft.is_leader().await
         false
     }
 
     /// Get current Raft term
     pub async fn current_term(&self) -> u64 {
-        // TODO: Get current term from Raft
+        // TODO: Get current term from Raft after initializing Raft instance
+        // Example: self.raft.current_term().await
         0
     }
 
     /// Get current Raft role (Leader, Follower, Candidate)
     pub async fn current_role(&self) -> String {
-        // TODO: Get current role from Raft
+        // TODO: Get current role from Raft after initializing Raft instance
+        // Example: match self.raft.current_role().await { ... }
         "Follower".to_string()
+    }
+
+    /// Apply a Raft operation (for leader nodes)
+    pub async fn apply_operation(
+        &self,
+        operation: RaidRaftOperation,
+    ) -> Result<RaidRaftResponse, AppError> {
+        // TODO: Apply operation through Raft after initializing Raft instance
+        // Example: self.raft.client_write(operation).await
+        // For now, apply directly to state machine (non-consensus mode)
+        self.state_machine.apply_operation(&operation).await
+    }
+
+    /// Get reference to transport for adding nodes
+    pub fn transport(&self) -> &crate::raid::raft_transport::HttpRaftTransport {
+        &self.transport
     }
 }
 

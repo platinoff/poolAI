@@ -125,12 +125,13 @@
 - [x] Create RaidRaftStateMachine with apply_operation method
 - [x] Update RaidRaftNode with storage, state_machine, and transport
 - [x] Add apply_operation method to RaidRaftNode
-- [ ] Implement RaftStorage trait (awaiting async-raft API verification)
-- [ ] Implement RaftNetwork trait (awaiting async-raft API verification)
+- [x] Add transport() method for node management
+- [x] Integration tests (5 tests passing)
+- [ ] Implement RaftStorage trait (awaiting async-raft 0.6.1 API verification)
+- [ ] Implement RaftNetwork trait (awaiting async-raft 0.6.1 API verification)
 - [ ] Initialize Raft instance in RaidRaftNode
 - [ ] Implement leader election
 - [ ] Basic log replication
-- [ ] Unit tests
 
 #### Phase 3: Testing (Week 11, Day 4-5)
 - [ ] Integration tests
