@@ -9,6 +9,7 @@
 pub mod api;
 pub mod ws;
 pub mod auth;
+pub mod raid_distributed_handlers;
 
 use axum::Router;
 use axum::routing::get;

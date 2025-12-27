@@ -17,6 +17,8 @@ use crate::libs::{get_global_manager, LibraryType};
 use crate::vm;
 use crate::raid;
 
+use crate::network::raid_distributed_handlers::*;
+
 #[derive(Serialize)]
 struct StatusResponse {
     status: &'static str,
@@ -104,6 +106,14 @@ pub fn create_api_routes() -> Router {
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
         .route("/raid/gc", post(raid_gc_handler).layer(middleware::from_fn(auth_middleware)))
+        // Distributed RAID Protocol endpoints
+        .route("/raid/distributed/artifacts/replicate", post(put_artifact_handler))
+        .route("/raid/distributed/artifacts/get", post(get_artifact_handler))
+        .route("/raid/distributed/artifacts/delete", post(delete_artifact_handler))
+        .route("/raid/distributed/artifacts/sync", post(sync_artifacts_handler))
+        .route("/raid/distributed/health", post(health_check_handler))
+        .route("/raid/distributed/cluster/join", post(join_cluster_handler))
+        .route("/raid/distributed/cluster/leave", post(leave_cluster_handler))
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {
