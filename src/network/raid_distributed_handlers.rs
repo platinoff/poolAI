@@ -2,18 +2,20 @@
 //!
 //! Handlers for processing protocol messages in the distributed RAID system.
 
-use axum::{Json, response::{IntoResponse, Response}, http::StatusCode};
-use crate::raid::protocol::*;
-use crate::raid;
 use crate::core::error::AppError;
-use tracing::{info, warn, error};
+use crate::raid;
+use crate::raid::protocol::*;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use chrono::Utc;
+use tracing::{error, info, warn};
 use uuid::Uuid;
 
 /// Handle PutArtifact protocol message
-pub async fn put_artifact_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn put_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received PutArtifact message: {}", message.id);
 
     let payload = match message.extract_put_artifact() {
@@ -29,7 +31,7 @@ pub async fn put_artifact_handler(
     };
 
     let manager = raid::get_global_manager();
-    
+
     // Decode base64 data if present
     let artifact_data = if let Some(data_base64) = payload.data {
         match base64_decode(&data_base64) {
@@ -50,28 +52,26 @@ pub async fn put_artifact_handler(
     // Store artifact locally
     let artifact_name = format!("{}-{}", payload.metadata.name, payload.metadata.version);
     match artifact_data {
-        Some(data) => {
-            match manager.put_artifact(&artifact_name, &data).await {
-                Ok(artifact_ref) => {
-                    info!("Artifact stored successfully: {}", artifact_ref.id);
-                    let response = PutArtifactResponse {
-                        status: OperationStatus::Success,
-                        artifact_id: payload.artifact_id,
-                        stored_at: Utc::now(),
-                        error: None,
-                    };
-                    create_success_response(&message, response)
-                }
-                Err(e) => {
-                    error!("Failed to store artifact: {}", e);
-                    create_error_response(
-                        &message,
-                        ErrorCode::ReplicationFailed,
-                        format!("Storage failed: {}", e),
-                    )
-                }
+        Some(data) => match manager.put_artifact(&artifact_name, &data).await {
+            Ok(artifact_ref) => {
+                info!("Artifact stored successfully: {}", artifact_ref.id);
+                let response = PutArtifactResponse {
+                    status: OperationStatus::Success,
+                    artifact_id: payload.artifact_id,
+                    stored_at: Utc::now(),
+                    error: None,
+                };
+                create_success_response(&message, response)
             }
-        }
+            Err(e) => {
+                error!("Failed to store artifact: {}", e);
+                create_error_response(
+                    &message,
+                    ErrorCode::ReplicationFailed,
+                    format!("Storage failed: {}", e),
+                )
+            }
+        },
         None => {
             // Metadata-only replication (data will be fetched separately)
             warn!("PutArtifact without data - metadata-only replication");
@@ -87,9 +87,7 @@ pub async fn put_artifact_handler(
 }
 
 /// Handle GetArtifact protocol message
-pub async fn get_artifact_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn get_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received GetArtifact message: {}", message.id);
 
     let payload = match message.extract_get_artifact() {
@@ -106,9 +104,11 @@ pub async fn get_artifact_handler(
 
     let manager = raid::get_global_manager();
     let artifacts = manager.list_artifacts().await;
-    
+
     // Find artifact by ID (simplified - in real implementation, would use proper ID mapping)
-    let artifact = artifacts.iter().find(|a| a.id.to_string() == payload.artifact_id);
+    let artifact = artifacts
+        .iter()
+        .find(|a| a.id.to_string() == payload.artifact_id);
 
     match artifact {
         Some(artifact_ref) => {
@@ -118,7 +118,7 @@ pub async fn get_artifact_handler(
                 metadata: Some(ArtifactMetadata {
                     name: artifact_ref.name.clone(),
                     version: "unknown".to_string(), // TODO: extract from artifact
-                    size_bytes: 0, // TODO: get actual size
+                    size_bytes: 0,                  // TODO: get actual size
                     checksum: "unknown".to_string(), // TODO: calculate checksum
                     created_at: artifact_ref.stored_at,
                     content_type: None,
@@ -132,7 +132,7 @@ pub async fn get_artifact_handler(
             if payload.include_data {
                 match tokio::fs::read(&artifact_ref.path).await {
                     Ok(data) => {
-                        use base64::{Engine as _, engine::general_purpose};
+                        use base64::{engine::general_purpose, Engine as _};
                         response.data = Some(general_purpose::STANDARD.encode(&data));
                     }
                     Err(e) => {
@@ -160,9 +160,7 @@ pub async fn get_artifact_handler(
 }
 
 /// Handle DeleteArtifact protocol message
-pub async fn delete_artifact_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn delete_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received DeleteArtifact message: {}", message.id);
 
     let payload = match message.extract_delete_artifact() {
@@ -179,33 +177,33 @@ pub async fn delete_artifact_handler(
 
     let manager = raid::get_global_manager();
     let artifacts = manager.list_artifacts().await;
-    
+
     // Find and delete artifact (simplified - in real implementation, would use proper ID mapping)
-    let artifact = artifacts.iter().find(|a| a.id.to_string() == payload.artifact_id);
+    let artifact = artifacts
+        .iter()
+        .find(|a| a.id.to_string() == payload.artifact_id);
 
     match artifact {
-        Some(artifact_ref) => {
-            match tokio::fs::remove_file(&artifact_ref.path).await {
-                Ok(_) => {
-                    info!("Artifact deleted successfully: {}", payload.artifact_id);
-                    let response = DeleteArtifactResponse {
-                        status: OperationStatus::Success,
-                        artifact_id: payload.artifact_id,
-                        deleted_at: Utc::now(),
-                        error: None,
-                    };
-                    create_success_response(&message, response)
-                }
-                Err(e) => {
-                    error!("Failed to delete artifact: {}", e);
-                    create_error_response(
-                        &message,
-                        ErrorCode::ReplicationFailed,
-                        format!("Delete failed: {}", e),
-                    )
-                }
+        Some(artifact_ref) => match tokio::fs::remove_file(&artifact_ref.path).await {
+            Ok(_) => {
+                info!("Artifact deleted successfully: {}", payload.artifact_id);
+                let response = DeleteArtifactResponse {
+                    status: OperationStatus::Success,
+                    artifact_id: payload.artifact_id,
+                    deleted_at: Utc::now(),
+                    error: None,
+                };
+                create_success_response(&message, response)
             }
-        }
+            Err(e) => {
+                error!("Failed to delete artifact: {}", e);
+                create_error_response(
+                    &message,
+                    ErrorCode::ReplicationFailed,
+                    format!("Delete failed: {}", e),
+                )
+            }
+        },
         None => {
             warn!("Artifact not found for deletion: {}", payload.artifact_id);
             let response = DeleteArtifactResponse {
@@ -220,9 +218,7 @@ pub async fn delete_artifact_handler(
 }
 
 /// Handle SyncArtifacts protocol message
-pub async fn sync_artifacts_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn sync_artifacts_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received SyncArtifacts message: {}", message.id);
 
     let _payload = match message.extract_sync_artifacts() {
@@ -239,14 +235,14 @@ pub async fn sync_artifacts_handler(
 
     let manager = raid::get_global_manager();
     let artifacts = manager.list_artifacts().await;
-    
+
     // Simplified sync implementation
     // In real implementation, would compare timestamps and sync accordingly
     let response = SyncArtifactsResponse {
         status: OperationStatus::Success,
         synced_count: artifacts.len() as u32,
         missing_artifacts: Vec::new(), // TODO: implement proper sync logic
-        conflicts: Vec::new(), // TODO: implement conflict detection
+        conflicts: Vec::new(),         // TODO: implement conflict detection
         error: None,
     };
 
@@ -254,22 +250,20 @@ pub async fn sync_artifacts_handler(
 }
 
 /// Handle HealthCheck protocol message
-pub async fn health_check_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn health_check_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received HealthCheck message: {}", message.id);
 
     let manager = raid::get_global_manager();
     let artifacts = manager.list_artifacts().await;
     let total_size = manager.get_total_size().await.unwrap_or(0);
-    
+
     // TODO: Get actual storage capacity from config
     let storage_total_bytes = 107374182400u64; // 100 GB default
     let storage_used_bytes = total_size;
-    
+
     // TODO: Get actual uptime
     let uptime_seconds = 3600u64;
-    
+
     // TODO: Get Raft role and term (when Raft is implemented)
     let response = HealthCheckResponse {
         status: HealthStatus::Healthy,
@@ -278,7 +272,7 @@ pub async fn health_check_handler(
         storage_total_bytes,
         artifact_count: artifacts.len() as u32,
         raft_role: RaftRole::Follower, // TODO: get actual role
-        raft_term: 0, // TODO: get actual term
+        raft_term: 0,                  // TODO: get actual term
         last_heartbeat: Utc::now(),
     };
 
@@ -286,9 +280,7 @@ pub async fn health_check_handler(
 }
 
 /// Handle JoinCluster protocol message
-pub async fn join_cluster_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn join_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received JoinCluster message: {}", message.id);
 
     let payload = match message.extract_join_cluster() {
@@ -304,21 +296,24 @@ pub async fn join_cluster_handler(
     };
 
     let manager = raid::get_global_manager();
-    
+
     // Register the new node
     let _node = manager.register_node(payload.address.clone()).await;
-    
+
     // Get existing nodes
     let nodes = manager.list_nodes().await;
-    let member_nodes: Vec<ClusterNode> = nodes.iter().map(|n| {
-        ClusterNode {
-            node_id: n.id.to_string(),
-            address: n.address.clone(),
-            role: RaftRole::Follower, // TODO: get actual role
-            status: Some(HealthStatus::Healthy),
-            last_seen: Some(n.last_seen),
-        }
-    }).collect();
+    let member_nodes: Vec<ClusterNode> = nodes
+        .iter()
+        .map(|n| {
+            ClusterNode {
+                node_id: n.id.to_string(),
+                address: n.address.clone(),
+                role: RaftRole::Follower, // TODO: get actual role
+                status: Some(HealthStatus::Healthy),
+                last_seen: Some(n.last_seen),
+            }
+        })
+        .collect();
 
     let response = JoinClusterResponse {
         status: JoinStatus::Accepted,
@@ -331,9 +326,7 @@ pub async fn join_cluster_handler(
 }
 
 /// Handle LeaveCluster protocol message
-pub async fn leave_cluster_handler(
-    Json(message): Json<ProtocolMessage>,
-) -> impl IntoResponse {
+pub async fn leave_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
     info!("Received LeaveCluster message: {}", message.id);
 
     let payload = match message.extract_leave_cluster() {
@@ -402,8 +395,8 @@ fn create_error_response(
 }
 
 fn base64_decode(data: &str) -> Result<Vec<u8>, AppError> {
-    use base64::{Engine as _, engine::general_purpose};
-    general_purpose::STANDARD.decode(data)
+    use base64::{engine::general_purpose, Engine as _};
+    general_purpose::STANDARD
+        .decode(data)
         .map_err(|e| AppError::ValidationError(format!("Base64 decode error: {}", e)))
 }
-

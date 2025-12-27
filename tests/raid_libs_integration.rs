@@ -7,7 +7,7 @@
 //! - Multiple libraries with artifacts
 
 use poolai::libs::LibraryManager;
-use poolai::raid::{RaidManager, RaidConfig};
+use poolai::raid::{RaidConfig, RaidManager};
 use std::path::PathBuf;
 use tempfile::TempDir;
 use tokio::fs;
@@ -17,7 +17,7 @@ async fn test_library_install_stores_artifact_in_raid() {
     let temp_dir = TempDir::new().unwrap();
     let libs_dir = temp_dir.path().join("libs");
     let raid_dir = temp_dir.path().join("raid");
-    
+
     fs::create_dir_all(&libs_dir).await.unwrap();
     fs::create_dir_all(&raid_dir).await.unwrap();
 
@@ -31,7 +31,7 @@ async fn test_library_install_stores_artifact_in_raid() {
     };
     let raid_manager = RaidManager::new(raid_config);
     raid_manager.initialize().await.unwrap();
-    
+
     // Set global RAID manager (would need to be done via OnceLock in real code)
     // For test, we'll manually check artifacts
 
@@ -39,7 +39,7 @@ async fn test_library_install_stores_artifact_in_raid() {
     let _lib_manager = LibraryManager::new();
     // Override base_path for test
     // Note: LibraryManager doesn't expose base_path setter, so we'll test via actual install
-    
+
     // This test would require actual library download, which is complex
     // For now, we'll test the artifact storage logic separately
     assert!(true); // Placeholder - full test requires mock registry
@@ -48,18 +48,18 @@ async fn test_library_install_stores_artifact_in_raid() {
 #[tokio::test]
 async fn test_library_info_has_artifact_ref() {
     // Test that LibraryInfo can have artifact_ref field
+    use chrono::Utc;
     use poolai::libs::{LibraryInfo, LibraryMetadata};
     use poolai::raid::ArtifactRef;
     use uuid::Uuid;
-    use chrono::Utc;
-    
+
     let artifact_ref = ArtifactRef {
         id: Uuid::new_v4(),
         name: "test-lib-1.0.0.tar.gz".to_string(),
         stored_at: Utc::now(),
         path: PathBuf::from("/test/path"),
     };
-    
+
     let lib_info = LibraryInfo {
         name: "test-lib".to_string(),
         version: "1.0.0".to_string(),
@@ -68,7 +68,7 @@ async fn test_library_info_has_artifact_ref() {
         metadata: LibraryMetadata::default(),
         artifact_ref: Some(artifact_ref.clone()),
     };
-    
+
     assert_eq!(lib_info.name, "test-lib");
     assert_eq!(lib_info.version, "1.0.0");
     assert!(lib_info.artifact_ref.is_some());
@@ -80,7 +80,7 @@ async fn test_get_library_path_or_load_from_raid() {
     let temp_dir = TempDir::new().unwrap();
     let libs_dir = temp_dir.path().join("libs");
     let raid_dir = temp_dir.path().join("raid");
-    
+
     fs::create_dir_all(&libs_dir).await.unwrap();
     fs::create_dir_all(&raid_dir).await.unwrap();
 
@@ -100,7 +100,9 @@ async fn test_get_library_path_or_load_from_raid() {
     lib_manager.initialize().await.unwrap();
 
     // Test: get_library_path_or_load_from_raid for non-existent library
-    let result = lib_manager.get_library_path_or_load_from_raid("non-existent").await;
+    let result = lib_manager
+        .get_library_path_or_load_from_raid("non-existent")
+        .await;
     assert!(result.is_ok());
     assert!(result.unwrap().is_none());
 
@@ -114,11 +116,11 @@ async fn test_get_library_path_or_load_from_raid() {
 
 #[tokio::test]
 async fn test_multiple_libraries_with_artifacts() {
+    use chrono::Utc;
     use poolai::libs::{LibraryInfo, LibraryMetadata};
     use poolai::raid::ArtifactRef;
     use uuid::Uuid;
-    use chrono::Utc;
-    
+
     // Create multiple library infos with artifacts
     let lib1 = LibraryInfo {
         name: "lib1".to_string(),
@@ -133,7 +135,7 @@ async fn test_multiple_libraries_with_artifacts() {
             path: PathBuf::from("/raid/artifacts/lib1-1.0.0.tar.gz"),
         }),
     };
-    
+
     let lib2 = LibraryInfo {
         name: "lib2".to_string(),
         version: "2.0.0".to_string(),
@@ -147,7 +149,7 @@ async fn test_multiple_libraries_with_artifacts() {
             path: PathBuf::from("/raid/artifacts/lib2-2.0.0.tar.gz"),
         }),
     };
-    
+
     assert!(lib1.artifact_ref.is_some());
     assert!(lib2.artifact_ref.is_some());
     assert_eq!(lib2.dependencies.len(), 1);
@@ -157,7 +159,7 @@ async fn test_multiple_libraries_with_artifacts() {
 #[tokio::test]
 async fn test_library_without_artifact_ref() {
     use poolai::libs::{LibraryInfo, LibraryMetadata};
-    
+
     // Library installed before RAID integration (no artifact_ref)
     let lib_info = LibraryInfo {
         name: "legacy-lib".to_string(),
@@ -167,8 +169,7 @@ async fn test_library_without_artifact_ref() {
         metadata: LibraryMetadata::default(),
         artifact_ref: None, // No artifact in RAID
     };
-    
+
     assert!(lib_info.artifact_ref.is_none());
     // This library can still be used if local path exists
 }
-

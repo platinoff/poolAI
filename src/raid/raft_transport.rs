@@ -4,23 +4,21 @@
 //! allowing Raft nodes to communicate over the existing REST API.
 
 #[cfg(feature = "raft")]
+use crate::raid::raft::{RaidRaftOperation, RaidRaftResponse};
+#[cfg(feature = "raft")]
 use async_raft::{
-    RaftNetwork, NodeId,
-    network::RaftNetworkError,
-    raft::RaftRequest, raft::RaftResponse,
+    network::RaftNetworkError, raft::RaftRequest, raft::RaftResponse, NodeId, RaftNetwork,
 };
 #[cfg(feature = "raft")]
-use crate::raid::raft::{RaidRaftOperation, RaidRaftResponse};
+use reqwest::Client;
+#[cfg(feature = "raft")]
+use serde_json;
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
 use tokio::sync::RwLock;
 #[cfg(feature = "raft")]
-use reqwest::Client;
-#[cfg(feature = "raft")]
 use tracing::{info, warn};
-#[cfg(feature = "raft")]
-use serde_json;
 
 /// Node address mapping
 #[cfg(feature = "raft")]
@@ -84,7 +82,7 @@ impl RaftNetwork<RaidRaftOperation, RaidRaftResponse> for HttpRaftTransport {
         };
 
         let url = format!("{}/raft/append-entries", address);
-        
+
         // Serialize the Raft request
         let body = match serde_json::to_vec(&rpc) {
             Ok(b) => b,
@@ -151,7 +149,7 @@ impl RaftNetwork<RaidRaftOperation, RaidRaftResponse> for HttpRaftTransport {
         };
 
         let url = format!("{}/raft/vote", address);
-        
+
         let body = match serde_json::to_vec(&rpc) {
             Ok(b) => b,
             Err(e) => {
@@ -189,4 +187,3 @@ impl RaftNetwork<RaidRaftOperation, RaidRaftResponse> for HttpRaftTransport {
         }
     }
 }
-

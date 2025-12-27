@@ -1,10 +1,10 @@
-use thiserror::Error;
-use std::io;
-use serde_json;
-use serde::{Serialize, Deserialize};
 use chrono;
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::io;
+use thiserror::Error;
+use tracing::{error, info, warn};
 use uuid;
-use tracing::{info, warn, error};
 
 #[derive(Error, Debug)]
 pub enum PoolAIError {
@@ -117,7 +117,7 @@ impl AppError {
     /// Attempt to recover from the error
     pub fn recover(&self) -> Result<(), AppError> {
         warn!("Attempting recovery from error: {:?}", self);
-        
+
         match self {
             AppError::ModelError(_) => {
                 // Attempt to reload the model
@@ -168,15 +168,16 @@ impl AppError {
 
     /// Check if the error is recoverable
     pub fn is_recoverable(&self) -> bool {
-        matches!(self,
-            AppError::ModelError(_) |
-            AppError::ConfigError(_) |
-            AppError::PoolError(_) |
-            AppError::MonitoringError(_) |
-            AppError::ResourceError(_) |
-            AppError::GpuError(_) |
-            AppError::MemoryError(_) |
-            AppError::TimeoutError(_)
+        matches!(
+            self,
+            AppError::ModelError(_)
+                | AppError::ConfigError(_)
+                | AppError::PoolError(_)
+                | AppError::MonitoringError(_)
+                | AppError::ResourceError(_)
+                | AppError::GpuError(_)
+                | AppError::MemoryError(_)
+                | AppError::TimeoutError(_)
         )
     }
 
@@ -249,18 +250,22 @@ impl ErrorMetrics {
     /// Получение статистики ошибок
     pub fn get_error_statistics(&self) -> std::collections::HashMap<String, f64> {
         let mut stats = std::collections::HashMap::new();
-        
+
         if self.total_errors > 0 {
             stats.insert("total_errors".to_string(), self.total_errors as f64);
-            stats.insert("recovery_rate".to_string(), 
-                self.successful_recoveries as f64 / self.recovery_attempts as f64);
-            
+            stats.insert(
+                "recovery_rate".to_string(),
+                self.successful_recoveries as f64 / self.recovery_attempts as f64,
+            );
+
             for (error_type, count) in &self.error_counts {
-                stats.insert(format!("error_rate_{}", error_type.to_lowercase()), 
-                    *count as f64 / self.total_errors as f64);
+                stats.insert(
+                    format!("error_rate_{}", error_type.to_lowercase()),
+                    *count as f64 / self.total_errors as f64,
+                );
             }
         }
-        
+
         stats
     }
-} 
+}

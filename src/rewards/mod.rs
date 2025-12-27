@@ -6,31 +6,31 @@
 //! - Achievement-based rewards
 //! - Reward history and statistics
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use chrono::{DateTime, Utc};
 
 // Reward types
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum RewardType {
-    Performance,    // For high performance
-    Efficiency,     // For efficient resource usage
-    Quality,        // For result quality
-    Innovation,     // For innovative solutions
-    Collaboration,  // For collaboration
-    Maintenance,    // For system maintenance
+    Performance,   // For high performance
+    Efficiency,    // For efficient resource usage
+    Quality,       // For result quality
+    Innovation,    // For innovative solutions
+    Collaboration, // For collaboration
+    Maintenance,   // For system maintenance
 }
 
 // Reward levels
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum RewardLevel {
-    Bronze = 1,    // 1x base reward
-    Silver = 2,    // 2x base reward
-    Gold = 3,      // 3x base reward
-    Platinum = 4,  // 4x base reward
-    Diamond = 5,   // 5x base reward
+    Bronze = 1,   // 1x base reward
+    Silver = 2,   // 2x base reward
+    Gold = 3,     // 3x base reward
+    Platinum = 4, // 4x base reward
+    Diamond = 5,  // 5x base reward
 }
 
 // Reward structure
@@ -127,18 +127,20 @@ impl RewardSystem {
     // Update user progress
     async fn update_user_progress(&self, user_id: &str, reward: &Reward) {
         let mut progress_map = self.user_progress.write().await;
-        
-        let progress = progress_map.entry(user_id.to_string()).or_insert_with(|| UserProgress {
-            user_id: user_id.to_string(),
-            total_rewards: 0.0,
-            reward_count: 0,
-            current_streak: 0,
-            longest_streak: 0,
-            last_reward_date: None,
-            achievements: Vec::new(),
-            level: 1,
-            experience: 0,
-        });
+
+        let progress = progress_map
+            .entry(user_id.to_string())
+            .or_insert_with(|| UserProgress {
+                user_id: user_id.to_string(),
+                total_rewards: 0.0,
+                reward_count: 0,
+                current_streak: 0,
+                longest_streak: 0,
+                last_reward_date: None,
+                achievements: Vec::new(),
+                level: 1,
+                experience: 0,
+            });
 
         // Update total amount and reward count
         progress.total_rewards += reward.amount;
@@ -175,10 +177,14 @@ impl RewardSystem {
         let mut new_achievements = Vec::new();
 
         // Achievements for reward count
-        if progress.reward_count >= 10 && !progress.achievements.contains(&"First Decade".to_string()) {
+        if progress.reward_count >= 10
+            && !progress.achievements.contains(&"First Decade".to_string())
+        {
             new_achievements.push("First Decade".to_string());
         }
-        if progress.reward_count >= 50 && !progress.achievements.contains(&"Half Century".to_string()) {
+        if progress.reward_count >= 50
+            && !progress.achievements.contains(&"Half Century".to_string())
+        {
             new_achievements.push("Half Century".to_string());
         }
         if progress.reward_count >= 100 && !progress.achievements.contains(&"Century".to_string()) {
@@ -186,10 +192,16 @@ impl RewardSystem {
         }
 
         // Achievements for streak
-        if progress.current_streak >= 7 && !progress.achievements.contains(&"Week Warrior".to_string()) {
+        if progress.current_streak >= 7
+            && !progress.achievements.contains(&"Week Warrior".to_string())
+        {
             new_achievements.push("Week Warrior".to_string());
         }
-        if progress.current_streak >= 30 && !progress.achievements.contains(&"Monthly Master".to_string()) {
+        if progress.current_streak >= 30
+            && !progress
+                .achievements
+                .contains(&"Monthly Master".to_string())
+        {
             new_achievements.push("Monthly Master".to_string());
         }
 
@@ -251,7 +263,7 @@ impl RewardSystem {
     pub async fn cleanup_old_rewards(&self, days_old: i64) {
         let cutoff_date = Utc::now() - chrono::Duration::days(days_old);
         let mut rewards = self.rewards.write().await;
-        
+
         rewards.retain(|_, reward| reward.timestamp > cutoff_date);
     }
 }
@@ -270,7 +282,16 @@ pub async fn create_reward(
     description: String,
     metadata: HashMap<String, String>,
 ) -> Reward {
-    REWARD_SYSTEM.create_reward(user_id, reward_type, level, base_amount, description, metadata).await
+    REWARD_SYSTEM
+        .create_reward(
+            user_id,
+            reward_type,
+            level,
+            base_amount,
+            description,
+            metadata,
+        )
+        .await
 }
 
 pub async fn get_user_rewards(user_id: &str) -> Vec<Reward> {
@@ -300,7 +321,8 @@ pub async fn award_performance_bonus(user_id: String, performance_score: f64) {
             100.0,
             "Outstanding Performance Bonus".to_string(),
             metadata,
-        ).await;
+        )
+        .await;
     } else if performance_score >= 0.8 {
         let metadata = HashMap::new();
         create_reward(
@@ -310,7 +332,8 @@ pub async fn award_performance_bonus(user_id: String, performance_score: f64) {
             50.0,
             "Good Performance Bonus".to_string(),
             metadata,
-        ).await;
+        )
+        .await;
     }
 }
 
@@ -329,7 +352,8 @@ mod tests {
             100.0,
             "Test reward".to_string(),
             HashMap::new(),
-        ).await;
+        )
+        .await;
 
         assert_eq!(reward.user_id, user_id);
         assert_eq!(reward.reward_type, RewardType::Performance);
@@ -361,7 +385,8 @@ mod tests {
                 base_amount,
                 format!("Test {:?}", level),
                 HashMap::new(),
-            ).await;
+            )
+            .await;
 
             // amount = base_amount * performance_multiplier * level_multiplier
             let expected = base_amount * performance_multiplier * level_multiplier;
@@ -372,7 +397,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_user_rewards() {
         let user_id = "test_user_2".to_string();
-        
+
         // Create multiple rewards
         create_reward(
             user_id.clone(),
@@ -381,7 +406,8 @@ mod tests {
             100.0,
             "Reward 1".to_string(),
             HashMap::new(),
-        ).await;
+        )
+        .await;
 
         create_reward(
             user_id.clone(),
@@ -390,7 +416,8 @@ mod tests {
             50.0,
             "Reward 2".to_string(),
             HashMap::new(),
-        ).await;
+        )
+        .await;
 
         let rewards = get_user_rewards(&user_id).await;
         assert_eq!(rewards.len(), 2);
@@ -400,7 +427,7 @@ mod tests {
     #[tokio::test]
     async fn test_user_progress_tracking() {
         let user_id = "test_user_3".to_string();
-        
+
         // Create rewards to build progress
         for _ in 0..5 {
             create_reward(
@@ -410,7 +437,8 @@ mod tests {
                 100.0,
                 "Progress test".to_string(),
                 HashMap::new(),
-            ).await;
+            )
+            .await;
         }
 
         let progress = get_user_progress(&user_id).await;
@@ -423,7 +451,7 @@ mod tests {
     #[tokio::test]
     async fn test_reward_statistics() {
         let user_id = "test_user_4".to_string();
-        
+
         create_reward(
             user_id.clone(),
             RewardType::Performance,
@@ -431,7 +459,8 @@ mod tests {
             100.0,
             "Stats test".to_string(),
             HashMap::new(),
-        ).await;
+        )
+        .await;
 
         let stats = get_reward_statistics().await;
         assert!(!stats.is_empty());
@@ -447,7 +476,7 @@ mod tests {
     async fn test_top_users() {
         let user1 = "top_user_1".to_string();
         let user2 = "top_user_2".to_string();
-        
+
         // Create more rewards for user1
         for _ in 0..3 {
             create_reward(
@@ -457,7 +486,8 @@ mod tests {
                 100.0,
                 "Top user test".to_string(),
                 HashMap::new(),
-            ).await;
+            )
+            .await;
         }
 
         // Create fewer rewards for user2
@@ -468,16 +498,19 @@ mod tests {
             50.0,
             "Top user test".to_string(),
             HashMap::new(),
-        ).await;
+        )
+        .await;
 
         let top_users = get_top_users(10).await;
         assert!(!top_users.is_empty());
         // user1 should have more rewards than user2
-        let user1_total: f64 = top_users.iter()
+        let user1_total: f64 = top_users
+            .iter()
             .find(|(id, _)| id == &user1)
             .map(|(_, total)| *total)
             .unwrap_or(0.0);
-        let user2_total: f64 = top_users.iter()
+        let user2_total: f64 = top_users
+            .iter()
             .find(|(id, _)| id == &user2)
             .map(|(_, total)| *total)
             .unwrap_or(0.0);
@@ -487,12 +520,14 @@ mod tests {
     #[tokio::test]
     async fn test_award_performance_bonus() {
         let user_id = "bonus_user".to_string();
-        
+
         // Test high performance
         award_performance_bonus(user_id.clone(), 0.95).await;
         let rewards = get_user_rewards(&user_id).await;
         assert!(!rewards.is_empty());
-        assert!(rewards.iter().any(|r| r.description.contains("Outstanding")));
+        assert!(rewards
+            .iter()
+            .any(|r| r.description.contains("Outstanding")));
 
         // Test medium performance
         let user_id2 = "bonus_user_2".to_string();

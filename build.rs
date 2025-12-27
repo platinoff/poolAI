@@ -13,4 +13,4 @@ fn main() {
     let dest_path = std::path::Path::new(&out_dir).join("build_time.rs");
     let mut f = File::create(&dest_path).unwrap();
     write!(f, "pub const BUILD_TIME: u64 = {};", build_time).unwrap();
-} 
+}

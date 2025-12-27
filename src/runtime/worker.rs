@@ -1,17 +1,17 @@
 //! Worker management for Stage 4.1 Runtime
-//! 
+//!
 //! Provides lifecycle management for AI mining workers with:
 //! - Process spawning and monitoring
 //! - Resource allocation
 //! - Health monitoring
 //! - Auto-scaling capabilities
 
-use std::sync::Arc;
-use tokio::sync::{RwLock, mpsc};
-use tokio::process::{Child, Command};
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn};
 use std::io::ErrorKind;
+use std::sync::Arc;
+use tokio::process::{Child, Command};
+use tokio::sync::{mpsc, RwLock};
+use tracing::{info, warn};
 
 /// Worker status enumeration
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -85,7 +85,7 @@ impl Worker {
     /// Create new worker instance
     pub fn new(_max_workers: usize) -> Self {
         let (tx, _rx) = mpsc::channel(100);
-        
+
         Self {
             config: WorkerConfig {
                 id: format!("worker-{}", uuid::Uuid::new_v4()),
@@ -106,16 +106,16 @@ impl Worker {
     /// Initialize worker
     pub async fn initialize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Initializing worker {}", self.config.id);
-        
+
         // Set status to ready
         {
             let mut status = self.status.write().await;
             *status = WorkerStatus::Ready;
         }
-        
+
         // Start health monitoring
         self.start_health_monitoring().await?;
-        
+
         info!("Worker {} initialized successfully", self.config.id);
         Ok(())
     }
@@ -123,16 +123,16 @@ impl Worker {
     /// Start worker
     pub async fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Starting worker {}", self.config.id);
-        
+
         // Spawn worker process
         self.spawn_process().await?;
-        
+
         // Update status
         {
             let mut status = self.status.write().await;
             *status = WorkerStatus::Ready;
         }
-        
+
         info!("Worker {} started successfully", self.config.id);
         Ok(())
     }
@@ -140,23 +140,23 @@ impl Worker {
     /// Shutdown worker
     pub async fn shutdown(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Shutting down worker {}", self.config.id);
-        
+
         // Update status
         {
             let mut status = self.status.write().await;
             *status = WorkerStatus::Shutdown;
         }
-        
+
         // Terminate process if running
         if let Some(mut process) = self.process.take() {
             if let Err(e) = process.kill().await {
                 warn!("Failed to kill worker process: {}", e);
             }
         }
-        
+
         // Cancel health monitoring
         self.health_monitor.abort();
-        
+
         info!("Worker {} shutdown completed", self.config.id);
         Ok(())
     }
@@ -206,14 +206,14 @@ impl Worker {
         // Ensure the child process is terminated when the parent drops the handle (graceful shutdown path).
         // This prevents orphaned `poolai-worker` processes during development and normal Ctrl+C shutdown.
         command.kill_on_drop(true);
-        
-                            // Set process priority (Windows-specific code commented out for now)
-                    #[cfg(target_os = "windows")]
-                    {
-                        // TODO: Implement Windows process priority setting
-                        // Requires windows crate dependency
-                    }
-        
+
+        // Set process priority (Windows-specific code commented out for now)
+        #[cfg(target_os = "windows")]
+        {
+            // TODO: Implement Windows process priority setting
+            // Requires windows crate dependency
+        }
+
         // Spawn process
         let child = match command
             .arg("--worker-id")
@@ -233,7 +233,7 @@ impl Worker {
             }
             Err(e) => return Err(e.into()),
         };
-        
+
         self.process = Some(child);
         Ok(())
     }
@@ -243,19 +243,19 @@ impl Worker {
         let status = Arc::clone(&self.status);
         let metrics = Arc::clone(&self.metrics);
         let config = self.config.clone();
-        
+
         self.health_monitor = tokio::task::spawn(async move {
-            let mut interval = tokio::time::interval(
-                tokio::time::Duration::from_secs(config.health_check_interval)
-            );
-            
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(
+                config.health_check_interval,
+            ));
+
             loop {
                 interval.tick().await;
-                
+
                 // Check worker health
                 if let Err(e) = Self::check_worker_health(&status, &metrics).await {
                     warn!("Health check failed for worker {}: {}", config.id, e);
-                    
+
                     // Auto-restart if enabled
                     if config.auto_restart {
                         warn!("Auto-restarting worker {}", config.id);
@@ -264,33 +264,36 @@ impl Worker {
                 }
             }
         });
-        
+
         Ok(())
     }
 
     /// Check worker health
     async fn check_worker_health(
         status: &Arc<RwLock<WorkerStatus>>,
-        metrics: &Arc<RwLock<WorkerMetrics>>
+        metrics: &Arc<RwLock<WorkerMetrics>>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let current_status = status.read().await;
         let current_metrics = metrics.read().await;
-        
+
         // Check if worker is responsive
         if *current_status == WorkerStatus::Error {
             return Err("Worker is in error state".into());
         }
-        
+
         // Check memory usage
         if current_metrics.memory_usage_mb > 2048.0 {
-            warn!("Worker memory usage high: {} MB", current_metrics.memory_usage_mb);
+            warn!(
+                "Worker memory usage high: {} MB",
+                current_metrics.memory_usage_mb
+            );
         }
-        
+
         // Check CPU usage
         if current_metrics.cpu_usage > 90.0 {
             warn!("Worker CPU usage high: {}%", current_metrics.cpu_usage);
         }
-        
+
         Ok(())
     }
 

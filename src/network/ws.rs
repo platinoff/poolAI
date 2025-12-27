@@ -1,18 +1,18 @@
 // network/ws.rs
 // WebSocket Security для real-time оновлень (Stage 3)
 
+use crate::network::auth::{validate_token, Claims};
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
-    response::IntoResponse,
     http::{Request, StatusCode},
+    response::IntoResponse,
     Json,
 };
+use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use futures_util::{StreamExt, SinkExt};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use crate::network::auth::{Claims, validate_token};
 
 // Структура для WebSocket повідомлень
 #[derive(Debug, Serialize, Deserialize)]
@@ -116,7 +116,7 @@ pub async fn websocket_handler(
 ) -> impl IntoResponse {
     // Перевіряємо JWT токен з query параметрів або заголовків
     let token = extract_token_from_request(&req);
-    
+
     match token {
         Some(token) => {
             match validate_token(&token) {
@@ -126,17 +126,25 @@ pub async fn websocket_handler(
                 }
                 Err(_) => {
                     // Невірний токен
-                    (StatusCode::UNAUTHORIZED, Json(serde_json::json!({
-                        "error": "Invalid authentication token"
-                    }))).into_response()
+                    (
+                        StatusCode::UNAUTHORIZED,
+                        Json(serde_json::json!({
+                            "error": "Invalid authentication token"
+                        })),
+                    )
+                        .into_response()
                 }
             }
         }
         None => {
             // Токен відсутній
-            (StatusCode::UNAUTHORIZED, Json(serde_json::json!({
-                "error": "Authentication token required"
-            }))).into_response()
+            (
+                StatusCode::UNAUTHORIZED,
+                Json(serde_json::json!({
+                    "error": "Authentication token required"
+                })),
+            )
+                .into_response()
         }
     }
 }
@@ -155,7 +163,9 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
     };
 
     // Додаємо з'єднання до менеджера
-    WS_MANAGER.add_connection(connection_id.clone(), connection).await;
+    WS_MANAGER
+        .add_connection(connection_id.clone(), connection)
+        .await;
 
     // Розбиваємо WebSocket на sender та receiver
     let (mut sender, mut receiver) = socket.split();
@@ -194,7 +204,7 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
                                     .unwrap()
                                     .as_secs(),
                             };
-                            
+
                             if let Ok(json) = serde_json::to_string(&error_msg) {
                                 let _ = sender.send(Message::Text(json)).await;
                             }
@@ -223,15 +233,20 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
 // Heartbeat цикл для підтримки з'єднань
 async fn heartbeat_loop(connection_id: String) {
     let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
-    
+
     loop {
         interval.tick().await;
-        
+
         // Перевіряємо, чи з'єднання все ще активне
-        if !WS_MANAGER.connections.read().await.contains_key(&connection_id) {
+        if !WS_MANAGER
+            .connections
+            .read()
+            .await
+            .contains_key(&connection_id)
+        {
             break;
         }
-        
+
         // Оновлюємо heartbeat
         update_heartbeat(&connection_id).await;
     }

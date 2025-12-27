@@ -159,10 +159,10 @@ impl PoolAIConfig {
     pub fn from_file(path: &str) -> Result<Self, AppError> {
         let content = std::fs::read_to_string(path)
             .map_err(|e| AppError::ConfigError(format!("Failed to read config file: {}", e)))?;
-        
+
         let config: PoolAIConfig = toml::from_str(&content)
             .map_err(|e| AppError::ConfigError(format!("Failed to parse config: {}", e)))?;
-        
+
         Ok(config)
     }
 
@@ -170,10 +170,10 @@ impl PoolAIConfig {
     pub fn save_to_file(&self, path: &str) -> Result<(), AppError> {
         let content = toml::to_string_pretty(self)
             .map_err(|e| AppError::ConfigError(format!("Failed to serialize config: {}", e)))?;
-        
+
         std::fs::write(path, content)
             .map_err(|e| AppError::ConfigError(format!("Failed to write config file: {}", e)))?;
-        
+
         Ok(())
     }
 
@@ -196,34 +196,48 @@ impl PoolAIConfig {
     pub fn validate(&self) -> Result<(), AppError> {
         // Validate system configuration
         if self.system.max_workers == 0 {
-            return Err(AppError::ConfigError("max_workers must be greater than 0".to_string()));
+            return Err(AppError::ConfigError(
+                "max_workers must be greater than 0".to_string(),
+            ));
         }
 
         if self.system.queue_size == 0 {
-            return Err(AppError::ConfigError("queue_size must be greater than 0".to_string()));
+            return Err(AppError::ConfigError(
+                "queue_size must be greater than 0".to_string(),
+            ));
         }
 
         // Validate GPU configuration
         if self.gpu.enabled && self.gpu.memory_limit == 0 {
-            return Err(AppError::ConfigError("GPU memory_limit must be greater than 0".to_string()));
+            return Err(AppError::ConfigError(
+                "GPU memory_limit must be greater than 0".to_string(),
+            ));
         }
 
         // Validate pool configuration
         if self.pool.max_workers == 0 {
-            return Err(AppError::ConfigError("pool max_workers must be greater than 0".to_string()));
+            return Err(AppError::ConfigError(
+                "pool max_workers must be greater than 0".to_string(),
+            ));
         }
 
         if self.pool.scaling_threshold < 0.0 || self.pool.scaling_threshold > 1.0 {
-            return Err(AppError::ConfigError("scaling_threshold must be between 0.0 and 1.0".to_string()));
+            return Err(AppError::ConfigError(
+                "scaling_threshold must be between 0.0 and 1.0".to_string(),
+            ));
         }
 
         // Validate monitoring configuration
         if self.monitoring.metrics_interval == 0 {
-            return Err(AppError::ConfigError("metrics_interval must be greater than 0".to_string()));
+            return Err(AppError::ConfigError(
+                "metrics_interval must be greater than 0".to_string(),
+            ));
         }
 
         if self.monitoring.alert_threshold < 0.0 || self.monitoring.alert_threshold > 1.0 {
-            return Err(AppError::ConfigError("alert_threshold must be between 0.0 and 1.0".to_string()));
+            return Err(AppError::ConfigError(
+                "alert_threshold must be between 0.0 and 1.0".to_string(),
+            ));
         }
 
         Ok(())
@@ -236,31 +250,34 @@ static CONFIG: OnceLock<PoolAIConfig> = OnceLock::new();
 /// Initialize configuration
 pub fn initialize_config(config: PoolAIConfig) -> Result<(), AppError> {
     config.validate()?;
-    
-    CONFIG.set(config).map_err(|_| {
-        AppError::ConfigError("Configuration already initialized".to_string())
-    })?;
-    
+
+    CONFIG
+        .set(config)
+        .map_err(|_| AppError::ConfigError("Configuration already initialized".to_string()))?;
+
     Ok(())
 }
 
 /// Get configuration
 pub fn get_config() -> Result<PoolAIConfig, AppError> {
-    CONFIG.get().cloned().ok_or_else(|| {
-        AppError::ConfigError("Configuration not initialized".to_string())
-    })
+    CONFIG
+        .get()
+        .cloned()
+        .ok_or_else(|| AppError::ConfigError("Configuration not initialized".to_string()))
 }
 
 /// Update configuration
 pub fn update_config(config: PoolAIConfig) -> Result<(), AppError> {
     config.validate()?;
-    
+
     // OnceLock doesn't support updates, so we need to reinitialize
     // This is a limitation, but ensures thread safety
     // For true updates, consider using Arc<RwLock<PoolAIConfig>> instead
     CONFIG.set(config).map_err(|_| {
-        AppError::ConfigError("Configuration already initialized. Use reinitialize_config() to update.".to_string())
+        AppError::ConfigError(
+            "Configuration already initialized. Use reinitialize_config() to update.".to_string(),
+        )
     })?;
-    
+
     Ok(())
-} 
+}

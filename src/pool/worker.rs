@@ -1,9 +1,9 @@
 use crate::core::error::AppError;
-use crate::core::model_interface::{ModelRequest, ModelResponse, ModelMetrics};
+use crate::core::model_interface::{ModelMetrics, ModelRequest, ModelResponse};
+use serde::{Deserialize, Serialize};
+use std::collections::VecDeque;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use std::collections::VecDeque;
-use serde::{Deserialize, Serialize};
 // use tracing::info; // Unused import
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -108,10 +108,13 @@ impl Worker {
         Ok(response)
     }
 
-    async fn simulate_request_processing(&self, request: &ModelRequest) -> Result<ModelResponse, AppError> {
+    async fn simulate_request_processing(
+        &self,
+        request: &ModelRequest,
+    ) -> Result<ModelResponse, AppError> {
         // Simulate processing time
         tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
-        
+
         Ok(ModelResponse {
             output: format!("Processed: {}", request.input),
             metrics: ModelMetrics {
@@ -141,7 +144,7 @@ impl Worker {
     async fn cache_response(&self, request: &ModelRequest, response: &ModelResponse) {
         let cache_key = self.generate_cache_key(request);
         let mut cache = self.cache.write().await;
-        
+
         // Check cache size
         if cache.len() >= self.config.cache_size {
             // Remove oldest item
@@ -150,20 +153,20 @@ impl Worker {
                 cache.remove(&oldest_key);
             }
         }
-        
+
         cache.insert(cache_key, response.clone());
     }
 
     fn generate_cache_key(&self, request: &ModelRequest) -> String {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        
+
         let mut hasher = DefaultHasher::new();
         request.input.hash(&mut hasher);
         request.parameters.temperature.to_bits().hash(&mut hasher);
         request.parameters.max_tokens.hash(&mut hasher);
         request.parameters.top_p.to_bits().hash(&mut hasher);
-        
+
         format!("{:x}", hasher.finish())
     }
 
@@ -171,13 +174,14 @@ impl Worker {
         let mut status = self.status.write().await;
         let total_requests = status.total_requests_processed as f64;
         let current_avg = status.average_response_time_ms;
-        let new_avg = (current_avg * (total_requests - 1.0) + processing_time.as_millis() as f64) / total_requests;
+        let new_avg = (current_avg * (total_requests - 1.0) + processing_time.as_millis() as f64)
+            / total_requests;
         status.average_response_time_ms = new_avg;
     }
 
     pub async fn health_check(&self) -> Result<bool, AppError> {
         let start_time = chrono::Utc::now();
-        
+
         // Simple health check
         let mut status = self.status.write().await;
         status.is_healthy = true;
@@ -188,9 +192,8 @@ impl Worker {
     pub fn get_active_connections(&self) -> usize {
         // Blocking call for simplicity
         tokio::task::block_in_place(|| {
-            tokio::runtime::Handle::current().block_on(async {
-                self.status.read().await.active_connections
-            })
+            tokio::runtime::Handle::current()
+                .block_on(async { self.status.read().await.active_connections })
         })
     }
 
@@ -202,11 +205,17 @@ impl Worker {
                 if !status.is_healthy {
                     return 0.0;
                 }
-                
+
                 // Simple health score based on metrics
-                let connection_score = 1.0 - (status.active_connections as f64 / self.config.max_concurrent_requests as f64);
-                let response_time_score = if status.average_response_time_ms < 1000.0 { 1.0 } else { 0.5 };
-                
+                let connection_score = 1.0
+                    - (status.active_connections as f64
+                        / self.config.max_concurrent_requests as f64);
+                let response_time_score = if status.average_response_time_ms < 1000.0 {
+                    1.0
+                } else {
+                    0.5
+                };
+
                 connection_score * response_time_score
             })
         })
@@ -226,8 +235,8 @@ impl Worker {
         // Cleanup resources
         self.request_queue.write().await.clear();
         self.cache.write().await.clear();
-        
+
         tracing::info!("Worker {} shutdown complete", self.config.worker_id);
         Ok(())
     }
-} 
+}

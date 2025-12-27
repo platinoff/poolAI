@@ -7,15 +7,15 @@
 
 use crate::core::error::AppError;
 use crate::libs::LibraryInfo;
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use tracing::info;
-use std::cmp::Ordering;
 
 /// Library Registry - Manages registry of available libraries
 pub struct LibraryRegistry {
     libraries: HashMap<String, Vec<String>>, // name -> versions
-    metadata: HashMap<String, LibraryInfo>, // name:version -> LibraryInfo
-    download_urls: HashMap<String, String>, // name:version -> download URL
+    metadata: HashMap<String, LibraryInfo>,  // name:version -> LibraryInfo
+    download_urls: HashMap<String, String>,  // name:version -> download URL
 }
 
 impl LibraryRegistry {
@@ -31,10 +31,10 @@ impl LibraryRegistry {
     /// Initialize registry
     pub async fn initialize(&mut self) -> Result<(), AppError> {
         info!("Initializing Library Registry");
-        
+
         // TODO: Load registry from remote source or local cache
         // For now, initialize with empty registry
-        
+
         info!("Library Registry initialized");
         Ok(())
     }
@@ -46,19 +46,20 @@ impl LibraryRegistry {
         version: &str,
         info: LibraryInfo,
     ) -> Result<(), AppError> {
-        let versions = self.libraries
+        let versions = self
+            .libraries
             .entry(name.to_string())
             .or_insert_with(Vec::new);
-        
+
         if !versions.contains(&version.to_string()) {
             versions.push(version.to_string());
             // Keep versions sorted (basic semver: MAJOR.MINOR.PATCH)
             versions.sort_by(|a, b| semver_cmp(a, b));
         }
-        
+
         let key = format!("{}:{}", name, version);
         self.metadata.insert(key, info);
-        
+
         Ok(())
     }
 
@@ -76,13 +77,13 @@ impl LibraryRegistry {
             None
         }
     }
-    
+
     /// Get download URL for a library version
     pub fn get_download_url(&self, name: &str, version: &str) -> Option<String> {
         let key = format!("{}:{}", name, version);
         self.download_urls.get(&key).cloned()
     }
-    
+
     /// Set download URL for a library version
     pub fn set_download_url(&mut self, name: &str, version: &str, url: &str) {
         let key = format!("{}:{}", name, version);
@@ -126,4 +127,3 @@ impl Default for LibraryRegistry {
         Self::new()
     }
 }
-

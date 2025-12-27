@@ -50,22 +50,23 @@ impl ProtocolClient {
     }
 
     /// Send a protocol message and get response
-    async fn send_message<T>(
-        &self,
-        endpoint: &str,
-        message: ProtocolMessage,
-    ) -> Result<T, AppError>
+    async fn send_message<T>(&self, endpoint: &str, message: ProtocolMessage) -> Result<T, AppError>
     where
         T: serde::de::DeserializeOwned,
     {
         let url = format!("{}/api/v1/raid/distributed{}", self.base_url, endpoint);
-        
-        let json = message.to_json()
-            .map_err(|e| AppError::ValidationError(format!("Failed to serialize message: {}", e)))?;
 
-        info!("Sending protocol message to {}: {}", url, message.message_type);
+        let json = message.to_json().map_err(|e| {
+            AppError::ValidationError(format!("Failed to serialize message: {}", e))
+        })?;
 
-        let response = self.client
+        info!(
+            "Sending protocol message to {}: {}",
+            url, message.message_type
+        );
+
+        let response = self
+            .client
             .post(&url)
             .header("Content-Type", "application/json")
             .body(json)
@@ -82,15 +83,19 @@ impl ProtocolClient {
             )));
         }
 
-        let response_json: serde_json::Value = response.json().await
+        let response_json: serde_json::Value = response
+            .json()
+            .await
             .map_err(|e| AppError::NetworkError(format!("Failed to parse response: {}", e)))?;
 
         // Extract payload from response message
-        let payload = response_json.get("payload")
+        let payload = response_json
+            .get("payload")
             .ok_or_else(|| AppError::ValidationError("Response missing payload".to_string()))?;
 
-        serde_json::from_value(payload.clone())
-            .map_err(|e| AppError::ValidationError(format!("Failed to deserialize response: {}", e)))
+        serde_json::from_value(payload.clone()).map_err(|e| {
+            AppError::ValidationError(format!("Failed to deserialize response: {}", e))
+        })
     }
 
     /// Replicate an artifact to another node
@@ -103,10 +108,10 @@ impl ProtocolClient {
         sync_mode: SyncMode,
     ) -> Result<PutArtifactResponse, AppError> {
         let data_base64 = data.map(|d| {
-            use base64::{Engine as _, engine::general_purpose};
+            use base64::{engine::general_purpose, Engine as _};
             general_purpose::STANDARD.encode(&d)
         });
-        
+
         let payload = PutArtifactPayload {
             artifact_id: artifact_id.clone(),
             source_node: self.node_id.clone(),
@@ -179,10 +184,7 @@ impl ProtocolClient {
         address: String,
         node_info: NodeInfo,
     ) -> Result<JoinClusterResponse, AppError> {
-        let payload = JoinClusterPayload {
-            address,
-            node_info,
-        };
+        let payload = JoinClusterPayload { address, node_info };
 
         let message = ProtocolMessage::join_cluster(self.node_id.clone(), payload)?;
         self.send_message("/cluster/join", message).await
@@ -194,10 +196,7 @@ impl ProtocolClient {
         reason: LeaveReason,
         graceful: bool,
     ) -> Result<LeaveClusterResponse, AppError> {
-        let payload = LeaveClusterPayload {
-            reason,
-            graceful,
-        };
+        let payload = LeaveClusterPayload { reason, graceful };
 
         let message = ProtocolMessage::leave_cluster(self.node_id.clone(), payload)?;
         self.send_message("/cluster/leave", message).await
@@ -212,11 +211,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_protocol_client_creation() {
-        let client = ProtocolClient::new(
-            "http://localhost:8080".to_string(),
-            "test-node".to_string(),
-        );
-        
+        let client =
+            ProtocolClient::new("http://localhost:8080".to_string(), "test-node".to_string());
+
         assert_eq!(client.node_id, "test-node");
         assert_eq!(client.base_url, "http://localhost:8080");
     }
@@ -247,4 +244,3 @@ mod tests {
         assert_eq!(message.message_type, "put_artifact");
     }
 }
-

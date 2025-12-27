@@ -11,12 +11,12 @@ pub mod worker;
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelRequest, ModelResponse};
 // use crate::core::config::PoolAIConfig; // Not used in MVP
-use std::collections::HashMap;
-use tokio::sync::RwLock;
-use std::sync::{Arc, OnceLock};
-use tracing::{info, warn};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use std::collections::HashMap;
+use std::sync::{Arc, OnceLock};
+use tokio::sync::RwLock;
+use tracing::{info, warn};
 
 #[derive(Debug, Clone)]
 pub struct PoolConfig {
@@ -84,15 +84,22 @@ impl Pool {
         }
     }
 
-    pub async fn add_worker(&self, worker_id: String, worker: worker::Worker) -> Result<(), AppError> {
+    pub async fn add_worker(
+        &self,
+        worker_id: String,
+        worker: worker::Worker,
+    ) -> Result<(), AppError> {
         let mut workers = self.workers.write().await;
         workers.insert(worker_id.clone(), worker);
-        
+
         // Update metrics
         let mut metrics = self.metrics.write().await;
         metrics.active_workers = workers.len();
-        
-        info!("Added worker: {} (total workers: {})", worker_id, metrics.active_workers);
+
+        info!(
+            "Added worker: {} (total workers: {})",
+            worker_id, metrics.active_workers
+        );
         Ok(())
     }
 
@@ -102,34 +109,40 @@ impl Pool {
             // Update metrics
             let mut metrics = self.metrics.write().await;
             metrics.active_workers = workers.len();
-            
-            info!("Removed worker: {} (total workers: {})", worker_id, metrics.active_workers);
+
+            info!(
+                "Removed worker: {} (total workers: {})",
+                worker_id, metrics.active_workers
+            );
             Ok(())
         } else {
-            Err(AppError::PoolError(format!("Worker '{}' not found", worker_id)))
+            Err(AppError::PoolError(format!(
+                "Worker '{}' not found",
+                worker_id
+            )))
         }
     }
 
     pub async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError> {
         // Select worker according to load balancing strategy
         let worker = self.select_worker().await?;
-        
+
         // Process request
         let response = worker.process_request(request).await?;
-        
+
         // Update metrics
         self.update_metrics(&response).await;
-        
+
         Ok(response)
     }
 
     async fn select_worker(&self) -> Result<worker::Worker, AppError> {
         let workers = self.workers.read().await;
-        
+
         if workers.is_empty() {
             return Err(AppError::PoolError("No workers available".to_string()));
         }
-        
+
         match self.config.load_balancing_strategy {
             LoadBalancingStrategy::RoundRobin => {
                 // Simple round-robin implementation
@@ -141,16 +154,20 @@ impl Pool {
             }
             LoadBalancingStrategy::LeastConnections => {
                 // Select worker with least connections
-                workers.iter()
+                workers
+                    .iter()
                     .min_by_key(|(_, worker)| worker.get_active_connections())
                     .map(|(_, worker)| worker.clone())
                     .ok_or_else(|| AppError::PoolError("No workers available".to_string()))
             }
             LoadBalancingStrategy::Weighted => {
                 // Weighted selection based on metrics
-                workers.iter()
+                workers
+                    .iter()
                     .max_by(|(_, a), (_, b)| {
-                        a.get_health_score().partial_cmp(&b.get_health_score()).unwrap_or(std::cmp::Ordering::Equal)
+                        a.get_health_score()
+                            .partial_cmp(&b.get_health_score())
+                            .unwrap_or(std::cmp::Ordering::Equal)
                     })
                     .map(|(_, worker)| worker.clone())
                     .ok_or_else(|| AppError::PoolError("No workers available".to_string()))
@@ -158,7 +175,8 @@ impl Pool {
             LoadBalancingStrategy::Random => {
                 // Random selection
                 let worker_list: Vec<_> = workers.values().collect();
-                worker_list.choose(&mut thread_rng())
+                worker_list
+                    .choose(&mut thread_rng())
                     .map(|worker| (*worker).clone())
                     .ok_or_else(|| AppError::PoolError("No workers available".to_string()))
             }
@@ -168,7 +186,7 @@ impl Pool {
     async fn update_metrics(&self, response: &ModelResponse) {
         let mut metrics = self.metrics.write().await;
         metrics.total_requests += 1;
-        
+
         match response.status {
             crate::core::model_interface::ResponseStatus::Success => {
                 metrics.successful_requests += 1;
@@ -177,24 +195,25 @@ impl Pool {
                 metrics.failed_requests += 1;
             }
         }
-        
+
         // Update average response time
-        metrics.average_response_time_ms = 
-            (metrics.average_response_time_ms * (metrics.total_requests - 1) as f64 + 
-             response.metrics.processing_time_ms as f64) / metrics.total_requests as f64;
-        
+        metrics.average_response_time_ms = (metrics.average_response_time_ms
+            * (metrics.total_requests - 1) as f64
+            + response.metrics.processing_time_ms as f64)
+            / metrics.total_requests as f64;
+
         // Update error rate
         if metrics.total_requests > 0 {
             metrics.error_rate = metrics.failed_requests as f32 / metrics.total_requests as f32;
         }
-        
+
         // Update throughput (requests per second)
         // This is a simplified calculation - in production you'd want a rolling window
         let uptime_seconds = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
             .as_secs();
-        
+
         if uptime_seconds > 0 {
             metrics.throughput_rps = metrics.total_requests as f32 / uptime_seconds as f32;
         }
@@ -247,12 +266,12 @@ impl Pool {
     pub async fn get_worker_status(&self) -> HashMap<String, worker::WorkerStatus> {
         let workers = self.workers.read().await;
         let mut status_map = HashMap::new();
-        
+
         for (id, worker) in workers.iter() {
             let status = worker.get_status().await;
             status_map.insert(id.clone(), status);
         }
-        
+
         status_map
     }
 }
@@ -264,7 +283,7 @@ static GLOBAL_POOL: OnceLock<Arc<RwLock<Pool>>> = OnceLock::new();
 /// Initialize pool module
 pub async fn initialize() -> Result<(), AppError> {
     info!("Initializing pool module");
-    
+
     // Create default pool configuration
     let config = PoolConfig {
         max_workers: 10,
@@ -274,14 +293,14 @@ pub async fn initialize() -> Result<(), AppError> {
         scaling_threshold: 0.8,
         request_timeout: 30,
     };
-    
+
     let pool = Pool::new(config);
-    
+
     // Store global instance wrapped in Arc<RwLock<>>
-    GLOBAL_POOL.set(Arc::new(RwLock::new(pool))).map_err(|_| {
-        AppError::PoolError("Pool already initialized".to_string())
-    })?;
-    
+    GLOBAL_POOL
+        .set(Arc::new(RwLock::new(pool)))
+        .map_err(|_| AppError::PoolError("Pool already initialized".to_string()))?;
+
     info!("Pool module initialized successfully");
     Ok(())
 }
@@ -289,14 +308,14 @@ pub async fn initialize() -> Result<(), AppError> {
 /// Initialize pool module with custom configuration
 pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> {
     info!("Initializing pool module with custom configuration");
-    
+
     let pool = Pool::new(config);
-    
+
     // Store global instance wrapped in Arc<RwLock<>>
-    GLOBAL_POOL.set(Arc::new(RwLock::new(pool))).map_err(|_| {
-        AppError::PoolError("Pool already initialized".to_string())
-    })?;
-    
+    GLOBAL_POOL
+        .set(Arc::new(RwLock::new(pool)))
+        .map_err(|_| AppError::PoolError("Pool already initialized".to_string()))?;
+
     info!("Pool module initialized with custom configuration successfully");
     Ok(())
 }
@@ -304,11 +323,11 @@ pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> 
 /// Shutdown pool module
 pub async fn shutdown() -> Result<(), AppError> {
     info!("Shutting down pool module");
-    
+
     // Note: OnceLock doesn't support clearing, so we can't fully remove it
     // The pool will remain in memory but won't be accessible after this
     // For true cleanup, consider using a different pattern or accept this limitation
-    
+
     info!("Pool module shut down successfully");
     Ok(())
 }
@@ -316,12 +335,14 @@ pub async fn shutdown() -> Result<(), AppError> {
 /// Health check for pool module
 pub async fn health_check() -> Result<(), AppError> {
     info!("Pool module health check");
-    
+
     // Check if global pool exists
     if GLOBAL_POOL.get().is_none() {
-        return Err(AppError::PoolError("Global pool not initialized".to_string()));
+        return Err(AppError::PoolError(
+            "Global pool not initialized".to_string(),
+        ));
     }
-    
+
     info!("Pool module health check passed");
     Ok(())
 }

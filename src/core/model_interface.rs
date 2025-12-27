@@ -1,5 +1,5 @@
-use crate::core::error::AppError;
 use crate::core::config::ModelConfig as ConfigModelConfig;
+use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -200,31 +200,31 @@ pub struct PerformanceSettings {
 pub trait ModelInterface {
     /// Process a request with the model
     async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, AppError>;
-    
+
     /// Get model information
     async fn get_model_info(&self) -> Result<ModelInfo, AppError>;
-    
+
     /// Update model configuration
     async fn update_config(&self, config: ModelConfig) -> Result<(), AppError>;
-    
+
     /// Get model metrics
     async fn get_metrics(&self) -> Result<ModelMetrics, AppError>;
-    
+
     /// Get model state
     async fn get_state(&self) -> Result<ModelState, AppError>;
-    
+
     /// Initialize the model
     async fn initialize(&self) -> Result<(), AppError>;
-    
+
     /// Shutdown the model
     async fn shutdown(&self) -> Result<(), AppError>;
-    
+
     /// Health check for the model
     async fn health_check(&self) -> Result<(), AppError>;
-    
+
     /// Clear cache
     async fn clear_cache(&self) -> Result<(), AppError>;
-    
+
     /// Get statistics
     async fn get_statistics(&self) -> Result<HashMap<String, f64>, AppError>;
 }
@@ -253,10 +253,10 @@ impl ModelManager {
     ) -> Result<(), AppError> {
         // Model initialization
         model.initialize().await?;
-        
+
         // Health check
         model.health_check().await?;
-        
+
         self.models.insert(name, model);
         Ok(())
     }
@@ -296,24 +296,24 @@ impl ModelManager {
     /// Get metrics for all models
     pub async fn get_all_metrics(&self) -> Result<HashMap<String, ModelMetrics>, AppError> {
         let mut metrics = HashMap::new();
-        
+
         for (name, model) in &self.models {
             let model_metrics = model.get_metrics().await?;
             metrics.insert(name.clone(), model_metrics);
         }
-        
+
         Ok(metrics)
     }
 
     /// Get states for all models
     pub async fn get_all_states(&self) -> Result<HashMap<String, ModelState>, AppError> {
         let mut states = HashMap::new();
-        
+
         for (name, model) in &self.models {
             let model_state = model.get_state().await?;
             states.insert(name.clone(), model_state);
         }
-        
+
         Ok(states)
     }
-} 
+}

@@ -7,8 +7,8 @@
 //! - Health status API endpoint
 //! - Auto-restart on health check failure (stub)
 
-use poolai::vm::{VmManager, VmResources, VmIsolation};
 use poolai::runtime::health::HealthStatus;
+use poolai::vm::{VmIsolation, VmManager, VmResources};
 use tokio::time::{sleep, Duration};
 
 #[tokio::test]
@@ -28,14 +28,20 @@ async fn test_health_check_registration_on_start() {
 
     // Health check should not be registered before start
     let health_before = manager.get_instance_health(instance.id).await.unwrap();
-    assert!(health_before.is_none(), "Health check should not be registered before start");
+    assert!(
+        health_before.is_none(),
+        "Health check should not be registered before start"
+    );
 
     // Start instance (should register health check)
     manager.start_instance(instance.id).await.unwrap();
 
     // Health check should be registered after start
     let health_after = manager.get_instance_health(instance.id).await.unwrap();
-    assert!(health_after.is_some(), "Health check should be registered after start");
+    assert!(
+        health_after.is_some(),
+        "Health check should be registered after start"
+    );
 }
 
 #[tokio::test]
@@ -55,10 +61,13 @@ async fn test_health_check_unregistration_on_stop() {
 
     // Start instance (registers health check)
     manager.start_instance(instance.id).await.unwrap();
-    
+
     // Verify health check is registered
     let health_running = manager.get_instance_health(instance.id).await.unwrap();
-    assert!(health_running.is_some(), "Health check should be registered when running");
+    assert!(
+        health_running.is_some(),
+        "Health check should be registered when running"
+    );
 
     // Stop instance (should unregister health check)
     manager.stop_instance(instance.id).await.unwrap();
@@ -69,7 +78,10 @@ async fn test_health_check_unregistration_on_stop() {
     // Note: HealthMonitor may keep the entry, so we check instance status instead
     let instance_after = manager.get_instance(instance.id).await;
     assert!(instance_after.is_some());
-    assert!(matches!(instance_after.unwrap().status, poolai::vm::VmStatus::Stopped));
+    assert!(matches!(
+        instance_after.unwrap().status,
+        poolai::vm::VmStatus::Stopped
+    ));
 }
 
 #[tokio::test]
@@ -92,10 +104,12 @@ async fn test_health_check_for_running_instance() {
 
     // Perform manual health check
     let health_status = manager.check_instance_health(instance.id).await.unwrap();
-    
+
     // Running instance should be healthy
-    assert!(matches!(health_status, HealthStatus::Healthy), 
-        "Running instance should have healthy status");
+    assert!(
+        matches!(health_status, HealthStatus::Healthy),
+        "Running instance should have healthy status"
+    );
 }
 
 #[tokio::test]
@@ -120,10 +134,15 @@ async fn test_health_check_for_stopped_instance() {
     // Perform manual health check on stopped instance
     // Note: After stop, health check is unregistered, so status will be Unknown
     let health_status = manager.check_instance_health(instance.id).await.unwrap();
-    
+
     // Stopped instance should be Unknown (health check unregistered) or Unhealthy
-    assert!(matches!(health_status, HealthStatus::Unknown | HealthStatus::Unhealthy(_)), 
-        "Stopped instance should have Unknown or Unhealthy status");
+    assert!(
+        matches!(
+            health_status,
+            HealthStatus::Unknown | HealthStatus::Unhealthy(_)
+        ),
+        "Stopped instance should have Unknown or Unhealthy status"
+    );
 }
 
 #[tokio::test]
@@ -135,8 +154,10 @@ async fn test_health_check_for_nonexistent_instance() {
 
     // Health check for non-existent instance should return Unknown
     let health_status = manager.check_instance_health(nonexistent_id).await.unwrap();
-    assert!(matches!(health_status, HealthStatus::Unknown), 
-        "Non-existent instance should have unknown health status");
+    assert!(
+        matches!(health_status, HealthStatus::Unknown),
+        "Non-existent instance should have unknown health status"
+    );
 }
 
 #[tokio::test]
@@ -156,19 +177,27 @@ async fn test_get_health_status_api() {
 
     // Before start - should return None
     let health = manager.get_instance_health(instance.id).await.unwrap();
-    assert!(health.is_none(), "Health should be None before instance start");
+    assert!(
+        health.is_none(),
+        "Health should be None before instance start"
+    );
 
     // Start instance
     manager.start_instance(instance.id).await.unwrap();
 
     // After start - should return Some(HealthStatus)
     let health = manager.get_instance_health(instance.id).await.unwrap();
-    assert!(health.is_some(), "Health should be Some after instance start");
-    
+    assert!(
+        health.is_some(),
+        "Health should be Some after instance start"
+    );
+
     // Should be Healthy for running instance
     if let Some(status) = health {
-        assert!(matches!(status, HealthStatus::Healthy | HealthStatus::Unknown),
-            "Health status should be Healthy or Unknown for running instance");
+        assert!(
+            matches!(status, HealthStatus::Healthy | HealthStatus::Unknown),
+            "Health status should be Healthy or Unknown for running instance"
+        );
     }
 }
 
@@ -189,20 +218,22 @@ async fn test_restart_instance() {
 
     // Start instance
     manager.start_instance(instance.id).await.unwrap();
-    
+
     // Verify instance is running
     let inst_before = manager.get_instance(instance.id).await.unwrap();
     assert!(matches!(inst_before.status, poolai::vm::VmStatus::Running));
 
     // Restart instance
     manager.restart_instance(instance.id).await.unwrap();
-    
+
     // Verify instance is still running after restart
     let inst_after = manager.get_instance(instance.id).await.unwrap();
     assert!(matches!(inst_after.status, poolai::vm::VmStatus::Running));
-    
+
     // Health check should still be registered
     let health = manager.get_instance_health(instance.id).await.unwrap();
-    assert!(health.is_some(), "Health check should still be registered after restart");
+    assert!(
+        health.is_some(),
+        "Health check should still be registered after restart"
+    );
 }
-

@@ -14,11 +14,11 @@ use poolai::{
     ui,
     version::{APP_VERSION, BUILD_TIME},
     vm,
-    AppState,  // Re-exported from core::state
+    AppState, // Re-exported from core::state
 };
 use std::net::SocketAddr;
-use tracing::{info, error};
 use tokio::signal;
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -1,13 +1,13 @@
 //! Integration tests for Distributed RAID Protocol
 
-use poolai::raid::protocol::*;
 use chrono::Utc;
+use poolai::raid::protocol::*;
 
 #[test]
 fn test_put_artifact_message_flow() {
     let node_id = "test-node-1".to_string();
     let artifact_id = "artifact-123".to_string();
-    
+
     let metadata = ArtifactMetadata {
         name: "test-library".to_string(),
         version: "1.0.0".to_string(),
@@ -28,11 +28,11 @@ fn test_put_artifact_message_flow() {
     };
 
     let message = ProtocolMessage::put_artifact(node_id.clone(), payload).unwrap();
-    
+
     // Verify message structure
     assert_eq!(message.message_type, "put_artifact");
     assert_eq!(message.node_id, node_id);
-    
+
     // Extract and verify payload
     let extracted = message.extract_put_artifact().unwrap();
     assert_eq!(extracted.artifact_id, artifact_id);
@@ -45,16 +45,16 @@ fn test_put_artifact_message_flow() {
 fn test_get_artifact_message_flow() {
     let node_id = "test-node-1".to_string();
     let artifact_id = "artifact-456".to_string();
-    
+
     let payload = GetArtifactPayload {
         artifact_id: artifact_id.clone(),
         include_data: true,
     };
 
     let message = ProtocolMessage::get_artifact(node_id.clone(), payload).unwrap();
-    
+
     assert_eq!(message.message_type, "get_artifact");
-    
+
     let extracted = message.extract_get_artifact().unwrap();
     assert_eq!(extracted.artifact_id, artifact_id);
     assert!(extracted.include_data);
@@ -64,16 +64,16 @@ fn test_get_artifact_message_flow() {
 fn test_delete_artifact_message_flow() {
     let node_id = "test-node-1".to_string();
     let artifact_id = "artifact-789".to_string();
-    
+
     let payload = DeleteArtifactPayload {
         artifact_id: artifact_id.clone(),
         propagate: true,
     };
 
     let message = ProtocolMessage::delete_artifact(node_id.clone(), payload).unwrap();
-    
+
     assert_eq!(message.message_type, "delete_artifact");
-    
+
     let extracted = message.extract_delete_artifact().unwrap();
     assert_eq!(extracted.artifact_id, artifact_id);
     assert!(extracted.propagate);
@@ -83,7 +83,7 @@ fn test_delete_artifact_message_flow() {
 fn test_sync_artifacts_message_flow() {
     let node_id = "test-node-1".to_string();
     let last_sync = Utc::now();
-    
+
     let payload = SyncArtifactsPayload {
         last_sync_timestamp: Some(last_sync),
         artifact_ids: Some(vec!["artifact-1".to_string(), "artifact-2".to_string()]),
@@ -91,9 +91,9 @@ fn test_sync_artifacts_message_flow() {
     };
 
     let message = ProtocolMessage::sync_artifacts(node_id.clone(), payload).unwrap();
-    
+
     assert_eq!(message.message_type, "sync_artifacts");
-    
+
     let extracted = message.extract_sync_artifacts().unwrap();
     assert_eq!(extracted.direction, SyncDirection::Bidirectional);
     assert!(extracted.artifact_ids.is_some());
@@ -103,7 +103,7 @@ fn test_sync_artifacts_message_flow() {
 #[test]
 fn test_join_cluster_message_flow() {
     let node_id = "new-node".to_string();
-    
+
     let node_info = NodeInfo {
         storage_capacity_bytes: 107374182400, // 100 GB
         region: Some("us-east-1".to_string()),
@@ -116,27 +116,30 @@ fn test_join_cluster_message_flow() {
     };
 
     let message = ProtocolMessage::join_cluster(node_id.clone(), payload).unwrap();
-    
+
     assert_eq!(message.message_type, "join_cluster");
-    
+
     let extracted = message.extract_join_cluster().unwrap();
     assert_eq!(extracted.address, "https://new-node.example.com:8080");
-    assert_eq!(extracted.node_info.storage_capacity_bytes, node_info.storage_capacity_bytes);
+    assert_eq!(
+        extracted.node_info.storage_capacity_bytes,
+        node_info.storage_capacity_bytes
+    );
 }
 
 #[test]
 fn test_leave_cluster_message_flow() {
     let node_id = "leaving-node".to_string();
-    
+
     let payload = LeaveClusterPayload {
         reason: LeaveReason::Maintenance,
         graceful: true,
     };
 
     let message = ProtocolMessage::leave_cluster(node_id.clone(), payload).unwrap();
-    
+
     assert_eq!(message.message_type, "leave_cluster");
-    
+
     let extracted = message.extract_leave_cluster().unwrap();
     assert_eq!(extracted.reason, LeaveReason::Maintenance);
     assert!(extracted.graceful);
@@ -165,21 +168,24 @@ fn test_message_serialization_roundtrip() {
     };
 
     let message = ProtocolMessage::put_artifact(node_id.clone(), payload).unwrap();
-    
+
     // Serialize to JSON
     let json = message.to_json().unwrap();
-    
+
     // Deserialize from JSON
     let deserialized = ProtocolMessage::from_json(&json).unwrap();
-    
+
     // Verify roundtrip
     assert_eq!(message.message_type, deserialized.message_type);
     assert_eq!(message.node_id, deserialized.node_id);
-    
+
     // Verify payload
     let original_payload = message.extract_put_artifact().unwrap();
     let deserialized_payload = deserialized.extract_put_artifact().unwrap();
-    assert_eq!(original_payload.artifact_id, deserialized_payload.artifact_id);
+    assert_eq!(
+        original_payload.artifact_id,
+        deserialized_payload.artifact_id
+    );
     assert_eq!(original_payload.sync_mode, deserialized_payload.sync_mode);
 }
 
@@ -188,7 +194,7 @@ fn test_health_check_response() {
     let response = HealthCheckResponse {
         status: HealthStatus::Healthy,
         uptime_seconds: 3600,
-        storage_used_bytes: 10737418240, // 10 GB
+        storage_used_bytes: 10737418240,   // 10 GB
         storage_total_bytes: 107374182400, // 100 GB
         artifact_count: 150,
         raft_role: RaftRole::Leader,
@@ -200,7 +206,7 @@ fn test_health_check_response() {
     let json = serde_json::to_string(&response).unwrap();
     assert!(json.contains("healthy"));
     assert!(json.contains("leader"));
-    
+
     // Test deserialization
     let deserialized: HealthCheckResponse = serde_json::from_str(&json).unwrap();
     assert_eq!(deserialized.status, HealthStatus::Healthy);
@@ -217,8 +223,7 @@ fn test_error_codes() {
 
     let json = serde_json::to_string(&error).unwrap();
     assert!(json.contains("ARTIFACT_NOT_FOUND"));
-    
+
     let deserialized: ProtocolError = serde_json::from_str(&json).unwrap();
     assert_eq!(deserialized.error_code, ErrorCode::ArtifactNotFound);
 }
-

@@ -16,7 +16,7 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
 use tokio::sync::RwLock;
 use tokio::time::Duration;
-use tracing::{info, warn, error};
+use tracing::{error, info, warn};
 use uuid::Uuid;
 
 /// Process status
@@ -85,20 +85,20 @@ impl ProcessManager {
             processes: Arc::new(RwLock::new(HashMap::new())),
         }
     }
-    
+
     pub async fn initialize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Initializing Process Manager");
         Ok(())
     }
-    
+
     pub async fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Starting Process Manager");
         Ok(())
     }
-    
+
     pub async fn shutdown(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Shutting down Process Manager");
-        
+
         // Stop all running processes
         let mut processes = self.processes.write().await;
         for (id, info) in processes.iter_mut() {
@@ -108,10 +108,10 @@ impl ProcessManager {
                 }
             }
         }
-        
+
         Ok(())
     }
-    
+
     pub fn get_running_count(&self) -> usize {
         // This is a sync method, so we can't use async here
         // Return 0 for now, can be enhanced with blocking read if needed
@@ -119,20 +119,17 @@ impl ProcessManager {
     }
 
     /// Spawn a new process
-    pub async fn spawn_process(
-        &self,
-        config: ProcessConfig,
-    ) -> Result<Uuid, AppError> {
+    pub async fn spawn_process(&self, config: ProcessConfig) -> Result<Uuid, AppError> {
         let id = Uuid::new_v4();
         info!("Spawning process {}: {}", id, config.command);
 
         let mut command = Command::new(&config.command);
         command.args(&config.args);
-        
+
         if let Some(working_dir) = &config.working_dir {
             command.current_dir(working_dir);
         }
-        
+
         for (key, value) in &config.env {
             command.env(key, value);
         }
@@ -201,7 +198,10 @@ impl ProcessManager {
                 let mut s = status_timeout.write().await;
                 if *s == ProcessStatus::Running {
                     *s = ProcessStatus::Timeout;
-                    warn!("Process {} timed out after {} seconds", process_id, timeout_secs);
+                    warn!(
+                        "Process {} timed out after {} seconds",
+                        process_id, timeout_secs
+                    );
                 }
             });
         }
@@ -243,7 +243,10 @@ impl ProcessManager {
                 error!("Failed to kill process {}: {}", id, e);
                 let mut status = info.status.write().await;
                 *status = ProcessStatus::Failed(format!("Kill failed: {}", e));
-                return Err(AppError::ResourceError(format!("Failed to kill process: {}", e)));
+                return Err(AppError::ResourceError(format!(
+                    "Failed to kill process: {}",
+                    e
+                )));
             }
         }
 
@@ -262,7 +265,7 @@ impl ProcessManager {
         let info = processes
             .get(&id)
             .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
-        
+
         let status = info.status.read().await.clone();
         Ok(status)
     }
@@ -273,7 +276,7 @@ impl ProcessManager {
         let info = processes
             .get(&id)
             .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
-        
+
         let logs = info.logs.read().await.clone();
         Ok(logs)
     }
@@ -289,7 +292,7 @@ impl ProcessManager {
         let info = processes
             .get(&id)
             .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
-        
+
         Ok(info.pid)
     }
 }

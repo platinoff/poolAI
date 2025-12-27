@@ -2,9 +2,9 @@ pub mod metrics;
 
 use crate::core::error::AppError;
 use std::collections::HashMap;
-use tokio::sync::RwLock;
 use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant};
+use tokio::sync::RwLock;
 
 #[derive(Debug, Clone)]
 pub struct Alert {
@@ -76,53 +76,57 @@ impl Monitoring {
     pub async fn process_alert(&self, alert: Alert) -> Result<(), AppError> {
         let mut alerts = self.alerts.write().await;
         alerts.push(alert);
-        
+
         // Check alert limits
         if alerts.len() > 1000 {
             alerts.retain(|a| !a.resolved);
         }
-        
+
         Ok(())
     }
 
     pub async fn update_status(&self, status: SystemStatus) -> Result<(), AppError> {
         let mut current_status = self.status.write().await;
         *current_status = status;
-        
+
         // Save historical data
         let historical_entry = HistoricalData {
             timestamp: Instant::now(),
             metrics: HashMap::new(), // Will be filled from metrics
             alerts: self.alerts.read().await.clone(),
         };
-        
+
         let mut historical_data = self.historical_data.write().await;
         historical_data.push(historical_entry);
-        
+
         // Limit historical data size
         if historical_data.len() > 10000 {
             historical_data.drain(0..1000);
         }
-        
+
         Ok(())
     }
 
-    pub async fn get_historical_data(&self, duration: Duration) -> Result<Vec<HistoricalData>, AppError> {
+    pub async fn get_historical_data(
+        &self,
+        duration: Duration,
+    ) -> Result<Vec<HistoricalData>, AppError> {
         let historical_data = self.historical_data.read().await;
         let cutoff_time = Instant::now() - duration;
-        
+
         let filtered_data: Vec<HistoricalData> = historical_data
             .iter()
             .filter(|data| data.timestamp >= cutoff_time)
             .cloned()
             .collect();
-        
+
         Ok(filtered_data)
     }
 
     pub async fn get_active_alerts(&self) -> Vec<Alert> {
         let alerts = self.alerts.read().await;
-        alerts.iter()
+        alerts
+            .iter()
             .filter(|alert| !alert.resolved)
             .cloned()
             .collect()
@@ -130,12 +134,15 @@ impl Monitoring {
 
     pub async fn resolve_alert(&self, alert_id: &str) -> Result<(), AppError> {
         let mut alerts = self.alerts.write().await;
-        
+
         if let Some(alert) = alerts.iter_mut().find(|a| a.id == alert_id) {
             alert.resolved = true;
             Ok(())
         } else {
-            Err(AppError::MonitoringError(format!("Alert '{}' not found", alert_id)))
+            Err(AppError::MonitoringError(format!(
+                "Alert '{}' not found",
+                alert_id
+            )))
         }
     }
 
@@ -147,13 +154,13 @@ impl Monitoring {
         // Start background monitoring
         let metrics_collector = self.metrics_collector.clone();
         let status = self.status.clone();
-        
+
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(Duration::from_secs(30));
-            
+
             loop {
                 interval.tick().await;
-                
+
                 // Collect metrics
                 if let Ok(metrics) = metrics_collector.collect().await {
                     // Update status based on metrics
@@ -161,37 +168,37 @@ impl Monitoring {
                     current_status.gpu_utilization = metrics.gpu_utilization;
                     current_status.memory_usage_mb = metrics.memory_usage_mb;
                     current_status.average_response_time_ms = metrics.average_response_time_ms;
-                    
+
                     // Calculate overall system health
                     let health_score = Self::calculate_health_score(&metrics);
                     current_status.overall_health = health_score;
                 }
             }
         });
-        
+
         Ok(())
     }
 
     fn calculate_health_score(metrics: &metrics::Metrics) -> f32 {
         let mut score: f32 = 100.0;
-        
+
         // Penalties for various issues
         if metrics.gpu_utilization > 90.0 {
             score -= 20.0;
         }
-        
+
         if metrics.memory_usage_mb > 8000.0 {
             score -= 15.0;
         }
-        
+
         if metrics.average_response_time_ms > 5000.0 {
             score -= 25.0;
         }
-        
+
         if metrics.error_rate > 0.05 {
             score -= 30.0;
         }
-        
+
         score.max(0.0)
     }
 }
@@ -205,18 +212,18 @@ static GLOBAL_MONITORING: OnceLock<Arc<Monitoring>> = OnceLock::new();
 /// Initialize monitoring module
 pub async fn initialize() -> Result<(), AppError> {
     tracing::info!("Initializing monitoring module");
-    
+
     let monitoring = Monitoring::new();
     let monitoring_arc = Arc::new(monitoring);
-    
+
     // Store global instance
-    GLOBAL_MONITORING.set(monitoring_arc.clone()).map_err(|_| {
-        AppError::MonitoringError("Monitoring already initialized".to_string())
-    })?;
-    
+    GLOBAL_MONITORING
+        .set(monitoring_arc.clone())
+        .map_err(|_| AppError::MonitoringError("Monitoring already initialized".to_string()))?;
+
     // Start background monitoring
     monitoring_arc.start_monitoring().await?;
-    
+
     tracing::info!("Monitoring module initialized successfully");
     Ok(())
 }
@@ -224,11 +231,11 @@ pub async fn initialize() -> Result<(), AppError> {
 /// Shutdown monitoring module
 pub async fn shutdown() -> Result<(), AppError> {
     tracing::info!("Shutting down monitoring module");
-    
+
     // Note: OnceLock doesn't support clearing, so we can't fully remove it
     // The monitoring instance will remain in memory but won't be accessible after this
     // For true cleanup, consider using a different pattern or accept this limitation
-    
+
     tracing::info!("Monitoring module shut down successfully");
     Ok(())
 }
@@ -236,12 +243,14 @@ pub async fn shutdown() -> Result<(), AppError> {
 /// Health check for monitoring module
 pub async fn health_check() -> Result<(), AppError> {
     tracing::info!("Monitoring module health check");
-    
+
     // Check if global monitoring exists
     if GLOBAL_MONITORING.get().is_none() {
-        return Err(AppError::MonitoringError("Global monitoring not initialized".to_string()));
+        return Err(AppError::MonitoringError(
+            "Global monitoring not initialized".to_string(),
+        ));
     }
-    
+
     tracing::info!("Monitoring module health check passed");
     Ok(())
 }

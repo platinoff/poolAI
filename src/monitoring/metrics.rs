@@ -71,24 +71,24 @@ impl MetricsCollector {
 
     pub async fn collect(&self) -> Result<Metrics, AppError> {
         let timestamp = Instant::now();
-        
+
         // Сбор системных метрик
         let gpu_utilization = self.collect_gpu_utilization().await?;
         let memory_usage_mb = self.collect_memory_usage().await?;
         let cpu_usage_percent = self.collect_cpu_usage().await?;
         let disk_usage_percent = self.collect_disk_usage().await?;
         let network_throughput_mbps = self.collect_network_metrics().await?;
-        
+
         // Сбор метрик производительности
         let average_response_time_ms = self.calculate_average_response_time().await?;
         let requests_per_second = self.calculate_requests_per_second().await?;
         let error_rate = self.calculate_error_rate().await?;
         let active_connections = self.get_active_connections().await?;
         let queue_size = self.get_queue_size().await?;
-        
+
         // Сбор специфичных метрик моделей
         let model_specific_metrics = self.collect_model_specific_metrics().await?;
-        
+
         let metrics = Metrics {
             timestamp,
             gpu_utilization,
@@ -103,7 +103,7 @@ impl MetricsCollector {
             queue_size,
             model_specific_metrics,
         };
-        
+
         Ok(metrics)
     }
 
@@ -195,7 +195,7 @@ impl MetricsCollector {
 
     pub async fn get_historical_metrics(&self, duration: Duration) -> Vec<Metrics> {
         let cutoff_time = Instant::now() - duration;
-        
+
         self.historical_metrics
             .iter()
             .filter(|metrics| metrics.timestamp >= cutoff_time)
@@ -205,10 +205,10 @@ impl MetricsCollector {
 
     pub async fn add_metrics_to_history(&mut self, metrics: Metrics) {
         self.historical_metrics.push(metrics);
-        
+
         // Ограничение размера истории
         if self.historical_metrics.len() > 10000 {
             self.historical_metrics.drain(0..1000);
         }
     }
-} 
+}

@@ -6,7 +6,7 @@
 //! - Dependency graph
 
 use crate::core::error::AppError;
-use crate::libs::constraints::{VersionConstraint, parse_constraints, satisfies_all};
+use crate::libs::constraints::{parse_constraints, satisfies_all, VersionConstraint};
 use crate::libs::registry::LibraryRegistry;
 use std::collections::{HashMap, HashSet};
 use tracing::info;
@@ -39,25 +39,26 @@ impl DependencyResolver {
     }
 
     /// Resolve dependencies for a library
-    pub async fn resolve(
-        &self,
-        name: &str,
-        version: &str,
-    ) -> Result<Vec<String>, AppError> {
+    pub async fn resolve(&self, name: &str, version: &str) -> Result<Vec<String>, AppError> {
         info!("Resolving dependencies for {} v{}", name, version);
-        
+
         // Check if library has dependencies
         if let Some(deps) = self.dependency_graph.get(name) {
             // Filter dependencies that satisfy constraints
             let mut resolved = Vec::new();
-            
+
             for dep_spec in deps {
                 // For now, we'll return all dependencies
                 // In full implementation, we'd check version constraints
                 resolved.push(dep_spec.name.clone());
             }
-            
-            info!("Resolved {} dependencies for {} v{}", resolved.len(), name, version);
+
+            info!(
+                "Resolved {} dependencies for {} v{}",
+                resolved.len(),
+                name,
+                version
+            );
             Ok(resolved)
         } else {
             Ok(Vec::new())
@@ -79,9 +80,12 @@ impl DependencyResolver {
 
         let mut resolved = Vec::new();
         for dep_spec in deps {
-            let versions = registry
-                .get_versions(&dep_spec.name)
-                .ok_or_else(|| AppError::ConfigError(format!("No versions available for dependency {}", dep_spec.name)))?;
+            let versions = registry.get_versions(&dep_spec.name).ok_or_else(|| {
+                AppError::ConfigError(format!(
+                    "No versions available for dependency {}",
+                    dep_spec.name
+                ))
+            })?;
 
             // choose latest version that satisfies constraints (versions are sorted in registry)
             let mut chosen: Option<String> = None;
@@ -109,7 +113,7 @@ impl DependencyResolver {
 
         Ok(resolved)
     }
-    
+
     /// Add dependency with version constraints
     pub fn add_dependency_with_constraints(
         &mut self,
@@ -118,16 +122,17 @@ impl DependencyResolver {
         constraints: &str,
     ) -> Result<(), AppError> {
         let parsed_constraints = parse_constraints(constraints)?;
-        
-        let deps = self.dependency_graph
+
+        let deps = self
+            .dependency_graph
             .entry(library.to_string())
             .or_insert_with(Vec::new);
-        
+
         deps.push(DependencySpec {
             name: dependency.to_string(),
             constraints: parsed_constraints,
         });
-        
+
         Ok(())
     }
 
@@ -143,25 +148,23 @@ impl DependencyResolver {
     }
 
     /// Check for dependency conflicts
-    pub async fn check_conflicts(
-        &self,
-        dependencies: &[String],
-    ) -> Result<(), AppError> {
+    pub async fn check_conflicts(&self, dependencies: &[String]) -> Result<(), AppError> {
         // Check for circular dependencies
         let mut visited = HashSet::new();
         let mut rec_stack = HashSet::new();
-        
+
         for dep in dependencies {
             if self.has_circular_dependency(dep, &mut visited, &mut rec_stack)? {
-                return Err(AppError::ConfigError(
-                    format!("Circular dependency detected involving: {}", dep)
-                ));
+                return Err(AppError::ConfigError(format!(
+                    "Circular dependency detected involving: {}",
+                    dep
+                )));
             }
         }
-        
+
         Ok(())
     }
-    
+
     /// Check for circular dependencies using DFS
     fn has_circular_dependency(
         &self,
@@ -172,14 +175,14 @@ impl DependencyResolver {
         if rec_stack.contains(node) {
             return Ok(true); // Circular dependency found
         }
-        
+
         if visited.contains(node) {
             return Ok(false); // Already processed
         }
-        
+
         visited.insert(node.to_string());
         rec_stack.insert(node.to_string());
-        
+
         if let Some(deps) = self.dependency_graph.get(node) {
             for dep_spec in deps {
                 if self.has_circular_dependency(&dep_spec.name, visited, rec_stack)? {
@@ -187,7 +190,7 @@ impl DependencyResolver {
                 }
             }
         }
-        
+
         rec_stack.remove(node);
         Ok(false)
     }
@@ -196,9 +199,9 @@ impl DependencyResolver {
     pub fn build_graph(&self, root: &str) -> Result<Vec<String>, AppError> {
         let mut visited = HashSet::new();
         let mut result = Vec::new();
-        
+
         self.dfs(root, &mut visited, &mut result)?;
-        
+
         Ok(result)
     }
 
@@ -212,15 +215,15 @@ impl DependencyResolver {
         if visited.contains(node) {
             return Ok(());
         }
-        
+
         visited.insert(node.to_string());
-        
+
         if let Some(deps) = self.dependency_graph.get(node) {
             for dep_spec in deps {
                 self.dfs(&dep_spec.name, visited, result)?;
             }
         }
-        
+
         result.push(node.to_string());
         Ok(())
     }
@@ -242,4 +245,3 @@ impl Default for DependencyResolver {
         Self::new()
     }
 }
-

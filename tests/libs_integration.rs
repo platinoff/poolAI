@@ -5,10 +5,8 @@
 //! - Atomic install rollback scenarios
 //! - Dependency resolution with fixtures
 
-use poolai::libs::{
-    LibraryInfo, LibraryMetadata,
-};
 use poolai::libs::manifest::InstalledLibrariesManifest;
+use poolai::libs::{LibraryInfo, LibraryMetadata};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use tempfile::TempDir;
@@ -40,7 +38,9 @@ async fn test_manifest_load_save_atomic() {
     assert!(manifest_path.exists());
 
     // Load manifest
-    let loaded = InstalledLibrariesManifest::load(&manifest_path).await.unwrap();
+    let loaded = InstalledLibrariesManifest::load(&manifest_path)
+        .await
+        .unwrap();
     assert!(loaded.is_some());
     let loaded = loaded.unwrap();
 
@@ -56,7 +56,9 @@ async fn test_manifest_load_nonexistent() {
     let manifest_path = temp_dir.path().join("nonexistent.json");
 
     // Load non-existent manifest should return None
-    let loaded = InstalledLibrariesManifest::load(&manifest_path).await.unwrap();
+    let loaded = InstalledLibrariesManifest::load(&manifest_path)
+        .await
+        .unwrap();
     assert!(loaded.is_none());
 }
 
@@ -72,7 +74,10 @@ async fn test_manifest_atomic_write_survives_crash() {
 
     // Verify tmp file is cleaned up
     let tmp_path = manifest_path.parent().unwrap().join("manifest.json.tmp");
-    assert!(!tmp_path.exists(), "Temporary file should be removed after atomic write");
+    assert!(
+        !tmp_path.exists(),
+        "Temporary file should be removed after atomic write"
+    );
 
     // Verify final file exists
     assert!(manifest_path.exists(), "Final manifest file should exist");
@@ -103,10 +108,12 @@ async fn test_manifest_multiple_libraries() {
     let manifest = InstalledLibrariesManifest::new(libraries.clone());
     manifest.save_atomic(&manifest_path).await.unwrap();
 
-    let loaded = InstalledLibrariesManifest::load(&manifest_path).await.unwrap().unwrap();
+    let loaded = InstalledLibrariesManifest::load(&manifest_path)
+        .await
+        .unwrap()
+        .unwrap();
     assert_eq!(loaded.libraries.len(), 5);
     for i in 1..=5 {
         assert!(loaded.libraries.contains_key(&format!("lib-{}", i)));
     }
 }
-

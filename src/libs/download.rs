@@ -7,11 +7,11 @@
 //! - Download progress tracking
 
 use crate::core::error::AppError;
-use sha2::{Sha256, Digest};
-use std::path::{Path, PathBuf};
-use tokio::io::{AsyncWriteExt, AsyncReadExt};
-use tracing::info;
 use futures_util::StreamExt;
+use sha2::{Digest, Sha256};
+use std::path::{Path, PathBuf};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tracing::info;
 
 /// Download progress callback
 pub type ProgressCallback = Box<dyn Fn(u64, u64) + Send + Sync>;
@@ -23,51 +23,52 @@ pub async fn download_library(
     expected_checksum: Option<&str>,
 ) -> Result<PathBuf, AppError> {
     info!("Downloading library from: {}", url);
-    
+
     // Create HTTP client
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(300)) // 5 minutes timeout
         .build()
         .map_err(|e| AppError::ConfigError(format!("Failed to create HTTP client: {}", e)))?;
-    
+
     // Download file
     let response = client
         .get(url)
         .send()
         .await
         .map_err(|e| AppError::ConfigError(format!("Failed to download library: {}", e)))?;
-    
+
     if !response.status().is_success() {
         return Err(AppError::ConfigError(format!(
             "Failed to download library: HTTP {}",
             response.status()
         )));
     }
-    
+
     // Get content length for progress tracking
     let content_length = response.content_length().unwrap_or(0);
     info!("Downloading {} bytes", content_length);
-    
+
     // Create destination file
     let mut file = tokio::fs::File::create(destination)
         .await
         .map_err(|e| AppError::ConfigError(format!("Failed to create destination file: {}", e)))?;
-    
+
     // Download with progress tracking
     let mut stream = response.bytes_stream();
     let mut hasher = Sha256::new();
     let mut downloaded = 0u64;
-    
+
     while let Some(chunk) = stream.next().await {
         let chunk = chunk.map_err(|e| AppError::ConfigError(format!("Download error: {}", e)))?;
-        
+
         // Write chunk to file
-        file.write_all(&chunk).await
+        file.write_all(&chunk)
+            .await
             .map_err(|e| AppError::ConfigError(format!("Failed to write file: {}", e)))?;
-        
+
         // Update checksum
         hasher.update(&chunk);
-        
+
         // Update progress
         downloaded += chunk.len() as u64;
         if content_length > 0 && downloaded % (content_length / 10).max(1) == 0 {
@@ -75,11 +76,12 @@ pub async fn download_library(
             info!("Download progress: {}%", progress);
         }
     }
-    
+
     // Finalize file
-    file.sync_all().await
+    file.sync_all()
+        .await
         .map_err(|e| AppError::ConfigError(format!("Failed to sync file: {}", e)))?;
-    
+
     // Verify checksum if provided
     let calculated_checksum = format!("{:x}", hasher.finalize());
     if let Some(expected) = expected_checksum {
@@ -93,27 +95,29 @@ pub async fn download_library(
     } else {
         info!("Downloaded checksum: {}", calculated_checksum);
     }
-    
+
     info!("Library downloaded successfully to: {:?}", destination);
     Ok(destination.to_path_buf())
 }
 
 /// Extract archive (tar.gz, tar, zip)
-pub async fn extract_archive(
-    archive_path: &Path,
-    destination: &Path,
-) -> Result<PathBuf, AppError> {
-    info!("Extracting archive: {:?} to {:?}", archive_path, destination);
-    
+pub async fn extract_archive(archive_path: &Path, destination: &Path) -> Result<PathBuf, AppError> {
+    info!(
+        "Extracting archive: {:?} to {:?}",
+        archive_path, destination
+    );
+
     // Ensure destination directory exists
-    tokio::fs::create_dir_all(destination).await
-        .map_err(|e| AppError::ConfigError(format!("Failed to create destination directory: {}", e)))?;
-    
+    tokio::fs::create_dir_all(destination).await.map_err(|e| {
+        AppError::ConfigError(format!("Failed to create destination directory: {}", e))
+    })?;
+
     // Determine archive type from extension
-    let extension = archive_path.extension()
+    let extension = archive_path
+        .extension()
         .and_then(|s| s.to_str())
         .unwrap_or("");
-    
+
     match extension {
         "gz" | "tgz" => {
             // Handle tar.gz
@@ -134,7 +138,7 @@ pub async fn extract_archive(
             )));
         }
     }
-    
+
     info!("Archive extracted successfully to: {:?}", destination);
     Ok(destination.to_path_buf())
 }
@@ -144,41 +148,43 @@ async fn extract_tar_gz(archive_path: &Path, destination: &Path) -> Result<(), A
     use flate2::read::GzDecoder;
     use std::fs::File;
     use std::io::BufReader;
-    
+
     let file = File::open(archive_path)
         .map_err(|e| AppError::ConfigError(format!("Failed to open archive: {}", e)))?;
-    
+
     let gz = GzDecoder::new(BufReader::new(file));
     let mut archive = tar::Archive::new(gz);
-    
-    archive.unpack(destination)
+
+    archive
+        .unpack(destination)
         .map_err(|e| AppError::ConfigError(format!("Failed to extract tar.gz: {}", e)))?;
-    
+
     Ok(())
 }
 
 /// Extract tar archive
 async fn extract_tar(archive_path: &Path, destination: &Path) -> Result<(), AppError> {
     use std::fs::File;
-    
+
     // Run blocking I/O in spawn_blocking
     let archive_path = archive_path.to_path_buf();
     let destination = destination.to_path_buf();
-    
+
     tokio::task::spawn_blocking(move || {
         let file = File::open(&archive_path)
             .map_err(|e| AppError::ConfigError(format!("Failed to open archive: {}", e)))?;
-        
+
         let mut archive = tar::Archive::new(file);
-        
-        archive.unpack(&destination)
+
+        archive
+            .unpack(&destination)
             .map_err(|e| AppError::ConfigError(format!("Failed to extract tar: {}", e)))?;
-        
+
         Ok::<(), AppError>(())
     })
     .await
     .map_err(|e| AppError::ConfigError(format!("Task join error: {}", e)))??;
-    
+
     Ok(())
 }
 
@@ -186,74 +192,81 @@ async fn extract_tar(archive_path: &Path, destination: &Path) -> Result<(), AppE
 async fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), AppError> {
     use std::fs::File;
     use std::io::Read;
-    
+
     // Run blocking I/O in spawn_blocking
     let archive_path = archive_path.to_path_buf();
     let destination = destination.to_path_buf();
-    
+
     tokio::task::spawn_blocking(move || {
         let file = File::open(&archive_path)
             .map_err(|e| AppError::ConfigError(format!("Failed to open archive: {}", e)))?;
-        
+
         let mut archive = zip::ZipArchive::new(file)
             .map_err(|e| AppError::ConfigError(format!("Failed to read zip archive: {}", e)))?;
-        
+
         for i in 0..archive.len() {
-            let mut file = archive.by_index(i)
+            let mut file = archive
+                .by_index(i)
                 .map_err(|e| AppError::ConfigError(format!("Failed to read zip entry: {}", e)))?;
-            
+
             let outpath = destination.join(file.name());
-            
+
             if file.name().ends_with('/') {
                 // Directory
-                std::fs::create_dir_all(&outpath)
-                    .map_err(|e| AppError::ConfigError(format!("Failed to create directory: {}", e)))?;
+                std::fs::create_dir_all(&outpath).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to create directory: {}", e))
+                })?;
             } else {
                 // File
                 if let Some(parent) = outpath.parent() {
-                    std::fs::create_dir_all(parent)
-                        .map_err(|e| AppError::ConfigError(format!("Failed to create parent directory: {}", e)))?;
+                    std::fs::create_dir_all(parent).map_err(|e| {
+                        AppError::ConfigError(format!("Failed to create parent directory: {}", e))
+                    })?;
                 }
-                
+
                 let mut outfile = std::fs::File::create(&outpath)
                     .map_err(|e| AppError::ConfigError(format!("Failed to create file: {}", e)))?;
-                
+
                 let mut buffer = Vec::new();
-                file.read_to_end(&mut buffer)
-                    .map_err(|e| AppError::ConfigError(format!("Failed to read zip entry: {}", e)))?;
-                
+                file.read_to_end(&mut buffer).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to read zip entry: {}", e))
+                })?;
+
                 std::io::Write::write_all(&mut outfile, &buffer)
                     .map_err(|e| AppError::ConfigError(format!("Failed to write file: {}", e)))?;
             }
         }
-        
+
         Ok::<(), AppError>(())
     })
     .await
     .map_err(|e| AppError::ConfigError(format!("Task join error: {}", e)))??;
-    
+
     Ok(())
 }
 
 /// Calculate file checksum
 pub async fn calculate_checksum(file_path: &Path) -> Result<String, AppError> {
-    let mut file = tokio::fs::File::open(file_path).await
+    let mut file = tokio::fs::File::open(file_path)
+        .await
         .map_err(|e| AppError::ConfigError(format!("Failed to open file: {}", e)))?;
-    
+
     let mut hasher = Sha256::new();
     let mut buffer = vec![0u8; 8192];
-    
+
     loop {
-        let n = file.read(&mut buffer).await
+        let n = file
+            .read(&mut buffer)
+            .await
             .map_err(|e| AppError::ConfigError(format!("Failed to read file: {}", e)))?;
-        
+
         if n == 0 {
             break;
         }
-        
+
         hasher.update(&buffer[..n]);
     }
-    
+
     Ok(format!("{:x}", hasher.finalize()))
 }
 
@@ -262,43 +275,50 @@ pub async fn create_artifact_archive(
     source_dir: &Path,
     archive_path: &Path,
 ) -> Result<PathBuf, AppError> {
-    info!("Creating artifact archive from {:?} to {:?}", source_dir, archive_path);
-    
+    info!(
+        "Creating artifact archive from {:?} to {:?}",
+        source_dir, archive_path
+    );
+
     // Ensure parent directory exists
     if let Some(parent) = archive_path.parent() {
-        tokio::fs::create_dir_all(parent).await
-            .map_err(|e| AppError::ConfigError(format!("Failed to create archive parent directory: {}", e)))?;
+        tokio::fs::create_dir_all(parent).await.map_err(|e| {
+            AppError::ConfigError(format!("Failed to create archive parent directory: {}", e))
+        })?;
     }
-    
+
     let source_dir = source_dir.to_path_buf();
     let archive_path = archive_path.to_path_buf();
-    
+
     let archive_path_clone = archive_path.clone();
-    
+
     // Run blocking I/O in spawn_blocking
     tokio::task::spawn_blocking(move || {
-        use flate2::Compression;
         use flate2::write::GzEncoder;
+        use flate2::Compression;
         use std::fs::File;
-        
+
         let file = File::create(&archive_path)
             .map_err(|e| AppError::ConfigError(format!("Failed to create archive file: {}", e)))?;
-        
+
         let gz = GzEncoder::new(file, Compression::default());
         let mut tar = tar::Builder::new(gz);
-        
-        tar.append_dir_all(".", &source_dir)
-            .map_err(|e| AppError::ConfigError(format!("Failed to add directory to archive: {}", e)))?;
-        
+
+        tar.append_dir_all(".", &source_dir).map_err(|e| {
+            AppError::ConfigError(format!("Failed to add directory to archive: {}", e))
+        })?;
+
         tar.finish()
             .map_err(|e| AppError::ConfigError(format!("Failed to finish archive: {}", e)))?;
-        
+
         Ok::<PathBuf, AppError>(archive_path)
     })
     .await
     .map_err(|e| AppError::ConfigError(format!("Task join error: {}", e)))??;
-    
-    info!("Artifact archive created successfully: {:?}", archive_path_clone);
+
+    info!(
+        "Artifact archive created successfully: {:?}",
+        archive_path_clone
+    );
     Ok(archive_path_clone)
 }
-

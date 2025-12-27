@@ -30,25 +30,30 @@ impl ArtifactManifest {
     pub async fn load(path: &Path) -> Result<Option<Self>, AppError> {
         match tokio::fs::read(path).await {
             Ok(bytes) => {
-                let m: Self = serde_json::from_slice(&bytes)
-                    .map_err(|e| AppError::ConfigError(format!("Failed to parse artifact manifest: {}", e)))?;
+                let m: Self = serde_json::from_slice(&bytes).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to parse artifact manifest: {}", e))
+                })?;
                 Ok(Some(m))
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
-            Err(e) => Err(AppError::ConfigError(format!("Failed to read artifact manifest: {}", e))),
+            Err(e) => Err(AppError::ConfigError(format!(
+                "Failed to read artifact manifest: {}",
+                e
+            ))),
         }
     }
 
     pub async fn save_atomic(&self, path: &Path) -> Result<(), AppError> {
         if let Some(parent) = path.parent() {
-            tokio::fs::create_dir_all(parent)
-                .await
-                .map_err(|e| AppError::ConfigError(format!("Failed to create manifest dir: {}", e)))?;
+            tokio::fs::create_dir_all(parent).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to create manifest dir: {}", e))
+            })?;
         }
 
         let tmp = tmp_path(path);
-        let data = serde_json::to_vec_pretty(self)
-            .map_err(|e| AppError::ConfigError(format!("Failed to serialize artifact manifest: {}", e)))?;
+        let data = serde_json::to_vec_pretty(self).map_err(|e| {
+            AppError::ConfigError(format!("Failed to serialize artifact manifest: {}", e))
+        })?;
 
         let mut f = tokio::fs::File::create(&tmp)
             .await
@@ -73,9 +78,10 @@ impl ArtifactManifest {
 
 fn tmp_path(path: &Path) -> PathBuf {
     let mut tmp = path.to_path_buf();
-    let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("artifacts.json");
+    let name = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("artifacts.json");
     tmp.set_file_name(format!("{}.tmp", name));
     tmp
 }
-
-

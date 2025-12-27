@@ -15,4 +15,4 @@ pub async fn start_bot(token: &str) {
 pub async fn send_notification(chat_id: &str, message: &str) {
     // TODO: Implement notification sending
     println!("[tgbot] Sending notification to {}: {}", chat_id, message);
-} 
+}

@@ -5,11 +5,11 @@
 //! - Quota enforcement removes oldest artifacts when exceeded
 //! - Total size calculation
 
-use poolai::raid::{RaidManager, RaidConfig, RaidMode, ArtifactRef};
+use chrono::{Duration, Utc};
+use poolai::raid::{ArtifactRef, RaidConfig, RaidManager, RaidMode};
 use std::path::PathBuf;
 use tempfile::TempDir;
 use uuid::Uuid;
-use chrono::{Utc, Duration};
 
 #[tokio::test]
 async fn test_gc_removes_old_artifacts() {
@@ -17,7 +17,7 @@ async fn test_gc_removes_old_artifacts() {
     // Since we can't easily manipulate stored_at after creation, we test GC logic
     // by verifying it works when retention_days is set and artifacts exist.
     // In a real scenario, we'd add a test helper method to create artifacts with custom stored_at.
-    
+
     let temp_dir = TempDir::new().unwrap();
     let config = RaidConfig {
         mode: RaidMode::Local,
@@ -58,9 +58,18 @@ async fn test_quota_enforcement() {
     manager.initialize().await.unwrap();
 
     // Add artifacts that exceed quota
-    manager.put_artifact("artifact1", &vec![0u8; 50]).await.unwrap();
-    manager.put_artifact("artifact2", &vec![0u8; 50]).await.unwrap();
-    manager.put_artifact("artifact3", &vec![0u8; 50]).await.unwrap();
+    manager
+        .put_artifact("artifact1", &vec![0u8; 50])
+        .await
+        .unwrap();
+    manager
+        .put_artifact("artifact2", &vec![0u8; 50])
+        .await
+        .unwrap();
+    manager
+        .put_artifact("artifact3", &vec![0u8; 50])
+        .await
+        .unwrap();
 
     // Total is 150 bytes, quota is 100 bytes
     let total_before = manager.get_total_size().await.unwrap();
@@ -122,4 +131,3 @@ async fn test_gc_with_no_retention_policy() {
     let artifacts = manager.list_artifacts().await;
     assert_eq!(artifacts.len(), 1);
 }
-

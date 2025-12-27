@@ -4,20 +4,20 @@
 //! distributed RAID nodes. It integrates with async-raft library.
 
 #[cfg(feature = "raft")]
-use async_raft::{
-    Config, Raft, RaftStorage, RaftNetwork, AppData, AppDataResponse,
-    storage::RaftStateMachine, NodeId,
-};
-#[cfg(feature = "raft")]
 use crate::core::error::AppError;
 #[cfg(feature = "raft")]
 use crate::raid::RaidManager;
+#[cfg(feature = "raft")]
+use async_raft::{
+    storage::RaftStateMachine, AppData, AppDataResponse, Config, NodeId, Raft, RaftNetwork,
+    RaftStorage,
+};
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
 use tokio::sync::RwLock;
 #[cfg(feature = "raft")]
-use tracing::{info, warn, error};
+use tracing::{error, info, warn};
 
 /// Raft configuration for Distributed RAID
 #[cfg(feature = "raft")]
@@ -38,7 +38,7 @@ impl Default for RaftConfig {
         Self {
             node_id: 1,
             cluster_members: vec![1],
-            election_timeout: 1000, // 1 second
+            election_timeout: 1000,  // 1 second
             heartbeat_interval: 100, // 100ms
         }
     }
@@ -73,13 +73,9 @@ pub enum RaidRaftOperation {
         metadata: crate::raid::manifest::ArtifactManifest,
     },
     /// Delete artifact operation
-    DeleteArtifact {
-        artifact_id: String,
-    },
+    DeleteArtifact { artifact_id: String },
     /// Sync artifacts operation
-    SyncArtifacts {
-        artifacts: Vec<String>,
-    },
+    SyncArtifacts { artifacts: Vec<String> },
 }
 
 /// Raft operation response
@@ -183,4 +179,3 @@ impl RaidRaftNode {
         "Disabled".to_string()
     }
 }
-

@@ -35,7 +35,11 @@ impl From<crate::vm::VmResources> for ResourceLimits {
         Self {
             cpu_cores: resources.cpu_cores,
             memory_mb: resources.memory_mb,
-            gpu_device: if resources.gpu_required { Some(0) } else { None },
+            gpu_device: if resources.gpu_required {
+                Some(0)
+            } else {
+                None
+            },
         }
     }
 }
@@ -86,12 +90,12 @@ impl ResourceLimiter for PlatformResourceLimiter {
         {
             windows::apply_windows_limits(command, limits).await
         }
-        
+
         #[cfg(target_os = "linux")]
         {
             linux::apply_linux_limits(command, limits).await
         }
-        
+
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         {
             // Fallback: basic validation only
@@ -105,12 +109,12 @@ impl ResourceLimiter for PlatformResourceLimiter {
         {
             windows::get_windows_usage(process_id).await
         }
-        
+
         #[cfg(target_os = "linux")]
         {
             linux::get_linux_usage(process_id).await
         }
-        
+
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         {
             Err(AppError::ConfigError(
@@ -124,7 +128,7 @@ impl ResourceLimiter for PlatformResourceLimiter {
         {
             true
         }
-        
+
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         {
             false
@@ -226,4 +230,3 @@ mod fallback {
         Ok(())
     }
 }
-

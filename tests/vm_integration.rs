@@ -6,7 +6,7 @@
 //! - Process logs capture
 //! - Process status tracking
 
-use poolai::vm::{VmManager, VmResources, VmIsolation};
+use poolai::vm::{VmIsolation, VmManager, VmResources};
 use std::path::PathBuf;
 use tempfile::TempDir;
 
@@ -16,10 +16,18 @@ async fn test_vm_create_instance_with_command() {
     manager.initialize().await.unwrap();
 
     let resources = VmResources::default();
-    
+
     // Use platform-specific command
     #[cfg(target_os = "windows")]
-    let (cmd, args) = ("cmd", vec!["/C".to_string(), "echo".to_string(), "Hello".to_string(), "World".to_string()]);
+    let (cmd, args) = (
+        "cmd",
+        vec![
+            "/C".to_string(),
+            "echo".to_string(),
+            "Hello".to_string(),
+            "World".to_string(),
+        ],
+    );
     #[cfg(not(target_os = "windows"))]
     let (cmd, args) = ("echo", vec!["Hello".to_string(), "World".to_string()]);
 
@@ -47,10 +55,13 @@ async fn test_vm_start_stop_instance() {
     manager.initialize().await.unwrap();
 
     let resources = VmResources::default();
-    
+
     // Use platform-specific command
     #[cfg(target_os = "windows")]
-    let (cmd, args) = ("cmd", vec!["/C".to_string(), "echo".to_string(), "test".to_string()]);
+    let (cmd, args) = (
+        "cmd",
+        vec!["/C".to_string(), "echo".to_string(), "test".to_string()],
+    );
     #[cfg(not(target_os = "windows"))]
     let (cmd, args) = ("echo", vec!["test".to_string()]);
 
@@ -118,10 +129,17 @@ async fn test_vm_get_instance_logs() {
     manager.initialize().await.unwrap();
 
     let resources = VmResources::default();
-    
+
     // Use a command that produces output
     #[cfg(target_os = "windows")]
-    let (cmd, args) = ("cmd", vec!["/C".to_string(), "echo".to_string(), "test output".to_string()]);
+    let (cmd, args) = (
+        "cmd",
+        vec![
+            "/C".to_string(),
+            "echo".to_string(),
+            "test output".to_string(),
+        ],
+    );
     #[cfg(not(target_os = "windows"))]
     let (cmd, args) = ("echo", vec!["test output".to_string()]);
 
@@ -164,7 +182,7 @@ async fn test_vm_list_instances() {
     manager.initialize().await.unwrap();
 
     let resources = VmResources::default();
-    
+
     // Create multiple instances
     let _instance1 = manager
         .create_instance(
@@ -193,4 +211,3 @@ async fn test_vm_list_instances() {
     let instances = manager.list_instances().await;
     assert_eq!(instances.len(), 2);
 }
-

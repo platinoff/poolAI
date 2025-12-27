@@ -21,9 +21,7 @@ fn parse_args() -> Args {
         match arg.as_str() {
             "--worker-id" => worker_id = it.next(),
             "--max-memory" => {
-                max_memory_mb = it
-                    .next()
-                    .and_then(|v| v.parse::<usize>().ok());
+                max_memory_mb = it.next().and_then(|v| v.parse::<usize>().ok());
             }
             other => {
                 if other.starts_with('-') {
@@ -56,5 +54,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         tokio::time::sleep(Duration::from_secs(60)).await;
     }
 }
-
-

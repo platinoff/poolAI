@@ -17,9 +17,9 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
 
+pub mod client;
 pub mod manifest;
 pub mod protocol;
-pub mod client;
 #[cfg(feature = "raft")]
 pub mod raft;
 #[cfg(feature = "raft")]
@@ -60,7 +60,7 @@ impl RaidConfig {
             mode: RaidMode::Local,
             base_path,
             quota_bytes: Some(10 * 1024 * 1024 * 1024), // 10 GB default
-            retention_days: Some(30), // 30 days default
+            retention_days: Some(30),                   // 30 days default
             gc_on_startup: true,
         }
     }
@@ -101,7 +101,9 @@ impl RaidManager {
         info!("Initializing RAID manager (mode: {:?})", cfg.mode);
         tokio::fs::create_dir_all(&cfg.base_path)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to create RAID base directory: {}", e)))?;
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to create RAID base directory: {}", e))
+            })?;
 
         // Load manifest (if exists), prune missing files and persist.
         let manifest_path = self.manifest_path_inner(&cfg.base_path);
@@ -152,7 +154,9 @@ impl RaidManager {
         let artifacts_dir = cfg.base_path.join("artifacts");
         tokio::fs::create_dir_all(&artifacts_dir)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to create artifacts directory: {}", e)))?;
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to create artifacts directory: {}", e))
+            })?;
 
         let id = Uuid::new_v4();
         let safe_name = sanitize_filename(name);
@@ -220,9 +224,9 @@ impl RaidManager {
         };
 
         if artifact.path.exists() {
-            tokio::fs::remove_file(&artifact.path)
-                .await
-                .map_err(|e| AppError::ConfigError(format!("Failed to remove artifact file: {}", e)))?;
+            tokio::fs::remove_file(&artifact.path).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to remove artifact file: {}", e))
+            })?;
         }
         self.persist_manifest().await?;
         Ok(())
@@ -261,7 +265,10 @@ impl RaidManager {
         }
 
         if removed > 0 {
-            info!("GC removed {} old artifacts (retention: {} days)", removed, retention_days);
+            info!(
+                "GC removed {} old artifacts (retention: {} days)",
+                removed, retention_days
+            );
         }
         Ok(removed)
     }
@@ -286,7 +293,10 @@ impl RaidManager {
         }
 
         let excess = total_size - quota_bytes;
-        info!("Quota exceeded: {} / {} bytes (excess: {} bytes)", total_size, quota_bytes, excess);
+        info!(
+            "Quota exceeded: {} / {} bytes (excess: {} bytes)",
+            total_size, quota_bytes, excess
+        );
 
         // Sort artifacts by age (oldest first) and remove until quota is met
         let mut artifacts_by_age: Vec<(Uuid, DateTime<Utc>, u64)> = {
@@ -319,7 +329,10 @@ impl RaidManager {
             }
 
             if let Err(e) = self.delete_artifact(id).await {
-                warn!("Failed to delete artifact {} during quota enforcement: {}", id, e);
+                warn!(
+                    "Failed to delete artifact {} during quota enforcement: {}",
+                    id, e
+                );
             } else {
                 removed += 1;
                 freed_bytes += size;
@@ -327,7 +340,10 @@ impl RaidManager {
         }
 
         if removed > 0 {
-            info!("Quota enforcement removed {} artifacts, freed {} bytes", removed, freed_bytes);
+            info!(
+                "Quota enforcement removed {} artifacts, freed {} bytes",
+                removed, freed_bytes
+            );
         }
         Ok(removed)
     }
@@ -397,5 +413,3 @@ pub async fn initialize() -> Result<(), AppError> {
 pub async fn shutdown() -> Result<(), AppError> {
     get_global_manager().shutdown().await
 }
-
-

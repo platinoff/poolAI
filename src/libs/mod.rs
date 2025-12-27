@@ -7,22 +7,25 @@
 //! - Path optimization for libraries
 //! - Automatic updates
 
-pub mod manager;
-pub mod registry;
-pub mod versioning;
+pub mod constraints;
 pub mod dependencies;
 pub mod download;
-pub mod constraints;
 pub mod integration;
+pub mod manager;
 pub mod manifest;
+pub mod registry;
+pub mod versioning;
 
 // Re-export main types for convenient access
+pub use constraints::{ConstraintOp, VersionConstraint};
+pub use dependencies::DependencyResolver;
+pub use integration::{
+    auto_update_libraries, auto_update_libtorch_if_needed, check_library_compatibility,
+    check_libtorch_compatibility, ensure_libtorch, AutoUpdatePolicy,
+};
 pub use manager::LibraryManager;
 pub use registry::LibraryRegistry;
 pub use versioning::VersionManager;
-pub use dependencies::DependencyResolver;
-pub use constraints::{VersionConstraint, ConstraintOp};
-pub use integration::{ensure_libtorch, check_library_compatibility, check_libtorch_compatibility, auto_update_libraries, auto_update_libtorch_if_needed, AutoUpdatePolicy};
 
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
@@ -66,9 +69,9 @@ pub enum LibraryStatus {
 /// Library type
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum LibraryType {
-    ModelLibrary,    // libtorch, etc.
-    NativeLibrary,   // System libraries
-    CustomLibrary,   // Custom user libraries
+    ModelLibrary,  // libtorch, etc.
+    NativeLibrary, // System libraries
+    CustomLibrary, // Custom user libraries
 }
 
 // Global library manager instance
@@ -77,16 +80,16 @@ static GLOBAL_LIBRARY_MANAGER: OnceLock<Arc<RwLock<LibraryManager>>> = OnceLock:
 /// Initialize library management module
 pub async fn initialize() -> Result<(), AppError> {
     tracing::info!("Initializing library management module");
-    
+
     // Initialize global library manager
     let manager = LibraryManager::new();
     manager.initialize().await?;
-    
+
     // Store global instance
-    GLOBAL_LIBRARY_MANAGER.set(Arc::new(RwLock::new(manager))).map_err(|_| {
-        AppError::ConfigError("Library manager already initialized".to_string())
-    })?;
-    
+    GLOBAL_LIBRARY_MANAGER
+        .set(Arc::new(RwLock::new(manager)))
+        .map_err(|_| AppError::ConfigError("Library manager already initialized".to_string()))?;
+
     tracing::info!("Library management module initialized successfully");
     Ok(())
 }
@@ -99,11 +102,11 @@ pub fn get_global_manager() -> Option<&'static Arc<RwLock<LibraryManager>>> {
 /// Shutdown library management module
 pub async fn shutdown() -> Result<(), AppError> {
     tracing::info!("Shutting down library management module");
-    
+
     // Note: OnceLock doesn't support clearing, so we can't fully remove it
     // The manager will remain in memory but won't be accessible after this
     // For true cleanup, consider using a different pattern or accept this limitation
-    
+
     tracing::info!("Library management module shut down successfully");
     Ok(())
 }
@@ -113,4 +116,3 @@ pub async fn health_check() -> Result<(), AppError> {
     // Check if library manager is operational
     Ok(())
 }
-

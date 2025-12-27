@@ -31,39 +31,43 @@ impl InstalledLibrariesManifest {
     pub async fn load(path: &Path) -> Result<Option<Self>, AppError> {
         match tokio::fs::read(path).await {
             Ok(bytes) => {
-                let manifest: Self = serde_json::from_slice(&bytes)
-                    .map_err(|e| AppError::ConfigError(format!("Failed to parse manifest: {}", e)))?;
+                let manifest: Self = serde_json::from_slice(&bytes).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to parse manifest: {}", e))
+                })?;
                 Ok(Some(manifest))
             }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
-            Err(e) => Err(AppError::ConfigError(format!("Failed to read manifest: {}", e))),
+            Err(e) => Err(AppError::ConfigError(format!(
+                "Failed to read manifest: {}",
+                e
+            ))),
         }
     }
 
     pub async fn save_atomic(&self, path: &Path) -> Result<(), AppError> {
         if let Some(parent) = path.parent() {
-            tokio::fs::create_dir_all(parent)
-                .await
-                .map_err(|e| AppError::ConfigError(format!("Failed to create manifest directory: {}", e)))?;
+            tokio::fs::create_dir_all(parent).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to create manifest directory: {}", e))
+            })?;
         }
 
         let tmp_path = tmp_manifest_path(path);
         let data = serde_json::to_vec_pretty(self)
             .map_err(|e| AppError::ConfigError(format!("Failed to serialize manifest: {}", e)))?;
 
-        let mut file = tokio::fs::File::create(&tmp_path)
-            .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to create manifest tmp file: {}", e)))?;
-        file.write_all(&data)
-            .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to write manifest tmp file: {}", e)))?;
-        file.sync_all()
-            .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to sync manifest tmp file: {}", e)))?;
+        let mut file = tokio::fs::File::create(&tmp_path).await.map_err(|e| {
+            AppError::ConfigError(format!("Failed to create manifest tmp file: {}", e))
+        })?;
+        file.write_all(&data).await.map_err(|e| {
+            AppError::ConfigError(format!("Failed to write manifest tmp file: {}", e))
+        })?;
+        file.sync_all().await.map_err(|e| {
+            AppError::ConfigError(format!("Failed to sync manifest tmp file: {}", e))
+        })?;
 
-        tokio::fs::rename(&tmp_path, path)
-            .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to move manifest into place: {}", e)))?;
+        tokio::fs::rename(&tmp_path, path).await.map_err(|e| {
+            AppError::ConfigError(format!("Failed to move manifest into place: {}", e))
+        })?;
         Ok(())
     }
 }
@@ -77,5 +81,3 @@ fn tmp_manifest_path(path: &Path) -> PathBuf {
     tmp.set_file_name(format!("{}.tmp", file_name));
     tmp
 }
-
-

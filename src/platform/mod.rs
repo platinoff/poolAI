@@ -3,8 +3,8 @@
 //! Provides platform-specific implementations for Windows and Linux
 //! with a unified interface for GPU information and system resources.
 
-pub mod windows;
 pub mod linux;
+pub mod windows;
 
 use serde::Serialize;
 

@@ -7,7 +7,7 @@
 //! - Start/Stop/Restart VM instance
 //! - RBAC permission checks (stub - would require full API server)
 
-use poolai::vm::{VmManager, VmResources, VmIsolation, VmStatus};
+use poolai::vm::{VmIsolation, VmManager, VmResources, VmStatus};
 
 #[tokio::test]
 async fn test_create_vm_instance() {
@@ -33,7 +33,10 @@ async fn test_create_vm_instance() {
     assert_eq!(instance.resources.cpu_cores, 2);
     assert_eq!(instance.resources.memory_mb, 1024);
     assert_eq!(instance.resources.gpu_required, false);
-    assert!(matches!(instance.status, VmStatus::Creating | VmStatus::Stopped));
+    assert!(matches!(
+        instance.status,
+        VmStatus::Creating | VmStatus::Stopped
+    ));
 
     // Verify instance exists in list
     let instances = manager.list_instances().await;
@@ -126,7 +129,10 @@ async fn test_start_stop_vm_instance() {
 
     // Initially creating or stopped
     let inst_before = manager.get_instance(instance.id).await.unwrap();
-    assert!(matches!(inst_before.status, VmStatus::Creating | VmStatus::Stopped));
+    assert!(matches!(
+        inst_before.status,
+        VmStatus::Creating | VmStatus::Stopped
+    ));
 
     // Start instance
     manager.start_instance(instance.id).await.unwrap();
@@ -208,4 +214,3 @@ async fn test_start_stop_nonexistent_instance() {
     let stop_result = manager.stop_instance(nonexistent_id).await;
     assert!(stop_result.is_err());
 }
-

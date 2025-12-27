@@ -39,7 +39,7 @@ impl VersionConstraint {
     /// Examples: ">=1.2.3", "~2.0.0", "^1.0.0", "==1.5.0"
     pub fn parse(constraint: &str) -> Result<Self, AppError> {
         let constraint = constraint.trim();
-        
+
         if constraint.starts_with(">=") {
             Ok(Self {
                 operator: ConstraintOp::GreaterEqual,
@@ -83,11 +83,11 @@ impl VersionConstraint {
             })
         }
     }
-    
+
     /// Check if version satisfies constraint
     pub fn satisfies(&self, version: &str) -> Result<bool, AppError> {
         let ordering = compare_versions(version, &self.version)?;
-        
+
         match self.operator {
             ConstraintOp::Exact => Ok(ordering == Ordering::Equal),
             ConstraintOp::GreaterEqual => Ok(ordering != Ordering::Less),
@@ -100,13 +100,14 @@ impl VersionConstraint {
                 if compatible_ordering == Ordering::Less {
                     return Ok(false);
                 }
-                
+
                 // Parse version to get next minor version
-                let parts: Vec<u32> = self.version
+                let parts: Vec<u32> = self
+                    .version
                     .split('.')
                     .filter_map(|s| s.parse::<u32>().ok())
                     .collect();
-                
+
                 if parts.len() >= 2 {
                     let next_minor = format!("{}.{}.0", parts[0], parts[1] + 1);
                     let next_ordering = compare_versions(version, &next_minor)?;
@@ -121,13 +122,14 @@ impl VersionConstraint {
                 if caret_ordering == Ordering::Less {
                     return Ok(false);
                 }
-                
+
                 // Parse version to get next major version
-                let parts: Vec<u32> = self.version
+                let parts: Vec<u32> = self
+                    .version
                     .split('.')
                     .filter_map(|s| s.parse::<u32>().ok())
                     .collect();
-                
+
                 if !parts.is_empty() {
                     let next_major = format!("{}.0.0", parts[0] + 1);
                     let next_ordering = compare_versions(version, &next_major)?;
@@ -142,34 +144,28 @@ impl VersionConstraint {
 
 /// Compare semantic versions
 fn compare_versions(a: &str, b: &str) -> Result<Ordering, AppError> {
-    let a_parts: Vec<u32> = a
-        .split('.')
-        .filter_map(|s| s.parse::<u32>().ok())
-        .collect();
-    
-    let b_parts: Vec<u32> = b
-        .split('.')
-        .filter_map(|s| s.parse::<u32>().ok())
-        .collect();
-    
+    let a_parts: Vec<u32> = a.split('.').filter_map(|s| s.parse::<u32>().ok()).collect();
+
+    let b_parts: Vec<u32> = b.split('.').filter_map(|s| s.parse::<u32>().ok()).collect();
+
     if a_parts.is_empty() || b_parts.is_empty() {
         return Err(AppError::ConfigError(format!(
             "Invalid version format: {} or {}",
             a, b
         )));
     }
-    
+
     // Compare major, minor, patch
     for i in 0..3 {
         let a_val = a_parts.get(i).copied().unwrap_or(0);
         let b_val = b_parts.get(i).copied().unwrap_or(0);
-        
+
         match a_val.cmp(&b_val) {
             Ordering::Equal => continue,
             other => return Ok(other),
         }
     }
-    
+
     // If all components are equal, compare as strings (for pre-release, build metadata)
     Ok(a.cmp(b))
 }
@@ -227,4 +223,3 @@ mod tests {
         assert!(!satisfies_all("2.0.0", &cs).unwrap());
     }
 }
-

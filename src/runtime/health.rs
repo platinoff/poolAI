@@ -63,22 +63,25 @@ impl HealthMonitor {
             checks: Arc::new(RwLock::new(HashMap::new())),
         }
     }
-    
+
     pub async fn initialize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        info!("Initializing Health Monitor (interval: {}s)", self.config.interval_seconds);
+        info!(
+            "Initializing Health Monitor (interval: {}s)",
+            self.config.interval_seconds
+        );
         Ok(())
     }
-    
+
     pub async fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Starting Health Monitor");
         Ok(())
     }
-    
+
     pub async fn shutdown(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Shutting down Health Monitor");
         Ok(())
     }
-    
+
     pub fn get_health_score(&self) -> f32 {
         // Calculate health score based on registered checks
         // For now, return 1.0 (all healthy)
@@ -88,13 +91,16 @@ impl HealthMonitor {
     /// Register a health check for a process/VM instance
     pub async fn register_check(&self, id: Uuid, name: String) {
         let mut checks = self.checks.write().await;
-        checks.insert(id, HealthCheckEntry {
+        checks.insert(
             id,
-            name,
-            failure_count: 0,
-            last_check: None,
-            status: HealthStatus::Unknown,
-        });
+            HealthCheckEntry {
+                id,
+                name,
+                failure_count: 0,
+                last_check: None,
+                status: HealthStatus::Unknown,
+            },
+        );
     }
 
     /// Unregister a health check
@@ -104,18 +110,15 @@ impl HealthMonitor {
     }
 
     /// Perform health check for a process
-    pub async fn check_process_health<F>(
-        &self,
-        id: Uuid,
-        check_fn: F,
-    ) -> HealthStatus
+    pub async fn check_process_health<F>(&self, id: Uuid, check_fn: F) -> HealthStatus
     where
-        F: FnOnce() -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), AppError>> + Send>>,
+        F: FnOnce() -> std::pin::Pin<
+            Box<dyn std::future::Future<Output = Result<(), AppError>> + Send>,
+        >,
     {
-        let result = tokio::time::timeout(
-            Duration::from_secs(self.config.timeout_seconds),
-            check_fn(),
-        ).await;
+        let result =
+            tokio::time::timeout(Duration::from_secs(self.config.timeout_seconds), check_fn())
+                .await;
 
         let mut checks = self.checks.write().await;
         let entry = checks.get_mut(&id);
@@ -123,7 +126,7 @@ impl HealthMonitor {
         match entry {
             Some(entry) => {
                 entry.last_check = Some(chrono::Utc::now());
-                
+
                 match result {
                     Ok(Ok(())) => {
                         // Health check passed
@@ -136,12 +139,14 @@ impl HealthMonitor {
                         entry.failure_count += 1;
                         let reason = format!("{}", e);
                         entry.status = HealthStatus::Unhealthy(reason.clone());
-                        
+
                         if entry.failure_count >= self.config.max_failures {
-                            warn!("Process {} failed health check {} times (max: {})", 
-                                entry.name, entry.failure_count, self.config.max_failures);
+                            warn!(
+                                "Process {} failed health check {} times (max: {})",
+                                entry.name, entry.failure_count, self.config.max_failures
+                            );
                         }
-                        
+
                         HealthStatus::Unhealthy(reason)
                     }
                     Err(_) => {
@@ -149,12 +154,14 @@ impl HealthMonitor {
                         entry.failure_count += 1;
                         let reason = "Health check timeout".to_string();
                         entry.status = HealthStatus::Unhealthy(reason.clone());
-                        
+
                         if entry.failure_count >= self.config.max_failures {
-                            warn!("Process {} failed health check {} times (max: {})", 
-                                entry.name, entry.failure_count, self.config.max_failures);
+                            warn!(
+                                "Process {} failed health check {} times (max: {})",
+                                entry.name, entry.failure_count, self.config.max_failures
+                            );
                         }
-                        
+
                         HealthStatus::Unhealthy(reason)
                     }
                 }
@@ -172,17 +179,18 @@ impl HealthMonitor {
     /// Get all health check entries
     pub async fn list_checks(&self) -> Vec<(Uuid, String, HealthStatus)> {
         let checks = self.checks.read().await;
-        checks.values()
+        checks
+            .values()
             .map(|e| (e.id, e.name.clone(), e.status.clone()))
             .collect()
     }
-    
+
     /// Get failure count for a registered check
     pub async fn get_failure_count(&self, id: Uuid) -> Option<u32> {
         let checks = self.checks.read().await;
         checks.get(&id).map(|e| e.failure_count)
     }
-    
+
     /// Get health check configuration
     pub fn get_config(&self) -> &HealthCheckConfig {
         &self.config

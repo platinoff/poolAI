@@ -5,62 +5,64 @@
 
 // Core modules
 pub mod core;
-pub mod pool;
 pub mod monitoring;
 pub mod platform;
-pub mod version;
+pub mod pool;
 pub mod rewards;
 pub mod runtime;
+pub mod version;
 
 // Public modules (exposed for external use)
-pub mod network;
-pub mod tgbot;
 pub mod libs;
-pub mod vm;
+pub mod network;
 pub mod raid;
+pub mod tgbot;
 pub mod ui;
+pub mod vm;
 
 // Re-export core types for convenient access
-pub use core::model_interface::{ModelInterface, ModelInfo};
 pub use core::config::PoolAIConfig;
-pub use core::state::AppState;
 pub use core::error::AppError;
+pub use core::model_interface::{ModelInfo, ModelInterface};
+pub use core::state::AppState;
 
 // Re-export pool types
-pub use pool::{Pool, PoolConfig, PoolMetrics};
 pub use pool::LoadBalancingStrategy;
+pub use pool::{Pool, PoolConfig, PoolMetrics};
 
 // Re-export monitoring types
 pub use monitoring::MetricsCollector;
-pub use monitoring::{Monitoring, Alert, AlertSeverity, SystemStatus, HistoricalData};
+pub use monitoring::{Alert, AlertSeverity, HistoricalData, Monitoring, SystemStatus};
 
 // Re-export runtime types
-pub use runtime::{RuntimeManager, RuntimeConfig, RuntimeStatus};
 pub use runtime::{
-    TaskScheduler, TaskQueue, CacheManager, StorageManager,
-    ProcessManager, ResourceOrchestrator, HealthMonitor
+    CacheManager, HealthMonitor, ProcessManager, ResourceOrchestrator, StorageManager, TaskQueue,
+    TaskScheduler,
 };
+pub use runtime::{RuntimeConfig, RuntimeManager, RuntimeStatus};
 
 // Re-export rewards types
-pub use rewards::{RewardSystem, RewardType, RewardLevel, Reward, UserProgress};
+pub use rewards::{Reward, RewardLevel, RewardSystem, RewardType, UserProgress};
 
 // Re-export platform types
-pub use platform::{GpuInfo, get_gpu_info};
+pub use platform::{get_gpu_info, GpuInfo};
 
 // Re-export library management types
-pub use libs::{LibraryManager, LibraryInfo, LibraryStatus, LibraryType};
+pub use libs::{LibraryInfo, LibraryManager, LibraryStatus, LibraryType};
 
 // Re-export VM types
-pub use vm::{VmManager, VmInstance, VmStatus, VmResources, VmIsolation, ResourceLimits, ResourceUsage};
+pub use vm::{
+    ResourceLimits, ResourceUsage, VmInstance, VmIsolation, VmManager, VmResources, VmStatus,
+};
 
 // Re-export RAID types
-pub use raid::{RaidManager, RaidConfig, RaidMode, RaidNode, ArtifactRef};
+pub use raid::{ArtifactRef, RaidConfig, RaidManager, RaidMode, RaidNode};
 
 // Re-export network functions
 pub use network::start_server;
 
 // Re-export tgbot functions
-pub use tgbot::{start_bot, send_notification};
+pub use tgbot::{send_notification, start_bot};
 
 // Re-export version information
 pub use version::{APP_VERSION, BUILD_TIME};

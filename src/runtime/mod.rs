@@ -1,5 +1,5 @@
 //! Runtime Module for Stage 4.1 - Advanced Runtime Management
-//! 
+//!
 //! This module provides:
 //! - Worker lifecycle management
 //! - Task scheduling with priorities
@@ -7,24 +7,24 @@
 //! - Process management
 //! - Auto-scaling capabilities
 
-pub mod worker;
-pub mod scheduler;
-pub mod queue;
 pub mod cache;
-pub mod storage;
-pub mod process;
-pub mod orchestrator;
 pub mod health;
+pub mod orchestrator;
+pub mod process;
+pub mod queue;
+pub mod scheduler;
+pub mod storage;
+pub mod worker;
 
 // Re-export main types for easy access
-pub use worker::Worker;
-pub use scheduler::TaskScheduler;
-pub use queue::TaskQueue;
 pub use cache::CacheManager;
-pub use storage::StorageManager;
-pub use process::{ProcessManager, ProcessConfig, ProcessStatus, ProcessLogs};
-pub use orchestrator::ResourceOrchestrator;
 pub use health::HealthMonitor;
+pub use orchestrator::ResourceOrchestrator;
+pub use process::{ProcessConfig, ProcessLogs, ProcessManager, ProcessStatus};
+pub use queue::TaskQueue;
+pub use scheduler::TaskScheduler;
+pub use storage::StorageManager;
+pub use worker::Worker;
 
 /// Runtime configuration for Stage 4.1
 #[derive(Debug, Clone)]
@@ -89,7 +89,7 @@ impl RuntimeManager {
     /// Initialize runtime system
     pub async fn initialize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         tracing::info!("Initializing Runtime Manager for Stage 4.1");
-        
+
         // Initialize all components
         self.worker_manager.initialize().await?;
         self.scheduler.initialize().await?;
@@ -99,7 +99,7 @@ impl RuntimeManager {
         self.process_manager.initialize().await?;
         self.orchestrator.initialize().await?;
         self.health_monitor.initialize().await?;
-        
+
         tracing::info!("Runtime Manager initialized successfully");
         Ok(())
     }
@@ -107,7 +107,7 @@ impl RuntimeManager {
     /// Start runtime system
     pub async fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         tracing::info!("Starting Runtime Manager");
-        
+
         // Start all components
         self.worker_manager.start().await?;
         self.scheduler.start().await?;
@@ -117,7 +117,7 @@ impl RuntimeManager {
         self.process_manager.start().await?;
         self.orchestrator.start().await?;
         self.health_monitor.start().await?;
-        
+
         tracing::info!("Runtime Manager started successfully");
         Ok(())
     }
@@ -125,7 +125,7 @@ impl RuntimeManager {
     /// Shutdown runtime system
     pub async fn shutdown(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         tracing::info!("Shutting down Runtime Manager");
-        
+
         // Shutdown all components gracefully
         self.health_monitor.shutdown().await?;
         self.orchestrator.shutdown().await?;
@@ -135,7 +135,7 @@ impl RuntimeManager {
         self.queue.shutdown().await?;
         self.scheduler.shutdown().await?;
         self.worker_manager.shutdown().await?;
-        
+
         tracing::info!("Runtime Manager shutdown completed");
         Ok(())
     }
@@ -143,7 +143,7 @@ impl RuntimeManager {
     /// Get runtime status
     pub async fn get_status(&self) -> RuntimeStatus {
         RuntimeStatus {
-                            workers_active: self.worker_manager.get_active_count().await,
+            workers_active: self.worker_manager.get_active_count().await,
             queue_length: self.queue.get_length(),
             cache_usage: self.cache.get_usage_percentage(),
             storage_usage: self.storage.get_usage_percentage(),
@@ -167,7 +167,9 @@ pub struct RuntimeStatus {
 }
 
 /// Initialize global runtime manager
-pub async fn initialize_runtime(config: RuntimeConfig) -> Result<RuntimeManager, Box<dyn std::error::Error>> {
+pub async fn initialize_runtime(
+    config: RuntimeConfig,
+) -> Result<RuntimeManager, Box<dyn std::error::Error>> {
     let mut runtime = RuntimeManager::new(config);
     runtime.initialize().await?;
     runtime.start().await?;

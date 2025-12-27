@@ -1,11 +1,11 @@
-use std::sync::Arc;
-use parking_lot::{RwLock, Mutex};
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
-use chrono::{DateTime, Utc};
-use crate::core::error::AppError;
 use crate::core::config::PoolAIConfig;
+use crate::core::error::AppError;
 use crate::core::model_interface::{ModelState, ModelStatus};
+use chrono::{DateTime, Utc};
+use parking_lot::{Mutex, RwLock};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::sync::Arc;
 use tracing::info;
 
 /// Worker state
@@ -183,22 +183,22 @@ impl AppState {
     pub async fn initialize(&self) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut initialized = self.is_initialized.write();
-        
+
         if *initialized {
             return Ok(());
         }
 
         info!("Initializing application state...");
-        
+
         // Load configuration
         let config = PoolAIConfig::default();
         *self.config.write() = config;
-        
+
         // Update system state
         let mut system_state = self.system_state.write();
         system_state.status = SystemStatus::Running;
         system_state.last_activity = Utc::now();
-        
+
         *initialized = true;
         info!("Application state initialized successfully");
         Ok(())
@@ -208,23 +208,23 @@ impl AppState {
     pub async fn cleanup(&self) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         info!("Cleaning up application state...");
-        
+
         // Clear workers
         self.workers.write().clear();
-        
+
         // Clear model states
         self.model_states.write().clear();
-        
+
         // Update system state
         let mut system_state = self.system_state.write();
         system_state.status = SystemStatus::Shutdown;
         system_state.active_workers = 0;
         system_state.total_workers = 0;
         system_state.active_models = 0;
-        
+
         // Reset initialization flag
         *self.is_initialized.write() = false;
-        
+
         info!("Application state cleanup complete");
         Ok(())
     }
@@ -234,16 +234,16 @@ impl AppState {
         let _lock = self.state_mutex.lock();
         let mut workers = self.workers.write();
         let mut system_state = self.system_state.write();
-        
+
         workers.insert(worker.id.clone(), worker.clone());
         system_state.total_workers += 1;
-        
+
         if matches!(worker.status, WorkerStatus::Active) {
             system_state.active_workers += 1;
         }
-        
+
         system_state.last_activity = Utc::now();
-        
+
         info!("Added worker: {} (status: {:?})", worker.id, worker.status);
         Ok(())
     }
@@ -253,20 +253,23 @@ impl AppState {
         let _lock = self.state_mutex.lock();
         let mut workers = self.workers.write();
         let mut system_state = self.system_state.write();
-        
+
         if let Some(worker) = workers.remove(worker_id) {
             system_state.total_workers -= 1;
-            
+
             if matches!(worker.status, WorkerStatus::Active) {
                 system_state.active_workers = system_state.active_workers.saturating_sub(1);
             }
-            
+
             system_state.last_activity = Utc::now();
-            
+
             info!("Removed worker: {}", worker_id);
             Ok(())
         } else {
-            Err(AppError::ResourceError(format!("Worker '{}' not found", worker_id)))
+            Err(AppError::ResourceError(format!(
+                "Worker '{}' not found",
+                worker_id
+            )))
         }
     }
 
@@ -281,44 +284,58 @@ impl AppState {
     }
 
     /// Update worker status
-    pub fn update_worker_status(&self, worker_id: &str, status: WorkerStatus) -> Result<(), AppError> {
+    pub fn update_worker_status(
+        &self,
+        worker_id: &str,
+        status: WorkerStatus,
+    ) -> Result<(), AppError> {
         let _lock = self.state_mutex.lock();
         let mut workers = self.workers.write();
         let mut system_state = self.system_state.write();
-        
+
         if let Some(worker) = workers.get_mut(worker_id) {
             let was_active = matches!(worker.status, WorkerStatus::Active);
             let is_active = matches!(status, WorkerStatus::Active);
-            
+
             worker.status = status.clone();
             worker.last_seen = Utc::now();
-            
+
             // Update active worker counters
             if was_active && !is_active {
                 system_state.active_workers = system_state.active_workers.saturating_sub(1);
             } else if !was_active && is_active {
                 system_state.active_workers += 1;
             }
-            
+
             system_state.last_activity = Utc::now();
-            
+
             info!("Updated worker {} status to {:?}", worker_id, status);
             Ok(())
         } else {
-            Err(AppError::ResourceError(format!("Worker '{}' not found", worker_id)))
+            Err(AppError::ResourceError(format!(
+                "Worker '{}' not found",
+                worker_id
+            )))
         }
     }
 
     /// Update worker metrics
-    pub fn update_worker_metrics(&self, worker_id: &str, metrics: WorkerMetrics) -> Result<(), AppError> {
+    pub fn update_worker_metrics(
+        &self,
+        worker_id: &str,
+        metrics: WorkerMetrics,
+    ) -> Result<(), AppError> {
         let mut workers = self.workers.write();
-        
+
         if let Some(worker) = workers.get_mut(worker_id) {
             worker.metrics = metrics;
             worker.last_seen = Utc::now();
             Ok(())
         } else {
-            Err(AppError::ResourceError(format!("Worker '{}' not found", worker_id)))
+            Err(AppError::ResourceError(format!(
+                "Worker '{}' not found",
+                worker_id
+            )))
         }
     }
 
@@ -327,16 +344,19 @@ impl AppState {
         let _lock = self.state_mutex.lock();
         let mut model_states = self.model_states.write();
         let mut system_state = self.system_state.write();
-        
+
         model_states.insert(model_name.clone(), state.clone());
-        
+
         if matches!(state.status, ModelStatus::Ready) {
             system_state.active_models += 1;
         }
-        
+
         system_state.last_activity = Utc::now();
-        
-        info!("Added model state: {} (status: {:?})", model_name, state.status);
+
+        info!(
+            "Added model state: {} (status: {:?})",
+            model_name, state.status
+        );
         Ok(())
     }
 
@@ -345,11 +365,11 @@ impl AppState {
         let _lock = self.state_mutex.lock();
         let mut model_states = self.model_states.write();
         let mut system_state = self.system_state.write();
-        
+
         if let Some(existing_state) = model_states.get(model_name) {
             let was_ready = matches!(existing_state.status, ModelStatus::Ready);
             let is_ready = matches!(state.status, ModelStatus::Ready);
-            
+
             // Update active model counters
             if was_ready && !is_ready {
                 system_state.active_models = system_state.active_models.saturating_sub(1);
@@ -357,11 +377,14 @@ impl AppState {
                 system_state.active_models += 1;
             }
         }
-        
+
         model_states.insert(model_name.to_string(), state.clone());
         system_state.last_activity = Utc::now();
-        
-        info!("Updated model state: {} (status: {:?})", model_name, state.status);
+
+        info!(
+            "Updated model state: {} (status: {:?})",
+            model_name, state.status
+        );
         Ok(())
     }
 
@@ -399,4 +422,4 @@ impl AppState {
         system_state.last_activity = Utc::now();
         Ok(())
     }
-} 
+}

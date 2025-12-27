@@ -7,16 +7,16 @@
 //! - HTTPS/TLS support with certificate management
 
 pub mod api;
-pub mod ws;
 pub mod auth;
 pub mod raid_distributed_handlers;
+pub mod ws;
 
-use axum::Router;
-use axum::routing::get;
+use crate::ui;
 use axum::response::Redirect;
+use axum::routing::get;
+use axum::Router;
 use std::net::SocketAddr;
 use tracing::info;
-use crate::ui;
 
 #[cfg(feature = "https")]
 use axum_server::tls_rustls::RustlsConfig;
@@ -40,15 +40,17 @@ pub async fn start_server(addr: SocketAddr) {
     // HTTPS support is optional and requires feature "https"
     // For production, use: cargo build --features https
     // Note: Requires native toolchain (gcc/dlltool on Windows GNU)
-    
+
     #[cfg(feature = "https")]
     {
         // HTTPS mode - requires certificates
         // TODO: Read cert paths from config
         use tracing::warn;
-        let cert_path = std::env::var("HTTPS_CERT_PATH").unwrap_or_else(|_| "certs/cert.pem".to_string());
-        let key_path = std::env::var("HTTPS_KEY_PATH").unwrap_or_else(|_| "certs/key.pem".to_string());
-        
+        let cert_path =
+            std::env::var("HTTPS_CERT_PATH").unwrap_or_else(|_| "certs/cert.pem".to_string());
+        let key_path =
+            std::env::var("HTTPS_KEY_PATH").unwrap_or_else(|_| "certs/key.pem".to_string());
+
         match RustlsConfig::from_pem_file(&cert_path, &key_path).await {
             Ok(config) => {
                 info!("Starting HTTPS server on {}", addr);
@@ -58,7 +60,10 @@ pub async fn start_server(addr: SocketAddr) {
                     .unwrap();
             }
             Err(e) => {
-                warn!("Failed to load HTTPS certificates ({}): {}. Falling back to HTTP.", cert_path, e);
+                warn!(
+                    "Failed to load HTTPS certificates ({}): {}. Falling back to HTTP.",
+                    cert_path, e
+                );
                 info!("Starting HTTP server on {}", addr);
                 let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
                 info!("Server listening on {}", addr);
@@ -66,7 +71,7 @@ pub async fn start_server(addr: SocketAddr) {
             }
         }
     }
-    
+
     #[cfg(not(feature = "https"))]
     {
         // HTTP mode (default)
@@ -75,4 +80,4 @@ pub async fn start_server(addr: SocketAddr) {
         info!("Server listening on {}", addr);
         axum::serve(listener, app).await.unwrap();
     }
-} 
+}

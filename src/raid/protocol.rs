@@ -3,8 +3,8 @@
 //! Defines message types and structures for node-to-node communication
 //! in the distributed RAID system.
 
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Protocol message wrapper
@@ -307,24 +307,44 @@ pub enum ErrorCode {
 
 /// Helper functions for creating protocol messages
 impl ProtocolMessage {
-    pub fn put_artifact(node_id: String, payload: PutArtifactPayload) -> Result<Self, serde_json::Error> {
+    pub fn put_artifact(
+        node_id: String,
+        payload: PutArtifactPayload,
+    ) -> Result<Self, serde_json::Error> {
         let payload_json = serde_json::to_value(payload)?;
         Ok(Self::new("put_artifact".to_string(), node_id, payload_json))
     }
 
-    pub fn get_artifact(node_id: String, payload: GetArtifactPayload) -> Result<Self, serde_json::Error> {
+    pub fn get_artifact(
+        node_id: String,
+        payload: GetArtifactPayload,
+    ) -> Result<Self, serde_json::Error> {
         let payload_json = serde_json::to_value(payload)?;
         Ok(Self::new("get_artifact".to_string(), node_id, payload_json))
     }
 
-    pub fn delete_artifact(node_id: String, payload: DeleteArtifactPayload) -> Result<Self, serde_json::Error> {
+    pub fn delete_artifact(
+        node_id: String,
+        payload: DeleteArtifactPayload,
+    ) -> Result<Self, serde_json::Error> {
         let payload_json = serde_json::to_value(payload)?;
-        Ok(Self::new("delete_artifact".to_string(), node_id, payload_json))
+        Ok(Self::new(
+            "delete_artifact".to_string(),
+            node_id,
+            payload_json,
+        ))
     }
 
-    pub fn sync_artifacts(node_id: String, payload: SyncArtifactsPayload) -> Result<Self, serde_json::Error> {
+    pub fn sync_artifacts(
+        node_id: String,
+        payload: SyncArtifactsPayload,
+    ) -> Result<Self, serde_json::Error> {
         let payload_json = serde_json::to_value(payload)?;
-        Ok(Self::new("sync_artifacts".to_string(), node_id, payload_json))
+        Ok(Self::new(
+            "sync_artifacts".to_string(),
+            node_id,
+            payload_json,
+        ))
     }
 
     pub fn health_check(node_id: String) -> Self {
@@ -332,14 +352,24 @@ impl ProtocolMessage {
         Self::new("health_check".to_string(), node_id, payload)
     }
 
-    pub fn join_cluster(node_id: String, payload: JoinClusterPayload) -> Result<Self, serde_json::Error> {
+    pub fn join_cluster(
+        node_id: String,
+        payload: JoinClusterPayload,
+    ) -> Result<Self, serde_json::Error> {
         let payload_json = serde_json::to_value(payload)?;
         Ok(Self::new("join_cluster".to_string(), node_id, payload_json))
     }
 
-    pub fn leave_cluster(node_id: String, payload: LeaveClusterPayload) -> Result<Self, serde_json::Error> {
+    pub fn leave_cluster(
+        node_id: String,
+        payload: LeaveClusterPayload,
+    ) -> Result<Self, serde_json::Error> {
         let payload_json = serde_json::to_value(payload)?;
-        Ok(Self::new("leave_cluster".to_string(), node_id, payload_json))
+        Ok(Self::new(
+            "leave_cluster".to_string(),
+            node_id,
+            payload_json,
+        ))
     }
 }
 
@@ -406,7 +436,7 @@ mod tests {
     fn test_health_check_message() {
         let node_id = "node-123".to_string();
         let msg = ProtocolMessage::health_check(node_id.clone());
-        
+
         assert_eq!(msg.message_type, "health_check");
         assert_eq!(msg.node_id, node_id);
     }
@@ -436,4 +466,3 @@ mod tests {
         assert_eq!(json, "\"leader\"");
     }
 }
-

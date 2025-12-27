@@ -3,4 +3,4 @@
 
 pub fn get_linux_gpu_info() -> &'static str {
     "Linux GPU info (stub)"
-} 
+}

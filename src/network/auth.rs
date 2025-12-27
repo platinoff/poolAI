@@ -7,19 +7,19 @@ use axum::{
     Json,
 };
 // JWT support (optional - enabled with feature "jwt")
+use base64::Engine;
 #[cfg(feature = "jwt")]
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
-use base64::Engine;
 
 // JWT Claims структура
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
-    pub sub: String,        // User ID
-    pub exp: usize,         // Expiration time
-    pub iat: usize,         // Issued at
-    pub role: UserRole,     // User role
+    pub sub: String,              // User ID
+    pub exp: usize,               // Expiration time
+    pub iat: usize,               // Issued at
+    pub role: UserRole,           // User role
     pub permissions: Vec<String>, // User permissions
 }
 
@@ -104,7 +104,7 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_secs() as usize;
-    
+
     // Simple base64-like encoding (NOT SECURE - for development only)
     let claims = Claims {
         sub: _username.to_string(),
@@ -113,10 +113,13 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
         role: _role.clone(),
         permissions: _role.get_permissions(),
     };
-    
+
     // Use serde_json to create a simple token (NOT a real JWT)
     let token_json = serde_json::to_string(&claims).unwrap_or_default();
-    Ok(format!("dev_token_{}", base64::engine::general_purpose::STANDARD.encode(token_json.as_bytes())))
+    Ok(format!(
+        "dev_token_{}",
+        base64::engine::general_purpose::STANDARD.encode(token_json.as_bytes())
+    ))
 }
 
 // Функція для валідації JWT токена
@@ -128,35 +131,36 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
         use jsonwebtoken::{decode, DecodingKey, Validation};
         let key = DecodingKey::from_secret(config.secret.as_ref());
         let validation = Validation::default();
-        
+
         decode::<Claims>(token, &key, &validation)
             .map(|data| data.claims)
             .map_err(|e| format!("Token validation failed: {}", e))
     }
-    
+
     #[cfg(not(feature = "jwt"))]
     {
         // Fallback: Simple validation (NOT SECURE - for development only)
         if !token.starts_with("dev_token_") {
             return Err("Invalid token format".to_string());
         }
-        
+
         let token_data = &token[10..]; // Skip "dev_token_"
-        let decoded = base64::engine::general_purpose::STANDARD.decode(token_data)
+        let decoded = base64::engine::general_purpose::STANDARD
+            .decode(token_data)
             .map_err(|e| format!("Decode error: {}", e))?;
-        let claims: Claims = serde_json::from_slice(&decoded)
-            .map_err(|e| format!("Parse error: {}", e))?;
-        
+        let claims: Claims =
+            serde_json::from_slice(&decoded).map_err(|e| format!("Parse error: {}", e))?;
+
         // Check expiration
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs() as usize;
-        
+
         if claims.exp < now {
             return Err("Token expired".to_string());
         }
-        
+
         Ok(claims)
     }
 }
@@ -210,20 +214,20 @@ pub async fn permission_middleware(
     next: Next,
     required_permission: &str,
 ) -> Result<Response, (StatusCode, Json<serde_json::Value>)> {
-    let claims = req
-        .extensions()
-        .get::<Claims>()
-        .ok_or_else(|| {
-            (
-                StatusCode::UNAUTHORIZED,
-                Json(serde_json::json!({
-                    "error": "User not authenticated"
-                })),
-            )
-        })?;
+    let claims = req.extensions().get::<Claims>().ok_or_else(|| {
+        (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({
+                "error": "User not authenticated"
+            })),
+        )
+    })?;
 
     // Перевіряємо права доступу
-    if !claims.permissions.contains(&required_permission.to_string()) {
+    if !claims
+        .permissions
+        .contains(&required_permission.to_string())
+    {
         return Err((
             StatusCode::FORBIDDEN,
             Json(serde_json::json!({
@@ -238,10 +242,12 @@ pub async fn permission_middleware(
 }
 
 // Функція для аутентифікації користувача
-pub async fn authenticate_user(auth_req: AuthRequest) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
+pub async fn authenticate_user(
+    auth_req: AuthRequest,
+) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
     // TODO: Реальна перевірка користувача з бази даних
     // Зараз використовуємо хардкод для тестування
-    
+
     let (role, username) = match (auth_req.username.as_str(), auth_req.password.as_str()) {
         ("admin", "admin123") => (UserRole::Admin, "admin"),
         ("operator", "op123") => (UserRole::Operator, "operator"),
@@ -266,7 +272,7 @@ pub async fn authenticate_user(auth_req: AuthRequest) -> Result<AuthResponse, (S
     })?;
 
     let config = JwtConfig::default();
-    
+
     Ok(AuthResponse {
         token,
         token_type: "Bearer".to_string(),
@@ -292,6 +298,10 @@ pub fn has_role(req: &Request, required_role: UserRole) -> bool {
 pub fn has_permission(req: &Request, required_permission: &str) -> bool {
     req.extensions()
         .get::<Claims>()
-        .map(|claims| claims.permissions.contains(&required_permission.to_string()))
+        .map(|claims| {
+            claims
+                .permissions
+                .contains(&required_permission.to_string())
+        })
         .unwrap_or(false)
-} 
+}

@@ -885,7 +885,7 @@ async fn login_page() -> Html<String> {
     
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     "#;
-    
+
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -1218,7 +1218,7 @@ async fn libs_page() -> Html<String> {
     refresh();
     setInterval(refresh, 5000);
     "#;
-    
+
     layout(
         "Libraries",
         r#"
@@ -1329,7 +1329,7 @@ async fn vm_page() -> Html<String> {
     refresh();
     setInterval(refresh, 5000);
     "#;
-    
+
     layout(
         "VM Instances",
         r#"
@@ -1413,5 +1413,3 @@ pub async fn initialize() -> Result<(), AppError> {
 pub async fn shutdown() -> Result<(), AppError> {
     UiManager::new().shutdown().await
 }
-
-
