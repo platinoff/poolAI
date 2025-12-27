@@ -20,6 +20,10 @@ use uuid::Uuid;
 pub mod manifest;
 pub mod protocol;
 pub mod client;
+#[cfg(feature = "raft")]
+pub mod raft;
+#[cfg(feature = "raft")]
+pub mod raft_transport;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RaidMode {

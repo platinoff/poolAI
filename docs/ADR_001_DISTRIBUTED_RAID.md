@@ -167,8 +167,11 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [ ] Unit tests for message serialization
 
 ### Phase 2: Raft Integration (Week 11-12)
-- [ ] Choose Raft library
-- [ ] Integrate Raft consensus
+- [x] Choose Raft library (async-raft 0.6.1)
+- [x] Create Raft transport module (HTTP/HTTPS)
+- [x] Define Raft state machine structures
+- [x] Basic Raft node setup
+- [ ] Integrate Raft consensus with RaidManager
 - [ ] Implement leader election
 - [ ] Log replication
 - [ ] Integration tests

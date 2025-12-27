@@ -81,6 +81,10 @@ zip = { version = "0.6", default-features = false, features = ["deflate", "time"
 sha2 = "0.10"
 hex = "0.4"
 
+# Raft consensus (optional - enabled with feature "raft")
+# Use: cargo build --features raft
+async-raft = { version = "0.6", optional = true }
+
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
 # [target.'cfg(windows)'.dependencies]
@@ -108,5 +112,8 @@ jwt = ["jsonwebtoken"]
 # Use: cargo build --features https
 # Note: Without this feature, server runs in HTTP mode
 https = ["axum-server"]
+# Raft consensus for distributed RAID (optional)
+# Use: cargo build --features raft
+raft = ["async-raft"]
 # Full security features (when both jwt and https are available)
 # security = ["jwt", "https"]
