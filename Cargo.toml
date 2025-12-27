@@ -83,7 +83,7 @@ hex = "0.4"
 
 # Raft consensus (optional - enabled with feature "raft")
 # Use: cargo build --features raft
-async-raft = { version = "0.6", optional = true }
+async-raft = { version = "0.6.1", optional = true }
 
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
