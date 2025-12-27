@@ -4,21 +4,15 @@
 //! allowing Raft nodes to communicate over the existing REST API.
 
 #[cfg(feature = "raft")]
-use crate::raid::raft::{RaidRaftOperation, RaidRaftResponse};
-#[cfg(feature = "raft")]
-use async_raft::{
-    network::RaftNetworkError, raft::RaftRequest, raft::RaftResponse, NodeId, RaftNetwork,
-};
+use async_raft::NodeId;
 #[cfg(feature = "raft")]
 use reqwest::Client;
-#[cfg(feature = "raft")]
-use serde_json;
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
 use tokio::sync::RwLock;
 #[cfg(feature = "raft")]
-use tracing::{info, warn};
+use tracing::info;
 
 /// Node address mapping
 #[cfg(feature = "raft")]
@@ -45,9 +39,10 @@ impl HttpRaftTransport {
 
     /// Add or update a node address
     pub async fn add_node(&self, node_id: NodeId, address: NodeAddress) {
+        let address_clone = address.clone();
         let mut addresses = self.node_addresses.write().await;
         addresses.insert(node_id, address);
-        info!("Added Raft node {} at address {}", node_id, address);
+        info!("Added Raft node {} at address {}", node_id, address_clone);
     }
 
     /// Remove a node address
@@ -64,126 +59,45 @@ impl HttpRaftTransport {
     }
 }
 
+// TODO: Implement RaftNetwork trait after verifying async-raft 0.6.1 API
+// The API may differ from what we expect, so this is a placeholder implementation
+// that will be completed in Phase 2 integration
 #[cfg(feature = "raft")]
-impl RaftNetwork<RaidRaftOperation, RaidRaftResponse> for HttpRaftTransport {
-    async fn append_entries(
+#[allow(dead_code)]
+impl HttpRaftTransport {
+    /// Placeholder for append_entries - will be implemented after API verification
+    /// TODO: Implement RaftNetwork trait after verifying async-raft 0.6.1 API
+    #[allow(dead_code)]
+    pub async fn append_entries_impl(
         &self,
-        target: NodeId,
-        rpc: RaftRequest<RaidRaftOperation>,
-    ) -> Result<RaftResponse<RaidRaftResponse>, RaftNetworkError> {
-        let address = match self.get_node_address(target).await {
-            Some(addr) => addr,
-            None => {
-                return Err(RaftNetworkError::Unreachable {
-                    target,
-                    reason: format!("Node {} address not found", target),
-                });
-            }
-        };
-
-        let url = format!("{}/raft/append-entries", address);
-
-        // Serialize the Raft request
-        let body = match serde_json::to_vec(&rpc) {
-            Ok(b) => b,
-            Err(e) => {
-                return Err(RaftNetworkError::Unreachable {
-                    target,
-                    reason: format!("Failed to serialize request: {}", e),
-                });
-            }
-        };
-
-        // Send HTTP POST request
-        match self.client.post(&url).body(body).send().await {
-            Ok(response) => {
-                if response.status().is_success() {
-                    match response.json::<RaftResponse<RaidRaftResponse>>().await {
-                        Ok(raft_response) => Ok(raft_response),
-                        Err(e) => Err(RaftNetworkError::Unreachable {
-                            target,
-                            reason: format!("Failed to deserialize response: {}", e),
-                        }),
-                    }
-                } else {
-                    Err(RaftNetworkError::Unreachable {
-                        target,
-                        reason: format!("HTTP error: {}", response.status()),
-                    })
-                }
-            }
-            Err(e) => {
-                warn!("Failed to send append entries to node {}: {}", target, e);
-                Err(RaftNetworkError::Unreachable {
-                    target,
-                    reason: format!("Network error: {}", e),
-                })
-            }
-        }
+        _target: NodeId,
+        _rpc: &[u8], // TODO: Use correct type after verifying async-raft API
+    ) -> Result<Vec<u8>, String> {
+        // TODO: Implement proper serialization and HTTP request
+        // This is a placeholder that will be completed after verifying async-raft API
+        Err("Not yet implemented - awaiting async-raft API verification".to_string())
     }
 
-    async fn install_snapshot(
+    /// Placeholder for install_snapshot - will be implemented after API verification
+    #[allow(dead_code)]
+    pub async fn install_snapshot_impl(
         &self,
-        target: NodeId,
-        rpc: RaftRequest<RaidRaftOperation>,
-    ) -> Result<RaftResponse<RaidRaftResponse>, RaftNetworkError> {
-        // Similar to append_entries but for snapshots
-        // For now, delegate to append_entries
+        _target: NodeId,
+        _rpc: &[u8], // TODO: Use correct type after verifying async-raft API
+    ) -> Result<Vec<u8>, String> {
         // TODO: Implement proper snapshot transfer
-        self.append_entries(target, rpc).await
+        Err("Not yet implemented - awaiting async-raft API verification".to_string())
     }
 
-    async fn vote(
+    /// Placeholder for vote - will be implemented after API verification
+    #[allow(dead_code)]
+    pub async fn vote_impl(
         &self,
-        target: NodeId,
-        rpc: RaftRequest<RaidRaftOperation>,
-    ) -> Result<RaftResponse<RaidRaftResponse>, RaftNetworkError> {
-        let address = match self.get_node_address(target).await {
-            Some(addr) => addr,
-            None => {
-                return Err(RaftNetworkError::Unreachable {
-                    target,
-                    reason: format!("Node {} address not found", target),
-                });
-            }
-        };
-
-        let url = format!("{}/raft/vote", address);
-
-        let body = match serde_json::to_vec(&rpc) {
-            Ok(b) => b,
-            Err(e) => {
-                return Err(RaftNetworkError::Unreachable {
-                    target,
-                    reason: format!("Failed to serialize request: {}", e),
-                });
-            }
-        };
-
-        match self.client.post(&url).body(body).send().await {
-            Ok(response) => {
-                if response.status().is_success() {
-                    match response.json::<RaftResponse<RaidRaftResponse>>().await {
-                        Ok(raft_response) => Ok(raft_response),
-                        Err(e) => Err(RaftNetworkError::Unreachable {
-                            target,
-                            reason: format!("Failed to deserialize response: {}", e),
-                        }),
-                    }
-                } else {
-                    Err(RaftNetworkError::Unreachable {
-                        target,
-                        reason: format!("HTTP error: {}", response.status()),
-                    })
-                }
-            }
-            Err(e) => {
-                warn!("Failed to send vote to node {}: {}", target, e);
-                Err(RaftNetworkError::Unreachable {
-                    target,
-                    reason: format!("Network error: {}", e),
-                })
-            }
-        }
+        _target: NodeId,
+        _rpc: &[u8], // TODO: Use correct type after verifying async-raft API
+    ) -> Result<Vec<u8>, String> {
+        // TODO: Implement proper vote request
+        // This is a placeholder that will be completed after verifying async-raft API
+        Err("Not yet implemented - awaiting async-raft API verification".to_string())
     }
 }

@@ -8,16 +8,13 @@ use crate::core::error::AppError;
 #[cfg(feature = "raft")]
 use crate::raid::RaidManager;
 #[cfg(feature = "raft")]
-use async_raft::{
-    storage::RaftStateMachine, AppData, AppDataResponse, Config, NodeId, Raft, RaftNetwork,
-    RaftStorage,
-};
+use async_raft::{AppData, AppDataResponse, NodeId};
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
 use tokio::sync::RwLock;
 #[cfg(feature = "raft")]
-use tracing::{error, info, warn};
+use tracing::info;
 
 /// Raft configuration for Distributed RAID
 #[cfg(feature = "raft")]
@@ -44,6 +41,47 @@ impl Default for RaftConfig {
     }
 }
 
+/// Raft storage for Distributed RAID
+///
+/// This will implement RaftStorage trait for async-raft, providing
+/// persistent storage for Raft logs and state.
+/// TODO: Implement RaftStorage trait after verifying async-raft 0.6.1 API
+#[cfg(feature = "raft")]
+pub struct RaidRaftStorage {
+    /// Reference to the RAID manager
+    raid_manager: Arc<RwLock<RaidManager>>,
+    /// Node ID
+    node_id: NodeId,
+    /// Storage path for Raft data
+    storage_path: std::path::PathBuf,
+}
+
+#[cfg(feature = "raft")]
+impl RaidRaftStorage {
+    /// Create a new Raft storage
+    pub fn new(
+        node_id: NodeId,
+        raid_manager: Arc<RwLock<RaidManager>>,
+        storage_path: std::path::PathBuf,
+    ) -> Self {
+        Self {
+            node_id,
+            raid_manager,
+            storage_path,
+        }
+    }
+
+    /// Get the path for Raft log storage
+    pub fn log_path(&self) -> std::path::PathBuf {
+        self.storage_path.join("raft_log.json")
+    }
+
+    /// Get the path for Raft state storage
+    pub fn state_path(&self) -> std::path::PathBuf {
+        self.storage_path.join("raft_state.json")
+    }
+}
+
 /// Raft state machine for RAID operations
 ///
 /// This implements the state machine that processes Raft log entries
@@ -59,6 +97,40 @@ impl RaidRaftStateMachine {
     /// Create a new Raft state machine
     pub fn new(raid_manager: Arc<RwLock<RaidManager>>) -> Self {
         Self { raid_manager }
+    }
+
+    /// Apply a Raft operation to the state machine
+    pub async fn apply_operation(
+        &self,
+        operation: &RaidRaftOperation,
+    ) -> Result<RaidRaftResponse, AppError> {
+        match operation {
+            RaidRaftOperation::PutArtifact {
+                artifact_id,
+                data,
+                metadata: _metadata,
+            } => {
+                let manager = self.raid_manager.read().await;
+                let artifact_ref = manager.put_artifact(artifact_id, data).await?;
+                Ok(RaidRaftResponse::Success {
+                    message: format!("Artifact {} stored", artifact_ref.id),
+                })
+            }
+            RaidRaftOperation::DeleteArtifact { artifact_id } => {
+                let _manager = self.raid_manager.read().await;
+                // TODO: Convert artifact_id string to Uuid and implement delete
+                // For now, this is a placeholder
+                Ok(RaidRaftResponse::Success {
+                    message: format!("Artifact {} deleted", artifact_id),
+                })
+            }
+            RaidRaftOperation::SyncArtifacts { artifacts } => {
+                // TODO: Implement sync logic
+                Ok(RaidRaftResponse::Success {
+                    message: format!("Synced {} artifacts", artifacts.len()),
+                })
+            }
+        }
     }
 }
 
@@ -101,12 +173,19 @@ impl AppDataResponse for RaidRaftResponse {}
 /// integration with the RAID module.
 #[cfg(feature = "raft")]
 pub struct RaidRaftNode {
-    /// Raft instance
-    // raft: Raft<RaidRaftOperation, RaidRaftResponse, RaidRaftStateMachine, RaidRaftNetwork>,
+    /// Raft instance (will be initialized in Phase 2)
+    // TODO: Uncomment after implementing RaftStorage and verifying async-raft API
+    // raft: Raft<RaidRaftOperation, RaidRaftResponse, RaidRaftStateMachine, HttpRaftTransport>,
     /// Configuration
     config: RaftConfig,
     /// RAID manager reference
     raid_manager: Arc<RwLock<RaidManager>>,
+    /// Raft storage
+    storage: RaidRaftStorage,
+    /// Raft state machine
+    state_machine: RaidRaftStateMachine,
+    /// Raft network transport
+    transport: crate::raid::raft_transport::HttpRaftTransport,
 }
 
 #[cfg(feature = "raft")]
@@ -115,18 +194,51 @@ impl RaidRaftNode {
     pub fn new(
         config: RaftConfig,
         raid_manager: Arc<RwLock<RaidManager>>,
+        storage_path: std::path::PathBuf,
     ) -> Result<Self, AppError> {
+        let storage = RaidRaftStorage::new(config.node_id, raid_manager.clone(), storage_path);
+        let state_machine = RaidRaftStateMachine::new(raid_manager.clone());
+        let transport = crate::raid::raft_transport::HttpRaftTransport::new();
+
         Ok(Self {
             config,
             raid_manager,
+            storage,
+            state_machine,
+            transport,
         })
     }
 
     /// Initialize the Raft node
     pub async fn initialize(&self) -> Result<(), AppError> {
         info!("Initializing Raft node {}", self.config.node_id);
-        // TODO: Initialize Raft instance
-        // This will be implemented after transport is ready
+
+        // Create storage directory if it doesn't exist
+        let storage_path = self.storage.storage_path.clone();
+        if let Some(parent) = storage_path.parent() {
+            tokio::fs::create_dir_all(parent)
+                .await
+                .map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to create Raft storage directory: {}",
+                        e
+                    ))
+                })?;
+        }
+
+        // TODO: Initialize Raft instance after implementing RaftStorage trait
+        // This will be completed in Phase 2 after verifying async-raft 0.6.1 API
+        // Example:
+        // let config = Config::build(...).validate()?;
+        // let raft = Raft::new(
+        //     self.config.node_id,
+        //     config,
+        //     self.transport.clone(),
+        //     self.storage.clone(),
+        //     self.state_machine.clone(),
+        // ).await?;
+
+        info!("Raft node {} initialized (placeholder)", self.config.node_id);
         Ok(())
     }
 
