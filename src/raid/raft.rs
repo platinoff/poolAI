@@ -8,11 +8,24 @@ use crate::core::error::AppError;
 #[cfg(feature = "raft")]
 use crate::raid::RaidManager;
 #[cfg(feature = "raft")]
-use async_raft::{AppData, AppDataResponse, NodeId};
+use async_raft::{
+    storage::{CurrentSnapshotData, HardState, InitialState, RaftStorage},
+    raft::{Entry, MembershipConfig},
+    AppData, AppDataResponse, NodeId,
+};
+#[cfg(feature = "raft")]
+use anyhow::Result;
+#[cfg(feature = "raft")]
+use async_trait::async_trait;
+#[cfg(feature = "raft")]
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
-use tokio::sync::RwLock;
+use tokio::{
+    fs::{File, OpenOptions},
+    io::{AsyncReadExt, AsyncWriteExt},
+    sync::RwLock,
+};
 #[cfg(feature = "raft")]
 use tracing::info;
 
@@ -81,6 +94,223 @@ impl RaidRaftStorage {
     /// Get the path for Raft state storage
     pub fn state_path(&self) -> std::path::PathBuf {
         self.storage_path.join("raft_state.json")
+    }
+
+    /// Get the path for snapshot storage
+    pub fn snapshot_path(&self, snapshot_id: &str) -> std::path::PathBuf {
+        self.storage_path.join(format!("snapshot_{}.snap", snapshot_id))
+    }
+
+    /// Load hard state from disk
+    async fn load_hard_state(&self) -> Result<HardState> {
+        let state_path = self.state_path();
+        if !state_path.exists() {
+            return Ok(HardState {
+                current_term: 0,
+                voted_for: None,
+            });
+        }
+
+        let mut file = File::open(&state_path).await?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).await?;
+        let state: HardState = serde_json::from_str(&contents)
+            .map_err(|e| anyhow::anyhow!("Failed to parse hard state: {}", e))?;
+        Ok(state)
+    }
+
+    /// Save hard state to disk
+    async fn save_hard_state_internal(&self, hs: &HardState) -> Result<()> {
+        let state_path = self.state_path();
+        let contents = serde_json::to_string_pretty(hs)
+            .map_err(|e| anyhow::anyhow!("Failed to serialize hard state: {}", e))?;
+        
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&state_path)
+            .await?;
+        file.write_all(contents.as_bytes()).await?;
+        file.sync_all().await?;
+        Ok(())
+    }
+
+    /// Load log entries from disk
+    async fn load_log_entries(&self) -> Result<Vec<Entry<RaidRaftOperation>>> {
+        let log_path = self.log_path();
+        if !log_path.exists() {
+            return Ok(Vec::new());
+        }
+
+        let mut file = File::open(&log_path).await?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).await?;
+        let entries: Vec<Entry<RaidRaftOperation>> = serde_json::from_str(&contents)
+            .map_err(|e| anyhow::anyhow!("Failed to parse log entries: {}", e))?;
+        Ok(entries)
+    }
+
+    /// Save log entries to disk
+    async fn save_log_entries(&self, entries: &[Entry<RaidRaftOperation>]) -> Result<()> {
+        let log_path = self.log_path();
+        let contents = serde_json::to_string_pretty(entries)
+            .map_err(|e| anyhow::anyhow!("Failed to serialize log entries: {}", e))?;
+        
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&log_path)
+            .await?;
+        file.write_all(contents.as_bytes()).await?;
+        file.sync_all().await?;
+        Ok(())
+    }
+}
+
+/// Implement RaftStorage trait for RaidRaftStorage
+#[cfg(feature = "raft")]
+#[async_trait]
+impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
+    type Snapshot = File;
+    type ShutdownError = AppError;
+
+    async fn get_membership_config(&self) -> Result<MembershipConfig> {
+        // For now, return initial membership config
+        // TODO: Implement reverse search through log to find latest membership config
+        Ok(MembershipConfig::new_initial(self.node_id))
+    }
+
+    async fn get_initial_state(&self) -> Result<InitialState> {
+        let hard_state = self.load_hard_state().await?;
+        let entries = self.load_log_entries().await?;
+
+        let last_log_index = entries.len() as u64;
+        let last_log_term = entries
+            .last()
+            .map(|e| e.term)
+            .unwrap_or(0);
+
+        // TODO: Track last_applied_log separately
+        let last_applied_log = last_log_index;
+
+        let membership = self.get_membership_config().await?;
+
+        Ok(InitialState {
+            last_log_index,
+            last_log_term,
+            last_applied_log,
+            hard_state,
+            membership,
+        })
+    }
+
+    async fn save_hard_state(&self, hs: &HardState) -> Result<()> {
+        self.save_hard_state_internal(hs).await
+    }
+
+    async fn get_log_entries(&self, start: u64, stop: u64) -> Result<Vec<Entry<RaidRaftOperation>>> {
+        let entries = self.load_log_entries().await?;
+        let start_idx = start as usize;
+        let stop_idx = (stop as usize).min(entries.len());
+        
+        if start_idx >= entries.len() {
+            return Ok(Vec::new());
+        }
+
+        Ok(entries[start_idx..stop_idx].to_vec())
+    }
+
+    async fn delete_logs_from(&self, start: u64, stop: Option<u64>) -> Result<()> {
+        let mut entries = self.load_log_entries().await?;
+        let start_idx = start as usize;
+        
+        if start_idx >= entries.len() {
+            return Ok(());
+        }
+
+        let stop_idx = stop.map(|s| s as usize).unwrap_or(entries.len());
+        
+        if stop_idx <= start_idx {
+            return Ok(());
+        }
+
+        // Remove entries from start to stop
+        entries.drain(start_idx..stop_idx.min(entries.len()));
+        self.save_log_entries(&entries).await
+    }
+
+    async fn append_entry_to_log(&self, entry: &Entry<RaidRaftOperation>) -> Result<()> {
+        let mut entries = self.load_log_entries().await?;
+        entries.push(entry.clone());
+        self.save_log_entries(&entries).await
+    }
+
+    async fn replicate_to_log(&self, entries: &[Entry<RaidRaftOperation>]) -> Result<()> {
+        let mut all_entries = self.load_log_entries().await?;
+        all_entries.extend_from_slice(entries);
+        self.save_log_entries(&all_entries).await
+    }
+
+    async fn apply_entry_to_state_machine(
+        &self,
+        _index: &u64,
+        data: &RaidRaftOperation,
+    ) -> Result<RaidRaftResponse> {
+        let state_machine = RaidRaftStateMachine::new(self.raid_manager.clone());
+        state_machine
+            .apply_operation(data)
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))
+    }
+
+    async fn replicate_to_state_machine(
+        &self,
+        entries: &[(&u64, &RaidRaftOperation)],
+    ) -> Result<()> {
+        let state_machine = RaidRaftStateMachine::new(self.raid_manager.clone());
+        for (_index, data) in entries {
+            state_machine
+                .apply_operation(data)
+                .await
+                .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))?;
+        }
+        Ok(())
+    }
+
+    async fn do_log_compaction(&self) -> Result<CurrentSnapshotData<Self::Snapshot>> {
+        // TODO: Implement proper snapshot creation
+        // For now, return a placeholder
+        Err(anyhow::anyhow!("Snapshot creation not yet implemented"))
+    }
+
+    async fn create_snapshot(&self) -> Result<(String, Box<Self::Snapshot>)> {
+        // TODO: Implement snapshot creation
+        let snapshot_id = uuid::Uuid::new_v4().to_string();
+        let snapshot_path = self.snapshot_path(&snapshot_id);
+        let file = File::create(&snapshot_path).await?;
+        Ok((snapshot_id, Box::new(file)))
+    }
+
+    async fn finalize_snapshot_installation(
+        &self,
+        _index: u64,
+        _term: u64,
+        delete_through: Option<u64>,
+        _id: String,
+        _snapshot: Box<Self::Snapshot>,
+    ) -> Result<()> {
+        // TODO: Implement snapshot installation finalization
+        if let Some(delete_through) = delete_through {
+            self.delete_logs_from(0, Some(delete_through + 1)).await?;
+        }
+        Ok(())
+    }
+
+    async fn get_current_snapshot(&self) -> Result<Option<CurrentSnapshotData<Self::Snapshot>>> {
+        // TODO: Implement snapshot retrieval
+        Ok(None)
     }
 }
 
