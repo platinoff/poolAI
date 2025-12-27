@@ -168,6 +168,8 @@
     - ✅ Інтеграція з RaidManager через state machine
     - ✅ Apply operation method для non-consensus mode
     - ✅ Integration tests (5 tests passing)
+    - ✅ Enhanced documentation з детальними TODO коментарями
+    - ✅ Improved placeholder methods з детальними інструкціями
     - 🔄 RaftStorage trait implementation (awaiting async-raft 0.6.1 API verification)
     - 🔄 RaftNetwork trait implementation (awaiting async-raft 0.6.1 API verification)
     - 🔄 Raft instance initialization з Config

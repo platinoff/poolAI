@@ -45,7 +45,9 @@ impl Default for RaftConfig {
 ///
 /// This will implement RaftStorage trait for async-raft, providing
 /// persistent storage for Raft logs and state.
-/// TODO: Implement RaftStorage trait after verifying async-raft 0.6.1 API
+///
+/// Note: async-raft 0.6.1 API verification needed before full implementation.
+/// The trait methods will be implemented after confirming the exact API.
 #[cfg(feature = "raft")]
 pub struct RaidRaftStorage {
     /// Reference to the RAID manager
@@ -226,17 +228,30 @@ impl RaidRaftNode {
                 })?;
         }
 
-        // TODO: Initialize Raft instance after implementing RaftStorage trait
-        // This will be completed in Phase 2 after verifying async-raft 0.6.1 API
-        // Example:
-        // let config = Config::build(...).validate()?;
-        // let raft = Raft::new(
-        //     self.config.node_id,
-        //     config,
-        //     self.transport.clone(),
-        //     self.storage.clone(),
-        //     self.state_machine.clone(),
-        // ).await?;
+        // TODO: Initialize Raft instance after implementing RaftStorage and RaftNetwork traits
+        // 
+        // Steps to complete:
+        // 1. Implement RaftStorage trait for RaidRaftStorage
+        //    - Methods: get_initial_state, save_hard_state, get_log_entries, delete_logs_from,
+        //               append_entry_to_log, apply_entry_to_state_machine, create_snapshot, install_snapshot
+        // 2. Implement RaftNetwork trait for HttpRaftTransport
+        //    - Methods: append_entries, install_snapshot, vote
+        // 3. Create Raft Config from RaftConfig
+        //    - Convert election_timeout and heartbeat_interval to Duration
+        //    - Set cluster membership
+        // 4. Initialize Raft instance:
+        //    let config = Config::build(...)
+        //        .election_timeout(Duration::from_millis(self.config.election_timeout))
+        //        .heartbeat_interval(Duration::from_millis(self.config.heartbeat_interval))
+        //        .validate()?;
+        //    let raft = Raft::new(
+        //        self.config.node_id,
+        //        config,
+        //        self.transport.clone(),
+        //        self.storage.clone(),
+        //        self.state_machine.clone(),
+        //    ).await?;
+        // 5. Store raft instance in RaidRaftNode struct
 
         info!("Raft node {} initialized (placeholder)", self.config.node_id);
         Ok(())
