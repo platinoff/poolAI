@@ -604,12 +604,31 @@ impl RaidRaftNode {
     /// This method is mainly useful for single-node clusters or testing.
     pub async fn trigger_election(&self) -> Result<(), AppError> {
         let instance_guard = self.raft_instance.read().await;
-        if let Some(ref raft) = *instance_guard {
+        if instance_guard.is_some() {
             // async-raft doesn't have a direct trigger_election method
             // Elections happen automatically based on timeout
             // For single-node clusters, the node should become leader automatically
             info!("Election will be triggered automatically by Raft");
             Ok(())
+        } else {
+            Err(AppError::ConfigError("Raft instance not initialized".to_string()))
+        }
+    }
+
+    /// Get Raft metrics for monitoring
+    /// 
+    /// Returns current term, leader, and other Raft state information
+    pub async fn get_metrics(&self) -> Result<String, AppError> {
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            let metrics_receiver = raft.metrics();
+            let metrics = metrics_receiver.borrow();
+            Ok(format!(
+                "term: {}, leader: {:?}, last_log_index: {}",
+                metrics.current_term,
+                metrics.current_leader,
+                metrics.last_log_index
+            ))
         } else {
             Err(AppError::ConfigError("Raft instance not initialized".to_string()))
         }

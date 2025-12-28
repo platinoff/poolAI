@@ -33,7 +33,7 @@
 - **Модулів реалізовано**: 13 основних модулів (including Raft integration)
 - **API endpoints**: 37+ REST endpoints + WebSocket (including 7 distributed RAID endpoints)
 - **Unit tests**: 6 passing (libs constraints/versioning)
-- **Integration tests**: 55+ passing (4 libs + 4 raid + 9 security + 5 vm + 5 raid-libs + 8 resource-limits + 6 linux-limits + 6 windows-limits + 7 health + 8 write-operations + 5 raft)
+- **Integration tests**: 55+ passing (4 libs + 4 raid + 9 security + 5 vm + 5 raid-libs + 8 resource-limits + 6 linux-limits + 6 windows-limits + 7 health + 8 write-operations + 5 raft - all passing)
 - **Бінарних цілей**: 2 (poolai, poolai-worker)
 - **Feature flags**: jwt, https, raft (optional features)
 
