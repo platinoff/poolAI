@@ -9,8 +9,10 @@ use crate::core::error::AppError;
 use crate::raid::RaidManager;
 #[cfg(feature = "raft")]
 use async_raft::{
+    config::Config,
+    Raft,
     storage::{CurrentSnapshotData, HardState, InitialState, RaftStorage},
-    raft::{Entry, MembershipConfig},
+    raft::{Entry, MembershipConfig, ClientWriteRequest},
     AppData, AppDataResponse, NodeId,
 };
 #[cfg(feature = "raft")]
@@ -21,13 +23,14 @@ use async_trait::async_trait;
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
+#[cfg(feature = "raft")]
 use tokio::{
     fs::{File, OpenOptions},
     io::{AsyncReadExt, AsyncWriteExt},
     sync::RwLock,
 };
 #[cfg(feature = "raft")]
-use tracing::info;
+use tracing::{info, warn};
 
 /// Raft configuration for Distributed RAID
 #[cfg(feature = "raft")]
@@ -62,6 +65,7 @@ impl Default for RaftConfig {
 /// Note: async-raft 0.6.1 API verification needed before full implementation.
 /// The trait methods will be implemented after confirming the exact API.
 #[cfg(feature = "raft")]
+#[derive(Clone)]
 pub struct RaidRaftStorage {
     /// Reference to the RAID manager
     raid_manager: Arc<RwLock<RaidManager>>,
@@ -405,9 +409,9 @@ impl AppDataResponse for RaidRaftResponse {}
 /// integration with the RAID module.
 #[cfg(feature = "raft")]
 pub struct RaidRaftNode {
-    /// Raft instance (will be initialized in Phase 2)
-    // TODO: Uncomment after implementing RaftStorage and verifying async-raft API
-    // raft: Raft<RaidRaftOperation, RaidRaftResponse, RaidRaftStateMachine, HttpRaftTransport>,
+    /// Raft instance (initialized in initialize())
+    /// Using Arc<RwLock<>> for interior mutability since Raft needs to be mutable
+    raft_instance: Arc<RwLock<Option<Raft<RaidRaftOperation, RaidRaftResponse, crate::raid::raft_transport::HttpRaftTransport, RaidRaftStorage>>>>,
     /// Configuration
     config: RaftConfig,
     /// RAID manager reference
@@ -433,6 +437,7 @@ impl RaidRaftNode {
         let transport = crate::raid::raft_transport::HttpRaftTransport::new();
 
         Ok(Self {
+            raft_instance: Arc::new(RwLock::new(None)),
             config,
             raid_manager,
             storage,
@@ -458,54 +463,79 @@ impl RaidRaftNode {
                 })?;
         }
 
-        // TODO: Initialize Raft instance after implementing RaftStorage and RaftNetwork traits
-        // 
-        // Steps to complete:
-        // 1. Implement RaftStorage trait for RaidRaftStorage
-        //    - Methods: get_initial_state, save_hard_state, get_log_entries, delete_logs_from,
-        //               append_entry_to_log, apply_entry_to_state_machine, create_snapshot, install_snapshot
-        // 2. Implement RaftNetwork trait for HttpRaftTransport
-        //    - Methods: append_entries, install_snapshot, vote
-        // 3. Create Raft Config from RaftConfig
-        //    - Convert election_timeout and heartbeat_interval to Duration
-        //    - Set cluster membership
-        // 4. Initialize Raft instance:
-        //    let config = Config::build(...)
-        //        .election_timeout(Duration::from_millis(self.config.election_timeout))
-        //        .heartbeat_interval(Duration::from_millis(self.config.heartbeat_interval))
-        //        .validate()?;
-        //    let raft = Raft::new(
-        //        self.config.node_id,
-        //        config,
-        //        self.transport.clone(),
-        //        self.storage.clone(),
-        //        self.state_machine.clone(),
-        //    ).await?;
-        // 5. Store raft instance in RaidRaftNode struct
+        // Build Raft configuration
+        let raft_config = Config::build("poolai-raid-cluster".to_string())
+            .election_timeout_min(self.config.election_timeout)
+            .election_timeout_max(self.config.election_timeout * 2)
+            .heartbeat_interval(self.config.heartbeat_interval)
+            .validate()
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to build Raft config: {}", e))
+            })?;
 
-        info!("Raft node {} initialized (placeholder)", self.config.node_id);
+        // Initialize Raft instance
+        // Note: Raft::new takes Arc<Config>, Arc<Network>, Arc<Storage>
+        // State machine is part of Storage implementation
+        let config_arc = Arc::new(raft_config);
+        let transport_arc = Arc::new(self.transport.clone());
+        let storage_arc = Arc::new(self.storage.clone());
+        let raft = Raft::new(
+            self.config.node_id,
+            config_arc,
+            transport_arc,
+            storage_arc,
+        );
+
+        // Store raft instance
+        *self.raft_instance.write().await = Some(raft);
+        
+        info!("Raft node {} initialized successfully", self.config.node_id);
         Ok(())
     }
 
     /// Check if this node is the leader
     pub async fn is_leader(&self) -> bool {
-        // TODO: Check Raft leader status after initializing Raft instance
-        // Example: self.raft.is_leader().await
-        false
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            // Use metrics to check if node is leader
+            let metrics_receiver = raft.metrics();
+            let metrics = metrics_receiver.borrow();
+            // State enum is private, but we can check current_leader
+            metrics.current_leader == Some(self.config.node_id)
+        } else {
+            false
+        }
     }
 
     /// Get current Raft term
     pub async fn current_term(&self) -> u64 {
-        // TODO: Get current term from Raft after initializing Raft instance
-        // Example: self.raft.current_term().await
-        0
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            let metrics_receiver = raft.metrics();
+            let metrics = metrics_receiver.borrow();
+            metrics.current_term
+        } else {
+            0
+        }
     }
 
     /// Get current Raft role (Leader, Follower, Candidate)
     pub async fn current_role(&self) -> String {
-        // TODO: Get current role from Raft after initializing Raft instance
-        // Example: match self.raft.current_role().await { ... }
-        "Follower".to_string()
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            let metrics_receiver = raft.metrics();
+            let metrics = metrics_receiver.borrow();
+            // State enum is private, use current_leader to determine role
+            if metrics.current_leader == Some(self.config.node_id) {
+                "Leader".to_string()
+            } else if metrics.current_leader.is_some() {
+                "Follower".to_string()
+            } else {
+                "Candidate".to_string()
+            }
+        } else {
+            "Follower".to_string()
+        }
     }
 
     /// Apply a Raft operation (for leader nodes)
@@ -513,10 +543,20 @@ impl RaidRaftNode {
         &self,
         operation: RaidRaftOperation,
     ) -> Result<RaidRaftResponse, AppError> {
-        // TODO: Apply operation through Raft after initializing Raft instance
-        // Example: self.raft.client_write(operation).await
-        // For now, apply directly to state machine (non-consensus mode)
-        self.state_machine.apply_operation(&operation).await
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            // Use Raft's client_write for consensus-based operations
+            let request = ClientWriteRequest::new(operation);
+            let response = raft
+                .client_write(request)
+                .await
+                .map_err(|e| AppError::ConfigError(format!("Raft client_write failed: {}", e)))?;
+            Ok(response.data)
+        } else {
+            // Fallback to direct state machine application if Raft not initialized
+            warn!("Raft instance not initialized, applying operation directly to state machine");
+            self.state_machine.apply_operation(&operation).await
+        }
     }
 
     /// Get reference to transport for adding nodes

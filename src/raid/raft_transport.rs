@@ -31,6 +31,7 @@ type NodeAddress = String; // e.g., "http://192.168.1.100:8080"
 
 /// HTTP/HTTPS transport for Raft network communication
 #[cfg(feature = "raft")]
+#[derive(Clone)]
 pub struct HttpRaftTransport {
     /// HTTP client for making requests
     client: Client,
