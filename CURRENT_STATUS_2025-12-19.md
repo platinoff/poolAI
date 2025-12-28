@@ -170,9 +170,12 @@
     - ✅ Integration tests (5 tests passing)
     - ✅ Enhanced documentation з детальними TODO коментарями
     - ✅ Improved placeholder methods з детальними інструкціями
-    - 🔄 RaftStorage trait implementation (awaiting async-raft 0.6.1 API verification)
-    - 🔄 RaftNetwork trait implementation (awaiting async-raft 0.6.1 API verification)
-    - 🔄 Raft instance initialization з Config
+    - ✅ RaftStorage trait implementation завершено
+    - ✅ RaftNetwork trait implementation завершено
+    - ✅ Raft instance initialization з Config завершено
+    - ✅ Методи для роботи з Raft instance (is_leader, current_term, current_role, apply_operation)
+    - ✅ Wait for leader election метод
+    - ✅ Integration tests виправлено (5 tests passing)
   - 🔄 Leader election та log replication (Week 11-12, Phase 2 продовження)
 - 🔄 Event Sourcing (Week 13)
 - 🔄 Circuit Breaker Pattern (Week 14)

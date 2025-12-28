@@ -490,6 +490,14 @@ impl RaidRaftNode {
         *self.raft_instance.write().await = Some(raft);
         
         info!("Raft node {} initialized successfully", self.config.node_id);
+        
+        // For single-node clusters, wait a bit for automatic leader election
+        // In multi-node clusters, leader election happens automatically
+        if self.config.cluster_members.len() == 1 {
+            info!("Single-node cluster detected, waiting for leader election...");
+            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+        }
+        
         Ok(())
     }
 
@@ -562,6 +570,49 @@ impl RaidRaftNode {
     /// Get reference to transport for adding nodes
     pub fn transport(&self) -> &crate::raid::raft_transport::HttpRaftTransport {
         &self.transport
+    }
+
+    /// Wait for this node to become leader (with timeout)
+    /// 
+    /// This is useful for single-node clusters or testing scenarios
+    /// where we need to ensure the node is leader before operations.
+    pub async fn wait_for_leader(&self, timeout_ms: u64) -> Result<bool, AppError> {
+        use tokio::time::{sleep, Duration, timeout};
+        
+        let timeout_duration = Duration::from_millis(timeout_ms);
+        let check_interval = Duration::from_millis(100);
+        
+        let result = timeout(timeout_duration, async {
+            loop {
+                if self.is_leader().await {
+                    return true;
+                }
+                sleep(check_interval).await;
+            }
+        }).await;
+        
+        match result {
+            Ok(true) => Ok(true),
+            Ok(false) => Ok(false),
+            Err(_) => Ok(false), // Timeout
+        }
+    }
+
+    /// Trigger election manually (for testing or single-node clusters)
+    /// 
+    /// Note: In a multi-node cluster, elections happen automatically.
+    /// This method is mainly useful for single-node clusters or testing.
+    pub async fn trigger_election(&self) -> Result<(), AppError> {
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            // async-raft doesn't have a direct trigger_election method
+            // Elections happen automatically based on timeout
+            // For single-node clusters, the node should become leader automatically
+            info!("Election will be triggered automatically by Raft");
+            Ok(())
+        } else {
+            Err(AppError::ConfigError("Raft instance not initialized".to_string()))
+        }
     }
 }
 

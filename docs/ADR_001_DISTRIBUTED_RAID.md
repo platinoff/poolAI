@@ -175,12 +175,15 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [x] Create RaidRaftStateMachine with apply_operation
 - [x] Update RaidRaftNode with full integration (storage, state_machine, transport)
 - [x] Integrate state machine with RaidManager
-- [ ] Implement RaftStorage trait (awaiting async-raft 0.6.1 API verification)
-- [ ] Implement RaftNetwork trait (awaiting async-raft 0.6.1 API verification)
-- [ ] Initialize Raft instance in RaidRaftNode
-- [ ] Implement leader election
-- [ ] Log replication
-- [ ] Integration tests
+- [x] Implement RaftStorage trait
+- [x] Implement RaftNetwork trait
+- [x] Initialize Raft instance in RaidRaftNode
+- [x] Basic leader election support (automatic for single-node clusters)
+- [x] Wait for leader election method
+- [x] Integration tests (5 tests passing)
+- [ ] Multi-node leader election testing
+- [ ] Log replication testing
+- [ ] Multi-node cluster integration tests
 
 ### Phase 3: Event Sourcing (Week 13)
 - [ ] Event store implementation

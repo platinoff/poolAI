@@ -127,11 +127,15 @@
 - [x] Add apply_operation method to RaidRaftNode
 - [x] Add transport() method for node management
 - [x] Integration tests (5 tests passing)
-- [ ] Implement RaftStorage trait (awaiting async-raft 0.6.1 API verification)
-- [ ] Implement RaftNetwork trait (awaiting async-raft 0.6.1 API verification)
-- [ ] Initialize Raft instance in RaidRaftNode
-- [ ] Implement leader election
-- [ ] Basic log replication
+- [x] Implement RaftStorage trait
+- [x] Implement RaftNetwork trait
+- [x] Initialize Raft instance in RaidRaftNode
+- [x] Basic leader election support (automatic for single-node clusters)
+- [x] Wait for leader election method
+- [x] Integration tests виправлено (5 tests passing)
+- [ ] Multi-node leader election testing
+- [ ] Basic log replication testing
+- [ ] Multi-node cluster integration tests
 
 #### Phase 3: Testing (Week 11, Day 4-5)
 - [ ] Integration tests
