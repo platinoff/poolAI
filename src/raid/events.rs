@@ -77,6 +77,19 @@ pub struct EventRecord {
     pub timestamp: DateTime<Utc>,
 }
 
+/// Snapshot data structure for fast recovery
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Snapshot {
+    /// Snapshot sequence (last event sequence included)
+    pub sequence: u64,
+    /// Snapshot timestamp
+    pub timestamp: DateTime<Utc>,
+    /// Artifact manifest snapshot
+    pub artifacts: serde_json::Value,
+    /// Nodes snapshot
+    pub nodes: serde_json::Value,
+}
+
 /// Event store for Distributed RAID
 pub struct EventStore {
     /// Storage path for events
@@ -293,6 +306,116 @@ impl EventStore {
             .into_iter()
             .filter(|e| e.timestamp >= start && e.timestamp <= end)
             .collect())
+    }
+
+    /// Create a snapshot of current state
+    /// 
+    /// This creates a snapshot that can be used for fast recovery
+    /// without replaying all events from the beginning.
+    pub async fn create_snapshot(
+        &self,
+        artifacts: &crate::raid::manifest::ArtifactManifest,
+        nodes: &[crate::raid::RaidNode],
+    ) -> Result<Snapshot, AppError> {
+        let sequence = self.get_current_sequence().await;
+        let timestamp = Utc::now();
+
+        let artifacts_json = serde_json::to_value(artifacts)
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to serialize artifacts: {}", e))
+            })?;
+
+        let nodes_json = serde_json::to_value(nodes)
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to serialize nodes: {}", e))
+            })?;
+
+        let snapshot = Snapshot {
+            sequence,
+            timestamp,
+            artifacts: artifacts_json,
+            nodes: nodes_json,
+        };
+
+        // Save snapshot to file
+        let snapshot_json = serde_json::to_string_pretty(&snapshot)
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to serialize snapshot: {}", e))
+            })?;
+
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&self.snapshot_path)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to open snapshot file: {}", e))
+            })?;
+
+        file.write_all(snapshot_json.as_bytes()).await
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to write snapshot: {}", e))
+            })?;
+
+        file.sync_all().await
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to sync snapshot: {}", e))
+            })?;
+
+        info!("Snapshot created: sequence={}, timestamp={}", sequence, timestamp);
+        Ok(snapshot)
+    }
+
+    /// Load snapshot from storage
+    pub async fn load_snapshot(&self) -> Result<Option<Snapshot>, AppError> {
+        if !self.snapshot_path.exists() {
+            return Ok(None);
+        }
+
+        let mut file = File::open(&self.snapshot_path)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to open snapshot file: {}", e))
+            })?;
+
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to read snapshot: {}", e))
+            })?;
+
+        let snapshot: Snapshot = serde_json::from_str(&contents)
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to parse snapshot: {}", e))
+            })?;
+
+        Ok(Some(snapshot))
+    }
+
+    /// Replay events since snapshot
+    /// 
+    /// This method loads a snapshot and replays only events that occurred
+    /// after the snapshot, allowing for fast state reconstruction.
+    pub async fn replay_events_since_snapshot<F>(
+        &self,
+        mut handler: F,
+    ) -> Result<u64, AppError>
+    where
+        F: FnMut(&EventRecord) -> Result<(), AppError>,
+    {
+        // Try to load snapshot
+        let snapshot = self.load_snapshot().await?;
+        let start_sequence = snapshot.as_ref().map(|s| s.sequence).unwrap_or(0);
+
+        // Replay events since snapshot
+        let events = self.get_events_since(start_sequence).await?;
+        for event in events {
+            handler(&event)?;
+        }
+
+        Ok(start_sequence)
     }
 }
 

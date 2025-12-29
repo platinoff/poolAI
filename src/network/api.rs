@@ -137,6 +137,11 @@ pub fn create_api_routes() -> Router {
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route("/raid/quota", get(raid_quota_handler))
+        .route("/raid/events", get(raid_events_handler))
+        .route("/raid/events/:artifact_id", get(raid_events_for_artifact_handler))
+        .route("/raid/events/range", get(raid_events_range_handler))
+        .route("/raid/snapshot", get(raid_snapshot_handler))
+        .route("/raid/snapshot/create", post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)))
         .route(
             "/raid/gc",
             post(raid_gc_handler).layer(middleware::from_fn(auth_middleware)),
@@ -573,6 +578,171 @@ async fn raid_quota_handler() -> impl IntoResponse {
 #[derive(serde::Serialize)]
 struct RaidGcResponse {
     removed_count: usize,
+}
+
+// Audit log API handlers
+
+/// Get all events from the event store
+async fn raid_events_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    
+    if let Some(event_store) = manager.event_store() {
+        match event_store.read().await.load_events().await {
+            Ok(events) => Json(serde_json::json!({
+                "events": events,
+                "count": events.len()
+            })).into_response(),
+            Err(e) => (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to load events: {}", e)
+                })),
+            ).into_response(),
+        }
+    } else {
+        (
+            axum::http::StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": "Event store not available"
+            })),
+        ).into_response()
+    }
+}
+
+/// Get events for a specific artifact
+async fn raid_events_for_artifact_handler(
+    axum::extract::Path(artifact_id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    
+    if let Some(event_store) = manager.event_store() {
+        match event_store.read().await.get_events_for_artifact(&artifact_id).await {
+            Ok(events) => Json(serde_json::json!({
+                "artifact_id": artifact_id,
+                "events": events,
+                "count": events.len()
+            })).into_response(),
+            Err(e) => (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to load events: {}", e)
+                })),
+            ).into_response(),
+        }
+    } else {
+        (
+            axum::http::StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": "Event store not available"
+            })),
+        ).into_response()
+    }
+}
+
+/// Get events in a time range
+#[derive(serde::Deserialize)]
+struct EventsRangeQuery {
+    start: Option<String>, // ISO 8601 timestamp
+    end: Option<String>,   // ISO 8601 timestamp
+}
+
+async fn raid_events_range_handler(
+    axum::extract::Query(params): axum::extract::Query<EventsRangeQuery>,
+) -> impl IntoResponse {
+    use chrono::DateTime;
+    
+    let manager = raid::get_global_manager();
+    
+    if let Some(event_store) = manager.event_store() {
+        let start = params.start
+            .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+            .map(|dt| dt.with_timezone(&chrono::Utc))
+            .unwrap_or_else(|| chrono::Utc::now() - chrono::Duration::days(7));
+        
+        let end = params.end
+            .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+            .map(|dt| dt.with_timezone(&chrono::Utc))
+            .unwrap_or_else(chrono::Utc::now);
+        
+        match event_store.read().await.get_events_in_range(start, end).await {
+            Ok(events) => Json(serde_json::json!({
+                "start": start.to_rfc3339(),
+                "end": end.to_rfc3339(),
+                "events": events,
+                "count": events.len()
+            })).into_response(),
+            Err(e) => (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to load events: {}", e)
+                })),
+            ).into_response(),
+        }
+    } else {
+        (
+            axum::http::StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": "Event store not available"
+            })),
+        ).into_response()
+    }
+}
+
+/// Get current snapshot
+async fn raid_snapshot_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    
+    if let Some(event_store) = manager.event_store() {
+        match event_store.read().await.load_snapshot().await {
+            Ok(Some(snapshot)) => Json(snapshot).into_response(),
+            Ok(None) => (
+                axum::http::StatusCode::NOT_FOUND,
+                Json(serde_json::json!({
+                    "error": "No snapshot available"
+                })),
+            ).into_response(),
+            Err(e) => (
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to load snapshot: {}", e)
+                })),
+            ).into_response(),
+        }
+    } else {
+        (
+            axum::http::StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": "Event store not available"
+            })),
+        ).into_response()
+    }
+}
+
+/// Create a new snapshot
+async fn raid_snapshot_create_handler(
+    Extension(claims): Extension<Claims>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:raid
+    if let Err(err) = check_permission(&claims, "write:all")
+        .or_else(|_| check_permission(&claims, "write:raid"))
+    {
+        return err.into_response();
+    }
+    
+    let manager = raid::get_global_manager();
+    
+    match manager.create_snapshot().await {
+        Ok(_) => Json(serde_json::json!({
+            "status": "success",
+            "message": "Snapshot created successfully"
+        })).into_response(),
+        Err(e) => (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to create snapshot: {}", e)
+            })),
+        ).into_response(),
+    }
 }
 
 async fn raid_gc_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {

@@ -461,7 +461,7 @@ poolAI/
 - ✅ Integration tests (10 tests: 6 unit + 4 integration)
 - 🔄 SAT solver для сложных dependency conflicts (опционально, будущее)
 
-**RAID система (raid/)** - ✅ ~85% ЗАВЕРШЕНО (local reliable store)
+**RAID система (raid/)** - ✅ ~90% ЗАВЕРШЕНО (local reliable store + distributed features)
 - ✅ `raid/mod.rs` - RaidManager + local artifact storage (`/raid/artifacts`)
 - ✅ Node registry primitives (register/list)
 - ✅ Artifact manifest persistence (atomic write) + list/delete APIs
@@ -473,6 +473,17 @@ poolAI/
 - ✅ **RAID-Libs Integration** — libs сохраняет загруженное как artifact — ЗАВЕРШЕНО
 - ✅ **Runtime Integration** — автоматическая загрузка из RAID — ЗАВЕРШЕНО
 - ✅ Integration tests (9 tests: 4 raid + 5 raid-libs)
+- ✅ **Distributed RAID Protocol** — Protocol message structures, client, handlers — ЗАВЕРШЕНО (Week 10)
+- ✅ **Raft Consensus Integration** — RaftStorage, RaftNetwork, leader election — ЗАВЕРШЕНО (Week 11-12)
+- ✅ **Event Sourcing** — Event store, snapshot, audit log API — ЗАВЕРШЕНО (Week 13)
+  - ✅ Event store implementation (`EventStore`, `RaidEvent`, `EventRecord`, `Snapshot`)
+  - ✅ Event replay mechanism
+  - ✅ Snapshot creation та loading
+  - ✅ Integration з RaidManager (автоматичне записування подій)
+  - ✅ Audit log API endpoints (5 endpoints)
+  - ✅ Integration tests (8 tests)
+- 🔄 Circuit Breaker Pattern (planned, Week 14)
+- 🔄 Full Replication Strategy (planned, Week 15-16)
 - 🔄 BurstRAID logic (planned, отдельная фаза)
 - 🔄 SmallWorld distributed system (planned, отдельная фаза)
 - 🔄 Administrative control plane (planned)

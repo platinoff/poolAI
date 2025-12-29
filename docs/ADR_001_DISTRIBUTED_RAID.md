@@ -185,12 +185,12 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [ ] Log replication testing
 - [ ] Multi-node cluster integration tests
 
-### Phase 3: Event Sourcing (Week 13)
-- [ ] Event store implementation
-- [ ] Event replay mechanism
-- [ ] Snapshot creation
-- [ ] Audit log API
-- [ ] Integration tests
+### Phase 3: Event Sourcing (Week 13) — ✅ ЗАВЕРШЕНО
+- [x] Event store implementation (`EventStore`, `RaidEvent`, `EventRecord`, `Snapshot`)
+- [x] Event replay mechanism (`replay_events`, `replay_events_since_snapshot`)
+- [x] Snapshot creation (`create_snapshot`, `load_snapshot`)
+- [x] Audit log API (5 REST endpoints: `/raid/events`, `/raid/events/:artifact_id`, `/raid/events/range`, `/raid/snapshot`, `/raid/snapshot/create`)
+- [x] Integration tests (8 tests passing)
 
 ### Phase 4: Circuit Breaker (Week 14)
 - [ ] Circuit breaker implementation

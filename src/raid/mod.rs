@@ -144,7 +144,31 @@ impl RaidManager {
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
         info!("Shutting down RAID manager");
+        
+        // Create snapshot before shutdown
+        if let Some(ref event_store) = self.event_store {
+            let artifacts = self.artifacts.read().await.clone();
+            let nodes = self.nodes.read().await.clone();
+            let _ = event_store.write().await.create_snapshot(&artifacts, &nodes).await;
+        }
+        
         Ok(())
+    }
+
+    /// Create a snapshot of current state
+    pub async fn create_snapshot(&self) -> Result<(), AppError> {
+        if let Some(ref event_store) = self.event_store {
+            let artifacts = self.artifacts.read().await.clone();
+            let nodes = self.nodes.read().await.clone();
+            event_store.write().await.create_snapshot(&artifacts, &nodes).await?;
+            info!("Snapshot created successfully");
+        }
+        Ok(())
+    }
+
+    /// Get event store reference (for API access)
+    pub fn event_store(&self) -> Option<Arc<RwLock<EventStore>>> {
+        self.event_store.clone()
     }
 
     pub async fn list_nodes(&self) -> Vec<RaidNode> {
