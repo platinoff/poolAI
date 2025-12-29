@@ -243,7 +243,16 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
   - [x] Read consistency levels tests
   - [x] Conflict resolution strategies tests
   - [x] 10 tests passing
-- [ ] Failure scenario tests (Phase 6.2)
+- [x] Failure scenario tests (Phase 6.2) — ✅ ЗАВЕРШЕНО
+  - [x] Quorum availability during failures
+  - [x] Circuit breaker failure detection and recovery
+  - [x] Replication status on failure
+  - [x] Node selection with failed nodes
+  - [x] Partial failure handling
+  - [x] Read consistency with failures
+  - [x] Replication retry on failure
+  - [x] Network partition scenarios
+  - [x] 9 tests passing
 - [ ] Performance benchmarks (Phase 6.3)
 - [ ] Load testing (Phase 6.4)
 - [ ] Documentation
