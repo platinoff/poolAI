@@ -11,15 +11,14 @@
 //! - Node selection and health-aware routing
 
 use crate::core::error::AppError;
-// These will be used in Week 15.2-15.3:
-// use crate::raid::client::ProtocolClient;
-// use crate::raid::events::RaidEvent;
-// use crate::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
+use crate::raid::client::ProtocolClient;
 use crate::raid::events::EventStore;
+use crate::raid::protocol::{ArtifactMetadata, SyncMode};
 use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use tokio::time::{timeout, Duration as TokioDuration};
 use tracing::{debug, info, warn};
 
 /// Replication configuration
@@ -84,8 +83,7 @@ pub struct ReplicationMetadata {
 ///
 /// Coordinates artifact replication across multiple nodes in the distributed RAID system.
 pub struct ReplicationEngine {
-    /// RAID manager reference (will be used in Week 15.2 for synchronous replication)
-    #[allow(dead_code)]
+    /// RAID manager reference
     raid_manager: Arc<RwLock<crate::raid::RaidManager>>,
     /// Event store for auditability (will be used in Week 15.3 for replication events)
     #[allow(dead_code)]
@@ -96,6 +94,8 @@ pub struct ReplicationEngine {
     replication_metadata: Arc<RwLock<HashMap<String, ReplicationMetadata>>>,
     /// Available nodes for replication (node_id -> address)
     available_nodes: Arc<RwLock<HashMap<u64, String>>>,
+    /// Protocol clients by node ID (lazy initialization)
+    protocol_clients: Arc<RwLock<HashMap<u64, Arc<ProtocolClient>>>>,
 }
 
 impl ReplicationEngine {
@@ -111,6 +111,7 @@ impl ReplicationEngine {
             config,
             replication_metadata: Arc::new(RwLock::new(HashMap::new())),
             available_nodes: Arc::new(RwLock::new(HashMap::new())),
+            protocol_clients: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -204,10 +205,23 @@ impl ReplicationEngine {
         metadata.get(artifact_id).cloned()
     }
 
+    /// Get or create protocol client for a node
+    async fn get_protocol_client(&self, node_id: u64, address: &str) -> Arc<ProtocolClient> {
+        let mut clients = self.protocol_clients.write().await;
+        
+        if let Some(client) = clients.get(&node_id) {
+            return client.clone();
+        }
+
+        let client = Arc::new(ProtocolClient::new(
+            address.to_string(),
+            format!("node-{}", node_id),
+        ));
+        clients.insert(node_id, client.clone());
+        client
+    }
+
     /// Update replication metadata
-    /// 
-    /// This method will be used in Week 15.2 for synchronous replication
-    #[allow(dead_code)]
     async fn update_metadata(
         &self,
         artifact_id: String,
@@ -311,6 +325,202 @@ impl ReplicationEngine {
     /// Update configuration
     pub fn update_config(&mut self, config: ReplicationConfig) {
         self.config = config;
+    }
+
+    /// Replicate an artifact synchronously to multiple nodes
+    ///
+    /// This method replicates an artifact to the specified nodes and waits for
+    /// quorum confirmation before returning. Quorum is calculated as (N/2) + 1
+    /// where N is the replication factor.
+    ///
+    /// # Arguments
+    /// * `artifact_id` - ID of the artifact to replicate
+    /// * `artifact_data` - The artifact data bytes
+    /// * `metadata` - Artifact metadata
+    /// * `replication_factor` - Target number of replicas
+    /// * `target_nodes` - Optional list of specific nodes to replicate to (if None, nodes are selected automatically)
+    ///
+    /// # Returns
+    /// * `Ok(Vec<u64>)` - List of node IDs where replication succeeded
+    /// * `Err(AppError)` - Error if quorum is not reached or replication fails
+    pub async fn replicate_sync(
+        &self,
+        artifact_id: String,
+        artifact_data: Vec<u8>,
+        metadata: ArtifactMetadata,
+        replication_factor: u32,
+        target_nodes: Option<Vec<u64>>,
+    ) -> Result<Vec<u64>, AppError> {
+        // Initialize replication metadata
+        self.initialize_replication(artifact_id.clone(), replication_factor)
+            .await?;
+
+        // Update status to InProgress
+        let selected_nodes = if let Some(nodes) = target_nodes {
+            nodes
+        } else {
+            self.select_replication_nodes(replication_factor, None).await?
+        };
+
+        self.update_metadata(
+            artifact_id.clone(),
+            ReplicationStatus::InProgress,
+            selected_nodes.clone(),
+        )
+        .await;
+
+        info!(
+            "Starting synchronous replication of artifact {} to {} nodes",
+            artifact_id, replication_factor
+        );
+
+        // Calculate quorum: (N/2) + 1
+        let quorum = (replication_factor / 2) + 1;
+        let mut successful_nodes = Vec::new();
+        let mut failed_nodes = Vec::new();
+
+        // Create replication tasks for all target nodes
+        let mut replication_tasks = Vec::new();
+
+        for node_id in &selected_nodes {
+            let node_id = *node_id;
+            let nodes = self.available_nodes.read().await;
+            let address = nodes.get(&node_id).ok_or_else(|| {
+                AppError::ConfigError(format!("Node {} not found in available nodes", node_id))
+            })?;
+
+            let artifact_id_clone = artifact_id.clone();
+            let artifact_data_clone = artifact_data.clone();
+            let metadata_clone = metadata.clone();
+            let client = self.get_protocol_client(node_id, address).await;
+
+            let task = tokio::spawn(async move {
+                let result = client
+                    .put_artifact(
+                        artifact_id_clone,
+                        Some(artifact_data_clone),
+                        metadata_clone,
+                        replication_factor,
+                        SyncMode::Sync,
+                    )
+                    .await;
+
+                (node_id, result)
+            });
+
+            replication_tasks.push(task);
+        }
+
+        // Wait for all replication tasks with timeout
+        let timeout_duration = TokioDuration::from_secs(self.config.sync_timeout_seconds);
+        let timeout_result = timeout(timeout_duration, async {
+            let mut results = Vec::new();
+            for task in replication_tasks {
+                if let Ok((node_id, result)) = task.await {
+                    results.push((node_id, result));
+                }
+            }
+            results
+        })
+        .await;
+
+        let replication_results = match timeout_result {
+            Ok(results) => results,
+            Err(_) => {
+                warn!(
+                    "Synchronous replication timeout for artifact {} after {} seconds",
+                    artifact_id, self.config.sync_timeout_seconds
+                );
+                return Err(AppError::NetworkError(format!(
+                    "Replication timeout after {} seconds",
+                    self.config.sync_timeout_seconds
+                )));
+            }
+        };
+
+        // Process results
+        for (node_id, result) in replication_results {
+            match result {
+                Ok(_) => {
+                    successful_nodes.push(node_id);
+                    debug!("Successfully replicated artifact {} to node {}", artifact_id, node_id);
+                }
+                Err(e) => {
+                    failed_nodes.push(node_id);
+                    warn!(
+                        "Failed to replicate artifact {} to node {}: {}",
+                        artifact_id, node_id, e
+                    );
+                }
+            }
+        }
+
+        // Check if quorum is reached
+        if successful_nodes.len() >= quorum as usize {
+            // Quorum reached - replication successful
+            self.update_metadata(
+                artifact_id.clone(),
+                ReplicationStatus::Completed,
+                successful_nodes.clone(),
+            )
+            .await;
+
+            info!(
+                "Synchronous replication completed for artifact {}: {}/{} nodes (quorum: {})",
+                artifact_id,
+                successful_nodes.len(),
+                replication_factor,
+                quorum
+            );
+
+            Ok(successful_nodes)
+        } else if successful_nodes.len() > 0 {
+            // Partial success - some nodes succeeded but quorum not reached
+            let status = ReplicationStatus::Partial {
+                successful: successful_nodes.len() as u32,
+                failed: failed_nodes.len() as u32,
+            };
+            self.update_metadata(artifact_id.clone(), status, successful_nodes.clone())
+                .await;
+
+            warn!(
+                "Partial replication for artifact {}: {}/{} nodes (quorum: {} not reached)",
+                artifact_id,
+                successful_nodes.len(),
+                replication_factor,
+                quorum
+            );
+
+            Err(AppError::NetworkError(format!(
+                "Quorum not reached: {}/{} successful (quorum: {})",
+                successful_nodes.len(),
+                replication_factor,
+                quorum
+            )))
+        } else {
+            // Complete failure
+            self.update_metadata(
+                artifact_id.clone(),
+                ReplicationStatus::Failed {
+                    reason: "All replication attempts failed".to_string(),
+                },
+                Vec::new(),
+            )
+            .await;
+
+            Err(AppError::NetworkError(format!(
+                "Replication failed: all {} nodes failed",
+                replication_factor
+            )))
+        }
+    }
+
+    /// Wait for quorum confirmation
+    ///
+    /// This is a helper method that can be used to wait for quorum
+    /// in custom replication scenarios.
+    pub fn calculate_quorum(&self, replication_factor: u32) -> u32 {
+        (replication_factor / 2) + 1
     }
 }
 
