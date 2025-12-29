@@ -46,18 +46,7 @@ async fn create_replication_engine(
     ReplicationEngine::with_defaults(raid_manager, event_store)
 }
 
-/// Helper function to create test artifact metadata
-fn create_test_metadata(size_bytes: u64) -> ArtifactMetadata {
-    ArtifactMetadata {
-        name: "benchmark-artifact".to_string(),
-        version: "1.0.0".to_string(),
-        size_bytes,
-        checksum: format!("sha256-{:x}", size_bytes),
-        created_at: Utc::now(),
-        content_type: Some("application/octet-stream".to_string()),
-        tags: Some(vec!["benchmark".to_string()]),
-    }
-}
+// Note: create_test_metadata helper removed as it's not used in current benchmarks
 
 #[tokio::test]
 async fn benchmark_node_selection_performance() {
