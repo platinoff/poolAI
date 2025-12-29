@@ -1144,7 +1144,7 @@ impl ReplicationEngine {
     ) -> Vec<ArtifactConflict> {
         let mut conflicts = Vec::new();
 
-        for (node_id, response) in remote_responses {
+        for (_node_id, response) in remote_responses {
             if let Some(ref remote_metadata) = response.metadata {
                 // Check if checksums differ (indicates conflict)
                 if remote_metadata.checksum != local_metadata.checksum {
@@ -1219,7 +1219,7 @@ impl ReplicationEngine {
                 let mut latest_metadata = local_metadata.clone();
                 let mut latest_timestamp = local_metadata.created_at;
 
-                for (node_id, response) in remote_responses {
+                for (_node_id, response) in remote_responses {
                     if let Some(ref remote_metadata) = response.metadata {
                         if remote_metadata.created_at > latest_timestamp {
                             latest_timestamp = remote_metadata.created_at;
@@ -1239,7 +1239,7 @@ impl ReplicationEngine {
                 let mut earliest_metadata = local_metadata.clone();
                 let mut earliest_timestamp = local_metadata.created_at;
 
-                for (node_id, response) in remote_responses {
+                for (_node_id, response) in remote_responses {
                     if let Some(ref remote_metadata) = response.metadata {
                         if remote_metadata.created_at < earliest_timestamp {
                             earliest_timestamp = remote_metadata.created_at;
