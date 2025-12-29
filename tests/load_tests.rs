@@ -41,12 +41,12 @@ fn create_test_event_store(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<Event
     Arc::new(RwLock::new(event_store))
 }
 
-/// Helper function to create a replication engine
+/// Helper function to create a replication engine wrapped in Arc
 async fn create_replication_engine(
     raid_manager: Arc<RwLock<RaidManager>>,
     event_store: Option<Arc<RwLock<EventStore>>>,
-) -> ReplicationEngine {
-    ReplicationEngine::with_defaults(raid_manager, event_store)
+) -> Arc<ReplicationEngine> {
+    Arc::new(ReplicationEngine::with_defaults(raid_manager, event_store))
 }
 
 #[tokio::test]
@@ -102,7 +102,7 @@ async fn test_concurrent_metadata_initialization() {
     let mut handles = Vec::new();
 
     for i in 0..artifact_count {
-        let engine_clone = &engine;
+        let engine_clone = engine.clone();
         let artifact_id = format!("artifact-{}", i);
         let handle = tokio::spawn(async move {
             engine_clone
@@ -150,7 +150,7 @@ async fn test_concurrent_node_selection() {
     let mut handles = Vec::new();
 
     for _ in 0..selection_count {
-        let engine_clone = &engine;
+        let engine_clone = engine.clone();
         let handle = tokio::spawn(async move {
             let selected = engine_clone.select_replication_nodes(3, None).await.unwrap();
             assert_eq!(selected.len(), 3);
@@ -355,7 +355,7 @@ async fn test_mixed_workload() {
 
     // Node selections
     for _ in 0..100 {
-        let engine_clone = &engine;
+        let engine_clone = engine.clone();
         let handle = tokio::spawn(async move {
             let _selected = engine_clone.select_replication_nodes(3, None).await.unwrap();
         });
@@ -364,7 +364,7 @@ async fn test_mixed_workload() {
 
     // Metadata initializations
     for i in 0..100 {
-        let engine_clone = &engine;
+        let engine_clone = engine.clone();
         let artifact_id = format!("artifact-{}", i);
         let handle = tokio::spawn(async move {
             engine_clone
@@ -377,7 +377,7 @@ async fn test_mixed_workload() {
 
     // Quorum calculations
     for _ in 0..100 {
-        let engine_clone = &engine;
+        let engine_clone = engine.clone();
         let handle = tokio::spawn(async move {
             let _quorum = engine_clone.calculate_quorum(5);
         });
