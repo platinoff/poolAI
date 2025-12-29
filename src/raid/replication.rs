@@ -12,7 +12,7 @@
 
 use crate::core::error::AppError;
 use crate::raid::client::ProtocolClient;
-use crate::raid::events::EventStore;
+use crate::raid::events::{EventStore, RaidEvent};
 use crate::raid::protocol::{ArtifactMetadata, SyncMode};
 use chrono::Utc;
 use std::collections::HashMap;
@@ -86,8 +86,7 @@ pub struct ReplicationEngine {
     /// RAID manager reference (will be used for local artifact operations)
     #[allow(dead_code)]
     raid_manager: Arc<RwLock<crate::raid::RaidManager>>,
-    /// Event store for auditability (will be used in Week 15.3 for replication events)
-    #[allow(dead_code)]
+    /// Event store for auditability
     event_store: Option<Arc<RwLock<EventStore>>>,
     /// Configuration
     config: ReplicationConfig,

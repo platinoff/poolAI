@@ -210,7 +210,10 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
   - [x] Protocol client management
   - [x] Timeout handling
   - [x] Error recovery and partial success handling
-- [ ] Replication events integration (Week 15.3)
+- [x] Replication events integration (Week 15.3) — ✅ ЗАВЕРШЕНО
+  - [x] Emit ReplicationStarted events for each target node
+  - [x] Emit ReplicationCompleted events on successful replication
+  - [x] Integration with EventStore in replicate_sync()
 - [ ] Asynchronous replication (Week 16.1)
 - [ ] Read replica support (Week 16.2)
 - [ ] Conflict resolution (Week 16.3)
