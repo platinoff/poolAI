@@ -707,6 +707,29 @@ impl RaidRaftNode {
             Err(_) => Ok(None), // Timeout
         }
     }
+
+    /// Get last log index from metrics
+    /// 
+    /// Returns the index of the last log entry
+    pub async fn get_last_log_index(&self) -> u64 {
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            let metrics_receiver = raft.metrics();
+            let metrics = metrics_receiver.borrow();
+            metrics.last_log_index
+        } else {
+            0
+        }
+    }
+
+    /// Get log entries from storage (for testing/debugging)
+    /// 
+    /// This method allows reading log entries directly from storage
+    /// to verify replication in tests.
+    pub async fn get_log_entries(&self) -> Result<Vec<async_raft::raft::Entry<RaidRaftOperation>>, AppError> {
+        self.storage.load_log_entries().await
+            .map_err(|e| AppError::ConfigError(format!("Failed to load log entries: {}", e)))
+    }
 }
 
 /// Placeholder for non-raft builds

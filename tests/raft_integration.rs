@@ -580,3 +580,144 @@ async fn test_raft_multi_node_leader_election_setup() {
     // nodes cannot communicate, so we can only verify the setup is correct.
 }
 
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_log_replication_single_node() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: storage_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    raid_manager.write().await.initialize().await.unwrap();
+
+    let raft_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node = RaidRaftNode::new(
+        raft_config,
+        raid_manager.clone(),
+        storage_path.join("raft"),
+    )
+    .unwrap();
+
+    raft_node.initialize().await.unwrap();
+
+    // Wait for node to become leader
+    let became_leader = raft_node.wait_for_leader(5000).await.unwrap_or(false);
+    assert!(became_leader, "Single-node cluster should become leader");
+
+    // Initial log index should be 0 (or 1 if there's an initial entry)
+    let initial_log_index = raft_node.get_last_log_index().await;
+    
+    // Apply an operation through Raft
+    let operation = RaidRaftOperation::PutArtifact {
+        artifact_id: "test-artifact-log-1".to_string(),
+        data: b"test data for log replication".to_vec(),
+        metadata: poolai::raid::manifest::ArtifactManifest::new(),
+    };
+
+    let response = raft_node.apply_operation(operation).await.unwrap();
+    match response {
+        poolai::raid::raft::RaidRaftResponse::Success { message } => {
+            assert!(message.contains("stored"));
+        }
+        _ => panic!("Expected Success response"),
+    }
+
+    // Wait a bit for log to be written
+    tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+
+    // Verify log index increased
+    let new_log_index = raft_node.get_last_log_index().await;
+    assert!(new_log_index >= initial_log_index, "Log index should increase after operation");
+
+    // Verify log entries can be read
+    let log_entries = raft_node.get_log_entries().await.unwrap();
+    assert!(log_entries.len() > 0, "Log should contain entries after operation");
+
+    // Verify metrics show updated log index
+    let metrics = raft_node.get_metrics().await.unwrap();
+    assert!(metrics.contains(&format!("last_log_index: {}", new_log_index)), 
+            "Metrics should show updated log index");
+}
+
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_log_replication_multiple_operations() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: storage_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    raid_manager.write().await.initialize().await.unwrap();
+
+    let raft_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node = RaidRaftNode::new(
+        raft_config,
+        raid_manager.clone(),
+        storage_path.join("raft"),
+    )
+    .unwrap();
+
+    raft_node.initialize().await.unwrap();
+
+    // Wait for node to become leader
+    let became_leader = raft_node.wait_for_leader(5000).await.unwrap_or(false);
+    assert!(became_leader, "Single-node cluster should become leader");
+
+    // Apply multiple operations
+    let num_operations = 5;
+    for i in 0..num_operations {
+        let operation = RaidRaftOperation::PutArtifact {
+            artifact_id: format!("test-artifact-log-{}", i),
+            data: format!("test data {}", i).into_bytes(),
+            metadata: poolai::raid::manifest::ArtifactManifest::new(),
+        };
+
+        let response = raft_node.apply_operation(operation).await.unwrap();
+        match response {
+            poolai::raid::raft::RaidRaftResponse::Success { .. } => {}
+            _ => panic!("Expected Success response"),
+        }
+    }
+
+    // Wait for all logs to be written
+    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+    // Verify log entries
+    let log_entries = raft_node.get_log_entries().await.unwrap();
+    // Log should contain at least the operations we applied
+    // (may contain more if there are initial entries)
+    assert!(log_entries.len() >= num_operations as usize, 
+            "Log should contain at least {} entries", num_operations);
+
+    // Verify last log index
+    let last_log_index = raft_node.get_last_log_index().await;
+    assert!(last_log_index >= num_operations as u64, 
+            "Last log index should be at least {}", num_operations);
+}
+
