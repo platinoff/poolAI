@@ -178,9 +178,9 @@
     - ✅ Get metrics метод для моніторингу
     - ✅ Integration tests виправлено (5 tests passing - all passing)
     - ✅ Leader election support для single-node clusters
-  - 🔄 Multi-node leader election testing (Week 12)
-  - 🔄 Log replication testing (Week 12)
-  - 🔄 Multi-node cluster integration tests (Week 12)
+  - ✅ Multi-node leader election testing (Week 12) — базові тести реалізовано (14 tests passing з --features raft)
+  - ✅ Log replication testing (Week 12) — базові тести реалізовано
+  - ✅ Multi-node cluster integration tests (Week 12) — базові тести реалізовано
 - ✅ **Event Sourcing (Week 13)** — **ЗАВЕРШЕНО** 🎉
   - ✅ Event store implementation (`EventStore`, `RaidEvent`, `EventRecord`, `Snapshot`)
   - ✅ Event replay mechanism
