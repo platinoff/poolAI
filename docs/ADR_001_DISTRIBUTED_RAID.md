@@ -200,10 +200,16 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [x] Integration tests (8 tests passing)
 
 ### Phase 5: Replication (Week 15-16)
-- [ ] Synchronous replication
-- [ ] Asynchronous replication
-- [ ] Read replica support
-- [ ] Conflict resolution
+- [x] Replication Engine Core (Week 15.1) — ✅ ЗАВЕРШЕНО
+  - [x] ReplicationEngine structure
+  - [x] Node selection algorithm
+  - [x] Replication metadata tracking
+  - [x] Unit tests (7 tests passing)
+- [ ] Synchronous replication (Week 15.2)
+- [ ] Replication events integration (Week 15.3)
+- [ ] Asynchronous replication (Week 16.1)
+- [ ] Read replica support (Week 16.2)
+- [ ] Conflict resolution (Week 16.3)
 - [ ] Integration tests
 
 ### Phase 6: Testing & Optimization (Week 17-18)
