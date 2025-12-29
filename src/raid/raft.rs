@@ -667,6 +667,46 @@ impl RaidRaftNode {
             Err(AppError::ConfigError("Raft instance not initialized".to_string()))
         }
     }
+
+    /// Get current leader ID (if any)
+    /// 
+    /// Returns Some(node_id) if there is a leader, None otherwise
+    pub async fn get_current_leader(&self) -> Option<NodeId> {
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            let metrics_receiver = raft.metrics();
+            let metrics = metrics_receiver.borrow();
+            metrics.current_leader
+        } else {
+            None
+        }
+    }
+
+    /// Wait for any leader to be elected in the cluster (with timeout)
+    /// 
+    /// This is useful for multi-node clusters where we need to wait
+    /// for leader election to complete before operations.
+    pub async fn wait_for_any_leader(&self, timeout_ms: u64) -> Result<Option<NodeId>, AppError> {
+        use tokio::time::{sleep, Duration, timeout};
+        
+        let timeout_duration = Duration::from_millis(timeout_ms);
+        let check_interval = Duration::from_millis(100);
+        
+        let result = timeout(timeout_duration, async {
+            loop {
+                if let Some(leader) = self.get_current_leader().await {
+                    return Some(leader);
+                }
+                sleep(check_interval).await;
+            }
+        }).await;
+        
+        match result {
+            Ok(Some(leader)) => Ok(Some(leader)),
+            Ok(None) => Ok(None),
+            Err(_) => Ok(None), // Timeout
+        }
+    }
 }
 
 /// Placeholder for non-raft builds

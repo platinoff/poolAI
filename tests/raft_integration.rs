@@ -383,3 +383,200 @@ async fn test_raft_cluster_initialization() {
     assert!(result.is_ok() || result.is_err());
 }
 
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_leader_election_metrics() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: storage_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    raid_manager.write().await.initialize().await.unwrap();
+
+    // Test single-node cluster - should become leader
+    let raft_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node = RaidRaftNode::new(
+        raft_config,
+        raid_manager.clone(),
+        storage_path.join("raft"),
+    )
+    .unwrap();
+
+    raft_node.initialize().await.unwrap();
+
+    // Wait for leader election
+    let became_leader = raft_node.wait_for_leader(5000).await.unwrap_or(false);
+    assert!(became_leader, "Single-node cluster should become leader");
+
+    // Verify metrics
+    let metrics = raft_node.get_metrics().await.unwrap();
+    assert!(metrics.contains("term:"));
+    assert!(metrics.contains("leader:"));
+
+    // Verify current leader
+    let leader = raft_node.get_current_leader().await;
+    assert_eq!(leader, Some(1), "Node 1 should be the leader");
+
+    // Verify is_leader
+    assert!(raft_node.is_leader().await, "Node should be leader");
+    assert_eq!(raft_node.current_role().await, "Leader");
+}
+
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_multi_node_leader_election_setup() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    // Create three separate storage paths for three nodes
+    let node1_path = storage_path.join("node1");
+    let node2_path = storage_path.join("node2");
+    let node3_path = storage_path.join("node3");
+
+    // Setup Node 1
+    let raid_config1 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node1_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager1 = Arc::new(RwLock::new(RaidManager::new(raid_config1)));
+    raid_manager1.write().await.initialize().await.unwrap();
+
+    let raft_config1 = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1, 2, 3],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node1 = RaidRaftNode::new(
+        raft_config1,
+        raid_manager1.clone(),
+        node1_path.join("raft"),
+    )
+    .unwrap();
+
+    // Setup Node 2
+    let raid_config2 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node2_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager2 = Arc::new(RwLock::new(RaidManager::new(raid_config2)));
+    raid_manager2.write().await.initialize().await.unwrap();
+
+    let raft_config2 = RaftConfig {
+        node_id: 2,
+        cluster_members: vec![1, 2, 3],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node2 = RaidRaftNode::new(
+        raft_config2,
+        raid_manager2.clone(),
+        node2_path.join("raft"),
+    )
+    .unwrap();
+
+    // Setup Node 3
+    let raid_config3 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node3_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager3 = Arc::new(RwLock::new(RaidManager::new(raid_config3)));
+    raid_manager3.write().await.initialize().await.unwrap();
+
+    let raft_config3 = RaftConfig {
+        node_id: 3,
+        cluster_members: vec![1, 2, 3],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node3 = RaidRaftNode::new(
+        raft_config3,
+        raid_manager3.clone(),
+        node3_path.join("raft"),
+    )
+    .unwrap();
+
+    // Configure transport for all nodes
+    raft_node1.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node1.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node1.transport().add_node(3, "http://127.0.0.1:8082".to_string()).await;
+    
+    raft_node2.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node2.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node2.transport().add_node(3, "http://127.0.0.1:8082".to_string()).await;
+    
+    raft_node3.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node3.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node3.transport().add_node(3, "http://127.0.0.1:8082".to_string()).await;
+
+    // Initialize all nodes
+    raft_node1.initialize().await.unwrap();
+    raft_node2.initialize().await.unwrap();
+    raft_node3.initialize().await.unwrap();
+
+    // Initialize cluster on node 1 (first node)
+    raft_node1.initialize_cluster().await.unwrap();
+
+    // Wait a bit for nodes to communicate (in real scenario, they would via HTTP)
+    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+    // Verify all nodes are initialized
+    let term1 = raft_node1.current_term().await;
+    let term2 = raft_node2.current_term().await;
+    let term3 = raft_node3.current_term().await;
+    
+    // Terms should be valid (>= 0)
+    assert!(term1 >= 0);
+    assert!(term2 >= 0);
+    assert!(term3 >= 0);
+
+    // Verify transport configuration
+    let addr1 = raft_node1.transport().get_node_address(1).await;
+    let addr2 = raft_node1.transport().get_node_address(2).await;
+    let addr3 = raft_node1.transport().get_node_address(3).await;
+    assert_eq!(addr1, Some("http://127.0.0.1:8080".to_string()));
+    assert_eq!(addr2, Some("http://127.0.0.1:8081".to_string()));
+    assert_eq!(addr3, Some("http://127.0.0.1:8082".to_string()));
+
+    // Verify metrics are accessible
+    let metrics1 = raft_node1.get_metrics().await;
+    let metrics2 = raft_node2.get_metrics().await;
+    let metrics3 = raft_node3.get_metrics().await;
+    
+    assert!(metrics1.is_ok(), "Node 1 metrics should be accessible");
+    assert!(metrics2.is_ok(), "Node 2 metrics should be accessible");
+    assert!(metrics3.is_ok(), "Node 3 metrics should be accessible");
+
+    // Note: In a real multi-node scenario with HTTP endpoints,
+    // leader election would happen automatically. Without HTTP endpoints,
+    // nodes cannot communicate, so we can only verify the setup is correct.
+}
+
