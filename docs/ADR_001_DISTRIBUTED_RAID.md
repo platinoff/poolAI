@@ -224,7 +224,13 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
   - [x] Load balancing for reads (round-robin)
   - [x] Read consistency levels (Eventual, Quorum, Strong)
   - [x] Health checks for replicas (circuit breaker integration)
-- [ ] Conflict resolution (Week 16.3)
+- [x] Conflict resolution (Week 16.3) — ✅ ЗАВЕРШЕНО
+  - [x] Conflict detection (checksum mismatch, concurrent writes)
+  - [x] Last-write-wins strategy
+  - [x] First-write-wins strategy
+  - [x] Vector clock structure (basic implementation)
+  - [x] Manual resolution support
+  - [x] sync_with_conflict_resolution() API
 - [ ] Integration tests
 
 ### Phase 6: Testing & Optimization (Week 17-18)

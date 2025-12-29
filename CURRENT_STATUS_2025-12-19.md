@@ -199,9 +199,9 @@
   - ✅ Synchronous Replication (Week 15.2) - quorum-based, timeout handling
   - ✅ Replication Events Integration (Week 15.3) - EventStore integration
   - ✅ Asynchronous Replication (Week 16.1) - background queue, workers, retry mechanism
+  - ✅ Read Replicas Support (Week 16.2) - health-aware selection, consistency levels
   - ✅ Integration tests (7 tests passing)
-- 🔄 Read Replicas (Week 16.2) — **В ПРОЦЕСІ**
-- 🔄 Conflict Resolution (Week 16.3)
+- 🔄 Conflict Resolution (Week 16.3) — **ОСТАННЯ ФАЗА**
 
 **Git Branches**:
 - `stage3/raid-local-artifacts` ✅

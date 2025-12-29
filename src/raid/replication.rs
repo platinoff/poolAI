@@ -13,7 +13,7 @@
 use crate::core::error::AppError;
 use crate::raid::client::ProtocolClient;
 use crate::raid::events::{EventStore, RaidEvent};
-use crate::raid::protocol::{ArtifactMetadata, SyncMode};
+use crate::raid::protocol::{ArtifactConflict, ArtifactMetadata, GetArtifactResponse, SyncMode};
 use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -49,6 +49,94 @@ pub enum ReadConsistencyLevel {
     Quorum,
     /// Read from all replicas (slowest, strongest consistency)
     Strong,
+}
+
+/// Conflict resolution strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConflictResolutionStrategy {
+    /// Last-write-wins: use the version with the latest timestamp
+    LastWriteWins,
+    /// First-write-wins: use the version with the earliest timestamp
+    FirstWriteWins,
+    /// Require manual resolution
+    Manual,
+    /// Use vector clock for ordering (more sophisticated)
+    VectorClock,
+}
+
+/// Vector clock for conflict detection
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VectorClock {
+    /// Clock entries by node ID
+    pub entries: HashMap<u64, u64>,
+}
+
+impl VectorClock {
+    /// Create a new vector clock
+    pub fn new() -> Self {
+        Self {
+            entries: HashMap::new(),
+        }
+    }
+
+    /// Increment clock for a node
+    pub fn increment(&mut self, node_id: u64) {
+        let entry = self.entries.entry(node_id).or_insert(0);
+        *entry += 1;
+    }
+
+    /// Compare two vector clocks
+    ///
+    /// Returns:
+    /// - Some(true) if self > other (happens-before)
+    /// - Some(false) if self < other (happens-after)
+    /// - None if concurrent (conflict)
+    pub fn compare(&self, other: &VectorClock) -> Option<bool> {
+        let mut self_greater = false;
+        let mut other_greater = false;
+
+        let all_nodes: Vec<u64> = self
+            .entries
+            .keys()
+            .chain(other.entries.keys())
+            .cloned()
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect();
+
+        for node_id in all_nodes {
+            let self_ts = self.entries.get(&node_id).copied().unwrap_or(0);
+            let other_ts = other.entries.get(&node_id).copied().unwrap_or(0);
+
+            if self_ts > other_ts {
+                self_greater = true;
+            } else if other_ts > self_ts {
+                other_greater = true;
+            }
+        }
+
+        if self_greater && !other_greater {
+            Some(true)
+        } else if other_greater && !self_greater {
+            Some(false)
+        } else {
+            None // Concurrent (conflict)
+        }
+    }
+
+    /// Merge two vector clocks (take maximum for each node)
+    pub fn merge(&mut self, other: &VectorClock) {
+        for (node_id, timestamp) in &other.entries {
+            let entry = self.entries.entry(*node_id).or_insert(0);
+            *entry = (*entry).max(*timestamp);
+        }
+    }
+}
+
+impl Default for VectorClock {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Replication configuration
@@ -1035,6 +1123,235 @@ impl ReplicationEngine {
         }
 
         Ok(health_map)
+    }
+
+    /// Detect conflicts between local and remote artifact versions
+    ///
+    /// Compares artifact metadata from different nodes to detect conflicts.
+    ///
+    /// # Arguments
+    /// * `artifact_id` - ID of the artifact to check
+    /// * `local_metadata` - Local artifact metadata
+    /// * `remote_responses` - Map of node_id -> GetArtifactResponse from remote nodes
+    ///
+    /// # Returns
+    /// * `Vec<ArtifactConflict>` - List of detected conflicts
+    pub async fn detect_conflicts(
+        &self,
+        artifact_id: &str,
+        local_metadata: &ArtifactMetadata,
+        remote_responses: &HashMap<u64, GetArtifactResponse>,
+    ) -> Vec<ArtifactConflict> {
+        let mut conflicts = Vec::new();
+
+        for (node_id, response) in remote_responses {
+            if let Some(ref remote_metadata) = response.metadata {
+                // Check if checksums differ (indicates conflict)
+                if remote_metadata.checksum != local_metadata.checksum {
+                    conflicts.push(ArtifactConflict {
+                        artifact_id: artifact_id.to_string(),
+                        reason: format!(
+                            "Checksum mismatch: local={}, remote={}",
+                            local_metadata.checksum, remote_metadata.checksum
+                        ),
+                        local_version: local_metadata.created_at,
+                        remote_version: remote_metadata.created_at,
+                    });
+                }
+                // Check if timestamps indicate concurrent writes
+                else if remote_metadata.created_at != local_metadata.created_at {
+                    // If timestamps are very close (within 1 second), might be concurrent
+                    let time_diff = (local_metadata.created_at - remote_metadata.created_at)
+                        .num_seconds()
+                        .abs();
+                    if time_diff < 1 {
+                        conflicts.push(ArtifactConflict {
+                            artifact_id: artifact_id.to_string(),
+                            reason: format!(
+                                "Concurrent writes detected (time diff: {}s)",
+                                time_diff
+                            ),
+                            local_version: local_metadata.created_at,
+                            remote_version: remote_metadata.created_at,
+                        });
+                    }
+                }
+            }
+        }
+
+        conflicts
+    }
+
+    /// Resolve conflicts using specified strategy
+    ///
+    /// # Arguments
+    /// * `artifact_id` - ID of the artifact with conflicts
+    /// * `conflicts` - List of detected conflicts
+    /// * `strategy` - Conflict resolution strategy
+    /// * `local_metadata` - Local artifact metadata
+    /// * `remote_responses` - Map of node_id -> GetArtifactResponse from remote nodes
+    ///
+    /// # Returns
+    /// * `Ok(ArtifactMetadata)` - Resolved metadata
+    /// * `Err(AppError)` - Error if resolution fails
+    pub async fn resolve_conflicts(
+        &self,
+        artifact_id: &str,
+        conflicts: &[ArtifactConflict],
+        strategy: ConflictResolutionStrategy,
+        local_metadata: &ArtifactMetadata,
+        remote_responses: &HashMap<u64, GetArtifactResponse>,
+    ) -> Result<ArtifactMetadata, AppError> {
+        if conflicts.is_empty() {
+            return Ok(local_metadata.clone());
+        }
+
+        info!(
+            "Resolving {} conflicts for artifact {} using strategy {:?}",
+            conflicts.len(),
+            artifact_id,
+            strategy
+        );
+
+        match strategy {
+            ConflictResolutionStrategy::LastWriteWins => {
+                // Find the version with the latest timestamp
+                let mut latest_metadata = local_metadata.clone();
+                let mut latest_timestamp = local_metadata.created_at;
+
+                for (node_id, response) in remote_responses {
+                    if let Some(ref remote_metadata) = response.metadata {
+                        if remote_metadata.created_at > latest_timestamp {
+                            latest_timestamp = remote_metadata.created_at;
+                            latest_metadata = remote_metadata.clone();
+                        }
+                    }
+                }
+
+                info!(
+                    "Last-write-wins: selected version with timestamp {}",
+                    latest_timestamp
+                );
+                Ok(latest_metadata)
+            }
+            ConflictResolutionStrategy::FirstWriteWins => {
+                // Find the version with the earliest timestamp
+                let mut earliest_metadata = local_metadata.clone();
+                let mut earliest_timestamp = local_metadata.created_at;
+
+                for (node_id, response) in remote_responses {
+                    if let Some(ref remote_metadata) = response.metadata {
+                        if remote_metadata.created_at < earliest_timestamp {
+                            earliest_timestamp = remote_metadata.created_at;
+                            earliest_metadata = remote_metadata.clone();
+                        }
+                    }
+                }
+
+                info!(
+                    "First-write-wins: selected version with timestamp {}",
+                    earliest_timestamp
+                );
+                Ok(earliest_metadata)
+            }
+            ConflictResolutionStrategy::VectorClock => {
+                // For vector clock, we'd need to store vector clocks with artifacts
+                // For now, fall back to last-write-wins logic directly
+                warn!(
+                    "Vector clock resolution not fully implemented, using last-write-wins fallback"
+                );
+                // Find the version with the latest timestamp
+                let mut latest_metadata = local_metadata.clone();
+                let mut latest_timestamp = local_metadata.created_at;
+
+                for (_node_id, response) in remote_responses {
+                    if let Some(ref remote_metadata) = response.metadata {
+                        if remote_metadata.created_at > latest_timestamp {
+                            latest_timestamp = remote_metadata.created_at;
+                            latest_metadata = remote_metadata.clone();
+                        }
+                    }
+                }
+
+                info!(
+                    "Vector clock fallback (last-write-wins): selected version with timestamp {}",
+                    latest_timestamp
+                );
+                Ok(latest_metadata)
+            }
+            ConflictResolutionStrategy::Manual => {
+                // Manual resolution requires user intervention
+                Err(AppError::ValidationError(format!(
+                    "Manual conflict resolution required for artifact {}: {} conflicts detected",
+                    artifact_id,
+                    conflicts.len()
+                )))
+            }
+        }
+    }
+
+    /// Sync artifacts and detect/resolve conflicts
+    ///
+    /// This method synchronizes artifacts with remote nodes and handles conflicts.
+    ///
+    /// # Arguments
+    /// * `artifact_id` - ID of the artifact to sync
+    /// * `local_metadata` - Local artifact metadata
+    /// * `strategy` - Conflict resolution strategy
+    ///
+    /// # Returns
+    /// * `Ok((resolved_metadata, conflicts))` - Resolved metadata and list of conflicts
+    /// * `Err(AppError)` - Error if sync fails
+    pub async fn sync_with_conflict_resolution(
+        &self,
+        artifact_id: &str,
+        local_metadata: &ArtifactMetadata,
+        strategy: ConflictResolutionStrategy,
+    ) -> Result<(ArtifactMetadata, Vec<ArtifactConflict>), AppError> {
+        // Get replication metadata
+        let metadata = self.replication_metadata.read().await;
+        let meta = metadata.get(artifact_id).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "No replication metadata found for artifact {}",
+                artifact_id
+            ))
+        })?;
+
+        // Read from all replicas
+        let mut remote_responses = HashMap::new();
+        let nodes = self.available_nodes.read().await;
+
+        for node_id in &meta.replica_nodes {
+            if let Some(address) = nodes.get(node_id) {
+                let client = self.get_protocol_client(*node_id, address).await;
+                match client.get_artifact(artifact_id.to_string(), false).await {
+                    Ok(response) => {
+                        remote_responses.insert(*node_id, response);
+                    }
+                    Err(e) => {
+                        warn!("Failed to read from replica {}: {}", node_id, e);
+                    }
+                }
+            }
+        }
+
+        // Detect conflicts
+        let conflicts = self
+            .detect_conflicts(artifact_id, local_metadata, &remote_responses)
+            .await;
+
+        // Resolve conflicts
+        let resolved_metadata = self
+            .resolve_conflicts(
+                artifact_id,
+                &conflicts,
+                strategy,
+                local_metadata,
+                &remote_responses,
+            )
+            .await?;
+
+        Ok((resolved_metadata, conflicts))
     }
 }
 
