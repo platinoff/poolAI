@@ -181,9 +181,10 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [x] Basic leader election support (automatic for single-node clusters)
 - [x] Wait for leader election method
 - [x] Integration tests (5 tests passing)
-- [ ] Multi-node leader election testing
-- [ ] Log replication testing
-- [ ] Multi-node cluster integration tests
+- [x] Multi-node leader election testing — ✅ базові тести реалізовано (Week 12)
+- [x] Log replication testing — ✅ базові тести реалізовано (Week 12)
+- [x] Multi-node cluster integration tests — ✅ базові тести реалізовано (Week 12)
+- ℹ️ Примітка: Тести потребують feature flag `--features raft` для запуску
 
 ### Phase 3: Event Sourcing (Week 13) — ✅ ЗАВЕРШЕНО
 - [x] Event store implementation (`EventStore`, `RaidEvent`, `EventRecord`, `Snapshot`)
