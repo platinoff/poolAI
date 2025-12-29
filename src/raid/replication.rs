@@ -11,15 +11,16 @@
 //! - Node selection and health-aware routing
 
 use crate::core::error::AppError;
-use crate::raid::client::ProtocolClient;
-use crate::raid::events::{EventStore, RaidEvent};
-use crate::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
+// These will be used in Week 15.2-15.3:
+// use crate::raid::client::ProtocolClient;
+// use crate::raid::events::RaidEvent;
+// use crate::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
+use crate::raid::events::EventStore;
 use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
-use uuid::Uuid;
 
 /// Replication configuration
 #[derive(Debug, Clone)]
@@ -83,9 +84,11 @@ pub struct ReplicationMetadata {
 ///
 /// Coordinates artifact replication across multiple nodes in the distributed RAID system.
 pub struct ReplicationEngine {
-    /// RAID manager reference
+    /// RAID manager reference (will be used in Week 15.2 for synchronous replication)
+    #[allow(dead_code)]
     raid_manager: Arc<RwLock<crate::raid::RaidManager>>,
-    /// Event store for auditability
+    /// Event store for auditability (will be used in Week 15.3 for replication events)
+    #[allow(dead_code)]
     event_store: Option<Arc<RwLock<EventStore>>>,
     /// Configuration
     config: ReplicationConfig,
@@ -202,6 +205,9 @@ impl ReplicationEngine {
     }
 
     /// Update replication metadata
+    /// 
+    /// This method will be used in Week 15.2 for synchronous replication
+    #[allow(dead_code)]
     async fn update_metadata(
         &self,
         artifact_id: String,
