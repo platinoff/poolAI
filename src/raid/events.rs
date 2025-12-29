@@ -264,5 +264,35 @@ impl EventStore {
     pub fn snapshot_path(&self) -> &PathBuf {
         &self.snapshot_path
     }
+
+    /// Replay events to reconstruct state
+    /// 
+    /// This method replays all events from the store, allowing
+    /// state reconstruction from the event log.
+    pub async fn replay_events<F>(&self, mut handler: F) -> Result<(), AppError>
+    where
+        F: FnMut(&EventRecord) -> Result<(), AppError>,
+    {
+        let events = self.load_events().await?;
+        
+        for event in events {
+            handler(&event)?;
+        }
+        
+        Ok(())
+    }
+
+    /// Get events in a time range
+    pub async fn get_events_in_range(
+        &self,
+        start: DateTime<Utc>,
+        end: DateTime<Utc>,
+    ) -> Result<Vec<EventRecord>, AppError> {
+        let all_events = self.load_events().await?;
+        Ok(all_events
+            .into_iter()
+            .filter(|e| e.timestamp >= start && e.timestamp <= end)
+            .collect())
+    }
 }
 
