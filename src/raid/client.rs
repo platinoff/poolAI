@@ -4,9 +4,12 @@
 //! in the distributed RAID system.
 
 use crate::core::error::AppError;
+use crate::raid::circuit_breaker::CircuitBreakerManager;
 use crate::raid::protocol::*;
 use reqwest::Client;
+use std::sync::Arc;
 use std::time::Duration;
+use tokio::sync::RwLock;
 use tracing::info;
 
 /// Protocol client for distributed RAID communication
@@ -16,6 +19,8 @@ pub struct ProtocolClient {
     node_id: String,
     #[allow(dead_code)] // Reserved for future use
     timeout: Duration,
+    /// Circuit breaker manager for fault tolerance
+    circuit_breaker_manager: Arc<RwLock<CircuitBreakerManager>>,
 }
 
 impl ProtocolClient {
@@ -31,6 +36,7 @@ impl ProtocolClient {
             base_url,
             node_id,
             timeout: Duration::from_secs(30),
+            circuit_breaker_manager: Arc::new(RwLock::new(CircuitBreakerManager::with_defaults())),
         }
     }
 
@@ -46,14 +52,35 @@ impl ProtocolClient {
             base_url,
             node_id,
             timeout,
+            circuit_breaker_manager: Arc::new(RwLock::new(CircuitBreakerManager::with_defaults())),
         }
     }
 
     /// Send a protocol message and get response
+    /// 
+    /// This method integrates with circuit breaker for fault tolerance.
+    /// Circuit breaker prevents cascading failures by rejecting requests
+    /// when a node is detected as failing.
     async fn send_message<T>(&self, endpoint: &str, message: ProtocolMessage) -> Result<T, AppError>
     where
         T: serde::de::DeserializeOwned,
     {
+        // Use base_url hash as node identifier for circuit breaker
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let mut hasher = DefaultHasher::new();
+        self.base_url.hash(&mut hasher);
+        let node_id = hasher.finish() as u64;
+
+        // Get or create circuit breaker for this node
+        let breaker = {
+            let manager = self.circuit_breaker_manager.read().await;
+            manager.get_or_create(node_id).await
+        };
+
+        // Check if request is allowed
+        breaker.allow_request().await?;
+
         let url = format!("{}/api/v1/raid/distributed{}", self.base_url, endpoint);
 
         let json = message.to_json().map_err(|e| {
@@ -65,37 +92,63 @@ impl ProtocolClient {
             url, message.message_type
         );
 
-        let response = self
+        // Attempt to send request
+        let result = self
             .client
             .post(&url)
             .header("Content-Type", "application/json")
             .body(json)
             .send()
-            .await
-            .map_err(|e| AppError::NetworkError(format!("Failed to send request: {}", e)))?;
+            .await;
 
-        if !response.status().is_success() {
-            let status = response.status();
-            let error_text = response.text().await.unwrap_or_default();
-            return Err(AppError::NetworkError(format!(
-                "Request failed with status {}: {}",
-                status, error_text
-            )));
-        }
+        let response = match result {
+            Ok(resp) => {
+                if resp.status().is_success() {
+                    // Record success
+                    breaker.record_success().await;
+                    resp
+                } else {
+                    // Record failure for non-success status
+                    breaker.record_failure().await;
+                    let status = resp.status();
+                    let error_text = resp.text().await.unwrap_or_default();
+                    return Err(AppError::NetworkError(format!(
+                        "Request failed with status {}: {}",
+                        status, error_text
+                    )));
+                }
+            }
+            Err(e) => {
+                // Record failure for network errors
+                breaker.record_failure().await;
+                return Err(AppError::NetworkError(format!("Failed to send request: {}", e)));
+            }
+        };
 
-        let response_json: serde_json::Value = response
-            .json()
-            .await
-            .map_err(|e| AppError::NetworkError(format!("Failed to parse response: {}", e)))?;
+        let response_json: serde_json::Value = match response.json().await {
+            Ok(json) => json,
+            Err(e) => {
+                breaker.record_failure().await;
+                return Err(AppError::NetworkError(format!("Failed to parse response: {}", e)));
+            }
+        };
 
         // Extract payload from response message
-        let payload = response_json
-            .get("payload")
-            .ok_or_else(|| AppError::ValidationError("Response missing payload".to_string()))?;
+        let payload = match response_json.get("payload") {
+            Some(p) => p,
+            None => {
+                breaker.record_failure().await;
+                return Err(AppError::ValidationError("Response missing payload".to_string()));
+            }
+        };
 
-        serde_json::from_value(payload.clone()).map_err(|e| {
-            AppError::ValidationError(format!("Failed to deserialize response: {}", e))
-        })
+        match serde_json::from_value(payload.clone()) {
+            Ok(result) => Ok(result),
+            Err(e) => {
+                breaker.record_failure().await;
+                Err(AppError::ValidationError(format!("Failed to deserialize response: {}", e)))
+            }
+        }
     }
 
     /// Replicate an artifact to another node
@@ -200,6 +253,27 @@ impl ProtocolClient {
 
         let message = ProtocolMessage::leave_cluster(self.node_id.clone(), payload)?;
         self.send_message("/cluster/leave", message).await
+    }
+
+    /// Get circuit breaker manager reference
+    pub fn circuit_breaker_manager(&self) -> &Arc<RwLock<CircuitBreakerManager>> {
+        &self.circuit_breaker_manager
+    }
+
+    /// Get circuit breaker state for this client's node
+    pub async fn circuit_breaker_state(&self) -> crate::raid::circuit_breaker::CircuitState {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let mut hasher = DefaultHasher::new();
+        self.base_url.hash(&mut hasher);
+        let node_id = hasher.finish() as u64;
+
+        let manager = self.circuit_breaker_manager.read().await;
+        if let Some(breaker) = manager.get(node_id).await {
+            breaker.state().await
+        } else {
+            crate::raid::circuit_breaker::CircuitState::Closed
+        }
     }
 }
 

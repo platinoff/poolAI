@@ -192,12 +192,12 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
 - [x] Audit log API (5 REST endpoints: `/raid/events`, `/raid/events/:artifact_id`, `/raid/events/range`, `/raid/snapshot`, `/raid/snapshot/create`)
 - [x] Integration tests (8 tests passing)
 
-### Phase 4: Circuit Breaker (Week 14)
-- [ ] Circuit breaker implementation
-- [ ] Health check integration
-- [ ] Failure detection
-- [ ] Recovery mechanism
-- [ ] Integration tests
+### Phase 4: Circuit Breaker (Week 14) — ✅ ЗАВЕРШЕНО
+- [x] Circuit breaker implementation (`CircuitBreaker`, `CircuitBreakerManager`)
+- [x] Integration with ProtocolClient (automatic failure detection)
+- [x] Failure detection (consecutive failure counting)
+- [x] Recovery mechanism (half-open state with success threshold)
+- [x] Integration tests (8 tests passing)
 
 ### Phase 5: Replication (Week 15-16)
 - [ ] Synchronous replication

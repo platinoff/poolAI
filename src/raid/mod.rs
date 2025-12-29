@@ -18,6 +18,7 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
 
+pub mod circuit_breaker;
 pub mod client;
 pub mod events;
 pub mod manifest;
