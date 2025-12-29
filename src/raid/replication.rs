@@ -18,7 +18,7 @@ use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
-use tokio::time::{sleep, timeout, Duration as TokioDuration};
+use tokio::time::{timeout, Duration as TokioDuration};
 use tracing::{debug, info, warn};
 
 /// Async replication task

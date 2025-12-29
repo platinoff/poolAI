@@ -214,7 +214,11 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
   - [x] Emit ReplicationStarted events for each target node
   - [x] Emit ReplicationCompleted events on successful replication
   - [x] Integration with EventStore in replicate_sync()
-- [ ] Asynchronous replication (Week 16.1)
+- [x] Asynchronous replication (Week 16.1) — ✅ ЗАВЕРШЕНО
+  - [x] Background replication queue (mpsc channel)
+  - [x] Async replication workers (configurable count)
+  - [x] Retry mechanism (configurable attempts)
+  - [x] Status tracking (Queued status)
 - [ ] Read replica support (Week 16.2)
 - [ ] Conflict resolution (Week 16.3)
 - [ ] Integration tests
