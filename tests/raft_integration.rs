@@ -721,3 +721,255 @@ async fn test_raft_log_replication_multiple_operations() {
             "Last log index should be at least {}", num_operations);
 }
 
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_failover_node_removal() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    // Create two separate storage paths for two nodes
+    let node1_path = storage_path.join("node1");
+    let node2_path = storage_path.join("node2");
+
+    // Setup Node 1
+    let raid_config1 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node1_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager1 = Arc::new(RwLock::new(RaidManager::new(raid_config1)));
+    raid_manager1.write().await.initialize().await.unwrap();
+
+    let raft_config1 = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1, 2],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node1 = RaidRaftNode::new(
+        raft_config1,
+        raid_manager1.clone(),
+        node1_path.join("raft"),
+    )
+    .unwrap();
+
+    // Setup Node 2
+    let raid_config2 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node2_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager2 = Arc::new(RwLock::new(RaidManager::new(raid_config2)));
+    raid_manager2.write().await.initialize().await.unwrap();
+
+    let raft_config2 = RaftConfig {
+        node_id: 2,
+        cluster_members: vec![1, 2],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node2 = RaidRaftNode::new(
+        raft_config2,
+        raid_manager2.clone(),
+        node2_path.join("raft"),
+    )
+    .unwrap();
+
+    // Configure transport for both nodes
+    raft_node1.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node1.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node2.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node2.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+
+    // Initialize both nodes
+    raft_node1.initialize().await.unwrap();
+    raft_node2.initialize().await.unwrap();
+
+    // Verify both nodes are initialized
+    let term1_before = raft_node1.current_term().await;
+    let term2_before = raft_node2.current_term().await;
+    
+    assert!(term1_before >= 0);
+    assert!(term2_before >= 0);
+
+    // Simulate failover by removing node 2 from node 1's transport
+    // This simulates node 2 becoming unavailable
+    raft_node1.transport().remove_node(2).await;
+
+    // Verify node 2 is removed from node 1's transport
+    let addr2_after = raft_node1.transport().get_node_address(2).await;
+    assert_eq!(addr2_after, None, "Node 2 should be removed from transport");
+
+    // Node 1 should still be able to function (though without node 2)
+    let term1_after = raft_node1.current_term().await;
+    assert!(term1_after >= term1_before, "Node 1 term should not decrease");
+
+    // Verify metrics are still accessible
+    let metrics1 = raft_node1.get_metrics().await;
+    assert!(metrics1.is_ok(), "Node 1 metrics should still be accessible after failover simulation");
+}
+
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_failover_continuity() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: storage_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    raid_manager.write().await.initialize().await.unwrap();
+
+    // Test that a single-node cluster can continue operations after "failover"
+    // (In single-node, there's no actual failover, but we test continuity)
+    let raft_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node = RaidRaftNode::new(
+        raft_config,
+        raid_manager.clone(),
+        storage_path.join("raft"),
+    )
+    .unwrap();
+
+    raft_node.initialize().await.unwrap();
+
+    // Wait for leader
+    let became_leader = raft_node.wait_for_leader(5000).await.unwrap_or(false);
+    assert!(became_leader, "Node should become leader");
+
+    // Apply an operation before "failover"
+    let operation1 = RaidRaftOperation::PutArtifact {
+        artifact_id: "test-artifact-before-failover".to_string(),
+        data: b"data before failover".to_vec(),
+        metadata: poolai::raid::manifest::ArtifactManifest::new(),
+    };
+
+    let response1 = raft_node.apply_operation(operation1).await.unwrap();
+    match response1 {
+        poolai::raid::raft::RaidRaftResponse::Success { .. } => {}
+        _ => panic!("Expected Success response"),
+    }
+
+    // Get log index before "failover"
+    let log_index_before = raft_node.get_last_log_index().await;
+
+    // Simulate "failover" by checking metrics
+    let metrics_before = raft_node.get_metrics().await.unwrap();
+    
+    // Wait a bit (simulating recovery time)
+    tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+
+    // Verify node is still leader after "failover"
+    let still_leader = raft_node.is_leader().await;
+    assert!(still_leader, "Node should still be leader after failover simulation");
+
+    // Apply an operation after "failover"
+    let operation2 = RaidRaftOperation::PutArtifact {
+        artifact_id: "test-artifact-after-failover".to_string(),
+        data: b"data after failover".to_vec(),
+        metadata: poolai::raid::manifest::ArtifactManifest::new(),
+    };
+
+    let response2 = raft_node.apply_operation(operation2).await.unwrap();
+    match response2 {
+        poolai::raid::raft::RaidRaftResponse::Success { .. } => {}
+        _ => panic!("Expected Success response"),
+    }
+
+    // Verify log index increased
+    let log_index_after = raft_node.get_last_log_index().await;
+    assert!(log_index_after > log_index_before, "Log index should increase after operation");
+
+    // Verify metrics are still accessible
+    let metrics_after = raft_node.get_metrics().await.unwrap();
+    assert!(metrics_after.contains("term:"), "Metrics should still be accessible");
+}
+
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_failover_term_consistency() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: storage_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    raid_manager.write().await.initialize().await.unwrap();
+
+    let raft_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node = RaidRaftNode::new(
+        raft_config,
+        raid_manager.clone(),
+        storage_path.join("raft"),
+    )
+    .unwrap();
+
+    raft_node.initialize().await.unwrap();
+
+    // Wait for leader
+    let became_leader = raft_node.wait_for_leader(5000).await.unwrap_or(false);
+    assert!(became_leader, "Node should become leader");
+
+    // Get initial term
+    let initial_term = raft_node.current_term().await;
+    assert!(initial_term > 0, "Initial term should be greater than 0");
+
+    // Apply operations
+    for i in 0..3 {
+        let operation = RaidRaftOperation::PutArtifact {
+            artifact_id: format!("test-artifact-{}", i),
+            data: format!("data {}", i).into_bytes(),
+            metadata: poolai::raid::manifest::ArtifactManifest::new(),
+        };
+
+        let response = raft_node.apply_operation(operation).await.unwrap();
+        match response {
+            poolai::raid::raft::RaidRaftResponse::Success { .. } => {}
+            _ => panic!("Expected Success response"),
+        }
+    }
+
+    // Verify term consistency (term should not decrease)
+    let term_after = raft_node.current_term().await;
+    assert!(term_after >= initial_term, "Term should not decrease after operations");
+
+    // Verify leader is still the same
+    let leader = raft_node.get_current_leader().await;
+    assert_eq!(leader, Some(1), "Leader should remain node 1");
+
+    // Verify role is still Leader
+    let role = raft_node.current_role().await;
+    assert_eq!(role, "Leader", "Role should remain Leader");
+}
+
