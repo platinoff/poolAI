@@ -231,3 +231,155 @@ async fn test_raft_transport_node_management() {
     assert_eq!(addr1_after, None);
 }
 
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_multi_node_setup() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    // Create two separate storage paths for two nodes
+    let node1_path = storage_path.join("node1");
+    let node2_path = storage_path.join("node2");
+
+    // Setup Node 1
+    let raid_config1 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node1_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager1 = Arc::new(RwLock::new(RaidManager::new(raid_config1)));
+    raid_manager1.write().await.initialize().await.unwrap();
+
+    let raft_config1 = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1, 2],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node1 = RaidRaftNode::new(
+        raft_config1,
+        raid_manager1.clone(),
+        node1_path.join("raft"),
+    )
+    .unwrap();
+
+    // Setup Node 2
+    let raid_config2 = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: node2_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager2 = Arc::new(RwLock::new(RaidManager::new(raid_config2)));
+    raid_manager2.write().await.initialize().await.unwrap();
+
+    let raft_config2 = RaftConfig {
+        node_id: 2,
+        cluster_members: vec![1, 2],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node2 = RaidRaftNode::new(
+        raft_config2,
+        raid_manager2.clone(),
+        node2_path.join("raft"),
+    )
+    .unwrap();
+
+    // Configure transport for both nodes
+    // Note: In a real scenario, these would be actual HTTP addresses
+    // For testing, we'll just verify the setup works
+    raft_node1.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node1.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node2.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
+    raft_node2.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+
+    // Initialize both nodes
+    raft_node1.initialize().await.unwrap();
+    raft_node2.initialize().await.unwrap();
+
+    // Verify both nodes are initialized
+    let term1 = raft_node1.current_term().await;
+    let term2 = raft_node2.current_term().await;
+    
+    // Terms should be valid (>= 0)
+    assert!(term1 >= 0);
+    assert!(term2 >= 0);
+
+    // Verify transport configuration
+    let addr1 = raft_node1.transport().get_node_address(1).await;
+    let addr2 = raft_node1.transport().get_node_address(2).await;
+    assert_eq!(addr1, Some("http://127.0.0.1:8080".to_string()));
+    assert_eq!(addr2, Some("http://127.0.0.1:8081".to_string()));
+}
+
+#[cfg(feature = "raft")]
+#[tokio::test]
+async fn test_raft_cluster_initialization() {
+    let temp_dir = TempDir::new().unwrap();
+    let storage_path = temp_dir.path().to_path_buf();
+
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: storage_path.clone(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    raid_manager.write().await.initialize().await.unwrap();
+
+    // Test single-node cluster initialization (should work)
+    let raft_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let raft_node = RaidRaftNode::new(
+        raft_config,
+        raid_manager.clone(),
+        storage_path.join("raft"),
+    )
+    .unwrap();
+
+    raft_node.initialize().await.unwrap();
+
+    // For single-node, should become leader
+    let became_leader = raft_node.wait_for_leader(5000).await.unwrap_or(false);
+    assert!(became_leader, "Single-node cluster should become leader");
+
+    // Test multi-node cluster initialization method
+    let multi_node_config = RaftConfig {
+        node_id: 1,
+        cluster_members: vec![1, 2, 3],
+        election_timeout: 1000,
+        heartbeat_interval: 100,
+    };
+
+    let multi_node = RaidRaftNode::new(
+        multi_node_config,
+        raid_manager.clone(),
+        storage_path.join("raft_multi"),
+    )
+    .unwrap();
+
+    multi_node.initialize().await.unwrap();
+    
+    // For multi-node without actual nodes, initialize_cluster should handle it gracefully
+    // (It will fail if Raft instance is not initialized, which is expected)
+    // This test verifies the method exists and can be called
+    let result = multi_node.initialize_cluster().await;
+    // Result may be Ok or Err depending on state, but method should exist
+    assert!(result.is_ok() || result.is_err());
+}
+

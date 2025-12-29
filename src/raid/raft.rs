@@ -452,16 +452,15 @@ impl RaidRaftNode {
 
         // Create storage directory if it doesn't exist
         let storage_path = self.storage.storage_path.clone();
-        if let Some(parent) = storage_path.parent() {
-            tokio::fs::create_dir_all(parent)
-                .await
-                .map_err(|e| {
-                    AppError::ConfigError(format!(
-                        "Failed to create Raft storage directory: {}",
-                        e
-                    ))
-                })?;
-        }
+        // Create the directory itself, not just parent
+        tokio::fs::create_dir_all(&storage_path)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to create Raft storage directory: {}",
+                    e
+                ))
+            })?;
 
         // Build Raft configuration
         let raft_config = Config::build("poolai-raid-cluster".to_string())
@@ -491,11 +490,46 @@ impl RaidRaftNode {
         
         info!("Raft node {} initialized successfully", self.config.node_id);
         
-        // For single-node clusters, wait a bit for automatic leader election
-        // In multi-node clusters, leader election happens automatically
+        // For single-node clusters, initialize the cluster and wait for leader election
+        // In multi-node clusters, only the first node should initialize the cluster
         if self.config.cluster_members.len() == 1 {
-            info!("Single-node cluster detected, waiting for leader election...");
-            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+            info!("Single-node cluster detected, initializing cluster and waiting for leader election...");
+            use std::collections::HashSet;
+            let members: HashSet<NodeId> = self.config.cluster_members.iter().cloned().collect();
+            self.raft_instance.read().await.as_ref().unwrap().initialize(members).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to initialize single-node Raft cluster: {}", e))
+            })?;
+            self.wait_for_leader(5000).await?;
+            info!("Node {} is now leader.", self.config.node_id);
+        }
+        
+        Ok(())
+    }
+
+    /// Initialize a multi-node Raft cluster
+    /// 
+    /// This should be called on the first node to bootstrap the cluster.
+    /// Other nodes should just call `initialize()` without calling this method.
+    pub async fn initialize_cluster(&self) -> Result<(), AppError> {
+        if self.config.cluster_members.len() == 1 {
+            // Single-node cluster is handled in initialize()
+            return Ok(());
+        }
+
+        info!("Initializing multi-node Raft cluster with {} nodes", self.config.cluster_members.len());
+        
+        let instance_guard = self.raft_instance.read().await;
+        if let Some(ref raft) = *instance_guard {
+            // Initialize the cluster with all members
+            // async-raft expects HashSet<NodeId>
+            use std::collections::HashSet;
+            let members: HashSet<NodeId> = self.config.cluster_members.iter().cloned().collect();
+            raft.initialize(members).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to initialize multi-node Raft cluster: {}", e))
+            })?;
+            info!("Multi-node cluster initialized successfully");
+        } else {
+            return Err(AppError::ConfigError("Raft instance not initialized".to_string()));
         }
         
         Ok(())
