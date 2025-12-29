@@ -66,7 +66,7 @@ async fn test_concurrent_node_registration() {
     let mut handles = Vec::new();
 
     for i in 1..=node_count {
-        let engine_clone = &engine;
+        let engine_clone = engine.clone();
         let handle = tokio::spawn(async move {
             engine_clone
                 .register_node(i, format!("http://127.0.0.1:{}", 8080 + i))
