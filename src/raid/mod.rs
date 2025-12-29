@@ -7,6 +7,7 @@
 //! - Artifact storage for libraries/models (local implementation)
 
 use crate::core::error::AppError;
+use crate::raid::events::{EventStore, RaidEvent};
 use crate::raid::manifest::ArtifactManifest;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -18,6 +19,7 @@ use tracing::{info, warn};
 use uuid::Uuid;
 
 pub mod client;
+pub mod events;
 pub mod manifest;
 pub mod protocol;
 #[cfg(feature = "raft")]
@@ -85,14 +87,22 @@ pub struct RaidManager {
     config: Arc<RwLock<RaidConfig>>,
     nodes: Arc<RwLock<Vec<RaidNode>>>,
     artifacts: Arc<RwLock<ArtifactManifest>>,
+    /// Event store for auditability and state reconstruction
+    event_store: Option<Arc<RwLock<EventStore>>>,
 }
 
 impl RaidManager {
     pub fn new(config: RaidConfig) -> Self {
+        // Initialize event store if enabled (for now, always create it)
+        let event_store = Some(Arc::new(RwLock::new(
+            EventStore::new(config.base_path.join("events"))
+        )));
+        
         Self {
             config: Arc::new(RwLock::new(config)),
             nodes: Arc::new(RwLock::new(Vec::new())),
             artifacts: Arc::new(RwLock::new(ArtifactManifest::new())),
+            event_store,
         }
     }
 
@@ -122,6 +132,11 @@ impl RaidManager {
         // Enforce quota if configured
         if cfg.quota_bytes.is_some() {
             self.enforce_quota().await?;
+        }
+
+        // Initialize event store
+        if let Some(ref event_store) = self.event_store {
+            event_store.write().await.initialize().await?;
         }
 
         Ok(())
@@ -184,6 +199,21 @@ impl RaidManager {
             let mut m = self.artifacts.write().await;
             m.artifacts.insert(id, artifact.clone());
             m.updated_at = Utc::now();
+        }
+
+        // Record event
+        if let Some(ref event_store) = self.event_store {
+            let metadata = serde_json::json!({
+                "name": name,
+                "size": bytes.len(),
+                "path": artifact.path.to_string_lossy(),
+            });
+            let _ = event_store.write().await.append_event(RaidEvent::ArtifactCreated {
+                artifact_id: id.to_string(),
+                node_id: 0, // TODO: Get actual node ID from Raft
+                timestamp: Utc::now(),
+                metadata,
+            }).await;
         }
         self.persist_manifest().await?;
 
