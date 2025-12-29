@@ -190,12 +190,10 @@ async fn test_concurrent_metadata_retrieval() {
     let retrieval_count = 1000;
     let mut handles = Vec::new();
 
-    for _ in 0..retrieval_count {
-        let engine_clone = &engine;
-        // Use deterministic "random" selection based on iteration
-        let mut hasher = DefaultHasher::new();
-        i.hash(&mut hasher);
-        let artifact_id = format!("artifact-{}", hasher.finish() as usize % artifact_count);
+    for i in 0..retrieval_count {
+        let engine_clone = engine.clone();
+        // Use deterministic selection based on iteration
+        let artifact_id = format!("artifact-{}", i % artifact_count);
         let handle = tokio::spawn(async move {
             let metadata = engine_clone.get_replication_metadata(&artifact_id).await;
             assert!(metadata.is_some(), "Metadata should exist");
@@ -313,9 +311,9 @@ async fn test_concurrent_quorum_calculations() {
     let calculation_count = 10000;
     let mut handles = Vec::new();
 
-    for _ in 0..calculation_count {
-        let engine_clone = &engine;
-        // Use deterministic "random" factor based on iteration
+    for i in 0..calculation_count {
+        let engine_clone = engine.clone();
+        // Use deterministic factor based on iteration
         let replication_factor = ((i as u32) % 100) + 1;
         let handle = tokio::spawn(async move {
             let quorum = engine_clone.calculate_quorum(replication_factor);
