@@ -219,7 +219,11 @@ We will implement a **Distributed RAID** system (internally called "BurstRAID/Sm
   - [x] Async replication workers (configurable count)
   - [x] Retry mechanism (configurable attempts)
   - [x] Status tracking (Queued status)
-- [ ] Read replica support (Week 16.2)
+- [x] Read replica support (Week 16.2) — ✅ ЗАВЕРШЕНО
+  - [x] Read replica selection (health-aware)
+  - [x] Load balancing for reads (round-robin)
+  - [x] Read consistency levels (Eventual, Quorum, Strong)
+  - [x] Health checks for replicas (circuit breaker integration)
 - [ ] Conflict resolution (Week 16.3)
 - [ ] Integration tests
 

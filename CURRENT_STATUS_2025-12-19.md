@@ -10,7 +10,7 @@
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок  
 **Статус тестів**: ✅ **73+ tests passing** (6 unit + 67+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication tests)  
-**Останній коміт**: Week 15.2 - Synchronous Replication Complete (Quorum-based, Timeout Handling, Error Recovery)
+**Останній коміт**: Week 16.1 - Asynchronous Replication Complete (Background Queue, Workers, Retry Mechanism)
 
 ---
 
@@ -194,13 +194,13 @@
   - ✅ Three-state machine (Closed, Open, HalfOpen)
   - ✅ Failure threshold and recovery mechanism
   - ✅ Integration tests (8 tests passing)
-- ✅ **Replication Strategy (Week 15)** — **ЗАВЕРШЕНО** 🎉
+- ✅ **Replication Strategy (Week 15-16)** — **В ПРОЦЕСІ** 🚧
   - ✅ Replication Engine Core (Week 15.1) - node selection, metadata tracking
   - ✅ Synchronous Replication (Week 15.2) - quorum-based, timeout handling
   - ✅ Replication Events Integration (Week 15.3) - EventStore integration
+  - ✅ Asynchronous Replication (Week 16.1) - background queue, workers, retry mechanism
   - ✅ Integration tests (7 tests passing)
-- 🔄 Asynchronous Replication (Week 16.1)
-- 🔄 Read Replicas (Week 16.2)
+- 🔄 Read Replicas (Week 16.2) — **В ПРОЦЕСІ**
 - 🔄 Conflict Resolution (Week 16.3)
 
 **Git Branches**:

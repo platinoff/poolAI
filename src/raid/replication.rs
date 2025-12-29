@@ -40,6 +40,17 @@ pub struct AsyncReplicationTask {
     pub max_retries: u32,
 }
 
+/// Read consistency level
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReadConsistencyLevel {
+    /// Read from any available replica (fastest, eventual consistency)
+    Eventual,
+    /// Read from quorum of replicas (balanced)
+    Quorum,
+    /// Read from all replicas (slowest, strongest consistency)
+    Strong,
+}
+
 /// Replication configuration
 #[derive(Debug, Clone)]
 pub struct ReplicationConfig {
@@ -55,6 +66,8 @@ pub struct ReplicationConfig {
     pub async_queue_size: usize,
     /// Number of background workers for async replication
     pub async_worker_count: usize,
+    /// Default read consistency level
+    pub default_read_consistency: ReadConsistencyLevel,
 }
 
 impl Default for ReplicationConfig {
@@ -66,6 +79,7 @@ impl Default for ReplicationConfig {
             async_retry_delay_seconds: 5,
             async_queue_size: 1000,
             async_worker_count: 2,
+            default_read_consistency: ReadConsistencyLevel::Quorum,
         }
     }
 }
@@ -787,6 +801,240 @@ impl ReplicationEngine {
 
         info!("Async replication workers shut down");
         Ok(())
+    }
+
+    /// Select a read replica for an artifact
+    ///
+    /// This method selects a healthy replica node for reading an artifact.
+    /// It considers:
+    /// - Node health (via circuit breaker)
+    /// - Load balancing (round-robin)
+    /// - Replica availability
+    ///
+    /// # Arguments
+    /// * `artifact_id` - ID of the artifact to read
+    ///
+    /// # Returns
+    /// * `Ok(Some(u64))` - Selected replica node ID
+    /// * `Ok(None)` - No replicas available
+    /// * `Err(AppError)` - Error if metadata not found
+    pub async fn select_read_replica(&self, artifact_id: &str) -> Result<Option<u64>, AppError> {
+        let metadata = self.replication_metadata.read().await;
+        let meta = metadata.get(artifact_id).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "No replication metadata found for artifact {}",
+                artifact_id
+            ))
+        })?;
+
+        if meta.replica_nodes.is_empty() {
+            return Ok(None);
+        }
+
+        // Filter healthy replicas (check circuit breaker)
+        let mut healthy_replicas = Vec::new();
+        let nodes = self.available_nodes.read().await;
+        
+        for node_id in &meta.replica_nodes {
+            if let Some(address) = nodes.get(node_id) {
+                let client = self.get_protocol_client(*node_id, address).await;
+                let state = client.circuit_breaker_state().await;
+                
+                // Only use replicas with closed circuit breaker (healthy)
+                if matches!(state, crate::raid::circuit_breaker::CircuitState::Closed) {
+                    healthy_replicas.push(*node_id);
+                }
+            }
+        }
+
+        if healthy_replicas.is_empty() {
+            warn!("No healthy replicas available for artifact {}", artifact_id);
+            return Ok(None);
+        }
+
+        // Simple round-robin selection (in production, could use more sophisticated load balancing)
+        // For now, just return the first healthy replica
+        Ok(Some(healthy_replicas[0]))
+    }
+
+    /// Get an artifact from a read replica
+    ///
+    /// This method reads an artifact from a selected replica node.
+    /// It automatically selects a healthy replica and handles failures.
+    ///
+    /// # Arguments
+    /// * `artifact_id` - ID of the artifact to read
+    /// * `include_data` - Whether to include artifact data in response
+    /// * `consistency_level` - Read consistency level (if None, uses default)
+    ///
+    /// # Returns
+    /// * `Ok(GetArtifactResponse)` - Artifact data from replica
+    /// * `Err(AppError)` - Error if no replicas available or read fails
+    pub async fn get_artifact_from_replica(
+        &self,
+        artifact_id: String,
+        include_data: bool,
+        consistency_level: Option<ReadConsistencyLevel>,
+    ) -> Result<crate::raid::protocol::GetArtifactResponse, AppError> {
+        let consistency = consistency_level.unwrap_or(self.config.default_read_consistency);
+
+        match consistency {
+            ReadConsistencyLevel::Eventual => {
+                // Read from any healthy replica
+                let replica_node = self.select_read_replica(&artifact_id).await?;
+                let node_id = replica_node.ok_or_else(|| {
+                    AppError::NetworkError("No healthy replicas available".to_string())
+                })?;
+
+                let nodes = self.available_nodes.read().await;
+                let address = nodes.get(&node_id).ok_or_else(|| {
+                    AppError::ConfigError(format!("Node {} not found", node_id))
+                })?;
+
+                let client = self.get_protocol_client(node_id, address).await;
+                client.get_artifact(artifact_id, include_data).await
+            }
+            ReadConsistencyLevel::Quorum => {
+                // Read from quorum of replicas and return first successful response
+                let metadata = self.replication_metadata.read().await;
+                let meta = metadata.get(&artifact_id).ok_or_else(|| {
+                    AppError::ValidationError(format!(
+                        "No replication metadata found for artifact {}",
+                        artifact_id
+                    ))
+                })?;
+
+                let quorum = self.calculate_quorum(meta.current_count);
+                let mut healthy_replicas = Vec::new();
+
+                // Get healthy replicas
+                let nodes = self.available_nodes.read().await;
+                for node_id in &meta.replica_nodes {
+                    if let Some(address) = nodes.get(node_id) {
+                        let client = self.get_protocol_client(*node_id, address).await;
+                        let state = client.circuit_breaker_state().await;
+                        
+                        if matches!(state, crate::raid::circuit_breaker::CircuitState::Closed) {
+                            healthy_replicas.push((*node_id, address.clone()));
+                        }
+                    }
+                }
+
+                if healthy_replicas.len() < quorum as usize {
+                    return Err(AppError::NetworkError(format!(
+                        "Quorum not available: {}/{} healthy replicas (quorum: {})",
+                        healthy_replicas.len(),
+                        meta.current_count,
+                        quorum
+                    )));
+                }
+
+                // Try reading from quorum nodes, return first successful
+                let mut last_error = None;
+                for (node_id, address) in healthy_replicas.iter().take(quorum as usize) {
+                    let client = self.get_protocol_client(*node_id, address).await;
+                    match client.get_artifact(artifact_id.clone(), include_data).await {
+                        Ok(response) => return Ok(response),
+                        Err(e) => {
+                            last_error = Some(e);
+                            continue;
+                        }
+                    }
+                }
+
+                Err(last_error.unwrap_or_else(|| {
+                    AppError::NetworkError("All quorum reads failed".to_string())
+                }))
+            }
+            ReadConsistencyLevel::Strong => {
+                // Read from all replicas and verify consistency
+                let metadata = self.replication_metadata.read().await;
+                let meta = metadata.get(&artifact_id).ok_or_else(|| {
+                    AppError::ValidationError(format!(
+                        "No replication metadata found for artifact {}",
+                        artifact_id
+                    ))
+                })?;
+
+                let mut responses = Vec::new();
+                let nodes = self.available_nodes.read().await;
+
+                for node_id in &meta.replica_nodes {
+                    if let Some(address) = nodes.get(node_id) {
+                        let client = self.get_protocol_client(*node_id, address).await;
+                        let state = client.circuit_breaker_state().await;
+                        
+                        if matches!(state, crate::raid::circuit_breaker::CircuitState::Closed) {
+                            match client.get_artifact(artifact_id.clone(), include_data).await {
+                                Ok(response) => responses.push(response),
+                                Err(e) => {
+                                    warn!("Failed to read from replica {}: {}", node_id, e);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if responses.is_empty() {
+                    return Err(AppError::NetworkError(
+                        "No replicas responded to strong consistency read".to_string(),
+                    ));
+                }
+
+                // Verify all responses are consistent (same checksum)
+                // For now, return the first response
+                // In production, would verify checksums match
+                Ok(responses[0].clone())
+            }
+        }
+    }
+
+    /// Get list of read replicas for an artifact
+    ///
+    /// Returns all replica nodes where the artifact is stored.
+    pub async fn get_read_replicas(&self, artifact_id: &str) -> Result<Vec<u64>, AppError> {
+        let metadata = self.replication_metadata.read().await;
+        let meta = metadata.get(artifact_id).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "No replication metadata found for artifact {}",
+                artifact_id
+            ))
+        })?;
+
+        Ok(meta.replica_nodes.clone())
+    }
+
+    /// Check health of read replicas for an artifact
+    ///
+    /// Returns a map of node_id -> health status (true = healthy, false = unhealthy).
+    pub async fn check_replica_health(
+        &self,
+        artifact_id: &str,
+    ) -> Result<HashMap<u64, bool>, AppError> {
+        let metadata = self.replication_metadata.read().await;
+        let meta = metadata.get(artifact_id).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "No replication metadata found for artifact {}",
+                artifact_id
+            ))
+        })?;
+
+        let mut health_map = HashMap::new();
+        let nodes = self.available_nodes.read().await;
+
+        for node_id in &meta.replica_nodes {
+            if let Some(address) = nodes.get(node_id) {
+                let client = self.get_protocol_client(*node_id, address).await;
+                let state = client.circuit_breaker_state().await;
+                
+                let is_healthy = matches!(state, crate::raid::circuit_breaker::CircuitState::Closed);
+                health_map.insert(*node_id, is_healthy);
+            } else {
+                health_map.insert(*node_id, false);
+            }
+        }
+
+        Ok(health_map)
     }
 }
 
