@@ -374,6 +374,19 @@ impl ReplicationEngine {
             artifact_id, replication_factor
         );
 
+        // Emit ReplicationStarted events for each target node
+        if let Some(ref event_store) = self.event_store {
+            let source_node = 0; // TODO: Get actual source node ID from Raft
+            for target_node in &selected_nodes {
+                let _ = event_store.write().await.append_event(RaidEvent::ReplicationStarted {
+                    artifact_id: artifact_id.clone(),
+                    source_node,
+                    target_node: *target_node,
+                    timestamp: Utc::now(),
+                }).await;
+            }
+        }
+
         // Calculate quorum: (N/2) + 1
         let quorum = (replication_factor / 2) + 1;
         let mut successful_nodes = Vec::new();
@@ -438,12 +451,23 @@ impl ReplicationEngine {
             }
         };
 
-        // Process results
+        // Process results and emit events
+        let source_node = 0; // TODO: Get actual source node ID from Raft
         for (node_id, result) in replication_results {
             match result {
                 Ok(_) => {
                     successful_nodes.push(node_id);
                     debug!("Successfully replicated artifact {} to node {}", artifact_id, node_id);
+                    
+                    // Emit ReplicationCompleted event
+                    if let Some(ref event_store) = self.event_store {
+                        let _ = event_store.write().await.append_event(RaidEvent::ReplicationCompleted {
+                            artifact_id: artifact_id.clone(),
+                            source_node,
+                            target_node: node_id,
+                            timestamp: Utc::now(),
+                        }).await;
+                    }
                 }
                 Err(e) => {
                     failed_nodes.push(node_id);
@@ -451,6 +475,8 @@ impl ReplicationEngine {
                         "Failed to replicate artifact {} to node {}: {}",
                         artifact_id, node_id, e
                     );
+                    // Note: We don't emit ReplicationFailed events as they're not defined in RaidEvent
+                    // This could be added in the future if needed
                 }
             }
         }
