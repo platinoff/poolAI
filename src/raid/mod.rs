@@ -23,6 +23,7 @@ pub mod client;
 pub mod events;
 pub mod manifest;
 pub mod protocol;
+pub mod replication;
 #[cfg(feature = "raft")]
 pub mod raft;
 #[cfg(feature = "raft")]
