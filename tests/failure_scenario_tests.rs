@@ -166,10 +166,9 @@ async fn test_circuit_breaker_recovery() {
 
     assert_eq!(breaker.state().await, CircuitState::Open);
 
-    // Wait for recovery timeout (half_open_timeout_ms)
-    // Note: CircuitBreakerConfig uses half_open_timeout_ms, not recovery_timeout_ms
-    tokio::time::sleep(tokio::time::Duration::from_millis(
-        config.half_open_timeout_ms + 100,
+    // Wait for recovery timeout (timeout_seconds)
+    tokio::time::sleep(tokio::time::Duration::from_secs(
+        config.timeout_seconds + 1,
     ))
     .await;
 
