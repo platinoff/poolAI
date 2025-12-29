@@ -83,7 +83,8 @@ pub struct ReplicationMetadata {
 ///
 /// Coordinates artifact replication across multiple nodes in the distributed RAID system.
 pub struct ReplicationEngine {
-    /// RAID manager reference
+    /// RAID manager reference (will be used for local artifact operations)
+    #[allow(dead_code)]
     raid_manager: Arc<RwLock<crate::raid::RaidManager>>,
     /// Event store for auditability (will be used in Week 15.3 for replication events)
     #[allow(dead_code)]
