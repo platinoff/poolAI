@@ -17,9 +17,28 @@ use crate::raid::protocol::{ArtifactMetadata, SyncMode};
 use chrono::Utc;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::RwLock;
-use tokio::time::{timeout, Duration as TokioDuration};
+use tokio::sync::{mpsc, RwLock};
+use tokio::time::{sleep, timeout, Duration as TokioDuration};
 use tracing::{debug, info, warn};
+
+/// Async replication task
+#[derive(Debug, Clone)]
+pub struct AsyncReplicationTask {
+    /// Artifact ID
+    pub artifact_id: String,
+    /// Artifact data
+    pub artifact_data: Vec<u8>,
+    /// Artifact metadata
+    pub metadata: ArtifactMetadata,
+    /// Target replication factor
+    pub replication_factor: u32,
+    /// Target nodes (if None, nodes will be selected automatically)
+    pub target_nodes: Option<Vec<u64>>,
+    /// Retry attempt count
+    pub retry_count: u32,
+    /// Maximum retry attempts
+    pub max_retries: u32,
+}
 
 /// Replication configuration
 #[derive(Debug, Clone)]
@@ -32,6 +51,10 @@ pub struct ReplicationConfig {
     pub async_retry_attempts: u32,
     /// Delay between async retry attempts (seconds)
     pub async_retry_delay_seconds: u64,
+    /// Maximum queue size for async replication
+    pub async_queue_size: usize,
+    /// Number of background workers for async replication
+    pub async_worker_count: usize,
 }
 
 impl Default for ReplicationConfig {
@@ -41,6 +64,8 @@ impl Default for ReplicationConfig {
             sync_timeout_seconds: 30,
             async_retry_attempts: 3,
             async_retry_delay_seconds: 5,
+            async_queue_size: 1000,
+            async_worker_count: 2,
         }
     }
 }
@@ -58,6 +83,8 @@ pub enum ReplicationStatus {
     Failed { reason: String },
     /// Partially replicated (some nodes failed)
     Partial { successful: u32, failed: u32 },
+    /// Queued for asynchronous replication
+    Queued,
 }
 
 /// Replication metadata for an artifact
@@ -96,6 +123,12 @@ pub struct ReplicationEngine {
     available_nodes: Arc<RwLock<HashMap<u64, String>>>,
     /// Protocol clients by node ID (lazy initialization)
     protocol_clients: Arc<RwLock<HashMap<u64, Arc<ProtocolClient>>>>,
+    /// Async replication queue (sender side)
+    async_queue_tx: Option<mpsc::Sender<AsyncReplicationTask>>,
+    /// Async replication queue (receiver side, for worker)
+    async_queue_rx: Option<Arc<RwLock<Option<mpsc::Receiver<AsyncReplicationTask>>>>>,
+    /// Background worker handle
+    background_worker: Option<tokio::task::JoinHandle<()>>,
 }
 
 impl ReplicationEngine {
@@ -112,6 +145,9 @@ impl ReplicationEngine {
             replication_metadata: Arc::new(RwLock::new(HashMap::new())),
             available_nodes: Arc::new(RwLock::new(HashMap::new())),
             protocol_clients: Arc::new(RwLock::new(HashMap::new())),
+            async_queue_tx: None,
+            async_queue_rx: None,
+            background_worker: None,
         }
     }
 
@@ -547,6 +583,210 @@ impl ReplicationEngine {
     /// in custom replication scenarios.
     pub fn calculate_quorum(&self, replication_factor: u32) -> u32 {
         (replication_factor / 2) + 1
+    }
+
+    /// Initialize async replication queue and background workers
+    ///
+    /// This must be called before using `replicate_async()`.
+    pub async fn initialize_async_replication(&mut self) -> Result<(), AppError> {
+        if self.async_queue_tx.is_some() {
+            return Err(AppError::ConfigError(
+                "Async replication already initialized".to_string(),
+            ));
+        }
+
+        let (tx, rx) = mpsc::channel(self.config.async_queue_size);
+        self.async_queue_tx = Some(tx);
+        self.async_queue_rx = Some(Arc::new(RwLock::new(Some(rx))));
+
+        // Start background workers
+        let worker_count = self.config.async_worker_count;
+        let mut worker_handles = Vec::new();
+
+        for worker_id in 0..worker_count {
+            let rx_clone = self.async_queue_rx.as_ref().unwrap().clone();
+            let engine_clone = self.clone_for_worker();
+
+            let handle = tokio::spawn(async move {
+                Self::async_replication_worker(worker_id, rx_clone, engine_clone).await;
+            });
+
+            worker_handles.push(handle);
+        }
+
+        // Store first worker handle (we'll need to manage all of them in production)
+        if let Some(handle) = worker_handles.into_iter().next() {
+            self.background_worker = Some(handle);
+        }
+
+        info!(
+            "Initialized async replication with {} workers and queue size {}",
+            worker_count, self.config.async_queue_size
+        );
+
+        Ok(())
+    }
+
+    /// Clone engine for background worker (without async queue to avoid circular reference)
+    fn clone_for_worker(&self) -> Arc<ReplicationEngine> {
+        Arc::new(ReplicationEngine {
+            raid_manager: self.raid_manager.clone(),
+            event_store: self.event_store.clone(),
+            config: self.config.clone(),
+            replication_metadata: self.replication_metadata.clone(),
+            available_nodes: self.available_nodes.clone(),
+            protocol_clients: self.protocol_clients.clone(),
+            async_queue_tx: None,
+            async_queue_rx: None,
+            background_worker: None,
+        })
+    }
+
+    /// Background worker for async replication
+    async fn async_replication_worker(
+        worker_id: usize,
+        rx: Arc<RwLock<Option<mpsc::Receiver<AsyncReplicationTask>>>>,
+        engine: Arc<ReplicationEngine>,
+    ) {
+        info!("Async replication worker {} started", worker_id);
+
+        loop {
+            let task = {
+                let mut rx_guard = rx.write().await;
+                if let Some(ref mut receiver) = *rx_guard {
+                    match receiver.recv().await {
+                        Some(task) => task,
+                        None => {
+                            debug!("Async replication worker {}: channel closed", worker_id);
+                            break;
+                        }
+                    }
+                } else {
+                    debug!("Async replication worker {}: receiver not available", worker_id);
+                    break;
+                }
+            };
+
+            info!(
+                "Worker {} processing async replication for artifact {} (attempt {}/{})",
+                worker_id, task.artifact_id, task.retry_count + 1, task.max_retries
+            );
+
+            // Update status to InProgress
+            engine
+                .update_metadata(
+                    task.artifact_id.clone(),
+                    ReplicationStatus::InProgress,
+                    task.target_nodes.clone().unwrap_or_default(),
+                )
+                .await;
+
+            // Attempt replication
+            let result = engine
+                .replicate_sync(
+                    task.artifact_id.clone(),
+                    task.artifact_data.clone(),
+                    task.metadata.clone(),
+                    task.replication_factor,
+                    task.target_nodes.clone(),
+                )
+                .await;
+
+            match result {
+                Ok(_) => {
+                    info!(
+                        "Worker {}: Async replication completed for artifact {}",
+                        worker_id, task.artifact_id
+                    );
+                }
+                Err(e) => {
+                    warn!(
+                        "Worker {}: Async replication failed for artifact {}: {}",
+                        worker_id, task.artifact_id, e
+                    );
+
+                    // Max retries reached - mark as failed
+                    if task.retry_count >= task.max_retries {
+                        engine
+                            .update_metadata(
+                                task.artifact_id.clone(),
+                                ReplicationStatus::Failed {
+                                    reason: format!(
+                                        "Max retries ({}) exceeded: {}",
+                                        task.max_retries, e
+                                    ),
+                                },
+                                Vec::new(),
+                            )
+                            .await;
+                    }
+                }
+            }
+        }
+
+        info!("Async replication worker {} stopped", worker_id);
+    }
+
+    /// Replicate an artifact asynchronously
+    ///
+    /// This method queues the replication task and returns immediately.
+    /// The actual replication is performed by background workers.
+    pub async fn replicate_async(
+        &self,
+        artifact_id: String,
+        artifact_data: Vec<u8>,
+        metadata: ArtifactMetadata,
+        replication_factor: u32,
+        target_nodes: Option<Vec<u64>>,
+    ) -> Result<(), AppError> {
+        let tx = self.async_queue_tx.as_ref().ok_or_else(|| {
+            AppError::ConfigError("Async replication not initialized. Call initialize_async_replication() first.".to_string())
+        })?;
+
+        // Initialize replication metadata
+        self.initialize_replication(artifact_id.clone(), replication_factor)
+            .await?;
+
+        // Update status to Queued
+        self.update_metadata(
+            artifact_id.clone(),
+            ReplicationStatus::Queued,
+            target_nodes.clone().unwrap_or_default(),
+        )
+        .await;
+
+        let task = AsyncReplicationTask {
+            artifact_id: artifact_id.clone(),
+            artifact_data,
+            metadata,
+            replication_factor,
+            target_nodes,
+            retry_count: 0,
+            max_retries: self.config.async_retry_attempts,
+        };
+
+        tx.send(task)
+            .await
+            .map_err(|e| AppError::NetworkError(format!("Failed to queue replication task: {}", e)))?;
+
+        info!("Queued async replication for artifact {}", artifact_id);
+        Ok(())
+    }
+
+    /// Shutdown async replication workers
+    pub async fn shutdown_async_replication(&mut self) -> Result<(), AppError> {
+        // Close the sender to signal workers to stop
+        self.async_queue_tx = None;
+
+        // Wait for workers to finish
+        if let Some(handle) = self.background_worker.take() {
+            handle.await.map_err(|e| {
+                AppError::ConfigError(format!("Error waiting for background worker: {:?}", e))
+            })?;
+        }
+
+        info!("Async replication workers shut down");
+        Ok(())
     }
 }
 
