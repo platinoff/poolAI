@@ -8,6 +8,30 @@ use crate::core::error::AppError;
 use std::path::PathBuf;
 
 /// Network isolation configuration
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::vm::NetworkIsolationConfig;
+///
+/// // Basic configuration with loopback only
+/// let config = NetworkIsolationConfig {
+///     enabled: true,
+///     allowed_interfaces: vec![],
+///     allowed_ports: vec![],
+///     allow_loopback: true,
+///     strict: false,
+/// };
+///
+/// // Configuration with specific interfaces and ports
+/// let config = NetworkIsolationConfig {
+///     enabled: true,
+///     allowed_interfaces: vec!["eth0".to_string()],
+///     allowed_ports: vec![80, 443, 8080],
+///     allow_loopback: true,
+///     strict: false,
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct NetworkIsolationConfig {
     /// Whether to enable network isolation
@@ -17,8 +41,15 @@ pub struct NetworkIsolationConfig {
     /// Allowed ports (empty = all blocked)
     pub allowed_ports: Vec<u16>,
     /// Whether to allow loopback
+    ///
+    /// When enabled, automatically sets up loopback interface (`lo`) in the network namespace.
+    /// This is useful for processes that need local communication.
     pub allow_loopback: bool,
     /// Whether to fail if isolation cannot be applied (default: false, graceful degradation)
+    ///
+    /// When `strict = false`, if isolation setup fails (e.g., missing privileges),
+    /// the operation will log a warning and continue (graceful degradation).
+    /// When `strict = true`, any failure will return an error.
     pub strict: bool,
 }
 
@@ -35,19 +66,66 @@ impl Default for NetworkIsolationConfig {
 }
 
 /// Filesystem isolation configuration
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::vm::FilesystemIsolationConfig;
+/// use std::path::PathBuf;
+///
+/// // Basic configuration with chroot
+/// let config = FilesystemIsolationConfig {
+///     enabled: true,
+///     root_dir: Some(PathBuf::from("/tmp/vm-root")),
+///     allowed_paths: vec![],
+///     read_only_paths: vec![],
+///     use_chroot: true,
+///     strict: false,
+/// };
+///
+/// // Configuration with bind mounts
+/// let config = FilesystemIsolationConfig {
+///     enabled: true,
+///     root_dir: None,
+///     allowed_paths: vec![
+///         PathBuf::from("/tmp/allowed-data"),
+///     ],
+///     read_only_paths: vec![
+///         PathBuf::from("/usr/share/data"),
+///     ],
+///     use_chroot: false,
+///     strict: false,
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct FilesystemIsolationConfig {
     /// Whether to enable filesystem isolation
     pub enabled: bool,
     /// Root directory for the VM instance
+    ///
+    /// Required when `use_chroot = true`. Used as the new root directory
+    /// for the process after chroot is applied.
     pub root_dir: Option<PathBuf>,
     /// Allowed paths (empty = all blocked)
+    ///
+    /// These paths will be bind-mounted into the isolated filesystem,
+    /// allowing read-write access to specific directories.
     pub allowed_paths: Vec<PathBuf>,
     /// Read-only paths
+    ///
+    /// These paths will be bind-mounted as read-only into the isolated filesystem,
+    /// allowing read-only access to specific directories.
     pub read_only_paths: Vec<PathBuf>,
     /// Whether to use chroot
+    ///
+    /// When enabled, changes the root directory of the process to `root_dir`.
+    /// Requires `root_dir` to be specified.
     pub use_chroot: bool,
     /// Whether to fail if isolation cannot be applied (default: false, graceful degradation)
+    ///
+    /// When `strict = false`, if isolation setup fails (e.g., missing privileges),
+    /// the operation will log a warning and continue (graceful degradation).
+    /// When `strict = true`, any failure will return an error.
     pub strict: bool,
 }
 

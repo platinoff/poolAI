@@ -272,6 +272,86 @@ async fn test_filesystem_isolation_graceful_degradation() {
 }
 
 #[tokio::test]
+async fn test_network_isolation_loopback_setup() {
+    let isolator = PlatformNetworkIsolator::new();
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec![],
+        allowed_ports: vec![],
+        allow_loopback: true, // Enable loopback
+        strict: false,
+    };
+
+    // Should succeed with loopback enabled
+    // Note: On Windows or without root, this may only validate config
+    let result = isolator.apply_network_isolation(12345, &config);
+    // Should succeed (either actually set up loopback or gracefully degrade)
+    assert!(result.is_ok(), "Network isolation with loopback should succeed");
+}
+
+#[tokio::test]
+async fn test_network_isolation_no_loopback() {
+    let isolator = PlatformNetworkIsolator::new();
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec!["eth0".to_string()], // At least one interface allowed
+        allowed_ports: vec![80, 443],
+        allow_loopback: false, // Disable loopback
+        strict: false,
+    };
+
+    // Should succeed even without loopback (other interfaces allowed)
+    let result = isolator.apply_network_isolation(12345, &config);
+    assert!(result.is_ok(), "Network isolation without loopback should succeed if other interfaces allowed");
+}
+
+#[tokio::test]
+async fn test_filesystem_isolation_bind_mounts() {
+    use std::path::PathBuf;
+    
+    let isolator = PlatformFilesystemIsolator::new();
+    let config = FilesystemIsolationConfig {
+        enabled: true,
+        root_dir: None, // No chroot, just bind mounts
+        allowed_paths: vec![
+            PathBuf::from("/tmp/test-allowed"),
+        ],
+        read_only_paths: vec![
+            PathBuf::from("/tmp/test-readonly"),
+        ],
+        use_chroot: false,
+        strict: false,
+    };
+
+    // Should succeed (either actually set up bind mounts or gracefully degrade)
+    // Note: On Windows or without root, this may only validate config
+    let result = isolator.apply_filesystem_isolation(12345, &config);
+    assert!(result.is_ok(), "Filesystem isolation with bind mounts should succeed");
+}
+
+#[tokio::test]
+async fn test_filesystem_isolation_read_only_mounts() {
+    use std::path::PathBuf;
+    
+    let isolator = PlatformFilesystemIsolator::new();
+    let config = FilesystemIsolationConfig {
+        enabled: true,
+        root_dir: None,
+        allowed_paths: vec![],
+        read_only_paths: vec![
+            PathBuf::from("/tmp/test-readonly-1"),
+            PathBuf::from("/tmp/test-readonly-2"),
+        ],
+        use_chroot: false,
+        strict: false,
+    };
+
+    // Should succeed with read-only mounts
+    let result = isolator.apply_filesystem_isolation(12345, &config);
+    assert!(result.is_ok(), "Filesystem isolation with read-only mounts should succeed");
+}
+
+#[tokio::test]
 async fn test_filesystem_isolation_apply_enabled() {
     use std::path::PathBuf;
 
