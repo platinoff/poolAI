@@ -9,6 +9,7 @@
 pub mod api;
 pub mod auth;
 pub mod raid_distributed_handlers;
+pub mod validation;
 pub mod ws;
 
 use crate::ui;

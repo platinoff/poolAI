@@ -18,6 +18,7 @@ use axum::{
 use serde::Serialize;
 
 use crate::network::raid_distributed_handlers::*;
+use crate::network::validation;
 
 #[derive(Serialize)]
 struct StatusResponse {
@@ -579,12 +580,24 @@ async fn raid_artifact_create_handler(
     use base64::Engine;
     use base64::engine::general_purpose::STANDARD as base64_engine;
 
-    // Validate input
-    if payload.name.trim().is_empty() {
+    // Validate artifact name
+    if let Err(e) = validation::validate_artifact_name(&payload.name) {
         return (
             axum::http::StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
-                "error": "Artifact name cannot be empty"
+                "error": e.to_string()
+            })),
+        )
+            .into_response();
+    }
+
+    // Validate base64 data size (max 100MB)
+    const MAX_ARTIFACT_SIZE: usize = 100 * 1024 * 1024; // 100MB
+    if let Err(e) = validation::validate_base64_data(&payload.data, MAX_ARTIFACT_SIZE) {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": e.to_string()
             })),
         )
             .into_response();
@@ -603,6 +616,17 @@ async fn raid_artifact_create_handler(
                 .into_response();
         }
     };
+
+    // Validate decoded data size
+    if let Err(e) = validation::validate_artifact_data_size(data.len(), MAX_ARTIFACT_SIZE) {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response();
+    }
 
     // Create artifact
     let manager = raid::get_global_manager();
@@ -635,21 +659,19 @@ struct DeleteArtifactResponse {
 async fn raid_artifact_delete_handler(
     axum::extract::Path(artifact_id): axum::extract::Path<String>,
 ) -> impl IntoResponse {
-    use uuid::Uuid;
+    // Validate UUID format
+    if let Err(e) = validation::validate_uuid(&artifact_id) {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response();
+    }
 
     // Parse artifact ID
-    let id = match Uuid::parse_str(&artifact_id) {
-        Ok(u) => u,
-        Err(e) => {
-            return (
-                axum::http::StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({
-                    "error": format!("Invalid artifact ID: {}", e)
-                })),
-            )
-                .into_response();
-        }
-    };
+    let id = uuid::Uuid::parse_str(&artifact_id).unwrap(); // Safe after validation
 
     // Delete artifact
     let manager = raid::get_global_manager();
@@ -1104,12 +1126,12 @@ struct CreateWorkerResponse {
 async fn worker_create_handler(
     axum::extract::Json(payload): axum::extract::Json<CreateWorkerRequest>,
 ) -> impl IntoResponse {
-    // Validate input
-    if payload.worker_id.trim().is_empty() {
+    // Validate worker ID format
+    if let Err(e) = validation::validate_worker_id(&payload.worker_id) {
         return (
             axum::http::StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
-                "error": "Worker ID cannot be empty"
+                "error": e.to_string()
             })),
         )
             .into_response();
@@ -1129,16 +1151,42 @@ async fn worker_create_handler(
         }
     };
 
+    // Prepare worker config values with defaults
+    let max_concurrent_requests = payload.max_concurrent_requests.unwrap_or(10);
+    let request_timeout_ms = payload.request_timeout_ms.unwrap_or(5000);
+    let health_check_interval_ms = payload.health_check_interval_ms.unwrap_or(1000);
+    let cache_size = payload.cache_size.unwrap_or(1000);
+    let max_memory_mb = payload.max_memory_mb.unwrap_or(2048);
+    let cpu_priority = payload.cpu_priority.unwrap_or(5);
+
+    // Validate worker configuration values
+    if let Err(e) = validation::validate_worker_config(
+        max_concurrent_requests,
+        request_timeout_ms,
+        health_check_interval_ms,
+        cache_size,
+        max_memory_mb,
+        cpu_priority,
+    ) {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response();
+    }
+
     // Create worker config
     let worker_config = pool::worker::WorkerConfig {
         worker_id: payload.worker_id.clone(),
-        max_concurrent_requests: payload.max_concurrent_requests.unwrap_or(10),
-        request_timeout_ms: payload.request_timeout_ms.unwrap_or(5000),
-        health_check_interval_ms: payload.health_check_interval_ms.unwrap_or(1000),
+        max_concurrent_requests,
+        request_timeout_ms,
+        health_check_interval_ms,
         enable_caching: payload.enable_caching.unwrap_or(true),
-        cache_size: payload.cache_size.unwrap_or(1000),
-        max_memory_mb: payload.max_memory_mb.unwrap_or(2048),
-        cpu_priority: payload.cpu_priority.unwrap_or(5),
+        cache_size,
+        max_memory_mb,
+        cpu_priority,
         gpu_device: payload.gpu_device,
         auto_restart: payload.auto_restart.unwrap_or(true),
         resource_monitoring: payload.resource_monitoring.unwrap_or(true),
