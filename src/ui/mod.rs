@@ -7,6 +7,9 @@
 mod components;
 pub use components::get_component_styles;
 
+mod themes;
+pub use themes::{get_theme, get_all_themes, Theme, DARK_THEME, LIGHT_THEME, HIGH_CONTRAST_THEME};
+
 use crate::core::error::AppError;
 use axum::{response::Html, routing::get, Router};
 use tracing::info;
@@ -44,50 +47,23 @@ pub fn create_ui_routes() -> Router {
 }
 
 const BASE_CSS: &str = r#"
-  body { font-family: Segoe UI, Arial, sans-serif; background:#0f1216; color:#e8e8e8; margin:0; }
-  a { color:#77c7ff; text-decoration:none; }
-  a:hover { text-decoration:underline; }
-  code { background:#0f1216; padding:2px 6px; border-radius:6px; border:1px solid #262b36; }
+  body { font-family: Segoe UI, Arial, sans-serif; background: var(--bg, #0f1216); color: var(--text, #e8e8e8); margin: 0; }
+  a { color: var(--link, #77c7ff); text-decoration: none; }
+  a:hover { color: var(--link-hover, #8bd5ff); text-decoration: underline; }
+  code { background: var(--bg, #0f1216); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border, #262b36); }
   .wrap { max-width: 1080px; margin: 28px auto; padding: 0 16px; }
-  .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; padding: 14px 16px; border:1px solid #262b36; border-radius:14px; background:#171b22; box-shadow: 0 12px 40px rgba(0,0,0,.20); }
-  .brand { display:flex; align-items:center; gap:12px; }
-  .brand h1 { margin:0; font-size: 18px; color:#67e480; }
-  .brand .muted { color:#a8b0bf; font-size: 0.95em; }
-  .nav { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-  .nav a { padding: 6px 10px; border:1px solid #262b36; border-radius: 10px; background:#0f1216; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--border, #262b36); border-radius: 14px; background: var(--surface, #171b22); box-shadow: 0 12px 40px rgba(0,0,0,.20); }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand h1 { margin: 0; font-size: 18px; color: var(--primary, #67e480); }
+  .brand .muted { color: var(--text-muted, #a8b0bf); font-size: 0.95em; }
+  .nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .nav a { padding: 6px 10px; border: 1px solid var(--border, #262b36); border-radius: 10px; background: var(--bg, #0f1216); }
   .content { margin-top: 14px; }
-  .card { background:#171b22; border:1px solid #262b36; border-radius:14px; padding: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.20); }
-  .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  .item { padding: 12px; border-radius: 12px; border:1px solid #262b36; background:#0f1216; }
-  .muted { color:#a8b0bf; font-size: 0.95em; }
-  .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  pre { white-space: pre-wrap; word-break: break-word; background:#0b0d10; border:1px solid #262b36; border-radius: 12px; padding: 12px; margin: 12px 0 0; }
-  table { width:100%; border-collapse: collapse; margin-top: 12px; }
-  th, td { border:1px solid #262b36; padding: 8px; text-align:left; vertical-align: top; }
-  th { background:#0f1216; color:#cfe3ff; }
-  .pill { display:inline-block; padding: 2px 8px; border-radius: 999px; background:#0f1216; border:1px solid #262b36; color:#a8b0bf; font-size: 0.9em; }
-  .btn { padding: 8px 16px; border:1px solid #262b36; border-radius: 8px; background:#171b22; color:#e8e8e8; cursor:pointer; font-size: 0.95em; }
-  .btn:hover { background:#1e2329; border-color:#44475a; }
-  .btn:disabled { opacity:0.5; cursor:not-allowed; }
-  .btn-primary { background:#50fa7b; color:#0f1216; border-color:#50fa7b; }
-  .btn-primary:hover { background:#67e480; }
-  .btn-danger { background:#ff5555; color:#fff; border-color:#ff5555; }
-  .btn-danger:hover { background:#ff6e6e; }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display:block; margin-bottom: 6px; color:#cfe3ff; font-size: 0.9em; }
-  .form-group input, .form-group select { width:100%; padding: 8px 12px; border:1px solid #262b36; border-radius: 8px; background:#0f1216; color:#e8e8e8; font-size: 0.95em; }
-  .form-group input:focus, .form-group select:focus { outline:none; border-color:#50fa7b; }
-  .modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
-  .modal.active { display:flex; }
-  .modal-content { background:#171b22; border:1px solid #262b36; border-radius:14px; padding:24px; max-width:500px; width:90%; max-height:90vh; overflow-y:auto; }
-  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-  .modal-header h3 { margin:0; color:#67e480; }
-  .modal-close { background:none; border:none; color:#a8b0bf; font-size:24px; cursor:pointer; padding:0; width:30px; height:30px; }
-  .modal-close:hover { color:#e8e8e8; }
-  .modal-footer { display:flex; gap:12px; justify-content:flex-end; margin-top:20px; }
-  .action-buttons { display:flex; gap:8px; flex-wrap:wrap; }
-  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .item { padding: 12px; border-radius: 12px; border: 1px solid var(--border, #262b36); background: var(--bg, #0f1216); }
+  .muted { color: var(--text-muted, #a8b0bf); font-size: 0.9em; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  pre { white-space: pre-wrap; word-break: break-word; background: var(--bg, #0b0d10); border: 1px solid var(--border, #262b36); border-radius: 12px; padding: 12px; margin: 12px 0 0; }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
 "#;
 
@@ -96,6 +72,8 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let nav_auth_link = format!(r#"<a href="{}" id="authLoginBtn">Login</a>"#, auth_url);
     let user_info_html = "<div class=\"user-info\" id=\"userInfo\" style=\"display:none;\">\n          <span class=\"role\" id=\"userRole\"></span>\n          <a href=\"#\" id=\"logoutBtn\">Logout</a>\n        </div>";
     let component_styles = get_component_styles();
+    let theme = DARK_THEME; // Default theme
+    let theme_css = theme.to_css();
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -104,7 +82,8 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <style>{base_css}
-{component_css}</style>
+{component_css}
+{theme_css}</style>
 </head>
 <body>
   <div class="wrap">
@@ -124,6 +103,11 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         <a href="/ui/libs">Libs</a>
         <a href="/ui/vm">VM</a>
         <a href="/ui/raid">RAID</a>
+        <select id="themeSelector" style="padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.9em; cursor: pointer;" title="Select theme">
+          <option value="dark">🌙 Dark</option>
+          <option value="light">☀️ Light</option>
+          <option value="high-contrast">🔆 High Contrast</option>
+        </select>
         {user_info_html}
         {nav_auth_link}
       </div>
@@ -805,7 +789,70 @@ if (document.readyState === 'loading') {
   }
 }
 
-// Setup logout link
+// Theme management
+function getTheme() {
+  return localStorage.getItem('poolai_theme') || 'dark';
+}
+
+function setTheme(themeName) {
+  localStorage.setItem('poolai_theme', themeName);
+  applyTheme(themeName);
+}
+
+function applyTheme(themeName) {
+  const themes = {
+    dark: {
+      bg: '#0f1216', surface: '#171b22', surfaceSecondary: '#0f1216',
+      text: '#e8e8e8', textMuted: '#a8b0bf', border: '#262b36',
+      primary: '#50fa7b', primaryHover: '#67e480',
+      danger: '#ff5555', dangerHover: '#ff6e6e',
+      secondary: '#6272a4', secondaryHover: '#7a8bc4',
+      success: '#50fa7b', warning: '#f1fa8c', info: '#8be9fd',
+      link: '#77c7ff', linkHover: '#8bd5ff'
+    },
+    light: {
+      bg: '#ffffff', surface: '#f5f5f5', surfaceSecondary: '#e8e8e8',
+      text: '#1a1a1a', textMuted: '#666666', border: '#d0d0d0',
+      primary: '#00a86b', primaryHover: '#00c47a',
+      danger: '#dc3545', dangerHover: '#c82333',
+      secondary: '#6c757d', secondaryHover: '#5a6268',
+      success: '#28a745', warning: '#ffc107', info: '#17a2b8',
+      link: '#007bff', linkHover: '#0056b3'
+    },
+    'high-contrast': {
+      bg: '#000000', surface: '#1a1a1a', surfaceSecondary: '#000000',
+      text: '#ffffff', textMuted: '#cccccc', border: '#ffffff',
+      primary: '#00ff00', primaryHover: '#00cc00',
+      danger: '#ff0000', dangerHover: '#cc0000',
+      secondary: '#ffff00', secondaryHover: '#cccc00',
+      success: '#00ff00', warning: '#ffff00', info: '#00ffff',
+      link: '#00aaff', linkHover: '#0088cc'
+    }
+  };
+  
+  const theme = themes[themeName] || themes.dark;
+  const root = document.documentElement;
+  
+  root.style.setProperty('--bg', theme.bg);
+  root.style.setProperty('--surface', theme.surface);
+  root.style.setProperty('--surface-secondary', theme.surfaceSecondary);
+  root.style.setProperty('--text', theme.text);
+  root.style.setProperty('--text-muted', theme.textMuted);
+  root.style.setProperty('--border', theme.border);
+  root.style.setProperty('--primary', theme.primary);
+  root.style.setProperty('--primary-hover', theme.primaryHover);
+  root.style.setProperty('--danger', theme.danger);
+  root.style.setProperty('--danger-hover', theme.dangerHover);
+  root.style.setProperty('--secondary', theme.secondary);
+  root.style.setProperty('--secondary-hover', theme.secondaryHover);
+  root.style.setProperty('--success', theme.success);
+  root.style.setProperty('--warning', theme.warning);
+  root.style.setProperty('--info', theme.info);
+  root.style.setProperty('--link', theme.link);
+  root.style.setProperty('--link-hover', theme.linkHover);
+}
+
+// Setup logout link and theme selector
 document.addEventListener('DOMContentLoaded', function() {
   const logoutLink = document.getElementById('logoutBtn');
   if (logoutLink) {
@@ -814,6 +861,19 @@ document.addEventListener('DOMContentLoaded', function() {
       removeToken();
       updateUI();
       window.location.href = '/ui/auth';
+    });
+  }
+  
+  // Setup theme selector
+  const themeSelector = document.getElementById('themeSelector');
+  if (themeSelector) {
+    const currentTheme = getTheme();
+    themeSelector.value = currentTheme;
+    applyTheme(currentTheme);
+    
+    themeSelector.addEventListener('change', function(e) {
+      const newTheme = e.target.value;
+      setTheme(newTheme);
     });
   }
 });

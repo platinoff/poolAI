@@ -328,8 +328,8 @@
 
 ---
 
-### 13. UI Module (`src/ui/`) — ✅ ~90% COMPLETED
-**Файли**: 2 (mod.rs, components.rs)
+### 13. UI Module (`src/ui/`) — ✅ ~95% COMPLETED
+**Файли**: 3 (mod.rs, components.rs, themes.rs)
 
 **Реалізовано**:
 - ✅ Read-only dashboard pages (mounted at `/ui`)
@@ -367,6 +367,15 @@
   - ✅ Badge/Pill components (success, error, warning, info)
   - ✅ Table components with hover effects
   - ✅ Notification components with animations
+- ✅ **Theme Customization** — **COMPLETED** 🎉
+  - ✅ Theme system with CSS variables (`ui/themes.rs`)
+  - ✅ Dark theme (default, Dracula-inspired)
+  - ✅ Light theme
+  - ✅ High contrast theme (accessibility)
+  - ✅ Theme switcher dropdown in navigation
+  - ✅ Theme persistence in localStorage
+  - ✅ Dynamic theme application via JavaScript
+  - ✅ All components use CSS variables for theming
 
 **Особливості**:
 - ✅ Dark theme (Dracula-inspired)
@@ -382,7 +391,14 @@
   - ✅ Reusable component styles (buttons, cards, forms, modals, badges, tables, notifications)
   - ✅ Modular CSS organization
   - ✅ Consistent styling across all pages
-- 🔄 Themes/layouts customization (planned)
+- ✅ **Theme Customization** — **COMPLETED** 🎉
+  - ✅ Theme system with CSS variables
+  - ✅ Dark theme (default, Dracula-inspired)
+  - ✅ Light theme
+  - ✅ High contrast theme (accessibility)
+  - ✅ Theme switcher UI component
+  - ✅ Theme persistence in localStorage
+  - ✅ Dynamic theme application via JavaScript
 
 **Git Branches**:
 - `stage3/ui-readonly-runtime-hardening` ✅
