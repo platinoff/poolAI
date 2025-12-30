@@ -86,6 +86,17 @@ hex = "0.4"
 async-raft = { version = "0.6.1", optional = true }
 anyhow = { version = "1.0", optional = true }
 
+# VM Isolation - Linux system calls (optional - enabled with feature "vm-isolation-linux")
+# Use: cargo build --features vm-isolation-linux
+# Note: Requires root privileges or CAP_NET_ADMIN, CAP_SYS_ADMIN
+nix = { version = "0.27", optional = true }
+
+# VM Isolation - Windows API (optional - enabled with feature "vm-isolation-windows")
+# Use: cargo build --features vm-isolation-windows
+# Note: Requires administrator privileges
+# Note: Windows isolation implementation is planned but not yet implemented
+# windows-sys = { version = "0.52", optional = true, features = ["Win32_Foundation", "Win32_System_JobObjects", "Win32_System_Threading"] }
+
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
 # [target.'cfg(windows)'.dependencies]
@@ -116,5 +127,15 @@ https = ["axum-server"]
 # Raft consensus for distributed RAID (optional)
 # Use: cargo build --features raft
 raft = ["async-raft", "anyhow"]
+# VM Isolation - Linux (requires root or CAP_NET_ADMIN, CAP_SYS_ADMIN)
+# Use: cargo build --features vm-isolation-linux
+vm-isolation-linux = ["nix"]
+# VM Isolation - Windows (requires administrator privileges)
+# Use: cargo build --features vm-isolation-windows
+# Note: Windows isolation implementation is planned but not yet implemented
+# vm-isolation-windows = ["windows-sys"]
+# Full VM isolation (platform-specific)
+# Note: Windows isolation is planned but not yet implemented
+vm-isolation = ["vm-isolation-linux"]
 # Full security features (when both jwt and https are available)
 # security = ["jwt", "https"]

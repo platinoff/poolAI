@@ -37,15 +37,25 @@ This document describes the approach and implementation plan for full VM isolati
 - Provides clear error messages
 - Prepares foundation for full implementation
 
-### Phase 2: System Call Implementation 🔄 PENDING
+### Phase 2: System Call Implementation ✅ PARTIALLY COMPLETED
 
-**Status**: 🔄 Pending
+**Status**: ✅ Linux implementation started, Windows pending
 
 **Requirements**:
-- `nix` crate for Linux system calls
-- `winapi` crate for Windows API calls
+- ✅ `nix` crate for Linux system calls (optional feature `vm-isolation-linux`)
+- 🔄 Windows API calls (planned, not yet implemented)
 - Root/administrator privileges
 - Complex error handling
+
+**Implementation**:
+- ✅ Added optional feature `vm-isolation-linux` for Linux system calls
+- ✅ Implemented network namespace creation using `unshare(CLONE_NEWNET)`
+- ✅ Implemented mount namespace creation using `unshare(CLONE_NEWNS)`
+- ✅ Implemented chroot using `nix::unistd::chroot`
+- 🔄 Network interface configuration (planned)
+- 🔄 Firewall rules setup (planned)
+- 🔄 Bind mounts setup (planned)
+- 🔄 Windows AppContainer implementation (planned)
 
 **Linux Implementation**:
 
@@ -121,14 +131,21 @@ use winapi::um::appmodel::CreateAppContainerProfile;
 #### Linux
 ```toml
 [dependencies]
-nix = "0.27"  # For system calls (unshare, chroot, mount, setns)
+nix = { version = "0.27", optional = true }
+```
+
+Build with feature:
+```bash
+cargo build --features vm-isolation-linux
 ```
 
 #### Windows
 ```toml
-[dependencies]
-winapi = { version = "0.3", features = ["winbase", "appmodel", "netfw"] }
+# Planned but not yet implemented
+# windows-sys = { version = "0.52", optional = true, features = [...] }
 ```
+
+**Note**: Windows isolation implementation is planned but not yet implemented.
 
 ### Privilege Requirements
 

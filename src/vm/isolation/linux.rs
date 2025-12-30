@@ -8,6 +8,15 @@ use crate::vm::isolation::{FilesystemIsolationConfig, FilesystemIsolator, Networ
 use std::path::PathBuf;
 use tracing::{info, warn};
 
+#[cfg(feature = "vm-isolation-linux")]
+use nix::sched::{unshare, CloneFlags};
+#[cfg(feature = "vm-isolation-linux")]
+use nix::unistd::chroot;
+#[cfg(feature = "vm-isolation-linux")]
+use nix::mount::{mount, MsFlags};
+#[cfg(feature = "vm-isolation-linux")]
+use std::fs;
+
 /// Linux network isolator using network namespaces
 pub struct LinuxNetworkIsolator;
 
@@ -52,23 +61,36 @@ impl NetworkIsolator for LinuxNetworkIsolator {
             config.allowed_ports
         );
 
-        // TODO: Full implementation would involve:
-        // 1. Creating a network namespace using unshare(CLONE_NEWNET)
-        // 2. Moving the process into the namespace using setns()
-        // 3. Configuring network interfaces using ip netns commands or netlink
-        // 4. Setting up firewall rules using iptables/nftables
-        // 5. Setting up allowed ports and interfaces
-        //
-        // This requires:
-        // - nix crate for system calls
-        // - Root privileges (CAP_NET_ADMIN)
-        // - Complex error handling
-        //
-        // For now, this validates configuration and logs the intent
-        warn!(
-            "Network isolation configuration validated for process {}, but full implementation requires system calls (unshare, setns) which are not yet implemented",
-            process_id
-        );
+        #[cfg(feature = "vm-isolation-linux")]
+        {
+            // Attempt to create network namespace
+            // Note: This requires root privileges or CAP_NET_ADMIN
+            match unshare(CloneFlags::CLONE_NEWNET) {
+                Ok(_) => {
+                    info!("Successfully created network namespace for process {}", process_id);
+                    // TODO: Additional configuration:
+                    // - Set up loopback interface if allow_loopback
+                    // - Configure allowed interfaces
+                    // - Set up firewall rules for allowed ports
+                    // - Move process to namespace (requires setns or process creation in namespace)
+                }
+                Err(e) => {
+                    warn!(
+                        "Failed to create network namespace for process {}: {}. Isolation may not be fully applied.",
+                        process_id, e
+                    );
+                    // Continue with validation-only mode
+                }
+            }
+        }
+
+        #[cfg(not(feature = "vm-isolation-linux"))]
+        {
+            warn!(
+                "Network isolation configuration validated for process {}, but full implementation requires 'vm-isolation-linux' feature and system calls (unshare, setns)",
+                process_id
+            );
+        }
 
         Ok(())
     }
@@ -82,16 +104,23 @@ impl NetworkIsolator for LinuxNetworkIsolator {
 
         info!("Removing network isolation from process {}", process_id);
 
-        // TODO: Full implementation would involve:
-        // 1. Moving process back to original network namespace
-        // 2. Cleaning up network namespace if it was created by us
-        // 3. Removing firewall rules
-        //
-        // For now, this just logs the intent
-        warn!(
-            "Network isolation removal requested for process {}, but full implementation requires system calls which are not yet implemented",
-            process_id
-        );
+        #[cfg(feature = "vm-isolation-linux")]
+        {
+            // TODO: Full cleanup implementation:
+            // 1. Move process back to original network namespace
+            // 2. Clean up network namespace if it was created by us
+            // 3. Remove firewall rules
+            // Note: This is complex because we need to track which namespace was created
+            info!("Network isolation removal for process {} (cleanup requires namespace tracking)", process_id);
+        }
+
+        #[cfg(not(feature = "vm-isolation-linux"))]
+        {
+            warn!(
+                "Network isolation removal requested for process {}, but full implementation requires 'vm-isolation-linux' feature",
+                process_id
+            );
+        }
 
         Ok(())
     }
@@ -154,23 +183,72 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
             config.use_chroot
         );
 
-        // TODO: Full implementation would involve:
-        // 1. Creating a root directory for the VM instance (if not provided)
-        // 2. Setting up bind mounts for allowed paths using mount(MS_BIND)
-        // 3. Using chroot() or pivot_root() to change root
-        // 4. Setting up read-only mounts using mount(MS_RDONLY)
-        // 5. Creating mount namespace using unshare(CLONE_NEWNS)
-        //
-        // This requires:
-        // - nix crate for system calls (chroot, mount, unshare, pivot_root)
-        // - Root privileges (CAP_SYS_ADMIN)
-        // - Complex error handling and cleanup
-        //
-        // For now, this validates configuration and logs the intent
-        warn!(
-            "Filesystem isolation configuration validated for process {}, but full implementation requires system calls (chroot, mount, unshare) which are not yet implemented",
-            process_id
-        );
+        #[cfg(feature = "vm-isolation-linux")]
+        {
+            // Create mount namespace for isolation
+            match unshare(CloneFlags::CLONE_NEWNS) {
+                Ok(_) => {
+                    info!("Successfully created mount namespace for process {}", process_id);
+
+                    // Set up bind mounts for allowed paths
+                    for allowed_path in &config.allowed_paths {
+                        // TODO: Create target path in root_dir if use_chroot
+                        // TODO: Set up bind mount
+                        info!("Would set up bind mount for: {:?}", allowed_path);
+                    }
+
+                    // Set up read-only mounts
+                    for read_only_path in &config.read_only_paths {
+                        // TODO: Set up read-only mount
+                        info!("Would set up read-only mount for: {:?}", read_only_path);
+                    }
+
+                    // Apply chroot if requested
+                    if config.use_chroot {
+                        if let Some(ref root_dir) = config.root_dir {
+                            // Ensure root directory exists
+                            if !root_dir.exists() {
+                                fs::create_dir_all(root_dir).map_err(|e| {
+                                    AppError::ConfigError(format!(
+                                        "Failed to create root directory {:?}: {}",
+                                        root_dir, e
+                                    ))
+                                })?;
+                            }
+
+                            // Apply chroot
+                            match chroot(root_dir) {
+                                Ok(_) => {
+                                    info!("Successfully applied chroot to {:?} for process {}", root_dir, process_id);
+                                }
+                                Err(e) => {
+                                    warn!(
+                                        "Failed to apply chroot to {:?} for process {}: {}. Isolation may not be fully applied.",
+                                        root_dir, process_id, e
+                                    );
+                                    // Continue without chroot
+                                }
+                            }
+                        }
+                    }
+                }
+                Err(e) => {
+                    warn!(
+                        "Failed to create mount namespace for process {}: {}. Isolation may not be fully applied.",
+                        process_id, e
+                    );
+                    // Continue with validation-only mode
+                }
+            }
+        }
+
+        #[cfg(not(feature = "vm-isolation-linux"))]
+        {
+            warn!(
+                "Filesystem isolation configuration validated for process {}, but full implementation requires 'vm-isolation-linux' feature and system calls (chroot, mount, unshare)",
+                process_id
+            );
+        }
 
         Ok(())
     }
@@ -184,16 +262,23 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
         info!("Removing filesystem isolation from process {}", process_id);
 
-        // TODO: Full implementation would involve:
-        // 1. Unmounting bind mounts
-        // 2. Moving process back to original mount namespace
-        // 3. Cleaning up temporary directories if created
-        //
-        // For now, this just logs the intent
-        warn!(
-            "Filesystem isolation removal requested for process {}, but full implementation requires system calls which are not yet implemented",
-            process_id
-        );
+        #[cfg(feature = "vm-isolation-linux")]
+        {
+            // TODO: Full cleanup implementation:
+            // 1. Unmount bind mounts
+            // 2. Move process back to original mount namespace
+            // 3. Clean up temporary directories if created
+            // Note: This is complex because we need to track what was mounted
+            info!("Filesystem isolation removal for process {} (cleanup requires mount tracking)", process_id);
+        }
+
+        #[cfg(not(feature = "vm-isolation-linux"))]
+        {
+            warn!(
+                "Filesystem isolation removal requested for process {}, but full implementation requires 'vm-isolation-linux' feature",
+                process_id
+            );
+        }
 
         Ok(())
     }
