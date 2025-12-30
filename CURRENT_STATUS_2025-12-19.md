@@ -9,7 +9,7 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок та warnings  
-**Статус тестів**: ✅ **170+ tests passing** (6 unit + 164+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 14 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
+**Статус тестів**: ✅ **172+ tests passing** (6 unit + 166+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 18 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
 **Останній коміт**: Production Deployment Preparation Complete - All documentation guides finished (Deployment, Configuration, Monitoring, Performance, Security, Troubleshooting, Migration)
 
 ---
@@ -266,7 +266,10 @@
   - ✅ `apply_isolation()` method для process isolation
   - ✅ `remove_isolation()` method для cleanup
   - ✅ Support detection methods (`is_network_isolation_supported`, `is_filesystem_isolation_supported`)
-  - ✅ Integration tests (14 tests для isolation module)
+  - ✅ Integration tests (18 tests для isolation module, including validation tests)
+  - ✅ Configuration validation (network, filesystem isolation configs)
+  - ✅ Process ID validation
+  - ✅ Error handling improvements
 - ✅ **Auto-Recovery Enhancements** — **ЗАВЕРШЕНО (Week 9)** 🎉
   - ✅ AutoRecoveryConfig struct з налаштуваннями (max_restart_attempts, delays, exponential backoff)
   - ✅ Exponential backoff для restart delay

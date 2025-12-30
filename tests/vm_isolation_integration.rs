@@ -167,6 +167,69 @@ async fn test_network_isolation_apply_enabled() {
 }
 
 #[tokio::test]
+async fn test_network_isolation_apply_invalid_config() {
+    let isolator = PlatformNetworkIsolator::new();
+    // Config that would block all network access
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec![],
+        allowed_ports: vec![],
+        allow_loopback: false,
+    };
+
+    // Should fail validation
+    let result = isolator.apply_network_isolation(12345, &config);
+    assert!(result.is_err(), "Network isolation with blocking config should fail validation");
+}
+
+#[tokio::test]
+async fn test_network_isolation_apply_invalid_process_id() {
+    let isolator = PlatformNetworkIsolator::new();
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec!["eth0".to_string()],
+        allowed_ports: vec![80, 443],
+        allow_loopback: true,
+    };
+
+    // Should fail with invalid process ID
+    let result = isolator.apply_network_isolation(0, &config);
+    assert!(result.is_err(), "Network isolation with process ID 0 should fail");
+}
+
+#[tokio::test]
+async fn test_filesystem_isolation_apply_invalid_process_id() {
+    let isolator = PlatformFilesystemIsolator::new();
+    let config = FilesystemIsolationConfig {
+        enabled: true,
+        root_dir: Some(std::path::PathBuf::from("/tmp/vm-root")),
+        allowed_paths: vec![],
+        read_only_paths: vec![],
+        use_chroot: true,
+    };
+
+    // Should fail with invalid process ID
+    let result = isolator.apply_filesystem_isolation(0, &config);
+    assert!(result.is_err(), "Filesystem isolation with process ID 0 should fail");
+}
+
+#[tokio::test]
+async fn test_filesystem_isolation_apply_chroot_without_root_dir() {
+    let isolator = PlatformFilesystemIsolator::new();
+    let config = FilesystemIsolationConfig {
+        enabled: true,
+        root_dir: None,
+        allowed_paths: vec![],
+        read_only_paths: vec![],
+        use_chroot: true,  // Requires root_dir
+    };
+
+    // Should fail validation
+    let result = isolator.apply_filesystem_isolation(12345, &config);
+    assert!(result.is_err(), "Filesystem isolation with use_chroot but no root_dir should fail");
+}
+
+#[tokio::test]
 async fn test_filesystem_isolation_apply_enabled() {
     use std::path::PathBuf;
 
