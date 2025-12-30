@@ -324,7 +324,7 @@ async fn vm_instance_update_handler(
     };
 
     match manager
-        .update_instance(uuid, payload.name, payload.resources, payload.isolation)
+        .update_instance(uuid, payload.name, payload.resources, payload.isolation, None)
         .await
     {
         Ok(instance) => Json(instance).into_response(),

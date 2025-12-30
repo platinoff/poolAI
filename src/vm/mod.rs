@@ -61,6 +61,30 @@ pub enum VmIsolation {
     HardwareVm,
 }
 
+/// Auto-recovery configuration for VM instances
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AutoRecoveryConfig {
+    /// Maximum number of restart attempts before giving up
+    pub max_restart_attempts: u32,
+    /// Initial delay before first restart (in seconds)
+    pub initial_restart_delay_secs: u64,
+    /// Maximum delay between restarts (in seconds)
+    pub max_restart_delay_secs: u64,
+    /// Whether to use exponential backoff
+    pub use_exponential_backoff: bool,
+}
+
+impl Default for AutoRecoveryConfig {
+    fn default() -> Self {
+        Self {
+            max_restart_attempts: 5,
+            initial_restart_delay_secs: 1,
+            max_restart_delay_secs: 60,
+            use_exponential_backoff: true,
+        }
+    }
+}
+
 /// A VM instance representation (in-memory for now).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VmInstance {
@@ -70,6 +94,11 @@ pub struct VmInstance {
     pub status: VmStatus,
     pub resources: VmResources,
     pub isolation: VmIsolation,
+    /// Auto-recovery configuration
+    pub auto_recovery: AutoRecoveryConfig,
+    /// Number of restart attempts (internal tracking)
+    #[serde(skip)]
+    pub restart_attempts: u32,
 }
 
 /// VM Manager - central orchestrator for VM instances.
@@ -179,50 +208,98 @@ impl VmManager {
 
                         // Auto-restart if configured and failure count reached threshold
                         if auto_restart && failure_count >= max_failures {
-                            warn!(
-                                "Auto-restarting VM instance {} ({}) after {} failures",
-                                id, name, failure_count
-                            );
-
-                            // Restart the instance
-                            let instances_clone = Arc::clone(&instances);
-                            let health_monitor_clone = Arc::clone(&health_monitor);
-
-                            // Stop the instance first
-                            {
-                                let mut insts = instances_clone.write().await;
+                            // Check restart attempts and auto-recovery config
+                            let (should_restart, restart_delay, restart_attempts) = {
+                                let mut insts = instances.write().await;
                                 if let Some(inst) = insts.get_mut(&id) {
-                                    inst.status = VmStatus::Stopped;
+                                    let restart_attempts = inst.restart_attempts;
+                                    let config = &inst.auto_recovery;
+
+                                    // Check if we've exceeded max restart attempts
+                                    if restart_attempts >= config.max_restart_attempts {
+                                        warn!(
+                                            "VM instance {} ({}) exceeded max restart attempts ({}), marking as failed",
+                                            id, name, config.max_restart_attempts
+                                        );
+                                        inst.status = VmStatus::Failed(format!(
+                                            "Exceeded max restart attempts ({})",
+                                            config.max_restart_attempts
+                                        ));
+                                        (false, 0, restart_attempts)
+                                    } else {
+                                        // Calculate restart delay with exponential backoff
+                                        let delay = if config.use_exponential_backoff {
+                                            let delay = config.initial_restart_delay_secs
+                                                * (1u64 << restart_attempts.min(10)); // Cap at 2^10 = 1024
+                                            delay.min(config.max_restart_delay_secs)
+                                        } else {
+                                            config.initial_restart_delay_secs
+                                        };
+
+                                        inst.restart_attempts += 1;
+                                        (true, delay, inst.restart_attempts)
+                                    }
+                                } else {
+                                    (false, 0, 0)
                                 }
-                            }
+                            };
 
-                            // Unregister health check
-                            {
-                                let hm = health_monitor_clone.write().await;
-                                hm.unregister_check(id).await;
-                            }
+                            if should_restart {
+                                warn!(
+                                    "Auto-restarting VM instance {} ({}) after {} failures (attempt {}/{})",
+                                    id, name, failure_count, restart_attempts,
+                                    {
+                                        let insts = instances.read().await;
+                                        insts.get(&id)
+                                            .map(|inst| inst.auto_recovery.max_restart_attempts)
+                                            .unwrap_or(5)
+                                    }
+                                );
 
-                            // Wait a bit before restarting
-                            tokio::time::sleep(Duration::from_secs(1)).await;
+                                // Restart the instance
+                                let instances_clone = Arc::clone(&instances);
+                                let health_monitor_clone = Arc::clone(&health_monitor);
 
-                            // Restart the instance
-                            {
-                                let mut insts = instances_clone.write().await;
-                                if let Some(inst) = insts.get_mut(&id) {
-                                    inst.status = VmStatus::Running;
+                                // Stop the instance first
+                                {
+                                    let mut insts = instances_clone.write().await;
+                                    if let Some(inst) = insts.get_mut(&id) {
+                                        inst.status = VmStatus::Stopped;
+                                    }
                                 }
-                            }
 
-                            // Re-register health check with reset failure count
-                            {
-                                let hm = health_monitor_clone.write().await;
-                                hm.register_check(id, name.clone()).await;
-                            }
+                                // Unregister health check
+                                {
+                                    let hm = health_monitor_clone.write().await;
+                                    hm.unregister_check(id).await;
+                                }
 
-                            info!(
-                                "VM instance {} ({}) restarted after health check failure",
-                                id, name
-                            );
+                                // Wait with exponential backoff before restarting
+                                info!(
+                                    "Waiting {} seconds before restarting VM instance {} ({})",
+                                    restart_delay, id, name
+                                );
+                                tokio::time::sleep(Duration::from_secs(restart_delay)).await;
+
+                                // Restart the instance
+                                {
+                                    let mut insts = instances_clone.write().await;
+                                    if let Some(inst) = insts.get_mut(&id) {
+                                        inst.status = VmStatus::Running;
+                                    }
+                                }
+
+                                // Re-register health check with reset failure count
+                                {
+                                    let hm = health_monitor_clone.write().await;
+                                    hm.register_check(id, name.clone()).await;
+                                }
+
+                                info!(
+                                    "VM instance {} ({}) restarted after health check failure (attempt {})",
+                                    id, name, restart_attempts
+                                );
+                            }
                         } else if failure_count >= max_failures {
                             // Mark as failed if auto-restart is disabled
                             let mut insts = instances.write().await;
@@ -274,6 +351,8 @@ impl VmManager {
             status: VmStatus::Creating,
             resources,
             isolation,
+            auto_recovery: AutoRecoveryConfig::default(),
+            restart_attempts: 0,
         };
 
         self.instances.write().await.insert(id, instance.clone());
@@ -287,6 +366,7 @@ impl VmManager {
         name: Option<String>,
         resources: Option<VmResources>,
         isolation: Option<VmIsolation>,
+        auto_recovery: Option<AutoRecoveryConfig>,
     ) -> Result<VmInstance, AppError> {
         let mut instances = self.instances.write().await;
         let inst = instances
@@ -301,6 +381,11 @@ impl VmManager {
         }
         if let Some(new_isolation) = isolation {
             inst.isolation = new_isolation;
+        }
+        if let Some(new_auto_recovery) = auto_recovery {
+            inst.auto_recovery = new_auto_recovery;
+            // Reset restart attempts when auto-recovery config changes
+            inst.restart_attempts = 0;
         }
 
         let updated = inst.clone();
@@ -348,6 +433,8 @@ impl VmManager {
             })?;
 
             inst.status = VmStatus::Running;
+            // Reset restart attempts on successful start
+            inst.restart_attempts = 0;
             inst.name.clone()
         };
 
@@ -554,13 +641,18 @@ impl VmManager {
     }
 
     /// Restart a VM instance (stop and start)
+    ///
+    /// This is a manual restart, which resets the restart attempts counter.
     pub async fn restart_instance(&self, id: Uuid) -> Result<(), AppError> {
         let name = {
-            let instances = self.instances.read().await;
-            instances
-                .get(&id)
-                .map(|inst| inst.name.clone())
-                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?
+            let mut instances = self.instances.write().await;
+            let inst = instances
+                .get_mut(&id)
+                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            
+            // Reset restart attempts on manual restart
+            inst.restart_attempts = 0;
+            inst.name.clone()
         };
 
         info!("Restarting VM instance {} ({})", id, name);
@@ -575,6 +667,35 @@ impl VmManager {
         self.start_instance(id).await?;
 
         info!("VM instance {} ({}) restarted successfully", id, name);
+        Ok(())
+    }
+
+    /// Get auto-recovery configuration for a VM instance
+    pub async fn get_auto_recovery_config(&self, id: Uuid) -> Result<AutoRecoveryConfig, AppError> {
+        let instances = self.instances.read().await;
+        let inst = instances
+            .get(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+        Ok(inst.auto_recovery.clone())
+    }
+
+    /// Get restart attempts count for a VM instance
+    pub async fn get_restart_attempts(&self, id: Uuid) -> Result<u32, AppError> {
+        let instances = self.instances.read().await;
+        let inst = instances
+            .get(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+        Ok(inst.restart_attempts)
+    }
+
+    /// Reset restart attempts for a VM instance
+    pub async fn reset_restart_attempts(&self, id: Uuid) -> Result<(), AppError> {
+        let mut instances = self.instances.write().await;
+        let inst = instances
+            .get_mut(&id)
+            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+        inst.restart_attempts = 0;
+        info!("Reset restart attempts for VM instance {}", id);
         Ok(())
     }
 }

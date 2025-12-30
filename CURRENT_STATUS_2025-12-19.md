@@ -9,8 +9,8 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок та warnings  
-**Статус тестів**: ✅ **150+ tests passing** (6 unit + 144+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 14 VM isolation integration)  
-**Останній коміт**: VM Isolation Integration Tests Complete - 14 isolation tests passing, VmManager integration complete
+**Статус тестів**: ✅ **159+ tests passing** (6 unit + 153+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 14 VM isolation integration + 9 VM auto-recovery)  
+**Останній коміт**: VM Auto-Recovery Enhancements Complete - exponential backoff, max restart attempts, configurable delays, 9 tests passing
 
 ---
 
@@ -267,7 +267,13 @@
   - ✅ `remove_isolation()` method для cleanup
   - ✅ Support detection methods (`is_network_isolation_supported`, `is_filesystem_isolation_supported`)
   - ✅ Integration tests (14 tests для isolation module)
-- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health + 8 для write operations + 14 для isolation = 54 tests)
+- ✅ **Auto-Recovery Enhancements** — **ЗАВЕРШЕНО (Week 9)** 🎉
+  - ✅ AutoRecoveryConfig struct з налаштуваннями (max_restart_attempts, delays, exponential backoff)
+  - ✅ Exponential backoff для restart delay
+  - ✅ Max restart attempts enforcement
+  - ✅ Restart attempts tracking та reset
+  - ✅ Integration tests (9 tests для auto-recovery)
+- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health + 8 для write operations + 14 для isolation + 9 для auto-recovery = 63 tests)
 
 **API Endpoints**:
 - ✅ `GET /api/v1/vm/instances` - список instances

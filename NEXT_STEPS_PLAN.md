@@ -84,9 +84,14 @@
    - ✅ `apply_isolation()` method для process isolation
    - ✅ `remove_isolation()` method для cleanup
    - ✅ Support detection methods
-4. 🔄 Full isolation implementation (network namespaces, chroot, AppContainers)
-5. Resource monitoring enhancements
-6. Auto-recovery mechanisms improvements
+4. ✅ **Auto-Recovery Enhancements** — **ЗАВЕРШЕНО** 🎉
+   - ✅ AutoRecoveryConfig struct з налаштуваннями
+   - ✅ Exponential backoff для restart delay
+   - ✅ Max restart attempts enforcement
+   - ✅ Restart attempts tracking та reset
+   - ✅ Integration tests (9 tests passing)
+5. 🔄 Full isolation implementation (network namespaces, chroot, AppContainers)
+6. Resource monitoring enhancements
 
 **Файли**:
 - ✅ `src/vm/isolation.rs` (створено)
