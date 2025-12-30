@@ -136,6 +136,14 @@ pub fn create_api_routes() -> Router {
         )
         .route("/raid/nodes", get(raid_nodes_handler))
         .route("/raid/artifacts", get(raid_artifacts_handler))
+        .route(
+            "/raid/artifacts",
+            post(raid_artifact_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/raid/artifacts/:id",
+            delete(raid_artifact_delete_handler).layer(middleware::from_fn(auth_middleware)),
+        )
         .route("/raid/quota", get(raid_quota_handler))
         .route("/raid/events", get(raid_events_handler))
         .route("/raid/events/:artifact_id", get(raid_events_for_artifact_handler))
@@ -540,6 +548,118 @@ async fn raid_artifacts_handler() -> impl IntoResponse {
     let manager = raid::get_global_manager();
     let artifacts = manager.list_artifacts().await;
     Json(artifacts)
+}
+
+#[derive(serde::Deserialize)]
+struct CreateArtifactRequest {
+    name: String,
+    data: String, // base64-encoded data
+}
+
+#[derive(serde::Serialize)]
+struct CreateArtifactResponse {
+    artifact_id: String,
+    name: String,
+    stored_at: String,
+    message: String,
+}
+
+async fn raid_artifact_create_handler(
+    axum::extract::Json(payload): axum::extract::Json<CreateArtifactRequest>,
+) -> impl IntoResponse {
+    use base64::Engine;
+    use base64::engine::general_purpose::STANDARD as base64_engine;
+
+    // Validate input
+    if payload.name.trim().is_empty() {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Artifact name cannot be empty"
+            })),
+        )
+            .into_response();
+    }
+
+    // Decode base64 data
+    let data = match base64_engine.decode(&payload.data) {
+        Ok(d) => d,
+        Err(e) => {
+            return (
+                axum::http::StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid base64 data: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Create artifact
+    let manager = raid::get_global_manager();
+    match manager.put_artifact(&payload.name, &data).await {
+        Ok(artifact) => {
+            let response = CreateArtifactResponse {
+                artifact_id: artifact.id.to_string(),
+                name: artifact.name,
+                stored_at: artifact.stored_at.to_rfc3339(),
+                message: "Artifact created successfully".to_string(),
+            };
+            (axum::http::StatusCode::CREATED, Json(response)).into_response()
+        }
+        Err(e) => (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to create artifact: {}", e)
+            })),
+        )
+            .into_response()
+    }
+}
+
+#[derive(serde::Serialize)]
+struct DeleteArtifactResponse {
+    artifact_id: String,
+    message: String,
+}
+
+async fn raid_artifact_delete_handler(
+    axum::extract::Path(artifact_id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    use uuid::Uuid;
+
+    // Parse artifact ID
+    let id = match Uuid::parse_str(&artifact_id) {
+        Ok(u) => u,
+        Err(e) => {
+            return (
+                axum::http::StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid artifact ID: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Delete artifact
+    let manager = raid::get_global_manager();
+    match manager.delete_artifact(id).await {
+        Ok(_) => {
+            let response = DeleteArtifactResponse {
+                artifact_id: artifact_id,
+                message: "Artifact deleted successfully".to_string(),
+            };
+            Json(response).into_response()
+        }
+        Err(e) => (
+            axum::http::StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": format!("Failed to delete artifact: {}", e)
+            })),
+        )
+            .into_response()
+    }
 }
 
 #[derive(serde::Serialize)]

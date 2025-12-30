@@ -1385,9 +1385,214 @@ async fn vm_page() -> Html<String> {
 }
 
 async fn raid_page() -> Html<String> {
+    let raid_js = r#"
+    window.refreshRaidArtifacts = async function() {
+      await poll('/api/v1/raid/artifacts', renderRaidArtifactsTable, 'artifacts');
+    };
+    
+    function renderRaidArtifactsTable(containerId, data) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = '';
+      
+      if (!Array.isArray(data)) {
+        renderJsonPre(containerId, data);
+        return;
+      }
+      
+      if (data.length === 0) {
+        el.innerHTML = '<div class="muted">No artifacts stored.</div>';
+        return;
+      }
+      
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const hr = document.createElement('tr');
+      ['id', 'name', 'stored_at', 'actions'].forEach(k => {
+        const th = document.createElement('th');
+        th.textContent = k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ');
+        hr.appendChild(th);
+      });
+      thead.appendChild(hr);
+      table.appendChild(thead);
+      
+      const tbody = document.createElement('tbody');
+      for (const artifact of data) {
+        const tr = document.createElement('tr');
+        
+        ['id', 'name', 'stored_at'].forEach(k => {
+          const td = document.createElement('td');
+          let v = artifact ? artifact[k] : null;
+          if (k === 'stored_at' && v) {
+            try {
+              const date = new Date(v);
+              v = date.toLocaleString();
+            } catch (e) {
+              // Keep original value
+            }
+          }
+          td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
+          tr.appendChild(td);
+        });
+        
+        // Action buttons
+        const actionsTd = document.createElement('td');
+        actionsTd.className = 'action-buttons';
+        actionsTd.style.cssText = 'white-space: nowrap;';
+        
+        const artifactId = artifact.id;
+        const artifactName = artifact.name || artifactId;
+        const user = getUser();
+        const canWrite = user && (user.role === 'Admin' || user.role === 'Operator');
+        
+        if (canWrite) {
+          // Delete button
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn btn-danger';
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+          deleteBtn.onclick = () => handleArtifactDelete(artifactId, artifactName);
+          actionsTd.appendChild(deleteBtn);
+        }
+        
+        tr.appendChild(actionsTd);
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      el.appendChild(table);
+    }
+    
+    async function showCreateArtifactModal() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      showModal('createArtifactModal');
+    }
+    
+    async function handleCreateArtifact(event) {
+      event.preventDefault();
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      if (!validateForm('createArtifactForm')) {
+        showNotification('Please fill in all required fields correctly.', 'error');
+        return;
+      }
+      
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+      
+      try {
+        const name = document.getElementById('artifactName').value;
+        const fileInput = document.getElementById('artifactFile');
+        
+        if (!fileInput.files || fileInput.files.length === 0) {
+          showNotification('Please select a file to upload.', 'error');
+          btn.disabled = false;
+          btn.textContent = originalText;
+          return;
+        }
+        
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = async function(e) {
+          try {
+            const arrayBuffer = e.target.result;
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+            
+            const result = await fetchJson('/api/v1/raid/artifacts', {
+              method: 'POST',
+              body: JSON.stringify({
+                name: name,
+                data: base64
+              })
+            });
+            
+            showNotification('Artifact created successfully', 'success');
+            hideModal('createArtifactModal');
+            form.reset();
+            
+            setTimeout(() => {
+              window.refreshRaidArtifacts();
+            }, 500);
+          } catch (err) {
+            showNotification('Error: ' + err.message, 'error');
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        };
+        
+        reader.onerror = function() {
+          showNotification('Error reading file', 'error');
+          btn.disabled = false;
+          btn.textContent = originalText;
+        };
+        
+        reader.readAsArrayBuffer(file);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+    
+    async function handleArtifactDelete(artifactId, artifactName) {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      showConfirmDialog(
+        `Are you sure you want to delete artifact "${artifactName}" (${artifactId})? This action cannot be undone.`,
+        async () => {
+          try {
+            showLoading('artifacts', 'Deleting artifact...');
+            
+            await fetchJson(`/api/v1/raid/artifacts/${artifactId}`, {
+              method: 'DELETE'
+            });
+            
+            showNotification('Artifact deleted successfully', 'success');
+            setTimeout(() => {
+              window.refreshRaidArtifacts();
+            }, 1000);
+          } catch (e) {
+            showNotification('Error: ' + e.message, 'error');
+            hideLoading('artifacts');
+          }
+        }
+      );
+    }
+    
+    async function refresh() {
+      await poll('/api/v1/raid/nodes', renderTable, 'nodes');
+      await window.refreshRaidArtifacts();
+    }
+    
+    refresh();
+    setInterval(refresh, 5000);
+    "#;
+
     layout(
         "RAID",
         r#"
+<div class="row" style="margin-bottom:16px;">
+  <div class="muted">Artifacts: <code>/api/v1/raid/artifacts</code></div>
+  <button class="btn btn-primary" onclick="showCreateArtifactModal()">Create Artifact</button>
+</div>
+
 <div class="grid">
   <div class="item">
     <div class="muted">Nodes: <code>/api/v1/raid/nodes</code></div>
@@ -1398,11 +1603,32 @@ async fn raid_page() -> Html<String> {
     <div id="artifacts"></div>
   </div>
 </div>
+
+<!-- Create Artifact Modal -->
+<div id="createArtifactModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create Artifact</h3>
+      <button class="modal-close" onclick="hideModal('createArtifactModal')">&times;</button>
+    </div>
+    <form id="createArtifactForm" onsubmit="handleCreateArtifact(event)">
+      <div class="form-group">
+        <label for="artifactName">Artifact Name</label>
+        <input type="text" id="artifactName" name="name" required placeholder="my-artifact" />
+      </div>
+      <div class="form-group">
+        <label for="artifactFile">File</label>
+        <input type="file" id="artifactFile" name="file" required />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="hideModal('createArtifactModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
 "#,
-        &format!(
-            "{}\nasync function refresh(){{ await poll('/api/v1/raid/nodes', renderTable, 'nodes'); await poll('/api/v1/raid/artifacts', renderTable, 'artifacts'); }}\nrefresh(); setInterval(refresh, 5000);",
-            common_js()
-        ),
+        &format!("{}\n{}", common_js(), raid_js),
     )
 }
 
