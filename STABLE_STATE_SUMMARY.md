@@ -170,7 +170,7 @@ cd S:\rust\poolAI; git push origin HEAD
 - ✅ Troubleshooting guides
 - ✅ Migration guides
 
-### VM Module - 97% Complete
+### VM Module - 98% Complete
 - ✅ Process runner integration
 - ✅ Resource limits (Linux cgroups, Windows Job Objects)
 - ✅ Health checks with auto-recovery
@@ -178,5 +178,11 @@ cd S:\rust\poolAI; git push origin HEAD
 - ✅ Auto-recovery enhancements
 - ✅ Resource monitoring enhancements
 - ✅ Isolation validation and error handling (18 tests passing)
-- 🔄 Full isolation system calls (pending - requires nix/winapi crates)
+- ✅ Linux isolation system calls (optional feature `vm-isolation-linux`)
+  - ✅ Network namespace creation
+  - ✅ Mount namespace creation
+  - ✅ Chroot implementation
+  - 🔄 Network interface configuration (planned)
+  - 🔄 Firewall rules setup (planned)
+- 🔄 Windows isolation (planned - requires Windows API)
 

@@ -270,6 +270,14 @@
   - ✅ Configuration validation (network, filesystem isolation configs)
   - ✅ Process ID validation
   - ✅ Error handling improvements
+  - ✅ **Linux Isolation System Calls** — **PARTIALLY IMPLEMENTED** 🎉
+    - ✅ Optional feature `vm-isolation-linux` added
+    - ✅ Network namespace creation (`unshare(CLONE_NEWNET)`)
+    - ✅ Mount namespace creation (`unshare(CLONE_NEWNS)`)
+    - ✅ Chroot implementation (`nix::unistd::chroot`)
+    - 🔄 Network interface configuration (planned)
+    - 🔄 Firewall rules setup (planned)
+    - 🔄 Bind mounts setup (planned)
 - ✅ **Auto-Recovery Enhancements** — **ЗАВЕРШЕНО (Week 9)** 🎉
   - ✅ AutoRecoveryConfig struct з налаштуваннями (max_restart_attempts, delays, exponential backoff)
   - ✅ Exponential backoff для restart delay
