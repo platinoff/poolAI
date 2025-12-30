@@ -3,6 +3,7 @@ use crate::libs::{get_global_manager, LibraryType};
 use crate::network::auth::{auth_middleware, authenticate_user, AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
 use crate::platform;
+use crate::pool;
 use crate::raid;
 use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
 use crate::vm;
@@ -41,9 +42,9 @@ struct ModelInfo {
 
 #[derive(Serialize)]
 struct WorkerInfo {
-    id: &'static str,
-    status: &'static str,
-    current_task: Option<&'static str>,
+    id: String,
+    status: String,
+    current_task: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -78,6 +79,14 @@ pub fn create_api_routes() -> Router {
         .route("/metrics", get(metrics_handler))
         .route("/models", get(models_handler))
         .route("/workers", get(workers_handler))
+        .route(
+            "/workers",
+            post(worker_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/workers/:id",
+            delete(worker_delete_handler).layer(middleware::from_fn(auth_middleware)),
+        )
         .route("/gpu", get(gpu_info))
         .route("/ws/metrics", get(websocket_handler))
         .route("/rewards", get(rewards_handler))
@@ -1031,19 +1040,174 @@ async fn models_handler() -> impl IntoResponse {
 }
 
 async fn workers_handler() -> impl IntoResponse {
+    // Try to get real workers from pool, fallback to mock data
+    if let Some(pool) = pool::get_global_pool() {
+        let worker_statuses = {
+            let pool_guard = pool.read().await;
+            pool_guard.get_worker_status().await
+        };
+        
+        if !worker_statuses.is_empty() {
+            let worker_infos: Vec<WorkerInfo> = worker_statuses
+                .iter()
+                .map(|(id, status)| WorkerInfo {
+                    id: id.clone(),
+                    status: match status.is_healthy {
+                        true => if status.active_connections > 0 { "busy".to_string() } else { "idle".to_string() },
+                        false => "error".to_string(),
+                    },
+                    current_task: None, // TODO: Get from worker status
+                })
+                .collect();
+            
+            return Json(worker_infos);
+        }
+    }
+    
+    // Fallback to mock data
     let workers = vec![
         WorkerInfo {
-            id: "worker-1",
-            status: "busy",
-            current_task: Some("text-generation"),
+            id: "worker-1".to_string(),
+            status: "busy".to_string(),
+            current_task: Some("text-generation".to_string()),
         },
         WorkerInfo {
-            id: "worker-2",
-            status: "idle",
+            id: "worker-2".to_string(),
+            status: "idle".to_string(),
             current_task: None,
         },
     ];
     Json(workers)
+}
+
+#[derive(serde::Deserialize)]
+struct CreateWorkerRequest {
+    worker_id: String,
+    max_concurrent_requests: Option<usize>,
+    request_timeout_ms: Option<u64>,
+    health_check_interval_ms: Option<u64>,
+    enable_caching: Option<bool>,
+    cache_size: Option<usize>,
+    max_memory_mb: Option<usize>,
+    cpu_priority: Option<u8>,
+    gpu_device: Option<usize>,
+    auto_restart: Option<bool>,
+    resource_monitoring: Option<bool>,
+}
+
+#[derive(serde::Serialize)]
+struct CreateWorkerResponse {
+    worker_id: String,
+    message: String,
+}
+
+async fn worker_create_handler(
+    axum::extract::Json(payload): axum::extract::Json<CreateWorkerRequest>,
+) -> impl IntoResponse {
+    // Validate input
+    if payload.worker_id.trim().is_empty() {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Worker ID cannot be empty"
+            })),
+        )
+            .into_response();
+    }
+
+    // Get global pool
+    let pool = match pool::get_global_pool() {
+        Some(p) => p,
+        None => {
+            return (
+                axum::http::StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({
+                    "error": "Pool not initialized"
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Create worker config
+    let worker_config = pool::worker::WorkerConfig {
+        worker_id: payload.worker_id.clone(),
+        max_concurrent_requests: payload.max_concurrent_requests.unwrap_or(10),
+        request_timeout_ms: payload.request_timeout_ms.unwrap_or(5000),
+        health_check_interval_ms: payload.health_check_interval_ms.unwrap_or(1000),
+        enable_caching: payload.enable_caching.unwrap_or(true),
+        cache_size: payload.cache_size.unwrap_or(1000),
+        max_memory_mb: payload.max_memory_mb.unwrap_or(2048),
+        cpu_priority: payload.cpu_priority.unwrap_or(5),
+        gpu_device: payload.gpu_device,
+        auto_restart: payload.auto_restart.unwrap_or(true),
+        resource_monitoring: payload.resource_monitoring.unwrap_or(true),
+    };
+
+    // Create worker
+    let worker = pool::worker::Worker::new(worker_config);
+
+    // Add worker to pool
+    let pool_guard = pool.write().await;
+    match pool_guard.add_worker(payload.worker_id.clone(), worker).await {
+        Ok(_) => {
+            let response = CreateWorkerResponse {
+                worker_id: payload.worker_id,
+                message: "Worker created successfully".to_string(),
+            };
+            (axum::http::StatusCode::CREATED, Json(response)).into_response()
+        }
+        Err(e) => (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to create worker: {}", e)
+            })),
+        )
+            .into_response()
+    }
+}
+
+#[derive(serde::Serialize)]
+struct DeleteWorkerResponse {
+    worker_id: String,
+    message: String,
+}
+
+async fn worker_delete_handler(
+    axum::extract::Path(worker_id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    // Get global pool
+    let pool = match pool::get_global_pool() {
+        Some(p) => p,
+        None => {
+            return (
+                axum::http::StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({
+                    "error": "Pool not initialized"
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Remove worker from pool
+    let pool_guard = pool.write().await;
+    match pool_guard.remove_worker(&worker_id).await {
+        Ok(_) => {
+            let response = DeleteWorkerResponse {
+                worker_id: worker_id,
+                message: "Worker deleted successfully".to_string(),
+            };
+            Json(response).into_response()
+        }
+        Err(e) => (
+            axum::http::StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": format!("Failed to delete worker: {}", e)
+            })),
+        )
+            .into_response()
+    }
 }
 
 async fn gpu_info() -> impl IntoResponse {

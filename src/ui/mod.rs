@@ -1018,13 +1018,251 @@ async fn metrics_page() -> Html<String> {
 }
 
 async fn workers_page() -> Html<String> {
+    let workers_js = r#"
+    window.refreshWorkers = async function() {
+      await poll('/api/v1/workers', renderWorkersTable, 'data');
+    };
+    
+    function renderWorkersTable(containerId, data) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = '';
+      
+      if (!Array.isArray(data)) {
+        renderJsonPre(containerId, data);
+        return;
+      }
+      
+      if (data.length === 0) {
+        el.innerHTML = '<div class="muted">No workers available.</div>';
+        return;
+      }
+      
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const hr = document.createElement('tr');
+      ['id', 'status', 'actions'].forEach(k => {
+        const th = document.createElement('th');
+        th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+        hr.appendChild(th);
+      });
+      thead.appendChild(hr);
+      table.appendChild(thead);
+      
+      const tbody = document.createElement('tbody');
+      for (const worker of data) {
+        const tr = document.createElement('tr');
+        
+        ['id', 'status'].forEach(k => {
+          const td = document.createElement('td');
+          const v = worker ? worker[k] : null;
+          td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
+          tr.appendChild(td);
+        });
+        
+        // Action buttons
+        const actionsTd = document.createElement('td');
+        actionsTd.className = 'action-buttons';
+        actionsTd.style.cssText = 'white-space: nowrap;';
+        
+        const workerId = worker.id;
+        const user = getUser();
+        const canWrite = user && (user.role === 'Admin' || user.role === 'Operator');
+        
+        if (canWrite) {
+          // Delete button
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn btn-danger';
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
+          deleteBtn.onclick = () => handleWorkerDelete(workerId);
+          actionsTd.appendChild(deleteBtn);
+        }
+        
+        tr.appendChild(actionsTd);
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      el.appendChild(table);
+    }
+    
+    async function showCreateWorkerModal() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      showModal('createWorkerModal');
+    }
+    
+    async function handleCreateWorker(event) {
+      event.preventDefault();
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      if (!validateForm('createWorkerForm')) {
+        showNotification('Please fill in all required fields correctly.', 'error');
+        return;
+      }
+      
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+      
+      try {
+        const payload = {
+          worker_id: document.getElementById('workerId').value,
+          max_concurrent_requests: parseInt(document.getElementById('workerMaxConcurrent').value, 10) || 10,
+          request_timeout_ms: parseInt(document.getElementById('workerTimeout').value, 10) || 5000,
+          health_check_interval_ms: parseInt(document.getElementById('workerHealthInterval').value, 10) || 1000,
+          enable_caching: document.getElementById('workerEnableCache').checked,
+          cache_size: parseInt(document.getElementById('workerCacheSize').value, 10) || 1000,
+          max_memory_mb: parseInt(document.getElementById('workerMaxMemory').value, 10) || 2048,
+          cpu_priority: parseInt(document.getElementById('workerCpuPriority').value, 10) || 5,
+          gpu_device: document.getElementById('workerGpuDevice').value ? parseInt(document.getElementById('workerGpuDevice').value, 10) : null,
+          auto_restart: document.getElementById('workerAutoRestart').checked,
+          resource_monitoring: document.getElementById('workerResourceMonitoring').checked
+        };
+        
+        const result = await fetchJson('/api/v1/workers', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        
+        showNotification('Worker created successfully', 'success');
+        hideModal('createWorkerModal');
+        form.reset();
+        
+        setTimeout(() => {
+          window.refreshWorkers();
+        }, 500);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+    
+    async function handleWorkerDelete(workerId) {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      showConfirmDialog(
+        `Are you sure you want to delete worker "${workerId}"? This action cannot be undone.`,
+        async () => {
+          try {
+            showLoading('data', 'Deleting worker...');
+            
+            await fetchJson(`/api/v1/workers/${workerId}`, {
+              method: 'DELETE'
+            });
+            
+            showNotification('Worker deleted successfully', 'success');
+            setTimeout(() => {
+              window.refreshWorkers();
+            }, 1000);
+          } catch (e) {
+            showNotification('Error: ' + e.message, 'error');
+            hideLoading('data');
+          }
+        }
+      );
+    }
+    
+    async function refresh() {
+      await window.refreshWorkers();
+    }
+    
+    refresh();
+    setInterval(refresh, 5000);
+    "#;
+
     layout(
         "Workers",
-        r#"<div class="muted">Source: <code>/api/v1/workers</code></div><div id="data"></div>"#,
-        &format!(
-            "{}\nasync function refresh(){{ await poll('/api/v1/workers', renderTable, 'data'); }}\nrefresh(); setInterval(refresh, 5000);",
-            common_js()
-        ),
+        r#"
+<div class="row" style="margin-bottom:16px;">
+  <div class="muted">Source: <code>/api/v1/workers</code></div>
+  <button class="btn btn-primary" onclick="showCreateWorkerModal()">Create Worker</button>
+</div>
+<div id="data"></div>
+
+<!-- Create Worker Modal -->
+<div id="createWorkerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create Worker</h3>
+      <button class="modal-close" onclick="hideModal('createWorkerModal')">&times;</button>
+    </div>
+    <form id="createWorkerForm" onsubmit="handleCreateWorker(event)">
+      <div class="form-group">
+        <label for="workerId">Worker ID</label>
+        <input type="text" id="workerId" name="worker_id" required placeholder="worker-1" />
+      </div>
+      <div class="form-group">
+        <label for="workerMaxConcurrent">Max Concurrent Requests</label>
+        <input type="number" id="workerMaxConcurrent" name="max_concurrent_requests" min="1" max="100" value="10" />
+      </div>
+      <div class="form-group">
+        <label for="workerTimeout">Request Timeout (ms)</label>
+        <input type="number" id="workerTimeout" name="request_timeout_ms" min="1000" max="60000" value="5000" />
+      </div>
+      <div class="form-group">
+        <label for="workerHealthInterval">Health Check Interval (ms)</label>
+        <input type="number" id="workerHealthInterval" name="health_check_interval_ms" min="100" max="10000" value="1000" />
+      </div>
+      <div class="form-group">
+        <label for="workerMaxMemory">Max Memory (MB)</label>
+        <input type="number" id="workerMaxMemory" name="max_memory_mb" min="256" max="131072" value="2048" />
+      </div>
+      <div class="form-group">
+        <label for="workerCpuPriority">CPU Priority (1-10)</label>
+        <input type="number" id="workerCpuPriority" name="cpu_priority" min="1" max="10" value="5" />
+      </div>
+      <div class="form-group">
+        <label for="workerGpuDevice">GPU Device ID (optional)</label>
+        <input type="number" id="workerGpuDevice" name="gpu_device" min="0" placeholder="Leave empty for no GPU" />
+      </div>
+      <div class="form-group">
+        <label for="workerEnableCache">
+          <input type="checkbox" id="workerEnableCache" name="enable_caching" checked />
+          Enable Caching
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="workerCacheSize">Cache Size</label>
+        <input type="number" id="workerCacheSize" name="cache_size" min="100" max="10000" value="1000" />
+      </div>
+      <div class="form-group">
+        <label for="workerAutoRestart">
+          <input type="checkbox" id="workerAutoRestart" name="auto_restart" checked />
+          Auto Restart on Failure
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="workerResourceMonitoring">
+          <input type="checkbox" id="workerResourceMonitoring" name="resource_monitoring" checked />
+          Resource Monitoring
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="hideModal('createWorkerModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+"#,
+        &format!("{}\n{}", common_js(), workers_js),
     )
 }
 
