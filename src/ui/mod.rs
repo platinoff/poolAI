@@ -409,27 +409,65 @@ async function requireAuth(requiredRole = null) {
   return true;
 }
 
-// User feedback functions with ARIA support
-function showNotification(message, type = 'info', duration = 3000) {
-  // Remove existing notification if any
-  const existing = document.getElementById('globalNotification');
-  if (existing) existing.remove();
-  
+// Enhanced notification system with stacking and actions
+let notificationStack = [];
+let notificationIdCounter = 0;
+
+function showNotification(message, type = 'info', duration = 3000, actions = null) {
+  const notificationId = 'notification-' + (notificationIdCounter++);
   const notification = document.createElement('div');
-  notification.id = 'globalNotification';
+  notification.id = notificationId;
+  notification.className = 'notification notification-' + type;
   notification.setAttribute('role', 'alert');
-  notification.setAttribute('aria-live', 'assertive');
+  notification.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
   notification.setAttribute('aria-atomic', 'true');
+  
+  const notificationContent = document.createElement('div');
+  notificationContent.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 12px;';
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.textContent = message;
+  messageDiv.style.flex = '1';
+  notificationContent.appendChild(messageDiv);
+  
+  if (actions && actions.length > 0) {
+    const actionsDiv = document.createElement('div');
+    actionsDiv.style.cssText = 'display: flex; gap: 8px;';
+    actions.forEach(action => {
+      const btn = document.createElement('button');
+      btn.textContent = action.label;
+      btn.style.cssText = 'padding: 4px 8px; border: none; background: rgba(255,255,255,0.2); color: inherit; border-radius: 4px; cursor: pointer; font-size: 0.85em;';
+      btn.onclick = () => {
+        if (action.onClick) action.onClick();
+        removeNotification(notificationId);
+      };
+      actionsDiv.appendChild(btn);
+    });
+    notificationContent.appendChild(actionsDiv);
+  }
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.style.cssText = 'background: none; border: none; color: inherit; font-size: 20px; cursor: pointer; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;';
+  closeBtn.onclick = () => removeNotification(notificationId);
+  closeBtn.setAttribute('aria-label', 'Close notification');
+  notificationContent.appendChild(closeBtn);
+  
+  notification.appendChild(notificationContent);
+  
+  // Position notification
+  const top = 20 + (notificationStack.length * 70);
   notification.style.cssText = `
-    position: fixed; top: 20px; right: 20px; z-index: 10000;
+    position: fixed; top: ${top}px; right: 20px; z-index: ${10000 + notificationStack.length};
     padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    background: ${type === 'success' ? '#50fa7b' : type === 'error' ? '#ff5555' : '#8be9fd'};
+    background: ${type === 'success' ? '#50fa7b' : type === 'error' ? '#ff5555' : type === 'warning' ? '#f1fa8c' : '#8be9fd'};
     color: ${type === 'error' ? '#fff' : '#0f1216'};
     font-weight: 500; max-width: 400px; word-wrap: break-word;
     animation: slideIn 0.3s ease-out;
   `;
-  notification.textContent = message;
+  
   document.body.appendChild(notification);
+  notificationStack.push({ id: notificationId, element: notification });
   
   // Announce to screen readers
   const liveRegion = document.getElementById('aria_live_region');
@@ -440,17 +478,43 @@ function showNotification(message, type = 'info', duration = 3000) {
     }, duration + 300);
   }
   
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease-out';
-    setTimeout(() => notification.remove(), 300);
-  }, duration);
+  if (duration > 0) {
+    setTimeout(() => {
+      removeNotification(notificationId);
+    }, duration);
+  }
+  
+  return notificationId;
 }
 
-function showLoading(elementId, message = 'Loading...') {
+function removeNotification(notificationId) {
+  const index = notificationStack.findIndex(n => n.id === notificationId);
+  if (index === -1) return;
+  
+  const notification = notificationStack[index].element;
+  notification.style.animation = 'slideOut 0.3s ease-out';
+  setTimeout(() => {
+    notification.remove();
+    notificationStack.splice(index, 1);
+    // Reposition remaining notifications
+    notificationStack.forEach((n, i) => {
+      n.element.style.top = (20 + (i * 70)) + 'px';
+      n.element.style.zIndex = (10000 + i).toString();
+    });
+  }, 300);
+}
+
+// Enhanced loading functions with skeleton support
+function showLoading(elementId, message = 'Loading...', useSkeleton = false) {
   const el = document.getElementById(elementId);
   if (!el) return;
   el.dataset.loading = 'true';
-  el.innerHTML = `<div style="text-align:center; padding:20px; color:#a8b0bf;">${message}</div>`;
+  
+  if (useSkeleton) {
+    el.innerHTML = createSkeletonLoader(message);
+  } else {
+    el.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted, #a8b0bf);"><div class="spinner"></div><div style="margin-top:12px;">${message}</div></div>`;
+  }
 }
 
 function hideLoading(elementId) {
@@ -458,6 +522,254 @@ function hideLoading(elementId) {
   if (el && el.dataset.loading === 'true') {
     el.dataset.loading = 'false';
   }
+}
+
+function createSkeletonLoader(type = 'table') {
+  if (type === 'table') {
+    return `
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+        <div style="margin-top: 16px;">
+          ${Array(5).fill('<div class="skeleton skeleton-table-row"></div>').join('')}
+        </div>
+      </div>
+    `;
+  } else if (type === 'card') {
+    return `
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 90%;"></div>
+        <div class="skeleton skeleton-text" style="width: 70%;"></div>
+      </div>
+    `;
+  } else if (type === 'list') {
+    return `
+      <div>
+        ${Array(3).fill(`
+          <div class="skeleton-card" style="margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="skeleton skeleton-avatar"></div>
+              <div style="flex: 1;">
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text" style="width: 60%; margin-top: 8px;"></div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  return `<div class="skeleton skeleton-text"></div>`;
+}
+
+function showSpinner(containerId, message = 'Loading...', size = 'medium') {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const sizeClass = size === 'small' ? 'spinner-small' : size === 'large' ? 'spinner-large' : '';
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px;">
+      <div class="spinner ${sizeClass}"></div>
+      ${message ? `<div class="loading-text">${message}</div>` : ''}
+    </div>
+  `;
+}
+
+function showLoadingOverlay(message = 'Loading...') {
+  const overlay = document.createElement('div');
+  overlay.id = 'loadingOverlay';
+  overlay.className = 'loading-overlay';
+  overlay.innerHTML = `
+    <div class="loading-spinner-container">
+      <div class="spinner"></div>
+      <div class="loading-text">${message}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function hideLoadingOverlay() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+// Error handling functions with retry support
+function showErrorBoundary(containerId, error, retryFn = null) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  container.innerHTML = `
+    <div class="error-boundary">
+      <div class="error-boundary-title">⚠️ Error</div>
+      <div class="error-boundary-message">${escapeHtml(error.message || String(error))}</div>
+      ${retryFn ? `
+        <div class="error-boundary-actions">
+          <button class="error-retry" onclick="(${retryFn.toString()})()">Retry</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Enhanced fetchJson with retry support
+async function fetchJsonWithRetry(url, options = {}, maxRetries = 3, retryDelay = 1000) {
+  let lastError;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetchJson(url, options);
+      return res;
+    } catch (error) {
+      lastError = error;
+      
+      if (attempt < maxRetries) {
+        // Exponential backoff
+        const delay = retryDelay * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+// Search & Filter functions
+function initSearchFilter(searchInputId, tableId, filterOptions = {}) {
+  const searchInput = document.getElementById(searchInputId);
+  const table = document.getElementById(tableId);
+  if (!searchInput || !table) return;
+  
+  let originalData = [];
+  const tbody = table.querySelector('tbody');
+  if (tbody) {
+    // Store original rows
+    originalData = Array.from(tbody.querySelectorAll('tr')).map(row => ({
+      element: row,
+      text: row.textContent.toLowerCase()
+    }));
+  }
+  
+  searchInput.addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase().trim();
+    filterTable(table, query, filterOptions);
+  });
+  
+  // Add search icon if not present
+  if (!searchInput.parentElement.querySelector('.search-icon')) {
+    const icon = document.createElement('span');
+    icon.className = 'search-icon';
+    icon.innerHTML = '🔍';
+    icon.style.cssText = 'position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted, #a8b0bf); pointer-events: none;';
+    searchInput.parentElement.style.position = 'relative';
+    searchInput.parentElement.appendChild(icon);
+  }
+}
+
+function filterTable(table, query, options = {}) {
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+  
+  const rows = tbody.querySelectorAll('tr');
+  let visibleCount = 0;
+  
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    const matches = !query || text.includes(query);
+    
+    if (matches) {
+      row.style.display = '';
+      visibleCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+  
+  // Show "no results" message if needed
+  let noResultsRow = tbody.querySelector('.no-results-row');
+  if (visibleCount === 0 && query) {
+    if (!noResultsRow) {
+      noResultsRow = document.createElement('tr');
+      noResultsRow.className = 'no-results-row';
+      const td = document.createElement('td');
+      td.colSpan = table.querySelectorAll('th').length;
+      td.textContent = 'No results found';
+      td.style.cssText = 'text-align: center; padding: 20px; color: var(--text-muted, #a8b0bf);';
+      noResultsRow.appendChild(td);
+      tbody.appendChild(noResultsRow);
+    }
+    noResultsRow.style.display = '';
+  } else if (noResultsRow) {
+    noResultsRow.style.display = 'none';
+  }
+}
+
+function sortTable(table, columnIndex, ascending = true) {
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+  
+  const rows = Array.from(tbody.querySelectorAll('tr:not(.no-results-row)'));
+  const isNumeric = rows.every(row => {
+    const cell = row.cells[columnIndex];
+    return cell && !isNaN(parseFloat(cell.textContent));
+  });
+  
+  rows.sort((a, b) => {
+    const aCell = a.cells[columnIndex];
+    const bCell = b.cells[columnIndex];
+    
+    if (!aCell || !bCell) return 0;
+    
+    const aValue = isNumeric ? parseFloat(aCell.textContent) : aCell.textContent.trim();
+    const bValue = isNumeric ? parseFloat(bCell.textContent) : bCell.textContent.trim();
+    
+    if (aValue < bValue) return ascending ? -1 : 1;
+    if (aValue > bValue) return ascending ? 1 : -1;
+    return 0;
+  });
+  
+  // Remove all rows
+  rows.forEach(row => row.remove());
+  
+  // Re-append sorted rows
+  rows.forEach(row => tbody.appendChild(row));
+  
+  // Update sort indicators
+  const headers = table.querySelectorAll('th');
+  headers.forEach((header, index) => {
+    if (index === columnIndex) {
+      header.setAttribute('data-sort', ascending ? 'asc' : 'desc');
+    } else {
+      header.removeAttribute('data-sort');
+    }
+  });
+}
+
+function initTableSorting(tableId) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  
+  const headers = table.querySelectorAll('th');
+  headers.forEach((header, index) => {
+    header.style.cursor = 'pointer';
+    header.style.userSelect = 'none';
+    header.addEventListener('click', function() {
+      const currentSort = header.getAttribute('data-sort');
+      const ascending = currentSort !== 'asc';
+      sortTable(table, index, ascending);
+    });
+  });
 }
 
 // Modal dialog functions with keyboard navigation
@@ -776,44 +1088,201 @@ function renderTable(containerId, data) {
   el.appendChild(table);
 }
 
-// Form validation
+// Enhanced form validation with real-time feedback
 function validateForm(formId) {
   const form = document.getElementById(formId);
   if (!form) return false;
   
-  const inputs = form.querySelectorAll('input[required], select[required]');
+  const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
   let isValid = true;
   
   inputs.forEach(input => {
-    if (!input.value.trim()) {
+    const fieldValid = validateField(input);
+    if (!fieldValid) {
       isValid = false;
-      input.style.borderColor = '#ff5555';
-      setTimeout(() => {
-        input.style.borderColor = '';
-      }, 2000);
-    } else {
-      input.style.borderColor = '';
-    }
-    
-    // Number validation
-    if (input.type === 'number') {
-      const min = input.getAttribute('min');
-      const max = input.getAttribute('max');
-      const value = parseInt(input.value, 10);
-      
-      if (min && value < parseInt(min, 10)) {
-        isValid = false;
-        input.style.borderColor = '#ff5555';
-        showNotification(`Value must be at least ${min}`, 'error');
-      } else if (max && value > parseInt(max, 10)) {
-        isValid = false;
-        input.style.borderColor = '#ff5555';
-        showNotification(`Value must be at most ${max}`, 'error');
-      }
     }
   });
   
   return isValid;
+}
+
+function validateField(input) {
+  let isValid = true;
+  let errorMessage = '';
+  
+  // Remove previous error message
+  const existingError = input.parentElement.querySelector('.error-text');
+  if (existingError) {
+    existingError.remove();
+  }
+  
+  // Required validation
+  if (input.hasAttribute('required') && !input.value.trim()) {
+    isValid = false;
+    errorMessage = 'This field is required';
+  }
+  
+  // Number validation
+  if (input.type === 'number' && input.value) {
+    const min = input.getAttribute('min');
+    const max = input.getAttribute('max');
+    const value = parseFloat(input.value);
+    
+    if (isNaN(value)) {
+      isValid = false;
+      errorMessage = 'Please enter a valid number';
+    } else if (min && value < parseFloat(min)) {
+      isValid = false;
+      errorMessage = `Value must be at least ${min}`;
+    } else if (max && value > parseFloat(max)) {
+      isValid = false;
+      errorMessage = `Value must be at most ${max}`;
+    }
+  }
+  
+  // Email validation
+  if (input.type === 'email' && input.value) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(input.value)) {
+      isValid = false;
+      errorMessage = 'Please enter a valid email address';
+    }
+  }
+  
+  // Pattern validation
+  if (input.hasAttribute('pattern') && input.value) {
+    const pattern = new RegExp(input.getAttribute('pattern'));
+    if (!pattern.test(input.value)) {
+      isValid = false;
+      errorMessage = input.getAttribute('data-pattern-error') || 'Invalid format';
+    }
+  }
+  
+  // Update UI
+  if (isValid) {
+    input.style.borderColor = '';
+    input.classList.remove('error');
+  } else {
+    input.style.borderColor = 'var(--danger, #ff5555)';
+    input.classList.add('error');
+    
+    // Show error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-text';
+    errorDiv.textContent = errorMessage;
+    input.parentElement.appendChild(errorDiv);
+  }
+  
+  return isValid;
+}
+
+// Real-time form validation
+function initRealTimeValidation(formId) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+  
+  const inputs = form.querySelectorAll('input, select, textarea');
+  inputs.forEach(input => {
+    // Validate on blur
+    input.addEventListener('blur', function() {
+      validateField(input);
+    });
+    
+    // Validate on input (for immediate feedback)
+    input.addEventListener('input', function() {
+      if (input.classList.contains('error')) {
+        validateField(input);
+      }
+    });
+  });
+}
+
+// Form auto-save functionality
+function initFormAutoSave(formId, storageKey, interval = 30000) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+  
+  // Load saved data
+  const savedData = localStorage.getItem(storageKey);
+  if (savedData) {
+    try {
+      const data = JSON.parse(savedData);
+      Object.keys(data).forEach(key => {
+        const input = form.querySelector(`[name="${key}"]`);
+        if (input && !input.value) {
+          input.value = data[key];
+        }
+      });
+    } catch (e) {
+      console.error('Failed to load auto-saved form data:', e);
+    }
+  }
+  
+  // Auto-save on input
+  let saveTimeout;
+  form.addEventListener('input', function() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      const formData = new FormData(form);
+      const data = {};
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    }, 1000); // Debounce 1 second
+  });
+  
+  // Clear saved data on successful submit
+  form.addEventListener('submit', function() {
+    localStorage.removeItem(storageKey);
+  });
+}
+
+// Form wizard functionality
+function initFormWizard(wizardId) {
+  const wizard = document.getElementById(wizardId);
+  if (!wizard) return;
+  
+  const steps = wizard.querySelectorAll('.wizard-step');
+  let currentStep = 0;
+  
+  steps.forEach((step, index) => {
+    step.style.display = index === 0 ? 'block' : 'none';
+    step.setAttribute('data-step', index.toString());
+  });
+  
+  window.nextWizardStep = function() {
+    if (currentStep < steps.length - 1) {
+      steps[currentStep].style.display = 'none';
+      currentStep++;
+      steps[currentStep].style.display = 'block';
+      updateWizardProgress(wizard, currentStep, steps.length);
+    }
+  };
+  
+  window.prevWizardStep = function() {
+    if (currentStep > 0) {
+      steps[currentStep].style.display = 'none';
+      currentStep--;
+      steps[currentStep].style.display = 'block';
+      updateWizardProgress(wizard, currentStep, steps.length);
+    }
+  };
+  
+  updateWizardProgress(wizard, currentStep, steps.length);
+}
+
+function updateWizardProgress(wizard, current, total) {
+  const progress = wizard.querySelector('.wizard-progress');
+  if (progress) {
+    const percentage = ((current + 1) / total) * 100;
+    progress.style.width = percentage + '%';
+  }
+  
+  const stepIndicator = wizard.querySelector('.wizard-step-indicator');
+  if (stepIndicator) {
+    stepIndicator.textContent = `Step ${current + 1} of ${total}`;
+  }
 }
 
 // VM action handlers

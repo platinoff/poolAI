@@ -611,6 +611,288 @@ pub const TABS_STYLES: &str = r#"
   }
 "#;
 
+/// Skeleton Loader component styles (uses CSS variables for theming)
+pub const SKELETON_STYLES: &str = r#"
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg, #0f1216) 25%, var(--surface-secondary, #1e2329) 50%, var(--bg, #0f1216) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+  }
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-text {
+    height: 1em;
+    margin-bottom: 8px;
+  }
+  .skeleton-text:last-child {
+    margin-bottom: 0;
+  }
+  .skeleton-title {
+    height: 1.5em;
+    width: 60%;
+    margin-bottom: 12px;
+  }
+  .skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  .skeleton-button {
+    height: 36px;
+    width: 120px;
+    border-radius: 8px;
+  }
+  .skeleton-card {
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--surface, #171b22);
+    border: 1px solid var(--border, #262b36);
+  }
+  .skeleton-table-row {
+    height: 48px;
+    margin-bottom: 8px;
+  }
+"#;
+
+/// Spinner/Loading component styles (uses CSS variables for theming)
+pub const SPINNER_STYLES: &str = r#"
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--border, #262b36);
+    border-top-color: var(--primary, #50fa7b);
+    border-radius: 50%;
+    animation: spinner-spin 0.8s linear infinite;
+  }
+  @keyframes spinner-spin {
+    to { transform: rotate(360deg); }
+  }
+  .spinner-small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+  }
+  .spinner-large {
+    width: 32px;
+    height: 32px;
+    border-width: 4px;
+  }
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  .loading-spinner-container {
+    background: var(--surface, #171b22);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border, #262b36);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .loading-spinner-container .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+  }
+  .loading-text {
+    color: var(--text, #e8e8e8);
+    font-size: 0.95em;
+  }
+"#;
+
+/// Error Boundary component styles (uses CSS variables for theming)
+pub const ERROR_BOUNDARY_STYLES: &str = r#"
+  .error-boundary {
+    padding: 20px;
+    border: 1px solid var(--danger, #ff5555);
+    border-radius: 8px;
+    background: var(--surface, #171b22);
+    margin: 16px 0;
+  }
+  .error-boundary-title {
+    color: var(--danger, #ff5555);
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .error-boundary-message {
+    color: var(--text, #e8e8e8);
+    font-size: 0.9em;
+    margin-bottom: 12px;
+  }
+  .error-boundary-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .error-retry {
+    padding: 6px 12px;
+    background: var(--primary, #50fa7b);
+    color: var(--bg, #0f1216);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.2s ease;
+  }
+  .error-retry:hover {
+    background: var(--primary-hover, #67e480);
+  }
+"#;
+
+/// Form Wizard component styles (uses CSS variables for theming)
+pub const FORM_WIZARD_STYLES: &str = r#"
+  .wizard {
+    position: relative;
+  }
+  .wizard-progress-bar {
+    height: 4px;
+    background: var(--bg, #0f1216);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .wizard-progress {
+    height: 100%;
+    background: var(--primary, #50fa7b);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .wizard-step-indicator {
+    text-align: center;
+    color: var(--text-muted, #a8b0bf);
+    font-size: 0.9em;
+    margin-bottom: 16px;
+  }
+  .wizard-step {
+    display: none;
+  }
+  .wizard-step.active {
+    display: block;
+  }
+  .wizard-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    gap: 12px;
+  }
+  .wizard-nav-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border, #262b36);
+    border-radius: 8px;
+    background: var(--surface, #171b22);
+    color: var(--text, #e8e8e8);
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: all 0.2s ease;
+  }
+  .wizard-nav-btn:hover {
+    background: var(--surface-secondary, #1e2329);
+    border-color: var(--primary, #50fa7b);
+  }
+  .wizard-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .wizard-nav-btn-primary {
+    background: var(--primary, #50fa7b);
+    color: var(--bg, #0f1216);
+    border-color: var(--primary, #50fa7b);
+  }
+  .wizard-nav-btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover, #67e480);
+  }
+"#;
+
+/// Search & Filter component styles (uses CSS variables for theming)
+pub const SEARCH_FILTER_STYLES: &str = r#"
+  .search-container {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .search-input {
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid var(--border, #262b36);
+    border-radius: 8px;
+    background: var(--bg, #0f1216);
+    color: var(--text, #e8e8e8);
+    font-size: 0.95em;
+    box-sizing: border-box;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary, #50fa7b);
+  }
+  .search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted, #a8b0bf);
+    pointer-events: none;
+  }
+  .filter-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .filter-chip {
+    padding: 6px 12px;
+    border: 1px solid var(--border, #262b36);
+    border-radius: 16px;
+    background: var(--surface, #171b22);
+    color: var(--text, #e8e8e8);
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .filter-chip:hover {
+    background: var(--surface-secondary, #1e2329);
+    border-color: var(--primary, #50fa7b);
+  }
+  .filter-chip.active {
+    background: var(--primary, #50fa7b);
+    color: var(--bg, #0f1216);
+    border-color: var(--primary, #50fa7b);
+  }
+  .filter-chip-remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+  }
+  .filter-chip-remove:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+"#;
+
 /// Accordion component styles (uses CSS variables for theming)
 pub const ACCORDION_STYLES: &str = r#"
   .accordion {
@@ -671,7 +953,7 @@ pub const ACCORDION_STYLES: &str = r#"
 /// Get all component styles
 pub fn get_component_styles() -> String {
     format!(
-        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
+        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
         BUTTON_STYLES,
         CARD_STYLES,
         FORM_STYLES,
@@ -683,7 +965,12 @@ pub fn get_component_styles() -> String {
         TOOLTIP_STYLES,
         DROPDOWN_STYLES,
         TABS_STYLES,
-        ACCORDION_STYLES
+        ACCORDION_STYLES,
+        SKELETON_STYLES,
+        SPINNER_STYLES,
+        ERROR_BOUNDARY_STYLES,
+        SEARCH_FILTER_STYLES,
+        FORM_WIZARD_STYLES
     )
 }
 
