@@ -52,7 +52,9 @@ pub use libs::{LibraryInfo, LibraryManager, LibraryStatus, LibraryType};
 
 // Re-export VM types
 pub use vm::{
-    ResourceLimits, ResourceUsage, VmInstance, VmIsolation, VmManager, VmResources, VmStatus,
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
+    PlatformFilesystemIsolator, PlatformNetworkIsolator, ResourceLimits, ResourceUsage,
+    VmInstance, VmIsolation, VmManager, VmResources, VmStatus,
 };
 
 // Re-export RAID types

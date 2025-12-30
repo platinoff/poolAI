@@ -79,18 +79,24 @@ pub struct VmManager {
     #[allow(dead_code)] // Used for periodic health checks
     health_check_task: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
     resource_limiter: Arc<dyn ResourceLimiter>,
+    network_isolator: Arc<dyn NetworkIsolator>,
+    filesystem_isolator: Arc<dyn FilesystemIsolator>,
 }
 
 impl VmManager {
     pub fn new() -> Self {
         let health_monitor = Arc::new(RwLock::new(HealthMonitor::new(30))); // 30 second interval
         let resource_limiter: Arc<dyn ResourceLimiter> = Arc::new(PlatformResourceLimiter::new());
+        let network_isolator: Arc<dyn NetworkIsolator> = Arc::new(PlatformNetworkIsolator::new());
+        let filesystem_isolator: Arc<dyn FilesystemIsolator> = Arc::new(PlatformFilesystemIsolator::new());
 
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
             health_monitor,
             health_check_task: Arc::new(RwLock::new(None)),
             resource_limiter,
+            network_isolator,
+            filesystem_isolator,
         }
     }
 
@@ -451,6 +457,100 @@ impl VmManager {
     /// Check if resource limits are supported on this platform
     pub fn is_resource_limits_supported(&self) -> bool {
         self.resource_limiter.is_supported()
+    }
+
+    /// Apply network and filesystem isolation to a process
+    ///
+    /// # Arguments
+    /// * `process_id` - Native process ID
+    /// * `instance_id` - VM instance ID
+    ///
+    /// # Returns
+    /// `Ok(())` if isolation was applied successfully
+    ///
+    /// # Note
+    /// This method applies isolation based on the instance's isolation policy.
+    /// Currently, isolation is applied based on VmIsolation enum, but full
+    /// implementation requires process_id which is not yet available.
+    pub async fn apply_isolation(
+        &self,
+        process_id: u32,
+        instance_id: Uuid,
+    ) -> Result<(), AppError> {
+        let instance = {
+            let instances = self.instances.read().await;
+            instances
+                .get(&instance_id)
+                .ok_or_else(|| {
+                    AppError::ValidationError(format!("VM instance {} not found", instance_id))
+                })?
+                .clone()
+        };
+
+        // Apply isolation based on instance's isolation policy
+        match instance.isolation {
+            VmIsolation::ProcessSandbox => {
+                // Apply network isolation
+                let network_config = NetworkIsolationConfig {
+                    enabled: true,
+                    allowed_interfaces: vec![],
+                    allowed_ports: vec![],
+                    allow_loopback: true,
+                };
+                self.network_isolator
+                    .apply_network_isolation(process_id, &network_config)?;
+
+                // Apply filesystem isolation
+                let fs_config = FilesystemIsolationConfig {
+                    enabled: true,
+                    root_dir: None,
+                    allowed_paths: vec![],
+                    read_only_paths: vec![],
+                    use_chroot: false,
+                };
+                self.filesystem_isolator
+                    .apply_filesystem_isolation(process_id, &fs_config)?;
+
+                info!(
+                    "Applied isolation to process {} for VM instance {}",
+                    process_id, instance_id
+                );
+            }
+            VmIsolation::HardwareVm => {
+                // Hardware VM isolation would be handled by the hypervisor
+                // For now, just log
+                info!(
+                    "Hardware VM isolation requested for VM instance {} (not yet implemented)",
+                    instance_id
+                );
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Remove network and filesystem isolation from a process
+    ///
+    /// # Arguments
+    /// * `process_id` - Native process ID
+    ///
+    /// # Returns
+    /// `Ok(())` if isolation was removed successfully
+    pub async fn remove_isolation(&self, process_id: u32) -> Result<(), AppError> {
+        self.network_isolator.remove_network_isolation(process_id)?;
+        self.filesystem_isolator.remove_filesystem_isolation(process_id)?;
+        info!("Removed isolation from process {}", process_id);
+        Ok(())
+    }
+
+    /// Check if network isolation is supported on this platform
+    pub fn is_network_isolation_supported(&self) -> bool {
+        self.network_isolator.is_supported()
+    }
+
+    /// Check if filesystem isolation is supported on this platform
+    pub fn is_filesystem_isolation_supported(&self) -> bool {
+        self.filesystem_isolator.is_supported()
     }
 
     /// Restart a VM instance (stop and start)
