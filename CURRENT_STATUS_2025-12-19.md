@@ -219,8 +219,8 @@
 
 ---
 
-### 12. VM Module (`src/vm/`) — ✅ ~85% COMPLETED
-**Файли**: 3 (mod.rs, resources.rs, resources/linux.rs, resources/windows.rs)
+### 12. VM Module (`src/vm/`) — ✅ ~90% COMPLETED
+**Файли**: 7 (mod.rs, resources.rs, resources/linux.rs, resources/windows.rs, isolation.rs, isolation/linux.rs, isolation/windows.rs, isolation/noop.rs)
 
 **Реалізовано**:
 - ✅ VmManager з Arc<RwLock<>>
@@ -274,7 +274,12 @@
 
 **Залишилось**:
 - ✅ **Health Checks Integration** — **ЗАВЕРШЕНО (Week 5)** 🎉
-- 🔄 Isolation/security enforcement (sandbox/containers)
+- ✅ **Isolation Module Structure** — **ЗАВЕРШЕНО (Week 9)** 🎉
+  - ✅ Network isolation traits та platform-specific implementations
+  - ✅ Filesystem isolation traits та platform-specific implementations
+  - ✅ Linux, Windows, та noop implementations
+  - ✅ Platform-agnostic wrappers
+  - ⚠️ Full implementation pending (placeholders ready)
 - 🔄 GPU scheduling policy (advanced)
 
 **Git Branches**:

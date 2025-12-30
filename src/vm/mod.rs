@@ -8,6 +8,12 @@
 mod resources;
 pub use resources::{PlatformResourceLimiter, ResourceLimiter, ResourceLimits, ResourceUsage};
 
+mod isolation;
+pub use isolation::{
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
+    PlatformFilesystemIsolator, PlatformNetworkIsolator,
+};
+
 use crate::core::error::AppError;
 use crate::runtime::health::{HealthMonitor, HealthStatus};
 use chrono::{DateTime, Utc};
