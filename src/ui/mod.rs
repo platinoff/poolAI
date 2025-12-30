@@ -87,6 +87,33 @@ const BASE_CSS: &str = r#"
   .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   pre { white-space: pre-wrap; word-break: break-word; background: var(--bg, #0b0d10); border: 1px solid var(--border, #262b36); border-radius: 12px; padding: 12px; margin: 12px 0 0; }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  /* Accessibility: Skip links */
+  .skip_link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary, #50fa7b);
+    color: var(--bg, #0f1216);
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 10000;
+    font-weight: bold;
+  }
+  .skip_link:focus {
+    top: 0;
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: 2px;
+  }
+  /* Accessibility: Focus indicators */
+  a:focus, button:focus, input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: 2px;
+  }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: 2px;
+  }
 "#;
 
 fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
@@ -96,6 +123,35 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let component_styles = get_component_styles();
     let theme = DARK_THEME; // Default theme
     let theme_css = theme.to_css();
+    let high_contrast_value = "high-contrast";
+    
+    // Prepare navigation links and attributes with dashes
+    let nav_id = "navigation";
+    let main_content_id = "main_content";
+    let skip_link_class = "skip_link";
+    let skip_to_main_href = format!("#{}", main_content_id);
+    let skip_to_nav_href = format!("#{}", nav_id);
+    let ui_base = "/ui";
+    let ui_status = "/ui/status";
+    let ui_health = "/ui/health";
+    let ui_metrics = "/ui/metrics";
+    let ui_workers = "/ui/workers";
+    let ui_libs = "/ui/libs";
+    let ui_vm = "/ui/vm";
+    let ui_raid = "/ui/raid";
+    let aria_label_nav = "Main navigation";
+    let aria_label_home = "Home page";
+    let aria_label_status = "System status";
+    let aria_label_health = "Health check";
+    let aria_label_metrics = "System metrics";
+    let aria_label_workers = "Worker management";
+    let aria_label_libs = "Library management";
+    let aria_label_vm = "VM instance management";
+    let aria_label_raid = "RAID artifact management";
+    let aria_label_theme = "Select theme";
+    let title_theme = "Select theme";
+    let style_select = "padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.9em; cursor: pointer;";
+    
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -108,46 +164,53 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
 {theme_css}</style>
 </head>
 <body>
+  <!-- Skip links for accessibility -->
+  <a href="{skip_to_main_href}" class="{skip_link_class}">Skip to main content</a>
+  <a href="{skip_to_nav_href}" class="{skip_link_class}">Skip to navigation</a>
+  
   <div class="wrap">
-    <div class="topbar">
+    <header class="topbar" role="banner">
       <div class="brand">
         <div>
           <h1>PoolAI UI</h1>
           <div class="muted">Dashboard with Write Operations (Stage 3)</div>
         </div>
       </div>
-      <div class="nav">
-        <a href="/ui">Home</a>
-        <a href="/ui/status">Status</a>
-        <a href="/ui/health">Health</a>
-        <a href="/ui/metrics">Metrics</a>
-        <a href="/ui/workers">Workers</a>
-        <a href="/ui/libs">Libs</a>
-        <a href="/ui/vm">VM</a>
-        <a href="/ui/raid">RAID</a>
-        <select id="themeSelector" style="padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.9em; cursor: pointer;" title="Select theme">
+      <nav class="nav" id="{nav_id}" role="navigation" aria-label="{aria_label_nav}">
+        <a href="{ui_base}" aria-label="{aria_label_home}">Home</a>
+        <a href="{ui_status}" aria-label="{aria_label_status}">Status</a>
+        <a href="{ui_health}" aria-label="{aria_label_health}">Health</a>
+        <a href="{ui_metrics}" aria-label="{aria_label_metrics}">Metrics</a>
+        <a href="{ui_workers}" aria-label="{aria_label_workers}">Workers</a>
+        <a href="{ui_libs}" aria-label="{aria_label_libs}">Libs</a>
+        <a href="{ui_vm}" aria-label="{aria_label_vm}">VM</a>
+        <a href="{ui_raid}" aria-label="{aria_label_raid}">RAID</a>
+        <select id="themeSelector" aria-label="{aria_label_theme}" style="{style_select}" title="{title_theme}">
           <option value="dark">🌙 Dark</option>
           <option value="light">☀️ Light</option>
-          <option value="high-contrast">🔆 High Contrast</option>
+          <option value="{high_contrast_value}">🔆 High Contrast</option>
         </select>
         {user_info_html}
         {nav_auth_link}
-      </div>
-    </div>
+      </nav>
+    </header>
 
-    <div class="content">
+    <main class="content" id="{main_content_id}" role="main">
       <div class="card">
         <div class="row">
           <div>
             <h2 style="margin:0 0 6px">{title}</h2>
             <div class="muted">Auto-refresh is enabled (5s). Write operations available for authenticated users with appropriate permissions.</div>
           </div>
-          <div class="pill" id="last_updated">—</div>
+          <div class="pill" id="last_updated" aria-live="polite" aria-atomic="true">—</div>
         </div>
         {body}
       </div>
-    </div>
+    </main>
   </div>
+
+  <!-- ARIA live region for notifications -->
+  <div id="aria_live_region" aria-live="polite" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
 
   <script>
   {script}
@@ -160,7 +223,33 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         body = body_html,
         script = script_js,
         nav_auth_link = nav_auth_link,
-        user_info_html = user_info_html
+        user_info_html = user_info_html,
+        skip_to_main_href = skip_to_main_href,
+        skip_link_class = skip_link_class,
+        skip_to_nav_href = skip_to_nav_href,
+        nav_id = nav_id,
+        aria_label_nav = aria_label_nav,
+        ui_base = ui_base,
+        aria_label_home = aria_label_home,
+        ui_status = ui_status,
+        aria_label_status = aria_label_status,
+        ui_health = ui_health,
+        aria_label_health = aria_label_health,
+        ui_metrics = ui_metrics,
+        aria_label_metrics = aria_label_metrics,
+        ui_workers = ui_workers,
+        aria_label_workers = aria_label_workers,
+        ui_libs = ui_libs,
+        aria_label_libs = aria_label_libs,
+        ui_vm = ui_vm,
+        aria_label_vm = aria_label_vm,
+        ui_raid = ui_raid,
+        aria_label_raid = aria_label_raid,
+        aria_label_theme = aria_label_theme,
+        style_select = style_select,
+        title_theme = title_theme,
+        high_contrast_value = high_contrast_value,
+        main_content_id = main_content_id
     );
 
     Html(html)
@@ -320,7 +409,7 @@ async function requireAuth(requiredRole = null) {
   return true;
 }
 
-// User feedback functions
+// User feedback functions with ARIA support
 function showNotification(message, type = 'info', duration = 3000) {
   // Remove existing notification if any
   const existing = document.getElementById('globalNotification');
@@ -328,6 +417,9 @@ function showNotification(message, type = 'info', duration = 3000) {
   
   const notification = document.createElement('div');
   notification.id = 'globalNotification';
+  notification.setAttribute('role', 'alert');
+  notification.setAttribute('aria-live', 'assertive');
+  notification.setAttribute('aria-atomic', 'true');
   notification.style.cssText = `
     position: fixed; top: 20px; right: 20px; z-index: 10000;
     padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -338,6 +430,15 @@ function showNotification(message, type = 'info', duration = 3000) {
   `;
   notification.textContent = message;
   document.body.appendChild(notification);
+  
+  // Announce to screen readers
+  const liveRegion = document.getElementById('aria_live_region');
+  if (liveRegion) {
+    liveRegion.textContent = message;
+    setTimeout(() => {
+      liveRegion.textContent = '';
+    }, duration + 300);
+  }
   
   setTimeout(() => {
     notification.style.animation = 'slideOut 0.3s ease-out';
@@ -359,20 +460,107 @@ function hideLoading(elementId) {
   }
 }
 
-// Modal dialog functions
+// Modal dialog functions with keyboard navigation
+let activeModal = null;
+let modalFocusableElements = [];
+let previousActiveElement = null;
+
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.add('active');
+  if (!modal) return;
+  
+  // Store previous active element for focus restoration
+  previousActiveElement = document.activeElement;
+  
+  // Set ARIA attributes
+  modal.setAttribute('aria-hidden', 'false');
+  modal.setAttribute('aria-modal', 'true');
+  modal.classList.add('active');
+  activeModal = modal;
+  
+  // Get all focusable elements in modal
+  modalFocusableElements = modal.querySelectorAll(
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  );
+  
+  // Focus first focusable element
+  if (modalFocusableElements.length > 0) {
+    modalFocusableElements[0].focus();
   }
+  
+  // Trap focus within modal
+  modal.addEventListener('keydown', trapModalFocus);
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
 }
 
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) {
-    modal.classList.remove('active');
+  if (!modal) return;
+  
+  // Remove ARIA attributes
+  modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('aria-modal', 'false');
+  modal.classList.remove('active');
+  
+  // Remove focus trap
+  modal.removeEventListener('keydown', trapModalFocus);
+  
+  // Restore previous focus
+  if (previousActiveElement) {
+    previousActiveElement.focus();
+    previousActiveElement = null;
+  }
+  
+  activeModal = null;
+  modalFocusableElements = [];
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+function trapModalFocus(e) {
+  if (!activeModal || e.key !== 'Tab') return;
+  
+  const focusableElements = Array.from(activeModal.querySelectorAll(
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  ));
+  
+  if (focusableElements.length === 0) return;
+  
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+  
+  if (e.shiftKey) {
+    // Shift + Tab
+    if (document.activeElement === firstElement) {
+      e.preventDefault();
+      lastElement.focus();
+    }
+  } else {
+    // Tab
+    if (document.activeElement === lastElement) {
+      e.preventDefault();
+      firstElement.focus();
+    }
   }
 }
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  // Esc key closes modals
+  if (e.key === 'Escape' && activeModal) {
+    hideModal(activeModal.id);
+  }
+  
+  // Ctrl+K or Cmd+K for search (placeholder)
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    // TODO: Implement search functionality
+    console.log('Search shortcut pressed (not yet implemented)');
+  }
+});
 
 function confirmAction(message, onConfirm) {
   if (confirm(message)) {
@@ -380,7 +568,7 @@ function confirmAction(message, onConfirm) {
   }
 }
 
-// Enhanced confirmation dialog
+// Enhanced confirmation dialog with ARIA support
 function showConfirmDialog(message, onConfirm, onCancel = null) {
   const dialogId = 'confirmDialog';
   let dialog = document.getElementById(dialogId);
@@ -389,11 +577,15 @@ function showConfirmDialog(message, onConfirm, onCancel = null) {
     dialog = document.createElement('div');
     dialog.id = dialogId;
     dialog.className = 'modal';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-labelledby', 'confirmDialogTitle');
+    dialog.setAttribute('aria-describedby', 'confirmMessage');
+    dialog.setAttribute('aria-modal', 'true');
     dialog.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Confirm Action</h3>
-          <button class="modal-close" onclick="hideModal('${dialogId}')">&times;</button>
+          <h3 id="confirmDialogTitle">Confirm Action</h3>
+          <button class="modal-close" aria-label="Close dialog" onclick="hideModal('${dialogId}')">&times;</button>
         </div>
         <div id="confirmMessage" style="margin-bottom:20px; color:#e8e8e8;"></div>
         <div class="modal-footer">
@@ -538,6 +730,7 @@ function renderTable(containerId, data) {
         const startBtn = document.createElement('button');
         startBtn.className = 'btn btn-primary';
         startBtn.textContent = 'Start';
+        startBtn.setAttribute('aria-label', `Start VM instance ${instanceId}`);
         startBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
         startBtn.onclick = () => handleVmAction(instanceId, 'start');
         actionsTd.appendChild(startBtn);
@@ -548,6 +741,7 @@ function renderTable(containerId, data) {
         const stopBtn = document.createElement('button');
         stopBtn.className = 'btn';
         stopBtn.textContent = 'Stop';
+        stopBtn.setAttribute('aria-label', `Stop VM instance ${instanceId}`);
         stopBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
         stopBtn.onclick = () => handleVmAction(instanceId, 'stop');
         actionsTd.appendChild(stopBtn);
@@ -558,6 +752,7 @@ function renderTable(containerId, data) {
         const restartBtn = document.createElement('button');
         restartBtn.className = 'btn';
         restartBtn.textContent = 'Restart';
+        restartBtn.setAttribute('aria-label', `Restart VM instance ${instanceId}`);
         restartBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
         restartBtn.onclick = () => handleVmAction(instanceId, 'restart');
         actionsTd.appendChild(restartBtn);
@@ -567,6 +762,7 @@ function renderTable(containerId, data) {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn btn-danger';
       deleteBtn.textContent = 'Delete';
+      deleteBtn.setAttribute('aria-label', `Delete VM instance ${instanceId}`);
       deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
       deleteBtn.onclick = () => handleVmDelete(instanceId, row.name || instanceId);
       actionsTd.appendChild(deleteBtn);
@@ -1162,6 +1358,7 @@ async fn workers_page() -> Html<String> {
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'btn btn-danger';
           deleteBtn.textContent = 'Delete';
+          deleteBtn.setAttribute('aria-label', `Delete worker ${workerId}`);
           deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           deleteBtn.onclick = () => handleWorkerDelete(workerId);
           actionsTd.appendChild(deleteBtn);
@@ -1280,16 +1477,16 @@ async fn workers_page() -> Html<String> {
         r#"
 <div class="row" style="margin-bottom:16px;">
   <div class="muted">Source: <code>/api/v1/workers</code></div>
-  <button class="btn btn-primary" onclick="showCreateWorkerModal()">Create Worker</button>
+  <button class="btn btn-primary" onclick="showCreateWorkerModal()" aria-label="Create new worker">Create Worker</button>
 </div>
 <div id="data"></div>
 
 <!-- Create Worker Modal -->
-<div id="createWorkerModal" class="modal">
+<div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="true" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Create Worker</h3>
-      <button class="modal-close" onclick="hideModal('createWorkerModal')">&times;</button>
+      <h3 id="createWorkerModalTitle">Create Worker</h3>
+      <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createWorkerModal')">&times;</button>
     </div>
     <form id="createWorkerForm" onsubmit="handleCreateWorker(event)">
       <div class="form-group">
@@ -1411,6 +1608,7 @@ async fn libs_page() -> Html<String> {
           const updateBtn = document.createElement('button');
           updateBtn.className = 'btn';
           updateBtn.textContent = 'Update';
+          updateBtn.setAttribute('aria-label', `Update library ${libName}`);
           updateBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           updateBtn.onclick = () => handleLibraryAction(libName, 'update');
           actionsTd.appendChild(updateBtn);
@@ -1419,6 +1617,7 @@ async fn libs_page() -> Html<String> {
           const uninstallBtn = document.createElement('button');
           uninstallBtn.className = 'btn btn-danger';
           uninstallBtn.textContent = 'Uninstall';
+          uninstallBtn.setAttribute('aria-label', `Uninstall library ${libName}`);
           uninstallBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           uninstallBtn.onclick = () => handleLibraryUninstall(libName);
           actionsTd.appendChild(uninstallBtn);
@@ -1661,16 +1860,16 @@ async fn vm_page() -> Html<String> {
         r#"
 <div class="row" style="margin-bottom:16px;">
   <div class="muted">Source: <code>/api/v1/vm/instances</code></div>
-  <button class="btn btn-primary" onclick="showCreateVmModal()">Create VM Instance</button>
+  <button class="btn btn-primary" onclick="showCreateVmModal()" aria-label="Create new VM instance">Create VM Instance</button>
 </div>
 <div id="data"></div>
 
 <!-- Create VM Modal -->
-<div id="createVmModal" class="modal">
+<div id="createVmModal" class="modal" role="dialog" aria-labelledby="createVmModalTitle" aria-modal="true" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Create VM Instance</h3>
-      <button class="modal-close" onclick="hideModal('createVmModal')">&times;</button>
+      <h3 id="createVmModalTitle">Create VM Instance</h3>
+      <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createVmModal')">&times;</button>
     </div>
     <form id="createVmForm" onsubmit="handleCreateVm(event)">
       <div class="form-group">
@@ -1776,6 +1975,7 @@ async fn raid_page() -> Html<String> {
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'btn btn-danger';
           deleteBtn.textContent = 'Delete';
+          deleteBtn.setAttribute('aria-label', `Delete artifact ${artifactName}`);
           deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           deleteBtn.onclick = () => handleArtifactDelete(artifactId, artifactName);
           actionsTd.appendChild(deleteBtn);
@@ -1916,7 +2116,7 @@ async fn raid_page() -> Html<String> {
         r#"
 <div class="row" style="margin-bottom:16px;">
   <div class="muted">Artifacts: <code>/api/v1/raid/artifacts</code></div>
-  <button class="btn btn-primary" onclick="showCreateArtifactModal()">Create Artifact</button>
+  <button class="btn btn-primary" onclick="showCreateArtifactModal()" aria-label="Create new artifact">Create Artifact</button>
 </div>
 
 <div class="grid">
@@ -1931,11 +2131,11 @@ async fn raid_page() -> Html<String> {
 </div>
 
 <!-- Create Artifact Modal -->
-<div id="createArtifactModal" class="modal">
+<div id="createArtifactModal" class="modal" role="dialog" aria-labelledby="createArtifactModalTitle" aria-modal="true" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Create Artifact</h3>
-      <button class="modal-close" onclick="hideModal('createArtifactModal')">&times;</button>
+      <h3 id="createArtifactModalTitle">Create Artifact</h3>
+      <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createArtifactModal')">&times;</button>
     </div>
     <form id="createArtifactForm" onsubmit="handleCreateArtifact(event)">
       <div class="form-group">
