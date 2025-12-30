@@ -4,6 +4,9 @@
 //! - Web dashboard (basic)
 //! - UI components/themes/layouts (planned)
 
+mod components;
+pub use components::get_component_styles;
+
 use crate::core::error::AppError;
 use axum::{response::Html, routing::get, Router};
 use tracing::info;
@@ -92,6 +95,7 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let auth_url = "/ui/auth";
     let nav_auth_link = format!(r#"<a href="{}" id="authLoginBtn">Login</a>"#, auth_url);
     let user_info_html = "<div class=\"user-info\" id=\"userInfo\" style=\"display:none;\">\n          <span class=\"role\" id=\"userRole\"></span>\n          <a href=\"#\" id=\"logoutBtn\">Logout</a>\n        </div>";
+    let component_styles = get_component_styles();
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -99,7 +103,8 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
-  <style>{css}</style>
+  <style>{base_css}
+{component_css}</style>
 </head>
 <body>
   <div class="wrap">
@@ -144,7 +149,8 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
 </body>
 </html>"#,
         title = title,
-        css = BASE_CSS,
+        base_css = BASE_CSS,
+        component_css = component_styles,
         body = body_html,
         script = script_js,
         nav_auth_link = nav_auth_link,
