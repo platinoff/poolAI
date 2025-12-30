@@ -1,5 +1,27 @@
 //! UI module
 //!
+//! Provides web dashboard interface with read/write operations, authentication,
+//! theme customization, and reusable UI components.
+//!
+//! # Features
+//!
+//! - **Dashboard Pages**: Status, health, metrics, workers, libs, VM, RAID
+//! - **Authentication**: JWT-based authentication with role-based access control
+//! - **Write Operations**: Create/delete artifacts and workers through UI
+//! - **Theme Support**: Dark, light, and high-contrast themes
+//! - **Components**: Reusable UI components (buttons, cards, forms, modals)
+//!
+//! # Routes
+//!
+//! - `/ui` - Home page
+//! - `/ui/status` - System status
+//! - `/ui/health` - Health check
+//! - `/ui/metrics` - System metrics
+//! - `/ui/workers` - Worker management
+//! - `/ui/libs` - Library management
+//! - `/ui/vm` - VM instance management
+//! - `/ui/raid` - RAID artifact management
+//!
 //! Concept alignment (planned in `poolAI_concept.txt`):
 //! - Web dashboard (basic)
 //! - UI components/themes/layouts (planned)

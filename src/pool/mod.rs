@@ -348,7 +348,7 @@ pub async fn health_check() -> Result<(), AppError> {
 }
 
 /// Get global pool instance
-/// Returns a reference to Arc<RwLock<Pool>> for async-safe access
+/// Returns a reference to `Arc<RwLock<Pool>>` for async-safe access
 pub fn get_global_pool() -> Option<&'static Arc<RwLock<Pool>>> {
     GLOBAL_POOL.get()
 }

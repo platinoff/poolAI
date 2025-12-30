@@ -1,5 +1,67 @@
 //! Virtual Machines (VM) module
 //!
+//! Provides VM instance management, resource limits, isolation, auto-recovery,
+//! and resource monitoring capabilities.
+//!
+//! # Examples
+//!
+//! ## Creating a VM instance
+//!
+//! ```no_run
+//! use poolai::vm::{VmManager, VmResources, VmIsolation};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = VmManager::new();
+//!
+//! let instance = manager.create_instance(
+//!     "my-vm".to_string(),
+//!     VmResources::default(),
+//!     VmIsolation::ProcessSandbox,
+//! ).await?;
+//!
+//! println!("Created VM instance: {:?}", instance.id);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Configuring auto-recovery
+//!
+//! ```no_run
+//! use poolai::vm::{VmManager, AutoRecoveryConfig};
+//! use uuid::Uuid;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = VmManager::new();
+//! let instance_id = Uuid::new_v4();
+//!
+//! let auto_recovery = AutoRecoveryConfig {
+//!     max_restart_attempts: 5,
+//!     initial_restart_delay_secs: 1,
+//!     max_restart_delay_secs: 60,
+//!     use_exponential_backoff: true,
+//! };
+//!
+//! manager.update_instance(instance_id, None, None, Some(auto_recovery)).await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Monitoring resource usage
+//!
+//! ```no_run
+//! use poolai::vm::VmManager;
+//! use uuid::Uuid;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = VmManager::new();
+//! let instance_id = Uuid::new_v4();
+//!
+//! let stats = manager.get_resource_usage_stats(instance_id).await?;
+//! println!("CPU avg: {:.2}%", stats.cpu_percent_avg);
+//! # Ok(())
+//! # }
+//! ```
+//!
 //! Concept alignment:
 //! - VM instance management (planned in `poolAI_concept.txt`)
 //! - Isolation/security hooks (stubbed)

@@ -2,6 +2,71 @@
 //!
 //! This library provides a comprehensive AI mining pool management system
 //! with advanced runtime management, monitoring, and enterprise features.
+//!
+//! # Quick Start
+//!
+//! ## Starting the server
+//!
+//! ```no_run
+//! use poolai::network::start_server;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! // Start the server with default configuration
+//! start_server().await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Creating a VM instance
+//!
+//! ```no_run
+//! use poolai::vm::{VmManager, VmResources, VmIsolation};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = VmManager::new();
+//!
+//! let instance = manager.create_instance(
+//!     "my-vm".to_string(),
+//!     VmResources::default(),
+//!     VmIsolation::ProcessSandbox,
+//! ).await?;
+//!
+//! println!("Created VM: {:?}", instance.id);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Storing an artifact in RAID
+//!
+//! ```no_run
+//! use poolai::raid::{RaidManager, RaidConfig, RaidMode};
+//! use std::path::PathBuf;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let config = RaidConfig {
+//!     mode: RaidMode::Local,
+//!     base_path: PathBuf::from("./data/raid"),
+//!     quota_bytes: Some(10 * 1024 * 1024 * 1024),
+//!     retention_days: Some(30),
+//!     gc_on_startup: true,
+//! };
+//!
+//! let manager = RaidManager::new(config).await?;
+//! let artifact_id = manager.store_artifact("my-artifact", b"data").await?;
+//! println!("Stored artifact: {:?}", artifact_id);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! # Modules
+//!
+//! - [`core`] - Core functionality (config, error handling, model interface)
+//! - [`pool`] - Worker pool management
+//! - [`monitoring`] - System monitoring and metrics
+//! - [`network`] - REST API and WebSocket server
+//! - [`vm`] - Virtual machine instance management
+//! - [`raid`] - Distributed artifact storage
+//! - [`ui`] - Web dashboard interface
 
 // Core modules
 pub mod core;
@@ -28,7 +93,7 @@ pub use core::state::AppState;
 
 // Re-export pool types
 pub use pool::LoadBalancingStrategy;
-pub use pool::{Pool, PoolConfig, PoolMetrics};
+pub use pool::{Pool as PoolType, PoolConfig, PoolMetrics};
 
 // Re-export monitoring types
 pub use monitoring::MetricsCollector;

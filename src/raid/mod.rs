@@ -1,5 +1,60 @@
 //! RAID / Storage module
 //!
+//! Provides distributed artifact storage with replication, event sourcing,
+//! circuit breaker pattern, and Raft consensus for consistency.
+//!
+//! # Features
+//!
+//! - **Local Storage**: File-based artifact storage with manifest management
+//! - **Distributed RAID**: Multi-node replication with quorum-based consistency
+//! - **Event Sourcing**: Complete audit trail of all operations
+//! - **Circuit Breaker**: Fault tolerance and automatic recovery
+//! - **Raft Consensus**: Distributed consistency (optional, requires `raft` feature)
+//!
+//! # Examples
+//!
+//! ## Storing an artifact
+//!
+//! ```no_run
+//! use poolai::raid::{RaidManager, RaidConfig, RaidMode};
+//! use std::path::PathBuf;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let config = RaidConfig {
+//!     mode: RaidMode::Local,
+//!     base_path: PathBuf::from("./data/raid"),
+//!     quota_bytes: Some(10 * 1024 * 1024 * 1024), // 10 GB
+//!     retention_days: Some(30),
+//!     gc_on_startup: true,
+//! };
+//!
+//! let manager = RaidManager::new(config).await?;
+//!
+//! // Store an artifact
+//! let artifact_id = manager.store_artifact("my-artifact", b"artifact data").await?;
+//! println!("Stored artifact: {:?}", artifact_id);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Retrieving an artifact
+//!
+//! ```no_run
+//! use poolai::raid::RaidManager;
+//! use uuid::Uuid;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! # let manager = poolai::raid::RaidManager::new(
+//! #     poolai::raid::RaidConfig::default_for_platform()
+//! # ).await?;
+//! let artifact_id = Uuid::new_v4();
+//!
+//! let data = manager.get_artifact(artifact_id).await?;
+//! println!("Retrieved {} bytes", data.len());
+//! # Ok(())
+//! # }
+//! ```
+//!
 //! Concept alignment (planned in `poolAI_concept.txt`):
 //! - BurstRAID logic (stub)
 //! - SmallWorld distributed system (stub)
