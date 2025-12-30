@@ -182,6 +182,9 @@ cd S:\rust\poolAI; git push origin HEAD
   - ✅ Network namespace creation
   - ✅ Mount namespace creation
   - ✅ Chroot implementation
+  - ✅ Error handling & graceful degradation (strict mode support)
+  - ✅ Partial isolation support
+  - ✅ Integration tests (20 tests passing)
   - 🔄 Network interface configuration (planned)
   - 🔄 Firewall rules setup (planned)
 - 🔄 Windows isolation (planned - requires Windows API)

@@ -28,6 +28,7 @@ async fn test_network_isolation_config_custom() {
         allowed_interfaces: vec!["eth0".to_string(), "lo".to_string()],
         allowed_ports: vec![80, 443, 8080],
         allow_loopback: false,
+        strict: false,
     };
 
     assert!(config.enabled);
@@ -56,6 +57,7 @@ async fn test_filesystem_isolation_config_custom() {
         allowed_paths: vec![PathBuf::from("/tmp/allowed")],
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
+        strict: false,
     };
 
     assert!(config.enabled);
@@ -159,6 +161,7 @@ async fn test_network_isolation_apply_enabled() {
         allowed_interfaces: vec!["eth0".to_string()],
         allowed_ports: vec![80, 443],
         allow_loopback: true,
+        strict: false,
     };
 
     // Should succeed (even if not fully implemented, placeholders return Ok)
@@ -175,6 +178,7 @@ async fn test_network_isolation_apply_invalid_config() {
         allowed_interfaces: vec![],
         allowed_ports: vec![],
         allow_loopback: false,
+        strict: false,
     };
 
     // Should fail validation
@@ -190,6 +194,7 @@ async fn test_network_isolation_apply_invalid_process_id() {
         allowed_interfaces: vec!["eth0".to_string()],
         allowed_ports: vec![80, 443],
         allow_loopback: true,
+        strict: false,
     };
 
     // Should fail with invalid process ID
@@ -206,6 +211,7 @@ async fn test_filesystem_isolation_apply_invalid_process_id() {
         allowed_paths: vec![],
         read_only_paths: vec![],
         use_chroot: true,
+        strict: false,
     };
 
     // Should fail with invalid process ID
@@ -222,11 +228,47 @@ async fn test_filesystem_isolation_apply_chroot_without_root_dir() {
         allowed_paths: vec![],
         read_only_paths: vec![],
         use_chroot: true,  // Requires root_dir
+        strict: false,
     };
 
     // Should fail validation
     let result = isolator.apply_filesystem_isolation(12345, &config);
     assert!(result.is_err(), "Filesystem isolation with use_chroot but no root_dir should fail");
+}
+
+#[tokio::test]
+async fn test_network_isolation_graceful_degradation() {
+    let isolator = PlatformNetworkIsolator::new();
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec!["eth0".to_string()],
+        allowed_ports: vec![80, 443],
+        allow_loopback: true,
+        strict: false, // Graceful degradation enabled
+    };
+
+    // Should succeed even if system calls fail (graceful degradation)
+    let result = isolator.apply_network_isolation(12345, &config);
+    assert!(result.is_ok(), "Network isolation should succeed with graceful degradation");
+}
+
+#[tokio::test]
+async fn test_filesystem_isolation_graceful_degradation() {
+    use std::path::PathBuf;
+    
+    let isolator = PlatformFilesystemIsolator::new();
+    let config = FilesystemIsolationConfig {
+        enabled: true,
+        root_dir: Some(PathBuf::from("/tmp/vm-root")),
+        allowed_paths: vec![PathBuf::from("/tmp/allowed")],
+        read_only_paths: vec![PathBuf::from("/tmp/readonly")],
+        use_chroot: true,
+        strict: false, // Graceful degradation enabled
+    };
+
+    // Should succeed even if system calls fail (graceful degradation)
+    let result = isolator.apply_filesystem_isolation(12345, &config);
+    assert!(result.is_ok(), "Filesystem isolation should succeed with graceful degradation");
 }
 
 #[tokio::test]
@@ -240,6 +282,7 @@ async fn test_filesystem_isolation_apply_enabled() {
         allowed_paths: vec![PathBuf::from("/tmp/allowed")],
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
+        strict: false,
     };
 
     // Should succeed (even if not fully implemented, placeholders return Ok)

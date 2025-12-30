@@ -108,13 +108,24 @@ use winapi::um::appmodel::CreateAppContainerProfile;
 // Configure allowed paths using capabilities
 ```
 
-### Phase 3: Error Handling and Recovery 🔄 PENDING
+### Phase 3: Error Handling and Recovery ✅ PARTIALLY COMPLETED
+
+**Status**: ✅ Graceful degradation implemented, resource tracking planned
 
 **Requirements**:
-- Graceful fallbacks when isolation fails
-- Cleanup on errors
-- Resource tracking
-- Rollback mechanisms
+- ✅ Graceful fallbacks when isolation fails (strict mode support)
+- 🔄 Cleanup on errors (planned)
+- 🔄 Resource tracking (planned)
+- 🔄 Rollback mechanisms (planned)
+
+**Implementation**:
+- ✅ Added `strict` field to `NetworkIsolationConfig` and `FilesystemIsolationConfig`
+- ✅ Graceful degradation: if isolation fails and `strict=false`, log warning and continue
+- ✅ Strict mode: if isolation fails and `strict=true`, return error
+- ✅ Improved error messages with context
+- ✅ Partial isolation support: if network isolation fails, filesystem isolation can still be applied
+- 🔄 Resource tracking for cleanup (planned)
+- 🔄 Rollback mechanisms (planned)
 
 ### Phase 4: Advanced Features 🔄 PENDING
 

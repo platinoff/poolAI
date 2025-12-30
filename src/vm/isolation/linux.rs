@@ -75,11 +75,22 @@ impl NetworkIsolator for LinuxNetworkIsolator {
                     // - Move process to namespace (requires setns or process creation in namespace)
                 }
                 Err(e) => {
-                    warn!(
-                        "Failed to create network namespace for process {}: {}. Isolation may not be fully applied.",
+                    let error_msg = format!(
+                        "Failed to create network namespace for process {}: {}",
                         process_id, e
                     );
-                    // Continue with validation-only mode
+                    if config.strict {
+                        return Err(AppError::ConfigError(format!(
+                            "{}. Isolation is required (strict mode enabled).",
+                            error_msg
+                        )));
+                    } else {
+                        warn!(
+                            "{}. Isolation may not be fully applied (graceful degradation).",
+                            error_msg
+                        );
+                        // Continue with validation-only mode
+                    }
                 }
             }
         }
@@ -186,7 +197,8 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
         #[cfg(feature = "vm-isolation-linux")]
         {
             // Create mount namespace for isolation
-            match unshare(CloneFlags::CLONE_NEWNS) {
+            let mount_ns_result = unshare(CloneFlags::CLONE_NEWNS);
+            match mount_ns_result {
                 Ok(_) => {
                     info!("Successfully created mount namespace for process {}", process_id);
 
@@ -208,12 +220,23 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
                         if let Some(ref root_dir) = config.root_dir {
                             // Ensure root directory exists
                             if !root_dir.exists() {
-                                fs::create_dir_all(root_dir).map_err(|e| {
-                                    AppError::ConfigError(format!(
-                                        "Failed to create root directory {:?}: {}",
-                                        root_dir, e
-                                    ))
-                                })?;
+                                match fs::create_dir_all(root_dir) {
+                                    Ok(_) => {
+                                        info!("Created root directory: {:?}", root_dir);
+                                    }
+                                    Err(e) => {
+                                        let error_msg = format!(
+                                            "Failed to create root directory {:?}: {}",
+                                            root_dir, e
+                                        );
+                                        if config.strict {
+                                            return Err(AppError::ConfigError(error_msg));
+                                        } else {
+                                            warn!("{}. Continuing without chroot.", error_msg);
+                                            return Ok(()); // Skip chroot but continue
+                                        }
+                                    }
+                                }
                             }
 
                             // Apply chroot
@@ -222,22 +245,41 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
                                     info!("Successfully applied chroot to {:?} for process {}", root_dir, process_id);
                                 }
                                 Err(e) => {
-                                    warn!(
-                                        "Failed to apply chroot to {:?} for process {}: {}. Isolation may not be fully applied.",
+                                    let error_msg = format!(
+                                        "Failed to apply chroot to {:?} for process {}: {}",
                                         root_dir, process_id, e
                                     );
-                                    // Continue without chroot
+                                    if config.strict {
+                                        return Err(AppError::ConfigError(error_msg));
+                                    } else {
+                                        warn!(
+                                            "{}. Isolation may not be fully applied (graceful degradation).",
+                                            error_msg
+                                        );
+                                        // Continue without chroot
+                                    }
                                 }
                             }
                         }
                     }
                 }
                 Err(e) => {
-                    warn!(
-                        "Failed to create mount namespace for process {}: {}. Isolation may not be fully applied.",
+                    let error_msg = format!(
+                        "Failed to create mount namespace for process {}: {}",
                         process_id, e
                     );
-                    // Continue with validation-only mode
+                    if config.strict {
+                        return Err(AppError::ConfigError(format!(
+                            "{}. Isolation is required (strict mode enabled).",
+                            error_msg
+                        )));
+                    } else {
+                        warn!(
+                            "{}. Isolation may not be fully applied (graceful degradation).",
+                            error_msg
+                        );
+                        // Continue with validation-only mode
+                    }
                 }
             }
         }

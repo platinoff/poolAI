@@ -18,6 +18,8 @@ pub struct NetworkIsolationConfig {
     pub allowed_ports: Vec<u16>,
     /// Whether to allow loopback
     pub allow_loopback: bool,
+    /// Whether to fail if isolation cannot be applied (default: false, graceful degradation)
+    pub strict: bool,
 }
 
 impl Default for NetworkIsolationConfig {
@@ -27,6 +29,7 @@ impl Default for NetworkIsolationConfig {
             allowed_interfaces: vec![],
             allowed_ports: vec![],
             allow_loopback: true,
+            strict: false,
         }
     }
 }
@@ -44,6 +47,8 @@ pub struct FilesystemIsolationConfig {
     pub read_only_paths: Vec<PathBuf>,
     /// Whether to use chroot
     pub use_chroot: bool,
+    /// Whether to fail if isolation cannot be applied (default: false, graceful degradation)
+    pub strict: bool,
 }
 
 impl Default for FilesystemIsolationConfig {
@@ -54,6 +59,7 @@ impl Default for FilesystemIsolationConfig {
             allowed_paths: vec![],
             read_only_paths: vec![],
             use_chroot: false,
+            strict: false,
         }
     }
 }

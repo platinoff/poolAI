@@ -863,31 +863,66 @@ impl VmManager {
         // Apply isolation based on instance's isolation policy
         match instance.isolation {
             VmIsolation::ProcessSandbox => {
-                // Apply network isolation
+                // Apply network isolation with graceful error handling
                 let network_config = NetworkIsolationConfig {
                     enabled: true,
                     allowed_interfaces: vec![],
                     allowed_ports: vec![],
                     allow_loopback: true,
+                    strict: false, // Graceful degradation by default
                 };
-                self.network_isolator
-                    .apply_network_isolation(process_id, &network_config)?;
+                
+                let network_result = self.network_isolator
+                    .apply_network_isolation(process_id, &network_config);
+                
+                // If network isolation fails, log but continue (unless strict mode)
+                if let Err(ref e) = network_result {
+                    warn!(
+                        "Network isolation failed for process {} (instance {}): {}. Continuing with filesystem isolation.",
+                        process_id, instance_id, e
+                    );
+                }
 
-                // Apply filesystem isolation
+                // Apply filesystem isolation with graceful error handling
                 let fs_config = FilesystemIsolationConfig {
                     enabled: true,
                     root_dir: None,
                     allowed_paths: vec![],
                     read_only_paths: vec![],
                     use_chroot: false,
+                    strict: false, // Graceful degradation by default
                 };
-                self.filesystem_isolator
-                    .apply_filesystem_isolation(process_id, &fs_config)?;
+                
+                let fs_result = self.filesystem_isolator
+                    .apply_filesystem_isolation(process_id, &fs_config);
 
-                info!(
-                    "Applied isolation to process {} for VM instance {}",
-                    process_id, instance_id
-                );
+                // If both isolations fail, return error
+                match (network_result, fs_result) {
+                    (Ok(_), Ok(_)) => {
+                        info!(
+                            "Successfully applied isolation to process {} for VM instance {}",
+                            process_id, instance_id
+                        );
+                    }
+                    (Err(net_err), Err(fs_err)) => {
+                        return Err(AppError::ConfigError(format!(
+                            "Both network and filesystem isolation failed for process {} (instance {}): network={}, filesystem={}",
+                            process_id, instance_id, net_err, fs_err
+                        )));
+                    }
+                    (Ok(_), Err(fs_err)) => {
+                        warn!(
+                            "Filesystem isolation failed for process {} (instance {}): {}. Network isolation applied.",
+                            process_id, instance_id, fs_err
+                        );
+                    }
+                    (Err(net_err), Ok(_)) => {
+                        warn!(
+                            "Network isolation failed for process {} (instance {}): {}. Filesystem isolation applied.",
+                            process_id, instance_id, net_err
+                        );
+                    }
+                }
             }
             VmIsolation::HardwareVm => {
                 // Hardware VM isolation would be handled by the hypervisor

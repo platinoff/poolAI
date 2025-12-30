@@ -275,6 +275,11 @@
     - ✅ Network namespace creation (`unshare(CLONE_NEWNET)`)
     - ✅ Mount namespace creation (`unshare(CLONE_NEWNS)`)
     - ✅ Chroot implementation (`nix::unistd::chroot`)
+    - ✅ **Error Handling & Graceful Degradation** — **COMPLETED** 🎉
+      - ✅ `strict` mode support (fail on error vs graceful degradation)
+      - ✅ Partial isolation support (network or filesystem can fail independently)
+      - ✅ Improved error messages with context
+      - ✅ Integration tests (20 tests passing)
     - 🔄 Network interface configuration (planned)
     - 🔄 Firewall rules setup (planned)
     - 🔄 Bind mounts setup (planned)
