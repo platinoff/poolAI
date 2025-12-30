@@ -9,7 +9,7 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок та warnings  
-**Статус тестів**: ✅ **173+ tests passing** (33 unit + 140+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 20 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
+**Статус тестів**: ✅ **177+ tests passing** (33 unit + 144+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 24 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
 **Останній коміт**: Improve Rustdoc documentation - add usage examples to VM, RAID, UI modules and library root
 
 ---
@@ -219,7 +219,7 @@
 
 ---
 
-### 12. VM Module (`src/vm/`) — ✅ ~98% COMPLETED
+### 12. VM Module (`src/vm/`) — ✅ ~99% COMPLETED
 **Файли**: 8 (mod.rs, resources.rs, resources/linux.rs, resources/windows.rs, isolation.rs, isolation/linux.rs, isolation/windows.rs, isolation/noop.rs)
 
 **Реалізовано**:
@@ -279,10 +279,13 @@
       - ✅ `strict` mode support (fail on error vs graceful degradation)
       - ✅ Partial isolation support (network or filesystem can fail independently)
       - ✅ Improved error messages with context
-      - ✅ Integration tests (20 tests passing)
-    - 🔄 Network interface configuration (planned)
-    - 🔄 Firewall rules setup (planned)
-    - 🔄 Bind mounts setup (planned)
+      - ✅ Integration tests (24 tests passing)
+      - ✅ Loopback interface setup (`ip link set lo up`)
+      - ✅ Bind mounts implementation (`nix::mount::mount` with `MS_BIND`)
+      - ✅ Read-only mounts implementation (`MS_RDONLY` flag)
+      - ✅ Usage examples in Rustdoc
+    - 🔄 Network interface configuration (veth pairs, macvlan - planned)
+    - 🔄 Firewall rules setup (iptables/nftables - planned)
 - ✅ **Auto-Recovery Enhancements** — **ЗАВЕРШЕНО (Week 9)** 🎉
   - ✅ AutoRecoveryConfig struct з налаштуваннями (max_restart_attempts, delays, exponential backoff)
   - ✅ Exponential backoff для restart delay
@@ -295,7 +298,7 @@
   - ✅ Resource alert thresholds (configurable per instance)
   - ✅ Automatic alert checking при record_resource_usage
   - ✅ Integration tests (11 tests для resource monitoring)
-- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health + 8 для write operations + 14 для isolation + 9 для auto-recovery + 11 для resource monitoring = 74 tests)
+- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health + 8 для write operations + 24 для isolation + 9 для auto-recovery + 11 для resource monitoring = 78 tests)
 
 **API Endpoints**:
 - ✅ `GET /api/v1/vm/instances` - список instances
