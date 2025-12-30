@@ -16,6 +16,8 @@ use nix::unistd::chroot;
 use nix::mount::{mount, MsFlags};
 #[cfg(feature = "vm-isolation-linux")]
 use std::fs;
+#[cfg(feature = "vm-isolation-linux")]
+use std::process::Command;
 
 /// Linux network isolator using network namespaces
 pub struct LinuxNetworkIsolator;
@@ -23,6 +25,33 @@ pub struct LinuxNetworkIsolator;
 impl LinuxNetworkIsolator {
     pub fn new() -> Self {
         Self
+    }
+    
+    /// Set up loopback interface in the current network namespace
+    #[cfg(feature = "vm-isolation-linux")]
+    fn setup_loopback_interface() -> Result<(), AppError> {
+        // Use `ip` command to bring up loopback interface
+        // This is simpler than using raw socket calls
+        let output = Command::new("ip")
+            .args(&["link", "set", "lo", "up"])
+            .output()
+            .map_err(|e| AppError::ConfigError(format!("Failed to execute ip command: {}", e)))?;
+        
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::ConfigError(format!(
+                "Failed to set up loopback interface: {}",
+                stderr
+            )));
+        }
+        
+        Ok(())
+    }
+    
+    #[cfg(not(feature = "vm-isolation-linux"))]
+    fn setup_loopback_interface() -> Result<(), AppError> {
+        // No-op when feature is not enabled
+        Ok(())
     }
 }
 
@@ -68,10 +97,30 @@ impl NetworkIsolator for LinuxNetworkIsolator {
             match unshare(CloneFlags::CLONE_NEWNET) {
                 Ok(_) => {
                     info!("Successfully created network namespace for process {}", process_id);
+                    
+                    // Set up loopback interface if allowed
+                    if config.allow_loopback {
+                        match Self::setup_loopback_interface() {
+                            Ok(_) => {
+                                info!("Successfully set up loopback interface for process {}", process_id);
+                            }
+                            Err(e) => {
+                                let error_msg = format!(
+                                    "Failed to set up loopback interface for process {}: {}",
+                                    process_id, e
+                                );
+                                if config.strict {
+                                    return Err(AppError::ConfigError(error_msg));
+                                } else {
+                                    warn!("{}. Continuing without loopback.", error_msg);
+                                }
+                            }
+                        }
+                    }
+                    
                     // TODO: Additional configuration:
-                    // - Set up loopback interface if allow_loopback
-                    // - Configure allowed interfaces
-                    // - Set up firewall rules for allowed ports
+                    // - Configure allowed interfaces (requires veth pairs or macvlan)
+                    // - Set up firewall rules for allowed ports (iptables/nftables)
                     // - Move process to namespace (requires setns or process creation in namespace)
                 }
                 Err(e) => {
@@ -149,6 +198,73 @@ impl LinuxFilesystemIsolator {
     pub fn new() -> Self {
         Self
     }
+    
+    /// Set up a bind mount for filesystem isolation
+    #[cfg(feature = "vm-isolation-linux")]
+    fn setup_bind_mount(
+        source: &PathBuf,
+        root_dir: Option<&PathBuf>,
+        read_only: bool,
+    ) -> Result<(), AppError> {
+        // Validate source path exists
+        if !source.exists() {
+            return Err(AppError::ConfigError(format!(
+                "Source path does not exist: {:?}",
+                source
+            )));
+        }
+        
+        // If root_dir is provided and use_chroot is enabled, we need to create
+        // the mount point inside the chroot directory
+        // For now, we'll just set up the bind mount in the current namespace
+        let target = if let Some(root_dir) = root_dir {
+            // Create target path inside root_dir
+            let relative_path = source.strip_prefix("/").unwrap_or(source);
+            let target_path = root_dir.join(relative_path);
+            if let Some(parent) = target_path.parent() {
+                if let Err(e) = fs::create_dir_all(parent) {
+                    return Err(AppError::ConfigError(format!(
+                        "Failed to create target directory {:?}: {}",
+                        parent, e
+                    )));
+                }
+            }
+            target_path
+        } else {
+            source.clone()
+        };
+        
+        // Set up bind mount flags
+        let mut flags = MsFlags::MS_BIND | MsFlags::MS_REC;
+        if read_only {
+            flags |= MsFlags::MS_RDONLY;
+        }
+        
+        // Create bind mount
+        mount(
+            Some(source.as_os_str()),
+            target.as_os_str(),
+            None::<&str>,
+            flags,
+            None::<&str>,
+        )
+        .map_err(|e| AppError::ConfigError(format!(
+            "Failed to create bind mount from {:?} to {:?}: {}",
+            source, target, e
+        )))?;
+        
+        Ok(())
+    }
+    
+    #[cfg(not(feature = "vm-isolation-linux"))]
+    fn setup_bind_mount(
+        _source: &PathBuf,
+        _root_dir: Option<&PathBuf>,
+        _read_only: bool,
+    ) -> Result<(), AppError> {
+        // No-op when feature is not enabled
+        Ok(())
+    }
 }
 
 impl FilesystemIsolator for LinuxFilesystemIsolator {
@@ -204,15 +320,36 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
                     // Set up bind mounts for allowed paths
                     for allowed_path in &config.allowed_paths {
-                        // TODO: Create target path in root_dir if use_chroot
-                        // TODO: Set up bind mount
-                        info!("Would set up bind mount for: {:?}", allowed_path);
+                        if let Err(e) = Self::setup_bind_mount(allowed_path, config.root_dir.as_ref(), false) {
+                            let error_msg = format!(
+                                "Failed to set up bind mount for {:?}: {}",
+                                allowed_path, e
+                            );
+                            if config.strict {
+                                return Err(AppError::ConfigError(error_msg));
+                            } else {
+                                warn!("{}. Continuing without this mount.", error_msg);
+                            }
+                        } else {
+                            info!("Successfully set up bind mount for: {:?}", allowed_path);
+                        }
                     }
 
                     // Set up read-only mounts
                     for read_only_path in &config.read_only_paths {
-                        // TODO: Set up read-only mount
-                        info!("Would set up read-only mount for: {:?}", read_only_path);
+                        if let Err(e) = Self::setup_bind_mount(read_only_path, config.root_dir.as_ref(), true) {
+                            let error_msg = format!(
+                                "Failed to set up read-only mount for {:?}: {}",
+                                read_only_path, e
+                            );
+                            if config.strict {
+                                return Err(AppError::ConfigError(error_msg));
+                            } else {
+                                warn!("{}. Continuing without this mount.", error_msg);
+                            }
+                        } else {
+                            info!("Successfully set up read-only mount for: {:?}", read_only_path);
+                        }
                     }
 
                     // Apply chroot if requested

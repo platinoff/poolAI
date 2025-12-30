@@ -52,9 +52,11 @@ This document describes the approach and implementation plan for full VM isolati
 - ✅ Implemented network namespace creation using `unshare(CLONE_NEWNET)`
 - ✅ Implemented mount namespace creation using `unshare(CLONE_NEWNS)`
 - ✅ Implemented chroot using `nix::unistd::chroot`
-- 🔄 Network interface configuration (planned)
-- 🔄 Firewall rules setup (planned)
-- 🔄 Bind mounts setup (planned)
+- ✅ Implemented loopback interface setup using `ip link set lo up`
+- ✅ Implemented bind mounts setup using `nix::mount::mount` with `MS_BIND` flag
+- ✅ Implemented read-only mounts using `MS_RDONLY` flag
+- 🔄 Network interface configuration (veth pairs, macvlan - planned)
+- 🔄 Firewall rules setup (iptables/nftables - planned)
 - 🔄 Windows AppContainer implementation (planned)
 
 **Linux Implementation**:
@@ -62,10 +64,15 @@ This document describes the approach and implementation plan for full VM isolati
 #### Network Isolation
 ```rust
 use nix::sched::{unshare, CloneFlags};
-use nix::sys::socket::{socket, AddressFamily, SockType, SockFlag};
+use std::process::Command;
 
 // Create network namespace
 unshare(CloneFlags::CLONE_NEWNET)?;
+
+// Set up loopback interface
+Command::new("ip")
+    .args(&["link", "set", "lo", "up"])
+    .output()?;
 
 // Move process to namespace
 // Use setns() or create process in namespace
@@ -75,12 +82,28 @@ unshare(CloneFlags::CLONE_NEWNET)?;
 ```rust
 use nix::unistd::chroot;
 use nix::mount::{mount, MsFlags};
+use nix::sched::{unshare, CloneFlags};
 
 // Create mount namespace
 unshare(CloneFlags::CLONE_NEWNS)?;
 
-// Set up bind mounts
-mount(Some("/source"), "/target", None::<&str>, MsFlags::MS_BIND, None::<&str>)?;
+// Set up bind mounts (read-write)
+mount(
+    Some("/source"),
+    "/target",
+    None::<&str>,
+    MsFlags::MS_BIND | MsFlags::MS_REC,
+    None::<&str>,
+)?;
+
+// Set up read-only mounts
+mount(
+    Some("/readonly-source"),
+    "/readonly-target",
+    None::<&str>,
+    MsFlags::MS_BIND | MsFlags::MS_REC | MsFlags::MS_RDONLY,
+    None::<&str>,
+)?;
 
 // Change root
 chroot("/new/root")?;
