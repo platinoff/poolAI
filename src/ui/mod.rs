@@ -1070,6 +1070,290 @@ function applyTheme(themeName) {
   root.style.setProperty('--link-hover', theme.linkHover);
 }
 
+// Progress Bar functions
+function updateProgressBar(barId, value, max = 100) {
+  const bar = document.getElementById(barId);
+  if (!bar) return;
+  
+  const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
+  const fill = bar.querySelector('.progress-bar-fill');
+  if (fill) {
+    fill.style.width = percentage + '%';
+  }
+  
+  const labelValue = bar.querySelector('.progress-bar-label-value');
+  if (labelValue) {
+    labelValue.textContent = Math.round(percentage) + '%';
+  }
+}
+
+function updateCircularProgress(circleId, value, max = 100) {
+  const circle = document.getElementById(circleId);
+  if (!circle) return;
+  
+  const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
+  const circumference = 2 * Math.PI * 30; // radius = 30
+  const offset = circumference - (percentage / 100) * circumference;
+  
+  const fill = circle.querySelector('.progress-bar-circular-fill');
+  if (fill) {
+    fill.style.strokeDashoffset = offset;
+  }
+  
+  const text = circle.querySelector('.progress-bar-circular-text');
+  if (text) {
+    text.textContent = Math.round(percentage) + '%';
+  }
+}
+
+// Tooltip functions
+function initTooltips() {
+  const tooltips = document.querySelectorAll('[data-tooltip]');
+  tooltips.forEach(tooltip => {
+    const text = tooltip.getAttribute('data-tooltip');
+    const position = tooltip.getAttribute('data-tooltip-position') || 'top';
+    const delay = parseInt(tooltip.getAttribute('data-tooltip-delay')) || 0;
+    
+    if (!tooltip.querySelector('.tooltip-content')) {
+      const content = document.createElement('div');
+      content.className = 'tooltip-content';
+      content.textContent = text;
+      tooltip.classList.add('tooltip', 'tooltip-' + position);
+      tooltip.appendChild(content);
+      
+      if (delay > 0) {
+        let timeout;
+        tooltip.addEventListener('mouseenter', function() {
+          timeout = setTimeout(() => {
+            content.style.visibility = 'visible';
+            content.style.opacity = '1';
+          }, delay);
+        });
+        tooltip.addEventListener('mouseleave', function() {
+          clearTimeout(timeout);
+          content.style.visibility = 'hidden';
+          content.style.opacity = '0';
+        });
+      }
+    }
+  });
+}
+
+// Dropdown functions
+function initDropdowns() {
+  const dropdowns = document.querySelectorAll('.dropdown');
+  dropdowns.forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    if (!toggle || !menu) return;
+    
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isActive = menu.classList.contains('active');
+      closeAllDropdowns();
+      if (!isActive) {
+        menu.classList.add('active');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+    
+    // Keyboard navigation
+    toggle.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle.click();
+      } else if (e.key === 'Escape') {
+        closeAllDropdowns();
+      }
+    });
+    
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!dropdown.contains(e.target)) {
+        menu.classList.remove('active');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    
+    // Item selection
+    const items = menu.querySelectorAll('.dropdown-item');
+    items.forEach((item, index) => {
+      item.addEventListener('click', function() {
+        const value = item.getAttribute('data-value');
+        if (value !== null) {
+          toggle.textContent = item.textContent;
+          toggle.setAttribute('data-value', value);
+          menu.classList.remove('active');
+          toggle.setAttribute('aria-expanded', 'false');
+          
+          // Trigger change event
+          const event = new CustomEvent('dropdown-change', { detail: { value, text: item.textContent } });
+          dropdown.dispatchEvent(event);
+        }
+      });
+      
+      // Keyboard navigation
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.click();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const next = items[index + 1] || items[0];
+          next.focus();
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prev = items[index - 1] || items[items.length - 1];
+          prev.focus();
+        } else if (e.key === 'Escape') {
+          closeAllDropdowns();
+          toggle.focus();
+        }
+      });
+      
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'option');
+    });
+  });
+}
+
+function closeAllDropdowns() {
+  const dropdowns = document.querySelectorAll('.dropdown-menu');
+  dropdowns.forEach(menu => {
+    menu.classList.remove('active');
+    const toggle = menu.parentElement.querySelector('.dropdown-toggle');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+// Tabs functions
+function initTabs() {
+  const tabContainers = document.querySelectorAll('.tabs-container');
+  tabContainers.forEach(container => {
+    const tabs = container.querySelectorAll('.tab');
+    const contents = container.querySelectorAll('.tab-content');
+    
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', function() {
+        // Remove active class from all tabs and contents
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        const contentId = tab.getAttribute('data-tab');
+        if (contentId) {
+          const content = container.querySelector('#' + contentId);
+          if (content) {
+            content.classList.add('active');
+          }
+        } else if (contents[index]) {
+          contents[index].classList.add('active');
+        }
+        
+        // Update ARIA attributes
+        tabs.forEach((t, i) => {
+          t.setAttribute('aria-selected', i === index ? 'true' : 'false');
+          if (contents[i]) {
+            contents[i].setAttribute('aria-hidden', i === index ? 'false' : 'true');
+          }
+        });
+      });
+      
+      // Keyboard navigation
+      tab.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          e.preventDefault();
+          const direction = e.key === 'ArrowRight' ? 1 : -1;
+          const nextIndex = (index + direction + tabs.length) % tabs.length;
+          tabs[nextIndex].click();
+          tabs[nextIndex].focus();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          tabs[0].click();
+          tabs[0].focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          tabs[tabs.length - 1].click();
+          tabs[tabs.length - 1].focus();
+        }
+      });
+      
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+      if (contents[index]) {
+        contents[index].setAttribute('role', 'tabpanel');
+        contents[index].setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
+      }
+    });
+  });
+}
+
+// Accordion functions
+function initAccordions() {
+  const accordions = document.querySelectorAll('.accordion');
+  accordions.forEach(accordion => {
+    const items = accordion.querySelectorAll('.accordion-item');
+    
+    items.forEach(item => {
+      const header = item.querySelector('.accordion-header');
+      const content = item.querySelector('.accordion-content');
+      if (!header || !content) return;
+      
+      header.addEventListener('click', function() {
+        const isActive = item.classList.contains('active');
+        
+        // Close all items if not allowing multiple open
+        if (!accordion.hasAttribute('data-multiple')) {
+          items.forEach(i => i.classList.remove('active'));
+        }
+        
+        // Toggle current item
+        if (isActive) {
+          item.classList.remove('active');
+          header.setAttribute('aria-expanded', 'false');
+        } else {
+          item.classList.add('active');
+          header.setAttribute('aria-expanded', 'true');
+        }
+      });
+      
+      // Keyboard navigation
+      header.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          header.click();
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const next = item.nextElementSibling;
+          if (next) {
+            next.querySelector('.accordion-header').focus();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prev = item.previousElementSibling;
+          if (prev) {
+            prev.querySelector('.accordion-header').focus();
+          }
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          items[0].querySelector('.accordion-header').focus();
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          items[items.length - 1].querySelector('.accordion-header').focus();
+        }
+      });
+      
+      header.setAttribute('role', 'button');
+      header.setAttribute('aria-expanded', 'false');
+      header.setAttribute('tabindex', '0');
+      content.setAttribute('role', 'region');
+    });
+  });
+}
+
 // Setup logout link and theme selector
 document.addEventListener('DOMContentLoaded', function() {
   const logoutLink = document.getElementById('logoutBtn');
@@ -1094,6 +1378,12 @@ document.addEventListener('DOMContentLoaded', function() {
       setTheme(newTheme);
     });
   }
+  
+  // Initialize new UI components
+  initTooltips();
+  initDropdowns();
+  initTabs();
+  initAccordions();
 });
 "#
 }
