@@ -232,29 +232,84 @@ pub const BADGE_STYLES: &str = r#"
 
 /// Table component styles
 pub const TABLE_STYLES: &str = r#"
+  /* Table container для автоматичного вирівнювання */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 12px;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    border: 1px solid var(--border, #262b36);
+  }
+  
   table { 
     width: 100%; 
+    min-width: 100%;
     border-collapse: collapse; 
-    margin-top: 12px; 
+    margin: 0;
+    table-layout: auto;
+    border-spacing: 0;
   }
+  
   th, td { 
-    border: 1px solid #262b36; 
-    padding: 8px; 
+    border: 1px solid var(--border, #262b36); 
+    padding: 10px 12px; 
     text-align: left; 
-    vertical-align: top; 
+    vertical-align: middle; 
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
+  
   th { 
-    background: #0f1216; 
-    color: #cfe3ff; 
+    background: var(--bg, #0f1216); 
+    color: var(--text, #cfe3ff); 
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
+  
+  td {
+    background: var(--surface, #171b22);
+    color: var(--text, #e8e8e8);
+  }
+  
   tr:hover {
-    background: #1e2329;
+    background: var(--surface-secondary, #1e2329);
   }
+  
+  /* Правильне вирівнювання для першого та останнього стовпців */
+  td:first-child,
+  th:first-child {
+    padding-left: 16px;
+  }
+  
+  td:last-child,
+  th:last-child {
+    padding-right: 16px;
+  }
+  
+  /* Автоматичне обрізання довгих текстів */
+  td {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  td.action-buttons {
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  
   .action-buttons { 
     display: flex; 
     gap: 8px; 
     flex-wrap: wrap; 
     white-space: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
   }
 "#;
 

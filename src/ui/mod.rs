@@ -69,24 +69,119 @@ pub fn create_ui_routes() -> Router {
 }
 
 const BASE_CSS: &str = r#"
-  body { font-family: Segoe UI, Arial, sans-serif; background: var(--bg, #0f1216); color: var(--text, #e8e8e8); margin: 0; }
+  /* Box-sizing для правильного позиціонування */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  body { 
+    font-family: Segoe UI, Arial, sans-serif; 
+    background: var(--bg, #0f1216); 
+    color: var(--text, #e8e8e8); 
+    margin: 0; 
+    padding: 0;
+  }
   a { color: var(--link, #77c7ff); text-decoration: none; }
   a:hover { color: var(--link-hover, #8bd5ff); text-decoration: underline; }
   code { background: var(--bg, #0f1216); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border, #262b36); }
-  .wrap { max-width: 1080px; margin: 28px auto; padding: 0 16px; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--border, #262b36); border-radius: 14px; background: var(--surface, #171b22); box-shadow: 0 12px 40px rgba(0,0,0,.20); }
-  .brand { display: flex; align-items: center; gap: 12px; }
+  
+  /* Wrap контейнер з автоматичним вирівнюванням */
+  .wrap { 
+    max-width: 1080px; 
+    margin: 28px auto; 
+    padding: 0 16px; 
+    width: 100%;
+  }
+  
+  /* Topbar з правильним вирівнюванням */
+  .topbar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 16px; 
+    padding: 14px 16px; 
+    border: 1px solid var(--border, #262b36); 
+    border-radius: 14px; 
+    background: var(--surface, #171b22); 
+    box-shadow: 0 12px 40px rgba(0,0,0,.20); 
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
   .brand h1 { margin: 0; font-size: 18px; color: var(--primary, #67e480); }
   .brand .muted { color: var(--text-muted, #a8b0bf); font-size: 0.95em; }
-  .nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-  .nav a { padding: 6px 10px; border: 1px solid var(--border, #262b36); border-radius: 10px; background: var(--bg, #0f1216); }
-  .content { margin-top: 14px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  .item { padding: 12px; border-radius: 12px; border: 1px solid var(--border, #262b36); background: var(--bg, #0f1216); }
+  
+  /* Navigation з автоматичним вирівнюванням */
+  .nav { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    align-items: center; 
+    flex: 1 1 auto;
+    justify-content: flex-end;
+  }
+  .nav a { 
+    padding: 6px 10px; 
+    border: 1px solid var(--border, #262b36); 
+    border-radius: 10px; 
+    background: var(--bg, #0f1216); 
+    white-space: nowrap;
+  }
+  
+  /* Content з правильним spacing */
+  .content { 
+    margin-top: 14px; 
+    width: 100%;
+  }
+  
+  /* Grid з автоматичним вирівнюванням */
+  .grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px; 
+    margin-top: 12px; 
+    width: 100%;
+  }
+  .item { 
+    padding: 12px; 
+    border-radius: 12px; 
+    border: 1px solid var(--border, #262b36); 
+    background: var(--bg, #0f1216); 
+    width: 100%;
+  }
   .muted { color: var(--text-muted, #a8b0bf); font-size: 0.9em; }
-  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  pre { white-space: pre-wrap; word-break: break-word; background: var(--bg, #0b0d10); border: 1px solid var(--border, #262b36); border-radius: 12px; padding: 12px; margin: 12px 0 0; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  
+  /* Row з автоматичним вирівнюванням до кордонів */
+  .row { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 12px; 
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .row > * {
+    flex: 0 0 auto;
+  }
+  .row > *:last-child {
+    margin-left: auto;
+  }
+  
+  pre { 
+    white-space: pre-wrap; 
+    word-break: break-word; 
+    background: var(--bg, #0b0d10); 
+    border: 1px solid var(--border, #262b36); 
+    border-radius: 12px; 
+    padding: 12px; 
+    margin: 12px 0 0; 
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  @media (max-width: 860px) { 
+    .grid { grid-template-columns: 1fr; } 
+  }
   /* Responsive Design */
   @media (max-width: 768px) {
     .wrap { padding: 0 12px; }
@@ -1134,7 +1229,12 @@ function renderTable(containerId, data) {
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
-  el.appendChild(table);
+  
+  // Обгортаємо таблицю в container для автоматичного вирівнювання
+  const container = document.createElement('div');
+  container.className = 'table-container';
+  container.appendChild(table);
+  el.appendChild(container);
 }
 
 // Enhanced form validation with real-time feedback
@@ -2365,7 +2465,12 @@ async fn workers_page() -> Html<String> {
         tbody.appendChild(tr);
       }
       table.appendChild(tbody);
-      el.appendChild(table);
+      
+      // Обгортаємо таблицю в container для автоматичного вирівнювання
+      const container = document.createElement('div');
+      container.className = 'table-container';
+      container.appendChild(table);
+      el.appendChild(container);
     }
     
     async function showCreateWorkerModal() {
@@ -2624,7 +2729,12 @@ async fn libs_page() -> Html<String> {
         tbody.appendChild(tr);
       }
       table.appendChild(tbody);
-      el.appendChild(table);
+      
+      // Обгортаємо таблицю в container для автоматичного вирівнювання
+      const container = document.createElement('div');
+      container.className = 'table-container';
+      container.appendChild(table);
+      el.appendChild(container);
     }
     
     async function showInstallLibraryModal() {
@@ -2982,7 +3092,12 @@ async fn raid_page() -> Html<String> {
         tbody.appendChild(tr);
       }
       table.appendChild(tbody);
-      el.appendChild(table);
+      
+      // Обгортаємо таблицю в container для автоматичного вирівнювання
+      const container = document.createElement('div');
+      container.className = 'table-container';
+      container.appendChild(table);
+      el.appendChild(container);
     }
     
     async function showCreateArtifactModal() {
