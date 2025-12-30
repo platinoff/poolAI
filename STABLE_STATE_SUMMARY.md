@@ -7,7 +7,7 @@
 
 ### Статус збірки
 - ✅ `cargo check` проходить без помилок
-- ✅ `cargo test` - 150+ tests passing
+- ✅ `cargo test` - 159+ tests passing
 - ✅ Всі модулі компілюються успішно
 
 ### Git статус
@@ -39,7 +39,7 @@
 ### Модулі в розробці
 - ✅ Libs Module (~95%) - production-ready
 - ✅ RAID Module (~90%) - local + distributed
-- ✅ VM Module (~92%) - process runner integrated, isolation module integrated
+- ✅ VM Module (~94%) - process runner integrated, isolation module integrated, auto-recovery enhanced
 - ✅ UI Module (~80%) - read-only dashboard + write operations
 
 ---
@@ -92,6 +92,7 @@ cd S:\rust\poolAI; git push origin HEAD
 - ✅ Isolation Module Structure - ЗАВЕРШЕНО (Week 9)
 - ✅ Isolation Integration Tests - ЗАВЕРШЕНО (14 tests passing)
 - ✅ VmManager Integration - ЗАВЕРШЕНО
+- ✅ Auto-Recovery Enhancements - ЗАВЕРШЕНО (exponential backoff, max restart attempts, 9 tests passing)
 - 🔄 Full isolation implementation (network namespaces, chroot, AppContainers)
 - Resource monitoring enhancements
 
@@ -138,7 +139,7 @@ cd S:\rust\poolAI; git push origin HEAD
 ### Код
 - **Total Lines**: ~15000+ lines
 - **Modules**: 20+ modules
-- **Tests**: 150+ tests passing
+- **Tests**: 159+ tests passing
 - **API Endpoints**: 50+ endpoints
 
 ### Розробка

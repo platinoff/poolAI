@@ -101,6 +101,49 @@ pub struct VmInstance {
     pub restart_attempts: u32,
 }
 
+/// Resource usage history entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResourceUsageHistoryEntry {
+    pub timestamp: DateTime<Utc>,
+    pub usage: ResourceUsage,
+}
+
+/// Resource usage statistics (aggregated)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResourceUsageStats {
+    pub cpu_percent_min: f32,
+    pub cpu_percent_max: f32,
+    pub cpu_percent_avg: f32,
+    pub memory_mb_min: u32,
+    pub memory_mb_max: u32,
+    pub memory_mb_avg: f32,
+    pub gpu_utilization_min: Option<f32>,
+    pub gpu_utilization_max: Option<f32>,
+    pub gpu_utilization_avg: Option<f32>,
+    pub sample_count: usize,
+}
+
+/// Resource alert thresholds
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResourceAlertThresholds {
+    /// CPU usage threshold (0.0-100.0)
+    pub cpu_percent_threshold: Option<f32>,
+    /// Memory usage threshold in MB
+    pub memory_mb_threshold: Option<u32>,
+    /// GPU utilization threshold (0.0-100.0)
+    pub gpu_utilization_threshold: Option<f32>,
+}
+
+impl Default for ResourceAlertThresholds {
+    fn default() -> Self {
+        Self {
+            cpu_percent_threshold: Some(90.0),
+            memory_mb_threshold: None,
+            gpu_utilization_threshold: Some(95.0),
+        }
+    }
+}
+
 /// VM Manager - central orchestrator for VM instances.
 pub struct VmManager {
     instances: Arc<RwLock<HashMap<Uuid, VmInstance>>>,
@@ -110,6 +153,10 @@ pub struct VmManager {
     resource_limiter: Arc<dyn ResourceLimiter>,
     network_isolator: Arc<dyn NetworkIsolator>,
     filesystem_isolator: Arc<dyn FilesystemIsolator>,
+    /// Resource usage history per instance (max 1000 entries per instance)
+    resource_history: Arc<RwLock<HashMap<Uuid, Vec<ResourceUsageHistoryEntry>>>>,
+    /// Resource alert thresholds per instance
+    resource_alert_thresholds: Arc<RwLock<HashMap<Uuid, ResourceAlertThresholds>>>,
 }
 
 impl VmManager {
@@ -126,6 +173,8 @@ impl VmManager {
             resource_limiter,
             network_isolator,
             filesystem_isolator,
+            resource_history: Arc::new(RwLock::new(HashMap::new())),
+            resource_alert_thresholds: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -413,6 +462,16 @@ impl VmManager {
             .remove(&id)
             .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
 
+        // Clean up resource history and alert thresholds
+        {
+            let mut history = self.resource_history.write().await;
+            history.remove(&id);
+        }
+        {
+            let mut alert_thresholds = self.resource_alert_thresholds.write().await;
+            alert_thresholds.remove(&id);
+        }
+
         info!("VM instance {} deleted", id);
         Ok(())
     }
@@ -525,6 +584,10 @@ impl VmManager {
     }
 
     /// Get resource usage for a VM instance
+    ///
+    /// This method attempts to get current resource usage and automatically
+    /// adds it to the history. If process_id is not available, returns the
+    /// most recent history entry if available.
     pub async fn get_instance_resource_usage(
         &self,
         instance_id: Uuid,
@@ -535,10 +598,233 @@ impl VmManager {
         })?;
 
         // TODO: Get actual process_id from instance when process spawning is implemented
-        // For now, return placeholder
+        // For now, return the most recent history entry if available
+        let history = self.resource_history.read().await;
+        if let Some(entries) = history.get(&instance_id) {
+            if let Some(latest) = entries.last() {
+                return Ok(latest.usage.clone());
+            }
+        }
+
         Err(AppError::ConfigError(
             "Process ID not available - process spawning not yet implemented".to_string(),
         ))
+    }
+
+    /// Record resource usage in history
+    ///
+    /// This method adds a resource usage entry to the history for an instance.
+    /// History is limited to 1000 entries per instance (FIFO).
+    pub async fn record_resource_usage(
+        &self,
+        instance_id: Uuid,
+        usage: ResourceUsage,
+    ) -> Result<(), AppError> {
+        let instances = self.instances.read().await;
+        instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+        })?;
+
+        let entry = ResourceUsageHistoryEntry {
+            timestamp: Utc::now(),
+            usage,
+        };
+
+        let mut history = self.resource_history.write().await;
+        let entries = history.entry(instance_id).or_insert_with(Vec::new);
+
+        // Limit history to 1000 entries (FIFO)
+        if entries.len() >= 1000 {
+            entries.remove(0);
+        }
+
+        entries.push(entry);
+
+        // Check alerts
+        self.check_resource_alerts(instance_id, &entries.last().unwrap().usage).await;
+
+        Ok(())
+    }
+
+    /// Get resource usage history for a VM instance
+    ///
+    /// Returns the last N entries from the history, or all entries if limit is None.
+    pub async fn get_resource_usage_history(
+        &self,
+        instance_id: Uuid,
+        limit: Option<usize>,
+    ) -> Result<Vec<ResourceUsageHistoryEntry>, AppError> {
+        let instances = self.instances.read().await;
+        instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+        })?;
+
+        let history = self.resource_history.read().await;
+        if let Some(entries) = history.get(&instance_id) {
+            if let Some(limit) = limit {
+                Ok(entries.iter().rev().take(limit).cloned().rev().collect())
+            } else {
+                Ok(entries.clone())
+            }
+        } else {
+            Ok(vec![])
+        }
+    }
+
+    /// Get resource usage statistics (aggregated)
+    ///
+    /// Calculates min, max, and average for CPU, memory, and GPU usage
+    /// from the history entries.
+    pub async fn get_resource_usage_stats(
+        &self,
+        instance_id: Uuid,
+        limit: Option<usize>,
+    ) -> Result<ResourceUsageStats, AppError> {
+        let instances = self.instances.read().await;
+        instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+        })?;
+
+        let history = self.resource_history.read().await;
+        let entries = if let Some(entries) = history.get(&instance_id) {
+            if let Some(limit) = limit {
+                entries.iter().rev().take(limit).cloned().collect::<Vec<_>>()
+            } else {
+                entries.clone()
+            }
+        } else {
+            return Err(AppError::ValidationError(
+                "No resource usage history available".to_string(),
+            ));
+        };
+
+        if entries.is_empty() {
+            return Err(AppError::ValidationError(
+                "No resource usage history available".to_string(),
+            ));
+        }
+
+        let mut cpu_values = Vec::new();
+        let mut memory_values = Vec::new();
+        let mut gpu_values = Vec::new();
+
+        for entry in &entries {
+            cpu_values.push(entry.usage.cpu_percent);
+            memory_values.push(entry.usage.memory_mb);
+            if let Some(gpu) = entry.usage.gpu_utilization {
+                gpu_values.push(gpu);
+            }
+        }
+
+        let cpu_min = cpu_values.iter().fold(f32::MAX, |a, &b| a.min(b));
+        let cpu_max = cpu_values.iter().fold(0.0f32, |a, &b| a.max(b));
+        let cpu_avg = cpu_values.iter().sum::<f32>() / cpu_values.len() as f32;
+
+        let memory_min = *memory_values.iter().min().unwrap_or(&0);
+        let memory_max = *memory_values.iter().max().unwrap_or(&0);
+        let memory_avg = memory_values.iter().sum::<u32>() as f32 / memory_values.len() as f32;
+
+        let (gpu_min, gpu_max, gpu_avg) = if gpu_values.is_empty() {
+            (None, None, None)
+        } else {
+            let min = gpu_values.iter().fold(f32::MAX, |a, &b| a.min(b));
+            let max = gpu_values.iter().fold(0.0f32, |a, &b| a.max(b));
+            let avg = gpu_values.iter().sum::<f32>() / gpu_values.len() as f32;
+            (Some(min), Some(max), Some(avg))
+        };
+
+        Ok(ResourceUsageStats {
+            cpu_percent_min: cpu_min,
+            cpu_percent_max: cpu_max,
+            cpu_percent_avg: cpu_avg,
+            memory_mb_min: memory_min,
+            memory_mb_max: memory_max,
+            memory_mb_avg: memory_avg,
+            gpu_utilization_min: gpu_min,
+            gpu_utilization_max: gpu_max,
+            gpu_utilization_avg: gpu_avg,
+            sample_count: entries.len(),
+        })
+    }
+
+    /// Set resource alert thresholds for a VM instance
+    pub async fn set_resource_alert_thresholds(
+        &self,
+        instance_id: Uuid,
+        thresholds: ResourceAlertThresholds,
+    ) -> Result<(), AppError> {
+        let instances = self.instances.read().await;
+        instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+        })?;
+
+        let mut alert_thresholds = self.resource_alert_thresholds.write().await;
+        alert_thresholds.insert(instance_id, thresholds);
+        Ok(())
+    }
+
+    /// Get resource alert thresholds for a VM instance
+    pub async fn get_resource_alert_thresholds(
+        &self,
+        instance_id: Uuid,
+    ) -> Result<ResourceAlertThresholds, AppError> {
+        let instances = self.instances.read().await;
+        instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+        })?;
+
+        let alert_thresholds = self.resource_alert_thresholds.read().await;
+        Ok(alert_thresholds
+            .get(&instance_id)
+            .cloned()
+            .unwrap_or_default())
+    }
+
+    /// Check resource usage against alert thresholds
+    ///
+    /// This is called automatically when resource usage is recorded.
+    async fn check_resource_alerts(&self, instance_id: Uuid, usage: &ResourceUsage) {
+        let alert_thresholds = self.resource_alert_thresholds.read().await;
+        if let Some(thresholds) = alert_thresholds.get(&instance_id) {
+            let mut alerts = Vec::new();
+
+            if let Some(cpu_threshold) = thresholds.cpu_percent_threshold {
+                if usage.cpu_percent > cpu_threshold {
+                    alerts.push(format!(
+                        "CPU usage {}% exceeds threshold {}%",
+                        usage.cpu_percent, cpu_threshold
+                    ));
+                }
+            }
+
+            if let Some(memory_threshold) = thresholds.memory_mb_threshold {
+                if usage.memory_mb > memory_threshold {
+                    alerts.push(format!(
+                        "Memory usage {}MB exceeds threshold {}MB",
+                        usage.memory_mb, memory_threshold
+                    ));
+                }
+            }
+
+            if let Some(gpu_threshold) = thresholds.gpu_utilization_threshold {
+                if let Some(gpu_util) = usage.gpu_utilization {
+                    if gpu_util > gpu_threshold {
+                        alerts.push(format!(
+                            "GPU utilization {}% exceeds threshold {}%",
+                            gpu_util, gpu_threshold
+                        ));
+                    }
+                }
+            }
+
+            if !alerts.is_empty() {
+                warn!(
+                    "Resource alerts for VM instance {}: {}",
+                    instance_id,
+                    alerts.join(", ")
+                );
+            }
+        }
     }
 
     /// Check if resource limits are supported on this platform

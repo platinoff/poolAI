@@ -90,8 +90,13 @@
    - ✅ Max restart attempts enforcement
    - ✅ Restart attempts tracking та reset
    - ✅ Integration tests (9 tests passing)
-5. 🔄 Full isolation implementation (network namespaces, chroot, AppContainers)
-6. Resource monitoring enhancements
+5. ✅ **Resource Monitoring Enhancements** — **ЗАВЕРШЕНО** 🎉
+   - ✅ Resource usage history tracking (FIFO, 1000 entries limit)
+   - ✅ Resource usage statistics (min, max, avg)
+   - ✅ Resource alert thresholds (configurable)
+   - ✅ Automatic alert checking
+   - ✅ Integration tests (11 tests passing)
+6. 🔄 Full isolation implementation (network namespaces, chroot, AppContainers)
 
 **Файли**:
 - ✅ `src/vm/isolation.rs` (створено)

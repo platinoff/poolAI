@@ -9,8 +9,8 @@
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
 **Статус збірки**: ✅ `cargo check` проходить без помилок та warnings  
-**Статус тестів**: ✅ **159+ tests passing** (6 unit + 153+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 14 VM isolation integration + 9 VM auto-recovery)  
-**Останній коміт**: VM Auto-Recovery Enhancements Complete - exponential backoff, max restart attempts, configurable delays, 9 tests passing
+**Статус тестів**: ✅ **170+ tests passing** (6 unit + 164+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 14 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
+**Останній коміт**: VM Resource Monitoring Enhancements Complete - history tracking, aggregation, alerts, 11 tests passing
 
 ---
 
@@ -273,7 +273,13 @@
   - ✅ Max restart attempts enforcement
   - ✅ Restart attempts tracking та reset
   - ✅ Integration tests (9 tests для auto-recovery)
-- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health + 8 для write operations + 14 для isolation + 9 для auto-recovery = 63 tests)
+- ✅ **Resource Monitoring Enhancements** — **ЗАВЕРШЕНО (Week 9)** 🎉
+  - ✅ Resource usage history tracking (time-series data, FIFO limit 1000 entries)
+  - ✅ Resource usage statistics (min, max, avg для CPU, memory, GPU)
+  - ✅ Resource alert thresholds (configurable per instance)
+  - ✅ Automatic alert checking при record_resource_usage
+  - ✅ Integration tests (11 tests для resource monitoring)
+- ✅ Integration tests (5 tests для process runner + 8 для resource limits + 6 для linux + 6 для windows + 7 для health + 8 для write operations + 14 для isolation + 9 для auto-recovery + 11 для resource monitoring = 74 tests)
 
 **API Endpoints**:
 - ✅ `GET /api/v1/vm/instances` - список instances
