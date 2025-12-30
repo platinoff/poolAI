@@ -87,6 +87,23 @@ const BASE_CSS: &str = r#"
   .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   pre { white-space: pre-wrap; word-break: break-word; background: var(--bg, #0b0d10); border: 1px solid var(--border, #262b36); border-radius: 12px; padding: 12px; margin: 12px 0 0; }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .wrap { padding: 0 12px; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .nav { width: 100%; flex-direction: column; align-items: stretch; }
+    .nav a { width: 100%; text-align: center; padding: 10px; }
+    .row { flex-direction: column; align-items: flex-start; }
+    .card { padding: 12px; }
+    table { font-size: 0.85em; }
+    th, td { padding: 6px; }
+  }
+  @media (max-width: 480px) {
+    .brand h1 { font-size: 16px; }
+    .brand .muted { font-size: 0.85em; }
+    .card { padding: 10px; }
+    .btn { padding: 10px 16px; font-size: 0.9em; }
+  }
   /* Accessibility: Skip links */
   .skip_link {
     position: absolute;
@@ -176,6 +193,9 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
           <div class="muted">Dashboard with Write Operations (Stage 3)</div>
         </div>
       </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open navigation menu" aria-expanded="false">
+        ☰
+      </button>
       <nav class="nav" id="{nav_id}" role="navigation" aria-label="{aria_label_nav}">
         <a href="{ui_base}" aria-label="{aria_label_home}">Home</a>
         <a href="{ui_status}" aria-label="{aria_label_status}">Status</a>
@@ -207,6 +227,35 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         {body}
       </div>
     </main>
+  </div>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+  <div class="mobile-nav-drawer" id="mobileNavDrawer" role="navigation" aria-label="Mobile navigation">
+    <div class="mobile-nav-header">
+      <h2 style="margin: 0; color: var(--primary, #67e480);">Menu</h2>
+      <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close navigation menu">×</button>
+    </div>
+    <div class="mobile-nav-content">
+      <a href="{ui_base}" class="mobile-nav-item" aria-label="{aria_label_home}">Home</a>
+      <a href="{ui_status}" class="mobile-nav-item" aria-label="{aria_label_status}">Status</a>
+      <a href="{ui_health}" class="mobile-nav-item" aria-label="{aria_label_health}">Health</a>
+      <a href="{ui_metrics}" class="mobile-nav-item" aria-label="{aria_label_metrics}">Metrics</a>
+      <a href="{ui_workers}" class="mobile-nav-item" aria-label="{aria_label_workers}">Workers</a>
+      <a href="{ui_libs}" class="mobile-nav-item" aria-label="{aria_label_libs}">Libs</a>
+      <a href="{ui_vm}" class="mobile-nav-item" aria-label="{aria_label_vm}">VM</a>
+      <a href="{ui_raid}" class="mobile-nav-item" aria-label="{aria_label_raid}">RAID</a>
+      <div class="mobile-nav-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+        <label for="mobileThemeSelector" style="font-size: 0.9em; color: var(--text-muted, #a8b0bf);">Theme:</label>
+        <select id="mobileThemeSelector" aria-label="{aria_label_theme}" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9em;">
+          <option value="dark">🌙 Dark</option>
+          <option value="light">☀️ Light</option>
+          <option value="high-contrast">🔆 High Contrast</option>
+        </select>
+      </div>
+      {user_info_html}
+      {nav_auth_link}
+    </div>
   </div>
 
   <!-- ARIA live region for notifications -->
@@ -1823,6 +1872,192 @@ function initAccordions() {
   });
 }
 
+// Mobile Navigation functions
+function initMobileNavigation() {
+  const toggle = document.getElementById('mobileMenuToggle');
+  const drawer = document.getElementById('mobileNavDrawer');
+  const overlay = document.getElementById('mobileNavOverlay');
+  const closeBtn = document.getElementById('mobileNavClose');
+  const mobileThemeSelector = document.getElementById('mobileThemeSelector');
+  
+  if (!toggle || !drawer || !overlay) return;
+  
+  function openDrawer() {
+    drawer.classList.add('active');
+    overlay.classList.add('active');
+    toggle.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeDrawer() {
+    drawer.classList.remove('active');
+    overlay.classList.remove('active');
+    toggle.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+  
+  toggle.addEventListener('click', openDrawer);
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+  
+  // Close on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && drawer.classList.contains('active')) {
+      closeDrawer();
+    }
+  });
+  
+  // Close drawer when clicking on nav item
+  const navItems = drawer.querySelectorAll('.mobile-nav-item');
+  navItems.forEach(item => {
+    item.addEventListener('click', function() {
+      setTimeout(closeDrawer, 100);
+    });
+  });
+  
+  // Sync mobile theme selector with main theme selector
+  if (mobileThemeSelector) {
+    const mainThemeSelector = document.getElementById('themeSelector');
+    if (mainThemeSelector) {
+      mobileThemeSelector.value = mainThemeSelector.value;
+      mobileThemeSelector.addEventListener('change', function(e) {
+        const newTheme = e.target.value;
+        setTheme(newTheme);
+        if (mainThemeSelector) {
+          mainThemeSelector.value = newTheme;
+        }
+      });
+    }
+  }
+}
+
+// Touch Gesture functions
+function initTouchGestures() {
+  // Swipe detection for swipeable elements
+  const swipeables = document.querySelectorAll('.swipeable');
+  swipeables.forEach(element => {
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let isSwiping = false;
+    
+    element.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isSwiping = false;
+    });
+    
+    element.addEventListener('touchmove', function(e) {
+      if (!startX || !startY) return;
+      
+      currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = startX - currentX;
+      const diffY = startY - currentY;
+      
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+        isSwiping = true;
+        const content = element.querySelector('.swipeable-content');
+        if (content) {
+          const translateX = Math.max(-100, Math.min(0, -diffX));
+          content.style.transform = 'translateX(' + translateX + 'px)';
+        }
+      }
+    });
+    
+    element.addEventListener('touchend', function(e) {
+      if (!isSwiping) return;
+      
+      const diffX = startX - currentX;
+      const threshold = 50;
+      
+      if (Math.abs(diffX) > threshold) {
+        if (diffX > 0) {
+          element.classList.add('swiped');
+          const content = element.querySelector('.swipeable-content');
+          if (content) {
+            content.style.transform = 'translateX(-80px)';
+          }
+        } else {
+          element.classList.remove('swiped');
+          const content = element.querySelector('.swipeable-content');
+          if (content) {
+            content.style.transform = 'translateX(0)';
+          }
+        }
+      } else {
+        const content = element.querySelector('.swipeable-content');
+        if (content) {
+          content.style.transform = 'translateX(0)';
+        }
+      }
+      
+      startX = 0;
+      startY = 0;
+      currentX = 0;
+      isSwiping = false;
+    });
+  });
+  
+  // Touch feedback for buttons
+  const touchElements = document.querySelectorAll('.btn, .nav a, .dropdown-toggle, .tab, .accordion-header');
+  touchElements.forEach(element => {
+    element.classList.add('touch-feedback');
+    element.addEventListener('touchstart', function() {
+      this.classList.add('touch-active');
+    });
+    element.addEventListener('touchend', function() {
+      const self = this;
+      setTimeout(function() {
+        self.classList.remove('touch-active');
+      }, 150);
+    });
+  });
+}
+
+// Responsive Tables functions
+function initResponsiveTables() {
+  if (window.innerWidth <= 768) {
+    const tables = document.querySelectorAll('table');
+    tables.forEach(table => {
+      if (table.classList.contains('responsive-table-card')) return;
+      
+      const container = table.parentElement;
+      if (!container || container.classList.contains('responsive-table-container')) return;
+      
+      const wrapper = document.createElement('div');
+      wrapper.className = 'responsive-table-container';
+      table.parentElement.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+      
+      const headers = table.querySelectorAll('th');
+      const headerTexts = Array.from(headers).map(function(th) {
+        return th.textContent.trim();
+      });
+      
+      table.classList.add('responsive-table-card');
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach(function(row) {
+        const cells = row.querySelectorAll('td');
+        cells.forEach(function(cell, index) {
+          if (headerTexts[index]) {
+            cell.setAttribute('data-label', headerTexts[index]);
+          }
+        });
+      });
+    });
+  }
+}
+
+// Handle window resize
+let resizeTimeout;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(function() {
+    initResponsiveTables();
+  }, 250);
+});
+
 // Setup logout link and theme selector
 document.addEventListener('DOMContentLoaded', function() {
   const logoutLink = document.getElementById('logoutBtn');
@@ -1853,6 +2088,9 @@ document.addEventListener('DOMContentLoaded', function() {
   initDropdowns();
   initTabs();
   initAccordions();
+  initMobileNavigation();
+  initTouchGestures();
+  initResponsiveTables();
 });
 "#
 }

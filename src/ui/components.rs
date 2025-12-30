@@ -754,6 +754,223 @@ pub const ERROR_BOUNDARY_STYLES: &str = r#"
   }
 "#;
 
+/// Mobile Navigation component styles (uses CSS variables for theming)
+pub const MOBILE_NAV_STYLES: &str = r#"
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text, #e8e8e8);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .mobile-menu-toggle:hover {
+    background: var(--surface-secondary, #1e2329);
+  }
+  .mobile-menu-toggle:focus {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: 2px;
+  }
+  .mobile-nav-drawer {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--surface, #171b22);
+    border-right: 1px solid var(--border, #262b36);
+    z-index: 10001;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.3);
+  }
+  .mobile-nav-drawer.active {
+    left: 0;
+  }
+  .mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: none;
+  }
+  .mobile-nav-overlay.active {
+    display: block;
+  }
+  .mobile-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border, #262b36);
+  }
+  .mobile-nav-close {
+    background: none;
+    border: none;
+    color: var(--text, #e8e8e8);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  .mobile-nav-close:hover {
+    background: var(--surface-secondary, #1e2329);
+  }
+  .mobile-nav-content {
+    padding: 16px;
+  }
+  .mobile-nav-item {
+    display: block;
+    padding: 12px 16px;
+    color: var(--text, #e8e8e8);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background 0.2s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .mobile-nav-item:hover {
+    background: var(--surface-secondary, #1e2329);
+  }
+  .mobile-nav-item:focus {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: -2px;
+  }
+  @media (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: flex;
+    }
+    .nav {
+      display: none;
+    }
+  }
+"#;
+
+/// Responsive Layout component styles (uses CSS variables for theming)
+pub const RESPONSIVE_LAYOUT_STYLES: &str = r#"
+  .responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .responsive-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .responsive-table {
+    min-width: 100%;
+  }
+  @media (max-width: 768px) {
+    .responsive-grid {
+      grid-template-columns: 1fr;
+    }
+    .responsive-table-container {
+      display: block;
+    }
+    .responsive-table-card {
+      display: block;
+    }
+    .responsive-table-card .table-row {
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border, #262b36);
+      border-radius: 8px;
+      background: var(--surface, #171b22);
+    }
+    .responsive-table-card .table-cell {
+      padding: 6px 0;
+      border: none;
+    }
+    .responsive-table-card .table-cell::before {
+      content: attr(data-label) ': ';
+      font-weight: 600;
+      color: var(--text-muted, #a8b0bf);
+      margin-right: 8px;
+    }
+  }
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .touch-friendly {
+    padding: 12px 16px;
+    font-size: 1em;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .btn, .nav a, .dropdown-toggle, .tab, .accordion-header {
+      min-height: 44px;
+      padding: 12px 16px;
+    }
+    .modal-content {
+      width: 95%;
+      max-width: none;
+      margin: 10px;
+    }
+    .dropdown-menu {
+      width: 100%;
+      max-width: 100vw;
+    }
+  }
+"#;
+
+/// Touch Gesture component styles (uses CSS variables for theming)
+pub const TOUCH_GESTURE_STYLES: &str = r#"
+  .swipeable {
+    position: relative;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .swipeable-content {
+    transition: transform 0.3s ease;
+  }
+  .swipeable-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    background: var(--danger, #ff5555);
+    padding: 0 16px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .swipeable.swiped .swipeable-actions {
+    transform: translateX(0);
+  }
+  .touch-feedback {
+    -webkit-tap-highlight-color: rgba(80, 250, 123, 0.3);
+    tap-highlight-color: rgba(80, 250, 123, 0.3);
+  }
+  .touch-active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+"#;
+
 /// Form Wizard component styles (uses CSS variables for theming)
 pub const FORM_WIZARD_STYLES: &str = r#"
   .wizard {
@@ -953,7 +1170,7 @@ pub const ACCORDION_STYLES: &str = r#"
 /// Get all component styles
 pub fn get_component_styles() -> String {
     format!(
-        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
+        "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
         BUTTON_STYLES,
         CARD_STYLES,
         FORM_STYLES,
@@ -970,7 +1187,10 @@ pub fn get_component_styles() -> String {
         SPINNER_STYLES,
         ERROR_BOUNDARY_STYLES,
         SEARCH_FILTER_STYLES,
-        FORM_WIZARD_STYLES
+        FORM_WIZARD_STYLES,
+        MOBILE_NAV_STYLES,
+        RESPONSIVE_LAYOUT_STYLES,
+        TOUCH_GESTURE_STYLES
     )
 }
 
