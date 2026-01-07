@@ -57,7 +57,7 @@
 ### Документація
 - `FIX_RING_GCC.md` - Виправлення ring/gcc проблеми
 - `JWT_TEMPORARY_DISABLE.md` - Інструкції для JWT
-- `COMPILATION_FIXES.md` - Виправлення компіляції
+- `COMPILATION_FIXES.md` - Виправлення компіляції (в `docs/archive/`)
 - `BUILD_CHECKLIST.md` - Чеклист перевірки збірки
 - `CARGO_WORKING.md` - Підтвердження роботи cargo
 - `MSYS2_RUST_SETUP.md` - Налаштування MSYS2

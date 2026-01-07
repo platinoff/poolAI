@@ -1,37 +1,122 @@
 # Cursor Rules for PoolAI Project
 
-## Documentation Structure
+## 📁 Documentation Structure - STRICT RULES
 
-- All `.md` files should be created in `docs/` directory with appropriate subdirectories
-- Keep root directory clean - only `README.md` and `README.uk.md` should be in root
-- Use the following structure:
-  - `docs/status/` - Current status and stable state documents
-  - `docs/development/` - Development plans and roadmaps
-  - `docs/archive/` - Historical/archived documents
-  - `docs/concept/` - Concept files
-  - `docs/deployment/` - Deployment guides
-  - `docs/configuration/` - Configuration guides
-  - `docs/monitoring/` - Monitoring setup guides
-  - `docs/security/` - Security documentation
-  - `docs/performance/` - Performance tuning guides
-  - `docs/troubleshooting/` - Troubleshooting guides
-  - `docs/migration/` - Migration guides
-  - `docs/vm/` - VM module documentation
+### ⚠️ CRITICAL: All documentation MUST be in `docs/` directory
 
-## File References
+**NEVER create `.md` files in the root directory** (except `README.md` and `README.uk.md`)
 
-- When referencing documentation files, use relative paths from the file location
-- Example: `[Current Status](../status/CURRENT_STATUS.md)`
-- Always update links when moving files
+### Directory Structure
 
-## Git Workflow
+When creating or referencing documentation, use this structure:
 
-- Commit documentation changes with descriptive messages
-- Use conventional commit format: `docs: organize documentation structure`
-- Keep commits focused on documentation organization
+```
+docs/
+├── README.md                    # Documentation index
+├── STRUCTURE.md                  # This structure description
+│
+├── status/                      # Current project status
+│   ├── CURRENT_STATUS.md
+│   └── STABLE_STATE_SUMMARY.md
+│
+├── development/                 # Development plans
+│   ├── NEXT_STEPS_PLAN.md
+│   ├── NEXT_DEVELOPMENT_PHASE.md
+│   └── DEVELOPMENT_PLAN_UPDATED.md
+│
+├── concept/                     # Project concepts
+│   └── poolAI_concept.txt
+│
+├── archive/                     # Historical documents
+│   └── [all old/archived files]
+│
+├── deployment/                  # Deployment guides
+├── configuration/               # Configuration guides
+├── monitoring/                   # Monitoring setup
+├── security/                    # Security documentation
+├── performance/                 # Performance guides
+├── troubleshooting/             # Troubleshooting
+├── migration/                   # Migration guides
+└── vm/                         # VM module docs
+```
 
-## Rust Code References
+### Rules for Creating New Documentation
 
-- When referencing concept files in Rust code comments, use: `docs/concept/poolAI_concept.txt`
-- Update all references when moving files
+1. **Always create in `docs/` subdirectory**:
+   - Status documents → `docs/status/`
+   - Development plans → `docs/development/`
+   - New features → `docs/[feature-name]/` or appropriate category
+   - Historical → `docs/archive/`
+
+2. **File naming**:
+   - Use UPPERCASE for main documents: `CURRENT_STATUS.md`
+   - Use descriptive names: `NEXT_STEPS_PLAN.md`
+   - Use underscores for spaces: `STABLE_STATE_SUMMARY.md`
+
+3. **When user asks to create documentation**:
+   - Ask which category it belongs to
+   - Create in appropriate `docs/` subdirectory
+   - Update `docs/README.md` index if needed
+
+## 🔗 File References
+
+### In Markdown Files
+
+- Use relative paths from current file location
+- Examples:
+  - Same directory: `[File](./FILE.md)`
+  - Parent directory: `[File](../FILE.md)`
+  - Subdirectory: `[File](./subdir/FILE.md)`
+  - From root docs: `[File](../status/CURRENT_STATUS.md)`
+
+### In Rust Code Comments
+
+- Always use: `docs/concept/poolAI_concept.txt`
+- For other docs: `docs/[category]/FILE.md`
+- Example: `//! See docs/development/NEXT_STEPS_PLAN.md`
+
+## 📝 When User Requests Documentation
+
+1. **If user says "create a plan" or "create documentation"**:
+   - Determine category (status, development, etc.)
+   - Create in `docs/[category]/`
+   - Update `docs/README.md` index
+
+2. **If user references a file not in docs/**:
+   - Check if it exists in `docs/archive/`
+   - If not found, ask user or create in appropriate `docs/` subdirectory
+
+3. **If user mentions "concept file"**:
+   - Use `docs/concept/poolAI_concept.txt`
+   - If updating, update that file
+
+## 🚫 What NOT to Do
+
+- ❌ NEVER create `.md` files in root (except README files)
+- ❌ NEVER reference files as if they're in root
+- ❌ NEVER create temporary documentation files
+- ❌ NEVER leave orphaned documentation files
+
+## ✅ What to Do
+
+- ✅ Always create in `docs/` with proper subdirectory
+- ✅ Update `docs/README.md` when adding new main documents
+- ✅ Use relative paths in references
+- ✅ Move any found root `.md` files to `docs/archive/` if old, or appropriate category if new
+
+## 🔄 Git Workflow
+
+- Commit documentation with: `docs: [description]`
+- When reorganizing: `docs: reorganize [category] documentation`
+- Always verify files are in `docs/` before committing
+
+## 📚 Quick Reference
+
+**Main active documents**:
+- Status: `docs/status/CURRENT_STATUS.md`
+- Plans: `docs/development/NEXT_STEPS_PLAN.md`
+- Concept: `docs/concept/poolAI_concept.txt`
+- Index: `docs/README.md`
+
+**Remember**: Rust Architect wants CLEAN structure - all docs in `docs/`!
 
