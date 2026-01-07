@@ -30,6 +30,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("🚀 Starting PoolAI v{}", APP_VERSION);
     info!("📅 Build time: {}", BUILD_TIME);
 
+    // Initialize uptime tracking
+    poolai::version::initialize_start_time();
+
     // Initialize core module
     info!("Initializing core module...");
     core::initialize().await?;

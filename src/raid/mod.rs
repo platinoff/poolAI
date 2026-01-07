@@ -490,6 +490,12 @@ impl RaidManager {
         Ok(total)
     }
 
+    /// Get quota bytes from configuration
+    pub async fn get_quota_bytes(&self) -> Option<u64> {
+        let config = self.config.read().await;
+        config.quota_bytes
+    }
+
     /// Placeholder: rebalancing would run for distributed modes.
     #[allow(dead_code)]
     pub async fn rebalance(&self) -> Result<(), AppError> {

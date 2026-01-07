@@ -49,13 +49,14 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 #### ✅ Stage 3 - COMPLETED! 🎉
 - ✅ **Runtime Module** - Lifecycle management and process control
 - ✅ **Libs Module** - Model library management and version control (95% complete)
-- ✅ **VM Module** - Virtualization and isolation support (99% complete)
+- ✅ **VM Module** - Virtualization and isolation support (99.5% complete)
   - ✅ Process runner integration
   - ✅ Resource limits (Linux cgroups, Windows Job Objects)
   - ✅ Health checks with auto-recovery
   - ✅ Resource monitoring with alerts
-  - ✅ Network isolation (loopback interface setup)
+  - ✅ Network isolation (loopback interface setup, veth pairs)
   - ✅ Filesystem isolation (bind mounts, read-only mounts)
+  - ✅ Firewall rules setup (nftables/iptables)
   - ✅ 24 integration tests passing
 - ✅ **RAID Module** - Fault tolerance and data replication (90% complete)
   - ✅ Local artifact storage

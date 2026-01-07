@@ -719,8 +719,8 @@ async fn raid_quota_handler() -> impl IntoResponse {
     let artifacts = manager.list_artifacts().await;
     let artifact_count = artifacts.len();
 
-    // Get quota from config (would need to expose it from RaidManager)
-    let quota_bytes = None; // TODO: expose from config
+    // Get quota from config
+    let quota_bytes = manager.get_quota_bytes().await;
 
     let usage_percent = quota_bytes.map(|quota| {
         if quota > 0 {
@@ -1339,11 +1339,14 @@ async fn health_handler() -> impl IntoResponse {
 
     let _response_time = start_time.elapsed().as_millis() as u64;
 
+    // Get actual uptime from version module
+    let uptime = crate::version::get_uptime_seconds();
+
     let health_response = HealthResponse {
         status: "healthy",
         timestamp: Utc::now().to_rfc3339(),
         version: "0.1.0",
-        uptime: 3600, // TODO: Actual uptime
+        uptime,
         checks: health_checks,
     };
 
