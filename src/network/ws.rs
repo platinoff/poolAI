@@ -72,7 +72,8 @@ impl WebSocketManager {
         // Запускаємо періодичну відправку метрик та подій
         let metrics_subs = manager.metrics_subscriptions.clone();
         let events_subs = manager.events_subscriptions.clone();
-        let senders_clone = manager.senders.clone();
+        let senders_metrics = manager.senders.clone();
+        let senders_events = manager.senders.clone();
         
         tokio::spawn(async move {
             let mut metrics_interval = tokio::time::interval(std::time::Duration::from_secs(5));
@@ -81,7 +82,7 @@ impl WebSocketManager {
                 
                 // Відправка метрик підписаним користувачам
                 let subs = metrics_subs.read().await;
-                let senders = senders_clone.read().await;
+                let senders = senders_metrics.read().await;
                 for (connection_id, _) in subs.iter() {
                     if let Some(sender) = senders.get(connection_id) {
                         let metrics = get_current_metrics().await;
@@ -108,9 +109,9 @@ impl WebSocketManager {
                 
                 // Відправка подій підписаним користувачам
                 let subs = events_subs.read().await;
-                let senders = senders_clone.read().await;
+                let senders = senders_events.read().await;
                 for (connection_id, _) in subs.iter() {
-                    if let Some(sender) = senders.get(connection_id) {
+                    if let Some(_sender) = senders.get(connection_id) {
                         // В реальній реалізації тут були б нові події з event store
                         // Зараз просто heartbeat для підтримки підписки
                     }
