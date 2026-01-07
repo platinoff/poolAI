@@ -121,6 +121,12 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 - **Storage**: 50GB+ available space
 - **GPU**: NVIDIA GPU with CUDA support (optional)
 
+### Rust Requirements
+- **Rust**: 1.70+ (stable) - **Recommended: 1.83+ (latest)**
+- **Cargo**: Included with Rust
+- **Edition**: 2021 (as specified in Cargo.toml)
+- **Toolchain**: stable-x86_64-pc-windows-gnu (Windows) or stable-x86_64-unknown-linux-gnu (Linux)
+
 ### Software Requirements
 - **Rust**: 1.70+ (latest stable)
 - **MSYS2** (Windows): For native dependencies

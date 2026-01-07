@@ -99,6 +99,12 @@ PoolAI - це комплексна розподілена система для 
 - **Storage**: 50GB+ доступного місця
 - **GPU**: NVIDIA GPU з підтримкою CUDA (опціонально)
 
+### Вимоги Rust
+- **Rust**: 1.70+ (stable) - **Рекомендовано: 1.83+ (остання версія)**
+- **Cargo**: Включено з Rust
+- **Edition**: 2021 (як вказано в Cargo.toml)
+- **Toolchain**: stable-x86_64-pc-windows-gnu (Windows) або stable-x86_64-unknown-linux-gnu (Linux)
+
 ### Програмні вимоги
 - **Rust**: 1.70+ (остання стабільна)
 - **MSYS2** (Windows): Для нативних залежностей
