@@ -1,9 +1,23 @@
 //! Resource Limits Enforcement for VM instances
 //!
-//! Platform-specific implementations:
-//! - Windows: Job Objects (TODO)
-//! - Linux: cgroups v2 (TODO)
-//! - Cross-platform: Basic validation and monitoring (current)
+//! This module provides resource limits enforcement for VM instances.
+//!
+//! ## Platform-specific implementations:
+//!
+//! - **Windows**: Job Objects (planned for future implementation)
+//!   - Windows Job Objects allow fine-grained control over process resources
+//!   - Will provide CPU and memory limits enforcement
+//!   - Requires Windows API integration
+//!
+//! - **Linux**: cgroups v2 (planned for future implementation)
+//!   - Modern cgroups v2 interface for resource control
+//!   - Will provide CPU, memory, and I/O limits enforcement
+//!   - Requires systemd or direct cgroup filesystem access
+//!
+//! - **Cross-platform**: Basic validation and monitoring (current implementation)
+//!   - Validates resource limits configuration
+//!   - Monitors resource usage through platform APIs
+//!   - Provides fallback behavior when platform-specific enforcement is not available
 
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
