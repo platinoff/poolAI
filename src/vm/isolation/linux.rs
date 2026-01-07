@@ -13,20 +13,115 @@ use tracing::{info, warn};
 #[cfg(feature = "vm-isolation-linux")]
 use nix::mount::{mount, MsFlags};
 #[cfg(feature = "vm-isolation-linux")]
-use nix::sched::{unshare, CloneFlags};
+use nix::sched::{setns, unshare, CloneFlags};
 #[cfg(feature = "vm-isolation-linux")]
 use nix::unistd::chroot;
 #[cfg(feature = "vm-isolation-linux")]
-use std::fs;
+use std::fs::{self, File};
+#[cfg(feature = "vm-isolation-linux")]
+use std::os::unix::io::AsRawFd;
 #[cfg(feature = "vm-isolation-linux")]
 use std::process::Command;
 
+/// Namespace state tracking for setns support
+///
+/// Stores file descriptors for original namespaces to allow
+/// processes to be moved back to their original namespaces.
+#[cfg(feature = "vm-isolation-linux")]
+#[derive(Debug, Clone)]
+struct NamespaceState {
+    /// Original network namespace file descriptor
+    /// Path: /proc/self/ns/net
+    original_net_ns: Option<File>,
+    /// Original mount namespace file descriptor
+    /// Path: /proc/self/ns/mnt
+    original_mnt_ns: Option<File>,
+    /// Whether we created the network namespace (for cleanup)
+    created_net_ns: bool,
+    /// Whether we created the mount namespace (for cleanup)
+    created_mnt_ns: bool,
+}
+
+#[cfg(feature = "vm-isolation-linux")]
+impl NamespaceState {
+    /// Save the current namespace file descriptors
+    fn save_current_namespaces() -> Result<Self, AppError> {
+        let net_ns = File::open("/proc/self/ns/net").map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to open current network namespace: {}. \
+                Context: Cannot save original network namespace for setns support. \
+                Suggestion: Ensure /proc filesystem is mounted and accessible. \
+                Error: {}",
+                e, e
+            ))
+        })?;
+
+        let mnt_ns = File::open("/proc/self/ns/mnt").map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to open current mount namespace: {}. \
+                Context: Cannot save original mount namespace for setns support. \
+                Suggestion: Ensure /proc filesystem is mounted and accessible. \
+                Error: {}",
+                e, e
+            ))
+        })?;
+
+        Ok(Self {
+            original_net_ns: Some(net_ns),
+            original_mnt_ns: Some(mnt_ns),
+            created_net_ns: false,
+            created_mnt_ns: false,
+        })
+    }
+
+    /// Restore the original network namespace using setns
+    fn restore_network_namespace(&self) -> Result<(), AppError> {
+        if let Some(ref net_ns) = self.original_net_ns {
+            setns(net_ns.as_raw_fd(), CloneFlags::CLONE_NEWNET).map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to restore original network namespace using setns: {}. \
+                    Context: Cannot move process back to original network namespace. \
+                    Suggestion: Ensure the process has CAP_SYS_ADMIN capability or is running as root. \
+                    Error: {}",
+                    e, e
+                ))
+            })?;
+            info!("Successfully restored original network namespace using setns");
+        }
+        Ok(())
+    }
+
+    /// Restore the original mount namespace using setns
+    fn restore_mount_namespace(&self) -> Result<(), AppError> {
+        if let Some(ref mnt_ns) = self.original_mnt_ns {
+            setns(mnt_ns.as_raw_fd(), CloneFlags::CLONE_NEWNS).map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to restore original mount namespace using setns: {}. \
+                    Context: Cannot move process back to original mount namespace. \
+                    Suggestion: Ensure the process has CAP_SYS_ADMIN capability or is running as root. \
+                    Error: {}",
+                    e, e
+                ))
+            })?;
+            info!("Successfully restored original mount namespace using setns");
+        }
+        Ok(())
+    }
+}
+
 /// Linux network isolator using network namespaces
-pub struct LinuxNetworkIsolator;
+pub struct LinuxNetworkIsolator {
+    /// Namespace state tracking for setns support
+    #[cfg(feature = "vm-isolation-linux")]
+    namespace_states: std::collections::HashMap<u32, NamespaceState>,
+}
 
 impl LinuxNetworkIsolator {
     pub fn new() -> Self {
-        Self
+        Self {
+            #[cfg(feature = "vm-isolation-linux")]
+            namespace_states: std::collections::HashMap::new(),
+        }
     }
 
     /// Set up loopback interface in the current network namespace
@@ -403,23 +498,54 @@ impl NetworkIsolator for LinuxNetworkIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // Future improvement: Full cleanup implementation:
-            // 1. Move process back to original network namespace using setns() with original namespace FD
-            //    - Requires storing the original namespace file descriptor during isolation setup
-            //    - Call setns(original_ns_fd, CLONE_NEWNET) to restore original namespace
-            // 2. Clean up network namespace if it was created by us
-            //    - Use 'ip netns delete namespace-name' to remove namespace
-            //    - Only delete if we created it (track creation flag)
-            //    - Ensure namespace is empty before deletion (all processes moved out)
-            // 3. Remove firewall rules using 'nft delete' or 'iptables -F' and 'iptables -X'
-            //    - Remove all rules from custom chains
-            //    - Delete custom chains after removing references
-            //    - Remove table if no longer needed
-            // Note: This requires tracking namespace ownership and original namespace state
-            info!(
-                "Network isolation removal for process {} (cleanup requires namespace tracking)",
-                process_id
-            );
+            // Get namespace state for this process
+            if let Some(namespace_state) = self.namespace_states.remove(&process_id) {
+                // 1. Restore original network namespace using setns
+                if namespace_state.created_net_ns {
+                    if let Err(e) = namespace_state.restore_network_namespace() {
+                        warn!(
+                            "Failed to restore original network namespace for process {}: {}. \
+                            Process may remain in isolated namespace.",
+                            process_id, e
+                        );
+                    } else {
+                        info!(
+                            "Successfully restored original network namespace for process {} using setns",
+                            process_id
+                        );
+                    }
+                }
+
+                // 2. Clean up network namespace if it was created by us
+                // Note: In a full implementation, we would:
+                // - Use 'ip netns delete namespace-name' to remove namespace
+                // - Only delete if we created it (tracked by created_net_ns flag)
+                // - Ensure namespace is empty before deletion (all processes moved out)
+                if namespace_state.created_net_ns {
+                    info!(
+                        "Network namespace cleanup for process {} (namespace was created by us, \
+                        but automatic deletion requires tracking namespace name and ensuring it's empty)",
+                        process_id
+                    );
+                }
+
+                // 3. Remove firewall rules using 'nft delete' or 'iptables -F' and 'iptables -X'
+                // Note: In a full implementation, we would:
+                // - Remove all rules from custom chains
+                // - Delete custom chains after removing references
+                // - Remove table if no longer needed
+                info!(
+                    "Firewall rules cleanup for process {} (automatic cleanup requires tracking \
+                    created rules and chains)",
+                    process_id
+                );
+            } else {
+                warn!(
+                    "No namespace state found for process {}. \
+                    Cannot restore original namespace using setns.",
+                    process_id
+                );
+            }
         }
 
         #[cfg(not(feature = "vm-isolation-linux"))]
@@ -440,11 +566,18 @@ impl NetworkIsolator for LinuxNetworkIsolator {
 }
 
 /// Linux filesystem isolator using chroot and bind mounts
-pub struct LinuxFilesystemIsolator;
+pub struct LinuxFilesystemIsolator {
+    /// Namespace state tracking for setns support
+    #[cfg(feature = "vm-isolation-linux")]
+    namespace_states: std::collections::HashMap<u32, NamespaceState>,
+}
 
 impl LinuxFilesystemIsolator {
     pub fn new() -> Self {
-        Self
+        Self {
+            #[cfg(feature = "vm-isolation-linux")]
+            namespace_states: std::collections::HashMap::new(),
+        }
     }
 
     /// Set up a bind mount for filesystem isolation
@@ -724,23 +857,52 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // Future improvement: Full cleanup implementation:
-            // 1. Unmount bind mounts using umount2() with MNT_DETACH flag
-            //    - Requires tracking all mount points created during isolation
-            //    - Use umount2(path, MNT_DETACH) for lazy unmounting
-            //    - Ensure process is not using the mount points before unmounting
-            // 2. Move process back to original mount namespace using setns() with original namespace FD
-            //    - Requires storing the original mount namespace file descriptor during isolation setup
-            //    - Call setns(original_ns_fd, CLONE_NEWNS) to restore original mount namespace
-            // 3. Clean up temporary directories if created
-            //    - Use fs::remove_dir_all() to remove temporary directories
-            //    - Only remove directories we created (track creation ownership)
-            //    - Ensure directories are empty and unmounted before removal
-            // Note: This requires tracking mount operations and original namespace state
-            info!(
-                "Filesystem isolation removal for process {} (cleanup requires mount tracking)",
-                process_id
-            );
+            // Get namespace state for this process
+            if let Some(namespace_state) = self.namespace_states.remove(&process_id) {
+                // 1. Unmount bind mounts using umount2() with MNT_DETACH flag
+                // Note: In a full implementation, we would:
+                // - Track all mount points created during isolation
+                // - Use umount2(path, MNT_DETACH) for lazy unmounting
+                // - Ensure process is not using the mount points before unmounting
+                info!(
+                    "Bind mount cleanup for process {} (automatic unmounting requires tracking \
+                    created mount points)",
+                    process_id
+                );
+
+                // 2. Restore original mount namespace using setns
+                if namespace_state.created_mnt_ns {
+                    if let Err(e) = namespace_state.restore_mount_namespace() {
+                        warn!(
+                            "Failed to restore original mount namespace for process {}: {}. \
+                            Process may remain in isolated namespace.",
+                            process_id, e
+                        );
+                    } else {
+                        info!(
+                            "Successfully restored original mount namespace for process {} using setns",
+                            process_id
+                        );
+                    }
+                }
+
+                // 3. Clean up temporary directories if created
+                // Note: In a full implementation, we would:
+                // - Use fs::remove_dir_all() to remove temporary directories
+                // - Only remove directories we created (track creation ownership)
+                // - Ensure directories are empty and unmounted before removal
+                info!(
+                    "Temporary directory cleanup for process {} (automatic cleanup requires tracking \
+                    created directories)",
+                    process_id
+                );
+            } else {
+                warn!(
+                    "No namespace state found for process {}. \
+                    Cannot restore original namespace using setns.",
+                    process_id
+                );
+            }
         }
 
         #[cfg(not(feature = "vm-isolation-linux"))]
