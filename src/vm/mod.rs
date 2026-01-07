@@ -161,6 +161,9 @@ pub struct VmInstance {
     /// Number of restart attempts (internal tracking)
     #[serde(skip)]
     pub restart_attempts: u32,
+    /// Process ID of the running process (if spawned)
+    #[serde(skip)]
+    pub process_id: Option<u32>,
 }
 
 /// Resource usage history entry
@@ -465,6 +468,7 @@ impl VmManager {
             isolation,
             auto_recovery: AutoRecoveryConfig::default(),
             restart_attempts: 0,
+            process_id: None,
         };
 
         self.instances.write().await.insert(id, instance.clone());
@@ -660,8 +664,27 @@ impl VmManager {
             AppError::ValidationError(format!("VM instance {} not found", instance_id))
         })?;
 
-        // TODO: Get actual process_id from instance when process spawning is implemented
-        // For now, return the most recent history entry if available
+        // Try to get process_id from instance
+        let instance = instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+        })?;
+        
+        // If process_id is available, try to get current resource usage
+        if let Some(process_id) = instance.process_id {
+            match self.resource_limiter.get_usage(process_id).await {
+                Ok(usage) => {
+                    // Record usage in history
+                    self.record_resource_usage(instance_id, usage.clone()).await?;
+                    return Ok(usage);
+                }
+                Err(e) => {
+                    warn!("Failed to get resource usage for process {}: {}", process_id, e);
+                    // Fall through to history lookup
+                }
+            }
+        }
+        
+        // Fallback: return the most recent history entry if available
         let history = self.resource_history.read().await;
         if let Some(entries) = history.get(&instance_id) {
             if let Some(latest) = entries.last() {
@@ -670,7 +693,7 @@ impl VmManager {
         }
 
         Err(AppError::ConfigError(
-            "Process ID not available - process spawning not yet implemented".to_string(),
+            "Process ID not available and no history found - process spawning not yet implemented".to_string(),
         ))
     }
 
