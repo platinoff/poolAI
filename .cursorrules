@@ -104,11 +104,65 @@ docs/
 - ✅ Use relative paths in references
 - ✅ Move any found root `.md` files to `docs/archive/` if old, or appropriate category if new
 
-## 🔄 Git Workflow
+## 🔄 Git Workflow - Conventional Commits
 
-- Commit documentation with: `docs: [description]`
-- When reorganizing: `docs: reorganize [category] documentation`
-- Always verify files are in `docs/` before committing
+### Commit Message Format
+
+**ALWAYS use Conventional Commits format**:
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation changes
+- `style` - Code style (formatting, no logic change)
+- `refactor` - Code refactoring
+- `perf` - Performance improvements
+- `test` - Adding/updating tests
+- `build` - Build system changes
+- `ci` - CI/CD changes
+- `chore` - Other changes (not code)
+- `revert` - Revert previous commit
+
+### Scope Examples
+- `vm` - VM Module
+- `ui` - UI Module
+- `raid` - RAID Module
+- `network` - Network Module
+- `docs` - Documentation
+- `scripts` - Scripts
+- (no scope for general changes)
+
+### Examples
+- ✅ `feat(vm): add network isolation`
+- ✅ `fix(ui): correct modal focus trap`
+- ✅ `docs: update project structure`
+- ✅ `test(vm): add isolation integration tests`
+- ❌ `Update README` (no type)
+- ❌ `docs: Updated the README` (past tense, too vague)
+
+### Rules
+- Subject: max 50 chars, lowercase, imperative mood
+- Body: optional, explains "what" and "why", max 72 chars per line
+- Footer: breaking changes, issue references
+- One logical change per commit
+- Include tests for new features/fixes
+- Update documentation for new features
+
+### Before Commit Checklist
+- [ ] Code compiles (`cargo check`)
+- [ ] Tests pass (`cargo test`)
+- [ ] Code formatted (`cargo fmt`)
+- [ ] Linter clean (`cargo clippy`)
+- [ ] Documentation updated (if needed)
+- [ ] Commit message follows format
+- [ ] Changes are atomic and logical
 
 ## 📚 Quick Reference
 
