@@ -120,3 +120,69 @@ docs/
 
 **Remember**: Rust Architect wants CLEAN structure - all docs in `docs/`!
 
+---
+
+## 🔧 Scripts Structure - STRICT RULES
+
+### ⚠️ CRITICAL: All shell scripts MUST be in `scripts/` directory
+
+**NEVER create `.sh` files in the root directory**
+
+### Scripts Directory Structure
+
+```
+scripts/
+├── README.md                    # Scripts documentation
+├── fix_cargo_now.sh             # Cargo fix script
+├── fix_gcc.sh                   # GCC fix script
+├── install_gcc.sh               # GCC installation
+├── setup_rust_path.sh           # Rust PATH setup
+├── QUICK_FIX_RUST_PATH.sh       # Quick Rust PATH fix
+├── verify_build.sh              # Build verification
+└── PUSH_COMMANDS.sh             # Git push helper
+```
+
+### Rules for Creating New Scripts
+
+1. **Always create in `scripts/` directory**:
+   - Build scripts → `scripts/`
+   - Setup scripts → `scripts/`
+   - Utility scripts → `scripts/`
+   - CI/CD scripts → `scripts/` (or `scripts/ci/` for multiple)
+
+2. **File naming**:
+   - Use lowercase with underscores: `setup_rust_path.sh`
+   - Use descriptive names: `fix_cargo_now.sh`
+   - Use UPPERCASE for important scripts: `PUSH_COMMANDS.sh` (optional)
+
+3. **When user asks to create a script**:
+   - Always create in `scripts/`
+   - Add description in `scripts/README.md`
+   - Make executable: `chmod +x scripts/script_name.sh`
+
+### Script References
+
+- In documentation: `scripts/script_name.sh`
+- In Rust code comments: `scripts/script_name.sh`
+- In CI/CD configs: `scripts/script_name.sh`
+
+## 🚫 What NOT to Do with Scripts
+
+- ❌ NEVER create `.sh` files in root
+- ❌ NEVER leave scripts without documentation
+- ❌ NEVER create scripts without proper shebang (`#!/bin/bash`)
+
+## ✅ What to Do with Scripts
+
+- ✅ Always create in `scripts/`
+- ✅ Add to `scripts/README.md` documentation
+- ✅ Use proper shebang and error handling
+- ✅ Make executable with `chmod +x`
+
+## 📚 Quick Reference
+
+**Scripts location**: `scripts/`
+**Documentation**: `scripts/README.md`
+
+**Remember**: Rust Architect wants CLEAN structure - all scripts in `scripts/`!
+

@@ -43,6 +43,27 @@
 - Використовуйте: `docs/concept/poolAI_concept.txt`
 - НЕ створюйте новий файл в корені!
 
+## 🔧 Робота зі скриптами (.sh файли)
+
+### Правила для скриптів
+
+1. **ВСІ `.sh` файли ПОВИННІ бути в `scripts/` каталозі!**
+
+2. **Коли користувач просить створити скрипт**:
+   - Створюйте в `scripts/`
+   - Додавайте shebang: `#!/bin/bash`
+   - Додавайте опис в коментарях
+   - Оновлюйте `scripts/README.md`
+
+3. **Приклади**:
+   ```bash
+   # ✅ ПРАВИЛЬНО
+   scripts/my_script.sh
+   
+   # ❌ НЕПРАВИЛЬНО
+   my_script.sh (в корені)
+   ```
+
 ## 🔍 Перевірка перед commit
 
 Перед кожним commit перевірте:
@@ -51,9 +72,12 @@
 # Перевірка: чи є .md файли в корені (окрім README)
 cd S:\rust\poolAI
 Get-ChildItem -Filter *.md -File | Where-Object { $_.Name -ne 'README.md' -and $_.Name -ne 'README.uk.md' }
+
+# Перевірка: чи є .sh файли в корені
+Get-ChildItem -Filter *.sh -File
 ```
 
-Якщо знайдено файли - перемістіть їх в `docs/`!
+Якщо знайдено файли - перемістіть їх в `docs/` або `scripts/` відповідно!
 
 ## 📝 Приклади правильних дій
 
@@ -97,6 +121,8 @@ Get-ChildItem -Filter *.md -File | Where-Object { $_.Name -ne 'README.md' -and $
 | "документація для X" | `docs/[category]/X.md` |
 | "архівний файл" | `docs/archive/` |
 | "концепт" | `docs/concept/poolAI_concept.txt` |
+| "створи скрипт" | `scripts/script_name.sh` |
+| "shell script" | `scripts/script_name.sh` |
 
 ## 🔄 Автоматична перевірка
 
