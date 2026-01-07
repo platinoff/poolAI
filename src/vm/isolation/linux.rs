@@ -37,7 +37,13 @@ impl LinuxNetworkIsolator {
         let output = Command::new("ip")
             .args(&["link", "set", "lo", "up"])
             .output()
-            .map_err(|e| AppError::ConfigError(format!("Failed to execute ip command: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to execute 'ip' command for loopback interface setup: {}. \
+                Suggestion: Ensure 'iproute2' package is installed (e.g., 'apt-get install iproute2' on Debian/Ubuntu, \
+                'yum install iproute' on RHEL/CentOS) and that the command is in PATH. \
+                Context: The 'ip' command is required for network namespace isolation on Linux.",
+                e
+            )))?;
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
@@ -76,7 +82,12 @@ impl LinuxNetworkIsolator {
             ])
             .output()
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to execute ip command for veth: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to execute 'ip' command for veth pair creation (interface: {}, process: {}): {}. \
+                    Suggestion: Ensure 'iproute2' package is installed and you have sufficient privileges (CAP_NET_ADMIN or root). \
+                    Context: veth pairs are required to connect network namespaces to the host network.",
+                    interface, process_id, e
+                ))
             })?;
 
         if !output.status.success() {
@@ -417,7 +428,10 @@ impl LinuxFilesystemIsolator {
         // Validate source path exists
         if !source.exists() {
             return Err(AppError::ConfigError(format!(
-                "Source path does not exist: {:?}",
+                "Source path does not exist: {:?}. \
+                Suggestion: Ensure the source path is correct and accessible. Check that the directory/file exists \
+                and that you have read permissions. If the path is relative, verify the current working directory. \
+                Context: Bind mounts require the source path to exist before mounting.",
                 source
             )));
         }
@@ -432,7 +446,10 @@ impl LinuxFilesystemIsolator {
             if let Some(parent) = target_path.parent() {
                 if let Err(e) = fs::create_dir_all(parent) {
                     return Err(AppError::ConfigError(format!(
-                        "Failed to create target directory {:?}: {}",
+                        "Failed to create target directory {:?}: {}. \
+                        Suggestion: Ensure you have write permissions for the parent directory and sufficient disk space. \
+                        Check that the path is valid and not already a file (directories cannot be created where files exist). \
+                        Context: Target directory must exist before creating bind mounts in chroot environments.",
                         parent, e
                     )));
                 }
@@ -458,7 +475,11 @@ impl LinuxFilesystemIsolator {
         )
         .map_err(|e| {
             AppError::ConfigError(format!(
-                "Failed to create bind mount from {:?} to {:?}: {}",
+                "Failed to create bind mount from {:?} to {:?}: {}. \
+                Suggestion: Ensure you have sufficient privileges (CAP_SYS_ADMIN or root) for mount operations. \
+                Verify that both source and target paths are valid, and that the target mount point is not already in use. \
+                On Linux, mount namespaces may be required; ensure the process has the necessary capabilities. \
+                Context: Bind mounts are used to make files/directories available in isolated mount namespaces.",
                 source, target, e
             ))
         })?;
@@ -490,7 +511,9 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
         // Validate process ID
         if process_id == 0 {
             return Err(AppError::ValidationError(
-                "Invalid process ID: 0".to_string(),
+                "Invalid process ID: 0. Process ID 0 is reserved for the kernel idle process and cannot be used for isolation. \
+                Suggestion: Provide a valid process ID from a running process. \
+                Context: Process IDs must be positive integers (typically 1 or greater on Linux systems).".to_string(),
             ));
         }
 
@@ -498,7 +521,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
         if let Some(ref root_dir) = config.root_dir {
             if !root_dir.is_absolute() {
                 return Err(AppError::ConfigError(format!(
-                    "Root directory must be an absolute path: {:?}",
+                    "Root directory must be an absolute path: {:?}. \
+                    Suggestion: Provide an absolute path starting with '/' (e.g., '/var/lib/poolai/chroot' or '/tmp/isolation'). \
+                    Relative paths are not supported for chroot operations. \
+                    Context: chroot requires an absolute path to the root directory for filesystem isolation.",
                     root_dir
                 )));
             }
@@ -507,7 +533,9 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
         // Validate that if use_chroot is true, root_dir must be provided
         if config.use_chroot && config.root_dir.is_none() {
             return Err(AppError::ConfigError(
-                "use_chroot requires root_dir to be specified".to_string(),
+                "use_chroot requires root_dir to be specified. \
+                Suggestion: Either set 'root_dir' in the filesystem isolation configuration, or disable 'use_chroot' if you only need mount namespace isolation. \
+                Context: chroot operations require a root directory to change the apparent root of the filesystem.".to_string(),
             ));
         }
 
