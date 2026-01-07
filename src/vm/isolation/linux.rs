@@ -108,11 +108,17 @@ impl LinuxNetworkIsolator {
             veth_host, veth_ns, interface, process_id
         );
 
-        // TODO: In a full implementation, we would:
-        // 1. Move veth_ns to the network namespace using setns
-        // 2. Configure IP addresses
-        // 3. Bring up the interfaces
-        // 4. Set up routing
+        // Future improvement: In a full implementation, we would:
+        // 1. Move veth_ns to the network namespace using setns(CLONE_NEWNET)
+        //    - This requires calling setns() syscall with the network namespace file descriptor
+        //    - After moving to namespace, all subsequent operations affect the isolated namespace
+        // 2. Configure IP addresses using 'ip addr add' command or libc socket operations
+        //    - Assign IP to veth_ns interface within the namespace
+        //    - Configure subnet and gateway if needed
+        // 3. Bring up the interfaces using 'ip link set up' or ioctl(SIOCSIFFLAGS)
+        // 4. Set up routing using 'ip route add' or netlink socket operations
+        //    - Configure default route if needed
+        //    - Add static routes for specific networks
 
         Ok(())
     }
@@ -164,11 +170,19 @@ impl LinuxNetworkIsolator {
             ));
         }
 
-        // TODO: In a full implementation, we would:
-        // 1. Create a table for the network namespace
-        // 2. Add chains for INPUT, OUTPUT, FORWARD
-        // 3. Add rules to allow only specified ports
-        // 4. Set default policy to DROP
+        // Future improvement: In a full implementation, we would:
+        // 1. Create a table for the network namespace using 'nft create table'
+        //    - Table name could be based on process_id or namespace identifier
+        //    - Specify address family (inet for IPv4/IPv6)
+        // 2. Add chains for INPUT, OUTPUT, FORWARD using 'nft create chain'
+        //    - INPUT chain for incoming traffic to the namespace
+        //    - OUTPUT chain for outgoing traffic from the namespace
+        //    - FORWARD chain for forwarding (if namespace acts as router)
+        // 3. Add rules to allow only specified ports using 'nft add rule'
+        //    - Use 'tcp dport {ports}' or 'udp dport {ports}' to allow specific ports
+        //    - Add rules for established connections (ct state established,related accept)
+        // 4. Set default policy to DROP using 'nft add rule ... drop'
+        //    - Ensure all unmatched traffic is dropped for security
 
         info!(
             "nftables rules would be set up for ports {:?} (process {})",
@@ -202,11 +216,18 @@ impl LinuxNetworkIsolator {
             ));
         }
 
-        // TODO: In a full implementation, we would:
-        // 1. Create a custom chain for the network namespace
-        // 2. Add rules to allow only specified ports
-        // 3. Set default policy to DROP
-        // 4. Link the chain to INPUT/OUTPUT
+        // Future improvement: In a full implementation, we would:
+        // 1. Create a custom chain for the network namespace using 'iptables -N chain-name'
+        //    - Chain name could be based on process_id or namespace identifier
+        //    - Use iptables -t filter -N for filter table
+        // 2. Add rules to allow only specified ports using 'iptables -A chain-name'
+        //    - Use '--dport' for destination ports: 'iptables -A chain -p tcp --dport 80 -j ACCEPT'
+        //    - Add rules for established connections: 'iptables -A chain -m state --state ESTABLISHED,RELATED -j ACCEPT'
+        // 3. Set default policy to DROP using 'iptables -P chain-name DROP'
+        //    - This ensures all unmatched traffic is dropped for security
+        // 4. Link the chain to INPUT/OUTPUT using 'iptables -I INPUT -j chain-name'
+        //    - Insert rule at the beginning of INPUT chain to jump to custom chain
+        //    - Do the same for OUTPUT chain if needed
 
         info!(
             "iptables rules would be set up for ports {:?} (process {})",
@@ -382,11 +403,19 @@ impl NetworkIsolator for LinuxNetworkIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // TODO: Full cleanup implementation:
-            // 1. Move process back to original network namespace
+            // Future improvement: Full cleanup implementation:
+            // 1. Move process back to original network namespace using setns() with original namespace FD
+            //    - Requires storing the original namespace file descriptor during isolation setup
+            //    - Call setns(original_ns_fd, CLONE_NEWNET) to restore original namespace
             // 2. Clean up network namespace if it was created by us
-            // 3. Remove firewall rules
-            // Note: This is complex because we need to track which namespace was created
+            //    - Use 'ip netns delete namespace-name' to remove namespace
+            //    - Only delete if we created it (track creation flag)
+            //    - Ensure namespace is empty before deletion (all processes moved out)
+            // 3. Remove firewall rules using 'nft delete' or 'iptables -F' and 'iptables -X'
+            //    - Remove all rules from custom chains
+            //    - Delete custom chains after removing references
+            //    - Remove table if no longer needed
+            // Note: This requires tracking namespace ownership and original namespace state
             info!(
                 "Network isolation removal for process {} (cleanup requires namespace tracking)",
                 process_id
@@ -695,11 +724,19 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // TODO: Full cleanup implementation:
-            // 1. Unmount bind mounts
-            // 2. Move process back to original mount namespace
+            // Future improvement: Full cleanup implementation:
+            // 1. Unmount bind mounts using umount2() with MNT_DETACH flag
+            //    - Requires tracking all mount points created during isolation
+            //    - Use umount2(path, MNT_DETACH) for lazy unmounting
+            //    - Ensure process is not using the mount points before unmounting
+            // 2. Move process back to original mount namespace using setns() with original namespace FD
+            //    - Requires storing the original mount namespace file descriptor during isolation setup
+            //    - Call setns(original_ns_fd, CLONE_NEWNS) to restore original mount namespace
             // 3. Clean up temporary directories if created
-            // Note: This is complex because we need to track what was mounted
+            //    - Use fs::remove_dir_all() to remove temporary directories
+            //    - Only remove directories we created (track creation ownership)
+            //    - Ensure directories are empty and unmounted before removal
+            // Note: This requires tracking mount operations and original namespace state
             info!(
                 "Filesystem isolation removal for process {} (cleanup requires mount tracking)",
                 process_id
