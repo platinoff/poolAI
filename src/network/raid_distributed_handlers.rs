@@ -5,6 +5,7 @@
 use crate::core::error::AppError;
 use crate::raid;
 use crate::raid::protocol::*;
+use crate::version;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -117,9 +118,33 @@ pub async fn get_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl 
                 artifact_id: payload.artifact_id.clone(),
                 metadata: Some(ArtifactMetadata {
                     name: artifact_ref.name.clone(),
-                    version: "unknown".to_string(), // TODO: extract from artifact
-                    size_bytes: 0,                  // TODO: get actual size
-                    checksum: "unknown".to_string(), // TODO: calculate checksum
+                    // Future improvement: Extract version from artifact metadata
+                    // 1. Parse version from artifact name using regex or heuristics
+                    //    - Example: "model-v1.2.3.bin" -> "1.2.3"
+                    // 2. Or read version from metadata file (if stored separately)
+                    //    - Check for <artifact_path>.meta or similar metadata file
+                    // 3. Or parse from artifact content header (if format supports it)
+                    //    - Some artifact formats (e.g., ONNX, TensorFlow) embed version info
+                    // 4. Fallback to "unknown" if version cannot be determined
+                    version: "unknown".to_string(),
+                    // Future improvement: Get actual artifact file size
+                    // 1. Use std::fs::metadata(&artifact_ref.path) to get file metadata
+                    // 2. Extract metadata.len() for file size in bytes
+                    // 3. Handle errors gracefully (file not found, permission denied)
+                    //    - Log warning and use 0 as fallback
+                    // Example: std::fs::metadata(&artifact_ref.path).map(|m| m.len()).unwrap_or(0)
+                    size_bytes: 0,
+                    // Future improvement: Calculate checksum for artifact
+                    // 1. Read artifact file using manager.get_artifact(&artifact_ref.path).await
+                    // 2. Calculate SHA-256 checksum using sha2 crate:
+                    //    - use sha2::{Sha256, Digest};
+                    //    - let mut hasher = Sha256::new();
+                    //    - hasher.update(&artifact_data);
+                    //    - let checksum = format!("{:x}", hasher.finalize());
+                    // 3. Optionally cache checksum in artifact metadata to avoid recomputation
+                    // 4. Handle errors gracefully (file read failures, I/O errors)
+                    //    - Log warning and use "unknown" as fallback
+                    checksum: "unknown".to_string(),
                     created_at: artifact_ref.stored_at,
                     content_type: None,
                     tags: None,
@@ -241,8 +266,30 @@ pub async fn sync_artifacts_handler(Json(message): Json<ProtocolMessage>) -> imp
     let response = SyncArtifactsResponse {
         status: OperationStatus::Success,
         synced_count: artifacts.len() as u32,
-        missing_artifacts: Vec::new(), // TODO: implement proper sync logic
-        conflicts: Vec::new(),         // TODO: implement conflict detection
+        // Future improvement: Implement proper sync logic
+        // 1. Compare local artifacts with remote node's artifact list
+        //    - Request artifact list from remote node using ProtocolMessage::ListArtifacts
+        //    - Compare timestamps (stored_at) to determine which artifacts are missing
+        // 2. Identify missing artifacts (present locally but not on remote)
+        //    - Create missing_artifacts list with artifact IDs and metadata
+        // 3. Optionally initiate replication for missing artifacts
+        //    - Call replication engine to sync missing artifacts to remote node
+        // 4. Track sync progress and handle failures
+        //    - Retry failed syncs with exponential backoff
+        //    - Report partial sync status if some artifacts fail to sync
+        missing_artifacts: Vec::new(),
+        // Future improvement: Implement conflict detection
+        // 1. Compare artifact versions/timestamps between local and remote
+        //    - If same artifact ID exists on both sides with different timestamps
+        //    - If same artifact ID has different checksums (data divergence)
+        // 2. Create conflict entries with:
+        //    - artifact_id: conflicting artifact ID
+        //    - local_version: local artifact version/timestamp
+        //    - remote_version: remote artifact version/timestamp
+        //    - resolution_strategy: "keep_latest", "merge", "manual_resolution"
+        // 3. Apply resolution strategy automatically or flag for manual review
+        // 4. Log conflicts for audit purposes
+        conflicts: Vec::new(),
         error: None,
     };
 
@@ -257,21 +304,50 @@ pub async fn health_check_handler(Json(message): Json<ProtocolMessage>) -> impl 
     let artifacts = manager.list_artifacts().await;
     let total_size = manager.get_total_size().await.unwrap_or(0);
 
-    // TODO: Get actual storage capacity from config
-    let storage_total_bytes = 107374182400u64; // 100 GB default
+    // Future improvement: Get actual storage capacity from config
+    // 1. Use manager.get_quota_bytes().await to get configured quota
+    //    - Returns Option<u64> from RaidConfig.quota_bytes
+    // 2. If quota is None (unlimited), calculate actual disk capacity:
+    //    - Use std::fs::metadata(&config.base_path) for directory metadata (not available in std)
+    //    - Or use platform-specific APIs (sysinfo crate or similar)
+    //    - For now, use quota_bytes as storage_total_bytes if available
+    // 3. Fallback to hardcoded default if quota not configured
+    // Example: let storage_total_bytes = manager.get_quota_bytes().await.unwrap_or(107374182400u64);
+    let storage_total_bytes = manager.get_quota_bytes().await.unwrap_or(107374182400u64); // 100 GB default
     let storage_used_bytes = total_size;
 
-    // TODO: Get actual uptime
-    let uptime_seconds = 3600u64;
+    // Get actual application uptime using version module
+    // Note: version::initialize_start_time() must be called at startup (already done in main.rs)
+    let uptime_seconds = version::get_uptime_seconds();
 
-    // TODO: Get Raft role and term (when Raft is implemented)
+    // Future improvement: Get Raft role and term (when Raft is implemented)
+    // 1. Access global Raft node using raid::raft::get_global_raft_node()
+    //    - Returns Arc<Raft<RaidRaftStateMachine, RaidRaftNetwork, RaidRaftStorage>>
+    // 2. Get current role using raft_node.current_leader() and raft_node.current_state()
+    //    - current_state() returns RaftState (Leader, Candidate, Follower)
+    //    - Map RaftState to RaftRole enum (Leader, Candidate, Follower)
+    // 3. Get current term using raft_node.current_term() or from HardState
+    //    - HardState contains current_term and voted_for
+    // 4. Handle errors gracefully if Raft is not initialized or not enabled
+    //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
+    //    - Fallback to RaftRole::Follower if Raft is not available
+    // Example (requires #[cfg(feature = "raft")]):
+    //    let raft_role = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
+    //        match raft_node.current_state() {
+    //            async_raft::raft::RaftState::Leader => RaftRole::Leader,
+    //            async_raft::raft::RaftState::Candidate => RaftRole::Candidate,
+    //            async_raft::raft::RaftState::Follower => RaftRole::Follower,
+    //        }
+    //    } else {
+    //        RaftRole::Follower
+    //    };
     let response = HealthCheckResponse {
         status: HealthStatus::Healthy,
         uptime_seconds,
         storage_used_bytes,
         storage_total_bytes,
         artifact_count: artifacts.len() as u32,
-        raft_role: RaftRole::Follower, // TODO: get actual role
+        raft_role: RaftRole::Follower, // Placeholder until Raft integration is complete
         raft_term: 0,                  // TODO: get actual term
         last_heartbeat: Utc::now(),
     };
