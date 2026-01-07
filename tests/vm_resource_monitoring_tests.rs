@@ -6,7 +6,10 @@
 //! - Resource alert thresholds
 //! - History limits (FIFO)
 
-use poolai::vm::{ResourceAlertThresholds, ResourceUsage, ResourceUsageHistoryEntry, VmManager, VmResources, VmIsolation};
+use poolai::vm::{
+    ResourceAlertThresholds, ResourceUsage, ResourceUsageHistoryEntry, VmIsolation, VmManager,
+    VmResources,
+};
 
 #[tokio::test]
 async fn test_record_resource_usage() {
@@ -347,8 +350,8 @@ async fn test_resource_alerts_triggered() {
 
     // Record usage that exceeds thresholds
     let usage = ResourceUsage {
-        cpu_percent: 75.0, // Exceeds 50.0
-        memory_mb: 1500,   // Exceeds 1000
+        cpu_percent: 75.0,           // Exceeds 50.0
+        memory_mb: 1500,             // Exceeds 1000
         gpu_utilization: Some(90.0), // Exceeds 80.0
     };
 
@@ -400,15 +403,10 @@ async fn test_delete_instance_cleans_up_resource_data() {
     manager.delete_instance(instance.id).await.unwrap();
 
     // Try to get history (should fail - instance not found)
-    let result = manager
-        .get_resource_usage_history(instance.id, None)
-        .await;
+    let result = manager.get_resource_usage_history(instance.id, None).await;
     assert!(result.is_err());
 
     // Try to get thresholds (should fail - instance not found)
-    let result = manager
-        .get_resource_alert_thresholds(instance.id)
-        .await;
+    let result = manager.get_resource_alert_thresholds(instance.id).await;
     assert!(result.is_err());
 }
-
