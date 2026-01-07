@@ -203,12 +203,13 @@ mod tests {
 
     #[test]
     fn test_validate_worker_id_success() {
+        let long_id = "a".repeat(64);
         let valid_ids = vec![
             "worker1",
             "worker-123",
             "worker_456",
             "w1",
-            "a".repeat(64).as_str(),
+            long_id.as_str(),
         ];
 
         for id in valid_ids {
@@ -222,6 +223,7 @@ mod tests {
 
     #[test]
     fn test_validate_worker_id_failure() {
+        let too_long = "a".repeat(65);
         let invalid_cases = vec![
             ("", "empty"),
             (" ", "whitespace only"),
@@ -229,7 +231,7 @@ mod tests {
             ("_invalid", "starts with underscore"),
             ("invalid@id", "contains invalid character"),
             ("invalid id", "contains space"),
-            ("a".repeat(65).as_str(), "too long"),
+            (too_long.as_str(), "too long"),
         ];
 
         for (id, reason) in invalid_cases {
@@ -244,13 +246,14 @@ mod tests {
 
     #[test]
     fn test_validate_artifact_name_success() {
+        let long_name = "a".repeat(255);
         let valid_names = vec![
             "my-model-v1",
             "model_weights_2024",
             "library-1.2.3",
             "test123",
             "a",
-            "a".repeat(255).as_str(),
+            long_name.as_str(),
         ];
 
         for name in valid_names {
@@ -264,6 +267,7 @@ mod tests {
 
     #[test]
     fn test_validate_artifact_name_failure() {
+        let too_long = "a".repeat(256);
         let invalid_cases = vec![
             ("", "empty"),
             (" ", "whitespace only"),
@@ -272,7 +276,7 @@ mod tests {
             (".invalid", "starts with dot"),
             ("invalid@name", "contains invalid character"),
             ("invalid name", "contains space"),
-            ("a".repeat(256).as_str(), "too long"),
+            (too_long.as_str(), "too long"),
         ];
 
         for (name, reason) in invalid_cases {
