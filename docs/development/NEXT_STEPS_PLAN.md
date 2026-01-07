@@ -106,7 +106,17 @@
    - ✅ Resource alert thresholds (configurable)
    - ✅ Automatic alert checking
    - ✅ Integration tests (11 tests passing)
-6. 🔄 Full isolation implementation (network namespaces, chroot, AppContainers)
+6. ✅ **Network Interface Configuration** — **ЗАВЕРШЕНО** 🎉
+   - ✅ veth pairs implementation for network interface access
+   - ✅ Support for multiple interfaces per process
+   - ✅ Integration with network namespace
+7. ✅ **Firewall Rules Setup** — **ЗАВЕРШЕНО** 🎉
+   - ✅ nftables support (preferred, modern approach)
+   - ✅ iptables fallback (if nftables unavailable)
+   - ✅ Port filtering for isolated processes
+8. 🔄 Full namespace integration (setns - requires process creation in namespace)
+9. 🔄 macvlan support (planned for future)
+10. 🔄 Windows isolation (AppContainer - planned)
 
 **Файли**:
 - ✅ `src/vm/isolation.rs` (створено)
