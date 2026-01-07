@@ -19,9 +19,7 @@ use async_raft::{
 #[cfg(feature = "raft")]
 use async_trait::async_trait;
 #[cfg(feature = "raft")]
-#[cfg(feature = "raft")]
 use std::sync::Arc;
-#[cfg(feature = "raft")]
 #[cfg(feature = "raft")]
 use tokio::{
     fs::{File, OpenOptions},
