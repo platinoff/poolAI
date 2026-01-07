@@ -7,7 +7,10 @@
 
 **Проект**: PoolAI - Distributed AI Mining Pool Management System  
 **Мова**: Rust (stable-x86_64-pc-windows-gnu)  
+**Rust Version**: 1.70+ (Recommended: 1.83+, Current: 1.87.0)  
+**Rust Edition**: 2021  
 **Поточний етап**: Stage 3 - Completion & Stabilization  
+**Rust Book Alignment**: ✅ 2024/2025 Edition  
 **Статус збірки**: ✅ `cargo check` проходить без помилок та warnings  
 **Статус тестів**: ✅ **177+ tests passing** (33 unit + 144+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 24 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
 **Останній коміт**: Improve Rustdoc documentation - add usage examples to VM, RAID, UI modules and library root

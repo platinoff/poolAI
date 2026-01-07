@@ -376,37 +376,56 @@ pub trait Query {
 }
 ```
 
-## 🎯 Rust Best Practices
+## 🎯 Rust Best Practices (Rust Book 2024/2025 Edition)
 
-### **Module Organization**
-- Each module has a `mod.rs` file as the entry point
+### **Module Organization** (Following Rust Book Chapter 7)
+- Each module has a `mod.rs` file as the entry point (or `mod.rs` in directory)
 - Sub-modules are declared in `mod.rs` and implemented in separate `.rs` files
-- Public API is re-exported through `pub use` statements
-- Private implementation details are kept in sub-modules
+- Public API is re-exported through `pub use` statements (convenience)
+- Private implementation details are kept in sub-modules (encapsulation)
+- Use `pub(crate)` for crate-internal visibility
+- Use `pub(super)` for parent module visibility
 
-### **Error Handling**
+### **Error Handling** (Following Rust Book Chapter 9)
 - All functions that can fail return `Result<T, AppError>`
-- Error types are defined in `core::error` module
-- Errors are propagated using `?` operator
-- Panic is only used for unrecoverable errors
+- Error types are defined in `core::error` module (centralized)
+- Errors are propagated using `?` operator (ergonomic)
+- Panic is only used for unrecoverable errors (`unwrap()` in tests only)
+- Use `thiserror` or `anyhow` for error handling (if needed)
+- Custom error types implement `std::error::Error` trait
 
-### **Concurrency**
-- Shared state uses `Arc<RwLock<T>>` for thread-safe access
-- Async functions use `tokio::sync::RwLock` for async contexts
-- Message passing via channels (`mpsc`, `oneshot`) for communication
-- Background tasks spawned with `tokio::spawn`
+### **Concurrency** (Following Rust Book Chapter 16)
+- Shared state uses `Arc<RwLock<T>>` for thread-safe access (sync)
+- Async functions use `tokio::sync::RwLock` for async contexts (async)
+- Message passing via channels (`mpsc`, `oneshot`, `broadcast`) for communication
+- Background tasks spawned with `tokio::spawn` (async runtime)
+- Use `tokio::select!` for concurrent operations (async select)
+- Prefer message passing over shared state (actor model)
 
-### **Memory Management**
-- Ownership is explicit and checked at compile time
-- Borrowing is used for temporary access
-- `Arc` is used for shared ownership across threads
-- Lifetimes prevent dangling references
+### **Memory Management** (Following Rust Book Chapter 4)
+- Ownership is explicit and checked at compile time (zero-cost)
+- Borrowing is used for temporary access (references)
+- `Arc` is used for shared ownership across threads (reference counting)
+- `Rc` is used for single-threaded shared ownership (if needed)
+- Lifetimes prevent dangling references (`'static`, `'a`, etc.)
+- Use `Box<T>` for heap allocation when size is unknown at compile time
 
-### **Testing**
-- Unit tests in `#[cfg(test)]` modules
-- Integration tests in `tests/` directory
-- Mocking for external dependencies
-- Property-based testing with `proptest`
+### **Testing** (Following Rust Book Chapter 11)
+- Unit tests in `#[cfg(test)]` modules (same file or `tests/` submodule)
+- Integration tests in `tests/` directory (separate compilation)
+- Doc tests in documentation comments (`/// # Examples`)
+- Mocking for external dependencies (mockall, mockito)
+- Property-based testing with `proptest` (fuzzing)
+- Use `#[should_panic]` for panic tests (expected panics)
+- Test private functions through public API (best practice)
+
+### **Documentation** (Following Rust Book Chapter 14)
+- Use `///` for public API documentation (rustdoc)
+- Use `//!` for module-level documentation (inner doc)
+- Include code examples in documentation (`# Examples`)
+- Use `#[doc(hidden)]` for internal APIs (hide from docs)
+- Generate docs with `cargo doc --open` (local docs)
+- Publish docs with `cargo doc --no-deps` (for crates.io)
 
 ## 🚀 Performance Features
 
