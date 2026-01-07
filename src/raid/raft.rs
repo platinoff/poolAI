@@ -103,6 +103,12 @@ impl RaidRaftStorage {
         self.storage_path.join("raft_state.json")
     }
 
+    /// Get the path for last applied log index storage
+    /// Note: We store it separately or can include in state file
+    pub fn last_applied_path(&self) -> std::path::PathBuf {
+        self.storage_path.join("last_applied.json")
+    }
+
     /// Get the path for snapshot storage
     pub fn snapshot_path(&self, snapshot_id: &str) -> std::path::PathBuf {
         self.storage_path
@@ -125,6 +131,58 @@ impl RaidRaftStorage {
         let state: HardState = serde_json::from_str(&contents)
             .map_err(|e| anyhow::anyhow!("Failed to parse hard state: {}", e))?;
         Ok(state)
+    }
+
+    /// Load last applied log index from disk
+    async fn load_last_applied_log(&self) -> Result<u64> {
+        let last_applied_path = self.last_applied_path();
+        if !last_applied_path.exists() {
+            // If no persisted value, return 0 (no entries applied yet)
+            return Ok(0);
+        }
+
+        let mut file = File::open(&last_applied_path).await
+            .map_err(|e| anyhow::anyhow!("Failed to open last_applied file: {}", e))?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).await
+            .map_err(|e| anyhow::anyhow!("Failed to read last_applied file: {}", e))?;
+        
+        let metadata: serde_json::Value = serde_json::from_str(&contents)
+            .map_err(|e| anyhow::anyhow!("Failed to parse last_applied file: {}", e))?;
+        
+        let last_applied = metadata["last_applied_log"]
+            .as_u64()
+            .ok_or_else(|| anyhow::anyhow!("Invalid last_applied_log in metadata"))?;
+        
+        Ok(last_applied)
+    }
+
+    /// Save last applied log index to disk
+    async fn save_last_applied_log(&self, last_applied: u64) -> Result<()> {
+        let last_applied_path = self.last_applied_path();
+        let metadata = serde_json::json!({
+            "last_applied_log": last_applied,
+            "updated_at": chrono::Utc::now().to_rfc3339(),
+        });
+
+        let contents = serde_json::to_string_pretty(&metadata)
+            .map_err(|e| anyhow::anyhow!("Failed to serialize last_applied metadata: {}", e))?;
+
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&last_applied_path)
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to create last_applied file: {}", e))?;
+        
+        file.write_all(contents.as_bytes()).await
+            .map_err(|e| anyhow::anyhow!("Failed to write last_applied file: {}", e))?;
+        
+        file.sync_all().await
+            .map_err(|e| anyhow::anyhow!("Failed to sync last_applied file: {}", e))?;
+        
+        Ok(())
     }
 
     /// Save hard state to disk
@@ -252,8 +310,8 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         let last_log_index = entries.len() as u64;
         let last_log_term = entries.last().map(|e| e.term).unwrap_or(0);
 
-        // TODO: Track last_applied_log separately
-        let last_applied_log = last_log_index;
+        // Load last applied log index from disk (tracked separately)
+        let last_applied_log = self.load_last_applied_log().await?;
 
         let membership = self.get_membership_config().await?;
 
@@ -319,14 +377,21 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
 
     async fn apply_entry_to_state_machine(
         &self,
-        _index: &u64,
+        index: &u64,
         data: &RaidRaftOperation,
     ) -> Result<RaidRaftResponse> {
         let state_machine = RaidRaftStateMachine::new(self.raid_manager.clone());
-        state_machine
+        let response = state_machine
             .apply_operation(data)
             .await
-            .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))
+            .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))?;
+        
+        // Update last_applied_log after successfully applying entry
+        self.save_last_applied_log(*index).await
+            .map_err(|e| anyhow::anyhow!("Failed to save last_applied_log: {}", e))?;
+        info!("Updated last_applied_log to index {}", index);
+        
+        Ok(response)
     }
 
     async fn replicate_to_state_machine(
@@ -334,12 +399,23 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         entries: &[(&u64, &RaidRaftOperation)],
     ) -> Result<()> {
         let state_machine = RaidRaftStateMachine::new(self.raid_manager.clone());
-        for (_index, data) in entries {
+        let mut last_applied: Option<u64> = None;
+        
+        for (index, data) in entries {
             state_machine
                 .apply_operation(data)
                 .await
                 .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))?;
+            last_applied = Some(**index);
         }
+        
+        // Update last_applied_log after successfully applying entries
+        if let Some(last_index) = last_applied {
+            self.save_last_applied_log(last_index).await
+                .map_err(|e| anyhow::anyhow!("Failed to save last_applied_log: {}", e))?;
+            info!("Updated last_applied_log to index {}", last_index);
+        }
+        
         Ok(())
     }
 
