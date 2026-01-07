@@ -203,6 +203,21 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
 
     // Розбиваємо WebSocket на sender та receiver
     let (mut sender, mut receiver) = socket.split();
+    
+    // Створюємо channel для відправки повідомлень
+    let (tx, mut rx) = mpsc::unbounded_channel::<Message>();
+    WS_MANAGER.register_sender(connection_id.clone(), tx).await;
+    
+    // Запускаємо task для відправки повідомлень через sender
+    let connection_id_send = connection_id.clone();
+    let sender_task = tokio::spawn(async move {
+        while let Some(msg) = rx.recv().await {
+            if sender.send(msg).await.is_err() {
+                break;
+            }
+        }
+        WS_MANAGER.remove_connection(&connection_id_send).await;
+    });
 
     // Запускаємо heartbeat
     let heartbeat_handle = tokio::spawn(heartbeat_loop(connection_id.clone()));
