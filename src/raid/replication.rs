@@ -519,7 +519,8 @@ impl ReplicationEngine {
 
         // Emit ReplicationStarted events for each target node
         if let Some(ref event_store) = self.event_store {
-            let source_node = 0; // TODO: Get actual source node ID from Raft
+            // Get actual source node ID from RaidManager
+            let source_node = crate::raid::get_global_manager().get_node_id().await;
             for target_node in &selected_nodes {
                 let _ = event_store
                     .write()
@@ -599,7 +600,8 @@ impl ReplicationEngine {
         };
 
         // Process results and emit events
-        let source_node = 0; // TODO: Get actual source node ID from Raft
+        // Get actual source node ID from RaidManager
+        let source_node = crate::raid::get_global_manager().get_node_id().await;
         for (node_id, result) in replication_results {
             match result {
                 Ok(_) => {
