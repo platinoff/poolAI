@@ -1010,11 +1010,10 @@ document.addEventListener('keydown', function(e) {
     hideModal(activeModal.id);
   }
   
-  // Ctrl+K or Cmd+K for search (placeholder)
+  // Ctrl+K or Cmd+K for global search
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
-    // TODO: Implement search functionality
-    console.log('Search shortcut pressed (not yet implemented)');
+    showSearchModal();
   }
 });
 
