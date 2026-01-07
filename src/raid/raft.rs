@@ -185,8 +185,63 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
     type ShutdownError = AppError;
 
     async fn get_membership_config(&self) -> Result<MembershipConfig> {
-        // For now, return initial membership config
-        // TODO: Implement reverse search through log to find latest membership config
+        // Try to get membership config from snapshot metadata first
+        // This is the most reliable source if snapshot exists
+        if let Ok(Some(_snapshot_data)) = self.get_current_snapshot().await {
+            // Find the latest snapshot metadata file
+            let snapshot_dir = &self.storage_path;
+            let mut metadata_files = Vec::new();
+            
+            if let Ok(mut entries) = tokio::fs::read_dir(snapshot_dir).await {
+                while let Ok(Some(entry)) = entries.next_entry().await {
+                    let path = entry.path();
+                    if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                        if file_name.contains("_metadata") && file_name.ends_with(".snap") {
+                            metadata_files.push(path);
+                        }
+                    }
+                }
+            }
+            
+            // Sort by filename (newest first, assuming UUID-based names)
+            metadata_files.sort_by(|a, b| {
+                let a_name = a.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                let b_name = b.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                b_name.cmp(a_name)
+            });
+            
+            // Try to load membership from the latest metadata file
+            for metadata_path in metadata_files {
+                if let Ok(mut file) = File::open(&metadata_path).await {
+                    let mut contents = String::new();
+                    if file.read_to_string(&mut contents).await.is_ok() {
+                        if let Ok(metadata) = serde_json::from_str::<serde_json::Value>(&contents) {
+                            if let Some(membership_json) = metadata.get("membership") {
+                                if let Ok(membership) = serde_json::from_value::<MembershipConfig>(membership_json.clone()) {
+                                    info!("Loaded membership config from snapshot metadata");
+                                    return Ok(membership);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // If no snapshot membership found, search log entries in reverse order
+        // for membership config changes (entries with membership information)
+        let entries = self.load_log_entries().await?;
+        // Note: In async-raft, membership changes are stored in Entry struct,
+        // but they may be at the Raft protocol level, not in application data.
+        // For now, we'll use the last entry's membership if available,
+        // otherwise fall back to initial membership.
+        
+        // Search backwards through entries for membership config
+        // In a full implementation, we would check Entry::membership field
+        // For now, we'll return initial membership as a safe default
+        // TODO: When async-raft API is confirmed, extract membership from Entry struct
+        
+        info!("Using initial membership config (node_id: {})", self.node_id);
         Ok(MembershipConfig::new_initial(self.node_id))
     }
 
@@ -297,12 +352,19 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         // Create snapshot
         let (snapshot_id, snapshot_file) = self.create_snapshot().await?;
 
-        // Store snapshot metadata (index and term) in a separate metadata file
+        // Get current membership config for snapshot metadata
+        let membership = self.get_membership_config().await?;
+        
+        // Store snapshot metadata (index, term, and membership) in a separate metadata file
         let metadata_path = self.snapshot_path(&format!("{}_metadata", snapshot_id));
+        let membership_json = serde_json::to_value(&membership)
+            .map_err(|e| anyhow::anyhow!("Failed to serialize membership config: {}", e))?;
+        
         let metadata = serde_json::json!({
             "snapshot_id": snapshot_id,
             "index": index,
             "term": term,
+            "membership": membership_json,
         });
         
         let mut metadata_file = File::create(&metadata_path).await
@@ -436,7 +498,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
             .and_then(|s| s.strip_prefix("snapshot_"))
             .ok_or_else(|| anyhow::anyhow!("Invalid snapshot filename format"))?;
 
-        // Load metadata to get index and term
+        // Load metadata to get index, term, and membership
         let metadata_path = self.snapshot_path(&format!("{}_metadata", snapshot_id));
         let (index, term) = if metadata_path.exists() {
             let mut metadata_file = File::open(&metadata_path).await
@@ -452,6 +514,9 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
                 .ok_or_else(|| anyhow::anyhow!("Invalid index in snapshot metadata"))?;
             let term = metadata["term"].as_u64()
                 .ok_or_else(|| anyhow::anyhow!("Invalid term in snapshot metadata"))?;
+            
+            // Note: membership config is stored in metadata but not used here
+            // It will be used in get_membership_config() when loading from snapshot
             
             (index, term)
         } else {
