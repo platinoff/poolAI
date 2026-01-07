@@ -13,15 +13,16 @@ use crate::core::error::AppError;
 /// - Must start with alphanumeric character
 pub fn validate_worker_id(worker_id: &str) -> Result<(), AppError> {
     if worker_id.trim().is_empty() {
-        return Err(AppError::ConfigError(
-            "Worker ID cannot be empty".to_string(),
+        return Err(AppError::ValidationError(
+            "Worker ID cannot be empty. Suggestion: Provide a non-empty worker ID (1-64 characters, alphanumeric with hyphens/underscores).".to_string(),
         ));
     }
 
     if worker_id.len() > 64 {
-        return Err(AppError::ConfigError(
-            "Worker ID must be 64 characters or less".to_string(),
-        ));
+        return Err(AppError::ValidationError(format!(
+            "Worker ID must be 64 characters or less (got {}). Suggestion: Shorten the worker ID to 64 characters or less.",
+            worker_id.len()
+        )));
     }
 
     if !worker_id
@@ -30,19 +31,24 @@ pub fn validate_worker_id(worker_id: &str) -> Result<(), AppError> {
         .map(|c| c.is_alphanumeric())
         .unwrap_or(false)
     {
-        return Err(AppError::ConfigError(
-            "Worker ID must start with an alphanumeric character".to_string(),
-        ));
+        return Err(AppError::ValidationError(format!(
+            "Worker ID must start with an alphanumeric character (got '{}'). Suggestion: Start the worker ID with a letter or number.",
+            worker_id.chars().next().unwrap_or('?')
+        )));
     }
 
     if !worker_id
         .chars()
         .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
     {
-        return Err(AppError::ConfigError(
-            "Worker ID can only contain alphanumeric characters, hyphens, and underscores"
-                .to_string(),
-        ));
+        let invalid_chars: Vec<char> = worker_id
+            .chars()
+            .filter(|c| !c.is_alphanumeric() && *c != '-' && *c != '_')
+            .collect();
+        return Err(AppError::ValidationError(format!(
+            "Worker ID can only contain alphanumeric characters, hyphens, and underscores (found invalid characters: {:?}). Suggestion: Remove or replace invalid characters.",
+            invalid_chars
+        )));
     }
 
     Ok(())
@@ -56,15 +62,16 @@ pub fn validate_worker_id(worker_id: &str) -> Result<(), AppError> {
 /// - Must start with alphanumeric character
 pub fn validate_artifact_name(name: &str) -> Result<(), AppError> {
     if name.trim().is_empty() {
-        return Err(AppError::ConfigError(
-            "Artifact name cannot be empty".to_string(),
+        return Err(AppError::ValidationError(
+            "Artifact name cannot be empty. Suggestion: Provide a non-empty artifact name (1-255 characters, alphanumeric with hyphens/underscores/dots).".to_string(),
         ));
     }
 
     if name.len() > 255 {
-        return Err(AppError::ConfigError(
-            "Artifact name must be 255 characters or less".to_string(),
-        ));
+        return Err(AppError::ValidationError(format!(
+            "Artifact name must be 255 characters or less (got {}). Suggestion: Shorten the artifact name to 255 characters or less.",
+            name.len()
+        )));
     }
 
     if !name
@@ -73,19 +80,24 @@ pub fn validate_artifact_name(name: &str) -> Result<(), AppError> {
         .map(|c| c.is_alphanumeric())
         .unwrap_or(false)
     {
-        return Err(AppError::ConfigError(
-            "Artifact name must start with an alphanumeric character".to_string(),
-        ));
+        return Err(AppError::ValidationError(format!(
+            "Artifact name must start with an alphanumeric character (got '{}'). Suggestion: Start the artifact name with a letter or number.",
+            name.chars().next().unwrap_or('?')
+        )));
     }
 
     if !name
         .chars()
         .all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.')
     {
-        return Err(AppError::ConfigError(
-            "Artifact name can only contain alphanumeric characters, hyphens, underscores, and dots"
-                .to_string(),
-        ));
+        let invalid_chars: Vec<char> = name
+            .chars()
+            .filter(|c| !c.is_alphanumeric() && *c != '-' && *c != '_' && *c != '.')
+            .collect();
+        return Err(AppError::ValidationError(format!(
+            "Artifact name can only contain alphanumeric characters, hyphens, underscores, and dots (found invalid characters: {:?}). Suggestion: Remove or replace invalid characters.",
+            invalid_chars
+        )));
     }
 
     Ok(())
@@ -99,9 +111,9 @@ pub fn validate_range<T: PartialOrd + std::fmt::Display>(
     field_name: &str,
 ) -> Result<(), AppError> {
     if value < min || value > max {
-        return Err(AppError::ConfigError(format!(
-            "{} must be between {} and {}",
-            field_name, min, max
+        return Err(AppError::ValidationError(format!(
+            "{} must be between {} and {} (got {}). Suggestion: Adjust the value to be within the valid range.",
+            field_name, min, max, value
         )));
     }
     Ok(())
@@ -114,8 +126,8 @@ pub fn validate_range<T: PartialOrd + std::fmt::Display>(
 /// - Must be within size limit (default: 100MB)
 pub fn validate_base64_data(data: &str, max_size_bytes: usize) -> Result<(), AppError> {
     if data.trim().is_empty() {
-        return Err(AppError::ConfigError(
-            "Base64 data cannot be empty".to_string(),
+        return Err(AppError::ValidationError(
+            "Base64 data cannot be empty. Suggestion: Provide valid base64-encoded data.".to_string(),
         ));
     }
 

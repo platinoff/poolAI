@@ -42,7 +42,9 @@ impl LinuxNetworkIsolator {
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             return Err(AppError::ConfigError(format!(
-                "Failed to set up loopback interface: {}",
+                "Failed to set up loopback interface: {}. \
+                Suggestion: Ensure 'ip' command is available and you have sufficient privileges. \
+                Context: This is required for network namespace isolation.",
                 stderr
             )));
         }
@@ -80,8 +82,10 @@ impl LinuxNetworkIsolator {
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             return Err(AppError::ConfigError(format!(
-                "Failed to create veth pair: {}",
-                stderr
+                "Failed to create veth pair for interface '{}' (process {}): {}. \
+                Suggestion: Ensure 'ip' command is available, you have root privileges or CAP_NET_ADMIN, \
+                and the interface name is unique. Context: veth pairs are required for network interface access in isolated namespaces.",
+                interface, process_id, stderr
             )));
         }
 
@@ -140,7 +144,12 @@ impl LinuxNetworkIsolator {
 
         if check_output.is_err() {
             return Err(AppError::ConfigError(
-                "nftables is not available on this system".to_string(),
+                format!(
+                    "nftables is not available on this system. \
+                    Suggestion: Install nftables package (e.g., 'apt-get install nftables' on Debian/Ubuntu, \
+                    'yum install nftables' on RHEL/CentOS) or use iptables fallback. \
+                    Context: nftables is the modern replacement for iptables and is preferred for firewall rules."
+                )
             ));
         }
 
@@ -173,7 +182,12 @@ impl LinuxNetworkIsolator {
 
         if check_output.is_err() {
             return Err(AppError::ConfigError(
-                "iptables is not available on this system".to_string(),
+                format!(
+                    "iptables is not available on this system. \
+                    Suggestion: Install iptables package (e.g., 'apt-get install iptables' on Debian/Ubuntu, \
+                    'yum install iptables' on RHEL/CentOS) or ensure nftables is available. \
+                    Context: iptables is used as fallback when nftables is not available for firewall rules."
+                )
             ));
         }
 
