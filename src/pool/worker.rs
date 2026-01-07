@@ -36,6 +36,8 @@ pub struct WorkerStatus {
     pub gpu_usage: Option<f32>,
     pub process_id: Option<u32>,
     pub uptime_seconds: u64,
+    /// Current task being processed (if any)
+    pub current_task: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -63,6 +65,7 @@ impl Worker {
                 gpu_usage: None,
                 process_id: None,
                 uptime_seconds: 0,
+                current_task: None,
             })),
             request_queue: Arc::new(RwLock::new(VecDeque::new())),
             cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
@@ -82,6 +85,8 @@ impl Worker {
             let mut status = self.status.write().await;
             status.active_connections += 1;
             status.queue_size += 1;
+            // Set current task based on request type
+            status.current_task = Some(format!("processing-{}", request.input.chars().take(20).collect::<String>()));
         }
 
         // Process request (simulated)
@@ -103,6 +108,10 @@ impl Worker {
             status.active_connections -= 1;
             status.queue_size -= 1;
             status.total_requests_processed += 1;
+            // Clear current task when done
+            if status.active_connections == 0 {
+                status.current_task = None;
+            }
         }
 
         Ok(response)

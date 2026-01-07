@@ -1120,7 +1120,7 @@ async fn workers_handler() -> impl IntoResponse {
                         }
                         false => "error".to_string(),
                     },
-                    current_task: None, // TODO: Get from worker status
+                    current_task: status.current_task.clone(),
                 })
                 .collect();
 
