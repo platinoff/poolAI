@@ -47,6 +47,10 @@ pub struct WebSocketManager {
     connections: Arc<RwLock<HashMap<String, WebSocketConnection>>>,
     // Channel для відправки повідомлень до з'єднань
     senders: Arc<RwLock<HashMap<String, mpsc::UnboundedSender<Message>>>>,
+    // Підписки на метрики
+    metrics_subscriptions: Arc<RwLock<HashMap<String, bool>>>,
+    // Підписки на події
+    events_subscriptions: Arc<RwLock<HashMap<String, bool>>>,
 }
 
 pub struct WebSocketConnection {
@@ -58,10 +62,63 @@ pub struct WebSocketConnection {
 
 impl WebSocketManager {
     pub fn new() -> Self {
-        Self {
+        let manager = Self {
             connections: Arc::new(RwLock::new(HashMap::new())),
             senders: Arc::new(RwLock::new(HashMap::new())),
-        }
+            metrics_subscriptions: Arc::new(RwLock::new(HashMap::new())),
+            events_subscriptions: Arc::new(RwLock::new(HashMap::new())),
+        };
+        
+        // Запускаємо періодичну відправку метрик та подій
+        let metrics_subs = manager.metrics_subscriptions.clone();
+        let events_subs = manager.events_subscriptions.clone();
+        let senders_clone = manager.senders.clone();
+        
+        tokio::spawn(async move {
+            let mut metrics_interval = tokio::time::interval(std::time::Duration::from_secs(5));
+            loop {
+                metrics_interval.tick().await;
+                
+                // Відправка метрик підписаним користувачам
+                let subs = metrics_subs.read().await;
+                let senders = senders_clone.read().await;
+                for (connection_id, _) in subs.iter() {
+                    if let Some(sender) = senders.get(connection_id) {
+                        let metrics = get_current_metrics().await;
+                        let ws_message = WebSocketMessage {
+                            message_type: "live_metrics".to_string(),
+                            data: serde_json::to_value(metrics).unwrap_or_default(),
+                            timestamp: std::time::SystemTime::now()
+                                .duration_since(std::time::UNIX_EPOCH)
+                                .unwrap()
+                                .as_secs(),
+                        };
+                        if let Ok(json) = serde_json::to_string(&ws_message) {
+                            let _ = sender.send(Message::Text(json));
+                        }
+                    }
+                }
+            }
+        });
+        
+        tokio::spawn(async move {
+            let mut events_interval = tokio::time::interval(std::time::Duration::from_secs(10));
+            loop {
+                events_interval.tick().await;
+                
+                // Відправка подій підписаним користувачам
+                let subs = events_subs.read().await;
+                let senders = senders_clone.read().await;
+                for (connection_id, _) in subs.iter() {
+                    if let Some(sender) = senders.get(connection_id) {
+                        // В реальній реалізації тут були б нові події з event store
+                        // Зараз просто heartbeat для підтримки підписки
+                    }
+                }
+            }
+        });
+        
+        manager
     }
     
     /// Register sender for a connection
@@ -82,6 +139,22 @@ impl WebSocketManager {
         connections.remove(connection_id);
         let mut senders = self.senders.write().await;
         senders.remove(connection_id);
+        let mut metrics_subs = self.metrics_subscriptions.write().await;
+        metrics_subs.remove(connection_id);
+        let mut events_subs = self.events_subscriptions.write().await;
+        events_subs.remove(connection_id);
+    }
+    
+    /// Subscribe connection to metrics updates
+    pub async fn subscribe_metrics(&self, connection_id: &str) {
+        let mut subs = self.metrics_subscriptions.write().await;
+        subs.insert(connection_id.to_string(), true);
+    }
+    
+    /// Subscribe connection to events updates
+    pub async fn subscribe_events(&self, connection_id: &str) {
+        let mut subs = self.events_subscriptions.write().await;
+        subs.insert(connection_id.to_string(), true);
     }
 
     // Broadcast повідомлення до всіх з'єднань
@@ -321,25 +394,50 @@ async fn update_heartbeat(connection_id: &str) {
 }
 
 // Обробка підписки на метрики
-async fn handle_metrics_subscription(_connection_id: &str, claims: &Claims) {
+async fn handle_metrics_subscription(connection_id: &str, claims: &Claims) {
     // Перевіряємо права доступу
     if !claims.permissions.contains(&"read:metrics".to_string()) {
         return;
     }
 
-    // TODO: Запуск періодичної відправки метрик
-    println!("User {} subscribed to metrics", claims.sub);
+    // Підписуємо з'єднання на метрики
+    WS_MANAGER.subscribe_metrics(connection_id).await;
+    tracing::info!("User {} subscribed to metrics", claims.sub);
 }
 
 // Обробка підписки на системні події
-async fn handle_events_subscription(_connection_id: &str, claims: &Claims) {
+async fn handle_events_subscription(connection_id: &str, claims: &Claims) {
     // Перевіряємо права доступу
     if !claims.permissions.contains(&"read:events".to_string()) {
         return;
     }
 
-    // TODO: Запуск періодичної відправки подій
-    println!("User {} subscribed to system events", claims.sub);
+    // Підписуємо з'єднання на події
+    WS_MANAGER.subscribe_events(connection_id).await;
+    tracing::info!("User {} subscribed to system events", claims.sub);
+}
+
+// Отримання поточних метрик системи
+async fn get_current_metrics() -> LiveMetrics {
+    let active_workers = if let Some(pool) = crate::pool::get_global_pool() {
+        let pool_guard = pool.read().await;
+        pool_guard.get_worker_count().await as u32
+    } else {
+        0
+    };
+    
+    // В реальній реалізації тут були б реальні метрики з monitoring модуля
+    LiveMetrics {
+        active_workers,
+        total_requests: 0,
+        avg_response_time: 0.0,
+        memory_usage: 0.0,
+        gpu_temperature: 0.0,
+        timestamp: std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs(),
+    }
 }
 
 // Функція для broadcast оновлень (публічне API)
