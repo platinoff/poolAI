@@ -287,17 +287,20 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         // If no snapshot membership found, search log entries in reverse order
         // for membership config changes (entries with membership information)
         let entries = self.load_log_entries().await?;
+        
         // Note: In async-raft, membership changes are stored in Entry struct,
         // but they may be at the Raft protocol level, not in application data.
         // For now, we'll use the last entry's membership if available,
         // otherwise fall back to initial membership.
+        //
+        // Future improvement: When async-raft API is confirmed, extract membership
+        // from Entry struct by searching backwards through log entries and checking
+        // the Entry::membership field for membership change entries.
+        // This would allow us to recover the actual membership config even without
+        // a snapshot.
         
-        // Search backwards through entries for membership config
-        // In a full implementation, we would check Entry::membership field
-        // For now, we'll return initial membership as a safe default
-        // TODO: When async-raft API is confirmed, extract membership from Entry struct
-        
-        info!("Using initial membership config (node_id: {})", self.node_id);
+        // For now, return initial membership as a safe default
+        info!("Using initial membership config (node_id: {}) - no snapshot membership found, log entries membership extraction not yet implemented", self.node_id);
         Ok(MembershipConfig::new_initial(self.node_id))
     }
 
@@ -708,10 +711,11 @@ pub enum RaidRaftResponse {
     Error { error: String },
 }
 
-// Placeholder implementation - will be completed in next steps
+/// Implement AppData trait for Raft operations
 #[cfg(feature = "raft")]
 impl AppData for RaidRaftOperation {}
 
+/// Implement AppDataResponse trait for Raft operation responses
 #[cfg(feature = "raft")]
 impl AppDataResponse for RaidRaftResponse {}
 
