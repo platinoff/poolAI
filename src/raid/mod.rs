@@ -232,6 +232,25 @@ impl RaidManager {
     }
 
     /// Get event store reference (for API access)
+    ///
+    /// Returns a clone of the event store Arc if event sourcing is enabled,
+    /// or `None` if event sourcing is disabled.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use poolai::raid::RaidManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// # let manager = RaidManager::new(poolai::raid::RaidConfig::default_for_platform());
+    /// if let Some(event_store) = manager.event_store() {
+    ///     // Access event store for querying events
+    ///     let events = event_store.read().await.list_events(0, 100).await;
+    ///     println!("Found {} events", events.len());
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn event_store(&self) -> Option<Arc<RwLock<EventStore>>> {
         self.event_store.clone()
     }
@@ -557,16 +576,87 @@ fn sanitize_filename(input: &str) -> String {
 
 static RAID_MANAGER: OnceLock<Arc<RaidManager>> = OnceLock::new();
 
+/// Get global RAID manager instance.
+///
+/// This function returns a singleton instance of `RaidManager` that can be used
+/// throughout the application. The instance is created on first access with
+/// default platform-specific configuration and reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::raid::get_global_manager;
+/// use uuid::Uuid;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = get_global_manager();
+///
+/// // List all artifacts
+/// let artifacts = manager.list_artifacts().await;
+/// for artifact in artifacts {
+///     println!("Artifact: {} ({})", artifact.name, artifact.id);
+/// }
+/// # Ok(())
+/// # }
+/// ```
 pub fn get_global_manager() -> Arc<RaidManager> {
     RAID_MANAGER
         .get_or_init(|| Arc::new(RaidManager::new(RaidConfig::default_for_platform())))
         .clone()
 }
 
+/// Initialize the RAID module.
+///
+/// This function initializes the global RAID manager instance, including:
+/// - Creating base directories
+/// - Loading artifact manifest
+/// - Running garbage collection (if enabled)
+/// - Enforcing quota (if configured)
+/// - Initializing event store
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::raid::initialize;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// // Initialize RAID module at application startup
+/// initialize().await?;
+/// println!("RAID module initialized");
+/// # Ok(())
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// Returns `AppError::ConfigError` if initialization fails (e.g., directory creation, manifest loading).
 pub async fn initialize() -> Result<(), AppError> {
     get_global_manager().initialize().await
 }
 
+/// Shutdown the RAID module.
+///
+/// This function gracefully shuts down the global RAID manager instance, including:
+/// - Creating a final snapshot of current state
+/// - Persisting manifest changes
+/// - Cleaning up resources
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::raid::shutdown;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// // Shutdown RAID module at application exit
+/// shutdown().await?;
+/// println!("RAID module shut down");
+/// # Ok(())
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// Returns `AppError::ConfigError` if shutdown fails (e.g., snapshot creation).
 pub async fn shutdown() -> Result<(), AppError> {
     get_global_manager().shutdown().await
 }

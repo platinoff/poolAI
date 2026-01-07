@@ -1119,6 +1119,28 @@ impl VmManager {
 static VM_MANAGER: OnceLock<Arc<VmManager>> = OnceLock::new();
 
 /// Get global VM manager instance.
+///
+/// This function returns a singleton instance of `VmManager` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::vm::get_global_manager;
+/// use uuid::Uuid;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = get_global_manager();
+///
+/// // List all VM instances
+/// let instances = manager.list_instances().await;
+/// for instance in instances {
+///     println!("VM: {} ({:?})", instance.name, instance.status);
+/// }
+/// # Ok(())
+/// # }
+/// ```
 pub fn get_global_manager() -> Arc<VmManager> {
     VM_MANAGER
         .get_or_init(|| Arc::new(VmManager::new()))
@@ -1126,11 +1148,55 @@ pub fn get_global_manager() -> Arc<VmManager> {
 }
 
 /// Initialize the VM module.
+///
+/// This function initializes the global VM manager instance, including:
+/// - Health monitor setup
+/// - Periodic health check tasks
+/// - Resource limiter initialization
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::vm::initialize;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// // Initialize VM module at application startup
+/// initialize().await?;
+/// println!("VM module initialized");
+/// # Ok(())
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// Returns `AppError::ConfigError` if health monitor initialization fails.
 pub async fn initialize() -> Result<(), AppError> {
     get_global_manager().initialize().await
 }
 
 /// Shutdown the VM module.
+///
+/// This function gracefully shuts down the global VM manager instance, including:
+/// - Stopping all running VM instances
+/// - Cleaning up health check tasks
+/// - Releasing resources
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::vm::shutdown;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// // Shutdown VM module at application exit
+/// shutdown().await?;
+/// println!("VM module shut down");
+/// # Ok(())
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// Returns `AppError::ConfigError` if shutdown fails.
 pub async fn shutdown() -> Result<(), AppError> {
     get_global_manager().shutdown().await
 }
