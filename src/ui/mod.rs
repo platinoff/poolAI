@@ -1017,6 +1017,112 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// Global search functionality
+function showSearchModal() {
+  const modalId = 'searchModal';
+  let modal = document.getElementById(modalId);
+  
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-labelledby', 'searchModalTitle');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3 id="searchModalTitle">Search</h3>
+          <button class="modal-close" aria-label="Close search dialog" onclick="hideModal('${modalId}')">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="search-container">
+            <input type="text" id="globalSearchInput" class="search-input" placeholder="Search pages, workers, artifacts..." autofocus aria-label="Search input" />
+            <span class="search-icon">🔍</span>
+          </div>
+          <div id="searchResults" style="margin-top: 16px; max-height: 400px; overflow-y: auto;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsContainer = document.getElementById('searchResults');
+    
+    // Search pages and navigation
+    const searchableItems = [
+      { name: 'Home', url: '/ui', category: 'Page' },
+      { name: 'Status', url: '/ui/status', category: 'Page' },
+      { name: 'Health', url: '/ui/health', category: 'Page' },
+      { name: 'Metrics', url: '/ui/metrics', category: 'Page' },
+      { name: 'Workers', url: '/ui/workers', category: 'Page' },
+      { name: 'Libraries', url: '/ui/libs', category: 'Page' },
+      { name: 'VM Instances', url: '/ui/vm', category: 'Page' },
+      { name: 'RAID', url: '/ui/raid', category: 'Page' },
+    ];
+    
+    searchInput.addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase().trim();
+      if (query.length === 0) {
+        resultsContainer.innerHTML = '<div class="muted">Type to search...</div>';
+        return;
+      }
+      
+      const results = searchableItems.filter(item => 
+        item.name.toLowerCase().includes(query) || 
+        item.category.toLowerCase().includes(query)
+      );
+      
+      if (results.length === 0) {
+        resultsContainer.innerHTML = '<div class="muted">No results found</div>';
+        return;
+      }
+      
+      resultsContainer.innerHTML = results.map(item => `
+        <div class="search-result-item" style="padding: 12px; border: 1px solid var(--border, #262b36); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s;" 
+             onclick="window.location.href='${item.url}'; hideModal('${modalId}');"
+             onmouseover="this.style.background='var(--surface-secondary, #1e2329)'"
+             onmouseout="this.style.background='var(--bg, #0f1216)'">
+          <div style="font-weight: bold; color: var(--primary, #67e480);">${item.name}</div>
+          <div class="muted" style="font-size: 0.85em; margin-top: 4px;">${item.category} • ${item.url}</div>
+        </div>
+      `).join('');
+    });
+    
+    // Close on Escape
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        hideModal(modalId);
+      }
+    });
+    
+    // Focus trap
+    modal.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        const focusableElements = modal.querySelectorAll('input, button, [tabindex]:not([tabindex="-1"])');
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    });
+  }
+  
+  showModal(modalId);
+  const searchInput = document.getElementById('globalSearchInput');
+  if (searchInput) {
+    searchInput.focus();
+    searchInput.select();
+  }
+}
+
 function confirmAction(message, onConfirm) {
   if (confirm(message)) {
     onConfirm();
