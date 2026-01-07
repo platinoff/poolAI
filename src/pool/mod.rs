@@ -224,28 +224,97 @@ impl Pool {
     }
 
     pub async fn scale_up(&self) -> Result<(), AppError> {
-        if self.config.auto_scaling {
-            let workers = self.workers.read().await;
-            if workers.len() < self.config.max_workers {
-                info!("Scaling up pool - adding new worker");
-                // TODO: Implement actual worker creation
-                // This would involve creating a new worker instance
-                // and adding it to the pool
-            }
+        if !self.config.auto_scaling {
+            return Ok(());
         }
+
+        let current_count = {
+            let workers = self.workers.read().await;
+            workers.len()
+        };
+
+        if current_count >= self.config.max_workers {
+            return Ok(());
+        }
+
+        info!("Scaling up pool - adding new worker (current: {}/{})", current_count, self.config.max_workers);
+
+        // Generate unique worker ID
+        let worker_id = format!("worker-{}", uuid::Uuid::new_v4().to_string().split('-').next().unwrap_or("auto"));
+
+        // Create worker config with reasonable defaults
+        let worker_config = worker::WorkerConfig {
+            worker_id: worker_id.clone(),
+            max_concurrent_requests: 10,
+            request_timeout_ms: self.config.request_timeout,
+            health_check_interval_ms: 5000,
+            enable_caching: true,
+            cache_size: 1000,
+            max_memory_mb: 2048,
+            cpu_priority: 5,
+            gpu_device: None,
+            auto_restart: true,
+            resource_monitoring: true,
+        };
+
+        // Create and add worker
+        let new_worker = worker::Worker::new(worker_config);
+        self.add_worker(worker_id.clone(), new_worker).await?;
+
+        info!("Successfully scaled up pool - new worker: {}", worker_id);
         Ok(())
     }
 
     pub async fn scale_down(&self) -> Result<(), AppError> {
-        if self.config.auto_scaling {
-            let workers = self.workers.read().await;
-            if workers.len() > 1 {
-                info!("Scaling down pool - removing worker");
-                // TODO: Implement actual worker removal
-                // This would involve gracefully shutting down a worker
-                // and removing it from the pool
-            }
+        if !self.config.auto_scaling {
+            return Ok(());
         }
+
+        let current_count = {
+            let workers = self.workers.read().await;
+            workers.len()
+        };
+
+        if current_count <= 1 {
+            return Ok(());
+        }
+
+        info!("Scaling down pool - removing least loaded worker (current: {})", current_count);
+
+        // Find the least loaded worker (minimum active_connections + queue_size)
+        let (least_loaded_id, least_loaded_worker) = {
+            let workers = self.workers.read().await;
+            let mut min_load = usize::MAX;
+            let mut candidate_id: Option<String> = None;
+            let mut candidate_worker: Option<worker::Worker> = None;
+
+            for (id, worker) in workers.iter() {
+                let status = worker.get_status().await;
+                let load = status.active_connections + status.queue_size;
+
+                if load < min_load {
+                    min_load = load;
+                    candidate_id = Some(id.clone());
+                    candidate_worker = Some(worker.clone());
+                }
+            }
+
+            match (candidate_id, candidate_worker) {
+                (Some(id), Some(worker)) => (id, worker),
+                _ => return Err(AppError::PoolError("No workers available for scaling down".to_string())),
+            }
+        };
+
+        // Gracefully shutdown the worker
+        if let Err(e) = least_loaded_worker.shutdown().await {
+            warn!("Failed to gracefully shutdown worker {}: {}", least_loaded_id, e);
+            // Continue with removal even if shutdown failed
+        }
+
+        // Remove worker from pool
+        self.remove_worker(&least_loaded_id).await?;
+
+        info!("Successfully scaled down pool - removed worker: {}", least_loaded_id);
         Ok(())
     }
 
