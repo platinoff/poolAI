@@ -13,7 +13,7 @@
 **Rust Book Alignment**: ✅ 2024/2025 Edition  
 **Статус збірки**: ✅ `cargo check` проходить без помилок та warnings  
 **Статус тестів**: ✅ **177+ tests passing** (33 unit + 144+ integration, including 8 event sourcing + 8 circuit breaker + 7 replication + 14 raft integration + 10 distributed replication + 9 failure scenario + 8 performance benchmark + 8 load tests + 14 UI write operations validation + 24 VM isolation integration + 9 VM auto-recovery + 11 VM resource monitoring)  
-**Останній коміт**: Update dependencies (tokio 1.48, uuid 1.19) - 2025-12-30
+**Останній коміт**: Improve Rustdoc documentation for Libs module - 2025-12-30
 
 ---
 
@@ -222,7 +222,7 @@
 
 ---
 
-### 12. VM Module (`src/vm/`) — ✅ ~99% COMPLETED
+### 12. VM Module (`src/vm/`) — ✅ ~99.5% COMPLETED
 **Файли**: 8 (mod.rs, resources.rs, resources/linux.rs, resources/windows.rs, isolation.rs, isolation/linux.rs, isolation/windows.rs, isolation/noop.rs)
 
 **Реалізовано**:
@@ -273,7 +273,7 @@
   - ✅ Configuration validation (network, filesystem isolation configs)
   - ✅ Process ID validation
   - ✅ Error handling improvements
-  - ✅ **Linux Isolation System Calls** — **PARTIALLY IMPLEMENTED** 🎉
+  - ✅ **Linux Isolation System Calls** — **MOSTLY IMPLEMENTED** 🎉
     - ✅ Optional feature `vm-isolation-linux` added
     - ✅ Network namespace creation (`unshare(CLONE_NEWNET)`)
     - ✅ Mount namespace creation (`unshare(CLONE_NEWNS)`)
@@ -287,8 +287,16 @@
       - ✅ Bind mounts implementation (`nix::mount::mount` with `MS_BIND`)
       - ✅ Read-only mounts implementation (`MS_RDONLY` flag)
       - ✅ Usage examples in Rustdoc
-    - 🔄 Network interface configuration (veth pairs, macvlan - planned)
-    - 🔄 Firewall rules setup (iptables/nftables - planned)
+    - ✅ **Network Interface Configuration** — **COMPLETED** 🎉
+      - ✅ veth pairs implementation for network interface access
+      - ✅ Support for multiple interfaces per process
+      - ✅ Integration with network namespace
+    - ✅ **Firewall Rules Setup** — **COMPLETED** 🎉
+      - ✅ nftables support (preferred, modern approach)
+      - ✅ iptables fallback (if nftables unavailable)
+      - ✅ Port filtering for isolated processes
+    - 🔄 Full namespace integration (setns - requires process creation in namespace)
+    - 🔄 macvlan support (planned for future)
 - ✅ **Auto-Recovery Enhancements** — **ЗАВЕРШЕНО (Week 9)** 🎉
   - ✅ AutoRecoveryConfig struct з налаштуваннями (max_restart_attempts, delays, exponential backoff)
   - ✅ Exponential backoff для restart delay
