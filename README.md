@@ -253,11 +253,16 @@ curl -k https://localhost:8080/api/v1/rewards
 
 ## 🤝 Contributing
 
+We welcome contributions! Please see our [Contributing Guidelines](.github/CONTRIBUTING.md) for details.
+
+### Quick Start
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make your changes following our [coding standards](.github/CONTRIBUTING.md#coding-standards)
+4. Commit using [Conventional Commits](docs/GIT_COMMIT_GUIDELINES.md) format
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request using our [PR template](.github/PULL_REQUEST_TEMPLATE.md)
 
 ### Development Guidelines
 
@@ -265,6 +270,7 @@ curl -k https://localhost:8080/api/v1/rewards
 - Focus on enterprise features and cloud integration
 - Maintain clean, documented code
 - Write tests for new functionality
+- Follow [Rust Book](https://doc.rust-lang.org/book/) best practices
 
 ## 📚 Documentation
 
