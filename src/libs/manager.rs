@@ -176,6 +176,26 @@ impl LibraryManager {
     }
 
     /// Install a library
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::libs::{LibraryManager, LibraryType};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = LibraryManager::new();
+    /// manager.initialize().await?;
+    ///
+    /// let library = manager.install_library(
+    ///     "libtorch".to_string(),
+    ///     "2.0.0".to_string(),
+    ///     LibraryType::ModelLibrary,
+    /// ).await?;
+    ///
+    /// println!("Installed: {} v{} at {:?}", library.name, library.version, library.path);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn install_library(
         &self,
         name: &str,

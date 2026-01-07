@@ -6,6 +6,60 @@
 //! - Library versioning
 //! - Path optimization for libraries
 //! - Automatic updates
+//!
+//! # Examples
+//!
+//! ## Installing a library
+//!
+//! ```no_run
+//! use poolai::libs::{LibraryManager, LibraryType};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = poolai::libs::get_global_manager();
+//! let manager = manager.read().await;
+//!
+//! // Install libtorch
+//! let library = manager.install_library(
+//!     "libtorch".to_string(),
+//!     "2.0.0".to_string(),
+//!     LibraryType::ModelLibrary,
+//! ).await?;
+//!
+//! println!("Installed library: {} at {:?}", library.name, library.path);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Checking library compatibility
+//!
+//! ```no_run
+//! use poolai::libs::check_libtorch_compatibility;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let compatible = check_libtorch_compatibility("2.0.0").await?;
+//! if compatible {
+//!     println!("libtorch 2.0.0 is compatible");
+//! }
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Listing installed libraries
+//!
+//! ```no_run
+//! use poolai::libs::get_global_manager;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = get_global_manager();
+//! let manager = manager.read().await;
+//!
+//! let libraries = manager.list_libraries().await?;
+//! for lib in libraries {
+//!     println!("Library: {} v{}", lib.name, lib.version);
+//! }
+//! # Ok(())
+//! # }
+//! ```
 
 pub mod constraints;
 pub mod dependencies;
