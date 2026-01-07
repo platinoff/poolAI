@@ -52,7 +52,7 @@
 - `install_gcc.sh` - Встановлення GCC для ring/JWT
 - `verify_build.sh` - Перевірка збірки
 - `fix_gcc.sh` - Швидке виправлення GCC PATH
-- `fix_cargo_now.sh` - Миттєве виправлення cargo
+- `scripts/fix_cargo_now.sh` - Миттєве виправлення cargo
 
 ### Документація
 - `FIX_RING_GCC.md` - Виправлення ring/gcc проблеми
