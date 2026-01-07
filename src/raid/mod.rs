@@ -236,6 +236,20 @@ impl RaidManager {
         self.event_store.clone()
     }
 
+    /// Get current node ID from Raft (if available) or return default
+    async fn get_node_id(&self) -> u64 {
+        #[cfg(feature = "raft")]
+        {
+            // Try to get node ID from Raft storage if available
+            // In a full implementation with Raft initialized, this would query the Raft node
+            // For now, return default node ID (1) when Raft is not available
+            // This can be extended to access global Raft instance when it's available
+        }
+        // Default node ID when Raft is not available or not initialized
+        // In production, this would be configured per node
+        1
+    }
+
     pub async fn list_nodes(&self) -> Vec<RaidNode> {
         self.nodes.read().await.clone()
     }
