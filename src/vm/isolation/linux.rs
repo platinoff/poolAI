@@ -717,6 +717,7 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
             let mount_ns_result = unshare(CloneFlags::CLONE_NEWNS);
             match mount_ns_result {
                 Ok(_) => {
+                    namespace_state.created_mnt_ns = true;
                     info!(
                         "Successfully created mount namespace for process {}",
                         process_id
