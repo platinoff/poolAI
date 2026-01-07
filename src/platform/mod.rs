@@ -26,7 +26,26 @@ pub fn get_gpu_info() -> GpuInfo {
     {
         println!("[platform] {}", linux::get_linux_gpu_info());
     }
-    // TODO: Implement real platform-specific calls for each OS
+    // Future improvement: Implement real platform-specific calls for each OS
+    // For Windows:
+    //  - Use Windows Management Instrumentation (WMI) or DirectX APIs
+    //  - Query GPU information using WMI Win32_VideoController class
+    //  - Or use vendor-specific APIs (NVIDIA Management Library, AMD ADL)
+    //
+    // For Linux:
+    //  - Read from /sys/class/drm/ for GPU information
+    //  - Use nvidia-smi or rocm-smi commands for vendor-specific info
+    //  - Parse /proc/driver/nvidia/gpus/*/information for NVIDIA
+    //  - Parse /sys/class/drm/card*/device/uevent for AMD
+    //
+    // For macOS:
+    //  - Use IOKit framework for GPU information
+    //  - Query IORegistry for GPU properties
+    //
+    // This requires:
+    // - Platform-specific API bindings (windows-sys, libc, or IOKit)
+    // - Vendor-specific SDKs for detailed GPU information (optional)
+    // - Proper error handling for missing GPUs or unsupported systems
     GpuInfo {
         device: "NVIDIA RTX 4090",
         memory_total: 24576,

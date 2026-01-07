@@ -210,8 +210,21 @@ impl Worker {
         // Set process priority (Windows-specific code commented out for now)
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement Windows process priority setting
-            // Requires windows crate dependency
+            // Future improvement: Implement Windows process priority setting
+            // 1. Open process handle using OpenProcess() Windows API
+            //    - Use PROCESS_SET_INFORMATION access right
+            //    - Handle must be closed with CloseHandle() when done
+            // 2. Set priority class using SetPriorityClass() Windows API
+            //    - Use HIGH_PRIORITY_CLASS, NORMAL_PRIORITY_CLASS, or BELOW_NORMAL_PRIORITY_CLASS
+            //    - Example: SetPriorityClass(process_handle, HIGH_PRIORITY_CLASS)
+            // 3. Optionally set thread priority using SetThreadPriority() Windows API
+            //    - Use THREAD_PRIORITY_* constants for fine-grained control
+            //    - Requires thread handle from process
+            //
+            // This requires:
+            // - Windows API bindings (windows-sys crate or winapi crate)
+            // - Process handle management (proper cleanup)
+            // - Understanding of Windows priority classes
         }
 
         // Spawn process
@@ -259,7 +272,30 @@ impl Worker {
                     // Auto-restart if enabled
                     if config.auto_restart {
                         warn!("Auto-restarting worker {}", config.id);
-                        // TODO: Implement restart logic
+                        // Future improvement: Implement restart logic
+                        // 1. Wait for process to fully terminate using wait() or kill()
+                        //    - Ensure process is completely stopped before restart
+                        //    - Use timeout to avoid hanging on unresponsive processes
+                        // 2. Check restart attempts counter against max_restart_attempts
+                        //    - Increment restart attempts counter
+                        //    - If max attempts reached, mark worker as failed
+                        // 3. Calculate restart delay using exponential backoff (if enabled)
+                        //    - Use exponential backoff: delay = initial * 2^attempts
+                        //    - Cap delay at max_restart_delay_secs
+                        //    - Sleep for calculated delay using tokio::time::sleep()
+                        // 4. Re-spawn worker process using the same spawn logic
+                        //    - Use command.spawn() to create new process
+                        //    - Update process_id in worker status
+                        //    - Reset restart attempts counter on successful restart
+                        // 5. Re-attach monitoring and health checks for new process
+                        //    - Re-register health checks
+                        //    - Re-attach process monitoring
+                        //
+                        // This requires:
+                        // - Process state tracking (restart attempts, last restart time)
+                        // - Delay calculation logic (exponential backoff)
+                        // - Process spawning (reuse existing spawn logic)
+                        // - Health check re-registration
                     }
                 }
             }
