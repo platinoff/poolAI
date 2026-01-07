@@ -221,46 +221,88 @@ impl PoolAIConfig {
         // Validate system configuration
         if self.system.max_workers == 0 {
             return Err(AppError::ConfigError(
-                "max_workers must be greater than 0".to_string(),
+                format!(
+                    "Invalid configuration: system.max_workers is 0 (must be > 0). \
+                    Context: max_workers defines the maximum number of concurrent worker processes. \
+                    Suggestion: Set max_workers to a positive value (e.g., 4-16 depending on CPU cores). \
+                    Current value: {}",
+                    self.system.max_workers
+                )
             ));
         }
 
         if self.system.queue_size == 0 {
             return Err(AppError::ConfigError(
-                "queue_size must be greater than 0".to_string(),
+                format!(
+                    "Invalid configuration: system.queue_size is 0 (must be > 0). \
+                    Context: queue_size defines the maximum number of pending requests in the queue. \
+                    Suggestion: Set queue_size to a positive value (e.g., 100-1000 depending on workload). \
+                    Current value: {}",
+                    self.system.queue_size
+                )
             ));
         }
 
         // Validate GPU configuration
         if self.gpu.enabled && self.gpu.memory_limit == 0 {
             return Err(AppError::ConfigError(
-                "GPU memory_limit must be greater than 0".to_string(),
+                format!(
+                    "Invalid configuration: GPU is enabled but memory_limit is 0 (must be > 0). \
+                    Context: When GPU is enabled, memory_limit defines the maximum GPU memory in MB. \
+                    Suggestion: Set gpu.memory_limit to a positive value (e.g., 4096 for 4GB) or disable GPU if not needed. \
+                    Current value: {}",
+                    self.gpu.memory_limit
+                )
             ));
         }
 
         // Validate pool configuration
         if self.pool.max_workers == 0 {
             return Err(AppError::ConfigError(
-                "pool max_workers must be greater than 0".to_string(),
+                format!(
+                    "Invalid configuration: pool.max_workers is 0 (must be > 0). \
+                    Context: pool.max_workers defines the maximum number of workers in the pool. \
+                    Suggestion: Set pool.max_workers to a positive value (e.g., 8-32 depending on system capacity). \
+                    Current value: {}",
+                    self.pool.max_workers
+                )
             ));
         }
 
         if self.pool.scaling_threshold < 0.0 || self.pool.scaling_threshold > 1.0 {
             return Err(AppError::ConfigError(
-                "scaling_threshold must be between 0.0 and 1.0".to_string(),
+                format!(
+                    "Invalid configuration: pool.scaling_threshold is {} (must be between 0.0 and 1.0). \
+                    Context: scaling_threshold defines the load threshold for auto-scaling (0.0 = 0%, 1.0 = 100%). \
+                    Suggestion: Set scaling_threshold to a value between 0.0 and 1.0 (e.g., 0.7 for 70% load threshold). \
+                    Current value: {}",
+                    self.pool.scaling_threshold, self.pool.scaling_threshold
+                )
             ));
         }
 
         // Validate monitoring configuration
         if self.monitoring.metrics_interval == 0 {
             return Err(AppError::ConfigError(
-                "metrics_interval must be greater than 0".to_string(),
+                format!(
+                    "Invalid configuration: monitoring.metrics_interval is 0 (must be > 0). \
+                    Context: metrics_interval defines the interval in seconds between metric collection. \
+                    Suggestion: Set metrics_interval to a positive value (e.g., 5-60 seconds depending on monitoring needs). \
+                    Current value: {}",
+                    self.monitoring.metrics_interval
+                )
             ));
         }
 
         if self.monitoring.alert_threshold < 0.0 || self.monitoring.alert_threshold > 1.0 {
             return Err(AppError::ConfigError(
-                "alert_threshold must be between 0.0 and 1.0".to_string(),
+                format!(
+                    "Invalid configuration: monitoring.alert_threshold is {} (must be between 0.0 and 1.0). \
+                    Context: alert_threshold defines the threshold for triggering alerts (0.0 = 0%, 1.0 = 100%). \
+                    Suggestion: Set alert_threshold to a value between 0.0 and 1.0 (e.g., 0.9 for 90% threshold). \
+                    Current value: {}",
+                    self.monitoring.alert_threshold, self.monitoring.alert_threshold
+                )
             ));
         }
 

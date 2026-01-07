@@ -251,10 +251,22 @@ impl VmManager {
         {
             let mut hm = self.health_monitor.write().await;
             hm.initialize().await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to initialize health monitor: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to initialize health monitor: {}. \
+                    Context: Health monitor initialization failed during VM manager startup. \
+                    Suggestion: Check system permissions and ensure health monitor dependencies are available. \
+                    Error details: {}",
+                    e, e
+                ))
             })?;
             hm.start().await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to start health monitor: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to start health monitor: {}. \
+                    Context: Health monitor failed to start after initialization. \
+                    Suggestion: Check system resources and ensure health monitor background tasks can be spawned. \
+                    Error details: {}",
+                    e, e
+                ))
             })?;
         }
 
@@ -299,10 +311,24 @@ impl VmManager {
                                     Some(inst) if matches!(inst.status, VmStatus::Running) => {
                                         Ok(())
                                     }
-                                    _ => Err(AppError::ValidationError(format!(
-                                        "VM instance {} is not running",
-                                        id
-                                    ))),
+                                    Some(inst) => {
+                                        let status = inst.status.clone();
+                                        Err(AppError::ValidationError(format!(
+                                            "VM instance is not running: {}. \
+                                            Context: Health checks can only be performed on running VM instances. \
+                                            Suggestion: Start the VM instance first using start_instance() before checking its health. \
+                                            Current status: {:?}",
+                                            id, status
+                                        )))
+                                    }
+                                    None => {
+                                        Err(AppError::ValidationError(format!(
+                                            "VM instance not found: {}. \
+                                            Context: The VM instance was removed or does not exist. \
+                                            Suggestion: Verify the instance ID is correct.",
+                                            id
+                                        )))
+                                    }
                                 }
                             })
                         })
@@ -445,7 +471,13 @@ impl VmManager {
         {
             let mut hm = self.health_monitor.write().await;
             hm.shutdown().await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to shutdown health monitor: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to shutdown health monitor: {}. \
+                    Context: Health monitor failed to shutdown gracefully during VM manager shutdown. \
+                    Suggestion: Health monitor may have already stopped. Check logs for details. \
+                    Error details: {}",
+                    e, e
+                ))
             })?;
         }
 
@@ -487,7 +519,13 @@ impl VmManager {
         let mut instances = self.instances.write().await;
         let inst = instances
             .get_mut(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            .ok_or_else(|| AppError::ValidationError(format!(
+                "VM instance not found: {}. \
+                Context: The specified VM instance ID does not exist in the system. \
+                Suggestion: Verify the instance ID is correct. Use list_instances() to see all available instances. \
+                Instance ID: {}",
+                id, id
+            )))?;
 
         if let Some(new_name) = name {
             inst.name = new_name;
@@ -527,7 +565,13 @@ impl VmManager {
         let mut instances = self.instances.write().await;
         instances
             .remove(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            .ok_or_else(|| AppError::ValidationError(format!(
+                "VM instance not found: {}. \
+                Context: The specified VM instance ID does not exist in the system. \
+                Suggestion: Verify the instance ID is correct. Use list_instances() to see all available instances. \
+                Instance ID: {}",
+                id, id
+            )))?;
 
         // Clean up resource history and alert thresholds
         {
@@ -587,7 +631,13 @@ impl VmManager {
         let mut instances = self.instances.write().await;
         let inst = instances
             .get_mut(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            .ok_or_else(|| AppError::ValidationError(format!(
+                "VM instance not found: {}. \
+                Context: The specified VM instance ID does not exist in the system. \
+                Suggestion: Verify the instance ID is correct. Use list_instances() to see all available instances. \
+                Instance ID: {}",
+                id, id
+            )))?;
 
         inst.status = VmStatus::Stopped;
         info!(
@@ -1091,7 +1141,13 @@ impl VmManager {
         let instances = self.instances.read().await;
         let inst = instances
             .get(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            .ok_or_else(|| AppError::ValidationError(format!(
+                "VM instance not found: {}. \
+                Context: The specified VM instance ID does not exist in the system. \
+                Suggestion: Verify the instance ID is correct. Use list_instances() to see all available instances. \
+                Instance ID: {}",
+                id, id
+            )))?;
         Ok(inst.auto_recovery.clone())
     }
 
@@ -1100,7 +1156,13 @@ impl VmManager {
         let instances = self.instances.read().await;
         let inst = instances
             .get(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            .ok_or_else(|| AppError::ValidationError(format!(
+                "VM instance not found: {}. \
+                Context: The specified VM instance ID does not exist in the system. \
+                Suggestion: Verify the instance ID is correct. Use list_instances() to see all available instances. \
+                Instance ID: {}",
+                id, id
+            )))?;
         Ok(inst.restart_attempts)
     }
 
@@ -1109,7 +1171,13 @@ impl VmManager {
         let mut instances = self.instances.write().await;
         let inst = instances
             .get_mut(&id)
-            .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
+            .ok_or_else(|| AppError::ValidationError(format!(
+                "VM instance not found: {}. \
+                Context: The specified VM instance ID does not exist in the system. \
+                Suggestion: Verify the instance ID is correct. Use list_instances() to see all available instances. \
+                Instance ID: {}",
+                id, id
+            )))?;
         inst.restart_attempts = 0;
         info!("Reset restart attempts for VM instance {}", id);
         Ok(())

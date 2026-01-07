@@ -998,7 +998,13 @@ impl ReplicationEngine {
                 // Read from any healthy replica
                 let replica_node = self.select_read_replica(&artifact_id).await?;
                 let node_id = replica_node.ok_or_else(|| {
-                    AppError::NetworkError("No healthy replicas available".to_string())
+                    AppError::NetworkError(format!(
+                        "No healthy replicas available for artifact: {}. \
+                        Context: All replica nodes are either unreachable or marked as unhealthy. \
+                        Suggestion: Check network connectivity to replica nodes. Verify replica nodes are running and accessible. \
+                        Consider: Adding more replica nodes or checking circuit breaker states.",
+                        artifact_id
+                    ))
                 })?;
 
                 let nodes = self.available_nodes.read().await;
@@ -1058,7 +1064,15 @@ impl ReplicationEngine {
                 }
 
                 Err(last_error.unwrap_or_else(|| {
-                    AppError::NetworkError("All quorum reads failed".to_string())
+                    AppError::NetworkError(format!(
+                        "All quorum reads failed for artifact: {}. \
+                        Context: Unable to read from enough replica nodes to satisfy quorum requirements. \
+                        Suggestion: Check network connectivity to replica nodes. Verify replica nodes are running and have the artifact. \
+                        Quorum requirement: {}, Healthy replicas: {}",
+                        artifact_id,
+                        quorum,
+                        healthy_replicas.len()
+                    ))
                 }))
             }
             ReadConsistencyLevel::Strong => {

@@ -292,7 +292,13 @@ impl RaidManager {
         tokio::fs::create_dir_all(&artifacts_dir)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to create artifacts directory: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to create artifacts directory: {:?}. \
+                    Context: The artifacts directory is required for storing RAID artifacts. \
+                    Suggestion: Check filesystem permissions and ensure the base path exists and is writable. \
+                    Base path: {:?}, Error: {}",
+                    artifacts_dir, cfg.base_path, e
+                ))
             })?;
 
         let id = Uuid::new_v4();
@@ -301,13 +307,31 @@ impl RaidManager {
 
         let mut file = tokio::fs::File::create(&path)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to create artifact file: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to create artifact file: {:?}. \
+                Context: Unable to create a new file for storing the artifact. \
+                Suggestion: Check filesystem permissions and available disk space. Ensure the artifacts directory exists and is writable. \
+                Path: {:?}, Error: {}",
+                path, path, e
+            )))?;
         file.write_all(bytes)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to write artifact file: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to write artifact file: {:?}. \
+                Context: Unable to write artifact data to the file. \
+                Suggestion: Check available disk space and filesystem permissions. Ensure the file is not locked by another process. \
+                Path: {:?}, Size: {} bytes, Error: {}",
+                path, path, bytes.len(), e
+            )))?;
         file.sync_all()
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to sync artifact file: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to sync artifact file: {:?}. \
+                Context: Unable to sync file data to disk. This may cause data loss if the system crashes. \
+                Suggestion: Check filesystem status and available disk space. Ensure the filesystem supports sync operations. \
+                Path: {:?}, Error: {}",
+                path, path, e
+            )))?;
 
         let artifact = ArtifactRef {
             id,

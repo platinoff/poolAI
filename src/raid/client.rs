@@ -84,7 +84,13 @@ impl ProtocolClient {
         let url = format!("{}/api/v1/raid/distributed{}", self.base_url, endpoint);
 
         let json = message.to_json().map_err(|e| {
-            AppError::ValidationError(format!("Failed to serialize message: {}", e))
+            AppError::ValidationError(format!(
+                "Failed to serialize protocol message: {}. \
+                Context: Unable to serialize the protocol message to JSON format. \
+                Suggestion: Verify the message structure is valid and all required fields are present. \
+                Message type: {}, Error: {}",
+                e, message.message_type, e
+            ))
         })?;
 
         info!(
