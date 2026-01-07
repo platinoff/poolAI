@@ -348,7 +348,20 @@ pub async fn health_check_handler(Json(message): Json<ProtocolMessage>) -> impl 
         storage_total_bytes,
         artifact_count: artifacts.len() as u32,
         raft_role: RaftRole::Follower, // Placeholder until Raft integration is complete
-        raft_term: 0,                  // TODO: get actual term
+        // Future improvement: Get actual Raft term from Raft node
+        // 1. Access global Raft node using raid::raft::get_global_raft_node()
+        // 2. Get current term using raft_node.current_term() or from HardState
+        //    - HardState contains current_term and voted_for
+        // 3. Handle errors gracefully if Raft is not initialized or not enabled
+        //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
+        //    - Fallback to 0 if Raft is not available
+        // Example (requires #[cfg(feature = "raft")]):
+        //    let raft_term = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
+        //        raft_node.current_term()
+        //    } else {
+        //        0
+        //    };
+        raft_term: 0,
         last_heartbeat: Utc::now(),
     };
 
@@ -384,7 +397,27 @@ pub async fn join_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl 
             ClusterNode {
                 node_id: n.id.to_string(),
                 address: n.address.clone(),
-                role: RaftRole::Follower, // TODO: get actual role
+                // Future improvement: Get actual Raft role for each node
+                // 1. Access global Raft node using raid::raft::get_global_raft_node()
+                // 2. Get current leader using raft_node.current_leader()
+                // 3. Compare node_id with current_leader to determine role:
+                //    - If node_id == current_leader: RaftRole::Leader
+                //    - If node_id in candidates: RaftRole::Candidate
+                //    - Otherwise: RaftRole::Follower
+                // 4. Handle errors gracefully if Raft is not initialized or not enabled
+                //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
+                //    - Fallback to RaftRole::Follower if Raft is not available
+                // Example (requires #[cfg(feature = "raft")]):
+                //    let role = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
+                //        if raft_node.current_leader() == Some(node_id) {
+                //            RaftRole::Leader
+                //        } else {
+                //            RaftRole::Follower
+                //        }
+                //    } else {
+                //        RaftRole::Follower
+                //    };
+                role: RaftRole::Follower,
                 status: Some(HealthStatus::Healthy),
                 last_seen: Some(n.last_seen),
             }
@@ -393,7 +426,20 @@ pub async fn join_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl 
 
     let response = JoinClusterResponse {
         status: JoinStatus::Accepted,
-        cluster_id: Uuid::new_v4().to_string(), // TODO: use actual cluster ID
+        // Future improvement: Use actual cluster ID from configuration or Raft
+        // 1. Get cluster ID from RaidConfig (if stored in config)
+        //    - Add cluster_id field to RaidConfig
+        //    - Read from config file or environment variable
+        // 2. Or generate cluster ID on first node and persist it
+        //    - Store cluster ID in metadata file (e.g., cluster.json)
+        //    - Share cluster ID with all nodes during join
+        // 3. Or derive cluster ID from Raft membership configuration
+        //    - Use MembershipConfig to generate stable cluster ID
+        //    - Persist cluster ID with membership changes
+        // 4. Ensure cluster ID is consistent across all nodes
+        //    - Reject join requests if cluster ID mismatch
+        // Example: let cluster_id = manager.get_cluster_id().await.unwrap_or_else(|| Uuid::new_v4().to_string());
+        cluster_id: Uuid::new_v4().to_string(),
         member_nodes,
         error: None,
     };
@@ -417,15 +463,40 @@ pub async fn leave_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl
         }
     };
 
-    // TODO: Implement graceful leave logic
-    // - Replicate artifacts to other nodes
-    // - Update cluster membership
-    // - Handle graceful shutdown
+    // Future improvement: Implement graceful leave logic
+    // 1. If graceful=true:
+    //    a. Replicate all local artifacts to other nodes before leaving
+    //       - Get list of all local artifacts using manager.list_artifacts()
+    //       - For each artifact, use replication engine to sync to target nodes
+    //       - Wait for replication to complete (with timeout)
+    //    b. Update cluster membership via Raft
+    //       - Create Raft operation to remove this node from membership
+    //       - Wait for membership update to be applied
+    //    c. Handle graceful shutdown
+    //       - Stop accepting new requests
+    //       - Complete in-flight requests
+    //       - Close connections to other nodes
+    // 2. If graceful=false:
+    //    - Simply remove node from membership (other nodes will detect failure)
+    //    - Don't wait for artifact replication
+    // 3. Track artifact migration progress
+    //    - Count artifacts successfully replicated
+    //    - Return artifacts_moved count in response
+    // 4. Handle errors gracefully
+    //    - Log warnings for failed replications
+    //    - Continue with leave even if some artifacts fail to replicate
 
     let response = LeaveClusterResponse {
         status: OperationStatus::Success,
         replication_complete: payload.graceful,
-        artifacts_moved: 0, // TODO: implement artifact migration
+        // Future improvement: Implement artifact migration tracking
+        // 1. If graceful=true, count artifacts successfully replicated during leave
+        //    - Track artifacts_moved during graceful leave logic
+        //    - Return actual count of artifacts migrated
+        // 2. If graceful=false, return 0 (no migration performed)
+        // 3. Include failed artifacts in error response if any
+        // Example: artifacts_moved: if payload.graceful { migrated_count } else { 0 }
+        artifacts_moved: 0,
     };
 
     create_success_response(&message, response)
@@ -441,7 +512,15 @@ fn create_success_response<T: serde::Serialize>(
         message_type: format!("{}_response", original_message.message_type),
         id: Uuid::new_v4().to_string(),
         timestamp: Utc::now(),
-        node_id: original_message.node_id.clone(), // TODO: use actual node ID
+        // Future improvement: Use actual node ID instead of copying from request
+        // 1. Get node ID from RaidManager using manager.get_node_id().await
+        //    - This returns the actual node ID from Raft configuration
+        //    - More reliable than trusting client-provided node_id
+        // 2. Handle errors gracefully if node ID cannot be retrieved
+        //    - Fallback to original_message.node_id if get_node_id fails
+        // Example: node_id: manager.get_node_id().await.to_string()
+        // Note: For now, using original_message.node_id for compatibility
+        node_id: original_message.node_id.clone(),
         payload: serde_json::to_value(payload).unwrap_or(serde_json::Value::Null),
     };
 

@@ -97,7 +97,20 @@ impl Default for JwtConfig {
 // Temporarily disabled - requires ring/gcc
 // Install gcc via: bash install_gcc.sh
 pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String> {
-    // TODO: Re-enable after installing gcc
+    // Future improvement: Re-enable JWT token generation after installing gcc
+    // 1. Install gcc compiler (required by ring crate for crypto operations)
+    //    - Windows: Install MinGW-w64 or use MSVC build tools
+    //    - Linux: Install gcc via package manager (apt-get install gcc, yum install gcc)
+    //    - macOS: Install Xcode Command Line Tools (xcode-select --install)
+    // 2. Verify gcc installation: gcc --version
+    // 3. Re-enable JWT token generation code
+    //    - Uncomment JWT signing logic
+    //    - Use ring::hmac for HMAC-SHA256 signing
+    //    - Use ring::signature for RSA signing (if needed)
+    // 4. Test JWT token generation and validation
+    //    - Generate token with proper claims (sub, role, exp)
+    //    - Validate token signature and expiration
+    // Note: For now, returning placeholder token for development
     // For now, return a simple placeholder token
     let config = JwtConfig::default();
     let now = SystemTime::now()

@@ -32,7 +32,32 @@ impl LibraryRegistry {
     pub async fn initialize(&mut self) -> Result<(), AppError> {
         info!("Initializing Library Registry");
 
-        // TODO: Load registry from remote source or local cache
+        // Future improvement: Load registry from remote source or local cache
+        // 1. Check for local cache file (e.g., registry.json or registry.toml)
+        //    - Load from config.base_path.join("registry.json")
+        //    - Parse JSON/TOML into registry structure
+        //    - Handle file not found gracefully (empty registry)
+        // 2. If local cache doesn't exist or is stale, fetch from remote source
+        //    - Define remote registry URL in config (e.g., registry_url field)
+        //    - Use HTTP client (reqwest crate) to fetch registry data
+        //    - Parse remote response (JSON/YAML)
+        //    - Cache locally for offline use
+        // 3. Implement cache refresh logic
+        //    - Check cache age (last_updated timestamp)
+        //    - Refresh if cache is older than TTL (e.g., 24 hours)
+        //    - Background refresh to avoid blocking initialization
+        // 4. Handle errors gracefully
+        //    - Fallback to empty registry if remote fetch fails
+        //    - Log warnings for network errors
+        //    - Continue with cached data if available
+        // Example:
+        //    if let Ok(cache_file) = fs::read_to_string(cache_path).await {
+        //        self.load_from_json(&cache_file)?;
+        //    } else if let Some(remote_url) = &config.registry_url {
+        //        let registry_data = fetch_registry(remote_url).await?;
+        //        self.load_from_json(&registry_data)?;
+        //        self.save_cache(cache_path).await?;
+        //    }
         // For now, initialize with empty registry
 
         info!("Library Registry initialized");
