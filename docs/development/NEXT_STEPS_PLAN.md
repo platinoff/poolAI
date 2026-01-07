@@ -253,9 +253,9 @@ Production Deployment Prep (Priority 3)
 
 ## 📚 Посилання
 
-- `CURRENT_STATUS_2025-12-19.md` - Поточний стан проекту
-- `NEXT_DEVELOPMENT_PHASE.md` - Наступна фаза розробки
-- `DEVELOPMENT_PLAN_UPDATED_2025-12-28.md` - Детальний план розробки
+- [`../status/CURRENT_STATUS.md`](../status/CURRENT_STATUS.md) - Поточний стан проекту
+- [`NEXT_DEVELOPMENT_PHASE.md`](./NEXT_DEVELOPMENT_PHASE.md) - Наступна фаза розробки
+- [`DEVELOPMENT_PLAN_UPDATED.md`](./DEVELOPMENT_PLAN_UPDATED.md) - Детальний план розробки
 
 ---
 

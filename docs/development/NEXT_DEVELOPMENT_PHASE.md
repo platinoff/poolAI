@@ -234,8 +234,8 @@
 
 ## 📚 Посилання
 
-- `CURRENT_STATUS_2025-12-19.md` - Поточний стан проекту
-- `DEVELOPMENT_PLAN_UPDATED_2025-12-28.md` - Детальний план розробки
+- [`../status/CURRENT_STATUS.md`](../status/CURRENT_STATUS.md) - Поточний стан проекту
+- [`DEVELOPMENT_PLAN_UPDATED.md`](./DEVELOPMENT_PLAN_UPDATED.md) - Детальний план розробки
 - `DISTRIBUTED_RAID_COMPLETE_MILESTONE.md` - Distributed RAID milestone
 - `ADR_001_DISTRIBUTED_RAID.md` - Architecture Decision Record
 

@@ -277,9 +277,9 @@
 
 ## 📚 Посилання
 
-- `CURRENT_STATUS_2025-12-19.md` - Поточний стан проекту
-- `NEXT_STEPS_PLAN.md` - План наступних кроків
-- `STABLE_STATE_SUMMARY.md` - Стабільний стан розробки
+- [`status/CURRENT_STATUS.md`](./status/CURRENT_STATUS.md) - Поточний стан проекту
+- [`development/NEXT_STEPS_PLAN.md`](./development/NEXT_STEPS_PLAN.md) - План наступних кроків
+- [`status/STABLE_STATE_SUMMARY.md`](./status/STABLE_STATE_SUMMARY.md) - Стабільний стан розробки
 
 ---
 

@@ -1,0 +1,37 @@
+# Cursor Rules for PoolAI Project
+
+## Documentation Structure
+
+- All `.md` files should be created in `docs/` directory with appropriate subdirectories
+- Keep root directory clean - only `README.md` and `README.uk.md` should be in root
+- Use the following structure:
+  - `docs/status/` - Current status and stable state documents
+  - `docs/development/` - Development plans and roadmaps
+  - `docs/archive/` - Historical/archived documents
+  - `docs/concept/` - Concept files
+  - `docs/deployment/` - Deployment guides
+  - `docs/configuration/` - Configuration guides
+  - `docs/monitoring/` - Monitoring setup guides
+  - `docs/security/` - Security documentation
+  - `docs/performance/` - Performance tuning guides
+  - `docs/troubleshooting/` - Troubleshooting guides
+  - `docs/migration/` - Migration guides
+  - `docs/vm/` - VM module documentation
+
+## File References
+
+- When referencing documentation files, use relative paths from the file location
+- Example: `[Current Status](../status/CURRENT_STATUS.md)`
+- Always update links when moving files
+
+## Git Workflow
+
+- Commit documentation changes with descriptive messages
+- Use conventional commit format: `docs: organize documentation structure`
+- Keep commits focused on documentation organization
+
+## Rust Code References
+
+- When referencing concept files in Rust code comments, use: `docs/concept/poolAI_concept.txt`
+- Update all references when moving files
+

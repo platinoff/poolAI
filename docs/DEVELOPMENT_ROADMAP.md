@@ -185,8 +185,8 @@ See `CONTRIBUTING.md` for guidelines on contributing to PoolAI.
 
 ## References
 
-- `poolAI_concept.txt` - Core concepts and architecture
-- `CURRENT_STATUS_2025-12-19.md` - Detailed current status
-- `NEXT_STEPS_PLAN.md` - Next development steps
-- `STABLE_STATE_SUMMARY.md` - Stable state summary
+- [`concept/poolAI_concept.txt`](./concept/poolAI_concept.txt) - Core concepts and architecture
+- [`status/CURRENT_STATUS.md`](./status/CURRENT_STATUS.md) - Detailed current status
+- [`development/NEXT_STEPS_PLAN.md`](./development/NEXT_STEPS_PLAN.md) - Next development steps
+- [`status/STABLE_STATE_SUMMARY.md`](./status/STABLE_STATE_SUMMARY.md) - Stable state summary
 

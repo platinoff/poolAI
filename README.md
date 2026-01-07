@@ -260,6 +260,17 @@ curl -k https://localhost:8080/api/v1/rewards
 - Maintain clean, documented code
 - Write tests for new functionality
 
+## 📚 Documentation
+
+Вся документація проекту знаходиться в каталозі [`docs/`](./docs/). Дивіться [`docs/README.md`](./docs/README.md) для повного списку документів.
+
+### Основні документи:
+- [`docs/status/CURRENT_STATUS.md`](./docs/status/CURRENT_STATUS.md) - Поточний стан проекту
+- [`docs/development/NEXT_DEVELOPMENT_PHASE.md`](./docs/development/NEXT_DEVELOPMENT_PHASE.md) - Наступна фаза розробки
+- [`docs/development/NEXT_STEPS_PLAN.md`](./docs/development/NEXT_STEPS_PLAN.md) - План наступних кроків
+- [`docs/status/STABLE_STATE_SUMMARY.md`](./docs/status/STABLE_STATE_SUMMARY.md) - Стабільний стан розробки
+- [`docs/concept/poolAI_concept.txt`](./docs/concept/poolAI_concept.txt) - Концепція проекту
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

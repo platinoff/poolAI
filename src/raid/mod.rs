@@ -55,7 +55,7 @@
 //! # }
 //! ```
 //!
-//! Concept alignment (planned in `poolAI_concept.txt`):
+//! Concept alignment (planned in `docs/concept/poolAI_concept.txt`):
 //! - BurstRAID logic (stub)
 //! - SmallWorld distributed system (stub)
 //! - Administrative management (basic primitives)

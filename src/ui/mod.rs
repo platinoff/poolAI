@@ -22,7 +22,7 @@
 //! - `/ui/vm` - VM instance management
 //! - `/ui/raid` - RAID artifact management
 //!
-//! Concept alignment (planned in `poolAI_concept.txt`):
+//! Concept alignment (planned in `docs/concept/poolAI_concept.txt`):
 //! - Web dashboard (basic)
 //! - UI components/themes/layouts (planned)
 

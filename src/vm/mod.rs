@@ -63,7 +63,7 @@
 //! ```
 //!
 //! Concept alignment:
-//! - VM instance management (planned in `poolAI_concept.txt`)
+//! - VM instance management (planned in `docs/concept/poolAI_concept.txt`)
 //! - Isolation/security hooks (stubbed)
 //! - Resource optimization primitives (basic)
 

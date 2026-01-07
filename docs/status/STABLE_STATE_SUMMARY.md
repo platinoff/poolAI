@@ -50,12 +50,12 @@
 ## 📚 Документація
 
 ### Актуальні документи
-- ✅ `CURRENT_STATUS_2025-12-19.md` - Поточний стан (v10.0)
-- ✅ `DEVELOPMENT_PLAN_UPDATED_2025-12-28.md` - План розробки
-- ✅ `DISTRIBUTED_RAID_COMPLETE_MILESTONE.md` - Distributed RAID milestone
-- ✅ `NEXT_DEVELOPMENT_PHASE.md` - План наступної фази
-- ✅ `ADR_001_DISTRIBUTED_RAID.md` - Architecture Decision Record
-- ✅ `poolAI_concept.txt` - Концепція проекту
+- ✅ [`CURRENT_STATUS.md`](./CURRENT_STATUS.md) - Поточний стан (v10.0)
+- ✅ [`../development/DEVELOPMENT_PLAN_UPDATED.md`](../development/DEVELOPMENT_PLAN_UPDATED.md) - План розробки
+- ✅ [`../archive/DISTRIBUTED_RAID_COMPLETE_MILESTONE.md`](../archive/DISTRIBUTED_RAID_COMPLETE_MILESTONE.md) - Distributed RAID milestone
+- ✅ [`../development/NEXT_DEVELOPMENT_PHASE.md`](../development/NEXT_DEVELOPMENT_PHASE.md) - План наступної фази
+- ✅ [`../ADR_001_DISTRIBUTED_RAID.md`](../ADR_001_DISTRIBUTED_RAID.md) - Architecture Decision Record
+- ✅ [`../concept/poolAI_concept.txt`](../concept/poolAI_concept.txt) - Концепція проекту
 
 ### Git команди (для уникнення помилок)
 ```powershell
