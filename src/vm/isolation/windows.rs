@@ -51,16 +51,30 @@ impl NetworkIsolator for WindowsNetworkIsolator {
             process_id, config.allow_loopback, config.allowed_interfaces, config.allowed_ports
         );
 
-        // TODO: Full implementation would involve:
-        // 1. Creating an AppContainer using CreateAppContainerProfile
-        // 2. Configuring Windows Firewall rules using INetFwPolicy2
+        // Future improvement: Full implementation would involve:
+        // 1. Creating an AppContainer using CreateAppContainerProfile Windows API
+        //    - Call CreateAppContainerProfile() with SID, display name, and description
+        //    - Store the AppContainer SID for later use
+        //    - Requires Windows 8+ and administrator privileges
+        // 2. Configuring Windows Firewall rules using INetFwPolicy2 COM interface
+        //    - Use CoCreateInstance() to get INetFwPolicy2 interface
+        //    - Call INetFwPolicy2::get_Rules() to access firewall rules collection
+        //    - Create INetFwRule objects for each allowed port/interface
+        //    - Set rule properties (direction, protocol, local/remote ports, action)
         // 3. Setting up network restrictions using Windows Filtering Platform (WFP)
+        //    - Use WFP API (FwpmEngineOpen0, FwpmFilterAdd0) for fine-grained control
+        //    - Create filters that match AppContainer SID
+        //    - Block all traffic by default, allow only specified ports/interfaces
         // 4. Configuring allowed ports and interfaces
+        //    - Map allowed_ports to firewall rules (TCP/UDP)
+        //    - Map allowed_interfaces to WFP filters or firewall rules
+        //    - Ensure loopback is handled separately if allow_loopback is true
         //
         // This requires:
-        // - Windows API bindings (winapi crate)
-        // - Administrator privileges
-        // - Complex COM interop
+        // - Windows API bindings (winapi crate with windows-sys or windows-rs)
+        // - Administrator privileges for AppContainer creation and firewall configuration
+        // - Complex COM interop for firewall rules (INetFwPolicy2, INetFwRule)
+        // - WFP API knowledge for advanced filtering
         //
         // For now, this validates configuration and logs the intent
         warn!(
@@ -80,10 +94,26 @@ impl NetworkIsolator for WindowsNetworkIsolator {
 
         info!("Removing network isolation from process {}", process_id);
 
-        // TODO: Full implementation would involve:
-        // 1. Removing AppContainer
-        // 2. Removing Windows Firewall rules
-        // 3. Cleaning up WFP filters
+        // Future improvement: Full cleanup implementation would involve:
+        // 1. Removing AppContainer using DeleteAppContainerProfile Windows API
+        //    - Call DeleteAppContainerProfile() with the AppContainer SID
+        //    - Ensure no processes are using the AppContainer before deletion
+        //    - Requires administrator privileges
+        // 2. Removing Windows Firewall rules using INetFwPolicy2 COM interface
+        //    - Use INetFwPolicy2::get_Rules() to access rules collection
+        //    - Find rules created for this process/AppContainer (by name or group)
+        //    - Call INetFwRules::Remove() to delete each rule
+        //    - Clean up COM objects properly
+        // 3. Cleaning up WFP filters using WFP API
+        //    - Use FwpmFilterDeleteByKey0() to remove filters by key
+        //    - Or use FwpmFilterDeleteById0() if filter ID is tracked
+        //    - Remove all filters associated with the AppContainer SID
+        //    - Close WFP engine handle using FwpmEngineClose0()
+        //
+        // This requires:
+        // - Tracking AppContainer SID and created resources
+        // - Maintaining list of created firewall rules and WFP filters
+        // - Proper cleanup order (filters before AppContainer deletion)
         //
         // For now, this just logs the intent
         warn!(
@@ -154,17 +184,34 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
             config.read_only_paths.len()
         );
 
-        // TODO: Full implementation would involve:
-        // 1. Creating an AppContainer using CreateAppContainerProfile
+        // Future improvement: Full implementation would involve:
+        // 1. Creating an AppContainer using CreateAppContainerProfile Windows API
+        //    - Call CreateAppContainerProfile() with SID, display name, and description
+        //    - Store the AppContainer SID for filesystem isolation
+        //    - Requires Windows 8+ and administrator privileges
         // 2. Setting up file system redirection using Windows File System Redirection
+        //    - Use SetAppContainerNamedObjectPath() to redirect file access
+        //    - Configure redirection for specific paths (allowed_paths)
+        //    - Use AppContainer capabilities (CAP_CHANGE_STATE, CAP_READ_MEDIA, etc.)
         // 3. Configuring allowed paths using AppContainer capabilities
-        // 4. Setting up read-only access using ACLs
+        //    - Use AddCapabilityToAppContainerProfile() to grant specific capabilities
+        //    - Map allowed_paths to appropriate capabilities or redirections
+        //    - Ensure paths are accessible within AppContainer context
+        // 4. Setting up read-only access using ACLs (Access Control Lists)
+        //    - Use SetFileSecurity() or SetNamedSecurityInfo() Windows APIs
+        //    - Create security descriptors with read-only permissions for AppContainer SID
+        //    - Apply ACLs to read_only_paths directories/files
         // 5. Using Windows file system virtualization (UAC Virtualization)
+        //    - Enable virtualization for legacy applications if needed
+        //    - Use SetTokenInformation() with TokenVirtualizationEnabled
+        //    - Redirect writes to user's VirtualStore directory
         //
         // This requires:
-        // - Windows API bindings (winapi crate)
-        // - Administrator privileges
-        // - Complex COM interop and security descriptors
+        // - Windows API bindings (winapi crate with windows-sys or windows-rs)
+        // - Administrator privileges for AppContainer creation
+        // - Complex COM interop for AppContainer management
+        // - Security descriptor manipulation (ACLs, SIDs, DACLs)
+        // - Understanding of Windows file system redirection mechanisms
         //
         // For now, this validates configuration and logs the intent
         warn!(
@@ -184,10 +231,27 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
 
         info!("Removing filesystem isolation from process {}", process_id);
 
-        // TODO: Full implementation would involve:
-        // 1. Removing AppContainer
+        // Future improvement: Full cleanup implementation would involve:
+        // 1. Removing AppContainer using DeleteAppContainerProfile Windows API
+        //    - Call DeleteAppContainerProfile() with the AppContainer SID
+        //    - Ensure no processes are using the AppContainer before deletion
+        //    - Clean up any AppContainer-specific resources
+        //    - Requires administrator privileges
         // 2. Removing file system redirection
-        // 3. Cleaning up ACLs
+        //    - Use RemoveAppContainerNamedObjectPath() to remove redirections
+        //    - Remove all redirections created during isolation setup
+        //    - Clean up any redirected directories if they were created by us
+        // 3. Cleaning up ACLs (Access Control Lists)
+        //    - Restore original security descriptors using SetFileSecurity()
+        //    - Remove AppContainer SID from ACLs on read_only_paths
+        //    - Restore original permissions if they were modified
+        //    - Use GetFileSecurity() to backup original ACLs before modification
+        //
+        // This requires:
+        // - Tracking AppContainer SID and created resources
+        // - Maintaining list of modified ACLs and redirections
+        // - Storing original security descriptors for restoration
+        // - Proper cleanup order (ACLs before AppContainer deletion)
         //
         // For now, this just logs the intent
         warn!(
