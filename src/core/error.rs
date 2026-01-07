@@ -269,3 +269,157 @@ impl ErrorMetrics {
         stats
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_code() {
+        assert_eq!(AppError::ModelError("test".to_string()).error_code(), "MODEL_ERROR");
+        assert_eq!(AppError::ConfigError("test".to_string()).error_code(), "CONFIG_ERROR");
+        assert_eq!(AppError::PoolError("test".to_string()).error_code(), "POOL_ERROR");
+        assert_eq!(AppError::ValidationError("test".to_string()).error_code(), "VALIDATION_ERROR");
+        assert_eq!(AppError::Unknown.error_code(), "UNKNOWN_ERROR");
+    }
+
+    #[test]
+    fn test_is_recoverable() {
+        assert!(AppError::ModelError("test".to_string()).is_recoverable());
+        assert!(AppError::ConfigError("test".to_string()).is_recoverable());
+        assert!(AppError::PoolError("test".to_string()).is_recoverable());
+        assert!(AppError::MonitoringError("test".to_string()).is_recoverable());
+        assert!(AppError::ResourceError("test".to_string()).is_recoverable());
+        assert!(AppError::GpuError("test".to_string()).is_recoverable());
+        assert!(AppError::MemoryError("test".to_string()).is_recoverable());
+        assert!(AppError::TimeoutError("test".to_string()).is_recoverable());
+        assert!(!AppError::ValidationError("test".to_string()).is_recoverable());
+        assert!(!AppError::Unknown.is_recoverable());
+    }
+
+    #[test]
+    fn test_recover() {
+        // Test that recover() doesn't panic for all error types
+        assert!(AppError::ModelError("test".to_string()).recover().is_ok());
+        assert!(AppError::ConfigError("test".to_string()).recover().is_ok());
+        assert!(AppError::PoolError("test".to_string()).recover().is_ok());
+        assert!(AppError::ValidationError("test".to_string()).recover().is_ok());
+        assert!(AppError::Unknown.recover().is_ok());
+    }
+
+    #[test]
+    fn test_error_metrics_add_error() {
+        let mut metrics = ErrorMetrics::default();
+        
+        metrics.add_error(&AppError::ModelError("test".to_string()));
+        assert_eq!(metrics.total_errors, 1);
+        assert_eq!(metrics.error_counts.get("MODEL_ERROR"), Some(&1));
+        assert!(metrics.last_error_time.is_some());
+        
+        metrics.add_error(&AppError::ConfigError("test".to_string()));
+        assert_eq!(metrics.total_errors, 2);
+        assert_eq!(metrics.error_counts.get("CONFIG_ERROR"), Some(&1));
+        
+        metrics.add_error(&AppError::ModelError("test2".to_string()));
+        assert_eq!(metrics.total_errors, 3);
+        assert_eq!(metrics.error_counts.get("MODEL_ERROR"), Some(&2));
+    }
+
+    #[test]
+    fn test_error_metrics_add_recovery_attempt() {
+        let mut metrics = ErrorMetrics::default();
+        
+        metrics.add_recovery_attempt(true);
+        assert_eq!(metrics.recovery_attempts, 1);
+        assert_eq!(metrics.successful_recoveries, 1);
+        
+        metrics.add_recovery_attempt(false);
+        assert_eq!(metrics.recovery_attempts, 2);
+        assert_eq!(metrics.successful_recoveries, 1);
+        
+        metrics.add_recovery_attempt(true);
+        assert_eq!(metrics.recovery_attempts, 3);
+        assert_eq!(metrics.successful_recoveries, 2);
+    }
+
+    #[test]
+    fn test_error_metrics_get_error_statistics() {
+        let mut metrics = ErrorMetrics::default();
+        
+        // Test with no errors
+        let stats = metrics.get_error_statistics();
+        assert_eq!(stats.len(), 0);
+        
+        // Add errors
+        metrics.add_error(&AppError::ModelError("test1".to_string()));
+        metrics.add_error(&AppError::ModelError("test2".to_string()));
+        metrics.add_error(&AppError::ConfigError("test".to_string()));
+        
+        metrics.add_recovery_attempt(true);
+        metrics.add_recovery_attempt(true);
+        
+        let stats = metrics.get_error_statistics();
+        assert_eq!(stats.get("total_errors"), Some(&3.0));
+        assert_eq!(stats.get("recovery_rate"), Some(&1.0));
+        assert_eq!(stats.get("error_rate_model_error"), Some(&(2.0 / 3.0)));
+        assert_eq!(stats.get("error_rate_config_error"), Some(&(1.0 / 3.0)));
+    }
+
+    #[test]
+    fn test_error_metrics_default() {
+        let metrics = ErrorMetrics::default();
+        assert_eq!(metrics.total_errors, 0);
+        assert_eq!(metrics.recovery_attempts, 0);
+        assert_eq!(metrics.successful_recoveries, 0);
+        assert_eq!(metrics.error_counts.len(), 0);
+        assert!(metrics.last_error_time.is_none());
+    }
+
+    #[test]
+    fn test_error_from_io_error() {
+        use std::io;
+        let io_err = io::Error::new(io::ErrorKind::NotFound, "file not found");
+        let app_err = AppError::from(io_err);
+        
+        match app_err {
+            AppError::IoError(_) => {}
+            _ => panic!("Expected IoError"),
+        }
+    }
+
+    #[test]
+    fn test_error_from_serde_json_error() {
+        let invalid_json = "invalid json";
+        let json_err = serde_json::from_str::<serde_json::Value>(invalid_json).unwrap_err();
+        let app_err = AppError::from(json_err);
+        
+        match app_err {
+            AppError::SerializationError(_) => {}
+            _ => panic!("Expected SerializationError"),
+        }
+    }
+
+    #[test]
+    fn test_poolai_error_from_io_error() {
+        use std::io;
+        let io_err = io::Error::new(io::ErrorKind::NotFound, "file not found");
+        let poolai_err = PoolAIError::from(io_err);
+        
+        match poolai_err {
+            PoolAIError::IoError(_) => {}
+            _ => panic!("Expected IoError"),
+        }
+    }
+
+    #[test]
+    fn test_poolai_error_from_serde_json_error() {
+        let invalid_json = "invalid json";
+        let json_err = serde_json::from_str::<serde_json::Value>(invalid_json).unwrap_err();
+        let poolai_err = PoolAIError::from(json_err);
+        
+        match poolai_err {
+            PoolAIError::JsonError(_) => {}
+            _ => panic!("Expected JsonError"),
+        }
+    }
+}
