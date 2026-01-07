@@ -185,9 +185,34 @@ impl LinuxCgroupLimiter {
     async fn get_cpu_usage(&self, process_id: Uuid) -> Result<f64, AppError> {
         let cgroup_path = self.get_cgroup_path(process_id, "cpu");
         
+        // Future improvement: Read CPU usage from cgroup files
+        // 1. Detect cgroup version (v1 or v2)
+        //    - Check if /sys/fs/cgroup/cpu exists (v1) or /sys/fs/cgroup/cgroup.controllers exists (v2)
+        //    - Use appropriate path based on version
+        // 2. For cgroup v1 (cpuacct controller):
+        //    - Read /sys/fs/cgroup/cpu,cpuacct/<cgroup_path>/cpuacct.usage (nanoseconds since boot)
+        //    - Parse as u64 (nanoseconds)
+        //    - Compare with previous measurement to calculate CPU percentage
+        //    - CPU % = (current_usage - previous_usage) / (elapsed_time * num_cores * 1_000_000_000) * 100
+        // 3. For cgroup v2:
+        //    - Read /sys/fs/cgroup/<cgroup_path>/cpu.stat
+        //    - Parse lines: "usage_usec <value>" (microseconds)
+        //    - Calculate CPU percentage similarly to v1
+        // 4. Track previous measurements for rate calculation
+        //    - Store previous measurements in HashMap (process_id -> (previous_usage, previous_timestamp))
+        //    - Use Instant::now() for elapsed time calculation
+        //    - Handle first measurement (return 0.0 if no previous measurement)
+        // 5. Error handling
+        //    - Handle file read errors gracefully
+        //    - Handle parse errors (invalid format)
+        //    - Handle cgroup not found errors
+        //    - Return 0.0 if unable to retrieve CPU usage
+        // Example (cgroup v2):
+        //    let cpu_stat_path = cgroup_path.join("cpu.stat");
+        //    let content = tokio::fs::read_to_string(&cpu_stat_path).await?;
+        //    let usage_usec = parse_cpu_stat(&content)?;
+        //    let cpu_percent = calculate_cpu_percentage(usage_usec, previous_measurement, elapsed_time, num_cores)?;
         // For now, return 0.0 as placeholder
-        // TODO: Read from cpu.stat or cpuacct.usage (cgroup v1) or cpu.stat (cgroup v2)
-        // This requires parsing and calculating usage over time
         
         Ok(0.0)
     }
@@ -253,7 +278,44 @@ impl LinuxCgroupLimiter {
         Ok(ResourceUsage {
             cpu_percent,
             memory_mb,
-            gpu_percent: None, // TODO: GPU usage monitoring
+            // Future improvement: GPU usage monitoring on Linux
+            // 1. Option A: Use NVIDIA Management Library (NVML) for NVIDIA GPUs
+            //    - Link against libnvidia-ml.so (requires NVIDIA driver)
+            //    - Use nvmlDeviceGetUtilizationRates for GPU utilization
+            //    - Use nvmlDeviceGetProcessUtilization for per-process GPU usage
+            //    - Requires nvml-sys crate or FFI bindings
+            //    - Path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so or similar
+            // 2. Option B: Read from /sys/class/drm/ (generic GPU info, limited per-process support)
+            //    - Read /sys/class/drm/card*/device/uevent for GPU identification
+            //    - Read /sys/class/drm/card*/gt/gt*/rps_act_freq_mhz for current frequency
+            //    - Less accurate, no per-process GPU usage
+            // 3. Option C: Use nvidia-smi command (NVIDIA GPUs)
+            //    - Parse output of 'nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader'
+            //    - Use 'nvidia-smi pmon' for per-process GPU usage
+            //    - Requires parsing command output (slower, less reliable)
+            // 4. Option D: Use rocm-smi command (AMD GPUs)
+            //    - Parse output of 'rocm-smi --showuse --showmemuse' for AMD GPUs
+            //    - Similar to nvidia-smi approach
+            // 5. Option E: Use Intel GPU Tools (Intel GPUs)
+            //    - Use intel_gpu_top or similar tools for Intel GPU monitoring
+            //    - Parse output or use library bindings
+            // 6. Implementation considerations
+            //    - Detect available GPU vendor and use appropriate API
+            //    - Handle cases where GPU is not available or unsupported
+            //    - Cache GPU usage queries (expensive operations)
+            //    - Return None if GPU monitoring is not available
+            // Example (NVML - most accurate):
+            //    use nvml_sys::*;
+            //    let device = nvmlDeviceGetHandleByIndex_v2(0)?;
+            //    let mut utilization = nvmlUtilization_t::default();
+            //    nvmlDeviceGetUtilizationRates(device, &mut utilization)?;
+            //    Some(utilization.gpu as f32)
+            // Example (nvidia-smi - fallback):
+            //    let output = Command::new("nvidia-smi")
+            //        .args(&["--query-gpu=utilization.gpu", "--format=csv,noheader,nounits"])
+            //        .output().await?;
+            //    let gpu_percent = String::from_utf8(output.stdout)?.trim().parse::<f32>()?;
+            gpu_percent: None,
             gpu_memory_mb: None,
         })
     }
