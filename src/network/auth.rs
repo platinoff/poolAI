@@ -258,7 +258,31 @@ pub async fn permission_middleware(
 pub async fn authenticate_user(
     auth_req: AuthRequest,
 ) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
-    // TODO: Реальна перевірка користувача з бази даних
+    // Future improvement: Реальна перевірка користувача з бази даних
+    // 1. Підключення до бази даних (SQLite, PostgreSQL, MySQL, тощо)
+    //    - Використовувати async database driver (sqlx, diesel, sea-orm)
+    //    - Зберігати connection pool в global state або config
+    // 2. Запит до бази для перевірки користувача
+    //    - SELECT * FROM users WHERE username = ? AND password_hash = ?
+    //    - Використовувати prepared statements для безпеки
+    //    - Хешувати пароль перед порівнянням (bcrypt, argon2, scrypt)
+    // 3. Перевірка пароля
+    //    - Використовувати secure password hashing (argon2 рекомендовано)
+    //    - Перевіряти password hash з stored hash
+    //    - Handle timing attacks (constant-time comparison)
+    // 4. Отримання ролі користувача
+    //    - Завантажувати role з users table або roles join table
+    //    - Map database role to UserRole enum
+    // 5. Error handling
+    //    - Handle database connection errors gracefully
+    //    - Return generic error for invalid credentials (don't leak user existence)
+    //    - Log authentication failures for security monitoring
+    // Example:
+    //    let user = db.query_user_by_username(&auth_req.username).await?;
+    //    if !verify_password(&auth_req.password, &user.password_hash)? {
+    //        return Err((StatusCode::UNAUTHORIZED, Json(json!({"error": "Invalid credentials"}))));
+    //    }
+    //    let role = UserRole::from_str(&user.role)?;
     // Зараз використовуємо хардкод для тестування
 
     let (role, username) = match (auth_req.username.as_str(), auth_req.password.as_str()) {

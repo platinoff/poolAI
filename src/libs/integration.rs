@@ -30,7 +30,30 @@ pub async fn ensure_libtorch(required_version: Option<&str>) -> Result<(), AppEr
                                 "libtorch version mismatch: installed {}, required {}",
                                 lib.version, required
                             );
-                            // TODO: Auto-update if needed (based on auto-update policy)
+                            // Future improvement: Auto-update if needed (based on auto-update policy)
+                            // 1. Check auto-update policy from config
+                            //    - Get auto_update_enabled flag from LibraryConfig
+                            //    - Get auto_update_policy (always, major_only, never)
+                            // 2. Determine if update is needed
+                            //    - Compare installed version with required version
+                            //    - Check if update is allowed by policy (major/minor/patch)
+                            //    - Check if update is available from remote registry
+                            // 3. Perform auto-update
+                            //    - Call manager.update_library() to update to required version
+                            //    - Handle update errors gracefully (log warnings, continue with incompatible version)
+                            //    - Verify updated library compatibility after update
+                            // 4. Handle update failures
+                            //    - If update fails, warn but don't block execution (if possible)
+                            //    - Fall back to incompatible version if update not possible
+                            //    - Log update attempts for monitoring
+                            // Example:
+                            //    if let Some(config) = &self.auto_update_config {
+                            //        if config.enabled && should_auto_update(&lib.version, &required, &config.policy) {
+                            //            if let Err(e) = manager.update_library(&lib.name).await {
+                            //                warn!("Auto-update failed for {}: {}", lib.name, e);
+                            //            }
+                            //        }
+                            //    }
                         }
                     }
                     info!("libtorch v{} is installed", lib.version);

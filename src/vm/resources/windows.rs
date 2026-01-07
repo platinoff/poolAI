@@ -43,11 +43,28 @@ impl WindowsJobObjectLimiter {
     async fn create_job_object(&self, process_id: Uuid) -> Result<usize, AppError> {
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement actual Job Object creation using Windows API
-            // This requires:
+            // Future improvement: Implement actual Job Object creation using Windows API
             // 1. Use windows crate with proper features enabled
-            // 2. Call CreateJobObjectW
-            // 3. Store the HANDLE
+            //    - Add windows crate dependency with "Win32_System_JobObjects" feature
+            //    - Import: use windows::Win32::System::JobObjects::*;
+            // 2. Create Job Object using CreateJobObjectW
+            //    - Call CreateJobObjectW(Some(&mut security_attributes), Some(&job_name))
+            //    - Handle security attributes (NULL for default)
+            //    - Handle job name (optional, can be NULL for unnamed job)
+            // 3. Store the HANDLE for later use
+            //    - Store HANDLE in job_objects HashMap
+            //    - Use Arc<HANDLE> for shared ownership if needed
+            //    - Remember to close handle when job object is removed (CloseHandle)
+            // 4. Error handling
+            //    - Check if CreateJobObjectW returns INVALID_HANDLE_VALUE
+            //    - Get last error using GetLastError() if creation fails
+            //    - Return AppError with meaningful message
+            // Example:
+            //    use windows::Win32::Foundation::HANDLE;
+            //    use windows::Win32::System::JobObjects::CreateJobObjectW;
+            //    let job_handle = unsafe { CreateJobObjectW(None, None)? };
+            //    job_objects.insert(process_id, job_handle.0 as usize);
+            //    Ok(job_handle.0 as usize)
             
             // For now, return a placeholder handle ID
             // In real implementation, this would be the actual HANDLE value
@@ -77,11 +94,27 @@ impl WindowsJobObjectLimiter {
     ) -> Result<(), AppError> {
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement actual CPU limits using Job Objects
-            // This requires:
+            // Future improvement: Implement actual CPU limits using Job Objects
             // 1. Get or create Job Object for this process
-            // 2. Use SetInformationJobObject with JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
-            // 3. Set CpuRate to cpu_cores * 100 (percentage of CPU time)
+            //    - Retrieve HANDLE from job_objects HashMap
+            //    - If not found, create new Job Object using create_job_object()
+            // 2. Prepare JOBOBJECT_CPU_RATE_CONTROL_INFORMATION structure
+            //    - Set ControlFlags to JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP
+            //    - Calculate CpuRate: (cpu_cores as u32) * 100 (percentage, 0-10000 for 100%)
+            //    - Example: 2 cores = 200 (20% of 10 cores) or 2000 (20% of 10 cores with 10000 scale)
+            // 3. Use SetInformationJobObject to apply limits
+            //    - Call SetInformationJobObject(job_handle, JobObjectCpuRateControlInformation, &cpu_info)
+            //    - Check return value for errors
+            // 4. Error handling
+            //    - Handle invalid job handle errors
+            //    - Handle invalid CPU rate errors
+            //    - Return AppError with meaningful message
+            // Example:
+            //    let cpu_info = JOBOBJECT_CPU_RATE_CONTROL_INFORMATION {
+            //        ControlFlags: JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP,
+            //        CpuRate: (cpu_cores as u32) * 100,
+            //    };
+            //    unsafe { SetInformationJobObject(job_handle, JobObjectCpuRateControlInformation, &cpu_info)? }
             
             // For now, just log the request
             tracing::info!(
@@ -114,9 +147,10 @@ impl WindowsJobObjectLimiter {
     ) -> Result<(), AppError> {
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement actual memory limits using Job Objects
-            // This requires:
+            // Future improvement: Implement actual memory limits using Job Objects
             // 1. Get or create Job Object for this process
+            //    - Retrieve HANDLE from job_objects HashMap
+            //    - If not found, create new Job Object using create_job_object()
             // 2. Use SetInformationJobObject with JOBOBJECT_EXTENDED_LIMIT_INFORMATION
             // 3. Set ProcessMemoryLimit to memory_mb * 1024 * 1024 (bytes)
             
@@ -151,11 +185,31 @@ impl WindowsJobObjectLimiter {
     ) -> Result<(), AppError> {
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement actual process assignment
-            // This requires:
+            // Future improvement: Implement actual process assignment
             // 1. Get Job Object handle for this process_id
+            //    - Retrieve HANDLE from job_objects HashMap
+            //    - Return error if job object not found (should be created first)
             // 2. Open process handle using OpenProcess
+            //    - Use PROCESS_SET_QUOTA | PROCESS_TERMINATE access rights
+            //    - Call OpenProcess with pid and access rights
+            //    - Handle invalid PID errors (process not found)
             // 3. Call AssignProcessToJobObject
+            //    - Assign process handle to job object handle
+            //    - Process must be in a suspended state (if spawned) or not yet running
+            //    - Once assigned, all child processes will also be in the job
+            // 4. Clean up process handle
+            //    - Close handle using CloseHandle after assignment
+            // 5. Error handling
+            //    - Handle invalid job handle errors
+            //    - Handle process not found errors
+            //    - Handle assignment failures (process already in a job)
+            //    - Return AppError with meaningful message
+            // Example:
+            //    use windows::Win32::System::Threading::{OpenProcess, PROCESS_SET_QUOTA};
+            //    use windows::Win32::System::JobObjects::AssignProcessToJobObject;
+            //    let process_handle = unsafe { OpenProcess(PROCESS_SET_QUOTA, false, pid)? };
+            //    unsafe { AssignProcessToJobObject(job_handle, process_handle)? };
+            //    unsafe { CloseHandle(process_handle)? };
             
             // For now, just log the request
             tracing::info!(
@@ -178,11 +232,30 @@ impl WindowsJobObjectLimiter {
     async fn get_cpu_usage(&self, process_id: Uuid) -> Result<f64, AppError> {
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement actual CPU usage retrieval
-            // This requires:
+            // Future improvement: Implement actual CPU usage retrieval
             // 1. Get Job Object handle
-            // 2. Use QueryInformationJobObject with JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION
-            // 3. Calculate CPU usage from UserTime and KernelTime
+            //    - Retrieve HANDLE from job_objects HashMap
+            //    - Return error if job object not found
+            // 2. Query Job Object information using QueryInformationJobObject
+            //    - Use JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION structure
+            //    - Call QueryInformationJobObject(job_handle, JobObjectBasicAndIoAccountingInformation, &accounting_info)
+            // 3. Calculate CPU usage from timing information
+            //    - Extract UserTime and KernelTime from BasicInfo
+            //    - Calculate total CPU time: UserTime + KernelTime
+            //    - Compare with previous measurement (if available) to get CPU percentage
+            //    - CPU % = (current_total_time - previous_total_time) / elapsed_time * 100
+            // 4. Track previous measurements for rate calculation
+            //    - Store previous measurements in HashMap (process_id -> previous_time)
+            //    - Use SystemTime or Instant for elapsed time calculation
+            // 5. Error handling
+            //    - Handle invalid job handle errors
+            //    - Handle query failures
+            //    - Return 0.0 if no previous measurement available
+            // Example:
+            //    let mut accounting_info = JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION::default();
+            //    unsafe { QueryInformationJobObject(job_handle, JobObjectBasicAndIoAccountingInformation, &mut accounting_info)? };
+            //    let total_time = accounting_info.BasicInfo.TotalUserTime + accounting_info.BasicInfo.TotalKernelTime;
+            //    let cpu_percent = calculate_cpu_percentage(total_time, previous_measurement, elapsed_time);
             
             // For now, return 0.0
             let _ = process_id;
@@ -201,11 +274,32 @@ impl WindowsJobObjectLimiter {
     async fn get_memory_usage(&self, process_id: Uuid) -> Result<u32, AppError> {
         #[cfg(target_os = "windows")]
         {
-            // TODO: Implement actual memory usage retrieval
-            // This requires:
+            // Future improvement: Implement actual memory usage retrieval
             // 1. Get Job Object handle
-            // 2. Use QueryInformationJobObject with JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-            // 3. Read ProcessMemoryLimit or use GetProcessMemoryInfo
+            //    - Retrieve HANDLE from job_objects HashMap
+            //    - Return error if job object not found
+            // 2. Option A: Query Job Object information (aggregate for all processes in job)
+            //    - Use QueryInformationJobObject with JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+            //    - Read PeakProcessMemoryUsed for peak memory usage
+            //    - Aggregate memory across all processes in the job
+            // 3. Option B: Query individual process memory (more accurate)
+            //    - Open process handle using OpenProcess with PROCESS_QUERY_INFORMATION
+            //    - Use GetProcessMemoryInfo with PROCESS_MEMORY_COUNTERS_EX structure
+            //    - Read WorkingSetSize or PrivateUsage for actual memory usage
+            //    - Close process handle after query
+            // 4. Convert bytes to MB: memory_bytes / (1024 * 1024)
+            // 5. Error handling
+            //    - Handle invalid job handle errors
+            //    - Handle process not found errors
+            //    - Handle query failures
+            //    - Return 0 if unable to retrieve memory usage
+            // Example (Option B - more accurate):
+            //    use windows::Win32::System::ProcessStatus::GetProcessMemoryInfo;
+            //    use windows::Win32::System::Threading::{OpenProcess, PROCESS_QUERY_INFORMATION};
+            //    let process_handle = unsafe { OpenProcess(PROCESS_QUERY_INFORMATION, false, pid)? };
+            //    let mut mem_counters = PROCESS_MEMORY_COUNTERS_EX::default();
+            //    unsafe { GetProcessMemoryInfo(process_handle, &mut mem_counters as *mut _ as *mut _, std::mem::size_of::<PROCESS_MEMORY_COUNTERS_EX>() as u32)? };
+            //    let memory_mb = (mem_counters.WorkingSetSize / (1024 * 1024)) as u32;
             
             // For now, return 0
             let _ = process_id;
@@ -254,7 +348,32 @@ impl WindowsJobObjectLimiter {
         Ok(ResourceUsage {
             cpu_percent,
             memory_mb,
-            gpu_percent: None, // TODO: GPU usage monitoring
+            // Future improvement: GPU usage monitoring on Windows
+            // 1. Option A: Use NVIDIA Management Library (NVML) for NVIDIA GPUs
+            //    - Link against nvml.dll (requires NVIDIA driver)
+            //    - Use nvmlDeviceGetUtilizationRates for GPU utilization
+            //    - Use nvmlDeviceGetProcessUtilization for per-process GPU usage
+            //    - Requires nvml-sys crate or FFI bindings
+            // 2. Option B: Use Windows Management Instrumentation (WMI) for generic GPU info
+            //    - Query Win32_VideoController for GPU information
+            //    - Less accurate, no per-process GPU usage
+            // 3. Option C: Use DirectX API for GPU query (Windows 10+)
+            //    - Use DXGI or Direct3D APIs for GPU monitoring
+            //    - More complex but more accurate
+            // 4. Option D: Use vendor-specific APIs (AMD ADL, Intel GPU Tools)
+            //    - Requires vendor-specific SDKs
+            // 5. Implementation considerations
+            //    - Detect available GPU vendor and use appropriate API
+            //    - Handle cases where GPU is not available or unsupported
+            //    - Cache GPU usage queries (expensive operations)
+            //    - Return None if GPU monitoring is not available
+            // Example (NVML):
+            //    use nvml_sys::*;
+            //    let device = nvmlDeviceGetHandleByIndex(0)?;
+            //    let mut utilization = nvmlUtilization_t::default();
+            //    nvmlDeviceGetUtilizationRates(device, &mut utilization)?;
+            //    Some(utilization.gpu as f32)
+            gpu_percent: None,
             gpu_memory_mb: None,
         })
     }
