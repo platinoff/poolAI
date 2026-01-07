@@ -297,8 +297,7 @@ impl LibraryManager {
                 AppError::ConfigError(format!("Failed to create library directory: {}", e))
             })?;
 
-        // Get download URL from registry (for now, use placeholder)
-        // TODO: Get actual URL from registry
+        // Get download URL from registry
         let download_url = self.get_download_url(name, version).await?;
 
         if let Some(url) = download_url {
@@ -607,8 +606,8 @@ impl LibraryManager {
         // Uninstall old version
         self.uninstall_library(name).await?;
 
-        // Install new version
-        let library_type = LibraryType::ModelLibrary; // TODO: Determine from registry
+        // Install new version - determine library type from registry or name
+        let library_type = self.determine_library_type(name).await;
         self.install_library(name, &latest_version, library_type)
             .await
     }
