@@ -30,6 +30,8 @@ use tokio::{
 };
 #[cfg(feature = "raft")]
 use tracing::{info, warn};
+#[cfg(feature = "raft")]
+use uuid::Uuid;
 
 /// Raft configuration for Distributed RAID
 #[cfg(feature = "raft")]
@@ -354,17 +356,32 @@ impl RaidRaftStateMachine {
                 })
             }
             RaidRaftOperation::DeleteArtifact { artifact_id } => {
-                let _manager = self.raid_manager.read().await;
-                // TODO: Convert artifact_id string to Uuid and implement delete
-                // For now, this is a placeholder
+                let manager = self.raid_manager.read().await;
+                let id = Uuid::parse_str(artifact_id).map_err(|e| {
+                    AppError::ValidationError(format!(
+                        "Invalid artifact_id UUID '{}': {}. Suggestion: Use a canonical UUID string (e.g. 550e8400-e29b-41d4-a716-446655440000).",
+                        artifact_id, e
+                    ))
+                })?;
+
+                manager.delete_artifact(id).await?;
                 Ok(RaidRaftResponse::Success {
                     message: format!("Artifact {} deleted", artifact_id),
                 })
             }
             RaidRaftOperation::SyncArtifacts { artifacts } => {
-                // TODO: Implement sync logic
+                // Minimal, safe behavior for now: validate artifact IDs.
+                // Full sync requires network/transport integration and conflict resolution.
+                for artifact_id in artifacts {
+                    Uuid::parse_str(artifact_id).map_err(|e| {
+                        AppError::ValidationError(format!(
+                            "Invalid artifact_id UUID '{}': {}. Suggestion: Provide UUID strings in SyncArtifacts payload.",
+                            artifact_id, e
+                        ))
+                    })?;
+                }
                 Ok(RaidRaftResponse::Success {
-                    message: format!("Synced {} artifacts", artifacts.len()),
+                    message: format!("Validated {} artifacts for sync", artifacts.len()),
                 })
             }
         }

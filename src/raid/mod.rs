@@ -365,6 +365,20 @@ impl RaidManager {
                 AppError::ConfigError(format!("Failed to remove artifact file: {}", e))
             })?;
         }
+
+        // Record event
+        if let Some(ref event_store) = self.event_store {
+            let _ = event_store
+                .write()
+                .await
+                .append_event(RaidEvent::ArtifactDeleted {
+                    artifact_id: id.to_string(),
+                    node_id: self.get_node_id().await,
+                    timestamp: Utc::now(),
+                })
+                .await;
+        }
+
         self.persist_manifest().await?;
         Ok(())
     }
