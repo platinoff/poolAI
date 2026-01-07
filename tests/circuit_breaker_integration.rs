@@ -155,4 +155,3 @@ async fn test_circuit_breaker_success_resets_failure_count() {
     assert_eq!(breaker.failure_count().await, 0);
     assert_eq!(breaker.state().await, CircuitState::Closed);
 }
-

@@ -57,7 +57,7 @@ impl ProtocolClient {
     }
 
     /// Send a protocol message and get response
-    /// 
+    ///
     /// This method integrates with circuit breaker for fault tolerance.
     /// Circuit breaker prevents cascading failures by rejecting requests
     /// when a node is detected as failing.
@@ -121,7 +121,10 @@ impl ProtocolClient {
             Err(e) => {
                 // Record failure for network errors
                 breaker.record_failure().await;
-                return Err(AppError::NetworkError(format!("Failed to send request: {}", e)));
+                return Err(AppError::NetworkError(format!(
+                    "Failed to send request: {}",
+                    e
+                )));
             }
         };
 
@@ -129,7 +132,10 @@ impl ProtocolClient {
             Ok(json) => json,
             Err(e) => {
                 breaker.record_failure().await;
-                return Err(AppError::NetworkError(format!("Failed to parse response: {}", e)));
+                return Err(AppError::NetworkError(format!(
+                    "Failed to parse response: {}",
+                    e
+                )));
             }
         };
 
@@ -138,7 +144,9 @@ impl ProtocolClient {
             Some(p) => p,
             None => {
                 breaker.record_failure().await;
-                return Err(AppError::ValidationError("Response missing payload".to_string()));
+                return Err(AppError::ValidationError(
+                    "Response missing payload".to_string(),
+                ));
             }
         };
 
@@ -146,7 +154,10 @@ impl ProtocolClient {
             Ok(result) => Ok(result),
             Err(e) => {
                 breaker.record_failure().await;
-                Err(AppError::ValidationError(format!("Failed to deserialize response: {}", e)))
+                Err(AppError::ValidationError(format!(
+                    "Failed to deserialize response: {}",
+                    e
+                )))
             }
         }
     }

@@ -4,6 +4,8 @@
 //! allowing Raft nodes to communicate over the existing REST API.
 
 #[cfg(feature = "raft")]
+use anyhow::Result;
+#[cfg(feature = "raft")]
 use async_raft::{
     network::RaftNetwork,
     raft::{
@@ -12,8 +14,6 @@ use async_raft::{
     },
     AppData, NodeId,
 };
-#[cfg(feature = "raft")]
-use anyhow::Result;
 #[cfg(feature = "raft")]
 use async_trait::async_trait;
 #[cfg(feature = "raft")]

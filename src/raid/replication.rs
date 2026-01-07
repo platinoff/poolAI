@@ -266,7 +266,10 @@ impl ReplicationEngine {
         let address_clone = address.clone();
         let mut nodes = self.available_nodes.write().await;
         nodes.insert(node_id, address);
-        info!("Registered node {} for replication at {}", node_id, address_clone);
+        info!(
+            "Registered node {} for replication at {}",
+            node_id, address_clone
+        );
     }
 
     /// Unregister a node (e.g., when it becomes unavailable)
@@ -279,7 +282,10 @@ impl ReplicationEngine {
     /// Get list of available nodes
     pub async fn get_available_nodes(&self) -> Vec<(u64, String)> {
         let nodes = self.available_nodes.read().await;
-        nodes.iter().map(|(id, address)| (*id, address.clone())).collect()
+        nodes
+            .iter()
+            .map(|(id, address)| (*id, address.clone()))
+            .collect()
     }
 
     /// Select nodes for replication based on replication factor
@@ -292,7 +298,7 @@ impl ReplicationEngine {
         exclude_nodes: Option<Vec<u64>>,
     ) -> Result<Vec<u64>, AppError> {
         let nodes = self.available_nodes.read().await;
-        
+
         if nodes.is_empty() {
             return Err(AppError::ConfigError(
                 "No available nodes for replication".to_string(),
@@ -335,10 +341,7 @@ impl ReplicationEngine {
     }
 
     /// Get replication metadata for an artifact
-    pub async fn get_replication_metadata(
-        &self,
-        artifact_id: &str,
-    ) -> Option<ReplicationMetadata> {
+    pub async fn get_replication_metadata(&self, artifact_id: &str) -> Option<ReplicationMetadata> {
         let metadata = self.replication_metadata.read().await;
         metadata.get(artifact_id).cloned()
     }
@@ -346,7 +349,7 @@ impl ReplicationEngine {
     /// Get or create protocol client for a node
     async fn get_protocol_client(&self, node_id: u64, address: &str) -> Arc<ProtocolClient> {
         let mut clients = self.protocol_clients.write().await;
-        
+
         if let Some(client) = clients.get(&node_id) {
             return client.clone();
         }
@@ -367,18 +370,19 @@ impl ReplicationEngine {
         replica_nodes: Vec<u64>,
     ) {
         let mut metadata_map = self.replication_metadata.write().await;
-        
-        let metadata = metadata_map.entry(artifact_id.clone()).or_insert_with(|| {
-            ReplicationMetadata {
-                artifact_id: artifact_id.clone(),
-                status: ReplicationStatus::Pending,
-                target_factor: self.config.default_replication_factor,
-                current_count: 0,
-                replica_nodes: Vec::new(),
-                last_replication_attempt: None,
-                replicated_at: None,
-            }
-        });
+
+        let metadata =
+            metadata_map
+                .entry(artifact_id.clone())
+                .or_insert_with(|| ReplicationMetadata {
+                    artifact_id: artifact_id.clone(),
+                    status: ReplicationStatus::Pending,
+                    target_factor: self.config.default_replication_factor,
+                    current_count: 0,
+                    replica_nodes: Vec::new(),
+                    last_replication_attempt: None,
+                    replicated_at: None,
+                });
 
         metadata.status = status.clone();
         metadata.replica_nodes = replica_nodes.clone();
@@ -402,7 +406,7 @@ impl ReplicationEngine {
         target_factor: u32,
     ) -> Result<(), AppError> {
         let mut metadata_map = self.replication_metadata.write().await;
-        
+
         if metadata_map.contains_key(&artifact_id) {
             return Err(AppError::ValidationError(format!(
                 "Replication already initialized for artifact {}",
@@ -497,7 +501,8 @@ impl ReplicationEngine {
         let selected_nodes = if let Some(nodes) = target_nodes {
             nodes
         } else {
-            self.select_replication_nodes(replication_factor, None).await?
+            self.select_replication_nodes(replication_factor, None)
+                .await?
         };
 
         self.update_metadata(
@@ -516,12 +521,16 @@ impl ReplicationEngine {
         if let Some(ref event_store) = self.event_store {
             let source_node = 0; // TODO: Get actual source node ID from Raft
             for target_node in &selected_nodes {
-                let _ = event_store.write().await.append_event(RaidEvent::ReplicationStarted {
-                    artifact_id: artifact_id.clone(),
-                    source_node,
-                    target_node: *target_node,
-                    timestamp: Utc::now(),
-                }).await;
+                let _ = event_store
+                    .write()
+                    .await
+                    .append_event(RaidEvent::ReplicationStarted {
+                        artifact_id: artifact_id.clone(),
+                        source_node,
+                        target_node: *target_node,
+                        timestamp: Utc::now(),
+                    })
+                    .await;
             }
         }
 
@@ -595,16 +604,23 @@ impl ReplicationEngine {
             match result {
                 Ok(_) => {
                     successful_nodes.push(node_id);
-                    debug!("Successfully replicated artifact {} to node {}", artifact_id, node_id);
-                    
+                    debug!(
+                        "Successfully replicated artifact {} to node {}",
+                        artifact_id, node_id
+                    );
+
                     // Emit ReplicationCompleted event
                     if let Some(ref event_store) = self.event_store {
-                        let _ = event_store.write().await.append_event(RaidEvent::ReplicationCompleted {
-                            artifact_id: artifact_id.clone(),
-                            source_node,
-                            target_node: node_id,
-                            timestamp: Utc::now(),
-                        }).await;
+                        let _ = event_store
+                            .write()
+                            .await
+                            .append_event(RaidEvent::ReplicationCompleted {
+                                artifact_id: artifact_id.clone(),
+                                source_node,
+                                target_node: node_id,
+                                timestamp: Utc::now(),
+                            })
+                            .await;
                     }
                 }
                 Err(e) => {
@@ -764,14 +780,20 @@ impl ReplicationEngine {
                         }
                     }
                 } else {
-                    debug!("Async replication worker {}: receiver not available", worker_id);
+                    debug!(
+                        "Async replication worker {}: receiver not available",
+                        worker_id
+                    );
                     break;
                 }
             };
 
             info!(
                 "Worker {} processing async replication for artifact {} (attempt {}/{})",
-                worker_id, task.artifact_id, task.retry_count + 1, task.max_retries
+                worker_id,
+                task.artifact_id,
+                task.retry_count + 1,
+                task.max_retries
             );
 
             // Update status to InProgress
@@ -842,7 +864,10 @@ impl ReplicationEngine {
         target_nodes: Option<Vec<u64>>,
     ) -> Result<(), AppError> {
         let tx = self.async_queue_tx.as_ref().ok_or_else(|| {
-            AppError::ConfigError("Async replication not initialized. Call initialize_async_replication() first.".to_string())
+            AppError::ConfigError(
+                "Async replication not initialized. Call initialize_async_replication() first."
+                    .to_string(),
+            )
         })?;
 
         // Initialize replication metadata
@@ -867,9 +892,9 @@ impl ReplicationEngine {
             max_retries: self.config.async_retry_attempts,
         };
 
-        tx.send(task)
-            .await
-            .map_err(|e| AppError::NetworkError(format!("Failed to queue replication task: {}", e)))?;
+        tx.send(task).await.map_err(|e| {
+            AppError::NetworkError(format!("Failed to queue replication task: {}", e))
+        })?;
 
         info!("Queued async replication for artifact {}", artifact_id);
         Ok(())
@@ -922,12 +947,12 @@ impl ReplicationEngine {
         // Filter healthy replicas (check circuit breaker)
         let mut healthy_replicas = Vec::new();
         let nodes = self.available_nodes.read().await;
-        
+
         for node_id in &meta.replica_nodes {
             if let Some(address) = nodes.get(node_id) {
                 let client = self.get_protocol_client(*node_id, address).await;
                 let state = client.circuit_breaker_state().await;
-                
+
                 // Only use replicas with closed circuit breaker (healthy)
                 if matches!(state, crate::raid::circuit_breaker::CircuitState::Closed) {
                     healthy_replicas.push(*node_id);
@@ -975,9 +1000,9 @@ impl ReplicationEngine {
                 })?;
 
                 let nodes = self.available_nodes.read().await;
-                let address = nodes.get(&node_id).ok_or_else(|| {
-                    AppError::ConfigError(format!("Node {} not found", node_id))
-                })?;
+                let address = nodes
+                    .get(&node_id)
+                    .ok_or_else(|| AppError::ConfigError(format!("Node {} not found", node_id)))?;
 
                 let client = self.get_protocol_client(node_id, address).await;
                 client.get_artifact(artifact_id, include_data).await
@@ -1001,7 +1026,7 @@ impl ReplicationEngine {
                     if let Some(address) = nodes.get(node_id) {
                         let client = self.get_protocol_client(*node_id, address).await;
                         let state = client.circuit_breaker_state().await;
-                        
+
                         if matches!(state, crate::raid::circuit_breaker::CircuitState::Closed) {
                             healthy_replicas.push((*node_id, address.clone()));
                         }
@@ -1051,7 +1076,7 @@ impl ReplicationEngine {
                     if let Some(address) = nodes.get(node_id) {
                         let client = self.get_protocol_client(*node_id, address).await;
                         let state = client.circuit_breaker_state().await;
-                        
+
                         if matches!(state, crate::raid::circuit_breaker::CircuitState::Closed) {
                             match client.get_artifact(artifact_id.clone(), include_data).await {
                                 Ok(response) => responses.push(response),
@@ -1114,8 +1139,9 @@ impl ReplicationEngine {
             if let Some(address) = nodes.get(node_id) {
                 let client = self.get_protocol_client(*node_id, address).await;
                 let state = client.circuit_breaker_state().await;
-                
-                let is_healthy = matches!(state, crate::raid::circuit_breaker::CircuitState::Closed);
+
+                let is_healthy =
+                    matches!(state, crate::raid::circuit_breaker::CircuitState::Closed);
                 health_map.insert(*node_id, is_healthy);
             } else {
                 health_map.insert(*node_id, false);
@@ -1376,7 +1402,7 @@ mod tests {
     async fn test_replication_engine_creation() {
         let raid_manager = create_test_raid_manager();
         let engine = ReplicationEngine::with_defaults(raid_manager, None);
-        
+
         assert_eq!(engine.config().default_replication_factor, 3);
         assert_eq!(engine.config().sync_timeout_seconds, 30);
     }
@@ -1386,8 +1412,12 @@ mod tests {
         let raid_manager = create_test_raid_manager();
         let engine = ReplicationEngine::with_defaults(raid_manager, None);
 
-        engine.register_node(1, "http://node1:8080".to_string()).await;
-        engine.register_node(2, "http://node2:8080".to_string()).await;
+        engine
+            .register_node(1, "http://node1:8080".to_string())
+            .await;
+        engine
+            .register_node(2, "http://node2:8080".to_string())
+            .await;
 
         let nodes = engine.get_available_nodes().await;
         assert_eq!(nodes.len(), 2);
@@ -1426,7 +1456,9 @@ mod tests {
         let raid_manager = create_test_raid_manager();
         let engine = ReplicationEngine::with_defaults(raid_manager, None);
 
-        engine.register_node(1, "http://node1:8080".to_string()).await;
+        engine
+            .register_node(1, "http://node1:8080".to_string())
+            .await;
 
         // Request more nodes than available
         let result = engine.select_replication_nodes(5, None).await;
@@ -1450,7 +1482,10 @@ mod tests {
         let engine = ReplicationEngine::with_defaults(raid_manager, None);
 
         let artifact_id = "test-artifact-123".to_string();
-        engine.initialize_replication(artifact_id.clone(), 3).await.unwrap();
+        engine
+            .initialize_replication(artifact_id.clone(), 3)
+            .await
+            .unwrap();
 
         let metadata = engine.get_replication_metadata(&artifact_id).await;
         assert!(metadata.is_some());
@@ -1467,7 +1502,10 @@ mod tests {
         let engine = ReplicationEngine::with_defaults(raid_manager, None);
 
         let artifact_id = "test-artifact-123".to_string();
-        engine.initialize_replication(artifact_id.clone(), 3).await.unwrap();
+        engine
+            .initialize_replication(artifact_id.clone(), 3)
+            .await
+            .unwrap();
 
         let status = engine.get_replication_status(&artifact_id).await.unwrap();
         assert!(matches!(status, ReplicationStatus::Pending));
@@ -1488,4 +1526,3 @@ mod tests {
         assert!(is_fully_replicated);
     }
 }
-

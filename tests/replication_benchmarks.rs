@@ -7,6 +7,7 @@
 //! - Metadata operations performance
 //! - Conflict resolution performance
 
+use chrono::Utc;
 use poolai::raid::{
     events::{EventStore, RaidEvent},
     protocol::ArtifactMetadata,
@@ -16,9 +17,8 @@ use poolai::raid::{
     RaidConfig, RaidManager, RaidMode,
 };
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use tempfile::TempDir;
-use chrono::Utc;
+use tokio::sync::RwLock;
 
 /// Helper function to create a test RAID manager
 fn create_test_raid_manager(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<RaidManager>> {
@@ -117,7 +117,10 @@ async fn benchmark_quorum_calculation_performance() {
     );
 
     // Performance assertion: should be very fast (nanoseconds)
-    assert!(duration.as_millis() < 100, "Quorum calculation should be very fast");
+    assert!(
+        duration.as_millis() < 100,
+        "Quorum calculation should be very fast"
+    );
 }
 
 #[tokio::test]
@@ -138,10 +141,7 @@ async fn benchmark_replication_metadata_operations() {
 
     for i in 0..artifact_count {
         let artifact_id = format!("artifact-{}", i);
-        engine
-            .initialize_replication(artifact_id, 3)
-            .await
-            .unwrap();
+        engine.initialize_replication(artifact_id, 3).await.unwrap();
     }
 
     let duration = start.elapsed();
@@ -175,10 +175,7 @@ async fn benchmark_metadata_retrieval_performance() {
     let artifact_count = 1000;
     for i in 0..artifact_count {
         let artifact_id = format!("artifact-{}", i);
-        engine
-            .initialize_replication(artifact_id, 3)
-            .await
-            .unwrap();
+        engine.initialize_replication(artifact_id, 3).await.unwrap();
     }
 
     // Benchmark metadata retrieval
@@ -339,4 +336,3 @@ async fn benchmark_conflict_resolution_strategy_comparison() {
         "Enum comparison should be extremely fast"
     );
 }
-

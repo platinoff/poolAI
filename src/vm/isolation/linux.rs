@@ -4,16 +4,18 @@
 //! for network and filesystem isolation.
 
 use crate::core::error::AppError;
-use crate::vm::isolation::{FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator};
+use crate::vm::isolation::{
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
+};
 use std::path::PathBuf;
 use tracing::{info, warn};
 
 #[cfg(feature = "vm-isolation-linux")]
+use nix::mount::{mount, MsFlags};
+#[cfg(feature = "vm-isolation-linux")]
 use nix::sched::{unshare, CloneFlags};
 #[cfg(feature = "vm-isolation-linux")]
 use nix::unistd::chroot;
-#[cfg(feature = "vm-isolation-linux")]
-use nix::mount::{mount, MsFlags};
 #[cfg(feature = "vm-isolation-linux")]
 use std::fs;
 #[cfg(feature = "vm-isolation-linux")]
@@ -26,7 +28,7 @@ impl LinuxNetworkIsolator {
     pub fn new() -> Self {
         Self
     }
-    
+
     /// Set up loopback interface in the current network namespace
     #[cfg(feature = "vm-isolation-linux")]
     fn setup_loopback_interface() -> Result<(), AppError> {
@@ -36,7 +38,7 @@ impl LinuxNetworkIsolator {
             .args(&["link", "set", "lo", "up"])
             .output()
             .map_err(|e| AppError::ConfigError(format!("Failed to execute ip command: {}", e)))?;
-        
+
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             return Err(AppError::ConfigError(format!(
@@ -44,10 +46,10 @@ impl LinuxNetworkIsolator {
                 stderr
             )));
         }
-        
+
         Ok(())
     }
-    
+
     #[cfg(not(feature = "vm-isolation-linux"))]
     fn setup_loopback_interface() -> Result<(), AppError> {
         // No-op when feature is not enabled
@@ -66,7 +68,10 @@ impl NetworkIsolator for LinuxNetworkIsolator {
         }
 
         // Validate configuration
-        if !config.allow_loopback && config.allowed_interfaces.is_empty() && config.allowed_ports.is_empty() {
+        if !config.allow_loopback
+            && config.allowed_interfaces.is_empty()
+            && config.allowed_ports.is_empty()
+        {
             return Err(AppError::ConfigError(
                 "Network isolation configuration would block all network access. At least one of allow_loopback, allowed_interfaces, or allowed_ports must be enabled.".to_string(),
             ));
@@ -84,10 +89,7 @@ impl NetworkIsolator for LinuxNetworkIsolator {
         // Log configuration details
         info!(
             "Applying network isolation to process {}: loopback={}, interfaces={:?}, ports={:?}",
-            process_id,
-            config.allow_loopback,
-            config.allowed_interfaces,
-            config.allowed_ports
+            process_id, config.allow_loopback, config.allowed_interfaces, config.allowed_ports
         );
 
         #[cfg(feature = "vm-isolation-linux")]
@@ -96,13 +98,19 @@ impl NetworkIsolator for LinuxNetworkIsolator {
             // Note: This requires root privileges or CAP_NET_ADMIN
             match unshare(CloneFlags::CLONE_NEWNET) {
                 Ok(_) => {
-                    info!("Successfully created network namespace for process {}", process_id);
-                    
+                    info!(
+                        "Successfully created network namespace for process {}",
+                        process_id
+                    );
+
                     // Set up loopback interface if allowed
                     if config.allow_loopback {
                         match Self::setup_loopback_interface() {
                             Ok(_) => {
-                                info!("Successfully set up loopback interface for process {}", process_id);
+                                info!(
+                                    "Successfully set up loopback interface for process {}",
+                                    process_id
+                                );
                             }
                             Err(e) => {
                                 let error_msg = format!(
@@ -117,7 +125,7 @@ impl NetworkIsolator for LinuxNetworkIsolator {
                             }
                         }
                     }
-                    
+
                     // TODO: Additional configuration:
                     // - Configure allowed interfaces (requires veth pairs or macvlan)
                     // - Set up firewall rules for allowed ports (iptables/nftables)
@@ -171,7 +179,10 @@ impl NetworkIsolator for LinuxNetworkIsolator {
             // 2. Clean up network namespace if it was created by us
             // 3. Remove firewall rules
             // Note: This is complex because we need to track which namespace was created
-            info!("Network isolation removal for process {} (cleanup requires namespace tracking)", process_id);
+            info!(
+                "Network isolation removal for process {} (cleanup requires namespace tracking)",
+                process_id
+            );
         }
 
         #[cfg(not(feature = "vm-isolation-linux"))]
@@ -198,7 +209,7 @@ impl LinuxFilesystemIsolator {
     pub fn new() -> Self {
         Self
     }
-    
+
     /// Set up a bind mount for filesystem isolation
     #[cfg(feature = "vm-isolation-linux")]
     fn setup_bind_mount(
@@ -213,7 +224,7 @@ impl LinuxFilesystemIsolator {
                 source
             )));
         }
-        
+
         // If root_dir is provided and use_chroot is enabled, we need to create
         // the mount point inside the chroot directory
         // For now, we'll just set up the bind mount in the current namespace
@@ -233,13 +244,13 @@ impl LinuxFilesystemIsolator {
         } else {
             source.clone()
         };
-        
+
         // Set up bind mount flags
         let mut flags = MsFlags::MS_BIND | MsFlags::MS_REC;
         if read_only {
             flags |= MsFlags::MS_RDONLY;
         }
-        
+
         // Create bind mount
         mount(
             Some(source.as_os_str()),
@@ -248,14 +259,16 @@ impl LinuxFilesystemIsolator {
             flags,
             None::<&str>,
         )
-        .map_err(|e| AppError::ConfigError(format!(
-            "Failed to create bind mount from {:?} to {:?}: {}",
-            source, target, e
-        )))?;
-        
+        .map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to create bind mount from {:?} to {:?}: {}",
+                source, target, e
+            ))
+        })?;
+
         Ok(())
     }
-    
+
     #[cfg(not(feature = "vm-isolation-linux"))]
     fn setup_bind_mount(
         _source: &PathBuf,
@@ -287,9 +300,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
         // Validate root directory if provided
         if let Some(ref root_dir) = config.root_dir {
             if !root_dir.is_absolute() {
-                return Err(AppError::ConfigError(
-                    format!("Root directory must be an absolute path: {:?}", root_dir)
-                ));
+                return Err(AppError::ConfigError(format!(
+                    "Root directory must be an absolute path: {:?}",
+                    root_dir
+                )));
             }
         }
 
@@ -316,11 +330,16 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
             let mount_ns_result = unshare(CloneFlags::CLONE_NEWNS);
             match mount_ns_result {
                 Ok(_) => {
-                    info!("Successfully created mount namespace for process {}", process_id);
+                    info!(
+                        "Successfully created mount namespace for process {}",
+                        process_id
+                    );
 
                     // Set up bind mounts for allowed paths
                     for allowed_path in &config.allowed_paths {
-                        if let Err(e) = Self::setup_bind_mount(allowed_path, config.root_dir.as_ref(), false) {
+                        if let Err(e) =
+                            Self::setup_bind_mount(allowed_path, config.root_dir.as_ref(), false)
+                        {
                             let error_msg = format!(
                                 "Failed to set up bind mount for {:?}: {}",
                                 allowed_path, e
@@ -337,7 +356,9 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
                     // Set up read-only mounts
                     for read_only_path in &config.read_only_paths {
-                        if let Err(e) = Self::setup_bind_mount(read_only_path, config.root_dir.as_ref(), true) {
+                        if let Err(e) =
+                            Self::setup_bind_mount(read_only_path, config.root_dir.as_ref(), true)
+                        {
                             let error_msg = format!(
                                 "Failed to set up read-only mount for {:?}: {}",
                                 read_only_path, e
@@ -348,7 +369,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
                                 warn!("{}. Continuing without this mount.", error_msg);
                             }
                         } else {
-                            info!("Successfully set up read-only mount for: {:?}", read_only_path);
+                            info!(
+                                "Successfully set up read-only mount for: {:?}",
+                                read_only_path
+                            );
                         }
                     }
 
@@ -379,7 +403,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
                             // Apply chroot
                             match chroot(root_dir) {
                                 Ok(_) => {
-                                    info!("Successfully applied chroot to {:?} for process {}", root_dir, process_id);
+                                    info!(
+                                        "Successfully applied chroot to {:?} for process {}",
+                                        root_dir, process_id
+                                    );
                                 }
                                 Err(e) => {
                                     let error_msg = format!(
@@ -448,7 +475,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
             // 2. Move process back to original mount namespace
             // 3. Clean up temporary directories if created
             // Note: This is complex because we need to track what was mounted
-            info!("Filesystem isolation removal for process {} (cleanup requires mount tracking)", process_id);
+            info!(
+                "Filesystem isolation removal for process {} (cleanup requires mount tracking)",
+                process_id
+            );
         }
 
         #[cfg(not(feature = "vm-isolation-linux"))]
@@ -467,4 +497,3 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
         true
     }
 }
-

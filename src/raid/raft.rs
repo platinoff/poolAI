@@ -8,15 +8,14 @@ use crate::core::error::AppError;
 #[cfg(feature = "raft")]
 use crate::raid::RaidManager;
 #[cfg(feature = "raft")]
+use anyhow::Result;
+#[cfg(feature = "raft")]
 use async_raft::{
     config::Config,
-    Raft,
+    raft::{ClientWriteRequest, Entry, MembershipConfig},
     storage::{CurrentSnapshotData, HardState, InitialState, RaftStorage},
-    raft::{Entry, MembershipConfig, ClientWriteRequest},
-    AppData, AppDataResponse, NodeId,
+    AppData, AppDataResponse, NodeId, Raft,
 };
-#[cfg(feature = "raft")]
-use anyhow::Result;
 #[cfg(feature = "raft")]
 use async_trait::async_trait;
 #[cfg(feature = "raft")]
@@ -102,7 +101,8 @@ impl RaidRaftStorage {
 
     /// Get the path for snapshot storage
     pub fn snapshot_path(&self, snapshot_id: &str) -> std::path::PathBuf {
-        self.storage_path.join(format!("snapshot_{}.snap", snapshot_id))
+        self.storage_path
+            .join(format!("snapshot_{}.snap", snapshot_id))
     }
 
     /// Load hard state from disk
@@ -128,7 +128,7 @@ impl RaidRaftStorage {
         let state_path = self.state_path();
         let contents = serde_json::to_string_pretty(hs)
             .map_err(|e| anyhow::anyhow!("Failed to serialize hard state: {}", e))?;
-        
+
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -160,7 +160,7 @@ impl RaidRaftStorage {
         let log_path = self.log_path();
         let contents = serde_json::to_string_pretty(entries)
             .map_err(|e| anyhow::anyhow!("Failed to serialize log entries: {}", e))?;
-        
+
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -191,10 +191,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         let entries = self.load_log_entries().await?;
 
         let last_log_index = entries.len() as u64;
-        let last_log_term = entries
-            .last()
-            .map(|e| e.term)
-            .unwrap_or(0);
+        let last_log_term = entries.last().map(|e| e.term).unwrap_or(0);
 
         // TODO: Track last_applied_log separately
         let last_applied_log = last_log_index;
@@ -214,11 +211,15 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         self.save_hard_state_internal(hs).await
     }
 
-    async fn get_log_entries(&self, start: u64, stop: u64) -> Result<Vec<Entry<RaidRaftOperation>>> {
+    async fn get_log_entries(
+        &self,
+        start: u64,
+        stop: u64,
+    ) -> Result<Vec<Entry<RaidRaftOperation>>> {
         let entries = self.load_log_entries().await?;
         let start_idx = start as usize;
         let stop_idx = (stop as usize).min(entries.len());
-        
+
         if start_idx >= entries.len() {
             return Ok(Vec::new());
         }
@@ -229,13 +230,13 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
     async fn delete_logs_from(&self, start: u64, stop: Option<u64>) -> Result<()> {
         let mut entries = self.load_log_entries().await?;
         let start_idx = start as usize;
-        
+
         if start_idx >= entries.len() {
             return Ok(());
         }
 
         let stop_idx = stop.map(|s| s as usize).unwrap_or(entries.len());
-        
+
         if stop_idx <= start_idx {
             return Ok(());
         }
@@ -411,7 +412,18 @@ impl AppDataResponse for RaidRaftResponse {}
 pub struct RaidRaftNode {
     /// Raft instance (initialized in initialize())
     /// Using Arc<RwLock<>> for interior mutability since Raft needs to be mutable
-    raft_instance: Arc<RwLock<Option<Raft<RaidRaftOperation, RaidRaftResponse, crate::raid::raft_transport::HttpRaftTransport, RaidRaftStorage>>>>,
+    raft_instance: Arc<
+        RwLock<
+            Option<
+                Raft<
+                    RaidRaftOperation,
+                    RaidRaftResponse,
+                    crate::raid::raft_transport::HttpRaftTransport,
+                    RaidRaftStorage,
+                >,
+            >,
+        >,
+    >,
     /// Configuration
     config: RaftConfig,
     /// RAID manager reference
@@ -456,10 +468,7 @@ impl RaidRaftNode {
         tokio::fs::create_dir_all(&storage_path)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!(
-                    "Failed to create Raft storage directory: {}",
-                    e
-                ))
+                AppError::ConfigError(format!("Failed to create Raft storage directory: {}", e))
             })?;
 
         // Build Raft configuration
@@ -468,9 +477,7 @@ impl RaidRaftNode {
             .election_timeout_max(self.config.election_timeout * 2)
             .heartbeat_interval(self.config.heartbeat_interval)
             .validate()
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to build Raft config: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to build Raft config: {}", e)))?;
 
         // Initialize Raft instance
         // Note: Raft::new takes Arc<Config>, Arc<Network>, Arc<Storage>
@@ -478,36 +485,41 @@ impl RaidRaftNode {
         let config_arc = Arc::new(raft_config);
         let transport_arc = Arc::new(self.transport.clone());
         let storage_arc = Arc::new(self.storage.clone());
-        let raft = Raft::new(
-            self.config.node_id,
-            config_arc,
-            transport_arc,
-            storage_arc,
-        );
+        let raft = Raft::new(self.config.node_id, config_arc, transport_arc, storage_arc);
 
         // Store raft instance
         *self.raft_instance.write().await = Some(raft);
-        
+
         info!("Raft node {} initialized successfully", self.config.node_id);
-        
+
         // For single-node clusters, initialize the cluster and wait for leader election
         // In multi-node clusters, only the first node should initialize the cluster
         if self.config.cluster_members.len() == 1 {
             info!("Single-node cluster detected, initializing cluster and waiting for leader election...");
             use std::collections::HashSet;
             let members: HashSet<NodeId> = self.config.cluster_members.iter().cloned().collect();
-            self.raft_instance.read().await.as_ref().unwrap().initialize(members).await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to initialize single-node Raft cluster: {}", e))
-            })?;
+            self.raft_instance
+                .read()
+                .await
+                .as_ref()
+                .unwrap()
+                .initialize(members)
+                .await
+                .map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to initialize single-node Raft cluster: {}",
+                        e
+                    ))
+                })?;
             self.wait_for_leader(5000).await?;
             info!("Node {} is now leader.", self.config.node_id);
         }
-        
+
         Ok(())
     }
 
     /// Initialize a multi-node Raft cluster
-    /// 
+    ///
     /// This should be called on the first node to bootstrap the cluster.
     /// Other nodes should just call `initialize()` without calling this method.
     pub async fn initialize_cluster(&self) -> Result<(), AppError> {
@@ -516,8 +528,11 @@ impl RaidRaftNode {
             return Ok(());
         }
 
-        info!("Initializing multi-node Raft cluster with {} nodes", self.config.cluster_members.len());
-        
+        info!(
+            "Initializing multi-node Raft cluster with {} nodes",
+            self.config.cluster_members.len()
+        );
+
         let instance_guard = self.raft_instance.read().await;
         if let Some(ref raft) = *instance_guard {
             // Initialize the cluster with all members
@@ -525,13 +540,18 @@ impl RaidRaftNode {
             use std::collections::HashSet;
             let members: HashSet<NodeId> = self.config.cluster_members.iter().cloned().collect();
             raft.initialize(members).await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to initialize multi-node Raft cluster: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to initialize multi-node Raft cluster: {}",
+                    e
+                ))
             })?;
             info!("Multi-node cluster initialized successfully");
         } else {
-            return Err(AppError::ConfigError("Raft instance not initialized".to_string()));
+            return Err(AppError::ConfigError(
+                "Raft instance not initialized".to_string(),
+            ));
         }
-        
+
         Ok(())
     }
 
@@ -607,15 +627,15 @@ impl RaidRaftNode {
     }
 
     /// Wait for this node to become leader (with timeout)
-    /// 
+    ///
     /// This is useful for single-node clusters or testing scenarios
     /// where we need to ensure the node is leader before operations.
     pub async fn wait_for_leader(&self, timeout_ms: u64) -> Result<bool, AppError> {
-        use tokio::time::{sleep, Duration, timeout};
-        
+        use tokio::time::{sleep, timeout, Duration};
+
         let timeout_duration = Duration::from_millis(timeout_ms);
         let check_interval = Duration::from_millis(100);
-        
+
         let result = timeout(timeout_duration, async {
             loop {
                 if self.is_leader().await {
@@ -623,8 +643,9 @@ impl RaidRaftNode {
                 }
                 sleep(check_interval).await;
             }
-        }).await;
-        
+        })
+        .await;
+
         match result {
             Ok(true) => Ok(true),
             Ok(false) => Ok(false),
@@ -633,7 +654,7 @@ impl RaidRaftNode {
     }
 
     /// Trigger election manually (for testing or single-node clusters)
-    /// 
+    ///
     /// Note: In a multi-node cluster, elections happen automatically.
     /// This method is mainly useful for single-node clusters or testing.
     pub async fn trigger_election(&self) -> Result<(), AppError> {
@@ -645,12 +666,14 @@ impl RaidRaftNode {
             info!("Election will be triggered automatically by Raft");
             Ok(())
         } else {
-            Err(AppError::ConfigError("Raft instance not initialized".to_string()))
+            Err(AppError::ConfigError(
+                "Raft instance not initialized".to_string(),
+            ))
         }
     }
 
     /// Get Raft metrics for monitoring
-    /// 
+    ///
     /// Returns current term, leader, and other Raft state information
     pub async fn get_metrics(&self) -> Result<String, AppError> {
         let instance_guard = self.raft_instance.read().await;
@@ -659,17 +682,17 @@ impl RaidRaftNode {
             let metrics = metrics_receiver.borrow();
             Ok(format!(
                 "term: {}, leader: {:?}, last_log_index: {}",
-                metrics.current_term,
-                metrics.current_leader,
-                metrics.last_log_index
+                metrics.current_term, metrics.current_leader, metrics.last_log_index
             ))
         } else {
-            Err(AppError::ConfigError("Raft instance not initialized".to_string()))
+            Err(AppError::ConfigError(
+                "Raft instance not initialized".to_string(),
+            ))
         }
     }
 
     /// Get current leader ID (if any)
-    /// 
+    ///
     /// Returns Some(node_id) if there is a leader, None otherwise
     pub async fn get_current_leader(&self) -> Option<NodeId> {
         let instance_guard = self.raft_instance.read().await;
@@ -683,15 +706,15 @@ impl RaidRaftNode {
     }
 
     /// Wait for any leader to be elected in the cluster (with timeout)
-    /// 
+    ///
     /// This is useful for multi-node clusters where we need to wait
     /// for leader election to complete before operations.
     pub async fn wait_for_any_leader(&self, timeout_ms: u64) -> Result<Option<NodeId>, AppError> {
-        use tokio::time::{sleep, Duration, timeout};
-        
+        use tokio::time::{sleep, timeout, Duration};
+
         let timeout_duration = Duration::from_millis(timeout_ms);
         let check_interval = Duration::from_millis(100);
-        
+
         let result = timeout(timeout_duration, async {
             loop {
                 if let Some(leader) = self.get_current_leader().await {
@@ -699,8 +722,9 @@ impl RaidRaftNode {
                 }
                 sleep(check_interval).await;
             }
-        }).await;
-        
+        })
+        .await;
+
         match result {
             Ok(Some(leader)) => Ok(Some(leader)),
             Ok(None) => Ok(None),
@@ -709,7 +733,7 @@ impl RaidRaftNode {
     }
 
     /// Get last log index from metrics
-    /// 
+    ///
     /// Returns the index of the last log entry
     pub async fn get_last_log_index(&self) -> u64 {
         let instance_guard = self.raft_instance.read().await;
@@ -723,11 +747,15 @@ impl RaidRaftNode {
     }
 
     /// Get log entries from storage (for testing/debugging)
-    /// 
+    ///
     /// This method allows reading log entries directly from storage
     /// to verify replication in tests.
-    pub async fn get_log_entries(&self) -> Result<Vec<async_raft::raft::Entry<RaidRaftOperation>>, AppError> {
-        self.storage.load_log_entries().await
+    pub async fn get_log_entries(
+        &self,
+    ) -> Result<Vec<async_raft::raft::Entry<RaidRaftOperation>>, AppError> {
+        self.storage
+            .load_log_entries()
+            .await
             .map_err(|e| AppError::ConfigError(format!("Failed to load log entries: {}", e)))
     }
 }

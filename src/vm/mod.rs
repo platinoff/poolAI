@@ -226,7 +226,8 @@ impl VmManager {
         let health_monitor = Arc::new(RwLock::new(HealthMonitor::new(30))); // 30 second interval
         let resource_limiter: Arc<dyn ResourceLimiter> = Arc::new(PlatformResourceLimiter::new());
         let network_isolator: Arc<dyn NetworkIsolator> = Arc::new(PlatformNetworkIsolator::new());
-        let filesystem_isolator: Arc<dyn FilesystemIsolator> = Arc::new(PlatformFilesystemIsolator::new());
+        let filesystem_isolator: Arc<dyn FilesystemIsolator> =
+            Arc::new(PlatformFilesystemIsolator::new());
 
         Self {
             instances: Arc::new(RwLock::new(HashMap::new())),
@@ -703,7 +704,8 @@ impl VmManager {
         entries.push(entry);
 
         // Check alerts
-        self.check_resource_alerts(instance_id, &entries.last().unwrap().usage).await;
+        self.check_resource_alerts(instance_id, &entries.last().unwrap().usage)
+            .await;
 
         Ok(())
     }
@@ -750,7 +752,12 @@ impl VmManager {
         let history = self.resource_history.read().await;
         let entries = if let Some(entries) = history.get(&instance_id) {
             if let Some(limit) = limit {
-                entries.iter().rev().take(limit).cloned().collect::<Vec<_>>()
+                entries
+                    .iter()
+                    .rev()
+                    .take(limit)
+                    .cloned()
+                    .collect::<Vec<_>>()
             } else {
                 entries.clone()
             }
@@ -933,10 +940,11 @@ impl VmManager {
                     allow_loopback: true,
                     strict: false, // Graceful degradation by default
                 };
-                
-                let network_result = self.network_isolator
+
+                let network_result = self
+                    .network_isolator
                     .apply_network_isolation(process_id, &network_config);
-                
+
                 // If network isolation fails, log but continue (unless strict mode)
                 if let Err(ref e) = network_result {
                     warn!(
@@ -954,8 +962,9 @@ impl VmManager {
                     use_chroot: false,
                     strict: false, // Graceful degradation by default
                 };
-                
-                let fs_result = self.filesystem_isolator
+
+                let fs_result = self
+                    .filesystem_isolator
                     .apply_filesystem_isolation(process_id, &fs_config);
 
                 // If both isolations fail, return error
@@ -1008,7 +1017,8 @@ impl VmManager {
     /// `Ok(())` if isolation was removed successfully
     pub async fn remove_isolation(&self, process_id: u32) -> Result<(), AppError> {
         self.network_isolator.remove_network_isolation(process_id)?;
-        self.filesystem_isolator.remove_filesystem_isolation(process_id)?;
+        self.filesystem_isolator
+            .remove_filesystem_isolation(process_id)?;
         info!("Removed isolation from process {}", process_id);
         Ok(())
     }
@@ -1029,10 +1039,10 @@ impl VmManager {
     pub async fn restart_instance(&self, id: Uuid) -> Result<(), AppError> {
         let name = {
             let mut instances = self.instances.write().await;
-            let inst = instances
-                .get_mut(&id)
-                .ok_or_else(|| AppError::ValidationError(format!("VM instance {} not found", id)))?;
-            
+            let inst = instances.get_mut(&id).ok_or_else(|| {
+                AppError::ValidationError(format!("VM instance {} not found", id))
+            })?;
+
             // Reset restart attempts on manual restart
             inst.restart_attempts = 0;
             inst.name.clone()

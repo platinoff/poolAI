@@ -107,7 +107,7 @@ impl EventStore {
     pub fn new(storage_path: PathBuf) -> Self {
         let event_log_path = storage_path.join("events.log");
         let snapshot_path = storage_path.join("snapshot.json");
-        
+
         Self {
             storage_path,
             sequence: Arc::new(RwLock::new(0)),
@@ -120,26 +120,17 @@ impl EventStore {
     pub async fn initialize(&self) -> Result<(), AppError> {
         // Create storage directory if it doesn't exist
         if let Some(parent) = self.storage_path.parent() {
-            tokio::fs::create_dir_all(parent)
-                .await
-                .map_err(|e| {
-                    AppError::ConfigError(format!(
-                        "Failed to create event store directory: {}",
-                        e
-                    ))
-                })?;
+            tokio::fs::create_dir_all(parent).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to create event store directory: {}", e))
+            })?;
         }
 
         // Load existing events to determine current sequence
         let events = self.load_events().await?;
-        let max_sequence = events
-            .iter()
-            .map(|e| e.sequence)
-            .max()
-            .unwrap_or(0);
-        
+        let max_sequence = events.iter().map(|e| e.sequence).max().unwrap_or(0);
+
         *self.sequence.write().await = max_sequence;
-        
+
         info!("Event store initialized with sequence: {}", max_sequence);
         Ok(())
     }
@@ -148,7 +139,7 @@ impl EventStore {
     pub async fn append_event(&self, event: RaidEvent) -> Result<EventRecord, AppError> {
         let mut sequence = self.sequence.write().await;
         *sequence += 1;
-        
+
         let event_record = EventRecord {
             event_id: Uuid::new_v4(),
             sequence: *sequence,
@@ -158,11 +149,13 @@ impl EventStore {
 
         // Append to event log file
         self.append_to_log(&event_record).await?;
-        
-        info!("Event appended: sequence={}, type={:?}", 
-              event_record.sequence, 
-              std::mem::discriminant(&event));
-        
+
+        info!(
+            "Event appended: sequence={}, type={:?}",
+            event_record.sequence,
+            std::mem::discriminant(&event)
+        );
+
         Ok(event_record)
     }
 
@@ -174,16 +167,12 @@ impl EventStore {
 
         let mut file = File::open(&self.event_log_path)
             .await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to open event log: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to open event log: {}", e)))?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)
             .await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to read event log: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to read event log: {}", e)))?;
 
         // Parse events (one per line, JSON)
         let mut events = Vec::new();
@@ -191,11 +180,9 @@ impl EventStore {
             if line.trim().is_empty() {
                 continue;
             }
-            
+
             let event: EventRecord = serde_json::from_str(line)
-                .map_err(|e| {
-                    AppError::ConfigError(format!("Failed to parse event: {}", e))
-                })?;
+                .map_err(|e| AppError::ConfigError(format!("Failed to parse event: {}", e)))?;
             events.push(event);
         }
 
@@ -203,7 +190,10 @@ impl EventStore {
     }
 
     /// Get events since a specific sequence number
-    pub async fn get_events_since(&self, since_sequence: u64) -> Result<Vec<EventRecord>, AppError> {
+    pub async fn get_events_since(
+        &self,
+        since_sequence: u64,
+    ) -> Result<Vec<EventRecord>, AppError> {
         let all_events = self.load_events().await?;
         Ok(all_events
             .into_iter()
@@ -212,19 +202,30 @@ impl EventStore {
     }
 
     /// Get events for a specific artifact
-    pub async fn get_events_for_artifact(&self, artifact_id: &str) -> Result<Vec<EventRecord>, AppError> {
+    pub async fn get_events_for_artifact(
+        &self,
+        artifact_id: &str,
+    ) -> Result<Vec<EventRecord>, AppError> {
         let all_events = self.load_events().await?;
         Ok(all_events
             .into_iter()
-            .filter(|e| {
-                match &e.event {
-                    RaidEvent::ArtifactCreated { artifact_id: id, .. } => id == artifact_id,
-                    RaidEvent::ArtifactUpdated { artifact_id: id, .. } => id == artifact_id,
-                    RaidEvent::ArtifactDeleted { artifact_id: id, .. } => id == artifact_id,
-                    RaidEvent::ReplicationStarted { artifact_id: id, .. } => id == artifact_id,
-                    RaidEvent::ReplicationCompleted { artifact_id: id, .. } => id == artifact_id,
-                    _ => false,
-                }
+            .filter(|e| match &e.event {
+                RaidEvent::ArtifactCreated {
+                    artifact_id: id, ..
+                } => id == artifact_id,
+                RaidEvent::ArtifactUpdated {
+                    artifact_id: id, ..
+                } => id == artifact_id,
+                RaidEvent::ArtifactDeleted {
+                    artifact_id: id, ..
+                } => id == artifact_id,
+                RaidEvent::ReplicationStarted {
+                    artifact_id: id, ..
+                } => id == artifact_id,
+                RaidEvent::ReplicationCompleted {
+                    artifact_id: id, ..
+                } => id == artifact_id,
+                _ => false,
             })
             .collect())
     }
@@ -237,9 +238,7 @@ impl EventStore {
     /// Append event to log file
     async fn append_to_log(&self, event: &EventRecord) -> Result<(), AppError> {
         let json = serde_json::to_string(event)
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to serialize event: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to serialize event: {}", e)))?;
 
         let mut file = OpenOptions::new()
             .create(true)
@@ -250,20 +249,17 @@ impl EventStore {
                 AppError::ConfigError(format!("Failed to open event log for writing: {}", e))
             })?;
 
-        file.write_all(json.as_bytes()).await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to write event: {}", e))
-            })?;
-        
-        file.write_all(b"\n").await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to write newline: {}", e))
-            })?;
-        
-        file.sync_all().await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to sync event log: {}", e))
-            })?;
+        file.write_all(json.as_bytes())
+            .await
+            .map_err(|e| AppError::ConfigError(format!("Failed to write event: {}", e)))?;
+
+        file.write_all(b"\n")
+            .await
+            .map_err(|e| AppError::ConfigError(format!("Failed to write newline: {}", e)))?;
+
+        file.sync_all()
+            .await
+            .map_err(|e| AppError::ConfigError(format!("Failed to sync event log: {}", e)))?;
 
         Ok(())
     }
@@ -279,7 +275,7 @@ impl EventStore {
     }
 
     /// Replay events to reconstruct state
-    /// 
+    ///
     /// This method replays all events from the store, allowing
     /// state reconstruction from the event log.
     pub async fn replay_events<F>(&self, mut handler: F) -> Result<(), AppError>
@@ -287,11 +283,11 @@ impl EventStore {
         F: FnMut(&EventRecord) -> Result<(), AppError>,
     {
         let events = self.load_events().await?;
-        
+
         for event in events {
             handler(&event)?;
         }
-        
+
         Ok(())
     }
 
@@ -309,7 +305,7 @@ impl EventStore {
     }
 
     /// Create a snapshot of current state
-    /// 
+    ///
     /// This creates a snapshot that can be used for fast recovery
     /// without replaying all events from the beginning.
     pub async fn create_snapshot(
@@ -321,14 +317,10 @@ impl EventStore {
         let timestamp = Utc::now();
 
         let artifacts_json = serde_json::to_value(artifacts)
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to serialize artifacts: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to serialize artifacts: {}", e)))?;
 
         let nodes_json = serde_json::to_value(nodes)
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to serialize nodes: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to serialize nodes: {}", e)))?;
 
         let snapshot = Snapshot {
             sequence,
@@ -339,9 +331,7 @@ impl EventStore {
 
         // Save snapshot to file
         let snapshot_json = serde_json::to_string_pretty(&snapshot)
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to serialize snapshot: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to serialize snapshot: {}", e)))?;
 
         let mut file = OpenOptions::new()
             .create(true)
@@ -349,21 +339,20 @@ impl EventStore {
             .truncate(true)
             .open(&self.snapshot_path)
             .await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to open snapshot file: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to open snapshot file: {}", e)))?;
 
-        file.write_all(snapshot_json.as_bytes()).await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to write snapshot: {}", e))
-            })?;
+        file.write_all(snapshot_json.as_bytes())
+            .await
+            .map_err(|e| AppError::ConfigError(format!("Failed to write snapshot: {}", e)))?;
 
-        file.sync_all().await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to sync snapshot: {}", e))
-            })?;
+        file.sync_all()
+            .await
+            .map_err(|e| AppError::ConfigError(format!("Failed to sync snapshot: {}", e)))?;
 
-        info!("Snapshot created: sequence={}, timestamp={}", sequence, timestamp);
+        info!(
+            "Snapshot created: sequence={}, timestamp={}",
+            sequence, timestamp
+        );
         Ok(snapshot)
     }
 
@@ -375,33 +364,24 @@ impl EventStore {
 
         let mut file = File::open(&self.snapshot_path)
             .await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to open snapshot file: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to open snapshot file: {}", e)))?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)
             .await
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to read snapshot: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to read snapshot: {}", e)))?;
 
         let snapshot: Snapshot = serde_json::from_str(&contents)
-            .map_err(|e| {
-                AppError::ConfigError(format!("Failed to parse snapshot: {}", e))
-            })?;
+            .map_err(|e| AppError::ConfigError(format!("Failed to parse snapshot: {}", e)))?;
 
         Ok(Some(snapshot))
     }
 
     /// Replay events since snapshot
-    /// 
+    ///
     /// This method loads a snapshot and replays only events that occurred
     /// after the snapshot, allowing for fast state reconstruction.
-    pub async fn replay_events_since_snapshot<F>(
-        &self,
-        mut handler: F,
-    ) -> Result<u64, AppError>
+    pub async fn replay_events_since_snapshot<F>(&self, mut handler: F) -> Result<u64, AppError>
     where
         F: FnMut(&EventRecord) -> Result<(), AppError>,
     {
@@ -418,4 +398,3 @@ impl EventStore {
         Ok(start_sequence)
     }
 }
-

@@ -7,7 +7,7 @@
 //! - Restart attempts tracking
 //! - Reset restart attempts
 
-use poolai::vm::{AutoRecoveryConfig, VmManager, VmResources, VmIsolation};
+use poolai::vm::{AutoRecoveryConfig, VmIsolation, VmManager, VmResources};
 
 #[tokio::test]
 async fn test_auto_recovery_config_default() {
@@ -61,10 +61,7 @@ async fn test_get_auto_recovery_config() {
         .await
         .unwrap();
 
-    let config = manager
-        .get_auto_recovery_config(instance.id)
-        .await
-        .unwrap();
+    let config = manager.get_auto_recovery_config(instance.id).await.unwrap();
 
     assert_eq!(config.max_restart_attempts, 5);
     assert_eq!(config.initial_restart_delay_secs, 1);
@@ -127,13 +124,7 @@ async fn test_update_instance_with_auto_recovery() {
     };
 
     let updated = manager
-        .update_instance(
-            instance.id,
-            None,
-            None,
-            None,
-            Some(new_config.clone()),
-        )
+        .update_instance(instance.id, None, None, None, Some(new_config.clone()))
         .await
         .unwrap();
 
@@ -189,4 +180,3 @@ async fn test_restart_instance_resets_restart_attempts() {
     let attempts = manager.get_restart_attempts(instance.id).await.unwrap();
     assert_eq!(attempts, 0);
 }
-

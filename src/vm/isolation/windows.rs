@@ -4,7 +4,9 @@
 //! for network and filesystem isolation.
 
 use crate::core::error::AppError;
-use crate::vm::isolation::{FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator};
+use crate::vm::isolation::{
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
+};
 use tracing::{info, warn};
 
 /// Windows network isolator using AppContainers and Windows Firewall
@@ -27,7 +29,10 @@ impl NetworkIsolator for WindowsNetworkIsolator {
         }
 
         // Validate configuration
-        if !config.allow_loopback && config.allowed_interfaces.is_empty() && config.allowed_ports.is_empty() {
+        if !config.allow_loopback
+            && config.allowed_interfaces.is_empty()
+            && config.allowed_ports.is_empty()
+        {
             return Err(AppError::ConfigError(
                 "Network isolation configuration would block all network access. At least one of allow_loopback, allowed_interfaces, or allowed_ports must be enabled.".to_string(),
             ));
@@ -43,10 +48,7 @@ impl NetworkIsolator for WindowsNetworkIsolator {
         // Log configuration details
         info!(
             "Applying network isolation to process {}: loopback={}, interfaces={:?}, ports={:?}",
-            process_id,
-            config.allow_loopback,
-            config.allowed_interfaces,
-            config.allowed_ports
+            process_id, config.allow_loopback, config.allowed_interfaces, config.allowed_ports
         );
 
         // TODO: Full implementation would involve:
@@ -201,4 +203,3 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
         true
     }
 }
-

@@ -156,10 +156,16 @@ pub fn create_api_routes() -> Router {
         )
         .route("/raid/quota", get(raid_quota_handler))
         .route("/raid/events", get(raid_events_handler))
-        .route("/raid/events/:artifact_id", get(raid_events_for_artifact_handler))
+        .route(
+            "/raid/events/:artifact_id",
+            get(raid_events_for_artifact_handler),
+        )
         .route("/raid/events/range", get(raid_events_range_handler))
         .route("/raid/snapshot", get(raid_snapshot_handler))
-        .route("/raid/snapshot/create", post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)))
+        .route(
+            "/raid/snapshot/create",
+            post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
         .route(
             "/raid/gc",
             post(raid_gc_handler).layer(middleware::from_fn(auth_middleware)),
@@ -324,7 +330,13 @@ async fn vm_instance_update_handler(
     };
 
     match manager
-        .update_instance(uuid, payload.name, payload.resources, payload.isolation, None)
+        .update_instance(
+            uuid,
+            payload.name,
+            payload.resources,
+            payload.isolation,
+            None,
+        )
         .await
     {
         Ok(instance) => Json(instance).into_response(),
@@ -577,8 +589,8 @@ struct CreateArtifactResponse {
 async fn raid_artifact_create_handler(
     axum::extract::Json(payload): axum::extract::Json<CreateArtifactRequest>,
 ) -> impl IntoResponse {
-    use base64::Engine;
     use base64::engine::general_purpose::STANDARD as base64_engine;
+    use base64::Engine;
 
     // Validate artifact name
     if let Err(e) = validation::validate_artifact_name(&payload.name) {
@@ -646,7 +658,7 @@ async fn raid_artifact_create_handler(
                 "error": format!("Failed to create artifact: {}", e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 
@@ -689,7 +701,7 @@ async fn raid_artifact_delete_handler(
                 "error": format!("Failed to delete artifact: {}", e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 
@@ -736,19 +748,21 @@ struct RaidGcResponse {
 /// Get all events from the event store
 async fn raid_events_handler() -> impl IntoResponse {
     let manager = raid::get_global_manager();
-    
+
     if let Some(event_store) = manager.event_store() {
         match event_store.read().await.load_events().await {
             Ok(events) => Json(serde_json::json!({
                 "events": events,
                 "count": events.len()
-            })).into_response(),
+            }))
+            .into_response(),
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
                     "error": format!("Failed to load events: {}", e)
                 })),
-            ).into_response(),
+            )
+                .into_response(),
         }
     } else {
         (
@@ -756,7 +770,8 @@ async fn raid_events_handler() -> impl IntoResponse {
             Json(serde_json::json!({
                 "error": "Event store not available"
             })),
-        ).into_response()
+        )
+            .into_response()
     }
 }
 
@@ -765,20 +780,27 @@ async fn raid_events_for_artifact_handler(
     axum::extract::Path(artifact_id): axum::extract::Path<String>,
 ) -> impl IntoResponse {
     let manager = raid::get_global_manager();
-    
+
     if let Some(event_store) = manager.event_store() {
-        match event_store.read().await.get_events_for_artifact(&artifact_id).await {
+        match event_store
+            .read()
+            .await
+            .get_events_for_artifact(&artifact_id)
+            .await
+        {
             Ok(events) => Json(serde_json::json!({
                 "artifact_id": artifact_id,
                 "events": events,
                 "count": events.len()
-            })).into_response(),
+            }))
+            .into_response(),
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
                     "error": format!("Failed to load events: {}", e)
                 })),
-            ).into_response(),
+            )
+                .into_response(),
         }
     } else {
         (
@@ -786,7 +808,8 @@ async fn raid_events_for_artifact_handler(
             Json(serde_json::json!({
                 "error": "Event store not available"
             })),
-        ).into_response()
+        )
+            .into_response()
     }
 }
 
@@ -801,33 +824,42 @@ async fn raid_events_range_handler(
     axum::extract::Query(params): axum::extract::Query<EventsRangeQuery>,
 ) -> impl IntoResponse {
     use chrono::DateTime;
-    
+
     let manager = raid::get_global_manager();
-    
+
     if let Some(event_store) = manager.event_store() {
-        let start = params.start
+        let start = params
+            .start
             .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
             .map(|dt| dt.with_timezone(&chrono::Utc))
             .unwrap_or_else(|| chrono::Utc::now() - chrono::Duration::days(7));
-        
-        let end = params.end
+
+        let end = params
+            .end
             .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
             .map(|dt| dt.with_timezone(&chrono::Utc))
             .unwrap_or_else(chrono::Utc::now);
-        
-        match event_store.read().await.get_events_in_range(start, end).await {
+
+        match event_store
+            .read()
+            .await
+            .get_events_in_range(start, end)
+            .await
+        {
             Ok(events) => Json(serde_json::json!({
                 "start": start.to_rfc3339(),
                 "end": end.to_rfc3339(),
                 "events": events,
                 "count": events.len()
-            })).into_response(),
+            }))
+            .into_response(),
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
                     "error": format!("Failed to load events: {}", e)
                 })),
-            ).into_response(),
+            )
+                .into_response(),
         }
     } else {
         (
@@ -835,14 +867,15 @@ async fn raid_events_range_handler(
             Json(serde_json::json!({
                 "error": "Event store not available"
             })),
-        ).into_response()
+        )
+            .into_response()
     }
 }
 
 /// Get current snapshot
 async fn raid_snapshot_handler() -> impl IntoResponse {
     let manager = raid::get_global_manager();
-    
+
     if let Some(event_store) = manager.event_store() {
         match event_store.read().await.load_snapshot().await {
             Ok(Some(snapshot)) => Json(snapshot).into_response(),
@@ -851,13 +884,15 @@ async fn raid_snapshot_handler() -> impl IntoResponse {
                 Json(serde_json::json!({
                     "error": "No snapshot available"
                 })),
-            ).into_response(),
+            )
+                .into_response(),
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
                     "error": format!("Failed to load snapshot: {}", e)
                 })),
-            ).into_response(),
+            )
+                .into_response(),
         }
     } else {
         (
@@ -865,34 +900,35 @@ async fn raid_snapshot_handler() -> impl IntoResponse {
             Json(serde_json::json!({
                 "error": "Event store not available"
             })),
-        ).into_response()
+        )
+            .into_response()
     }
 }
 
 /// Create a new snapshot
-async fn raid_snapshot_create_handler(
-    Extension(claims): Extension<Claims>,
-) -> impl IntoResponse {
+async fn raid_snapshot_create_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
     // Check permission: write:all or write:raid
-    if let Err(err) = check_permission(&claims, "write:all")
-        .or_else(|_| check_permission(&claims, "write:raid"))
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
     {
         return err.into_response();
     }
-    
+
     let manager = raid::get_global_manager();
-    
+
     match manager.create_snapshot().await {
         Ok(_) => Json(serde_json::json!({
             "status": "success",
             "message": "Snapshot created successfully"
-        })).into_response(),
+        }))
+        .into_response(),
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to create snapshot: {}", e)
             })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 
@@ -1068,24 +1104,30 @@ async fn workers_handler() -> impl IntoResponse {
             let pool_guard = pool.read().await;
             pool_guard.get_worker_status().await
         };
-        
+
         if !worker_statuses.is_empty() {
             let worker_infos: Vec<WorkerInfo> = worker_statuses
                 .iter()
                 .map(|(id, status)| WorkerInfo {
                     id: id.clone(),
                     status: match status.is_healthy {
-                        true => if status.active_connections > 0 { "busy".to_string() } else { "idle".to_string() },
+                        true => {
+                            if status.active_connections > 0 {
+                                "busy".to_string()
+                            } else {
+                                "idle".to_string()
+                            }
+                        }
                         false => "error".to_string(),
                     },
                     current_task: None, // TODO: Get from worker status
                 })
                 .collect();
-            
+
             return Json(worker_infos);
         }
     }
-    
+
     // Fallback to mock data
     let workers = vec![
         WorkerInfo {
@@ -1197,7 +1239,10 @@ async fn worker_create_handler(
 
     // Add worker to pool
     let pool_guard = pool.write().await;
-    match pool_guard.add_worker(payload.worker_id.clone(), worker).await {
+    match pool_guard
+        .add_worker(payload.worker_id.clone(), worker)
+        .await
+    {
         Ok(_) => {
             let response = CreateWorkerResponse {
                 worker_id: payload.worker_id,
@@ -1211,7 +1256,7 @@ async fn worker_create_handler(
                 "error": format!("Failed to create worker: {}", e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 
@@ -1254,7 +1299,7 @@ async fn worker_delete_handler(
                 "error": format!("Failed to delete worker: {}", e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 

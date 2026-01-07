@@ -8,6 +8,7 @@
 //! - Stress testing with many artifacts
 //! - Concurrent read operations
 
+use chrono::Utc;
 use poolai::raid::{
     events::{EventStore, RaidEvent},
     protocol::ArtifactMetadata,
@@ -16,12 +17,11 @@ use poolai::raid::{
     },
     RaidConfig, RaidManager, RaidMode,
 };
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use tempfile::TempDir;
-use chrono::Utc;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::sync::Arc;
+use tempfile::TempDir;
+use tokio::sync::RwLock;
 
 /// Helper function to create a test RAID manager
 fn create_test_raid_manager(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<RaidManager>> {
@@ -122,7 +122,11 @@ async fn test_concurrent_metadata_initialization() {
     for i in 0..artifact_count {
         let artifact_id = format!("artifact-{}", i);
         let metadata = engine.get_replication_metadata(&artifact_id).await;
-        assert!(metadata.is_some(), "Metadata should exist for artifact {}", artifact_id);
+        assert!(
+            metadata.is_some(),
+            "Metadata should exist for artifact {}",
+            artifact_id
+        );
     }
 }
 
@@ -152,7 +156,10 @@ async fn test_concurrent_node_selection() {
     for _ in 0..selection_count {
         let engine_clone = engine.clone();
         let handle = tokio::spawn(async move {
-            let selected = engine_clone.select_replication_nodes(3, None).await.unwrap();
+            let selected = engine_clone
+                .select_replication_nodes(3, None)
+                .await
+                .unwrap();
             assert_eq!(selected.len(), 3);
         });
         handles.push(handle);
@@ -180,10 +187,7 @@ async fn test_concurrent_metadata_retrieval() {
     let artifact_count = 100;
     for i in 0..artifact_count {
         let artifact_id = format!("artifact-{}", i);
-        engine
-            .initialize_replication(artifact_id, 3)
-            .await
-            .unwrap();
+        engine.initialize_replication(artifact_id, 3).await.unwrap();
     }
 
     // Concurrent metadata retrieval
@@ -225,10 +229,7 @@ async fn test_high_throughput_replication_metadata() {
 
     for i in 0..operations {
         let artifact_id = format!("artifact-{}", i);
-        engine
-            .initialize_replication(artifact_id, 3)
-            .await
-            .unwrap();
+        engine.initialize_replication(artifact_id, 3).await.unwrap();
     }
 
     let duration = start.elapsed();
@@ -265,10 +266,7 @@ async fn test_stress_many_artifacts() {
 
     for i in 0..artifact_count {
         let artifact_id = format!("artifact-{}", i);
-        engine
-            .initialize_replication(artifact_id, 3)
-            .await
-            .unwrap();
+        engine.initialize_replication(artifact_id, 3).await.unwrap();
     }
 
     let duration = start.elapsed();
@@ -284,7 +282,11 @@ async fn test_stress_many_artifacts() {
     for i in 0..artifact_count.min(100) {
         // Sample check (checking all 10000 would be too slow)
         let artifact_id = format!("artifact-{}", i);
-        if engine.get_replication_metadata(&artifact_id).await.is_some() {
+        if engine
+            .get_replication_metadata(&artifact_id)
+            .await
+            .is_some()
+        {
             verified += 1;
         }
     }
@@ -355,7 +357,10 @@ async fn test_mixed_workload() {
     for _ in 0..100 {
         let engine_clone = engine.clone();
         let handle = tokio::spawn(async move {
-            let _selected = engine_clone.select_replication_nodes(3, None).await.unwrap();
+            let _selected = engine_clone
+                .select_replication_nodes(3, None)
+                .await
+                .unwrap();
         });
         handles.push(handle);
     }
@@ -387,4 +392,3 @@ async fn test_mixed_workload() {
         handle.await.unwrap();
     }
 }
-

@@ -24,7 +24,12 @@ pub fn validate_worker_id(worker_id: &str) -> Result<(), AppError> {
         ));
     }
 
-    if !worker_id.chars().next().map(|c| c.is_alphanumeric()).unwrap_or(false) {
+    if !worker_id
+        .chars()
+        .next()
+        .map(|c| c.is_alphanumeric())
+        .unwrap_or(false)
+    {
         return Err(AppError::ConfigError(
             "Worker ID must start with an alphanumeric character".to_string(),
         ));
@@ -62,7 +67,12 @@ pub fn validate_artifact_name(name: &str) -> Result<(), AppError> {
         ));
     }
 
-    if !name.chars().next().map(|c| c.is_alphanumeric()).unwrap_or(false) {
+    if !name
+        .chars()
+        .next()
+        .map(|c| c.is_alphanumeric())
+        .unwrap_or(false)
+    {
         return Err(AppError::ConfigError(
             "Artifact name must start with an alphanumeric character".to_string(),
         ));
@@ -141,7 +151,12 @@ pub fn validate_worker_config(
 ) -> Result<(), AppError> {
     validate_range(max_concurrent_requests, 1, 1000, "max_concurrent_requests")?;
     validate_range(request_timeout_ms, 100, 300_000, "request_timeout_ms")?; // 100ms to 5min
-    validate_range(health_check_interval_ms, 100, 60_000, "health_check_interval_ms")?; // 100ms to 1min
+    validate_range(
+        health_check_interval_ms,
+        100,
+        60_000,
+        "health_check_interval_ms",
+    )?; // 100ms to 1min
     validate_range(cache_size, 100, 100_000, "cache_size")?;
     validate_range(max_memory_mb, 256, 131_072, "max_memory_mb")?; // 256MB to 128GB
     validate_range(cpu_priority, 1, 10, "cpu_priority")?;
@@ -150,7 +165,10 @@ pub fn validate_worker_config(
 }
 
 /// Validate artifact data size
-pub fn validate_artifact_data_size(data_size: usize, max_size_bytes: usize) -> Result<(), AppError> {
+pub fn validate_artifact_data_size(
+    data_size: usize,
+    max_size_bytes: usize,
+) -> Result<(), AppError> {
     if data_size == 0 {
         return Err(AppError::ConfigError(
             "Artifact data cannot be empty".to_string(),
@@ -166,4 +184,3 @@ pub fn validate_artifact_data_size(data_size: usize, max_size_bytes: usize) -> R
 
     Ok(())
 }
-

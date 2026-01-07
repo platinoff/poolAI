@@ -251,7 +251,10 @@ impl CircuitBreaker {
         *self.failure_count.write().await = 0;
         *self.success_count.write().await = 0;
         *self.opened_at.write().await = None;
-        info!("Circuit breaker for node {} manually reset to Closed", self.node_id);
+        info!(
+            "Circuit breaker for node {} manually reset to Closed",
+            self.node_id
+        );
     }
 
     /// Get node ID
@@ -285,7 +288,7 @@ impl CircuitBreakerManager {
     /// Get or create circuit breaker for a node
     pub async fn get_or_create(&self, node_id: u64) -> Arc<CircuitBreaker> {
         let mut breakers = self.breakers.write().await;
-        
+
         if let Some(breaker) = breakers.get(&node_id) {
             return breaker.clone();
         }
@@ -318,12 +321,11 @@ impl CircuitBreakerManager {
     pub async fn get_states(&self) -> std::collections::HashMap<u64, CircuitState> {
         let breakers = self.breakers.read().await;
         let mut states = std::collections::HashMap::new();
-        
+
         for (node_id, breaker) in breakers.iter() {
             states.insert(*node_id, breaker.state().await);
         }
-        
+
         states
     }
 }
-

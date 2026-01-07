@@ -30,7 +30,7 @@ mod components;
 pub use components::get_component_styles;
 
 mod themes;
-pub use themes::{get_theme, get_all_themes, Theme, DARK_THEME, LIGHT_THEME, HIGH_CONTRAST_THEME};
+pub use themes::{get_all_themes, get_theme, Theme, DARK_THEME, HIGH_CONTRAST_THEME, LIGHT_THEME};
 
 use crate::core::error::AppError;
 use axum::{response::Html, routing::get, Router};
@@ -236,7 +236,7 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let theme = DARK_THEME; // Default theme
     let theme_css = theme.to_css();
     let high_contrast_value = "high-contrast";
-    
+
     // Prepare navigation links and attributes with dashes
     let nav_id = "navigation";
     let main_content_id = "main_content";
@@ -263,7 +263,7 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let aria_label_theme = "Select theme";
     let title_theme = "Select theme";
     let style_select = "padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.9em; cursor: pointer;";
-    
+
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">

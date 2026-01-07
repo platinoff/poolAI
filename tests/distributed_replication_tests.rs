@@ -8,6 +8,7 @@
 //! - Read replicas with consistency levels
 //! - Async replication queue
 
+use chrono::Utc;
 use poolai::core::error::AppError;
 use poolai::raid::{
     client::ProtocolClient,
@@ -20,9 +21,8 @@ use poolai::raid::{
 };
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use tempfile::TempDir;
-use chrono::Utc;
+use tokio::sync::RwLock;
 
 /// Helper function to create a test RAID manager
 fn create_test_raid_manager(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<RaidManager>> {
@@ -74,17 +74,19 @@ async fn test_multi_node_synchronous_replication() {
     event_store3.write().await.initialize().await.unwrap();
 
     // Create replication engine on node 1
-    let mut engine1 = create_replication_engine(
-        raid_manager1.clone(),
-        Some(event_store1.clone()),
-        None,
-    )
-    .await;
+    let mut engine1 =
+        create_replication_engine(raid_manager1.clone(), Some(event_store1.clone()), None).await;
 
     // Register nodes
-    engine1.register_node(1, "http://127.0.0.1:8080".to_string()).await;
-    engine1.register_node(2, "http://127.0.0.1:8081".to_string()).await;
-    engine1.register_node(3, "http://127.0.0.1:8082".to_string()).await;
+    engine1
+        .register_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    engine1
+        .register_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
+    engine1
+        .register_node(3, "http://127.0.0.1:8082".to_string())
+        .await;
 
     // Create test artifact
     let artifact_id = "test-artifact-multi-node".to_string();
@@ -267,13 +269,16 @@ async fn test_node_selection_insufficient_nodes() {
 
     // Try to select 3 nodes (should fail or return only available nodes)
     let result = engine.select_replication_nodes(3, None).await;
-    
+
     // The method might return available nodes (2) instead of error
     // Check both cases
     match result {
         Ok(selected) => {
             // If it returns nodes, should be only 2 (all available)
-            assert!(selected.len() <= 2, "Should not select more than available nodes");
+            assert!(
+                selected.len() <= 2,
+                "Should not select more than available nodes"
+            );
         }
         Err(AppError::ValidationError(msg)) => {
             assert!(msg.contains("insufficient") || msg.contains("available"));
@@ -339,7 +344,10 @@ async fn test_replication_config_defaults() {
     assert_eq!(config.async_retry_delay_seconds, 5);
     assert_eq!(config.async_queue_size, 1000);
     assert_eq!(config.async_worker_count, 2);
-    assert_eq!(config.default_read_consistency, ReadConsistencyLevel::Quorum);
+    assert_eq!(
+        config.default_read_consistency,
+        ReadConsistencyLevel::Quorum
+    );
 }
 
 #[tokio::test]
@@ -380,4 +388,3 @@ async fn test_replication_status_enum() {
         _ => panic!("Expected Failed status"),
     }
 }
-

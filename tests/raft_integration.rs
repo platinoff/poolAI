@@ -8,7 +8,7 @@
 
 #[cfg(feature = "raft")]
 use poolai::raid::{
-    raft::{RaidRaftNode, RaidRaftStateMachine, RaidRaftStorage, RaftConfig, RaidRaftOperation},
+    raft::{RaftConfig, RaidRaftNode, RaidRaftOperation, RaidRaftStateMachine, RaidRaftStorage},
     RaidConfig, RaidManager, RaidMode,
 };
 #[cfg(feature = "raft")]
@@ -16,9 +16,9 @@ use std::path::PathBuf;
 #[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
-use tokio::sync::RwLock;
-#[cfg(feature = "raft")]
 use tempfile::TempDir;
+#[cfg(feature = "raft")]
+use tokio::sync::RwLock;
 
 #[cfg(feature = "raft")]
 #[tokio::test]
@@ -44,12 +44,8 @@ async fn test_raft_node_creation() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     // Test initialization
     raft_node.initialize().await.unwrap();
@@ -63,7 +59,7 @@ async fn test_raft_node_creation() {
     let is_leader = raft_node.is_leader().await;
     let term = raft_node.current_term().await;
     let role = raft_node.current_role().await;
-    
+
     // At least verify that methods work (term should be >= 0, role should be valid)
     assert!(term >= 0);
     assert!(role == "Leader" || role == "Follower" || role == "Candidate");
@@ -155,19 +151,15 @@ async fn test_raft_node_apply_operation() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
     // Wait for node to become leader (single-node cluster should become leader automatically)
     // Wait up to 2 seconds for leader election
     let became_leader = raft_node.wait_for_leader(2000).await.unwrap_or(false);
-    
+
     if !became_leader {
         // If not leader, use direct state machine application (fallback mode)
         // This tests the fallback path when Raft is not leader
@@ -176,12 +168,12 @@ async fn test_raft_node_apply_operation() {
             data: b"test data 2".to_vec(),
             metadata: poolai::raid::manifest::ArtifactManifest::new(),
         };
-        
+
         // Direct state machine application should work even if not leader
         use poolai::raid::raft::RaidRaftStateMachine;
         let state_machine = RaidRaftStateMachine::new(raid_manager.clone());
         let response = state_machine.apply_operation(&operation).await.unwrap();
-        
+
         match response {
             poolai::raid::raft::RaidRaftResponse::Success { message } => {
                 assert!(message.contains("stored"));
@@ -215,8 +207,12 @@ async fn test_raft_transport_node_management() {
     let transport = HttpRaftTransport::new();
 
     // Test adding nodes
-    transport.add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    transport.add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    transport
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    transport
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
 
     // Test getting node address
     let addr1 = transport.get_node_address(1).await;
@@ -260,12 +256,8 @@ async fn test_raft_multi_node_setup() {
         heartbeat_interval: 100,
     };
 
-    let raft_node1 = RaidRaftNode::new(
-        raft_config1,
-        raid_manager1.clone(),
-        node1_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node1 =
+        RaidRaftNode::new(raft_config1, raid_manager1.clone(), node1_path.join("raft")).unwrap();
 
     // Setup Node 2
     let raid_config2 = RaidConfig {
@@ -286,20 +278,28 @@ async fn test_raft_multi_node_setup() {
         heartbeat_interval: 100,
     };
 
-    let raft_node2 = RaidRaftNode::new(
-        raft_config2,
-        raid_manager2.clone(),
-        node2_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node2 =
+        RaidRaftNode::new(raft_config2, raid_manager2.clone(), node2_path.join("raft")).unwrap();
 
     // Configure transport for both nodes
     // Note: In a real scenario, these would be actual HTTP addresses
     // For testing, we'll just verify the setup works
-    raft_node1.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node1.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
-    raft_node2.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node2.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node1
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node1
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
+    raft_node2
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node2
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
 
     // Initialize both nodes
     raft_node1.initialize().await.unwrap();
@@ -308,7 +308,7 @@ async fn test_raft_multi_node_setup() {
     // Verify both nodes are initialized
     let term1 = raft_node1.current_term().await;
     let term2 = raft_node2.current_term().await;
-    
+
     // Terms should be valid (>= 0)
     assert!(term1 >= 0);
     assert!(term2 >= 0);
@@ -345,12 +345,8 @@ async fn test_raft_cluster_initialization() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
@@ -374,7 +370,7 @@ async fn test_raft_cluster_initialization() {
     .unwrap();
 
     multi_node.initialize().await.unwrap();
-    
+
     // For multi-node without actual nodes, initialize_cluster should handle it gracefully
     // (It will fail if Raft instance is not initialized, which is expected)
     // This test verifies the method exists and can be called
@@ -408,12 +404,8 @@ async fn test_raft_leader_election_metrics() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
@@ -465,12 +457,8 @@ async fn test_raft_multi_node_leader_election_setup() {
         heartbeat_interval: 100,
     };
 
-    let raft_node1 = RaidRaftNode::new(
-        raft_config1,
-        raid_manager1.clone(),
-        node1_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node1 =
+        RaidRaftNode::new(raft_config1, raid_manager1.clone(), node1_path.join("raft")).unwrap();
 
     // Setup Node 2
     let raid_config2 = RaidConfig {
@@ -491,12 +479,8 @@ async fn test_raft_multi_node_leader_election_setup() {
         heartbeat_interval: 100,
     };
 
-    let raft_node2 = RaidRaftNode::new(
-        raft_config2,
-        raid_manager2.clone(),
-        node2_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node2 =
+        RaidRaftNode::new(raft_config2, raid_manager2.clone(), node2_path.join("raft")).unwrap();
 
     // Setup Node 3
     let raid_config3 = RaidConfig {
@@ -517,25 +501,48 @@ async fn test_raft_multi_node_leader_election_setup() {
         heartbeat_interval: 100,
     };
 
-    let raft_node3 = RaidRaftNode::new(
-        raft_config3,
-        raid_manager3.clone(),
-        node3_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node3 =
+        RaidRaftNode::new(raft_config3, raid_manager3.clone(), node3_path.join("raft")).unwrap();
 
     // Configure transport for all nodes
-    raft_node1.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node1.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
-    raft_node1.transport().add_node(3, "http://127.0.0.1:8082".to_string()).await;
-    
-    raft_node2.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node2.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
-    raft_node2.transport().add_node(3, "http://127.0.0.1:8082".to_string()).await;
-    
-    raft_node3.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node3.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
-    raft_node3.transport().add_node(3, "http://127.0.0.1:8082".to_string()).await;
+    raft_node1
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node1
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
+    raft_node1
+        .transport()
+        .add_node(3, "http://127.0.0.1:8082".to_string())
+        .await;
+
+    raft_node2
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node2
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
+    raft_node2
+        .transport()
+        .add_node(3, "http://127.0.0.1:8082".to_string())
+        .await;
+
+    raft_node3
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node3
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
+    raft_node3
+        .transport()
+        .add_node(3, "http://127.0.0.1:8082".to_string())
+        .await;
 
     // Initialize all nodes
     raft_node1.initialize().await.unwrap();
@@ -552,7 +559,7 @@ async fn test_raft_multi_node_leader_election_setup() {
     let term1 = raft_node1.current_term().await;
     let term2 = raft_node2.current_term().await;
     let term3 = raft_node3.current_term().await;
-    
+
     // Terms should be valid (>= 0)
     assert!(term1 >= 0);
     assert!(term2 >= 0);
@@ -570,7 +577,7 @@ async fn test_raft_multi_node_leader_election_setup() {
     let metrics1 = raft_node1.get_metrics().await;
     let metrics2 = raft_node2.get_metrics().await;
     let metrics3 = raft_node3.get_metrics().await;
-    
+
     assert!(metrics1.is_ok(), "Node 1 metrics should be accessible");
     assert!(metrics2.is_ok(), "Node 2 metrics should be accessible");
     assert!(metrics3.is_ok(), "Node 3 metrics should be accessible");
@@ -604,12 +611,8 @@ async fn test_raft_log_replication_single_node() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
@@ -619,7 +622,7 @@ async fn test_raft_log_replication_single_node() {
 
     // Initial log index should be 0 (or 1 if there's an initial entry)
     let initial_log_index = raft_node.get_last_log_index().await;
-    
+
     // Apply an operation through Raft
     let operation = RaidRaftOperation::PutArtifact {
         artifact_id: "test-artifact-log-1".to_string(),
@@ -640,16 +643,24 @@ async fn test_raft_log_replication_single_node() {
 
     // Verify log index increased
     let new_log_index = raft_node.get_last_log_index().await;
-    assert!(new_log_index >= initial_log_index, "Log index should increase after operation");
+    assert!(
+        new_log_index >= initial_log_index,
+        "Log index should increase after operation"
+    );
 
     // Verify log entries can be read
     let log_entries = raft_node.get_log_entries().await.unwrap();
-    assert!(log_entries.len() > 0, "Log should contain entries after operation");
+    assert!(
+        log_entries.len() > 0,
+        "Log should contain entries after operation"
+    );
 
     // Verify metrics show updated log index
     let metrics = raft_node.get_metrics().await.unwrap();
-    assert!(metrics.contains(&format!("last_log_index: {}", new_log_index)), 
-            "Metrics should show updated log index");
+    assert!(
+        metrics.contains(&format!("last_log_index: {}", new_log_index)),
+        "Metrics should show updated log index"
+    );
 }
 
 #[cfg(feature = "raft")]
@@ -676,12 +687,8 @@ async fn test_raft_log_replication_multiple_operations() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
@@ -712,13 +719,19 @@ async fn test_raft_log_replication_multiple_operations() {
     let log_entries = raft_node.get_log_entries().await.unwrap();
     // Log should contain at least the operations we applied
     // (may contain more if there are initial entries)
-    assert!(log_entries.len() >= num_operations as usize, 
-            "Log should contain at least {} entries", num_operations);
+    assert!(
+        log_entries.len() >= num_operations as usize,
+        "Log should contain at least {} entries",
+        num_operations
+    );
 
     // Verify last log index
     let last_log_index = raft_node.get_last_log_index().await;
-    assert!(last_log_index >= num_operations as u64, 
-            "Last log index should be at least {}", num_operations);
+    assert!(
+        last_log_index >= num_operations as u64,
+        "Last log index should be at least {}",
+        num_operations
+    );
 }
 
 #[cfg(feature = "raft")]
@@ -750,12 +763,8 @@ async fn test_raft_failover_node_removal() {
         heartbeat_interval: 100,
     };
 
-    let raft_node1 = RaidRaftNode::new(
-        raft_config1,
-        raid_manager1.clone(),
-        node1_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node1 =
+        RaidRaftNode::new(raft_config1, raid_manager1.clone(), node1_path.join("raft")).unwrap();
 
     // Setup Node 2
     let raid_config2 = RaidConfig {
@@ -776,18 +785,26 @@ async fn test_raft_failover_node_removal() {
         heartbeat_interval: 100,
     };
 
-    let raft_node2 = RaidRaftNode::new(
-        raft_config2,
-        raid_manager2.clone(),
-        node2_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node2 =
+        RaidRaftNode::new(raft_config2, raid_manager2.clone(), node2_path.join("raft")).unwrap();
 
     // Configure transport for both nodes
-    raft_node1.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node1.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
-    raft_node2.transport().add_node(1, "http://127.0.0.1:8080".to_string()).await;
-    raft_node2.transport().add_node(2, "http://127.0.0.1:8081".to_string()).await;
+    raft_node1
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node1
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
+    raft_node2
+        .transport()
+        .add_node(1, "http://127.0.0.1:8080".to_string())
+        .await;
+    raft_node2
+        .transport()
+        .add_node(2, "http://127.0.0.1:8081".to_string())
+        .await;
 
     // Initialize both nodes
     raft_node1.initialize().await.unwrap();
@@ -796,7 +813,7 @@ async fn test_raft_failover_node_removal() {
     // Verify both nodes are initialized
     let term1_before = raft_node1.current_term().await;
     let term2_before = raft_node2.current_term().await;
-    
+
     assert!(term1_before >= 0);
     assert!(term2_before >= 0);
 
@@ -810,11 +827,17 @@ async fn test_raft_failover_node_removal() {
 
     // Node 1 should still be able to function (though without node 2)
     let term1_after = raft_node1.current_term().await;
-    assert!(term1_after >= term1_before, "Node 1 term should not decrease");
+    assert!(
+        term1_after >= term1_before,
+        "Node 1 term should not decrease"
+    );
 
     // Verify metrics are still accessible
     let metrics1 = raft_node1.get_metrics().await;
-    assert!(metrics1.is_ok(), "Node 1 metrics should still be accessible after failover simulation");
+    assert!(
+        metrics1.is_ok(),
+        "Node 1 metrics should still be accessible after failover simulation"
+    );
 }
 
 #[cfg(feature = "raft")]
@@ -843,12 +866,8 @@ async fn test_raft_failover_continuity() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
@@ -874,13 +893,16 @@ async fn test_raft_failover_continuity() {
 
     // Simulate "failover" by checking metrics
     let metrics_before = raft_node.get_metrics().await.unwrap();
-    
+
     // Wait a bit (simulating recovery time)
     tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
 
     // Verify node is still leader after "failover"
     let still_leader = raft_node.is_leader().await;
-    assert!(still_leader, "Node should still be leader after failover simulation");
+    assert!(
+        still_leader,
+        "Node should still be leader after failover simulation"
+    );
 
     // Apply an operation after "failover"
     let operation2 = RaidRaftOperation::PutArtifact {
@@ -897,11 +919,17 @@ async fn test_raft_failover_continuity() {
 
     // Verify log index increased
     let log_index_after = raft_node.get_last_log_index().await;
-    assert!(log_index_after > log_index_before, "Log index should increase after operation");
+    assert!(
+        log_index_after > log_index_before,
+        "Log index should increase after operation"
+    );
 
     // Verify metrics are still accessible
     let metrics_after = raft_node.get_metrics().await.unwrap();
-    assert!(metrics_after.contains("term:"), "Metrics should still be accessible");
+    assert!(
+        metrics_after.contains("term:"),
+        "Metrics should still be accessible"
+    );
 }
 
 #[cfg(feature = "raft")]
@@ -928,12 +956,8 @@ async fn test_raft_failover_term_consistency() {
         heartbeat_interval: 100,
     };
 
-    let raft_node = RaidRaftNode::new(
-        raft_config,
-        raid_manager.clone(),
-        storage_path.join("raft"),
-    )
-    .unwrap();
+    let raft_node =
+        RaidRaftNode::new(raft_config, raid_manager.clone(), storage_path.join("raft")).unwrap();
 
     raft_node.initialize().await.unwrap();
 
@@ -962,7 +986,10 @@ async fn test_raft_failover_term_consistency() {
 
     // Verify term consistency (term should not decrease)
     let term_after = raft_node.current_term().await;
-    assert!(term_after >= initial_term, "Term should not decrease after operations");
+    assert!(
+        term_after >= initial_term,
+        "Term should not decrease after operations"
+    );
 
     // Verify leader is still the same
     let leader = raft_node.get_current_leader().await;
@@ -972,4 +999,3 @@ async fn test_raft_failover_term_consistency() {
     let role = raft_node.current_role().await;
     assert_eq!(role, "Leader", "Role should remain Leader");
 }
-

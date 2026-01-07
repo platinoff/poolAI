@@ -4,7 +4,9 @@
 //! to compile and run on platforms where isolation is not yet implemented.
 
 use crate::core::error::AppError;
-use crate::vm::isolation::{FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator};
+use crate::vm::isolation::{
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
+};
 
 /// No-op network isolator for unsupported platforms
 pub struct NoopNetworkIsolator;
@@ -63,4 +65,3 @@ impl FilesystemIsolator for NoopFilesystemIsolator {
         false
     }
 }
-

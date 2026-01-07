@@ -1248,4 +1248,3 @@ pub fn get_component_styles() -> String {
         TOUCH_GESTURE_STYLES
     )
 }
-

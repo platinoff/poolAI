@@ -89,10 +89,16 @@ async fn test_network_isolation_support_detection() {
     // On Linux/Windows, should be true (even if not fully implemented)
     // On other platforms, should be false
     #[cfg(any(target_os = "linux", target_os = "windows"))]
-    assert!(supported, "Network isolation should be supported on Linux/Windows");
+    assert!(
+        supported,
+        "Network isolation should be supported on Linux/Windows"
+    );
 
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
-    assert!(!supported, "Network isolation should not be supported on unsupported platforms");
+    assert!(
+        !supported,
+        "Network isolation should not be supported on unsupported platforms"
+    );
 }
 
 #[tokio::test]
@@ -103,10 +109,16 @@ async fn test_filesystem_isolation_support_detection() {
     // On Linux/Windows, should be true (even if not fully implemented)
     // On other platforms, should be false
     #[cfg(any(target_os = "linux", target_os = "windows"))]
-    assert!(supported, "Filesystem isolation should be supported on Linux/Windows");
+    assert!(
+        supported,
+        "Filesystem isolation should be supported on Linux/Windows"
+    );
 
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
-    assert!(!supported, "Filesystem isolation should not be supported on unsupported platforms");
+    assert!(
+        !supported,
+        "Filesystem isolation should not be supported on unsupported platforms"
+    );
 }
 
 #[tokio::test]
@@ -150,7 +162,10 @@ async fn test_filesystem_isolation_remove() {
 
     // Removing isolation should always succeed (even if not applied)
     let result = isolator.remove_filesystem_isolation(12345);
-    assert!(result.is_ok(), "Removing filesystem isolation should succeed");
+    assert!(
+        result.is_ok(),
+        "Removing filesystem isolation should succeed"
+    );
 }
 
 #[tokio::test]
@@ -166,7 +181,10 @@ async fn test_network_isolation_apply_enabled() {
 
     // Should succeed (even if not fully implemented, placeholders return Ok)
     let result = isolator.apply_network_isolation(12345, &config);
-    assert!(result.is_ok(), "Applying network isolation should succeed (placeholder)");
+    assert!(
+        result.is_ok(),
+        "Applying network isolation should succeed (placeholder)"
+    );
 }
 
 #[tokio::test]
@@ -183,7 +201,10 @@ async fn test_network_isolation_apply_invalid_config() {
 
     // Should fail validation
     let result = isolator.apply_network_isolation(12345, &config);
-    assert!(result.is_err(), "Network isolation with blocking config should fail validation");
+    assert!(
+        result.is_err(),
+        "Network isolation with blocking config should fail validation"
+    );
 }
 
 #[tokio::test]
@@ -199,7 +220,10 @@ async fn test_network_isolation_apply_invalid_process_id() {
 
     // Should fail with invalid process ID
     let result = isolator.apply_network_isolation(0, &config);
-    assert!(result.is_err(), "Network isolation with process ID 0 should fail");
+    assert!(
+        result.is_err(),
+        "Network isolation with process ID 0 should fail"
+    );
 }
 
 #[tokio::test]
@@ -216,7 +240,10 @@ async fn test_filesystem_isolation_apply_invalid_process_id() {
 
     // Should fail with invalid process ID
     let result = isolator.apply_filesystem_isolation(0, &config);
-    assert!(result.is_err(), "Filesystem isolation with process ID 0 should fail");
+    assert!(
+        result.is_err(),
+        "Filesystem isolation with process ID 0 should fail"
+    );
 }
 
 #[tokio::test]
@@ -227,13 +254,16 @@ async fn test_filesystem_isolation_apply_chroot_without_root_dir() {
         root_dir: None,
         allowed_paths: vec![],
         read_only_paths: vec![],
-        use_chroot: true,  // Requires root_dir
+        use_chroot: true, // Requires root_dir
         strict: false,
     };
 
     // Should fail validation
     let result = isolator.apply_filesystem_isolation(12345, &config);
-    assert!(result.is_err(), "Filesystem isolation with use_chroot but no root_dir should fail");
+    assert!(
+        result.is_err(),
+        "Filesystem isolation with use_chroot but no root_dir should fail"
+    );
 }
 
 #[tokio::test]
@@ -249,13 +279,16 @@ async fn test_network_isolation_graceful_degradation() {
 
     // Should succeed even if system calls fail (graceful degradation)
     let result = isolator.apply_network_isolation(12345, &config);
-    assert!(result.is_ok(), "Network isolation should succeed with graceful degradation");
+    assert!(
+        result.is_ok(),
+        "Network isolation should succeed with graceful degradation"
+    );
 }
 
 #[tokio::test]
 async fn test_filesystem_isolation_graceful_degradation() {
     use std::path::PathBuf;
-    
+
     let isolator = PlatformFilesystemIsolator::new();
     let config = FilesystemIsolationConfig {
         enabled: true,
@@ -268,7 +301,10 @@ async fn test_filesystem_isolation_graceful_degradation() {
 
     // Should succeed even if system calls fail (graceful degradation)
     let result = isolator.apply_filesystem_isolation(12345, &config);
-    assert!(result.is_ok(), "Filesystem isolation should succeed with graceful degradation");
+    assert!(
+        result.is_ok(),
+        "Filesystem isolation should succeed with graceful degradation"
+    );
 }
 
 #[tokio::test]
@@ -286,7 +322,10 @@ async fn test_network_isolation_loopback_setup() {
     // Note: On Windows or without root, this may only validate config
     let result = isolator.apply_network_isolation(12345, &config);
     // Should succeed (either actually set up loopback or gracefully degrade)
-    assert!(result.is_ok(), "Network isolation with loopback should succeed");
+    assert!(
+        result.is_ok(),
+        "Network isolation with loopback should succeed"
+    );
 }
 
 #[tokio::test]
@@ -302,23 +341,22 @@ async fn test_network_isolation_no_loopback() {
 
     // Should succeed even without loopback (other interfaces allowed)
     let result = isolator.apply_network_isolation(12345, &config);
-    assert!(result.is_ok(), "Network isolation without loopback should succeed if other interfaces allowed");
+    assert!(
+        result.is_ok(),
+        "Network isolation without loopback should succeed if other interfaces allowed"
+    );
 }
 
 #[tokio::test]
 async fn test_filesystem_isolation_bind_mounts() {
     use std::path::PathBuf;
-    
+
     let isolator = PlatformFilesystemIsolator::new();
     let config = FilesystemIsolationConfig {
         enabled: true,
         root_dir: None, // No chroot, just bind mounts
-        allowed_paths: vec![
-            PathBuf::from("/tmp/test-allowed"),
-        ],
-        read_only_paths: vec![
-            PathBuf::from("/tmp/test-readonly"),
-        ],
+        allowed_paths: vec![PathBuf::from("/tmp/test-allowed")],
+        read_only_paths: vec![PathBuf::from("/tmp/test-readonly")],
         use_chroot: false,
         strict: false,
     };
@@ -326,13 +364,16 @@ async fn test_filesystem_isolation_bind_mounts() {
     // Should succeed (either actually set up bind mounts or gracefully degrade)
     // Note: On Windows or without root, this may only validate config
     let result = isolator.apply_filesystem_isolation(12345, &config);
-    assert!(result.is_ok(), "Filesystem isolation with bind mounts should succeed");
+    assert!(
+        result.is_ok(),
+        "Filesystem isolation with bind mounts should succeed"
+    );
 }
 
 #[tokio::test]
 async fn test_filesystem_isolation_read_only_mounts() {
     use std::path::PathBuf;
-    
+
     let isolator = PlatformFilesystemIsolator::new();
     let config = FilesystemIsolationConfig {
         enabled: true,
@@ -348,7 +389,10 @@ async fn test_filesystem_isolation_read_only_mounts() {
 
     // Should succeed with read-only mounts
     let result = isolator.apply_filesystem_isolation(12345, &config);
-    assert!(result.is_ok(), "Filesystem isolation with read-only mounts should succeed");
+    assert!(
+        result.is_ok(),
+        "Filesystem isolation with read-only mounts should succeed"
+    );
 }
 
 #[tokio::test]
@@ -367,6 +411,8 @@ async fn test_filesystem_isolation_apply_enabled() {
 
     // Should succeed (even if not fully implemented, placeholders return Ok)
     let result = isolator.apply_filesystem_isolation(12345, &config);
-    assert!(result.is_ok(), "Applying filesystem isolation should succeed (placeholder)");
+    assert!(
+        result.is_ok(),
+        "Applying filesystem isolation should succeed (placeholder)"
+    );
 }
-

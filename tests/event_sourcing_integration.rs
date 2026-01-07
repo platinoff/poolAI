@@ -7,11 +7,14 @@
 //! - Snapshot creation and loading
 //! - Event queries (by artifact, time range)
 
-use poolai::raid::{events::{EventStore, RaidEvent, Snapshot}, RaidConfig, RaidManager, RaidMode};
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use tempfile::TempDir;
 use chrono::Utc;
+use poolai::raid::{
+    events::{EventStore, RaidEvent, Snapshot},
+    RaidConfig, RaidManager, RaidMode,
+};
+use std::sync::Arc;
+use tempfile::TempDir;
+use tokio::sync::RwLock;
 
 #[tokio::test]
 async fn test_event_store_creation() {
@@ -22,8 +25,14 @@ async fn test_event_store_creation() {
     event_store.initialize().await.unwrap();
 
     // Verify paths
-    assert!(event_store.event_log_path().to_string_lossy().contains("events.log"));
-    assert!(event_store.snapshot_path().to_string_lossy().contains("snapshot.json"));
+    assert!(event_store
+        .event_log_path()
+        .to_string_lossy()
+        .contains("events.log"));
+    assert!(event_store
+        .snapshot_path()
+        .to_string_lossy()
+        .contains("snapshot.json"));
 }
 
 #[tokio::test]
@@ -78,11 +87,14 @@ async fn test_event_replay() {
 
     // Replay events
     let mut replayed_count = 0;
-    event_store.replay_events(|event| {
-        replayed_count += 1;
-        assert!(event.sequence > 0);
-        Ok(())
-    }).await.unwrap();
+    event_store
+        .replay_events(|event| {
+            replayed_count += 1;
+            assert!(event.sequence > 0);
+            Ok(())
+        })
+        .await
+        .unwrap();
 
     assert_eq!(replayed_count, 5);
 }
@@ -107,7 +119,10 @@ async fn test_event_queries() {
     }
 
     // Query events for specific artifact
-    let events = event_store.get_events_for_artifact("artifact-1").await.unwrap();
+    let events = event_store
+        .get_events_for_artifact("artifact-1")
+        .await
+        .unwrap();
     assert_eq!(events.len(), 1);
     match &events[0].event {
         RaidEvent::ArtifactCreated { artifact_id, .. } => {
@@ -138,8 +153,18 @@ async fn test_snapshot_creation() {
     raid_manager.write().await.initialize().await.unwrap();
 
     // Create some artifacts
-    raid_manager.write().await.put_artifact("test1", b"data1").await.unwrap();
-    raid_manager.write().await.put_artifact("test2", b"data2").await.unwrap();
+    raid_manager
+        .write()
+        .await
+        .put_artifact("test1", b"data1")
+        .await
+        .unwrap();
+    raid_manager
+        .write()
+        .await
+        .put_artifact("test2", b"data2")
+        .await
+        .unwrap();
 
     // Create snapshot
     raid_manager.write().await.create_snapshot().await.unwrap();
@@ -185,17 +210,20 @@ async fn test_snapshot_replay() {
 
     let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
     raid_manager.write().await.initialize().await.unwrap();
-    
+
     // Create snapshot
     raid_manager.write().await.create_snapshot().await.unwrap();
 
     // Replay events since snapshot
     let event_store_opt = raid_manager.read().await.event_store();
     if let Some(event_store) = event_store_opt {
-        let start_sequence = event_store.read().await.replay_events_since_snapshot(|_event| {
-            Ok(())
-        }).await.unwrap();
-        
+        let start_sequence = event_store
+            .read()
+            .await
+            .replay_events_since_snapshot(|_event| Ok(()))
+            .await
+            .unwrap();
+
         // Should start from snapshot sequence (0 if no snapshot, or snapshot sequence)
         assert!(start_sequence >= 0);
     }
@@ -226,7 +254,10 @@ async fn test_event_time_range() {
     let end_time = Utc::now();
 
     // Query events in time range
-    let events = event_store.get_events_in_range(start_time, end_time).await.unwrap();
+    let events = event_store
+        .get_events_in_range(start_time, end_time)
+        .await
+        .unwrap();
     assert_eq!(events.len(), 3);
 }
 
@@ -247,20 +278,30 @@ async fn test_event_integration_with_raid_manager() {
     raid_manager.write().await.initialize().await.unwrap();
 
     // Create artifacts (should generate events)
-    raid_manager.write().await.put_artifact("test1", b"data1").await.unwrap();
-    raid_manager.write().await.put_artifact("test2", b"data2").await.unwrap();
+    raid_manager
+        .write()
+        .await
+        .put_artifact("test1", b"data1")
+        .await
+        .unwrap();
+    raid_manager
+        .write()
+        .await
+        .put_artifact("test2", b"data2")
+        .await
+        .unwrap();
 
     // Verify events were created
     let event_store_opt = raid_manager.read().await.event_store();
     if let Some(event_store) = event_store_opt {
         let events = event_store.read().await.load_events().await.unwrap();
         assert!(events.len() >= 2); // At least 2 ArtifactCreated events
-        
+
         // Verify artifact events
-        let artifact_events: Vec<_> = events.iter()
+        let artifact_events: Vec<_> = events
+            .iter()
             .filter(|e| matches!(&e.event, RaidEvent::ArtifactCreated { .. }))
             .collect();
         assert!(artifact_events.len() >= 2);
     }
 }
-

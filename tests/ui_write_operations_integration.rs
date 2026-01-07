@@ -59,13 +59,7 @@ async fn test_validate_artifact_name_failure() {
 async fn test_validate_worker_id_success() {
     // Test valid worker IDs
     let long_id = "a".repeat(64);
-    let valid_ids = vec![
-        "worker-1",
-        "worker_1",
-        "worker123",
-        "w",
-        long_id.as_str(),
-    ];
+    let valid_ids = vec!["worker-1", "worker_1", "worker123", "w", long_id.as_str()];
 
     for id in valid_ids {
         assert!(
@@ -162,7 +156,7 @@ async fn test_validate_base64_data_success() {
 async fn test_validate_base64_data_failure() {
     // Test invalid base64 data
     let invalid_cases = vec![
-        ("", 100_000_000), // Empty data
+        ("", 100_000_000),  // Empty data
         (" ", 100_000_000), // Whitespace only
         // Large data test - create a base64 string that exceeds limit
         // Note: We can't easily create a huge base64 string in test, so we test with small limit
@@ -172,10 +166,7 @@ async fn test_validate_base64_data_failure() {
     for (data, max_size) in invalid_cases {
         let result = validation::validate_base64_data(data, max_size);
         if data.trim().is_empty() {
-            assert!(
-                result.is_err(),
-                "Empty base64 data should be invalid"
-            );
+            assert!(result.is_err(), "Empty base64 data should be invalid");
         } else {
             assert!(
                 result.is_err(),
@@ -189,12 +180,12 @@ async fn test_validate_base64_data_failure() {
 async fn test_validate_worker_config_success() {
     // Test valid worker configuration
     let result = validation::validate_worker_config(
-        10,    // max_concurrent_requests (1-1000)
-        5000,  // request_timeout_ms (100-300000)
-        1000,  // health_check_interval_ms (100-60000)
-        1000,  // cache_size (100-100000)
-        2048,  // max_memory_mb (256-131072)
-        5,     // cpu_priority (1-10)
+        10,   // max_concurrent_requests (1-1000)
+        5000, // request_timeout_ms (100-300000)
+        1000, // health_check_interval_ms (100-60000)
+        1000, // cache_size (100-100000)
+        2048, // max_memory_mb (256-131072)
+        5,    // cpu_priority (1-10)
     );
 
     assert!(result.is_ok(), "Valid worker config should pass validation");
@@ -205,14 +196,54 @@ async fn test_validate_worker_config_failure() {
     // Test invalid worker configuration values
     let invalid_cases = vec![
         // max_concurrent_requests out of range
-        (0, 5000, 1000, 1000, 2048, 5, "max_concurrent_requests too low"),
-        (1001, 5000, 1000, 1000, 2048, 5, "max_concurrent_requests too high"),
+        (
+            0,
+            5000,
+            1000,
+            1000,
+            2048,
+            5,
+            "max_concurrent_requests too low",
+        ),
+        (
+            1001,
+            5000,
+            1000,
+            1000,
+            2048,
+            5,
+            "max_concurrent_requests too high",
+        ),
         // request_timeout_ms out of range
         (10, 99, 1000, 1000, 2048, 5, "request_timeout_ms too low"),
-        (10, 300_001, 1000, 1000, 2048, 5, "request_timeout_ms too high"),
+        (
+            10,
+            300_001,
+            1000,
+            1000,
+            2048,
+            5,
+            "request_timeout_ms too high",
+        ),
         // health_check_interval_ms out of range
-        (10, 5000, 99, 1000, 2048, 5, "health_check_interval_ms too low"),
-        (10, 5000, 60_001, 1000, 2048, 5, "health_check_interval_ms too high"),
+        (
+            10,
+            5000,
+            99,
+            1000,
+            2048,
+            5,
+            "health_check_interval_ms too low",
+        ),
+        (
+            10,
+            5000,
+            60_001,
+            1000,
+            2048,
+            5,
+            "health_check_interval_ms too high",
+        ),
         // cache_size out of range
         (10, 5000, 1000, 99, 2048, 5, "cache_size too low"),
         (10, 5000, 1000, 100_001, 2048, 5, "cache_size too high"),
@@ -225,9 +256,8 @@ async fn test_validate_worker_config_failure() {
     ];
 
     for (max_req, timeout, health, cache, memory, priority, reason) in invalid_cases {
-        let result = validation::validate_worker_config(
-            max_req, timeout, health, cache, memory, priority,
-        );
+        let result =
+            validation::validate_worker_config(max_req, timeout, health, cache, memory, priority);
         assert!(
             result.is_err(),
             "Invalid worker config should fail validation: {}",
@@ -240,7 +270,7 @@ async fn test_validate_worker_config_failure() {
 async fn test_validate_artifact_data_size_success() {
     // Test valid artifact data sizes
     let valid_cases = vec![
-        (1, 100_000_000),        // 1 byte within 100MB limit
+        (1, 100_000_000),           // 1 byte within 100MB limit
         (100_000_000, 100_000_000), // Exactly at limit
         (50_000_000, 100_000_000),  // 50MB within limit
     ];
@@ -314,4 +344,3 @@ async fn test_validate_range_failure() {
         );
     }
 }
-

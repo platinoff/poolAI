@@ -78,11 +78,11 @@ pub mod client;
 pub mod events;
 pub mod manifest;
 pub mod protocol;
-pub mod replication;
 #[cfg(feature = "raft")]
 pub mod raft;
 #[cfg(feature = "raft")]
 pub mod raft_transport;
+pub mod replication;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RaidMode {
@@ -151,10 +151,10 @@ pub struct RaidManager {
 impl RaidManager {
     pub fn new(config: RaidConfig) -> Self {
         // Initialize event store if enabled (for now, always create it)
-        let event_store = Some(Arc::new(RwLock::new(
-            EventStore::new(config.base_path.join("events"))
-        )));
-        
+        let event_store = Some(Arc::new(RwLock::new(EventStore::new(
+            config.base_path.join("events"),
+        ))));
+
         Self {
             config: Arc::new(RwLock::new(config)),
             nodes: Arc::new(RwLock::new(Vec::new())),
@@ -201,14 +201,18 @@ impl RaidManager {
 
     pub async fn shutdown(&self) -> Result<(), AppError> {
         info!("Shutting down RAID manager");
-        
+
         // Create snapshot before shutdown
         if let Some(ref event_store) = self.event_store {
             let artifacts = self.artifacts.read().await.clone();
             let nodes = self.nodes.read().await.clone();
-            let _ = event_store.write().await.create_snapshot(&artifacts, &nodes).await;
+            let _ = event_store
+                .write()
+                .await
+                .create_snapshot(&artifacts, &nodes)
+                .await;
         }
-        
+
         Ok(())
     }
 
@@ -217,7 +221,11 @@ impl RaidManager {
         if let Some(ref event_store) = self.event_store {
             let artifacts = self.artifacts.read().await.clone();
             let nodes = self.nodes.read().await.clone();
-            event_store.write().await.create_snapshot(&artifacts, &nodes).await?;
+            event_store
+                .write()
+                .await
+                .create_snapshot(&artifacts, &nodes)
+                .await?;
             info!("Snapshot created successfully");
         }
         Ok(())
@@ -289,12 +297,16 @@ impl RaidManager {
                 "size": bytes.len(),
                 "path": artifact.path.to_string_lossy(),
             });
-            let _ = event_store.write().await.append_event(RaidEvent::ArtifactCreated {
-                artifact_id: id.to_string(),
-                node_id: 0, // TODO: Get actual node ID from Raft
-                timestamp: Utc::now(),
-                metadata,
-            }).await;
+            let _ = event_store
+                .write()
+                .await
+                .append_event(RaidEvent::ArtifactCreated {
+                    artifact_id: id.to_string(),
+                    node_id: 0, // TODO: Get actual node ID from Raft
+                    timestamp: Utc::now(),
+                    metadata,
+                })
+                .await;
         }
         self.persist_manifest().await?;
 

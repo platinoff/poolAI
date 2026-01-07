@@ -231,4 +231,3 @@ pub fn get_theme(name: &str) -> &'static Theme {
 pub fn get_all_themes() -> Vec<&'static Theme> {
     vec![&DARK_THEME, &LIGHT_THEME, &HIGH_CONTRAST_THEME]
 }
-

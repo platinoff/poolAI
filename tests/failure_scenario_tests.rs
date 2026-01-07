@@ -8,6 +8,7 @@
 //! - Circuit breaker integration with failures
 //! - Quorum availability during failures
 
+use chrono::Utc;
 use poolai::core::error::AppError;
 use poolai::raid::{
     circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitState},
@@ -22,9 +23,8 @@ use poolai::raid::{
 };
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use tempfile::TempDir;
-use chrono::Utc;
+use tokio::sync::RwLock;
 
 /// Helper function to create a test RAID manager
 fn create_test_raid_manager(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<RaidManager>> {
@@ -168,10 +168,7 @@ async fn test_circuit_breaker_recovery() {
     assert_eq!(breaker.state().await, CircuitState::Open);
 
     // Wait for recovery timeout (timeout_seconds)
-    tokio::time::sleep(tokio::time::Duration::from_secs(
-        config.timeout_seconds + 1,
-    ))
-    .await;
+    tokio::time::sleep(tokio::time::Duration::from_secs(config.timeout_seconds + 1)).await;
 
     // Circuit should transition to half-open
     // (In real scenario, would need to check after timeout)
@@ -409,4 +406,3 @@ async fn test_network_partition_scenario() {
         assert!(partition1_nodes.contains(node_id));
     }
 }
-
