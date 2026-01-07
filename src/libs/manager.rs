@@ -472,6 +472,19 @@ impl LibraryManager {
         Ok(registry.get_download_url(name, version))
     }
 
+    /// Determine library type from registry metadata or library name
+    async fn determine_library_type(&self, name: &str) -> LibraryType {
+        // Use heuristics based on library name
+        let name_lower = name.to_lowercase();
+        if name_lower.contains("torch") || name_lower.contains("tensorflow") || name_lower.contains("onnx") {
+            LibraryType::ModelLibrary
+        } else if name_lower.starts_with("lib") || name_lower.contains("native") {
+            LibraryType::NativeLibrary
+        } else {
+            LibraryType::CustomLibrary
+        }
+    }
+
     /// Verify library installation
     async fn verify_installation(&self, library_dir: &PathBuf, name: &str) -> Result<(), AppError> {
         // Check if library directory exists and is not empty
