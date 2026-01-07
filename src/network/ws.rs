@@ -255,7 +255,11 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
                             };
 
                             if let Ok(json) = serde_json::to_string(&error_msg) {
-                                let _ = sender.send(Message::Text(json)).await;
+                                // Send error message through channel
+                                let tx_clone = WS_MANAGER.senders.read().await.get(&connection_id).cloned();
+                                if let Some(tx) = tx_clone {
+                                    let _ = tx.send(Message::Text(json));
+                                }
                             }
                         }
                     }
@@ -265,9 +269,12 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
                 break;
             }
             Ok(Message::Ping(data)) => {
-                // Відповідаємо на ping
-                if let Err(_) = sender.send(Message::Pong(data)).await {
-                    break;
+                // Відповідаємо на ping через channel
+                let tx_clone = WS_MANAGER.senders.read().await.get(&connection_id).cloned();
+                if let Some(tx) = tx_clone {
+                    if tx.send(Message::Pong(data)).is_err() {
+                        break;
+                    }
                 }
             }
             _ => {}
