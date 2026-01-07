@@ -95,6 +95,27 @@ pub struct HealthConfig {
     pub expected_workers: usize,
 }
 
+/// HTTPS/TLS configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HttpsConfig {
+    /// Enable HTTPS (requires feature "https")
+    pub enabled: bool,
+    /// Certificate file path (PEM format)
+    pub cert_path: Option<String>,
+    /// Private key file path (PEM format)
+    pub key_path: Option<String>,
+}
+
+impl Default for HttpsConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            cert_path: Some("certs/cert.pem".to_string()),
+            key_path: Some("certs/key.pem".to_string()),
+        }
+    }
+}
+
 /// Main PoolAI configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoolAIConfig {
@@ -110,6 +131,8 @@ pub struct PoolAIConfig {
     pub version: VersionConfig,
     /// Health check configuration
     pub health: HealthConfig,
+    /// HTTPS/TLS configuration
+    pub https: HttpsConfig,
 }
 
 impl Default for PoolAIConfig {
@@ -150,6 +173,7 @@ impl Default for PoolAIConfig {
             health: HealthConfig {
                 expected_workers: 8,
             },
+            https: HttpsConfig::default(),
         }
     }
 }

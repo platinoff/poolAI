@@ -28,8 +28,8 @@ use axum_server::tls_rustls::RustlsConfig;
 /// * `addr` - Socket address to bind the server to
 ///
 /// # Note
-/// HTTPS support is currently disabled due to build toolchain issues.
-/// TODO: Read HTTPS configuration from config file
+/// HTTPS support requires feature "https" and valid certificates.
+/// Configuration is read from PoolAIConfig.
 pub async fn start_server(addr: SocketAddr) {
     let app = Router::new()
         // Trailing-slash compat for UI entrypoint.
@@ -37,20 +37,38 @@ pub async fn start_server(addr: SocketAddr) {
         .nest("/api/v1", api::create_api_routes())
         .nest("/ui", ui::create_ui_routes());
 
-    // TODO: Read from configuration file
+    // Read HTTPS configuration from config file
     // HTTPS support is optional and requires feature "https"
     // For production, use: cargo build --features https
     // Note: Requires native toolchain (gcc/dlltool on Windows GNU)
 
     #[cfg(feature = "https")]
     {
-        // HTTPS mode - requires certificates
-        // TODO: Read cert paths from config
+        // HTTPS mode - read configuration from config file
+        use crate::core::config::get_config;
         use tracing::warn;
-        let cert_path =
-            std::env::var("HTTPS_CERT_PATH").unwrap_or_else(|_| "certs/cert.pem".to_string());
-        let key_path =
-            std::env::var("HTTPS_KEY_PATH").unwrap_or_else(|_| "certs/key.pem".to_string());
+
+        let https_config = get_config()
+            .map(|config| config.https.clone())
+            .unwrap_or_default();
+
+        if !https_config.enabled {
+            info!("HTTPS is disabled in configuration, starting HTTP server");
+            let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+            info!("Server listening on {}", addr);
+            axum::serve(listener, app).await.unwrap();
+            return;
+        }
+
+        // Get certificate paths from config or environment variables
+        let cert_path = https_config
+            .cert_path
+            .or_else(|| std::env::var("HTTPS_CERT_PATH").ok())
+            .unwrap_or_else(|| "certs/cert.pem".to_string());
+        let key_path = https_config
+            .key_path
+            .or_else(|| std::env::var("HTTPS_KEY_PATH").ok())
+            .unwrap_or_else(|| "certs/key.pem".to_string());
 
         match RustlsConfig::from_pem_file(&cert_path, &key_path).await {
             Ok(config) => {
