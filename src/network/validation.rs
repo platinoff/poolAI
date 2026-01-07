@@ -196,3 +196,198 @@ pub fn validate_artifact_data_size(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_validate_worker_id_success() {
+        let valid_ids = vec![
+            "worker1",
+            "worker-123",
+            "worker_456",
+            "w1",
+            "a".repeat(64).as_str(),
+        ];
+
+        for id in valid_ids {
+            assert!(
+                validate_worker_id(id).is_ok(),
+                "Worker ID '{}' should be valid",
+                id
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_worker_id_failure() {
+        let invalid_cases = vec![
+            ("", "empty"),
+            (" ", "whitespace only"),
+            ("-invalid", "starts with hyphen"),
+            ("_invalid", "starts with underscore"),
+            ("invalid@id", "contains invalid character"),
+            ("invalid id", "contains space"),
+            ("a".repeat(65).as_str(), "too long"),
+        ];
+
+        for (id, reason) in invalid_cases {
+            assert!(
+                validate_worker_id(id).is_err(),
+                "Worker ID '{}' should be invalid: {}",
+                id,
+                reason
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_artifact_name_success() {
+        let valid_names = vec![
+            "my-model-v1",
+            "model_weights_2024",
+            "library-1.2.3",
+            "test123",
+            "a",
+            "a".repeat(255).as_str(),
+        ];
+
+        for name in valid_names {
+            assert!(
+                validate_artifact_name(name).is_ok(),
+                "Artifact name '{}' should be valid",
+                name
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_artifact_name_failure() {
+        let invalid_cases = vec![
+            ("", "empty"),
+            (" ", "whitespace only"),
+            ("-invalid", "starts with hyphen"),
+            ("_invalid", "starts with underscore"),
+            (".invalid", "starts with dot"),
+            ("invalid@name", "contains invalid character"),
+            ("invalid name", "contains space"),
+            ("a".repeat(256).as_str(), "too long"),
+        ];
+
+        for (name, reason) in invalid_cases {
+            assert!(
+                validate_artifact_name(name).is_err(),
+                "Artifact name '{}' should be invalid: {}",
+                name,
+                reason
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_range_success() {
+        assert!(validate_range(5, 1, 10, "value").is_ok());
+        assert!(validate_range(1, 1, 10, "value").is_ok());
+        assert!(validate_range(10, 1, 10, "value").is_ok());
+        assert!(validate_range(5.5, 1.0, 10.0, "value").is_ok());
+    }
+
+    #[test]
+    fn test_validate_range_failure() {
+        assert!(validate_range(0, 1, 10, "value").is_err());
+        assert!(validate_range(11, 1, 10, "value").is_err());
+        assert!(validate_range(0.5, 1.0, 10.0, "value").is_err());
+        assert!(validate_range(10.5, 1.0, 10.0, "value").is_err());
+    }
+
+    #[test]
+    fn test_validate_base64_data_success() {
+        let valid_data = "SGVsbG8gV29ybGQ="; // "Hello World" in base64
+        assert!(validate_base64_data(valid_data, 1000).is_ok());
+        assert!(validate_base64_data("dGVzdA==", 1000).is_ok()); // "test" in base64
+    }
+
+    #[test]
+    fn test_validate_base64_data_failure() {
+        assert!(validate_base64_data("", 1000).is_err());
+        assert!(validate_base64_data(" ", 1000).is_err());
+        // Test with data that exceeds size limit
+        let large_data = "A".repeat(1_000_000);
+        assert!(validate_base64_data(&large_data, 1000).is_err());
+    }
+
+    #[test]
+    fn test_validate_uuid_success() {
+        let valid_uuids = vec![
+            "550e8400-e29b-41d4-a716-446655440000",
+            "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+            "00000000-0000-0000-0000-000000000000",
+        ];
+
+        for uuid_str in valid_uuids {
+            assert!(
+                validate_uuid(uuid_str).is_ok(),
+                "UUID '{}' should be valid",
+                uuid_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_uuid_failure() {
+        let invalid_uuids = vec![
+            "",
+            "not-a-uuid",
+            "550e8400-e29b-41d4-a716",
+            "550e8400-e29b-41d4-a716-446655440000-extra",
+        ];
+
+        for uuid_str in invalid_uuids {
+            assert!(
+                validate_uuid(uuid_str).is_err(),
+                "UUID '{}' should be invalid",
+                uuid_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_validate_worker_config_success() {
+        assert!(validate_worker_config(
+            100,      // max_concurrent_requests
+            5000,     // request_timeout_ms
+            1000,     // health_check_interval_ms
+            1000,     // cache_size
+            4096,     // max_memory_mb
+            5         // cpu_priority
+        )
+        .is_ok());
+    }
+
+    #[test]
+    fn test_validate_worker_config_failure() {
+        // Test each invalid parameter
+        assert!(validate_worker_config(0, 5000, 1000, 1000, 4096, 5).is_err()); // max_concurrent_requests too low
+        assert!(validate_worker_config(1001, 5000, 1000, 1000, 4096, 5).is_err()); // max_concurrent_requests too high
+        assert!(validate_worker_config(100, 50, 1000, 1000, 4096, 5).is_err()); // request_timeout_ms too low
+        assert!(validate_worker_config(100, 5000, 50, 1000, 4096, 5).is_err()); // health_check_interval_ms too low
+        assert!(validate_worker_config(100, 5000, 1000, 50, 4096, 5).is_err()); // cache_size too low
+        assert!(validate_worker_config(100, 5000, 1000, 1000, 128, 5).is_err()); // max_memory_mb too low
+        assert!(validate_worker_config(100, 5000, 1000, 1000, 4096, 0).is_err()); // cpu_priority too low
+        assert!(validate_worker_config(100, 5000, 1000, 1000, 4096, 11).is_err()); // cpu_priority too high
+    }
+
+    #[test]
+    fn test_validate_artifact_data_size_success() {
+        assert!(validate_artifact_data_size(100, 1000).is_ok());
+        assert!(validate_artifact_data_size(1000, 1000).is_ok());
+        assert!(validate_artifact_data_size(1, 1000).is_ok());
+    }
+
+    #[test]
+    fn test_validate_artifact_data_size_failure() {
+        assert!(validate_artifact_data_size(0, 1000).is_err());
+        assert!(validate_artifact_data_size(1001, 1000).is_err());
+    }
+}
