@@ -1,6 +1,6 @@
 # PoolAI Concept (v5, 2025) - Complete Rust Architecture! 🚀
 
-## 🎯 Current Status: Stage 4.1 COMPLETED! UI Module 99% Complete! VM Module 99.5% Complete! Stage 4.2 & 4.4 PLANNED
+## 🎯 Current Status: Stage 4.1 COMPLETED! UI Module 99% Complete! VM Module 99.5% Complete! Documentation Improvements Complete! Stage 4.2 & 4.4 PLANNED
 
 ### ✅ What's Implemented:
 
@@ -72,7 +72,18 @@
     - ✅ Touch optimizations (swipe gestures, touch feedback)
   - ✅ **UI Alignment Improvements** - **COMPLETED** 🎉
     - ✅ Box-sizing, table containers, proper spacing, auto-alignment to borders
+  - ✅ **Global Search** - **COMPLETED** 🎉
+    - ✅ Ctrl+K/Cmd+K shortcut for global search
+    - ✅ Modal window with keyboard navigation
+    - ✅ ARIA labels and roles for accessibility
 - ✅ **Raft Consensus** - Distributed RAID consensus (all 6 phases complete)
+- ✅ **Documentation Improvements** - **COMPLETED** 🎉
+  - ✅ Enhanced TODO comments in runtime module (Windows process priority, restart logic)
+  - ✅ Enhanced TODO comments in platform module (GPU info retrieval)
+  - ✅ Enhanced TODO comments in RAID distributed handlers (artifact metadata, sync logic, health checks)
+  - ✅ Improved documentation in Telegram bot module (module-level and function-level docs with examples)
+  - ✅ Enhanced TODO comments in VM isolation modules (Linux/Windows isolation details)
+  - ✅ Enhanced TODO comments in VM resources module (Windows Job Objects, Linux cgroups)
 
 #### Stage 4.1: Advanced Runtime - COMPLETED ✅
 - ✅ **Process Management** - Advanced process management
