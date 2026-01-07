@@ -12,7 +12,7 @@ use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::RwLock;
+use tokio::sync::{mpsc, RwLock};
 
 // Структура для WebSocket повідомлень
 #[derive(Debug, Serialize, Deserialize)]
@@ -45,6 +45,8 @@ pub struct SystemEvent {
 // Менеджер WebSocket з'єднань
 pub struct WebSocketManager {
     connections: Arc<RwLock<HashMap<String, WebSocketConnection>>>,
+    // Channel для відправки повідомлень до з'єднань
+    senders: Arc<RwLock<HashMap<String, mpsc::UnboundedSender<Message>>>>,
 }
 
 pub struct WebSocketConnection {
@@ -58,7 +60,14 @@ impl WebSocketManager {
     pub fn new() -> Self {
         Self {
             connections: Arc::new(RwLock::new(HashMap::new())),
+            senders: Arc::new(RwLock::new(HashMap::new())),
         }
+    }
+    
+    /// Register sender for a connection
+    pub async fn register_sender(&self, connection_id: String, sender: mpsc::UnboundedSender<Message>) {
+        let mut senders = self.senders.write().await;
+        senders.insert(connection_id, sender);
     }
 
     // Додавання нового з'єднання
@@ -71,22 +80,47 @@ impl WebSocketManager {
     pub async fn remove_connection(&self, connection_id: &str) {
         let mut connections = self.connections.write().await;
         connections.remove(connection_id);
+        let mut senders = self.senders.write().await;
+        senders.remove(connection_id);
     }
 
     // Broadcast повідомлення до всіх з'єднань
     pub async fn broadcast(&self, message: WebSocketMessage) {
-        let connections = self.connections.read().await;
-        for (_, connection) in connections.iter() {
-            // TODO: Відправка повідомлення через WebSocket
-            println!("Broadcasting to user {}: {:?}", connection.user_id, message);
+        let senders = self.senders.read().await;
+        let message_json = match serde_json::to_string(&message) {
+            Ok(json) => json,
+            Err(e) => {
+                tracing::warn!("Failed to serialize WebSocket message: {}", e);
+                return;
+            }
+        };
+        
+        for (connection_id, sender) in senders.iter() {
+            if let Err(e) = sender.send(Message::Text(message_json.clone())) {
+                tracing::warn!("Failed to send message to connection {}: {}", connection_id, e);
+            }
         }
     }
 
     // Відправка повідомлення конкретному користувачу
     pub async fn send_to_user(&self, user_id: &str, message: WebSocketMessage) {
         let connections = self.connections.read().await;
+        let senders = self.senders.read().await;
+        
         if let Some(connection) = connections.get(user_id) {
-            println!("Sending to user {}: {:?}", connection.user_id, message);
+            let message_json = match serde_json::to_string(&message) {
+                Ok(json) => json,
+                Err(e) => {
+                    tracing::warn!("Failed to serialize WebSocket message: {}", e);
+                    return;
+                }
+            };
+            
+            if let Some(sender) = senders.get(user_id) {
+                if let Err(e) = sender.send(Message::Text(message_json)) {
+                    tracing::warn!("Failed to send message to user {}: {}", connection.user_id, e);
+                }
+            }
         }
     }
 
@@ -227,6 +261,7 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
 
     // Очищаємо ресурси
     heartbeat_handle.abort();
+    sender_task.abort();
     WS_MANAGER.remove_connection(&connection_id).await;
 }
 
