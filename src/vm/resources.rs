@@ -161,8 +161,28 @@ mod windows {
         _command: &mut Command,
         limits: &ResourceLimits,
     ) -> Result<(), AppError> {
-        // TODO: Implement Windows Job Objects for CPU/memory limits
-        // Requires windows crate or winapi crate
+        // Future improvement: Implement Windows Job Objects for CPU/memory limits
+        // 1. Create Job Object using CreateJobObjectW Windows API
+        //    - Call CreateJobObjectW(NULL, job_name) to create a new job object
+        //    - Store job handle for later use
+        //    - Requires windows-sys or winapi crate bindings
+        // 2. Configure CPU limits using JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
+        //    - Set ControlFlags to JOB_OBJECT_CPU_RATE_CONTROL_ENABLE
+        //    - Set CpuRate to percentage (0-100) for CPU cores limit
+        //    - Use SetInformationJobObject() with JobObjectCpuRateControlInformation
+        // 3. Configure memory limits using JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+        //    - Set JobMemoryLimit to memory_mb * 1024 * 1024 (bytes)
+        //    - Set LimitFlags to include JOB_OBJECT_LIMIT_JOB_MEMORY
+        //    - Use SetInformationJobObject() with JobObjectExtendedLimitInformation
+        // 4. Assign process to job using AssignProcessToJobObject()
+        //    - Call AssignProcessToJobObject(job_handle, process_handle)
+        //    - Process must not already be in a job object
+        //    - Process must be created suspended (CREATE_SUSPENDED flag)
+        //
+        // This requires:
+        // - Windows API bindings (windows-sys crate or winapi crate)
+        // - Administrator privileges for some job object features
+        // - Understanding of Windows Job Objects API
         if limits.cpu_cores > 0 || limits.memory_mb > 0 {
             warn!(
                 "Windows resource limits not yet implemented (CPU: {}, Memory: {} MB)",
@@ -179,8 +199,28 @@ mod windows {
     }
 
     pub async fn get_windows_usage(_process_id: u32) -> Result<ResourceUsage, AppError> {
-        // TODO: Implement Windows process resource usage query
-        // Requires windows crate or winapi crate
+        // Future improvement: Implement Windows process resource usage query
+        // 1. Open process handle using OpenProcess() Windows API
+        //    - Use PROCESS_QUERY_INFORMATION | PROCESS_VM_READ access rights
+        //    - Handle must be closed with CloseHandle() when done
+        // 2. Query CPU usage using GetProcessTimes() Windows API
+        //    - Get kernel time and user time
+        //    - Calculate CPU percentage based on elapsed time and process time
+        //    - Requires tracking previous times for percentage calculation
+        // 3. Query memory usage using PROCESS_MEMORY_COUNTERS_EX structure
+        //    - Use GetProcessMemoryInfo() to get PROCESS_MEMORY_COUNTERS_EX
+        //    - Read PrivateUsage field for process memory in bytes
+        //    - Convert bytes to MB for ResourceUsage struct
+        // 4. Query GPU usage (optional, requires vendor-specific APIs)
+        //    - Use NVIDIA Management Library (NVML) or AMD ADL API
+        //    - Map process_id to GPU context
+        //    - Query GPU utilization percentage
+        //
+        // This requires:
+        // - Windows API bindings (windows-sys crate or winapi crate)
+        // - Process handle management (proper cleanup)
+        // - Time tracking for CPU percentage calculation
+        // - Optional GPU vendor SDKs for GPU usage
         Ok(ResourceUsage {
             cpu_percent: 0.0,
             memory_mb: 0,
@@ -198,8 +238,29 @@ mod linux {
         _command: &mut Command,
         limits: &ResourceLimits,
     ) -> Result<(), AppError> {
-        // TODO: Implement Linux cgroups v2 for CPU/memory limits
-        // Requires cgroups-rs or manual cgroup manipulation
+        // Future improvement: Implement Linux cgroups v2 for CPU/memory limits
+        // 1. Create or access cgroup using cgroups v2 filesystem
+        //    - Use /sys/fs/cgroup/system.slice/ or custom cgroup path
+        //    - Create cgroup directory: mkdir -p /sys/fs/cgroup/system.slice/poolai-{pid}
+        //    - Write process PID to cgroup.procs file
+        // 2. Configure CPU limits using cpu.max cgroup file
+        //    - Format: "max 100000" for 100% CPU (1 core = 100000, 0.5 core = 50000)
+        //    - Write "cpu.max" with value based on cpu_cores limit
+        //    - Example: "50000 100000" for 50% CPU limit (0.5 cores)
+        // 3. Configure memory limits using memory.max cgroup file
+        //    - Write memory_mb * 1024 * 1024 (bytes) to memory.max
+        //    - Set memory.high for soft limit (optional, for throttling)
+        //    - Set memory.swap.max for swap limit (optional)
+        // 4. Apply limits to process before starting
+        //    - Move process to cgroup by writing PID to cgroup.procs
+        //    - Process must be in the cgroup before it starts executing
+        //    - Use systemd-run or direct cgroup manipulation
+        //
+        // This requires:
+        // - cgroups v2 filesystem access (usually /sys/fs/cgroup/)
+        // - Root privileges or CAP_SYS_ADMIN capability
+        // - Understanding of cgroups v2 interface
+        // - Process must be moved to cgroup before it starts
         if limits.cpu_cores > 0 || limits.memory_mb > 0 {
             warn!(
                 "Linux resource limits not yet implemented (CPU: {}, Memory: {} MB)",
@@ -216,8 +277,32 @@ mod linux {
     }
 
     pub async fn get_linux_usage(_process_id: u32) -> Result<ResourceUsage, AppError> {
-        // TODO: Implement Linux process resource usage query
-        // Requires reading from /proc/{pid}/stat and /proc/{pid}/status
+        // Future improvement: Implement Linux process resource usage query
+        // 1. Read CPU usage from /proc/{pid}/stat file
+        //    - Parse utime (user time) and stime (system time) fields (positions 14 and 15)
+        //    - Read /proc/stat for system uptime to calculate CPU percentage
+        //    - Calculate: ((utime + stime) / (system_uptime * clock_ticks)) * 100
+        //    - Requires tracking previous times for accurate percentage calculation
+        // 2. Read memory usage from /proc/{pid}/status file
+        //    - Parse VmRSS (Resident Set Size) field for physical memory
+        //    - Parse VmSize field for virtual memory (optional)
+        //    - Convert KB to MB for ResourceUsage struct
+        //    - Example: VmRSS: 123456 kB -> 120 MB
+        // 3. Read CPU and memory from /proc/{pid}/statm file (alternative)
+        //    - First field: total program size (pages)
+        //    - Second field: resident set size (pages)
+        //    - Convert pages to bytes: pages * page_size (getconf PAGESIZE)
+        // 4. Query GPU usage (optional, requires vendor-specific APIs)
+        //    - Use nvidia-smi for NVIDIA GPUs (parse command output)
+        //    - Use rocm-smi for AMD GPUs (parse command output)
+        //    - Map process_id to GPU context using vendor APIs
+        //
+        // This requires:
+        // - Reading from /proc filesystem (available on all Linux systems)
+        // - Parsing /proc/{pid}/stat and /proc/{pid}/status files
+        // - Time tracking for CPU percentage calculation
+        // - Optional GPU vendor tools for GPU usage
+        // - Understanding of Linux proc filesystem format
         Ok(ResourceUsage {
             cpu_percent: 0.0,
             memory_mb: 0,
