@@ -1,0 +1,742 @@
+# PoolAI Concept (v5, 2025) - Complete Rust Architecture! 🚀
+
+## 🎯 Current Status: Stage 4.1 COMPLETED! UI Module 99% Complete! VM Module 99% Complete! Stage 4.2 & 4.4 PLANNED
+
+### ✅ What's Implemented:
+
+#### MVP (Stage 1) - COMPLETED ✅
+- ✅ **Core Module** - Base structures and traits
+- ✅ **Pool Module** - Worker pool management
+- ✅ **Monitoring Module** - Basic metrics and monitoring
+
+#### Stage 2 - COMPLETED ✅
+- ✅ **Network Module** - REST API and WebSocket with HTTPS/TLS
+- ✅ **Platform Module** - GPU management and optimization
+- ✅ **TGBot Module** - Telegram bot for management
+- ✅ **Security Module** - JWT authentication, rate limiting, RBAC
+
+#### Stage 3 - MOSTLY COMPLETED ✅
+- ✅ **Runtime Module** - Process lifecycle management
+- ✅ **Rewards System** - Achievement-based reward system
+- ✅ **WebSocket Security** - Secure real-time updates
+- ✅ **Enhanced API** - Extended endpoints (67+ endpoints)
+- ✅ **Libs Module** - Model library management (100% complete)
+- ✅ **VM Module** - Virtualization and isolation (99% complete)
+  - ✅ Process runner integration
+  - ✅ Resource limits (Linux cgroups, Windows Job Objects)
+  - ✅ Health checks with auto-recovery (exponential backoff)
+  - ✅ Resource monitoring (history tracking, alerts)
+  - ✅ Isolation module structure (Linux system calls implemented)
+  - ✅ Loopback interface setup (`ip link set lo up`)
+  - ✅ Bind mounts implementation (`nix::mount::mount` with `MS_BIND`)
+  - ✅ Read-only mounts implementation (`MS_RDONLY` flag)
+  - ✅ 24 integration tests passing
+  - 🔄 Network interface configuration (veth pairs, macvlan - planned)
+  - 🔄 Firewall rules setup (iptables/nftables - planned)
+  - 🔄 Windows isolation (AppContainer - planned)
+- ✅ **RAID Module** - Fault tolerance and replication (90% complete)
+  - ✅ Local artifact storage
+  - ✅ Distributed RAID protocol
+  - ✅ Raft consensus (all 6 phases complete)
+  - ✅ Event sourcing
+  - ✅ Circuit breaker pattern
+  - ✅ Replication strategies
+  - ✅ 122+ tests passing
+- ✅ **UI Module** - Web interface (99% complete)
+  - ✅ Dashboard pages (Home, Status, Health, Metrics, Workers, Libs, VM, RAID)
+  - ✅ JWT authentication with login page
+  - ✅ Write operations (Create/Delete Workers, Artifacts, VM Instances)
+  - ✅ RBAC integration (Admin, Operator, Viewer)
+  - ✅ UI Components Library (buttons, cards, forms, modals, badges, tables, notifications)
+  - ✅ Theme customization (dark, light, high-contrast with persistence)
+  - ✅ **Accessibility Features** - **COMPLETED** 🎉
+    - ✅ Keyboard navigation (Tab, Esc, Ctrl+K shortcuts)
+    - ✅ ARIA labels & roles for all interactive elements
+    - ✅ Skip links for quick navigation
+    - ✅ Semantic HTML (header, nav, main, footer)
+    - ✅ Focus indicators (outline styles)
+    - ✅ Modal focus trap
+    - ✅ ARIA live regions for notifications
+  - ✅ **Additional UI Components** - **COMPLETED** 🎉
+    - ✅ Dropdowns, tooltips, progress bars, tabs, accordion
+  - ✅ **UX Improvements** - **COMPLETED** 🎉
+    - ✅ Skeleton loaders, enhanced error handling with retry
+    - ✅ Search & filtering, form improvements (auto-save, real-time validation, wizard)
+  - ✅ **Responsive Design** - **COMPLETED** 🎉
+    - ✅ Mobile navigation (hamburger menu, drawer)
+    - ✅ Responsive layouts (grid, flexbox, stack on mobile)
+    - ✅ Touch optimizations (swipe gestures, touch feedback)
+  - ✅ **UI Alignment Improvements** - **COMPLETED** 🎉
+    - ✅ Box-sizing, table containers, proper spacing, auto-alignment to borders
+- ✅ **Raft Consensus** - Distributed RAID consensus (all 6 phases complete)
+
+#### Stage 4.1: Advanced Runtime - COMPLETED ✅
+- ✅ **Process Management** - Advanced process management
+- ✅ **Resource Orchestration** - Resource orchestration
+- ✅ **Task Scheduling** - Advanced task scheduling
+- ✅ **Caching System** - Multi-level caching
+- ✅ **Storage Management** - Storage optimization
+- ✅ **Health Monitoring** - Comprehensive health checks
+- ✅ **Auto-scaling** - Automatic scaling capabilities
+
+#### Stage 4.2: Enterprise Features - PLANNED 🔄
+- 🔄 **Multi-tenancy** - Multi-client support (Planned)
+- 🔄 **Advanced Security** - OAuth2, SAML, RBAC, security policies (Planned)
+- 🔄 **Audit Logging** - Comprehensive audit trail (Planned)
+- 🔄 **Advanced Monitoring** - Real-time dashboards, alerts, metrics (Planned)
+
+#### Stage 4.4: AI/ML Enhancement - PLANNED 🔄
+- 🔄 **Model Optimization** - Model performance optimization (Planned)
+- 🔄 **AutoML Integration** - Automated machine learning (Planned)
+- 🔄 **Federated Learning** - Distributed learning capabilities (Planned)
+- 🔄 **Model Versioning** - Model lifecycle management (Planned)
+- 🔄 **Experiment Tracking** - ML experiment management (Planned)
+- 🔄 **Pipeline Management** - ML pipeline orchestration (Planned)
+
+## 🚀 Next Phase: Stage 4.3
+
+### **Stage 4.3: Cloud Integration** (Weeks 1-3)
+- 🔄 **Kubernetes Support** - Container orchestration
+- 🔄 **Cloud Providers** - AWS, Azure, GCP integration
+- 🔄 **Auto-scaling** - Cloud-based auto-scaling
+- 🔄 **Load Balancing** - Advanced load balancing strategies
+
+## 🏗️ Rust Architecture Principles
+
+### **Zero-Cost Abstractions**
+- Trait-based polymorphism without runtime overhead
+- Compiler optimizes abstractions to native code
+- Zero-copy operations where possible
+
+### **Memory Safety without GC**
+- Ownership and Borrowing for safe memory management
+- Arc<RwLock<T>> for shared mutable state
+- Lifetimes prevent dangling pointers
+
+### **Concurrency-First Design**
+- Async/await for non-blocking operations
+- Tokio runtime for multithreading
+- Actor model for state isolation
+
+### **Type Safety**
+- Strong typing prevents runtime errors
+- Pattern matching for exhaustive handling
+- Option<T> and Result<T, E> for error handling
+
+## 🔧 Modular Architecture
+
+### **Current Project Structure**
+
+The project follows Rust module conventions where each module directory contains:
+- `mod.rs` - Main module file with public API
+- Sub-modules as separate `.rs` files
+- Re-exports for convenient access
+
+**Actual Project Structure** (as of Stage 4.1):
+```
+poolAI/src/
+├── main.rs                    # Application entry point
+├── lib.rs                     # Library root with re-exports
+├── version.rs                 # Version and build time information
+├── core/
+│   ├── mod.rs                 # Core module initialization
+│   ├── config.rs              # System configuration (PoolAIConfig, SystemConfig, GpuConfig)
+│   ├── error.rs               # Error handling (AppError, ErrorMetrics)
+│   ├── state.rs               # Application state (AppState, Worker, SystemState)
+│   └── model_interface.rs     # Model interface (ModelInterface trait, ModelManager)
+├── pool/
+│   ├── mod.rs                 # Pool management (Pool, PoolConfig, PoolMetrics, LoadBalancingStrategy)
+│   └── worker.rs              # Worker management (Worker, WorkerConfig, WorkerMetrics)
+├── monitoring/
+│   ├── mod.rs                 # Monitoring system (Monitoring, Alert, SystemStatus, HistoricalData)
+│   └── metrics.rs             # Metrics collection (Metrics, MetricsCollector)
+├── network/
+│   ├── mod.rs                 # Network server initialization
+│   ├── api.rs                 # REST API endpoints (67+ endpoints)
+│   ├── auth.rs                # Authentication and authorization (JWT, RBAC)
+│   └── ws.rs                  # WebSocket connections
+├── platform/
+│   ├── mod.rs                 # Cross-platform interface (GpuInfo, get_gpu_info)
+│   ├── windows.rs             # Windows-specific functionality
+│   └── linux.rs               # Linux-specific functionality
+├── runtime/
+│   ├── mod.rs                 # Runtime manager (RuntimeManager, RuntimeConfig, RuntimeStatus)
+│   ├── worker.rs              # Runtime workers
+│   ├── scheduler.rs           # Task scheduler
+│   ├── queue.rs               # Task queue
+│   ├── cache.rs               # Multi-level caching
+│   ├── storage.rs             # Storage management
+│   ├── process.rs             # Process management
+│   ├── orchestrator.rs         # Resource orchestration
+│   └── health.rs               # Health monitoring
+├── rewards/
+│   └── mod.rs                 # Reward system (RewardSystem, RewardType, RewardLevel, UserProgress)
+└── tgbot/
+    └── mod.rs                 # Telegram bot integration (start_bot, send_notification)
+```
+
+**Implemented Modules** (as of Stage 4.1):
+- ✅ `core/` - Core functionality (config, error, state, model_interface)
+- ✅ `pool/` - Worker pool management (worker, Pool, PoolConfig)
+- ✅ `monitoring/` - Metrics and monitoring (metrics, Monitoring, Alert)
+- ✅ `network/` - REST API and WebSocket (api, ws, auth)
+- ✅ `platform/` - Platform-specific code (linux, windows, GPU info)
+- ✅ `runtime/` - Advanced runtime management (worker, scheduler, queue, cache, storage, process, orchestrator, health)
+- ✅ `rewards/` - Reward system (RewardSystem, RewardType, RewardLevel)
+- ✅ `tgbot/` - Telegram bot integration (basic implementation)
+- ✅ `version.rs` - Version information
+
+**Completed Modules** (Stage 3):
+- ✅ `libs/` - Library management (100% complete)
+  - ✅ Manager, registry, versioning, dependencies
+  - ✅ HTTP download, archive extraction, checksum verification
+  - ✅ Constraint-based dependency selection
+  - ✅ Auto-update policies
+- ✅ `vm/` - Virtualization (98% complete)
+  - ✅ Manager, instance, process runner
+  - ✅ Resource limits, health checks, auto-recovery
+  - ✅ Resource monitoring, isolation module
+  - ✅ Linux system calls (network namespaces, chroot)
+- ✅ `raid/` - RAID system (90% complete)
+  - ✅ Local artifacts, distributed protocol
+  - ✅ Raft consensus, event sourcing
+  - ✅ Circuit breaker, replication strategies
+- ✅ `ui/` - Web interface (95% complete)
+  - ✅ Dashboard, components, themes
+  - ✅ Authentication, write operations, RBAC
+  - ✅ Accessibility features (keyboard navigation, ARIA)
+
+**Planned Modules** (Stage 4.2+):
+- 🔄 `enterprise/` - Enterprise features (multi-tenancy, security, audit, monitoring, ai_ml)
+
+## 📦 Module Details
+
+### **Core Module** - `src/core/`
+```rust
+pub mod config;      // System configuration
+pub mod error;       // Error handling
+pub mod state;       // Application state
+pub mod model_interface; // AI model interface
+```
+
+### **Pool Module** - `src/pool/`
+```rust
+pub mod worker;      // Worker processes
+// mod.rs            // Main worker pool (Pool, PoolConfig, LoadBalancingStrategy)
+```
+
+### **Network Module** - `src/network/`
+```rust
+pub mod api;         // REST API endpoints (67+ endpoints)
+pub mod ws;          // WebSocket connections
+pub mod auth;        // Authentication and authorization
+// mod.rs            // Network server initialization
+```
+
+### **Monitoring Module** - `src/monitoring/`
+```rust
+pub mod metrics;     // Metrics collection
+// mod.rs            // Main monitoring (Monitoring, Alert, SystemStatus, HistoricalData)
+```
+
+### **Platform Module** - `src/platform/`
+```rust
+pub mod linux;       // Linux-specific functionality
+pub mod windows;     // Windows-specific functionality
+// mod.rs            // Cross-platform interface (GpuInfo, get_gpu_info)
+```
+
+### **Runtime Module** - `src/runtime/`
+```rust
+pub mod worker;      // Runtime workers
+pub mod scheduler;   // Task scheduler
+pub mod queue;       // Task queue
+pub mod cache;       // Caching system
+pub mod storage;     // Storage management
+pub mod process;     // Process management
+pub mod orchestrator; // Resource orchestration
+pub mod health;      // Health monitoring
+// mod.rs            // Main runtime manager (RuntimeManager, RuntimeConfig)
+```
+
+### **Rewards Module** - `src/rewards/`
+```rust
+// mod.rs            // Reward system (RewardSystem, RewardType, RewardLevel, UserProgress)
+```
+
+### **TGBot Module** - `src/tgbot/`
+```rust
+// mod.rs            // Telegram bot integration
+```
+
+### **Version Module** - `src/version.rs`
+```rust
+// Version information (APP_VERSION, BUILD_TIME)
+```
+
+## 🔮 Planned Modules (Stage 4.3+)
+
+### **Libs Module** - `src/libs/` (Planned)
+```rust
+pub mod manager;     // Library manager
+pub mod registry;    // Library registry
+pub mod versioning;  // Version management
+pub mod dependencies; // Dependency management
+// mod.rs            // Main interface
+```
+
+### **VM Module** - `src/vm/` (Planned)
+```rust
+pub mod manager;     // VM manager
+pub mod instance;    // VM instances
+pub mod template;    // VM templates
+pub mod networking;  // VM networking
+// mod.rs            // Main interface
+```
+
+### **RAID Module** - `src/raid/` (Planned)
+```rust
+pub mod burst_raid;  // BurstRAID implementation
+pub mod small_world; // Small World network
+pub mod admin;       // Administration
+pub mod vm;          // VM integration
+pub mod worker_interface; // Worker interface
+pub mod config;      // RAID configuration
+pub mod network;     // Network layer
+pub mod storage;     // Storage management
+pub mod worker;      // RAID workers
+pub mod mount;       // Mounting
+pub mod manager;     // RAID manager
+// mod.rs            // Main interface
+```
+
+### **UI Module** - `src/ui/` (Planned)
+```rust
+pub mod dashboard;   // Dashboards
+pub mod components;  // UI components
+pub mod api;         // UI API
+pub mod static_files; // Static files
+pub mod manager;     // UI manager
+// mod.rs            // Main interface
+```
+
+### **Enterprise Module** - `src/enterprise/` (Planned)
+```rust
+pub mod multi_tenancy; // Multi-tenancy
+pub mod security;    // Security
+pub mod audit;       // Audit logging
+pub mod monitoring;  // Advanced monitoring
+pub mod ai_ml;       // AI/ML features
+// mod.rs            // Main manager
+```
+
+## 🔄 Architectural Patterns
+
+### **Actor Model**
+```rust
+pub struct ModuleActor {
+    state: Arc<RwLock<ModuleState>>,
+    message_queue: mpsc::UnboundedReceiver<Message>,
+}
+```
+
+### **Repository Pattern**
+```rust
+pub trait Repository<T> {
+    async fn get(&self, id: &str) -> Result<Option<T>, AppError>;
+    async fn save(&self, entity: T) -> Result<(), AppError>;
+    async fn delete(&self, id: &str) -> Result<(), AppError>;
+}
+```
+
+### **CQRS Pattern**
+```rust
+pub trait Command {
+    async fn execute(&self) -> Result<(), AppError>;
+}
+
+pub trait Query {
+    type Result;
+    async fn execute(&self) -> Result<Self::Result, AppError>;
+}
+```
+
+## 🎯 Rust Best Practices
+
+### **Module Organization**
+- Each module has a `mod.rs` file as the entry point
+- Sub-modules are declared in `mod.rs` and implemented in separate `.rs` files
+- Public API is re-exported through `pub use` statements
+- Private implementation details are kept in sub-modules
+
+### **Error Handling**
+- All functions that can fail return `Result<T, AppError>`
+- Error types are defined in `core::error` module
+- Errors are propagated using `?` operator
+- Panic is only used for unrecoverable errors
+
+### **Concurrency**
+- Shared state uses `Arc<RwLock<T>>` for thread-safe access
+- Async functions use `tokio::sync::RwLock` for async contexts
+- Message passing via channels (`mpsc`, `oneshot`) for communication
+- Background tasks spawned with `tokio::spawn`
+
+### **Memory Management**
+- Ownership is explicit and checked at compile time
+- Borrowing is used for temporary access
+- `Arc` is used for shared ownership across threads
+- Lifetimes prevent dangling references
+
+### **Testing**
+- Unit tests in `#[cfg(test)]` modules
+- Integration tests in `tests/` directory
+- Mocking for external dependencies
+- Property-based testing with `proptest`
+
+## 🚀 Performance Features
+
+### **Memory Management**
+- Zero-copy deserialization with `serde`
+- Object pooling for frequently created objects
+- Lazy loading for large resources
+
+### **Concurrency**
+- Async/await for I/O bound operations
+- Rayon for CPU bound operations
+- Lock-free data structures where possible
+
+### **Caching**
+- Multi-level caching (L1, L2, L3)
+- LRU eviction policy
+- Cache warming strategies
+
+## 🔒 Security Features
+
+### **Type Safety**
+- Compile-time type checking
+- No null pointer exceptions
+- Memory safety guarantees
+
+### **Error Handling**
+- `Result<T, E>` for recoverable errors
+- `panic!` only for unrecoverable errors
+- Structured error types
+
+### **Security**
+- JWT for authentication
+- RBAC for authorization
+- Input validation and sanitization
+
+### **HTTPS/TLS Architecture**
+
+#### Deployment Variants
+
+**Variant A: Embedded HTTPS (Recommended for production)**
+```
+Internet → PoolAI (HTTPS:443) → Internal Services
+         ↑
+   TLS termination in PoolAI
+   - Let's Encrypt automatic renewal
+   - Self-signed for development
+   - Wildcard certificates for subdomains
+```
+
+**Variant B: Reverse Proxy (Recommended for enterprise)**
+```
+Internet → Nginx/Apache (HTTPS:443) → PoolAI (HTTP:8080)
+         ↑
+   TLS termination in Nginx
+   - Centralized certificate management
+   - Load balancing
+   - Additional protection layers
+```
+
+#### Implementation Stages
+
+**Stage 1: HTTP for Development (MVP)**
+- HTTP on localhost:8080
+- Basic authentication
+- Architecture preparation for HTTPS
+
+**Stage 2: HTTPS for Testing (Stage 2)**
+- Self-signed certificates
+- Embedded TLS support
+- Testing in staging environment
+
+**Stage 3: Production HTTPS (Stage 3)**
+- Let's Encrypt automatic certificates
+- HSTS headers
+- Perfect Forward Secrecy
+- Certificate Transparency
+
+#### Security Configuration
+
+```toml
+[security]
+# TLS/HTTPS settings
+enable_https = true
+cert_path = "/etc/poolai/certs/cert.pem"
+key_path = "/etc/poolai/certs/key.pem"
+redirect_http_to_https = true
+
+# Authentication
+jwt_secret = "your-super-secret-key"
+jwt_expiration = 3600  # 1 hour
+rate_limit_requests = 100  # requests per minute
+rate_limit_window = 60  # seconds
+
+# CORS settings
+cors_origins = ["https://poolai.example.com"]
+cors_methods = ["GET", "POST", "PUT", "DELETE"]
+cors_headers = ["Authorization", "Content-Type"]
+
+# Security headers
+security_headers = true
+hsts_max_age = 31536000  # 1 year
+content_security_policy = "default-src 'self'"
+```
+
+#### WebSocket Security
+- WSS (WebSocket Secure) for real-time updates
+- Authentication via JWT in WebSocket handshake
+- Rate limiting for WebSocket connections
+- Heartbeat for connection monitoring
+
+## 📊 Monitoring & Observability
+
+### **Metrics**
+- Prometheus-compatible metrics
+- Custom business metrics
+- Real-time dashboards
+
+### **Logging**
+- Structured logging with `tracing`
+- Log levels (ERROR, WARN, INFO, DEBUG, TRACE)
+- Correlation IDs for tracing
+
+### **Health Checks**
+- Liveness probes
+- Readiness probes
+- Dependency health checks
+
+## 🌐 API Endpoints
+
+**Current Implementation**: Core API endpoints are implemented. Stage 3 endpoints for Libraries/VM/RAID/UI are now partially implemented.
+
+### **Core API**
+- `/api/status` — System status ✅
+- `/api/health` — Health check ✅
+- `/api/metrics` — System metrics ✅
+- `/api/models` — AI models ✅
+- `/api/workers` — Worker management ✅
+- `/api/gpu` — GPU information ✅
+- `/api/rewards` — Reward system ✅
+- `/ws/metrics` — Live metrics (WebSocket) ✅
+
+### **Enterprise API** (Planned)
+- `/api/enterprise/tenants` — Multi-tenancy 🔄
+- `/api/enterprise/security` — Security management 🔄
+- `/api/enterprise/audit` — Audit logging 🔄
+- `/api/enterprise/monitoring` — Advanced monitoring 🔄
+- `/api/enterprise/ai-ml` — AI/ML features 🔄
+
+### **Library Management API** (Stage 3 — In Progress)
+- `/api/v1/libraries` — Library list ✅
+- `/api/v1/libraries/:name` — Library info ✅
+- `/api/v1/libraries/:name/install` — Install ✅
+- `/api/v1/libraries/:name/uninstall` — Uninstall ✅
+- `/api/v1/libraries/:name/update` — Update ✅
+
+### **VM Management API** (Stage 3 — In Progress)
+- `/api/v1/vm/instances` — VM instances (read-only) ✅
+- `/api/vm/templates` — VM templates 🔄
+- `/api/vm/networks` — VM networks 🔄
+
+### **RAID System API** (Stage 3 — In Progress)
+- `/api/v1/raid/nodes` — RAID nodes (read-only) ✅
+- `/api/v1/raid/artifacts` — RAID artifacts (read-only) ✅
+- `/api/raid/workers` — RAID workers 🔄
+- `/api/raid/status` — RAID status 🔄
+- `/api/raid/snapshots` — Snapshot management 🔄
+
+### **UI Management API** (Planned)
+### **UI (Stage 3 — Read-only implemented)**
+- `/ui` — Dashboard Home ✅
+- `/ui/status` — Status ✅
+- `/ui/health` — Health ✅
+- `/ui/metrics` — Metrics ✅
+- `/ui/workers` — Workers ✅
+- `/ui/libs` — Libraries ✅
+- `/ui/vm` — VM ✅
+- `/ui/raid` — RAID ✅
+- `/api/ui/dashboards` — Dashboard management 🔄
+- `/api/ui/components` — UI components 🔄
+- `/api/ui/themes` — Theme management 🔄
+
+## 🚀 Deployment
+
+### **Containerization**
+- Docker containers
+- Multi-stage builds
+- Minimal attack surface
+
+### **Orchestration**
+- Kubernetes ready
+- Health checks
+- Rolling updates
+
+## 🧪 Testing
+
+### **Unit Tests**
+- 100% coverage for critical paths
+- Mocking for external dependencies
+- Property-based testing
+
+### **Integration Tests**
+- End-to-end testing
+- Database integration
+- API testing
+
+### **Performance Tests**
+- Load testing
+- Stress testing
+- Memory leak detection
+
+## 📈 Success Metrics
+
+- **Throughput**: Tasks per second
+- **Latency**: P95 response time
+- **Availability**: 99.9% uptime
+- **Resource Utilization**: CPU/GPU/Memory efficiency
+- **Error Rate**: < 0.1%
+
+## 🛠️ Technology Stack
+
+- **Language**: Rust (latest stable)
+- **Runtime**: Tokio
+- **Web Framework**: Axum
+- **Serialization**: Serde
+- **Database**: PostgreSQL + Redis
+- **Monitoring**: Prometheus + Grafana
+- **Logging**: Tracing
+- **Testing**: Cargo test + Criterion
+
+## 🛠️ Development Environment & Build System
+
+### **MSYS2 UCRT64 (Recommended for Windows)**
+
+PoolAI is configured to use **MSYS2 UCRT64** as the primary development and compilation environment on Windows.
+
+#### **Requirements**
+- **MSYS2 UCRT64** - Primary development environment
+- **Rust toolchain**: `stable-x86_64-pc-windows-gnu` (GNU toolchain)
+- **MSYS2 UCRT64 shell** - Automatically used in Cursor/VS Code terminal
+- **GCC/MinGW-w64** - Provided by MSYS2 UCRT64
+
+#### **Terminal Configuration**
+The project is configured for automatic MSYS2 UCRT64 shell usage:
+- `.vscode/settings.json` contains terminal settings
+- Terminal automatically launches in MSYS2 UCRT64 when opening a new terminal
+- Environment variables `MSYSTEM=UCRT64` and `CHERE_INVOKING=1` are set automatically
+
+#### **Rust Toolchain Setup**
+
+**If Rust is not found in MSYS2 UCRT64** (`cargo: command not found`):
+
+**Quick Fix** (Recommended - Automatic):
+```bash
+cd /s/rust/poolAI
+bash setup_rust_path.sh
+source ~/.bashrc
+cargo --version
+```
+
+**Manual Setup**:
+
+1. **Add Rust to PATH** (if Rust is already installed on Windows):
+```bash
+# Add to ~/.bashrc or ~/.bash_profile
+echo 'export PATH="/c/Users/$USER/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+2. **Or install Rust via rustup in MSYS2**:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+3. **Install GNU toolchain**:
+```bash
+# Install GNU toolchain for MSYS2
+rustup default stable-x86_64-pc-windows-gnu
+
+# Or for this project only
+rustup override set stable-x86_64-pc-windows-gnu
+```
+
+4. **Verify installation**:
+```bash
+cargo --version
+rustc --version
+rustup show
+```
+
+**Note**: VS Code/Cursor settings have been updated to automatically include Rust PATH in terminal environment. See `setup_rust_path.sh` for automatic setup script.
+
+#### **Project Structure**
+```
+poolAI/
+├── .vscode/
+│   ├── settings.json          # MSYS2 UCRT64 terminal settings
+│   └── README_TERMINAL.md     # Setup instructions
+├── .cargo/
+│   └── config.toml            # Linker configuration for GNU toolchain
+├── src/                       # Source code
+├── Cargo.toml                 # Project dependencies
+└── build.rs                   # Build script for build_time.rs
+```
+
+#### **Benefits of MSYS2 UCRT64**
+- **Compatibility**: Full Windows API compatibility through UCRT (Universal C Runtime)
+- **Performance**: Optimized binaries for Windows
+- **Libraries**: Easy access to libraries via pacman (MSYS2 package manager)
+- **Integration**: Smooth integration with modern development tools
+- **Debugging**: Support for GDB and other debugging tools
+
+#### **Alternative Environments**
+- **Linux**: Native compilation via standard Rust toolchain
+- **WSL**: Can be used, but MSYS2 UCRT64 is recommended for Windows
+- **MSVC**: Not recommended due to dependency issues (ring, gcc.exe)
+
+## 🚀 Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/platinoff/poolAI.git
+cd poolAI
+
+# Setup Rust toolchain (if not already set)
+rustup default stable-x86_64-pc-windows-gnu
+
+# Build and run (in MSYS2 UCRT64 terminal)
+cargo build
+cargo run
+
+# Access API
+curl http://localhost:8080/api/status
+```
+
+## 📚 Documentation
+
+- [README.md](./README.md) (EN) - Updated for Stage 4
+- [README.uk.md](./README.uk.md) (UA) - Updated for Stage 4
+- [API Documentation](./docs/api.md) - Complete API reference
+- [Architecture Guide](./docs/architecture.md) - Detailed architecture
+
+---
+
+**PoolAI** — AI Mining Pool Management System  
+**Status**: Stage 4.1 COMPLETED! Stage 4.2 & 4.4 PLANNED 🎯  
+**Next Goal**: Stage 4.2 - Enterprise Features 🚀  
+**Architecture**: Rust Constructor Implementation (Core modules complete, Enterprise modules planned) ✅
