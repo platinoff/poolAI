@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          
+      - name: Build release
+        run: cargo build --release --features jwt,https
+        
+      - name: Run tests
+        run: cargo test --release
+        
+      - name: Create release archive
+        run: |
+          mkdir -p release
+          cp target/release/poolai release/
+          cp target/release/poolai-worker release/
+          cp README.md release/
+          cp LICENSE release/
+          tar -czf poolai-${{ github.ref_name }}.tar.gz release/
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: poolai-${{ github.ref_name }}.tar.gz
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
