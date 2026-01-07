@@ -581,6 +581,11 @@ impl RaidRaftNode {
         }
     }
 
+    /// Get node ID
+    pub async fn get_node_id(&self) -> u64 {
+        self.config.node_id
+    }
+
     /// Get current Raft role (Leader, Follower, Candidate)
     pub async fn current_role(&self) -> String {
         let instance_guard = self.raft_instance.read().await;

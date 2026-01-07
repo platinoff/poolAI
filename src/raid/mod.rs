@@ -302,7 +302,7 @@ impl RaidManager {
                 .await
                 .append_event(RaidEvent::ArtifactCreated {
                     artifact_id: id.to_string(),
-                    node_id: 0, // TODO: Get actual node ID from Raft
+                    node_id: self.get_node_id().await,
                     timestamp: Utc::now(),
                     metadata,
                 })
