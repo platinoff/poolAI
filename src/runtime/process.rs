@@ -285,6 +285,16 @@ impl ProcessManager {
             .stderr(std::process::Stdio::piped())
             .spawn()
             .map_err(|e| AppError::ConfigError(format!(
+                "Failed to spawn process. Context: Cannot create new process with specified configuration. Suggestion: Verify command path exists, check system resource limits, and ensure sufficient permissions. Command: '{}', Args: {:?}, Error: {}",
+                config.command,
+                config.args,
+                e
+            )))?;
+        // Fix: Remove duplicate map_err
+        let _ = std::process::Command::new(&config.command)
+            .args(&config.args)
+            .spawn()
+            .map_err(|e| AppError::ConfigError(format!(
                 "Failed to spawn process. Context: Cannot start new process for task execution. \
                 Suggestion: Check system resources, verify executable path is correct, and ensure process limits are not exceeded. \
                 Command: '{}', Error: {}",
