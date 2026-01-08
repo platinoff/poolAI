@@ -4,6 +4,21 @@ use std::sync::OnceLock;
 use crate::core::error::AppError;
 
 /// PoolAI system configuration
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::core::config::SystemConfig;
+///
+/// let config = SystemConfig {
+///     name: "MyPoolAI".to_string(),
+///     version: "1.0.0".to_string(),
+///     log_level: "info".to_string(),
+///     max_workers: 16,
+///     queue_size: 2000,
+///     metrics_interval: 10,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SystemConfig {
     /// System name
@@ -117,6 +132,30 @@ impl Default for HttpsConfig {
 }
 
 /// Main PoolAI configuration
+///
+/// Contains all configuration sections for the PoolAI system.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::core::config::PoolAIConfig;
+///
+/// // Use default configuration
+/// let config = PoolAIConfig::default();
+///
+/// // Or create custom configuration
+/// let config = PoolAIConfig {
+///     system: poolai::core::config::SystemConfig {
+///         name: "MyPoolAI".to_string(),
+///         version: "1.0.0".to_string(),
+///         log_level: "debug".to_string(),
+///         max_workers: 32,
+///         queue_size: 5000,
+///         metrics_interval: 10,
+///     },
+///     ..Default::default()
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PoolAIConfig {
     /// System configuration
@@ -314,6 +353,32 @@ impl PoolAIConfig {
 static CONFIG: OnceLock<PoolAIConfig> = OnceLock::new();
 
 /// Initialize configuration
+///
+/// This function initializes the global configuration instance.
+/// Must be called before using any configuration-dependent functionality.
+///
+/// # Arguments
+///
+/// * `config` - The configuration to initialize
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - Configuration validation fails
+/// - Configuration is already initialized
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::core::config::{PoolAIConfig, initialize_config};
+///
+/// # fn example() -> Result<(), poolai::core::error::AppError> {
+/// let config = PoolAIConfig::default();
+/// initialize_config(config)?;
+/// // Now you can use get_config() to retrieve the configuration
+/// # Ok(())
+/// # }
+/// ```
 pub fn initialize_config(config: PoolAIConfig) -> Result<(), AppError> {
     config.validate()?;
 
@@ -325,6 +390,29 @@ pub fn initialize_config(config: PoolAIConfig) -> Result<(), AppError> {
 }
 
 /// Get configuration
+///
+/// Retrieves a clone of the global configuration instance.
+/// Must be called after `initialize_config()`.
+///
+/// # Errors
+///
+/// Returns an error if configuration has not been initialized.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::core::config::{get_config, initialize_config, PoolAIConfig};
+///
+/// # fn example() -> Result<(), poolai::core::error::AppError> {
+/// // First initialize
+/// initialize_config(PoolAIConfig::default())?;
+///
+/// // Then retrieve
+/// let config = get_config()?;
+/// println!("System name: {}", config.system.name);
+/// # Ok(())
+/// # }
+/// ```
 pub fn get_config() -> Result<PoolAIConfig, AppError> {
     CONFIG
         .get()
