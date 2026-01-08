@@ -86,7 +86,10 @@ impl Worker {
             status.active_connections += 1;
             status.queue_size += 1;
             // Set current task based on request type
-            status.current_task = Some(format!("processing-{}", request.input.chars().take(20).collect::<String>()));
+            status.current_task = Some(format!(
+                "processing-{}",
+                request.input.chars().take(20).collect::<String>()
+            ));
         }
 
         // Process request (simulated)

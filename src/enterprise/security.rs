@@ -243,11 +243,17 @@ impl SecurityManager {
 
         // Build authorization URL with parameters
         let mut url = format!("{}?", provider.config.authorization_url);
-        url.push_str(&format!("client_id={}", urlencoding::encode(&provider.config.client_id)));
-        url.push_str(&format!("&redirect_uri={}", urlencoding::encode(&provider.config.redirect_uri)));
+        url.push_str(&format!(
+            "client_id={}",
+            urlencoding::encode(&provider.config.client_id)
+        ));
+        url.push_str(&format!(
+            "&redirect_uri={}",
+            urlencoding::encode(&provider.config.redirect_uri)
+        ));
         url.push_str(&format!("&response_type=code"));
         url.push_str(&format!("&state={}", urlencoding::encode(state)));
-        
+
         if !provider.config.scopes.is_empty() {
             let scopes = provider.config.scopes.join(" ");
             url.push_str(&format!("&scope={}", urlencoding::encode(&scopes)));
@@ -268,10 +274,7 @@ impl SecurityManager {
     ) -> Result<OAuth2TokenResponse, AppError> {
         let providers = self.oauth2_providers.read().await;
         let provider = providers.get(provider_name).ok_or_else(|| {
-            AppError::ValidationError(format!(
-                "OAuth2 provider not found: {}",
-                provider_name
-            ))
+            AppError::ValidationError(format!("OAuth2 provider not found: {}", provider_name))
         })?;
 
         if !provider.enabled {
@@ -349,10 +352,7 @@ impl SecurityManager {
     /// # Errors
     ///
     /// Returns `AppError` if provider is not found or URL generation fails.
-    pub async fn get_saml_sso_url(
-        &self,
-        provider_name: &str,
-    ) -> Result<String, AppError> {
+    pub async fn get_saml_sso_url(&self, provider_name: &str) -> Result<String, AppError> {
         let providers = self.saml_providers.read().await;
         let provider = providers.get(provider_name).ok_or_else(|| {
             AppError::ValidationError(format!(
@@ -384,7 +384,10 @@ impl SecurityManager {
             provider_name
         );
 
-        Ok(format!("{}?SAMLRequest=placeholder", provider.config.sso_url))
+        Ok(format!(
+            "{}?SAMLRequest=placeholder",
+            provider.config.sso_url
+        ))
     }
 
     /// Creates a security policy
@@ -392,10 +395,7 @@ impl SecurityManager {
     /// # Errors
     ///
     /// Returns `AppError` if policy creation fails.
-    pub async fn create_security_policy(
-        &self,
-        policy: SecurityPolicy,
-    ) -> Result<(), AppError> {
+    pub async fn create_security_policy(&self, policy: SecurityPolicy) -> Result<(), AppError> {
         if policy.name.is_empty() {
             return Err(AppError::ValidationError(
                 "Security policy name cannot be empty".to_string(),
@@ -478,7 +478,10 @@ mod tests {
             scopes: vec!["openid".to_string(), "profile".to_string()],
         };
 
-        assert!(manager.register_oauth2_provider("test-provider".to_string(), config).await.is_ok());
+        assert!(manager
+            .register_oauth2_provider("test-provider".to_string(), config)
+            .await
+            .is_ok());
     }
 
     #[tokio::test]
@@ -495,9 +498,15 @@ mod tests {
             scopes: vec!["openid".to_string()],
         };
 
-        manager.register_oauth2_provider("test-provider".to_string(), config).await.unwrap();
-        
-        let url = manager.get_oauth2_authorization_url("test-provider", "state123").await.unwrap();
+        manager
+            .register_oauth2_provider("test-provider".to_string(), config)
+            .await
+            .unwrap();
+
+        let url = manager
+            .get_oauth2_authorization_url("test-provider", "state123")
+            .await
+            .unwrap();
         assert!(url.contains("test-client-id"));
         assert!(url.contains("state123"));
     }
@@ -517,7 +526,7 @@ mod tests {
         };
 
         assert!(manager.create_security_policy(policy).await.is_ok());
-        
+
         let retrieved = manager.get_security_policy("test-policy").await.unwrap();
         assert!(retrieved.is_some());
         assert_eq!(retrieved.unwrap().require_mfa, true);

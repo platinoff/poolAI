@@ -185,18 +185,18 @@ impl WebSocketManager {
             metrics_subscriptions: Arc::new(RwLock::new(HashMap::new())),
             events_subscriptions: Arc::new(RwLock::new(HashMap::new())),
         };
-        
+
         // Запускаємо періодичну відправку метрик та подій
         let metrics_subs = manager.metrics_subscriptions.clone();
         let events_subs = manager.events_subscriptions.clone();
         let senders_metrics = manager.senders.clone();
         let senders_events = manager.senders.clone();
-        
+
         tokio::spawn(async move {
             let mut metrics_interval = tokio::time::interval(std::time::Duration::from_secs(5));
             loop {
                 metrics_interval.tick().await;
-                
+
                 // Відправка метрик підписаним користувачам
                 let subs = metrics_subs.read().await;
                 let senders = senders_metrics.read().await;
@@ -218,12 +218,12 @@ impl WebSocketManager {
                 }
             }
         });
-        
+
         tokio::spawn(async move {
             let mut events_interval = tokio::time::interval(std::time::Duration::from_secs(10));
             loop {
                 events_interval.tick().await;
-                
+
                 // Відправка подій підписаним користувачам
                 let subs = events_subs.read().await;
                 let senders = senders_events.read().await;
@@ -235,12 +235,16 @@ impl WebSocketManager {
                 }
             }
         });
-        
+
         manager
     }
-    
+
     /// Register sender for a connection
-    pub async fn register_sender(&self, connection_id: String, sender: mpsc::UnboundedSender<Message>) {
+    pub async fn register_sender(
+        &self,
+        connection_id: String,
+        sender: mpsc::UnboundedSender<Message>,
+    ) {
         let mut senders = self.senders.write().await;
         senders.insert(connection_id, sender);
     }
@@ -262,13 +266,13 @@ impl WebSocketManager {
         let mut events_subs = self.events_subscriptions.write().await;
         events_subs.remove(connection_id);
     }
-    
+
     /// Subscribe connection to metrics updates
     pub async fn subscribe_metrics(&self, connection_id: &str) {
         let mut subs = self.metrics_subscriptions.write().await;
         subs.insert(connection_id.to_string(), true);
     }
-    
+
     /// Subscribe connection to events updates
     pub async fn subscribe_events(&self, connection_id: &str) {
         let mut subs = self.events_subscriptions.write().await;
@@ -285,10 +289,14 @@ impl WebSocketManager {
                 return;
             }
         };
-        
+
         for (connection_id, sender) in senders.iter() {
             if let Err(e) = sender.send(Message::Text(message_json.clone().into())) {
-                tracing::warn!("Failed to send message to connection {}: {}", connection_id, e);
+                tracing::warn!(
+                    "Failed to send message to connection {}: {}",
+                    connection_id,
+                    e
+                );
             }
         }
     }
@@ -297,7 +305,7 @@ impl WebSocketManager {
     pub async fn send_to_user(&self, user_id: &str, message: WebSocketMessage) {
         let connections = self.connections.read().await;
         let senders = self.senders.read().await;
-        
+
         if let Some(connection) = connections.get(user_id) {
             let message_json = match serde_json::to_string(&message) {
                 Ok(json) => json,
@@ -306,10 +314,14 @@ impl WebSocketManager {
                     return;
                 }
             };
-            
+
             if let Some(sender) = senders.get(user_id) {
                 if let Err(e) = sender.send(Message::Text(message_json.into())) {
-                    tracing::warn!("Failed to send message to user {}: {}", connection.user_id, e);
+                    tracing::warn!(
+                        "Failed to send message to user {}: {}",
+                        connection.user_id,
+                        e
+                    );
                 }
             }
         }
@@ -418,11 +430,11 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
 
     // Розбиваємо WebSocket на sender та receiver
     let (mut sender, mut receiver) = socket.split();
-    
+
     // Створюємо channel для відправки повідомлень
     let (tx, mut rx) = mpsc::unbounded_channel::<Message>();
     WS_MANAGER.register_sender(connection_id.clone(), tx).await;
-    
+
     // Запускаємо task для відправки повідомлень через sender
     let connection_id_send = connection_id.clone();
     let sender_task = tokio::spawn(async move {
@@ -472,7 +484,8 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
 
                             if let Ok(json) = serde_json::to_string(&error_msg) {
                                 // Send error message through channel
-                                let tx_clone = WS_MANAGER.senders.read().await.get(&connection_id).cloned();
+                                let tx_clone =
+                                    WS_MANAGER.senders.read().await.get(&connection_id).cloned();
                                 if let Some(tx) = tx_clone {
                                     let _ = tx.send(Message::Text(json.into()));
                                 }
@@ -568,7 +581,7 @@ async fn get_current_metrics() -> LiveMetrics {
     } else {
         0
     };
-    
+
     // В реальній реалізації тут були б реальні метрики з monitoring модуля
     LiveMetrics {
         active_workers,

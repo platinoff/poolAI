@@ -206,11 +206,7 @@ impl LinuxNetworkIsolator {
     /// - CAP_NET_ADMIN capability or root privileges
     /// - Network namespace already created
     #[cfg(feature = "vm-isolation-linux")]
-    fn setup_macvlan(
-        interface: &str,
-        process_id: u32,
-        mode: Option<&str>,
-    ) -> Result<(), AppError> {
+    fn setup_macvlan(interface: &str, process_id: u32, mode: Option<&str>) -> Result<(), AppError> {
         // Validate interface name
         if interface.is_empty() {
             return Err(AppError::ConfigError(
@@ -462,9 +458,7 @@ impl LinuxNetworkIsolator {
     #[cfg(feature = "vm-isolation-linux")]
     fn setup_nftables_rules(ports: &[u16], _process_id: u32) -> Result<(), AppError> {
         // Check if nftables is available
-        let check_output = Command::new("nft")
-            .args(&["list", "tables"])
-            .output();
+        let check_output = Command::new("nft").args(&["list", "tables"]).output();
 
         if check_output.is_err() {
             return Err(AppError::ConfigError(
@@ -508,9 +502,7 @@ impl LinuxNetworkIsolator {
     #[cfg(feature = "vm-isolation-linux")]
     fn setup_iptables_rules(ports: &[u16], _process_id: u32) -> Result<(), AppError> {
         // Check if iptables is available
-        let check_output = Command::new("iptables")
-            .args(&["-L"])
-            .output();
+        let check_output = Command::new("iptables").args(&["-L"]).output();
 
         if check_output.is_err() {
             return Err(AppError::ConfigError(

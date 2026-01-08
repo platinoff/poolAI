@@ -40,11 +40,14 @@ pub async fn start_server(addr: SocketAddr) {
             .route("/ui/", get(|| async { Redirect::permanent("/ui") }))
             .nest("/api/v1", api::create_api_routes())
             .nest("/ui", ui::create_ui_routes());
-        
+
         // Add enterprise API routes if feature is enabled
         #[cfg(feature = "enterprise")]
         {
-            router.nest("/api/enterprise", enterprise_api::create_enterprise_api_routes())
+            router.nest(
+                "/api/enterprise",
+                enterprise_api::create_enterprise_api_routes(),
+            )
         }
         #[cfg(not(feature = "enterprise"))]
         {

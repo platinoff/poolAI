@@ -13,13 +13,13 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let manager = AzureManager::new(Some("subscription-id".to_string()));
 //! manager.initialize().await?;
-//! 
+//!
 //! // Create VM Scale Set
 //! let scale_set_id = manager.create_vm_scale_set(
 //!     "poolai-rg",
 //!     "poolai-workers"
 //! ).await?;
-//! 
+//!
 //! manager.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -108,7 +108,9 @@ impl AzureManager {
         // - Return VMSS ID
         info!(
             "Creating VM Scale Set: {} / {} in subscription {} (placeholder)",
-            resource_group, name, self._subscription_id.as_deref().unwrap_or("default")
+            resource_group,
+            name,
+            self._subscription_id.as_deref().unwrap_or("default")
         );
         Ok(uuid::Uuid::new_v4().to_string())
     }

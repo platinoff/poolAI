@@ -1,6 +1,6 @@
+use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use std::sync::OnceLock;
-use crate::core::error::AppError;
 
 /// PoolAI system configuration
 ///
@@ -497,7 +497,10 @@ mod tests {
         config.pool.scaling_threshold = -0.1;
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("scaling_threshold"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("scaling_threshold"));
     }
 
     #[test]
@@ -506,7 +509,10 @@ mod tests {
         config.pool.scaling_threshold = 1.5;
         let result = config.validate();
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("scaling_threshold"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("scaling_threshold"));
     }
 
     #[test]

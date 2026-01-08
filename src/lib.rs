@@ -188,8 +188,8 @@ pub use cloud::{CloudConfig, CloudManager};
 #[cfg(feature = "enterprise")]
 pub use enterprise::{
     audit::{AuditEvent, AuditLevel, AuditLogger, AuditQueryFilters},
+    monitoring::MonitoringManager,
     multi_tenancy::{Tenant, TenantConfig, TenantManager},
     security::SecurityManager,
-    monitoring::MonitoringManager,
     EnterpriseManager,
 };

@@ -19,6 +19,8 @@ use async_raft::{
 #[cfg(feature = "raft")]
 use async_trait::async_trait;
 #[cfg(feature = "raft")]
+use chrono;
+#[cfg(feature = "raft")]
 use std::sync::Arc;
 #[cfg(feature = "raft")]
 use tokio::{
@@ -30,8 +32,6 @@ use tokio::{
 use tracing::{info, warn};
 #[cfg(feature = "raft")]
 use uuid::Uuid;
-#[cfg(feature = "raft")]
-use chrono;
 
 /// Raft configuration for Distributed RAID
 #[cfg(feature = "raft")]
@@ -139,19 +139,21 @@ impl RaidRaftStorage {
             return Ok(0);
         }
 
-        let mut file = File::open(&last_applied_path).await
+        let mut file = File::open(&last_applied_path)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to open last_applied file: {}", e))?;
         let mut contents = String::new();
-        file.read_to_string(&mut contents).await
+        file.read_to_string(&mut contents)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to read last_applied file: {}", e))?;
-        
+
         let metadata: serde_json::Value = serde_json::from_str(&contents)
             .map_err(|e| anyhow::anyhow!("Failed to parse last_applied file: {}", e))?;
-        
+
         let last_applied = metadata["last_applied_log"]
             .as_u64()
             .ok_or_else(|| anyhow::anyhow!("Invalid last_applied_log in metadata"))?;
-        
+
         Ok(last_applied)
     }
 
@@ -173,13 +175,15 @@ impl RaidRaftStorage {
             .open(&last_applied_path)
             .await
             .map_err(|e| anyhow::anyhow!("Failed to create last_applied file: {}", e))?;
-        
-        file.write_all(contents.as_bytes()).await
+
+        file.write_all(contents.as_bytes())
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to write last_applied file: {}", e))?;
-        
-        file.sync_all().await
+
+        file.sync_all()
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to sync last_applied file: {}", e))?;
-        
+
         Ok(())
     }
 
@@ -247,7 +251,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
             // Find the latest snapshot metadata file
             let snapshot_dir = &self.storage_path;
             let mut metadata_files = Vec::new();
-            
+
             if let Ok(mut entries) = tokio::fs::read_dir(snapshot_dir).await {
                 while let Ok(Some(entry)) = entries.next_entry().await {
                     let path = entry.path();
@@ -258,14 +262,14 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
                     }
                 }
             }
-            
+
             // Sort by filename (newest first, assuming UUID-based names)
             metadata_files.sort_by(|a, b| {
                 let a_name = a.file_name().and_then(|n| n.to_str()).unwrap_or("");
                 let b_name = b.file_name().and_then(|n| n.to_str()).unwrap_or("");
                 b_name.cmp(a_name)
             });
-            
+
             // Try to load membership from the latest metadata file
             for metadata_path in metadata_files {
                 if let Ok(mut file) = File::open(&metadata_path).await {
@@ -273,7 +277,9 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
                     if file.read_to_string(&mut contents).await.is_ok() {
                         if let Ok(metadata) = serde_json::from_str::<serde_json::Value>(&contents) {
                             if let Some(membership_json) = metadata.get("membership") {
-                                if let Ok(membership) = serde_json::from_value::<MembershipConfig>(membership_json.clone()) {
+                                if let Ok(membership) = serde_json::from_value::<MembershipConfig>(
+                                    membership_json.clone(),
+                                ) {
                                     info!("Loaded membership config from snapshot metadata");
                                     return Ok(membership);
                                 }
@@ -287,7 +293,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         // If no snapshot membership found, search log entries in reverse order
         // for membership config changes (entries with membership information)
         let entries = self.load_log_entries().await?;
-        
+
         // Note: In async-raft, membership changes are stored in Entry struct,
         // but they may be at the Raft protocol level, not in application data.
         // For now, we'll use the last entry's membership if available,
@@ -298,7 +304,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         // the Entry::membership field for membership change entries.
         // This would allow us to recover the actual membership config even without
         // a snapshot.
-        
+
         // For now, return initial membership as a safe default
         info!("Using initial membership config (node_id: {}) - no snapshot membership found, log entries membership extraction not yet implemented", self.node_id);
         Ok(MembershipConfig::new_initial(self.node_id))
@@ -386,12 +392,13 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
             .apply_operation(data)
             .await
             .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))?;
-        
+
         // Update last_applied_log after successfully applying entry
-        self.save_last_applied_log(*index).await
+        self.save_last_applied_log(*index)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to save last_applied_log: {}", e))?;
         info!("Updated last_applied_log to index {}", index);
-        
+
         Ok(response)
     }
 
@@ -401,7 +408,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
     ) -> Result<()> {
         let state_machine = RaidRaftStateMachine::new(self.raid_manager.clone());
         let mut last_applied: Option<u64> = None;
-        
+
         for (index, data) in entries {
             state_machine
                 .apply_operation(data)
@@ -409,14 +416,15 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
                 .map_err(|e| anyhow::anyhow!("Failed to apply operation: {}", e))?;
             last_applied = Some(**index);
         }
-        
+
         // Update last_applied_log after successfully applying entries
         if let Some(last_index) = last_applied {
-            self.save_last_applied_log(last_index).await
+            self.save_last_applied_log(last_index)
+                .await
                 .map_err(|e| anyhow::anyhow!("Failed to save last_applied_log: {}", e))?;
             info!("Updated last_applied_log to index {}", last_index);
         }
-        
+
         Ok(())
     }
 
@@ -431,33 +439,41 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
 
         // Get current membership config for snapshot metadata
         let membership = self.get_membership_config().await?;
-        
+
         // Store snapshot metadata (index, term, and membership) in a separate metadata file
         let metadata_path = self.snapshot_path(&format!("{}_metadata", snapshot_id));
         let membership_json = serde_json::to_value(&membership)
             .map_err(|e| anyhow::anyhow!("Failed to serialize membership config: {}", e))?;
-        
+
         let metadata = serde_json::json!({
             "snapshot_id": snapshot_id,
             "index": index,
             "term": term,
             "membership": membership_json,
         });
-        
-        let mut metadata_file = File::create(&metadata_path).await
+
+        let mut metadata_file = File::create(&metadata_path)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to create snapshot metadata file: {}", e))?;
-        
+
         let metadata_json = serde_json::to_string(&metadata)
             .map_err(|e| anyhow::anyhow!("Failed to serialize snapshot metadata: {}", e))?;
-        
-        metadata_file.write_all(metadata_json.as_bytes()).await
+
+        metadata_file
+            .write_all(metadata_json.as_bytes())
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to write snapshot metadata: {}", e))?;
-        
-        metadata_file.sync_all().await
+
+        metadata_file
+            .sync_all()
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to sync snapshot metadata: {}", e))?;
 
-        info!("Log compaction completed - snapshot {} at index {}, term {}", snapshot_id, index, term);
-        
+        info!(
+            "Log compaction completed - snapshot {} at index {}, term {}",
+            snapshot_id, index, term
+        );
+
         Ok(CurrentSnapshotData {
             index,
             term,
@@ -489,16 +505,19 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         });
 
         // Write snapshot data to file
-        let mut file = File::create(&snapshot_path).await
+        let mut file = File::create(&snapshot_path)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to create snapshot file: {}", e))?;
-        
+
         let snapshot_json = serde_json::to_string_pretty(&snapshot_data)
             .map_err(|e| anyhow::anyhow!("Failed to serialize snapshot data: {}", e))?;
-        
-        file.write_all(snapshot_json.as_bytes()).await
+
+        file.write_all(snapshot_json.as_bytes())
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to write snapshot data: {}", e))?;
-        
-        file.sync_all().await
+
+        file.sync_all()
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to sync snapshot file: {}", e))?;
 
         info!("Created snapshot {} at {:?}", snapshot_id, snapshot_path);
@@ -523,12 +542,12 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
             info!("Finalizing snapshot installation {} (index: {}, term: {}) - no log deletion requested", 
                   snapshot_id, index, term);
         }
-        
+
         // Note: In a full implementation, we might:
         // - Remove old snapshot files (keep only the N most recent)
         // - Verify snapshot integrity
         // - Update cluster state
-        
+
         Ok(())
     }
 
@@ -541,7 +560,10 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
             while let Ok(Some(entry)) = entries.next_entry().await {
                 let path = entry.path();
                 if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
-                    if file_name.starts_with("snapshot_") && file_name.ends_with(".snap") && !file_name.contains("_metadata") {
+                    if file_name.starts_with("snapshot_")
+                        && file_name.ends_with(".snap")
+                        && !file_name.contains("_metadata")
+                    {
                         snapshot_files.push(path);
                     }
                 }
@@ -564,9 +586,9 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         });
 
         // Get the latest snapshot
-        let latest_snapshot_path = snapshot_files.first().ok_or_else(|| {
-            anyhow::anyhow!("No snapshot files found despite listing")
-        })?;
+        let latest_snapshot_path = snapshot_files
+            .first()
+            .ok_or_else(|| anyhow::anyhow!("No snapshot files found despite listing"))?;
 
         // Extract snapshot ID from filename (snapshot_{id}.snap)
         let snapshot_id = latest_snapshot_path
@@ -578,23 +600,28 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         // Load metadata to get index, term, and membership
         let metadata_path = self.snapshot_path(&format!("{}_metadata", snapshot_id));
         let (index, term) = if metadata_path.exists() {
-            let mut metadata_file = File::open(&metadata_path).await
+            let mut metadata_file = File::open(&metadata_path)
+                .await
                 .map_err(|e| anyhow::anyhow!("Failed to open snapshot metadata: {}", e))?;
             let mut metadata_contents = String::new();
-            metadata_file.read_to_string(&mut metadata_contents).await
+            metadata_file
+                .read_to_string(&mut metadata_contents)
+                .await
                 .map_err(|e| anyhow::anyhow!("Failed to read snapshot metadata: {}", e))?;
-            
+
             let metadata: serde_json::Value = serde_json::from_str(&metadata_contents)
                 .map_err(|e| anyhow::anyhow!("Failed to parse snapshot metadata: {}", e))?;
-            
-            let index = metadata["index"].as_u64()
+
+            let index = metadata["index"]
+                .as_u64()
                 .ok_or_else(|| anyhow::anyhow!("Invalid index in snapshot metadata"))?;
-            let term = metadata["term"].as_u64()
+            let term = metadata["term"]
+                .as_u64()
                 .ok_or_else(|| anyhow::anyhow!("Invalid term in snapshot metadata"))?;
-            
+
             // Note: membership config is stored in metadata but not used here
             // It will be used in get_membership_config() when loading from snapshot
-            
+
             (index, term)
         } else {
             // Fallback: if metadata doesn't exist, use last log entry
@@ -605,11 +632,15 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         };
 
         // Open snapshot file
-        let snapshot_file = File::open(latest_snapshot_path).await
+        let snapshot_file = File::open(latest_snapshot_path)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to open snapshot file: {}", e))?;
 
-        info!("Retrieved snapshot {} at index {}, term {}", snapshot_id, index, term);
-        
+        info!(
+            "Retrieved snapshot {} at index {}, term {}",
+            snapshot_id, index, term
+        );
+
         Ok(Some(CurrentSnapshotData {
             index,
             term,

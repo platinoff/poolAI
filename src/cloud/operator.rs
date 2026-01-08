@@ -43,9 +43,9 @@
 
 use crate::core::error::AppError;
 use std::sync::Arc;
-use tokio::sync::{RwLock, mpsc};
+use tokio::sync::{mpsc, RwLock};
 use tokio::time::{interval, Duration};
-use tracing::{info, warn, error};
+use tracing::{error, info, warn};
 
 /// CRD event type
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -115,7 +115,9 @@ impl PoolAIOperator {
             namespace: namespace.clone(),
             running: Arc::new(RwLock::new(false)),
             #[cfg(feature = "cloud-sdk")]
-            k8s_manager: Some(Arc::new(crate::cloud::kubernetes::KubernetesManager::new(namespace.clone()))),
+            k8s_manager: Some(Arc::new(crate::cloud::kubernetes::KubernetesManager::new(
+                namespace.clone(),
+            ))),
             #[cfg(feature = "cloud-sdk")]
             watcher_handles: Arc::new(RwLock::new(Vec::new())),
             #[cfg(feature = "cloud-sdk")]
@@ -154,7 +156,10 @@ impl PoolAIOperator {
             return Ok(());
         }
 
-        info!("Starting PoolAI Kubernetes operator for namespace: {}", self.namespace);
+        info!(
+            "Starting PoolAI Kubernetes operator for namespace: {}",
+            self.namespace
+        );
 
         if self.namespace.is_empty() {
             return Err(AppError::InitializationError(
@@ -178,23 +183,23 @@ impl PoolAIOperator {
                     e
                 )))?;
             }
-            
+
             // Verify CRDs are installed (check if we can list CRDs)
             // For now, we'll assume CRDs are installed
             // In production, we would check: GET /apis/apiextensions.k8s.io/v1/customresourcedefinitions
-            
+
             // Create event channel for CRD events
             let (event_tx, event_rx) = mpsc::unbounded_channel();
-            
+
             // Store event_tx for shutdown
             // Note: We can't store it in self because of lifetime issues
             // In production, we'd use a different approach (e.g., Arc<Mutex<Option<...>>>)
-            
+
             // Start watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
             let watcher_handles = self.watcher_handles.clone();
             let namespace = self.namespace.clone();
             let k8s_manager = self.k8s_manager.clone();
-            
+
             // Start watcher for PoolAIWorker CRD
             let handle_worker = tokio::spawn(Self::watch_crd_resources(
                 "poolaiworkers".to_string(),
@@ -206,7 +211,7 @@ impl PoolAIOperator {
                 k8s_manager.clone(),
             ));
             watcher_handles.write().await.push(handle_worker);
-            
+
             // Start watcher for PoolAIVM CRD
             let handle_vm = tokio::spawn(Self::watch_crd_resources(
                 "poolaivms".to_string(),
@@ -218,7 +223,7 @@ impl PoolAIOperator {
                 k8s_manager.clone(),
             ));
             watcher_handles.write().await.push(handle_vm);
-            
+
             // Start watcher for PoolAITenant CRD
             let handle_tenant = tokio::spawn(Self::watch_crd_resources(
                 "poolaitenants".to_string(),
@@ -230,7 +235,7 @@ impl PoolAIOperator {
                 k8s_manager.clone(),
             ));
             watcher_handles.write().await.push(handle_tenant);
-            
+
             // Start reconciliation loop
             let k8s_manager_reconcile = self.k8s_manager.clone();
             let namespace_reconcile = self.namespace.clone();
@@ -240,16 +245,22 @@ impl PoolAIOperator {
                 k8s_manager_reconcile,
             ));
             watcher_handles.write().await.push(handle_reconcile);
-            
-            info!("Started {} watchers and reconciliation loop", watcher_handles.read().await.len());
+
+            info!(
+                "Started {} watchers and reconciliation loop",
+                watcher_handles.read().await.len()
+            );
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
             warn!("Operator started without cloud-sdk feature - CRD watching disabled");
         }
 
-        info!("PoolAI Kubernetes operator started for namespace: {}", self.namespace);
+        info!(
+            "PoolAI Kubernetes operator started for namespace: {}",
+            self.namespace
+        );
         *running = true;
         Ok(())
     }
@@ -284,20 +295,20 @@ impl PoolAIOperator {
             // Stop watchers and reconciliation loops gracefully
             let mut handles = self.watcher_handles.write().await;
             info!("Stopping {} watcher tasks...", handles.len());
-            
+
             // Abort all watcher tasks
             for handle in handles.drain(..) {
                 handle.abort();
             }
-            
+
             // Note: Event channel is closed when all senders are dropped
             // Watchers will stop when their tasks are aborted
-            
+
             // Shutdown Kubernetes manager
             if let Some(ref k8s_manager) = self.k8s_manager {
                 let _ = k8s_manager.shutdown().await;
             }
-            
+
             info!("All watchers stopped");
         }
 
@@ -463,11 +474,12 @@ impl PoolAIOperator {
         k8s_manager: Option<Arc<crate::cloud::kubernetes::KubernetesManager>>,
     ) {
         let mut interval = interval(Duration::from_secs(10)); // Poll every 10 seconds
-        let mut last_resources: std::collections::HashMap<String, String> = std::collections::HashMap::new();
-        
+        let mut last_resources: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
+
         loop {
             interval.tick().await;
-            
+
             // Poll Kubernetes API for CRD resource changes
             // This implementation uses HTTP polling with resourceVersion comparison
             // to detect Added, Modified, and Deleted events.
@@ -476,51 +488,76 @@ impl PoolAIOperator {
                 // Check if manager is initialized
                 if manager.is_cluster_available().await.unwrap_or(false) {
                     // List resources and detect changes by comparing resourceVersion
-                    match manager.list_crd_resources(&group, &version, &resource_plural).await {
+                    match manager
+                        .list_crd_resources(&group, &version, &resource_plural)
+                        .await
+                    {
                         Ok(resources_json) => {
-                        if let Some(items) = resources_json.get("items").and_then(|i| i.as_array()) {
-                            let mut current_resources: std::collections::HashMap<String, String> = std::collections::HashMap::new();
-                            
-                            for item in items {
-                                if let Some(name) = item.get("metadata")
-                                    .and_then(|m| m.get("name"))
-                                    .and_then(|n| n.as_str())
-                                {
-                                    let resource_version = item.get("metadata")
-                                        .and_then(|m| m.get("resourceVersion"))
-                                        .and_then(|rv| rv.as_str())
-                                        .unwrap_or("")
-                                        .to_string();
-                                    
-                                    // Check if resource is new or modified
-                                    if let Some(old_version) = last_resources.get(name) {
-                                        if old_version != &resource_version {
-                                            // Resource modified
+                            if let Some(items) =
+                                resources_json.get("items").and_then(|i| i.as_array())
+                            {
+                                let mut current_resources: std::collections::HashMap<
+                                    String,
+                                    String,
+                                > = std::collections::HashMap::new();
+
+                                for item in items {
+                                    if let Some(name) = item
+                                        .get("metadata")
+                                        .and_then(|m| m.get("name"))
+                                        .and_then(|n| n.as_str())
+                                    {
+                                        let resource_version = item
+                                            .get("metadata")
+                                            .and_then(|m| m.get("resourceVersion"))
+                                            .and_then(|rv| rv.as_str())
+                                            .unwrap_or("")
+                                            .to_string();
+
+                                        // Check if resource is new or modified
+                                        if let Some(old_version) = last_resources.get(name) {
+                                            if old_version != &resource_version {
+                                                // Resource modified
+                                                let _ = event_tx.send(CrdEvent {
+                                                    event_type: CrdEventType::Modified,
+                                                    resource_type: resource_type.clone(),
+                                                    name: name.to_string(),
+                                                    namespace: namespace.clone(),
+                                                });
+                                            }
+                                        } else {
+                                            // Resource added
                                             let _ = event_tx.send(CrdEvent {
-                                                event_type: CrdEventType::Modified,
+                                                event_type: CrdEventType::Added,
                                                 resource_type: resource_type.clone(),
                                                 name: name.to_string(),
                                                 namespace: namespace.clone(),
                                             });
                                         }
-                                    } else {
-                                        // Resource added
+
+                                        current_resources
+                                            .insert(name.to_string(), resource_version);
+                                    }
+                                }
+
+                                // Detect deleted resources
+                                for (name, _) in &last_resources {
+                                    if !current_resources.contains_key(name) {
+                                        // Resource deleted
                                         let _ = event_tx.send(CrdEvent {
-                                            event_type: CrdEventType::Added,
+                                            event_type: CrdEventType::Deleted,
                                             resource_type: resource_type.clone(),
-                                            name: name.to_string(),
+                                            name: name.clone(),
                                             namespace: namespace.clone(),
                                         });
                                     }
-                                    
-                                    current_resources.insert(name.to_string(), resource_version);
                                 }
-                            }
-                            
-                            // Detect deleted resources
-                            for (name, _) in &last_resources {
-                                if !current_resources.contains_key(name) {
-                                    // Resource deleted
+
+                                last_resources = current_resources;
+                            } else {
+                                // No items in response (empty list)
+                                // Check for deleted resources
+                                for (name, _) in &last_resources {
                                     let _ = event_tx.send(CrdEvent {
                                         event_type: CrdEventType::Deleted,
                                         resource_type: resource_type.clone(),
@@ -528,22 +565,8 @@ impl PoolAIOperator {
                                         namespace: namespace.clone(),
                                     });
                                 }
+                                last_resources.clear();
                             }
-                            
-                            last_resources = current_resources;
-                        } else {
-                            // No items in response (empty list)
-                            // Check for deleted resources
-                            for (name, _) in &last_resources {
-                                let _ = event_tx.send(CrdEvent {
-                                    event_type: CrdEventType::Deleted,
-                                    resource_type: resource_type.clone(),
-                                    name: name.clone(),
-                                    namespace: namespace.clone(),
-                                });
-                            }
-                            last_resources.clear();
-                        }
                         }
                         Err(e) => {
                             warn!("Failed to list CRD resources {}: {}", resource_plural, e);
@@ -556,12 +579,12 @@ impl PoolAIOperator {
             } else {
                 warn!("Kubernetes manager not available, skipping CRD resource polling");
             }
-            
+
             // In production, we would break on shutdown signal
             // For now, this runs indefinitely
         }
     }
-    
+
     /// Reconciliation loop
     ///
     /// Processes CRD events and reconciles desired state vs actual state.
@@ -571,7 +594,7 @@ impl PoolAIOperator {
         k8s_manager: Option<Arc<crate::cloud::kubernetes::KubernetesManager>>,
     ) {
         info!("Reconciliation loop started for namespace: {}", namespace);
-        
+
         let k8s_manager = match k8s_manager {
             Some(manager) => manager,
             None => {
@@ -579,27 +602,40 @@ impl PoolAIOperator {
                 return;
             }
         };
-        
+
         while let Some(event) = event_rx.recv().await {
             match event.event_type {
                 CrdEventType::Added | CrdEventType::Modified => {
-                    info!("CRD resource {}: {} ({:?}) in namespace {}", 
+                    info!(
+                        "CRD resource {}: {} ({:?}) in namespace {}",
                         match event.event_type {
                             CrdEventType::Added => "added",
                             CrdEventType::Modified => "modified",
                             _ => unreachable!(),
                         },
-                        event.name, 
+                        event.name,
                         event.resource_type,
                         event.namespace
                     );
-                    
+
                     // Parse resource spec from Kubernetes API and reconcile
                     match event.resource_type {
                         CrdResourceType::Worker => {
-                            match Self::parse_worker_crd(&k8s_manager, &event.namespace, &event.name).await {
+                            match Self::parse_worker_crd(
+                                &k8s_manager,
+                                &event.namespace,
+                                &event.name,
+                            )
+                            .await
+                            {
                                 Ok(worker) => {
-                                    if let Err(e) = Self::reconcile_worker(&worker, &event.namespace, &k8s_manager).await {
+                                    if let Err(e) = Self::reconcile_worker(
+                                        &worker,
+                                        &event.namespace,
+                                        &k8s_manager,
+                                    )
+                                    .await
+                                    {
                                         error!("Failed to reconcile worker {}: {}", event.name, e);
                                         // Update CRD status with error
                                         let status = json!({
@@ -610,7 +646,15 @@ impl PoolAIOperator {
                                                 "message": format!("Reconciliation failed: {}", e)
                                             }]
                                         });
-                                        let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaiworkers", &event.name, status).await;
+                                        let _ = k8s_manager
+                                            .update_crd_status(
+                                                "poolai.io",
+                                                "v1",
+                                                "poolaiworkers",
+                                                &event.name,
+                                                status,
+                                            )
+                                            .await;
                                     }
                                 }
                                 Err(e) => {
@@ -619,9 +663,14 @@ impl PoolAIOperator {
                             }
                         }
                         CrdResourceType::Vm => {
-                            match Self::parse_vm_crd(&k8s_manager, &event.namespace, &event.name).await {
+                            match Self::parse_vm_crd(&k8s_manager, &event.namespace, &event.name)
+                                .await
+                            {
                                 Ok(vm) => {
-                                    if let Err(e) = Self::reconcile_vm(&vm, &event.namespace, &k8s_manager).await {
+                                    if let Err(e) =
+                                        Self::reconcile_vm(&vm, &event.namespace, &k8s_manager)
+                                            .await
+                                    {
                                         error!("Failed to reconcile VM {}: {}", event.name, e);
                                         // Update CRD status with error
                                         let status = json!({
@@ -632,7 +681,15 @@ impl PoolAIOperator {
                                                 "message": format!("Reconciliation failed: {}", e)
                                             }]
                                         });
-                                        let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaivms", &event.name, status).await;
+                                        let _ = k8s_manager
+                                            .update_crd_status(
+                                                "poolai.io",
+                                                "v1",
+                                                "poolaivms",
+                                                &event.name,
+                                                status,
+                                            )
+                                            .await;
                                     }
                                 }
                                 Err(e) => {
@@ -641,9 +698,21 @@ impl PoolAIOperator {
                             }
                         }
                         CrdResourceType::Tenant => {
-                            match Self::parse_tenant_crd(&k8s_manager, &event.namespace, &event.name).await {
+                            match Self::parse_tenant_crd(
+                                &k8s_manager,
+                                &event.namespace,
+                                &event.name,
+                            )
+                            .await
+                            {
                                 Ok(tenant) => {
-                                    if let Err(e) = Self::reconcile_tenant(&tenant, &event.namespace, &k8s_manager).await {
+                                    if let Err(e) = Self::reconcile_tenant(
+                                        &tenant,
+                                        &event.namespace,
+                                        &k8s_manager,
+                                    )
+                                    .await
+                                    {
                                         error!("Failed to reconcile tenant {}: {}", event.name, e);
                                         // Update CRD status with error
                                         let status = json!({
@@ -654,7 +723,15 @@ impl PoolAIOperator {
                                                 "message": format!("Reconciliation failed: {}", e)
                                             }]
                                         });
-                                        let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaitenants", &event.name, status).await;
+                                        let _ = k8s_manager
+                                            .update_crd_status(
+                                                "poolai.io",
+                                                "v1",
+                                                "poolaitenants",
+                                                &event.name,
+                                                status,
+                                            )
+                                            .await;
                                     }
                                 }
                                 Err(e) => {
@@ -669,113 +746,148 @@ impl PoolAIOperator {
                         info!("Reconciliation loop shutting down");
                         break;
                     }
-                    info!("CRD resource deleted: {} ({:?}) in namespace {}", 
-                        event.name, 
-                        event.resource_type,
-                        event.namespace
+                    info!(
+                        "CRD resource deleted: {} ({:?}) in namespace {}",
+                        event.name, event.resource_type, event.namespace
                     );
-                    
+
                     // Cleanup: Delete associated Kubernetes resources
                     match event.resource_type {
                         CrdResourceType::Worker => {
                             // Delete worker deployment
-                            if let Err(e) = k8s_manager.delete_worker_deployment(&event.name).await {
+                            if let Err(e) = k8s_manager.delete_worker_deployment(&event.name).await
+                            {
                                 warn!("Failed to delete worker deployment {}: {}", event.name, e);
                             } else {
-                                info!("Deleted worker deployment: {} from namespace {}", event.name, event.namespace);
+                                info!(
+                                    "Deleted worker deployment: {} from namespace {}",
+                                    event.name, event.namespace
+                                );
                             }
-                            
+
                             // Delete associated service
                             let service_name = format!("{}-service", event.name);
                             if let Err(e) = k8s_manager.delete_service(&service_name).await {
-                                warn!("Failed to delete service {}: {} (may not exist)", service_name, e);
+                                warn!(
+                                    "Failed to delete service {}: {} (may not exist)",
+                                    service_name, e
+                                );
                             } else {
-                                info!("Deleted service: {} from namespace {}", service_name, event.namespace);
+                                info!(
+                                    "Deleted service: {} from namespace {}",
+                                    service_name, event.namespace
+                                );
                             }
                         }
                         CrdResourceType::Vm => {
                             // Delete VM deployment
-                            if let Err(e) = k8s_manager.delete_worker_deployment(&event.name).await {
+                            if let Err(e) = k8s_manager.delete_worker_deployment(&event.name).await
+                            {
                                 warn!("Failed to delete VM deployment {}: {}", event.name, e);
                             } else {
-                                info!("Deleted VM deployment: {} from namespace {}", event.name, event.namespace);
+                                info!(
+                                    "Deleted VM deployment: {} from namespace {}",
+                                    event.name, event.namespace
+                                );
                             }
-                            
+
                             // Delete associated service
                             let service_name = format!("{}-service", event.name);
                             if let Err(e) = k8s_manager.delete_service(&service_name).await {
-                                warn!("Failed to delete service {}: {} (may not exist)", service_name, e);
+                                warn!(
+                                    "Failed to delete service {}: {} (may not exist)",
+                                    service_name, e
+                                );
                             } else {
-                                info!("Deleted service: {} from namespace {}", service_name, event.namespace);
+                                info!(
+                                    "Deleted service: {} from namespace {}",
+                                    service_name, event.namespace
+                                );
                             }
-                            
+
                             // Delete associated PVC
                             let pvc_name = format!("{}-pvc", event.name);
                             if let Err(e) = k8s_manager.delete_pvc(&pvc_name).await {
                                 warn!("Failed to delete PVC {}: {} (may not exist)", pvc_name, e);
                             } else {
-                                info!("Deleted PVC: {} from namespace {}", pvc_name, event.namespace);
+                                info!(
+                                    "Deleted PVC: {} from namespace {}",
+                                    pvc_name, event.namespace
+                                );
                             }
                         }
                         CrdResourceType::Tenant => {
                             // Delete ResourceQuota for tenant
                             if let Err(e) = k8s_manager.delete_resource_quota(&event.name).await {
-                                warn!("Failed to delete ResourceQuota for tenant {}: {}", event.name, e);
+                                warn!(
+                                    "Failed to delete ResourceQuota for tenant {}: {}",
+                                    event.name, e
+                                );
                             } else {
-                                info!("Deleted ResourceQuota for tenant: {} from namespace {}", event.name, event.namespace);
+                                info!(
+                                    "Deleted ResourceQuota for tenant: {} from namespace {}",
+                                    event.name, event.namespace
+                                );
                             }
                         }
                     }
                 }
             }
         }
-        
+
         info!("Reconciliation loop stopped");
     }
-    
+
     /// Parse PoolAIWorker CRD from Kubernetes API
     async fn parse_worker_crd(
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
         namespace: &str,
         name: &str,
     ) -> Result<PoolAIWorker, AppError> {
-        let resource = k8s_manager.get_crd_resource("poolai.io", "v1", "poolaiworkers", name).await?;
-        
-        let spec = resource.get("spec")
+        let resource = k8s_manager
+            .get_crd_resource("poolai.io", "v1", "poolaiworkers", name)
+            .await?;
+
+        let spec = resource
+            .get("spec")
             .ok_or_else(|| AppError::NetworkError("CRD spec is missing".to_string()))?;
-        
-        let name = resource.get("metadata")
+
+        let name = resource
+            .get("metadata")
             .and_then(|m| m.get("name"))
             .and_then(|n| n.as_str())
             .unwrap_or(name)
             .to_string();
-        
-        let image = spec.get("image")
+
+        let image = spec
+            .get("image")
             .and_then(|i| i.as_str())
             .unwrap_or("poolai/worker:latest")
             .to_string();
-        
-        let replicas = spec.get("replicas")
-            .and_then(|r| r.as_u64())
-            .unwrap_or(1) as u32;
-        
-        let resources_spec = spec.get("resources")
+
+        let replicas = spec.get("replicas").and_then(|r| r.as_u64()).unwrap_or(1) as u32;
+
+        let resources_spec = spec
+            .get("resources")
             .ok_or_else(|| AppError::NetworkError("Resources spec is missing".to_string()))?;
-        
-        let cpu = resources_spec.get("cpu")
+
+        let cpu = resources_spec
+            .get("cpu")
             .and_then(|c| c.as_str())
             .unwrap_or("100m")
             .to_string();
-        
-        let memory = resources_spec.get("memory")
+
+        let memory = resources_spec
+            .get("memory")
             .and_then(|m| m.as_str())
             .unwrap_or("128Mi")
             .to_string();
-        
-        let gpu = resources_spec.get("gpu")
+
+        let gpu = resources_spec
+            .get("gpu")
             .and_then(|g| g.as_u64())
             .map(|g| g as u32);
-        
+
         // Parse environment variables if present
         let mut env = std::collections::HashMap::new();
         if let Some(env_spec) = spec.get("env").and_then(|e| e.as_object()) {
@@ -785,7 +897,7 @@ impl PoolAIOperator {
                 }
             }
         }
-        
+
         Ok(PoolAIWorker {
             name,
             image,
@@ -794,61 +906,74 @@ impl PoolAIOperator {
             env: if env.is_empty() { None } else { Some(env) },
         })
     }
-    
+
     /// Parse PoolAIVM CRD from Kubernetes API
     async fn parse_vm_crd(
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
         namespace: &str,
         name: &str,
     ) -> Result<PoolAIVM, AppError> {
-        let resource = k8s_manager.get_crd_resource("poolai.io", "v1", "poolaivms", name).await?;
-        
-        let spec = resource.get("spec")
+        let resource = k8s_manager
+            .get_crd_resource("poolai.io", "v1", "poolaivms", name)
+            .await?;
+
+        let spec = resource
+            .get("spec")
             .ok_or_else(|| AppError::NetworkError("CRD spec is missing".to_string()))?;
-        
-        let name = resource.get("metadata")
+
+        let name = resource
+            .get("metadata")
             .and_then(|m| m.get("name"))
             .and_then(|n| n.as_str())
             .unwrap_or(name)
             .to_string();
-        
-        let image = spec.get("image")
+
+        let image = spec
+            .get("image")
             .and_then(|i| i.as_str())
             .unwrap_or("poolai/vm:latest")
             .to_string();
-        
-        let resources_spec = spec.get("resources")
+
+        let resources_spec = spec
+            .get("resources")
             .ok_or_else(|| AppError::NetworkError("Resources spec is missing".to_string()))?;
-        
-        let cpu = resources_spec.get("cpu")
+
+        let cpu = resources_spec
+            .get("cpu")
             .and_then(|c| c.as_str())
             .unwrap_or("500m")
             .to_string();
-        
-        let memory = resources_spec.get("memory")
+
+        let memory = resources_spec
+            .get("memory")
             .and_then(|m| m.as_str())
             .unwrap_or("512Mi")
             .to_string();
-        
-        let gpu = resources_spec.get("gpu")
+
+        let gpu = resources_spec
+            .get("gpu")
             .and_then(|g| g.as_u64())
             .map(|g| g as u32);
-        
-        let storage_spec = spec.get("storage")
+
+        let storage_spec = spec
+            .get("storage")
             .ok_or_else(|| AppError::NetworkError("Storage spec is missing".to_string()))?;
-        
-        let size = storage_spec.get("size")
+
+        let size = storage_spec
+            .get("size")
             .and_then(|s| s.as_str())
             .unwrap_or("10Gi")
             .to_string();
-        
-        let storage_class = storage_spec.get("storage_class")
+
+        let storage_class = storage_spec
+            .get("storage_class")
             .and_then(|sc| sc.as_str())
             .unwrap_or("standard")
             .to_string();
-        
+
         // Parse network ports if present
-        let ports = spec.get("ports")
+        let ports = spec
+            .get("ports")
             .and_then(|p| p.as_array())
             .map(|ports_array| {
                 ports_array
@@ -856,54 +981,60 @@ impl PoolAIOperator {
                     .filter_map(|p| p.as_u64().map(|p| p as u16))
                     .collect()
             });
-        
+
         Ok(PoolAIVM {
             name,
             image,
             resources: VmResources { cpu, memory, gpu },
-            storage: VmStorage { size, storage_class },
+            storage: VmStorage {
+                size,
+                storage_class,
+            },
             ports,
         })
     }
-    
+
     /// Parse PoolAITenant CRD from Kubernetes API
     async fn parse_tenant_crd(
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
         namespace: &str,
         name: &str,
     ) -> Result<PoolAITenant, AppError> {
-        let resource = k8s_manager.get_crd_resource("poolai.io", "v1", "poolaitenants", name).await?;
-        
-        let spec = resource.get("spec")
+        let resource = k8s_manager
+            .get_crd_resource("poolai.io", "v1", "poolaitenants", name)
+            .await?;
+
+        let spec = resource
+            .get("spec")
             .ok_or_else(|| AppError::NetworkError("CRD spec is missing".to_string()))?;
-        
-        let name = resource.get("metadata")
+
+        let name = resource
+            .get("metadata")
             .and_then(|m| m.get("name"))
             .and_then(|n| n.as_str())
             .unwrap_or(name)
             .to_string();
-        
-        let active = spec.get("active")
-            .and_then(|a| a.as_bool())
-            .unwrap_or(true);
-        
-        let quotas_spec = spec.get("quotas")
+
+        let active = spec.get("active").and_then(|a| a.as_bool()).unwrap_or(true);
+
+        let quotas_spec = spec
+            .get("quotas")
             .ok_or_else(|| AppError::NetworkError("Quotas spec is missing".to_string()))?;
-        
-        let max_workers = quotas_spec.get("max_workers")
+
+        let max_workers = quotas_spec
+            .get("max_workers")
             .and_then(|w| w.as_u64())
             .map(|w| w as usize);
-        
-        let max_memory_mb = quotas_spec.get("max_memory_mb")
-            .and_then(|m| m.as_u64());
-        
-        let max_cpu_cores = quotas_spec.get("max_cpu_cores")
+
+        let max_memory_mb = quotas_spec.get("max_memory_mb").and_then(|m| m.as_u64());
+
+        let max_cpu_cores = quotas_spec
+            .get("max_cpu_cores")
             .and_then(|c| c.as_u64())
             .map(|c| c as usize);
-        
-        let max_storage_mb = quotas_spec.get("max_storage_mb")
-            .and_then(|s| s.as_u64());
-        
+
+        let max_storage_mb = quotas_spec.get("max_storage_mb").and_then(|s| s.as_u64());
+
         Ok(PoolAITenant {
             name,
             active,
@@ -915,7 +1046,7 @@ impl PoolAIOperator {
             },
         })
     }
-    
+
     /// Reconcile a PoolAIWorker resource
     ///
     /// Ensures the actual state matches the desired state.
@@ -929,8 +1060,11 @@ impl PoolAIOperator {
         namespace: &str,
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
     ) -> Result<(), AppError> {
-        info!("Reconciling worker: {} in namespace {}", worker.name, namespace);
-        
+        info!(
+            "Reconciling worker: {} in namespace {}",
+            worker.name, namespace
+        );
+
         // Build WorkerDeploymentConfig from PoolAIWorker
         let config = crate::cloud::kubernetes::WorkerDeploymentConfig {
             image: worker.image.clone(),
@@ -942,70 +1076,107 @@ impl PoolAIOperator {
             },
             env: worker.env.clone().unwrap_or_default(),
         };
-        
+
         // Check if deployment exists
         let deployment_name = &worker.name;
         let deployments = k8s_manager.list_deployments().await.unwrap_or_default();
         let deployment_exists = deployments.iter().any(|d| d == deployment_name);
-        
+
         if deployment_exists {
             // Update existing deployment
-            match k8s_manager.update_worker_deployment(deployment_name, &config).await {
+            match k8s_manager
+                .update_worker_deployment(deployment_name, &config)
+                .await
+            {
                 Ok(_) => {
-                    info!("Updated worker deployment: {} in namespace {}", deployment_name, namespace);
+                    info!(
+                        "Updated worker deployment: {} in namespace {}",
+                        deployment_name, namespace
+                    );
                 }
                 Err(e) => {
-                    warn!("Failed to update worker deployment {}: {}", deployment_name, e);
+                    warn!(
+                        "Failed to update worker deployment {}: {}",
+                        deployment_name, e
+                    );
                     return Err(e);
                 }
             }
         } else {
             // Create new deployment
-            match k8s_manager.create_worker_deployment(deployment_name, &config).await {
+            match k8s_manager
+                .create_worker_deployment(deployment_name, &config)
+                .await
+            {
                 Ok(deployment_id) => {
-                    info!("Created worker deployment: {} in namespace {}", deployment_id, namespace);
+                    info!(
+                        "Created worker deployment: {} in namespace {}",
+                        deployment_id, namespace
+                    );
                 }
                 Err(e) => {
-                    warn!("Failed to create worker deployment {}: {}", deployment_name, e);
+                    warn!(
+                        "Failed to create worker deployment {}: {}",
+                        deployment_name, e
+                    );
                     return Err(e);
                 }
             }
         }
-        
+
         // Create/update Service for the worker (if ports are needed)
         // For now, we'll create a default service on port 8080
         let service_name = format!("{}-service", deployment_name);
         let service_exists = k8s_manager.service_exists(&service_name).await;
-        
+
         if service_exists {
             // Update existing service
-            if let Err(e) = k8s_manager.update_service(
-                &service_name,
-                deployment_name,
-                &[8080], // Default port
-                crate::cloud::kubernetes::ServiceType::ClusterIP,
-            ).await {
-                warn!("Failed to update service for worker {}: {}", deployment_name, e);
+            if let Err(e) = k8s_manager
+                .update_service(
+                    &service_name,
+                    deployment_name,
+                    &[8080], // Default port
+                    crate::cloud::kubernetes::ServiceType::ClusterIP,
+                )
+                .await
+            {
+                warn!(
+                    "Failed to update service for worker {}: {}",
+                    deployment_name, e
+                );
             } else {
-                info!("Updated service: {} for worker {}", service_name, deployment_name);
+                info!(
+                    "Updated service: {} for worker {}",
+                    service_name, deployment_name
+                );
             }
         } else {
             // Create new service
-            if let Err(e) = k8s_manager.create_service(
-                &service_name,
-                deployment_name,
-                &[8080], // Default port
-                crate::cloud::kubernetes::ServiceType::ClusterIP,
-            ).await {
-                warn!("Failed to create service for worker {}: {}", deployment_name, e);
+            if let Err(e) = k8s_manager
+                .create_service(
+                    &service_name,
+                    deployment_name,
+                    &[8080], // Default port
+                    crate::cloud::kubernetes::ServiceType::ClusterIP,
+                )
+                .await
+            {
+                warn!(
+                    "Failed to create service for worker {}: {}",
+                    deployment_name, e
+                );
             } else {
-                info!("Created service: {} for worker {}", service_name, deployment_name);
+                info!(
+                    "Created service: {} for worker {}",
+                    service_name, deployment_name
+                );
             }
         }
-        
+
         // Update CRD status with deployment status
         // Get actual deployment status if deployment exists
-        let (deployment_ready, replicas, available_replicas, ready_replicas) = if deployment_exists {
+        let (deployment_ready, replicas, available_replicas, ready_replicas) = if deployment_exists
+        {
             match k8s_manager.get_deployment_status(deployment_name).await {
                 Ok(deployment_status) => (
                     deployment_status.ready,
@@ -1014,28 +1185,31 @@ impl PoolAIOperator {
                     deployment_status.ready_replicas,
                 ),
                 Err(e) => {
-                    warn!("Failed to get deployment status for {}: {}", deployment_name, e);
+                    warn!(
+                        "Failed to get deployment status for {}: {}",
+                        deployment_name, e
+                    );
                     (true, 0, 0, 0) // Assume ready if we can't check, but no replica info
                 }
             }
         } else {
             (false, 0, 0, 0) // Not ready if deployment doesn't exist yet
         };
-        
+
         let status = json!({
             "conditions": [{
                 "type": "Ready",
                 "status": if deployment_ready { "True" } else { "False" },
-                "reason": if deployment_exists { 
+                "reason": if deployment_exists {
                     if deployment_ready { "DeploymentReady" } else { "DeploymentNotReady" }
-                } else { 
-                    "DeploymentCreated" 
+                } else {
+                    "DeploymentCreated"
                 },
-                "message": format!("Worker deployment {} {}", deployment_name, 
-                    if deployment_exists { 
+                "message": format!("Worker deployment {} {}", deployment_name,
+                    if deployment_exists {
                         if deployment_ready { "is ready" } else { "is not ready yet" }
-                    } else { 
-                        "created" 
+                    } else {
+                        "created"
                     })
             }],
             "deploymentName": deployment_name,
@@ -1044,15 +1218,21 @@ impl PoolAIOperator {
             "availableReplicas": available_replicas,
             "readyReplicas": ready_replicas
         });
-        
-        if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaiworkers", &worker.name, status).await {
-            warn!("Failed to update CRD status for worker {}: {}", worker.name, e);
+
+        if let Err(e) = k8s_manager
+            .update_crd_status("poolai.io", "v1", "poolaiworkers", &worker.name, status)
+            .await
+        {
+            warn!(
+                "Failed to update CRD status for worker {}: {}",
+                worker.name, e
+            );
             // Don't fail reconciliation if status update fails
         }
-        
+
         Ok(())
     }
-    
+
     /// Reconcile a PoolAIVM resource
     ///
     /// Ensures the actual state matches the desired state.
@@ -1067,7 +1247,7 @@ impl PoolAIOperator {
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
     ) -> Result<(), AppError> {
         info!("Reconciling VM: {} in namespace {}", vm.name, namespace);
-        
+
         // Build VmDeploymentConfig from PoolAIVM
         let config = crate::cloud::kubernetes::VmDeploymentConfig {
             image: vm.image.clone(),
@@ -1085,17 +1265,23 @@ impl PoolAIOperator {
                 service_type: crate::cloud::kubernetes::ServiceType::ClusterIP, // Default service type
             },
         };
-        
+
         // Check if deployment exists
         let deployment_name = &vm.name;
         let deployments = k8s_manager.list_deployments().await.unwrap_or_default();
         let deployment_exists = deployments.iter().any(|d| d == deployment_name);
-        
+
         if deployment_exists {
             // Update existing deployment
-            match k8s_manager.update_vm_deployment(deployment_name, &config).await {
+            match k8s_manager
+                .update_vm_deployment(deployment_name, &config)
+                .await
+            {
                 Ok(_) => {
-                    info!("Updated VM deployment: {} in namespace {}", deployment_name, namespace);
+                    info!(
+                        "Updated VM deployment: {} in namespace {}",
+                        deployment_name, namespace
+                    );
                 }
                 Err(e) => {
                     warn!("Failed to update VM deployment {}: {}", deployment_name, e);
@@ -1104,9 +1290,15 @@ impl PoolAIOperator {
             }
         } else {
             // Create new deployment
-            match k8s_manager.create_vm_deployment(deployment_name, &config).await {
+            match k8s_manager
+                .create_vm_deployment(deployment_name, &config)
+                .await
+            {
                 Ok(deployment_id) => {
-                    info!("Created VM deployment: {} in namespace {}", deployment_id, namespace);
+                    info!(
+                        "Created VM deployment: {} in namespace {}",
+                        deployment_id, namespace
+                    );
                 }
                 Err(e) => {
                     warn!("Failed to create VM deployment {}: {}", deployment_name, e);
@@ -1114,11 +1306,11 @@ impl PoolAIOperator {
                 }
             }
         }
-        
+
         // Create/update PVC for VM storage
         let pvc_name = format!("{}-pvc", deployment_name);
         let pvc_exists = k8s_manager.pvc_exists(&pvc_name).await;
-        
+
         if pvc_exists {
             // Update existing PVC (size can be updated if storage class supports expansion)
             if let Err(e) = k8s_manager.update_pvc(&pvc_name, &vm.storage.size).await {
@@ -1128,55 +1320,57 @@ impl PoolAIOperator {
             }
         } else {
             // Create new PVC
-            if let Err(e) = k8s_manager.create_pvc(
-                &pvc_name,
-                &vm.storage.size,
-                &vm.storage.storage_class,
-            ).await {
+            if let Err(e) = k8s_manager
+                .create_pvc(&pvc_name, &vm.storage.size, &vm.storage.storage_class)
+                .await
+            {
                 warn!("Failed to create PVC for VM {}: {}", deployment_name, e);
             } else {
                 info!("Created PVC: {} for VM {}", pvc_name, deployment_name);
             }
         }
-        
+
         // Create/update Service for the VM (if ports are specified)
         if let Some(ref ports) = vm.ports {
             if !ports.is_empty() {
                 let service_name = format!("{}-service", deployment_name);
                 let service_type = crate::cloud::kubernetes::ServiceType::ClusterIP; // Default service type
                 let service_exists = k8s_manager.service_exists(&service_name).await;
-                
+
                 if service_exists {
                     // Update existing service
-                    if let Err(e) = k8s_manager.update_service(
-                        &service_name,
-                        deployment_name,
-                        ports,
-                        service_type,
-                    ).await {
+                    if let Err(e) = k8s_manager
+                        .update_service(&service_name, deployment_name, ports, service_type)
+                        .await
+                    {
                         warn!("Failed to update service for VM {}: {}", deployment_name, e);
                     } else {
-                        info!("Updated service: {} for VM {}", service_name, deployment_name);
+                        info!(
+                            "Updated service: {} for VM {}",
+                            service_name, deployment_name
+                        );
                     }
                 } else {
                     // Create new service
-                    if let Err(e) = k8s_manager.create_service(
-                        &service_name,
-                        deployment_name,
-                        ports,
-                        service_type,
-                    ).await {
+                    if let Err(e) = k8s_manager
+                        .create_service(&service_name, deployment_name, ports, service_type)
+                        .await
+                    {
                         warn!("Failed to create service for VM {}: {}", deployment_name, e);
                     } else {
-                        info!("Created service: {} for VM {}", service_name, deployment_name);
+                        info!(
+                            "Created service: {} for VM {}",
+                            service_name, deployment_name
+                        );
                     }
                 }
             }
         }
-        
+
         // Update CRD status with deployment status
         // Get actual deployment status if deployment exists
-        let (deployment_ready, replicas, available_replicas, ready_replicas) = if deployment_exists {
+        let (deployment_ready, replicas, available_replicas, ready_replicas) = if deployment_exists
+        {
             match k8s_manager.get_deployment_status(deployment_name).await {
                 Ok(deployment_status) => (
                     deployment_status.ready,
@@ -1185,28 +1379,31 @@ impl PoolAIOperator {
                     deployment_status.ready_replicas,
                 ),
                 Err(e) => {
-                    warn!("Failed to get deployment status for {}: {}", deployment_name, e);
+                    warn!(
+                        "Failed to get deployment status for {}: {}",
+                        deployment_name, e
+                    );
                     (true, 0, 0, 0) // Assume ready if we can't check, but no replica info
                 }
             }
         } else {
             (false, 0, 0, 0) // Not ready if deployment doesn't exist yet
         };
-        
+
         let status = json!({
             "conditions": [{
                 "type": "Ready",
                 "status": if deployment_ready { "True" } else { "False" },
-                "reason": if deployment_exists { 
+                "reason": if deployment_exists {
                     if deployment_ready { "DeploymentReady" } else { "DeploymentNotReady" }
-                } else { 
-                    "DeploymentCreated" 
+                } else {
+                    "DeploymentCreated"
                 },
-                "message": format!("VM deployment {} {}", deployment_name, 
-                    if deployment_exists { 
+                "message": format!("VM deployment {} {}", deployment_name,
+                    if deployment_exists {
                         if deployment_ready { "is ready" } else { "is not ready yet" }
-                    } else { 
-                        "created" 
+                    } else {
+                        "created"
                     })
             }],
             "deploymentName": deployment_name,
@@ -1215,15 +1412,18 @@ impl PoolAIOperator {
             "availableReplicas": available_replicas,
             "readyReplicas": ready_replicas
         });
-        
-        if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaivms", &vm.name, status).await {
+
+        if let Err(e) = k8s_manager
+            .update_crd_status("poolai.io", "v1", "poolaivms", &vm.name, status)
+            .await
+        {
             warn!("Failed to update CRD status for VM {}: {}", vm.name, e);
             // Don't fail reconciliation if status update fails
         }
-        
+
         Ok(())
     }
-    
+
     /// Reconcile a PoolAITenant resource
     ///
     /// Ensures the actual state matches the desired state.
@@ -1235,10 +1435,16 @@ impl PoolAIOperator {
         namespace: &str,
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
     ) -> Result<(), AppError> {
-        info!("Reconciling tenant: {} in namespace {}", tenant.name, namespace);
-        
+        info!(
+            "Reconciling tenant: {} in namespace {}",
+            tenant.name, namespace
+        );
+
         if !tenant.active {
-            info!("Tenant {} is inactive, skipping reconciliation", tenant.name);
+            info!(
+                "Tenant {} is inactive, skipping reconciliation",
+                tenant.name
+            );
             // Update status to indicate tenant is inactive
             let status = json!({
                 "conditions": [{
@@ -1248,51 +1454,63 @@ impl PoolAIOperator {
                     "message": "Tenant is marked as inactive"
                 }]
             });
-            let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaitenants", &tenant.name, status).await;
+            let _ = k8s_manager
+                .update_crd_status("poolai.io", "v1", "poolaitenants", &tenant.name, status)
+                .await;
             return Ok(());
         }
-        
+
         // Build ResourceQuota spec from tenant quotas
         let mut quota_hard = serde_json::Map::new();
-        
+
         if let Some(max_cpu) = tenant.quotas.max_cpu_cores {
             quota_hard.insert("requests.cpu".to_string(), json!(max_cpu.to_string()));
             quota_hard.insert("limits.cpu".to_string(), json!(max_cpu.to_string()));
         }
-        
+
         if let Some(max_memory_mb) = tenant.quotas.max_memory_mb {
             let memory_gi = format!("{}Mi", max_memory_mb);
             quota_hard.insert("requests.memory".to_string(), json!(memory_gi.clone()));
             quota_hard.insert("limits.memory".to_string(), json!(memory_gi));
         }
-        
+
         if let Some(max_storage_mb) = tenant.quotas.max_storage_mb {
             let storage_gi = format!("{}Mi", max_storage_mb);
             quota_hard.insert("requests.storage".to_string(), json!(storage_gi));
-            quota_hard.insert("persistentvolumeclaims".to_string(), json!("10")); // Default PVC limit
+            quota_hard.insert("persistentvolumeclaims".to_string(), json!("10"));
+            // Default PVC limit
         }
-        
+
         if let Some(max_workers) = tenant.quotas.max_workers {
             // Note: Kubernetes doesn't have a direct way to limit deployments per namespace
             // We'll use a custom annotation or rely on ResourceQuota for resource limits
             quota_hard.insert("count/deployments.apps".to_string(), json!(max_workers));
         }
-        
+
         let quotas_json = json!({
             "hard": quota_hard
         });
-        
+
         // Create or update ResourceQuota
-        match k8s_manager.create_or_update_resource_quota(&tenant.name, quotas_json).await {
+        match k8s_manager
+            .create_or_update_resource_quota(&tenant.name, quotas_json)
+            .await
+        {
             Ok(_) => {
-                info!("Created/updated ResourceQuota for tenant {} in namespace {}", tenant.name, namespace);
+                info!(
+                    "Created/updated ResourceQuota for tenant {} in namespace {}",
+                    tenant.name, namespace
+                );
             }
             Err(e) => {
-                warn!("Failed to create/update ResourceQuota for tenant {}: {}", tenant.name, e);
+                warn!(
+                    "Failed to create/update ResourceQuota for tenant {}: {}",
+                    tenant.name, e
+                );
                 return Err(e);
             }
         }
-        
+
         // Update CRD status
         let status = json!({
             "conditions": [{
@@ -1303,12 +1521,18 @@ impl PoolAIOperator {
             }],
             "active": tenant.active
         });
-        
-        if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaitenants", &tenant.name, status).await {
-            warn!("Failed to update CRD status for tenant {}: {}", tenant.name, e);
+
+        if let Err(e) = k8s_manager
+            .update_crd_status("poolai.io", "v1", "poolaitenants", &tenant.name, status)
+            .await
+        {
+            warn!(
+                "Failed to update CRD status for tenant {}: {}",
+                tenant.name, e
+            );
             // Don't fail reconciliation if status update fails
         }
-        
+
         Ok(())
     }
 }

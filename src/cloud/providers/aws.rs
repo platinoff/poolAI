@@ -14,19 +14,19 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let manager = AwsManager::new(Some("us-east-1".to_string()));
 //! manager.initialize().await?;
-//! 
+//!
 //! // Create EC2 instance
 //! let instance_id = manager.create_ec2_instance(
 //!     "t3.medium",
 //!     "ami-12345678"
 //! ).await?;
-//! 
+//!
 //! // Create ECS task
 //! let task_id = manager.create_ecs_task(
 //!     "poolai-cluster",
 //!     "poolai-worker-task"
 //! ).await?;
-//! 
+//!
 //! manager.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -66,7 +66,10 @@ impl AwsManager {
         // - S3 client
 
         let region = self.region.as_deref().unwrap_or("us-east-1");
-        info!("AWS manager initialized for region: {} (placeholder)", region);
+        info!(
+            "AWS manager initialized for region: {} (placeholder)",
+            region
+        );
 
         *initialized = true;
         Ok(())
@@ -116,9 +119,14 @@ impl AwsManager {
         // - Return instance ID
         info!(
             "Creating EC2 instance: {} / {} in region {} (placeholder)",
-            instance_type, image_id, self.region.as_deref().unwrap_or("default")
+            instance_type,
+            image_id,
+            self.region.as_deref().unwrap_or("default")
         );
-        Ok(format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string()))
+        Ok(format!(
+            "i-{}",
+            uuid::Uuid::new_v4().to_string()[..8].to_string()
+        ))
     }
 
     /// Create ECS task
@@ -158,7 +166,9 @@ impl AwsManager {
         // - Return task ARN
         info!(
             "Creating ECS task: {} / {} in region {} (placeholder)",
-            cluster, task_definition, self.region.as_deref().unwrap_or("default")
+            cluster,
+            task_definition,
+            self.region.as_deref().unwrap_or("default")
         );
         Ok(uuid::Uuid::new_v4().to_string())
     }

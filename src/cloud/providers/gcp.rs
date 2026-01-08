@@ -13,13 +13,13 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let manager = GcpManager::new(Some("my-project-id".to_string()));
 //! manager.initialize().await?;
-//! 
+//!
 //! // Create Compute Engine instance
 //! let instance_id = manager.create_compute_instance(
 //!     "us-central1-a",
 //!     "n1-standard-2"
 //! ).await?;
-//! 
+//!
 //! manager.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -58,7 +58,10 @@ impl GcpManager {
         // - Cloud Storage client
 
         let project = self.project_id.as_deref().unwrap_or("unknown");
-        info!("GCP manager initialized for project: {} (placeholder)", project);
+        info!(
+            "GCP manager initialized for project: {} (placeholder)",
+            project
+        );
 
         *initialized = true;
         Ok(())

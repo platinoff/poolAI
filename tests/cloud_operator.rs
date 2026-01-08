@@ -2,8 +2,8 @@
 
 #[cfg(feature = "cloud")]
 use poolai::cloud::operator::{
-    PoolAIOperator, PoolAIWorker, PoolAIVM, PoolAITenant, WorkerResources, VmResources, VmStorage,
-    TenantQuotas,
+    PoolAIOperator, PoolAITenant, PoolAIVM, PoolAIWorker, TenantQuotas, VmResources, VmStorage,
+    WorkerResources,
 };
 
 #[cfg(feature = "cloud")]
@@ -17,25 +17,25 @@ async fn test_operator_creation() {
 #[tokio::test]
 async fn test_operator_start_stop() {
     let operator = PoolAIOperator::new("test-namespace".to_string());
-    
+
     // Initially not running
     assert!(!operator.is_running().await);
-    
+
     // Start operator
     let result = operator.start().await;
     assert!(result.is_ok());
     assert!(operator.is_running().await);
-    
+
     // Start again (should be idempotent)
     let result = operator.start().await;
     assert!(result.is_ok());
     assert!(operator.is_running().await);
-    
+
     // Stop operator
     let result = operator.stop().await;
     assert!(result.is_ok());
     assert!(!operator.is_running().await);
-    
+
     // Stop again (should be idempotent)
     let result = operator.stop().await;
     assert!(result.is_ok());
@@ -46,7 +46,7 @@ async fn test_operator_start_stop() {
 #[tokio::test]
 async fn test_operator_start_with_empty_namespace() {
     let operator = PoolAIOperator::new("".to_string());
-    
+
     let result = operator.start().await;
     assert!(result.is_err());
     assert!(!operator.is_running().await);
@@ -65,7 +65,7 @@ fn test_poolai_worker_creation() {
             gpu: Some(1),
         },
     };
-    
+
     assert_eq!(worker.name, "test-worker");
     assert_eq!(worker.image, "poolai/worker:v1.0.0");
     assert_eq!(worker.replicas, 3);
@@ -90,7 +90,7 @@ fn test_poolai_vm_creation() {
             storage_class: "ssd".to_string(),
         },
     };
-    
+
     assert_eq!(vm.name, "test-vm");
     assert_eq!(vm.image, "poolai/vm:v1.0.0");
     assert_eq!(vm.resources.cpu, "1");
@@ -112,7 +112,7 @@ fn test_poolai_tenant_creation() {
         },
         active: true,
     };
-    
+
     assert_eq!(tenant.name, "tenant-abc");
     assert_eq!(tenant.quotas.max_workers, Some(10));
     assert_eq!(tenant.quotas.max_memory_mb, Some(1024));
@@ -129,7 +129,7 @@ fn test_worker_resources_without_gpu() {
         memory: "128Mi".to_string(),
         gpu: None,
     };
-    
+
     assert_eq!(resources.cpu, "100m");
     assert_eq!(resources.memory, "128Mi");
     assert_eq!(resources.gpu, None);
@@ -144,7 +144,7 @@ fn test_tenant_quotas_partial() {
         max_cpu_cores: Some(2),
         max_storage_mb: None,
     };
-    
+
     assert_eq!(quotas.max_workers, Some(5));
     assert_eq!(quotas.max_memory_mb, None);
     assert_eq!(quotas.max_cpu_cores, Some(2));

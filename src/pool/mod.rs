@@ -83,7 +83,7 @@ pub enum LoadBalancingStrategy {
 ///
 /// let metrics = PoolMetrics::default();
 /// println!("Active workers: {}", metrics.active_workers);
-/// println!("Success rate: {:.2}%", 
+/// println!("Success rate: {:.2}%",
 ///     (metrics.successful_requests as f64 / metrics.total_requests as f64) * 100.0);
 /// ```
 #[derive(Debug, Clone)]
@@ -272,7 +272,7 @@ impl Pool {
     pub async fn remove_worker(&self, worker_id: &str) -> Result<(), AppError> {
         let mut workers = self.workers.write().await;
         let current_worker_count = workers.len();
-        
+
         if workers.remove(worker_id).is_some() {
             // Update metrics
             let mut metrics = self.metrics.write().await;
@@ -413,10 +413,20 @@ impl Pool {
             return Ok(());
         }
 
-        info!("Scaling up pool - adding new worker (current: {}/{})", current_count, self.config.max_workers);
+        info!(
+            "Scaling up pool - adding new worker (current: {}/{})",
+            current_count, self.config.max_workers
+        );
 
         // Generate unique worker ID
-        let worker_id = format!("worker-{}", uuid::Uuid::new_v4().to_string().split('-').next().unwrap_or("auto"));
+        let worker_id = format!(
+            "worker-{}",
+            uuid::Uuid::new_v4()
+                .to_string()
+                .split('-')
+                .next()
+                .unwrap_or("auto")
+        );
 
         // Create worker config with reasonable defaults
         let worker_config = worker::WorkerConfig {
@@ -455,7 +465,10 @@ impl Pool {
             return Ok(());
         }
 
-        info!("Scaling down pool - removing least loaded worker (current: {})", current_count);
+        info!(
+            "Scaling down pool - removing least loaded worker (current: {})",
+            current_count
+        );
 
         // Find the least loaded worker (minimum active_connections + queue_size)
         let (least_loaded_id, least_loaded_worker) = {
@@ -488,14 +501,20 @@ impl Pool {
 
         // Gracefully shutdown the worker
         if let Err(e) = least_loaded_worker.shutdown().await {
-            warn!("Failed to gracefully shutdown worker {}: {}", least_loaded_id, e);
+            warn!(
+                "Failed to gracefully shutdown worker {}: {}",
+                least_loaded_id, e
+            );
             // Continue with removal even if shutdown failed
         }
 
         // Remove worker from pool
         self.remove_worker(&least_loaded_id).await?;
 
-        info!("Successfully scaled down pool - removed worker: {}", least_loaded_id);
+        info!(
+            "Successfully scaled down pool - removed worker: {}",
+            least_loaded_id
+        );
         Ok(())
     }
 

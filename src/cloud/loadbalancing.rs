@@ -14,7 +14,7 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let loadbalancer = LoadBalancer::new();
 //! loadbalancer.initialize().await?;
-//! 
+//!
 //! // Add backends
 //! let backend1 = Backend {
 //!     id: "backend-1".to_string(),
@@ -22,21 +22,21 @@
 //!     port: 8080,
 //!     weight: 100,
 //! };
-//! 
+//!
 //! let backend2 = Backend {
 //!     id: "backend-2".to_string(),
 //!     address: "10.0.1.11".to_string(),
 //!     port: 8080,
 //!     weight: 100,
 //! };
-//! 
+//!
 //! loadbalancer.add_backend(backend1).await?;
 //! loadbalancer.add_backend(backend2).await?;
-//! 
+//!
 //! // Check health status
 //! let health = loadbalancer.get_health_status().await?;
 //! println!("Healthy backends: {}/{}", health.healthy_backends, health.total_backends);
-//! 
+//!
 //! loadbalancer.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -267,7 +267,10 @@ impl LoadBalancer {
         }
 
         backends.insert(backend.id.clone(), backend.clone());
-        info!("Added backend: {} at {}:{}", backend.id, backend.address, backend.port);
+        info!(
+            "Added backend: {} at {}:{}",
+            backend.id, backend.address, backend.port
+        );
         Ok(())
     }
 
@@ -339,23 +342,25 @@ impl LoadBalancer {
     pub async fn get_health_status(&self) -> Result<LoadBalancerHealth, AppError> {
         let backends = self.backends.read().await;
         let total = backends.len() as u32;
-        
+
         let health_config = self.health_check_config.read().await;
         let mut healthy = 0;
         let mut unhealthy = 0;
-        
+
         // Perform health checks for each backend
         for (backend_id, backend) in backends.iter() {
             let is_healthy = self.check_backend_health(backend, &health_config).await;
-            
+
             // Update health status
             let mut backend_health_map = self.backend_health.write().await;
-            let health = backend_health_map.entry(backend_id.clone()).or_insert_with(|| BackendHealth {
-                healthy: true,
-                consecutive_failures: 0,
-                last_check: None,
-            });
-            
+            let health = backend_health_map
+                .entry(backend_id.clone())
+                .or_insert_with(|| BackendHealth {
+                    healthy: true,
+                    consecutive_failures: 0,
+                    last_check: None,
+                });
+
             if is_healthy {
                 if !health.healthy {
                     // Backend recovered
@@ -375,7 +380,7 @@ impl LoadBalancer {
             }
             health.last_check = Some(std::time::Instant::now());
         }
-        
+
         drop(health_config);
 
         Ok(LoadBalancerHealth {
@@ -384,7 +389,7 @@ impl LoadBalancer {
             total_backends: total,
         })
     }
-    
+
     /// Check health of a single backend
     async fn check_backend_health(&self, backend: &Backend, config: &HealthCheckConfig) -> bool {
         #[cfg(feature = "cloud-sdk")]
@@ -399,7 +404,7 @@ impl LoadBalancer {
                 }
             }
         }
-        
+
         // Fallback: HTTP health check
         #[cfg(feature = "cloud-sdk")]
         {
@@ -408,12 +413,14 @@ impl LoadBalancer {
                 let client = reqwest::Client::builder()
                     .timeout(Duration::from_secs(config.timeout_secs))
                     .build();
-                
+
                 if let Ok(client) = client {
                     if let Ok(result) = timeout(
                         Duration::from_secs(config.timeout_secs),
-                        client.get(&url).send()
-                    ).await {
+                        client.get(&url).send(),
+                    )
+                    .await
+                    {
                         if let Ok(response) = result {
                             return response.status().is_success();
                         }
@@ -421,7 +428,7 @@ impl LoadBalancer {
                 }
             }
         }
-        
+
         // If no health check path configured, assume healthy
         // (for TCP-only backends)
         true

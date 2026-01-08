@@ -84,8 +84,11 @@ pub async fn start_bot(token: &str) {
     // 3. Register command handlers for /status, /metrics, /gpu
     // 4. Start webhook or long polling: bot.set_my_commands(...).await
     // 5. Integrate with PoolAI API to fetch real system data
-    
-    tracing::info!("[tgbot] Starting bot with token: {} (placeholder - not yet implemented)", token);
+
+    tracing::info!(
+        "[tgbot] Starting bot with token: {} (placeholder - not yet implemented)",
+        token
+    );
     tracing::info!("[tgbot] Bot would handle commands: /status, /metrics, /gpu");
 }
 
@@ -120,6 +123,10 @@ pub async fn send_notification(chat_id: &str, message: &str) {
     // 3. Send message: bot.send_message(chat_id, message).await
     // 4. Handle errors with retry logic for transient failures
     // 5. Log success/failure for monitoring
-    
-    tracing::info!("[tgbot] Sending notification to {}: {} (placeholder - not yet implemented)", chat_id, message);
+
+    tracing::info!(
+        "[tgbot] Sending notification to {}: {} (placeholder - not yet implemented)",
+        chat_id,
+        message
+    );
 }

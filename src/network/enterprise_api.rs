@@ -31,17 +31,15 @@ pub fn create_enterprise_api_routes() -> Router {
             "/tenants",
             post(tenant_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
-        .route(
-            "/tenants/:id",
-            get(tenant_get_handler),
-        )
+        .route("/tenants/:id", get(tenant_get_handler))
         .route(
             "/tenants/:id",
             post(tenant_update_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
             "/tenants/:id",
-            axum::routing::delete(tenant_delete_handler).layer(middleware::from_fn(auth_middleware)),
+            axum::routing::delete(tenant_delete_handler)
+                .layer(middleware::from_fn(auth_middleware)),
         )
         .route("/tenants/:id/usage", get(tenant_usage_handler))
         .route("/tenants/:id/quota", post(tenant_quota_check_handler))
@@ -60,15 +58,23 @@ pub fn create_enterprise_api_routes() -> Router {
         )
         .route("/monitoring/metrics", get(monitoring_metrics_handler))
         // Security
-        .route("/security/oauth2/providers", get(security_oauth2_providers_handler))
         .route(
             "/security/oauth2/providers",
-            post(security_oauth2_provider_register_handler).layer(middleware::from_fn(auth_middleware)),
+            get(security_oauth2_providers_handler),
         )
-        .route("/security/saml/providers", get(security_saml_providers_handler))
+        .route(
+            "/security/oauth2/providers",
+            post(security_oauth2_provider_register_handler)
+                .layer(middleware::from_fn(auth_middleware)),
+        )
         .route(
             "/security/saml/providers",
-            post(security_saml_provider_register_handler).layer(middleware::from_fn(auth_middleware)),
+            get(security_saml_providers_handler),
+        )
+        .route(
+            "/security/saml/providers",
+            post(security_saml_provider_register_handler)
+                .layer(middleware::from_fn(auth_middleware)),
         )
         .route("/security/policies", get(security_policies_handler))
         .route(
@@ -93,9 +99,7 @@ struct TenantCreateRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_create_handler(
-    Json(_req): Json<TenantCreateRequest>,
-) -> impl IntoResponse {
+async fn tenant_create_handler(Json(_req): Json<TenantCreateRequest>) -> impl IntoResponse {
     // TODO: Get global tenant manager and create tenant
     // For now, return placeholder
     (
@@ -107,9 +111,7 @@ async fn tenant_create_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_get_handler(
-    Path(_id): Path<String>,
-) -> impl IntoResponse {
+async fn tenant_get_handler(Path(_id): Path<String>) -> impl IntoResponse {
     // TODO: Get global tenant manager and retrieve tenant
     (
         StatusCode::NOT_IMPLEMENTED,
@@ -133,9 +135,7 @@ async fn tenant_update_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_delete_handler(
-    Path(_id): Path<String>,
-) -> impl IntoResponse {
+async fn tenant_delete_handler(Path(_id): Path<String>) -> impl IntoResponse {
     (
         StatusCode::NOT_IMPLEMENTED,
         Json(serde_json::json!({
@@ -145,9 +145,7 @@ async fn tenant_delete_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_usage_handler(
-    Path(_id): Path<String>,
-) -> impl IntoResponse {
+async fn tenant_usage_handler(Path(_id): Path<String>) -> impl IntoResponse {
     (
         StatusCode::NOT_IMPLEMENTED,
         Json(serde_json::json!({
@@ -185,9 +183,7 @@ struct AuditQueryParams {
 }
 
 #[cfg(feature = "enterprise")]
-async fn audit_events_query_handler(
-    Query(_params): Query<AuditQueryParams>,
-) -> impl IntoResponse {
+async fn audit_events_query_handler(Query(_params): Query<AuditQueryParams>) -> impl IntoResponse {
     // TODO: Get global audit logger and query events
     // For now, return empty list
     Json::<Vec<enterprise::audit::AuditEvent>>(Vec::new())
@@ -211,9 +207,7 @@ async fn monitoring_alerts_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn monitoring_alert_acknowledge_handler(
-    Path(_id): Path<String>,
-) -> impl IntoResponse {
+async fn monitoring_alert_acknowledge_handler(Path(_id): Path<String>) -> impl IntoResponse {
     // TODO: Get global monitoring manager and acknowledge alert
     (
         StatusCode::NOT_IMPLEMENTED,
@@ -303,9 +297,7 @@ async fn security_policies_handler() -> impl IntoResponse {
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_policy_create_handler(
-    Json(_req): Json<serde_json::Value>,
-) -> impl IntoResponse {
+async fn security_policy_create_handler(Json(_req): Json<serde_json::Value>) -> impl IntoResponse {
     (
         StatusCode::NOT_IMPLEMENTED,
         Json(serde_json::json!({

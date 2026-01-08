@@ -178,17 +178,26 @@ mod tests {
         // Test with missing components (compares numerically, then falls back to string comparison)
         assert_eq!(compare_versions("1.0", "1.0.0"), std::cmp::Ordering::Less); // "1.0" < "1.0.0" lexicographically
         assert_eq!(compare_versions("1", "1.0.0"), std::cmp::Ordering::Less); // "1" < "1.0.0" lexicographically
-        
+
         // Test major version differences
-        assert_eq!(compare_versions("2.0.0", "1.9.9"), std::cmp::Ordering::Greater);
+        assert_eq!(
+            compare_versions("2.0.0", "1.9.9"),
+            std::cmp::Ordering::Greater
+        );
         assert_eq!(compare_versions("1.0.0", "2.0.0"), std::cmp::Ordering::Less);
-        
+
         // Test minor version differences
-        assert_eq!(compare_versions("1.2.0", "1.1.9"), std::cmp::Ordering::Greater);
+        assert_eq!(
+            compare_versions("1.2.0", "1.1.9"),
+            std::cmp::Ordering::Greater
+        );
         assert_eq!(compare_versions("1.1.0", "1.2.0"), std::cmp::Ordering::Less);
-        
+
         // Test patch version differences
-        assert_eq!(compare_versions("1.0.1", "1.0.0"), std::cmp::Ordering::Greater);
+        assert_eq!(
+            compare_versions("1.0.1", "1.0.0"),
+            std::cmp::Ordering::Greater
+        );
         assert_eq!(compare_versions("1.0.0", "1.0.1"), std::cmp::Ordering::Less);
     }
 
@@ -200,10 +209,10 @@ mod tests {
 
         vm.register_version("lib", "1.0.0", &p1).await.unwrap();
         vm.register_version("lib", "2.0.0", &p2).await.unwrap();
-        
+
         // Active version should be 2.0.0
         assert_eq!(vm.get_active_version("lib").unwrap().version, "2.0.0");
-        
+
         // Rollback to 1.0.0
         vm.rollback("lib", "1.0.0").await.unwrap();
         assert_eq!(vm.get_active_version("lib").unwrap().version, "1.0.0");
@@ -215,7 +224,7 @@ mod tests {
         let p1 = PathBuf::from("/tmp/lib/1.0.0");
 
         vm.register_version("lib", "1.0.0", &p1).await.unwrap();
-        
+
         // Attempt to register same version again should fail
         let result = vm.register_version("lib", "1.0.0", &p1).await;
         assert!(result.is_err());
@@ -228,7 +237,7 @@ mod tests {
 
         vm.register_version("lib", "1.0.0", &p1).await.unwrap();
         assert!(vm.get_active_version("lib").is_some());
-        
+
         vm.unregister_version("lib").await.unwrap();
         assert!(vm.get_active_version("lib").is_none());
     }
@@ -236,7 +245,7 @@ mod tests {
     #[test]
     fn test_get_versions() {
         let mut vm = VersionManager::new();
-        
+
         // No versions initially
         assert!(vm.get_versions("lib").is_none());
     }

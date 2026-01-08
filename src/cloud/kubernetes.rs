@@ -23,7 +23,7 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let manager = KubernetesManager::new("poolai".to_string());
 //! manager.initialize().await?;
-//! 
+//!
 //! // Create a worker deployment
 //! let config = WorkerDeploymentConfig {
 //!     image: "poolai/worker:v1.0.0".to_string(),
@@ -35,13 +35,13 @@
 //!     },
 //!     env: std::collections::HashMap::new(),
 //! };
-//! 
+//!
 //! let deployment_id = manager.create_worker_deployment("my-worker", &config).await?;
 //! println!("Created deployment: {}", deployment_id);
-//! 
+//!
 //! // Get service endpoints
 //! let endpoints = manager.get_service_endpoints(&deployment_id).await?;
-//! 
+//!
 //! manager.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -180,8 +180,11 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            info!("Initializing Kubernetes API client for namespace: {}", self.namespace);
-            
+            info!(
+                "Initializing Kubernetes API client for namespace: {}",
+                self.namespace
+            );
+
             // Try to load kubeconfig, fallback to in-cluster config
             let (api_url, token) = self.load_kubeconfig().await
                 .or_else(|_| self.load_in_cluster_config().await)
@@ -191,13 +194,16 @@ impl KubernetesManager {
                     Error: {}",
                     e
                 )))?;
-            
+
             *self.api_base_url.write().await = Some(api_url);
             *self.api_token.write().await = Some(token);
-            
-            info!("Kubernetes API client initialized successfully for namespace: {}", self.namespace);
+
+            info!(
+                "Kubernetes API client initialized successfully for namespace: {}",
+                self.namespace
+            );
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
             info!(
@@ -250,11 +256,11 @@ impl KubernetesManager {
         let url_guard = self.api_base_url.read().await;
         url_guard.clone().ok_or_else(|| {
             AppError::InitializationError(
-                "Kubernetes API client not initialized. Call initialize() first.".to_string()
+                "Kubernetes API client not initialized. Call initialize() first.".to_string(),
             )
         })
     }
-    
+
     #[cfg(feature = "cloud-sdk")]
     /// Get Kubernetes API token (internal helper)
     ///
@@ -265,11 +271,11 @@ impl KubernetesManager {
         let token_guard = self.api_token.read().await;
         token_guard.clone().ok_or_else(|| {
             AppError::InitializationError(
-                "Kubernetes API client not initialized. Call initialize() first.".to_string()
+                "Kubernetes API client not initialized. Call initialize() first.".to_string(),
             )
         })
     }
-    
+
     #[cfg(feature = "cloud-sdk")]
     /// Load kubeconfig from file or KUBECONFIG env var
     ///
@@ -282,45 +288,46 @@ impl KubernetesManager {
     /// Returns `AppError::ConfigError` if kubeconfig cannot be loaded or parsed.
     async fn load_kubeconfig(&self) -> Result<(String, String), AppError> {
         // Get kubeconfig path from env var or default location
-        let kubeconfig_path = std::env::var("KUBECONFIG")
-            .unwrap_or_else(|_| {
-                let home = std::env::var("HOME")
-                    .or_else(|_| std::env::var("USERPROFILE")) // Windows
-                    .unwrap_or_else(|_| "~".to_string());
-                format!("{}/.kube/config", home)
-            });
-        
+        let kubeconfig_path = std::env::var("KUBECONFIG").unwrap_or_else(|_| {
+            let home = std::env::var("HOME")
+                .or_else(|_| std::env::var("USERPROFILE")) // Windows
+                .unwrap_or_else(|_| "~".to_string());
+            format!("{}/.kube/config", home)
+        });
+
         // Read kubeconfig file
-        let content = tokio::fs::read_to_string(&kubeconfig_path).await
-            .map_err(|e| AppError::ConfigError(format!(
-                "Failed to read kubeconfig file at '{}'. Error: {}",
-                kubeconfig_path, e
-            )))?;
-        
+        let content = tokio::fs::read_to_string(&kubeconfig_path)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to read kubeconfig file at '{}'. Error: {}",
+                    kubeconfig_path, e
+                ))
+            })?;
+
         // Parse YAML (simplified - full implementation would parse full kubeconfig structure)
         // For now, we'll use a simple approach: try to extract server URL and token
         // Note: Full kubeconfig parsing would require handling contexts, clusters, users, etc.
-        
+
         // Try to find server URL in kubeconfig
-        let api_url = extract_kubeconfig_server(&content)
-            .ok_or_else(|| AppError::ConfigError(
-                "Failed to extract server URL from kubeconfig".to_string()
-            ))?;
-        
+        let api_url = extract_kubeconfig_server(&content).ok_or_else(|| {
+            AppError::ConfigError("Failed to extract server URL from kubeconfig".to_string())
+        })?;
+
         // Try to find token (from user auth-info or exec command)
         // For now, we'll use a placeholder - full implementation would:
         // 1. Parse kubeconfig YAML structure
         // 2. Extract current context
         // 3. Get user auth-info
         // 4. Extract token or execute auth command
-        
+
         // Placeholder: Try to read token from file if specified
         let token = extract_kubeconfig_token(&content)
             .unwrap_or_else(|| "placeholder-token-from-kubeconfig".to_string());
-        
+
         Ok((api_url, token))
     }
-    
+
     #[cfg(feature = "cloud-sdk")]
     /// Load in-cluster configuration (when running inside Kubernetes)
     ///
@@ -333,26 +340,30 @@ impl KubernetesManager {
     /// Returns `AppError::ConfigError` if in-cluster config cannot be loaded.
     async fn load_in_cluster_config(&self) -> Result<(String, String), AppError> {
         // Get API server host and port from environment
-        let host = std::env::var("KUBERNETES_SERVICE_HOST")
-            .map_err(|_| AppError::ConfigError(
-                "KUBERNETES_SERVICE_HOST not set (not running in cluster)".to_string()
-            ))?;
-        
-        let port = std::env::var("KUBERNETES_SERVICE_PORT")
-            .unwrap_or_else(|_| "443".to_string());
-        
+        let host = std::env::var("KUBERNETES_SERVICE_HOST").map_err(|_| {
+            AppError::ConfigError(
+                "KUBERNETES_SERVICE_HOST not set (not running in cluster)".to_string(),
+            )
+        })?;
+
+        let port = std::env::var("KUBERNETES_SERVICE_PORT").unwrap_or_else(|_| "443".to_string());
+
         let api_url = format!("https://{}:{}", host, port);
-        
+
         // Read service account token
-        let token = tokio::fs::read_to_string("/var/run/secrets/kubernetes.io/serviceaccount/token").await
-            .map_err(|e| AppError::ConfigError(format!(
-                "Failed to read service account token. Error: {}",
-                e
-            )))?;
-        
+        let token =
+            tokio::fs::read_to_string("/var/run/secrets/kubernetes.io/serviceaccount/token")
+                .await
+                .map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to read service account token. Error: {}",
+                        e
+                    ))
+                })?;
+
         Ok((api_url, token))
     }
-    
+
     #[cfg(feature = "cloud-sdk")]
     /// Make HTTP request to Kubernetes API (internal helper)
     ///
@@ -373,7 +384,7 @@ impl KubernetesManager {
     ) -> Result<serde_json::Value, AppError> {
         let base_url = self.get_api_base_url().await?;
         let token = self.get_api_token().await?;
-        
+
         let client = reqwest::Client::builder()
             .danger_accept_invalid_certs(true) // For self-signed certs in development
             .build()
@@ -382,7 +393,7 @@ impl KubernetesManager {
                 Error: {}",
                 e
             )))?;
-        
+
         let url = format!("{}{}", base_url, path);
         let mut request = match method {
             "GET" => client.get(&url),
@@ -396,24 +407,24 @@ impl KubernetesManager {
                 method
             ))),
         };
-        
+
         // Add authentication header
         request = request.bearer_auth(&token);
-        
+
         // Add Content-Type header for POST/PUT/PATCH
         if matches!(method, "POST" | "PUT" | "PATCH") {
             request = request.header("Content-Type", "application/json");
         }
-        
+
         // Add request body if provided
         if let Some(body) = body {
             request = request.json(&body);
         }
-        
+
         // Send request with retry logic for transient errors
         const MAX_RETRIES: u32 = 3;
         const INITIAL_RETRY_DELAY_MS: u64 = 100;
-        
+
         let mut last_error = None;
         for attempt in 0..=MAX_RETRIES {
             // Clone request for retry
@@ -423,11 +434,14 @@ impl KubernetesManager {
                 "PUT" => client.put(&url),
                 "PATCH" => client.patch(&url),
                 "DELETE" => client.delete(&url),
-                _ => return Err(AppError::NetworkError(format!(
-                    "Unsupported HTTP method: {}", method
-                ))),
+                _ => {
+                    return Err(AppError::NetworkError(format!(
+                        "Unsupported HTTP method: {}",
+                        method
+                    )))
+                }
             };
-            
+
             retry_request = retry_request.bearer_auth(&token);
             if matches!(method, "POST" | "PUT" | "PATCH") {
                 retry_request = retry_request.header("Content-Type", "application/json");
@@ -435,11 +449,11 @@ impl KubernetesManager {
             if let Some(ref body) = body {
                 retry_request = retry_request.json(body);
             }
-            
+
             match retry_request.send().await {
                 Ok(response) => {
                     let status = response.status();
-                    
+
                     // Read response body
                     let response_text = match response.text().await {
                         Ok(text) => text,
@@ -451,7 +465,8 @@ impl KubernetesManager {
                             if attempt < MAX_RETRIES && status.is_server_error() {
                                 // Retry on server errors
                                 let delay_ms = INITIAL_RETRY_DELAY_MS * (1 << attempt);
-                                tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                                tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms))
+                                    .await;
                                 continue;
                             }
                             return Err(AppError::NetworkError(format!(
@@ -461,7 +476,7 @@ impl KubernetesManager {
                             )));
                         }
                     };
-                    
+
                     // Check for errors
                     if !status.is_success() {
                         // Retry on 5xx errors (server errors) and 429 (rate limit)
@@ -472,7 +487,7 @@ impl KubernetesManager {
                             tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
                             continue;
                         }
-                        
+
                         return Err(AppError::NetworkError(format!(
                             "Kubernetes API error. Context: API request returned error status. \
                             Suggestion: Check resource name, namespace permissions, and resource existence. \
@@ -480,7 +495,7 @@ impl KubernetesManager {
                             method, path, status, response_text
                         )));
                     }
-                    
+
                     // Parse JSON response
                     return serde_json::from_str(&response_text).map_err(|e| AppError::NetworkError(format!(
                         "Failed to parse Kubernetes API response. Context: Response is not valid JSON. \
@@ -501,7 +516,7 @@ impl KubernetesManager {
                 }
             }
         }
-        
+
         // All retries exhausted
         Err(AppError::NetworkError(format!(
             "Kubernetes API request failed after {} retries. Context: HTTP request to Kubernetes API failed. \
@@ -577,27 +592,37 @@ impl KubernetesManager {
                 &config.resources,
                 &config.env,
             )?;
-            
+
             // Create deployment via Kubernetes API
             let path = format!("/apis/apps/v1/namespaces/{}/deployments", self.namespace);
-            let response = self.k8s_api_request("POST", &path, Some(deployment)).await?;
-            
+            let response = self
+                .k8s_api_request("POST", &path, Some(deployment))
+                .await?;
+
             // Extract deployment name from response
             let deployment_name = response
                 .get("metadata")
                 .and_then(|m| m.get("name"))
                 .and_then(|n| n.as_str())
-                .ok_or_else(|| AppError::NetworkError(
-                    "Deployment created but name is missing in response".to_string()
-                ))?;
-            
-            info!("Created worker deployment: {} in namespace {}", deployment_name, self.namespace);
+                .ok_or_else(|| {
+                    AppError::NetworkError(
+                        "Deployment created but name is missing in response".to_string(),
+                    )
+                })?;
+
+            info!(
+                "Created worker deployment: {} in namespace {}",
+                deployment_name, self.namespace
+            );
             Ok(deployment_name.to_string())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Creating worker deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Creating worker deployment: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(format!("worker-{}", name))
         }
     }
@@ -683,15 +708,17 @@ impl KubernetesManager {
                     }
                 }
             });
-            
+
             // Add GPU if specified
             if let Some(gpu) = config.resources.gpu {
                 if gpu > 0 {
-                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["requests"]["nvidia.com/gpu"] = json!(gpu);
-                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["nvidia.com/gpu"] = json!(gpu);
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]
+                        ["requests"]["nvidia.com/gpu"] = json!(gpu);
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]
+                        ["limits"]["nvidia.com/gpu"] = json!(gpu);
                 }
             }
-            
+
             // Add environment variables if any
             if !config.env.is_empty() {
                 let mut env_vars = Vec::new();
@@ -703,18 +730,29 @@ impl KubernetesManager {
                 }
                 patch_body["spec"]["template"]["spec"]["containers"][0]["env"] = json!(env_vars);
             }
-            
+
             // Update deployment via Kubernetes API (PATCH)
-            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, name);
-            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
-            
-            info!("Updated worker deployment: {} in namespace {}", name, self.namespace);
+            let path = format!(
+                "/apis/apps/v1/namespaces/{}/deployments/{}",
+                self.namespace, name
+            );
+            let _response = self
+                .k8s_api_request("PATCH", &path, Some(patch_body))
+                .await?;
+
+            info!(
+                "Updated worker deployment: {} in namespace {}",
+                name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Updating worker deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Updating worker deployment: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -760,16 +798,25 @@ impl KubernetesManager {
         #[cfg(feature = "cloud-sdk")]
         {
             // Delete deployment via Kubernetes API
-            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, name);
+            let path = format!(
+                "/apis/apps/v1/namespaces/{}/deployments/{}",
+                self.namespace, name
+            );
             let _response = self.k8s_api_request("DELETE", &path, None).await?;
-            
-            info!("Deleted worker deployment: {} from namespace {}", name, self.namespace);
+
+            info!(
+                "Deleted worker deployment: {} from namespace {}",
+                name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Deleting worker deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Deleting worker deployment: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -841,27 +888,37 @@ impl KubernetesManager {
                 &config.storage,
                 &config.network,
             )?;
-            
+
             // Create deployment via Kubernetes API
             let path = format!("/apis/apps/v1/namespaces/{}/deployments", self.namespace);
-            let response = self.k8s_api_request("POST", &path, Some(deployment)).await?;
-            
+            let response = self
+                .k8s_api_request("POST", &path, Some(deployment))
+                .await?;
+
             // Extract deployment name from response
             let deployment_name = response
                 .get("metadata")
                 .and_then(|m| m.get("name"))
                 .and_then(|n| n.as_str())
-                .ok_or_else(|| AppError::NetworkError(
-                    "Deployment created but name is missing in response".to_string()
-                ))?;
-            
-            info!("Created VM deployment: {} in namespace {}", deployment_name, self.namespace);
+                .ok_or_else(|| {
+                    AppError::NetworkError(
+                        "Deployment created but name is missing in response".to_string(),
+                    )
+                })?;
+
+            info!(
+                "Created VM deployment: {} in namespace {}",
+                deployment_name, self.namespace
+            );
             Ok(deployment_name.to_string())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Creating VM deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Creating VM deployment: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(format!("vm-{}", name))
         }
     }
@@ -946,15 +1003,17 @@ impl KubernetesManager {
                     }
                 }
             });
-            
+
             // Add GPU if specified
             if let Some(gpu) = config.resources.gpu {
                 if gpu > 0 {
-                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["requests"]["nvidia.com/gpu"] = json!(gpu);
-                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["nvidia.com/gpu"] = json!(gpu);
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]
+                        ["requests"]["nvidia.com/gpu"] = json!(gpu);
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]
+                        ["limits"]["nvidia.com/gpu"] = json!(gpu);
                 }
             }
-            
+
             // Add ports if any
             if !config.network.ports.is_empty() {
                 let mut ports = Vec::new();
@@ -966,18 +1025,29 @@ impl KubernetesManager {
                 }
                 patch_body["spec"]["template"]["spec"]["containers"][0]["ports"] = json!(ports);
             }
-            
+
             // Update deployment via Kubernetes API (PATCH)
-            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, name);
-            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
-            
-            info!("Updated VM deployment: {} in namespace {}", name, self.namespace);
+            let path = format!(
+                "/apis/apps/v1/namespaces/{}/deployments/{}",
+                self.namespace, name
+            );
+            let _response = self
+                .k8s_api_request("PATCH", &path, Some(patch_body))
+                .await?;
+
+            info!(
+                "Updated VM deployment: {} in namespace {}",
+                name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Updating VM deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Updating VM deployment: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -1026,12 +1096,15 @@ impl KubernetesManager {
         #[cfg(feature = "cloud-sdk")]
         {
             // Query service endpoints via Kubernetes API
-            let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, resource_name);
+            let path = format!(
+                "/api/v1/namespaces/{}/services/{}",
+                self.namespace, resource_name
+            );
             let service_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract endpoints
             let mut endpoints = Vec::new();
-            
+
             // Get ClusterIP
             if let Some(cluster_ip) = service_json
                 .get("spec")
@@ -1047,11 +1120,11 @@ impl KubernetesManager {
                         .and_then(|port| port.get("port"))
                         .and_then(|p| p.as_u64())
                         .unwrap_or(8080);
-                    
+
                     endpoints.push(format!("{}:{}", cluster_ip, port));
                 }
             }
-            
+
             // Get LoadBalancer IPs
             if let Some(ingress) = service_json
                 .get("status")
@@ -1068,14 +1141,21 @@ impl KubernetesManager {
                     }
                 }
             }
-            
-            info!("Found {} endpoints for service: {}", endpoints.len(), resource_name);
+
+            info!(
+                "Found {} endpoints for service: {}",
+                endpoints.len(),
+                resource_name
+            );
             Ok(endpoints)
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Getting service endpoints for: {} (placeholder - enable cloud-sdk feature)", resource_name);
+            info!(
+                "Getting service endpoints for: {} (placeholder - enable cloud-sdk feature)",
+                resource_name
+            );
             Ok(vec![])
         }
     }
@@ -1115,14 +1195,17 @@ impl KubernetesManager {
             ));
         }
 
-        info!("Getting status for pod {} in namespace {}", pod_name, self.namespace);
-        
+        info!(
+            "Getting status for pod {} in namespace {}",
+            pod_name, self.namespace
+        );
+
         #[cfg(feature = "cloud-sdk")]
         {
             // Query pod status via Kubernetes API
             let path = format!("/api/v1/namespaces/{}/pods/{}", self.namespace, pod_name);
             let pod_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract pod status information
             let name = pod_json
                 .get("metadata")
@@ -1130,14 +1213,14 @@ impl KubernetesManager {
                 .and_then(|n| n.as_str())
                 .unwrap_or(pod_name)
                 .to_string();
-            
+
             let phase = pod_json
                 .get("status")
                 .and_then(|s| s.get("phase"))
                 .and_then(|p| p.as_str())
                 .unwrap_or("Unknown")
                 .to_string();
-            
+
             // Check if pod is ready
             let ready = pod_json
                 .get("status")
@@ -1149,29 +1232,28 @@ impl KubernetesManager {
                             .and_then(|t| t.as_str())
                             .map(|t| t == "Ready")
                             .unwrap_or(false)
-                        && cond.get("status")
-                            .and_then(|s| s.as_str())
-                            .map(|s| s == "True")
-                            .unwrap_or(false)
+                            && cond
+                                .get("status")
+                                .and_then(|s| s.as_str())
+                                .map(|s| s == "True")
+                                .unwrap_or(false)
                     })
                 })
                 .unwrap_or(false);
-            
+
             // Calculate restart count
             let restart_count = pod_json
                 .get("status")
                 .and_then(|s| s.get("containerStatuses"))
                 .and_then(|cs| cs.as_array())
                 .map(|statuses| {
-                    statuses.iter()
-                        .filter_map(|status| {
-                            status.get("restartCount")
-                                .and_then(|rc| rc.as_u64())
-                        })
+                    statuses
+                        .iter()
+                        .filter_map(|status| status.get("restartCount").and_then(|rc| rc.as_u64()))
                         .sum::<u64>() as u32
                 })
                 .unwrap_or(0);
-            
+
             return Ok(PodStatus {
                 name,
                 phase,
@@ -1179,7 +1261,7 @@ impl KubernetesManager {
                 restart_count,
             });
         }
-        
+
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(PodStatus {
             name: pod_name.to_string(),
@@ -1214,7 +1296,10 @@ impl KubernetesManager {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_deployment_status(&self, deployment_name: &str) -> Result<DeploymentStatus, AppError> {
+    pub async fn get_deployment_status(
+        &self,
+        deployment_name: &str,
+    ) -> Result<DeploymentStatus, AppError> {
         if deployment_name.is_empty() {
             return Err(AppError::ValidationError(
                 "Deployment name cannot be empty. Context: Attempted to get deployment status with empty name. \
@@ -1224,14 +1309,20 @@ impl KubernetesManager {
             ));
         }
 
-        info!("Getting status for deployment {} in namespace {}", deployment_name, self.namespace);
-        
+        info!(
+            "Getting status for deployment {} in namespace {}",
+            deployment_name, self.namespace
+        );
+
         #[cfg(feature = "cloud-sdk")]
         {
             // Query deployment status via Kubernetes API
-            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, deployment_name);
+            let path = format!(
+                "/apis/apps/v1/namespaces/{}/deployments/{}",
+                self.namespace, deployment_name
+            );
             let deployment_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract deployment status information
             let name = deployment_json
                 .get("metadata")
@@ -1239,37 +1330,37 @@ impl KubernetesManager {
                 .and_then(|n| n.as_str())
                 .unwrap_or(deployment_name)
                 .to_string();
-            
+
             // Get desired replicas from spec
             let replicas = deployment_json
                 .get("spec")
                 .and_then(|s| s.get("replicas"))
                 .and_then(|r| r.as_u64())
                 .unwrap_or(0) as u32;
-            
+
             // Get status information
-            let status = deployment_json.get("status").ok_or_else(|| AppError::NetworkError(
-                "Deployment status not found in response".to_string()
-            ))?;
-            
+            let status = deployment_json.get("status").ok_or_else(|| {
+                AppError::NetworkError("Deployment status not found in response".to_string())
+            })?;
+
             let ready_replicas = status
                 .get("readyReplicas")
                 .and_then(|r| r.as_u64())
                 .unwrap_or(0) as u32;
-            
+
             let available_replicas = status
                 .get("availableReplicas")
                 .and_then(|r| r.as_u64())
                 .unwrap_or(0) as u32;
-            
+
             let unavailable_replicas = status
                 .get("unavailableReplicas")
                 .and_then(|r| r.as_u64())
                 .unwrap_or(0) as u32;
-            
+
             // Deployment is ready if all replicas are available
             let ready = available_replicas == replicas && replicas > 0;
-            
+
             return Ok(DeploymentStatus {
                 name,
                 replicas,
@@ -1279,7 +1370,7 @@ impl KubernetesManager {
                 ready,
             });
         }
-        
+
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(DeploymentStatus {
             name: deployment_name.to_string(),
@@ -1337,46 +1428,56 @@ impl KubernetesManager {
         }
 
         let limit = limit.unwrap_or(10);
-        info!("Getting events for deployment {} in namespace {} (limit: {})", deployment_name, self.namespace, limit);
-        
+        info!(
+            "Getting events for deployment {} in namespace {} (limit: {})",
+            deployment_name, self.namespace, limit
+        );
+
         #[cfg(feature = "cloud-sdk")]
         {
             // Query events via Kubernetes API
             // Events are associated with involved objects (deployment, replicaset, pods)
-            let path = format!("/api/v1/namespaces/{}/events?fieldSelector=involvedObject.name={}", self.namespace, deployment_name);
+            let path = format!(
+                "/api/v1/namespaces/{}/events?fieldSelector=involvedObject.name={}",
+                self.namespace, deployment_name
+            );
             let events_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract events
             let events_array = events_json
                 .get("items")
                 .and_then(|i| i.as_array())
-                .ok_or_else(|| AppError::NetworkError(
-                    "Invalid events response format".to_string()
-                ))?;
-            
+                .ok_or_else(|| {
+                    AppError::NetworkError("Invalid events response format".to_string())
+                })?;
+
             let mut events: Vec<DeploymentEvent> = events_array
                 .iter()
                 .take(limit)
                 .filter_map(|event_json| {
-                    let reason = event_json.get("reason")
+                    let reason = event_json
+                        .get("reason")
                         .and_then(|r| r.as_str())
                         .unwrap_or("Unknown")
                         .to_string();
-                    
-                    let message = event_json.get("message")
+
+                    let message = event_json
+                        .get("message")
                         .and_then(|m| m.as_str())
                         .unwrap_or("")
                         .to_string();
-                    
-                    let event_type = event_json.get("type")
+
+                    let event_type = event_json
+                        .get("type")
                         .and_then(|t| t.as_str())
                         .unwrap_or("Normal")
                         .to_string();
-                    
-                    let first_timestamp = event_json.get("firstTimestamp")
+
+                    let first_timestamp = event_json
+                        .get("firstTimestamp")
                         .and_then(|t| t.as_str())
                         .map(|s| s.to_string());
-                    
+
                     Some(DeploymentEvent {
                         reason,
                         message,
@@ -1385,16 +1486,18 @@ impl KubernetesManager {
                     })
                 })
                 .collect();
-            
+
             // Sort by timestamp (most recent first)
-            events.sort_by(|a, b| {
-                b.first_timestamp.cmp(&a.first_timestamp)
-            });
-            
-            info!("Found {} events for deployment {}", events.len(), deployment_name);
+            events.sort_by(|a, b| b.first_timestamp.cmp(&a.first_timestamp));
+
+            info!(
+                "Found {} events for deployment {}",
+                events.len(),
+                deployment_name
+            );
             return Ok(events);
         }
-        
+
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
@@ -1411,7 +1514,11 @@ impl KubernetesManager {
     /// Returns `AppError::ValidationError` if:
     /// - `deployment_name` is empty
     /// - `replicas` is negative
-    pub async fn scale_deployment(&self, deployment_name: &str, replicas: i32) -> Result<(), AppError> {
+    pub async fn scale_deployment(
+        &self,
+        deployment_name: &str,
+        replicas: i32,
+    ) -> Result<(), AppError> {
         if deployment_name.is_empty() {
             return Err(AppError::ValidationError(
                 "Deployment name cannot be empty. Current value: ''. Suggestion: Provide a valid deployment name."
@@ -1431,22 +1538,33 @@ impl KubernetesManager {
         #[cfg(feature = "cloud-sdk")]
         {
             // Scale deployment via Kubernetes API (PATCH)
-            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, deployment_name);
+            let path = format!(
+                "/apis/apps/v1/namespaces/{}/deployments/{}",
+                self.namespace, deployment_name
+            );
             let patch_body = json!({
                 "spec": {
                     "replicas": replicas
                 }
             });
-            
-            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
-            
-            info!("Scaled deployment {} to {} replicas in namespace {}", deployment_name, replicas, self.namespace);
+
+            let _response = self
+                .k8s_api_request("PATCH", &path, Some(patch_body))
+                .await?;
+
+            info!(
+                "Scaled deployment {} to {} replicas in namespace {}",
+                deployment_name, replicas, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Scaling deployment {} to {} replicas (placeholder - enable cloud-sdk feature)", deployment_name, replicas);
+            info!(
+                "Scaling deployment {} to {} replicas (placeholder - enable cloud-sdk feature)",
+                deployment_name, replicas
+            );
             Ok(())
         }
     }
@@ -1484,7 +1602,7 @@ impl KubernetesManager {
                 Err(_) => false,
             }
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
             false
@@ -1518,21 +1636,21 @@ impl KubernetesManager {
     /// ```
     pub async fn list_pods(&self) -> Result<Vec<String>, AppError> {
         info!("Listing pods in namespace {}", self.namespace);
-        
+
         #[cfg(feature = "cloud-sdk")]
         {
             // List pods via Kubernetes API
             let path = format!("/api/v1/namespaces/{}/pods", self.namespace);
             let pod_list_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract pod names
             let pods = pod_list_json
                 .get("items")
                 .and_then(|i| i.as_array())
-                .ok_or_else(|| AppError::NetworkError(
-                    "Invalid pod list response format".to_string()
-                ))?;
-            
+                .ok_or_else(|| {
+                    AppError::NetworkError("Invalid pod list response format".to_string())
+                })?;
+
             let names: Vec<String> = pods
                 .iter()
                 .filter_map(|pod| {
@@ -1542,10 +1660,10 @@ impl KubernetesManager {
                         .map(|s| s.to_string())
                 })
                 .collect();
-            
+
             return Ok(names);
         }
-        
+
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
@@ -1580,7 +1698,10 @@ impl KubernetesManager {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn list_deployment_pods(&self, deployment_name: &str) -> Result<Vec<String>, AppError> {
+    pub async fn list_deployment_pods(
+        &self,
+        deployment_name: &str,
+    ) -> Result<Vec<String>, AppError> {
         if deployment_name.is_empty() {
             return Err(AppError::ValidationError(
                 "Deployment name cannot be empty. Context: Attempted to list pods for deployment with empty name. \
@@ -1590,23 +1711,29 @@ impl KubernetesManager {
             ));
         }
 
-        info!("Listing pods for deployment {} in namespace {}", deployment_name, self.namespace);
-        
+        info!(
+            "Listing pods for deployment {} in namespace {}",
+            deployment_name, self.namespace
+        );
+
         #[cfg(feature = "cloud-sdk")]
         {
             // List pods using label selector (deployments typically use app=<deployment_name> label)
             let label_selector = format!("app={}", deployment_name);
-            let path = format!("/api/v1/namespaces/{}/pods?labelSelector={}", self.namespace, label_selector);
+            let path = format!(
+                "/api/v1/namespaces/{}/pods?labelSelector={}",
+                self.namespace, label_selector
+            );
             let pod_list_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract pod names
             let pods = pod_list_json
                 .get("items")
                 .and_then(|i| i.as_array())
-                .ok_or_else(|| AppError::NetworkError(
-                    "Invalid pod list response format".to_string()
-                ))?;
-            
+                .ok_or_else(|| {
+                    AppError::NetworkError("Invalid pod list response format".to_string())
+                })?;
+
             let names: Vec<String> = pods
                 .iter()
                 .filter_map(|pod| {
@@ -1616,11 +1743,15 @@ impl KubernetesManager {
                         .map(|s| s.to_string())
                 })
                 .collect();
-            
-            info!("Found {} pods for deployment {}", names.len(), deployment_name);
+
+            info!(
+                "Found {} pods for deployment {}",
+                names.len(),
+                deployment_name
+            );
             return Ok(names);
         }
-        
+
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
@@ -1652,21 +1783,21 @@ impl KubernetesManager {
     /// ```
     pub async fn list_deployments(&self) -> Result<Vec<String>, AppError> {
         info!("Listing deployments in namespace {}", self.namespace);
-        
+
         #[cfg(feature = "cloud-sdk")]
         {
             // List deployments via Kubernetes API
             let path = format!("/apis/apps/v1/namespaces/{}/deployments", self.namespace);
             let deployment_list_json = self.k8s_api_request("GET", &path, None).await?;
-            
+
             // Extract deployment names
             let deployments = deployment_list_json
                 .get("items")
                 .and_then(|i| i.as_array())
-                .ok_or_else(|| AppError::NetworkError(
-                    "Invalid deployment list response format".to_string()
-                ))?;
-            
+                .ok_or_else(|| {
+                    AppError::NetworkError("Invalid deployment list response format".to_string())
+                })?;
+
             let names: Vec<String> = deployments
                 .iter()
                 .filter_map(|deployment| {
@@ -1677,10 +1808,10 @@ impl KubernetesManager {
                         .map(|s| s.to_string())
                 })
                 .collect();
-            
+
             return Ok(names);
         }
-        
+
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
@@ -1719,14 +1850,20 @@ impl KubernetesManager {
     ) -> Result<serde_json::Value, AppError> {
         #[cfg(feature = "cloud-sdk")]
         {
-            let path = format!("/apis/{}/{}/namespaces/{}/{}", group, version, self.namespace, plural);
+            let path = format!(
+                "/apis/{}/{}/namespaces/{}/{}",
+                group, version, self.namespace, plural
+            );
             let resources = self.k8s_api_request("GET", &path, None).await?;
             Ok(resources)
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Listing CRD resources {} (placeholder - enable cloud-sdk feature)", plural);
+            info!(
+                "Listing CRD resources {} (placeholder - enable cloud-sdk feature)",
+                plural
+            );
             Ok(serde_json::json!({"items": []}))
         }
     }
@@ -1777,14 +1914,20 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            let path = format!("/apis/{}/{}/namespaces/{}/{}/{}", group, version, self.namespace, plural, name);
+            let path = format!(
+                "/apis/{}/{}/namespaces/{}/{}/{}",
+                group, version, self.namespace, plural, name
+            );
             let resource = self.k8s_api_request("GET", &path, None).await?;
             Ok(resource)
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Getting CRD resource {}/{} (placeholder - enable cloud-sdk feature)", plural, name);
+            info!(
+                "Getting CRD resource {}/{} (placeholder - enable cloud-sdk feature)",
+                plural, name
+            );
             Ok(serde_json::json!({}))
         }
     }
@@ -1843,18 +1986,29 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            let path = format!("/apis/{}/{}/namespaces/{}/{}/{}/status", group, version, self.namespace, plural, name);
+            let path = format!(
+                "/apis/{}/{}/namespaces/{}/{}/{}/status",
+                group, version, self.namespace, plural, name
+            );
             let patch_body = json!({
                 "status": status
             });
-            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
-            info!("Updated CRD status for {}/{} in namespace {}", plural, name, self.namespace);
+            let _response = self
+                .k8s_api_request("PATCH", &path, Some(patch_body))
+                .await?;
+            info!(
+                "Updated CRD status for {}/{} in namespace {}",
+                plural, name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Updating CRD status for {}/{} (placeholder - enable cloud-sdk feature)", plural, name);
+            info!(
+                "Updating CRD status for {}/{} (placeholder - enable cloud-sdk feature)",
+                plural, name
+            );
             Ok(())
         }
     }
@@ -1909,9 +2063,12 @@ impl KubernetesManager {
         #[cfg(feature = "cloud-sdk")]
         {
             // Check if ResourceQuota exists
-            let get_path = format!("/api/v1/namespaces/{}/resourcequotas/{}", self.namespace, name);
+            let get_path = format!(
+                "/api/v1/namespaces/{}/resourcequotas/{}",
+                self.namespace, name
+            );
             let exists = self.k8s_api_request("GET", &get_path, None).await.is_ok();
-            
+
             let quota_body = json!({
                 "apiVersion": "v1",
                 "kind": "ResourceQuota",
@@ -1924,27 +2081,47 @@ impl KubernetesManager {
                 },
                 "spec": quotas
             });
-            
+
             if exists {
                 // Update existing ResourceQuota
-                let path = format!("/api/v1/namespaces/{}/resourcequotas/{}", self.namespace, name);
-                let _response = self.k8s_api_request("PATCH", &path, Some(json!({
-                    "spec": quotas
-                }))).await?;
-                info!("Updated ResourceQuota {} in namespace {}", name, self.namespace);
+                let path = format!(
+                    "/api/v1/namespaces/{}/resourcequotas/{}",
+                    self.namespace, name
+                );
+                let _response = self
+                    .k8s_api_request(
+                        "PATCH",
+                        &path,
+                        Some(json!({
+                            "spec": quotas
+                        })),
+                    )
+                    .await?;
+                info!(
+                    "Updated ResourceQuota {} in namespace {}",
+                    name, self.namespace
+                );
             } else {
                 // Create new ResourceQuota
                 let path = format!("/api/v1/namespaces/{}/resourcequotas", self.namespace);
-                let _response = self.k8s_api_request("POST", &path, Some(quota_body)).await?;
-                info!("Created ResourceQuota {} in namespace {}", name, self.namespace);
+                let _response = self
+                    .k8s_api_request("POST", &path, Some(quota_body))
+                    .await?;
+                info!(
+                    "Created ResourceQuota {} in namespace {}",
+                    name, self.namespace
+                );
             }
-            
+
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Creating/updating ResourceQuota {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Creating/updating ResourceQuota {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2011,7 +2188,7 @@ impl KubernetesManager {
         // 3. Handle watch events (ADDED, MODIFIED, DELETED, BOOKMARK)
         // 4. Implement reconnection logic on connection loss
         // 5. Track resourceVersion for efficient reconnection
-        
+
         info!("Watch API method called (placeholder - use HTTP polling for now)");
         Ok(())
     }
@@ -2055,16 +2232,25 @@ impl KubernetesManager {
         #[cfg(feature = "cloud-sdk")]
         {
             // Delete ResourceQuota via Kubernetes API
-            let path = format!("/api/v1/namespaces/{}/resourcequotas/{}", self.namespace, name);
+            let path = format!(
+                "/api/v1/namespaces/{}/resourcequotas/{}",
+                self.namespace, name
+            );
             let _response = self.k8s_api_request("DELETE", &path, None).await?;
-            
-            info!("Deleted ResourceQuota {} from namespace {}", name, self.namespace);
+
+            info!(
+                "Deleted ResourceQuota {} from namespace {}",
+                name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Deleting ResourceQuota {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Deleting ResourceQuota {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2133,7 +2319,7 @@ impl KubernetesManager {
                 ServiceType::NodePort => "NodePort",
                 ServiceType::LoadBalancer => "LoadBalancer",
             };
-            
+
             let mut service_ports = Vec::new();
             for port in ports {
                 service_ports.push(json!({
@@ -2142,7 +2328,7 @@ impl KubernetesManager {
                     "protocol": "TCP"
                 }));
             }
-            
+
             let service_body = json!({
                 "apiVersion": "v1",
                 "kind": "Service",
@@ -2162,18 +2348,26 @@ impl KubernetesManager {
                     "ports": service_ports
                 }
             });
-            
+
             // Create service via Kubernetes API
             let path = format!("/api/v1/namespaces/{}/services", self.namespace);
-            let _response = self.k8s_api_request("POST", &path, Some(service_body)).await?;
-            
-            info!("Created service: {} for deployment {} in namespace {}", name, deployment_name, self.namespace);
+            let _response = self
+                .k8s_api_request("POST", &path, Some(service_body))
+                .await?;
+
+            info!(
+                "Created service: {} for deployment {} in namespace {}",
+                name, deployment_name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Creating service: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Creating service: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2255,18 +2449,27 @@ impl KubernetesManager {
                     "storageClassName": storage_class
                 }
             });
-            
+
             // Create PVC via Kubernetes API
-            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims", self.namespace);
+            let path = format!(
+                "/api/v1/namespaces/{}/persistentvolumeclaims",
+                self.namespace
+            );
             let _response = self.k8s_api_request("POST", &path, Some(pvc_body)).await?;
-            
-            info!("Created PVC: {} with size {} in namespace {}", name, size, self.namespace);
+
+            info!(
+                "Created PVC: {} with size {} in namespace {}",
+                name, size, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Creating PVC: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Creating PVC: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2312,7 +2515,7 @@ impl KubernetesManager {
                 ServiceType::NodePort => "NodePort",
                 ServiceType::LoadBalancer => "LoadBalancer",
             };
-            
+
             let mut service_ports = Vec::new();
             for port in ports {
                 service_ports.push(json!({
@@ -2321,7 +2524,7 @@ impl KubernetesManager {
                     "protocol": "TCP"
                 }));
             }
-            
+
             // Update service spec (PATCH)
             let patch_body = json!({
                 "spec": {
@@ -2332,17 +2535,25 @@ impl KubernetesManager {
                     "ports": service_ports
                 }
             });
-            
+
             let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, name);
-            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
-            
-            info!("Updated service: {} for deployment {} in namespace {}", name, deployment_name, self.namespace);
+            let _response = self
+                .k8s_api_request("PATCH", &path, Some(patch_body))
+                .await?;
+
+            info!(
+                "Updated service: {} for deployment {} in namespace {}",
+                name, deployment_name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Updating service: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Updating service: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2373,14 +2584,20 @@ impl KubernetesManager {
         {
             let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, name);
             let _response = self.k8s_api_request("DELETE", &path, None).await?;
-            
-            info!("Deleted service: {} from namespace {}", name, self.namespace);
+
+            info!(
+                "Deleted service: {} from namespace {}",
+                name, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Deleting service: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Deleting service: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2436,17 +2653,28 @@ impl KubernetesManager {
                     }
                 }
             });
-            
-            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims/{}", self.namespace, name);
-            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
-            
-            info!("Updated PVC: {} with size {} in namespace {}", name, size, self.namespace);
+
+            let path = format!(
+                "/api/v1/namespaces/{}/persistentvolumeclaims/{}",
+                self.namespace, name
+            );
+            let _response = self
+                .k8s_api_request("PATCH", &path, Some(patch_body))
+                .await?;
+
+            info!(
+                "Updated PVC: {} with size {} in namespace {}",
+                name, size, self.namespace
+            );
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Updating PVC: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Updating PVC: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2475,16 +2703,22 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims/{}", self.namespace, name);
+            let path = format!(
+                "/api/v1/namespaces/{}/persistentvolumeclaims/{}",
+                self.namespace, name
+            );
             let _response = self.k8s_api_request("DELETE", &path, None).await?;
-            
+
             info!("Deleted PVC: {} from namespace {}", name, self.namespace);
             Ok(())
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("Deleting PVC: {} (placeholder - enable cloud-sdk feature)", name);
+            info!(
+                "Deleting PVC: {} (placeholder - enable cloud-sdk feature)",
+                name
+            );
             Ok(())
         }
     }
@@ -2508,7 +2742,7 @@ impl KubernetesManager {
             let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, name);
             self.k8s_api_request("GET", &path, None).await.is_ok()
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
             false
@@ -2531,10 +2765,13 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims/{}", self.namespace, name);
+            let path = format!(
+                "/api/v1/namespaces/{}/persistentvolumeclaims/{}",
+                self.namespace, name
+            );
             self.k8s_api_request("GET", &path, None).await.is_ok()
         }
-        
+
         #[cfg(not(feature = "cloud-sdk"))]
         {
             false
@@ -2564,14 +2801,14 @@ pub struct VmDeploymentConfig {
 #[derive(Debug, Clone)]
 pub struct ResourceRequirements {
     pub cpu: String,      // e.g., "100m", "1"
-    pub memory: String,  // e.g., "128Mi", "1Gi"
+    pub memory: String,   // e.g., "128Mi", "1Gi"
     pub gpu: Option<u32>, // Number of GPUs
 }
 
 /// Storage configuration
 #[derive(Debug, Clone)]
 pub struct StorageConfig {
-    pub size: String,        // e.g., "10Gi"
+    pub size: String,          // e.g., "10Gi"
     pub storage_class: String, // e.g., "standard", "ssd"
 }
 
@@ -2642,7 +2879,7 @@ fn build_deployment(
             "value": value
         }));
     }
-    
+
     let mut resources_obj = json!({
         "requests": {
             "cpu": resources.cpu,
@@ -2653,14 +2890,14 @@ fn build_deployment(
             "memory": resources.memory
         }
     });
-    
+
     if let Some(gpu) = resources.gpu {
         if gpu > 0 {
             resources_obj["requests"]["nvidia.com/gpu"] = json!(gpu);
             resources_obj["limits"]["nvidia.com/gpu"] = json!(gpu);
         }
     }
-    
+
     Ok(json!({
         "apiVersion": "apps/v1",
         "kind": "Deployment",
@@ -2716,14 +2953,14 @@ fn build_vm_deployment(
             "memory": resources.memory
         }
     });
-    
+
     if let Some(gpu) = resources.gpu {
         if gpu > 0 {
             resources_obj["requests"]["nvidia.com/gpu"] = json!(gpu);
             resources_obj["limits"]["nvidia.com/gpu"] = json!(gpu);
         }
     }
-    
+
     let mut ports = Vec::new();
     for port in &network.ports {
         ports.push(json!({
@@ -2731,13 +2968,13 @@ fn build_vm_deployment(
             "protocol": "TCP"
         }));
     }
-    
+
     let service_type = match network.service_type {
         ServiceType::ClusterIP => "ClusterIP",
         ServiceType::NodePort => "NodePort",
         ServiceType::LoadBalancer => "LoadBalancer",
     };
-    
+
     Ok(json!({
         "apiVersion": "apps/v1",
         "kind": "Deployment",
@@ -2796,7 +3033,12 @@ fn extract_kubeconfig_server(content: &str) -> Option<String> {
     // Full implementation would parse YAML structure
     for line in content.lines() {
         if line.trim().starts_with("server:") {
-            let url = line.split(':').skip(1).collect::<String>().trim().to_string();
+            let url = line
+                .split(':')
+                .skip(1)
+                .collect::<String>()
+                .trim()
+                .to_string();
             if !url.is_empty() {
                 return Some(url);
             }
@@ -2819,13 +3061,23 @@ fn extract_kubeconfig_token(content: &str) -> Option<String> {
     for line in content.lines() {
         let trimmed = line.trim();
         if trimmed.starts_with("token:") {
-            let token = trimmed.split(':').skip(1).collect::<String>().trim().to_string();
+            let token = trimmed
+                .split(':')
+                .skip(1)
+                .collect::<String>()
+                .trim()
+                .to_string();
             if !token.is_empty() {
                 return Some(token);
             }
         } else if trimmed.starts_with("token-file:") {
             // Try to read token from file
-            let path = trimmed.split(':').skip(1).collect::<String>().trim().to_string();
+            let path = trimmed
+                .split(':')
+                .skip(1)
+                .collect::<String>()
+                .trim()
+                .to_string();
             if let Ok(token) = std::fs::read_to_string(&path) {
                 return Some(token.trim().to_string());
             }

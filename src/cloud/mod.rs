@@ -27,10 +27,10 @@
 //!     kubernetes_namespace: "poolai".to_string(),
 //!     ..Default::default()
 //! };
-//! 
+//!
 //! let manager = CloudManager::new(config);
 //! manager.initialize().await?;
-//! 
+//!
 //! // Use Kubernetes manager
 //! if let Some(k8s) = manager.kubernetes() {
 //!     let deployment = k8s.create_worker_deployment(
@@ -39,7 +39,7 @@
 //!     ).await?;
 //!     println!("Created deployment: {}", deployment);
 //! }
-//! 
+//!
 //! manager.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -62,24 +62,24 @@
 //!     loadbalancing_enabled: true,
 //!     ..Default::default()
 //! };
-//! 
+//!
 //! let manager = CloudManager::new(config);
 //! manager.initialize().await?;
-//! 
+//!
 //! // Use auto-scaler
 //! if let Some(autoscaler) = manager.autoscaler() {
 //!     autoscaler.scale_up("worker-pool", 5).await?;
 //! }
-//! 
+//!
 //! # Ok(())
 //! # }
 //! ```
 
-pub mod kubernetes;
-pub mod providers;
 pub mod autoscaling;
+pub mod kubernetes;
 pub mod loadbalancing;
 pub mod operator;
+pub mod providers;
 
 use crate::core::error::AppError;
 use std::sync::Arc;
@@ -149,7 +149,9 @@ impl CloudConfig {
         }
 
         if self.aws_enabled {
-            let has_region = self.aws_region.as_ref()
+            let has_region = self
+                .aws_region
+                .as_ref()
                 .map(|r| !r.is_empty())
                 .unwrap_or_else(|| {
                     std::env::var("AWS_REGION")
@@ -165,7 +167,9 @@ impl CloudConfig {
         }
 
         if self.azure_enabled {
-            let has_subscription = self.azure_subscription_id.as_ref()
+            let has_subscription = self
+                .azure_subscription_id
+                .as_ref()
                 .map(|s| !s.is_empty())
                 .unwrap_or_else(|| {
                     std::env::var("AZURE_SUBSCRIPTION_ID")
@@ -181,7 +185,9 @@ impl CloudConfig {
         }
 
         if self.gcp_enabled {
-            let has_project = self.gcp_project_id.as_ref()
+            let has_project = self
+                .gcp_project_id
+                .as_ref()
                 .map(|p| !p.is_empty())
                 .unwrap_or_else(|| {
                     std::env::var("GCP_PROJECT_ID")
@@ -241,9 +247,7 @@ impl CloudManager {
         };
 
         let aws = if config.aws_enabled {
-            Some(providers::aws::AwsManager::new(
-                config.aws_region.clone(),
-            ))
+            Some(providers::aws::AwsManager::new(config.aws_region.clone()))
         } else {
             None
         };

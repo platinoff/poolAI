@@ -76,22 +76,24 @@ pub async fn download_library(
     let mut downloaded = 0u64;
 
     while let Some(chunk) = stream.next().await {
-        let chunk = chunk.map_err(|e| AppError::ConfigError(format!(
-            "Download error. Context: Failed to read chunk from HTTP response stream. \
+        let chunk = chunk.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Download error. Context: Failed to read chunk from HTTP response stream. \
             Suggestion: Check network stability and retry the download. \
             URL: '{}', Downloaded: {} bytes, Error: {}",
-            url, downloaded, e
-        )))?;
+                url, downloaded, e
+            ))
+        })?;
 
         // Write chunk to file
-        file.write_all(&chunk)
-            .await
-            .map_err(|e| AppError::ConfigError(format!(
+        file.write_all(&chunk).await.map_err(|e| {
+            AppError::ConfigError(format!(
                 "Failed to write file. Context: Cannot write downloaded chunk to destination file. \
                 Suggestion: Check disk space and filesystem permissions. \
                 Path: '{}', Downloaded: {} bytes, Error: {}",
                 destination.display(), downloaded, e
-            )))?;
+            ))
+        })?;
 
         // Update checksum
         hasher.update(&chunk);
@@ -105,14 +107,15 @@ pub async fn download_library(
     }
 
     // Finalize file
-    file.sync_all()
-        .await
-        .map_err(|e| AppError::ConfigError(format!(
+    file.sync_all().await.map_err(|e| {
+        AppError::ConfigError(format!(
             "Failed to sync file. Context: Cannot flush file data to disk after download. \
             Suggestion: Check disk space and filesystem integrity. \
             Path: '{}', Error: {}",
-            destination.display(), e
-        )))?;
+            destination.display(),
+            e
+        ))
+    })?;
 
     // Verify checksum if provided
     let calculated_checksum = format!("{:x}", hasher.finalize());
@@ -175,7 +178,8 @@ pub async fn extract_archive(archive_path: &Path, destination: &Path) -> Result<
                 "Unsupported archive format. Context: Archive file extension is not recognized. \
                 Suggestion: Supported formats are: .tar.gz, .tgz, .tar, .zip. \
                 Archive: '{}', Extension: '{}'",
-                archive_path.display(), extension
+                archive_path.display(),
+                extension
             )));
         }
     }
@@ -190,25 +194,29 @@ async fn extract_tar_gz(archive_path: &Path, destination: &Path) -> Result<(), A
     use std::fs::File;
     use std::io::BufReader;
 
-    let file = File::open(archive_path)
-        .map_err(|e| AppError::ConfigError(format!(
+    let file = File::open(archive_path).map_err(|e| {
+        AppError::ConfigError(format!(
             "Failed to open archive. Context: Cannot open tar.gz archive file for extraction. \
             Suggestion: Check file permissions and verify archive file is not corrupted. \
             Archive: '{}', Error: {}",
-            archive_path.display(), e
-        )))?;
+            archive_path.display(),
+            e
+        ))
+    })?;
 
     let gz = GzDecoder::new(BufReader::new(file));
     let mut archive = tar::Archive::new(gz);
 
-    archive
-        .unpack(destination)
-        .map_err(|e| AppError::ConfigError(format!(
+    archive.unpack(destination).map_err(|e| {
+        AppError::ConfigError(format!(
             "Failed to extract tar.gz. Context: Cannot extract contents from tar.gz archive. \
             Suggestion: Verify archive integrity and ensure destination directory is writable. \
             Archive: '{}', Destination: '{}', Error: {}",
-            archive_path.display(), destination.display(), e
-        )))?;
+            archive_path.display(),
+            destination.display(),
+            e
+        ))
+    })?;
 
     Ok(())
 }
@@ -224,24 +232,25 @@ async fn extract_tar(archive_path: &Path, destination: &Path) -> Result<(), AppE
     let archive_path_str = archive_path.display().to_string();
     let destination_str = destination.display().to_string();
     tokio::task::spawn_blocking(move || {
-        let file = File::open(&archive_path)
-            .map_err(|e| AppError::ConfigError(format!(
+        let file = File::open(&archive_path).map_err(|e| {
+            AppError::ConfigError(format!(
                 "Failed to open archive. Context: Cannot open tar archive file for extraction. \
                 Suggestion: Check file permissions and verify archive file is not corrupted. \
                 Archive: '{}', Error: {}",
                 archive_path_str, e
-            )))?;
+            ))
+        })?;
 
         let mut archive = tar::Archive::new(file);
 
-        archive
-            .unpack(&destination)
-            .map_err(|e| AppError::ConfigError(format!(
+        archive.unpack(&destination).map_err(|e| {
+            AppError::ConfigError(format!(
                 "Failed to extract tar. Context: Cannot extract contents from tar archive. \
                 Suggestion: Verify archive integrity and ensure destination directory is writable. \
                 Archive: '{}', Destination: '{}', Error: {}",
                 archive_path_str, destination_str, e
-            )))?;
+            ))
+        })?;
 
         Ok::<(), AppError>(())
     })
@@ -351,14 +360,15 @@ async fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), AppE
 
 /// Calculate file checksum
 pub async fn calculate_checksum(file_path: &Path) -> Result<String, AppError> {
-    let mut file = tokio::fs::File::open(file_path)
-        .await
-        .map_err(|e| AppError::ConfigError(format!(
+    let mut file = tokio::fs::File::open(file_path).await.map_err(|e| {
+        AppError::ConfigError(format!(
             "Failed to open file. Context: Cannot open file for checksum calculation. \
             Suggestion: Check file permissions and ensure file exists. \
             Path: '{}', Error: {}",
-            file_path.display(), e
-        )))?;
+            file_path.display(),
+            e
+        ))
+    })?;
 
     let mut hasher = Sha256::new();
     let mut buffer = vec![0u8; 8192];

@@ -139,7 +139,7 @@ async fn admin_dashboard() -> Html<String> {
     loadSystemOverview();
     setInterval(loadSystemOverview, 10000);
     "#;
-    
+
     admin_layout(
         "Admin Dashboard",
         r#"
@@ -220,7 +220,7 @@ async fn admin_tenants() -> Html<String> {
     
     loadTenants();
     "#;
-    
+
     admin_layout(
         "Tenant Management",
         r#"
@@ -268,7 +268,7 @@ async fn admin_security() -> Html<String> {
     
     loadTabContent('oauth2');
     "#;
-    
+
     admin_layout(
         "Security Management",
         r#"
@@ -344,7 +344,7 @@ async fn admin_audit() -> Html<String> {
     
     queryAuditLogs();
     "#;
-    
+
     admin_layout(
         "Audit Logs",
         r#"
@@ -405,7 +405,7 @@ async fn admin_monitoring() -> Html<String> {
     loadMonitoring();
     setInterval(loadMonitoring, 5000);
     "#;
-    
+
     admin_layout(
         "Monitoring Dashboard",
         r#"
@@ -481,7 +481,7 @@ async fn admin_vm() -> Html<String> {
     
     loadVmInstances();
     "#;
-    
+
     admin_layout(
         "VM Management",
         r#"
@@ -556,7 +556,7 @@ async fn admin_workers() -> Html<String> {
     loadWorkers();
     setInterval(loadWorkers, 5000);
     "#;
-    
+
     admin_layout(
         "Worker Management",
         r#"
@@ -619,7 +619,7 @@ async fn admin_libs() -> Html<String> {
     
     loadLibraries();
     "#;
-    
+
     admin_layout(
         "Library Management",
         r#"
@@ -690,7 +690,7 @@ async fn admin_raid() -> Html<String> {
     
     loadRaidArtifacts();
     "#;
-    
+
     admin_layout(
         "RAID Management",
         r#"
@@ -753,7 +753,7 @@ async fn admin_users() -> Html<String> {
     
     loadUsers();
     "#;
-    
+
     admin_layout(
         "User Management",
         r#"
@@ -790,7 +790,7 @@ async fn admin_config() -> Html<String> {
     
     loadConfigTab('general');
     "#;
-    
+
     admin_layout(
         "System Configuration",
         r#"
@@ -812,7 +812,7 @@ async fn admin_config() -> Html<String> {
 fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let base_css = include_str!("admin_styles.css");
     let common_js = include_str!("admin_common.js");
-    
+
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -878,6 +878,6 @@ fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
         common_js = common_js,
         script = script_js
     );
-    
+
     Html(html)
 }

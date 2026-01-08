@@ -34,9 +34,9 @@
 //! ```
 
 pub mod audit;
+pub mod monitoring;
 pub mod multi_tenancy;
 pub mod security;
-pub mod monitoring;
 
 use crate::core::error::AppError;
 use std::sync::Arc;

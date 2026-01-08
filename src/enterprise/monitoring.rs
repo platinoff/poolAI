@@ -223,7 +223,7 @@ impl MonitoringManager {
     /// Checks alert rules against a metric data point
     async fn check_alert_rules(&self, data_point: &MetricDataPoint) -> Result<(), AppError> {
         let rules = self.alert_rules.read().await;
-        
+
         for (rule_name, rule) in rules.iter() {
             if !rule.enabled {
                 continue;
@@ -273,7 +273,11 @@ impl MonitoringManager {
 
                 info!(
                     "Alert triggered: {} (metric={}, value={}, threshold={}, severity={})",
-                    rule_name, data_point.metric, data_point.value, rule.threshold, rule.severity.as_str()
+                    rule_name,
+                    data_point.metric,
+                    data_point.value,
+                    rule.threshold,
+                    rule.severity.as_str()
                 );
             }
         }
@@ -342,7 +346,8 @@ impl MonitoringManager {
         acknowledged: Option<bool>,
     ) -> Result<Vec<Alert>, AppError> {
         let alerts = self.active_alerts.read().await;
-        let mut filtered: Vec<Alert> = alerts.values()
+        let mut filtered: Vec<Alert> = alerts
+            .values()
             .filter(|alert| {
                 if let Some(sev) = severity {
                     if alert.severity != sev {
@@ -420,9 +425,13 @@ impl MonitoringManager {
     /// # Arguments
     ///
     /// * `tenant_id` - Optional tenant ID filter
-    pub async fn list_dashboards(&self, tenant_id: Option<Uuid>) -> Result<Vec<Dashboard>, AppError> {
+    pub async fn list_dashboards(
+        &self,
+        tenant_id: Option<Uuid>,
+    ) -> Result<Vec<Dashboard>, AppError> {
         let dashboards = self.dashboards.read().await;
-        let filtered: Vec<Dashboard> = dashboards.values()
+        let filtered: Vec<Dashboard> = dashboards
+            .values()
             .filter(|dashboard| {
                 if let Some(tid) = tenant_id {
                     if dashboard.tenant_id != Some(tid) {
@@ -454,7 +463,8 @@ impl MonitoringManager {
         limit: Option<usize>,
     ) -> Result<Vec<MetricDataPoint>, AppError> {
         let history = self.metrics_history.read().await;
-        let mut filtered: Vec<MetricDataPoint> = history.iter()
+        let mut filtered: Vec<MetricDataPoint> = history
+            .iter()
             .filter(|point| {
                 if let Some(m) = metric {
                     if point.metric != m {
@@ -483,7 +493,7 @@ impl MonitoringManager {
 
         // Sort by timestamp (newest first)
         filtered.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
-        
+
         // Apply limit
         if let Some(limit) = limit {
             filtered.truncate(limit);

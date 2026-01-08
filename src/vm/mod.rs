@@ -1044,22 +1044,26 @@ impl VmManager {
                 instance_id, instance_id
             ))
         })?;
-        
+
         // If process_id is available, try to get current resource usage
         if let Some(process_id) = instance.process_id {
             match self.resource_limiter.get_usage(process_id).await {
                 Ok(usage) => {
                     // Record usage in history
-                    self.record_resource_usage(instance_id, usage.clone()).await?;
+                    self.record_resource_usage(instance_id, usage.clone())
+                        .await?;
                     return Ok(usage);
                 }
                 Err(e) => {
-                    warn!("Failed to get resource usage for process {}: {}", process_id, e);
+                    warn!(
+                        "Failed to get resource usage for process {}: {}",
+                        process_id, e
+                    );
                     // Fall through to history lookup
                 }
             }
         }
-        
+
         // Fallback: return the most recent history entry if available
         let history = self.resource_history.read().await;
         if let Some(entries) = history.get(&instance_id) {
@@ -1069,7 +1073,8 @@ impl VmManager {
         }
 
         Err(AppError::ConfigError(
-            "Process ID not available and no history found - process spawning not yet implemented".to_string(),
+            "Process ID not available and no history found - process spawning not yet implemented"
+                .to_string(),
         ))
     }
 
@@ -1639,10 +1644,7 @@ mod tests {
 
     #[test]
     fn test_vm_isolation_variants() {
-        let isolations = vec![
-            VmIsolation::ProcessSandbox,
-            VmIsolation::HardwareVm,
-        ];
+        let isolations = vec![VmIsolation::ProcessSandbox, VmIsolation::HardwareVm];
         for isolation in isolations {
             let cloned = isolation.clone();
             assert!(matches!(
@@ -1671,9 +1673,15 @@ mod tests {
         };
         let cloned = config.clone();
         assert_eq!(config.max_restart_attempts, cloned.max_restart_attempts);
-        assert_eq!(config.initial_restart_delay_secs, cloned.initial_restart_delay_secs);
+        assert_eq!(
+            config.initial_restart_delay_secs,
+            cloned.initial_restart_delay_secs
+        );
         assert_eq!(config.max_restart_delay_secs, cloned.max_restart_delay_secs);
-        assert_eq!(config.use_exponential_backoff, cloned.use_exponential_backoff);
+        assert_eq!(
+            config.use_exponential_backoff,
+            cloned.use_exponential_backoff
+        );
     }
 
     #[test]
@@ -1720,11 +1728,14 @@ mod tests {
     #[tokio::test]
     async fn test_vm_manager_create_instance() {
         let manager = VmManager::new();
-        let instance = manager.create_instance(
-            "test-vm".to_string(),
-            VmResources::default(),
-            VmIsolation::ProcessSandbox,
-        ).await.unwrap();
+        let instance = manager
+            .create_instance(
+                "test-vm".to_string(),
+                VmResources::default(),
+                VmIsolation::ProcessSandbox,
+            )
+            .await
+            .unwrap();
         assert_eq!(instance.name, "test-vm");
         assert!(matches!(instance.status, VmStatus::Creating));
     }

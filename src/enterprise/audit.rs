@@ -96,12 +96,7 @@ pub struct AuditEvent {
 
 impl AuditEvent {
     /// Creates a new audit event with current timestamp
-    pub fn new(
-        level: AuditLevel,
-        action: String,
-        resource_type: String,
-        result: String,
-    ) -> Self {
+    pub fn new(level: AuditLevel, action: String, resource_type: String, result: String) -> Self {
         Self {
             timestamp: Utc::now(),
             level,
@@ -210,23 +205,26 @@ impl AuditLogger {
         }
 
         // Create log directory if it doesn't exist
-        tokio::fs::create_dir_all(&self.config.log_directory).await.map_err(|e| {
-            AppError::ConfigError(format!(
-                "Failed to create audit log directory: {}. \
+        tokio::fs::create_dir_all(&self.config.log_directory)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to create audit log directory: {}. \
                 Context: Cannot initialize audit logging without a valid directory. \
                 Suggestion: Ensure write permissions for the parent directory. \
                 Path: {:?}, Error: {}",
-                e,
-                self.config.log_directory,
-                e
-            ))
-        })?;
+                    e, self.config.log_directory, e
+                ))
+            })?;
 
         // Open initial log file
         self.rotate_log_file().await?;
 
         *initialized = true;
-        info!("Audit logger initialized with directory: {:?}", self.config.log_directory);
+        info!(
+            "Audit logger initialized with directory: {:?}",
+            self.config.log_directory
+        );
         Ok(())
     }
 
@@ -310,10 +308,7 @@ impl AuditLogger {
         let mut file_guard = self.current_file.write().await;
         if let Some(mut file) = file_guard.take() {
             file.flush().await.map_err(|e| {
-                AppError::ConfigError(format!(
-                    "Failed to flush audit log during rotation: {}",
-                    e
-                ))
+                AppError::ConfigError(format!("Failed to flush audit log during rotation: {}", e))
             })?;
         }
 
@@ -388,17 +383,17 @@ impl AuditLogger {
         drop(initialized);
 
         // Get all log files in the directory
-        let mut entries = tokio::fs::read_dir(&self.config.log_directory).await.map_err(|e| {
-            AppError::ConfigError(format!(
-                "Failed to read audit log directory: {}. \
+        let mut entries = tokio::fs::read_dir(&self.config.log_directory)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to read audit log directory: {}. \
                 Context: Cannot query audit events without access to log directory. \
                 Suggestion: Check directory permissions and path. \
                 Path: {:?}, Error: {}",
-                e,
-                self.config.log_directory,
-                e
-            ))
-        })?;
+                    e, self.config.log_directory, e
+                ))
+            })?;
 
         let mut log_files = Vec::new();
         while let Some(entry) = entries.next_entry().await.map_err(|e| {
@@ -435,7 +430,10 @@ impl AuditLogger {
                 break;
             }
 
-            match self.read_events_from_file(&log_file, filters, limit - all_events.len()).await {
+            match self
+                .read_events_from_file(&log_file, filters, limit - all_events.len())
+                .await
+            {
                 Ok(mut events) => {
                     all_events.append(&mut events);
                 }
@@ -483,7 +481,10 @@ impl AuditLogger {
             let event: AuditEvent = match serde_json::from_str(line) {
                 Ok(e) => e,
                 Err(e) => {
-                    warn!("Failed to parse audit event from line: {}. Error: {}", line, e);
+                    warn!(
+                        "Failed to parse audit event from line: {}. Error: {}",
+                        line, e
+                    );
                     continue;
                 }
             };
@@ -571,16 +572,21 @@ impl AuditLogger {
 
     /// Cleans up old log files, keeping only the most recent max_files
     async fn cleanup_old_logs(&self) -> Result<(), AppError> {
-        let mut entries = tokio::fs::read_dir(&self.config.log_directory).await.map_err(|e| {
-            AppError::ConfigError(format!(
-                "Failed to read audit log directory for cleanup: {}",
-                e
-            ))
-        })?;
+        let mut entries = tokio::fs::read_dir(&self.config.log_directory)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to read audit log directory for cleanup: {}",
+                    e
+                ))
+            })?;
 
         let mut log_files = Vec::new();
         while let Some(entry) = entries.next_entry().await.map_err(|e| {
-            AppError::ConfigError(format!("Failed to read directory entry during cleanup: {}", e))
+            AppError::ConfigError(format!(
+                "Failed to read directory entry during cleanup: {}",
+                e
+            ))
         })? {
             let path = entry.path();
             if path.is_file() {
@@ -752,7 +758,9 @@ mod tests {
             ..Default::default()
         };
         let events = logger.query_events(&filters).await.unwrap();
-        assert!(events.iter().all(|e| e.user_id.as_ref() == Some(&"user123".to_string())));
+        assert!(events
+            .iter()
+            .all(|e| e.user_id.as_ref() == Some(&"user123".to_string())));
 
         // Query by action
         let filters = AuditQueryFilters {
@@ -769,7 +777,10 @@ mod tests {
         };
         let events = logger.query_events(&filters).await.unwrap();
         assert!(events.iter().all(|e| {
-            matches!(e.level, AuditLevel::Warning | AuditLevel::Error | AuditLevel::Critical)
+            matches!(
+                e.level,
+                AuditLevel::Warning | AuditLevel::Error | AuditLevel::Critical
+            )
         }));
 
         assert!(logger.shutdown().await.is_ok());

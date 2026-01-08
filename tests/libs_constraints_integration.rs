@@ -11,7 +11,7 @@ fn test_version_constraint_creation() {
         operator: ConstraintOp::Exact,
         version: "1.0.0".to_string(),
     };
-    
+
     assert_eq!(constraint.operator, ConstraintOp::Exact);
     assert_eq!(constraint.version, "1.0.0");
 }
@@ -27,7 +27,7 @@ fn test_constraint_op_variants() {
         ConstraintOp::Compatible,
         ConstraintOp::Caret,
     ];
-    
+
     for op in ops {
         let constraint = VersionConstraint {
             operator: op,
@@ -43,7 +43,7 @@ fn test_version_constraint_clone() {
         operator: ConstraintOp::GreaterEqual,
         version: "2.0.0".to_string(),
     };
-    
+
     let cloned = constraint.clone();
     assert_eq!(constraint.operator, cloned.operator);
     assert_eq!(constraint.version, cloned.version);
@@ -55,7 +55,7 @@ fn test_version_constraint_serialization() {
         operator: ConstraintOp::Exact,
         version: "1.0.0".to_string(),
     };
-    
+
     // Note: VersionConstraint may not implement Serialize
     // This test verifies the structure is correct
     assert_eq!(constraint.version, "1.0.0");

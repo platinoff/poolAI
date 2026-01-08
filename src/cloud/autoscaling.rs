@@ -14,20 +14,20 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let autoscaler = AutoScaler::new();
 //! autoscaler.initialize().await?;
-//! 
+//!
 //! // Get current metrics
 //! let metrics = autoscaler.get_metrics("worker-pool").await?;
-//! 
+//!
 //! // Scale up if CPU usage is high
 //! if metrics.cpu_usage > 0.8 {
 //!     autoscaler.scale_up("worker-pool", metrics.current_replicas + 2).await?;
 //! }
-//! 
+//!
 //! // Scale down if usage is low
 //! if metrics.cpu_usage < 0.3 && metrics.current_replicas > 1 {
 //!     autoscaler.scale_down("worker-pool", metrics.current_replicas - 1).await?;
 //! }
-//! 
+//!
 //! autoscaler.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -212,12 +212,15 @@ impl AutoScaler {
                 )
             ));
         }
-        
+
         #[cfg(feature = "cloud-sdk")]
         {
             if let Some(ref k8s_manager) = self.k8s_manager {
                 // Scale deployment via Kubernetes API
-                match k8s_manager.scale_deployment(resource_id, target_replicas as i32).await {
+                match k8s_manager
+                    .scale_deployment(resource_id, target_replicas as i32)
+                    .await
+                {
                     Ok(_) => {
                         info!(
                             "Scaled up resource: {} from {} to {} replicas",
@@ -232,7 +235,7 @@ impl AutoScaler {
                 }
             }
         }
-        
+
         // Fallback: Log placeholder scaling
         info!(
             "Scaling up resource: {} from {} to {} replicas (placeholder - enable cloud-sdk feature)",
@@ -298,12 +301,15 @@ impl AutoScaler {
                 )
             ));
         }
-        
+
         #[cfg(feature = "cloud-sdk")]
         {
             if let Some(ref k8s_manager) = self.k8s_manager {
                 // Scale deployment via Kubernetes API
-                match k8s_manager.scale_deployment(resource_id, target_replicas as i32).await {
+                match k8s_manager
+                    .scale_deployment(resource_id, target_replicas as i32)
+                    .await
+                {
                     Ok(_) => {
                         info!(
                             "Scaled down resource: {} from {} to {} replicas",
@@ -318,7 +324,7 @@ impl AutoScaler {
                 }
             }
         }
-        
+
         // Fallback: Log placeholder scaling
         info!(
             "Scaling down resource: {} from {} to {} replicas (placeholder - enable cloud-sdk feature)",
@@ -379,13 +385,13 @@ impl AutoScaler {
                 } else {
                     0
                 };
-                
+
                 // Query Pod metrics API for CPU and memory usage
                 // Note: This requires metrics-server to be installed in the cluster
                 let mut total_cpu_usage = 0.0;
                 let mut total_memory_usage = 0.0;
                 let mut pod_count = 0;
-                
+
                 if current_replicas > 0 {
                     let pods = k8s_manager.list_pods().await.unwrap_or_default();
                     for pod_name in pods.iter().filter(|p| p.starts_with(resource_id)) {
@@ -395,7 +401,7 @@ impl AutoScaler {
                         // In production, we'd query the metrics API and calculate averages
                         pod_count += 1;
                     }
-                    
+
                     // Calculate average CPU and memory usage
                     // Placeholder: In production, we'd query actual metrics
                     // For now, return placeholder values
@@ -404,20 +410,24 @@ impl AutoScaler {
                         total_memory_usage = 0.6; // Placeholder: 60% memory usage
                     }
                 }
-                
+
                 // Request rate would come from load balancer or API gateway metrics
                 // For now, we'll use a placeholder
                 let request_rate = 0.0;
-                
+
                 return Ok(ScalingMetrics {
                     cpu_usage: total_cpu_usage,
                     memory_usage: total_memory_usage,
                     request_rate,
-                    current_replicas: if current_replicas > 0 { current_replicas } else { 1 },
+                    current_replicas: if current_replicas > 0 {
+                        current_replicas
+                    } else {
+                        1
+                    },
                 });
             }
         }
-        
+
         // Fallback: Return placeholder metrics
         Ok(ScalingMetrics {
             cpu_usage: 0.0,
@@ -477,13 +487,14 @@ impl AutoScaler {
     /// Returns `AppError::ValidationError` if min > max or max is 0.
     pub async fn set_replica_limits(&self, min: u32, max: u32) -> Result<(), AppError> {
         if min > max {
-            return Err(AppError::ValidationError(
-                format!("Minimum replicas ({}) cannot be greater than maximum ({})", min, max)
-            ));
+            return Err(AppError::ValidationError(format!(
+                "Minimum replicas ({}) cannot be greater than maximum ({})",
+                min, max
+            )));
         }
         if max == 0 {
             return Err(AppError::ValidationError(
-                "Maximum replicas cannot be 0".to_string()
+                "Maximum replicas cannot be 0".to_string(),
             ));
         }
 
@@ -517,8 +528,8 @@ pub struct ScalingPolicy {
 /// Scaling metrics for auto-scaling decisions
 #[derive(Debug, Clone)]
 pub struct ScalingMetrics {
-    pub cpu_usage: f64,        // 0.0 - 1.0
-    pub memory_usage: f64,     // 0.0 - 1.0
-    pub request_rate: f64,     // requests per second
+    pub cpu_usage: f64,    // 0.0 - 1.0
+    pub memory_usage: f64, // 0.0 - 1.0
+    pub request_rate: f64, // requests per second
     pub current_replicas: u32,
 }

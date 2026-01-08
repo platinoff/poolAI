@@ -1,6 +1,6 @@
 //! Integration tests for Runtime Process Module
 
-use poolai::runtime::process::{ProcessManager, ProcessConfig, ProcessStatus};
+use poolai::runtime::process::{ProcessConfig, ProcessManager, ProcessStatus};
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -31,14 +31,14 @@ async fn test_list_processes_empty() {
 async fn test_process_not_found_error() {
     let manager = ProcessManager::new();
     let fake_id = Uuid::new_v4();
-    
+
     // Should return error for non-existent process
     let status_result = manager.get_process_status(fake_id).await;
     assert!(status_result.is_err());
-    
+
     let logs_result = manager.get_process_logs(fake_id).await;
     assert!(logs_result.is_err());
-    
+
     let pid_result = manager.get_process_pid(fake_id).await;
     assert!(pid_result.is_err());
 }
@@ -55,7 +55,7 @@ async fn test_process_config_creation() {
         memory_limit_mb: Some(1024),
         capture_logs: true,
     };
-    
+
     assert_eq!(config.command, "echo");
     assert_eq!(config.args.len(), 1);
     assert_eq!(config.timeout_seconds, Some(30));
@@ -65,7 +65,7 @@ async fn test_process_config_creation() {
 #[tokio::test]
 async fn test_process_logs_default() {
     let logs = poolai::runtime::process::ProcessLogs::default();
-    
+
     assert_eq!(logs.stdout.len(), 0);
     assert_eq!(logs.stderr.len(), 0);
     assert_eq!(logs.max_lines, 1000);
@@ -81,7 +81,7 @@ async fn test_process_status_variants() {
         ProcessStatus::Failed("test error".to_string()),
         ProcessStatus::Timeout,
     ];
-    
+
     for status in statuses {
         let cloned = status.clone();
         assert_eq!(status, cloned);

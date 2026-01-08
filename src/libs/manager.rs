@@ -531,7 +531,10 @@ impl LibraryManager {
     async fn determine_library_type(&self, name: &str) -> LibraryType {
         // Use heuristics based on library name
         let name_lower = name.to_lowercase();
-        if name_lower.contains("torch") || name_lower.contains("tensorflow") || name_lower.contains("onnx") {
+        if name_lower.contains("torch")
+            || name_lower.contains("tensorflow")
+            || name_lower.contains("onnx")
+        {
             LibraryType::ModelLibrary
         } else if name_lower.starts_with("lib") || name_lower.contains("native") {
             LibraryType::NativeLibrary
@@ -670,15 +673,14 @@ impl LibraryManager {
         info!("Updating library: {}", name);
 
         // Get current version
-        let current_lib = self
-            .get_library(name)
-            .await
-            .ok_or_else(|| AppError::ConfigError(format!(
+        let current_lib = self.get_library(name).await.ok_or_else(|| {
+            AppError::ConfigError(format!(
                 "Library not found. Context: Attempted to update a library that is not installed. \
                 Suggestion: Install the library first using install_library(). \
                 Library: '{}'",
                 name
-            )))?;
+            ))
+        })?;
 
         // Get latest version from registry
         let latest_version = {

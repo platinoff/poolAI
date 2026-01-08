@@ -71,7 +71,7 @@ pub fn create_ui_routes() -> Router {
         .route("/libs", get(libs_page))
         .route("/vm", get(vm_page))
         .route("/raid", get(raid_page));
-    
+
     // Add admin routes if enterprise feature is enabled
     #[cfg(feature = "enterprise")]
     {

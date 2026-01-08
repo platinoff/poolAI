@@ -1,6 +1,6 @@
 //! Integration tests for Network WebSocket Module
 
-use poolai::network::ws::{LiveMetrics, SystemEvent, WebSocketMessage, WebSocketManager};
+use poolai::network::ws::{LiveMetrics, SystemEvent, WebSocketManager, WebSocketMessage};
 use serde_json::json;
 use std::time::SystemTime;
 
@@ -67,15 +67,15 @@ async fn test_system_event_creation() {
 #[tokio::test]
 async fn test_websocket_manager_connection_management() {
     let manager = WebSocketManager::new();
-    
+
     // Test connection management (these are async operations that require actual WebSocket connections)
     // For now, we just verify the manager can be created and methods exist
     let connection_id = "test_connection".to_string();
-    
+
     // These would require actual WebSocket connections to test fully
     // manager.add_connection(...).await;
     // manager.remove_connection(&connection_id).await;
-    
+
     // Just verify manager exists
     let _ = manager;
 }

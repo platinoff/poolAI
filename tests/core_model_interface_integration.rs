@@ -2,12 +2,12 @@
 //!
 //! Tests model interface traits, model manager, and model lifecycle operations.
 
+use poolai::core::config::ModelConfig as ConfigModelConfig;
+use poolai::core::error::AppError;
 use poolai::core::model_interface::{
     ModelConfig, ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
     ModelRequest, ModelResponse, ModelState, ModelStatus,
 };
-use poolai::core::config::ModelConfig as ConfigModelConfig;
-use poolai::core::error::AppError;
 use std::collections::HashMap;
 
 // Mock implementation of ModelInterface for testing

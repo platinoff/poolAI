@@ -1,11 +1,11 @@
 //! Integration tests for Network Auth Module
 
-use poolai::network::auth::{
-    authenticate_user, generate_token, get_current_user, has_permission, has_role,
-    validate_token, AuthRequest, UserRole,
-};
 use axum::extract::Request;
 use axum::http::StatusCode;
+use poolai::network::auth::{
+    authenticate_user, generate_token, get_current_user, has_permission, has_role, validate_token,
+    AuthRequest, UserRole,
+};
 
 #[tokio::test]
 async fn test_generate_token() {
@@ -20,7 +20,7 @@ async fn test_validate_token() {
     let token = generate_token("test_user", UserRole::Admin).unwrap();
     let result = validate_token(&token);
     assert!(result.is_ok());
-    
+
     let claims = result.unwrap();
     assert_eq!(claims.sub, "test_user");
     assert_eq!(claims.role, UserRole::Admin);
@@ -41,7 +41,7 @@ async fn test_authenticate_user_admin() {
 
     let result = authenticate_user(auth_req).await;
     assert!(result.is_ok());
-    
+
     let response = result.unwrap();
     assert_eq!(response.role, UserRole::Admin);
     assert_eq!(response.token_type, "Bearer");
@@ -57,7 +57,7 @@ async fn test_authenticate_user_operator() {
 
     let result = authenticate_user(auth_req).await;
     assert!(result.is_ok());
-    
+
     let response = result.unwrap();
     assert_eq!(response.role, UserRole::Operator);
 }
@@ -71,7 +71,7 @@ async fn test_authenticate_user_viewer() {
 
     let result = authenticate_user(auth_req).await;
     assert!(result.is_ok());
-    
+
     let response = result.unwrap();
     assert_eq!(response.role, UserRole::Viewer);
 }
@@ -85,7 +85,7 @@ async fn test_authenticate_user_invalid() {
 
     let result = authenticate_user(auth_req).await;
     assert!(result.is_err());
-    
+
     if let Err((status, _)) = result {
         assert_eq!(status, StatusCode::UNAUTHORIZED);
     }

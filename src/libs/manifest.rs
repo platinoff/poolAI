@@ -64,13 +64,14 @@ impl InstalledLibrariesManifest {
         }
 
         let tmp_path = tmp_manifest_path(path);
-        let data = serde_json::to_vec_pretty(self)
-            .map_err(|e| AppError::ConfigError(format!(
+        let data = serde_json::to_vec_pretty(self).map_err(|e| {
+            AppError::ConfigError(format!(
                 "Failed to serialize manifest. Context: Cannot convert manifest to JSON format. \
                 Suggestion: Check manifest data structure and ensure all fields are serializable. \
                 Error: {}",
                 e
-            )))?;
+            ))
+        })?;
 
         let mut file = tokio::fs::File::create(&tmp_path).await.map_err(|e| {
             AppError::ConfigError(format!(
@@ -93,7 +94,8 @@ impl InstalledLibrariesManifest {
                 "Failed to sync manifest tmp file. Context: Cannot flush manifest data to disk. \
                 Suggestion: Check disk space and filesystem integrity. \
                 Path: '{}', Error: {}",
-                tmp_path.display(), e
+                tmp_path.display(),
+                e
             ))
         })?;
 

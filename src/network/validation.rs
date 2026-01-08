@@ -127,7 +127,8 @@ pub fn validate_range<T: PartialOrd + std::fmt::Display>(
 pub fn validate_base64_data(data: &str, max_size_bytes: usize) -> Result<(), AppError> {
     if data.trim().is_empty() {
         return Err(AppError::ValidationError(
-            "Base64 data cannot be empty. Suggestion: Provide valid base64-encoded data.".to_string(),
+            "Base64 data cannot be empty. Suggestion: Provide valid base64-encoded data."
+                .to_string(),
         ));
     }
 
@@ -367,12 +368,12 @@ mod tests {
     #[test]
     fn test_validate_worker_config_success() {
         assert!(validate_worker_config(
-            100,      // max_concurrent_requests
-            5000,     // request_timeout_ms
-            1000,     // health_check_interval_ms
-            1000,     // cache_size
-            4096,     // max_memory_mb
-            5         // cpu_priority
+            100,  // max_concurrent_requests
+            5000, // request_timeout_ms
+            1000, // health_check_interval_ms
+            1000, // cache_size
+            4096, // max_memory_mb
+            5     // cpu_priority
         )
         .is_ok());
     }
@@ -387,7 +388,8 @@ mod tests {
         assert!(validate_worker_config(100, 5000, 1000, 50, 4096, 5).is_err()); // cache_size too low
         assert!(validate_worker_config(100, 5000, 1000, 1000, 128, 5).is_err()); // max_memory_mb too low
         assert!(validate_worker_config(100, 5000, 1000, 1000, 4096, 0).is_err()); // cpu_priority too low
-        assert!(validate_worker_config(100, 5000, 1000, 1000, 4096, 11).is_err()); // cpu_priority too high
+        assert!(validate_worker_config(100, 5000, 1000, 1000, 4096, 11).is_err());
+        // cpu_priority too high
     }
 
     #[test]
