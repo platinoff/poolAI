@@ -259,15 +259,14 @@ pub async fn auto_update_libtorch_if_needed(
             && (policy == AutoUpdatePolicy::OnMismatch
                 || policy == AutoUpdatePolicy::OnStartupAndMismatch)
         {
-                info!(
-                    "Auto-updating libtorch due to version mismatch (policy: {:?})",
-                    policy
-                );
-                if let Some(manager) = get_global_manager() {
-                    let manager = manager.read().await;
-                    manager.update_library("libtorch").await?;
-                    info!("libtorch auto-update completed");
-                }
+            info!(
+                "Auto-updating libtorch due to version mismatch (policy: {:?})",
+                policy
+            );
+            if let Some(manager) = get_global_manager() {
+                let manager = manager.read().await;
+                manager.update_library("libtorch").await?;
+                info!("libtorch auto-update completed");
             }
         }
     }
