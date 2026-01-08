@@ -25,4 +25,8 @@ impl TaskQueue {
     pub fn get_length(&self) -> usize {
         0
     }
+
+    pub fn get_capacity(&self) -> usize {
+        self.capacity
+    }
 }
