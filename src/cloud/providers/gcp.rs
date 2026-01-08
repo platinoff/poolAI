@@ -72,15 +72,40 @@ impl GcpManager {
     }
 
     /// Create Compute Engine instance
+    ///
+    /// # Arguments
+    ///
+    /// * `zone` - GCP zone (e.g., "us-central1-a")
+    /// * `machine_type` - Machine type (e.g., "n1-standard-2")
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `zone` is empty
+    /// - `machine_type` is empty
     pub async fn create_compute_instance(
         &self,
         zone: &str,
         machine_type: &str,
     ) -> Result<String, AppError> {
+        if zone.is_empty() {
+            return Err(AppError::ValidationError(
+                "Zone cannot be empty. Current value: ''. Suggestion: Provide a valid GCP zone (e.g., 'us-central1-a')."
+                    .to_string(),
+            ));
+        }
+
+        if machine_type.is_empty() {
+            return Err(AppError::ValidationError(
+                "Machine type cannot be empty. Current value: ''. Suggestion: Provide a valid GCP machine type (e.g., 'n1-standard-2')."
+                    .to_string(),
+            ));
+        }
+
         // TODO: Implement Compute Engine instance creation
         info!(
-            "Creating Compute Engine instance: {} / {} (placeholder)",
-            zone, machine_type
+            "Creating Compute Engine instance: {} / {} in project {} (placeholder)",
+            zone, machine_type, self.project_id
         );
         Ok(uuid::Uuid::new_v4().to_string())
     }
