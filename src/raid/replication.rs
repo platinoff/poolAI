@@ -335,20 +335,33 @@ impl ReplicationEngine {
 
         if nodes.is_empty() {
             return Err(AppError::ConfigError(
-                "No available nodes for replication".to_string(),
+                format!(
+                    "No available nodes for replication. Context: Cannot select nodes for replication because no nodes are registered in the cluster. \
+                    Suggestion: Register nodes using RaidManager::register_node() before attempting replication. \
+                    Current node count: 0, Required replication factor: {}",
+                    replication_factor
+                )
             ));
         }
 
         let mut candidate_nodes: Vec<u64> = nodes.keys().cloned().collect();
 
         // Exclude specified nodes
-        if let Some(exclude) = exclude_nodes {
+        let excluded_count = exclude_nodes.as_ref().map(|v| v.len()).unwrap_or(0);
+        if let Some(ref exclude) = exclude_nodes {
             candidate_nodes.retain(|id| !exclude.contains(id));
         }
 
         if candidate_nodes.is_empty() {
             return Err(AppError::ConfigError(
-                "No available nodes after exclusions".to_string(),
+                format!(
+                    "No available nodes after exclusions. Context: All candidate nodes were excluded from replication selection. \
+                    Suggestion: Reduce the number of excluded nodes or add more nodes to the cluster. \
+                    Total nodes: {}, Excluded nodes: {}, Required replication factor: {}",
+                    nodes.len(),
+                    excluded_count,
+                    replication_factor
+                )
             ));
         }
 
@@ -443,8 +456,11 @@ impl ReplicationEngine {
 
         if metadata_map.contains_key(&artifact_id) {
             return Err(AppError::ValidationError(format!(
-                "Replication already initialized for artifact {}",
-                artifact_id
+                "Replication already initialized for artifact. Context: Attempted to initialize replication for an artifact that already has replication metadata. \
+                Suggestion: Check if replication is already in progress using get_replication_status() or wait for current replication to complete. \
+                Artifact ID: '{}', Current target factor: {}",
+                artifact_id,
+                metadata_map.get(&artifact_id).map(|m| m.target_factor).unwrap_or(0)
             )));
         }
 
@@ -632,8 +648,12 @@ impl ReplicationEngine {
                     artifact_id, self.config.sync_timeout_seconds
                 );
                 return Err(AppError::NetworkError(format!(
-                    "Replication timeout after {} seconds",
-                    self.config.sync_timeout_seconds
+                    "Replication timeout. Context: Synchronous replication did not complete within the configured timeout period. \
+                    Suggestion: Increase sync_timeout_seconds in ReplicationConfig, check network connectivity to target nodes, or use asynchronous replication for large artifacts. \
+                    Artifact ID: '{}', Timeout: {} seconds, Target replication factor: {}",
+                    artifact_id,
+                    self.config.sync_timeout_seconds,
+                    replication_factor
                 )));
             }
         };
@@ -750,7 +770,12 @@ impl ReplicationEngine {
     pub async fn initialize_async_replication(&mut self) -> Result<(), AppError> {
         if self.async_queue_tx.is_some() {
             return Err(AppError::ConfigError(
-                "Async replication already initialized".to_string(),
+                format!(
+                    "Async replication already initialized. Context: Attempted to initialize async replication queue when it is already initialized. \
+                    Suggestion: Call initialize_async_replication() only once at startup, or call shutdown_async_replication() before reinitializing. \
+                    Note: Async replication queue size: {}",
+                    self.config.async_queue_size
+                )
             ));
         }
 
