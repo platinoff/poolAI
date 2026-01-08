@@ -89,10 +89,40 @@ impl KubernetesManager {
     /// - Check for Kubernetes cluster connectivity
     /// - Verify namespace exists
     /// - Initialize CRD watchers (when implemented)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::InitializationError` if:
+    /// - Kubernetes cluster is not accessible
+    /// - Namespace does not exist
+    /// - Authentication/authorization fails
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn initialize(&self) -> Result<(), AppError> {
         let mut initialized = self.initialized.write().await;
         if *initialized {
             return Ok(());
+        }
+
+        if self.namespace.is_empty() {
+            return Err(AppError::InitializationError(
+                format!(
+                    "Kubernetes namespace cannot be empty. Context: Attempted to initialize Kubernetes manager with empty namespace. \
+                    Suggestion: Provide a valid namespace name (e.g., 'poolai', 'default'). \
+                    Current namespace: '{}'",
+                    self.namespace
+                )
+            ));
         }
 
         // TODO: Implement Kubernetes client initialization
@@ -124,11 +154,57 @@ impl KubernetesManager {
     /// # Arguments
     /// * `name` - Name of the worker
     /// * `config` - Worker configuration
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `config.image` is empty
+    /// - Deployment with same name already exists
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Kubernetes API is unreachable
+    /// - Namespace does not exist
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::{KubernetesManager, WorkerDeploymentConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let config = WorkerDeploymentConfig::default();
+    /// let deployment_id = manager.create_worker_deployment("my-worker", &config).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn create_worker_deployment(
         &self,
         name: &str,
-        _config: &WorkerDeploymentConfig,
+        config: &WorkerDeploymentConfig,
     ) -> Result<String, AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Worker deployment name cannot be empty. Context: Attempted to create worker deployment with empty name. \
+                Suggestion: Provide a valid deployment name (e.g., 'worker-1', 'poolai-worker'). \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if config.image.is_empty() {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Worker deployment image cannot be empty. Context: Attempted to create worker deployment '{}' with empty image. \
+                    Suggestion: Provide a valid container image (e.g., 'poolai/worker:v1.0.0'). \
+                    Current value: ''",
+                    name
+                )
+            ));
+        }
+
         // TODO: Implement Kubernetes deployment creation
         // - Create Deployment resource
         // - Set up service
@@ -138,28 +214,151 @@ impl KubernetesManager {
     }
 
     /// Delete a worker deployment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Name of the worker deployment to delete
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Deployment does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// manager.delete_worker_deployment("my-worker").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn delete_worker_deployment(&self, name: &str) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Worker deployment name cannot be empty. Context: Attempted to delete worker deployment with empty name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
         // TODO: Implement Kubernetes deployment deletion
         info!("Deleting worker deployment: {} (placeholder)", name);
         Ok(())
     }
 
     /// Create a VM instance deployment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Name of the VM deployment
+    /// * `config` - VM deployment configuration
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `config.image` is empty
+    /// - Deployment with same name already exists
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Kubernetes API is unreachable
+    /// - Namespace does not exist
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::{KubernetesManager, VmDeploymentConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let config = VmDeploymentConfig::default();
+    /// let deployment_id = manager.create_vm_deployment("my-vm", &config).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn create_vm_deployment(
         &self,
         name: &str,
-        _config: &VmDeploymentConfig,
+        config: &VmDeploymentConfig,
     ) -> Result<String, AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "VM deployment name cannot be empty. Context: Attempted to create VM deployment with empty name. \
+                Suggestion: Provide a valid deployment name (e.g., 'vm-1', 'poolai-vm'). \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if config.image.is_empty() {
+            return Err(AppError::ValidationError(
+                format!(
+                    "VM deployment image cannot be empty. Context: Attempted to create VM deployment '{}' with empty image. \
+                    Suggestion: Provide a valid container image (e.g., 'poolai/vm:v1.0.0'). \
+                    Current value: ''",
+                    name
+                )
+            ));
+        }
+
         // TODO: Implement Kubernetes VM deployment
         info!("Creating VM deployment: {} (placeholder)", name);
         Ok(format!("vm-{}", name))
     }
 
     /// Get service endpoints for a resource
+    ///
+    /// # Arguments
+    ///
+    /// * `resource_name` - Name of the resource (deployment, service, etc.)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `resource_name` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Resource does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let endpoints = manager.get_service_endpoints("my-worker").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_service_endpoints(
         &self,
         resource_name: &str,
     ) -> Result<Vec<String>, AppError> {
+        if resource_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Resource name cannot be empty. Context: Attempted to get service endpoints for empty resource name. \
+                Suggestion: Provide a valid resource name (deployment, service, etc.). \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
         // TODO: Query Kubernetes API for service endpoints
         info!("Getting service endpoints for: {} (placeholder)", resource_name);
         Ok(vec![])
