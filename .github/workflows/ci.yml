@@ -52,6 +52,14 @@ jobs:
       - name: Lint with clippy (with features)
         run: cargo clippy --all-targets --features jwt,https -- -D warnings
         continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
+      
+      - name: Lint with clippy (cloud-sdk feature)
+        run: cargo clippy --all-targets --features cloud,cloud-sdk -- -D warnings
+        continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
       - name: Build (no features)
         run: cargo build --verbose
@@ -59,6 +67,14 @@ jobs:
       - name: Build (with features)
         run: cargo build --verbose --features jwt,https
         continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
+      
+      - name: Build (cloud-sdk feature)
+        run: cargo build --verbose --features cloud,cloud-sdk
+        continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
       - name: Run tests (no features)
         run: cargo test --verbose --no-default-features
@@ -67,6 +83,14 @@ jobs:
       - name: Run tests (default)
         run: cargo test --verbose
         continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
+      
+      - name: Run tests (cloud-sdk feature)
+        run: cargo test --verbose --features cloud,cloud-sdk
+        continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
 
   check:
     name: Check (no features)
@@ -93,6 +117,7 @@ jobs:
           - https
           - jwt,https
           - raft
+          - cloud,cloud-sdk
     
     steps:
       - name: Checkout code
@@ -105,4 +130,6 @@ jobs:
       - name: Check with features
         run: cargo check --features ${{ matrix.features }}
         continue-on-error: true
+        env:
+          K8S_OPENAPI_ENABLED_VERSION: "1.28"
 

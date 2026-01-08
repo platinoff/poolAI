@@ -255,10 +255,10 @@ pub async fn auto_update_libtorch_if_needed(
     if let Some(required) = required_version {
         let compatible = check_libtorch_compatibility(Some(required)).await?;
 
-        if !compatible {
-            if policy == AutoUpdatePolicy::OnMismatch
-                || policy == AutoUpdatePolicy::OnStartupAndMismatch
-            {
+        if !compatible
+            && (policy == AutoUpdatePolicy::OnMismatch
+                || policy == AutoUpdatePolicy::OnStartupAndMismatch)
+        {
                 info!(
                     "Auto-updating libtorch due to version mismatch (policy: {:?})",
                     policy
