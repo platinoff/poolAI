@@ -126,25 +126,21 @@
 
 **Найпростіші TODO**:
 
-1. **`src/network/api.rs:723`** - Expose quota_bytes from config
-   - Складність: ⭐ Низька
-   - Залежності: Config module ✅
-   - Оцінка: 30 хвилин
+1. ✅ **`src/network/api.rs:723`** - Expose quota_bytes from config — **ЗАВЕРШЕНО**
+   - ✅ Використовується `manager.get_quota_bytes().await`
+   - ✅ Quota_bytes експортується в API response
 
-2. **`src/network/api.rs:1346`** - Get actual uptime
-   - Складність: ⭐ Низька
-   - Залежності: Monitoring module ✅
-   - Оцінка: 30 хвилин
+2. ✅ **`src/network/api.rs:1346`** - Get actual uptime — **ЗАВЕРШЕНО**
+   - ✅ Використовується `crate::version::get_uptime_seconds()`
+   - ✅ Uptime включається в health check response
 
-3. **`src/ui/mod.rs:1016`** - Implement search functionality
-   - Складність: ⭐ Низька
-   - Залежності: UI module ✅
-   - Оцінка: 1-2 години
+3. ✅ **`src/ui/mod.rs:1016`** - Implement search functionality — **ЗАВЕРШЕНО**
+   - ✅ Реалізовано функція `showSearchModal()`
+   - ✅ Підтримка глобального пошуку через Ctrl+K / Cmd+K
 
-4. **`src/network/mod.rs:32`** - Read HTTPS configuration from config file
-   - Складність: ⭐ Низька
-   - Залежності: Config module ✅
-   - Оцінка: 1 година
+4. ✅ **`src/network/mod.rs:32`** - Read HTTPS configuration from config file — **ЗАВЕРШЕНО**
+   - ✅ Конфігурація читається з PoolAIConfig
+   - ✅ Документовано в коментарях
 
 ---
 
