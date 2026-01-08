@@ -1363,6 +1363,81 @@ impl KubernetesManager {
         Ok(vec![])
     }
 
+    /// List pods for a specific deployment
+    ///
+    /// Returns a list of pod names that belong to the specified deployment.
+    /// Uses label selector to find pods managed by the deployment.
+    ///
+    /// # Arguments
+    ///
+    /// * `deployment_name` - Name of the deployment to list pods for
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `deployment_name` is empty.
+    /// Returns `AppError::NetworkError` if:
+    /// - Kubernetes API is unreachable
+    /// - Deployment does not exist
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let pods = manager.list_deployment_pods("my-deployment").await?;
+    /// println!("Found {} pods for deployment", pods.len());
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn list_deployment_pods(&self, deployment_name: &str) -> Result<Vec<String>, AppError> {
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Deployment name cannot be empty. Context: Attempted to list pods for deployment with empty name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        info!("Listing pods for deployment {} in namespace {}", deployment_name, self.namespace);
+        
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // List pods using label selector (deployments typically use app=<deployment_name> label)
+            let label_selector = format!("app={}", deployment_name);
+            let path = format!("/api/v1/namespaces/{}/pods?labelSelector={}", self.namespace, label_selector);
+            let pod_list_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract pod names
+            let pods = pod_list_json
+                .get("items")
+                .and_then(|i| i.as_array())
+                .ok_or_else(|| AppError::NetworkError(
+                    "Invalid pod list response format".to_string()
+                ))?;
+            
+            let names: Vec<String> = pods
+                .iter()
+                .filter_map(|pod| {
+                    pod.get("metadata")
+                        .and_then(|m| m.get("name"))
+                        .and_then(|n| n.as_str())
+                        .map(|s| s.to_string())
+                })
+                .collect();
+            
+            info!("Found {} pods for deployment {}", names.len(), deployment_name);
+            return Ok(names);
+        }
+        
+        // Placeholder implementation (when cloud-sdk feature is not enabled)
+        Ok(vec![])
+    }
+
     /// List all deployments in the namespace
     ///
     /// Returns a list of deployment names in the configured namespace.

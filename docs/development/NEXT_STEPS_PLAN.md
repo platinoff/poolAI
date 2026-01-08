@@ -109,12 +109,13 @@
 - ✅ Improved reconciliation logic (check Service/PVC existence before create/update operations)
 - ✅ Complete cleanup for deleted CRD resources (Service and PVC deletion on CRD deletion)
 - ✅ Deployment status monitoring (get_deployment_status method with DeploymentStatus struct)
+- ✅ Deployment pods listing (list_deployment_pods method using label selectors)
 
-**Прогрес Cloud Module**: ~95% 🔄
+**Прогрес Cloud Module**: ~96% 🔄
 - Infrastructure: 100% ✅
 - Testing: 100% ✅ (67 tests)
 - Documentation: 100% ✅
-- Implementation: ~93% 🔄
+- Implementation: ~94% 🔄
 
 ---
 

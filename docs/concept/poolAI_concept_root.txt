@@ -122,6 +122,7 @@
   - ✅ **Smart Reconciliation** - Check Service/PVC existence before create/update operations in reconciliation
   - ✅ **Complete Cleanup** - Automatic Service and PVC deletion when CRD resources are deleted
   - ✅ **Deployment Status Monitoring** - get_deployment_status method for monitoring deployment health and replica status
+  - ✅ **Deployment Pods Listing** - list_deployment_pods method for getting pods managed by a specific deployment
   - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
   - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
   - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs
