@@ -211,7 +211,7 @@ async fn vm_instance_resources_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -289,7 +289,7 @@ async fn vm_instance_create_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to create VM instance: {}", e)
+                "error": format!("Failed to create VM instance. Context: Cannot create new VM instance with specified configuration. Suggestion: Verify resource limits, isolation settings, and system capacity. Instance name: '{}', Error: {}", payload.name, e)
             })),
         )
             .into_response(),
@@ -322,7 +322,7 @@ async fn vm_instance_update_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -343,7 +343,7 @@ async fn vm_instance_update_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to update VM instance: {}", e)
+                "error": format!("Failed to update VM instance. Context: Cannot update VM instance with new configuration. Suggestion: Verify instance exists, is in a valid state for updates, and check resource availability. Instance ID: '{}', Error: {}", id, e)
             })),
         )
             .into_response(),
@@ -368,7 +368,7 @@ async fn vm_instance_delete_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -383,7 +383,7 @@ async fn vm_instance_delete_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to delete VM instance: {}", e)
+                "error": format!("Failed to delete VM instance. Context: Cannot delete VM instance. Suggestion: Ensure instance is stopped, check for active resources, and verify permissions. Instance ID: '{}', Error: {}", id, e)
             })),
         )
             .into_response(),
@@ -408,7 +408,7 @@ async fn vm_instance_start_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -423,7 +423,7 @@ async fn vm_instance_start_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to start VM instance: {}", e)
+                "error": format!("Failed to start VM instance. Context: Cannot start VM instance. Suggestion: Verify instance exists, check resource availability, and ensure isolation settings are valid. Instance ID: '{}', Error: {}", id, e)
             })),
         )
             .into_response(),
@@ -448,7 +448,7 @@ async fn vm_instance_stop_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -463,7 +463,7 @@ async fn vm_instance_stop_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to stop VM instance: {}", e)
+                "error": format!("Failed to stop VM instance. Context: Cannot stop VM instance. Suggestion: Verify instance is running, check for blocking operations, and ensure proper shutdown sequence. Instance ID: '{}', Error: {}", id, e)
             })),
         )
             .into_response(),
@@ -488,7 +488,7 @@ async fn vm_instance_restart_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -503,7 +503,7 @@ async fn vm_instance_restart_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to restart VM instance: {}", e)
+                "error": format!("Failed to restart VM instance. Context: Cannot restart VM instance. Suggestion: Verify instance exists, ensure proper shutdown before restart, and check resource availability. Instance ID: '{}', Error: {}", id, e)
             })),
         )
             .into_response(),
@@ -520,7 +520,7 @@ async fn vm_instance_health_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": "Invalid UUID format"
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
                 })),
             )
                 .into_response();
@@ -622,7 +622,7 @@ async fn raid_artifact_create_handler(
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": format!("Invalid base64 data: {}", e)
+                    "error": format!("Invalid base64 data. Context: Cannot decode base64-encoded artifact data. Suggestion: Verify data is properly base64-encoded and not corrupted. Artifact name: '{}', Error: {}", payload.name, e)
                 })),
             )
                 .into_response();
@@ -655,7 +655,7 @@ async fn raid_artifact_create_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to create artifact: {}", e)
+                "error": format!("Failed to create artifact. Context: Cannot store artifact in RAID storage. Suggestion: Check storage quota, verify RAID manager is initialized, and ensure sufficient disk space. Artifact name: '{}', Data size: {} bytes, Error: {}", payload.name, data.len(), e)
             })),
         )
             .into_response(),
@@ -698,7 +698,7 @@ async fn raid_artifact_delete_handler(
         Err(e) => (
             axum::http::StatusCode::NOT_FOUND,
             Json(serde_json::json!({
-                "error": format!("Failed to delete artifact: {}", e)
+                "error": format!("Failed to delete artifact. Context: Cannot delete artifact from RAID storage. Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. Artifact ID: '{}', Error: {}", artifact_id, e)
             })),
         )
             .into_response(),
@@ -759,7 +759,7 @@ async fn raid_events_handler() -> impl IntoResponse {
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to load events: {}", e)
+                    "error": format!("Failed to load events. Context: Cannot retrieve events from event store. Suggestion: Verify event store is accessible, check file permissions, and ensure event store is properly initialized. Error: {}", e)
                 })),
             )
                 .into_response(),
@@ -767,9 +767,9 @@ async fn raid_events_handler() -> impl IntoResponse {
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Event store not available"
-            })),
+                Json(serde_json::json!({
+                    "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
+                })),
         )
             .into_response()
     }
@@ -797,7 +797,7 @@ async fn raid_events_for_artifact_handler(
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to load events: {}", e)
+                    "error": format!("Failed to load events. Context: Cannot retrieve events from event store. Suggestion: Verify event store is accessible, check file permissions, and ensure event store is properly initialized. Error: {}", e)
                 })),
             )
                 .into_response(),
@@ -805,9 +805,9 @@ async fn raid_events_for_artifact_handler(
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Event store not available"
-            })),
+                Json(serde_json::json!({
+                    "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
+                })),
         )
             .into_response()
     }
@@ -856,7 +856,7 @@ async fn raid_events_range_handler(
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to load events: {}", e)
+                    "error": format!("Failed to load events. Context: Cannot retrieve events from event store. Suggestion: Verify event store is accessible, check file permissions, and ensure event store is properly initialized. Error: {}", e)
                 })),
             )
                 .into_response(),
@@ -864,9 +864,9 @@ async fn raid_events_range_handler(
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Event store not available"
-            })),
+                Json(serde_json::json!({
+                    "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
+                })),
         )
             .into_response()
     }
@@ -889,7 +889,7 @@ async fn raid_snapshot_handler() -> impl IntoResponse {
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to load snapshot: {}", e)
+                    "error": format!("Failed to load snapshot. Context: Cannot retrieve snapshot from event store. Suggestion: Verify snapshot exists, check file permissions, and ensure event store is properly initialized. Error: {}", e)
                 })),
             )
                 .into_response(),
@@ -897,9 +897,9 @@ async fn raid_snapshot_handler() -> impl IntoResponse {
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Event store not available"
-            })),
+                Json(serde_json::json!({
+                    "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
+                })),
         )
             .into_response()
     }
@@ -925,7 +925,7 @@ async fn raid_snapshot_create_handler(Extension(claims): Extension<Claims>) -> i
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to create snapshot: {}", e)
+                "error": format!("Failed to create snapshot. Context: Cannot create new snapshot in event store. Suggestion: Verify event store is accessible, check disk space, and ensure event store is properly initialized. Error: {}", e)
             })),
         )
             .into_response(),
@@ -947,7 +947,7 @@ async fn raid_gc_handler(Extension(claims): Extension<Claims>) -> impl IntoRespo
         .into_response(),
         Err(e) => {
             let error_response = serde_json::json!({
-                "error": format!("GC failed: {}", e)
+                "error": format!("GC failed. Context: Cannot perform garbage collection on old artifacts. Suggestion: Verify RAID manager is accessible, check file permissions, and ensure storage is not locked. Error: {}", e)
             });
             (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
@@ -1186,7 +1186,7 @@ async fn worker_create_handler(
             return (
                 axum::http::StatusCode::SERVICE_UNAVAILABLE,
                 Json(serde_json::json!({
-                    "error": "Pool not initialized"
+                    "error": "Pool not initialized. Context: Worker pool manager is not available. Suggestion: Ensure pool is initialized before creating or managing workers. Check system startup sequence and pool initialization status."
                 })),
             )
                 .into_response();
@@ -1253,7 +1253,7 @@ async fn worker_create_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to create worker: {}", e)
+                "error": format!("Failed to create worker. Context: Cannot add new worker to pool. Suggestion: Verify pool is initialized, check worker ID is unique, and ensure resource limits are not exceeded. Worker ID: '{}', Error: {}", payload.worker_id, e)
             })),
         )
             .into_response(),
@@ -1276,7 +1276,7 @@ async fn worker_delete_handler(
             return (
                 axum::http::StatusCode::SERVICE_UNAVAILABLE,
                 Json(serde_json::json!({
-                    "error": "Pool not initialized"
+                    "error": "Pool not initialized. Context: Worker pool manager is not available. Suggestion: Ensure pool is initialized before creating or managing workers. Check system startup sequence and pool initialization status."
                 })),
             )
                 .into_response();
@@ -1296,7 +1296,7 @@ async fn worker_delete_handler(
         Err(e) => (
             axum::http::StatusCode::NOT_FOUND,
             Json(serde_json::json!({
-                "error": format!("Failed to delete worker: {}", e)
+                "error": format!("Failed to delete worker. Context: Cannot remove worker from pool. Suggestion: Verify worker ID exists, ensure worker is not processing critical tasks, and check pool status. Worker ID: '{}', Error: {}", worker_id, e)
             })),
         )
             .into_response(),
@@ -1414,9 +1414,9 @@ async fn libraries_list_handler() -> impl IntoResponse {
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Library manager not initialized"
-            })),
+                Json(serde_json::json!({
+                    "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                })),
         )
             .into_response()
     }
@@ -1441,9 +1441,9 @@ async fn library_info_handler(
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Library manager not initialized"
-            })),
+                Json(serde_json::json!({
+                    "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                })),
         )
             .into_response()
     }
@@ -1469,7 +1469,7 @@ async fn library_install_handler(
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to install library: {}", e)
+                    "error": format!("Failed to install library. Context: Cannot install library from registry. Suggestion: Verify library name and version exist, check network connectivity, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", name, version, e)
                 })),
             )
                 .into_response(),
@@ -1477,9 +1477,9 @@ async fn library_install_handler(
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Library manager not initialized"
-            })),
+                Json(serde_json::json!({
+                    "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                })),
         )
             .into_response()
     }
@@ -1506,7 +1506,7 @@ async fn library_uninstall_handler(
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to uninstall library: {}", e)
+                    "error": format!("Failed to uninstall library. Context: Cannot remove library from system. Suggestion: Verify library is installed, check for active dependencies, ensure library is not in use, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
                 })),
             )
                 .into_response(),
@@ -1514,9 +1514,9 @@ async fn library_uninstall_handler(
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Library manager not initialized"
-            })),
+                Json(serde_json::json!({
+                    "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                })),
         )
             .into_response()
     }
@@ -1540,7 +1540,7 @@ async fn library_update_handler(
             Err(e) => (
                 axum::http::StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
-                    "error": format!("Failed to update library: {}", e)
+                    "error": format!("Failed to update library. Context: Cannot update library to newer version. Suggestion: Verify library is installed, check for available updates, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
                 })),
             )
                 .into_response(),
@@ -1548,9 +1548,9 @@ async fn library_update_handler(
     } else {
         (
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": "Library manager not initialized"
-            })),
+                Json(serde_json::json!({
+                    "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                })),
         )
             .into_response()
     }
