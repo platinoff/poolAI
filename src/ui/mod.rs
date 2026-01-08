@@ -671,8 +671,8 @@ function removeNotification(notificationId) {
   }, 300);
 }
 
-// Enhanced loading functions with skeleton support
-function showLoading(elementId, message = 'Loading...', useSkeleton = false) {
+// Enhanced loading functions with skeleton support and accessibility
+function showLoading(elementId, message = 'Loading...', useSkeleton = false, progress = null) {
   const el = document.getElementById(elementId);
   if (!el) return;
   el.dataset.loading = 'true';
@@ -680,7 +680,23 @@ function showLoading(elementId, message = 'Loading...', useSkeleton = false) {
   if (useSkeleton) {
     el.innerHTML = createSkeletonLoader(message);
   } else {
-    el.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted, #a8b0bf);"><div class="spinner"></div><div style="margin-top:12px;">${message}</div></div>`;
+    const loadingId = 'loading-' + elementId + '-' + Date.now();
+    let progressHtml = '';
+    if (progress !== null) {
+      progressHtml = `
+        <div class="progress-bar" style="margin-top: 12px; max-width: 300px; margin-left: auto; margin-right: auto;">
+          <div class="progress-bar-fill" style="width: ${Math.min(100, Math.max(0, progress))}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" role="progressbar" aria-label="${message}: ${progress}%"></div>
+        </div>
+      `;
+    }
+    el.innerHTML = `
+      <div role="status" aria-live="polite" aria-busy="true" id="${loadingId}" style="text-align:center; padding:20px; color:var(--text-muted, #a8b0bf);">
+        <div class="spinner" aria-hidden="true"></div>
+        <div style="margin-top:12px;">${escapeHtml(message)}</div>
+        ${progressHtml}
+      </div>
+    `;
+    el.setAttribute('aria-label', message);
   }
 }
 
@@ -688,6 +704,32 @@ function hideLoading(elementId) {
   const el = document.getElementById(elementId);
   if (el && el.dataset.loading === 'true') {
     el.dataset.loading = 'false';
+    el.removeAttribute('aria-label');
+    el.removeAttribute('aria-busy');
+  }
+}
+
+function updateLoadingProgress(elementId, progress, message = null) {
+  const el = document.getElementById(elementId);
+  if (!el || el.dataset.loading !== 'true') return;
+  
+  const progressBar = el.querySelector('.progress-bar-fill');
+  const messageDiv = el.querySelector('div[style*="margin-top:12px"]');
+  
+  if (progressBar) {
+    progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    progressBar.setAttribute('aria-valuenow', progress);
+    progressBar.setAttribute('aria-label', (message || 'Loading') + ': ' + progress + '%');
+  }
+  
+  if (messageDiv && message) {
+    messageDiv.textContent = message;
+  }
+  
+  // Announce to screen readers
+  if (el.querySelector('[role="status"]')) {
+    const statusEl = el.querySelector('[role="status"]');
+    statusEl.setAttribute('aria-label', (message || 'Loading') + ': ' + progress + '%');
   }
 }
 
@@ -765,22 +807,55 @@ function hideLoadingOverlay() {
   }
 }
 
-// Error handling functions with retry support
-function showErrorBoundary(containerId, error, retryFn = null) {
+// Enhanced error handling functions with retry support and accessibility
+function showErrorBoundary(containerId, error, retryFn = null, suggestions = null) {
   const container = document.getElementById(containerId);
   if (!container) return;
   
+  const errorId = 'error-' + containerId + '-' + Date.now();
+  const errorMessage = error.message || String(error);
+  const errorDetails = error.details || error.stack || null;
+  const showDetails = errorDetails && errorDetails.length < 500; // Only show if not too long
+  
+  let suggestionsHtml = '';
+  if (suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
+    suggestionsHtml = `
+      <div class="error-suggestions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border, #262b36);">
+        <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">Suggestions:</div>
+        <ul style="margin: 0; padding-left: 20px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">
+          ${suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+  
   container.innerHTML = `
-    <div class="error-boundary">
+    <div class="error-boundary" role="alert" aria-live="assertive" id="${errorId}">
       <div class="error-boundary-title">⚠️ Error</div>
-      <div class="error-boundary-message">${escapeHtml(error.message || String(error))}</div>
+      <div class="error-boundary-message">${escapeHtml(errorMessage)}</div>
+      ${showDetails ? `
+        <details style="margin-top: 12px;">
+          <summary style="cursor: pointer; color: var(--text-muted, #a8b0bf); font-size: 0.85em;">Show details</summary>
+          <pre style="margin-top: 8px; padding: 8px; background: var(--bg, #0b0d10); border: 1px solid var(--border, #262b36); border-radius: 6px; font-size: 0.8em; overflow-x: auto; max-height: 200px; overflow-y: auto;">${escapeHtml(errorDetails)}</pre>
+        </details>
+      ` : ''}
+      ${suggestionsHtml}
       ${retryFn ? `
         <div class="error-boundary-actions">
-          <button class="error-retry" onclick="(${retryFn.toString()})()">Retry</button>
+          <button class="error-retry" type="button" onclick="(${retryFn.toString()})()" aria-label="Retry the operation that failed">Retry</button>
         </div>
       ` : ''}
     </div>
   `;
+  
+  // Announce error to screen readers
+  const ariaLiveRegion = document.getElementById('aria_live_region');
+  if (ariaLiveRegion) {
+    ariaLiveRegion.textContent = 'Error: ' + errorMessage;
+    setTimeout(() => {
+      ariaLiveRegion.textContent = '';
+    }, 1000);
+  }
 }
 
 function escapeHtml(text) {
@@ -789,77 +864,244 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Enhanced fetchJson with retry support
+// Enhanced fetchJson with retry support and better error handling
 async function fetchJsonWithRetry(url, options = {}, maxRetries = 3, retryDelay = 1000) {
   let lastError;
+  const errors = [];
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetchJson(url, options);
+      // Clear any retry notifications on success
+      if (attempt > 0) {
+        showNotification(`Request succeeded after ${attempt} ${attempt === 1 ? 'retry' : 'retries'}`, 'success', 2000);
+      }
       return res;
     } catch (error) {
       lastError = error;
+      errors.push(error);
       
       if (attempt < maxRetries) {
-        // Exponential backoff
+        // Exponential backoff with notification
         const delay = retryDelay * Math.pow(2, attempt);
+        showNotification(
+          `Request failed. Retrying in ${(delay / 1000).toFixed(1)}s... (${attempt + 1}/${maxRetries})`,
+          'warning',
+          2000
+        );
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
     }
   }
   
-  throw lastError;
+  // Create enhanced error with context
+  const enhancedError = {
+    message: lastError.message || 'Request failed after all retries',
+    originalError: lastError,
+    attempts: maxRetries + 1,
+    url: url,
+    suggestions: [
+      'Check your internet connection',
+      'Verify the server is running',
+      'Try refreshing the page',
+      'Contact support if the problem persists'
+    ]
+  };
+  
+  throw enhancedError;
 }
 
 // Search & Filter functions
+// Enhanced search filter with debounce, accessibility, and better UX
 function initSearchFilter(searchInputId, tableId, filterOptions = {}) {
   const searchInput = document.getElementById(searchInputId);
   const table = document.getElementById(tableId);
   if (!searchInput || !table) return;
   
+  const debounceDelay = filterOptions.debounceDelay || 300;
+  let debounceTimer = null;
   let originalData = [];
   const tbody = table.querySelector('tbody');
+  
+  // Store original rows with metadata
   if (tbody) {
-    // Store original rows
-    originalData = Array.from(tbody.querySelectorAll('tr')).map(row => ({
+    originalData = Array.from(tbody.querySelectorAll('tr:not(.no-results-row)')).map(row => ({
       element: row,
-      text: row.textContent.toLowerCase()
+      text: row.textContent.toLowerCase(),
+      visible: true
     }));
   }
   
-  searchInput.addEventListener('input', function(e) {
-    const query = e.target.value.toLowerCase().trim();
-    filterTable(table, query, filterOptions);
-  });
+  // Add search icon and clear button if not present
+  const container = searchInput.parentElement;
+  if (container.style.position !== 'relative') {
+    container.style.position = 'relative';
+  }
   
-  // Add search icon if not present
-  if (!searchInput.parentElement.querySelector('.search-icon')) {
+  if (!container.querySelector('.search-icon')) {
     const icon = document.createElement('span');
     icon.className = 'search-icon';
+    icon.setAttribute('aria-hidden', 'true');
     icon.innerHTML = '🔍';
-    icon.style.cssText = 'position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted, #a8b0bf); pointer-events: none;';
-    searchInput.parentElement.style.position = 'relative';
-    searchInput.parentElement.appendChild(icon);
+    icon.style.cssText = 'position: absolute; right: 40px; top: 50%; transform: translateY(-50%); color: var(--text-muted, #a8b0bf); pointer-events: none;';
+    container.appendChild(icon);
+  }
+  
+  // Add clear button
+  let clearButton = container.querySelector('.search-clear');
+  if (!clearButton) {
+    clearButton = document.createElement('button');
+    clearButton.className = 'search-clear';
+    clearButton.type = 'button';
+    clearButton.setAttribute('aria-label', 'Clear search');
+    clearButton.innerHTML = '×';
+    clearButton.style.cssText = 'position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted, #a8b0bf); cursor: pointer; font-size: 20px; width: 24px; height: 24px; display: none; padding: 0;';
+    clearButton.onclick = () => {
+      searchInput.value = '';
+      searchInput.focus();
+      filterTable(table, '', filterOptions);
+      updateSearchStatus(table, 0, originalData.length);
+      clearButton.style.display = 'none';
+    };
+    container.appendChild(clearButton);
+  }
+  
+  // Enhanced accessibility
+  searchInput.setAttribute('aria-label', filterOptions.ariaLabel || 'Search table');
+  searchInput.setAttribute('role', 'searchbox');
+  searchInput.setAttribute('aria-controls', tableId);
+  
+  // Debounced search with status updates
+  searchInput.addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase().trim();
+    
+    // Show/hide clear button
+    if (query) {
+      clearButton.style.display = 'flex';
+      clearButton.style.alignItems = 'center';
+      clearButton.style.justifyContent = 'center';
+    } else {
+      clearButton.style.display = 'none';
+    }
+    
+    // Clear previous timer
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+    
+    // Show loading indicator while searching
+    if (query && filterOptions.showLoading !== false) {
+      searchInput.setAttribute('aria-busy', 'true');
+    }
+    
+    // Debounce search
+    debounceTimer = setTimeout(() => {
+      const visibleCount = filterTable(table, query, filterOptions);
+      updateSearchStatus(table, visibleCount, originalData.length, query);
+      searchInput.removeAttribute('aria-busy');
+      
+      // Announce to screen readers
+      const statusMsg = query ? `${visibleCount} of ${originalData.length} results found` : 'All results shown';
+      searchInput.setAttribute('aria-label', (filterOptions.ariaLabel || 'Search table') + ': ' + statusMsg);
+    }, debounceDelay);
+  });
+  
+  // Keyboard shortcuts
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && searchInput.value) {
+      searchInput.value = '';
+      filterTable(table, '', filterOptions);
+      updateSearchStatus(table, 0, originalData.length);
+      clearButton.style.display = 'none';
+      searchInput.focus();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      e.preventDefault(); // Prevent browser search
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
+}
+
+function updateSearchStatus(table, visibleCount, totalCount, query = '') {
+  // Remove existing status row
+  const existingStatus = table.querySelector('.search-status-row');
+  if (existingStatus) {
+    existingStatus.remove();
+  }
+  
+  // Add status row if there's a query
+  if (query) {
+    const tbody = table.querySelector('tbody');
+    if (tbody) {
+      const statusRow = document.createElement('tr');
+      statusRow.className = 'search-status-row';
+      statusRow.setAttribute('role', 'status');
+      statusRow.setAttribute('aria-live', 'polite');
+      const statusCell = document.createElement('td');
+      statusCell.colSpan = table.querySelectorAll('th').length;
+      statusCell.textContent = `${visibleCount} of ${totalCount} results`;
+      statusCell.style.cssText = 'text-align: center; padding: 12px; color: var(--text-muted, #a8b0bf); font-size: 0.9em; border-top: 1px solid var(--border, #262b36);';
+      statusRow.appendChild(statusCell);
+      tbody.appendChild(statusRow);
+    }
   }
 }
 
+// Enhanced table filtering with better matching and highlighting
 function filterTable(table, query, options = {}) {
   const tbody = table.querySelector('tbody');
-  if (!tbody) return;
+  if (!tbody) return 0;
   
-  const rows = tbody.querySelectorAll('tr');
+  const rows = tbody.querySelectorAll('tr:not(.no-results-row):not(.search-status-row)');
   let visibleCount = 0;
+  const highlightMatches = options.highlightMatches !== false;
+  const matchColumns = options.matchColumns || null; // Array of column indices to match, or null for all
   
   rows.forEach(row => {
-    const text = row.textContent.toLowerCase();
-    const matches = !query || text.includes(query);
+    if (matchColumns && Array.isArray(matchColumns)) {
+      // Only match specific columns
+      const rowText = Array.from(row.cells)
+        .filter((cell, index) => matchColumns.includes(index))
+        .map(cell => cell.textContent)
+        .join(' ')
+        .toLowerCase();
+      var matches = !query || rowText.includes(query.toLowerCase());
+    } else {
+      // Match all columns
+      const rowText = row.textContent.toLowerCase();
+      var matches = !query || rowText.includes(query.toLowerCase());
+    }
     
     if (matches) {
       row.style.display = '';
+      row.setAttribute('aria-hidden', 'false');
       visibleCount++;
+      
+      // Highlight matches if enabled and query exists
+      if (highlightMatches && query) {
+        row.querySelectorAll('td').forEach(cell => {
+          const originalText = cell.dataset.originalText || cell.textContent;
+          if (!cell.dataset.originalText) {
+            cell.dataset.originalText = cell.textContent;
+          }
+          
+          const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+          const highlighted = originalText.replace(regex, '<mark style="background: var(--primary, #50fa7b); color: var(--bg, #0f1216); padding: 2px 0;">$1</mark>');
+          cell.innerHTML = highlighted;
+        });
+      } else {
+        // Restore original text
+        row.querySelectorAll('td').forEach(cell => {
+          if (cell.dataset.originalText) {
+            cell.textContent = cell.dataset.originalText;
+            delete cell.dataset.originalText;
+          }
+        });
+      }
     } else {
       row.style.display = 'none';
+      row.setAttribute('aria-hidden', 'true');
     }
   });
   
@@ -869,17 +1111,26 @@ function filterTable(table, query, options = {}) {
     if (!noResultsRow) {
       noResultsRow = document.createElement('tr');
       noResultsRow.className = 'no-results-row';
+      noResultsRow.setAttribute('role', 'status');
+      noResultsRow.setAttribute('aria-live', 'polite');
       const td = document.createElement('td');
       td.colSpan = table.querySelectorAll('th').length;
-      td.textContent = 'No results found';
+      td.textContent = `No results found for "${query}"`;
       td.style.cssText = 'text-align: center; padding: 20px; color: var(--text-muted, #a8b0bf);';
       noResultsRow.appendChild(td);
       tbody.appendChild(noResultsRow);
     }
     noResultsRow.style.display = '';
+    noResultsRow.querySelector('td').textContent = `No results found for "${query}"`;
   } else if (noResultsRow) {
     noResultsRow.style.display = 'none';
   }
+  
+  return visibleCount;
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function sortTable(table, columnIndex, ascending = true) {
