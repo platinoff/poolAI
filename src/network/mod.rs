@@ -35,7 +35,7 @@ use axum_server::tls_rustls::RustlsConfig;
 /// Configuration is read from PoolAIConfig.
 pub async fn start_server(addr: SocketAddr) {
     let app = {
-        let mut router = Router::new()
+        let router = Router::new()
             // Trailing-slash compat for UI entrypoint.
             .route("/ui/", get(|| async { Redirect::permanent("/ui") }))
             .nest("/api/v1", api::create_api_routes())
