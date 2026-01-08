@@ -1,16 +1,19 @@
 //! Integration tests for Kubernetes Operator module
 
+#[cfg(feature = "cloud")]
 use poolai::cloud::operator::{
     PoolAIOperator, PoolAIWorker, PoolAIVM, PoolAITenant, WorkerResources, VmResources, VmStorage,
     TenantQuotas,
 };
 
+#[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_operator_creation() {
     let operator = PoolAIOperator::new("test-namespace".to_string());
     assert!(!operator.is_running().await);
 }
 
+#[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_operator_start_stop() {
     let operator = PoolAIOperator::new("test-namespace".to_string());
@@ -39,6 +42,7 @@ async fn test_operator_start_stop() {
     assert!(!operator.is_running().await);
 }
 
+#[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_operator_start_with_empty_namespace() {
     let operator = PoolAIOperator::new("".to_string());
@@ -48,6 +52,7 @@ async fn test_operator_start_with_empty_namespace() {
     assert!(!operator.is_running().await);
 }
 
+#[cfg(feature = "cloud")]
 #[test]
 fn test_poolai_worker_creation() {
     let worker = PoolAIWorker {
@@ -69,6 +74,7 @@ fn test_poolai_worker_creation() {
     assert_eq!(worker.resources.gpu, Some(1));
 }
 
+#[cfg(feature = "cloud")]
 #[test]
 fn test_poolai_vm_creation() {
     let vm = PoolAIVM {
@@ -93,6 +99,7 @@ fn test_poolai_vm_creation() {
     assert_eq!(vm.storage.storage_class, "ssd");
 }
 
+#[cfg(feature = "cloud")]
 #[test]
 fn test_poolai_tenant_creation() {
     let tenant = PoolAITenant {
@@ -114,6 +121,7 @@ fn test_poolai_tenant_creation() {
     assert!(tenant.active);
 }
 
+#[cfg(feature = "cloud")]
 #[test]
 fn test_worker_resources_without_gpu() {
     let resources = WorkerResources {
@@ -127,6 +135,7 @@ fn test_worker_resources_without_gpu() {
     assert_eq!(resources.gpu, None);
 }
 
+#[cfg(feature = "cloud")]
 #[test]
 fn test_tenant_quotas_partial() {
     let quotas = TenantQuotas {
