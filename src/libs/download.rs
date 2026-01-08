@@ -259,6 +259,7 @@ async fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), AppE
     // Run blocking I/O in spawn_blocking
     let archive_path = archive_path.to_path_buf();
     let destination = destination.to_path_buf();
+    let archive_path_str = archive_path.display().to_string();
 
     tokio::task::spawn_blocking(move || {
         let file = File::open(&archive_path)
@@ -266,7 +267,7 @@ async fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), AppE
                 "Failed to open archive. Context: Cannot open zip archive file for extraction. \
                 Suggestion: Check file permissions and verify archive file is not corrupted. \
                 Archive: '{}', Error: {}",
-                archive_path.display(), e
+                archive_path_str, e
             )))?;
 
         let mut archive = zip::ZipArchive::new(file)
@@ -274,7 +275,7 @@ async fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), AppE
                 "Failed to read zip archive. Context: Cannot parse zip archive structure. \
                 Suggestion: Verify archive integrity and ensure file is a valid ZIP archive. \
                 Archive: '{}', Error: {}",
-                archive_path.display(), e
+                archive_path_str, e
             )))?;
 
         for i in 0..archive.len() {
@@ -284,7 +285,7 @@ async fn extract_zip(archive_path: &Path, destination: &Path) -> Result<(), AppE
                     "Failed to read zip entry. Context: Cannot read entry from zip archive. \
                     Suggestion: Archive may be corrupted or incomplete. Try re-downloading. \
                     Archive: '{}', Entry index: {}, Error: {}",
-                    archive_path.display(), i, e
+                    archive_path_str, i, e
                 )))?;
 
             let outpath = destination.join(file.name());
