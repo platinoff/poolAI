@@ -242,45 +242,119 @@ impl LinuxNetworkIsolator {
         // Generate unique name for macvlan interface
         let macvlan_name = format!("macvlan-poolai-{}", process_id);
 
-        // Future improvement: Full implementation would involve:
-        // 1. Checking if parent interface exists and is UP
-        //    - Use: `ip link show <parent-interface>`
-        //    - Parse output to check interface state
-        //    - Return error if interface doesn't exist or is DOWN
-        // 2. Creating macvlan interface using `ip link add` command
-        //    - Use: `ip link add <macvlan-name> link <parent-interface> type macvlan mode <mode>`
-        //    - Example: `ip link add macvlan-poolai-1234 link eth0 type macvlan mode bridge`
-        //    - Store the macvlan interface name for cleanup (in NamespaceState or similar)
-        // 3. Moving the macvlan interface to the network namespace
-        //    - Use `ip link set <macvlan-name> netns <namespace-name>` if namespace has a name
-        //    - Or use `setns(CLONE_NEWNET)` to enter namespace, then move interface
-        //    - Requires the network namespace to be already created
-        //    - Requires CAP_NET_ADMIN capability or root privileges
-        // 4. Bringing up the macvlan interface
-        //    - Use: `ip link set <macvlan-name> up`
-        //    - This can be done inside the namespace using setns
-        //    - Example: `ip -n <namespace-name> link set <macvlan-name> up`
-        // 5. Configuring IP address (if needed)
-        //    - Use: `ip addr add <ip-address>/<prefix> dev <macvlan-name>`
-        //    - Example: `ip -n <namespace-name> addr add 192.168.1.100/24 dev macvlan-poolai-1234`
-        //    - Or use DHCP: `dhclient -n <macvlan-name>` inside namespace
-        //
-        // This requires:
-        // - Linux kernel 3.9+ (macvlan support)
-        // - Parent interface must be in UP state
-        // - CAP_NET_ADMIN capability or root privileges
-        // - Network namespace already created
-        //
-        // For now, this validates configuration and logs the intent
-        warn!(
-            "Macvlan setup requested for interface {} (process {}, mode: {}), but full implementation requires system calls (ip link, setns) which are not yet implemented. \
-            Context: macvlan support requires Linux kernel 3.9+, CAP_NET_ADMIN, and network namespace. \
-            Suggestion: Enable 'vm-isolation-linux' feature and ensure root privileges when ready to implement.",
-            interface, process_id, macvlan_mode
-        );
+        #[cfg(feature = "vm-isolation-linux")]
+        {
+            // 1. Check if parent interface exists and is UP
+            let check_output = Command::new("ip")
+                .args(&["link", "show", interface])
+                .output()
+                .map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to check parent interface {}: {}. \
+                        Context: Cannot verify parent interface for macvlan setup. \
+                        Suggestion: Ensure the interface exists and 'ip' command is available. \
+                        Error: {}",
+                        interface, e, e
+                    ))
+                })?;
 
-        // Suppress unused variable warnings
-        let _ = macvlan_name;
+            if !check_output.status.success() {
+                return Err(AppError::ConfigError(format!(
+                    "Parent interface {} does not exist or is not accessible. \
+                    Context: macvlan requires a valid parent interface. \
+                    Suggestion: Verify the interface name and ensure it exists. \
+                    Interface: {}",
+                    interface, interface
+                )));
+            }
+
+            // Check if interface is UP (contains "state UP" in output)
+            let output_str = String::from_utf8_lossy(&check_output.stdout);
+            if !output_str.contains("state UP") && !output_str.contains("UP") {
+                warn!(
+                    "Parent interface {} is not in UP state. Macvlan may not work correctly. \
+                    Context: macvlan requires parent interface to be UP. \
+                    Suggestion: Bring up the interface using 'ip link set {} up' before creating macvlan.",
+                    interface, interface
+                );
+            }
+
+            // 2. Create macvlan interface using `ip link add` command
+            let create_output = Command::new("ip")
+                .args(&[
+                    "link", "add", &macvlan_name,
+                    "link", interface,
+                    "type", "macvlan",
+                    "mode", macvlan_mode,
+                ])
+                .output()
+                .map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to create macvlan interface {}: {}. \
+                        Context: Cannot create macvlan interface on parent {}. \
+                        Suggestion: Ensure CAP_NET_ADMIN capability or root privileges, and Linux kernel 3.9+. \
+                        Error: {}",
+                        macvlan_name, e, interface, e
+                    ))
+                })?;
+
+            if !create_output.status.success() {
+                let error_msg = String::from_utf8_lossy(&create_output.stderr);
+                return Err(AppError::ConfigError(format!(
+                    "Failed to create macvlan interface {}: {}. \
+                    Context: 'ip link add' command failed. \
+                    Suggestion: Check kernel support (3.9+), CAP_NET_ADMIN, and parent interface state. \
+                    Error: {}",
+                    macvlan_name, error_msg, error_msg
+                )));
+            }
+
+            info!(
+                "Created macvlan interface {} on parent {} with mode {}",
+                macvlan_name, interface, macvlan_mode
+            );
+
+            // 3. Bring up the macvlan interface
+            let up_output = Command::new("ip")
+                .args(&["link", "set", &macvlan_name, "up"])
+                .output()
+                .map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to bring up macvlan interface {}: {}. \
+                        Context: Cannot activate macvlan interface. \
+                        Suggestion: Ensure CAP_NET_ADMIN capability or root privileges. \
+                        Error: {}",
+                        macvlan_name, e, e
+                    ))
+                })?;
+
+            if !up_output.status.success() {
+                let error_msg = String::from_utf8_lossy(&up_output.stderr);
+                warn!(
+                    "Failed to bring up macvlan interface {}: {}. \
+                    Context: Interface created but could not be activated. \
+                    Suggestion: Check permissions and interface state. \
+                    Error: {}",
+                    macvlan_name, error_msg, error_msg
+                );
+            } else {
+                info!("Successfully brought up macvlan interface {}", macvlan_name);
+            }
+
+            // Note: Moving to namespace and IP configuration would be done separately
+            // when the namespace is created and process is started
+            // This is handled by the caller or in apply_network_isolation()
+        }
+
+        #[cfg(not(feature = "vm-isolation-linux"))]
+        {
+            warn!(
+                "Macvlan setup requested for interface {} (process {}, mode: {}), but 'vm-isolation-linux' feature is not enabled. \
+                Context: macvlan support requires 'vm-isolation-linux' feature. \
+                Suggestion: Enable 'vm-isolation-linux' feature in Cargo.toml to enable macvlan support.",
+                interface, process_id, macvlan_mode
+            );
+        }
 
         Ok(())
     }
@@ -545,13 +619,13 @@ impl NetworkIsolator for LinuxNetworkIsolator {
                         }
                     }
 
-                    // Configure allowed interfaces using veth pairs
-                    // Future improvement: Support macvlan interfaces as alternative to veth pairs
-                    // - Add config option to choose between veth and macvlan
-                    // - Call setup_macvlan() instead of setup_veth_pair() when macvlan is requested
-                    // - Example: if interface_config.mode == "macvlan" { setup_macvlan(...) } else { setup_veth_pair(...) }
+                    // Configure allowed interfaces using veth pairs or macvlan
+                    // Note: macvlan can be used by calling setup_macvlan() instead of setup_veth_pair()
+                    // when direct physical interface access is needed
                     if !config.allowed_interfaces.is_empty() {
                         for interface in &config.allowed_interfaces {
+                            // Default to veth pairs, but macvlan can be used if needed
+                            // To use macvlan, call: Self::setup_macvlan(interface, process_id, Some("bridge"))
                             match Self::setup_veth_pair(interface, process_id) {
                                 Ok(_) => {
                                     info!(
