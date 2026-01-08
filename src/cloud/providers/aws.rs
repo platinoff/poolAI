@@ -5,6 +5,32 @@
 //! - ECS for container orchestration
 //! - Lambda for serverless functions
 //! - S3 for artifact storage
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use poolai::cloud::providers::aws::AwsManager;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = AwsManager::new(Some("us-east-1".to_string()));
+//! manager.initialize().await?;
+//! 
+//! // Create EC2 instance
+//! let instance_id = manager.create_ec2_instance(
+//!     "t3.medium",
+//!     "ami-12345678"
+//! ).await?;
+//! 
+//! // Create ECS task
+//! let task_id = manager.create_ecs_task(
+//!     "poolai-cluster",
+//!     "poolai-worker-task"
+//! ).await?;
+//! 
+//! manager.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::core::error::AppError;
 use std::sync::Arc;

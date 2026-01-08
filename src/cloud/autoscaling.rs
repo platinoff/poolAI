@@ -5,6 +5,33 @@
 //! - Horizontal Pod Autoscaler (Kubernetes)
 //! - Cloud provider auto-scaling groups
 //! - Cost optimization strategies
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use poolai::cloud::autoscaling::AutoScaler;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let autoscaler = AutoScaler::new();
+//! autoscaler.initialize().await?;
+//! 
+//! // Get current metrics
+//! let metrics = autoscaler.get_metrics("worker-pool").await?;
+//! 
+//! // Scale up if CPU usage is high
+//! if metrics.cpu_usage > 0.8 {
+//!     autoscaler.scale_up("worker-pool", metrics.current_replicas + 2).await?;
+//! }
+//! 
+//! // Scale down if usage is low
+//! if metrics.cpu_usage < 0.3 && metrics.current_replicas > 1 {
+//!     autoscaler.scale_down("worker-pool", metrics.current_replicas - 1).await?;
+//! }
+//! 
+//! autoscaler.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::core::error::AppError;
 use std::sync::Arc;

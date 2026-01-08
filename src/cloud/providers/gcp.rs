@@ -4,6 +4,26 @@
 //! - Compute Engine for VM instances
 //! - Cloud Run for containers
 //! - Cloud Storage for artifact storage
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use poolai::cloud::providers::gcp::GcpManager;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = GcpManager::new(Some("my-project-id".to_string()));
+//! manager.initialize().await?;
+//! 
+//! // Create Compute Engine instance
+//! let instance_id = manager.create_compute_instance(
+//!     "us-central1-a",
+//!     "n1-standard-2"
+//! ).await?;
+//! 
+//! manager.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::core::error::AppError;
 use std::sync::Arc;

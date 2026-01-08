@@ -15,12 +15,62 @@
 //!
 //! # Example
 //!
+//! ## Basic Usage
+//!
 //! ```rust,no_run
 //! use poolai::cloud::{CloudManager, CloudConfig};
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
-//! let manager = CloudManager::new(CloudConfig::default());
+//! // Create cloud manager with Kubernetes enabled
+//! let config = CloudConfig {
+//!     kubernetes_enabled: true,
+//!     kubernetes_namespace: "poolai".to_string(),
+//!     ..Default::default()
+//! };
+//! 
+//! let manager = CloudManager::new(config);
 //! manager.initialize().await?;
+//! 
+//! // Use Kubernetes manager
+//! if let Some(k8s) = manager.kubernetes() {
+//!     let deployment = k8s.create_worker_deployment(
+//!         "my-worker",
+//!         &poolai::cloud::kubernetes::WorkerDeploymentConfig::default()
+//!     ).await?;
+//!     println!("Created deployment: {}", deployment);
+//! }
+//! 
+//! manager.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Multi-Cloud Configuration
+//!
+//! ```rust,no_run
+//! use poolai::cloud::{CloudManager, CloudConfig};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! // Enable multiple cloud providers
+//! let config = CloudConfig {
+//!     kubernetes_enabled: true,
+//!     aws_enabled: true,
+//!     aws_region: Some("us-east-1".to_string()),
+//!     azure_enabled: true,
+//!     gcp_enabled: true,
+//!     autoscaling_enabled: true,
+//!     loadbalancing_enabled: true,
+//!     ..Default::default()
+//! };
+//! 
+//! let manager = CloudManager::new(config);
+//! manager.initialize().await?;
+//! 
+//! // Use auto-scaler
+//! if let Some(autoscaler) = manager.autoscaler() {
+//!     autoscaler.scale_up("worker-pool", 5).await?;
+//! }
+//! 
 //! # Ok(())
 //! # }
 //! ```

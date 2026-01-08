@@ -15,12 +15,34 @@
 //!
 //! # Example
 //!
+//! ## Basic Usage
+//!
 //! ```rust,no_run
-//! use poolai::cloud::kubernetes::KubernetesManager;
+//! use poolai::cloud::kubernetes::{KubernetesManager, WorkerDeploymentConfig};
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
-//! let manager = KubernetesManager::new("default".to_string());
+//! let manager = KubernetesManager::new("poolai".to_string());
 //! manager.initialize().await?;
+//! 
+//! // Create a worker deployment
+//! let config = WorkerDeploymentConfig {
+//!     image: "poolai/worker:v1.0.0".to_string(),
+//!     replicas: 3,
+//!     resources: poolai::cloud::kubernetes::ResourceRequirements {
+//!         cpu: "500m".to_string(),
+//!         memory: "512Mi".to_string(),
+//!         gpu: Some(1),
+//!     },
+//!     env: std::collections::HashMap::new(),
+//! };
+//! 
+//! let deployment_id = manager.create_worker_deployment("my-worker", &config).await?;
+//! println!("Created deployment: {}", deployment_id);
+//! 
+//! // Get service endpoints
+//! let endpoints = manager.get_service_endpoints(&deployment_id).await?;
+//! 
+//! manager.shutdown().await?;
 //! # Ok(())
 //! # }
 //! ```

@@ -4,6 +4,26 @@
 //! - VM Scale Sets for auto-scaling
 //! - Container Instances for containers
 //! - Blob Storage for artifact storage
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use poolai::cloud::providers::azure::AzureManager;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let manager = AzureManager::new(Some("subscription-id".to_string()));
+//! manager.initialize().await?;
+//! 
+//! // Create VM Scale Set
+//! let scale_set_id = manager.create_vm_scale_set(
+//!     "poolai-rg",
+//!     "poolai-workers"
+//! ).await?;
+//! 
+//! manager.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::core::error::AppError;
 use std::sync::Arc;

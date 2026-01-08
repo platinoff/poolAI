@@ -5,6 +5,42 @@
 //! - Health check integration
 //! - Traffic distribution strategies
 //! - Geographic load balancing
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use poolai::cloud::loadbalancing::{LoadBalancer, Backend};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let loadbalancer = LoadBalancer::new();
+//! loadbalancer.initialize().await?;
+//! 
+//! // Add backends
+//! let backend1 = Backend {
+//!     id: "backend-1".to_string(),
+//!     address: "10.0.1.10".to_string(),
+//!     port: 8080,
+//!     weight: 100,
+//! };
+//! 
+//! let backend2 = Backend {
+//!     id: "backend-2".to_string(),
+//!     address: "10.0.1.11".to_string(),
+//!     port: 8080,
+//!     weight: 100,
+//! };
+//! 
+//! loadbalancer.add_backend(backend1).await?;
+//! loadbalancer.add_backend(backend2).await?;
+//! 
+//! // Check health status
+//! let health = loadbalancer.get_health_status().await?;
+//! println!("Healthy backends: {}/{}", health.healthy_backends, health.total_backends);
+//! 
+//! loadbalancer.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::core::error::AppError;
 use std::sync::Arc;
