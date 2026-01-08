@@ -2041,18 +2041,50 @@ async function handleVmDelete(instanceId, instanceName) {
   );
 }
 
-async function poll(url, renderFn, containerId) {
-  try {
-    const data = await fetchJson(url);
-    renderFn(containerId, data);
-    setUpdated();
-  } catch (e) {
-    const el = document.getElementById(containerId);
-    if (el) {
-      el.innerHTML = '<div style="color:#ff5555; padding:12px; border:1px solid #ff5555; border-radius:8px;">Error: ' + String(e) + '</div>';
-    }
-    console.error('Poll error:', e);
+// Polling with request deduplication and retry logic
+const activePolls = new Map();
+const pollRetries = new Map();
+
+async function poll(url, renderFn, containerId, retries = 3) {
+  // Prevent duplicate requests for the same URL
+  if (activePolls.has(url)) {
+    return activePolls.get(url);
   }
+  
+  const pollPromise = (async () => {
+    try {
+      const data = await fetchJson(url);
+      renderFn(containerId, data);
+      setUpdated();
+      pollRetries.delete(url); // Reset retry count on success
+      activePolls.delete(url);
+      return data;
+    } catch (e) {
+      activePolls.delete(url);
+      
+      // Retry logic with exponential backoff
+      const retryCount = pollRetries.get(url) || 0;
+      if (retryCount < retries) {
+        pollRetries.set(url, retryCount + 1);
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Max 10s delay
+        
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return poll(url, renderFn, containerId, retries);
+      }
+      
+      // Max retries reached, show error
+      pollRetries.delete(url);
+      const el = document.getElementById(containerId);
+      if (el) {
+        const errorMsg = String(e);
+        el.innerHTML = '<div style="color:#ff5555; padding:12px; border:1px solid #ff5555; border-radius:8px;">Error: ' + errorMsg + '<br><button onclick="location.reload()" style="margin-top:8px; padding:6px 12px; background:#ff5555; color:white; border:none; border-radius:4px; cursor:pointer;">Retry</button></div>';
+      }
+      console.error('Poll error (max retries reached):', e);
+    }
+  })();
+  
+  activePolls.set(url, pollPromise);
+  return pollPromise;
 }
 
 // Token validation and refresh
