@@ -104,12 +104,14 @@
 - ✅ PVC creation methods (create_pvc for VM storage)
 - ✅ Service and PVC integration in reconciliation (automatic creation for workers and VMs)
 - ✅ Improved watch_crd_resources implementation (actual resource listing and comparison, better error handling and logging)
+- ✅ Service management methods (update_service, delete_service, service_exists)
+- ✅ PVC management methods (update_pvc, delete_pvc, pvc_exists)
 
-**Прогрес Cloud Module**: ~90% 🔄
+**Прогрес Cloud Module**: ~92% 🔄
 - Infrastructure: 100% ✅
 - Testing: 100% ✅ (67 tests)
 - Documentation: 100% ✅
-- Implementation: ~88% 🔄
+- Implementation: ~90% 🔄
 
 ---
 

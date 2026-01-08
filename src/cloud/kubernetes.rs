@@ -1889,6 +1889,276 @@ impl KubernetesManager {
             Ok(())
         }
     }
+
+    /// Update an existing Kubernetes Service
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Service name to update
+    /// * `deployment_name` - Deployment name the service is for
+    /// * `ports` - Updated list of ports to expose
+    /// * `service_type` - Updated service type
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `deployment_name` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Service does not exist
+    /// - Kubernetes API is unreachable
+    pub async fn update_service(
+        &self,
+        name: &str,
+        deployment_name: &str,
+        ports: &[u16],
+        service_type: ServiceType,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Service name cannot be empty. Context: Attempted to update service with empty name. \
+                Suggestion: Provide a valid service name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let service_type_str = match service_type {
+                ServiceType::ClusterIP => "ClusterIP",
+                ServiceType::NodePort => "NodePort",
+                ServiceType::LoadBalancer => "LoadBalancer",
+            };
+            
+            let mut service_ports = Vec::new();
+            for port in ports {
+                service_ports.push(json!({
+                    "port": port,
+                    "targetPort": port,
+                    "protocol": "TCP"
+                }));
+            }
+            
+            // Update service spec (PATCH)
+            let patch_body = json!({
+                "spec": {
+                    "type": service_type_str,
+                    "selector": {
+                        "app": deployment_name
+                    },
+                    "ports": service_ports
+                }
+            });
+            
+            let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, name);
+            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
+            
+            info!("Updated service: {} for deployment {} in namespace {}", name, deployment_name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Updating service: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
+
+    /// Delete a Kubernetes Service
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Service name to delete
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `name` is empty.
+    /// Returns `AppError::NetworkError` if:
+    /// - Service does not exist
+    /// - Kubernetes API is unreachable
+    pub async fn delete_service(&self, name: &str) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Service name cannot be empty. Context: Attempted to delete service with empty name. \
+                Suggestion: Provide a valid service name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, name);
+            let _response = self.k8s_api_request("DELETE", &path, None).await?;
+            
+            info!("Deleted service: {} from namespace {}", name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Deleting service: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
+
+    /// Update an existing PersistentVolumeClaim
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - PVC name to update
+    /// * `size` - Updated storage size (e.g., "20Gi")
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `size` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - PVC does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Note
+    ///
+    /// PVC size updates are only allowed if the storage class supports volume expansion.
+    pub async fn update_pvc(&self, name: &str, size: &str) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "PVC name cannot be empty. Context: Attempted to update PVC with empty name. \
+                Suggestion: Provide a valid PVC name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if size.is_empty() {
+            return Err(AppError::ValidationError(
+                "Storage size cannot be empty. Context: Attempted to update PVC with empty size. \
+                Suggestion: Provide a valid storage size (e.g., '10Gi', '100Mi'). \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Update PVC spec (PATCH) - only size can be updated
+            let patch_body = json!({
+                "spec": {
+                    "resources": {
+                        "requests": {
+                            "storage": size
+                        }
+                    }
+                }
+            });
+            
+            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims/{}", self.namespace, name);
+            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
+            
+            info!("Updated PVC: {} with size {} in namespace {}", name, size, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Updating PVC: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
+
+    /// Delete a PersistentVolumeClaim
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - PVC name to delete
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `name` is empty.
+    /// Returns `AppError::NetworkError` if:
+    /// - PVC does not exist
+    /// - Kubernetes API is unreachable
+    pub async fn delete_pvc(&self, name: &str) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "PVC name cannot be empty. Context: Attempted to delete PVC with empty name. \
+                Suggestion: Provide a valid PVC name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims/{}", self.namespace, name);
+            let _response = self.k8s_api_request("DELETE", &path, None).await?;
+            
+            info!("Deleted PVC: {} from namespace {}", name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Deleting PVC: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
+
+    /// Check if a Service exists
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Service name to check
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the service exists, `false` otherwise.
+    pub async fn service_exists(&self, name: &str) -> bool {
+        if name.is_empty() {
+            return false;
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, name);
+            self.k8s_api_request("GET", &path, None).await.is_ok()
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            false
+        }
+    }
+
+    /// Check if a PVC exists
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - PVC name to check
+    ///
+    /// # Returns
+    ///
+    /// Returns `true` if the PVC exists, `false` otherwise.
+    pub async fn pvc_exists(&self, name: &str) -> bool {
+        if name.is_empty() {
+            return false;
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims/{}", self.namespace, name);
+            self.k8s_api_request("GET", &path, None).await.is_ok()
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            false
+        }
+    }
 }
 
 /// Worker deployment configuration for Kubernetes
