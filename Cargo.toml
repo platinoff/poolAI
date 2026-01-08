@@ -35,7 +35,7 @@ futures-util = "0.3"
 # Use: cargo build --features jwt
 # Note: Requires native toolchain (gcc/dlltool on Windows GNU)
 # Without this feature, uses fallback base64 encoding (dev only, NOT SECURE)
-jsonwebtoken = { version = "9.3", optional = true }
+jsonwebtoken = { version = "10.2", optional = true }
 
 # HTTPS/TLS support (optional - enabled with feature "https")
 # Use: cargo build --features https
