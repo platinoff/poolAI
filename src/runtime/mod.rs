@@ -1,11 +1,50 @@
 //! Runtime Module for Stage 4.1 - Advanced Runtime Management
 //!
-//! This module provides:
-//! - Worker lifecycle management
-//! - Task scheduling with priorities
-//! - Resource orchestration
-//! - Process management
-//! - Auto-scaling capabilities
+//! This module provides comprehensive runtime management capabilities including
+//! worker lifecycle, task scheduling, resource orchestration, process management,
+//! and auto-scaling.
+//!
+//! # Features
+//!
+//! - **Worker Management**: Lifecycle management with auto-scaling
+//! - **Task Scheduling**: Priority-based task scheduling
+//! - **Resource Orchestration**: CPU, memory, and GPU resource allocation
+//! - **Process Management**: Process lifecycle, logging, and monitoring
+//! - **Caching**: In-memory caching for performance optimization
+//! - **Storage Management**: Persistent storage for artifacts and data
+//! - **Health Monitoring**: System health checks and recovery
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::runtime::{RuntimeManager, RuntimeConfig};
+//!
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! // Create runtime configuration
+//! let config = RuntimeConfig {
+//!     max_workers: 10,
+//!     queue_capacity: 2000,
+//!     cache_size_mb: 1024,
+//!     auto_scaling: true,
+//!     health_check_interval: 30,
+//!     resource_monitoring: true,
+//! };
+//!
+//! // Initialize and start runtime manager
+//! let mut runtime = RuntimeManager::new(config);
+//! runtime.initialize().await?;
+//! runtime.start().await?;
+//!
+//! // Get runtime status
+//! let status = runtime.get_status().await;
+//! println!("Active workers: {}", status.workers_active);
+//! println!("Queue length: {}", status.queue_length);
+//!
+//! // Shutdown gracefully
+//! runtime.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 pub mod cache;
 pub mod health;
@@ -27,6 +66,24 @@ pub use storage::StorageManager;
 pub use worker::Worker;
 
 /// Runtime configuration for Stage 4.1
+///
+/// Configures the runtime manager with worker limits, queue capacity,
+/// caching, and monitoring settings.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::runtime::RuntimeConfig;
+///
+/// let config = RuntimeConfig {
+///     max_workers: 10,
+///     queue_capacity: 2000,
+///     cache_size_mb: 1024,
+///     auto_scaling: true,
+///     health_check_interval: 30,
+///     resource_monitoring: true,
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct RuntimeConfig {
     /// Maximum number of concurrent workers
@@ -57,6 +114,28 @@ impl Default for RuntimeConfig {
 }
 
 /// Main runtime manager for Stage 4.1
+///
+/// Orchestrates all runtime components including workers, scheduler,
+/// queue, cache, storage, process manager, resource orchestrator,
+/// and health monitor.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::runtime::{RuntimeManager, RuntimeConfig};
+///
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let config = RuntimeConfig::default();
+/// let mut runtime = RuntimeManager::new(config);
+/// runtime.initialize().await?;
+/// runtime.start().await?;
+///
+/// // Use runtime...
+///
+/// runtime.shutdown().await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct RuntimeManager {
     #[allow(dead_code)] // Configuration stored for future use (reconfiguration, etc.)
     config: RuntimeConfig,

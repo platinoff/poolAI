@@ -3,20 +3,54 @@
 //! This module provides Telegram bot integration for system management,
 //! command handling, and notifications.
 //!
-//! ## Features (planned):
+//! # Features (planned)
 //!
-//! - **Command Handling**: /status, /metrics, /gpu commands
+//! - **Command Handling**: `/status`, `/metrics`, `/gpu` commands
 //! - **Notification System**: Send notifications to configured chat IDs
 //! - **Real-time Updates**: Receive real-time system updates via Telegram
+//! - **System Monitoring**: Query system status and metrics via bot commands
 //!
-//! ## Implementation Notes:
+//! # Implementation Notes
 //!
-//! This module will use the `teloxide` crate (or similar) for Telegram Bot API integration.
+//! This module will use the `teloxide` crate for Telegram Bot API integration.
 //! Future implementation will include:
 //! - Bot initialization with token authentication
 //! - Command dispatcher for handling bot commands
 //! - Webhook or long polling for receiving updates
 //! - Message sending for notifications
+//! - Integration with PoolAI API for system data
+//!
+//! # Example (future implementation)
+//!
+//! ```no_run
+//! use poolai::tgbot::start_bot;
+//!
+//! # async fn example() {
+//! // Start bot with token from environment or config
+//! let token = std::env::var("TELEGRAM_BOT_TOKEN")
+//!     .expect("TELEGRAM_BOT_TOKEN must be set");
+//!
+//! start_bot(&token).await;
+//! // Bot will handle commands:
+//! // - /status - Get system status
+//! // - /metrics - Get system metrics
+//! // - /gpu - Get GPU information
+//! # }
+//! ```
+//!
+//! # Notification Example (future)
+//!
+//! ```no_run
+//! use poolai::tgbot::send_notification;
+//!
+//! # async fn example() {
+//! // Send alert notification
+//! send_notification(
+//!     "123456789", // Chat ID
+//!     "⚠️ System Alert: High CPU usage detected (95%)"
+//! ).await;
+//! # }
+//! ```
 
 use tracing;
 
