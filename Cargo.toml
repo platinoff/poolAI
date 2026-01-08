@@ -40,7 +40,7 @@ jsonwebtoken = { version = "9.3", optional = true }
 # HTTPS/TLS support (optional - enabled with feature "https")
 # Use: cargo build --features https
 # Note: Requires native toolchain (gcc/dlltool on Windows GNU)
-axum-server = { version = "0.6", optional = true, features = ["rustls"] }
+axum-server = { version = "0.8", optional = true, features = ["rustls"] }
 
 # Using base64 for temporary token encoding (dev only or fallback)
 base64 = { version = "0.22", features = ["alloc"] }
