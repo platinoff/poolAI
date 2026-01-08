@@ -75,7 +75,7 @@ impl AutoScaler {
     }
 
     /// Get current scaling metrics
-    pub async fn get_metrics(&self, resource_id: &str) -> Result<ScalingMetrics, AppError> {
+    pub async fn get_metrics(&self, _resource_id: &str) -> Result<ScalingMetrics, AppError> {
         // TODO: Query metrics from monitoring system
         Ok(ScalingMetrics {
             cpu_usage: 0.0,

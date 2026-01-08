@@ -92,7 +92,7 @@ impl KubernetesManager {
     pub async fn create_worker_deployment(
         &self,
         name: &str,
-        config: &WorkerDeploymentConfig,
+        _config: &WorkerDeploymentConfig,
     ) -> Result<String, AppError> {
         // TODO: Implement Kubernetes deployment creation
         // - Create Deployment resource
@@ -113,7 +113,7 @@ impl KubernetesManager {
     pub async fn create_vm_deployment(
         &self,
         name: &str,
-        config: &VmDeploymentConfig,
+        _config: &VmDeploymentConfig,
     ) -> Result<String, AppError> {
         // TODO: Implement Kubernetes VM deployment
         info!("Creating VM deployment: {} (placeholder)", name);

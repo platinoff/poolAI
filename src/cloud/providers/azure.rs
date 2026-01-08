@@ -12,7 +12,7 @@ use tracing::info;
 
 /// Azure manager for cloud resources
 pub struct AzureManager {
-    subscription_id: Option<String>,
+    _subscription_id: Option<String>,
     initialized: Arc<RwLock<bool>>,
 }
 
@@ -20,7 +20,7 @@ impl AzureManager {
     /// Create a new Azure manager
     pub fn new(subscription_id: Option<String>) -> Self {
         Self {
-            subscription_id: subscription_id
+            _subscription_id: subscription_id
                 .or_else(|| std::env::var("AZURE_SUBSCRIPTION_ID").ok()),
             initialized: Arc::new(RwLock::new(false)),
         }
