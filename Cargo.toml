@@ -100,6 +100,9 @@ nix = { version = "0.27", optional = true }
 # Note: k8s-openapi features should only be enabled in binary crates, not libraries
 # Library crates should use k8s_if_* macros or build scripts for version-specific code
 k8s-openapi = { version = "0.21", optional = true }
+# Note: kube-rs requires Rust 1.88+ (home@0.5.12 dependency)
+# Using reqwest + k8s-openapi directly instead for Rust 1.70+ compatibility
+# kube = { version = "0.87", features = ["runtime", "client"], optional = true }
 # AWS SDK (requires Rust 1.88+)
 # Note: Commented out until Rust version is upgraded to 1.88+
 # aws-config = { version = "1.1", optional = true }
@@ -163,6 +166,7 @@ cloud = []
 # Note: AWS SDK requires Rust 1.88+ and is commented out until Rust version is upgraded
 cloud-sdk = [
     "k8s-openapi",
+    # "kube", # Requires Rust 1.88+, using reqwest + k8s-openapi directly instead
     "azure_core",
     "azure_identity",
     "azure_mgmt_compute"
@@ -179,3 +183,4 @@ vm-isolation-linux = ["nix"]
 vm-isolation = ["vm-isolation-linux"]
 # Full security features (when both jwt and https are available)
 # security = ["jwt", "https"]
+

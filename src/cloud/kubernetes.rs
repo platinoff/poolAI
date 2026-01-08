@@ -54,11 +54,7 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
-// Note: k8s-openapi types are available but features should only be enabled in binary crates
-// Library crates should use k8s_if_* macros or build scripts for version-specific code
-// For now, we'll use the types without version-specific features
-// use k8s_openapi::api::core::v1 as corev1;
-// use k8s_openapi::api::apps::v1 as appsv1;
+use serde_json::json;
 
 /// Kubernetes Pod status information
 #[derive(Debug, Clone)]
@@ -78,19 +74,35 @@ pub struct KubernetesManager {
     namespace: String,
     initialized: Arc<RwLock<bool>>,
     #[cfg(feature = "cloud-sdk")]
-    /// Kubernetes API client (only available with cloud-sdk feature)
-    /// This is a placeholder for future implementation with kube-rs or direct HTTP client
-    _client_placeholder: Option<()>,
+    /// Kubernetes API base URL and authentication token
+    /// Using reqwest + k8s-openapi directly (kube-rs requires Rust 1.88+)
+    api_base_url: Arc<RwLock<Option<String>>>,
+    #[cfg(feature = "cloud-sdk")]
+    api_token: Arc<RwLock<Option<String>>>,
 }
 
 impl KubernetesManager {
     /// Create a new KubernetesManager
+    ///
+    /// # Arguments
+    ///
+    /// * `namespace` - Kubernetes namespace to operate in
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// ```
     pub fn new(namespace: String) -> Self {
         Self {
             namespace,
             initialized: Arc::new(RwLock::new(false)),
             #[cfg(feature = "cloud-sdk")]
-            _client_placeholder: None,
+            api_base_url: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            api_token: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -138,24 +150,29 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            // TODO: Implement Kubernetes client initialization with kube-rs or HTTP client
-            // - Load kubeconfig from default location or KUBECONFIG env var
-            // - Create HTTP client with authentication
-            // - Check cluster connectivity
-            // - Verify namespace exists
-            // - Initialize CRD watchers
-            // - Set up operator
+            info!("Initializing Kubernetes API client for namespace: {}", self.namespace);
             
-            // For now, k8s-openapi provides types but we need an HTTP client
-            // Options:
-            // 1. Use kube-rs crate (recommended for full Kubernetes client)
-            // 2. Use reqwest with k8s-openapi types (more manual but lighter)
-            // 3. Use k8s-client crate (alternative)
+            // TODO: Load kubeconfig and extract API server URL and token
+            // For now, use in-cluster config or KUBECONFIG env var
+            // This is a placeholder - full implementation would:
+            // 1. Load kubeconfig from ~/.kube/config or KUBECONFIG env var
+            // 2. Extract API server URL and authentication token
+            // 3. Verify namespace exists
             
-            info!(
-                "Kubernetes manager initialized for namespace: {} (SDK types available)",
-                self.namespace
+            // Placeholder: Set API base URL (would be extracted from kubeconfig)
+            *self.api_base_url.write().await = Some(
+                std::env::var("KUBERNETES_SERVICE_HOST")
+                    .map(|host| format!("https://{}:443", host))
+                    .unwrap_or_else(|_| "https://kubernetes.default.svc".to_string())
             );
+            
+            // Placeholder: Set API token (would be extracted from kubeconfig or service account)
+            *self.api_token.write().await = Some(
+                std::fs::read_to_string("/var/run/secrets/kubernetes.io/serviceaccount/token")
+                    .unwrap_or_else(|_| "placeholder-token".to_string())
+            );
+            
+            info!("Kubernetes API client initialized (placeholder - full kubeconfig loading TODO)");
         }
         
         #[cfg(not(feature = "cloud-sdk"))]
@@ -172,11 +189,62 @@ impl KubernetesManager {
     }
 
     /// Shutdown Kubernetes integration
+    ///
+    /// Cleans up Kubernetes client connections and watchers.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    /// // Use manager...
+    /// manager.shutdown().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // TODO: Clean up watchers, close connections
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Clear API credentials
+            *self.api_base_url.write().await = None;
+            *self.api_token.write().await = None;
+        }
         *self.initialized.write().await = false;
         info!("Kubernetes manager shut down");
         Ok(())
+    }
+
+    #[cfg(feature = "cloud-sdk")]
+    /// Get Kubernetes API base URL (internal helper)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::InitializationError` if not initialized.
+    async fn get_api_base_url(&self) -> Result<String, AppError> {
+        let url_guard = self.api_base_url.read().await;
+        url_guard.clone().ok_or_else(|| {
+            AppError::InitializationError(
+                "Kubernetes API client not initialized. Call initialize() first.".to_string()
+            )
+        })
+    }
+    
+    #[cfg(feature = "cloud-sdk")]
+    /// Get Kubernetes API token (internal helper)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::InitializationError` if not initialized.
+    async fn get_api_token(&self) -> Result<String, AppError> {
+        let token_guard = self.api_token.read().await;
+        token_guard.clone().ok_or_else(|| {
+            AppError::InitializationError(
+                "Kubernetes API client not initialized. Call initialize() first.".to_string()
+            )
+        })
     }
 
     /// Create a PoolAI worker deployment
@@ -235,12 +303,32 @@ impl KubernetesManager {
             ));
         }
 
-        // TODO: Implement Kubernetes deployment creation
-        // - Create Deployment resource
-        // - Set up service
-        // - Configure health checks
-        info!("Creating worker deployment: {} (placeholder)", name);
-        Ok(format!("worker-{}", name))
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Build Deployment resource
+            let deployment = build_deployment(
+                name,
+                &config.image,
+                config.replicas as i32,
+                &config.resources,
+                &config.env,
+            )?;
+            
+            // TODO: Use reqwest to create deployment via Kubernetes API
+            // For now, this is a placeholder - full implementation would:
+            // 1. Serialize deployment to JSON
+            // 2. POST to /apis/apps/v1/namespaces/{namespace}/deployments
+            // 3. Handle authentication and response
+            
+            info!("Creating worker deployment: {} (k8s-openapi types ready, API call TODO)", name);
+            Ok(format!("worker-{}", name))
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Creating worker deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(format!("worker-{}", name))
+        }
     }
 
     /// Delete a worker deployment
@@ -281,9 +369,20 @@ impl KubernetesManager {
             ));
         }
 
-        // TODO: Implement Kubernetes deployment deletion
-        info!("Deleting worker deployment: {} (placeholder)", name);
-        Ok(())
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // TODO: Use reqwest to delete deployment via Kubernetes API
+            // DELETE /apis/apps/v1/namespaces/{namespace}/deployments/{name}
+            
+            info!("Deleting worker deployment: {} (k8s-openapi types ready, API call TODO)", name);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Deleting worker deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
     }
 
     /// Create a VM instance deployment
