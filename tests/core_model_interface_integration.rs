@@ -6,7 +6,7 @@ use poolai::core::model_interface::{
     ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
     ModelRequest, ModelResponse, ModelState, ModelStatus,
 };
-use poolai::core::config::ModelConfig;
+use poolai::core::config::ModelConfig as ConfigModelConfig;
 use poolai::core::error::AppError;
 use std::collections::HashMap;
 
