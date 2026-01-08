@@ -148,9 +148,14 @@ impl CloudConfig {
         }
 
         if self.aws_enabled {
-            let region = self.aws_region.as_deref()
-                .or_else(|| std::env::var("AWS_REGION").ok().as_deref());
-            if region.is_none() || region.unwrap().is_empty() {
+            let has_region = self.aws_region.as_ref()
+                .map(|r| !r.is_empty())
+                .unwrap_or_else(|| {
+                    std::env::var("AWS_REGION")
+                        .map(|r| !r.is_empty())
+                        .unwrap_or(false)
+                });
+            if !has_region {
                 return Err(AppError::ValidationError(
                     "AWS region must be set when AWS is enabled. Current value: None. Suggestion: Set aws_region in config or set AWS_REGION environment variable."
                         .to_string(),
@@ -159,9 +164,14 @@ impl CloudConfig {
         }
 
         if self.azure_enabled {
-            let subscription_id = self.azure_subscription_id.as_deref()
-                .or_else(|| std::env::var("AZURE_SUBSCRIPTION_ID").ok().as_deref());
-            if subscription_id.is_none() || subscription_id.unwrap().is_empty() {
+            let has_subscription = self.azure_subscription_id.as_ref()
+                .map(|s| !s.is_empty())
+                .unwrap_or_else(|| {
+                    std::env::var("AZURE_SUBSCRIPTION_ID")
+                        .map(|s| !s.is_empty())
+                        .unwrap_or(false)
+                });
+            if !has_subscription {
                 return Err(AppError::ValidationError(
                     "Azure subscription ID must be set when Azure is enabled. Current value: None. Suggestion: Set azure_subscription_id in config or set AZURE_SUBSCRIPTION_ID environment variable."
                         .to_string(),
@@ -170,9 +180,14 @@ impl CloudConfig {
         }
 
         if self.gcp_enabled {
-            let project_id = self.gcp_project_id.as_deref()
-                .or_else(|| std::env::var("GCP_PROJECT_ID").ok().as_deref());
-            if project_id.is_none() || project_id.unwrap().is_empty() {
+            let has_project = self.gcp_project_id.as_ref()
+                .map(|p| !p.is_empty())
+                .unwrap_or_else(|| {
+                    std::env::var("GCP_PROJECT_ID")
+                        .map(|p| !p.is_empty())
+                        .unwrap_or(false)
+                });
+            if !has_project {
                 return Err(AppError::ValidationError(
                     "GCP project ID must be set when GCP is enabled. Current value: None. Suggestion: Set gcp_project_id in config or set GCP_PROJECT_ID environment variable."
                         .to_string(),
