@@ -10,8 +10,8 @@ async fn test_dependency_resolver_creation() {
     let _ = resolver;
 }
 
-#[tokio::test]
-async fn test_dependency_resolver_resolve_versions() {
+#[test]
+fn test_dependency_resolver_resolve_versions() {
     let resolver = DependencyResolver::new();
     let registry = LibraryRegistry::new();
     
