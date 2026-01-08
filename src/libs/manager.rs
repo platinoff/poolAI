@@ -632,7 +632,12 @@ impl LibraryManager {
             info!("Library {} uninstalled successfully", name);
             Ok(())
         } else {
-            Err(AppError::ConfigError(format!("Library {} not found", name)))
+            Err(AppError::ConfigError(format!(
+                "Library not found. Context: Attempted to uninstall a library that is not installed. \
+                Suggestion: Verify library name is correct and check installed libraries with list_libraries(). \
+                Library: '{}'",
+                name
+            )))
         }
     }
 
@@ -666,13 +671,23 @@ impl LibraryManager {
         let current_lib = self
             .get_library(name)
             .await
-            .ok_or_else(|| AppError::ConfigError(format!("Library {} not found", name)))?;
+            .ok_or_else(|| AppError::ConfigError(format!(
+                "Library not found. Context: Attempted to update a library that is not installed. \
+                Suggestion: Install the library first using install_library(). \
+                Library: '{}'",
+                name
+            )))?;
 
         // Get latest version from registry
         let latest_version = {
             let registry = self.registry.read().await;
             registry.get_latest_version(name).ok_or_else(|| {
-                AppError::ConfigError(format!("No versions available for {}", name))
+                AppError::ConfigError(format!(
+                    "No versions available. Context: Library registry does not contain any versions for this library. \
+                    Suggestion: Verify library name is correct and check registry configuration. \
+                    Library: '{}'",
+                    name
+                ))
             })?
         };
 
@@ -745,13 +760,23 @@ impl LibraryManager {
             .get_artifact(&artifact_ref.path)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to get artifact from RAID: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to get artifact from RAID. Context: Cannot retrieve library artifact from RAID storage. \
+                    Suggestion: Verify RAID storage is accessible and artifact reference is valid. \
+                    Library: '{}', Artifact path: '{}', Error: {}",
+                    lib_info.name, artifact_ref.path, e
+                ))
             })?;
 
         // Create temp directory for extraction
         let tmp_root = self.base_path.join(".tmp");
         tokio::fs::create_dir_all(&tmp_root).await.map_err(|e| {
-            AppError::ConfigError(format!("Failed to create temp directory: {}", e))
+            AppError::ConfigError(format!(
+                "Failed to create temp directory. Context: Cannot create temporary directory for library extraction from RAID. \
+                Suggestion: Check filesystem permissions and ensure base library directory is writable. \
+                Path: '{}', Error: {}",
+                tmp_root.display(), e
+            ))
         })?;
 
         let session_dir = tmp_root.join(format!(
@@ -761,7 +786,12 @@ impl LibraryManager {
             Uuid::new_v4()
         ));
         tokio::fs::create_dir_all(&session_dir).await.map_err(|e| {
-            AppError::ConfigError(format!("Failed to create temp session directory: {}", e))
+            AppError::ConfigError(format!(
+                "Failed to create temp session directory. Context: Cannot create temporary session directory for library extraction. \
+                Suggestion: Check filesystem permissions and ensure temp directory is writable. \
+                Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                lib_info.name, lib_info.version, session_dir.display(), e
+            ))
         })?;
 
         // Write artifact bytes to temp file
@@ -769,7 +799,12 @@ impl LibraryManager {
         tokio::fs::write(&artifact_archive, &artifact_bytes)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to write artifact archive: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to write artifact archive. Context: Cannot write artifact data to temporary file. \
+                    Suggestion: Check disk space and filesystem permissions. \
+                    Library: '{}', Path: '{}', Error: {}",
+                    lib_info.name, artifact_archive.display(), e
+                ))
             })?;
 
         // Extract archive
@@ -785,21 +820,36 @@ impl LibraryManager {
             tokio::fs::remove_dir_all(&lib_info.path)
                 .await
                 .map_err(|e| {
-                    AppError::ConfigError(format!("Failed to remove existing library dir: {}", e))
+                    AppError::ConfigError(format!(
+                        "Failed to remove existing library dir. Context: Cannot remove existing library directory before loading from RAID. \
+                        Suggestion: Check filesystem permissions and ensure directory is not locked. \
+                        Library: '{}', Path: '{}', Error: {}",
+                        lib_info.name, lib_info.path.display(), e
+                    ))
                 })?;
         }
 
         // Create parent directory if needed
         if let Some(parent) = lib_info.path.parent() {
             tokio::fs::create_dir_all(parent).await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to create library parent directory: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to create library parent directory. Context: Cannot create parent directory for library path. \
+                    Suggestion: Check filesystem permissions and ensure parent directory path is valid. \
+                    Library: '{}', Path: '{}', Error: {}",
+                    lib_info.name, parent.display(), e
+                ))
             })?;
         }
 
         tokio::fs::rename(&extract_dir, &lib_info.path)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to finalize library load from RAID: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to finalize library load from RAID. Context: Cannot atomically move extracted library to final location. \
+                    Suggestion: Ensure both source and destination are on the same filesystem and check permissions. \
+                    Library: '{}', From: '{}', To: '{}', Error: {}",
+                    lib_info.name, extract_dir.display(), lib_info.path.display(), e
+                ))
             })?;
 
         // Cleanup temp session
