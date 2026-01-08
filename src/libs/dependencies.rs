@@ -82,8 +82,10 @@ impl DependencyResolver {
         for dep_spec in deps {
             let versions = registry.get_versions(&dep_spec.name).ok_or_else(|| {
                 AppError::ConfigError(format!(
-                    "No versions available for dependency {}",
-                    dep_spec.name
+                    "No versions available for dependency {}. Context: Cannot resolve dependency version from registry. \
+                    Suggestion: Verify dependency name is correct, check registry configuration, or ensure dependency is registered. \
+                    Dependency: '{}', Library: '{}'",
+                    dep_spec.name, dep_spec.name, name
                 ))
             })?;
 
@@ -99,9 +101,15 @@ impl DependencyResolver {
 
             let version = chosen.ok_or_else(|| {
                 AppError::ConfigError(format!(
-                    "No compatible version for dependency {} (constraints: {})",
+                    "No compatible version for dependency {} (constraints: {}). Context: No version satisfies the specified constraints. \
+                    Suggestion: Check available versions in registry, relax version constraints, or update dependency specification. \
+                    Dependency: '{}', Constraints: '{}', Available versions: {:?}, Library: '{}'",
                     dep_spec.name,
-                    constraints_to_string(&dep_spec.constraints)
+                    constraints_to_string(&dep_spec.constraints),
+                    dep_spec.name,
+                    constraints_to_string(&dep_spec.constraints),
+                    versions,
+                    name
                 ))
             })?;
 
@@ -150,14 +158,17 @@ impl DependencyResolver {
     /// Check for dependency conflicts
     pub async fn check_conflicts(&self, dependencies: &[String]) -> Result<(), AppError> {
         // Check for circular dependencies
-        let mut visited = HashSet::new();
-        let mut rec_stack = HashSet::new();
+        let mut visited = HashSet::<String>::new();
+        let mut rec_stack = HashSet::<String>::new();
 
         for dep in dependencies {
+            rec_stack.clear();
             if self.has_circular_dependency(dep, &mut visited, &mut rec_stack)? {
                 return Err(AppError::ConfigError(format!(
-                    "Circular dependency detected involving: {}",
-                    dep
+                    "Circular dependency detected involving: {}. Context: Dependency graph contains a cycle which would cause infinite recursion. \
+                    Suggestion: Review dependency specifications and remove circular references. \
+                    Dependency: '{}', Cycle detected in: {:?}",
+                    dep, dep, rec_stack
                 )));
             }
         }
