@@ -1918,20 +1918,34 @@ function updateCircularProgress(circleId, value, max = 100) {
   }
 }
 
-// Tooltip functions
+// Tooltip functions with enhanced accessibility
 function initTooltips() {
   const tooltips = document.querySelectorAll('[data-tooltip]');
-  tooltips.forEach(tooltip => {
+  tooltips.forEach((tooltip, index) => {
     const text = tooltip.getAttribute('data-tooltip');
     const position = tooltip.getAttribute('data-tooltip-position') || 'top';
     const delay = parseInt(tooltip.getAttribute('data-tooltip-delay')) || 0;
+    const tooltipId = 'tooltip-' + index;
     
     if (!tooltip.querySelector('.tooltip-content')) {
       const content = document.createElement('div');
+      content.id = tooltipId;
       content.className = 'tooltip-content';
+      content.setAttribute('role', 'tooltip');
       content.textContent = text;
       tooltip.classList.add('tooltip', 'tooltip-' + position);
+      tooltip.setAttribute('aria-describedby', tooltipId);
       tooltip.appendChild(content);
+      
+      // Show on focus for keyboard users
+      tooltip.addEventListener('focus', function() {
+        content.style.visibility = 'visible';
+        content.style.opacity = '1';
+      });
+      tooltip.addEventListener('blur', function() {
+        content.style.visibility = 'hidden';
+        content.style.opacity = '0';
+      });
       
       if (delay > 0) {
         let timeout;
@@ -1946,18 +1960,36 @@ function initTooltips() {
           content.style.visibility = 'hidden';
           content.style.opacity = '0';
         });
+      } else {
+        tooltip.addEventListener('mouseenter', function() {
+          content.style.visibility = 'visible';
+          content.style.opacity = '1';
+        });
+        tooltip.addEventListener('mouseleave', function() {
+          if (document.activeElement !== tooltip) {
+            content.style.visibility = 'hidden';
+            content.style.opacity = '0';
+          }
+        });
       }
     }
   });
 }
 
-// Dropdown functions
+// Dropdown functions with enhanced accessibility
 function initDropdowns() {
   const dropdowns = document.querySelectorAll('.dropdown');
-  dropdowns.forEach(dropdown => {
+  dropdowns.forEach((dropdown, index) => {
     const toggle = dropdown.querySelector('.dropdown-toggle');
     const menu = dropdown.querySelector('.dropdown-menu');
     if (!toggle || !menu) return;
+    
+    const menuId = 'dropdown-menu-' + index;
+    menu.id = menuId;
+    toggle.setAttribute('aria-haspopup', 'true');
+    toggle.setAttribute('aria-controls', menuId);
+    toggle.setAttribute('aria-expanded', 'false');
+    menu.setAttribute('role', 'menu');
     
     toggle.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -1966,6 +1998,11 @@ function initDropdowns() {
       if (!isActive) {
         menu.classList.add('active');
         toggle.setAttribute('aria-expanded', 'true');
+        // Focus first item
+        const firstItem = menu.querySelector('.dropdown-item');
+        if (firstItem) {
+          setTimeout(() => firstItem.focus(), 0);
+        }
       }
     });
     
@@ -1990,6 +2027,9 @@ function initDropdowns() {
     // Item selection
     const items = menu.querySelectorAll('.dropdown-item');
     items.forEach((item, index) => {
+      item.setAttribute('role', 'menuitem');
+      item.setAttribute('tabindex', '-1');
+      
       item.addEventListener('click', function() {
         const value = item.getAttribute('data-value');
         if (value !== null) {
@@ -2001,6 +2041,9 @@ function initDropdowns() {
           // Trigger change event
           const event = new CustomEvent('dropdown-change', { detail: { value, text: item.textContent } });
           dropdown.dispatchEvent(event);
+          
+          // Return focus to toggle
+          toggle.focus();
         }
       });
       
@@ -2013,19 +2056,35 @@ function initDropdowns() {
           e.preventDefault();
           const next = items[index + 1] || items[0];
           next.focus();
+          next.setAttribute('tabindex', '0');
+          item.setAttribute('tabindex', '-1');
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
           const prev = items[index - 1] || items[items.length - 1];
           prev.focus();
+          prev.setAttribute('tabindex', '0');
+          item.setAttribute('tabindex', '-1');
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          items[0].focus();
+          items[0].setAttribute('tabindex', '0');
+          item.setAttribute('tabindex', '-1');
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          items[items.length - 1].focus();
+          items[items.length - 1].setAttribute('tabindex', '0');
+          item.setAttribute('tabindex', '-1');
         } else if (e.key === 'Escape') {
           closeAllDropdowns();
           toggle.focus();
         }
       });
-      
-      item.setAttribute('tabindex', '0');
-      item.setAttribute('role', 'option');
     });
+    
+    // Initialize first item as focusable
+    if (items.length > 0) {
+      items[0].setAttribute('tabindex', '0');
+    }
   });
 }
 
@@ -2040,29 +2099,49 @@ function closeAllDropdowns() {
   });
 }
 
-// Tabs functions
+// Tabs functions with enhanced accessibility
 function initTabs() {
   const tabContainers = document.querySelectorAll('.tabs-container');
-  tabContainers.forEach(container => {
+  tabContainers.forEach((container, containerIndex) => {
     const tabs = container.querySelectorAll('.tab');
     const contents = container.querySelectorAll('.tab-content');
+    const tabsId = 'tabs-' + containerIndex;
+    
+    container.setAttribute('role', 'tablist');
+    container.setAttribute('aria-label', container.getAttribute('aria-label') || 'Tabs');
     
     tabs.forEach((tab, index) => {
+      const contentId = tab.getAttribute('data-tab') || ('tab-content-' + containerIndex + '-' + index);
+      const tabId = 'tab-' + containerIndex + '-' + index;
+      
+      tab.id = tabId;
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-controls', contentId);
+      tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+      tab.setAttribute('tabindex', index === 0 ? '0' : '-1');
+      
+      if (contents[index]) {
+        contents[index].id = contentId;
+        contents[index].setAttribute('role', 'tabpanel');
+        contents[index].setAttribute('aria-labelledby', tabId);
+        contents[index].setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
+      }
+      
       tab.addEventListener('click', function() {
         // Remove active class from all tabs and contents
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('tabindex', '-1');
+        });
         contents.forEach(c => c.classList.remove('active'));
         
         // Add active class to clicked tab and corresponding content
         tab.classList.add('active');
-        const contentId = tab.getAttribute('data-tab');
-        if (contentId) {
-          const content = container.querySelector('#' + contentId);
-          if (content) {
-            content.classList.add('active');
-          }
-        } else if (contents[index]) {
-          contents[index].classList.add('active');
+        tab.setAttribute('tabindex', '0');
+        const contentId = tab.getAttribute('data-tab') || ('tab-content-' + containerIndex + '-' + index);
+        const content = container.querySelector('#' + contentId) || contents[index];
+        if (content) {
+          content.classList.add('active');
         }
         
         // Update ARIA attributes
@@ -2074,7 +2153,7 @@ function initTabs() {
         });
       });
       
-      // Keyboard navigation
+      // Keyboard navigation (ARIA tab pattern)
       tab.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
           e.preventDefault();
@@ -2092,34 +2171,43 @@ function initTabs() {
           tabs[tabs.length - 1].focus();
         }
       });
-      
-      tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-      if (contents[index]) {
-        contents[index].setAttribute('role', 'tabpanel');
-        contents[index].setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
-      }
     });
   });
 }
 
-// Accordion functions
+// Accordion functions with enhanced accessibility
 function initAccordions() {
   const accordions = document.querySelectorAll('.accordion');
-  accordions.forEach(accordion => {
+  accordions.forEach((accordion, accordionIndex) => {
     const items = accordion.querySelectorAll('.accordion-item');
     
-    items.forEach(item => {
+    items.forEach((item, index) => {
       const header = item.querySelector('.accordion-header');
       const content = item.querySelector('.accordion-content');
       if (!header || !content) return;
+      
+      const headerId = 'accordion-header-' + accordionIndex + '-' + index;
+      const contentId = 'accordion-content-' + accordionIndex + '-' + index;
+      
+      header.id = headerId;
+      header.setAttribute('role', 'button');
+      header.setAttribute('aria-expanded', 'false');
+      header.setAttribute('aria-controls', contentId);
+      header.setAttribute('tabindex', '0');
+      
+      content.id = contentId;
+      content.setAttribute('role', 'region');
+      content.setAttribute('aria-labelledby', headerId);
       
       header.addEventListener('click', function() {
         const isActive = item.classList.contains('active');
         
         // Close all items if not allowing multiple open
         if (!accordion.hasAttribute('data-multiple')) {
-          items.forEach(i => i.classList.remove('active'));
+          items.forEach(i => {
+            i.classList.remove('active');
+            i.querySelector('.accordion-header').setAttribute('aria-expanded', 'false');
+          });
         }
         
         // Toggle current item
