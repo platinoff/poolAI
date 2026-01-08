@@ -1,10 +1,43 @@
 //! Rewards module for Stage 3 - Endorphin-based reward system
 //!
-//! This module provides:
-//! - Reward system with multiple reward types
-//! - User progress tracking
-//! - Achievement-based rewards
-//! - Reward history and statistics
+//! Provides a comprehensive reward system with multiple reward types, user progress
+//! tracking, achievement-based rewards, and reward history/statistics.
+//!
+//! # Features
+//!
+//! - **Multiple Reward Types**: Performance, Efficiency, Quality, Innovation, Collaboration, Maintenance
+//! - **Reward Levels**: Bronze, Silver, Gold, Platinum, Diamond with multipliers
+//! - **User Progress Tracking**: Total rewards, streaks, achievements, levels, experience
+//! - **Achievement System**: Automatic achievement unlocking based on milestones
+//! - **Statistics**: Reward statistics and top users leaderboard
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::rewards::{create_reward, get_user_progress, RewardType, RewardLevel};
+//! use std::collections::HashMap;
+//!
+//! # async fn example() {
+//! // Create a reward for a user
+//! let reward = create_reward(
+//!     "user123".to_string(),
+//!     RewardType::Performance,
+//!     RewardLevel::Gold,
+//!     100.0,
+//!     "Outstanding performance".to_string(),
+//!     HashMap::new(),
+//! ).await;
+//!
+//! println!("Reward amount: {}", reward.amount);
+//!
+//! // Get user progress
+//! if let Some(progress) = get_user_progress("user123").await {
+//!     println!("Total rewards: {}", progress.total_rewards);
+//!     println!("Level: {}", progress.level);
+//!     println!("Achievements: {:?}", progress.achievements);
+//! }
+//! # }
+//! ```
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -12,7 +45,25 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-// Reward types
+/// Reward types
+///
+/// Different types of rewards that can be awarded to users based on their activities.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::rewards::RewardType;
+///
+/// let reward_type = RewardType::Performance;
+/// match reward_type {
+///     RewardType::Performance => println!("High performance reward"),
+///     RewardType::Efficiency => println!("Efficient resource usage"),
+///     RewardType::Quality => println!("Quality result"),
+///     RewardType::Innovation => println!("Innovative solution"),
+///     RewardType::Collaboration => println!("Great collaboration"),
+///     RewardType::Maintenance => println!("System maintenance"),
+/// }
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum RewardType {
     Performance,   // For high performance
@@ -23,7 +74,24 @@ pub enum RewardType {
     Maintenance,   // For system maintenance
 }
 
-// Reward levels
+/// Reward levels
+///
+/// Different levels of rewards with increasing multipliers:
+/// - Bronze: 1x base reward
+/// - Silver: 2x base reward
+/// - Gold: 3x base reward
+/// - Platinum: 4x base reward
+/// - Diamond: 5x base reward
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::rewards::RewardLevel;
+///
+/// let level = RewardLevel::Gold;
+/// let multiplier = level as u8 as f64; // 3.0
+/// println!("Level multiplier: {}", multiplier);
+/// ```
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum RewardLevel {
     Bronze = 1,   // 1x base reward
@@ -33,7 +101,29 @@ pub enum RewardLevel {
     Diamond = 5,  // 5x base reward
 }
 
-// Reward structure
+/// Reward structure
+///
+/// Represents a single reward awarded to a user with type, level, amount,
+/// description, timestamp, and optional metadata.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::rewards::{Reward, RewardType, RewardLevel};
+/// use chrono::Utc;
+/// use std::collections::HashMap;
+///
+/// let reward = Reward {
+///     id: "reward-123".to_string(),
+///     user_id: "user-456".to_string(),
+///     reward_type: RewardType::Performance,
+///     level: RewardLevel::Gold,
+///     amount: 450.0,
+///     description: "Outstanding performance".to_string(),
+///     timestamp: Utc::now(),
+///     metadata: HashMap::new(),
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Reward {
     pub id: String,
@@ -46,7 +136,29 @@ pub struct Reward {
     pub metadata: HashMap<String, String>,
 }
 
-// User progress structure
+/// User progress structure
+///
+/// Tracks a user's progress including total rewards, streaks, achievements,
+/// level, and experience points.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::rewards::UserProgress;
+/// use chrono::Utc;
+///
+/// let progress = UserProgress {
+///     user_id: "user-123".to_string(),
+///     total_rewards: 1000.0,
+///     reward_count: 10,
+///     current_streak: 5,
+///     longest_streak: 7,
+///     last_reward_date: Some(Utc::now()),
+///     achievements: vec!["First Decade".to_string()],
+///     level: 5,
+///     experience: 5000,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserProgress {
     pub user_id: String,
@@ -60,7 +172,21 @@ pub struct UserProgress {
     pub experience: u64,
 }
 
-// Reward system
+/// Reward system
+///
+/// Manages rewards, user progress, and achievements. Provides methods for
+/// creating rewards, tracking progress, and generating statistics.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::RewardSystem;
+///
+/// # async fn example() {
+/// let system = RewardSystem::new();
+/// // System is automatically initialized and ready to use
+/// # }
+/// ```
 pub struct RewardSystem {
     rewards: Arc<RwLock<HashMap<String, Reward>>>,
     user_progress: Arc<RwLock<HashMap<String, UserProgress>>>,
@@ -273,7 +399,45 @@ lazy_static::lazy_static! {
     static ref REWARD_SYSTEM: RewardSystem = RewardSystem::new();
 }
 
-// Public functions for accessing the reward system
+/// Create a new reward for a user
+///
+/// Creates a reward with the specified type, level, and base amount.
+/// The final amount is calculated using reward type multiplier and level multiplier.
+///
+/// # Arguments
+///
+/// * `user_id` - ID of the user receiving the reward
+/// * `reward_type` - Type of reward (Performance, Efficiency, etc.)
+/// * `level` - Reward level (Bronze, Silver, Gold, etc.)
+/// * `base_amount` - Base reward amount before multipliers
+/// * `description` - Description of the reward
+/// * `metadata` - Optional metadata as key-value pairs
+///
+/// # Returns
+///
+/// Returns the created `Reward` with calculated amount.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::{create_reward, RewardType, RewardLevel};
+/// use std::collections::HashMap;
+///
+/// # async fn example() {
+/// let reward = create_reward(
+///     "user123".to_string(),
+///     RewardType::Performance,
+///     RewardLevel::Gold,
+///     100.0,
+///     "Outstanding performance".to_string(),
+///     HashMap::new(),
+/// ).await;
+///
+/// // Performance multiplier = 1.5, Gold level = 3
+/// // Final amount = 100.0 * 1.5 * 3.0 = 450.0
+/// println!("Reward amount: {}", reward.amount);
+/// # }
+/// ```
 pub async fn create_reward(
     user_id: String,
     reward_type: RewardType,
@@ -294,23 +458,136 @@ pub async fn create_reward(
         .await
 }
 
+/// Get all rewards for a user
+///
+/// Retrieves all rewards awarded to a specific user.
+///
+/// # Arguments
+///
+/// * `user_id` - ID of the user
+///
+/// # Returns
+///
+/// Returns a vector of all rewards for the user.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::get_user_rewards;
+///
+/// # async fn example() {
+/// let rewards = get_user_rewards("user123").await;
+/// println!("User has {} rewards", rewards.len());
+/// # }
+/// ```
 pub async fn get_user_rewards(user_id: &str) -> Vec<Reward> {
     REWARD_SYSTEM.get_user_rewards(user_id).await
 }
 
+/// Get user progress
+///
+/// Retrieves the progress information for a user including total rewards,
+/// streaks, achievements, level, and experience.
+///
+/// # Arguments
+///
+/// * `user_id` - ID of the user
+///
+/// # Returns
+///
+/// Returns `Some(UserProgress)` if user has progress, `None` otherwise.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::get_user_progress;
+///
+/// # async fn example() {
+/// if let Some(progress) = get_user_progress("user123").await {
+///     println!("Total rewards: {}", progress.total_rewards);
+///     println!("Level: {}", progress.level);
+///     println!("Current streak: {}", progress.current_streak);
+///     println!("Achievements: {:?}", progress.achievements);
+/// }
+/// # }
+/// ```
 pub async fn get_user_progress(user_id: &str) -> Option<UserProgress> {
     REWARD_SYSTEM.get_user_progress(user_id).await
 }
 
+/// Get reward statistics
+///
+/// Returns aggregated statistics for all rewards grouped by reward type and level.
+///
+/// # Returns
+///
+/// Returns a HashMap with keys in format "{RewardType}_{RewardLevel}" and
+/// values as total reward amounts.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::get_reward_statistics;
+///
+/// # async fn example() {
+/// let stats = get_reward_statistics().await;
+/// for (key, amount) in stats {
+///     println!("{}: {}", key, amount);
+/// }
+/// # }
+/// ```
 pub async fn get_reward_statistics() -> HashMap<String, f64> {
     REWARD_SYSTEM.get_reward_statistics().await
 }
 
+/// Get top users by total rewards
+///
+/// Returns a list of top users sorted by total rewards in descending order.
+///
+/// # Arguments
+///
+/// * `limit` - Maximum number of users to return
+///
+/// # Returns
+///
+/// Returns a vector of tuples (user_id, total_rewards) sorted by total rewards.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::get_top_users;
+///
+/// # async fn example() {
+/// let top_users = get_top_users(10).await;
+/// for (user_id, total) in top_users {
+///     println!("User {}: {} total rewards", user_id, total);
+/// }
+/// # }
+/// ```
 pub async fn get_top_users(limit: usize) -> Vec<(String, f64)> {
     REWARD_SYSTEM.get_top_users(limit).await
 }
 
-// Function for automatic performance bonus awarding
+/// Award performance bonus automatically
+///
+/// Automatically awards a performance bonus to a user based on their performance score.
+/// Awards Gold level for scores >= 0.9 and Silver level for scores >= 0.8.
+///
+/// # Arguments
+///
+/// * `user_id` - ID of the user
+/// * `performance_score` - Performance score (0.0 - 1.0)
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::rewards::award_performance_bonus;
+///
+/// # async fn example() {
+/// // Award bonus for high performance
+/// award_performance_bonus("user123".to_string(), 0.95).await;
+/// # }
+/// ```
 pub async fn award_performance_bonus(user_id: String, performance_score: f64) {
     if performance_score >= 0.9 {
         let metadata = HashMap::new();
