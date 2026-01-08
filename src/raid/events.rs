@@ -163,6 +163,77 @@ impl EventStore {
         Ok(event_record)
     }
 
+    /// Append multiple events in a batch (optimized for performance)
+    ///
+    /// This method is more efficient than calling `append_event` multiple times
+    /// as it opens the file once and writes all events together.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::raid::events::{EventStore, RaidEvent};
+    /// use chrono::Utc;
+    /// use std::path::PathBuf;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let store = EventStore::new(PathBuf::from("./events"));
+    /// store.initialize().await?;
+    ///
+    /// let events = vec![
+    ///     RaidEvent::ArtifactCreated {
+    ///         artifact_id: "artifact-1".to_string(),
+    ///         node_id: 1,
+    ///         timestamp: Utc::now(),
+    ///         metadata: serde_json::json!({}),
+    ///     },
+    ///     RaidEvent::ArtifactCreated {
+    ///         artifact_id: "artifact-2".to_string(),
+    ///         node_id: 1,
+    ///         timestamp: Utc::now(),
+    ///         metadata: serde_json::json!({}),
+    ///     },
+    /// ];
+    ///
+    /// let records = store.append_events_batch(events).await?;
+    /// println!("Appended {} events", records.len());
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn append_events_batch(
+        &self,
+        events: Vec<RaidEvent>,
+    ) -> Result<Vec<EventRecord>, AppError> {
+        if events.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut sequence = self.sequence.write().await;
+        let mut event_records = Vec::with_capacity(events.len());
+
+        // Create event records with sequential sequence numbers
+        for event in events {
+            *sequence += 1;
+            event_records.push(EventRecord {
+                event_id: Uuid::new_v4(),
+                sequence: *sequence,
+                event: event.clone(),
+                timestamp: Utc::now(),
+            });
+        }
+
+        // Append all events to log file in a single write operation (optimized)
+        self.append_batch_to_log(&event_records).await?;
+
+        info!(
+            "Batch appended {} events: sequence range {}-{}",
+            event_records.len(),
+            event_records.first().map(|e| e.sequence).unwrap_or(0),
+            event_records.last().map(|e| e.sequence).unwrap_or(0)
+        );
+
+        Ok(event_records)
+    }
+
     /// Load all events from storage
     pub async fn load_events(&self) -> Result<Vec<EventRecord>, AppError> {
         if !self.event_log_path.exists() {
@@ -294,6 +365,61 @@ impl EventStore {
             .await
             .map_err(|e| AppError::ConfigError(format!(
                 "Failed to sync event log. Context: Cannot sync event log to disk. Suggestion: Check disk I/O status and filesystem health. Path: '{}', Error: {}",
+                self.event_log_path.display(),
+                e
+            )))?;
+
+        Ok(())
+    }
+
+    /// Append multiple events to log file in a single write operation (optimized)
+    async fn append_batch_to_log(&self, events: &[EventRecord]) -> Result<(), AppError> {
+        if events.is_empty() {
+            return Ok(());
+        }
+
+        // Pre-allocate buffer for better performance
+        let mut buffer = String::with_capacity(events.len() * 256); // Estimate 256 bytes per event
+
+        // Serialize all events to buffer
+        for event in events {
+            let json = serde_json::to_string(event)
+                .map_err(|e| AppError::ConfigError(format!(
+                    "Failed to serialize event. Context: Cannot serialize event record to JSON. Suggestion: Verify event data structure and serialization logic. Event sequence: {}, Error: {}",
+                    event.sequence,
+                    e
+                )))?;
+            buffer.push_str(&json);
+            buffer.push('\n');
+        }
+
+        // Write all events in a single I/O operation (optimized)
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&self.event_log_path)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to open event log for batch writing. Context: Cannot open event log file for appending. Suggestion: Check filesystem permissions and available disk space. Path: '{}', Error: {}",
+                    self.event_log_path.display(),
+                    e
+                ))
+            })?;
+
+        file.write_all(buffer.as_bytes())
+            .await
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to write batch events. Context: Cannot write event batch data to log file. Suggestion: Check disk space and I/O status. Batch size: {}, Path: '{}', Error: {}",
+                events.len(),
+                self.event_log_path.display(),
+                e
+            )))?;
+
+        file.sync_all()
+            .await
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to sync event log batch. Context: Cannot sync event log to disk. Suggestion: Check disk I/O status and filesystem health. Path: '{}', Error: {}",
                 self.event_log_path.display(),
                 e
             )))?;

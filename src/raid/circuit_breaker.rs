@@ -164,15 +164,15 @@ impl CircuitBreaker {
         }
     }
 
-    /// Record a successful request
+    /// Record a successful request (optimized: minimize lock operations)
     pub async fn record_success(&self) {
-        let mut state = self.state.write().await;
-        let mut failure_count = self.failure_count.write().await;
-        let mut success_count = self.success_count.write().await;
-
-        match *state {
+        // Optimize: Read state first to minimize lock contention
+        let current_state = *self.state.read().await;
+        
+        match current_state {
             CircuitState::Closed => {
-                // Reset failure count on success
+                // Reset failure count on success (optimized: single write lock)
+                let mut failure_count = self.failure_count.write().await;
                 *failure_count = 0;
                 debug!(
                     "Circuit breaker for node {}: success in Closed state",
@@ -187,19 +187,36 @@ impl CircuitBreaker {
                 );
             }
             CircuitState::HalfOpen => {
-                // Increment success count
+                // Increment success count and check threshold (optimized: minimize lock operations)
+                let mut success_count = self.success_count.write().await;
                 *success_count += 1;
+                let count = *success_count;
+                drop(success_count); // Release lock early
+                
                 debug!(
                     "Circuit breaker for node {}: success in HalfOpen state (count: {})",
-                    self.node_id, *success_count
+                    self.node_id, count
                 );
 
                 // If we've reached the success threshold, close the circuit
-                if *success_count >= self.config.success_threshold {
+                if count >= self.config.success_threshold {
+                    let mut state = self.state.write().await;
                     *state = CircuitState::Closed;
+                    drop(state); // Release state lock
+                    
+                    // Reset counters (optimized: separate locks to minimize contention)
+                    let mut failure_count = self.failure_count.write().await;
                     *failure_count = 0;
+                    drop(failure_count);
+                    
+                    let mut success_count = self.success_count.write().await;
                     *success_count = 0;
-                    *self.opened_at.write().await = None;
+                    drop(success_count);
+                    
+                    let mut opened_at = self.opened_at.write().await;
+                    *opened_at = None;
+                    drop(opened_at);
+                    
                     info!(
                         "Circuit breaker for node {} transitioning to Closed",
                         self.node_id
@@ -209,34 +226,46 @@ impl CircuitBreaker {
         }
     }
 
-    /// Record a failed request
+    /// Record a failed request (optimized: minimize lock operations)
     pub async fn record_failure(&self) {
-        let mut state = self.state.write().await;
-        let mut failure_count = self.failure_count.write().await;
-        let mut success_count = self.success_count.write().await;
-
-        match *state {
+        // Optimize: Read state first to minimize lock contention
+        let current_state = *self.state.read().await;
+        
+        match current_state {
             CircuitState::Closed => {
-                // Increment failure count
+                // Increment failure count (optimized: single write lock)
+                let mut failure_count = self.failure_count.write().await;
                 *failure_count += 1;
+                let count = *failure_count;
+                drop(failure_count); // Release lock early
+                
                 debug!(
                     "Circuit breaker for node {}: failure in Closed state (count: {})",
-                    self.node_id, *failure_count
+                    self.node_id, count
                 );
 
                 // If we've reached the failure threshold, open the circuit
-                if *failure_count >= self.config.failure_threshold {
+                if count >= self.config.failure_threshold {
+                    let mut state = self.state.write().await;
                     *state = CircuitState::Open;
-                    *self.opened_at.write().await = Some(Utc::now());
+                    drop(state);
+                    
+                    let mut opened_at = self.opened_at.write().await;
+                    *opened_at = Some(Utc::now());
+                    drop(opened_at);
+                    
                     info!(
                         "Circuit breaker for node {} transitioning to Open ({} failures)",
-                        self.node_id, *failure_count
+                        self.node_id, count
                     );
                 }
             }
             CircuitState::Open => {
-                // Already open, just update timestamp
-                *self.opened_at.write().await = Some(Utc::now());
+                // Already open, just update timestamp (optimized: single write lock)
+                let mut opened_at = self.opened_at.write().await;
+                *opened_at = Some(Utc::now());
+                drop(opened_at);
+                
                 debug!(
                     "Circuit breaker for node {}: failure in Open state",
                     self.node_id
@@ -244,10 +273,22 @@ impl CircuitBreaker {
             }
             CircuitState::HalfOpen => {
                 // Failure in half-open means node is still failing - open circuit
+                let mut state = self.state.write().await;
                 *state = CircuitState::Open;
+                drop(state);
+                
+                let mut failure_count = self.failure_count.write().await;
                 *failure_count = self.config.failure_threshold;
+                drop(failure_count);
+                
+                let mut success_count = self.success_count.write().await;
                 *success_count = 0;
-                *self.opened_at.write().await = Some(Utc::now());
+                drop(success_count);
+                
+                let mut opened_at = self.opened_at.write().await;
+                *opened_at = Some(Utc::now());
+                drop(opened_at);
+                
                 warn!(
                     "Circuit breaker for node {} transitioning back to Open from HalfOpen",
                     self.node_id
