@@ -99,7 +99,9 @@
   - ✅ **CRD Watching** - HTTP polling-based watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
   - ✅ **Event Handling** - CrdEvent and CrdEventType for processing CRD changes (Added, Modified, Deleted)
   - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
-  - ✅ **Reconciliation Functions** - Placeholder functions for reconcile_worker, reconcile_vm, reconcile_tenant
+  - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
+  - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs
+  - ✅ **Error Handling** - Improved error handling and logging in reconciliation functions
   - ✅ **Graceful Shutdown** - Proper shutdown of watchers and reconciliation loops
   - ✅ **CRD Definitions** - YAML files for PoolAIWorker, PoolAIVM, PoolAITenant with OpenAPI schema validation
   - ✅ **Helm Charts** - Complete Helm chart for PoolAI deployment (Chart.yaml, values.yaml, templates, README.md)
