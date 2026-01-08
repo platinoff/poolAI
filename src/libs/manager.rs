@@ -545,8 +545,10 @@ impl LibraryManager {
         // Check if library directory exists and is not empty
         if !library_dir.exists() {
             return Err(AppError::ConfigError(format!(
-                "Library directory does not exist: {:?}",
-                library_dir
+                "Library directory does not exist. Context: Cannot verify library installation because directory is missing. \
+                Suggestion: Verify library installation completed successfully and directory was created. \
+                Library: '{}', Path: '{}'",
+                name, library_dir.display()
             )));
         }
 
