@@ -121,7 +121,11 @@ impl EventStore {
         // Create storage directory if it doesn't exist
         if let Some(parent) = self.storage_path.parent() {
             tokio::fs::create_dir_all(parent).await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to create event store directory: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to create event store directory. Context: Cannot create directory for event store initialization. Suggestion: Check filesystem permissions and available disk space. Path: '{}', Error: {}",
+                    parent.display(),
+                    e
+                ))
             })?;
         }
 
@@ -167,12 +171,20 @@ impl EventStore {
 
         let mut file = File::open(&self.event_log_path)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to open event log: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to open event log. Context: Cannot open event log file for reading. Suggestion: Verify file exists and has read permissions. Path: '{}', Error: {}",
+                self.event_log_path.display(),
+                e
+            )))?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to read event log: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to read event log. Context: Cannot read event log file contents. Suggestion: Check file permissions and disk I/O status. Path: '{}', Error: {}",
+                self.event_log_path.display(),
+                e
+            )))?;
 
         // Parse events (one per line, JSON)
         let mut events = Vec::new();
@@ -182,7 +194,11 @@ impl EventStore {
             }
 
             let event: EventRecord = serde_json::from_str(line)
-                .map_err(|e| AppError::ConfigError(format!("Failed to parse event: {}", e)))?;
+                .map_err(|e| AppError::ConfigError(format!(
+                    "Failed to parse event. Context: Cannot deserialize event record from JSON. Suggestion: Verify event log file integrity and JSON format. Line number: ~{}, Error: {}",
+                    events.len() + 1,
+                    e
+                )))?;
             events.push(event);
         }
 
@@ -238,7 +254,11 @@ impl EventStore {
     /// Append event to log file
     async fn append_to_log(&self, event: &EventRecord) -> Result<(), AppError> {
         let json = serde_json::to_string(event)
-            .map_err(|e| AppError::ConfigError(format!("Failed to serialize event: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to serialize event. Context: Cannot serialize event record to JSON. Suggestion: Verify event data structure and serialization logic. Event sequence: {}, Error: {}",
+                event.sequence,
+                e
+            )))?;
 
         let mut file = OpenOptions::new()
             .create(true)
@@ -246,20 +266,37 @@ impl EventStore {
             .open(&self.event_log_path)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to open event log for writing: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to open event log for writing. Context: Cannot open event log file for appending. Suggestion: Check filesystem permissions and available disk space. Path: '{}', Error: {}",
+                    self.event_log_path.display(),
+                    e
+                ))
             })?;
 
         file.write_all(json.as_bytes())
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to write event: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to write event. Context: Cannot write event data to log file. Suggestion: Check disk space and I/O status. Event sequence: {}, Path: '{}', Error: {}",
+                event.sequence,
+                self.event_log_path.display(),
+                e
+            )))?;
 
         file.write_all(b"\n")
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to write newline: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to write newline. Context: Cannot write newline separator to event log. Suggestion: Check disk space and I/O status. Path: '{}', Error: {}",
+                self.event_log_path.display(),
+                e
+            )))?;
 
         file.sync_all()
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to sync event log: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to sync event log. Context: Cannot sync event log to disk. Suggestion: Check disk I/O status and filesystem health. Path: '{}', Error: {}",
+                self.event_log_path.display(),
+                e
+            )))?;
 
         Ok(())
     }
@@ -317,10 +354,18 @@ impl EventStore {
         let timestamp = Utc::now();
 
         let artifacts_json = serde_json::to_value(artifacts)
-            .map_err(|e| AppError::ConfigError(format!("Failed to serialize artifacts: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to serialize artifacts. Context: Cannot serialize artifact manifest to JSON for snapshot. Suggestion: Verify artifact manifest structure and serialization logic. Snapshot sequence: {}, Error: {}",
+                sequence,
+                e
+            )))?;
 
         let nodes_json = serde_json::to_value(nodes)
-            .map_err(|e| AppError::ConfigError(format!("Failed to serialize nodes: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to serialize nodes. Context: Cannot serialize node list to JSON for snapshot. Suggestion: Verify node list structure and serialization logic. Snapshot sequence: {}, Error: {}",
+                sequence,
+                e
+            )))?;
 
         let snapshot = Snapshot {
             sequence,
@@ -331,7 +376,11 @@ impl EventStore {
 
         // Save snapshot to file
         let snapshot_json = serde_json::to_string_pretty(&snapshot)
-            .map_err(|e| AppError::ConfigError(format!("Failed to serialize snapshot: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to serialize snapshot. Context: Cannot serialize snapshot data to JSON. Suggestion: Verify snapshot structure and serialization logic. Snapshot sequence: {}, Error: {}",
+                sequence,
+                e
+            )))?;
 
         let mut file = OpenOptions::new()
             .create(true)
@@ -339,15 +388,28 @@ impl EventStore {
             .truncate(true)
             .open(&self.snapshot_path)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to open snapshot file: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to open snapshot file. Context: Cannot open snapshot file for writing. Suggestion: Check filesystem permissions and available disk space. Path: '{}', Error: {}",
+                self.snapshot_path.display(),
+                e
+            )))?;
 
         file.write_all(snapshot_json.as_bytes())
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to write snapshot: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to write snapshot. Context: Cannot write snapshot data to file. Suggestion: Check disk space and I/O status. Snapshot sequence: {}, Path: '{}', Error: {}",
+                sequence,
+                self.snapshot_path.display(),
+                e
+            )))?;
 
         file.sync_all()
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to sync snapshot: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to sync snapshot. Context: Cannot sync snapshot file to disk. Suggestion: Check disk I/O status and filesystem health. Path: '{}', Error: {}",
+                self.snapshot_path.display(),
+                e
+            )))?;
 
         info!(
             "Snapshot created: sequence={}, timestamp={}",
@@ -364,15 +426,27 @@ impl EventStore {
 
         let mut file = File::open(&self.snapshot_path)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to open snapshot file: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to open snapshot file. Context: Cannot open snapshot file for reading. Suggestion: Verify file exists and has read permissions. Path: '{}', Error: {}",
+                self.snapshot_path.display(),
+                e
+            )))?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to read snapshot: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to read snapshot. Context: Cannot read snapshot file contents. Suggestion: Check file permissions and disk I/O status. Path: '{}', Error: {}",
+                self.snapshot_path.display(),
+                e
+            )))?;
 
         let snapshot: Snapshot = serde_json::from_str(&contents)
-            .map_err(|e| AppError::ConfigError(format!("Failed to parse snapshot: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to parse snapshot. Context: Cannot deserialize snapshot from JSON. Suggestion: Verify snapshot file integrity and JSON format. Path: '{}', Error: {}",
+                self.snapshot_path.display(),
+                e
+            )))?;
 
         Ok(Some(snapshot))
     }

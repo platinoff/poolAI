@@ -792,7 +792,10 @@ impl RaidRaftNode {
             .election_timeout_max(self.config.election_timeout * 2)
             .heartbeat_interval(self.config.heartbeat_interval)
             .validate()
-            .map_err(|e| AppError::ConfigError(format!("Failed to build Raft config: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to build Raft configuration. Context: Cannot create Raft configuration from settings. Suggestion: Verify Raft configuration parameters (election timeout, heartbeat interval, cluster members). Error: {}",
+                e
+            )))?;
 
         // Initialize Raft instance
         // Note: Raft::new takes Arc<Config>, Arc<Network>, Arc<Storage>
@@ -932,7 +935,10 @@ impl RaidRaftNode {
             let response = raft
                 .client_write(request)
                 .await
-                .map_err(|e| AppError::ConfigError(format!("Raft client_write failed: {}", e)))?;
+                .map_err(|e| AppError::ConfigError(format!(
+                    "Raft client write failed. Context: Cannot write data to Raft cluster. Suggestion: Verify cluster is healthy, node is leader or can reach leader, and data is valid. Error: {}",
+                    e
+                )))?;
             Ok(response.data)
         } else {
             // Fallback to direct state machine application if Raft not initialized
@@ -1076,7 +1082,10 @@ impl RaidRaftNode {
         self.storage
             .load_log_entries()
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to load log entries: {}", e)))
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to load Raft log entries. Context: Cannot load log entries from Raft storage. Suggestion: Verify Raft storage is accessible and log file integrity. Error: {}",
+                e
+            )))
     }
 }
 
