@@ -13,6 +13,25 @@ This guide covers deploying PoolAI using Docker containers. Docker provides a co
 
 ## Quick Start
 
+### Testing Deployment Files
+
+Before building, you can test the deployment files:
+
+**On Linux/macOS:**
+```bash
+./scripts/test_deployment.sh
+```
+
+**On Windows (PowerShell):**
+```powershell
+.\scripts\test_deployment.ps1
+```
+
+**Using Rust tests:**
+```bash
+cargo test --test deployment_integration
+```
+
 ### Single Container Deployment
 
 ```bash
