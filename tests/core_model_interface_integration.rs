@@ -3,10 +3,10 @@
 //! Tests model interface traits, model manager, and model lifecycle operations.
 
 use poolai::core::model_interface::{
-    ModelConfig, ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
+    ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
     ModelRequest, ModelResponse, ModelState, ModelStatus,
 };
-use poolai::core::config::PoolAIConfig;
+use poolai::core::config::ModelConfig;
 use poolai::core::error::AppError;
 use std::collections::HashMap;
 
@@ -129,8 +129,17 @@ impl ModelInterface for MockModel {
 
 #[tokio::test]
 async fn test_model_manager_creation() {
-    let config = PoolAIConfig::default();
-    let manager = ModelManager::new(config.model);
+    let config = ModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let manager = ModelManager::new(config);
     // Manager should be created successfully
     assert_eq!(manager.get_all_models().len(), 0);
 }
@@ -215,8 +224,17 @@ async fn test_process_request() {
 
 #[tokio::test]
 async fn test_process_request_nonexistent_model() {
-    let config = PoolAIConfig::default();
-    let manager = ModelManager::new(config.model);
+    let config = ModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let manager = ModelManager::new(config);
 
     let request = ModelRequest {
         input: "Hello, world!".to_string(),
