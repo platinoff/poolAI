@@ -280,6 +280,7 @@ async fn vm_instance_create_handler(
 
     let manager = vm::get_global_manager();
     let isolation = payload.isolation.unwrap_or(vm::VmIsolation::ProcessSandbox);
+    let instance_name = payload.name.clone();
 
     match manager
         .create_instance(payload.name, payload.resources, isolation)
@@ -289,7 +290,7 @@ async fn vm_instance_create_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to create VM instance. Context: Cannot create new VM instance with specified configuration. Suggestion: Verify resource limits, isolation settings, and system capacity. Instance name: '{}', Error: {}", payload.name, e)
+                "error": format!("Failed to create VM instance. Context: Cannot create new VM instance with specified configuration. Suggestion: Verify resource limits, isolation settings, and system capacity. Instance name: '{}', Error: {}", instance_name, e)
             })),
         )
             .into_response(),
@@ -642,6 +643,7 @@ async fn raid_artifact_create_handler(
 
     // Create artifact
     let manager = raid::get_global_manager();
+    let data_size = data.len();
     match manager.put_artifact(&payload.name, &data).await {
         Ok(artifact) => {
             let response = CreateArtifactResponse {
@@ -655,7 +657,7 @@ async fn raid_artifact_create_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to create artifact. Context: Cannot store artifact in RAID storage. Suggestion: Check storage quota, verify RAID manager is initialized, and ensure sufficient disk space. Artifact name: '{}', Data size: {} bytes, Error: {}", payload.name, data.len(), e)
+                "error": format!("Failed to create artifact. Context: Cannot store artifact in RAID storage. Suggestion: Check storage quota, verify RAID manager is initialized, and ensure sufficient disk space. Artifact name: '{}', Data size: {} bytes, Error: {}", artifact_name, data_size, e)
             })),
         )
             .into_response(),
