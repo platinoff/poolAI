@@ -72,8 +72,9 @@
 - ✅ VM deployment implementation (create_vm_deployment with real API calls)
 - ✅ Service endpoints implementation (get_service_endpoints with real API calls)
 - ✅ Cluster availability check (is_cluster_available with real API calls)
+- ✅ Operator watchers and reconciliation structure (basic structure with placeholders)
 - ⚠️ AWS SDK dependencies commented out (requires Rust 1.88+, current: 1.70+)
-- 🔄 Kubernetes Operator implementation (watchers, reconciliation loops - planned)
+- 🔄 Kubernetes Operator full implementation (CRD watching, event handling - planned)
 
 ---
 
