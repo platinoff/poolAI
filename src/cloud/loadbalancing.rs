@@ -43,14 +43,16 @@
 //! ```
 
 use crate::core::error::AppError;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
 
 /// Load balancer for distributing traffic
 pub struct LoadBalancer {
     initialized: Arc<RwLock<bool>>,
-    // TODO: Add load balancing configuration
+    backends: Arc<RwLock<HashMap<String, Backend>>>,
+    // TODO: Add load balancing configuration (strategy, health check intervals, etc.)
 }
 
 impl LoadBalancer {
@@ -58,6 +60,7 @@ impl LoadBalancer {
     pub fn new() -> Self {
         Self {
             initialized: Arc::new(RwLock::new(false)),
+            backends: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -87,27 +90,126 @@ impl LoadBalancer {
     }
 
     /// Add backend to load balancer
+    ///
+    /// # Arguments
+    ///
+    /// * `backend` - Backend configuration to add
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - Backend ID is empty
+    /// - Backend address is empty
+    /// - Backend port is 0
+    /// - Backend with same ID already exists
     pub async fn add_backend(&self, backend: Backend) -> Result<(), AppError> {
-        // TODO: Add backend to load balancer
-        info!("Adding backend: {} (placeholder)", backend.address);
+        if backend.id.is_empty() {
+            return Err(AppError::ValidationError(
+                "Backend ID cannot be empty. Current value: ''. Suggestion: Provide a unique identifier for the backend."
+                    .to_string(),
+            ));
+        }
+
+        if backend.address.is_empty() {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Backend address cannot be empty for backend '{}'. Current value: ''. Suggestion: Provide a valid IP address or hostname.",
+                    backend.id
+                ),
+            ));
+        }
+
+        if backend.port == 0 {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Backend port must be greater than 0 for backend '{}'. Current value: {}. Suggestion: Set port to a valid port number (1-65535).",
+                    backend.id, backend.port
+                ),
+            ));
+        }
+
+        let mut backends = self.backends.write().await;
+        if backends.contains_key(&backend.id) {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Backend with ID '{}' already exists. Current value: '{}'. Suggestion: Use a different backend ID or remove the existing backend first.",
+                    backend.id, backend.id
+                ),
+            ));
+        }
+
+        backends.insert(backend.id.clone(), backend.clone());
+        info!("Added backend: {} at {}:{}", backend.id, backend.address, backend.port);
         Ok(())
     }
 
     /// Remove backend from load balancer
+    ///
+    /// # Arguments
+    ///
+    /// * `backend_id` - ID of the backend to remove
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `backend_id` is empty
+    /// - Backend with given ID does not exist
     pub async fn remove_backend(&self, backend_id: &str) -> Result<(), AppError> {
-        // TODO: Remove backend from load balancer
-        info!("Removing backend: {} (placeholder)", backend_id);
+        if backend_id.is_empty() {
+            return Err(AppError::ValidationError(
+                "Backend ID cannot be empty. Current value: ''. Suggestion: Provide a valid backend identifier."
+                    .to_string(),
+            ));
+        }
+
+        let mut backends = self.backends.write().await;
+        if !backends.contains_key(backend_id) {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Backend with ID '{}' does not exist. Current value: '{}'. Suggestion: Check the backend ID or list backends to see available IDs.",
+                    backend_id, backend_id
+                ),
+            ));
+        }
+
+        backends.remove(backend_id);
+        info!("Removed backend: {}", backend_id);
         Ok(())
     }
 
     /// Get load balancer health status
+    ///
+    /// Returns the current health status of all registered backends.
+    /// This is a placeholder implementation that assumes all backends are healthy.
+    ///
+    /// # Future Implementation
+    ///
+    /// This will be enhanced to:
+    /// - Perform actual health checks (HTTP/HTTPS/TCP)
+    /// - Track health check history
+    /// - Mark backends as unhealthy after consecutive failures
     pub async fn get_health_status(&self) -> Result<LoadBalancerHealth, AppError> {
-        // TODO: Query health status
+        let backends = self.backends.read().await;
+        let total = backends.len() as u32;
+        
+        // TODO: Perform actual health checks
+        // For now, assume all backends are healthy
+        let healthy = total;
+        let unhealthy = 0;
+
         Ok(LoadBalancerHealth {
-            healthy_backends: 0,
-            unhealthy_backends: 0,
-            total_backends: 0,
+            healthy_backends: healthy,
+            unhealthy_backends: unhealthy,
+            total_backends: total,
         })
+    }
+
+    /// List all registered backends
+    ///
+    /// Returns a vector of all backend IDs and their configurations.
+    pub async fn list_backends(&self) -> Vec<Backend> {
+        let backends = self.backends.read().await;
+        backends.values().cloned().collect()
     }
 }
 

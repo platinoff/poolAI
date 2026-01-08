@@ -78,25 +78,107 @@ impl AutoScaler {
     }
 
     /// Scale up resources based on metrics
+    ///
+    /// # Arguments
+    ///
+    /// * `resource_id` - Identifier for the resource to scale
+    /// * `target_replicas` - Target number of replicas (must be > current replicas)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `resource_id` is empty
+    /// - `target_replicas` is 0
+    /// - `target_replicas` is less than or equal to current replicas
     pub async fn scale_up(&self, resource_id: &str, target_replicas: u32) -> Result<(), AppError> {
-        // TODO: Implement scale up logic
+        if resource_id.is_empty() {
+            return Err(AppError::ValidationError(
+                "Resource ID cannot be empty. Current value: ''. Suggestion: Provide a valid resource identifier."
+                    .to_string(),
+            ));
+        }
+
+        if target_replicas == 0 {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Target replicas must be greater than 0 for scale up. Current value: {}. Suggestion: Set target_replicas to at least 1.",
+                    target_replicas
+                ),
+            ));
+        }
+
+        // Get current metrics to validate scale up
+        let metrics = self.get_metrics(resource_id).await?;
+        if target_replicas <= metrics.current_replicas {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Target replicas ({}) must be greater than current replicas ({}) for scale up. Current value: {}. Suggestion: Set target_replicas to a value greater than {}.",
+                    target_replicas, metrics.current_replicas, target_replicas, metrics.current_replicas
+                ),
+            ));
+        }
+
+        // TODO: Implement actual scale up logic
+        // - Call Kubernetes HPA or cloud provider API
+        // - Update deployment/service replicas
         info!(
-            "Scaling up resource: {} to {} replicas (placeholder)",
-            resource_id, target_replicas
+            "Scaling up resource: {} from {} to {} replicas (placeholder)",
+            resource_id, metrics.current_replicas, target_replicas
         );
         Ok(())
     }
 
     /// Scale down resources based on metrics
+    ///
+    /// # Arguments
+    ///
+    /// * `resource_id` - Identifier for the resource to scale
+    /// * `target_replicas` - Target number of replicas (must be < current replicas and >= 1)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `resource_id` is empty
+    /// - `target_replicas` is 0
+    /// - `target_replicas` is greater than or equal to current replicas
     pub async fn scale_down(
         &self,
         resource_id: &str,
         target_replicas: u32,
     ) -> Result<(), AppError> {
-        // TODO: Implement scale down logic
+        if resource_id.is_empty() {
+            return Err(AppError::ValidationError(
+                "Resource ID cannot be empty. Current value: ''. Suggestion: Provide a valid resource identifier."
+                    .to_string(),
+            ));
+        }
+
+        if target_replicas == 0 {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Target replicas must be at least 1 for scale down. Current value: {}. Suggestion: Set target_replicas to at least 1.",
+                    target_replicas
+                ),
+            ));
+        }
+
+        // Get current metrics to validate scale down
+        let metrics = self.get_metrics(resource_id).await?;
+        if target_replicas >= metrics.current_replicas {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Target replicas ({}) must be less than current replicas ({}) for scale down. Current value: {}. Suggestion: Set target_replicas to a value less than {}.",
+                    target_replicas, metrics.current_replicas, target_replicas, metrics.current_replicas
+                ),
+            ));
+        }
+
+        // TODO: Implement actual scale down logic
+        // - Call Kubernetes HPA or cloud provider API
+        // - Update deployment/service replicas
         info!(
-            "Scaling down resource: {} to {} replicas (placeholder)",
-            resource_id, target_replicas
+            "Scaling down resource: {} from {} to {} replicas (placeholder)",
+            resource_id, metrics.current_replicas, target_replicas
         );
         Ok(())
     }
