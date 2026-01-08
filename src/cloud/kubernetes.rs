@@ -410,38 +410,104 @@ impl KubernetesManager {
             request = request.json(&body);
         }
         
-        // Send request
-        let response = request.send().await.map_err(|e| AppError::NetworkError(format!(
-            "Kubernetes API request failed. Context: HTTP request to Kubernetes API failed. \
-            Suggestion: Check cluster connectivity, authentication token, and API server URL. \
-            Method: {}, Path: {}, Error: {}",
-            method, path, e
-        )))?;
+        // Send request with retry logic for transient errors
+        const MAX_RETRIES: u32 = 3;
+        const INITIAL_RETRY_DELAY_MS: u64 = 100;
         
-        let status = response.status();
-        
-        // Read response body
-        let response_text = response.text().await.map_err(|e| AppError::NetworkError(format!(
-            "Failed to read Kubernetes API response. Context: Cannot read response body. \
-            Method: {}, Path: {}, Status: {}, Error: {}",
-            method, path, status, e
-        )))?;
-        
-        // Check for errors
-        if !status.is_success() {
-            return Err(AppError::NetworkError(format!(
-                "Kubernetes API error. Context: API request returned error status. \
-                Suggestion: Check resource name, namespace permissions, and resource existence. \
-                Method: {}, Path: {}, Status: {}, Response: {}",
-                method, path, status, response_text
-            )));
+        let mut last_error = None;
+        for attempt in 0..=MAX_RETRIES {
+            // Clone request for retry
+            let mut retry_request = match method {
+                "GET" => client.get(&url),
+                "POST" => client.post(&url),
+                "PUT" => client.put(&url),
+                "PATCH" => client.patch(&url),
+                "DELETE" => client.delete(&url),
+                _ => return Err(AppError::NetworkError(format!(
+                    "Unsupported HTTP method: {}", method
+                ))),
+            };
+            
+            retry_request = retry_request.bearer_auth(&token);
+            if matches!(method, "POST" | "PUT" | "PATCH") {
+                retry_request = retry_request.header("Content-Type", "application/json");
+            }
+            if let Some(ref body) = body {
+                retry_request = retry_request.json(body);
+            }
+            
+            match retry_request.send().await {
+                Ok(response) => {
+                    let status = response.status();
+                    
+                    // Read response body
+                    let response_text = match response.text().await {
+                        Ok(text) => text,
+                        Err(e) => {
+                            last_error = Some(format!(
+                                "Failed to read response body. Status: {}, Error: {}",
+                                status, e
+                            ));
+                            if attempt < MAX_RETRIES && status.is_server_error() {
+                                // Retry on server errors
+                                let delay_ms = INITIAL_RETRY_DELAY_MS * (1 << attempt);
+                                tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                                continue;
+                            }
+                            return Err(AppError::NetworkError(format!(
+                                "Failed to read Kubernetes API response. Context: Cannot read response body. \
+                                Method: {}, Path: {}, Status: {}, Error: {}",
+                                method, path, status, e
+                            )));
+                        }
+                    };
+                    
+                    // Check for errors
+                    if !status.is_success() {
+                        // Retry on 5xx errors (server errors) and 429 (rate limit)
+                        if attempt < MAX_RETRIES && (status.is_server_error() || status == 429) {
+                            let delay_ms = INITIAL_RETRY_DELAY_MS * (1 << attempt);
+                            warn!("Kubernetes API error (attempt {}/{}): Status {}, retrying in {}ms...", 
+                                attempt + 1, MAX_RETRIES + 1, status, delay_ms);
+                            tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                            continue;
+                        }
+                        
+                        return Err(AppError::NetworkError(format!(
+                            "Kubernetes API error. Context: API request returned error status. \
+                            Suggestion: Check resource name, namespace permissions, and resource existence. \
+                            Method: {}, Path: {}, Status: {}, Response: {}",
+                            method, path, status, response_text
+                        )));
+                    }
+                    
+                    // Parse JSON response
+                    return serde_json::from_str(&response_text).map_err(|e| AppError::NetworkError(format!(
+                        "Failed to parse Kubernetes API response. Context: Response is not valid JSON. \
+                        Method: {}, Path: {}, Error: {}, Response: {}",
+                        method, path, e, response_text
+                    )));
+                }
+                Err(e) => {
+                    last_error = Some(e.to_string());
+                    // Retry on network errors
+                    if attempt < MAX_RETRIES {
+                        let delay_ms = INITIAL_RETRY_DELAY_MS * (1 << attempt);
+                        warn!("Kubernetes API request failed (attempt {}/{}): {}, retrying in {}ms...", 
+                            attempt + 1, MAX_RETRIES + 1, e, delay_ms);
+                        tokio::time::sleep(tokio::time::Duration::from_millis(delay_ms)).await;
+                        continue;
+                    }
+                }
+            }
         }
         
-        // Parse JSON response
-        serde_json::from_str(&response_text).map_err(|e| AppError::NetworkError(format!(
-            "Failed to parse Kubernetes API response. Context: Response is not valid JSON. \
-            Method: {}, Path: {}, Error: {}, Response: {}",
-            method, path, e, response_text
+        // All retries exhausted
+        Err(AppError::NetworkError(format!(
+            "Kubernetes API request failed after {} retries. Context: HTTP request to Kubernetes API failed. \
+            Suggestion: Check cluster connectivity, authentication token, and API server URL. \
+            Method: {}, Path: {}, Last error: {}",
+            MAX_RETRIES + 1, method, path, last_error.unwrap_or_else(|| "Unknown error".to_string())
         )))
     }
 
