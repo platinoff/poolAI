@@ -21,6 +21,8 @@ use axum::{
 };
 #[cfg(feature = "enterprise")]
 use serde::Deserialize;
+#[cfg(feature = "enterprise")]
+use uuid::Uuid;
 
 #[cfg(feature = "enterprise")]
 pub fn create_enterprise_api_routes() -> Router {
