@@ -553,5 +553,10 @@ fn base64_decode(data: &str) -> Result<Vec<u8>, AppError> {
     use base64::{engine::general_purpose, Engine as _};
     general_purpose::STANDARD
         .decode(data)
-        .map_err(|e| AppError::ValidationError(format!("Base64 decode error: {}", e)))
+        .map_err(|e| AppError::ValidationError(format!(
+            "Base64 decode error: {}. Context: Failed to decode base64-encoded artifact data. \
+            Suggestion: Verify the data is valid base64 encoding. Ensure no whitespace or invalid characters are present. \
+            Error details: {}, Data length: {}",
+            e, e, data.len()
+        )))
 }

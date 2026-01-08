@@ -136,8 +136,11 @@ pub fn validate_base64_data(data: &str, max_size_bytes: usize) -> Result<(), App
     let estimated_size = (data.len() * 3) / 4;
     if estimated_size > max_size_bytes {
         return Err(AppError::ConfigError(format!(
-            "Artifact data size ({}) exceeds maximum allowed size ({})",
-            estimated_size, max_size_bytes
+            "Artifact data size ({}) exceeds maximum allowed size ({}). \
+            Context: Base64-encoded artifact data exceeds size limit. \
+            Suggestion: Reduce artifact size or increase max_size_bytes limit. \
+            Estimated size: {} bytes, Max allowed: {} bytes",
+            estimated_size, max_size_bytes, estimated_size, max_size_bytes
         )));
     }
 
@@ -149,7 +152,12 @@ pub fn validate_uuid(uuid_str: &str) -> Result<(), AppError> {
     use uuid::Uuid;
     Uuid::parse_str(uuid_str)
         .map(|_| ())
-        .map_err(|e| AppError::ConfigError(format!("Invalid UUID format: {}", e)))
+        .map_err(|e| AppError::ConfigError(format!(
+            "Invalid UUID format: {}. Context: Failed to parse UUID string. \
+            Suggestion: Ensure UUID is in standard format (e.g., 550e8400-e29b-41d4-a716-446655440000). \
+            Provided value: '{}', Error: {}",
+            e, uuid_str, e
+        )))
 }
 
 /// Validate worker configuration values
