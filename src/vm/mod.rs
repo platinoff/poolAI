@@ -599,7 +599,12 @@ impl VmManager {
         let name = {
             let mut instances = self.instances.write().await;
             let inst = instances.get_mut(&id).ok_or_else(|| {
-                AppError::ValidationError(format!("VM instance {} not found", id))
+                AppError::ValidationError(format!(
+                    "VM instance {} not found. Context: Cannot start a VM instance that doesn't exist. \
+                    Suggestion: Verify instance ID using list_instances() or create_instance() first. \
+                    Instance ID: {}",
+                    id, id
+                ))
             })?;
 
             inst.status = VmStatus::Running;
@@ -668,13 +673,20 @@ impl VmManager {
                     let insts = instances.read().await;
                     match insts.get(&id) {
                         Some(inst) if matches!(inst.status, VmStatus::Running) => Ok(()),
-                        Some(_) => Err(AppError::ValidationError(format!(
-                            "VM instance {} is not running",
-                            id
-                        ))),
+                        Some(inst) => {
+                            let status = inst.status.clone();
+                            Err(AppError::ValidationError(format!(
+                                "VM instance {} is not running. Context: Health checks can only be performed on running VM instances. \
+                                Suggestion: Start the VM instance first using start_instance() before checking its health. \
+                                Instance ID: {}, Current status: {:?}",
+                                id, id, status
+                            )))
+                        },
                         None => Err(AppError::ValidationError(format!(
-                            "VM instance {} not found",
-                            id
+                            "VM instance {} not found. Context: The VM instance was removed or does not exist during health check. \
+                            Suggestion: Verify the instance ID is correct and ensure the instance exists using list_instances(). \
+                            Instance ID: {}",
+                            id, id
                         ))),
                     }
                 })
@@ -693,7 +705,12 @@ impl VmManager {
     ) -> Result<(), AppError> {
         let instances = self.instances.read().await;
         let instance = instances.get(&instance_id).ok_or_else(|| {
-            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+            AppError::ValidationError(format!(
+                "VM instance {} not found. Context: Cannot apply resource limits to a non-existent VM instance. \
+                Suggestion: Verify instance ID is correct and ensure instance exists using list_instances(). \
+                Instance ID: {}",
+                instance_id, instance_id
+            ))
         })?;
 
         let limits = ResourceLimits::from(instance.resources.clone());
@@ -710,13 +727,13 @@ impl VmManager {
         instance_id: Uuid,
     ) -> Result<ResourceUsage, AppError> {
         let instances = self.instances.read().await;
-        let _instance = instances.get(&instance_id).ok_or_else(|| {
-            AppError::ValidationError(format!("VM instance {} not found", instance_id))
-        })?;
-
-        // Try to get process_id from instance
         let instance = instances.get(&instance_id).ok_or_else(|| {
-            AppError::ValidationError(format!("VM instance {} not found", instance_id))
+            AppError::ValidationError(format!(
+                "VM instance {} not found. Context: Cannot get resource usage for a non-existent VM instance. \
+                Suggestion: Verify instance ID is correct and ensure instance exists using list_instances(). \
+                Instance ID: {}",
+                instance_id, instance_id
+            ))
         })?;
         
         // If process_id is available, try to get current resource usage
