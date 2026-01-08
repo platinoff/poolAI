@@ -246,6 +246,98 @@ impl KubernetesManager {
             )
         })
     }
+    
+    #[cfg(feature = "cloud-sdk")]
+    /// Make HTTP request to Kubernetes API (internal helper)
+    ///
+    /// # Arguments
+    ///
+    /// * `method` - HTTP method (GET, POST, DELETE, etc.)
+    /// * `path` - API path (e.g., "/apis/apps/v1/namespaces/{namespace}/deployments")
+    /// * `body` - Optional request body (JSON)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if request fails.
+    async fn k8s_api_request(
+        &self,
+        method: &str,
+        path: &str,
+        body: Option<serde_json::Value>,
+    ) -> Result<serde_json::Value, AppError> {
+        let base_url = self.get_api_base_url().await?;
+        let token = self.get_api_token().await?;
+        
+        let client = reqwest::Client::builder()
+            .danger_accept_invalid_certs(true) // For self-signed certs in development
+            .build()
+            .map_err(|e| AppError::NetworkError(format!(
+                "Failed to create HTTP client. Context: Cannot initialize reqwest client for Kubernetes API. \
+                Error: {}",
+                e
+            )))?;
+        
+        let url = format!("{}{}", base_url, path);
+        let mut request = match method {
+            "GET" => client.get(&url),
+            "POST" => client.post(&url),
+            "PUT" => client.put(&url),
+            "PATCH" => client.patch(&url),
+            "DELETE" => client.delete(&url),
+            _ => return Err(AppError::NetworkError(format!(
+                "Unsupported HTTP method: {}. Context: Invalid HTTP method for Kubernetes API request. \
+                Suggestion: Use GET, POST, PUT, PATCH, or DELETE.",
+                method
+            ))),
+        };
+        
+        // Add authentication header
+        request = request.bearer_auth(&token);
+        
+        // Add Content-Type header for POST/PUT/PATCH
+        if matches!(method, "POST" | "PUT" | "PATCH") {
+            request = request.header("Content-Type", "application/json");
+        }
+        
+        // Add request body if provided
+        if let Some(body) = body {
+            request = request.json(&body);
+        }
+        
+        // Send request
+        let response = request.send().await.map_err(|e| AppError::NetworkError(format!(
+            "Kubernetes API request failed. Context: HTTP request to Kubernetes API failed. \
+            Suggestion: Check cluster connectivity, authentication token, and API server URL. \
+            Method: {}, Path: {}, Error: {}",
+            method, path, e
+        )))?;
+        
+        let status = response.status();
+        
+        // Read response body
+        let response_text = response.text().await.map_err(|e| AppError::NetworkError(format!(
+            "Failed to read Kubernetes API response. Context: Cannot read response body. \
+            Method: {}, Path: {}, Status: {}, Error: {}",
+            method, path, status, e
+        )))?;
+        
+        // Check for errors
+        if !status.is_success() {
+            return Err(AppError::NetworkError(format!(
+                "Kubernetes API error. Context: API request returned error status. \
+                Suggestion: Check resource name, namespace permissions, and resource existence. \
+                Method: {}, Path: {}, Status: {}, Response: {}",
+                method, path, status, response_text
+            )));
+        }
+        
+        // Parse JSON response
+        serde_json::from_str(&response_text).map_err(|e| AppError::NetworkError(format!(
+            "Failed to parse Kubernetes API response. Context: Response is not valid JSON. \
+            Method: {}, Path: {}, Error: {}, Response: {}",
+            method, path, e, response_text
+        )))
+    }
 
     /// Create a PoolAI worker deployment
     ///
@@ -314,14 +406,21 @@ impl KubernetesManager {
                 &config.env,
             )?;
             
-            // TODO: Use reqwest to create deployment via Kubernetes API
-            // For now, this is a placeholder - full implementation would:
-            // 1. Serialize deployment to JSON
-            // 2. POST to /apis/apps/v1/namespaces/{namespace}/deployments
-            // 3. Handle authentication and response
+            // Create deployment via Kubernetes API
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments", self.namespace);
+            let response = self.k8s_api_request("POST", &path, Some(deployment)).await?;
             
-            info!("Creating worker deployment: {} (k8s-openapi types ready, API call TODO)", name);
-            Ok(format!("worker-{}", name))
+            // Extract deployment name from response
+            let deployment_name = response
+                .get("metadata")
+                .and_then(|m| m.get("name"))
+                .and_then(|n| n.as_str())
+                .ok_or_else(|| AppError::NetworkError(
+                    "Deployment created but name is missing in response".to_string()
+                ))?;
+            
+            info!("Created worker deployment: {} in namespace {}", deployment_name, self.namespace);
+            Ok(deployment_name.to_string())
         }
         
         #[cfg(not(feature = "cloud-sdk"))]
@@ -371,10 +470,11 @@ impl KubernetesManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            // TODO: Use reqwest to delete deployment via Kubernetes API
-            // DELETE /apis/apps/v1/namespaces/{namespace}/deployments/{name}
+            // Delete deployment via Kubernetes API
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, name);
+            let _response = self.k8s_api_request("DELETE", &path, None).await?;
             
-            info!("Deleting worker deployment: {} (k8s-openapi types ready, API call TODO)", name);
+            info!("Deleted worker deployment: {} from namespace {}", name, self.namespace);
             Ok(())
         }
         
@@ -532,21 +632,68 @@ impl KubernetesManager {
         
         #[cfg(feature = "cloud-sdk")]
         {
-            // TODO: Implement actual Kubernetes API query
-            // Example with k8s-openapi types:
-            // let pod: corev1::Pod = ... // Query from API
-            // return Ok(PodStatus {
-            //     name: pod.metadata.name.unwrap_or_default(),
-            //     phase: pod.status.phase.unwrap_or_default(),
-            //     ready: pod.status.conditions.iter()
-            //         .any(|c| c.type_ == "Ready" && c.status == "True"),
-            //     restart_count: pod.status.container_statuses.iter()
-            //         .map(|cs| cs.restart_count)
-            //         .sum(),
-            // });
+            // Query pod status via Kubernetes API
+            let path = format!("/api/v1/namespaces/{}/pods/{}", self.namespace, pod_name);
+            let pod_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract pod status information
+            let name = pod_json
+                .get("metadata")
+                .and_then(|m| m.get("name"))
+                .and_then(|n| n.as_str())
+                .unwrap_or(pod_name)
+                .to_string();
+            
+            let phase = pod_json
+                .get("status")
+                .and_then(|s| s.get("phase"))
+                .and_then(|p| p.as_str())
+                .unwrap_or("Unknown")
+                .to_string();
+            
+            // Check if pod is ready
+            let ready = pod_json
+                .get("status")
+                .and_then(|s| s.get("conditions"))
+                .and_then(|c| c.as_array())
+                .map(|conditions| {
+                    conditions.iter().any(|cond| {
+                        cond.get("type")
+                            .and_then(|t| t.as_str())
+                            .map(|t| t == "Ready")
+                            .unwrap_or(false)
+                        && cond.get("status")
+                            .and_then(|s| s.as_str())
+                            .map(|s| s == "True")
+                            .unwrap_or(false)
+                    })
+                })
+                .unwrap_or(false);
+            
+            // Calculate restart count
+            let restart_count = pod_json
+                .get("status")
+                .and_then(|s| s.get("containerStatuses"))
+                .and_then(|cs| cs.as_array())
+                .map(|statuses| {
+                    statuses.iter()
+                        .filter_map(|status| {
+                            status.get("restartCount")
+                                .and_then(|rc| rc.as_u64())
+                        })
+                        .sum::<u64>() as u32
+                })
+                .unwrap_or(0);
+            
+            return Ok(PodStatus {
+                name,
+                phase,
+                ready,
+                restart_count,
+            });
         }
         
-        // Placeholder implementation
+        // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(PodStatus {
             name: pod_name.to_string(),
             phase: "Running".to_string(),
@@ -584,12 +731,27 @@ impl KubernetesManager {
             ));
         }
 
-        info!(
-            "Scaling deployment {} in namespace {} to {} replicas",
-            deployment_name, self.namespace, replicas
-        );
-        // Future: Update deployment spec
-        Ok(())
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Scale deployment via Kubernetes API (PATCH)
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, deployment_name);
+            let patch_body = json!({
+                "spec": {
+                    "replicas": replicas
+                }
+            });
+            
+            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
+            
+            info!("Scaled deployment {} to {} replicas in namespace {}", deployment_name, replicas, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Scaling deployment {} to {} replicas (placeholder - enable cloud-sdk feature)", deployment_name, replicas);
+            Ok(())
+        }
     }
 
     /// Check if Kubernetes cluster is available
@@ -641,15 +803,32 @@ impl KubernetesManager {
         
         #[cfg(feature = "cloud-sdk")]
         {
-            // TODO: Implement actual Kubernetes API query
-            // Example with k8s-openapi types:
-            // let pod_list: corev1::PodList = ... // Query from API
-            // return Ok(pod_list.items.iter()
-            //     .filter_map(|p| p.metadata.name.clone())
-            //     .collect());
+            // List pods via Kubernetes API
+            let path = format!("/api/v1/namespaces/{}/pods", self.namespace);
+            let pod_list_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract pod names
+            let pods = pod_list_json
+                .get("items")
+                .and_then(|i| i.as_array())
+                .ok_or_else(|| AppError::NetworkError(
+                    "Invalid pod list response format".to_string()
+                ))?;
+            
+            let names: Vec<String> = pods
+                .iter()
+                .filter_map(|pod| {
+                    pod.get("metadata")
+                        .and_then(|m| m.get("name"))
+                        .and_then(|n| n.as_str())
+                        .map(|s| s.to_string())
+                })
+                .collect();
+            
+            return Ok(names);
         }
         
-        // Placeholder implementation
+        // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
 
@@ -683,15 +862,33 @@ impl KubernetesManager {
         
         #[cfg(feature = "cloud-sdk")]
         {
-            // TODO: Implement actual Kubernetes API query
-            // Example with k8s-openapi types:
-            // let deployment_list: appsv1::DeploymentList = ... // Query from API
-            // return Ok(deployment_list.items.iter()
-            //     .filter_map(|d| d.metadata.name.clone())
-            //     .collect());
+            // List deployments via Kubernetes API
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments", self.namespace);
+            let deployment_list_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract deployment names
+            let deployments = deployment_list_json
+                .get("items")
+                .and_then(|i| i.as_array())
+                .ok_or_else(|| AppError::NetworkError(
+                    "Invalid deployment list response format".to_string()
+                ))?;
+            
+            let names: Vec<String> = deployments
+                .iter()
+                .filter_map(|deployment| {
+                    deployment
+                        .get("metadata")
+                        .and_then(|m| m.get("name"))
+                        .and_then(|n| n.as_str())
+                        .map(|s| s.to_string())
+                })
+                .collect();
+            
+            return Ok(names);
         }
         
-        // Placeholder implementation
+        // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
 }
