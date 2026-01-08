@@ -72,15 +72,43 @@ impl AzureManager {
     }
 
     /// Create VM Scale Set
+    ///
+    /// # Arguments
+    ///
+    /// * `resource_group` - Azure resource group name
+    /// * `name` - VM Scale Set name
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `resource_group` is empty
+    /// - `name` is empty
     pub async fn create_vm_scale_set(
         &self,
         resource_group: &str,
         name: &str,
     ) -> Result<String, AppError> {
+        if resource_group.is_empty() {
+            return Err(AppError::ValidationError(
+                "Resource group name cannot be empty. Current value: ''. Suggestion: Provide a valid Azure resource group name."
+                    .to_string(),
+            ));
+        }
+
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "VM Scale Set name cannot be empty. Current value: ''. Suggestion: Provide a valid VM Scale Set name."
+                    .to_string(),
+            ));
+        }
+
         // TODO: Implement VM Scale Set creation
+        // - Call Azure Compute API
+        // - Create VMSS with configuration
+        // - Return VMSS ID
         info!(
-            "Creating VM Scale Set: {} / {} (placeholder)",
-            resource_group, name
+            "Creating VM Scale Set: {} / {} in subscription {} (placeholder)",
+            resource_group, name, self._subscription_id.as_deref().unwrap_or("default")
         );
         Ok(uuid::Uuid::new_v4().to_string())
     }

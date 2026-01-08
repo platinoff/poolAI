@@ -51,7 +51,20 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{info, warn};
+use tracing::info;
+
+/// Kubernetes Pod status information
+#[derive(Debug, Clone)]
+pub struct PodStatus {
+    /// Pod name
+    pub name: String,
+    /// Pod phase (Pending, Running, Succeeded, Failed, Unknown)
+    pub phase: String,
+    /// Whether the pod is ready
+    pub ready: bool,
+    /// Number of times the pod has been restarted
+    pub restart_count: u32,
+}
 
 /// Kubernetes manager for PoolAI resources
 pub struct KubernetesManager {
