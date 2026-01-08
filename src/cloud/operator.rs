@@ -948,16 +948,32 @@ impl PoolAIOperator {
         // Create/update Service for the worker (if ports are needed)
         // For now, we'll create a default service on port 8080
         let service_name = format!("{}-service", deployment_name);
-        if let Err(e) = k8s_manager.create_service(
-            &service_name,
-            deployment_name,
-            &[8080], // Default port
-            crate::cloud::kubernetes::ServiceType::ClusterIP,
-        ).await {
-            // Service might already exist, which is OK
-            warn!("Failed to create service for worker {}: {} (may already exist)", deployment_name, e);
+        let service_exists = k8s_manager.service_exists(&service_name).await;
+        
+        if service_exists {
+            // Update existing service
+            if let Err(e) = k8s_manager.update_service(
+                &service_name,
+                deployment_name,
+                &[8080], // Default port
+                crate::cloud::kubernetes::ServiceType::ClusterIP,
+            ).await {
+                warn!("Failed to update service for worker {}: {}", deployment_name, e);
+            } else {
+                info!("Updated service: {} for worker {}", service_name, deployment_name);
+            }
         } else {
-            info!("Created/updated service: {} for worker {}", service_name, deployment_name);
+            // Create new service
+            if let Err(e) = k8s_manager.create_service(
+                &service_name,
+                deployment_name,
+                &[8080], // Default port
+                crate::cloud::kubernetes::ServiceType::ClusterIP,
+            ).await {
+                warn!("Failed to create service for worker {}: {}", deployment_name, e);
+            } else {
+                info!("Created service: {} for worker {}", service_name, deployment_name);
+            }
         }
         
         // Update CRD status with deployment status
@@ -1044,15 +1060,26 @@ impl PoolAIOperator {
         
         // Create/update PVC for VM storage
         let pvc_name = format!("{}-pvc", deployment_name);
-        if let Err(e) = k8s_manager.create_pvc(
-            &pvc_name,
-            &vm.storage.size,
-            &vm.storage.storage_class,
-        ).await {
-            // PVC might already exist, which is OK
-            warn!("Failed to create PVC for VM {}: {} (may already exist)", deployment_name, e);
+        let pvc_exists = k8s_manager.pvc_exists(&pvc_name).await;
+        
+        if pvc_exists {
+            // Update existing PVC (size can be updated if storage class supports expansion)
+            if let Err(e) = k8s_manager.update_pvc(&pvc_name, &vm.storage.size).await {
+                warn!("Failed to update PVC for VM {}: {}", deployment_name, e);
+            } else {
+                info!("Updated PVC: {} for VM {}", pvc_name, deployment_name);
+            }
         } else {
-            info!("Created/updated PVC: {} for VM {}", pvc_name, deployment_name);
+            // Create new PVC
+            if let Err(e) = k8s_manager.create_pvc(
+                &pvc_name,
+                &vm.storage.size,
+                &vm.storage.storage_class,
+            ).await {
+                warn!("Failed to create PVC for VM {}: {}", deployment_name, e);
+            } else {
+                info!("Created PVC: {} for VM {}", pvc_name, deployment_name);
+            }
         }
         
         // Create/update Service for the VM (if ports are specified)
@@ -1060,15 +1087,32 @@ impl PoolAIOperator {
             if !ports.is_empty() {
                 let service_name = format!("{}-service", deployment_name);
                 let service_type = crate::cloud::kubernetes::ServiceType::ClusterIP; // Default service type
-                if let Err(e) = k8s_manager.create_service(
-                    &service_name,
-                    deployment_name,
-                    ports,
-                    service_type,
-                ).await {
-                    warn!("Failed to create service for VM {}: {} (may already exist)", deployment_name, e);
+                let service_exists = k8s_manager.service_exists(&service_name).await;
+                
+                if service_exists {
+                    // Update existing service
+                    if let Err(e) = k8s_manager.update_service(
+                        &service_name,
+                        deployment_name,
+                        ports,
+                        service_type,
+                    ).await {
+                        warn!("Failed to update service for VM {}: {}", deployment_name, e);
+                    } else {
+                        info!("Updated service: {} for VM {}", service_name, deployment_name);
+                    }
                 } else {
-                    info!("Created/updated service: {} for VM {}", service_name, deployment_name);
+                    // Create new service
+                    if let Err(e) = k8s_manager.create_service(
+                        &service_name,
+                        deployment_name,
+                        ports,
+                        service_type,
+                    ).await {
+                        warn!("Failed to create service for VM {}: {}", deployment_name, e);
+                    } else {
+                        info!("Created service: {} for VM {}", service_name, deployment_name);
+                    }
                 }
             }
         }
