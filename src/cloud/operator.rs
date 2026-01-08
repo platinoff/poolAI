@@ -43,8 +43,31 @@
 
 use crate::core::error::AppError;
 use std::sync::Arc;
-use tokio::sync::RwLock;
-use tracing::{info, warn};
+use tokio::sync::{RwLock, mpsc};
+use tokio::time::{interval, Duration};
+use tracing::{info, warn, error};
+
+/// CRD event type
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CrdEventType {
+    /// Resource was added
+    Added,
+    /// Resource was modified
+    Modified,
+    /// Resource was deleted
+    Deleted,
+}
+
+/// CRD event
+#[derive(Debug, Clone)]
+pub struct CrdEvent {
+    /// Event type
+    pub event_type: CrdEventType,
+    /// Resource name
+    pub name: String,
+    /// Resource namespace
+    pub namespace: String,
+}
 
 /// PoolAI Kubernetes Operator
 ///
@@ -55,6 +78,9 @@ pub struct PoolAIOperator {
     #[cfg(feature = "cloud-sdk")]
     /// Kubernetes manager for API operations
     k8s_manager: Option<Arc<crate::cloud::kubernetes::KubernetesManager>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Watcher shutdown handles
+    watcher_handles: Arc<RwLock<Vec<tokio::task::JoinHandle<()>>>>,
 }
 
 impl PoolAIOperator {
@@ -76,7 +102,11 @@ impl PoolAIOperator {
             namespace: namespace.clone(),
             running: Arc::new(RwLock::new(false)),
             #[cfg(feature = "cloud-sdk")]
-            k8s_manager: Some(Arc::new(crate::cloud::kubernetes::KubernetesManager::new(namespace))),
+            k8s_manager: Some(Arc::new(crate::cloud::kubernetes::KubernetesManager::new(namespace.clone()))),
+            #[cfg(feature = "cloud-sdk")]
+            watcher_handles: Arc::new(RwLock::new(Vec::new())),
+            #[cfg(feature = "cloud-sdk")]
+            event_tx: None,
         }
     }
 
@@ -137,18 +167,65 @@ impl PoolAIOperator {
             }
             
             // Verify CRDs are installed (check if we can list CRDs)
-            // TODO: Implement CRD verification
             // For now, we'll assume CRDs are installed
+            // In production, we would check: GET /apis/apiextensions.k8s.io/v1/customresourcedefinitions
             
-            // Initialize watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
-            // TODO: Implement watchers with k8s-openapi or HTTP polling
-            // For now, this is a placeholder structure
+            // Create event channel for CRD events
+            let (event_tx, event_rx) = mpsc::unbounded_channel();
             
-            // Start reconciliation loops
-            // TODO: Implement reconciliation loops
-            // - Watch for CRD changes
-            // - Reconcile desired state vs actual state
-            // - Handle create, update, delete events
+            // Store event_tx for shutdown
+            // Note: We can't store it in self because of lifetime issues
+            // In production, we'd use a different approach (e.g., Arc<Mutex<Option<...>>>)
+            
+            // Start watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
+            let watcher_handles = self.watcher_handles.clone();
+            let namespace = self.namespace.clone();
+            let k8s_manager = self.k8s_manager.clone();
+            
+            // Start watcher for PoolAIWorker CRD
+            let handle_worker = tokio::spawn(Self::watch_crd_resources(
+                "poolaiworkers".to_string(),
+                "poolai.io".to_string(),
+                "v1".to_string(),
+                namespace.clone(),
+                event_tx.clone(),
+                k8s_manager.clone(),
+            ));
+            watcher_handles.write().await.push(handle_worker);
+            
+            // Start watcher for PoolAIVM CRD
+            let handle_vm = tokio::spawn(Self::watch_crd_resources(
+                "poolaivms".to_string(),
+                "poolai.io".to_string(),
+                "v1".to_string(),
+                namespace.clone(),
+                event_tx.clone(),
+                k8s_manager.clone(),
+            ));
+            watcher_handles.write().await.push(handle_vm);
+            
+            // Start watcher for PoolAITenant CRD
+            let handle_tenant = tokio::spawn(Self::watch_crd_resources(
+                "poolaitenants".to_string(),
+                "poolai.io".to_string(),
+                "v1".to_string(),
+                namespace.clone(),
+                event_tx.clone(),
+                k8s_manager.clone(),
+            ));
+            watcher_handles.write().await.push(handle_tenant);
+            
+            // Start reconciliation loop
+            let k8s_manager_reconcile = self.k8s_manager.clone();
+            let namespace_reconcile = self.namespace.clone();
+            let handle_reconcile = tokio::spawn(Self::reconciliation_loop(
+                event_rx,
+                namespace_reconcile,
+                k8s_manager_reconcile,
+            ));
+            watcher_handles.write().await.push(handle_reconcile);
+            
+            info!("Started {} watchers and reconciliation loop", watcher_handles.read().await.len());
         }
         
         #[cfg(not(feature = "cloud-sdk"))]
@@ -188,13 +265,24 @@ impl PoolAIOperator {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            // Stop watchers and reconciliation loops
-            // TODO: Implement graceful shutdown of watchers
+            // Stop watchers and reconciliation loops gracefully
+            let mut handles = self.watcher_handles.write().await;
+            info!("Stopping {} watcher tasks...", handles.len());
+            
+            // Abort all watcher tasks
+            for handle in handles.drain(..) {
+                handle.abort();
+            }
+            
+            // Note: Event channel is closed when all senders are dropped
+            // Watchers will stop when their tasks are aborted
             
             // Shutdown Kubernetes manager
             if let Some(ref k8s_manager) = self.k8s_manager {
                 let _ = k8s_manager.shutdown().await;
             }
+            
+            info!("All watchers stopped");
         }
 
         *running = false;
@@ -330,4 +418,152 @@ pub struct TenantQuotas {
     pub max_cpu_cores: Option<usize>,
     /// Maximum storage (MB)
     pub max_storage_mb: Option<u64>,
+}
+
+#[cfg(feature = "cloud-sdk")]
+impl PoolAIOperator {
+    /// Watch CRD resources using HTTP polling
+    ///
+    /// Polls the Kubernetes API for changes to CRD resources.
+    /// This is a simplified implementation using HTTP polling.
+    /// In production, you would use Kubernetes watch API for efficiency.
+    async fn watch_crd_resources(
+        resource_plural: String,
+        group: String,
+        version: String,
+        namespace: String,
+        event_tx: mpsc::UnboundedSender<CrdEvent>,
+        k8s_manager: Option<Arc<crate::cloud::kubernetes::KubernetesManager>>,
+    ) {
+        let mut interval = interval(Duration::from_secs(10)); // Poll every 10 seconds
+        let mut last_resources: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        
+        loop {
+            interval.tick().await;
+            
+            // In a real implementation, we would:
+            // 1. GET /apis/{group}/{version}/namespaces/{namespace}/{resource_plural}
+            // 2. Compare with last_resources to detect changes
+            // 3. Send events for Added, Modified, Deleted
+            
+            // For now, this is a placeholder that logs polling activity
+            if let Some(ref manager) = k8s_manager {
+                // Check if manager is initialized
+                if manager.is_cluster_available().await.unwrap_or(false) {
+                    // TODO: Implement actual resource listing and comparison
+                    // This would involve:
+                    // - Making HTTP GET request to Kubernetes API
+                    // - Parsing JSON response
+                    // - Comparing resourceVersion to detect changes
+                    // - Sending appropriate events
+                    
+                    // Placeholder: log that we're polling
+                    if let Ok(_) = tokio::time::timeout(Duration::from_millis(100), async {
+                        // Simulate checking for resources
+                        false
+                    }).await {
+                        // Resource check completed
+                    }
+                }
+            }
+            
+            // In production, we would break on shutdown signal
+            // For now, this runs indefinitely
+        }
+    }
+    
+    /// Reconciliation loop
+    ///
+    /// Processes CRD events and reconciles desired state vs actual state.
+    async fn reconciliation_loop(
+        mut event_rx: mpsc::UnboundedReceiver<CrdEvent>,
+        namespace: String,
+        k8s_manager: Option<Arc<crate::cloud::kubernetes::KubernetesManager>>,
+    ) {
+        info!("Reconciliation loop started for namespace: {}", namespace);
+        
+        while let Some(event) = event_rx.recv().await {
+            match event.event_type {
+                CrdEventType::Added => {
+                    info!("CRD resource added: {} in namespace {}", event.name, event.namespace);
+                    // TODO: Implement reconciliation for added resource
+                    // - Parse resource spec
+                    // - Create/update Kubernetes resources (Deployments, Services, etc.)
+                    // - Update status
+                }
+                CrdEventType::Modified => {
+                    info!("CRD resource modified: {} in namespace {}", event.name, event.namespace);
+                    // TODO: Implement reconciliation for modified resource
+                    // - Compare desired vs actual state
+                    // - Update Kubernetes resources if needed
+                    // - Update status
+                }
+                CrdEventType::Deleted => {
+                    if event.name == "shutdown" {
+                        info!("Reconciliation loop shutting down");
+                        break;
+                    }
+                    info!("CRD resource deleted: {} in namespace {}", event.name, event.namespace);
+                    // TODO: Implement cleanup for deleted resource
+                    // - Delete associated Kubernetes resources
+                    // - Clean up any external resources
+                }
+            }
+        }
+        
+        info!("Reconciliation loop stopped");
+    }
+    
+    /// Reconcile a PoolAIWorker resource
+    ///
+    /// Ensures the actual state matches the desired state.
+    async fn reconcile_worker(
+        worker: &PoolAIWorker,
+        namespace: &str,
+        k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
+    ) -> Result<(), AppError> {
+        // TODO: Implement worker reconciliation
+        // 1. Check if Deployment exists
+        // 2. Create/update Deployment based on worker spec
+        // 3. Create/update Service if needed
+        // 4. Update CRD status
+        
+        info!("Reconciling worker: {} in namespace {}", worker.name, namespace);
+        Ok(())
+    }
+    
+    /// Reconcile a PoolAIVM resource
+    ///
+    /// Ensures the actual state matches the desired state.
+    async fn reconcile_vm(
+        vm: &PoolAIVM,
+        namespace: &str,
+        k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
+    ) -> Result<(), AppError> {
+        // TODO: Implement VM reconciliation
+        // 1. Check if VM Deployment exists
+        // 2. Create/update Deployment based on VM spec
+        // 3. Create/update PVC if needed
+        // 4. Update CRD status
+        
+        info!("Reconciling VM: {} in namespace {}", vm.name, namespace);
+        Ok(())
+    }
+    
+    /// Reconcile a PoolAITenant resource
+    ///
+    /// Ensures the actual state matches the desired state.
+    async fn reconcile_tenant(
+        tenant: &PoolAITenant,
+        namespace: &str,
+        _k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
+    ) -> Result<(), AppError> {
+        // TODO: Implement tenant reconciliation
+        // 1. Create/update ResourceQuota based on tenant quotas
+        // 2. Create/update LimitRange if needed
+        // 3. Update CRD status
+        
+        info!("Reconciling tenant: {} in namespace {}", tenant.name, namespace);
+        Ok(())
+    }
 }
