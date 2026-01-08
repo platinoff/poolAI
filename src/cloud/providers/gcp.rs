@@ -103,9 +103,10 @@ impl GcpManager {
         }
 
         // TODO: Implement Compute Engine instance creation
+        let project = self.project_id.as_deref().unwrap_or("unknown");
         info!(
             "Creating Compute Engine instance: {} / {} in project {} (placeholder)",
-            zone, machine_type, self.project_id
+            zone, machine_type, project
         );
         Ok(uuid::Uuid::new_v4().to_string())
     }
