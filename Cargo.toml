@@ -44,6 +44,8 @@ axum-server = { version = "0.6", optional = true, features = ["rustls"] }
 
 # Using base64 for temporary token encoding (dev only or fallback)
 base64 = { version = "0.22", features = ["alloc"] }
+# URL encoding for OAuth2
+urlencoding = "2.1"
 
 # Error handling
 thiserror = "1.0"
