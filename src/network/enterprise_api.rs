@@ -582,6 +582,7 @@ async fn security_saml_provider_register_handler(
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
 struct SecurityPolicyCreateRequest {
+    #[allow(dead_code)] // Policy name is included in the policy struct itself
     name: String,
     policy: enterprise::security::SecurityPolicy,
 }
