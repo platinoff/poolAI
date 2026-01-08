@@ -310,7 +310,12 @@ impl Pool {
         let workers = self.workers.read().await;
 
         if workers.is_empty() {
-            return Err(AppError::PoolError("No workers available".to_string()));
+            return Err(AppError::PoolError(
+                "No workers available. Context: Cannot process request because worker pool is empty. \
+                Suggestion: Add workers to the pool using add_worker() before processing requests. \
+                Current pool size: 0 workers, Max workers: {}"
+                    .to_string(),
+            ));
         }
 
         match self.config.load_balancing_strategy {
@@ -471,7 +476,12 @@ impl Pool {
 
             match (candidate_id, candidate_worker) {
                 (Some(id), Some(worker)) => (id, worker),
-                _ => return Err(AppError::PoolError("No workers available for scaling down".to_string())),
+                _ => return Err(AppError::PoolError(
+                    "No workers available for scaling down. Context: Cannot scale down because pool is already at minimum size. \
+                    Suggestion: Verify current worker count before attempting to scale down. \
+                    Current workers: {}, Minimum workers: 1"
+                        .to_string(),
+                )),
             }
         };
 
@@ -538,7 +548,12 @@ pub async fn initialize() -> Result<(), AppError> {
     // Store global instance wrapped in Arc<RwLock<>>
     GLOBAL_POOL
         .set(Arc::new(RwLock::new(pool)))
-        .map_err(|_| AppError::PoolError("Pool already initialized".to_string()))?;
+        .map_err(|_| AppError::PoolError(
+            "Pool already initialized. Context: Attempted to initialize global pool instance twice. \
+            Suggestion: Ensure initialize() is called only once at application startup. \
+            Note: Pool module uses OnceLock for thread-safe single initialization."
+                .to_string(),
+        ))?;
 
     info!("Pool module initialized successfully");
     Ok(())
@@ -553,7 +568,12 @@ pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> 
     // Store global instance wrapped in Arc<RwLock<>>
     GLOBAL_POOL
         .set(Arc::new(RwLock::new(pool)))
-        .map_err(|_| AppError::PoolError("Pool already initialized".to_string()))?;
+        .map_err(|_| AppError::PoolError(
+            "Pool already initialized. Context: Attempted to initialize global pool instance twice. \
+            Suggestion: Ensure initialize() is called only once at application startup. \
+            Note: Pool module uses OnceLock for thread-safe single initialization."
+                .to_string(),
+        ))?;
 
     info!("Pool module initialized with custom configuration successfully");
     Ok(())
@@ -578,7 +598,10 @@ pub async fn health_check() -> Result<(), AppError> {
     // Check if global pool exists
     if GLOBAL_POOL.get().is_none() {
         return Err(AppError::PoolError(
-            "Global pool not initialized".to_string(),
+            "Global pool not initialized. Context: Attempted to access global pool instance before initialization. \
+            Suggestion: Call pool::initialize() or pool::initialize_with_config() before using global pool functions. \
+            Note: This should be called once at application startup."
+                .to_string(),
         ));
     }
 

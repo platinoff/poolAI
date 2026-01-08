@@ -142,7 +142,12 @@ pub async fn initialize() -> Result<(), AppError> {
     // Store global instance
     GLOBAL_LIBRARY_MANAGER
         .set(Arc::new(RwLock::new(manager)))
-        .map_err(|_| AppError::ConfigError("Library manager already initialized".to_string()))?;
+        .map_err(|_| AppError::ConfigError(
+            "Library manager already initialized. Context: Attempted to initialize global library manager instance twice. \
+            Suggestion: Ensure libs::initialize() is called only once at application startup. \
+            Note: Library manager uses OnceLock for thread-safe single initialization."
+                .to_string(),
+        ))?;
 
     tracing::info!("Library management module initialized successfully");
     Ok(())
