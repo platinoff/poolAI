@@ -584,23 +584,68 @@ impl PoolAIOperator {
                     // Parse resource spec from Kubernetes API and reconcile
                     match event.resource_type {
                         CrdResourceType::Worker => {
-                            if let Ok(worker) = Self::parse_worker_crd(&k8s_manager, &event.namespace, &event.name).await {
-                                if let Err(e) = Self::reconcile_worker(&worker, &event.namespace, &k8s_manager).await {
-                                    error!("Failed to reconcile worker {}: {}", event.name, e);
+                            match Self::parse_worker_crd(&k8s_manager, &event.namespace, &event.name).await {
+                                Ok(worker) => {
+                                    if let Err(e) = Self::reconcile_worker(&worker, &event.namespace, &k8s_manager).await {
+                                        error!("Failed to reconcile worker {}: {}", event.name, e);
+                                        // Update CRD status with error
+                                        let status = json!({
+                                            "conditions": [{
+                                                "type": "Ready",
+                                                "status": "False",
+                                                "reason": "ReconciliationFailed",
+                                                "message": format!("Reconciliation failed: {}", e)
+                                            }]
+                                        });
+                                        let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaiworkers", &event.name, status).await;
+                                    }
+                                }
+                                Err(e) => {
+                                    error!("Failed to parse worker CRD {}: {}", event.name, e);
                                 }
                             }
                         }
                         CrdResourceType::Vm => {
-                            if let Ok(vm) = Self::parse_vm_crd(&k8s_manager, &event.namespace, &event.name).await {
-                                if let Err(e) = Self::reconcile_vm(&vm, &event.namespace, &k8s_manager).await {
-                                    error!("Failed to reconcile VM {}: {}", event.name, e);
+                            match Self::parse_vm_crd(&k8s_manager, &event.namespace, &event.name).await {
+                                Ok(vm) => {
+                                    if let Err(e) = Self::reconcile_vm(&vm, &event.namespace, &k8s_manager).await {
+                                        error!("Failed to reconcile VM {}: {}", event.name, e);
+                                        // Update CRD status with error
+                                        let status = json!({
+                                            "conditions": [{
+                                                "type": "Ready",
+                                                "status": "False",
+                                                "reason": "ReconciliationFailed",
+                                                "message": format!("Reconciliation failed: {}", e)
+                                            }]
+                                        });
+                                        let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaivms", &event.name, status).await;
+                                    }
+                                }
+                                Err(e) => {
+                                    error!("Failed to parse VM CRD {}: {}", event.name, e);
                                 }
                             }
                         }
                         CrdResourceType::Tenant => {
-                            if let Ok(tenant) = Self::parse_tenant_crd(&k8s_manager, &event.namespace, &event.name).await {
-                                if let Err(e) = Self::reconcile_tenant(&tenant, &event.namespace, &k8s_manager).await {
-                                    error!("Failed to reconcile tenant {}: {}", event.name, e);
+                            match Self::parse_tenant_crd(&k8s_manager, &event.namespace, &event.name).await {
+                                Ok(tenant) => {
+                                    if let Err(e) = Self::reconcile_tenant(&tenant, &event.namespace, &k8s_manager).await {
+                                        error!("Failed to reconcile tenant {}: {}", event.name, e);
+                                        // Update CRD status with error
+                                        let status = json!({
+                                            "conditions": [{
+                                                "type": "Ready",
+                                                "status": "False",
+                                                "reason": "ReconciliationFailed",
+                                                "message": format!("Reconciliation failed: {}", e)
+                                            }]
+                                        });
+                                        let _ = k8s_manager.update_crd_status("poolai.io", "v1", "poolaitenants", &event.name, status).await;
+                                    }
+                                }
+                                Err(e) => {
+                                    error!("Failed to parse tenant CRD {}: {}", event.name, e);
                                 }
                             }
                         }
