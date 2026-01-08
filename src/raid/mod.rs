@@ -84,25 +84,72 @@ pub mod raft;
 pub mod raft_transport;
 pub mod replication;
 
+/// RAID storage mode
+///
+/// Defines the storage strategy used for artifact storage and replication.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::raid::RaidMode;
+///
+/// // Use local-only storage
+/// let mode = RaidMode::Local;
+///
+/// // Use distributed storage strategies (planned)
+/// let burst_mode = RaidMode::BurstRaid;
+/// let small_world_mode = RaidMode::SmallWorld;
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RaidMode {
-    /// Local-only artifact storage (current implementation).
+    /// Local-only artifact storage (current implementation)
+    ///
+    /// Stores artifacts locally with manifest management and event sourcing.
+    /// No distributed replication is performed.
     Local,
-    /// Placeholder for "BurstRAID" strategy.
+    /// Placeholder for "BurstRAID" strategy (planned)
+    ///
+    /// Distributed storage strategy optimized for burst workloads.
     BurstRaid,
-    /// Placeholder for "SmallWorld" distributed strategy.
+    /// Placeholder for "SmallWorld" distributed strategy (planned)
+    ///
+    /// Distributed storage strategy using SmallWorld network topology for replication.
     SmallWorld,
 }
 
+/// Configuration for RAID storage manager
+///
+/// Configures storage mode, paths, quotas, and retention policies for artifact storage.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::raid::{RaidConfig, RaidMode};
+/// use std::path::PathBuf;
+///
+/// // Create custom configuration
+/// let config = RaidConfig {
+///     mode: RaidMode::Local,
+///     base_path: PathBuf::from("./data/raid"),
+///     quota_bytes: Some(20 * 1024 * 1024 * 1024), // 20 GB
+///     retention_days: Some(60), // 60 days
+///     gc_on_startup: true,
+/// };
+///
+/// // Or use platform defaults
+/// let default_config = RaidConfig::default_for_platform();
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RaidConfig {
+    /// Storage mode (Local, BurstRaid, or SmallWorld)
     pub mode: RaidMode,
+    /// Base directory path for artifact storage
     pub base_path: PathBuf,
     /// Maximum total size of artifacts in bytes (None = unlimited)
     pub quota_bytes: Option<u64>,
-    /// Retention policy: artifacts older than this will be eligible for GC
+    /// Retention policy: artifacts older than this will be eligible for GC (None = no retention limit)
     pub retention_days: Option<u32>,
-    /// Enable automatic GC on startup
+    /// Enable automatic garbage collection on startup
     pub gc_on_startup: bool,
 }
 
@@ -125,21 +172,79 @@ impl RaidConfig {
     }
 }
 
+/// A RAID cluster node
+///
+/// Represents a single node in the distributed RAID cluster.
+/// Used for tracking cluster membership and health.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RaidNode {
+    /// Unique identifier for the node
     pub id: Uuid,
+    /// Network address (e.g., "192.168.1.100:8080")
     pub address: String,
+    /// Last time this node was seen/heard from
     pub last_seen: DateTime<Utc>,
 }
 
+/// Reference to a stored artifact
+///
+/// Contains metadata about a stored artifact including its ID, name,
+/// storage timestamp, and file system path.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::raid::ArtifactRef;
+/// use uuid::Uuid;
+/// use chrono::Utc;
+/// use std::path::PathBuf;
+///
+/// let artifact = ArtifactRef {
+///     id: Uuid::new_v4(),
+///     name: "my-model-v1.0.0".to_string(),
+///     stored_at: Utc::now(),
+///     path: PathBuf::from("./data/raid/artifacts/12345"),
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ArtifactRef {
+    /// Unique identifier for the artifact
     pub id: Uuid,
+    /// Human-readable name for the artifact
     pub name: String,
+    /// Timestamp when the artifact was stored
     pub stored_at: DateTime<Utc>,
+    /// File system path to the artifact data
     pub path: PathBuf,
 }
 
+/// RAID storage manager
+///
+/// Central orchestrator for artifact storage, replication, and management.
+/// Supports local storage with manifest management, event sourcing, and
+/// distributed replication (planned).
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::raid::{RaidManager, RaidConfig, RaidMode};
+/// use std::path::PathBuf;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let config = RaidConfig::default_for_platform();
+/// let manager = RaidManager::new(config);
+/// manager.initialize().await?;
+///
+/// // Store an artifact
+/// let artifact = manager.put_artifact("my-artifact", b"artifact data").await?;
+/// println!("Stored artifact: {} at {:?}", artifact.name, artifact.path);
+///
+/// // Retrieve an artifact
+/// let data = manager.get_artifact(&artifact.path).await?;
+/// println!("Retrieved {} bytes", data.len());
+/// # Ok(())
+/// # }
+/// ```
 pub struct RaidManager {
     config: Arc<RwLock<RaidConfig>>,
     nodes: Arc<RwLock<Vec<RaidNode>>>,
@@ -149,6 +254,23 @@ pub struct RaidManager {
 }
 
 impl RaidManager {
+    /// Creates a new RAID manager instance
+    ///
+    /// Initializes the manager with the provided configuration.
+    /// The manager must be initialized with `initialize()` before use.
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Configuration for storage mode, paths, quotas, and retention
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::raid::{RaidManager, RaidConfig};
+    ///
+    /// let config = RaidConfig::default_for_platform();
+    /// let manager = RaidManager::new(config);
+    /// ```
     pub fn new(config: RaidConfig) -> Self {
         // Initialize event store if enabled (for now, always create it)
         let event_store = Some(Arc::new(RwLock::new(EventStore::new(
@@ -163,6 +285,31 @@ impl RaidManager {
         }
     }
 
+    /// Initializes the RAID manager
+    ///
+    /// Creates necessary directories, loads manifests, and performs garbage
+    /// collection if configured. Must be called before using the manager.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if initialization succeeds.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ConfigError` if directory creation fails.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::raid::{RaidManager, RaidConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let config = RaidConfig::default_for_platform();
+    /// let manager = RaidManager::new(config);
+    /// manager.initialize().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn initialize(&self) -> Result<(), AppError> {
         let cfg = self.config.read().await;
         info!("Initializing RAID manager (mode: {:?})", cfg.mode);
@@ -286,6 +433,39 @@ impl RaidManager {
     /// Store an artifact (library, model weights, etc.).
     ///
     /// Current implementation: local file write into `base_path/artifacts/<id>_<name>`.
+    /// Stores an artifact in RAID storage
+    ///
+    /// Writes the artifact data to disk, updates the manifest, and records
+    /// an event in the event store. Returns a reference to the stored artifact.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Human-readable name for the artifact
+    /// * `bytes` - Artifact data to store
+    ///
+    /// # Returns
+    ///
+    /// Returns `ArtifactRef` containing the artifact ID, name, storage timestamp, and path.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ConfigError` if file creation, writing, or manifest persistence fails.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::raid::{RaidManager, RaidConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let config = RaidConfig::default_for_platform();
+    /// let manager = RaidManager::new(config);
+    /// manager.initialize().await?;
+    ///
+    /// let artifact = manager.put_artifact("my-model", b"model data").await?;
+    /// println!("Stored artifact: {} at {:?}", artifact.name, artifact.path);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn put_artifact(&self, name: &str, bytes: &[u8]) -> Result<ArtifactRef, AppError> {
         let cfg = self.config.read().await;
         let artifacts_dir = cfg.base_path.join("artifacts");
@@ -370,7 +550,39 @@ impl RaidManager {
         Ok(artifact)
     }
 
-    /// Read an artifact from local storage.
+    /// Reads an artifact from local storage
+    ///
+    /// Reads the artifact data from the specified file path.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - File system path to the artifact file
+    ///
+    /// # Returns
+    ///
+    /// Returns the artifact data as a byte vector.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ConfigError` if the file cannot be opened or read.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::raid::{RaidManager, RaidConfig};
+    /// use std::path::Path;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let config = RaidConfig::default_for_platform();
+    /// let manager = RaidManager::new(config);
+    /// manager.initialize().await?;
+    ///
+    /// let artifact = manager.put_artifact("my-model", b"model data").await?;
+    /// let data = manager.get_artifact(&artifact.path).await?;
+    /// println!("Retrieved {} bytes", data.len());
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_artifact(&self, path: &Path) -> Result<Vec<u8>, AppError> {
         let mut file = tokio::fs::File::open(path)
             .await
@@ -382,6 +594,32 @@ impl RaidManager {
         Ok(buf)
     }
 
+    /// Lists all stored artifacts
+    ///
+    /// Returns a list of all artifacts currently stored in RAID storage,
+    /// including their IDs, names, storage timestamps, and paths.
+    ///
+    /// # Returns
+    ///
+    /// Returns a vector of `ArtifactRef` for all stored artifacts.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::raid::{RaidManager, RaidConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let config = RaidConfig::default_for_platform();
+    /// let manager = RaidManager::new(config);
+    /// manager.initialize().await?;
+    ///
+    /// let artifacts = manager.list_artifacts().await;
+    /// for artifact in artifacts {
+    ///     println!("Artifact: {} ({})", artifact.name, artifact.id);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn list_artifacts(&self) -> Vec<ArtifactRef> {
         self.artifacts
             .read()
@@ -392,6 +630,39 @@ impl RaidManager {
             .collect()
     }
 
+    /// Deletes an artifact from storage
+    ///
+    /// Removes the artifact from the manifest, deletes the file from disk,
+    /// and records a deletion event. The artifact is permanently removed.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - Unique identifier of the artifact to delete
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the artifact was successfully deleted.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ConfigError` if the artifact doesn't exist or file deletion fails.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::raid::{RaidManager, RaidConfig};
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let config = RaidConfig::default_for_platform();
+    /// let manager = RaidManager::new(config);
+    /// manager.initialize().await?;
+    ///
+    /// let artifact = manager.put_artifact("my-model", b"model data").await?;
+    /// manager.delete_artifact(artifact.id).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn delete_artifact(&self, id: Uuid) -> Result<(), AppError> {
         let artifact = {
             let mut m = self.artifacts.write().await;
