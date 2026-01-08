@@ -88,6 +88,9 @@ pub mod vm;
 #[cfg(feature = "enterprise")]
 pub mod enterprise;
 
+#[cfg(feature = "cloud")]
+pub mod cloud;
+
 // Re-export core types for convenient access
 pub use core::config::PoolAIConfig;
 pub use core::error::AppError;

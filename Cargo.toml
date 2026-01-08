@@ -132,6 +132,9 @@ raft = ["async-raft", "anyhow"]
 # Enterprise features (optional)
 # Use: cargo build --features enterprise
 enterprise = []
+# Cloud integration features (optional)
+# Use: cargo build --features cloud
+cloud = []
 # VM Isolation - Linux (requires root or CAP_NET_ADMIN, CAP_SYS_ADMIN)
 # Use: cargo build --features vm-isolation-linux
 vm-isolation-linux = ["nix"]
