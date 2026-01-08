@@ -1,3 +1,37 @@
+//! Model interface module
+//!
+//! Provides abstractions for AI model integration, including request/response
+//! handling, model lifecycle management, and metrics collection.
+//!
+//! # Features
+//!
+//! - **Model Interface Trait**: Unified interface for different model backends
+//! - **Model Manager**: Centralized model registration and management
+//! - **Request/Response**: Structured request and response types
+//! - **Metrics**: Performance metrics and monitoring
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::core::model_interface::{ModelInterface, ModelRequest, ModelParameters};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! // Create a model request
+//! let request = ModelRequest {
+//!     input: "Hello, world!".to_string(),
+//!     parameters: ModelParameters::default(),
+//!     session_id: None,
+//!     priority: 5,
+//!     timeout: Some(30),
+//! };
+//!
+//! // Process request (assuming model implements ModelInterface)
+//! // let response = model.process_request(request).await?;
+//! // println!("Generated: {}", response.output);
+//! # Ok(())
+//! # }
+//! ```
+
 use crate::core::config::ModelConfig as ConfigModelConfig;
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
@@ -196,6 +230,37 @@ pub struct PerformanceSettings {
 }
 
 /// Primary model interface according to the MVP concept
+///
+/// Defines the standard interface that all AI models must implement
+/// to integrate with PoolAI. Provides methods for request processing,
+/// lifecycle management, and monitoring.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::core::model_interface::{ModelInterface, ModelRequest, ModelResponse};
+///
+/// // Example implementation (simplified)
+/// struct MyModel;
+///
+/// #[async_trait::async_trait]
+/// impl ModelInterface for MyModel {
+///     async fn process_request(&self, request: ModelRequest) -> Result<ModelResponse, poolai::core::error::AppError> {
+///         // Implementation here
+///         # todo!()
+///     }
+///     // ... other required methods
+///     # async fn get_model_info(&self) -> Result<poolai::core::model_interface::ModelInfo, poolai::core::error::AppError> { todo!() }
+///     # async fn update_config(&self, _config: poolai::core::model_interface::ModelConfig) -> Result<(), poolai::core::error::AppError> { todo!() }
+///     # async fn get_metrics(&self) -> Result<poolai::core::model_interface::ModelMetrics, poolai::core::error::AppError> { todo!() }
+///     # async fn get_state(&self) -> Result<poolai::core::model_interface::ModelState, poolai::core::error::AppError> { todo!() }
+///     # async fn initialize(&self) -> Result<(), poolai::core::error::AppError> { todo!() }
+///     # async fn shutdown(&self) -> Result<(), poolai::core::error::AppError> { todo!() }
+///     # async fn health_check(&self) -> Result<(), poolai::core::error::AppError> { todo!() }
+///     # async fn clear_cache(&self) -> Result<(), poolai::core::error::AppError> { todo!() }
+///     # async fn get_statistics(&self) -> Result<std::collections::HashMap<String, f64>, poolai::core::error::AppError> { todo!() }
+/// }
+/// ```
 #[async_trait::async_trait]
 pub trait ModelInterface {
     /// Process a request with the model
@@ -230,6 +295,31 @@ pub trait ModelInterface {
 }
 
 /// Model manager for MVP
+///
+/// Centralized manager for registering, managing, and routing requests
+/// to different AI models. Supports multiple models simultaneously.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::core::model_interface::{ModelManager, ModelRequest};
+/// use poolai::core::config::ModelConfig as ConfigModelConfig;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let mut manager = ModelManager::new(ConfigModelConfig::default());
+///
+/// // Register a model (assuming model implements ModelInterface)
+/// // manager.register_model("my-model".to_string(), Box::new(my_model)).await?;
+///
+/// // Process a request
+/// // let request = ModelRequest { ... };
+/// // let response = manager.process_request("my-model", request).await?;
+///
+/// // Get metrics for all models
+/// // let all_metrics = manager.get_all_metrics().await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct ModelManager {
     models: HashMap<String, Box<dyn ModelInterface + Send + Sync>>,
     #[allow(dead_code)] // Will be used for model configuration in future

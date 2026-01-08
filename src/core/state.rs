@@ -1,3 +1,52 @@
+//! Application state management module
+//!
+//! Provides centralized state management for PoolAI, including worker tracking,
+//! system state, model states, and configuration management.
+//!
+//! # Features
+//!
+//! - **Worker Management**: Add, remove, update workers and their metrics
+//! - **System State**: Track system status, metrics, and health
+//! - **Model State**: Manage model states and lifecycle
+//! - **Thread Safety**: All operations are thread-safe using `Arc<RwLock<>>`
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::core::state::AppState;
+//! use poolai::core::state::{Worker, WorkerStatus, WorkerMetrics};
+//! use chrono::Utc;
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let state = AppState::new();
+//! state.initialize().await?;
+//!
+//! // Add a worker
+//! let worker = Worker {
+//!     id: "worker-1".to_string(),
+//!     address: "127.0.0.1:8080".to_string(),
+//!     mining_power: 100.0,
+//!     status: WorkerStatus::Active,
+//!     last_seen: Utc::now(),
+//!     metrics: WorkerMetrics::default(),
+//!     active_models: vec![],
+//! };
+//! state.add_worker(worker)?;
+//!
+//! // Get worker
+//! if let Some(worker) = state.get_worker("worker-1") {
+//!     println!("Worker status: {:?}", worker.status);
+//! }
+//!
+//! // Get system state
+//! let system_state = state.get_system_state();
+//! println!("Active workers: {}", system_state.active_workers);
+//!
+//! state.cleanup().await?;
+//! # Ok(())
+//! # }
+//! ```
+
 use crate::core::config::PoolAIConfig;
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelState, ModelStatus};
@@ -143,6 +192,31 @@ impl Default for SystemMetrics {
 }
 
 /// Main application state
+///
+/// Centralized state management for PoolAI application. Provides thread-safe
+/// access to workers, system state, model states, and configuration.
+///
+/// # Thread Safety
+///
+/// All operations are thread-safe using `Arc<RwLock<>>` for shared state
+/// and `Arc<Mutex<>>` for synchronization.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::core::state::AppState;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let state = AppState::new();
+/// state.initialize().await?;
+///
+/// // Use state for worker and model management
+/// // ...
+///
+/// state.cleanup().await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct AppState {
     /// Workers
     pub workers: Arc<RwLock<HashMap<String, Worker>>>,
@@ -160,6 +234,22 @@ pub struct AppState {
 
 impl AppState {
     /// Create new application state
+    ///
+    /// Initializes a new `AppState` with empty collections and default values.
+    /// Remember to call `initialize()` before using the state.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::core::state::AppState;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let state = AppState::new();
+    /// state.initialize().await?;
+    /// // Now state is ready to use
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new() -> Self {
         Self {
             workers: Arc::new(RwLock::new(HashMap::new())),
