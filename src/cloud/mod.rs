@@ -133,7 +133,7 @@ impl CloudManager {
             gcp,
             autoscaler,
             loadbalancer,
-            config,
+            _config: config,
             initialized: Arc::new(RwLock::new(false)),
         }
     }
