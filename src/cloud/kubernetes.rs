@@ -165,10 +165,116 @@ impl KubernetesManager {
         Ok(vec![])
     }
 
+    /// Get status of a Kubernetes Pod (placeholder)
+    ///
+    /// # Arguments
+    ///
+    /// * `pod_name` - Name of the pod to query
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `pod_name` is empty.
+    /// Returns other `AppError` variants if pod is not found or query fails.
+    pub async fn get_pod_status(&self, pod_name: &str) -> Result<PodStatus, AppError> {
+        if pod_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Pod name cannot be empty. Current value: ''. Suggestion: Provide a valid pod name."
+                    .to_string(),
+            ));
+        }
+
+        info!("Getting status for pod {} in namespace {}", pod_name, self.namespace);
+        // Future: Query k8s API for pod status
+        Ok(PodStatus {
+            name: pod_name.to_string(),
+            phase: "Running".to_string(),
+            ready: true,
+            restart_count: 0,
+        })
+    }
+
+    /// Scale a Kubernetes Deployment (placeholder)
+    ///
+    /// # Arguments
+    ///
+    /// * `deployment_name` - Name of the deployment to scale
+    /// * `replicas` - Target number of replicas (must be >= 0)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `deployment_name` is empty
+    /// - `replicas` is negative
+    pub async fn scale_deployment(&self, deployment_name: &str, replicas: i32) -> Result<(), AppError> {
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Deployment name cannot be empty. Current value: ''. Suggestion: Provide a valid deployment name."
+                    .to_string(),
+            ));
+        }
+
+        if replicas < 0 {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Replicas must be non-negative. Current value: {}. Suggestion: Set replicas to 0 or greater.",
+                    replicas
+                ),
+            ));
+        }
+
+        info!(
+            "Scaling deployment {} in namespace {} to {} replicas",
+            deployment_name, self.namespace, replicas
+        );
+        // Future: Update deployment spec
+        Ok(())
+    }
+
     /// Check if Kubernetes cluster is available
+    ///
+    /// Returns `true` if the cluster is accessible, `false` otherwise.
+    /// This is a placeholder implementation that always returns `false`.
+    ///
+    /// # Future Implementation
+    ///
+    /// This will be enhanced to:
+    /// - Perform actual cluster connectivity check
+    /// - Verify API server accessibility
+    /// - Check authentication/authorization
     pub async fn is_cluster_available(&self) -> bool {
-        // TODO: Check cluster connectivity
+        // TODO: Implement actual cluster availability check
+        // - Ping API server
+        // - Check authentication
+        // - Verify namespace access
         false
+    }
+
+    /// List all pods in the namespace
+    ///
+    /// Returns a list of pod names in the configured namespace.
+    /// This is a placeholder implementation that returns an empty list.
+    ///
+    /// # Future Implementation
+    ///
+    /// This will query the Kubernetes API to get actual pod list.
+    pub async fn list_pods(&self) -> Result<Vec<String>, AppError> {
+        info!("Listing pods in namespace {}", self.namespace);
+        // TODO: Query k8s API for pod list
+        Ok(vec![])
+    }
+
+    /// List all deployments in the namespace
+    ///
+    /// Returns a list of deployment names in the configured namespace.
+    /// This is a placeholder implementation that returns an empty list.
+    ///
+    /// # Future Implementation
+    ///
+    /// This will query the Kubernetes API to get actual deployment list.
+    pub async fn list_deployments(&self) -> Result<Vec<String>, AppError> {
+        info!("Listing deployments in namespace {}", self.namespace);
+        // TODO: Query k8s API for deployment list
+        Ok(vec![])
     }
 }
 
