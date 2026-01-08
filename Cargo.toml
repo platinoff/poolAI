@@ -97,6 +97,8 @@ nix = { version = "0.27", optional = true }
 # Use: cargo build --features cloud,cloud-sdk
 # Note: Some SDKs require Rust 1.88+ (AWS SDK), consider upgrading Rust version
 # Kubernetes API client
+# Note: k8s-openapi features should only be enabled in binary crates, not libraries
+# Library crates should use k8s_if_* macros or build scripts for version-specific code
 k8s-openapi = { version = "0.21", optional = true }
 # AWS SDK (requires Rust 1.88+)
 # Note: Commented out until Rust version is upgraded to 1.88+
