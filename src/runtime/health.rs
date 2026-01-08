@@ -1,6 +1,40 @@
 //! Health Monitor for Stage 4.1 Runtime
 //!
-//! Provides health checking for processes, workers, and VM instances
+//! Provides health checking for processes, workers, and VM instances.
+//!
+//! # Features
+//!
+//! - **Health Checks**: Monitor health status of processes and VM instances
+//! - **Failure Tracking**: Track failure counts and auto-restart on failures
+//! - **Timeout Handling**: Configurable timeout for health checks
+//! - **Health Score**: Calculate overall system health score
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::runtime::health::HealthMonitor;
+//! use uuid::Uuid;
+//!
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! let mut monitor = HealthMonitor::new(30); // 30 second interval
+//! monitor.initialize().await?;
+//! monitor.start().await?;
+//!
+//! // Register a health check
+//! let process_id = Uuid::new_v4();
+//! monitor.register_check(process_id, "worker-1".to_string()).await;
+//!
+//! // Perform health check
+//! let status = monitor.check_process_health(process_id, || {
+//!     Box::pin(async { Ok(()) }) // Health check function
+//! }).await;
+//!
+//! println!("Health status: {:?}", status);
+//!
+//! monitor.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
 
 use crate::core::error::AppError;
 use std::collections::HashMap;
