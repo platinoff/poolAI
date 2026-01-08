@@ -1,3 +1,37 @@
+//! Monitoring module for PoolAI
+//!
+//! Provides system monitoring, metrics collection, alerts, and health checks.
+//!
+//! # Example
+//!
+//! ```rust,no_run
+//! use poolai::monitoring::{Monitoring, Alert, AlertSeverity};
+//!
+//! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! let monitoring = Monitoring::new();
+//!
+//! // Collect metrics
+//! let metrics = monitoring.collect_metrics().await?;
+//! println!("CPU usage: {}%", metrics.resource.cpu_usage_percent);
+//!
+//! // Process an alert
+//! let alert = Alert {
+//!     id: "alert-1".to_string(),
+//!     severity: AlertSeverity::Warning,
+//!     message: "High CPU usage".to_string(),
+//!     timestamp: std::time::Instant::now(),
+//!     source: "system".to_string(),
+//!     resolved: false,
+//! };
+//! monitoring.process_alert(alert).await?;
+//!
+//! // Get system status
+//! let status = monitoring.get_status().await?;
+//! println!("Overall health: {}%", status.overall_health);
+//! # Ok(())
+//! # }
+//! ```
+
 pub mod metrics;
 
 use crate::core::error::AppError;
@@ -6,6 +40,25 @@ use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
 
+/// System alert
+///
+/// Represents an alert or warning in the system with severity and metadata.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::monitoring::{Alert, AlertSeverity};
+/// use std::time::Instant;
+///
+/// let alert = Alert {
+///     id: "high-cpu-123".to_string(),
+///     severity: AlertSeverity::Warning,
+///     message: "CPU usage above 80%".to_string(),
+///     timestamp: Instant::now(),
+///     source: "monitoring".to_string(),
+///     resolved: false,
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct Alert {
     pub id: String,
@@ -16,6 +69,21 @@ pub struct Alert {
     pub resolved: bool,
 }
 
+/// Alert severity levels
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::monitoring::AlertSeverity;
+///
+/// let severity = AlertSeverity::Warning;
+/// match severity {
+///     AlertSeverity::Info => println!("Informational alert"),
+///     AlertSeverity::Warning => println!("Warning alert"),
+///     AlertSeverity::Error => println!("Error alert"),
+///     AlertSeverity::Critical => println!("Critical alert"),
+/// }
+/// ```
 #[derive(Debug, Clone)]
 pub enum AlertSeverity {
     Info,
@@ -43,6 +111,33 @@ pub struct HistoricalData {
     pub alerts: Vec<Alert>,
 }
 
+/// Monitoring system for PoolAI
+///
+/// Provides centralized monitoring, metrics collection, and alert management.
+///
+/// # Thread Safety
+///
+/// All methods are async and thread-safe, using `Arc<RwLock<>>` internally.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::monitoring::Monitoring;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let monitoring = Monitoring::new();
+///
+/// // Initialize monitoring
+/// monitoring.initialize().await?;
+///
+/// // Collect metrics periodically
+/// let metrics = monitoring.collect_metrics().await?;
+///
+/// // Get current status
+/// let status = monitoring.get_status().await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct Monitoring {
     alerts: Arc<RwLock<Vec<Alert>>>,
     metrics_collector: Arc<metrics::MetricsCollector>,
@@ -51,6 +146,16 @@ pub struct Monitoring {
 }
 
 impl Monitoring {
+    /// Create a new monitoring instance
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::monitoring::Monitoring;
+    ///
+    /// let monitoring = Monitoring::new();
+    /// // Remember to call initialize() before using
+    /// ```
     pub fn new() -> Self {
         Self {
             alerts: Arc::new(RwLock::new(Vec::new())),
@@ -69,10 +174,53 @@ impl Monitoring {
         }
     }
 
+    /// Collect current system metrics
+    ///
+    /// Gathers metrics from all sources (CPU, memory, GPU, disk, network).
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::monitoring::Monitoring;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let monitoring = Monitoring::new();
+    /// let metrics = monitoring.collect_metrics().await?;
+    /// println!("CPU: {}%, Memory: {}MB", 
+    ///     metrics.resource.cpu_usage_percent,
+    ///     metrics.resource.memory_usage_mb);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn collect_metrics(&self) -> Result<metrics::Metrics, AppError> {
         self.metrics_collector.collect().await
     }
 
+    /// Process and store an alert
+    ///
+    /// Adds an alert to the monitoring system and triggers any configured
+    /// alert handlers or notifications.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::monitoring::{Monitoring, Alert, AlertSeverity};
+    /// use std::time::Instant;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let monitoring = Monitoring::new();
+    /// let alert = Alert {
+    ///     id: "high-cpu-123".to_string(),
+    ///     severity: AlertSeverity::Warning,
+    ///     message: "CPU usage above 80%".to_string(),
+    ///     timestamp: Instant::now(),
+    ///     source: "monitoring".to_string(),
+    ///     resolved: false,
+    /// };
+    /// monitoring.process_alert(alert).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn process_alert(&self, alert: Alert) -> Result<(), AppError> {
         let mut alerts = self.alerts.write().await;
         alerts.push(alert);
@@ -146,6 +294,25 @@ impl Monitoring {
         }
     }
 
+    /// Get current system status
+    ///
+    /// Returns a snapshot of the current system health and metrics.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::monitoring::Monitoring;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let monitoring = Monitoring::new();
+    /// let status = monitoring.get_system_status().await;
+    /// println!("Health: {}%, Workers: {}, Requests: {}",
+    ///     status.overall_health,
+    ///     status.active_workers,
+    ///     status.total_requests);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_system_status(&self) -> SystemStatus {
         self.status.read().await.clone()
     }
