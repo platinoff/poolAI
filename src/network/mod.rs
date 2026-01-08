@@ -12,6 +12,9 @@ pub mod raid_distributed_handlers;
 pub mod validation;
 pub mod ws;
 
+#[cfg(feature = "enterprise")]
+pub mod enterprise_api;
+
 use crate::ui;
 use axum::response::Redirect;
 use axum::routing::get;
@@ -31,11 +34,17 @@ use axum_server::tls_rustls::RustlsConfig;
 /// HTTPS support requires feature "https" and valid certificates.
 /// Configuration is read from PoolAIConfig.
 pub async fn start_server(addr: SocketAddr) {
-    let app = Router::new()
+    let mut app = Router::new()
         // Trailing-slash compat for UI entrypoint.
         .route("/ui/", get(|| async { Redirect::permanent("/ui") }))
         .nest("/api/v1", api::create_api_routes())
         .nest("/ui", ui::create_ui_routes());
+    
+    // Add enterprise API routes if feature is enabled
+    #[cfg(feature = "enterprise")]
+    {
+        app = app.nest("/api/enterprise", enterprise_api::create_enterprise_api_routes());
+    }
 
     // Read HTTPS configuration from config file
     // HTTPS support is optional and requires feature "https"

@@ -32,6 +32,11 @@ pub use components::get_component_styles;
 mod themes;
 pub use themes::{get_all_themes, get_theme, Theme, DARK_THEME, HIGH_CONTRAST_THEME, LIGHT_THEME};
 
+#[cfg(feature = "enterprise")]
+mod admin;
+#[cfg(feature = "enterprise")]
+pub use admin::create_admin_routes;
+
 use crate::core::error::AppError;
 use axum::{response::Html, routing::get, Router};
 use tracing::info;
@@ -55,7 +60,7 @@ impl UiManager {
 }
 
 pub fn create_ui_routes() -> Router {
-    Router::new()
+    let mut router = Router::new()
         .route("/", get(home_handler))
         .route("/auth", get(login_page))
         .route("/login", get(login_page))
@@ -65,7 +70,15 @@ pub fn create_ui_routes() -> Router {
         .route("/workers", get(workers_page))
         .route("/libs", get(libs_page))
         .route("/vm", get(vm_page))
-        .route("/raid", get(raid_page))
+        .route("/raid", get(raid_page));
+    
+    // Add admin routes if enterprise feature is enabled
+    #[cfg(feature = "enterprise")]
+    {
+        router = router.merge(create_admin_routes());
+    }
+    
+    router
 }
 
 const BASE_CSS: &str = r#"
