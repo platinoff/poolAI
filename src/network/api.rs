@@ -85,29 +85,29 @@ pub fn create_api_routes() -> Router {
             post(worker_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/workers/:id",
+            "/workers/{id}",
             delete(worker_delete_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/gpu", get(gpu_info))
         .route("/ws/metrics", get(websocket_handler))
         .route("/rewards", get(rewards_handler))
-        .route("/rewards/:user_id", get(user_rewards_handler))
-        .route("/rewards/progress/:user_id", get(user_progress_handler))
+        .route("/rewards/{user_id}", get(user_rewards_handler))
+        .route("/rewards/progress/{user_id}", get(user_progress_handler))
         .route("/rewards/statistics", get(rewards_statistics_handler))
         .route("/rewards/top", get(top_users_handler))
         .route("/libraries", get(libraries_list_handler))
-        .route("/libraries/:name", get(library_info_handler))
+        .route("/libraries/{name}", get(library_info_handler))
         // Write endpoints with auth middleware
         .route(
-            "/libraries/:name/install",
+            "/libraries/{name}/install",
             post(library_install_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/libraries/:name/uninstall",
+            "/libraries/{name}/uninstall",
             post(library_uninstall_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/libraries/:name/update",
+            "/libraries/{name}/update",
             post(library_update_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/vm/instances", get(vm_instances_handler))
@@ -116,28 +116,28 @@ pub fn create_api_routes() -> Router {
             post(vm_instance_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/vm/instances/:id",
+            "/vm/instances/{id}",
             put(vm_instance_update_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/vm/instances/:id",
+            "/vm/instances/{id}",
             delete(vm_instance_delete_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/vm/instances/:id/start",
+            "/vm/instances/{id}/start",
             post(vm_instance_start_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/vm/instances/:id/stop",
+            "/vm/instances/{id}/stop",
             post(vm_instance_stop_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/vm/instances/:id/restart",
+            "/vm/instances/{id}/restart",
             post(vm_instance_restart_handler).layer(middleware::from_fn(auth_middleware)),
         )
-        .route("/vm/instances/:id/health", get(vm_instance_health_handler))
+        .route("/vm/instances/{id}/health", get(vm_instance_health_handler))
         .route(
-            "/vm/instances/:id/resources",
+            "/vm/instances/{id}/resources",
             get(vm_instance_resources_handler),
         )
         .route(
@@ -151,13 +151,13 @@ pub fn create_api_routes() -> Router {
             post(raid_artifact_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/raid/artifacts/:id",
+            "/raid/artifacts/{id}",
             delete(raid_artifact_delete_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/raid/quota", get(raid_quota_handler))
         .route("/raid/events", get(raid_events_handler))
         .route(
-            "/raid/events/:artifact_id",
+            "/raid/events/{artifact_id}",
             get(raid_events_for_artifact_handler),
         )
         .route("/raid/events/range", get(raid_events_range_handler))
