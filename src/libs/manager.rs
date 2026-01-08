@@ -756,7 +756,7 @@ impl LibraryManager {
 
         // Get artifact from RAID using artifact_ref.path
         let raid_manager = crate::raid::get_global_manager();
-        let artifact_path_str = artifact_ref.path.clone();
+        let artifact_path_str = artifact_ref.path.display().to_string();
         let artifact_bytes = raid_manager
             .get_artifact(&artifact_ref.path)
             .await
