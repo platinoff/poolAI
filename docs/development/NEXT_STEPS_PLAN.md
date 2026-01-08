@@ -100,12 +100,15 @@
 - ✅ Network ports support in VM CRD (parse and apply ports)
 - ✅ Complete cleanup implementation (VM deployment deletion, ResourceQuota deletion)
 - ✅ Enhanced error handling in reconciliation loop (CRD status updates on errors, better error messages)
+- ✅ Service creation methods (create_service for exposing deployments)
+- ✅ PVC creation methods (create_pvc for VM storage)
+- ✅ Service and PVC integration in reconciliation (automatic creation for workers and VMs)
 
-**Прогрес Cloud Module**: ~87% 🔄
+**Прогрес Cloud Module**: ~90% 🔄
 - Infrastructure: 100% ✅
 - Testing: 100% ✅ (67 tests)
 - Documentation: 100% ✅
-- Implementation: ~85% 🔄
+- Implementation: ~88% 🔄
 
 ---
 

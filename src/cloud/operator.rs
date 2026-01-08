@@ -932,6 +932,21 @@ impl PoolAIOperator {
             }
         }
         
+        // Create/update Service for the worker (if ports are needed)
+        // For now, we'll create a default service on port 8080
+        let service_name = format!("{}-service", deployment_name);
+        if let Err(e) = k8s_manager.create_service(
+            &service_name,
+            deployment_name,
+            &[8080], // Default port
+            crate::cloud::kubernetes::ServiceType::ClusterIP,
+        ).await {
+            // Service might already exist, which is OK
+            warn!("Failed to create service for worker {}: {} (may already exist)", deployment_name, e);
+        } else {
+            info!("Created/updated service: {} for worker {}", service_name, deployment_name);
+        }
+        
         // Update CRD status with deployment status
         let status = json!({
             "conditions": [{
@@ -940,7 +955,8 @@ impl PoolAIOperator {
                 "reason": if deployment_exists { "DeploymentUpdated" } else { "DeploymentCreated" },
                 "message": format!("Worker deployment {} {}", deployment_name, if deployment_exists { "updated" } else { "created" })
             }],
-            "deploymentName": deployment_name
+            "deploymentName": deployment_name,
+            "serviceName": service_name
         });
         
         if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaiworkers", &worker.name, status).await {
@@ -1013,6 +1029,37 @@ impl PoolAIOperator {
             }
         }
         
+        // Create/update PVC for VM storage
+        let pvc_name = format!("{}-pvc", deployment_name);
+        if let Err(e) = k8s_manager.create_pvc(
+            &pvc_name,
+            &vm.storage.size,
+            &vm.storage.storage_class,
+        ).await {
+            // PVC might already exist, which is OK
+            warn!("Failed to create PVC for VM {}: {} (may already exist)", deployment_name, e);
+        } else {
+            info!("Created/updated PVC: {} for VM {}", pvc_name, deployment_name);
+        }
+        
+        // Create/update Service for the VM (if ports are specified)
+        if let Some(ref ports) = vm.ports {
+            if !ports.is_empty() {
+                let service_name = format!("{}-service", deployment_name);
+                let service_type = crate::cloud::kubernetes::ServiceType::ClusterIP; // Default service type
+                if let Err(e) = k8s_manager.create_service(
+                    &service_name,
+                    deployment_name,
+                    ports,
+                    service_type,
+                ).await {
+                    warn!("Failed to create service for VM {}: {} (may already exist)", deployment_name, e);
+                } else {
+                    info!("Created/updated service: {} for VM {}", service_name, deployment_name);
+                }
+            }
+        }
+        
         // Update CRD status with deployment status
         let status = json!({
             "conditions": [{
@@ -1021,7 +1068,8 @@ impl PoolAIOperator {
                 "reason": if deployment_exists { "DeploymentUpdated" } else { "DeploymentCreated" },
                 "message": format!("VM deployment {} {}", deployment_name, if deployment_exists { "updated" } else { "created" })
             }],
-            "deploymentName": deployment_name
+            "deploymentName": deployment_name,
+            "pvcName": pvc_name
         });
         
         if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaivms", &vm.name, status).await {

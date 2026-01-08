@@ -1687,6 +1687,208 @@ impl KubernetesManager {
             Ok(())
         }
     }
+
+    /// Create a Kubernetes Service
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Service name
+    /// * `deployment_name` - Deployment name to create service for
+    /// * `ports` - List of ports to expose
+    /// * `service_type` - Service type (ClusterIP, NodePort, LoadBalancer)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `deployment_name` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Service with same name already exists
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::{KubernetesManager, ServiceType};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// manager.create_service("my-service", "my-deployment", &[8080], ServiceType::ClusterIP).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn create_service(
+        &self,
+        name: &str,
+        deployment_name: &str,
+        ports: &[u16],
+        service_type: ServiceType,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Service name cannot be empty. Context: Attempted to create service with empty name. \
+                Suggestion: Provide a valid service name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Deployment name cannot be empty. Context: Attempted to create service with empty deployment name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let service_type_str = match service_type {
+                ServiceType::ClusterIP => "ClusterIP",
+                ServiceType::NodePort => "NodePort",
+                ServiceType::LoadBalancer => "LoadBalancer",
+            };
+            
+            let mut service_ports = Vec::new();
+            for port in ports {
+                service_ports.push(json!({
+                    "port": port,
+                    "targetPort": port,
+                    "protocol": "TCP"
+                }));
+            }
+            
+            let service_body = json!({
+                "apiVersion": "v1",
+                "kind": "Service",
+                "metadata": {
+                    "name": name,
+                    "namespace": self.namespace,
+                    "labels": {
+                        "app": deployment_name,
+                        "managed-by": "poolai"
+                    }
+                },
+                "spec": {
+                    "type": service_type_str,
+                    "selector": {
+                        "app": deployment_name
+                    },
+                    "ports": service_ports
+                }
+            });
+            
+            // Create service via Kubernetes API
+            let path = format!("/api/v1/namespaces/{}/services", self.namespace);
+            let _response = self.k8s_api_request("POST", &path, Some(service_body)).await?;
+            
+            info!("Created service: {} for deployment {} in namespace {}", name, deployment_name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Creating service: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
+
+    /// Create a PersistentVolumeClaim
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - PVC name
+    /// * `size` - Storage size (e.g., "10Gi")
+    /// * `storage_class` - Storage class name
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `size` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - PVC with same name already exists
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// manager.create_pvc("my-pvc", "10Gi", "standard").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn create_pvc(
+        &self,
+        name: &str,
+        size: &str,
+        storage_class: &str,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "PVC name cannot be empty. Context: Attempted to create PVC with empty name. \
+                Suggestion: Provide a valid PVC name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if size.is_empty() {
+            return Err(AppError::ValidationError(
+                "Storage size cannot be empty. Context: Attempted to create PVC with empty size. \
+                Suggestion: Provide a valid storage size (e.g., '10Gi', '100Mi'). \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let pvc_body = json!({
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "metadata": {
+                    "name": name,
+                    "namespace": self.namespace,
+                    "labels": {
+                        "managed-by": "poolai"
+                    }
+                },
+                "spec": {
+                    "accessModes": ["ReadWriteOnce"],
+                    "resources": {
+                        "requests": {
+                            "storage": size
+                        }
+                    },
+                    "storageClassName": storage_class
+                }
+            });
+            
+            // Create PVC via Kubernetes API
+            let path = format!("/api/v1/namespaces/{}/persistentvolumeclaims", self.namespace);
+            let _response = self.k8s_api_request("POST", &path, Some(pvc_body)).await?;
+            
+            info!("Created PVC: {} with size {} in namespace {}", name, size, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Creating PVC: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
 }
 
 /// Worker deployment configuration for Kubernetes
