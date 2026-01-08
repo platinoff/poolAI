@@ -1,0 +1,18 @@
+apiVersion: v2
+name: poolai
+description: A Helm chart for PoolAI - Distributed AI Mining Pool Management System
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - ai
+  - mining
+  - pool
+  - gpu
+  - distributed
+home: https://github.com/poolai/poolai
+sources:
+  - https://github.com/poolai/poolai
+maintainers:
+  - name: PoolAI Team
+dependencies: []

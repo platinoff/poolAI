@@ -1,0 +1,4 @@
+{{- if .Values.crds.install }}
+# Install CRDs from the crds directory
+# Note: CRDs should be installed before deploying the operator
+{{- end }}

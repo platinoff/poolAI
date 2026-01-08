@@ -1,0 +1,131 @@
+# Default values for PoolAI
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  namespace: poolai
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# Operator configuration
+operator:
+  enabled: true
+  image:
+    repository: poolai/operator
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+
+# API Server configuration
+apiServer:
+  enabled: true
+  image:
+    repository: poolai/api-server
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+# Worker configuration
+worker:
+  enabled: true
+  image:
+    repository: poolai/worker
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  defaultReplicas: 3
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Kubernetes configuration
+kubernetes:
+  namespace: poolai
+  createNamespace: true
+
+# Service account and RBAC
+serviceAccount:
+  create: true
+  name: poolai-operator
+  annotations: {}
+
+rbac:
+  create: true
+
+# CRD installation
+crds:
+  install: true
+  keep: true
+
+# Monitoring
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    scrapeTimeout: 10s
+
+# Ingress
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: poolai.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+# Security
+security:
+  jwt:
+    enabled: true
+  https:
+    enabled: false
+  tls:
+    enabled: false
+    secretName: ""
+
+# Enterprise features
+enterprise:
+  enabled: false
+  auditLogging:
+    enabled: true
+  multiTenancy:
+    enabled: true
+  advancedSecurity:
+    enabled: false
+  advancedMonitoring:
+    enabled: false
