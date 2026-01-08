@@ -410,6 +410,8 @@ pub async fn create_artifact_archive(
     let archive_path = archive_path.to_path_buf();
 
     let archive_path_clone = archive_path.clone();
+    let archive_path_str = archive_path_clone.display().to_string();
+    let source_dir_str = source_dir.display().to_string();
 
     // Run blocking I/O in spawn_blocking
     tokio::task::spawn_blocking(move || {
@@ -422,7 +424,7 @@ pub async fn create_artifact_archive(
                 "Failed to create archive file. Context: Cannot create tar.gz archive file. \
                 Suggestion: Check filesystem permissions and disk space. \
                 Path: '{}', Error: {}",
-                archive_path.display(), e
+                archive_path_str, e
             )))?;
 
         let gz = GzEncoder::new(file, Compression::default());
@@ -433,7 +435,7 @@ pub async fn create_artifact_archive(
                 "Failed to add directory to archive. Context: Cannot add source directory contents to tar archive. \
                 Suggestion: Check source directory permissions and verify directory is accessible. \
                 Source: '{}', Archive: '{}', Error: {}",
-                source_dir.display(), archive_path.display(), e
+                source_dir_str, archive_path_str, e
             ))
         })?;
 
@@ -442,7 +444,7 @@ pub async fn create_artifact_archive(
                 "Failed to finish archive. Context: Cannot finalize tar.gz archive creation. \
                 Suggestion: Check disk space and filesystem integrity. \
                 Archive: '{}', Error: {}",
-                archive_path.display(), e
+                archive_path_str, e
             )))?;
 
         Ok::<PathBuf, AppError>(archive_path)
