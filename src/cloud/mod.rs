@@ -86,18 +86,102 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 /// Cloud integration configuration
+///
+/// Configures which cloud features are enabled and their settings.
+/// All features are optional and can be enabled independently.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::cloud::CloudConfig;
+///
+/// let config = CloudConfig {
+///     kubernetes_enabled: true,
+///     kubernetes_namespace: "poolai".to_string(),
+///     aws_enabled: true,
+///     aws_region: Some("us-east-1".to_string()),
+///     ..Default::default()
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct CloudConfig {
+    /// Enable Kubernetes integration
     pub kubernetes_enabled: bool,
+    /// Kubernetes namespace for PoolAI resources
     pub kubernetes_namespace: String,
+    /// Enable AWS cloud provider integration
     pub aws_enabled: bool,
+    /// AWS region (defaults to AWS_REGION env var if not set)
     pub aws_region: Option<String>,
+    /// Enable Azure cloud provider integration
     pub azure_enabled: bool,
+    /// Azure subscription ID (defaults to AZURE_SUBSCRIPTION_ID env var if not set)
     pub azure_subscription_id: Option<String>,
+    /// Enable GCP cloud provider integration
     pub gcp_enabled: bool,
+    /// GCP project ID (defaults to GCP_PROJECT_ID env var if not set)
     pub gcp_project_id: Option<String>,
+    /// Enable auto-scaling features
     pub autoscaling_enabled: bool,
+    /// Enable load balancing features
     pub loadbalancing_enabled: bool,
+}
+
+impl CloudConfig {
+    /// Validate configuration
+    ///
+    /// Checks that configuration is valid and returns an error if any issues are found.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - Kubernetes namespace is empty when Kubernetes is enabled
+    /// - AWS region is not set when AWS is enabled
+    /// - Azure subscription ID is not set when Azure is enabled
+    /// - GCP project ID is not set when GCP is enabled
+    pub fn validate(&self) -> Result<(), AppError> {
+        if self.kubernetes_enabled && self.kubernetes_namespace.is_empty() {
+            return Err(AppError::ValidationError(format!(
+                "Kubernetes namespace cannot be empty when Kubernetes is enabled. Current value: '{}'. Suggestion: Set a valid namespace like 'poolai' or 'default'.",
+                self.kubernetes_namespace
+            )));
+        }
+
+        if self.aws_enabled {
+            let region = self.aws_region.as_deref()
+                .or_else(|| std::env::var("AWS_REGION").ok().as_deref());
+            if region.is_none() || region.unwrap().is_empty() {
+                return Err(AppError::ValidationError(
+                    "AWS region must be set when AWS is enabled. Current value: None. Suggestion: Set aws_region in config or set AWS_REGION environment variable."
+                        .to_string(),
+                ));
+            }
+        }
+
+        if self.azure_enabled {
+            let subscription_id = self.azure_subscription_id.as_deref()
+                .or_else(|| std::env::var("AZURE_SUBSCRIPTION_ID").ok().as_deref());
+            if subscription_id.is_none() || subscription_id.unwrap().is_empty() {
+                return Err(AppError::ValidationError(
+                    "Azure subscription ID must be set when Azure is enabled. Current value: None. Suggestion: Set azure_subscription_id in config or set AZURE_SUBSCRIPTION_ID environment variable."
+                        .to_string(),
+                ));
+            }
+        }
+
+        if self.gcp_enabled {
+            let project_id = self.gcp_project_id.as_deref()
+                .or_else(|| std::env::var("GCP_PROJECT_ID").ok().as_deref());
+            if project_id.is_none() || project_id.unwrap().is_empty() {
+                return Err(AppError::ValidationError(
+                    "GCP project ID must be set when GCP is enabled. Current value: None. Suggestion: Set gcp_project_id in config or set GCP_PROJECT_ID environment variable."
+                        .to_string(),
+                ));
+            }
+        }
+
+        Ok(())
+    }
 }
 
 impl Default for CloudConfig {
@@ -189,7 +273,17 @@ impl CloudManager {
     }
 
     /// Initialize cloud integration
+    ///
+    /// Validates configuration and initializes all enabled cloud features.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if configuration is invalid.
+    /// Returns other `AppError` variants if initialization fails.
     pub async fn initialize(&self) -> Result<(), AppError> {
+        // Validate configuration
+        self.config.validate()?;
+
         let mut initialized = self.initialized.write().await;
         if *initialized {
             return Ok(());
