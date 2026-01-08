@@ -1,0 +1,95 @@
+# PoolAI Tenant Custom Resource Definition
+# 
+# This CRD defines the PoolAITenant resource type for Kubernetes.
+# Install with: kubectl apply -f poolai-tenant-crd.yaml
+#
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: poolaitenants.poolai.io
+  labels:
+    app: poolai
+    component: operator
+spec:
+  group: poolai.io
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - quotas
+                - active
+              properties:
+                quotas:
+                  type: object
+                  properties:
+                    max_workers:
+                      type: integer
+                      minimum: 0
+                      description: Maximum number of workers
+                      example: 10
+                    max_memory_mb:
+                      type: integer
+                      minimum: 0
+                      description: Maximum memory in MB
+                      example: 1024
+                    max_cpu_cores:
+                      type: integer
+                      minimum: 0
+                      description: Maximum CPU cores
+                      example: 4
+                    max_storage_mb:
+                      type: integer
+                      minimum: 0
+                      description: Maximum storage in MB
+                      example: 10000
+                    max_vm_instances:
+                      type: integer
+                      minimum: 0
+                      description: Maximum VM instances
+                      example: 5
+                active:
+                  type: boolean
+                  description: Whether the tenant is active
+                  default: true
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: [Active, Inactive, Suspended, Unknown]
+                  description: Current phase of the tenant
+                usage:
+                  type: object
+                  properties:
+                    workers:
+                      type: integer
+                      description: Current number of workers
+                    memory_mb:
+                      type: integer
+                      description: Current memory usage in MB
+                    cpu_cores:
+                      type: integer
+                      description: Current CPU cores used
+                    storage_mb:
+                      type: integer
+                      description: Current storage usage in MB
+                    vm_instances:
+                      type: integer
+                      description: Current number of VM instances
+      subresources:
+        status: {}
+  scope: Namespaced
+  names:
+    plural: poolaitenants
+    singular: poolaitenant
+    kind: PoolAITenant
+    shortNames:
+      - pat
+      - tenant
