@@ -85,6 +85,9 @@ pub mod tgbot;
 pub mod ui;
 pub mod vm;
 
+#[cfg(feature = "enterprise")]
+pub mod enterprise;
+
 // Re-export core types for convenient access
 pub use core::config::PoolAIConfig;
 pub use core::error::AppError;
@@ -134,3 +137,13 @@ pub use tgbot::{send_notification, start_bot};
 
 // Re-export version information
 pub use version::{APP_VERSION, BUILD_TIME};
+
+// Re-export enterprise types (if feature enabled)
+#[cfg(feature = "enterprise")]
+pub use enterprise::{
+    audit::{AuditEvent, AuditLevel, AuditLogger, AuditQueryFilters},
+    multi_tenancy::{Tenant, TenantConfig, TenantManager},
+    security::SecurityManager,
+    monitoring::MonitoringManager,
+    EnterpriseManager,
+};
