@@ -48,7 +48,7 @@ base64 = { version = "0.22", features = ["alloc"] }
 urlencoding = "2.1"
 
 # Error handling
-thiserror = "1.0"
+thiserror = "2.0"
 
 # Date and time
 chrono = { version = "0.4", features = ["serde"] }
