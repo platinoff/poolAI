@@ -486,17 +486,21 @@ impl PoolAIOperator {
             match event.event_type {
                 CrdEventType::Added => {
                     info!("CRD resource added: {} in namespace {}", event.name, event.namespace);
-                    // TODO: Implement reconciliation for added resource
-                    // - Parse resource spec
-                    // - Create/update Kubernetes resources (Deployments, Services, etc.)
-                    // - Update status
+                    // TODO: Parse resource spec from Kubernetes API
+                    // For now, we'll log the event
+                    // In production, we would:
+                    // 1. GET /apis/poolai.io/v1/namespaces/{namespace}/poolaiworkers/{name}
+                    // 2. Parse PoolAIWorker spec
+                    // 3. Call reconcile_worker()
                 }
                 CrdEventType::Modified => {
                     info!("CRD resource modified: {} in namespace {}", event.name, event.namespace);
-                    // TODO: Implement reconciliation for modified resource
-                    // - Compare desired vs actual state
-                    // - Update Kubernetes resources if needed
-                    // - Update status
+                    // TODO: Parse resource spec from Kubernetes API
+                    // For now, we'll log the event
+                    // In production, we would:
+                    // 1. GET /apis/poolai.io/v1/namespaces/{namespace}/poolaiworkers/{name}
+                    // 2. Parse PoolAIWorker spec
+                    // 3. Call reconcile_worker() to update resources
                 }
                 CrdEventType::Deleted => {
                     if event.name == "shutdown" {
@@ -517,36 +521,117 @@ impl PoolAIOperator {
     /// Reconcile a PoolAIWorker resource
     ///
     /// Ensures the actual state matches the desired state.
+    /// This will:
+    /// 1. Check if Deployment exists
+    /// 2. Create/update Deployment based on worker spec
+    /// 3. Create/update Service if needed
+    /// 4. Update CRD status (when implemented)
     async fn reconcile_worker(
         worker: &PoolAIWorker,
         namespace: &str,
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
     ) -> Result<(), AppError> {
-        // TODO: Implement worker reconciliation
-        // 1. Check if Deployment exists
-        // 2. Create/update Deployment based on worker spec
-        // 3. Create/update Service if needed
-        // 4. Update CRD status
-        
         info!("Reconciling worker: {} in namespace {}", worker.name, namespace);
+        
+        // Build WorkerDeploymentConfig from PoolAIWorker
+        let config = crate::cloud::kubernetes::WorkerDeploymentConfig {
+            image: worker.image.clone(),
+            replicas: worker.replicas,
+            resources: crate::cloud::kubernetes::ResourceRequirements {
+                cpu: worker.resources.cpu.clone(),
+                memory: worker.resources.memory.clone(),
+                gpu: worker.resources.gpu,
+            },
+            env: std::collections::HashMap::new(), // TODO: Add env vars from worker spec
+        };
+        
+        // Check if deployment exists
+        let deployment_name = &worker.name;
+        let deployments = k8s_manager.list_deployments().await.unwrap_or_default();
+        let deployment_exists = deployments.iter().any(|d| d == deployment_name);
+        
+        if deployment_exists {
+            // Update existing deployment
+            // TODO: Implement deployment update logic
+            // For now, we'll try to create (which will fail if exists, but that's OK for now)
+            info!("Deployment {} exists, update logic not yet implemented", deployment_name);
+        } else {
+            // Create new deployment
+            match k8s_manager.create_worker_deployment(deployment_name, &config).await {
+                Ok(deployment_id) => {
+                    info!("Created worker deployment: {} in namespace {}", deployment_id, namespace);
+                }
+                Err(e) => {
+                    warn!("Failed to create worker deployment {}: {}", deployment_name, e);
+                    return Err(e);
+                }
+            }
+        }
+        
+        // TODO: Create/update Service for the worker
+        // TODO: Update CRD status with deployment status
+        
         Ok(())
     }
     
     /// Reconcile a PoolAIVM resource
     ///
     /// Ensures the actual state matches the desired state.
+    /// This will:
+    /// 1. Check if VM Deployment exists
+    /// 2. Create/update Deployment based on VM spec
+    /// 3. Create/update PVC if needed
+    /// 4. Update CRD status (when implemented)
     async fn reconcile_vm(
         vm: &PoolAIVM,
         namespace: &str,
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
     ) -> Result<(), AppError> {
-        // TODO: Implement VM reconciliation
-        // 1. Check if VM Deployment exists
-        // 2. Create/update Deployment based on VM spec
-        // 3. Create/update PVC if needed
-        // 4. Update CRD status
-        
         info!("Reconciling VM: {} in namespace {}", vm.name, namespace);
+        
+        // Build VmDeploymentConfig from PoolAIVM
+        let config = crate::cloud::kubernetes::VmDeploymentConfig {
+            image: vm.image.clone(),
+            resources: crate::cloud::kubernetes::ResourceRequirements {
+                cpu: vm.resources.cpu.clone(),
+                memory: vm.resources.memory.clone(),
+                gpu: vm.resources.gpu,
+            },
+            storage: crate::cloud::kubernetes::StorageConfig {
+                size: vm.storage.size.clone(),
+                storage_class: vm.storage.storage_class.clone(),
+            },
+            network: crate::cloud::kubernetes::NetworkConfig {
+                ports: vec![], // TODO: Add ports from VM spec
+                service_type: crate::cloud::kubernetes::ServiceType::ClusterIP, // Default service type
+            },
+        };
+        
+        // Check if deployment exists
+        let deployment_name = &vm.name;
+        let deployments = k8s_manager.list_deployments().await.unwrap_or_default();
+        let deployment_exists = deployments.iter().any(|d| d == deployment_name);
+        
+        if deployment_exists {
+            // Update existing deployment
+            // TODO: Implement deployment update logic
+            info!("Deployment {} exists, update logic not yet implemented", deployment_name);
+        } else {
+            // Create new deployment
+            match k8s_manager.create_vm_deployment(deployment_name, &config).await {
+                Ok(deployment_id) => {
+                    info!("Created VM deployment: {} in namespace {}", deployment_id, namespace);
+                }
+                Err(e) => {
+                    warn!("Failed to create VM deployment {}: {}", deployment_name, e);
+                    return Err(e);
+                }
+            }
+        }
+        
+        // TODO: Create/update PVC for VM storage
+        // TODO: Update CRD status with deployment status
+        
         Ok(())
     }
     
