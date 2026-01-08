@@ -47,6 +47,32 @@ impl Default for CircuitBreakerConfig {
 }
 
 /// Circuit breaker for a single node
+///
+/// Monitors the health of a single node and prevents cascading failures by
+/// rejecting requests when the node is detected as failing.
+///
+/// # States
+///
+/// - **Closed**: Normal operation, all requests pass through
+/// - **Open**: Node is failing, requests are rejected immediately
+/// - **HalfOpen**: Testing recovery, limited requests allowed
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::raid::circuit_breaker::{CircuitBreaker, CircuitBreakerConfig};
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let breaker = CircuitBreaker::with_defaults(1);
+///
+/// // Check if request is allowed
+/// breaker.allow_request().await?;
+///
+/// // After request completes
+/// breaker.record_success().await;
+/// # Ok(())
+/// # }
+/// ```
 pub struct CircuitBreaker {
     /// Node ID this circuit breaker monitors
     node_id: u64,
@@ -264,6 +290,28 @@ impl CircuitBreaker {
 }
 
 /// Circuit breaker manager for multiple nodes
+///
+/// Manages circuit breakers for multiple nodes in the distributed RAID cluster.
+/// Provides centralized access to circuit breaker state and configuration.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::raid::circuit_breaker::CircuitBreakerManager;
+///
+/// # async fn example() {
+/// let manager = CircuitBreakerManager::with_defaults();
+///
+/// // Get or create circuit breaker for a node
+/// let breaker = manager.get_or_create(1).await;
+///
+/// // Check circuit breaker state
+/// let states = manager.get_states().await;
+/// for (node_id, state) in states {
+///     println!("Node {}: {:?}", node_id, state);
+/// }
+/// # }
+/// ```
 pub struct CircuitBreakerManager {
     /// Circuit breakers by node ID
     breakers: Arc<RwLock<std::collections::HashMap<u64, Arc<CircuitBreaker>>>>,

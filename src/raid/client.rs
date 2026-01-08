@@ -13,6 +13,44 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 /// Protocol client for distributed RAID communication
+///
+/// Provides a client interface for communicating with other nodes in the
+/// distributed RAID cluster. Integrates with circuit breaker for fault tolerance.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::raid::client::ProtocolClient;
+/// use poolai::raid::protocol::{ArtifactMetadata, SyncMode};
+/// use chrono::Utc;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let client = ProtocolClient::new(
+///     "http://node1:8080".to_string(),
+///     "node-123".to_string()
+/// );
+///
+/// // Replicate an artifact
+/// let metadata = ArtifactMetadata {
+///     name: "my-model".to_string(),
+///     version: "1.0.0".to_string(),
+///     size_bytes: 1024,
+///     checksum: "sha256-hash".to_string(),
+///     created_at: Utc::now(),
+///     content_type: None,
+///     tags: None,
+/// };
+///
+/// let response = client.put_artifact(
+///     "artifact-123".to_string(),
+///     Some(b"artifact data".to_vec()),
+///     metadata,
+///     3,
+///     SyncMode::Sync,
+/// ).await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct ProtocolClient {
     client: Client,
     base_url: String,
@@ -25,6 +63,25 @@ pub struct ProtocolClient {
 
 impl ProtocolClient {
     /// Create a new protocol client
+    ///
+    /// Initializes a client with default timeout (30 seconds) for communicating
+    /// with a remote RAID node.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_url` - Base URL of the remote node (e.g., "http://node1:8080")
+    /// * `node_id` - Identifier for this client node
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::raid::client::ProtocolClient;
+    ///
+    /// let client = ProtocolClient::new(
+    ///     "http://node1:8080".to_string(),
+    ///     "node-123".to_string()
+    /// );
+    /// ```
     pub fn new(base_url: String, node_id: String) -> Self {
         let client = Client::builder()
             .timeout(Duration::from_secs(30))
@@ -41,6 +98,27 @@ impl ProtocolClient {
     }
 
     /// Create a client with custom timeout
+    ///
+    /// Initializes a client with a custom timeout for requests.
+    ///
+    /// # Arguments
+    ///
+    /// * `base_url` - Base URL of the remote node
+    /// * `node_id` - Identifier for this client node
+    /// * `timeout` - Custom timeout duration for requests
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::raid::client::ProtocolClient;
+    /// use std::time::Duration;
+    ///
+    /// let client = ProtocolClient::with_timeout(
+    ///     "http://node1:8080".to_string(),
+    ///     "node-123".to_string(),
+    ///     Duration::from_secs(60)
+    /// );
+    /// ```
     pub fn with_timeout(base_url: String, node_id: String, timeout: Duration) -> Self {
         let client = Client::builder()
             .timeout(timeout)
@@ -169,6 +247,51 @@ impl ProtocolClient {
     }
 
     /// Replicate an artifact to another node
+    ///
+    /// Sends an artifact to a remote node for replication. The artifact data
+    /// is base64-encoded for transmission.
+    ///
+    /// # Arguments
+    ///
+    /// * `artifact_id` - Unique identifier for the artifact
+    /// * `data` - Optional artifact data bytes (None for metadata-only operations)
+    /// * `metadata` - Artifact metadata including name, version, checksum
+    /// * `replication_factor` - Target number of replicas
+    /// * `sync_mode` - Synchronization mode (Sync or Async)
+    ///
+    /// # Returns
+    ///
+    /// Returns `PutArtifactResponse` with replication status.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::raid::client::ProtocolClient;
+    /// use poolai::raid::protocol::{ArtifactMetadata, SyncMode};
+    /// use chrono::Utc;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let client = ProtocolClient::new("http://node1:8080".to_string(), "node-123".to_string());
+    /// let metadata = ArtifactMetadata {
+    ///     name: "my-model".to_string(),
+    ///     version: "1.0.0".to_string(),
+    ///     size_bytes: 1024,
+    ///     checksum: "sha256-hash".to_string(),
+    ///     created_at: Utc::now(),
+    ///     content_type: None,
+    ///     tags: None,
+    /// };
+    ///
+    /// let response = client.put_artifact(
+    ///     "artifact-123".to_string(),
+    ///     Some(b"artifact data".to_vec()),
+    ///     metadata,
+    ///     3,
+    ///     SyncMode::Sync,
+    /// ).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn put_artifact(
         &self,
         artifact_id: String,
@@ -196,6 +319,35 @@ impl ProtocolClient {
     }
 
     /// Get an artifact from another node
+    ///
+    /// Retrieves an artifact from a remote node. Can fetch metadata only
+    /// or include the artifact data.
+    ///
+    /// # Arguments
+    ///
+    /// * `artifact_id` - Unique identifier for the artifact
+    /// * `include_data` - Whether to include artifact data in the response
+    ///
+    /// # Returns
+    ///
+    /// Returns `GetArtifactResponse` with artifact metadata and optionally data.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::raid::client::ProtocolClient;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let client = ProtocolClient::new("http://node1:8080".to_string(), "node-123".to_string());
+    ///
+    /// // Get artifact with data
+    /// let response = client.get_artifact("artifact-123".to_string(), true).await?;
+    /// if let Some(data) = response.data {
+    ///     println!("Retrieved {} bytes", data.len());
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_artifact(
         &self,
         artifact_id: String,
@@ -211,6 +363,26 @@ impl ProtocolClient {
     }
 
     /// Delete an artifact from another node
+    ///
+    /// Removes an artifact from a remote node. Can optionally propagate
+    /// the deletion to other replicas.
+    ///
+    /// # Arguments
+    ///
+    /// * `artifact_id` - Unique identifier for the artifact
+    /// * `propagate` - Whether to propagate deletion to other replicas
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::raid::client::ProtocolClient;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let client = ProtocolClient::new("http://node1:8080".to_string(), "node-123".to_string());
+    /// let response = client.delete_artifact("artifact-123".to_string(), true).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn delete_artifact(
         &self,
         artifact_id: String,
@@ -243,6 +415,26 @@ impl ProtocolClient {
     }
 
     /// Check health status of another node
+    ///
+    /// Performs a health check on the remote node, returning status information
+    /// including uptime, storage usage, and Raft role.
+    ///
+    /// # Returns
+    ///
+    /// Returns `HealthCheckResponse` with node health information.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::raid::client::ProtocolClient;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let client = ProtocolClient::new("http://node1:8080".to_string(), "node-123".to_string());
+    /// let health = client.health_check().await?;
+    /// println!("Node status: {:?}, Uptime: {}s", health.status, health.uptime_seconds);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn health_check(&self) -> Result<HealthCheckResponse, AppError> {
         let message = ProtocolMessage::health_check(self.node_id.clone());
         self.send_message("/health", message).await

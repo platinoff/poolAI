@@ -211,6 +211,40 @@ pub struct ReplicationMetadata {
 /// Replication Engine
 ///
 /// Coordinates artifact replication across multiple nodes in the distributed RAID system.
+/// Supports both synchronous (quorum-based) and asynchronous replication strategies.
+///
+/// # Features
+///
+/// - Synchronous replication with quorum confirmation
+/// - Asynchronous replication with background workers
+/// - Read replica selection with health awareness
+/// - Conflict detection and resolution
+/// - Node selection and load balancing
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::raid::replication::{ReplicationEngine, ReplicationConfig};
+/// use poolai::raid::RaidManager;
+/// use std::sync::Arc;
+/// use tokio::sync::RwLock;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let raid_manager = Arc::new(RwLock::new(RaidManager::new(
+///     poolai::raid::RaidConfig::default_for_platform()
+/// )));
+///
+/// let engine = ReplicationEngine::with_defaults(raid_manager, None);
+///
+/// // Register nodes
+/// engine.register_node(1, "http://node1:8080".to_string()).await;
+/// engine.register_node(2, "http://node2:8080".to_string()).await;
+///
+/// // Replicate an artifact synchronously
+/// // let result = engine.replicate_sync(...).await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct ReplicationEngine {
     /// RAID manager reference (will be used for local artifact operations)
     #[allow(dead_code)]

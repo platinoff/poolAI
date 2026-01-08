@@ -8,6 +8,38 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Protocol message wrapper
+///
+/// Encapsulates all messages sent between nodes in the distributed RAID system.
+/// Messages include type, ID, timestamp, node ID, and a JSON payload.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::raid::protocol::{ProtocolMessage, PutArtifactPayload, ArtifactMetadata, SyncMode};
+/// use chrono::Utc;
+///
+/// let metadata = ArtifactMetadata {
+///     name: "my-model".to_string(),
+///     version: "1.0.0".to_string(),
+///     size_bytes: 1024,
+///     checksum: "sha256-hash".to_string(),
+///     created_at: Utc::now(),
+///     content_type: None,
+///     tags: None,
+/// };
+///
+/// let payload = PutArtifactPayload {
+///     artifact_id: "artifact-123".to_string(),
+///     source_node: "node-123".to_string(),
+///     data: Some("base64data".to_string()),
+///     metadata,
+///     replication_factor: 3,
+///     sync_mode: SyncMode::Sync,
+/// };
+///
+/// let message = ProtocolMessage::put_artifact("node-123".to_string(), payload).unwrap();
+/// let json = message.to_json().unwrap();
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProtocolMessage {
     #[serde(rename = "type")]
@@ -51,6 +83,26 @@ pub struct PutArtifactPayload {
 }
 
 /// Artifact metadata
+///
+/// Contains descriptive information about an artifact including name, version,
+/// size, checksum, and optional tags.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::raid::protocol::ArtifactMetadata;
+/// use chrono::Utc;
+///
+/// let metadata = ArtifactMetadata {
+///     name: "llama-2-7b".to_string(),
+///     version: "1.0.0".to_string(),
+///     size_bytes: 13_000_000_000, // 13 GB
+///     checksum: "sha256:abc123...".to_string(),
+///     created_at: Utc::now(),
+///     content_type: Some("application/octet-stream".to_string()),
+///     tags: Some(vec!["model".to_string(), "llama".to_string()]),
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ArtifactMetadata {
     pub name: String,
