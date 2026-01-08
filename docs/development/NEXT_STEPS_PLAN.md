@@ -95,6 +95,7 @@
 - ✅ Actual health checks для load balancing (Kubernetes pod status + HTTP health checks)
 - ✅ Auto-scaling integration with Kubernetes (scale_up/scale_down with real API calls)
 - ✅ Load balancer health tracking (consecutive failures, health status per backend)
+- ✅ Improved watch_crd_resources documentation (watch API placeholder added, improved polling logic)
 
 **Прогрес Cloud Module**: ~85% 🔄
 - Infrastructure: 100% ✅

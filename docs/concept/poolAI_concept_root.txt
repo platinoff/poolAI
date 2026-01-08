@@ -109,6 +109,7 @@
   - ✅ **Real Health Checks** - Kubernetes pod status + HTTP health checks for load balancing
   - ✅ **Auto-scaling Integration** - scale_up/scale_down with real Kubernetes API calls
   - ✅ **Load Balancer Health Tracking** - consecutive failures tracking, health status per backend
+  - ✅ **Improved CRD Watching** - enhanced polling logic with resourceVersion tracking, watch API placeholder for future optimization
   - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
   - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
   - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs

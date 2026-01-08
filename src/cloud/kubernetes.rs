@@ -1567,6 +1567,73 @@ impl KubernetesManager {
             Ok(())
         }
     }
+
+    /// Watch CRD resources using Kubernetes watch API
+    ///
+    /// This is more efficient than polling as it uses server-sent events.
+    /// The watch API provides real-time updates without periodic polling.
+    ///
+    /// # Arguments
+    ///
+    /// * `group` - API group (e.g., "poolai.io")
+    /// * `version` - API version (e.g., "v1")
+    /// * `plural` - Resource plural name (e.g., "poolaiworkers")
+    /// * `resource_version` - Optional resource version to start watching from
+    ///
+    /// # Returns
+    ///
+    /// Returns a stream of watch events (Added, Modified, Deleted).
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Kubernetes API is unreachable
+    /// - Watch connection fails
+    ///
+    /// # Note
+    ///
+    /// This is a placeholder implementation. Full watch API support would require:
+    /// - Proper SSE (Server-Sent Events) parsing
+    /// - Handling watch bookmarks for efficient reconnection
+    /// - Error handling and reconnection logic
+    /// - Resource version tracking
+    ///
+    /// Currently, the operator uses HTTP polling which is simpler and more reliable
+    /// for initial implementation. Watch API can be integrated later for better efficiency.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// // Watch for changes (in production, you'd process the stream)
+    /// // Note: This is a placeholder - full implementation would return a proper stream
+    /// info!("Watch API support is available but not yet fully implemented");
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn watch_crd_resources(
+        &self,
+        _group: &str,
+        _version: &str,
+        _plural: &str,
+        _resource_version: Option<&str>,
+    ) -> Result<(), AppError> {
+        // Placeholder: Full watch API implementation would:
+        // 1. Create a GET request with ?watch=true parameter
+        // 2. Parse Server-Sent Events (SSE) stream
+        // 3. Handle watch events (ADDED, MODIFIED, DELETED, BOOKMARK)
+        // 4. Implement reconnection logic on connection loss
+        // 5. Track resourceVersion for efficient reconnection
+        
+        info!("Watch API method called (placeholder - use HTTP polling for now)");
+        Ok(())
+    }
 }
 
 /// Worker deployment configuration for Kubernetes

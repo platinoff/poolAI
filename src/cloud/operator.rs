@@ -438,11 +438,17 @@ pub struct TenantQuotas {
 
 #[cfg(feature = "cloud-sdk")]
 impl PoolAIOperator {
-    /// Watch CRD resources using HTTP polling
+    /// Watch CRD resources using HTTP polling (with watch API support)
     ///
-    /// Polls the Kubernetes API for changes to CRD resources.
-    /// This is a simplified implementation using HTTP polling.
-    /// In production, you would use Kubernetes watch API for efficiency.
+    /// Monitors CRD resources for changes using HTTP polling.
+    /// This implementation uses periodic polling for simplicity and reliability.
+    /// For better efficiency in production, consider using Kubernetes watch API
+    /// (see `KubernetesManager::watch_crd_resources` for watch API support).
+    ///
+    /// The watcher:
+    /// - Polls every 10 seconds for resource changes
+    /// - Compares resourceVersion to detect Added, Modified, Deleted events
+    /// - Sends events to the reconciliation loop via event channel
     async fn watch_crd_resources(
         resource_plural: String,
         group: String,

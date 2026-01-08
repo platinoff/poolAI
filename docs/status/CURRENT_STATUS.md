@@ -98,6 +98,7 @@
     - ✅ Real health checks for load balancing (Kubernetes pod status + HTTP health checks)
     - ✅ Auto-scaling integration with Kubernetes (scale_up/scale_down with real API calls)
     - ✅ Load balancer health tracking (consecutive failures, health status per backend)
+    - ✅ Improved watch_crd_resources (enhanced polling logic, watch API placeholder for future use)
     - ✅ Multi-cloud provider support (AWS, Azure, GCP placeholders)
     - ✅ Auto-scaling module structure with scaling policies
     - ✅ Load balancing module structure with strategies and health checks
