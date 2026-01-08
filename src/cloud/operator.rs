@@ -12,15 +12,34 @@
 //!
 //! # Example
 //!
+//! ## Basic Usage
+//!
 //! ```rust,no_run
 //! use poolai::cloud::operator::PoolAIOperator;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
+//! // Create and start the operator
 //! let operator = PoolAIOperator::new("poolai".to_string());
 //! operator.start().await?;
+//!
+//! // Operator is now watching for CRD changes and reconciling resources
+//! // Check if operator is running
+//! if operator.is_running().await {
+//!     println!("Operator is running");
+//! }
+//!
+//! // Stop the operator when done
+//! operator.stop().await?;
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ## CRD Resources
+//!
+//! The operator manages three types of Custom Resources:
+//! - `PoolAIWorker` - Worker deployments
+//! - `PoolAIVM` - VM instances
+//! - `PoolAITenant` - Tenant configurations
 
 use crate::core::error::AppError;
 use std::sync::Arc;
@@ -180,6 +199,24 @@ pub struct WorkerResources {
 /// PoolAI VM Custom Resource
 ///
 /// Represents a PoolAI VM instance resource in Kubernetes.
+/// This CRD allows users to define VM instances declaratively.
+///
+/// # Example
+///
+/// ```yaml
+/// apiVersion: poolai.io/v1
+/// kind: PoolAIVM
+/// metadata:
+///   name: my-vm
+/// spec:
+///   image: poolai/vm:v1.0.0
+///   resources:
+///     cpu: "1"
+///     memory: "2Gi"
+///   storage:
+///     size: "20Gi"
+///     storage_class: "ssd"
+/// ```
 #[derive(Debug, Clone)]
 pub struct PoolAIVM {
     /// VM name
@@ -215,6 +252,23 @@ pub struct VmStorage {
 /// PoolAI Tenant Custom Resource
 ///
 /// Represents a PoolAI tenant resource in Kubernetes.
+/// This CRD allows users to define tenant configurations with resource quotas.
+///
+/// # Example
+///
+/// ```yaml
+/// apiVersion: poolai.io/v1
+/// kind: PoolAITenant
+/// metadata:
+///   name: tenant-abc
+/// spec:
+///   active: true
+///   quotas:
+///     max_workers: 10
+///     max_memory_mb: 1024
+///     max_cpu_cores: 4
+///     max_storage_mb: 10000
+/// ```
 #[derive(Debug, Clone)]
 pub struct PoolAITenant {
     /// Tenant name
