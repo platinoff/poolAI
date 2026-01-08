@@ -51,7 +51,7 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
 
 /// Kubernetes Pod status information
 #[derive(Debug, Clone)]
