@@ -1967,7 +1967,7 @@ async fn admin_libs() -> Html<String> {
     let script = r#"
     async function loadLibraries() {
       try {
-        const libs = await fetchJson('/api/v1/libs');
+        const libs = await fetchJson('/api/v1/libraries');
         renderLibraries(libs);
       } catch (e) {
         showNotification('Error loading libraries: ' + e.message, 'error');
@@ -1986,7 +1986,7 @@ async fn admin_libs() -> Html<String> {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Type</th>
+              <th>Version</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -1994,11 +1994,16 @@ async fn admin_libs() -> Html<String> {
           <tbody>
             ${libs.map(l => `
               <tr>
-                <td>${l.name || l.id}</td>
-                <td>${l.type || 'unknown'}</td>
-                <td><span class="status-badge ${l.status === 'active' ? 'active' : 'inactive'}">${l.status || 'unknown'}</span></td>
+                <td><strong>${l.name || l.id || 'unknown'}</strong></td>
+                <td>${l.version || l.installed_version || 'N/A'}</td>
+                <td><span class="status-badge ${l.installed ? 'active' : 'inactive'}">${l.installed ? 'Installed' : 'Not Installed'}</span></td>
                 <td>
-                  <button class="btn" onclick="showNotification('Library actions - to be implemented', 'info')">Manage</button>
+                  ${l.installed ? `
+                    <button class="btn" onclick="uninstallLibrary('${l.name || l.id}')">Uninstall</button>
+                    <button class="btn" onclick="updateLibrary('${l.name || l.id}')">Update</button>
+                  ` : `
+                    <button class="btn btn-primary" onclick="installLibrary('${l.name || l.id}')">Install</button>
+                  `}
                 </td>
               </tr>
             `).join('')}
@@ -2007,7 +2012,75 @@ async fn admin_libs() -> Html<String> {
       `;
     }
     
+    async function installLibrary(name) {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      const version = prompt('Enter version to install (leave empty for latest):');
+      if (version === null) return;
+      
+      try {
+        const payload = version ? { version: version } : {};
+        await fetchJson(`/api/v1/libraries/${encodeURIComponent(name)}/install`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        showNotification('Library installation started', 'success');
+        setTimeout(() => loadLibraries(), 1000);
+      } catch (e) {
+        showNotification('Error installing library: ' + e.message, 'error');
+      }
+    }
+    
+    async function uninstallLibrary(name) {
+      if (!confirm('Uninstall library "' + name + '"? This action cannot be undone.')) {
+        return;
+      }
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      try {
+        await fetchJson(`/api/v1/libraries/${encodeURIComponent(name)}/uninstall`, {
+          method: 'POST'
+        });
+        showNotification('Library uninstalled successfully', 'success');
+        loadLibraries();
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      }
+    }
+    
+    async function updateLibrary(name) {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      const version = prompt('Enter version to update to (leave empty for latest):');
+      if (version === null) return;
+      
+      try {
+        const payload = version ? { version: version } : {};
+        await fetchJson(`/api/v1/libraries/${encodeURIComponent(name)}/update`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        showNotification('Library update started', 'success');
+        setTimeout(() => loadLibraries(), 1000);
+      } catch (e) {
+        showNotification('Error updating library: ' + e.message, 'error');
+      }
+    }
+    
     loadLibraries();
+    setInterval(loadLibraries, 10000);
     "#;
 
     admin_layout(
@@ -2016,7 +2089,6 @@ async fn admin_libs() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2>Libraries</h2>
-            <button class="btn btn-primary" onclick="showNotification('Upload library - to be implemented', 'info')">Upload Library</button>
           </div>
           <div id="libraries-list"></div>
         </div>
@@ -2061,7 +2133,7 @@ async fn admin_raid() -> Html<String> {
                 <td>${a.name || 'unnamed'}</td>
                 <td>${formatBytes(a.size || 0)}</td>
                 <td>
-                  <button class="btn" onclick="showNotification('Artifact actions - to be implemented', 'info')">Manage</button>
+                  <button class="btn btn-danger" onclick="deleteArtifact('${a.id || a.artifact_id}')">Delete</button>
                 </td>
               </tr>
             `).join('')}
@@ -2078,7 +2150,84 @@ async fn admin_raid() -> Html<String> {
       return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
     }
     
+    function showUploadArtifactModal() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      showModal('uploadArtifactModal');
+    }
+    
+    async function handleUploadArtifact(event) {
+      event.preventDefault();
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+      
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+      
+      try {
+        const name = document.getElementById('artifactName').value;
+        const data = document.getElementById('artifactData').value;
+        
+        if (!name || !data) {
+          showNotification('Name and data are required', 'error');
+          return;
+        }
+        
+        const payload = {
+          name: name,
+          data: data
+        };
+        
+        await fetchJson('/api/v1/raid/artifacts', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        
+        showNotification('Artifact uploaded successfully', 'success');
+        hideModal('uploadArtifactModal');
+        form.reset();
+        loadRaidArtifacts();
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+    
+    async function deleteArtifact(id) {
+      if (!confirm('Delete artifact "' + id + '"? This action cannot be undone.')) {
+        return;
+      }
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+      
+      try {
+        await fetchJson(`/api/v1/raid/artifacts/${encodeURIComponent(id)}`, {
+          method: 'DELETE'
+        });
+        showNotification('Artifact deleted successfully', 'success');
+        loadRaidArtifacts();
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+      }
+    }
+    
     loadRaidArtifacts();
+    setInterval(loadRaidArtifacts, 10000);
     "#;
 
     admin_layout(
@@ -2087,9 +2236,34 @@ async fn admin_raid() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2>RAID Artifacts</h2>
-            <button class="btn btn-primary" onclick="showNotification('Upload artifact - to be implemented', 'info')">Upload Artifact</button>
+            <button class="btn btn-primary" onclick="showUploadArtifactModal()" aria-label="Upload artifact">Upload Artifact</button>
           </div>
           <div id="raid-artifacts"></div>
+        </div>
+        
+        <!-- Upload Artifact Modal -->
+        <div id="uploadArtifactModal" class="modal" role="dialog" aria-labelledby="uploadArtifactModalTitle" aria-modal="true" aria-hidden="true">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 id="uploadArtifactModalTitle">Upload Artifact</h3>
+              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('uploadArtifactModal')">&times;</button>
+            </div>
+            <form id="uploadArtifactForm" onsubmit="handleUploadArtifact(event)">
+              <div class="form-group">
+                <label for="artifactName">Artifact Name <span class="required">*</span></label>
+                <input type="text" id="artifactName" name="name" required placeholder="my-artifact" />
+              </div>
+              <div class="form-group">
+                <label for="artifactData">Artifact Data (Base64) <span class="required">*</span></label>
+                <textarea id="artifactData" name="data" required rows="10" placeholder="Paste base64-encoded data here"></textarea>
+                <small class="form-hint">Paste base64-encoded artifact data</small>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn" onclick="hideModal('uploadArtifactModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+              </div>
+            </form>
+          </div>
         </div>
         "#,
         script,
