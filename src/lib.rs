@@ -142,6 +142,10 @@ pub use tgbot::{send_notification, start_bot};
 pub use version::{APP_VERSION, BUILD_TIME};
 
 // Re-export enterprise types (if feature enabled)
+// Re-export cloud types
+#[cfg(feature = "cloud")]
+pub use cloud::{CloudConfig, CloudManager};
+
 #[cfg(feature = "enterprise")]
 pub use enterprise::{
     audit::{AuditEvent, AuditLevel, AuditLogger, AuditQueryFilters},
