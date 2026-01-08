@@ -87,20 +87,62 @@ use tokio::time::Duration;
 use tracing::{info, warn};
 use uuid::Uuid;
 
-/// VM lifecycle status.
+/// VM lifecycle status
+///
+/// Represents the current state of a VM instance in its lifecycle.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::VmStatus;
+///
+/// let status = VmStatus::Running;
+/// match status {
+///     VmStatus::Running => println!("VM is running"),
+///     VmStatus::Stopped => println!("VM is stopped"),
+///     VmStatus::Creating => println!("VM is being created"),
+///     VmStatus::Failed(err) => println!("VM failed: {}", err),
+/// }
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum VmStatus {
+    /// VM instance is being created
     Creating,
+    /// VM instance is running and ready to process requests
     Running,
+    /// VM instance has been stopped
     Stopped,
+    /// VM instance has failed with an error message
     Failed(String),
 }
 
-/// Resource limits / requests for a VM instance.
+/// Resource limits and requests for a VM instance
+///
+/// Specifies CPU, memory, and GPU requirements for a VM instance.
+/// These resources are used to set limits and track usage.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::VmResources;
+///
+/// // Create resources with default values
+/// let resources = VmResources::default();
+///
+/// // Create custom resources
+/// let custom = VmResources {
+///     cpu_cores: 4,
+///     memory_mb: 4096,
+///     gpu_required: true,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VmResources {
+    /// Number of CPU cores allocated to the VM
     pub cpu_cores: u16,
+    /// Memory allocation in megabytes
     pub memory_mb: u32,
+    /// Whether GPU is required for this VM instance
     pub gpu_required: bool,
 }
 
@@ -114,16 +156,53 @@ impl Default for VmResources {
     }
 }
 
-/// Isolation/security policy placeholder.
+/// Isolation/security policy for VM instances
+///
+/// Defines the level of isolation and security applied to a VM instance.
+/// Higher isolation levels provide better security but may have performance overhead.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::VmIsolation;
+///
+/// // Use process sandboxing for basic isolation
+/// let isolation = VmIsolation::ProcessSandbox;
+///
+/// // Use hardware virtualization for maximum isolation (planned)
+/// let isolation = VmIsolation::HardwareVm;
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum VmIsolation {
-    /// Best-effort isolation using OS-level process sandboxing (planned).
+    /// Best-effort isolation using OS-level process sandboxing (planned)
+    ///
+    /// Uses platform-specific isolation mechanisms like Linux namespaces,
+    /// Windows AppContainers, or cgroups for resource limits.
     ProcessSandbox,
-    /// Hardware virtualization (planned).
+    /// Hardware virtualization (planned)
+    ///
+    /// Full hardware-level virtualization for maximum isolation and security.
     HardwareVm,
 }
 
 /// Auto-recovery configuration for VM instances
+///
+/// Configures automatic restart behavior when a VM instance fails health checks.
+/// Supports exponential backoff to prevent rapid restart loops.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::AutoRecoveryConfig;
+///
+/// // Configure aggressive auto-recovery with exponential backoff
+/// let config = AutoRecoveryConfig {
+///     max_restart_attempts: 5,
+///     initial_restart_delay_secs: 1,
+///     max_restart_delay_secs: 60,
+///     use_exponential_backoff: true,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AutoRecoveryConfig {
     /// Maximum number of restart attempts before giving up
@@ -132,7 +211,9 @@ pub struct AutoRecoveryConfig {
     pub initial_restart_delay_secs: u64,
     /// Maximum delay between restarts (in seconds)
     pub max_restart_delay_secs: u64,
-    /// Whether to use exponential backoff
+    /// Whether to use exponential backoff for restart delays
+    ///
+    /// If `true`, delays will increase exponentially: initial_delay, 2x, 4x, ... up to max_delay.
     pub use_exponential_backoff: bool,
 }
 
@@ -147,55 +228,137 @@ impl Default for AutoRecoveryConfig {
     }
 }
 
-/// A VM instance representation (in-memory for now).
+/// A VM instance representation
+///
+/// Represents a single VM instance with its configuration, status, and runtime information.
+/// Instances are managed by `VmManager` and tracked in memory.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::vm::{VmInstance, VmResources, VmIsolation, AutoRecoveryConfig};
+/// use uuid::Uuid;
+/// use chrono::Utc;
+/// use poolai::vm::VmStatus;
+///
+/// let instance = VmInstance {
+///     id: Uuid::new_v4(),
+///     name: "my-vm".to_string(),
+///     created_at: Utc::now(),
+///     status: VmStatus::Running,
+///     resources: VmResources::default(),
+///     isolation: VmIsolation::ProcessSandbox,
+///     auto_recovery: AutoRecoveryConfig::default(),
+///     restart_attempts: 0,
+///     process_id: Some(12345),
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VmInstance {
+    /// Unique identifier for the VM instance
     pub id: Uuid,
+    /// Human-readable name for the VM instance
     pub name: String,
+    /// Timestamp when the VM instance was created
     pub created_at: DateTime<Utc>,
+    /// Current status of the VM instance
     pub status: VmStatus,
+    /// Resource requirements and limits for this instance
     pub resources: VmResources,
+    /// Isolation/security policy for this instance
     pub isolation: VmIsolation,
-    /// Auto-recovery configuration
+    /// Auto-recovery configuration for automatic restarts
     pub auto_recovery: AutoRecoveryConfig,
-    /// Number of restart attempts (internal tracking)
+    /// Number of restart attempts (internal tracking, not serialized)
     #[serde(skip)]
     pub restart_attempts: u32,
-    /// Process ID of the running process (if spawned)
+    /// Process ID of the running process (if spawned, not serialized)
     #[serde(skip)]
     pub process_id: Option<u32>,
 }
 
 /// Resource usage history entry
+///
+/// Stores a single resource usage measurement at a specific timestamp.
+/// Used to build resource usage history for VM instances.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResourceUsageHistoryEntry {
+    /// Timestamp when the measurement was taken
     pub timestamp: DateTime<Utc>,
+    /// Resource usage measurements at this timestamp
     pub usage: ResourceUsage,
 }
 
 /// Resource usage statistics (aggregated)
+///
+/// Provides aggregated statistics (min, max, average) for resource usage over a time period.
+/// Used for monitoring and alerting.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::ResourceUsageStats;
+///
+/// let stats = ResourceUsageStats {
+///     cpu_percent_min: 10.0,
+///     cpu_percent_max: 90.0,
+///     cpu_percent_avg: 50.0,
+///     memory_mb_min: 1024,
+///     memory_mb_max: 2048,
+///     memory_mb_avg: 1536.0,
+///     gpu_utilization_min: Some(20.0),
+///     gpu_utilization_max: Some(95.0),
+///     gpu_utilization_avg: Some(60.0),
+///     sample_count: 100,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResourceUsageStats {
+    /// Minimum CPU usage percentage (0.0-100.0)
     pub cpu_percent_min: f32,
+    /// Maximum CPU usage percentage (0.0-100.0)
     pub cpu_percent_max: f32,
+    /// Average CPU usage percentage (0.0-100.0)
     pub cpu_percent_avg: f32,
+    /// Minimum memory usage in megabytes
     pub memory_mb_min: u32,
+    /// Maximum memory usage in megabytes
     pub memory_mb_max: u32,
+    /// Average memory usage in megabytes
     pub memory_mb_avg: f32,
+    /// Minimum GPU utilization percentage (0.0-100.0), `None` if GPU not available
     pub gpu_utilization_min: Option<f32>,
+    /// Maximum GPU utilization percentage (0.0-100.0), `None` if GPU not available
     pub gpu_utilization_max: Option<f32>,
+    /// Average GPU utilization percentage (0.0-100.0), `None` if GPU not available
     pub gpu_utilization_avg: Option<f32>,
+    /// Number of samples used for aggregation
     pub sample_count: usize,
 }
 
 /// Resource alert thresholds
+///
+/// Configures thresholds for resource usage alerts. When resource usage exceeds
+/// these thresholds, alerts are generated.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::ResourceAlertThresholds;
+///
+/// let thresholds = ResourceAlertThresholds {
+///     cpu_percent_threshold: Some(90.0),
+///     memory_mb_threshold: Some(4096),
+///     gpu_utilization_threshold: Some(95.0),
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResourceAlertThresholds {
-    /// CPU usage threshold (0.0-100.0)
+    /// CPU usage threshold (0.0-100.0), `None` to disable CPU alerts
     pub cpu_percent_threshold: Option<f32>,
-    /// Memory usage threshold in MB
+    /// Memory usage threshold in MB, `None` to disable memory alerts
     pub memory_mb_threshold: Option<u32>,
-    /// GPU utilization threshold (0.0-100.0)
+    /// GPU utilization threshold (0.0-100.0), `None` to disable GPU alerts
     pub gpu_utilization_threshold: Option<f32>,
 }
 
@@ -209,7 +372,33 @@ impl Default for ResourceAlertThresholds {
     }
 }
 
-/// VM Manager - central orchestrator for VM instances.
+/// VM Manager - central orchestrator for VM instances
+///
+/// Manages VM instance lifecycle, resource limits, isolation, health monitoring,
+/// and auto-recovery. Provides a thread-safe interface for creating, starting,
+/// stopping, and monitoring VM instances.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::vm::{VmManager, VmResources, VmIsolation};
+/// use uuid::Uuid;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = VmManager::new();
+/// manager.initialize().await?;
+///
+/// // Create and start a VM instance
+/// let instance = manager.create_instance(
+///     "my-vm".to_string(),
+///     VmResources::default(),
+///     VmIsolation::ProcessSandbox,
+/// ).await?;
+///
+/// manager.start_instance(instance.id).await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct VmManager {
     instances: Arc<RwLock<HashMap<Uuid, VmInstance>>>,
     health_monitor: Arc<RwLock<HealthMonitor>>,
@@ -225,6 +414,19 @@ pub struct VmManager {
 }
 
 impl VmManager {
+    /// Creates a new VM manager instance
+    ///
+    /// Initializes all necessary components including health monitor,
+    /// resource limiter, and isolation components. The manager must be
+    /// initialized with `initialize()` before use.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::vm::VmManager;
+    ///
+    /// let manager = VmManager::new();
+    /// ```
     pub fn new() -> Self {
         let health_monitor = Arc::new(RwLock::new(HealthMonitor::new(30))); // 30 second interval
         let resource_limiter: Arc<dyn ResourceLimiter> = Arc::new(PlatformResourceLimiter::new());
@@ -484,6 +686,45 @@ impl VmManager {
         Ok(())
     }
 
+    /// Creates a new VM instance
+    ///
+    /// Creates a VM instance with the specified name, resource requirements,
+    /// and isolation policy. The instance is created in `Creating` status and
+    /// must be started using `start_instance()` to begin operation.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Human-readable name for the VM instance
+    /// * `resources` - CPU, memory, and GPU requirements
+    /// * `isolation` - Isolation/security policy (ProcessSandbox or HardwareVm)
+    ///
+    /// # Returns
+    ///
+    /// Returns the created `VmInstance` with a unique ID.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::vm::{VmManager, VmResources, VmIsolation};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = VmManager::new();
+    /// manager.initialize().await?;
+    ///
+    /// let instance = manager.create_instance(
+    ///     "my-worker-vm".to_string(),
+    ///     VmResources {
+    ///         cpu_cores: 4,
+    ///         memory_mb: 4096,
+    ///         gpu_required: true,
+    ///     },
+    ///     VmIsolation::ProcessSandbox,
+    /// ).await?;
+    ///
+    /// println!("Created VM instance: {}", instance.id);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn create_instance(
         &self,
         name: String,
@@ -595,6 +836,43 @@ impl VmManager {
         self.instances.read().await.get(&id).cloned()
     }
 
+    /// Starts a VM instance
+    ///
+    /// Changes the VM instance status to `Running` and registers it for health checks.
+    /// Resets restart attempts counter on successful start.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - Unique identifier of the VM instance to start
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the instance was successfully started.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if the instance doesn't exist.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::vm::{VmManager, VmResources, VmIsolation};
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = VmManager::new();
+    /// manager.initialize().await?;
+    ///
+    /// let instance = manager.create_instance(
+    ///     "my-vm".to_string(),
+    ///     VmResources::default(),
+    ///     VmIsolation::ProcessSandbox,
+    /// ).await?;
+    ///
+    /// manager.start_instance(instance.id).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn start_instance(&self, id: Uuid) -> Result<(), AppError> {
         let name = {
             let mut instances = self.instances.write().await;
@@ -626,6 +904,37 @@ impl VmManager {
         Ok(())
     }
 
+    /// Stops a VM instance
+    ///
+    /// Changes the VM instance status to `Stopped` and unregisters it from health checks.
+    /// The instance can be restarted later using `start_instance()`.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - Unique identifier of the VM instance to stop
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the instance was successfully stopped.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if the instance doesn't exist.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::vm::VmManager;
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = VmManager::new();
+    /// let instance_id = Uuid::new_v4();
+    ///
+    /// manager.stop_instance(instance_id).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn stop_instance(&self, id: Uuid) -> Result<(), AppError> {
         // Unregister health check
         {
