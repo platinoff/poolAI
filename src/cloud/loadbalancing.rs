@@ -48,19 +48,64 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::info;
 
+/// Load balancing strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LoadBalancingStrategy {
+    /// Round-robin distribution
+    RoundRobin,
+    /// Weighted round-robin based on backend weights
+    WeightedRoundRobin,
+    /// Least connections
+    LeastConnections,
+    /// IP hash for session affinity
+    IpHash,
+}
+
+/// Health check configuration
+#[derive(Debug, Clone)]
+pub struct HealthCheckConfig {
+    /// Health check interval in seconds
+    pub interval_secs: u64,
+    /// Timeout in seconds
+    pub timeout_secs: u64,
+    /// Number of consecutive failures before marking unhealthy
+    pub failure_threshold: u32,
+    /// Number of consecutive successes before marking healthy
+    pub success_threshold: u32,
+    /// Health check path (for HTTP/HTTPS)
+    pub path: Option<String>,
+}
+
 /// Load balancer for distributing traffic
 pub struct LoadBalancer {
     initialized: Arc<RwLock<bool>>,
     backends: Arc<RwLock<HashMap<String, Backend>>>,
-    // TODO: Add load balancing configuration (strategy, health check intervals, etc.)
+    strategy: Arc<RwLock<LoadBalancingStrategy>>,
+    health_check_config: Arc<RwLock<HealthCheckConfig>>,
 }
 
 impl LoadBalancer {
     /// Create a new LoadBalancer
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::cloud::loadbalancing::LoadBalancer;
+    ///
+    /// let loadbalancer = LoadBalancer::new();
+    /// ```
     pub fn new() -> Self {
         Self {
             initialized: Arc::new(RwLock::new(false)),
             backends: Arc::new(RwLock::new(HashMap::new())),
+            strategy: Arc::new(RwLock::new(LoadBalancingStrategy::RoundRobin)),
+            health_check_config: Arc::new(RwLock::new(HealthCheckConfig {
+                interval_secs: 10,
+                timeout_secs: 5,
+                failure_threshold: 3,
+                success_threshold: 2,
+                path: Some("/health".to_string()),
+            })),
         }
     }
 
@@ -92,12 +137,18 @@ impl LoadBalancer {
             return Ok(());
         }
 
-        // TODO: Initialize load balancer
-        // - Set up health checks
-        // - Configure routing rules
-        // - Initialize cloud load balancer (if applicable)
+        // Initialize health check configuration
+        let health_config = self.health_check_config.read().await;
+        info!(
+            "Load balancer initialized with strategy: {:?}, health check interval: {}s",
+            *self.strategy.read().await,
+            health_config.interval_secs
+        );
+        drop(health_config);
 
-        info!("Load balancer initialized (placeholder)");
+        // TODO: Set up actual health check tasks
+        // TODO: Configure routing rules
+        // TODO: Initialize cloud load balancer (if applicable)
 
         *initialized = true;
         Ok(())
@@ -255,6 +306,47 @@ impl LoadBalancer {
     pub async fn list_backends(&self) -> Vec<Backend> {
         let backends = self.backends.read().await;
         backends.values().cloned().collect()
+    }
+
+    /// Set load balancing strategy
+    ///
+    /// # Arguments
+    ///
+    /// * `strategy` - Load balancing strategy to use
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::loadbalancing::{LoadBalancer, LoadBalancingStrategy};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let loadbalancer = LoadBalancer::new();
+    /// loadbalancer.initialize().await?;
+    /// loadbalancer.set_strategy(LoadBalancingStrategy::WeightedRoundRobin).await;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn set_strategy(&self, strategy: LoadBalancingStrategy) {
+        *self.strategy.write().await = strategy;
+    }
+
+    /// Get current load balancing strategy
+    pub async fn get_strategy(&self) -> LoadBalancingStrategy {
+        *self.strategy.read().await
+    }
+
+    /// Update health check configuration
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - New health check configuration
+    pub async fn set_health_check_config(&self, config: HealthCheckConfig) {
+        *self.health_check_config.write().await = config;
+    }
+
+    /// Get current health check configuration
+    pub async fn get_health_check_config(&self) -> HealthCheckConfig {
+        self.health_check_config.read().await.clone()
     }
 }
 

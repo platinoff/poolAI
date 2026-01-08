@@ -41,14 +41,27 @@ use tracing::info;
 /// Auto-scaler for managing resource scaling
 pub struct AutoScaler {
     initialized: Arc<RwLock<bool>>,
-    // TODO: Add scaling policies and metrics
+    scaling_policies: Arc<RwLock<Vec<ScalingPolicy>>>,
+    min_replicas: Arc<RwLock<u32>>,
+    max_replicas: Arc<RwLock<u32>>,
 }
 
 impl AutoScaler {
     /// Create a new AutoScaler
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::cloud::autoscaling::AutoScaler;
+    ///
+    /// let autoscaler = AutoScaler::new();
+    /// ```
     pub fn new() -> Self {
         Self {
             initialized: Arc::new(RwLock::new(false)),
+            scaling_policies: Arc::new(RwLock::new(Vec::new())),
+            min_replicas: Arc::new(RwLock::new(1)),
+            max_replicas: Arc::new(RwLock::new(10)),
         }
     }
 
@@ -80,12 +93,22 @@ impl AutoScaler {
             return Ok(());
         }
 
-        // TODO: Initialize scaling policies
-        // - Set up metrics collection
-        // - Configure scaling rules
-        // - Initialize HPA (if Kubernetes)
+        // Initialize default scaling policies
+        let mut policies = self.scaling_policies.write().await;
+        policies.push(ScalingPolicy {
+            name: "default-cpu".to_string(),
+            metric_type: "CPU".to_string(),
+            target_value: 70.0,
+            scale_up_threshold: 80.0,
+            scale_down_threshold: 50.0,
+        });
+        drop(policies);
 
-        info!("Auto-scaler initialized (placeholder)");
+        // TODO: Set up metrics collection
+        // TODO: Configure scaling rules
+        // TODO: Initialize HPA (if Kubernetes)
+
+        info!("Auto-scaler initialized with default policies");
 
         *initialized = true;
         Ok(())
@@ -256,12 +279,92 @@ impl AutoScaler {
             current_replicas: 1,
         })
     }
+
+    /// Add a scaling policy
+    ///
+    /// # Arguments
+    ///
+    /// * `policy` - Scaling policy to add
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::autoscaling::{AutoScaler, ScalingPolicy};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let autoscaler = AutoScaler::new();
+    /// autoscaler.initialize().await?;
+    ///
+    /// let policy = ScalingPolicy {
+    ///     name: "memory-policy".to_string(),
+    ///     metric_type: "Memory".to_string(),
+    ///     target_value: 75.0,
+    ///     scale_up_threshold: 85.0,
+    ///     scale_down_threshold: 60.0,
+    /// };
+    /// autoscaler.add_policy(policy).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn add_policy(&self, policy: ScalingPolicy) -> Result<(), AppError> {
+        let mut policies = self.scaling_policies.write().await;
+        policies.push(policy);
+        Ok(())
+    }
+
+    /// Get all scaling policies
+    pub async fn get_policies(&self) -> Vec<ScalingPolicy> {
+        let policies = self.scaling_policies.read().await;
+        policies.clone()
+    }
+
+    /// Set min/max replica limits
+    ///
+    /// # Arguments
+    ///
+    /// * `min` - Minimum number of replicas
+    /// * `max` - Maximum number of replicas
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if min > max or max is 0.
+    pub async fn set_replica_limits(&self, min: u32, max: u32) -> Result<(), AppError> {
+        if min > max {
+            return Err(AppError::ValidationError(
+                format!("Minimum replicas ({}) cannot be greater than maximum ({})", min, max)
+            ));
+        }
+        if max == 0 {
+            return Err(AppError::ValidationError(
+                "Maximum replicas cannot be 0".to_string()
+            ));
+        }
+
+        *self.min_replicas.write().await = min;
+        *self.max_replicas.write().await = max;
+        Ok(())
+    }
 }
 
 impl Default for AutoScaler {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Scaling policy configuration
+#[derive(Debug, Clone)]
+pub struct ScalingPolicy {
+    /// Policy name
+    pub name: String,
+    /// Metric type (CPU, Memory, RequestRate)
+    pub metric_type: String,
+    /// Target value for the metric
+    pub target_value: f64,
+    /// Scale up threshold
+    pub scale_up_threshold: f64,
+    /// Scale down threshold
+    pub scale_down_threshold: f64,
 }
 
 /// Scaling metrics for auto-scaling decisions
