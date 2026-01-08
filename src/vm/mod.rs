@@ -1594,3 +1594,138 @@ pub async fn initialize() -> Result<(), AppError> {
 pub async fn shutdown() -> Result<(), AppError> {
     get_global_manager().shutdown().await
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vm_status_variants() {
+        let statuses = vec![
+            VmStatus::Creating,
+            VmStatus::Running,
+            VmStatus::Stopped,
+            VmStatus::Failed("error".to_string()),
+        ];
+        for status in statuses {
+            let cloned = status.clone();
+            assert!(matches!(
+                cloned,
+                VmStatus::Creating | VmStatus::Running | VmStatus::Stopped | VmStatus::Failed(_)
+            ));
+        }
+    }
+
+    #[test]
+    fn test_vm_resources_default() {
+        let resources = VmResources::default();
+        assert_eq!(resources.cpu_cores, 2);
+        assert_eq!(resources.memory_mb, 2048);
+        assert!(!resources.gpu_required);
+    }
+
+    #[test]
+    fn test_vm_resources_clone() {
+        let resources = VmResources {
+            cpu_cores: 4,
+            memory_mb: 4096,
+            gpu_required: true,
+        };
+        let cloned = resources.clone();
+        assert_eq!(resources.cpu_cores, cloned.cpu_cores);
+        assert_eq!(resources.memory_mb, cloned.memory_mb);
+        assert_eq!(resources.gpu_required, cloned.gpu_required);
+    }
+
+    #[test]
+    fn test_vm_isolation_variants() {
+        let isolations = vec![
+            VmIsolation::ProcessSandbox,
+            VmIsolation::HardwareVm,
+        ];
+        for isolation in isolations {
+            let cloned = isolation.clone();
+            assert!(matches!(
+                cloned,
+                VmIsolation::ProcessSandbox | VmIsolation::HardwareVm
+            ));
+        }
+    }
+
+    #[test]
+    fn test_auto_recovery_config_default() {
+        let config = AutoRecoveryConfig::default();
+        assert_eq!(config.max_restart_attempts, 5);
+        assert_eq!(config.initial_restart_delay_secs, 1);
+        assert_eq!(config.max_restart_delay_secs, 60);
+        assert!(config.use_exponential_backoff);
+    }
+
+    #[test]
+    fn test_auto_recovery_config_clone() {
+        let config = AutoRecoveryConfig {
+            max_restart_attempts: 10,
+            initial_restart_delay_secs: 2,
+            max_restart_delay_secs: 120,
+            use_exponential_backoff: false,
+        };
+        let cloned = config.clone();
+        assert_eq!(config.max_restart_attempts, cloned.max_restart_attempts);
+        assert_eq!(config.initial_restart_delay_secs, cloned.initial_restart_delay_secs);
+        assert_eq!(config.max_restart_delay_secs, cloned.max_restart_delay_secs);
+        assert_eq!(config.use_exponential_backoff, cloned.use_exponential_backoff);
+    }
+
+    #[test]
+    fn test_resource_alert_thresholds_default() {
+        let thresholds = ResourceAlertThresholds::default();
+        assert_eq!(thresholds.cpu_percent_threshold, Some(90.0));
+        assert_eq!(thresholds.memory_mb_threshold, None);
+        assert_eq!(thresholds.gpu_utilization_threshold, Some(95.0));
+    }
+
+    #[test]
+    fn test_resource_usage_stats_fields() {
+        let stats = ResourceUsageStats {
+            cpu_percent_min: 10.0,
+            cpu_percent_max: 90.0,
+            cpu_percent_avg: 50.0,
+            memory_mb_min: 1024,
+            memory_mb_max: 2048,
+            memory_mb_avg: 1536.0,
+            gpu_utilization_min: Some(20.0),
+            gpu_utilization_max: Some(95.0),
+            gpu_utilization_avg: Some(60.0),
+            sample_count: 100,
+        };
+        assert_eq!(stats.cpu_percent_avg, 50.0);
+        assert_eq!(stats.memory_mb_avg, 1536.0);
+        assert_eq!(stats.sample_count, 100);
+    }
+
+    #[tokio::test]
+    async fn test_vm_manager_new() {
+        let manager = VmManager::new();
+        let instances = manager.list_instances().await;
+        assert_eq!(instances.len(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_vm_manager_list_instances_empty() {
+        let manager = VmManager::new();
+        let instances = manager.list_instances().await;
+        assert!(instances.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_vm_manager_create_instance() {
+        let manager = VmManager::new();
+        let instance = manager.create_instance(
+            "test-vm".to_string(),
+            VmResources::default(),
+            VmIsolation::ProcessSandbox,
+        ).await.unwrap();
+        assert_eq!(instance.name, "test-vm");
+        assert!(matches!(instance.status, VmStatus::Creating));
+    }
+}
