@@ -14,6 +14,24 @@ use tokio::sync::{mpsc, RwLock};
 use tracing::{info, warn};
 
 /// Worker status enumeration
+///
+/// Represents the current state of a worker instance in the runtime system.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::runtime::worker::WorkerStatus;
+///
+/// let status = WorkerStatus::Ready;
+/// match status {
+///     WorkerStatus::Initializing => println!("Worker is initializing"),
+///     WorkerStatus::Ready => println!("Worker is ready"),
+///     WorkerStatus::Busy => println!("Worker is busy"),
+///     WorkerStatus::Idle => println!("Worker is idle"),
+///     WorkerStatus::Error => println!("Worker has error"),
+///     WorkerStatus::Shutdown => println!("Worker is shutdown"),
+/// }
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum WorkerStatus {
     Initializing,
@@ -25,6 +43,24 @@ pub enum WorkerStatus {
 }
 
 /// Worker configuration
+///
+/// Defines configuration parameters for a worker instance including resource
+/// limits, GPU assignment, and health monitoring settings.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::runtime::worker::WorkerConfig;
+///
+/// let config = WorkerConfig {
+///     id: "worker-1".to_string(),
+///     max_memory_mb: 4096,
+///     cpu_priority: 7,
+///     gpu_device: Some(0),
+///     auto_restart: true,
+///     health_check_interval: 30,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerConfig {
     /// Worker ID
@@ -42,6 +78,25 @@ pub struct WorkerConfig {
 }
 
 /// Worker metrics
+///
+/// Tracks performance and resource usage metrics for a worker instance.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::runtime::worker::WorkerMetrics;
+/// use chrono::Utc;
+///
+/// let metrics = WorkerMetrics {
+///     cpu_usage: 45.5,
+///     memory_usage_mb: 2048.0,
+///     gpu_usage: Some(78.0),
+///     tasks_completed: 100,
+///     tasks_failed: 2,
+///     avg_task_duration_ms: 250.0,
+///     last_activity: Utc::now(),
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerMetrics {
     /// CPU usage percentage
@@ -61,6 +116,32 @@ pub struct WorkerMetrics {
 }
 
 /// Worker instance
+///
+/// Manages the lifecycle of an AI mining worker process including spawning,
+/// monitoring, health checks, and graceful shutdown.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::runtime::worker::Worker;
+///
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let mut worker = Worker::new(1);
+/// worker.initialize().await?;
+/// worker.start().await?;
+///
+/// // Get worker status
+/// let status = worker.get_status().await;
+/// println!("Worker status: {:?}", status);
+///
+/// // Get worker metrics
+/// let metrics = worker.get_metrics().await;
+/// println!("CPU usage: {:.1}%", metrics.cpu_usage);
+///
+/// worker.shutdown().await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct Worker {
     config: WorkerConfig,
     status: Arc<RwLock<WorkerStatus>>,
@@ -83,6 +164,21 @@ pub struct WorkerTask {
 
 impl Worker {
     /// Create new worker instance
+    ///
+    /// Initializes a new worker with default configuration. The worker must be
+    /// initialized and started before use.
+    ///
+    /// # Arguments
+    ///
+    /// * `_max_workers` - Maximum number of workers (reserved for future use)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::runtime::worker::Worker;
+    ///
+    /// let worker = Worker::new(1);
+    /// ```
     pub fn new(_max_workers: usize) -> Self {
         let (tx, _rx) = mpsc::channel(100);
 
@@ -104,6 +200,25 @@ impl Worker {
     }
 
     /// Initialize worker
+    ///
+    /// Prepares the worker for operation by setting up health monitoring
+    /// and transitioning to Ready status.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if initialization succeeds.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::worker::Worker;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut worker = Worker::new(1);
+    /// worker.initialize().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn initialize(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Initializing worker {}", self.config.id);
 
@@ -121,6 +236,26 @@ impl Worker {
     }
 
     /// Start worker
+    ///
+    /// Spawns the worker process and transitions the worker to Ready status.
+    /// The worker process will run as a separate child process.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the worker process is spawned successfully.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::worker::Worker;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut worker = Worker::new(1);
+    /// worker.initialize().await?;
+    /// worker.start().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn start(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Starting worker {}", self.config.id);
 
@@ -138,6 +273,27 @@ impl Worker {
     }
 
     /// Shutdown worker
+    ///
+    /// Gracefully shuts down the worker by terminating the process and
+    /// stopping health monitoring.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if shutdown completes successfully.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::worker::Worker;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut worker = Worker::new(1);
+    /// worker.initialize().await?;
+    /// worker.start().await?;
+    /// worker.shutdown().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn shutdown(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         info!("Shutting down worker {}", self.config.id);
 
@@ -334,18 +490,84 @@ impl Worker {
     }
 
     /// Update worker metrics
+    ///
+    /// Updates the worker's performance and resource usage metrics.
+    ///
+    /// # Arguments
+    ///
+    /// * `new_metrics` - New metrics to store
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::worker::{Worker, WorkerMetrics};
+    /// use chrono::Utc;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let worker = Worker::new(1);
+    /// let metrics = WorkerMetrics {
+    ///     cpu_usage: 50.0,
+    ///     memory_usage_mb: 1024.0,
+    ///     gpu_usage: Some(75.0),
+    ///     tasks_completed: 50,
+    ///     tasks_failed: 0,
+    ///     avg_task_duration_ms: 200.0,
+    ///     last_activity: Utc::now(),
+    /// };
+    /// worker.update_metrics(metrics).await;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn update_metrics(&self, new_metrics: WorkerMetrics) {
         let mut metrics = self.metrics.write().await;
         *metrics = new_metrics;
     }
 
     /// Get worker status
+    ///
+    /// Retrieves the current status of the worker.
+    ///
+    /// # Returns
+    ///
+    /// Returns the current `WorkerStatus`.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::worker::Worker;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let worker = Worker::new(1);
+    /// let status = worker.get_status().await;
+    /// println!("Worker status: {:?}", status);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_status(&self) -> WorkerStatus {
         let status = self.status.read().await;
         status.clone()
     }
 
     /// Get worker metrics
+    ///
+    /// Retrieves the current performance and resource usage metrics.
+    ///
+    /// # Returns
+    ///
+    /// Returns a clone of the current `WorkerMetrics`.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::worker::Worker;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let worker = Worker::new(1);
+    /// let metrics = worker.get_metrics().await;
+    /// println!("CPU: {:.1}%, Memory: {:.1}MB", metrics.cpu_usage, metrics.memory_usage_mb);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_metrics(&self) -> WorkerMetrics {
         let metrics = self.metrics.read().await;
         metrics.clone()

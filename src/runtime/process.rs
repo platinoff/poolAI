@@ -20,6 +20,24 @@ use tracing::{error, info, warn};
 use uuid::Uuid;
 
 /// Process status
+///
+/// Represents the current state of a managed process.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::runtime::process::ProcessStatus;
+///
+/// let status = ProcessStatus::Running;
+/// match status {
+///     ProcessStatus::Starting => println!("Process is starting"),
+///     ProcessStatus::Running => println!("Process is running"),
+///     ProcessStatus::Stopping => println!("Process is stopping"),
+///     ProcessStatus::Stopped => println!("Process is stopped"),
+///     ProcessStatus::Failed(reason) => println!("Process failed: {}", reason),
+///     ProcessStatus::Timeout => println!("Process timed out"),
+/// }
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ProcessStatus {
     Starting,
@@ -31,6 +49,32 @@ pub enum ProcessStatus {
 }
 
 /// Process configuration
+///
+/// Defines how a process should be spawned including command, arguments,
+/// environment variables, resource limits, and timeout settings.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::runtime::process::ProcessConfig;
+/// use std::collections::HashMap;
+/// use std::path::PathBuf;
+///
+/// let config = ProcessConfig {
+///     command: "python".to_string(),
+///     args: vec!["script.py".to_string(), "--arg".to_string()],
+///     working_dir: Some(PathBuf::from("/tmp")),
+///     env: {
+///         let mut env = HashMap::new();
+///         env.insert("VAR1".to_string(), "value1".to_string());
+///         env
+///     },
+///     timeout_seconds: Some(300),
+///     cpu_limit_percent: Some(50),
+///     memory_limit_mb: Some(1024),
+///     capture_logs: true,
+/// };
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessConfig {
     pub command: String,
@@ -75,11 +119,72 @@ pub struct ProcessInfo {
 }
 
 /// Process Manager
+///
+/// Manages the lifecycle of multiple processes including spawning, monitoring,
+/// log capture, and graceful termination.
+///
+/// # Features
+///
+/// - Process spawning with resource limits
+/// - Log capture (stdout/stderr)
+/// - Timeout handling
+/// - Health monitoring
+/// - Graceful shutdown
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::runtime::process::{ProcessManager, ProcessConfig};
+/// use std::collections::HashMap;
+/// use uuid::Uuid;
+///
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let mut manager = ProcessManager::new();
+/// manager.initialize().await?;
+/// manager.start().await?;
+///
+/// // Spawn a process
+/// let config = ProcessConfig {
+///     command: "python".to_string(),
+///     args: vec!["script.py".to_string()],
+///     working_dir: None,
+///     env: HashMap::new(),
+///     timeout_seconds: Some(300),
+///     cpu_limit_percent: None,
+///     memory_limit_mb: None,
+///     capture_logs: true,
+/// };
+///
+/// let process_id = manager.spawn_process(config).await?;
+///
+/// // Get process status
+/// let status = manager.get_process_status(process_id).await?;
+/// println!("Process status: {:?}", status);
+///
+/// // Stop process
+/// manager.stop_process(process_id).await?;
+///
+/// manager.shutdown().await?;
+/// # Ok(())
+/// # }
+/// ```
 pub struct ProcessManager {
     processes: Arc<RwLock<HashMap<Uuid, ProcessInfo>>>,
 }
 
 impl ProcessManager {
+    /// Create a new process manager
+    ///
+    /// Initializes a new process manager instance. The manager must be
+    /// initialized and started before use.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::runtime::process::ProcessManager;
+    ///
+    /// let manager = ProcessManager::new();
+    /// ```
     pub fn new() -> Self {
         Self {
             processes: Arc::new(RwLock::new(HashMap::new())),
@@ -119,6 +224,43 @@ impl ProcessManager {
     }
 
     /// Spawn a new process
+    ///
+    /// Creates and starts a new process with the specified configuration.
+    /// The process will be monitored for health, logs will be captured if enabled,
+    /// and timeout will be enforced if configured.
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Process configuration including command, arguments, and limits
+    ///
+    /// # Returns
+    ///
+    /// Returns the UUID of the spawned process.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::process::{ProcessManager, ProcessConfig};
+    /// use std::collections::HashMap;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = ProcessManager::new();
+    /// let config = ProcessConfig {
+    ///     command: "python".to_string(),
+    ///     args: vec!["script.py".to_string()],
+    ///     working_dir: None,
+    ///     env: HashMap::new(),
+    ///     timeout_seconds: Some(300),
+    ///     cpu_limit_percent: None,
+    ///     memory_limit_mb: None,
+    ///     capture_logs: true,
+    /// };
+    ///
+    /// let process_id = manager.spawn_process(config).await?;
+    /// println!("Spawned process: {}", process_id);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn spawn_process(&self, config: ProcessConfig) -> Result<Uuid, AppError> {
         let id = Uuid::new_v4();
         info!("Spawning process {}: {}", id, config.command);
@@ -232,6 +374,31 @@ impl ProcessManager {
     }
 
     /// Stop a process
+    ///
+    /// Terminates a running process by sending a kill signal. The process
+    /// status will be updated to Stopped after termination.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - UUID of the process to stop
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the process is stopped successfully.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::process::ProcessManager;
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = ProcessManager::new();
+    /// let process_id = Uuid::new_v4(); // In real usage, this would come from spawn_process
+    /// manager.stop_process(process_id).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn stop_process(&self, id: Uuid) -> Result<(), AppError> {
         let mut processes = self.processes.write().await;
         let info = processes
@@ -272,6 +439,31 @@ impl ProcessManager {
     }
 
     /// Get process status
+    ///
+    /// Retrieves the current status of a managed process.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - UUID of the process
+    ///
+    /// # Returns
+    ///
+    /// Returns the current `ProcessStatus` of the process.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::process::ProcessManager;
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = ProcessManager::new();
+    /// let process_id = Uuid::new_v4();
+    /// let status = manager.get_process_status(process_id).await?;
+    /// println!("Process status: {:?}", status);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_process_status(&self, id: Uuid) -> Result<ProcessStatus, AppError> {
         let processes = self.processes.read().await;
         let info = processes
@@ -288,6 +480,34 @@ impl ProcessManager {
     }
 
     /// Get process logs
+    ///
+    /// Retrieves captured stdout and stderr logs for a process. Logs are only
+    /// available if `capture_logs` was enabled in the process configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - UUID of the process
+    ///
+    /// # Returns
+    ///
+    /// Returns `ProcessLogs` containing stdout and stderr lines.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::process::ProcessManager;
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = ProcessManager::new();
+    /// let process_id = Uuid::new_v4();
+    /// let logs = manager.get_process_logs(process_id).await?;
+    /// for line in logs.stdout {
+    ///     println!("STDOUT: {}", line);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_process_logs(&self, id: Uuid) -> Result<ProcessLogs, AppError> {
         let processes = self.processes.read().await;
         let info = processes
@@ -304,11 +524,55 @@ impl ProcessManager {
     }
 
     /// List all processes
+    ///
+    /// Returns a list of UUIDs for all managed processes.
+    ///
+    /// # Returns
+    ///
+    /// Returns a vector of process UUIDs.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::process::ProcessManager;
+    ///
+    /// # async fn example() {
+    /// let manager = ProcessManager::new();
+    /// let processes = manager.list_processes().await;
+    /// println!("Managed {} processes", processes.len());
+    /// # }
+    /// ```
     pub async fn list_processes(&self) -> Vec<Uuid> {
         self.processes.read().await.keys().cloned().collect()
     }
 
     /// Get process PID
+    ///
+    /// Retrieves the platform-specific process ID (PID) for a managed process.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - UUID of the process
+    ///
+    /// # Returns
+    ///
+    /// Returns `Some(pid)` if the process is running, `None` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use poolai::runtime::process::ProcessManager;
+    /// use uuid::Uuid;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = ProcessManager::new();
+    /// let process_id = Uuid::new_v4();
+    /// if let Some(pid) = manager.get_process_pid(process_id).await? {
+    ///     println!("Process PID: {}", pid);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_process_pid(&self, id: Uuid) -> Result<Option<u32>, AppError> {
         let processes = self.processes.read().await;
         let info = processes
