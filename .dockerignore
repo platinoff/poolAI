@@ -1,0 +1,72 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+**/*_test.rs
+**/*_tests.rs
+
+# CI/CD
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Temporary files
+*.tmp
+*.log
+*.cache
+
+# Certificates (should be mounted as volumes)
+certs/
+*.pem
+*.key
+*.crt
+
+# Config files (should be mounted as volumes)
+config.toml
+config.*.toml
+!config.example.toml
+
+# Data directories (should be mounted as volumes)
+data/
+*.db
+*.sqlite
+
+# Scripts
+scripts/
+*.sh
+*.ps1
+
+# Other
+.env
+.env.local
+*.bak
+*.orig

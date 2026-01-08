@@ -31,23 +31,26 @@ docker run -d \
 
 ### Using Docker Compose
 
-Create a `docker-compose.yml` file:
+A `docker-compose.yml` file is provided in the project root. To use it:
 
-```yaml
-version: '3.8'
+```bash
+# Start all services
+docker-compose up -d
 
-services:
-  poolai:
-    build: .
-    image: poolai:latest
-    container_name: poolai
-    restart: unless-stopped
-    ports:
-      - "8080:8080"   # HTTP
-      - "8443:8443"   # HTTPS
-    volumes:
-      - poolai-data:/data
-      - poolai-config:/config
+# View logs
+docker-compose logs -f poolai
+
+# Stop all services
+docker-compose down
+```
+
+The `docker-compose.yml` file includes:
+- PoolAI service with health checks
+- Volume management for data and configuration
+- Network configuration
+- Optional Prometheus and Grafana services (commented out)
+
+**Note**: The `docker-compose.yml` file is already present in the project root. You can customize it as needed.
       - poolai-certs:/certs
     environment:
       - RUST_LOG=info
