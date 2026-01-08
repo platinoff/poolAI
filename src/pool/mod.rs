@@ -10,8 +10,8 @@ pub mod worker;
 
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelRequest, ModelResponse};
-use rand::seq::SliceRandom;
-use rand::thread_rng;
+use rand::prelude::IndexedRandom;
+use rand::rngs::ThreadRng;
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
@@ -350,8 +350,9 @@ impl Pool {
             LoadBalancingStrategy::Random => {
                 // Random selection
                 let worker_list: Vec<_> = workers.values().collect();
+                let mut rng = ThreadRng::default();
                 worker_list
-                    .choose(&mut thread_rng())
+                    .choose(&mut rng)
                     .map(|worker| (*worker).clone())
                     .ok_or_else(|| AppError::PoolError("No workers available".to_string()))
             }

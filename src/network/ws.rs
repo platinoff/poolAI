@@ -212,7 +212,7 @@ impl WebSocketManager {
                                 .as_secs(),
                         };
                         if let Ok(json) = serde_json::to_string(&ws_message) {
-                            let _ = sender.send(Message::Text(json));
+                            let _ = sender.send(Message::Text(json.into()));
                         }
                     }
                 }
@@ -287,7 +287,7 @@ impl WebSocketManager {
         };
         
         for (connection_id, sender) in senders.iter() {
-            if let Err(e) = sender.send(Message::Text(message_json.clone())) {
+            if let Err(e) = sender.send(Message::Text(message_json.clone().into())) {
                 tracing::warn!("Failed to send message to connection {}: {}", connection_id, e);
             }
         }
@@ -308,7 +308,7 @@ impl WebSocketManager {
             };
             
             if let Some(sender) = senders.get(user_id) {
-                if let Err(e) = sender.send(Message::Text(message_json)) {
+                if let Err(e) = sender.send(Message::Text(message_json.into())) {
                     tracing::warn!("Failed to send message to user {}: {}", connection.user_id, e);
                 }
             }
@@ -441,7 +441,8 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
     while let Some(msg) = receiver.next().await {
         match msg {
             Ok(Message::Text(text)) => {
-                if let Ok(message) = serde_json::from_str::<WebSocketMessage>(&text) {
+                let text_str = text.to_string();
+                if let Ok(message) = serde_json::from_str::<WebSocketMessage>(&text_str) {
                     match message.message_type.as_str() {
                         "heartbeat" => {
                             // Оновлюємо heartbeat
@@ -473,7 +474,7 @@ async fn handle_websocket_connection(socket: WebSocket, claims: Claims) {
                                 // Send error message through channel
                                 let tx_clone = WS_MANAGER.senders.read().await.get(&connection_id).cloned();
                                 if let Some(tx) = tx_clone {
-                                    let _ = tx.send(Message::Text(json));
+                                    let _ = tx.send(Message::Text(json.into()));
                                 }
                             }
                         }
