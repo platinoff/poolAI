@@ -506,6 +506,123 @@ impl KubernetesManager {
         }
     }
 
+    /// Update an existing worker deployment
+    ///
+    /// # Arguments
+    /// * `name` - Name of the worker deployment to update
+    /// * `config` - Updated worker configuration
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `config.image` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Deployment does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::{KubernetesManager, WorkerDeploymentConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let config = WorkerDeploymentConfig::default();
+    /// manager.update_worker_deployment("my-worker", &config).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn update_worker_deployment(
+        &self,
+        name: &str,
+        config: &WorkerDeploymentConfig,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Worker deployment name cannot be empty. Context: Attempted to update worker deployment with empty name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if config.image.is_empty() {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Worker deployment image cannot be empty. Context: Attempted to update worker deployment '{}' with empty image. \
+                    Suggestion: Provide a valid container image (e.g., 'poolai/worker:v1.0.0'). \
+                    Current value: ''",
+                    name
+                )
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Build patch body for updating deployment
+            let mut patch_body = json!({
+                "spec": {
+                    "replicas": config.replicas,
+                    "template": {
+                        "spec": {
+                            "containers": [{
+                                "name": name,
+                                "image": config.image,
+                                "resources": {
+                                    "requests": {
+                                        "cpu": config.resources.cpu,
+                                        "memory": config.resources.memory
+                                    },
+                                    "limits": {
+                                        "cpu": config.resources.cpu,
+                                        "memory": config.resources.memory
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
+            });
+            
+            // Add GPU if specified
+            if let Some(gpu) = config.resources.gpu {
+                if gpu > 0 {
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["requests"]["nvidia.com/gpu"] = json!(gpu);
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["nvidia.com/gpu"] = json!(gpu);
+                }
+            }
+            
+            // Add environment variables if any
+            if !config.env.is_empty() {
+                let mut env_vars = Vec::new();
+                for (key, value) in &config.env {
+                    env_vars.push(json!({
+                        "name": key,
+                        "value": value
+                    }));
+                }
+                patch_body["spec"]["template"]["spec"]["containers"][0]["env"] = json!(env_vars);
+            }
+            
+            // Update deployment via Kubernetes API (PATCH)
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, name);
+            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
+            
+            info!("Updated worker deployment: {} in namespace {}", name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Updating worker deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
+
     /// Delete a worker deployment
     ///
     /// # Arguments
@@ -650,6 +767,122 @@ impl KubernetesManager {
         {
             info!("Creating VM deployment: {} (placeholder - enable cloud-sdk feature)", name);
             Ok(format!("vm-{}", name))
+        }
+    }
+
+    /// Update an existing VM deployment
+    ///
+    /// # Arguments
+    /// * `name` - Name of the VM deployment to update
+    /// * `config` - Updated VM configuration
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `name` is empty
+    /// - `config.image` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Deployment does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::{KubernetesManager, VmDeploymentConfig};
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let config = VmDeploymentConfig::default();
+    /// manager.update_vm_deployment("my-vm", &config).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn update_vm_deployment(
+        &self,
+        name: &str,
+        config: &VmDeploymentConfig,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "VM deployment name cannot be empty. Context: Attempted to update VM deployment with empty name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        if config.image.is_empty() {
+            return Err(AppError::ValidationError(
+                format!(
+                    "VM deployment image cannot be empty. Context: Attempted to update VM deployment '{}' with empty image. \
+                    Suggestion: Provide a valid container image (e.g., 'poolai/vm:v1.0.0'). \
+                    Current value: ''",
+                    name
+                )
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Build patch body for updating VM deployment
+            let mut patch_body = json!({
+                "spec": {
+                    "template": {
+                        "spec": {
+                            "containers": [{
+                                "name": name,
+                                "image": config.image,
+                                "resources": {
+                                    "requests": {
+                                        "cpu": config.resources.cpu,
+                                        "memory": config.resources.memory
+                                    },
+                                    "limits": {
+                                        "cpu": config.resources.cpu,
+                                        "memory": config.resources.memory
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                }
+            });
+            
+            // Add GPU if specified
+            if let Some(gpu) = config.resources.gpu {
+                if gpu > 0 {
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["requests"]["nvidia.com/gpu"] = json!(gpu);
+                    patch_body["spec"]["template"]["spec"]["containers"][0]["resources"]["limits"]["nvidia.com/gpu"] = json!(gpu);
+                }
+            }
+            
+            // Add ports if any
+            if !config.network.ports.is_empty() {
+                let mut ports = Vec::new();
+                for port in &config.network.ports {
+                    ports.push(json!({
+                        "containerPort": port,
+                        "protocol": "TCP"
+                    }));
+                }
+                patch_body["spec"]["template"]["spec"]["containers"][0]["ports"] = json!(ports);
+            }
+            
+            // Update deployment via Kubernetes API (PATCH)
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, name);
+            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
+            
+            info!("Updated VM deployment: {} in namespace {}", name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Updating VM deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
         }
     }
 
@@ -1154,6 +1387,166 @@ impl Default for VmDeploymentConfig {
             },
         }
     }
+}
+
+#[cfg(feature = "cloud-sdk")]
+/// Build Kubernetes Deployment JSON for worker
+fn build_deployment(
+    name: &str,
+    image: &str,
+    replicas: i32,
+    resources: &ResourceRequirements,
+    env: &HashMap<String, String>,
+) -> Result<serde_json::Value, AppError> {
+    let mut env_vars = Vec::new();
+    for (key, value) in env {
+        env_vars.push(json!({
+            "name": key,
+            "value": value
+        }));
+    }
+    
+    let mut resources_obj = json!({
+        "requests": {
+            "cpu": resources.cpu,
+            "memory": resources.memory
+        },
+        "limits": {
+            "cpu": resources.cpu,
+            "memory": resources.memory
+        }
+    });
+    
+    if let Some(gpu) = resources.gpu {
+        if gpu > 0 {
+            resources_obj["requests"]["nvidia.com/gpu"] = json!(gpu);
+            resources_obj["limits"]["nvidia.com/gpu"] = json!(gpu);
+        }
+    }
+    
+    Ok(json!({
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+            "name": name,
+            "labels": {
+                "app": name,
+                "managed-by": "poolai"
+            }
+        },
+        "spec": {
+            "replicas": replicas,
+            "selector": {
+                "matchLabels": {
+                    "app": name
+                }
+            },
+            "template": {
+                "metadata": {
+                    "labels": {
+                        "app": name
+                    }
+                },
+                "spec": {
+                    "containers": [{
+                        "name": name,
+                        "image": image,
+                        "resources": resources_obj,
+                        "env": env_vars
+                    }]
+                }
+            }
+        }
+    }))
+}
+
+#[cfg(feature = "cloud-sdk")]
+/// Build Kubernetes Deployment JSON for VM
+fn build_vm_deployment(
+    name: &str,
+    image: &str,
+    resources: &ResourceRequirements,
+    storage: &StorageConfig,
+    network: &NetworkConfig,
+) -> Result<serde_json::Value, AppError> {
+    let mut resources_obj = json!({
+        "requests": {
+            "cpu": resources.cpu,
+            "memory": resources.memory
+        },
+        "limits": {
+            "cpu": resources.cpu,
+            "memory": resources.memory
+        }
+    });
+    
+    if let Some(gpu) = resources.gpu {
+        if gpu > 0 {
+            resources_obj["requests"]["nvidia.com/gpu"] = json!(gpu);
+            resources_obj["limits"]["nvidia.com/gpu"] = json!(gpu);
+        }
+    }
+    
+    let mut ports = Vec::new();
+    for port in &network.ports {
+        ports.push(json!({
+            "containerPort": port,
+            "protocol": "TCP"
+        }));
+    }
+    
+    let service_type = match network.service_type {
+        ServiceType::ClusterIP => "ClusterIP",
+        ServiceType::NodePort => "NodePort",
+        ServiceType::LoadBalancer => "LoadBalancer",
+    };
+    
+    Ok(json!({
+        "apiVersion": "apps/v1",
+        "kind": "Deployment",
+        "metadata": {
+            "name": name,
+            "labels": {
+                "app": name,
+                "managed-by": "poolai",
+                "type": "vm"
+            }
+        },
+        "spec": {
+            "replicas": 1,
+            "selector": {
+                "matchLabels": {
+                    "app": name
+                }
+            },
+            "template": {
+                "metadata": {
+                    "labels": {
+                        "app": name,
+                        "type": "vm"
+                    }
+                },
+                "spec": {
+                    "containers": [{
+                        "name": name,
+                        "image": image,
+                        "resources": resources_obj,
+                        "ports": ports,
+                        "volumeMounts": [{
+                            "name": "storage",
+                            "mountPath": "/data"
+                        }]
+                    }],
+                    "volumes": [{
+                        "name": "storage",
+                        "persistentVolumeClaim": {
+                            "claimName": format!("{}-pvc", name)
+                        }
+                    }]
+                }
+            }
+        }
+    }))
 }
 
 #[cfg(feature = "cloud-sdk")]

@@ -552,9 +552,15 @@ impl PoolAIOperator {
         
         if deployment_exists {
             // Update existing deployment
-            // TODO: Implement deployment update logic
-            // For now, we'll try to create (which will fail if exists, but that's OK for now)
-            info!("Deployment {} exists, update logic not yet implemented", deployment_name);
+            match k8s_manager.update_worker_deployment(deployment_name, &config).await {
+                Ok(_) => {
+                    info!("Updated worker deployment: {} in namespace {}", deployment_name, namespace);
+                }
+                Err(e) => {
+                    warn!("Failed to update worker deployment {}: {}", deployment_name, e);
+                    return Err(e);
+                }
+            }
         } else {
             // Create new deployment
             match k8s_manager.create_worker_deployment(deployment_name, &config).await {
@@ -614,8 +620,15 @@ impl PoolAIOperator {
         
         if deployment_exists {
             // Update existing deployment
-            // TODO: Implement deployment update logic
-            info!("Deployment {} exists, update logic not yet implemented", deployment_name);
+            match k8s_manager.update_vm_deployment(deployment_name, &config).await {
+                Ok(_) => {
+                    info!("Updated VM deployment: {} in namespace {}", deployment_name, namespace);
+                }
+                Err(e) => {
+                    warn!("Failed to update VM deployment {}: {}", deployment_name, e);
+                    return Err(e);
+                }
+            }
         } else {
             // Create new deployment
             match k8s_manager.create_vm_deployment(deployment_name, &config).await {

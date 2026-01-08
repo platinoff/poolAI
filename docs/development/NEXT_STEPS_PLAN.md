@@ -75,7 +75,9 @@
 - ✅ Operator watchers and reconciliation structure (CRD watching, event handling, reconciliation loop)
 - ✅ CRD watching implementation (HTTP polling-based watchers for all CRD types)
 - ✅ Event handling (CrdEvent, CrdEventType, event-driven reconciliation)
-- ✅ Reconciliation functions (reconcile_worker, reconcile_vm with real implementation, reconcile_tenant placeholder)
+- ✅ Reconciliation functions (reconcile_worker, reconcile_vm with create/update support, reconcile_tenant placeholder)
+- ✅ Deployment update methods (update_worker_deployment, update_vm_deployment with PATCH support)
+- ✅ Build deployment helpers (build_deployment, build_vm_deployment for Kubernetes JSON)
 - ✅ Graceful shutdown (proper cleanup of watchers and reconciliation loops)
 - ✅ Scaling policies configuration (ScalingPolicy struct with metric-based rules)
 - ✅ Load balancing strategies (LoadBalancingStrategy enum: RoundRobin, WeightedRoundRobin, LeastConnections, IpHash)
@@ -84,15 +86,16 @@
 - ✅ Methods for configuring load balancing strategy and health checks
 - ⚠️ AWS SDK dependencies commented out (requires Rust 1.88+, current: 1.70+)
 - ✅ Kubernetes Operator CRD watching and event handling (HTTP polling-based implementation)
-- 🔄 Kubernetes Operator full reconciliation (actual resource creation/update/deletion - planned)
+- ✅ Kubernetes Operator deployment reconciliation (create and update support for workers and VMs)
+- 🔄 Kubernetes Operator full reconciliation (CRD status updates, tenant reconciliation with ResourceQuota - planned)
 - 🔄 Real metrics collection для auto-scaling (planned)
 - 🔄 Actual health checks для load balancing (planned)
 
-**Прогрес Cloud Module**: ~75% 🔄
+**Прогрес Cloud Module**: ~78% 🔄
 - Infrastructure: 100% ✅
 - Testing: 100% ✅ (67 tests)
 - Documentation: 100% ✅
-- Implementation: ~60% 🔄
+- Implementation: ~65% 🔄
 
 ---
 
