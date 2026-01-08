@@ -65,10 +65,10 @@
 - ✅ Real HTTP calls for Pods (get status, list)
 - ✅ Improved kubeconfig loading (file and in-cluster config support)
 - ✅ Kubernetes Operator structure created (PoolAIOperator with CRD definitions)
+- ✅ CRD Definitions created (PoolAIWorker, PoolAIVM, PoolAITenant YAML files)
+- ✅ Enhanced operator module documentation with YAML examples
 - ⚠️ AWS SDK dependencies commented out (requires Rust 1.88+, current: 1.70+)
 - 🔄 Kubernetes Operator implementation (watchers, reconciliation loops - planned)
-- 🔄 Kubernetes Operator (planned)
-- 🔄 CRD Definitions (planned)
 - 🔄 Helm Charts (planned)
 
 ---

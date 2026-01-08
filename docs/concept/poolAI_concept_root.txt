@@ -96,6 +96,7 @@
   - ✅ **Kubernetes API Integration** - Real HTTP calls to Kubernetes API via reqwest (Deployments, Pods, Services)
   - ✅ **Kubernetes kubeconfig Loading** - Improved kubeconfig loading with file and in-cluster config support
   - ✅ **Kubernetes Operator Structure** - PoolAIOperator with CRD definitions (PoolAIWorker, PoolAIVM, PoolAITenant)
+  - ✅ **CRD Definitions** - YAML files for PoolAIWorker, PoolAIVM, PoolAITenant with OpenAPI schema validation
   - ✅ **Enterprise Module Documentation** - Enhanced Rustdoc documentation with usage examples for EnterpriseManager
   - ✅ **Unit Tests** - Comprehensive unit tests for versioning, config, pool, raid, vm modules
   - ✅ **Integration Tests** - 39 new integration tests (7 worker + 7 process + 8 rewards + 9 auth + 8 websocket)
