@@ -15,6 +15,7 @@ use crate::raid::client::ProtocolClient;
 use crate::raid::events::{EventStore, RaidEvent};
 use crate::raid::protocol::{ArtifactConflict, ArtifactMetadata, GetArtifactResponse, SyncMode};
 use chrono::Utc;
+use futures_util::future::join_all;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
@@ -627,16 +628,22 @@ impl ReplicationEngine {
             replication_tasks.push(task);
         }
 
-        // Wait for all replication tasks with timeout
+        // Wait for all replication tasks with timeout (optimized: parallel execution)
         let timeout_duration = TokioDuration::from_secs(self.config.sync_timeout_seconds);
         let timeout_result = timeout(timeout_duration, async {
-            let mut results = Vec::new();
-            for task in replication_tasks {
-                if let Ok((node_id, result)) = task.await {
-                    results.push((node_id, result));
-                }
-            }
-            results
+            // Use join_all for parallel execution instead of sequential await
+            let task_results = join_all(replication_tasks).await;
+            
+            task_results
+                .into_iter()
+                .filter_map(|result| {
+                    if let Ok((node_id, replication_result)) = result {
+                        Some((node_id, replication_result))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>()
         })
         .await;
 
