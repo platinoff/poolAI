@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::sync::OnceLock;
-// use std::collections::HashMap; // Not used in MVP
 use crate::core::error::AppError;
 
 /// PoolAI system configuration

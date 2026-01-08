@@ -10,7 +10,6 @@ pub mod worker;
 
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelRequest, ModelResponse};
-// use crate::core::config::PoolAIConfig; // Not used in MVP
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashMap;
