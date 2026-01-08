@@ -81,8 +81,9 @@
     - ✅ Multi-cloud provider support (AWS, Azure, GCP placeholders)
     - ✅ Auto-scaling module structure
     - ✅ Load balancing module structure
-    - ✅ Enhanced error handling з контекстом та пропозиціями в Kubernetes module
+    - ✅ Enhanced error handling з контекстом та пропозиціями в всіх cloud submodules
     - ✅ Comprehensive Rustdoc documentation з прикладами використання
+    - ✅ SDK dependencies added (k8s-openapi, Azure SDK) - optional feature "cloud-sdk"
     - ✅ 66 cloud integration tests passing
 
 ---
@@ -621,6 +622,7 @@
 - ✅ `Result<T, AppError>` для всіх fallible операцій
 - ✅ Proper error propagation з `?`
 - ✅ Enhanced error messages з контекстом та пропозиціями в RAID replication module
+- ✅ Enhanced error messages з контекстом та пропозиціями в Cloud module (Kubernetes, Auto-scaling, Load Balancing)
 
 ---
 
