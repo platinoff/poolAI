@@ -37,7 +37,7 @@
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
@@ -60,7 +60,7 @@ pub struct OAuth2Config {
 }
 
 /// OAuth2 provider information
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OAuth2Provider {
     /// Provider name (e.g., "google", "github", "microsoft")
     pub name: String,
@@ -114,7 +114,7 @@ pub struct SamlConfig {
 }
 
 /// SAML provider information
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SamlProvider {
     /// Provider name
     pub name: String,
@@ -439,6 +439,156 @@ impl SecurityManager {
         Ok(())
     }
 
+    /// Lists all OAuth2 providers
+    pub async fn list_oauth2_providers(&self) -> Result<Vec<OAuth2Provider>, AppError> {
+        let providers = self.oauth2_providers.read().await;
+        Ok(providers.values().cloned().collect())
+    }
+
+    /// Gets an OAuth2 provider by name
+    pub async fn get_oauth2_provider(
+        &self,
+        name: &str,
+    ) -> Result<Option<OAuth2Provider>, AppError> {
+        let providers = self.oauth2_providers.read().await;
+        Ok(providers.get(name).cloned())
+    }
+
+    /// Updates an OAuth2 provider
+    pub async fn update_oauth2_provider(
+        &self,
+        name: String,
+        config: Option<OAuth2Config>,
+        enabled: Option<bool>,
+    ) -> Result<(), AppError> {
+        let mut providers = self.oauth2_providers.write().await;
+        let provider = providers.get_mut(&name).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "OAuth2 provider not found: {}. Context: Cannot update non-existent provider. Suggestion: Check provider name and ensure provider exists.",
+                name
+            ))
+        })?;
+
+        if let Some(new_config) = config {
+            provider.config = new_config;
+        }
+
+        if let Some(new_enabled) = enabled {
+            provider.enabled = new_enabled;
+        }
+
+        info!("Updated OAuth2 provider: {}", name);
+        Ok(())
+    }
+
+    /// Deletes an OAuth2 provider
+    pub async fn delete_oauth2_provider(&self, name: &str) -> Result<(), AppError> {
+        let mut providers = self.oauth2_providers.write().await;
+        if providers.remove(name).is_none() {
+            return Err(AppError::ValidationError(format!(
+                "OAuth2 provider not found: {}. Context: Cannot delete non-existent provider. Suggestion: Check provider name.",
+                name
+            )));
+        }
+
+        info!("Deleted OAuth2 provider: {}", name);
+        Ok(())
+    }
+
+    /// Lists all SAML providers
+    pub async fn list_saml_providers(&self) -> Result<Vec<SamlProvider>, AppError> {
+        let providers = self.saml_providers.read().await;
+        Ok(providers.values().cloned().collect())
+    }
+
+    /// Gets a SAML provider by name
+    pub async fn get_saml_provider(&self, name: &str) -> Result<Option<SamlProvider>, AppError> {
+        let providers = self.saml_providers.read().await;
+        Ok(providers.get(name).cloned())
+    }
+
+    /// Updates a SAML provider
+    pub async fn update_saml_provider(
+        &self,
+        name: String,
+        config: Option<SamlConfig>,
+        enabled: Option<bool>,
+    ) -> Result<(), AppError> {
+        let mut providers = self.saml_providers.write().await;
+        let provider = providers.get_mut(&name).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "SAML provider not found: {}. Context: Cannot update non-existent provider. Suggestion: Check provider name and ensure provider exists.",
+                name
+            ))
+        })?;
+
+        if let Some(new_config) = config {
+            provider.config = new_config;
+        }
+
+        if let Some(new_enabled) = enabled {
+            provider.enabled = new_enabled;
+        }
+
+        info!("Updated SAML provider: {}", name);
+        Ok(())
+    }
+
+    /// Deletes a SAML provider
+    pub async fn delete_saml_provider(&self, name: &str) -> Result<(), AppError> {
+        let mut providers = self.saml_providers.write().await;
+        if providers.remove(name).is_none() {
+            return Err(AppError::ValidationError(format!(
+                "SAML provider not found: {}. Context: Cannot delete non-existent provider. Suggestion: Check provider name.",
+                name
+            )));
+        }
+
+        info!("Deleted SAML provider: {}", name);
+        Ok(())
+    }
+
+    /// Lists all security policies
+    pub async fn list_security_policies(&self) -> Result<Vec<SecurityPolicy>, AppError> {
+        let policies = self.security_policies.read().await;
+        Ok(policies.values().cloned().collect())
+    }
+
+    /// Updates a security policy
+    pub async fn update_security_policy(&self, policy: SecurityPolicy) -> Result<(), AppError> {
+        let mut policies = self.security_policies.write().await;
+        if !policies.contains_key(&policy.name) {
+            return Err(AppError::ValidationError(format!(
+                "Security policy not found: {}. Context: Cannot update non-existent policy. Suggestion: Check policy name and ensure policy exists.",
+                policy.name
+            )));
+        }
+
+        policies.insert(policy.name.clone(), policy.clone());
+        info!("Updated security policy: {}", policy.name);
+        Ok(())
+    }
+
+    /// Deletes a security policy
+    pub async fn delete_security_policy(&self, name: &str) -> Result<(), AppError> {
+        if name == "default" {
+            return Err(AppError::ValidationError(
+                "Cannot delete default security policy. Context: Default policy is required for system operation. Suggestion: Create a new policy instead of deleting the default one.".to_string()
+            ));
+        }
+
+        let mut policies = self.security_policies.write().await;
+        if policies.remove(name).is_none() {
+            return Err(AppError::ValidationError(format!(
+                "Security policy not found: {}. Context: Cannot delete non-existent policy. Suggestion: Check policy name.",
+                name
+            )));
+        }
+
+        info!("Deleted security policy: {}", name);
+        Ok(())
+    }
+
     /// Shuts down the security manager
     pub async fn shutdown(&self) -> Result<(), AppError> {
         *self.initialized.write().await = false;
@@ -451,6 +601,20 @@ impl Default for SecurityManager {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Global security manager instance
+static SECURITY_MANAGER: OnceLock<Arc<SecurityManager>> = OnceLock::new();
+
+/// Get global security manager instance.
+///
+/// This function returns a singleton instance of `SecurityManager` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+pub fn get_global_security_manager() -> Arc<SecurityManager> {
+    SECURITY_MANAGER
+        .get_or_init(|| Arc::new(SecurityManager::new()))
+        .clone()
 }
 
 #[cfg(test)]

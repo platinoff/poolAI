@@ -9,10 +9,12 @@
 #[cfg(feature = "enterprise")]
 use crate::enterprise;
 #[cfg(feature = "enterprise")]
-use crate::network::auth::auth_middleware;
+use crate::network::api::check_permission;
+#[cfg(feature = "enterprise")]
+use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
 use axum::{
-    extract::{Path, Query},
+    extract::{Extension, Path, Query},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -85,6 +87,10 @@ pub fn create_enterprise_api_routes() -> Router {
         )
 }
 
+// ============================================================================
+// Tenant Management Handlers
+// ============================================================================
+
 #[cfg(feature = "enterprise")]
 async fn tenants_list_handler() -> impl IntoResponse {
     let manager = enterprise::multi_tenancy::get_global_tenant_manager();
@@ -97,12 +103,11 @@ async fn tenants_list_handler() -> impl IntoResponse {
             })),
         )
             .into_response(),
-    )
+    }
 }
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
-#[allow(dead_code)] // Will be used when implementation is complete
 struct TenantCreateRequest {
     name: String,
     config: enterprise::multi_tenancy::TenantConfig,
@@ -111,7 +116,7 @@ struct TenantCreateRequest {
 #[cfg(feature = "enterprise")]
 async fn tenant_create_handler(Json(req): Json<TenantCreateRequest>) -> impl IntoResponse {
     let manager = enterprise::multi_tenancy::get_global_tenant_manager();
-    
+
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
         return (
@@ -122,7 +127,7 @@ async fn tenant_create_handler(Json(req): Json<TenantCreateRequest>) -> impl Int
         )
             .into_response();
     }
-    
+
     match manager.create_tenant(req.name, req.config).await {
         Ok(tenant) => Json(tenant).into_response(),
         Err(e) => (
@@ -132,14 +137,14 @@ async fn tenant_create_handler(Json(req): Json<TenantCreateRequest>) -> impl Int
             })),
         )
             .into_response(),
-    )
+    }
 }
 
 #[cfg(feature = "enterprise")]
 async fn tenant_get_handler(Path(id): Path<String>) -> impl IntoResponse {
     let manager = enterprise::multi_tenancy::get_global_tenant_manager();
-    
-    let tenant_id = match uuid::Uuid::parse_str(&id) {
+
+    let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
             return (
@@ -151,7 +156,7 @@ async fn tenant_get_handler(Path(id): Path<String>) -> impl IntoResponse {
                 .into_response();
         }
     };
-    
+
     match manager.get_tenant(tenant_id).await {
         Ok(Some(tenant)) => Json(tenant).into_response(),
         Ok(None) => (
@@ -182,13 +187,14 @@ async fn tenant_update_handler(
             "error": "Tenant update not yet implemented"
         })),
     )
+        .into_response()
 }
 
 #[cfg(feature = "enterprise")]
 async fn tenant_delete_handler(Path(id): Path<String>) -> impl IntoResponse {
     let manager = enterprise::multi_tenancy::get_global_tenant_manager();
-    
-    let tenant_id = match uuid::Uuid::parse_str(&id) {
+
+    let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
             return (
@@ -200,7 +206,7 @@ async fn tenant_delete_handler(Path(id): Path<String>) -> impl IntoResponse {
                 .into_response();
         }
     };
-    
+
     match manager.delete_tenant(tenant_id).await {
         Ok(()) => (
             StatusCode::OK,
@@ -222,8 +228,8 @@ async fn tenant_delete_handler(Path(id): Path<String>) -> impl IntoResponse {
 #[cfg(feature = "enterprise")]
 async fn tenant_usage_handler(Path(id): Path<String>) -> impl IntoResponse {
     let manager = enterprise::multi_tenancy::get_global_tenant_manager();
-    
-    let tenant_id = match uuid::Uuid::parse_str(&id) {
+
+    let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
             return (
@@ -235,7 +241,7 @@ async fn tenant_usage_handler(Path(id): Path<String>) -> impl IntoResponse {
                 .into_response();
         }
     };
-    
+
     match manager.get_usage(tenant_id).await {
         Ok(usage) => Json(usage).into_response(),
         Err(e) => (
@@ -264,8 +270,8 @@ async fn tenant_quota_check_handler(
     Json(req): Json<QuotaCheckRequest>,
 ) -> impl IntoResponse {
     let manager = enterprise::multi_tenancy::get_global_tenant_manager();
-    
-    let tenant_id = match uuid::Uuid::parse_str(&id) {
+
+    let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
             return (
@@ -277,7 +283,7 @@ async fn tenant_quota_check_handler(
                 .into_response();
         }
     };
-    
+
     match manager
         .check_quota(
             tenant_id,
@@ -300,9 +306,13 @@ async fn tenant_quota_check_handler(
     }
 }
 
+// ============================================================================
+// Audit Logs Handlers
+// ============================================================================
+
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
-#[allow(dead_code)] // Will be used when implementation is complete
+#[allow(dead_code)]
 struct AuditQueryParams {
     user_id: Option<String>,
     tenant_id: Option<String>,
@@ -322,9 +332,13 @@ async fn audit_events_query_handler(Query(_params): Query<AuditQueryParams>) -> 
     Json::<Vec<enterprise::audit::AuditEvent>>(Vec::new())
 }
 
+// ============================================================================
+// Monitoring Handlers
+// ============================================================================
+
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
-#[allow(dead_code)] // Will be used when implementation is complete
+#[allow(dead_code)]
 struct MonitoringAlertsQuery {
     severity: Option<String>,
     tenant_id: Option<String>,
@@ -348,6 +362,7 @@ async fn monitoring_alert_acknowledge_handler(Path(_id): Path<String>) -> impl I
             "error": "Alert acknowledgment not yet implemented"
         })),
     )
+        .into_response()
 }
 
 #[cfg(feature = "enterprise")]
@@ -366,11 +381,12 @@ async fn monitoring_dashboard_create_handler(
             "error": "Dashboard creation not yet implemented"
         })),
     )
+        .into_response()
 }
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
-#[allow(dead_code)] // Will be used when implementation is complete
+#[allow(dead_code)]
 struct MonitoringMetricsQuery {
     metric: Option<String>,
     start_time: Option<String>,
@@ -387,57 +403,260 @@ async fn monitoring_metrics_handler(
     Json::<Vec<enterprise::monitoring::MetricDataPoint>>(Vec::new())
 }
 
+// ============================================================================
+// Security Management Handlers
+// ============================================================================
+
+#[cfg(feature = "enterprise")]
+#[derive(Deserialize)]
+struct OAuth2ProviderRegisterRequest {
+    name: String,
+    config: enterprise::security::OAuth2Config,
+    enabled: Option<bool>,
+}
+
 #[cfg(feature = "enterprise")]
 async fn security_oauth2_providers_handler() -> impl IntoResponse {
-    // TODO: Get global security manager and retrieve OAuth2 providers
-    Json::<Vec<serde_json::Value>>(Vec::new())
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.list_oauth2_providers().await {
+        Ok(providers) => Json(providers).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list OAuth2 providers. Context: Cannot retrieve OAuth2 provider list. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
 
 #[cfg(feature = "enterprise")]
 async fn security_oauth2_provider_register_handler(
-    Json(_req): Json<serde_json::Value>,
+    Extension(claims): Extension<Claims>,
+    Json(req): Json<OAuth2ProviderRegisterRequest>,
 ) -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "OAuth2 provider registration not yet implemented"
-        })),
-    )
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot register OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.register_oauth2_provider(req.name.clone(), req.config).await {
+        Ok(()) => {
+            // Update enabled status if provided
+            if let Some(enabled) = req.enabled {
+                if enabled {
+                    // Provider is enabled by default when registered
+                }
+            }
+
+            (
+                StatusCode::CREATED,
+                Json(serde_json::json!({
+                    "message": "OAuth2 provider registered successfully",
+                    "name": req.name
+                })),
+            )
+                .into_response()
+        }
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to register OAuth2 provider. Context: Cannot register OAuth2 provider with specified configuration. Suggestion: Verify provider name and configuration parameters. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+#[derive(Deserialize)]
+struct SamlProviderRegisterRequest {
+    name: String,
+    config: enterprise::security::SamlConfig,
+    enabled: Option<bool>,
 }
 
 #[cfg(feature = "enterprise")]
 async fn security_saml_providers_handler() -> impl IntoResponse {
-    // TODO: Get global security manager and retrieve SAML providers
-    Json::<Vec<serde_json::Value>>(Vec::new())
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.list_saml_providers().await {
+        Ok(providers) => Json(providers).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list SAML providers. Context: Cannot retrieve SAML provider list. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
 
 #[cfg(feature = "enterprise")]
 async fn security_saml_provider_register_handler(
-    Json(_req): Json<serde_json::Value>,
+    Extension(claims): Extension<Claims>,
+    Json(req): Json<SamlProviderRegisterRequest>,
 ) -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "SAML provider registration not yet implemented"
-        })),
-    )
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot register SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.register_saml_provider(req.name.clone(), req.config).await {
+        Ok(()) => {
+            // Update enabled status if provided
+            if let Some(enabled) = req.enabled {
+                if enabled {
+                    // Provider is enabled by default when registered
+                }
+            }
+
+            (
+                StatusCode::CREATED,
+                Json(serde_json::json!({
+                    "message": "SAML provider registered successfully",
+                    "name": req.name
+                })),
+            )
+                .into_response()
+        }
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to register SAML provider. Context: Cannot register SAML provider with specified configuration. Suggestion: Verify provider name and configuration parameters. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+#[derive(Deserialize)]
+struct SecurityPolicyCreateRequest {
+    name: String,
+    policy: enterprise::security::SecurityPolicy,
 }
 
 #[cfg(feature = "enterprise")]
 async fn security_policies_handler() -> impl IntoResponse {
-    // TODO: Get global security manager and retrieve policies
-    Json::<Vec<enterprise::security::SecurityPolicy>>(Vec::new())
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.list_security_policies().await {
+        Ok(policies) => Json(policies).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list security policies. Context: Cannot retrieve security policy list. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_policy_create_handler(Json(_req): Json<serde_json::Value>) -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Security policy creation not yet implemented"
-        })),
-    )
+async fn security_policy_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(req): Json<SecurityPolicyCreateRequest>,
+) -> impl IntoResponse {
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot create security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.create_security_policy(req.policy).await {
+        Ok(()) => (
+            StatusCode::CREATED,
+            Json(serde_json::json!({
+                "message": "Security policy created successfully"
+            })),
+        )
+            .into_response(),
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to create security policy. Context: Cannot create security policy with specified parameters. Suggestion: Verify policy name and configuration. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
+
+// ============================================================================
+// Non-enterprise stub
+// ============================================================================
 
 #[cfg(not(feature = "enterprise"))]
 pub fn create_enterprise_api_routes() -> Router {

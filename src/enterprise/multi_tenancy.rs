@@ -104,7 +104,7 @@ pub struct Tenant {
 }
 
 /// Quota check result
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuotaCheckResult {
     /// Whether the requested resources are allowed
     pub allowed: bool,

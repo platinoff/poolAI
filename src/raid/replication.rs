@@ -633,7 +633,7 @@ impl ReplicationEngine {
         let timeout_result = timeout(timeout_duration, async {
             // Use join_all for parallel execution instead of sequential await
             let task_results = join_all(replication_tasks).await;
-            
+
             task_results
                 .into_iter()
                 .filter_map(|result| {

@@ -168,7 +168,7 @@ impl CircuitBreaker {
     pub async fn record_success(&self) {
         // Optimize: Read state first to minimize lock contention
         let current_state = *self.state.read().await;
-        
+
         match current_state {
             CircuitState::Closed => {
                 // Reset failure count on success (optimized: single write lock)
@@ -192,7 +192,7 @@ impl CircuitBreaker {
                 *success_count += 1;
                 let count = *success_count;
                 drop(success_count); // Release lock early
-                
+
                 debug!(
                     "Circuit breaker for node {}: success in HalfOpen state (count: {})",
                     self.node_id, count
@@ -203,20 +203,20 @@ impl CircuitBreaker {
                     let mut state = self.state.write().await;
                     *state = CircuitState::Closed;
                     drop(state); // Release state lock
-                    
+
                     // Reset counters (optimized: separate locks to minimize contention)
                     let mut failure_count = self.failure_count.write().await;
                     *failure_count = 0;
                     drop(failure_count);
-                    
+
                     let mut success_count = self.success_count.write().await;
                     *success_count = 0;
                     drop(success_count);
-                    
+
                     let mut opened_at = self.opened_at.write().await;
                     *opened_at = None;
                     drop(opened_at);
-                    
+
                     info!(
                         "Circuit breaker for node {} transitioning to Closed",
                         self.node_id
@@ -230,7 +230,7 @@ impl CircuitBreaker {
     pub async fn record_failure(&self) {
         // Optimize: Read state first to minimize lock contention
         let current_state = *self.state.read().await;
-        
+
         match current_state {
             CircuitState::Closed => {
                 // Increment failure count (optimized: single write lock)
@@ -238,7 +238,7 @@ impl CircuitBreaker {
                 *failure_count += 1;
                 let count = *failure_count;
                 drop(failure_count); // Release lock early
-                
+
                 debug!(
                     "Circuit breaker for node {}: failure in Closed state (count: {})",
                     self.node_id, count
@@ -249,11 +249,11 @@ impl CircuitBreaker {
                     let mut state = self.state.write().await;
                     *state = CircuitState::Open;
                     drop(state);
-                    
+
                     let mut opened_at = self.opened_at.write().await;
                     *opened_at = Some(Utc::now());
                     drop(opened_at);
-                    
+
                     info!(
                         "Circuit breaker for node {} transitioning to Open ({} failures)",
                         self.node_id, count
@@ -265,7 +265,7 @@ impl CircuitBreaker {
                 let mut opened_at = self.opened_at.write().await;
                 *opened_at = Some(Utc::now());
                 drop(opened_at);
-                
+
                 debug!(
                     "Circuit breaker for node {}: failure in Open state",
                     self.node_id
@@ -276,19 +276,19 @@ impl CircuitBreaker {
                 let mut state = self.state.write().await;
                 *state = CircuitState::Open;
                 drop(state);
-                
+
                 let mut failure_count = self.failure_count.write().await;
                 *failure_count = self.config.failure_threshold;
                 drop(failure_count);
-                
+
                 let mut success_count = self.success_count.write().await;
                 *success_count = 0;
                 drop(success_count);
-                
+
                 let mut opened_at = self.opened_at.write().await;
                 *opened_at = Some(Utc::now());
                 drop(opened_at);
-                
+
                 warn!(
                     "Circuit breaker for node {} transitioning back to Open from HalfOpen",
                     self.node_id

@@ -480,7 +480,7 @@ pub async fn authenticate_user(
     //    let role = UserRole::from_str(&user.role)?;
     // Use UserManager for authentication
     let manager = get_global_user_manager();
-    
+
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
         return Err((
@@ -490,9 +490,11 @@ pub async fn authenticate_user(
             })),
         ));
     }
-    
+
     // Verify password
-    let is_valid = manager.verify_password(&auth_req.username, &auth_req.password).await
+    let is_valid = manager
+        .verify_password(&auth_req.username, &auth_req.password)
+        .await
         .map_err(|e| {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -501,7 +503,7 @@ pub async fn authenticate_user(
                 })),
             )
         })?;
-    
+
     if !is_valid {
         return Err((
             StatusCode::UNAUTHORIZED,
@@ -510,9 +512,11 @@ pub async fn authenticate_user(
             })),
         ));
     }
-    
+
     // Get user to retrieve role
-    let user = manager.get_user_by_username(&auth_req.username).await
+    let user = manager
+        .get_user_by_username(&auth_req.username)
+        .await
         .map_err(|e| {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -521,7 +525,7 @@ pub async fn authenticate_user(
                 })),
             )
         })?;
-    
+
     let (role, username) = if let Some(u) = user {
         (u.role, u.username)
     } else {
@@ -755,7 +759,10 @@ impl UserManager {
         }
 
         *initialized = true;
-        info!("User manager initialized with {} default users", users.len());
+        info!(
+            "User manager initialized with {} default users",
+            users.len()
+        );
         Ok(())
     }
 

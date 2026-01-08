@@ -1,13 +1,14 @@
 // network/api.rs
 use crate::libs::{get_global_manager, LibraryType};
-use crate::network::auth::{auth_middleware, authenticate_user, AuthRequest, Claims, get_global_user_manager, UserRole};
+use crate::network::auth::{
+    auth_middleware, authenticate_user, get_global_user_manager, AuthRequest, Claims, UserRole,
+};
 use crate::network::ws::websocket_handler;
 use crate::platform;
 use crate::pool;
 use crate::raid;
 use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
 use crate::vm;
-use uuid::Uuid;
 use axum::extract::Extension;
 use axum::{
     http::header::ACCEPT,
@@ -17,6 +18,7 @@ use axum::{
     Json, Router,
 };
 use serde::Serialize;
+use uuid::Uuid;
 
 use crate::network::raid_distributed_handlers::*;
 use crate::network::validation;
@@ -254,7 +256,7 @@ async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
 }
 
 // Helper function to check RBAC permissions
-fn check_permission(
+pub(crate) fn check_permission(
     claims: &Claims,
     required_permission: &str,
 ) -> Result<(), (axum::http::StatusCode, Json<serde_json::Value>)> {
@@ -1586,7 +1588,7 @@ struct UserCreateRequest {
 
 async fn users_list_handler() -> impl IntoResponse {
     let manager = get_global_user_manager();
-    
+
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
         return (
@@ -1597,7 +1599,7 @@ async fn users_list_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     match manager.list_users().await {
         Ok(users) => Json(users).into_response(),
         Err(e) => (
@@ -1618,9 +1620,9 @@ async fn user_create_handler(
     if let Err(err) = check_permission(&claims, "admin:all") {
         return err.into_response();
     }
-    
+
     let manager = get_global_user_manager();
-    
+
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
         return (
@@ -1631,7 +1633,7 @@ async fn user_create_handler(
         )
             .into_response();
     }
-    
+
     match manager.create_user(req.username, req.password, req.role).await {
         Ok(user) => Json(user).into_response(),
         Err(e) => (
@@ -1648,7 +1650,7 @@ async fn user_get_handler(
     axum::extract::Path(id): axum::extract::Path<String>,
 ) -> impl IntoResponse {
     let manager = get_global_user_manager();
-    
+
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -1661,7 +1663,7 @@ async fn user_get_handler(
                 .into_response();
         }
     };
-    
+
     match manager.get_user(user_id).await {
         Ok(Some(user)) => Json(user).into_response(),
         Ok(None) => (
@@ -1698,9 +1700,9 @@ async fn user_update_handler(
     if let Err(err) = check_permission(&claims, "admin:all") {
         return err.into_response();
     }
-    
+
     let manager = get_global_user_manager();
-    
+
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -1713,7 +1715,7 @@ async fn user_update_handler(
                 .into_response();
         }
     };
-    
+
     match manager.update_user(user_id, req.username, req.password, req.role, req.active).await {
         Ok(user) => Json(user).into_response(),
         Err(e) => (
@@ -1734,9 +1736,9 @@ async fn user_delete_handler(
     if let Err(err) = check_permission(&claims, "admin:all") {
         return err.into_response();
     }
-    
+
     let manager = get_global_user_manager();
-    
+
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -1749,7 +1751,7 @@ async fn user_delete_handler(
                 .into_response();
         }
     };
-    
+
     match manager.delete_user(user_id).await {
         Ok(()) => (
             axum::http::StatusCode::OK,

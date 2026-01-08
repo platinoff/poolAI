@@ -16,8 +16,7 @@ fn test_dockerfile_exists() {
 
 #[test]
 fn test_dockerfile_contains_required_stages() {
-    let dockerfile_content = fs::read_to_string("Dockerfile")
-        .expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
 
     // Check for multi-stage build
     assert!(
@@ -32,8 +31,7 @@ fn test_dockerfile_contains_required_stages() {
 
 #[test]
 fn test_dockerfile_exposes_ports() {
-    let dockerfile_content = fs::read_to_string("Dockerfile")
-        .expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("EXPOSE 8080"),
@@ -47,8 +45,7 @@ fn test_dockerfile_exposes_ports() {
 
 #[test]
 fn test_dockerfile_uses_non_root_user() {
-    let dockerfile_content = fs::read_to_string("Dockerfile")
-        .expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("USER poolai") || dockerfile_content.contains("USER "),
@@ -58,8 +55,7 @@ fn test_dockerfile_uses_non_root_user() {
 
 #[test]
 fn test_dockerfile_has_healthcheck() {
-    let dockerfile_content = fs::read_to_string("Dockerfile")
-        .expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("HEALTHCHECK"),
@@ -77,8 +73,8 @@ fn test_docker_compose_exists() {
 
 #[test]
 fn test_docker_compose_has_poolai_service() {
-    let compose_content = fs::read_to_string("docker-compose.yml")
-        .expect("Failed to read docker-compose.yml");
+    let compose_content =
+        fs::read_to_string("docker-compose.yml").expect("Failed to read docker-compose.yml");
 
     assert!(
         compose_content.contains("poolai:"),
@@ -88,8 +84,8 @@ fn test_docker_compose_has_poolai_service() {
 
 #[test]
 fn test_docker_compose_has_volumes() {
-    let compose_content = fs::read_to_string("docker-compose.yml")
-        .expect("Failed to read docker-compose.yml");
+    let compose_content =
+        fs::read_to_string("docker-compose.yml").expect("Failed to read docker-compose.yml");
 
     assert!(
         compose_content.contains("poolai-data:") || compose_content.contains("volumes:"),
@@ -99,8 +95,8 @@ fn test_docker_compose_has_volumes() {
 
 #[test]
 fn test_docker_compose_has_networks() {
-    let compose_content = fs::read_to_string("docker-compose.yml")
-        .expect("Failed to read docker-compose.yml");
+    let compose_content =
+        fs::read_to_string("docker-compose.yml").expect("Failed to read docker-compose.yml");
 
     assert!(
         compose_content.contains("networks:") || compose_content.contains("poolai-network:"),
@@ -118,8 +114,8 @@ fn test_dockerignore_exists() {
 
 #[test]
 fn test_dockerignore_excludes_target() {
-    let dockerignore_content = fs::read_to_string(".dockerignore")
-        .expect("Failed to read .dockerignore");
+    let dockerignore_content =
+        fs::read_to_string(".dockerignore").expect("Failed to read .dockerignore");
 
     assert!(
         dockerignore_content.contains("target/") || dockerignore_content.contains("target"),
@@ -137,8 +133,8 @@ fn test_config_example_exists() {
 
 #[test]
 fn test_config_example_is_valid_toml() {
-    let config_content = fs::read_to_string("config.example.toml")
-        .expect("Failed to read config.example.toml");
+    let config_content =
+        fs::read_to_string("config.example.toml").expect("Failed to read config.example.toml");
 
     // Basic TOML validation - check for common sections
     assert!(
@@ -149,8 +145,8 @@ fn test_config_example_is_valid_toml() {
 
 #[test]
 fn test_config_example_has_required_sections() {
-    let config_content = fs::read_to_string("config.example.toml")
-        .expect("Failed to read config.example.toml");
+    let config_content =
+        fs::read_to_string("config.example.toml").expect("Failed to read config.example.toml");
 
     // Check for common required sections
     let has_system = config_content.contains("[system]");
