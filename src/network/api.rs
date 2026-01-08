@@ -554,7 +554,7 @@ async fn vm_instance_health_handler(
         Err(e) => (
             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("{}", e)
+                "error": format!("Failed to retrieve VM instance health. Context: Cannot get health status for VM instance. Suggestion: Verify instance ID exists, ensure health monitor is registered for this instance, and check health monitor status. Instance ID: '{}', Error: {}", id, e)
             })),
         )
             .into_response(),
@@ -617,13 +617,14 @@ async fn raid_artifact_create_handler(
     }
 
     // Decode base64 data
+    let artifact_name = payload.name.clone();
     let data = match base64_engine.decode(&payload.data) {
         Ok(d) => d,
         Err(e) => {
             return (
                 axum::http::StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({
-                    "error": format!("Invalid base64 data. Context: Cannot decode base64-encoded artifact data. Suggestion: Verify data is properly base64-encoded and not corrupted. Artifact name: '{}', Error: {}", payload.name, e)
+                    "error": format!("Invalid base64 data. Context: Cannot decode base64-encoded artifact data. Suggestion: Verify data is properly base64-encoded and not corrupted. Artifact name: '{}', Error: {}", artifact_name, e)
                 })),
             )
                 .into_response();
