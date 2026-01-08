@@ -4,9 +4,9 @@
 
 use poolai::core::model_interface::{
     ModelConfig, ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
-    ModelRequest, ModelResponse, ModelState, ModelStatus, PerformanceSettings,
+    ModelRequest, ModelResponse, ModelState, ModelStatus,
 };
-use poolai::core::config::ModelConfig as ConfigModelConfig;
+use poolai::core::config::PoolAIConfig;
 use poolai::core::error::AppError;
 use std::collections::HashMap;
 
@@ -129,16 +129,16 @@ impl ModelInterface for MockModel {
 
 #[tokio::test]
 async fn test_model_manager_creation() {
-    let config = ConfigModelConfig::default();
-    let manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let manager = ModelManager::new(config.model);
     // Manager should be created successfully
     assert_eq!(manager.get_all_models().len(), 0);
 }
 
 #[tokio::test]
 async fn test_register_model() {
-    let config = ConfigModelConfig::default();
-    let mut manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let mut manager = ModelManager::new(config.model);
 
     let model = Box::new(MockModel {
         name: "test-model".to_string(),
@@ -156,8 +156,8 @@ async fn test_register_model() {
 
 #[tokio::test]
 async fn test_unregister_model() {
-    let config = ConfigModelConfig::default();
-    let mut manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let mut manager = ModelManager::new(config.model);
 
     let model = Box::new(MockModel {
         name: "test-model".to_string(),
@@ -180,8 +180,8 @@ async fn test_unregister_model() {
 
 #[tokio::test]
 async fn test_process_request() {
-    let config = ConfigModelConfig::default();
-    let mut manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let mut manager = ModelManager::new(config.model);
 
     let model = Box::new(MockModel {
         name: "test-model".to_string(),
@@ -215,8 +215,8 @@ async fn test_process_request() {
 
 #[tokio::test]
 async fn test_process_request_nonexistent_model() {
-    let config = ConfigModelConfig::default();
-    let manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let manager = ModelManager::new(config.model);
 
     let request = ModelRequest {
         input: "Hello, world!".to_string(),
@@ -232,8 +232,8 @@ async fn test_process_request_nonexistent_model() {
 
 #[tokio::test]
 async fn test_get_all_metrics() {
-    let config = ConfigModelConfig::default();
-    let mut manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let mut manager = ModelManager::new(config.model);
 
     for i in 1..=3 {
         let model = Box::new(MockModel {
@@ -259,8 +259,8 @@ async fn test_get_all_metrics() {
 
 #[tokio::test]
 async fn test_get_all_states() {
-    let config = ConfigModelConfig::default();
-    let mut manager = ModelManager::new(config);
+    let config = PoolAIConfig::default();
+    let mut manager = ModelManager::new(config.model);
 
     for i in 1..=3 {
         let model = Box::new(MockModel {
