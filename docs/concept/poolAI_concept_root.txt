@@ -110,6 +110,9 @@
   - ✅ **Auto-scaling Integration** - scale_up/scale_down with real Kubernetes API calls
   - ✅ **Load Balancer Health Tracking** - consecutive failures tracking, health status per backend
   - ✅ **Improved CRD Watching** - enhanced polling logic with resourceVersion tracking, watch API placeholder for future optimization
+  - ✅ **Environment Variables Support** - parse and apply env vars from worker CRD spec in reconciliation
+  - ✅ **Network Ports Support** - parse and apply ports from VM CRD spec in reconciliation
+  - ✅ **Complete Cleanup** - VM deployment deletion and ResourceQuota deletion for deleted CRD resources
   - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
   - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
   - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs

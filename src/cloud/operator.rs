@@ -327,6 +327,8 @@ pub struct PoolAIWorker {
     pub replicas: u32,
     /// Resource requirements
     pub resources: WorkerResources,
+    /// Environment variables
+    pub env: Option<std::collections::HashMap<String, String>>,
 }
 
 /// Worker resource requirements
@@ -371,6 +373,8 @@ pub struct PoolAIVM {
     pub resources: VmResources,
     /// Storage configuration
     pub storage: VmStorage,
+    /// Network ports
+    pub ports: Option<Vec<u16>>,
 }
 
 /// VM resource requirements
@@ -621,12 +625,20 @@ impl PoolAIOperator {
                             }
                         }
                         CrdResourceType::Vm => {
-                            // TODO: Implement VM deployment deletion
-                            info!("VM deletion for {} not yet implemented", event.name);
+                            // Delete VM deployment
+                            if let Err(e) = k8s_manager.delete_worker_deployment(&event.name).await {
+                                warn!("Failed to delete VM deployment {}: {}", event.name, e);
+                            } else {
+                                info!("Deleted VM deployment: {} from namespace {}", event.name, event.namespace);
+                            }
                         }
                         CrdResourceType::Tenant => {
-                            // TODO: Implement tenant cleanup (delete ResourceQuota)
-                            info!("Tenant cleanup for {} not yet implemented", event.name);
+                            // Delete ResourceQuota for tenant
+                            if let Err(e) = k8s_manager.delete_resource_quota(&event.name).await {
+                                warn!("Failed to delete ResourceQuota for tenant {}: {}", event.name, e);
+                            } else {
+                                info!("Deleted ResourceQuota for tenant: {} from namespace {}", event.name, event.namespace);
+                            }
                         }
                     }
                 }
@@ -679,11 +691,22 @@ impl PoolAIOperator {
             .and_then(|g| g.as_u64())
             .map(|g| g as u32);
         
+        // Parse environment variables if present
+        let mut env = std::collections::HashMap::new();
+        if let Some(env_spec) = spec.get("env").and_then(|e| e.as_object()) {
+            for (key, value) in env_spec {
+                if let Some(val_str) = value.as_str() {
+                    env.insert(key.clone(), val_str.to_string());
+                }
+            }
+        }
+        
         Ok(PoolAIWorker {
             name,
             image,
             replicas,
             resources: WorkerResources { cpu, memory, gpu },
+            env: if env.is_empty() { None } else { Some(env) },
         })
     }
     
@@ -739,11 +762,22 @@ impl PoolAIOperator {
             .unwrap_or("standard")
             .to_string();
         
+        // Parse network ports if present
+        let ports = spec.get("ports")
+            .and_then(|p| p.as_array())
+            .map(|ports_array| {
+                ports_array
+                    .iter()
+                    .filter_map(|p| p.as_u64().map(|p| p as u16))
+                    .collect()
+            });
+        
         Ok(PoolAIVM {
             name,
             image,
             resources: VmResources { cpu, memory, gpu },
             storage: VmStorage { size, storage_class },
+            ports,
         })
     }
     
@@ -821,7 +855,7 @@ impl PoolAIOperator {
                 memory: worker.resources.memory.clone(),
                 gpu: worker.resources.gpu,
             },
-            env: std::collections::HashMap::new(), // TODO: Add env vars from worker spec
+            env: worker.env.clone().unwrap_or_default(),
         };
         
         // Check if deployment exists
@@ -900,7 +934,7 @@ impl PoolAIOperator {
                 storage_class: vm.storage.storage_class.clone(),
             },
             network: crate::cloud::kubernetes::NetworkConfig {
-                ports: vec![], // TODO: Add ports from VM spec
+                ports: vm.ports.clone().unwrap_or_default(),
                 service_type: crate::cloud::kubernetes::ServiceType::ClusterIP, // Default service type
             },
         };

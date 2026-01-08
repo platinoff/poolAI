@@ -1634,6 +1634,59 @@ impl KubernetesManager {
         info!("Watch API method called (placeholder - use HTTP polling for now)");
         Ok(())
     }
+
+    /// Delete a ResourceQuota
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - ResourceQuota name to delete
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `name` is empty.
+    /// Returns `AppError::NetworkError` if:
+    /// - ResourceQuota does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// manager.delete_resource_quota("tenant-abc").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn delete_resource_quota(&self, name: &str) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "ResourceQuota name cannot be empty. Context: Attempted to delete ResourceQuota with empty name. \
+                Suggestion: Provide a valid ResourceQuota name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Delete ResourceQuota via Kubernetes API
+            let path = format!("/api/v1/namespaces/{}/resourcequotas/{}", self.namespace, name);
+            let _response = self.k8s_api_request("DELETE", &path, None).await?;
+            
+            info!("Deleted ResourceQuota {} from namespace {}", name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Deleting ResourceQuota {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
 }
 
 /// Worker deployment configuration for Kubernetes

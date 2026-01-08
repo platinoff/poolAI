@@ -96,6 +96,9 @@
 - ✅ Auto-scaling integration with Kubernetes (scale_up/scale_down with real API calls)
 - ✅ Load balancer health tracking (consecutive failures, health status per backend)
 - ✅ Improved watch_crd_resources documentation (watch API placeholder added, improved polling logic)
+- ✅ Environment variables support in worker CRD (parse and apply env vars)
+- ✅ Network ports support in VM CRD (parse and apply ports)
+- ✅ Complete cleanup implementation (VM deployment deletion, ResourceQuota deletion)
 
 **Прогрес Cloud Module**: ~85% 🔄
 - Infrastructure: 100% ✅
