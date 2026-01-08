@@ -236,7 +236,12 @@ impl ProcessManager {
         let mut processes = self.processes.write().await;
         let info = processes
             .get_mut(&id)
-            .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
+            .ok_or_else(|| AppError::ResourceError(format!(
+                "Process not found. Context: Attempted to stop a process that does not exist or has been terminated. \
+                Suggestion: Verify process ID is correct and process is still running. \
+                Process ID: '{}'",
+                id
+            )))?;
 
         {
             let mut status = info.status.write().await;
@@ -249,8 +254,10 @@ impl ProcessManager {
                 let mut status = info.status.write().await;
                 *status = ProcessStatus::Failed(format!("Kill failed: {}", e));
                 return Err(AppError::ResourceError(format!(
-                    "Failed to kill process: {}",
-                    e
+                    "Failed to kill process. Context: Cannot terminate process using kill signal. \
+                    Suggestion: Check process permissions and ensure process is still running. \
+                    Process ID: '{}', Error: {}",
+                    id, e
                 )));
             }
         }
@@ -269,7 +276,12 @@ impl ProcessManager {
         let processes = self.processes.read().await;
         let info = processes
             .get(&id)
-            .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
+            .ok_or_else(|| AppError::ResourceError(format!(
+                "Process not found. Context: Attempted to access a process that does not exist or has been terminated. \
+                Suggestion: Verify process ID is correct and process is still running. \
+                Process ID: '{}'",
+                id
+            )))?;
 
         let status = info.status.read().await.clone();
         Ok(status)
@@ -280,7 +292,12 @@ impl ProcessManager {
         let processes = self.processes.read().await;
         let info = processes
             .get(&id)
-            .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
+            .ok_or_else(|| AppError::ResourceError(format!(
+                "Process not found. Context: Attempted to access a process that does not exist or has been terminated. \
+                Suggestion: Verify process ID is correct and process is still running. \
+                Process ID: '{}'",
+                id
+            )))?;
 
         let logs = info.logs.read().await.clone();
         Ok(logs)
@@ -296,7 +313,12 @@ impl ProcessManager {
         let processes = self.processes.read().await;
         let info = processes
             .get(&id)
-            .ok_or_else(|| AppError::ResourceError(format!("Process {} not found", id)))?;
+            .ok_or_else(|| AppError::ResourceError(format!(
+                "Process not found. Context: Attempted to access a process that does not exist or has been terminated. \
+                Suggestion: Verify process ID is correct and process is still running. \
+                Process ID: '{}'",
+                id
+            )))?;
 
         Ok(info.pid)
     }
