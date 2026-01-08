@@ -288,10 +288,10 @@ impl Monitoring {
             Ok(())
         } else {
             Err(AppError::MonitoringError(format!(
-                "Alert '{}' not found. Context: Cannot resolve alert that doesn't exist. \
-                Suggestion: Check alert ID spelling or verify alert exists using get_active_alerts(). \
-                Current alert ID: '{}'",
-                alert_id, alert_id
+                "Alert '{}' not found. Context: Cannot resolve alert that doesn't exist or has already been resolved. \
+                Suggestion: Check alert ID spelling, verify alert exists using get_active_alerts(), or check if alert was already resolved. \
+                Current alert ID: '{}', Total alerts: {}",
+                alert_id, alert_id, alerts.len()
             )))
         }
     }
