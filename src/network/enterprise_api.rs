@@ -31,24 +31,24 @@ pub fn create_enterprise_api_routes() -> Router {
             "/tenants",
             post(tenant_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
-        .route("/tenants/:id", get(tenant_get_handler))
+        .route("/tenants/{id}", get(tenant_get_handler))
         .route(
-            "/tenants/:id",
+            "/tenants/{id}",
             post(tenant_update_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
-            "/tenants/:id",
+            "/tenants/{id}",
             axum::routing::delete(tenant_delete_handler)
                 .layer(middleware::from_fn(auth_middleware)),
         )
-        .route("/tenants/:id/usage", get(tenant_usage_handler))
-        .route("/tenants/:id/quota", post(tenant_quota_check_handler))
+        .route("/tenants/{id}/usage", get(tenant_usage_handler))
+        .route("/tenants/{id}/quota", post(tenant_quota_check_handler))
         // Audit logs
         .route("/audit/events", get(audit_events_query_handler))
         // Monitoring
         .route("/monitoring/alerts", get(monitoring_alerts_handler))
         .route(
-            "/monitoring/alerts/:id/acknowledge",
+            "/monitoring/alerts/{id}/acknowledge",
             post(monitoring_alert_acknowledge_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/monitoring/dashboards", get(monitoring_dashboards_handler))
