@@ -69,6 +69,8 @@
 - ✅ Enhanced operator module documentation with YAML examples
 - ✅ Integration tests for operator module (8 tests passing)
 - ✅ Helm Charts created (Chart.yaml, values.yaml, templates, README.md)
+- ✅ VM deployment implementation (create_vm_deployment with real API calls)
+- ✅ Service endpoints implementation (get_service_endpoints with real API calls)
 - ⚠️ AWS SDK dependencies commented out (requires Rust 1.88+, current: 1.70+)
 - 🔄 Kubernetes Operator implementation (watchers, reconciliation loops - planned)
 
