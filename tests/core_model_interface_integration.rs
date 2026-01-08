@@ -3,7 +3,7 @@
 //! Tests model interface traits, model manager, and model lifecycle operations.
 
 use poolai::core::model_interface::{
-    ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
+    ModelConfig, ModelInfo, ModelInterface, ModelManager, ModelMetrics, ModelParameters,
     ModelRequest, ModelResponse, ModelState, ModelStatus,
 };
 use poolai::core::config::ModelConfig as ConfigModelConfig;
