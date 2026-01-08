@@ -55,6 +55,22 @@ pub struct EnterpriseManager {
 
 impl EnterpriseManager {
     /// Creates a new enterprise manager instance
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::enterprise::EnterpriseManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = EnterpriseManager::new();
+    /// manager.initialize().await?;
+    ///
+    /// // Use enterprise features
+    /// let audit_logger = manager.audit_logger();
+    /// let tenant_manager = manager.tenant_manager();
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new() -> Self {
         Self {
             audit_logger: Arc::new(audit::AuditLogger::new()),
@@ -66,9 +82,30 @@ impl EnterpriseManager {
 
     /// Initializes all enterprise features
     ///
+    /// Initializes audit logging, multi-tenancy, security, and monitoring features.
+    /// All components must initialize successfully for this method to return `Ok`.
+    ///
     /// # Errors
     ///
-    /// Returns `AppError` if initialization fails for any component.
+    /// Returns `AppError::InitializationError` if:
+    /// - Audit logger initialization fails
+    /// - Tenant manager initialization fails
+    /// - Security manager initialization fails
+    /// - Monitoring manager initialization fails
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::enterprise::EnterpriseManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = EnterpriseManager::new();
+    /// manager.initialize().await?;
+    ///
+    /// // All enterprise features are now ready to use
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn initialize(&self) -> Result<(), AppError> {
         info!("Initializing enterprise features...");
 
@@ -89,6 +126,29 @@ impl EnterpriseManager {
     }
 
     /// Shuts down all enterprise features gracefully
+    ///
+    /// Performs clean shutdown of all enterprise components, ensuring
+    /// that all pending operations are completed and resources are released.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ShutdownError` if shutdown fails for any component.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::enterprise::EnterpriseManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = EnterpriseManager::new();
+    /// manager.initialize().await?;
+    ///
+    /// // Use enterprise features...
+    ///
+    /// manager.shutdown().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn shutdown(&self) -> Result<(), AppError> {
         info!("Shutting down enterprise features...");
 
@@ -131,7 +191,25 @@ impl Default for EnterpriseManager {
 /// Initializes the enterprise module
 ///
 /// This is a convenience function that creates and initializes
-/// the enterprise manager.
+/// the enterprise manager. Returns an `Arc<EnterpriseManager>` for shared ownership.
+///
+/// # Errors
+///
+/// Returns `AppError::InitializationError` if initialization fails.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::enterprise;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = enterprise::initialize().await?;
+///
+/// // Use enterprise features through the manager
+/// let audit_logger = manager.audit_logger();
+/// # Ok(())
+/// # }
+/// ```
 pub async fn initialize() -> Result<Arc<EnterpriseManager>, AppError> {
     let manager = Arc::new(EnterpriseManager::new());
     manager.initialize().await?;
