@@ -69,6 +69,23 @@ pub struct PodStatus {
     pub restart_count: u32,
 }
 
+/// Kubernetes Deployment status information
+#[derive(Debug, Clone)]
+pub struct DeploymentStatus {
+    /// Deployment name
+    pub name: String,
+    /// Number of desired replicas
+    pub replicas: u32,
+    /// Number of ready replicas
+    pub ready_replicas: u32,
+    /// Number of available replicas
+    pub available_replicas: u32,
+    /// Number of unavailable replicas
+    pub unavailable_replicas: u32,
+    /// Whether the deployment is ready (all replicas available)
+    pub ready: bool,
+}
+
 /// Kubernetes manager for PoolAI resources
 pub struct KubernetesManager {
     namespace: String,
@@ -1090,6 +1107,108 @@ impl KubernetesManager {
             phase: "Running".to_string(),
             ready: true,
             restart_count: 0,
+        })
+    }
+
+    /// Get status of a Kubernetes Deployment
+    ///
+    /// # Arguments
+    ///
+    /// * `deployment_name` - Name of the deployment to query
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `deployment_name` is empty.
+    /// Returns other `AppError` variants if deployment is not found or query fails.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let status = manager.get_deployment_status("my-deployment").await?;
+    /// println!("Deployment ready: {} ({}/{} replicas)", status.ready, status.ready_replicas, status.replicas);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn get_deployment_status(&self, deployment_name: &str) -> Result<DeploymentStatus, AppError> {
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Deployment name cannot be empty. Context: Attempted to get deployment status with empty name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        info!("Getting status for deployment {} in namespace {}", deployment_name, self.namespace);
+        
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Query deployment status via Kubernetes API
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments/{}", self.namespace, deployment_name);
+            let deployment_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract deployment status information
+            let name = deployment_json
+                .get("metadata")
+                .and_then(|m| m.get("name"))
+                .and_then(|n| n.as_str())
+                .unwrap_or(deployment_name)
+                .to_string();
+            
+            // Get desired replicas from spec
+            let replicas = deployment_json
+                .get("spec")
+                .and_then(|s| s.get("replicas"))
+                .and_then(|r| r.as_u64())
+                .unwrap_or(0) as u32;
+            
+            // Get status information
+            let status = deployment_json.get("status").ok_or_else(|| AppError::NetworkError(
+                "Deployment status not found in response".to_string()
+            ))?;
+            
+            let ready_replicas = status
+                .get("readyReplicas")
+                .and_then(|r| r.as_u64())
+                .unwrap_or(0) as u32;
+            
+            let available_replicas = status
+                .get("availableReplicas")
+                .and_then(|r| r.as_u64())
+                .unwrap_or(0) as u32;
+            
+            let unavailable_replicas = status
+                .get("unavailableReplicas")
+                .and_then(|r| r.as_u64())
+                .unwrap_or(0) as u32;
+            
+            // Deployment is ready if all replicas are available
+            let ready = available_replicas == replicas && replicas > 0;
+            
+            return Ok(DeploymentStatus {
+                name,
+                replicas,
+                ready_replicas,
+                available_replicas,
+                unavailable_replicas,
+                ready,
+            });
+        }
+        
+        // Placeholder implementation (when cloud-sdk feature is not enabled)
+        Ok(DeploymentStatus {
+            name: deployment_name.to_string(),
+            replicas: 1,
+            ready_replicas: 1,
+            available_replicas: 1,
+            unavailable_replicas: 0,
+            ready: true,
         })
     }
 
