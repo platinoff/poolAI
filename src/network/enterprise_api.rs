@@ -85,9 +85,17 @@ pub fn create_enterprise_api_routes() -> Router {
 
 #[cfg(feature = "enterprise")]
 async fn tenants_list_handler() -> impl IntoResponse {
-    // TODO: Get global tenant manager
-    // For now, return empty list
-    Json::<Vec<enterprise::multi_tenancy::Tenant>>(Vec::new())
+    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    match manager.list_tenants().await {
+        Ok(tenants) => Json(tenants).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list tenants. Context: Cannot retrieve tenant list. Suggestion: Check system logs and tenant manager initialization status. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    )
 }
 
 #[cfg(feature = "enterprise")]
@@ -99,26 +107,66 @@ struct TenantCreateRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_create_handler(Json(_req): Json<TenantCreateRequest>) -> impl IntoResponse {
-    // TODO: Get global tenant manager and create tenant
-    // For now, return placeholder
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Tenant creation not yet implemented - requires global tenant manager"
-        })),
+async fn tenant_create_handler(Json(req): Json<TenantCreateRequest>) -> impl IntoResponse {
+    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Tenant manager not initialized. Context: Cannot create tenant - tenant manager initialization failed. Suggestion: Check system startup sequence and tenant manager initialization status. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+    
+    match manager.create_tenant(req.name, req.config).await {
+        Ok(tenant) => Json(tenant).into_response(),
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to create tenant. Context: Cannot create new tenant with specified configuration. Suggestion: Verify tenant name and configuration parameters. Error: {}", e)
+            })),
+        )
+            .into_response(),
     )
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_get_handler(Path(_id): Path<String>) -> impl IntoResponse {
-    // TODO: Get global tenant manager and retrieve tenant
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Tenant retrieval not yet implemented"
-        })),
-    )
+async fn tenant_get_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    
+    let tenant_id = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager.get_tenant(tenant_id).await {
+        Ok(Some(tenant)) => Json(tenant).into_response(),
+        Ok(None) => (
+            StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": format!("Tenant not found. Context: Cannot find tenant with specified ID. Suggestion: Verify tenant ID and ensure tenant exists. Tenant ID: '{}'", id)
+            })),
+        )
+            .into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to retrieve tenant. Context: Cannot retrieve tenant information. Suggestion: Check system logs and tenant manager status. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
 
 #[cfg(feature = "enterprise")]
@@ -135,36 +183,119 @@ async fn tenant_update_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_delete_handler(Path(_id): Path<String>) -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Tenant deletion not yet implemented"
-        })),
-    )
+async fn tenant_delete_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    
+    let tenant_id = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager.delete_tenant(tenant_id).await {
+        Ok(()) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "message": "Tenant deleted successfully"
+            })),
+        )
+            .into_response(),
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to delete tenant. Context: Cannot delete tenant. Suggestion: Ensure tenant has no active resources. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_usage_handler(Path(_id): Path<String>) -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Tenant usage retrieval not yet implemented"
-        })),
-    )
+async fn tenant_usage_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    
+    let tenant_id = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager.get_usage(tenant_id).await {
+        Ok(usage) => Json(usage).into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": format!("Failed to retrieve tenant usage. Context: Cannot retrieve usage information for tenant. Suggestion: Verify tenant ID and ensure tenant exists. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+#[derive(Deserialize)]
+struct QuotaCheckRequest {
+    workers: usize,
+    memory_mb: u64,
+    cpu_cores: usize,
+    storage_mb: Option<u64>,
+    vm_instances: Option<usize>,
 }
 
 #[cfg(feature = "enterprise")]
 async fn tenant_quota_check_handler(
-    Path(_id): Path<String>,
-    Json(_req): Json<serde_json::Value>,
+    Path(id): Path<String>,
+    Json(req): Json<QuotaCheckRequest>,
 ) -> impl IntoResponse {
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Tenant quota check not yet implemented"
-        })),
-    )
+    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    
+    let tenant_id = match uuid::Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager
+        .check_quota(
+            tenant_id,
+            req.workers,
+            req.memory_mb,
+            req.cpu_cores,
+            req.storage_mb,
+            req.vm_instances,
+        )
+        .await
+    {
+        Ok(result) => Json(result).into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": format!("Failed to check quota. Context: Cannot check quota for tenant. Suggestion: Verify tenant ID and ensure tenant exists. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
 }
 
 #[cfg(feature = "enterprise")]

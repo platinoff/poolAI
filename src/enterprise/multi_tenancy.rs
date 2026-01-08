@@ -34,7 +34,7 @@
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
@@ -726,4 +726,36 @@ mod tests {
         // Now delete should succeed
         assert!(manager.delete_tenant(tenant.id).await.is_ok());
     }
+}
+
+/// Global tenant manager instance
+static TENANT_MANAGER: OnceLock<Arc<TenantManager>> = OnceLock::new();
+
+/// Get global tenant manager instance.
+///
+/// This function returns a singleton instance of `TenantManager` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::enterprise::multi_tenancy::get_global_tenant_manager;
+/// use uuid::Uuid;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = get_global_tenant_manager();
+///
+/// // List all tenants
+/// let tenants = manager.list_tenants().await;
+/// for tenant in tenants {
+///     println!("Tenant: {} ({:?})", tenant.name, tenant.id);
+/// }
+/// # Ok(())
+/// # }
+/// ```
+pub fn get_global_tenant_manager() -> Arc<TenantManager> {
+    TENANT_MANAGER
+        .get_or_init(|| Arc::new(TenantManager::new()))
+        .clone()
 }
