@@ -955,3 +955,94 @@ pub async fn initialize() -> Result<(), AppError> {
 pub async fn shutdown() -> Result<(), AppError> {
     get_global_manager().shutdown().await
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_raid_mode_variants() {
+        let modes = vec![
+            RaidMode::Local,
+            RaidMode::BurstRaid,
+            RaidMode::SmallWorld,
+        ];
+        for mode in modes {
+            let cloned = mode.clone();
+            assert!(matches!(
+                cloned,
+                RaidMode::Local | RaidMode::BurstRaid | RaidMode::SmallWorld
+            ));
+        }
+    }
+
+    #[test]
+    fn test_raid_config_default_for_platform() {
+        let config = RaidConfig::default_for_platform();
+        assert!(matches!(config.mode, RaidMode::Local));
+        assert!(config.quota_bytes.is_some());
+        assert!(config.retention_days.is_some());
+        assert!(config.gc_on_startup);
+    }
+
+    #[test]
+    fn test_raid_config_clone() {
+        let config = RaidConfig {
+            mode: RaidMode::Local,
+            base_path: PathBuf::from("./test"),
+            quota_bytes: Some(1000),
+            retention_days: Some(7),
+            gc_on_startup: false,
+        };
+        let cloned = config.clone();
+        assert!(matches!(config.mode, RaidMode::Local));
+        assert!(matches!(cloned.mode, RaidMode::Local));
+        assert_eq!(config.quota_bytes, cloned.quota_bytes);
+        assert_eq!(config.retention_days, cloned.retention_days);
+    }
+
+    #[test]
+    fn test_artifact_ref_fields() {
+        let artifact = ArtifactRef {
+            id: Uuid::new_v4(),
+            name: "test-artifact".to_string(),
+            stored_at: Utc::now(),
+            path: PathBuf::from("./test/path"),
+        };
+        assert_eq!(artifact.name, "test-artifact");
+        assert!(!artifact.path.as_os_str().is_empty());
+    }
+
+    #[test]
+    fn test_raid_node_fields() {
+        let node = RaidNode {
+            id: Uuid::new_v4(),
+            address: "127.0.0.1:8080".to_string(),
+            last_seen: Utc::now(),
+        };
+        assert_eq!(node.address, "127.0.0.1:8080");
+        assert!(!node.id.to_string().is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_raid_manager_new() {
+        let config = RaidConfig::default_for_platform();
+        let manager = RaidManager::new(config);
+        // Manager should be created successfully
+        assert!(manager.list_artifacts().await.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_raid_manager_list_artifacts_empty() {
+        let config = RaidConfig {
+            mode: RaidMode::Local,
+            base_path: PathBuf::from("./test_raid_empty"),
+            quota_bytes: Some(1000),
+            retention_days: Some(7),
+            gc_on_startup: false,
+        };
+        let manager = RaidManager::new(config);
+        let artifacts = manager.list_artifacts().await;
+        assert_eq!(artifacts.len(), 0);
+    }
+}
