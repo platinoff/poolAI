@@ -102,6 +102,8 @@
   - ✅ **Service Endpoints Implementation** - Real Kubernetes API calls for querying service endpoints
   - ✅ **Operator Reconciliation Structure** - Basic structure for watchers and reconciliation loops
   - ✅ **Providers Module Documentation** - Enhanced documentation with multi-cloud usage examples
+  - ✅ **Scaling Policies** - Added ScalingPolicy struct with metric-based scaling rules
+  - ✅ **Load Balancing Configuration** - Added LoadBalancingStrategy enum and HealthCheckConfig
   - ✅ **Enterprise Module Documentation** - Enhanced Rustdoc documentation with usage examples for EnterpriseManager
   - ✅ **Unit Tests** - Comprehensive unit tests for versioning, config, pool, raid, vm modules
   - ✅ **Integration Tests** - 39 new integration tests (7 worker + 7 process + 8 rewards + 9 auth + 8 websocket)
