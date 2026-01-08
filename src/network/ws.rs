@@ -166,10 +166,10 @@ pub struct WebSocketManager {
 /// WebSocket connection information
 ///
 /// Tracks user information, permissions, and connection health for a WebSocket connection.
-#[derive(Debug, Clone)]
 /// WebSocket connection information
 ///
 /// Tracks user information, permissions, and connection health for a WebSocket connection.
+#[derive(Debug, Clone)]
 pub struct WebSocketConnection {
     pub user_id: String,
     pub role: String,
