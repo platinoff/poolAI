@@ -112,12 +112,13 @@
 - ✅ Deployment pods listing (list_deployment_pods method using label selectors)
 - ✅ Real deployment status in CRD updates (use get_deployment_status for accurate Ready condition)
 - ✅ Detailed deployment info in CRD status (replicas, availableReplicas, readyReplicas for better monitoring)
+- ✅ Deployment events monitoring (get_deployment_events method with DeploymentEvent struct for debugging)
 
-**Прогрес Cloud Module**: ~98% 🔄
+**Прогрес Cloud Module**: ~99% 🔄
 - Infrastructure: 100% ✅
 - Testing: 100% ✅ (67 tests)
 - Documentation: 100% ✅
-- Implementation: ~96% 🔄
+- Implementation: ~97% 🔄
 
 ---
 

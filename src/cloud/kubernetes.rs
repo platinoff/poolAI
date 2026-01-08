@@ -86,6 +86,19 @@ pub struct DeploymentStatus {
     pub ready: bool,
 }
 
+/// Kubernetes Deployment event information
+#[derive(Debug, Clone)]
+pub struct DeploymentEvent {
+    /// Event reason (e.g., "ScalingReplicaSet", "SuccessfulCreate")
+    pub reason: String,
+    /// Event message
+    pub message: String,
+    /// Event type (Normal, Warning)
+    pub event_type: String,
+    /// First occurrence timestamp
+    pub first_timestamp: Option<String>,
+}
+
 /// Kubernetes manager for PoolAI resources
 pub struct KubernetesManager {
     namespace: String,
@@ -1210,6 +1223,114 @@ impl KubernetesManager {
             unavailable_replicas: 0,
             ready: true,
         })
+    }
+
+    /// Get events for a Kubernetes Deployment
+    ///
+    /// Returns recent events related to the deployment, which can help with debugging
+    /// and understanding deployment state changes.
+    ///
+    /// # Arguments
+    ///
+    /// * `deployment_name` - Name of the deployment to get events for
+    /// * `limit` - Maximum number of events to return (default: 10)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if `deployment_name` is empty.
+    /// Returns other `AppError` variants if query fails.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let events = manager.get_deployment_events("my-deployment", Some(5)).await?;
+    /// for event in events {
+    ///     println!("Event: {} - {}", event.reason, event.message);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn get_deployment_events(
+        &self,
+        deployment_name: &str,
+        limit: Option<usize>,
+    ) -> Result<Vec<DeploymentEvent>, AppError> {
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Deployment name cannot be empty. Context: Attempted to get events for deployment with empty name. \
+                Suggestion: Provide a valid deployment name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        let limit = limit.unwrap_or(10);
+        info!("Getting events for deployment {} in namespace {} (limit: {})", deployment_name, self.namespace, limit);
+        
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Query events via Kubernetes API
+            // Events are associated with involved objects (deployment, replicaset, pods)
+            let path = format!("/api/v1/namespaces/{}/events?fieldSelector=involvedObject.name={}", self.namespace, deployment_name);
+            let events_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract events
+            let events_array = events_json
+                .get("items")
+                .and_then(|i| i.as_array())
+                .ok_or_else(|| AppError::NetworkError(
+                    "Invalid events response format".to_string()
+                ))?;
+            
+            let mut events: Vec<DeploymentEvent> = events_array
+                .iter()
+                .take(limit)
+                .filter_map(|event_json| {
+                    let reason = event_json.get("reason")
+                        .and_then(|r| r.as_str())
+                        .unwrap_or("Unknown")
+                        .to_string();
+                    
+                    let message = event_json.get("message")
+                        .and_then(|m| m.as_str())
+                        .unwrap_or("")
+                        .to_string();
+                    
+                    let event_type = event_json.get("type")
+                        .and_then(|t| t.as_str())
+                        .unwrap_or("Normal")
+                        .to_string();
+                    
+                    let first_timestamp = event_json.get("firstTimestamp")
+                        .and_then(|t| t.as_str())
+                        .map(|s| s.to_string());
+                    
+                    Some(DeploymentEvent {
+                        reason,
+                        message,
+                        event_type,
+                        first_timestamp,
+                    })
+                })
+                .collect();
+            
+            // Sort by timestamp (most recent first)
+            events.sort_by(|a, b| {
+                b.first_timestamp.cmp(&a.first_timestamp)
+            });
+            
+            info!("Found {} events for deployment {}", events.len(), deployment_name);
+            return Ok(events);
+        }
+        
+        // Placeholder implementation (when cloud-sdk feature is not enabled)
+        Ok(vec![])
     }
 
     /// Scale a Kubernetes Deployment (placeholder)

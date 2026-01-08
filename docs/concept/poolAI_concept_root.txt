@@ -125,6 +125,7 @@
   - ✅ **Deployment Pods Listing** - list_deployment_pods method for getting pods managed by a specific deployment
   - ✅ **Real Deployment Status in CRD** - Use actual deployment status for accurate CRD Ready condition updates
   - ✅ **Detailed Deployment Info in CRD** - Include replicas, availableReplicas, readyReplicas in CRD status for comprehensive monitoring
+  - ✅ **Deployment Events Monitoring** - get_deployment_events method for retrieving deployment events for debugging and diagnostics
   - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
   - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
   - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs
