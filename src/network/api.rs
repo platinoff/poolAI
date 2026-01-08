@@ -1,12 +1,13 @@
 // network/api.rs
 use crate::libs::{get_global_manager, LibraryType};
-use crate::network::auth::{auth_middleware, authenticate_user, AuthRequest, Claims};
+use crate::network::auth::{auth_middleware, authenticate_user, AuthRequest, Claims, get_global_user_manager, UserInfo, UserRole};
 use crate::network::ws::websocket_handler;
 use crate::platform;
 use crate::pool;
 use crate::raid;
 use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
 use crate::vm;
+use uuid::Uuid;
 use axum::extract::Extension;
 use axum::{
     http::header::ACCEPT,
@@ -192,6 +193,21 @@ pub fn create_api_routes() -> Router {
         .route(
             "/raid/distributed/cluster/leave",
             post(leave_cluster_handler),
+        )
+        // User management endpoints
+        .route("/users", get(users_list_handler))
+        .route(
+            "/users",
+            post(user_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route("/users/{id}", get(user_get_handler))
+        .route(
+            "/users/{id}",
+            put(user_update_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/users/{id}",
+            delete(user_delete_handler).layer(middleware::from_fn(auth_middleware)),
         )
 }
 
@@ -1556,5 +1572,198 @@ async fn library_update_handler(
                 })),
         )
             .into_response()
+    }
+}
+
+// User management handlers
+
+#[derive(serde::Deserialize)]
+struct UserCreateRequest {
+    username: String,
+    password: String,
+    role: UserRole,
+}
+
+async fn users_list_handler() -> impl IntoResponse {
+    let manager = get_global_user_manager();
+    
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            axum::http::StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("User manager not initialized. Context: User manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+    
+    match manager.list_users().await {
+        Ok(users) => Json(users).into_response(),
+        Err(e) => (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list users. Context: Cannot retrieve user list. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn user_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(req): Json<UserCreateRequest>,
+) -> impl IntoResponse {
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+    
+    let manager = get_global_user_manager();
+    
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            axum::http::StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("User manager not initialized. Context: Cannot create user - user manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+    
+    match manager.create_user(req.username, req.password, req.role).await {
+        Ok(user) => Json(user).into_response(),
+        Err(e) => (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to create user. Context: Cannot create new user with specified parameters. Suggestion: Verify username uniqueness and parameters. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn user_get_handler(
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    let manager = get_global_user_manager();
+    
+    let user_id = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                axum::http::StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager.get_user(user_id).await {
+        Ok(Some(user)) => Json(user).into_response(),
+        Ok(None) => (
+            axum::http::StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": format!("User not found. Context: Cannot find user with specified ID. Suggestion: Verify user ID and ensure user exists. User ID: '{}'", id)
+            })),
+        )
+            .into_response(),
+        Err(e) => (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to retrieve user. Context: Cannot retrieve user information. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct UserUpdateRequest {
+    username: Option<String>,
+    password: Option<String>,
+    role: Option<UserRole>,
+    active: Option<bool>,
+}
+
+async fn user_update_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+    Json(req): Json<UserUpdateRequest>,
+) -> impl IntoResponse {
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+    
+    let manager = get_global_user_manager();
+    
+    let user_id = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                axum::http::StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager.update_user(user_id, req.username, req.password, req.role, req.active).await {
+        Ok(user) => Json(user).into_response(),
+        Err(e) => (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to update user. Context: Cannot update user with specified parameters. Suggestion: Verify user ID and update parameters. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn user_delete_handler(
+    Extension(claims): Extension<Claims>,
+    axum::extract::Path(id): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+    
+    let manager = get_global_user_manager();
+    
+    let user_id = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                axum::http::StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+    
+    match manager.delete_user(user_id).await {
+        Ok(()) => (
+            axum::http::StatusCode::OK,
+            Json(serde_json::json!({
+                "message": "User deleted successfully"
+            })),
+        )
+            .into_response(),
+        Err(e) => (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to delete user. Context: Cannot delete user. Suggestion: Verify user ID and ensure user exists. Error: {}", e)
+            })),
+        )
+            .into_response(),
     }
 }
