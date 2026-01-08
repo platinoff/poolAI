@@ -58,6 +58,25 @@ pub enum CursorError {
     Other(String),
 }
 
+/// Application error type for PoolAI
+///
+/// This enum represents all possible errors that can occur in the PoolAI system.
+/// It provides structured error handling with context and suggestions.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::core::error::AppError;
+///
+/// // Create a configuration error
+/// let err = AppError::ConfigError("Invalid configuration: max_workers must be > 0".to_string());
+///
+/// // Check error code
+/// assert_eq!(err.error_code(), "CONFIG_ERROR");
+///
+/// // Check if recoverable
+/// assert!(!err.is_recoverable());
+/// ```
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("Model error: {0}")]
@@ -94,6 +113,19 @@ pub enum AppError {
 
 impl AppError {
     /// Log the error with appropriate severity level
+    ///
+    /// Automatically selects the appropriate logging level based on error type:
+    /// - `error!` for critical errors (ConfigError, ModelError, etc.)
+    /// - `warn!` for recoverable errors (ResourceError, TimeoutError)
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::core::error::AppError;
+    ///
+    /// let err = AppError::ConfigError("Invalid config".to_string());
+    /// err.log(); // Logs at error level
+    /// ```
     pub fn log(&self) {
         match self {
             AppError::ModelError(msg) => error!("Model error: {}", msg),
@@ -115,6 +147,29 @@ impl AppError {
     }
 
     /// Attempt to recover from the error
+    ///
+    /// Attempts automatic recovery based on error type.
+    /// Returns `Ok(())` if recovery is attempted, but does not guarantee success.
+    ///
+    /// # Recovery strategies by error type
+    ///
+    /// - `ModelError`: Attempts to reload the model
+    /// - `ConfigError`: Attempts to load default configuration
+    /// - `PoolError`: Attempts to restart the pool
+    /// - `ResourceError`: Attempts to free resources
+    /// - `TimeoutError`: Returns Ok (timeout is transient)
+    /// - Other errors: May not have recovery strategies
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::core::error::AppError;
+    ///
+    /// let err = AppError::TimeoutError("Request timeout".to_string());
+    /// if err.is_recoverable() {
+    ///     let _ = err.recover(); // Attempt recovery
+    /// }
+    /// ```
     pub fn recover(&self) -> Result<(), AppError> {
         warn!("Attempting recovery from error: {:?}", self);
 
@@ -167,6 +222,22 @@ impl AppError {
     }
 
     /// Check if the error is recoverable
+    /// Check if the error is recoverable
+    ///
+    /// Returns `true` if the error type supports automatic recovery.
+    /// Recoverable errors include timeouts, resource errors, and transient failures.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::core::error::AppError;
+    ///
+    /// let timeout_err = AppError::TimeoutError("Request timeout".to_string());
+    /// assert!(timeout_err.is_recoverable());
+    ///
+    /// let config_err = AppError::ConfigError("Invalid config".to_string());
+    /// assert!(!config_err.is_recoverable());
+    /// ```
     pub fn is_recoverable(&self) -> bool {
         matches!(
             self,
@@ -182,6 +253,35 @@ impl AppError {
     }
 
     /// Get error code string
+    /// Get a machine-readable error code
+    ///
+    /// Returns a static string identifier for the error type.
+    /// Useful for error handling, logging, and API responses.
+    ///
+    /// # Error codes
+    ///
+    /// - `MODEL_ERROR`: Model-related errors
+    /// - `CONFIG_ERROR`: Configuration errors
+    /// - `POOL_ERROR`: Pool management errors
+    /// - `RESOURCE_ERROR`: Resource-related errors
+    /// - `TIMEOUT_ERROR`: Timeout errors
+    /// - `VALIDATION_ERROR`: Validation errors
+    /// - And others...
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::core::error::AppError;
+    ///
+    /// let err = AppError::ConfigError("Invalid config".to_string());
+    /// assert_eq!(err.error_code(), "CONFIG_ERROR");
+    ///
+    /// // Use in API responses
+    /// let error_response = serde_json::json!({
+    ///     "error": err.error_code(),
+    ///     "message": err.to_string()
+    /// });
+    /// ```
     pub fn error_code(&self) -> &'static str {
         match self {
             AppError::ModelError(_) => "MODEL_ERROR",
