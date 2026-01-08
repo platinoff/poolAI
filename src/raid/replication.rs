@@ -547,7 +547,12 @@ impl ReplicationEngine {
             let node_id = *node_id;
             let nodes = self.available_nodes.read().await;
             let address = nodes.get(&node_id).ok_or_else(|| {
-                AppError::ConfigError(format!("Node {} not found in available nodes", node_id))
+                AppError::ConfigError(format!(
+                    "Node {} not found in available nodes. Context: Cannot replicate to unavailable node. \
+                    Suggestion: Check node health status and ensure node is registered in cluster. \
+                    Node ID: '{}'",
+                    node_id, node_id
+                ))
             })?;
 
             let artifact_id_clone = artifact_id.clone();
