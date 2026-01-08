@@ -24,7 +24,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
 # Web framework
-axum = { version = "0.7", features = ["ws"] }  # WebSocket support
+axum = { version = "0.8", features = ["ws"] }  # WebSocket support
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
