@@ -338,8 +338,15 @@ impl AuditLogger {
 
         info!("Rotated audit log file to: {:?}", file_path);
 
-        // TODO: Implement log file cleanup (keep only max_files)
-        // TODO: Implement compression if enable_compression is true
+        // Cleanup old log files (keep only max_files)
+        self.cleanup_old_logs().await?;
+
+        // Compress old log file if enabled
+        if self.config.enable_compression {
+            // Note: Compression would require additional dependencies (flate2, zstd, etc.)
+            // For now, we'll leave this as a future enhancement
+            // TODO: Add compression support when flate2 or zstd is added as optional dependency
+        }
 
         Ok(())
     }
@@ -360,20 +367,250 @@ impl AuditLogger {
         Ok(())
     }
 
-    /// Queries audit events (placeholder for future implementation)
+    /// Queries audit events from log files
     ///
-    /// This will support filtering by user, tenant, action, time range, etc.
+    /// Reads all log files, parses JSON events, and filters based on query criteria.
+    /// Returns events in reverse chronological order (newest first).
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if reading or parsing log files fails.
     pub async fn query_events(
         &self,
-        _filters: &AuditQueryFilters,
+        filters: &AuditQueryFilters,
     ) -> Result<Vec<AuditEvent>, AppError> {
-        // TODO: Implement event querying from log files
-        // This would involve:
-        // 1. Reading log files in reverse chronological order
-        // 2. Parsing JSON lines
-        // 3. Filtering based on query criteria
-        // 4. Returning matching events
-        Ok(Vec::new())
+        let initialized = self.initialized.read().await;
+        if !*initialized {
+            return Err(AppError::ConfigError(
+                "Audit logger not initialized. Call initialize() first.".to_string(),
+            ));
+        }
+        drop(initialized);
+
+        // Get all log files in the directory
+        let mut entries = tokio::fs::read_dir(&self.config.log_directory).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to read audit log directory: {}. \
+                Context: Cannot query audit events without access to log directory. \
+                Suggestion: Check directory permissions and path. \
+                Path: {:?}, Error: {}",
+                e,
+                self.config.log_directory,
+                e
+            ))
+        })?;
+
+        let mut log_files = Vec::new();
+        while let Some(entry) = entries.next_entry().await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to read directory entry: {}. \
+                Context: Cannot enumerate log files for querying. \
+                Error: {}",
+                e, e
+            ))
+        })? {
+            let path = entry.path();
+            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("log") {
+                if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                    if file_name.starts_with("audit_") {
+                        log_files.push(path);
+                    }
+                }
+            }
+        }
+
+        // Sort by filename (which includes timestamp) in reverse order (newest first)
+        log_files.sort_by(|a, b| {
+            b.file_name()
+                .and_then(|n| n.to_str())
+                .cmp(&a.file_name().and_then(|n| n.to_str()))
+        });
+
+        let mut all_events = Vec::new();
+        let limit = filters.limit.unwrap_or(1000);
+
+        // Read events from each log file
+        for log_file in log_files {
+            if all_events.len() >= limit {
+                break;
+            }
+
+            match self.read_events_from_file(&log_file, filters, limit - all_events.len()).await {
+                Ok(mut events) => {
+                    all_events.append(&mut events);
+                }
+                Err(e) => {
+                    warn!("Failed to read events from {:?}: {}", log_file, e);
+                    // Continue with other files
+                }
+            }
+        }
+
+        // Sort by timestamp (newest first) and apply limit
+        all_events.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+        all_events.truncate(limit);
+
+        Ok(all_events)
+    }
+
+    /// Reads events from a single log file and applies filters
+    async fn read_events_from_file(
+        &self,
+        file_path: &std::path::Path,
+        filters: &AuditQueryFilters,
+        max_events: usize,
+    ) -> Result<Vec<AuditEvent>, AppError> {
+        let contents = tokio::fs::read_to_string(file_path).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to read audit log file: {}. \
+                Context: Cannot query events from log file. \
+                Suggestion: Check file permissions. \
+                Path: {:?}, Error: {}",
+                e, file_path, e
+            ))
+        })?;
+
+        let mut events = Vec::new();
+        for line in contents.lines() {
+            if line.trim().is_empty() {
+                continue;
+            }
+
+            if events.len() >= max_events {
+                break;
+            }
+
+            let event: AuditEvent = match serde_json::from_str(line) {
+                Ok(e) => e,
+                Err(e) => {
+                    warn!("Failed to parse audit event from line: {}. Error: {}", line, e);
+                    continue;
+                }
+            };
+
+            // Apply filters
+            if self.event_matches_filters(&event, filters) {
+                events.push(event);
+            }
+        }
+
+        Ok(events)
+    }
+
+    /// Checks if an event matches the query filters
+    fn event_matches_filters(&self, event: &AuditEvent, filters: &AuditQueryFilters) -> bool {
+        // Filter by user ID
+        if let Some(ref user_id) = filters.user_id {
+            if event.user_id.as_ref() != Some(user_id) {
+                return false;
+            }
+        }
+
+        // Filter by tenant ID
+        if let Some(ref tenant_id) = filters.tenant_id {
+            if event.tenant_id.as_ref() != Some(tenant_id) {
+                return false;
+            }
+        }
+
+        // Filter by action
+        if let Some(ref action) = filters.action {
+            if event.action != *action {
+                return false;
+            }
+        }
+
+        // Filter by resource type
+        if let Some(ref resource_type) = filters.resource_type {
+            if event.resource_type != *resource_type {
+                return false;
+            }
+        }
+
+        // Filter by result
+        if let Some(ref result) = filters.result {
+            if event.result != *result {
+                return false;
+            }
+        }
+
+        // Filter by minimum level
+        if let Some(min_level) = filters.min_level {
+            let event_level_priority = match event.level {
+                AuditLevel::Info => 0,
+                AuditLevel::Warning => 1,
+                AuditLevel::Error => 2,
+                AuditLevel::Critical => 3,
+            };
+            let min_level_priority = match min_level {
+                AuditLevel::Info => 0,
+                AuditLevel::Warning => 1,
+                AuditLevel::Error => 2,
+                AuditLevel::Critical => 3,
+            };
+            if event_level_priority < min_level_priority {
+                return false;
+            }
+        }
+
+        // Filter by time range
+        if let Some(start_time) = filters.start_time {
+            if event.timestamp < start_time {
+                return false;
+            }
+        }
+
+        if let Some(end_time) = filters.end_time {
+            if event.timestamp > end_time {
+                return false;
+            }
+        }
+
+        true
+    }
+
+    /// Cleans up old log files, keeping only the most recent max_files
+    async fn cleanup_old_logs(&self) -> Result<(), AppError> {
+        let mut entries = tokio::fs::read_dir(&self.config.log_directory).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to read audit log directory for cleanup: {}",
+                e
+            ))
+        })?;
+
+        let mut log_files = Vec::new();
+        while let Some(entry) = entries.next_entry().await.map_err(|e| {
+            AppError::ConfigError(format!("Failed to read directory entry during cleanup: {}", e))
+        })? {
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                    if file_name.starts_with("audit_") && file_name.ends_with(".log") {
+                        if let Ok(metadata) = entry.metadata().await {
+                            if let Ok(modified) = metadata.modified() {
+                                log_files.push((path, modified));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Sort by modification time (newest first)
+        log_files.sort_by(|a, b| b.1.cmp(&a.1));
+
+        // Delete old files beyond max_files
+        if log_files.len() > self.config.max_files {
+            for (path, _) in log_files.iter().skip(self.config.max_files) {
+                if let Err(e) = tokio::fs::remove_file(path).await {
+                    warn!("Failed to delete old audit log file {:?}: {}", path, e);
+                } else {
+                    info!("Deleted old audit log file: {:?}", path);
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 
@@ -419,5 +656,143 @@ impl Default for AuditQueryFilters {
             end_time: None,
             limit: Some(1000),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    #[tokio::test]
+    async fn test_audit_logger_initialization() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = AuditConfig {
+            log_directory: temp_dir.path().to_path_buf(),
+            max_file_size: 1024,
+            max_files: 5,
+            enable_compression: false,
+            immediate_flush: false,
+        };
+
+        let logger = AuditLogger::with_config(config);
+        assert!(logger.initialize().await.is_ok());
+        assert!(logger.shutdown().await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_audit_log_event() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = AuditConfig {
+            log_directory: temp_dir.path().to_path_buf(),
+            max_file_size: 1024 * 1024, // 1 MB
+            max_files: 5,
+            enable_compression: false,
+            immediate_flush: false,
+        };
+
+        let logger = AuditLogger::with_config(config);
+        logger.initialize().await.unwrap();
+
+        let event = AuditEvent::new(
+            AuditLevel::Info,
+            "test_action".to_string(),
+            "test_resource".to_string(),
+            "success".to_string(),
+        )
+        .with_user_id("user123".to_string())
+        .with_tenant_id("tenant-abc".to_string());
+
+        assert!(logger.log_event(event).await.is_ok());
+        assert!(logger.shutdown().await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_audit_query_events() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = AuditConfig {
+            log_directory: temp_dir.path().to_path_buf(),
+            max_file_size: 1024 * 1024,
+            max_files: 5,
+            enable_compression: false,
+            immediate_flush: false,
+        };
+
+        let logger = AuditLogger::with_config(config);
+        logger.initialize().await.unwrap();
+
+        // Log some events
+        let event1 = AuditEvent::new(
+            AuditLevel::Info,
+            "create_instance".to_string(),
+            "vm_instance".to_string(),
+            "success".to_string(),
+        )
+        .with_user_id("user123".to_string());
+
+        let event2 = AuditEvent::new(
+            AuditLevel::Warning,
+            "delete_instance".to_string(),
+            "vm_instance".to_string(),
+            "success".to_string(),
+        )
+        .with_user_id("user456".to_string());
+
+        logger.log_event(event1).await.unwrap();
+        logger.log_event(event2).await.unwrap();
+
+        // Query all events
+        let filters = AuditQueryFilters::default();
+        let events = logger.query_events(&filters).await.unwrap();
+        assert!(events.len() >= 2);
+
+        // Query by user ID
+        let filters = AuditQueryFilters {
+            user_id: Some("user123".to_string()),
+            ..Default::default()
+        };
+        let events = logger.query_events(&filters).await.unwrap();
+        assert!(events.iter().all(|e| e.user_id.as_ref() == Some(&"user123".to_string())));
+
+        // Query by action
+        let filters = AuditQueryFilters {
+            action: Some("create_instance".to_string()),
+            ..Default::default()
+        };
+        let events = logger.query_events(&filters).await.unwrap();
+        assert!(events.iter().all(|e| e.action == "create_instance"));
+
+        // Query by minimum level
+        let filters = AuditQueryFilters {
+            min_level: Some(AuditLevel::Warning),
+            ..Default::default()
+        };
+        let events = logger.query_events(&filters).await.unwrap();
+        assert!(events.iter().all(|e| {
+            matches!(e.level, AuditLevel::Warning | AuditLevel::Error | AuditLevel::Critical)
+        }));
+
+        assert!(logger.shutdown().await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_audit_event_builder() {
+        let event = AuditEvent::new(
+            AuditLevel::Error,
+            "test_action".to_string(),
+            "test_resource".to_string(),
+            "failure".to_string(),
+        )
+        .with_user_id("user123".to_string())
+        .with_tenant_id("tenant-abc".to_string())
+        .with_resource_id("resource-456".to_string())
+        .with_metadata("key1".to_string(), "value1".to_string());
+
+        assert_eq!(event.level, AuditLevel::Error);
+        assert_eq!(event.action, "test_action");
+        assert_eq!(event.user_id, Some("user123".to_string()));
+        assert_eq!(event.tenant_id, Some("tenant-abc".to_string()));
+        assert_eq!(event.resource_id, Some("resource-456".to_string()));
+        assert_eq!(event.metadata.get("key1"), Some(&"value1".to_string()));
     }
 }
