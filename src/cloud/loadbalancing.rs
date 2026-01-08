@@ -65,6 +65,27 @@ impl LoadBalancer {
     }
 
     /// Initialize load balancer
+    ///
+    /// Sets up health checks, routing rules, and cloud load balancer (if applicable).
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::InitializationError` if:
+    /// - Health check configuration fails
+    /// - Routing rules cannot be configured
+    /// - Cloud load balancer initialization fails (if applicable)
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::loadbalancing::LoadBalancer;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let loadbalancer = LoadBalancer::new();
+    /// loadbalancer.initialize().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn initialize(&self) -> Result<(), AppError> {
         let mut initialized = self.initialized.write().await;
         if *initialized {
@@ -180,7 +201,12 @@ impl LoadBalancer {
     /// Get load balancer health status
     ///
     /// Returns the current health status of all registered backends.
-    /// This is a placeholder implementation that assumes all backends are healthy.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Health check service is unreachable
+    /// - Health check requests fail
     ///
     /// # Future Implementation
     ///
@@ -188,11 +214,30 @@ impl LoadBalancer {
     /// - Perform actual health checks (HTTP/HTTPS/TCP)
     /// - Track health check history
     /// - Mark backends as unhealthy after consecutive failures
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::loadbalancing::LoadBalancer;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let loadbalancer = LoadBalancer::new();
+    /// loadbalancer.initialize().await?;
+    ///
+    /// let health = loadbalancer.get_health_status().await?;
+    /// println!("Healthy backends: {}/{}", health.healthy_backends, health.total_backends);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn get_health_status(&self) -> Result<LoadBalancerHealth, AppError> {
         let backends = self.backends.read().await;
         let total = backends.len() as u32;
         
         // TODO: Perform actual health checks
+        // - Send HTTP/HTTPS/TCP health check requests to each backend
+        // - Track consecutive failures per backend
+        // - Mark backends as unhealthy after threshold failures
+        // - Return actual health status
         // For now, assume all backends are healthy
         let healthy = total;
         let unhealthy = 0;

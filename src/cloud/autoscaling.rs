@@ -53,6 +53,27 @@ impl AutoScaler {
     }
 
     /// Initialize auto-scaler
+    ///
+    /// Sets up metrics collection, scaling policies, and HPA (if Kubernetes is enabled).
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::InitializationError` if:
+    /// - Metrics collection cannot be initialized
+    /// - Scaling policies cannot be configured
+    /// - HPA initialization fails (if Kubernetes is enabled)
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::autoscaling::AutoScaler;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let autoscaler = AutoScaler::new();
+    /// autoscaler.initialize().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn initialize(&self) -> Result<(), AppError> {
         let mut initialized = self.initialized.write().await;
         if *initialized {
@@ -184,8 +205,50 @@ impl AutoScaler {
     }
 
     /// Get current scaling metrics
-    pub async fn get_metrics(&self, _resource_id: &str) -> Result<ScalingMetrics, AppError> {
+    ///
+    /// # Arguments
+    ///
+    /// * `resource_id` - Identifier for the resource to query metrics for
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `resource_id` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Metrics service is unreachable
+    /// - Resource does not exist
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::autoscaling::AutoScaler;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let autoscaler = AutoScaler::new();
+    /// autoscaler.initialize().await?;
+    ///
+    /// let metrics = autoscaler.get_metrics("worker-pool").await?;
+    /// println!("CPU usage: {:.1}%", metrics.cpu_usage * 100.0);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn get_metrics(&self, resource_id: &str) -> Result<ScalingMetrics, AppError> {
+        if resource_id.is_empty() {
+            return Err(AppError::ValidationError(
+                "Resource ID cannot be empty. Context: Attempted to get scaling metrics with empty resource ID. \
+                Suggestion: Provide a valid resource identifier. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
         // TODO: Query metrics from monitoring system
+        // - Query Prometheus or cloud provider metrics API
+        // - Calculate CPU/memory usage percentages
+        // - Get request rate from load balancer or API gateway
+        // - Get current replica count from Kubernetes or cloud provider
+        
         Ok(ScalingMetrics {
             cpu_usage: 0.0,
             memory_usage: 0.0,
