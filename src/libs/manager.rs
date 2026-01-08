@@ -841,6 +841,8 @@ impl LibraryManager {
             })?;
         }
 
+        let extract_dir_str = extract_dir.display().to_string();
+        let lib_path_str = lib_info.path.display().to_string();
         tokio::fs::rename(&extract_dir, &lib_info.path)
             .await
             .map_err(|e| {
@@ -848,7 +850,7 @@ impl LibraryManager {
                     "Failed to finalize library load from RAID. Context: Cannot atomically move extracted library to final location. \
                     Suggestion: Ensure both source and destination are on the same filesystem and check permissions. \
                     Library: '{}', From: '{}', To: '{}', Error: {}",
-                    lib_info.name, extract_dir.display(), lib_info.path.display(), e
+                    lib_info.name, extract_dir_str, lib_path_str, e
                 ))
             })?;
 
