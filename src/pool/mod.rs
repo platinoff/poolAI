@@ -592,3 +592,106 @@ pub async fn health_check() -> Result<(), AppError> {
 pub fn get_global_pool() -> Option<&'static Arc<RwLock<Pool>>> {
     GLOBAL_POOL.get()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pool_metrics_default() {
+        let metrics = PoolMetrics::default();
+        assert_eq!(metrics.active_workers, 0);
+        assert_eq!(metrics.queue_size, 0);
+        assert_eq!(metrics.total_requests, 0);
+        assert_eq!(metrics.successful_requests, 0);
+        assert_eq!(metrics.failed_requests, 0);
+        assert_eq!(metrics.average_response_time_ms, 0.0);
+        assert_eq!(metrics.gpu_utilization, 0.0);
+        assert_eq!(metrics.memory_usage_mb, 0.0);
+        assert_eq!(metrics.throughput_rps, 0.0);
+        assert_eq!(metrics.error_rate, 0.0);
+    }
+
+    #[test]
+    fn test_pool_config_clone() {
+        let config = PoolConfig {
+            max_workers: 10,
+            max_queue_size: 1000,
+            load_balancing_strategy: LoadBalancingStrategy::LeastConnections,
+            auto_scaling: true,
+            scaling_threshold: 0.8,
+            request_timeout: 30,
+        };
+        let cloned = config.clone();
+        assert_eq!(config.max_workers, cloned.max_workers);
+        assert_eq!(config.max_queue_size, cloned.max_queue_size);
+        assert_eq!(config.request_timeout, cloned.request_timeout);
+    }
+
+    #[test]
+    fn test_load_balancing_strategy_variants() {
+        let strategies = vec![
+            LoadBalancingStrategy::RoundRobin,
+            LoadBalancingStrategy::LeastConnections,
+            LoadBalancingStrategy::Weighted,
+            LoadBalancingStrategy::Random,
+        ];
+        for strategy in strategies {
+            let cloned = strategy.clone();
+            assert!(matches!(
+                cloned,
+                LoadBalancingStrategy::RoundRobin
+                    | LoadBalancingStrategy::LeastConnections
+                    | LoadBalancingStrategy::Weighted
+                    | LoadBalancingStrategy::Random
+            ));
+        }
+    }
+
+    #[tokio::test]
+    async fn test_pool_new() {
+        let config = PoolConfig {
+            max_workers: 10,
+            max_queue_size: 1000,
+            load_balancing_strategy: LoadBalancingStrategy::Random,
+            auto_scaling: false,
+            scaling_threshold: 0.8,
+            request_timeout: 30,
+        };
+        let pool = Pool::new(config);
+        let metrics = pool.get_metrics().await;
+        assert_eq!(metrics.active_workers, 0);
+        assert_eq!(metrics.queue_size, 0);
+    }
+
+    #[tokio::test]
+    async fn test_pool_get_metrics() {
+        let config = PoolConfig {
+            max_workers: 10,
+            max_queue_size: 1000,
+            load_balancing_strategy: LoadBalancingStrategy::Random,
+            auto_scaling: false,
+            scaling_threshold: 0.8,
+            request_timeout: 30,
+        };
+        let pool = Pool::new(config);
+        let metrics = pool.get_metrics().await;
+        assert_eq!(metrics.active_workers, 0);
+        assert_eq!(metrics.total_requests, 0);
+    }
+
+    #[tokio::test]
+    async fn test_pool_get_worker_count_empty() {
+        let config = PoolConfig {
+            max_workers: 10,
+            max_queue_size: 1000,
+            load_balancing_strategy: LoadBalancingStrategy::Random,
+            auto_scaling: false,
+            scaling_threshold: 0.8,
+            request_timeout: 30,
+        };
+        let pool = Pool::new(config);
+        let count = pool.get_worker_count().await;
+        assert_eq!(count, 0);
+    }
+}
