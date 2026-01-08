@@ -182,22 +182,113 @@ const BASE_CSS: &str = r#"
   @media (max-width: 860px) { 
     .grid { grid-template-columns: 1fr; } 
   }
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .wrap { padding: 0 12px; }
-    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .nav { width: 100%; flex-direction: column; align-items: stretch; }
-    .nav a { width: 100%; text-align: center; padding: 10px; }
-    .row { flex-direction: column; align-items: flex-start; }
-    .card { padding: 12px; }
-    table { font-size: 0.85em; }
-    th, td { padding: 6px; }
+  
+  /* Responsive Design - Tablet (768px - 1024px) */
+  @media (max-width: 1024px) {
+    .wrap { max-width: 100%; padding: 0 16px; }
+    .grid { gap: 10px; }
   }
+  
+  /* Responsive Design - Mobile Landscape (768px) */
+  @media (max-width: 768px) {
+    .wrap { padding: 0 12px; margin: 16px auto; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px; }
+    .nav { display: none; } /* Hide desktop nav, show mobile drawer */
+    .row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .card { padding: 12px; border-radius: 10px; }
+    table { font-size: 0.85em; }
+    th, td { padding: 8px 6px; }
+    .item { padding: 10px; }
+    pre { padding: 10px; font-size: 0.85em; }
+    h2 { font-size: 1.2em; }
+    .muted { font-size: 0.85em; }
+  }
+  
+  /* Responsive Design - Mobile Portrait (480px) */
   @media (max-width: 480px) {
+    .wrap { padding: 0 8px; margin: 12px auto; }
+    .topbar { padding: 10px; border-radius: 10px; }
     .brand h1 { font-size: 16px; }
-    .brand .muted { font-size: 0.85em; }
+    .brand .muted { font-size: 0.8em; display: none; } /* Hide subtitle on small screens */
+    .card { padding: 10px; border-radius: 8px; }
+    .btn { padding: 12px 16px; font-size: 0.9em; min-height: 44px; } /* Touch-friendly buttons */
+    .item { padding: 8px; border-radius: 8px; }
+    .grid { gap: 8px; margin-top: 8px; }
+    pre { padding: 8px; font-size: 0.8em; border-radius: 8px; }
+    h2 { font-size: 1.1em; margin-bottom: 4px; }
+    .pill { font-size: 0.8em; padding: 2px 6px; }
+    table { font-size: 0.8em; }
+    th, td { padding: 6px 4px; }
+  }
+  
+  /* Responsive Design - Small Mobile (360px) */
+  @media (max-width: 360px) {
+    .wrap { padding: 0 6px; margin: 8px auto; }
+    .topbar { padding: 8px; }
+    .brand h1 { font-size: 14px; }
+    .card { padding: 8px; }
+    .btn { padding: 10px 12px; font-size: 0.85em; }
+    pre { font-size: 0.75em; }
+    th, td { padding: 4px 3px; font-size: 0.75em; }
+  }
+  
+  /* Touch Device Optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    .btn, .nav a, button, a, select, input[type="checkbox"], input[type="radio"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    .nav a { padding: 12px 14px; }
+    .btn { padding: 12px 20px; }
+    select { padding: 10px 12px; }
+    input[type="text"], input[type="password"], input[type="email"], textarea {
+      padding: 12px;
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+    /* Disable hover effects on touch devices */
+    .btn:hover, .nav a:hover, .card:hover, .item:hover {
+      transform: none;
+    }
+    /* Add active states for touch feedback */
+    .btn:active, .nav a:active {
+      opacity: 0.8;
+      transform: scale(0.98);
+    }
+    /* Larger tap targets for table actions */
+    .action-buttons .btn { min-height: 40px; padding: 10px 14px; }
+    /* Better spacing for touch */
+    .form-group { margin-bottom: 20px; }
+    .modal-content { padding: 20px; }
+    .dropdown-item { padding: 14px 16px; min-height: 44px; }
+    .tab { padding: 14px 20px; min-height: 44px; }
+    .accordion-header { padding: 16px; min-height: 48px; }
+  }
+  
+  /* Landscape orientation adjustments */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .wrap { margin: 8px auto; }
+    .topbar { padding: 8px 12px; }
     .card { padding: 10px; }
-    .btn { padding: 10px 16px; font-size: 0.9em; }
+    .modal-content { max-height: 85vh; }
+    .mobile-nav-drawer { width: 50%; }
+  }
+  
+  /* High DPI / Retina displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .card, .topbar, .item { box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+  }
+  
+  /* Print styles */
+  @media print {
+    .topbar, .nav, .mobile-menu-toggle, .mobile-nav-drawer, .mobile-nav-overlay, .btn, .action-buttons {
+      display: none !important;
+    }
+    .wrap { max-width: 100%; margin: 0; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    body { background: white; color: black; }
+    a { color: black; text-decoration: underline; }
+    pre { white-space: pre-wrap; word-break: break-word; border: 1px solid #ccc; }
   }
   /* Accessibility: Skip links */
   .skip_link {
@@ -2505,13 +2596,21 @@ function initAccordions() {
   });
 }
 
-// Mobile Navigation functions
+// Enhanced Mobile Navigation functions with touch gestures
 function initMobileNavigation() {
   const toggle = document.getElementById('mobileMenuToggle');
   const drawer = document.getElementById('mobileNavDrawer');
   const overlay = document.getElementById('mobileNavOverlay');
   const closeBtn = document.getElementById('mobileNavClose');
   const mobileThemeSelector = document.getElementById('mobileThemeSelector');
+  
+  // Touch gesture variables
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+  const swipeThreshold = 50; // Minimum swipe distance in pixels
+  const swipeAngleThreshold = 30; // Maximum angle from horizontal for swipe detection
   
   if (!toggle || !drawer || !overlay) return;
   
@@ -2562,6 +2661,61 @@ function initMobileNavigation() {
       });
     }
   }
+  
+  // Swipe to open drawer from left edge
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  
+  document.addEventListener('touchend', function(e) {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    
+    touchEndX = e.changedTouches[0].clientX;
+    touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+    const angle = Math.abs(Math.atan2(diffY, diffX) * 180 / Math.PI);
+    
+    // Check if it's a horizontal swipe (within angle threshold)
+    if (angle > swipeAngleThreshold && angle < (180 - swipeAngleThreshold)) return;
+    
+    // Swipe right from left edge to open drawer
+    if (touchStartX < 30 && diffX > swipeThreshold && !drawer.classList.contains('active')) {
+      openDrawer();
+    }
+    
+    // Swipe left to close drawer
+    if (diffX < -swipeThreshold && drawer.classList.contains('active')) {
+      closeDrawer();
+    }
+  }, { passive: true });
+  
+  // Swipe on drawer to close
+  drawer.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  
+  drawer.addEventListener('touchend', function(e) {
+    if (!e.changedTouches || e.changedTouches.length === 0) return;
+    
+    touchEndX = e.changedTouches[0].clientX;
+    touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+    const angle = Math.abs(Math.atan2(diffY, diffX) * 180 / Math.PI);
+    
+    // Check if it's a horizontal swipe
+    if (angle > swipeAngleThreshold && angle < (180 - swipeAngleThreshold)) return;
+    
+    // Swipe left to close
+    if (diffX < -swipeThreshold) {
+      closeDrawer();
+    }
+  }, { passive: true });
 }
 
 // Touch Gesture functions
