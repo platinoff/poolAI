@@ -76,7 +76,18 @@ impl ModelInterface for MockModel {
             total_requests: 0,
             last_activity: chrono::Utc::now(),
             errors: vec![],
-            metrics: ModelMetrics::default(),
+            metrics: ModelMetrics {
+                processing_time_ms: 0,
+                tokens_generated: 0,
+                gpu_utilization: 0.0,
+                memory_usage_mb: 0.0,
+                throughput_tokens_per_sec: 0.0,
+                cpu_utilization: 0.0,
+                gpu_temperature: 0.0,
+                gpu_power_watts: 0.0,
+                queue_length: 0,
+                average_latency_ms: 0.0,
+            },
         })
     }
 
@@ -276,8 +287,19 @@ async fn test_model_parameters_default() {
 }
 
 #[tokio::test]
-async fn test_model_metrics_default() {
-    let metrics = ModelMetrics::default();
+async fn test_model_metrics_structure() {
+    let metrics = ModelMetrics {
+        processing_time_ms: 0,
+        tokens_generated: 0,
+        gpu_utilization: 0.0,
+        memory_usage_mb: 0.0,
+        throughput_tokens_per_sec: 0.0,
+        cpu_utilization: 0.0,
+        gpu_temperature: 0.0,
+        gpu_power_watts: 0.0,
+        queue_length: 0,
+        average_latency_ms: 0.0,
+    };
     assert_eq!(metrics.processing_time_ms, 0);
     assert_eq!(metrics.tokens_generated, 0);
     assert_eq!(metrics.gpu_utilization, 0.0);

@@ -134,7 +134,9 @@ raft = ["async-raft", "anyhow"]
 enterprise = []
 # Cloud integration features (optional)
 # Use: cargo build --features cloud
-cloud = ["k8s-openapi", "aws-config", "azure_core", "google-cloud-rust"]
+# Note: SDK dependencies are optional and can be added when needed
+# For now, keeping cloud feature without heavy SDK dependencies
+cloud = []
 # VM Isolation - Linux (requires root or CAP_NET_ADMIN, CAP_SYS_ADMIN)
 # Use: cargo build --features vm-isolation-linux
 vm-isolation-linux = ["nix"]
