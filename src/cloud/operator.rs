@@ -1005,16 +1005,21 @@ impl PoolAIOperator {
         
         // Update CRD status with deployment status
         // Get actual deployment status if deployment exists
-        let deployment_ready = if deployment_exists {
+        let (deployment_ready, replicas, available_replicas, ready_replicas) = if deployment_exists {
             match k8s_manager.get_deployment_status(deployment_name).await {
-                Ok(deployment_status) => deployment_status.ready,
+                Ok(deployment_status) => (
+                    deployment_status.ready,
+                    deployment_status.replicas,
+                    deployment_status.available_replicas,
+                    deployment_status.ready_replicas,
+                ),
                 Err(e) => {
                     warn!("Failed to get deployment status for {}: {}", deployment_name, e);
-                    true // Assume ready if we can't check
+                    (true, 0, 0, 0) // Assume ready if we can't check, but no replica info
                 }
             }
         } else {
-            false // Not ready if deployment doesn't exist yet
+            (false, 0, 0, 0) // Not ready if deployment doesn't exist yet
         };
         
         let status = json!({
@@ -1034,7 +1039,10 @@ impl PoolAIOperator {
                     })
             }],
             "deploymentName": deployment_name,
-            "serviceName": service_name
+            "serviceName": service_name,
+            "replicas": replicas,
+            "availableReplicas": available_replicas,
+            "readyReplicas": ready_replicas
         });
         
         if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaiworkers", &worker.name, status).await {
@@ -1168,16 +1176,21 @@ impl PoolAIOperator {
         
         // Update CRD status with deployment status
         // Get actual deployment status if deployment exists
-        let deployment_ready = if deployment_exists {
+        let (deployment_ready, replicas, available_replicas, ready_replicas) = if deployment_exists {
             match k8s_manager.get_deployment_status(deployment_name).await {
-                Ok(deployment_status) => deployment_status.ready,
+                Ok(deployment_status) => (
+                    deployment_status.ready,
+                    deployment_status.replicas,
+                    deployment_status.available_replicas,
+                    deployment_status.ready_replicas,
+                ),
                 Err(e) => {
                     warn!("Failed to get deployment status for {}: {}", deployment_name, e);
-                    true // Assume ready if we can't check
+                    (true, 0, 0, 0) // Assume ready if we can't check, but no replica info
                 }
             }
         } else {
-            false // Not ready if deployment doesn't exist yet
+            (false, 0, 0, 0) // Not ready if deployment doesn't exist yet
         };
         
         let status = json!({
@@ -1197,7 +1210,10 @@ impl PoolAIOperator {
                     })
             }],
             "deploymentName": deployment_name,
-            "pvcName": pvc_name
+            "pvcName": pvc_name,
+            "replicas": replicas,
+            "availableReplicas": available_replicas,
+            "readyReplicas": ready_replicas
         });
         
         if let Err(e) = k8s_manager.update_crd_status("poolai.io", "v1", "poolaivms", &vm.name, status).await {
