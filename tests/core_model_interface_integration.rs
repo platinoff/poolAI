@@ -146,8 +146,17 @@ async fn test_model_manager_creation() {
 
 #[tokio::test]
 async fn test_register_model() {
-    let config = PoolAIConfig::default();
-    let mut manager = ModelManager::new(config.model);
+    let config = ConfigModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let mut manager = ModelManager::new(config);
 
     let model = Box::new(MockModel {
         name: "test-model".to_string(),
@@ -165,8 +174,17 @@ async fn test_register_model() {
 
 #[tokio::test]
 async fn test_unregister_model() {
-    let config = PoolAIConfig::default();
-    let mut manager = ModelManager::new(config.model);
+    let config = ConfigModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let mut manager = ModelManager::new(config);
 
     let model = Box::new(MockModel {
         name: "test-model".to_string(),
@@ -189,8 +207,17 @@ async fn test_unregister_model() {
 
 #[tokio::test]
 async fn test_process_request() {
-    let config = PoolAIConfig::default();
-    let mut manager = ModelManager::new(config.model);
+    let config = ConfigModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let mut manager = ModelManager::new(config);
 
     let model = Box::new(MockModel {
         name: "test-model".to_string(),
@@ -250,8 +277,17 @@ async fn test_process_request_nonexistent_model() {
 
 #[tokio::test]
 async fn test_get_all_metrics() {
-    let config = PoolAIConfig::default();
-    let mut manager = ModelManager::new(config.model);
+    let config = ConfigModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let mut manager = ModelManager::new(config);
 
     for i in 1..=3 {
         let model = Box::new(MockModel {
@@ -277,8 +313,17 @@ async fn test_get_all_metrics() {
 
 #[tokio::test]
 async fn test_get_all_states() {
-    let config = PoolAIConfig::default();
-    let mut manager = ModelManager::new(config.model);
+    let config = ConfigModelConfig {
+        name: "test-model".to_string(),
+        path: "./models/test".to_string(),
+        max_batch_size: 1,
+        memory_limit: 1024,
+        temperature: 0.7,
+        max_tokens: 100,
+        enable_cache: false,
+        cache_size: 0,
+    };
+    let mut manager = ModelManager::new(config);
 
     for i in 1..=3 {
         let model = Box::new(MockModel {
