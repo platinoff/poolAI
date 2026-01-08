@@ -105,6 +105,7 @@
     - ✅ Enhanced error handling in reconciliation loop (error status updates, better error messages)
     - ✅ Service creation for workers and VMs (automatic Service creation with ClusterIP)
     - ✅ PVC creation for VMs (automatic PersistentVolumeClaim creation for VM storage)
+    - ✅ Improved watch_crd_resources implementation (actual resource listing and comparison, better error handling)
     - ✅ Multi-cloud provider support (AWS, Azure, GCP placeholders)
     - ✅ Auto-scaling module structure with scaling policies
     - ✅ Load balancing module structure with strategies and health checks

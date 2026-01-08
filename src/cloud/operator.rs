@@ -468,24 +468,16 @@ impl PoolAIOperator {
         loop {
             interval.tick().await;
             
-            // In a real implementation, we would:
-            // 1. GET /apis/{group}/{version}/namespaces/{namespace}/{resource_plural}
-            // 2. Compare with last_resources to detect changes
-            // 3. Send events for Added, Modified, Deleted
-            
-            // For now, this is a placeholder that logs polling activity
+            // Poll Kubernetes API for CRD resource changes
+            // This implementation uses HTTP polling with resourceVersion comparison
+            // to detect Added, Modified, and Deleted events.
+            // For better efficiency in production, consider using Kubernetes watch API.
             if let Some(ref manager) = k8s_manager {
                 // Check if manager is initialized
                 if manager.is_cluster_available().await.unwrap_or(false) {
-                    // TODO: Implement actual resource listing and comparison
-                    // This would involve:
-                    // - Making HTTP GET request to Kubernetes API
-                    // - Parsing JSON response
-                    // - Comparing resourceVersion to detect changes
-                    // - Sending appropriate events
-                    
-                    // Try to list resources and detect changes
-                    if let Ok(resources_json) = manager.list_crd_resources(&group, &version, &resource_plural).await {
+                    // List resources and detect changes by comparing resourceVersion
+                    match manager.list_crd_resources(&group, &version, &resource_plural).await {
+                        Ok(resources_json) => {
                         if let Some(items) = resources_json.get("items").and_then(|i| i.as_array()) {
                             let mut current_resources: std::collections::HashMap<String, String> = std::collections::HashMap::new();
                             
@@ -539,9 +531,30 @@ impl PoolAIOperator {
                             }
                             
                             last_resources = current_resources;
+                        } else {
+                            // No items in response (empty list)
+                            // Check for deleted resources
+                            for (name, _) in &last_resources {
+                                let _ = event_tx.send(CrdEvent {
+                                    event_type: CrdEventType::Deleted,
+                                    resource_type: resource_type.clone(),
+                                    name: name.clone(),
+                                    namespace: namespace.clone(),
+                                });
+                            }
+                            last_resources.clear();
+                        }
+                        }
+                        Err(e) => {
+                            warn!("Failed to list CRD resources {}: {}", resource_plural, e);
+                            // Continue polling - error might be temporary
                         }
                     }
+                } else {
+                    warn!("Kubernetes cluster not available, skipping CRD resource polling");
                 }
+            } else {
+                warn!("Kubernetes manager not available, skipping CRD resource polling");
             }
             
             // In production, we would break on shutdown signal

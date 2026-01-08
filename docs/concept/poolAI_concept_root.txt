@@ -116,6 +116,7 @@
   - ✅ **Enhanced Error Handling** - CRD status updates on reconciliation errors, better error messages and logging
   - ✅ **Service Creation** - Automatic Kubernetes Service creation for workers and VMs
   - ✅ **PVC Creation** - Automatic PersistentVolumeClaim creation for VM storage
+  - ✅ **Improved CRD Watching** - Actual resource listing and comparison with better error handling
   - ✅ **Reconciliation Loop** - Event-driven reconciliation loop for desired vs actual state
   - ✅ **Reconciliation Functions** - Real implementation for reconcile_worker and reconcile_vm using KubernetesManager
   - ✅ **Deployment Management** - Check existence and create deployments for workers and VMs

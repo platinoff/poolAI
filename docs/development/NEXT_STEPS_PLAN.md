@@ -103,6 +103,7 @@
 - ✅ Service creation methods (create_service for exposing deployments)
 - ✅ PVC creation methods (create_pvc for VM storage)
 - ✅ Service and PVC integration in reconciliation (automatic creation for workers and VMs)
+- ✅ Improved watch_crd_resources implementation (actual resource listing and comparison, better error handling and logging)
 
 **Прогрес Cloud Module**: ~90% 🔄
 - Infrastructure: 100% ✅
