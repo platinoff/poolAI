@@ -678,8 +678,19 @@ impl PoolAIOperator {
                     // Cleanup: Delete associated Kubernetes resources
                     match event.resource_type {
                         CrdResourceType::Worker => {
+                            // Delete worker deployment
                             if let Err(e) = k8s_manager.delete_worker_deployment(&event.name).await {
                                 warn!("Failed to delete worker deployment {}: {}", event.name, e);
+                            } else {
+                                info!("Deleted worker deployment: {} from namespace {}", event.name, event.namespace);
+                            }
+                            
+                            // Delete associated service
+                            let service_name = format!("{}-service", event.name);
+                            if let Err(e) = k8s_manager.delete_service(&service_name).await {
+                                warn!("Failed to delete service {}: {} (may not exist)", service_name, e);
+                            } else {
+                                info!("Deleted service: {} from namespace {}", service_name, event.namespace);
                             }
                         }
                         CrdResourceType::Vm => {
@@ -688,6 +699,22 @@ impl PoolAIOperator {
                                 warn!("Failed to delete VM deployment {}: {}", event.name, e);
                             } else {
                                 info!("Deleted VM deployment: {} from namespace {}", event.name, event.namespace);
+                            }
+                            
+                            // Delete associated service
+                            let service_name = format!("{}-service", event.name);
+                            if let Err(e) = k8s_manager.delete_service(&service_name).await {
+                                warn!("Failed to delete service {}: {} (may not exist)", service_name, e);
+                            } else {
+                                info!("Deleted service: {} from namespace {}", service_name, event.namespace);
+                            }
+                            
+                            // Delete associated PVC
+                            let pvc_name = format!("{}-pvc", event.name);
+                            if let Err(e) = k8s_manager.delete_pvc(&pvc_name).await {
+                                warn!("Failed to delete PVC {}: {} (may not exist)", pvc_name, e);
+                            } else {
+                                info!("Deleted PVC: {} from namespace {}", pvc_name, event.namespace);
                             }
                         }
                         CrdResourceType::Tenant => {
