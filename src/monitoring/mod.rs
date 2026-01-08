@@ -377,6 +377,23 @@ pub use crate::monitoring::metrics::MetricsCollector;
 static GLOBAL_MONITORING: OnceLock<Arc<Monitoring>> = OnceLock::new();
 
 /// Initialize monitoring module
+/// Initialize the global monitoring instance
+///
+/// Sets up the global monitoring singleton. Must be called before
+/// using other monitoring functions that rely on the global instance.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use poolai::monitoring::initialize;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// // Initialize monitoring at application startup
+/// initialize().await?;
+/// // Now you can use monitoring functions
+/// # Ok(())
+/// # }
+/// ```
 pub async fn initialize() -> Result<(), AppError> {
     tracing::info!("Initializing monitoring module");
 
