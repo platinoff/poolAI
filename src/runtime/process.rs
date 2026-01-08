@@ -142,7 +142,12 @@ impl ProcessManager {
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())
             .spawn()
-            .map_err(|e| AppError::ConfigError(format!("Failed to spawn process: {}", e)))?;
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to spawn process. Context: Cannot start new process for task execution. \
+                Suggestion: Check system resources, verify executable path is correct, and ensure process limits are not exceeded. \
+                Command: '{}', Error: {}",
+                config.command, e
+            )))?;
 
         let status = Arc::new(RwLock::new(ProcessStatus::Starting));
         let logs = Arc::new(RwLock::new(ProcessLogs::default()));
