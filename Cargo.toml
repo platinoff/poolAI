@@ -91,7 +91,7 @@ anyhow = { version = "1.0", optional = true }
 # VM Isolation - Linux system calls (optional - enabled with feature "vm-isolation-linux")
 # Use: cargo build --features vm-isolation-linux
 # Note: Requires root privileges or CAP_NET_ADMIN, CAP_SYS_ADMIN
-nix = { version = "0.27", optional = true }
+nix = { version = "0.30", optional = true }
 
 # Cloud SDK dependencies (optional - enabled with feature "cloud-sdk")
 # Use: cargo build --features cloud,cloud-sdk
