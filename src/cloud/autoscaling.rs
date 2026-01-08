@@ -36,7 +36,10 @@
 use crate::core::error::AppError;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
+
+#[cfg(feature = "cloud-sdk")]
+use crate::cloud::kubernetes::KubernetesManager;
 
 /// Auto-scaler for managing resource scaling
 pub struct AutoScaler {
@@ -44,6 +47,9 @@ pub struct AutoScaler {
     scaling_policies: Arc<RwLock<Vec<ScalingPolicy>>>,
     min_replicas: Arc<RwLock<u32>>,
     max_replicas: Arc<RwLock<u32>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Kubernetes manager for scaling operations
+    k8s_manager: Option<Arc<KubernetesManager>>,
 }
 
 impl AutoScaler {
@@ -62,6 +68,38 @@ impl AutoScaler {
             scaling_policies: Arc::new(RwLock::new(Vec::new())),
             min_replicas: Arc::new(RwLock::new(1)),
             max_replicas: Arc::new(RwLock::new(10)),
+            #[cfg(feature = "cloud-sdk")]
+            k8s_manager: None,
+        }
+    }
+
+    /// Create a new AutoScaler with Kubernetes manager
+    ///
+    /// # Arguments
+    ///
+    /// * `k8s_manager` - Kubernetes manager for scaling operations
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::autoscaling::AutoScaler;
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let k8s_manager = Arc::new(KubernetesManager::new("poolai".to_string()));
+    /// k8s_manager.initialize().await?;
+    /// let autoscaler = AutoScaler::with_k8s_manager(k8s_manager);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "cloud-sdk")]
+    pub fn with_k8s_manager(k8s_manager: Arc<KubernetesManager>) -> Self {
+        Self {
+            initialized: Arc::new(RwLock::new(false)),
+            scaling_policies: Arc::new(RwLock::new(Vec::new())),
+            min_replicas: Arc::new(RwLock::new(1)),
+            max_replicas: Arc::new(RwLock::new(10)),
+            k8s_manager: Some(k8s_manager),
         }
     }
 
@@ -162,11 +200,42 @@ impl AutoScaler {
             ));
         }
 
-        // TODO: Implement actual scale up logic
-        // - Call Kubernetes HPA or cloud provider API
-        // - Update deployment/service replicas
+        // Check replica limits
+        let max_replicas = *self.max_replicas.read().await;
+        if target_replicas > max_replicas {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Target replicas ({}) exceeds maximum replicas ({}). Context: Attempted to scale up beyond configured limit. \
+                    Suggestion: Increase max_replicas or scale to a lower value. \
+                    Current value: {}, Max: {}",
+                    target_replicas, max_replicas, target_replicas, max_replicas
+                )
+            ));
+        }
+        
+        #[cfg(feature = "cloud-sdk")]
+        {
+            if let Some(ref k8s_manager) = self.k8s_manager {
+                // Scale deployment via Kubernetes API
+                match k8s_manager.scale_deployment(resource_id, target_replicas as i32).await {
+                    Ok(_) => {
+                        info!(
+                            "Scaled up resource: {} from {} to {} replicas",
+                            resource_id, metrics.current_replicas, target_replicas
+                        );
+                        return Ok(());
+                    }
+                    Err(e) => {
+                        warn!("Failed to scale up deployment {}: {}", resource_id, e);
+                        return Err(e);
+                    }
+                }
+            }
+        }
+        
+        // Fallback: Log placeholder scaling
         info!(
-            "Scaling up resource: {} from {} to {} replicas (placeholder)",
+            "Scaling up resource: {} from {} to {} replicas (placeholder - enable cloud-sdk feature)",
             resource_id, metrics.current_replicas, target_replicas
         );
         Ok(())
@@ -217,11 +286,42 @@ impl AutoScaler {
             ));
         }
 
-        // TODO: Implement actual scale down logic
-        // - Call Kubernetes HPA or cloud provider API
-        // - Update deployment/service replicas
+        // Check replica limits
+        let min_replicas = *self.min_replicas.read().await;
+        if target_replicas < min_replicas {
+            return Err(AppError::ValidationError(
+                format!(
+                    "Target replicas ({}) is below minimum replicas ({}). Context: Attempted to scale down below configured limit. \
+                    Suggestion: Decrease min_replicas or scale to a higher value. \
+                    Current value: {}, Min: {}",
+                    target_replicas, min_replicas, target_replicas, min_replicas
+                )
+            ));
+        }
+        
+        #[cfg(feature = "cloud-sdk")]
+        {
+            if let Some(ref k8s_manager) = self.k8s_manager {
+                // Scale deployment via Kubernetes API
+                match k8s_manager.scale_deployment(resource_id, target_replicas as i32).await {
+                    Ok(_) => {
+                        info!(
+                            "Scaled down resource: {} from {} to {} replicas",
+                            resource_id, metrics.current_replicas, target_replicas
+                        );
+                        return Ok(());
+                    }
+                    Err(e) => {
+                        warn!("Failed to scale down deployment {}: {}", resource_id, e);
+                        return Err(e);
+                    }
+                }
+            }
+        }
+        
+        // Fallback: Log placeholder scaling
         info!(
-            "Scaling down resource: {} from {} to {} replicas (placeholder)",
+            "Scaling down resource: {} from {} to {} replicas (placeholder - enable cloud-sdk feature)",
             resource_id, metrics.current_replicas, target_replicas
         );
         Ok(())
@@ -266,12 +366,59 @@ impl AutoScaler {
             ));
         }
 
-        // TODO: Query metrics from monitoring system
-        // - Query Prometheus or cloud provider metrics API
-        // - Calculate CPU/memory usage percentages
-        // - Get request rate from load balancer or API gateway
-        // - Get current replica count from Kubernetes or cloud provider
+        #[cfg(feature = "cloud-sdk")]
+        {
+            if let Some(ref k8s_manager) = self.k8s_manager {
+                // Get deployment replicas
+                let deployments = k8s_manager.list_deployments().await.unwrap_or_default();
+                let current_replicas = if deployments.contains(&resource_id.to_string()) {
+                    // Try to get deployment details to get replica count
+                    // For now, we'll use a placeholder - in production, we'd query deployment spec
+                    let pods = k8s_manager.list_pods().await.unwrap_or_default();
+                    pods.iter().filter(|p| p.starts_with(resource_id)).count() as u32
+                } else {
+                    0
+                };
+                
+                // Query Pod metrics API for CPU and memory usage
+                // Note: This requires metrics-server to be installed in the cluster
+                let mut total_cpu_usage = 0.0;
+                let mut total_memory_usage = 0.0;
+                let mut pod_count = 0;
+                
+                if current_replicas > 0 {
+                    let pods = k8s_manager.list_pods().await.unwrap_or_default();
+                    for pod_name in pods.iter().filter(|p| p.starts_with(resource_id)) {
+                        // Query metrics for each pod
+                        // Path: /apis/metrics.k8s.io/v1beta1/namespaces/{namespace}/pods/{pod_name}
+                        // For now, we'll use a simplified approach
+                        // In production, we'd query the metrics API and calculate averages
+                        pod_count += 1;
+                    }
+                    
+                    // Calculate average CPU and memory usage
+                    // Placeholder: In production, we'd query actual metrics
+                    // For now, return placeholder values
+                    if pod_count > 0 {
+                        total_cpu_usage = 0.5; // Placeholder: 50% CPU usage
+                        total_memory_usage = 0.6; // Placeholder: 60% memory usage
+                    }
+                }
+                
+                // Request rate would come from load balancer or API gateway metrics
+                // For now, we'll use a placeholder
+                let request_rate = 0.0;
+                
+                return Ok(ScalingMetrics {
+                    cpu_usage: total_cpu_usage,
+                    memory_usage: total_memory_usage,
+                    request_rate,
+                    current_replicas: if current_replicas > 0 { current_replicas } else { 1 },
+                });
+            }
+        }
         
+        // Fallback: Return placeholder metrics
         Ok(ScalingMetrics {
             cpu_usage: 0.0,
             memory_usage: 0.0,

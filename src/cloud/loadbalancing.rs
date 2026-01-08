@@ -46,7 +46,11 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::info;
+use tokio::time::{timeout, Duration};
+use tracing::{info, warn};
+
+#[cfg(feature = "cloud-sdk")]
+use crate::cloud::kubernetes::KubernetesManager;
 
 /// Load balancing strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -76,12 +80,24 @@ pub struct HealthCheckConfig {
     pub path: Option<String>,
 }
 
+/// Backend health status
+#[derive(Debug, Clone)]
+struct BackendHealth {
+    healthy: bool,
+    consecutive_failures: u32,
+    last_check: Option<std::time::Instant>,
+}
+
 /// Load balancer for distributing traffic
 pub struct LoadBalancer {
     initialized: Arc<RwLock<bool>>,
     backends: Arc<RwLock<HashMap<String, Backend>>>,
+    backend_health: Arc<RwLock<HashMap<String, BackendHealth>>>,
     strategy: Arc<RwLock<LoadBalancingStrategy>>,
     health_check_config: Arc<RwLock<HealthCheckConfig>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Kubernetes manager for health checks
+    k8s_manager: Option<Arc<KubernetesManager>>,
 }
 
 impl LoadBalancer {
@@ -98,6 +114,7 @@ impl LoadBalancer {
         Self {
             initialized: Arc::new(RwLock::new(false)),
             backends: Arc::new(RwLock::new(HashMap::new())),
+            backend_health: Arc::new(RwLock::new(HashMap::new())),
             strategy: Arc::new(RwLock::new(LoadBalancingStrategy::RoundRobin)),
             health_check_config: Arc::new(RwLock::new(HealthCheckConfig {
                 interval_secs: 10,
@@ -106,6 +123,45 @@ impl LoadBalancer {
                 success_threshold: 2,
                 path: Some("/health".to_string()),
             })),
+            #[cfg(feature = "cloud-sdk")]
+            k8s_manager: None,
+        }
+    }
+
+    /// Create a new LoadBalancer with Kubernetes manager
+    ///
+    /// # Arguments
+    ///
+    /// * `k8s_manager` - Kubernetes manager for health checks
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::loadbalancing::LoadBalancer;
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let k8s_manager = Arc::new(KubernetesManager::new("poolai".to_string()));
+    /// k8s_manager.initialize().await?;
+    /// let loadbalancer = LoadBalancer::with_k8s_manager(k8s_manager);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "cloud-sdk")]
+    pub fn with_k8s_manager(k8s_manager: Arc<KubernetesManager>) -> Self {
+        Self {
+            initialized: Arc::new(RwLock::new(false)),
+            backends: Arc::new(RwLock::new(HashMap::new())),
+            backend_health: Arc::new(RwLock::new(HashMap::new())),
+            strategy: Arc::new(RwLock::new(LoadBalancingStrategy::RoundRobin)),
+            health_check_config: Arc::new(RwLock::new(HealthCheckConfig {
+                interval_secs: 10,
+                timeout_secs: 5,
+                failure_threshold: 3,
+                success_threshold: 2,
+                path: Some("/health".to_string()),
+            })),
+            k8s_manager: Some(k8s_manager),
         }
     }
 
@@ -284,20 +340,91 @@ impl LoadBalancer {
         let backends = self.backends.read().await;
         let total = backends.len() as u32;
         
-        // TODO: Perform actual health checks
-        // - Send HTTP/HTTPS/TCP health check requests to each backend
-        // - Track consecutive failures per backend
-        // - Mark backends as unhealthy after threshold failures
-        // - Return actual health status
-        // For now, assume all backends are healthy
-        let healthy = total;
-        let unhealthy = 0;
+        let health_config = self.health_check_config.read().await;
+        let mut healthy = 0;
+        let mut unhealthy = 0;
+        
+        // Perform health checks for each backend
+        for (backend_id, backend) in backends.iter() {
+            let is_healthy = self.check_backend_health(backend, &health_config).await;
+            
+            // Update health status
+            let mut backend_health_map = self.backend_health.write().await;
+            let health = backend_health_map.entry(backend_id.clone()).or_insert_with(|| BackendHealth {
+                healthy: true,
+                consecutive_failures: 0,
+                last_check: None,
+            });
+            
+            if is_healthy {
+                if !health.healthy {
+                    // Backend recovered
+                    health.consecutive_failures = 0;
+                    health.healthy = true;
+                }
+                healthy += 1;
+            } else {
+                health.consecutive_failures += 1;
+                if health.consecutive_failures >= health_config.failure_threshold {
+                    health.healthy = false;
+                    unhealthy += 1;
+                } else {
+                    // Not yet marked as unhealthy, but failing
+                    healthy += 1;
+                }
+            }
+            health.last_check = Some(std::time::Instant::now());
+        }
+        
+        drop(health_config);
 
         Ok(LoadBalancerHealth {
             healthy_backends: healthy,
             unhealthy_backends: unhealthy,
             total_backends: total,
         })
+    }
+    
+    /// Check health of a single backend
+    async fn check_backend_health(&self, backend: &Backend, config: &HealthCheckConfig) -> bool {
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Try Kubernetes pod health check first
+            if let Some(ref k8s_manager) = self.k8s_manager {
+                // Check if backend is a Kubernetes pod
+                if let Ok(pod_status) = k8s_manager.get_pod_status(&backend.id).await {
+                    if pod_status.ready && pod_status.phase == "Running" {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        // Fallback: HTTP health check
+        #[cfg(feature = "cloud-sdk")]
+        {
+            if let Some(ref path) = config.path {
+                let url = format!("http://{}:{}{}", backend.address, backend.port, path);
+                let client = reqwest::Client::builder()
+                    .timeout(Duration::from_secs(config.timeout_secs))
+                    .build();
+                
+                if let Ok(client) = client {
+                    if let Ok(result) = timeout(
+                        Duration::from_secs(config.timeout_secs),
+                        client.get(&url).send()
+                    ).await {
+                        if let Ok(response) = result {
+                            return response.status().is_success();
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If no health check path configured, assume healthy
+        // (for TCP-only backends)
+        true
     }
 
     /// List all registered backends

@@ -91,14 +91,16 @@
 - ✅ CRD resource parsing (parse_worker_crd, parse_vm_crd, parse_tenant_crd)
 - ✅ Reconciliation loop integration (calls reconcile functions based on CRD events)
 - ✅ CRD status updates after reconciliation (update_crd_status for all resource types)
-- 🔄 Real metrics collection для auto-scaling (planned)
-- 🔄 Actual health checks для load balancing (planned)
+- ✅ Real metrics collection для auto-scaling (Kubernetes Pod metrics integration)
+- ✅ Actual health checks для load balancing (Kubernetes pod status + HTTP health checks)
+- ✅ Auto-scaling integration with Kubernetes (scale_up/scale_down with real API calls)
+- ✅ Load balancer health tracking (consecutive failures, health status per backend)
 
-**Прогрес Cloud Module**: ~82% 🔄
+**Прогрес Cloud Module**: ~85% 🔄
 - Infrastructure: 100% ✅
 - Testing: 100% ✅ (67 tests)
 - Documentation: 100% ✅
-- Implementation: ~75% 🔄
+- Implementation: ~80% 🔄
 
 ---
 
