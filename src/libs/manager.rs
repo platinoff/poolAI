@@ -55,7 +55,12 @@ impl LibraryManager {
             tokio::fs::create_dir_all(&self.base_path)
                 .await
                 .map_err(|e| {
-                    AppError::ConfigError(format!("Failed to create library directory: {}", e))
+                    AppError::ConfigError(format!(
+                        "Failed to create library directory. Context: Cannot create base library directory. \
+                        Suggestion: Check filesystem permissions and ensure parent directory exists. \
+                        Path: '{}', Error: {}",
+                        self.base_path.display(), e
+                    ))
                 })?;
         }
 
@@ -112,7 +117,12 @@ impl LibraryManager {
         }
 
         let mut entries = tokio::fs::read_dir(&self.base_path).await.map_err(|e| {
-            AppError::ConfigError(format!("Failed to read library directory: {}", e))
+            AppError::ConfigError(format!(
+                "Failed to read library directory. Context: Cannot scan library directory for metadata. \
+                Suggestion: Check filesystem permissions and ensure directory exists. \
+                Path: '{}', Error: {}",
+                self.base_path.display(), e
+            ))
         })?;
 
         let mut libraries = self.libraries.write().await;
@@ -120,7 +130,12 @@ impl LibraryManager {
         while let Some(entry) = entries
             .next_entry()
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to read directory entry: {}", e)))?
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to read directory entry. Context: Cannot read next entry while scanning library directory. \
+                Suggestion: Check filesystem permissions and verify directory integrity. \
+                Path: '{}', Error: {}",
+                self.base_path.display(), e
+            )))?
         {
             let path = entry.path();
             if path.is_dir() {
@@ -128,12 +143,22 @@ impl LibraryManager {
                 if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
                     // Look for version subdirectories
                     let mut version_dirs = tokio::fs::read_dir(&path).await.map_err(|e| {
-                        AppError::ConfigError(format!("Failed to read version directory: {}", e))
+                        AppError::ConfigError(format!(
+                            "Failed to read version directory. Context: Cannot scan library version directory. \
+                            Suggestion: Check filesystem permissions and verify library directory structure. \
+                            Library: '{}', Path: '{}', Error: {}",
+                            name, path.display(), e
+                        ))
                     })?;
 
                     while let Some(version_entry) =
                         version_dirs.next_entry().await.map_err(|e| {
-                            AppError::ConfigError(format!("Failed to read version entry: {}", e))
+                            AppError::ConfigError(format!(
+                                "Failed to read version entry. Context: Cannot read next entry in version directory. \
+                                Suggestion: Check filesystem permissions and verify library version directory structure. \
+                                Library: '{}', Path: '{}', Error: {}",
+                                name, path.display(), e
+                            ))
                         })?
                     {
                         let version_path = version_entry.path();
@@ -294,7 +319,12 @@ impl LibraryManager {
         tokio::fs::create_dir_all(&library_parent)
             .await
             .map_err(|e| {
-                AppError::ConfigError(format!("Failed to create library directory: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to create library directory. Context: Cannot create library version directory during installation. \
+                    Suggestion: Check filesystem permissions and ensure parent directory exists. \
+                    Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                    name, version, library_parent.display(), e
+                ))
             })?;
 
         // Get download URL from registry
@@ -304,12 +334,22 @@ impl LibraryManager {
             // Production-min atomic install: download+extract to temp, then rename into place.
             let tmp_root = self.base_path.join(".tmp");
             tokio::fs::create_dir_all(&tmp_root).await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to create temp directory: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to create temp directory. Context: Cannot create temporary directory for library installation. \
+                    Suggestion: Check filesystem permissions and ensure base library directory is writable. \
+                    Path: '{}', Error: {}",
+                    tmp_root.display(), e
+                ))
             })?;
 
             let session_dir = tmp_root.join(format!("{}-{}-{}", name, version, Uuid::new_v4()));
             tokio::fs::create_dir_all(&session_dir).await.map_err(|e| {
-                AppError::ConfigError(format!("Failed to create temp session directory: {}", e))
+                AppError::ConfigError(format!(
+                    "Failed to create temp session directory. Context: Cannot create temporary session directory for library extraction. \
+                    Suggestion: Check filesystem permissions and ensure temp directory is writable. \
+                    Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                    name, version, session_dir.display(), e
+                ))
             })?;
 
             let archive_path = session_dir.join("archive");
@@ -341,7 +381,12 @@ impl LibraryManager {
 
                 // Read archive bytes
                 let artifact_bytes = tokio::fs::read(&artifact_archive).await.map_err(|e| {
-                    AppError::ConfigError(format!("Failed to read artifact archive: {}", e))
+                    AppError::ConfigError(format!(
+                        "Failed to read artifact archive. Context: Cannot read downloaded archive file for RAID storage. \
+                        Suggestion: Check filesystem permissions and verify archive file integrity. \
+                        Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                        name, version, artifact_archive.display(), e
+                    ))
                 })?;
 
                 // Store in RAID
@@ -365,7 +410,12 @@ impl LibraryManager {
             tokio::fs::rename(&extract_dir, &library_dir)
                 .await
                 .map_err(|e| {
-                    AppError::ConfigError(format!("Failed to finalize install (rename): {}", e))
+                    AppError::ConfigError(format!(
+                        "Failed to finalize install (rename). Context: Cannot rename extracted directory to final library location. \
+                        Suggestion: Check filesystem permissions, ensure target directory doesn't exist, and verify both paths are on the same filesystem. \
+                        Library: '{}', Version: '{}', From: '{}', To: '{}', Error: {}",
+                        name, version, extract_dir.display(), library_dir.display(), e
+                    ))
                 })?;
 
             // Cleanup temp session (archive + empty session dir)
@@ -427,7 +477,12 @@ impl LibraryManager {
 
                 for entry in entries {
                     let entry = entry.map_err(|e| {
-                        AppError::ConfigError(format!("Failed to read directory entry: {}", e))
+                        AppError::ConfigError(format!(
+                            "Failed to read directory entry. Context: Cannot read entry while creating artifact archive. \
+                            Suggestion: Check filesystem permissions and verify source directory integrity. \
+                            Directory: '{}', Error: {}",
+                            dir.display(), e
+                        ))
                     })?;
                     let path = entry.path();
                     let relative_path = path.strip_prefix(base).map_err(|e| {
@@ -505,13 +560,23 @@ impl LibraryManager {
 
         let mut found = false;
         let mut entries = tokio::fs::read_dir(library_dir).await.map_err(|e| {
-            AppError::ConfigError(format!("Failed to read library directory: {}", e))
+            AppError::ConfigError(format!(
+                "Failed to read library directory. Context: Cannot scan library directory during installation verification. \
+                Suggestion: Check filesystem permissions and ensure library directory exists. \
+                Library: '{}', Path: '{}', Error: {}",
+                name, library_dir.display(), e
+            ))
         })?;
 
         while let Some(entry) = entries
             .next_entry()
             .await
-            .map_err(|e| AppError::ConfigError(format!("Failed to read directory entry: {}", e)))?
+            .map_err(|e| AppError::ConfigError(format!(
+                "Failed to read directory entry. Context: Cannot read next entry while verifying library installation. \
+                Suggestion: Check filesystem permissions and verify directory integrity. \
+                Library: '{}', Path: '{}', Error: {}",
+                name, library_dir.display(), e
+            )))?
         {
             let file_name = entry.file_name();
             let file_name_str = file_name.to_string_lossy();

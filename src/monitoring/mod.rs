@@ -288,8 +288,10 @@ impl Monitoring {
             Ok(())
         } else {
             Err(AppError::MonitoringError(format!(
-                "Alert '{}' not found",
-                alert_id
+                "Alert '{}' not found. Context: Cannot resolve alert that doesn't exist. \
+                Suggestion: Check alert ID spelling or verify alert exists using get_active_alerts(). \
+                Current alert ID: '{}'",
+                alert_id, alert_id
             )))
         }
     }
@@ -403,7 +405,11 @@ pub async fn initialize() -> Result<(), AppError> {
     // Store global instance
     GLOBAL_MONITORING
         .set(monitoring_arc.clone())
-        .map_err(|_| AppError::MonitoringError("Monitoring already initialized".to_string()))?;
+        .map_err(|_| AppError::MonitoringError(
+            "Monitoring already initialized. Context: Attempted to initialize monitoring module twice. \
+            Suggestion: Ensure initialize() is called only once at application startup. \
+            Note: Monitoring module uses OnceLock for thread-safe single initialization.".to_string()
+        ))?;
 
     // Start background monitoring
     monitoring_arc.start_monitoring().await?;
@@ -431,7 +437,9 @@ pub async fn health_check() -> Result<(), AppError> {
     // Check if global monitoring exists
     if GLOBAL_MONITORING.get().is_none() {
         return Err(AppError::MonitoringError(
-            "Global monitoring not initialized".to_string(),
+            "Monitoring not initialized. Context: Attempted to use monitoring functionality before initialization. \
+            Suggestion: Call monitoring::initialize() before using monitoring functions. \
+            Note: This should be called once at application startup.".to_string()
         ));
     }
 

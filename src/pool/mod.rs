@@ -105,6 +105,8 @@ impl Pool {
 
     pub async fn remove_worker(&self, worker_id: &str) -> Result<(), AppError> {
         let mut workers = self.workers.write().await;
+        let current_worker_count = workers.len();
+        
         if workers.remove(worker_id).is_some() {
             // Update metrics
             let mut metrics = self.metrics.write().await;
@@ -117,8 +119,10 @@ impl Pool {
             Ok(())
         } else {
             Err(AppError::PoolError(format!(
-                "Worker '{}' not found",
-                worker_id
+                "Worker '{}' not found. Context: Attempted to stop a worker that doesn't exist in the pool. \
+                Suggestion: Verify worker_id using list_workers() or get_worker_metrics(). \
+                Current worker_id: '{}', Active workers: {}",
+                worker_id, worker_id, current_worker_count
             )))
         }
     }
