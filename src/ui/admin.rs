@@ -860,7 +860,16 @@ fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
   </div>
   
   <script>{common_js}</script>
-  <script>{script}</script>
+  <script>
+    // Check admin access on page load
+    (function() {{
+      if (!requireAdmin()) {{
+        return;
+      }}
+      // Initialize admin panel
+      {script}
+    }})();
+  </script>
 </body>
 </html>"#,
         title = title,

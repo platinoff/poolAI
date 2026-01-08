@@ -7,7 +7,18 @@ const API_BASE = '/api/v1';
 const ENTERPRISE_API_BASE = '/api/enterprise';
 
 // Utility functions
+// Compatible with main UI module storage format
 function getUser() {
+  // Try new format first (poolai_user, poolai_role)
+  const username = localStorage.getItem('poolai_user');
+  const role = localStorage.getItem('poolai_role');
+  const token = localStorage.getItem('poolai_token');
+  
+  if (username && role) {
+    return { username, role, token };
+  }
+  
+  // Fallback to old format (user JSON)
   const userStr = localStorage.getItem('user');
   if (!userStr) return null;
   try {
@@ -18,19 +29,40 @@ function getUser() {
 }
 
 function setUser(user) {
-  localStorage.setItem('user', JSON.stringify(user));
+  if (typeof user === 'string') {
+    // Legacy format: setUser(username, role) - called from login
+    const role = arguments[1] || 'Viewer';
+    localStorage.setItem('poolai_user', user);
+    localStorage.setItem('poolai_role', role);
+  } else if (user && typeof user === 'object') {
+    // New format: setUser({username, role, token})
+    if (user.username) localStorage.setItem('poolai_user', user.username);
+    if (user.role) localStorage.setItem('poolai_role', user.role);
+    if (user.token) localStorage.setItem('poolai_token', user.token);
+    // Also store in old format for compatibility
+    localStorage.setItem('user', JSON.stringify(user));
+  }
 }
 
 function clearUser() {
   localStorage.removeItem('user');
+  localStorage.removeItem('poolai_user');
+  localStorage.removeItem('poolai_role');
+  localStorage.removeItem('poolai_token');
+  localStorage.removeItem('poolai_token_exp');
 }
 
 function isAdmin() {
   const user = getUser();
-  return user && user.role === 'Admin';
+  return user && (user.role === 'Admin' || user.role === 'admin');
 }
 
 function requireAdmin() {
+  const user = getUser();
+  if (!user) {
+    window.location.href = '/ui/auth';
+    return false;
+  }
   if (!isAdmin()) {
     alert('Admin access required');
     window.location.href = '/ui/auth';
@@ -42,19 +74,27 @@ function requireAdmin() {
 // API helpers
 async function fetchJson(url, options = {}) {
   const user = getUser();
+  const token = user?.token || localStorage.getItem('poolai_token');
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
   
-  if (user && user.token) {
-    headers['Authorization'] = `Bearer ${user.token}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
   
   const response = await fetch(url, {
     ...options,
     headers,
   });
+  
+  if (response.status === 401) {
+    // Unauthorized - redirect to login
+    clearUser();
+    window.location.href = '/ui/auth';
+    throw new Error('Unauthorized');
+  }
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: response.statusText }));
