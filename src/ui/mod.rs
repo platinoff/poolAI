@@ -60,7 +60,7 @@ impl UiManager {
 }
 
 pub fn create_ui_routes() -> Router {
-    let mut router = Router::new()
+    let router = Router::new()
         .route("/", get(home_handler))
         .route("/auth", get(login_page))
         .route("/login", get(login_page))
@@ -75,10 +75,12 @@ pub fn create_ui_routes() -> Router {
     // Add admin routes if enterprise feature is enabled
     #[cfg(feature = "enterprise")]
     {
-        router = router.merge(create_admin_routes());
+        router.merge(create_admin_routes())
     }
-    
-    router
+    #[cfg(not(feature = "enterprise"))]
+    {
+        router
+    }
 }
 
 const BASE_CSS: &str = r#"

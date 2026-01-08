@@ -34,17 +34,23 @@ use axum_server::tls_rustls::RustlsConfig;
 /// HTTPS support requires feature "https" and valid certificates.
 /// Configuration is read from PoolAIConfig.
 pub async fn start_server(addr: SocketAddr) {
-    let mut app = Router::new()
-        // Trailing-slash compat for UI entrypoint.
-        .route("/ui/", get(|| async { Redirect::permanent("/ui") }))
-        .nest("/api/v1", api::create_api_routes())
-        .nest("/ui", ui::create_ui_routes());
-    
-    // Add enterprise API routes if feature is enabled
-    #[cfg(feature = "enterprise")]
-    {
-        app = app.nest("/api/enterprise", enterprise_api::create_enterprise_api_routes());
-    }
+    let app = {
+        let mut router = Router::new()
+            // Trailing-slash compat for UI entrypoint.
+            .route("/ui/", get(|| async { Redirect::permanent("/ui") }))
+            .nest("/api/v1", api::create_api_routes())
+            .nest("/ui", ui::create_ui_routes());
+        
+        // Add enterprise API routes if feature is enabled
+        #[cfg(feature = "enterprise")]
+        {
+            router.nest("/api/enterprise", enterprise_api::create_enterprise_api_routes())
+        }
+        #[cfg(not(feature = "enterprise"))]
+        {
+            router
+        }
+    };
 
     // Read HTTPS configuration from config file
     // HTTPS support is optional and requires feature "https"
