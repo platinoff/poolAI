@@ -1004,12 +1004,34 @@ impl PoolAIOperator {
         }
         
         // Update CRD status with deployment status
+        // Get actual deployment status if deployment exists
+        let deployment_ready = if deployment_exists {
+            match k8s_manager.get_deployment_status(deployment_name).await {
+                Ok(deployment_status) => deployment_status.ready,
+                Err(e) => {
+                    warn!("Failed to get deployment status for {}: {}", deployment_name, e);
+                    true // Assume ready if we can't check
+                }
+            }
+        } else {
+            false // Not ready if deployment doesn't exist yet
+        };
+        
         let status = json!({
             "conditions": [{
                 "type": "Ready",
-                "status": if deployment_exists { "True" } else { "True" },
-                "reason": if deployment_exists { "DeploymentUpdated" } else { "DeploymentCreated" },
-                "message": format!("Worker deployment {} {}", deployment_name, if deployment_exists { "updated" } else { "created" })
+                "status": if deployment_ready { "True" } else { "False" },
+                "reason": if deployment_exists { 
+                    if deployment_ready { "DeploymentReady" } else { "DeploymentNotReady" }
+                } else { 
+                    "DeploymentCreated" 
+                },
+                "message": format!("Worker deployment {} {}", deployment_name, 
+                    if deployment_exists { 
+                        if deployment_ready { "is ready" } else { "is not ready yet" }
+                    } else { 
+                        "created" 
+                    })
             }],
             "deploymentName": deployment_name,
             "serviceName": service_name
@@ -1145,12 +1167,34 @@ impl PoolAIOperator {
         }
         
         // Update CRD status with deployment status
+        // Get actual deployment status if deployment exists
+        let deployment_ready = if deployment_exists {
+            match k8s_manager.get_deployment_status(deployment_name).await {
+                Ok(deployment_status) => deployment_status.ready,
+                Err(e) => {
+                    warn!("Failed to get deployment status for {}: {}", deployment_name, e);
+                    true // Assume ready if we can't check
+                }
+            }
+        } else {
+            false // Not ready if deployment doesn't exist yet
+        };
+        
         let status = json!({
             "conditions": [{
                 "type": "Ready",
-                "status": if deployment_exists { "True" } else { "True" },
-                "reason": if deployment_exists { "DeploymentUpdated" } else { "DeploymentCreated" },
-                "message": format!("VM deployment {} {}", deployment_name, if deployment_exists { "updated" } else { "created" })
+                "status": if deployment_ready { "True" } else { "False" },
+                "reason": if deployment_exists { 
+                    if deployment_ready { "DeploymentReady" } else { "DeploymentNotReady" }
+                } else { 
+                    "DeploymentCreated" 
+                },
+                "message": format!("VM deployment {} {}", deployment_name, 
+                    if deployment_exists { 
+                        if deployment_ready { "is ready" } else { "is not ready yet" }
+                    } else { 
+                        "created" 
+                    })
             }],
             "deploymentName": deployment_name,
             "pvcName": pvc_name
