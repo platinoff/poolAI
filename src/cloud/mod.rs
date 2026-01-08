@@ -79,6 +79,7 @@ pub mod kubernetes;
 pub mod providers;
 pub mod autoscaling;
 pub mod loadbalancing;
+pub mod operator;
 
 use crate::core::error::AppError;
 use std::sync::Arc;
