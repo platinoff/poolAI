@@ -129,7 +129,7 @@ impl ModelInterface for MockModel {
 
 #[tokio::test]
 async fn test_model_manager_creation() {
-    let config = ModelConfig {
+    let config = ConfigModelConfig {
         name: "test-model".to_string(),
         path: "./models/test".to_string(),
         max_batch_size: 1,
@@ -224,7 +224,7 @@ async fn test_process_request() {
 
 #[tokio::test]
 async fn test_process_request_nonexistent_model() {
-    let config = ModelConfig {
+    let config = ConfigModelConfig {
         name: "test-model".to_string(),
         path: "./models/test".to_string(),
         max_batch_size: 1,
