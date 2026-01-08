@@ -173,7 +173,7 @@ impl HealthMonitor {
                         entry.failure_count += 1;
                         let reason = format!(
                             "Health check failed. Context: Process health check returned error. Suggestion: Verify process is running, check resource usage, and review process logs. Process: '{}', Error: {}",
-                            process_name,
+                            entry.name,
                             e
                         );
                         entry.status = HealthStatus::Unhealthy(reason.clone());
