@@ -52,6 +52,9 @@ use tracing::{info, warn};
 pub struct PoolAIOperator {
     namespace: String,
     running: Arc<RwLock<bool>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Kubernetes manager for API operations
+    k8s_manager: Option<Arc<crate::cloud::kubernetes::KubernetesManager>>,
 }
 
 impl PoolAIOperator {
@@ -70,8 +73,10 @@ impl PoolAIOperator {
     /// ```
     pub fn new(namespace: String) -> Self {
         Self {
-            namespace,
+            namespace: namespace.clone(),
             running: Arc::new(RwLock::new(false)),
+            #[cfg(feature = "cloud-sdk")]
+            k8s_manager: Some(Arc::new(crate::cloud::kubernetes::KubernetesManager::new(namespace))),
         }
     }
 
@@ -119,11 +124,37 @@ impl PoolAIOperator {
             ));
         }
 
-        // TODO: Implement operator logic
-        // 1. Verify CRDs are installed
-        // 2. Initialize watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
-        // 3. Start reconciliation loops
-        // 4. Handle resource events (create, update, delete)
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Initialize Kubernetes manager if not already initialized
+            if let Some(ref k8s_manager) = self.k8s_manager {
+                k8s_manager.initialize().await.map_err(|e| AppError::InitializationError(format!(
+                    "Failed to initialize Kubernetes manager for operator. Context: Cannot start operator without Kubernetes access. \
+                    Suggestion: Check kubeconfig and cluster connectivity. \
+                    Error: {}",
+                    e
+                )))?;
+            }
+            
+            // Verify CRDs are installed (check if we can list CRDs)
+            // TODO: Implement CRD verification
+            // For now, we'll assume CRDs are installed
+            
+            // Initialize watchers for PoolAIWorker, PoolAIVM, PoolAITenant CRDs
+            // TODO: Implement watchers with k8s-openapi or HTTP polling
+            // For now, this is a placeholder structure
+            
+            // Start reconciliation loops
+            // TODO: Implement reconciliation loops
+            // - Watch for CRD changes
+            // - Reconcile desired state vs actual state
+            // - Handle create, update, delete events
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            warn!("Operator started without cloud-sdk feature - CRD watching disabled");
+        }
 
         info!("PoolAI Kubernetes operator started for namespace: {}", self.namespace);
         *running = true;
@@ -155,7 +186,16 @@ impl PoolAIOperator {
 
         info!("Stopping PoolAI Kubernetes operator...");
 
-        // TODO: Stop watchers and reconciliation loops
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Stop watchers and reconciliation loops
+            // TODO: Implement graceful shutdown of watchers
+            
+            // Shutdown Kubernetes manager
+            if let Some(ref k8s_manager) = self.k8s_manager {
+                let _ = k8s_manager.shutdown().await;
+            }
+        }
 
         *running = false;
         info!("PoolAI Kubernetes operator stopped");
