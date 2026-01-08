@@ -144,7 +144,7 @@
 
 ## 🚀 Next Phase: Stage 4.3
 
-### **Stage 4.3: Cloud Integration** - IN PROGRESS 🔄 (Infrastructure 100% ✅, Error Handling Enhanced ✅, Documentation Enhanced ✅)
+### **Stage 4.3: Cloud Integration** - IN PROGRESS 🔄 (Infrastructure 100% ✅, Error Handling Enhanced ✅, Documentation Enhanced ✅, CRD Definitions Created ✅)
 - ✅ **Module Structure** - Complete cloud module architecture created
 - ✅ **Kubernetes Support** - Infrastructure ready (operator, CRDs, service discovery placeholders)
 - ✅ **Cloud Providers** - AWS, Azure, GCP integration infrastructure ready
@@ -153,11 +153,13 @@
 - ✅ **Enhanced Error Handling** - Context and suggestions in all cloud submodules (Kubernetes, Auto-scaling, Load Balancing)
 - ✅ **Comprehensive Documentation** - Rustdoc documentation with usage examples for all cloud submodules
 - ✅ **SDK Dependencies** - k8s-openapi, Azure SDK added as optional features (cloud-sdk feature)
-- ✅ **Basic SDK Integration Structure** - Conditional compilation ready for k8s-openapi
+- ✅ **Kubernetes API Integration** - Real HTTP calls via reqwest (Deployments, Pods)
+- ✅ **Kubeconfig Loading** - Improved loading with file and in-cluster config support
+- ✅ **Kubernetes Operator Structure** - PoolAIOperator with CRD definitions
+- ✅ **CRD Definitions** - YAML files for PoolAIWorker, PoolAIVM, PoolAITenant with OpenAPI schema
 - ✅ **Unit Tests** - 66 comprehensive tests passing (8 integration + 8 config validation + 9 autoscaling + 12 loadbalancing + 10 kubernetes + 12 providers + 7 cloud integration)
-- 🔄 **SDK Integration Implementation** - Full implementation with cloud SDKs (infrastructure ready)
-- 🔄 **Kubernetes Operator** - Full operator implementation (planned)
-- 🔄 **CRD Definitions** - Custom Resource Definitions (planned)
+- 🔄 **Kubernetes Operator Implementation** - Watchers and reconciliation loops (planned)
+- 🔄 **Helm Charts** - Deployment templates (planned)
 - 🔄 **Helm Charts** - Deployment templates (planned)
 
 ### **Admin Panel** - COMPLETED ✅ 🎉
