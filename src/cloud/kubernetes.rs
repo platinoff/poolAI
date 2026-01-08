@@ -915,20 +915,41 @@ impl KubernetesManager {
     /// Check if Kubernetes cluster is available
     ///
     /// Returns `true` if the cluster is accessible, `false` otherwise.
-    /// This is a placeholder implementation that always returns `false`.
     ///
-    /// # Future Implementation
+    /// # Example
     ///
-    /// This will be enhanced to:
-    /// - Perform actual cluster connectivity check
-    /// - Verify API server accessibility
-    /// - Check authentication/authorization
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// if manager.is_cluster_available().await {
+    ///     println!("Cluster is accessible");
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn is_cluster_available(&self) -> bool {
-        // TODO: Implement actual cluster availability check
-        // - Ping API server
-        // - Check authentication
-        // - Verify namespace access
-        false
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Check cluster availability by querying API server version
+            let path = "/version";
+            match self.k8s_api_request("GET", path, None).await {
+                Ok(_) => {
+                    // Also verify namespace access
+                    let ns_path = format!("/api/v1/namespaces/{}", self.namespace);
+                    self.k8s_api_request("GET", &ns_path, None).await.is_ok()
+                }
+                Err(_) => false,
+            }
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            false
+        }
     }
 
     /// List all pods in the namespace
