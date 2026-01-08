@@ -68,9 +68,9 @@
 - ✅ CRD Definitions created (PoolAIWorker, PoolAIVM, PoolAITenant YAML files)
 - ✅ Enhanced operator module documentation with YAML examples
 - ✅ Integration tests for operator module (8 tests passing)
+- ✅ Helm Charts created (Chart.yaml, values.yaml, templates, README.md)
 - ⚠️ AWS SDK dependencies commented out (requires Rust 1.88+, current: 1.70+)
 - 🔄 Kubernetes Operator implementation (watchers, reconciliation loops - planned)
-- 🔄 Helm Charts (planned)
 
 ---
 
