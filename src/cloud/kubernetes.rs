@@ -618,9 +618,39 @@ impl KubernetesManager {
             ));
         }
 
-        // TODO: Implement Kubernetes VM deployment
-        info!("Creating VM deployment: {} (placeholder)", name);
-        Ok(format!("vm-{}", name))
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Build VM Deployment resource (similar to worker deployment but with storage)
+            let deployment = build_vm_deployment(
+                name,
+                &config.image,
+                &config.resources,
+                &config.storage,
+                &config.network,
+            )?;
+            
+            // Create deployment via Kubernetes API
+            let path = format!("/apis/apps/v1/namespaces/{}/deployments", self.namespace);
+            let response = self.k8s_api_request("POST", &path, Some(deployment)).await?;
+            
+            // Extract deployment name from response
+            let deployment_name = response
+                .get("metadata")
+                .and_then(|m| m.get("name"))
+                .and_then(|n| n.as_str())
+                .ok_or_else(|| AppError::NetworkError(
+                    "Deployment created but name is missing in response".to_string()
+                ))?;
+            
+            info!("Created VM deployment: {} in namespace {}", deployment_name, self.namespace);
+            Ok(deployment_name.to_string())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Creating VM deployment: {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(format!("vm-{}", name))
+        }
     }
 
     /// Get service endpoints for a resource
@@ -664,9 +694,61 @@ impl KubernetesManager {
             ));
         }
 
-        // TODO: Query Kubernetes API for service endpoints
-        info!("Getting service endpoints for: {} (placeholder)", resource_name);
-        Ok(vec![])
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Query service endpoints via Kubernetes API
+            let path = format!("/api/v1/namespaces/{}/services/{}", self.namespace, resource_name);
+            let service_json = self.k8s_api_request("GET", &path, None).await?;
+            
+            // Extract endpoints
+            let mut endpoints = Vec::new();
+            
+            // Get ClusterIP
+            if let Some(cluster_ip) = service_json
+                .get("spec")
+                .and_then(|s| s.get("clusterIP"))
+                .and_then(|ip| ip.as_str())
+            {
+                if cluster_ip != "None" {
+                    let port = service_json
+                        .get("spec")
+                        .and_then(|s| s.get("ports"))
+                        .and_then(|p| p.as_array())
+                        .and_then(|ports| ports.first())
+                        .and_then(|port| port.get("port"))
+                        .and_then(|p| p.as_u64())
+                        .unwrap_or(8080);
+                    
+                    endpoints.push(format!("{}:{}", cluster_ip, port));
+                }
+            }
+            
+            // Get LoadBalancer IPs
+            if let Some(ingress) = service_json
+                .get("status")
+                .and_then(|s| s.get("loadBalancer"))
+                .and_then(|lb| lb.get("ingress"))
+                .and_then(|i| i.as_array())
+            {
+                for ing in ingress {
+                    if let Some(ip) = ing.get("ip").and_then(|i| i.as_str()) {
+                        endpoints.push(ip.to_string());
+                    }
+                    if let Some(hostname) = ing.get("hostname").and_then(|h| h.as_str()) {
+                        endpoints.push(hostname.to_string());
+                    }
+                }
+            }
+            
+            info!("Found {} endpoints for service: {}", endpoints.len(), resource_name);
+            Ok(endpoints)
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Getting service endpoints for: {} (placeholder - enable cloud-sdk feature)", resource_name);
+            Ok(vec![])
+        }
     }
 
     /// Get status of a Kubernetes Pod
