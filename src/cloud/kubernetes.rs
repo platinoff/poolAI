@@ -1303,6 +1303,270 @@ impl KubernetesManager {
         // Placeholder implementation (when cloud-sdk feature is not enabled)
         Ok(vec![])
     }
+
+    /// List CRD resources from Kubernetes API
+    ///
+    /// # Arguments
+    ///
+    /// * `group` - API group (e.g., "poolai.io")
+    /// * `version` - API version (e.g., "v1")
+    /// * `plural` - Resource plural name (e.g., "poolaiworkers")
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let resources = manager.list_crd_resources("poolai.io", "v1", "poolaiworkers").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn list_crd_resources(
+        &self,
+        group: &str,
+        version: &str,
+        plural: &str,
+    ) -> Result<serde_json::Value, AppError> {
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/apis/{}/{}/namespaces/{}/{}", group, version, self.namespace, plural);
+            let resources = self.k8s_api_request("GET", &path, None).await?;
+            Ok(resources)
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Listing CRD resources {} (placeholder - enable cloud-sdk feature)", plural);
+            Ok(serde_json::json!({"items": []}))
+        }
+    }
+
+    /// Get a CRD resource from Kubernetes API
+    ///
+    /// # Arguments
+    ///
+    /// * `group` - API group (e.g., "poolai.io")
+    /// * `version` - API version (e.g., "v1")
+    /// * `plural` - Resource plural name (e.g., "poolaiworkers")
+    /// * `name` - Resource name
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Resource does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let resource = manager.get_crd_resource("poolai.io", "v1", "poolaiworkers", "my-worker").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn get_crd_resource(
+        &self,
+        group: &str,
+        version: &str,
+        plural: &str,
+        name: &str,
+    ) -> Result<serde_json::Value, AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "CRD resource name cannot be empty. Context: Attempted to get CRD resource with empty name. \
+                Suggestion: Provide a valid resource name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/apis/{}/{}/namespaces/{}/{}/{}", group, version, self.namespace, plural, name);
+            let resource = self.k8s_api_request("GET", &path, None).await?;
+            Ok(resource)
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Getting CRD resource {}/{} (placeholder - enable cloud-sdk feature)", plural, name);
+            Ok(serde_json::json!({}))
+        }
+    }
+
+    /// Update CRD status
+    ///
+    /// # Arguments
+    ///
+    /// * `group` - API group (e.g., "poolai.io")
+    /// * `version` - API version (e.g., "v1")
+    /// * `plural` - Resource plural name (e.g., "poolaiworkers")
+    /// * `name` - Resource name
+    /// * `status` - Status object to update
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Resource does not exist
+    /// - Kubernetes API is unreachable
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let status = serde_json::json!({
+    ///     "conditions": [{
+    ///         "type": "Ready",
+    ///         "status": "True"
+    ///     }]
+    /// });
+    /// manager.update_crd_status("poolai.io", "v1", "poolaiworkers", "my-worker", status).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn update_crd_status(
+        &self,
+        group: &str,
+        version: &str,
+        plural: &str,
+        name: &str,
+        status: serde_json::Value,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "CRD resource name cannot be empty. Context: Attempted to update CRD status with empty name. \
+                Suggestion: Provide a valid resource name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let path = format!("/apis/{}/{}/namespaces/{}/{}/{}/status", group, version, self.namespace, plural, name);
+            let patch_body = json!({
+                "status": status
+            });
+            let _response = self.k8s_api_request("PATCH", &path, Some(patch_body)).await?;
+            info!("Updated CRD status for {}/{} in namespace {}", plural, name, self.namespace);
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Updating CRD status for {}/{} (placeholder - enable cloud-sdk feature)", plural, name);
+            Ok(())
+        }
+    }
+
+    /// Create or update a ResourceQuota
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - ResourceQuota name
+    /// * `quotas` - Quota specifications (CPU, memory, storage, etc.)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Kubernetes API is unreachable
+    /// - Namespace does not exist
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let quotas = serde_json::json!({
+    ///     "hard": {
+    ///         "requests.cpu": "4",
+    ///         "requests.memory": "4Gi",
+    ///         "persistentvolumeclaims": "10"
+    ///     }
+    /// });
+    /// manager.create_or_update_resource_quota("tenant-abc", quotas).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn create_or_update_resource_quota(
+        &self,
+        name: &str,
+        quotas: serde_json::Value,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "ResourceQuota name cannot be empty. Context: Attempted to create ResourceQuota with empty name. \
+                Suggestion: Provide a valid ResourceQuota name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Check if ResourceQuota exists
+            let get_path = format!("/api/v1/namespaces/{}/resourcequotas/{}", self.namespace, name);
+            let exists = self.k8s_api_request("GET", &get_path, None).await.is_ok();
+            
+            let quota_body = json!({
+                "apiVersion": "v1",
+                "kind": "ResourceQuota",
+                "metadata": {
+                    "name": name,
+                    "namespace": self.namespace,
+                    "labels": {
+                        "managed-by": "poolai"
+                    }
+                },
+                "spec": quotas
+            });
+            
+            if exists {
+                // Update existing ResourceQuota
+                let path = format!("/api/v1/namespaces/{}/resourcequotas/{}", self.namespace, name);
+                let _response = self.k8s_api_request("PATCH", &path, Some(json!({
+                    "spec": quotas
+                }))).await?;
+                info!("Updated ResourceQuota {} in namespace {}", name, self.namespace);
+            } else {
+                // Create new ResourceQuota
+                let path = format!("/api/v1/namespaces/{}/resourcequotas", self.namespace);
+                let _response = self.k8s_api_request("POST", &path, Some(quota_body)).await?;
+                info!("Created ResourceQuota {} in namespace {}", name, self.namespace);
+            }
+            
+            Ok(())
+        }
+        
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            info!("Creating/updating ResourceQuota {} (placeholder - enable cloud-sdk feature)", name);
+            Ok(())
+        }
+    }
 }
 
 /// Worker deployment configuration for Kubernetes
