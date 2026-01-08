@@ -58,6 +58,40 @@
 //! # }
 //! ```
 //!
+//! ## Using Enterprise Features
+//!
+//! ```no_run
+//! use poolai::enterprise::{EnterpriseManager, EnterpriseConfig};
+//!
+//! # async fn example() -> Result<(), poolai::AppError> {
+//! let config = EnterpriseConfig::default();
+//! let manager = EnterpriseManager::new(config);
+//! manager.initialize().await?;
+//!
+//! // Use enterprise features...
+//! manager.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Using Cloud Integration
+//!
+//! ```no_run
+//! use poolai::cloud::{CloudManager, CloudConfig};
+//!
+//! # async fn example() -> Result<(), poolai::AppError> {
+//! let config = CloudConfig {
+//!     kubernetes_enabled: true,
+//!     kubernetes_namespace: "poolai".to_string(),
+//!     ..Default::default()
+//! };
+//! let manager = CloudManager::new(config);
+//! manager.initialize().await?;
+//! manager.shutdown().await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
 //! # Modules
 //!
 //! - [`core`] - Core functionality (config, error handling, model interface)
@@ -67,6 +101,11 @@
 //! - [`vm`] - Virtual machine instance management
 //! - [`raid`] - Distributed artifact storage
 //! - [`ui`] - Web dashboard interface
+//! - [`runtime`] - Advanced runtime management (Stage 4.1)
+//! - [`platform`] - Cross-platform GPU and system information
+//! - [`tgbot`] - Telegram bot integration (planned)
+//! - [`enterprise`] - Enterprise features (multi-tenancy, audit, security, monitoring)
+//! - [`cloud`] - Cloud integration (Kubernetes, AWS, Azure, GCP)
 
 // Core modules
 pub mod core;
