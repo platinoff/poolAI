@@ -756,6 +756,7 @@ impl LibraryManager {
 
         // Get artifact from RAID using artifact_ref.path
         let raid_manager = crate::raid::get_global_manager();
+        let artifact_path_str = artifact_ref.path.clone();
         let artifact_bytes = raid_manager
             .get_artifact(&artifact_ref.path)
             .await
@@ -764,7 +765,7 @@ impl LibraryManager {
                     "Failed to get artifact from RAID. Context: Cannot retrieve library artifact from RAID storage. \
                     Suggestion: Verify RAID storage is accessible and artifact reference is valid. \
                     Library: '{}', Artifact path: '{}', Error: {}",
-                    lib_info.name, artifact_ref.path, e
+                    lib_info.name, artifact_path_str, e
                 ))
             })?;
 
