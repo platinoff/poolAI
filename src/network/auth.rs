@@ -1,4 +1,34 @@
-// network/auth.rs
+//! Authentication and authorization module
+//!
+//! Provides JWT-based authentication, role-based access control (RBAC),
+//! and middleware for protecting API endpoints.
+//!
+//! # Features
+//!
+//! - **JWT Token Generation**: Create and validate JWT tokens with claims
+//! - **Role-Based Access Control**: Admin, Operator, and Viewer roles with permissions
+//! - **Authentication Middleware**: Protect routes with token validation
+//! - **Permission Middleware**: Check specific permissions for route access
+//! - **User Authentication**: Authenticate users and generate tokens
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::network::auth::{authenticate_user, AuthRequest, UserRole};
+//!
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! // Authenticate user
+//! let auth_req = AuthRequest {
+//!     username: "admin".to_string(),
+//!     password: "admin123".to_string(),
+//! };
+//!
+//! let response = authenticate_user(auth_req).await?;
+//! println!("Token: {}", response.token);
+//! println!("Role: {:?}", response.role);
+//! # Ok(())
+//! # }
+//! ```
 use axum::{
     extract::Request,
     http::{header::AUTHORIZATION, StatusCode},
@@ -13,7 +43,30 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation}
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-// JWT Claims структура
+/// JWT Claims structure
+///
+/// Contains user information embedded in JWT tokens including user ID,
+/// expiration time, role, and permissions.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::auth::{Claims, UserRole};
+/// use std::time::{SystemTime, UNIX_EPOCH};
+///
+/// let now = SystemTime::now()
+///     .duration_since(UNIX_EPOCH)
+///     .unwrap()
+///     .as_secs() as usize;
+///
+/// let claims = Claims {
+///     sub: "user123".to_string(),
+///     exp: now + 3600,
+///     iat: now,
+///     role: UserRole::Admin,
+///     permissions: vec!["read:all".to_string(), "write:all".to_string()],
+/// };
+/// ```
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub sub: String,              // User ID
@@ -23,7 +76,22 @@ pub struct Claims {
     pub permissions: Vec<String>, // User permissions
 }
 
-// Ролі користувачів
+/// User roles for role-based access control
+///
+/// Defines three roles with different permission levels:
+/// - **Admin**: Full access to all resources
+/// - **Operator**: Read access and write access to workers/models
+/// - **Viewer**: Read-only access to status, metrics, and models
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::auth::UserRole;
+///
+/// let role = UserRole::Admin;
+/// let permissions = role.get_permissions();
+/// println!("Admin permissions: {:?}", permissions);
+/// ```
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub enum UserRole {
     Admin,
@@ -55,14 +123,43 @@ impl UserRole {
     }
 }
 
-// Структура для аутентифікації
+/// Authentication request structure
+///
+/// Contains username and password for user authentication.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::auth::AuthRequest;
+///
+/// let auth_req = AuthRequest {
+///     username: "admin".to_string(),
+///     password: "admin123".to_string(),
+/// };
+/// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthRequest {
     pub username: String,
     pub password: String,
 }
 
-// Структура для відповіді аутентифікації
+/// Authentication response structure
+///
+/// Contains the JWT token, token type, expiration time, and user role
+/// after successful authentication.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::auth::{AuthResponse, UserRole};
+///
+/// let response = AuthResponse {
+///     token: "dev_token_...".to_string(),
+///     token_type: "Bearer".to_string(),
+///     expires_in: 3600,
+///     role: UserRole::Admin,
+/// };
+/// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthResponse {
     pub token: String,
@@ -93,9 +190,30 @@ impl Default for JwtConfig {
     }
 }
 
-// Функція для генерації JWT токена
-// Temporarily disabled - requires ring/gcc
-// Install gcc via: bash install_gcc.sh
+/// Generate JWT token for a user
+///
+/// Creates a JWT token containing user claims (ID, role, permissions, expiration).
+/// Currently uses a development token format (base64-encoded JSON) until JWT
+/// library is fully configured with gcc/ring support.
+///
+/// # Arguments
+///
+/// * `_username` - Username to include in token claims
+/// * `_role` - User role to include in token claims
+///
+/// # Returns
+///
+/// Returns a token string on success, or an error if token generation fails.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::auth::{generate_token, UserRole};
+///
+/// let token = generate_token("admin", UserRole::Admin)?;
+/// println!("Generated token: {}", token);
+/// # Ok::<(), String>(())
+/// ```
 pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String> {
     // Future improvement: Re-enable JWT token generation after installing gcc
     // 1. Install gcc compiler (required by ring crate for crypto operations)
@@ -135,7 +253,30 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
     ))
 }
 
-// Функція для валідації JWT токена
+/// Validate JWT token
+///
+/// Validates a JWT token and extracts claims. Checks token format, expiration,
+/// and signature (when JWT feature is enabled).
+///
+/// # Arguments
+///
+/// * `token` - JWT token string to validate
+///
+/// # Returns
+///
+/// Returns `Claims` if token is valid, or an error if validation fails.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::auth::validate_token;
+///
+/// let token = "dev_token_...";
+/// match validate_token(token) {
+///     Ok(claims) => println!("User: {}, Role: {:?}", claims.sub, claims.role),
+///     Err(e) => println!("Token validation failed: {}", e),
+/// }
+/// ```
 pub fn validate_token(token: &str) -> Result<Claims, String> {
     #[cfg(feature = "jwt")]
     {
@@ -178,7 +319,27 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
     }
 }
 
-// Middleware для аутентифікації
+/// Authentication middleware
+///
+/// Middleware that validates JWT tokens from the `Authorization` header
+/// and adds claims to request extensions for use in route handlers.
+///
+/// # Returns
+///
+/// Returns the response from the next middleware/handler, or an error
+/// if authentication fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::auth::auth_middleware;
+/// use axum::{middleware, Router, routing::post};
+///
+/// // Protect a route with authentication
+/// let app = Router::new()
+///     .route("/api/workers", post(create_worker))
+///     .layer(middleware::from_fn(auth_middleware));
+/// ```
 pub async fn auth_middleware(
     mut req: Request,
     next: Next,
@@ -254,7 +415,36 @@ pub async fn permission_middleware(
     Ok(next.run(req).await)
 }
 
-// Функція для аутентифікації користувача
+/// Authenticate user and generate token
+///
+/// Validates user credentials and generates a JWT token with appropriate
+/// role and permissions. Currently uses hardcoded credentials for development.
+///
+/// # Arguments
+///
+/// * `auth_req` - Authentication request with username and password
+///
+/// # Returns
+///
+/// Returns `AuthResponse` with token and user information on success,
+/// or an error if authentication fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::auth::{authenticate_user, AuthRequest};
+///
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+/// let auth_req = AuthRequest {
+///     username: "admin".to_string(),
+///     password: "admin123".to_string(),
+/// };
+///
+/// let response = authenticate_user(auth_req).await?;
+/// println!("Token: {}", response.token);
+/// # Ok(())
+/// # }
+/// ```
 pub async fn authenticate_user(
     auth_req: AuthRequest,
 ) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
@@ -318,12 +508,60 @@ pub async fn authenticate_user(
     })
 }
 
-// Функція для отримання поточного користувача з request
+/// Get current user from request
+///
+/// Extracts the authenticated user's claims from request extensions.
+/// Returns `None` if user is not authenticated.
+///
+/// # Arguments
+///
+/// * `req` - HTTP request with authentication middleware applied
+///
+/// # Returns
+///
+/// Returns `Some(Claims)` if user is authenticated, `None` otherwise.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::auth::get_current_user;
+/// use axum::extract::Request;
+///
+/// # async fn handler(req: Request) {
+/// if let Some(claims) = get_current_user(&req) {
+///     println!("Authenticated user: {}", claims.sub);
+/// }
+/// # }
+/// ```
 pub fn get_current_user(req: &Request) -> Option<&Claims> {
     req.extensions().get::<Claims>()
 }
 
-// Функція для перевірки ролі користувача
+/// Check if user has required role
+///
+/// Verifies if the authenticated user has the specified role.
+///
+/// # Arguments
+///
+/// * `req` - HTTP request with authentication middleware applied
+/// * `required_role` - Role to check for
+///
+/// # Returns
+///
+/// Returns `true` if user has the required role, `false` otherwise.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::auth::{has_role, UserRole};
+/// use axum::extract::Request;
+///
+/// # async fn handler(req: Request) {
+/// if has_role(&req, UserRole::Admin) {
+///     println!("User is an admin");
+/// }
+/// # }
+/// ```
 pub fn has_role(req: &Request, required_role: UserRole) -> bool {
     req.extensions()
         .get::<Claims>()
@@ -331,7 +569,31 @@ pub fn has_role(req: &Request, required_role: UserRole) -> bool {
         .unwrap_or(false)
 }
 
-// Функція для перевірки прав доступу
+/// Check if user has required permission
+///
+/// Verifies if the authenticated user has the specified permission.
+///
+/// # Arguments
+///
+/// * `req` - HTTP request with authentication middleware applied
+/// * `required_permission` - Permission to check for (e.g., "read:metrics")
+///
+/// # Returns
+///
+/// Returns `true` if user has the required permission, `false` otherwise.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::auth::has_permission;
+/// use axum::extract::Request;
+///
+/// # async fn handler(req: Request) {
+/// if has_permission(&req, "read:metrics") {
+///     println!("User can read metrics");
+/// }
+/// # }
+/// ```
 pub fn has_permission(req: &Request, required_permission: &str) -> bool {
     req.extensions()
         .get::<Claims>()

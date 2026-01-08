@@ -1,5 +1,44 @@
-// network/ws.rs
-// WebSocket Security для real-time оновлень (Stage 3)
+//! WebSocket module for real-time updates (Stage 3)
+//!
+//! Provides secure WebSocket connections for real-time metrics, system events,
+//! and live updates with authentication and authorization support.
+//!
+//! # Features
+//!
+//! - **Secure WebSocket Connections**: JWT-based authentication for WebSocket upgrades
+//! - **Real-time Metrics**: Live system metrics broadcasting to subscribed clients
+//! - **System Events**: Real-time system event notifications
+//! - **Connection Management**: Automatic heartbeat, cleanup, and connection tracking
+//! - **Subscription System**: Subscribe to metrics or events based on permissions
+//!
+//! # Example
+//!
+//! ```no_run
+//! use poolai::network::ws::{websocket_handler, broadcast_update, send_live_metrics, LiveMetrics};
+//! use std::time::SystemTime;
+//!
+//! # async fn example() {
+//! // WebSocket handler is used in route configuration
+//! // let app = Router::new().route("/ws/metrics", get(websocket_handler));
+//!
+//! // Broadcast system update to all connected clients
+//! broadcast_update("System maintenance scheduled").await;
+//!
+//! // Send live metrics
+//! let metrics = LiveMetrics {
+//!     active_workers: 10,
+//!     total_requests: 1000,
+//!     avg_response_time: 45.5,
+//!     memory_usage: 75.0,
+//!     gpu_temperature: 65.0,
+//!     timestamp: SystemTime::now()
+//!         .duration_since(std::time::UNIX_EPOCH)
+//!         .unwrap()
+//!         .as_secs(),
+//! };
+//! send_live_metrics(metrics).await;
+//! # }
+//! ```
 
 use crate::network::auth::{validate_token, Claims};
 use axum::{
@@ -14,7 +53,22 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 
-// Структура для WebSocket повідомлень
+/// WebSocket message structure
+///
+/// Represents a message sent over WebSocket connections with type, data, and timestamp.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::ws::WebSocketMessage;
+/// use serde_json::json;
+///
+/// let message = WebSocketMessage {
+///     message_type: "live_metrics".to_string(),
+///     data: json!({"active_workers": 10}),
+///     timestamp: 1234567890,
+/// };
+/// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WebSocketMessage {
     pub message_type: String,
@@ -22,7 +76,29 @@ pub struct WebSocketMessage {
     pub timestamp: u64,
 }
 
-// Структура для метрик в реальному часі
+/// Live metrics structure
+///
+/// Contains real-time system metrics including worker status, request statistics,
+/// resource usage, and GPU information.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::ws::LiveMetrics;
+/// use std::time::SystemTime;
+///
+/// let metrics = LiveMetrics {
+///     active_workers: 10,
+///     total_requests: 1000,
+///     avg_response_time: 45.5,
+///     memory_usage: 75.0,
+///     gpu_temperature: 65.0,
+///     timestamp: SystemTime::now()
+///         .duration_since(std::time::UNIX_EPOCH)
+///         .unwrap()
+///         .as_secs(),
+/// };
+/// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LiveMetrics {
     pub active_workers: u32,
@@ -33,7 +109,26 @@ pub struct LiveMetrics {
     pub timestamp: u64,
 }
 
-// Структура для системних подій
+/// System event structure
+///
+/// Represents a system event with type, severity, message, and timestamp.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::network::ws::SystemEvent;
+/// use std::time::SystemTime;
+///
+/// let event = SystemEvent {
+///     event_type: "alert".to_string(),
+///     severity: "warning".to_string(),
+///     message: "High CPU usage detected".to_string(),
+///     timestamp: SystemTime::now()
+///         .duration_since(std::time::UNIX_EPOCH)
+///         .unwrap()
+///         .as_secs(),
+/// };
+/// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SystemEvent {
     pub event_type: String,
@@ -42,7 +137,22 @@ pub struct SystemEvent {
     pub timestamp: u64,
 }
 
-// Менеджер WebSocket з'єднань
+/// WebSocket connection manager
+///
+/// Manages all WebSocket connections, subscriptions, and message broadcasting.
+/// Automatically handles heartbeat, cleanup, and subscription management.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::ws::WebSocketManager;
+///
+/// # async fn example() {
+/// let manager = WebSocketManager::new();
+/// // Manager is automatically initialized and starts background tasks
+/// // for metrics and events broadcasting
+/// # }
+/// ```
 pub struct WebSocketManager {
     connections: Arc<RwLock<HashMap<String, WebSocketConnection>>>,
     // Channel для відправки повідомлень до з'єднань
@@ -53,6 +163,10 @@ pub struct WebSocketManager {
     events_subscriptions: Arc<RwLock<HashMap<String, bool>>>,
 }
 
+/// WebSocket connection information
+///
+/// Tracks user information, permissions, and connection health for a WebSocket connection.
+#[derive(Debug, Clone)]
 pub struct WebSocketConnection {
     pub user_id: String,
     pub role: String,
@@ -217,7 +331,31 @@ lazy_static::lazy_static! {
     static ref WS_MANAGER: WebSocketManager = WebSocketManager::new();
 }
 
-// WebSocket upgrade handler з аутентифікацією
+/// WebSocket upgrade handler with authentication
+///
+/// Handles WebSocket connection upgrades with JWT token validation.
+/// Extracts token from query parameters or headers and validates it before
+/// upgrading the connection.
+///
+/// # Arguments
+///
+/// * `ws` - WebSocket upgrade request
+/// * `req` - HTTP request containing authentication token
+///
+/// # Returns
+///
+/// Returns either a WebSocket connection or an error response if authentication fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::ws::websocket_handler;
+/// use axum::routing::get;
+/// use axum::Router;
+///
+/// // Use in route configuration
+/// let app = Router::new().route("/ws/metrics", get(websocket_handler));
+/// ```
 pub async fn websocket_handler(
     ws: WebSocketUpgrade,
     req: Request<axum::body::Body>,
@@ -441,7 +579,23 @@ async fn get_current_metrics() -> LiveMetrics {
     }
 }
 
-// Функція для broadcast оновлень (публічне API)
+/// Broadcast system update to all connected WebSocket clients
+///
+/// Sends a system update message to all active WebSocket connections.
+///
+/// # Arguments
+///
+/// * `message` - Update message to broadcast
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::ws::broadcast_update;
+///
+/// # async fn example() {
+/// broadcast_update("System maintenance scheduled for 2:00 AM").await;
+/// # }
+/// ```
 pub async fn broadcast_update(message: &str) {
     let ws_message = WebSocketMessage {
         message_type: "system_update".to_string(),
@@ -458,7 +612,35 @@ pub async fn broadcast_update(message: &str) {
     WS_MANAGER.broadcast(ws_message).await;
 }
 
-// Функція для відправки метрик в реальному часі
+/// Send live metrics to all subscribed WebSocket clients
+///
+/// Broadcasts live system metrics to all clients that have subscribed to metrics updates.
+///
+/// # Arguments
+///
+/// * `metrics` - Live metrics to send
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::ws::{send_live_metrics, LiveMetrics};
+/// use std::time::SystemTime;
+///
+/// # async fn example() {
+/// let metrics = LiveMetrics {
+///     active_workers: 10,
+///     total_requests: 1000,
+///     avg_response_time: 45.5,
+///     memory_usage: 75.0,
+///     gpu_temperature: 65.0,
+///     timestamp: SystemTime::now()
+///         .duration_since(std::time::UNIX_EPOCH)
+///         .unwrap()
+///         .as_secs(),
+/// };
+/// send_live_metrics(metrics).await;
+/// # }
+/// ```
 pub async fn send_live_metrics(metrics: LiveMetrics) {
     let ws_message = WebSocketMessage {
         message_type: "live_metrics".to_string(),
@@ -472,7 +654,33 @@ pub async fn send_live_metrics(metrics: LiveMetrics) {
     WS_MANAGER.broadcast(ws_message).await;
 }
 
-// Функція для відправки системних подій
+/// Send system event to all subscribed WebSocket clients
+///
+/// Broadcasts a system event to all clients that have subscribed to event updates.
+///
+/// # Arguments
+///
+/// * `event` - System event to send
+///
+/// # Example
+///
+/// ```no_run
+/// use poolai::network::ws::{send_system_event, SystemEvent};
+/// use std::time::SystemTime;
+///
+/// # async fn example() {
+/// let event = SystemEvent {
+///     event_type: "alert".to_string(),
+///     severity: "warning".to_string(),
+///     message: "High CPU usage detected".to_string(),
+///     timestamp: SystemTime::now()
+///         .duration_since(std::time::UNIX_EPOCH)
+///         .unwrap()
+///         .as_secs(),
+/// };
+/// send_system_event(event).await;
+/// # }
+/// ```
 pub async fn send_system_event(event: SystemEvent) {
     let ws_message = WebSocketMessage {
         message_type: "system_event".to_string(),
