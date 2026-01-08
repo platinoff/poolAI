@@ -40,7 +40,6 @@ pub mod monitoring;
 
 use crate::core::error::AppError;
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use tracing::info;
 
 /// Enterprise module manager

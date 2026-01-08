@@ -20,11 +20,7 @@ use axum::{
     Json, Router,
 };
 #[cfg(feature = "enterprise")]
-use serde::{Deserialize, Serialize};
-#[cfg(feature = "enterprise")]
-use std::collections::HashMap;
-#[cfg(feature = "enterprise")]
-use uuid::Uuid;
+use serde::Deserialize;
 
 #[cfg(feature = "enterprise")]
 pub fn create_enterprise_api_routes() -> Router {
@@ -90,6 +86,7 @@ async fn tenants_list_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
+#[allow(dead_code)] // Will be used when implementation is complete
 struct TenantCreateRequest {
     name: String,
     config: enterprise::multi_tenancy::TenantConfig,
@@ -97,7 +94,7 @@ struct TenantCreateRequest {
 
 #[cfg(feature = "enterprise")]
 async fn tenant_create_handler(
-    Json(req): Json<TenantCreateRequest>,
+    Json(_req): Json<TenantCreateRequest>,
 ) -> impl IntoResponse {
     // TODO: Get global tenant manager and create tenant
     // For now, return placeholder
@@ -111,7 +108,7 @@ async fn tenant_create_handler(
 
 #[cfg(feature = "enterprise")]
 async fn tenant_get_handler(
-    Path(id): Path<String>,
+    Path(_id): Path<String>,
 ) -> impl IntoResponse {
     // TODO: Get global tenant manager and retrieve tenant
     (
@@ -124,7 +121,7 @@ async fn tenant_get_handler(
 
 #[cfg(feature = "enterprise")]
 async fn tenant_update_handler(
-    Path(id): Path<String>,
+    Path(_id): Path<String>,
     Json(_req): Json<serde_json::Value>,
 ) -> impl IntoResponse {
     (
@@ -137,7 +134,7 @@ async fn tenant_update_handler(
 
 #[cfg(feature = "enterprise")]
 async fn tenant_delete_handler(
-    Path(id): Path<String>,
+    Path(_id): Path<String>,
 ) -> impl IntoResponse {
     (
         StatusCode::NOT_IMPLEMENTED,
@@ -149,7 +146,7 @@ async fn tenant_delete_handler(
 
 #[cfg(feature = "enterprise")]
 async fn tenant_usage_handler(
-    Path(id): Path<String>,
+    Path(_id): Path<String>,
 ) -> impl IntoResponse {
     (
         StatusCode::NOT_IMPLEMENTED,
@@ -161,7 +158,7 @@ async fn tenant_usage_handler(
 
 #[cfg(feature = "enterprise")]
 async fn tenant_quota_check_handler(
-    Path(id): Path<String>,
+    Path(_id): Path<String>,
     Json(_req): Json<serde_json::Value>,
 ) -> impl IntoResponse {
     (
@@ -174,6 +171,7 @@ async fn tenant_quota_check_handler(
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
+#[allow(dead_code)] // Will be used when implementation is complete
 struct AuditQueryParams {
     user_id: Option<String>,
     tenant_id: Option<String>,
@@ -188,7 +186,7 @@ struct AuditQueryParams {
 
 #[cfg(feature = "enterprise")]
 async fn audit_events_query_handler(
-    Query(params): Query<AuditQueryParams>,
+    Query(_params): Query<AuditQueryParams>,
 ) -> impl IntoResponse {
     // TODO: Get global audit logger and query events
     // For now, return empty list
@@ -197,6 +195,7 @@ async fn audit_events_query_handler(
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
+#[allow(dead_code)] // Will be used when implementation is complete
 struct MonitoringAlertsQuery {
     severity: Option<String>,
     tenant_id: Option<String>,
@@ -205,7 +204,7 @@ struct MonitoringAlertsQuery {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_alerts_handler(
-    Query(params): Query<MonitoringAlertsQuery>,
+    Query(_params): Query<MonitoringAlertsQuery>,
 ) -> impl IntoResponse {
     // TODO: Get global monitoring manager and retrieve alerts
     Json::<Vec<enterprise::monitoring::Alert>>(Vec::new())
@@ -213,7 +212,7 @@ async fn monitoring_alerts_handler(
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_alert_acknowledge_handler(
-    Path(id): Path<String>,
+    Path(_id): Path<String>,
 ) -> impl IntoResponse {
     // TODO: Get global monitoring manager and acknowledge alert
     (
@@ -244,6 +243,7 @@ async fn monitoring_dashboard_create_handler(
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
+#[allow(dead_code)] // Will be used when implementation is complete
 struct MonitoringMetricsQuery {
     metric: Option<String>,
     start_time: Option<String>,
@@ -254,7 +254,7 @@ struct MonitoringMetricsQuery {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_metrics_handler(
-    Query(params): Query<MonitoringMetricsQuery>,
+    Query(_params): Query<MonitoringMetricsQuery>,
 ) -> impl IntoResponse {
     // TODO: Get global monitoring manager and retrieve metrics
     Json::<Vec<enterprise::monitoring::MetricDataPoint>>(Vec::new())
