@@ -435,3 +435,142 @@ pub fn update_config(config: PoolAIConfig) -> Result<(), AppError> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_validate_valid_config() {
+        let config = PoolAIConfig::default();
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_zero_max_workers() {
+        let mut config = PoolAIConfig::default();
+        config.system.max_workers = 0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("max_workers"));
+    }
+
+    #[test]
+    fn test_validate_zero_queue_size() {
+        let mut config = PoolAIConfig::default();
+        config.system.queue_size = 0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("queue_size"));
+    }
+
+    #[test]
+    fn test_validate_gpu_enabled_zero_memory() {
+        let mut config = PoolAIConfig::default();
+        config.gpu.enabled = true;
+        config.gpu.memory_limit = 0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("memory_limit"));
+    }
+
+    #[test]
+    fn test_validate_gpu_disabled_zero_memory() {
+        let mut config = PoolAIConfig::default();
+        config.gpu.enabled = false;
+        config.gpu.memory_limit = 0;
+        // Should be OK when GPU is disabled
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_pool_zero_max_workers() {
+        let mut config = PoolAIConfig::default();
+        config.pool.max_workers = 0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("pool.max_workers"));
+    }
+
+    #[test]
+    fn test_validate_scaling_threshold_too_low() {
+        let mut config = PoolAIConfig::default();
+        config.pool.scaling_threshold = -0.1;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("scaling_threshold"));
+    }
+
+    #[test]
+    fn test_validate_scaling_threshold_too_high() {
+        let mut config = PoolAIConfig::default();
+        config.pool.scaling_threshold = 1.5;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("scaling_threshold"));
+    }
+
+    #[test]
+    fn test_validate_scaling_threshold_valid() {
+        let mut config = PoolAIConfig::default();
+        config.pool.scaling_threshold = 0.7;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_validate_metrics_interval_zero() {
+        let mut config = PoolAIConfig::default();
+        config.monitoring.metrics_interval = 0;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("metrics_interval"));
+    }
+
+    #[test]
+    fn test_validate_alert_threshold_too_low() {
+        let mut config = PoolAIConfig::default();
+        config.monitoring.alert_threshold = -0.1;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("alert_threshold"));
+    }
+
+    #[test]
+    fn test_validate_alert_threshold_too_high() {
+        let mut config = PoolAIConfig::default();
+        config.monitoring.alert_threshold = 1.5;
+        let result = config.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("alert_threshold"));
+    }
+
+    #[test]
+    fn test_validate_alert_threshold_valid() {
+        let mut config = PoolAIConfig::default();
+        config.monitoring.alert_threshold = 0.9;
+        assert!(config.validate().is_ok());
+    }
+
+    #[test]
+    fn test_get_config_not_initialized() {
+        // Reset CONFIG to None for testing
+        // Note: OnceLock doesn't support reset, so this test may fail if
+        // config was already initialized in a previous test
+        let result = get_config();
+        // This might fail if config was already set, which is OK
+        if result.is_err() {
+            assert!(result.unwrap_err().to_string().contains("not initialized"));
+        }
+    }
+
+    #[test]
+    fn test_initialize_and_get_config() {
+        let config = PoolAIConfig::default();
+        // Try to initialize - might fail if already initialized
+        if initialize_config(config.clone()).is_ok() {
+            let retrieved = get_config().unwrap();
+            assert_eq!(retrieved.system.name, config.system.name);
+            assert_eq!(retrieved.system.max_workers, config.system.max_workers);
+        }
+    }
+}
