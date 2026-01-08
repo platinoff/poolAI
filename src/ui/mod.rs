@@ -218,13 +218,36 @@ const BASE_CSS: &str = r#"
     outline-offset: 2px;
   }
   /* Accessibility: Focus indicators */
-  a:focus, button:focus, input:focus, select:focus, textarea:focus {
+  a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
     outline: 2px solid var(--primary, #50fa7b);
     outline-offset: 2px;
   }
-  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
     outline: 2px solid var(--primary, #50fa7b);
     outline-offset: 2px;
+  }
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  /* Enhanced keyboard navigation for interactive elements */
+  .search-result-item:focus,
+  [role="option"]:focus,
+  [role="button"]:focus {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: 2px;
+    background: var(--surface-secondary, #1e2329);
+  }
+  /* Skip link positioning fix */
+  .skip_link:focus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10000;
   }
 "#;
 
@@ -1062,10 +1085,14 @@ function showSearchModal() {
       { name: 'RAID', url: '/ui/raid', category: 'Page' },
     ];
     
+    let selectedIndex = -1;
+    
     searchInput.addEventListener('input', function(e) {
       const query = e.target.value.toLowerCase().trim();
+      selectedIndex = -1;
+      
       if (query.length === 0) {
-        resultsContainer.innerHTML = '<div class="muted">Type to search...</div>';
+        resultsContainer.innerHTML = '<div class="muted" role="status" aria-live="polite">Type to search...</div>';
         return;
       }
       
@@ -1075,25 +1102,87 @@ function showSearchModal() {
       );
       
       if (results.length === 0) {
-        resultsContainer.innerHTML = '<div class="muted">No results found</div>';
+        resultsContainer.innerHTML = '<div class="muted" role="status" aria-live="polite">No results found</div>';
         return;
       }
       
-      resultsContainer.innerHTML = results.map(item => `
-        <div class="search-result-item" style="padding: 12px; border: 1px solid var(--border, #262b36); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s;" 
+      resultsContainer.setAttribute('role', 'listbox');
+      resultsContainer.setAttribute('aria-label', 'Search results');
+      resultsContainer.innerHTML = results.map((item, index) => `
+        <div class="search-result-item" 
+             role="option" 
+             id="search-result-${index}"
+             tabindex="0"
+             aria-label="${item.name}, ${item.category}, ${item.url}"
+             aria-selected="false"
+             style="padding: 12px; border: 1px solid var(--border, #262b36); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s; outline: none;" 
              onclick="window.location.href='${item.url}'; hideModal('${modalId}');"
-             onmouseover="this.style.background='var(--surface-secondary, #1e2329)'"
-             onmouseout="this.style.background='var(--bg, #0f1216)'">
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='${item.url}';hideModal('${modalId}');}"
+             onfocus="this.style.background='var(--surface-secondary, #1e2329)';this.setAttribute('aria-selected','true');selectedIndex=${index};"
+             onblur="this.style.background='var(--bg, #0f1216)';this.setAttribute('aria-selected','false');"
+             onmouseover="this.style.background='var(--surface-secondary, #1e2329)';this.setAttribute('aria-selected','true');selectedIndex=${index};"
+             onmouseout="if(document.activeElement!==this){this.style.background='var(--bg, #0f1216)';this.setAttribute('aria-selected','false');}">
           <div style="font-weight: bold; color: var(--primary, #67e480);">${item.name}</div>
           <div class="muted" style="font-size: 0.85em; margin-top: 4px;">${item.category} • ${item.url}</div>
         </div>
       `).join('');
+      
+      // Announce results count to screen readers
+      const statusMsg = results.length === 1 ? '1 result found' : results.length + ' results found';
+      resultsContainer.setAttribute('aria-label', 'Search results: ' + statusMsg);
     });
     
-    // Close on Escape
+    // Enhanced keyboard navigation for search modal
     searchInput.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         hideModal(modalId);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const items = resultsContainer.querySelectorAll('.search-result-item[role="option"]');
+        if (items.length > 0) {
+          selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+          items[selectedIndex].focus();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const items = resultsContainer.querySelectorAll('.search-result-item[role="option"]');
+        if (items.length > 0) {
+          selectedIndex = Math.max(selectedIndex - 1, -1);
+          if (selectedIndex >= 0) {
+            items[selectedIndex].focus();
+          } else {
+            searchInput.focus();
+          }
+        }
+      }
+    });
+    
+    // Handle keyboard navigation in results container
+    resultsContainer.addEventListener('keydown', function(e) {
+      const items = Array.from(resultsContainer.querySelectorAll('.search-result-item[role="option"]'));
+      const currentIndex = items.findIndex(item => item === document.activeElement);
+      
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = Math.min(currentIndex + 1, items.length - 1);
+        items[nextIndex].focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentIndex > 0) {
+          items[currentIndex - 1].focus();
+        } else {
+          searchInput.focus();
+        }
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        if (items.length > 0) {
+          items[0].focus();
+        }
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        if (items.length > 0) {
+          items[items.length - 1].focus();
+        }
       }
     });
     
@@ -2525,10 +2614,22 @@ async fn workers_page() -> Html<String> {
       }
       
       const table = document.createElement('table');
+      table.setAttribute('role', 'table');
+      table.setAttribute('aria-label', 'Workers list');
+      table.setAttribute('aria-describedby', 'workers-table-desc');
+      const tableDesc = document.createElement('div');
+      tableDesc.id = 'workers-table-desc';
+      tableDesc.className = 'sr-only';
+      tableDesc.textContent = 'Table showing workers with their IDs, status, and available actions';
+      tableDesc.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
+      
       const thead = document.createElement('thead');
       const hr = document.createElement('tr');
+      hr.setAttribute('role', 'row');
       ['id', 'status', 'actions'].forEach(k => {
         const th = document.createElement('th');
+        th.setAttribute('role', 'columnheader');
+        th.setAttribute('scope', 'col');
         th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
         hr.appendChild(th);
       });
@@ -2536,11 +2637,16 @@ async fn workers_page() -> Html<String> {
       table.appendChild(thead);
       
       const tbody = document.createElement('tbody');
+      tbody.setAttribute('role', 'rowgroup');
       for (const worker of data) {
         const tr = document.createElement('tr');
+        tr.setAttribute('role', 'row');
+        const workerId = worker ? worker.id : 'unknown';
+        tr.setAttribute('aria-label', 'Worker ' + workerId);
         
         ['id', 'status'].forEach(k => {
           const td = document.createElement('td');
+          td.setAttribute('role', 'cell');
           const v = worker ? worker[k] : null;
           td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
           tr.appendChild(td);
@@ -2549,9 +2655,10 @@ async fn workers_page() -> Html<String> {
         // Action buttons
         const actionsTd = document.createElement('td');
         actionsTd.className = 'action-buttons';
+        actionsTd.setAttribute('role', 'cell');
         actionsTd.style.cssText = 'white-space: nowrap;';
         
-        const workerId = worker.id;
+        const workerId = worker ? worker.id : 'unknown';
         const user = getUser();
         const canWrite = user && (user.role === 'Admin' || user.role === 'Operator');
         
@@ -2560,10 +2667,29 @@ async fn workers_page() -> Html<String> {
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'btn btn-danger';
           deleteBtn.textContent = 'Delete';
+          deleteBtn.setAttribute('type', 'button');
           deleteBtn.setAttribute('aria-label', `Delete worker ${workerId}`);
+          deleteBtn.setAttribute('aria-describedby', `worker-${workerId}-desc`);
           deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           deleteBtn.onclick = () => handleWorkerDelete(workerId);
+          deleteBtn.onkeydown = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleWorkerDelete(workerId);
+            }
+          };
           actionsTd.appendChild(deleteBtn);
+          
+          // Hidden description for screen readers
+          const desc = document.createElement('span');
+          desc.id = `worker-${workerId}-desc`;
+          desc.className = 'sr-only';
+          desc.textContent = `Permanently delete worker ${workerId}`;
+          desc.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
+          actionsTd.appendChild(desc);
+        } else {
+          actionsTd.setAttribute('aria-label', 'No actions available for your role');
+          actionsTd.textContent = '—';
         }
         
         tr.appendChild(actionsTd);
