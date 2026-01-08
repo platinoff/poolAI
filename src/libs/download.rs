@@ -221,13 +221,15 @@ async fn extract_tar(archive_path: &Path, destination: &Path) -> Result<(), AppE
     let archive_path = archive_path.to_path_buf();
     let destination = destination.to_path_buf();
 
+    let archive_path_str = archive_path.display().to_string();
+    let destination_str = destination.display().to_string();
     tokio::task::spawn_blocking(move || {
         let file = File::open(&archive_path)
             .map_err(|e| AppError::ConfigError(format!(
                 "Failed to open archive. Context: Cannot open tar archive file for extraction. \
                 Suggestion: Check file permissions and verify archive file is not corrupted. \
                 Archive: '{}', Error: {}",
-                archive_path.display(), e
+                archive_path_str, e
             )))?;
 
         let mut archive = tar::Archive::new(file);
@@ -238,7 +240,7 @@ async fn extract_tar(archive_path: &Path, destination: &Path) -> Result<(), AppE
                 "Failed to extract tar. Context: Cannot extract contents from tar archive. \
                 Suggestion: Verify archive integrity and ensure destination directory is writable. \
                 Archive: '{}', Destination: '{}', Error: {}",
-                archive_path.display(), destination.display(), e
+                archive_path_str, destination_str, e
             )))?;
 
         Ok::<(), AppError>(())
