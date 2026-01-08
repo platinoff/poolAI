@@ -18,35 +18,96 @@ use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 
+/// Configuration for the worker pool
+///
+/// Controls pool behavior including worker limits, load balancing strategy,
+/// and auto-scaling parameters.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::pool::{PoolConfig, LoadBalancingStrategy};
+///
+/// let config = PoolConfig {
+///     max_workers: 10,
+///     max_queue_size: 1000,
+///     load_balancing_strategy: LoadBalancingStrategy::LeastConnections,
+///     auto_scaling: true,
+///     scaling_threshold: 0.8,
+///     request_timeout: 30,
+/// };
+/// ```
 #[derive(Debug, Clone)]
 pub struct PoolConfig {
+    /// Maximum number of workers in the pool
     pub max_workers: usize,
+    /// Maximum number of requests in the queue
     pub max_queue_size: usize,
+    /// Strategy for distributing requests across workers
     pub load_balancing_strategy: LoadBalancingStrategy,
+    /// Enable automatic scaling based on load
     pub auto_scaling: bool,
+    /// Threshold (0.0-1.0) for triggering scaling actions
     pub scaling_threshold: f32,
+    /// Request timeout in seconds
     pub request_timeout: u64,
 }
 
+/// Load balancing strategy for distributing requests across workers
+///
+/// Different strategies optimize for different scenarios:
+/// - `RoundRobin`: Simple, predictable distribution
+/// - `LeastConnections`: Balances based on current worker load
+/// - `Weighted`: Allows prioritization of specific workers
+/// - `Random`: Simple random selection
 #[derive(Debug, Clone)]
 pub enum LoadBalancingStrategy {
+    /// Distribute requests in round-robin fashion
     RoundRobin,
+    /// Route to worker with fewest active connections
     LeastConnections,
+    /// Use weighted distribution based on worker capacity
     Weighted,
+    /// Randomly select a worker
     Random,
 }
 
+/// Metrics for monitoring pool performance
+///
+/// Provides comprehensive statistics about pool operation including
+/// worker count, request statistics, resource utilization, and performance metrics.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::pool::PoolMetrics;
+///
+/// let metrics = PoolMetrics::default();
+/// println!("Active workers: {}", metrics.active_workers);
+/// println!("Success rate: {:.2}%", 
+///     (metrics.successful_requests as f64 / metrics.total_requests as f64) * 100.0);
+/// ```
 #[derive(Debug, Clone)]
 pub struct PoolMetrics {
+    /// Number of currently active workers
     pub active_workers: usize,
+    /// Current number of requests in queue
     pub queue_size: usize,
+    /// Total number of requests processed
     pub total_requests: u64,
+    /// Number of successfully completed requests
     pub successful_requests: u64,
+    /// Number of failed requests
     pub failed_requests: u64,
+    /// Average response time in milliseconds
     pub average_response_time_ms: f64,
+    /// GPU utilization percentage (0.0-1.0)
     pub gpu_utilization: f32,
+    /// Memory usage in megabytes
     pub memory_usage_mb: f32,
+    /// Throughput in requests per second
     pub throughput_rps: f32,
+    /// Error rate (0.0-1.0)
     pub error_rate: f32,
 }
 
@@ -67,6 +128,31 @@ impl Default for PoolMetrics {
     }
 }
 
+/// Worker pool for managing and distributing inference tasks
+///
+/// The `Pool` manages a collection of workers, handles load balancing,
+/// tracks metrics, and provides auto-scaling capabilities.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::pool::{Pool, PoolConfig, LoadBalancingStrategy};
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let config = PoolConfig {
+///         max_workers: 10,
+///         max_queue_size: 1000,
+///         load_balancing_strategy: LoadBalancingStrategy::LeastConnections,
+///         auto_scaling: true,
+///         scaling_threshold: 0.8,
+///         request_timeout: 30,
+///     };
+///     
+///     let pool = Pool::new(config);
+///     // Add workers and process requests...
+/// }
+/// ```
 pub struct Pool {
     config: PoolConfig,
     workers: Arc<RwLock<HashMap<String, worker::Worker>>>,
@@ -75,6 +161,27 @@ pub struct Pool {
 }
 
 impl Pool {
+    /// Creates a new worker pool with the specified configuration
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Pool configuration including worker limits and load balancing strategy
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use poolai::pool::{Pool, PoolConfig, LoadBalancingStrategy};
+    ///
+    /// let config = PoolConfig {
+    ///     max_workers: 10,
+    ///     max_queue_size: 1000,
+    ///     load_balancing_strategy: LoadBalancingStrategy::Random,
+    ///     auto_scaling: false,
+    ///     scaling_threshold: 0.8,
+    ///     request_timeout: 30,
+    /// };
+    /// let pool = Pool::new(config);
+    /// ```
     pub fn new(config: PoolConfig) -> Self {
         Self {
             config,
@@ -84,6 +191,35 @@ impl Pool {
         }
     }
 
+    /// Adds a new worker to the pool
+    ///
+    /// # Arguments
+    ///
+    /// * `worker_id` - Unique identifier for the worker
+    /// * `worker` - Worker instance to add
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` on success, or an error if the operation fails.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// # use poolai::pool::{Pool, PoolConfig, LoadBalancingStrategy};
+    /// # use poolai::pool::worker::Worker;
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let config = PoolConfig {
+    /// #     max_workers: 10, max_queue_size: 1000,
+    /// #     load_balancing_strategy: LoadBalancingStrategy::Random,
+    /// #     auto_scaling: false, scaling_threshold: 0.8, request_timeout: 30,
+    /// # };
+    /// let pool = Pool::new(config);
+    /// let worker = Worker::new("worker-1".to_string());
+    /// pool.add_worker("worker-1".to_string(), worker).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn add_worker(
         &self,
         worker_id: String,
@@ -103,6 +239,37 @@ impl Pool {
         Ok(())
     }
 
+    /// Removes a worker from the pool
+    ///
+    /// # Arguments
+    ///
+    /// * `worker_id` - Identifier of the worker to remove
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if the worker was found and removed, or an error if the worker
+    /// doesn't exist or the operation fails.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::PoolError` if the worker is not found in the pool.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// # use poolai::pool::{Pool, PoolConfig, LoadBalancingStrategy};
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let config = PoolConfig {
+    /// #     max_workers: 10, max_queue_size: 1000,
+    /// #     load_balancing_strategy: LoadBalancingStrategy::Random,
+    /// #     auto_scaling: false, scaling_threshold: 0.8, request_timeout: 30,
+    /// # };
+    /// let pool = Pool::new(config);
+    /// pool.remove_worker("worker-1").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn remove_worker(&self, worker_id: &str) -> Result<(), AppError> {
         let mut workers = self.workers.write().await;
         let current_worker_count = workers.len();
