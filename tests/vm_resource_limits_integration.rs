@@ -17,6 +17,7 @@ async fn test_resource_limits_from_vm_resources() {
         cpu_cores: 4,
         memory_mb: 4096,
         gpu_required: true,
+        gpu_scheduling_policy: None,
     };
 
     let limits = ResourceLimits::from(resources);
@@ -45,6 +46,7 @@ async fn test_resource_limits_validation() {
         cpu_cores: 2,
         memory_mb: 1024,
         gpu_required: false,
+        gpu_scheduling_policy: None,
     };
 
     let instance = manager

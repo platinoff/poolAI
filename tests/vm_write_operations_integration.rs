@@ -18,6 +18,7 @@ async fn test_create_vm_instance() {
         cpu_cores: 2,
         memory_mb: 1024,
         gpu_required: false,
+        gpu_scheduling_policy: None,
     };
 
     let instance = manager
@@ -63,6 +64,7 @@ async fn test_update_vm_instance() {
         cpu_cores: 4,
         memory_mb: 2048,
         gpu_required: true,
+        gpu_scheduling_policy: None,
     };
 
     let updated = manager
@@ -183,7 +185,7 @@ async fn test_update_nonexistent_instance() {
     let nonexistent_id = uuid::Uuid::new_v4();
 
     let result = manager
-        .update_instance(nonexistent_id, Some("new-name".to_string()), None, None)
+        .update_instance(nonexistent_id, Some("new-name".to_string()), None, None, None)
         .await;
 
     assert!(result.is_err());

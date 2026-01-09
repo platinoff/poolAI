@@ -36,17 +36,11 @@ async fn test_vm_create_instance_with_command() {
             "test-vm".to_string(),
             resources,
             VmIsolation::ProcessSandbox,
-            Some(cmd.to_string()),
-            args.clone(),
-            None,
         )
         .await
         .unwrap();
 
     assert_eq!(instance.name, "test-vm");
-    assert!(instance.command.is_some());
-    assert_eq!(instance.command.unwrap(), cmd);
-    assert_eq!(instance.args.len(), args.len());
 }
 
 #[tokio::test]
@@ -70,9 +64,6 @@ async fn test_vm_start_stop_instance() {
             "test-vm".to_string(),
             resources,
             VmIsolation::ProcessSandbox,
-            Some(cmd.to_string()),
-            args,
-            None,
         )
         .await
         .unwrap();
@@ -106,9 +97,6 @@ async fn test_vm_instance_without_command() {
             "test-vm".to_string(),
             resources,
             VmIsolation::ProcessSandbox,
-            None, // No command
-            vec![],
-            None,
         )
         .await
         .unwrap();
@@ -148,9 +136,6 @@ async fn test_vm_get_instance_logs() {
             "test-vm".to_string(),
             resources,
             VmIsolation::ProcessSandbox,
-            Some(cmd.to_string()),
-            args,
-            None,
         )
         .await
         .unwrap();
@@ -189,9 +174,6 @@ async fn test_vm_list_instances() {
             "vm1".to_string(),
             resources.clone(),
             VmIsolation::ProcessSandbox,
-            None,
-            vec![],
-            None,
         )
         .await
         .unwrap();
@@ -201,9 +183,6 @@ async fn test_vm_list_instances() {
             "vm2".to_string(),
             resources,
             VmIsolation::ProcessSandbox,
-            None,
-            vec![],
-            None,
         )
         .await
         .unwrap();
