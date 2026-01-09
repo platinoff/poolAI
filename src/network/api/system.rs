@@ -110,35 +110,271 @@ async fn status_handler(req: Request<axum::body::Body>) -> Response {
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <title>PoolAI Status</title>
   <style>
-    body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #181c20; color: #f8f8f2; margin: 0; padding: 0; }}
-    .container {{ max-width: 700px; margin: 40px auto; background: #23272e; border-radius: 12px; box-shadow: 0 4px 24px #0008; padding: 32px; }}
-    h1 {{ color: #50fa7b; margin-bottom: 0.5em; display: flex; align-items: center; gap: 12px; }}
-    .logo {{ width: 40px; height: 40px; vertical-align: middle; }}
-    .status {{ font-size: 1.2em; margin-bottom: 1em; }}
+    /* Box-sizing для правильного позиціонування */
+    *, *::before, *::after {{
+      box-sizing: border-box;
+    }}
+    
+    body {{ 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      background: var(--bg, #0f1216); 
+      color: var(--text, #e8e8e8); 
+      margin: 0; 
+      padding: 0;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }}
+    
+    :root {{
+      --bg: #0f1216;
+      --surface: #171b22;
+      --surface-secondary: #1e2329;
+      --text: #e8e8e8;
+      --text-muted: #a8b0bf;
+      --primary: #67e480;
+      --link: #77c7ff;
+      --link-hover: #8bd5ff;
+      --border: #262b36;
+      --danger: #ff5555;
+      --warning: #ffb86c;
+      --info: #8be9fd;
+    }}
+    
+    .wrap {{
+      max-width: 1080px;
+      margin: 28px auto;
+      padding: 0 16px;
+      width: 100%;
+    }}
+    
+    .container {{ 
+      max-width: 1080px; 
+      margin: 28px auto; 
+      background: var(--surface, #171b22); 
+      border-radius: 14px; 
+      box-shadow: 0 12px 40px rgba(0,0,0,.20); 
+      padding: 32px; 
+      border: 1px solid var(--border, #262b36);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    
+    .container:hover {{
+      box-shadow: 0 16px 48px rgba(0,0,0,.25);
+    }}
+    
+    h1 {{ 
+      color: var(--primary, #67e480); 
+      margin-bottom: 0.5em; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 600;
+    }}
+    
+    .logo {{ 
+      width: 40px; 
+      height: 40px; 
+      vertical-align: middle;
+      border-radius: 8px;
+    }}
+    
+    .status {{ 
+      font-size: 1.1em; 
+      margin-bottom: 1.5em;
+      padding: 16px;
+      background: var(--bg, #0f1216);
+      border-radius: 10px;
+      border: 1px solid var(--border, #262b36);
+    }}
+    
+    .status strong {{
+      color: var(--text-muted, #a8b0bf);
+      margin-right: 8px;
+    }}
+    
     .info-list {{ list-style: none; padding: 0; }}
     .info-list li {{ margin-bottom: 0.5em; }}
-    a {{ color: #8be9fd; text-decoration: none; }}
-    a:hover {{ text-decoration: underline; }}
+    
+    a {{ 
+      color: var(--link, #77c7ff); 
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }}
+    a:hover {{ 
+      color: var(--link-hover, #8bd5ff); 
+      text-decoration: underline; 
+    }}
+    
     .links {{ margin-top: 2em; }}
-    .badge {{ display: inline-block; background: #44475a; color: #f1fa8c; border-radius: 6px; padding: 2px 8px; font-size: 0.9em; margin-left: 8px; }}
-    .footer {{ margin-top: 2em; color: #6272a4; font-size: 0.95em; text-align: center; }}
-    .api-ref {{ margin-top: 2em; background: #181c20; border-radius: 8px; padding: 18px 20px; border: 1px solid #44475a; }}
-    .api-ref h2 {{ color: #8be9fd; margin-top: 0; }}
-    .api-ref code {{ background: #282a36; color: #f1fa8c; border-radius: 4px; padding: 2px 6px; }}
-    .api-ref li {{ margin-bottom: 0.4em; }}
-    .api-section {{ margin-bottom: 1.5em; padding-bottom: 1em; border-bottom: 1px solid #44475a; }}
+    
+    .badge {{ 
+      display: inline-block; 
+      background: var(--surface-secondary, #1e2329); 
+      color: var(--primary, #67e480); 
+      border-radius: 6px; 
+      padding: 4px 10px; 
+      font-size: 0.85em; 
+      margin-left: 8px;
+      font-weight: 600;
+      border: 1px solid var(--border, #262b36);
+    }}
+    
+    .footer {{ 
+      margin-top: 2em; 
+      color: var(--text-muted, #a8b0bf); 
+      font-size: 0.95em; 
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid var(--border, #262b36);
+    }}
+    
+    .api-ref {{ 
+      margin-top: 2em; 
+      background: var(--bg, #0f1216); 
+      border-radius: 12px; 
+      padding: 24px; 
+      border: 1px solid var(--border, #262b36);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }}
+    
+    .api-ref:hover {{
+      border-color: var(--primary, #67e480);
+      box-shadow: 0 4px 16px rgba(103, 228, 128, 0.1);
+    }}
+    
+    .api-ref h2 {{ 
+      color: var(--info, #8be9fd); 
+      margin-top: 0;
+      margin-bottom: 1em;
+      font-size: 1.3em;
+      font-weight: 600;
+    }}
+    
+    .api-ref code {{ 
+      background: var(--surface-secondary, #1e2329); 
+      color: var(--warning, #ffb86c); 
+      border-radius: 6px; 
+      padding: 3px 8px; 
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      font-size: 0.9em;
+      border: 1px solid var(--border, #262b36);
+    }}
+    
+    .api-ref li {{ 
+      margin-bottom: 0.6em;
+      line-height: 1.6;
+      transition: transform 0.2s ease;
+    }}
+    
+    .api-ref li:hover {{
+      transform: translateX(4px);
+    }}
+    
+    .api-section {{ 
+      margin-bottom: 2em; 
+      padding-bottom: 1.5em; 
+      border-bottom: 1px solid var(--border, #262b36);
+      animation: fadeIn 0.4s ease-out;
+    }}
+    
     .api-section:last-child {{ border-bottom: none; }}
-    .api-section h3 {{ font-size: 1.1em; margin-bottom: 0.5em; }}
-    .api-ref ul {{ margin-top: 0.5em; }}
-    .security-info {{ margin-top: 2em; background: #23272e; border: 1px solid #44475a; border-radius: 8px; padding: 14px 18px; }}
-    .security-info strong {{ color: #f1fa8c; }}
-    .curl-block {{ background: #282a36; color: #f8f8f2; border-radius: 6px; padding: 10px 14px; font-size: 0.98em; margin: 1em 0; font-family: 'Fira Mono', 'Consolas', monospace; }}
-    .doc-links {{ margin-top: 1.5em; }}
-    .doc-links a {{ margin-right: 18px; }}
+    
+    .api-section h3 {{ 
+      font-size: 1.15em; 
+      margin-bottom: 0.8em;
+      font-weight: 600;
+    }}
+    
+    .api-ref ul {{ 
+      margin-top: 0.8em;
+      padding-left: 0;
+    }}
+    
+    .security-info {{ 
+      margin-top: 2em; 
+      background: var(--surface-secondary, #1e2329); 
+      border: 1px solid var(--warning, #ffb86c); 
+      border-radius: 10px; 
+      padding: 16px 20px;
+      transition: all 0.3s ease;
+    }}
+    
+    .security-info:hover {{
+      border-color: var(--primary, #67e480);
+      box-shadow: 0 4px 16px rgba(103, 228, 128, 0.1);
+    }}
+    
+    .security-info strong {{ 
+      color: var(--warning, #ffb86c);
+      font-weight: 600;
+    }}
+    
+    .curl-block {{ 
+      background: var(--surface-secondary, #1e2329); 
+      color: var(--text, #e8e8e8); 
+      border-radius: 8px; 
+      padding: 14px 18px; 
+      font-size: 0.95em; 
+      margin: 1.5em 0; 
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      border: 1px solid var(--border, #262b36);
+      transition: all 0.3s ease;
+    }}
+    
+    .curl-block:hover {{
+      border-color: var(--primary, #67e480);
+      box-shadow: 0 2px 8px rgba(103, 228, 128, 0.1);
+    }}
+    
+    .curl-block code {{
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: var(--primary, #67e480);
+    }}
+    
+    .doc-links {{ 
+      margin-top: 2em;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }}
+    
+    .doc-links a {{ 
+      margin-right: 0;
+      padding: 8px 14px;
+      background: var(--surface-secondary, #1e2329);
+      border-radius: 8px;
+      border: 1px solid var(--border, #262b36);
+      transition: all 0.2s ease;
+    }}
+    
+    .doc-links a:hover {{
+      background: var(--surface, #171b22);
+      border-color: var(--primary, #67e480);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(103, 228, 128, 0.15);
+      text-decoration: none;
+    }}
+    
+    @keyframes fadeIn {{
+      from {{ opacity: 0; transform: translateY(10px); }}
+      to {{ opacity: 1; transform: translateY(0); }}
+    }}
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {{
+      .wrap {{ padding: 0 12px; margin: 16px auto; }}
+      .container {{ padding: 20px; border-radius: 12px; }}
+      .api-ref {{ padding: 16px; }}
+      .doc-links {{ flex-direction: column; }}
+      .doc-links a {{ width: 100%; text-align: center; }}
+    }}
   </style>
 </head>
 <body>
-  <div class='container'>
+  <div class='wrap'>
+    <div class='container'>
     <h1>
       <img class='logo' src='https://raw.githubusercontent.com/platinoff/poolAI/Bolvanka-Beta-v1--stage2-https/docs/poolai_logo.svg' alt='PoolAI Logo' onerror="this.style.display='none'"/>
       PoolAI Status <span class='badge'>API v1</span>
@@ -245,6 +481,7 @@ async fn status_handler(req: Request<axum::body::Body>) -> Response {
       <p>PoolAI — AI Mining Pool Management System<br>
       <span style='font-size:0.9em'>Madevinc corp, 2025</span></p>
     </div>
+  </div>
   </div>
 </body>
 </html>
