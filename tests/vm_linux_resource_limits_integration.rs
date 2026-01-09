@@ -49,20 +49,19 @@ async fn test_register_process_pid() {
     let process_id = Uuid::new_v4();
     let pid = 12345u32;
 
-    // Register PID
-    limiter.register_process_pid(process_id, pid).await;
-
-    // Verify it was registered (by trying to apply limits)
-    // This will fail if PID is not registered (on Linux)
+    // Test applying limits to a command (no PID registration needed)
     let limits = ResourceLimits {
-        cpu_cores: Some(2),
-        memory_mb: Some(2048),
+        cpu_cores: 2,
+        memory_mb: 2048,
         gpu_device: None,
     };
 
-    // On Linux, this should work if PID is registered
-    // On other platforms, it should just log
-    let result = limiter.apply_limits(process_id, &limits).await;
+    // Create a command to apply limits to
+    let mut command = tokio::process::Command::new("echo");
+    
+    // On Linux, this should work if cgroups are available
+    // On other platforms, it should just validate
+    let result = limiter.apply_limits(&mut command, &limits).await;
 
     #[cfg(target_os = "linux")]
     {
@@ -146,12 +145,12 @@ async fn test_resource_limits_validation() {
     let process_id = Uuid::new_v4();
 
     // Register a fake PID
-    limiter.register_process_pid(process_id, 99999).await;
+    // Test applying limits to a command (no PID registration needed)
 
     // Invalid limits: zero CPU cores
     let invalid_limits = ResourceLimits {
-        cpu_cores: Some(0),
-        memory_mb: Some(2048),
+        cpu_cores: 0,
+        memory_mb: 2048,
         gpu_device: None,
     };
 
@@ -160,12 +159,13 @@ async fn test_resource_limits_validation() {
 
     // Invalid limits: too low memory
     let invalid_memory = ResourceLimits {
-        cpu_cores: Some(2),
-        memory_mb: Some(64), // Less than 128 MB minimum
+        cpu_cores: 2,
+        memory_mb: 64, // Less than 128 MB minimum
         gpu_device: None,
     };
 
-    let result = limiter.apply_limits(process_id, &invalid_memory).await;
+    let mut command2 = tokio::process::Command::new("echo");
+    let result = limiter.apply_limits(&mut command2, &invalid_memory).await;
     assert!(result.is_err());
 }
 

@@ -107,8 +107,8 @@ async fn test_get_usage_windows() {
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
-    // Get usage for non-existent process
-    let result = limiter.get_usage(process_id).await;
+    // Get usage for non-existent process (use u32 PID, not Uuid)
+    let result = limiter.get_usage(99999u32).await;
 
     // Should return default usage (0.0 CPU, 0 MB memory)
     assert!(result.is_ok());
