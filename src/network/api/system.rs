@@ -13,7 +13,7 @@ use axum::{
     http::{header::ACCEPT, StatusCode},
     middleware,
     response::{IntoResponse, Response},
-    routing::{get, post, put},
+    routing::{get, put},
     Json, Router,
 };
 use serde::Serialize;

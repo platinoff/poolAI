@@ -674,7 +674,7 @@ impl LibraryManager {
         name: &str,
         version: &str,
         base64_data: &str,
-        library_type: LibraryType,
+        _library_type: LibraryType,
     ) -> Result<LibraryInfo, AppError> {
         use base64::{engine::general_purpose::STANDARD, Engine};
 
