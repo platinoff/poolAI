@@ -95,6 +95,7 @@ const BASE_CSS: &str = r#"
     color: var(--text, #e8e8e8); 
     margin: 0; 
     padding: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   a { color: var(--link, #77c7ff); text-decoration: none; }
   a:hover { color: var(--link-hover, #8bd5ff); text-decoration: underline; }
@@ -141,6 +142,17 @@ const BASE_CSS: &str = r#"
     border-radius: 10px; 
     background: var(--bg, #0f1216); 
     white-space: nowrap;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .nav a:hover {
+    background: var(--surface-secondary, #1e2329);
+    border-color: var(--primary, #50fa7b);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(80, 250, 123, 0.2);
+  }
+  .nav a:active {
+    transform: translateY(0);
   }
   
   /* Content з правильним spacing */
@@ -163,6 +175,13 @@ const BASE_CSS: &str = r#"
     border: 1px solid var(--border, #262b36); 
     background: var(--bg, #0f1216); 
     width: 100%;
+    transition: all 0.2s ease;
+  }
+  .item:hover {
+    background: var(--surface, #171b22);
+    border-color: var(--border, #44475a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
   .muted { color: var(--text-muted, #a8b0bf); font-size: 0.9em; }
   
@@ -192,6 +211,11 @@ const BASE_CSS: &str = r#"
     margin: 12px 0 0; 
     width: 100%;
     overflow-x: auto;
+    transition: all 0.2s ease;
+  }
+  pre:hover {
+    border-color: var(--primary, #50fa7b);
+    box-shadow: 0 2px 8px rgba(80, 250, 123, 0.1);
   }
   
   @media (max-width: 860px) { 
@@ -355,6 +379,125 @@ const BASE_CSS: &str = r#"
     left: 0;
     z-index: 10000;
   }
+  
+  /* Enhanced UI Improvements - Smooth Transitions & Visual Polish */
+  .card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+  }
+  
+  /* Smooth fade-in for content */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .content > .card {
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  /* Enhanced button transitions */
+  .btn {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  .btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  
+  /* Enhanced table row transitions */
+  tr {
+    transition: all 0.2s ease;
+  }
+  tr:hover {
+    background: var(--surface-secondary, #1e2329) !important;
+    transform: scale(1.01);
+  }
+  
+  /* Smooth loading state transitions */
+  [data-loading="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+  }
+  [data-loading="true"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(80, 250, 123, 0.1), transparent);
+    animation: loading-shimmer 1.5s infinite;
+  }
+  @keyframes loading-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  /* Enhanced topbar transitions */
+  .topbar {
+    transition: all 0.3s ease;
+  }
+  
+  /* Smooth theme transitions */
+  * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  /* Enhanced focus states */
+  input:focus, select:focus, textarea:focus {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(80, 250, 123, 0.2);
+  }
+  
+  /* Smooth modal transitions */
+  .modal {
+    animation: fadeIn 0.2s ease-out;
+  }
+  .modal-content {
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  /* Enhanced pill badge transitions */
+  .pill {
+    transition: all 0.2s ease;
+  }
+  .pill:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Smooth grid item transitions */
+  .grid .item {
+    animation: fadeIn 0.3s ease-out;
+    animation-fill-mode: both;
+  }
+  .grid .item:nth-child(1) { animation-delay: 0.05s; }
+  .grid .item:nth-child(2) { animation-delay: 0.1s; }
+  .grid .item:nth-child(3) { animation-delay: 0.15s; }
+  .grid .item:nth-child(4) { animation-delay: 0.2s; }
 "#;
 
 fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
