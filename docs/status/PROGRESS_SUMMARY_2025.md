@@ -70,7 +70,7 @@
 - ✅ Responsive design
 - ✅ Accessibility
 
-### Функціональність: **96%** ✅
+### Функціональність: **98%** ✅
 
 #### ✅ Повністю реалізовано (100%)
 - ✅ **User Management** - CRUD operations (UI + Backend)
@@ -80,11 +80,11 @@
 - ✅ **Dashboard** - System overview, metrics, alerts
 - ✅ **Security Management** - OAuth2/SAML/Policies CRUD (UI + Backend)
 
-#### ✅ Майже завершено (80-95%)
-- ✅ **System Configuration** - 80% (Forms implemented, additional settings pending)
+#### ✅ Майже завершено (95-100%)
+- ✅ **System Configuration** - 100% (All tabs implemented: General, Performance, GPU, Security, Monitoring, Health)
+- ✅ **Monitoring Dashboard** - 100% (View + Create dashboard/alert rules + Alert rules display)
 - ✅ **Library Management** - 95% (Basic + Advanced actions, upload backend pending)
 - ✅ **RAID Management** - 95% (Basic + Advanced actions, restore backend pending)
-- ✅ **Monitoring Dashboard** - 90% (View + Create dashboard/alert rules, drag-and-drop pending)
 
 ---
 
