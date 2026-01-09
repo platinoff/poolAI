@@ -14,17 +14,19 @@
 //! - `common` - Shared types and utilities
 
 pub mod common;
+pub mod libraries;
+pub mod raid;
 pub mod rewards;
 pub mod system;
+pub mod users;
 pub mod vm;
 pub mod workers;
 
 // Re-export check_permission for backward compatibility with api_legacy.rs
 pub use common::check_permission;
 
-// Note: Other modules (raid, libraries, users) are still in api_legacy.rs
-// They will be gradually migrated to modular structure
-// TODO: Create modules: raid, libraries, users
+// All API modules have been migrated to modular structure ✅
+// api_legacy.rs is kept for backward compatibility and distributed RAID handlers
 
 use axum::Router;
 
@@ -39,14 +41,11 @@ pub fn create_api_routes() -> Router {
         .merge(workers::create_workers_routes())
         .merge(rewards::create_rewards_routes())
         .merge(vm::create_vm_routes())
-        // Temporarily delegate to legacy implementation for other routes
-        // TODO: Migrate to modular structure
-        .merge(create_legacy_routes())
+        .merge(raid::create_raid_routes())
+        .merge(libraries::create_libraries_routes())
+        .merge(users::create_users_routes())
+        // api_legacy.rs is kept for backward compatibility
+        // All handlers have been migrated to modular structure
 }
 
-/// Temporary function to create routes from legacy api.rs file
-/// TODO: Remove once all handlers are migrated to modules
-fn create_legacy_routes() -> Router {
-    use crate::network::api_legacy::create_api_routes;
-    create_api_routes()
-}
+// Legacy routes function removed - all handlers migrated to modules ✅
