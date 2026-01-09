@@ -10,6 +10,7 @@ pub mod api;
 pub mod api_legacy;
 pub mod auth;
 pub mod raid_distributed_handlers;
+pub mod security_headers;
 pub mod tls_config;
 pub mod validation;
 pub mod ws;
@@ -18,6 +19,7 @@ pub mod ws;
 pub mod enterprise_api;
 
 use crate::ui;
+use axum::middleware;
 use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
@@ -41,7 +43,9 @@ pub async fn start_server(addr: SocketAddr) {
             // Trailing-slash compat for UI entrypoint.
             .route("/ui/", get(|| async { Redirect::permanent("/ui") }))
             .nest("/api/v1", api::create_api_routes())
-            .nest("/ui", ui::create_ui_routes());
+            .nest("/ui", ui::create_ui_routes())
+            // Add security headers middleware to all responses
+            .layer(middleware::from_fn(security_headers::security_headers_middleware));
 
         // Add enterprise API routes if feature is enabled
         #[cfg(feature = "enterprise")]

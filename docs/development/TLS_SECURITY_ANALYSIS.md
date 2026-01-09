@@ -107,6 +107,26 @@ let cert_path = https_config
    - Автоматично додається до всіх HTTPS responses
    - Налаштовується через конфігурацію
 
+2. **Content-Security-Policy (CSP)** ✅
+   - Реалізовано через `SecurityHeadersConfig`
+   - Автоматично додається до всіх responses
+   - Налаштовується через конфігурацію
+
+3. **X-Frame-Options** ✅
+   - Реалізовано через `SecurityHeadersConfig`
+   - Автоматично додається до всіх responses
+   - Значення за замовчуванням: `DENY`
+
+4. **X-Content-Type-Options** ✅
+   - Реалізовано через `SecurityHeadersConfig`
+   - Автоматично додається до всіх responses
+   - Значення за замовчуванням: `nosniff`
+
+5. **Referrer-Policy** ✅
+   - Реалізовано через `SecurityHeadersConfig`
+   - Автоматично додається до всіх responses
+   - Значення за замовчуванням: `strict-origin-when-cross-origin`
+
 ### Рекомендовані Headers (для додавання)
 
 2. **Content-Security-Policy (CSP)** 🔄
@@ -140,9 +160,9 @@ let cert_path = https_config
 ### Області для покращення 🔄
 
 1. **Certificate Transparency**: Додати перевірку CT logs
-2. **Security Headers**: Додати CSP, X-Frame-Options, X-Content-Type-Options
-3. **Rate Limiting**: Додати rate limiting для HTTPS endpoints
-4. **OCSP Stapling**: Додати OCSP stapling для швидшої перевірки сертифікатів
+2. **Rate Limiting**: Додати rate limiting для HTTPS endpoints
+3. **OCSP Stapling**: Додати OCSP stapling для швидшої перевірки сертифікатів
+4. **Permissions-Policy**: Розширити підтримку Permissions-Policy header
 
 ---
 
@@ -199,11 +219,12 @@ app.layer(axum::middleware::from_fn(|req, next| {
 - ✅ Perfect Forward Secrecy
 - ✅ Certificate management
 - ✅ Архітектура для TLS 2.0
+- ✅ Security Headers (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
 
 **Рекомендації**:
-- 🔄 Додати security headers (CSP, X-Frame-Options, etc.)
 - 🔄 Додати Certificate Transparency перевірку
 - 🔄 Додати OCSP stapling
+- 🔄 Розширити підтримку Permissions-Policy header
 
 **Готовність до production**: ✅ **ГОТОВО**
 
