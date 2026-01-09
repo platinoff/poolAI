@@ -383,10 +383,26 @@ const BASE_CSS: &str = r#"
   /* Enhanced UI Improvements - Smooth Transitions & Visual Polish */
   .card {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(119, 199, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  .card:hover::before {
+    left: 100%;
   }
   .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+    border-color: var(--primary, #50fa7b);
   }
   
   /* Smooth fade-in for content */
@@ -394,8 +410,80 @@ const BASE_CSS: &str = r#"
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
   .content > .card {
     animation: fadeIn 0.4s ease-out;
+  }
+  .content > .card:nth-child(1) { animation-delay: 0.1s; }
+  .content > .card:nth-child(2) { animation-delay: 0.2s; }
+  .content > .card:nth-child(3) { animation-delay: 0.3s; }
+  .content > .card:nth-child(4) { animation-delay: 0.4s; }
+  
+  /* Enhanced item hover effects */
+  .item {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .item:hover {
+    background: var(--surface, #171b22);
+    border-color: var(--primary, #50fa7b);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 24px rgba(80, 250, 123, 0.15);
+  }
+  
+  /* Enhanced button interactions */
+  .btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+  }
+  .btn:active::after {
+    width: 300px;
+    height: 300px;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  
+  /* Enhanced topbar with subtle animation */
+  .topbar {
+    animation: slideInUp 0.3s ease-out;
+  }
+  
+  /* Loading state improvements */
+  .loading {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  /* Enhanced navigation link active state */
+  .nav a.active {
+    background: var(--primary, #50fa7b);
+    color: var(--bg, #0f1216);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(80, 250, 123, 0.3);
+  }
+  
+  /* Smooth theme transitions */
+  * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
   
   /* Enhanced button transitions */
