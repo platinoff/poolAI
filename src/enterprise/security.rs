@@ -42,6 +42,21 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
 
+// OAuth2 token exchange response from provider
+#[derive(Debug, Deserialize)]
+struct OAuth2TokenResponseRaw {
+    access_token: String,
+    token_type: Option<String>,
+    expires_in: Option<u64>,
+    refresh_token: Option<String>,
+    id_token: Option<String>,
+    scope: Option<String>,
+    #[serde(default)]
+    error: Option<String>,
+    #[serde(default)]
+    error_description: Option<String>,
+}
+
 /// OAuth2 provider configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OAuth2Config {
@@ -284,29 +299,99 @@ impl SecurityManager {
             )));
         }
 
-        // TODO: Implement actual OAuth2 token exchange
-        // This would involve:
-        // 1. Making HTTP POST request to token_url
-        // 2. Sending client_id, client_secret, code, redirect_uri
-        // 3. Parsing response (JSON with access_token, refresh_token, etc.)
-        // 4. Validating and storing tokens
-        // For now, return placeholder response
+        // Create HTTP client for OAuth2 token exchange
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .map_err(|e| {
+                AppError::NetworkError(format!(
+                    "Failed to create HTTP client for OAuth2 token exchange. Context: Cannot initialize HTTP client. \
+                    Suggestion: Check network configuration and ensure reqwest crate is properly configured. \
+                    Provider: '{}', Error: {}",
+                    provider_name, e
+                ))
+            })?;
 
-        warn!(
-            "OAuth2 token exchange requested for provider {}, but full implementation requires HTTP client integration. \
-            Context: Token exchange requires making HTTP POST request to provider's token endpoint. \
-            Suggestion: Add reqwest or similar HTTP client dependency and implement token exchange.",
+        // Prepare form data for token exchange (OAuth2 requires application/x-www-form-urlencoded)
+        // Build URL-encoded form body manually since reqwest without default features doesn't have form() method
+        let form_body = format!(
+            "grant_type=authorization_code&code={}&client_id={}&client_secret={}&redirect_uri={}",
+            urlencoding::encode(code),
+            urlencoding::encode(&provider.config.client_id),
+            urlencoding::encode(&provider.config.client_secret),
+            urlencoding::encode(&provider.config.redirect_uri)
+        );
+
+        // Make HTTP POST request to token endpoint
+        let response = client
+            .post(&provider.config.token_url)
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .header("Accept", "application/json")
+            .body(form_body)
+            .send()
+            .await
+            .map_err(|e| {
+                AppError::NetworkError(format!(
+                    "OAuth2 token exchange request failed. Context: HTTP request to token endpoint failed. \
+                    Suggestion: Check network connectivity, verify token URL is correct, and ensure provider is accessible. \
+                    Provider: '{}', Token URL: '{}', Error: {}",
+                    provider_name, provider.config.token_url, e
+                ))
+            })?;
+
+        // Check response status
+        let status = response.status();
+        if !status.is_success() {
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(AppError::NetworkError(format!(
+                "OAuth2 token exchange failed with status {}. Context: Token endpoint returned error. \
+                Suggestion: Verify authorization code is valid and not expired, check client credentials, and ensure redirect_uri matches. \
+                Provider: '{}', Status: {}, Response: {}",
+                status, provider_name, status, error_text
+            )));
+        }
+
+        // Parse JSON response
+        let token_response: OAuth2TokenResponseRaw = response
+            .json()
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to parse OAuth2 token response. Context: Token endpoint returned invalid JSON. \
+                    Suggestion: Verify provider token endpoint format matches OAuth2 specification. \
+                    Provider: '{}', Error: {}",
+                    provider_name, e
+                ))
+            })?;
+
+        // Check for OAuth2 error response
+        if let Some(error) = token_response.error {
+            return Err(AppError::ValidationError(format!(
+                "OAuth2 token exchange error: {}. Description: {}. Context: Provider returned OAuth2 error during token exchange. \
+                Suggestion: Check authorization code validity, client credentials, and redirect URI. \
+                Provider: '{}', Error: '{}'",
+                error,
+                token_response.error_description.unwrap_or_default(),
+                provider_name,
+                error
+            )));
+        }
+
+        info!(
+            "OAuth2 token exchange successful for provider: {}",
             provider_name
         );
 
-        // Placeholder response
+        // Convert to our response format
         Ok(OAuth2TokenResponse {
-            access_token: format!("placeholder_token_{}", code),
-            token_type: "Bearer".to_string(),
-            expires_in: Some(3600),
-            refresh_token: Some(format!("placeholder_refresh_{}", code)),
-            id_token: None,
-            scope: Some(provider.config.scopes.join(" ")),
+            access_token: token_response.access_token,
+            token_type: token_response
+                .token_type
+                .unwrap_or_else(|| "Bearer".to_string()),
+            expires_in: token_response.expires_in,
+            refresh_token: token_response.refresh_token,
+            id_token: token_response.id_token,
+            scope: token_response.scope,
         })
     }
 
