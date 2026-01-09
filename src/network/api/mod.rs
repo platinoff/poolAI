@@ -14,15 +14,17 @@
 //! - `common` - Shared types and utilities
 
 pub mod common;
+pub mod rewards;
 pub mod system;
+pub mod vm;
 pub mod workers;
 
 // Re-export check_permission for backward compatibility with api_legacy.rs
 pub use common::check_permission;
 
-// Note: Other modules (vm, raid, libraries, users, rewards) are still in api_legacy.rs
+// Note: Other modules (raid, libraries, users) are still in api_legacy.rs
 // They will be gradually migrated to modular structure
-// TODO: Create modules: vm, raid, libraries, users, rewards
+// TODO: Create modules: raid, libraries, users
 
 use axum::Router;
 
@@ -35,6 +37,8 @@ pub fn create_api_routes() -> Router {
     Router::new()
         .merge(system::create_system_routes())
         .merge(workers::create_workers_routes())
+        .merge(rewards::create_rewards_routes())
+        .merge(vm::create_vm_routes())
         // Temporarily delegate to legacy implementation for other routes
         // TODO: Migrate to modular structure
         .merge(create_legacy_routes())
