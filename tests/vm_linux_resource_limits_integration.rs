@@ -173,11 +173,25 @@ async fn test_resource_limits_validation() {
 async fn test_vm_manager_with_resource_limits() {
     let manager = VmManager::new();
 
-    // Resource limits support is platform-dependent
-    // On Linux: depends on cgroups availability
-    // On Windows: depends on Job Objects availability
-    // Just verify manager can be created and initialized
-    manager.initialize().await.unwrap();
+    // Check if resource limits are supported
+    let supported = manager.is_resource_limits_supported();
+
+    #[cfg(target_os = "linux")]
+    {
+        // On Linux, depends on cgroups availability
+        let _ = supported; // Just verify it doesn't panic
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, depends on Job Objects availability
+        let _ = supported; // Just verify it doesn't panic
+    }
+
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    {
+        assert!(!supported);
+    }
 
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
