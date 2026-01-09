@@ -14,8 +14,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::network::api::common::check_permission;
-use crate::network::auth::{auth_middleware, Claims};
+use crate::network::auth::auth_middleware;
 use crate::pool;
 use crate::network::validation;
 
