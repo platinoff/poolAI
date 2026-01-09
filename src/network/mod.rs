@@ -7,6 +7,7 @@
 //! - HTTPS/TLS support with certificate management
 
 pub mod api;
+pub mod api_legacy;
 pub mod auth;
 pub mod raid_distributed_handlers;
 pub mod validation;
