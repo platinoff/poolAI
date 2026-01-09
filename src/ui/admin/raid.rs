@@ -10,43 +10,73 @@ pub async fn admin_raid() -> Html<String> {
     let script = r#"
     async function loadRaidArtifacts() {
       try {
-        const artifacts = await fetchJson('/api/v1/raid/artifacts');
-        renderRaidArtifacts(artifacts);
+        const [artifacts, snapshot] = await Promise.all([
+          fetchJson('/api/v1/raid/artifacts'),
+          loadSnapshot().catch(() => null)
+        ]);
+        renderRaidArtifacts(artifacts, snapshot);
       } catch (e) {
         showNotification('Error loading RAID artifacts: ' + e.message, 'error');
       }
     }
     
-    function renderRaidArtifacts(artifacts) {
+    async function loadSnapshot() {
+      try {
+        const snapshot = await fetchJson('/api/v1/raid/snapshot');
+        return snapshot;
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    function renderRaidArtifacts(artifacts, snapshot) {
       const el = document.getElementById('raid-artifacts');
       if (!el) return;
-      if (!artifacts || artifacts.length === 0) {
-        el.innerHTML = '<div class="muted">No artifacts found</div>';
-        return;
-      }
-      el.innerHTML = `
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Size</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${artifacts.map(a => `
+      
+      const artifactsHtml = !artifacts || artifacts.length === 0 
+        ? '<div class="muted">No artifacts found</div>'
+        : `
+          <table class="admin-table">
+            <thead>
               <tr>
-                <td><code>${a.id || a.artifact_id || 'unknown'}</code></td>
-                <td>${a.name || 'unnamed'}</td>
-                <td>${formatBytes(a.size || 0)}</td>
-                <td>
-                  <button class="btn btn-danger" onclick="deleteArtifact('${a.id || a.artifact_id}')">Delete</button>
-                </td>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Actions</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${artifacts.map(a => `
+                <tr>
+                  <td><code>${a.id || a.artifact_id || 'unknown'}</code></td>
+                  <td>${a.name || 'unnamed'}</td>
+                  <td>${formatBytes(a.size || 0)}</td>
+                  <td>
+                    <button class="btn btn-danger" onclick="deleteArtifact('${a.id || a.artifact_id}')">Delete</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      
+      const snapshotHtml = snapshot 
+        ? `
+          <div class="admin-card">
+            <h3>Current Snapshot</h3>
+            <div class="muted">Sequence: ${snapshot.sequence || 'N/A'}</div>
+            <div class="muted">Created: ${snapshot.timestamp ? new Date(snapshot.timestamp).toLocaleString() : 'N/A'}</div>
+            <button class="btn" onclick="restoreFromSnapshot()">Restore from Snapshot</button>
+          </div>
+        `
+        : '<div class="admin-card"><div class="muted">No snapshot available</div></div>';
+      
+      el.innerHTML = `
+        <div class="admin-card">
+          <h3>Artifacts (${artifacts?.length || 0})</h3>
+          ${artifactsHtml}
+        </div>
+        ${snapshotHtml}
       `;
     }
     
@@ -134,6 +164,92 @@ pub async fn admin_raid() -> Html<String> {
       }
     }
     
+    async function createSnapshot() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      if (!confirm('Create a new snapshot? This will capture the current state of all artifacts.')) {
+        return;
+      }
+      
+      try {
+        await fetchJson('/api/v1/raid/snapshot/create', {
+          method: 'POST'
+        });
+        showNotification('Snapshot created successfully', 'success');
+        loadRaidArtifacts();
+      } catch (e) {
+        showNotification('Error creating snapshot: ' + e.message, 'error');
+      }
+    }
+    
+    async function restoreFromSnapshot() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      if (!confirm('Restore from snapshot? This will restore the RAID state from the latest snapshot. This action cannot be undone.')) {
+        return;
+      }
+      
+      try {
+        // Note: Restore functionality would need to be implemented in backend
+        // For now, we'll show a notification that this feature is pending
+        showNotification('Restore from snapshot - backend implementation pending', 'info');
+        // await fetchJson('/api/v1/raid/snapshot/restore', { method: 'POST' });
+        // showNotification('Restored from snapshot successfully', 'success');
+        // loadRaidArtifacts();
+      } catch (e) {
+        showNotification('Error restoring from snapshot: ' + e.message, 'error');
+      }
+    }
+    
+    async function syncArtifacts() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      try {
+        await fetchJson('/api/v1/raid/distributed/artifacts/sync', {
+          method: 'POST',
+          body: JSON.stringify({})
+        });
+        showNotification('Artifacts sync started', 'success');
+        setTimeout(() => loadRaidArtifacts(), 2000);
+      } catch (e) {
+        showNotification('Error syncing artifacts: ' + e.message, 'error');
+      }
+    }
+    
+    async function runGc() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      if (!confirm('Run garbage collection? This will remove old artifacts that are no longer referenced.')) {
+        return;
+      }
+      
+      try {
+        const result = await fetchJson('/api/v1/raid/gc', {
+          method: 'POST'
+        });
+        showNotification(`Garbage collection completed. Removed ${result.removed_count || 0} artifacts.`, 'success');
+        loadRaidArtifacts();
+      } catch (e) {
+        showNotification('Error running GC: ' + e.message, 'error');
+      }
+    }
+    
     loadRaidArtifacts();
     setInterval(loadRaidArtifacts, 10000);
     "#;
@@ -144,7 +260,12 @@ pub async fn admin_raid() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2>RAID Artifacts</h2>
-            <button class="btn btn-primary" onclick="showUploadArtifactModal()" aria-label="Upload artifact">Upload Artifact</button>
+            <div>
+              <button class="btn btn-primary" onclick="showUploadArtifactModal()" aria-label="Upload artifact">Upload Artifact</button>
+              <button class="btn" onclick="createSnapshot()" aria-label="Create snapshot">Create Snapshot</button>
+              <button class="btn" onclick="syncArtifacts()" aria-label="Sync artifacts">Sync Artifacts</button>
+              <button class="btn" onclick="runGc()" aria-label="Run garbage collection">Run GC</button>
+            </div>
           </div>
           <div id="raid-artifacts"></div>
         </div>

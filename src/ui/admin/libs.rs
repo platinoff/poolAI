@@ -122,6 +122,16 @@ pub async fn admin_libs() -> Html<String> {
       }
     }
     
+    function showUploadLibraryModal() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      showNotification('Library upload functionality - backend implementation pending', 'info');
+      // showModal('uploadLibraryModal');
+    }
+    
     loadLibraries();
     setInterval(loadLibraries, 10000);
     "#;
@@ -132,6 +142,7 @@ pub async fn admin_libs() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2>Libraries</h2>
+            <button class="btn btn-primary" onclick="showUploadLibraryModal()" aria-label="Upload library">Upload Library</button>
           </div>
           <div id="libraries-list"></div>
         </div>
