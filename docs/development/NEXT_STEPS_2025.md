@@ -92,12 +92,23 @@
 
 ### ⭐ Пріоритет 2: Архітектурні покращення (опціонально)
 
-#### 2.1 Розбити великі файли (High Priority)
+#### 2.1 Розбити великі файли (In Progress - ~30% complete) ✅
 **Складність**: Низька-Середня  
-**Оцінка**: 2-3 дні
+**Оцінка**: 2-3 дні (1 день виконано)
+
+**Поточний стан**: 
+- ✅ Створено модульну структуру `src/network/api/`
+- ✅ Модуль `system.rs` - system handlers (status, health, metrics, login, models, gpu, websocket)
+- ✅ Модуль `workers.rs` - worker handlers (list, create, delete)
+- ✅ Модуль `common.rs` - спільні утиліти (check_permission)
+- ✅ Модуль `mod.rs` - композиція маршрутів
+- 🔄 `api_legacy.rs` - решта handlers (vm, raid, libraries, users, rewards) - для зворотної сумісності
 
 **Завдання**:
-- [ ] Розбити `network/api.rs` (~1770 рядків) на доменні файли:
+- [x] Створити модульну структуру `src/network/api/`
+- [x] Перемістити system handlers в `api/system.rs`
+- [x] Перемістити worker handlers в `api/workers.rs`
+- [ ] Розбити `api_legacy.rs` на доменні файли:
   - `network/api/workers.rs`
   - `network/api/vm.rs`
   - `network/api/raid.rs`
