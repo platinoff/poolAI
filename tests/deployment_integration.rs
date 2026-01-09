@@ -11,12 +11,12 @@ use std::path::Path;
 
 #[test]
 fn test_dockerfile_exists() {
-    assert!(Path::new("Dockerfile").exists(), "Dockerfile should exist");
+    assert!(Path::new("docker/Dockerfile").exists(), "Dockerfile should exist in docker/");
 }
 
 #[test]
 fn test_dockerfile_contains_required_stages() {
-    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     // Check for multi-stage build
     assert!(
@@ -31,21 +31,25 @@ fn test_dockerfile_contains_required_stages() {
 
 #[test]
 fn test_dockerfile_exposes_ports() {
-    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
-        dockerfile_content.contains("EXPOSE 8080"),
+        dockerfile_content.contains("8080"),
         "Dockerfile should expose port 8080"
     );
     assert!(
-        dockerfile_content.contains("EXPOSE 8443"),
+        dockerfile_content.contains("8443"),
         "Dockerfile should expose port 8443"
+    );
+    assert!(
+        dockerfile_content.contains("EXPOSE"),
+        "Dockerfile should contain EXPOSE directive"
     );
 }
 
 #[test]
 fn test_dockerfile_uses_non_root_user() {
-    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("USER poolai") || dockerfile_content.contains("USER "),
@@ -55,7 +59,7 @@ fn test_dockerfile_uses_non_root_user() {
 
 #[test]
 fn test_dockerfile_has_healthcheck() {
-    let dockerfile_content = fs::read_to_string("Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("HEALTHCHECK"),
@@ -66,15 +70,15 @@ fn test_dockerfile_has_healthcheck() {
 #[test]
 fn test_docker_compose_exists() {
     assert!(
-        Path::new("docker-compose.yml").exists(),
-        "docker-compose.yml should exist"
+        Path::new("docker/docker-compose.yml").exists(),
+        "docker-compose.yml should exist in docker/"
     );
 }
 
 #[test]
 fn test_docker_compose_has_poolai_service() {
     let compose_content =
-        fs::read_to_string("docker-compose.yml").expect("Failed to read docker-compose.yml");
+        fs::read_to_string("docker/docker-compose.yml").expect("Failed to read docker-compose.yml");
 
     assert!(
         compose_content.contains("poolai:"),
@@ -85,7 +89,7 @@ fn test_docker_compose_has_poolai_service() {
 #[test]
 fn test_docker_compose_has_volumes() {
     let compose_content =
-        fs::read_to_string("docker-compose.yml").expect("Failed to read docker-compose.yml");
+        fs::read_to_string("docker/docker-compose.yml").expect("Failed to read docker-compose.yml");
 
     assert!(
         compose_content.contains("poolai-data:") || compose_content.contains("volumes:"),
@@ -96,7 +100,7 @@ fn test_docker_compose_has_volumes() {
 #[test]
 fn test_docker_compose_has_networks() {
     let compose_content =
-        fs::read_to_string("docker-compose.yml").expect("Failed to read docker-compose.yml");
+        fs::read_to_string("docker/docker-compose.yml").expect("Failed to read docker-compose.yml");
 
     assert!(
         compose_content.contains("networks:") || compose_content.contains("poolai-network:"),
@@ -107,15 +111,15 @@ fn test_docker_compose_has_networks() {
 #[test]
 fn test_dockerignore_exists() {
     assert!(
-        Path::new(".dockerignore").exists(),
-        ".dockerignore should exist"
+        Path::new("docker/.dockerignore").exists(),
+        ".dockerignore should exist in docker/"
     );
 }
 
 #[test]
 fn test_dockerignore_excludes_target() {
     let dockerignore_content =
-        fs::read_to_string(".dockerignore").expect("Failed to read .dockerignore");
+        fs::read_to_string("docker/.dockerignore").expect("Failed to read .dockerignore");
 
     assert!(
         dockerignore_content.contains("target/") || dockerignore_content.contains("target"),

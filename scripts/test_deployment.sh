@@ -39,52 +39,52 @@ fi
 # Test 1: Check if Dockerfile exists
 echo ""
 echo "📦 Testing Dockerfile..."
-if [ -f "Dockerfile" ]; then
-    echo -e "${GREEN}✅ Dockerfile exists${NC}"
+if [ -f "docker/Dockerfile" ]; then
+    echo -e "${GREEN}✅ Dockerfile exists in docker/${NC}"
     
     # Check Dockerfile syntax (if docker is available)
     if [ "$DOCKER_AVAILABLE" = true ]; then
         echo "  Validating Dockerfile syntax..."
-        if docker build --dry-run -f Dockerfile . >/dev/null 2>&1; then
+        if docker build --dry-run -f docker/Dockerfile . >/dev/null 2>&1; then
             echo -e "${GREEN}  ✅ Dockerfile syntax is valid${NC}"
         else
             echo -e "${YELLOW}  ⚠️  Could not validate Dockerfile syntax (docker build --dry-run not supported)${NC}"
         fi
     fi
 else
-    echo -e "${RED}❌ Dockerfile not found${NC}"
+    echo -e "${RED}❌ Dockerfile not found in docker/${NC}"
     exit 1
 fi
 
 # Test 2: Check if docker-compose.yml exists
 echo ""
 echo "🐳 Testing docker-compose.yml..."
-if [ -f "docker-compose.yml" ]; then
-    echo -e "${GREEN}✅ docker-compose.yml exists${NC}"
+if [ -f "docker/docker-compose.yml" ]; then
+    echo -e "${GREEN}✅ docker-compose.yml exists in docker/${NC}"
     
     # Check docker-compose syntax (if docker-compose is available)
     if [ "$COMPOSE_AVAILABLE" = true ]; then
         echo "  Validating docker-compose.yml syntax..."
-        if docker-compose config >/dev/null 2>&1; then
+        if docker-compose -f docker/docker-compose.yml config >/dev/null 2>&1; then
             echo -e "${GREEN}  ✅ docker-compose.yml syntax is valid${NC}"
         else
             echo -e "${RED}  ❌ docker-compose.yml syntax is invalid${NC}"
-            docker-compose config
+            docker-compose -f docker/docker-compose.yml config
             exit 1
         fi
     fi
 else
-    echo -e "${RED}❌ docker-compose.yml not found${NC}"
+    echo -e "${RED}❌ docker-compose.yml not found in docker/${NC}"
     exit 1
 fi
 
 # Test 3: Check if .dockerignore exists
 echo ""
 echo "🚫 Testing .dockerignore..."
-if [ -f ".dockerignore" ]; then
-    echo -e "${GREEN}✅ .dockerignore exists${NC}"
+if [ -f "docker/.dockerignore" ]; then
+    echo -e "${GREEN}✅ .dockerignore exists in docker/${NC}"
 else
-    echo -e "${YELLOW}⚠️  .dockerignore not found (optional but recommended)${NC}"
+    echo -e "${YELLOW}⚠️  .dockerignore not found in docker/ (optional but recommended)${NC}"
 fi
 
 # Test 4: Check if config.example.toml exists
@@ -136,6 +136,6 @@ echo ""
 echo "📝 Next steps:"
 echo "  1. Review the deployment files"
 echo "  2. Test Docker build: docker build -t poolai:latest ."
-echo "  3. Test docker-compose: docker-compose up -d"
+echo "  3. Test docker-compose: docker-compose -f docker/docker-compose.yml up -d"
 echo "  4. Follow the deployment testing checklist"
 echo ""

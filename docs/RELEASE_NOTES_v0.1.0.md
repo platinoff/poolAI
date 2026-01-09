@@ -77,8 +77,8 @@ PoolAI v0.1.0 is the first production-ready release of the Distributed AI Mining
 
 ### Docker
 ```bash
-docker build -t poolai:0.1.0 .
-docker-compose up
+docker build -t poolai:0.1.0 -f docker/Dockerfile .
+docker-compose -f docker/docker-compose.yml up
 ```
 
 ### Kubernetes

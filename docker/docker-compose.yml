@@ -3,8 +3,8 @@ version: '3.8'
 services:
   poolai:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: docker/Dockerfile
     image: poolai:latest
     container_name: poolai
     restart: unless-stopped

@@ -36,7 +36,7 @@ cargo test --test deployment_integration
 
 ```bash
 # Build the Docker image
-docker build -t poolai:latest .
+docker build -t poolai:latest -f docker/Dockerfile .
 
 # Run the container
 docker run -d \
@@ -50,26 +50,26 @@ docker run -d \
 
 ### Using Docker Compose
 
-A `docker-compose.yml` file is provided in the project root. To use it:
+A `docker-compose.yml` file is provided in the `docker/` directory. To use it:
 
 ```bash
 # Start all services
-docker-compose up -d
+docker-compose -f docker/docker-compose.yml up -d
 
 # View logs
-docker-compose logs -f poolai
+docker-compose -f docker/docker-compose.yml logs -f poolai
 
 # Stop all services
-docker-compose down
+docker-compose -f docker/docker-compose.yml down
 ```
 
-The `docker-compose.yml` file includes:
+The `docker/docker-compose.yml` file includes:
 - PoolAI service with health checks
 - Volume management for data and configuration
 - Network configuration
 - Optional Prometheus and Grafana services (commented out)
 
-**Note**: The `docker-compose.yml` file is already present in the project root. You can customize it as needed.
+**Note**: The `docker-compose.yml` file is located in the `docker/` directory. You can customize it as needed.
       - poolai-certs:/certs
     environment:
       - RUST_LOG=info
@@ -93,12 +93,12 @@ networks:
 Start with:
 
 ```bash
-docker-compose up -d
+docker-compose -f docker/docker-compose.yml up -d
 ```
 
 ## Dockerfile
 
-Create a `Dockerfile` in the project root:
+The `Dockerfile` is located in the `docker/` directory. To build:
 
 ```dockerfile
 # Build stage
@@ -300,11 +300,11 @@ docker network inspect poolai-network
 git pull
 
 # Rebuild image
-docker build -t poolai:latest .
+docker build -t poolai:latest -f docker/Dockerfile .
 
 # Restart container
 docker-compose down
-docker-compose up -d
+docker-compose -f docker/docker-compose.yml up -d
 ```
 
 ## Backup and Restore

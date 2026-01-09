@@ -32,11 +32,11 @@ if (-not $composeAvailable) {
 
 # Test 1: Check if Dockerfile exists
 Write-Host "`n📦 Testing Dockerfile..." -ForegroundColor Cyan
-if (Test-Path "Dockerfile") {
-    Write-Host "✅ Dockerfile exists" -ForegroundColor Green
+if (Test-Path "docker/Dockerfile") {
+    Write-Host "✅ Dockerfile exists in docker/" -ForegroundColor Green
     
     # Check Dockerfile content
-    $dockerfileContent = Get-Content "Dockerfile" -Raw
+    $dockerfileContent = Get-Content "docker/Dockerfile" -Raw
     if ($dockerfileContent -match "FROM rust:") {
         Write-Host "  ✅ Contains Rust builder stage" -ForegroundColor Green
     }
@@ -53,38 +53,38 @@ if (Test-Path "Dockerfile") {
         Write-Host "  ✅ Has health check" -ForegroundColor Green
     }
 } else {
-    Write-Host "❌ Dockerfile not found" -ForegroundColor Red
+    Write-Host "❌ Dockerfile not found in docker/" -ForegroundColor Red
     exit 1
 }
 
 # Test 2: Check if docker-compose.yml exists
 Write-Host "`n🐳 Testing docker-compose.yml..." -ForegroundColor Cyan
-if (Test-Path "docker-compose.yml") {
-    Write-Host "✅ docker-compose.yml exists" -ForegroundColor Green
+if (Test-Path "docker/docker-compose.yml") {
+    Write-Host "✅ docker-compose.yml exists in docker/" -ForegroundColor Green
     
     # Check docker-compose syntax (if docker-compose is available)
     if ($composeAvailable) {
         Write-Host "  Validating docker-compose.yml syntax..." -ForegroundColor Gray
         try {
-            docker-compose config | Out-Null
+            docker-compose -f docker/docker-compose.yml config | Out-Null
             Write-Host "  ✅ docker-compose.yml syntax is valid" -ForegroundColor Green
         } catch {
             Write-Host "  ❌ docker-compose.yml syntax is invalid" -ForegroundColor Red
-            docker-compose config
+            docker-compose -f docker/docker-compose.yml config
             exit 1
         }
     }
 } else {
-    Write-Host "❌ docker-compose.yml not found" -ForegroundColor Red
+    Write-Host "❌ docker-compose.yml not found in docker/" -ForegroundColor Red
     exit 1
 }
 
 # Test 3: Check if .dockerignore exists
 Write-Host "`n🚫 Testing .dockerignore..." -ForegroundColor Cyan
-if (Test-Path ".dockerignore") {
-    Write-Host "✅ .dockerignore exists" -ForegroundColor Green
+if (Test-Path "docker/.dockerignore") {
+    Write-Host "✅ .dockerignore exists in docker/" -ForegroundColor Green
 } else {
-    Write-Host "⚠️  .dockerignore not found (optional but recommended)" -ForegroundColor Yellow
+    Write-Host "⚠️  .dockerignore not found in docker/ (optional but recommended)" -ForegroundColor Yellow
 }
 
 # Test 4: Check if config.example.toml exists
@@ -130,6 +130,6 @@ Write-Host ""
 Write-Host "📝 Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Review the deployment files"
 Write-Host "  2. Test Docker build: docker build -t poolai:latest ."
-Write-Host "  3. Test docker-compose: docker-compose up -d"
+Write-Host "  3. Test docker-compose: docker-compose -f docker/docker-compose.yml up -d"
 Write-Host "  4. Follow the deployment testing checklist"
 Write-Host ""
