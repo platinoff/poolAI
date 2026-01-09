@@ -115,8 +115,7 @@ async fn test_get_usage_windows() {
     let usage = result.unwrap();
     assert_eq!(usage.cpu_percent, 0.0);
     assert_eq!(usage.memory_mb, 0);
-    assert_eq!(usage.gpu_percent, None);
-    assert_eq!(usage.gpu_memory_mb, None);
+    assert_eq!(usage.gpu_utilization, None);
 }
 
 #[tokio::test]
