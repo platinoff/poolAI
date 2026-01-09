@@ -63,6 +63,11 @@ pub fn create_enterprise_api_routes() -> Router {
             post(monitoring_dashboard_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/monitoring/metrics", get(monitoring_metrics_handler))
+        .route(
+            "/monitoring/alert-rules",
+            post(monitoring_alert_rule_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route("/monitoring/alert-rules", get(monitoring_alert_rules_handler))
         // Security
         .route(
             "/security/oauth2/providers",
@@ -742,6 +747,80 @@ async fn monitoring_metrics_handler(
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve metrics. Context: Cannot retrieve monitoring metrics. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+async fn monitoring_alert_rules_handler() -> impl IntoResponse {
+    let manager = enterprise::monitoring::get_global_monitoring_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Monitoring manager not initialized. Context: Monitoring manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.list_alert_rules().await {
+        Ok(rules) => Json(rules).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to retrieve alert rules. Context: Cannot retrieve monitoring alert rules. Suggestion: Check system logs. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+async fn monitoring_alert_rule_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(rule): Json<enterprise::monitoring::AlertRule>,
+) -> impl IntoResponse {
+    // Check permission: admin:all or write:monitoring
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        // Try write:monitoring permission
+        if check_permission(&claims, "write:monitoring").is_err() {
+            return err.into_response();
+        }
+    }
+
+    let manager = enterprise::monitoring::get_global_monitoring_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Monitoring manager not initialized. Context: Cannot create alert rule - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    match manager.create_alert_rule(rule.clone()).await {
+        Ok(()) => {
+            (
+                StatusCode::CREATED,
+                Json(serde_json::json!({
+                    "message": "Alert rule created successfully",
+                    "rule_name": rule.name
+                })),
+            )
+                .into_response()
+        }
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to create alert rule. Context: Cannot create monitoring alert rule. Suggestion: Verify rule configuration and parameters. Error: {}", e)
             })),
         )
             .into_response(),
