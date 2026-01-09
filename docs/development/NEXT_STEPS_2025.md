@@ -122,14 +122,19 @@
   - `network/api/libs.rs`
   - `network/api/users.rs`
   - `network/api/rewards.rs`
-- [ ] Розбити `ui/admin.rs` (~1378 рядків) на окремі handlers:
-  - `ui/admin/dashboard.rs`
-  - `ui/admin/users.rs`
-  - `ui/admin/tenants.rs`
-  - `ui/admin/workers.rs`
-  - `ui/admin/vm.rs`
-  - `ui/admin/security.rs`
-  - `ui/admin/config.rs`
+- [x] Розбити `ui/admin.rs` (~2628 рядків) на окремі handlers:
+  - [x] `ui/admin/dashboard.rs` - ✅ Complete
+  - [x] `ui/admin/users.rs` - ✅ Complete
+  - [x] `ui/admin/tenants.rs` - ✅ Complete
+  - [x] `ui/admin/workers.rs` - ✅ Complete
+  - [x] `ui/admin/vm.rs` - ✅ Complete
+  - [x] `ui/admin/security.rs` - ✅ Complete
+  - [x] `ui/admin/audit.rs` - ✅ Complete
+  - [x] `ui/admin/monitoring.rs` - ✅ Complete
+  - [x] `ui/admin/libs.rs` - ✅ Complete
+  - [x] `ui/admin/raid.rs` - ✅ Complete
+  - [x] `ui/admin/config.rs` - ✅ Complete
+  - [x] `ui/admin/mod.rs` - ✅ Complete (route composition + admin_layout)
 
 **Переваги**:
 - Краща підтримуваність
