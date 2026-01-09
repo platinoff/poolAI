@@ -30,31 +30,124 @@ pub async fn admin_monitoring() -> Html<String> {
       }
     }
     
+    async function loadAlertRules() {
+      try {
+        const rules = await fetchJson('/api/enterprise/monitoring/alert-rules');
+        return rules;
+      } catch (e) {
+        console.error('Error loading alert rules:', e);
+        return [];
+      }
+    }
+    
     function renderMonitoring(alerts, dashboards) {
       const el = document.getElementById('monitoring-content');
       if (!el) return;
+      
+      const alertsHtml = alerts.length === 0 
+        ? '<div class="muted">No active alerts</div>'
+        : `
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Metric</th>
+                <th>Current Value</th>
+                <th>Threshold</th>
+                <th>Triggered</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${alerts.map(a => `
+                <tr>
+                  <td><span class="status-badge ${a.severity?.toLowerCase() || 'warning'}">${a.severity || 'WARNING'}</span></td>
+                  <td><strong>${a.metric || 'unknown'}</strong></td>
+                  <td>${a.current_value || 'N/A'}</td>
+                  <td>${a.threshold || 'N/A'}</td>
+                  <td>${a.triggered_at ? new Date(a.triggered_at).toLocaleString() : 'N/A'}</td>
+                  <td>${a.acknowledged ? '<span class="muted">Acknowledged</span>' : '<span class="status-badge active">Active</span>'}</td>
+                  <td>${a.acknowledged ? '' : '<button class="btn btn-sm" onclick="acknowledgeAlert(\'' + a.id + '\')">Acknowledge</button>'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      
+      const dashboardsHtml = dashboards.length === 0
+        ? '<div class="muted">No dashboards created</div>'
+        : `
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Metrics</th>
+                <th>Public</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${dashboards.map(d => `
+                <tr>
+                  <td><strong>${d.name || 'unnamed'}</strong></td>
+                  <td>${d.description || '—'}</td>
+                  <td>${d.metrics?.length || 0} metrics</td>
+                  <td><span class="status-badge ${d.is_public ? 'active' : 'inactive'}">${d.is_public ? 'Public' : 'Private'}</span></td>
+                  <td>${d.created_at ? new Date(d.created_at).toLocaleDateString() : 'N/A'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      
       el.innerHTML = `
         <div class="admin-card">
           <h3>Active Alerts (${alerts.length})</h3>
-          <div>${alerts.length === 0 ? '<div class="muted">No active alerts</div>' : alerts.map(a => `
-            <div class="alert-item">
-              <span class="status-badge ${a.severity?.toLowerCase() || 'warning'}">${a.severity || 'WARNING'}</span>
-              <span><strong>${a.metric || 'unknown'}</strong>: ${a.current_value} (threshold: ${a.threshold})</span>
-              ${a.acknowledged ? '<span class="muted">Acknowledged</span>' : '<button class="btn btn-sm" onclick="acknowledgeAlert(\'' + a.id + '\')">Acknowledge</button>'}
-            </div>
-          `).join('')}</div>
+          ${alertsHtml}
         </div>
         <div class="admin-card">
           <h3>Dashboards (${dashboards.length})</h3>
-          <div>${dashboards.length === 0 ? '<div class="muted">No dashboards</div>' : dashboards.map(d => `
-            <div class="dashboard-item">
-              <strong>${d.name}</strong>
-              ${d.description ? '<div class="muted">' + d.description + '</div>' : ''}
-              <div class="muted">Metrics: ${d.metrics?.length || 0}</div>
-            </div>
-          `).join('')}</div>
+          ${dashboardsHtml}
         </div>
       `;
+      
+      // Load alert rules asynchronously
+      loadAlertRules().then(rules => {
+        if (rules && rules.length > 0) {
+          const rulesHtml = `
+            <div class="admin-card">
+              <h3>Alert Rules (${rules.length})</h3>
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Metric</th>
+                    <th>Operator</th>
+                    <th>Threshold</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rules.map(r => `
+                    <tr>
+                      <td><strong>${r.name || 'unnamed'}</strong></td>
+                      <td>${r.metric || 'N/A'}</td>
+                      <td><code>${r.operator || '>'}</code></td>
+                      <td>${r.threshold || 'N/A'}</td>
+                      <td><span class="status-badge ${r.severity?.toLowerCase() || 'warning'}">${r.severity || 'WARNING'}</span></td>
+                      <td><span class="status-badge ${r.enabled ? 'active' : 'inactive'}">${r.enabled ? 'Enabled' : 'Disabled'}</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+          el.innerHTML += rulesHtml;
+        }
+      }).catch(e => console.error('Error loading alert rules:', e));
     }
     
     function showCreateDashboardModal() {

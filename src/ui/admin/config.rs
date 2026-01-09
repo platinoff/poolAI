@@ -43,6 +43,12 @@ pub async fn admin_config() -> Html<String> {
         case 'monitoring':
           renderMonitoringConfig(config);
           break;
+        case 'gpu':
+          renderGpuConfig(config);
+          break;
+        case 'health':
+          renderHealthConfig(config);
+          break;
         default:
           el.innerHTML = '<div class="muted">Unknown tab: ' + tabName + '</div>';
       }
@@ -75,6 +81,10 @@ pub async fn admin_config() -> Html<String> {
           <div class="form-group">
             <label for="configQueueSize">Queue Size</label>
             <input type="number" id="configQueueSize" name="queue_size" value="${config.system?.queue_size || 2000}" min="1" max="100000" required />
+          </div>
+          <div class="form-group">
+            <label for="configMetricsInterval">Metrics Interval (seconds)</label>
+            <input type="number" id="configMetricsInterval" name="metrics_interval" value="${config.system?.metrics_interval || 10}" min="1" max="3600" required />
           </div>
           <button type="submit" class="btn btn-primary">Save Configuration</button>
         </form>
@@ -168,6 +178,55 @@ pub async fn admin_config() -> Html<String> {
       `;
     }
     
+    function renderGpuConfig(config) {
+      const el = document.getElementById('config-content');
+      if (!el) return;
+      
+      el.innerHTML = `
+        <form id="gpuConfigForm" onsubmit="handleSaveConfig(event, 'gpu')">
+          <div class="form-group">
+            <label for="configGpuEnabled">
+              <input type="checkbox" id="configGpuEnabled" name="enabled" ${config.gpu?.enabled ? 'checked' : ''} />
+              Enable GPU
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="configGpuMemoryLimit">GPU Memory Limit (MB)</label>
+            <input type="number" id="configGpuMemoryLimit" name="memory_limit" value="${config.gpu?.memory_limit || 8192}" min="256" max="131072" required />
+          </div>
+          <div class="form-group">
+            <label for="configGpuTemperatureLimit">Temperature Limit (°C)</label>
+            <input type="number" id="configGpuTemperatureLimit" name="temperature_limit" value="${config.gpu?.temperature_limit || 85}" min="50" max="120" required />
+          </div>
+          <div class="form-group">
+            <label for="configGpuPowerLimit">Power Limit (Watts)</label>
+            <input type="number" id="configGpuPowerLimit" name="power_limit" value="${config.gpu?.power_limit || 200}" min="50" max="1000" required />
+          </div>
+          <div class="form-group">
+            <label for="configGpuCount">GPU Count</label>
+            <input type="number" id="configGpuCount" name="gpu_count" value="${config.gpu?.gpu_count || 1}" min="1" max="16" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Save Configuration</button>
+        </form>
+      `;
+    }
+    
+    function renderHealthConfig(config) {
+      const el = document.getElementById('config-content');
+      if (!el) return;
+      
+      el.innerHTML = `
+        <form id="healthConfigForm" onsubmit="handleSaveConfig(event, 'health')">
+          <div class="form-group">
+            <label for="configExpectedWorkers">Expected Workers</label>
+            <input type="number" id="configExpectedWorkers" name="expected_workers" value="${config.health?.expected_workers || 8}" min="1" max="1024" required />
+            <small class="form-hint">Number of workers expected for health checks</small>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Configuration</button>
+        </form>
+      `;
+    }
+    
     async function handleSaveConfig(event, tabName) {
       event.preventDefault();
       const user = getUser();
@@ -197,7 +256,7 @@ pub async fn admin_config() -> Html<String> {
             log_level: document.getElementById('configLogLevel').value,
             max_workers: parseInt(document.getElementById('configMaxWorkers').value, 10),
             queue_size: parseInt(document.getElementById('configQueueSize').value, 10),
-            metrics_interval: updatedConfig.system?.metrics_interval || 10,
+            metrics_interval: parseInt(document.getElementById('configMetricsInterval').value, 10),
             version: updatedConfig.system?.version || '0.1.0'
           };
         } else if (tabName === 'performance') {
@@ -213,8 +272,8 @@ pub async fn admin_config() -> Html<String> {
           updatedConfig.https = {
             ...updatedConfig.https,
             enabled: document.getElementById('configHttpsEnabled').checked,
-            cert_path: document.getElementById('configHttpsCertPath').value,
-            key_path: document.getElementById('configHttpsKeyPath').value
+            cert_path: document.getElementById('configHttpsCertPath').value || null,
+            key_path: document.getElementById('configHttpsKeyPath').value || null
           };
         } else if (tabName === 'monitoring') {
           updatedConfig.monitoring = {
@@ -223,6 +282,20 @@ pub async fn admin_config() -> Html<String> {
             alert_threshold: parseFloat(document.getElementById('configAlertThreshold').value),
             retention_days: parseInt(document.getElementById('configRetentionDays').value, 10),
             detailed_logging: document.getElementById('configDetailedLogging').checked
+          };
+        } else if (tabName === 'gpu') {
+          updatedConfig.gpu = {
+            ...updatedConfig.gpu,
+            enabled: document.getElementById('configGpuEnabled').checked,
+            memory_limit: parseInt(document.getElementById('configGpuMemoryLimit').value, 10),
+            temperature_limit: parseInt(document.getElementById('configGpuTemperatureLimit').value, 10),
+            power_limit: parseInt(document.getElementById('configGpuPowerLimit').value, 10),
+            gpu_count: parseInt(document.getElementById('configGpuCount').value, 10)
+          };
+        } else if (tabName === 'health') {
+          updatedConfig.health = {
+            ...updatedConfig.health,
+            expected_workers: parseInt(document.getElementById('configExpectedWorkers').value, 10)
           };
         }
         
@@ -255,8 +328,10 @@ pub async fn admin_config() -> Html<String> {
           <div class="admin-tabs">
             <button class="tab active" data-tab="general">General</button>
             <button class="tab" data-tab="performance">Performance</button>
+            <button class="tab" data-tab="gpu">GPU</button>
             <button class="tab" data-tab="security">Security</button>
             <button class="tab" data-tab="monitoring">Monitoring</button>
+            <button class="tab" data-tab="health">Health</button>
           </div>
           <div id="config-content"></div>
         </div>
