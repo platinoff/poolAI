@@ -10,6 +10,7 @@ pub mod api;
 pub mod api_legacy;
 pub mod auth;
 pub mod raid_distributed_handlers;
+pub mod tls_config;
 pub mod validation;
 pub mod ws;
 

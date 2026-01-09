@@ -112,10 +112,10 @@ rustls-pemfile = { version = "1.0", optional = true }
 
 ### Етап 3: Оновлення коду (2-3 дні)
 
-#### 3.1 Оновлення конфігурації TLS
+#### 3.1 Оновлення конфігурації TLS до TLS 2.0
 ```rust
 // Поточна реалізація в src/network/mod.rs
-match RustlsConfig::from_pem_file(&cert_path, &key_path).await {
+match RustlsConfig::from_pem_file(cert_path.clone(), key_path.clone()).await {
     Ok(config) => {
         info!("Starting HTTPS server on {}", addr);
         axum_server::bind_rustls(addr, config)
@@ -127,11 +127,13 @@ match RustlsConfig::from_pem_file(&cert_path, &key_path).await {
 }
 ```
 
-**Планові зміни:**
-- [ ] Перевірити API `RustlsConfig` в новій версії axum-server
-- [ ] Додати явну конфігурацію TLS версії (якщо потрібно)
-- [ ] Додати конфігурацію cipher suites (якщо потрібно)
-- [ ] Додати конфігурацію HSTS (якщо потрібно)
+**Планові зміни для TLS 2.0:**
+- [ ] Створити абстракцію для TLS конфігурації (підтримка TLS 1.3 та TLS 2.0)
+- [ ] Додати конфігурацію TLS версії з підтримкою TLS 2.0
+- [ ] Додати конфігурацію cipher suites для TLS 2.0 (коли будуть доступні)
+- [ ] Додати конфігурацію HSTS з підтримкою TLS 2.0
+- [ ] Додати feature flag для TLS 2.0 (коли буде доступний)
+- [ ] Підготувати міграційний шлях від TLS 1.3 до TLS 2.0
 
 #### 3.2 Покращення безпеки
 ```rust

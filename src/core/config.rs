@@ -118,6 +118,16 @@ pub struct HttpsConfig {
     pub cert_path: Option<String>,
     /// Private key file path (PEM format)
     pub key_path: Option<String>,
+    /// TLS version (target: "2.0", current: "1.3")
+    pub tls_version: Option<String>,
+    /// Minimum TLS version
+    pub tls_min_version: Option<String>,
+    /// Maximum TLS version (target: "2.0")
+    pub tls_max_version: Option<String>,
+    /// Enable HSTS (HTTP Strict Transport Security)
+    pub hsts_enabled: Option<bool>,
+    /// HSTS max age in seconds
+    pub hsts_max_age: Option<u64>,
 }
 
 impl Default for HttpsConfig {
@@ -126,6 +136,11 @@ impl Default for HttpsConfig {
             enabled: false,
             cert_path: Some("certs/cert.pem".to_string()),
             key_path: Some("certs/key.pem".to_string()),
+            tls_version: Some("1.3".to_string()), // Target: "2.0" when available
+            tls_min_version: Some("1.3".to_string()),
+            tls_max_version: Some("1.3".to_string()), // Target: "2.0" when available
+            hsts_enabled: Some(true),
+            hsts_max_age: Some(31536000), // 1 year
         }
     }
 }

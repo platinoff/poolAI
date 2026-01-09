@@ -52,7 +52,12 @@ cert_path = "/etc/poolai/certs/cert.pem"
 key_path = "/etc/poolai/certs/key.pem"
 
 # Настройки TLS
-tls_version = "1.3"
+# Цільова версія: TLS 2.0 (коли буде доступна)
+# Поточна версія: TLS 1.3 (проміжний крок до TLS 2.0)
+tls_version = "1.3"  # Оновити до "2.0" коли буде доступна
+tls_min_version = "1.3"  # Мінімальна версія TLS
+tls_max_version = "1.3"  # Максимальна версія TLS (оновить до "2.0")
+# TLS 2.0 cipher suites (коли будуть доступні)
 cipher_suites = ["TLS_AES_256_GCM_SHA384", "TLS_CHACHA20_POLY1305_SHA256"]
 
 # Аутентификация и авторизация
