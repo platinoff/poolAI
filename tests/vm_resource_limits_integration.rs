@@ -114,6 +114,7 @@ async fn test_apply_resource_limits_to_instance() {
         cpu_cores: 2,
         memory_mb: 2048,
         gpu_required: false,
+        gpu_scheduling_policy: None,
     };
 
     let instance = manager
