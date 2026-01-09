@@ -37,7 +37,7 @@ use crate::core::error::AppError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
@@ -599,4 +599,36 @@ mod tests {
 
         assert!(manager.create_dashboard(dashboard).await.is_ok());
     }
+}
+
+/// Global monitoring manager instance
+static MONITORING_MANAGER: OnceLock<Arc<MonitoringManager>> = OnceLock::new();
+
+/// Get global monitoring manager instance.
+///
+/// This function returns a singleton instance of `MonitoringManager` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::enterprise::monitoring::get_global_monitoring_manager;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let manager = get_global_monitoring_manager();
+/// manager.initialize().await?;
+///
+/// // Get active alerts
+/// let alerts = manager.get_active_alerts(None, None, None).await?;
+/// for alert in alerts {
+///     println!("Alert: {} - {}", alert.metric, alert.current_value);
+/// }
+/// # Ok(())
+/// # }
+/// ```
+pub fn get_global_monitoring_manager() -> Arc<MonitoringManager> {
+    MONITORING_MANAGER
+        .get_or_init(|| Arc::new(MonitoringManager::new()))
+        .clone()
 }

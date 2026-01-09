@@ -39,7 +39,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::io::AsyncWriteExt;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -806,4 +806,38 @@ mod tests {
         assert_eq!(event.resource_id, Some("resource-456".to_string()));
         assert_eq!(event.metadata.get("key1"), Some(&"value1".to_string()));
     }
+}
+
+/// Global audit logger instance
+static AUDIT_LOGGER: OnceLock<Arc<AuditLogger>> = OnceLock::new();
+
+/// Get global audit logger instance.
+///
+/// This function returns a singleton instance of `AuditLogger` that can be used
+/// throughout the application. The instance is created on first access and
+/// reused for subsequent calls.
+///
+/// # Examples
+///
+/// ```no_run
+/// use poolai::enterprise::audit::get_global_audit_logger;
+///
+/// # async fn example() -> Result<(), poolai::core::error::AppError> {
+/// let logger = get_global_audit_logger();
+/// logger.initialize().await?;
+///
+/// // Log an event
+/// logger.log_event(poolai::enterprise::audit::AuditEvent::new(
+///     poolai::enterprise::audit::AuditLevel::Info,
+///     "test_action".to_string(),
+///     "test_resource".to_string(),
+///     "success".to_string(),
+/// )).await?;
+/// # Ok(())
+/// # }
+/// ```
+pub fn get_global_audit_logger() -> Arc<AuditLogger> {
+    AUDIT_LOGGER
+        .get_or_init(|| Arc::new(AuditLogger::new()))
+        .clone()
 }

@@ -306,9 +306,9 @@ impl AppError {
 
 ### Immediate (This Week)
 1. ✅ Create integration tests for Security Management - **DONE**
-2. ⚠️ Add global managers for Audit Logger and Monitoring Manager
-3. ⚠️ Implement missing API endpoints (audit, monitoring)
-4. ⚠️ Add tests for Audit Logger and Monitoring Manager
+2. ✅ Add global managers for Audit Logger and Monitoring Manager - **DONE**
+3. ✅ Implement missing API endpoints (audit, monitoring, tenant update, security CRUD) - **DONE**
+4. ⚠️ Add tests for Audit Logger and Monitoring Manager endpoints
 
 ### Short-term (Next 2 Weeks)
 5. Implement OAuth2 token exchange
