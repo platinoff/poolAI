@@ -378,6 +378,81 @@ impl RaidManager {
         Ok(())
     }
 
+    /// Restore RAID state from a snapshot
+    ///
+    /// Loads a snapshot from the event store and restores the artifacts
+    /// and nodes state. This will overwrite the current state.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if restore succeeds.
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ConfigError` if snapshot loading or state restoration fails.
+    pub async fn restore_from_snapshot(&self) -> Result<(), AppError> {
+        if let Some(ref event_store) = self.event_store {
+            let snapshot = event_store
+                .read()
+                .await
+                .load_snapshot()
+                .await?
+                .ok_or_else(|| {
+                    AppError::ConfigError(
+                        "No snapshot available for restore".to_string(),
+                    )
+                })?;
+
+            info!(
+                "Restoring RAID state from snapshot (sequence: {}, timestamp: {})",
+                snapshot.sequence, snapshot.timestamp
+            );
+
+            // Restore artifacts from snapshot
+            if let Some(artifacts_json) = snapshot.artifacts.as_object() {
+                let mut artifacts = ArtifactManifest::new();
+                // Parse artifacts from JSON snapshot
+                if let Ok(artifacts_vec) = serde_json::from_value::<Vec<ArtifactRef>>(
+                    serde_json::Value::Array(
+                        artifacts_json
+                            .get("artifacts")
+                            .and_then(|v| v.as_array())
+                            .cloned()
+                            .unwrap_or_default(),
+                    ),
+                ) {
+                    for artifact in artifacts_vec {
+                        artifacts.artifacts.insert(artifact.id, artifact);
+                    }
+                }
+                *self.artifacts.write().await = artifacts;
+                self.persist_manifest().await?;
+            }
+
+            // Restore nodes from snapshot
+            if let Some(nodes_json) = snapshot.nodes.as_object() {
+                if let Ok(nodes_vec) = serde_json::from_value::<Vec<RaidNode>>(
+                    serde_json::Value::Array(
+                        nodes_json
+                            .get("nodes")
+                            .and_then(|v| v.as_array())
+                            .cloned()
+                            .unwrap_or_default(),
+                    ),
+                ) {
+                    *self.nodes.write().await = nodes_vec;
+                }
+            }
+
+            info!("RAID state restored from snapshot successfully");
+            Ok(())
+        } else {
+            Err(AppError::ConfigError(
+                "Event store not available for snapshot restore".to_string(),
+            ))
+        }
+    }
+
     /// Get event store reference (for API access)
     ///
     /// Returns a clone of the event store Arc if event sourcing is enabled,

@@ -84,10 +84,14 @@ pub fn create_raid_routes() -> Router {
         .route("/raid/events/{artifact_id}", get(raid_events_for_artifact_handler))
         .route("/raid/events/range", get(raid_events_range_handler))
         .route("/raid/snapshot", get(raid_snapshot_handler))
-        .route(
-            "/raid/snapshot/create",
-            post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)),
-        )
+            .route(
+                "/raid/snapshot/create",
+                post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)),
+            )
+            .route(
+                "/raid/snapshot/restore",
+                post(raid_snapshot_restore_handler).layer(middleware::from_fn(auth_middleware)),
+            )
         .route(
             "/raid/gc",
             post(raid_gc_handler).layer(middleware::from_fn(auth_middleware)),
@@ -414,6 +418,31 @@ async fn raid_snapshot_create_handler(Extension(claims): Extension<Claims>) -> i
             StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
                 "error": format!("Failed to create snapshot. Context: Cannot create new snapshot in event store. Suggestion: Verify event store is accessible, check disk space, and ensure event store is properly initialized. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn raid_snapshot_restore_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
+    // Check permission: write:all or write:raid
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
+    {
+        return err.into_response();
+    }
+
+    let manager = raid::get_global_manager();
+    match manager.restore_from_snapshot().await {
+        Ok(_) => AxumJson(serde_json::json!({
+            "status": "success",
+            "message": "RAID state restored from snapshot successfully"
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": format!("Failed to restore from snapshot. Context: Cannot restore RAID state from snapshot. Suggestion: Verify snapshot exists, check event store is accessible, and ensure event store is properly initialized. Error: {}", e)
             })),
         )
             .into_response(),
