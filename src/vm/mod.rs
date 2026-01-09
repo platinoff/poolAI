@@ -116,6 +116,54 @@ pub enum VmStatus {
     Failed(String),
 }
 
+/// GPU scheduling policy for VM instances
+///
+/// Defines how GPU resources are allocated and scheduled across VM instances.
+/// Used to optimize GPU utilization and ensure fair resource distribution.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::GpuSchedulingPolicy;
+///
+/// // Use round-robin for fair distribution
+/// let policy = GpuSchedulingPolicy::RoundRobin;
+///
+/// // Use priority-based for important workloads
+/// let policy = GpuSchedulingPolicy::PriorityBased { priority: 10 };
+///
+/// // Use load-based for optimal utilization
+/// let policy = GpuSchedulingPolicy::LoadBased;
+/// ```
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GpuSchedulingPolicy {
+    /// Round-robin scheduling - distributes GPU access evenly across instances
+    ///
+    /// Each VM instance gets equal time slices on the GPU, ensuring fair distribution.
+    RoundRobin,
+    /// Priority-based scheduling - allocates GPU based on priority level
+    ///
+    /// Higher priority instances get more GPU time. Priority range: 1-100 (higher = more priority).
+    PriorityBased {
+        /// Priority level (1-100, higher = more priority)
+        priority: u8,
+    },
+    /// Load-based scheduling - allocates GPU based on current load
+    ///
+    /// Instances with higher GPU utilization get more resources to maximize throughput.
+    LoadBased,
+    /// Exclusive scheduling - one instance gets exclusive GPU access
+    ///
+    /// Only one instance can use the GPU at a time, ensuring maximum performance for that instance.
+    Exclusive,
+}
+
+impl Default for GpuSchedulingPolicy {
+    fn default() -> Self {
+        Self::RoundRobin
+    }
+}
+
 /// Resource limits and requests for a VM instance
 ///
 /// Specifies CPU, memory, and GPU requirements for a VM instance.
@@ -124,16 +172,17 @@ pub enum VmStatus {
 /// # Example
 ///
 /// ```rust
-/// use poolai::vm::VmResources;
+/// use poolai::vm::{VmResources, GpuSchedulingPolicy};
 ///
 /// // Create resources with default values
 /// let resources = VmResources::default();
 ///
-/// // Create custom resources
+/// // Create custom resources with GPU scheduling policy
 /// let custom = VmResources {
 ///     cpu_cores: 4,
 ///     memory_mb: 4096,
 ///     gpu_required: true,
+///     gpu_scheduling_policy: Some(GpuSchedulingPolicy::PriorityBased { priority: 10 }),
 /// };
 /// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -144,6 +193,9 @@ pub struct VmResources {
     pub memory_mb: u32,
     /// Whether GPU is required for this VM instance
     pub gpu_required: bool,
+    /// GPU scheduling policy (only used if `gpu_required` is true)
+    #[serde(default)]
+    pub gpu_scheduling_policy: Option<GpuSchedulingPolicy>,
 }
 
 impl Default for VmResources {
@@ -152,6 +204,7 @@ impl Default for VmResources {
             cpu_cores: 2,
             memory_mb: 2048,
             gpu_required: false,
+            gpu_scheduling_policy: None,
         }
     }
 }
@@ -291,8 +344,8 @@ pub struct ResourceUsageHistoryEntry {
 
 /// Resource usage statistics (aggregated)
 ///
-/// Provides aggregated statistics (min, max, average) for resource usage over a time period.
-/// Used for monitoring and alerting.
+/// Provides aggregated statistics (min, max, average, percentiles, variance) for resource usage over a time period.
+/// Used for monitoring and alerting with improved accuracy.
 ///
 /// # Example
 ///
@@ -303,12 +356,24 @@ pub struct ResourceUsageHistoryEntry {
 ///     cpu_percent_min: 10.0,
 ///     cpu_percent_max: 90.0,
 ///     cpu_percent_avg: 50.0,
+///     cpu_percent_p50: Some(48.0),
+///     cpu_percent_p95: Some(85.0),
+///     cpu_percent_p99: Some(88.0),
+///     cpu_percent_variance: Some(256.0),
 ///     memory_mb_min: 1024,
 ///     memory_mb_max: 2048,
 ///     memory_mb_avg: 1536.0,
+///     memory_mb_p50: Some(1500),
+///     memory_mb_p95: Some(2000),
+///     memory_mb_p99: Some(2024),
+///     memory_mb_variance: Some(125000.0),
 ///     gpu_utilization_min: Some(20.0),
 ///     gpu_utilization_max: Some(95.0),
 ///     gpu_utilization_avg: Some(60.0),
+///     gpu_utilization_p50: Some(58.0),
+///     gpu_utilization_p95: Some(92.0),
+///     gpu_utilization_p99: Some(94.0),
+///     gpu_utilization_variance: Some(225.0),
 ///     sample_count: 100,
 /// };
 /// ```
@@ -320,18 +385,42 @@ pub struct ResourceUsageStats {
     pub cpu_percent_max: f32,
     /// Average CPU usage percentage (0.0-100.0)
     pub cpu_percent_avg: f32,
+    /// 50th percentile (median) CPU usage percentage
+    pub cpu_percent_p50: Option<f32>,
+    /// 95th percentile CPU usage percentage
+    pub cpu_percent_p95: Option<f32>,
+    /// 99th percentile CPU usage percentage
+    pub cpu_percent_p99: Option<f32>,
+    /// CPU usage variance (measure of variability)
+    pub cpu_percent_variance: Option<f32>,
     /// Minimum memory usage in megabytes
     pub memory_mb_min: u32,
     /// Maximum memory usage in megabytes
     pub memory_mb_max: u32,
     /// Average memory usage in megabytes
     pub memory_mb_avg: f32,
+    /// 50th percentile (median) memory usage in megabytes
+    pub memory_mb_p50: Option<u32>,
+    /// 95th percentile memory usage in megabytes
+    pub memory_mb_p95: Option<u32>,
+    /// 99th percentile memory usage in megabytes
+    pub memory_mb_p99: Option<u32>,
+    /// Memory usage variance (measure of variability)
+    pub memory_mb_variance: Option<f32>,
     /// Minimum GPU utilization percentage (0.0-100.0), `None` if GPU not available
     pub gpu_utilization_min: Option<f32>,
     /// Maximum GPU utilization percentage (0.0-100.0), `None` if GPU not available
     pub gpu_utilization_max: Option<f32>,
     /// Average GPU utilization percentage (0.0-100.0), `None` if GPU not available
     pub gpu_utilization_avg: Option<f32>,
+    /// 50th percentile (median) GPU utilization percentage
+    pub gpu_utilization_p50: Option<f32>,
+    /// 95th percentile GPU utilization percentage
+    pub gpu_utilization_p95: Option<f32>,
+    /// 99th percentile GPU utilization percentage
+    pub gpu_utilization_p99: Option<f32>,
+    /// GPU utilization variance (measure of variability)
+    pub gpu_utilization_variance: Option<f32>,
     /// Number of samples used for aggregation
     pub sample_count: usize,
 }
@@ -1189,33 +1278,88 @@ impl VmManager {
             }
         }
 
-        let cpu_min = cpu_values.iter().fold(f32::MAX, |a, &b| a.min(b));
-        let cpu_max = cpu_values.iter().fold(0.0f32, |a, &b| a.max(b));
+        // Helper function to calculate percentile
+        let percentile = |values: &[f32], p: f32| -> Option<f32> {
+            if values.is_empty() {
+                return None;
+            }
+            let mut sorted = values.to_vec();
+            sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            let index = ((sorted.len() - 1) as f32 * p / 100.0).ceil() as usize;
+            Some(sorted[index.min(sorted.len() - 1)])
+        };
+
+        // Helper function to calculate variance
+        let variance = |values: &[f32], avg: f32| -> Option<f32> {
+            if values.is_empty() {
+                return None;
+            }
+            let sum_sq_diff: f32 = values.iter().map(|&v| (v - avg).powi(2)).sum();
+            Some(sum_sq_diff / values.len() as f32)
+        };
+
+        // CPU statistics
+        cpu_values.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let cpu_min = cpu_values.first().copied().unwrap_or(0.0);
+        let cpu_max = cpu_values.last().copied().unwrap_or(0.0);
         let cpu_avg = cpu_values.iter().sum::<f32>() / cpu_values.len() as f32;
+        let cpu_percent_p50 = percentile(&cpu_values, 50.0);
+        let cpu_percent_p95 = percentile(&cpu_values, 95.0);
+        let cpu_percent_p99 = percentile(&cpu_values, 99.0);
+        let cpu_percent_variance = variance(&cpu_values, cpu_avg);
 
-        let memory_min = *memory_values.iter().min().unwrap_or(&0);
-        let memory_max = *memory_values.iter().max().unwrap_or(&0);
+        // Memory statistics
+        memory_values.sort();
+        let memory_min = *memory_values.first().unwrap_or(&0);
+        let memory_max = *memory_values.last().unwrap_or(&0);
         let memory_avg = memory_values.iter().sum::<u32>() as f32 / memory_values.len() as f32;
-
-        let (gpu_min, gpu_max, gpu_avg) = if gpu_values.is_empty() {
-            (None, None, None)
+        let memory_mb_p50 = memory_values.get((memory_values.len() as f32 * 0.5).ceil() as usize - 1).copied();
+        let memory_mb_p95 = memory_values.get((memory_values.len() as f32 * 0.95).ceil() as usize - 1).copied();
+        let memory_mb_p99 = memory_values.get((memory_values.len() as f32 * 0.99).ceil() as usize - 1).copied();
+        let memory_mb_variance = if !memory_values.is_empty() {
+            let sum_sq_diff: f32 = memory_values.iter().map(|&v| (v as f32 - memory_avg).powi(2)).sum();
+            Some(sum_sq_diff / memory_values.len() as f32)
         } else {
-            let min = gpu_values.iter().fold(f32::MAX, |a, &b| a.min(b));
-            let max = gpu_values.iter().fold(0.0f32, |a, &b| a.max(b));
+            None
+        };
+
+        // GPU statistics
+        let (gpu_min, gpu_max, gpu_avg, gpu_utilization_p50, gpu_utilization_p95, gpu_utilization_p99, gpu_utilization_variance) = if gpu_values.is_empty() {
+            (None, None, None, None, None, None, None)
+        } else {
+            gpu_values.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            let min = *gpu_values.first().unwrap();
+            let max = *gpu_values.last().unwrap();
             let avg = gpu_values.iter().sum::<f32>() / gpu_values.len() as f32;
-            (Some(min), Some(max), Some(avg))
+            let p50 = percentile(&gpu_values, 50.0);
+            let p95 = percentile(&gpu_values, 95.0);
+            let p99 = percentile(&gpu_values, 99.0);
+            let var = variance(&gpu_values, avg);
+            (Some(min), Some(max), Some(avg), p50, p95, p99, var)
         };
 
         Ok(ResourceUsageStats {
             cpu_percent_min: cpu_min,
             cpu_percent_max: cpu_max,
             cpu_percent_avg: cpu_avg,
+            cpu_percent_p50,
+            cpu_percent_p95,
+            cpu_percent_p99,
+            cpu_percent_variance,
             memory_mb_min: memory_min,
             memory_mb_max: memory_max,
             memory_mb_avg: memory_avg,
+            memory_mb_p50: memory_mb_p50,
+            memory_mb_p95: memory_mb_p95,
+            memory_mb_p99: memory_mb_p99,
+            memory_mb_variance: memory_mb_variance,
             gpu_utilization_min: gpu_min,
             gpu_utilization_max: gpu_max,
             gpu_utilization_avg: gpu_avg,
+            gpu_utilization_p50,
+            gpu_utilization_p95,
+            gpu_utilization_p99,
+            gpu_utilization_variance,
             sample_count: entries.len(),
         })
     }
@@ -1635,6 +1779,7 @@ mod tests {
             cpu_cores: 4,
             memory_mb: 4096,
             gpu_required: true,
+            gpu_scheduling_policy: None,
         };
         let cloned = resources.clone();
         assert_eq!(resources.cpu_cores, cloned.cpu_cores);
@@ -1698,16 +1843,31 @@ mod tests {
             cpu_percent_min: 10.0,
             cpu_percent_max: 90.0,
             cpu_percent_avg: 50.0,
+            cpu_percent_p50: Some(48.0),
+            cpu_percent_p95: Some(85.0),
+            cpu_percent_p99: Some(88.0),
+            cpu_percent_variance: Some(256.0),
             memory_mb_min: 1024,
             memory_mb_max: 2048,
             memory_mb_avg: 1536.0,
+            memory_mb_p50: Some(1500),
+            memory_mb_p95: Some(2000),
+            memory_mb_p99: Some(2024),
+            memory_mb_variance: Some(125000.0),
             gpu_utilization_min: Some(20.0),
             gpu_utilization_max: Some(95.0),
             gpu_utilization_avg: Some(60.0),
+            gpu_utilization_p50: Some(58.0),
+            gpu_utilization_p95: Some(92.0),
+            gpu_utilization_p99: Some(94.0),
+            gpu_utilization_variance: Some(225.0),
             sample_count: 100,
         };
         assert_eq!(stats.cpu_percent_avg, 50.0);
+        assert_eq!(stats.cpu_percent_p50, Some(48.0));
         assert_eq!(stats.memory_mb_avg, 1536.0);
+        assert_eq!(stats.memory_mb_p50, Some(1500));
+        assert_eq!(stats.gpu_utilization_p95, Some(92.0));
         assert_eq!(stats.sample_count, 100);
     }
 
