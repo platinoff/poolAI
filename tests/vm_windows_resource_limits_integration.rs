@@ -125,8 +125,7 @@ async fn test_resource_limits_validation_windows() {
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
-    // Register a fake PID
-    limiter.register_process_pid(process_id, 99999).await;
+    // Test applying limits to a command (no PID registration needed)
 
     // Invalid limits: zero CPU cores
     let invalid_limits = ResourceLimits {
