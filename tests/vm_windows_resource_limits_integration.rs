@@ -9,13 +9,13 @@
 //! Note: These tests will only work on Windows systems.
 //! On other platforms, they will test the fallback behavior.
 
-use poolai::vm::resources::{ResourceLimiter, ResourceLimits, ResourceUsage};
+use poolai::vm::{ResourceLimiter, ResourceLimits, ResourceUsage};
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use uuid::Uuid;
 
 #[tokio::test]
 async fn test_windows_job_object_limiter_creation() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
 
     // On Windows, should be supported if Job Objects are available
@@ -38,7 +38,7 @@ async fn test_windows_job_object_limiter_creation() {
 
 #[tokio::test]
 async fn test_register_process_pid_windows() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
     let pid = 12345u32;
@@ -74,7 +74,7 @@ async fn test_register_process_pid_windows() {
 
 #[tokio::test]
 async fn test_apply_limits_without_pid_windows() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
@@ -102,7 +102,7 @@ async fn test_apply_limits_without_pid_windows() {
 
 #[tokio::test]
 async fn test_get_usage_windows() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
@@ -120,7 +120,7 @@ async fn test_get_usage_windows() {
 
 #[tokio::test]
 async fn test_resource_limits_validation_windows() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 

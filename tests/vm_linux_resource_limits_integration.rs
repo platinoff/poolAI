@@ -9,13 +9,13 @@
 //! Note: These tests will only work on Linux systems with cgroups enabled.
 //! On other platforms, they will test the fallback behavior.
 
-use poolai::vm::resources::{ResourceLimiter, ResourceLimits, ResourceUsage};
+use poolai::vm::{ResourceLimiter, ResourceLimits, ResourceUsage};
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use uuid::Uuid;
 
 #[tokio::test]
 async fn test_platform_resource_limiter_creation() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
 
     // On Linux, should be supported if cgroups are available
@@ -44,7 +44,7 @@ async fn test_platform_resource_limiter_creation() {
 
 #[tokio::test]
 async fn test_register_process_pid() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
     let pid = 12345u32;
@@ -89,7 +89,7 @@ async fn test_register_process_pid() {
 
 #[tokio::test]
 async fn test_apply_limits_without_pid() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
@@ -123,7 +123,7 @@ async fn test_apply_limits_without_pid() {
 
 #[tokio::test]
 async fn test_get_usage() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
@@ -141,7 +141,7 @@ async fn test_get_usage() {
 
 #[tokio::test]
 async fn test_resource_limits_validation() {
-    use poolai::vm::resources::PlatformResourceLimiter;
+    use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let process_id = Uuid::new_v4();
 
