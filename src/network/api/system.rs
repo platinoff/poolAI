@@ -9,15 +9,18 @@
 //! - GPU information
 
 use axum::{
-    extract::Request,
+    extract::{Extension, Request},
     http::{header::ACCEPT, StatusCode},
+    middleware,
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, post, put},
     Json, Router,
 };
 use serde::Serialize;
 
-use crate::network::auth::{authenticate_user, AuthRequest};
+use crate::core::config::{get_config, update_config, PoolAIConfig};
+use crate::network::api::common::check_permission;
+use crate::network::auth::{authenticate_user, AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
 use crate::platform;
 
@@ -76,6 +79,11 @@ pub fn create_system_routes() -> Router {
         .route("/models", get(models_handler))
         .route("/gpu", get(gpu_info))
         .route("/ws/metrics", get(websocket_handler))
+        .route("/config", get(config_get_handler))
+        .route(
+            "/config",
+            put(config_update_handler).layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
 }
 
 async fn status_handler(req: Request<axum::body::Body>) -> Response {
@@ -272,5 +280,44 @@ async fn login_handler(Json(auth_req): Json<AuthRequest>) -> impl IntoResponse {
     match authenticate_user(auth_req).await {
         Ok(auth_response) => Json(auth_response).into_response(),
         Err((status, error)) => (status, error).into_response(),
+    }
+}
+
+/// Get system configuration
+async fn config_get_handler() -> impl IntoResponse {
+    match get_config() {
+        Ok(config) => Json(config).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to get configuration: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+/// Update system configuration
+async fn config_update_handler(
+    Extension(claims): Extension<Claims>,
+    Json(config): Json<PoolAIConfig>,
+) -> impl IntoResponse {
+    // Check permission: admin:all
+    if let Err(err) = check_permission(&claims, "admin:all") {
+        return err.into_response();
+    }
+
+    match update_config(config) {
+        Ok(()) => Json(serde_json::json!({
+            "message": "Configuration updated successfully"
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Failed to update configuration: {}", e)
+            })),
+        )
+            .into_response(),
     }
 }
