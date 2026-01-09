@@ -66,12 +66,14 @@
      - ✅ Worker ID, Artifact name, UUID validation
      - ✅ Base64 data та size validation
      - ✅ Worker configuration validation (ranges, limits)
-   - 🔄 **API Modularization** — **IN PROGRESS (~30%)** 🏗️
+   - 🔄 **API Modularization** — **IN PROGRESS (~50%)** 🏗️
      - ✅ Створено модульну структуру `src/network/api/`
      - ✅ Модуль `system.rs` - system handlers
      - ✅ Модуль `workers.rs` - worker handlers
+     - ✅ Модуль `rewards.rs` - rewards handlers
+     - ✅ Модуль `vm.rs` - VM instance handlers (10 handlers)
      - ✅ Модуль `common.rs` - спільні утиліти
-     - 🔄 Модулі `vm.rs`, `raid.rs`, `libraries.rs`, `users.rs`, `rewards.rs` - TODO
+     - 🔄 Модулі `raid.rs`, `libraries.rs`, `users.rs` - TODO
 5. ✅ **Platform Module** - GPU detection (cross-platform)
 6. ✅ **Runtime Module** - process management, scheduling, caching (Stage 4.1)
 7. ✅ **Rewards System** - achievement-based rewards
