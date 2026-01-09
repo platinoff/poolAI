@@ -204,9 +204,6 @@ async fn test_vm_manager_with_resource_limits() {
             "test-instance".to_string(),
             VmResources::default(),
             VmIsolation::ProcessSandbox,
-            None,
-            Vec::new(),
-            None,
         )
         .await
         .unwrap();

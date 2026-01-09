@@ -43,19 +43,19 @@ async fn test_register_process_pid_windows() {
     let process_id = Uuid::new_v4();
     let pid = 12345u32;
 
-    // Register PID
-    limiter.register_process_pid(process_id, pid).await;
-
-    // Verify it was registered (by trying to apply limits)
+    // Test applying limits to a command
     let limits = ResourceLimits {
-        cpu_cores: Some(2),
-        memory_mb: Some(2048),
+        cpu_cores: 2,
+        memory_mb: 2048,
         gpu_device: None,
     };
 
-    // On Windows, this should work if PID is registered
-    // On other platforms, it should just log
-    let result = limiter.apply_limits(process_id, &limits).await;
+    // Create a command to apply limits to
+    let mut command = tokio::process::Command::new("echo");
+    
+    // On Windows, this should work if Job Objects are available
+    // On other platforms, it should just validate
+    let result = limiter.apply_limits(&mut command, &limits).await;
 
     #[cfg(target_os = "windows")]
     {
@@ -84,8 +84,9 @@ async fn test_apply_limits_without_pid_windows() {
         gpu_device: None,
     };
 
-    // Try to apply limits without registering PID
-    let result = limiter.apply_limits(process_id, &limits).await;
+    // Try to apply limits to a command
+    let mut command = tokio::process::Command::new("echo");
+    let result = limiter.apply_limits(&mut command, &limits).await;
 
     #[cfg(target_os = "windows")]
     {
@@ -172,9 +173,6 @@ async fn test_vm_manager_with_resource_limits_windows() {
             "test-instance".to_string(),
             VmResources::default(),
             VmIsolation::ProcessSandbox,
-            None,
-            Vec::new(),
-            None,
         )
         .await
         .unwrap();
