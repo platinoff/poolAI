@@ -126,6 +126,10 @@ async fn status_handler(req: Request<axum::body::Body>) -> Response {
     .api-ref h2 {{ color: #8be9fd; margin-top: 0; }}
     .api-ref code {{ background: #282a36; color: #f1fa8c; border-radius: 4px; padding: 2px 6px; }}
     .api-ref li {{ margin-bottom: 0.4em; }}
+    .api-section {{ margin-bottom: 1.5em; padding-bottom: 1em; border-bottom: 1px solid #44475a; }}
+    .api-section:last-child {{ border-bottom: none; }}
+    .api-section h3 {{ font-size: 1.1em; margin-bottom: 0.5em; }}
+    .api-ref ul {{ margin-top: 0.5em; }}
     .security-info {{ margin-top: 2em; background: #23272e; border: 1px solid #44475a; border-radius: 8px; padding: 14px 18px; }}
     .security-info strong {{ color: #f1fa8c; }}
     .curl-block {{ background: #282a36; color: #f8f8f2; border-radius: 6px; padding: 10px 14px; font-size: 0.98em; margin: 1em 0; font-family: 'Fira Mono', 'Consolas', monospace; }}
@@ -145,26 +149,85 @@ async fn status_handler(req: Request<axum::body::Body>) -> Response {
       <strong>Uptime:</strong> {uptime} seconds
     </div>
     <div class='security-info'>
-      <strong>Security:</strong> HTTPS <span style='color:#50fa7b'>enabled</span>, JWT <span style='color:#ffb86c'>planned</span>, CORS <span style='color:#50fa7b'>enabled</span>
+      <strong>Security:</strong> HTTPS <span style='color:#50fa7b'>enabled</span>, JWT <span style='color:#50fa7b'>enabled</span>, CORS <span style='color:#50fa7b'>enabled</span>
       <br><span style='font-size:0.95em'>Self-signed certificate for dev. <b>Never commit private keys to git!</b></span>
+      <br><span style='font-size:0.9em; color:#6272a4'>🔐 = Requires authentication | ✨ = New feature | 🎁 = Rewards system</span>
     </div>
     <div class='api-ref'>
-      <h2>API Reference</h2>
-      <ul>
-        <li><b>GET</b> <code>/api/v1/status</code> — Server status (HTML/JSON)</li>
-        <li><b>GET</b> <code>/api/v1/health</code> — Health check <span style='color:#50fa7b'>✨ NEW!</span></li>
-        <li><b>POST</b> <code>/api/v1/login</code> — Authentication <span style='color:#50fa7b'>🔐 NEW!</span></li>
-        <li><b>GET</b> <code>/api/v1/metrics</code> — Metrics</li>
-        <li><b>GET</b> <code>/api/v1/models</code> — Models</li>
-        <li><b>GET</b> <code>/api/v1/gpu</code> — GPU Info</li>
-                 <li><b>GET</b> <code>/api/v1/workers</code> — Workers</li>
-         <li><b>WS</b> <code>/ws/metrics</code> — Live metrics (WebSocket) <span style='color:#50fa7b'>✨ NEW!</span></li>
-         <li><b>GET</b> <code>/api/v1/rewards</code> — Rewards system <span style='color:#ffb86c'>🎁 NEW!</span></li>
-         <li><b>GET</b> <code>/api/v1/rewards/:user_id</code> — User rewards</li>
-         <li><b>GET</b> <code>/api/v1/rewards/progress/:user_id</code> — User progress</li>
-         <li><b>GET</b> <code>/api/v1/rewards/statistics</code> — Rewards statistics</li>
-         <li><b>GET</b> <code>/api/v1/rewards/top</code> — Top users</li>
-      </ul>
+      <h2>API Reference <span style='font-size:0.7em; color:#6272a4'>(67+ endpoints)</span></h2>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd; margin-top:0;'>System</h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/status</code> — Server status (HTML/JSON)</li>
+          <li><b>GET</b> <code>/api/v1/health</code> — Health check <span style='color:#50fa7b'>✨</span></li>
+          <li><b>POST</b> <code>/api/v1/login</code> — Authentication <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>GET</b> <code>/api/v1/metrics</code> — Metrics</li>
+          <li><b>GET</b> <code>/api/v1/models</code> — Models</li>
+          <li><b>GET</b> <code>/api/v1/gpu</code> — GPU Info</li>
+          <li><b>WS</b> <code>/ws/metrics</code> — Live metrics (WebSocket) <span style='color:#50fa7b'>✨</span></li>
+        </ul>
+      </div>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd;'>Workers</h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/workers</code> — List workers</li>
+          <li><b>POST</b> <code>/api/v1/workers</code> — Create worker <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>DELETE</b> <code>/api/v1/workers/:id</code> — Delete worker <span style='color:#50fa7b'>🔐</span></li>
+        </ul>
+      </div>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd;'>Rewards</h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/rewards</code> — Rewards system <span style='color:#ffb86c'>🎁</span></li>
+          <li><b>GET</b> <code>/api/v1/rewards/:user_id</code> — User rewards</li>
+          <li><b>GET</b> <code>/api/v1/rewards/progress/:user_id</code> — User progress</li>
+          <li><b>GET</b> <code>/api/v1/rewards/statistics</code> — Rewards statistics</li>
+          <li><b>GET</b> <code>/api/v1/rewards/top</code> — Top users</li>
+        </ul>
+      </div>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd;'>VM Management</h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/vm/instances</code> — List VM instances</li>
+          <li><b>POST</b> <code>/api/v1/vm/instances</code> — Create VM <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>PUT</b> <code>/api/v1/vm/instances/:id</code> — Update VM <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>DELETE</b> <code>/api/v1/vm/instances/:id</code> — Delete VM <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/vm/instances/:id/start</code> — Start VM <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/vm/instances/:id/stop</code> — Stop VM <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/vm/instances/:id/restart</code> — Restart VM <span style='color:#50fa7b'>🔐</span></li>
+        </ul>
+      </div>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd;'>RAID Storage</h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/raid/nodes</code> — List nodes</li>
+          <li><b>GET</b> <code>/api/v1/raid/artifacts</code> — List artifacts</li>
+          <li><b>POST</b> <code>/api/v1/raid/artifacts</code> — Create artifact <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>DELETE</b> <code>/api/v1/raid/artifacts/:id</code> — Delete artifact <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/raid/snapshot/create</code> — Create snapshot <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/raid/snapshot/restore</code> — Restore snapshot <span style='color:#50fa7b'>🔐</span></li>
+        </ul>
+      </div>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd;'>Libraries</h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/libraries</code> — List libraries</li>
+          <li><b>GET</b> <code>/api/v1/libraries/:name</code> — Library info</li>
+          <li><b>POST</b> <code>/api/v1/libraries/:name/install</code> — Install library <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/libraries/:name/uninstall</code> — Uninstall library <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/libraries/upload</code> — Upload library <span style='color:#50fa7b'>🔐</span></li>
+        </ul>
+      </div>
+      <div class='api-section'>
+        <h3 style='color:#8be9fd;'>Enterprise <span style='font-size:0.8em; color:#6272a4'>(requires enterprise feature)</span></h3>
+        <ul>
+          <li><b>GET</b> <code>/api/v1/users</code> — List users <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/users</code> — Create user <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>GET</b> <code>/api/v1/tenants</code> — List tenants <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>GET</b> <code>/api/v1/audit/events</code> — Audit events <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>GET</b> <code>/api/v1/monitoring/dashboards</code> — Monitoring dashboards <span style='color:#50fa7b'>🔐</span></li>
+        </ul>
+      </div>
       <div class='curl-block'>
         <b>Example (curl):</b><br>
         <code>curl -k https://localhost:8080/api/v1/status</code>
