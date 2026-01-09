@@ -89,7 +89,7 @@ pub async fn start_server(addr: SocketAddr) {
             .or_else(|| std::env::var("HTTPS_KEY_PATH").ok())
             .unwrap_or_else(|| "certs/key.pem".to_string());
 
-        match RustlsConfig::from_pem_file(&cert_path, &key_path).await {
+        match RustlsConfig::from_pem_file(cert_path.clone(), key_path.clone()).await {
             Ok(config) => {
                 info!("Starting HTTPS server on {}", addr);
                 axum_server::bind_rustls(addr, config)
