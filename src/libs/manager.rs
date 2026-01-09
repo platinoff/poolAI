@@ -668,6 +668,158 @@ impl LibraryManager {
         }
     }
 
+    /// Upload and install a library from base64-encoded archive data
+    pub async fn upload_library(
+        &self,
+        name: &str,
+        version: &str,
+        base64_data: &str,
+        library_type: LibraryType,
+    ) -> Result<LibraryInfo, AppError> {
+        use base64::{engine::general_purpose::STANDARD, Engine};
+
+        info!("Uploading library: {} v{}", name, version);
+
+        // Decode base64 data
+        let archive_bytes = STANDARD.decode(base64_data).map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to decode base64 data. Context: Cannot decode base64-encoded library archive. \
+                Suggestion: Verify the base64 data is valid and properly encoded. \
+                Library: '{}', Version: '{}', Error: {}",
+                name, version, e
+            ))
+        })?;
+
+        // Create temp directory for upload
+        let tmp_root = self.base_path.join(".tmp");
+        tokio::fs::create_dir_all(&tmp_root).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to create temp directory. Context: Cannot create temporary directory for library upload. \
+                Suggestion: Check filesystem permissions and ensure base library directory is writable. \
+                Path: '{}', Error: {}",
+                tmp_root.display(), e
+            ))
+        })?;
+
+        let session_dir = tmp_root.join(format!("{}-{}-{}", name, version, Uuid::new_v4()));
+        tokio::fs::create_dir_all(&session_dir).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to create temp session directory. Context: Cannot create temporary session directory for library upload. \
+                Suggestion: Check filesystem permissions and ensure temp directory is writable. \
+                Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                name, version, session_dir.display(), e
+            ))
+        })?;
+
+        // Write archive bytes to temp file
+        let archive_path = session_dir.join("archive");
+        tokio::fs::write(&archive_path, &archive_bytes).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to write archive file. Context: Cannot write uploaded archive data to temporary file. \
+                Suggestion: Check disk space and filesystem permissions. \
+                Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                name, version, archive_path.display(), e
+            ))
+        })?;
+
+        // Extract archive
+        let extract_dir = session_dir.join("extract");
+        crate::libs::download::extract_archive(&archive_path, &extract_dir).await?;
+
+        // Verify installation
+        self.verify_installation(&extract_dir, name).await?;
+
+        // Store extracted library as artifact in RAID
+        let artifact_ref = {
+            let artifact_archive = session_dir.join("artifact.tar.gz");
+            self.create_artifact_archive(&extract_dir, &artifact_archive)
+                .await?;
+
+            let artifact_bytes = tokio::fs::read(&artifact_archive).await.map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to read artifact archive. Context: Cannot read uploaded archive file for RAID storage. \
+                    Suggestion: Check filesystem permissions and verify archive file integrity. \
+                    Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                    name, version, artifact_archive.display(), e
+                ))
+            })?;
+
+            let raid_manager = crate::raid::get_global_manager();
+            let artifact_name = format!("{}-{}.tar.gz", name, version);
+            raid_manager
+                .put_artifact(&artifact_name, &artifact_bytes)
+                .await
+                .map_err(|e| {
+                    AppError::ConfigError(format!("Failed to store artifact in RAID: {}", e))
+                })?
+        };
+
+        // Install to final location
+        let library_dir = self.base_path.join(name).join(version);
+        let library_parent = self.base_path.join(name);
+        tokio::fs::create_dir_all(&library_parent).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to create library directory. Context: Cannot create library version directory during upload. \
+                Suggestion: Check filesystem permissions and ensure parent directory exists. \
+                Library: '{}', Version: '{}', Path: '{}', Error: {}",
+                name, version, library_parent.display(), e
+            ))
+        })?;
+
+        // Replace existing target if present
+        if library_dir.exists() {
+            tokio::fs::remove_dir_all(&library_dir).await.map_err(|e| {
+                AppError::ConfigError(format!("Failed to remove existing library dir: {}", e))
+            })?;
+        }
+
+        tokio::fs::rename(&extract_dir, &library_dir).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to finalize upload (rename). Context: Cannot rename extracted directory to final library location. \
+                Suggestion: Check filesystem permissions, ensure target directory doesn't exist, and verify both paths are on the same filesystem. \
+                Library: '{}', Version: '{}', From: '{}', To: '{}', Error: {}",
+                name, version, extract_dir.display(), library_dir.display(), e
+            ))
+        })?;
+
+        // Cleanup temp session
+        if let Err(e) = tokio::fs::remove_dir_all(&session_dir).await {
+            warn!("Failed to remove temp session dir: {}", e);
+        }
+
+        // Create library info
+        let library_info = LibraryInfo {
+            name: name.to_string(),
+            version: version.to_string(),
+            path: library_dir,
+            dependencies: vec![],
+            metadata: LibraryMetadata {
+                installed_at: Some(chrono::Utc::now()),
+                ..Default::default()
+            },
+            artifact_ref: Some(artifact_ref),
+        };
+
+        // Register library
+        {
+            let mut libraries = self.libraries.write().await;
+            libraries.insert(name.to_string(), library_info.clone());
+        }
+
+        // Register in version manager
+        self.version_manager
+            .write()
+            .await
+            .register_version(name, version, &library_info.path)
+            .await?;
+
+        // Persist manifest
+        self.persist_manifest().await?;
+
+        info!("Library {} v{} uploaded and installed successfully", name, version);
+        Ok(library_info)
+    }
+
     /// Update library to latest version
     pub async fn update_library(&self, name: &str) -> Result<LibraryInfo, AppError> {
         info!("Updating library: {}", name);

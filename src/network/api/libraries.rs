@@ -35,6 +35,10 @@ pub fn create_libraries_routes() -> Router {
             "/libraries/{name}/update",
             post(library_update_handler).layer(middleware::from_fn(auth_middleware)),
         )
+        .route(
+            "/libraries/upload",
+            post(library_upload_handler).layer(middleware::from_fn(auth_middleware)),
+        )
 }
 
 async fn libraries_list_handler() -> impl IntoResponse {
@@ -168,6 +172,55 @@ async fn library_update_handler(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 AxumJson(serde_json::json!({
                     "error": format!("Failed to update library. Context: Cannot update library to newer version. Suggestion: Verify library is installed, check for available updates, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
+                })),
+            )
+                .into_response(),
+        }
+    } else {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            AxumJson(serde_json::json!({
+                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+            })),
+        )
+            .into_response()
+    }
+}
+
+#[derive(serde::Deserialize)]
+struct LibraryUploadRequest {
+    name: String,
+    version: String,
+    data: String, // Base64-encoded archive data
+}
+
+async fn library_upload_handler(
+    Extension(claims): Extension<Claims>,
+    Json(payload): Json<LibraryUploadRequest>,
+) -> impl IntoResponse {
+    // Check permission: write:all or write:libs
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:libs"))
+    {
+        return err.into_response();
+    }
+
+    if let Some(manager) = get_global_manager() {
+        let manager = manager.read().await;
+        match manager
+            .upload_library(
+                &payload.name,
+                &payload.version,
+                &payload.data,
+                LibraryType::ModelLibrary,
+            )
+            .await
+        {
+            Ok(lib) => AxumJson(lib).into_response(),
+            Err(e) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                AxumJson(serde_json::json!({
+                    "error": format!("Failed to upload library. Context: Cannot upload and install library from base64 data. Suggestion: Verify base64 data is valid, check disk space, ensure sufficient permissions, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", payload.name, payload.version, e)
                 })),
             )
                 .into_response(),

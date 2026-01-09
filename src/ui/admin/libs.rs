@@ -128,8 +128,74 @@ pub async fn admin_libs() -> Html<String> {
         showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
         return;
       }
-      showNotification('Library upload functionality - backend implementation pending', 'info');
-      // showModal('uploadLibraryModal');
+      showModal('uploadLibraryModal');
+    }
+
+    async function handleUploadLibrary(event) {
+      event.preventDefault();
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions.', 'error');
+        return;
+      }
+
+      const form = event.target;
+      const btn = form.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
+
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+
+      try {
+        const name = document.getElementById('libraryUploadName').value;
+        const version = document.getElementById('libraryUploadVersion').value;
+        const fileInput = document.getElementById('libraryUploadFile');
+        const file = fileInput.files[0];
+
+        if (!name || !version || !file) {
+          showNotification('Name, version, and file are required', 'error');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            const binaryString = e.target.result;
+            const base64Data = btoa(binaryString);
+
+            const payload = {
+              name: name,
+              version: version,
+              data: base64Data
+            };
+
+            await fetchJson('/api/v1/libraries/upload', {
+              method: 'POST',
+              body: JSON.stringify(payload)
+            });
+
+            showNotification('Library uploaded successfully', 'success');
+            hideModal('uploadLibraryModal');
+            form.reset();
+            loadLibraries();
+          } catch (uploadError) {
+            showNotification('Error uploading library: ' + uploadError.message, 'error');
+          } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        };
+        reader.onerror = function() {
+          showNotification('Error reading file', 'error');
+          btn.disabled = false;
+          btn.textContent = originalText;
+        };
+        reader.readAsBinaryString(file);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
     }
     
     loadLibraries();
@@ -145,6 +211,34 @@ pub async fn admin_libs() -> Html<String> {
             <button class="btn btn-primary" onclick="showUploadLibraryModal()" aria-label="Upload library">Upload Library</button>
           </div>
           <div id="libraries-list"></div>
+        </div>
+
+        <!-- Upload Library Modal -->
+        <div id="uploadLibraryModal" class="modal" role="dialog" aria-labelledby="uploadLibraryModalTitle" aria-modal="true" aria-hidden="true">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 id="uploadLibraryModalTitle">Upload Library</h3>
+              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('uploadLibraryModal')">&times;</button>
+            </div>
+            <form id="uploadLibraryForm" onsubmit="handleUploadLibrary(event)">
+              <div class="form-group">
+                <label for="libraryUploadName">Library Name <span class="required">*</span></label>
+                <input type="text" id="libraryUploadName" name="name" required placeholder="my-model-lib" />
+              </div>
+              <div class="form-group">
+                <label for="libraryUploadVersion">Version <span class="required">*</span></label>
+                <input type="text" id="libraryUploadVersion" name="version" required placeholder="1.0.0" />
+              </div>
+              <div class="form-group">
+                <label for="libraryUploadFile">Library File (e.g., .zip, .tar.gz) <span class="required">*</span></label>
+                <input type="file" id="libraryUploadFile" name="file" required />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn" onclick="hideModal('uploadLibraryModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Upload</button>
+              </div>
+            </form>
+          </div>
         </div>
         "#,
         script,
