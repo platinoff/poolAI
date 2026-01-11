@@ -81,29 +81,47 @@ pub fn create_raid_routes() -> Router {
         )
         .route("/raid/quota", get(raid_quota_handler))
         .route("/raid/events", get(raid_events_handler))
-        .route("/raid/events/{artifact_id}", get(raid_events_for_artifact_handler))
+        .route(
+            "/raid/events/{artifact_id}",
+            get(raid_events_for_artifact_handler),
+        )
         .route("/raid/events/range", get(raid_events_range_handler))
         .route("/raid/snapshot", get(raid_snapshot_handler))
-            .route(
-                "/raid/snapshot/create",
-                post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)),
-            )
-            .route(
-                "/raid/snapshot/restore",
-                post(raid_snapshot_restore_handler).layer(middleware::from_fn(auth_middleware)),
-            )
+        .route(
+            "/raid/snapshot/create",
+            post(raid_snapshot_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/raid/snapshot/restore",
+            post(raid_snapshot_restore_handler).layer(middleware::from_fn(auth_middleware)),
+        )
         .route(
             "/raid/gc",
             post(raid_gc_handler).layer(middleware::from_fn(auth_middleware)),
         )
         // Distributed RAID Protocol endpoints
-        .route("/raid/distributed/artifacts/replicate", post(put_artifact_handler))
-        .route("/raid/distributed/artifacts/get", post(get_artifact_handler))
-        .route("/raid/distributed/artifacts/delete", post(delete_artifact_handler))
-        .route("/raid/distributed/artifacts/sync", post(sync_artifacts_handler))
+        .route(
+            "/raid/distributed/artifacts/replicate",
+            post(put_artifact_handler),
+        )
+        .route(
+            "/raid/distributed/artifacts/get",
+            post(get_artifact_handler),
+        )
+        .route(
+            "/raid/distributed/artifacts/delete",
+            post(delete_artifact_handler),
+        )
+        .route(
+            "/raid/distributed/artifacts/sync",
+            post(sync_artifacts_handler),
+        )
         .route("/raid/distributed/health", post(health_check_handler))
         .route("/raid/distributed/cluster/join", post(join_cluster_handler))
-        .route("/raid/distributed/cluster/leave", post(leave_cluster_handler))
+        .route(
+            "/raid/distributed/cluster/leave",
+            post(leave_cluster_handler),
+        )
 }
 
 async fn raid_nodes_handler() -> impl IntoResponse {

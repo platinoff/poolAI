@@ -42,43 +42,43 @@ pub fn create_vm_routes() -> Router {
         .route("/vm/instances", get(vm_instances_handler))
         .route(
             "/vm/instances",
-            post(vm_instance_create_handler).layer(middleware::from_fn(
-                crate::network::auth::auth_middleware,
-            )),
+            post(vm_instance_create_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
         .route(
             "/vm/instances/{id}",
-            put(vm_instance_update_handler).layer(middleware::from_fn(
-                crate::network::auth::auth_middleware,
-            )),
+            put(vm_instance_update_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
         .route(
             "/vm/instances/{id}",
-            delete(vm_instance_delete_handler).layer(middleware::from_fn(
-                crate::network::auth::auth_middleware,
-            )),
+            delete(vm_instance_delete_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
         .route(
             "/vm/instances/{id}/start",
-            post(vm_instance_start_handler).layer(middleware::from_fn(
-                crate::network::auth::auth_middleware,
-            )),
+            post(vm_instance_start_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
         .route(
             "/vm/instances/{id}/stop",
-            post(vm_instance_stop_handler).layer(middleware::from_fn(
-                crate::network::auth::auth_middleware,
-            )),
+            post(vm_instance_stop_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
         .route(
             "/vm/instances/{id}/restart",
-            post(vm_instance_restart_handler).layer(middleware::from_fn(
-                crate::network::auth::auth_middleware,
-            )),
+            post(vm_instance_restart_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
         .route("/vm/instances/{id}/health", get(vm_instance_health_handler))
-        .route("/vm/instances/{id}/resources", get(vm_instance_resources_handler))
-        .route("/vm/resource-limits-supported", get(vm_resource_limits_supported_handler))
+        .route(
+            "/vm/instances/{id}/resources",
+            get(vm_instance_resources_handler),
+        )
+        .route(
+            "/vm/resource-limits-supported",
+            get(vm_resource_limits_supported_handler),
+        )
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {

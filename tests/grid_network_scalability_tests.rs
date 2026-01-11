@@ -12,9 +12,7 @@
 
 use poolai::core::error::AppError;
 use poolai::raid::{
-    events::EventStore,
-    replication::ReplicationEngine,
-    RaidConfig, RaidManager, RaidMode,
+    events::EventStore, replication::ReplicationEngine, RaidConfig, RaidManager, RaidMode,
 };
 use std::sync::Arc;
 use tempfile::TempDir;
@@ -100,7 +98,7 @@ impl GridNetwork {
         // Register all nodes in each replication engine
         // Create a vector of node IDs and addresses first to avoid borrowing issues
         let node_addresses: Vec<(u64, u16)> = nodes.iter().map(|n| (n.node_id, n.port)).collect();
-        
+
         for node in &mut nodes {
             for (other_id, other_port) in &node_addresses {
                 let address = format!("http://127.0.0.1:{}", other_port);
@@ -161,17 +159,17 @@ impl GridNetwork {
             // Find artifact by ID in list
             let artifacts = node.raid_manager.read().await.list_artifacts().await;
             let artifact_found = artifacts.iter().any(|a| a.id.to_string() == artifact_id);
-            
+
             if !artifact_found {
                 all_present = false;
                 break;
             }
-            
+
             // Try to read artifact data
             if let Some(artifact) = artifacts.iter().find(|a| a.id.to_string() == artifact_id) {
                 let path = artifact.path.clone();
                 let result = node.raid_manager.read().await.get_artifact(&path).await;
-                
+
                 match result {
                     Ok(_) => {
                         // Artifact exists and is readable on this node
@@ -236,7 +234,10 @@ async fn test_grid_network_small_scale() {
     // For now, verify artifact exists on source node
     let node1 = grid.get_node(1).unwrap();
     let artifacts = node1.raid_manager.read().await.list_artifacts().await;
-    let artifact = artifacts.iter().find(|a| a.id.to_string() == artifact_id).unwrap();
+    let artifact = artifacts
+        .iter()
+        .find(|a| a.id.to_string() == artifact_id)
+        .unwrap();
     let retrieved = node1
         .raid_manager
         .read()
@@ -283,7 +284,10 @@ async fn test_grid_network_large_scale() {
     // Verify artifact exists
     let node1 = grid.get_node(1).unwrap();
     let artifacts = node1.raid_manager.read().await.list_artifacts().await;
-    let artifact = artifacts.iter().find(|a| a.id.to_string() == artifact_id).unwrap();
+    let artifact = artifacts
+        .iter()
+        .find(|a| a.id.to_string() == artifact_id)
+        .unwrap();
     let retrieved = node1
         .raid_manager
         .read()
@@ -311,7 +315,10 @@ async fn test_grid_network_maximum_scale() {
     // Verify artifact exists on source node
     let node1 = grid.get_node(1).unwrap();
     let artifacts = node1.raid_manager.read().await.list_artifacts().await;
-    let artifact = artifacts.iter().find(|a| a.id.to_string() == artifact_id).unwrap();
+    let artifact = artifacts
+        .iter()
+        .find(|a| a.id.to_string() == artifact_id)
+        .unwrap();
     let retrieved = node1
         .raid_manager
         .read()
@@ -349,9 +356,13 @@ async fn test_grid_network_concurrent_operations() {
     // Store artifacts sequentially (concurrent access to mutable grid would require Arc<Mutex>)
     for i in 0..5 {
         let artifact_data = format!("concurrent artifact {}", i).into_bytes();
-        grid.store_and_replicate((i % 10 + 1) as u64, &format!("artifact-{}", i), &artifact_data)
-            .await
-            .unwrap();
+        grid.store_and_replicate(
+            (i % 10 + 1) as u64,
+            &format!("artifact-{}", i),
+            &artifact_data,
+        )
+        .await
+        .unwrap();
     }
 
     // Verify statistics

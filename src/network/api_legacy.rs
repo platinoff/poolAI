@@ -1,8 +1,6 @@
 // network/api.rs
 use crate::libs::{get_global_manager, LibraryType};
-use crate::network::auth::{
-    auth_middleware, get_global_user_manager, Claims, UserRole,
-};
+use crate::network::auth::{auth_middleware, get_global_user_manager, Claims, UserRole};
 // System-related imports (authenticate_user, AuthRequest, platform, websocket_handler) moved to api/system.rs
 use crate::pool;
 use crate::raid;

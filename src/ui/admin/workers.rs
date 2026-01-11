@@ -1,9 +1,9 @@
-﻿//! Worker Management page
+//! Worker Management page
 //!
 //! Provides worker pool configuration and monitoring.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Worker management page
 pub async fn admin_workers() -> Html<String> {

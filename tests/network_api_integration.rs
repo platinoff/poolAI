@@ -29,7 +29,7 @@ async fn test_status_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -45,7 +45,7 @@ async fn test_health_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -61,7 +61,7 @@ async fn test_metrics_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -77,7 +77,7 @@ async fn test_workers_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -93,7 +93,7 @@ async fn test_libraries_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -109,7 +109,7 @@ async fn test_vm_instances_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -125,7 +125,7 @@ async fn test_raid_artifacts_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -141,7 +141,7 @@ async fn test_raid_nodes_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -157,7 +157,7 @@ async fn test_rewards_endpoint_exists() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::OK);
 }
 
@@ -173,6 +173,6 @@ async fn test_nonexistent_endpoint_returns_404() {
         )
         .await
         .unwrap();
-    
+
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }

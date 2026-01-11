@@ -6,16 +6,9 @@
 //! - Get user progress
 //! - Get top users
 
-use axum::{
-    extract::Path,
-    response::IntoResponse,
-    routing::get,
-    Json, Router,
-};
+use axum::{extract::Path, response::IntoResponse, routing::get, Json, Router};
 
-use crate::rewards::{
-    get_reward_statistics, get_top_users, get_user_progress, get_user_rewards,
-};
+use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
 
 /// Create rewards system routes
 pub fn create_rewards_routes() -> Router {

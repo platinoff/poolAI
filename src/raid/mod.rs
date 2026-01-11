@@ -398,9 +398,7 @@ impl RaidManager {
                 .load_snapshot()
                 .await?
                 .ok_or_else(|| {
-                    AppError::ConfigError(
-                        "No snapshot available for restore".to_string(),
-                    )
+                    AppError::ConfigError("No snapshot available for restore".to_string())
                 })?;
 
             info!(
@@ -412,15 +410,15 @@ impl RaidManager {
             if let Some(artifacts_json) = snapshot.artifacts.as_object() {
                 let mut artifacts = ArtifactManifest::new();
                 // Parse artifacts from JSON snapshot
-                if let Ok(artifacts_vec) = serde_json::from_value::<Vec<ArtifactRef>>(
-                    serde_json::Value::Array(
+                if let Ok(artifacts_vec) =
+                    serde_json::from_value::<Vec<ArtifactRef>>(serde_json::Value::Array(
                         artifacts_json
                             .get("artifacts")
                             .and_then(|v| v.as_array())
                             .cloned()
                             .unwrap_or_default(),
-                    ),
-                ) {
+                    ))
+                {
                     for artifact in artifacts_vec {
                         artifacts.artifacts.insert(artifact.id, artifact);
                     }
@@ -431,15 +429,15 @@ impl RaidManager {
 
             // Restore nodes from snapshot
             if let Some(nodes_json) = snapshot.nodes.as_object() {
-                if let Ok(nodes_vec) = serde_json::from_value::<Vec<RaidNode>>(
-                    serde_json::Value::Array(
+                if let Ok(nodes_vec) =
+                    serde_json::from_value::<Vec<RaidNode>>(serde_json::Value::Array(
                         nodes_json
                             .get("nodes")
                             .and_then(|v| v.as_array())
                             .cloned()
                             .unwrap_or_default(),
-                    ),
-                ) {
+                    ))
+                {
                     *self.nodes.write().await = nodes_vec;
                 }
             }

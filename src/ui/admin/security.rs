@@ -1,9 +1,9 @@
-﻿//! Security Management page
+//! Security Management page
 //!
 //! Provides OAuth2/SAML providers and security policies management.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Security management page
 pub async fn admin_security() -> Html<String> {

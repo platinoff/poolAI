@@ -6,13 +6,13 @@
 //! - Query filtering (user_id, tenant_id, action, level, time range)
 
 #[cfg(feature = "enterprise")]
-use poolai::enterprise::audit::{
-    get_global_audit_logger, AuditEvent, AuditLevel, AuditQueryFilters,
-};
+use chrono::Utc;
 #[cfg(feature = "enterprise")]
 use poolai::core::error::AppError;
 #[cfg(feature = "enterprise")]
-use chrono::Utc;
+use poolai::enterprise::audit::{
+    get_global_audit_logger, AuditEvent, AuditLevel, AuditQueryFilters,
+};
 
 #[cfg(feature = "enterprise")]
 #[tokio::test]
@@ -105,7 +105,9 @@ async fn test_query_audit_events_by_user_id() {
         ..Default::default()
     };
     let events = logger.query_events(&filters).await.unwrap();
-    assert!(events.iter().all(|e| e.user_id.as_ref() == Some(&"user123".to_string())));
+    assert!(events
+        .iter()
+        .all(|e| e.user_id.as_ref() == Some(&"user123".to_string())));
 }
 
 #[cfg(feature = "enterprise")]
@@ -213,9 +215,9 @@ async fn test_query_audit_events_by_time_range() {
         ..Default::default()
     };
     let events = logger.query_events(&filters).await.unwrap();
-    assert!(events.iter().all(|e| {
-        e.timestamp >= start_time && e.timestamp <= end_time
-    }));
+    assert!(events
+        .iter()
+        .all(|e| { e.timestamp >= start_time && e.timestamp <= end_time }));
 }
 
 #[cfg(feature = "enterprise")]

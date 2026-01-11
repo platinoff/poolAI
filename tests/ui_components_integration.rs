@@ -2,7 +2,7 @@
 //!
 //! Tests for UI components, themes, and layout functionality.
 
-use poolai::ui::{get_all_themes, get_theme, DARK_THEME, LIGHT_THEME, HIGH_CONTRAST_THEME};
+use poolai::ui::{get_all_themes, get_theme, DARK_THEME, HIGH_CONTRAST_THEME, LIGHT_THEME};
 
 #[tokio::test]
 async fn test_theme_get_all_themes() {

@@ -54,8 +54,7 @@ pub fn create_enterprise_api_routes() -> Router {
         .route("/monitoring/alerts", get(monitoring_alerts_handler))
         .route(
             "/monitoring/alerts/{id}/acknowledge",
-            post(monitoring_alert_acknowledge_handler)
-                .layer(middleware::from_fn(auth_middleware)),
+            post(monitoring_alert_acknowledge_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route("/monitoring/dashboards", get(monitoring_dashboards_handler))
         .route(
@@ -67,7 +66,10 @@ pub fn create_enterprise_api_routes() -> Router {
             "/monitoring/alert-rules",
             post(monitoring_alert_rule_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
-        .route("/monitoring/alert-rules", get(monitoring_alert_rules_handler))
+        .route(
+            "/monitoring/alert-rules",
+            get(monitoring_alert_rules_handler),
+        )
         // Security
         .route(
             "/security/oauth2/providers",
@@ -107,8 +109,7 @@ pub fn create_enterprise_api_routes() -> Router {
         )
         .route(
             "/security/saml/providers/{name}",
-            put(security_saml_provider_update_handler)
-                .layer(middleware::from_fn(auth_middleware)),
+            put(security_saml_provider_update_handler).layer(middleware::from_fn(auth_middleware)),
         )
         .route(
             "/security/saml/providers/{name}",
@@ -493,15 +494,16 @@ async fn monitoring_alerts_handler(
     }
 
     // Parse severity filter
-    let severity = params.severity.as_ref().and_then(|s| {
-        match s.to_uppercase().as_str() {
+    let severity = params
+        .severity
+        .as_ref()
+        .and_then(|s| match s.to_uppercase().as_str() {
             "INFO" => Some(enterprise::monitoring::AlertSeverity::Info),
             "WARNING" => Some(enterprise::monitoring::AlertSeverity::Warning),
             "ERROR" => Some(enterprise::monitoring::AlertSeverity::Error),
             "CRITICAL" => Some(enterprise::monitoring::AlertSeverity::Critical),
             _ => None,
-        }
-    });
+        });
 
     // Parse tenant ID filter
     let tenant_id = params.tenant_id.and_then(|id| Uuid::parse_str(&id).ok());

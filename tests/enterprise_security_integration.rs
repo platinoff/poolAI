@@ -8,12 +8,12 @@
 //! - SSO URL generation
 
 #[cfg(feature = "enterprise")]
+use poolai::core::error::AppError;
+#[cfg(feature = "enterprise")]
 use poolai::enterprise::security::{
     get_global_security_manager, OAuth2Config, OAuth2Provider, SamlConfig, SamlProvider,
     SecurityManager, SecurityPolicy,
 };
-#[cfg(feature = "enterprise")]
-use poolai::core::error::AppError;
 
 #[cfg(feature = "enterprise")]
 #[tokio::test]
@@ -74,7 +74,11 @@ async fn test_oauth2_provider_crud() {
         .await
         .is_ok());
 
-    let provider = manager.get_oauth2_provider("test-oauth2").await.unwrap().unwrap();
+    let provider = manager
+        .get_oauth2_provider("test-oauth2")
+        .await
+        .unwrap()
+        .unwrap();
     assert!(!provider.enabled);
     assert_eq!(provider.config.client_id, "updated-client-id");
 
@@ -100,7 +104,9 @@ async fn test_oauth2_provider_validation() {
         scopes: vec![],
     };
 
-    let result = manager.register_oauth2_provider("".to_string(), config).await;
+    let result = manager
+        .register_oauth2_provider("".to_string(), config)
+        .await;
     assert!(result.is_err());
     if let Err(AppError::ValidationError(msg)) = result {
         assert!(msg.contains("name cannot be empty"));
@@ -210,7 +216,11 @@ async fn test_saml_provider_crud() {
         .await
         .is_ok());
 
-    let provider = manager.get_saml_provider("test-saml").await.unwrap().unwrap();
+    let provider = manager
+        .get_saml_provider("test-saml")
+        .await
+        .unwrap()
+        .unwrap();
     assert!(!provider.enabled);
     assert_eq!(provider.config.entity_id, "updated-entity-id");
 
@@ -235,7 +245,9 @@ async fn test_saml_provider_validation() {
         attribute_mapping: std::collections::HashMap::new(),
     };
 
-    let result = manager.register_saml_provider("".to_string(), config.clone()).await;
+    let result = manager
+        .register_saml_provider("".to_string(), config.clone())
+        .await;
     assert!(result.is_err());
     if let Err(AppError::ValidationError(msg)) = result {
         assert!(msg.contains("name cannot be empty"));
@@ -340,7 +352,11 @@ async fn test_security_policy_crud() {
 
     assert!(manager.update_security_policy(updated_policy).await.is_ok());
 
-    let retrieved = manager.get_security_policy("test-policy").await.unwrap().unwrap();
+    let retrieved = manager
+        .get_security_policy("test-policy")
+        .await
+        .unwrap()
+        .unwrap();
     assert_eq!(retrieved.description, "Updated test security policy");
     assert_eq!(retrieved.require_mfa, false);
     assert_eq!(retrieved.session_timeout, 3600);

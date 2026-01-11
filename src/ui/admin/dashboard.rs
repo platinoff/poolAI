@@ -2,8 +2,8 @@
 //!
 //! Provides system overview with real-time status, metrics, alerts, and recent activity.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Admin dashboard home page
 pub async fn admin_dashboard() -> Html<String> {

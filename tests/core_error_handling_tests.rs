@@ -57,16 +57,15 @@ fn test_error_kind_debug() {
 
 #[test]
 fn test_error_with_context() {
-    let err = AppError::new(ErrorKind::InvalidInput, "Invalid input")
-        .with_context("field", "username");
+    let err =
+        AppError::new(ErrorKind::InvalidInput, "Invalid input").with_context("field", "username");
     assert_eq!(err.message(), "Invalid input");
 }
 
 #[test]
 fn test_error_chain() {
     let err1 = AppError::new(ErrorKind::StorageError, "Storage error");
-    let err2 = AppError::new(ErrorKind::InternalError, "Internal error")
-        .with_cause(err1);
+    let err2 = AppError::new(ErrorKind::InternalError, "Internal error").with_cause(err1);
     assert_eq!(err2.message(), "Internal error");
 }
 
@@ -109,7 +108,7 @@ fn test_error_from_static_str() {
 fn test_error_send_sync() {
     fn assert_send<T: Send>() {}
     fn assert_sync<T: Sync>() {}
-    
+
     assert_send::<AppError>();
     assert_sync::<AppError>();
 }

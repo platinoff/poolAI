@@ -8,14 +8,14 @@
 //! - Metric history retrieval
 
 #[cfg(feature = "enterprise")]
+use chrono::Utc;
+#[cfg(feature = "enterprise")]
+use poolai::core::error::AppError;
+#[cfg(feature = "enterprise")]
 use poolai::enterprise::monitoring::{
     get_global_monitoring_manager, Alert, AlertRule, AlertSeverity, Dashboard, MetricDataPoint,
     MonitoringManager,
 };
-#[cfg(feature = "enterprise")]
-use poolai::core::error::AppError;
-#[cfg(feature = "enterprise")]
-use chrono::Utc;
 #[cfg(feature = "enterprise")]
 use uuid::Uuid;
 
@@ -303,9 +303,9 @@ async fn test_get_metric_history_with_time_range() {
         )
         .await
         .unwrap();
-    assert!(metrics.iter().all(|m| {
-        m.timestamp >= start_time && m.timestamp <= end_time
-    }));
+    assert!(metrics
+        .iter()
+        .all(|m| { m.timestamp >= start_time && m.timestamp <= end_time }));
 }
 
 #[cfg(feature = "enterprise")]

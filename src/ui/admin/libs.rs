@@ -1,9 +1,9 @@
-﻿//! Library Management page
+//! Library Management page
 //!
 //! Provides model library administration.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Library management page
 pub async fn admin_libs() -> Html<String> {

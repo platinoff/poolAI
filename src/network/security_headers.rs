@@ -47,7 +47,8 @@ impl SecurityHeadersConfig {
             content_security_policy,
             x_frame_options: x_frame_options.or(Some("DENY".to_string())),
             x_content_type_options: x_content_type_options.or(Some("nosniff".to_string())),
-            referrer_policy: referrer_policy.or(Some("strict-origin-when-cross-origin".to_string())),
+            referrer_policy: referrer_policy
+                .or(Some("strict-origin-when-cross-origin".to_string())),
             permissions_policy: None,
         }
     }
@@ -65,20 +66,16 @@ impl SecurityHeadersConfig {
 }
 
 /// Middleware function to add security headers to responses
-pub async fn security_headers_middleware(
-    req: Request,
-    next: Next,
-) -> Response {
+pub async fn security_headers_middleware(req: Request, next: Next) -> Response {
     let mut response = next.run(req).await;
     let config = SecurityHeadersConfig::default();
 
     // Add Content-Security-Policy header
     if let Some(ref csp) = config.content_security_policy {
         if let Ok(header_value) = HeaderValue::from_str(csp) {
-            response.headers_mut().insert(
-                axum::http::header::CONTENT_SECURITY_POLICY,
-                header_value,
-            );
+            response
+                .headers_mut()
+                .insert(axum::http::header::CONTENT_SECURITY_POLICY, header_value);
         }
     }
 

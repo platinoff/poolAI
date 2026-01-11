@@ -58,7 +58,7 @@ async fn test_register_process_pid() {
 
     // Create a command to apply limits to
     let mut command = tokio::process::Command::new("echo");
-    
+
     // On Linux, this should work if cgroups are available
     // On other platforms, it should just validate
     let result = limiter.apply_limits(&mut command, &limits).await;

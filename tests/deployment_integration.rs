@@ -11,12 +11,16 @@ use std::path::Path;
 
 #[test]
 fn test_dockerfile_exists() {
-    assert!(Path::new("docker/Dockerfile").exists(), "Dockerfile should exist in docker/");
+    assert!(
+        Path::new("docker/Dockerfile").exists(),
+        "Dockerfile should exist in docker/"
+    );
 }
 
 #[test]
 fn test_dockerfile_contains_required_stages() {
-    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content =
+        fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     // Check for multi-stage build
     assert!(
@@ -31,7 +35,8 @@ fn test_dockerfile_contains_required_stages() {
 
 #[test]
 fn test_dockerfile_exposes_ports() {
-    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content =
+        fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("8080"),
@@ -49,7 +54,8 @@ fn test_dockerfile_exposes_ports() {
 
 #[test]
 fn test_dockerfile_uses_non_root_user() {
-    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content =
+        fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("USER poolai") || dockerfile_content.contains("USER "),
@@ -59,7 +65,8 @@ fn test_dockerfile_uses_non_root_user() {
 
 #[test]
 fn test_dockerfile_has_healthcheck() {
-    let dockerfile_content = fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
+    let dockerfile_content =
+        fs::read_to_string("docker/Dockerfile").expect("Failed to read Dockerfile");
 
     assert!(
         dockerfile_content.contains("HEALTHCHECK"),

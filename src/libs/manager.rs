@@ -816,7 +816,10 @@ impl LibraryManager {
         // Persist manifest
         self.persist_manifest().await?;
 
-        info!("Library {} v{} uploaded and installed successfully", name, version);
+        info!(
+            "Library {} v{} uploaded and installed successfully",
+            name, version
+        );
         Ok(library_info)
     }
 

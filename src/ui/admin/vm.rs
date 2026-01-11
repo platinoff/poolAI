@@ -1,9 +1,9 @@
-﻿//! VM Management page
+//! VM Management page
 //!
 //! Provides VM instance lifecycle management.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// VM management page
 pub async fn admin_vm() -> Html<String> {

@@ -171,11 +171,7 @@ async fn test_vm_list_instances() {
         .unwrap();
 
     let _instance2 = manager
-        .create_instance(
-            "vm2".to_string(),
-            resources,
-            VmIsolation::ProcessSandbox,
-        )
+        .create_instance("vm2".to_string(), resources, VmIsolation::ProcessSandbox)
         .await
         .unwrap();
 

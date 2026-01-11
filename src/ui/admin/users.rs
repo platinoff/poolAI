@@ -1,9 +1,9 @@
-﻿//! User Management page
+//! User Management page
 //!
 //! Provides user CRUD operations with role-based access control.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// User management page
 pub async fn admin_users() -> Html<String> {

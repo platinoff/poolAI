@@ -81,11 +81,7 @@ impl TlsConfig {
     }
 
     /// Create TLS configuration with custom settings
-    pub fn new(
-        min_version: TlsVersion,
-        max_version: TlsVersion,
-        hsts_enabled: bool,
-    ) -> Self {
+    pub fn new(min_version: TlsVersion, max_version: TlsVersion, hsts_enabled: bool) -> Self {
         Self {
             min_version,
             max_version,

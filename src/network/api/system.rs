@@ -82,7 +82,8 @@ pub fn create_system_routes() -> Router {
         .route("/config", get(config_get_handler))
         .route(
             "/config",
-            put(config_update_handler).layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+            put(config_update_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
 }
 

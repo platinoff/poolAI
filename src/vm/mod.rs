@@ -1313,18 +1313,35 @@ impl VmManager {
         let memory_min = *memory_values.first().unwrap_or(&0);
         let memory_max = *memory_values.last().unwrap_or(&0);
         let memory_avg = memory_values.iter().sum::<u32>() as f32 / memory_values.len() as f32;
-        let memory_mb_p50 = memory_values.get((memory_values.len() as f32 * 0.5).ceil() as usize - 1).copied();
-        let memory_mb_p95 = memory_values.get((memory_values.len() as f32 * 0.95).ceil() as usize - 1).copied();
-        let memory_mb_p99 = memory_values.get((memory_values.len() as f32 * 0.99).ceil() as usize - 1).copied();
+        let memory_mb_p50 = memory_values
+            .get((memory_values.len() as f32 * 0.5).ceil() as usize - 1)
+            .copied();
+        let memory_mb_p95 = memory_values
+            .get((memory_values.len() as f32 * 0.95).ceil() as usize - 1)
+            .copied();
+        let memory_mb_p99 = memory_values
+            .get((memory_values.len() as f32 * 0.99).ceil() as usize - 1)
+            .copied();
         let memory_mb_variance = if !memory_values.is_empty() {
-            let sum_sq_diff: f32 = memory_values.iter().map(|&v| (v as f32 - memory_avg).powi(2)).sum();
+            let sum_sq_diff: f32 = memory_values
+                .iter()
+                .map(|&v| (v as f32 - memory_avg).powi(2))
+                .sum();
             Some(sum_sq_diff / memory_values.len() as f32)
         } else {
             None
         };
 
         // GPU statistics
-        let (gpu_min, gpu_max, gpu_avg, gpu_utilization_p50, gpu_utilization_p95, gpu_utilization_p99, gpu_utilization_variance) = if gpu_values.is_empty() {
+        let (
+            gpu_min,
+            gpu_max,
+            gpu_avg,
+            gpu_utilization_p50,
+            gpu_utilization_p95,
+            gpu_utilization_p99,
+            gpu_utilization_variance,
+        ) = if gpu_values.is_empty() {
             (None, None, None, None, None, None, None)
         } else {
             gpu_values.sort_by(|a, b| a.partial_cmp(b).unwrap());

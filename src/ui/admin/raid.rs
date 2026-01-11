@@ -1,9 +1,9 @@
-﻿//! RAID Management page
+//! RAID Management page
 //!
 //! Provides artifact storage and replication management.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// RAID management page
 pub async fn admin_raid() -> Html<String> {

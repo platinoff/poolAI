@@ -2,8 +2,8 @@
 //!
 //! Provides tenant CRUD operations with resource quota management.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Tenant management page
 pub async fn admin_tenants() -> Html<String> {

@@ -185,7 +185,13 @@ async fn test_update_nonexistent_instance() {
     let nonexistent_id = uuid::Uuid::new_v4();
 
     let result = manager
-        .update_instance(nonexistent_id, Some("new-name".to_string()), None, None, None)
+        .update_instance(
+            nonexistent_id,
+            Some("new-name".to_string()),
+            None,
+            None,
+            None,
+        )
         .await;
 
     assert!(result.is_err());

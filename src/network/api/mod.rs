@@ -44,8 +44,8 @@ pub fn create_api_routes() -> Router {
         .merge(raid::create_raid_routes())
         .merge(libraries::create_libraries_routes())
         .merge(users::create_users_routes())
-        // api_legacy.rs is kept for backward compatibility
-        // All handlers have been migrated to modular structure
+    // api_legacy.rs is kept for backward compatibility
+    // All handlers have been migrated to modular structure
 }
 
 // Legacy routes function removed - all handlers migrated to modules ✅

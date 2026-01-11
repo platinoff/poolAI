@@ -2,8 +2,8 @@
 //!
 //! Provides query interface for viewing and filtering audit events.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Audit logs viewer page
 pub async fn admin_audit() -> Html<String> {

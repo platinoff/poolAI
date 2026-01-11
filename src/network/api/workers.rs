@@ -15,8 +15,8 @@ use axum::{
 use serde::{Deserialize, Serialize};
 
 use crate::network::auth::auth_middleware;
-use crate::pool;
 use crate::network::validation;
+use crate::pool;
 
 #[derive(Serialize)]
 pub struct WorkerInfo {
@@ -113,9 +113,7 @@ async fn workers_handler() -> impl IntoResponse {
     AxumJson(workers).into_response()
 }
 
-async fn worker_create_handler(
-    Json(payload): Json<CreateWorkerRequest>,
-) -> impl IntoResponse {
+async fn worker_create_handler(Json(payload): Json<CreateWorkerRequest>) -> impl IntoResponse {
     // Validate worker ID format
     if let Err(e) = validation::validate_worker_id(&payload.worker_id) {
         return (
@@ -208,9 +206,7 @@ async fn worker_create_handler(
     }
 }
 
-async fn worker_delete_handler(
-    Path(worker_id): Path<String>,
-) -> impl IntoResponse {
+async fn worker_delete_handler(Path(worker_id): Path<String>) -> impl IntoResponse {
     // Get global pool
     let pool = match pool::get_global_pool() {
         Some(p) => p,

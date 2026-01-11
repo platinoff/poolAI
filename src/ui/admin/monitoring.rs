@@ -2,8 +2,8 @@
 //!
 //! Provides real-time monitoring with alerts and dashboards.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// Monitoring dashboard page
 pub async fn admin_monitoring() -> Html<String> {

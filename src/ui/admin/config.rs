@@ -2,8 +2,8 @@
 //!
 //! Provides system configuration interface with tabs for different settings.
 
-use axum::response::Html;
 use crate::ui::admin::admin_layout;
+use axum::response::Html;
 
 /// System configuration page
 pub async fn admin_config() -> Html<String> {

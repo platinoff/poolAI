@@ -45,7 +45,9 @@ pub async fn start_server(addr: SocketAddr) {
             .nest("/api/v1", api::create_api_routes())
             .nest("/ui", ui::create_ui_routes())
             // Add security headers middleware to all responses
-            .layer(middleware::from_fn(security_headers::security_headers_middleware));
+            .layer(middleware::from_fn(
+                security_headers::security_headers_middleware,
+            ));
 
         // Add enterprise API routes if feature is enabled
         #[cfg(feature = "enterprise")]

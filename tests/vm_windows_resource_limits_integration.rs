@@ -52,7 +52,7 @@ async fn test_register_process_pid_windows() {
 
     // Create a command to apply limits to
     let mut command = tokio::process::Command::new("echo");
-    
+
     // On Windows, this should work if Job Objects are available
     // On other platforms, it should just validate
     let result = limiter.apply_limits(&mut command, &limits).await;
