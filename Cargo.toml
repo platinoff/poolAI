@@ -70,7 +70,7 @@ parking_lot = "0.12"
 
 # HTTP client for library downloads
 # Using default features without native-tls to avoid zstd-sys compilation issues
-reqwest = { version = "0.11", features = ["stream", "json"], default-features = false }
+reqwest = { version = "0.12", features = ["stream", "json"], default-features = false }
 
 # Archive extraction
 flate2 = "1.0"
