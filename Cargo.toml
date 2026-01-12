@@ -73,7 +73,7 @@ parking_lot = "0.12"
 reqwest = { version = "0.11", features = ["stream", "json"], default-features = false }
 
 # Archive extraction
-flate2 = "1.0"
+flate2 = "1.1"
 tar = "0.4"
 # zip default features enable bzip2 + zstd, which require a C toolchain (gcc.exe) on windows-gnu.
 # Keep it minimal/pure-Rust for now.
