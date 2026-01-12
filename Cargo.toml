@@ -110,7 +110,7 @@ k8s-openapi = { version = "0.21", optional = true }
 # aws-sdk-ecs = { version = "1.30", optional = true }
 # aws-sdk-s3 = { version = "1.30", optional = true }
 # Azure SDK (older versions compatible with Rust 1.70+)
-azure_core = { version = "0.19", optional = true }
+azure_core = { version = "0.21", optional = true }
 azure_identity = { version = "0.19", optional = true }
 azure_mgmt_compute = { version = "0.21", optional = true }
 # GCP SDK (using google-cloud-rust crates)
