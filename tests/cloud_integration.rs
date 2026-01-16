@@ -106,7 +106,7 @@ async fn test_azure_manager() {
 async fn test_gcp_manager() {
     use poolai::cloud::providers::gcp::GcpManager;
 
-    let manager = GcpManager::new(None);
+    let manager = GcpManager::new(Some("test-project-id".to_string()));
     manager.initialize().await.unwrap();
     manager.shutdown().await.unwrap();
 }
