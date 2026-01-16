@@ -107,10 +107,7 @@ impl GcpManager {
             )
         })?;
 
-        info!(
-            "Initializing GCP SDK clients for project: {}",
-            project_id
-        );
+        info!("Initializing GCP SDK clients for project: {}", project_id);
 
         // TODO: Initialize GCP SDK clients once SDK is confirmed
         // Note: GCP SDK for Rust needs to be selected and added to Cargo.toml
