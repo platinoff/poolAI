@@ -52,7 +52,7 @@ jobs:
         run: cargo fmt --all -- --check
       
       - name: Lint with clippy (no features)
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets --no-default-features -- -D warnings
         continue-on-error: true
       
       - name: Lint with clippy (with features)
