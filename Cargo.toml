@@ -99,6 +99,8 @@ nix = { version = "0.30", optional = true }
 # Kubernetes API client
 # Note: k8s-openapi features should only be enabled in binary crates, not libraries
 # Library crates should use k8s_if_* macros or build scripts for version-specific code
+# k8s-openapi requires a version feature flag (v1_28 used for compatibility)
+# Note: Version feature is added in cloud-sdk feature below
 k8s-openapi = { version = "0.21", optional = true }
 # Note: kube-rs requires Rust 1.88+ (home@0.5.12 dependency)
 # Using reqwest + k8s-openapi directly instead for Rust 1.70+ compatibility
@@ -169,7 +171,7 @@ cloud = []
 # Note: Adds heavy SDK dependencies (k8s-openapi, azure SDK, etc.)
 # Note: AWS SDK requires Rust 1.88+ and is commented out until Rust version is upgraded
 cloud-sdk = [
-    "k8s-openapi",
+    "k8s-openapi/v1_28",  # Enable Kubernetes API v1.28 support
     # "kube", # Requires Rust 1.88+, using reqwest + k8s-openapi directly instead
     "azure_core",
     "azure_identity",
