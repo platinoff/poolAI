@@ -199,7 +199,7 @@ impl KubernetesManager {
                             e1_msg, e2
                         ))),
                     }
-                },
+                }
             }?;
 
             *self.api_base_url.write().await = Some(api_url);
