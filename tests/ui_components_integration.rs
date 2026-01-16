@@ -8,9 +8,11 @@ use poolai::ui::{get_all_themes, get_theme, DARK_THEME, HIGH_CONTRAST_THEME, LIG
 async fn test_theme_get_all_themes() {
     let themes = get_all_themes();
     assert_eq!(themes.len(), 3);
-    assert!(themes.contains(&&DARK_THEME));
-    assert!(themes.contains(&&LIGHT_THEME));
-    assert!(themes.contains(&&HIGH_CONTRAST_THEME));
+    // Theme doesn't implement PartialEq, so check by name instead
+    let theme_names: Vec<&str> = themes.iter().map(|t| t.name).collect();
+    assert!(theme_names.contains(&"dark"));
+    assert!(theme_names.contains(&"light"));
+    assert!(theme_names.contains(&"high-contrast"));
 }
 
 #[tokio::test]
