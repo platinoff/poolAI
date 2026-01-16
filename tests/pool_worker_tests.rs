@@ -2,8 +2,8 @@
 //!
 //! Tests for worker pool functionality, worker management, and worker lifecycle.
 
-use poolai::pool::worker::{Worker, WorkerConfig, WorkerStatus};
 use chrono;
+use poolai::pool::worker::{Worker, WorkerConfig, WorkerStatus};
 
 #[test]
 fn test_worker_status_creation() {

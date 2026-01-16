@@ -183,9 +183,9 @@ impl Monitoring {
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
     /// let monitoring = Monitoring::new();
     /// let metrics = monitoring.collect_metrics().await?;
-/// println!("CPU: {}%, Memory: {}MB",
-///     metrics.cpu_usage_percent,
-///     metrics.memory_usage_mb);
+    /// println!("CPU: {}%, Memory: {}MB",
+    ///     metrics.cpu_usage_percent,
+    ///     metrics.memory_usage_mb);
     /// # Ok(())
     /// # }
     /// ```

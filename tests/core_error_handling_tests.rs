@@ -41,10 +41,10 @@ fn test_app_error_debug() {
 fn test_app_error_error_code() {
     let err = AppError::ConfigError("Invalid config".to_string());
     assert_eq!(err.error_code(), "CONFIG_ERROR");
-    
+
     let err2 = AppError::NetworkError("Network error".to_string());
     assert_eq!(err2.error_code(), "NETWORK_ERROR");
-    
+
     let err3 = AppError::TimeoutError("Timeout".to_string());
     assert_eq!(err3.error_code(), "TIMEOUT_ERROR");
 }
@@ -53,13 +53,13 @@ fn test_app_error_error_code() {
 fn test_app_error_is_recoverable() {
     let recoverable = AppError::TimeoutError("Request timeout".to_string());
     assert!(recoverable.is_recoverable());
-    
+
     let recoverable2 = AppError::ResourceError("Resource error".to_string());
     assert!(recoverable2.is_recoverable());
-    
+
     let non_recoverable = AppError::ValidationError("Invalid input".to_string());
     assert!(!non_recoverable.is_recoverable());
-    
+
     let non_recoverable2 = AppError::Unknown;
     assert!(!non_recoverable2.is_recoverable());
 }

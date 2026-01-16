@@ -235,8 +235,8 @@ impl AppError {
     /// let timeout_err = AppError::TimeoutError("Request timeout".to_string());
     /// assert!(timeout_err.is_recoverable());
     ///
-/// let config_err = AppError::ConfigError("Invalid config".to_string());
-/// assert!(config_err.is_recoverable());
+    /// let config_err = AppError::ConfigError("Invalid config".to_string());
+    /// assert!(config_err.is_recoverable());
     /// ```
     pub fn is_recoverable(&self) -> bool {
         matches!(

@@ -101,7 +101,7 @@ async fn test_apply_limits_without_pid() {
 
     // Create a command to apply limits to
     let mut command = tokio::process::Command::new("echo");
-    
+
     // Apply limits to command - this should succeed even without PID registration
     // because apply_limits works with Command before spawning (no PID needed yet)
     let result = limiter.apply_limits(&mut command, &limits).await;
@@ -152,7 +152,7 @@ async fn test_resource_limits_validation() {
     // Invalid limits: too low memory (will be validated)
     // Note: cpu_cores: 0 means unlimited, not invalid
     let invalid_limits = ResourceLimits {
-        cpu_cores: 0, // 0 means unlimited, this is valid
+        cpu_cores: 0,  // 0 means unlimited, this is valid
         memory_mb: 32, // Less than 64 MB minimum
         gpu_device: None,
     };
