@@ -919,4 +919,7 @@ curl http://localhost:8080/api/status
 **Status**: v0.1.0 PRODUCTION READY! ✅ **First Day of PRO Package: 2026-01-16** 🚀  
 **Next Goal**: Production Hardening (Performance, Security, Observability) 🎯  
 **Architecture**: Complete Rust Architecture (All 15 modules 100% complete) ✅  
-**Version**: v6, 2026 (PRO Edition)
+**Version**: v6, 2026 (PRO Edition)  
+**Creator**: Madevinc (one developer with Cursor AI)  
+**Repository**: https://github.com/platinoff/poolAI  
+**Solana Donations**: GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8 (Madevinc welcomes donations to support this crypto project)
