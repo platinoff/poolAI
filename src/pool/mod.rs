@@ -214,7 +214,17 @@ impl Pool {
     /// #     auto_scaling: false, scaling_threshold: 0.8, request_timeout: 30,
     /// # };
     /// let pool = Pool::new(config);
-    /// let worker = Worker::new("worker-1".to_string());
+    /// let worker = Worker::new(poolai::pool::worker::WorkerConfig {
+///     worker_id: "worker-1".to_string(),
+///     max_concurrent_requests: 10,
+///     request_timeout_ms: 30000,
+///     health_check_interval_ms: 5000,
+///     enable_caching: false,
+///     cache_size: 0,
+///     max_memory_mb: 512,
+///     cpu_priority: 5,
+///     gpu_device: None,
+/// });
     /// pool.add_worker("worker-1".to_string(), worker).await?;
     /// # Ok(())
     /// # }
