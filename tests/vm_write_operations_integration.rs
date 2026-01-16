@@ -190,7 +190,6 @@ async fn test_update_nonexistent_instance() {
             Some("new-name".to_string()),
             None,
             None,
-            None,
         )
         .await;
 
