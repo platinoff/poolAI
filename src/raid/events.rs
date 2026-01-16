@@ -119,15 +119,13 @@ impl EventStore {
     /// Initialize the event store
     pub async fn initialize(&self) -> Result<(), AppError> {
         // Create storage directory if it doesn't exist
-        if let Some(parent) = self.storage_path.parent() {
-            tokio::fs::create_dir_all(parent).await.map_err(|e| {
-                AppError::ConfigError(format!(
-                    "Failed to create event store directory. Context: Cannot create directory for event store initialization. Suggestion: Check filesystem permissions and available disk space. Path: '{}', Error: {}",
-                    parent.display(),
-                    e
-                ))
-            })?;
-        }
+        tokio::fs::create_dir_all(&self.storage_path).await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to create event store directory. Context: Cannot create directory for event store initialization. Suggestion: Check filesystem permissions and available disk space. Path: '{}', Error: {}",
+                self.storage_path.display(),
+                e
+            ))
+        })?;
 
         // Load existing events to determine current sequence
         let events = self.load_events().await?;
