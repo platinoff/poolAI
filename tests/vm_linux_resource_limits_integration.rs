@@ -9,7 +9,8 @@
 //! Note: These tests will only work on Linux systems with cgroups enabled.
 //! On other platforms, they will test the fallback behavior.
 
-use poolai::vm::{ResourceLimiter, ResourceLimits, ResourceUsage};
+use poolai::vm::ResourceLimiter;
+use poolai::vm::ResourceLimits;
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use uuid::Uuid;
 
@@ -33,6 +34,7 @@ async fn test_platform_resource_limiter_creation() {
     #[cfg(target_os = "windows")]
     {
         // On Windows, depends on Job Objects availability
+        let supported = limiter.is_supported();
         let _ = supported; // Just verify it doesn't panic
     }
 
@@ -46,8 +48,8 @@ async fn test_platform_resource_limiter_creation() {
 async fn test_register_process_pid() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
-    let pid = 12345u32;
+    let _process_id = Uuid::new_v4();
+    let _pid = 12345u32;
 
     // Test applying limits to a command (no PID registration needed)
     let limits = ResourceLimits {
@@ -90,16 +92,19 @@ async fn test_register_process_pid() {
 async fn test_apply_limits_without_pid() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
 
     let limits = ResourceLimits {
-        cpu_cores: Some(2),
-        memory_mb: Some(2048),
+        cpu_cores: 2,
+        memory_mb: 2048,
         gpu_device: None,
     };
 
-    // Try to apply limits without registering PID
-    let result = limiter.apply_limits(process_id, &limits).await;
+    // Create a command to apply limits to
+    let mut command = tokio::process::Command::new("echo");
+    
+    // Try to apply limits to command
+    let result = limiter.apply_limits(&mut command, &limits).await;
 
     #[cfg(target_os = "linux")]
     {
@@ -124,25 +129,25 @@ async fn test_apply_limits_without_pid() {
 async fn test_get_usage() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
 
-    // Get usage for non-existent process
-    let result = limiter.get_usage(process_id).await;
+    // Get usage for non-existent process (using PID, not UUID)
+    let pid = 12345u32;
+    let result = limiter.get_usage(pid).await;
 
     // Should return default usage (0.0 CPU, 0 MB memory)
     assert!(result.is_ok());
     let usage = result.unwrap();
     assert_eq!(usage.cpu_percent, 0.0);
     assert_eq!(usage.memory_mb, 0);
-    assert_eq!(usage.gpu_percent, None);
-    assert_eq!(usage.gpu_memory_mb, None);
+    assert_eq!(usage.gpu_utilization, None);
 }
 
 #[tokio::test]
 async fn test_resource_limits_validation() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
 
     // Register a fake PID
     // Test applying limits to a command (no PID registration needed)
@@ -154,7 +159,9 @@ async fn test_resource_limits_validation() {
         gpu_device: None,
     };
 
-    let result = limiter.apply_limits(process_id, &invalid_limits).await;
+    // Create a command to apply limits to
+    let mut command = tokio::process::Command::new("echo");
+    let result = limiter.apply_limits(&mut command, &invalid_limits).await;
     assert!(result.is_err());
 
     // Invalid limits: too low memory
