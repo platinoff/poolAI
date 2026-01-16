@@ -483,6 +483,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         Ok(CurrentSnapshotData {
             index,
             term,
+            membership,
             snapshot: snapshot_file,
         })
     }
@@ -605,7 +606,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
 
         // Load metadata to get index, term, and membership
         let metadata_path = self.snapshot_path(&format!("{}_metadata", snapshot_id));
-        let (index, term) = if metadata_path.exists() {
+        let (index, term, membership) = if metadata_path.exists() {
             let mut metadata_file = File::open(&metadata_path)
                 .await
                 .map_err(|e| anyhow::anyhow!("Failed to open snapshot metadata: {}", e))?;
@@ -625,16 +626,26 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
                 .as_u64()
                 .ok_or_else(|| anyhow::anyhow!("Invalid term in snapshot metadata"))?;
 
-            // Note: membership config is stored in metadata but not used here
-            // It will be used in get_membership_config() when loading from snapshot
+            // Load membership config from metadata
+            let membership = if let Some(membership_json) = metadata.get("membership") {
+                serde_json::from_value::<MembershipConfig>(membership_json.clone())
+                    .unwrap_or_else(|_| {
+                        warn!("Failed to parse membership from snapshot metadata, using initial membership");
+                        MembershipConfig::new_initial(self.node_id)
+                    })
+            } else {
+                warn!("No membership in snapshot metadata, using initial membership");
+                MembershipConfig::new_initial(self.node_id)
+            };
 
-            (index, term)
+            (index, term, membership)
         } else {
-            // Fallback: if metadata doesn't exist, use last log entry
+            // Fallback: if metadata doesn't exist, use last log entry and initial membership
             let entries = self.load_log_entries().await?;
             let index = entries.len() as u64;
             let term = entries.last().map(|e| e.term).unwrap_or(0);
-            (index, term)
+            let membership = MembershipConfig::new_initial(self.node_id);
+            (index, term, membership)
         };
 
         // Open snapshot file
@@ -650,6 +661,7 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         Ok(Some(CurrentSnapshotData {
             index,
             term,
+            membership,
             snapshot: Box::new(snapshot_file),
         }))
     }
