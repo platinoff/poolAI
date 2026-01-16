@@ -84,6 +84,7 @@ impl AutoScaler {
     /// ```rust,no_run
     /// use poolai::cloud::autoscaling::AutoScaler;
     /// use poolai::cloud::kubernetes::KubernetesManager;
+    /// use std::sync::Arc;
     ///
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
     /// let k8s_manager = Arc::new(KubernetesManager::new("poolai".to_string()));

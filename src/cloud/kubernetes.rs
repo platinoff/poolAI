@@ -2174,6 +2174,7 @@ impl KubernetesManager {
     ///
     /// ```rust,no_run
     /// use poolai::cloud::kubernetes::KubernetesManager;
+    /// use tracing::info;
     ///
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
     /// let manager = KubernetesManager::new("poolai".to_string());
