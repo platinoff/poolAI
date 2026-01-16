@@ -4,6 +4,27 @@
 
 This guide covers common issues encountered when deploying and operating PoolAI, along with troubleshooting steps and solutions.
 
+## Development Environment Issues
+
+### Avast Antivirus False Positive
+
+**Symptoms:**
+- Avast repeatedly scans `rust_out.exe` (60+ seconds each scan)
+- Doc-tests hang or fail to compile
+- Slow compilation due to repeated scans
+- Cyclic scanning windows appearing
+
+**Solution:**
+See [AVAST_FALSE_POSITIVE.md](./AVAST_FALSE_POSITIVE.md) for detailed instructions.
+
+**Quick Fix:**
+1. Open **Avast** → **Settings** → **General** → **Exceptions**
+2. Click **Add Exception** → **Folder**
+3. Add: `S:\rust\poolAI\target`
+4. Restart Avast
+
+This is a known issue with Rust binaries triggering false positives in antivirus software.
+
 ## Startup Issues
 
 ### Application Won't Start
