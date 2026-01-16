@@ -1,8 +1,8 @@
 # 🎯 Cursor Development Guide - PoolAI
 ## Максимальна адаптація для майбутньої розробки
 
-**Дата створення**: 2026-01-09  
-**Версія**: 1.0  
+**Дата створення**: 2026-01-16  
+**Версія**: 1.1  
 **Статус**: Production Ready (v0.1.0), Planning for v0.2.0+
 
 ---
@@ -93,7 +93,7 @@ git log --all --oneline --grep="concept\|plan\|TODO\|implement\|feature" -i
 13. Cloud Module ✅ (інфраструктура)
 14. Telegram Bot Module ✅
 
-**Тестування**: 416+ tests passing ✅
+**Тестування**: підтверджувати через `cargo test` перед релізом ✅
 
 **Безпека**: TLS 1.3, HSTS, Security Headers ✅
 
@@ -318,6 +318,19 @@ git log --all --oneline --grep="concept\|plan\|TODO\|implement\|feature" -i
 **Загальна оцінка Stage 4.4**: 14-21 тиждень (3.5-5 місяців)
 
 **Пріоритет**: Низький (для v0.3.0+)
+
+---
+
+## 🧠 Claude/AI правила (RALF)
+
+**Робоче тлумачення**: "RALF" у контексті Claude трактується як RLAIF/Constitutional AI принципи (alignment через політики та self-review).  
+Якщо у команди інше визначення RALF — оновити цей розділ.
+
+### Як адаптувати до Cursor правил
+1. **Alignment first**: не відхилятися від концепту/roadmap.
+2. **Least assumptions**: всі припущення фіксувати у звіті.
+3. **Failure-aware**: виявлені ризики/залежності — описувати і планувати.
+4. **Feedback loop**: оновлювати документацію після змін.
 
 ---
 

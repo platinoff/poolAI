@@ -339,6 +339,21 @@ pub trait Query {
 - Mocking для внешних зависимостей
 - Property-based тестирование с `proptest`
 
+### 9.7.6 Политика MSRV и издания Rust
+- Явно фиксировать MSRV (минимальная версия Rust) в `rust-toolchain.toml`
+- Обновлять MSRV только после CI/локальной проверки
+- Планировать миграцию на Rust 2024 edition в отдельной задаче
+
+### 9.7.7 Hygiene зависимостей и безопасность supply-chain
+- Регулярно выполнять `cargo audit` и фиксировать уязвимости
+- Использовать `cargo deny` для лицензий/дубликатов/уязвимостей
+- Минимизировать зависимости и отключать лишние default features
+
+### 9.7.8 Инструменты качества
+- `cargo fmt` и `cargo clippy` в CI
+- Политика `deny(warnings)` для release профиля (поэтапно)
+- Логирование через `tracing` с явными контекстами
+
 ## 9.8 Производительность
 
 ### 9.8.1 Управление памятью
@@ -366,8 +381,7 @@ poolAI/
 │   ├── lib.rs               # Основные библиотечные функции и re-exports
 │   └── version.rs           # Информация о версии и времени сборки
 ├── .vscode/
-│   ├── settings.json        # Настройки терминала MSYS2 UCRT64
-│   └── README_TERMINAL.md   # Инструкции по настройке
+│   └── settings.json        # Настройки терминала MSYS2 UCRT64
 ├── .cargo/
 │   └── config.toml         # Конфигурация linker для GNU toolchain
 ├── Cargo.toml              # Зависимости проекта
@@ -538,6 +552,7 @@ poolAI/
 - Файл `.vscode/settings.json` содержит настройки терминала
 - Терминал автоматически запускается в MSYS2 UCRT64 при открытии нового терминала
 - Переменные окружения `MSYSTEM=UCRT64` и `CHERE_INVOKING=1` установлены автоматически
+- Рабочая директория терминала указывает на каталог проекта (`terminal.integrated.cwd`)
 
 #### 11.1.3 Rust Toolchain Setup
 
@@ -606,8 +621,10 @@ linker = "x86_64-w64-mingw32-gcc"
 ```
 poolAI/
 ├── .vscode/
-│   ├── settings.json          # Настройки терминала MSYS2 UCRT64
-│   └── README_TERMINAL.md     # Инструкции по настройке
+│   └── settings.json          # Настройки терминала MSYS2 UCRT64
+├── docs/
+│   └── development/
+│       └── TERMINAL_SETUP.md  # Інструкції по MSYS2 у Cursor/VS Code
 ├── .cargo/
 │   └── config.toml            # Конфигурация linker для GNU toolchain
 └── Cargo.toml                 # Зависимости проекта

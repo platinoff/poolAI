@@ -555,6 +555,21 @@ pub trait Query {
 - Generate docs with `cargo doc --open` (local docs)
 - Publish docs with `cargo doc --no-deps` (for crates.io)
 
+### **MSRV & Edition Policy** (2026 Best Practice)
+- Pin MSRV in `rust-toolchain.toml` and document it in `README`
+- Upgrade MSRV only with CI verification
+- Plan Rust 2024 edition migration as a tracked task
+
+### **Dependency Hygiene & Supply Chain**
+- Run `cargo audit` regularly and fix vulnerabilities promptly
+- Use `cargo deny` to enforce license and dependency policies
+- Minimize default features and prefer feature-gated dependencies
+
+### **Observability & Diagnostics**
+- Use `tracing` spans with request IDs for correlation
+- Keep structured logs in JSON for production ingestion
+- Track metrics for latency, error rate, and saturation
+
 ## 🚀 Performance Features
 
 ### **Memory Management**
@@ -844,14 +859,16 @@ rustc --version
 rustup show
 ```
 
-**Note**: VS Code/Cursor settings have been updated to automatically include Rust PATH in terminal environment. See `setup_rust_path.sh` for automatic setup script.
+**Note**: VS Code/Cursor settings include Rust PATH for terminal environment. See `scripts/setup_rust_path.sh` for automated setup.
 
 #### **Project Structure**
 ```
 poolAI/
 ├── .vscode/
-│   ├── settings.json          # MSYS2 UCRT64 terminal settings
-│   └── README_TERMINAL.md     # Setup instructions
+│   └── settings.json          # MSYS2 UCRT64 terminal settings
+├── docs/
+│   └── development/
+│       └── TERMINAL_SETUP.md  # MSYS2 setup for Cursor/VS Code
 ├── .cargo/
 │   └── config.toml            # Linker configuration for GNU toolchain
 ├── src/                       # Source code

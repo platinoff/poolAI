@@ -24,11 +24,14 @@
   "rust-analyzer.cargo.buildScripts.enable": true,
   
   // Build configuration
-  "terminal.integrated.cwd": "${workspaceFolder}",
+  // Note: workspace root is S:\rust; project lives in S:\rust\poolAI
+  "terminal.integrated.cwd": "${workspaceFolder}/poolAI",
   
   // Auto-detect MSYS2 environment
   "terminal.integrated.env.windows": {
-    "PATH": "${env:PATH};C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;C:\\Users\\${env:USERNAME}\\.cargo\\bin"
+    "PATH": "${env:PATH};C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;C:\\Users\\${env:USERNAME}\\.cargo\\bin",
+    "MSYSTEM": "UCRT64",
+    "CHERE_INVOKING": "1"
   }
 }
 

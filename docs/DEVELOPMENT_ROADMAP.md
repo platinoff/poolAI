@@ -56,10 +56,8 @@ This document outlines the development roadmap for PoolAI, including completed m
 
 ### Test Coverage
 
-- **Total Tests**: 170+ passing
-- **Unit Tests**: 6
-- **Integration Tests**: 164+
-- **Coverage**: Core functionality fully tested
+- **Policy**: підтверджувати через `cargo test` перед релізом
+- **CI Gate**: `cargo fmt`, `cargo clippy`, `cargo test`
 
 ## Next Steps
 
@@ -132,6 +130,13 @@ This document outlines the development roadmap for PoolAI, including completed m
 4. **Memory Safety**: Leverage ownership and borrowing, avoid unsafe code
 5. **Testing**: Comprehensive unit and integration tests
 
+### 2026 Quality Gates (Rust Architect)
+1. **MSRV Policy**: Pin MSRV in `rust-toolchain.toml`
+2. **Supply Chain**: `cargo audit` + `cargo deny` on CI
+3. **Linting**: `cargo fmt` and `cargo clippy` mandatory
+4. **Feature Hygiene**: Default-features minimized, optional deps feature-gated
+5. **Observability**: Structured logs + tracing spans
+
 ### Architecture Principles
 
 1. **Modularity**: Each module is self-contained with clear interfaces
@@ -141,6 +146,10 @@ This document outlines the development roadmap for PoolAI, including completed m
 5. **Observability**: Comprehensive logging and metrics
 
 ## Version History
+
+### Version 12.0 (2026-01-16)
+- ✅ Updated Rust best practices (MSRV, supply-chain, quality gates)
+- ✅ Updated terminal setup guidance for MSYS2 UCRT64
 
 ### Version 11.0 (2025-12-30)
 - ✅ Production Deployment Preparation complete
