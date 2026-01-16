@@ -369,7 +369,7 @@ lazy_static::lazy_static! {
 /// use axum::Router;
 ///
 /// // Use in route configuration
-/// let app = Router::new().route("/ws/metrics", get(websocket_handler));
+/// let app: Router = Router::new().route("/ws/metrics", get(websocket_handler));
 /// ```
 pub async fn websocket_handler(
     ws: WebSocketUpgrade,

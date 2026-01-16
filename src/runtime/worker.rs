@@ -174,10 +174,13 @@ impl Worker {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```rust,no_run
     /// use poolai::runtime::worker::Worker;
     ///
+    /// # #[tokio::main]
+    /// # async fn main() {
     /// let worker = Worker::new(1);
+    /// # }
     /// ```
     pub fn new(_max_workers: usize) -> Self {
         let (tx, _rx) = mpsc::channel(100);

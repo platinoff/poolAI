@@ -23,7 +23,9 @@
 //!     password: "admin123".to_string(),
 //! };
 //!
-//! let response = authenticate_user(auth_req).await?;
+//! let response = authenticate_user(auth_req).await.map_err(|(code, json)| {
+//!     format!("Authentication failed: {} - {}", code, json)
+//! })?;
 //! println!("Token: {}", response.token);
 //! println!("Role: {:?}", response.role);
 //! # Ok(())
@@ -445,7 +447,9 @@ pub async fn permission_middleware(
 ///     password: "admin123".to_string(),
 /// };
 ///
-/// let response = authenticate_user(auth_req).await?;
+/// let response = authenticate_user(auth_req).await.map_err(|(code, json)| {
+///     format!("Authentication failed: {} - {}", code, json)
+/// })?;
 /// println!("Token: {}", response.token);
 /// # Ok(())
 /// # }
