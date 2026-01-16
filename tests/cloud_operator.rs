@@ -64,6 +64,7 @@ fn test_poolai_worker_creation() {
             memory: "512Mi".to_string(),
             gpu: Some(1),
         },
+        env: None,
     };
 
     assert_eq!(worker.name, "test-worker");
@@ -89,6 +90,7 @@ fn test_poolai_vm_creation() {
             size: "20Gi".to_string(),
             storage_class: "ssd".to_string(),
         },
+        ports: None,
     };
 
     assert_eq!(vm.name, "test-vm");
