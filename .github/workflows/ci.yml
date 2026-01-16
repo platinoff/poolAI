@@ -111,7 +111,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       
       - name: Check compilation (without optional deps)
-        run: cargo check --no-default-features --lib --no-deps
+        run: cargo check --no-default-features --lib
 
   check-features:
     name: Check Features
