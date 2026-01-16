@@ -3,33 +3,75 @@
 //! Tests for worker pool functionality, worker management, and worker lifecycle.
 
 use poolai::pool::worker::{Worker, WorkerConfig, WorkerStatus};
+use chrono;
 
 #[test]
-fn test_worker_status_variants() {
-    let _ = WorkerStatus::Idle;
-    let _ = WorkerStatus::Busy;
-    let _ = WorkerStatus::Offline;
-    let _ = WorkerStatus::Error;
-}
-
-#[test]
-fn test_worker_status_display() {
-    assert_eq!(format!("{}", WorkerStatus::Idle), "Idle");
-    assert_eq!(format!("{}", WorkerStatus::Busy), "Busy");
-    assert_eq!(format!("{}", WorkerStatus::Offline), "Offline");
-    assert_eq!(format!("{}", WorkerStatus::Error), "Error");
+fn test_worker_status_creation() {
+    // WorkerStatus is a struct, not an enum
+    let status = WorkerStatus {
+        is_healthy: true,
+        active_connections: 0,
+        queue_size: 0,
+        last_health_check: chrono::Utc::now(),
+        total_requests_processed: 0,
+        average_response_time_ms: 0.0,
+        cpu_usage: 0.0,
+        memory_usage_mb: 0.0,
+        gpu_usage: None,
+        process_id: None,
+        uptime_seconds: 0,
+        current_task: None,
+    };
+    assert!(status.is_healthy);
+    assert_eq!(status.active_connections, 0);
 }
 
 #[test]
 fn test_worker_status_debug() {
-    let debug = format!("{:?}", WorkerStatus::Idle);
-    assert!(debug.contains("Idle"));
+    let status = WorkerStatus {
+        is_healthy: true,
+        active_connections: 0,
+        queue_size: 0,
+        last_health_check: chrono::Utc::now(),
+        total_requests_processed: 0,
+        average_response_time_ms: 0.0,
+        cpu_usage: 0.0,
+        memory_usage_mb: 0.0,
+        gpu_usage: None,
+        process_id: None,
+        uptime_seconds: 0,
+        current_task: None,
+    };
+    let debug = format!("{:?}", status);
+    assert!(debug.contains("WorkerStatus"));
 }
 
 #[test]
-fn test_worker_status_equality() {
-    assert_eq!(WorkerStatus::Idle, WorkerStatus::Idle);
-    assert_ne!(WorkerStatus::Idle, WorkerStatus::Busy);
+fn test_worker_status_fields() {
+    let mut status = WorkerStatus {
+        is_healthy: true,
+        active_connections: 5,
+        queue_size: 10,
+        last_health_check: chrono::Utc::now(),
+        total_requests_processed: 100,
+        average_response_time_ms: 50.0,
+        cpu_usage: 75.0,
+        memory_usage_mb: 512.0,
+        gpu_usage: Some(60.0),
+        process_id: Some(12345),
+        uptime_seconds: 3600,
+        current_task: Some("task-123".to_string()),
+    };
+    assert!(status.is_healthy);
+    assert_eq!(status.active_connections, 5);
+    assert_eq!(status.queue_size, 10);
+    assert_eq!(status.total_requests_processed, 100);
+    assert_eq!(status.cpu_usage, 75.0);
+    assert_eq!(status.memory_usage_mb, 512.0);
+    assert_eq!(status.gpu_usage, Some(60.0));
+    assert_eq!(status.process_id, Some(12345));
+    assert_eq!(status.uptime_seconds, 3600);
+    assert_eq!(status.current_task, Some("task-123".to_string()));
 }
 
 #[test]
