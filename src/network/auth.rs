@@ -24,7 +24,7 @@
 //! };
 //!
 //! let response = authenticate_user(auth_req).await.map_err(|(code, json)| {
-//!     format!("Authentication failed: {} - {}", code, json)
+//!     format!("Authentication failed: {} - {:?}", code, json)
 //! })?;
 //! println!("Token: {}", response.token);
 //! println!("Role: {:?}", response.role);
@@ -344,7 +344,7 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
 ///
 /// // Protect a route with authentication
 /// async fn handler() -> &'static str { "ok" }
-/// let app = Router::new()
+/// let app: Router<()> = Router::new()
 ///     .route("/api/workers", post(handler))
 ///     .layer(middleware::from_fn(auth_middleware));
 /// ```
@@ -449,7 +449,7 @@ pub async fn permission_middleware(
 /// };
 ///
 /// let response = authenticate_user(auth_req).await.map_err(|(code, json)| {
-///     format!("Authentication failed: {} - {}", code, json)
+///     format!("Authentication failed: {} - {:?}", code, json)
 /// })?;
 /// println!("Token: {}", response.token);
 /// # Ok(())

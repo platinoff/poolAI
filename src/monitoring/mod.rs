@@ -131,7 +131,7 @@ pub struct HistoricalData {
 /// let metrics = monitoring.collect_metrics().await?;
 ///
 /// // Get current status
-/// let status = monitoring.get_system_status().await?;
+/// let status = monitoring.get_system_status().await;
 /// # Ok(())
 /// # }
 /// ```

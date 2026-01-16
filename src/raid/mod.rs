@@ -32,7 +32,7 @@
 //!
 //! // Store an artifact
 //! let artifact_ref = manager.put_artifact("my-artifact", b"artifact data").await?;
-//! println!("Stored artifact: {:?}", artifact_id);
+//! println!("Stored artifact: {:?}", artifact_ref);
 //! # Ok(())
 //! # }
 //! ```
