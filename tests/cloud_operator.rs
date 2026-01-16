@@ -15,6 +15,7 @@ async fn test_operator_creation() {
 
 #[cfg(feature = "cloud")]
 #[tokio::test]
+#[ignore] // Requires actual Kubernetes cluster
 async fn test_operator_start_stop() {
     let operator = PoolAIOperator::new("test-namespace".to_string());
 
