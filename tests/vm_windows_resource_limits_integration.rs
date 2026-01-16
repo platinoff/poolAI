@@ -13,6 +13,7 @@ use poolai::vm::{ResourceLimiter, ResourceLimits, ResourceUsage};
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use uuid::Uuid;
 
+#[cfg(target_os = "windows")]
 #[tokio::test]
 async fn test_windows_job_object_limiter_creation() {
     use poolai::vm::PlatformResourceLimiter;
@@ -154,6 +155,7 @@ async fn test_resource_limits_validation_windows() {
     let _ = result;
 }
 
+#[cfg(target_os = "windows")]
 #[tokio::test]
 async fn test_vm_manager_with_resource_limits_windows() {
     let manager = VmManager::new();
