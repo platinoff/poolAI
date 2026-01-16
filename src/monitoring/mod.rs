@@ -12,7 +12,7 @@
 //!
 //! // Collect metrics
 //! let metrics = monitoring.collect_metrics().await?;
-//! println!("CPU usage: {}%", metrics.resource.cpu_usage_percent);
+//! println!("CPU usage: {}%", metrics.cpu_usage_percent);
 //!
 //! // Process an alert
 //! let alert = Alert {
@@ -26,7 +26,7 @@
 //! monitoring.process_alert(alert).await?;
 //!
 //! // Get system status
-//! let status = monitoring.get_status().await?;
+//! let status = monitoring.get_system_status().await?;
 //! println!("Overall health: {}%", status.overall_health);
 //! # Ok(())
 //! # }
@@ -127,14 +127,11 @@ pub struct HistoricalData {
 /// # async fn example() -> Result<(), poolai::core::error::AppError> {
 /// let monitoring = Monitoring::new();
 ///
-/// // Initialize monitoring
-/// monitoring.initialize().await?;
-///
 /// // Collect metrics periodically
 /// let metrics = monitoring.collect_metrics().await?;
 ///
 /// // Get current status
-/// let status = monitoring.get_status().await?;
+/// let status = monitoring.get_system_status().await?;
 /// # Ok(())
 /// # }
 /// ```
@@ -186,9 +183,9 @@ impl Monitoring {
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
     /// let monitoring = Monitoring::new();
     /// let metrics = monitoring.collect_metrics().await?;
-    /// println!("CPU: {}%, Memory: {}MB",
-    ///     metrics.resource.cpu_usage_percent,
-    ///     metrics.resource.memory_usage_mb);
+/// println!("CPU: {}%, Memory: {}MB",
+///     metrics.cpu_usage_percent,
+///     metrics.memory_usage_mb);
     /// # Ok(())
     /// # }
     /// ```

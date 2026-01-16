@@ -9,10 +9,12 @@
 //!
 //! ```no_run
 //! use poolai::network::start_server;
+//! use std::net::SocketAddr;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! // Start the server with default configuration
-//! start_server().await?;
+//! let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+//! start_server(addr).await;
 //! # Ok(())
 //! # }
 //! ```
@@ -51,7 +53,7 @@
 //!     gc_on_startup: true,
 //! };
 //!
-//! let manager = RaidManager::new(config).await?;
+//! let manager = RaidManager::new(config);
 //! let artifact_id = manager.store_artifact("my-artifact", b"data").await?;
 //! println!("Stored artifact: {:?}", artifact_id);
 //! # Ok(())
@@ -60,34 +62,39 @@
 //!
 //! ## Using Enterprise Features
 //!
-//! ```no_run
+//! ```rust,ignore
+//! // Note: Requires the "enterprise" feature to be enabled
+//! # #[cfg(feature = "enterprise")]
 //! use poolai::enterprise::{EnterpriseManager, EnterpriseConfig};
 //!
+//! # #[cfg(feature = "enterprise")]
 //! # async fn example() -> Result<(), poolai::AppError> {
-//! let config = EnterpriseConfig::default();
-//! let manager = EnterpriseManager::new(config);
-//! manager.initialize().await?;
-//!
+//! # let config = EnterpriseConfig::default();
+//! # let manager = EnterpriseManager::new(config);
+//! # manager.initialize().await?;
 //! // Use enterprise features...
-//! manager.shutdown().await?;
+//! # manager.shutdown().await?;
 //! # Ok(())
 //! # }
 //! ```
 //!
 //! ## Using Cloud Integration
 //!
-//! ```no_run
+//! ```rust,ignore
+//! // Note: Requires the "cloud" feature to be enabled
+//! # #[cfg(feature = "cloud")]
 //! use poolai::cloud::{CloudManager, CloudConfig};
 //!
+//! # #[cfg(feature = "cloud")]
 //! # async fn example() -> Result<(), poolai::AppError> {
-//! let config = CloudConfig {
-//!     kubernetes_enabled: true,
-//!     kubernetes_namespace: "poolai".to_string(),
-//!     ..Default::default()
-//! };
-//! let manager = CloudManager::new(config);
-//! manager.initialize().await?;
-//! manager.shutdown().await?;
+//! # let config = CloudConfig {
+//! #     kubernetes_enabled: true,
+//! #     kubernetes_namespace: "poolai".to_string(),
+//! #     ..Default::default()
+//! # };
+//! # let manager = CloudManager::new(config);
+//! # manager.initialize().await?;
+//! # manager.shutdown().await?;
 //! # Ok(())
 //! # }
 //! ```

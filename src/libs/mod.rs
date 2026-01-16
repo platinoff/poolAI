@@ -15,13 +15,14 @@
 //! use poolai::libs::{LibraryManager, LibraryType};
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
-//! let manager = poolai::libs::get_global_manager();
+//! let manager = poolai::libs::get_global_manager()
+//!     .expect("Library manager not initialized");
 //! let manager = manager.read().await;
 //!
 //! // Install libtorch
 //! let library = manager.install_library(
-//!     "libtorch".to_string(),
-//!     "2.0.0".to_string(),
+//!     "libtorch",
+//!     "2.0.0",
 //!     LibraryType::ModelLibrary,
 //! ).await?;
 //!
@@ -36,7 +37,7 @@
 //! use poolai::libs::check_libtorch_compatibility;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
-//! let compatible = check_libtorch_compatibility("2.0.0").await?;
+//! let compatible = check_libtorch_compatibility(Some("2.0.0")).await?;
 //! if compatible {
 //!     println!("libtorch 2.0.0 is compatible");
 //! }
@@ -50,7 +51,8 @@
 //! use poolai::libs::get_global_manager;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
-//! let manager = get_global_manager();
+//! let manager = get_global_manager()
+//!     .expect("Library manager not initialized");
 //! let manager = manager.read().await;
 //!
 //! let libraries = manager.list_libraries().await?;
