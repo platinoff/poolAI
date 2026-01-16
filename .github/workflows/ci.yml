@@ -110,8 +110,8 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       
-      - name: Check compilation
-        run: cargo check --no-default-features --lib
+      - name: Check compilation (without optional deps)
+        run: cargo check --no-default-features --lib --no-deps
 
   check-features:
     name: Check Features
