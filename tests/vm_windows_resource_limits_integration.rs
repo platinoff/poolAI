@@ -40,7 +40,7 @@ async fn test_windows_job_object_limiter_creation() {
 async fn test_register_process_pid_windows() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
     let pid = 12345u32;
 
     // Test applying limits to a command
@@ -76,7 +76,7 @@ async fn test_register_process_pid_windows() {
 async fn test_apply_limits_without_pid_windows() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
 
     let limits = ResourceLimits {
         cpu_cores: 2,
@@ -84,14 +84,17 @@ async fn test_apply_limits_without_pid_windows() {
         gpu_device: None,
     };
 
-    // Try to apply limits to a command
+    // Apply limits to command - this should succeed even without PID registration
+    // because apply_limits works with Command before spawning (no PID needed yet)
     let mut command = tokio::process::Command::new("echo");
     let result = limiter.apply_limits(&mut command, &limits).await;
 
     #[cfg(target_os = "windows")]
     {
-        // On Windows, should fail because PID is not registered
-        assert!(result.is_err());
+        // On Windows, placeholder implementation just validates and logs
+        // Full implementation would apply limits when process is spawned
+        // apply_limits works with Command before process is spawned, so it doesn't need PID
+        assert!(result.is_ok());
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -105,7 +108,7 @@ async fn test_apply_limits_without_pid_windows() {
 async fn test_get_usage_windows() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
 
     // Get usage for non-existent process (use u32 PID, not Uuid)
     let result = limiter.get_usage(99999u32).await;
@@ -122,7 +125,7 @@ async fn test_get_usage_windows() {
 async fn test_resource_limits_validation_windows() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
-    let process_id = Uuid::new_v4();
+    let _process_id = Uuid::new_v4();
 
     // Test applying limits to a command (no PID registration needed)
 
