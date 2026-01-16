@@ -96,7 +96,7 @@ async fn test_aws_manager() {
 async fn test_azure_manager() {
     use poolai::cloud::providers::azure::AzureManager;
 
-    let manager = AzureManager::new(None);
+    let manager = AzureManager::new(Some("test-subscription-id".to_string()));
     manager.initialize().await.unwrap();
     manager.shutdown().await.unwrap();
 }
