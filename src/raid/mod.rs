@@ -465,7 +465,7 @@ impl RaidManager {
     /// # let manager = RaidManager::new(poolai::raid::RaidConfig::default_for_platform());
     /// if let Some(event_store) = manager.event_store() {
     ///     // Access event store for querying events
-    ///     let events = event_store.read().await.list_events(0, 100).await;
+    ///     let events = event_store.read().await.load_events().await?;
     ///     println!("Found {} events", events.len());
     /// }
     /// # Ok(())

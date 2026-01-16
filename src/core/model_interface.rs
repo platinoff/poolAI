@@ -306,7 +306,16 @@ pub trait ModelInterface {
 /// use poolai::core::config::ModelConfig as ConfigModelConfig;
 ///
 /// # async fn example() -> Result<(), poolai::core::error::AppError> {
-/// let mut manager = ModelManager::new(ConfigModelConfig::default());
+/// let mut manager = ModelManager::new(ConfigModelConfig {
+///     name: "my-model".to_string(),
+///     path: "/path/to/model".to_string(),
+///     max_batch_size: 32,
+///     memory_limit: 2048,
+///     temperature: 0.7,
+///     max_tokens: 2048,
+///     enable_cache: true,
+///     cache_size: 512,
+/// });
 ///
 /// // Register a model (assuming model implements ModelInterface)
 /// // manager.register_model("my-model".to_string(), Box::new(my_model)).await?;

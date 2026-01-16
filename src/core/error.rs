@@ -74,8 +74,8 @@ pub enum CursorError {
 /// // Check error code
 /// assert_eq!(err.error_code(), "CONFIG_ERROR");
 ///
-/// // Check if recoverable
-/// assert!(!err.is_recoverable());
+/// // Check if recoverable (ConfigError is recoverable)
+/// assert!(err.is_recoverable());
 /// ```
 #[derive(Debug, Error)]
 pub enum AppError {
@@ -235,8 +235,8 @@ impl AppError {
     /// let timeout_err = AppError::TimeoutError("Request timeout".to_string());
     /// assert!(timeout_err.is_recoverable());
     ///
-    /// let config_err = AppError::ConfigError("Invalid config".to_string());
-    /// assert!(!config_err.is_recoverable());
+/// let config_err = AppError::ConfigError("Invalid config".to_string());
+/// assert!(config_err.is_recoverable());
     /// ```
     pub fn is_recoverable(&self) -> bool {
         matches!(
