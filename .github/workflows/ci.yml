@@ -68,7 +68,7 @@ jobs:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
       - name: Build (no features)
-        run: cargo build --verbose --no-default-features
+        run: cargo build --verbose --no-default-features --lib
       
       - name: Build (with features)
         run: cargo build --verbose --features jwt,https
