@@ -186,14 +186,21 @@ impl KubernetesManager {
             );
 
             // Try to load kubeconfig, fallback to in-cluster config
-            let (api_url, token) = self.load_kubeconfig().await
-                .or_else(|_| self.load_in_cluster_config().await)
-                .map_err(|e| AppError::InitializationError(format!(
-                    "Failed to load Kubernetes configuration. Context: Cannot connect to Kubernetes cluster. \
-                    Suggestion: Ensure KUBECONFIG is set, kubeconfig file exists at ~/.kube/config, or running inside a cluster with service account. \
-                    Error: {}",
-                    e
-                )))?;
+            let (api_url, token) = match self.load_kubeconfig().await {
+                Ok(config) => Ok(config),
+                Err(e1) => {
+                    let e1_msg = format!("{}", e1);
+                    match self.load_in_cluster_config().await {
+                        Ok(config) => Ok(config),
+                        Err(e2) => Err(AppError::InitializationError(format!(
+                            "Failed to load Kubernetes configuration. Context: Cannot connect to Kubernetes cluster. \
+                            Suggestion: Ensure KUBECONFIG is set, kubeconfig file exists at ~/.kube/config, or running inside a cluster with service account. \
+                            Errors: kubeconfig={}, in-cluster={}",
+                            e1_msg, e2
+                        ))),
+                    }
+                },
+            }?;
 
             *self.api_base_url.write().await = Some(api_url);
             *self.api_token.write().await = Some(token);
@@ -385,8 +392,9 @@ impl KubernetesManager {
         let base_url = self.get_api_base_url().await?;
         let token = self.get_api_token().await?;
 
+        // Note: danger_accept_invalid_certs is not available with default-features = false
+        // For production, use proper TLS certificates
         let client = reqwest::Client::builder()
-            .danger_accept_invalid_certs(true) // For self-signed certs in development
             .build()
             .map_err(|e| AppError::NetworkError(format!(
                 "Failed to create HTTP client. Context: Cannot initialize reqwest client for Kubernetes API. \

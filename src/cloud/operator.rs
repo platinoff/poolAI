@@ -42,6 +42,7 @@
 //! - `PoolAITenant` - Tenant configurations
 
 use crate::core::error::AppError;
+use serde_json::json;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 use tokio::time::{interval, Duration};
@@ -120,8 +121,6 @@ impl PoolAIOperator {
             ))),
             #[cfg(feature = "cloud-sdk")]
             watcher_handles: Arc::new(RwLock::new(Vec::new())),
-            #[cfg(feature = "cloud-sdk")]
-            event_tx: None,
         }
     }
 
@@ -486,7 +485,7 @@ impl PoolAIOperator {
             // For better efficiency in production, consider using Kubernetes watch API.
             if let Some(ref manager) = k8s_manager {
                 // Check if manager is initialized
-                if manager.is_cluster_available().await.unwrap_or(false) {
+                if manager.is_cluster_available().await {
                     // List resources and detect changes by comparing resourceVersion
                     match manager
                         .list_crd_resources(&group, &version, &resource_plural)
