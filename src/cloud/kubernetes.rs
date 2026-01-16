@@ -424,9 +424,12 @@ impl KubernetesManager {
             request = request.header("Content-Type", "application/json");
         }
 
+        // Store body reference for reuse in retry loop
+        let body_ref = body.as_ref();
+
         // Add request body if provided
-        if let Some(body) = body {
-            request = request.json(&body);
+        if let Some(ref body) = body {
+            request = request.json(body);
         }
 
         // Send request with retry logic for transient errors
@@ -454,7 +457,7 @@ impl KubernetesManager {
             if matches!(method, "POST" | "PUT" | "PATCH") {
                 retry_request = retry_request.header("Content-Type", "application/json");
             }
-            if let Some(ref body) = body {
+            if let Some(body) = body_ref {
                 retry_request = retry_request.json(body);
             }
 
