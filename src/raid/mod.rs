@@ -31,7 +31,7 @@
 //! let manager = RaidManager::new(config);
 //!
 //! // Store an artifact
-//! let artifact_id = manager.store_artifact("my-artifact", b"artifact data").await?;
+//! let artifact_ref = manager.put_artifact("my-artifact", b"artifact data").await?;
 //! println!("Stored artifact: {:?}", artifact_id);
 //! # Ok(())
 //! # }
@@ -47,9 +47,10 @@
 //! # let manager = poolai::raid::RaidManager::new(
 //! #     poolai::raid::RaidConfig::default_for_platform()
 //! # );
-//! let artifact_id = Uuid::new_v4();
+//! # manager.initialize().await?;
+//! let artifact = manager.put_artifact("my-artifact", b"artifact data").await?;
 //!
-//! let data = manager.get_artifact(artifact_id).await?;
+//! let data = manager.get_artifact(&artifact.path).await?;
 //! println!("Retrieved {} bytes", data.len());
 //! # Ok(())
 //! # }

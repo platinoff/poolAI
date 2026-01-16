@@ -54,7 +54,7 @@
 //! };
 //!
 //! let manager = RaidManager::new(config);
-//! let artifact_id = manager.store_artifact("my-artifact", b"data").await?;
+//! let artifact_id = manager.put_artifact("my-artifact", b"data").await?;
 //! println!("Stored artifact: {:?}", artifact_id);
 //! # Ok(())
 //! # }

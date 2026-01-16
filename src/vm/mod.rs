@@ -802,11 +802,12 @@ impl VmManager {
     ///
     /// let instance = manager.create_instance(
     ///     "my-worker-vm".to_string(),
-    ///     VmResources {
-    ///         cpu_cores: 4,
-    ///         memory_mb: 4096,
-    ///         gpu_required: true,
-    ///     },
+///     VmResources {
+///         cpu_cores: 4,
+///         memory_mb: 4096,
+///         gpu_required: true,
+///         gpu_scheduling_policy: None,
+///     },
     ///     VmIsolation::ProcessSandbox,
     /// ).await?;
     ///

@@ -26,7 +26,7 @@
 //! monitoring.process_alert(alert).await?;
 //!
 //! // Get system status
-//! let status = monitoring.get_system_status().await?;
+//! let status = monitoring.get_system_status().await;
 //! println!("Overall health: {}%", status.overall_health);
 //! # Ok(())
 //! # }

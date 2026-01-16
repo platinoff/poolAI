@@ -224,6 +224,8 @@ impl Pool {
 ///     max_memory_mb: 512,
 ///     cpu_priority: 5,
 ///     gpu_device: None,
+///     auto_restart: false,
+///     resource_monitoring: true,
 /// });
     /// pool.add_worker("worker-1".to_string(), worker).await?;
     /// # Ok(())

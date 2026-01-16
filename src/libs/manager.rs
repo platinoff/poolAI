@@ -212,8 +212,8 @@ impl LibraryManager {
     /// manager.initialize().await?;
     ///
     /// let library = manager.install_library(
-    ///     "libtorch".to_string(),
-    ///     "2.0.0".to_string(),
+    ///     "libtorch",
+    ///     "2.0.0",
     ///     LibraryType::ModelLibrary,
     /// ).await?;
     ///

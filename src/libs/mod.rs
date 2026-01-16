@@ -55,7 +55,7 @@
 //!     .expect("Library manager not initialized");
 //! let manager = manager.read().await;
 //!
-//! let libraries = manager.list_libraries().await?;
+//! let libraries = manager.list_libraries().await;
 //! for lib in libraries {
 //!     println!("Library: {} v{}", lib.name, lib.version);
 //! }
