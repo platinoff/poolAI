@@ -95,8 +95,8 @@ async fn test_get_library_path_or_load_from_raid() {
     let raid_manager = RaidManager::new(raid_config);
     raid_manager.initialize().await.unwrap();
 
-    // Initialize Library Manager
-    let lib_manager = LibraryManager::new();
+    // Initialize Library Manager with test directory
+    let lib_manager = LibraryManager::with_base_path(libs_dir.clone());
     lib_manager.initialize().await.unwrap();
 
     // Test: get_library_path_or_load_from_raid for non-existent library

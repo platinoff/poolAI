@@ -46,6 +46,31 @@ impl LibraryManager {
         }
     }
 
+    /// Create new library manager with custom base path (for testing)
+    ///
+    /// # Arguments
+    ///
+    /// * `base_path` - Custom base path for library storage
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::libs::LibraryManager;
+    /// use std::path::PathBuf;
+    ///
+    /// let manager = LibraryManager::with_base_path(PathBuf::from("/custom/libs"));
+    /// ```
+    #[doc(hidden)]
+    pub fn with_base_path(base_path: PathBuf) -> Self {
+        Self {
+            registry: Arc::new(RwLock::new(LibraryRegistry::new())),
+            version_manager: Arc::new(RwLock::new(VersionManager::new())),
+            dependency_resolver: Arc::new(RwLock::new(DependencyResolver::new())),
+            libraries: Arc::new(RwLock::new(HashMap::new())),
+            base_path,
+        }
+    }
+
     /// Initialize library manager
     pub async fn initialize(&self) -> Result<(), AppError> {
         info!("Initializing Library Manager");
