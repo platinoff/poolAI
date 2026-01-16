@@ -343,8 +343,9 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
 /// use axum::{middleware, Router, routing::post};
 ///
 /// // Protect a route with authentication
+/// async fn handler() -> &'static str { "ok" }
 /// let app = Router::new()
-///     .route("/api/workers", post(create_worker))
+///     .route("/api/workers", post(handler))
 ///     .layer(middleware::from_fn(auth_middleware));
 /// ```
 pub async fn auth_middleware(
