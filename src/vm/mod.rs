@@ -41,7 +41,7 @@
 //!     use_exponential_backoff: true,
 //! };
 //!
-//! manager.update_instance(instance_id, None, None, Some(auto_recovery)).await?;
+//! manager.update_instance(instance_id, None, None, None, Some(auto_recovery)).await?;
 //! # Ok(())
 //! # }
 //! ```
@@ -56,7 +56,7 @@
 //! let manager = VmManager::new();
 //! let instance_id = Uuid::new_v4();
 //!
-//! let stats = manager.get_resource_usage_stats(instance_id).await?;
+//! let stats = manager.get_resource_usage_stats(instance_id, None).await?;
 //! println!("CPU avg: {:.2}%", stats.cpu_percent_avg);
 //! # Ok(())
 //! # }

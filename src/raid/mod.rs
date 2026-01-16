@@ -28,7 +28,7 @@
 //!     gc_on_startup: true,
 //! };
 //!
-//! let manager = RaidManager::new(config).await?;
+//! let manager = RaidManager::new(config);
 //!
 //! // Store an artifact
 //! let artifact_id = manager.store_artifact("my-artifact", b"artifact data").await?;
@@ -46,7 +46,7 @@
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! # let manager = poolai::raid::RaidManager::new(
 //! #     poolai::raid::RaidConfig::default_for_platform()
-//! # ).await?;
+//! # );
 //! let artifact_id = Uuid::new_v4();
 //!
 //! let data = manager.get_artifact(artifact_id).await?;
