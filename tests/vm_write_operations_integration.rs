@@ -73,6 +73,7 @@ async fn test_update_vm_instance() {
             Some("test-vm-updated".to_string()),
             Some(new_resources),
             None,
+            None, // auto_recovery
         )
         .await
         .unwrap();
@@ -190,6 +191,7 @@ async fn test_update_nonexistent_instance() {
             Some("new-name".to_string()),
             None,
             None,
+            None, // auto_recovery
         )
         .await;
 
