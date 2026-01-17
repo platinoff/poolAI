@@ -97,6 +97,13 @@ jobs:
         continue-on-error: true
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
+      
+      - name: Security audit
+        uses: rustsec/audit-check@v1.4.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          deny-warnings: false
+        continue-on-error: true
 
   check:
     name: Check (no features)
