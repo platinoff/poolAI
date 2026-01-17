@@ -395,7 +395,7 @@ impl AutoScaler {
 
                 if current_replicas > 0 {
                     let pods = k8s_manager.list_pods().await.unwrap_or_default();
-                    for pod_name in pods.iter().filter(|p| p.starts_with(resource_id)) {
+                    for _pod_name in pods.iter().filter(|p| p.starts_with(resource_id)) {
                         // Query metrics for each pod
                         // Path: /apis/metrics.k8s.io/v1beta1/namespaces/{namespace}/pods/{pod_name}
                         // For now, we'll use a simplified approach

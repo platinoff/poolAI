@@ -439,15 +439,15 @@ impl GcpManager {
                 instance_id, zone, project_id
             );
 
-            return Ok(instance_id);
+            Ok(instance_id)
+        } else {
+            // Fallback for non-cloud-sdk feature
+            let project = self.project_id.as_deref().unwrap_or("unknown");
+            info!(
+                "Creating Compute Engine instance: {} / {} in project {} (placeholder - cloud-sdk feature disabled)",
+                zone, machine_type, project
+            );
+            Ok(uuid::Uuid::new_v4().to_string())
         }
-
-        // Fallback for non-cloud-sdk feature
-        let project = self.project_id.as_deref().unwrap_or("unknown");
-        info!(
-            "Creating Compute Engine instance: {} / {} in project {} (placeholder - cloud-sdk feature disabled)",
-            zone, machine_type, project
-        );
-        Ok(uuid::Uuid::new_v4().to_string())
     }
 }

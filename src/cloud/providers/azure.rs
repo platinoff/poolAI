@@ -371,16 +371,16 @@ impl AzureManager {
                 vmss_id, resource_group, subscription_id
             );
 
-            return Ok(vmss_id);
+            Ok(vmss_id)
+        } else {
+            // Fallback for non-cloud-sdk feature
+            info!(
+                "Creating VM Scale Set: {} / {} in subscription {} (placeholder - cloud-sdk feature disabled)",
+                resource_group,
+                name,
+                self.subscription_id.as_deref().unwrap_or("default")
+            );
+            Ok(uuid::Uuid::new_v4().to_string())
         }
-
-        // Fallback for non-cloud-sdk feature
-        info!(
-            "Creating VM Scale Set: {} / {} in subscription {} (placeholder - cloud-sdk feature disabled)",
-            resource_group,
-            name,
-            self.subscription_id.as_deref().unwrap_or("default")
-        );
-        Ok(uuid::Uuid::new_v4().to_string())
     }
 }

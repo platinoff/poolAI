@@ -134,6 +134,7 @@ async fn test_security_headers_config_custom() {
         Some("default-src 'self'".to_string()),
         Some("SAMEORIGIN".to_string()),
         Some("nosniff".to_string()),
+        Some("nosniff".to_string()),
         Some("no-referrer".to_string()),
     );
 

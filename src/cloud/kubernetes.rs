@@ -429,7 +429,7 @@ impl KubernetesManager {
 
         // Add request body if provided
         if let Some(ref body) = body {
-            request = request.json(body);
+            request = request.json(body.clone());
         }
 
         // Send request with retry logic for transient errors
@@ -2952,7 +2952,7 @@ fn build_vm_deployment(
     name: &str,
     image: &str,
     resources: &ResourceRequirements,
-    storage: &StorageConfig,
+    _storage: &StorageConfig,
     network: &NetworkConfig,
 ) -> Result<serde_json::Value, AppError> {
     let mut resources_obj = json!({
@@ -2981,7 +2981,7 @@ fn build_vm_deployment(
         }));
     }
 
-    let service_type = match network.service_type {
+    let _service_type = match network.service_type {
         ServiceType::ClusterIP => "ClusterIP",
         ServiceType::NodePort => "NodePort",
         ServiceType::LoadBalancer => "LoadBalancer",
