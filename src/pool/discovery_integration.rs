@@ -13,13 +13,13 @@ use tracing::{debug, info, warn};
 
 /// Sync discovery peers with worker pool
 pub struct DiscoveryPoolSync {
-    pool: Arc<Pool>,
+    pool: Arc<RwLock<Pool>>,
     known_peer_ids: Arc<RwLock<std::collections::HashSet<String>>>,
 }
 
 impl DiscoveryPoolSync {
     /// Creates a new discovery pool sync
-    pub fn new(pool: Arc<Pool>) -> Self {
+    pub fn new(pool: Arc<RwLock<Pool>>) -> Self {
         Self {
             pool,
             known_peer_ids: Arc::new(RwLock::new(std::collections::HashSet::new())),
@@ -40,7 +40,7 @@ impl DiscoveryPoolSync {
 
     /// Background task for syncing peers with worker pool
     async fn sync_task(
-        pool: Arc<Pool>,
+        pool: Arc<RwLock<Pool>>,
         known_peer_ids: Arc<RwLock<std::collections::HashSet<String>>>,
     ) {
         let mut interval = interval(Duration::from_secs(5)); // Sync every 5 seconds
@@ -58,14 +58,17 @@ impl DiscoveryPoolSync {
                         // Convert peer to worker
                         match Self::create_worker_from_peer(peer) {
                             Ok((worker_id, worker)) => {
-                                if let Err(e) = pool.add_worker(worker_id.clone(), worker).await {
-                                    warn!("Failed to add discovered peer as worker: {}", e);
-                                } else {
-                                    info!(
-                                        "Added discovered peer {} as worker {}",
-                                        peer.peer_id, worker_id
-                                    );
-                                    known_ids.insert(peer.peer_id.clone());
+                                {
+                                    let pool_guard = pool.read().await;
+                                    if let Err(e) = pool_guard.add_worker(worker_id.clone(), worker).await {
+                                        warn!("Failed to add discovered peer as worker: {}", e);
+                                    } else {
+                                        info!(
+                                            "Added discovered peer {} as worker {}",
+                                            peer.peer_id, worker_id
+                                        );
+                                        known_ids.insert(peer.peer_id.clone());
+                                    }
                                 }
                             }
                             Err(e) => {
@@ -86,11 +89,14 @@ impl DiscoveryPoolSync {
 
                 for peer_id in to_remove {
                     let worker_id = format!("discovered-{}", peer_id);
-                    if let Err(e) = pool.remove_worker(&worker_id).await {
-                        warn!("Failed to remove stale worker {}: {}", worker_id, e);
-                    } else {
-                        info!("Removed stale worker: {}", worker_id);
-                        known_ids.remove(&peer_id);
+                    {
+                        let pool_guard = pool.read().await;
+                        if let Err(e) = pool_guard.remove_worker(&worker_id).await {
+                            warn!("Failed to remove stale worker {}: {}", worker_id, e);
+                        } else {
+                            info!("Removed stale worker: {}", worker_id);
+                            known_ids.remove(&peer_id);
+                        }
                     }
                 }
             } else {
