@@ -164,6 +164,69 @@ async fn test_gcp_manager_initialization() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "cloud")]
+#[tokio::test]
+async fn test_gcp_create_compute_instance_empty_zone() {
+    let manager = GcpManager::new(Some("project-id".to_string()));
+    manager.initialize().await.unwrap();
+
+    let result = manager.create_compute_instance("", "n1-standard-2").await;
+    assert!(result.is_err());
+    if let Err(AppError::ValidationError(msg)) = result {
+        assert!(msg.contains("Zone cannot be empty"));
+    }
+}
+
+#[cfg(feature = "cloud")]
+#[tokio::test]
+async fn test_gcp_create_compute_instance_empty_machine_type() {
+    let manager = GcpManager::new(Some("project-id".to_string()));
+    manager.initialize().await.unwrap();
+
+    let result = manager.create_compute_instance("us-central1-a", "").await;
+    assert!(result.is_err());
+    if let Err(AppError::ValidationError(msg)) = result {
+        assert!(msg.contains("Machine type cannot be empty"));
+    }
+}
+
+#[cfg(feature = "cloud")]
+#[tokio::test]
+async fn test_gcp_create_compute_instance_success() -> Result<(), AppError> {
+    let manager = GcpManager::new(Some("test-project-id".to_string()));
+    manager.initialize().await?;
+
+    // Note: This test will fail if running without GCP credentials or cloud-sdk feature
+    // It's expected to fail with InitializationError if no credentials are available
+    // For now, we'll test the validation logic
+    let result = manager
+        .create_compute_instance("us-central1-a", "n1-standard-2")
+        .await;
+
+    // If cloud-sdk feature is enabled and credentials are available, instance should be created
+    // Otherwise, it should fail gracefully with appropriate error
+    match result {
+        Ok(instance_id) => {
+            // Success case: instance was created (when running on GCP or with credentials)
+            assert!(!instance_id.is_empty());
+        }
+        Err(AppError::InitializationError(_)) => {
+            // Expected when no credentials are available
+            // This is acceptable for unit tests
+        }
+        Err(AppError::NetworkError(_)) => {
+            // Expected when API call fails (e.g., no network, invalid project, etc.)
+            // This is acceptable for unit tests
+        }
+        Err(e) => {
+            // Other errors are unexpected
+            panic!("Unexpected error: {:?}", e);
+        }
+    }
+
+    Ok(())
+}
+
 // TODO: Re-enable these tests when create_instance_group method is implemented in GcpManager
 // #[cfg(feature = "cloud")]
 // #[tokio::test]
