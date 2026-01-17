@@ -169,12 +169,38 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ### Software Requirements
 - **Rust**: 1.70+ (latest stable)
-- **MSYS2** (Windows): For native dependencies
+- **MSYS2** (Windows): For native dependencies (gcc, dlltool)
 - **CUDA**: 11.0+ (optional, for GPU support)
 - **OpenSSL**: 1.1.1+ (for HTTPS/TLS support)
 - **Certbot**: For Let's Encrypt certificates (production)
 
 ## 🛠️ Installation
+
+### Windows Setup (Required for jwt/https features)
+
+If you're building on Windows with `jwt` or `https` features, you need MSYS2 tools (`dlltool.exe`, `gcc`) in your PATH:
+
+#### Quick Setup (PowerShell)
+```powershell
+# Run setup script to add MSYS2 to PATH
+.\scripts\setup_msys2_path.ps1
+
+# Verify dlltool is available
+dlltool --version
+```
+
+#### Manual Setup
+If MSYS2 is installed but not in PATH, add it manually:
+```powershell
+# For current PowerShell session
+$env:PATH += ";C:\msys64\usr\bin"
+
+# Or add C:\msys64\usr\bin to System PATH environment variable permanently
+```
+
+**Note**: The `setup_msys2_path.ps1` script adds MSYS2 to PATH only for the current PowerShell session. For a permanent solution, add `C:\msys64\usr\bin` to your system PATH environment variable.
+
+**Troubleshooting**: If you get `Error calling dlltool 'dlltool.exe': program not found`, run `.\scripts\setup_msys2_path.ps1` before building.
 
 ### Quick Start
 
@@ -184,7 +210,12 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
    cd poolAI
    ```
 
-2. **Install dependencies**
+2. **Windows: Setup MSYS2 PATH** (if using jwt/https features)
+   ```powershell
+   .\scripts\setup_msys2_path.ps1
+   ```
+
+3. **Install dependencies**
    ```bash
    cargo build --features "stage3 https"
    ```
