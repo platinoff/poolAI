@@ -5,9 +5,9 @@
 //! - LRU cache operations (get/put)
 //! - ModelRequest/Response processing
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
-use poolai::runtime::{MemoryPool, CacheManager};
-use poolai::core::model_interface::{ModelRequest, ModelParameters};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use poolai::core::model_interface::{ModelParameters, ModelRequest};
+use poolai::runtime::{CacheManager, MemoryPool};
 use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::runtime::Runtime;
 
@@ -54,11 +54,13 @@ fn bench_lru_cache_operations(c: &mut Criterion) {
     });
 
     let mut group = c.benchmark_group("lru_cache");
-    
+
     // Warm up cache
     rt.block_on(async {
         for i in 0..100 {
-            cache.put(format!("key{}", i), format!("value{}", i), None).await;
+            cache
+                .put(format!("key{}", i), format!("value{}", i), None)
+                .await;
         }
     });
 
@@ -78,17 +80,21 @@ fn bench_lru_cache_operations(c: &mut Criterion) {
         let counter = AtomicU64::new(0);
         b.to_async(&rt).iter(|| async {
             let val = counter.fetch_add(1, Ordering::Relaxed);
-            cache.put(
-                black_box(format!("new_key_{}", val)),
-                black_box("new_value"),
-                None
-            ).await;
+            cache
+                .put(
+                    black_box(format!("new_key_{}", val)),
+                    black_box("new_value"),
+                    None,
+                )
+                .await;
         });
     });
 
     group.bench_function("put_existing", |b| {
         b.to_async(&rt).iter(|| async {
-            cache.put(black_box("key50"), black_box("updated_value"), None).await;
+            cache
+                .put(black_box("key50"), black_box("updated_value"), None)
+                .await;
         });
     });
 
@@ -100,7 +106,9 @@ fn bench_lru_cache_operations(c: &mut Criterion) {
             cache_size.initialize().await.unwrap();
             // Pre-fill to 80% capacity
             for i in 0..(*size * 8 / 10) {
-                cache_size.put(format!("key{}", i), format!("value{}", i), None).await;
+                cache_size
+                    .put(format!("key{}", i), format!("value{}", i), None)
+                    .await;
             }
         });
 

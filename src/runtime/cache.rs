@@ -100,7 +100,10 @@ impl CacheManager {
             return Ok(());
         }
 
-        info!("Initializing Cache Manager with LRU eviction (capacity: {})", self.size_limit);
+        info!(
+            "Initializing Cache Manager with LRU eviction (capacity: {})",
+            self.size_limit
+        );
 
         // Clear any existing entries
         let mut cache = self.cache.write().await;
@@ -156,7 +159,12 @@ impl CacheManager {
     /// * `key` - The cache key
     /// * `value` - The value to cache
     /// * `ttl_seconds` - Optional TTL in seconds (defaults to 1 hour if None)
-    pub async fn put(&self, key: impl Into<String>, value: impl Into<String>, ttl_seconds: Option<i64>) -> Option<String> {
+    pub async fn put(
+        &self,
+        key: impl Into<String>,
+        value: impl Into<String>,
+        ttl_seconds: Option<i64>,
+    ) -> Option<String> {
         let key = key.into();
         let value = value.into();
         let ttl = ttl_seconds.unwrap_or(DEFAULT_TTL_SECONDS);
@@ -177,13 +185,15 @@ impl CacheManager {
             false
         };
 
-        let old_value = cache.put(
-            key.clone(),
-            CacheEntry {
-                value: value.clone(),
-                expires_at,
-            },
-        ).map(|e| e.value);
+        let old_value = cache
+            .put(
+                key.clone(),
+                CacheEntry {
+                    value: value.clone(),
+                    expires_at,
+                },
+            )
+            .map(|e| e.value);
 
         if evicted && old_value.is_none() {
             // An entry was evicted due to LRU
@@ -241,9 +251,7 @@ impl CacheManager {
     pub fn get_usage_percentage_sync(&self) -> f32 {
         // Use a blocking call for non-async contexts
         tokio::task::block_in_place(|| {
-            tokio::runtime::Handle::current().block_on(async {
-                self.get_usage_percentage().await
-            })
+            tokio::runtime::Handle::current().block_on(async { self.get_usage_percentage().await })
         })
     }
 
@@ -404,7 +412,9 @@ mod tests {
 
         // Fill to capacity
         for i in 2..=10 {
-            cache.put(format!("key{}", i), format!("value{}", i), None).await;
+            cache
+                .put(format!("key{}", i), format!("value{}", i), None)
+                .await;
         }
         assert_eq!(cache.get_usage_percentage().await, 1.0);
 

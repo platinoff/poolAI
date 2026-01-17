@@ -213,7 +213,10 @@ pub fn validate_artifact_data_size(
 /// - No parent directory traversal (`..`)
 /// - No absolute paths
 /// - Path components validated for invalid characters
-pub fn validate_path_traversal(path: &std::path::Path, base_dir: &std::path::Path) -> Result<(), AppError> {
+pub fn validate_path_traversal(
+    path: &std::path::Path,
+    base_dir: &std::path::Path,
+) -> Result<(), AppError> {
     // Check for path traversal attempts (.. or .)
     let path_str = path.to_string_lossy();
     if path_str.contains("..") || path_str.contains("//") {
@@ -238,28 +241,31 @@ pub fn validate_path_traversal(path: &std::path::Path, base_dir: &std::path::Pat
     }
 
     // Normalize and check if path is within base directory
-    let normalized_path = base_dir.join(path).canonicalize()
-        .map_err(|e| AppError::ValidationError(
-            format!(
-                "Invalid path: '{}'. Context: Cannot resolve path. Error: {}. \
+    let normalized_path = base_dir.join(path).canonicalize().map_err(|e| {
+        AppError::ValidationError(format!(
+            "Invalid path: '{}'. Context: Cannot resolve path. Error: {}. \
                 Suggestion: Ensure path exists and is accessible. Base: '{}'",
-                path_str, e, base_dir.display()
-            )
-        ))?;
+            path_str,
+            e,
+            base_dir.display()
+        ))
+    })?;
 
-    let normalized_base = base_dir.canonicalize()
-        .map_err(|e| AppError::ConfigError(
-            format!("Cannot resolve base directory '{}': {}", base_dir.display(), e)
-        ))?;
+    let normalized_base = base_dir.canonicalize().map_err(|e| {
+        AppError::ConfigError(format!(
+            "Cannot resolve base directory '{}': {}",
+            base_dir.display(),
+            e
+        ))
+    })?;
 
     if !normalized_path.starts_with(&normalized_base) {
-        return Err(AppError::ValidationError(
-            format!(
-                "Path '{}' is outside base directory '{}'. Context: Path traversal attempt detected. \
+        return Err(AppError::ValidationError(format!(
+            "Path '{}' is outside base directory '{}'. Context: Path traversal attempt detected. \
                 Suggestion: Use only paths within the base directory.",
-                path_str, base_dir.display()
-            )
-        ));
+            path_str,
+            base_dir.display()
+        )));
     }
 
     Ok(())
@@ -270,7 +276,11 @@ pub fn validate_path_traversal(path: &std::path::Path, base_dir: &std::path::Pat
 /// Rules:
 /// - String must be within specified length limits
 /// - Trims whitespace before validation
-pub fn validate_string_length(s: &str, max_length: usize, field_name: &str) -> Result<(), AppError> {
+pub fn validate_string_length(
+    s: &str,
+    max_length: usize,
+    field_name: &str,
+) -> Result<(), AppError> {
     let trimmed = s.trim();
     if trimmed.len() > max_length {
         return Err(AppError::ValidationError(format!(
@@ -291,12 +301,13 @@ pub fn validate_string_length(s: &str, max_length: usize, field_name: &str) -> R
 pub fn validate_url_for_ssrf(url: &str) -> Result<(), AppError> {
     // Check for local/internal addresses
     let url_lower = url.to_lowercase();
-    
+
     // Block localhost variations
-    if url_lower.contains("localhost") || 
-       url_lower.contains("127.0.0.1") ||
-       url_lower.contains("::1") ||
-       url_lower.contains("0.0.0.0") {
+    if url_lower.contains("localhost")
+        || url_lower.contains("127.0.0.1")
+        || url_lower.contains("::1")
+        || url_lower.contains("0.0.0.0")
+    {
         return Err(AppError::ValidationError(
             format!(
                 "URL '{}' contains local/internal address. Context: SSRF protection - local addresses are not allowed. \
@@ -338,13 +349,11 @@ pub fn validate_url_for_ssrf(url: &str) -> Result<(), AppError> {
             }
         }
     } else {
-        return Err(AppError::ValidationError(
-            format!(
-                "Invalid URL format: '{}'. Context: URL parsing failed. \
+        return Err(AppError::ValidationError(format!(
+            "Invalid URL format: '{}'. Context: URL parsing failed. \
                 Suggestion: Provide a valid HTTP or HTTPS URL.",
-                url
-            )
-        ));
+            url
+        )));
     }
 
     Ok(())
@@ -375,7 +384,10 @@ pub fn validate_model_input(input: &str, max_length: usize) -> Result<(), AppErr
     for pattern in &suspicious_patterns {
         if input_lower.contains(pattern) {
             // Log warning but don't block (CSP will handle XSS in production)
-            tracing::warn!("Suspicious XSS pattern detected in model input: {}", pattern);
+            tracing::warn!(
+                "Suspicious XSS pattern detected in model input: {}",
+                pattern
+            );
             // In strict mode, could return error, but for now just log
             // return Err(AppError::ValidationError(format!(
             //     "Suspicious pattern detected in input: '{}'", pattern

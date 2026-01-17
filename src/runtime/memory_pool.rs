@@ -31,7 +31,9 @@
 //! # }
 //! ```
 
-use crate::core::model_interface::{ModelRequest, ModelResponse, ModelParameters, ModelMetrics, ResponseStatus};
+use crate::core::model_interface::{
+    ModelMetrics, ModelParameters, ModelRequest, ModelResponse, ResponseStatus,
+};
 use std::collections::VecDeque;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -106,7 +108,8 @@ impl MemoryPool {
     /// Acquire a ModelRequest from the pool, or create a new one if pool is empty
     pub async fn acquire_request(&self) -> ModelRequest {
         let mut pool = self.request_pool.lock().await;
-        pool.pop_front().unwrap_or_else(Self::create_default_request)
+        pool.pop_front()
+            .unwrap_or_else(Self::create_default_request)
     }
 
     /// Release a ModelRequest back to the pool (resets its fields)
@@ -126,7 +129,8 @@ impl MemoryPool {
     /// Acquire a ModelResponse from the pool, or create a new one if pool is empty
     pub async fn acquire_response(&self) -> ModelResponse {
         let mut pool = self.response_pool.lock().await;
-        pool.pop_front().unwrap_or_else(Self::create_default_response)
+        pool.pop_front()
+            .unwrap_or_else(Self::create_default_response)
     }
 
     /// Release a ModelResponse back to the pool (resets its fields)
@@ -157,7 +161,8 @@ impl MemoryPool {
     /// Acquire a String from the pool, or create a new one if pool is empty
     pub async fn acquire_string(&self) -> String {
         let mut pool = self.string_pool.lock().await;
-        pool.pop_front().unwrap_or_else(|| String::with_capacity(64))
+        pool.pop_front()
+            .unwrap_or_else(|| String::with_capacity(64))
     }
 
     /// Release a String back to the pool (clears it for reuse)

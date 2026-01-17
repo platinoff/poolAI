@@ -131,9 +131,8 @@ impl RateLimitState {
 
     /// Cleanup old entries outside the time window
     fn cleanup(&mut self, now: Instant, window: Duration) {
-        self.entries.retain(|_, entry| {
-            now.duration_since(entry.window_start) <= window
-        });
+        self.entries
+            .retain(|_, entry| now.duration_since(entry.window_start) <= window);
     }
 }
 
@@ -232,7 +231,9 @@ fn create_rate_limit_response(retry_after: Duration) -> Response {
             HeaderValue::from_str(&retry_after.as_secs().to_string())
                 .unwrap_or_else(|_| HeaderValue::from_static("60")),
         )
-        .body(axum::body::Body::from(serde_json::to_string(&body).unwrap()))
+        .body(axum::body::Body::from(
+            serde_json::to_string(&body).unwrap(),
+        ))
         .unwrap()
 }
 
@@ -250,4 +251,3 @@ fn add_rate_limit_headers(response: &mut Response, config: &RateLimitConfig) {
             .unwrap_or_else(|_| HeaderValue::from_static("60")),
     );
 }
-
