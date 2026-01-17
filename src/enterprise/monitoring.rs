@@ -244,8 +244,14 @@ impl MonitoringManager {
         //     CREATE INDEX IF NOT EXISTS idx_metrics_tenant ON metrics_history(tenant_id);
 
         *initialized = true;
-        info!("Monitoring manager initialized (persistence: {})", 
-            if self.db_path.is_some() { "enabled" } else { "in-memory only" });
+        info!(
+            "Monitoring manager initialized (persistence: {})",
+            if self.db_path.is_some() {
+                "enabled"
+            } else {
+                "in-memory only"
+            }
+        );
         Ok(())
     }
 

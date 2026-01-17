@@ -25,9 +25,9 @@
 //! ```
 
 use crate::core::error::AppError;
+use crate::raid::events::EventStore;
 use crate::raid::replication::ReplicationEngine;
 use crate::raid::RaidManager;
-use crate::raid::events::EventStore;
 use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -58,7 +58,7 @@ impl Default for BurstRaidConfig {
             base_replication_factor: 2,
             max_replication_factor: 5,
             burst_threshold_rps: 10.0,
-            burst_cooldown_secs: 300, // 5 minutes
+            burst_cooldown_secs: 300,        // 5 minutes
             rebalancing_interval_secs: 3600, // 1 hour
             enable_auto_rebalancing: true,
         }
@@ -114,10 +114,8 @@ impl BurstRaidStrategy {
         raid_manager: Arc<RwLock<RaidManager>>,
         event_store: Option<Arc<RwLock<EventStore>>>,
     ) -> Self {
-        let replication_engine = Arc::new(ReplicationEngine::with_defaults(
-            raid_manager,
-            event_store,
-        ));
+        let replication_engine =
+            Arc::new(ReplicationEngine::with_defaults(raid_manager, event_store));
 
         Self {
             config,
@@ -159,9 +157,7 @@ impl BurstRaidStrategy {
         let now = Utc::now();
         let mut counters = self.request_counters.write().await;
 
-        let (count, window_start) = counters
-            .entry(artifact_id)
-            .or_insert_with(|| (0, now));
+        let (count, window_start) = counters.entry(artifact_id).or_insert_with(|| (0, now));
 
         // Reset window if it's been more than 1 second
         let window_duration = (now - *window_start).num_seconds();
@@ -259,11 +255,13 @@ impl BurstRaidStrategy {
         let is_burst = self.is_burst(artifact_id).await;
         let mut burst_states = self.burst_states.write().await;
 
-        let state = burst_states.entry(artifact_id).or_insert_with(|| BurstState {
-            replication_factor: self.config.base_replication_factor,
-            last_burst_time: None,
-            in_burst: false,
-        });
+        let state = burst_states
+            .entry(artifact_id)
+            .or_insert_with(|| BurstState {
+                replication_factor: self.config.base_replication_factor,
+                last_burst_time: None,
+                in_burst: false,
+            });
 
         let was_in_burst = state.in_burst;
         state.in_burst = is_burst;
@@ -339,8 +337,7 @@ impl BurstRaidStrategy {
 
         info!(
             "Replicated artifact {} (replication factor: {})",
-            artifact_id,
-            replication_factor
+            artifact_id, replication_factor
         );
 
         Ok(())
@@ -360,7 +357,7 @@ impl BurstRaidStrategy {
 
         // 1. Analyze current distribution of artifacts across nodes
         let distribution = self.analyze_distribution().await?;
-        
+
         if distribution.is_empty() {
             info!("No artifacts to rebalance");
             return Ok(());
@@ -380,7 +377,10 @@ impl BurstRaidStrategy {
             return Ok(());
         }
 
-        info!("Rebalancing plan: {} artifacts to move", rebalance_plan.len());
+        info!(
+            "Rebalancing plan: {} artifacts to move",
+            rebalance_plan.len()
+        );
 
         // 3. Move artifacts to better nodes
         let mut moved_count = 0;
@@ -419,7 +419,10 @@ impl BurstRaidStrategy {
             let artifact_id = match Uuid::parse_str(artifact_id_str) {
                 Ok(id) => id,
                 Err(_) => {
-                    warn!("Invalid artifact ID in replication metadata: {}", artifact_id_str);
+                    warn!(
+                        "Invalid artifact ID in replication metadata: {}",
+                        artifact_id_str
+                    );
                     continue;
                 }
             };
@@ -455,7 +458,7 @@ impl BurstRaidStrategy {
         distribution: &[(Uuid, u64, bool, Vec<u64>)],
     ) -> Result<Vec<(Uuid, Vec<u64>)>, AppError> {
         let available_nodes = self.replication_engine.get_available_nodes().await;
-        
+
         if available_nodes.is_empty() {
             return Ok(Vec::new());
         }
@@ -478,7 +481,7 @@ impl BurstRaidStrategy {
 
             // Check if rebalancing is needed
             let current_factor = current_nodes.len() as u32;
-            
+
             if current_factor == target_factor && !current_nodes.is_empty() {
                 // Already at target factor, check if we need to redistribute
                 // For now, skip if already at target factor
@@ -527,26 +530,23 @@ impl BurstRaidStrategy {
 
         // Get artifact from RaidManager
         let raid_manager_ref = self.replication_engine.get_raid_manager();
-        
+
         // Get artifact reference (clone it to release lock early)
         let artifact_path = {
             let raid_manager = raid_manager_ref.read().await;
             let artifacts = raid_manager.artifacts.read().await;
-            
-            let artifact_ref = artifacts
-                .artifacts
-                .get(&artifact_id)
-                .ok_or_else(|| {
-                    AppError::ValidationError(format!("Artifact {} not found in manifest", artifact_id))
-                })?;
-            
+
+            let artifact_ref = artifacts.artifacts.get(&artifact_id).ok_or_else(|| {
+                AppError::ValidationError(format!("Artifact {} not found in manifest", artifact_id))
+            })?;
+
             artifact_ref.path.clone()
         };
 
         // Read artifact data (now we can read without holding the lock)
         let raid_manager = raid_manager_ref.read().await;
         let artifact_data = raid_manager.get_artifact(&artifact_path).await?;
-        
+
         // Get artifact metadata (need to read again for name, etc.)
         let artifact_ref = {
             let artifacts = raid_manager.artifacts.read().await;
@@ -554,11 +554,14 @@ impl BurstRaidStrategy {
                 .artifacts
                 .get(&artifact_id)
                 .ok_or_else(|| {
-                    AppError::ValidationError(format!("Artifact {} not found in manifest", artifact_id))
+                    AppError::ValidationError(format!(
+                        "Artifact {} not found in manifest",
+                        artifact_id
+                    ))
                 })?
                 .clone()
         };
-        
+
         drop(raid_manager);
 
         // Calculate checksum
@@ -625,13 +628,13 @@ mod tests {
         use crate::raid::RaidManager;
         use std::sync::Arc;
         use tokio::sync::RwLock;
-        
+
         let config = BurstRaidConfig::default();
         let raid_manager = Arc::new(RwLock::new(RaidManager::new(
-            crate::raid::RaidConfig::default_for_platform()
+            crate::raid::RaidConfig::default_for_platform(),
         )));
         let strategy = BurstRaidStrategy::new(config, raid_manager, None);
-        
+
         // Should not fail
         let _ = strategy.initialize().await;
     }
@@ -641,10 +644,10 @@ mod tests {
         let config = BurstRaidConfig::default();
         let repl_config = ReplicationEngineConfig::default();
         let strategy = BurstRaidStrategy::new(config, repl_config);
-        
+
         let artifact_id = Uuid::new_v4();
         strategy.record_access(artifact_id).await;
-        
+
         let counters = strategy.request_counters.read().await;
         assert!(counters.contains_key(&artifact_id));
     }

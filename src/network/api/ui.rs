@@ -31,10 +31,7 @@ pub fn create_ui_routes() -> Router {
             "/ui/dashboards",
             post(ui_dashboard_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
-        .route(
-            "/ui/dashboards/{id}",
-            get(ui_dashboard_get_handler),
-        )
+        .route("/ui/dashboards/{id}", get(ui_dashboard_get_handler))
         .route(
             "/ui/dashboards/{id}",
             put(ui_dashboard_update_handler).layer(middleware::from_fn(auth_middleware)),
@@ -45,16 +42,10 @@ pub fn create_ui_routes() -> Router {
         )
         // Theme management endpoints
         .route("/ui/themes", get(ui_themes_handler))
-        .route(
-            "/ui/themes/{name}",
-            get(ui_theme_get_handler),
-        )
+        .route("/ui/themes/{name}", get(ui_theme_get_handler))
         // Component registry endpoints
         .route("/ui/components", get(ui_components_handler))
-        .route(
-            "/ui/components/{name}",
-            get(ui_component_get_handler),
-        )
+        .route("/ui/components/{name}", get(ui_component_get_handler))
 }
 
 // ============================================================================
@@ -381,7 +372,9 @@ async fn ui_components_handler() -> impl IntoResponse {
             name: "button".to_string(),
             component_type: "button".to_string(),
             styles: components::BUTTON_STYLES.to_string(),
-            description: Some("Button component with primary, danger, secondary variants".to_string()),
+            description: Some(
+                "Button component with primary, danger, secondary variants".to_string(),
+            ),
         },
         ComponentInfo {
             name: "card".to_string(),
@@ -406,7 +399,9 @@ async fn ui_component_get_handler(Path(name): Path<String>) -> impl IntoResponse
             name: "button".to_string(),
             component_type: "button".to_string(),
             styles: components::BUTTON_STYLES.to_string(),
-            description: Some("Button component with primary, danger, secondary variants".to_string()),
+            description: Some(
+                "Button component with primary, danger, secondary variants".to_string(),
+            ),
         },
         "card" => ComponentInfo {
             name: "card".to_string(),

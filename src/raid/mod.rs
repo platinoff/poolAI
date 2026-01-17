@@ -546,17 +546,22 @@ impl RaidManager {
     /// # Errors
     ///
     /// Returns `AppError::ResourceError` if node not found.
-    pub async fn update_node(&self, id: Uuid, address: Option<String>) -> Result<RaidNode, AppError> {
+    pub async fn update_node(
+        &self,
+        id: Uuid,
+        address: Option<String>,
+    ) -> Result<RaidNode, AppError> {
         let mut nodes = self.nodes.write().await;
-        let node = nodes.iter_mut().find(|n| n.id == id).ok_or_else(|| {
-            AppError::ResourceError(format!("RAID node not found: {}", id))
-        })?;
-        
+        let node = nodes
+            .iter_mut()
+            .find(|n| n.id == id)
+            .ok_or_else(|| AppError::ResourceError(format!("RAID node not found: {}", id)))?;
+
         if let Some(addr) = address {
             node.address = addr;
         }
         node.last_seen = Utc::now();
-        
+
         info!("Updated RAID node: {} ({})", node.address, node.id);
         Ok(node.clone())
     }
@@ -570,12 +575,15 @@ impl RaidManager {
         let mut nodes = self.nodes.write().await;
         let initial_len = nodes.len();
         nodes.retain(|n| n.id != id);
-        
+
         if nodes.len() < initial_len {
             info!("Deleted RAID node: {}", id);
             Ok(())
         } else {
-            Err(AppError::ResourceError(format!("RAID node not found: {}", id)))
+            Err(AppError::ResourceError(format!(
+                "RAID node not found: {}",
+                id
+            )))
         }
     }
 
@@ -701,7 +709,10 @@ impl RaidManager {
         drop(cfg); // Release config lock
 
         if is_burst_raid {
-            if let Err(e) = self.replicate_artifact_burst_raid(id, bytes.to_vec(), name).await {
+            if let Err(e) = self
+                .replicate_artifact_burst_raid(id, bytes.to_vec(), name)
+                .await
+            {
                 warn!("BurstRAID replication failed for artifact {}: {}", id, e);
                 // Continue even if replication fails - artifact is stored locally
             }
@@ -779,7 +790,9 @@ impl RaidManager {
         };
 
         // Replicate artifact
-        strategy.replicate_artifact(artifact_id, artifact_data, metadata).await
+        strategy
+            .replicate_artifact(artifact_id, artifact_data, metadata)
+            .await
     }
 
     /// Reads an artifact from local storage

@@ -605,38 +605,34 @@ impl SecurityManager {
         // Create basic SAML 2.0 AuthnRequest XML
         let request_id = uuid::Uuid::new_v4().to_string();
         let issue_instant = chrono::Utc::now().to_rfc3339();
-        
+
         // Build AuthnRequest XML
         // SAML 2.0 AuthnRequest format (simplified - without signing)
         let acs_url = provider.config.acs_url.clone().unwrap_or_else(|| {
             // Default ACS URL if not provided (should be configured in production)
             "/api/enterprise/security/saml/callback".to_string()
         });
-        
+
         let authn_request = format!(
             r#"<samlp:AuthnRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_{}" Version="2.0" IssueInstant="{}" Destination="{}" AssertionConsumerServiceURL="{}" ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
   <saml:Issuer>{}</saml:Issuer>
 </samlp:AuthnRequest>"#,
-            request_id,
-            issue_instant,
-            provider.config.sso_url,
-            acs_url,
-            provider.config.entity_id
+            request_id, issue_instant, provider.config.sso_url, acs_url, provider.config.entity_id
         );
 
         // Deflate and Base64 encode (SAML 2.0 HTTP-Redirect binding)
         // For simplicity, we'll use base64 encoding without deflate
         // Full implementation would use deflate compression before base64
-        let encoded_request = base64::engine::general_purpose::STANDARD.encode(authn_request.as_bytes());
-        
+        let encoded_request =
+            base64::engine::general_purpose::STANDARD.encode(authn_request.as_bytes());
+
         // URL encode the SAMLRequest parameter
         let url_encoded_request = urlencoding::encode(&encoded_request);
-        
+
         // Build final SSO URL
         let sso_url = format!(
             "{}?SAMLRequest={}",
-            provider.config.sso_url,
-            url_encoded_request
+            provider.config.sso_url, url_encoded_request
         );
 
         info!(

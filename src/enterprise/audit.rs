@@ -448,14 +448,14 @@ impl AuditLogger {
                             log_path, e
                         );
                     } else {
-                        info!(
-                            "Compressed audit log file: {:?} -> {:?}",
-                            log_path, gz_path
-                        );
+                        info!("Compressed audit log file: {:?} -> {:?}", log_path, gz_path);
                     }
                 }
                 Err(e) => {
-                    warn!("Failed to compress audit log file: {:?}, Error: {}", log_path, e);
+                    warn!(
+                        "Failed to compress audit log file: {:?}, Error: {}",
+                        log_path, e
+                    );
                 }
             }
         }

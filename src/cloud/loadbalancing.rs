@@ -248,11 +248,13 @@ impl LoadBalancer {
 
                     // Update backend health status
                     let mut health_map = backend_health.write().await;
-                    let health = health_map.entry(backend.id.clone()).or_insert(BackendHealth {
-                        healthy: true,
-                        consecutive_failures: 0,
-                        last_check: None,
-                    });
+                    let health = health_map
+                        .entry(backend.id.clone())
+                        .or_insert(BackendHealth {
+                            healthy: true,
+                            consecutive_failures: 0,
+                            last_check: None,
+                        });
 
                     if is_healthy {
                         health.consecutive_failures = 0;

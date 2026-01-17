@@ -182,7 +182,9 @@ async fn test_saml_provider_crud() {
     let config = SamlConfig {
         entity_id: "test-entity-id".to_string(),
         sso_url: "https://saml.example.com/sso".to_string(),
-        acs_url: Some("https://poolai.example.com/api/enterprise/security/saml/callback".to_string()),
+        acs_url: Some(
+            "https://poolai.example.com/api/enterprise/security/saml/callback".to_string(),
+        ),
         slo_url: Some("https://saml.example.com/slo".to_string()),
         certificate: "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----".to_string(),
         attribute_mapping: std::collections::HashMap::from([
@@ -281,7 +283,9 @@ async fn test_saml_sso_url() {
     let config = SamlConfig {
         entity_id: "test-entity-id".to_string(),
         sso_url: "https://saml.example.com/sso".to_string(),
-        acs_url: Some("https://poolai.example.com/api/enterprise/security/saml/callback".to_string()),
+        acs_url: Some(
+            "https://poolai.example.com/api/enterprise/security/saml/callback".to_string(),
+        ),
         slo_url: None,
         certificate: "test-cert".to_string(),
         attribute_mapping: std::collections::HashMap::new(),

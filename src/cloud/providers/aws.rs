@@ -216,7 +216,7 @@ impl AwsManager {
         #[cfg(feature = "cloud-sdk")]
         {
             let region = self.region.as_deref().unwrap_or("us-east-1");
-            
+
             // Get HTTP client
             let client_guard = self.http_client.read().await;
             let client = client_guard.as_ref().ok_or_else(|| {
@@ -256,7 +256,7 @@ impl AwsManager {
             // Note: Full implementation would use AWS Signature Version 4
             let service = "ec2";
             let endpoint = format!("https://{}.{}.amazonaws.com", service, region);
-            
+
             // For now, return a placeholder with a note about signature requirement
             // TODO: Implement AWS Signature Version 4 signing for REST API calls
             warn!(
@@ -268,9 +268,7 @@ impl AwsManager {
 
             info!(
                 "Creating EC2 instance: {} / {} in region {} (REST API - signature required)",
-                instance_type,
-                image_id,
-                region
+                instance_type, image_id, region
             );
 
             // Placeholder: Return a generated instance ID
@@ -351,7 +349,7 @@ impl AwsManager {
         #[cfg(feature = "cloud-sdk")]
         {
             let region = self.region.as_deref().unwrap_or("us-east-1");
-            
+
             // Get HTTP client
             let client_guard = self.http_client.read().await;
             let client = client_guard.as_ref().ok_or_else(|| {
@@ -387,9 +385,7 @@ impl AwsManager {
 
             info!(
                 "Creating ECS task: {} / {} in region {} (REST API - signature required)",
-                cluster,
-                task_definition,
-                region
+                cluster, task_definition, region
             );
 
             // Placeholder: Return a generated task ARN

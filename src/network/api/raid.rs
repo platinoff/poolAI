@@ -104,17 +104,16 @@ pub fn create_raid_routes() -> Router {
             "/raid/workers",
             post(raid_worker_create_handler).layer(middleware::from_fn(auth_middleware)),
         )
+        .route("/raid/workers/{id}", get(raid_worker_get_handler))
         .route(
             "/raid/workers/{id}",
-            get(raid_worker_get_handler),
+            axum::routing::put(raid_worker_update_handler)
+                .layer(middleware::from_fn(auth_middleware)),
         )
         .route(
             "/raid/workers/{id}",
-            axum::routing::put(raid_worker_update_handler).layer(middleware::from_fn(auth_middleware)),
-        )
-        .route(
-            "/raid/workers/{id}",
-            axum::routing::delete(raid_worker_delete_handler).layer(middleware::from_fn(auth_middleware)),
+            axum::routing::delete(raid_worker_delete_handler)
+                .layer(middleware::from_fn(auth_middleware)),
         )
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route(
@@ -322,13 +321,13 @@ async fn raid_quota_handler() -> impl IntoResponse {
 
 async fn raid_status_handler() -> impl IntoResponse {
     let manager = raid::get_global_manager();
-    
+
     // Get basic information
     let nodes = manager.list_nodes().await;
     let artifacts = manager.list_artifacts().await;
     let node_count = nodes.len();
     let artifact_count = artifacts.len();
-    
+
     // Get storage information
     let total_size = manager.get_total_size().await.unwrap_or(0);
     let quota_bytes = manager.get_quota_bytes().await;
@@ -340,10 +339,10 @@ async fn raid_status_handler() -> impl IntoResponse {
         }
     });
     let available_bytes = quota_bytes.map(|quota| quota.saturating_sub(total_size));
-    
+
     // Get mode from config
     let mode = format!("{:?}", manager.get_mode().await);
-    
+
     // Determine cluster status
     // Healthy: nodes > 0, usage < 90%, no errors
     // Degraded: usage >= 90%, or some nodes unavailable
@@ -361,7 +360,7 @@ async fn raid_status_handler() -> impl IntoResponse {
     } else {
         "healthy".to_string()
     };
-    
+
     // Check replication status (if in distributed mode)
     let replication_status = if mode != "Local" {
         // For distributed modes, check if replication is active
@@ -370,7 +369,7 @@ async fn raid_status_handler() -> impl IntoResponse {
     } else {
         None
     };
-    
+
     // Check Raft status (if enabled)
     // TODO: Implement Raft status query when Raft integration is complete
     // Placeholder: Raft status would be queried from the global Raft node
@@ -382,10 +381,10 @@ async fn raid_status_handler() -> impl IntoResponse {
         // - Get leader ID from Raft state
         None
     };
-    
+
     #[cfg(not(feature = "raft"))]
     let raft_status: Option<RaftStatus> = None;
-    
+
     let response = RaidStatusResponse {
         cluster_status,
         node_count,
@@ -400,7 +399,7 @@ async fn raid_status_handler() -> impl IntoResponse {
         replication_status,
         raft_status,
     };
-    
+
     AxumJson(response).into_response()
 }
 

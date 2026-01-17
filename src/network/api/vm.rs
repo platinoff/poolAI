@@ -86,10 +86,7 @@ pub fn create_vm_routes() -> Router {
             post(vm_template_create_handler)
                 .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
-        .route(
-            "/vm/templates/{id}",
-            get(vm_template_get_handler),
-        )
+        .route("/vm/templates/{id}", get(vm_template_get_handler))
         .route(
             "/vm/templates/{id}",
             put(vm_template_update_handler)
@@ -107,10 +104,7 @@ pub fn create_vm_routes() -> Router {
             post(vm_network_create_handler)
                 .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
-        .route(
-            "/vm/networks/{id}",
-            get(vm_network_get_handler),
-        )
+        .route("/vm/networks/{id}", get(vm_network_get_handler))
         .route(
             "/vm/networks/{id}",
             put(vm_network_update_handler)

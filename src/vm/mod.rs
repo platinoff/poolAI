@@ -1073,7 +1073,10 @@ impl VmManager {
             info!("Deleted VM template: {} ({})", template.name, id);
             Ok(())
         } else {
-            Err(AppError::ResourceError(format!("Template not found: {}", id)))
+            Err(AppError::ResourceError(format!(
+                "Template not found: {}",
+                id
+            )))
         }
     }
 
@@ -1165,7 +1168,10 @@ impl VmManager {
             info!("Deleted VM network: {} ({})", network.name, id);
             Ok(())
         } else {
-            Err(AppError::ResourceError(format!("Network not found: {}", id)))
+            Err(AppError::ResourceError(format!(
+                "Network not found: {}",
+                id
+            )))
         }
     }
 
