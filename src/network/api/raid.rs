@@ -98,6 +98,24 @@ struct EventsRangeQuery {
 pub fn create_raid_routes() -> Router {
     Router::new()
         .route("/raid/nodes", get(raid_nodes_handler))
+        // RAID Workers (nodes) management endpoints
+        .route("/raid/workers", get(raid_workers_handler))
+        .route(
+            "/raid/workers",
+            post(raid_worker_create_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/raid/workers/{id}",
+            get(raid_worker_get_handler),
+        )
+        .route(
+            "/raid/workers/{id}",
+            axum::routing::put(raid_worker_update_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route(
+            "/raid/workers/{id}",
+            axum::routing::delete(raid_worker_delete_handler).layer(middleware::from_fn(auth_middleware)),
+        )
         .route("/raid/artifacts", get(raid_artifacts_handler))
         .route(
             "/raid/artifacts",
@@ -601,5 +619,182 @@ async fn raid_gc_handler(Extension(claims): Extension<Claims>) -> impl IntoRespo
             });
             (StatusCode::INTERNAL_SERVER_ERROR, AxumJson(error_response)).into_response()
         }
+    }
+}
+
+// ============================================================================
+// RAID Workers (nodes) handlers
+// ============================================================================
+
+#[derive(Deserialize)]
+struct CreateRaidWorkerRequest {
+    address: String, // Network address (e.g., "192.168.1.100:8080")
+}
+
+#[derive(serde::Serialize)]
+struct RaidWorkerResponse {
+    id: String,
+    address: String,
+    last_seen: String,
+}
+
+async fn raid_workers_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let nodes = manager.list_nodes().await;
+    let workers: Vec<RaidWorkerResponse> = nodes
+        .into_iter()
+        .map(|node| RaidWorkerResponse {
+            id: node.id.to_string(),
+            address: node.address,
+            last_seen: node.last_seen.to_rfc3339(),
+        })
+        .collect();
+    AxumJson(workers).into_response()
+}
+
+async fn raid_worker_get_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.get_node(uuid).await {
+        Some(node) => {
+            let response = RaidWorkerResponse {
+                id: node.id.to_string(),
+                address: node.address,
+                last_seen: node.last_seen.to_rfc3339(),
+            };
+            AxumJson(response).into_response()
+        }
+        None => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": format!("RAID worker not found: {}", id)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn raid_worker_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(payload): Json<CreateRaidWorkerRequest>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
+    {
+        return err.into_response();
+    }
+
+    if payload.address.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            AxumJson(serde_json::json!({
+                "error": "Address cannot be empty".to_string()
+            })),
+        )
+            .into_response();
+    }
+
+    let manager = raid::get_global_manager();
+    let node = manager.register_node(payload.address.clone()).await;
+    let response = RaidWorkerResponse {
+        id: node.id.to_string(),
+        address: node.address,
+        last_seen: node.last_seen.to_rfc3339(),
+    };
+    (StatusCode::CREATED, AxumJson(response)).into_response()
+}
+
+async fn raid_worker_update_handler(
+    Extension(claims): Extension<Claims>,
+    Path(id): Path<String>,
+    Json(payload): Json<CreateRaidWorkerRequest>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
+    {
+        return err.into_response();
+    }
+
+    let manager = raid::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.update_node(uuid, Some(payload.address)).await {
+        Ok(node) => {
+            let response = RaidWorkerResponse {
+                id: node.id.to_string(),
+                address: node.address,
+                last_seen: node.last_seen.to_rfc3339(),
+            };
+            AxumJson(response).into_response()
+        }
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn raid_worker_delete_handler(
+    Extension(claims): Extension<Claims>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "delete:all").or_else(|_| check_permission(&claims, "write:raid"))
+    {
+        return err.into_response();
+    }
+
+    let manager = raid::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.delete_node(uuid).await {
+        Ok(_) => AxumJson(serde_json::json!({
+            "message": format!("RAID worker {} deleted successfully", id)
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response(),
     }
 }

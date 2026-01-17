@@ -516,6 +516,12 @@ impl RaidManager {
         self.nodes.read().await.clone()
     }
 
+    /// Get a RAID node by ID
+    pub async fn get_node(&self, id: Uuid) -> Option<RaidNode> {
+        let nodes = self.nodes.read().await;
+        nodes.iter().find(|n| n.id == id).cloned()
+    }
+
     pub async fn register_node(&self, address: String) -> RaidNode {
         let node = RaidNode {
             id: Uuid::new_v4(),
@@ -523,7 +529,46 @@ impl RaidManager {
             last_seen: Utc::now(),
         };
         self.nodes.write().await.push(node.clone());
+        info!("Registered RAID node: {} ({})", node.address, node.id);
         node
+    }
+
+    /// Update a RAID node
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if node not found.
+    pub async fn update_node(&self, id: Uuid, address: Option<String>) -> Result<RaidNode, AppError> {
+        let mut nodes = self.nodes.write().await;
+        let node = nodes.iter_mut().find(|n| n.id == id).ok_or_else(|| {
+            AppError::ResourceError(format!("RAID node not found: {}", id))
+        })?;
+        
+        if let Some(addr) = address {
+            node.address = addr;
+        }
+        node.last_seen = Utc::now();
+        
+        info!("Updated RAID node: {} ({})", node.address, node.id);
+        Ok(node.clone())
+    }
+
+    /// Delete a RAID node
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if node not found.
+    pub async fn delete_node(&self, id: Uuid) -> Result<(), AppError> {
+        let mut nodes = self.nodes.write().await;
+        let initial_len = nodes.len();
+        nodes.retain(|n| n.id != id);
+        
+        if nodes.len() < initial_len {
+            info!("Deleted RAID node: {}", id);
+            Ok(())
+        } else {
+            Err(AppError::ResourceError(format!("RAID node not found: {}", id)))
+        }
     }
 
     /// Store an artifact (library, model weights, etc.).
