@@ -125,7 +125,7 @@
 
 **Оцінка**: 5-7 днів
 
-#### 2.2 Security Hardening (7-10 днів) - 70% 🔄
+#### 2.2 Security Hardening (7-10 днів) - 80% 🔄
 
 **Завдання**:
 - [x] Security audit (`cargo audit`) ✅ (CI integration added)
@@ -135,7 +135,7 @@
 - [x] Input validation review (SQL injection, XSS) ✅ (Path traversal, SSRF, XSS validation added)
 - [x] Rate limiting enhancement ✅ (Per-IP rate limiting with configurable limits implemented)
 - [x] Secrets management review ✅ (Comprehensive guide with Vault/AWS/Azure recommendations created)
-- [ ] Certificate management security review
+- [x] Certificate management security review ✅ (Certificate lifecycle, rotation, monitoring guide created)
 
 **Інструменти**:
 - `cargo audit` - dependency vulnerabilities
