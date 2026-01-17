@@ -419,10 +419,12 @@ impl RaidManager {
                     warn!("Failed to restore artifacts from snapshot: {}. Attempting fallback parsing.", e);
                     // Fallback: try to parse as an object with "artifacts" key
                     if let Some(artifacts_obj) = snapshot.artifacts.as_object() {
-                        if let Some(artifacts_array) = artifacts_obj.get("artifacts").and_then(|v| v.as_array()) {
+                        if let Some(artifacts_array) =
+                            artifacts_obj.get("artifacts").and_then(|v| v.as_array())
+                        {
                             let mut artifacts = ArtifactManifest::new();
                             if let Ok(artifacts_vec) = serde_json::from_value::<Vec<ArtifactRef>>(
-                                serde_json::Value::Array(artifacts_array.clone())
+                                serde_json::Value::Array(artifacts_array.clone()),
                             ) {
                                 for artifact in artifacts_vec {
                                     artifacts.artifacts.insert(artifact.id, artifact);
@@ -444,12 +446,16 @@ impl RaidManager {
                     info!("Nodes restored from snapshot");
                 }
                 Err(e) => {
-                    warn!("Failed to restore nodes from snapshot: {}. Attempting fallback parsing.", e);
+                    warn!(
+                        "Failed to restore nodes from snapshot: {}. Attempting fallback parsing.",
+                        e
+                    );
                     // Fallback: try to parse as an object with "nodes" key
                     if let Some(nodes_obj) = snapshot.nodes.as_object() {
-                        if let Some(nodes_array) = nodes_obj.get("nodes").and_then(|v| v.as_array()) {
+                        if let Some(nodes_array) = nodes_obj.get("nodes").and_then(|v| v.as_array())
+                        {
                             if let Ok(nodes_vec) = serde_json::from_value::<Vec<RaidNode>>(
-                                serde_json::Value::Array(nodes_array.clone())
+                                serde_json::Value::Array(nodes_array.clone()),
                             ) {
                                 *self.nodes.write().await = nodes_vec;
                                 info!("Nodes restored from snapshot (fallback parsing)");

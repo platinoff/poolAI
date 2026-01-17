@@ -117,12 +117,20 @@ async fn test_list_instances() {
         .unwrap();
 
     let instance_id1 = manager
-        .create_instance("test-model-1".to_string(), placements[0].clone(), HashMap::new())
+        .create_instance(
+            "test-model-1".to_string(),
+            placements[0].clone(),
+            HashMap::new(),
+        )
         .await
         .unwrap();
 
     let instance_id2 = manager
-        .create_instance("test-model-1".to_string(), placements[0].clone(), HashMap::new())
+        .create_instance(
+            "test-model-1".to_string(),
+            placements[0].clone(),
+            HashMap::new(),
+        )
         .await
         .unwrap();
 
@@ -159,7 +167,11 @@ async fn test_get_instance_by_model_id() {
         .unwrap();
 
     let instance_id = manager
-        .create_instance("unique-model".to_string(), placements[0].clone(), HashMap::new())
+        .create_instance(
+            "unique-model".to_string(),
+            placements[0].clone(),
+            HashMap::new(),
+        )
         .await
         .unwrap();
 
@@ -210,7 +222,11 @@ async fn test_instance_status_transitions() {
         .unwrap();
 
     let instance_id = manager
-        .create_instance("status-test-model".to_string(), placements[0].clone(), HashMap::new())
+        .create_instance(
+            "status-test-model".to_string(),
+            placements[0].clone(),
+            HashMap::new(),
+        )
         .await
         .unwrap();
 
@@ -337,7 +353,11 @@ async fn test_process_request_via_instance_without_model() {
         .unwrap();
 
     let instance_id = manager
-        .create_instance("no-model-test".to_string(), placements[0].clone(), HashMap::new())
+        .create_instance(
+            "no-model-test".to_string(),
+            placements[0].clone(),
+            HashMap::new(),
+        )
         .await
         .unwrap();
 
@@ -350,7 +370,9 @@ async fn test_process_request_via_instance_without_model() {
         timeout: Some(30),
     };
 
-    let result = manager.process_request_via_instance(&instance_id, request).await;
+    let result = manager
+        .process_request_via_instance(&instance_id, request)
+        .await;
     assert!(result.is_err());
     let error_msg = result.unwrap_err().to_string();
     // Error message changed - now checks ModelManager too

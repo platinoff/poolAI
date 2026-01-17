@@ -85,24 +85,24 @@ pub struct PeerCapabilities {
 }
 
 /// Detect local system capabilities
-/// 
+///
 /// Automatically detects CPU cores, memory, and GPU devices on the current system.
 /// This function attempts to detect actual system resources, falling back to
 /// reasonable defaults if detection fails.
 pub fn detect_local_capabilities() -> PeerCapabilities {
     // Detect CPU cores
     let cpu_cores = num_cpus::get();
-    
+
     // Detect total and available system memory
     let (memory_mb, _available_mb) = detect_system_memory().unwrap_or((8192, 6144)); // Default to 8GB total, 6GB available
-    
+
     // Detect GPU devices (simplified - check for GPU presence)
     let gpu_devices = detect_gpu_devices();
-    
+
     // Determine parallelism support based on capabilities
     let supports_tensor_parallelism = gpu_devices.len() >= 2; // Requires 2+ GPUs
     let supports_pipeline_parallelism = cpu_cores >= 4 && memory_mb >= 8192; // Requires sufficient resources
-    
+
     PeerCapabilities {
         cpu_cores,
         gpu_devices,
@@ -125,7 +125,7 @@ fn detect_system_memory() -> Option<(usize, usize)> {
         if let Ok(content) = fs::read_to_string("/proc/meminfo") {
             let mut total_mb = None;
             let mut available_mb = None;
-            
+
             for line in content.lines() {
                 if line.starts_with("MemTotal:") {
                     if let Some(value) = line.split_whitespace().nth(1) {
@@ -149,27 +149,27 @@ fn detect_system_memory() -> Option<(usize, usize)> {
                     }
                 }
             }
-            
+
             if let Some(total) = total_mb {
                 let available = available_mb.unwrap_or(total / 4); // Fallback to 25% if can't detect
                 return Some((total, available));
             }
         }
     }
-    
+
     #[cfg(target_os = "windows")]
     {
         // On Windows, try to use system commands
         // Could use PowerShell: (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory
         // For now, return None and use fallback
     }
-    
+
     #[cfg(target_os = "macos")]
     {
         // On macOS, use sysctl for memory detection
         let mut total_mb = None;
         let mut available_mb = None;
-        
+
         // Get total memory
         if let Ok(output) = std::process::Command::new("sysctl")
             .arg("-n")
@@ -184,11 +184,9 @@ fn detect_system_memory() -> Option<(usize, usize)> {
                 }
             }
         }
-        
+
         // Get available memory (vm_stat on macOS)
-        if let Ok(output) = std::process::Command::new("vm_stat")
-            .output()
-        {
+        if let Ok(output) = std::process::Command::new("vm_stat").output() {
             if output.status.success() {
                 let content = String::from_utf8_lossy(&output.stdout);
                 // Parse vm_stat output for free pages (simplified)
@@ -198,32 +196,30 @@ fn detect_system_memory() -> Option<(usize, usize)> {
                 }
             }
         }
-        
+
         if let Some(total) = total_mb {
             let available = available_mb.unwrap_or(total / 4);
             return Some((total, available));
         }
     }
-    
+
     None
 }
 
 /// Detect available GPU devices
-/// 
+///
 /// Returns a list of GPU device indices (0, 1, 2, ...) for detected GPUs.
 /// Currently uses heuristics to detect GPU presence.
 fn detect_gpu_devices() -> Vec<usize> {
     let mut devices = Vec::new();
-    
+
     // Try to detect NVIDIA GPUs via nvidia-smi
     if let Ok(output) = std::process::Command::new("nvidia-smi")
         .arg("--list-gpus")
         .output()
     {
         if output.status.success() {
-            let count = String::from_utf8_lossy(&output.stdout)
-                .lines()
-                .count();
+            let count = String::from_utf8_lossy(&output.stdout).lines().count();
             for i in 0..count {
                 devices.push(i);
             }
@@ -232,7 +228,7 @@ fn detect_gpu_devices() -> Vec<usize> {
             }
         }
     }
-    
+
     // Try to detect AMD GPUs via rocm-smi (Linux)
     #[cfg(target_os = "linux")]
     {
@@ -253,14 +249,16 @@ fn detect_gpu_devices() -> Vec<usize> {
                 }
             }
         }
-        
+
         // Try to detect GPUs via /sys/class/drm on Linux
         if let Ok(entries) = std::fs::read_dir("/sys/class/drm") {
             let mut gpu_count = 0;
             for entry in entries.flatten() {
                 let name = entry.file_name();
                 let name_str = name.to_string_lossy();
-                if name_str.starts_with("card") && name_str.chars().skip(4).all(|c| c.is_ascii_digit()) {
+                if name_str.starts_with("card")
+                    && name_str.chars().skip(4).all(|c| c.is_ascii_digit())
+                {
                     gpu_count += 1;
                 }
             }
@@ -272,11 +270,11 @@ fn detect_gpu_devices() -> Vec<usize> {
             }
         }
     }
-    
+
     // Fallback: check if platform module reports GPU (even if placeholder)
     // This allows for future platform-specific detection
     // Note: Platform detection can be added via platform module if needed
-    
+
     // Default: assume no GPUs detected
     devices
 }
@@ -294,15 +292,11 @@ pub enum DiscoveryMessage {
         metadata: HashMap<String, String>,
     },
     /// Heartbeat from an existing peer
-    Heartbeat {
-        peer_id: String,
-    },
+    Heartbeat { peer_id: String },
     /// Query for available peers
     Query,
     /// Response to a query
-    Response {
-        peers: Vec<PeerInfo>,
-    },
+    Response { peers: Vec<PeerInfo> },
 }
 
 /// Discovery service for automatic peer/worker detection
@@ -329,7 +323,7 @@ impl DiscoveryService {
     /// Creates a new discovery service
     pub fn new(config: DiscoveryConfig, local_address: SocketAddr) -> Self {
         let local_peer_id = format!("poolai-{}", Uuid::new_v4().to_string()[..8].to_string());
-        
+
         Self {
             config,
             local_peer_id,
@@ -415,21 +409,25 @@ impl DiscoveryService {
     pub async fn send_announcement(&self) -> Result<(), AppError> {
         // Detect local system capabilities
         let mut capabilities = detect_local_capabilities();
-        
+
         // Update load metrics if instance manager is available
         if let Some(instance_manager) = crate::runtime::instance::get_global_instance_manager() {
             let manager = instance_manager.read().await;
             let instances = manager.list_instances().await;
-            
+
             // Note: We can't await in filter, so we collect instances first
             let mut active_count = 0;
             for inst in instances {
                 let status = inst.status.read().await;
-                if matches!(*status, crate::runtime::instance::InstanceStatus::Ready | crate::runtime::instance::InstanceStatus::Active) {
+                if matches!(
+                    *status,
+                    crate::runtime::instance::InstanceStatus::Ready
+                        | crate::runtime::instance::InstanceStatus::Active
+                ) {
                     active_count += 1;
                 }
             }
-            
+
             capabilities.active_requests = active_count;
             capabilities.current_load = if capabilities.capacity > 0 {
                 (active_count as f32 / capabilities.capacity as f32).min(1.0)
@@ -437,7 +435,7 @@ impl DiscoveryService {
                 0.0
             };
         }
-        
+
         let metadata = HashMap::new();
 
         let message = DiscoveryMessage::Announce {
@@ -456,19 +454,22 @@ impl DiscoveryService {
     async fn send_broadcast(&self, message: &DiscoveryMessage) -> Result<(), AppError> {
         let socket = UdpSocket::bind("0.0.0.0:0")
             .map_err(|e| AppError::NetworkError(format!("Failed to bind UDP socket: {}", e)))?;
-        
-        socket.set_broadcast(true)
+
+        socket
+            .set_broadcast(true)
             .map_err(|e| AppError::NetworkError(format!("Failed to enable broadcast: {}", e)))?;
 
-        let data = serde_json::to_vec(message)
-            .map_err(|e| AppError::ConfigError(format!("Failed to serialize discovery message: {}", e)))?;
+        let data = serde_json::to_vec(message).map_err(|e| {
+            AppError::ConfigError(format!("Failed to serialize discovery message: {}", e))
+        })?;
 
         let broadcast_addr = SocketAddr::new(
             IpAddr::from([255, 255, 255, 255]),
             self.config.broadcast_port,
         );
 
-        socket.send_to(&data, broadcast_addr)
+        socket
+            .send_to(&data, broadcast_addr)
             .map_err(|e| AppError::NetworkError(format!("Failed to send broadcast: {}", e)))?;
 
         debug!("Sent discovery broadcast: {:?}", message);
@@ -513,10 +514,8 @@ impl DiscoveryService {
                 }
             };
 
-            let broadcast_addr = SocketAddr::new(
-                IpAddr::from([255, 255, 255, 255]),
-                config.broadcast_port,
-            );
+            let broadcast_addr =
+                SocketAddr::new(IpAddr::from([255, 255, 255, 255]), config.broadcast_port);
 
             if let Err(e) = socket.send_to(&data, broadcast_addr) {
                 warn!("Failed to send heartbeat: {}", e);
@@ -527,12 +526,9 @@ impl DiscoveryService {
     }
 
     /// Background task for UDP listener
-    async fn udp_listener_task(
-        discovery: Arc<DiscoveryServiceClone>,
-        config: DiscoveryConfig,
-    ) {
+    async fn udp_listener_task(discovery: Arc<DiscoveryServiceClone>, config: DiscoveryConfig) {
         let bind_addr = SocketAddr::new(Ipv4Addr::UNSPECIFIED.into(), config.broadcast_port);
-        
+
         let socket = match TokioUdpSocket::bind(bind_addr).await {
             Ok(s) => {
                 info!("Discovery UDP listener started on {}", bind_addr);
@@ -550,20 +546,28 @@ impl DiscoveryService {
             match socket.recv_from(&mut buf).await {
                 Ok((len, source)) => {
                     let data = &buf[..len];
-                    
+
                     match serde_json::from_slice::<DiscoveryMessage>(data) {
                         Ok(message) => {
                             debug!("Received discovery message from {}: {:?}", source, message);
-                            
+
                             // Handle message
                             let mut peers = discovery.peers.write().await;
                             match message {
-                                DiscoveryMessage::Announce { peer_id, address, port, capabilities, metadata } => {
+                                DiscoveryMessage::Announce {
+                                    peer_id,
+                                    address,
+                                    port,
+                                    capabilities,
+                                    metadata,
+                                } => {
                                     // Ignore our own messages
-                                    if peer_id == discovery.local_peer_id || source == discovery.local_address {
+                                    if peer_id == discovery.local_peer_id
+                                        || source == discovery.local_address
+                                    {
                                         continue;
                                     }
-                                    
+
                                     let peer_info = PeerInfo {
                                         peer_id: peer_id.clone(),
                                         address,
@@ -574,9 +578,15 @@ impl DiscoveryService {
                                     };
 
                                     if peers.contains_key(&peer_id) {
-                                        debug!("Updated peer: {} (last seen: {})", peer_id, peer_info.last_seen);
+                                        debug!(
+                                            "Updated peer: {} (last seen: {})",
+                                            peer_id, peer_info.last_seen
+                                        );
                                     } else {
-                                        info!("Discovered new peer: {} at {}:{}", peer_id, peer_info.address, port);
+                                        info!(
+                                            "Discovered new peer: {} at {}:{}",
+                                            peer_id, peer_info.address, port
+                                        );
                                     }
                                     peers.insert(peer_id, peer_info);
                                 }
@@ -588,11 +598,10 @@ impl DiscoveryService {
                                 }
                                 DiscoveryMessage::Query => {
                                     // Respond with list of peers
-                                    let peers_list: Vec<PeerInfo> = peers.values().cloned().collect();
-                                    let response = DiscoveryMessage::Response {
-                                        peers: peers_list,
-                                    };
-                                    
+                                    let peers_list: Vec<PeerInfo> =
+                                        peers.values().cloned().collect();
+                                    let response = DiscoveryMessage::Response { peers: peers_list };
+
                                     if let Ok(data) = serde_json::to_vec(&response) {
                                         if let Err(e) = socket.send_to(&data, source).await {
                                             warn!("Failed to send discovery response: {}", e);
@@ -621,10 +630,7 @@ impl DiscoveryService {
     }
 
     /// Background task for cleaning up stale peers
-    async fn cleanup_task(
-        peers: Arc<RwLock<HashMap<String, PeerInfo>>>,
-        config: DiscoveryConfig,
-    ) {
+    async fn cleanup_task(peers: Arc<RwLock<HashMap<String, PeerInfo>>>, config: DiscoveryConfig) {
         let mut interval = interval(Duration::from_secs(config.worker_timeout_secs));
 
         loop {
@@ -637,11 +643,14 @@ impl DiscoveryService {
             peers_guard.retain(|peer_id, peer_info| {
                 let elapsed = now.signed_duration_since(peer_info.last_seen);
                 let is_valid = elapsed.num_seconds() < timeout_duration.as_secs() as i64;
-                
+
                 if !is_valid {
-                    info!("Removing stale peer: {} (last seen: {})", peer_id, peer_info.last_seen);
+                    info!(
+                        "Removing stale peer: {} (last seen: {})",
+                        peer_id, peer_info.last_seen
+                    );
                 }
-                
+
                 is_valid
             });
         }
@@ -665,14 +674,24 @@ impl DiscoveryService {
     }
 
     /// Handles an incoming discovery message (called by UDP listener)
-    pub async fn handle_message(&self, message: DiscoveryMessage, source: SocketAddr) -> Result<(), AppError> {
+    pub async fn handle_message(
+        &self,
+        message: DiscoveryMessage,
+        source: SocketAddr,
+    ) -> Result<(), AppError> {
         // Ignore our own messages
         if source == self.local_address {
             return Ok(());
         }
 
         match message {
-            DiscoveryMessage::Announce { peer_id, address, port, capabilities, metadata } => {
+            DiscoveryMessage::Announce {
+                peer_id,
+                address,
+                port,
+                capabilities,
+                metadata,
+            } => {
                 let peer_info = PeerInfo {
                     peer_id: peer_id.clone(),
                     address,
@@ -684,9 +703,15 @@ impl DiscoveryService {
 
                 let mut peers = self.peers.write().await;
                 if peers.contains_key(&peer_id) {
-                    debug!("Updated peer: {} (last seen: {})", peer_id, peer_info.last_seen);
+                    debug!(
+                        "Updated peer: {} (last seen: {})",
+                        peer_id, peer_info.last_seen
+                    );
                 } else {
-                    info!("Discovered new peer: {} at {}:{}", peer_id, peer_info.address, port);
+                    info!(
+                        "Discovered new peer: {} at {}:{}",
+                        peer_id, peer_info.address, port
+                    );
                 }
                 peers.insert(peer_id, peer_info);
             }
@@ -700,19 +725,20 @@ impl DiscoveryService {
             DiscoveryMessage::Query => {
                 // Respond with list of peers
                 let peers_list = self.get_peers().await;
-                let response = DiscoveryMessage::Response {
-                    peers: peers_list,
-                };
-                
-                // Send response back to source
-                let socket = UdpSocket::bind("0.0.0.0:0")
-                    .map_err(|e| AppError::NetworkError(format!("Failed to bind UDP socket: {}", e)))?;
-                
-                let data = serde_json::to_vec(&response)
-                    .map_err(|e| AppError::ConfigError(format!("Failed to serialize response: {}", e)))?;
+                let response = DiscoveryMessage::Response { peers: peers_list };
 
-                socket.send_to(&data, source)
-                    .map_err(|e| AppError::NetworkError(format!("Failed to send response: {}", e)))?;
+                // Send response back to source
+                let socket = UdpSocket::bind("0.0.0.0:0").map_err(|e| {
+                    AppError::NetworkError(format!("Failed to bind UDP socket: {}", e))
+                })?;
+
+                let data = serde_json::to_vec(&response).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to serialize response: {}", e))
+                })?;
+
+                socket.send_to(&data, source).map_err(|e| {
+                    AppError::NetworkError(format!("Failed to send response: {}", e))
+                })?;
             }
             DiscoveryMessage::Response { peers } => {
                 // Update peer list from response
@@ -741,12 +767,11 @@ pub fn initialize_global_discovery(
     local_address: SocketAddr,
 ) -> Result<Arc<DiscoveryService>, AppError> {
     let service = Arc::new(DiscoveryService::new(config, local_address));
-    
-    GLOBAL_DISCOVERY.set(service.clone())
-        .map_err(|_| AppError::ConfigError(
-            "Global discovery service already initialized".to_string()
-        ))?;
-    
+
+    GLOBAL_DISCOVERY.set(service.clone()).map_err(|_| {
+        AppError::ConfigError("Global discovery service already initialized".to_string())
+    })?;
+
     Ok(service)
 }
 
@@ -779,7 +804,12 @@ mod tests {
         let deserialized: DiscoveryMessage = serde_json::from_str(&serialized).unwrap();
 
         match deserialized {
-            DiscoveryMessage::Announce { peer_id, address, port, .. } => {
+            DiscoveryMessage::Announce {
+                peer_id,
+                address,
+                port,
+                ..
+            } => {
                 assert_eq!(peer_id, "test-peer");
                 assert_eq!(address, "127.0.0.1");
                 assert_eq!(port, 8080);

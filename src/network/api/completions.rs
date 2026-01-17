@@ -185,20 +185,29 @@ async fn chat_completions_handler(
 
     // Try to find instance by model ID
     let instance_manager_opt = get_global_instance_manager();
-    
+
     if let Some(manager_arc) = instance_manager_opt {
         let manager = manager_arc.read().await;
-        
+
         // Try to find instance by model_id
         if let Some(instance) = manager.get_instance_by_model_id(&request.model).await {
             // Use instance to process request
             if request.stream {
                 // Streaming response
-                let stream = create_streaming_response_from_instance(&instance.instance_id, &request.model, model_request);
+                let stream = create_streaming_response_from_instance(
+                    &instance.instance_id,
+                    &request.model,
+                    model_request,
+                );
                 Sse::new(stream).into_response()
             } else {
                 // Non-streaming response
-                let response = process_chat_completion_via_instance(&instance.instance_id, &request.model, model_request).await;
+                let response = process_chat_completion_via_instance(
+                    &instance.instance_id,
+                    &request.model,
+                    model_request,
+                )
+                .await;
 
                 match response {
                     Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
@@ -253,13 +262,16 @@ async fn process_chat_completion_via_instance(
     model: &str,
     request: ModelRequest,
 ) -> Result<ChatCompletionResponse, crate::core::error::AppError> {
-    let manager_arc = get_global_instance_manager()
-        .ok_or_else(|| crate::core::error::AppError::ConfigError("Instance manager not initialized".to_string()))?;
-    
+    let manager_arc = get_global_instance_manager().ok_or_else(|| {
+        crate::core::error::AppError::ConfigError("Instance manager not initialized".to_string())
+    })?;
+
     let manager = manager_arc.read().await;
-    
+
     // Process request via instance
-    let model_response = manager.process_request_via_instance(instance_id, request.clone()).await?;
+    let model_response = manager
+        .process_request_via_instance(instance_id, request.clone())
+        .await?;
 
     let completion = ChatCompletionResponse {
         id: format!("chatcmpl-{}", uuid::Uuid::new_v4()),
@@ -326,28 +338,31 @@ fn create_streaming_response_from_instance(
 ) -> impl Stream<Item = Result<Event, Infallible>> {
     use crate::runtime::instance::get_global_instance_manager;
     use tokio::sync::mpsc;
-    
+
     let instance_id = instance_id.to_string();
     let model = model.to_string();
     let response_id = format!("chatcmpl-{}", uuid::Uuid::new_v4());
     let created = chrono::Utc::now().timestamp();
-    
+
     // Use channel to process request asynchronously and stream chunks
     let (tx, rx) = mpsc::unbounded_channel();
     let manager_opt = get_global_instance_manager();
-    
+
     if let Some(manager_arc) = manager_opt {
         let manager_clone = manager_arc.clone();
         let request_clone = request.clone();
         let instance_id_clone = instance_id.clone();
         let model_clone = model.clone();
         let response_id_clone = response_id.clone();
-        
+
         // Spawn task to process request and send chunks
         let request_input = request_clone.input.clone();
         tokio::spawn(async move {
             let manager = manager_clone.read().await;
-            match manager.process_request_via_instance(&instance_id_clone, request_clone).await {
+            match manager
+                .process_request_via_instance(&instance_id_clone, request_clone)
+                .await
+            {
                 Ok(model_response) => {
                     // Chunk the response for streaming
                     let response_text = model_response.output;
@@ -357,13 +372,13 @@ fn create_streaming_response_from_instance(
                         .chunks(5)
                         .map(|chunk| chunk.iter().collect())
                         .collect();
-                    
+
                     let chunks_len = chunks.len();
-                    
+
                     for (index, chunk) in chunks.into_iter().enumerate() {
                         let is_first = index == 0;
                         let is_last = index == chunks_len - 1;
-                        
+
                         let chunk_data = ChatCompletionChunk {
                             id: response_id_clone.clone(),
                             object: "chat.completion.chunk".to_string(),
@@ -386,11 +401,11 @@ fn create_streaming_response_from_instance(
                                 },
                             }],
                         };
-                        
+
                         let json = serde_json::to_string(&chunk_data).unwrap_or_default();
                         let _ = tx.send(Ok(Event::default().data(json)));
                     }
-                    
+
                     let _ = tx.send(Ok(Event::default().data("[DONE]")));
                 }
                 Err(_) => {
@@ -402,12 +417,12 @@ fn create_streaming_response_from_instance(
                         .chunks(5)
                         .map(|chunk| chunk.iter().collect())
                         .collect();
-                    
+
                     let chunks_len = chunks.len();
                     for (index, chunk) in chunks.into_iter().enumerate() {
                         let is_first = index == 0;
                         let is_last = index == chunks_len - 1;
-                        
+
                         let chunk_data = ChatCompletionChunk {
                             id: response_id_clone.clone(),
                             object: "chat.completion.chunk".to_string(),
@@ -430,31 +445,31 @@ fn create_streaming_response_from_instance(
                                 },
                             }],
                         };
-                        
+
                         let json = serde_json::to_string(&chunk_data).unwrap_or_default();
                         let _ = tx.send(Ok(Event::default().data(json)));
                     }
-                    
+
                     let _ = tx.send(Ok(Event::default().data("[DONE]")));
                 }
             }
         });
-        
+
         // Convert receiver to stream
         return tokio_stream::wrappers::UnboundedReceiverStream::new(rx);
     }
-    
+
     // Fallback to simplified streaming if manager not available
     // Use channel for consistency
     let (tx, rx) = mpsc::unbounded_channel();
     let model_clone = model.clone();
     let request_input = request.input.clone();
     let response_id_clone = response_id.clone();
-    
+
     tokio::spawn(async move {
         // Simulate processing
         tokio::time::sleep(Duration::from_millis(100)).await;
-        
+
         let response_text = format!("Processed: {}", request_input);
         let chunks: Vec<String> = response_text
             .chars()
@@ -462,12 +477,12 @@ fn create_streaming_response_from_instance(
             .chunks(5)
             .map(|chunk| chunk.iter().collect())
             .collect();
-        
+
         let chunks_len = chunks.len();
         for (index, chunk) in chunks.into_iter().enumerate() {
             let is_first = index == 0;
             let is_last = index == chunks_len - 1;
-            
+
             let chunk_data = ChatCompletionChunk {
                 id: response_id_clone.clone(),
                 object: "chat.completion.chunk".to_string(),
@@ -490,14 +505,14 @@ fn create_streaming_response_from_instance(
                     },
                 }],
             };
-            
+
             let json = serde_json::to_string(&chunk_data).unwrap_or_default();
             let _ = tx.send(Ok(Event::default().data(json)));
         }
-        
+
         let _ = tx.send(Ok(Event::default().data("[DONE]")));
     });
-    
+
     tokio_stream::wrappers::UnboundedReceiverStream::new(rx)
 }
 

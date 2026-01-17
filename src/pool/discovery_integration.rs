@@ -58,17 +58,17 @@ impl DiscoveryPoolSync {
                         // Convert peer to worker
                         match Self::create_worker_from_peer(peer) {
                             Ok((worker_id, worker)) => {
+                                let pool_guard = pool.read().await;
+                                if let Err(e) =
+                                    pool_guard.add_worker(worker_id.clone(), worker).await
                                 {
-                                    let pool_guard = pool.read().await;
-                                    if let Err(e) = pool_guard.add_worker(worker_id.clone(), worker).await {
-                                        warn!("Failed to add discovered peer as worker: {}", e);
-                                    } else {
-                                        info!(
-                                            "Added discovered peer {} as worker {}",
-                                            peer.peer_id, worker_id
-                                        );
-                                        known_ids.insert(peer.peer_id.clone());
-                                    }
+                                    warn!("Failed to add discovered peer as worker: {}", e);
+                                } else {
+                                    info!(
+                                        "Added discovered peer {} as worker {}",
+                                        peer.peer_id, worker_id
+                                    );
+                                    known_ids.insert(peer.peer_id.clone());
                                 }
                             }
                             Err(e) => {

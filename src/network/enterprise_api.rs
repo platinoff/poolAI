@@ -139,7 +139,10 @@ pub fn create_enterprise_api_routes() -> Router {
         .route("/auth/google", get(oauth2_google_auth_handler))
         .route("/auth/google/callback", get(oauth2_google_callback_handler))
         .route("/auth/telegram", get(oauth2_telegram_auth_handler))
-        .route("/auth/telegram/callback", get(oauth2_telegram_callback_handler))
+        .route(
+            "/auth/telegram/callback",
+            get(oauth2_telegram_callback_handler),
+        )
 }
 
 // ============================================================================
@@ -1500,9 +1503,9 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
     // 3. Generate authorization URL using SecurityManager::get_oauth2_authorization_url
     // 4. Store state in session/cookie for verification in callback
     // 5. Redirect to GitHub authorization URL
-    
+
     let manager = enterprise::security::get_global_security_manager();
-    
+
     if let Err(e) = manager.initialize().await {
         return (
             StatusCode::SERVICE_UNAVAILABLE,
@@ -1512,11 +1515,11 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     // Check if GitHub provider is registered
     let providers = manager.list_oauth2_providers().await.unwrap_or_default();
     let github_provider = providers.iter().find(|p| p.name == "github");
-    
+
     if github_provider.is_none() {
         return (
             StatusCode::NOT_FOUND,
@@ -1526,12 +1529,12 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     // Generate state (should be cryptographically random in production)
     let state = uuid::Uuid::new_v4().to_string();
-    
+
     // TODO: Store state in session/cookie
-    
+
     match manager.get_oauth2_authorization_url("github", &state).await {
         Ok(auth_url) => {
             // Redirect to GitHub authorization page
@@ -1559,11 +1562,11 @@ async fn oauth2_github_callback_handler(
     // 4. Create or find user in PoolAI (user mapping)
     // 5. Generate PoolAI JWT token using generate_token
     // 6. Return token to client (or redirect to UI with token)
-    
+
     let code = params.get("code").cloned().unwrap_or_default();
     let _state = params.get("state").cloned().unwrap_or_default();
     let error = params.get("error").cloned();
-    
+
     if let Some(error) = error {
         return (
             StatusCode::BAD_REQUEST,
@@ -1573,7 +1576,7 @@ async fn oauth2_github_callback_handler(
         )
             .into_response();
     }
-    
+
     if code.is_empty() {
         return (
             StatusCode::BAD_REQUEST,
@@ -1583,11 +1586,11 @@ async fn oauth2_github_callback_handler(
         )
             .into_response();
     }
-    
+
     // TODO: Verify state parameter
-    
+
     let manager = enterprise::security::get_global_security_manager();
-    
+
     // Exchange code for token
     let token_response = match manager.exchange_oauth2_code("github", &code).await {
         Ok(token) => token,
@@ -1688,14 +1691,14 @@ async fn oauth2_github_callback_handler(
         role,
         expires_in
     );
-    
+
     Redirect::temporary(&redirect_url).into_response()
 }
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_google_auth_handler() -> impl IntoResponse {
     let manager = enterprise::security::get_global_security_manager();
-    
+
     if let Err(e) = manager.initialize().await {
         return (
             StatusCode::SERVICE_UNAVAILABLE,
@@ -1705,11 +1708,11 @@ async fn oauth2_google_auth_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     // Check if Google provider is registered
     let providers = manager.list_oauth2_providers().await.unwrap_or_default();
     let google_provider = providers.iter().find(|p| p.name == "google");
-    
+
     if google_provider.is_none() {
         return (
             StatusCode::NOT_FOUND,
@@ -1719,14 +1722,12 @@ async fn oauth2_google_auth_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     // Generate state (should be cryptographically random in production)
     let state = uuid::Uuid::new_v4().to_string();
-    
+
     match manager.get_oauth2_authorization_url("google", &state).await {
-        Ok(auth_url) => {
-            Redirect::temporary(&auth_url).into_response()
-        }
+        Ok(auth_url) => Redirect::temporary(&auth_url).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
@@ -1744,7 +1745,7 @@ async fn oauth2_google_callback_handler(
     let code = params.get("code").cloned().unwrap_or_default();
     let _state = params.get("state").cloned().unwrap_or_default();
     let error = params.get("error").cloned();
-    
+
     if let Some(error) = error {
         return (
             StatusCode::BAD_REQUEST,
@@ -1754,7 +1755,7 @@ async fn oauth2_google_callback_handler(
         )
             .into_response();
     }
-    
+
     if code.is_empty() {
         return (
             StatusCode::BAD_REQUEST,
@@ -1764,9 +1765,9 @@ async fn oauth2_google_callback_handler(
         )
             .into_response();
     }
-    
+
     let manager = enterprise::security::get_global_security_manager();
-    
+
     // Exchange code for token
     let token_response = match manager.exchange_oauth2_code("google", &code).await {
         Ok(token) => token,
@@ -1864,7 +1865,7 @@ async fn oauth2_google_callback_handler(
         role,
         expires_in
     );
-    
+
     Redirect::temporary(&redirect_url).into_response()
 }
 
@@ -1873,7 +1874,7 @@ async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
     // Telegram Login Widget uses a different flow - it's client-side
     // This handler can return the bot name and token for client-side widget initialization
     let manager = enterprise::security::get_global_security_manager();
-    
+
     if let Err(e) = manager.initialize().await {
         return (
             StatusCode::SERVICE_UNAVAILABLE,
@@ -1883,11 +1884,11 @@ async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     // Check if Telegram provider is registered
     let providers = manager.list_oauth2_providers().await.unwrap_or_default();
     let telegram_provider = providers.iter().find(|p| p.name == "telegram");
-    
+
     if telegram_provider.is_none() {
         return (
             StatusCode::NOT_FOUND,
@@ -1897,7 +1898,7 @@ async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
         )
             .into_response();
     }
-    
+
     // Return configuration for Telegram Login Widget
     // The client will use this to initialize the widget
     Json(serde_json::json!({
@@ -1918,7 +1919,7 @@ async fn oauth2_telegram_callback_handler(
     let auth_data = params.get("auth_data").cloned().unwrap_or_default();
     let hash = params.get("hash").cloned().unwrap_or_default();
     let error = params.get("error").cloned();
-    
+
     if let Some(error) = error {
         return (
             StatusCode::BAD_REQUEST,
@@ -1928,7 +1929,7 @@ async fn oauth2_telegram_callback_handler(
         )
             .into_response();
     }
-    
+
     if auth_data.is_empty() || hash.is_empty() {
         return (
             StatusCode::BAD_REQUEST,
@@ -1938,11 +1939,11 @@ async fn oauth2_telegram_callback_handler(
         )
             .into_response();
     }
-    
+
     // Parse auth_data (it's typically URL-encoded JSON)
     // In a production environment, you should verify the hash using Telegram's bot token
     let user_data: Result<serde_json::Value, _> = serde_json::from_str(&auth_data);
-    
+
     if let Err(_) = user_data {
         return (
             StatusCode::BAD_REQUEST,
@@ -1952,20 +1953,23 @@ async fn oauth2_telegram_callback_handler(
         )
             .into_response();
     }
-    
+
     let user_data = user_data.unwrap();
-    let telegram_id = user_data.get("id")
+    let telegram_id = user_data
+        .get("id")
         .and_then(|v| v.as_u64())
         .map(|v| v.to_string())
         .unwrap_or_default();
-    let username = user_data.get("username")
+    let username = user_data
+        .get("username")
         .and_then(|v| v.as_str())
         .unwrap_or("telegram_user")
         .to_string();
-    let _first_name = user_data.get("first_name")
+    let _first_name = user_data
+        .get("first_name")
         .and_then(|v| v.as_str())
         .map(|s| s.to_string());
-    
+
     if telegram_id.is_empty() {
         return (
             StatusCode::BAD_REQUEST,
@@ -1975,7 +1979,7 @@ async fn oauth2_telegram_callback_handler(
         )
             .into_response();
     }
-    
+
     // Get or create user in PoolAI
     let user_manager = crate::network::auth::get_global_user_manager();
     if let Err(e) = user_manager.initialize().await {
@@ -2040,7 +2044,7 @@ async fn oauth2_telegram_callback_handler(
         urlencoding::encode(&final_username),
         role
     );
-    
+
     Redirect::temporary(&redirect_url).into_response()
 }
 

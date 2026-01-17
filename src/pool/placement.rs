@@ -26,9 +26,7 @@ impl PlacementCalculator for TopologyAwarePlacementCalculator {
 
         // Get topology manager
         let topology_manager = get_global_topology_manager()
-            .ok_or_else(|| AppError::ConfigError(
-                "Topology manager not initialized".to_string()
-            ))?;
+            .ok_or_else(|| AppError::ConfigError("Topology manager not initialized".to_string()))?;
 
         let topology = topology_manager.read().await;
 
@@ -36,19 +34,25 @@ impl PlacementCalculator for TopologyAwarePlacementCalculator {
         let mut placements = Vec::new();
 
         // Strategy 1: Single node placement (best resource match)
-        if let Some(single_placement) = calculate_single_placement(&*topology, model_info, required_memory).await {
+        if let Some(single_placement) =
+            calculate_single_placement(&*topology, model_info, required_memory).await
+        {
             placements.push(single_placement);
         }
 
         // Strategy 2: Pipeline parallelism (if model is large enough)
         if required_memory > 4000 {
-            if let Some(pipeline_placement) = calculate_pipeline_placement(&*topology, model_info, required_memory).await {
+            if let Some(pipeline_placement) =
+                calculate_pipeline_placement(&*topology, model_info, required_memory).await
+            {
                 placements.push(pipeline_placement);
             }
         }
 
         // Strategy 3: Tensor parallelism (if supported by nodes)
-        if let Some(tensor_placement) = calculate_tensor_placement(&*topology, model_info, required_memory).await {
+        if let Some(tensor_placement) =
+            calculate_tensor_placement(&*topology, model_info, required_memory).await
+        {
             placements.push(tensor_placement);
         }
 
@@ -56,7 +60,9 @@ impl PlacementCalculator for TopologyAwarePlacementCalculator {
         placements.sort_by(|a, b| {
             let score_a = placement_score(a);
             let score_b = placement_score(b);
-            score_a.partial_cmp(&score_b).unwrap_or(std::cmp::Ordering::Equal)
+            score_a
+                .partial_cmp(&score_b)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
         Ok(placements)
@@ -70,11 +76,13 @@ async fn calculate_single_placement(
     required_memory: u64,
 ) -> Option<InstancePlacement> {
     // Find best single node
-    let candidates = topology.find_best_nodes(
-        required_memory,
-        1, // Minimum 1 CPU core
-        1, // Single node
-    ).await;
+    let candidates = topology
+        .find_best_nodes(
+            required_memory,
+            1, // Minimum 1 CPU core
+            1, // Single node
+        )
+        .await;
 
     if candidates.is_empty() {
         return None;
@@ -106,11 +114,7 @@ async fn calculate_pipeline_placement(
     // Each node handles a stage of the pipeline
     let memory_per_node = required_memory / 2; // Split between 2 nodes
 
-    let candidates = topology.find_best_nodes(
-        memory_per_node,
-        1,
-        2,
-    ).await;
+    let candidates = topology.find_best_nodes(memory_per_node, 1, 2).await;
 
     if candidates.len() < 2 {
         return None;
@@ -150,11 +154,7 @@ async fn calculate_tensor_placement(
 
     let memory_per_node = required_memory / 2; // Split between 2 nodes
 
-    let candidates = topology.find_best_nodes(
-        memory_per_node,
-        1,
-        2,
-    ).await;
+    let candidates = topology.find_best_nodes(memory_per_node, 1, 2).await;
 
     if candidates.len() < 2 {
         return None;
@@ -192,6 +192,6 @@ fn placement_score(placement: &InstancePlacement) -> f64 {
     // and memory delta (lower is better if negative)
     let node_count_penalty = placement.node_ids.len() as f64 * 10.0;
     let memory_penalty = placement.memory_delta as f64 * 0.01;
-    
+
     node_count_penalty + memory_penalty
 }

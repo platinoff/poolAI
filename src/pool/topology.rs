@@ -83,7 +83,7 @@ impl TopologyManager {
     /// Get latency between two nodes (in milliseconds)
     pub async fn get_latency(&self, node_id1: &str, node_id2: &str) -> Option<f64> {
         let topology = self.topology.read().await;
-        
+
         // Try direct path
         let key = format!("{}:{}", node_id1, node_id2);
         if let Some(&latency) = topology.latency_matrix.get(&key) {
@@ -102,7 +102,7 @@ impl TopologyManager {
     /// Get bandwidth between two nodes (in Mbps)
     pub async fn get_bandwidth(&self, node_id1: &str, node_id2: &str) -> Option<f64> {
         let topology = self.topology.read().await;
-        
+
         let key = format!("{}:{}", node_id1, node_id2);
         topology.bandwidth_matrix.get(&key).copied().or_else(|| {
             // Try reverse path
@@ -122,13 +122,14 @@ impl TopologyManager {
         // Simplified latency measurement using TCP connect time
         // In real implementation, this would use ICMP ping or HTTP ping
         let addr = format!("{}:{}", peer.address, peer.port);
-        
+
         // Try to establish a TCP connection and measure time
         let start = std::time::Instant::now();
         let result = timeout(
             Duration::from_secs(self.latency_timeout_secs),
             tokio::net::TcpStream::connect(&addr),
-        ).await;
+        )
+        .await;
 
         match result {
             Ok(Ok(_stream)) => {
@@ -149,7 +150,7 @@ impl TopologyManager {
     /// Update topology with discovered peers
     pub async fn update_topology(&self) -> Result<(), AppError> {
         use crate::runtime::instance::get_global_instance_manager;
-        
+
         info!("Updating network topology");
 
         // Get discovered peers from discovery service
@@ -163,17 +164,21 @@ impl TopologyManager {
 
         // Calculate load per node from active instances
         let mut node_loads: HashMap<String, (usize, usize)> = HashMap::new(); // (active_requests, capacity)
-        
+
         if let Some(instance_manager) = get_global_instance_manager() {
             let manager = instance_manager.read().await;
             let instances = manager.list_instances().await;
-            
+
             for instance in instances {
                 // Count active instances per node (active = Ready or Active status)
                 let status = instance.status.read().await;
-                let is_active = matches!(*status, crate::runtime::instance::InstanceStatus::Ready | crate::runtime::instance::InstanceStatus::Active);
+                let is_active = matches!(
+                    *status,
+                    crate::runtime::instance::InstanceStatus::Ready
+                        | crate::runtime::instance::InstanceStatus::Active
+                );
                 drop(status);
-                
+
                 if is_active {
                     for node_id in &instance.placement.node_ids {
                         let entry = node_loads.entry(node_id.clone()).or_insert((0, 0));
@@ -187,20 +192,21 @@ impl TopologyManager {
         // Update node resources from peers with load
         for peer in &peers {
             // Get load for this node
-            let (active_requests, capacity) = node_loads.get(&peer.peer_id).copied().unwrap_or((0, 10));
+            let (active_requests, capacity) =
+                node_loads.get(&peer.peer_id).copied().unwrap_or((0, 10));
             let calculated_load = if capacity > 0 {
                 (active_requests as f32 / capacity as f32).min(1.0)
             } else {
                 0.0
             };
-            
+
             // Use peer capabilities load if available (from heartbeat), otherwise calculate from instances
             let current_load = if peer.capabilities.capacity > 0 {
                 peer.capabilities.current_load
             } else {
                 calculated_load
             };
-            
+
             let resources = NodeResources {
                 node_id: peer.peer_id.clone(),
                 available_gpu_memory_mb: peer.capabilities.memory_mb as u64, // Simplified
@@ -212,7 +218,9 @@ impl TopologyManager {
                 current_load,
             };
 
-            topology.node_resources.insert(peer.peer_id.clone(), resources);
+            topology
+                .node_resources
+                .insert(peer.peer_id.clone(), resources);
         }
 
         // Measure latency between nodes
@@ -226,7 +234,7 @@ impl TopologyManager {
             }
 
             let key = format!("{}:{}", local_peer_id, peer.peer_id);
-            
+
             // Measure latency (non-blocking, don't fail if measurement fails)
             if let Some(latency) = self.measure_latency(peer).await {
                 topology.latency_matrix.insert(key.clone(), latency);
@@ -240,7 +248,7 @@ impl TopologyManager {
         }
 
         topology.last_updated = Utc::now();
-        
+
         info!(
             "Topology updated: {} nodes, {} latency measurements, load tracking enabled",
             topology.node_resources.len(),
@@ -317,7 +325,6 @@ impl TopologyManager {
         let topology = self.topology.read().await;
         topology.clone()
     }
-
 }
 
 impl Default for TopologyManager {
@@ -334,9 +341,7 @@ pub fn initialize_global_topology_manager() -> Result<(), AppError> {
     let manager = TopologyManager::new();
     GLOBAL_TOPOLOGY_MANAGER
         .set(Arc::new(RwLock::new(manager)))
-        .map_err(|_| AppError::ConfigError(
-            "Topology manager already initialized".to_string()
-        ))?;
+        .map_err(|_| AppError::ConfigError("Topology manager already initialized".to_string()))?;
     Ok(())
 }
 

@@ -5,13 +5,7 @@
 //! - Latency matrix between nodes
 //! - Node resource information
 
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::get,
-    Json, Router,
-};
+use axum::{extract::Path, http::StatusCode, response::IntoResponse, routing::get, Json, Router};
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -81,11 +75,7 @@ async fn topology_handler() -> impl IntoResponse {
         let manager = manager_arc.read().await;
         let topology = manager.get_topology_snapshot().await;
 
-        let node_ids: Vec<String> = topology
-            .node_resources
-            .keys()
-            .cloned()
-            .collect();
+        let node_ids: Vec<String> = topology.node_resources.keys().cloned().collect();
 
         let response = TopologyResponse {
             node_count: topology.node_resources.len(),

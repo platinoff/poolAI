@@ -17,11 +17,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::core::model_interface::{GpuRequirements, ModelInfo};
-use crate::network::auth::Claims;
-use crate::runtime::instance::{
-    get_global_instance_manager, InstancePlacement,
-};
 use crate::libs::get_global_manager as get_library_manager;
+use crate::network::auth::Claims;
+use crate::runtime::instance::{get_global_instance_manager, InstancePlacement};
 
 /// Instance preview response
 #[derive(Serialize)]
@@ -118,7 +116,10 @@ async fn instance_previews_handler(
                     .map(|placement| InstancePreview {
                         model_id: model_id.clone(),
                         sharding: format!("{:?}", placement.strategy),
-                        instance_meta: format!("Placement: {:?}, Nodes: {:?}", placement.strategy, placement.node_ids),
+                        instance_meta: format!(
+                            "Placement: {:?}, Nodes: {:?}",
+                            placement.strategy, placement.node_ids
+                        ),
                         instance: serde_json::json!({
                             "strategy": format!("{:?}", placement.strategy),
                             "node_ids": placement.node_ids,
@@ -346,7 +347,7 @@ async fn get_model_info(model_id: &str) -> ModelInfo {
                 name: library.name.clone(),
                 version: library.version.clone(),
                 capabilities: vec!["text-generation".to_string()], // Default capabilities
-                max_tokens: 2048, // Default
+                max_tokens: 2048,                                  // Default
                 supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
                 model_size_mb: size_mb.max(1),
                 supported_languages: vec!["en".to_string()],

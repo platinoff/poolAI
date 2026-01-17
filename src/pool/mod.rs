@@ -591,7 +591,7 @@ pub async fn initialize() -> Result<(), AppError> {
         ))?;
 
     info!("Pool module initialized successfully");
-    
+
     // Start discovery pool sync if pool is available
     if let Some(pool_arc) = get_global_pool() {
         let pool = Arc::clone(pool_arc);
@@ -602,7 +602,7 @@ pub async fn initialize() -> Result<(), AppError> {
             info!("Discovery pool sync started");
         }
     }
-    
+
     Ok(())
 }
 

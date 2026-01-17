@@ -42,21 +42,21 @@ async fn peers_handler() -> impl IntoResponse {
     if let Some(discovery) = get_global_discovery_service() {
         let peers = discovery.get_peers().await;
         let local_peer_id = discovery.local_peer_id().to_string();
-        
+
         let response = PeersResponse {
             peers,
             local_peer_id,
         };
-        
+
         return (StatusCode::OK, Json(response));
     }
-    
+
     // Discovery service not initialized
     let response = PeersResponse {
         peers: vec![],
         local_peer_id: "not-initialized".to_string(),
     };
-    
+
     (StatusCode::SERVICE_UNAVAILABLE, Json(response))
 }
 
@@ -68,7 +68,7 @@ async fn peer_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
         let response = PeerResponse { peer };
         return (StatusCode::OK, Json(response));
     }
-    
+
     // Discovery service not initialized
     let response = PeerResponse { peer: None };
     (StatusCode::SERVICE_UNAVAILABLE, Json(response))
@@ -84,6 +84,6 @@ async fn register_handler() -> impl IntoResponse {
         }
         return StatusCode::OK;
     }
-    
+
     StatusCode::SERVICE_UNAVAILABLE
 }

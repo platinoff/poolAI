@@ -43,7 +43,7 @@ use axum_server::tls_rustls::RustlsConfig;
 pub async fn start_server(addr: SocketAddr) {
     // Initialize and start discovery service
     use crate::network::discovery::{initialize_global_discovery, DiscoveryConfig};
-    
+
     let discovery_config = DiscoveryConfig::default();
     if discovery_config.enabled {
         if let Ok(discovery) = initialize_global_discovery(discovery_config, addr) {

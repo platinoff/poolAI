@@ -126,7 +126,7 @@ impl PlacementCalculator for DefaultPlacementCalculator {
     ) -> Result<Vec<InstancePlacement>, AppError> {
         // Simple single-node placement for now
         let memory_required = model_info.gpu_requirements.recommended_memory_mb;
-        
+
         let placement = InstancePlacement {
             strategy: PlacementStrategy::Single,
             node_ids: vec!["local".to_string()],
@@ -196,19 +196,17 @@ impl InstanceManager {
         let mut instances = self.instances.write().await;
         instances.insert(instance_id.clone(), instance);
 
-        info!("Created model instance: {} for model: {}", instance_id, model_id);
+        info!(
+            "Created model instance: {} for model: {}",
+            instance_id, model_id
+        );
 
         // Try to load model if available (non-blocking - won't fail if model not found)
         let _ = self.load_model_for_instance(&instance_id, &model_id).await;
 
         // Update status to Ready
         {
-            let mut status = instances
-                .get(&instance_id)
-                .unwrap()
-                .status
-                .write()
-                .await;
+            let mut status = instances.get(&instance_id).unwrap().status.write().await;
             *status = InstanceStatus::Ready;
         }
 
@@ -228,15 +226,18 @@ impl InstanceManager {
                 // Model found in ModelManager - we can't clone Box<dyn ModelInterface>
                 // So we store a reference that the instance can use
                 // Note: In production, we'd need a different approach (e.g., model registry with Arc)
-                info!("Model {} found in ModelManager for instance {}", model_id, instance_id);
-                
+                info!(
+                    "Model {} found in ModelManager for instance {}",
+                    model_id, instance_id
+                );
+
                 // Update instance to mark model as available (though we can't store it directly)
                 // The instance will need to query ModelManager when processing requests
                 // This is a limitation of the current architecture - models are owned by ModelManager
                 return Ok(());
             }
         }
-        
+
         // Try to find model library in LibraryManager
         if let Some(lib_manager) = crate::libs::get_global_manager() {
             let manager = lib_manager.read().await;
@@ -247,7 +248,7 @@ impl InstanceManager {
                 return Ok(());
             }
         }
-        
+
         // Model not found - provide detailed error information
         warn!(
             "Model '{}' not found in ModelManager or LibraryManager for instance '{}'. \
@@ -284,7 +285,10 @@ impl InstanceManager {
             // Shutdown model if loaded
             if let Some(model) = &instance.model {
                 if let Err(e) = model.shutdown().await {
-                    warn!("Error shutting down model for instance {}: {}", instance_id, e);
+                    warn!(
+                        "Error shutting down model for instance {}: {}",
+                        instance_id, e
+                    );
                 }
             }
 
@@ -327,9 +331,9 @@ impl InstanceManager {
         request: crate::core::model_interface::ModelRequest,
     ) -> Result<crate::core::model_interface::ModelResponse, AppError> {
         let instances = self.instances.read().await;
-        let instance = instances
-            .get(instance_id)
-            .ok_or_else(|| AppError::ResourceError(format!("Instance '{}' not found", instance_id)))?;
+        let instance = instances.get(instance_id).ok_or_else(|| {
+            AppError::ResourceError(format!("Instance '{}' not found", instance_id))
+        })?;
 
         // Try to use instance's model first (if directly stored)
         if let Some(model) = &instance.model {
@@ -415,20 +419,19 @@ static GLOBAL_INSTANCE_MANAGER: OnceLock<Arc<RwLock<InstanceManager>>> = OnceLoc
 /// Initialize global instance manager
 pub fn initialize_global_instance_manager() -> Result<(), AppError> {
     // Try to use topology-aware placement if topology manager is available
-    let manager = if let Some(_topology_manager) = crate::pool::topology::get_global_topology_manager() {
-        // Use topology-aware placement calculator
-        let calculator = Arc::new(crate::pool::placement::TopologyAwarePlacementCalculator);
-        InstanceManager::with_placement_calculator(calculator)
-    } else {
-        // Fallback to default placement calculator
-        InstanceManager::new()
-    };
-    
+    let manager =
+        if let Some(_topology_manager) = crate::pool::topology::get_global_topology_manager() {
+            // Use topology-aware placement calculator
+            let calculator = Arc::new(crate::pool::placement::TopologyAwarePlacementCalculator);
+            InstanceManager::with_placement_calculator(calculator)
+        } else {
+            // Fallback to default placement calculator
+            InstanceManager::new()
+        };
+
     GLOBAL_INSTANCE_MANAGER
         .set(Arc::new(RwLock::new(manager)))
-        .map_err(|_| AppError::ConfigError(
-            "Instance manager already initialized".to_string()
-        ))?;
+        .map_err(|_| AppError::ConfigError("Instance manager already initialized".to_string()))?;
     Ok(())
 }
 

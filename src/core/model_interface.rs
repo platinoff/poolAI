@@ -426,7 +426,7 @@ static GLOBAL_MODEL_MANAGER: OnceLock<Arc<RwLock<ModelManager>>> = OnceLock::new
 /// Initialize global model manager
 pub fn initialize_global_model_manager() -> Result<(), AppError> {
     use crate::core::config::ModelConfig as ConfigModelConfig;
-    
+
     let config = ConfigModelConfig {
         name: "global".to_string(),
         path: "./models".to_string(),
@@ -437,13 +437,11 @@ pub fn initialize_global_model_manager() -> Result<(), AppError> {
         enable_cache: true,
         cache_size: 512,
     };
-    
+
     let manager = ModelManager::new(config);
     GLOBAL_MODEL_MANAGER
         .set(Arc::new(RwLock::new(manager)))
-        .map_err(|_| AppError::ConfigError(
-            "Model manager already initialized".to_string()
-        ))?;
+        .map_err(|_| AppError::ConfigError("Model manager already initialized".to_string()))?;
     Ok(())
 }
 
