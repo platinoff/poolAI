@@ -28,8 +28,9 @@ axum = { version = "0.8", features = ["ws"] }  # WebSocket support
 tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace"] }
 
-# WebSocket support
+# WebSocket and streaming support
 futures-util = "0.3"
+tokio-stream = "0.1"
 
 # JWT authentication (optional - enabled with feature "jwt")
 # Use: cargo build --features jwt

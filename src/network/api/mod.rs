@@ -14,6 +14,7 @@
 //! - `common` - Shared types and utilities
 
 pub mod common;
+pub mod completions;
 pub mod discovery;
 pub mod instances;
 pub mod libraries;
@@ -48,6 +49,7 @@ pub fn create_api_routes() -> Router {
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
         .merge(instances::create_instance_routes())
+        .merge(completions::create_completions_routes())
     // api_legacy.rs is kept for backward compatibility
     // All handlers have been migrated to modular structure
 }
