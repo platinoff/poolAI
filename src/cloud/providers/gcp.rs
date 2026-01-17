@@ -121,8 +121,12 @@ impl GcpManager {
                 project_id
             );
 
-            // Initialize HTTP client for GCP REST API calls
+            // Initialize HTTP client with connection pooling for GCP REST API calls
+            // Connection pooling improves performance by reusing connections
             let http_client = reqwest::Client::builder()
+                .pool_idle_timeout(std::time::Duration::from_secs(90))
+                .pool_max_idle_per_host(10)
+                .timeout(std::time::Duration::from_secs(30))
                 .build()
                 .map_err(|e| AppError::InitializationError(format!(
                     "Failed to create HTTP client for GCP API. Context: Cannot initialize reqwest client. \
@@ -204,12 +208,17 @@ impl GcpManager {
     async fn get_token_from_metadata_server(&self) -> Result<String, AppError> {
         let metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token";
 
-        let client = reqwest::Client::builder().build().map_err(|e| {
-            AppError::InitializationError(format!(
-                "Failed to create HTTP client for metadata server. Error: {}",
-                e
-            ))
-        })?;
+        // Create a temporary client for metadata server (one-time use during initialization)
+        // Note: Metadata server is internal to GCP and doesn't benefit from connection pooling
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(5))
+            .build()
+            .map_err(|e| {
+                AppError::InitializationError(format!(
+                    "Failed to create HTTP client for metadata server. Error: {}",
+                    e
+                ))
+            })?;
 
         let response = client
             .get(metadata_url)

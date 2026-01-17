@@ -141,8 +141,12 @@ impl AzureManager {
             // Store credential
             *self.credential.write().await = Some(credential);
 
-            // Initialize HTTP client for REST API calls (fallback when SDK has version conflicts)
+            // Initialize HTTP client with connection pooling for REST API calls
+            // Connection pooling improves performance by reusing connections
             let http_client = reqwest::Client::builder()
+                .pool_idle_timeout(std::time::Duration::from_secs(90))
+                .pool_max_idle_per_host(10)
+                .timeout(std::time::Duration::from_secs(30))
                 .build()
                 .map_err(|e| AppError::InitializationError(format!(
                     "Failed to create HTTP client for Azure API. Context: Cannot initialize reqwest client. \
