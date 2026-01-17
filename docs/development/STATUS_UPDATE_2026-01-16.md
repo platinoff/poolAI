@@ -157,14 +157,14 @@
 - ✅ Compilation: `cargo check` passing на всіх платформах
 - ✅ Doc-tests: Passing на всіх платформах
 
-### Cloud Integration: **75%** 🔄
+### Cloud Integration: **85%** 🔄
 - ✅ Infrastructure: **100%** ✅
 - ✅ Testing: **100%** ✅
 - ✅ Documentation: **100%** ✅
-- 🔄 SDK Implementation: **0%** (structures ready, implementation pending)
-  - Azure SDK: Structure ready, API verification needed
-  - GCP SDK: Structure ready, SDK selection needed
-  - AWS SDK: Requires Rust 1.88+
+- 🔄 SDK Implementation: **~85%** ✅ (REST API implementation complete)
+  - ✅ Azure SDK: 90% (credential ✅, HTTP client ✅, VMSS creation ✅)
+  - ✅ GCP SDK: 90% (HTTP client ✅, metadata token ✅, compute API ✅)
+  - ⏳ AWS SDK: 0% (requires Rust 1.88+)
 
 ---
 
