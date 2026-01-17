@@ -37,6 +37,8 @@ use tracing::info;
 use azure_identity::DefaultAzureCredential;
 #[cfg(feature = "cloud-sdk")]
 use azure_mgmt_compute::Client as ComputeClient;
+#[cfg(feature = "cloud-sdk")]
+use reqwest::Client as HttpClient;
 
 /// Azure manager for cloud resources
 pub struct AzureManager {
@@ -50,6 +52,9 @@ pub struct AzureManager {
     /// Azure Compute client for VM Scale Sets and VM management
     /// Note: azure_mgmt_compute 0.21 uses azure_core 0.21, may need API verification
     compute_client: Arc<RwLock<Option<ComputeClient>>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// HTTP client for Azure REST API calls (used as fallback when SDK has version conflicts)
+    http_client: Arc<RwLock<Option<HttpClient>>>,
 }
 
 impl AzureManager {
@@ -75,6 +80,8 @@ impl AzureManager {
             credential: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             compute_client: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            http_client: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -134,9 +141,20 @@ impl AzureManager {
             // Store credential
             *self.credential.write().await = Some(credential);
 
+            // Initialize HTTP client for REST API calls (fallback when SDK has version conflicts)
+            let http_client = reqwest::Client::builder()
+                .build()
+                .map_err(|e| AppError::InitializationError(format!(
+                    "Failed to create HTTP client for Azure API. Context: Cannot initialize reqwest client. \
+                    Error: {}",
+                    e
+                )))?;
+            *self.http_client.write().await = Some(http_client);
+
             // TODO: Initialize Compute client once API is verified
             // Note: azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
             // This version mismatch may cause compilation errors. Need to verify API compatibility.
+            // For now, using REST API approach (similar to GCP) to avoid version conflicts.
             // Expected API (needs verification):
             // let compute_client = ComputeClient::builder()
             //     .subscription_id(subscription_id.to_string())
@@ -145,7 +163,7 @@ impl AzureManager {
             // *self.compute_client.write().await = Some(compute_client);
 
             info!(
-                "Azure credential initialized for subscription: {} (Compute client initialization pending API verification)",
+                "Azure credential and HTTP client initialized for subscription: {} (Compute SDK client initialization pending API verification)",
                 subscription_id
             );
         }
@@ -184,6 +202,7 @@ impl AzureManager {
         {
             // Clear clients
             *self.compute_client.write().await = None;
+            *self.http_client.write().await = None;
             *self.credential.write().await = None;
         }
 
@@ -223,24 +242,137 @@ impl AzureManager {
             ));
         }
 
-        // TODO: Implement VM Scale Set creation
-        // - Call Azure Compute API
-        // - Create VMSS with configuration
-        // - Return VMSS ID
         #[cfg(feature = "cloud-sdk")]
         {
-            // TODO: Implement actual VM Scale Set creation using Azure Compute API
-            // Example implementation:
-            // let client = self.compute_client.read().await;
-            // let client = client.as_ref().ok_or_else(|| AppError::InitializationError(
-            //     "Azure Compute client not initialized. Call initialize() first.".to_string()
-            // ))?;
-            // let scale_set = azure_mgmt_compute::models::VirtualMachineScaleSet::new(...);
-            // client.virtual_machine_scale_sets().create_or_update(...).await?;
+            let subscription_id = self.subscription_id.as_deref().ok_or_else(|| {
+                AppError::ValidationError(
+                    "Azure subscription ID is required for Compute API calls".to_string(),
+                )
+            })?;
+
+            // Get HTTP client and access token
+            let client_guard = self.http_client.read().await;
+            let client = client_guard.as_ref().ok_or_else(|| {
+                AppError::InitializationError(
+                    "Azure HTTP client not initialized. Call initialize() first.".to_string(),
+                )
+            })?;
+
+            // Get access token from credential
+            let credential_guard = self.credential.read().await;
+            let credential = credential_guard.as_ref().ok_or_else(|| {
+                AppError::InitializationError(
+                    "Azure credential not initialized. Call initialize() first.".to_string(),
+                )
+            })?;
+
+            // Get access token - DefaultAzureCredential implements TokenCredential trait
+            // Note: TokenCredential requires scope, typically "https://management.azure.com/.default"
+            let token = credential
+                .token(&["https://management.azure.com/.default"])
+                .await
+                .map_err(|e| {
+                    AppError::InitializationError(format!(
+                        "Failed to obtain Azure access token. Context: Token request failed. \
+                    Error: {}",
+                        e
+                    ))
+                })?;
+
+            // Prepare VM Scale Set configuration
+            // Note: Minimal configuration for now, can be extended later
+            let vmss_config = serde_json::json!({
+                "location": "eastus", // TODO: Make location configurable
+                "sku": {
+                    "name": "Standard_DS1_v2",
+                    "tier": "Standard",
+                    "capacity": 2
+                },
+                "properties": {
+                    "upgradePolicy": {
+                        "mode": "Manual"
+                    },
+                    "virtualMachineProfile": {
+                        "storageProfile": {
+                            "imageReference": {
+                                "publisher": "Canonical",
+                                "offer": "UbuntuServer",
+                                "sku": "18.04-LTS",
+                                "version": "latest"
+                            },
+                            "osDisk": {
+                                "caching": "ReadWrite",
+                                "createOption": "FromImage"
+                            }
+                        },
+                        "osProfile": {
+                            "computerNamePrefix": name,
+                            "adminUsername": "azureuser",
+                            "adminPassword": "ChangeMe123!"
+                        }
+                    }
+                }
+            });
+
+            // Make API call to create VM Scale Set
+            let api_url = format!(
+                "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}?api-version=2023-03-01",
+                subscription_id, resource_group, name
+            );
+
+            let response = client
+                .put(&api_url)
+                .bearer_auth(token.token.secret())
+                .header("Content-Type", "application/json")
+                .json(&vmss_config)
+                .send()
+                .await
+                .map_err(|e| {
+                    AppError::NetworkError(format!(
+                        "Failed to create VM Scale Set. Context: Azure API request failed. \
+                    Resource Group: {}, Name: {}, Error: {}",
+                        resource_group, name, e
+                    ))
+                })?;
+
+            if !response.status().is_success() {
+                let status = response.status();
+                let error_text = response
+                    .text()
+                    .await
+                    .unwrap_or_else(|_| "Unknown error".to_string());
+                return Err(AppError::NetworkError(format!(
+                    "Azure Compute API error. Context: VM Scale Set creation failed. \
+                    Resource Group: {}, Name: {}, Status: {}, Response: {}",
+                    resource_group, name, status, error_text
+                )));
+            }
+
+            let response_json: serde_json::Value = response.json().await.map_err(|e| {
+                AppError::NetworkError(format!("Failed to parse Azure API response. Error: {}", e))
+            })?;
+
+            // Extract VM Scale Set ID from response
+            let vmss_id = response_json
+                .get("id")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| format!(
+                    "/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}",
+                    subscription_id, resource_group, name
+                ));
+
+            info!(
+                "Created VM Scale Set: {} in resource group {} / subscription {}",
+                vmss_id, resource_group, subscription_id
+            );
+
+            return Ok(vmss_id);
         }
 
+        // Fallback for non-cloud-sdk feature
         info!(
-            "Creating VM Scale Set: {} / {} in subscription {} (placeholder)",
+            "Creating VM Scale Set: {} / {} in subscription {} (placeholder - cloud-sdk feature disabled)",
             resource_group,
             name,
             self.subscription_id.as_deref().unwrap_or("default")
