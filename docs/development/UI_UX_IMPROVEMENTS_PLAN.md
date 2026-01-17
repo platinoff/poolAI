@@ -529,10 +529,21 @@ cargo test --features enterprise -- --nocapture
 
 ## 🚀 Next Immediate Steps (This Week)
 
+### Priority 0: Critical Bug Fixes (Quick Click Test Issues) ⚠️
+1. **Day 1**: Fix modal dialogs and buttons (showModal/hideModal, onclick handlers, focus trap)
+2. **Day 2**: Fix authentication boxes and authorization UI issues
+3. **Day 3**: OAuth2 Integration - GitHub OAuth2
+4. **Day 4**: OAuth2 Integration - Google OAuth2
+5. **Day 5**: OAuth2 Integration - Telegram OAuth2
+6. **Day 6-7**: Admin panel CRUD operations fixes and improvements
+
+### Original Plan (Postponed):
 1. **Day 1-2**: Audit CSS variables, create design tokens
 2. **Day 3-4**: Implement typography & spacing system
 3. **Day 5**: Component consistency review
 4. **Day 6-7**: Error handling & user feedback improvements
+
+**See**: [`UI_BUGFIXES_AND_OAUTH_PLAN.md`](UI_BUGFIXES_AND_OAUTH_PLAN.md) for detailed bug fixes plan
 
 ---
 
