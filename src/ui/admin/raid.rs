@@ -198,14 +198,15 @@ pub async fn admin_raid() -> Html<String> {
       }
       
       try {
-        // Note: Restore functionality would need to be implemented in backend
-        // For now, we'll show a notification that this feature is pending
-        showNotification('Restore from snapshot - backend implementation pending', 'info');
-        // await fetchJson('/api/v1/raid/snapshot/restore', { method: 'POST' });
-        // showNotification('Restored from snapshot successfully', 'success');
-        // loadRaidArtifacts();
+        showLoading('raid-artifacts', 'Restoring from snapshot...');
+        await fetchJson('/api/v1/raid/snapshot/restore', { method: 'POST' });
+        showNotification('Restored from snapshot successfully', 'success');
+        setTimeout(() => {
+          loadRaidArtifacts();
+        }, 1000);
       } catch (e) {
         showNotification('Error restoring from snapshot: ' + e.message, 'error');
+        hideLoading('raid-artifacts');
       }
     }
     
