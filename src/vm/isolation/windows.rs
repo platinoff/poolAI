@@ -7,6 +7,8 @@ use crate::core::error::AppError;
 use crate::vm::isolation::{
     FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
 };
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 use tracing::{info, warn};
 
 /// Windows AppContainer state tracking for isolation support
@@ -16,7 +18,7 @@ use tracing::{info, warn};
 #[cfg(windows)]
 #[derive(Debug, Clone)]
 #[allow(dead_code)] // Fields will be used when full Windows isolation is implemented
-struct AppContainerState {
+pub struct AppContainerState {
     /// AppContainer SID (Security Identifier)
     /// Created by CreateAppContainerProfile()
     appcontainer_sid: Option<String>,
@@ -43,17 +45,40 @@ impl AppContainerState {
 
 /// Windows network isolator using AppContainers and Windows Firewall
 pub struct WindowsNetworkIsolator {
-    // Note: AppContainer state tracking would require interior mutability (RefCell/Mutex)
-    // TODO: Add RefCell<HashMap<u32, AppContainerState>> for state tracking when implementing full Windows isolation
-    // #[cfg(windows)]
-    // appcontainer_states: std::cell::RefCell<std::collections::HashMap<u32, AppContainerState>>,
+    /// AppContainer state tracking for isolation support
+    /// Using Arc<Mutex<HashMap>> for thread-safe access (required for Send + Sync)
+    /// Note: Using Mutex instead of RwLock because trait methods are synchronous (not async)
+    appcontainer_states: Arc<Mutex<HashMap<u32, AppContainerState>>>,
 }
 
 impl WindowsNetworkIsolator {
     pub fn new() -> Self {
         Self {
-            // TODO: Initialize RefCell<HashMap> when implementing state tracking
+            appcontainer_states: Arc::new(Mutex::new(HashMap::new())),
         }
+    }
+
+    /// Get AppContainer state for a process
+    ///
+    /// Returns the state of the AppContainer associated with the given process ID.
+    pub fn get_appcontainer_state(&self, process_id: u32) -> Option<AppContainerState> {
+        self.appcontainer_states
+            .lock()
+            .unwrap()
+            .get(&process_id)
+            .cloned()
+    }
+
+    /// List all AppContainer states
+    ///
+    /// Returns a vector of all AppContainer states.
+    pub fn list_appcontainer_states(&self) -> Vec<(u32, AppContainerState)> {
+        self.appcontainer_states
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|(k, v)| (*k, v.clone()))
+            .collect()
     }
 }
 
@@ -138,11 +163,9 @@ impl NetworkIsolator for WindowsNetworkIsolator {
                 process_id
             );
 
-            // Store AppContainer state for this process (even though not fully implemented yet)
-            // Note: In a full implementation, we would use RefCell or Mutex for interior mutability
-            // since trait methods require &self. For now, we'll log but not store the state.
-            // TODO: Add RefCell<HashMap<u32, AppContainerState>> for state tracking
-            let _ = _appcontainer_state; // Suppress unused variable warning
+            // Store AppContainer state for this process
+            let mut states = self.appcontainer_states.lock().unwrap();
+            states.insert(process_id, _appcontainer_state);
         }
 
         #[cfg(not(windows))]
@@ -168,9 +191,8 @@ impl NetworkIsolator for WindowsNetworkIsolator {
         #[cfg(windows)]
         {
             // Get AppContainer state for this process
-            // Note: In a full implementation, we would retrieve state from RefCell/Mutex
-            // TODO: Add RefCell<HashMap<u32, AppContainerState>> for state tracking
-            // For now, we'll just log the cleanup intent
+            let mut states = self.appcontainer_states.lock().unwrap();
+            let _appcontainer_state = states.remove(&process_id);
 
             // 1. Clean up WFP filters using WFP API
             // Note: In a full implementation, we would:
@@ -228,17 +250,40 @@ impl NetworkIsolator for WindowsNetworkIsolator {
 
 /// Windows filesystem isolator using AppContainers and file system redirection
 pub struct WindowsFilesystemIsolator {
-    // Note: AppContainer state tracking would require interior mutability (RefCell/Mutex)
-    // TODO: Add RefCell<HashMap<u32, AppContainerState>> for state tracking when implementing full Windows isolation
-    // #[cfg(windows)]
-    // appcontainer_states: std::cell::RefCell<std::collections::HashMap<u32, AppContainerState>>,
+    /// AppContainer state tracking for isolation support
+    /// Using Arc<Mutex<HashMap>> for thread-safe access (required for Send + Sync)
+    /// Note: Using Mutex instead of RwLock because trait methods are synchronous (not async)
+    appcontainer_states: Arc<Mutex<HashMap<u32, AppContainerState>>>,
 }
 
 impl WindowsFilesystemIsolator {
     pub fn new() -> Self {
         Self {
-            // TODO: Initialize RefCell<HashMap> when implementing state tracking
+            appcontainer_states: Arc::new(Mutex::new(HashMap::new())),
         }
+    }
+
+    /// Get AppContainer state for a process
+    ///
+    /// Returns the state of the AppContainer associated with the given process ID.
+    pub fn get_appcontainer_state(&self, process_id: u32) -> Option<AppContainerState> {
+        self.appcontainer_states
+            .lock()
+            .unwrap()
+            .get(&process_id)
+            .cloned()
+    }
+
+    /// List all AppContainer states
+    ///
+    /// Returns a vector of all AppContainer states.
+    pub fn list_appcontainer_states(&self) -> Vec<(u32, AppContainerState)> {
+        self.appcontainer_states
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|(k, v)| (*k, v.clone()))
+            .collect()
     }
 }
 
@@ -338,11 +383,9 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
                 process_id
             );
 
-            // Store AppContainer state for this process (even though not fully implemented yet)
-            // Note: In a full implementation, we would use RefCell or Mutex for interior mutability
-            // since trait methods require &self. For now, we'll log but not store the state.
-            // TODO: Add RefCell<HashMap<u32, AppContainerState>> for state tracking
-            let _ = _appcontainer_state; // Suppress unused variable warning
+            // Store AppContainer state for this process
+            let mut states = self.appcontainer_states.lock().unwrap();
+            states.insert(process_id, _appcontainer_state);
         }
 
         #[cfg(not(windows))]
@@ -368,9 +411,8 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
         #[cfg(windows)]
         {
             // Get AppContainer state for this process
-            // Note: In a full implementation, we would retrieve state from RefCell/Mutex
-            // TODO: Add RefCell<HashMap<u32, AppContainerState>> for state tracking
-            // For now, we'll just log the cleanup intent
+            let mut states = self.appcontainer_states.lock().unwrap();
+            let _appcontainer_state = states.remove(&process_id);
 
             // 1. Clean up ACLs (Access Control Lists)
             // Note: In a full implementation, we would:

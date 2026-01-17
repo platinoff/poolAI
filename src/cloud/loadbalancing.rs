@@ -527,46 +527,13 @@ impl LoadBalancer {
 
     /// Check health of a single backend
     async fn check_backend_health(&self, backend: &Backend, config: &HealthCheckConfig) -> bool {
-        #[cfg(feature = "cloud-sdk")]
-        {
-            // Try Kubernetes pod health check first
-            if let Some(ref k8s_manager) = self.k8s_manager {
-                // Check if backend is a Kubernetes pod
-                if let Ok(pod_status) = k8s_manager.get_pod_status(&backend.id).await {
-                    if pod_status.ready && pod_status.phase == "Running" {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // Fallback: HTTP health check
-        #[cfg(feature = "cloud-sdk")]
-        {
-            if let Some(ref path) = config.path {
-                let url = format!("http://{}:{}{}", backend.address, backend.port, path);
-                let client = reqwest::Client::builder()
-                    .timeout(Duration::from_secs(config.timeout_secs))
-                    .build();
-
-                if let Ok(client) = client {
-                    if let Ok(result) = timeout(
-                        Duration::from_secs(config.timeout_secs),
-                        client.get(&url).send(),
-                    )
-                    .await
-                    {
-                        if let Ok(response) = result {
-                            return response.status().is_success();
-                        }
-                    }
-                }
-            }
-        }
-
-        // If no health check path configured, assume healthy
-        // (for TCP-only backends)
-        true
+        Self::check_backend_health_static(
+            backend,
+            config,
+            #[cfg(feature = "cloud-sdk")]
+            self.k8s_manager.as_ref(),
+        )
+        .await
     }
 
     /// List all registered backends

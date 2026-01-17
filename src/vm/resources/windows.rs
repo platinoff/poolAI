@@ -10,14 +10,47 @@
 
 use crate::core::error::AppError;
 use crate::vm::resources::{ResourceLimits, ResourceUsage};
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
+
+/// Windows Job Object state tracking
+///
+/// Stores Job Object handle and metadata for proper cleanup and state queries.
+#[derive(Debug, Clone)]
+pub struct JobObjectState {
+    /// Job Object handle (stored as usize for Send + Sync safety)
+    pub handle: usize,
+    /// Process ID associated with this Job Object
+    pub process_id: Uuid,
+    /// Applied CPU limits (cores)
+    pub cpu_cores: Option<u16>,
+    /// Applied memory limits (MB)
+    pub memory_mb: Option<u32>,
+    /// When the Job Object was created
+    pub created_at: DateTime<Utc>,
+    /// Whether the process is assigned to the Job Object
+    pub process_assigned: bool,
+}
+
+impl JobObjectState {
+    /// Create a new Job Object state
+    pub fn new(handle: usize, process_id: Uuid) -> Self {
+        Self {
+            handle,
+            process_id,
+            cpu_cores: None,
+            memory_mb: None,
+            created_at: Utc::now(),
+            process_assigned: false,
+        }
+    }
+}
 
 /// Windows Job Object manager for resource limiting
 pub struct WindowsJobObjectLimiter {
-    /// Mapping from process_id (Uuid) to Job Object handles
-    /// Using usize to store HANDLE values (HANDLE is *mut c_void which can be converted to usize)
-    /// We store as usize to make it Send + Sync safe
-    job_objects: std::sync::Arc<tokio::sync::RwLock<std::collections::HashMap<Uuid, usize>>>,
+    /// Mapping from process_id (Uuid) to Job Object state
+    /// Using Arc<RwLock<HashMap>> for thread-safe access
+    job_objects: std::sync::Arc<tokio::sync::RwLock<std::collections::HashMap<Uuid, JobObjectState>>>,
 }
 
 impl WindowsJobObjectLimiter {
@@ -34,7 +67,9 @@ impl WindowsJobObjectLimiter {
         #[cfg(target_os = "windows")]
         {
             Ok(Self {
-                job_objects: std::sync::Arc::new(tokio::sync::RwLock::new(std::collections::HashMap::new())),
+                job_objects: std::sync::Arc::new(tokio::sync::RwLock::new(
+                    std::collections::HashMap::new(),
+                )),
             })
         }
     }
@@ -69,10 +104,11 @@ impl WindowsJobObjectLimiter {
             // For now, return a placeholder handle ID
             // In real implementation, this would be the actual HANDLE value
             let handle_id = process_id.as_u128() as u64 as usize;
-            
+
             let mut job_objects = self.job_objects.write().await;
-            job_objects.insert(process_id, handle_id);
-            
+            let state = JobObjectState::new(handle_id, process_id);
+            job_objects.insert(process_id, state.clone());
+
             tracing::info!("Created Job Object placeholder for process {}", process_id);
             Ok(handle_id)
         }
@@ -94,6 +130,18 @@ impl WindowsJobObjectLimiter {
     ) -> Result<(), AppError> {
         #[cfg(target_os = "windows")]
         {
+            // Update Job Object state with CPU limits
+            let mut job_objects = self.job_objects.write().await;
+            if let Some(state) = job_objects.get_mut(&process_id) {
+                state.cpu_cores = Some(cpu_cores);
+            } else {
+                // Create Job Object if it doesn't exist
+                let handle_id = self.create_job_object(process_id).await?;
+                if let Some(state) = job_objects.get_mut(&process_id) {
+                    state.cpu_cores = Some(cpu_cores);
+                }
+            }
+
             // Future improvement: Implement actual CPU limits using Job Objects
             // 1. Get or create Job Object for this process
             //    - Retrieve HANDLE from job_objects HashMap
@@ -115,18 +163,18 @@ impl WindowsJobObjectLimiter {
             //        CpuRate: (cpu_cores as u32) * 100,
             //    };
             //    unsafe { SetInformationJobObject(job_handle, JobObjectCpuRateControlInformation, &cpu_info)? }
-            
+
             // For now, just log the request
             tracing::info!(
                 "Windows CPU limits requested for process {} (PID {}): {} cores",
                 process_id, _pid, cpu_cores
             );
-            
+
             // Placeholder: In real implementation, we would:
             // 1. Create or get Job Object handle
             // 2. Set JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
             // 3. Call SetInformationJobObject
-            
+
             Ok(())
         }
 
@@ -147,25 +195,37 @@ impl WindowsJobObjectLimiter {
     ) -> Result<(), AppError> {
         #[cfg(target_os = "windows")]
         {
+            // Update Job Object state with memory limits
+            let mut job_objects = self.job_objects.write().await;
+            if let Some(state) = job_objects.get_mut(&process_id) {
+                state.memory_mb = Some(memory_mb);
+            } else {
+                // Create Job Object if it doesn't exist
+                let _handle_id = self.create_job_object(process_id).await?;
+                if let Some(state) = job_objects.get_mut(&process_id) {
+                    state.memory_mb = Some(memory_mb);
+                }
+            }
+
             // Future improvement: Implement actual memory limits using Job Objects
             // 1. Get or create Job Object for this process
             //    - Retrieve HANDLE from job_objects HashMap
             //    - If not found, create new Job Object using create_job_object()
             // 2. Use SetInformationJobObject with JOBOBJECT_EXTENDED_LIMIT_INFORMATION
             // 3. Set ProcessMemoryLimit to memory_mb * 1024 * 1024 (bytes)
-            
+
             // For now, just log the request
             tracing::info!(
                 "Windows memory limits requested for process {} (PID {}): {} MB",
                 process_id, _pid, memory_mb
             );
-            
+
             // Placeholder: In real implementation, we would:
             // 1. Create or get Job Object handle
             // 2. Set JOBOBJECT_EXTENDED_LIMIT_INFORMATION
             // 3. Set ProcessMemoryLimit
             // 4. Call SetInformationJobObject
-            
+
             Ok(())
         }
 
@@ -185,6 +245,18 @@ impl WindowsJobObjectLimiter {
     ) -> Result<(), AppError> {
         #[cfg(target_os = "windows")]
         {
+            // Update Job Object state to mark process as assigned
+            let mut job_objects = self.job_objects.write().await;
+            if let Some(state) = job_objects.get_mut(&process_id) {
+                state.process_assigned = true;
+            } else {
+                // Create Job Object if it doesn't exist
+                let _handle_id = self.create_job_object(process_id).await?;
+                if let Some(state) = job_objects.get_mut(&process_id) {
+                    state.process_assigned = true;
+                }
+            }
+
             // Future improvement: Implement actual process assignment
             // 1. Get Job Object handle for this process_id
             //    - Retrieve HANDLE from job_objects HashMap
@@ -210,13 +282,13 @@ impl WindowsJobObjectLimiter {
             //    let process_handle = unsafe { OpenProcess(PROCESS_SET_QUOTA, false, pid)? };
             //    unsafe { AssignProcessToJobObject(job_handle, process_handle)? };
             //    unsafe { CloseHandle(process_handle)? };
-            
+
             // For now, just log the request
             tracing::info!(
                 "Windows Job Object assignment requested for process {} (PID {})",
                 process_id, _pid
             );
-            
+
             Ok(())
         }
 
@@ -232,10 +304,18 @@ impl WindowsJobObjectLimiter {
     async fn get_cpu_usage(&self, process_id: Uuid) -> Result<f64, AppError> {
         #[cfg(target_os = "windows")]
         {
+            // Check if Job Object state exists
+            let job_objects = self.job_objects.read().await;
+            if !job_objects.contains_key(&process_id) {
+                return Err(AppError::ValidationError(format!(
+                    "Job Object not found for process {}",
+                    process_id
+                )));
+            }
+
             // Future improvement: Implement actual CPU usage retrieval
             // 1. Get Job Object handle
-            //    - Retrieve HANDLE from job_objects HashMap
-            //    - Return error if job object not found
+            //    - Retrieve HANDLE from job_objects HashMap (already checked above)
             // 2. Query Job Object information using QueryInformationJobObject
             //    - Use JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION structure
             //    - Call QueryInformationJobObject(job_handle, JobObjectBasicAndIoAccountingInformation, &accounting_info)
@@ -256,9 +336,8 @@ impl WindowsJobObjectLimiter {
             //    unsafe { QueryInformationJobObject(job_handle, JobObjectBasicAndIoAccountingInformation, &mut accounting_info)? };
             //    let total_time = accounting_info.BasicInfo.TotalUserTime + accounting_info.BasicInfo.TotalKernelTime;
             //    let cpu_percent = calculate_cpu_percentage(total_time, previous_measurement, elapsed_time);
-            
+
             // For now, return 0.0
-            let _ = process_id;
             Ok(0.0)
         }
 
@@ -274,10 +353,18 @@ impl WindowsJobObjectLimiter {
     async fn get_memory_usage(&self, process_id: Uuid) -> Result<u32, AppError> {
         #[cfg(target_os = "windows")]
         {
+            // Check if Job Object state exists
+            let job_objects = self.job_objects.read().await;
+            if !job_objects.contains_key(&process_id) {
+                return Err(AppError::ValidationError(format!(
+                    "Job Object not found for process {}",
+                    process_id
+                )));
+            }
+
             // Future improvement: Implement actual memory usage retrieval
             // 1. Get Job Object handle
-            //    - Retrieve HANDLE from job_objects HashMap
-            //    - Return error if job object not found
+            //    - Retrieve HANDLE from job_objects HashMap (already checked above)
             // 2. Option A: Query Job Object information (aggregate for all processes in job)
             //    - Use QueryInformationJobObject with JOBOBJECT_EXTENDED_LIMIT_INFORMATION
             //    - Read PeakProcessMemoryUsed for peak memory usage
@@ -300,9 +387,8 @@ impl WindowsJobObjectLimiter {
             //    let mut mem_counters = PROCESS_MEMORY_COUNTERS_EX::default();
             //    unsafe { GetProcessMemoryInfo(process_handle, &mut mem_counters as *mut _ as *mut _, std::mem::size_of::<PROCESS_MEMORY_COUNTERS_EX>() as u32)? };
             //    let memory_mb = (mem_counters.WorkingSetSize / (1024 * 1024)) as u32;
-            
+
             // For now, return 0
-            let _ = process_id;
             Ok(0)
         }
 
@@ -376,5 +462,21 @@ impl WindowsJobObjectLimiter {
             gpu_percent: None,
             gpu_memory_mb: None,
         })
+    }
+
+    /// Get Job Object state for a process
+    ///
+    /// Returns the state of the Job Object associated with the given process ID.
+    pub async fn get_job_object_state(&self, process_id: Uuid) -> Option<JobObjectState> {
+        let job_objects = self.job_objects.read().await;
+        job_objects.get(&process_id).cloned()
+    }
+
+    /// List all Job Object states
+    ///
+    /// Returns a vector of all Job Object states.
+    pub async fn list_job_object_states(&self) -> Vec<JobObjectState> {
+        let job_objects = self.job_objects.read().await;
+        job_objects.values().cloned().collect()
     }
 }
