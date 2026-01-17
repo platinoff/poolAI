@@ -16,11 +16,10 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::core::model_interface::ModelInfo;
-use crate::network::api::common::check_permission;
+use crate::core::model_interface::{GpuRequirements, ModelInfo};
 use crate::network::auth::Claims;
 use crate::runtime::instance::{
-    get_global_instance_manager, InstanceManager, InstancePlacement, InstanceStatus,
+    get_global_instance_manager, InstancePlacement,
 };
 
 /// Instance preview response
@@ -112,9 +111,12 @@ async fn instance_previews_handler(
         let model_info = ModelInfo {
             name: model_id.clone(),
             version: "1.0".to_string(),
-            description: None,
-            parameters: 1000000, // Placeholder
-            gpu_requirements: crate::core::model_interface::GpuRequirements {
+            capabilities: vec!["text-generation".to_string()],
+            max_tokens: 2048,
+            supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
+            model_size_mb: 2000,
+            supported_languages: vec!["en".to_string()],
+            gpu_requirements: GpuRequirements {
                 min_memory_mb: 1000,
                 recommended_memory_mb: 2000,
                 supported_architectures: vec!["CUDA".to_string()],
@@ -226,19 +228,18 @@ async fn instance_list_handler() -> impl IntoResponse {
         let manager = manager_arc.read().await;
         let instances = manager.list_instances().await;
 
-        let instance_infos: Vec<InstanceInfo> = instances
-            .into_iter()
-            .map(|instance| {
-                let status = instance.status.read().await.clone();
-                InstanceInfo {
-                    instance_id: instance.instance_id.clone(),
-                    model_id: instance.model_id.clone(),
-                    status: format!("{:?}", status),
-                    created_at: instance.created_at.to_rfc3339(),
-                    placement: instance.placement.clone(),
-                }
-            })
-            .collect();
+        // Collect instance infos with async status reading
+        let mut instance_infos = Vec::new();
+        for instance in instances {
+            let status = instance.status.read().await.clone();
+            instance_infos.push(InstanceInfo {
+                instance_id: instance.instance_id.clone(),
+                model_id: instance.model_id.clone(),
+                status: format!("{:?}", status),
+                created_at: instance.created_at.to_rfc3339(),
+                placement: instance.placement.clone(),
+            });
+        }
 
         let response = InstanceListResponse {
             instances: instance_infos,
@@ -322,20 +323,19 @@ async fn state_handler() -> impl IntoResponse {
         let manager = manager_arc.read().await;
         let instances = manager.list_instances().await;
 
-        let state: HashMap<String, serde_json::Value> = instances
-            .into_iter()
-            .map(|instance| {
-                let status = instance.status.read().await.clone();
-                (
-                    instance.instance_id.clone(),
-                    serde_json::json!({
-                        "model_id": instance.model_id,
-                        "status": format!("{:?}", status),
-                        "created_at": instance.created_at.to_rfc3339(),
-                    }),
-                )
-            })
-            .collect();
+        // Collect state with async status reading
+        let mut state = HashMap::new();
+        for instance in instances {
+            let status = instance.status.read().await.clone();
+            state.insert(
+                instance.instance_id.clone(),
+                serde_json::json!({
+                    "model_id": instance.model_id,
+                    "status": format!("{:?}", status),
+                    "created_at": instance.created_at.to_rfc3339(),
+                }),
+            );
+        }
 
         (StatusCode::OK, Json(state)).into_response()
     } else {
