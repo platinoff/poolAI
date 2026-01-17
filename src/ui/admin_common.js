@@ -130,36 +130,150 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// Modal system
+// Modal system - Enhanced with overlay support and accessibility
+let activeModal = null;
+let activeOverlay = null;
+let previousActiveElement = null;
+
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) {
-    const overlay = modal.closest('.modal-overlay') || createModalOverlay(modal);
-    overlay.classList.add('active');
+  if (!modal) {
+    console.warn('Modal not found:', modalId);
+    return;
   }
+  
+  // Store previous active element for focus restoration
+  previousActiveElement = document.activeElement;
+  
+  // Check if modal is already in an overlay
+  let overlay = modal.closest('.modal-overlay');
+  
+  // Create overlay if it doesn't exist
+  if (!overlay) {
+    overlay = createModalOverlay(modal);
+  }
+  
+  // Set ARIA attributes
+  modal.setAttribute('aria-hidden', 'false');
+  modal.setAttribute('aria-modal', 'true');
+  overlay.classList.add('active');
+  
+  activeModal = modal;
+  activeOverlay = overlay;
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+  
+  // Focus first focusable element after a short delay
+  setTimeout(() => {
+    const focusableElements = modal.querySelectorAll(
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusableElements.length > 0) {
+      focusableElements[0].focus();
+    }
+  }, 100);
+  
+  // Trap focus within modal
+  modal.addEventListener('keydown', trapModalFocus);
+  
+  // Close on Escape key (global listener already handled in main UI)
+  document.addEventListener('keydown', handleModalEscape);
 }
 
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (modal) {
-    const overlay = modal.closest('.modal-overlay');
-    if (overlay) {
-      overlay.classList.remove('active');
+  if (!modal) {
+    console.warn('Modal not found:', modalId);
+    return;
+  }
+  
+  // Remove ARIA attributes
+  modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('aria-modal', 'false');
+  
+  // Hide overlay
+  const overlay = modal.closest('.modal-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
+  
+  // Remove focus trap
+  if (activeModal) {
+    activeModal.removeEventListener('keydown', trapModalFocus);
+  }
+  
+  document.removeEventListener('keydown', handleModalEscape);
+  
+  // Restore previous focus
+  if (previousActiveElement) {
+    previousActiveElement.focus();
+    previousActiveElement = null;
+  }
+  
+  activeModal = null;
+  activeOverlay = null;
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+function createModalOverlay(modal) {
+  // Check if overlay already exists
+  let overlay = document.getElementById('modal-overlay-global');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-overlay-global';
+    overlay.className = 'modal-overlay';
+    document.body.appendChild(overlay);
+    
+    // Close modal on backdrop click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay && activeModal) {
+        hideModal(activeModal.id);
+      }
+    });
+  }
+  
+  // Move modal to overlay if not already there
+  if (modal.parentElement !== overlay) {
+    overlay.appendChild(modal);
+  }
+  
+  return overlay;
+}
+
+function trapModalFocus(e) {
+  if (!activeModal || e.key !== 'Tab') return;
+  
+  const focusableElements = Array.from(activeModal.querySelectorAll(
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  ));
+  
+  if (focusableElements.length === 0) return;
+  
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+  
+  if (e.shiftKey) {
+    // Shift + Tab
+    if (document.activeElement === firstElement) {
+      e.preventDefault();
+      lastElement.focus();
+    }
+  } else {
+    // Tab
+    if (document.activeElement === lastElement) {
+      e.preventDefault();
+      firstElement.focus();
     }
   }
 }
 
-function createModalOverlay(modal) {
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.onclick = (e) => {
-    if (e.target === overlay) {
-      overlay.classList.remove('active');
-    }
-  };
-  modal.parentNode.insertBefore(overlay, modal);
-  overlay.appendChild(modal);
-  return overlay;
+function handleModalEscape(e) {
+  if (e.key === 'Escape' && activeModal) {
+    hideModal(activeModal.id);
+  }
 }
 
 // Tab system
