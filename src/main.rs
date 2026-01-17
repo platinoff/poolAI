@@ -20,15 +20,78 @@ use std::net::SocketAddr;
 use tokio::signal;
 use tracing::{error, info};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// Get optimal number of worker threads for tokio runtime
+///
+/// Uses environment variable TOKIO_WORKER_THREADS if set,
+/// otherwise defaults to number of CPU cores (detected at runtime).
+fn get_worker_threads() -> usize {
+    std::env::var("TOKIO_WORKER_THREADS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or_else(|| {
+            // Use available_parallelism() (Rust 1.59+)
+            // Fallback to 4 if unavailable
+            std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(4)
+        })
+}
+
+/// Get optimal blocking pool size for tokio runtime
+///
+/// Uses environment variable TOKIO_BLOCKING_THREADS if set,
+/// otherwise defaults to 2 * worker_threads for blocking I/O operations.
+fn get_blocking_threads(worker_threads: usize) -> usize {
+    std::env::var("TOKIO_BLOCKING_THREADS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or_else(|| worker_threads.max(2).saturating_mul(2))
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Configure tokio runtime with optimal settings for production
+    let worker_threads = get_worker_threads();
+    let blocking_threads = get_blocking_threads(worker_threads);
+
+    // Build tokio runtime with performance-optimized settings
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(worker_threads)
+        .max_blocking_threads(blocking_threads)
+        .thread_name("poolai-worker")
+        .thread_stack_size(3 * 1024 * 1024) // 3MB stack per thread (default is 2MB)
+        .enable_all()
+        .build()
+        .map_err(|e| format!("Failed to create tokio runtime: {}", e))?;
+
+    runtime.block_on(async_main())
+}
+
+async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize tracing subscriber for logging
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
+    // Log runtime configuration for debugging
+    let worker_threads = std::env::var("TOKIO_WORKER_THREADS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or_else(|| {
+            std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(4)
+        });
+    let blocking_threads = std::env::var("TOKIO_BLOCKING_THREADS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or_else(|| worker_threads.max(2).saturating_mul(2));
+
     info!("🚀 Starting PoolAI v{}", APP_VERSION);
     info!("📅 Build time: {}", BUILD_TIME);
+    info!(
+        "⚙️  Tokio runtime: {} worker threads, {} blocking threads",
+        worker_threads, blocking_threads
+    );
 
     // Initialize uptime tracking
     poolai::version::initialize_start_time();
