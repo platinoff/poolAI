@@ -32,7 +32,7 @@ struct PeerResponse {
 pub fn create_discovery_routes() -> Router {
     Router::new()
         .route("/discovery/peers", get(peers_handler))
-        .route("/discovery/peers/:peer_id", get(peer_handler))
+        .route("/discovery/peers/{peer_id}", get(peer_handler))
         .route("/discovery/register", post(register_handler))
 }
 

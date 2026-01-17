@@ -81,11 +81,11 @@ pub fn create_instance_routes() -> Router {
         )
         .route("/instance", get(instance_list_handler))
         .route(
-            "/instance/:id",
+            "/instance/{id}",
             delete(instance_delete_handler)
                 .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
         )
-        .route("/instance/:id", get(instance_get_handler))
+        .route("/instance/{id}", get(instance_get_handler))
         .route("/state", get(state_handler))
 }
 
