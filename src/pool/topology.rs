@@ -59,7 +59,9 @@ pub struct TopologyManager {
     topology: Arc<RwLock<Topology>>,
     /// Latency measurement timeout (seconds)
     latency_timeout_secs: u64,
-    /// Interval for topology updates (seconds)
+    // Note: update_interval_secs is configured in main.rs topology update task
+    // Stored here for future use in self-managed update loops
+    #[allow(dead_code)]
     update_interval_secs: u64,
 }
 
