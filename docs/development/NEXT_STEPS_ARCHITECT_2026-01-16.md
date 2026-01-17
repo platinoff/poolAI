@@ -194,6 +194,72 @@
 
 ---
 
+## 🎨 Пріоритет 4: UI/UX Enhancement (9-10 тижнів) ⭐⭐⭐
+
+**Поточний прогрес**: Basic Implementation 100% ✅, Design Quality 75% 🔄, UX Optimization 70% 🔄, Testing 0% ⏳
+
+**Детальний план**: Дивіться [`UI_UX_IMPROVEMENTS_PLAN.md`](./UI_UX_IMPROVEMENTS_PLAN.md)
+
+### 4.1 Design System & Consistency (5-7 днів) ⭐⭐⭐
+
+**Завдання**:
+- [ ] CSS Variables & Theme System Enhancement (design tokens, theme preview)
+- [ ] Typography & Spacing System (consistent scale, responsive)
+- [ ] Component Consistency (buttons, forms, tables, modals, cards)
+
+**Файли для редагування**:
+- `src/ui/themes.rs` - design tokens, theme system
+- `src/ui/components.rs` - component styles
+- `src/ui/mod.rs` - BASE_CSS variables
+- `src/ui/admin_styles.css` - admin-specific styles
+
+**Критерії успіху**:
+- ✅ 100% CSS variable usage (no hardcoded colors)
+- ✅ Consistent spacing (4px base unit)
+- ✅ Typography scale (6 sizes: xs, sm, base, lg, xl, 2xl)
+- ✅ Component library documented
+
+### 4.2 UX Enhancements (7-10 днів) ⭐⭐
+
+**Завдання**:
+- [ ] Error Handling & User Feedback (enhanced messages, toast notifications)
+- [ ] Loading States & Performance (skeleton loaders, lazy loading)
+- [ ] User Experience Improvements (breadcrumbs, tooltips, keyboard shortcuts)
+
+**Implementation**:
+- Add `showToast()` function (success, error, warning, info)
+- Create `SkeletonLoader` component
+- Implement virtual scrolling for large tables
+- Add breadcrumb navigation
+
+### 4.3 Testing & Quality Assurance (7-10 днів) ⭐⭐
+
+**Завдання**:
+- [ ] E2E Testing (Playwright/Cypress setup, critical user flows)
+- [ ] Visual Regression Testing (screenshots, theme variations, browsers)
+- [ ] Accessibility Testing (automated + manual, WCAG AA compliance)
+
+**Tools**:
+- Playwright (E2E testing)
+- Percy/Chromatic or Playwright screenshots (visual regression)
+- axe-core/pa11y (accessibility testing)
+
+**Test Files**:
+- `tests/ui/e2e/login.spec.ts`
+- `tests/ui/e2e/dashboard.spec.ts`
+- `tests/ui/e2e/admin.spec.ts`
+- `tests/ui/e2e/responsive.spec.ts`
+
+### 4.4 Advanced Features (10-14 днів) ⭐
+
+**Завдання**:
+- [ ] Data Visualization (charts, real-time graphs, resource usage)
+- [ ] Advanced Tables (sortable, filterable, exportable)
+- [ ] Search & Filtering Enhancements (advanced search, saved filters)
+- [ ] User Preferences & Customization (settings page, dashboard layout)
+
+---
+
 ## 📊 Параметри запуску
 
 ### Базовий запуск (без features):
@@ -211,10 +277,19 @@ cargo run --features https
 cargo run --features jwt
 ```
 
-### З Enterprise Features:
+### З Enterprise Features (Admin Panel):
 ```bash
 cargo run --features enterprise
 ```
+- Access UI: `http://localhost:8080/ui`
+- Access Admin Panel: `http://localhost:8080/admin`
+- Admin routes: `/admin/dashboard`, `/admin/users`, `/admin/tenants`, `/admin/workers`, `/admin/vm`, `/admin/raid`, `/admin/config`, `/admin/security`, `/admin/monitoring`, `/admin/audit`
+
+### З Enterprise Features + HTTPS:
+```bash
+cargo run --features enterprise,https
+```
+- Access Admin Panel: `https://localhost:8443/admin`
 
 ### З Cloud Integration (без SDK):
 ```bash
