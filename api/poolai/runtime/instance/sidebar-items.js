@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["InstanceStatus","PlacementStrategy"],"fn":["get_global_instance_manager","initialize_global_instance_manager"],"struct":["DefaultPlacementCalculator","InstanceManager","InstancePlacement","ModelInstance"],"trait":["PlacementCalculator"]};
