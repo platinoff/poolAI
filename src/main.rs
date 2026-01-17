@@ -121,6 +121,11 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     libs::initialize().await?;
     info!("✅ Library management module initialized");
 
+    // Initialize global model manager (for instance integration)
+    core::model_interface::initialize_global_model_manager()
+        .map_err(|e| format!("Failed to initialize model manager: {}", e))?;
+    info!("✅ Model manager initialized");
+
     // Initialize runtime module
     info!("Initializing runtime module...");
     let runtime_config = RuntimeConfig::default();

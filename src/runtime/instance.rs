@@ -221,12 +221,39 @@ impl InstanceManager {
         instance_id: &str,
         model_id: &str,
     ) -> Result<(), AppError> {
-        // TODO: In real implementation, this would:
-        // 1. Check ModelManager for registered models
-        // 2. Check LibraryManager for model libraries
-        // 3. Load model using ModelInterface
-        // For now, this is a placeholder that doesn't fail
-        info!("Attempting to load model {} for instance {} (placeholder)", model_id, instance_id);
+        // Try to find model in ModelManager first
+        if let Some(model_manager) = crate::core::model_interface::get_global_model_manager() {
+            let manager = model_manager.read().await;
+            if manager.get_model(model_id).is_some() {
+                // Model found in ModelManager - we can't clone Box<dyn ModelInterface>
+                // So we store a reference that the instance can use
+                // Note: In production, we'd need a different approach (e.g., model registry with Arc)
+                info!("Model {} found in ModelManager for instance {}", model_id, instance_id);
+                
+                // Update instance to mark model as available (though we can't store it directly)
+                // The instance will need to query ModelManager when processing requests
+                // This is a limitation of the current architecture - models are owned by ModelManager
+                return Ok(());
+            }
+        }
+        
+        // Try to find model library in LibraryManager
+        if let Some(lib_manager) = crate::libs::get_global_manager() {
+            let manager = lib_manager.read().await;
+            if let Some(_library) = manager.get_library(model_id).await {
+                info!("Model library {} found for instance {} (model loading from library not yet implemented)", model_id, instance_id);
+                // TODO: Load model from library (requires ModelInterface implementation for library models)
+                // For now, we just note that the library exists
+                return Ok(());
+            }
+        }
+        
+        // Model not found - log but don't fail (instance can still be created without loaded model)
+        warn!(
+            "Model {} not found in ModelManager or LibraryManager for instance {}. \
+            Instance will be created but model processing will fail until model is registered.",
+            model_id, instance_id
+        );
         Ok(())
     }
 
@@ -303,7 +330,7 @@ impl InstanceManager {
             .get(instance_id)
             .ok_or_else(|| AppError::ResourceError(format!("Instance '{}' not found", instance_id)))?;
 
-        // Check if model is loaded
+        // Try to use instance's model first (if directly stored)
         if let Some(model) = &instance.model {
             // Update last activity
             {
@@ -330,13 +357,46 @@ impl InstanceManager {
                 }
             }
 
-            Ok(response)
-        } else {
-            Err(AppError::ModelError(format!(
-                "Model not loaded for instance '{}'",
-                instance_id
-            )))
+            return Ok(response);
         }
+
+        // If model not stored in instance, try to get from ModelManager
+        if let Some(model_manager) = crate::core::model_interface::get_global_model_manager() {
+            let manager = model_manager.read().await;
+            if manager.get_model(&instance.model_id).is_some() {
+                // Update last activity
+                {
+                    let mut last_activity = instance.last_activity.write().await;
+                    *last_activity = Utc::now();
+                }
+
+                // Update status to Active
+                {
+                    let mut status = instance.status.write().await;
+                    if *status != InstanceStatus::Error(String::new()) {
+                        *status = InstanceStatus::Active;
+                    }
+                }
+
+                // Process request via ModelManager
+                let response = manager.process_request(&instance.model_id, request).await?;
+
+                // Update status back to Ready
+                {
+                    let mut status = instance.status.write().await;
+                    if *status == InstanceStatus::Active {
+                        *status = InstanceStatus::Ready;
+                    }
+                }
+
+                return Ok(response);
+            }
+        }
+
+        Err(AppError::ModelError(format!(
+            "Model '{}' not found in instance or ModelManager for instance '{}'",
+            instance.model_id, instance_id
+        )))
     }
 }
 

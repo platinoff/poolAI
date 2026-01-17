@@ -416,3 +416,38 @@ impl ModelManager {
         Ok(states)
     }
 }
+
+// Global model manager instance (for integration with instance manager)
+use std::sync::{Arc, OnceLock};
+use tokio::sync::RwLock;
+
+static GLOBAL_MODEL_MANAGER: OnceLock<Arc<RwLock<ModelManager>>> = OnceLock::new();
+
+/// Initialize global model manager
+pub fn initialize_global_model_manager() -> Result<(), AppError> {
+    use crate::core::config::ModelConfig as ConfigModelConfig;
+    
+    let config = ConfigModelConfig {
+        name: "global".to_string(),
+        path: "./models".to_string(),
+        max_batch_size: 32,
+        memory_limit: 4096,
+        temperature: 0.7,
+        max_tokens: 2048,
+        enable_cache: true,
+        cache_size: 512,
+    };
+    
+    let manager = ModelManager::new(config);
+    GLOBAL_MODEL_MANAGER
+        .set(Arc::new(RwLock::new(manager)))
+        .map_err(|_| AppError::ConfigError(
+            "Model manager already initialized".to_string()
+        ))?;
+    Ok(())
+}
+
+/// Get global model manager
+pub fn get_global_model_manager() -> Option<&'static Arc<RwLock<ModelManager>>> {
+    GLOBAL_MODEL_MANAGER.get()
+}
