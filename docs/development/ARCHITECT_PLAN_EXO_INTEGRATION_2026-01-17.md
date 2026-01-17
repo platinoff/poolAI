@@ -244,6 +244,48 @@
 
 ---
 
+## ⚠️ Відомі проблеми та placeholder implementations
+
+### 1. Model Instance Management - Placeholder Implementations
+
+#### Real Model Loading (70%)
+**Проблема**: `load_model_for_instance()` - placeholder, не завантажує реальні моделі  
+**Файл**: `src/runtime/instance.rs:224-229`  
+**Пріоритет**: Високий ⭐⭐⭐  
+**Оцінка**: 2-3 дні
+
+#### Streaming через Instance Models (70%)
+**Проблема**: `create_streaming_response_from_instance()` використовує fallback  
+**Файл**: `src/network/api/completions.rs:327`  
+**Пріоритет**: Середній ⭐⭐  
+**Оцінка**: 1-2 дні
+
+### 2. Topology Management - Placeholder Data
+
+#### Node Load Tracking (80%)
+**Проблема**: `current_load: 0.0` - завжди 0, не отримується з peer status  
+**Файл**: `src/pool/topology.rs:170`  
+**Пріоритет**: Середній ⭐⭐  
+**Оцінка**: 1-2 дні
+
+#### Discovery Capabilities (70%)
+**Проблема**: Local capabilities - placeholder  
+**Файл**: `src/network/discovery.rs:210`  
+**Пріоритет**: Середній ⭐⭐  
+**Оцінка**: 2-3 дні
+
+### 3. RAID System - Planned Features
+
+#### BurstRAID та SmallWorld Strategies (0%)
+**Проблема**: Placeholders, тільки Standard strategy реалізована  
+**Файл**: `src/raid/mod.rs:111-115`  
+**Пріоритет**: Низький ⭐  
+**Оцінка**: 5-7 днів (planned для v0.2.0+)
+
+**Детальний план доробки**: Див. `docs/development/STATUS_UPDATE_2026-01-17_FINAL.md`
+
+---
+
 ## 📊 Оновлений прогрес з інтеграцією exo
 
 ### Поточний стан (2026-01-17):
