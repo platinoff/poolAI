@@ -1509,8 +1509,11 @@ impl KubernetesManager {
             return Ok(events);
         }
 
-        // Placeholder implementation (when cloud-sdk feature is not enabled)
-        Ok(vec![])
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            // Placeholder implementation (when cloud-sdk feature is not enabled)
+            return Ok(vec![]);
+        }
     }
 
     /// Scale a Kubernetes Deployment (placeholder)
