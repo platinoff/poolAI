@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DiscoveryMessage"],"fn":["get_global_discovery_service","initialize_global_discovery"],"struct":["DiscoveryConfig","DiscoveryService","PeerCapabilities","PeerInfo"]};
+window.SIDEBAR_ITEMS = {"enum":["DiscoveryMessage"],"fn":["detect_local_capabilities","get_global_discovery_service","initialize_global_discovery"],"struct":["DiscoveryConfig","DiscoveryService","PeerCapabilities","PeerInfo"]};
