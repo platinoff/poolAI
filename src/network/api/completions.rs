@@ -222,7 +222,7 @@ async fn process_chat_completion(
             index: 0,
             message: ChatMessage {
                 role: "assistant".to_string(),
-                content: response_text,
+                content: response_text.clone(),
             },
             finish_reason: "stop".to_string(),
         }],
