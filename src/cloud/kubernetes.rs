@@ -1273,13 +1273,16 @@ impl KubernetesManager {
             });
         }
 
-        // Placeholder implementation (when cloud-sdk feature is not enabled)
-        Ok(PodStatus {
-            name: pod_name.to_string(),
-            phase: "Running".to_string(),
-            ready: true,
-            restart_count: 0,
-        })
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            // Placeholder implementation (when cloud-sdk feature is not enabled)
+            return Ok(PodStatus {
+                name: pod_name.to_string(),
+                phase: "Running".to_string(),
+                ready: true,
+                restart_count: 0,
+            });
+        }
     }
 
     /// Get status of a Kubernetes Deployment
