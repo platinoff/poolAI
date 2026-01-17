@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_global_topology_manager","initialize_global_topology_manager"],"struct":["NodeResources","Topology","TopologyManager"]};
