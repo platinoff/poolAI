@@ -6,7 +6,7 @@
 ## 📚 Аналіз exo проекту
 
 **Джерело**: [exo-explore/exo](https://github.com/exo-explore/exo) (Apache 2.0 License)  
-**Ліцензія**: Apache 2.0 ✅ (Sumisna для комерційного використання)  
+**Примітка**: exo використовується як референс для best practices (Apache 2.0)  
 **Концепція**: Run your own AI cluster at home with everyday devices
 
 ### Ключові фічі exo:
@@ -360,4 +360,5 @@
 **Підготовлено**: Rust Architect  
 **Дата**: 2026-01-17  
 **Версія**: 1.0 - Architect Plan з інтеграцією практик exo  
-**Ліцензія**: PoolAI (власна), exo reference (Apache 2.0)
+**Ліцензія PoolAI**: MIT License (див. [LICENSE](../../LICENSE))  
+**Ліцензія exo (reference)**: Apache 2.0
