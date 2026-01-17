@@ -248,10 +248,11 @@ impl InstanceManager {
             }
         }
         
-        // Model not found - log but don't fail (instance can still be created without loaded model)
+        // Model not found - provide detailed error information
         warn!(
-            "Model {} not found in ModelManager or LibraryManager for instance {}. \
-            Instance will be created but model processing will fail until model is registered.",
+            "Model '{}' not found in ModelManager or LibraryManager for instance '{}'. \
+            Instance will be created, but model processing requests will fail until model is registered. \
+            To resolve: 1) Register model in ModelManager via register_model(), or 2) Install model library via LibraryManager.",
             model_id, instance_id
         );
         Ok(())

@@ -118,7 +118,7 @@ async fn instance_previews_handler(
                     .map(|placement| InstancePreview {
                         model_id: model_id.clone(),
                         sharding: format!("{:?}", placement.strategy),
-                        instance_meta: "MlxRing".to_string(), // Placeholder
+                        instance_meta: format!("Placement: {:?}, Nodes: {:?}", placement.strategy, placement.node_ids),
                         instance: serde_json::json!({
                             "strategy": format!("{:?}", placement.strategy),
                             "node_ids": placement.node_ids,
