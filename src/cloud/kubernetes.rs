@@ -1675,8 +1675,11 @@ impl KubernetesManager {
             return Ok(names);
         }
 
-        // Placeholder implementation (when cloud-sdk feature is not enabled)
-        Ok(vec![])
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            // Placeholder implementation (when cloud-sdk feature is not enabled)
+            return Ok(vec![]);
+        }
     }
 
     /// List pods for a specific deployment
@@ -1763,8 +1766,11 @@ impl KubernetesManager {
             return Ok(names);
         }
 
-        // Placeholder implementation (when cloud-sdk feature is not enabled)
-        Ok(vec![])
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            // Placeholder implementation (when cloud-sdk feature is not enabled)
+            return Ok(vec![]);
+        }
     }
 
     /// List all deployments in the namespace
@@ -1823,8 +1829,11 @@ impl KubernetesManager {
             return Ok(names);
         }
 
-        // Placeholder implementation (when cloud-sdk feature is not enabled)
-        Ok(vec![])
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            // Placeholder implementation (when cloud-sdk feature is not enabled)
+            return Ok(vec![]);
+        }
     }
 
     /// List CRD resources from Kubernetes API

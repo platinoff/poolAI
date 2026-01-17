@@ -131,11 +131,11 @@ async fn test_security_headers_config_minimal() {
 #[tokio::test]
 async fn test_security_headers_config_custom() {
     let config = SecurityHeadersConfig::new(
-        Some("default-src 'self'".to_string()),      // content_security_policy
-        Some("max-age=31536000".to_string()),        // strict_transport_security
-        Some("SAMEORIGIN".to_string()),              // x_frame_options
-        Some("nosniff".to_string()),                 // x_content_type_options
-        Some("no-referrer".to_string()),             // referrer_policy
+        Some("default-src 'self'".to_string()), // content_security_policy
+        Some("max-age=31536000".to_string()),   // strict_transport_security
+        Some("SAMEORIGIN".to_string()),         // x_frame_options
+        Some("nosniff".to_string()),            // x_content_type_options
+        Some("no-referrer".to_string()),        // referrer_policy
     );
 
     assert_eq!(
