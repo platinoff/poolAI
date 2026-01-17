@@ -113,9 +113,38 @@ cargo build --release --features jwt,https,enterprise
 cargo build --release --features cloud,cloud-sdk
 ```
 
+## Windows Setup (для features jwt, https)
+
+Якщо ви отримуєте помилку `Error calling dlltool 'dlltool.exe': program not found` на Windows, виконайте:
+
+### PowerShell (рекомендовано)
+```powershell
+# Додати MSYS2 до PATH для поточної сесії
+.\scripts\setup_msys2_path.ps1
+
+# Після цього можна компілювати
+cargo build --features jwt,https
+```
+
+### Або вручну додати до PATH
+```powershell
+# Додати C:\msys64\usr\bin до системного PATH
+$env:PATH += ";C:\msys64\usr\bin"
+```
+
+### Перевірка
+```powershell
+# Перевірити, що dlltool доступний
+dlltool --version
+```
+
+**Примітка:** Скрипт `setup_msys2_path.ps1` додає MSYS2 до PATH лише для поточної PowerShell сесії. Для постійного вирішення додайте `C:\msys64\usr\bin` до системного PATH змінної середовища.
+
 ## Примітки
 
 - `jwt` та `https` потребують native toolchain (gcc/dlltool) на Windows GNU
+  - Використайте `scripts/setup_msys2_path.ps1` для налаштування PATH на Windows
+  - Або додайте `C:\msys64\usr\bin` до системного PATH вручну
 - `vm-isolation-linux` потребує root або CAP_NET_ADMIN, CAP_SYS_ADMIN
 - `cloud-sdk` додає важкі SDK залежності
 - AWS SDK потребує Rust 1.88+ (закоментовано в Cargo.toml)
