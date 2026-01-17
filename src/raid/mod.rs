@@ -67,6 +67,7 @@ use crate::raid::events::{EventStore, RaidEvent};
 use crate::raid::manifest::ArtifactManifest;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -253,6 +254,9 @@ pub struct RaidManager {
     artifacts: Arc<RwLock<ArtifactManifest>>,
     /// Event store for auditability and state reconstruction
     event_store: Option<Arc<RwLock<EventStore>>>,
+    /// BurstRAID strategy instance (initialized when mode is BurstRaid)
+    /// Lazy initialization - created on first use in put_artifact()
+    burst_strategy: Arc<RwLock<Option<Arc<burst_raid::BurstRaidStrategy>>>>,
 }
 
 impl RaidManager {
@@ -284,6 +288,7 @@ impl RaidManager {
             nodes: Arc::new(RwLock::new(Vec::new())),
             artifacts: Arc::new(RwLock::new(ArtifactManifest::new())),
             event_store,
+            burst_strategy: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -344,6 +349,8 @@ impl RaidManager {
         if let Some(ref event_store) = self.event_store {
             event_store.write().await.initialize().await?;
         }
+
+        // Note: BurstRAID strategy is initialized lazily in put_artifact() when mode is BurstRaid
 
         Ok(())
     }
@@ -689,7 +696,90 @@ impl RaidManager {
         }
         self.persist_manifest().await?;
 
+        // If mode is BurstRaid, trigger replication through BurstRAID strategy
+        let is_burst_raid = matches!(cfg.mode, RaidMode::BurstRaid);
+        drop(cfg); // Release config lock
+
+        if is_burst_raid {
+            if let Err(e) = self.replicate_artifact_burst_raid(id, bytes.to_vec(), name).await {
+                warn!("BurstRAID replication failed for artifact {}: {}", id, e);
+                // Continue even if replication fails - artifact is stored locally
+            }
+        }
+
         Ok(artifact)
+    }
+
+    /// Initialize BurstRAID strategy lazily
+    ///
+    /// Creates BurstRaidStrategy instance if not already initialized.
+    /// Called from put_artifact() when mode is BurstRaid.
+    async fn ensure_burst_strategy(&self) -> Result<Arc<burst_raid::BurstRaidStrategy>, AppError> {
+        let mut strategy_guard = self.burst_strategy.write().await;
+
+        if let Some(ref strategy) = *strategy_guard {
+            return Ok(strategy.clone());
+        }
+
+        // Create BurstRAID strategy
+        use burst_raid::BurstRaidConfig;
+
+        // Create a separate RaidManager instance for ReplicationEngine
+        // (This avoids circular dependency, ReplicationEngine uses it for local ops only)
+        let cfg = self.config.read().await;
+        let raid_manager_for_engine = Arc::new(RwLock::new(RaidManager::new(RaidConfig {
+            mode: RaidMode::Local, // Use Local for ReplicationEngine's RaidManager
+            base_path: cfg.base_path.clone(),
+            quota_bytes: cfg.quota_bytes,
+            retention_days: cfg.retention_days,
+            gc_on_startup: false,
+        })));
+
+        let burst_config = BurstRaidConfig::default();
+        let strategy = Arc::new(burst_raid::BurstRaidStrategy::new(
+            burst_config,
+            raid_manager_for_engine,
+            self.event_store.clone(),
+        ));
+
+        // Initialize strategy
+        strategy.initialize().await?;
+
+        *strategy_guard = Some(strategy.clone());
+        Ok(strategy)
+    }
+
+    /// Replicate artifact using BurstRAID strategy
+    async fn replicate_artifact_burst_raid(
+        &self,
+        artifact_id: Uuid,
+        artifact_data: Vec<u8>,
+        artifact_name: &str,
+    ) -> Result<(), AppError> {
+        let strategy = self.ensure_burst_strategy().await?;
+
+        // Record access for burst detection
+        strategy.record_access(artifact_id).await;
+
+        // Create ArtifactMetadata
+        use crate::raid::protocol::ArtifactMetadata;
+
+        let mut hasher = Sha256::new();
+        hasher.update(&artifact_data);
+        let checksum = format!("sha256:{:x}", hasher.finalize());
+
+        let metadata = ArtifactMetadata {
+            name: artifact_name.to_string(),
+            version: "1.0.0".to_string(),
+            size_bytes: artifact_data.len() as u64,
+            checksum,
+            created_at: Utc::now(),
+            content_type: Some("application/octet-stream".to_string()),
+            tags: None,
+        };
+
+        // Replicate artifact
+        strategy.replicate_artifact(artifact_id, artifact_data, metadata).await
     }
 
     /// Reads an artifact from local storage
@@ -733,7 +823,32 @@ impl RaidManager {
         file.read_to_end(&mut buf)
             .await
             .map_err(|e| AppError::ConfigError(format!("Failed to read artifact: {}", e)))?;
+
+        // Record access for burst detection if mode is BurstRaid
+        let cfg = self.config.read().await;
+        if matches!(cfg.mode, RaidMode::BurstRaid) {
+            // Try to find artifact ID from path
+            if let Some(artifact_id) = self.find_artifact_id_from_path(path).await {
+                let strategy_guard = self.burst_strategy.read().await;
+                if let Some(ref strategy) = *strategy_guard {
+                    strategy.record_access(artifact_id).await;
+                }
+            }
+        }
+
         Ok(buf)
+    }
+
+    /// Find artifact ID from path
+    ///
+    /// Searches manifest for artifact with matching path.
+    async fn find_artifact_id_from_path(&self, path: &Path) -> Option<Uuid> {
+        let artifacts = self.artifacts.read().await;
+        artifacts
+            .artifacts
+            .iter()
+            .find(|(_, artifact)| artifact.path == path)
+            .map(|(id, _)| *id)
     }
 
     /// Lists all stored artifacts
