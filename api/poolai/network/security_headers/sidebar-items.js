@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["security_headers_middleware"],"struct":["SecurityHeadersConfig"]};

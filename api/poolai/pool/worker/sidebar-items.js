@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Worker","WorkerConfig","WorkerStatus"]};

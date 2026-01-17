@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_linux_gpu_info"]};

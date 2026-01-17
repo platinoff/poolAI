@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ConflictResolutionStrategy","ReadConsistencyLevel","ReplicationStatus"],"struct":["AsyncReplicationTask","ReplicationConfig","ReplicationEngine","ReplicationMetadata","VectorClock"]};

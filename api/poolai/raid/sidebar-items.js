@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["RaidMode"],"fn":["get_global_manager","initialize","shutdown"],"mod":["circuit_breaker","client","events","manifest","protocol","replication"],"struct":["ArtifactRef","RaidConfig","RaidManager","RaidNode"]};

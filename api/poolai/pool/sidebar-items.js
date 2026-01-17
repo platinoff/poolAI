@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["LoadBalancingStrategy"],"fn":["get_global_pool","health_check","initialize","initialize_with_config","shutdown"],"mod":["worker"],"struct":["Pool","PoolConfig","PoolMetrics"]};

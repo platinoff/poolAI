@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["UserRole"],"fn":["auth_middleware","authenticate_user","generate_token","get_current_user","get_global_user_manager","has_permission","has_role","permission_middleware","validate_token"],"struct":["AuthRequest","AuthResponse","Claims","JwtConfig","PermissionCheck","User","UserInfo","UserManager"]};

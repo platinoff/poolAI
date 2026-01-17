@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AutoUpdatePolicy"],"fn":["auto_update_libraries","auto_update_libtorch_if_needed","check_library_compatibility","check_libtorch_compatibility","ensure_libtorch"]};

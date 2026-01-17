@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["delete_artifact_handler","get_artifact_handler","health_check_handler","join_cluster_handler","leave_cluster_handler","put_artifact_handler","sync_artifacts_handler"]};

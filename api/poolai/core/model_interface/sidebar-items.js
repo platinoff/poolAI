@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ModelStatus","ResponseStatus"],"struct":["GpuRequirements","ModelConfig","ModelInfo","ModelManager","ModelMetrics","ModelParameters","ModelRequest","ModelResponse","ModelState","PerformanceSettings"],"trait":["ModelInterface"]};

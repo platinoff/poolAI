@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Platform module for cross-platform GPU and system information"><title>poolai::platform - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="poolai" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module platform</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../poolai/index.html">poolai</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module platform</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#features" title="Features">Features</a></li><li><a href="#example" title="Example">Example</a></li><li><a href="#platform-specific-implementation" title="Platform-Specific Implementation">Platform-Specific Implementation</a><ul><li><a href="#windows" title="Windows">Windows</a></li><li><a href="#linux" title="Linux">Linux</a></li><li><a href="#macos-planned" title="macOS (planned)">macOS (planned)</a></li></ul></li></ul><h3><a href="#modules">Module Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate poolai</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">poolai</a></div><h1>Module <span>platform</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/poolai/platform/mod.rs.html#1-178">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Platform module for cross-platform GPU and system information</p>
+<p>Provides platform-specific implementations for Windows and Linux
+with a unified interface for GPU information and system resources.</p>
+<h2 id="features"><a class="doc-anchor" href="#features">§</a>Features</h2>
+<ul>
+<li><strong>Cross-platform Support</strong>: Windows, Linux, and macOS (planned)</li>
+<li><strong>GPU Information</strong>: Device name, memory usage, temperature, utilization</li>
+<li><strong>Vendor Support</strong>: NVIDIA, AMD, Intel GPU detection</li>
+<li><strong>Unified Interface</strong>: Same API across all platforms</li>
+</ul>
+<h2 id="example"><a class="doc-anchor" href="#example">§</a>Example</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>poolai::platform::get_gpu_info;
+
+<span class="comment">// Get GPU information (works on Windows and Linux)
+</span><span class="kw">let </span>gpu_info = get_gpu_info();
+
+<span class="macro">println!</span>(<span class="string">"GPU Device: {}"</span>, gpu_info.device);
+<span class="macro">println!</span>(<span class="string">"Memory: {} MB / {} MB"</span>, gpu_info.memory_used, gpu_info.memory_total);
+<span class="macro">println!</span>(<span class="string">"Temperature: {:.1}°C"</span>, gpu_info.temperature);
+<span class="macro">println!</span>(<span class="string">"Utilization: {:.1}%"</span>, gpu_info.utilization);
+
+<span class="comment">// Calculate memory usage percentage
+</span><span class="kw">let </span>memory_usage = (gpu_info.memory_used <span class="kw">as </span>f32 / gpu_info.memory_total <span class="kw">as </span>f32) * <span class="number">100.0</span>;
+<span class="macro">println!</span>(<span class="string">"Memory Usage: {:.1}%"</span>, memory_usage);</code></pre></div><h2 id="platform-specific-implementation"><a class="doc-anchor" href="#platform-specific-implementation">§</a>Platform-Specific Implementation</h2><h3 id="windows"><a class="doc-anchor" href="#windows">§</a>Windows</h3>
+<ul>
+<li>Uses Windows Management Instrumentation (WMI) or DirectX APIs</li>
+<li>Queries <code>Win32_VideoController</code> class for GPU information</li>
+<li>Supports NVIDIA Management Library and AMD ADL (when available)</li>
+</ul>
+<h3 id="linux"><a class="doc-anchor" href="#linux">§</a>Linux</h3>
+<ul>
+<li>Reads from <code>/sys/class/drm/</code> for GPU information</li>
+<li>Uses <code>nvidia-smi</code> or <code>rocm-smi</code> commands for vendor-specific info</li>
+<li>Parses <code>/proc/driver/nvidia/gpus/*/information</code> for NVIDIA</li>
+<li>Parses <code>/sys/class/drm/card*/device/uevent</code> for AMD</li>
+</ul>
+<h3 id="macos-planned"><a class="doc-anchor" href="#macos-planned">§</a>macOS (planned)</h3>
+<ul>
+<li>Uses IOKit framework for GPU information</li>
+<li>Queries IORegistry for GPU properties</li>
+</ul>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="linux/index.html" title="mod poolai::platform::linux">linux</a></dt><dt><a class="mod" href="windows/index.html" title="mod poolai::platform::windows">windows</a></dt></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.GpuInfo.html" title="struct poolai::platform::GpuInfo">GpuInfo</a></dt><dd>GPU information structure</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.get_gpu_info.html" title="fn poolai::platform::get_gpu_info">get_<wbr>gpu_<wbr>info</a></dt><dd>Get GPU information for the current platform</dd></dl></section></div></main></body></html>

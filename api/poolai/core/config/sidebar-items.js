@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_config","initialize_config","update_config"],"struct":["GpuConfig","HealthConfig","HttpsConfig","ModelConfig","MonitoringConfig","PoolAIConfig","PoolConfig","SystemConfig","VersionConfig"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NodeStatus","SystemStatus","WorkerStatus"],"struct":["AppState","SystemMetrics","SystemState","Worker","WorkerMetrics"]};

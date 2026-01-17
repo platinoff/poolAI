@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["broadcast_update","send_live_metrics","send_system_event","websocket_handler"],"struct":["LiveMetrics","SystemEvent","WebSocketConnection","WebSocketManager","WebSocketMessage"]};

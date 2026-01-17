@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_gpu_info"],"mod":["linux","windows"],"struct":["GpuInfo"]};

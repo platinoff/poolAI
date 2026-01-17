@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["LibraryStatus","LibraryType"],"fn":["get_global_manager","health_check","initialize","shutdown"],"mod":["constraints","dependencies","download","integration","manager","manifest","registry","versioning"],"struct":["LibraryInfo","LibraryMetadata"]};
