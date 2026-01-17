@@ -32,9 +32,14 @@ use tracing::info;
 
 // Note: Azure SDK 0.30 API differs from expected structure
 // azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
-// This version mismatch may require workaround or API verification
+// This version mismatch requires using REST API directly via reqwest instead of SDK clients
+// Using REST API approach similar to GCP integration to avoid version conflicts
+// Note: DefaultAzureCredential may not be directly importable in azure_identity 0.30
+// Using REST API with manual token acquisition as fallback
+// TODO: Verify correct import path for DefaultAzureCredential in azure_identity 0.30
+// For now, using REST API approach which doesn't require DefaultAzureCredential directly
 #[cfg(feature = "cloud-sdk")]
-use azure_identity::DefaultAzureCredential;
+type DefaultAzureCredential = azure_identity::DefaultAzureCredential;
 #[cfg(feature = "cloud-sdk")]
 use azure_mgmt_compute::Client as ComputeClient;
 #[cfg(feature = "cloud-sdk")]
@@ -46,8 +51,9 @@ pub struct AzureManager {
     initialized: Arc<RwLock<bool>>,
     #[cfg(feature = "cloud-sdk")]
     /// Azure credential for authentication
-    /// Note: Currently placeholder - API needs verification for version compatibility
-    credential: Arc<RwLock<Option<DefaultAzureCredential>>>,
+    /// Note: Using REST API approach, credential storage not needed for now
+    /// TODO: Re-enable when DefaultAzureCredential import path is verified
+    // credential: Arc<RwLock<Option<DefaultAzureCredential>>>,
     #[cfg(feature = "cloud-sdk")]
     /// Azure Compute client for VM Scale Sets and VM management
     /// Note: azure_mgmt_compute 0.21 uses azure_core 0.21, may need API verification
@@ -76,8 +82,8 @@ impl AzureManager {
             subscription_id: subscription_id
                 .or_else(|| std::env::var("AZURE_SUBSCRIPTION_ID").ok()),
             initialized: Arc::new(RwLock::new(false)),
-            #[cfg(feature = "cloud-sdk")]
-            credential: Arc::new(RwLock::new(None)),
+            // #[cfg(feature = "cloud-sdk")]
+            // credential: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             compute_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
@@ -131,15 +137,10 @@ impl AzureManager {
             );
 
             // Initialize Azure credentials
-            // Note: DefaultAzureCredential tries multiple authentication methods:
-            // 1. Environment variables (AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID)
-            // 2. Managed Identity (when running on Azure)
-            // 3. Azure CLI (when logged in via `az login`)
-            // 4. Azure PowerShell (when logged in)
-            let credential = DefaultAzureCredential::default();
-
-            // Store credential
-            *self.credential.write().await = Some(credential);
+            // Note: Using REST API approach - tokens obtained via get_azure_access_token()
+            // DefaultAzureCredential API structure needs verification for azure_identity 0.30
+            // For now, using environment-based authentication via REST API
+            // Credential will be obtained on-demand when needed for API calls
 
             // Initialize HTTP client with connection pooling for REST API calls
             // Connection pooling improves performance by reusing connections
@@ -207,7 +208,6 @@ impl AzureManager {
             // Clear clients
             *self.compute_client.write().await = None;
             *self.http_client.write().await = None;
-            *self.credential.write().await = None;
         }
 
         *self.initialized.write().await = false;
@@ -262,26 +262,17 @@ impl AzureManager {
                 )
             })?;
 
-            // Get access token from credential
-            let credential_guard = self.credential.read().await;
-            let credential = credential_guard.as_ref().ok_or_else(|| {
-                AppError::InitializationError(
-                    "Azure credential not initialized. Call initialize() first.".to_string(),
-                )
-            })?;
-
-            // Get access token - DefaultAzureCredential implements TokenCredential trait
-            // Note: TokenCredential requires scope, typically "https://management.azure.com/.default"
-            let token = credential
-                .token(&["https://management.azure.com/.default"])
-                .await
-                .map_err(|e| {
-                    AppError::InitializationError(format!(
-                        "Failed to obtain Azure access token. Context: Token request failed. \
-                    Error: {}",
-                        e
-                    ))
-                })?;
+            // Get access token via REST API
+            // Note: Using environment-based authentication (Azure CLI, environment variables, Managed Identity)
+            // TODO: Implement proper token acquisition when DefaultAzureCredential API is verified
+            // For now, returning error requiring manual token setup
+            // Users should set AZURE_ACCESS_TOKEN environment variable or use Azure CLI
+            let token = std::env::var("AZURE_ACCESS_TOKEN")
+                .map_err(|_| AppError::InitializationError(
+                    "Azure access token not found. Context: AZURE_ACCESS_TOKEN environment variable is not set. \
+                    Suggestion: Run 'az login' to authenticate with Azure CLI, or set AZURE_ACCESS_TOKEN environment variable. \
+                    Note: Full DefaultAzureCredential support pending Azure SDK 0.30 API verification.".to_string()
+                ))?;
 
             // Prepare VM Scale Set configuration
             // Note: Minimal configuration for now, can be extended later

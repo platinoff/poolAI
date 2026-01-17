@@ -47,7 +47,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio::time::{timeout, Duration};
-use tracing::{info, warn};
+use tracing::info;
 
 #[cfg(feature = "cloud-sdk")]
 use crate::cloud::kubernetes::KubernetesManager;
