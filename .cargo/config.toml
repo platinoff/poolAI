@@ -10,6 +10,12 @@ rustflags = ["-C", "target-feature=+crt-static"]
 
 [target.x86_64-pc-windows-gnu]
 linker = "x86_64-w64-mingw32-gcc"
+
+[env]
+# MSYS2 path for dlltool.exe and other MinGW tools (Windows)
+# Set this if dlltool.exe is not in PATH
+# Note: On Windows, you may need to add C:\msys64\usr\bin to PATH
+# or run scripts/setup_msys2_path.ps1 before building
  
 [env]
 CXXFLAGS = "-std=c++17"
