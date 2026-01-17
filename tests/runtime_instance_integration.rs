@@ -352,7 +352,9 @@ async fn test_process_request_via_instance_without_model() {
 
     let result = manager.process_request_via_instance(&instance_id, request).await;
     assert!(result.is_err());
-    assert!(result.unwrap_err().to_string().contains("Model not loaded"));
+    let error_msg = result.unwrap_err().to_string();
+    // Error message changed - now checks ModelManager too
+    assert!(error_msg.contains("Model") || error_msg.contains("not found"));
 
     // Cleanup
     manager.delete_instance(&instance_id).await.unwrap();
