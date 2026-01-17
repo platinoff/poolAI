@@ -140,8 +140,7 @@ pub const FORM_STYLES: &str = r#"
 
 /// Modal component styles
 pub const MODAL_STYLES: &str = r#"
-  .modal { 
-    display: none; 
+  .modal-overlay { 
     position: fixed; 
     top: 0; 
     left: 0; 
@@ -149,11 +148,24 @@ pub const MODAL_STYLES: &str = r#"
     bottom: 0; 
     background: rgba(0,0,0,0.7); 
     z-index: 1000; 
+    display: none;
     align-items: center; 
     justify-content: center; 
   }
-  .modal.active { 
+  .modal-overlay.active { 
     display: flex; 
+  }
+  .modal {
+    position: relative;
+    background: #171b22;
+    border: 1px solid #262b36;
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,.30);
   }
   .modal-content { 
     background: #171b22; 

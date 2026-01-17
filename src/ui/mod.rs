@@ -563,8 +563,26 @@ const BASE_CSS: &str = r#"
     box-shadow: 0 0 0 3px rgba(80, 250, 123, 0.2);
   }
   
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+  
   /* Smooth modal transitions */
   .modal {
+    position: relative;
     animation: fadeIn 0.2s ease-out;
   }
   .modal-content {
@@ -1535,31 +1553,59 @@ function initTableSorting(tableId) {
 
 // Modal dialog functions with keyboard navigation
 let activeModal = null;
+let activeOverlay = null;
 let modalFocusableElements = [];
 let previousActiveElement = null;
 
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (!modal) return;
+  if (!modal) {
+    console.warn('Modal not found:', modalId);
+    return;
+  }
   
   // Store previous active element for focus restoration
   previousActiveElement = document.activeElement;
   
+  // Create or get overlay
+  let overlay = document.getElementById('modal-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'modal-overlay';
+    overlay.className = 'modal-overlay';
+    document.body.appendChild(overlay);
+    
+    // Close modal on backdrop click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay && activeModal) {
+        hideModal(activeModal.id);
+      }
+    });
+  }
+  
+  // Move modal to overlay if not already there
+  if (modal.parentElement !== overlay) {
+    overlay.appendChild(modal);
+  }
+  
   // Set ARIA attributes
   modal.setAttribute('aria-hidden', 'false');
   modal.setAttribute('aria-modal', 'true');
-  modal.classList.add('active');
+  overlay.classList.add('active');
   activeModal = modal;
+  activeOverlay = overlay;
   
   // Get all focusable elements in modal
-  modalFocusableElements = modal.querySelectorAll(
+  modalFocusableElements = Array.from(modal.querySelectorAll(
     'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  );
+  ));
   
-  // Focus first focusable element
-  if (modalFocusableElements.length > 0) {
-    modalFocusableElements[0].focus();
-  }
+  // Focus first focusable element after a short delay to ensure modal is visible
+  setTimeout(() => {
+    if (modalFocusableElements.length > 0) {
+      modalFocusableElements[0].focus();
+    }
+  }, 100);
   
   // Trap focus within modal
   modal.addEventListener('keydown', trapModalFocus);
@@ -1570,15 +1616,26 @@ function showModal(modalId) {
 
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (!modal) return;
+  if (!modal) {
+    console.warn('Modal not found:', modalId);
+    return;
+  }
+  
+  const overlay = document.getElementById('modal-overlay');
   
   // Remove ARIA attributes
   modal.setAttribute('aria-hidden', 'true');
   modal.setAttribute('aria-modal', 'false');
-  modal.classList.remove('active');
+  
+  // Hide overlay
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
   
   // Remove focus trap
-  modal.removeEventListener('keydown', trapModalFocus);
+  if (activeModal) {
+    activeModal.removeEventListener('keydown', trapModalFocus);
+  }
   
   // Restore previous focus
   if (previousActiveElement) {
@@ -1587,6 +1644,7 @@ function hideModal(modalId) {
   }
   
   activeModal = null;
+  activeOverlay = null;
   modalFocusableElements = [];
   
   // Restore body scroll
