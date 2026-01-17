@@ -35,6 +35,7 @@
 //! ```
 
 use crate::core::error::AppError;
+use base64::Engine;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
