@@ -226,7 +226,7 @@ impl RuntimeManager {
         RuntimeStatus {
             workers_active: self.worker_manager.get_active_count().await,
             queue_length: self.queue.get_length(),
-            cache_usage: self.cache.get_usage_percentage(),
+            cache_usage: self.cache.get_usage_percentage().await,
             storage_usage: self.storage.get_usage_percentage(),
             processes_running: self.process_manager.get_running_count(),
             resource_utilization: self.orchestrator.get_resource_utilization(),

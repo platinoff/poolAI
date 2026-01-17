@@ -68,6 +68,9 @@ rand = "0.9"
 # Lock-free data structures
 parking_lot = "0.12"
 
+# LRU cache
+lru = "0.12"
+
 # HTTP client for library downloads
 # Using default features without native-tls to avoid zstd-sys compilation issues
 reqwest = { version = "0.13", features = ["stream", "json"], default-features = false }
