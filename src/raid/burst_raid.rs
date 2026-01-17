@@ -76,6 +76,229 @@ struct BurstState {
     in_burst: bool,
 }
 
+/// Minimal BurstRaidStrategy clone for background tasks
+///
+/// Contains only the fields needed for background tasks to avoid circular references.
+struct BurstRaidStrategyForTask {
+    config: BurstRaidConfig,
+    replication_engine: Arc<ReplicationEngine>,
+    burst_states: Arc<RwLock<HashMap<Uuid, BurstState>>>,
+    request_counters: Arc<RwLock<HashMap<Uuid, (u64, DateTime<Utc>)>>>,
+}
+
+impl BurstRaidStrategyForTask {
+    /// Run rebalancing (reuses logic from BurstRaidStrategy)
+    async fn run_rebalance(&self) -> Result<(), AppError> {
+        // Reuse the rebalance() method by calling it through a temporary BurstRaidStrategy
+        // For now, inline the core rebalancing logic here
+        info!("Starting BurstRAID rebalancing");
+
+        // Analyze distribution
+        let distribution = self.analyze_distribution().await?;
+
+        if distribution.is_empty() {
+            info!("No artifacts to rebalance");
+            return Ok(());
+        }
+
+        info!("Analyzed distribution: {} artifacts", distribution.len());
+
+        // Create rebalance plan
+        let rebalance_plan = self.create_rebalance_plan(&distribution).await?;
+
+        if rebalance_plan.is_empty() {
+            info!("Rebalancing not needed: distribution is already balanced");
+            return Ok(());
+        }
+
+        info!(
+            "Rebalancing plan: {} artifacts to move",
+            rebalance_plan.len()
+        );
+
+        // Move artifacts
+        let mut moved_count = 0;
+        let mut failed_count = 0;
+
+        for (artifact_id, target_nodes) in rebalance_plan {
+            match self.move_artifact_to_nodes(artifact_id, target_nodes).await {
+                Ok(_) => moved_count += 1,
+                Err(e) => {
+                    failed_count += 1;
+                    warn!("Failed to move artifact {}: {}", artifact_id, e);
+                }
+            }
+        }
+
+        info!(
+            "BurstRAID rebalancing completed: {} moved, {} failed",
+            moved_count, failed_count
+        );
+
+        Ok(())
+    }
+
+    // Helper methods (same as BurstRaidStrategy)
+    async fn analyze_distribution(&self) -> Result<Vec<(Uuid, u64, bool, Vec<u64>)>, AppError> {
+        let metadata_map = self.replication_engine.get_all_replication_metadata().await;
+        let mut distribution = Vec::new();
+
+        for (artifact_id_str, metadata) in metadata_map.iter() {
+            let artifact_id = match Uuid::parse_str(artifact_id_str) {
+                Ok(id) => id,
+                Err(_) => {
+                    warn!(
+                        "Invalid artifact ID in replication metadata: {}",
+                        artifact_id_str
+                    );
+                    continue;
+                }
+            };
+
+            let request_counters = self.request_counters.read().await;
+            let access_count = request_counters
+                .get(&artifact_id)
+                .map(|(count, _)| *count)
+                .unwrap_or(0);
+
+            let burst_states = self.burst_states.read().await;
+            let in_burst = burst_states
+                .get(&artifact_id)
+                .map(|state| state.in_burst)
+                .unwrap_or(false);
+
+            distribution.push((
+                artifact_id,
+                access_count,
+                in_burst,
+                metadata.replica_nodes.clone(),
+            ));
+        }
+
+        Ok(distribution)
+    }
+
+    async fn create_rebalance_plan(
+        &self,
+        distribution: &[(Uuid, u64, bool, Vec<u64>)],
+    ) -> Result<Vec<(Uuid, Vec<u64>)>, AppError> {
+        let available_nodes = self.replication_engine.get_available_nodes().await;
+        if available_nodes.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let node_ids: Vec<u64> = available_nodes.iter().map(|(id, _)| *id).collect();
+        let mut rebalance_plan = Vec::new();
+
+        for (artifact_id, access_count, in_burst, current_nodes) in distribution {
+            let target_factor = if *in_burst {
+                self.config.max_replication_factor
+            } else if *access_count > (self.config.burst_threshold_rps * 3600.0) as u64 {
+                (self.config.base_replication_factor + self.config.max_replication_factor) / 2
+            } else {
+                self.config.base_replication_factor
+            };
+
+            let current_factor = current_nodes.len() as u32;
+            if current_factor == target_factor && !current_nodes.is_empty() {
+                continue;
+            }
+
+            let mut target_nodes = Vec::new();
+            let mut candidate_nodes: Vec<u64> = node_ids
+                .iter()
+                .filter(|node_id| !current_nodes.contains(node_id))
+                .copied()
+                .collect();
+
+            if target_factor > current_factor {
+                let needed = target_factor - current_factor;
+                for _ in 0..needed.min(candidate_nodes.len() as u32) {
+                    if let Some(node) = candidate_nodes.pop() {
+                        target_nodes.push(node);
+                    }
+                }
+            }
+
+            if !target_nodes.is_empty() {
+                rebalance_plan.push((*artifact_id, target_nodes));
+            }
+        }
+
+        Ok(rebalance_plan)
+    }
+
+    async fn move_artifact_to_nodes(
+        &self,
+        artifact_id: Uuid,
+        target_nodes: Vec<u64>,
+    ) -> Result<(), AppError> {
+        use crate::raid::protocol::ArtifactMetadata;
+        use sha2::{Digest, Sha256};
+
+        let raid_manager_ref = self.replication_engine.get_raid_manager();
+        let artifact_path = {
+            let raid_manager = raid_manager_ref.read().await;
+            let artifacts = raid_manager.artifacts.read().await;
+            artifacts
+                .artifacts
+                .get(&artifact_id)
+                .ok_or_else(|| {
+                    AppError::ValidationError(format!(
+                        "Artifact {} not found in manifest",
+                        artifact_id
+                    ))
+                })?
+                .path
+                .clone()
+        };
+
+        let raid_manager = raid_manager_ref.read().await;
+        let artifact_data = raid_manager.get_artifact(&artifact_path).await?;
+
+        let artifact_ref = {
+            let artifacts = raid_manager.artifacts.read().await;
+            artifacts
+                .artifacts
+                .get(&artifact_id)
+                .ok_or_else(|| {
+                    AppError::ValidationError(format!(
+                        "Artifact {} not found in manifest",
+                        artifact_id
+                    ))
+                })?
+                .clone()
+        };
+        drop(raid_manager);
+
+        let mut hasher = Sha256::new();
+        hasher.update(&artifact_data);
+        let checksum = format!("sha256:{:x}", hasher.finalize());
+
+        let metadata = ArtifactMetadata {
+            name: artifact_ref.name,
+            version: "1.0.0".to_string(),
+            size_bytes: artifact_data.len() as u64,
+            checksum,
+            created_at: artifact_ref.stored_at,
+            content_type: Some("application/octet-stream".to_string()),
+            tags: None,
+        };
+
+        self.replication_engine
+            .replicate_sync(
+                artifact_id.to_string(),
+                artifact_data,
+                metadata,
+                target_nodes.len() as u32,
+                Some(target_nodes),
+            )
+            .await?;
+
+        Ok(())
+    }
+}
+
 /// BurstRAID strategy implementation
 pub struct BurstRaidStrategy {
     config: BurstRaidConfig,
@@ -84,6 +307,10 @@ pub struct BurstRaidStrategy {
     burst_states: Arc<RwLock<HashMap<Uuid, BurstState>>>,
     /// Request counters for burst detection
     request_counters: Arc<RwLock<HashMap<Uuid, (u64, DateTime<Utc>)>>>,
+    /// Background rebalancing task handle
+    rebalancing_handle: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
+    /// Background cleanup task handle
+    cleanup_handle: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
 }
 
 impl BurstRaidStrategy {
@@ -122,6 +349,8 @@ impl BurstRaidStrategy {
             replication_engine,
             burst_states: Arc::new(RwLock::new(HashMap::new())),
             request_counters: Arc::new(RwLock::new(HashMap::new())),
+            rebalancing_handle: Arc::new(RwLock::new(None)),
+            cleanup_handle: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -137,12 +366,86 @@ impl BurstRaidStrategy {
 
         // Start rebalancing task if enabled
         if self.config.enable_auto_rebalancing {
-            // TODO: Start background rebalancing task
-            info!("Auto-rebalancing enabled (will be started in background task)");
+            self.start_rebalancing_task().await;
+            info!("Auto-rebalancing enabled and started");
         }
+
+        // Start cleanup task for stale counters
+        self.start_cleanup_task().await;
 
         info!("BurstRAID strategy initialized successfully");
         Ok(())
+    }
+
+    /// Start background rebalancing task
+    async fn start_rebalancing_task(&self) {
+        let strategy = Arc::new(BurstRaidStrategyForTask {
+            replication_engine: Arc::clone(&self.replication_engine),
+            burst_states: Arc::clone(&self.burst_states),
+            request_counters: Arc::clone(&self.request_counters),
+            config: self.config.clone(),
+        });
+        let interval_secs = self.config.rebalancing_interval_secs;
+
+        let handle = tokio::spawn(async move {
+            let mut interval =
+                tokio::time::interval(tokio::time::Duration::from_secs(interval_secs));
+            interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+            loop {
+                interval.tick().await;
+
+                info!("Running scheduled BurstRAID rebalancing");
+                if let Err(e) = strategy.run_rebalance().await {
+                    warn!("BurstRAID rebalancing failed: {}", e);
+                }
+            }
+        });
+
+        *self.rebalancing_handle.write().await = Some(handle);
+    }
+
+    /// Start background cleanup task for stale counters
+    async fn start_cleanup_task(&self) {
+        let request_counters = Arc::clone(&self.request_counters);
+        let burst_states = Arc::clone(&self.burst_states);
+        let burst_cooldown = self.config.burst_cooldown_secs;
+
+        let handle = tokio::spawn(async move {
+            let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(60)); // Run every minute
+            interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+            loop {
+                interval.tick().await;
+
+                let now = Utc::now();
+                let cutoff = now - chrono::Duration::seconds(burst_cooldown as i64);
+
+                // Cleanup stale request counters
+                let mut counters = request_counters.write().await;
+                let initial_len = counters.len();
+                counters.retain(|_, (_, timestamp)| *timestamp > cutoff);
+                let removed_counters = initial_len - counters.len();
+
+                if removed_counters > 0 {
+                    debug!("Cleaned up {} stale request counters", removed_counters);
+                }
+
+                // Cleanup stale burst states (artifacts not accessed recently)
+                let mut states = burst_states.write().await;
+                let initial_len = states.len();
+                states.retain(|_, state| {
+                    state.last_burst_time.map(|t| t > cutoff).unwrap_or(true) || state.in_burst
+                });
+                let removed_states = initial_len - states.len();
+
+                if removed_states > 0 {
+                    debug!("Cleaned up {} stale burst states", removed_states);
+                }
+            }
+        });
+
+        *self.cleanup_handle.write().await = Some(handle);
     }
 
     /// Record an artifact access for burst detection
@@ -604,7 +907,17 @@ impl BurstRaidStrategy {
     pub async fn shutdown(&self) -> Result<(), AppError> {
         info!("Shutting down BurstRAID strategy");
 
-        // TODO: Stop background tasks
+        // Stop rebalancing task
+        if let Some(handle) = self.rebalancing_handle.write().await.take() {
+            handle.abort();
+            info!("Stopped rebalancing task");
+        }
+
+        // Stop cleanup task
+        if let Some(handle) = self.cleanup_handle.write().await.take() {
+            handle.abort();
+            info!("Stopped cleanup task");
+        }
 
         info!("BurstRAID strategy shut down successfully");
         Ok(())
