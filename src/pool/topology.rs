@@ -152,7 +152,7 @@ impl TopologyManager {
 
         // Get discovered peers from discovery service
         let peers = if let Some(discovery) = get_global_discovery_service() {
-            discovery.list_peers().await
+            discovery.get_peers().await
         } else {
             Vec::new()
         };
