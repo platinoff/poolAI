@@ -146,19 +146,59 @@ impl TopologyManager {
 
     /// Update topology with discovered peers
     pub async fn update_topology(&self) -> Result<(), AppError> {
+        use crate::runtime::instance::get_global_instance_manager;
+        
         info!("Updating network topology");
 
         // Get discovered peers from discovery service
         let peers = if let Some(discovery) = get_global_discovery_service() {
-            discovery.get_peers().await
+            discovery.list_peers().await
         } else {
             Vec::new()
         };
 
         let mut topology = self.topology.write().await;
 
-        // Update node resources from peers
+        // Calculate load per node from active instances
+        let mut node_loads: HashMap<String, (usize, usize)> = HashMap::new(); // (active_requests, capacity)
+        
+        if let Some(instance_manager) = get_global_instance_manager() {
+            let manager = instance_manager.read().await;
+            let instances = manager.list_instances().await;
+            
+            for instance in instances {
+                // Count active instances per node (active = Ready or Active status)
+                let status = instance.status.read().await;
+                let is_active = matches!(*status, crate::runtime::instance::InstanceStatus::Ready | crate::runtime::instance::InstanceStatus::Active);
+                drop(status);
+                
+                if is_active {
+                    for node_id in &instance.placement.node_ids {
+                        let entry = node_loads.entry(node_id.clone()).or_insert((0, 0));
+                        entry.0 += 1; // active_requests
+                        entry.1 += 10; // capacity (estimate: 10 instances per node)
+                    }
+                }
+            }
+        }
+
+        // Update node resources from peers with load
         for peer in &peers {
+            // Get load for this node
+            let (active_requests, capacity) = node_loads.get(&peer.peer_id).copied().unwrap_or((0, 10));
+            let calculated_load = if capacity > 0 {
+                (active_requests as f32 / capacity as f32).min(1.0)
+            } else {
+                0.0
+            };
+            
+            // Use peer capabilities load if available (from heartbeat), otherwise calculate from instances
+            let current_load = if peer.capabilities.capacity > 0 {
+                peer.capabilities.current_load
+            } else {
+                calculated_load
+            };
+            
             let resources = NodeResources {
                 node_id: peer.peer_id.clone(),
                 available_gpu_memory_mb: peer.capabilities.memory_mb as u64, // Simplified
@@ -167,7 +207,7 @@ impl TopologyManager {
                 total_cpu_cores: peer.capabilities.cpu_cores,
                 available_memory_mb: peer.capabilities.memory_mb as u64,
                 total_memory_mb: peer.capabilities.memory_mb as u64,
-                current_load: 0.0, // TODO: Get from peer status
+                current_load,
             };
 
             topology.node_resources.insert(peer.peer_id.clone(), resources);
@@ -200,7 +240,7 @@ impl TopologyManager {
         topology.last_updated = Utc::now();
         
         info!(
-            "Topology updated: {} nodes, {} latency measurements",
+            "Topology updated: {} nodes, {} latency measurements, load tracking enabled",
             topology.node_resources.len(),
             topology.latency_matrix.len()
         );

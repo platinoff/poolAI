@@ -73,6 +73,15 @@ pub struct PeerCapabilities {
     pub supports_tensor_parallelism: bool,
     /// Whether peer supports pipeline parallelism
     pub supports_pipeline_parallelism: bool,
+    /// Current active requests count
+    #[serde(default)]
+    pub active_requests: usize,
+    /// Maximum capacity (total concurrent requests supported)
+    #[serde(default)]
+    pub capacity: usize,
+    /// Current load (0.0-1.0), calculated as active_requests / capacity
+    #[serde(default)]
+    pub current_load: f32,
 }
 
 /// Discovery message types
