@@ -34,7 +34,7 @@ pub enum InstanceStatus {
 }
 
 /// Instance placement strategy
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum PlacementStrategy {
     /// Single node placement
     Single,
@@ -394,8 +394,11 @@ mod tests {
         let model_info = ModelInfo {
             name: "test-model".to_string(),
             version: "1.0".to_string(),
-            description: None,
-            parameters: 1000000,
+            capabilities: vec!["text-generation".to_string()],
+            max_tokens: 2048,
+            supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
+            model_size_mb: 2000,
+            supported_languages: vec!["en".to_string()],
             gpu_requirements: GpuRequirements {
                 min_memory_mb: 1000,
                 recommended_memory_mb: 2000,
@@ -419,8 +422,11 @@ mod tests {
         let model_info = ModelInfo {
             name: "test-model".to_string(),
             version: "1.0".to_string(),
-            description: None,
-            parameters: 1000000,
+            capabilities: vec!["text-generation".to_string()],
+            max_tokens: 2048,
+            supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
+            model_size_mb: 2000,
+            supported_languages: vec!["en".to_string()],
             gpu_requirements: GpuRequirements {
                 min_memory_mb: 1000,
                 recommended_memory_mb: 2000,
