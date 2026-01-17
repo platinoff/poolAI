@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Mobile Navigation component styles (uses CSS variables for theming)"><title>MOBILE_NAV_STYLES in poolai::ui::components - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="poolai" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc constant"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">MOBILE_NAV_STYLES</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../poolai/index.html">poolai</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><div id="rustdoc-modnav"><h2><a href="index.html">In poolai::<wbr>ui::<wbr>components</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">poolai</a>::<wbr><a href="../index.html">ui</a>::<wbr><a href="index.html">components</a></div><h1>Constant <span class="constant">MOBILE_<wbr>NAV_<wbr>STYLES</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/poolai/ui/components.rs.html#868-975">Source</a> </span></div><pre class="rust item-decl"><code>pub const MOBILE_NAV_STYLES: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.92.0/std/primitive.str.html">str</a> = r#&quot;
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text, #e8e8e8);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+  .mobile-menu-toggle:hover {
+    background: var(--surface-secondary, #1e2329);
+  }
+  .mobile-menu-toggle:focus {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: 2px;
+  }
+  .mobile-nav-drawer {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--surface, #171b22);
+    border-right: 1px solid var(--border, #262b36);
+    z-index: 10001;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.3);
+  }
+  .mobile-nav-drawer.active {
+    left: 0;
+  }
+  .mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: none;
+  }
+  .mobile-nav-overlay.active {
+    display: block;
+  }
+  .mobile-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border, #262b36);
+  }
+  .mobile-nav-close {
+    background: none;
+    border: none;
+    color: var(--text, #e8e8e8);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  .mobile-nav-close:hover {
+    background: var(--surface-secondary, #1e2329);
+  }
+  .mobile-nav-content {
+    padding: 16px;
+  }
+  .mobile-nav-item {
+    display: block;
+    padding: 12px 16px;
+    color: var(--text, #e8e8e8);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background 0.2s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .mobile-nav-item:hover {
+    background: var(--surface-secondary, #1e2329);
+  }
+  .mobile-nav-item:focus {
+    outline: 2px solid var(--primary, #50fa7b);
+    outline-offset: -2px;
+  }
+  @media (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: flex;
+    }
+    .nav {
+      display: none;
+    }
+  }
+&quot;#;</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Mobile Navigation component styles (uses CSS variables for theming)</p>
+</div></details></section></div></main></body></html>

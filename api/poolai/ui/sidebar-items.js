@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["DARK_THEME","HIGH_CONTRAST_THEME","LIGHT_THEME"],"fn":["create_ui_routes","get_all_themes","get_component_styles","get_theme","initialize","shutdown"],"struct":["Theme","UiManager"]};
+window.SIDEBAR_ITEMS = {"constant":["DARK_THEME","HIGH_CONTRAST_THEME","LIGHT_THEME"],"fn":["create_ui_routes","get_all_themes","get_theme","initialize","shutdown"],"mod":["components"],"struct":["Theme","UiManager"]};

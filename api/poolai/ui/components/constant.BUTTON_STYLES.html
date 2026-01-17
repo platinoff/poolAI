@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Button component styles (uses CSS variables for theming)"><title>BUTTON_STYLES in poolai::ui::components - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="poolai" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc constant"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">BUTTON_STYLES</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../poolai/index.html">poolai</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"><div id="rustdoc-modnav"><h2><a href="index.html">In poolai::<wbr>ui::<wbr>components</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">poolai</a>::<wbr><a href="../index.html">ui</a>::<wbr><a href="index.html">components</a></div><h1>Constant <span class="constant">BUTTON_<wbr>STYLES</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/poolai/ui/components.rs.html#7-58">Source</a> </span></div><pre class="rust item-decl"><code>pub const BUTTON_STYLES: &amp;<a class="primitive" href="https://doc.rust-lang.org/1.92.0/std/primitive.str.html">str</a> = r#&quot;
+  .btn { 
+    padding: 8px 16px; 
+    border: 1px solid var(--border, #262b36); 
+    border-radius: 8px; 
+    background: var(--surface, #171b22); 
+    color: var(--text, #e8e8e8); 
+    cursor: pointer; 
+    font-size: 0.95em; 
+    transition: all 0.2s ease;
+  }
+  .btn:hover { 
+    background: var(--surface-secondary, #1e2329); 
+    border-color: var(--border, #44475a); 
+  }
+  .btn:disabled { 
+    opacity: 0.5; 
+    cursor: not-allowed; 
+  }
+  .btn-primary { 
+    background: var(--primary, #50fa7b); 
+    color: var(--bg, #0f1216); 
+    border-color: var(--primary, #50fa7b); 
+  }
+  .btn-primary:hover { 
+    background: var(--primary-hover, #67e480); 
+  }
+  .btn-danger { 
+    background: var(--danger, #ff5555); 
+    color: #fff; 
+    border-color: var(--danger, #ff5555); 
+  }
+  .btn-danger:hover { 
+    background: var(--danger-hover, #ff6e6e); 
+  }
+  .btn-secondary {
+    background: var(--secondary, #6272a4);
+    color: #fff;
+    border-color: var(--secondary, #6272a4);
+  }
+  .btn-secondary:hover {
+    background: var(--secondary-hover, #7a8bc4);
+  }
+  .btn-small {
+    padding: 4px 8px;
+    font-size: 0.85em;
+  }
+  .btn-large {
+    padding: 12px 24px;
+    font-size: 1.1em;
+  }
+&quot;#;</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Button component styles (uses CSS variables for theming)</p>
+</div></details></section></div></main></body></html>
