@@ -33,11 +33,13 @@
 pub mod audit;
 pub mod config;
 pub mod dashboard;
+pub mod instances;
 pub mod libs;
 pub mod monitoring;
 pub mod raid;
 pub mod security;
 pub mod tenants;
+pub mod topology;
 pub mod users;
 pub mod vm;
 pub mod workers;
@@ -56,6 +58,8 @@ pub fn create_admin_routes() -> Router {
         .route("/admin/workers", get(workers::admin_workers))
         .route("/admin/libs", get(libs::admin_libs))
         .route("/admin/raid", get(raid::admin_raid))
+        .route("/admin/instances", get(instances::admin_instances))
+        .route("/admin/topology", get(topology::admin_topology))
         .route("/admin/users", get(users::admin_users))
         .route("/admin/config", get(config::admin_config))
 }
@@ -91,6 +95,8 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
         <a href="/ui/admin/workers" class="admin-nav-item">Workers</a>
         <a href="/ui/admin/libs" class="admin-nav-item">Libraries</a>
         <a href="/ui/admin/raid" class="admin-nav-item">RAID</a>
+        <a href="/ui/admin/instances" class="admin-nav-item">Model Instances</a>
+        <a href="/ui/admin/topology" class="admin-nav-item">Topology</a>
         <a href="/ui/admin/users" class="admin-nav-item">Users</a>
         <a href="/ui/admin/config" class="admin-nav-item">Configuration</a>
       </nav>
