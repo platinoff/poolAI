@@ -312,10 +312,9 @@
 - ✅ `Cargo.toml` - додано `num_cpus = "1.17"`
 - ⏳ `src/platform/mod.rs` - можна інтегрувати для детальнішої інформації
 
-**Залишилось** (10%):
-- ⏳ Детальна GPU memory detection
-- ⏳ CPU architecture detection
-- ⏳ Available memory detection (не тільки total)
+**Залишилось** (5%):
+- ⏳ Детальна GPU memory detection per device (опціонально)
+- ⏳ Available memory detection (не тільки total) (опціонально)
 
 **Критерії успіху**:
 - ✅ Discovery автоматично визначає GPU/CPU/Memory
@@ -359,11 +358,11 @@
 
 ### Поточний стан (оновлено 2026-01-17):
 - **Core Infrastructure**: 100% ✅
-- **Distributed AI Features**: 99% ✅ (Device Discovery ✅, Instance API 95% ✅, Topology 95% ✅, Capabilities 90% ✅)
+- **Distributed AI Features**: 99% ✅ (Device Discovery ✅, Instance API 95% ✅, Topology 95% ✅, Capabilities 95% ✅)
 - **Real Model Integration**: 90% ✅ (ModelManager integration ✅, LibraryManager lookup ✅)
 - **Streaming Support**: 95% ✅ (Real model streaming ✅, Native token streaming ⏳)
 - **Load Tracking**: 95% ✅ (Real load calculation from instances ✅)
-- **Capabilities Detection**: 90% ✅ (CPU ✅, Memory ✅, GPU ✅)
+- **Capabilities Detection**: 95% ✅ (CPU ✅, Memory ✅, GPU ✅, Capacity estimation ✅)
 - **Testing**: 100% ✅ (43 integration tests passing)
 - **Security**: 90% ✅
 - **UI/UX**: 85% ✅
