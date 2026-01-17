@@ -84,6 +84,144 @@ pub struct PeerCapabilities {
     pub current_load: f32,
 }
 
+/// Detect local system capabilities
+/// 
+/// Automatically detects CPU cores, memory, and GPU devices on the current system.
+/// This function attempts to detect actual system resources, falling back to
+/// reasonable defaults if detection fails.
+pub fn detect_local_capabilities() -> PeerCapabilities {
+    // Detect CPU cores
+    let cpu_cores = num_cpus::get();
+    
+    // Detect total system memory
+    let memory_mb = detect_system_memory().unwrap_or(8192); // Default to 8GB if detection fails
+    
+    // Detect GPU devices (simplified - check for GPU presence)
+    let gpu_devices = detect_gpu_devices();
+    
+    // Determine parallelism support based on capabilities
+    let supports_tensor_parallelism = gpu_devices.len() >= 2; // Requires 2+ GPUs
+    let supports_pipeline_parallelism = cpu_cores >= 4 && memory_mb >= 8192; // Requires sufficient resources
+    
+    PeerCapabilities {
+        cpu_cores,
+        gpu_devices,
+        memory_mb,
+        supports_tensor_parallelism,
+        supports_pipeline_parallelism,
+        active_requests: 0,
+        capacity: 10, // Default capacity: 10 concurrent requests
+        current_load: 0.0,
+    }
+}
+
+/// Detect total system memory in MB
+fn detect_system_memory() -> Option<usize> {
+    #[cfg(target_os = "linux")]
+    {
+        // Read from /proc/meminfo on Linux
+        use std::fs;
+        if let Ok(content) = fs::read_to_string("/proc/meminfo") {
+            for line in content.lines() {
+                if line.starts_with("MemTotal:") {
+                    if let Some(value) = line.split_whitespace().nth(1) {
+                        if let Ok(kb) = value.parse::<usize>() {
+                            return Some(kb / 1024); // Convert KB to MB
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    #[cfg(target_os = "windows")]
+    {
+        // On Windows, use sysinfo crate or similar
+        // For now, return None and use fallback
+    }
+    
+    #[cfg(target_os = "macos")]
+    {
+        // On macOS, could use sysctl
+        // For now, return None and use fallback
+    }
+    
+    None
+}
+
+/// Detect available GPU devices
+/// 
+/// Returns a list of GPU device indices (0, 1, 2, ...) for detected GPUs.
+/// Currently uses heuristics to detect GPU presence.
+fn detect_gpu_devices() -> Vec<usize> {
+    let mut devices = Vec::new();
+    
+    // Try to detect NVIDIA GPUs via nvidia-smi
+    if let Ok(output) = std::process::Command::new("nvidia-smi")
+        .arg("--list-gpus")
+        .output()
+    {
+        if output.status.success() {
+            let count = String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .count();
+            for i in 0..count {
+                devices.push(i);
+            }
+            if !devices.is_empty() {
+                return devices;
+            }
+        }
+    }
+    
+    // Try to detect AMD GPUs via rocm-smi (Linux)
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(output) = std::process::Command::new("rocm-smi")
+            .arg("--listid")
+            .output()
+        {
+            if output.status.success() {
+                let count = String::from_utf8_lossy(&output.stdout)
+                    .lines()
+                    .filter(|l| !l.trim().is_empty())
+                    .count();
+                for i in 0..count {
+                    devices.push(i);
+                }
+                if !devices.is_empty() {
+                    return devices;
+                }
+            }
+        }
+        
+        // Try to detect GPUs via /sys/class/drm on Linux
+        if let Ok(entries) = std::fs::read_dir("/sys/class/drm") {
+            let mut gpu_count = 0;
+            for entry in entries.flatten() {
+                let name = entry.file_name();
+                let name_str = name.to_string_lossy();
+                if name_str.starts_with("card") && name_str.chars().skip(4).all(|c| c.is_ascii_digit()) {
+                    gpu_count += 1;
+                }
+            }
+            if gpu_count > 0 {
+                for i in 0..gpu_count {
+                    devices.push(i);
+                }
+                return devices;
+            }
+        }
+    }
+    
+    // Fallback: check if platform module reports GPU (even if placeholder)
+    // This allows for future platform-specific detection
+    // Note: Platform detection can be added via platform module if needed
+    
+    // Default: assume no GPUs detected
+    devices
+}
+
 /// Discovery message types
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
@@ -216,8 +354,31 @@ impl DiscoveryService {
 
     /// Broadcasts an announcement message
     pub async fn send_announcement(&self) -> Result<(), AppError> {
-        // Get local capabilities (placeholder for now)
-        let capabilities = PeerCapabilities::default();
+        // Detect local system capabilities
+        let mut capabilities = detect_local_capabilities();
+        
+        // Update load metrics if instance manager is available
+        if let Some(instance_manager) = crate::runtime::instance::get_global_instance_manager() {
+            let manager = instance_manager.read().await;
+            let instances = manager.list_instances().await;
+            
+            // Note: We can't await in filter, so we collect instances first
+            let mut active_count = 0;
+            for inst in instances {
+                let status = inst.status.read().await;
+                if matches!(*status, crate::runtime::instance::InstanceStatus::Ready | crate::runtime::instance::InstanceStatus::Active) {
+                    active_count += 1;
+                }
+            }
+            
+            capabilities.active_requests = active_count;
+            capabilities.current_load = if capabilities.capacity > 0 {
+                (active_count as f32 / capabilities.capacity as f32).min(1.0)
+            } else {
+                0.0
+            };
+        }
+        
         let metadata = HashMap::new();
 
         let message = DiscoveryMessage::Announce {
