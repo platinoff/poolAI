@@ -10,6 +10,7 @@ pub mod api;
 pub mod api_legacy;
 pub mod auth;
 pub mod raid_distributed_handlers;
+pub mod rate_limit;
 pub mod security_headers;
 pub mod tls_config;
 pub mod validation;
