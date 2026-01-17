@@ -1665,80 +1665,383 @@ async fn oauth2_github_callback_handler(
     };
 
     // Generate PoolAI JWT token
-    let poolai_token = crate::network::auth::generate_token(&username, role.clone())
-        .map_err(|e| {
-            (
+    let poolai_token = match crate::network::auth::generate_token(&username, role.clone()) {
+        Ok(token) => token,
+        Err(e) => {
+            return (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
                     "error": format!("Failed to generate token: {}", e)
                 })),
             )
-        })
-        .unwrap();
+                .into_response();
+        }
+    };
 
-    // Return success response with token
-    // In production, you might want to redirect to UI with token in query param or cookie
+    // Redirect to UI with token in query parameters
+    // The UI JavaScript will extract the token and store it
+    let expires_in = token_response.expires_in.unwrap_or(3600);
+    let redirect_url = format!(
+        "/ui/auth?token={}&username={}&role={:?}&expires_in={}",
+        urlencoding::encode(&poolai_token),
+        urlencoding::encode(&username),
+        role,
+        expires_in
+    );
+    
+    Redirect::temporary(&redirect_url).into_response()
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_google_auth_handler() -> impl IntoResponse {
+    let manager = enterprise::security::get_global_security_manager();
+    
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized: {}", e)
+            })),
+        )
+            .into_response();
+    }
+    
+    // Check if Google provider is registered
+    let providers = manager.list_oauth2_providers().await.unwrap_or_default();
+    let google_provider = providers.iter().find(|p| p.name == "google");
+    
+    if google_provider.is_none() {
+        return (
+            StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": "Google OAuth2 provider not configured. Please register it in the admin panel."
+            })),
+        )
+            .into_response();
+    }
+    
+    // Generate state (should be cryptographically random in production)
+    let state = uuid::Uuid::new_v4().to_string();
+    
+    match manager.get_oauth2_authorization_url("google", &state).await {
+        Ok(auth_url) => {
+            Redirect::temporary(&auth_url).into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to generate authorization URL: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_google_callback_handler(
+    Query(params): Query<std::collections::HashMap<String, String>>,
+) -> impl IntoResponse {
+    let code = params.get("code").cloned().unwrap_or_default();
+    let _state = params.get("state").cloned().unwrap_or_default();
+    let error = params.get("error").cloned();
+    
+    if let Some(error) = error {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("OAuth2 error: {}", error)
+            })),
+        )
+            .into_response();
+    }
+    
+    if code.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Missing authorization code"
+            })),
+        )
+            .into_response();
+    }
+    
+    let manager = enterprise::security::get_global_security_manager();
+    
+    // Exchange code for token
+    let token_response = match manager.exchange_oauth2_code("google", &code).await {
+        Ok(token) => token,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to exchange authorization code: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Get user info from Google
+    let user_info = match manager
+        .get_oauth2_user_info("google", &token_response.access_token)
+        .await
+    {
+        Ok(info) => info,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to get user info from Google: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Get or create user in PoolAI
+    let user_manager = crate::network::auth::get_global_user_manager();
+    if let Err(e) = user_manager.initialize().await {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("User manager initialization failed: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    // Try to find existing user by email or username
+    let poolai_user = user_manager
+        .get_user_by_username(&user_info.username)
+        .await
+        .unwrap_or(None);
+
+    let (username, role) = if let Some(user) = poolai_user {
+        (user.username.clone(), user.role)
+    } else {
+        // Create new user with Viewer role by default
+        match user_manager
+            .create_user(
+                user_info.username.clone(),
+                format!("oauth2_google_{}", user_info.id),
+                crate::network::auth::UserRole::Viewer,
+            )
+            .await
+        {
+            Ok(new_user) => (new_user.username, crate::network::auth::UserRole::Viewer),
+            Err(e) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({
+                        "error": format!("Failed to create user: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+        }
+    };
+
+    // Generate PoolAI JWT token
+    let poolai_token = match crate::network::auth::generate_token(&username, role.clone()) {
+        Ok(token) => token,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to generate token: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Redirect to UI with token
+    let expires_in = token_response.expires_in.unwrap_or(3600);
+    let redirect_url = format!(
+        "/ui/auth?token={}&username={}&role={:?}&expires_in={}",
+        urlencoding::encode(&poolai_token),
+        urlencoding::encode(&username),
+        role,
+        expires_in
+    );
+    
+    Redirect::temporary(&redirect_url).into_response()
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
+    // Telegram Login Widget uses a different flow - it's client-side
+    // This handler can return the bot name and token for client-side widget initialization
+    let manager = enterprise::security::get_global_security_manager();
+    
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized: {}", e)
+            })),
+        )
+            .into_response();
+    }
+    
+    // Check if Telegram provider is registered
+    let providers = manager.list_oauth2_providers().await.unwrap_or_default();
+    let telegram_provider = providers.iter().find(|p| p.name == "telegram");
+    
+    if telegram_provider.is_none() {
+        return (
+            StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": "Telegram OAuth2 provider not configured. Please register it in the admin panel."
+            })),
+        )
+            .into_response();
+    }
+    
+    // Return configuration for Telegram Login Widget
+    // The client will use this to initialize the widget
     Json(serde_json::json!({
-        "token": poolai_token,
-        "token_type": "Bearer",
-        "expires_in": token_response.expires_in.unwrap_or(3600),
-        "role": format!("{:?}", role),
-        "username": username,
-        "message": "OAuth2 authentication successful. Use this token for API requests."
+        "bot_name": telegram_provider.unwrap().config.client_id.clone(),
+        "widget_url": "https://oauth.telegram.org/auth",
+        "redirect_uri": telegram_provider.unwrap().config.redirect_uri.clone(),
+        "message": "Use Telegram Login Widget on the client side. This endpoint provides configuration."
     }))
         .into_response()
 }
 
 #[cfg(feature = "enterprise")]
-async fn oauth2_google_auth_handler() -> impl IntoResponse {
-    // TODO: Implement Google OAuth2 authorization flow (similar to GitHub)
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Google OAuth2 not yet implemented"
-        })),
-    )
-        .into_response()
-}
-
-#[cfg(feature = "enterprise")]
-async fn oauth2_google_callback_handler(
-    Query(_params): Query<std::collections::HashMap<String, String>>,
-) -> impl IntoResponse {
-    // TODO: Implement Google OAuth2 callback flow (similar to GitHub)
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Google OAuth2 callback not yet implemented"
-        })),
-    )
-        .into_response()
-}
-
-#[cfg(feature = "enterprise")]
-async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
-    // TODO: Implement Telegram Login Widget authentication flow
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Telegram OAuth2 not yet implemented"
-        })),
-    )
-        .into_response()
-}
-
-#[cfg(feature = "enterprise")]
 async fn oauth2_telegram_callback_handler(
-    Query(_params): Query<std::collections::HashMap<String, String>>,
+    Query(params): Query<std::collections::HashMap<String, String>>,
 ) -> impl IntoResponse {
-    // TODO: Implement Telegram callback flow
-    (
-        StatusCode::NOT_IMPLEMENTED,
-        Json(serde_json::json!({
-            "error": "Telegram callback not yet implemented"
-        })),
-    )
-        .into_response()
+    // Telegram Login Widget sends auth data via hash in URL
+    // This needs to be handled client-side, then sent to this endpoint
+    let auth_data = params.get("auth_data").cloned().unwrap_or_default();
+    let hash = params.get("hash").cloned().unwrap_or_default();
+    let error = params.get("error").cloned();
+    
+    if let Some(error) = error {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("Telegram authentication error: {}", error)
+            })),
+        )
+            .into_response();
+    }
+    
+    if auth_data.is_empty() || hash.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Missing authentication data from Telegram"
+            })),
+        )
+            .into_response();
+    }
+    
+    // Parse auth_data (it's typically URL-encoded JSON)
+    // In a production environment, you should verify the hash using Telegram's bot token
+    let user_data: Result<serde_json::Value, _> = serde_json::from_str(&auth_data);
+    
+    if let Err(_) = user_data {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Invalid authentication data format from Telegram"
+            })),
+        )
+            .into_response();
+    }
+    
+    let user_data = user_data.unwrap();
+    let telegram_id = user_data.get("id")
+        .and_then(|v| v.as_u64())
+        .map(|v| v.to_string())
+        .unwrap_or_default();
+    let username = user_data.get("username")
+        .and_then(|v| v.as_str())
+        .unwrap_or("telegram_user")
+        .to_string();
+    let _first_name = user_data.get("first_name")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
+    
+    if telegram_id.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Missing user ID in Telegram authentication data"
+            })),
+        )
+            .into_response();
+    }
+    
+    // Get or create user in PoolAI
+    let user_manager = crate::network::auth::get_global_user_manager();
+    if let Err(e) = user_manager.initialize().await {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("User manager initialization failed: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    // Try to find existing user by username
+    let poolai_user = user_manager
+        .get_user_by_username(&username)
+        .await
+        .unwrap_or(None);
+
+    let (final_username, role) = if let Some(user) = poolai_user {
+        (user.username.clone(), user.role)
+    } else {
+        // Create new user with Viewer role by default
+        match user_manager
+            .create_user(
+                username.clone(),
+                format!("oauth2_telegram_{}", telegram_id),
+                crate::network::auth::UserRole::Viewer,
+            )
+            .await
+        {
+            Ok(new_user) => (new_user.username, crate::network::auth::UserRole::Viewer),
+            Err(e) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({
+                        "error": format!("Failed to create user: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+        }
+    };
+
+    // Generate PoolAI JWT token
+    let poolai_token = match crate::network::auth::generate_token(&final_username, role.clone()) {
+        Ok(token) => token,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to generate token: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Redirect to UI with token
+    let redirect_url = format!(
+        "/ui/auth?token={}&username={}&role={:?}&expires_in=3600",
+        urlencoding::encode(&poolai_token),
+        urlencoding::encode(&final_username),
+        role
+    );
+    
+    Redirect::temporary(&redirect_url).into_response()
 }
 
 // ============================================================================

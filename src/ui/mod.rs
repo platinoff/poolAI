@@ -3283,6 +3283,110 @@ async fn login_page() -> Html<String> {
       }
     }
     
+    async function handleOAuth2Login(provider) {
+      hideAlert();
+      
+      try {
+        // Redirect to OAuth2 provider
+        window.location.href = '/api/enterprise/auth/' + provider;
+      } catch (e) {
+        showAlert('Failed to start OAuth2 login: ' + e.message, 'error');
+      }
+    }
+    
+    // Check for OAuth2 callback (token in URL or response)
+    async function checkOAuth2Callback() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const error = urlParams.get('error');
+      
+      if (error) {
+        showAlert('OAuth2 authentication failed: ' + error, 'error');
+        // Clean URL
+        window.history.replaceState({}, document.title, '/ui/auth');
+        return;
+      }
+      
+      if (token) {
+        try {
+          // Token received from OAuth2 callback
+          setToken(token);
+          
+          // Get user info if available
+          const username = urlParams.get('username') || 'oauth2_user';
+          const role = urlParams.get('role') || 'Viewer';
+          
+          setUser(username, role);
+          
+          // Store token expiration if provided
+          const expiresIn = urlParams.get('expires_in');
+          if (expiresIn) {
+            const exp = Math.floor(Date.now() / 1000) + parseInt(expiresIn, 10);
+            localStorage.setItem('poolai_token_exp', exp.toString());
+          } else {
+            // Default 1 hour
+            const exp = Math.floor(Date.now() / 1000) + 3600;
+            localStorage.setItem('poolai_token_exp', exp.toString());
+          }
+          
+          updateUI();
+          
+          // Clean URL and redirect
+          window.history.replaceState({}, document.title, '/ui');
+          window.location.href = '/ui';
+        } catch (e) {
+          showAlert('Failed to process OAuth2 token: ' + e.message, 'error');
+        }
+      }
+    }
+    
+    // Load available OAuth2 providers and show buttons
+    async function loadOAuth2Providers() {
+      try {
+        const res = await fetch('/api/enterprise/security/oauth2/providers');
+        if (!res.ok) return; // OAuth2 not available or not configured
+        
+        const providers = await res.json();
+        const container = document.getElementById('oauth2-providers');
+        if (!container) return;
+        
+        const availableProviders = Array.isArray(providers) 
+          ? providers.filter(p => p.enabled && (p.name === 'github' || p.name === 'google' || p.name === 'telegram'))
+          : [];
+        
+        if (availableProviders.length === 0) {
+          container.style.display = 'none';
+          return;
+        }
+        
+        let buttonsHtml = '<div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border, #262b36);"><div style="margin-bottom: 12px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">Or sign in with:</div><div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">';
+        
+        availableProviders.forEach(provider => {
+          const providerName = provider.name.toLowerCase();
+          let icon = '';
+          let label = providerName.charAt(0).toUpperCase() + providerName.slice(1);
+          
+          if (providerName === 'github') {
+            icon = '🔷';
+          } else if (providerName === 'google') {
+            icon = '🔴';
+          } else if (providerName === 'telegram') {
+            icon = '✈️';
+          }
+          
+          buttonsHtml += `<button type="button" class="btn oauth2-btn" style="min-width: 120px;" onclick="handleOAuth2Login('${providerName}')" aria-label="Sign in with ${label}">${icon} ${label}</button>`;
+        });
+        
+        buttonsHtml += '</div></div>';
+        container.innerHTML = buttonsHtml;
+        container.style.display = 'block';
+      } catch (e) {
+        // OAuth2 providers endpoint not available or failed
+        const container = document.getElementById('oauth2-providers');
+        if (container) container.style.display = 'none';
+      }
+    }
+    
     function logout() {
       removeToken();
       updateUI();
@@ -3292,6 +3396,12 @@ async fn login_page() -> Html<String> {
     if (getUser()) {
       window.location.href = '/ui';
     }
+    
+    // Check for OAuth2 callback on page load
+    checkOAuth2Callback();
+    
+    // Load OAuth2 providers
+    loadOAuth2Providers();
     
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
     "#;
@@ -3327,6 +3437,7 @@ async fn login_page() -> Html<String> {
           </div>
           <button type="submit" class="btn" id="loginBtn">Login</button>
         </form>
+        <div id="oauth2-providers" style="display: none;"></div>
         <div style="margin-top: 20px; font-size: 0.9em; color:#a8b0bf;">
           <div><strong>Test accounts:</strong></div>
           <div>Admin: admin / admin123</div>
