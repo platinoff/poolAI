@@ -106,12 +106,12 @@
 
 **Поточний прогрес**: 0% 🔄
 
-#### 2.1 Performance Optimization (5-7 днів)
+#### 2.1 Performance Optimization (5-7 днів) - 20% 🔄
 
 **Завдання**:
 - [ ] Профілювання hot paths (CPU, memory)
 - [ ] Async runtime tuning (tokio worker threads, blocking pool)
-- [ ] Connection pooling для HTTP clients
+- [x] Connection pooling для HTTP clients ✅ (Azure & GCP providers)
 - [ ] Memory pool optimization для часто алокованих структур
 - [ ] Cache optimization (LRU, TTL tuning)
 - [ ] Database query optimization (якщо використовується)
