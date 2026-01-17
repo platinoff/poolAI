@@ -26,7 +26,7 @@
 //! - Web dashboard (basic)
 //! - UI components/themes/layouts (planned)
 
-mod components;
+pub mod components;
 pub use components::get_component_styles;
 
 mod themes;

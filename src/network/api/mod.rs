@@ -22,6 +22,7 @@ pub mod raid;
 pub mod rewards;
 pub mod system;
 pub mod topology;
+pub mod ui;
 pub mod users;
 pub mod vm;
 pub mod workers;
@@ -52,6 +53,7 @@ pub fn create_api_routes() -> Router {
         .merge(instances::create_instance_routes())
         .merge(completions::create_completions_routes())
         .merge(topology::create_topology_routes())
+        .merge(ui::create_ui_routes())
     // api_legacy.rs is kept for backward compatibility
     // All handlers have been migrated to modular structure
 }
