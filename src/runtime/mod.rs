@@ -48,6 +48,7 @@
 
 pub mod cache;
 pub mod health;
+pub mod memory_pool;
 pub mod orchestrator;
 pub mod process;
 pub mod queue;
@@ -58,6 +59,7 @@ pub mod worker;
 // Re-export main types for easy access
 pub use cache::CacheManager;
 pub use health::HealthMonitor;
+pub use memory_pool::MemoryPool;
 pub use orchestrator::ResourceOrchestrator;
 pub use process::{ProcessConfig, ProcessLogs, ProcessManager, ProcessStatus};
 pub use queue::TaskQueue;
