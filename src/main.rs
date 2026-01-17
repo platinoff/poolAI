@@ -129,7 +129,27 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize instance manager
     runtime::instance::initialize_global_instance_manager()
         .map_err(|e| format!("Failed to initialize instance manager: {}", e))?;
-    info!("✅ Runtime module initialized (including instance manager)");
+    
+    // Initialize topology manager
+    pool::topology::initialize_global_topology_manager()
+        .map_err(|e| format!("Failed to initialize topology manager: {}", e))?;
+    
+    // Start topology update task (simplified - just trigger periodic updates)
+    if let Some(topology_manager) = pool::topology::get_global_topology_manager() {
+        let topology_manager_clone = topology_manager.clone();
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
+            loop {
+                interval.tick().await;
+                if let Ok(()) = topology_manager_clone.read().await.update_topology().await {
+                    info!("Topology updated successfully");
+                }
+            }
+        });
+        info!("✅ Topology manager started");
+    }
+    
+    info!("✅ Runtime module initialized (including instance manager and topology manager)");
 
     // Initialize VM module
     info!("Initializing VM module...");

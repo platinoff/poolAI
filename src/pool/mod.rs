@@ -7,6 +7,8 @@
 //! - Auto-scaling capabilities
 
 pub mod discovery_integration;
+pub mod placement;
+pub mod topology;
 pub mod worker;
 
 use crate::core::error::AppError;
