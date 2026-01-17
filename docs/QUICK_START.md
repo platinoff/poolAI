@@ -8,9 +8,23 @@
 
 ### Optional (for production):
 - **Native toolchain**: For JWT and HTTPS features
-  - Windows: MSVC or MinGW (gcc.exe)
+  - Windows: MSVC or MinGW (gcc.exe, dlltool.exe) - **Use MSYS2 setup script**
   - Linux: gcc, make
   - macOS: Xcode Command Line Tools
+
+### Windows Setup (Required for jwt/https features)
+
+If you're building on Windows with `jwt` or `https` features, you need MSYS2 tools in your PATH:
+
+```powershell
+# Run setup script to add MSYS2 to PATH
+.\scripts\setup_msys2_path.ps1
+
+# Verify dlltool is available
+dlltool --version
+```
+
+**Note**: The `setup_msys2_path.ps1` script adds MSYS2 to PATH only for the current PowerShell session. For a permanent solution, add `C:\msys64\usr\bin` to your system PATH environment variable.
 
 ## Installation
 
@@ -21,7 +35,17 @@ git clone https://github.com/poolai/poolai.git
 cd poolai
 ```
 
-### 2. Build the project
+### 2. Windows: Setup MSYS2 PATH (if using jwt/https features)
+
+**Before building with jwt or https features on Windows:**
+
+```powershell
+.\scripts\setup_msys2_path.ps1
+```
+
+This adds `C:\msys64\usr\bin` to PATH for access to `dlltool.exe` and other MinGW tools.
+
+### 3. Build the project
 
 #### Basic build (no security features):
 ```bash
@@ -43,7 +67,7 @@ cargo build --release --features https
 cargo build --release --features jwt,https
 ```
 
-### 3. Run the server
+### 4. Run the server
 
 #### Basic mode (HTTP, no JWT):
 ```bash
