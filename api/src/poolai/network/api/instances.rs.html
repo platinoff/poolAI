@@ -118,8 +118,8 @@
 <a href=#118 id=118 data-nosnippet>118</a>                    .map(|placement| InstancePreview {
 <a href=#119 id=119 data-nosnippet>119</a>                        model_id: model_id.clone(),
 <a href=#120 id=120 data-nosnippet>120</a>                        sharding: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, placement.strategy),
-<a href=#121 id=121 data-nosnippet>121</a>                        instance_meta: <span class="string">"MlxRing"</span>.to_string(), <span class="comment">// Placeholder
-<a href=#122 id=122 data-nosnippet>122</a>                        </span>instance: <span class="macro">serde_json::json!</span>({
+<a href=#121 id=121 data-nosnippet>121</a>                        instance_meta: <span class="macro">format!</span>(<span class="string">"Placement: {:?}, Nodes: {:?}"</span>, placement.strategy, placement.node_ids),
+<a href=#122 id=122 data-nosnippet>122</a>                        instance: <span class="macro">serde_json::json!</span>({
 <a href=#123 id=123 data-nosnippet>123</a>                            <span class="string">"strategy"</span>: <span class="macro">format!</span>(<span class="string">"{:?}"</span>, placement.strategy),
 <a href=#124 id=124 data-nosnippet>124</a>                            <span class="string">"node_ids"</span>: placement.node_ids,
 <a href=#125 id=125 data-nosnippet>125</a>                        }),
