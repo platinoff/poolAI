@@ -69,7 +69,7 @@ rand = "0.9"
 parking_lot = "0.12"
 
 # LRU cache
-lru = "0.12"
+lru = "0.16"
 
 # HTTP client for library downloads
 # Using default features without native-tls to avoid zstd-sys compilation issues

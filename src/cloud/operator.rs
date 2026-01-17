@@ -840,7 +840,7 @@ impl PoolAIOperator {
     /// Parse PoolAIWorker CRD from Kubernetes API
     async fn parse_worker_crd(
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
-        namespace: &str,
+        _namespace: &str,
         name: &str,
     ) -> Result<PoolAIWorker, AppError> {
         let resource = k8s_manager
@@ -909,7 +909,7 @@ impl PoolAIOperator {
     /// Parse PoolAIVM CRD from Kubernetes API
     async fn parse_vm_crd(
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
-        namespace: &str,
+        _namespace: &str,
         name: &str,
     ) -> Result<PoolAIVM, AppError> {
         let resource = k8s_manager
@@ -996,7 +996,7 @@ impl PoolAIOperator {
     /// Parse PoolAITenant CRD from Kubernetes API
     async fn parse_tenant_crd(
         k8s_manager: &Arc<crate::cloud::kubernetes::KubernetesManager>,
-        namespace: &str,
+        _namespace: &str,
         name: &str,
     ) -> Result<PoolAITenant, AppError> {
         let resource = k8s_manager

@@ -244,7 +244,7 @@ mod tests {
 
     #[test]
     fn test_get_versions() {
-        let mut vm = VersionManager::new();
+        let vm = VersionManager::new();
 
         // No versions initially
         assert!(vm.get_versions("lib").is_none());
