@@ -133,6 +133,13 @@ pub fn create_enterprise_api_routes() -> Router {
             "/security/policies/{name}",
             delete(security_policy_delete_handler).layer(middleware::from_fn(auth_middleware)),
         )
+        // OAuth2 Authentication endpoints
+        .route("/auth/github", get(oauth2_github_auth_handler))
+        .route("/auth/github/callback", get(oauth2_github_callback_handler))
+        .route("/auth/google", get(oauth2_google_auth_handler))
+        .route("/auth/google/callback", get(oauth2_google_callback_handler))
+        .route("/auth/telegram", get(oauth2_telegram_auth_handler))
+        .route("/auth/telegram/callback", get(oauth2_telegram_callback_handler))
 }
 
 // ============================================================================
@@ -1479,6 +1486,186 @@ async fn security_policy_delete_handler(
         )
             .into_response(),
     }
+}
+
+// ============================================================================
+// OAuth2 Authentication Handlers
+// ============================================================================
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_github_auth_handler() -> impl IntoResponse {
+    // TODO: Implement GitHub OAuth2 authorization flow
+    // 1. Generate state parameter for CSRF protection
+    // 2. Get GitHub OAuth2 provider config from SecurityManager
+    // 3. Generate authorization URL using SecurityManager::get_oauth2_authorization_url
+    // 4. Store state in session/cookie for verification in callback
+    // 5. Redirect to GitHub authorization URL
+    
+    let manager = enterprise::security::get_global_security_manager();
+    
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized: {}", e)
+            })),
+        )
+            .into_response();
+    }
+    
+    // Check if GitHub provider is registered
+    let providers = manager.list_oauth2_providers().await.unwrap_or_default();
+    let github_provider = providers.iter().find(|p| p.name == "github");
+    
+    if github_provider.is_none() {
+        return (
+            StatusCode::NOT_FOUND,
+            Json(serde_json::json!({
+                "error": "GitHub OAuth2 provider not configured. Please register it in the admin panel."
+            })),
+        )
+            .into_response();
+    }
+    
+    // Generate state (should be cryptographically random in production)
+    let state = uuid::Uuid::new_v4().to_string();
+    
+    // TODO: Store state in session/cookie
+    
+    match manager.get_oauth2_authorization_url("github", &state).await {
+        Ok(auth_url) => {
+            // TODO: In production, use Redirect instead of returning JSON
+            // Redirect::temporary(&auth_url).into_response()
+            Json(serde_json::json!({
+                "authorization_url": auth_url,
+                "state": state
+            }))
+                .into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to generate authorization URL: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_github_callback_handler(
+    Query(params): Query<std::collections::HashMap<String, String>>,
+) -> impl IntoResponse {
+    // TODO: Implement GitHub OAuth2 callback flow
+    // 1. Verify state parameter (CSRF protection)
+    // 2. Exchange authorization code for access token using SecurityManager::exchange_oauth2_code
+    // 3. Get user info from GitHub API using access token
+    // 4. Create or find user in PoolAI (user mapping)
+    // 5. Generate PoolAI JWT token using generate_token
+    // 6. Return token to client (or redirect to UI with token)
+    
+    let code = params.get("code").cloned().unwrap_or_default();
+    let _state = params.get("state").cloned().unwrap_or_default();
+    let error = params.get("error").cloned();
+    
+    if let Some(error) = error {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": format!("OAuth2 error: {}", error)
+            })),
+        )
+            .into_response();
+    }
+    
+    if code.is_empty() {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Missing authorization code"
+            })),
+        )
+            .into_response();
+    }
+    
+    // TODO: Verify state parameter
+    
+    let manager = enterprise::security::get_global_security_manager();
+    
+    // Exchange code for token
+    match manager.exchange_oauth2_code("github", &code).await {
+        Ok(token_response) => {
+            // TODO: Get user info from GitHub API using token_response.access_token
+            // TODO: Create or find user in PoolAI
+            // TODO: Generate PoolAI JWT token
+            
+            Json(serde_json::json!({
+                "message": "OAuth2 callback received",
+                "access_token": token_response.access_token,
+                "note": "Full implementation pending - user info retrieval and token generation"
+            }))
+                .into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to exchange authorization code: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_google_auth_handler() -> impl IntoResponse {
+    // TODO: Implement Google OAuth2 authorization flow (similar to GitHub)
+    (
+        StatusCode::NOT_IMPLEMENTED,
+        Json(serde_json::json!({
+            "error": "Google OAuth2 not yet implemented"
+        })),
+    )
+        .into_response()
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_google_callback_handler(
+    Query(_params): Query<std::collections::HashMap<String, String>>,
+) -> impl IntoResponse {
+    // TODO: Implement Google OAuth2 callback flow (similar to GitHub)
+    (
+        StatusCode::NOT_IMPLEMENTED,
+        Json(serde_json::json!({
+            "error": "Google OAuth2 callback not yet implemented"
+        })),
+    )
+        .into_response()
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
+    // TODO: Implement Telegram Login Widget authentication flow
+    (
+        StatusCode::NOT_IMPLEMENTED,
+        Json(serde_json::json!({
+            "error": "Telegram OAuth2 not yet implemented"
+        })),
+    )
+        .into_response()
+}
+
+#[cfg(feature = "enterprise")]
+async fn oauth2_telegram_callback_handler(
+    Query(_params): Query<std::collections::HashMap<String, String>>,
+) -> impl IntoResponse {
+    // TODO: Implement Telegram callback flow
+    (
+        StatusCode::NOT_IMPLEMENTED,
+        Json(serde_json::json!({
+            "error": "Telegram callback not yet implemented"
+        })),
+    )
+        .into_response()
 }
 
 // ============================================================================
