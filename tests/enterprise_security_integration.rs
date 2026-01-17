@@ -105,7 +105,7 @@ async fn test_oauth2_provider_validation() {
     };
 
     let result = manager
-        .register_oauth2_provider("".to_string(), config)
+        .register_oauth2_provider("".to_string(), config.clone())
         .await;
     assert!(result.is_err());
     if let Err(AppError::ValidationError(msg)) = result {

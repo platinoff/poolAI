@@ -321,7 +321,7 @@ async fn test_conflict_resolution_strategies() {
     let event_store = create_test_event_store(&temp_dir, 1);
     event_store.write().await.initialize().await.unwrap();
 
-    let engine = create_replication_engine(raid_manager, Some(event_store), None).await;
+    let _engine = create_replication_engine(raid_manager, Some(event_store), None).await;
 
     // Test conflict resolution strategy enum
     let last_write_wins = ConflictResolutionStrategy::LastWriteWins;
