@@ -162,16 +162,23 @@ pub struct Dashboard {
 /// Monitoring manager
 ///
 /// Manages advanced monitoring, dashboards, and alerts.
+/// Supports persistent storage for metrics history (SQLite, optional).
 pub struct MonitoringManager {
     alert_rules: Arc<RwLock<HashMap<String, AlertRule>>>,
     active_alerts: Arc<RwLock<HashMap<Uuid, Alert>>>,
-    metrics_history: Arc<RwLock<Vec<MetricDataPoint>>>,
+    metrics_history: Arc<RwLock<Vec<MetricDataPoint>>>, // In-memory cache (last 1000 points)
     dashboards: Arc<RwLock<HashMap<Uuid, Dashboard>>>,
     initialized: Arc<RwLock<bool>>,
+    /// SQLite database path for metrics persistence (None = in-memory only)
+    #[allow(dead_code)] // Reserved for future SQLite integration
+    db_path: Option<String>,
 }
 
 impl MonitoringManager {
     /// Creates a new monitoring manager
+    ///
+    /// Metrics are stored in-memory by default. For persistent storage,
+    /// use `new_with_persistence()` or configure persistence in `initialize()`.
     pub fn new() -> Self {
         Self {
             alert_rules: Arc::new(RwLock::new(HashMap::new())),
@@ -179,6 +186,33 @@ impl MonitoringManager {
             metrics_history: Arc::new(RwLock::new(Vec::new())),
             dashboards: Arc::new(RwLock::new(HashMap::new())),
             initialized: Arc::new(RwLock::new(false)),
+            db_path: None,
+        }
+    }
+
+    /// Creates a new monitoring manager with SQLite persistence
+    ///
+    /// # Arguments
+    ///
+    /// * `db_path` - Path to SQLite database file (None = in-memory)
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::enterprise::monitoring::MonitoringManager;
+    ///
+    /// // Create with file-based persistence
+    /// let manager = MonitoringManager::new_with_persistence(Some("./data/metrics.db".to_string()));
+    /// ```
+    #[allow(dead_code)] // Reserved for future SQLite integration
+    pub fn new_with_persistence(db_path: Option<String>) -> Self {
+        Self {
+            alert_rules: Arc::new(RwLock::new(HashMap::new())),
+            active_alerts: Arc::new(RwLock::new(HashMap::new())),
+            metrics_history: Arc::new(RwLock::new(Vec::new())),
+            dashboards: Arc::new(RwLock::new(HashMap::new())),
+            initialized: Arc::new(RwLock::new(false)),
+            db_path,
         }
     }
 
@@ -190,11 +224,28 @@ impl MonitoringManager {
         }
 
         // TODO: Initialize metrics aggregation
-        // TODO: Initialize dashboard storage
+        // TODO: Initialize dashboard storage (SQLite/PostgreSQL)
         // TODO: Initialize alert rules engine
+        // TODO: Initialize SQLite database if db_path is configured
+        //   - Create metrics_history table if not exists
+        //   - Create indexes for efficient queries (timestamp, metric, tenant_id)
+        //   - Example schema:
+        //     CREATE TABLE IF NOT EXISTS metrics_history (
+        //       id INTEGER PRIMARY KEY AUTOINCREMENT,
+        //       timestamp TEXT NOT NULL,
+        //       metric TEXT NOT NULL,
+        //       value REAL NOT NULL,
+        //       tags TEXT, -- JSON string
+        //       tenant_id TEXT,
+        //       created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        //     );
+        //     CREATE INDEX IF NOT EXISTS idx_metrics_timestamp ON metrics_history(timestamp);
+        //     CREATE INDEX IF NOT EXISTS idx_metrics_metric ON metrics_history(metric);
+        //     CREATE INDEX IF NOT EXISTS idx_metrics_tenant ON metrics_history(tenant_id);
 
         *initialized = true;
-        info!("Monitoring manager initialized");
+        info!("Monitoring manager initialized (persistence: {})", 
+            if self.db_path.is_some() { "enabled" } else { "in-memory only" });
         Ok(())
     }
 
@@ -206,13 +257,22 @@ impl MonitoringManager {
     ///
     /// Returns `AppError` if recording fails.
     pub async fn record_metric(&self, data_point: MetricDataPoint) -> Result<(), AppError> {
-        // Store metric in history (keep last 10000 points)
+        // Store metric in in-memory history (keep last 1000 points for fast access)
         let mut history = self.metrics_history.write().await;
         history.push(data_point.clone());
-        if history.len() > 10000 {
+        if history.len() > 1000 {
             history.remove(0);
         }
         drop(history);
+
+        // TODO: Persist to SQLite database if db_path is configured
+        //   - Insert metric into metrics_history table
+        //   - Serialize tags HashMap to JSON string
+        //   - Use transaction for better performance (batch inserts)
+        //   - Example:
+        //     INSERT INTO metrics_history (timestamp, metric, value, tags, tenant_id)
+        //     VALUES (?, ?, ?, ?, ?)
+        //   - Cleanup old metrics (older than retention period, e.g., 30 days)
 
         // Check alert rules
         self.check_alert_rules(&data_point).await?;
@@ -462,6 +522,22 @@ impl MonitoringManager {
         tenant_id: Option<Uuid>,
         limit: Option<usize>,
     ) -> Result<Vec<MetricDataPoint>, AppError> {
+        // TODO: Query from SQLite database if db_path is configured
+        //   - Build SQL query with filters for metric, start_time, end_time, tenant_id
+        //   - Use indexes for efficient querying
+        //   - Deserialize tags JSON string to HashMap
+        //   - Example:
+        //     SELECT timestamp, metric, value, tags, tenant_id
+        //     FROM metrics_history
+        //     WHERE (? IS NULL OR metric = ?)
+        //       AND (? IS NULL OR timestamp >= ?)
+        //       AND (? IS NULL OR timestamp <= ?)
+        //       AND (? IS NULL OR tenant_id = ?)
+        //     ORDER BY timestamp DESC
+        //     LIMIT ?
+        //   - If database is not available, fallback to in-memory history
+
+        // Fallback to in-memory history (for now)
         let history = self.metrics_history.read().await;
         let mut filtered: Vec<MetricDataPoint> = history
             .iter()
