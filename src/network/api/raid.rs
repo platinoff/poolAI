@@ -354,20 +354,15 @@ async fn raid_status_handler() -> impl IntoResponse {
     };
     
     // Check Raft status (if enabled)
+    // TODO: Implement Raft status query when Raft integration is complete
+    // Placeholder: Raft status would be queried from the global Raft node
     #[cfg(feature = "raft")]
-    let raft_status = {
-        use crate::raid::raft;
-        if let Some(raft_node) = raft::get_global_raft_node_opt() {
-            let node = raft_node.read().await;
-            // Get Raft state (simplified - actual implementation would query Raft node)
-            Some(RaftStatus {
-                role: "follower".to_string(), // Placeholder - would get from Raft node
-                term: 0, // Placeholder - would get from Raft node
-                leader_id: None, // Placeholder - would get from Raft node
-            })
-        } else {
-            None
-        }
+    let raft_status: Option<RaftStatus> = {
+        // Future implementation:
+        // - Query Raft node for current role (leader/follower/candidate)
+        // - Get current term from Raft state
+        // - Get leader ID from Raft state
+        None
     };
     
     #[cfg(not(feature = "raft"))]
