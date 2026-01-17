@@ -36,10 +36,9 @@ use tracing::info;
 // Using REST API approach similar to GCP integration to avoid version conflicts
 // Note: DefaultAzureCredential may not be directly importable in azure_identity 0.30
 // Using REST API with manual token acquisition as fallback
-// TODO: Verify correct import path for DefaultAzureCredential in azure_identity 0.30
-// For now, using REST API approach which doesn't require DefaultAzureCredential directly
-#[cfg(feature = "cloud-sdk")]
-type DefaultAzureCredential = azure_identity::DefaultAzureCredential;
+// Note: azure_identity 0.30 - DefaultAzureCredential API structure verification needed
+// Currently using REST API approach with manual token acquisition
+// Tokens can be obtained via Azure CLI, environment variables, or Managed Identity
 #[cfg(feature = "cloud-sdk")]
 use azure_mgmt_compute::Client as ComputeClient;
 #[cfg(feature = "cloud-sdk")]
