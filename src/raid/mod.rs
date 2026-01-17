@@ -934,6 +934,12 @@ impl RaidManager {
         config.quota_bytes
     }
 
+    /// Get storage mode from configuration
+    pub async fn get_mode(&self) -> RaidMode {
+        let config = self.config.read().await;
+        config.mode.clone()
+    }
+
     /// Placeholder: rebalancing would run for distributed modes.
     #[allow(dead_code)]
     pub async fn rebalance(&self) -> Result<(), AppError> {

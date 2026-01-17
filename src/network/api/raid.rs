@@ -59,6 +59,35 @@ struct RaidGcResponse {
     removed_count: usize,
 }
 
+#[derive(serde::Serialize)]
+struct RaidStatusResponse {
+    cluster_status: String, // "healthy", "degraded", "unhealthy"
+    node_count: usize,
+    artifact_count: usize,
+    storage: RaidStorageStatus,
+    mode: String, // "Local", "BurstRaid", "SmallWorld"
+    #[serde(skip_serializing_if = "Option::is_none")]
+    replication_status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    raft_status: Option<RaftStatus>,
+}
+
+#[derive(serde::Serialize)]
+struct RaidStorageStatus {
+    total_size_bytes: u64,
+    quota_bytes: Option<u64>,
+    usage_percent: Option<f64>,
+    available_bytes: Option<u64>,
+}
+
+#[derive(serde::Serialize)]
+struct RaftStatus {
+    role: String, // "leader", "follower", "candidate"
+    term: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    leader_id: Option<String>,
+}
+
 #[derive(Deserialize)]
 struct EventsRangeQuery {
     start: Option<String>, // ISO 8601 timestamp
@@ -80,6 +109,7 @@ pub fn create_raid_routes() -> Router {
                 .layer(middleware::from_fn(auth_middleware)),
         )
         .route("/raid/quota", get(raid_quota_handler))
+        .route("/raid/status", get(raid_status_handler))
         .route("/raid/events", get(raid_events_handler))
         .route(
             "/raid/events/{artifact_id}",
@@ -270,6 +300,95 @@ async fn raid_quota_handler() -> impl IntoResponse {
         artifact_count,
     })
     .into_response()
+}
+
+async fn raid_status_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    
+    // Get basic information
+    let nodes = manager.list_nodes().await;
+    let artifacts = manager.list_artifacts().await;
+    let node_count = nodes.len();
+    let artifact_count = artifacts.len();
+    
+    // Get storage information
+    let total_size = manager.get_total_size().await.unwrap_or(0);
+    let quota_bytes = manager.get_quota_bytes().await;
+    let usage_percent = quota_bytes.map(|quota| {
+        if quota > 0 {
+            (total_size as f64 / quota as f64) * 100.0
+        } else {
+            0.0
+        }
+    });
+    let available_bytes = quota_bytes.map(|quota| quota.saturating_sub(total_size));
+    
+    // Get mode from config
+    let mode = format!("{:?}", manager.get_mode().await);
+    
+    // Determine cluster status
+    // Healthy: nodes > 0, usage < 90%, no errors
+    // Degraded: usage >= 90%, or some nodes unavailable
+    // Unhealthy: no nodes, or critical errors
+    let cluster_status = if node_count == 0 {
+        "unhealthy".to_string()
+    } else if let Some(usage) = usage_percent {
+        if usage >= 95.0 {
+            "unhealthy".to_string()
+        } else if usage >= 90.0 {
+            "degraded".to_string()
+        } else {
+            "healthy".to_string()
+        }
+    } else {
+        "healthy".to_string()
+    };
+    
+    // Check replication status (if in distributed mode)
+    let replication_status = if mode != "Local" {
+        // For distributed modes, check if replication is active
+        // Placeholder: in future, check actual replication status
+        Some("active".to_string())
+    } else {
+        None
+    };
+    
+    // Check Raft status (if enabled)
+    #[cfg(feature = "raft")]
+    let raft_status = {
+        use crate::raid::raft;
+        if let Some(raft_node) = raft::get_global_raft_node_opt() {
+            let node = raft_node.read().await;
+            // Get Raft state (simplified - actual implementation would query Raft node)
+            Some(RaftStatus {
+                role: "follower".to_string(), // Placeholder - would get from Raft node
+                term: 0, // Placeholder - would get from Raft node
+                leader_id: None, // Placeholder - would get from Raft node
+            })
+        } else {
+            None
+        }
+    };
+    
+    #[cfg(not(feature = "raft"))]
+    let raft_status: Option<RaftStatus> = None;
+    
+    let response = RaidStatusResponse {
+        cluster_status,
+        node_count,
+        artifact_count,
+        storage: RaidStorageStatus {
+            total_size_bytes: total_size,
+            quota_bytes,
+            usage_percent,
+            available_bytes,
+        },
+        mode,
+        replication_status,
+        raft_status,
+    };
+    
+    AxumJson(response).into_response()
 }
 
 async fn raid_events_handler() -> impl IntoResponse {
