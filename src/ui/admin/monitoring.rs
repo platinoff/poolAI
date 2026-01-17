@@ -30,16 +30,6 @@ pub async fn admin_monitoring() -> Html<String> {
       }
     }
     
-    async function loadAlertRules() {
-      try {
-        const rules = await fetchJson('/api/enterprise/monitoring/alert-rules');
-        return rules;
-      } catch (e) {
-        console.error('Error loading alert rules:', e);
-        return [];
-      }
-    }
-    
     function renderMonitoring(alerts, dashboards) {
       const el = document.getElementById('monitoring-content');
       if (!el) return;
