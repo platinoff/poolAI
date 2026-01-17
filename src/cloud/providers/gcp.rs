@@ -333,10 +333,110 @@ impl GcpManager {
             ));
         }
 
-        // TODO: Implement Compute Engine instance creation
+        #[cfg(feature = "cloud-sdk")]
+        {
+            let project_id = self.project_id.as_deref().ok_or_else(|| {
+                AppError::ValidationError(
+                    "GCP project ID is required for Compute Engine API calls".to_string(),
+                )
+            })?;
+
+            // Get HTTP client and access token
+            let client_guard = self.http_client.read().await;
+            let client = client_guard.as_ref().ok_or_else(|| {
+                AppError::InitializationError(
+                    "GCP HTTP client not initialized. Call initialize() first.".to_string(),
+                )
+            })?;
+
+            let token_guard = self.access_token.read().await;
+            let token = token_guard.as_ref().ok_or_else(|| {
+                AppError::InitializationError(
+                    "GCP access token not initialized. Call initialize() first.".to_string(),
+                )
+            })?;
+
+            // Create instance name
+            let instance_name = format!("poolai-instance-{}", uuid::Uuid::new_v4());
+
+            // Prepare instance configuration
+            // Note: Minimal configuration for now, can be extended later
+            let instance_config = serde_json::json!({
+                "name": instance_name,
+                "machineType": format!("zones/{}/machineTypes/{}", zone, machine_type),
+                "disks": [{
+                    "boot": true,
+                    "autoDelete": true,
+                    "initializeParams": {
+                        "sourceImage": "projects/debian-cloud/global/images/family/debian-12"
+                    }
+                }],
+                "networkInterfaces": [{
+                    "network": "global/networks/default",
+                    "accessConfigs": [{
+                        "type": "ONE_TO_ONE_NAT",
+                        "name": "External NAT"
+                    }]
+                }]
+            });
+
+            // Make API call to create instance
+            let api_url = format!(
+                "https://compute.googleapis.com/compute/v1/projects/{}/zones/{}/instances",
+                project_id, zone
+            );
+
+            let response = client
+                .post(&api_url)
+                .bearer_auth(token)
+                .header("Content-Type", "application/json")
+                .json(&instance_config)
+                .send()
+                .await
+                .map_err(|e| {
+                    AppError::NetworkError(format!(
+                    "Failed to create Compute Engine instance. Context: GCP API request failed. \
+                    Zone: {}, Machine Type: {}, Error: {}",
+                    zone, machine_type, e
+                ))
+                })?;
+
+            if !response.status().is_success() {
+                let status = response.status();
+                let error_text = response
+                    .text()
+                    .await
+                    .unwrap_or_else(|_| "Unknown error".to_string());
+                return Err(AppError::NetworkError(format!(
+                    "GCP Compute Engine API error. Context: Instance creation failed. \
+                    Zone: {}, Machine Type: {}, Status: {}, Response: {}",
+                    zone, machine_type, status, error_text
+                )));
+            }
+
+            let response_json: serde_json::Value = response.json().await.map_err(|e| {
+                AppError::NetworkError(format!("Failed to parse GCP API response. Error: {}", e))
+            })?;
+
+            // Extract instance ID from response
+            let instance_id = response_json
+                .get("id")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| instance_name.clone());
+
+            info!(
+                "Created Compute Engine instance: {} in zone {} / project {}",
+                instance_id, zone, project_id
+            );
+
+            return Ok(instance_id);
+        }
+
+        // Fallback for non-cloud-sdk feature
         let project = self.project_id.as_deref().unwrap_or("unknown");
         info!(
-            "Creating Compute Engine instance: {} / {} in project {} (placeholder)",
+            "Creating Compute Engine instance: {} / {} in project {} (placeholder - cloud-sdk feature disabled)",
             zone, machine_type, project
         );
         Ok(uuid::Uuid::new_v4().to_string())
