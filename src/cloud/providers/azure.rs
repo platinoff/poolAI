@@ -317,7 +317,7 @@ impl AzureManager {
 
             let response = client
                 .put(&api_url)
-                .bearer_auth(token.token.secret())
+                .bearer_auth(&token)
                 .header("Content-Type", "application/json")
                 .json(&vmss_config)
                 .send()
