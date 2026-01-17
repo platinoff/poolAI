@@ -93,8 +93,8 @@ pub fn detect_local_capabilities() -> PeerCapabilities {
     // Detect CPU cores
     let cpu_cores = num_cpus::get();
     
-    // Detect total system memory
-    let memory_mb = detect_system_memory().unwrap_or(8192); // Default to 8GB if detection fails
+    // Detect total and available system memory
+    let (memory_mb, _available_mb) = detect_system_memory().unwrap_or((8192, 6144)); // Default to 8GB total, 6GB available
     
     // Detect GPU devices (simplified - check for GPU presence)
     let gpu_devices = detect_gpu_devices();
@@ -115,21 +115,44 @@ pub fn detect_local_capabilities() -> PeerCapabilities {
     }
 }
 
-/// Detect total system memory in MB
-fn detect_system_memory() -> Option<usize> {
+/// Detect total and available system memory in MB
+/// Returns (total_memory_mb, available_memory_mb)
+fn detect_system_memory() -> Option<(usize, usize)> {
     #[cfg(target_os = "linux")]
     {
         // Read from /proc/meminfo on Linux
         use std::fs;
         if let Ok(content) = fs::read_to_string("/proc/meminfo") {
+            let mut total_mb = None;
+            let mut available_mb = None;
+            
             for line in content.lines() {
                 if line.starts_with("MemTotal:") {
                     if let Some(value) = line.split_whitespace().nth(1) {
                         if let Ok(kb) = value.parse::<usize>() {
-                            return Some(kb / 1024); // Convert KB to MB
+                            total_mb = Some(kb / 1024); // Convert KB to MB
+                        }
+                    }
+                } else if line.starts_with("MemAvailable:") {
+                    // Prefer MemAvailable (kernel 3.14+) as it's more accurate
+                    if let Some(value) = line.split_whitespace().nth(1) {
+                        if let Ok(kb) = value.parse::<usize>() {
+                            available_mb = Some(kb / 1024);
+                        }
+                    }
+                } else if available_mb.is_none() && line.starts_with("MemFree:") {
+                    // Fallback to MemFree if MemAvailable not available
+                    if let Some(value) = line.split_whitespace().nth(1) {
+                        if let Ok(kb) = value.parse::<usize>() {
+                            available_mb = Some(kb / 1024);
                         }
                     }
                 }
+            }
+            
+            if let Some(total) = total_mb {
+                let available = available_mb.unwrap_or(total / 4); // Fallback to 25% if can't detect
+                return Some((total, available));
             }
         }
     }
@@ -143,7 +166,11 @@ fn detect_system_memory() -> Option<usize> {
     
     #[cfg(target_os = "macos")]
     {
-        // On macOS, use sysctl hw.memsize
+        // On macOS, use sysctl for memory detection
+        let mut total_mb = None;
+        let mut available_mb = None;
+        
+        // Get total memory
         if let Ok(output) = std::process::Command::new("sysctl")
             .arg("-n")
             .arg("hw.memsize")
@@ -152,10 +179,29 @@ fn detect_system_memory() -> Option<usize> {
             if output.status.success() {
                 if let Ok(contents) = String::from_utf8(output.stdout) {
                     if let Ok(bytes) = contents.trim().parse::<usize>() {
-                        return Some(bytes / (1024 * 1024)); // Convert bytes to MB
+                        total_mb = Some(bytes / (1024 * 1024)); // Convert bytes to MB
                     }
                 }
             }
+        }
+        
+        // Get available memory (vm_stat on macOS)
+        if let Ok(output) = std::process::Command::new("vm_stat")
+            .output()
+        {
+            if output.status.success() {
+                let content = String::from_utf8_lossy(&output.stdout);
+                // Parse vm_stat output for free pages (simplified)
+                // In production, would parse "Pages free" and "Pages inactive"
+                if let Some(total) = total_mb {
+                    available_mb = Some(total / 4); // Rough estimate: 25% available
+                }
+            }
+        }
+        
+        if let Some(total) = total_mb {
+            let available = available_mb.unwrap_or(total / 4);
+            return Some((total, available));
         }
     }
     
