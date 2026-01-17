@@ -14,7 +14,7 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::network::discovery::PeerInfo;
+use crate::network::discovery::{get_global_discovery_service, PeerInfo};
 
 /// Discovery API response types
 #[derive(Serialize)]
@@ -39,31 +39,51 @@ pub fn create_discovery_routes() -> Router {
 /// Handler for GET /api/v1/discovery/peers
 /// Returns list of all discovered peers
 async fn peers_handler() -> impl IntoResponse {
-    // TODO: Get discovery service from app state
-    // For now, return empty list
+    if let Some(discovery) = get_global_discovery_service() {
+        let peers = discovery.get_peers().await;
+        let local_peer_id = discovery.local_peer_id().to_string();
+        
+        let response = PeersResponse {
+            peers,
+            local_peer_id,
+        };
+        
+        return (StatusCode::OK, Json(response));
+    }
+    
+    // Discovery service not initialized
     let response = PeersResponse {
         peers: vec![],
-        local_peer_id: "poolai-local".to_string(),
+        local_peer_id: "not-initialized".to_string(),
     };
     
-    (StatusCode::OK, Json(response))
+    (StatusCode::SERVICE_UNAVAILABLE, Json(response))
 }
 
 /// Handler for GET /api/v1/discovery/peers/:peer_id
 /// Returns information about a specific peer
-async fn peer_handler(Path(_peer_id): Path<String>) -> impl IntoResponse {
-    // TODO: Get discovery service from app state
-    // For now, return None
-    let response = PeerResponse {
-        peer: None,
-    };
+async fn peer_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
+    if let Some(discovery) = get_global_discovery_service() {
+        let peer = discovery.get_peer(&peer_id).await;
+        let response = PeerResponse { peer };
+        return (StatusCode::OK, Json(response));
+    }
     
-    (StatusCode::OK, Json(response))
+    // Discovery service not initialized
+    let response = PeerResponse { peer: None };
+    (StatusCode::SERVICE_UNAVAILABLE, Json(response))
 }
 
 /// Handler for POST /api/v1/discovery/register
 /// Registers this node as a peer
 async fn register_handler() -> impl IntoResponse {
-    // TODO: Trigger discovery announcement
-    StatusCode::OK
+    if let Some(discovery) = get_global_discovery_service() {
+        if let Err(e) = discovery.send_announcement().await {
+            tracing::warn!("Failed to send discovery announcement: {}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
+        return StatusCode::OK;
+    }
+    
+    StatusCode::SERVICE_UNAVAILABLE
 }

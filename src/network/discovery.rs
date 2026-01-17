@@ -12,7 +12,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::net::{IpAddr, SocketAddr, UdpSocket};
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tokio::time::{interval, Duration};
 use tracing::{debug, info, warn};
@@ -182,7 +182,7 @@ impl DiscoveryService {
     }
 
     /// Broadcasts an announcement message
-    async fn send_announcement(&self) -> Result<(), AppError> {
+    pub async fn send_announcement(&self) -> Result<(), AppError> {
         // Get local capabilities (placeholder for now)
         let capabilities = PeerCapabilities::default();
         let metadata = HashMap::new();
@@ -378,6 +378,29 @@ impl DiscoveryService {
 
         Ok(())
     }
+}
+
+/// Global discovery service instance
+static GLOBAL_DISCOVERY: OnceLock<Arc<DiscoveryService>> = OnceLock::new();
+
+/// Get or initialize the global discovery service
+pub fn get_global_discovery_service() -> Option<&'static Arc<DiscoveryService>> {
+    GLOBAL_DISCOVERY.get()
+}
+
+/// Initialize the global discovery service
+pub fn initialize_global_discovery(
+    config: DiscoveryConfig,
+    local_address: SocketAddr,
+) -> Result<Arc<DiscoveryService>, AppError> {
+    let service = Arc::new(DiscoveryService::new(config, local_address));
+    
+    GLOBAL_DISCOVERY.set(service.clone())
+        .map_err(|_| AppError::ConfigError(
+            "Global discovery service already initialized".to_string()
+        ))?;
+    
+    Ok(service)
 }
 
 #[cfg(test)]
