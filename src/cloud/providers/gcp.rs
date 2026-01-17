@@ -440,7 +440,10 @@ impl GcpManager {
             );
 
             Ok(instance_id)
-        } else {
+        }
+
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
             // Fallback for non-cloud-sdk feature
             let project = self.project_id.as_deref().unwrap_or("unknown");
             info!(

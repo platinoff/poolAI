@@ -372,7 +372,10 @@ impl AzureManager {
             );
 
             Ok(vmss_id)
-        } else {
+        }
+
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
             // Fallback for non-cloud-sdk feature
             info!(
                 "Creating VM Scale Set: {} / {} in subscription {} (placeholder - cloud-sdk feature disabled)",
