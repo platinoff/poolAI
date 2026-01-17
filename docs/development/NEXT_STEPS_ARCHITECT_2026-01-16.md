@@ -125,14 +125,14 @@
 
 **Оцінка**: 5-7 днів
 
-#### 2.2 Security Hardening (7-10 днів) - 40% 🔄
+#### 2.2 Security Hardening (7-10 днів) - 50% 🔄
 
 **Завдання**:
 - [x] Security audit (`cargo audit`) ✅ (CI integration added)
 - [x] Dependency updates (безпечні версії) ✅ (Documentation and strategy created)
 - [ ] Penetration testing (OWASP Top 10)
 - [x] Security headers enhancement (CSP, HSTS, X-Frame-Options) ✅ (HSTS, X-XSS-Protection, Permissions-Policy added)
-- [ ] Input validation review (SQL injection, XSS)
+- [x] Input validation review (SQL injection, XSS) ✅ (Path traversal, SSRF, XSS validation added)
 - [ ] Rate limiting enhancement
 - [ ] Secrets management review
 - [ ] Certificate management security review
