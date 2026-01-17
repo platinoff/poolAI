@@ -30,22 +30,25 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::info;
 
-// Note: GCP SDK for Rust may not be available as a single crate
-// TODO: Investigate GCP SDK options:
-// 1. google-cloud-rust (if available)
-// 2. Direct REST API calls via reqwest (like Kubernetes implementation)
-// 3. gcloud-rs or similar community crates
-// Placeholder implementation until SDK is confirmed
+#[cfg(feature = "cloud-sdk")]
+use reqwest::Client as HttpClient;
+
+// Note: GCP integration uses REST API via reqwest (similar to Kubernetes implementation)
+// This avoids version conflicts and additional dependencies
+// TODO: Consider adding google-cloud-compute-v1 crate in the future if needed
+// For now, using direct REST API calls to GCP Compute Engine API
 
 /// GCP manager for cloud resources
 pub struct GcpManager {
     project_id: Option<String>,
     initialized: Arc<RwLock<bool>>,
-    // Note: GCP SDK client fields commented out until SDK is confirmed
-    // TODO: Add GCP SDK clients once SDK is selected:
-    // - Compute Engine client
-    // - Cloud Run client
-    // - Cloud Storage client
+    #[cfg(feature = "cloud-sdk")]
+    /// HTTP client for GCP REST API calls
+    http_client: Arc<RwLock<Option<HttpClient>>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// GCP access token for authentication
+    /// Note: Retrieved via Application Default Credentials (ADC) or service account key
+    access_token: Arc<RwLock<Option<String>>>,
 }
 
 impl GcpManager {
@@ -66,6 +69,10 @@ impl GcpManager {
         Self {
             project_id: project_id.or_else(|| std::env::var("GCP_PROJECT_ID").ok()),
             initialized: Arc::new(RwLock::new(false)),
+            #[cfg(feature = "cloud-sdk")]
+            http_client: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            access_token: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -107,34 +114,49 @@ impl GcpManager {
             )
         })?;
 
-        info!("Initializing GCP SDK clients for project: {}", project_id);
+        #[cfg(feature = "cloud-sdk")]
+        {
+            info!(
+                "Initializing GCP REST API client for project: {}",
+                project_id
+            );
 
-        // TODO: Initialize GCP SDK clients once SDK is confirmed
-        // Note: GCP SDK for Rust needs to be selected and added to Cargo.toml
-        // Expected flow (after SDK is selected):
-        // 1. Initialize GCP credentials (Application Default Credentials or service account key)
-        // 2. Create Compute Engine client
-        // 3. Create Cloud Run client
-        // 4. Create Cloud Storage client
-        // 5. Store clients for use in API calls
-        //
-        // Options for GCP SDK:
-        // - google-cloud-rust (if available)
-        // - Direct REST API calls via reqwest (similar to Kubernetes implementation)
-        // - Community crates (gcloud-rs, etc.)
-        //
-        // Example (API needs verification once SDK is selected):
-        // let credential = GcpCredential::default();
-        // let compute_client = ComputeClient::new(credential, project_id);
-        // *self.compute_client.write().await = Some(compute_client);
+            // Initialize HTTP client for GCP REST API calls
+            let http_client = reqwest::Client::builder()
+                .build()
+                .map_err(|e| AppError::InitializationError(format!(
+                    "Failed to create HTTP client for GCP API. Context: Cannot initialize reqwest client. \
+                    Error: {}",
+                    e
+                )))?;
+            *self.http_client.write().await = Some(http_client);
 
-        info!(
-            "GCP SDK client initialization placeholder for project: {} (TODO: implement with confirmed SDK)",
-            project_id
-        );
+            // TODO: Initialize GCP access token
+            // Note: GCP authentication can be done via:
+            // 1. Application Default Credentials (ADC) - `gcloud auth application-default login`
+            // 2. Service account key file - `GOOGLE_APPLICATION_CREDENTIALS` env var
+            // 3. Metadata server (when running on GCP)
+            //
+            // For now, we'll use a placeholder. Full implementation would:
+            // - Try to load credentials from GOOGLE_APPLICATION_CREDENTIALS
+            // - Try to use gcloud ADC
+            // - Try to use metadata server
+            // - Get access token from credentials
+            // - Store token for API calls
+            //
+            // Example implementation (needs verification):
+            // let token = get_gcp_access_token().await?;
+            // *self.access_token.write().await = Some(token);
+
+            info!(
+                "GCP HTTP client initialized for project: {} (Access token initialization pending)",
+                project_id
+            );
+        }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            info!("GCP manager initialized (placeholder mode)");
             tracing::warn!(
                 "GCP integration is a placeholder - enable cloud-sdk feature for full SDK support"
             );
@@ -162,7 +184,13 @@ impl GcpManager {
     /// # }
     /// ```
     pub async fn shutdown(&self) -> Result<(), AppError> {
-        // TODO: Clear SDK clients when implemented
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Clear clients
+            *self.http_client.write().await = None;
+            *self.access_token.write().await = None;
+        }
+
         *self.initialized.write().await = false;
         info!("GCP manager shut down");
         Ok(())
