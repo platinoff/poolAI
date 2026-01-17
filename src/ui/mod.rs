@@ -91,11 +91,14 @@ const BASE_CSS: &str = r#"
   
   body { 
     font-family: Segoe UI, Arial, sans-serif; 
+    font-size: var(--font-size-base, 16px);
+    line-height: var(--line-height-normal, 1.5);
+    font-weight: var(--font-weight-normal, 400);
     background: var(--bg, #0f1216); 
     color: var(--text, #e8e8e8); 
     margin: 0; 
     padding: 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color var(--transition-slow, 0.3s ease), color var(--transition-slow, 0.3s ease);
   }
   a { color: var(--link, #77c7ff); text-decoration: none; }
   a:hover { color: var(--link-hover, #8bd5ff); text-decoration: underline; }
@@ -104,8 +107,8 @@ const BASE_CSS: &str = r#"
   /* Wrap контейнер з автоматичним вирівнюванням */
   .wrap { 
     max-width: 1080px; 
-    margin: 28px auto; 
-    padding: 0 16px; 
+    margin: var(--spacing-8, 32px) auto; 
+    padding: 0 var(--spacing-4, 16px); 
     width: 100%;
   }
   
@@ -114,36 +117,37 @@ const BASE_CSS: &str = r#"
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    gap: 16px; 
-    padding: 14px 16px; 
+    gap: var(--spacing-4, 16px); 
+    padding: var(--spacing-3, 12px) var(--spacing-4, 16px); 
     border: 1px solid var(--border, #262b36); 
-    border-radius: 14px; 
+    border-radius: var(--radius-lg, 12px); 
     background: var(--surface, #171b22); 
-    box-shadow: 0 12px 40px rgba(0,0,0,.20); 
+    box-shadow: var(--shadow-xl, 0 12px 40px rgba(0,0,0,.20)); 
     width: 100%;
     flex-wrap: wrap;
   }
-  .brand { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
-  .brand h1 { margin: 0; font-size: 18px; color: var(--primary, #67e480); }
-  .brand .muted { color: var(--text-muted, #a8b0bf); font-size: 0.95em; }
+  .brand { display: flex; align-items: center; gap: var(--spacing-3, 12px); flex: 0 0 auto; }
+  .brand h1 { margin: 0; font-size: var(--font-size-lg, 18px); color: var(--primary, #67e480); font-weight: var(--font-weight-semibold, 600); }
+  .brand .muted { color: var(--text-muted, #a8b0bf); font-size: var(--font-size-sm, 14px); }
   
   /* Navigation з автоматичним вирівнюванням */
   .nav { 
     display: flex; 
     flex-wrap: wrap; 
-    gap: 10px; 
+    gap: var(--spacing-2, 8px); 
     align-items: center; 
     flex: 1 1 auto;
     justify-content: flex-end;
   }
   .nav a { 
-    padding: 6px 10px; 
+    padding: var(--spacing-1, 4px) var(--spacing-2, 8px); 
     border: 1px solid var(--border, #262b36); 
-    border-radius: 10px; 
+    border-radius: var(--radius-md, 8px); 
     background: var(--bg, #0f1216); 
     white-space: nowrap;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base, 0.2s ease);
     position: relative;
+    font-size: var(--font-size-sm, 14px);
   }
   .nav a:hover {
     background: var(--surface-secondary, #1e2329);
@@ -157,7 +161,7 @@ const BASE_CSS: &str = r#"
   
   /* Content з правильним spacing */
   .content { 
-    margin-top: 14px; 
+    margin-top: var(--spacing-3, 12px); 
     width: 100%;
   }
   
@@ -165,17 +169,17 @@ const BASE_CSS: &str = r#"
   .grid { 
     display: grid; 
     grid-template-columns: 1fr 1fr; 
-    gap: 12px; 
-    margin-top: 12px; 
+    gap: var(--spacing-3, 12px); 
+    margin-top: var(--spacing-3, 12px); 
     width: 100%;
   }
   .item { 
-    padding: 12px; 
-    border-radius: 12px; 
+    padding: var(--spacing-3, 12px); 
+    border-radius: var(--radius-lg, 12px); 
     border: 1px solid var(--border, #262b36); 
     background: var(--bg, #0f1216); 
     width: 100%;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base, 0.2s ease);
   }
   .item:hover {
     background: var(--surface, #171b22);
@@ -190,7 +194,7 @@ const BASE_CSS: &str = r#"
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    gap: 12px; 
+    gap: var(--spacing-3, 12px); 
     width: 100%;
     flex-wrap: wrap;
   }
@@ -206,12 +210,14 @@ const BASE_CSS: &str = r#"
     word-break: break-word; 
     background: var(--bg, #0b0d10); 
     border: 1px solid var(--border, #262b36); 
-    border-radius: 12px; 
-    padding: 12px; 
-    margin: 12px 0 0; 
+    border-radius: var(--radius-lg, 12px); 
+    padding: var(--spacing-3, 12px); 
+    margin: var(--spacing-3, 12px) 0 0; 
     width: 100%;
     overflow-x: auto;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base, 0.2s ease);
+    font-size: var(--font-size-sm, 14px);
+    line-height: var(--line-height-normal, 1.5);
   }
   pre:hover {
     border-color: var(--primary, #50fa7b);
