@@ -104,9 +104,9 @@
 
 ### Пріоритет 2: Production Hardening (17-24 дні) ⭐⭐
 
-**Поточний прогрес**: 20% 🔄 (Performance Optimization: Memory pool ✅, LRU cache ✅)
+**Поточний прогрес**: 25% 🔄 (Performance Optimization: Memory pool ✅, LRU cache ✅, Benchmarks ✅)
 
-#### 2.1 Performance Optimization (5-7 днів) - 60% 🔄
+#### 2.1 Performance Optimization (5-7 днів) - 70% 🔄
 
 **Завдання**:
 - [ ] Профілювання hot paths (CPU, memory)
@@ -115,7 +115,7 @@
 - [x] Memory pool optimization для часто алокованих структур ✅ (ModelRequest/ModelResponse/String/Vec<String> pools implemented)
 - [x] Cache optimization (LRU, TTL tuning) ✅ (LRU cache with TTL support, statistics tracking)
 - [ ] Database query optimization (якщо використовується)
-- [ ] Benchmark tests для критичних шляхів
+- [x] Benchmark tests для критичних шляхів ✅ (Memory pool, LRU cache, ModelRequest/Response, cache key generation benchmarks)
 
 **Інструменти**:
 - `cargo flamegraph` - CPU profiling
