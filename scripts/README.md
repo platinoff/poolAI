@@ -10,6 +10,12 @@
   - Використання: `bash scripts/setup_rust_path.sh`
   - Опис: Автоматично налаштовує PATH для Rust та Cargo в MSYS2 UCRT64
 
+- **`setup_msys2_path.ps1`** - Налаштування MSYS2 PATH для Windows (PowerShell)
+  - Використання: `.\scripts\setup_msys2_path.ps1`
+  - Опис: Додає `C:\msys64\usr\bin` до PATH для доступу до `dlltool.exe` та інших MinGW інструментів
+  - Призначення: Необхідно для компіляції Rust крейтів з нативними Windows залежностями (windows-sys, chrono)
+  - Коли використовувати: Перед `cargo build` або `cargo test` на Windows, якщо виникає помилка "dlltool.exe: program not found"
+
 - **`QUICK_FIX_RUST_PATH.sh`** - Швидке виправлення Rust PATH
   - Використання: `bash scripts/QUICK_FIX_RUST_PATH.sh`
   - Опис: Швидке виправлення PATH для Rust
