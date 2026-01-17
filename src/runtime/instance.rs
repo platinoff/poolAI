@@ -353,7 +353,16 @@ static GLOBAL_INSTANCE_MANAGER: OnceLock<Arc<RwLock<InstanceManager>>> = OnceLoc
 
 /// Initialize global instance manager
 pub fn initialize_global_instance_manager() -> Result<(), AppError> {
-    let manager = InstanceManager::new();
+    // Try to use topology-aware placement if topology manager is available
+    let manager = if let Some(_topology_manager) = crate::pool::topology::get_global_topology_manager() {
+        // Use topology-aware placement calculator
+        let calculator = Arc::new(crate::pool::placement::TopologyAwarePlacementCalculator);
+        InstanceManager::with_placement_calculator(calculator)
+    } else {
+        // Fallback to default placement calculator
+        InstanceManager::new()
+    };
+    
     GLOBAL_INSTANCE_MANAGER
         .set(Arc::new(RwLock::new(manager)))
         .map_err(|_| AppError::ConfigError(

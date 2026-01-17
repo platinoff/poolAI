@@ -126,13 +126,13 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let runtime_config = RuntimeConfig::default();
     let _runtime_manager = runtime::initialize_runtime(runtime_config).await?;
     
-    // Initialize instance manager
-    runtime::instance::initialize_global_instance_manager()
-        .map_err(|e| format!("Failed to initialize instance manager: {}", e))?;
-    
-    // Initialize topology manager
+    // Initialize topology manager first (before instance manager so it can use topology-aware placement)
     pool::topology::initialize_global_topology_manager()
         .map_err(|e| format!("Failed to initialize topology manager: {}", e))?;
+    
+    // Initialize instance manager (will use topology-aware placement if topology manager is available)
+    runtime::instance::initialize_global_instance_manager()
+        .map_err(|e| format!("Failed to initialize instance manager: {}", e))?;
     
     // Start topology update task (simplified - just trigger periodic updates)
     if let Some(topology_manager) = pool::topology::get_global_topology_manager() {

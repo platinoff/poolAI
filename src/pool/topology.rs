@@ -270,6 +270,12 @@ impl TopologyManager {
         }
     }
 
+    /// Get topology snapshot (for API access)
+    pub async fn get_topology_snapshot(&self) -> Topology {
+        let topology = self.topology.read().await;
+        topology.clone()
+    }
+
 }
 
 impl Default for TopologyManager {
