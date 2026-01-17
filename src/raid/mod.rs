@@ -74,6 +74,7 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
 
+pub mod burst_raid;
 pub mod circuit_breaker;
 pub mod client;
 pub mod events;
