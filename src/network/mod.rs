@@ -39,7 +39,21 @@ use axum_server::tls_rustls::RustlsConfig;
 /// # Note
 /// HTTPS support requires feature "https" and valid certificates.
 /// Configuration is read from PoolAIConfig.
+/// Discovery service is automatically started if enabled.
 pub async fn start_server(addr: SocketAddr) {
+    // Initialize and start discovery service
+    use crate::network::discovery::{initialize_global_discovery, DiscoveryConfig};
+    
+    let discovery_config = DiscoveryConfig::default();
+    if discovery_config.enabled {
+        if let Ok(discovery) = initialize_global_discovery(discovery_config, addr) {
+            if let Err(e) = discovery.start().await {
+                tracing::warn!("Failed to start discovery service: {}", e);
+            } else {
+                info!("Discovery service started successfully");
+            }
+        }
+    }
     let app = {
         let router = Router::new()
             // Trailing-slash compat for UI entrypoint.

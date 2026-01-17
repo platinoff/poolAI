@@ -11,11 +11,12 @@ use crate::core::error::AppError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::net::{IpAddr, SocketAddr, UdpSocket};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket};
 use std::sync::{Arc, OnceLock};
+use tokio::net::UdpSocket as TokioUdpSocket;
 use tokio::sync::RwLock;
 use tokio::time::{interval, Duration};
-use tracing::{debug, info, warn};
+use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 
 /// Discovery configuration
@@ -111,6 +112,13 @@ pub struct DiscoveryService {
     running: Arc<RwLock<bool>>,
 }
 
+/// Minimal clone of discovery service for listener task
+struct DiscoveryServiceClone {
+    peers: Arc<RwLock<HashMap<String, PeerInfo>>>,
+    local_address: SocketAddr,
+    local_peer_id: String,
+}
+
 impl DiscoveryService {
     /// Creates a new discovery service
     pub fn new(config: DiscoveryConfig, local_address: SocketAddr) -> Self {
@@ -150,6 +158,13 @@ impl DiscoveryService {
         let config = self.config.clone();
         let local_peer_id = self.local_peer_id.clone();
         let local_address = self.local_address;
+        let discovery_service = Arc::new(self.clone_for_listener());
+
+        // UDP listener task
+        tokio::spawn(Self::udp_listener_task(
+            discovery_service.clone(),
+            config.clone(),
+        ));
 
         // Broadcast task
         tokio::spawn(Self::broadcast_task(
@@ -166,6 +181,15 @@ impl DiscoveryService {
         self.send_announcement().await?;
 
         Ok(())
+    }
+
+    /// Clone discovery service for listener (minimal clone)
+    fn clone_for_listener(&self) -> DiscoveryServiceClone {
+        DiscoveryServiceClone {
+            peers: Arc::clone(&self.peers),
+            local_address: self.local_address,
+            local_peer_id: self.local_peer_id.clone(),
+        }
     }
 
     /// Stops the discovery service
@@ -269,6 +293,100 @@ impl DiscoveryService {
                 warn!("Failed to send heartbeat: {}", e);
             } else {
                 debug!("Sent heartbeat: {}", local_peer_id);
+            }
+        }
+    }
+
+    /// Background task for UDP listener
+    async fn udp_listener_task(
+        discovery: Arc<DiscoveryServiceClone>,
+        config: DiscoveryConfig,
+    ) {
+        let bind_addr = SocketAddr::new(Ipv4Addr::UNSPECIFIED.into(), config.broadcast_port);
+        
+        let socket = match TokioUdpSocket::bind(bind_addr).await {
+            Ok(s) => {
+                info!("Discovery UDP listener started on {}", bind_addr);
+                s
+            }
+            Err(e) => {
+                error!("Failed to bind UDP socket for discovery listener: {}", e);
+                return;
+            }
+        };
+
+        let mut buf = vec![0u8; 4096];
+
+        loop {
+            match socket.recv_from(&mut buf).await {
+                Ok((len, source)) => {
+                    let data = &buf[..len];
+                    
+                    match serde_json::from_slice::<DiscoveryMessage>(data) {
+                        Ok(message) => {
+                            debug!("Received discovery message from {}: {:?}", source, message);
+                            
+                            // Handle message
+                            let mut peers = discovery.peers.write().await;
+                            match message {
+                                DiscoveryMessage::Announce { peer_id, address, port, capabilities, metadata } => {
+                                    // Ignore our own messages
+                                    if peer_id == discovery.local_peer_id || source == discovery.local_address {
+                                        continue;
+                                    }
+                                    
+                                    let peer_info = PeerInfo {
+                                        peer_id: peer_id.clone(),
+                                        address,
+                                        port,
+                                        last_seen: Utc::now(),
+                                        capabilities,
+                                        metadata,
+                                    };
+
+                                    if peers.contains_key(&peer_id) {
+                                        debug!("Updated peer: {} (last seen: {})", peer_id, peer_info.last_seen);
+                                    } else {
+                                        info!("Discovered new peer: {} at {}:{}", peer_id, peer_info.address, port);
+                                    }
+                                    peers.insert(peer_id, peer_info);
+                                }
+                                DiscoveryMessage::Heartbeat { peer_id } => {
+                                    if let Some(peer_info) = peers.get_mut(&peer_id) {
+                                        peer_info.last_seen = Utc::now();
+                                        debug!("Received heartbeat from: {}", peer_id);
+                                    }
+                                }
+                                DiscoveryMessage::Query => {
+                                    // Respond with list of peers
+                                    let peers_list: Vec<PeerInfo> = peers.values().cloned().collect();
+                                    let response = DiscoveryMessage::Response {
+                                        peers: peers_list,
+                                    };
+                                    
+                                    if let Ok(data) = serde_json::to_vec(&response) {
+                                        if let Err(e) = socket.send_to(&data, source).await {
+                                            warn!("Failed to send discovery response: {}", e);
+                                        }
+                                    }
+                                }
+                                DiscoveryMessage::Response { peers: peers_list } => {
+                                    // Update peer list from response
+                                    for peer in peers_list {
+                                        peers.insert(peer.peer_id.clone(), peer);
+                                    }
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            warn!("Failed to parse discovery message from {}: {}", source, e);
+                        }
+                    }
+                }
+                Err(e) => {
+                    error!("Error receiving UDP packet: {}", e);
+                    break;
+                }
             }
         }
     }
