@@ -394,6 +394,21 @@ impl ReplicationEngine {
         metadata.get(artifact_id).cloned()
     }
 
+    /// Get all replication metadata
+    ///
+    /// Returns a clone of all replication metadata for analysis and monitoring.
+    pub async fn get_all_replication_metadata(&self) -> HashMap<String, ReplicationMetadata> {
+        let metadata = self.replication_metadata.read().await;
+        metadata.clone()
+    }
+
+    /// Get RAID manager reference
+    ///
+    /// Returns a clone of the RAID manager Arc for artifact operations.
+    pub fn get_raid_manager(&self) -> Arc<RwLock<crate::raid::RaidManager>> {
+        self.raid_manager.clone()
+    }
+
     /// Get or create protocol client for a node
     async fn get_protocol_client(&self, node_id: u64, address: &str) -> Arc<ProtocolClient> {
         let mut clients = self.protocol_clients.write().await;

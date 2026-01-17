@@ -32,7 +32,7 @@ use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 use uuid::Uuid;
 
 /// Configuration for BurstRAID strategy
@@ -349,6 +349,8 @@ impl BurstRaidStrategy {
     /// Trigger rebalancing of artifacts across nodes
     ///
     /// This method redistributes artifacts to balance storage and access patterns.
+    /// It analyzes current distribution, identifies artifacts that should be moved
+    /// based on access patterns and node capacity, and moves them to better nodes.
     ///
     /// # Errors
     ///
@@ -356,13 +358,236 @@ impl BurstRaidStrategy {
     pub async fn rebalance(&self) -> Result<(), AppError> {
         info!("Starting BurstRAID rebalancing");
 
-        // TODO: Implement rebalancing logic
         // 1. Analyze current distribution of artifacts across nodes
-        // 2. Identify artifacts that should be moved (based on access patterns, node capacity, etc.)
-        // 3. Move artifacts to better nodes
-        // 4. Update replication metadata
+        let distribution = self.analyze_distribution().await?;
+        
+        if distribution.is_empty() {
+            info!("No artifacts to rebalance");
+            return Ok(());
+        }
 
-        info!("BurstRAID rebalancing completed");
+        info!(
+            "Analyzed distribution: {} artifacts across {} nodes",
+            distribution.len(),
+            self.replication_engine.get_available_nodes().await.len()
+        );
+
+        // 2. Identify artifacts that should be moved (based on access patterns, node capacity, etc.)
+        let rebalance_plan = self.create_rebalance_plan(&distribution).await?;
+
+        if rebalance_plan.is_empty() {
+            info!("Rebalancing not needed: distribution is already balanced");
+            return Ok(());
+        }
+
+        info!("Rebalancing plan: {} artifacts to move", rebalance_plan.len());
+
+        // 3. Move artifacts to better nodes
+        let mut moved_count = 0;
+        let mut failed_count = 0;
+
+        for (artifact_id, target_nodes) in rebalance_plan {
+            match self.move_artifact_to_nodes(artifact_id, target_nodes).await {
+                Ok(_) => {
+                    moved_count += 1;
+                    debug!("Moved artifact {} to new nodes", artifact_id);
+                }
+                Err(e) => {
+                    failed_count += 1;
+                    warn!("Failed to move artifact {}: {}", artifact_id, e);
+                }
+            }
+        }
+
+        info!(
+            "BurstRAID rebalancing completed: {} moved, {} failed",
+            moved_count, failed_count
+        );
+
+        Ok(())
+    }
+
+    /// Analyze current distribution of artifacts across nodes
+    ///
+    /// Returns a map of artifact_id -> (access_count, burst_state, replica_nodes)
+    async fn analyze_distribution(&self) -> Result<Vec<(Uuid, u64, bool, Vec<u64>)>, AppError> {
+        // Get all replication metadata
+        let metadata_map = self.replication_engine.get_all_replication_metadata().await;
+        let mut distribution = Vec::new();
+
+        for (artifact_id_str, metadata) in metadata_map.iter() {
+            let artifact_id = match Uuid::parse_str(artifact_id_str) {
+                Ok(id) => id,
+                Err(_) => {
+                    warn!("Invalid artifact ID in replication metadata: {}", artifact_id_str);
+                    continue;
+                }
+            };
+
+            // Get access count from request counters
+            let request_counters = self.request_counters.read().await;
+            let access_count = request_counters
+                .get(&artifact_id)
+                .map(|(count, _)| *count)
+                .unwrap_or(0);
+
+            // Get burst state
+            let burst_states = self.burst_states.read().await;
+            let in_burst = burst_states
+                .get(&artifact_id)
+                .map(|state| state.in_burst)
+                .unwrap_or(false);
+
+            // Get replica nodes from metadata
+            let replica_nodes = metadata.replica_nodes.clone();
+
+            distribution.push((artifact_id, access_count, in_burst, replica_nodes));
+        }
+
+        Ok(distribution)
+    }
+
+    /// Create rebalance plan based on distribution analysis
+    ///
+    /// Returns a map of artifact_id -> target_nodes for rebalancing.
+    async fn create_rebalance_plan(
+        &self,
+        distribution: &[(Uuid, u64, bool, Vec<u64>)],
+    ) -> Result<Vec<(Uuid, Vec<u64>)>, AppError> {
+        let available_nodes = self.replication_engine.get_available_nodes().await;
+        
+        if available_nodes.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let node_ids: Vec<u64> = available_nodes.iter().map(|(id, _)| *id).collect();
+
+        // Calculate target replication factor per artifact based on access patterns
+        let mut rebalance_plan = Vec::new();
+
+        for (artifact_id, access_count, in_burst, current_nodes) in distribution {
+            // Determine target replication factor
+            let target_factor = if *in_burst {
+                self.config.max_replication_factor
+            } else if *access_count > (self.config.burst_threshold_rps * 3600.0) as u64 {
+                // High access count but not in burst - use medium replication
+                (self.config.base_replication_factor + self.config.max_replication_factor) / 2
+            } else {
+                self.config.base_replication_factor
+            };
+
+            // Check if rebalancing is needed
+            let current_factor = current_nodes.len() as u32;
+            
+            if current_factor == target_factor && !current_nodes.is_empty() {
+                // Already at target factor, check if we need to redistribute
+                // For now, skip if already at target factor
+                continue;
+            }
+
+            // Select target nodes for rebalancing
+            // Prefer nodes that don't already have the artifact
+            let mut target_nodes = Vec::new();
+            let mut candidate_nodes: Vec<u64> = node_ids
+                .iter()
+                .filter(|node_id| !current_nodes.contains(node_id))
+                .copied()
+                .collect();
+
+            // If we need more replicas, add from candidates
+            if target_factor > current_factor {
+                let needed = target_factor - current_factor;
+                for _ in 0..needed.min(candidate_nodes.len() as u32) {
+                    if let Some(node) = candidate_nodes.pop() {
+                        target_nodes.push(node);
+                    }
+                }
+            }
+
+            // If we need fewer replicas, mark for removal (handled separately)
+            // For now, we'll add new replicas to balance load
+            if !target_nodes.is_empty() {
+                rebalance_plan.push((*artifact_id, target_nodes));
+            }
+        }
+
+        Ok(rebalance_plan)
+    }
+
+    /// Move artifact to new nodes
+    ///
+    /// Reads artifact data from RaidManager and replicates to target nodes.
+    async fn move_artifact_to_nodes(
+        &self,
+        artifact_id: Uuid,
+        target_nodes: Vec<u64>,
+    ) -> Result<(), AppError> {
+        use crate::raid::protocol::ArtifactMetadata;
+        use sha2::{Digest, Sha256};
+
+        // Get artifact from RaidManager
+        let raid_manager_ref = self.replication_engine.get_raid_manager();
+        
+        // Get artifact reference (clone it to release lock early)
+        let artifact_path = {
+            let raid_manager = raid_manager_ref.read().await;
+            let artifacts = raid_manager.artifacts.read().await;
+            
+            let artifact_ref = artifacts
+                .artifacts
+                .get(&artifact_id)
+                .ok_or_else(|| {
+                    AppError::ValidationError(format!("Artifact {} not found in manifest", artifact_id))
+                })?;
+            
+            artifact_ref.path.clone()
+        };
+
+        // Read artifact data (now we can read without holding the lock)
+        let raid_manager = raid_manager_ref.read().await;
+        let artifact_data = raid_manager.get_artifact(&artifact_path).await?;
+        
+        // Get artifact metadata (need to read again for name, etc.)
+        let artifact_ref = {
+            let artifacts = raid_manager.artifacts.read().await;
+            artifacts
+                .artifacts
+                .get(&artifact_id)
+                .ok_or_else(|| {
+                    AppError::ValidationError(format!("Artifact {} not found in manifest", artifact_id))
+                })?
+                .clone()
+        };
+        
+        drop(raid_manager);
+
+        // Calculate checksum
+        let mut hasher = Sha256::new();
+        hasher.update(&artifact_data);
+        let checksum = format!("sha256:{:x}", hasher.finalize());
+
+        // Create metadata
+        let metadata = ArtifactMetadata {
+            name: artifact_ref.name,
+            version: "1.0.0".to_string(),
+            size_bytes: artifact_data.len() as u64,
+            checksum,
+            created_at: artifact_ref.stored_at,
+            content_type: Some("application/octet-stream".to_string()),
+            tags: None,
+        };
+
+        // Replicate to target nodes
+        self.replication_engine
+            .replicate_sync(
+                artifact_id.to_string(),
+                artifact_data,
+                metadata,
+                target_nodes.len() as u32,
+                Some(target_nodes),
+            )
+            .await?;
+
         Ok(())
     }
 
