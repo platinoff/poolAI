@@ -1,0 +1,373 @@
+//! Model instance management
+//!
+//! This module provides:
+//! - Model instance lifecycle management
+//! - Instance placement strategies
+//! - Instance state tracking
+//! - Resource allocation and validation
+
+use crate::core::error::AppError;
+use crate::core::model_interface::{ModelInfo, ModelInterface};
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use tracing::{info, warn};
+use uuid::Uuid;
+
+/// Model instance state
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum InstanceStatus {
+    /// Instance is being created
+    Creating,
+    /// Instance is ready to process requests
+    Ready,
+    /// Instance is processing requests
+    Active,
+    /// Instance is stopped
+    Stopped,
+    /// Instance encountered an error
+    Error(String),
+    /// Instance is being deleted
+    Deleting,
+}
+
+/// Instance placement strategy
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum PlacementStrategy {
+    /// Single node placement
+    Single,
+    /// Pipeline parallelism across nodes
+    Pipeline,
+    /// Tensor parallelism (sharding)
+    Tensor,
+}
+
+/// Instance placement information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstancePlacement {
+    /// Placement strategy
+    pub strategy: PlacementStrategy,
+    /// Node IDs where instance is placed
+    pub node_ids: Vec<String>,
+    /// Memory allocation per node (MB)
+    pub memory_by_node: HashMap<String, u64>,
+    /// Estimated memory delta
+    pub memory_delta: i64,
+    /// Error if placement is invalid
+    pub error: Option<String>,
+}
+
+/// Model instance
+#[derive(Clone)]
+pub struct ModelInstance {
+    /// Unique instance ID
+    pub instance_id: String,
+    /// Model ID/name
+    pub model_id: String,
+    /// Instance status
+    pub status: Arc<RwLock<InstanceStatus>>,
+    /// Placement information
+    pub placement: InstancePlacement,
+    /// Created timestamp
+    pub created_at: DateTime<Utc>,
+    /// Last activity timestamp
+    pub last_activity: Arc<RwLock<DateTime<Utc>>>,
+    /// Model interface (if loaded) - not included in Debug/Clone
+    pub model: Option<Arc<dyn ModelInterface + Send + Sync>>,
+    /// Instance metadata
+    pub metadata: HashMap<String, String>,
+}
+
+impl std::fmt::Debug for ModelInstance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ModelInstance")
+            .field("instance_id", &self.instance_id)
+            .field("model_id", &self.model_id)
+            .field("status", &"<Arc<RwLock<InstanceStatus>>>")
+            .field("placement", &self.placement)
+            .field("created_at", &self.created_at)
+            .field("last_activity", &"<Arc<RwLock<DateTime<Utc>>>>")
+            .field("model", &self.model.as_ref().map(|_| "<ModelInterface>"))
+            .field("metadata", &self.metadata)
+            .finish()
+    }
+}
+
+/// Instance manager
+pub struct InstanceManager {
+    /// Active instances
+    instances: Arc<RwLock<HashMap<String, ModelInstance>>>,
+    /// Placement strategy calculator
+    placement_calculator: Arc<dyn PlacementCalculator + Send + Sync>,
+}
+
+/// Trait for placement calculation
+#[async_trait::async_trait]
+pub trait PlacementCalculator: Send + Sync {
+    /// Calculate placement options for a model
+    async fn calculate_placements(
+        &self,
+        model_id: &str,
+        model_info: &ModelInfo,
+    ) -> Result<Vec<InstancePlacement>, AppError>;
+}
+
+/// Default placement calculator
+pub struct DefaultPlacementCalculator;
+
+#[async_trait::async_trait]
+impl PlacementCalculator for DefaultPlacementCalculator {
+    async fn calculate_placements(
+        &self,
+        _model_id: &str,
+        model_info: &ModelInfo,
+    ) -> Result<Vec<InstancePlacement>, AppError> {
+        // Simple single-node placement for now
+        let memory_required = model_info.gpu_requirements.recommended_memory_mb;
+        
+        let placement = InstancePlacement {
+            strategy: PlacementStrategy::Single,
+            node_ids: vec!["local".to_string()],
+            memory_by_node: {
+                let mut map = HashMap::new();
+                map.insert("local".to_string(), memory_required);
+                map
+            },
+            memory_delta: memory_required as i64,
+            error: None,
+        };
+
+        Ok(vec![placement])
+    }
+}
+
+impl InstanceManager {
+    /// Create a new instance manager
+    pub fn new() -> Self {
+        Self {
+            instances: Arc::new(RwLock::new(HashMap::new())),
+            placement_calculator: Arc::new(DefaultPlacementCalculator),
+        }
+    }
+
+    /// Create a new instance manager with custom placement calculator
+    pub fn with_placement_calculator(
+        calculator: Arc<dyn PlacementCalculator + Send + Sync>,
+    ) -> Self {
+        Self {
+            instances: Arc::new(RwLock::new(HashMap::new())),
+            placement_calculator: calculator,
+        }
+    }
+
+    /// Get placement previews for a model
+    pub async fn get_placement_previews(
+        &self,
+        model_id: &str,
+        model_info: &ModelInfo,
+    ) -> Result<Vec<InstancePlacement>, AppError> {
+        self.placement_calculator
+            .calculate_placements(model_id, model_info)
+            .await
+    }
+
+    /// Create a new model instance
+    pub async fn create_instance(
+        &self,
+        model_id: String,
+        placement: InstancePlacement,
+        metadata: HashMap<String, String>,
+    ) -> Result<String, AppError> {
+        let instance_id = format!("inst-{}", Uuid::new_v4().to_string()[..8].to_string());
+
+        let instance = ModelInstance {
+            instance_id: instance_id.clone(),
+            model_id: model_id.clone(),
+            status: Arc::new(RwLock::new(InstanceStatus::Creating)),
+            placement,
+            created_at: Utc::now(),
+            last_activity: Arc::new(RwLock::new(Utc::now())),
+            model: None, // Will be loaded later
+            metadata,
+        };
+
+        let mut instances = self.instances.write().await;
+        instances.insert(instance_id.clone(), instance);
+
+        info!("Created model instance: {} for model: {}", instance_id, model_id);
+
+        // Update status to Ready (simplified - in real implementation would load model)
+        {
+            let mut status = instances
+                .get(&instance_id)
+                .unwrap()
+                .status
+                .write()
+                .await;
+            *status = InstanceStatus::Ready;
+        }
+
+        Ok(instance_id)
+    }
+
+    /// Get instance by ID
+    pub async fn get_instance(&self, instance_id: &str) -> Option<ModelInstance> {
+        let instances = self.instances.read().await;
+        instances.get(instance_id).cloned()
+    }
+
+    /// List all instances
+    pub async fn list_instances(&self) -> Vec<ModelInstance> {
+        let instances = self.instances.read().await;
+        instances.values().cloned().collect()
+    }
+
+    /// Delete an instance
+    pub async fn delete_instance(&self, instance_id: &str) -> Result<(), AppError> {
+        let mut instances = self.instances.write().await;
+
+        if let Some(instance) = instances.get(instance_id) {
+            // Update status to Deleting
+            {
+                let mut status = instance.status.write().await;
+                *status = InstanceStatus::Deleting;
+            }
+
+            // Shutdown model if loaded
+            if let Some(model) = &instance.model {
+                if let Err(e) = model.shutdown().await {
+                    warn!("Error shutting down model for instance {}: {}", instance_id, e);
+                }
+            }
+
+            instances.remove(instance_id);
+            info!("Deleted model instance: {}", instance_id);
+            Ok(())
+        } else {
+            Err(AppError::ResourceError(format!(
+                "Instance '{}' not found",
+                instance_id
+            )))
+        }
+    }
+
+    /// Get instance status
+    pub async fn get_instance_status(&self, instance_id: &str) -> Option<InstanceStatus> {
+        let instances = self.instances.read().await;
+        if let Some(instance) = instances.get(instance_id) {
+            // Read the status from RwLock
+            let status = instance.status.read().await;
+            Some(status.clone())
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for InstanceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// Global instance manager
+use std::sync::OnceLock;
+
+static GLOBAL_INSTANCE_MANAGER: OnceLock<Arc<RwLock<InstanceManager>>> = OnceLock::new();
+
+/// Initialize global instance manager
+pub fn initialize_global_instance_manager() -> Result<(), AppError> {
+    let manager = InstanceManager::new();
+    GLOBAL_INSTANCE_MANAGER
+        .set(Arc::new(RwLock::new(manager)))
+        .map_err(|_| AppError::ConfigError(
+            "Instance manager already initialized".to_string()
+        ))?;
+    Ok(())
+}
+
+/// Get global instance manager
+pub fn get_global_instance_manager() -> Option<&'static Arc<RwLock<InstanceManager>>> {
+    GLOBAL_INSTANCE_MANAGER.get()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::model_interface::{GpuRequirements, ModelInfo};
+
+    #[tokio::test]
+    async fn test_instance_manager_creation() {
+        let manager = InstanceManager::new();
+        let instances = manager.list_instances().await;
+        assert_eq!(instances.len(), 0);
+    }
+
+    #[tokio::test]
+    async fn test_get_placement_previews() {
+        let manager = InstanceManager::new();
+        let model_info = ModelInfo {
+            name: "test-model".to_string(),
+            version: "1.0".to_string(),
+            description: None,
+            parameters: 1000000,
+            gpu_requirements: GpuRequirements {
+                min_memory_mb: 1000,
+                recommended_memory_mb: 2000,
+                supported_architectures: vec!["CUDA".to_string()],
+                requires_cuda: true,
+            },
+        };
+
+        let placements = manager
+            .get_placement_previews("test-model", &model_info)
+            .await
+            .unwrap();
+
+        assert!(!placements.is_empty());
+        assert_eq!(placements[0].strategy, PlacementStrategy::Single);
+    }
+
+    #[tokio::test]
+    async fn test_create_and_delete_instance() {
+        let manager = InstanceManager::new();
+        let model_info = ModelInfo {
+            name: "test-model".to_string(),
+            version: "1.0".to_string(),
+            description: None,
+            parameters: 1000000,
+            gpu_requirements: GpuRequirements {
+                min_memory_mb: 1000,
+                recommended_memory_mb: 2000,
+                supported_architectures: vec!["CUDA".to_string()],
+                requires_cuda: true,
+            },
+        };
+
+        let placements = manager
+            .get_placement_previews("test-model", &model_info)
+            .await
+            .unwrap();
+
+        let instance_id = manager
+            .create_instance(
+                "test-model".to_string(),
+                placements[0].clone(),
+                HashMap::new(),
+            )
+            .await
+            .unwrap();
+
+        assert!(!instance_id.is_empty());
+
+        let instance = manager.get_instance(&instance_id).await;
+        assert!(instance.is_some());
+
+        manager.delete_instance(&instance_id).await.unwrap();
+
+        let instance = manager.get_instance(&instance_id).await;
+        assert!(instance.is_none());
+    }
+}

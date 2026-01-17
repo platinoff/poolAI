@@ -15,6 +15,7 @@
 
 pub mod common;
 pub mod discovery;
+pub mod instances;
 pub mod libraries;
 pub mod raid;
 pub mod rewards;
@@ -46,6 +47,7 @@ pub fn create_api_routes() -> Router {
         .merge(libraries::create_libraries_routes())
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
+        .merge(instances::create_instance_routes())
     // api_legacy.rs is kept for backward compatibility
     // All handlers have been migrated to modular structure
 }

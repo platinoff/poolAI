@@ -48,6 +48,7 @@
 
 pub mod cache;
 pub mod health;
+pub mod instance;
 pub mod memory_pool;
 pub mod orchestrator;
 pub mod process;

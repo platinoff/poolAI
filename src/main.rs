@@ -125,7 +125,11 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Initializing runtime module...");
     let runtime_config = RuntimeConfig::default();
     let _runtime_manager = runtime::initialize_runtime(runtime_config).await?;
-    info!("✅ Runtime module initialized");
+    
+    // Initialize instance manager
+    runtime::instance::initialize_global_instance_manager()
+        .map_err(|e| format!("Failed to initialize instance manager: {}", e))?;
+    info!("✅ Runtime module initialized (including instance manager)");
 
     // Initialize VM module
     info!("Initializing VM module...");
