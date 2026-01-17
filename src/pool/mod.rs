@@ -6,6 +6,7 @@
 //! - Pool metrics and monitoring
 //! - Auto-scaling capabilities
 
+pub mod discovery_integration;
 pub mod worker;
 
 use crate::core::error::AppError;
@@ -588,6 +589,18 @@ pub async fn initialize() -> Result<(), AppError> {
         ))?;
 
     info!("Pool module initialized successfully");
+    
+    // Start discovery pool sync if pool is available
+    if let Some(pool_arc) = get_global_pool() {
+        let pool = Arc::clone(pool_arc);
+        let sync = discovery_integration::DiscoveryPoolSync::new(pool);
+        if let Err(e) = sync.start().await {
+            warn!("Failed to start discovery pool sync: {}", e);
+        } else {
+            info!("Discovery pool sync started");
+        }
+    }
+    
     Ok(())
 }
 
