@@ -136,14 +136,27 @@ fn detect_system_memory() -> Option<usize> {
     
     #[cfg(target_os = "windows")]
     {
-        // On Windows, use sysinfo crate or similar
+        // On Windows, try to use system commands
+        // Could use PowerShell: (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory
         // For now, return None and use fallback
     }
     
     #[cfg(target_os = "macos")]
     {
-        // On macOS, could use sysctl
-        // For now, return None and use fallback
+        // On macOS, use sysctl hw.memsize
+        if let Ok(output) = std::process::Command::new("sysctl")
+            .arg("-n")
+            .arg("hw.memsize")
+            .output()
+        {
+            if output.status.success() {
+                if let Ok(contents) = String::from_utf8(output.stdout) {
+                    if let Ok(bytes) = contents.trim().parse::<usize>() {
+                        return Some(bytes / (1024 * 1024)); // Convert bytes to MB
+                    }
+                }
+            }
+        }
     }
     
     None
