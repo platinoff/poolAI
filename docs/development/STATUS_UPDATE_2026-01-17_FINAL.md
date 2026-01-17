@@ -27,12 +27,13 @@
   - Auto-sync з worker pool
   - API endpoints для peer management
 
-- ✅ **Model Instance Management API**: 95% ✅
+- ✅ **Model Instance Management API**: 98% ✅
   - Instance creation/deletion/list
   - Placement preview API
   - OpenAI-compatible `/v1/chat/completions` endpoint
   - ✅ **Streaming support (SSE) through real instance models** ✅
   - Real model integration via ModelManager
+  - ✅ **Improved metadata and error messages** ✅
   - Integration tests (12 tests passing)
 
 - ✅ **Topology-Aware Load Balancing**: 95% ✅
@@ -369,7 +370,7 @@
 
 ### Поточний стан (оновлено 2026-01-17):
 - **Core Infrastructure**: 100% ✅
-- **Distributed AI Features**: 100% ✅ (Device Discovery ✅, Instance API 95% ✅, Topology 95% ✅, Capabilities 100% ✅)
+- **Distributed AI Features**: 100% ✅ (Device Discovery ✅, Instance API 98% ✅, Topology 95% ✅, Capabilities 100% ✅)
 - **Real Model Integration**: 90% ✅ (ModelManager integration ✅, LibraryManager lookup ✅)
 - **Streaming Support**: 95% ✅ (Real model streaming ✅, Native token streaming ⏳)
 - **Load Tracking**: 95% ✅ (Real load calculation from instances ✅)
