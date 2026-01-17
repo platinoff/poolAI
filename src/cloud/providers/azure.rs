@@ -31,8 +31,10 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 // Note: Azure SDK 0.30 API differs from expected structure
-// TODO: Investigate correct API for azure_identity 0.30 and azure_mgmt_compute 0.21
-// Placeholder implementation until correct API is confirmed
+// azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
+// This version mismatch may require workaround or API verification
+#[cfg(feature = "cloud-sdk")]
+use azure_identity::DefaultAzureCredential;
 #[cfg(feature = "cloud-sdk")]
 use azure_mgmt_compute::Client as ComputeClient;
 
@@ -40,14 +42,14 @@ use azure_mgmt_compute::Client as ComputeClient;
 pub struct AzureManager {
     subscription_id: Option<String>,
     initialized: Arc<RwLock<bool>>,
-    // Note: Azure SDK client fields commented out until correct API is confirmed
-    // #[cfg(feature = "cloud-sdk")]
-    // /// Azure credential for authentication
-    // credential: Arc<RwLock<Option<DefaultAzureCredential>>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Azure credential for authentication
+    /// Note: Currently placeholder - API needs verification for version compatibility
+    credential: Arc<RwLock<Option<DefaultAzureCredential>>>,
     #[cfg(feature = "cloud-sdk")]
     /// Azure Compute client for VM Scale Sets and VM management
-    /// TODO: Initialize with proper credential once Azure SDK API is confirmed
-    _compute_client: Arc<RwLock<Option<ComputeClient>>>,
+    /// Note: azure_mgmt_compute 0.21 uses azure_core 0.21, may need API verification
+    compute_client: Arc<RwLock<Option<ComputeClient>>>,
 }
 
 impl AzureManager {
@@ -70,7 +72,9 @@ impl AzureManager {
                 .or_else(|| std::env::var("AZURE_SUBSCRIPTION_ID").ok()),
             initialized: Arc::new(RwLock::new(false)),
             #[cfg(feature = "cloud-sdk")]
-            _compute_client: Arc::new(RwLock::new(None)),
+            credential: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            compute_client: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -119,22 +123,29 @@ impl AzureManager {
                 subscription_id
             );
 
-            // TODO: Initialize Azure SDK clients once correct API is confirmed
-            // Note: Azure SDK 0.30 API structure needs to be verified
-            // Expected flow:
-            // 1. Initialize Azure credentials (DefaultAzureCredential or EnvironmentCredential)
-            // 2. Create Compute client with credential and subscription_id
-            // 3. Store clients for use in API calls
-            //
-            // Example (API needs verification):
-            // let credential = DefaultAzureCredential::default();
-            // let compute_client = ComputeClient::builder(credential)
+            // Initialize Azure credentials
+            // Note: DefaultAzureCredential tries multiple authentication methods:
+            // 1. Environment variables (AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID)
+            // 2. Managed Identity (when running on Azure)
+            // 3. Azure CLI (when logged in via `az login`)
+            // 4. Azure PowerShell (when logged in)
+            let credential = DefaultAzureCredential::default();
+
+            // Store credential
+            *self.credential.write().await = Some(credential);
+
+            // TODO: Initialize Compute client once API is verified
+            // Note: azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
+            // This version mismatch may cause compilation errors. Need to verify API compatibility.
+            // Expected API (needs verification):
+            // let compute_client = ComputeClient::builder()
             //     .subscription_id(subscription_id.to_string())
+            //     .credential(credential.clone())
             //     .build();
-            // *self._compute_client.write().await = Some(compute_client);
+            // *self.compute_client.write().await = Some(compute_client);
 
             info!(
-                "Azure SDK client initialization placeholder for subscription: {} (TODO: implement with verified API)",
+                "Azure credential initialized for subscription: {} (Compute client initialization pending API verification)",
                 subscription_id
             );
         }
@@ -171,8 +182,9 @@ impl AzureManager {
     pub async fn shutdown(&self) -> Result<(), AppError> {
         #[cfg(feature = "cloud-sdk")]
         {
-            // Clear clients (when implemented)
-            *self._compute_client.write().await = None;
+            // Clear clients
+            *self.compute_client.write().await = None;
+            *self.credential.write().await = None;
         }
 
         *self.initialized.write().await = false;
