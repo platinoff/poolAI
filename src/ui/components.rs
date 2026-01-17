@@ -95,6 +95,9 @@ pub const CARD_STYLES: &str = r#"
 /// Form component styles (uses CSS variables for theming)
 pub const FORM_STYLES: &str = r#"
   .form-group { 
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     margin-bottom: 16px; 
   }
   .form-group label { 
@@ -102,31 +105,42 @@ pub const FORM_STYLES: &str = r#"
     margin-bottom: 6px; 
     color: var(--text, #cfe3ff); 
     font-size: 0.9em; 
+    font-weight: 500;
+  }
+  .form-group .required {
+    color: var(--danger, #ff5555);
+    margin-left: 4px;
   }
   .form-group input, 
   .form-group select, 
   .form-group textarea { 
     width: 100%; 
-    padding: 8px 12px; 
+    padding: 10px; 
     border: 1px solid var(--border, #262b36); 
     border-radius: 8px; 
     background: var(--bg, #0f1216); 
     color: var(--text, #e8e8e8); 
     font-size: 0.95em; 
+    font-family: inherit;
     box-sizing: border-box;
+    transition: all 0.3s ease;
   }
   .form-group input:focus, 
   .form-group select:focus, 
   .form-group textarea:focus { 
-    outline: none; 
+    outline: 2px solid var(--primary, #50fa7b); 
+    outline-offset: 2px;
     border-color: var(--primary, #50fa7b); 
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(103, 228, 128, 0.2);
   }
   .form-group input:invalid,
   .form-group select:invalid,
   .form-group textarea:invalid {
     border-color: var(--danger, #ff5555);
   }
-  .form-group .help-text {
+  .form-group .help-text,
+  .form-group .form-hint {
     margin-top: 4px;
     font-size: 0.85em;
     color: var(--text-muted, #a8b0bf);
@@ -147,7 +161,7 @@ pub const MODAL_STYLES: &str = r#"
     right: 0; 
     bottom: 0; 
     background: rgba(0,0,0,0.7); 
-    z-index: 1000; 
+    z-index: var(--z-modal-backdrop, 1040); 
     display: none;
     align-items: center; 
     justify-content: center; 
@@ -157,25 +171,38 @@ pub const MODAL_STYLES: &str = r#"
   }
   .modal {
     position: relative;
-    background: #171b22;
-    border: 1px solid #262b36;
+    background: var(--surface, #171b22);
+    border: 1px solid var(--border, #262b36);
     border-radius: 14px;
     padding: 24px;
-    max-width: 500px;
+    max-width: 600px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 12px 40px rgba(0,0,0,.30);
+    z-index: var(--z-modal, 1050);
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
   .modal-content { 
-    background: #171b22; 
-    border: 1px solid #262b36; 
+    background: var(--surface, #171b22); 
+    border: 1px solid var(--border, #262b36); 
     border-radius: 14px; 
     padding: 24px; 
-    max-width: 500px; 
+    max-width: 600px; 
     width: 90%; 
     max-height: 90vh; 
     overflow-y: auto; 
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .modal-header { 
     display: flex; 
@@ -185,27 +212,36 @@ pub const MODAL_STYLES: &str = r#"
   }
   .modal-header h3 { 
     margin: 0; 
-    color: #67e480; 
+    font-size: 20px;
+    color: var(--primary, #67e480); 
+    font-weight: 600;
   }
   .modal-close { 
-    background: none; 
+    background: transparent;
     border: none; 
-    color: #a8b0bf; 
+    color: var(--text-muted, #a8b0bf); 
     font-size: 24px; 
     cursor: pointer; 
     padding: 0; 
     width: 30px; 
     height: 30px; 
-    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
   }
   .modal-close:hover { 
-    color: #e8e8e8; 
+    color: var(--text, #e8e8e8);
+    background: var(--surface-secondary, #1e2329);
   }
   .modal-footer { 
     display: flex; 
     gap: 12px; 
     justify-content: flex-end; 
     margin-top: 20px; 
+    padding-top: 16px;
+    border-top: 1px solid var(--border, #262b36);
   }
 "#;
 
@@ -265,16 +301,17 @@ pub const TABLE_STYLES: &str = r#"
   
   th, td { 
     border: 1px solid var(--border, #262b36); 
-    padding: 10px 12px; 
+    padding: 12px; 
     text-align: left; 
     vertical-align: middle; 
     word-wrap: break-word;
     overflow-wrap: break-word;
+    transition: all 0.2s ease;
   }
   
   th { 
-    background: var(--bg, #0f1216); 
-    color: var(--text, #cfe3ff); 
+    background: var(--surface-secondary, #1e2329); 
+    color: var(--primary, #67e480); 
     font-weight: 600;
     position: sticky;
     top: 0;
@@ -286,8 +323,14 @@ pub const TABLE_STYLES: &str = r#"
     color: var(--text, #e8e8e8);
   }
   
+  tr {
+    transition: all 0.2s ease;
+  }
+  
   tr:hover {
     background: var(--surface-secondary, #1e2329);
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
   }
   
   /* Правильне вирівнювання для першого та останнього стовпців */
