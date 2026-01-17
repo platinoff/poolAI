@@ -12,7 +12,7 @@
 <a href=#12 id=12 data-nosnippet>12</a><span class="kw">use </span>serde::{Deserialize, Serialize};
 <a href=#13 id=13 data-nosnippet>13</a><span class="kw">use </span>std::collections::HashMap;
 <a href=#14 id=14 data-nosnippet>14</a><span class="kw">use </span>std::net::{IpAddr, SocketAddr, UdpSocket};
-<a href=#15 id=15 data-nosnippet>15</a><span class="kw">use </span>std::sync::Arc;
+<a href=#15 id=15 data-nosnippet>15</a><span class="kw">use </span>std::sync::{Arc, OnceLock};
 <a href=#16 id=16 data-nosnippet>16</a><span class="kw">use </span>tokio::sync::RwLock;
 <a href=#17 id=17 data-nosnippet>17</a><span class="kw">use </span>tokio::time::{interval, Duration};
 <a href=#18 id=18 data-nosnippet>18</a><span class="kw">use </span>tracing::{debug, info, warn};
@@ -182,7 +182,7 @@
 <a href=#182 id=182 data-nosnippet>182</a>    }
 <a href=#183 id=183 data-nosnippet>183</a>
 <a href=#184 id=184 data-nosnippet>184</a>    <span class="doccomment">/// Broadcasts an announcement message
-<a href=#185 id=185 data-nosnippet>185</a>    </span><span class="kw">async fn </span>send_announcement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
+<a href=#185 id=185 data-nosnippet>185</a>    </span><span class="kw">pub async fn </span>send_announcement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
 <a href=#186 id=186 data-nosnippet>186</a>        <span class="comment">// Get local capabilities (placeholder for now)
 <a href=#187 id=187 data-nosnippet>187</a>        </span><span class="kw">let </span>capabilities = PeerCapabilities::default();
 <a href=#188 id=188 data-nosnippet>188</a>        <span class="kw">let </span>metadata = HashMap::new();
@@ -380,41 +380,64 @@
 <a href=#380 id=380 data-nosnippet>380</a>    }
 <a href=#381 id=381 data-nosnippet>381</a>}
 <a href=#382 id=382 data-nosnippet>382</a>
-<a href=#383 id=383 data-nosnippet>383</a><span class="attr">#[cfg(test)]
-<a href=#384 id=384 data-nosnippet>384</a></span><span class="kw">mod </span>tests {
-<a href=#385 id=385 data-nosnippet>385</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#386 id=386 data-nosnippet>386</a>    <span class="kw">use </span>std::net::{Ipv4Addr, SocketAddrV4};
-<a href=#387 id=387 data-nosnippet>387</a>
-<a href=#388 id=388 data-nosnippet>388</a>    <span class="attr">#[tokio::test]
-<a href=#389 id=389 data-nosnippet>389</a>    </span><span class="kw">async fn </span>test_discovery_service_creation() {
-<a href=#390 id=390 data-nosnippet>390</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
-<a href=#391 id=391 data-nosnippet>391</a>        <span class="kw">let </span>config = DiscoveryConfig::default();
-<a href=#392 id=392 data-nosnippet>392</a>        <span class="kw">let </span>service = DiscoveryService::new(config, addr);
-<a href=#393 id=393 data-nosnippet>393</a>
-<a href=#394 id=394 data-nosnippet>394</a>        <span class="macro">assert!</span>(!service.local_peer_id().is_empty());
-<a href=#395 id=395 data-nosnippet>395</a>        <span class="macro">assert!</span>(service.local_peer_id().starts_with(<span class="string">"poolai-"</span>));
-<a href=#396 id=396 data-nosnippet>396</a>    }
-<a href=#397 id=397 data-nosnippet>397</a>
-<a href=#398 id=398 data-nosnippet>398</a>    <span class="attr">#[tokio::test]
-<a href=#399 id=399 data-nosnippet>399</a>    </span><span class="kw">async fn </span>test_discovery_message_serialization() {
-<a href=#400 id=400 data-nosnippet>400</a>        <span class="kw">let </span>message = DiscoveryMessage::Announce {
-<a href=#401 id=401 data-nosnippet>401</a>            peer_id: <span class="string">"test-peer"</span>.to_string(),
-<a href=#402 id=402 data-nosnippet>402</a>            address: <span class="string">"127.0.0.1"</span>.to_string(),
-<a href=#403 id=403 data-nosnippet>403</a>            port: <span class="number">8080</span>,
-<a href=#404 id=404 data-nosnippet>404</a>            capabilities: PeerCapabilities::default(),
-<a href=#405 id=405 data-nosnippet>405</a>            metadata: HashMap::new(),
-<a href=#406 id=406 data-nosnippet>406</a>        };
-<a href=#407 id=407 data-nosnippet>407</a>
-<a href=#408 id=408 data-nosnippet>408</a>        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>message).unwrap();
-<a href=#409 id=409 data-nosnippet>409</a>        <span class="kw">let </span>deserialized: DiscoveryMessage = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
+<a href=#383 id=383 data-nosnippet>383</a><span class="doccomment">/// Global discovery service instance
+<a href=#384 id=384 data-nosnippet>384</a></span><span class="kw">static </span>GLOBAL_DISCOVERY: OnceLock&lt;Arc&lt;DiscoveryService&gt;&gt; = OnceLock::new();
+<a href=#385 id=385 data-nosnippet>385</a>
+<a href=#386 id=386 data-nosnippet>386</a><span class="doccomment">/// Get or initialize the global discovery service
+<a href=#387 id=387 data-nosnippet>387</a></span><span class="kw">pub fn </span>get_global_discovery_service() -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>Arc&lt;DiscoveryService&gt;&gt; {
+<a href=#388 id=388 data-nosnippet>388</a>    GLOBAL_DISCOVERY.get()
+<a href=#389 id=389 data-nosnippet>389</a>}
+<a href=#390 id=390 data-nosnippet>390</a>
+<a href=#391 id=391 data-nosnippet>391</a><span class="doccomment">/// Initialize the global discovery service
+<a href=#392 id=392 data-nosnippet>392</a></span><span class="kw">pub fn </span>initialize_global_discovery(
+<a href=#393 id=393 data-nosnippet>393</a>    config: DiscoveryConfig,
+<a href=#394 id=394 data-nosnippet>394</a>    local_address: SocketAddr,
+<a href=#395 id=395 data-nosnippet>395</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;DiscoveryService&gt;, AppError&gt; {
+<a href=#396 id=396 data-nosnippet>396</a>    <span class="kw">let </span>service = Arc::new(DiscoveryService::new(config, local_address));
+<a href=#397 id=397 data-nosnippet>397</a>    
+<a href=#398 id=398 data-nosnippet>398</a>    GLOBAL_DISCOVERY.set(service.clone())
+<a href=#399 id=399 data-nosnippet>399</a>        .map_err(|<span class="kw">_</span>| AppError::ConfigError(
+<a href=#400 id=400 data-nosnippet>400</a>            <span class="string">"Global discovery service already initialized"</span>.to_string()
+<a href=#401 id=401 data-nosnippet>401</a>        ))<span class="question-mark">?</span>;
+<a href=#402 id=402 data-nosnippet>402</a>    
+<a href=#403 id=403 data-nosnippet>403</a>    <span class="prelude-val">Ok</span>(service)
+<a href=#404 id=404 data-nosnippet>404</a>}
+<a href=#405 id=405 data-nosnippet>405</a>
+<a href=#406 id=406 data-nosnippet>406</a><span class="attr">#[cfg(test)]
+<a href=#407 id=407 data-nosnippet>407</a></span><span class="kw">mod </span>tests {
+<a href=#408 id=408 data-nosnippet>408</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#409 id=409 data-nosnippet>409</a>    <span class="kw">use </span>std::net::{Ipv4Addr, SocketAddrV4};
 <a href=#410 id=410 data-nosnippet>410</a>
-<a href=#411 id=411 data-nosnippet>411</a>        <span class="kw">match </span>deserialized {
-<a href=#412 id=412 data-nosnippet>412</a>            DiscoveryMessage::Announce { peer_id, address, port, .. } =&gt; {
-<a href=#413 id=413 data-nosnippet>413</a>                <span class="macro">assert_eq!</span>(peer_id, <span class="string">"test-peer"</span>);
-<a href=#414 id=414 data-nosnippet>414</a>                <span class="macro">assert_eq!</span>(address, <span class="string">"127.0.0.1"</span>);
-<a href=#415 id=415 data-nosnippet>415</a>                <span class="macro">assert_eq!</span>(port, <span class="number">8080</span>);
-<a href=#416 id=416 data-nosnippet>416</a>            }
-<a href=#417 id=417 data-nosnippet>417</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected message type"</span>),
-<a href=#418 id=418 data-nosnippet>418</a>        }
+<a href=#411 id=411 data-nosnippet>411</a>    <span class="attr">#[tokio::test]
+<a href=#412 id=412 data-nosnippet>412</a>    </span><span class="kw">async fn </span>test_discovery_service_creation() {
+<a href=#413 id=413 data-nosnippet>413</a>        <span class="kw">let </span>addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, <span class="number">8080</span>));
+<a href=#414 id=414 data-nosnippet>414</a>        <span class="kw">let </span>config = DiscoveryConfig::default();
+<a href=#415 id=415 data-nosnippet>415</a>        <span class="kw">let </span>service = DiscoveryService::new(config, addr);
+<a href=#416 id=416 data-nosnippet>416</a>
+<a href=#417 id=417 data-nosnippet>417</a>        <span class="macro">assert!</span>(!service.local_peer_id().is_empty());
+<a href=#418 id=418 data-nosnippet>418</a>        <span class="macro">assert!</span>(service.local_peer_id().starts_with(<span class="string">"poolai-"</span>));
 <a href=#419 id=419 data-nosnippet>419</a>    }
-<a href=#420 id=420 data-nosnippet>420</a>}</code></pre></div></section></main></body></html>
+<a href=#420 id=420 data-nosnippet>420</a>
+<a href=#421 id=421 data-nosnippet>421</a>    <span class="attr">#[tokio::test]
+<a href=#422 id=422 data-nosnippet>422</a>    </span><span class="kw">async fn </span>test_discovery_message_serialization() {
+<a href=#423 id=423 data-nosnippet>423</a>        <span class="kw">let </span>message = DiscoveryMessage::Announce {
+<a href=#424 id=424 data-nosnippet>424</a>            peer_id: <span class="string">"test-peer"</span>.to_string(),
+<a href=#425 id=425 data-nosnippet>425</a>            address: <span class="string">"127.0.0.1"</span>.to_string(),
+<a href=#426 id=426 data-nosnippet>426</a>            port: <span class="number">8080</span>,
+<a href=#427 id=427 data-nosnippet>427</a>            capabilities: PeerCapabilities::default(),
+<a href=#428 id=428 data-nosnippet>428</a>            metadata: HashMap::new(),
+<a href=#429 id=429 data-nosnippet>429</a>        };
+<a href=#430 id=430 data-nosnippet>430</a>
+<a href=#431 id=431 data-nosnippet>431</a>        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>message).unwrap();
+<a href=#432 id=432 data-nosnippet>432</a>        <span class="kw">let </span>deserialized: DiscoveryMessage = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
+<a href=#433 id=433 data-nosnippet>433</a>
+<a href=#434 id=434 data-nosnippet>434</a>        <span class="kw">match </span>deserialized {
+<a href=#435 id=435 data-nosnippet>435</a>            DiscoveryMessage::Announce { peer_id, address, port, .. } =&gt; {
+<a href=#436 id=436 data-nosnippet>436</a>                <span class="macro">assert_eq!</span>(peer_id, <span class="string">"test-peer"</span>);
+<a href=#437 id=437 data-nosnippet>437</a>                <span class="macro">assert_eq!</span>(address, <span class="string">"127.0.0.1"</span>);
+<a href=#438 id=438 data-nosnippet>438</a>                <span class="macro">assert_eq!</span>(port, <span class="number">8080</span>);
+<a href=#439 id=439 data-nosnippet>439</a>            }
+<a href=#440 id=440 data-nosnippet>440</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected message type"</span>),
+<a href=#441 id=441 data-nosnippet>441</a>        }
+<a href=#442 id=442 data-nosnippet>442</a>    }
+<a href=#443 id=443 data-nosnippet>443</a>}</code></pre></div></section></main></body></html>
