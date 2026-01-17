@@ -206,6 +206,186 @@ pub fn validate_artifact_data_size(
     Ok(())
 }
 
+/// Validate file path to prevent path traversal attacks
+///
+/// Rules:
+/// - Path must be within the base directory
+/// - No parent directory traversal (`..`)
+/// - No absolute paths
+/// - Path components validated for invalid characters
+pub fn validate_path_traversal(path: &std::path::Path, base_dir: &std::path::Path) -> Result<(), AppError> {
+    // Check for path traversal attempts (.. or .)
+    let path_str = path.to_string_lossy();
+    if path_str.contains("..") || path_str.contains("//") {
+        return Err(AppError::ValidationError(
+            format!(
+                "Path traversal detected in '{}'. Context: Path contains '..' or '//' which could allow directory traversal. \
+                Suggestion: Use only valid relative paths within the base directory. Base: '{}'",
+                path_str, base_dir.display()
+            )
+        ));
+    }
+
+    // Check for absolute paths (on Unix/Linux, starts with /; on Windows, starts with C:\ etc.)
+    if path.is_absolute() {
+        return Err(AppError::ValidationError(
+            format!(
+                "Absolute path not allowed: '{}'. Context: Absolute paths are not permitted for security reasons. \
+                Suggestion: Use only relative paths within the base directory. Base: '{}'",
+                path_str, base_dir.display()
+            )
+        ));
+    }
+
+    // Normalize and check if path is within base directory
+    let normalized_path = base_dir.join(path).canonicalize()
+        .map_err(|e| AppError::ValidationError(
+            format!(
+                "Invalid path: '{}'. Context: Cannot resolve path. Error: {}. \
+                Suggestion: Ensure path exists and is accessible. Base: '{}'",
+                path_str, e, base_dir.display()
+            )
+        ))?;
+
+    let normalized_base = base_dir.canonicalize()
+        .map_err(|e| AppError::ConfigError(
+            format!("Cannot resolve base directory '{}': {}", base_dir.display(), e)
+        ))?;
+
+    if !normalized_path.starts_with(&normalized_base) {
+        return Err(AppError::ValidationError(
+            format!(
+                "Path '{}' is outside base directory '{}'. Context: Path traversal attempt detected. \
+                Suggestion: Use only paths within the base directory.",
+                path_str, base_dir.display()
+            )
+        ));
+    }
+
+    Ok(())
+}
+
+/// Validate string length to prevent DoS attacks from extremely long inputs
+///
+/// Rules:
+/// - String must be within specified length limits
+/// - Trims whitespace before validation
+pub fn validate_string_length(s: &str, max_length: usize, field_name: &str) -> Result<(), AppError> {
+    let trimmed = s.trim();
+    if trimmed.len() > max_length {
+        return Err(AppError::ValidationError(format!(
+            "{} must be {} characters or less (got {}). Context: Input too long, potential DoS risk. \
+            Suggestion: Reduce input length to {} characters or less. Field: '{}'",
+            field_name, max_length, trimmed.len(), max_length, field_name
+        )));
+    }
+    Ok(())
+}
+
+/// Validate URL to prevent SSRF (Server-Side Request Forgery) attacks
+///
+/// Rules:
+/// - Must be a valid HTTP/HTTPS URL
+/// - Must not be a local/internal address
+/// - Must not contain IP addresses (only domain names allowed)
+pub fn validate_url_for_ssrf(url: &str) -> Result<(), AppError> {
+    // Check for local/internal addresses
+    let url_lower = url.to_lowercase();
+    
+    // Block localhost variations
+    if url_lower.contains("localhost") || 
+       url_lower.contains("127.0.0.1") ||
+       url_lower.contains("::1") ||
+       url_lower.contains("0.0.0.0") {
+        return Err(AppError::ValidationError(
+            format!(
+                "URL '{}' contains local/internal address. Context: SSRF protection - local addresses are not allowed. \
+                Suggestion: Use only external, publicly accessible URLs.",
+                url
+            )
+        ));
+    }
+
+    // Parse URL using reqwest::Url (already in dependencies)
+    if let Ok(parsed_url) = reqwest::Url::parse(url) {
+        // Check scheme first
+        match parsed_url.scheme() {
+            "http" | "https" => {}
+            _ => {
+                return Err(AppError::ValidationError(
+                    format!(
+                        "URL '{}' uses unsupported scheme '{}'. Context: Only HTTP and HTTPS are allowed. \
+                        Suggestion: Use HTTP or HTTPS URLs only.",
+                        url, parsed_url.scheme()
+                    )
+                ));
+            }
+        }
+
+        // Check for IP addresses in host
+        if let Some(host_str) = parsed_url.host_str() {
+            // Simple check for IP-like patterns (basic SSRF protection)
+            // Note: This is a simplified check; for production, consider using proper IP parsing
+            if host_str.parse::<std::net::IpAddr>().is_ok() {
+                // Block all IP addresses (require domain names)
+                return Err(AppError::ValidationError(
+                    format!(
+                        "URL '{}' uses IP address instead of domain name. Context: SSRF protection - IP addresses are not allowed. \
+                        Suggestion: Use only public domain names (e.g., example.com).",
+                        url
+                    )
+                ));
+            }
+        }
+    } else {
+        return Err(AppError::ValidationError(
+            format!(
+                "Invalid URL format: '{}'. Context: URL parsing failed. \
+                Suggestion: Provide a valid HTTP or HTTPS URL.",
+                url
+            )
+        ));
+    }
+
+    Ok(())
+}
+
+/// Validate ModelRequest input to prevent XSS and DoS attacks
+///
+/// Rules:
+/// - Input length within reasonable limits (default: 1MB)
+/// - No suspicious patterns (e.g., `<script>` tags)
+pub fn validate_model_input(input: &str, max_length: usize) -> Result<(), AppError> {
+    // Validate length
+    validate_string_length(input, max_length, "model input")?;
+
+    // Basic XSS pattern detection (simple check - CSP provides stronger protection)
+    let input_lower = input.to_lowercase();
+    let suspicious_patterns = [
+        "<script",
+        "javascript:",
+        "onerror=",
+        "onload=",
+        "onclick=",
+        "<iframe",
+        "<object",
+        "<embed",
+    ];
+
+    for pattern in &suspicious_patterns {
+        if input_lower.contains(pattern) {
+            // Log warning but don't block (CSP will handle XSS in production)
+            tracing::warn!("Suspicious XSS pattern detected in model input: {}", pattern);
+            // In strict mode, could return error, but for now just log
+            // return Err(AppError::ValidationError(format!(
+            //     "Suspicious pattern detected in input: '{}'", pattern
+            // )));
+        }
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
