@@ -79,6 +79,48 @@ pub fn create_vm_routes() -> Router {
             "/vm/resource-limits-supported",
             get(vm_resource_limits_supported_handler),
         )
+        // VM Templates endpoints
+        .route("/vm/templates", get(vm_templates_handler))
+        .route(
+            "/vm/templates",
+            post(vm_template_create_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
+        .route(
+            "/vm/templates/{id}",
+            get(vm_template_get_handler),
+        )
+        .route(
+            "/vm/templates/{id}",
+            put(vm_template_update_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
+        .route(
+            "/vm/templates/{id}",
+            delete(vm_template_delete_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
+        // VM Networks endpoints
+        .route("/vm/networks", get(vm_networks_handler))
+        .route(
+            "/vm/networks",
+            post(vm_network_create_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
+        .route(
+            "/vm/networks/{id}",
+            get(vm_network_get_handler),
+        )
+        .route(
+            "/vm/networks/{id}",
+            put(vm_network_update_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
+        .route(
+            "/vm/networks/{id}",
+            delete(vm_network_delete_handler)
+                .layer(middleware::from_fn(crate::network::auth::auth_middleware)),
+        )
 }
 
 async fn vm_instances_handler() -> impl IntoResponse {
@@ -395,6 +437,258 @@ async fn vm_instance_health_handler(Path(id): Path<String>) -> impl IntoResponse
             StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
                 "error": format!("Failed to retrieve VM instance health. Context: Cannot get health status for VM instance. Suggestion: Verify instance ID exists, ensure health monitor is registered for this instance, and check health monitor status. Instance ID: '{}', Error: {}", id, e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+// ============================================================================
+// VM Templates handlers
+// ============================================================================
+
+async fn vm_templates_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let templates = manager.list_templates().await;
+    AxumJson(templates).into_response()
+}
+
+async fn vm_template_get_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.get_template(uuid).await {
+        Some(template) => AxumJson(template).into_response(),
+        None => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": format!("Template not found: {}", id)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn vm_template_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(template): Json<vm::VmTemplate>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:vm"))
+    {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    match manager.create_template(template.clone()).await {
+        Ok(_) => AxumJson(template).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": format!("Failed to create template: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn vm_template_update_handler(
+    Extension(claims): Extension<Claims>,
+    Path(id): Path<String>,
+    Json(template): Json<vm::VmTemplate>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:vm"))
+    {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    match manager.update_template(template).await {
+        Ok(_) => AxumJson(serde_json::json!({
+            "message": format!("Template {} updated successfully", id)
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn vm_template_delete_handler(
+    Extension(claims): Extension<Claims>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "delete:all").or_else(|_| check_permission(&claims, "write:vm"))
+    {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.delete_template(uuid).await {
+        Ok(_) => AxumJson(serde_json::json!({
+            "message": format!("Template {} deleted successfully", id)
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response(),
+    }
+}
+
+// ============================================================================
+// VM Networks handlers
+// ============================================================================
+
+async fn vm_networks_handler() -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let networks = manager.list_networks().await;
+    AxumJson(networks).into_response()
+}
+
+async fn vm_network_get_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let manager = vm::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.get_network(uuid).await {
+        Some(network) => AxumJson(network).into_response(),
+        None => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": format!("Network not found: {}", id)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn vm_network_create_handler(
+    Extension(claims): Extension<Claims>,
+    Json(network): Json<vm::VmNetwork>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:vm"))
+    {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    match manager.create_network(network.clone()).await {
+        Ok(_) => AxumJson(network).into_response(),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": format!("Failed to create network: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn vm_network_update_handler(
+    Extension(claims): Extension<Claims>,
+    Path(id): Path<String>,
+    Json(network): Json<vm::VmNetwork>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:vm"))
+    {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    match manager.update_network(network).await {
+        Ok(_) => AxumJson(serde_json::json!({
+            "message": format!("Network {} updated successfully", id)
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": e.to_string()
+            })),
+        )
+            .into_response(),
+    }
+}
+
+async fn vm_network_delete_handler(
+    Extension(claims): Extension<Claims>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    if let Err(err) =
+        check_permission(&claims, "delete:all").or_else(|_| check_permission(&claims, "write:vm"))
+    {
+        return err.into_response();
+    }
+
+    let manager = vm::get_global_manager();
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                AxumJson(serde_json::json!({
+                    "error": format!("Invalid UUID format: {}", id)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    match manager.delete_network(uuid).await {
+        Ok(_) => AxumJson(serde_json::json!({
+            "message": format!("Network {} deleted successfully", id)
+        }))
+        .into_response(),
+        Err(e) => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": e.to_string()
             })),
         )
             .into_response(),

@@ -32,7 +32,7 @@ use std::path::PathBuf;
 ///     strict: false,
 /// };
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NetworkIsolationConfig {
     /// Whether to enable network isolation
     pub enabled: bool,

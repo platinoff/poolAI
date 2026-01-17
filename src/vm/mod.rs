@@ -461,6 +461,87 @@ impl Default for ResourceAlertThresholds {
     }
 }
 
+/// VM template configuration
+///
+/// Defines a reusable template for creating VM instances with predefined
+/// resource limits, isolation settings, and other configurations.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::{VmTemplate, VmResources, VmIsolation};
+/// use uuid::Uuid;
+/// use chrono::Utc;
+///
+/// let template = VmTemplate {
+///     id: Uuid::new_v4(),
+///     name: "standard-vm".to_string(),
+///     description: "Standard VM template with 2 CPU cores and 4GB RAM".to_string(),
+///     resources: VmResources {
+///         cpu_cores: 2,
+///         memory_mb: 4096,
+///         gpu_required: false,
+///         gpu_scheduling_policy: None,
+///     },
+///     isolation: VmIsolation::ProcessSandbox,
+///     created_at: Utc::now(),
+/// };
+/// ```
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VmTemplate {
+    /// Unique identifier for the template
+    pub id: Uuid,
+    /// Human-readable name for the template
+    pub name: String,
+    /// Optional description of the template
+    pub description: String,
+    /// Default resource configuration for instances created from this template
+    pub resources: VmResources,
+    /// Default isolation configuration for instances created from this template
+    pub isolation: VmIsolation,
+    /// Timestamp when the template was created
+    pub created_at: DateTime<Utc>,
+}
+
+/// VM network configuration
+///
+/// Defines a network configuration for VM instances, including
+/// network isolation settings, allowed interfaces, and ports.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::vm::{VmNetwork, NetworkIsolationConfig};
+/// use uuid::Uuid;
+/// use chrono::Utc;
+///
+/// let network = VmNetwork {
+///     id: Uuid::new_v4(),
+///     name: "isolated-network".to_string(),
+///     description: "Network with isolation enabled".to_string(),
+///     isolation_config: NetworkIsolationConfig {
+///         enabled: true,
+///         allow_loopback: true,
+///         allowed_interfaces: vec!["eth0".to_string()],
+///         allowed_ports: vec![80, 443],
+///     },
+///     created_at: Utc::now(),
+/// };
+/// ```
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VmNetwork {
+    /// Unique identifier for the network
+    pub id: Uuid,
+    /// Human-readable name for the network
+    pub name: String,
+    /// Optional description of the network
+    pub description: String,
+    /// Network isolation configuration
+    pub isolation_config: NetworkIsolationConfig,
+    /// Timestamp when the network was created
+    pub created_at: DateTime<Utc>,
+}
+
 /// VM Manager - central orchestrator for VM instances
 ///
 /// Manages VM instance lifecycle, resource limits, isolation, health monitoring,
@@ -500,6 +581,10 @@ pub struct VmManager {
     resource_history: Arc<RwLock<HashMap<Uuid, Vec<ResourceUsageHistoryEntry>>>>,
     /// Resource alert thresholds per instance
     resource_alert_thresholds: Arc<RwLock<HashMap<Uuid, ResourceAlertThresholds>>>,
+    /// VM templates for template-based instance creation
+    templates: Arc<RwLock<HashMap<Uuid, VmTemplate>>>,
+    /// VM networks for network configuration management
+    networks: Arc<RwLock<HashMap<Uuid, VmNetwork>>>,
 }
 
 impl VmManager {
@@ -532,6 +617,8 @@ impl VmManager {
             filesystem_isolator,
             resource_history: Arc::new(RwLock::new(HashMap::new())),
             resource_alert_thresholds: Arc::new(RwLock::new(HashMap::new())),
+            templates: Arc::new(RwLock::new(HashMap::new())),
+            networks: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 
@@ -920,6 +1007,166 @@ impl VmManager {
 
     pub async fn list_instances(&self) -> Vec<VmInstance> {
         self.instances.read().await.values().cloned().collect()
+    }
+
+    // ============================================================================
+    // VM Templates Management
+    // ============================================================================
+
+    /// Create a VM template
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if template name is empty.
+    pub async fn create_template(&self, template: VmTemplate) -> Result<(), AppError> {
+        if template.name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Template name cannot be empty".to_string(),
+            ));
+        }
+
+        let mut templates = self.templates.write().await;
+        templates.insert(template.id, template.clone());
+        info!("Created VM template: {} ({})", template.name, template.id);
+        Ok(())
+    }
+
+    /// Get a VM template by ID
+    pub async fn get_template(&self, id: Uuid) -> Option<VmTemplate> {
+        let templates = self.templates.read().await;
+        templates.get(&id).cloned()
+    }
+
+    /// List all VM templates
+    pub async fn list_templates(&self) -> Vec<VmTemplate> {
+        let templates = self.templates.read().await;
+        templates.values().cloned().collect()
+    }
+
+    /// Update a VM template
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if template not found.
+    pub async fn update_template(&self, template: VmTemplate) -> Result<(), AppError> {
+        let mut templates = self.templates.write().await;
+        if templates.contains_key(&template.id) {
+            templates.insert(template.id, template.clone());
+            info!("Updated VM template: {} ({})", template.name, template.id);
+            Ok(())
+        } else {
+            Err(AppError::ResourceError(format!(
+                "Template not found: {}",
+                template.id
+            )))
+        }
+    }
+
+    /// Delete a VM template
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if template not found.
+    pub async fn delete_template(&self, id: Uuid) -> Result<(), AppError> {
+        let mut templates = self.templates.write().await;
+        if let Some(template) = templates.remove(&id) {
+            info!("Deleted VM template: {} ({})", template.name, id);
+            Ok(())
+        } else {
+            Err(AppError::ResourceError(format!("Template not found: {}", id)))
+        }
+    }
+
+    /// Create a VM instance from a template
+    ///
+    /// # Arguments
+    ///
+    /// * `template_id` - Template ID to use for instance creation
+    /// * `instance_name` - Name for the new instance (overrides template name if provided)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if template not found.
+    pub async fn create_instance_from_template(
+        &self,
+        template_id: Uuid,
+        instance_name: Option<String>,
+    ) -> Result<VmInstance, AppError> {
+        let template = self.get_template(template_id).await.ok_or_else(|| {
+            AppError::ResourceError(format!("Template not found: {}", template_id))
+        })?;
+
+        let name = instance_name.unwrap_or_else(|| template.name.clone());
+        self.create_instance(name, template.resources, template.isolation)
+            .await
+    }
+
+    // ============================================================================
+    // VM Networks Management
+    // ============================================================================
+
+    /// Create a VM network
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if network name is empty.
+    pub async fn create_network(&self, network: VmNetwork) -> Result<(), AppError> {
+        if network.name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Network name cannot be empty".to_string(),
+            ));
+        }
+
+        let mut networks = self.networks.write().await;
+        networks.insert(network.id, network.clone());
+        info!("Created VM network: {} ({})", network.name, network.id);
+        Ok(())
+    }
+
+    /// Get a VM network by ID
+    pub async fn get_network(&self, id: Uuid) -> Option<VmNetwork> {
+        let networks = self.networks.read().await;
+        networks.get(&id).cloned()
+    }
+
+    /// List all VM networks
+    pub async fn list_networks(&self) -> Vec<VmNetwork> {
+        let networks = self.networks.read().await;
+        networks.values().cloned().collect()
+    }
+
+    /// Update a VM network
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if network not found.
+    pub async fn update_network(&self, network: VmNetwork) -> Result<(), AppError> {
+        let mut networks = self.networks.write().await;
+        if networks.contains_key(&network.id) {
+            networks.insert(network.id, network.clone());
+            info!("Updated VM network: {} ({})", network.name, network.id);
+            Ok(())
+        } else {
+            Err(AppError::ResourceError(format!(
+                "Network not found: {}",
+                network.id
+            )))
+        }
+    }
+
+    /// Delete a VM network
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ResourceError` if network not found.
+    pub async fn delete_network(&self, id: Uuid) -> Result<(), AppError> {
+        let mut networks = self.networks.write().await;
+        if let Some(network) = networks.remove(&id) {
+            info!("Deleted VM network: {} ({})", network.name, id);
+            Ok(())
+        } else {
+            Err(AppError::ResourceError(format!("Network not found: {}", id)))
+        }
     }
 
     pub async fn get_instance(&self, id: Uuid) -> Option<VmInstance> {
