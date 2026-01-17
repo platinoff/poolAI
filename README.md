@@ -218,18 +218,25 @@ $env:PATH += ";C:\msys64\usr\bin"
 
 3. **Install dependencies**
    ```bash
-   cargo build --features "stage3 https"
+   cargo build
    ```
 
-3. **Generate certificates (for HTTPS)**
+4. **Generate certificates (for HTTPS)**
    ```bash
    mkdir certs
    openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes
    ```
 
-4. **Run with Stage 3 features**
+5. **Run the application**
    ```bash
-   cargo run --features "stage3 https"
+   # Basic run (standard UI)
+   cargo run
+   
+   # With Admin Panel (Enterprise features)
+   cargo run --features enterprise
+   
+   # With Admin Panel + HTTPS + JWT
+   cargo run --features enterprise,https,jwt
    ```
 
 ## 🚀 Usage
@@ -237,15 +244,41 @@ $env:PATH += ";C:\msys64\usr\bin"
 ### Starting the System
 
 ```bash
-# Stage 3 with HTTPS
-cargo run --features "stage3 https"
+# Basic run (standard UI at http://localhost:8080/ui)
+cargo run
+
+# With Admin Panel (Enterprise features)
+cargo run --features enterprise
+# Access Admin Panel at: http://localhost:8080/admin
+
+# With Admin Panel + HTTPS + JWT (Recommended for development)
+cargo run --features enterprise,https,jwt
+# Access Admin Panel at: https://localhost:8443/admin
 
 # With specific config
-POOLAI_CONFIG_PATH=./custom_config.toml cargo run --features "stage3 https"
+POOLAI_CONFIG_PATH=./custom_config.toml cargo run --features enterprise
 
 # With logging
-RUST_LOG=debug cargo run --features "stage3 https"
+RUST_LOG=debug cargo run --features enterprise
 ```
+
+### Creating Admin User
+
+After starting the server, create an admin user via API:
+
+```bash
+# Create admin user
+curl -X POST http://localhost:8080/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123", "role": "Admin"}'
+
+# Login to get JWT token
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}'
+```
+
+The JWT token will be stored in localStorage or cookie after login for accessing the admin panel.
 
 ### Current Features (Stage 3)
 
