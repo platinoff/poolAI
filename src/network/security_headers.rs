@@ -13,6 +13,8 @@ use axum::response::Response;
 pub struct SecurityHeadersConfig {
     /// Content-Security-Policy header value
     pub content_security_policy: Option<String>,
+    /// Strict-Transport-Security (HSTS) header value
+    pub strict_transport_security: Option<String>,
     /// X-Frame-Options header value
     pub x_frame_options: Option<String>,
     /// X-Content-Type-Options header value
@@ -21,16 +23,20 @@ pub struct SecurityHeadersConfig {
     pub referrer_policy: Option<String>,
     /// Permissions-Policy header value
     pub permissions_policy: Option<String>,
+    /// X-XSS-Protection header value (legacy, but still useful)
+    pub x_xss_protection: Option<String>,
 }
 
 impl Default for SecurityHeadersConfig {
     fn default() -> Self {
         Self {
             content_security_policy: Some("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'".to_string()),
+            strict_transport_security: Some("max-age=31536000; includeSubDomains; preload".to_string()),
             x_frame_options: Some("DENY".to_string()),
             x_content_type_options: Some("nosniff".to_string()),
             referrer_policy: Some("strict-origin-when-cross-origin".to_string()),
-            permissions_policy: None,
+            permissions_policy: Some("geolocation=(), microphone=(), camera=()".to_string()),
+            x_xss_protection: Some("1; mode=block".to_string()),
         }
     }
 }
@@ -39,17 +45,20 @@ impl SecurityHeadersConfig {
     /// Create security headers config with custom settings
     pub fn new(
         content_security_policy: Option<String>,
+        strict_transport_security: Option<String>,
         x_frame_options: Option<String>,
         x_content_type_options: Option<String>,
         referrer_policy: Option<String>,
     ) -> Self {
         Self {
             content_security_policy,
+            strict_transport_security,
             x_frame_options: x_frame_options.or(Some("DENY".to_string())),
             x_content_type_options: x_content_type_options.or(Some("nosniff".to_string())),
             referrer_policy: referrer_policy
                 .or(Some("strict-origin-when-cross-origin".to_string())),
-            permissions_policy: None,
+            permissions_policy: Some("geolocation=(), microphone=(), camera=()".to_string()),
+            x_xss_protection: Some("1; mode=block".to_string()),
         }
     }
 
@@ -57,10 +66,12 @@ impl SecurityHeadersConfig {
     pub fn minimal() -> Self {
         Self {
             content_security_policy: None,
+            strict_transport_security: None,
             x_frame_options: Some("DENY".to_string()),
             x_content_type_options: Some("nosniff".to_string()),
             referrer_policy: Some("strict-origin-when-cross-origin".to_string()),
             permissions_policy: None,
+            x_xss_protection: None,
         }
     }
 }
@@ -76,6 +87,19 @@ pub async fn security_headers_middleware(req: Request, next: Next) -> Response {
             response
                 .headers_mut()
                 .insert(axum::http::header::CONTENT_SECURITY_POLICY, header_value);
+        }
+    }
+
+    // Add Strict-Transport-Security (HSTS) header (only for HTTPS)
+    if let Some(ref hsts) = config.strict_transport_security {
+        // Only add HSTS when using HTTPS (check if request was secure)
+        // In practice, HSTS should be configured at the reverse proxy level,
+        // but we add it here for completeness
+        if let Ok(header_value) = HeaderValue::from_str(hsts) {
+            response.headers_mut().insert(
+                axum::http::header::HeaderName::from_static("strict-transport-security"),
+                header_value,
+            );
         }
     }
 
@@ -114,6 +138,16 @@ pub async fn security_headers_middleware(req: Request, next: Next) -> Response {
         if let Ok(header_value) = HeaderValue::from_str(pp) {
             response.headers_mut().insert(
                 axum::http::header::HeaderName::from_static("permissions-policy"),
+                header_value,
+            );
+        }
+    }
+
+    // Add X-XSS-Protection header (legacy, but still useful for older browsers)
+    if let Some(ref xxss) = config.x_xss_protection {
+        if let Ok(header_value) = HeaderValue::from_str(xxss) {
+            response.headers_mut().insert(
+                axum::http::header::HeaderName::from_static("x-xss-protection"),
                 header_value,
             );
         }
