@@ -17,7 +17,7 @@ use axum::{
     extract::{Extension, Path, Query},
     http::StatusCode,
     middleware,
-    response::IntoResponse,
+    response::{IntoResponse, Redirect},
     routing::{delete, get, post, put},
     Json, Router,
 };
@@ -1534,13 +1534,9 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
     
     match manager.get_oauth2_authorization_url("github", &state).await {
         Ok(auth_url) => {
-            // TODO: In production, use Redirect instead of returning JSON
-            // Redirect::temporary(&auth_url).into_response()
-            Json(serde_json::json!({
-                "authorization_url": auth_url,
-                "state": state
-            }))
-                .into_response()
+            // Redirect to GitHub authorization page
+            // Note: In production, store state in session/cookie for CSRF protection
+            Redirect::temporary(&auth_url).into_response()
         }
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -1593,27 +1589,104 @@ async fn oauth2_github_callback_handler(
     let manager = enterprise::security::get_global_security_manager();
     
     // Exchange code for token
-    match manager.exchange_oauth2_code("github", &code).await {
-        Ok(token_response) => {
-            // TODO: Get user info from GitHub API using token_response.access_token
-            // TODO: Create or find user in PoolAI
-            // TODO: Generate PoolAI JWT token
-            
-            Json(serde_json::json!({
-                "message": "OAuth2 callback received",
-                "access_token": token_response.access_token,
-                "note": "Full implementation pending - user info retrieval and token generation"
-            }))
-                .into_response()
+    let token_response = match manager.exchange_oauth2_code("github", &code).await {
+        Ok(token) => token,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to exchange authorization code: {}", e)
+                })),
+            )
+                .into_response();
         }
-        Err(e) => (
+    };
+
+    // Get user info from GitHub
+    let user_info = match manager
+        .get_oauth2_user_info("github", &token_response.access_token)
+        .await
+    {
+        Ok(info) => info,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to get user info from GitHub: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Get or create user in PoolAI
+    let user_manager = crate::network::auth::get_global_user_manager();
+    if let Err(e) = user_manager.initialize().await {
+        return (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
-                "error": format!("Failed to exchange authorization code: {}", e)
+                "error": format!("User manager initialization failed: {}", e)
             })),
         )
-            .into_response(),
+            .into_response();
     }
+
+    // Try to find existing user by username (GitHub login)
+    let poolai_user = user_manager
+        .get_user_by_username(&user_info.username)
+        .await
+        .unwrap_or(None);
+
+    let (username, role) = if let Some(user) = poolai_user {
+        // User exists, use existing role
+        (user.username.clone(), user.role)
+    } else {
+        // Create new user with Viewer role by default
+        // In production, you might want to map roles based on GitHub organization membership
+        match user_manager
+            .create_user(
+                user_info.username.clone(),
+                format!("oauth2_github_{}", user_info.id), // Dummy password (won't be used for OAuth2 users)
+                crate::network::auth::UserRole::Viewer,
+            )
+            .await
+        {
+            Ok(new_user) => (new_user.username, crate::network::auth::UserRole::Viewer),
+            Err(e) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({
+                        "error": format!("Failed to create user: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+        }
+    };
+
+    // Generate PoolAI JWT token
+    let poolai_token = crate::network::auth::generate_token(&username, role.clone())
+        .map_err(|e| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to generate token: {}", e)
+                })),
+            )
+        })
+        .unwrap();
+
+    // Return success response with token
+    // In production, you might want to redirect to UI with token in query param or cookie
+    Json(serde_json::json!({
+        "token": poolai_token,
+        "token_type": "Bearer",
+        "expires_in": token_response.expires_in.unwrap_or(3600),
+        "role": format!("{:?}", role),
+        "username": username,
+        "message": "OAuth2 authentication successful. Use this token for API requests."
+    }))
+        .into_response()
 }
 
 #[cfg(feature = "enterprise")]

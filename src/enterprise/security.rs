@@ -113,6 +113,21 @@ pub struct OAuth2TokenResponse {
     pub scope: Option<String>,
 }
 
+/// OAuth2 user information from provider
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OAuth2UserInfo {
+    /// Provider-specific user ID
+    pub id: String,
+    /// Username/login from provider
+    pub username: String,
+    /// Email address (if available)
+    pub email: Option<String>,
+    /// Display name (if available)
+    pub name: Option<String>,
+    /// Avatar/profile picture URL (if available)
+    pub avatar_url: Option<String>,
+}
+
 /// SAML provider configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SamlConfig {
@@ -393,6 +408,133 @@ impl SecurityManager {
             id_token: token_response.id_token,
             scope: token_response.scope,
         })
+    }
+
+    /// Gets user information from OAuth2 provider
+    ///
+    /// After exchanging authorization code for access token, this method
+    /// retrieves user information from the OAuth2 provider's user info endpoint.
+    ///
+    /// # Arguments
+    ///
+    /// * `provider_name` - Name of the OAuth2 provider (e.g., "github", "google")
+    /// * `access_token` - Access token obtained from token exchange
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if user info retrieval fails.
+    pub async fn get_oauth2_user_info(
+        &self,
+        provider_name: &str,
+        access_token: &str,
+    ) -> Result<OAuth2UserInfo, AppError> {
+        let user_info_url = match provider_name {
+            "github" => "https://api.github.com/user",
+            "google" => "https://www.googleapis.com/oauth2/v2/userinfo",
+            _ => {
+                return Err(AppError::ValidationError(format!(
+                    "User info endpoint not configured for provider: {}",
+                    provider_name
+                )));
+            }
+        };
+
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(30))
+            .build()
+            .map_err(|e| {
+                AppError::NetworkError(format!(
+                    "Failed to create HTTP client for OAuth2 user info. Context: Cannot initialize HTTP client. \
+                    Suggestion: Check network configuration. Provider: '{}', Error: {}",
+                    provider_name, e
+                ))
+            })?;
+
+        let response = client
+            .get(user_info_url)
+            .header("Authorization", format!("Bearer {}", access_token))
+            .header("Accept", "application/json")
+            .header("User-Agent", "PoolAI/0.1.0")
+            .send()
+            .await
+            .map_err(|e| {
+                AppError::NetworkError(format!(
+                    "OAuth2 user info request failed. Context: HTTP request to user info endpoint failed. \
+                    Suggestion: Check network connectivity and verify access token. \
+                    Provider: '{}', User Info URL: '{}', Error: {}",
+                    provider_name, user_info_url, e
+                ))
+            })?;
+
+        let status = response.status();
+        if !status.is_success() {
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(AppError::NetworkError(format!(
+                "OAuth2 user info request failed with status {}. Context: User info endpoint returned error. \
+                Suggestion: Verify access token is valid and not expired. \
+                Provider: '{}', Status: {}, Response: {}",
+                status, provider_name, status, error_text
+            )));
+        }
+
+        // Parse response based on provider
+        match provider_name {
+            "github" => {
+                #[derive(Deserialize)]
+                struct GitHubUser {
+                    login: String,
+                    id: u64,
+                    name: Option<String>,
+                    email: Option<String>,
+                    avatar_url: Option<String>,
+                }
+
+                let github_user: GitHubUser = response.json().await.map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to parse GitHub user info. Context: User info endpoint returned invalid JSON. \
+                        Suggestion: Verify GitHub API response format. Provider: '{}', Error: {}",
+                        provider_name, e
+                    ))
+                })?;
+
+                Ok(OAuth2UserInfo {
+                    id: github_user.id.to_string(),
+                    username: github_user.login,
+                    email: github_user.email,
+                    name: github_user.name,
+                    avatar_url: github_user.avatar_url,
+                })
+            }
+            "google" => {
+                #[derive(Deserialize)]
+                struct GoogleUser {
+                    id: String,
+                    email: String,
+                    name: Option<String>,
+                    picture: Option<String>,
+                }
+
+                let google_user: GoogleUser = response.json().await.map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to parse Google user info. Context: User info endpoint returned invalid JSON. \
+                        Suggestion: Verify Google API response format. Provider: '{}', Error: {}",
+                        provider_name, e
+                    ))
+                })?;
+
+                Ok(OAuth2UserInfo {
+                    id: google_user.id,
+                    username: google_user.email.clone(),
+                    email: Some(google_user.email),
+                    name: google_user.name,
+                    avatar_url: google_user.picture,
+                })
+            }
+            _ => Err(AppError::ValidationError(format!(
+                "Unsupported provider for user info: {}",
+                provider_name
+            ))),
+        }
     }
 
     /// Registers a SAML provider
