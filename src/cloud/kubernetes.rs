@@ -1382,15 +1382,18 @@ impl KubernetesManager {
             });
         }
 
-        // Placeholder implementation (when cloud-sdk feature is not enabled)
-        Ok(DeploymentStatus {
-            name: deployment_name.to_string(),
-            replicas: 1,
-            ready_replicas: 1,
-            available_replicas: 1,
-            unavailable_replicas: 0,
-            ready: true,
-        })
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            // Placeholder implementation (when cloud-sdk feature is not enabled)
+            return Ok(DeploymentStatus {
+                name: deployment_name.to_string(),
+                replicas: 1,
+                ready_replicas: 1,
+                available_replicas: 1,
+                unavailable_replicas: 0,
+                ready: true,
+            });
+        }
     }
 
     /// Get events for a Kubernetes Deployment
