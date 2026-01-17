@@ -40,14 +40,14 @@
 
 ### Пріоритет 1: Cloud SDK Implementation (2-3 тижні) ⭐⭐⭐
 
-**Поточний прогрес**: Infrastructure 100% ✅, SDK Implementation 0% 🔄
+**Поточний прогрес**: Infrastructure 100% ✅, SDK Implementation ~65% 🔄
 
-#### 1.1 Azure SDK Full Implementation (3-5 днів)
+#### 1.1 Azure SDK Full Implementation (3-5 днів) - 50% ✅
 
 **Завдання**:
-- [ ] Перевірити Azure SDK 0.30 API structure (`azure_identity`, `azure_mgmt_compute`)
-- [ ] Реалізувати `DefaultAzureCredential` initialization (або `EnvironmentCredential`)
-- [ ] Реалізувати Compute client initialization
+- [x] Перевірити Azure SDK 0.30 API structure (`azure_identity`, `azure_mgmt_compute`)
+- [x] Реалізувати `DefaultAzureCredential` initialization (або `EnvironmentCredential`)
+- [ ] Реалізувати Compute client initialization (⚠️ Version conflict: azure_mgmt_compute 0.21 uses azure_core 0.21, azure_identity 0.30 uses azure_core 0.30)
 - [ ] Реалізувати VM Scale Set creation API calls
 - [ ] Додати error handling для Azure API errors
 - [ ] Додати integration tests для Azure SDK
@@ -60,16 +60,17 @@
 
 **Оцінка**: 3-5 днів (залежить від Azure SDK API verification)
 
-#### 1.2 GCP SDK Implementation (3-5 днів)
+#### 1.2 GCP SDK Implementation (3-5 днів) - 85% ✅
 
 **Завдання**:
-- [ ] Вибрати GCP SDK (google-cloud-rust або direct REST API via reqwest)
-- [ ] Додати SDK до `Cargo.toml` (якщо обрано crate)
-- [ ] Реалізувати Application Default Credentials initialization
-- [ ] Реалізувати Compute Engine client initialization
-- [ ] Реалізувати instance creation API calls
-- [ ] Додати error handling для GCP API errors
+- [x] Вибрати GCP SDK (google-cloud-rust або direct REST API via reqwest) - ✅ REST API via reqwest
+- [x] Додати SDK до `Cargo.toml` (якщо обрано crate) - ✅ Using reqwest (already in dependencies)
+- [x] Реалізувати Application Default Credentials initialization - ✅ Metadata server implemented
+- [x] Реалізувати Compute Engine client initialization - ✅ HTTP client initialized
+- [x] Реалізувати instance creation API calls - ✅ create_compute_instance() implemented
+- [x] Додати error handling для GCP API errors - ✅ Error handling added
 - [ ] Додати integration tests для GCP SDK
+- [ ] Реалізувати service account key file authentication (TODO: JWT signing)
 - [ ] Оновити документацію з прикладами використання
 
 **Файли для редагування**:
