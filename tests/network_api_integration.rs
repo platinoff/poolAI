@@ -256,6 +256,57 @@ async fn test_chat_completions_endpoint_exists() {
 }
 
 #[tokio::test]
+async fn test_topology_endpoint_exists() {
+    let app = Router::new().nest("/api/v1", create_api_routes());
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/topology")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    // Endpoint exists if it returns something other than 404
+    assert_ne!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_topology_latency_endpoint_exists() {
+    let app = Router::new().nest("/api/v1", create_api_routes());
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/topology/latency")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    // Endpoint exists if it returns something other than 404
+    assert_ne!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_topology_nodes_endpoint_exists() {
+    let app = Router::new().nest("/api/v1", create_api_routes());
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/topology/nodes")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    // Endpoint exists if it returns something other than 404
+    assert_ne!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
 async fn test_nonexistent_endpoint_returns_404() {
     let app = Router::new().nest("/api/v1", create_api_routes());
     let response = app
