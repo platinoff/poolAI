@@ -429,7 +429,7 @@ impl KubernetesManager {
 
         // Add request body if provided
         if let Some(ref body) = body {
-            request = request.json(body.clone());
+            request = request.json(&**body);
         }
 
         // Send request with retry logic for transient errors
