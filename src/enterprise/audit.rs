@@ -352,7 +352,6 @@ impl AuditLogger {
         use flate2::write::GzEncoder;
         use flate2::Compression;
         use std::fs::File;
-        use std::io::BufWriter;
 
         let mut entries = tokio::fs::read_dir(&self.config.log_directory)
             .await
@@ -414,7 +413,7 @@ impl AuditLogger {
                     ))
                 })?;
 
-                let mut gz_writer = BufWriter::new(GzEncoder::new(gz_file, Compression::default()));
+                let mut gz_writer = GzEncoder::new(gz_file, Compression::default());
                 std::io::copy(&mut log_reader, &mut gz_writer).map_err(|e| {
                     AppError::ConfigError(format!(
                         "Failed to compress log file: {:?}, Error: {}",
@@ -422,10 +421,11 @@ impl AuditLogger {
                     ))
                 })?;
 
-                gz_writer.flush().map_err(|e| {
+                // Finish compression (flushes and closes GzEncoder)
+                gz_writer.finish().map_err(|e| {
                     AppError::ConfigError(format!(
-                        "Failed to flush compressed file: {:?}, Error: {}",
-                        gz_path_clone, e
+                        "Failed to finish compression: {:?}, Error: {}",
+                        log_path_clone, e
                     ))
                 })?;
 

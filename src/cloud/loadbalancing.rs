@@ -46,8 +46,8 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tokio::time::{timeout, Duration};
-use tracing::info;
+use tokio::time::{timeout, Duration, Interval};
+use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
 use crate::cloud::kubernetes::KubernetesManager;
@@ -95,6 +95,8 @@ pub struct LoadBalancer {
     backend_health: Arc<RwLock<HashMap<String, BackendHealth>>>,
     strategy: Arc<RwLock<LoadBalancingStrategy>>,
     health_check_config: Arc<RwLock<HealthCheckConfig>>,
+    /// Background task handle for periodic health checks
+    health_check_handle: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
     #[cfg(feature = "cloud-sdk")]
     /// Kubernetes manager for health checks
     k8s_manager: Option<Arc<KubernetesManager>>,
@@ -123,6 +125,7 @@ impl LoadBalancer {
                 success_threshold: 2,
                 path: Some("/health".to_string()),
             })),
+            health_check_handle: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             k8s_manager: None,
         }
@@ -162,6 +165,7 @@ impl LoadBalancer {
                 success_threshold: 2,
                 path: Some("/health".to_string()),
             })),
+            health_check_handle: Arc::new(RwLock::new(None)),
             k8s_manager: Some(k8s_manager),
         }
     }
@@ -196,14 +200,90 @@ impl LoadBalancer {
 
         // Initialize health check configuration
         let health_config = self.health_check_config.read().await;
-        info!(
-            "Load balancer initialized with strategy: {:?}, health check interval: {}s",
-            *self.strategy.read().await,
-            health_config.interval_secs
-        );
+        let interval_secs = health_config.interval_secs;
+        let strategy = *self.strategy.read().await;
         drop(health_config);
 
-        // TODO: Set up actual health check tasks
+        info!(
+            "Load balancer initialized with strategy: {:?}, health check interval: {}s",
+            strategy, interval_secs
+        );
+
+        // Start background health check task
+        let backends = Arc::clone(&self.backends);
+        let backend_health = Arc::clone(&self.backend_health);
+        let health_check_config = Arc::clone(&self.health_check_config);
+        let initialized_flag = Arc::clone(&self.initialized);
+        #[cfg(feature = "cloud-sdk")]
+        let k8s_manager = self.k8s_manager.clone();
+
+        let handle = tokio::spawn(async move {
+            let mut interval = tokio::time::interval(Duration::from_secs(interval_secs));
+            interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+
+            loop {
+                interval.tick().await;
+
+                // Check if still initialized
+                let is_initialized = *initialized_flag.read().await;
+                if !is_initialized {
+                    info!("Load balancer shutdown detected, stopping health check task");
+                    break;
+                }
+
+                // Perform health checks for all backends
+                let backends_clone = backends.read().await.clone();
+                let health_config = health_check_config.read().await.clone();
+                drop(health_check_config);
+
+                for backend in backends_clone.values() {
+                    // Check backend health
+                    let is_healthy = Self::check_backend_health_static(
+                        backend,
+                        &health_config,
+                        #[cfg(feature = "cloud-sdk")]
+                        k8s_manager.as_ref(),
+                    )
+                    .await;
+
+                    // Update backend health status
+                    let mut health_map = backend_health.write().await;
+                    let health = health_map.entry(backend.id.clone()).or_insert(BackendHealth {
+                        healthy: true,
+                        consecutive_failures: 0,
+                        last_check: None,
+                    });
+
+                    if is_healthy {
+                        health.consecutive_failures = 0;
+                        if !health.healthy {
+                            // Mark healthy after success_threshold consecutive successes
+                            if health.consecutive_failures == 0 {
+                                health.healthy = true;
+                                info!("Backend {} marked as healthy", backend.id);
+                            }
+                        }
+                    } else {
+                        health.consecutive_failures += 1;
+                        if health.consecutive_failures >= health_config.failure_threshold {
+                            if health.healthy {
+                                health.healthy = false;
+                                warn!(
+                                    "Backend {} marked as unhealthy after {} consecutive failures",
+                                    backend.id, health.consecutive_failures
+                                );
+                            }
+                        }
+                    }
+
+                    health.last_check = Some(std::time::Instant::now());
+                }
+            }
+        });
+
+        // Store handle
+        *self.health_check_handle.write().await = Some(handle);
+
         // TODO: Configure routing rules
         // TODO: Initialize cloud load balancer (if applicable)
 
@@ -211,8 +291,62 @@ impl LoadBalancer {
         Ok(())
     }
 
+    /// Static helper method for checking backend health (used in background task)
+    async fn check_backend_health_static(
+        backend: &Backend,
+        config: &HealthCheckConfig,
+        #[cfg(feature = "cloud-sdk")] k8s_manager: Option<&Arc<KubernetesManager>>,
+    ) -> bool {
+        #[cfg(feature = "cloud-sdk")]
+        {
+            // Try Kubernetes pod health check first
+            if let Some(k8s_manager) = k8s_manager {
+                // Check if backend is a Kubernetes pod
+                if let Ok(pod_status) = k8s_manager.get_pod_status(&backend.id).await {
+                    if pod_status.ready && pod_status.phase == "Running" {
+                        return true;
+                    }
+                }
+            }
+
+            // Fallback: HTTP health check
+            if let Some(ref path) = config.path {
+                let url = format!("http://{}:{}{}", backend.address, backend.port, path);
+                let client = reqwest::Client::builder()
+                    .timeout(Duration::from_secs(config.timeout_secs))
+                    .build();
+
+                if let Ok(client) = client {
+                    if let Ok(result) = timeout(
+                        Duration::from_secs(config.timeout_secs),
+                        client.get(&url).send(),
+                    )
+                    .await
+                    {
+                        if let Ok(response) = result {
+                            return response.status().is_success();
+                        }
+                    }
+                }
+            }
+        }
+
+        // If no health check path configured, assume healthy
+        // (for TCP-only backends)
+        true
+    }
+
     /// Shutdown load balancer
     pub async fn shutdown(&self) -> Result<(), AppError> {
+        // Stop health check background task
+        let mut handle_guard = self.health_check_handle.write().await;
+        if let Some(handle) = handle_guard.take() {
+            handle.abort();
+            // Wait a bit for task to finish
+            let _ = tokio::time::timeout(Duration::from_millis(100), handle).await;
+        }
+        drop(handle_guard);
+
         *self.initialized.write().await = false;
         info!("Load balancer shut down");
         Ok(())
