@@ -17,6 +17,7 @@ use tokio_stream::{self as stream, Stream, StreamExt};
 
 use crate::core::model_interface::{ModelParameters, ModelRequest};
 use crate::network::auth::Claims;
+use crate::runtime::instance::get_global_instance_manager;
 
 /// OpenAI-compatible chat message
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -182,32 +183,113 @@ async fn chat_completions_handler(
         timeout: Some(30),
     };
 
-    // Process request (simplified - in real implementation would use instance manager)
-    if request.stream {
-        // Streaming response
-        let stream = create_streaming_response(&request.model, model_request);
-        Sse::new(stream).into_response()
-    } else {
-        // Non-streaming response
-        let response = process_chat_completion(&request.model, model_request).await;
+    // Try to find instance by model ID
+    let instance_manager_opt = get_global_instance_manager();
+    
+    if let Some(manager_arc) = instance_manager_opt {
+        let manager = manager_arc.read().await;
+        
+        // Try to find instance by model_id
+        if let Some(instance) = manager.get_instance_by_model_id(&request.model).await {
+            // Use instance to process request
+            if request.stream {
+                // Streaming response
+                let stream = create_streaming_response_from_instance(&instance.instance_id, &request.model, model_request);
+                Sse::new(stream).into_response()
+            } else {
+                // Non-streaming response
+                let response = process_chat_completion_via_instance(&instance.instance_id, &request.model, model_request).await;
 
-        match response {
-            Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
-            )
-                .into_response(),
+                match response {
+                    Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
+                    Err(e) => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
+                    )
+                        .into_response(),
+                }
+            }
+        } else {
+            // Fallback to simplified processing if no instance found
+            if request.stream {
+                let stream = create_streaming_response(&request.model, model_request);
+                Sse::new(stream).into_response()
+            } else {
+                let response = process_chat_completion(&request.model, model_request).await;
+
+                match response {
+                    Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
+                    Err(e) => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
+                    )
+                        .into_response(),
+                }
+            }
+        }
+    } else {
+        // Fallback to simplified processing if instance manager not initialized
+        if request.stream {
+            let stream = create_streaming_response(&request.model, model_request);
+            Sse::new(stream).into_response()
+        } else {
+            let response = process_chat_completion(&request.model, model_request).await;
+
+            match response {
+                Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
+                Err(e) => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
+                )
+                    .into_response(),
+            }
         }
     }
 }
 
-/// Process chat completion (non-streaming)
+/// Process chat completion via instance (non-streaming)
+async fn process_chat_completion_via_instance(
+    instance_id: &str,
+    model: &str,
+    request: ModelRequest,
+) -> Result<ChatCompletionResponse, crate::core::error::AppError> {
+    let manager_arc = get_global_instance_manager()
+        .ok_or_else(|| crate::core::error::AppError::ConfigError("Instance manager not initialized".to_string()))?;
+    
+    let manager = manager_arc.read().await;
+    
+    // Process request via instance
+    let model_response = manager.process_request_via_instance(instance_id, request.clone()).await?;
+
+    let completion = ChatCompletionResponse {
+        id: format!("chatcmpl-{}", uuid::Uuid::new_v4()),
+        object: "chat.completion".to_string(),
+        created: chrono::Utc::now().timestamp(),
+        model: model.to_string(),
+        choices: vec![ChatCompletionChoice {
+            index: 0,
+            message: ChatMessage {
+                role: "assistant".to_string(),
+                content: model_response.output,
+            },
+            finish_reason: "stop".to_string(),
+        }],
+        usage: ChatUsage {
+            prompt_tokens: model_response.metrics.tokens_generated, // Approximate
+            completion_tokens: model_response.metrics.tokens_generated,
+            total_tokens: model_response.metrics.tokens_generated * 2, // Rough estimate
+        },
+    };
+
+    Ok(completion)
+}
+
+/// Process chat completion (non-streaming fallback)
 async fn process_chat_completion(
     model: &str,
     request: ModelRequest,
 ) -> Result<ChatCompletionResponse, crate::core::error::AppError> {
-    // Simplified processing - in real implementation would use instance manager
+    // Simplified processing - fallback when no instance found
     // For now, simulate processing
     tokio::time::sleep(Duration::from_millis(100)).await;
 
@@ -236,7 +318,18 @@ async fn process_chat_completion(
     Ok(completion)
 }
 
-/// Create streaming response
+/// Create streaming response from instance
+fn create_streaming_response_from_instance(
+    _instance_id: &str,
+    model: &str,
+    request: ModelRequest,
+) -> impl Stream<Item = Result<Event, Infallible>> {
+    // TODO: In real implementation, this would use instance.process_request_via_instance with streaming
+    // For now, fallback to simplified streaming
+    create_streaming_response(model, request)
+}
+
+/// Create streaming response (fallback)
 fn create_streaming_response(
     model: &str,
     request: ModelRequest,

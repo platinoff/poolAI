@@ -189,7 +189,7 @@ impl InstanceManager {
             placement,
             created_at: Utc::now(),
             last_activity: Arc::new(RwLock::new(Utc::now())),
-            model: None, // Will be loaded later
+            model: None, // Will be loaded later via load_model_for_instance
             metadata,
         };
 
@@ -198,7 +198,10 @@ impl InstanceManager {
 
         info!("Created model instance: {} for model: {}", instance_id, model_id);
 
-        // Update status to Ready (simplified - in real implementation would load model)
+        // Try to load model if available (non-blocking - won't fail if model not found)
+        let _ = self.load_model_for_instance(&instance_id, &model_id).await;
+
+        // Update status to Ready
         {
             let mut status = instances
                 .get(&instance_id)
@@ -210,6 +213,21 @@ impl InstanceManager {
         }
 
         Ok(instance_id)
+    }
+
+    /// Load model for an instance (internal method - tries to find model from ModelManager or LibraryManager)
+    async fn load_model_for_instance(
+        &self,
+        instance_id: &str,
+        model_id: &str,
+    ) -> Result<(), AppError> {
+        // TODO: In real implementation, this would:
+        // 1. Check ModelManager for registered models
+        // 2. Check LibraryManager for model libraries
+        // 3. Load model using ModelInterface
+        // For now, this is a placeholder that doesn't fail
+        info!("Attempting to load model {} for instance {} (placeholder)", model_id, instance_id);
+        Ok(())
     }
 
     /// Get instance by ID
@@ -262,6 +280,62 @@ impl InstanceManager {
             Some(status.clone())
         } else {
             None
+        }
+    }
+
+    /// Get model instance by model ID (for routing completions requests)
+    pub async fn get_instance_by_model_id(&self, model_id: &str) -> Option<ModelInstance> {
+        let instances = self.instances.read().await;
+        instances
+            .values()
+            .find(|instance| instance.model_id == model_id)
+            .cloned()
+    }
+
+    /// Process request using an instance's model
+    pub async fn process_request_via_instance(
+        &self,
+        instance_id: &str,
+        request: crate::core::model_interface::ModelRequest,
+    ) -> Result<crate::core::model_interface::ModelResponse, AppError> {
+        let instances = self.instances.read().await;
+        let instance = instances
+            .get(instance_id)
+            .ok_or_else(|| AppError::ResourceError(format!("Instance '{}' not found", instance_id)))?;
+
+        // Check if model is loaded
+        if let Some(model) = &instance.model {
+            // Update last activity
+            {
+                let mut last_activity = instance.last_activity.write().await;
+                *last_activity = Utc::now();
+            }
+
+            // Update status to Active
+            {
+                let mut status = instance.status.write().await;
+                if *status != InstanceStatus::Error(String::new()) {
+                    *status = InstanceStatus::Active;
+                }
+            }
+
+            // Process request
+            let response = model.process_request(request).await?;
+
+            // Update status back to Ready
+            {
+                let mut status = instance.status.write().await;
+                if *status == InstanceStatus::Active {
+                    *status = InstanceStatus::Ready;
+                }
+            }
+
+            Ok(response)
+        } else {
+            Err(AppError::ModelError(format!(
+                "Model not loaded for instance '{}'",
+                instance_id
+            )))
         }
     }
 }

@@ -21,6 +21,7 @@ use crate::network::auth::Claims;
 use crate::runtime::instance::{
     get_global_instance_manager, InstancePlacement,
 };
+use crate::libs::get_global_manager as get_library_manager;
 
 /// Instance preview response
 #[derive(Serialize)]
@@ -107,22 +108,8 @@ async fn instance_previews_handler(
     if let Some(manager_arc) = get_global_instance_manager() {
         let manager = manager_arc.read().await;
 
-        // Get model info (simplified - in real implementation would fetch from model registry)
-        let model_info = ModelInfo {
-            name: model_id.clone(),
-            version: "1.0".to_string(),
-            capabilities: vec!["text-generation".to_string()],
-            max_tokens: 2048,
-            supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
-            model_size_mb: 2000,
-            supported_languages: vec!["en".to_string()],
-            gpu_requirements: GpuRequirements {
-                min_memory_mb: 1000,
-                recommended_memory_mb: 2000,
-                supported_architectures: vec!["CUDA".to_string()],
-                requires_cuda: true,
-            },
-        };
+        // Get model info - try to fetch from library manager, fallback to default
+        let model_info = get_model_info(model_id).await;
 
         match manager.get_placement_previews(model_id, &model_info).await {
             Ok(placements) => {
@@ -344,5 +331,49 @@ async fn state_handler() -> impl IntoResponse {
             Json(serde_json::json!({"error": "Instance manager not initialized"})),
         )
             .into_response()
+    }
+}
+
+/// Get model information from library manager or return default
+async fn get_model_info(model_id: &str) -> ModelInfo {
+    // Try to get model info from library manager
+    if let Some(lib_manager_arc) = get_library_manager() {
+        let lib_manager = lib_manager_arc.read().await;
+        if let Some(library) = lib_manager.get_library(model_id).await {
+            // Convert LibraryInfo to ModelInfo
+            let size_mb = library.metadata.size_bytes.unwrap_or(0) / (1024 * 1024);
+            return ModelInfo {
+                name: library.name.clone(),
+                version: library.version.clone(),
+                capabilities: vec!["text-generation".to_string()], // Default capabilities
+                max_tokens: 2048, // Default
+                supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
+                model_size_mb: size_mb.max(1),
+                supported_languages: vec!["en".to_string()],
+                gpu_requirements: GpuRequirements {
+                    min_memory_mb: (size_mb / 2).max(512), // Estimate: half of model size
+                    recommended_memory_mb: size_mb.max(1000),
+                    supported_architectures: vec!["CUDA".to_string(), "CPU".to_string()],
+                    requires_cuda: size_mb > 1000, // Large models typically need CUDA
+                },
+            };
+        }
+    }
+
+    // Fallback to default model info
+    ModelInfo {
+        name: model_id.to_string(),
+        version: "1.0".to_string(),
+        capabilities: vec!["text-generation".to_string()],
+        max_tokens: 2048,
+        supported_parameters: vec!["temperature".to_string(), "max_tokens".to_string()],
+        model_size_mb: 2000,
+        supported_languages: vec!["en".to_string()],
+        gpu_requirements: GpuRequirements {
+            min_memory_mb: 1000,
+            recommended_memory_mb: 2000,
+            supported_architectures: vec!["CUDA".to_string()],
+            requires_cuda: true,
+        },
     }
 }
