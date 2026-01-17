@@ -333,14 +333,131 @@ impl AuditLogger {
 
         info!("Rotated audit log file to: {:?}", file_path);
 
+        // Compress old log files if enabled (before cleanup to compress recent files)
+        if self.config.enable_compression {
+            self.compress_old_logs().await?;
+        }
+
         // Cleanup old log files (keep only max_files)
         self.cleanup_old_logs().await?;
 
-        // Compress old log file if enabled
-        if self.config.enable_compression {
-            // Note: Compression would require additional dependencies (flate2, zstd, etc.)
-            // For now, we'll leave this as a future enhancement
-            // TODO: Add compression support when flate2 or zstd is added as optional dependency
+        Ok(())
+    }
+
+    /// Compresses old log files using gzip compression
+    ///
+    /// Compresses `.log` files to `.log.gz` and removes original files.
+    /// Only compresses files that are not already compressed.
+    async fn compress_old_logs(&self) -> Result<(), AppError> {
+        use flate2::write::GzEncoder;
+        use flate2::Compression;
+        use std::fs::File;
+        use std::io::BufWriter;
+
+        let mut entries = tokio::fs::read_dir(&self.config.log_directory)
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to read audit log directory for compression: {}",
+                    e
+                ))
+            })?;
+
+        let mut log_files = Vec::new();
+        while let Some(entry) = entries.next_entry().await.map_err(|e| {
+            AppError::ConfigError(format!(
+                "Failed to read directory entry during compression: {}",
+                e
+            ))
+        })? {
+            let path = entry.path();
+            if path.is_file() {
+                if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                    // Only compress .log files (not .log.gz files)
+                    if file_name.starts_with("audit_")
+                        && file_name.ends_with(".log")
+                        && !file_name.ends_with(".log.gz")
+                    {
+                        log_files.push(path);
+                    }
+                }
+            }
+        }
+
+        // Compress each log file
+        for log_path in log_files {
+            let gz_path = log_path.with_extension("log.gz");
+
+            // Skip if compressed file already exists
+            if gz_path.exists() {
+                warn!("Compressed file already exists: {:?}, skipping", gz_path);
+                continue;
+            }
+
+            // Use blocking I/O for compression (flate2 is synchronous)
+            let log_path_clone = log_path.clone();
+            let gz_path_clone = gz_path.clone();
+            let compress_result = tokio::task::spawn_blocking(move || -> Result<(), AppError> {
+                // Read log file content
+                let mut log_reader = File::open(&log_path_clone).map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to open log file for compression (blocking): {:?}, Error: {}",
+                        log_path_clone, e
+                    ))
+                })?;
+
+                // Compress directly from file to gzip file (streaming)
+                let gz_file = File::create(&gz_path_clone).map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to create compressed file: {:?}, Error: {}",
+                        gz_path_clone, e
+                    ))
+                })?;
+
+                let mut gz_writer = BufWriter::new(GzEncoder::new(gz_file, Compression::default()));
+                std::io::copy(&mut log_reader, &mut gz_writer).map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to compress log file: {:?}, Error: {}",
+                        log_path_clone, e
+                    ))
+                })?;
+
+                gz_writer.flush().map_err(|e| {
+                    AppError::ConfigError(format!(
+                        "Failed to flush compressed file: {:?}, Error: {}",
+                        gz_path_clone, e
+                    ))
+                })?;
+
+                Ok(())
+            })
+            .await
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Compression task failed: {:?}, Error: {}",
+                    log_path, e
+                ))
+            })?;
+
+            match compress_result {
+                Ok(_) => {
+                    // Delete original log file after successful compression
+                    if let Err(e) = tokio::fs::remove_file(&log_path).await {
+                        warn!(
+                            "Failed to delete original log file after compression: {:?}, Error: {}",
+                            log_path, e
+                        );
+                    } else {
+                        info!(
+                            "Compressed audit log file: {:?} -> {:?}",
+                            log_path, gz_path
+                        );
+                    }
+                }
+                Err(e) => {
+                    warn!("Failed to compress audit log file: {:?}, Error: {}", log_path, e);
+                }
+            }
         }
 
         Ok(())
@@ -591,7 +708,10 @@ impl AuditLogger {
             let path = entry.path();
             if path.is_file() {
                 if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
-                    if file_name.starts_with("audit_") && file_name.ends_with(".log") {
+                    // Include both .log and .log.gz files in cleanup
+                    if file_name.starts_with("audit_")
+                        && (file_name.ends_with(".log") || file_name.ends_with(".log.gz"))
+                    {
                         if let Ok(metadata) = entry.metadata().await {
                             if let Ok(modified) = metadata.modified() {
                                 log_files.push((path, modified));
