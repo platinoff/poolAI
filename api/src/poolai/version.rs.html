@@ -19,7 +19,7 @@
 <a href=#19 id=19 data-nosnippet>19</a><span class="doccomment">/// Initialize application start time
 <a href=#20 id=20 data-nosnippet>20</a>/// Should be called once at application startup
 <a href=#21 id=21 data-nosnippet>21</a></span><span class="kw">pub fn </span>initialize_start_time() {
-<a href=#22 id=22 data-nosnippet>22</a>    START_TIME.get_or_init(|| SystemTime::now());
+<a href=#22 id=22 data-nosnippet>22</a>    START_TIME.get_or_init(SystemTime::now);
 <a href=#23 id=23 data-nosnippet>23</a>}
 <a href=#24 id=24 data-nosnippet>24</a>
 <a href=#25 id=25 data-nosnippet>25</a><span class="doccomment">/// Get application uptime in seconds

@@ -20,7 +20,7 @@ cache.start().<span class="kw">await</span><span class="question-mark">?</span>;
 </span>cache.put(<span class="string">"key1"</span>, <span class="string">"value1"</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
 
 <span class="comment">// Get an entry
-</span><span class="kw">if let </span><span class="prelude-val">Some</span>(value) = cache.get::&lt;String&gt;(<span class="string">"key1"</span>).<span class="kw">await </span>{
+</span><span class="kw">if let </span><span class="prelude-val">Some</span>(value) = cache.get(<span class="string">"key1"</span>).<span class="kw">await </span>{
     <span class="macro">println!</span>(<span class="string">"Found: {}"</span>, value);
 }
 

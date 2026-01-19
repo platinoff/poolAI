@@ -735,7 +735,7 @@
 <a href=#735 id=735 data-nosnippet>735</a>        <span class="self">self</span>.persist_manifest().<span class="kw">await</span><span class="question-mark">?</span>;
 <a href=#736 id=736 data-nosnippet>736</a>
 <a href=#737 id=737 data-nosnippet>737</a>        <span class="comment">// If mode is BurstRaid or SmallWorld, trigger replication through strategy
-<a href=#738 id=738 data-nosnippet>738</a>        </span><span class="kw">let </span>mode = cfg.mode.clone();
+<a href=#738 id=738 data-nosnippet>738</a>        </span><span class="kw">let </span>mode = cfg.mode;
 <a href=#739 id=739 data-nosnippet>739</a>        drop(cfg); <span class="comment">// Release config lock
 <a href=#740 id=740 data-nosnippet>740</a>
 <a href=#741 id=741 data-nosnippet>741</a>        </span><span class="kw">match </span>mode {
@@ -1232,7 +1232,7 @@
 <a href=#1232 id=1232 data-nosnippet>1232</a>    <span class="doccomment">/// Get storage mode from configuration
 <a href=#1233 id=1233 data-nosnippet>1233</a>    </span><span class="kw">pub async fn </span>get_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RaidMode {
 <a href=#1234 id=1234 data-nosnippet>1234</a>        <span class="kw">let </span>config = <span class="self">self</span>.config.read().<span class="kw">await</span>;
-<a href=#1235 id=1235 data-nosnippet>1235</a>        config.mode.clone()
+<a href=#1235 id=1235 data-nosnippet>1235</a>        config.mode
 <a href=#1236 id=1236 data-nosnippet>1236</a>    }
 <a href=#1237 id=1237 data-nosnippet>1237</a>
 <a href=#1238 id=1238 data-nosnippet>1238</a>    <span class="doccomment">/// Get strategy status for Administrative Control Plane

@@ -304,7 +304,7 @@
 <a href=#304 id=304 data-nosnippet>304</a>}
 <a href=#305 id=305 data-nosnippet>305</a>
 <a href=#306 id=306 data-nosnippet>306</a><span class="doccomment">/// Error metrics result
-<a href=#307 id=307 data-nosnippet>307</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
+<a href=#307 id=307 data-nosnippet>307</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 <a href=#308 id=308 data-nosnippet>308</a></span><span class="kw">pub struct </span>ErrorMetrics {
 <a href=#309 id=309 data-nosnippet>309</a>    <span class="doccomment">/// Error counts by type
 <a href=#310 id=310 data-nosnippet>310</a>    </span><span class="kw">pub </span>error_counts: std::collections::HashMap&lt;String, u64&gt;,
@@ -318,222 +318,210 @@
 <a href=#318 id=318 data-nosnippet>318</a>    </span><span class="kw">pub </span>successful_recoveries: u64,
 <a href=#319 id=319 data-nosnippet>319</a>}
 <a href=#320 id=320 data-nosnippet>320</a>
-<a href=#321 id=321 data-nosnippet>321</a><span class="kw">impl </span>Default <span class="kw">for </span>ErrorMetrics {
-<a href=#322 id=322 data-nosnippet>322</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#323 id=323 data-nosnippet>323</a>        <span class="self">Self </span>{
-<a href=#324 id=324 data-nosnippet>324</a>            error_counts: std::collections::HashMap::new(),
-<a href=#325 id=325 data-nosnippet>325</a>            last_error_time: <span class="prelude-val">None</span>,
-<a href=#326 id=326 data-nosnippet>326</a>            total_errors: <span class="number">0</span>,
-<a href=#327 id=327 data-nosnippet>327</a>            recovery_attempts: <span class="number">0</span>,
-<a href=#328 id=328 data-nosnippet>328</a>            successful_recoveries: <span class="number">0</span>,
-<a href=#329 id=329 data-nosnippet>329</a>        }
-<a href=#330 id=330 data-nosnippet>330</a>    }
-<a href=#331 id=331 data-nosnippet>331</a>}
-<a href=#332 id=332 data-nosnippet>332</a>
-<a href=#333 id=333 data-nosnippet>333</a><span class="kw">impl </span>ErrorMetrics {
-<a href=#334 id=334 data-nosnippet>334</a>    <span class="doccomment">/// Добавление ошибки в метрики
-<a href=#335 id=335 data-nosnippet>335</a>    </span><span class="kw">pub fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: <span class="kw-2">&amp;</span>AppError) {
-<a href=#336 id=336 data-nosnippet>336</a>        <span class="kw">let </span>error_code = error.error_code();
-<a href=#337 id=337 data-nosnippet>337</a>        <span class="kw-2">*</span><span class="self">self</span>.error_counts.entry(error_code.to_string()).or_insert(<span class="number">0</span>) += <span class="number">1</span>;
-<a href=#338 id=338 data-nosnippet>338</a>        <span class="self">self</span>.last_error_time = <span class="prelude-val">Some</span>(chrono::Utc::now());
-<a href=#339 id=339 data-nosnippet>339</a>        <span class="self">self</span>.total_errors += <span class="number">1</span>;
-<a href=#340 id=340 data-nosnippet>340</a>    }
+<a href=#321 id=321 data-nosnippet>321</a><span class="kw">impl </span>ErrorMetrics {
+<a href=#322 id=322 data-nosnippet>322</a>    <span class="doccomment">/// Добавление ошибки в метрики
+<a href=#323 id=323 data-nosnippet>323</a>    </span><span class="kw">pub fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: <span class="kw-2">&amp;</span>AppError) {
+<a href=#324 id=324 data-nosnippet>324</a>        <span class="kw">let </span>error_code = error.error_code();
+<a href=#325 id=325 data-nosnippet>325</a>        <span class="kw-2">*</span><span class="self">self</span>.error_counts.entry(error_code.to_string()).or_insert(<span class="number">0</span>) += <span class="number">1</span>;
+<a href=#326 id=326 data-nosnippet>326</a>        <span class="self">self</span>.last_error_time = <span class="prelude-val">Some</span>(chrono::Utc::now());
+<a href=#327 id=327 data-nosnippet>327</a>        <span class="self">self</span>.total_errors += <span class="number">1</span>;
+<a href=#328 id=328 data-nosnippet>328</a>    }
+<a href=#329 id=329 data-nosnippet>329</a>
+<a href=#330 id=330 data-nosnippet>330</a>    <span class="doccomment">/// Добавление попытки восстановления
+<a href=#331 id=331 data-nosnippet>331</a>    </span><span class="kw">pub fn </span>add_recovery_attempt(<span class="kw-2">&amp;mut </span><span class="self">self</span>, success: bool) {
+<a href=#332 id=332 data-nosnippet>332</a>        <span class="self">self</span>.recovery_attempts += <span class="number">1</span>;
+<a href=#333 id=333 data-nosnippet>333</a>        <span class="kw">if </span>success {
+<a href=#334 id=334 data-nosnippet>334</a>            <span class="self">self</span>.successful_recoveries += <span class="number">1</span>;
+<a href=#335 id=335 data-nosnippet>335</a>        }
+<a href=#336 id=336 data-nosnippet>336</a>    }
+<a href=#337 id=337 data-nosnippet>337</a>
+<a href=#338 id=338 data-nosnippet>338</a>    <span class="doccomment">/// Получение статистики ошибок
+<a href=#339 id=339 data-nosnippet>339</a>    </span><span class="kw">pub fn </span>get_error_statistics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::collections::HashMap&lt;String, f64&gt; {
+<a href=#340 id=340 data-nosnippet>340</a>        <span class="kw">let </span><span class="kw-2">mut </span>stats = std::collections::HashMap::new();
 <a href=#341 id=341 data-nosnippet>341</a>
-<a href=#342 id=342 data-nosnippet>342</a>    <span class="doccomment">/// Добавление попытки восстановления
-<a href=#343 id=343 data-nosnippet>343</a>    </span><span class="kw">pub fn </span>add_recovery_attempt(<span class="kw-2">&amp;mut </span><span class="self">self</span>, success: bool) {
-<a href=#344 id=344 data-nosnippet>344</a>        <span class="self">self</span>.recovery_attempts += <span class="number">1</span>;
-<a href=#345 id=345 data-nosnippet>345</a>        <span class="kw">if </span>success {
-<a href=#346 id=346 data-nosnippet>346</a>            <span class="self">self</span>.successful_recoveries += <span class="number">1</span>;
-<a href=#347 id=347 data-nosnippet>347</a>        }
-<a href=#348 id=348 data-nosnippet>348</a>    }
-<a href=#349 id=349 data-nosnippet>349</a>
-<a href=#350 id=350 data-nosnippet>350</a>    <span class="doccomment">/// Получение статистики ошибок
-<a href=#351 id=351 data-nosnippet>351</a>    </span><span class="kw">pub fn </span>get_error_statistics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::collections::HashMap&lt;String, f64&gt; {
-<a href=#352 id=352 data-nosnippet>352</a>        <span class="kw">let </span><span class="kw-2">mut </span>stats = std::collections::HashMap::new();
-<a href=#353 id=353 data-nosnippet>353</a>
-<a href=#354 id=354 data-nosnippet>354</a>        <span class="kw">if </span><span class="self">self</span>.total_errors &gt; <span class="number">0 </span>{
-<a href=#355 id=355 data-nosnippet>355</a>            stats.insert(<span class="string">"total_errors"</span>.to_string(), <span class="self">self</span>.total_errors <span class="kw">as </span>f64);
-<a href=#356 id=356 data-nosnippet>356</a>            stats.insert(
-<a href=#357 id=357 data-nosnippet>357</a>                <span class="string">"recovery_rate"</span>.to_string(),
-<a href=#358 id=358 data-nosnippet>358</a>                <span class="self">self</span>.successful_recoveries <span class="kw">as </span>f64 / <span class="self">self</span>.recovery_attempts <span class="kw">as </span>f64,
-<a href=#359 id=359 data-nosnippet>359</a>            );
+<a href=#342 id=342 data-nosnippet>342</a>        <span class="kw">if </span><span class="self">self</span>.total_errors &gt; <span class="number">0 </span>{
+<a href=#343 id=343 data-nosnippet>343</a>            stats.insert(<span class="string">"total_errors"</span>.to_string(), <span class="self">self</span>.total_errors <span class="kw">as </span>f64);
+<a href=#344 id=344 data-nosnippet>344</a>            stats.insert(
+<a href=#345 id=345 data-nosnippet>345</a>                <span class="string">"recovery_rate"</span>.to_string(),
+<a href=#346 id=346 data-nosnippet>346</a>                <span class="self">self</span>.successful_recoveries <span class="kw">as </span>f64 / <span class="self">self</span>.recovery_attempts <span class="kw">as </span>f64,
+<a href=#347 id=347 data-nosnippet>347</a>            );
+<a href=#348 id=348 data-nosnippet>348</a>
+<a href=#349 id=349 data-nosnippet>349</a>            <span class="kw">for </span>(error_type, count) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.error_counts {
+<a href=#350 id=350 data-nosnippet>350</a>                stats.insert(
+<a href=#351 id=351 data-nosnippet>351</a>                    <span class="macro">format!</span>(<span class="string">"error_rate_{}"</span>, error_type.to_lowercase()),
+<a href=#352 id=352 data-nosnippet>352</a>                    <span class="kw-2">*</span>count <span class="kw">as </span>f64 / <span class="self">self</span>.total_errors <span class="kw">as </span>f64,
+<a href=#353 id=353 data-nosnippet>353</a>                );
+<a href=#354 id=354 data-nosnippet>354</a>            }
+<a href=#355 id=355 data-nosnippet>355</a>        }
+<a href=#356 id=356 data-nosnippet>356</a>
+<a href=#357 id=357 data-nosnippet>357</a>        stats
+<a href=#358 id=358 data-nosnippet>358</a>    }
+<a href=#359 id=359 data-nosnippet>359</a>}
 <a href=#360 id=360 data-nosnippet>360</a>
-<a href=#361 id=361 data-nosnippet>361</a>            <span class="kw">for </span>(error_type, count) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.error_counts {
-<a href=#362 id=362 data-nosnippet>362</a>                stats.insert(
-<a href=#363 id=363 data-nosnippet>363</a>                    <span class="macro">format!</span>(<span class="string">"error_rate_{}"</span>, error_type.to_lowercase()),
-<a href=#364 id=364 data-nosnippet>364</a>                    <span class="kw-2">*</span>count <span class="kw">as </span>f64 / <span class="self">self</span>.total_errors <span class="kw">as </span>f64,
-<a href=#365 id=365 data-nosnippet>365</a>                );
-<a href=#366 id=366 data-nosnippet>366</a>            }
-<a href=#367 id=367 data-nosnippet>367</a>        }
-<a href=#368 id=368 data-nosnippet>368</a>
-<a href=#369 id=369 data-nosnippet>369</a>        stats
-<a href=#370 id=370 data-nosnippet>370</a>    }
-<a href=#371 id=371 data-nosnippet>371</a>}
-<a href=#372 id=372 data-nosnippet>372</a>
-<a href=#373 id=373 data-nosnippet>373</a><span class="attr">#[cfg(test)]
-<a href=#374 id=374 data-nosnippet>374</a></span><span class="kw">mod </span>tests {
-<a href=#375 id=375 data-nosnippet>375</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#376 id=376 data-nosnippet>376</a>
-<a href=#377 id=377 data-nosnippet>377</a>    <span class="attr">#[test]
-<a href=#378 id=378 data-nosnippet>378</a>    </span><span class="kw">fn </span>test_error_code() {
+<a href=#361 id=361 data-nosnippet>361</a><span class="attr">#[cfg(test)]
+<a href=#362 id=362 data-nosnippet>362</a></span><span class="kw">mod </span>tests {
+<a href=#363 id=363 data-nosnippet>363</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#364 id=364 data-nosnippet>364</a>
+<a href=#365 id=365 data-nosnippet>365</a>    <span class="attr">#[test]
+<a href=#366 id=366 data-nosnippet>366</a>    </span><span class="kw">fn </span>test_error_code() {
+<a href=#367 id=367 data-nosnippet>367</a>        <span class="macro">assert_eq!</span>(
+<a href=#368 id=368 data-nosnippet>368</a>            AppError::ModelError(<span class="string">"test"</span>.to_string()).error_code(),
+<a href=#369 id=369 data-nosnippet>369</a>            <span class="string">"MODEL_ERROR"
+<a href=#370 id=370 data-nosnippet>370</a>        </span>);
+<a href=#371 id=371 data-nosnippet>371</a>        <span class="macro">assert_eq!</span>(
+<a href=#372 id=372 data-nosnippet>372</a>            AppError::ConfigError(<span class="string">"test"</span>.to_string()).error_code(),
+<a href=#373 id=373 data-nosnippet>373</a>            <span class="string">"CONFIG_ERROR"
+<a href=#374 id=374 data-nosnippet>374</a>        </span>);
+<a href=#375 id=375 data-nosnippet>375</a>        <span class="macro">assert_eq!</span>(
+<a href=#376 id=376 data-nosnippet>376</a>            AppError::PoolError(<span class="string">"test"</span>.to_string()).error_code(),
+<a href=#377 id=377 data-nosnippet>377</a>            <span class="string">"POOL_ERROR"
+<a href=#378 id=378 data-nosnippet>378</a>        </span>);
 <a href=#379 id=379 data-nosnippet>379</a>        <span class="macro">assert_eq!</span>(
-<a href=#380 id=380 data-nosnippet>380</a>            AppError::ModelError(<span class="string">"test"</span>.to_string()).error_code(),
-<a href=#381 id=381 data-nosnippet>381</a>            <span class="string">"MODEL_ERROR"
+<a href=#380 id=380 data-nosnippet>380</a>            AppError::ValidationError(<span class="string">"test"</span>.to_string()).error_code(),
+<a href=#381 id=381 data-nosnippet>381</a>            <span class="string">"VALIDATION_ERROR"
 <a href=#382 id=382 data-nosnippet>382</a>        </span>);
-<a href=#383 id=383 data-nosnippet>383</a>        <span class="macro">assert_eq!</span>(
-<a href=#384 id=384 data-nosnippet>384</a>            AppError::ConfigError(<span class="string">"test"</span>.to_string()).error_code(),
-<a href=#385 id=385 data-nosnippet>385</a>            <span class="string">"CONFIG_ERROR"
-<a href=#386 id=386 data-nosnippet>386</a>        </span>);
-<a href=#387 id=387 data-nosnippet>387</a>        <span class="macro">assert_eq!</span>(
-<a href=#388 id=388 data-nosnippet>388</a>            AppError::PoolError(<span class="string">"test"</span>.to_string()).error_code(),
-<a href=#389 id=389 data-nosnippet>389</a>            <span class="string">"POOL_ERROR"
-<a href=#390 id=390 data-nosnippet>390</a>        </span>);
-<a href=#391 id=391 data-nosnippet>391</a>        <span class="macro">assert_eq!</span>(
-<a href=#392 id=392 data-nosnippet>392</a>            AppError::ValidationError(<span class="string">"test"</span>.to_string()).error_code(),
-<a href=#393 id=393 data-nosnippet>393</a>            <span class="string">"VALIDATION_ERROR"
-<a href=#394 id=394 data-nosnippet>394</a>        </span>);
-<a href=#395 id=395 data-nosnippet>395</a>        <span class="macro">assert_eq!</span>(AppError::Unknown.error_code(), <span class="string">"UNKNOWN_ERROR"</span>);
-<a href=#396 id=396 data-nosnippet>396</a>    }
-<a href=#397 id=397 data-nosnippet>397</a>
-<a href=#398 id=398 data-nosnippet>398</a>    <span class="attr">#[test]
-<a href=#399 id=399 data-nosnippet>399</a>    </span><span class="kw">fn </span>test_is_recoverable() {
-<a href=#400 id=400 data-nosnippet>400</a>        <span class="macro">assert!</span>(AppError::ModelError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#401 id=401 data-nosnippet>401</a>        <span class="macro">assert!</span>(AppError::ConfigError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#402 id=402 data-nosnippet>402</a>        <span class="macro">assert!</span>(AppError::PoolError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#403 id=403 data-nosnippet>403</a>        <span class="macro">assert!</span>(AppError::MonitoringError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#404 id=404 data-nosnippet>404</a>        <span class="macro">assert!</span>(AppError::ResourceError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#405 id=405 data-nosnippet>405</a>        <span class="macro">assert!</span>(AppError::GpuError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#406 id=406 data-nosnippet>406</a>        <span class="macro">assert!</span>(AppError::MemoryError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#407 id=407 data-nosnippet>407</a>        <span class="macro">assert!</span>(AppError::TimeoutError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#408 id=408 data-nosnippet>408</a>        <span class="macro">assert!</span>(!AppError::ValidationError(<span class="string">"test"</span>.to_string()).is_recoverable());
-<a href=#409 id=409 data-nosnippet>409</a>        <span class="macro">assert!</span>(!AppError::Unknown.is_recoverable());
+<a href=#383 id=383 data-nosnippet>383</a>        <span class="macro">assert_eq!</span>(AppError::Unknown.error_code(), <span class="string">"UNKNOWN_ERROR"</span>);
+<a href=#384 id=384 data-nosnippet>384</a>    }
+<a href=#385 id=385 data-nosnippet>385</a>
+<a href=#386 id=386 data-nosnippet>386</a>    <span class="attr">#[test]
+<a href=#387 id=387 data-nosnippet>387</a>    </span><span class="kw">fn </span>test_is_recoverable() {
+<a href=#388 id=388 data-nosnippet>388</a>        <span class="macro">assert!</span>(AppError::ModelError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#389 id=389 data-nosnippet>389</a>        <span class="macro">assert!</span>(AppError::ConfigError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#390 id=390 data-nosnippet>390</a>        <span class="macro">assert!</span>(AppError::PoolError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#391 id=391 data-nosnippet>391</a>        <span class="macro">assert!</span>(AppError::MonitoringError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#392 id=392 data-nosnippet>392</a>        <span class="macro">assert!</span>(AppError::ResourceError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#393 id=393 data-nosnippet>393</a>        <span class="macro">assert!</span>(AppError::GpuError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#394 id=394 data-nosnippet>394</a>        <span class="macro">assert!</span>(AppError::MemoryError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#395 id=395 data-nosnippet>395</a>        <span class="macro">assert!</span>(AppError::TimeoutError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#396 id=396 data-nosnippet>396</a>        <span class="macro">assert!</span>(!AppError::ValidationError(<span class="string">"test"</span>.to_string()).is_recoverable());
+<a href=#397 id=397 data-nosnippet>397</a>        <span class="macro">assert!</span>(!AppError::Unknown.is_recoverable());
+<a href=#398 id=398 data-nosnippet>398</a>    }
+<a href=#399 id=399 data-nosnippet>399</a>
+<a href=#400 id=400 data-nosnippet>400</a>    <span class="attr">#[test]
+<a href=#401 id=401 data-nosnippet>401</a>    </span><span class="kw">fn </span>test_recover() {
+<a href=#402 id=402 data-nosnippet>402</a>        <span class="comment">// Test that recover() doesn't panic for all error types
+<a href=#403 id=403 data-nosnippet>403</a>        </span><span class="macro">assert!</span>(AppError::ModelError(<span class="string">"test"</span>.to_string()).recover().is_ok());
+<a href=#404 id=404 data-nosnippet>404</a>        <span class="macro">assert!</span>(AppError::ConfigError(<span class="string">"test"</span>.to_string()).recover().is_ok());
+<a href=#405 id=405 data-nosnippet>405</a>        <span class="macro">assert!</span>(AppError::PoolError(<span class="string">"test"</span>.to_string()).recover().is_ok());
+<a href=#406 id=406 data-nosnippet>406</a>        <span class="macro">assert!</span>(AppError::ValidationError(<span class="string">"test"</span>.to_string())
+<a href=#407 id=407 data-nosnippet>407</a>            .recover()
+<a href=#408 id=408 data-nosnippet>408</a>            .is_ok());
+<a href=#409 id=409 data-nosnippet>409</a>        <span class="macro">assert!</span>(AppError::Unknown.recover().is_ok());
 <a href=#410 id=410 data-nosnippet>410</a>    }
 <a href=#411 id=411 data-nosnippet>411</a>
 <a href=#412 id=412 data-nosnippet>412</a>    <span class="attr">#[test]
-<a href=#413 id=413 data-nosnippet>413</a>    </span><span class="kw">fn </span>test_recover() {
-<a href=#414 id=414 data-nosnippet>414</a>        <span class="comment">// Test that recover() doesn't panic for all error types
-<a href=#415 id=415 data-nosnippet>415</a>        </span><span class="macro">assert!</span>(AppError::ModelError(<span class="string">"test"</span>.to_string()).recover().is_ok());
-<a href=#416 id=416 data-nosnippet>416</a>        <span class="macro">assert!</span>(AppError::ConfigError(<span class="string">"test"</span>.to_string()).recover().is_ok());
-<a href=#417 id=417 data-nosnippet>417</a>        <span class="macro">assert!</span>(AppError::PoolError(<span class="string">"test"</span>.to_string()).recover().is_ok());
-<a href=#418 id=418 data-nosnippet>418</a>        <span class="macro">assert!</span>(AppError::ValidationError(<span class="string">"test"</span>.to_string())
-<a href=#419 id=419 data-nosnippet>419</a>            .recover()
-<a href=#420 id=420 data-nosnippet>420</a>            .is_ok());
-<a href=#421 id=421 data-nosnippet>421</a>        <span class="macro">assert!</span>(AppError::Unknown.recover().is_ok());
-<a href=#422 id=422 data-nosnippet>422</a>    }
-<a href=#423 id=423 data-nosnippet>423</a>
-<a href=#424 id=424 data-nosnippet>424</a>    <span class="attr">#[test]
-<a href=#425 id=425 data-nosnippet>425</a>    </span><span class="kw">fn </span>test_error_metrics_add_error() {
-<a href=#426 id=426 data-nosnippet>426</a>        <span class="kw">let </span><span class="kw-2">mut </span>metrics = ErrorMetrics::default();
-<a href=#427 id=427 data-nosnippet>427</a>
-<a href=#428 id=428 data-nosnippet>428</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test"</span>.to_string()));
-<a href=#429 id=429 data-nosnippet>429</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">1</span>);
-<a href=#430 id=430 data-nosnippet>430</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.get(<span class="string">"MODEL_ERROR"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
-<a href=#431 id=431 data-nosnippet>431</a>        <span class="macro">assert!</span>(metrics.last_error_time.is_some());
-<a href=#432 id=432 data-nosnippet>432</a>
-<a href=#433 id=433 data-nosnippet>433</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ConfigError(<span class="string">"test"</span>.to_string()));
-<a href=#434 id=434 data-nosnippet>434</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">2</span>);
-<a href=#435 id=435 data-nosnippet>435</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.get(<span class="string">"CONFIG_ERROR"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
-<a href=#436 id=436 data-nosnippet>436</a>
-<a href=#437 id=437 data-nosnippet>437</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test2"</span>.to_string()));
-<a href=#438 id=438 data-nosnippet>438</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">3</span>);
-<a href=#439 id=439 data-nosnippet>439</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.get(<span class="string">"MODEL_ERROR"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2</span>));
-<a href=#440 id=440 data-nosnippet>440</a>    }
+<a href=#413 id=413 data-nosnippet>413</a>    </span><span class="kw">fn </span>test_error_metrics_add_error() {
+<a href=#414 id=414 data-nosnippet>414</a>        <span class="kw">let </span><span class="kw-2">mut </span>metrics = ErrorMetrics::default();
+<a href=#415 id=415 data-nosnippet>415</a>
+<a href=#416 id=416 data-nosnippet>416</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test"</span>.to_string()));
+<a href=#417 id=417 data-nosnippet>417</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">1</span>);
+<a href=#418 id=418 data-nosnippet>418</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.get(<span class="string">"MODEL_ERROR"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
+<a href=#419 id=419 data-nosnippet>419</a>        <span class="macro">assert!</span>(metrics.last_error_time.is_some());
+<a href=#420 id=420 data-nosnippet>420</a>
+<a href=#421 id=421 data-nosnippet>421</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ConfigError(<span class="string">"test"</span>.to_string()));
+<a href=#422 id=422 data-nosnippet>422</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">2</span>);
+<a href=#423 id=423 data-nosnippet>423</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.get(<span class="string">"CONFIG_ERROR"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
+<a href=#424 id=424 data-nosnippet>424</a>
+<a href=#425 id=425 data-nosnippet>425</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test2"</span>.to_string()));
+<a href=#426 id=426 data-nosnippet>426</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">3</span>);
+<a href=#427 id=427 data-nosnippet>427</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.get(<span class="string">"MODEL_ERROR"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2</span>));
+<a href=#428 id=428 data-nosnippet>428</a>    }
+<a href=#429 id=429 data-nosnippet>429</a>
+<a href=#430 id=430 data-nosnippet>430</a>    <span class="attr">#[test]
+<a href=#431 id=431 data-nosnippet>431</a>    </span><span class="kw">fn </span>test_error_metrics_add_recovery_attempt() {
+<a href=#432 id=432 data-nosnippet>432</a>        <span class="kw">let </span><span class="kw-2">mut </span>metrics = ErrorMetrics::default();
+<a href=#433 id=433 data-nosnippet>433</a>
+<a href=#434 id=434 data-nosnippet>434</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
+<a href=#435 id=435 data-nosnippet>435</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">1</span>);
+<a href=#436 id=436 data-nosnippet>436</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">1</span>);
+<a href=#437 id=437 data-nosnippet>437</a>
+<a href=#438 id=438 data-nosnippet>438</a>        metrics.add_recovery_attempt(<span class="bool-val">false</span>);
+<a href=#439 id=439 data-nosnippet>439</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">2</span>);
+<a href=#440 id=440 data-nosnippet>440</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">1</span>);
 <a href=#441 id=441 data-nosnippet>441</a>
-<a href=#442 id=442 data-nosnippet>442</a>    <span class="attr">#[test]
-<a href=#443 id=443 data-nosnippet>443</a>    </span><span class="kw">fn </span>test_error_metrics_add_recovery_attempt() {
-<a href=#444 id=444 data-nosnippet>444</a>        <span class="kw">let </span><span class="kw-2">mut </span>metrics = ErrorMetrics::default();
-<a href=#445 id=445 data-nosnippet>445</a>
-<a href=#446 id=446 data-nosnippet>446</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
-<a href=#447 id=447 data-nosnippet>447</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">1</span>);
-<a href=#448 id=448 data-nosnippet>448</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">1</span>);
-<a href=#449 id=449 data-nosnippet>449</a>
-<a href=#450 id=450 data-nosnippet>450</a>        metrics.add_recovery_attempt(<span class="bool-val">false</span>);
-<a href=#451 id=451 data-nosnippet>451</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">2</span>);
-<a href=#452 id=452 data-nosnippet>452</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">1</span>);
-<a href=#453 id=453 data-nosnippet>453</a>
-<a href=#454 id=454 data-nosnippet>454</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
-<a href=#455 id=455 data-nosnippet>455</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">3</span>);
-<a href=#456 id=456 data-nosnippet>456</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">2</span>);
-<a href=#457 id=457 data-nosnippet>457</a>    }
-<a href=#458 id=458 data-nosnippet>458</a>
-<a href=#459 id=459 data-nosnippet>459</a>    <span class="attr">#[test]
-<a href=#460 id=460 data-nosnippet>460</a>    </span><span class="kw">fn </span>test_error_metrics_get_error_statistics() {
-<a href=#461 id=461 data-nosnippet>461</a>        <span class="kw">let </span><span class="kw-2">mut </span>metrics = ErrorMetrics::default();
+<a href=#442 id=442 data-nosnippet>442</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
+<a href=#443 id=443 data-nosnippet>443</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">3</span>);
+<a href=#444 id=444 data-nosnippet>444</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">2</span>);
+<a href=#445 id=445 data-nosnippet>445</a>    }
+<a href=#446 id=446 data-nosnippet>446</a>
+<a href=#447 id=447 data-nosnippet>447</a>    <span class="attr">#[test]
+<a href=#448 id=448 data-nosnippet>448</a>    </span><span class="kw">fn </span>test_error_metrics_get_error_statistics() {
+<a href=#449 id=449 data-nosnippet>449</a>        <span class="kw">let </span><span class="kw-2">mut </span>metrics = ErrorMetrics::default();
+<a href=#450 id=450 data-nosnippet>450</a>
+<a href=#451 id=451 data-nosnippet>451</a>        <span class="comment">// Test with no errors
+<a href=#452 id=452 data-nosnippet>452</a>        </span><span class="kw">let </span>stats = metrics.get_error_statistics();
+<a href=#453 id=453 data-nosnippet>453</a>        <span class="macro">assert_eq!</span>(stats.len(), <span class="number">0</span>);
+<a href=#454 id=454 data-nosnippet>454</a>
+<a href=#455 id=455 data-nosnippet>455</a>        <span class="comment">// Add errors
+<a href=#456 id=456 data-nosnippet>456</a>        </span>metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test1"</span>.to_string()));
+<a href=#457 id=457 data-nosnippet>457</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test2"</span>.to_string()));
+<a href=#458 id=458 data-nosnippet>458</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ConfigError(<span class="string">"test"</span>.to_string()));
+<a href=#459 id=459 data-nosnippet>459</a>
+<a href=#460 id=460 data-nosnippet>460</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
+<a href=#461 id=461 data-nosnippet>461</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
 <a href=#462 id=462 data-nosnippet>462</a>
-<a href=#463 id=463 data-nosnippet>463</a>        <span class="comment">// Test with no errors
-<a href=#464 id=464 data-nosnippet>464</a>        </span><span class="kw">let </span>stats = metrics.get_error_statistics();
-<a href=#465 id=465 data-nosnippet>465</a>        <span class="macro">assert_eq!</span>(stats.len(), <span class="number">0</span>);
-<a href=#466 id=466 data-nosnippet>466</a>
-<a href=#467 id=467 data-nosnippet>467</a>        <span class="comment">// Add errors
-<a href=#468 id=468 data-nosnippet>468</a>        </span>metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test1"</span>.to_string()));
-<a href=#469 id=469 data-nosnippet>469</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ModelError(<span class="string">"test2"</span>.to_string()));
-<a href=#470 id=470 data-nosnippet>470</a>        metrics.add_error(<span class="kw-2">&amp;</span>AppError::ConfigError(<span class="string">"test"</span>.to_string()));
-<a href=#471 id=471 data-nosnippet>471</a>
-<a href=#472 id=472 data-nosnippet>472</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
-<a href=#473 id=473 data-nosnippet>473</a>        metrics.add_recovery_attempt(<span class="bool-val">true</span>);
-<a href=#474 id=474 data-nosnippet>474</a>
-<a href=#475 id=475 data-nosnippet>475</a>        <span class="kw">let </span>stats = metrics.get_error_statistics();
-<a href=#476 id=476 data-nosnippet>476</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"total_errors"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3.0</span>));
-<a href=#477 id=477 data-nosnippet>477</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"recovery_rate"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1.0</span>));
-<a href=#478 id=478 data-nosnippet>478</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"error_rate_model_error"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="number">2.0 </span>/ <span class="number">3.0</span>)));
-<a href=#479 id=479 data-nosnippet>479</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"error_rate_config_error"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="number">1.0 </span>/ <span class="number">3.0</span>)));
-<a href=#480 id=480 data-nosnippet>480</a>    }
-<a href=#481 id=481 data-nosnippet>481</a>
-<a href=#482 id=482 data-nosnippet>482</a>    <span class="attr">#[test]
-<a href=#483 id=483 data-nosnippet>483</a>    </span><span class="kw">fn </span>test_error_metrics_default() {
-<a href=#484 id=484 data-nosnippet>484</a>        <span class="kw">let </span>metrics = ErrorMetrics::default();
-<a href=#485 id=485 data-nosnippet>485</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">0</span>);
-<a href=#486 id=486 data-nosnippet>486</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">0</span>);
-<a href=#487 id=487 data-nosnippet>487</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">0</span>);
-<a href=#488 id=488 data-nosnippet>488</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.len(), <span class="number">0</span>);
-<a href=#489 id=489 data-nosnippet>489</a>        <span class="macro">assert!</span>(metrics.last_error_time.is_none());
+<a href=#463 id=463 data-nosnippet>463</a>        <span class="kw">let </span>stats = metrics.get_error_statistics();
+<a href=#464 id=464 data-nosnippet>464</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"total_errors"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3.0</span>));
+<a href=#465 id=465 data-nosnippet>465</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"recovery_rate"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1.0</span>));
+<a href=#466 id=466 data-nosnippet>466</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"error_rate_model_error"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="number">2.0 </span>/ <span class="number">3.0</span>)));
+<a href=#467 id=467 data-nosnippet>467</a>        <span class="macro">assert_eq!</span>(stats.get(<span class="string">"error_rate_config_error"</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="number">1.0 </span>/ <span class="number">3.0</span>)));
+<a href=#468 id=468 data-nosnippet>468</a>    }
+<a href=#469 id=469 data-nosnippet>469</a>
+<a href=#470 id=470 data-nosnippet>470</a>    <span class="attr">#[test]
+<a href=#471 id=471 data-nosnippet>471</a>    </span><span class="kw">fn </span>test_error_metrics_default() {
+<a href=#472 id=472 data-nosnippet>472</a>        <span class="kw">let </span>metrics = ErrorMetrics::default();
+<a href=#473 id=473 data-nosnippet>473</a>        <span class="macro">assert_eq!</span>(metrics.total_errors, <span class="number">0</span>);
+<a href=#474 id=474 data-nosnippet>474</a>        <span class="macro">assert_eq!</span>(metrics.recovery_attempts, <span class="number">0</span>);
+<a href=#475 id=475 data-nosnippet>475</a>        <span class="macro">assert_eq!</span>(metrics.successful_recoveries, <span class="number">0</span>);
+<a href=#476 id=476 data-nosnippet>476</a>        <span class="macro">assert_eq!</span>(metrics.error_counts.len(), <span class="number">0</span>);
+<a href=#477 id=477 data-nosnippet>477</a>        <span class="macro">assert!</span>(metrics.last_error_time.is_none());
+<a href=#478 id=478 data-nosnippet>478</a>    }
+<a href=#479 id=479 data-nosnippet>479</a>
+<a href=#480 id=480 data-nosnippet>480</a>    <span class="attr">#[test]
+<a href=#481 id=481 data-nosnippet>481</a>    </span><span class="kw">fn </span>test_error_from_io_error() {
+<a href=#482 id=482 data-nosnippet>482</a>        <span class="kw">use </span>std::io;
+<a href=#483 id=483 data-nosnippet>483</a>        <span class="kw">let </span>io_err = io::Error::new(io::ErrorKind::NotFound, <span class="string">"file not found"</span>);
+<a href=#484 id=484 data-nosnippet>484</a>        <span class="kw">let </span>app_err = AppError::from(io_err);
+<a href=#485 id=485 data-nosnippet>485</a>
+<a href=#486 id=486 data-nosnippet>486</a>        <span class="kw">match </span>app_err {
+<a href=#487 id=487 data-nosnippet>487</a>            AppError::IoError(<span class="kw">_</span>) =&gt; {}
+<a href=#488 id=488 data-nosnippet>488</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected IoError"</span>),
+<a href=#489 id=489 data-nosnippet>489</a>        }
 <a href=#490 id=490 data-nosnippet>490</a>    }
 <a href=#491 id=491 data-nosnippet>491</a>
 <a href=#492 id=492 data-nosnippet>492</a>    <span class="attr">#[test]
-<a href=#493 id=493 data-nosnippet>493</a>    </span><span class="kw">fn </span>test_error_from_io_error() {
-<a href=#494 id=494 data-nosnippet>494</a>        <span class="kw">use </span>std::io;
-<a href=#495 id=495 data-nosnippet>495</a>        <span class="kw">let </span>io_err = io::Error::new(io::ErrorKind::NotFound, <span class="string">"file not found"</span>);
-<a href=#496 id=496 data-nosnippet>496</a>        <span class="kw">let </span>app_err = AppError::from(io_err);
+<a href=#493 id=493 data-nosnippet>493</a>    </span><span class="kw">fn </span>test_error_from_serde_json_error() {
+<a href=#494 id=494 data-nosnippet>494</a>        <span class="kw">let </span>invalid_json = <span class="string">"invalid json"</span>;
+<a href=#495 id=495 data-nosnippet>495</a>        <span class="kw">let </span>json_err = serde_json::from_str::&lt;serde_json::Value&gt;(invalid_json).unwrap_err();
+<a href=#496 id=496 data-nosnippet>496</a>        <span class="kw">let </span>app_err = AppError::from(json_err);
 <a href=#497 id=497 data-nosnippet>497</a>
 <a href=#498 id=498 data-nosnippet>498</a>        <span class="kw">match </span>app_err {
-<a href=#499 id=499 data-nosnippet>499</a>            AppError::IoError(<span class="kw">_</span>) =&gt; {}
-<a href=#500 id=500 data-nosnippet>500</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected IoError"</span>),
+<a href=#499 id=499 data-nosnippet>499</a>            AppError::SerializationError(<span class="kw">_</span>) =&gt; {}
+<a href=#500 id=500 data-nosnippet>500</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected SerializationError"</span>),
 <a href=#501 id=501 data-nosnippet>501</a>        }
 <a href=#502 id=502 data-nosnippet>502</a>    }
 <a href=#503 id=503 data-nosnippet>503</a>
 <a href=#504 id=504 data-nosnippet>504</a>    <span class="attr">#[test]
-<a href=#505 id=505 data-nosnippet>505</a>    </span><span class="kw">fn </span>test_error_from_serde_json_error() {
-<a href=#506 id=506 data-nosnippet>506</a>        <span class="kw">let </span>invalid_json = <span class="string">"invalid json"</span>;
-<a href=#507 id=507 data-nosnippet>507</a>        <span class="kw">let </span>json_err = serde_json::from_str::&lt;serde_json::Value&gt;(invalid_json).unwrap_err();
-<a href=#508 id=508 data-nosnippet>508</a>        <span class="kw">let </span>app_err = AppError::from(json_err);
+<a href=#505 id=505 data-nosnippet>505</a>    </span><span class="kw">fn </span>test_poolai_error_from_io_error() {
+<a href=#506 id=506 data-nosnippet>506</a>        <span class="kw">use </span>std::io;
+<a href=#507 id=507 data-nosnippet>507</a>        <span class="kw">let </span>io_err = io::Error::new(io::ErrorKind::NotFound, <span class="string">"file not found"</span>);
+<a href=#508 id=508 data-nosnippet>508</a>        <span class="kw">let </span>poolai_err = PoolAIError::from(io_err);
 <a href=#509 id=509 data-nosnippet>509</a>
-<a href=#510 id=510 data-nosnippet>510</a>        <span class="kw">match </span>app_err {
-<a href=#511 id=511 data-nosnippet>511</a>            AppError::SerializationError(<span class="kw">_</span>) =&gt; {}
-<a href=#512 id=512 data-nosnippet>512</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected SerializationError"</span>),
+<a href=#510 id=510 data-nosnippet>510</a>        <span class="kw">match </span>poolai_err {
+<a href=#511 id=511 data-nosnippet>511</a>            PoolAIError::IoError(<span class="kw">_</span>) =&gt; {}
+<a href=#512 id=512 data-nosnippet>512</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected IoError"</span>),
 <a href=#513 id=513 data-nosnippet>513</a>        }
 <a href=#514 id=514 data-nosnippet>514</a>    }
 <a href=#515 id=515 data-nosnippet>515</a>
 <a href=#516 id=516 data-nosnippet>516</a>    <span class="attr">#[test]
-<a href=#517 id=517 data-nosnippet>517</a>    </span><span class="kw">fn </span>test_poolai_error_from_io_error() {
-<a href=#518 id=518 data-nosnippet>518</a>        <span class="kw">use </span>std::io;
-<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">let </span>io_err = io::Error::new(io::ErrorKind::NotFound, <span class="string">"file not found"</span>);
-<a href=#520 id=520 data-nosnippet>520</a>        <span class="kw">let </span>poolai_err = PoolAIError::from(io_err);
+<a href=#517 id=517 data-nosnippet>517</a>    </span><span class="kw">fn </span>test_poolai_error_from_serde_json_error() {
+<a href=#518 id=518 data-nosnippet>518</a>        <span class="kw">let </span>invalid_json = <span class="string">"invalid json"</span>;
+<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">let </span>json_err = serde_json::from_str::&lt;serde_json::Value&gt;(invalid_json).unwrap_err();
+<a href=#520 id=520 data-nosnippet>520</a>        <span class="kw">let </span>poolai_err = PoolAIError::from(json_err);
 <a href=#521 id=521 data-nosnippet>521</a>
 <a href=#522 id=522 data-nosnippet>522</a>        <span class="kw">match </span>poolai_err {
-<a href=#523 id=523 data-nosnippet>523</a>            PoolAIError::IoError(<span class="kw">_</span>) =&gt; {}
-<a href=#524 id=524 data-nosnippet>524</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected IoError"</span>),
+<a href=#523 id=523 data-nosnippet>523</a>            PoolAIError::JsonError(<span class="kw">_</span>) =&gt; {}
+<a href=#524 id=524 data-nosnippet>524</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected JsonError"</span>),
 <a href=#525 id=525 data-nosnippet>525</a>        }
 <a href=#526 id=526 data-nosnippet>526</a>    }
-<a href=#527 id=527 data-nosnippet>527</a>
-<a href=#528 id=528 data-nosnippet>528</a>    <span class="attr">#[test]
-<a href=#529 id=529 data-nosnippet>529</a>    </span><span class="kw">fn </span>test_poolai_error_from_serde_json_error() {
-<a href=#530 id=530 data-nosnippet>530</a>        <span class="kw">let </span>invalid_json = <span class="string">"invalid json"</span>;
-<a href=#531 id=531 data-nosnippet>531</a>        <span class="kw">let </span>json_err = serde_json::from_str::&lt;serde_json::Value&gt;(invalid_json).unwrap_err();
-<a href=#532 id=532 data-nosnippet>532</a>        <span class="kw">let </span>poolai_err = PoolAIError::from(json_err);
-<a href=#533 id=533 data-nosnippet>533</a>
-<a href=#534 id=534 data-nosnippet>534</a>        <span class="kw">match </span>poolai_err {
-<a href=#535 id=535 data-nosnippet>535</a>            PoolAIError::JsonError(<span class="kw">_</span>) =&gt; {}
-<a href=#536 id=536 data-nosnippet>536</a>            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Expected JsonError"</span>),
-<a href=#537 id=537 data-nosnippet>537</a>        }
-<a href=#538 id=538 data-nosnippet>538</a>    }
-<a href=#539 id=539 data-nosnippet>539</a>}</code></pre></div></section></main></body></html>
+<a href=#527 id=527 data-nosnippet>527</a>}</code></pre></div></section></main></body></html>

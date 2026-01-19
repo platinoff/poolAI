@@ -180,7 +180,7 @@
 <a href=#180 id=180 data-nosnippet>180</a>        placement: InstancePlacement,
 <a href=#181 id=181 data-nosnippet>181</a>        metadata: HashMap&lt;String, String&gt;,
 <a href=#182 id=182 data-nosnippet>182</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, AppError&gt; {
-<a href=#183 id=183 data-nosnippet>183</a>        <span class="kw">let </span>instance_id = <span class="macro">format!</span>(<span class="string">"inst-{}"</span>, Uuid::new_v4().to_string()[..<span class="number">8</span>].to_string());
+<a href=#183 id=183 data-nosnippet>183</a>        <span class="kw">let </span>instance_id = <span class="macro">format!</span>(<span class="string">"inst-{}"</span>, <span class="kw-2">&amp;</span>Uuid::new_v4().to_string()[..<span class="number">8</span>]);
 <a href=#184 id=184 data-nosnippet>184</a>
 <a href=#185 id=185 data-nosnippet>185</a>        <span class="kw">let </span>instance = ModelInstance {
 <a href=#186 id=186 data-nosnippet>186</a>            instance_id: instance_id.clone(),
