@@ -62,11 +62,34 @@ impl From<crate::vm::VmResources> for ResourceLimits {
 #[async_trait::async_trait]
 pub trait ResourceLimiter: Send + Sync {
     /// Apply resource limits to a command before spawning
+    ///
+    /// This is called before the process is spawned. For platforms like Linux cgroups,
+    /// this may only set environment variables, and actual limits should be applied
+    /// post-spawn using `apply_limits_post_spawn()`.
     async fn apply_limits(
         &self,
         command: &mut Command,
         limits: &ResourceLimits,
     ) -> Result<(), AppError>;
+
+    /// Apply resource limits to a process after spawning
+    ///
+    /// This is called after the process is spawned and PID is available.
+    /// Used by platforms like Linux cgroups that require process PID.
+    ///
+    /// # Arguments
+    /// * `process_id` - VM instance ID (Uuid)
+    /// * `pid` - Process ID (u32)
+    /// * `limits` - Resource limits to apply
+    async fn apply_limits_post_spawn(
+        &self,
+        _process_id: uuid::Uuid,
+        _pid: u32,
+        _limits: &ResourceLimits,
+    ) -> Result<(), AppError> {
+        // Default implementation: no-op (limits applied in apply_limits)
+        Ok(())
+    }
 
     /// Get current resource usage for a process
     async fn get_usage(&self, process_id: u32) -> Result<ResourceUsage, AppError>;
@@ -198,6 +221,29 @@ mod windows {
         Ok(())
     }
 
+    #[allow(dead_code)] // Will be used when Windows Job Objects are fully implemented
+    pub async fn apply_windows_limits_post_spawn(
+        _process_id: uuid::Uuid,
+        _pid: u32,
+        limits: &ResourceLimits,
+    ) -> Result<(), AppError> {
+        // Future improvement: Implement Windows Job Objects for CPU/memory limits
+        // This should be called after process spawn to apply limits to existing process
+        // 1. Create or get Job Object for this process_id using WindowsJobObjectLimiter
+        // 2. Apply CPU limits using JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
+        // 3. Apply memory limits using JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+        // 4. Assign process to Job Object using AssignProcessToJobObject()
+
+        if limits.cpu_cores > 0 || limits.memory_mb > 0 {
+            warn!(
+                "Windows resource limits post-spawn not yet implemented (CPU: {}, Memory: {} MB)",
+                limits.cpu_cores, limits.memory_mb
+            );
+        }
+
+        Ok(())
+    }
+
     pub async fn get_windows_usage(_process_id: u32) -> Result<ResourceUsage, AppError> {
         // Future improvement: Implement Windows process resource usage query
         // 1. Open process handle using OpenProcess() Windows API
@@ -232,47 +278,78 @@ mod windows {
 #[cfg(target_os = "linux")]
 mod linux {
     use super::*;
-    use tracing::warn;
+    use std::sync::{Arc, OnceLock};
+    use tokio::sync::RwLock;
+
+    // Global LinuxCgroupLimiter instance (lazy initialization)
+    static CGROUP_LIMITER: OnceLock<
+        Arc<RwLock<Option<crate::vm::resources::linux::LinuxCgroupLimiter>>>,
+    > = OnceLock::new();
+
+    fn get_limiter(
+    ) -> Result<Arc<RwLock<Option<crate::vm::resources::linux::LinuxCgroupLimiter>>>, AppError>
+    {
+        CGROUP_LIMITER
+            .get_or_init(|| {
+                match crate::vm::resources::linux::LinuxCgroupLimiter::new() {
+                    Ok(limiter) => Arc::new(RwLock::new(Some(limiter))),
+                    Err(_) => {
+                        // cgroups not available, use None
+                        Arc::new(RwLock::new(None))
+                    }
+                }
+            })
+            .clone();
+
+        Ok(CGROUP_LIMITER.get().unwrap().clone())
+    }
 
     pub async fn apply_linux_limits(
-        _command: &mut Command,
+        command: &mut Command,
         limits: &ResourceLimits,
     ) -> Result<(), AppError> {
-        // Future improvement: Implement Linux cgroups v2 for CPU/memory limits
-        // 1. Create or access cgroup using cgroups v2 filesystem
-        //    - Use /sys/fs/cgroup/system.slice/ or custom cgroup path
-        //    - Create cgroup directory: mkdir -p /sys/fs/cgroup/system.slice/poolai-{pid}
-        //    - Write process PID to cgroup.procs file
-        // 2. Configure CPU limits using cpu.max cgroup file
-        //    - Format: "max 100000" for 100% CPU (1 core = 100000, 0.5 core = 50000)
-        //    - Write "cpu.max" with value based on cpu_cores limit
-        //    - Example: "50000 100000" for 50% CPU limit (0.5 cores)
-        // 3. Configure memory limits using memory.max cgroup file
-        //    - Write memory_mb * 1024 * 1024 (bytes) to memory.max
-        //    - Set memory.high for soft limit (optional, for throttling)
-        //    - Set memory.swap.max for swap limit (optional)
-        // 4. Apply limits to process before starting
-        //    - Move process to cgroup by writing PID to cgroup.procs
-        //    - Process must be in the cgroup before it starts executing
-        //    - Use systemd-run or direct cgroup manipulation
-        //
-        // This requires:
-        // - cgroups v2 filesystem access (usually /sys/fs/cgroup/)
-        // - Root privileges or CAP_SYS_ADMIN capability
-        // - Understanding of cgroups v2 interface
-        // - Process must be moved to cgroup before it starts
-        if limits.cpu_cores > 0 || limits.memory_mb > 0 {
-            warn!(
-                "Linux resource limits not yet implemented (CPU: {}, Memory: {} MB)",
-                limits.cpu_cores, limits.memory_mb
-            );
-            // For now, just validate
-            if limits.memory_mb > 0 && limits.memory_mb < 64 {
-                return Err(AppError::ValidationError(
-                    "Memory limit too low (minimum 64 MB)".to_string(),
-                ));
+        // Validate limits
+        if limits.memory_mb > 0 && limits.memory_mb < 64 {
+            return Err(AppError::ValidationError(
+                "Memory limit too low (minimum 64 MB)".to_string(),
+            ));
+        }
+
+        // Get cgroup limiter (if available)
+        let limiter_arc = get_limiter()?;
+        let limiter_guard = limiter_arc.read().await;
+
+        if let Some(ref limiter) = *limiter_guard {
+            // cgroups are available - use systemd-run or cgroup exec approach
+            // Note: To apply limits before process starts, we need to use systemd-run
+            // or create a wrapper script that creates cgroup and adds process after spawn
+            // For now, we'll store limits in environment variables for post-spawn application
+            //
+            // Future: Use systemd-run --scope --property=CPUQuota=... --property=MemoryLimit=...
+            // or create wrapper that:
+            // 1. Creates cgroup with limits
+            // 2. Spawns process
+            // 3. Adds process PID to cgroup.procs
+
+            // Store limits in environment for post-spawn application
+            if limits.cpu_cores > 0 {
+                command.env("POOLAI_CPU_LIMIT", limits.cpu_cores.to_string());
+            }
+            if limits.memory_mb > 0 {
+                command.env("POOLAI_MEMORY_LIMIT_MB", limits.memory_mb.to_string());
+            }
+            // Note: Actual cgroup application should be done after process spawn
+            // using apply_limits(process_id, pid, limits) from LinuxCgroupLimiter
+        } else {
+            // cgroups not available - only validate
+            if limits.cpu_cores > 0 || limits.memory_mb > 0 {
+                tracing::warn!(
+                    "Linux cgroups not available, limits will not be enforced (CPU: {}, Memory: {} MB)",
+                    limits.cpu_cores, limits.memory_mb
+                );
             }
         }
+
         Ok(())
     }
 

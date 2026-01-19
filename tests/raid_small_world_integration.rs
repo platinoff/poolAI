@@ -84,7 +84,10 @@ async fn test_replicate_artifact_no_nodes() {
         .await;
 
     // Should return error when no nodes are available
-    assert!(result.is_err(), "Should return error when no nodes available");
+    assert!(
+        result.is_err(),
+        "Should return error when no nodes available"
+    );
 }
 
 #[tokio::test]
@@ -94,7 +97,10 @@ async fn test_rebalance_empty_distribution() {
 
     // Rebalance with empty distribution should succeed
     let result = strategy.rebalance().await;
-    assert!(result.is_ok(), "Rebalancing empty distribution should succeed");
+    assert!(
+        result.is_ok(),
+        "Rebalancing empty distribution should succeed"
+    );
 }
 
 #[tokio::test]

@@ -255,13 +255,13 @@ impl LinuxCgroupLimiter {
         limits: &ResourceLimits,
     ) -> Result<(), AppError> {
         // Apply CPU limits
-        if let Some(cpu_cores) = limits.cpu_cores {
-            self.apply_cpu_limits(process_id, cpu_cores).await?;
+        if limits.cpu_cores > 0 {
+            self.apply_cpu_limits(process_id, limits.cpu_cores).await?;
         }
 
         // Apply memory limits
-        if let Some(memory_mb) = limits.memory_mb {
-            self.apply_memory_limits(process_id, memory_mb).await?;
+        if limits.memory_mb > 0 {
+            self.apply_memory_limits(process_id, limits.memory_mb).await?;
         }
 
         // Add process to cgroup
