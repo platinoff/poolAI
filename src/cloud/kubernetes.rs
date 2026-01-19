@@ -416,14 +416,6 @@ impl KubernetesManager {
             ))),
         };
 
-        // Add authentication header
-        request = request.bearer_auth(&token);
-
-        // Add Content-Type header for POST/PUT/PATCH
-        if matches!(method, "POST" | "PUT" | "PATCH") {
-            request = request.header("Content-Type", "application/json");
-        }
-
         // Store body reference for reuse in retry loop
         let body_ref = body.as_ref();
 
