@@ -31,6 +31,10 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 #[cfg(feature = "cloud-sdk")]
+use chrono::{Duration, Utc};
+#[cfg(feature = "cloud-sdk")]
+use jsonwebtoken::{encode, EncodingKey, Header};
+#[cfg(feature = "cloud-sdk")]
 use reqwest::Client as HttpClient;
 
 // Note: GCP integration uses REST API via reqwest (similar to Kubernetes implementation)
@@ -260,25 +264,151 @@ impl GcpManager {
     /// Get access token from service account key file
     ///
     /// Reads service account JSON key file and generates OAuth2 access token.
-    async fn get_token_from_service_account(&self, _key_path: &str) -> Result<String, AppError> {
-        // TODO: Implement service account key file parsing and JWT signing
-        // Note: Full implementation would require:
-        // 1. Read JSON key file
-        // 2. Parse service account email and private key
-        // 3. Create JWT assertion (claims: iss, sub, aud, exp, iat)
-        // 4. Sign JWT with RSA private key
-        // 5. Exchange JWT for access token via OAuth2 token endpoint
-        // 6. Return access token
-        //
-        // This is complex and may require additional dependencies (jwt crate, rsa, etc.)
-        // For now, return an error indicating this method needs implementation
-        Err(AppError::InitializationError(
-            "Service account key file authentication not yet implemented. \
-            Context: GOOGLE_APPLICATION_CREDENTIALS is set but parsing is not implemented. \
-            Suggestion: Use metadata server (when running on GCP) or implement service account key parsing. \
-            Current value: Service account key file authentication is a placeholder."
-                .to_string(),
-        ))
+    /// This implements the full OAuth2 flow:
+    /// 1. Parse service account JSON key file
+    /// 2. Create JWT assertion with claims (iss, sub, aud, exp, iat)
+    /// 3. Sign JWT with RSA private key from service account
+    /// 4. Exchange JWT for access token via Google OAuth2 token endpoint
+    async fn get_token_from_service_account(&self, key_path: &str) -> Result<String, AppError> {
+        use serde::Deserialize;
+        use std::fs;
+
+        // Step 1: Parse service account JSON key file
+        #[derive(Deserialize)]
+        struct ServiceAccountKey {
+            #[serde(rename = "type")]
+            key_type: String,
+            project_id: String,
+            private_key_id: String,
+            private_key: String,
+            client_email: String,
+            client_id: String,
+            auth_uri: String,
+            token_uri: String,
+        }
+
+        let key_content = fs::read_to_string(key_path).map_err(|e| {
+            AppError::InitializationError(format!(
+                "Failed to read service account key file. Context: Cannot read file at {}. \
+                Error: {}. Suggestion: Ensure GOOGLE_APPLICATION_CREDENTIALS points to a valid JSON key file.",
+                key_path, e
+            ))
+        })?;
+
+        let key: ServiceAccountKey = serde_json::from_str(&key_content).map_err(|e| {
+            AppError::InitializationError(format!(
+                "Failed to parse service account key file. Context: Cannot parse JSON from {}. \
+                Error: {}. Suggestion: Ensure the file is a valid GCP service account JSON key.",
+                key_path, e
+            ))
+        })?;
+
+        if key.key_type != "service_account" {
+            return Err(AppError::InitializationError(format!(
+                "Invalid service account key type. Context: Expected 'service_account', got '{}'. \
+                Suggestion: Ensure the file is a valid GCP service account JSON key.",
+                key.key_type
+            )));
+        }
+
+        // Step 2: Create JWT claims
+        let now = Utc::now();
+        let iat = now.timestamp();
+        let exp = (now + Duration::hours(1)).timestamp(); // Token valid for 1 hour
+
+        #[derive(serde::Serialize)]
+        struct JwtClaims {
+            iss: String, // Issuer (service account email)
+            sub: String, // Subject (service account email)
+            aud: String, // Audience (token_uri)
+            exp: i64,    // Expiration time
+            iat: i64,    // Issued at time
+        }
+
+        let claims = JwtClaims {
+            iss: key.client_email.clone(),
+            sub: key.client_email.clone(),
+            aud: key.token_uri.clone(),
+            exp,
+            iat,
+        };
+
+        // Step 3: Sign JWT with RSA private key
+        let encoding_key = EncodingKey::from_rsa_pem(key.private_key.as_bytes()).map_err(|e| {
+            AppError::InitializationError(format!(
+                "Failed to parse RSA private key. Context: Cannot parse private_key from service account key. \
+                Error: {}. Suggestion: Ensure the service account key file contains a valid RSA private key in PEM format.",
+                e
+            ))
+        })?;
+
+        let header = Header::new(jsonwebtoken::Algorithm::RS256);
+        let jwt = encode(&header, &claims, &encoding_key).map_err(|e| {
+            AppError::InitializationError(format!(
+                "Failed to sign JWT. Context: Cannot create JWT assertion with RSA signature. \
+                Error: {}. Suggestion: Check service account key validity.",
+                e
+            ))
+        })?;
+
+        // Step 4: Exchange JWT for access token via Google OAuth2 token endpoint
+        let client_guard = self.http_client.read().await;
+        let client = client_guard.as_ref().ok_or_else(|| {
+            AppError::InitializationError(
+                "GCP HTTP client not initialized. Call initialize() first.".to_string(),
+            )
+        })?;
+
+        let token_request = serde_json::json!({
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+            "assertion": jwt
+        });
+
+        let response = client
+            .post(&key.token_uri)
+            .header("Content-Type", "application/json")
+            .json(&token_request)
+            .send()
+            .await
+            .map_err(|e| {
+                AppError::InitializationError(format!(
+                    "Failed to exchange JWT for access token. Context: Cannot send request to Google OAuth2 token endpoint. \
+                    Error: {}. Suggestion: Check network connectivity and service account key validity.",
+                    e
+                ))
+            })?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_body = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
+            return Err(AppError::InitializationError(format!(
+                "Google OAuth2 token exchange failed. Context: Token endpoint returned status {}. \
+                Response: {}. Suggestion: Check service account key validity and permissions.",
+                status, error_body
+            )));
+        }
+
+        let token_response: serde_json::Value = response.json().await.map_err(|e| {
+            AppError::InitializationError(format!(
+                "Failed to parse token response. Context: Cannot parse JSON response from Google OAuth2 token endpoint. \
+                Error: {}. Suggestion: Check service account key validity.",
+                e
+            ))
+        })?;
+
+        token_response
+            .get("access_token")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+            .ok_or_else(|| {
+                AppError::InitializationError(
+                    "Token response missing access_token. Context: Google OAuth2 response does not contain access_token field. \
+                    Suggestion: Check service account key validity and permissions.".to_string()
+                )
+            })
     }
 
     /// Shutdown GCP integration

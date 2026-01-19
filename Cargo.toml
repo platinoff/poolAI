@@ -194,7 +194,8 @@ cloud-sdk = [
     "http",  # HTTP types for request building
     "azure_core",
     "azure_identity",
-    "azure_mgmt_compute"
+    "azure_mgmt_compute",
+    "jsonwebtoken"  # JWT signing for GCP service account authentication
 ]
 # VM Isolation - Linux (requires root or CAP_NET_ADMIN, CAP_SYS_ADMIN)
 # Use: cargo build --features vm-isolation-linux
