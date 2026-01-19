@@ -33,15 +33,15 @@
 //! ```
 
 use crate::core::error::AppError;
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use tracing::{info, warn};
 #[cfg(feature = "cloud-sdk")]
 use aws_sign_v4::AwsSign;
 #[cfg(feature = "cloud-sdk")]
 use chrono::Utc;
 #[cfg(feature = "cloud-sdk")]
 use http::header::HeaderMap;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use tracing::{info, warn};
 
 /// AWS manager for cloud resources
 pub struct AwsManager {
@@ -273,17 +273,25 @@ impl AwsManager {
             let mut headers = HeaderMap::new();
             headers.insert(
                 "host",
-                host.parse().map_err(|e| AppError::NetworkError(format!(
-                    "Failed to parse host header. Context: Cannot parse host. Error: {}",
-                    e
-                )))?,
+                host.parse().map_err(|e| {
+                    AppError::NetworkError(format!(
+                        "Failed to parse host header. Context: Cannot parse host. Error: {}",
+                        e
+                    ))
+                })?,
             );
             headers.insert(
                 "X-Amz-Date",
-                datetime.format("%Y%m%dT%H%M%SZ").to_string().parse().map_err(|e| AppError::NetworkError(format!(
-                    "Failed to parse date header. Context: Cannot parse date. Error: {}",
-                    e
-                )))?,
+                datetime
+                    .format("%Y%m%dT%H%M%SZ")
+                    .to_string()
+                    .parse()
+                    .map_err(|e| {
+                        AppError::NetworkError(format!(
+                            "Failed to parse date header. Context: Cannot parse date. Error: {}",
+                            e
+                        ))
+                    })?,
             );
             headers.insert(
                 "Content-Type",
@@ -295,14 +303,7 @@ impl AwsManager {
 
             // Sign the request using aws-sign-v4
             let signer = AwsSign::new(
-                "POST",
-                &url,
-                &datetime,
-                &headers,
-                region,
-                access_key,
-                secret_key,
-                service,
+                "POST", &url, &datetime, &headers, region, access_key, secret_key, service,
                 "", // empty body for query string requests
             );
 
@@ -345,7 +346,10 @@ impl AwsManager {
 
             if !response.status().is_success() {
                 let status = response.status();
-                let error_body = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+                let error_body = response
+                    .text()
+                    .await
+                    .unwrap_or_else(|_| "Unknown error".to_string());
                 return Err(AppError::NetworkError(format!(
                     "EC2 RunInstances API returned error. Context: AWS EC2 API returned status {}. \
                     Response: {}. Suggestion: Check instance type, AMI ID, and AWS permissions.",
@@ -355,10 +359,12 @@ impl AwsManager {
 
             // Parse XML response to extract instance ID
             // Note: EC2 API returns XML, not JSON
-            let response_text = response.text().await.map_err(|e| AppError::NetworkError(format!(
+            let response_text = response.text().await.map_err(|e| {
+                AppError::NetworkError(format!(
                 "Failed to read EC2 API response. Context: Cannot read response body. Error: {}",
                 e
-            )))?;
+            ))
+            })?;
 
             // Simple XML parsing to extract instance ID
             // Full implementation would use an XML parser like quick-xml
@@ -501,17 +507,25 @@ impl AwsManager {
             let mut headers = HeaderMap::new();
             headers.insert(
                 "host",
-                host.parse().map_err(|e| AppError::NetworkError(format!(
+                host.parse().map_err(|e| {
+                    AppError::NetworkError(format!(
                     "Failed to parse host header for ECS. Context: Cannot parse host. Error: {}",
                     e
-                )))?,
+                ))
+                })?,
             );
             headers.insert(
                 "X-Amz-Date",
-                datetime.format("%Y%m%dT%H%M%SZ").to_string().parse().map_err(|e| AppError::NetworkError(format!(
+                datetime
+                    .format("%Y%m%dT%H%M%SZ")
+                    .to_string()
+                    .parse()
+                    .map_err(|e| {
+                        AppError::NetworkError(format!(
                     "Failed to parse date header for ECS. Context: Cannot parse date. Error: {}",
                     e
-                )))?,
+                ))
+                    })?,
             );
             headers.insert(
                 "Content-Type",
@@ -522,23 +536,20 @@ impl AwsManager {
             );
             headers.insert(
                 "X-Amz-Target",
-                "AmazonEC2ContainerServiceV20141113.RunTask".parse().map_err(|e| AppError::NetworkError(format!(
+                "AmazonEC2ContainerServiceV20141113.RunTask"
+                    .parse()
+                    .map_err(|e| {
+                        AppError::NetworkError(format!(
                     "Failed to parse X-Amz-Target header. Context: Cannot parse target. Error: {}",
                     e
-                )))?,
+                ))
+                    })?,
             );
 
             // Sign the request using aws-sign-v4
             // ECS uses JSON body, so we sign with the body content
             let signer = AwsSign::new(
-                "POST",
-                &url,
-                &datetime,
-                &headers,
-                region,
-                access_key,
-                secret_key,
-                service,
+                "POST", &url, &datetime, &headers, region, access_key, secret_key, service,
                 &body_str, // JSON body
             );
 
@@ -583,7 +594,10 @@ impl AwsManager {
 
             if !response.status().is_success() {
                 let status = response.status();
-                let error_body = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+                let error_body = response
+                    .text()
+                    .await
+                    .unwrap_or_else(|_| "Unknown error".to_string());
                 return Err(AppError::NetworkError(format!(
                     "ECS RunTask API returned error. Context: AWS ECS API returned status {}. \
                     Response: {}. Suggestion: Check cluster name, task definition, and AWS permissions.",
@@ -592,10 +606,12 @@ impl AwsManager {
             }
 
             // Parse JSON response to extract task ARN
-            let response_json: serde_json::Value = response.json().await.map_err(|e| AppError::NetworkError(format!(
+            let response_json: serde_json::Value = response.json().await.map_err(|e| {
+                AppError::NetworkError(format!(
                 "Failed to parse ECS API response. Context: Cannot parse JSON response. Error: {}",
                 e
-            )))?;
+            ))
+            })?;
 
             // Extract task ARN from response
             let task_arn = response_json
@@ -608,7 +624,12 @@ impl AwsManager {
                 .unwrap_or_else(|| {
                     // Fallback: generate task ARN if parsing fails
                     warn!("Failed to parse task ARN from ECS response, using generated ARN");
-                    format!("arn:aws:ecs:{}:123456789012:task/{}/{}", region, cluster, uuid::Uuid::new_v4())
+                    format!(
+                        "arn:aws:ecs:{}:123456789012:task/{}/{}",
+                        region,
+                        cluster,
+                        uuid::Uuid::new_v4()
+                    )
                 });
 
             info!("ECS task created successfully: {}", task_arn);

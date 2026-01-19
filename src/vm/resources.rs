@@ -232,17 +232,20 @@ mod windows {
             // Note: WindowsJobObjectLimiter is not exported, so we use the apply_limits method
             // from the windows module directly
             use crate::vm::resources::windows::WindowsJobObjectLimiter;
-            
+
             let limiter = WindowsJobObjectLimiter::new()?;
-            
+
             // Apply limits using WindowsJobObjectLimiter
             limiter.apply_limits(process_id, pid, limits).await?;
-            
+
             tracing::info!(
                 "Applied Windows resource limits to process {} (PID {}): CPU: {}, Memory: {} MB",
-                process_id, pid, limits.cpu_cores, limits.memory_mb
+                process_id,
+                pid,
+                limits.cpu_cores,
+                limits.memory_mb
             );
-            
+
             Ok(())
         }
 
@@ -308,7 +311,7 @@ mod linux {
         // Try to initialize LinuxCgroupLimiter to check if cgroups are available
         // Note: We can't use LinuxCgroupLimiter::apply_limits() here because it requires
         // a process_id (Uuid) and pid (u32), which we don't have yet (process not spawned)
-        // 
+        //
         // Actual cgroup limits should be applied in VmManager after process spawn:
         // 1. Spawn process and get PID
         // 2. Create LinuxCgroupLimiter instance
