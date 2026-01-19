@@ -55,6 +55,9 @@ jobs:
         run: cargo clippy --all-targets --no-default-features -- -D warnings
         continue-on-error: true
       
+      - name: Build (no features) - Required
+        run: cargo build --verbose --no-default-features --lib
+      
       - name: Lint with clippy (with features)
         run: cargo clippy --all-targets --features jwt,https -- -D warnings
         continue-on-error: true
@@ -66,9 +69,6 @@ jobs:
         continue-on-error: true
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
-      
-      - name: Build (no features)
-        run: cargo build --verbose --no-default-features --lib
       
       - name: Build (with features)
         run: cargo build --verbose --features jwt,https
@@ -86,9 +86,8 @@ jobs:
         run: cargo test --verbose --no-default-features
         continue-on-error: true
       
-      - name: Run tests (default)
-        run: cargo test --verbose
-        continue-on-error: true
+      - name: Run tests (default) - Required
+        run: cargo test --verbose --lib --tests
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
