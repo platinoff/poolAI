@@ -61,6 +61,9 @@ impl WindowsNetworkIsolator {
     /// Get AppContainer state for a process
     ///
     /// Returns the state of the AppContainer associated with the given process ID.
+    ///
+    /// Note: This method is part of the public API for future use in monitoring/management endpoints.
+    #[allow(dead_code)]
     pub fn get_appcontainer_state(&self, process_id: u32) -> Option<AppContainerState> {
         self.appcontainer_states
             .lock()
@@ -72,6 +75,9 @@ impl WindowsNetworkIsolator {
     /// List all AppContainer states
     ///
     /// Returns a vector of all AppContainer states.
+    ///
+    /// Note: This method is part of the public API for future use in monitoring/management endpoints.
+    #[allow(dead_code)]
     pub fn list_appcontainer_states(&self) -> Vec<(u32, AppContainerState)> {
         self.appcontainer_states
             .lock()
@@ -266,6 +272,9 @@ impl WindowsFilesystemIsolator {
     /// Get AppContainer state for a process
     ///
     /// Returns the state of the AppContainer associated with the given process ID.
+    ///
+    /// Note: This method is part of the public API for future use in monitoring/management endpoints.
+    #[allow(dead_code)]
     pub fn get_appcontainer_state(&self, process_id: u32) -> Option<AppContainerState> {
         self.appcontainer_states
             .lock()
@@ -277,6 +286,9 @@ impl WindowsFilesystemIsolator {
     /// List all AppContainer states
     ///
     /// Returns a vector of all AppContainer states.
+    ///
+    /// Note: This method is part of the public API for future use in monitoring/management endpoints.
+    #[allow(dead_code)]
     pub fn list_appcontainer_states(&self) -> Vec<(u32, AppContainerState)> {
         self.appcontainer_states
             .lock()

@@ -40,7 +40,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
-use tracing::{info, warn};
+use tracing::info;
 use uuid::Uuid;
 
 // OAuth2 token exchange response from provider

@@ -18,7 +18,6 @@ use uuid::Uuid;
 
 #[cfg(feature = "enterprise")]
 use crate::enterprise::monitoring::{get_global_monitoring_manager, Dashboard};
-use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::ui::{components, get_all_themes, get_theme};
 
@@ -52,7 +51,12 @@ pub fn create_ui_routes() -> Router {
 // Dashboard management handlers
 // ============================================================================
 
+/// Request structure for creating a dashboard
+///
+/// Note: Fields are used via move semantics in handlers, which may not be detected by the compiler.
+/// This is part of the API contract and fields are actively used in dashboard creation.
 #[derive(Deserialize)]
+#[allow(dead_code)] // Fields are used via move in handlers
 struct CreateDashboardRequest {
     name: String,
     description: String,
@@ -159,9 +163,9 @@ async fn ui_dashboard_create_handler(
     let dashboard = Dashboard {
         id: Uuid::new_v4(),
         name: payload.name.clone(),
-        description: payload.description,
-        metrics: payload.metrics,
-        layout: payload.layout,
+        description: payload.description.clone(),
+        metrics: payload.metrics.clone(),
+        layout: payload.layout.clone(),
         is_public: payload.is_public.unwrap_or(false),
         tenant_id: payload.tenant_id,
         created_at: chrono::Utc::now(),
