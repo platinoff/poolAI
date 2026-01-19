@@ -217,6 +217,11 @@ mod windows {
         Ok(())
     }
 
+    /// Apply Windows resource limits to an already-spawned process
+    ///
+    /// This function is intended for future use when applying limits to running processes.
+    /// Currently unused but kept for post-spawn resource limit application scenarios.
+    #[allow(dead_code)]
     pub async fn apply_windows_limits_post_spawn(
         process_id: uuid::Uuid,
         pid: u32,
