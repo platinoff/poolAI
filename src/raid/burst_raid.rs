@@ -954,9 +954,15 @@ mod tests {
 
     #[tokio::test]
     async fn test_record_access() {
+        use crate::raid::RaidManager;
+        use std::sync::Arc;
+        use tokio::sync::RwLock;
+
         let config = BurstRaidConfig::default();
-        let repl_config = ReplicationEngineConfig::default();
-        let strategy = BurstRaidStrategy::new(config, repl_config);
+        let raid_manager = Arc::new(RwLock::new(RaidManager::new(
+            crate::raid::RaidConfig::default_for_platform(),
+        )));
+        let strategy = BurstRaidStrategy::new(config, raid_manager, None);
 
         let artifact_id = Uuid::new_v4();
         strategy.record_access(artifact_id).await;
