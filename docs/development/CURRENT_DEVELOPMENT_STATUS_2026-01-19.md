@@ -126,20 +126,29 @@ async fn get_azure_access_token(&self) -> Result<String, AppError> {
 - RSA private key parsing та JWT signing з RS256
 - OAuth2 token exchange з Google token endpoint
 
-### Крок 3: Integration Tests Infrastructure (3-4 години)
+### Крок 3: Integration Tests Infrastructure ✅ (Завершено 2026-01-19)
 
 **Завдання**:
-- [ ] Створити mock server infrastructure
-- [ ] Додати integration tests для AWS
-- [ ] Додати integration tests для Azure
-- [ ] Додати integration tests для GCP
-- [ ] Додати тести для token acquisition
+- [x] Створити mock server infrastructure
+- [x] Додати mockito до dev-dependencies
+- [x] Створити структуру tests/integration/cloud/
+- [x] Реалізувати MockAwsEc2Server, MockAwsEcsServer
+- [x] Реалізувати MockAzureServer
+- [x] Реалізувати MockGcpServer
+- [x] Додати placeholder tests для token acquisition
+- [ ] Додати повні integration tests для AWS (наступний крок)
+- [ ] Додати повні integration tests для Azure (наступний крок)
+- [ ] Додати повні integration tests для GCP (наступний крок)
 
-**Файли для створення**:
-- `tests/integration/cloud/aws_tests.rs`
-- `tests/integration/cloud/azure_tests.rs`
-- `tests/integration/cloud/gcp_tests.rs`
-- `tests/integration/cloud/mock_servers.rs`
+**Файли створено**:
+- `tests/integration/cloud/mod.rs` - модуль для cloud integration tests
+- `tests/integration/cloud/mock_servers.rs` - mock server infrastructure
+- `tests/integration/cloud/token_acquisition_tests.rs` - placeholder tests
+
+**Реалізовано**:
+- Async mock servers з використанням mockito async API
+- Mock endpoints для AWS EC2, AWS ECS, Azure IMDS, Azure VMSS, GCP metadata, GCP OAuth2
+- Структура для майбутніх integration tests
 
 ---
 
@@ -212,8 +221,8 @@ async fn get_azure_access_token(&self) -> Result<String, AppError> {
 
 ---
 
-**Статус**: 🚀 **Azure & GCP Token Acquisition Complete | Ready for Integration Tests**  
-**Останній commit**: `ddad133` - feat(cloud): implement GCP service account key parsing and JWT signing  
-**Наступний крок**: Integration Tests Infrastructure або Token Refresh Enhancement  
+**Статус**: 🚀 **Token Acquisition Complete | Integration Test Infrastructure Ready**  
+**Останній commit**: `723f033` - feat(tests): add integration test infrastructure with mock servers  
+**Наступний крок**: Complete Integration Tests для AWS/Azure/GCP або Token Refresh Enhancement  
 **Підготовлено**: Rust Architect  
 **Дата**: 2026-01-19
