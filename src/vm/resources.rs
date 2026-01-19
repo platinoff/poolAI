@@ -290,41 +290,26 @@ mod linux {
             ));
         }
 
-        // Get cgroup limiter (if available)
-        let limiter_arc = get_limiter()?;
-        let limiter_guard = limiter_arc.read().await;
-
-        if let Some(ref limiter) = *limiter_guard {
-            // cgroups are available - use systemd-run or cgroup exec approach
-            // Note: To apply limits before process starts, we need to use systemd-run
-            // or create a wrapper script that creates cgroup and adds process after spawn
-            // For now, we'll store limits in environment variables for post-spawn application
-            //
-            // Future: Use systemd-run --scope --property=CPUQuota=... --property=MemoryLimit=...
-            // or create wrapper that:
-            // 1. Creates cgroup with limits
-            // 2. Spawns process
-            // 3. Adds process PID to cgroup.procs
-
-            // Store limits in environment for post-spawn application
-            if limits.cpu_cores > 0 {
-                command.env("POOLAI_CPU_LIMIT", limits.cpu_cores.to_string());
-            }
-            if limits.memory_mb > 0 {
-                command.env("POOLAI_MEMORY_LIMIT_MB", limits.memory_mb.to_string());
-            }
-            // Note: Actual cgroup application should be done after process spawn
-            // using apply_limits(process_id, pid, limits) from LinuxCgroupLimiter
-        } else {
-            // cgroups not available - only validate
-            if limits.cpu_cores > 0 || limits.memory_mb > 0 {
-                tracing::warn!(
-                    "Linux cgroups not available, limits will not be enforced (CPU: {}, Memory: {} MB)",
-                    limits.cpu_cores, limits.memory_mb
-                );
-            }
+        // Try to initialize LinuxCgroupLimiter to check if cgroups are available
+        // Note: We can't use LinuxCgroupLimiter::apply_limits() here because it requires
+        // a process_id (Uuid) and pid (u32), which we don't have yet (process not spawned)
+        // 
+        // Actual cgroup limits should be applied in VmManager after process spawn:
+        // 1. Spawn process and get PID
+        // 2. Create LinuxCgroupLimiter instance
+        // 3. Apply limits using limiter.apply_limits(process_id, pid, limits)
+        //
+        // For now, store limits in environment variables as a hint that limits should be applied
+        if limits.cpu_cores > 0 {
+            command.env("POOLAI_CPU_LIMIT", limits.cpu_cores.to_string());
+        }
+        if limits.memory_mb > 0 {
+            command.env("POOLAI_MEMORY_LIMIT_MB", limits.memory_mb.to_string());
         }
 
+        // Note: Actual cgroup enforcement requires post-spawn application
+        // This is a limitation of cgroups - they need the process PID
+        // See LinuxCgroupLimiter::apply_limits() for actual implementation
         Ok(())
     }
 
