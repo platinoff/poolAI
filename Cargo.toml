@@ -161,6 +161,8 @@ criterion = { version = "0.8", features = ["async_tokio"] }
 # Note: Library crates must not enable features in direct dependency, only in dev-dependency
 # Using v1_28 as it's available in k8s-openapi 0.21
 k8s-openapi = { version = "0.24", features = ["v1_28"] }
+# Mock HTTP server for integration tests
+mockito = "1.4"
 
 [features]
 default = []
