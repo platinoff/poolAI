@@ -1,4 +1,5 @@
 {
+  // Terminal settings for MSYS2 (Windows)
   "terminal.integrated.defaultProfile.windows": "bash (MSYS2)",
   "terminal.integrated.env.windows": {
     "MSYSTEM": "UCRT64",
@@ -6,6 +7,26 @@
     "PATH": "${env:PATH};C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;C:\\Users\\${env:USERNAME}\\.cargo\\bin"
   },
   "terminal.integrated.cwd": "${workspaceFolder}",
+  
+  // Rust Analyzer settings
   "rust-analyzer.rustc.source": "discover",
-  "rust-analyzer.cargo.buildScripts.enable": true
+  "rust-analyzer.cargo.buildScripts.enable": true,
+  
+  // Cursor Agent settings (to prevent connection issues)
+  "cursor.chat.model": "default",
+  "cursor.general.enableAgent": true,
+  "cursor.general.enableComposer": true,
+  
+  // File watcher settings (to prevent agent connection issues)
+  "files.watcherExclude": {
+    "**/target/**": true,
+    "**/.git/**": true,
+    "**/node_modules/**": true
+  },
+  
+  // Editor settings for better agent experience
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": false
+  }
 }

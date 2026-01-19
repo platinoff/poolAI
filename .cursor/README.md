@@ -14,6 +14,8 @@ This directory contains configuration for Cursor's AI coding agent, following be
   - `fix-issue.md` - Fix a GitHub issue
   - `pr.md` - Create a pull request
 - `plans/` - Saved implementation plans (created via Plan Mode)
+- `hooks/` - Agent hooks for extended workflows
+  - `check-tests.ps1` - Verify tests pass before stopping (optional)
 
 ## Usage
 
