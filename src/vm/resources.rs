@@ -221,27 +221,42 @@ mod windows {
         Ok(())
     }
 
-    #[allow(dead_code)] // Will be used when Windows Job Objects are fully implemented
     pub async fn apply_windows_limits_post_spawn(
-        _process_id: uuid::Uuid,
-        _pid: u32,
+        process_id: uuid::Uuid,
+        pid: u32,
         limits: &ResourceLimits,
     ) -> Result<(), AppError> {
-        // Future improvement: Implement Windows Job Objects for CPU/memory limits
-        // This should be called after process spawn to apply limits to existing process
-        // 1. Create or get Job Object for this process_id using WindowsJobObjectLimiter
-        // 2. Apply CPU limits using JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
-        // 3. Apply memory limits using JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-        // 4. Assign process to Job Object using AssignProcessToJobObject()
-
-        if limits.cpu_cores > 0 || limits.memory_mb > 0 {
-            warn!(
-                "Windows resource limits post-spawn not yet implemented (CPU: {}, Memory: {} MB)",
-                limits.cpu_cores, limits.memory_mb
+        #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
+        {
+            // Use WindowsJobObjectLimiter to apply limits
+            // Note: WindowsJobObjectLimiter is not exported, so we use the apply_limits method
+            // from the windows module directly
+            use crate::vm::resources::windows::WindowsJobObjectLimiter;
+            
+            let limiter = WindowsJobObjectLimiter::new()?;
+            
+            // Apply limits using WindowsJobObjectLimiter
+            limiter.apply_limits(process_id, pid, limits).await?;
+            
+            tracing::info!(
+                "Applied Windows resource limits to process {} (PID {}): CPU: {}, Memory: {} MB",
+                process_id, pid, limits.cpu_cores, limits.memory_mb
             );
+            
+            Ok(())
         }
 
-        Ok(())
+        #[cfg(not(all(target_os = "windows", feature = "vm-isolation-windows")))]
+        {
+            // Fallback: just log
+            if limits.cpu_cores > 0 || limits.memory_mb > 0 {
+                warn!(
+                    "Windows resource limits post-spawn not available (Windows API not enabled) (CPU: {}, Memory: {} MB)",
+                    limits.cpu_cores, limits.memory_mb
+                );
+            }
+            Ok(())
+        }
     }
 
     pub async fn get_windows_usage(_process_id: u32) -> Result<ResourceUsage, AppError> {

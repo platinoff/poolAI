@@ -2080,6 +2080,7 @@ dependencies = [
  "tracing-subscriber",
  "urlencoding",
  "uuid",
+ "windows-sys 0.52.0",
  "zip",
 ]
 

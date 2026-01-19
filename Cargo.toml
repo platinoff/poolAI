@@ -128,9 +128,8 @@ azure_mgmt_compute = { version = "0.21", optional = true }  # Latest available v
 
 # VM Isolation - Windows API (optional - enabled with feature "vm-isolation-windows")
 # Use: cargo build --features vm-isolation-windows
-# Note: Requires administrator privileges
-# Note: Windows isolation implementation is planned but not yet implemented
-# windows-sys = { version = "0.52", optional = true, features = ["Win32_Foundation", "Win32_System_JobObjects", "Win32_System_Threading"] }
+# Note: Requires administrator privileges for some features
+windows-sys = { version = "0.52", optional = true, features = ["Win32_Foundation", "Win32_System_JobObjects", "Win32_System_Threading", "Win32_System_ProcessStatus"] }
 
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
@@ -193,8 +192,7 @@ cloud-sdk = [
 vm-isolation-linux = ["nix"]
 # VM Isolation - Windows (requires administrator privileges)
 # Use: cargo build --features vm-isolation-windows
-# Note: Windows isolation implementation is planned but not yet implemented
-# vm-isolation-windows = ["windows-sys"]
+vm-isolation-windows = ["windows-sys"]
 # Full VM isolation (platform-specific)
 # Note: Windows isolation is planned but not yet implemented
 vm-isolation = ["vm-isolation-linux"]

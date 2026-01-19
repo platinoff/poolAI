@@ -76,48 +76,39 @@ impl WindowsJobObjectLimiter {
 
     /// Create a Job Object for a process
     async fn create_job_object(&self, process_id: Uuid) -> Result<usize, AppError> {
-        #[cfg(target_os = "windows")]
+        #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
         {
-            // Future improvement: Implement actual Job Object creation using Windows API
-            // 1. Use windows crate with proper features enabled
-            //    - Add windows crate dependency with "Win32_System_JobObjects" feature
-            //    - Import: use windows::Win32::System::JobObjects::*;
-            // 2. Create Job Object using CreateJobObjectW
-            //    - Call CreateJobObjectW(Some(&mut security_attributes), Some(&job_name))
-            //    - Handle security attributes (NULL for default)
-            //    - Handle job name (optional, can be NULL for unnamed job)
-            // 3. Store the HANDLE for later use
-            //    - Store HANDLE in job_objects HashMap
-            //    - Use Arc<HANDLE> for shared ownership if needed
-            //    - Remember to close handle when job object is removed (CloseHandle)
-            // 4. Error handling
-            //    - Check if CreateJobObjectW returns INVALID_HANDLE_VALUE
-            //    - Get last error using GetLastError() if creation fails
-            //    - Return AppError with meaningful message
-            // Example:
-            //    use windows::Win32::Foundation::HANDLE;
-            //    use windows::Win32::System::JobObjects::CreateJobObjectW;
-            //    let job_handle = unsafe { CreateJobObjectW(None, None)? };
-            //    job_objects.insert(process_id, job_handle.0 as usize);
-            //    Ok(job_handle.0 as usize)
-            
-            // For now, return a placeholder handle ID
-            // In real implementation, this would be the actual HANDLE value
+            // Create Job Object using Windows API
+            let job_handle = unsafe { CreateJobObjectW(std::ptr::null_mut(), std::ptr::null()) };
+
+            if job_handle == INVALID_HANDLE_VALUE || job_handle == 0 {
+                return Err(AppError::ConfigError(format!(
+                    "Failed to create Job Object for process {}. Context: CreateJobObjectW returned invalid handle. Suggestion: Check if running with administrator privileges and ensure Windows Job Objects are supported on this system.",
+                    process_id
+                )));
+            }
+
+            let handle_id = job_handle as usize;
+
+            let mut job_objects = self.job_objects.write().await;
+            let state = JobObjectState::new(handle_id, process_id);
+            job_objects.insert(process_id, state.clone());
+
+            tracing::info!("Created Job Object for process {} (handle: {})", process_id, handle_id);
+            Ok(handle_id)
+        }
+
+        #[cfg(not(all(target_os = "windows", feature = "vm-isolation-windows")))]
+        {
+            // Fallback: return placeholder handle ID when Windows API is not available
             let handle_id = process_id.as_u128() as u64 as usize;
 
             let mut job_objects = self.job_objects.write().await;
             let state = JobObjectState::new(handle_id, process_id);
             job_objects.insert(process_id, state.clone());
 
-            tracing::info!("Created Job Object placeholder for process {}", process_id);
+            tracing::info!("Created Job Object placeholder for process {} (Windows API not available)", process_id);
             Ok(handle_id)
-        }
-
-        #[cfg(not(target_os = "windows"))]
-        {
-            Err(AppError::ConfigError(
-                "Windows Job Objects are only available on Windows".to_string(),
-            ))
         }
     }
 
@@ -193,47 +184,76 @@ impl WindowsJobObjectLimiter {
         _pid: u32,
         memory_mb: u32,
     ) -> Result<(), AppError> {
-        #[cfg(target_os = "windows")]
+        #[cfg(all(target_os = "windows", feature = "vm-isolation-windows"))]
         {
-            // Update Job Object state with memory limits
+            // Get or create Job Object
+            let job_objects = self.job_objects.read().await;
+            let job_handle = if let Some(state) = job_objects.get(&process_id) {
+                state.handle as HANDLE
+            } else {
+                drop(job_objects);
+                let handle_id = self.create_job_object(process_id).await?;
+                handle_id as HANDLE
+            };
+
+            // Calculate memory limit in bytes
+            let memory_bytes = (memory_mb as u64) * 1024 * 1024;
+
+            // Prepare extended limit information
+            let mut limit_info = JOBOBJECT_EXTENDED_LIMIT_INFORMATION::default();
+            limit_info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_JOB_MEMORY;
+            limit_info.ProcessMemoryLimit = memory_bytes;
+
+            // Apply memory limits
+            let result = unsafe {
+                SetInformationJobObject(
+                    job_handle,
+                    JobObjectExtendedLimitInformation,
+                    &limit_info as *const _ as *const _,
+                    std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32,
+                )
+            };
+
+            if result == 0 {
+                return Err(AppError::ConfigError(format!(
+                    "Failed to set memory limits for process {}. Context: SetInformationJobObject failed. Suggestion: Check if running with administrator privileges and ensure the Job Object handle is valid. Memory: {} MB",
+                    process_id, memory_mb
+                )));
+            }
+
+            // Update state
+            let mut job_objects = self.job_objects.write().await;
+            if let Some(state) = job_objects.get_mut(&process_id) {
+                state.memory_mb = Some(memory_mb);
+            }
+
+            tracing::info!(
+                "Applied memory limits to process {}: {} MB ({} bytes)",
+                process_id, memory_mb, memory_bytes
+            );
+
+            Ok(())
+        }
+
+        #[cfg(not(all(target_os = "windows", feature = "vm-isolation-windows")))]
+        {
+            // Fallback: just update state
             let mut job_objects = self.job_objects.write().await;
             if let Some(state) = job_objects.get_mut(&process_id) {
                 state.memory_mb = Some(memory_mb);
             } else {
-                // Create Job Object if it doesn't exist
                 let _handle_id = self.create_job_object(process_id).await?;
                 if let Some(state) = job_objects.get_mut(&process_id) {
                     state.memory_mb = Some(memory_mb);
                 }
             }
 
-            // Future improvement: Implement actual memory limits using Job Objects
-            // 1. Get or create Job Object for this process
-            //    - Retrieve HANDLE from job_objects HashMap
-            //    - If not found, create new Job Object using create_job_object()
-            // 2. Use SetInformationJobObject with JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-            // 3. Set ProcessMemoryLimit to memory_mb * 1024 * 1024 (bytes)
-
-            // For now, just log the request
             tracing::info!(
-                "Windows memory limits requested for process {} (PID {}): {} MB",
+                "Windows memory limits requested for process {} (PID {}): {} MB (Windows API not available)",
                 process_id, _pid, memory_mb
             );
 
-            // Placeholder: In real implementation, we would:
-            // 1. Create or get Job Object handle
-            // 2. Set JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-            // 3. Set ProcessMemoryLimit
-            // 4. Call SetInformationJobObject
-
             Ok(())
-        }
-
-        #[cfg(not(target_os = "windows"))]
-        {
-            Err(AppError::ConfigError(
-                "Windows Job Objects are only available on Windows".to_string(),
-            ))
         }
     }
 
