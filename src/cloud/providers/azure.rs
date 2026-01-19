@@ -30,6 +30,9 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::info;
 
+#[cfg(feature = "cloud-sdk")]
+use chrono::{DateTime, Utc};
+
 // Note: Azure SDK 0.30 API differs from expected structure
 // azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
 // This version mismatch requires using REST API directly via reqwest instead of SDK clients
@@ -60,6 +63,17 @@ pub struct AzureManager {
     #[cfg(feature = "cloud-sdk")]
     /// HTTP client for Azure REST API calls (used as fallback when SDK has version conflicts)
     http_client: Arc<RwLock<Option<HttpClient>>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Cached Azure access token with expiration time
+    /// Token is refreshed automatically when expired or about to expire
+    cached_token: Arc<RwLock<Option<CachedToken>>>,
+}
+
+#[cfg(feature = "cloud-sdk")]
+/// Cached token with expiration time
+struct CachedToken {
+    token: String,
+    expires_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl AzureManager {
@@ -87,6 +101,8 @@ impl AzureManager {
             compute_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             http_client: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            cached_token: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -204,9 +220,10 @@ impl AzureManager {
     pub async fn shutdown(&self) -> Result<(), AppError> {
         #[cfg(feature = "cloud-sdk")]
         {
-            // Clear clients
+            // Clear clients and cached token
             *self.compute_client.write().await = None;
             *self.http_client.write().await = None;
+            *self.cached_token.write().await = None;
         }
 
         *self.initialized.write().await = false;
@@ -215,35 +232,81 @@ impl AzureManager {
     }
 
     #[cfg(feature = "cloud-sdk")]
-    /// Get Azure access token with fallback methods
+    /// Get Azure access token with fallback methods and caching
     ///
     /// Tries multiple authentication methods in order:
     /// 1. Environment variable (`AZURE_ACCESS_TOKEN`)
     /// 2. Azure CLI (`az account get-access-token`)
     /// 3. Managed Identity (when running on Azure VM/App Service)
     ///
+    /// Tokens are cached with expiration time and automatically refreshed when expired or about to expire.
+    ///
     /// # Errors
     ///
     /// Returns `AppError::InitializationError` if no valid credentials can be found.
     async fn get_azure_access_token(&self) -> Result<String, AppError> {
+        // Check cached token first
+        {
+            let cached_guard = self.cached_token.read().await;
+            if let Some(cached) = cached_guard.as_ref() {
+                // Refresh token if it expires in less than 5 minutes
+                let refresh_threshold = chrono::Utc::now() + chrono::Duration::minutes(5);
+                if cached.expires_at > refresh_threshold {
+                    info!(
+                        "Azure access token obtained from cache (expires at {})",
+                        cached.expires_at
+                    );
+                    return Ok(cached.token.clone());
+                }
+            }
+        }
+
+        // Token expired or not cached, acquire new token
+        let (token, expires_in_seconds) = self.acquire_azure_token().await?;
+
+        // Calculate expiration time
+        let expires_at = chrono::Utc::now() + chrono::Duration::seconds(expires_in_seconds as i64);
+
+        // Cache the token
+        {
+            let mut cached_guard = self.cached_token.write().await;
+            *cached_guard = Some(CachedToken {
+                token: token.clone(),
+                expires_at,
+            });
+        }
+
+        info!(
+            "Azure access token acquired and cached (expires at {})",
+            expires_at
+        );
+        Ok(token)
+    }
+
+    #[cfg(feature = "cloud-sdk")]
+    /// Acquire Azure access token from available sources
+    ///
+    /// Returns tuple of (token, expires_in_seconds)
+    async fn acquire_azure_token(&self) -> Result<(String, u64), AppError> {
         // Try 1: Environment variable (highest priority for explicit override)
+        // Note: Environment variable tokens don't have expiration info, assume 1 hour
         if let Ok(token) = std::env::var("AZURE_ACCESS_TOKEN") {
             if !token.is_empty() {
                 info!("Azure access token obtained from AZURE_ACCESS_TOKEN environment variable");
-                return Ok(token);
+                return Ok((token, 3600)); // Assume 1 hour expiration
             }
         }
 
         // Try 2: Azure CLI
-        if let Ok(token) = self.get_token_from_azure_cli().await {
+        if let Ok((token, expires_in)) = self.get_token_from_azure_cli().await {
             info!("Azure access token obtained from Azure CLI");
-            return Ok(token);
+            return Ok((token, expires_in));
         }
 
         // Try 3: Managed Identity (when running on Azure)
-        if let Ok(token) = self.get_token_from_managed_identity().await {
+        if let Ok((token, expires_in)) = self.get_token_from_managed_identity().await {
             info!("Azure access token obtained from Managed Identity");
-            return Ok(token);
+            return Ok((token, expires_in));
         }
 
         // All methods failed
@@ -259,18 +322,18 @@ impl AzureManager {
     #[cfg(feature = "cloud-sdk")]
     /// Get access token from Azure CLI
     ///
-    /// Executes `az account get-access-token --query accessToken -o tsv` to get token.
-    async fn get_token_from_azure_cli(&self) -> Result<String, AppError> {
+    /// Executes `az account get-access-token` to get token with expiration info.
+    /// Returns tuple of (token, expires_in_seconds).
+    async fn get_token_from_azure_cli(&self) -> Result<(String, u64), AppError> {
         use tokio::process::Command;
 
+        // Get full token response with expiration info
         let output = Command::new("az")
             .args(&[
                 "account",
                 "get-access-token",
-                "--query",
-                "accessToken",
                 "-o",
-                "tsv",
+                "json",
             ])
             .output()
             .await
@@ -289,23 +352,49 @@ impl AzureManager {
             )));
         }
 
-        let token = String::from_utf8(output.stdout)
+        let response_json: serde_json::Value = serde_json::from_slice(&output.stdout)
             .map_err(|e| AppError::InitializationError(format!(
-                "Failed to parse Azure CLI output. Context: Cannot parse token from 'az account get-access-token' output. \
+                "Failed to parse Azure CLI output. Context: Cannot parse JSON from 'az account get-access-token' output. \
                 Error: {}. Suggestion: Ensure Azure CLI is properly configured.",
                 e
-            )))?
-            .trim()
+            )))?;
+
+        let token = response_json
+            .get("accessToken")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| AppError::InitializationError(
+                "Azure CLI response missing accessToken. Context: 'az account get-access-token' response does not contain accessToken field. \
+                Suggestion: Run 'az login' to authenticate with Azure CLI.".to_string()
+            ))?
             .to_string();
 
-        if token.is_empty() {
-            return Err(AppError::InitializationError(
-                "Azure CLI returned empty token. Context: 'az account get-access-token' returned empty string. \
-                Suggestion: Run 'az login' to authenticate with Azure CLI.".to_string()
-            ));
-        }
+        // Parse expiration time (expiresOn is in format "2024-01-01 12:00:00.000000" or RFC3339)
+        let expires_in =
+            if let Some(expires_on_str) = response_json.get("expiresOn").and_then(|v| v.as_str()) {
+                // Try RFC3339 format first
+                if let Ok(expires_on) = DateTime::parse_from_rfc3339(expires_on_str) {
+                    let now = Utc::now();
+                    let expires_at = expires_on.with_timezone(&Utc);
+                    let duration = expires_at.signed_duration_since(now);
+                    duration.num_seconds().max(0) as u64
+                } else if let Ok(expires_on) =
+                    DateTime::parse_from_str(expires_on_str, "%Y-%m-%d %H:%M:%S%.f")
+                {
+                    // Try Azure CLI format: "2024-01-01 12:00:00.000000"
+                    let now = Utc::now();
+                    let expires_at = expires_on.with_timezone(&Utc);
+                    let duration = expires_at.signed_duration_since(now);
+                    duration.num_seconds().max(0) as u64
+                } else {
+                    // Fallback: assume 1 hour if parsing fails
+                    3600
+                }
+            } else {
+                // Fallback: assume 1 hour if expiration not provided
+                3600
+            };
 
-        Ok(token)
+        Ok((token, expires_in))
     }
 
     #[cfg(feature = "cloud-sdk")]
@@ -313,7 +402,8 @@ impl AzureManager {
     ///
     /// Queries the Azure Instance Metadata Service (IMDS) for Managed Identity token.
     /// This works when running on Azure VM, App Service, or other Azure services with Managed Identity enabled.
-    async fn get_token_from_managed_identity(&self) -> Result<String, AppError> {
+    /// Returns tuple of (token, expires_in_seconds).
+    async fn get_token_from_managed_identity(&self) -> Result<(String, u64), AppError> {
         let client_guard = self.http_client.read().await;
         let client = client_guard.as_ref().ok_or_else(|| {
             AppError::InitializationError(
@@ -354,16 +444,24 @@ impl AzureManager {
             ))
         })?;
 
-        token_response
+        let token = token_response
             .get("access_token")
             .and_then(|v| v.as_str())
-            .map(|s| s.to_string())
             .ok_or_else(|| {
                 AppError::InitializationError(
                     "Managed Identity response missing access_token. Context: IMDS response does not contain access_token field. \
                     Suggestion: Check Azure Managed Identity configuration.".to_string()
                 )
-            })
+            })?
+            .to_string();
+
+        // Parse expiration time (expires_in is in seconds)
+        let expires_in = token_response
+            .get("expires_in")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(3600); // Default to 1 hour if not provided
+
+        Ok((token, expires_in))
     }
 
     /// Create VM Scale Set

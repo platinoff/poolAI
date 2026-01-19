@@ -104,7 +104,7 @@ pub mod small_world;
 /// let burst_mode = RaidMode::BurstRaid;
 /// let small_world_mode = RaidMode::SmallWorld;
 /// ```
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RaidMode {
     /// Local-only artifact storage (current implementation)
     ///
@@ -119,6 +119,31 @@ pub enum RaidMode {
     ///
     /// Distributed storage strategy using SmallWorld network topology for replication.
     SmallWorld,
+}
+
+/// Strategy status for Administrative Control Plane
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct StrategyStatus {
+    /// Strategy mode name ("Local", "BurstRaid", "SmallWorld")
+    pub mode: String,
+    /// Whether the strategy is initialized
+    pub initialized: bool,
+    /// Whether the strategy is currently active
+    pub active: bool,
+    /// Whether automatic rebalancing is enabled
+    pub rebalancing_enabled: bool,
+    /// Last rebalance timestamp (if available)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_rebalance: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+/// Rebalance result for Administrative Control Plane
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct RebalanceResult {
+    /// Number of artifacts moved during rebalancing
+    pub artifacts_moved: usize,
+    /// Whether rebalancing completed successfully
+    pub success: bool,
 }
 
 /// Configuration for RAID storage manager
@@ -1208,6 +1233,84 @@ impl RaidManager {
     pub async fn get_mode(&self) -> RaidMode {
         let config = self.config.read().await;
         config.mode.clone()
+    }
+
+    /// Get strategy status for Administrative Control Plane
+    ///
+    /// Returns status information about the currently active strategy (BurstRAID or SmallWorld).
+    pub async fn get_strategy_status(&self) -> Result<StrategyStatus, AppError> {
+        let mode = self.get_mode().await;
+        match mode {
+            RaidMode::Local => Ok(StrategyStatus {
+                mode: "Local".to_string(),
+                initialized: true,
+                active: true,
+                rebalancing_enabled: false,
+                last_rebalance: None,
+            }),
+            RaidMode::BurstRaid => {
+                let strategy_guard = self.burst_strategy.read().await;
+                let initialized = strategy_guard.is_some();
+                let rebalancing_enabled = if let Some(ref _strategy) = *strategy_guard {
+                    // BurstRAID config has enable_auto_rebalancing
+                    true // TODO: Expose config to check actual value
+                } else {
+                    false
+                };
+                Ok(StrategyStatus {
+                    mode: "BurstRaid".to_string(),
+                    initialized,
+                    active: initialized,
+                    rebalancing_enabled,
+                    last_rebalance: None, // TODO: Track last rebalance time
+                })
+            }
+            RaidMode::SmallWorld => {
+                let strategy_guard = self.small_world_strategy.read().await;
+                let initialized = strategy_guard.is_some();
+                let rebalancing_enabled = if let Some(ref _strategy) = *strategy_guard {
+                    // SmallWorld config has enable_auto_rebalancing
+                    true // TODO: Expose config to check actual value
+                } else {
+                    false
+                };
+                Ok(StrategyStatus {
+                    mode: "SmallWorld".to_string(),
+                    initialized,
+                    active: initialized,
+                    rebalancing_enabled,
+                    last_rebalance: None, // TODO: Track last rebalance time
+                })
+            }
+        }
+    }
+
+    /// Trigger manual rebalancing for the active strategy
+    ///
+    /// Returns the number of artifacts moved during rebalancing.
+    pub async fn trigger_rebalance(&self) -> Result<RebalanceResult, AppError> {
+        let mode = self.get_mode().await;
+        match mode {
+            RaidMode::Local => Err(AppError::ValidationError(
+                "Rebalancing not available for Local mode".to_string(),
+            )),
+            RaidMode::BurstRaid => {
+                let strategy = self.ensure_burst_strategy().await?;
+                strategy.rebalance().await?;
+                Ok(RebalanceResult {
+                    artifacts_moved: 0, // TODO: Return actual count from rebalance()
+                    success: true,
+                })
+            }
+            RaidMode::SmallWorld => {
+                let strategy = self.ensure_small_world_strategy().await?;
+                strategy.rebalance().await?;
+                Ok(RebalanceResult {
+                    artifacts_moved: 0, // TODO: Return actual count from rebalance()
+                    success: true,
+                })
+            }
+        }
     }
 
     /// Placeholder: rebalancing would run for distributed modes.

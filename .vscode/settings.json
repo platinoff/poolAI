@@ -1,19 +1,7 @@
 {
   // Terminal settings (Windows)
-  // Using Command Prompt as default to avoid Cursor agent serialize binary errors
-  // See: https://forum.cursor.com/t/connection-error-serialize-binary/148894
-  // Note: For cloud-sdk compilation, MSYS2 bash profile is available
-  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  // MSYS2 bash profile available for cloud-sdk compilation
   "terminal.integrated.profiles.windows": {
-    "Command Prompt": {
-      "path": "${env:windir}\\System32\\cmd.exe",
-      "args": [],
-      "icon": "terminal-cmd"
-    },
-    "PowerShell": {
-      "source": "PowerShell",
-      "icon": "terminal-powershell"
-    },
     "bash (MSYS2)": {
       "path": "C:\\msys64\\usr\\bin\\bash.exe",
       "args": ["-l"],
@@ -32,23 +20,5 @@
   
   // Rust Analyzer settings
   "rust-analyzer.rustc.source": "discover",
-  "rust-analyzer.cargo.buildScripts.enable": true,
-  
-  // Cursor Agent settings (to prevent connection issues)
-  "cursor.chat.model": "default",
-  "cursor.general.enableAgent": true,
-  "cursor.general.enableComposer": true,
-  
-  // File watcher settings (to prevent agent connection issues)
-  "files.watcherExclude": {
-    "**/target/**": true,
-    "**/.git/**": true,
-    "**/node_modules/**": true
-  },
-  
-  // Editor settings for better agent experience
-  "editor.formatOnSave": false,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": false
-  }
+  "rust-analyzer.cargo.buildScripts.enable": true
 }

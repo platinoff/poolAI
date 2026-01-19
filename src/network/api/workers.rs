@@ -226,7 +226,7 @@ async fn worker_delete_handler(Path(worker_id): Path<String>) -> impl IntoRespon
     match pool_guard.remove_worker(&worker_id).await {
         Ok(_) => {
             let response = DeleteWorkerResponse {
-                worker_id: worker_id,
+                worker_id,
                 message: "Worker deleted successfully".to_string(),
             };
             AxumJson(response).into_response()

@@ -650,7 +650,7 @@ async fn raid_artifact_delete_handler(
     match manager.delete_artifact(id).await {
         Ok(_) => {
             let response = DeleteArtifactResponse {
-                artifact_id: artifact_id,
+                artifact_id,
                 message: "Artifact deleted successfully".to_string(),
             };
             Json(response).into_response()
@@ -1111,7 +1111,7 @@ async fn worker_delete_handler(
     match pool_guard.remove_worker(&worker_id).await {
         Ok(_) => {
             let response = DeleteWorkerResponse {
-                worker_id: worker_id,
+                worker_id,
                 message: "Worker deleted successfully".to_string(),
             };
             Json(response).into_response()

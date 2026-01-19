@@ -169,6 +169,14 @@ pub fn create_raid_routes() -> Router {
             "/raid/distributed/cluster/leave",
             post(leave_cluster_handler),
         )
+        // Administrative Control Plane endpoints
+        .route("/raid/strategies", get(raid_strategies_handler))
+        .route("/raid/metrics", get(raid_metrics_handler))
+        .route(
+            "/raid/rebalance",
+            post(raid_rebalance_handler).layer(middleware::from_fn(auth_middleware)),
+        )
+        .route("/raid/health", get(raid_health_handler))
 }
 
 async fn raid_nodes_handler() -> impl IntoResponse {
@@ -278,7 +286,7 @@ async fn raid_artifact_delete_handler(Path(artifact_id): Path<String>) -> impl I
     match manager.delete_artifact(id).await {
         Ok(_) => {
             let response = DeleteArtifactResponse {
-                artifact_id: artifact_id,
+                artifact_id,
                 message: "Artifact deleted successfully".to_string(),
             };
             AxumJson(response).into_response()
@@ -796,4 +804,213 @@ async fn raid_worker_delete_handler(
         )
             .into_response(),
     }
+}
+
+// ============================================================================
+// Administrative Control Plane handlers
+// ============================================================================
+
+#[derive(serde::Serialize)]
+struct RaidStrategiesResponse {
+    strategies: Vec<raid::StrategyStatus>,
+    current_mode: String,
+}
+
+#[derive(serde::Serialize)]
+struct RaidMetricsResponse {
+    mode: String,
+    total_artifacts: usize,
+    total_size_bytes: u64,
+    quota_bytes: Option<u64>,
+    usage_percent: Option<f64>,
+    node_count: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    replication_factor: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    clustering_coefficient: Option<f64>,
+}
+
+#[derive(serde::Serialize)]
+struct RaidRebalanceResponse {
+    success: bool,
+    artifacts_moved: usize,
+    message: String,
+}
+
+#[derive(serde::Serialize)]
+struct RaidHealthResponse {
+    status: String, // "healthy", "degraded", "unhealthy"
+    mode: String,
+    strategy_initialized: bool,
+    storage_available: bool,
+    replication_active: bool,
+}
+
+/// Get strategy status for all available strategies
+async fn raid_strategies_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let current_mode = manager.get_mode().await;
+
+    // Get status for current strategy
+    match manager.get_strategy_status().await {
+        Ok(status) => {
+            let response = RaidStrategiesResponse {
+                strategies: vec![status],
+                current_mode: format!("{:?}", current_mode),
+            };
+            AxumJson(response).into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": format!("Failed to get strategy status. Context: Cannot retrieve strategy status from RAID manager. Suggestion: Verify RAID manager is initialized and strategy is properly configured. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+/// Get metrics for the active RAID strategy
+async fn raid_metrics_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let mode = manager.get_mode().await;
+    let mode_str = format!("{:?}", mode);
+
+    let artifacts = manager.list_artifacts().await;
+    let total_artifacts = artifacts.len();
+    let total_size = manager.get_total_size().await.unwrap_or(0);
+    let quota_bytes = manager.get_quota_bytes().await;
+    let usage_percent = quota_bytes.map(|quota| {
+        if quota > 0 {
+            (total_size as f64 / quota as f64) * 100.0
+        } else {
+            0.0
+        }
+    });
+    let nodes = manager.list_nodes().await;
+    let node_count = nodes.len();
+
+    // Strategy-specific metrics
+    let replication_factor = match mode {
+        raid::RaidMode::BurstRaid | raid::RaidMode::SmallWorld => {
+            // Default replication factors
+            Some(match mode {
+                raid::RaidMode::BurstRaid => 2,  // base_replication_factor
+                raid::RaidMode::SmallWorld => 3, // base_replication_factor
+                _ => unreachable!(),
+            })
+        }
+        _ => None,
+    };
+
+    let clustering_coefficient = match mode {
+        raid::RaidMode::SmallWorld => {
+            // TODO: Get actual clustering coefficient from SmallWorld strategy
+            None
+        }
+        _ => None,
+    };
+
+    let response = RaidMetricsResponse {
+        mode: mode_str,
+        total_artifacts,
+        total_size_bytes: total_size,
+        quota_bytes,
+        usage_percent,
+        node_count,
+        replication_factor,
+        clustering_coefficient,
+    };
+
+    AxumJson(response).into_response()
+}
+
+/// Trigger manual rebalancing for the active strategy
+async fn raid_rebalance_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
+    // Check permission: write:all or write:raid
+    if let Err(err) =
+        check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
+    {
+        return err.into_response();
+    }
+
+    let manager = raid::get_global_manager();
+    match manager.trigger_rebalance().await {
+        Ok(result) => {
+            let response = RaidRebalanceResponse {
+                success: result.success,
+                artifacts_moved: result.artifacts_moved,
+                message: format!(
+                    "Rebalancing completed successfully. {} artifacts moved.",
+                    result.artifacts_moved
+                ),
+            };
+            AxumJson(response).into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": format!("Failed to trigger rebalancing. Context: Cannot trigger rebalancing for RAID strategy. Suggestion: Verify RAID manager is initialized, check strategy mode (Local mode does not support rebalancing), and ensure strategy is properly configured. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+/// Health check for RAID strategies
+async fn raid_health_handler() -> impl IntoResponse {
+    let manager = raid::get_global_manager();
+    let mode = manager.get_mode().await;
+    let mode_str = format!("{:?}", mode);
+
+    // Get strategy status
+    let strategy_status = manager.get_strategy_status().await.ok();
+    let strategy_initialized = strategy_status
+        .as_ref()
+        .map(|s| s.initialized)
+        .unwrap_or(false);
+
+    // Check storage availability
+    let total_size = manager.get_total_size().await.unwrap_or(0);
+    let quota_bytes = manager.get_quota_bytes().await;
+    let storage_available = quota_bytes
+        .map(|quota| {
+            let usage_percent = if quota > 0 {
+                (total_size as f64 / quota as f64) * 100.0
+            } else {
+                0.0
+            };
+            usage_percent < 95.0 // Consider available if usage < 95%
+        })
+        .unwrap_or(true);
+
+    // Check replication status
+    let replication_active = match mode {
+        raid::RaidMode::Local => false,
+        raid::RaidMode::BurstRaid | raid::RaidMode::SmallWorld => strategy_status
+            .as_ref()
+            .map(|s| s.active && s.rebalancing_enabled)
+            .unwrap_or(false),
+    };
+
+    // Determine overall health status
+    let status = if !strategy_initialized && mode != raid::RaidMode::Local {
+        "unhealthy"
+    } else if !storage_available {
+        "degraded"
+    } else if !replication_active && mode != raid::RaidMode::Local {
+        "degraded"
+    } else {
+        "healthy"
+    };
+
+    let response = RaidHealthResponse {
+        status: status.to_string(),
+        mode: mode_str,
+        strategy_initialized,
+        storage_available,
+        replication_active,
+    };
+
+    AxumJson(response).into_response()
 }

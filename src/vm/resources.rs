@@ -252,6 +252,7 @@ mod windows {
         #[cfg(not(all(target_os = "windows", feature = "vm-isolation-windows")))]
         {
             // Fallback: just log
+            let _ = (process_id, pid); // Suppress unused variable warnings
             if limits.cpu_cores > 0 || limits.memory_mb > 0 {
                 warn!(
                     "Windows resource limits post-spawn not available (Windows API not enabled) (CPU: {}, Memory: {} MB)",
