@@ -35,7 +35,7 @@ impl PlacementCalculator for TopologyAwarePlacementCalculator {
 
         // Strategy 1: Single node placement (best resource match)
         if let Some(single_placement) =
-            calculate_single_placement(&*topology, model_info, required_memory).await
+            calculate_single_placement(&topology, model_info, required_memory).await
         {
             placements.push(single_placement);
         }
@@ -43,7 +43,7 @@ impl PlacementCalculator for TopologyAwarePlacementCalculator {
         // Strategy 2: Pipeline parallelism (if model is large enough)
         if required_memory > 4000 {
             if let Some(pipeline_placement) =
-                calculate_pipeline_placement(&*topology, model_info, required_memory).await
+                calculate_pipeline_placement(&topology, model_info, required_memory).await
             {
                 placements.push(pipeline_placement);
             }
@@ -51,7 +51,7 @@ impl PlacementCalculator for TopologyAwarePlacementCalculator {
 
         // Strategy 3: Tensor parallelism (if supported by nodes)
         if let Some(tensor_placement) =
-            calculate_tensor_placement(&*topology, model_info, required_memory).await
+            calculate_tensor_placement(&topology, model_info, required_memory).await
         {
             placements.push(tensor_placement);
         }

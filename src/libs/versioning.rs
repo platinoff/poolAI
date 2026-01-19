@@ -40,10 +40,7 @@ impl VersionManager {
         version: &str,
         path: &PathBuf,
     ) -> Result<(), AppError> {
-        let versions = self
-            .versions
-            .entry(name.to_string())
-            .or_insert_with(Vec::new);
+        let versions = self.versions.entry(name.to_string()).or_default();
 
         // Check if version already exists
         if versions.iter().any(|v| v.version == version) {

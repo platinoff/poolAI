@@ -177,6 +177,12 @@ pub struct WebSocketConnection {
     pub last_heartbeat: u64,
 }
 
+impl Default for WebSocketManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WebSocketManager {
     pub fn new() -> Self {
         let manager = Self {

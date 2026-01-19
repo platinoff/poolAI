@@ -71,10 +71,7 @@ impl LibraryRegistry {
         version: &str,
         info: LibraryInfo,
     ) -> Result<(), AppError> {
-        let versions = self
-            .libraries
-            .entry(name.to_string())
-            .or_insert_with(Vec::new);
+        let versions = self.libraries.entry(name.to_string()).or_default();
 
         if !versions.contains(&version.to_string()) {
             versions.push(version.to_string());

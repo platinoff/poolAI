@@ -588,6 +588,12 @@ pub struct VmManager {
     networks: Arc<RwLock<HashMap<Uuid, VmNetwork>>>,
 }
 
+impl Default for VmManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl VmManager {
     /// Creates a new VM manager instance
     ///
@@ -1051,8 +1057,8 @@ impl VmManager {
     /// Returns `AppError::ResourceError` if template not found.
     pub async fn update_template(&self, template: VmTemplate) -> Result<(), AppError> {
         let mut templates = self.templates.write().await;
-        if templates.contains_key(&template.id) {
-            templates.insert(template.id, template.clone());
+        if let std::collections::hash_map::Entry::Occupied(mut e) = templates.entry(template.id) {
+            e.insert(template.clone());
             info!("Updated VM template: {} ({})", template.name, template.id);
             Ok(())
         } else {
@@ -1146,8 +1152,8 @@ impl VmManager {
     /// Returns `AppError::ResourceError` if network not found.
     pub async fn update_network(&self, network: VmNetwork) -> Result<(), AppError> {
         let mut networks = self.networks.write().await;
-        if networks.contains_key(&network.id) {
-            networks.insert(network.id, network.clone());
+        if let std::collections::hash_map::Entry::Occupied(mut e) = networks.entry(network.id) {
+            e.insert(network.clone());
             info!("Updated VM network: {} ({})", network.name, network.id);
             Ok(())
         } else {

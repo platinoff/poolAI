@@ -173,6 +173,12 @@ pub struct MetricsCollector {
     resource_metrics: ResourceMetrics,
 }
 
+impl Default for MetricsCollector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MetricsCollector {
     /// Create a new metrics collector
     ///

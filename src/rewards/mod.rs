@@ -193,6 +193,12 @@ pub struct RewardSystem {
     _reward_multipliers: Arc<RwLock<HashMap<RewardType, f64>>>,
 }
 
+impl Default for RewardSystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RewardSystem {
     pub fn new() -> Self {
         let mut multipliers = HashMap::new();
@@ -227,7 +233,7 @@ impl RewardSystem {
             id: uuid::Uuid::new_v4().to_string(),
             user_id: user_id.clone(),
             reward_type: reward_type.clone(),
-            level: level.clone(),
+            level: level,
             amount,
             description,
             timestamp: Utc::now(),

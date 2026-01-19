@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 use tokio::process::Command;
 
 /// Resource limits configuration for a VM instance
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ResourceLimits {
     /// CPU cores limit (0 = unlimited)
     pub cpu_cores: u16,
@@ -32,16 +32,6 @@ pub struct ResourceLimits {
     pub memory_mb: u32,
     /// GPU device ID (None = no GPU)
     pub gpu_device: Option<usize>,
-}
-
-impl Default for ResourceLimits {
-    fn default() -> Self {
-        Self {
-            cpu_cores: 0, // Unlimited
-            memory_mb: 0, // Unlimited
-            gpu_device: None,
-        }
-    }
 }
 
 impl From<crate::vm::VmResources> for ResourceLimits {
@@ -108,6 +98,12 @@ pub struct ResourceUsage {
 
 /// Platform-specific resource limiter implementation
 pub struct PlatformResourceLimiter;
+
+impl Default for PlatformResourceLimiter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl PlatformResourceLimiter {
     pub fn new() -> Self {

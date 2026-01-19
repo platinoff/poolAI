@@ -134,7 +134,7 @@ impl DependencyResolver {
         let deps = self
             .dependency_graph
             .entry(library.to_string())
-            .or_insert_with(Vec::new);
+            .or_default();
 
         deps.push(DependencySpec {
             name: dependency.to_string(),
@@ -148,7 +148,7 @@ impl DependencyResolver {
     pub fn add_dependency(&mut self, library: &str, dependency: &str) {
         self.dependency_graph
             .entry(library.to_string())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(DependencySpec {
                 name: dependency.to_string(),
                 constraints: Vec::new(),

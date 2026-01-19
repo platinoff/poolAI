@@ -304,7 +304,7 @@ impl AppError {
 }
 
 /// Error metrics result
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ErrorMetrics {
     /// Error counts by type
     pub error_counts: std::collections::HashMap<String, u64>,
@@ -316,18 +316,6 @@ pub struct ErrorMetrics {
     pub recovery_attempts: u64,
     /// Успешные восстановления
     pub successful_recoveries: u64,
-}
-
-impl Default for ErrorMetrics {
-    fn default() -> Self {
-        Self {
-            error_counts: std::collections::HashMap::new(),
-            last_error_time: None,
-            total_errors: 0,
-            recovery_attempts: 0,
-            successful_recoveries: 0,
-        }
-    }
 }
 
 impl ErrorMetrics {

@@ -97,7 +97,7 @@ impl Default for NetworkIsolationConfig {
 ///     strict: false,
 /// };
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct FilesystemIsolationConfig {
     /// Whether to enable filesystem isolation
     pub enabled: bool,
@@ -127,19 +127,6 @@ pub struct FilesystemIsolationConfig {
     /// the operation will log a warning and continue (graceful degradation).
     /// When `strict = true`, any failure will return an error.
     pub strict: bool,
-}
-
-impl Default for FilesystemIsolationConfig {
-    fn default() -> Self {
-        Self {
-            enabled: false,
-            root_dir: None,
-            allowed_paths: vec![],
-            read_only_paths: vec![],
-            use_chroot: false,
-            strict: false,
-        }
-    }
 }
 
 /// Trait for network isolation implementation
@@ -212,6 +199,12 @@ pub struct PlatformNetworkIsolator {
     inner: noop::NoopNetworkIsolator,
 }
 
+impl Default for PlatformNetworkIsolator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PlatformNetworkIsolator {
     pub fn new() -> Self {
         Self {
@@ -253,6 +246,12 @@ pub struct PlatformFilesystemIsolator {
     inner: windows::WindowsFilesystemIsolator,
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     inner: noop::NoopFilesystemIsolator,
+}
+
+impl Default for PlatformFilesystemIsolator {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PlatformFilesystemIsolator {

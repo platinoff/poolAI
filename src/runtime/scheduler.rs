@@ -27,6 +27,12 @@
 
 pub struct TaskScheduler;
 
+impl Default for TaskScheduler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TaskScheduler {
     pub fn new() -> Self {
         Self

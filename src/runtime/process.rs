@@ -172,6 +172,12 @@ pub struct ProcessManager {
     processes: Arc<RwLock<HashMap<Uuid, ProcessInfo>>>,
 }
 
+impl Default for ProcessManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ProcessManager {
     /// Create a new process manager
     ///

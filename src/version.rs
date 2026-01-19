@@ -19,7 +19,7 @@ static START_TIME: OnceLock<SystemTime> = OnceLock::new();
 /// Initialize application start time
 /// Should be called once at application startup
 pub fn initialize_start_time() {
-    START_TIME.get_or_init(|| SystemTime::now());
+    START_TIME.get_or_init(SystemTime::now);
 }
 
 /// Get application uptime in seconds

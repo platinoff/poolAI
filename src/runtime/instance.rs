@@ -180,7 +180,7 @@ impl InstanceManager {
         placement: InstancePlacement,
         metadata: HashMap<String, String>,
     ) -> Result<String, AppError> {
-        let instance_id = format!("inst-{}", Uuid::new_v4().to_string()[..8].to_string());
+        let instance_id = format!("inst-{}", &Uuid::new_v4().to_string()[..8]);
 
         let instance = ModelInstance {
             instance_id: instance_id.clone(),

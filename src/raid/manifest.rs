@@ -18,6 +18,12 @@ pub struct ArtifactManifest {
     pub artifacts: HashMap<Uuid, ArtifactRef>,
 }
 
+impl Default for ArtifactManifest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ArtifactManifest {
     pub fn new() -> Self {
         Self {

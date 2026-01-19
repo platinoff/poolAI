@@ -142,6 +142,12 @@ pub struct Monitoring {
     historical_data: Arc<RwLock<Vec<HistoricalData>>>,
 }
 
+impl Default for Monitoring {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Monitoring {
     /// Create a new monitoring instance
     ///

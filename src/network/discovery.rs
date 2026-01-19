@@ -322,7 +322,7 @@ struct DiscoveryServiceClone {
 impl DiscoveryService {
     /// Creates a new discovery service
     pub fn new(config: DiscoveryConfig, local_address: SocketAddr) -> Self {
-        let local_peer_id = format!("poolai-{}", Uuid::new_v4().to_string()[..8].to_string());
+        let local_peer_id = format!("poolai-{}", &Uuid::new_v4().to_string()[..8]);
 
         Self {
             config,

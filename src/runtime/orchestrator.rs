@@ -28,6 +28,12 @@
 
 pub struct ResourceOrchestrator;
 
+impl Default for ResourceOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ResourceOrchestrator {
     pub fn new() -> Self {
         Self

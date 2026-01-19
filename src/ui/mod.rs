@@ -43,6 +43,12 @@ use tracing::info;
 
 pub struct UiManager;
 
+impl Default for UiManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl UiManager {
     pub fn new() -> Self {
         Self

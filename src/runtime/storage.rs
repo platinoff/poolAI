@@ -28,6 +28,12 @@
 
 pub struct StorageManager;
 
+impl Default for StorageManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl StorageManager {
     pub fn new() -> Self {
         Self

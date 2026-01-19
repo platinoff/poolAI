@@ -232,6 +232,12 @@ pub struct AppState {
     pub state_mutex: Arc<Mutex<()>>,
 }
 
+impl Default for AppState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AppState {
     /// Create new application state
     ///

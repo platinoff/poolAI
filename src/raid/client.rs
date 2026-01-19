@@ -148,7 +148,7 @@ impl ProtocolClient {
         use std::hash::{Hash, Hasher};
         let mut hasher = DefaultHasher::new();
         self.base_url.hash(&mut hasher);
-        let node_id = hasher.finish() as u64;
+        let node_id = hasher.finish();
 
         // Get or create circuit breaker for this node
         let breaker = {
@@ -475,7 +475,7 @@ impl ProtocolClient {
         use std::hash::{Hash, Hasher};
         let mut hasher = DefaultHasher::new();
         self.base_url.hash(&mut hasher);
-        let node_id = hasher.finish() as u64;
+        let node_id = hasher.finish();
 
         let manager = self.circuit_breaker_manager.read().await;
         if let Some(breaker) = manager.get(node_id).await {

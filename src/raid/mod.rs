@@ -735,7 +735,7 @@ impl RaidManager {
         self.persist_manifest().await?;
 
         // If mode is BurstRaid or SmallWorld, trigger replication through strategy
-        let mode = cfg.mode.clone();
+        let mode = cfg.mode;
         drop(cfg); // Release config lock
 
         match mode {
@@ -1232,7 +1232,7 @@ impl RaidManager {
     /// Get storage mode from configuration
     pub async fn get_mode(&self) -> RaidMode {
         let config = self.config.read().await;
-        config.mode.clone()
+        config.mode
     }
 
     /// Get strategy status for Administrative Control Plane
