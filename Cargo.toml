@@ -149,7 +149,7 @@ azure_mgmt_compute = { version = "0.21", optional = true }  # Latest available v
 [dev-dependencies]
 tempfile = "3.24"
 # Benchmark framework
-criterion = { version = "0.5", features = ["async_tokio"] }
+criterion = { version = "0.8", features = ["async_tokio"] }
 # k8s-openapi dev-dependency for library crate (required for tests/examples)
 # Note: Library crates must not enable features in direct dependency, only in dev-dependency
 # Using v1_28 as it's available in k8s-openapi 0.21
