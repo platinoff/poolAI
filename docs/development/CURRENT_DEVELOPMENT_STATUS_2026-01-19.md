@@ -50,27 +50,25 @@
    - Mock Azure REST API responses
    - Test token acquisition methods
 
-### GCP Cloud Provider (70% Complete)
+### GCP Cloud Provider (90% Complete) ✅
 
 **Поточний стан**:
 - ✅ REST API структура готова
 - ✅ HTTP client ініціалізація
 - ✅ `get_gcp_access_token()` з кількома методами
-- ⚠️ Service account key file parsing не реалізовано
+- ✅ **Service account key file parsing реалізовано** (2026-01-19)
+- ✅ **JWT signing з RSA private key реалізовано**
+- ✅ **OAuth2 token exchange реалізовано**
 
 **Наступні кроки**:
-1. **Реалізувати service account key file parsing** (2-3 години)
-   - Парсинг JSON ключа
-   - JWT signing для service account
-   - Token exchange з Google OAuth2
-
-2. **Покращити token refresh** (1 година)
+1. **Покращити token refresh** (1 година)
    - Автоматичне оновлення токенів
    - Кешування токенів з TTL
 
-3. **Додати integration tests** (2-3 години)
+2. **Додати integration tests** (2-3 години)
    - Mock GCP REST API responses
    - Test service account authentication
+   - Test metadata server authentication
 
 ---
 
@@ -110,20 +108,23 @@ async fn get_azure_access_token(&self) -> Result<String, AppError> {
 }
 ```
 
-### Крок 2: GCP Service Account Key Parsing (2-3 години)
+### Крок 2: GCP Service Account Key Parsing ✅ (Завершено 2026-01-19)
 
 **Завдання**:
-- [ ] Створити структуру для service account key
-- [ ] Реалізувати JSON parsing для ключа
-- [ ] Реалізувати JWT signing для service account
-- [ ] Додати token exchange з Google OAuth2
+- [x] Створити структуру для service account key
+- [x] Реалізувати JSON parsing для ключа
+- [x] Реалізувати JWT signing для service account
+- [x] Додати token exchange з Google OAuth2
 
-**Файли для змін**:
-- `src/cloud/providers/gcp.rs` - покращити `get_gcp_access_token()`
+**Файли змінено**:
+- `src/cloud/providers/gcp.rs` - реалізовано `get_token_from_service_account()`
+- `Cargo.toml` - додано `jsonwebtoken` до `cloud-sdk` feature
 
-**Залежності**:
-- Можливо потрібно додати `jsonwebtoken` або `jwt-simple` для JWT signing
-- Перевірити чи є вже `jsonwebtoken` в dependencies (є в `jwt` feature)
+**Реалізовано**:
+- ServiceAccountKey struct для парсингу JSON ключів
+- JWT claims creation (iss, sub, aud, exp, iat)
+- RSA private key parsing та JWT signing з RS256
+- OAuth2 token exchange з Google token endpoint
 
 ### Крок 3: Integration Tests Infrastructure (3-4 години)
 
@@ -162,9 +163,9 @@ async fn get_azure_access_token(&self) -> Result<String, AppError> {
 ### GCP Implementation
 - **REST API Structure**: ✅ 100%
 - **HTTP Client**: ✅ 100%
-- **Token Acquisition**: ⏳ 70% (ADC працює, service account pending)
+- **Token Acquisition**: ✅ 100% (Metadata server, Service account, ADC)
 - **Compute Engine**: ⏳ 70%
-- **Service Account Auth**: ⏳ 30%
+- **Service Account Auth**: ✅ 100% (JWT signing, OAuth2 exchange)
 - **Integration Tests**: ⏳ 0%
 
 ---
@@ -211,7 +212,8 @@ async fn get_azure_access_token(&self) -> Result<String, AppError> {
 
 ---
 
-**Статус**: 🚀 **Ready for Azure Token Acquisition Enhancement**  
-**Наступний крок**: Реалізувати `get_azure_access_token()` з fallback методами  
+**Статус**: 🚀 **Azure & GCP Token Acquisition Complete | Ready for Integration Tests**  
+**Останній commit**: `ddad133` - feat(cloud): implement GCP service account key parsing and JWT signing  
+**Наступний крок**: Integration Tests Infrastructure або Token Refresh Enhancement  
 **Підготовлено**: Rust Architect  
 **Дата**: 2026-01-19
