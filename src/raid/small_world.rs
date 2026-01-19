@@ -245,7 +245,7 @@ impl SmallWorldStrategy {
     /// 3. Short-path routing (minimize hops)
     async fn select_target_nodes(
         &self,
-        artifact_id: Uuid,
+        _artifact_id: Uuid,
         replication_factor: u32,
     ) -> Result<Vec<u64>, AppError> {
         let topology = self
