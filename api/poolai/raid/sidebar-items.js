@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["RaidMode"],"fn":["get_global_manager","initialize","shutdown"],"mod":["burst_raid","circuit_breaker","client","events","manifest","protocol","replication","small_world"],"struct":["ArtifactRef","RaidConfig","RaidManager","RaidNode"]};
+window.SIDEBAR_ITEMS = {"enum":["RaidMode"],"fn":["get_global_manager","initialize","shutdown"],"mod":["burst_raid","circuit_breaker","client","events","manifest","protocol","replication","small_world"],"struct":["ArtifactRef","RaidConfig","RaidManager","RaidNode","RebalanceResult","StrategyStatus"]};

@@ -650,7 +650,7 @@
 <a href=#650 id=650 data-nosnippet>650</a>    <span class="kw">match </span>manager.delete_artifact(id).<span class="kw">await </span>{
 <a href=#651 id=651 data-nosnippet>651</a>        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
 <a href=#652 id=652 data-nosnippet>652</a>            <span class="kw">let </span>response = DeleteArtifactResponse {
-<a href=#653 id=653 data-nosnippet>653</a>                artifact_id: artifact_id,
+<a href=#653 id=653 data-nosnippet>653</a>                artifact_id,
 <a href=#654 id=654 data-nosnippet>654</a>                message: <span class="string">"Artifact deleted successfully"</span>.to_string(),
 <a href=#655 id=655 data-nosnippet>655</a>            };
 <a href=#656 id=656 data-nosnippet>656</a>            Json(response).into_response()
@@ -1111,7 +1111,7 @@
 <a href=#1111 id=1111 data-nosnippet>1111</a>    <span class="kw">match </span>pool_guard.remove_worker(<span class="kw-2">&amp;</span>worker_id).<span class="kw">await </span>{
 <a href=#1112 id=1112 data-nosnippet>1112</a>        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
 <a href=#1113 id=1113 data-nosnippet>1113</a>            <span class="kw">let </span>response = DeleteWorkerResponse {
-<a href=#1114 id=1114 data-nosnippet>1114</a>                worker_id: worker_id,
+<a href=#1114 id=1114 data-nosnippet>1114</a>                worker_id,
 <a href=#1115 id=1115 data-nosnippet>1115</a>                message: <span class="string">"Worker deleted successfully"</span>.to_string(),
 <a href=#1116 id=1116 data-nosnippet>1116</a>            };
 <a href=#1117 id=1117 data-nosnippet>1117</a>            Json(response).into_response()

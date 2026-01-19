@@ -226,7 +226,7 @@
 <a href=#226 id=226 data-nosnippet>226</a>    <span class="kw">match </span>pool_guard.remove_worker(<span class="kw-2">&amp;</span>worker_id).<span class="kw">await </span>{
 <a href=#227 id=227 data-nosnippet>227</a>        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
 <a href=#228 id=228 data-nosnippet>228</a>            <span class="kw">let </span>response = DeleteWorkerResponse {
-<a href=#229 id=229 data-nosnippet>229</a>                worker_id: worker_id,
+<a href=#229 id=229 data-nosnippet>229</a>                worker_id,
 <a href=#230 id=230 data-nosnippet>230</a>                message: <span class="string">"Worker deleted successfully"</span>.to_string(),
 <a href=#231 id=231 data-nosnippet>231</a>            };
 <a href=#232 id=232 data-nosnippet>232</a>            AxumJson(response).into_response()
