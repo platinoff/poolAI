@@ -142,7 +142,8 @@ impl SmallWorldStrategy {
     ///
     /// Clustering coefficient measures how well-connected a node's neighbors are.
     /// Higher values indicate better local clustering.
-    async fn calculate_clustering_coefficient(&self, node_id: u64) -> Result<f64, AppError> {
+    #[cfg(test)]
+    pub(crate) async fn calculate_clustering_coefficient(&self, node_id: u64) -> Result<f64, AppError> {
         let topology = self
             .topology_manager
             .read()
