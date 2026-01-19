@@ -1,9 +1,31 @@
 {
-  // Terminal settings for MSYS2 (Windows)
-  "terminal.integrated.defaultProfile.windows": "bash (MSYS2)",
+  // Terminal settings (Windows)
+  // Using Command Prompt as default to avoid Cursor agent serialize binary errors
+  // See: https://forum.cursor.com/t/connection-error-serialize-binary/148894
+  // Note: For cloud-sdk compilation, MSYS2 bash profile is available
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "terminal.integrated.profiles.windows": {
+    "Command Prompt": {
+      "path": "${env:windir}\\System32\\cmd.exe",
+      "args": [],
+      "icon": "terminal-cmd"
+    },
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "bash (MSYS2)": {
+      "path": "C:\\msys64\\usr\\bin\\bash.exe",
+      "args": ["-l"],
+      "env": {
+        "MSYSTEM": "UCRT64",
+        "CHERE_INVOKING": "1"
+      },
+      "icon": "terminal-bash"
+    }
+  },
+  // Global PATH for all terminals (includes MSYS2 for gcc.exe when needed)
   "terminal.integrated.env.windows": {
-    "MSYSTEM": "UCRT64",
-    "CHERE_INVOKING": "1",
     "PATH": "${env:PATH};C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;C:\\Users\\${env:USERNAME}\\.cargo\\bin"
   },
   "terminal.integrated.cwd": "${workspaceFolder}",

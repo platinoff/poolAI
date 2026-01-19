@@ -168,6 +168,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-sign-v4"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a35b1c56648ef2a4eefb5a9e4152bf05310c48c459b9e661a8ea80517e0c2d7"
+dependencies = [
+ "chrono",
+ "hex",
+ "http",
+ "ring",
+ "sha256",
+ "url",
+]
+
+[[package]]
 name = "axum"
 version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2045,6 +2059,7 @@ dependencies = [
  "anyhow",
  "async-raft",
  "async-trait",
+ "aws-sign-v4",
  "axum",
  "axum-server",
  "azure_core 0.30.1",
@@ -2056,6 +2071,7 @@ dependencies = [
  "flate2",
  "futures-util",
  "hex",
+ "http",
  "jsonwebtoken",
  "k8s-openapi",
  "lazy_static",
@@ -2677,6 +2693,19 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "sha256"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f880fc8562bdeb709793f00eb42a2ad0e672c4f883bbe59122b926eca935c8f6"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "hex",
+ "sha2",
+ "tokio",
 ]
 
 [[package]]

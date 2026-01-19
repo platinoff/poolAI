@@ -53,6 +53,7 @@ thiserror = "2.0"
 
 # Date and time
 chrono = { version = "0.4", features = ["serde"] }
+# Note: chrono is also used by aws-sign-v4 for timestamps
 
 # UUID generation
 uuid = { version = "1.19", features = ["v4", "serde"] }
@@ -112,6 +113,11 @@ k8s-openapi = { version = "0.24", optional = true }
 # Note: kube-rs requires Rust 1.88+ (home@0.5.12 dependency)
 # Using reqwest + k8s-openapi directly instead for Rust 1.70+ compatibility
 # kube = { version = "0.87", features = ["runtime", "client"], optional = true }
+# AWS Signature Version 4 signing (for REST API calls without full SDK)
+# Note: Using aws-sign-v4 as it supports Rust 1.70+ (alternative to aws-sigv4 which requires 1.88+)
+# Note: aws-sign-v4 uses chrono internally, but we already have chrono in dependencies
+aws-sign-v4 = { version = "0.3", optional = true }
+http = { version = "1", optional = true }
 # AWS SDK (requires Rust 1.88+)
 # Note: Commented out until Rust version is upgraded to 1.88+
 # aws-config = { version = "1.1", optional = true }
@@ -183,6 +189,9 @@ cloud = []
 cloud-sdk = [
     "k8s-openapi/v1_28",  # Enable Kubernetes API v1.28 support
     # "kube", # Requires Rust 1.88+, using reqwest + k8s-openapi directly instead
+    "aws-sign-v4",  # AWS Signature Version 4 signing for REST API (Rust 1.70+ compatible)
+    # Note: chrono is already in dependencies (line 55), no need to add here
+    "http",  # HTTP types for request building
     "azure_core",
     "azure_identity",
     "azure_mgmt_compute"

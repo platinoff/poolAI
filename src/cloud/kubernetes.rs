@@ -427,11 +427,6 @@ impl KubernetesManager {
         // Store body reference for reuse in retry loop
         let body_ref = body.as_ref();
 
-        // Add request body if provided
-        if let Some(body) = body_ref {
-            request = request.json(body);
-        }
-
         // Send request with retry logic for transient errors
         const MAX_RETRIES: u32 = 3;
         const INITIAL_RETRY_DELAY_MS: u64 = 100;

@@ -46,7 +46,7 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tokio::time::{timeout, Duration, Interval};
+use tokio::time::{timeout, Duration};
 use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
@@ -234,7 +234,6 @@ impl LoadBalancer {
                 // Perform health checks for all backends
                 let backends_clone = backends.read().await.clone();
                 let health_config = health_check_config.read().await.clone();
-                drop(health_check_config);
 
                 for backend in backends_clone.values() {
                     // Check backend health
