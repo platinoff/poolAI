@@ -776,6 +776,13 @@ impl SmallWorldStrategyForTask {
         drop(topology);
         drop(coefficients);
 
+        info!(
+            "Selected {} target nodes for artifact {}: {:?}",
+            selected_nodes.len(),
+            artifact_id,
+            selected_nodes
+        );
+
         Ok(selected_nodes)
     }
 
