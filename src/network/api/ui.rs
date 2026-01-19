@@ -18,6 +18,7 @@ use uuid::Uuid;
 
 #[cfg(feature = "enterprise")]
 use crate::enterprise::monitoring::{get_global_monitoring_manager, Dashboard};
+use crate::network::api::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::ui::{components, get_all_themes, get_theme};
 
