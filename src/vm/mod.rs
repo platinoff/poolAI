@@ -524,6 +524,7 @@ pub struct VmTemplate {
 ///         allow_loopback: true,
 ///         allowed_interfaces: vec!["eth0".to_string()],
 ///         allowed_ports: vec![80, 443],
+///         strict: false,
 ///     },
 ///     created_at: Utc::now(),
 /// };

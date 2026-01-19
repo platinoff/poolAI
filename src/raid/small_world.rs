@@ -28,10 +28,19 @@
 //!
 //! ```rust,no_run
 //! use poolai::raid::small_world::{SmallWorldStrategy, SmallWorldConfig};
+//! use poolai::raid::replication::ReplicationEngine;
+//! use poolai::pool::topology::TopologyManager;
+//! use poolai::raid::{RaidConfig, RaidManager};
+//! use std::sync::Arc;
+//! use tokio::sync::RwLock;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let config = SmallWorldConfig::default();
-//! let strategy = SmallWorldStrategy::new(config);
+//! let raid_config = RaidConfig::default_for_platform();
+//! let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+//! let replication_engine = Arc::new(ReplicationEngine::with_defaults(raid_manager, None));
+//! let topology_manager = Arc::new(RwLock::new(TopologyManager::new()));
+//! let strategy = SmallWorldStrategy::new(config, replication_engine, topology_manager, None);
 //! strategy.initialize().await?;
 //! # Ok(())
 //! # }

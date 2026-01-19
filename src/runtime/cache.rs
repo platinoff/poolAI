@@ -25,7 +25,7 @@
 //! cache.put("key1", "value1", None).await;
 //!
 //! // Get an entry
-//! if let Some(value) = cache.get::<String>("key1").await {
+//! if let Some(value) = cache.get("key1").await {
 //!     println!("Found: {}", value);
 //! }
 //!

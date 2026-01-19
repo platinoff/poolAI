@@ -15,10 +15,15 @@
 //!
 //! ```rust,no_run
 //! use poolai::raid::burst_raid::{BurstRaidStrategy, BurstRaidConfig};
+//! use poolai::raid::{RaidConfig, RaidManager};
+//! use std::sync::Arc;
+//! use tokio::sync::RwLock;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! let config = BurstRaidConfig::default();
-//! let strategy = BurstRaidStrategy::new(config);
+//! let raid_config = RaidConfig::default_for_platform();
+//! let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+//! let strategy = BurstRaidStrategy::new(config, raid_manager, None);
 //! strategy.initialize().await?;
 //! # Ok(())
 //! # }

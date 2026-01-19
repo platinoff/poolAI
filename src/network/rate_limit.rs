@@ -15,7 +15,6 @@
 //!
 //! ```no_run
 //! use poolai::network::rate_limit::{RateLimitLayer, RateLimitConfig};
-//! use axum::{Router, middleware};
 //!
 //! # async fn example() {
 //! let config = RateLimitConfig {
@@ -26,14 +25,10 @@
 //!
 //! let rate_limit = RateLimitLayer::new(config);
 //!
-//! let app = Router::new()
-//!     .route("/api/v1/login", login_handler)
-//!     .layer(middleware::from_fn_with_state(
-//!         rate_limit.clone(),
-//!         |req, next| async move {
-//!             rate_limit.middleware(req, next).await
-//!         }
-//!     ));
+//! // Use rate_limit.middleware() in your Axum middleware chain
+//! // Example: router.layer(middleware::from_fn(|req, next| {
+//! //     rate_limit.clone().middleware(req, next)
+//! // }))
 //! # }
 //! ```
 
