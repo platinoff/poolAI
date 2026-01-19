@@ -86,6 +86,7 @@ pub mod raft;
 #[cfg(feature = "raft")]
 pub mod raft_transport;
 pub mod replication;
+pub mod small_world;
 
 /// RAID storage mode
 ///
@@ -257,6 +258,9 @@ pub struct RaidManager {
     /// BurstRAID strategy instance (initialized when mode is BurstRaid)
     /// Lazy initialization - created on first use in put_artifact()
     burst_strategy: Arc<RwLock<Option<Arc<burst_raid::BurstRaidStrategy>>>>,
+    /// SmallWorld strategy instance (initialized when mode is SmallWorld)
+    /// Lazy initialization - created on first use in put_artifact()
+    small_world_strategy: Arc<RwLock<Option<Arc<small_world::SmallWorldStrategy>>>>,
 }
 
 impl RaidManager {
@@ -289,6 +293,7 @@ impl RaidManager {
             artifacts: Arc::new(RwLock::new(ArtifactManifest::new())),
             event_store,
             burst_strategy: Arc::new(RwLock::new(None)),
+            small_world_strategy: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -704,17 +709,31 @@ impl RaidManager {
         }
         self.persist_manifest().await?;
 
-        // If mode is BurstRaid, trigger replication through BurstRAID strategy
-        let is_burst_raid = matches!(cfg.mode, RaidMode::BurstRaid);
+        // If mode is BurstRaid or SmallWorld, trigger replication through strategy
+        let mode = cfg.mode.clone();
         drop(cfg); // Release config lock
 
-        if is_burst_raid {
-            if let Err(e) = self
-                .replicate_artifact_burst_raid(id, bytes.to_vec(), name)
-                .await
-            {
-                warn!("BurstRAID replication failed for artifact {}: {}", id, e);
-                // Continue even if replication fails - artifact is stored locally
+        match mode {
+            RaidMode::BurstRaid => {
+                if let Err(e) = self
+                    .replicate_artifact_burst_raid(id, bytes.to_vec(), name)
+                    .await
+                {
+                    warn!("BurstRAID replication failed for artifact {}: {}", id, e);
+                    // Continue even if replication fails - artifact is stored locally
+                }
+            }
+            RaidMode::SmallWorld => {
+                if let Err(e) = self
+                    .replicate_artifact_small_world(id, bytes.to_vec(), name)
+                    .await
+                {
+                    warn!("SmallWorld replication failed for artifact {}: {}", id, e);
+                    // Continue even if replication fails - artifact is stored locally
+                }
+            }
+            RaidMode::Local => {
+                // No replication needed for local mode
             }
         }
 
@@ -792,6 +811,83 @@ impl RaidManager {
         // Replicate artifact
         strategy
             .replicate_artifact(artifact_id, artifact_data, metadata)
+            .await
+    }
+
+    /// Initialize SmallWorld strategy lazily
+    ///
+    /// Creates SmallWorldStrategy instance if not already initialized.
+    /// Called from put_artifact() when mode is SmallWorld.
+    async fn ensure_small_world_strategy(
+        &self,
+    ) -> Result<Arc<small_world::SmallWorldStrategy>, AppError> {
+        let mut strategy_guard = self.small_world_strategy.write().await;
+
+        if let Some(ref strategy) = *strategy_guard {
+            return Ok(strategy.clone());
+        }
+
+        // Create SmallWorld strategy
+        use small_world::SmallWorldConfig;
+
+        // Create a separate RaidManager instance for ReplicationEngine
+        let cfg = self.config.read().await;
+        let raid_manager_for_engine = Arc::new(RwLock::new(RaidManager::new(RaidConfig {
+            mode: RaidMode::Local, // Use Local for ReplicationEngine's RaidManager
+            base_path: cfg.base_path.clone(),
+            quota_bytes: cfg.quota_bytes,
+            retention_days: cfg.retention_days,
+            gc_on_startup: false,
+        })));
+
+        let replication_config = replication::ReplicationConfig::default();
+        // ReplicationEngine::new signature: (raid_manager, event_store, config)
+        let replication_engine = Arc::new(replication::ReplicationEngine::new(
+            raid_manager_for_engine,
+            self.event_store.clone(),
+            replication_config,
+        ));
+
+        // Get topology manager
+        let topology_manager_arc = crate::pool::topology::get_global_topology_manager()
+            .ok_or_else(|| {
+                AppError::ConfigError(
+                    "Topology manager not initialized. Context: SmallWorld strategy requires topology manager for network-aware placement. Suggestion: Ensure topology manager is initialized before using SmallWorld mode."
+                        .to_string(),
+                )
+            })?;
+        // Clone the Arc to share the same TopologyManager instance
+        let topology_manager = Arc::clone(topology_manager_arc);
+
+        let small_world_config = SmallWorldConfig::default();
+        let strategy = Arc::new(small_world::SmallWorldStrategy::new(
+            small_world_config,
+            replication_engine,
+            topology_manager,
+            self.event_store.clone(),
+        ));
+
+        // Initialize strategy
+        strategy.initialize().await?;
+
+        *strategy_guard = Some(strategy.clone());
+        Ok(strategy)
+    }
+
+    /// Replicate artifact using SmallWorld strategy
+    ///
+    /// Called from put_artifact() when mode is SmallWorld.
+    async fn replicate_artifact_small_world(
+        &self,
+        artifact_id: Uuid,
+        artifact_data: Vec<u8>,
+        artifact_name: &str,
+    ) -> Result<(), AppError> {
+        let strategy = self.ensure_small_world_strategy().await?;
+
+        // Replicate artifact using SmallWorld topology
+        strategy
+            .replicate_artifact(artifact_id, artifact_data, artifact_name)
             .await
     }
 
