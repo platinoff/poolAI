@@ -547,6 +547,7 @@ impl SmallWorldStrategy {
 /// Minimal SmallWorldStrategy clone for background tasks
 struct SmallWorldStrategyForTask {
     config: SmallWorldConfig,
+    #[allow(dead_code)] // Used in future rebalancing operations
     replication_engine: Arc<ReplicationEngine>,
     topology_manager: Arc<RwLock<TopologyManager>>,
     artifact_placements: Arc<RwLock<HashMap<Uuid, Vec<u64>>>>,

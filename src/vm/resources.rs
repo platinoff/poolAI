@@ -278,31 +278,6 @@ mod windows {
 #[cfg(target_os = "linux")]
 mod linux {
     use super::*;
-    use std::sync::{Arc, OnceLock};
-    use tokio::sync::RwLock;
-
-    // Global LinuxCgroupLimiter instance (lazy initialization)
-    static CGROUP_LIMITER: OnceLock<
-        Arc<RwLock<Option<crate::vm::resources::linux::LinuxCgroupLimiter>>>,
-    > = OnceLock::new();
-
-    fn get_limiter(
-    ) -> Result<Arc<RwLock<Option<crate::vm::resources::linux::LinuxCgroupLimiter>>>, AppError>
-    {
-        CGROUP_LIMITER
-            .get_or_init(|| {
-                match crate::vm::resources::linux::LinuxCgroupLimiter::new() {
-                    Ok(limiter) => Arc::new(RwLock::new(Some(limiter))),
-                    Err(_) => {
-                        // cgroups not available, use None
-                        Arc::new(RwLock::new(None))
-                    }
-                }
-            })
-            .clone();
-
-        Ok(CGROUP_LIMITER.get().unwrap().clone())
-    }
 
     pub async fn apply_linux_limits(
         command: &mut Command,

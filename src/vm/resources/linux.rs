@@ -13,6 +13,7 @@ use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
 
 /// Linux cgroup manager for resource limiting
+#[allow(dead_code)] // Used in resources.rs
 pub struct LinuxCgroupLimiter {
     /// Base path for cgroup filesystem
     cgroup_root: PathBuf,
