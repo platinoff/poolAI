@@ -31,7 +31,7 @@ use tokio::sync::RwLock;
 use tracing::info;
 
 #[cfg(feature = "cloud-sdk")]
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 #[cfg(feature = "cloud-sdk")]
 use jsonwebtoken::{encode, EncodingKey, Header};
 #[cfg(feature = "cloud-sdk")]
@@ -50,9 +50,16 @@ pub struct GcpManager {
     /// HTTP client for GCP REST API calls
     http_client: Arc<RwLock<Option<HttpClient>>>,
     #[cfg(feature = "cloud-sdk")]
-    /// GCP access token for authentication
-    /// Note: Retrieved via Application Default Credentials (ADC) or service account key
-    access_token: Arc<RwLock<Option<String>>>,
+    /// Cached GCP access token with expiration time
+    /// Token is refreshed automatically when expired or about to expire
+    cached_token: Arc<RwLock<Option<CachedToken>>>,
+}
+
+#[cfg(feature = "cloud-sdk")]
+/// Cached token with expiration time
+struct CachedToken {
+    token: String,
+    expires_at: DateTime<Utc>,
 }
 
 impl GcpManager {
@@ -76,7 +83,7 @@ impl GcpManager {
             #[cfg(feature = "cloud-sdk")]
             http_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
-            access_token: Arc::new(RwLock::new(None)),
+            cached_token: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -139,13 +146,13 @@ impl GcpManager {
                 )))?;
             *self.http_client.write().await = Some(http_client);
 
-            // Initialize GCP access token
+            // Initialize GCP access token (with caching)
             // Note: GCP authentication tries multiple methods in order:
             // 1. Metadata server (when running on GCP Compute Engine, Cloud Run, etc.)
             // 2. Service account key file - `GOOGLE_APPLICATION_CREDENTIALS` env var
             // 3. Application Default Credentials (ADC) - `gcloud auth application-default login`
-            let token = self.get_gcp_access_token().await?;
-            *self.access_token.write().await = Some(token.clone());
+            // Token will be cached with expiration time and automatically refreshed
+            let _ = self.get_gcp_access_token().await?;
 
             info!(
                 "GCP HTTP client and access token initialized for project: {}",
@@ -166,28 +173,73 @@ impl GcpManager {
     }
 
     #[cfg(feature = "cloud-sdk")]
-    /// Get GCP access token
+    /// Get GCP access token with fallback methods and caching
     ///
     /// Tries multiple authentication methods in order:
     /// 1. Metadata server (when running on GCP)
     /// 2. Service account key file (GOOGLE_APPLICATION_CREDENTIALS env var)
     /// 3. Application Default Credentials (ADC) via gcloud
     ///
+    /// Tokens are cached with expiration time and automatically refreshed when expired or about to expire.
+    ///
     /// # Errors
     ///
     /// Returns `AppError::InitializationError` if no valid credentials can be found.
     async fn get_gcp_access_token(&self) -> Result<String, AppError> {
+        // Check cached token first
+        {
+            let cached_guard = self.cached_token.read().await;
+            if let Some(cached) = cached_guard.as_ref() {
+                // Refresh token if it expires in less than 5 minutes
+                let refresh_threshold = Utc::now() + Duration::minutes(5);
+                if cached.expires_at > refresh_threshold {
+                    info!(
+                        "GCP access token obtained from cache (expires at {})",
+                        cached.expires_at
+                    );
+                    return Ok(cached.token.clone());
+                }
+            }
+        }
+
+        // Token expired or not cached, acquire new token
+        let (token, expires_in_seconds) = self.acquire_gcp_token().await?;
+
+        // Calculate expiration time
+        let expires_at = Utc::now() + Duration::seconds(expires_in_seconds as i64);
+
+        // Cache the token
+        {
+            let mut cached_guard = self.cached_token.write().await;
+            *cached_guard = Some(CachedToken {
+                token: token.clone(),
+                expires_at,
+            });
+        }
+
+        info!(
+            "GCP access token acquired and cached (expires at {})",
+            expires_at
+        );
+        Ok(token)
+    }
+
+    #[cfg(feature = "cloud-sdk")]
+    /// Acquire GCP access token from available sources
+    ///
+    /// Returns tuple of (token, expires_in_seconds)
+    async fn acquire_gcp_token(&self) -> Result<(String, u64), AppError> {
         // Try 1: Metadata server (when running on GCP Compute Engine, Cloud Run, etc.)
-        if let Ok(token) = self.get_token_from_metadata_server().await {
+        if let Ok((token, expires_in)) = self.get_token_from_metadata_server().await {
             info!("GCP access token obtained from metadata server");
-            return Ok(token);
+            return Ok((token, expires_in));
         }
 
         // Try 2: Service account key file (GOOGLE_APPLICATION_CREDENTIALS env var)
         if let Ok(credentials_path) = std::env::var("GOOGLE_APPLICATION_CREDENTIALS") {
-            if let Ok(token) = self.get_token_from_service_account(&credentials_path).await {
+            if let Ok((token, expires_in)) = self.get_token_from_service_account(&credentials_path).await {
                 info!("GCP access token obtained from service account key file");
-                return Ok(token);
+                return Ok((token, expires_in));
             }
         }
 
@@ -209,7 +261,8 @@ impl GcpManager {
     /// Get access token from GCP metadata server
     ///
     /// This works when running on GCP Compute Engine, Cloud Run, App Engine, etc.
-    async fn get_token_from_metadata_server(&self) -> Result<String, AppError> {
+    /// Returns tuple of (token, expires_in_seconds)
+    async fn get_token_from_metadata_server(&self) -> Result<(String, u64), AppError> {
         let metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token";
 
         // Create a temporary client for metadata server (one-time use during initialization)
@@ -250,14 +303,23 @@ impl GcpManager {
             ))
         })?;
 
-        json.get("access_token")
+        let token = json
+            .get("access_token")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string())
             .ok_or_else(|| {
                 AppError::InitializationError(
                     "Metadata server response missing access_token field".to_string(),
                 )
-            })
+            })?;
+
+        // Extract expires_in (default to 3600 seconds if not present)
+        let expires_in = json
+            .get("expires_in")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(3600);
+
+        Ok((token, expires_in))
     }
 
     #[cfg(feature = "cloud-sdk")]
@@ -269,7 +331,8 @@ impl GcpManager {
     /// 2. Create JWT assertion with claims (iss, sub, aud, exp, iat)
     /// 3. Sign JWT with RSA private key from service account
     /// 4. Exchange JWT for access token via Google OAuth2 token endpoint
-    async fn get_token_from_service_account(&self, key_path: &str) -> Result<String, AppError> {
+    /// Returns tuple of (token, expires_in_seconds)
+    async fn get_token_from_service_account(&self, key_path: &str) -> Result<(String, u64), AppError> {
         use serde::Deserialize;
         use std::fs;
 
@@ -399,7 +462,7 @@ impl GcpManager {
             ))
         })?;
 
-        token_response
+        let token = token_response
             .get("access_token")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string())
@@ -408,7 +471,15 @@ impl GcpManager {
                     "Token response missing access_token. Context: Google OAuth2 response does not contain access_token field. \
                     Suggestion: Check service account key validity and permissions.".to_string()
                 )
-            })
+            })?;
+
+        // Extract expires_in (default to 3600 seconds if not present)
+        let expires_in = token_response
+            .get("expires_in")
+            .and_then(|v| v.as_u64())
+            .unwrap_or(3600);
+
+        Ok((token, expires_in))
     }
 
     /// Shutdown GCP integration
@@ -433,7 +504,7 @@ impl GcpManager {
         {
             // Clear clients
             *self.http_client.write().await = None;
-            *self.access_token.write().await = None;
+            *self.cached_token.write().await = None;
         }
 
         *self.initialized.write().await = false;
@@ -488,12 +559,7 @@ impl GcpManager {
                 )
             })?;
 
-            let token_guard = self.access_token.read().await;
-            let token = token_guard.as_ref().ok_or_else(|| {
-                AppError::InitializationError(
-                    "GCP access token not initialized. Call initialize() first.".to_string(),
-                )
-            })?;
+            let token = self.get_gcp_access_token().await?;
 
             // Create instance name
             let instance_name = format!("poolai-instance-{}", uuid::Uuid::new_v4());
