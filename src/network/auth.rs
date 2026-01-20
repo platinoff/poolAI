@@ -289,7 +289,6 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
     {
         // Real JWT token validation
         let config = JwtConfig::default();
-        use jsonwebtoken::{decode, DecodingKey, Validation};
         let key = DecodingKey::from_secret(config.secret.as_ref());
         let validation = Validation::default();
 
