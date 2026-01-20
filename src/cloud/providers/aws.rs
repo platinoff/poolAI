@@ -33,18 +33,18 @@
 //! ```
 
 use crate::core::error::AppError;
-#[cfg(feature = "cloud-sdk")]
-use aws_sign_v4::AwsSign;
-#[cfg(feature = "cloud-sdk")]
-use chrono::Utc;
-#[cfg(feature = "cloud-sdk")]
-use http::header::HeaderMap;
 #[cfg(feature = "aws-sdk-ec2")]
 use aws_sdk_ec2::Client as Ec2Client;
 #[cfg(feature = "aws-sdk-ecs")]
 use aws_sdk_ecs::Client as EcsClient;
 #[cfg(feature = "aws-sdk-s3")]
 use aws_sdk_s3::Client as S3Client;
+#[cfg(feature = "cloud-sdk")]
+use aws_sign_v4::AwsSign;
+#[cfg(feature = "cloud-sdk")]
+use chrono::Utc;
+#[cfg(feature = "cloud-sdk")]
+use http::header::HeaderMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -150,10 +150,7 @@ impl AwsManager {
 
                 // Create region provider (AWS_REGION env var or default)
                 let region_provider = RegionProviderChain::first_try(
-                    std::env::var("AWS_REGION")
-                        .ok()
-                        .map(Region::new)
-                        .as_ref(),
+                    std::env::var("AWS_REGION").ok().map(Region::new).as_ref(),
                 )
                 .or_default_provider()
                 .or_else(Region::new(region_str.to_string()));
@@ -163,10 +160,7 @@ impl AwsManager {
                 // 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
                 // 2. AWS credentials file (~/.aws/credentials)
                 // 3. IAM roles (when running on EC2/ECS/Lambda)
-                let config = aws_config::from_env()
-                    .region(region_provider)
-                    .load()
-                    .await;
+                let config = aws_config::from_env().region(region_provider).load().await;
 
                 // Initialize EC2 client
                 #[cfg(feature = "aws-sdk-ec2")]
@@ -592,7 +586,7 @@ impl AwsManager {
                         cluster, task_definition, region
                     );
 
-                    use aws_sdk_ecs::types::{RunTaskRequest};
+                    use aws_sdk_ecs::types::RunTaskRequest;
 
                     // Build RunTask request
                     let request = RunTaskRequest::builder()

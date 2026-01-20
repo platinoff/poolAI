@@ -237,7 +237,9 @@ impl GcpManager {
 
         // Try 2: Service account key file (GOOGLE_APPLICATION_CREDENTIALS env var)
         if let Ok(credentials_path) = std::env::var("GOOGLE_APPLICATION_CREDENTIALS") {
-            if let Ok((token, expires_in)) = self.get_token_from_service_account(&credentials_path).await {
+            if let Ok((token, expires_in)) =
+                self.get_token_from_service_account(&credentials_path).await
+            {
                 info!("GCP access token obtained from service account key file");
                 return Ok((token, expires_in));
             }
@@ -332,7 +334,10 @@ impl GcpManager {
     /// 3. Sign JWT with RSA private key from service account
     /// 4. Exchange JWT for access token via Google OAuth2 token endpoint
     /// Returns tuple of (token, expires_in_seconds)
-    async fn get_token_from_service_account(&self, key_path: &str) -> Result<(String, u64), AppError> {
+    async fn get_token_from_service_account(
+        &self,
+        key_path: &str,
+    ) -> Result<(String, u64), AppError> {
         use serde::Deserialize;
         use std::fs;
 
