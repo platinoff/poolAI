@@ -39,6 +39,12 @@ use aws_sign_v4::AwsSign;
 use chrono::Utc;
 #[cfg(feature = "cloud-sdk")]
 use http::header::HeaderMap;
+#[cfg(feature = "aws-sdk-ec2")]
+use aws_sdk_ec2::Client as Ec2Client;
+#[cfg(feature = "aws-sdk-ecs")]
+use aws_sdk_ecs::Client as EcsClient;
+#[cfg(feature = "aws-sdk-s3")]
+use aws_sdk_s3::Client as S3Client;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -48,14 +54,23 @@ pub struct AwsManager {
     region: Option<String>,
     initialized: Arc<RwLock<bool>>,
     #[cfg(feature = "cloud-sdk")]
-    /// HTTP client for AWS REST API calls
+    /// HTTP client for AWS REST API calls (fallback when SDK not available)
     http_client: Arc<RwLock<Option<reqwest::Client>>>,
     #[cfg(feature = "cloud-sdk")]
-    /// AWS access key ID (from environment or config)
+    /// AWS access key ID (from environment or config, used for REST API fallback)
     access_key_id: Option<String>,
     #[cfg(feature = "cloud-sdk")]
-    /// AWS secret access key (from environment or config)
+    /// AWS secret access key (from environment or config, used for REST API fallback)
     secret_access_key: Option<String>,
+    #[cfg(feature = "aws-sdk-ec2")]
+    /// AWS SDK EC2 client
+    ec2_client: Arc<RwLock<Option<Ec2Client>>>,
+    #[cfg(feature = "aws-sdk-ecs")]
+    /// AWS SDK ECS client
+    ecs_client: Arc<RwLock<Option<EcsClient>>>,
+    #[cfg(feature = "aws-sdk-s3")]
+    /// AWS SDK S3 client
+    s3_client: Arc<RwLock<Option<S3Client>>>,
 }
 
 impl AwsManager {
@@ -82,6 +97,12 @@ impl AwsManager {
             access_key_id: std::env::var("AWS_ACCESS_KEY_ID").ok(),
             #[cfg(feature = "cloud-sdk")]
             secret_access_key: std::env::var("AWS_SECRET_ACCESS_KEY").ok(),
+            #[cfg(feature = "aws-sdk-ec2")]
+            ec2_client: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "aws-sdk-ecs")]
+            ecs_client: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "aws-sdk-s3")]
+            s3_client: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -116,10 +137,68 @@ impl AwsManager {
 
         #[cfg(feature = "cloud-sdk")]
         {
-            let region = self.region.as_deref().unwrap_or("us-east-1");
-            info!("Initializing AWS integration for region: {}", region);
+            let region_str = self.region.as_deref().unwrap_or("us-east-1");
+            info!("Initializing AWS integration for region: {}", region_str);
 
-            // Initialize HTTP client with connection pooling for REST API calls
+            // Try to initialize AWS SDK clients first (if available)
+            #[cfg(feature = "aws-config")]
+            {
+                use aws_config::meta::region::RegionProviderChain;
+                use aws_sdk_ec2::config::Region;
+
+                info!("Initializing AWS SDK clients...");
+
+                // Create region provider (AWS_REGION env var or default)
+                let region_provider = RegionProviderChain::first_try(
+                    std::env::var("AWS_REGION")
+                        .ok()
+                        .map(Region::new)
+                        .as_ref(),
+                )
+                .or_default_provider()
+                .or_else(Region::new(region_str.to_string()));
+
+                // Load AWS config with automatic credential chain resolution
+                // AWS SDK will try in order:
+                // 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+                // 2. AWS credentials file (~/.aws/credentials)
+                // 3. IAM roles (when running on EC2/ECS/Lambda)
+                let config = aws_config::from_env()
+                    .region(region_provider)
+                    .load()
+                    .await;
+
+                // Initialize EC2 client
+                #[cfg(feature = "aws-sdk-ec2")]
+                {
+                    let ec2_client = aws_sdk_ec2::Client::new(&config);
+                    *self.ec2_client.write().await = Some(ec2_client);
+                    info!("AWS SDK EC2 client initialized");
+                }
+
+                // Initialize ECS client
+                #[cfg(feature = "aws-sdk-ecs")]
+                {
+                    let ecs_client = aws_sdk_ecs::Client::new(&config);
+                    *self.ecs_client.write().await = Some(ecs_client);
+                    info!("AWS SDK ECS client initialized");
+                }
+
+                // Initialize S3 client
+                #[cfg(feature = "aws-sdk-s3")]
+                {
+                    let s3_client = aws_sdk_s3::Client::new(&config);
+                    *self.s3_client.write().await = Some(s3_client);
+                    info!("AWS SDK S3 client initialized");
+                }
+
+                info!(
+                    "AWS SDK clients initialized successfully for region: {}",
+                    config.region().map(|r| r.as_ref()).unwrap_or(region_str)
+                );
+            }
+
+            // Also initialize HTTP client for REST API fallback (if SDK not available or for backward compatibility)
             let http_client = reqwest::Client::builder()
                 .pool_idle_timeout(std::time::Duration::from_secs(90))
                 .pool_max_idle_per_host(10)
@@ -132,20 +211,17 @@ impl AwsManager {
                 )))?;
             *self.http_client.write().await = Some(http_client);
 
-            // Verify credentials are available (warn if not set, but don't fail)
-            // Note: AWS SDK would handle credential chain automatically, but for REST API we need explicit credentials
-            if self.access_key_id.is_none() || self.secret_access_key.is_none() {
-                warn!(
-                    "AWS credentials not found. Context: AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY not set. \
-                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, or use AWS IAM roles. \
-                    Note: REST API calls will fail without valid credentials."
-                );
+            // Note: AWS SDK handles credential chain automatically, so we only warn for REST API fallback
+            #[cfg(not(feature = "aws-config"))]
+            {
+                if self.access_key_id.is_none() || self.secret_access_key.is_none() {
+                    warn!(
+                        "AWS credentials not found. Context: AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY not set. \
+                        Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, or use AWS IAM roles. \
+                        Note: REST API calls will fail without valid credentials. Consider enabling AWS SDK (requires Rust 1.88+) for automatic credential chain resolution."
+                    );
+                }
             }
-
-            info!(
-                "AWS HTTP client initialized for region: {} (REST API approach)",
-                region
-            );
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
@@ -216,6 +292,56 @@ impl AwsManager {
         {
             let region = self.region.as_deref().unwrap_or("us-east-1");
 
+            // Try AWS SDK first (if available)
+            #[cfg(feature = "aws-sdk-ec2")]
+            {
+                let ec2_guard = self.ec2_client.read().await;
+                if let Some(ec2_client) = ec2_guard.as_ref() {
+                    info!(
+                        "Creating EC2 instance: {} / {} in region {} (AWS SDK)",
+                        instance_type, image_id, region
+                    );
+
+                    use aws_sdk_ec2::types::{
+                        BlockDeviceMapping, EbsBlockDevice, IamInstanceProfileSpecification,
+                        InstanceType, LaunchTemplateSpecification, RunInstancesRequest,
+                    };
+
+                    // Build RunInstances request
+                    let request = RunInstancesRequest::builder()
+                        .image_id(image_id)
+                        .instance_type(InstanceType::from(instance_type))
+                        .min_count(1)
+                        .max_count(1)
+                        .build();
+
+                    match ec2_client.run_instances().with(request).send().await {
+                        Ok(response) => {
+                            if let Some(instances) = response.instances {
+                                if let Some(instance) = instances.first() {
+                                    if let Some(instance_id) = instance.instance_id() {
+                                        info!(
+                                            "EC2 instance created successfully via AWS SDK: {}",
+                                            instance_id
+                                        );
+                                        return Ok(instance_id.to_string());
+                                    }
+                                }
+                            }
+                            Err(AppError::NetworkError(
+                                "EC2 RunInstances response missing instance ID".to_string(),
+                            ))
+                        }
+                        Err(e) => Err(AppError::NetworkError(format!(
+                            "EC2 RunInstances API call failed via AWS SDK. Context: AWS SDK request failed. \
+                            Error: {}. Suggestion: Check AWS credentials, permissions, instance type, and AMI ID.",
+                            e
+                        ))),
+                    }?;
+                }
+            }
+
+            // Fallback to REST API if SDK not available
             // Get HTTP client
             let client_guard = self.http_client.read().await;
             let client = client_guard.as_ref().ok_or_else(|| {
@@ -224,18 +350,20 @@ impl AwsManager {
                 )
             })?;
 
-            // Get credentials
+            // Get credentials for REST API
             let access_key = self.access_key_id.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
                     "AWS_ACCESS_KEY_ID not set. Context: AWS credentials required for EC2 API calls. \
-                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
+                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, \
+                    or use AWS SDK (enables automatic credential chain resolution)."
                         .to_string(),
                 )
             })?;
             let secret_key = self.secret_access_key.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
                     "AWS_SECRET_ACCESS_KEY not set. Context: AWS credentials required for EC2 API calls. \
-                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
+                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, \
+                    or use AWS SDK (enables automatic credential chain resolution)."
                         .to_string(),
                 )
             })?;
@@ -454,6 +582,52 @@ impl AwsManager {
         {
             let region = self.region.as_deref().unwrap_or("us-east-1");
 
+            // Try AWS SDK first (if available)
+            #[cfg(feature = "aws-sdk-ecs")]
+            {
+                let ecs_guard = self.ecs_client.read().await;
+                if let Some(ecs_client) = ecs_guard.as_ref() {
+                    info!(
+                        "Creating ECS task: {} / {} in region {} (AWS SDK)",
+                        cluster, task_definition, region
+                    );
+
+                    use aws_sdk_ecs::types::{RunTaskRequest};
+
+                    // Build RunTask request
+                    let request = RunTaskRequest::builder()
+                        .cluster(cluster)
+                        .task_definition(task_definition)
+                        .count(1)
+                        .build();
+
+                    match ecs_client.run_task().with(request).send().await {
+                        Ok(response) => {
+                            if let Some(tasks) = response.tasks {
+                                if let Some(task) = tasks.first() {
+                                    if let Some(task_arn) = task.task_arn() {
+                                        info!(
+                                            "ECS task created successfully via AWS SDK: {}",
+                                            task_arn
+                                        );
+                                        return Ok(task_arn.to_string());
+                                    }
+                                }
+                            }
+                            Err(AppError::NetworkError(
+                                "ECS RunTask response missing task ARN".to_string(),
+                            ))
+                        }
+                        Err(e) => Err(AppError::NetworkError(format!(
+                            "ECS RunTask API call failed via AWS SDK. Context: AWS SDK request failed. \
+                            Error: {}. Suggestion: Check AWS credentials, permissions, cluster name, and task definition.",
+                            e
+                        ))),
+                    }?;
+                }
+            }
+
+            // Fallback to REST API if SDK not available
             // Get HTTP client
             let client_guard = self.http_client.read().await;
             let client = client_guard.as_ref().ok_or_else(|| {
@@ -462,18 +636,20 @@ impl AwsManager {
                 )
             })?;
 
-            // Get credentials
+            // Get credentials for REST API
             let access_key = self.access_key_id.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
                     "AWS_ACCESS_KEY_ID not set. Context: AWS credentials required for ECS API calls. \
-                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
+                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, \
+                    or use AWS SDK (enables automatic credential chain resolution)."
                         .to_string(),
                 )
             })?;
             let secret_key = self.secret_access_key.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
                     "AWS_SECRET_ACCESS_KEY not set. Context: AWS credentials required for ECS API calls. \
-                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
+                    Suggestion: Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables, \
+                    or use AWS SDK (enables automatic credential chain resolution)."
                         .to_string(),
                 )
             })?;
@@ -668,7 +844,16 @@ impl AwsManager {
     pub async fn shutdown(&self) -> Result<(), AppError> {
         #[cfg(feature = "cloud-sdk")]
         {
+            // Clear HTTP client (REST API fallback)
             *self.http_client.write().await = None;
+
+            // Clear AWS SDK clients
+            #[cfg(feature = "aws-sdk-ec2")]
+            *self.ec2_client.write().await = None;
+            #[cfg(feature = "aws-sdk-ecs")]
+            *self.ecs_client.write().await = None;
+            #[cfg(feature = "aws-sdk-s3")]
+            *self.s3_client.write().await = None;
         }
 
         *self.initialized.write().await = false;

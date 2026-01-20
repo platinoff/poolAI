@@ -190,7 +190,7 @@ cloud = []
 cloud-sdk = [
     "k8s-openapi/v1_28",  # Enable Kubernetes API v1.28 support
     # "kube", # Requires Rust 1.88+, using reqwest + k8s-openapi directly instead
-    "aws-sign-v4",  # AWS Signature Version 4 signing for REST API (Rust 1.70+ compatible)
+    "aws-sign-v4",  # AWS Signature Version 4 signing for REST API (Rust 1.70+ compatible, fallback)
     # Note: chrono is already in dependencies (line 55), no need to add here
     "http",  # HTTP types for request building
     "aws-config",  # AWS SDK config (Rust 1.88+ compatible, now available with 1.92.0)
