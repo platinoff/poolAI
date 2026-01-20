@@ -21,8 +21,8 @@ cargo build --features enterprise,https,jwt
 Or use the provided script:
 
 ```bash
-chmod +x build-with-https.sh
-./build-with-https.sh
+chmod +x scripts/build-with-https.sh
+./scripts/build-with-https.sh
 ```
 
 ### In PowerShell:
