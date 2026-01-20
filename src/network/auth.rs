@@ -41,7 +41,7 @@ use axum::{
 // JWT support (optional - enabled with feature "jwt")
 use base64::Engine;
 #[cfg(feature = "jwt")]
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
