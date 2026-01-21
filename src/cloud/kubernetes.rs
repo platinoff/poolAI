@@ -403,7 +403,7 @@ impl KubernetesManager {
             )))?;
 
         let url = format!("{}{}", base_url, path);
-        let mut request = match method {
+        let request = match method {
             "GET" => client.get(&url),
             "POST" => client.post(&url),
             "PUT" => client.put(&url),

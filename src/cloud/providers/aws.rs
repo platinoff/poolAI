@@ -150,7 +150,7 @@ impl AwsManager {
 
                 // Create region provider (AWS_REGION env var or default)
                 let region_provider = RegionProviderChain::first_try(
-                    std::env::var("AWS_REGION").ok().map(Region::new).as_ref(),
+                    std::env::var("AWS_REGION").ok().map(Region::new),
                 )
                 .or_default_provider()
                 .or_else(Region::new(region_str.to_string()));
@@ -160,7 +160,10 @@ impl AwsManager {
                 // 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
                 // 2. AWS credentials file (~/.aws/credentials)
                 // 3. IAM roles (when running on EC2/ECS/Lambda)
-                let config = aws_config::from_env().region(region_provider).load().await;
+                let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+                    .region(region_provider)
+                    .load()
+                    .await;
 
                 // Initialize EC2 client
                 #[cfg(feature = "aws-sdk-ec2")]
@@ -296,22 +299,20 @@ impl AwsManager {
                         instance_type, image_id, region
                     );
 
-                    use aws_sdk_ec2::types::{
-                        BlockDeviceMapping, EbsBlockDevice, IamInstanceProfileSpecification,
-                        InstanceType, LaunchTemplateSpecification, RunInstancesRequest,
-                    };
+                    use aws_sdk_ec2::types::InstanceType;
 
-                    // Build RunInstances request
-                    let request = RunInstancesRequest::builder()
+                    // Build RunInstances request using fluent builder
+                    match ec2_client
+                        .run_instances()
                         .image_id(image_id)
                         .instance_type(InstanceType::from(instance_type))
                         .min_count(1)
                         .max_count(1)
-                        .build();
-
-                    match ec2_client.run_instances().with(request).send().await {
+                        .send()
+                        .await
+                    {
                         Ok(response) => {
-                            if let Some(instances) = response.instances {
+                            if let Some(instances) = response.instances() {
                                 if let Some(instance) = instances.first() {
                                     if let Some(instance_id) = instance.instance_id() {
                                         info!(
@@ -586,18 +587,17 @@ impl AwsManager {
                         cluster, task_definition, region
                     );
 
-                    use aws_sdk_ecs::types::RunTaskRequest;
-
-                    // Build RunTask request
-                    let request = RunTaskRequest::builder()
+                    // Build RunTask request using fluent builder
+                    match ecs_client
+                        .run_task()
                         .cluster(cluster)
                         .task_definition(task_definition)
                         .count(1)
-                        .build();
-
-                    match ecs_client.run_task().with(request).send().await {
+                        .send()
+                        .await
+                    {
                         Ok(response) => {
-                            if let Some(tasks) = response.tasks {
+                            if let Some(tasks) = response.tasks() {
                                 if let Some(task) = tasks.first() {
                                     if let Some(task_arn) = task.task_arn() {
                                         info!(
@@ -842,12 +842,15 @@ impl AwsManager {
             *self.http_client.write().await = None;
 
             // Clear AWS SDK clients
-            #[cfg(feature = "aws-sdk-ec2")]
-            *self.ec2_client.write().await = None;
-            #[cfg(feature = "aws-sdk-ecs")]
-            *self.ecs_client.write().await = None;
-            #[cfg(feature = "aws-sdk-s3")]
-            *self.s3_client.write().await = None;
+            if cfg!(feature = "aws-sdk-ec2") {
+                *self.ec2_client.write().await = None;
+            }
+            if cfg!(feature = "aws-sdk-ecs") {
+                *self.ecs_client.write().await = None;
+            }
+            if cfg!(feature = "aws-sdk-s3") {
+                *self.s3_client.write().await = None;
+            }
         }
 
         *self.initialized.write().await = false;
