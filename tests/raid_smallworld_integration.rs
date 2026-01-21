@@ -124,6 +124,9 @@ async fn test_rebalance_with_real_artifacts() {
     let metrics = strategy.get_metrics().await;
     assert_eq!(metrics.total_artifacts, 5, "Should track 5 artifacts");
     assert_eq!(metrics.total_nodes, 3, "Should have 3 nodes");
+
+    // Cleanup: shutdown strategy
+    strategy.shutdown().await;
 }
 
 #[tokio::test]
@@ -157,6 +160,9 @@ async fn test_node_selection_based_on_clustering() {
         metrics.avg_clustering_coefficient >= 0.0,
         "Average clustering coefficient should be calculated"
     );
+
+    // Cleanup: shutdown strategy
+    strategy.shutdown().await;
 }
 
 #[tokio::test]
@@ -185,6 +191,9 @@ async fn test_metrics_collection() {
         metrics.avg_clustering_coefficient >= 0.0 && metrics.avg_clustering_coefficient <= 1.0,
         "Average clustering coefficient should be between 0 and 1"
     );
+
+    // Cleanup: shutdown strategy
+    strategy.shutdown().await;
 }
 
 #[tokio::test]
@@ -207,6 +216,9 @@ async fn test_node_clustering_coefficient() {
     // Non-existent node should return None
     let coeff_none = strategy.get_node_clustering_coefficient(999).await;
     assert!(coeff_none.is_none(), "Non-existent node should return None");
+
+    // Cleanup: shutdown strategy
+    strategy.shutdown().await;
 }
 
 #[tokio::test]
@@ -234,4 +246,7 @@ async fn test_rebalance_optimizes_placement() {
     // Verify metrics are updated
     let metrics = strategy.get_metrics().await;
     assert_eq!(metrics.total_artifacts, 1, "Should track 1 artifact");
+
+    // Cleanup: shutdown strategy
+    strategy.shutdown().await;
 }
