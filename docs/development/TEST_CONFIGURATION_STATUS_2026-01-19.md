@@ -102,7 +102,27 @@
    - ✅ `test_gcp_token_refresh_and_caching()` - перевіряє token refresh та caching
    - ✅ Перевіряє shutdown та re-initialization
 
-**Статус**: ✅ Базові тести покривають основну функціональність
+4. **Extended AWS Integration Tests:**
+   - ✅ `test_aws_ec2_instance_creation_with_valid_params()` - тест створення EC2 з валідними параметрами
+   - ✅ `test_aws_ec2_instance_creation_with_invalid_ami()` - тест валідації AMI
+   - ✅ `test_aws_ecs_task_creation_with_valid_params()` - тест створення ECS task з валідними параметрами
+   - ✅ `test_aws_ecs_task_creation_with_invalid_task_def()` - тест валідації task definition
+
+5. **Extended Azure Integration Tests:**
+   - ✅ `test_azure_vmss_creation_with_valid_params()` - тест створення VM Scale Set з валідними параметрами
+   - ✅ `test_azure_vmss_creation_with_invalid_name()` - тест валідації імені
+   - ✅ `test_azure_vmss_creation_without_subscription_id()` - тест валідації subscription ID
+
+6. **Extended GCP Integration Tests:**
+   - ✅ `test_gcp_compute_instance_creation_with_valid_params()` - тест створення Compute instance з валідними параметрами
+   - ✅ `test_gcp_compute_instance_creation_with_invalid_zone()` - тест валідації zone
+   - ✅ `test_gcp_compute_instance_creation_without_project_id()` - тест валідації project ID
+
+7. **Cross-Provider Tests:**
+   - ✅ `test_multiple_providers_initialization()` - тест одночасної ініціалізації кількох провайдерів
+   - ✅ `test_provider_shutdown_after_timeout()` - тест shutdown після timeout
+
+**Статус**: ✅ Розширені тести покривають операції та валідацію для всіх провайдерів
 
 ---
 
@@ -152,14 +172,15 @@
 
 **Поточний стан**: 60% integration tests
 
-**Відсутні тести:**
-- ⏳ AWS SDK EC2 instance creation
-- ⏳ AWS SDK ECS task creation
-- ⏳ Azure VM Scale Set creation з mock server
-- ⏳ GCP Compute Engine instance creation з mock server
-- ⏳ Token refresh scenarios для всіх провайдерів
+**Додано тести:**
+- ✅ AWS SDK EC2 instance creation (з валідацією)
+- ✅ AWS SDK ECS task creation (з валідацією)
+- ✅ Azure VM Scale Set creation (з валідацією)
+- ✅ GCP Compute Engine instance creation (з валідацією)
+- ✅ Cross-provider integration tests
+- ✅ Timeout та error recovery tests
 
-**Рекомендація**: Додати більше integration tests з mock servers
+**Рекомендація**: Можна додати mock servers для success scenarios (опціонально)
 
 ---
 
