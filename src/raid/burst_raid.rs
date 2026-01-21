@@ -704,7 +704,7 @@ impl BurstRaidStrategy {
 
         if distribution.is_empty() {
             info!("No artifacts to rebalance");
-            return Ok(());
+            return Ok(0);
         }
 
         info!(
@@ -718,7 +718,7 @@ impl BurstRaidStrategy {
 
         if rebalance_plan.is_empty() {
             info!("Rebalancing not needed: distribution is already balanced");
-            return Ok(());
+            return Ok(0);
         }
 
         info!(
@@ -748,7 +748,7 @@ impl BurstRaidStrategy {
             moved_count, failed_count
         );
 
-        Ok(())
+        Ok(moved_count)
     }
 
     /// Analyze current distribution of artifacts across nodes
@@ -936,6 +936,34 @@ impl BurstRaidStrategy {
             .await?;
 
         Ok(())
+    }
+
+    /// Get BurstRAID metrics
+    ///
+    /// Returns overall metrics for the BurstRAID strategy.
+    ///
+    /// # Returns
+    ///
+    /// Returns `BurstRaidMetrics` with current statistics.
+    pub async fn get_metrics(&self) -> BurstRaidMetrics {
+        let request_counters = self.request_counters.read().await;
+        let burst_states = self.burst_states.read().await;
+        let replication_engine = self.replication_engine.get_raid_manager();
+        let raid_manager = replication_engine.read().await;
+        let artifacts = raid_manager.artifacts.read().await;
+
+        let total_artifacts = artifacts.artifacts.len();
+        let artifacts_in_burst = burst_states.values().filter(|s| s.in_burst).count();
+        let total_requests: u64 = request_counters.values().map(|(count, _)| *count).sum();
+
+        BurstRaidMetrics {
+            total_artifacts,
+            artifacts_in_burst,
+            total_requests,
+            burst_threshold_rps: self.config.burst_threshold_rps,
+            base_replication_factor: self.config.base_replication_factor,
+            max_replication_factor: self.config.max_replication_factor,
+        }
     }
 
     /// Shutdown the BurstRAID strategy

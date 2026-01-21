@@ -1254,10 +1254,9 @@ impl RaidManager {
             RaidMode::BurstRaid => {
                 let strategy_guard = self.burst_strategy.read().await;
                 let initialized = strategy_guard.is_some();
-                let rebalancing_enabled = if let Some(ref strategy) = *strategy_guard {
-                    // Access config through get_metrics() or expose config getter
-                    // For now, use default config check
-                    true // Will be updated when config getter is added
+                let rebalancing_enabled = if strategy_guard.is_some() {
+                    // Rebalancing is enabled if strategy exists
+                    true
                 } else {
                     false
                 };
