@@ -140,7 +140,8 @@ async fn test_rebalance_across_strategies() {
             .unwrap();
     }
 
-    // Trigger rebalance
+    // Rebalance should succeed even if no nodes are available (will return 0 moved)
+    // This tests that rebalance() handles empty distribution gracefully
     let rebalance_result = manager_burst.trigger_rebalance().await.unwrap();
     assert!(rebalance_result.success, "Rebalancing should succeed");
     assert!(
@@ -168,7 +169,8 @@ async fn test_rebalance_across_strategies() {
             .unwrap();
     }
 
-    // Trigger rebalance
+    // Rebalance should succeed even if no nodes are available (will return 0 moved)
+    // This tests that rebalance() handles empty distribution gracefully
     let rebalance_result = manager_smallworld.trigger_rebalance().await.unwrap();
     assert!(rebalance_result.success, "Rebalancing should succeed");
     assert!(
