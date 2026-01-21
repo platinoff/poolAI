@@ -11,9 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
-- SAML SSO implementation (optional)
 - Administrative Control Plane for RAID (optional)
 - Mock server integration for Cloud SDK (optional)
+
+## [0.2.1] - 2026-01-19
+
+### Added
+- **Enterprise Features - 100% Complete** 🎉
+  - **SAML SSO Implementation** - Full SAML 2.0 authentication flow
+    - SAML auth handler (`/auth/saml/{provider}`) - redirects to Identity Provider SSO URL
+    - SAML callback handler (`/auth/saml/{provider}/callback`) - processes SAML response
+    - SAML assertion validation with attribute extraction
+    - User creation/mapping from SAML attributes
+    - JWT token generation after successful SAML authentication
+    - Support for attribute mapping configuration
+    - RelayState support for custom redirect URLs
+  - **SQLite Persistence Integration Tests** - Comprehensive test coverage
+    - 10 integration tests for SQLite persistence
+    - Tests for metrics persistence, historical queries with filters
+    - Tests for automatic cleanup of old metrics (30 days)
+    - Tests for fallback to in-memory history when database unavailable
+    - Tests for tags serialization/deserialization
+    - Tests for multiple metrics handling
+    - Tests for error handling with invalid database paths
+
+### Changed
+- **Enterprise Features**: Status updated from 95% to 100% complete
+- **Test Coverage**: Increased from 427+ to 437+ tests (102 unit + 335+ integration)
+  - Added 10 new integration tests for SQLite persistence
+
+### Fixed
+- SAML route placement to avoid conflict with OAuth2 telegram callback
 
 ## [0.2.0] - 2026-01-19
 
@@ -194,6 +222,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/platinoff/poolAI/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/platinoff/poolAI/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/platinoff/poolAI/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/platinoff/poolAI/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/platinoff/poolAI/releases/tag/v0.1.0
 
