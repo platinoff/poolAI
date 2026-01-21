@@ -147,12 +147,11 @@ pub fn create_enterprise_api_routes() -> Router {
         .route("/auth/telegram", get(oauth2_telegram_auth_handler))
         .route(
             "/auth/telegram/callback",
+            get(oauth2_telegram_callback_handler),
         )
         // SAML SSO Authentication endpoints
         .route("/auth/saml/{provider}", get(saml_auth_handler))
         .route("/auth/saml/{provider}/callback", post(saml_callback_handler))
-            get(oauth2_telegram_callback_handler),
-        )
 }
 
 // ============================================================================
