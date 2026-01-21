@@ -135,11 +135,12 @@ pub enum VmStatus {
 /// // Use load-based for optimal utilization
 /// let policy = GpuSchedulingPolicy::LoadBased;
 /// ```
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub enum GpuSchedulingPolicy {
     /// Round-robin scheduling - distributes GPU access evenly across instances
     ///
     /// Each VM instance gets equal time slices on the GPU, ensuring fair distribution.
+    #[default]
     RoundRobin,
     /// Priority-based scheduling - allocates GPU based on priority level
     ///

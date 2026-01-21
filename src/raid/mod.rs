@@ -1485,9 +1485,8 @@ mod tests {
     fn test_raid_mode_variants() {
         let modes = vec![RaidMode::Local, RaidMode::BurstRaid, RaidMode::SmallWorld];
         for mode in modes {
-            let cloned = mode.clone();
             assert!(matches!(
-                cloned,
+                mode,
                 RaidMode::Local | RaidMode::BurstRaid | RaidMode::SmallWorld
             ));
         }
