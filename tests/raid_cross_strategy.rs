@@ -5,6 +5,7 @@
 //! - Strategy initialization and shutdown
 //! - Metrics comparison between strategies
 
+use poolai::pool::topology::initialize_global_topology_manager;
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use std::sync::Arc;
 use tempfile::TempDir;
@@ -118,6 +119,9 @@ async fn test_strategy_status() {
 
 #[tokio::test]
 async fn test_rebalance_across_strategies() {
+    // Initialize topology manager (required for SmallWorld strategy)
+    let _ = initialize_global_topology_manager();
+    
     let temp_dir = TempDir::new().unwrap();
 
     // Test rebalancing in BurstRaid mode
@@ -177,6 +181,10 @@ async fn test_rebalance_across_strategies() {
         rebalance_result.artifacts_moved >= 0,
         "Should return non-negative artifacts moved count"
     );
+
+    // Cleanup: shutdown managers to stop background tasks
+    manager_burst.shutdown().await.unwrap();
+    manager_smallworld.shutdown().await.unwrap();
 }
 
 #[tokio::test]

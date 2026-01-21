@@ -8,16 +8,22 @@
 ### Статус збірки
 - ✅ `cargo check` проходить без помилок
 - ✅ `cargo test --lib` - 102 unit tests passing
-- ✅ `cargo test --test '*'` - 335+ integration tests passing
+- ⚠️ `cargo test --test '*'` - 334/335 integration tests passing (1 failing)
+  - ❌ `test_rebalance_across_strategies` падає з помилкою tokio runtime
+  - Помилка: `Cannot start a runtime from within a runtime` (tokio::runtime::block_on викликається всередині async контексту)
 - ✅ Всі модулі компілюються успішно
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
-- ✅ CI/CD 100% Passing (Ubuntu + Windows) 🎉
+- ⚠️ CI/CD: 1 тест падає на Ubuntu (Windows CI проходить успішно)
 
 ### Git статус
-- ✅ Working tree clean
-- ✅ Всі зміни закомічені
-- ✅ Всі зміни запушені до remote
+- ⚠️ Working tree містить uncommitted changes:
+  - `README.md` (modified)
+  - `docs/CHANGELOG.md` (modified)
+  - `docs/status/ADMIN_PANEL_STATUS.md` (modified)
+  - `docs/status/STABLE_STATE_SUMMARY.md` (modified)
+- ⚠️ Всі зміни не закомічені
+- ⚠️ Всі зміни не запушені до remote
 - ✅ 870+ комітів на main branch
 
 ### Завершені модулі (100%)
@@ -168,6 +174,7 @@ cd S:\rust\poolAI; git push origin HEAD
 **Дата**: 2026-01-19 (Updated)  
 **Підготовлено**: Rust Architect  
 **Останні зміни**: 
+- ⚠️ **CI/CD помилка виявлена** (2026-01-19) - `test_rebalance_across_strategies` падає через tokio runtime conflict
 - ✅ **RAID Strategy Enhancements 100% Complete** (2026-01-19) ✅
   - ✅ BurstRAID metrics & integration tests ✅
   - ✅ SmallWorld metrics & integration tests ✅
@@ -188,6 +195,43 @@ cd S:\rust\poolAI; git push origin HEAD
 - ✅ Cursor rules organization ✅
 - ✅ UI/UX 100% Complete (accessibility, responsive design, components library) ✅
 - ✅ Admin Panel 100% Complete (UI + Functionality) ✅
+
+## ⚠️ Відомі проблеми та виправлення
+
+### CI/CD Помилка: `test_rebalance_across_strategies`
+**Статус**: 🔴 Активна проблема  
+**Дата виявлення**: 2026-01-19  
+**Пріоритет**: Високий
+
+**Опис проблеми**:
+- Тест `test_rebalance_across_strategies` падає на Ubuntu CI з помилкою:
+  ```
+  thread 'test_rebalance_across_strategies' panicked at 'Cannot start a runtime from within a runtime'
+  ```
+- Помилка виникає в `tokio::runtime::current_thread::Handle::block_on` 
+- Стек трейс показує проблему у `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.49.0/src/runtime/scheduler/current_thread/mod.rs:188:9`
+
+**Причина**:
+- Десь у коді викликається синхронний `block_on()` всередині async контексту
+- Можливі місця проблеми:
+  - `ReplicationEngine` може викликати `block_on` для синхронних операцій
+  - `TopologyManager::get_topology_snapshot()` може використовувати синхронні виклики
+  - Ініціалізація стратегій може створювати вкладений runtime
+
+**Кроки для виправлення**:
+1. ✅ Перевірено - `Runtime::block_on()` не використовується напряму
+2. ✅ Додано ініціалізацію `topology_manager` у тест (необхідно для SmallWorld стратегії)
+3. ✅ Додано `shutdown()` виклики для обох менеджерів у тесті перед завершенням
+4. ⚠️ Потрібно перевірити чи виправлення усуває проблему в CI
+
+**Виконані виправлення** (2026-01-19):
+- Додано `initialize_global_topology_manager()` у тест перед створенням SmallWorld стратегії
+- Додано `manager_burst.shutdown().await` та `manager_smallworld.shutdown().await` для cleanup
+- Додано імпорт `poolai::pool::topology::initialize_global_topology_manager`
+
+**Статус**: 🔄 Виправлення застосовано, очікується перевірка в CI
+
+---
 
 ## 🎉 Major Milestones Achieved
 
