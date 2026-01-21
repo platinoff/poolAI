@@ -325,6 +325,34 @@ impl TopologyManager {
         let topology = self.topology.read().await;
         topology.clone()
     }
+
+    /// Test helper: Add a node to topology (for testing only)
+    #[cfg(test)]
+    pub async fn test_add_node(&self, node_id: &str, address: &str) {
+        use crate::pool::topology::NodeResources;
+        let mut topology = self.topology.write().await;
+        topology.node_resources.insert(
+            node_id.to_string(),
+            NodeResources {
+                node_id: node_id.to_string(),
+                available_gpu_memory_mb: 8192,
+                total_gpu_memory_mb: 8192,
+                available_cpu_cores: 8,
+                total_cpu_cores: 8,
+                available_memory_mb: 16384,
+                total_memory_mb: 16384,
+                current_load: 0.0,
+            },
+        );
+    }
+
+    /// Test helper: Update latency between two nodes (for testing only)
+    #[cfg(test)]
+    pub async fn test_update_latency(&self, node_id1: &str, node_id2: &str, latency_ms: f64) {
+        let mut topology = self.topology.write().await;
+        let key = format!("{}:{}", node_id1, node_id2);
+        topology.latency_matrix.insert(key, latency_ms);
+    }
 }
 
 impl Default for TopologyManager {

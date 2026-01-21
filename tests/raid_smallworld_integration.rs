@@ -6,7 +6,6 @@
 //! - Metrics collection
 //! - Node selection based on clustering
 
-use poolai::core::error::AppError;
 use poolai::pool::topology::TopologyManager;
 use poolai::raid::replication::ReplicationEngine;
 use poolai::raid::small_world::{SmallWorldConfig, SmallWorldStrategy};
@@ -14,8 +13,6 @@ use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;
-use tokio::time::{sleep, Duration};
-use uuid::Uuid;
 
 /// Helper function to create a test SmallWorld strategy
 async fn create_test_smallworld_strategy() -> (
@@ -41,15 +38,15 @@ async fn create_test_smallworld_strategy() -> (
 
     // Add some test nodes to topology
     {
-        let mut topology = topology_manager.write().await;
-        topology.add_node("1", "192.168.1.1:8080").await.unwrap();
-        topology.add_node("2", "192.168.1.2:8080").await.unwrap();
-        topology.add_node("3", "192.168.1.3:8080").await.unwrap();
+        let manager = topology_manager.write().await;
+        manager.test_add_node("1", "192.168.1.1:8080").await;
+        manager.test_add_node("2", "192.168.1.2:8080").await;
+        manager.test_add_node("3", "192.168.1.3:8080").await;
 
         // Add latency information
-        topology.update_latency("1", "2", 10.0).await.unwrap();
-        topology.update_latency("2", "3", 15.0).await.unwrap();
-        topology.update_latency("1", "3", 20.0).await.unwrap();
+        manager.test_update_latency("1", "2", 10.0).await;
+        manager.test_update_latency("2", "3", 15.0).await;
+        manager.test_update_latency("1", "3", 20.0).await;
     }
 
     let smallworld_config = SmallWorldConfig {
@@ -75,7 +72,7 @@ async fn create_test_smallworld_strategy() -> (
 
 #[tokio::test]
 async fn test_clustering_coefficient_with_real_topology() {
-    let (strategy, _raid_manager, topology_manager) = create_test_smallworld_strategy().await;
+    let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
     // Clustering coefficients are updated during initialization
     // Get clustering coefficient for node 1 (may be None if not calculated yet)
@@ -224,7 +221,7 @@ async fn test_rebalance_optimizes_placement() {
         .await
         .unwrap();
 
-    let artifact_id = artifact_ref.id;
+    let _artifact_id = artifact_ref.id;
 
     // Initial placement (if any)
     // After rebalancing, placement should be optimized
