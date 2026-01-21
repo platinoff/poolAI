@@ -730,9 +730,21 @@ async fn test_multiple_providers_initialization() {
     let gcp_manager = GcpManager::new(Some("test-project-id".to_string()));
 
     // Initialize all with timeout
-    let aws_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), aws_manager.initialize()).await;
-    let azure_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), azure_manager.initialize()).await;
-    let gcp_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), gcp_manager.initialize()).await;
+    let aws_result = timeout(
+        Duration::from_secs(INIT_TIMEOUT_SECS),
+        aws_manager.initialize(),
+    )
+    .await;
+    let azure_result = timeout(
+        Duration::from_secs(INIT_TIMEOUT_SECS),
+        azure_manager.initialize(),
+    )
+    .await;
+    let gcp_result = timeout(
+        Duration::from_secs(INIT_TIMEOUT_SECS),
+        gcp_manager.initialize(),
+    )
+    .await;
 
     // All should either succeed or fail gracefully (not panic)
     if let Ok(Ok(_)) = aws_result {

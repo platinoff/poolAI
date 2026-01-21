@@ -307,7 +307,9 @@ impl MonitoringManager {
                 Ok::<(), AppError>(())
             })
             .await
-            .map_err(|e| AppError::InternalError(format!("Database initialization task failed: {}", e)))??;
+            .map_err(|e| {
+                AppError::InternalError(format!("Database initialization task failed: {}", e))
+            })??;
 
             info!("SQLite database initialized at: {}", db_path);
         }

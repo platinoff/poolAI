@@ -727,13 +727,13 @@ impl SecurityManager {
             // Simple attribute extraction (in production, use proper XML parsing)
             let attr_pattern = format!("<saml:Attribute Name=\"{}\">", saml_attr);
             if let Some(attr_start) = xml_str.find(&attr_pattern) {
-                if let Some(attr_value_start) = xml_str[attr_start..].find("<saml:AttributeValue>") {
-                    if let Some(attr_value_end) = xml_str[attr_start + attr_value_start..]
-                        .find("</saml:AttributeValue>")
+                if let Some(attr_value_start) = xml_str[attr_start..].find("<saml:AttributeValue>")
+                {
+                    if let Some(attr_value_end) =
+                        xml_str[attr_start + attr_value_start..].find("</saml:AttributeValue>")
                     {
-                        let attr_value = xml_str
-                            [attr_start + attr_value_start + 22
-                                ..attr_start + attr_value_start + attr_value_end]
+                        let attr_value = xml_str[attr_start + attr_value_start + 22
+                            ..attr_start + attr_value_start + attr_value_end]
                             .trim();
                         attributes.insert(user_field.clone(), attr_value.to_string());
                     }

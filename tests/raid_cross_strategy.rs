@@ -63,8 +63,14 @@ async fn test_strategy_switching() {
     let artifacts_local = manager_local.list_artifacts().await;
     let artifacts_burst = manager_burst.list_artifacts().await;
 
-    assert!(artifacts_local.len() >= 1, "Local manager should have artifacts");
-    assert!(artifacts_burst.len() >= 1, "BurstRaid manager should have artifacts");
+    assert!(
+        artifacts_local.len() >= 1,
+        "Local manager should have artifacts"
+    );
+    assert!(
+        artifacts_burst.len() >= 1,
+        "BurstRaid manager should have artifacts"
+    );
 }
 
 #[tokio::test]
@@ -102,10 +108,7 @@ async fn test_strategy_status() {
     manager_burst.initialize().await.unwrap();
 
     // Create artifact to initialize strategy
-    manager_burst
-        .put_artifact("test", b"data")
-        .await
-        .unwrap();
+    manager_burst.put_artifact("test", b"data").await.unwrap();
 
     let status_burst = manager_burst.get_strategy_status().await.unwrap();
     assert_eq!(status_burst.mode, "BurstRaid");

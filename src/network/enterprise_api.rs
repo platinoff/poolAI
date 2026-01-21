@@ -151,7 +151,10 @@ pub fn create_enterprise_api_routes() -> Router {
         )
         // SAML SSO Authentication endpoints
         .route("/auth/saml/{provider}", get(saml_auth_handler))
-        .route("/auth/saml/{provider}/callback", post(saml_callback_handler))
+        .route(
+            "/auth/saml/{provider}/callback",
+            post(saml_callback_handler),
+        )
 }
 
 // ============================================================================
@@ -1517,7 +1520,9 @@ static OAUTH2_STATES: OnceLock<Arc<RwLock<HashMap<String, OAuth2State>>>> = Once
 
 #[cfg(feature = "enterprise")]
 fn get_oauth2_state_store() -> Arc<RwLock<HashMap<String, OAuth2State>>> {
-    OAUTH2_STATES.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))).clone()
+    OAUTH2_STATES
+        .get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
+        .clone()
 }
 
 #[cfg(feature = "enterprise")]
@@ -1540,11 +1545,11 @@ async fn store_oauth2_state(state: String) {
 async fn verify_oauth2_state(state: &str) -> bool {
     let store = get_oauth2_state_store();
     let mut states = store.write().await;
-    
+
     // Cleanup old states first
     let cutoff = Utc::now() - Duration::minutes(10);
     states.retain(|_, s| s.created_at > cutoff);
-    
+
     // Verify state exists and is not expired
     if let Some(state_entry) = states.get(state) {
         if state_entry.created_at > cutoff {

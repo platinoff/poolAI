@@ -35,10 +35,7 @@ async fn create_test_smallworld_strategy() -> (
     let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
     raid_manager.write().await.initialize().await.unwrap();
 
-    let replication_engine = Arc::new(ReplicationEngine::with_defaults(
-        raid_manager.clone(),
-        None,
-    ));
+    let replication_engine = Arc::new(ReplicationEngine::with_defaults(raid_manager.clone(), None));
 
     let topology_manager = Arc::new(RwLock::new(TopologyManager::new()));
 
@@ -50,18 +47,9 @@ async fn create_test_smallworld_strategy() -> (
         topology.add_node("3", "192.168.1.3:8080").await.unwrap();
 
         // Add latency information
-        topology
-            .update_latency("1", "2", 10.0)
-            .await
-            .unwrap();
-        topology
-            .update_latency("2", "3", 15.0)
-            .await
-            .unwrap();
-        topology
-            .update_latency("1", "3", 20.0)
-            .await
-            .unwrap();
+        topology.update_latency("1", "2", 10.0).await.unwrap();
+        topology.update_latency("2", "3", 15.0).await.unwrap();
+        topology.update_latency("1", "3", 20.0).await.unwrap();
     }
 
     let smallworld_config = SmallWorldConfig {
@@ -92,7 +80,7 @@ async fn test_clustering_coefficient_with_real_topology() {
     // Clustering coefficients are updated during initialization
     // Get clustering coefficient for node 1 (may be None if not calculated yet)
     let coeff = strategy.get_node_clustering_coefficient(1).await;
-    
+
     // If coefficient is available, verify it's in valid range
     if let Some(coeff_value) = coeff {
         assert!(
@@ -137,14 +125,8 @@ async fn test_rebalance_with_real_artifacts() {
 
     // Verify metrics
     let metrics = strategy.get_metrics().await;
-    assert_eq!(
-        metrics.total_artifacts, 5,
-        "Should track 5 artifacts"
-    );
-    assert_eq!(
-        metrics.total_nodes, 3,
-        "Should have 3 nodes"
-    );
+    assert_eq!(metrics.total_artifacts, 5, "Should track 5 artifacts");
+    assert_eq!(metrics.total_nodes, 3, "Should have 3 nodes");
 }
 
 #[tokio::test]
@@ -164,7 +146,7 @@ async fn test_node_selection_based_on_clustering() {
     // Test that rebalancing uses clustering-based node selection
     // Rebalance internally uses select_target_nodes which considers clustering
     let artifacts_moved = strategy.rebalance().await.unwrap();
-    
+
     // Rebalancing should complete (may move 0 artifacts if already optimal)
     assert!(
         artifacts_moved >= 0,
@@ -173,10 +155,7 @@ async fn test_node_selection_based_on_clustering() {
 
     // Verify metrics show nodes are tracked
     let metrics = strategy.get_metrics().await;
-    assert_eq!(
-        metrics.total_nodes, 3,
-        "Should have 3 nodes in topology"
-    );
+    assert_eq!(metrics.total_nodes, 3, "Should have 3 nodes in topology");
     assert!(
         metrics.avg_clustering_coefficient >= 0.0,
         "Average clustering coefficient should be calculated"
@@ -199,14 +178,8 @@ async fn test_metrics_collection() {
 
     // Get metrics
     let metrics = strategy.get_metrics().await;
-    assert_eq!(
-        metrics.total_artifacts, 3,
-        "Should track 3 artifacts"
-    );
-    assert_eq!(
-        metrics.total_nodes, 3,
-        "Should have 3 nodes"
-    );
+    assert_eq!(metrics.total_artifacts, 3, "Should track 3 artifacts");
+    assert_eq!(metrics.total_nodes, 3, "Should have 3 nodes");
     assert_eq!(
         metrics.base_replication_factor, 3,
         "Base replication factor should be 3"
@@ -223,10 +196,16 @@ async fn test_node_clustering_coefficient() {
 
     // Get clustering coefficient for specific node
     let coeff1 = strategy.get_node_clustering_coefficient(1).await;
-    assert!(coeff1.is_some(), "Clustering coefficient should be available for node 1");
+    assert!(
+        coeff1.is_some(),
+        "Clustering coefficient should be available for node 1"
+    );
 
     let coeff2 = strategy.get_node_clustering_coefficient(2).await;
-    assert!(coeff2.is_some(), "Clustering coefficient should be available for node 2");
+    assert!(
+        coeff2.is_some(),
+        "Clustering coefficient should be available for node 2"
+    );
 
     // Non-existent node should return None
     let coeff_none = strategy.get_node_clustering_coefficient(999).await;
@@ -259,8 +238,5 @@ async fn test_rebalance_optimizes_placement() {
 
     // Verify metrics are updated
     let metrics = strategy.get_metrics().await;
-    assert_eq!(
-        metrics.total_artifacts, 1,
-        "Should track 1 artifact"
-    );
+    assert_eq!(metrics.total_artifacts, 1, "Should track 1 artifact");
 }

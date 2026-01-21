@@ -72,8 +72,7 @@ async fn test_burst_detection_with_real_artifacts() {
     // Verify replication factor increased
     let replication_factor = strategy.get_replication_factor(artifact_id).await;
     assert_eq!(
-        replication_factor,
-        5,
+        replication_factor, 5,
         "Replication factor should be max (5) during burst"
     );
 
@@ -83,7 +82,10 @@ async fn test_burst_detection_with_real_artifacts() {
     if let Some(stats) = stats {
         assert!(stats.in_burst, "Artifact should be in burst state");
         assert!(stats.current_rps >= 5.0, "RPS should be above threshold");
-        assert_eq!(stats.replication_factor, 5, "Replication factor should be max");
+        assert_eq!(
+            stats.replication_factor, 5,
+            "Replication factor should be max"
+        );
     }
 }
 
@@ -151,14 +153,8 @@ async fn test_rebalance_with_real_artifacts() {
 
     // Verify metrics are available
     let metrics = strategy.get_metrics().await;
-    assert_eq!(
-        metrics.total_artifacts, 5,
-        "Should track 5 artifacts"
-    );
-    assert!(
-        metrics.total_requests > 0,
-        "Should have recorded requests"
-    );
+    assert_eq!(metrics.total_artifacts, 5, "Should track 5 artifacts");
+    assert!(metrics.total_requests > 0, "Should have recorded requests");
 }
 
 #[tokio::test]
@@ -192,7 +188,10 @@ async fn test_metrics_collection() {
     // Get metrics
     let metrics = strategy.get_metrics().await;
     assert_eq!(metrics.total_artifacts, 2, "Should track 2 artifacts");
-    assert!(metrics.total_requests >= 11, "Should have recorded requests");
+    assert!(
+        metrics.total_requests >= 11,
+        "Should have recorded requests"
+    );
 
     // Check burst stats for high traffic artifact
     let stats1 = strategy.get_artifact_burst_stats(artifact1.id).await;
