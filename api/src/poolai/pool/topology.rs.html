@@ -327,8 +327,8 @@
 <a href=#327 id=327 data-nosnippet>327</a>    }
 <a href=#328 id=328 data-nosnippet>328</a>
 <a href=#329 id=329 data-nosnippet>329</a>    <span class="doccomment">/// Test helper: Add a node to topology (for testing only)
-<a href=#330 id=330 data-nosnippet>330</a>    </span><span class="attr">#[cfg(test)]
-<a href=#331 id=331 data-nosnippet>331</a>    </span><span class="kw">pub async fn </span>test_add_node(<span class="kw-2">&amp;</span><span class="self">self</span>, node_id: <span class="kw-2">&amp;</span>str, address: <span class="kw-2">&amp;</span>str) {
+<a href=#330 id=330 data-nosnippet>330</a>    /// This method is public to allow integration tests to set up test topology
+<a href=#331 id=331 data-nosnippet>331</a>    </span><span class="kw">pub async fn </span>test_add_node(<span class="kw-2">&amp;</span><span class="self">self</span>, node_id: <span class="kw-2">&amp;</span>str, _address: <span class="kw-2">&amp;</span>str) {
 <a href=#332 id=332 data-nosnippet>332</a>        <span class="kw">use </span><span class="kw">crate</span>::pool::topology::NodeResources;
 <a href=#333 id=333 data-nosnippet>333</a>        <span class="kw">let </span><span class="kw-2">mut </span>topology = <span class="self">self</span>.topology.write().<span class="kw">await</span>;
 <a href=#334 id=334 data-nosnippet>334</a>        topology.node_resources.insert(
@@ -347,7 +347,7 @@
 <a href=#347 id=347 data-nosnippet>347</a>    }
 <a href=#348 id=348 data-nosnippet>348</a>
 <a href=#349 id=349 data-nosnippet>349</a>    <span class="doccomment">/// Test helper: Update latency between two nodes (for testing only)
-<a href=#350 id=350 data-nosnippet>350</a>    </span><span class="attr">#[cfg(test)]
+<a href=#350 id=350 data-nosnippet>350</a>    /// This method is public to allow integration tests to set up test topology
 <a href=#351 id=351 data-nosnippet>351</a>    </span><span class="kw">pub async fn </span>test_update_latency(<span class="kw-2">&amp;</span><span class="self">self</span>, node_id1: <span class="kw-2">&amp;</span>str, node_id2: <span class="kw-2">&amp;</span>str, latency_ms: f64) {
 <a href=#352 id=352 data-nosnippet>352</a>        <span class="kw">let </span><span class="kw-2">mut </span>topology = <span class="self">self</span>.topology.write().<span class="kw">await</span>;
 <a href=#353 id=353 data-nosnippet>353</a>        <span class="kw">let </span>key = <span class="macro">format!</span>(<span class="string">"{}:{}"</span>, node_id1, node_id2);
