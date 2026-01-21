@@ -565,6 +565,8 @@ impl BurstRaidStrategy {
     /// - Base replication factor if not in burst
     /// - Max replication factor if in burst
     ///
+    /// This method automatically updates the burst state before returning the factor.
+    ///
     /// # Arguments
     ///
     /// * `artifact_id` - ID of the artifact
@@ -573,6 +575,9 @@ impl BurstRaidStrategy {
     ///
     /// Returns the replication factor (base_replication_factor to max_replication_factor)
     pub async fn get_replication_factor(&self, artifact_id: Uuid) -> u32 {
+        // Update burst state to ensure it's current
+        let _ = self.update_burst_state(artifact_id).await;
+        
         let burst_states = self.burst_states.read().await;
 
         if let Some(state) = burst_states.get(&artifact_id) {
@@ -950,6 +955,9 @@ impl BurstRaidStrategy {
     ///
     /// Returns `Some(ArtifactBurstStats)` if the artifact is being tracked, `None` otherwise.
     pub async fn get_artifact_burst_stats(&self, artifact_id: Uuid) -> Option<ArtifactBurstStats> {
+        // Update burst state to ensure it's current
+        let _ = self.update_burst_state(artifact_id).await;
+        
         let request_counters = self.request_counters.read().await;
         let burst_states = self.burst_states.read().await;
 
