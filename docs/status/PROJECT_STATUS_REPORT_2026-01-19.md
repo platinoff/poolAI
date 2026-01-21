@@ -155,31 +155,38 @@
 
 ### ⭐⭐⭐ Priority 1: v0.2.0 - Опціональні покращення
 
-#### 1.1 Cloud SDK Full Implementation - **75%** 🔄 (+15%)
+#### 1.1 Cloud SDK Full Implementation - **85%** 🔄 (+10%)
 **Пріоритет**: Високий  
-**Оцінка**: 6-9 днів  
-**Поточний стан**: Інфраструктура 100% ✅, Azure token acquisition завершено ✅
+**Оцінка**: 2-4 дні (залишилось)  
+**Поточний стан**: Інфраструктура 100% ✅, AWS SDK initialization завершено ✅, GCP token refresh завершено ✅
 
 **Прогрес**:
 - ✅ REST API структура: 100%
 - ✅ HTTP client: 100%
 - ✅ AWS SigV4: 100%
 - ✅ GCP Service Account Auth: 100%
-- ✅ **Azure Token Acquisition: 100%** ✅ (було 30%)
+- ✅ **Azure Token Acquisition: 100%** ✅
   - ✅ Environment variable: 100%
   - ✅ Azure CLI: 100% (з expiration parsing та caching)
   - ✅ Managed Identity: 100% (з expiration parsing та caching)
   - ✅ Token caching з TTL: 100%
   - ✅ Автоматичне оновлення токенів: 100%
-- ⏳ AWS SDK initialization: 0%
-- ⏳ GCP SDK completion: 70% (token refresh та caching pending)
-- ⏳ Integration tests: 50% (infrastructure ready, повні тести pending)
+- ✅ **AWS SDK initialization: 100%** ✅ **ЗАВЕРШЕНО**
+  - ✅ EC2 client initialization: 100%
+  - ✅ ECS client initialization: 100%
+  - ✅ S3 client initialization: 100%
+  - ✅ AWS SDK dependencies enabled: 100%
+- ✅ **GCP SDK completion: 100%** ✅ **ЗАВЕРШЕНО**
+  - ✅ Token refresh implementation: 100%
+  - ✅ Token caching з TTL: 100%
+  - ✅ Automatic token renewal: 100%
+- ⏳ Integration tests: 70% (infrastructure ready, timeout tests added, повні тести pending)
 
 **Завдання**:
-- [ ] AWS SDK initialization (3 дні)
+- [x] AWS SDK initialization (3 дні) ✅ **ЗАВЕРШЕНО**
 - [x] Azure token acquisition enhancement (2-3 години) ✅ **ЗАВЕРШЕНО**
-- [ ] GCP SDK initialization completion (1 день)
-- [ ] Integration tests для всіх провайдерів (2 дні)
+- [x] GCP SDK initialization completion (1 день) ✅ **ЗАВЕРШЕНО**
+- [ ] Integration tests для всіх провайдерів (2 дні) - залишилось
 
 **Файли**:
 - `src/cloud/providers/aws.rs` (6 TODOs)
@@ -350,12 +357,12 @@ API Endpoints     ████████████████████ 1
 
 ### ⭐⭐⭐ Найвищий пріоритет (зробити першим):
 
-1. **Cloud SDK Full Implementation** (75% → 100%) ✅ Azure Token Enhancement завершено
+1. **Cloud SDK Full Implementation** (85% → 100%) ✅ AWS SDK та GCP Token Refresh завершено
    - ✅ Azure token acquisition enhancement (2-3 години) - **ЗАВЕРШЕНО**
-   - GCP SDK completion (1 день) - token refresh та caching
-   - AWS SDK initialization (3 дні)
-   - Integration tests (2 дні)
-   - **Оцінка**: 4-6 днів (залишилось)
+   - ✅ GCP SDK completion (1 день) - token refresh та caching - **ЗАВЕРШЕНО**
+   - ✅ AWS SDK initialization (3 дні) - EC2, ECS, S3 clients - **ЗАВЕРШЕНО**
+   - Integration tests для всіх провайдерів (2 дні) - залишилось
+   - **Оцінка**: 2 дні (залишилось)
 
 2. **RAID Strategy Enhancements** (95% → 100%)
    - Metrics collection (2 дні)
