@@ -220,7 +220,10 @@ impl SmallWorldStrategy {
     }
 
     /// Update clustering coefficients for all nodes
-    async fn update_clustering_coefficients(&self) -> Result<(), AppError> {
+    ///
+    /// Recalculates clustering coefficients for all nodes in the topology.
+    /// This should be called when topology changes or periodically to keep coefficients up-to-date.
+    pub async fn update_clustering_coefficients(&self) -> Result<(), AppError> {
         info!("Updating clustering coefficients");
 
         let topology = self
