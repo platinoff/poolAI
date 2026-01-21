@@ -683,7 +683,7 @@ impl SmallWorldStrategyForTask {
         Ok(moved_count)
     }
 
-    async fn update_clustering_coefficients(&self) -> Result<(), AppError> {
+    pub async fn update_clustering_coefficients(&self) -> Result<(), AppError> {
         let topology = self
             .topology_manager
             .read()
