@@ -716,8 +716,6 @@ impl SmallWorldStrategyForTask {
         }
 
         Ok(())
-
-        Ok(())
     }
 
     async fn calculate_clustering_coefficient(&self, node_id: u64) -> Result<f64, AppError> {
