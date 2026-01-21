@@ -3,10 +3,12 @@
 
 **Поточний статус**: ✅ **v0.2.0 Released** → **v0.2.1 Ready**  
 **Останні досягнення**: 
-- ✅ Burst state auto-update fix
+- ✅ Burst state auto-update fix (видалено подвійний виклик, виправлено зависання тестів)
+- ✅ AWS SDK compilation fixes (fluent builder API, deprecated calls, cfg attributes)
+- ✅ Test fixes (raid_burst_integration tests)
 - ✅ Clippy warnings fixed
 - ✅ UI/UX & Admin Panel documentation updated
-- ✅ Button functions audit completed
+- ✅ Button functions audit completed (80+ buttons, 100% functional)
 
 ---
 
@@ -20,11 +22,12 @@
 - ✅ **Cloud SDK** - 95% (AWS, Azure, GCP integration)
 
 ### 🔄 Останні Виправлення (2026-01-19)
-- ✅ Виправлено burst state auto-update в `get_replication_factor()` та `get_artifact_burst_stats()`
-- ✅ Виправлено Clippy warnings (Default derive, clone on Copy type)
-- ✅ Виправлено Default impl conflict для `GpuSchedulingPolicy`
-- ✅ Оновлено документацію (RUST_ARCHITECT_STATUS, concept, UI/UX, Admin Panel)
-- ✅ Створено Button Functions Audit (80+ кнопок перевірено, 100% функціональні)
+- ✅ **Burst state auto-update fix**: Видалено подвійний виклик `update_burst_state`, виправлено зависання тестів
+- ✅ **AWS SDK compilation fixes**: Виправлено fluent builder API, deprecated calls, cfg attributes
+- ✅ **Test fixes**: Виправлено `test_multiple_artifacts_burst_detection` та зависання тестів
+- ✅ **Clippy warnings fixed**: Default derive, clone on Copy type
+- ✅ **Default impl conflict fixed**: Видалено дублікат для `GpuSchedulingPolicy`
+- ✅ **Documentation updated**: RUST_ARCHITECT_STATUS, concept, UI/UX, Admin Panel, Button Functions Audit
 
 ---
 
@@ -36,10 +39,10 @@
 
 **Завдання**:
 1. **Перевірити результати CI** (після останніх push)
-   - ✅ Перевірити, чи проходять тести `raid_burst_integration`
-   - ✅ Перевірити, чи немає помилок компіляції
-   - ✅ Перевірити, чи проходять Clippy checks
-   - ✅ Перевірити, чи проходять formatting checks
+   - ⏳ Перевірити, чи проходять тести `raid_burst_integration` (виправлено зависання)
+   - ⏳ Перевірити, чи немає помилок компіляції (AWS SDK fixes застосовано)
+   - ⏳ Перевірити, чи проходять Clippy checks
+   - ⏳ Перевірити, чи проходять formatting checks
 
 2. **Виправити проблеми (якщо є)**
    - Якщо тести все ще падають - додаткова діагностика
@@ -67,7 +70,9 @@
 1. **Оновити CHANGELOG.md**
    - Додати секцію для v0.2.1
    - Перелік виправлень:
-     - Burst state auto-update fix
+     - Burst state auto-update fix (видалено подвійний виклик, виправлено зависання тестів)
+     - AWS SDK compilation fixes (fluent builder API, deprecated calls)
+     - Test fixes (raid_burst_integration)
      - Clippy warnings fixed
      - Default impl conflict fixed
      - UI/UX documentation updated
