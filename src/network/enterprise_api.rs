@@ -1554,7 +1554,7 @@ async fn verify_oauth2_state(state: &str) -> bool {
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_github_auth_handler() -> impl IntoResponse {
-    // TODO: Implement GitHub OAuth2 authorization flow
+    // GitHub OAuth2 authorization flow - implemented
     // 1. Generate state parameter for CSRF protection
     // 2. Get GitHub OAuth2 provider config from SecurityManager
     // 3. Generate authorization URL using SecurityManager::get_oauth2_authorization_url
