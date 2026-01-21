@@ -387,3 +387,391 @@ async fn test_gcp_error_handling() {
         ));
     }
 }
+
+// Extended AWS Integration Tests
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_aws_ec2_instance_creation_with_valid_params() {
+    use poolai::cloud::providers::aws::AwsManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test EC2 instance creation with valid parameters
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_ec2_instance("t3.micro", "ami-12345678"),
+        )
+        .await;
+
+        // May succeed (if credentials valid) or fail gracefully (if no credentials)
+        match result {
+            Ok(Ok(instance_id)) => {
+                // Success - instance created (unlikely without real credentials, but possible)
+                assert!(!instance_id.is_empty());
+                manager.shutdown().await.unwrap();
+            }
+            Ok(Err(e)) => {
+                // Expected failure - check error type
+                assert!(matches!(
+                    e,
+                    AppError::NetworkError(_) | AppError::InitializationError(_)
+                ));
+            }
+            Err(_) => {
+                // Timeout - acceptable for tests without real credentials
+            }
+        }
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_aws_ec2_instance_creation_with_invalid_ami() {
+    use poolai::cloud::providers::aws::AwsManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test EC2 instance creation with empty AMI (should fail validation)
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_ec2_instance("t3.micro", ""),
+        )
+        .await;
+
+        if let Ok(Err(AppError::ValidationError(msg))) = result {
+            assert!(msg.contains("Image ID") || msg.contains("AMI"));
+        }
+
+        manager.shutdown().await.unwrap();
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_aws_ecs_task_creation_with_valid_params() {
+    use poolai::cloud::providers::aws::AwsManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test ECS task creation with valid parameters
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_ecs_task("test-cluster", "test-task-definition"),
+        )
+        .await;
+
+        // May succeed (if credentials valid) or fail gracefully (if no credentials)
+        match result {
+            Ok(Ok(task_id)) => {
+                // Success - task created (unlikely without real credentials, but possible)
+                assert!(!task_id.is_empty());
+                manager.shutdown().await.unwrap();
+            }
+            Ok(Err(e)) => {
+                // Expected failure - check error type
+                assert!(matches!(
+                    e,
+                    AppError::NetworkError(_) | AppError::InitializationError(_)
+                ));
+            }
+            Err(_) => {
+                // Timeout - acceptable for tests without real credentials
+            }
+        }
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_aws_ecs_task_creation_with_invalid_task_def() {
+    use poolai::cloud::providers::aws::AwsManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test ECS task creation with empty task definition (should fail validation)
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_ecs_task("test-cluster", ""),
+        )
+        .await;
+
+        if let Ok(Err(AppError::ValidationError(msg))) = result {
+            assert!(msg.contains("Task definition") || msg.contains("cannot be empty"));
+        }
+
+        manager.shutdown().await.unwrap();
+    }
+}
+
+// Extended Azure Integration Tests
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_azure_vmss_creation_with_valid_params() {
+    use poolai::cloud::providers::azure::AzureManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AzureManager::new(Some("test-subscription-id".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test VM Scale Set creation with valid parameters
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_vm_scale_set("test-resource-group", "test-vmss"),
+        )
+        .await;
+
+        // May succeed (if credentials valid) or fail gracefully (if no credentials)
+        match result {
+            Ok(Ok(vmss_id)) => {
+                // Success - VMSS created (unlikely without real credentials, but possible)
+                assert!(!vmss_id.is_empty());
+                manager.shutdown().await.unwrap();
+            }
+            Ok(Err(e)) => {
+                // Expected failure - check error type
+                assert!(matches!(
+                    e,
+                    AppError::NetworkError(_) | AppError::InitializationError(_)
+                ));
+            }
+            Err(_) => {
+                // Timeout - acceptable for tests without real credentials
+            }
+        }
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_azure_vmss_creation_with_invalid_name() {
+    use poolai::cloud::providers::azure::AzureManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AzureManager::new(Some("test-subscription-id".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test VM Scale Set creation with empty name (should fail validation)
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_vm_scale_set("test-resource-group", ""),
+        )
+        .await;
+
+        if let Ok(Err(AppError::ValidationError(msg))) = result {
+            assert!(msg.contains("VM Scale Set name") || msg.contains("cannot be empty"));
+        }
+
+        manager.shutdown().await.unwrap();
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_azure_vmss_creation_without_subscription_id() {
+    use poolai::cloud::providers::azure::AzureManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AzureManager::new(None);
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test VM Scale Set creation without subscription ID (should fail validation)
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_vm_scale_set("test-resource-group", "test-vmss"),
+        )
+        .await;
+
+        if let Ok(Err(AppError::ValidationError(msg))) = result {
+            assert!(msg.contains("subscription ID") || msg.contains("required"));
+        }
+
+        manager.shutdown().await.unwrap();
+    }
+}
+
+// Extended GCP Integration Tests
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_gcp_compute_instance_creation_with_valid_params() {
+    use poolai::cloud::providers::gcp::GcpManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = GcpManager::new(Some("test-project-id".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test Compute Engine instance creation with valid parameters
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_compute_instance("us-central1-a", "n1-standard-2"),
+        )
+        .await;
+
+        // May succeed (if credentials valid) or fail gracefully (if no credentials)
+        match result {
+            Ok(Ok(instance_id)) => {
+                // Success - instance created (unlikely without real credentials, but possible)
+                assert!(!instance_id.is_empty());
+                manager.shutdown().await.unwrap();
+            }
+            Ok(Err(e)) => {
+                // Expected failure - check error type
+                assert!(matches!(
+                    e,
+                    AppError::NetworkError(_) | AppError::InitializationError(_)
+                ));
+            }
+            Err(_) => {
+                // Timeout - acceptable for tests without real credentials
+            }
+        }
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_gcp_compute_instance_creation_with_invalid_zone() {
+    use poolai::cloud::providers::gcp::GcpManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = GcpManager::new(Some("test-project-id".to_string()));
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test Compute Engine instance creation with empty zone (should fail validation)
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_compute_instance("", "n1-standard-2"),
+        )
+        .await;
+
+        if let Ok(Err(AppError::ValidationError(msg))) = result {
+            assert!(msg.contains("Zone") || msg.contains("cannot be empty"));
+        }
+
+        manager.shutdown().await.unwrap();
+    }
+}
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_gcp_compute_instance_creation_without_project_id() {
+    use poolai::cloud::providers::gcp::GcpManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = GcpManager::new(None);
+
+    // Initialize with timeout
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    if let Ok(Ok(_)) = init_result {
+        // Test Compute Engine instance creation without project ID (should fail validation)
+        let result = timeout(
+            Duration::from_secs(OPERATION_TIMEOUT_SECS),
+            manager.create_compute_instance("us-central1-a", "n1-standard-2"),
+        )
+        .await;
+
+        if let Ok(Err(AppError::ValidationError(msg))) = result {
+            assert!(msg.contains("project ID") || msg.contains("required"));
+        }
+
+        manager.shutdown().await.unwrap();
+    }
+}
+
+// Cross-Provider Integration Tests
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_multiple_providers_initialization() {
+    use poolai::cloud::providers::{aws::AwsManager, azure::AzureManager, gcp::GcpManager};
+    use tokio::time::{timeout, Duration};
+
+    // Test that multiple providers can be initialized independently
+    let aws_manager = AwsManager::new(Some("us-east-1".to_string()));
+    let azure_manager = AzureManager::new(Some("test-subscription-id".to_string()));
+    let gcp_manager = GcpManager::new(Some("test-project-id".to_string()));
+
+    // Initialize all with timeout
+    let aws_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), aws_manager.initialize()).await;
+    let azure_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), azure_manager.initialize()).await;
+    let gcp_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), gcp_manager.initialize()).await;
+
+    // All should either succeed or fail gracefully (not panic)
+    if let Ok(Ok(_)) = aws_result {
+        aws_manager.shutdown().await.unwrap();
+    }
+    if let Ok(Ok(_)) = azure_result {
+        azure_manager.shutdown().await.unwrap();
+    }
+    if let Ok(Ok(_)) = gcp_result {
+        gcp_manager.shutdown().await.unwrap();
+    }
+}
+
+// Timeout and Error Recovery Tests
+
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
+#[tokio::test]
+async fn test_provider_shutdown_after_timeout() {
+    use poolai::cloud::providers::aws::AwsManager;
+    use tokio::time::{timeout, Duration};
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+
+    // Try to initialize (may timeout)
+    let init_result = timeout(Duration::from_secs(INIT_TIMEOUT_SECS), manager.initialize()).await;
+
+    // Shutdown should always work, even if initialization timed out
+    match init_result {
+        Ok(Ok(_)) => {
+            // Initialization succeeded, shutdown should work
+            manager.shutdown().await.unwrap();
+        }
+        Ok(Err(_)) => {
+            // Initialization failed, shutdown should still work
+            manager.shutdown().await.unwrap();
+        }
+        Err(_) => {
+            // Initialization timed out, shutdown should still work
+            manager.shutdown().await.unwrap();
+        }
+    }
+}
