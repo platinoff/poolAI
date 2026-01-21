@@ -49,4 +49,4 @@
 
 - Use Conventional Commits format
 - One logical change per commit
-- See `.cursorrules` for detailed commit format
+- See `git-workflow.md` for detailed commit format and workflow rules

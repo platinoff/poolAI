@@ -1,0 +1,111 @@
+# Documentation Structure Rules
+
+## 📁 Documentation Structure - STRICT RULES
+
+### ⚠️ CRITICAL: All documentation MUST be in `docs/` directory
+
+**NEVER create `.md` files in the root directory** (except `README.md` and `README.uk.md`)
+
+### Directory Structure
+
+When creating or referencing documentation, use this structure:
+
+```
+docs/
+├── README.md                    # Documentation index
+├── STRUCTURE.md                  # This structure description
+│
+├── status/                      # Current project status
+│   ├── CURRENT_STATUS.md
+│   └── STABLE_STATE_SUMMARY.md
+│
+├── development/                 # Development plans
+│   ├── NEXT_STEPS_PLAN.md
+│   ├── NEXT_DEVELOPMENT_PHASE.md
+│   └── DEVELOPMENT_PLAN_UPDATED.md
+│
+├── concept/                     # Project concepts
+│   ├── poolAI_concept_root.txt  # PRIMARY concept document (use this first)
+│   └── poolAI_concept.txt       # Alternative concept document
+│
+├── archive/                     # Historical documents
+│   └── [all old/archived files]
+│
+├── deployment/                  # Deployment guides
+├── configuration/               # Configuration guides
+├── monitoring/                   # Monitoring setup
+├── security/                    # Security documentation
+├── performance/                 # Performance guides
+├── troubleshooting/             # Troubleshooting
+├── migration/                   # Migration guides
+└── vm/                         # VM module docs
+```
+
+### Rules for Creating New Documentation
+
+1. **Always create in `docs/` subdirectory**:
+   - Status documents → `docs/status/`
+   - Development plans → `docs/development/`
+   - New features → `docs/[feature-name]/` or appropriate category
+   - Historical → `docs/archive/`
+
+2. **File naming**:
+   - Use UPPERCASE for main documents: `CURRENT_STATUS.md`
+   - Use descriptive names: `NEXT_STEPS_PLAN.md`
+   - Use underscores for spaces: `STABLE_STATE_SUMMARY.md`
+
+3. **When user asks to create documentation**:
+   - Ask which category it belongs to
+   - Create in appropriate `docs/` subdirectory
+   - Update `docs/README.md` index if needed
+
+## 🔗 File References
+
+### In Markdown Files
+
+- Use relative paths from current file location
+- Examples:
+  - Same directory: `[File](./FILE.md)`
+  - Parent directory: `[File](../FILE.md)`
+  - Subdirectory: `[File](./subdir/FILE.md)`
+  - From root docs: `[File](../status/CURRENT_STATUS.md)`
+
+### In Rust Code Comments
+
+- **PRIMARY**: Always use: `docs/concept/poolAI_concept_root.txt` (primary concept document)
+- **Alternative**: Use `docs/concept/poolAI_concept.txt` if root not available
+- For other docs: `docs/[category]/FILE.md`
+- Example: `//! See docs/concept/poolAI_concept_root.txt`
+- Example: `//! See docs/development/NEXT_STEPS_PLAN.md`
+
+## 📝 When User Requests Documentation
+
+1. **If user says "create a plan" or "create documentation"**:
+   - Determine category (status, development, etc.)
+   - Create in `docs/[category]/`
+   - Update `docs/README.md` index
+
+2. **If user references a file not in docs/**:
+   - Check if it exists in `docs/archive/`
+   - If not found, ask user or create in appropriate `docs/` subdirectory
+
+3. **If user mentions "concept file"**:
+   - **PRIMARY**: Use `docs/concept/poolAI_concept_root.txt` FIRST (this is the main working document)
+   - **Alternative**: Use `docs/concept/poolAI_concept.txt` if root not available
+   - If updating, update `docs/concept/poolAI_concept_root.txt`
+
+## 🚫 What NOT to Do
+
+- ❌ NEVER create `.md` files in root (except README files)
+- ❌ NEVER reference files as if they're in root
+- ❌ NEVER create temporary documentation files
+- ❌ NEVER leave orphaned documentation files
+
+## ✅ What to Do
+
+- ✅ Always create in `docs/` with proper subdirectory
+- ✅ Update `docs/README.md` when adding new main documents
+- ✅ Use relative paths in references
+- ✅ Move any found root `.md` files to `docs/archive/` if old, or appropriate category if new
+
+**Remember**: Rust Architect wants CLEAN structure - all docs in `docs/`!
