@@ -327,8 +327,8 @@ impl TopologyManager {
     }
 
     /// Test helper: Add a node to topology (for testing only)
-    #[cfg(test)]
-    pub async fn test_add_node(&self, node_id: &str, address: &str) {
+    /// This method is public to allow integration tests to set up test topology
+    pub async fn test_add_node(&self, node_id: &str, _address: &str) {
         use crate::pool::topology::NodeResources;
         let mut topology = self.topology.write().await;
         topology.node_resources.insert(
@@ -347,7 +347,7 @@ impl TopologyManager {
     }
 
     /// Test helper: Update latency between two nodes (for testing only)
-    #[cfg(test)]
+    /// This method is public to allow integration tests to set up test topology
     pub async fn test_update_latency(&self, node_id1: &str, node_id2: &str, latency_ms: f64) {
         let mut topology = self.topology.write().await;
         let key = format!("{}:{}", node_id1, node_id2);
