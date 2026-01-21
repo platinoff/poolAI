@@ -955,13 +955,13 @@ impl BurstRaidStrategy {
     ///
     /// Returns `Some(ArtifactBurstStats)` if the artifact is being tracked, `None` otherwise.
     pub async fn get_artifact_burst_stats(&self, artifact_id: Uuid) -> Option<ArtifactBurstStats> {
-        // Update burst state to ensure it's current
+        // Update burst state to ensure it's current (this creates entry if it doesn't exist)
         let _ = self.update_burst_state(artifact_id).await;
         
         let request_counters = self.request_counters.read().await;
         let burst_states = self.burst_states.read().await;
 
-        // Get burst state
+        // Get burst state (should exist after update_burst_state)
         let burst_state = burst_states.get(&artifact_id)?;
 
         // Calculate current RPS
