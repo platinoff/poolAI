@@ -6,6 +6,7 @@ Cargo.std.toml
 *.tmp
 *.bak
 *~
+file_list.csv
 
 # IDE files (but keep important configs)
 .vscode/*
