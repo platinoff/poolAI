@@ -63,14 +63,21 @@
 
 ## 🎯 Наступні Кроки (за пріоритетом)
 
-### ⭐⭐⭐ Priority 1.1: Cloud SDK Completion (90% → 100%)
-**Оцінка**: 1 день (опціонально) або готово до v0.2.0
+### ⭐⭐⭐ Priority 1.1: Cloud SDK Completion (90% → 95%)
+**Оцінка**: Готово до v0.2.1
 
-**Залишилось (опціонально)**:
-- [ ] Mock server integration для success scenarios
+**Завершено**:
+- [x] ✅ AWS SDK initialization - 100%
+- [x] ✅ GCP token refresh & caching - 100%
+- [x] ✅ Azure token acquisition - 100%
+- [x] ✅ Extended integration tests - 85%
+- [x] ✅ Cross-provider integration tests
+
+**Залишилось (опціонально для v0.3.0+)**:
+- [ ] Mock server integration для success scenarios (покращення тестів)
 - [ ] Додаткові edge case тести
 
-**Статус**: ✅ **Готово до v0.2.0** (основна функціональність завершена)
+**Статус**: ✅ **Готово до v0.2.1** (основна функціональність завершена, mock servers вже реалізовані, потрібна інтеграція в тести)
 
 ---
 
