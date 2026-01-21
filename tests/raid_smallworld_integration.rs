@@ -39,14 +39,14 @@ async fn create_test_smallworld_strategy() -> (
     // Add some test nodes to topology
     {
         let manager = topology_manager.write().await;
-        manager.test_add_node("1", "192.168.1.1:8080").await;
-        manager.test_add_node("2", "192.168.1.2:8080").await;
-        manager.test_add_node("3", "192.168.1.3:8080").await;
+        (&*manager).test_add_node("1", "192.168.1.1:8080").await;
+        (&*manager).test_add_node("2", "192.168.1.2:8080").await;
+        (&*manager).test_add_node("3", "192.168.1.3:8080").await;
 
         // Add latency information
-        manager.test_update_latency("1", "2", 10.0).await;
-        manager.test_update_latency("2", "3", 15.0).await;
-        manager.test_update_latency("1", "3", 20.0).await;
+        (&*manager).test_update_latency("1", "2", 10.0).await;
+        (&*manager).test_update_latency("2", "3", 15.0).await;
+        (&*manager).test_update_latency("1", "3", 20.0).await;
     }
 
     let smallworld_config = SmallWorldConfig {
@@ -130,7 +130,7 @@ async fn test_rebalance_with_real_artifacts() {
 async fn test_node_selection_based_on_clustering() {
     let (strategy, raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
-    let artifact_ref = raid_manager
+    let _artifact_ref = raid_manager
         .write()
         .await
         .put_artifact("test-artifact", b"test data")
@@ -214,7 +214,7 @@ async fn test_rebalance_optimizes_placement() {
     let (strategy, raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
     // Create artifact
-    let artifact_ref = raid_manager
+    let _artifact_ref = raid_manager
         .write()
         .await
         .put_artifact("test-artifact", b"test data")
