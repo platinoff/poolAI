@@ -577,7 +577,7 @@ impl BurstRaidStrategy {
     pub async fn get_replication_factor(&self, artifact_id: Uuid) -> u32 {
         // Update burst state to ensure it's current
         let _ = self.update_burst_state(artifact_id).await;
-        
+
         let burst_states = self.burst_states.read().await;
 
         if let Some(state) = burst_states.get(&artifact_id) {
@@ -957,7 +957,7 @@ impl BurstRaidStrategy {
     pub async fn get_artifact_burst_stats(&self, artifact_id: Uuid) -> Option<ArtifactBurstStats> {
         // Update burst state to ensure it's current (this creates entry if it doesn't exist)
         let _ = self.update_burst_state(artifact_id).await;
-        
+
         let request_counters = self.request_counters.read().await;
         let burst_states = self.burst_states.read().await;
 
