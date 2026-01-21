@@ -93,6 +93,9 @@ async fn test_clustering_coefficient_with_real_topology() {
         metrics.avg_clustering_coefficient >= 0.0,
         "Average clustering coefficient should be >= 0"
     );
+
+    // Cleanup: shutdown strategy
+    strategy.shutdown().await;
 }
 
 #[tokio::test]
