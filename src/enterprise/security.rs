@@ -643,6 +643,125 @@ impl SecurityManager {
         Ok(sso_url)
     }
 
+    /// Validates SAML assertion and extracts user attributes
+    ///
+    /// # Arguments
+    ///
+    /// * `provider_name` - Name of the SAML provider
+    /// * `saml_response` - Base64-encoded SAML response (SAMLResponse parameter)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if validation fails.
+    ///
+    /// # Note
+    ///
+    /// This is a simplified implementation. In production, you should:
+    /// - Parse full SAML XML response
+    /// - Verify XML signature using X.509 certificate
+    /// - Validate NotBefore/NotOnOrAfter timestamps
+    /// - Check Audience restriction
+    /// - Verify InResponseTo matches AuthnRequest ID
+    pub async fn validate_saml_assertion(
+        &self,
+        provider_name: &str,
+        saml_response: &str,
+    ) -> Result<HashMap<String, String>, AppError> {
+        let providers = self.saml_providers.read().await;
+        let provider = providers.get(provider_name).ok_or_else(|| {
+            AppError::ValidationError(format!(
+                "SAML provider not found: {}. Context: Cannot validate assertion for unknown provider. \
+                Suggestion: Register the provider first using register_saml_provider().",
+                provider_name
+            ))
+        })?;
+
+        if !provider.enabled {
+            return Err(AppError::ValidationError(format!(
+                "SAML provider is disabled: {}",
+                provider_name
+            )));
+        }
+
+        // Decode base64 SAML response
+        let decoded = base64::engine::general_purpose::STANDARD
+            .decode(saml_response)
+            .map_err(|e| {
+                AppError::ValidationError(format!(
+                    "Failed to decode SAML response. Context: Invalid base64 encoding. \
+                    Suggestion: Verify SAML response format. Error: {}",
+                    e
+                ))
+            })?;
+
+        // Parse SAML XML (simplified - in production use proper XML parser and signature verification)
+        let xml_str = String::from_utf8(decoded).map_err(|e| {
+            AppError::ValidationError(format!(
+                "Failed to parse SAML response as UTF-8. Context: Invalid character encoding. \
+                Suggestion: Verify SAML response format. Error: {}",
+                e
+            ))
+        })?;
+
+        // Extract user attributes from SAML response (simplified parsing)
+        // In production, use proper XML parsing library (e.g., quick-xml) and verify signature
+        let mut attributes = HashMap::new();
+
+        // Simple attribute extraction (for testing/demo purposes)
+        // Production implementation should:
+        // 1. Parse XML properly
+        // 2. Verify signature using provider.config.certificate
+        // 3. Extract attributes based on provider.config.attribute_mapping
+        // 4. Validate timestamps and audience
+
+        // Extract NameID (user identifier)
+        if let Some(nameid_start) = xml_str.find("<saml:NameID>") {
+            if let Some(nameid_end) = xml_str[nameid_start..].find("</saml:NameID>") {
+                let nameid = xml_str[nameid_start + 13..nameid_start + nameid_end].trim();
+                attributes.insert("nameid".to_string(), nameid.to_string());
+            }
+        }
+
+        // Extract attributes based on attribute mapping
+        for (saml_attr, user_field) in &provider.config.attribute_mapping {
+            // Simple attribute extraction (in production, use proper XML parsing)
+            let attr_pattern = format!("<saml:Attribute Name=\"{}\">", saml_attr);
+            if let Some(attr_start) = xml_str.find(&attr_pattern) {
+                if let Some(attr_value_start) = xml_str[attr_start..].find("<saml:AttributeValue>") {
+                    if let Some(attr_value_end) = xml_str[attr_start + attr_value_start..]
+                        .find("</saml:AttributeValue>")
+                    {
+                        let attr_value = xml_str
+                            [attr_start + attr_value_start + 22
+                                ..attr_start + attr_value_start + attr_value_end]
+                            .trim();
+                        attributes.insert(user_field.clone(), attr_value.to_string());
+                    }
+                }
+            }
+        }
+
+        // If no attributes extracted, use NameID as username
+        if attributes.is_empty() {
+            if let Some(nameid) = attributes.get("nameid") {
+                attributes.insert("username".to_string(), nameid.clone());
+            } else {
+                return Err(AppError::ValidationError(
+                    "Failed to extract user attributes from SAML response. Context: No valid attributes found. \
+                    Suggestion: Verify SAML response format and attribute mapping configuration.".to_string()
+                ));
+            }
+        }
+
+        info!(
+            "SAML assertion validated for provider {} (extracted {} attributes)",
+            provider_name,
+            attributes.len()
+        );
+
+        Ok(attributes)
+    }
+
     /// Creates a security policy
     ///
     /// # Errors

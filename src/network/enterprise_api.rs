@@ -14,7 +14,7 @@ use crate::network::api::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
 use axum::{
-    extract::{Extension, Path, Query},
+    extract::{Extension, Form, Path, Query},
     http::StatusCode,
     middleware,
     response::{IntoResponse, Redirect},
@@ -147,6 +147,10 @@ pub fn create_enterprise_api_routes() -> Router {
         .route("/auth/telegram", get(oauth2_telegram_auth_handler))
         .route(
             "/auth/telegram/callback",
+        )
+        // SAML SSO Authentication endpoints
+        .route("/auth/saml/{provider}", get(saml_auth_handler))
+        .route("/auth/saml/{provider}/callback", post(saml_callback_handler))
             get(oauth2_telegram_callback_handler),
         )
 }
