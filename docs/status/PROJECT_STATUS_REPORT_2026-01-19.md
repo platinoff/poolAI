@@ -155,10 +155,10 @@
 
 ### ⭐⭐⭐ Priority 1: v0.2.0 - Опціональні покращення
 
-#### 1.1 Cloud SDK Full Implementation - **85%** 🔄 (+10%)
+#### 1.1 Cloud SDK Full Implementation - **90%** 🔄 (+5%)
 **Пріоритет**: Високий  
-**Оцінка**: 2-4 дні (залишилось)  
-**Поточний стан**: Інфраструктура 100% ✅, AWS SDK initialization завершено ✅, GCP token refresh завершено ✅
+**Оцінка**: 1-2 дні (залишилось)  
+**Поточний стан**: Інфраструктура 100% ✅, AWS SDK initialization завершено ✅, GCP token refresh завершено ✅, Integration tests розширено ✅
 
 **Прогрес**:
 - ✅ REST API структура: 100%
@@ -180,13 +180,21 @@
   - ✅ Token refresh implementation: 100%
   - ✅ Token caching з TTL: 100%
   - ✅ Automatic token renewal: 100%
-- ⏳ Integration tests: 70% (infrastructure ready, timeout tests added, повні тести pending)
+- ✅ **Integration tests: 85%** ✅ **РОЗШИРЕНО**
+  - ✅ Timeout configuration додано
+  - ✅ Extended AWS integration tests (EC2, ECS operations)
+  - ✅ Extended Azure integration tests (VM Scale Set operations)
+  - ✅ Extended GCP integration tests (Compute Engine operations)
+  - ✅ Cross-provider integration tests
+  - ✅ Error handling tests
+  - ⏳ Mock server integration (опціонально)
 
 **Завдання**:
 - [x] AWS SDK initialization (3 дні) ✅ **ЗАВЕРШЕНО**
 - [x] Azure token acquisition enhancement (2-3 години) ✅ **ЗАВЕРШЕНО**
 - [x] GCP SDK initialization completion (1 день) ✅ **ЗАВЕРШЕНО**
-- [ ] Integration tests для всіх провайдерів (2 дні) - залишилось
+- [x] Extended integration tests для всіх провайдерів ✅ **ЗАВЕРШЕНО**
+- [ ] Mock server integration для success scenarios (опціонально, 1 день)
 
 **Файли**:
 - `src/cloud/providers/aws.rs` (6 TODOs)
@@ -357,12 +365,13 @@ API Endpoints     ████████████████████ 1
 
 ### ⭐⭐⭐ Найвищий пріоритет (зробити першим):
 
-1. **Cloud SDK Full Implementation** (85% → 100%) ✅ AWS SDK та GCP Token Refresh завершено
+1. **Cloud SDK Full Implementation** (90% → 100%) ✅ AWS SDK, GCP Token Refresh, Integration Tests завершено
    - ✅ Azure token acquisition enhancement (2-3 години) - **ЗАВЕРШЕНО**
    - ✅ GCP SDK completion (1 день) - token refresh та caching - **ЗАВЕРШЕНО**
    - ✅ AWS SDK initialization (3 дні) - EC2, ECS, S3 clients - **ЗАВЕРШЕНО**
-   - Integration tests для всіх провайдерів (2 дні) - залишилось
-   - **Оцінка**: 2 дні (залишилось)
+   - ✅ Extended integration tests (2 дні) - AWS, Azure, GCP operations - **ЗАВЕРШЕНО**
+   - Mock server integration для success scenarios (опціонально, 1 день)
+   - **Оцінка**: 1 день (опціонально) або готово до v0.2.0
 
 2. **RAID Strategy Enhancements** (95% → 100%)
    - Metrics collection (2 дні)
