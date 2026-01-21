@@ -34,8 +34,16 @@
 ## Scripts
 
 - All scripts MUST be in `scripts/` directory
-- Never create `.sh` files in root directory
+- Never create `.sh` or `.ps1` files in root directory
 - See `scripts/README.md` for script documentation
+
+## File Listing Rules
+
+**When creating file lists or inventories:**
+- ❌ **NEVER** use `.ps1` or `.ps` extensions in file lists
+- ✅ Use descriptive names: "MSVC environment setup script" instead of `setup_msvc_environment.ps1`
+- ✅ Group by category: "PowerShell scripts", "Bash scripts"
+- ✅ Use markdown lists or tables, not PowerShell command output
 
 ## Git
 

@@ -12,9 +12,10 @@
       "icon": "terminal-bash"
     }
   },
-  // Global PATH for all terminals (includes MSYS2 for gcc.exe when needed)
+  // Global PATH for all terminals
+  // Priority: Cargo -> MSVC (if available) -> MSYS2 (for GNU toolchain)
   "terminal.integrated.env.windows": {
-    "PATH": "${env:PATH};C:\\msys64\\ucrt64\\bin;C:\\msys64\\usr\\bin;C:\\Users\\${env:USERNAME}\\.cargo\\bin"
+    "PATH": "C:\\Users\\${env:USERNAME}\\.cargo\\bin;${env:PATH}"
   },
   "terminal.integrated.cwd": "${workspaceFolder}",
   

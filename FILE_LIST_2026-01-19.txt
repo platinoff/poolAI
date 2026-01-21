@@ -1,0 +1,223 @@
+ПЕРЕЛІК ФАЙЛІВ ПРОЕКТУ poolAI
+Оновлено: 2026-01-19
+Директорія: S:\rust\poolAI
+
+================================================================================
+КОРІНЬ ПРОЕКТУ
+================================================================================
+
+Конфігураційні файли:
+  Cargo.toml (8.46 KB) - основна конфігурація проекту
+  Cargo.lock (114.98 KB) - lock файл залежностей
+  rust-toolchain.toml (0.13 KB) - конфігурація Rust toolchain
+  .cursorrules (14.34 KB) - правила Cursor IDE
+  .gitignore (0.31 KB) - Git ignore rules
+  .gitattributes (0.34 KB) - Git attributes
+  build.rs (0.52 KB) - build script
+  LICENSE (1.07 KB) - ліцензія
+
+Документація:
+  README.md (17.09 KB) - основний README
+  README.uk.md (17.66 KB) - український README
+
+Конфігурація:
+  config.toml (0.54 KB) - конфігурація проекту
+  config.example.toml (1.12 KB) - приклад конфігурації
+  config.https.example.toml (6.15 KB) - приклад HTTPS конфігурації
+
+Cargo альтернативні конфігурації:
+  Cargo.minimal.toml (1.69 KB) - мінімальна конфігурація
+  Cargo.std.toml (0.53 KB) - стандартна конфігурація
+
+================================================================================
+ОСНОВНІ ДИРЕКТОРІЇ
+================================================================================
+
+.cargo/          - Cargo конфігурація
+.cursor/         - Cursor IDE конфігурація (rules, commands, hooks)
+.github/         - GitHub конфігурація (workflows, templates)
+.vscode/         - VS Code/Cursor налаштування
+benches/         - Benchmark тести
+certs/           - Сертифікати (cert.pem, key.pem)
+data/            - Дані проекту
+docker/          - Docker файли
+docs/            - Документація (90+ файлів)
+scripts/         - Скрипти (PowerShell та Bash)
+src/             - Вихідний код Rust
+target/          - Build artifacts (gitignored)
+tests/           - Тести (50+ файлів)
+
+================================================================================
+ТЕСТИ (tests/)
+================================================================================
+
+Cloud тести:
+  cloud_integration.rs (448 lines) - розширені integration тести з timeout
+  cloud_autoscaling.rs
+  cloud_config_validation.rs
+  cloud_kubernetes.rs
+  cloud_loadbalancing.rs
+  cloud_operator.rs
+  cloud_providers.rs
+
+Integration тести (tests/integration/):
+  tests/integration/cloud/token_acquisition_tests.rs
+  tests/integration/cloud/mock_servers.rs
+  tests/integration/cloud/aws_tests.rs
+  tests/integration/cloud/azure_tests.rs
+  tests/integration/cloud/gcp_tests.rs
+
+Інші тести (40+ файлів):
+  circuit_breaker_integration.rs
+  core_error_handling_tests.rs
+  core_model_interface_integration.rs
+  core_state_integration.rs
+  deployment_integration.rs
+  distributed_replication_tests.rs
+  enterprise_audit_integration.rs
+  enterprise_monitoring_integration.rs
+  enterprise_security_integration.rs
+  enterprise_tenant_integration.rs
+  event_sourcing_integration.rs
+  failure_scenario_tests.rs
+  libs_dependencies_integration.rs
+  libs_integration.rs
+  load_tests.rs
+  monitoring_metrics_integration.rs
+  network_api_integration.rs
+  network_auth_integration.rs
+  network_ws_integration.rs
+  platform_integration.rs
+  pool_worker_tests.rs
+  raft_integration.rs
+  raid_integration.rs
+  raid_libs_integration.rs
+  raid_protocol_integration.rs
+  raid_small_world_integration.rs
+  replication_benchmarks.rs
+  rewards_integration.rs
+  runtime_health_integration.rs
+  runtime_instance_integration.rs
+  runtime_integration.rs
+  runtime_orchestrator_integration.rs
+  runtime_process_integration.rs
+  runtime_queue_integration.rs
+  runtime_worker_integration.rs
+  security_headers_integration.rs
+  security_integration.rs
+  tgbot_integration.rs
+  ui_components_integration.rs
+  ui_write_operations_integration.rs
+  vm_auto_recovery_tests.rs
+  vm_health_integration.rs
+  vm_integration.rs
+  vm_isolation_integration.rs
+  vm_linux_resource_limits_integration.rs
+  vm_resource_limits_integration.rs
+  vm_resource_monitoring_tests.rs
+  vm_windows_resource_limits_integration.rs
+  vm_write_operations_integration.rs
+
+================================================================================
+СКРИПТИ (scripts/)
+================================================================================
+
+PowerShell скрипти:
+  setup_msys2_path.ps1 - налаштування MSYS2 PATH
+  setup_msvc_environment.ps1 - налаштування MSVC environment (новий)
+  setup_rust_environment.ps1 - автоматичне налаштування Rust environment (новий)
+
+Bash скрипти:
+  build-with-https.sh - компіляція з HTTPS features
+  fix_gcc.sh - виправлення GCC
+  install_gcc.sh - встановлення GCC
+  setup_rust_path.sh - налаштування Rust PATH
+  QUICK_FIX_RUST_PATH.sh - швидке виправлення Rust PATH
+  verify_build.sh - перевірка збірки
+  PUSH_COMMANDS.sh - Git push helper
+
+================================================================================
+ДОКУМЕНТАЦІЯ (docs/)
+================================================================================
+
+docs/development/ (50+ файлів):
+  Нові файли (2026-01-19):
+    NATIVECOMMANDERROR_ANALYSIS_2026-01-19.md - аналіз помилки PowerShell
+    TEST_CONFIGURATION_STATUS_2026-01-19.md - статус тестів
+    TEST_TIMEOUT_RESEARCH_2026-01-19.md - research про timeout
+    WINDOWS_ENVIRONMENT_STATUS_2026-01-19.md - статус Windows середовища
+    PROJECT_FILES_INVENTORY_2026-01-19.md - інвентар файлів
+
+  Інші важливі файли:
+    RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md
+    PRIORITY_1_1_COMPLETION_2026-01-19.md
+    CLOUD_SDK_PROGRESS_2026-01-19.md
+    NEXT_STEPS_2026-01-19.md
+    (та багато інших)
+
+docs/status/ - статус проекту
+docs/concept/ - концепції проекту
+docs/archive/ - архівні документи (60+ файлів)
+docs/deployment/ - розгортання
+docs/configuration/ - конфігурація
+docs/monitoring/ - моніторинг
+docs/security/ - безпека
+docs/performance/ - продуктивність
+docs/troubleshooting/ - troubleshooting
+docs/migration/ - міграція
+docs/vm/ - VM модуль
+docs/cloud/ - Cloud модуль
+
+================================================================================
+CURSOR CONFIGURATION (.cursor/)
+================================================================================
+
+  README.md - опис конфігурації
+  CHANGELOG.md - changelog
+  hooks.json - hooks конфігурація
+  CURSOR_CONFIG_STATUS_2026-01-19.md - статус конфігурації
+
+  rules/
+    rust.md - Rust правила
+    project-structure.md - правила структури проекту
+
+  commands/
+    check.md - команда check
+    test.md - команда test
+    review.md - команда review
+    fix-issue.md - команда fix-issue
+    pr.md - команда pr
+
+  hooks/
+    check-tests.ps1 - перевірка тестів перед зупинкою агента
+
+================================================================================
+GITHUB CONFIGURATION (.github/)
+================================================================================
+
+  CONTRIBUTING.md - інструкції для контрибюторів
+  SECURITY.md - політика безпеки
+  PULL_REQUEST_TEMPLATE.md - шаблон PR
+  dependabot.yml - конфігурація Dependabot
+
+  workflows/
+    ci.yml - CI workflow
+    docs.yml - документація workflow
+    release.yml - release workflow
+
+  ISSUE_TEMPLATE/
+    bug_report.md - шаблон bug report
+    feature_request.md - шаблон feature request
+
+================================================================================
+СТАТИСТИКА
+================================================================================
+
+Rust файли (.rs): 50+ файлів
+Документація (.md): 90+ файлів
+Скрипти: 10+ файлів
+Конфігурація: 15+ файлів
+
+Загальна структура: 13 основних директорій, 100+ файлів коду та документації
+
+================================================================================
