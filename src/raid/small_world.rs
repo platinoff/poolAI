@@ -92,6 +92,21 @@ impl Default for SmallWorldConfig {
     }
 }
 
+/// Metrics for SmallWorld strategy
+#[derive(Debug, Clone)]
+pub struct SmallWorldMetrics {
+    /// Total number of artifacts being tracked
+    pub total_artifacts: usize,
+    /// Total number of nodes
+    pub total_nodes: usize,
+    /// Average clustering coefficient across all nodes
+    pub avg_clustering_coefficient: f64,
+    /// Target clustering coefficient
+    pub target_clustering_coefficient: f64,
+    /// Base replication factor
+    pub base_replication_factor: u32,
+}
+
 /// SmallWorld network strategy for distributed storage
 pub struct SmallWorldStrategy {
     /// Configuration
@@ -447,7 +462,11 @@ impl SmallWorldStrategy {
     /// Rebalance artifacts across nodes
     ///
     /// Moves artifacts to optimize SmallWorld topology placement.
-    pub async fn rebalance(&self) -> Result<(), AppError> {
+    ///
+    /// # Returns
+    ///
+    /// Returns the number of artifacts moved during rebalancing.
+    pub async fn rebalance(&self) -> Result<usize, AppError> {
         info!("Starting SmallWorld rebalancing");
 
         // Update clustering coefficients
@@ -458,7 +477,7 @@ impl SmallWorldStrategy {
 
         if distribution.is_empty() {
             info!("No artifacts to rebalance");
-            return Ok(());
+            return Ok(0);
         }
 
         info!("Analyzed distribution: {} artifacts", distribution.len());
@@ -509,7 +528,39 @@ impl SmallWorldStrategy {
             moved_count, failed_count
         );
 
-        Ok(())
+        Ok(moved_count)
+    }
+
+    /// Get metrics for SmallWorld strategy
+    ///
+    /// Returns statistics about clustering and rebalancing.
+    pub async fn get_metrics(&self) -> SmallWorldMetrics {
+        let coefficients = self.clustering_coefficients.read().await;
+        let placements = self.artifact_placements.read().await;
+
+        let total_artifacts = placements.len();
+        let total_nodes = coefficients.len();
+        let avg_clustering_coefficient = if total_nodes > 0 {
+            coefficients.values().sum::<f64>() / total_nodes as f64
+        } else {
+            0.0
+        };
+
+        SmallWorldMetrics {
+            total_artifacts,
+            total_nodes,
+            avg_clustering_coefficient,
+            target_clustering_coefficient: self.config.target_clustering_coefficient,
+            base_replication_factor: self.config.base_replication_factor,
+        }
+    }
+
+    /// Get clustering coefficient for a specific node
+    ///
+    /// Returns the clustering coefficient if available.
+    pub async fn get_node_clustering_coefficient(&self, node_id: u64) -> Option<f64> {
+        let coefficients = self.clustering_coefficients.read().await;
+        coefficients.get(&node_id).copied()
     }
 
     /// Start background rebalancing task
@@ -564,7 +615,7 @@ struct SmallWorldStrategyForTask {
 }
 
 impl SmallWorldStrategyForTask {
-    async fn run_rebalance(&self) -> Result<(), AppError> {
+    async fn run_rebalance(&self) -> Result<usize, AppError> {
         info!("Starting SmallWorld rebalancing");
 
         // Update clustering coefficients
@@ -575,7 +626,7 @@ impl SmallWorldStrategyForTask {
 
         if distribution.is_empty() {
             info!("No artifacts to rebalance");
-            return Ok(());
+            return Ok(0);
         }
 
         info!("Analyzed distribution: {} artifacts", distribution.len());
@@ -626,7 +677,7 @@ impl SmallWorldStrategyForTask {
             moved_count, failed_count
         );
 
-        Ok(())
+        Ok(moved_count)
     }
 
     async fn update_clustering_coefficients(&self) -> Result<(), AppError> {

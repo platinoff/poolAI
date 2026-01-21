@@ -35,8 +35,11 @@
 
 use crate::core::error::AppError;
 use chrono::{DateTime, Utc};
+use rusqlite::{params, Connection, Result as SqliteResult};
 use serde::{Deserialize, Serialize};
+use serde_json;
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::{info, warn};
@@ -170,7 +173,6 @@ pub struct MonitoringManager {
     dashboards: Arc<RwLock<HashMap<Uuid, Dashboard>>>,
     initialized: Arc<RwLock<bool>>,
     /// SQLite database path for metrics persistence (None = in-memory only)
-    #[allow(dead_code)] // Reserved for future SQLite integration
     db_path: Option<String>,
 }
 
@@ -204,7 +206,6 @@ impl MonitoringManager {
     /// // Create with file-based persistence
     /// let manager = MonitoringManager::new_with_persistence(Some("./data/metrics.db".to_string()));
     /// ```
-    #[allow(dead_code)] // Reserved for future SQLite integration
     pub fn new_with_persistence(db_path: Option<String>) -> Self {
         Self {
             alert_rules: Arc::new(RwLock::new(HashMap::new())),
@@ -216,6 +217,68 @@ impl MonitoringManager {
         }
     }
 
+    /// Initialize SQLite database schema
+    fn init_database_schema(conn: &Connection) -> SqliteResult<()> {
+        // Create metrics_history table
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS metrics_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                metric TEXT NOT NULL,
+                value REAL NOT NULL,
+                tags TEXT,
+                tenant_id TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )",
+            [],
+        )?;
+
+        // Create indexes for efficient queries
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_metrics_timestamp ON metrics_history(timestamp)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_metrics_metric ON metrics_history(metric)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_metrics_tenant ON metrics_history(tenant_id)",
+            [],
+        )?;
+
+        // Create dashboards table
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS dashboards (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                metrics TEXT NOT NULL,
+                layout TEXT NOT NULL,
+                is_public INTEGER NOT NULL DEFAULT 0,
+                tenant_id TEXT,
+                created_at TEXT NOT NULL
+            )",
+            [],
+        )?;
+
+        // Create alert_rules table
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS alert_rules (
+                name TEXT PRIMARY KEY,
+                metric TEXT NOT NULL,
+                threshold REAL NOT NULL,
+                operator TEXT NOT NULL,
+                severity TEXT NOT NULL,
+                enabled INTEGER NOT NULL DEFAULT 1,
+                tenant_id TEXT
+            )",
+            [],
+        )?;
+
+        Ok(())
+    }
+
     /// Initializes the monitoring manager
     pub async fn initialize(&self) -> Result<(), AppError> {
         let mut initialized = self.initialized.write().await;
@@ -223,25 +286,31 @@ impl MonitoringManager {
             return Ok(());
         }
 
-        // TODO: Initialize metrics aggregation
-        // TODO: Initialize dashboard storage (SQLite/PostgreSQL)
-        // TODO: Initialize alert rules engine
-        // TODO: Initialize SQLite database if db_path is configured
-        //   - Create metrics_history table if not exists
-        //   - Create indexes for efficient queries (timestamp, metric, tenant_id)
-        //   - Example schema:
-        //     CREATE TABLE IF NOT EXISTS metrics_history (
-        //       id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //       timestamp TEXT NOT NULL,
-        //       metric TEXT NOT NULL,
-        //       value REAL NOT NULL,
-        //       tags TEXT, -- JSON string
-        //       tenant_id TEXT,
-        //       created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        //     );
-        //     CREATE INDEX IF NOT EXISTS idx_metrics_timestamp ON metrics_history(timestamp);
-        //     CREATE INDEX IF NOT EXISTS idx_metrics_metric ON metrics_history(metric);
-        //     CREATE INDEX IF NOT EXISTS idx_metrics_tenant ON metrics_history(tenant_id);
+        // Initialize SQLite database if db_path is configured
+        if let Some(ref db_path) = self.db_path {
+            // Ensure parent directory exists
+            if let Some(parent) = Path::new(db_path).parent() {
+                tokio::fs::create_dir_all(parent).await.map_err(|e| {
+                    AppError::ConfigError(format!("Failed to create database directory: {}", e))
+                })?;
+            }
+
+            // Initialize schema using spawn_blocking (rusqlite is blocking)
+            let db_path_clone = db_path.clone();
+            tokio::task::spawn_blocking(move || {
+                let conn = Connection::open(&db_path_clone).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to open SQLite database: {}", e))
+                })?;
+                Self::init_database_schema(&conn).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to initialize database schema: {}", e))
+                })?;
+                Ok::<(), AppError>(())
+            })
+            .await
+            .map_err(|e| AppError::InternalError(format!("Database initialization task failed: {}", e)))??;
+
+            info!("SQLite database initialized at: {}", db_path);
+        }
 
         *initialized = true;
         info!(
@@ -271,14 +340,56 @@ impl MonitoringManager {
         }
         drop(history);
 
-        // TODO: Persist to SQLite database if db_path is configured
-        //   - Insert metric into metrics_history table
-        //   - Serialize tags HashMap to JSON string
-        //   - Use transaction for better performance (batch inserts)
-        //   - Example:
-        //     INSERT INTO metrics_history (timestamp, metric, value, tags, tenant_id)
-        //     VALUES (?, ?, ?, ?, ?)
-        //   - Cleanup old metrics (older than retention period, e.g., 30 days)
+        // Persist to SQLite database if db_path is configured
+        if let Some(ref db_path) = self.db_path {
+            let data_point_clone = data_point.clone();
+            let history_len = self.metrics_history.read().await.len();
+            let db_path_clone = db_path.clone();
+
+            // Use spawn_blocking for database operations
+            tokio::task::spawn_blocking(move || {
+                let conn = match Connection::open(&db_path_clone) {
+                    Ok(c) => c,
+                    Err(e) => {
+                        warn!("Failed to open database connection: {}", e);
+                        return;
+                    }
+                };
+
+                // Serialize tags to JSON
+                let tags_json = serde_json::to_string(&data_point_clone.tags)
+                    .unwrap_or_else(|_| "{}".to_string());
+
+                // Insert metric into database
+                let tenant_id_str = data_point_clone.tenant_id.map(|id| id.to_string());
+                let timestamp_str = data_point_clone.timestamp.to_rfc3339();
+
+                if let Err(e) = conn.execute(
+                    "INSERT INTO metrics_history (timestamp, metric, value, tags, tenant_id) VALUES (?1, ?2, ?3, ?4, ?5)",
+                    params![
+                        timestamp_str,
+                        &data_point_clone.metric,
+                        data_point_clone.value,
+                        tags_json,
+                        tenant_id_str
+                    ],
+                ) {
+                    warn!("Failed to persist metric to database: {}", e);
+                } else {
+                    // Cleanup old metrics (older than 30 days) periodically
+                    // Only cleanup every 1000th insert to avoid performance impact
+                    if history_len % 1000 == 0 {
+                        let cutoff = (Utc::now() - chrono::Duration::days(30)).to_rfc3339();
+                        if let Err(e) = conn.execute(
+                            "DELETE FROM metrics_history WHERE timestamp < ?1",
+                            params![cutoff],
+                        ) {
+                            warn!("Failed to cleanup old metrics: {}", e);
+                        }
+                    }
+                }
+            });
+        }
 
         // Check alert rules
         self.check_alert_rules(&data_point).await?;
@@ -528,22 +639,115 @@ impl MonitoringManager {
         tenant_id: Option<Uuid>,
         limit: Option<usize>,
     ) -> Result<Vec<MetricDataPoint>, AppError> {
-        // TODO: Query from SQLite database if db_path is configured
-        //   - Build SQL query with filters for metric, start_time, end_time, tenant_id
-        //   - Use indexes for efficient querying
-        //   - Deserialize tags JSON string to HashMap
-        //   - Example:
-        //     SELECT timestamp, metric, value, tags, tenant_id
-        //     FROM metrics_history
-        //     WHERE (? IS NULL OR metric = ?)
-        //       AND (? IS NULL OR timestamp >= ?)
-        //       AND (? IS NULL OR timestamp <= ?)
-        //       AND (? IS NULL OR tenant_id = ?)
-        //     ORDER BY timestamp DESC
-        //     LIMIT ?
-        //   - If database is not available, fallback to in-memory history
+        // Query from SQLite database if db_path is configured
+        if let Some(ref db_path) = self.db_path {
+            let metric_clone = metric.map(|s| s.to_string());
+            let start_time_clone = start_time.map(|t| t.to_rfc3339());
+            let end_time_clone = end_time.map(|t| t.to_rfc3339());
+            let tenant_id_clone = tenant_id.map(|id| id.to_string());
+            let limit_clone = limit;
+            let db_path_clone = db_path.clone();
 
-        // Fallback to in-memory history (for now)
+            // Use spawn_blocking for database operations
+            let results = tokio::task::spawn_blocking(move || {
+                let conn = match Connection::open(&db_path_clone) {
+                    Ok(c) => c,
+                    Err(e) => {
+                        warn!("Failed to open database connection: {}", e);
+                        return Ok::<Vec<MetricDataPoint>, AppError>(Vec::new());
+                    }
+                };
+
+                // Build SQL query with filters
+                let mut query = "SELECT timestamp, metric, value, tags, tenant_id FROM metrics_history WHERE 1=1".to_string();
+                let mut params_vec: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+
+                if let Some(ref m) = metric_clone {
+                    query.push_str(" AND metric = ?");
+                    params_vec.push(Box::new(m.clone()));
+                }
+
+                if let Some(ref start) = start_time_clone {
+                    query.push_str(" AND timestamp >= ?");
+                    params_vec.push(Box::new(start.clone()));
+                }
+
+                if let Some(ref end) = end_time_clone {
+                    query.push_str(" AND timestamp <= ?");
+                    params_vec.push(Box::new(end.clone()));
+                }
+
+                if let Some(ref tid) = tenant_id_clone {
+                    query.push_str(" AND tenant_id = ?");
+                    params_vec.push(Box::new(tid.clone()));
+                }
+
+                query.push_str(" ORDER BY timestamp DESC");
+
+                if let Some(l) = limit_clone {
+                    query.push_str(&format!(" LIMIT {}", l));
+                }
+
+                // Execute query
+                let mut stmt = match conn.prepare(&query) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        return Err(AppError::InternalError(format!("Failed to prepare query: {}", e)));
+                    }
+                };
+
+                let rows = match stmt.query_map(
+                    rusqlite::params_from_iter(params_vec.iter().map(|p| p.as_ref())),
+                    |row| {
+                        let timestamp_str: String = row.get(0)?;
+                        let metric: String = row.get(1)?;
+                        let value: f64 = row.get(2)?;
+                        let tags_json: String = row.get(3)?;
+                        let tenant_id_str: Option<String> = row.get(4)?;
+
+                        let timestamp = DateTime::parse_from_rfc3339(&timestamp_str)
+                            .map_err(|_| rusqlite::Error::InvalidColumnType(0, "timestamp".to_string(), rusqlite::types::Type::Text))?
+                            .with_timezone(&Utc);
+
+                        let tags: HashMap<String, String> = serde_json::from_str(&tags_json)
+                            .unwrap_or_else(|_| HashMap::new());
+
+                        let tenant_id = tenant_id_str.and_then(|s| Uuid::parse_str(&s).ok());
+
+                        Ok(MetricDataPoint {
+                            timestamp,
+                            metric,
+                            value,
+                            tags,
+                            tenant_id,
+                        })
+                    },
+                ) {
+                    Ok(r) => r,
+                    Err(e) => {
+                        return Err(AppError::InternalError(format!("Failed to execute query: {}", e)));
+                    }
+                };
+
+                let mut results = Vec::new();
+                for row_result in rows {
+                    match row_result {
+                        Ok(point) => results.push(point),
+                        Err(e) => {
+                            warn!("Failed to parse metric row: {}", e);
+                        }
+                    }
+                }
+
+                Ok(results)
+            })
+            .await
+            .map_err(|e| AppError::InternalError(format!("Database query task failed: {}", e)))??;
+
+            return Ok(results);
+        }
+
+        // Fallback to in-memory history if database is not available
         let history = self.metrics_history.read().await;
         let mut filtered: Vec<MetricDataPoint> = history
             .iter()

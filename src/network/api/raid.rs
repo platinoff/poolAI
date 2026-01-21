@@ -892,21 +892,33 @@ async fn raid_metrics_handler() -> impl IntoResponse {
 
     // Strategy-specific metrics
     let replication_factor = match mode {
-        raid::RaidMode::BurstRaid | raid::RaidMode::SmallWorld => {
-            // Default replication factors
-            Some(match mode {
-                raid::RaidMode::BurstRaid => 2,  // base_replication_factor
-                raid::RaidMode::SmallWorld => 3, // base_replication_factor
-                _ => unreachable!(),
-            })
+        raid::RaidMode::BurstRaid => {
+            // Get actual replication factor from BurstRAID strategy
+            if let Some(metrics) = manager.get_burst_raid_metrics().await {
+                Some(metrics.base_replication_factor)
+            } else {
+                Some(2) // Default base_replication_factor
+            }
+        }
+        raid::RaidMode::SmallWorld => {
+            // Get actual replication factor from SmallWorld strategy
+            if let Some(metrics) = manager.get_small_world_metrics().await {
+                Some(metrics.base_replication_factor)
+            } else {
+                Some(3) // Default base_replication_factor
+            }
         }
         _ => None,
     };
 
     let clustering_coefficient = match mode {
         raid::RaidMode::SmallWorld => {
-            // TODO: Get actual clustering coefficient from SmallWorld strategy
-            None
+            // Get actual clustering coefficient from SmallWorld strategy
+            if let Some(metrics) = manager.get_small_world_metrics().await {
+                Some(metrics.avg_clustering_coefficient)
+            } else {
+                None
+            }
         }
         _ => None,
     };

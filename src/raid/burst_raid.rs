@@ -81,6 +81,38 @@ struct BurstState {
     in_burst: bool,
 }
 
+/// Metrics for BurstRAID strategy
+#[derive(Debug, Clone)]
+pub struct BurstRaidMetrics {
+    /// Total number of artifacts being tracked
+    pub total_artifacts: usize,
+    /// Number of artifacts currently in burst mode
+    pub artifacts_in_burst: usize,
+    /// Total number of requests tracked
+    pub total_requests: u64,
+    /// Burst detection threshold (requests per second)
+    pub burst_threshold_rps: f64,
+    /// Base replication factor
+    pub base_replication_factor: u32,
+    /// Maximum replication factor during bursts
+    pub max_replication_factor: u32,
+}
+
+/// Burst detection statistics for a specific artifact
+#[derive(Debug, Clone)]
+pub struct ArtifactBurstStats {
+    /// Artifact ID
+    pub artifact_id: Uuid,
+    /// Whether artifact is currently in burst mode
+    pub in_burst: bool,
+    /// Current requests per second
+    pub current_rps: f64,
+    /// Current replication factor
+    pub replication_factor: u32,
+    /// Last burst detection time
+    pub last_burst_time: Option<DateTime<Utc>>,
+}
+
 /// Minimal BurstRaidStrategy clone for background tasks
 ///
 /// Contains only the fields needed for background tasks to avoid circular references.
@@ -93,7 +125,7 @@ struct BurstRaidStrategyForTask {
 
 impl BurstRaidStrategyForTask {
     /// Run rebalancing (reuses logic from BurstRaidStrategy)
-    async fn run_rebalance(&self) -> Result<(), AppError> {
+    async fn run_rebalance(&self) -> Result<usize, AppError> {
         // Reuse the rebalance() method by calling it through a temporary BurstRaidStrategy
         // For now, inline the core rebalancing logic here
         info!("Starting BurstRAID rebalancing");
@@ -103,7 +135,7 @@ impl BurstRaidStrategyForTask {
 
         if distribution.is_empty() {
             info!("No artifacts to rebalance");
-            return Ok(());
+            return Ok(0);
         }
 
         info!("Analyzed distribution: {} artifacts", distribution.len());
@@ -113,7 +145,7 @@ impl BurstRaidStrategyForTask {
 
         if rebalance_plan.is_empty() {
             info!("Rebalancing not needed: distribution is already balanced");
-            return Ok(());
+            return Ok(0);
         }
 
         info!(
@@ -140,7 +172,7 @@ impl BurstRaidStrategyForTask {
             moved_count, failed_count
         );
 
-        Ok(())
+        Ok(moved_count)
     }
 
     // Helper methods (same as BurstRaidStrategy)
@@ -657,10 +689,14 @@ impl BurstRaidStrategy {
     /// It analyzes current distribution, identifies artifacts that should be moved
     /// based on access patterns and node capacity, and moves them to better nodes.
     ///
+    /// # Returns
+    ///
+    /// Returns the number of artifacts moved during rebalancing.
+    ///
     /// # Errors
     ///
     /// Returns `AppError` if rebalancing fails.
-    pub async fn rebalance(&self) -> Result<(), AppError> {
+    pub async fn rebalance(&self) -> Result<usize, AppError> {
         info!("Starting BurstRAID rebalancing");
 
         // 1. Analyze current distribution of artifacts across nodes

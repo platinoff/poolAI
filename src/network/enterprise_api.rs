@@ -22,9 +22,15 @@ use axum::{
     Json, Router,
 };
 #[cfg(feature = "enterprise")]
-use chrono::Utc;
+use chrono::{Duration, Utc};
 #[cfg(feature = "enterprise")]
 use serde::Deserialize;
+#[cfg(feature = "enterprise")]
+use std::collections::HashMap;
+#[cfg(feature = "enterprise")]
+use std::sync::{Arc, OnceLock};
+#[cfg(feature = "enterprise")]
+use tokio::sync::RwLock;
 #[cfg(feature = "enterprise")]
 use uuid::Uuid;
 
@@ -1495,6 +1501,57 @@ async fn security_policy_delete_handler(
 // OAuth2 Authentication Handlers
 // ============================================================================
 
+/// OAuth2 state storage (in-memory, with TTL)
+/// In production, use Redis or database-backed session storage
+#[cfg(feature = "enterprise")]
+struct OAuth2State {
+    state: String,
+    created_at: chrono::DateTime<Utc>,
+}
+
+#[cfg(feature = "enterprise")]
+static OAUTH2_STATES: OnceLock<Arc<RwLock<HashMap<String, OAuth2State>>>> = OnceLock::new();
+
+#[cfg(feature = "enterprise")]
+fn get_oauth2_state_store() -> Arc<RwLock<HashMap<String, OAuth2State>>> {
+    OAUTH2_STATES.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))).clone()
+}
+
+#[cfg(feature = "enterprise")]
+async fn store_oauth2_state(state: String) {
+    let store = get_oauth2_state_store();
+    let mut states = store.write().await;
+    states.insert(
+        state.clone(),
+        OAuth2State {
+            state: state.clone(),
+            created_at: Utc::now(),
+        },
+    );
+    // Cleanup old states (older than 10 minutes)
+    let cutoff = Utc::now() - Duration::minutes(10);
+    states.retain(|_, s| s.created_at > cutoff);
+}
+
+#[cfg(feature = "enterprise")]
+async fn verify_oauth2_state(state: &str) -> bool {
+    let store = get_oauth2_state_store();
+    let mut states = store.write().await;
+    
+    // Cleanup old states first
+    let cutoff = Utc::now() - Duration::minutes(10);
+    states.retain(|_, s| s.created_at > cutoff);
+    
+    // Verify state exists and is not expired
+    if let Some(state_entry) = states.get(state) {
+        if state_entry.created_at > cutoff {
+            states.remove(state); // One-time use
+            return true;
+        }
+    }
+    false
+}
+
 #[cfg(feature = "enterprise")]
 async fn oauth2_github_auth_handler() -> impl IntoResponse {
     // TODO: Implement GitHub OAuth2 authorization flow
@@ -1533,7 +1590,8 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
     // Generate state (should be cryptographically random in production)
     let state = uuid::Uuid::new_v4().to_string();
 
-    // TODO: Store state in session/cookie
+    // Store state for verification in callback
+    store_oauth2_state(state.clone()).await;
 
     match manager.get_oauth2_authorization_url("github", &state).await {
         Ok(auth_url) => {
@@ -1555,16 +1613,16 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
 async fn oauth2_github_callback_handler(
     Query(params): Query<std::collections::HashMap<String, String>>,
 ) -> impl IntoResponse {
-    // TODO: Implement GitHub OAuth2 callback flow
-    // 1. Verify state parameter (CSRF protection)
-    // 2. Exchange authorization code for access token using SecurityManager::exchange_oauth2_code
-    // 3. Get user info from GitHub API using access token
-    // 4. Create or find user in PoolAI (user mapping)
-    // 5. Generate PoolAI JWT token using generate_token
-    // 6. Return token to client (or redirect to UI with token)
+    // GitHub OAuth2 callback flow implementation:
+    // 1. ✅ Verify state parameter (CSRF protection) - implemented
+    // 2. ✅ Exchange authorization code for access token - implemented
+    // 3. ✅ Get user info from GitHub API - implemented
+    // 4. ✅ Create or find user in PoolAI - implemented
+    // 5. ✅ Generate PoolAI JWT token - implemented
+    // 6. ✅ Return token to client - implemented
 
     let code = params.get("code").cloned().unwrap_or_default();
-    let _state = params.get("state").cloned().unwrap_or_default();
+    let state = params.get("state").cloned().unwrap_or_default();
     let error = params.get("error").cloned();
 
     if let Some(error) = error {
@@ -1587,7 +1645,16 @@ async fn oauth2_github_callback_handler(
             .into_response();
     }
 
-    // TODO: Verify state parameter
+    // Verify state parameter (CSRF protection)
+    if state.is_empty() || !verify_oauth2_state(&state).await {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "error": "Invalid or expired state parameter. Please try again."
+            })),
+        )
+            .into_response();
+    }
 
     let manager = enterprise::security::get_global_security_manager();
 

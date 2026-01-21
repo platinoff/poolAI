@@ -91,6 +91,9 @@ zip = { version = "7.0", default-features = false, features = ["deflate", "time"
 sha2 = "0.10"
 hex = "0.4"
 
+# SQLite database for enterprise monitoring persistence
+rusqlite = { version = "0.32", features = ["bundled"] }
+
 # Raft consensus (optional - enabled with feature "raft")
 # Use: cargo build --features raft
 async-raft = { version = "0.6.1", optional = true }
