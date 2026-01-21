@@ -221,8 +221,6 @@ async fn test_rebalance_optimizes_placement() {
         .await
         .unwrap();
 
-    let _artifact_id = artifact_ref.id;
-
     // Initial placement (if any)
     // After rebalancing, placement should be optimized
     let artifacts_moved = strategy.rebalance().await.unwrap();
