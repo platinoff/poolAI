@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["SmallWorldConfig","SmallWorldStrategy"]};
+window.SIDEBAR_ITEMS = {"struct":["SmallWorldConfig","SmallWorldMetrics","SmallWorldStrategy"]};

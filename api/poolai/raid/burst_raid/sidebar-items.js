@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["BurstRaidConfig","BurstRaidStrategy"]};
+window.SIDEBAR_ITEMS = {"struct":["ArtifactBurstStats","BurstRaidConfig","BurstRaidMetrics","BurstRaidStrategy"]};
