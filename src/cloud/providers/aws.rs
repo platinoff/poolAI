@@ -312,15 +312,14 @@ impl AwsManager {
                         .await
                     {
                         Ok(response) => {
-                            if let Some(instances) = response.instances() {
-                                if let Some(instance) = instances.first() {
-                                    if let Some(instance_id) = instance.instance_id() {
-                                        info!(
-                                            "EC2 instance created successfully via AWS SDK: {}",
-                                            instance_id
-                                        );
-                                        return Ok(instance_id.to_string());
-                                    }
+                            let instances = response.instances();
+                            if let Some(instance) = instances.first() {
+                                if let Some(instance_id) = instance.instance_id() {
+                                    info!(
+                                        "EC2 instance created successfully via AWS SDK: {}",
+                                        instance_id
+                                    );
+                                    return Ok(instance_id.to_string());
                                 }
                             }
                             return Err(AppError::NetworkError(
@@ -597,15 +596,14 @@ impl AwsManager {
                         .await
                     {
                         Ok(response) => {
-                            if let Some(tasks) = response.tasks() {
-                                if let Some(task) = tasks.first() {
-                                    if let Some(task_arn) = task.task_arn() {
-                                        info!(
-                                            "ECS task created successfully via AWS SDK: {}",
-                                            task_arn
-                                        );
-                                        return Ok(task_arn.to_string());
-                                    }
+                            let tasks = response.tasks();
+                            if let Some(task) = tasks.first() {
+                                if let Some(task_arn) = task.task_arn() {
+                                    info!(
+                                        "ECS task created successfully via AWS SDK: {}",
+                                        task_arn
+                                    );
+                                    return Ok(task_arn.to_string());
                                 }
                             }
                             return Err(AppError::NetworkError(
