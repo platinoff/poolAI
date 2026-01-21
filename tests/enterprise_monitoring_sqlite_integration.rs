@@ -6,15 +6,20 @@
 //! - Automatic cleanup of old metrics
 //! - Fallback to in-memory history when database is unavailable
 
-use chrono::{DateTime, Duration, Utc};
+#[cfg(feature = "enterprise")]
+use chrono::{Duration, Utc};
+#[cfg(feature = "enterprise")]
 use poolai::core::error::AppError;
+#[cfg(feature = "enterprise")]
 use poolai::enterprise::monitoring::{MetricDataPoint, MonitoringManager};
+#[cfg(feature = "enterprise")]
 use std::collections::HashMap;
-use std::fs;
-use std::path::Path;
+#[cfg(feature = "enterprise")]
 use tempfile::TempDir;
+#[cfg(feature = "enterprise")]
 use uuid::Uuid;
 
+#[cfg(feature = "enterprise")]
 /// Helper function to create a temporary database path
 fn create_temp_db_path() -> (TempDir, String) {
     let temp_dir = TempDir::new().expect("Failed to create temp directory");
@@ -22,6 +27,7 @@ fn create_temp_db_path() -> (TempDir, String) {
     (temp_dir, db_path.to_string_lossy().to_string())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_record_metric() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -64,6 +70,7 @@ async fn test_sqlite_persistence_record_metric() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_multiple_metrics() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -106,6 +113,7 @@ async fn test_sqlite_persistence_multiple_metrics() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_time_range_filter() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -150,6 +158,7 @@ async fn test_sqlite_persistence_time_range_filter() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_limit_filter() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -187,6 +196,7 @@ async fn test_sqlite_persistence_limit_filter() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_tenant_filter() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -241,6 +251,7 @@ async fn test_sqlite_persistence_tenant_filter() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_tags_serialization() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -283,6 +294,7 @@ async fn test_sqlite_persistence_tags_serialization() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_fallback_to_memory() -> Result<(), AppError> {
     // Create manager without persistence (in-memory only)
@@ -311,6 +323,7 @@ async fn test_sqlite_persistence_fallback_to_memory() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_invalid_db_path() -> Result<(), AppError> {
     // Use invalid database path (non-existent parent directory)
@@ -341,6 +354,7 @@ async fn test_sqlite_persistence_invalid_db_path() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_cleanup_old_metrics() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
@@ -406,6 +420,7 @@ async fn test_sqlite_persistence_cleanup_old_metrics() -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_sqlite_persistence_empty_filters() -> Result<(), AppError> {
     let (_temp_dir, db_path) = create_temp_db_path();
