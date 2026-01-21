@@ -517,11 +517,19 @@ impl SmallWorldStrategy {
                     }
                 }
                 Err(e) => {
-                    warn!(
-                        "Failed to select optimal nodes for artifact {}: {}",
-                        artifact_id, e
-                    );
-                    failed_count += 1;
+                    // If no nodes available, skip rebalancing for this artifact (not an error)
+                    if e.to_string().contains("No nodes available") {
+                        debug!(
+                            "Skipping rebalancing for artifact {}: no nodes available",
+                            artifact_id
+                        );
+                    } else {
+                        warn!(
+                            "Failed to select optimal nodes for artifact {}: {}",
+                            artifact_id, e
+                        );
+                        failed_count += 1;
+                    }
                 }
             }
         }
