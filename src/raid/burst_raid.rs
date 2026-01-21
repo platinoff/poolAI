@@ -977,8 +977,12 @@ impl BurstRaidStrategy {
             0.0
         };
 
-        // Get replication factor
-        let replication_factor = self.get_replication_factor(artifact_id).await;
+        // Get replication factor directly from burst_state to avoid double update_burst_state call
+        let replication_factor = if burst_state.in_burst {
+            self.config.max_replication_factor
+        } else {
+            self.config.base_replication_factor
+        };
 
         Some(ArtifactBurstStats {
             artifact_id,

@@ -261,6 +261,12 @@ async fn test_multiple_artifacts_burst_detection() {
         sleep(Duration::from_millis(50)).await;
     }
 
+    // Update burst state before checking to ensure metrics are accurate
+    // Use get_replication_factor which updates burst state
+    let _ = strategy.get_replication_factor(artifacts[0]).await;
+    let _ = strategy.get_replication_factor(artifacts[1]).await;
+    let _ = strategy.get_replication_factor(artifacts[2]).await;
+
     // Only first artifact should be in burst
     assert!(
         strategy.is_burst(artifacts[0]).await,
