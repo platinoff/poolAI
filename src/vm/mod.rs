@@ -159,12 +159,6 @@ pub enum GpuSchedulingPolicy {
     Exclusive,
 }
 
-impl Default for GpuSchedulingPolicy {
-    fn default() -> Self {
-        Self::RoundRobin
-    }
-}
-
 /// Resource limits and requests for a VM instance
 ///
 /// Specifies CPU, memory, and GPU requirements for a VM instance.

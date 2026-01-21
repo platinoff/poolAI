@@ -27,6 +27,8 @@
   - ✅ Cross-strategy integration tests (5 тестів)
 - ✅ Rebalance tracking: 100% (last_rebalance_time, artifacts_moved count)
 - ✅ Config exposure: 100% (реальні metrics в API)
+- ✅ **Burst state auto-update fix** (2026-01-19): Виправлено логіку оновлення burst state в `get_replication_factor()` та `get_artifact_burst_stats()`
+- ✅ **Code quality fixes** (2026-01-19): Виправлено Clippy warnings (Default derive, clone on Copy type)
 
 #### ✅ Enterprise Features Enhancement - 95% Complete
 - ✅ SQLite persistence: 100% (metrics_history, automatic cleanup)
