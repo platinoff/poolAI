@@ -25,11 +25,11 @@
   - ✅ Cross-strategy integration tests (switching, status, rebalance)
 - ⏸️ Опціонально: Administrative Control Plane (1 тиждень) - для v0.2.0
 
-### ✅ Priority 1.3: Enterprise Features - **95%**
+### ✅ Priority 1.3: Enterprise Features - **98%**
 - ✅ SQLite persistence - 100%
 - ✅ GitHub OAuth2 flow - 100%
+- ✅ Integration tests для SQLite persistence - 100% (2026-01-19)
 - ⏸️ Опціонально: SAML SSO (1-2 дні)
-- ⏸️ Опціонально: Integration tests для SQLite (1 день)
 
 ---
 
