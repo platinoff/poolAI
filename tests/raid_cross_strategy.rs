@@ -121,7 +121,7 @@ async fn test_strategy_status() {
 async fn test_rebalance_across_strategies() {
     // Initialize topology manager (required for SmallWorld strategy)
     let _ = initialize_global_topology_manager();
-    
+
     let temp_dir = TempDir::new().unwrap();
 
     // Test rebalancing in BurstRaid mode
