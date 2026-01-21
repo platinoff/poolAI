@@ -700,6 +700,7 @@ impl SmallWorldStrategyForTask {
         let mut coefficients = self.clustering_coefficients.write().await;
         coefficients.clear();
 
+        // If no nodes available, coefficients remain empty (not an error)
         for node_id in node_ids {
             match self.calculate_clustering_coefficient(node_id).await {
                 Ok(coeff) => {
@@ -713,6 +714,8 @@ impl SmallWorldStrategyForTask {
                 }
             }
         }
+
+        Ok(())
 
         Ok(())
     }
