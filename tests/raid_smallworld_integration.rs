@@ -13,6 +13,7 @@ use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;
+use uuid::Uuid;
 
 /// Helper function to create a test SmallWorld strategy
 async fn create_test_smallworld_strategy() -> (
@@ -100,18 +101,21 @@ async fn test_clustering_coefficient_with_real_topology() {
 
 #[tokio::test]
 async fn test_rebalance_with_real_artifacts() {
-    let (strategy, raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
+    let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
-    // Create multiple artifacts
+    // Create multiple artifacts through strategy
     let mut artifact_ids = Vec::new();
     for i in 0..5 {
-        let artifact_ref = raid_manager
-            .write()
-            .await
-            .put_artifact(&format!("artifact-{}", i), b"test data")
+        let artifact_id = uuid::Uuid::new_v4();
+        strategy
+            .replicate_artifact(
+                artifact_id,
+                b"test data".to_vec(),
+                &format!("artifact-{}", i),
+            )
             .await
             .unwrap();
-        artifact_ids.push(artifact_ref.id);
+        artifact_ids.push(artifact_id);
     }
 
     // Trigger rebalancing
@@ -134,12 +138,12 @@ async fn test_rebalance_with_real_artifacts() {
 
 #[tokio::test]
 async fn test_node_selection_based_on_clustering() {
-    let (strategy, raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
+    let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
-    let _artifact_ref = raid_manager
-        .write()
-        .await
-        .put_artifact("test-artifact", b"test data")
+    // Create artifact through strategy
+    let artifact_id = uuid::Uuid::new_v4();
+    strategy
+        .replicate_artifact(artifact_id, b"test data".to_vec(), "test-artifact")
         .await
         .unwrap();
 
@@ -170,14 +174,17 @@ async fn test_node_selection_based_on_clustering() {
 
 #[tokio::test]
 async fn test_metrics_collection() {
-    let (strategy, raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
+    let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
-    // Create artifacts
+    // Create artifacts through strategy
     for i in 0..3 {
-        raid_manager
-            .write()
-            .await
-            .put_artifact(&format!("artifact-{}", i), b"test data")
+        let artifact_id = uuid::Uuid::new_v4();
+        strategy
+            .replicate_artifact(
+                artifact_id,
+                b"test data".to_vec(),
+                &format!("artifact-{}", i),
+            )
             .await
             .unwrap();
     }
@@ -226,13 +233,12 @@ async fn test_node_clustering_coefficient() {
 
 #[tokio::test]
 async fn test_rebalance_optimizes_placement() {
-    let (strategy, raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
+    let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
-    // Create artifact
-    let _artifact_ref = raid_manager
-        .write()
-        .await
-        .put_artifact("test-artifact", b"test data")
+    // Create artifact through strategy
+    let artifact_id = Uuid::new_v4();
+    strategy
+        .replicate_artifact(artifact_id, b"test data".to_vec(), "test-artifact")
         .await
         .unwrap();
 
