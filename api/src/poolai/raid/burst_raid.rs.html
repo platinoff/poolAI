@@ -577,7 +577,7 @@
 <a href=#577 id=577 data-nosnippet>577</a>    </span><span class="kw">pub async fn </span>get_replication_factor(<span class="kw-2">&amp;</span><span class="self">self</span>, artifact_id: Uuid) -&gt; u32 {
 <a href=#578 id=578 data-nosnippet>578</a>        <span class="comment">// Update burst state to ensure it's current
 <a href=#579 id=579 data-nosnippet>579</a>        </span><span class="kw">let _ </span>= <span class="self">self</span>.update_burst_state(artifact_id).<span class="kw">await</span>;
-<a href=#580 id=580 data-nosnippet>580</a>        
+<a href=#580 id=580 data-nosnippet>580</a>
 <a href=#581 id=581 data-nosnippet>581</a>        <span class="kw">let </span>burst_states = <span class="self">self</span>.burst_states.read().<span class="kw">await</span>;
 <a href=#582 id=582 data-nosnippet>582</a>
 <a href=#583 id=583 data-nosnippet>583</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(state) = burst_states.get(<span class="kw-2">&amp;</span>artifact_id) {
@@ -955,13 +955,13 @@
 <a href=#955 id=955 data-nosnippet>955</a>    ///
 <a href=#956 id=956 data-nosnippet>956</a>    /// Returns `Some(ArtifactBurstStats)` if the artifact is being tracked, `None` otherwise.
 <a href=#957 id=957 data-nosnippet>957</a>    </span><span class="kw">pub async fn </span>get_artifact_burst_stats(<span class="kw-2">&amp;</span><span class="self">self</span>, artifact_id: Uuid) -&gt; <span class="prelude-ty">Option</span>&lt;ArtifactBurstStats&gt; {
-<a href=#958 id=958 data-nosnippet>958</a>        <span class="comment">// Update burst state to ensure it's current
+<a href=#958 id=958 data-nosnippet>958</a>        <span class="comment">// Update burst state to ensure it's current (this creates entry if it doesn't exist)
 <a href=#959 id=959 data-nosnippet>959</a>        </span><span class="kw">let _ </span>= <span class="self">self</span>.update_burst_state(artifact_id).<span class="kw">await</span>;
-<a href=#960 id=960 data-nosnippet>960</a>        
+<a href=#960 id=960 data-nosnippet>960</a>
 <a href=#961 id=961 data-nosnippet>961</a>        <span class="kw">let </span>request_counters = <span class="self">self</span>.request_counters.read().<span class="kw">await</span>;
 <a href=#962 id=962 data-nosnippet>962</a>        <span class="kw">let </span>burst_states = <span class="self">self</span>.burst_states.read().<span class="kw">await</span>;
 <a href=#963 id=963 data-nosnippet>963</a>
-<a href=#964 id=964 data-nosnippet>964</a>        <span class="comment">// Get burst state
+<a href=#964 id=964 data-nosnippet>964</a>        <span class="comment">// Get burst state (should exist after update_burst_state)
 <a href=#965 id=965 data-nosnippet>965</a>        </span><span class="kw">let </span>burst_state = burst_states.get(<span class="kw-2">&amp;</span>artifact_id)<span class="question-mark">?</span>;
 <a href=#966 id=966 data-nosnippet>966</a>
 <a href=#967 id=967 data-nosnippet>967</a>        <span class="comment">// Calculate current RPS
