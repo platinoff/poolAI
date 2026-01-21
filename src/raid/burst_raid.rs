@@ -938,6 +938,49 @@ impl BurstRaidStrategy {
         Ok(())
     }
 
+    /// Get burst statistics for a specific artifact
+    ///
+    /// Returns detailed burst detection statistics for the given artifact.
+    ///
+    /// # Arguments
+    ///
+    /// * `artifact_id` - ID of the artifact
+    ///
+    /// # Returns
+    ///
+    /// Returns `Some(ArtifactBurstStats)` if the artifact is being tracked, `None` otherwise.
+    pub async fn get_artifact_burst_stats(&self, artifact_id: Uuid) -> Option<ArtifactBurstStats> {
+        let request_counters = self.request_counters.read().await;
+        let burst_states = self.burst_states.read().await;
+
+        // Get burst state
+        let burst_state = burst_states.get(&artifact_id)?;
+
+        // Calculate current RPS
+        let current_rps = if let Some((count, window_start)) = request_counters.get(&artifact_id) {
+            let now = Utc::now();
+            let window_duration_secs = (now - *window_start).num_seconds() as f64;
+            if window_duration_secs > 0.0 {
+                *count as f64 / window_duration_secs
+            } else {
+                *count as f64
+            }
+        } else {
+            0.0
+        };
+
+        // Get replication factor
+        let replication_factor = self.get_replication_factor(artifact_id).await;
+
+        Some(ArtifactBurstStats {
+            artifact_id,
+            in_burst: burst_state.in_burst,
+            current_rps,
+            replication_factor,
+            last_burst_time: burst_state.last_burst_time,
+        })
+    }
+
     /// Get BurstRAID metrics
     ///
     /// Returns overall metrics for the BurstRAID strategy.
