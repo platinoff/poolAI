@@ -11,6 +11,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
+- SAML SSO implementation (optional)
+- Administrative Control Plane for RAID (optional)
+- Mock server integration for Cloud SDK (optional)
+
+## [0.2.0] - 2026-01-19
+
+### Added
+- **RAID Strategy Enhancements** - 100% Complete 🎉
+  - **BurstRAID Strategy** - Full implementation with metrics and integration tests
+    - Burst detection with adaptive replication factor (2-5)
+    - Automatic rebalancing with artifact movement tracking
+    - Comprehensive metrics collection (`BurstRaidMetrics`, `ArtifactBurstStats`)
+    - Integration tests with real artifacts (6 tests)
+  - **SmallWorld Network Strategy** - Full implementation with metrics and integration tests
+    - Network topology-based replication
+    - Clustering coefficient calculation
+    - Short-path routing optimization
+    - Comprehensive metrics collection (`SmallWorldMetrics`)
+    - Integration tests with real artifacts (6 tests)
+  - **Cross-Strategy Integration** - Complete support for strategy switching
+    - Strategy switching tests (5 tests)
+    - Status tracking (`last_rebalance_time`, `artifacts_moved`)
+    - Real metrics exposure through API
+- **Enterprise Features Enhancement** - 95% Complete
+  - **SQLite Persistence for Monitoring** - 100% Complete
+    - Database schema for `metrics_history` table
+    - Automatic cleanup of old metrics (30 days retention)
+    - Historical metrics query API with filters (metric, time range, tenant_id, limit)
+    - Async-safe operations using `spawn_blocking`
+    - Fallback to in-memory history if database unavailable
+  - **GitHub OAuth2 Flow** - 100% Complete
+    - In-memory state storage with TTL (10 minutes)
+    - CSRF protection via state parameter verification
+    - Complete OAuth2 flow (authorization → callback → token generation)
+    - User mapping and JWT token generation
+- **Cloud SDK Improvements** - 90% Complete
+  - AWS SDK initialization (EC2, ECS, S3 clients) - 100%
+  - GCP token refresh and caching - 100%
+  - Azure token acquisition (Environment, CLI, Managed Identity) - 100%
+  - Extended integration tests with timeout configuration - 85%
+  - Cross-provider integration tests
+
+### Changed
+- **RAID Module**: Updated `rebalance()` to return `usize` (number of artifacts moved)
+- **RAID Module**: Added `last_rebalance_time` tracking in `RaidManager`
+- **Enterprise Monitoring**: Refactored to use transient SQLite connections via `spawn_blocking` for async safety
+- **Enterprise API**: Enhanced OAuth2 flow with state management and CSRF protection
+- **Test Coverage**: Increased from 410+ to 427+ tests (102 unit + 325+ integration)
+  - Added 17 new integration tests for RAID strategies
+
+### Fixed
+- SQLite connection handling in async context (using `spawn_blocking`)
+- SmallWorld strategy test access to private methods (made `update_clustering_coefficients()` public)
+- Cross-strategy integration test isolation
+
+### Security
+- Enhanced OAuth2 flow with CSRF protection
+- State parameter validation for OAuth2 callbacks
+- Secure state storage with automatic TTL cleanup
 
 ## [0.1.0] - 2025-01-09
 
