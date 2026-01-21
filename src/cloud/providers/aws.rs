@@ -323,9 +323,9 @@ impl AwsManager {
                                     }
                                 }
                             }
-                            Err(AppError::NetworkError(
+                            return Err(AppError::NetworkError(
                                 "EC2 RunInstances response missing instance ID".to_string(),
-                            ))
+                            ));
                         }
                         Err(e) => Err(AppError::NetworkError(format!(
                             "EC2 RunInstances API call failed via AWS SDK. Context: AWS SDK request failed. \
@@ -608,9 +608,9 @@ impl AwsManager {
                                     }
                                 }
                             }
-                            Err(AppError::NetworkError(
+                            return Err(AppError::NetworkError(
                                 "ECS RunTask response missing task ARN".to_string(),
-                            ))
+                            ));
                         }
                         Err(e) => Err(AppError::NetworkError(format!(
                             "ECS RunTask API call failed via AWS SDK. Context: AWS SDK request failed. \
