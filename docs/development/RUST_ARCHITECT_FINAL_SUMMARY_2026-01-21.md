@@ -119,13 +119,14 @@
 
 ### Тести
 - **Unit tests**: 122 passing
-- **Integration tests**: 341+ passing
+- **Integration tests**: 348+ passing
   - Cloud providers: 17 tests
   - Cloud edge cases: 10+ tests
   - RAID integration: 11 tests (cross-strategy + smallworld)
-  - RAID admin: 6 tests
+  - RAID admin: 12 tests (6 existing + 6 new API tests)
+  - SAML SSO: 28+ tests (25 existing + 4 new flow tests)
   - VM: 78 tests
-  - Enterprise: 51+ tests
+  - Enterprise: 55+ tests (51 existing + 4 new)
   - Інші: 200+ tests
 
 ---
