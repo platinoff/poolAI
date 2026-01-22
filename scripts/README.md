@@ -42,9 +42,12 @@
   - Використання: `bash scripts/verify_build.sh`
   - Опис: Перевіряє чи проект успішно збирається
 
-### 🚀 Git Helpers
+### 🚀 Git (MSYS2 bash, **без .sh** — copy-paste блок)
 
-- **`PUSH_COMMANDS.sh`** - Команди для Git push
+- **Git push**: команди в MSYS2 bash, без скриптів. Див. **`.cursor/commands/git-push.md`**, `docs/troubleshooting/GIT_PUSH_FAILED.md`.
+- Опційно: `git-push-poolai.sh`, `git-push-only.sh` — якщо зручніше скрипти.
+
+- **`PUSH_COMMANDS.sh`** - Команди для Git push (гілка fix/unsafe-global-...)
   - Використання: `bash scripts/PUSH_COMMANDS.sh`
   - Опис: Допоміжні команди для Git push
 

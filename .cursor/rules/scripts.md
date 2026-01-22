@@ -2,9 +2,10 @@
 
 ## 🔧 Scripts Structure - STRICT RULES
 
-### ⚠️ CRITICAL: All shell scripts MUST be in `scripts/` directory
+### ⚠️ CRITICAL: Bash only — No PowerShell, No cmd
 
-**NEVER create `.sh` or `.ps1` files in the root directory**
+- All dev/git in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`). Scripts: `scripts/*.sh` only.
+- **NEVER** create `.sh` or `.ps1` in project root.
 
 ### Scripts Directory Structure
 
@@ -29,14 +30,13 @@ scripts/
    - Setup scripts → `scripts/`
    - Utility scripts → `scripts/`
    - CI/CD scripts → `scripts/` (or `scripts/ci/` for multiple)
-   - PowerShell scripts (`.ps1`) → `scripts/`
-   - Bash scripts (`.sh`) → `scripts/`
+   - Bash scripts (`.sh`) → `scripts/` (preferred). Legacy `.ps1` may exist; do not add new ones.
 
 2. **File naming**:
    - Use lowercase with underscores: `setup_rust_path.sh`
    - Use descriptive names: `fix_cargo_now.sh`
    - Use UPPERCASE for important scripts: `PUSH_COMMANDS.sh` (optional)
-   - PowerShell scripts: `setup_msvc_environment.ps1`
+   - Legacy `.ps1`: avoid; use bash
 
 3. **When user asks to create a script**:
    - Always create in `scripts/`
@@ -56,7 +56,7 @@ scripts/
 - ❌ **NEVER** use `.ps1` or `.ps` extensions in file lists
 - ❌ **NEVER** use PowerShell-specific syntax in documentation lists
 - ✅ Use descriptive names: `setup_msvc_environment.ps1` → "MSVC environment setup script"
-- ✅ Group by category: "PowerShell scripts", "Bash scripts"
+- ✅ Group by category: "Bash scripts" (preferred)
 - ✅ Use markdown lists or tables, not PowerShell command output
 
 **Examples:**

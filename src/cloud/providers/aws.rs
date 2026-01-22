@@ -103,7 +103,23 @@ impl AwsManager {
             ecs_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "aws-sdk-s3")]
             s3_client: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            ec2_base_url_override: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            ecs_base_url_override: Arc::new(RwLock::new(None)),
         }
+    }
+
+    /// Set EC2 API base URL override (e.g. mock server for tests). When set, SigV4 is skipped.
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn set_ec2_base_url_override(&self, url: Option<String>) {
+        *self.ec2_base_url_override.write().await = url;
+    }
+
+    /// Set ECS API base URL override (e.g. mock server for tests). When set, SigV4 is skipped.
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn set_ecs_base_url_override(&self, url: Option<String>) {
+        *self.ecs_base_url_override.write().await = url;
     }
 
     /// Initialize AWS integration
@@ -336,7 +352,6 @@ impl AwsManager {
             }
 
             // Fallback to REST API if SDK not available
-            // Get HTTP client
             let client_guard = self.http_client.read().await;
             let client = client_guard.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
@@ -344,7 +359,60 @@ impl AwsManager {
                 )
             })?;
 
-            // Get credentials for REST API
+            let query_params = vec![
+                ("Action", "RunInstances"),
+                ("Version", "2016-11-15"),
+                ("InstanceType", instance_type),
+                ("ImageId", image_id),
+                ("MinCount", "1"),
+                ("MaxCount", "1"),
+            ];
+            let query_string = query_params
+                .iter()
+                .map(|(k, v)| format!("{}={}", urlencoding::encode(k), urlencoding::encode(v)))
+                .collect::<Vec<_>>()
+                .join("&");
+
+            if let Some(ref base) = *self.ec2_base_url_override.read().await {
+                let base = base.trim_end_matches('/');
+                let url = format!("{}?{}", base, query_string);
+                let response = client
+                    .post(&url)
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .send()
+                    .await
+                    .map_err(|e| {
+                        AppError::NetworkError(format!(
+                            "EC2 RunInstances (mock) failed. Error: {}",
+                            e
+                        ))
+                    })?;
+                if !response.status().is_success() {
+                    let status = response.status();
+                    let body = response.text().await.unwrap_or_default();
+                    return Err(AppError::NetworkError(format!(
+                        "EC2 mock returned {}: {}",
+                        status, body
+                    )));
+                }
+                let response_text = response
+                    .text()
+                    .await
+                    .map_err(|e| AppError::NetworkError(e.to_string()))?;
+                let instance_id = if let Some(start) = response_text.find("<instanceId>") {
+                    let start = start + "<instanceId>".len();
+                    if let Some(end) = response_text[start..].find("</instanceId>") {
+                        response_text[start..start + end].to_string()
+                    } else {
+                        format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string())
+                    }
+                } else {
+                    format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string())
+                };
+                info!("EC2 instance created (mock): {}", instance_id);
+                return Ok(instance_id);
+            }
+
             let access_key = self.access_key_id.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
                     "AWS_ACCESS_KEY_ID not set. Context: AWS credentials required for EC2 API calls. \
@@ -362,29 +430,8 @@ impl AwsManager {
                 )
             })?;
 
-            // AWS REST API requires AWS Signature Version 4 signing
-            // Using aws-sign-v4 crate for signing (Rust 1.70+ compatible)
             let service = "ec2";
             let endpoint = format!("https://ec2.{}.amazonaws.com", region);
-
-            // Prepare EC2 RunInstances API request
-            // EC2 uses query string format (not JSON)
-            let query_params = vec![
-                ("Action", "RunInstances"),
-                ("Version", "2016-11-15"),
-                ("InstanceType", instance_type),
-                ("ImageId", image_id),
-                ("MinCount", "1"),
-                ("MaxCount", "1"),
-            ];
-
-            // Build query string
-            let query_string = query_params
-                .iter()
-                .map(|(k, v)| format!("{}={}", urlencoding::encode(k), urlencoding::encode(v)))
-                .collect::<Vec<_>>()
-                .join("&");
-
             let url = format!("{}?{}", endpoint, query_string);
 
             // Get current timestamp for signing
@@ -620,7 +667,6 @@ impl AwsManager {
             }
 
             // Fallback to REST API if SDK not available
-            // Get HTTP client
             let client_guard = self.http_client.read().await;
             let client = client_guard.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
@@ -628,7 +674,56 @@ impl AwsManager {
                 )
             })?;
 
-            // Get credentials for REST API
+            let request_body = serde_json::json!({
+                "cluster": cluster,
+                "taskDefinition": task_definition,
+                "count": 1
+            });
+            let body_str = serde_json::to_string(&request_body).map_err(|e| {
+                AppError::NetworkError(format!(
+                    "Failed to serialize ECS request body. Error: {}",
+                    e
+                ))
+            })?;
+
+            if let Some(ref base) = *self.ecs_base_url_override.read().await {
+                let base = base.trim_end_matches('/');
+                let response = client
+                    .post(base)
+                    .header("Content-Type", "application/x-amz-json-1.1")
+                    .header("X-Amz-Target", "AmazonEC2ContainerServiceV20141113.RunTask")
+                    .body(body_str.clone())
+                    .send()
+                    .await
+                    .map_err(|e| {
+                        AppError::NetworkError(format!("ECS RunTask (mock) failed. Error: {}", e))
+                    })?;
+                if !response.status().is_success() {
+                    let status = response.status();
+                    let body = response.text().await.unwrap_or_default();
+                    return Err(AppError::NetworkError(format!(
+                        "ECS mock returned {}: {}",
+                        status, body
+                    )));
+                }
+                let json: serde_json::Value = response
+                    .json()
+                    .await
+                    .map_err(|e| AppError::NetworkError(e.to_string()))?;
+                let task_arn = json
+                    .get("tasks")
+                    .and_then(|t| t.as_array())
+                    .and_then(|a| a.first())
+                    .and_then(|t| t.get("taskArn"))
+                    .and_then(|a| a.as_str())
+                    .map(|s| s.to_string())
+                    .ok_or_else(|| {
+                        AppError::NetworkError("ECS mock response missing taskArn".to_string())
+                    })?;
+                info!("ECS task created (mock): {}", task_arn);
+                return Ok(task_arn);
+            }
+
             let access_key = self.access_key_id.as_ref().ok_or_else(|| {
                 AppError::InitializationError(
                     "AWS_ACCESS_KEY_ID not set. Context: AWS credentials required for ECS API calls. \
@@ -646,25 +741,8 @@ impl AwsManager {
                 )
             })?;
 
-            // AWS REST API requires AWS Signature Version 4 signing
-            // Using aws-sign-v4 crate for signing (Rust 1.70+ compatible)
             let service = "ecs";
             let endpoint = format!("https://ecs.{}.amazonaws.com", region);
-
-            // Prepare ECS RunTask API request
-            // ECS uses JSON format (not query string)
-            let request_body = serde_json::json!({
-                "cluster": cluster,
-                "taskDefinition": task_definition,
-                "count": 1
-            });
-
-            let body_str = serde_json::to_string(&request_body)
-                .map_err(|e| AppError::NetworkError(format!(
-                    "Failed to serialize ECS request body. Context: Cannot serialize JSON. Error: {}",
-                    e
-                )))?;
-
             let url = endpoint.clone();
 
             // Get current timestamp for signing

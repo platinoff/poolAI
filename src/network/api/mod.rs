@@ -13,6 +13,8 @@
 //! - `rewards` - Rewards system endpoints
 //! - `common` - Shared types and utilities
 
+#[cfg(feature = "ml")]
+pub mod ai_ml;
 pub mod common;
 pub mod completions;
 pub mod discovery;

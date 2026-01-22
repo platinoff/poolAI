@@ -1,124 +1,56 @@
-# Git Workflow Rules
+# Git Workflow — Conventional Commits (CL) & Push
 
-## 🔄 Git Workflow - Conventional Commits & Push Order
+## ⚠️ CRITICAL: MSYS2 bash only
 
-### ⚠️ CRITICAL: Git Push Order - IMPORTANT for AI Assistant
+All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).  
+**Do NOT use** PowerShell, cmd, or **Cursor integrated terminal** for git (CreateFileMapping, index.lock, truncated output). Use **external** MSYS2 UCRT64 only.
 
-**Problem**: AI assistant cannot read/modify files that are staged or have uncommitted changes when git marks them.
+## Git order (status → commit → push)
 
-**Solution**: Always follow this order when user requests git operations:
+1. **`git status --short`** — check modified/unstaged first.
+2. **Read/modify files** before `git add` if needed (AI: avoid staging files you still need to edit).
+3. **`git add <paths>`** or `git add -A` (use with care).
+4. **`git commit -m "type(scope): subject"`** — use **CL (Conventional Commits)** format.
+5. **`git push`** — pre-push hook runs `cargo fmt --all --check`; fix format then re-commit if it fails.
 
-### Git Operation Order (MANDATORY)
+## Commit format (CL = Conventional Commits)
 
-1. **Check git status FIRST**:
-   ```bash
-   git status --short
-   ```
-   - If files are modified but NOT staged: Read/modify files BEFORE `git add`
-   - If files are already staged: Commit first, then you can read them after
-
-2. **Read/Modify files BEFORE staging**:
-   - If files need to be read or modified: Do it BEFORE `git add`
-   - Once files are staged with `git add`, AI may have issues accessing them
-
-3. **Stage files** (only after reading/modifying if needed):
-   ```bash
-   git add <file>
-   # or
-   git add -A  # (use carefully, may take long if many files)
-   ```
-
-4. **Commit changes**:
-   ```bash
-   git commit -m "type(scope): subject" -m "body"
-   ```
-
-5. **Push to remote**:
-   ```bash
-   git push
-   ```
-   - **Pre-push hook**: Automatically runs `cargo fmt --all` before push
-   - If formatting fails, code will be auto-formatted and you'll need to commit changes
-   - **If push fails due to MSYS2**: Use PowerShell or remove MSYS2 from PATH
-
-### Rules for AI Assistant
-- **NEVER** do `git add` on files you need to read/modify
-- **ALWAYS** check `git status` before attempting to read/modify files
-- **If files are already staged**: Complete commit first, then files become readable again
-- **Use PowerShell for git operations** if MSYS2 causes authentication issues
-
-### Commit Message Format
-
-**ALWAYS use Conventional Commits format**:
 ```
 <type>(<scope>): <subject>
 
-<body>
+[optional body]
 
-<footer>
+[optional footer]
 ```
 
-### Types
-- `feat` - New feature
-- `fix` - Bug fix
-- `docs` - Documentation changes
-- `style` - Code style (formatting, no logic change)
-- `refactor` - Code refactoring
-- `perf` - Performance improvements
-- `test` - Adding/updating tests
-- `build` - Build system changes
-- `ci` - CI/CD changes
-- `chore` - Other changes (not code)
-- `revert` - Revert previous commit
+**Types**: `feat` | `fix` | `docs` | `style` | `refactor` | `perf` | `test` | `build` | `ci` | `chore` | `revert`  
+**Scope examples**: `vm`, `ui`, `raid`, `network`, `cloud`, `ml`, `docs`, `scripts`, `concept`  
+**Subject**: imperative, lowercase, ~50 chars.
 
-### Scope Examples
-- `vm` - VM Module
-- `ui` - UI Module
-- `raid` - RAID Module
-- `network` - Network Module
-- `docs` - Documentation
-- `scripts` - Scripts
-- `concept` - Concept documents
-- (no scope for general changes)
+**Examples**:
+- `feat(cloud): AWS EC2/ECS base_url_override`
+- `feat(ml): Stage 4.4 AI/ML stubs (ML.1–ML.3)`
+- `docs: update NEXT_STEPS and Cursor rules`
 
-### Examples
-- ✅ `feat(vm): add network isolation`
-- ✅ `fix(ui): correct modal focus trap`
-- ✅ `docs: update project structure`
-- ✅ `docs(concept): update concept document in Ukrainian`
-- ✅ `test(vm): add isolation integration tests`
-- ❌ `Update README` (no type)
-- ❌ `docs: Updated the README` (past tense, too vague)
+## Pre-push hook
 
-### Rules
-- Subject: max 50 chars, lowercase, imperative mood
-- Body: optional, explains "what" and "why", max 72 chars per line
-- Footer: breaking changes, issue references
-- One logical change per commit
-- Include tests for new features/fixes
-- Update documentation for new features
+- Runs `cargo fmt --all --check` before push.
+- If it fails → run `cargo fmt --all`, commit, then push again.
+- Bypass (not recommended): `git push --no-verify`.
 
-### Before Commit Checklist
-- [ ] Code compiles (`cargo check`)
-- [ ] Tests pass (`cargo test`)
-- [ ] Code formatted (`cargo fmt --all`) - **Auto-checked by pre-push hook**
-- [ ] Linter clean (`cargo clippy`)
-- [ ] Documentation updated (if needed)
-- [ ] Commit message follows format
-- [ ] Changes are atomic and logical
-- [ ] Files read/modified BEFORE `git add` (if needed)
+## Quick block (MSYS2 bash, без .sh)
 
-### Pre-Push Hook
-
-**Automatic Formatting Check**:
-- Pre-push hook (`.git/hooks/pre-push`) automatically runs `cargo fmt --all --check` before push
-- If formatting fails, hook will:
-  1. Auto-format code with `cargo fmt --all`
-  2. Exit with error
-  3. Require you to commit formatted changes before pushing
-- **To bypass** (not recommended): `git push --no-verify`
-
-**Manual Formatting** (in MSYS2 bash):
 ```bash
+export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+cd /s/rust/poolAI
+rm -f .git/index.lock
+git status --short
 cargo fmt --all
+git add Cargo.toml src/ tests/ scripts/
+git add -f docs/CHANGELOG.md docs/cloud/CLOUD_SDK_STATUS.md docs/concept/poolAI_concept_root.txt docs/development/NEXT_STEPS_2026-01-19.md docs/status/STABLE_STATE_SUMMARY.md docs/troubleshooting/GIT_PUSH_FAILED.md
+git add -f .cursor/rules/ .cursor/commands/
+git commit -m "feat(scope): subject"
+git push origin main
 ```
+
+Без скриптів. Якщо команди не відпрацьовують — перевір bash, `cd`-шлях, виконуй по одній; див. `.cursor/commands/git-push.md` (п.2 перевірка).

@@ -59,29 +59,22 @@
 - ✅ [`../ADR_001_DISTRIBUTED_RAID.md`](../ADR_001_DISTRIBUTED_RAID.md) - Architecture Decision Record
 - ✅ [`../concept/poolAI_concept.txt`](../concept/poolAI_concept.txt) - Концепція проекту
 
-### Git, Cargo, тести (bash / cmd — без PowerShell)
-**MSYS2 bash** (рекомендовано):
+### Git, Cargo, тести (тільки MSYS2 bash — без PS, без cmd)
+
+**Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`.
+
 ```bash
 export PATH=/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH
 cd /s/rust/poolAI
-rustup override set stable-x86_64-pc-windows-gnu   # якщо ще не задано
 
 git status --short
-git log --oneline -10
 cargo check --no-default-features --lib
 cargo test --no-default-features --lib
-cargo test --test raid_cross_strategy --test raid_smallworld_integration
 cargo fmt --all
-git add -A && git commit -m "type(scope): subject" && git push origin HEAD
+git add <paths> && git commit -m "type(scope): subject" && git push origin main
 ```
-**Windows cmd** (з MSYS2 у PATH):
-```bat
-set PATH=C:\msys64\ucrt64\bin;C:\msys64\usr\bin;%PATH%
-cd /d s:\rust\poolAI
-cargo check --no-default-features --lib
-cargo test --no-default-features --lib
-```
-**Bin-скрипти**: `bin/` — `git-status.sh`, `cargo-check.sh`, `cargo-test.sh`, `cargo-fmt.sh` (див. нижче).
+
+CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-workflow.md`. Push: copy-paste блок з `.cursor/commands/git-push.md` (без .sh).
 
 ---
 
@@ -94,7 +87,7 @@ cargo test --no-default-features --lib
 
 **Стабільний стан**: v0.2.2 ✅ | **Cloud SDK 100%** ✅ | HPA init ✅ | RAID/Enterprise 100% ✅ | Load Balancing ✅ (2026-01-22).
 
-**Базові команди** (MSYS2 bash, без PS): `bin/git-status.sh`, `bin/cargo-check.sh`, `bin/cargo-test.sh`, `bin/cargo-fmt.sh`; перед push — pre-push hook.
+**Базові команди** (MSYS2 bash only): `cargo check`, `cargo test`, `cargo fmt --all`; git — copy-paste блок з `.cursor/commands/git-push.md` (без .sh). Pre-push hook: `cargo fmt --all --check`.
 
 ---
 

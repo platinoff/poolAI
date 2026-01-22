@@ -1,10 +1,17 @@
 # AI Assistant Rules
 
+## 🧭 Подальша робота з чатом
+
+При **«налаштуйся для роботи з чатом»** або старті нової сесії — **спочатку читай `chat-context.md`**. Там зведено: проект, ключові документи, термінал (MSYS2 only), git (без .sh), патчі, поточний стан і наступні кроки.
+
+---
+
 ## 📚 Quick Reference - Key Documents for AI Assistant
 
 ### ⚠️ CRITICAL: Always check these documents first when answering questions
 
 **Main active documents** (ALWAYS reference these):
+- **Chat context** (session start / «налаштуйся»): `.cursor/rules/chat-context.md`
 - **PRIMARY Concept Document**: `docs/concept/poolAI_concept_root.txt` (USE THIS FIRST - most comprehensive)
 - **Alternative Concept**: `docs/concept/poolAI_concept.txt` (Ukrainian, detailed dev environment)
 - **Current Project Status**: `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` (most up-to-date)
@@ -47,16 +54,19 @@
    - Ensure version numbers match: `Cargo.toml` → `src/version.rs` → concept files
    - Ensure consistency across all documents
 
-4. **Terminal Commands** (CRITICAL):
+4. **Terminal** (CRITICAL):
    - ✅ ALWAYS use MSYS2 bash: `C:\msys64\usr\bin\bash.exe`
-   - ❌ NEVER use PowerShell for development tasks
-   - ✅ All cargo commands in MSYS2 bash
-   - ✅ Git operations in MSYS2 bash (preferred)
+   - ❌ NEVER use PowerShell or cmd for dev or git
+   - ✅ Cargo + git only in MSYS2 bash. **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
 
 5. **File Navigation**:
    - Use `file_list.csv` to find files by name or path
    - Check `docs/concept/poolAI_concept_root.txt` for file structure
    - All documentation in `docs/` directory
-   - All scripts in `scripts/` directory (bash scripts)
+   - All scripts in `scripts/` (bash only; no PS, no cmd)
 
 **Remember**: Rust Architect wants CLEAN structure - all docs in `docs/`!
+
+---
+
+**Session start**: See `chat-context.md` for compact context (project, docs, terminal, git, next steps).

@@ -991,4 +991,4 @@ curl http://localhost:8080/api/status
 **Creator**: Madevinc (one developer with Cursor AI)  
 **Repository**: https://github.com/platinoff/poolAI  
 **Solana Donations**: GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8 (Madevinc welcomes donations to support this crypto project)  
-**Latest Update**: 2026-01-22 - Cloud SDK 100% (Load Balancing ✅, HPA init ✅), stable state & next steps актуалізовано
+**Latest Update**: 2026-01-22 - Cloud SDK 100%, AWS overrides ✅, Stage 4.4 AI/ML scaffolding ✅ (`src/ml`, `/api/enterprise/ai-ml`), stable state & next steps актуалізовано

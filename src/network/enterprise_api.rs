@@ -36,7 +36,7 @@ use uuid::Uuid;
 
 #[cfg(feature = "enterprise")]
 pub fn create_enterprise_api_routes() -> Router {
-    Router::new()
+    let router = Router::new()
         // Tenant management
         .route("/tenants", get(tenants_list_handler))
         .route(
@@ -154,7 +154,10 @@ pub fn create_enterprise_api_routes() -> Router {
         .route(
             "/auth/saml/{provider}/callback",
             post(saml_callback_handler),
-        )
+        );
+    #[cfg(all(feature = "enterprise", feature = "ml"))]
+    let router = router.nest("/ai-ml", crate::network::api::ai_ml::create_ai_ml_routes());
+    router
 }
 
 // ============================================================================

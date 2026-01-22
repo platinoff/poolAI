@@ -112,6 +112,7 @@
 //! - [`platform`] - Cross-platform GPU and system information
 //! - [`tgbot`] - Telegram bot integration (planned)
 //! - [`enterprise`] - Enterprise features (multi-tenancy, audit, security, monitoring)
+//! - [`ml`] - Stage 4.4 AI/ML (Model Optimization, AutoML, Federated Learning; optional, feature `ml`)
 //! - [`cloud`] - Cloud integration (Kubernetes, AWS, Azure, GCP)
 
 // Core modules
@@ -133,6 +134,9 @@ pub mod vm;
 
 #[cfg(feature = "enterprise")]
 pub mod enterprise;
+
+#[cfg(feature = "ml")]
+pub mod ml;
 
 #[cfg(feature = "cloud")]
 pub mod cloud;

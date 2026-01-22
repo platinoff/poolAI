@@ -24,12 +24,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `GcpManager::set_base_url_override(Option<String>)` for metadata + Compute API
   - `get_token_from_metadata_server` and `create_compute_instance` use override when set
   - E2E test `test_gcp_compute_e2e_with_mock_server`; fix instance `id` parse (str or u64)
+- **Configurable base URL override (AWS)** 🎉
+  - `AwsManager::set_ec2_base_url_override`, `set_ecs_base_url_override`; SigV4 skipped when set
+  - E2E tests `test_aws_ec2_e2e_with_mock_server`, `test_aws_ecs_e2e_with_mock_server`
+- **Stage 4.4 AI/ML scaffolding (v0.3.0+)** 🎉
+  - `src/ml` module, feature `ml`, `AiMlStatus` stub
+  - `GET /api/enterprise/ai-ml` and `GET /api/enterprise/ai-ml/status` when `enterprise` + `ml` enabled
+  - Placeholders: Model Optimization, AutoML, Federated Learning, etc.
+- **ML.1 Model Optimization stub** 🎉
+  - `src/ml/optimization.rs`: `QuantizationLevel`, `OptimizationProfile`, `default_fast` / `default_balanced`
+  - `GET /api/enterprise/ai-ml/optimization` returns default profile
+- **ML.1 profiling, tuning, quantization (implementation)** 🎉
+  - `ModelProfile`, `profile_model()` — latency_ms, memory_mb, flops stubs
+  - `TuningConfig`, `TuningResult`, `suggest_hyperparams()` — hyperparameter stub
+  - `QuantizationResult`, `apply_quantization(profile)` — compression stub
+  - `GET /ai-ml/optimization/profile`, `/optimization/tuning`, `/optimization/quantization-result`
+- **ML.2 AutoML stub** 🎉 — `src/ml/automl.rs`: `AutomlConfig`, `GET /ai-ml/automl`
+- **ML.3 Federated Learning stub** 🎉 — `src/ml/federated.rs`: `AggregationMode`, `FederatedConfig`, `GET /ai-ml/federated`
 
 ### Planned
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
-- AWS base URL override (optional; Azure, GCP done)
 
 ## [0.2.2] - 2026-01-22
 

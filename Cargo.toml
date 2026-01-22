@@ -182,6 +182,9 @@ raft = ["async-raft", "anyhow"]
 # Enterprise features (optional)
 # Use: cargo build --features enterprise
 enterprise = []
+# Stage 4.4 AI/ML (v0.3.0+) — Model Optimization, AutoML, Federated Learning
+# Use: cargo build --features ml (also enable enterprise for /api/enterprise/ai-ml)
+ml = []
 # Cloud integration features (optional)
 # Use: cargo build --features cloud
 # Note: SDK dependencies are optional and can be added when needed

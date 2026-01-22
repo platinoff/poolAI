@@ -13,7 +13,7 @@
 | **1** | **v0.2.2 release prep** — Changelog, release notes, README | 1 день | ✅ Завершено |
 | **2** | **v0.3.0+** — Mock server integration, Stage 4.4 AI/ML | 2–4 тижні | ⏸️ Опціонально |
 
-**Рекомендація**: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook. Далі: Mock server або Stage 4.4 (P2).
+**Рекомендація**: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook. Далі: Stage 4.4 implementation (P2).
 
 ---
 
@@ -32,8 +32,14 @@
 - ✅ **HPA init** ✅ (2026-01-22) — create_hpa, hpa_exists, ensure_hpa_for
 - ✅ **Mock server integration** (2026-01-22) — cloud_mock_integration harness, tests/integration/cloud wired
 - ✅ **Azure base_url_override** (2026-01-22) — set_base_url_override, e2e VMSS mock test
-- ✅ **GCP base_url_override** (2026-01-22) — metadata + Compute API, e2e `test_gcp_compute_e2e_with_mock_server`
-- ⏸️ Далі: AWS base URL override (v0.3.0+)
+- ✅ **GCP base_url_override** (2026-01-22) — metadata + Compute API, e2e compute mock test
+- ✅ **AWS base_url_override** (2026-01-22) — EC2 + ECS, e2e mock tests
+- ✅ **Stage 4.4 AI/ML scaffolding** (2026-01-22) — `src/ml`, feature `ml`, `/api/enterprise/ai-ml` stub
+- ✅ **ML.1 Model Optimization stub** — `optimization.rs`, `GET /ai-ml/optimization`
+- ✅ **ML.1 profiling / tuning / quantization** — `ModelProfile`, `profile_model()`, `TuningConfig`/`TuningResult`, `suggest_hyperparams()`, `QuantizationResult`, `apply_quantization()`; `GET /ai-ml/optimization/profile`, `/tuning`, `/quantization-result`
+- ✅ **ML.2 AutoML stub** — `automl.rs`, `GET /ai-ml/automl`
+- ✅ **ML.3 Federated Learning stub** — `federated.rs`, `GET /ai-ml/federated`
+- ⏸️ Далі: ML.2–ML.3 implementation (pipeline, aggregation), ML.1 pruning strategies
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
@@ -80,7 +86,7 @@
 
 **Завдання**:
 1. ~~**HPA (Horizontal Pod Autoscaler)**~~ ✅ Завершено (2026-01-22) — create_hpa, hpa_exists, ensure_hpa_for
-2. ~~**Mock Server Integration**~~ ✅ Harness + Azure + GCP base_url_override + e2e mock tests. Далі: AWS override.
+2. ~~**Mock Server Integration**~~ ✅ Harness + Azure + GCP + AWS base_url_override + e2e mock tests.
 3. **Stage 4.4 AI/ML** — Model Optimization, AutoML, Federated Learning (з концепту)
 
 **Примітка**: SAML SSO ✅, SQLite persistence tests ✅, RAID Admin Control Plane ✅ вже реалізовано.
@@ -98,7 +104,7 @@
 **Рекомендований наступний крок**: **Priority 2** (v0.3.0+) — Mock server integration або Stage 4.4 AI/ML.
 
 **Далі**:
-- → **Priority 2**: Mock server, Stage 4.4 AI/ML (HPA init ✅)
+- → **Priority 2**: ML.1 profiling/tuning/quantization ✅; далі ML.2–ML.3 implementation, ML.1 pruning
 
 ---
 
@@ -123,8 +129,8 @@
 
 ## 🎯 План Дій
 
-1. **Зараз**: **Priority 2** — Mock server або Stage 4.4 AI/ML (v0.2.2 ✅, HPA init ✅)
-2. **Далі**: Реалізувати обраний крок
+1. **Зараз**: **Priority 2** — ML.1 profiling/tuning/quantization ✅ (v0.2.2 ✅, HPA ✅)
+2. **Далі**: ML.2–ML.3 implementation, ML.1 pruning strategies
 3. **Після**: `cargo fmt --all`, git push (pre-push hook), оновлення документації
 
 ---

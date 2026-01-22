@@ -6,7 +6,7 @@
 mod mock_servers;
 
 #[cfg(feature = "cloud-sdk")]
-use mock_servers::MockAwsEc2Server;
+use mock_servers::{MockAwsEc2Server, MockAwsEcsServer};
 #[cfg(feature = "cloud-sdk")]
 use poolai::cloud::providers::aws::AwsManager;
 #[cfg(feature = "cloud-sdk")]
@@ -100,5 +100,56 @@ async fn test_aws_credentials_handling() {
     manager.shutdown().await.unwrap();
 }
 
-// Note: Full end-to-end tests with mock servers would require making endpoints configurable
-// For now, these tests verify validation, error handling, and basic functionality
+#[cfg(feature = "cloud-sdk")]
+#[tokio::test]
+async fn test_aws_ec2_e2e_with_mock_server() -> Result<(), AppError> {
+    std::env::set_var("AWS_ACCESS_KEY_ID", "mock-key");
+    std::env::set_var("AWS_SECRET_ACCESS_KEY", "mock-secret");
+
+    let mut mock = MockAwsEc2Server::new().await;
+    let _m = mock.mock_run_instances_success().await;
+    let base = mock.url();
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+    manager.set_ec2_base_url_override(Some(base)).await;
+    manager.initialize().await?;
+
+    let id = manager
+        .create_ec2_instance("t3.medium", "ami-12345678")
+        .await?;
+    assert!(id.starts_with("i-"), "expected instance id i-*, got {}", id);
+
+    manager.shutdown().await?;
+    std::env::remove_var("AWS_ACCESS_KEY_ID");
+    std::env::remove_var("AWS_SECRET_ACCESS_KEY");
+    Ok(())
+}
+
+#[cfg(feature = "cloud-sdk")]
+#[tokio::test]
+async fn test_aws_ecs_e2e_with_mock_server() -> Result<(), AppError> {
+    std::env::set_var("AWS_ACCESS_KEY_ID", "mock-key");
+    std::env::set_var("AWS_SECRET_ACCESS_KEY", "mock-secret");
+
+    let mut mock = MockAwsEcsServer::new().await;
+    let _m = mock.mock_run_task_success().await;
+    let base = mock.url();
+
+    let manager = AwsManager::new(Some("us-east-1".to_string()));
+    manager.set_ecs_base_url_override(Some(base)).await;
+    manager.initialize().await?;
+
+    let arn = manager
+        .create_ecs_task("my-cluster", "poolai-worker-task")
+        .await?;
+    assert!(
+        arn.contains("task") && arn.contains("my-cluster"),
+        "expected task ARN, got {}",
+        arn
+    );
+
+    manager.shutdown().await?;
+    std::env::remove_var("AWS_ACCESS_KEY_ID");
+    std::env::remove_var("AWS_SECRET_ACCESS_KEY");
+    Ok(())
+}
