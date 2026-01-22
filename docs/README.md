@@ -98,6 +98,11 @@
 - [`PUSH_COMMIT_NOW.md`](./PUSH_COMMIT_NOW.md) - Push існуючого коміту
 - [`FIX_AUTH_AND_PUSH.md`](./FIX_AUTH_AND_PUSH.md) - ⚡ Виправлення аутентифікації та push (актуально)
 - [`PUSH_WITH_AUTH_FIX.md`](./PUSH_WITH_AUTH_FIX.md) - Детальний гайд з push та аутентифікації
+- [`PUSH_NOW_SSH_OR_PAT.md`](./PUSH_NOW_SSH_OR_PAT.md) - ⚡ Push зараз: SSH або PAT (найшвидше)
+- [`PUSH_SSH_OR_PAT.md`](./PUSH_SSH_OR_PAT.md) - Детальний гайд з SSH та PAT
+- [`PUSH_FINAL_SOLUTION.md`](./PUSH_FINAL_SOLUTION.md) - ⚡ Фінальне рішення: SSH або Credentials File (актуально)
+- [`CHECK_SYSTEM_NOW.md`](./CHECK_SYSTEM_NOW.md) - 🔍 Перевірка системи (SSH, git config, credentials)
+- [`SYSTEM_CHECK_REPORT.md`](./SYSTEM_CHECK_REPORT.md) - 📊 Звіт про перевірку системи (автоматична перевірка)
 
 ---
 
