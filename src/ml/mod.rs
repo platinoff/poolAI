@@ -13,8 +13,9 @@ pub mod automl;
 pub mod federated;
 pub mod optimization;
 
+pub mod versioning;
+
 // Placeholder submodules — to be implemented per roadmap
-// pub mod versioning;
 // pub mod experiments;
 // pub mod pipeline;
 
