@@ -1,8 +1,8 @@
 # 🎯 Наступні Кроки Розробки
-## Оновлено: 2026-01-19
+## Оновлено: 2026-01-22
 
-**Поточний статус**: ✅ **STABLE - PRODUCTION READY (v0.1.0)** → **v0.2.0 Ready**  
-**Останні досягнення**: RAID Strategy (100% ✅), Enterprise Features (95%), Cloud SDK (90%)
+**Поточний статус**: ✅ **STABLE - PRODUCTION READY (v0.2.1)**  
+**Останні досягнення**: RAID Strategy (100% ✅), Enterprise Features (100% ✅), Cloud SDK (99% ✅), Auto-scaling Metrics + Scaling Rules (100% ✅)
 
 ---
 
@@ -44,120 +44,59 @@
 
 ---
 
-## 🎯 Варіанти Наступних Кроків
+## 🎯 Наступні Кроки (Rust Architect — за пріоритетом)
 
-### Варіант A: Завершити RAID Strategy Integration Tests (2 дні) ⭐ Рекомендовано
+### ⭐ Priority 1: Load Balancing — routing rules (опціонально, ~1–2 дні)
 
-**Мета**: Додати integration tests з реальними artifacts для повного покриття RAID Strategy.
+**Мета**: Завершити Cloud SDK до 100% (залишилось 1%).
 
 **Завдання**:
-1. Створити тести для BurstRAID з реальними artifacts
-   - Тести burst detection з реальними даними
-   - Тести rebalancing з реальними artifacts
-   - Тести metrics collection
+1. `src/cloud/loadbalancing.rs`: Configure routing rules (TODO)
+2. `src/cloud/loadbalancing.rs`: Initialize cloud load balancer (if applicable) (TODO)
 
-2. Створити тести для SmallWorld з реальними artifacts
-   - Тести clustering coefficient з реальною топологією
-   - Тести rebalancing з реальними artifacts
-   - Тести metrics collection
-
-3. Cross-strategy tests
-   - Тести перемикання між стратегіями
-   - Тести одночасного використання
-
-**Результат**: RAID Strategy 98% → 100%
-
-**Файли**:
-- `tests/raid_burst_integration.rs` (створити)
-- `tests/raid_smallworld_integration.rs` (створити)
-- `tests/raid_cross_strategy.rs` (створити)
+**Результат**: Cloud SDK 99% → 100%
 
 ---
 
-### Варіант B: Підготувати v0.2.0 Release (1 день)
+### ⭐ Priority 2: Підготувати v0.2.2 Release (1 день)
 
-**Мета**: Підготувати release notes та документацію для v0.2.0.
+**Мета**: Release notes та документація для v0.2.2.
 
 **Завдання**:
-1. Створити CHANGELOG для v0.2.0
-   - Перелік нових features
-   - Breaking changes (якщо є)
-   - Deprecations
+1. Оновити CHANGELOG (нові features, breaking changes якщо є)
+2. Оновити README, migration guide за потреби
+3. Release notes: досягнення, тести, відомі issues
 
-2. Оновити документацію
-   - README.md з новими features
-   - Migration guide (якщо потрібно)
-
-3. Підготувати release notes
-   - Основні досягнення
-   - Статистика (tests, coverage)
-   - Відомі issues
-
-**Результат**: Готовий v0.2.0 release
+**Результат**: Готовий v0.2.2 release
 
 ---
 
-### Варіант C: Опціональні Features (3-5 днів)
+### ⭐ Priority 3: Опціональні Features (v0.3.0+)
 
-**Мета**: Реалізувати опціональні features для повного покриття.
+**Мета**: Додаткові features для v0.3.0+.
 
 **Завдання**:
-1. SAML SSO Implementation (1-2 дні)
-   - Реалізувати SAML SSO в `src/enterprise/security.rs`
-   - Додати SAML configuration
-   - Створити SAML assertion validation
-   - Додати integration tests
+1. **HPA (Horizontal Pod Autoscaler)** — ініціалізація для Kubernetes (`src/cloud/autoscaling.rs` TODO)
+2. **Mock Server Integration** для Cloud SDK — покращити тестове покриття
+3. **Stage 4.4 AI/ML** — Model Optimization, AutoML, Federated Learning (з концепту)
 
-2. Mock Server Integration для Cloud SDK (1 день)
-   - Додати mock servers для success scenarios
-   - Покращити тестове покриття
-
-3. Integration Tests для SQLite Persistence (1 день)
-   - Тести для metrics persistence
-   - Тести для historical queries
-   - Тести для cleanup
-
-**Результат**: Enterprise Features 95% → 100%, Cloud SDK 90% → 100%
+**Примітка**: SAML SSO ✅, SQLite persistence tests ✅, RAID Admin Control Plane ✅ вже реалізовано.
 
 ---
 
-### Варіант D: Administrative Control Plane для RAID (1 тиждень)
+### ~~Variant D: Administrative Control Plane для RAID~~ ✅ ЗАВЕРШЕНО (2026-01-19)
 
-**Мета**: Створити повноцінний Administrative Control Plane для управління RAID стратегіями.
-
-**Завдання**:
-1. Створити `src/raid/admin.rs` модуль
-   - Управління стратегіями
-   - Конфігурація стратегій
-   - Monitoring та metrics
-
-2. Реалізувати admin API endpoints (`src/network/api/raid_admin.rs`)
-   - CRUD операції для стратегій
-   - Управління конфігурацією
-   - Monitoring endpoints
-
-3. Інтеграція з Admin Panel
-   - UI для управління стратегіями
-   - Візуалізація metrics
-   - Конфігурація через UI
-
-**Результат**: RAID Strategy 98% → 100% з повним admin control plane
+- ✅ `src/raid/admin.rs`, Admin API `/raid/admin/*`, 6 integration tests
 
 ---
 
-## 📋 Рекомендація
+## 📋 Рекомендація (Rust Architect)
 
-**Рекомендований варіант**: **Варіант A** (RAID Strategy Integration Tests)
+**Рекомендований наступний крок**: **Priority 1** (Load Balancing routing rules) — опціонально; або **Priority 2** (v0.2.2 release prep).
 
-**Причини**:
-1. ✅ Найближче до завершення (98% → 100%)
-2. ✅ Покращує якість коду (більше тестів)
-3. ✅ Невеликий обсяг роботи (2 дні)
-4. ✅ Готує до v0.2.0 release
-
-**Після Варіанту A**:
-- → Варіант B (v0.2.0 Release)
-- → Або Варіант C (Опціональні Features)
+**Після Priority 1**:
+- → Priority 2 (v0.2.2 Release)
+- → Або Priority 3 (v0.3.0+ опціональні features)
 
 ---
 
@@ -166,8 +105,8 @@
 ### Cloud Module
 - `src/cloud/providers/gcp.rs`: google-cloud-compute-v1 crate (опціонально)
 - `src/cloud/providers/azure.rs`: Compute client, location config (опціонально)
-- `src/cloud/loadbalancing.rs`: Routing rules, cloud load balancer (опціонально)
-- `src/cloud/autoscaling.rs`: Metrics collection (опціонально)
+- `src/cloud/loadbalancing.rs`: Routing rules, cloud load balancer (Priority 1 — опціонально)
+- ~~`src/cloud/autoscaling.rs`: Metrics collection~~ ✅ ЗАВЕРШЕНО (2026-01-22)
 
 ### Runtime Module
 - `src/runtime/instance.rs`: Load model from library (майбутня функціональність)
@@ -181,12 +120,12 @@
 
 ## 🎯 План Дій
 
-1. **Зараз**: Обрати варіант (A, B, C, або D)
-2. **Далі**: Реалізувати обраний варіант
-3. **Після**: Підготувати v0.2.0 release або продовжити з наступним пріоритетом
+1. **Зараз**: Обрати пріоритет (1: Load Balancing, 2: v0.2.2 release, 3: v0.3.0+)
+2. **Далі**: Реалізувати обраний крок
+3. **Після**: Git push (pre-push: `cargo fmt --all`), оновлення документації
 
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата**: 2026-01-19  
-**Статус**: Очікуємо вибір варіанту
+**Дата**: 2026-01-22  
+**Статус**: Stable v0.2.1; наступні кроки за пріоритетом

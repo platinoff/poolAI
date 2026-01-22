@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect Analysis - 2026-01-21 (актуалізовано - останні покращення UI/UX та виправлення)
+## Rust Architect Analysis - 2026-01-22 (актуалізовано - Cloud SDK 99%, stable state, roadmap)
 
 ---
 
@@ -17,7 +17,7 @@
 
 ### Git статус
 - ✅ Гілка **main**, working tree clean
-- ✅ Останні коміти: `0484280` (chore: remove temp script), `3a7e279` (style: formatting fixes), `050f141` (fix: Axum route syntax), `4b84709` (fix: MSYS2 dlltool script), `d642933` (docs: GCC troubleshooting), `329a8dc` (docs: how to run), `844f522` (docs: run parameters), `eaf5908` (fix: CI rustfmt/clippy), `5334883` (docs: UI/UX improvements), `3a36b1d` (feat: UI/UX максимальні покращення)
+- ✅ Pre-push hook: `cargo fmt --all --check` перед push
 - ⚠️ Перед операціями: `git status --short`
 
 ### Завершені модулі (100%)
@@ -87,13 +87,15 @@ cargo test --no-default-features --lib
 
 ## 🎯 Наступні кроки (Rust Architect)
 
-**Детально**: `docs/development/RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md`
+**Детально**: `docs/development/NEXT_STEPS_2026-01-19.md`
 
-1. **Priority 1 — Cloud SDK** (75%→100%): AWS init, GCP token refresh, integration tests. Файли: `src/cloud/providers/aws.rs`, `gcp.rs`.
-2. **Priority 2 — RAID Admin** (95%→100%): Burst/SmallWorld metrics, Administrative Control Plane. Файли: `src/raid/burst_raid.rs`, `small_world.rs`, новий `admin.rs`.
-3. **Priority 3 — Enterprise** (85%→100%): SAML SSO, Monitoring persistence. Файли: `src/enterprise/security.rs`, `monitoring.rs`.
+1. **Priority 1 — Load Balancing** (опціонально): Routing rules, cloud LB init. Файл: `src/cloud/loadbalancing.rs`. Cloud SDK 99%→100%.
+2. **Priority 2 — v0.2.2 release**: Changelog, release notes, README.
+3. **Priority 3 — v0.3.0+** (опціонально): HPA init, Mock server integration, Stage 4.4 AI/ML.
 
-**Базові команди** (bash, без PS): `bin/git-status.sh`, `bin/cargo-check.sh`, `bin/cargo-test.sh`, `bin/cargo-fmt.sh`.
+**Стабільний стан**: v0.2.1 ✅ | Cloud SDK 99% ✅ | RAID/Enterprise 100% ✅ | Auto-scaling Metrics + Scaling Rules ✅ (2026-01-22).
+
+**Базові команди** (MSYS2 bash, без PS): `bin/git-status.sh`, `bin/cargo-check.sh`, `bin/cargo-test.sh`, `bin/cargo-fmt.sh`; перед push — pre-push hook.
 
 ---
 
@@ -152,35 +154,26 @@ cargo test --no-default-features --lib
 - **Documentation**: Complete
 - **Cursor Settings**: Optimized (2026-01-19)
 - **Environment Setup**: Automated (MSVC & Rust environment scripts) ✅
-- **Cloud SDK Progress**: 95% (AWS SDK ✅, GCP token refresh ✅, Azure token acquisition ✅, Extended integration tests ✅)
-- **RAID Strategy Progress**: 100% (BurstRAID ✅, SmallWorld ✅, Metrics ✅, Integration tests ✅, Burst state auto-update fix ✅)
+- **Cloud SDK Progress**: 99% (AWS/GCP/Azure ✅, Auto-scaling Metrics ✅, Scaling Rules evaluate_and_scale ✅, Extended tests ✅)
+- **RAID Strategy Progress**: 100% (BurstRAID ✅, SmallWorld ✅, Metrics ✅, Integration tests ✅, Admin Control Plane ✅)
 - **Enterprise Features Progress**: 100% (SQLite persistence ✅, GitHub OAuth2 ✅, SAML SSO ✅)
 
 ---
 
 **Статус**: ✅ **STABLE - PRODUCTION READY**  
-**Версія**: v0.2.0 Released ✅  
-**Дата**: 2026-01-19 (актуалізовано)  
+**Версія**: v0.2.1 Released ✅  
+**Дата**: 2026-01-22 (актуалізовано)  
 **Підготовлено**: Rust Architect  
 
-**Останні зміни** (2026-01-21):
-- ✅ **RAID Administrative Control Plane** (коміт adf01a4)
-  - ✅ `src/raid/admin.rs` module з RaidAdmin
-  - ✅ Admin API endpoints (`/raid/admin/*`)
-  - ✅ 6 integration tests passing
-- ✅ **Cloud SDK Extended Tests** (коміт 27119f9)
-  - ✅ Edge cases tests для credential chain, token caching, concurrent init
-  - ✅ Cloud SDK progress: 98%
-- ✅ **Cloud Providers Tests Fix** (коміт c4cd12d)
-  - ✅ 17 tests passing, tolerate missing credentials
-- ✅ **RAID Strategy 100%** (коміти b494aad … 079b207)
-  - ✅ `raid_cross_strategy`: topology init, shutdown, fmt
-  - ✅ `raid_smallworld_integration`: `add_test_artifact`, реєстрація нод, `base_replication_factor` assert
-  - ✅ **Clustering coefficient formula**: знаменник `k*(k-1)` замість `possible_edges` (було до 2, тепер [0,1])
-  - ✅ Усі 11 RAID integration тестів проходять локально (MSYS2 UCRT64)
-- ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, cross-strategy, metrics ✅
+**Останні зміни** (2026-01-22):
+- ✅ **Cloud SDK Auto-scaling** (Metrics + Scaling Rules)
+  - ✅ `get_pod_metrics()` в KubernetesManager, PodMetrics, parse_cpu_millicores/parse_memory_kibibytes
+  - ✅ AutoScaler.get_metrics() з реальним Metrics API
+  - ✅ `evaluate_and_scale()`, ScalingAction
+  - ✅ Cloud SDK progress: 99%
+- ✅ **Stable state оновлено**: concept, roadmap, NEXT_STEPS, STABLE_STATE_SUMMARY
+- ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, Admin Control Plane ✅
 - ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO ✅
-- ✅ **Cloud SDK 95%** — AWS/GCP/Azure ✅
 - ✅ **UI/UX, Admin Panel 100%** ✅
 
 ---

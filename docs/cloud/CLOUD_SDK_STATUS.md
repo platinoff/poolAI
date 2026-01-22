@@ -1,9 +1,9 @@
 # ☁️ Cloud SDK Implementation Status
 ## Поточний стан інтеграції з cloud providers
 
-**Дата оновлення**: 2026-01-21  
-**Версія**: 2.0  
-**Статус**: Infrastructure 100% ✅, SDK Implementation 98% ✅ (CI verification pending)
+**Дата оновлення**: 2026-01-22  
+**Версія**: 2.1  
+**Статус**: Infrastructure 100% ✅, SDK Implementation 99% ✅ (Metrics + Scaling Rules done)
 
 ---
 
@@ -15,7 +15,7 @@
 | **GCP** | ✅ 100% | ✅ 100% | ✅ 100% | ✅ 100% | 100% ✅ |
 | **AWS** | ✅ 100% | ✅ 100% | ✅ 100% | ✅ 100% | 100% ✅ |
 
-**Загальний прогрес**: **99%** ✅ (Metrics collection implemented, scaling rules pending)
+**Загальний прогрес**: **99%** ✅ (Metrics collection ✅, Scaling rules evaluate_and_scale ✅; залишилось: Load Balancing routing rules)
 
 ---
 
@@ -190,6 +190,11 @@ let task_id = manager.create_ecs_task(
 - ✅ Helper functions для парсингу CPU/memory (parse_cpu_millicores, parse_memory_kibibytes)
 - ✅ Fallback to placeholder metrics when Metrics API unavailable
 
+### Phase 3.5: Auto-scaling Scaling Rules - Завершено ✅ (2026-01-22)
+- ✅ evaluate_and_scale() для автоматичного масштабування за політиками
+- ✅ ScalingAction structure
+- ✅ Підтримка CPU, Memory, RequestRate
+
 ### Phase 4: Hybrid Approach (Planned)
 - [ ] Використовувати SDK де можливо
 - [ ] Fallback на REST API для compatibility
@@ -227,12 +232,12 @@ let task_id = manager.create_ecs_task(
 1. ✅ HTTP clients ініціалізовані для всіх providers
 2. ✅ Azure VM Scale Set creation працює
 3. ✅ GCP Compute Engine instance creation працює
-4. ⏳ AWS EC2/ECS creation (потребує SigV4)
+4. ✅ AWS EC2/ECS creation (SigV4 ✅)
 5. ✅ Error handling та validation
 6. ✅ Integration tests passing
 
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата**: 2026-01-17  
-**Версія**: 1.0 - Cloud SDK Status
+**Дата**: 2026-01-22  
+**Версія**: 2.1 - Cloud SDK Status

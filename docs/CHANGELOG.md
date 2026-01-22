@@ -7,12 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Documentation** (2026-01-22): Stable state, roadmap, next steps by priority
+  - Concept root: Cloud SDK 99%, Next Goal Load Balancing / v0.2.2
+  - DEVELOPMENT_ROADMAP: module status 100%, Next Steps (Rust Architect) by priority
+  - NEXT_STEPS_2026-01-19: v0.2.1 stable, Priority 1–3 (LB routing, v0.2.2, v0.3.0+)
+  - STABLE_STATE_SUMMARY: Cloud 99%, next steps, pre-push hook
+  - CLOUD_SDK_STATUS: Phase 3.5 Scaling Rules, criteria EC2/ECS ✅
+  - FUTURE_DEVELOPMENT_ROADMAP: v0.2.1, 437+ tests, Cloud 99%
+
 ### Planned
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
-- Administrative Control Plane for RAID (optional)
 - Mock server integration for Cloud SDK (optional)
+- Load Balancing routing rules (optional, Cloud SDK 100%)
 
 ## [0.2.1] - 2026-01-22
 
