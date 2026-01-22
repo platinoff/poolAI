@@ -28,6 +28,13 @@
 //!     autoscaler.scale_down("worker-pool", metrics.current_replicas - 1).await?;
 //! }
 //!
+//! // Or use automatic scaling based on policies
+//! let action = autoscaler.evaluate_and_scale("worker-pool").await?;
+//! if let Some(scaling) = action {
+//!     println!("Scaled {}: {} -> {} ({})", 
+//!         scaling.action, scaling.from_replicas, scaling.to_replicas, scaling.reason);
+//! }
+//!
 //! autoscaler.shutdown().await?;
 //! # Ok(())
 //! # }
@@ -36,7 +43,7 @@
 use crate::core::error::AppError;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
 use crate::cloud::kubernetes::KubernetesManager;
@@ -143,9 +150,18 @@ impl AutoScaler {
         });
         drop(policies);
 
-        // TODO: Set up metrics collection
-        // TODO: Configure scaling rules
-        // TODO: Initialize HPA (if Kubernetes)
+        // Metrics collection: ✅ Implemented via get_metrics() method
+        // - Real metrics collection from Kubernetes Metrics API (when k8s_manager is available)
+        // - Fallback to placeholder metrics when Metrics API is unavailable
+        
+        // Scaling rules: ✅ Configured via ScalingPolicy
+        // - Default CPU policy added (target: 70%, scale up: 80%, scale down: 50%)
+        // - Additional policies can be added via add_policy()
+        // - Automatic scaling can be triggered via evaluate_and_scale()
+        
+        // TODO: Initialize HPA (Horizontal Pod Autoscaler) for Kubernetes
+        // - Create HPA resource via Kubernetes API
+        // - Configure HPA with scaling policies
 
         info!("Auto-scaler initialized with default policies");
 
@@ -395,20 +411,40 @@ impl AutoScaler {
 
                 if current_replicas > 0 {
                     let pods = k8s_manager.list_pods().await.unwrap_or_default();
-                    for _pod_name in pods.iter().filter(|p| p.starts_with(resource_id)) {
-                        // Query metrics for each pod
-                        // Path: /apis/metrics.k8s.io/v1beta1/namespaces/{namespace}/pods/{pod_name}
-                        // For now, we'll use a simplified approach
-                        // In production, we'd query the metrics API and calculate averages
-                        pod_count += 1;
+                    let matching_pods: Vec<String> = pods.iter()
+                        .filter(|p| p.starts_with(resource_id))
+                        .cloned()
+                        .collect();
+
+                    // Query metrics for each pod
+                    for pod_name in &matching_pods {
+                        match k8s_manager.get_pod_metrics(pod_name).await {
+                            Ok(pod_metrics) => {
+                                // Convert millicores to usage ratio (assuming 1 core = 1000m per pod)
+                                // For simplicity, we'll use a default CPU limit of 1000m per pod
+                                let cpu_limit_millicores = 1000.0;
+                                let cpu_usage_ratio = (pod_metrics.cpu_millicores / cpu_limit_millicores).min(1.0);
+                                total_cpu_usage += cpu_usage_ratio;
+
+                                // Convert Kibibytes to usage ratio (assuming 1Gi = 1048576 KiB per pod)
+                                // For simplicity, we'll use a default memory limit of 1Gi per pod
+                                let memory_limit_kibibytes = 1024.0 * 1024.0; // 1 GiB
+                                let memory_usage_ratio = (pod_metrics.memory_kibibytes / memory_limit_kibibytes).min(1.0);
+                                total_memory_usage += memory_usage_ratio;
+
+                                pod_count += 1;
+                            }
+                            Err(e) => {
+                                warn!("Failed to get metrics for pod {}: {}", pod_name, e);
+                                // Continue with other pods
+                            }
+                        }
                     }
 
-                    // Calculate average CPU and memory usage
-                    // Placeholder: In production, we'd query actual metrics
-                    // For now, return placeholder values
+                    // Calculate average CPU and memory usage across all pods
                     if pod_count > 0 {
-                        total_cpu_usage = 0.5; // Placeholder: 50% CPU usage
-                        total_memory_usage = 0.6; // Placeholder: 60% memory usage
+                        total_cpu_usage = total_cpu_usage / pod_count as f64;
+                        total_memory_usage = total_memory_usage / pod_count as f64;
                     }
                 }
 
@@ -503,6 +539,110 @@ impl AutoScaler {
         *self.max_replicas.write().await = max;
         Ok(())
     }
+
+    /// Evaluate metrics and automatically scale based on policies
+    ///
+    /// This method evaluates current metrics against all scaling policies and
+    /// automatically scales up or down if thresholds are exceeded.
+    ///
+    /// # Arguments
+    ///
+    /// * `resource_id` - Identifier for the resource to evaluate and scale
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if:
+    /// - `resource_id` is empty
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Metrics cannot be retrieved
+    /// - Scaling operations fail
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::autoscaling::AutoScaler;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let autoscaler = AutoScaler::new();
+    /// autoscaler.initialize().await?;
+    ///
+    /// // Automatically evaluate and scale based on policies
+    /// autoscaler.evaluate_and_scale("worker-pool").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn evaluate_and_scale(&self, resource_id: &str) -> Result<Option<ScalingAction>, AppError> {
+        if resource_id.is_empty() {
+            return Err(AppError::ValidationError(
+                "Resource ID cannot be empty. Context: Attempted to evaluate and scale with empty resource ID. \
+                Suggestion: Provide a valid resource identifier. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        // Get current metrics
+        let metrics = self.get_metrics(resource_id).await?;
+        let policies = self.scaling_policies.read().await.clone();
+        let min_replicas = *self.min_replicas.read().await;
+        let max_replicas = *self.max_replicas.read().await;
+
+        // Evaluate each policy
+        for policy in &policies {
+            let metric_value = match policy.metric_type.as_str() {
+                "CPU" => metrics.cpu_usage * 100.0, // Convert to percentage
+                "Memory" => metrics.memory_usage * 100.0, // Convert to percentage
+                "RequestRate" => metrics.request_rate,
+                _ => continue, // Skip unknown metric types
+            };
+
+            // Check scale up condition
+            if metric_value >= policy.scale_up_threshold {
+                let new_replicas = (metrics.current_replicas as f64 * 1.5).ceil() as u32;
+                let target_replicas = new_replicas.min(max_replicas);
+                
+                if target_replicas > metrics.current_replicas {
+                    info!(
+                        "Policy '{}' triggered scale up: {} -> {} (metric: {:.1}% >= {:.1}%)",
+                        policy.name, metrics.current_replicas, target_replicas,
+                        metric_value, policy.scale_up_threshold
+                    );
+                    self.scale_up(resource_id, target_replicas).await?;
+                    return Ok(Some(ScalingAction {
+                        action: "scale_up".to_string(),
+                        from_replicas: metrics.current_replicas,
+                        to_replicas: target_replicas,
+                        reason: format!("Policy '{}' threshold exceeded", policy.name),
+                    }));
+                }
+            }
+
+            // Check scale down condition
+            if metric_value <= policy.scale_down_threshold && metrics.current_replicas > min_replicas {
+                let new_replicas = (metrics.current_replicas as f64 * 0.75).floor() as u32;
+                let target_replicas = new_replicas.max(min_replicas);
+                
+                if target_replicas < metrics.current_replicas {
+                    info!(
+                        "Policy '{}' triggered scale down: {} -> {} (metric: {:.1}% <= {:.1}%)",
+                        policy.name, metrics.current_replicas, target_replicas,
+                        metric_value, policy.scale_down_threshold
+                    );
+                    self.scale_down(resource_id, target_replicas).await?;
+                    return Ok(Some(ScalingAction {
+                        action: "scale_down".to_string(),
+                        from_replicas: metrics.current_replicas,
+                        to_replicas: target_replicas,
+                        reason: format!("Policy '{}' threshold under", policy.name),
+                    }));
+                }
+            }
+        }
+
+        // No scaling action needed
+        Ok(None)
+    }
 }
 
 impl Default for AutoScaler {
@@ -533,4 +673,32 @@ pub struct ScalingMetrics {
     pub memory_usage: f64, // 0.0 - 1.0
     pub request_rate: f64, // requests per second
     pub current_replicas: u32,
+}
+
+/// Scaling action result
+///
+/// Represents the result of an automatic scaling operation.
+///
+/// # Example
+///
+/// ```rust
+/// use poolai::cloud::autoscaling::ScalingAction;
+///
+/// let action = ScalingAction {
+///     action: "scale_up".to_string(),
+///     from_replicas: 3,
+///     to_replicas: 5,
+///     reason: "CPU usage exceeded threshold".to_string(),
+/// };
+/// ```
+#[derive(Debug, Clone)]
+pub struct ScalingAction {
+    /// Action type ("scale_up" or "scale_down")
+    pub action: String,
+    /// Number of replicas before scaling
+    pub from_replicas: u32,
+    /// Number of replicas after scaling
+    pub to_replicas: u32,
+    /// Reason for scaling
+    pub reason: String,
 }

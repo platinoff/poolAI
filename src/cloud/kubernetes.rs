@@ -69,6 +69,17 @@ pub struct PodStatus {
     pub restart_count: u32,
 }
 
+/// Kubernetes Pod metrics from Metrics API
+#[derive(Debug, Clone)]
+pub struct PodMetrics {
+    /// Pod name
+    pub pod_name: String,
+    /// CPU usage in millicores (1000 millicores = 1 core)
+    pub cpu_millicores: f64,
+    /// Memory usage in Kibibytes (1024 KiB = 1 MiB)
+    pub memory_kibibytes: f64,
+}
+
 /// Kubernetes Deployment status information
 #[derive(Debug, Clone)]
 pub struct DeploymentStatus {
@@ -1794,6 +1805,99 @@ impl KubernetesManager {
     /// # Ok(())
     /// # }
     /// ```
+    /// Get pod metrics from Kubernetes Metrics API
+    ///
+    /// # Arguments
+    ///
+    /// * `pod_name` - Name of the pod to query metrics for
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::NetworkError` if:
+    /// - Metrics API is unreachable
+    /// - Pod does not exist
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    ///
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    ///
+    /// let metrics = manager.get_pod_metrics("worker-pod-1").await?;
+    /// println!("CPU: {}m, Memory: {}Ki", metrics.cpu_millicores, metrics.memory_kibibytes);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn get_pod_metrics(&self, pod_name: &str) -> Result<PodMetrics, AppError> {
+        if pod_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Pod name cannot be empty. Context: Attempted to get metrics for empty pod name. \
+                Suggestion: Provide a valid pod name. \
+                Current value: ''"
+                    .to_string(),
+            ));
+        }
+
+        // Query Metrics API: /apis/metrics.k8s.io/v1beta1/namespaces/{namespace}/pods/{pod_name}
+        let path = format!(
+            "/apis/metrics.k8s.io/v1beta1/namespaces/{}/pods/{}",
+            self.namespace, pod_name
+        );
+
+        match self.k8s_api_request("GET", &path, None).await {
+            Ok(response) => {
+                // Parse metrics response
+                let metrics_json: serde_json::Value = serde_json::from_str(&response)
+                    .map_err(|e| AppError::NetworkError(format!(
+                        "Failed to parse pod metrics response. Context: Invalid JSON from Metrics API. \
+                        Suggestion: Check Metrics API server status. \
+                        Error: {}, Response: {}",
+                        e, response
+                    )))?;
+
+                // Extract CPU and memory from containers
+                let mut total_cpu_millicores = 0.0;
+                let mut total_memory_kibibytes = 0.0;
+
+                if let Some(containers) = metrics_json.get("containers").and_then(|c| c.as_array()) {
+                    for container in containers {
+                        // Parse CPU usage (format: "100m" = 100 millicores, "1" = 1000 millicores)
+                        if let Some(cpu) = container.get("usage").and_then(|u| u.get("cpu")).and_then(|c| c.as_str()) {
+                            total_cpu_millicores += parse_cpu_millicores(cpu);
+                        }
+
+                        // Parse memory usage (format: "128Mi" = 128 MiB, "1Gi" = 1024 MiB)
+                        if let Some(memory) = container.get("usage").and_then(|u| u.get("memory")).and_then(|m| m.as_str()) {
+                            total_memory_kibibytes += parse_memory_kibibytes(memory);
+                        }
+                    }
+                }
+
+                Ok(PodMetrics {
+                    pod_name: pod_name.to_string(),
+                    cpu_millicores: total_cpu_millicores,
+                    memory_kibibytes: total_memory_kibibytes,
+                })
+            }
+            Err(e) => {
+                // If Metrics API is not available, return placeholder metrics
+                warn!(
+                    "Metrics API not available for pod {}: {}. Returning placeholder metrics.",
+                    pod_name, e
+                );
+                Ok(PodMetrics {
+                    pod_name: pod_name.to_string(),
+                    cpu_millicores: 0.0,
+                    memory_kibibytes: 0.0,
+                })
+            }
+        }
+    }
+
     pub async fn list_deployments(&self) -> Result<Vec<String>, AppError> {
         info!("Listing deployments in namespace {}", self.namespace);
 
@@ -3038,6 +3142,57 @@ fn build_vm_deployment(
             }
         }
     }))
+}
+
+#[cfg(feature = "cloud-sdk")]
+/// Parse CPU usage string to millicores
+///
+/// Supports formats: "100m" (100 millicores), "1" (1000 millicores), "1.5" (1500 millicores)
+fn parse_cpu_millicores(cpu_str: &str) -> f64 {
+    if cpu_str.ends_with('m') {
+        // Format: "100m" = 100 millicores
+        cpu_str.trim_end_matches('m')
+            .parse::<f64>()
+            .unwrap_or(0.0)
+    } else {
+        // Format: "1" or "1.5" = cores, convert to millicores
+        cpu_str.parse::<f64>()
+            .unwrap_or(0.0) * 1000.0
+    }
+}
+
+#[cfg(feature = "cloud-sdk")]
+/// Parse memory usage string to Kibibytes
+///
+/// Supports formats: "128Ki" (128 KiB), "128Mi" (128 MiB = 131072 KiB), "1Gi" (1 GiB = 1048576 KiB)
+fn parse_memory_kibibytes(memory_str: &str) -> f64 {
+    let memory_str = memory_str.trim();
+    
+    if memory_str.ends_with("Ki") {
+        // Format: "128Ki" = 128 Kibibytes
+        memory_str.trim_end_matches("Ki")
+            .parse::<f64>()
+            .unwrap_or(0.0)
+    } else if memory_str.ends_with("Mi") {
+        // Format: "128Mi" = 128 MiB = 128 * 1024 KiB
+        memory_str.trim_end_matches("Mi")
+            .parse::<f64>()
+            .unwrap_or(0.0) * 1024.0
+    } else if memory_str.ends_with("Gi") {
+        // Format: "1Gi" = 1 GiB = 1024 * 1024 KiB
+        memory_str.trim_end_matches("Gi")
+            .parse::<f64>()
+            .unwrap_or(0.0) * 1024.0 * 1024.0
+    } else if memory_str.ends_with('i') {
+        // Handle other binary units (Ti, Pi, etc.) - not common for pod metrics
+        memory_str.trim_end_matches('i')
+            .parse::<f64>()
+            .unwrap_or(0.0)
+    } else {
+        // Assume bytes if no unit specified, convert to KiB
+        memory_str.parse::<f64>()
+            .unwrap_or(0.0) / 1024.0
+    }
 }
 
 #[cfg(feature = "cloud-sdk")]

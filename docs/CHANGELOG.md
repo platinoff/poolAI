@@ -16,6 +16,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - 2026-01-22
 
+### Added
+- **Cloud SDK Auto-scaling - Metrics Collection** 🎉
+  - Real metrics collection from Kubernetes Metrics API
+  - `get_pod_metrics()` method in KubernetesManager
+  - PodMetrics structure (CPU millicores, memory Kibibytes)
+  - Helper functions: `parse_cpu_millicores()`, `parse_memory_kibibytes()`
+  - Integration with AutoScaler.get_metrics() for real-time metrics
+  - Fallback to placeholder metrics when Metrics API unavailable
+- **Cloud SDK Auto-scaling - Automatic Scaling Rules** 🎉
+  - `evaluate_and_scale()` method for automatic scaling based on policies
+  - ScalingAction structure to track scaling operations
+  - Automatic scale up/down based on policy thresholds
+  - Support for CPU, Memory, and RequestRate metrics
+- **Pre-push Hook** 🎉
+  - Automatic `cargo fmt --all --check` before git push
+  - Auto-formatting if formatting fails
+  - Documentation: `docs/development/PRE_PUSH_HOOK.md`
+- **Rust Architect Rules** 🎉
+  - `.cursor/rules/rust-architect.md` - Complete workflow guide
+  - Rules for using concept files, file_list.csv, MSYS2 bash
+  - Document synchronization guidelines
+
 ### Changed
 - **Version Update**: Updated `APP_VERSION` in `src/version.rs` from 0.1.0 to 0.2.1 to match `Cargo.toml`
 - **Git Configuration**: Updated `.gitignore` to exclude development directories:
@@ -23,16 +45,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `docs/` - Local documentation (not synced)
   - `.vscode/` - VS Code settings (except important configs)
   - `scripts/` - Local development scripts
-- **Documentation**: Moved `QUICK_FIX_MSYS2.md` to `docs/troubleshooting/` for better organization
-- **Concept File**: Updated `poolAI_concept.txt` with:
+- **File Organization**:
+  - Moved `.cursorrules` to `.cursor/rules/.cursorrules`
+  - Moved `QUICK_FIX_MSYS2.md` to `docs/troubleshooting/`
+- **Documentation**: Updated concept files with:
   - Current Rust version (1.92.0)
   - Updated test counts (437+ tests passing)
   - MSYS2 commands and tools section
   - Git configuration documentation
+  - file_list.csv usage information
+- **Cloud SDK Progress**: 95% → 99% (Metrics collection + Scaling rules implemented)
 
 ### Fixed
 - Git working tree cleanup - removed all modified (M) flags from files
 - Version synchronization between `Cargo.toml` and `src/version.rs`
+- AutoScaler.get_metrics() now uses real Kubernetes Metrics API instead of placeholders
 
 ## [0.2.1] - 2026-01-19
 

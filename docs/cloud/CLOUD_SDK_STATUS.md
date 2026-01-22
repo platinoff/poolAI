@@ -15,7 +15,7 @@
 | **GCP** | ✅ 100% | ✅ 100% | ✅ 100% | ✅ 100% | 100% ✅ |
 | **AWS** | ✅ 100% | ✅ 100% | ✅ 100% | ✅ 100% | 100% ✅ |
 
-**Загальний прогрес**: **98%** ✅ (CI verification pending)
+**Загальний прогрес**: **99%** ✅ (Metrics collection implemented, scaling rules pending)
 
 ---
 
@@ -183,7 +183,14 @@ let task_id = manager.create_ecs_task(
 - ✅ Token management для всіх провайдерів
 - ✅ Integration tests: 27+ tests passing
 
-### Phase 3: Hybrid Approach
+### Phase 3: Auto-scaling Metrics Collection - Завершено ✅ (2026-01-22)
+- ✅ Pod metrics query через Kubernetes Metrics API
+- ✅ Real CPU and memory usage collection
+- ✅ Integration with AutoScaler.get_metrics()
+- ✅ Helper functions для парсингу CPU/memory (parse_cpu_millicores, parse_memory_kibibytes)
+- ✅ Fallback to placeholder metrics when Metrics API unavailable
+
+### Phase 4: Hybrid Approach (Planned)
 - [ ] Використовувати SDK де можливо
 - [ ] Fallback на REST API для compatibility
 - [ ] Unified interface для всіх providers

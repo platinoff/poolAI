@@ -8,13 +8,23 @@
 
 ## 📊 Поточний Стан Пріоритетів
 
-### ✅ Priority 1.1: Cloud SDK - **95%** (Готово до v0.2.1)
+### ✅ Priority 1.1: Cloud SDK - **99%** (Готово до v0.2.1) ✅
 - ✅ AWS SDK initialization - 100%
 - ✅ GCP token refresh - 100%
 - ✅ Azure token acquisition - 100%
 - ✅ Extended integration tests - 85%
+- ✅ **Auto-scaling Metrics Collection - 100%** ✅ (2026-01-22)
+  - ✅ Real metrics collection from Kubernetes Metrics API
+  - ✅ Pod metrics query (CPU, memory)
+  - ✅ Integration with AutoScaler.get_metrics()
+  - ✅ Helper functions для парсингу CPU/memory
+- ✅ **Auto-scaling Scaling Rules - 100%** ✅ (2026-01-22)
+  - ✅ Automatic scaling based on policies
+  - ✅ evaluate_and_scale() method
+  - ✅ ScalingAction result structure
 - ✅ Mock servers реалізовані (потрібна інтеграція в тести)
 - ⏸️ Опціонально: Mock server integration в тести (для v0.3.0+)
+- ⏸️ Опціонально: HPA initialization для Kubernetes (для v0.3.0+)
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
