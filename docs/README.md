@@ -103,6 +103,8 @@
 - [`PUSH_FINAL_SOLUTION.md`](./PUSH_FINAL_SOLUTION.md) - ⚡ Фінальне рішення: SSH або Credentials File (актуально)
 - [`CHECK_SYSTEM_NOW.md`](./CHECK_SYSTEM_NOW.md) - 🔍 Перевірка системи (SSH, git config, credentials)
 - [`SYSTEM_CHECK_REPORT.md`](./SYSTEM_CHECK_REPORT.md) - 📊 Звіт про перевірку системи (автоматична перевірка)
+- [`PUSH_SUCCESS_2026-01-22.md`](./PUSH_SUCCESS_2026-01-22.md) - ✅ Push успішно виконано (2026-01-22)
+- [`FINAL_PUSH_READY.md`](./FINAL_PUSH_READY.md) - 🚀 Готово до push (інструкції)
 
 ---
 
