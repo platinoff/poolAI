@@ -1,0 +1,7 @@
+docs(architect): update RUST_ARCHITECT with current state and next steps
+
+- Update RUST_ARCHITECT_NEXT_STEPS: cloud_providers tests fixed, bin/ scripts added
+- Update STABLE_STATE_SUMMARY: latest commits, CI/CD status
+- Add RUST_ARCHITECT_SUMMARY_2026-01-21: concise next steps overview
+- Cloud SDK progress: 80% (tests fixed, AWS/GCP SDK pending)
+- Update dates to 2026-01-21
