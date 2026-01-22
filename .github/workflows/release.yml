@@ -21,6 +21,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+          components: rustfmt, clippy
           
       - name: Build release
         run: cargo build --release --features jwt,https
