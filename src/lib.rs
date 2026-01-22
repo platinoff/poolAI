@@ -176,7 +176,10 @@ pub use vm::{
 };
 
 // Re-export RAID types
-pub use raid::{ArtifactRef, RaidConfig, RaidManager, RaidMode, RaidNode};
+pub use raid::{
+    admin::RaidAdmin, ArtifactRef, RaidConfig, RaidManager, RaidMode, RaidNode,
+    StrategyStatus,
+};
 
 // Re-export network functions
 pub use network::start_server;

@@ -75,6 +75,7 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
 
+pub mod admin;
 pub mod burst_raid;
 pub mod circuit_breaker;
 pub mod client;
@@ -1354,6 +1355,29 @@ impl RaidManager {
         let strategy_guard = self.small_world_strategy.read().await;
         if let Some(ref strategy) = *strategy_guard {
             strategy.get_node_clustering_coefficient(node_id).await
+        } else {
+            None
+        }
+    }
+
+    /// Get artifact burst stats for a specific artifact (BurstRAID strategy only)
+    ///
+    /// Returns burst statistics for a specific artifact if BurstRAID strategy is active.
+    ///
+    /// # Arguments
+    ///
+    /// * `artifact_id` - UUID of the artifact
+    ///
+    /// # Returns
+    ///
+    /// Returns `Some(ArtifactBurstStats)` if artifact is tracked and BurstRAID is active, `None` otherwise.
+    pub async fn get_artifact_burst_stats(
+        &self,
+        artifact_id: Uuid,
+    ) -> Option<burst_raid::ArtifactBurstStats> {
+        let strategy_guard = self.burst_strategy.read().await;
+        if let Some(ref strategy) = *strategy_guard {
+            strategy.get_artifact_burst_stats(artifact_id).await
         } else {
             None
         }

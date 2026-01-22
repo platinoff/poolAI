@@ -93,7 +93,7 @@ impl Default for SmallWorldConfig {
 }
 
 /// Metrics for SmallWorld strategy
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct SmallWorldMetrics {
     /// Total number of artifacts being tracked
     pub total_artifacts: usize,

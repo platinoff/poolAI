@@ -82,7 +82,7 @@ struct BurstState {
 }
 
 /// Metrics for BurstRAID strategy
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct BurstRaidMetrics {
     /// Total number of artifacts being tracked
     pub total_artifacts: usize,
@@ -99,7 +99,7 @@ pub struct BurstRaidMetrics {
 }
 
 /// Burst detection statistics for a specific artifact
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct ArtifactBurstStats {
     /// Artifact ID
     pub artifact_id: Uuid,

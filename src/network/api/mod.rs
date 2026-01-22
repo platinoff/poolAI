@@ -19,6 +19,7 @@ pub mod discovery;
 pub mod instances;
 pub mod libraries;
 pub mod raid;
+pub mod raid_admin;
 pub mod rewards;
 pub mod system;
 pub mod topology;
@@ -47,6 +48,7 @@ pub fn create_api_routes() -> Router {
         .merge(rewards::create_rewards_routes())
         .merge(vm::create_vm_routes())
         .merge(raid::create_raid_routes())
+        .merge(raid_admin::create_raid_admin_routes())
         .merge(libraries::create_libraries_routes())
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
