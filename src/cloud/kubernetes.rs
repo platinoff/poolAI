@@ -2420,9 +2420,9 @@ impl KubernetesManager {
     pub async fn create_service(
         &self,
         name: &str,
-        _deployment_name: &str,
-        _ports: &[u16],
-        _service_type: ServiceType,
+        deployment_name: &str,
+        ports: &[u16],
+        service_type: ServiceType,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(
@@ -2625,9 +2625,9 @@ impl KubernetesManager {
     pub async fn update_service(
         &self,
         name: &str,
-        _deployment_name: &str,
-        _ports: &[u16],
-        _service_type: ServiceType,
+        deployment_name: &str,
+        ports: &[u16],
+        service_type: ServiceType,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(

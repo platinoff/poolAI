@@ -1,7 +1,7 @@
 //! Unit tests for LoadBalancer operations
 
 #[cfg(feature = "cloud")]
-use poolai::cloud::loadbalancing::{Backend, LoadBalancer};
+use poolai::cloud::loadbalancing::{Backend, LoadBalancer, RoutingRule};
 #[cfg(feature = "cloud")]
 use poolai::AppError;
 
@@ -230,5 +230,39 @@ async fn test_get_health_status() -> Result<(), AppError> {
     assert_eq!(health.healthy_backends, 1);
     assert_eq!(health.unhealthy_backends, 0);
 
+    Ok(())
+}
+
+#[cfg(feature = "cloud")]
+#[tokio::test]
+async fn test_routing_rules_default_after_init() -> Result<(), AppError> {
+    let lb = LoadBalancer::new();
+    lb.initialize().await?;
+    let rules = lb.get_routing_rules().await;
+    assert!(!rules.is_empty());
+    assert_eq!(rules[0].path_prefix, "/*");
+    assert!(rules[0].host.is_none());
+    assert_eq!(rules[0].priority, 0);
+    lb.shutdown().await?;
+    Ok(())
+}
+
+#[cfg(feature = "cloud")]
+#[tokio::test]
+async fn test_add_and_get_routing_rules() -> Result<(), AppError> {
+    let lb = LoadBalancer::new();
+    lb.add_routing_rule(RoutingRule {
+        path_prefix: "/api".to_string(),
+        host: Some("api.example.com".to_string()),
+        priority: 1,
+    })
+    .await;
+    lb.initialize().await?;
+    let rules = lb.get_routing_rules().await;
+    assert!(rules.len() >= 1);
+    let api = rules.iter().find(|r| r.path_prefix == "/api").unwrap();
+    assert_eq!(api.host.as_deref(), Some("api.example.com"));
+    assert_eq!(api.priority, 1);
+    lb.shutdown().await?;
     Ok(())
 }

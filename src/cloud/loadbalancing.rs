@@ -46,11 +46,11 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tokio::time::Duration;
+use tokio::time::{timeout, Duration};
 use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
-use crate::cloud::kubernetes::KubernetesManager;
+use crate::cloud::kubernetes::{KubernetesManager, ServiceType};
 
 /// Load balancing strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -63,6 +63,17 @@ pub enum LoadBalancingStrategy {
     LeastConnections,
     /// IP hash for session affinity
     IpHash,
+}
+
+/// Routing rule for path- or host-based routing
+#[derive(Debug, Clone)]
+pub struct RoutingRule {
+    /// Path prefix to match (e.g. "/api", "/*")
+    pub path_prefix: String,
+    /// Optional host to match (e.g. "api.example.com")
+    pub host: Option<String>,
+    /// Priority (lower = higher priority)
+    pub priority: u32,
 }
 
 /// Health check configuration
@@ -95,6 +106,14 @@ pub struct LoadBalancer {
     backend_health: Arc<RwLock<HashMap<String, BackendHealth>>>,
     strategy: Arc<RwLock<LoadBalancingStrategy>>,
     health_check_config: Arc<RwLock<HealthCheckConfig>>,
+    /// Routing rules (path/host-based)
+    routing_rules: Arc<RwLock<Vec<RoutingRule>>>,
+    /// Optional cloud LB config: deployment name for K8s Service LoadBalancer
+    #[cfg(feature = "cloud-sdk")]
+    cloud_lb_deployment: Arc<RwLock<Option<String>>>,
+    /// Optional cloud LB config: ports to expose
+    #[cfg(feature = "cloud-sdk")]
+    cloud_lb_ports: Arc<RwLock<Vec<u16>>>,
     /// Background task handle for periodic health checks
     health_check_handle: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
     #[cfg(feature = "cloud-sdk")]
@@ -125,6 +144,11 @@ impl LoadBalancer {
                 success_threshold: 2,
                 path: Some("/health".to_string()),
             })),
+            routing_rules: Arc::new(RwLock::new(Vec::new())),
+            #[cfg(feature = "cloud-sdk")]
+            cloud_lb_deployment: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            cloud_lb_ports: Arc::new(RwLock::new(Vec::new())),
             health_check_handle: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             k8s_manager: None,
@@ -165,6 +189,9 @@ impl LoadBalancer {
                 success_threshold: 2,
                 path: Some("/health".to_string()),
             })),
+            routing_rules: Arc::new(RwLock::new(Vec::new())),
+            cloud_lb_deployment: Arc::new(RwLock::new(None)),
+            cloud_lb_ports: Arc::new(RwLock::new(Vec::new())),
             health_check_handle: Arc::new(RwLock::new(None)),
             k8s_manager: Some(k8s_manager),
         }
@@ -285,8 +312,47 @@ impl LoadBalancer {
         // Store handle
         *self.health_check_handle.write().await = Some(handle);
 
-        // TODO: Configure routing rules
-        // TODO: Initialize cloud load balancer (if applicable)
+        // Configure routing rules: default "/*" if none
+        {
+            let mut rules = self.routing_rules.write().await;
+            if rules.is_empty() {
+                rules.push(RoutingRule {
+                    path_prefix: "/*".to_string(),
+                    host: None,
+                    priority: 0,
+                });
+                info!("Load balancer: configured default routing rule '/*'");
+            }
+            drop(rules);
+        }
+
+        // Initialize cloud load balancer (if K8s manager and LB config set)
+        #[cfg(feature = "cloud-sdk")]
+        {
+            if let Some(ref k8s) = self.k8s_manager {
+                let deploy = self.cloud_lb_deployment.read().await.clone();
+                let ports = self.cloud_lb_ports.read().await.clone();
+                if let (Some(deployment), true) = (deploy, !ports.is_empty()) {
+                    let name = format!("{}-lb", deployment);
+                    if !k8s.service_exists(&name).await {
+                        if let Err(e) = k8s
+                            .create_service(&name, &deployment, &ports, ServiceType::LoadBalancer)
+                            .await
+                        {
+                            warn!(
+                                "Cloud load balancer service '{}' creation failed: {} (non-fatal)",
+                                name, e
+                            );
+                        } else {
+                            info!(
+                                "Cloud load balancer service '{}' created for deployment '{}'",
+                                name, deployment
+                            );
+                        }
+                    }
+                }
+            }
+        }
 
         *initialized = true;
         Ok(())
@@ -294,8 +360,8 @@ impl LoadBalancer {
 
     /// Static helper method for checking backend health (used in background task)
     async fn check_backend_health_static(
-        _backend: &Backend,
-        _config: &HealthCheckConfig,
+        backend: &Backend,
+        config: &HealthCheckConfig,
         #[cfg(feature = "cloud-sdk")] k8s_manager: Option<&Arc<KubernetesManager>>,
     ) -> bool {
         #[cfg(feature = "cloud-sdk")]
@@ -584,6 +650,29 @@ impl LoadBalancer {
     /// Get current health check configuration
     pub async fn get_health_check_config(&self) -> HealthCheckConfig {
         self.health_check_config.read().await.clone()
+    }
+
+    /// Add a routing rule (path/host-based).
+    ///
+    /// Call before `initialize()` if you want custom rules; otherwise default `/*` is used.
+    pub async fn add_routing_rule(&self, rule: RoutingRule) {
+        let mut rules = self.routing_rules.write().await;
+        rules.push(rule);
+    }
+
+    /// Get all routing rules.
+    pub async fn get_routing_rules(&self) -> Vec<RoutingRule> {
+        self.routing_rules.read().await.clone()
+    }
+
+    /// Set cloud load balancer config for Kubernetes.
+    ///
+    /// When `initialize()` is called with a K8s manager, creates a LoadBalancer Service
+    /// `{deployment}-lb` if it does not exist. Call before `initialize()`.
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn set_cloud_lb_config(&self, deployment: String, ports: Vec<u16>) {
+        *self.cloud_lb_deployment.write().await = Some(deployment);
+        *self.cloud_lb_ports.write().await = ports;
     }
 }
 
