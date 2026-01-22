@@ -14,17 +14,24 @@
   - `CHERE_INVOKING=1`
   - PATH includes: `C:\msys64\ucrt64\bin;C:\msys64\usr\bin`
 
-### When to Use MSYS2 vs PowerShell
-1. **Use MSYS2 bash** for:
-   - Building with `enterprise,https,jwt` features (requires `gcc.exe`)
-   - Running cargo commands that need native C/C++ libraries
-   - Executing shell scripts (`.sh` files)
-   - When encountering `gcc.exe not found` errors
+### ⚠️ CRITICAL: Always Use MSYS2 Bash (NOT PowerShell)
 
-2. **Use PowerShell** for:
-   - Git operations (may have authentication issues with MSYS2)
-   - Quick checks (`cargo check`, `cargo fmt`, `cargo clippy`)
-   - When MSYS2 causes PATH conflicts
+**PRIMARY TERMINAL**: `C:\msys64\usr\bin\bash.exe`  
+**DO NOT USE**: PowerShell for development tasks
+
+1. **ALWAYS Use MSYS2 bash** for:
+   - ✅ ALL cargo commands (`cargo check`, `cargo build`, `cargo test`, `cargo fmt`, `cargo clippy`)
+   - ✅ Building with `enterprise,https,jwt` features (requires `gcc.exe`)
+   - ✅ Running cargo commands that need native C/C++ libraries
+   - ✅ Executing shell scripts (`.sh` files)
+   - ✅ Git operations (preferred in MSYS2 bash)
+   - ✅ When encountering `gcc.exe not found` errors
+   - ✅ All development tasks
+
+2. **PowerShell** (AVOID for development):
+   - ❌ NOT recommended for cargo commands
+   - ❌ NOT recommended for git operations (use MSYS2 bash instead)
+   - ⚠️ Only use if MSYS2 bash is unavailable (rare cases)
 
 ### Building with HTTPS/JWT Features
 **CRITICAL**: When building with `enterprise,https,jwt` features:

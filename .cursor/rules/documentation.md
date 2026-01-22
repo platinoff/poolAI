@@ -6,6 +6,12 @@
 
 **NEVER create `.md` files in the root directory** (except `README.md` and `README.uk.md`)
 
+**File Organization**:
+- All documentation → `docs/` directory
+- All Cursor rules → `.cursor/rules/` directory
+- All scripts → `scripts/` directory
+- Troubleshooting guides → `docs/troubleshooting/`
+
 ### Directory Structure
 
 When creating or referencing documentation, use this structure:

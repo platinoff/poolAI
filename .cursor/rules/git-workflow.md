@@ -37,6 +37,8 @@
    ```bash
    git push
    ```
+   - **Pre-push hook**: Automatically runs `cargo fmt --all` before push
+   - If formatting fails, code will be auto-formatted and you'll need to commit changes
    - **If push fails due to MSYS2**: Use PowerShell or remove MSYS2 from PATH
 
 ### Rules for AI Assistant
@@ -99,9 +101,24 @@
 ### Before Commit Checklist
 - [ ] Code compiles (`cargo check`)
 - [ ] Tests pass (`cargo test`)
-- [ ] Code formatted (`cargo fmt`)
+- [ ] Code formatted (`cargo fmt --all`) - **Auto-checked by pre-push hook**
 - [ ] Linter clean (`cargo clippy`)
 - [ ] Documentation updated (if needed)
 - [ ] Commit message follows format
 - [ ] Changes are atomic and logical
 - [ ] Files read/modified BEFORE `git add` (if needed)
+
+### Pre-Push Hook
+
+**Automatic Formatting Check**:
+- Pre-push hook (`.git/hooks/pre-push`) automatically runs `cargo fmt --all --check` before push
+- If formatting fails, hook will:
+  1. Auto-format code with `cargo fmt --all`
+  2. Exit with error
+  3. Require you to commit formatted changes before pushing
+- **To bypass** (not recommended): `git push --no-verify`
+
+**Manual Formatting** (in MSYS2 bash):
+```bash
+cargo fmt --all
+```

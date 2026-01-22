@@ -5,9 +5,11 @@
 - `src/` - Source code (all Rust modules)
 - `tests/` - Integration tests (all test files)
 - `docs/` - Documentation (all markdown files)
-- `scripts/` - Build/deployment scripts (all shell scripts)
+  - `docs/troubleshooting/` - Troubleshooting guides (QUICK_FIX_MSYS2.md, etc.)
+- `scripts/` - Build/deployment scripts (all shell scripts, bash NOT PowerShell)
 - `docker/` - Docker files (Dockerfile, docker-compose.yml)
 - `.cursor/` - Cursor agent configuration (rules, commands, plans)
+  - `.cursor/rules/` - All Cursor rules (including `.cursorrules` moved here)
 
 ## File Naming
 
