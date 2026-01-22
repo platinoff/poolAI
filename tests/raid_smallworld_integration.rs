@@ -100,11 +100,13 @@ async fn test_clustering_coefficient_with_real_topology() {
     // Get clustering coefficient for node 1 (may be None if not calculated yet)
     let coeff = strategy.get_node_clustering_coefficient(1).await;
 
-    // If coefficient is available, verify it's in valid range
+    // If coefficient is available, verify it's in valid range (allow small float error)
+    const EPS: f64 = 1e-9;
     if let Some(coeff_value) = coeff {
         assert!(
-            coeff_value >= 0.0 && coeff_value <= 1.0,
-            "Clustering coefficient should be between 0 and 1"
+            coeff_value >= -EPS && coeff_value <= 1.0 + EPS,
+            "Clustering coefficient should be in [0, 1], got {}",
+            coeff_value
         );
     }
 
@@ -126,21 +128,15 @@ async fn test_rebalance_with_real_artifacts() {
 
     // Create multiple artifacts for testing (without real replication)
     let mut artifact_ids = Vec::new();
-    for i in 0..5 {
+    for _ in 0..5 {
         let artifact_id = Uuid::new_v4();
         // Add artifact to placements without real replication for tests
         strategy.add_test_artifact(artifact_id, vec![1, 2, 3]).await;
         artifact_ids.push(artifact_id);
     }
 
-    // Trigger rebalancing
-    let artifacts_moved = strategy.rebalance().await.unwrap();
-
-    // Rebalancing should complete (may move 0 artifacts if already optimal)
-    assert!(
-        artifacts_moved >= 0,
-        "Rebalancing should return non-negative count"
-    );
+    // Trigger rebalancing (may move 0 artifacts if already optimal)
+    let _artifacts_moved = strategy.rebalance().await.unwrap();
 
     // Verify metrics
     let metrics = strategy.get_metrics().await;
@@ -164,13 +160,7 @@ async fn test_node_selection_based_on_clustering() {
 
     // Test that rebalancing uses clustering-based node selection
     // Rebalance internally uses select_target_nodes which considers clustering
-    let artifacts_moved = strategy.rebalance().await.unwrap();
-
-    // Rebalancing should complete (may move 0 artifacts if already optimal)
-    assert!(
-        artifacts_moved >= 0,
-        "Rebalancing should return non-negative count"
-    );
+    let _artifacts_moved = strategy.rebalance().await.unwrap();
 
     // Verify metrics show nodes are tracked
     let metrics = strategy.get_metrics().await;
@@ -189,7 +179,7 @@ async fn test_metrics_collection() {
     let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
     // Create artifacts for testing (without real replication)
-    for i in 0..3 {
+    for _ in 0..3 {
         let artifact_id = Uuid::new_v4();
         // Add artifact to placements without real replication for tests
         strategy.add_test_artifact(artifact_id, vec![1, 2, 3]).await;
@@ -203,9 +193,12 @@ async fn test_metrics_collection() {
         metrics.base_replication_factor, 1,
         "Base replication factor should be 1 (config uses 1 for tests)"
     );
+    const EPS: f64 = 1e-9;
     assert!(
-        metrics.avg_clustering_coefficient >= 0.0 && metrics.avg_clustering_coefficient <= 1.0,
-        "Average clustering coefficient should be between 0 and 1"
+        metrics.avg_clustering_coefficient >= -EPS
+            && metrics.avg_clustering_coefficient <= 1.0 + EPS,
+        "Average clustering coefficient should be in [0, 1], got {}",
+        metrics.avg_clustering_coefficient
     );
 
     // Cleanup: shutdown strategy
@@ -246,15 +239,8 @@ async fn test_rebalance_optimizes_placement() {
     // Add artifact to placements without real replication for tests
     strategy.add_test_artifact(artifact_id, vec![1, 2, 3]).await;
 
-    // Initial placement (if any)
-    // After rebalancing, placement should be optimized
-    let artifacts_moved = strategy.rebalance().await.unwrap();
-
-    // Rebalancing should complete
-    assert!(
-        artifacts_moved >= 0,
-        "Rebalancing should return non-negative count"
-    );
+    // After rebalancing, placement should be optimized (may move 0 if already optimal)
+    let _artifacts_moved = strategy.rebalance().await.unwrap();
 
     // Verify metrics are updated
     let metrics = strategy.get_metrics().await;

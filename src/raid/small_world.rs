@@ -208,10 +208,11 @@ impl SmallWorldStrategy {
             }
         }
 
-        // Clustering coefficient = (2 * edges_between_neighbors) / (neighbors * (neighbors - 1))
-        let possible_edges = neighbors.len() * (neighbors.len() - 1) / 2;
+        // Clustering coefficient = (2 * edges_between_neighbors) / (k * (k - 1)), k = neighbors.len()
+        let k = neighbors.len();
+        let possible_edges = k * (k - 1) / 2;
         let coefficient = if possible_edges > 0 {
-            (2.0 * edges_between_neighbors as f64) / possible_edges as f64
+            (2.0 * edges_between_neighbors as f64) / (k * (k - 1)) as f64
         } else {
             0.0
         };
@@ -778,9 +779,10 @@ impl SmallWorldStrategyForTask {
             }
         }
 
-        let possible_edges = neighbors.len() * (neighbors.len() - 1) / 2;
+        let k = neighbors.len();
+        let possible_edges = k * (k - 1) / 2;
         let coefficient = if possible_edges > 0 {
-            (2.0 * edges_between_neighbors as f64) / possible_edges as f64
+            (2.0 * edges_between_neighbors as f64) / (k * (k - 1)) as f64
         } else {
             0.0
         };
