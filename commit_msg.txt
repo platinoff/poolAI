@@ -1,0 +1,3 @@
+chore: remove temporary fix script
+
+- Remove temp_fix.sh (temporary file)
