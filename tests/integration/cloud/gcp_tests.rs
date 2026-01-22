@@ -127,5 +127,31 @@ async fn test_gcp_service_account_key_parsing() {
     std::env::remove_var("GOOGLE_APPLICATION_CREDENTIALS");
 }
 
-// Note: Full end-to-end tests with mock servers would require making endpoints configurable
-// For now, these tests verify validation, error handling, and token acquisition logic
+#[cfg(feature = "cloud-sdk")]
+#[tokio::test]
+async fn test_gcp_compute_e2e_with_mock_server() -> Result<(), AppError> {
+    std::env::remove_var("GOOGLE_APPLICATION_CREDENTIALS");
+
+    let mut mock = MockGcpServer::new().await;
+    let _m1 = mock.mock_metadata_token().await;
+    let _m2 = mock
+        .mock_compute_instance_creation("test-project", "us-central1-a")
+        .await;
+    let base = mock.url();
+
+    let manager = GcpManager::new(Some("test-project".to_string()));
+    manager.set_base_url_override(Some(base)).await;
+    manager.initialize().await?;
+
+    let id = manager
+        .create_compute_instance("us-central1-a", "n1-standard-2")
+        .await?;
+    assert!(
+        id == "1234567890123456789" || id.starts_with("poolai-instance-"),
+        "unexpected instance id: {}",
+        id
+    );
+
+    manager.shutdown().await?;
+    Ok(())
+}

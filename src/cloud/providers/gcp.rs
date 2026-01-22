@@ -53,6 +53,9 @@ pub struct GcpManager {
     /// Cached GCP access token with expiration time
     /// Token is refreshed automatically when expired or about to expire
     cached_token: Arc<RwLock<Option<CachedToken>>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Override base URL for metadata server and Compute API (e.g. mock server). When set, used instead of metadata.google.internal / compute.googleapis.com.
+    base_url_override: Arc<RwLock<Option<String>>>,
 }
 
 #[cfg(feature = "cloud-sdk")]
@@ -84,7 +87,15 @@ impl GcpManager {
             http_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             cached_token: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            base_url_override: Arc::new(RwLock::new(None)),
         }
+    }
+
+    /// Set base URL override for metadata server and Compute API (e.g. mock server for tests).
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn set_base_url_override(&self, url: Option<String>) {
+        *self.base_url_override.write().await = url;
     }
 
     /// Initialize GCP integration
@@ -265,7 +276,15 @@ impl GcpManager {
     /// This works when running on GCP Compute Engine, Cloud Run, App Engine, etc.
     /// Returns tuple of (token, expires_in_seconds)
     async fn get_token_from_metadata_server(&self) -> Result<(String, u64), AppError> {
-        let metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token";
+        let path = "/computeMetadata/v1/instance/service-accounts/default/token";
+        let base = self
+            .base_url_override
+            .read()
+            .await
+            .clone()
+            .unwrap_or_else(|| "http://metadata.google.internal".to_string());
+        let base = base.trim_end_matches('/');
+        let metadata_url = format!("{}{}", base, path);
 
         // Create a temporary client for metadata server (one-time use during initialization)
         // Note: Metadata server is internal to GCP and doesn't benefit from connection pooling
@@ -280,7 +299,7 @@ impl GcpManager {
             })?;
 
         let response = client
-            .get(metadata_url)
+            .get(&metadata_url)
             .header("Metadata-Flavor", "Google")
             .send()
             .await
@@ -591,10 +610,18 @@ impl GcpManager {
             });
 
             // Make API call to create instance
-            let api_url = format!(
-                "https://compute.googleapis.com/compute/v1/projects/{}/zones/{}/instances",
+            let path = format!(
+                "/compute/v1/projects/{}/zones/{}/instances",
                 project_id, zone
             );
+            let base = self
+                .base_url_override
+                .read()
+                .await
+                .clone()
+                .unwrap_or_else(|| "https://compute.googleapis.com".to_string());
+            let base = base.trim_end_matches('/');
+            let api_url = format!("{}{}", base, path);
 
             let response = client
                 .post(&api_url)
@@ -631,8 +658,11 @@ impl GcpManager {
             // Extract instance ID from response
             let instance_id = response_json
                 .get("id")
-                .and_then(|v| v.as_str())
-                .map(|s| s.to_string())
+                .and_then(|v| {
+                    v.as_str()
+                        .map(|s| s.to_string())
+                        .or_else(|| v.as_u64().map(|n| n.to_string()))
+                })
                 .unwrap_or_else(|| instance_name.clone());
 
             info!(

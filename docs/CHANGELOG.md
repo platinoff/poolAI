@@ -20,12 +20,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Configurable base URL override (Azure)** 🎉
   - `AzureManager::set_base_url_override(Option<String>)` for Management API (e.g. mock server)
   - `create_vm_scale_set` uses override when set; e2e test `test_azure_vmss_e2e_with_mock_server`
+- **Configurable base URL override (GCP)** 🎉
+  - `GcpManager::set_base_url_override(Option<String>)` for metadata + Compute API
+  - `get_token_from_metadata_server` and `create_compute_instance` use override when set
+  - E2E test `test_gcp_compute_e2e_with_mock_server`; fix instance `id` parse (str or u64)
 
 ### Planned
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
-- GCP/AWS base URL overrides (optional; Azure done)
+- AWS base URL override (optional; Azure, GCP done)
 
 ## [0.2.2] - 2026-01-22
 
