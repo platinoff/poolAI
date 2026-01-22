@@ -8,15 +8,114 @@ use axum::response::Html;
 /// RAID management page
 pub async fn admin_raid() -> Html<String> {
     let script = r#"
-    async function loadRaidArtifacts() {
+    async function loadRaidData() {
       try {
-        const [artifacts, snapshot] = await Promise.all([
+        const [artifacts, snapshot, status, burstMetrics, smallworldMetrics] = await Promise.all([
           fetchJson('/api/v1/raid/artifacts'),
-          loadSnapshot().catch(() => null)
+          loadSnapshot().catch(() => null),
+          fetchJson('/api/raid/admin/status').catch(() => null),
+          fetchJson('/api/raid/admin/metrics/burst').catch(() => null),
+          fetchJson('/api/raid/admin/metrics/smallworld').catch(() => null)
         ]);
         renderRaidArtifacts(artifacts, snapshot);
+        renderRaidAdmin(status, burstMetrics, smallworldMetrics);
       } catch (e) {
-        showNotification('Error loading RAID artifacts: ' + e.message, 'error');
+        showNotification('Error loading RAID data: ' + e.message, 'error');
+      }
+    }
+    
+    function renderRaidAdmin(status, burstMetrics, smallworldMetrics) {
+      const el = document.getElementById('raid-admin');
+      if (!el) return;
+      
+      let html = '';
+      
+      if (status) {
+        html += `
+          <div class="admin-card">
+            <h3>RAID Strategy Status</h3>
+            <div class="stat-item">
+              <span class="stat-label">Mode:</span>
+              <span class="stat-value">${status.mode || 'Unknown'}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Initialized:</span>
+              <span class="stat-value status-badge ${status.initialized ? 'active' : 'inactive'}">${status.initialized ? 'Yes' : 'No'}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Active:</span>
+              <span class="stat-value status-badge ${status.active ? 'active' : 'inactive'}">${status.active ? 'Yes' : 'No'}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Rebalancing Enabled:</span>
+              <span class="stat-value status-badge ${status.rebalancing_enabled ? 'active' : 'inactive'}">${status.rebalancing_enabled ? 'Yes' : 'No'}</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (burstMetrics) {
+        html += `
+          <div class="admin-card">
+            <h3>BurstRAID Metrics</h3>
+            <div class="stat-item">
+              <span class="stat-label">Total Artifacts:</span>
+              <span class="stat-value">${burstMetrics.total_artifacts || 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Burst Artifacts:</span>
+              <span class="stat-value">${burstMetrics.burst_artifacts || 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Avg Replication Factor:</span>
+              <span class="stat-value">${(burstMetrics.avg_replication_factor || 0).toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (smallworldMetrics) {
+        html += `
+          <div class="admin-card">
+            <h3>SmallWorld Network Metrics</h3>
+            <div class="stat-item">
+              <span class="stat-label">Total Nodes:</span>
+              <span class="stat-value">${smallworldMetrics.total_nodes || 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Avg Clustering Coefficient:</span>
+              <span class="stat-value">${(smallworldMetrics.avg_clustering_coefficient || 0).toFixed(3)}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Avg Path Length:</span>
+              <span class="stat-value">${(smallworldMetrics.avg_path_length || 0).toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (html) {
+        el.innerHTML = html;
+      }
+    }
+    
+    async function triggerRebalance() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        return;
+      }
+      
+      if (!confirm('Are you sure you want to trigger RAID rebalancing? This may impact system performance.')) {
+        return;
+      }
+      
+      try {
+        await fetchJson('/api/raid/admin/rebalance', { method: 'POST' });
+        showNotification('Rebalancing triggered successfully', 'success');
+        setTimeout(() => loadRaidData(), 2000);
+      } catch (e) {
+        showNotification('Error: ' + e.message, 'error');
       }
     }
     
@@ -134,7 +233,7 @@ pub async fn admin_raid() -> Html<String> {
         showNotification('Artifact uploaded successfully', 'success');
         hideModal('uploadArtifactModal');
         form.reset();
-        loadRaidArtifacts();
+        loadRaidData();
       } catch (e) {
         showNotification('Error: ' + e.message, 'error');
       } finally {
@@ -158,7 +257,7 @@ pub async fn admin_raid() -> Html<String> {
           method: 'DELETE'
         });
         showNotification('Artifact deleted successfully', 'success');
-        loadRaidArtifacts();
+        loadRaidData();
       } catch (e) {
         showNotification('Error: ' + e.message, 'error');
       }
@@ -180,7 +279,7 @@ pub async fn admin_raid() -> Html<String> {
           method: 'POST'
         });
         showNotification('Snapshot created successfully', 'success');
-        loadRaidArtifacts();
+        loadRaidData();
       } catch (e) {
         showNotification('Error creating snapshot: ' + e.message, 'error');
       }
@@ -202,7 +301,7 @@ pub async fn admin_raid() -> Html<String> {
         await fetchJson('/api/v1/raid/snapshot/restore', { method: 'POST' });
         showNotification('Restored from snapshot successfully', 'success');
         setTimeout(() => {
-          loadRaidArtifacts();
+          loadRaidData();
         }, 1000);
       } catch (e) {
         showNotification('Error restoring from snapshot: ' + e.message, 'error');
@@ -245,14 +344,14 @@ pub async fn admin_raid() -> Html<String> {
           method: 'POST'
         });
         showNotification(`Garbage collection completed. Removed ${result.removed_count || 0} artifacts.`, 'success');
-        loadRaidArtifacts();
+        loadRaidData();
       } catch (e) {
         showNotification('Error running GC: ' + e.message, 'error');
       }
     }
     
-    loadRaidArtifacts();
-    setInterval(loadRaidArtifacts, 10000);
+    loadRaidData();
+    setInterval(loadRaidData, 10000);
     "#;
 
     admin_layout(
@@ -268,6 +367,7 @@ pub async fn admin_raid() -> Html<String> {
               <button class="btn" onclick="runGc()" aria-label="Run garbage collection">Run GC</button>
             </div>
           </div>
+          <div id="raid-admin"></div>
           <div id="raid-artifacts"></div>
         </div>
         

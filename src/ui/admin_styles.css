@@ -647,3 +647,51 @@ body {
     align-items: stretch;
   }
 }
+
+/* Metrics Visualization Styles */
+.metric-chart-container {
+  background: var(--surface, #171b22);
+  border: 1px solid var(--border, #262b36);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--spacing-4, 16px);
+  margin-bottom: var(--spacing-4, 16px);
+}
+
+.metric-chart-container h4 {
+  margin: 0 0 var(--spacing-3, 12px) 0;
+  color: var(--text, #e8e8e8);
+  font-size: var(--font-size-lg, 18px);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.metric-chart-container svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.metric-stats {
+  display: flex;
+  gap: var(--spacing-4, 16px);
+  margin-top: var(--spacing-2, 8px);
+  font-size: var(--font-size-sm, 14px);
+  color: var(--text-muted, #a8b0bf);
+}
+
+.metric-stats strong {
+  color: var(--text, #e8e8e8);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.metrics-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-4, 16px);
+  margin-top: var(--spacing-4, 16px);
+}
+
+@media (max-width: 768px) {
+  .metrics-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
