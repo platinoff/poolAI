@@ -1,0 +1,5 @@
+docs: add Rust version troubleshooting guide
+
+- Created RUST_VERSION_ISSUE.md with solutions for AWS SDK compatibility
+- Explains how to update Rust toolchain from 1.87.0 to 1.92.0
+- Provides alternative solutions if upgrade is not possible
