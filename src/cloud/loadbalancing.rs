@@ -46,7 +46,7 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tokio::time::{timeout, Duration};
+use tokio::time::Duration;
 use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
@@ -294,8 +294,8 @@ impl LoadBalancer {
 
     /// Static helper method for checking backend health (used in background task)
     async fn check_backend_health_static(
-        backend: &Backend,
-        config: &HealthCheckConfig,
+        _backend: &Backend,
+        _config: &HealthCheckConfig,
         #[cfg(feature = "cloud-sdk")] k8s_manager: Option<&Arc<KubernetesManager>>,
     ) -> bool {
         #[cfg(feature = "cloud-sdk")]

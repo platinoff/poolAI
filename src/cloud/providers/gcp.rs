@@ -116,7 +116,7 @@ impl GcpManager {
             return Ok(());
         }
 
-        let project_id = self.project_id.as_deref().ok_or_else(|| {
+        let _project_id = self.project_id.as_deref().ok_or_else(|| {
             AppError::InitializationError(
                 "GCP project ID is required. Context: Attempted to initialize GCP manager without project ID. \
                 Suggestion: Set gcp_project_id in config or set GCP_PROJECT_ID environment variable. \

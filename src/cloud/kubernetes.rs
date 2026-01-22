@@ -1860,8 +1860,8 @@ impl KubernetesManager {
     /// ```
     pub async fn list_crd_resources(
         &self,
-        group: &str,
-        version: &str,
+        _group: &str,
+        _version: &str,
         plural: &str,
     ) -> Result<serde_json::Value, AppError> {
         #[cfg(feature = "cloud-sdk")]
@@ -1914,8 +1914,8 @@ impl KubernetesManager {
     /// ```
     pub async fn get_crd_resource(
         &self,
-        group: &str,
-        version: &str,
+        _group: &str,
+        _version: &str,
         plural: &str,
         name: &str,
     ) -> Result<serde_json::Value, AppError> {
@@ -1985,11 +1985,11 @@ impl KubernetesManager {
     /// ```
     pub async fn update_crd_status(
         &self,
-        group: &str,
-        version: &str,
+        _group: &str,
+        _version: &str,
         plural: &str,
         name: &str,
-        status: serde_json::Value,
+        _status: serde_json::Value,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(
@@ -2065,7 +2065,7 @@ impl KubernetesManager {
     pub async fn create_or_update_resource_quota(
         &self,
         name: &str,
-        quotas: serde_json::Value,
+        _quotas: serde_json::Value,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(
@@ -2307,9 +2307,9 @@ impl KubernetesManager {
     pub async fn create_service(
         &self,
         name: &str,
-        deployment_name: &str,
-        ports: &[u16],
-        service_type: ServiceType,
+        _deployment_name: &str,
+        _ports: &[u16],
+        _service_type: ServiceType,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(
@@ -2424,7 +2424,7 @@ impl KubernetesManager {
         &self,
         name: &str,
         size: &str,
-        storage_class: &str,
+        _storage_class: &str,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(
@@ -2512,9 +2512,9 @@ impl KubernetesManager {
     pub async fn update_service(
         &self,
         name: &str,
-        deployment_name: &str,
-        ports: &[u16],
-        service_type: ServiceType,
+        _deployment_name: &str,
+        _ports: &[u16],
+        _service_type: ServiceType,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(

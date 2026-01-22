@@ -42,11 +42,9 @@
 //! - `PoolAITenant` - Tenant configurations
 
 use crate::core::error::AppError;
-use serde_json::json;
 use std::sync::Arc;
-use tokio::sync::{mpsc, RwLock};
-use tokio::time::{interval, Duration};
-use tracing::{error, info, warn};
+use tokio::sync::RwLock;
+use tracing::{info, warn};
 
 /// CRD event type
 #[derive(Debug, Clone, PartialEq, Eq)]
