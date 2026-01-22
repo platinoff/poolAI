@@ -237,7 +237,7 @@ pub fn create_raid_admin_routes() -> Router {
         .route("/raid/admin/metrics/burst", get(get_burst_raid_metrics_handler))
         .route("/raid/admin/metrics/smallworld", get(get_small_world_metrics_handler))
         .route(
-            "/raid/admin/artifacts/:id/burst",
+            "/raid/admin/artifacts/{id}/burst",
             get(get_artifact_burst_stats_handler),
         )
         .route(
