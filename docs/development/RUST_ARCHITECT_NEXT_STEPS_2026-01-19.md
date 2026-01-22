@@ -44,17 +44,26 @@
 
 ## 📊 План пріоритетів для v0.2.0
 
-### ⭐⭐⭐ Priority 1: Cloud SDK Full Implementation (80% → 100%)
+### ⭐⭐⭐ Priority 1: Cloud SDK Full Implementation (95% → 100%)
 
-**Поточний стан**: Інфраструктура 100% ✅, Azure token acquisition 100% ✅, Tests fixed ✅  
+**Поточний стан**: Інфраструктура 100% ✅, AWS SDK initialized ✅, GCP token refresh ✅, Azure 100% ✅, Tests fixed ✅  
 **Пріоритет**: Високий  
-**Оцінка**: 3-5 днів (залишилось)
+**Оцінка**: 1-2 дні (залишилось)
 
 #### Прогрес Cloud SDK:
 - ✅ REST API структура: 100%
 - ✅ HTTP client: 100%
 - ✅ AWS SigV4: 100%
+- ✅ **AWS SDK Initialization: 100%** ✅
+  - ✅ EC2, ECS, S3 clients initialized
+  - ✅ Credential chain resolution (env vars, credentials file, IAM roles)
+  - ✅ Region provider chain
+  - ✅ Fallback to REST API when SDK unavailable
 - ✅ GCP Service Account Auth: 100%
+- ✅ **GCP Token Refresh & Caching: 100%** ✅
+  - ✅ Automatic token refresh (5 min threshold)
+  - ✅ TTL-based caching
+  - ✅ Service account key parsing
 - ✅ **Azure Token Acquisition: 100%** ✅
   - ✅ Environment variable
   - ✅ Azure CLI (з expiration parsing та caching)
@@ -62,38 +71,38 @@
   - ✅ Token caching з TTL
   - ✅ Автоматичне оновлення токенів
 - ✅ **Cloud Providers Tests: 100%** ✅ (17 tests passing, tolerate missing credentials)
-- ⏳ AWS SDK initialization: 0% (3 дні)
-- ⏳ GCP SDK completion: 70% (token refresh та caching, 1 день)
-- ⏳ Extended integration tests: 50% (1 день)
+- ✅ **Extended Integration Tests: 80%** ✅ (basic tests in `tests/integration/cloud/`)
+- ⏳ Extended integration tests edge cases: 20% (1 день)
 
 #### Завдання Priority 1.1:
-1. **AWS SDK Initialization** (3 дні)
-   - [ ] Розкоментувати AWS SDK dependencies в `Cargo.toml`
-   - [ ] Реалізувати AWS client initialization в `src/cloud/providers/aws.rs`
-   - [ ] Додати credential management (environment, IAM roles, credentials file)
-   - [ ] Створити integration tests для AWS
+1. **AWS SDK Initialization** ✅ **ЗАВЕРШЕНО**
+   - ✅ AWS SDK dependencies в `Cargo.toml` (aws-config, aws-sdk-ec2, aws-sdk-ecs, aws-sdk-s3)
+   - ✅ AWS client initialization в `src/cloud/providers/aws.rs`
+   - ✅ Credential management (environment, IAM roles, credentials file via aws-config)
+   - ✅ Integration tests для AWS (basic tests in `tests/integration/cloud/aws_tests.rs`)
 
-2. **GCP SDK Completion** (1 день)
-   - [ ] Покращити token refresh (автоматичне оновлення токенів)
-   - [ ] Додати кешування токенів з TTL
-   - [ ] Створити integration tests для GCP
+2. **GCP SDK Completion** ✅ **ЗАВЕРШЕНО**
+   - ✅ Token refresh (автоматичне оновлення токенів, 5 min threshold)
+   - ✅ Кешування токенів з TTL
+   - ✅ Integration tests для GCP (basic tests in `tests/integration/cloud/gcp_tests.rs`)
 
-3. **Extended Integration Tests** (1 день)
+3. **Extended Integration Tests** (1-2 дні)
    - ✅ Basic integration tests для AWS/Azure/GCP providers (17 tests passing)
-   - [ ] Extended integration tests з реальними API calls (mock servers)
-   - [ ] Error handling improvements
-   - [ ] Test coverage для edge cases
+   - ✅ Extended integration tests structure (`tests/integration/cloud/` з mock servers)
+   - [ ] Extended integration tests edge cases (error scenarios, retry logic, timeout handling)
+   - [ ] Test coverage для credential chain edge cases
+   - [ ] Performance tests для token caching
 
 #### Файли для роботи:
-- `src/cloud/providers/aws.rs` (6 TODOs)
-- `src/cloud/providers/gcp.rs` (3 TODOs)
-- `src/cloud/providers/azure.rs` (3 TODOs - перевірити, можливо завершено)
-- `Cargo.toml` (розкоментувати AWS SDK dependencies)
+- ✅ `src/cloud/providers/aws.rs` — AWS SDK initialization завершено
+- ✅ `src/cloud/providers/gcp.rs` — Token refresh та caching завершено
+- ✅ `src/cloud/providers/azure.rs` — Token acquisition завершено
+- ⏳ `tests/integration/cloud/` — Extended edge case tests (1-2 дні)
 
 #### Технічні деталі:
-- **AWS SDK**: Потрібен Rust 1.88+ (перевірити поточну версію)
-- **GCP SDK**: Використовує Service Account JSON credentials
-- **Azure SDK**: Вже завершено ✅
+- ✅ **AWS SDK**: Rust 1.92.0 встановлено (вище мінімальної 1.88+)
+- ✅ **GCP SDK**: Service Account JSON credentials + token caching працює
+- ✅ **Azure SDK**: Token acquisition з expiration parsing завершено
 
 ---
 

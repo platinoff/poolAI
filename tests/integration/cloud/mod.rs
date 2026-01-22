@@ -17,3 +17,6 @@ mod azure_tests;
 
 #[cfg(feature = "cloud-sdk")]
 mod gcp_tests;
+
+#[cfg(feature = "cloud-sdk")]
+mod edge_cases_tests;
