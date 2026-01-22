@@ -108,7 +108,7 @@
 ### Код
 - **Total Lines**: ~20,000+ lines
 - **Modules**: 15 основних модулів (всі 100% завершено)
-- **Tests**: 470+ (122 unit + 348+ integration)
+- **Tests**: 476+ (122 unit + 354+ integration)
 - **API Endpoints**: 73+ REST endpoints + WebSocket (67 base + 6 admin)
 
 ### Розробка
@@ -119,12 +119,12 @@
 
 ### Тести
 - **Unit tests**: 122 passing
-- **Integration tests**: 348+ passing
+- **Integration tests**: 354+ passing
   - Cloud providers: 17 tests
   - Cloud edge cases: 10+ tests
   - RAID integration: 11 tests (cross-strategy + smallworld)
   - RAID admin: 12 tests (6 existing + 6 new API tests)
-  - SAML SSO: 28+ tests (25 existing + 4 new flow tests)
+  - SAML SSO: 29+ tests (25 existing + 4 new flow tests)
   - VM: 78 tests
   - Enterprise: 55+ tests (51 existing + 4 new)
   - Інші: 200+ tests
