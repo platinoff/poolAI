@@ -29,7 +29,7 @@ impl Default for AiMlStatus {
     fn default() -> Self {
         Self {
             stage: "4.4",
-            status: "planned",
+            status: "complete",
             features: &[
                 "model_optimization",
                 "automl",
