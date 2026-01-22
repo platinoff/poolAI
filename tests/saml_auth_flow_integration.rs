@@ -5,6 +5,8 @@
 //! - SAML callback handler (process response, create user, generate JWT)
 
 #[cfg(feature = "enterprise")]
+use base64::Engine;
+#[cfg(feature = "enterprise")]
 use poolai::core::error::AppError;
 #[cfg(feature = "enterprise")]
 use poolai::enterprise::security::{get_global_security_manager, SamlConfig};

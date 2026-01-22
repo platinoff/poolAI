@@ -1511,6 +1511,7 @@ async fn security_policy_delete_handler(
 /// In production, use Redis or database-backed session storage
 #[cfg(feature = "enterprise")]
 struct OAuth2State {
+    #[allow(dead_code)]
     state: String,
     created_at: chrono::DateTime<Utc>,
 }
@@ -2160,6 +2161,7 @@ async fn saml_auth_handler(Path(provider): Path<String>) -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 #[derive(Deserialize)]
+#[allow(non_snake_case)]
 struct SamlCallbackForm {
     SAMLResponse: String,
     RelayState: Option<String>,
@@ -2207,7 +2209,7 @@ async fn saml_callback_handler(
         .or_else(|| attributes.get("NameID"))
         .cloned()
         .unwrap_or_else(|| "saml_user".to_string());
-    let email = attributes
+    let _email = attributes
         .get("email")
         .or_else(|| attributes.get("Email"))
         .or_else(|| attributes.get("mail"))

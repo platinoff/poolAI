@@ -308,7 +308,7 @@ impl MonitoringManager {
             })
             .await
             .map_err(|e| {
-                AppError::InternalError(format!("Database initialization task failed: {}", e))
+                AppError::ConfigError(format!("Database initialization task failed: {}", e))
             })??;
 
             info!("SQLite database initialized at: {}", db_path);
@@ -694,7 +694,7 @@ impl MonitoringManager {
                 let mut stmt = match conn.prepare(&query) {
                     Ok(s) => s,
                     Err(e) => {
-                        return Err(AppError::InternalError(format!("Failed to prepare query: {}", e)));
+                        return Err(AppError::ConfigError(format!("Failed to prepare query: {}", e)));
                     }
                 };
 
@@ -727,7 +727,7 @@ impl MonitoringManager {
                 ) {
                     Ok(r) => r,
                     Err(e) => {
-                        return Err(AppError::InternalError(format!("Failed to execute query: {}", e)));
+                        return Err(AppError::ConfigError(format!("Failed to execute query: {}", e)));
                     }
                 };
 
@@ -744,7 +744,7 @@ impl MonitoringManager {
                 Ok(results)
             })
             .await
-            .map_err(|e| AppError::InternalError(format!("Database query task failed: {}", e)))??;
+            .map_err(|e| AppError::ConfigError(format!("Database query task failed: {}", e)))??;
 
             return Ok(results);
         }
