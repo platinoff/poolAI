@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- GlobalState manager for centralized state management
+- ErrorContext for structured error handling
+- Additional performance optimizations
+- Mock server integration for Cloud SDK (optional)
+- HPA (Horizontal Pod Autoscaler) init for Kubernetes (v0.3.0+)
+
+## [0.2.2] - 2026-01-22
+
 ### Added
 - **Load Balancing – routing rules & cloud LB init** 🎉
   - `RoutingRule` (path_prefix, host, priority), default rule `/*` on init
@@ -15,22 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cloud LB init: create `{deployment}-lb` Service when k8s_manager + config set
   - Fix `check_backend_health_static` param names (backend, config)
   - Tests: `test_routing_rules_default_after_init`, `test_add_and_get_routing_rules`
-  - Cloud SDK 99% → 100%
+  - Cloud SDK 100% complete
 
 ### Changed
-- **Documentation** (2026-01-22): Актуалізація стабільного стану, roadmap, наступні кроки (Rust Architect)
+- **Documentation** (2026-01-22): Stable state, roadmap, next steps (Rust Architect)
   - Concept root: Cloud SDK 100%, Next Goal v0.2.2 → v0.3.0+
-  - DEVELOPMENT_ROADMAP: Cloud 100%, Priority 1 (v0.2.2), Priority 2 (v0.3.0+)
-  - NEXT_STEPS_2026-01-19: Cloud SDK 100%, Load Balancing ✅; P1 v0.2.2, P2 v0.3.0+
-  - STABLE_STATE_SUMMARY: Cloud 100%, останні зміни (LB), next steps
-  - CLOUD_SDK_STATUS: Phase 4 Load Balancing ✅, SDK 100%
-  - FUTURE_DEVELOPMENT_ROADMAP: v0.2.1, 437+ tests, Cloud 100%
-
-### Planned
-- GlobalState manager for centralized state management
-- ErrorContext for structured error handling
-- Additional performance optimizations
-- Mock server integration for Cloud SDK (optional)
+  - DEVELOPMENT_ROADMAP: Cloud 100%, P1 (v0.2.2), P2 (v0.3.0+)
+  - NEXT_STEPS, STABLE_STATE_SUMMARY, CLOUD_SDK_STATUS, FUTURE_DEVELOPMENT_ROADMAP aligned
 
 ## [0.2.1] - 2026-01-22
 

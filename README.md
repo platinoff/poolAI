@@ -4,19 +4,23 @@
 
 PoolAI is a comprehensive distributed system for managing AI mining pools with integration of generative models, GPU optimization, and automated resource management.
 
-## 🎉 **PROJECT 100% COMPLETE! v0.2.0 RELEASED! PRO EDITION!** 🚀
+## 🎉 **PROJECT 100% COMPLETE! v0.2.2 RELEASED! PRO EDITION!** 🚀
 
-**Current Status**: **All 15 Modules 100% Complete!** **427+ Tests Passing!** **Production Ready!** **v0.2.0 Released!** **PRO Package Active!**  
+**Current Status**: **All 15 Modules 100% Complete!** **437+ Tests Passing!** **Production Ready!** **v0.2.2 Released!** **PRO Package Active!**  
 **Project Structure**: Optimized (Docker files in `docker/`, documentation in `docs/`)  
-**Release**: v0.2.0 - Production Ready (2026-01-19)  
-**Previous Release**: v0.1.0 (2025-01-09)  
+**Release**: v0.2.2 - Production Ready (2026-01-22)  
+**Previous Release**: v0.2.1 (2026-01-22)  
 **Package**: PRO Edition (First Day: 2026-01-16)
 
-### 🆕 What's New in v0.2.0
-- ✅ **RAID Strategy Enhancements** - BurstRAID & SmallWorld strategies 100% complete with metrics and integration tests
-- ✅ **Enterprise Features** - SQLite persistence for monitoring & GitHub OAuth2 flow (95% complete)
-- ✅ **Cloud SDK** - AWS, Azure, GCP integration improvements (90% complete)
-- ✅ **17 New Integration Tests** - Comprehensive RAID strategy testing  
+### 🆕 What's New in v0.2.2
+- ✅ **Cloud SDK 100%** - Load Balancing routing rules, Cloud LB init (K8s Service LoadBalancer)
+- ✅ **RoutingRule**, `add_routing_rule`, `get_routing_rules`, `set_cloud_lb_config`
+- ✅ **Documentation** - Stable state, roadmap, next steps (Rust Architect) aligned
+
+### 🆕 What's New in v0.2.1
+- ✅ **Cloud SDK Auto-scaling** - Metrics API, `evaluate_and_scale`, ScalingAction
+- ✅ **Pre-push Hook** - `cargo fmt --all --check` before git push
+- ✅ **Rust Architect Rules** - `.cursor/rules/`, MSYS2 bash, concept files  
 **Repository**: [https://github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
 **Creator**: Madevinc (one developer with Cursor AI)
 

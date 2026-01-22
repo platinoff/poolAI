@@ -10,7 +10,7 @@
 
 | Пріоритет | Крок | Оцінка | Статус |
 |-----------|------|--------|--------|
-| **1** | **v0.2.2 release prep** — Changelog, release notes, README | 1 день | 🔄 Рекомендовано |
+| **1** | **v0.2.2 release prep** — Changelog, release notes, README | 1 день | ✅ Завершено |
 | **2** | **v0.3.0+** — HPA init, Mock server integration, Stage 4.4 AI/ML | 2–4 тижні | ⏸️ Опціонально |
 
 **Рекомендація**: розпочати з **Priority 1** (v0.2.2). Команди: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook.
@@ -57,14 +57,14 @@
 
 ---
 
-### ⭐ Priority 1: Підготувати v0.2.2 Release (1 день)
+### ✅ Priority 1: Підготувати v0.2.2 Release — Завершено (2026-01-22)
 
 **Мета**: Release notes та документація для v0.2.2.
 
-**Завдання**:
-1. Оновити CHANGELOG (нові features, breaking changes якщо є)
-2. Оновити README, migration guide за потреби
-3. Release notes: досягнення, тести, відомі issues
+**Виконано**:
+1. Оновлено CHANGELOG ([0.2.2] — Load Balancing, docs)
+2. Оновлено README (v0.2.2, 437+ tests, What's New)
+3. Version bump: Cargo.toml, src/version.rs → 0.2.2
 
 **Результат**: Готовий v0.2.2 release
 
