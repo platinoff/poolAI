@@ -99,5 +99,27 @@ async fn test_azure_token_acquisition_fallback() {
     manager.shutdown().await.unwrap();
 }
 
-// Note: Full end-to-end tests with mock servers would require making endpoints configurable
-// For now, these tests verify validation, error handling, and token acquisition logic
+#[cfg(feature = "cloud-sdk")]
+#[tokio::test]
+async fn test_azure_vmss_e2e_with_mock_server() -> Result<(), AppError> {
+    std::env::set_var("AZURE_ACCESS_TOKEN", "mock-token-for-test");
+
+    let mut mock = MockAzureServer::new().await;
+    let _m = mock.mock_vmss_creation("test-sub", "test-rg").await;
+    let base = mock.url();
+
+    let manager = AzureManager::new(Some("test-sub".to_string()));
+    manager.set_base_url_override(Some(base)).await;
+    manager.initialize().await?;
+
+    let id = manager.create_vm_scale_set("test-rg", "test-vmss").await?;
+    assert!(
+        id.contains("test-vmss"),
+        "expected id to contain test-vmss, got {}",
+        id
+    );
+
+    manager.shutdown().await?;
+    std::env::remove_var("AZURE_ACCESS_TOKEN");
+    Ok(())
+}

@@ -235,6 +235,7 @@ let task_id = manager.create_ecs_task(
 - ✅ `tests/cloud_mock_integration.rs` + `tests/integration/cloud/` wired into test suite
 - ✅ Mock servers (mockito): AWS EC2/ECS, Azure, GCP — `mock_servers.rs`, token/aws/azure/gcp/edge_cases tests
 - Run: `cargo test --test cloud_mock_integration --features cloud,cloud-sdk` (requires Rust 1.88+ for AWS)
+- ✅ **Azure base_url_override**: `set_base_url_override(Option<String>)` for Management API; e2e `test_azure_vmss_e2e_with_mock_server`
 
 ---
 

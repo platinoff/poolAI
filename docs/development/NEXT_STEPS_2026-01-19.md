@@ -31,7 +31,8 @@
   - ✅ set_cloud_lb_config, Cloud LB init (K8s Service LoadBalancer)
 - ✅ **HPA init** ✅ (2026-01-22) — create_hpa, hpa_exists, ensure_hpa_for
 - ✅ **Mock server integration** (2026-01-22) — cloud_mock_integration harness, tests/integration/cloud wired
-- ⏸️ Далі: configurable provider base URLs for full e2e mock tests (v0.3.0+)
+- ✅ **Azure base_url_override** (2026-01-22) — set_base_url_override, e2e test `test_azure_vmss_e2e_with_mock_server`
+- ⏸️ Далі: GCP/AWS base URL overrides (v0.3.0+)
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
@@ -78,7 +79,7 @@
 
 **Завдання**:
 1. ~~**HPA (Horizontal Pod Autoscaler)**~~ ✅ Завершено (2026-01-22) — create_hpa, hpa_exists, ensure_hpa_for
-2. ~~**Mock Server Integration**~~ ✅ Harness wired (cloud_mock_integration, tests/integration/cloud). Далі: configurable base URLs.
+2. ~~**Mock Server Integration**~~ ✅ Harness + Azure base_url_override + e2e VMSS mock test. Далі: GCP/AWS overrides.
 3. **Stage 4.4 AI/ML** — Model Optimization, AutoML, Federated Learning (з концепту)
 
 **Примітка**: SAML SSO ✅, SQLite persistence tests ✅, RAID Admin Control Plane ✅ вже реалізовано.

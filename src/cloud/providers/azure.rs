@@ -67,6 +67,9 @@ pub struct AzureManager {
     /// Cached Azure access token with expiration time
     /// Token is refreshed automatically when expired or about to expire
     cached_token: Arc<RwLock<Option<CachedToken>>>,
+    #[cfg(feature = "cloud-sdk")]
+    /// Override Management API base URL (e.g. mock server). When set, used instead of https://management.azure.com.
+    base_url_override: Arc<RwLock<Option<String>>>,
 }
 
 #[cfg(feature = "cloud-sdk")]
@@ -103,7 +106,16 @@ impl AzureManager {
             http_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             cached_token: Arc::new(RwLock::new(None)),
+            #[cfg(feature = "cloud-sdk")]
+            base_url_override: Arc::new(RwLock::new(None)),
         }
+    }
+
+    /// Set base URL override for Management API (e.g. mock server for tests).
+    /// When set, create_vm_scale_set etc. use this instead of https://management.azure.com.
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn set_base_url_override(&self, url: Option<String>) {
+        *self.base_url_override.write().await = url;
     }
 
     /// Initialize Azure integration
@@ -550,10 +562,18 @@ impl AzureManager {
             });
 
             // Make API call to create VM Scale Set
-            let api_url = format!(
-                "https://management.azure.com/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}?api-version=2023-03-01",
+            let path = format!(
+                "/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}?api-version=2023-03-01",
                 subscription_id, resource_group, name
             );
+            let base = self
+                .base_url_override
+                .read()
+                .await
+                .clone()
+                .unwrap_or_else(|| "https://management.azure.com".to_string());
+            let base = base.trim_end_matches('/');
+            let api_url = format!("{}{}", base, path);
 
             let response = client
                 .put(&api_url)

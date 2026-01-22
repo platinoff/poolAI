@@ -17,12 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/cloud_mock_integration.rs` wires `tests/integration/cloud/` (mockito: AWS, Azure, GCP)
   - Run: `cargo test --test cloud_mock_integration --features cloud,cloud-sdk` (Rust 1.88+)
   - CLOUD_SDK_STATUS, NEXT_STEPS updated
+- **Configurable base URL override (Azure)** 🎉
+  - `AzureManager::set_base_url_override(Option<String>)` for Management API (e.g. mock server)
+  - `create_vm_scale_set` uses override when set; e2e test `test_azure_vmss_e2e_with_mock_server`
 
 ### Planned
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
-- Configurable provider base URLs for full e2e mock tests (optional)
+- GCP/AWS base URL overrides (optional; Azure done)
 
 ## [0.2.2] - 2026-01-22
 
