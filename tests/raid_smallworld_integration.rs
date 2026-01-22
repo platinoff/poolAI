@@ -35,6 +35,17 @@ async fn create_test_smallworld_strategy() -> (
 
     let replication_engine = Arc::new(ReplicationEngine::with_defaults(raid_manager.clone(), None));
 
+    // Register nodes in ReplicationEngine (required for replication)
+    replication_engine
+        .register_node(1, "http://192.168.1.1:8080".to_string())
+        .await;
+    replication_engine
+        .register_node(2, "http://192.168.1.2:8080".to_string())
+        .await;
+    replication_engine
+        .register_node(3, "http://192.168.1.3:8080".to_string())
+        .await;
+
     let topology_manager = Arc::new(RwLock::new(TopologyManager::new()));
 
     // Add some test nodes to topology
