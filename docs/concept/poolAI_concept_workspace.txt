@@ -21,7 +21,7 @@
 
 **Версія**: v0.2.0 Production Ready ✅  
 **Загальний прогрес**: **100%** ✅ (всі 15 модулів завершено)  
-**Тести**: **463+ passing** (122 unit + 341+ integration)  
+**Тести**: **476+ passing** (122 unit + 354+ integration)  
 **Статус збірки**: ✅ `cargo check` проходить (GNU toolchain + MSYS2 PATH; без PowerShell)  
 
 **Завершені модулі (15/15 - 100%)**:

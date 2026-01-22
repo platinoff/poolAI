@@ -3,15 +3,21 @@
 
 **Статус проекту**: v0.2.0 Production Ready ✅  
 **Загальний прогрес**: 100% (всі 15 модулів завершено)  
-**Тести**: 457+ passing (122 unit + 335+ integration)  
+**Тести**: 476+ passing (122 unit + 354+ integration)  
 **CI/CD**: ✅ Виправлено cloud_providers tests (коміт c4cd12d)  
 **Наступна версія**: v0.3.0 (Optional Enhancements)
 
-**Останні зміни**:
-- ✅ `c4cd12d` - fix(tests): cloud_providers tests tolerate missing credentials (17 tests passing)
-- ✅ `079b207` - docs: update STABLE_STATE_SUMMARY after RAID CI fixes
-- ✅ `f2c9dab` - fix(raid): clustering coefficient formula and smallworld test fixes
-- ✅ Додано `bin/` bash scripts для git, cargo, тестів (без PowerShell)
+**Останні зміни** (2026-01-21):
+- ✅ `0484280` - chore: remove temporary fix script
+- ✅ `3a7e279` - style: fix code formatting issues (cargo fmt)
+- ✅ `050f141` - fix: replace :id with {id} in Axum route path
+- ✅ `3a36b1d` - feat(ui): максимальні покращення UI/UX та моніторингу
+- ✅ `5334883` - docs: update UI/UX improvements in documentation
+- ✅ `844f522` - docs: add comprehensive run parameters documentation
+- ✅ `329a8dc` - docs: add simple how to run guide
+- ✅ `d642933` - docs: add GCC and dlltool not found troubleshooting guide
+- ✅ `eaf5908` - fix(ci): add rustfmt/clippy to release and docs workflows
+- ✅ `895912e` - fix(ci): add rustfmt and clippy components to toolchain config
 
 ---
 
