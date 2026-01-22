@@ -578,7 +578,7 @@
 <a href=#578 id=578 data-nosnippet>578</a>    ///
 <a href=#579 id=579 data-nosnippet>579</a>    /// This method is intended for testing purposes only.
 <a href=#580 id=580 data-nosnippet>580</a>    /// It adds an artifact to the placements map without performing actual replication.
-<a href=#581 id=581 data-nosnippet>581</a>    </span><span class="attr">#[cfg(test)]
+<a href=#581 id=581 data-nosnippet>581</a>    </span><span class="attr">#[cfg(any(test, feature = <span class="string">"test-helpers"</span>))]
 <a href=#582 id=582 data-nosnippet>582</a>    </span><span class="kw">pub async fn </span>add_test_artifact(<span class="kw-2">&amp;</span><span class="self">self</span>, artifact_id: Uuid, node_ids: Vec&lt;u64&gt;) {
 <a href=#583 id=583 data-nosnippet>583</a>        <span class="kw">let </span><span class="kw-2">mut </span>placements = <span class="self">self</span>.artifact_placements.write().<span class="kw">await</span>;
 <a href=#584 id=584 data-nosnippet>584</a>        placements.insert(artifact_id, node_ids);
