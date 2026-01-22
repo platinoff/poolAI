@@ -2502,6 +2502,140 @@ impl KubernetesManager {
         }
     }
 
+    /// Check if a HorizontalPodAutoscaler exists in the namespace
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - HPA name
+    ///
+    /// # Returns
+    ///
+    /// `true` if the HPA exists, `false` if not (404). Errors on other API failures.
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn hpa_exists(&self, name: &str) -> Result<bool, AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "HPA name cannot be empty. Context: hpa_exists called with empty name.".to_string(),
+            ));
+        }
+        let path = format!(
+            "/apis/autoscaling/v2/namespaces/{}/horizontalpodautoscalers/{}",
+            self.namespace, name
+        );
+        match self.k8s_api_request("GET", &path, None).await {
+            Ok(_) => Ok(true),
+            Err(e) => {
+                let msg = e.to_string();
+                if msg.contains("404") || msg.contains("not found") {
+                    Ok(false)
+                } else {
+                    Err(e)
+                }
+            }
+        }
+    }
+
+    /// Create a HorizontalPodAutoscaler (HPA) for a Deployment
+    ///
+    /// Uses `autoscaling/v2` API. Configures CPU-based scaling.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - HPA resource name
+    /// * `deployment_name` - Target Deployment name (must exist)
+    /// * `min_replicas` - Minimum number of replicas
+    /// * `max_replicas` - Maximum number of replicas
+    /// * `target_cpu_percent` - Target average CPU utilization (e.g. 70)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError::ValidationError` if name/deployment empty or min/max invalid.
+    /// Returns `AppError` on Kubernetes API errors (e.g. deployment not found, conflict).
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use poolai::cloud::kubernetes::KubernetesManager;
+    /// # async fn example() -> Result<(), poolai::core::error::AppError> {
+    /// let manager = KubernetesManager::new("poolai".to_string());
+    /// manager.initialize().await?;
+    /// manager.create_hpa("poolai-workers-hpa", "poolai-workers", 1, 10, 70).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn create_hpa(
+        &self,
+        name: &str,
+        deployment_name: &str,
+        min_replicas: u32,
+        max_replicas: u32,
+        target_cpu_percent: i32,
+    ) -> Result<(), AppError> {
+        if name.is_empty() {
+            return Err(AppError::ValidationError(
+                "HPA name cannot be empty. Context: create_hpa called with empty name.".to_string(),
+            ));
+        }
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "Deployment name cannot be empty. Context: create_hpa target is empty.".to_string(),
+            ));
+        }
+        if min_replicas > max_replicas {
+            return Err(AppError::ValidationError(format!(
+                "min_replicas ({}) cannot exceed max_replicas ({}). Context: create_hpa.",
+                min_replicas, max_replicas
+            )));
+        }
+        if target_cpu_percent <= 0 || target_cpu_percent > 100 {
+            return Err(AppError::ValidationError(format!(
+                "target_cpu_percent must be in (0, 100]. Got {}. Context: create_hpa.",
+                target_cpu_percent
+            )));
+        }
+
+        let body = json!({
+            "apiVersion": "autoscaling/v2",
+            "kind": "HorizontalPodAutoscaler",
+            "metadata": {
+                "name": name,
+                "namespace": self.namespace,
+                "labels": { "app": deployment_name, "managed-by": "poolai" }
+            },
+            "spec": {
+                "scaleTargetRef": {
+                    "apiVersion": "apps/v1",
+                    "kind": "Deployment",
+                    "name": deployment_name
+                },
+                "minReplicas": min_replicas,
+                "maxReplicas": max_replicas,
+                "metrics": [{
+                    "type": "Resource",
+                    "resource": {
+                        "name": "cpu",
+                        "target": {
+                            "type": "Utilization",
+                            "averageUtilization": target_cpu_percent
+                        }
+                    }
+                }]
+            }
+        });
+
+        let path = format!(
+            "/apis/autoscaling/v2/namespaces/{}/horizontalpodautoscalers",
+            self.namespace
+        );
+        self.k8s_api_request("POST", &path, Some(body)).await?;
+        info!(
+            "Created HPA {} for deployment {} (min={}, max={}, cpu%={}) in namespace {}",
+            name, deployment_name, min_replicas, max_replicas, target_cpu_percent, self.namespace
+        );
+        Ok(())
+    }
+
     /// Create a PersistentVolumeClaim
     ///
     /// # Arguments

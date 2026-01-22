@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect Analysis - 2026-01-22 (актуалізовано - Cloud SDK 99%, stable state, roadmap)
+## Rust Architect Analysis - 2026-01-22 (актуалізовано - Cloud SDK 100%, HPA init ✅, v0.2.2)
 
 ---
 
@@ -89,10 +89,10 @@ cargo test --no-default-features --lib
 
 **Детально**: `docs/development/NEXT_STEPS_2026-01-19.md`
 
-1. **Priority 1 — v0.2.2 release**: Changelog, release notes, README. (~1 день)
-2. **Priority 2 — v0.3.0+** (опціонально): HPA init, Mock server integration, Stage 4.4 AI/ML.
+1. **Priority 1 — v0.2.2 release**: ✅ Завершено (Changelog, README, version bump)
+2. **Priority 2 — v0.3.0+** (опціонально): Mock server integration, Stage 4.4 AI/ML (HPA init ✅).
 
-**Стабільний стан**: v0.2.1 ✅ | **Cloud SDK 100%** ✅ | RAID/Enterprise 100% ✅ | Load Balancing routing rules + Cloud LB init ✅ (2026-01-22).
+**Стабільний стан**: v0.2.2 ✅ | **Cloud SDK 100%** ✅ | HPA init ✅ | RAID/Enterprise 100% ✅ | Load Balancing ✅ (2026-01-22).
 
 **Базові команди** (MSYS2 bash, без PS): `bin/git-status.sh`, `bin/cargo-check.sh`, `bin/cargo-test.sh`, `bin/cargo-fmt.sh`; перед push — pre-push hook.
 
@@ -153,22 +153,21 @@ cargo test --no-default-features --lib
 - **Documentation**: Complete
 - **Cursor Settings**: Optimized (2026-01-19)
 - **Environment Setup**: Automated (MSVC & Rust environment scripts) ✅
-- **Cloud SDK Progress**: 100% (AWS/GCP/Azure ✅, Auto-scaling ✅, Load Balancing routing rules + Cloud LB init ✅)
+- **Cloud SDK Progress**: 100% (AWS/GCP/Azure ✅, Auto-scaling ✅, Load Balancing ✅, HPA init ✅)
 - **RAID Strategy Progress**: 100% (BurstRAID ✅, SmallWorld ✅, Metrics ✅, Integration tests ✅, Admin Control Plane ✅)
 - **Enterprise Features Progress**: 100% (SQLite persistence ✅, GitHub OAuth2 ✅, SAML SSO ✅)
 
 ---
 
 **Статус**: ✅ **STABLE - PRODUCTION READY**  
-**Версія**: v0.2.1 Released ✅  
+**Версія**: v0.2.2 Released ✅  
 **Дата**: 2026-01-22 (актуалізовано)  
 **Підготовлено**: Rust Architect  
 
 **Останні зміни** (2026-01-22):
-- ✅ **Cloud SDK 100%** — Load Balancing routing rules + Cloud LB init
-  - ✅ RoutingRule, add_routing_rule, get_routing_rules, default "/*"
-  - ✅ set_cloud_lb_config, K8s Service LoadBalancer init
-- ✅ **Cloud SDK Auto-scaling** — Metrics + Scaling Rules (get_pod_metrics, evaluate_and_scale)
+- ✅ **HPA init** — create_hpa, hpa_exists, ensure_hpa_for (K8s autoscaling/v2, CPU-based)
+- ✅ **Cloud SDK 100%** — Load Balancing ✅, Auto-scaling ✅ (Metrics + Scaling Rules, get_pod_metrics, evaluate_and_scale)
+  - ✅ RoutingRule, add_routing_rule, set_cloud_lb_config, K8s Service LoadBalancer init
 - ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, Admin Control Plane ✅
 - ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO ✅
 - ✅ **UI/UX, Admin Panel 100%** ✅

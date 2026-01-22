@@ -3,7 +3,7 @@
 
 **Дата оновлення**: 2026-01-22  
 **Версія**: 2.1  
-**Статус**: Infrastructure 100% ✅, SDK Implementation 100% ✅ (Metrics, Scaling Rules, Routing Rules, Cloud LB init)
+**Статус**: Infrastructure 100% ✅, SDK Implementation 100% ✅ (Metrics, Scaling Rules, Routing Rules, Cloud LB init, **HPA init** ✅)
 
 ---
 
@@ -15,7 +15,7 @@
 | **GCP** | ✅ 100% | ✅ 100% | ✅ 100% | ✅ 100% | 100% ✅ |
 | **AWS** | ✅ 100% | ✅ 100% | ✅ 100% | ✅ 100% | 100% ✅ |
 
-**Загальний прогрес**: **100%** ✅ (Metrics ✅, Scaling rules ✅, Routing rules ✅, Cloud LB init ✅)
+**Загальний прогрес**: **100%** ✅ (Metrics ✅, Scaling rules ✅, Routing rules ✅, Cloud LB init ✅, HPA init ✅)
 
 ---
 
@@ -202,6 +202,12 @@ let task_id = manager.create_ecs_task(
 - ✅ set_cloud_lb_config(deployment, ports)
 - ✅ Cloud LB init: створення K8s Service типу LoadBalancer при k8s_manager + config
 - ✅ Виправлено check_backend_health_static (backend/config)
+
+### Phase 4.5: HPA (Horizontal Pod Autoscaler) init - Завершено ✅ (2026-01-22)
+- ✅ KubernetesManager::hpa_exists(name), create_hpa(name, deployment, min, max, target_cpu%)
+- ✅ AutoScaler::ensure_hpa_for(deployment_name) — створення HPA з min/max скалера, CPU 70%
+- ✅ HPA v2 API (autoscaling/v2), CPU-based scaling
+- ✅ Initialize логи "HPA support (use ensure_hpa_for)" при k8s_manager
 
 ### Phase 5: Hybrid Approach (Planned)
 - [ ] Використовувати SDK де можливо

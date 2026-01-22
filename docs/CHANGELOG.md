@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **HPA (Horizontal Pod Autoscaler) init for Kubernetes** 🎉
+  - `KubernetesManager::hpa_exists(name)`, `create_hpa(name, deployment, min, max, target_cpu%)`
+  - `AutoScaler::ensure_hpa_for(deployment_name)` — create HPA from scaler min/max, CPU 70%
+  - HPA v2 API: `autoscaling/v2`, CPU-based scaling
+  - Initialize logs "HPA support (use ensure_hpa_for)" when k8s_manager set
+
 ### Planned
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
 - Mock server integration for Cloud SDK (optional)
-- HPA (Horizontal Pod Autoscaler) init for Kubernetes (v0.3.0+)
 
 ## [0.2.2] - 2026-01-22
 

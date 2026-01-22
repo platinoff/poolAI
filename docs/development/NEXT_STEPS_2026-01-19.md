@@ -1,8 +1,8 @@
 # 🎯 Наступні Кроки Розробки
 ## Оновлено: 2026-01-22
 
-**Поточний статус**: ✅ **STABLE - PRODUCTION READY (v0.2.1)**  
-**Останні досягнення**: RAID ✅, Enterprise ✅, **Cloud SDK 100%** ✅ (Auto-scaling Metrics + Scaling Rules ✅, Load Balancing routing rules + Cloud LB init ✅)
+**Поточний статус**: ✅ **STABLE - PRODUCTION READY (v0.2.2)**  
+**Останні досягнення**: RAID ✅, Enterprise ✅, **Cloud SDK 100%** ✅ (Auto-scaling ✅, Load Balancing ✅, **HPA init** ✅ 2026-01-22)
 
 ---
 
@@ -11,9 +11,9 @@
 | Пріоритет | Крок | Оцінка | Статус |
 |-----------|------|--------|--------|
 | **1** | **v0.2.2 release prep** — Changelog, release notes, README | 1 день | ✅ Завершено |
-| **2** | **v0.3.0+** — HPA init, Mock server integration, Stage 4.4 AI/ML | 2–4 тижні | ⏸️ Опціонально |
+| **2** | **v0.3.0+** — Mock server integration, Stage 4.4 AI/ML | 2–4 тижні | ⏸️ Опціонально |
 
-**Рекомендація**: розпочати з **Priority 1** (v0.2.2). Команди: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook.
+**Рекомендація**: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook. Далі: Mock server або Stage 4.4 (P2).
 
 ---
 
@@ -29,7 +29,8 @@
 - ✅ **Load Balancing** ✅ (2026-01-22)
   - ✅ RoutingRule, add_routing_rule, get_routing_rules, default "/*"
   - ✅ set_cloud_lb_config, Cloud LB init (K8s Service LoadBalancer)
-- ⏸️ Опціонально (v0.3.0+): Mock server integration, HPA init
+- ✅ **HPA init** ✅ (2026-01-22) — create_hpa, hpa_exists, ensure_hpa_for
+- ⏸️ Опціонально (v0.3.0+): Mock server integration
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
@@ -75,7 +76,7 @@
 **Мета**: Додаткові features для v0.3.0+.
 
 **Завдання**:
-1. **HPA (Horizontal Pod Autoscaler)** — ініціалізація для Kubernetes (`src/cloud/autoscaling.rs` TODO)
+1. ~~**HPA (Horizontal Pod Autoscaler)**~~ ✅ Завершено (2026-01-22) — create_hpa, hpa_exists, ensure_hpa_for
 2. **Mock Server Integration** для Cloud SDK — покращити тестове покриття
 3. **Stage 4.4 AI/ML** — Model Optimization, AutoML, Federated Learning (з концепту)
 
@@ -91,10 +92,10 @@
 
 ## 📋 Рекомендація (Rust Architect)
 
-**Рекомендований наступний крок**: **Priority 1** — підготовка v0.2.2 release (Changelog, release notes, README).
+**Рекомендований наступний крок**: **Priority 2** (v0.3.0+) — Mock server integration або Stage 4.4 AI/ML.
 
 **Далі**:
-- → **Priority 2** (v0.3.0+): HPA init, Mock server integration, Stage 4.4 AI/ML
+- → **Priority 2**: Mock server, Stage 4.4 AI/ML (HPA init ✅)
 
 ---
 
@@ -105,6 +106,7 @@
 - `src/cloud/providers/azure.rs`: Compute client, location config (опціонально)
 - ~~`src/cloud/loadbalancing.rs`: Routing rules, cloud LB~~ ✅ ЗАВЕРШЕНО (2026-01-22)
 - ~~`src/cloud/autoscaling.rs`: Metrics collection~~ ✅ ЗАВЕРШЕНО (2026-01-22)
+- ~~`src/cloud/autoscaling.rs`: HPA init~~ ✅ ЗАВЕРШЕНО (2026-01-22) — create_hpa, ensure_hpa_for
 
 ### Runtime Module
 - `src/runtime/instance.rs`: Load model from library (майбутня функціональність)
@@ -118,7 +120,7 @@
 
 ## 🎯 План Дій
 
-1. **Зараз**: **Priority 1** — v0.2.2 release prep (або **Priority 2** — v0.3.0+)
+1. **Зараз**: **Priority 2** — Mock server або Stage 4.4 AI/ML (v0.2.2 ✅, HPA init ✅)
 2. **Далі**: Реалізувати обраний крок
 3. **Після**: `cargo fmt --all`, git push (pre-push hook), оновлення документації
 
@@ -126,4 +128,4 @@
 
 **Підготовлено**: Rust Architect  
 **Дата**: 2026-01-22  
-**Статус**: Stable v0.2.1; Cloud SDK 100%; наступні кроки — v0.2.2 → v0.3.0+
+**Статус**: Stable v0.2.2; Cloud SDK 100% + HPA init ✅; наступні кроки — v0.3.0+ (Mock server, Stage 4.4)

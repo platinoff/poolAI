@@ -159,9 +159,14 @@ impl AutoScaler {
         // - Additional policies can be added via add_policy()
         // - Automatic scaling can be triggered via evaluate_and_scale()
 
-        // TODO: Initialize HPA (Horizontal Pod Autoscaler) for Kubernetes
-        // - Create HPA resource via Kubernetes API
-        // - Configure HPA with scaling policies
+        // HPA (Horizontal Pod Autoscaler): ✅ KubernetesManager::create_hpa, hpa_exists
+        // - Create HPA via ensure_hpa_for(deployment_name) when k8s_manager is set
+        // - Uses min/max replicas from scaler and default target CPU 70%
+
+        #[cfg(feature = "cloud-sdk")]
+        if self.k8s_manager.is_some() {
+            info!("Auto-scaler initialized with Kubernetes HPA support (use ensure_hpa_for)");
+        }
 
         info!("Auto-scaler initialized with default policies");
 
@@ -508,6 +513,55 @@ impl AutoScaler {
         let mut policies = self.scaling_policies.write().await;
         policies.push(policy);
         Ok(())
+    }
+
+    /// Ensure a HorizontalPodAutoscaler exists for the given Deployment (Kubernetes only).
+    ///
+    /// If an HPA named `{deployment_name}-hpa` already exists, this is a no-op.
+    /// Otherwise creates one using the scaler's min/max replica limits and target CPU 70%.
+    /// Requires `cloud-sdk` and `with_k8s_manager` to have been used.
+    ///
+    /// # Arguments
+    ///
+    /// * `deployment_name` - Name of the target Deployment (must exist in the cluster)
+    ///
+    /// # Errors
+    ///
+    /// Returns `AppError` if Kubernetes is unavailable, validation fails, or HPA create fails.
+    #[cfg(feature = "cloud-sdk")]
+    pub async fn ensure_hpa_for(&self, deployment_name: &str) -> Result<(), AppError> {
+        if deployment_name.is_empty() {
+            return Err(AppError::ValidationError(
+                "deployment_name cannot be empty for ensure_hpa_for.".to_string(),
+            ));
+        }
+        let mgr = match &self.k8s_manager {
+            Some(m) => m.clone(),
+            None => {
+                return Err(AppError::InitializationError(
+                    "ensure_hpa_for requires Kubernetes; use AutoScaler::with_k8s_manager."
+                        .to_string(),
+                ));
+            }
+        };
+
+        let name = format!("{}-hpa", deployment_name);
+        if mgr.hpa_exists(&name).await? {
+            info!("HPA {} already exists, skipping create", name);
+            return Ok(());
+        }
+
+        let min = *self.min_replicas.read().await;
+        let max = *self.max_replicas.read().await;
+        if min > max {
+            return Err(AppError::ValidationError(format!(
+                "min_replicas ({}) > max_replicas ({}); fix via set_replica_limits.",
+                min, max
+            )));
+        }
+        let target_cpu = 70i32;
+        mgr.create_hpa(&name, deployment_name, min, max, target_cpu)
+            .await
     }
 
     /// Get all scaling policies
