@@ -14,6 +14,34 @@ MSYS2/MinGW tools (`gcc.exe`, `dlltool.exe`) не додані до PATH.
 
 ## Рішення
 
+### Швидке рішення (MSYS2 Terminal) ⭐
+
+**Якщо ви працюєте в MSYS2 терміналі:**
+
+```bash
+# Додати MSYS2 до PATH для поточної сесії
+export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+
+# Встановити CC та AR змінні
+export CC="gcc"
+export CC_x86_64_pc_windows_gnu="gcc"
+export AR="ar"
+export AR_x86_64_pc_windows_gnu="ar"
+
+# Перевірити
+gcc --version
+dlltool --version
+
+# Тепер можна компілювати
+cargo build
+```
+
+**Або використайте скрипт:**
+```bash
+bash scripts/fix_dlltool_msys2.sh
+cargo build
+```
+
 ### Швидке рішення (PowerShell)
 
 ```powershell
