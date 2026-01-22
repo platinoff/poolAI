@@ -32,6 +32,7 @@
 //! # }
 //! ```
 
+pub mod context_memory;
 pub mod metrics;
 
 use crate::core::error::AppError;
