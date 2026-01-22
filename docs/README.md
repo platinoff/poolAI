@@ -94,6 +94,10 @@
 - [`NEXT_STEPS_AFTER_PUSH_2026-01-22.md`](./NEXT_STEPS_AFTER_PUSH_2026-01-22.md) - Наступні кроки після push
 - [`RUST_ARCHITECT_FINAL_COMMANDS.md`](./RUST_ARCHITECT_FINAL_COMMANDS.md) - Фінальні команди для виконання
 - [`EXECUTE_NOW.md`](./EXECUTE_NOW.md) - ⚡ Виконай зараз (git push + наступні кроки)
+- [`FIX_AND_PUSH_NOW.md`](./FIX_AND_PUSH_NOW.md) - Виправлення проблем та push
+- [`PUSH_COMMIT_NOW.md`](./PUSH_COMMIT_NOW.md) - Push існуючого коміту
+- [`FIX_AUTH_AND_PUSH.md`](./FIX_AUTH_AND_PUSH.md) - ⚡ Виправлення аутентифікації та push (актуально)
+- [`PUSH_WITH_AUTH_FIX.md`](./PUSH_WITH_AUTH_FIX.md) - Детальний гайд з push та аутентифікації
 
 ---
 
