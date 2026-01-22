@@ -115,6 +115,8 @@ jobs:
       
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
       
       - name: Check compilation (without optional deps)
         run: cargo check --no-default-features --lib
@@ -138,6 +140,8 @@ jobs:
       
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
       
       - name: Check with features
         run: cargo check --features ${{ matrix.features }}
