@@ -108,7 +108,7 @@
 ### Код
 - **Total Lines**: ~20,000+ lines
 - **Modules**: 15 основних модулів (всі 100% завершено)
-- **Tests**: 463+ (122 unit + 341+ integration)
+- **Tests**: 470+ (122 unit + 348+ integration)
 - **API Endpoints**: 73+ REST endpoints + WebSocket (67 base + 6 admin)
 
 ### Розробка
