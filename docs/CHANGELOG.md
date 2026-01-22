@@ -14,6 +14,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Administrative Control Plane for RAID (optional)
 - Mock server integration for Cloud SDK (optional)
 
+## [0.2.1] - 2026-01-22
+
+### Changed
+- **Version Update**: Updated `APP_VERSION` in `src/version.rs` from 0.1.0 to 0.2.1 to match `Cargo.toml`
+- **Git Configuration**: Updated `.gitignore` to exclude development directories:
+  - `.cursor/` - Cursor IDE settings and cache
+  - `docs/` - Local documentation (not synced)
+  - `.vscode/` - VS Code settings (except important configs)
+  - `scripts/` - Local development scripts
+- **Documentation**: Moved `QUICK_FIX_MSYS2.md` to `docs/troubleshooting/` for better organization
+- **Concept File**: Updated `poolAI_concept.txt` with:
+  - Current Rust version (1.92.0)
+  - Updated test counts (437+ tests passing)
+  - MSYS2 commands and tools section
+  - Git configuration documentation
+
+### Fixed
+- Git working tree cleanup - removed all modified (M) flags from files
+- Version synchronization between `Cargo.toml` and `src/version.rs`
+
 ## [0.2.1] - 2026-01-19
 
 ### Added

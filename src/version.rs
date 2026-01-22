@@ -7,7 +7,7 @@ use std::sync::OnceLock;
 use std::time::SystemTime;
 
 /// Application version string
-pub const APP_VERSION: &str = "0.1.0";
+pub const APP_VERSION: &str = "0.2.1";
 
 // Build time (generated at compile time).
 // Note: rustdoc does not attach doc comments to items produced by macros/includes.

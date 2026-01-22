@@ -9,12 +9,19 @@ Cargo.std.toml
 file_list.csv
 
 # IDE files (but keep important configs)
-.vscode/*
-!.vscode/settings.json
-!.vscode/README_TERMINAL.md
+.vscode/
 .idea/
 *.swp
 *.swo
+
+# Cursor IDE files
+.cursor/
+
+# Documentation (excluded from git)
+docs/
+
+# Scripts (excluded from git)
+scripts/
 
 # OS files
 .DS_Store
