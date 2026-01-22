@@ -89,7 +89,9 @@ async fn test_aws_credentials_handling() {
     manager.initialize().await.unwrap();
 
     // Should fail with InitializationError when credentials are missing
-    let result = manager.create_ec2_instance("t3.medium", "ami-12345678").await;
+    let result = manager
+        .create_ec2_instance("t3.medium", "ami-12345678")
+        .await;
     assert!(result.is_err());
     if let Err(AppError::InitializationError(msg)) = result {
         assert!(msg.contains("AWS_ACCESS_KEY_ID") || msg.contains("AWS_SECRET_ACCESS_KEY"));

@@ -90,7 +90,10 @@ async fn test_azure_token_acquisition_fallback() {
     let result = manager.create_vm_scale_set("test-rg", "test-vmss").await;
     assert!(result.is_err());
     if let Err(AppError::InitializationError(msg)) = result {
-        assert!(msg.contains("Azure access token not found") || msg.contains("All authentication methods failed"));
+        assert!(
+            msg.contains("Azure access token not found")
+                || msg.contains("All authentication methods failed")
+        );
     }
 
     manager.shutdown().await.unwrap();

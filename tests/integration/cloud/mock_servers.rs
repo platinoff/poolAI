@@ -140,7 +140,9 @@ impl MockAzureServer {
     pub async fn mock_managed_identity_token(&mut self) -> Mock {
         self.server
             .mock("GET", "/metadata/identity/oauth2/token")
-            .match_query(mockito::Matcher::Regex("api-version=2018-02-01".to_string()))
+            .match_query(mockito::Matcher::Regex(
+                "api-version=2018-02-01".to_string(),
+            ))
             .match_header("Metadata", "true")
             .with_status(200)
             .with_header("content-type", "application/json")
@@ -156,7 +158,11 @@ impl MockAzureServer {
     }
 
     /// Mock Azure VM Scale Set creation
-    pub async fn mock_vmss_creation(&mut self, subscription_id: &str, resource_group: &str) -> Mock {
+    pub async fn mock_vmss_creation(
+        &mut self,
+        subscription_id: &str,
+        resource_group: &str,
+    ) -> Mock {
         self.server
             .mock("PUT", &format!("/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}", subscription_id, resource_group, "test-vmss"))
             .with_status(200)
@@ -197,7 +203,10 @@ impl MockGcpServer {
     /// Mock GCP metadata server token endpoint
     pub async fn mock_metadata_token(&mut self) -> Mock {
         self.server
-            .mock("GET", "/computeMetadata/v1/instance/service-accounts/default/token")
+            .mock(
+                "GET",
+                "/computeMetadata/v1/instance/service-accounts/default/token",
+            )
             .match_header("Metadata-Flavor", "Google")
             .with_status(200)
             .with_header("content-type", "application/json")
@@ -232,7 +241,10 @@ impl MockGcpServer {
     /// Mock GCP Compute Engine instance creation
     pub async fn mock_compute_instance_creation(&mut self, project: &str, zone: &str) -> Mock {
         self.server
-            .mock("POST", &format!("/compute/v1/projects/{}/zones/{}/instances", project, zone))
+            .mock(
+                "POST",
+                &format!("/compute/v1/projects/{}/zones/{}/instances", project, zone),
+            )
             .with_status(200)
             .with_header("content-type", "application/json")
             .with_body(

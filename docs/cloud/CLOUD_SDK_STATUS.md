@@ -231,6 +231,11 @@ let task_id = manager.create_ecs_task(
 - ✅ Edge cases tests: 10+ tests (credential chain, token caching, concurrent init)
 - ✅ All tests tolerate missing credentials (CI-friendly)
 
+### Mock server integration (2026-01-22):
+- ✅ `tests/cloud_mock_integration.rs` + `tests/integration/cloud/` wired into test suite
+- ✅ Mock servers (mockito): AWS EC2/ECS, Azure, GCP — `mock_servers.rs`, token/aws/azure/gcp/edge_cases tests
+- Run: `cargo test --test cloud_mock_integration --features cloud,cloud-sdk` (requires Rust 1.88+ for AWS)
+
 ---
 
 ## 📚 Документація

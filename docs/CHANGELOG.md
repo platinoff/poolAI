@@ -13,12 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `AutoScaler::ensure_hpa_for(deployment_name)` — create HPA from scaler min/max, CPU 70%
   - HPA v2 API: `autoscaling/v2`, CPU-based scaling
   - Initialize logs "HPA support (use ensure_hpa_for)" when k8s_manager set
+- **Mock server integration harness** 🎉
+  - `tests/cloud_mock_integration.rs` wires `tests/integration/cloud/` (mockito: AWS, Azure, GCP)
+  - Run: `cargo test --test cloud_mock_integration --features cloud,cloud-sdk` (Rust 1.88+)
+  - CLOUD_SDK_STATUS, NEXT_STEPS updated
 
 ### Planned
 - GlobalState manager for centralized state management
 - ErrorContext for structured error handling
 - Additional performance optimizations
-- Mock server integration for Cloud SDK (optional)
+- Configurable provider base URLs for full e2e mock tests (optional)
 
 ## [0.2.2] - 2026-01-22
 

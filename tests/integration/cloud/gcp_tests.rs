@@ -62,11 +62,11 @@ async fn test_gcp_token_acquisition_fallback() {
     std::env::remove_var("GOOGLE_APPLICATION_CREDENTIALS");
 
     let manager = GcpManager::new(Some("test-project".to_string()));
-    
+
     // Should fail with InitializationError when no credentials available
     // (metadata server won't be available in test environment)
     let result = manager.initialize().await;
-    
+
     // May succeed if metadata server is somehow available, or fail with token error
     match result {
         Ok(_) => {
@@ -75,8 +75,10 @@ async fn test_gcp_token_acquisition_fallback() {
         }
         Err(AppError::InitializationError(msg)) => {
             // Expected when no credentials available
-            assert!(msg.contains("Failed to obtain GCP access token") || 
-                   msg.contains("All authentication methods failed"));
+            assert!(
+                msg.contains("Failed to obtain GCP access token")
+                    || msg.contains("All authentication methods failed")
+            );
         }
         Err(_) => {
             // Other errors are acceptable for this test
@@ -108,16 +110,18 @@ async fn test_gcp_service_account_key_parsing() {
     std::env::set_var("GOOGLE_APPLICATION_CREDENTIALS", temp_file.path());
 
     let manager = GcpManager::new(Some("test-project".to_string()));
-    
+
     // Should attempt to parse the key file
     // Will fail at OAuth2 token exchange (expected in test environment)
     let result = manager.initialize().await;
-    
+
     // Should not fail with key parsing error
     if let Err(AppError::InitializationError(msg)) = result {
         // Should not be a key parsing error
-        assert!(!msg.contains("Failed to parse service account key file") &&
-               !msg.contains("Cannot parse JSON"));
+        assert!(
+            !msg.contains("Failed to parse service account key file")
+                && !msg.contains("Cannot parse JSON")
+        );
     }
 
     std::env::remove_var("GOOGLE_APPLICATION_CREDENTIALS");
