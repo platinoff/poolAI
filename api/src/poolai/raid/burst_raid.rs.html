@@ -82,7 +82,7 @@
 <a href=#82 id=82 data-nosnippet>82</a>}
 <a href=#83 id=83 data-nosnippet>83</a>
 <a href=#84 id=84 data-nosnippet>84</a><span class="doccomment">/// Metrics for BurstRAID strategy
-<a href=#85 id=85 data-nosnippet>85</a></span><span class="attr">#[derive(Debug, Clone)]
+<a href=#85 id=85 data-nosnippet>85</a></span><span class="attr">#[derive(Debug, Clone, serde::Serialize)]
 <a href=#86 id=86 data-nosnippet>86</a></span><span class="kw">pub struct </span>BurstRaidMetrics {
 <a href=#87 id=87 data-nosnippet>87</a>    <span class="doccomment">/// Total number of artifacts being tracked
 <a href=#88 id=88 data-nosnippet>88</a>    </span><span class="kw">pub </span>total_artifacts: usize,
@@ -99,7 +99,7 @@
 <a href=#99 id=99 data-nosnippet>99</a>}
 <a href=#100 id=100 data-nosnippet>100</a>
 <a href=#101 id=101 data-nosnippet>101</a><span class="doccomment">/// Burst detection statistics for a specific artifact
-<a href=#102 id=102 data-nosnippet>102</a></span><span class="attr">#[derive(Debug, Clone)]
+<a href=#102 id=102 data-nosnippet>102</a></span><span class="attr">#[derive(Debug, Clone, serde::Serialize)]
 <a href=#103 id=103 data-nosnippet>103</a></span><span class="kw">pub struct </span>ArtifactBurstStats {
 <a href=#104 id=104 data-nosnippet>104</a>    <span class="doccomment">/// Artifact ID
 <a href=#105 id=105 data-nosnippet>105</a>    </span><span class="kw">pub </span>artifact_id: Uuid,
