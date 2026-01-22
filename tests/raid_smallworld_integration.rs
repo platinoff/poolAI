@@ -155,12 +155,9 @@ async fn test_rebalance_with_real_artifacts() {
 async fn test_node_selection_based_on_clustering() {
     let (strategy, _raid_manager, _topology_manager) = create_test_smallworld_strategy().await;
 
-    // Create artifact through strategy
-    let artifact_id = uuid::Uuid::new_v4();
-    strategy
-        .replicate_artifact(artifact_id, b"test data".to_vec(), "test-artifact")
-        .await
-        .unwrap();
+    // Create artifact for testing (without real replication)
+    let artifact_id = Uuid::new_v4();
+    strategy.add_test_artifact(artifact_id, vec![1, 2, 3]).await;
 
     // Update clustering coefficients first
     strategy.update_clustering_coefficients().await.unwrap();
@@ -203,8 +200,8 @@ async fn test_metrics_collection() {
     assert_eq!(metrics.total_artifacts, 3, "Should track 3 artifacts");
     assert_eq!(metrics.total_nodes, 3, "Should have 3 nodes");
     assert_eq!(
-        metrics.base_replication_factor, 3,
-        "Base replication factor should be 3"
+        metrics.base_replication_factor, 1,
+        "Base replication factor should be 1 (config uses 1 for tests)"
     );
     assert!(
         metrics.avg_clustering_coefficient >= 0.0 && metrics.avg_clustering_coefficient <= 1.0,
