@@ -6,9 +6,10 @@
 use serde::{Deserialize, Serialize};
 
 /// Aggregation mode for federated rounds.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum AggregationMode {
+    #[default]
     FedAvg,
     FedProx,
 }

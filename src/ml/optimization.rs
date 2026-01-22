@@ -6,9 +6,10 @@
 use serde::{Deserialize, Serialize};
 
 /// Quantization level for model compression.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum QuantizationLevel {
+    #[default]
     None,
     Int8,
     Int4,
