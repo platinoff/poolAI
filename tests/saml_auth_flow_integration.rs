@@ -73,8 +73,8 @@ async fn test_saml_callback_handler_validation() {
 
     // Test SAML assertion validation with mock response
     // Note: In production, this would be a real SAML response from IdP
-    let mock_saml_response = base64::engine::general_purpose::STANDARD
-        .encode(r#"<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+    let mock_saml_response = base64::engine::general_purpose::STANDARD.encode(
+        r#"<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
   <saml:Assertion>
     <saml:Subject>
       <saml:NameID>testuser@example.com</saml:NameID>
@@ -88,7 +88,9 @@ async fn test_saml_callback_handler_validation() {
       </saml:Attribute>
     </saml:AttributeStatement>
   </saml:Assertion>
-</samlp:Response>"#.as_bytes());
+</samlp:Response>"#
+            .as_bytes(),
+    );
 
     let result = manager
         .validate_saml_assertion("test", &mock_saml_response)

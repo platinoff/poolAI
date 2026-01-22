@@ -67,19 +67,17 @@ async fn get_strategy_status_handler(
     Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
 ) -> impl IntoResponse {
     let admin = RaidAdmin::new(raid_manager);
-    
+
     match admin.get_strategy_status().await {
-        Ok(status) => (
-            StatusCode::OK,
-            Json(StrategyStatusResponse { status }),
-        ).into_response(),
+        Ok(status) => (StatusCode::OK, Json(StrategyStatusResponse { status })).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": "Failed to get strategy status",
                 "message": e.to_string()
             })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 
@@ -96,7 +94,7 @@ async fn trigger_rebalance_handler(
     }
 
     let admin = RaidAdmin::new(raid_manager);
-    
+
     match admin.trigger_rebalance().await {
         Ok(result) => (
             StatusCode::OK,
@@ -105,14 +103,16 @@ async fn trigger_rebalance_handler(
                 success: result.success,
                 message: format!("Rebalanced {} artifacts", result.artifacts_moved),
             }),
-        ).into_response(),
+        )
+            .into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": "Failed to trigger rebalancing",
                 "message": e.to_string()
             })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 
@@ -123,19 +123,19 @@ async fn get_burst_raid_metrics_handler(
     Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
 ) -> impl IntoResponse {
     let admin = RaidAdmin::new(raid_manager);
-    
+
     match admin.get_burst_raid_metrics().await {
-        Some(metrics) => (
-            StatusCode::OK,
-            Json(BurstRaidMetricsResponse { metrics }),
-        ).into_response(),
+        Some(metrics) => {
+            (StatusCode::OK, Json(BurstRaidMetricsResponse { metrics })).into_response()
+        }
         None => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": "BurstRAID strategy not active",
                 "message": "BurstRAID metrics are only available when BurstRAID strategy is active"
             })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 
@@ -146,7 +146,7 @@ async fn get_small_world_metrics_handler(
     Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
 ) -> impl IntoResponse {
     let admin = RaidAdmin::new(raid_manager);
-    
+
     match admin.get_small_world_metrics().await {
         Some(metrics) => (
             StatusCode::OK,
@@ -178,24 +178,23 @@ async fn get_artifact_burst_stats_handler(
                     "error": "Invalid artifact ID",
                     "message": "Artifact ID must be a valid UUID"
                 })),
-            ).into_response();
+            )
+                .into_response();
         }
     };
 
     let admin = RaidAdmin::new(raid_manager);
-    
+
     match admin.get_artifact_burst_stats(artifact_uuid).await {
-        Some(stats) => (
-            StatusCode::OK,
-            Json(ArtifactBurstStatsResponse { stats }),
-        ).into_response(),
+        Some(stats) => (StatusCode::OK, Json(ArtifactBurstStatsResponse { stats })).into_response(),
         None => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": "Artifact burst stats not found",
                 "message": "Artifact is not tracked or BurstRAID strategy is not active"
             })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 
@@ -207,7 +206,7 @@ async fn get_node_clustering_handler(
     Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
 ) -> impl IntoResponse {
     let admin = RaidAdmin::new(raid_manager);
-    
+
     match admin.get_node_clustering_coefficient(params.node_id).await {
         Some(coeff) => (
             StatusCode::OK,
@@ -215,14 +214,16 @@ async fn get_node_clustering_handler(
                 node_id: params.node_id,
                 clustering_coefficient: coeff,
             }),
-        ).into_response(),
+        )
+            .into_response(),
         None => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": "Node clustering coefficient not found",
                 "message": "Node does not exist or SmallWorld strategy is not active"
             })),
-        ).into_response(),
+        )
+            .into_response(),
     }
 }
 
@@ -234,8 +235,14 @@ pub fn create_raid_admin_routes() -> Router {
             "/raid/admin/rebalance",
             post(trigger_rebalance_handler).layer(middleware::from_fn(auth_middleware)),
         )
-        .route("/raid/admin/metrics/burst", get(get_burst_raid_metrics_handler))
-        .route("/raid/admin/metrics/smallworld", get(get_small_world_metrics_handler))
+        .route(
+            "/raid/admin/metrics/burst",
+            get(get_burst_raid_metrics_handler),
+        )
+        .route(
+            "/raid/admin/metrics/smallworld",
+            get(get_small_world_metrics_handler),
+        )
         .route(
             "/raid/admin/artifacts/{id}/burst",
             get(get_artifact_burst_stats_handler),

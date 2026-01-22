@@ -2280,9 +2280,7 @@ async fn saml_callback_handler(
 
     // Redirect to UI with token
     // Use RelayState if provided, otherwise default to /ui/auth
-    let redirect_path = form
-        .RelayState
-        .unwrap_or_else(|| "/ui/auth".to_string());
+    let redirect_path = form.RelayState.unwrap_or_else(|| "/ui/auth".to_string());
     let redirect_url = format!(
         "{}?token={}&username={}&role={:?}",
         redirect_path,
