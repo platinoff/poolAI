@@ -6,19 +6,19 @@
 ## ✅ Поточний стан
 
 ### Статус збірки
-- ✅ `cargo check` проходить без помилок
-- ✅ `cargo test --lib` - 102 unit tests passing
-- ✅ `cargo test --test '*'` - 335+ integration tests passing
+- ✅ `cargo check` проходить без помилок (GNU toolchain + MSYS2 PATH)
+- ✅ `cargo test --lib` — **122 unit tests** passing
+- ✅ `cargo test --test '*'` — 335+ integration tests passing
 - ✅ RAID integration tests: `raid_cross_strategy` (5), `raid_smallworld_integration` (6) — всі проходять
 - ✅ Всі модулі компілюються успішно
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
-- ✅ CI/CD: очікується 100% Passing після останніх RAID-фіксів (коміт f2c9dab)
+- ✅ CI/CD: 100% Passing після RAID-фіксів (коміт 079b207)
 
 ### Git статус
-- ✅ Останні зміни закомічені та запушені (raid fixes)
-- ✅ 870+ комітів на main branch
-- ⚠️ Перед операціями перевіряти `git status --short`
+- ✅ Гілка **main**, working tree clean
+- ✅ Останні коміти: `079b207` (STABLE_STATE), `f2c9dab` (raid clustering), `b494aad` (raid tests)
+- ⚠️ Перед операціями: `git status --short`
 
 ### Завершені модулі (100%)
 1. ✅ Core Module
@@ -59,28 +59,47 @@
 - ✅ [`../ADR_001_DISTRIBUTED_RAID.md`](../ADR_001_DISTRIBUTED_RAID.md) - Architecture Decision Record
 - ✅ [`../concept/poolAI_concept.txt`](../concept/poolAI_concept.txt) - Концепція проекту
 
-### Git та Cargo (MSYS2 bash)
+### Git, Cargo, тести (bash / cmd — без PowerShell)
+**MSYS2 bash** (рекомендовано):
 ```bash
-# У MSYS2 UCRT64: export PATH=/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH
+export PATH=/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH
 cd /s/rust/poolAI
+rustup override set stable-x86_64-pc-windows-gnu   # якщо ще не задано
 
 git status --short
 git log --oneline -10
-cargo check
+cargo check --no-default-features --lib
+cargo test --no-default-features --lib
 cargo test --test raid_cross_strategy --test raid_smallworld_integration
 cargo fmt --all
 git add -A && git commit -m "type(scope): subject" && git push origin HEAD
 ```
+**Windows cmd** (з MSYS2 у PATH):
+```bat
+set PATH=C:\msys64\ucrt64\bin;C:\msys64\usr\bin;%PATH%
+cd /d s:\rust\poolAI
+cargo check --no-default-features --lib
+cargo test --no-default-features --lib
+```
+**Bin-скрипти**: `bin/` — `git-status.sh`, `cargo-check.sh`, `cargo-test.sh`, `cargo-fmt.sh` (див. нижче).
 
 ---
 
-## 🎯 Наступні кроки
+## 🎯 Наступні кроки (Rust Architect)
+
+**Детально**: `docs/development/RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md`
+
+1. **Priority 1 — Cloud SDK** (75%→100%): AWS init, GCP token refresh, integration tests. Файли: `src/cloud/providers/aws.rs`, `gcp.rs`.
+2. **Priority 2 — RAID Admin** (95%→100%): Burst/SmallWorld metrics, Administrative Control Plane. Файли: `src/raid/burst_raid.rs`, `small_world.rs`, новий `admin.rs`.
+3. **Priority 3 — Enterprise** (85%→100%): SAML SSO, Monitoring persistence. Файли: `src/enterprise/security.rs`, `monitoring.rs`.
+
+**Базові команди** (bash, без PS): `bin/git-status.sh`, `bin/cargo-check.sh`, `bin/cargo-test.sh`, `bin/cargo-fmt.sh`.
+
+---
 
 ### Пріоритет 1: UI Write Operations (Week 6-7)
-- Додати write операції до UI модуля
-- Інтеграція з Security (JWT)
-- Валідація даних
-- Integration tests
+- ✅ Write операції в UI реалізовано
+- Інтеграція з Security (JWT), валідація, integration tests
 
 ### Пріоритет 2: VM Module Completion (Week 8-10)
 - ✅ Isolation Module Structure - ЗАВЕРШЕНО (Week 9)
@@ -123,7 +142,7 @@ git add -A && git commit -m "type(scope): subject" && git push origin HEAD
 ### Код
 - **Total Lines**: ~20000+ lines
 - **Modules**: 15 основних модулів (всі 100% завершено)
-- **Tests**: 437+ tests passing (102 unit + 335+ integration); RAID cross/smallworld — 11 тестів ✅
+- **Tests**: 457+ (122 unit + 335+ integration); RAID cross/smallworld — 11 тестів ✅
 - **API Endpoints**: 67+ REST endpoints + WebSocket
 
 ### Розробка
@@ -145,7 +164,7 @@ git add -A && git commit -m "type(scope): subject" && git push origin HEAD
 **Підготовлено**: Rust Architect  
 
 **Останні зміни**:
-- ✅ **RAID CI та тести виправлено** (коміти b494aad … f2c9dab)
+- ✅ **RAID CI та тести** (коміти b494aad … 079b207)
   - ✅ `raid_cross_strategy`: topology init, shutdown, fmt
   - ✅ `raid_smallworld_integration`: `add_test_artifact`, реєстрація нод, `base_replication_factor` assert
   - ✅ **Clustering coefficient formula**: знаменник `k*(k-1)` замість `possible_edges` (було до 2, тепер [0,1])

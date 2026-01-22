@@ -1,14 +1,14 @@
 # 🏗️ Rust Architect - Наступні кроки розробки
 ## Оновлено: 2026-01-19
 
-**Статус проекту**: v0.1.0 Production Ready ✅  
+**Статус проекту**: v0.2.0 Production Ready ✅  
 **Загальний прогрес**: 100% (всі 15 модулів завершено)  
-**Тести**: 410+ passing (102 unit + 308+ integration)  
-**Наступна версія**: v0.2.0 (Optional Enhancements)
+**Тести**: 457+ passing (122 unit + 335+ integration)  
+**Наступна версія**: v0.3.0 (Optional Enhancements)
 
 ---
 
-## 🎯 Поточний стан проекту (v0.1.0)
+## 🎯 Поточний стан проекту (v0.2.0)
 
 ### ✅ Завершено на 100%
 
@@ -228,6 +228,23 @@
 3. **Documentation First**:
    - Оновлювати документацію одночасно з кодом
    - Додавати examples для нових features
+
+---
+
+## 🔧 Bin / автоматизація (git, cargo, тести) — без PowerShell
+
+У **MSYS2 bash** або **Git Bash**:
+
+```bash
+bash bin/git-status.sh
+bash bin/cargo-check.sh
+bash bin/cargo-test.sh
+bash bin/cargo-test.sh raid
+bash bin/cargo-fmt.sh
+```
+
+У **cmd** (Windows): `set PATH=C:\msys64\ucrt64\bin;C:\msys64\usr\bin;%PATH%`, потім `cargo check`, `cargo test`.  
+Детально: `docs/status/STABLE_STATE_SUMMARY.md`, `bin/README.md`.
 
 ---
 
