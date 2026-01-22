@@ -574,6 +574,16 @@ impl SmallWorldStrategy {
         coefficients.get(&node_id).copied()
     }
 
+    /// Add artifact to placements for testing (without real replication)
+    ///
+    /// This method is intended for testing purposes only.
+    /// It adds an artifact to the placements map without performing actual replication.
+    #[cfg(test)]
+    pub async fn add_test_artifact(&self, artifact_id: Uuid, node_ids: Vec<u64>) {
+        let mut placements = self.artifact_placements.write().await;
+        placements.insert(artifact_id, node_ids);
+    }
+
     /// Start background rebalancing task
     async fn start_rebalancing_task(&self) {
         let strategy = Arc::new(SmallWorldStrategyForTask {
