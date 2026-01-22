@@ -13,10 +13,10 @@ pub mod automl;
 pub mod federated;
 pub mod optimization;
 
+pub mod experiments;
 pub mod versioning;
 
 // Placeholder submodules — to be implemented per roadmap
-// pub mod experiments;
 // pub mod pipeline;
 
 /// AI/ML status for `/api/enterprise/ai-ml` stub.
