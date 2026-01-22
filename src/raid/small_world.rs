@@ -578,7 +578,10 @@ impl SmallWorldStrategy {
     ///
     /// This method is intended for testing purposes only.
     /// It adds an artifact to the placements map without performing actual replication.
-    #[cfg(any(test, feature = "test-helpers"))]
+    ///
+    /// # Note
+    /// This method is public to allow integration tests to set up test data.
+    /// It should not be used in production code.
     pub async fn add_test_artifact(&self, artifact_id: Uuid, node_ids: Vec<u64>) {
         let mut placements = self.artifact_placements.write().await;
         placements.insert(artifact_id, node_ids);
