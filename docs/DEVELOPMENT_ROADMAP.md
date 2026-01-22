@@ -54,7 +54,7 @@ This document outlines the development roadmap for PoolAI, including completed m
 | VM | ✅ Complete | 100% |
 | UI | ✅ Complete | 100% |
 | Enterprise | ✅ Complete | 100% |
-| Cloud | ✅ Complete | 99% |
+| Cloud | ✅ Complete | 100% |
 
 ### Test Coverage
 
@@ -63,33 +63,26 @@ This document outlines the development roadmap for PoolAI, including completed m
 
 ## Next Steps (Rust Architect — by priority, 2026-01-22)
 
-**Stable state**: v0.2.1 ✅ | 437+ tests ✅ | Cloud SDK 99% ✅ | RAID/Enterprise 100% ✅
+**Stable state**: v0.2.1 ✅ | 437+ tests ✅ | **Cloud SDK 100%** ✅ | RAID/Enterprise 100% ✅
 
-### Priority 1: Cloud SDK — remaining 1% (optional)
+### ~~Priority 1: Cloud SDK — Load Balancing~~ ✅ Done (2026-01-22)
 
-**Status**: 🔄 Optional  
-**Scope**: Load Balancing routing rules, cloud LB init (`src/cloud/loadbalancing.rs` TODOs)
+Routing rules, Cloud LB init. Cloud SDK 100%.
 
-**Tasks**:
-1. Configure routing rules in LoadBalancer
-2. Initialize cloud load balancer (if applicable)
-
-**Estimated Time**: 1–2 days
-
-### Priority 2: v0.2.2 release prep
+### Priority 1: v0.2.2 release prep
 
 **Status**: 🔄 Planned  
 **Tasks**: Changelog, release notes, README updates, optional minor polish.
 
 **Estimated Time**: 1 day
 
-### Priority 3: v0.3.0+ (optional)
+### Priority 2: v0.3.0+ (optional)
 
 **Status**: 🔄 Planned  
 **Tasks**:
-- HPA (Horizontal Pod Autoscaler) initialization for Kubernetes
+- HPA (Horizontal Pod Autoscaler) init for Kubernetes
 - Mock server integration for Cloud SDK tests
-- Stage 4.4 AI/ML Enhancement (Model Optimization, AutoML, Federated Learning, etc.)
+- Stage 4.4 AI/ML (Model Optimization, AutoML, Federated Learning, etc.)
 
 **Estimated Time**: 2–4 weeks (depending on scope)
 

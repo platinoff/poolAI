@@ -18,13 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cloud SDK 99% → 100%
 
 ### Changed
-- **Documentation** (2026-01-22): Stable state, roadmap, next steps by priority
-  - Concept root: Cloud SDK 99%, Next Goal Load Balancing / v0.2.2
-  - DEVELOPMENT_ROADMAP: module status 100%, Next Steps (Rust Architect) by priority
-  - NEXT_STEPS_2026-01-19: v0.2.1 stable, Priority 1–3 (LB routing, v0.2.2, v0.3.0+)
-  - STABLE_STATE_SUMMARY: Cloud 99%, next steps, pre-push hook
-  - CLOUD_SDK_STATUS: Phase 4 Load Balancing ✅, Phase 3.5 Scaling Rules, criteria EC2/ECS ✅
-  - FUTURE_DEVELOPMENT_ROADMAP: v0.2.1, 437+ tests, Cloud 99%
+- **Documentation** (2026-01-22): Актуалізація стабільного стану, roadmap, наступні кроки (Rust Architect)
+  - Concept root: Cloud SDK 100%, Next Goal v0.2.2 → v0.3.0+
+  - DEVELOPMENT_ROADMAP: Cloud 100%, Priority 1 (v0.2.2), Priority 2 (v0.3.0+)
+  - NEXT_STEPS_2026-01-19: Cloud SDK 100%, Load Balancing ✅; P1 v0.2.2, P2 v0.3.0+
+  - STABLE_STATE_SUMMARY: Cloud 100%, останні зміни (LB), next steps
+  - CLOUD_SDK_STATUS: Phase 4 Load Balancing ✅, SDK 100%
+  - FUTURE_DEVELOPMENT_ROADMAP: v0.2.1, 437+ tests, Cloud 100%
 
 ### Planned
 - GlobalState manager for centralized state management

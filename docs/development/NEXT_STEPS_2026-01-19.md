@@ -2,29 +2,34 @@
 ## Оновлено: 2026-01-22
 
 **Поточний статус**: ✅ **STABLE - PRODUCTION READY (v0.2.1)**  
-**Останні досягнення**: RAID Strategy (100% ✅), Enterprise Features (100% ✅), Cloud SDK (99% ✅), Auto-scaling Metrics + Scaling Rules (100% ✅)
+**Останні досягнення**: RAID ✅, Enterprise ✅, **Cloud SDK 100%** ✅ (Auto-scaling Metrics + Scaling Rules ✅, Load Balancing routing rules + Cloud LB init ✅)
+
+---
+
+## 🏗️ Rust Architect — наступні кроки
+
+| Пріоритет | Крок | Оцінка | Статус |
+|-----------|------|--------|--------|
+| **1** | **v0.2.2 release prep** — Changelog, release notes, README | 1 день | 🔄 Рекомендовано |
+| **2** | **v0.3.0+** — HPA init, Mock server integration, Stage 4.4 AI/ML | 2–4 тижні | ⏸️ Опціонально |
+
+**Рекомендація**: розпочати з **Priority 1** (v0.2.2). Команди: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook.
 
 ---
 
 ## 📊 Поточний Стан Пріоритетів
 
-### ✅ Priority 1.1: Cloud SDK - **99%** (Готово до v0.2.1) ✅
+### ✅ Priority 1.1: Cloud SDK - **100%** ✅ (2026-01-22)
 - ✅ AWS SDK initialization - 100%
 - ✅ GCP token refresh - 100%
 - ✅ Azure token acquisition - 100%
 - ✅ Extended integration tests - 85%
-- ✅ **Auto-scaling Metrics Collection - 100%** ✅ (2026-01-22)
-  - ✅ Real metrics collection from Kubernetes Metrics API
-  - ✅ Pod metrics query (CPU, memory)
-  - ✅ Integration with AutoScaler.get_metrics()
-  - ✅ Helper functions для парсингу CPU/memory
-- ✅ **Auto-scaling Scaling Rules - 100%** ✅ (2026-01-22)
-  - ✅ Automatic scaling based on policies
-  - ✅ evaluate_and_scale() method
-  - ✅ ScalingAction result structure
-- ✅ Mock servers реалізовані (потрібна інтеграція в тести)
-- ⏸️ Опціонально: Mock server integration в тести (для v0.3.0+)
-- ⏸️ Опціонально: HPA initialization для Kubernetes (для v0.3.0+)
+- ✅ **Auto-scaling Metrics Collection** ✅ — get_pod_metrics, Metrics API, parse_cpu/memory
+- ✅ **Auto-scaling Scaling Rules** ✅ — evaluate_and_scale(), ScalingAction
+- ✅ **Load Balancing** ✅ (2026-01-22)
+  - ✅ RoutingRule, add_routing_rule, get_routing_rules, default "/*"
+  - ✅ set_cloud_lb_config, Cloud LB init (K8s Service LoadBalancer)
+- ⏸️ Опціонально (v0.3.0+): Mock server integration, HPA init
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
@@ -46,19 +51,13 @@
 
 ## 🎯 Наступні Кроки (Rust Architect — за пріоритетом)
 
-### ⭐ Priority 1: Load Balancing — routing rules (опціонально, ~1–2 дні)
+### ~~Priority 1: Load Balancing~~ ✅ ЗАВЕРШЕНО (2026-01-22)
 
-**Мета**: Завершити Cloud SDK до 100% (залишилось 1%).
-
-**Завдання**:
-1. `src/cloud/loadbalancing.rs`: Configure routing rules (TODO)
-2. `src/cloud/loadbalancing.rs`: Initialize cloud load balancer (if applicable) (TODO)
-
-**Результат**: Cloud SDK 99% → 100%
+- ✅ Routing rules, Cloud LB init. Cloud SDK 100%.
 
 ---
 
-### ⭐ Priority 2: Підготувати v0.2.2 Release (1 день)
+### ⭐ Priority 1: Підготувати v0.2.2 Release (1 день)
 
 **Мета**: Release notes та документація для v0.2.2.
 
@@ -71,7 +70,7 @@
 
 ---
 
-### ⭐ Priority 3: Опціональні Features (v0.3.0+)
+### ⭐ Priority 2: Опціональні Features (v0.3.0+)
 
 **Мета**: Додаткові features для v0.3.0+.
 
@@ -92,11 +91,10 @@
 
 ## 📋 Рекомендація (Rust Architect)
 
-**Рекомендований наступний крок**: **Priority 1** (Load Balancing routing rules) — опціонально; або **Priority 2** (v0.2.2 release prep).
+**Рекомендований наступний крок**: **Priority 1** — підготовка v0.2.2 release (Changelog, release notes, README).
 
-**Після Priority 1**:
-- → Priority 2 (v0.2.2 Release)
-- → Або Priority 3 (v0.3.0+ опціональні features)
+**Далі**:
+- → **Priority 2** (v0.3.0+): HPA init, Mock server integration, Stage 4.4 AI/ML
 
 ---
 
@@ -105,7 +103,7 @@
 ### Cloud Module
 - `src/cloud/providers/gcp.rs`: google-cloud-compute-v1 crate (опціонально)
 - `src/cloud/providers/azure.rs`: Compute client, location config (опціонально)
-- `src/cloud/loadbalancing.rs`: Routing rules, cloud load balancer (Priority 1 — опціонально)
+- ~~`src/cloud/loadbalancing.rs`: Routing rules, cloud LB~~ ✅ ЗАВЕРШЕНО (2026-01-22)
 - ~~`src/cloud/autoscaling.rs`: Metrics collection~~ ✅ ЗАВЕРШЕНО (2026-01-22)
 
 ### Runtime Module
@@ -120,12 +118,12 @@
 
 ## 🎯 План Дій
 
-1. **Зараз**: Обрати пріоритет (1: Load Balancing, 2: v0.2.2 release, 3: v0.3.0+)
+1. **Зараз**: **Priority 1** — v0.2.2 release prep (або **Priority 2** — v0.3.0+)
 2. **Далі**: Реалізувати обраний крок
-3. **Після**: Git push (pre-push: `cargo fmt --all`), оновлення документації
+3. **Після**: `cargo fmt --all`, git push (pre-push hook), оновлення документації
 
 ---
 
 **Підготовлено**: Rust Architect  
 **Дата**: 2026-01-22  
-**Статус**: Stable v0.2.1; наступні кроки за пріоритетом
+**Статус**: Stable v0.2.1; Cloud SDK 100%; наступні кроки — v0.2.2 → v0.3.0+

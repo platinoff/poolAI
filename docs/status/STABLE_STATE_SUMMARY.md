@@ -89,11 +89,10 @@ cargo test --no-default-features --lib
 
 **Детально**: `docs/development/NEXT_STEPS_2026-01-19.md`
 
-1. **Priority 1 — Load Balancing** (опціонально): Routing rules, cloud LB init. Файл: `src/cloud/loadbalancing.rs`. Cloud SDK 99%→100%.
-2. **Priority 2 — v0.2.2 release**: Changelog, release notes, README.
-3. **Priority 3 — v0.3.0+** (опціонально): HPA init, Mock server integration, Stage 4.4 AI/ML.
+1. **Priority 1 — v0.2.2 release**: Changelog, release notes, README. (~1 день)
+2. **Priority 2 — v0.3.0+** (опціонально): HPA init, Mock server integration, Stage 4.4 AI/ML.
 
-**Стабільний стан**: v0.2.1 ✅ | Cloud SDK 99% ✅ | RAID/Enterprise 100% ✅ | Auto-scaling Metrics + Scaling Rules ✅ (2026-01-22).
+**Стабільний стан**: v0.2.1 ✅ | **Cloud SDK 100%** ✅ | RAID/Enterprise 100% ✅ | Load Balancing routing rules + Cloud LB init ✅ (2026-01-22).
 
 **Базові команди** (MSYS2 bash, без PS): `bin/git-status.sh`, `bin/cargo-check.sh`, `bin/cargo-test.sh`, `bin/cargo-fmt.sh`; перед push — pre-push hook.
 
@@ -154,7 +153,7 @@ cargo test --no-default-features --lib
 - **Documentation**: Complete
 - **Cursor Settings**: Optimized (2026-01-19)
 - **Environment Setup**: Automated (MSVC & Rust environment scripts) ✅
-- **Cloud SDK Progress**: 99% (AWS/GCP/Azure ✅, Auto-scaling Metrics ✅, Scaling Rules evaluate_and_scale ✅, Extended tests ✅)
+- **Cloud SDK Progress**: 100% (AWS/GCP/Azure ✅, Auto-scaling ✅, Load Balancing routing rules + Cloud LB init ✅)
 - **RAID Strategy Progress**: 100% (BurstRAID ✅, SmallWorld ✅, Metrics ✅, Integration tests ✅, Admin Control Plane ✅)
 - **Enterprise Features Progress**: 100% (SQLite persistence ✅, GitHub OAuth2 ✅, SAML SSO ✅)
 
@@ -166,12 +165,10 @@ cargo test --no-default-features --lib
 **Підготовлено**: Rust Architect  
 
 **Останні зміни** (2026-01-22):
-- ✅ **Cloud SDK Auto-scaling** (Metrics + Scaling Rules)
-  - ✅ `get_pod_metrics()` в KubernetesManager, PodMetrics, parse_cpu_millicores/parse_memory_kibibytes
-  - ✅ AutoScaler.get_metrics() з реальним Metrics API
-  - ✅ `evaluate_and_scale()`, ScalingAction
-  - ✅ Cloud SDK progress: 99%
-- ✅ **Stable state оновлено**: concept, roadmap, NEXT_STEPS, STABLE_STATE_SUMMARY
+- ✅ **Cloud SDK 100%** — Load Balancing routing rules + Cloud LB init
+  - ✅ RoutingRule, add_routing_rule, get_routing_rules, default "/*"
+  - ✅ set_cloud_lb_config, K8s Service LoadBalancer init
+- ✅ **Cloud SDK Auto-scaling** — Metrics + Scaling Rules (get_pod_metrics, evaluate_and_scale)
 - ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, Admin Control Plane ✅
 - ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO ✅
 - ✅ **UI/UX, Admin Panel 100%** ✅
