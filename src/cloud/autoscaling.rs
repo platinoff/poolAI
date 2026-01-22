@@ -31,7 +31,7 @@
 //! // Or use automatic scaling based on policies
 //! let action = autoscaler.evaluate_and_scale("worker-pool").await?;
 //! if let Some(scaling) = action {
-//!     println!("Scaled {}: {} -> {} ({})", 
+//!     println!("Scaled {}: {} -> {} ({})",
 //!         scaling.action, scaling.from_replicas, scaling.to_replicas, scaling.reason);
 //! }
 //!
@@ -153,12 +153,12 @@ impl AutoScaler {
         // Metrics collection: ✅ Implemented via get_metrics() method
         // - Real metrics collection from Kubernetes Metrics API (when k8s_manager is available)
         // - Fallback to placeholder metrics when Metrics API is unavailable
-        
+
         // Scaling rules: ✅ Configured via ScalingPolicy
         // - Default CPU policy added (target: 70%, scale up: 80%, scale down: 50%)
         // - Additional policies can be added via add_policy()
         // - Automatic scaling can be triggered via evaluate_and_scale()
-        
+
         // TODO: Initialize HPA (Horizontal Pod Autoscaler) for Kubernetes
         // - Create HPA resource via Kubernetes API
         // - Configure HPA with scaling policies
@@ -411,7 +411,8 @@ impl AutoScaler {
 
                 if current_replicas > 0 {
                     let pods = k8s_manager.list_pods().await.unwrap_or_default();
-                    let matching_pods: Vec<String> = pods.iter()
+                    let matching_pods: Vec<String> = pods
+                        .iter()
                         .filter(|p| p.starts_with(resource_id))
                         .cloned()
                         .collect();
@@ -423,13 +424,16 @@ impl AutoScaler {
                                 // Convert millicores to usage ratio (assuming 1 core = 1000m per pod)
                                 // For simplicity, we'll use a default CPU limit of 1000m per pod
                                 let cpu_limit_millicores = 1000.0;
-                                let cpu_usage_ratio = (pod_metrics.cpu_millicores / cpu_limit_millicores).min(1.0);
+                                let cpu_usage_ratio =
+                                    (pod_metrics.cpu_millicores / cpu_limit_millicores).min(1.0);
                                 total_cpu_usage += cpu_usage_ratio;
 
                                 // Convert Kibibytes to usage ratio (assuming 1Gi = 1048576 KiB per pod)
                                 // For simplicity, we'll use a default memory limit of 1Gi per pod
                                 let memory_limit_kibibytes = 1024.0 * 1024.0; // 1 GiB
-                                let memory_usage_ratio = (pod_metrics.memory_kibibytes / memory_limit_kibibytes).min(1.0);
+                                let memory_usage_ratio = (pod_metrics.memory_kibibytes
+                                    / memory_limit_kibibytes)
+                                    .min(1.0);
                                 total_memory_usage += memory_usage_ratio;
 
                                 pod_count += 1;
@@ -572,7 +576,10 @@ impl AutoScaler {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn evaluate_and_scale(&self, resource_id: &str) -> Result<Option<ScalingAction>, AppError> {
+    pub async fn evaluate_and_scale(
+        &self,
+        resource_id: &str,
+    ) -> Result<Option<ScalingAction>, AppError> {
         if resource_id.is_empty() {
             return Err(AppError::ValidationError(
                 "Resource ID cannot be empty. Context: Attempted to evaluate and scale with empty resource ID. \
@@ -591,7 +598,7 @@ impl AutoScaler {
         // Evaluate each policy
         for policy in &policies {
             let metric_value = match policy.metric_type.as_str() {
-                "CPU" => metrics.cpu_usage * 100.0, // Convert to percentage
+                "CPU" => metrics.cpu_usage * 100.0,       // Convert to percentage
                 "Memory" => metrics.memory_usage * 100.0, // Convert to percentage
                 "RequestRate" => metrics.request_rate,
                 _ => continue, // Skip unknown metric types
@@ -601,12 +608,15 @@ impl AutoScaler {
             if metric_value >= policy.scale_up_threshold {
                 let new_replicas = (metrics.current_replicas as f64 * 1.5).ceil() as u32;
                 let target_replicas = new_replicas.min(max_replicas);
-                
+
                 if target_replicas > metrics.current_replicas {
                     info!(
                         "Policy '{}' triggered scale up: {} -> {} (metric: {:.1}% >= {:.1}%)",
-                        policy.name, metrics.current_replicas, target_replicas,
-                        metric_value, policy.scale_up_threshold
+                        policy.name,
+                        metrics.current_replicas,
+                        target_replicas,
+                        metric_value,
+                        policy.scale_up_threshold
                     );
                     self.scale_up(resource_id, target_replicas).await?;
                     return Ok(Some(ScalingAction {
@@ -619,15 +629,20 @@ impl AutoScaler {
             }
 
             // Check scale down condition
-            if metric_value <= policy.scale_down_threshold && metrics.current_replicas > min_replicas {
+            if metric_value <= policy.scale_down_threshold
+                && metrics.current_replicas > min_replicas
+            {
                 let new_replicas = (metrics.current_replicas as f64 * 0.75).floor() as u32;
                 let target_replicas = new_replicas.max(min_replicas);
-                
+
                 if target_replicas < metrics.current_replicas {
                     info!(
                         "Policy '{}' triggered scale down: {} -> {} (metric: {:.1}% <= {:.1}%)",
-                        policy.name, metrics.current_replicas, target_replicas,
-                        metric_value, policy.scale_down_threshold
+                        policy.name,
+                        metrics.current_replicas,
+                        target_replicas,
+                        metric_value,
+                        policy.scale_down_threshold
                     );
                     self.scale_down(resource_id, target_replicas).await?;
                     return Ok(Some(ScalingAction {

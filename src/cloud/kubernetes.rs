@@ -1863,15 +1863,24 @@ impl KubernetesManager {
                 let mut total_cpu_millicores = 0.0;
                 let mut total_memory_kibibytes = 0.0;
 
-                if let Some(containers) = metrics_json.get("containers").and_then(|c| c.as_array()) {
+                if let Some(containers) = metrics_json.get("containers").and_then(|c| c.as_array())
+                {
                     for container in containers {
                         // Parse CPU usage (format: "100m" = 100 millicores, "1" = 1000 millicores)
-                        if let Some(cpu) = container.get("usage").and_then(|u| u.get("cpu")).and_then(|c| c.as_str()) {
+                        if let Some(cpu) = container
+                            .get("usage")
+                            .and_then(|u| u.get("cpu"))
+                            .and_then(|c| c.as_str())
+                        {
                             total_cpu_millicores += parse_cpu_millicores(cpu);
                         }
 
                         // Parse memory usage (format: "128Mi" = 128 MiB, "1Gi" = 1024 MiB)
-                        if let Some(memory) = container.get("usage").and_then(|u| u.get("memory")).and_then(|m| m.as_str()) {
+                        if let Some(memory) = container
+                            .get("usage")
+                            .and_then(|u| u.get("memory"))
+                            .and_then(|m| m.as_str())
+                        {
                             total_memory_kibibytes += parse_memory_kibibytes(memory);
                         }
                     }
@@ -3151,13 +3160,10 @@ fn build_vm_deployment(
 fn parse_cpu_millicores(cpu_str: &str) -> f64 {
     if cpu_str.ends_with('m') {
         // Format: "100m" = 100 millicores
-        cpu_str.trim_end_matches('m')
-            .parse::<f64>()
-            .unwrap_or(0.0)
+        cpu_str.trim_end_matches('m').parse::<f64>().unwrap_or(0.0)
     } else {
         // Format: "1" or "1.5" = cores, convert to millicores
-        cpu_str.parse::<f64>()
-            .unwrap_or(0.0) * 1000.0
+        cpu_str.parse::<f64>().unwrap_or(0.0) * 1000.0
     }
 }
 
@@ -3167,31 +3173,37 @@ fn parse_cpu_millicores(cpu_str: &str) -> f64 {
 /// Supports formats: "128Ki" (128 KiB), "128Mi" (128 MiB = 131072 KiB), "1Gi" (1 GiB = 1048576 KiB)
 fn parse_memory_kibibytes(memory_str: &str) -> f64 {
     let memory_str = memory_str.trim();
-    
+
     if memory_str.ends_with("Ki") {
         // Format: "128Ki" = 128 Kibibytes
-        memory_str.trim_end_matches("Ki")
+        memory_str
+            .trim_end_matches("Ki")
             .parse::<f64>()
             .unwrap_or(0.0)
     } else if memory_str.ends_with("Mi") {
         // Format: "128Mi" = 128 MiB = 128 * 1024 KiB
-        memory_str.trim_end_matches("Mi")
+        memory_str
+            .trim_end_matches("Mi")
             .parse::<f64>()
-            .unwrap_or(0.0) * 1024.0
+            .unwrap_or(0.0)
+            * 1024.0
     } else if memory_str.ends_with("Gi") {
         // Format: "1Gi" = 1 GiB = 1024 * 1024 KiB
-        memory_str.trim_end_matches("Gi")
+        memory_str
+            .trim_end_matches("Gi")
             .parse::<f64>()
-            .unwrap_or(0.0) * 1024.0 * 1024.0
+            .unwrap_or(0.0)
+            * 1024.0
+            * 1024.0
     } else if memory_str.ends_with('i') {
         // Handle other binary units (Ti, Pi, etc.) - not common for pod metrics
-        memory_str.trim_end_matches('i')
+        memory_str
+            .trim_end_matches('i')
             .parse::<f64>()
             .unwrap_or(0.0)
     } else {
         // Assume bytes if no unit specified, convert to KiB
-        memory_str.parse::<f64>()
-            .unwrap_or(0.0) / 1024.0
+        memory_str.parse::<f64>().unwrap_or(0.0) / 1024.0
     }
 }
 
