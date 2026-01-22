@@ -2124,6 +2124,175 @@ async fn oauth2_telegram_callback_handler(
 }
 
 // ============================================================================
+// SAML SSO Authentication Handlers
+// ============================================================================
+
+#[cfg(feature = "enterprise")]
+async fn saml_auth_handler(Path(provider): Path<String>) -> impl IntoResponse {
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    // Generate SAML SSO URL
+    match manager.get_saml_sso_url(&provider).await {
+        Ok(sso_url) => {
+            // Redirect to SAML Identity Provider SSO page
+            Redirect::temporary(&sso_url).into_response()
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to generate SAML SSO URL. Context: Cannot generate SSO URL for SAML provider. Suggestion: Verify SAML provider configuration. Error: {}", e)
+            })),
+        )
+            .into_response(),
+    }
+}
+
+#[cfg(feature = "enterprise")]
+#[derive(Deserialize)]
+struct SamlCallbackForm {
+    SAMLResponse: String,
+    RelayState: Option<String>,
+}
+
+#[cfg(feature = "enterprise")]
+async fn saml_callback_handler(
+    Path(provider): Path<String>,
+    Form(form): Form<SamlCallbackForm>,
+) -> impl IntoResponse {
+    let manager = enterprise::security::get_global_security_manager();
+
+    // Ensure manager is initialized
+    if let Err(e) = manager.initialize().await {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    // Validate SAML assertion and extract user attributes
+    let attributes = match manager
+        .validate_saml_assertion(&provider, &form.SAMLResponse)
+        .await
+    {
+        Ok(attrs) => attrs,
+        Err(e) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": format!("Failed to validate SAML assertion. Context: SAML response validation failed. Suggestion: Verify SAML response format and provider configuration. Error: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Extract user information from SAML attributes
+    // Map SAML attributes to user fields (nameid, email, etc.)
+    let nameid = attributes
+        .get("nameid")
+        .or_else(|| attributes.get("NameID"))
+        .cloned()
+        .unwrap_or_else(|| "saml_user".to_string());
+    let email = attributes
+        .get("email")
+        .or_else(|| attributes.get("Email"))
+        .or_else(|| attributes.get("mail"))
+        .cloned();
+    let username = attributes
+        .get("username")
+        .or_else(|| attributes.get("Username"))
+        .or_else(|| attributes.get("uid"))
+        .cloned()
+        .unwrap_or_else(|| nameid.clone());
+
+    // Get or create user in PoolAI
+    let user_manager = crate::network::auth::get_global_user_manager();
+    if let Err(e) = user_manager.initialize().await {
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("User manager initialization failed. Context: Cannot initialize user manager. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response();
+    }
+
+    // Try to find existing user by username
+    let poolai_user = user_manager
+        .get_user_by_username(&username)
+        .await
+        .unwrap_or(None);
+
+    let (final_username, role) = if let Some(user) = poolai_user {
+        (user.username.clone(), user.role)
+    } else {
+        // Create new user with Viewer role by default
+        match user_manager
+            .create_user(
+                username.clone(),
+                format!("saml_{}_{}", provider, nameid),
+                crate::network::auth::UserRole::Viewer,
+            )
+            .await
+        {
+            Ok(new_user) => (new_user.username, crate::network::auth::UserRole::Viewer),
+            Err(e) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({
+                        "error": format!("Failed to create user. Context: Cannot create user from SAML attributes. Suggestion: Verify user creation configuration. Error: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+        }
+    };
+
+    // Generate PoolAI JWT token
+    let poolai_token = match crate::network::auth::generate_token(&final_username, role.clone()) {
+        Ok(token) => token,
+        Err(e) => {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "error": format!("Failed to generate token. Context: Cannot generate JWT token after SAML authentication. Suggestion: Check JWT configuration. Error: {}", e)
+                })),
+            )
+                .into_response();
+        }
+    };
+
+    // Redirect to UI with token
+    // Use RelayState if provided, otherwise default to /ui/auth
+    let redirect_path = form
+        .RelayState
+        .unwrap_or_else(|| "/ui/auth".to_string());
+    let redirect_url = format!(
+        "{}?token={}&username={}&role={:?}",
+        redirect_path,
+        urlencoding::encode(&poolai_token),
+        urlencoding::encode(&final_username),
+        role
+    );
+
+    Redirect::temporary(&redirect_url).into_response()
+}
+
+// ============================================================================
 // Non-enterprise stub
 // ============================================================================
 
