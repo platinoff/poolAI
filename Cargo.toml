@@ -128,7 +128,7 @@ aws-sdk-ecs = { version = "1.30", optional = true }
 aws-sdk-s3 = { version = "1.30", optional = true }
 # Azure SDK (older versions compatible with Rust 1.70+)
 azure_core = { version = "0.30", optional = true }
-azure_identity = { version = "0.30", optional = true }
+azure_identity = { version = "0.31", optional = true }
 azure_mgmt_compute = { version = "0.21", optional = true }  # Latest available version
 # GCP SDK (using google-cloud-rust crates)
 # Note: google-cloud-rust may not exist, using placeholder for now
