@@ -36,7 +36,7 @@ tokio-stream = "0.1"
 # Use: cargo build --features jwt
 # Note: Requires native toolchain (gcc/dlltool on Windows GNU)
 # Without this feature, uses fallback base64 encoding (dev only, NOT SECURE)
-jsonwebtoken = { version = "10.2", optional = true, features = ["rust_crypto"] }
+jsonwebtoken = { version = "10.3", optional = true, features = ["rust_crypto"] }
 
 # HTTPS/TLS support (optional - enabled with feature "https")
 # Use: cargo build --features https
@@ -56,7 +56,7 @@ chrono = { version = "0.4", features = ["serde"] }
 # Note: chrono is also used by aws-sign-v4 for timestamps
 
 # UUID generation
-uuid = { version = "1.19", features = ["v4", "serde"] }
+uuid = { version = "1.20", features = ["v4", "serde"] }
 
 # CPU detection
 num_cpus = "1.17"
@@ -85,7 +85,7 @@ flate2 = "1.0"
 tar = "0.4"
 # zip default features enable bzip2 + zstd, which require a C toolchain (gcc.exe) on windows-gnu.
 # Keep it minimal/pure-Rust for now.
-zip = { version = "7.0", default-features = false, features = ["deflate", "time"] }
+zip = { version = "7.2", default-features = false, features = ["deflate", "time"] }
 
 # Checksum verification
 sha2 = "0.10"
@@ -123,9 +123,9 @@ aws-sign-v4 = { version = "0.3", optional = true }
 http = { version = "1", optional = true }
 # AWS SDK (requires Rust 1.88+, now available with Rust 1.92.0)
 aws-config = { version = "1.1", optional = true }
-aws-sdk-ec2 = { version = "1.30", optional = true }
+aws-sdk-ec2 = { version = "1.206", optional = true }
 aws-sdk-ecs = { version = "1.30", optional = true }
-aws-sdk-s3 = { version = "1.30", optional = true }
+aws-sdk-s3 = { version = "1.121", optional = true }
 # Azure SDK (older versions compatible with Rust 1.70+)
 azure_core = { version = "0.30", optional = true }
 azure_identity = { version = "0.30", optional = true }
