@@ -17,6 +17,7 @@
 - **Current Project Status**: `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` (most up-to-date)
 - **Stable State**: `docs/status/STABLE_STATE_SUMMARY.md`
 - **Development Plans**: `docs/development/NEXT_STEPS_PLAN.md` or `docs/development/NEXT_STEPS_2026-01-19.md`
+- **Cursor & next steps verification**: `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` (Cursor settings, doc cleanup list, next steps)
 - **Project README**: `README.md` (in root)
 - **Documentation Index**: `docs/README.md`
 - **Helper File**: `file_list.csv` (108254+ lines, file inventory for navigation)

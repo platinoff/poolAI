@@ -61,28 +61,32 @@ This document outlines the development roadmap for PoolAI, including completed m
 - **Policy**: підтверджувати через `cargo test` перед релізом
 - **CI Gate**: `cargo fmt`, `cargo clippy`, `cargo test`
 
-## Next Steps (Rust Architect — by priority, 2026-01-22)
+## Next Steps (Rust Architect — by priority, доадаптація 2026-03-04)
 
-**Stable state**: v0.2.1 ✅ | 437+ tests ✅ | **Cloud SDK 100%** ✅ | RAID/Enterprise 100% ✅
+**Stable state**: v0.2.2 ✅ | **Cloud SDK 100%** ✅ | HPA init ✅ | Load Balancing ✅ | RAID/Enterprise 100% ✅ | Stage 4.4 AI/ML (stubs + ML.4–ML.6, Context Memory, Runtime library на main — перевірити `git log`).
+
+**Детально**: `docs/status/STABLE_STATE_SUMMARY.md`, `docs/development/NEXT_STEPS_2026-01-19.md`.
 
 ### ~~Priority 1: Cloud SDK — Load Balancing~~ ✅ Done (2026-01-22)
 
 Routing rules, Cloud LB init. Cloud SDK 100%.
 
-### Priority 1: v0.2.2 release prep
+### ~~Priority 1: v0.2.2 release prep~~ ✅ Done (2026-01-22)
 
-**Status**: 🔄 Planned  
-**Tasks**: Changelog, release notes, README updates, optional minor polish.
+Changelog, release notes, README, version bump.
 
-**Estimated Time**: 1 day
+### Priority 0 (операційно): Git
 
-### Priority 2: v0.3.0+ (optional)
+Перевірити `git status --short`, `git log origin/main..HEAD --oneline`. Якщо main ahead of origin — push у зовнішньому MSYS2 bash (PAT/SSH).
 
-**Status**: 🔄 Planned  
-**Tasks**:
-- HPA (Horizontal Pod Autoscaler) init for Kubernetes
-- Mock server integration for Cloud SDK tests
-- Stage 4.4 AI/ML (Model Optimization, AutoML, Federated Learning, etc.)
+### Priority 2: v0.3.0 (на main)
+
+**Status**: Залежить від стану гілки main  
+**Tasks**: Якщо на main є ML.4–ML.6, Context Memory, Runtime Instance library — `cargo test`, оновити CHANGELOG (Unreleased → [0.3.0]), версію в Cargo.toml/version.rs, release.
+
+### Priority 3: v0.3.0+ далі (опціонально)
+
+**Tasks**: ML.1 pruning strategies; ML.2/ML.3 повна реалізація (pipeline, aggregation); performance (connection pooling, API cache, SQLite); UI (Chart.js, таблиці, пошук).
 
 **Estimated Time**: 2–4 weeks (depending on scope)
 
@@ -112,6 +116,13 @@ Routing rules, Cloud LB init. Cloud SDK 100%.
 5. **Observability**: Comprehensive logging and metrics
 
 ## Version History
+
+### Version 14.0 (2026-03-04)
+- ✅ Доадаптація docs: стабільний стан та наступні кроки
+- ✅ STABLE_STATE_SUMMARY: Git статус (ahead of origin), актуальні документи (таблиця), P0–P2 наступні кроки
+- ✅ NEXT_STEPS_2026-01-19: ML.4–ML.6, Context Memory, Runtime library на main; план дій (git → v0.3.0 → ML.1/ML.2/ML.3)
+- ✅ DEVELOPMENT_ROADMAP: Next Steps оновлено під v0.2.2 done, P0 git, P2 v0.3.0 на main, P3 далі
+- ✅ CURSOR_AND_NEXT_STEPS_VERIFICATION: секція 3 узгоджена з новим станом і кроками
 
 ### Version 13.0 (2026-01-22)
 - ✅ Updated module completion: Libs/RAID/VM/UI/Enterprise 100%, Cloud 99%

@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect Analysis - 2026-01-22 (актуалізовано - Cloud SDK 100%, HPA init ✅, v0.2.2)
+## Rust Architect — доадаптовано 2026-03-04 (v0.2.2, Stage 4.4 AI/ML у розвитку)
 
 ---
 
@@ -16,9 +16,10 @@
 - ✅ CI/CD: Виправлено rustfmt/clippy components у всіх workflows, форматування коду виправлено, очікується 100% Passing
 
 ### Git статус
-- ✅ Гілка **main**, working tree clean
+- ✅ Гілка **main**
+- ⚠️ Можливо **ahead of origin** (локальні коміти не запушені) — перевіряти: `git status --short`, `git log origin/main..HEAD --oneline`
 - ✅ Pre-push hook: `cargo fmt --all --check` перед push
-- ⚠️ Перед операціями: `git status --short`
+- **Рекомендація**: push тільки з зовнішнього MSYS2 bash; перед операціями завжди перевіряти статус
 
 ### Завершені модулі (100%)
 1. ✅ Core Module
@@ -51,13 +52,15 @@
 
 ## 📚 Документація
 
-### Актуальні документи
-- ✅ [`CURRENT_STATUS.md`](./CURRENT_STATUS.md) - Поточний стан (v10.0)
-- ✅ [`../development/DEVELOPMENT_PLAN_UPDATED.md`](../development/DEVELOPMENT_PLAN_UPDATED.md) - План розробки
-- ✅ [`../archive/DISTRIBUTED_RAID_COMPLETE_MILESTONE.md`](../archive/DISTRIBUTED_RAID_COMPLETE_MILESTONE.md) - Distributed RAID milestone
-- ✅ [`../development/NEXT_DEVELOPMENT_PHASE.md`](../development/NEXT_DEVELOPMENT_PHASE.md) - План наступної фази
-- ✅ [`../ADR_001_DISTRIBUTED_RAID.md`](../ADR_001_DISTRIBUTED_RAID.md) - Architecture Decision Record
-- ✅ [`../concept/poolAI_concept.txt`](../concept/poolAI_concept.txt) - Концепція проекту
+### Актуальні документи (орієнтири)
+| Призначення | Файл |
+|-------------|------|
+| Стабільний стан | `docs/status/STABLE_STATE_SUMMARY.md` (цей файл) |
+| Наступні кроки | `docs/development/NEXT_STEPS_2026-01-19.md` |
+| Перевірка Cursor і кроки | `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` |
+| Концепт (PRIMARY) | `docs/concept/poolAI_concept_root.txt` |
+| Roadmap | `docs/DEVELOPMENT_ROADMAP.md` |
+| Git push | `.cursor/commands/git-push.md`, `docs/troubleshooting/GIT_PUSH_FAILED.md` |
 
 ### Git, Cargo, тести (тільки MSYS2 bash — без PS, без cmd)
 
@@ -82,10 +85,21 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 
 **Детально**: `docs/development/NEXT_STEPS_2026-01-19.md`
 
-1. **Priority 1 — v0.2.2 release**: ✅ Завершено (Changelog, README, version bump)
-2. **Priority 2 — v0.3.0+** (опціонально): Mock server integration, Stage 4.4 AI/ML (HPA init ✅).
+**Коротко за пріоритетами:**
 
-**Стабільний стан**: v0.2.2 ✅ | **Cloud SDK 100%** ✅ | HPA init ✅ | RAID/Enterprise 100% ✅ | Load Balancing ✅ (2026-01-22).
+1. **P0 (операційно)**  
+   - Перевірити `git status --short`; якщо main **ahead of origin** — вирішити push у зовнішньому MSYS2 bash (PAT/SSH).  
+   - Перед push: `cargo fmt --all`, `cargo test` (або повний набір тестів).
+
+2. **P1 — v0.2.2**  
+   - ✅ Завершено (Changelog, README, version bump, Cloud SDK 100%, HPA init, Load Balancing).
+
+3. **P2 — v0.3.0+ (наступні кроки розробки)**  
+   - **ML на main (якщо вже закомічено)**: ML.4 Model Versioning, ML.5 Experiment Tracking, ML.6 Pipeline Management, Context Memory, Runtime Instance library loading — підтвердити тестами, при потребі оновити CHANGELOG і випустити v0.3.0.  
+   - **Далі по ML**: ML.1 pruning strategies; ML.2/ML.3 — повна реалізація pipeline/aggregation для AutoML і Federated Learning.  
+   - **Опціонально**: Mock server e2e покращення, performance (connection pooling, API cache, SQLite), UI (Chart.js, таблиці, пошук).
+
+**Стабільний стан**: v0.2.2 ✅ | Cloud SDK 100% ✅ | HPA init ✅ | RAID/Enterprise 100% ✅ | Load Balancing ✅ | Stage 4.4 AI/ML (stubs + ML.4–ML.6 у розвитку/на main).
 
 **Базові команди** (MSYS2 bash only): `cargo check`, `cargo test`, `cargo fmt --all`; git — copy-paste блок з `.cursor/commands/git-push.md` (без .sh). Pre-push hook: `cargo fmt --all --check`.
 
@@ -153,17 +167,16 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 ---
 
 **Статус**: ✅ **STABLE - PRODUCTION READY**  
-**Версія**: v0.2.2 Released ✅  
-**Дата**: 2026-01-22 (актуалізовано)  
+**Версія**: v0.2.2 ✅ (у репо; на main можуть бути коміти для v0.3.0)  
+**Дата документу**: 2026-03-04 (доадаптація)  
 **Підготовлено**: Rust Architect  
 
-**Останні зміни** (2026-01-22):
-- ✅ **HPA init** — create_hpa, hpa_exists, ensure_hpa_for (K8s autoscaling/v2, CPU-based)
-- ✅ **Cloud SDK 100%** — Load Balancing ✅, Auto-scaling ✅ (Metrics + Scaling Rules, get_pod_metrics, evaluate_and_scale)
-  - ✅ RoutingRule, add_routing_rule, set_cloud_lb_config, K8s Service LoadBalancer init
-- ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, Admin Control Plane ✅
-- ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO ✅
-- ✅ **UI/UX, Admin Panel 100%** ✅
+**Останні досягнення (орієнтир)**:
+- ✅ **Cloud SDK 100%** — Load Balancing, Auto-scaling, HPA init, Mock server harness, base_url_override (AWS/GCP/Azure)
+- ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, Admin Control Plane
+- ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO
+- ✅ **UI/UX, Admin Panel 100%**
+- ✅ **Stage 4.4 AI/ML** — scaffolding, ML.1 (optimization, profiling, tuning, quantization), ML.2/ML.3 stubs; на гілці main можуть бути реалізації ML.4 Model Versioning, ML.5 Experiment Tracking, ML.6 Pipeline Management, Context Memory, Runtime Instance library loading — перевіряти `git log -5 --oneline`.
 
 ---
 

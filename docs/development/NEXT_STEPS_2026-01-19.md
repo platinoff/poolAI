@@ -1,8 +1,8 @@
 # 🎯 Наступні Кроки Розробки
-## Оновлено: 2026-01-22
+## Оновлено: 2026-03-04 (доадаптація)
 
 **Поточний статус**: ✅ **STABLE - PRODUCTION READY (v0.2.2)**  
-**Останні досягнення**: RAID ✅, Enterprise ✅, **Cloud SDK 100%** ✅ (Auto-scaling ✅, Load Balancing ✅, **HPA init** ✅ 2026-01-22)
+**Останні досягнення**: Cloud SDK 100% ✅, HPA init ✅, Load Balancing ✅, Stage 4.4 AI/ML (stubs + ML.4–ML.6 та Runtime Instance library на main — перевірити `git log -5`).
 
 ---
 
@@ -10,10 +10,12 @@
 
 | Пріоритет | Крок | Оцінка | Статус |
 |-----------|------|--------|--------|
-| **1** | **v0.2.2 release prep** — Changelog, release notes, README | 1 день | ✅ Завершено |
-| **2** | **v0.3.0+** — Mock server integration, Stage 4.4 AI/ML | 2–4 тижні | ⏸️ Опціонально |
+| **0** | **Git** — перевірити `git status`, при потребі push у MSYS2 bash (PAT/SSH) | — | ⚠️ За потреби |
+| **1** | **v0.2.2 release prep** — Changelog, README, version bump | 1 день | ✅ Завершено |
+| **2** | **v0.3.0+** — ML.4–ML.6, Context Memory, Runtime library (на main) → тести, CHANGELOG, release | 1–2 тижні | 🔄 Залежить від стану main |
+| **3** | **Stage 4.4 далі** — ML.1 pruning, ML.2/ML.3 pipeline/aggregation, Mock e2e | 2–4 тижні | ⏸️ Опціонально |
 
-**Рекомендація**: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook. Далі: Stage 4.4 implementation (P2).
+**Рекомендація**: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook. Спочатку перевірити стан main і кількість комітів ahead of origin.
 
 ---
 
@@ -34,12 +36,13 @@
 - ✅ **Azure base_url_override** (2026-01-22) — set_base_url_override, e2e VMSS mock test
 - ✅ **GCP base_url_override** (2026-01-22) — metadata + Compute API, e2e compute mock test
 - ✅ **AWS base_url_override** (2026-01-22) — EC2 + ECS, e2e mock tests
-- ✅ **Stage 4.4 AI/ML scaffolding** (2026-01-22) — `src/ml`, feature `ml`, `/api/enterprise/ai-ml` stub
-- ✅ **ML.1 Model Optimization stub** — `optimization.rs`, `GET /ai-ml/optimization`
-- ✅ **ML.1 profiling / tuning / quantization** — `ModelProfile`, `profile_model()`, `TuningConfig`/`TuningResult`, `suggest_hyperparams()`, `QuantizationResult`, `apply_quantization()`; `GET /ai-ml/optimization/profile`, `/tuning`, `/quantization-result`
-- ✅ **ML.2 AutoML stub** — `automl.rs`, `GET /ai-ml/automl`
-- ✅ **ML.3 Federated Learning stub** — `federated.rs`, `GET /ai-ml/federated`
-- ⏸️ Далі: ML.2–ML.3 implementation (pipeline, aggregation), ML.1 pruning strategies
+- ✅ **Stage 4.4 AI/ML scaffolding** — `src/ml`, feature `ml`, stubs ML.1–ML.3
+- ✅ **ML.4 Model Versioning** (на main) — lifecycle management
+- ✅ **ML.5 Experiment Tracking** (на main) — lifecycle management
+- ✅ **ML.6 Pipeline Management** (на main) — orchestration
+- ✅ **Context Memory** (на main) — implementation
+- ✅ **Runtime Instance library loading** (на main) — load model from library
+- ⏸️ **Далі**: ML.1 pruning strategies; ML.2/ML.3 повна реалізація (pipeline, aggregation)
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
@@ -127,14 +130,16 @@
 
 ---
 
-## 🎯 План Дій
+## 🎯 План Дій (доадаптація 2026-03-04)
 
-1. **Зараз**: **Priority 2** — ML.1 profiling/tuning/quantization ✅ (v0.2.2 ✅, HPA ✅)
-2. **Далі**: ML.2–ML.3 implementation, ML.1 pruning strategies
-3. **Після**: `cargo fmt --all`, git push (pre-push hook), оновлення документації
+0. **Перед подальшою розробкою**: обробити **6 відкритих Dependabot PR** (#47–#51, #55) — мердж на GitHub, потім `git pull origin main` і `cargo test`. Детально: `docs/PUSH_AND_DEPENDABOT_PREREQUISITE_2026-03-04.md`.
+1. **Зараз**: Перевірити `git status --short` і `git log origin/main..HEAD --oneline`. Якщо є коміти ahead — вирішити push у зовнішньому MSYS2 bash.
+2. **Далі**: Якщо на main є ML.4–ML.6, Context Memory, Runtime library — пройти `cargo test`, оновити CHANGELOG (Unreleased → v0.3.0), за потреби оновити версію в Cargo.toml/version.rs.
+3. **Потім**: ML.1 pruning strategies; ML.2/ML.3 повна реалізація; опціонально performance, UI, CI.
+4. **Перед push**: `cargo fmt --all`, перевірка pre-push hook, оновлення документації.
 
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата**: 2026-01-22  
-**Статус**: Stable v0.2.2; Cloud SDK 100% + HPA init ✅; наступні кроки — v0.3.0+ (Mock server, Stage 4.4)
+**Дата**: 2026-03-04 (доадаптація)  
+**Статус**: Stable v0.2.2; Cloud SDK 100% + HPA + Load Balancing; на main можуть бути ML.4–ML.6, Runtime library; наступні кроки — git push, v0.3.0 prep, ML.1 pruning, ML.2/ML.3.
