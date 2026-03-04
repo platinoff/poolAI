@@ -4,7 +4,7 @@
 //! aggregation (FedAvg, FedProx), round management, and error handling.
 
 use poolai::ml::federated::{
-    AggregationMode, ClientUpdate, FederatedConfig, FederatedLearningPipeline,
+    AggregatedModel, AggregationMode, ClientUpdate, FederatedConfig, FederatedLearningPipeline,
 };
 
 #[tokio::test]
@@ -153,7 +153,7 @@ async fn test_federated_multiple_rounds() {
     pipeline.add_client_update(update1).await.unwrap();
     pipeline.add_client_update(update2).await.unwrap();
 
-    let aggregated1 = pipeline.aggregate_updates().await.unwrap();
+    let aggregated1: AggregatedModel = pipeline.aggregate_updates().await.unwrap();
     assert_eq!(aggregated1.round, 1);
 
     // Round 2
@@ -174,7 +174,7 @@ async fn test_federated_multiple_rounds() {
     pipeline.add_client_update(update3).await.unwrap();
     pipeline.add_client_update(update4).await.unwrap();
 
-    let aggregated2 = pipeline.aggregate_updates().await.unwrap();
+    let aggregated2: AggregatedModel = pipeline.aggregate_updates().await.unwrap();
     assert_eq!(aggregated2.round, 2);
 
     // Verify both rounds are stored

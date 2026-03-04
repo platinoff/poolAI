@@ -3,7 +3,9 @@
 //! Tests the pipeline management functionality including creation,
 //! execution, dependency resolution, and status tracking.
 
-use poolai::ml::pipeline::{MLPipelineManager, PipelineStatus, PipelineStep, StepStatus, StepType};
+use poolai::ml::pipeline::{
+    MLPipeline, MLPipelineManager, PipelineStatus, PipelineStep, StepStatus, StepType,
+};
 use std::collections::HashMap;
 
 #[tokio::test]
@@ -135,7 +137,7 @@ async fn test_execute_pipeline() {
         .await
         .unwrap();
 
-    let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+    let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.status, PipelineStatus::Completed);
     assert!(got.started_at.is_some());
     assert!(got.completed_at.is_some());
@@ -172,7 +174,7 @@ async fn test_execute_pipeline_with_dependencies() {
         .await
         .unwrap();
 
-    let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+    let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.status, PipelineStatus::Completed);
     assert_eq!(got.step_results.len(), 3);
 
@@ -234,7 +236,7 @@ async fn test_get_pipeline() {
     }];
 
     let pipeline = manager.create_pipeline("pipeline1", steps).await.unwrap();
-    let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+    let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.id, pipeline.id);
     assert_eq!(got.name, "pipeline1");
 }
@@ -333,7 +335,7 @@ async fn test_pipeline_with_all_step_types() {
         .await
         .unwrap();
 
-    let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+    let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.status, PipelineStatus::Completed);
     assert_eq!(got.step_results.len(), 4);
 }

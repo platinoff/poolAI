@@ -336,7 +336,7 @@ async fn test_automl_multiple_training_sessions() {
     };
 
     let model1 = pipeline.train(data1).await.unwrap();
-    let best1 = pipeline.get_best_model().await.unwrap();
+    let best1: TrainedModel = pipeline.get_best_model().await.unwrap();
     assert_eq!(model1.model_id, best1.model_id);
 
     // Second training session
@@ -346,7 +346,7 @@ async fn test_automl_multiple_training_sessions() {
     };
 
     let model2 = pipeline.train(data2).await.unwrap();
-    let best2 = pipeline.get_best_model().await.unwrap();
+    let best2: TrainedModel = pipeline.get_best_model().await.unwrap();
     assert_eq!(model2.model_id, best2.model_id);
     assert_ne!(model1.model_id, model2.model_id); // Different model IDs
 }

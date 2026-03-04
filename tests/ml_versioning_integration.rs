@@ -3,7 +3,7 @@
 //! Tests the model versioning functionality including registration, retrieval,
 //! comparison, tagging, and model listing.
 
-use poolai::ml::versioning::{ModelMetadata, ModelVersionManager, VersionComparison};
+use poolai::ml::versioning::{ModelMetadata, ModelVersion, ModelVersionManager, VersionComparison};
 use std::collections::HashMap;
 
 #[tokio::test]
@@ -120,7 +120,7 @@ async fn test_get_version() {
 
     manager.register_model("model1", metadata).await.unwrap();
 
-    let version = manager.get_version("model1", "v1").await.unwrap();
+    let version: ModelVersion = manager.get_version("model1", "v1").await.unwrap();
     assert_eq!(version.version, "v1");
     assert_eq!(version.model_id, "model1");
     assert_eq!(version.metadata.accuracy, 0.88);
@@ -174,7 +174,7 @@ async fn test_get_latest_version() {
         .unwrap();
     manager.register_model("model1", metadata).await.unwrap();
 
-    let latest = manager.get_latest_version("model1").await.unwrap();
+    let latest: ModelVersion = manager.get_latest_version("model1").await.unwrap();
     assert_eq!(latest.version, "v3");
 }
 
@@ -208,7 +208,7 @@ async fn test_list_versions() {
         .unwrap();
     manager.register_model("model1", metadata).await.unwrap();
 
-    let versions = manager.list_versions("model1").await.unwrap();
+    let versions: Vec<ModelVersion> = manager.list_versions("model1").await.unwrap();
     assert_eq!(versions.len(), 3);
     assert_eq!(versions[0].version, "v1");
     assert_eq!(versions[1].version, "v2");
@@ -298,7 +298,7 @@ async fn test_add_tags() {
         .await
         .unwrap();
 
-    let version = manager.get_version("model1", "v1").await.unwrap();
+    let version: ModelVersion = manager.get_version("model1", "v1").await.unwrap();
     assert!(version.tags.contains(&"production".to_string()));
     assert!(version.tags.contains(&"best".to_string()));
 }
@@ -325,7 +325,7 @@ async fn test_add_tags_duplicate() {
         .await
         .unwrap();
 
-    let version = manager.get_version("model1", "v1").await.unwrap();
+    let version: ModelVersion = manager.get_version("model1", "v1").await.unwrap();
     let production_count = version.tags.iter().filter(|t| *t == "production").count();
     assert_eq!(production_count, 1); // Should not duplicate
 }
