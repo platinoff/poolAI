@@ -88,7 +88,7 @@ jobs:
         continue-on-error: true
       
       - name: Run tests (default) - Required
-        run: cargo test --verbose --lib --tests
+        run: cargo test --verbose --lib --tests --features ml,enterprise,cloud
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
       
