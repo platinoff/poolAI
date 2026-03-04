@@ -13,7 +13,7 @@
 - ✅ Всі модулі компілюються успішно
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
-- ✅ CI/CD: Виправлено rustfmt/clippy components у всіх workflows, форматування коду виправлено, очікується 100% Passing
+- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud`; ML/enterprise/cloud інтеграційні тести збираються і проходять (2026-03-04).
 
 ### Git статус
 - ✅ Гілка **main**
@@ -61,6 +61,7 @@
 | Концепт (PRIMARY) | `docs/concept/poolAI_concept_root.txt` |
 | Roadmap | `docs/DEVELOPMENT_ROADMAP.md` |
 | Git push | `.cursor/commands/git-push.md`, `docs/troubleshooting/GIT_PUSH_FAILED.md` |
+| Знімок контексту | `docs/CONTEXT_SNAPSHOT_2026-03-04.md`, корінь: `CONTEXT_SNAPSHOT_2026-03-04.md` |
 
 ### Git, Cargo, тести (тільки MSYS2 bash — без PS, без cmd)
 
