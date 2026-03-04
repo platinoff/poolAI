@@ -3,7 +3,7 @@
 //! Tests the experiment tracking functionality including registration,
 //! metrics logging, status management, and best experiment selection.
 
-use poolai::ml::experiments::{ExperimentMetrics, ExperimentStatus, ExperimentTracker};
+use poolai::ml::experiments::{Experiment, ExperimentMetrics, ExperimentStatus, ExperimentTracker};
 use std::collections::HashMap;
 
 #[tokio::test]
@@ -44,7 +44,7 @@ async fn test_log_metrics() {
 
     tracker.log_metrics(exp.id.as_str(), metrics).await.unwrap();
 
-    let got = tracker.get_experiment(exp.id.as_str()).await.unwrap();
+    let got: Experiment = tracker.get_experiment(exp.id.as_str()).await.unwrap();
     assert!(got.metrics.is_some());
     let m = got.metrics.unwrap();
     assert!((m.accuracy - 0.95).abs() < 1e-9);
@@ -57,7 +57,7 @@ async fn test_end_experiment() {
 
     tracker.end_experiment(exp.id.as_str()).await.unwrap();
 
-    let got = tracker.get_experiment(exp.id.as_str()).await.unwrap();
+    let got: Experiment = tracker.get_experiment(exp.id.as_str()).await.unwrap();
     assert_eq!(got.status, ExperimentStatus::Completed);
     assert!(got.ended_at.is_some());
 }
@@ -69,7 +69,7 @@ async fn test_fail_experiment() {
 
     tracker.fail_experiment(exp.id.as_str()).await.unwrap();
 
-    let got = tracker.get_experiment(exp.id.as_str()).await.unwrap();
+    let got: Experiment = tracker.get_experiment(exp.id.as_str()).await.unwrap();
     assert_eq!(got.status, ExperimentStatus::Failed);
 }
 
@@ -89,7 +89,7 @@ async fn test_get_best_by_accuracy() {
     tracker.log_metrics(e2.id.as_str(), m2).await.unwrap();
     tracker.end_experiment(e2.id.as_str()).await.unwrap();
 
-    let best = tracker.get_best_by_accuracy().await.unwrap();
+    let best: Experiment = tracker.get_best_by_accuracy().await.unwrap();
     assert!((best.metrics.unwrap().accuracy - 0.95).abs() < 1e-9);
 }
 
@@ -109,7 +109,7 @@ async fn test_get_best_by_loss() {
     tracker.log_metrics(e2.id.as_str(), m2).await.unwrap();
     tracker.end_experiment(e2.id.as_str()).await.unwrap();
 
-    let best = tracker.get_best_by_loss().await.unwrap();
+    let best: Experiment = tracker.get_best_by_loss().await.unwrap();
     assert!((best.metrics.unwrap().loss - 0.05).abs() < 1e-9);
 }
 
@@ -151,7 +151,7 @@ async fn test_add_hyperparameters_and_tags() {
         .await
         .unwrap();
 
-    let got = tracker.get_experiment(exp.id.as_str()).await.unwrap();
+    let got: Experiment = tracker.get_experiment(exp.id.as_str()).await.unwrap();
     assert_eq!(got.hyperparameters.get("lr"), Some(&"0.001".to_string()));
     assert!(got.tags.contains(&"best".to_string()));
 }
@@ -191,7 +191,7 @@ async fn test_custom_metrics() {
 
     tracker.log_metrics(exp.id.as_str(), metrics).await.unwrap();
 
-    let got = tracker.get_experiment(exp.id.as_str()).await.unwrap();
+    let got: Experiment = tracker.get_experiment(exp.id.as_str()).await.unwrap();
     let m = got.metrics.unwrap();
     assert!((m.custom.get("f1_score").unwrap() - 0.92).abs() < 1e-9);
     assert!((m.custom.get("precision").unwrap() - 0.94).abs() < 1e-9);
