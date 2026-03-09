@@ -17,7 +17,7 @@ serde_json = "1.0"
 toml = "0.9"
 
 # Async runtime
-tokio = { version = "1.49", features = ["full"] }
+tokio = { version = "1.50", features = ["full"] }
 
 # Logging and tracing
 tracing = "0.1"
@@ -36,7 +36,7 @@ tokio-stream = "0.1"
 # Use: cargo build --features jwt
 # Note: Requires native toolchain (gcc/dlltool on Windows GNU)
 # Without this feature, uses fallback base64 encoding (dev only, NOT SECURE)
-jsonwebtoken = { version = "10.2", optional = true, features = ["rust_crypto"] }
+jsonwebtoken = { version = "10.3", optional = true, features = ["rust_crypto"] }
 
 # HTTPS/TLS support (optional - enabled with feature "https")
 # Use: cargo build --features https
@@ -56,7 +56,7 @@ chrono = { version = "0.4", features = ["serde"] }
 # Note: chrono is also used by aws-sign-v4 for timestamps
 
 # UUID generation
-uuid = { version = "1.19", features = ["v4", "serde"] }
+uuid = { version = "1.22", features = ["v4", "serde"] }
 
 # CPU detection
 num_cpus = "1.17"
@@ -81,7 +81,7 @@ lru = "0.16"
 reqwest = { version = "0.13", features = ["stream", "json"], default-features = false }
 
 # Archive extraction
-flate2 = "1.0"
+flate2 = "1.1"
 tar = "0.4"
 # zip default features enable bzip2 + zstd, which require a C toolchain (gcc.exe) on windows-gnu.
 # Keep it minimal/pure-Rust for now.
@@ -122,10 +122,10 @@ k8s-openapi = { version = "0.24", optional = true }
 aws-sign-v4 = { version = "0.3", optional = true }
 http = { version = "1", optional = true }
 # AWS SDK (requires Rust 1.88+, now available with Rust 1.92.0)
-aws-config = { version = "1.1", optional = true }
-aws-sdk-ec2 = { version = "1.30", optional = true }
-aws-sdk-ecs = { version = "1.30", optional = true }
-aws-sdk-s3 = { version = "1.30", optional = true }
+aws-config = { version = "1.8", optional = true }
+aws-sdk-ec2 = { version = "1.208", optional = true }
+aws-sdk-ecs = { version = "1.111", optional = true }
+aws-sdk-s3 = { version = "1.122", optional = true }
 # Azure SDK (older versions compatible with Rust 1.70+)
 azure_core = { version = "0.30", optional = true }
 azure_identity = { version = "0.30", optional = true }
@@ -154,7 +154,7 @@ windows-sys = { version = "0.52", optional = true, features = ["Win32_Foundation
 
 # Dev dependencies for testing
 [dev-dependencies]
-tempfile = "3.24"
+tempfile = "3.26"
 # Benchmark framework
 # Note: criterion 0.8+ requires Rust 1.86+ (MSRV), stable 1.91.1+
 # Breaking: async-std support dropped (we use tokio, so this is fine)
@@ -164,7 +164,7 @@ criterion = { version = "0.8", features = ["async_tokio"] }
 # Using v1_28 as it's available in k8s-openapi 0.21
 k8s-openapi = { version = "0.24", features = ["v1_28"] }
 # Mock HTTP server for integration tests
-mockito = "1.4"
+mockito = "1.7"
 
 [features]
 default = []
