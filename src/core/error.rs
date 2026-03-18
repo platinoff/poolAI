@@ -111,6 +111,46 @@ pub enum AppError {
     Unknown,
 }
 
+/// Structured error context for attaching rich metadata to errors.
+///
+/// This is designed to be serialized and logged alongside `AppError` to provide
+/// additional information about where and how the error occurred without
+/// changing the core error type itself.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ErrorContext {
+    /// High-level operation name, e.g. "create_worker", "sync_raid".
+    pub operation: Option<String>,
+    /// Logical resource kind, e.g. "worker", "raid_group", "vm_instance".
+    pub resource: Option<String>,
+    /// Optional identifier of the resource (UUID, name, numeric id).
+    pub resource_id: Option<String>,
+    /// Free-form human-readable details.
+    pub details: Option<String>,
+}
+
+impl ErrorContext {
+    /// Create a new context for a given operation.
+    pub fn new(operation: impl Into<String>) -> Self {
+        Self {
+            operation: Some(operation.into()),
+            ..Self::default()
+        }
+    }
+
+    /// Attach resource information to the context.
+    pub fn with_resource(mut self, resource: impl Into<String>, id: impl Into<String>) -> Self {
+        self.resource = Some(resource.into());
+        self.resource_id = Some(id.into());
+        self
+    }
+
+    /// Add additional human-readable details.
+    pub fn with_details(mut self, details: impl Into<String>) -> Self {
+        self.details = Some(details.into());
+        self
+    }
+}
+
 impl AppError {
     /// Log the error with appropriate severity level
     ///
@@ -523,5 +563,20 @@ mod tests {
             PoolAIError::JsonError(_) => {}
             _ => panic!("Expected JsonError"),
         }
+    }
+
+    #[test]
+    fn error_context_builder_works() {
+        let ctx = ErrorContext::new("create_worker")
+            .with_resource("worker", "w-1")
+            .with_details("failed to validate worker config");
+
+        assert_eq!(ctx.operation.as_deref(), Some("create_worker"));
+        assert_eq!(ctx.resource.as_deref(), Some("worker"));
+        assert_eq!(ctx.resource_id.as_deref(), Some("w-1"));
+        assert_eq!(
+            ctx.details.as_deref(),
+            Some("failed to validate worker config")
+        );
     }
 }

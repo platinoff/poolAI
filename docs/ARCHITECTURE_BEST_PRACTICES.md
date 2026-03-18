@@ -77,14 +77,19 @@ src/
 - ✅ Custom error types implement `std::error::Error` trait
 - ✅ Contextual error messages with suggestions
 
-**Example:**
+**Structured Error Model:**
+- Централізований тип `AppError` в `core::error`.
+- Допоміжна структура `ErrorContext` для збагачення логів та метрик контекстом (operation, resource, id, details).
+- API‑відповіді використовують `error_code()` з `AppError` + людиночитабельне повідомлення.
+
 ```rust
-pub enum AppError {
-    ConfigError(String),
-    ValidationError(String),
-    NetworkError(String),
-    // ... with context and suggestions
-}
+use poolai::core::error::{AppError, ErrorContext};
+
+let err = AppError::ValidationError("invalid worker config".to_string());
+let ctx = ErrorContext::new("create_worker")
+    .with_resource("worker", "w-1")
+    .with_details("missing required field 'address'");
+// err + ctx логуються разом і потрапляють у ErrorMetrics
 ```
 
 ### 3. **Concurrency** ✅
