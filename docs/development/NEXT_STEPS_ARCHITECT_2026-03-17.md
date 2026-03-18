@@ -140,9 +140,8 @@
   - [x] Створити `docs/concept/POOLAI_GRID_NODE.md` з ролями `miner` / `hub` / `hybrid`.
 - [x] Описати Memory Layer поверх RAID/ML:
   - [x] Створити `docs/concept/POOLAI_MEMORY_LAYER.md` з моделлю “AGI‑памʼяті” та seeds‑поведінкою (аналог торентів).
-- [ ] Формалізувати Job / Mining Layer в концептах:
-  - [ ] Додати розділ у цей план з описом AI‑Job (ресурси, дедлайни, тип задачі, верифікація).
-  - [ ] Додати окремий concept/development‑док з життєвим циклом `submitted → scheduled → executed → verified → rewarded`.
+- [x] Формалізувати Job / Mining Layer в концептах:
+  - [x] Додати окремий development‑док `JOB_LAYER_CONCEPT_2026-03-17.md` з описом AI‑Job (ресурси, дедлайни, тип задачі, верифікація) і життєвим циклом `submitted → scheduled → executed → verified → rewarded`.
 - [ ] Описати Grid Protocol (поверх Discovery/RAID):
   - [ ] Типи повідомлень: `Job`, `Result`, `MemoryShard`, `PeerStatus`.
   - [ ] Звʼязок із вже існуючими peer/discovery API та grid‑тестами RAID.
