@@ -20,6 +20,7 @@ pub mod ws;
 #[cfg(feature = "enterprise")]
 pub mod enterprise_api;
 
+use crate::core::state::ApiContext;
 use crate::ui;
 use axum::middleware;
 use axum::response::Redirect;
@@ -35,12 +36,13 @@ use axum_server::tls_rustls::RustlsConfig;
 ///
 /// # Arguments
 /// * `addr` - Socket address to bind the server to
+/// * `app_state` - Shared application context used by API handlers
 ///
 /// # Note
 /// HTTPS support requires feature "https" and valid certificates.
 /// Configuration is read from PoolAIConfig.
 /// Discovery service is automatically started if enabled.
-pub async fn start_server(addr: SocketAddr) {
+pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
     // Initialize and start discovery service
     use crate::network::discovery::{initialize_global_discovery, DiscoveryConfig};
 
@@ -67,16 +69,12 @@ pub async fn start_server(addr: SocketAddr) {
 
         // Add enterprise API routes if feature is enabled
         #[cfg(feature = "enterprise")]
-        {
-            router.nest(
-                "/api/enterprise",
-                enterprise_api::create_enterprise_api_routes(),
-            )
-        }
-        #[cfg(not(feature = "enterprise"))]
-        {
-            router
-        }
+        let router = router.nest(
+            "/api/enterprise",
+            enterprise_api::create_enterprise_api_routes(),
+        );
+
+        router.with_state(app_state)
     };
 
     // Read HTTPS configuration from config file

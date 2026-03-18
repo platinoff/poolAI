@@ -21,12 +21,13 @@
 **Мета**: одна точка входу для залежностей (конфіг, storage, менеджери модулів, клієнти), у стилі `AppState` в Axum‑проєктах.
 
 **Кроки**:
-- [ ] Створити структурований `AppState` / `ApiContext`:
-  - [ ] Окремий модуль (наприклад, `src/core/state.rs` або `src/core/context.rs`).
-  - [ ] Поля: конфіг (`PoolAIConfig`), хендлери сховищ/черг, менеджери (`RaidManager`, `VmManager`, …), клієнти cloud/monitoring.
+- [x] Створити структурований `AppState` / `ApiContext`:
+  - [x] Окремий модуль `src/core/state.rs` з `AppState`.
+  - [x] Ввести alias `ApiContext = Arc<AppState>` для HTTP та сервісного шару.
 - [ ] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст:
-  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `AppState/ApiContext` замість окремих глобальних доступів.
-  - [ ] У тестах створювати lightweight‑версію `AppState` для ізольованого тестування handler’ів/сервісів.
+  - [ ] Протягнути `ApiContext` у `network::start_server` і підʼєднати до `Router` як state.
+  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `ApiContext` (через state/extractors) замість окремих глобальних доступів.
+  - [ ] У тестах створювати lightweight‑версію `ApiContext` для ізольованого тестування handler’ів/сервісів.
 - [ ] Оновити відповідні розділи в:
   - [ ] `docs/ARCHITECTURE_REVIEW.md` (додати опис `AppState/ApiContext`),
   - [ ] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` (посилання на цей план).

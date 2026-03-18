@@ -9,7 +9,7 @@
 //! - GPU information
 
 use axum::{
-    extract::{Extension, Request},
+    extract::{Extension, Request, State},
     http::{header::ACCEPT, StatusCode},
     middleware,
     response::{IntoResponse, Response},
@@ -19,6 +19,7 @@ use axum::{
 use serde::Serialize;
 
 use crate::core::config::{get_config, update_config, PoolAIConfig};
+use crate::core::state::ApiContext;
 use crate::network::api::common::check_permission;
 use crate::network::auth::{authenticate_user, AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
@@ -69,8 +70,35 @@ struct HealthCheck {
     response_time_ms: u64,
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::body::Body;
+    use axum::http::{Request as HttpRequest, StatusCode};
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn status_handler_works_with_api_context() {
+        let app_state = ApiContext::default();
+
+        let app = create_system_routes().with_state(app_state);
+
+        let response = app
+            .oneshot(
+                HttpRequest::builder()
+                    .uri("/status")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .expect("request should succeed");
+
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+}
+
 /// Create system routes
-pub fn create_system_routes() -> Router {
+pub fn create_system_routes() -> Router<ApiContext> {
     Router::new()
         .route("/status", get(status_handler))
         .route("/health", get(health_handler))
@@ -87,7 +115,13 @@ pub fn create_system_routes() -> Router {
         )
 }
 
-async fn status_handler(req: Request<axum::body::Body>) -> Response {
+async fn status_handler(
+    State(app_state): State<ApiContext>,
+    req: Request<axum::body::Body>,
+) -> Response {
+    // Touch system state so that future extensions can use it without changing
+    // the handler signature again.
+    let _ = app_state.get_system_state();
     let uptime = crate::version::get_uptime_seconds();
     let status = StatusResponse {
         status: "running",

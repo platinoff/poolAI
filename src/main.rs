@@ -180,7 +180,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Spawn server task
     let server_handle = tokio::spawn(async move {
-        network::start_server(addr).await;
+        network::start_server(addr, app_state).await;
     });
 
     info!("✅ PoolAI started successfully!");
