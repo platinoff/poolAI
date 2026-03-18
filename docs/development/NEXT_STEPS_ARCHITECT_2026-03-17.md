@@ -131,6 +131,31 @@
 
 ---
 
+## ⭐ Priority 6 — Grid / Job / Memory / Tokenization (концептуальний шар)
+
+**Мета**: накрити вже реалізоване продакшн‑ядро (15 модулів, RAID/VM/Cloud/ML/Enterprise) єдиною моделлю `PoolAI Node` + Grid/Job/Memory/Token‑шарів, не ламаючи існуючий код.
+
+**Кроки**:
+- [x] Описати `PoolAI Node` як building block Grid‑мережі:
+  - [x] Створити `docs/concept/POOLAI_GRID_NODE.md` з ролями `miner` / `hub` / `hybrid`.
+- [x] Описати Memory Layer поверх RAID/ML:
+  - [x] Створити `docs/concept/POOLAI_MEMORY_LAYER.md` з моделлю “AGI‑памʼяті” та seeds‑поведінкою (аналог торентів).
+- [ ] Формалізувати Job / Mining Layer в концептах:
+  - [ ] Додати розділ у цей план з описом AI‑Job (ресурси, дедлайни, тип задачі, верифікація).
+  - [ ] Додати окремий concept/development‑док з життєвим циклом `submitted → scheduled → executed → verified → rewarded`.
+- [ ] Описати Grid Protocol (поверх Discovery/RAID):
+  - [ ] Типи повідомлень: `Job`, `Result`, `MemoryShard`, `PeerStatus`.
+  - [ ] Звʼязок із вже існуючими peer/discovery API та grid‑тестами RAID.
+- [ ] Визначити Solana‑adapter як окремий шар:
+  - [ ] У docs описати, які події (`JobCompleted`, `SeedProvided`, `MemoryUpdated`) відображаються в on‑chain події.
+  - [ ] Чітко відокремити core‑runtime (Rust) від billing/tokenization‑адаптера.
+
+**Критерії готовності**:
+- [ ] Існують окремі, узгоджені концепт‑/development‑доки для `PoolAI Node`, Grid Layer, Job/Mining Layer, Memory Layer, Solana‑adapter.
+- [ ] Всі нові документи посилаються на вже реалізовані модулі й тести, не суперечать існуючим концептам.
+
+---
+
 ## 🧩 Взаємозалежності між кроками
 
 ```text
@@ -143,6 +168,8 @@ Error Context (Priority 3)
 Performance Profiling (Priority 4)
     ↓
 Docs & Cleanup (Priority 5)
+    ↓
+Grid / Job / Memory / Tokenization (Priority 6)
 ```
 
 **Примітка**: Кроки 3–4 можуть виконуватись частково паралельно для різних модулів, але **AppState і Service Layer бажано стабілізувати першими**, щоб не плодити дублікати патернів.
