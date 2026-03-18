@@ -271,24 +271,25 @@ async fn test_grid_network_medium_scale() {
 #[tokio::test]
 async fn test_grid_network_large_scale() {
     // Test with 50 nodes (large scale)
-    let grid = GridNetwork::new(50, 9200).await.unwrap();
+    let grid: GridNetwork = GridNetwork::new(50, 9200).await.unwrap();
     assert_eq!(grid.node_count(), 50);
 
     // Store artifact and verify grid can handle it
     let artifact_data = b"test artifact for large grid";
-    let artifact_id = grid
+    let artifact_id: String = grid
         .store_and_replicate(1, "test-artifact-large", artifact_data)
         .await
         .unwrap();
 
     // Verify artifact exists
     let node1 = grid.get_node(1).unwrap();
-    let artifacts = node1.raid_manager.read().await.list_artifacts().await;
+    let artifacts: Vec<poolai::raid::ArtifactRef> =
+        node1.raid_manager.read().await.list_artifacts().await;
     let artifact = artifacts
         .iter()
         .find(|a| a.id.to_string() == artifact_id)
         .unwrap();
-    let retrieved = node1
+    let retrieved: Vec<u8> = node1
         .raid_manager
         .read()
         .await
@@ -302,24 +303,25 @@ async fn test_grid_network_large_scale() {
 async fn test_grid_network_maximum_scale() {
     // Test with 120 nodes (5! = 120, maximum scale)
     let max_nodes = factorial(5); // 120
-    let grid = GridNetwork::new(max_nodes, 9300).await.unwrap();
+    let grid: GridNetwork = GridNetwork::new(max_nodes, 9300).await.unwrap();
     assert_eq!(grid.node_count(), 120);
 
     // Store artifact on first node
     let artifact_data = b"test artifact for maximum grid scale";
-    let artifact_id = grid
+    let artifact_id: String = grid
         .store_and_replicate(1, "test-artifact-max", artifact_data)
         .await
         .unwrap();
 
     // Verify artifact exists on source node
     let node1 = grid.get_node(1).unwrap();
-    let artifacts = node1.raid_manager.read().await.list_artifacts().await;
+    let artifacts: Vec<poolai::raid::ArtifactRef> =
+        node1.raid_manager.read().await.list_artifacts().await;
     let artifact = artifacts
         .iter()
         .find(|a| a.id.to_string() == artifact_id)
         .unwrap();
-    let retrieved = node1
+    let retrieved: Vec<u8> = node1
         .raid_manager
         .read()
         .await

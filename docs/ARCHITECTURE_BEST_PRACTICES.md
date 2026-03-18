@@ -240,6 +240,20 @@ poolAI/
 - ✅ Connection pooling (when applicable)
 - ✅ Efficient memory usage
 
+### 4. **Hot-path Bottlenecks & Runtime Tuning** (узгоджено з `PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`)
+- **Tokio Runtime**:
+  - Робочі потоки (`worker_threads`) підбираються під кількість CPU-ядер; блокуючі потоки (`max_blocking_threads`) достатні, щоб не створювати черги для I/O.
+  - Для різних розмірів кластерів використовуються окремі профілі (small/medium/large), описані в `docs/performance/TUNING.md` та плані оптимізації.
+- **Глобальний стан (`AppState`)**:
+  - Використовується стратегія “fine-grained locking” замість одного великого `RwLock` там, де це виправдано результатами вимірювань.
+  - Довгі write-операції винесені з-під глобальних м’ютексів; для складних оновлень використовується композиція більш дрібних локів.
+- **Кеші та Memory Pool**:
+  - LRU cache і `MemoryPool` налаштовуються за результатами бенчмарків (`runtime_benchmarks.rs`) і мають рекомендовані розміри/TTL у `performance/TUNING.md`.
+  - Операції `get/put` у кеші проєктуються як O(1) з мінімальним блокуванням.
+- **Load Balancing & Autoscaling**:
+  - Стратегії `LoadBalancingStrategy` (RoundRobin, LeastConnections, Weighted, IpHash) вибираються під тип навантаження; для кожної існують профілі в плані оптимізації продуктивності.
+  - Пороги автоскейлінгу та cooldown-и задокументовані як частина performance-профілів, щоб уникати “flapping” та недовантаження воркерів.
+
 ---
 
 ## 🔒 Security Best Practices

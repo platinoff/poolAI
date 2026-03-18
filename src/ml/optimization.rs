@@ -559,7 +559,7 @@ mod tests {
     }
 
     #[test]
-    fn apply_iterative_pruning() {
+    fn apply_iterative_pruning_works() {
         let weights = vec![1.0, 0.5, 0.1, 2.0, 0.3, 0.05, 3.0, 0.2];
         let mut config = PruningConfig::default_config();
         config.iterative = true;
@@ -582,7 +582,7 @@ mod tests {
     }
 
     #[test]
-    fn evaluate_pruning() {
+    fn evaluate_pruning_basic() {
         let before = vec![1.0, 2.0, 3.0, 4.0, 5.0];
         let after = vec![1.0, 0.0, 3.0, 0.0, 5.0];
 

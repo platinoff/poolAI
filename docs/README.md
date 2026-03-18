@@ -23,6 +23,7 @@
 - [`development/NEXT_STEPS_2026-01-19.md`](./development/NEXT_STEPS_2026-01-19.md) - **АКТУАЛЬНІ** наступні кроки
 - [`development/NEXT_STEPS_ARCHITECT_2026-01-22.md`](./development/NEXT_STEPS_ARCHITECT_2026-01-22.md) - Останній план Rust Architect
 - [`development/FUTURE_DEVELOPMENT_ROADMAP.md`](./development/FUTURE_DEVELOPMENT_ROADMAP.md) - Майбутній roadmap
+ - [`development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`](./development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md) - **Основний план оптимізації продуктивності** (Tokio, AppState, кеш, RAID/VM/cache бенчмарки, autoscaling)
 
 **Індекси**:
 - [`status/README.md`](./status/README.md) - Індекс статусних документів
@@ -60,8 +61,8 @@
 - [`security/BEST_PRACTICES.md`](./security/BEST_PRACTICES.md) - Best practices для безпеки
 
 ### ⚡ Продуктивність
-- [`performance/TUNING.md`](./performance/TUNING.md) - Performance tuning
-- [`performance/BENCHMARKS.md`](./performance/BENCHMARKS.md) - Benchmark results
+- [`performance/TUNING.md`](./performance/TUNING.md) - Performance tuning (системний та конфігураційний рівень; див. також план у `development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`)
+- [`performance/BENCHMARKS.md`](./performance/BENCHMARKS.md) - Benchmark results (фактичні цифри; для інтерпретації та нових бенчмарків орієнтуйся на план оптимізації)
 
 ### 🔧 Troubleshooting
 

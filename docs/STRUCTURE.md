@@ -21,12 +21,14 @@ docs/
 │   └── STABLE_STATE_SUMMARY.md  # Стабільний стан розробки
 │
 ├── development/                 # Плани розробки
-│   ├── NEXT_STEPS_PLAN.md       # План наступних кроків
-│   ├── NEXT_DEVELOPMENT_PHASE.md # Наступна фаза розробки
-│   └── DEVELOPMENT_PLAN_UPDATED.md # Оновлений план розробки
+│   ├── NEXT_STEPS_2026-01-19.md           # Актуальні наступні кроки (оновлений Rust Architect план)
+│   ├── NEXT_STEPS_ARCHITECT_2026-01-22.md # Останній детальний план Architect
+│   ├── FUTURE_DEVELOPMENT_ROADMAP.md      # Довгостроковий roadmap
+│   └── PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md # План оптимізації продуктивності (bottleneck-и, бенчмарки, глибока логіка)
 │
 ├── concept/                     # Концепція проекту
-│   └── poolAI_concept.txt       # Основна концепція проекту
+│   ├── poolAI_concept_root.txt  # PRIMARY концепція проекту (оновлена, v6/v7)
+│   └── CONCEPT_UPDATE_2026-01-19.md # Оновлення концепції (розширені модулі, RAID/Enterprise/Cloud/ML)
 │
 ├── archive/                     # Архівні документи
 │   ├── PHASE*.md                # Статуси фаз розробки

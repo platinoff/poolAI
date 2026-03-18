@@ -4,6 +4,10 @@
 
 This document provides performance benchmarks and expected performance characteristics for PoolAI.
 
+For guidance on **which new benchmarks to run/add** (e.g. `ModelRequest`/`ModelResponse` overhead, cache key generation, MemoryPool acquire/release, LRU get/put under load) and how to interpret them from an architectural point of view, follow:
+
+- `docs/development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`
+
 ## Test Environment
 
 ### Hardware

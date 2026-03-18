@@ -1973,8 +1973,8 @@ impl KubernetesManager {
     /// ```
     pub async fn list_crd_resources(
         &self,
-        _group: &str,
-        _version: &str,
+        group: &str,
+        version: &str,
         plural: &str,
     ) -> Result<serde_json::Value, AppError> {
         #[cfg(feature = "cloud-sdk")]
@@ -2027,8 +2027,8 @@ impl KubernetesManager {
     /// ```
     pub async fn get_crd_resource(
         &self,
-        _group: &str,
-        _version: &str,
+        group: &str,
+        version: &str,
         plural: &str,
         name: &str,
     ) -> Result<serde_json::Value, AppError> {
@@ -2098,11 +2098,11 @@ impl KubernetesManager {
     /// ```
     pub async fn update_crd_status(
         &self,
-        _group: &str,
-        _version: &str,
+        group: &str,
+        version: &str,
         plural: &str,
         name: &str,
-        _status: serde_json::Value,
+        status: serde_json::Value,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(
@@ -2178,7 +2178,7 @@ impl KubernetesManager {
     pub async fn create_or_update_resource_quota(
         &self,
         name: &str,
-        _quotas: serde_json::Value,
+        quotas: serde_json::Value,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(

@@ -49,9 +49,9 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ## 🎯 Development Status
 
-**Current Phase: Stage 3 COMPLETED** 🎉  
-**Target: Advanced AI Mining Pool with Enterprise Features**  
-**UI/UX Enhancement**: Design Quality 75%, UX Optimization 70%, Testing 0% ⏳ (see [`docs/development/UI_UX_IMPROVEMENTS_PLAN.md`](docs/development/UI_UX_IMPROVEMENTS_PLAN.md))
+**Current Phase**: Stage 4.3 Cloud Integration in progress, Stage 4.4 AI/ML scaffolding ready (see docs)  
+**Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
+For a detailed status view see `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` and `docs/status/STABLE_STATE_SUMMARY.md`.
 
 ### 🚀 Development Roadmap
 
@@ -310,13 +310,13 @@ The JWT token will be stored in localStorage or cookie after login for accessing
 - **WebSocket**: Real-time communication and live metrics
 - **API**: Comprehensive REST endpoints with documentation
 
-### Planned Features (Stage 4)
+### Planned / Ongoing Work (Stage 4.x)
 
-- **Enterprise Features**: Multi-tenancy, advanced security, audit logging
-- **Cloud Integration**: Kubernetes support, cloud providers, auto-scaling
-- **AI/ML Enhancement**: Model optimization, AutoML integration, federated learning
-- **Advanced UI**: Modern dashboard with real-time monitoring
-- **CI/CD**: Automated testing and deployment pipelines
+- **Enterprise Features**: Multi-tenancy, advanced security, audit logging (**implemented**, see Enterprise docs)
+- **Cloud Integration**: Kubernetes support, cloud providers, auto-scaling, load balancing (see Cloud SDK docs and status)
+- **AI/ML Enhancement**: Model optimization, AutoML integration, federated learning (Stage 4.4 plan + stubs)
+- **Advanced UI**: Modern dashboard with real-time monitoring (**implemented**, further polish optional)
+- **CI/CD**: Automated testing and deployment pipelines (**configured**, can be extended with perf benchmarks)
 
 ## 🔒 Security & HTTPS
 

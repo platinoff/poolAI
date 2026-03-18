@@ -4,6 +4,12 @@
 
 This guide covers performance optimization techniques for PoolAI deployments to achieve maximum throughput and efficiency.
 
+For a **high-level, architect-driven plan** of how to investigate and fix bottlenecks inside the runtime (Tokio, AppState, caches, RAID/VM internals, autoscaling), see:
+
+- `docs/development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`
+
+Use this file (`TUNING.md`) for concrete system and configuration recipes; use the plan for **what to measure and in which order**.
+
 ## System-Level Optimization
 
 ### CPU Optimization
