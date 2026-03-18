@@ -57,6 +57,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::info;
 
+/// Shared application context for API and service layers.
+///
+/// This is the primary handle that HTTP handlers and services should depend on,
+/// rather than constructing their own state. It is a thin alias around
+/// `Arc<AppState>` to make intent explicit at call sites.
+pub type ApiContext = Arc<AppState>;
+
 /// Worker state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Worker {
@@ -517,5 +524,54 @@ impl AppState {
         system_state.system_metrics = metrics;
         system_state.last_activity = Utc::now();
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn app_state_initialize_sets_running_status() {
+        let state = AppState::new();
+        assert!(!state.is_ready());
+
+        state.initialize().await.expect("initialize should succeed");
+
+        assert!(state.is_ready());
+        let system_state = state.get_system_state();
+        assert!(matches!(system_state.status, SystemStatus::Running));
+    }
+
+    #[tokio::test]
+    async fn app_state_cleanup_resets_workers_and_models() {
+        let state = AppState::new();
+        state.initialize().await.expect("initialize should succeed");
+
+        // Add a worker and a model, then cleanup and verify they are cleared.
+        let worker = Worker {
+            id: "w-1".to_string(),
+            address: "127.0.0.1:1234".to_string(),
+            mining_power: 1.0,
+            status: WorkerStatus::Active,
+            last_seen: Utc::now(),
+            metrics: WorkerMetrics::default(),
+            active_models: vec!["m-1".to_string()],
+        };
+        state.add_worker(worker).expect("add_worker should succeed");
+
+        let model_state = ModelState::default();
+        state
+            .add_model_state("m-1".to_string(), model_state)
+            .expect("add_model_state should succeed");
+
+        assert_eq!(state.get_all_workers().len(), 1);
+        assert_eq!(state.get_all_model_states().len(), 1);
+
+        state.cleanup().await.expect("cleanup should succeed");
+
+        assert_eq!(state.get_all_workers().len(), 0);
+        assert_eq!(state.get_all_model_states().len(), 0);
+        assert!(!state.is_ready());
     }
 }
