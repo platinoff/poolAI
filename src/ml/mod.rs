@@ -50,7 +50,7 @@ mod tests {
     fn ai_ml_status_default() {
         let s = AiMlStatus::default();
         assert_eq!(s.stage, "4.4");
-        assert_eq!(s.status, "planned");
+        assert_eq!(s.status, "complete");
         assert!(s.features.contains(&"model_optimization"));
         assert!(s.features.contains(&"federated_learning"));
     }

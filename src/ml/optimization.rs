@@ -220,7 +220,8 @@ pub fn apply_pruning(weights: &[f64], config: &PruningConfig) -> PruningResult {
         PruningStrategy::Unstructured => unstructured_pruning(weights, target_count),
     };
 
-    let weights_after = pruned_weights.len();
+    // Logical "after" size is the number of retained (non-zero) weights.
+    let weights_after = pruned_weights.iter().filter(|&&w| w != 0.0).count();
     let compression_ratio = if weights_after > 0 {
         weights_before as f64 / weights_after as f64
     } else {
@@ -373,13 +374,15 @@ pub fn apply_iterative_pruning(weights: &[f64], config: &PruningConfig) -> Pruni
         current_weights = magnitude_based_pruning(&current_weights, result.weights_after);
     }
 
+    let retained_after = current_weights.iter().filter(|&&w| w != 0.0).count();
+
     PruningResult {
         strategy: config.strategy,
         weights_before: weights.len(),
-        weights_after: current_weights.len(),
+        weights_after: retained_after,
         pruned_count: total_pruned,
-        compression_ratio: if current_weights.len() > 0 {
-            weights.len() as f64 / current_weights.len() as f64
+        compression_ratio: if retained_after > 0 {
+            weights.len() as f64 / retained_after as f64
         } else {
             1.0
         },
