@@ -8,10 +8,11 @@
 
 use axum::{extract::Path, response::IntoResponse, routing::get, Json, Router};
 
+use crate::core::state::ApiContext;
 use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
 
 /// Create rewards system routes
-pub fn create_rewards_routes() -> Router {
+pub fn create_rewards_routes() -> Router<ApiContext> {
     Router::new()
         .route("/rewards", get(rewards_handler))
         .route("/rewards/{user_id}", get(user_rewards_handler))

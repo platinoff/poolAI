@@ -146,10 +146,8 @@ async fn test_rebalance_with_real_artifacts() {
     let artifacts_moved = strategy.rebalance().await.unwrap();
 
     // Rebalancing should complete (may move 0 artifacts if already balanced)
-    assert!(
-        artifacts_moved >= 0,
-        "Rebalancing should return non-negative count"
-    );
+    // artifacts_moved is an unsigned count; just acknowledge it.
+    let _ = artifacts_moved;
 
     // Verify metrics are available
     let metrics = strategy.get_metrics().await;

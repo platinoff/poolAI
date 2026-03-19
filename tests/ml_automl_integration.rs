@@ -98,7 +98,7 @@ async fn test_automl_get_candidates_after_training() {
     assert_eq!(candidates.len(), 5); // 5 model types
 
     // Verify all model types are present
-    let model_types: Vec<_> = candidates.iter().map(|c| &c.model_type).collect();
+    let model_types: Vec<_> = candidates.iter().map(|c| c.model_type()).collect();
     assert!(model_types.contains(&&ModelType::LinearRegression));
     assert!(model_types.contains(&&ModelType::RandomForest));
     assert!(model_types.contains(&&ModelType::GradientBoosting));

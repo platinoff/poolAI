@@ -17,6 +17,7 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::core::state::ApiContext;
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::raid::admin::RaidAdmin;
@@ -228,7 +229,7 @@ async fn get_node_clustering_handler(
 }
 
 /// Create RAID admin routes
-pub fn create_raid_admin_routes() -> Router {
+pub fn create_raid_admin_routes() -> Router<ApiContext> {
     Router::new()
         .route("/raid/admin/status", get(get_strategy_status_handler))
         .route(

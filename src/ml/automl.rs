@@ -95,11 +95,18 @@ pub struct TrainedModel {
 
 /// Model candidate for selection
 #[derive(Clone, Debug)]
-struct ModelCandidate {
+pub struct ModelCandidate {
     model_type: ModelType,
     hyperparameters: HashMap<String, String>,
     score: f64,
     training_time_ms: u64,
+}
+
+impl ModelCandidate {
+    /// Public accessor for tests/verification without exposing the internal struct fields.
+    pub fn model_type(&self) -> &ModelType {
+        &self.model_type
+    }
 }
 
 /// AutoML Pipeline

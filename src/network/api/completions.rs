@@ -16,6 +16,7 @@ use std::time::Duration;
 use tokio_stream::{self as stream, Stream, StreamExt};
 
 use crate::core::model_interface::{ModelParameters, ModelRequest};
+use crate::core::state::ApiContext;
 use crate::network::auth::Claims;
 use crate::runtime::instance::get_global_instance_manager;
 
@@ -147,7 +148,7 @@ pub struct ChatMessageDelta {
 }
 
 /// Create completions routes
-pub fn create_completions_routes() -> Router {
+pub fn create_completions_routes() -> Router<ApiContext> {
     Router::new().route("/v1/chat/completions", post(chat_completions_handler))
 }
 

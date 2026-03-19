@@ -4,10 +4,7 @@
 //! to verify authentication flows without requiring real credentials.
 
 #[cfg(feature = "cloud-sdk")]
-mod mock_servers;
-
-#[cfg(feature = "cloud-sdk")]
-use mock_servers::{MockAzureServer, MockGcpServer};
+use super::mock_servers::{MockAzureServer, MockGcpServer};
 
 #[cfg(feature = "cloud-sdk")]
 use poolai::cloud::providers::azure::AzureManager;

@@ -13,6 +13,7 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
+use poolai::core::state::ApiContext;
 use poolai::network::api::create_api_routes;
 use poolai::network::security_headers::{security_headers_middleware, SecurityHeadersConfig};
 use tower::ServiceExt; // for `call`, `oneshot`, and `ready`
@@ -149,7 +150,9 @@ async fn test_security_headers_config_custom() {
 
 #[tokio::test]
 async fn test_security_headers_on_api_endpoints() {
-    let app = create_api_routes().layer(axum::middleware::from_fn(security_headers_middleware));
+    let app = create_api_routes()
+        .layer(axum::middleware::from_fn(security_headers_middleware))
+        .with_state(ApiContext::default());
 
     let response = app
         .oneshot(

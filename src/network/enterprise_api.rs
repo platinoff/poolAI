@@ -7,6 +7,8 @@
 //! - Advanced monitoring
 
 #[cfg(feature = "enterprise")]
+use crate::core::state::ApiContext;
+#[cfg(feature = "enterprise")]
 use crate::enterprise;
 #[cfg(feature = "enterprise")]
 use crate::network::api::check_permission;
@@ -35,7 +37,7 @@ use tokio::sync::RwLock;
 use uuid::Uuid;
 
 #[cfg(feature = "enterprise")]
-pub fn create_enterprise_api_routes() -> Router {
+pub fn create_enterprise_api_routes() -> Router<ApiContext> {
     let router = Router::new()
         // Tenant management
         .route("/tenants", get(tenants_list_handler))
@@ -2300,6 +2302,6 @@ async fn saml_callback_handler(
 // ============================================================================
 
 #[cfg(not(feature = "enterprise"))]
-pub fn create_enterprise_api_routes() -> Router {
-    Router::new()
+pub fn create_enterprise_api_routes() -> axum::Router<crate::core::state::ApiContext> {
+    axum::Router::new()
 }

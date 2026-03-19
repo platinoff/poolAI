@@ -10,6 +10,7 @@ use poolai::cloud::providers::azure::AzureManager;
 use poolai::cloud::providers::gcp::GcpManager;
 #[cfg(feature = "cloud-sdk")]
 use poolai::core::error::AppError;
+use std::sync::Arc;
 
 // ============================================================================
 // AWS Edge Cases
@@ -293,12 +294,12 @@ async fn test_azure_invalid_subscription_id() {
 #[tokio::test]
 async fn test_concurrent_initialization() {
     // Test that concurrent initialization is safe
-    let manager = AwsManager::new(Some("us-east-1".to_string()));
+    let manager = Arc::new(AwsManager::new(Some("us-east-1".to_string())));
 
     // Initialize multiple times concurrently
     let handles: Vec<_> = (0..5)
         .map(|_| {
-            let m = &manager;
+            let m = Arc::clone(&manager);
             tokio::spawn(async move { m.initialize().await })
         })
         .collect();

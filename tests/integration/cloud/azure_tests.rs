@@ -3,10 +3,7 @@
 //! Tests Azure VM Scale Set API interactions and token acquisition.
 
 #[cfg(feature = "cloud-sdk")]
-mod mock_servers;
-
-#[cfg(feature = "cloud-sdk")]
-use mock_servers::MockAzureServer;
+use super::mock_servers::MockAzureServer;
 #[cfg(feature = "cloud-sdk")]
 use poolai::cloud::providers::azure::AzureManager;
 #[cfg(feature = "cloud-sdk")]

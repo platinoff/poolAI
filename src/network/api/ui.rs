@@ -16,6 +16,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::core::state::ApiContext;
 #[cfg(feature = "enterprise")]
 use crate::enterprise::monitoring::{get_global_monitoring_manager, Dashboard};
 #[cfg(feature = "enterprise")]
@@ -24,7 +25,7 @@ use crate::network::auth::{auth_middleware, Claims};
 use crate::ui::{components, get_all_themes, get_theme};
 
 /// Create UI management routes
-pub fn create_ui_routes() -> Router {
+pub fn create_ui_routes() -> Router<ApiContext> {
     Router::new()
         // Dashboard management endpoints
         .route("/ui/dashboards", get(ui_dashboards_handler))

@@ -20,6 +20,7 @@ use chrono::DateTime;
 use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::core::state::ApiContext;
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
@@ -95,7 +96,7 @@ struct EventsRangeQuery {
 }
 
 /// Create RAID management routes
-pub fn create_raid_routes() -> Router {
+pub fn create_raid_routes() -> Router<ApiContext> {
     Router::new()
         .route("/raid/nodes", get(raid_nodes_handler))
         // RAID Workers (nodes) management endpoints

@@ -59,7 +59,7 @@ async fn test_runtime_manager_lifecycle() -> Result<(), Box<dyn std::error::Erro
 
     let status = runtime.get_status().await;
     // workers_active may vary, just verify status is accessible
-    assert!(status.workers_active >= 0);
+    let _workers_active = status.workers_active;
 
     runtime.shutdown().await?;
     Ok(())
@@ -72,7 +72,7 @@ async fn test_initialize_runtime_helper() -> Result<(), Box<dyn std::error::Erro
 
     let status = runtime.get_status().await;
     // workers_active may vary, just verify status is accessible
-    assert!(status.workers_active >= 0);
+    let _workers_active = status.workers_active;
 
     runtime.shutdown().await?;
     Ok(())

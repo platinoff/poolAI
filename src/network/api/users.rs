@@ -15,6 +15,7 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::core::state::ApiContext;
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, get_global_user_manager, Claims, UserRole};
 
@@ -34,7 +35,7 @@ struct UserUpdateRequest {
 }
 
 /// Create user management routes
-pub fn create_users_routes() -> Router {
+pub fn create_users_routes() -> Router<ApiContext> {
     Router::new()
         .route("/users", get(users_list_handler))
         .route(

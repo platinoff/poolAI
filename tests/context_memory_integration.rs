@@ -207,8 +207,8 @@ async fn test_memory_usage_tracking() {
 
     let metrics = monitor.get_metrics().await;
     assert!(metrics.memory_usage.ram_bytes > 0);
-    assert!(metrics.memory_usage.disk_bytes >= 0);
-    assert!(metrics.memory_usage.cache_bytes >= 0);
+    let _disk_bytes = metrics.memory_usage.disk_bytes;
+    let _cache_bytes = metrics.memory_usage.cache_bytes;
 }
 
 #[tokio::test]

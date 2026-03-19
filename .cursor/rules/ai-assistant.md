@@ -16,7 +16,7 @@
 - **Alternative Concept**: `docs/concept/poolAI_concept.txt` (Ukrainian, detailed dev environment)
 - **Current Project Status**: `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` (most up-to-date)
 - **Stable State**: `docs/status/STABLE_STATE_SUMMARY.md`
-- **Development Plans**: `docs/development/NEXT_STEPS_PLAN.md` or `docs/development/NEXT_STEPS_2026-01-19.md`
+- **Development Plans**: `docs/development/NEXT_STEPS_PLAN.md` or `docs/development/NEXT_STEPS_2026-01-19.md` (і за потреби: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`)
 - **Cursor & next steps verification**: `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` (Cursor settings, doc cleanup list, next steps)
 - **Project README**: `README.md` (in root)
 - **Documentation Index**: `docs/README.md`
@@ -24,11 +24,11 @@
 
 **When answering questions about**:
 - **Module status/completion**: Check `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` FIRST
-- **Development plans**: Check `docs/development/NEXT_STEPS_PLAN.md` or latest `NEXT_STEPS_*.md`
+- **Development plans**: Check `docs/development/NEXT_STEPS_PLAN.md` or latest `NEXT_STEPS_*.md` (для архітектурних стабілізацій — `NEXT_STEPS_ARCHITECT_2026-03-17.md`)
 - **Project concept**: Check `docs/concept/poolAI_concept_root.txt` FIRST (PRIMARY concept document)
 - **Architecture**: Check `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` and `docs/concept/poolAI_concept_root.txt`
 - **Current progress**: Check `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md`
-- **Next steps**: Check `docs/development/NEXT_STEPS_2026-01-19.md`
+- **Next steps**: Check `docs/development/NEXT_STEPS_2026-01-19.md` (і додатково — `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` для архітектурних покращень)
 
 ### Rules for AI Assistant (Rust Architect Mode)
 

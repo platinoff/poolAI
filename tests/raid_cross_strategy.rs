@@ -148,10 +148,8 @@ async fn test_rebalance_across_strategies() {
     // This tests that rebalance() handles empty distribution gracefully
     let rebalance_result = manager_burst.trigger_rebalance().await.unwrap();
     assert!(rebalance_result.success, "Rebalancing should succeed");
-    assert!(
-        rebalance_result.artifacts_moved >= 0,
-        "Should return non-negative artifacts moved count"
-    );
+    // artifacts_moved is an unsigned count; just acknowledge it without absurd comparisons.
+    let _artifacts_moved_burst = rebalance_result.artifacts_moved;
 
     // Test rebalancing in SmallWorld mode
     let config_smallworld = RaidConfig {
@@ -177,10 +175,8 @@ async fn test_rebalance_across_strategies() {
     // This tests that rebalance() handles empty distribution gracefully
     let rebalance_result = manager_smallworld.trigger_rebalance().await.unwrap();
     assert!(rebalance_result.success, "Rebalancing should succeed");
-    assert!(
-        rebalance_result.artifacts_moved >= 0,
-        "Should return non-negative artifacts moved count"
-    );
+    // artifacts_moved is an unsigned count; just acknowledge it without absurd comparisons.
+    let _artifacts_moved_smallworld = rebalance_result.artifacts_moved;
 
     // Cleanup: shutdown managers to stop background tasks
     manager_burst.shutdown().await.unwrap();

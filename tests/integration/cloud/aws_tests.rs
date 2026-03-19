@@ -3,10 +3,7 @@
 //! Tests AWS EC2 and ECS API interactions using mock servers.
 
 #[cfg(feature = "cloud-sdk")]
-mod mock_servers;
-
-#[cfg(feature = "cloud-sdk")]
-use mock_servers::{MockAwsEc2Server, MockAwsEcsServer};
+use super::mock_servers::{MockAwsEc2Server, MockAwsEcsServer};
 #[cfg(feature = "cloud-sdk")]
 use poolai::cloud::providers::aws::AwsManager;
 #[cfg(feature = "cloud-sdk")]

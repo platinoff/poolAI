@@ -60,8 +60,8 @@ async fn test_raft_node_creation() {
     let term = raft_node.current_term().await;
     let role = raft_node.current_role().await;
 
-    // At least verify that methods work (term should be >= 0, role should be valid)
-    assert!(term >= 0);
+    // term is an unsigned counter; just acknowledge it.
+    let _ = term;
     assert!(role == "Leader" || role == "Follower" || role == "Candidate");
 }
 
@@ -309,9 +309,9 @@ async fn test_raft_multi_node_setup() {
     let term1 = raft_node1.current_term().await;
     let term2 = raft_node2.current_term().await;
 
-    // Terms should be valid (>= 0)
-    assert!(term1 >= 0);
-    assert!(term2 >= 0);
+    // Terms are unsigned; just acknowledge them.
+    let _ = term1;
+    let _ = term2;
 
     // Verify transport configuration
     let addr1 = raft_node1.transport().get_node_address(1).await;
@@ -560,10 +560,10 @@ async fn test_raft_multi_node_leader_election_setup() {
     let term2 = raft_node2.current_term().await;
     let term3 = raft_node3.current_term().await;
 
-    // Terms should be valid (>= 0)
-    assert!(term1 >= 0);
-    assert!(term2 >= 0);
-    assert!(term3 >= 0);
+    // Terms are unsigned; just acknowledge them.
+    let _ = term1;
+    let _ = term2;
+    let _ = term3;
 
     // Verify transport configuration
     let addr1 = raft_node1.transport().get_node_address(1).await;
@@ -814,8 +814,9 @@ async fn test_raft_failover_node_removal() {
     let term1_before = raft_node1.current_term().await;
     let term2_before = raft_node2.current_term().await;
 
-    assert!(term1_before >= 0);
-    assert!(term2_before >= 0);
+    // Terms are unsigned; just acknowledge them.
+    let _ = term1_before;
+    let _ = term2_before;
 
     // Simulate failover by removing node 2 from node 1's transport
     // This simulates node 2 becoming unavailable

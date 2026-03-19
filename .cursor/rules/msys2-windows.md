@@ -26,6 +26,16 @@
 - Running `scripts/*.sh` when needed (optional for git)
 - Any dev task
 
+### Tooling Checks (rustc/cargo/clippy/cl)
+
+- Version sanity (run once per session if something fails):
+  - `rustc --version`
+  - `cargo --version`
+  - `cargo clippy --version`
+- `cl` note:
+  - This project defaults to GNU toolchain (`x86_64-pc-windows-gnu`), so `cl.exe` typically is not required.
+  - If you ever switch to MSVC toolchain, verify `cl.exe` is available in PATH (e.g., `where cl` in a Windows terminal) and use MSVC-compatible environment.
+
 ### Paths in bash
 
 - Use `/` and MSYS2 paths: `/s/rust/poolAI` for `S:\rust\poolAI`

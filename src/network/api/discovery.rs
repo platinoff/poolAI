@@ -14,6 +14,7 @@ use axum::{
 };
 use serde::Serialize;
 
+use crate::core::state::ApiContext;
 use crate::network::discovery::{get_global_discovery_service, PeerInfo};
 
 /// Discovery API response types
@@ -29,7 +30,7 @@ struct PeerResponse {
 }
 
 /// Create discovery routes
-pub fn create_discovery_routes() -> Router {
+pub fn create_discovery_routes() -> Router<ApiContext> {
     Router::new()
         .route("/discovery/peers", get(peers_handler))
         .route("/discovery/peers/{peer_id}", get(peer_handler))

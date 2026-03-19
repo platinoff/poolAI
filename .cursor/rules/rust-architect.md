@@ -22,22 +22,25 @@
 
 **Status & Planning Documents**:
 - `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` - Current project status
-- `docs/status/STABLE_STATE_UPDATE_2026-01-19.md` - Stable state reference (v0.2.2)
+- `docs/status/STABLE_STATE_SUMMARY.md` - Stable state (доадаптовано 2026-03-04)
+- `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` - Cursor settings verification + next actions
 - `docs/concept/CONCEPT_UPDATE_2026-01-19.md` - Concept update (v7)
 - `docs/development/NEXT_STEPS_2026-01-19.md` - Latest next steps (v0.2.2 → v0.3.0+)
-- `docs/development/NEXT_STEPS_2026-01-22.md` - Current development roadmap
+- `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` - Architect stabilization plan (best practices)
 
 **Helper Files**:
 - `file_list.csv` - Complete project file inventory (108254+ lines)
   - Location: `S:\rust\poolAI\file_list.csv`
   - Use for: File navigation, structure analysis, finding files by name/path
-  - Format: CSV with `FullName`, `Length`, `LastWriteTime` columns
+  - Format: repo-relative inventory list (часто `./path -<...>`). Використовуй як “карта файлів”, не як звичайний CSV.
 
 ### Workflow Rules
 
 1. **Before Starting Any Task**:
    - ✅ Read `docs/concept/poolAI_concept_root.txt` for architecture context
    - ✅ Check `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` for current status
+   - ✅ Check `docs/status/STABLE_STATE_SUMMARY.md` for stable baseline (доадаптовано 2026-03-04)
+   - ✅ Check `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` for what to do next (Cursor + next actions)
    - ✅ Review relevant module documentation in `docs/`
    - ✅ Use `file_list.csv` to locate files if needed
 
@@ -45,7 +48,7 @@
    - ✅ Update `docs/concept/poolAI_concept_root.txt` FIRST (PRIMARY document)
    - ✅ Sync changes to `docs/concept/CONCEPT_UPDATE_2026-01-19.md` (v7)
    - ✅ Update `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` for status changes
-   - ✅ Update `docs/status/STABLE_STATE_UPDATE_2026-01-19.md` for stable state
+   - ✅ Update `docs/status/STABLE_STATE_SUMMARY.md` for stable state
    - ✅ Update `docs/development/NEXT_STEPS_2026-01-19.md` for plan changes
    - ✅ Ensure version numbers match: `Cargo.toml` (v0.2.2) → `src/version.rs` → docs
 
@@ -59,7 +62,9 @@
    - **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
    - Git: copy-paste блок з `.cursor/commands/git-push.md` (fmt, add, commit, push).
    ```bash
-   cargo check && cargo test && cargo fmt --all
+   cargo test --all-features && cargo build --all-features
+   cargo fmt --all
+   cargo clippy --all-targets --all-features
    git status --short
    git add <paths> && git commit -m "type(scope): subject" && git push origin main
    ```
@@ -165,6 +170,7 @@ type(scope): description
 ### Remember
 
 - ✅ **PRIMARY concept**: `docs/concept/poolAI_concept_root.txt` (USE FIRST)
+- ✅ **Stable baseline**: `docs/status/STABLE_STATE_SUMMARY.md` (доадаптовано 2026-03-04)
 - ✅ **Terminal**: MSYS2 bash (`C:\msys64\usr\bin\bash.exe`), NOT PowerShell, NOT cmd
 - ✅ **Helper file**: `file_list.csv` for file navigation
 - ✅ **Always sync**: Concept files ↔ Status documents ↔ README

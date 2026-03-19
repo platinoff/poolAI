@@ -36,6 +36,7 @@ pub use common::check_permission;
 // All API modules have been migrated to modular structure ✅
 // api_legacy.rs is kept for backward compatibility and distributed RAID handlers
 
+use crate::core::state::ApiContext;
 use axum::Router;
 
 /// Create API routes
@@ -43,7 +44,7 @@ use axum::Router;
 /// Composes all API endpoint modules into a single router.
 ///
 /// Currently, most routes are still in `api_legacy.rs` and will be gradually migrated.
-pub fn create_api_routes() -> Router {
+pub fn create_api_routes() -> Router<ApiContext> {
     Router::new()
         .merge(system::create_system_routes())
         .merge(workers::create_workers_routes())

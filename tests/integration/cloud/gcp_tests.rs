@@ -3,10 +3,7 @@
 //! Tests GCP Compute Engine API interactions and token acquisition.
 
 #[cfg(feature = "cloud-sdk")]
-mod mock_servers;
-
-#[cfg(feature = "cloud-sdk")]
-use mock_servers::MockGcpServer;
+use super::mock_servers::MockGcpServer;
 #[cfg(feature = "cloud-sdk")]
 use poolai::cloud::providers::gcp::GcpManager;
 #[cfg(feature = "cloud-sdk")]

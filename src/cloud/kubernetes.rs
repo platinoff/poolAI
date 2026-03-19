@@ -1850,14 +1850,8 @@ impl KubernetesManager {
 
         match self.k8s_api_request("GET", &path, None).await {
             Ok(response) => {
-                // Parse metrics response
-                let metrics_json: serde_json::Value = serde_json::from_str(&response)
-                    .map_err(|e| AppError::NetworkError(format!(
-                        "Failed to parse pod metrics response. Context: Invalid JSON from Metrics API. \
-                        Suggestion: Check Metrics API server status. \
-                        Error: {}, Response: {}",
-                        e, response
-                    )))?;
+                // Parse metrics response (already returned as JSON value)
+                let metrics_json: serde_json::Value = response;
 
                 // Extract CPU and memory from containers
                 let mut total_cpu_millicores = 0.0;
@@ -2671,7 +2665,7 @@ impl KubernetesManager {
         &self,
         name: &str,
         size: &str,
-        _storage_class: &str,
+        storage_class: &str,
     ) -> Result<(), AppError> {
         if name.is_empty() {
             return Err(AppError::ValidationError(

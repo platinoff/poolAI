@@ -168,6 +168,23 @@ pub struct ModelMetrics {
     pub average_latency_ms: f32,
 }
 
+impl Default for ModelMetrics {
+    fn default() -> Self {
+        Self {
+            processing_time_ms: 0,
+            tokens_generated: 0,
+            gpu_utilization: 0.0,
+            memory_usage_mb: 0.0,
+            throughput_tokens_per_sec: 0.0,
+            cpu_utilization: 0.0,
+            gpu_temperature: 0.0,
+            gpu_power_watts: 0.0,
+            queue_length: 0,
+            average_latency_ms: 0.0,
+        }
+    }
+}
+
 /// Model state
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelState {
@@ -193,6 +210,25 @@ pub enum ModelStatus {
     Busy,
     Error,
     Shutdown,
+}
+
+impl Default for ModelStatus {
+    fn default() -> Self {
+        ModelStatus::Initializing
+    }
+}
+
+impl Default for ModelState {
+    fn default() -> Self {
+        Self {
+            status: ModelStatus::default(),
+            active_requests: 0,
+            total_requests: 0,
+            last_activity: chrono::Utc::now(),
+            errors: Vec::new(),
+            metrics: ModelMetrics::default(),
+        }
+    }
 }
 
 /// Model configuration (for the interface)

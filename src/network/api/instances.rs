@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::core::model_interface::{GpuRequirements, ModelInfo};
+use crate::core::state::ApiContext;
 use crate::libs::get_global_manager as get_library_manager;
 use crate::network::auth::Claims;
 use crate::runtime::instance::{get_global_instance_manager, InstancePlacement};
@@ -69,7 +70,7 @@ struct InstanceInfo {
 }
 
 /// Create instance routes
-pub fn create_instance_routes() -> Router {
+pub fn create_instance_routes() -> Router<ApiContext> {
     Router::new()
         .route("/instance/previews", get(instance_previews_handler))
         .route(

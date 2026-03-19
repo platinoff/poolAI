@@ -224,9 +224,8 @@ async fn test_snapshot_replay() {
             .await
             .unwrap();
 
-        // Should start from snapshot sequence (0 if no snapshot, or snapshot sequence)
-        // start_sequence is u64, so it's always >= 0, but we verify it's a valid value
-        assert!(start_sequence <= u64::MAX);
+        // start_sequence is a u64 counter; just acknowledge it.
+        let _ = start_sequence;
     }
 }
 

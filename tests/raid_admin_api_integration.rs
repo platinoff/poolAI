@@ -62,7 +62,7 @@ async fn test_raid_admin_get_burst_raid_metrics() {
     let metrics = admin.get_burst_raid_metrics().await;
     // Metrics may be None in local mode, or Some if strategy is active
     if let Some(metrics) = metrics {
-        assert!(metrics.total_artifacts >= 0);
+        let _total_artifacts = metrics.total_artifacts;
     }
 }
 
@@ -76,7 +76,7 @@ async fn test_raid_admin_get_small_world_metrics() {
     let metrics = admin.get_small_world_metrics().await;
     // Metrics may be None in local mode, or Some if strategy is active
     if let Some(metrics) = metrics {
-        assert!(metrics.total_nodes >= 0);
+        let _total_nodes = metrics.total_nodes;
     }
 }
 

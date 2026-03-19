@@ -44,10 +44,11 @@ pub mod users;
 pub mod vm;
 pub mod workers;
 
+use crate::core::state::ApiContext;
 use axum::{response::Html, routing::get, Router};
 
 /// Admin panel routes
-pub fn create_admin_routes() -> Router {
+pub fn create_admin_routes() -> Router<ApiContext> {
     Router::new()
         .route("/admin", get(dashboard::admin_dashboard))
         .route("/admin/tenants", get(tenants::admin_tenants))

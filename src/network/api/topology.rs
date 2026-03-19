@@ -9,6 +9,7 @@ use axum::{extract::Path, http::StatusCode, response::IntoResponse, routing::get
 use serde::Serialize;
 use std::collections::HashMap;
 
+use crate::core::state::ApiContext;
 use crate::pool::topology::get_global_topology_manager;
 
 /// Topology response
@@ -60,7 +61,7 @@ struct AllNodesResourcesResponse {
 }
 
 /// Create topology routes
-pub fn create_topology_routes() -> Router {
+pub fn create_topology_routes() -> Router<ApiContext> {
     Router::new()
         .route("/topology", get(topology_handler))
         .route("/topology/latency", get(latency_matrix_handler))

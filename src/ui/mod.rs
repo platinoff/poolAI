@@ -38,6 +38,7 @@ mod admin;
 pub use admin::create_admin_routes;
 
 use crate::core::error::AppError;
+use crate::core::state::ApiContext;
 use axum::{response::Html, routing::get, Router};
 use tracing::info;
 
@@ -65,7 +66,7 @@ impl UiManager {
     }
 }
 
-pub fn create_ui_routes() -> Router {
+pub fn create_ui_routes() -> Router<ApiContext> {
     let router = Router::new()
         .route("/", get(home_handler))
         .route("/auth", get(login_page))

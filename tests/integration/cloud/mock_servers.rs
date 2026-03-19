@@ -4,12 +4,12 @@
 //! without requiring real cloud credentials or making actual API calls.
 
 #[cfg(feature = "cloud-sdk")]
-use mockito::{Mock, Server};
+use mockito::{Mock, Server, ServerGuard};
 
 #[cfg(feature = "cloud-sdk")]
 /// Mock AWS EC2 API server
 pub struct MockAwsEc2Server {
-    server: Server,
+    server: ServerGuard,
 }
 
 #[cfg(feature = "cloud-sdk")]
@@ -75,7 +75,7 @@ impl MockAwsEc2Server {
 #[cfg(feature = "cloud-sdk")]
 /// Mock AWS ECS API server
 pub struct MockAwsEcsServer {
-    server: Server,
+    server: ServerGuard,
 }
 
 #[cfg(feature = "cloud-sdk")]
@@ -119,7 +119,7 @@ impl MockAwsEcsServer {
 #[cfg(feature = "cloud-sdk")]
 /// Mock Azure REST API server
 pub struct MockAzureServer {
-    server: Server,
+    server: ServerGuard,
 }
 
 #[cfg(feature = "cloud-sdk")]
@@ -164,7 +164,16 @@ impl MockAzureServer {
         resource_group: &str,
     ) -> Mock {
         self.server
-            .mock("PUT", &format!("/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}", subscription_id, resource_group, "test-vmss"))
+            .mock(
+                "PUT",
+                format!(
+                    "/subscriptions/{}/resourceGroups/{}/providers/Microsoft.Compute/virtualMachineScaleSets/{}",
+                    subscription_id,
+                    resource_group,
+                    "test-vmss"
+                )
+                .as_str(),
+            )
             .with_status(200)
             .with_header("content-type", "application/json")
             .with_body(
@@ -183,7 +192,7 @@ impl MockAzureServer {
 #[cfg(feature = "cloud-sdk")]
 /// Mock GCP REST API server
 pub struct MockGcpServer {
-    server: Server,
+    server: ServerGuard,
 }
 
 #[cfg(feature = "cloud-sdk")]
@@ -243,7 +252,7 @@ impl MockGcpServer {
         self.server
             .mock(
                 "POST",
-                &format!("/compute/v1/projects/{}/zones/{}/instances", project, zone),
+                format!("/compute/v1/projects/{}/zones/{}/instances", project, zone).as_str(),
             )
             .with_status(200)
             .with_header("content-type", "application/json")

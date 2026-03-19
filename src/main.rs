@@ -17,6 +17,7 @@ use poolai::{
     AppState, // Re-exported from core::state
 };
 use std::net::SocketAddr;
+use std::sync::Arc;
 use tokio::signal;
 use tracing::{error, info};
 
@@ -102,7 +103,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     info!("✅ Core module initialized");
 
     // Initialize application state
-    let app_state = AppState::new();
+    let app_state = Arc::new(AppState::new());
     app_state.initialize().await?;
     info!("✅ Application state initialized");
 

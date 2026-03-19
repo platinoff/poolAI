@@ -4,6 +4,7 @@
 
 use axum::{routing::get, Json, Router};
 
+use crate::core::state::ApiContext;
 use crate::ml::automl::AutomlConfig;
 use crate::ml::federated::FederatedConfig;
 use crate::ml::optimization::{
@@ -22,7 +23,7 @@ use crate::ml::AiMlStatus;
 /// - `GET /optimization/quantization-result` — ML.1 quantization stub
 /// - `GET /automl` — ML.2
 /// - `GET /federated` — ML.3
-pub fn create_ai_ml_routes() -> Router {
+pub fn create_ai_ml_routes() -> Router<ApiContext> {
     Router::new()
         .route("/", get(ai_ml_status_handler))
         .route("/status", get(ai_ml_status_handler))

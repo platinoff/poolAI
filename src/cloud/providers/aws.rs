@@ -71,6 +71,14 @@ pub struct AwsManager {
     #[cfg(feature = "aws-sdk-s3")]
     /// AWS SDK S3 client
     s3_client: Arc<RwLock<Option<S3Client>>>,
+
+    #[cfg(feature = "cloud-sdk")]
+    /// EC2 REST API base URL override (e.g. mock server for tests).
+    ec2_base_url_override: Arc<RwLock<Option<String>>>,
+
+    #[cfg(feature = "cloud-sdk")]
+    /// ECS REST API base URL override (e.g. mock server for tests).
+    ecs_base_url_override: Arc<RwLock<Option<String>>>,
 }
 
 impl AwsManager {

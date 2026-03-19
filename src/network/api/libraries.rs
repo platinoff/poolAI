@@ -14,12 +14,13 @@ use axum::{
     Json as AxumJson, Router,
 };
 
+use crate::core::state::ApiContext;
 use crate::libs::{get_global_manager, LibraryType};
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 
 /// Create library management routes
-pub fn create_libraries_routes() -> Router {
+pub fn create_libraries_routes() -> Router<ApiContext> {
     Router::new()
         .route("/libraries", get(libraries_list_handler))
         .route("/libraries/{name}", get(library_info_handler))

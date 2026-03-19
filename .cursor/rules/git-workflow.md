@@ -18,7 +18,7 @@ All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).
 ```
 <type>(<scope>): <subject>
 
-[optional body]
+[optional body - рекомендується: 2-4 bullet points]
 
 [optional footer]
 ```
@@ -26,6 +26,10 @@ All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).
 **Types**: `feat` | `fix` | `docs` | `style` | `refactor` | `perf` | `test` | `build` | `ci` | `chore` | `revert`  
 **Scope examples**: `vm`, `ui`, `raid`, `network`, `cloud`, `ml`, `docs`, `scripts`, `concept`  
 **Subject**: imperative, lowercase, ~50 chars.
+
+**Commit summary/body (2-4 bullets)**:
+- що саме зроблено (1-2 рядки сумарно)
+- які перевірки виконані (наприклад: `cargo fmt`, `cargo clippy`, `cargo test`, `cargo build` з `--all-features`)
 
 **Examples**:
 - `feat(cloud): AWS EC2/ECS base_url_override`
@@ -46,10 +50,13 @@ cd /s/rust/poolAI
 rm -f .git/index.lock
 git status --short
 cargo fmt --all
+cargo clippy --all-targets --all-features
+cargo test --all-features
+cargo build --all-features
 git add Cargo.toml src/ tests/ scripts/
 git add -f docs/CHANGELOG.md docs/cloud/CLOUD_SDK_STATUS.md docs/concept/poolAI_concept_root.txt docs/development/NEXT_STEPS_2026-01-19.md docs/status/STABLE_STATE_SUMMARY.md docs/troubleshooting/GIT_PUSH_FAILED.md
 git add -f .cursor/rules/ .cursor/commands/
-git commit -m "feat(scope): subject"
+git commit -m "type(scope): subject" -m "Summary: cargo fmt/clippy/test/build (--all-features); updated code/docs/rules as needed"
 git push origin main
 ```
 

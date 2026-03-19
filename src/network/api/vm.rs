@@ -18,6 +18,7 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::core::state::ApiContext;
 use crate::network::api::common::check_permission;
 use crate::network::auth::Claims;
 use crate::vm;
@@ -37,7 +38,7 @@ struct VmUpdateRequest {
 }
 
 /// Create VM management routes
-pub fn create_vm_routes() -> Router {
+pub fn create_vm_routes() -> Router<ApiContext> {
     Router::new()
         .route("/vm/instances", get(vm_instances_handler))
         .route(

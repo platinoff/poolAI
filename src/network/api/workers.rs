@@ -14,6 +14,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::core::state::ApiContext;
 use crate::network::auth::auth_middleware;
 use crate::network::validation;
 use crate::pool;
@@ -53,7 +54,7 @@ struct DeleteWorkerResponse {
 }
 
 /// Create worker management routes
-pub fn create_workers_routes() -> Router {
+pub fn create_workers_routes() -> Router<ApiContext> {
     Router::new()
         .route("/workers", get(workers_handler))
         .route(

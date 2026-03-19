@@ -7,6 +7,7 @@ use axum::{
     http::{Request, StatusCode},
     Router,
 };
+use poolai::core::state::ApiContext;
 use poolai::network::api::create_api_routes;
 use tower::ServiceExt;
 
@@ -19,7 +20,9 @@ async fn test_api_routes_creation() {
 
 #[tokio::test]
 async fn test_status_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -35,7 +38,9 @@ async fn test_status_endpoint_exists() {
 
 #[tokio::test]
 async fn test_health_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -51,7 +56,9 @@ async fn test_health_endpoint_exists() {
 
 #[tokio::test]
 async fn test_metrics_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -67,7 +74,9 @@ async fn test_metrics_endpoint_exists() {
 
 #[tokio::test]
 async fn test_workers_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -83,7 +92,9 @@ async fn test_workers_endpoint_exists() {
 
 #[tokio::test]
 async fn test_libraries_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -102,7 +113,9 @@ async fn test_libraries_endpoint_exists() {
 
 #[tokio::test]
 async fn test_vm_instances_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -118,7 +131,9 @@ async fn test_vm_instances_endpoint_exists() {
 
 #[tokio::test]
 async fn test_raid_artifacts_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -134,7 +149,9 @@ async fn test_raid_artifacts_endpoint_exists() {
 
 #[tokio::test]
 async fn test_raid_nodes_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -150,7 +167,9 @@ async fn test_raid_nodes_endpoint_exists() {
 
 #[tokio::test]
 async fn test_rewards_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -166,7 +185,9 @@ async fn test_rewards_endpoint_exists() {
 
 #[tokio::test]
 async fn test_instance_previews_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -183,7 +204,9 @@ async fn test_instance_previews_endpoint_exists() {
 
 #[tokio::test]
 async fn test_instance_previews_requires_model_id() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -200,7 +223,9 @@ async fn test_instance_previews_requires_model_id() {
 
 #[tokio::test]
 async fn test_instance_list_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -219,7 +244,9 @@ async fn test_instance_list_endpoint_exists() {
 
 #[tokio::test]
 async fn test_state_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -236,7 +263,9 @@ async fn test_state_endpoint_exists() {
 
 #[tokio::test]
 async fn test_chat_completions_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -257,7 +286,9 @@ async fn test_chat_completions_endpoint_exists() {
 
 #[tokio::test]
 async fn test_topology_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -274,7 +305,9 @@ async fn test_topology_endpoint_exists() {
 
 #[tokio::test]
 async fn test_topology_latency_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -291,7 +324,9 @@ async fn test_topology_latency_endpoint_exists() {
 
 #[tokio::test]
 async fn test_topology_nodes_endpoint_exists() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
@@ -308,7 +343,9 @@ async fn test_topology_nodes_endpoint_exists() {
 
 #[tokio::test]
 async fn test_nonexistent_endpoint_returns_404() {
-    let app = Router::new().nest("/api/v1", create_api_routes());
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
     let response = app
         .oneshot(
             Request::builder()
