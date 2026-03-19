@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["AppError","CursorError","PoolAIError"],"struct":["ErrorMetrics"]};
+window.SIDEBAR_ITEMS = {"enum":["AppError","CursorError","PoolAIError"],"struct":["ErrorContext","ErrorMetrics"]};
