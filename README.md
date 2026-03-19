@@ -48,10 +48,20 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 ---
 
 ## 🎯 Development Status
-
-**Current Phase**: Stage 4.3 Cloud Integration in progress, Stage 4.4 AI/ML scaffolding ready (see docs)  
+**Current Phase**: Stage 4.3 Cloud Integration (SDK integration in progress; test suite hardening ongoing) and Stage 4.4 AI/ML (development in progress)  
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
-For a detailed status view see `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` and `docs/status/STABLE_STATE_SUMMARY.md`.
+For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`.
+
+### ✅ Current Build/Test Status (2026-03-19)
+- `cargo fmt --all` — OK
+- `cargo clippy --all-targets --all-features` — OK
+- `cargo build --all-features` — OK
+- `cargo test --all-features` — FAILS (compile-time `E0282` type inference in):
+  - `tests/cloud_providers.rs`
+  - `tests/load_tests.rs`
+
+### Next Focus
+- Fix `E0282` type inference in those tests, then re-run `cargo test --all-features` and `cargo build --all-features`.
 
 ### 🚀 Development Roadmap
 
@@ -200,27 +210,23 @@ For a detailed status view see `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md`
 
 If you're building on Windows with `jwt` or `https` features, you need MSYS2 tools (`dlltool.exe`, `gcc`) in your PATH:
 
-#### Quick Setup (PowerShell)
-```powershell
-# Run setup script to add MSYS2 to PATH
-.\scripts\setup_msys2_path.ps1
+#### Quick Setup (MSYS2 bash)
+Open an **MSYS2 UCRT64 bash** terminal and run:
+```bash
+export MSYSTEM=UCRT64
+export PATH=/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH
 
-# Verify dlltool is available
+# Verify tools are available
 dlltool --version
+gcc --version
 ```
 
-#### Manual Setup
-If MSYS2 is installed but not in PATH, add it manually:
-```powershell
-# For current PowerShell session
-$env:PATH += ";C:\msys64\usr\bin"
+#### Manual Setup (permanent)
+If the MSYS2 dirs are not on your Windows `PATH`, add permanently:
+- `C:\msys64\ucrt64\bin`
+- `C:\msys64\usr\bin`
 
-# Or add C:\msys64\usr\bin to System PATH environment variable permanently
-```
-
-**Note**: The `setup_msys2_path.ps1` script adds MSYS2 to PATH only for the current PowerShell session. For a permanent solution, add `C:\msys64\usr\bin` to your system PATH environment variable.
-
-**Troubleshooting**: If you get `Error calling dlltool 'dlltool.exe': program not found`, run `.\scripts\setup_msys2_path.ps1` before building.
+Then restart your terminal.
 
 ### Quick Start
 
@@ -231,8 +237,9 @@ $env:PATH += ";C:\msys64\usr\bin"
    ```
 
 2. **Windows: Setup MSYS2 PATH** (if using jwt/https features)
-   ```powershell
-   .\scripts\setup_msys2_path.ps1
+   ```bash
+   export MSYSTEM=UCRT64
+   export PATH=/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH
    ```
 
 3. **Install dependencies**
