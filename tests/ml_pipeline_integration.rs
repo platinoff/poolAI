@@ -302,6 +302,16 @@ async fn test_get_pipeline_status() {
 async fn test_pipeline_with_all_step_types() {
     let manager = MLPipelineManager::new();
 
+    let mut quant_cfg = HashMap::new();
+    quant_cfg.insert("quantization".to_string(), "int8".to_string());
+
+    let mut tune_cfg = HashMap::new();
+    tune_cfg.insert("lr_min".to_string(), "1e-5".to_string());
+    tune_cfg.insert("lr_max".to_string(), "1e-2".to_string());
+
+    let mut prune_cfg = HashMap::new();
+    prune_cfg.insert("ratio".to_string(), "0.15".to_string());
+
     let steps = vec![
         PipelineStep {
             id: "preprocess".to_string(),
@@ -316,10 +326,34 @@ async fn test_pipeline_with_all_step_types() {
             dependencies: vec!["preprocess".to_string()],
         },
         PipelineStep {
+            id: "quant".to_string(),
+            step_type: StepType::Quantization,
+            config: quant_cfg,
+            dependencies: vec!["train".to_string()],
+        },
+        PipelineStep {
+            id: "tune".to_string(),
+            step_type: StepType::HyperparameterTuning,
+            config: tune_cfg,
+            dependencies: vec!["quant".to_string()],
+        },
+        PipelineStep {
+            id: "prune".to_string(),
+            step_type: StepType::Pruning,
+            config: prune_cfg,
+            dependencies: vec!["tune".to_string()],
+        },
+        PipelineStep {
+            id: "automl".to_string(),
+            step_type: StepType::AutoMl,
+            config: HashMap::new(),
+            dependencies: vec!["prune".to_string()],
+        },
+        PipelineStep {
             id: "evaluate".to_string(),
             step_type: StepType::Evaluation,
             config: HashMap::new(),
-            dependencies: vec!["train".to_string()],
+            dependencies: vec!["automl".to_string()],
         },
         PipelineStep {
             id: "deploy".to_string(),
@@ -337,7 +371,34 @@ async fn test_pipeline_with_all_step_types() {
 
     let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.status, PipelineStatus::Completed);
-    assert_eq!(got.step_results.len(), 4);
+    assert_eq!(got.step_results.len(), 8);
+    assert_eq!(
+        got.step_results
+            .get("quant")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"quantization".to_string())
+    );
+    assert_eq!(
+        got.step_results
+            .get("tune")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"hyperparameter_tuning".to_string())
+    );
+    let prune_out = got
+        .step_results
+        .get("prune")
+        .and_then(|r| r.output.as_ref())
+        .unwrap();
+    assert_eq!(prune_out.get("step_kind"), Some(&"pruning".to_string()));
+    assert_eq!(
+        got.step_results
+            .get("automl")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"automl".to_string())
+    );
 }
 
 #[tokio::test]

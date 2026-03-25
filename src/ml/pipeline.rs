@@ -19,11 +19,13 @@
 //!         id: "preprocess".to_string(),
 //!         step_type: StepType::Preprocessing,
 //!         config: std::collections::HashMap::new(),
+//!         dependencies: vec![],
 //!     },
 //!     PipelineStep {
 //!         id: "train".to_string(),
 //!         step_type: StepType::Training,
 //!         config: std::collections::HashMap::new(),
+//!         dependencies: vec!["preprocess".to_string()],
 //!     },
 //! ];
 //!
@@ -34,6 +36,11 @@
 //! ```
 
 use crate::core::error::AppError;
+use crate::ml::automl::{AutoMLPipeline, AutomlConfig, TrainingData};
+use crate::ml::optimization::{
+    apply_iterative_pruning, apply_pruning, apply_quantization, suggest_hyperparams,
+    OptimizationProfile, PruningConfig, PruningStrategy, QuantizationLevel, TuningConfig,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -46,6 +53,14 @@ use uuid::Uuid;
 pub enum StepType {
     Preprocessing,
     Training,
+    /// ML.1 hyperparameter suggestion (`suggest_hyperparams`).
+    HyperparameterTuning,
+    /// ML.1 quantization (`apply_quantization`).
+    Quantization,
+    /// ML.1 structured / magnitude / unstructured pruning (`optimization` module).
+    Pruning,
+    /// ML.2 AutoML model selection (`AutoMLPipeline::train`).
+    AutoMl,
     Evaluation,
     Deployment,
 }
@@ -355,14 +370,396 @@ impl MLPipelineManager {
 
     /// Execute a single step (simulated)
     async fn execute_step(&self, step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
-        // Simulate step execution
         tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+
+        match step.step_type {
+            StepType::Pruning => Self::execute_pruning_step(step),
+            StepType::Quantization => Self::execute_quantization_step(step),
+            StepType::HyperparameterTuning => Self::execute_tuning_step(step),
+            StepType::AutoMl => Self::execute_automl_step(step).await,
+            _ => {
+                let mut output = HashMap::new();
+                output.insert("status".to_string(), "completed".to_string());
+                output.insert("step_id".to_string(), step.id.clone());
+                Ok(output)
+            }
+        }
+    }
+
+    fn execute_pruning_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
+        let (weights, pconf) = Self::pruning_inputs_from_step_config(step)?;
+
+        let result = if pconf.iterative && pconf.iterations > 1 {
+            apply_iterative_pruning(&weights, &pconf)
+        } else {
+            apply_pruning(&weights, &pconf)
+        };
 
         let mut output = HashMap::new();
         output.insert("status".to_string(), "completed".to_string());
         output.insert("step_id".to_string(), step.id.clone());
-
+        output.insert("step_kind".to_string(), "pruning".to_string());
+        output.insert(
+            "pruning_strategy".to_string(),
+            format!("{:?}", result.strategy),
+        );
+        output.insert(
+            "weights_before".to_string(),
+            result.weights_before.to_string(),
+        );
+        output.insert(
+            "weights_after".to_string(),
+            result.weights_after.to_string(),
+        );
+        output.insert("pruned_count".to_string(), result.pruned_count.to_string());
+        output.insert(
+            "compression_ratio".to_string(),
+            format!("{:.6}", result.compression_ratio),
+        );
+        output.insert(
+            "accuracy_drop_est".to_string(),
+            format!("{:.6}", result.accuracy_drop),
+        );
         Ok(output)
+    }
+
+    fn execute_quantization_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
+        let cfg = &step.config;
+        let level = Self::parse_quantization_level(
+            cfg.get("quantization")
+                .or_else(|| cfg.get("quantization_level"))
+                .or_else(|| cfg.get("level"))
+                .map(|s| s.as_str()),
+        )?;
+        let pruning_ratio = cfg
+            .get("profile_pruning_ratio")
+            .or_else(|| cfg.get("pruning_ratio"))
+            .map(|s| s.parse::<f32>())
+            .transpose()
+            .map_err(|_| {
+                AppError::ModelError(
+                    "Invalid profile_pruning_ratio for quantization step. Suggestion: float or omit."
+                        .to_string(),
+                )
+            })?
+            .unwrap_or(0.0);
+        if !(0.0..=1.0).contains(&pruning_ratio) {
+            return Err(AppError::ModelError(
+                "profile_pruning_ratio out of range [0,1].".to_string(),
+            ));
+        }
+
+        let profile = OptimizationProfile {
+            quantization: level,
+            pruning_ratio,
+        };
+        let q = apply_quantization(&profile);
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "quantization".to_string());
+        output.insert("quantization_level".to_string(), format!("{:?}", q.level));
+        output.insert(
+            "size_mb_before".to_string(),
+            format!("{:.6}", q.size_mb_before),
+        );
+        output.insert(
+            "size_mb_after".to_string(),
+            format!("{:.6}", q.size_mb_after),
+        );
+        output.insert(
+            "compression_ratio".to_string(),
+            format!("{:.6}", q.compression_ratio),
+        );
+        Ok(output)
+    }
+
+    fn execute_tuning_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
+        let cfg = Self::tuning_config_from_step(&step.config)?;
+        let r = suggest_hyperparams(&cfg);
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "hyperparameter_tuning".to_string());
+        output.insert(
+            "suggested_learning_rate".to_string(),
+            format!("{}", r.learning_rate),
+        );
+        output.insert("suggested_batch_size".to_string(), r.batch_size.to_string());
+        output.insert(
+            "suggested_epochs".to_string(),
+            r.suggested_epochs.to_string(),
+        );
+        Ok(output)
+    }
+
+    async fn execute_automl_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
+        let data = Self::parse_automl_training_data(&step.config)?;
+        let automl_cfg = Self::automl_config_from_step(&step.config)?;
+        let pipeline = AutoMLPipeline::new(automl_cfg);
+        let model = pipeline.train(data).await?;
+
+        let hp_json = serde_json::to_string(&model.hyperparameters).map_err(|e| {
+            AppError::ModelError(format!(
+                "Failed to serialize AutoML hyperparameters: {}. Context: serde_json.",
+                e
+            ))
+        })?;
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "automl".to_string());
+        output.insert("model_id".to_string(), model.model_id);
+        output.insert("accuracy".to_string(), format!("{:.6}", model.accuracy));
+        output.insert("model_type".to_string(), format!("{:?}", model.model_type));
+        output.insert(
+            "training_time_ms".to_string(),
+            model.training_time_ms.to_string(),
+        );
+        output.insert("hyperparameters_json".to_string(), hp_json);
+        Ok(output)
+    }
+
+    fn parse_quantization_level(s: Option<&str>) -> Result<QuantizationLevel, AppError> {
+        let Some(key) = s else {
+            return Ok(QuantizationLevel::None);
+        };
+        Ok(match key.to_ascii_lowercase().as_str() {
+            "none" | "fp32" | "fp" => QuantizationLevel::None,
+            "int8" | "q8" | "8" => QuantizationLevel::Int8,
+            "int4" | "q4" | "4" => QuantizationLevel::Int4,
+            other => {
+                return Err(AppError::ModelError(format!(
+                    "Unknown quantization level '{}'. Suggestion: none, int8, int4.",
+                    other
+                )));
+            }
+        })
+    }
+
+    fn tuning_config_from_step(cfg: &HashMap<String, String>) -> Result<TuningConfig, AppError> {
+        let mut t = TuningConfig::default_config();
+        if let Some(v) = cfg.get("lr_min").or_else(|| cfg.get("learning_rate_min")) {
+            t.learning_rate_min = v.parse().map_err(|_| {
+                AppError::ModelError(format!("Invalid learning_rate_min: '{}'.", v))
+            })?;
+        }
+        if let Some(v) = cfg.get("lr_max").or_else(|| cfg.get("learning_rate_max")) {
+            t.learning_rate_max = v.parse().map_err(|_| {
+                AppError::ModelError(format!("Invalid learning_rate_max: '{}'.", v))
+            })?;
+        }
+        if let Some(raw) = cfg
+            .get("batch_sizes")
+            .or_else(|| cfg.get("batch_size_candidates"))
+        {
+            let cand: Vec<u32> = raw
+                .split(',')
+                .filter_map(|x| x.trim().parse().ok())
+                .collect();
+            if !cand.is_empty() {
+                t.batch_size_candidates = cand;
+            }
+        }
+        if t.learning_rate_min > t.learning_rate_max {
+            return Err(AppError::ModelError(
+                "Tuning config: learning_rate_min must be <= learning_rate_max.".to_string(),
+            ));
+        }
+        Ok(t)
+    }
+
+    fn automl_config_from_step(cfg: &HashMap<String, String>) -> Result<AutomlConfig, AppError> {
+        let mut c = AutomlConfig::default_config();
+        if let Some(v) = cfg.get("automl_max_trials") {
+            c.max_trials = v.parse().map_err(|_| {
+                AppError::ModelError(format!("Invalid automl_max_trials: '{}'.", v))
+            })?;
+        }
+        if let Some(v) = cfg.get("automl_timeout_seconds") {
+            c.timeout_seconds = v.parse().map_err(|_| {
+                AppError::ModelError(format!("Invalid automl_timeout_seconds: '{}'.", v))
+            })?;
+        }
+        if let Some(v) = cfg.get("automl_ensemble_size") {
+            c.ensemble_size = v.parse().map_err(|_| {
+                AppError::ModelError(format!("Invalid automl_ensemble_size: '{}'.", v))
+            })?;
+        }
+        if let Some(v) = cfg.get("automl_cv_folds") {
+            c.cross_validation_folds = v
+                .parse()
+                .map_err(|_| AppError::ModelError(format!("Invalid automl_cv_folds: '{}'.", v)))?;
+        }
+        if let Some(v) = cfg.get("automl_auto_features") {
+            c.auto_feature_engineering =
+                matches!(v.to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on");
+        }
+        Ok(c)
+    }
+
+    /// Parse training data from step config.
+    ///
+    /// - `feature_rows`: rows separated by `;`, components by `,` (e.g. `"1,2;3,4;5,6"`).
+    /// - `labels`: comma-separated floats, same count as rows.
+    /// If omitted, uses a small built-in example (4×2 features).
+    fn parse_automl_training_data(cfg: &HashMap<String, String>) -> Result<TrainingData, AppError> {
+        let default_features = vec![
+            vec![1.0, 2.0],
+            vec![3.0, 4.0],
+            vec![5.0, 6.0],
+            vec![7.0, 8.0],
+        ];
+        let default_labels = vec![0.0, 1.0, 0.0, 1.0];
+
+        let (features, labels) = match cfg.get("feature_rows") {
+            None => (default_features, default_labels),
+            Some(rows_raw) => {
+                let features: Vec<Vec<f64>> = rows_raw
+                    .split(';')
+                    .map(|row| {
+                        row.split(',')
+                            .filter_map(|x| x.trim().parse::<f64>().ok())
+                            .collect::<Vec<f64>>()
+                    })
+                    .filter(|r| !r.is_empty())
+                    .collect();
+                if features.is_empty() {
+                    return Err(AppError::ModelError(
+                        "AutoML step: feature_rows parsed to no rows. Suggestion: use `1,2;3,4` \
+                         style or omit for demo data."
+                            .to_string(),
+                    ));
+                }
+                let dim0 = features[0].len();
+                if features.iter().any(|r| r.len() != dim0) {
+                    return Err(AppError::ModelError(
+                        "AutoML step: all feature rows must have the same length.".to_string(),
+                    ));
+                }
+                let labels_raw = cfg.get("labels").ok_or_else(|| {
+                    AppError::ModelError(
+                        "AutoML step: labels required when feature_rows is set. Suggestion: \
+                         labels=0,1,0,1 matching row count."
+                            .to_string(),
+                    )
+                })?;
+                let labels: Vec<f64> = labels_raw
+                    .split(',')
+                    .filter_map(|x| x.trim().parse::<f64>().ok())
+                    .collect();
+                if labels.len() != features.len() {
+                    return Err(AppError::ModelError(format!(
+                        "AutoML step: {} labels but {} feature rows.",
+                        labels.len(),
+                        features.len()
+                    )));
+                }
+                (features, labels)
+            }
+        };
+
+        Ok(TrainingData { features, labels })
+    }
+
+    fn pruning_inputs_from_step_config(
+        step: &PipelineStep,
+    ) -> Result<(Vec<f64>, PruningConfig), AppError> {
+        let cfg = &step.config;
+        let weights = Self::parse_pruning_weights(cfg);
+
+        if weights.is_empty() {
+            return Err(AppError::ModelError(
+                "Pruning step requires weights or default non-empty demo weights. Context: weight \
+                 vector is empty after parsing. Suggestion: add config key 'weights' with \
+                 comma-separated floats, or omit for built-in demo vector."
+                    .to_string(),
+            ));
+        }
+
+        let ratio_raw = cfg
+            .get("pruning_ratio")
+            .or_else(|| cfg.get("ratio"))
+            .map(|s| s.as_str())
+            .unwrap_or("0.1");
+        let ratio: f32 = ratio_raw.parse().map_err(|_| {
+            AppError::ModelError(format!(
+                "Invalid pruning ratio. Context: cannot parse '{}'. Suggestion: use a float in [0,1].",
+                ratio_raw
+            ))
+        })?;
+        if !(0.0..=1.0).contains(&ratio) {
+            return Err(AppError::ModelError(format!(
+                "Pruning ratio out of range. Context: ratio={}. Suggestion: use 0.0–1.0.",
+                ratio
+            )));
+        }
+
+        let strategy = Self::parse_pruning_strategy(
+            cfg.get("pruning_strategy")
+                .or_else(|| cfg.get("strategy"))
+                .map(|s| s.as_str()),
+        );
+
+        let iterative = cfg
+            .get("iterative")
+            .map(|s| matches!(s.to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(false);
+
+        let iterations: u32 = cfg
+            .get("iterations")
+            .map(|s| s.parse::<u32>())
+            .transpose()
+            .map_err(|_| {
+                AppError::ModelError(
+                    "Invalid iterations. Context: expected unsigned integer. Suggestion: e.g. \
+                     iterations=3"
+                        .to_string(),
+                )
+            })?
+            .unwrap_or(1)
+            .clamp(1, 64);
+
+        let mut pconf = PruningConfig {
+            strategy,
+            ratio,
+            iterative,
+            iterations,
+        };
+
+        if iterative && iterations == 1 {
+            pconf.iterative = false;
+        }
+
+        Ok((weights, pconf))
+    }
+
+    fn parse_pruning_weights(cfg: &HashMap<String, String>) -> Vec<f64> {
+        if let Some(raw) = cfg.get("weights") {
+            let v: Vec<f64> = raw
+                .split(',')
+                .filter_map(|t| t.trim().parse::<f64>().ok())
+                .collect();
+            if !v.is_empty() {
+                return v;
+            }
+        }
+        vec![1.0, 0.5, 0.1, 2.0, 0.3, 0.05, 3.0, 0.2]
+    }
+
+    fn parse_pruning_strategy(s: Option<&str>) -> PruningStrategy {
+        let Some(key) = s else {
+            return PruningStrategy::MagnitudeBased;
+        };
+        match key.to_ascii_lowercase().as_str() {
+            "structured" => PruningStrategy::Structured,
+            "unstructured" => PruningStrategy::Unstructured,
+            "magnitude" | "magnitude_based" => PruningStrategy::MagnitudeBased,
+            _ => PruningStrategy::MagnitudeBased,
+        }
     }
 
     /// Get pipeline by ID
@@ -514,5 +911,115 @@ mod tests {
         let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
         assert_eq!(got.status, PipelineStatus::Completed);
         assert_eq!(got.step_results.len(), 2);
+    }
+
+    #[tokio::test]
+    async fn test_execute_pruning_step_populates_metrics() {
+        let manager = MLPipelineManager::new();
+        let mut cfg = HashMap::new();
+        cfg.insert("pruning_ratio".to_string(), "0.2".to_string());
+        cfg.insert(
+            "pruning_strategy".to_string(),
+            "magnitude_based".to_string(),
+        );
+
+        let steps = vec![PipelineStep {
+            id: "prune1".to_string(),
+            step_type: StepType::Pruning,
+            config: cfg,
+            dependencies: vec![],
+        }];
+
+        let pipeline = manager.create_pipeline("p", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let res = got.step_results.get("prune1").unwrap();
+        assert_eq!(res.status, StepStatus::Completed);
+        let out = res.output.as_ref().unwrap();
+        assert_eq!(out.get("step_kind"), Some(&"pruning".to_string()));
+        assert!(out.get("pruned_count").unwrap().parse::<usize>().unwrap() > 0);
+    }
+
+    #[tokio::test]
+    async fn test_execute_quantization_step() {
+        let manager = MLPipelineManager::new();
+        let mut cfg = HashMap::new();
+        cfg.insert("quantization".to_string(), "int8".to_string());
+
+        let steps = vec![PipelineStep {
+            id: "q1".to_string(),
+            step_type: StepType::Quantization,
+            config: cfg,
+            dependencies: vec![],
+        }];
+        let pipeline = manager.create_pipeline("pq", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let out = got.step_results["q1"].output.as_ref().unwrap();
+        assert_eq!(out.get("step_kind"), Some(&"quantization".to_string()));
+        assert!(
+            out.get("compression_ratio")
+                .unwrap()
+                .parse::<f64>()
+                .unwrap()
+                >= 1.0
+        );
+    }
+
+    #[tokio::test]
+    async fn test_execute_tuning_step() {
+        let manager = MLPipelineManager::new();
+        let steps = vec![PipelineStep {
+            id: "t1".to_string(),
+            step_type: StepType::HyperparameterTuning,
+            config: HashMap::new(),
+            dependencies: vec![],
+        }];
+        let pipeline = manager.create_pipeline("pt", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let out = got.step_results["t1"].output.as_ref().unwrap();
+        assert_eq!(
+            out.get("step_kind"),
+            Some(&"hyperparameter_tuning".to_string())
+        );
+        assert!(
+            out.get("suggested_batch_size")
+                .unwrap()
+                .parse::<u32>()
+                .unwrap()
+                > 0
+        );
+    }
+
+    #[tokio::test]
+    async fn test_execute_automl_step_uses_builtin_data() {
+        let manager = MLPipelineManager::new();
+        let steps = vec![PipelineStep {
+            id: "a1".to_string(),
+            step_type: StepType::AutoMl,
+            config: HashMap::new(),
+            dependencies: vec![],
+        }];
+        let pipeline = manager.create_pipeline("pa", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let out = got.step_results["a1"].output.as_ref().unwrap();
+        assert_eq!(out.get("step_kind"), Some(&"automl".to_string()));
+        assert!(out.get("accuracy").unwrap().parse::<f64>().unwrap() > 0.0);
+        assert!(out.contains_key("hyperparameters_json"));
     }
 }
