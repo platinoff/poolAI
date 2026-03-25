@@ -2,7 +2,9 @@
 //!
 //! Serves `/api/enterprise/ai-ml` when both `enterprise` and `ml` features are enabled.
 
+use axum::http::StatusCode;
 use axum::{routing::get, Json, Router};
+use std::collections::HashMap;
 
 use crate::core::state::ApiContext;
 use crate::ml::automl::AutomlConfig;
@@ -11,6 +13,7 @@ use crate::ml::optimization::{
     apply_quantization, profile_model, suggest_hyperparams, ModelProfile, OptimizationProfile,
     QuantizationResult, TuningConfig, TuningResult,
 };
+use crate::ml::pipeline::{MLPipeline, MLPipelineManager, PipelineStep, StepType};
 use crate::ml::AiMlStatus;
 
 /// Create AI/ML API routes.
@@ -23,6 +26,7 @@ use crate::ml::AiMlStatus;
 /// - `GET /optimization/quantization-result` — ML.1 quantization stub
 /// - `GET /automl` — ML.2
 /// - `GET /federated` — ML.3
+/// - `GET /pipeline/demo` — ML.6 demo (single Profiling step; ephemeral manager per request)
 pub fn create_ai_ml_routes() -> Router<ApiContext> {
     Router::new()
         .route("/", get(ai_ml_status_handler))
@@ -42,6 +46,7 @@ pub fn create_ai_ml_routes() -> Router<ApiContext> {
         )
         .route("/automl", get(ai_ml_automl_handler))
         .route("/federated", get(ai_ml_federated_handler))
+        .route("/pipeline/demo", get(ai_ml_pipeline_demo_handler))
 }
 
 async fn ai_ml_status_handler() -> Json<AiMlStatus> {
@@ -72,4 +77,28 @@ async fn ai_ml_automl_handler() -> Json<AutomlConfig> {
 
 async fn ai_ml_federated_handler() -> Json<FederatedConfig> {
     Json(FederatedConfig::default_config())
+}
+
+/// Повертає результат виконання демо-pipeline (один крок Profiling). Окремий менеджер на запит.
+async fn ai_ml_pipeline_demo_handler() -> Result<Json<MLPipeline>, StatusCode> {
+    let manager = MLPipelineManager::new();
+    let steps = vec![PipelineStep {
+        id: "profile".to_string(),
+        step_type: StepType::Profiling,
+        config: HashMap::new(),
+        dependencies: vec![],
+    }];
+    let pipeline = manager
+        .create_pipeline("api-demo", steps)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    manager
+        .execute_pipeline(pipeline.id.as_str())
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let got = manager
+        .get_pipeline(pipeline.id.as_str())
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json(got))
 }

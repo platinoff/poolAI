@@ -13,7 +13,7 @@
 | **0** | **Git** — перевірити `git status`, при потребі push у MSYS2 bash (PAT/SSH) | — | ⚠️ За потреби |
 | **1** | **v0.2.2 release prep** — Changelog, README, version bump | 1 день | ✅ Завершено |
 | **2** | **v0.3.0+** — ML.4–ML.6, Context Memory, Runtime library (на main) → тести, CHANGELOG, release | 1–2 тижні | 🔄 Залежить від стану main |
-| **3** | **Stage 4.4 далі** — ML.1 pruning, ML.2/ML.3 pipeline/aggregation, Mock e2e | 2–4 тижні | ⏸️ Опціонально |
+| **3** | **Stage 4.4 далі** — ML pipeline розширення (HTTP/stateful manager у `AppState`), mock e2e, fine-tune stubs | 2–4 тижні | 🔄 У процесі (pipeline + federated + registry на main) |
 
 **Рекомендація**: MSYS2 bash, `cargo fmt --all` перед push, pre-push hook. Спочатку перевірити стан main і кількість комітів ahead of origin.
 
@@ -42,7 +42,8 @@
 - ✅ **ML.6 Pipeline Management** (на main) — orchestration
 - ✅ **Context Memory** (на main) — implementation
 - ✅ **Runtime Instance library loading** (на main) — load model from library
-- ⏸️ **Далі**: ML.1 pruning strategies; ML.2/ML.3 повна реалізація (pipeline, aggregation)
+- ✅ **ML.6 pipeline** (на main): profiling, tuning, quantization, pruning, AutoML, federated round step; AutoML → ML.4/ML.5 registry; див. `src/ml/pipeline.rs`, `GET .../ai-ml/pipeline/demo`.  
+- ⏸️ **Далі**: збережений `MLPipelineManager` у `AppState`, повноцінні POST body для pipeline, ML.1 реальне профілювання замість stub
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%
