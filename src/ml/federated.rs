@@ -95,10 +95,12 @@ pub struct AggregatedModel {
     pub aggregation_mode: AggregationMode,
 }
 
-/// Federated learning round state
+/// Federated learning round state (persisted for round history / future inspection APIs).
 #[derive(Clone, Debug)]
 struct RoundState {
+    #[allow(dead_code)]
     round: u32,
+    #[allow(dead_code)]
     updates: Vec<ClientUpdate>,
     aggregated: Option<AggregatedModel>,
 }
@@ -349,7 +351,7 @@ impl FederatedLearningPipeline {
         // Apply small regularization (proximal term)
         let mu = 0.01; // Proximal parameter
         for weight in aggregated.iter_mut() {
-            *weight *= (1.0 - mu);
+            *weight *= 1.0 - mu;
         }
 
         Ok(aggregated)

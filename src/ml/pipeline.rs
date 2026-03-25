@@ -38,7 +38,7 @@
 use crate::core::error::AppError;
 use crate::ml::automl::{AutoMLPipeline, AutomlConfig, TrainingData};
 use crate::ml::optimization::{
-    apply_iterative_pruning, apply_pruning, apply_quantization, suggest_hyperparams,
+    apply_iterative_pruning, apply_pruning, apply_quantization, profile_model, suggest_hyperparams,
     OptimizationProfile, PruningConfig, PruningStrategy, QuantizationLevel, TuningConfig,
 };
 use chrono::{DateTime, Utc};
@@ -53,6 +53,8 @@ use uuid::Uuid;
 pub enum StepType {
     Preprocessing,
     Training,
+    /// ML.1 model profiling stub (`profile_model`).
+    Profiling,
     /// ML.1 hyperparameter suggestion (`suggest_hyperparams`).
     HyperparameterTuning,
     /// ML.1 quantization (`apply_quantization`).
@@ -373,6 +375,7 @@ impl MLPipelineManager {
         tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
 
         match step.step_type {
+            StepType::Profiling => Ok(Self::execute_profiling_step(step)),
             StepType::Pruning => Self::execute_pruning_step(step),
             StepType::Quantization => Self::execute_quantization_step(step),
             StepType::HyperparameterTuning => Self::execute_tuning_step(step),
@@ -384,6 +387,18 @@ impl MLPipelineManager {
                 Ok(output)
             }
         }
+    }
+
+    fn execute_profiling_step(step: &PipelineStep) -> HashMap<String, String> {
+        let p = profile_model();
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "profiling".to_string());
+        output.insert("latency_ms".to_string(), format!("{:.6}", p.latency_ms));
+        output.insert("memory_mb".to_string(), format!("{:.6}", p.memory_mb));
+        output.insert("flops".to_string(), p.flops.to_string());
+        output
     }
 
     fn execute_pruning_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
@@ -942,6 +957,26 @@ mod tests {
         let out = res.output.as_ref().unwrap();
         assert_eq!(out.get("step_kind"), Some(&"pruning".to_string()));
         assert!(out.get("pruned_count").unwrap().parse::<usize>().unwrap() > 0);
+    }
+
+    #[tokio::test]
+    async fn test_execute_profiling_step() {
+        let manager = MLPipelineManager::new();
+        let steps = vec![PipelineStep {
+            id: "prof1".to_string(),
+            step_type: StepType::Profiling,
+            config: HashMap::new(),
+            dependencies: vec![],
+        }];
+        let pipeline = manager.create_pipeline("pp", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let out = got.step_results["prof1"].output.as_ref().unwrap();
+        assert_eq!(out.get("step_kind"), Some(&"profiling".to_string()));
+        assert!(out.get("flops").unwrap().parse::<u64>().unwrap() > 0);
     }
 
     #[tokio::test]

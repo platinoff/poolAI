@@ -326,10 +326,16 @@ async fn test_pipeline_with_all_step_types() {
             dependencies: vec!["preprocess".to_string()],
         },
         PipelineStep {
+            id: "profile".to_string(),
+            step_type: StepType::Profiling,
+            config: HashMap::new(),
+            dependencies: vec!["train".to_string()],
+        },
+        PipelineStep {
             id: "quant".to_string(),
             step_type: StepType::Quantization,
             config: quant_cfg,
-            dependencies: vec!["train".to_string()],
+            dependencies: vec!["profile".to_string()],
         },
         PipelineStep {
             id: "tune".to_string(),
@@ -371,7 +377,14 @@ async fn test_pipeline_with_all_step_types() {
 
     let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.status, PipelineStatus::Completed);
-    assert_eq!(got.step_results.len(), 8);
+    assert_eq!(got.step_results.len(), 9);
+    assert_eq!(
+        got.step_results
+            .get("profile")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"profiling".to_string())
+    );
     assert_eq!(
         got.step_results
             .get("quant")

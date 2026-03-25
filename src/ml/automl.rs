@@ -229,8 +229,12 @@ impl AutoMLPipeline {
             ModelType::SupportVectorMachine,
         ];
 
-        // Evaluate each model type
-        for model_type in model_types {
+        let take_n = (self.config.max_trials as usize)
+            .min(model_types.len())
+            .max(1);
+
+        // Evaluate each model type (capped by `max_trials` vs catalog size)
+        for model_type in model_types.into_iter().take(take_n) {
             let candidate = self.evaluate_model(&model_type, &data).await?;
             candidates.push(candidate);
         }
@@ -348,8 +352,9 @@ impl AutoMLPipeline {
             ModelType::SupportVectorMachine => 0.82,
         };
 
-        // Add some randomness to simulate different hyperparameter combinations
-        let variation = (data.features.len() as f64 % 10.0) / 100.0;
+        // Add some randomness; fold count slightly stabilizes the stub score spread
+        let folds = self.config.cross_validation_folds.max(1) as f64;
+        let variation = (data.features.len() as f64 % 10.0) / 100.0 / folds.sqrt();
         let score = (base_score + variation).min(1.0).max(0.0);
 
         Ok(score)
