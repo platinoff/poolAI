@@ -8,16 +8,29 @@
 #[cfg(feature = "enterprise")]
 use chrono::Utc;
 #[cfg(feature = "enterprise")]
-use poolai::core::error::AppError;
-#[cfg(feature = "enterprise")]
 use poolai::enterprise::audit::{
-    get_global_audit_logger, AuditEvent, AuditLevel, AuditQueryFilters,
+    AuditConfig, AuditEvent, AuditLevel, AuditLogger, AuditQueryFilters,
 };
+#[cfg(feature = "enterprise")]
+use tempfile::TempDir;
+
+#[cfg(feature = "enterprise")]
+fn create_test_logger() -> (AuditLogger, TempDir) {
+    let temp_dir = TempDir::new().expect("temp dir for audit test");
+    let config = AuditConfig {
+        log_directory: temp_dir.path().to_path_buf(),
+        max_file_size: 1024 * 1024,
+        max_files: 5,
+        enable_compression: false,
+        immediate_flush: true,
+    };
+    (AuditLogger::with_config(config), temp_dir)
+}
 
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_audit_logger_initialization() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     assert!(logger.initialize().await.is_ok());
     assert!(logger.shutdown().await.is_ok());
 }
@@ -25,7 +38,7 @@ async fn test_audit_logger_initialization() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_log_audit_event() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     let event = AuditEvent::new(
@@ -43,7 +56,7 @@ async fn test_log_audit_event() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_all() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     // Log some test events
@@ -76,7 +89,7 @@ async fn test_query_audit_events_all() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_by_user_id() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     // Log test events
@@ -113,7 +126,7 @@ async fn test_query_audit_events_by_user_id() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_by_action() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     // Log test events
@@ -146,7 +159,7 @@ async fn test_query_audit_events_by_action() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_by_level() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     // Log test events with different levels
@@ -192,7 +205,7 @@ async fn test_query_audit_events_by_level() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_by_time_range() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     let now = Utc::now();
@@ -223,7 +236,7 @@ async fn test_query_audit_events_by_time_range() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_with_limit() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     // Log multiple events
@@ -249,7 +262,7 @@ async fn test_query_audit_events_with_limit() {
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_query_audit_events_combined_filters() {
-    let logger = get_global_audit_logger();
+    let (logger, _tmp) = create_test_logger();
     logger.initialize().await.unwrap();
 
     // Log test events

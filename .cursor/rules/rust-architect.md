@@ -68,6 +68,10 @@
    git status --short
    git add <paths> && git commit -m "type(scope): subject" && git push origin main
    ```
+
+   - IMPORTANT: keep generated/static audit logs out of staging: `data/audit/*.log.gz` should stay ignored and should NOT be included in `git add <paths>`.
+   - If `--all-features` is too slow, for this working set run (in MSYS2 bash): `cargo test --test context_memory_integration`, `cargo test --test enterprise_audit_integration --features enterprise`, `cargo test --test enterprise_monitoring_integration --features enterprise`, `cargo test --test enterprise_monitoring_sqlite_integration --features enterprise`, `cargo test --test cloud_mock_integration --features cloud,cloud-sdk -- --test-threads=1` (requires `rustc >= 1.88` for AWS SDK; also ensure enough free disk space for compilation).
+
    See `git-workflow.md`, `git-push.md`.
 
 5. **File Organization**:

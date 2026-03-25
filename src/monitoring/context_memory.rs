@@ -158,29 +158,37 @@ impl ContextMemoryMonitor {
         file_path: &str,
         size_bytes: usize,
     ) -> Result<(), AppError> {
-        let mut files = self.files.write().await;
-        files.insert(file_path.to_string(), size_bytes);
+        let current_size = {
+            let mut files = self.files.write().await;
+            files.insert(file_path.to_string(), size_bytes);
+            files.values().sum::<usize>()
+        };
 
-        let mut changes = self.changes.write().await;
-        changes.push(ContextChange {
-            timestamp: Instant::now(),
-            change_type: ChangeType::FileAdded,
-            file_path: file_path.to_string(),
-            size_bytes,
-        });
+        {
+            let mut changes = self.changes.write().await;
+            changes.push(ContextChange {
+                timestamp: Instant::now(),
+                change_type: ChangeType::FileAdded,
+                file_path: file_path.to_string(),
+                size_bytes,
+            });
+        }
 
         // Update max size
-        let current_size: usize = files.values().sum();
-        let mut max_size = self.max_size.write().await;
-        if current_size > *max_size {
-            *max_size = current_size;
+        {
+            let mut max_size = self.max_size.write().await;
+            if current_size > *max_size {
+                *max_size = current_size;
+            }
         }
 
         // Record size history
-        let mut history = self.total_size_history.write().await;
-        history.push((Instant::now(), current_size));
-        if history.len() > 1000 {
-            history.drain(0..100);
+        {
+            let mut history = self.total_size_history.write().await;
+            history.push((Instant::now(), current_size));
+            if history.len() > 1000 {
+                history.drain(0..100);
+            }
         }
 
         // Track memory usage
@@ -212,29 +220,37 @@ impl ContextMemoryMonitor {
         file_path: &str,
         new_size_bytes: usize,
     ) -> Result<(), AppError> {
-        let mut files = self.files.write().await;
-        files.insert(file_path.to_string(), new_size_bytes);
+        let current_size = {
+            let mut files = self.files.write().await;
+            files.insert(file_path.to_string(), new_size_bytes);
+            files.values().sum::<usize>()
+        };
 
-        let mut changes = self.changes.write().await;
-        changes.push(ContextChange {
-            timestamp: Instant::now(),
-            change_type: ChangeType::FileModified,
-            file_path: file_path.to_string(),
-            size_bytes: new_size_bytes,
-        });
+        {
+            let mut changes = self.changes.write().await;
+            changes.push(ContextChange {
+                timestamp: Instant::now(),
+                change_type: ChangeType::FileModified,
+                file_path: file_path.to_string(),
+                size_bytes: new_size_bytes,
+            });
+        }
 
         // Update max size
-        let current_size: usize = files.values().sum();
-        let mut max_size = self.max_size.write().await;
-        if current_size > *max_size {
-            *max_size = current_size;
+        {
+            let mut max_size = self.max_size.write().await;
+            if current_size > *max_size {
+                *max_size = current_size;
+            }
         }
 
         // Record size history
-        let mut history = self.total_size_history.write().await;
-        history.push((Instant::now(), current_size));
-        if history.len() > 1000 {
-            history.drain(0..100);
+        {
+            let mut history = self.total_size_history.write().await;
+            history.push((Instant::now(), current_size));
+            if history.len() > 1000 {
+                history.drain(0..100);
+            }
         }
 
         // Track memory usage
@@ -261,23 +277,30 @@ impl ContextMemoryMonitor {
     /// # }
     /// ```
     pub async fn track_file_deleted(&self, file_path: &str) -> Result<(), AppError> {
-        let mut files = self.files.write().await;
-        let size_bytes = files.remove(file_path).unwrap_or(0);
+        let (size_bytes, current_size) = {
+            let mut files = self.files.write().await;
+            let size_bytes = files.remove(file_path).unwrap_or(0);
+            let current_size = files.values().sum::<usize>();
+            (size_bytes, current_size)
+        };
 
-        let mut changes = self.changes.write().await;
-        changes.push(ContextChange {
-            timestamp: Instant::now(),
-            change_type: ChangeType::FileDeleted,
-            file_path: file_path.to_string(),
-            size_bytes,
-        });
+        {
+            let mut changes = self.changes.write().await;
+            changes.push(ContextChange {
+                timestamp: Instant::now(),
+                change_type: ChangeType::FileDeleted,
+                file_path: file_path.to_string(),
+                size_bytes,
+            });
+        }
 
         // Record size history
-        let current_size: usize = files.values().sum();
-        let mut history = self.total_size_history.write().await;
-        history.push((Instant::now(), current_size));
-        if history.len() > 1000 {
-            history.drain(0..100);
+        {
+            let mut history = self.total_size_history.write().await;
+            history.push((Instant::now(), current_size));
+            if history.len() > 1000 {
+                history.drain(0..100);
+            }
         }
 
         // Track memory usage
@@ -300,23 +323,30 @@ impl ContextMemoryMonitor {
     /// # }
     /// ```
     pub async fn track_context_cleared(&self) -> Result<(), AppError> {
-        let mut files = self.files.write().await;
-        let total_size: usize = files.values().sum();
-        files.clear();
+        let total_size = {
+            let mut files = self.files.write().await;
+            let total_size = files.values().sum::<usize>();
+            files.clear();
+            total_size
+        };
 
-        let mut changes = self.changes.write().await;
-        changes.push(ContextChange {
-            timestamp: Instant::now(),
-            change_type: ChangeType::ContextCleared,
-            file_path: String::new(),
-            size_bytes: total_size,
-        });
+        {
+            let mut changes = self.changes.write().await;
+            changes.push(ContextChange {
+                timestamp: Instant::now(),
+                change_type: ChangeType::ContextCleared,
+                file_path: String::new(),
+                size_bytes: total_size,
+            });
+        }
 
         // Record size history
-        let mut history = self.total_size_history.write().await;
-        history.push((Instant::now(), 0));
-        if history.len() > 1000 {
-            history.drain(0..100);
+        {
+            let mut history = self.total_size_history.write().await;
+            history.push((Instant::now(), 0));
+            if history.len() > 1000 {
+                history.drain(0..100);
+            }
         }
 
         // Track memory usage

@@ -42,6 +42,17 @@ All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).
 - If it fails → run `cargo fmt --all`, commit, then push again.
 - Bypass (not recommended): `git push --no-verify`.
 
+## Before push (for current changes)
+
+- Do not stage static/generated audit logs: `data/audit/*.log.gz` (keep them ignored; avoid `git add -A` or `git add .`).
+- Run targeted tests for the files changed in this working set:
+- `cargo test --test context_memory_integration`
+- `cargo test --test enterprise_audit_integration --features enterprise`
+- `cargo test --test enterprise_monitoring_integration --features enterprise`
+- `cargo test --test enterprise_monitoring_sqlite_integration --features enterprise`
+- `cargo test --test cloud_mock_integration --features cloud,cloud-sdk -- --test-threads=1` (cloud tests can be flaky under parallel scheduling; requires `rustc >= 1.88` for AWS SDK; also ensure enough free disk space for aws-sdk compilation)
+- If time permits: `cargo test --all-features`
+
 ## Quick block (MSYS2 bash, без .sh)
 
 ```bash

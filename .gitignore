@@ -17,6 +17,9 @@ file_list.csv
 # Cursor IDE files
 .cursor/
 
+# Generated/static audit logs (do not commit/push)
+data/audit/*.log.gz
+
 # Documentation (excluded from git)
 docs/
 

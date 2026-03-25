@@ -348,8 +348,9 @@ impl MonitoringManager {
             let history_len = self.metrics_history.read().await.len();
             let db_path_clone = db_path.clone();
 
-            // Use spawn_blocking for database operations
-            tokio::task::spawn_blocking(move || {
+            // Use spawn_blocking for database operations — must await so callers/tests
+            // see a consistent SQLite view before the next read/query.
+            if let Err(join_err) = tokio::task::spawn_blocking(move || {
                 let conn = match Connection::open(&db_path_clone) {
                     Ok(c) => c,
                     Err(e) => {
@@ -390,7 +391,11 @@ impl MonitoringManager {
                         }
                     }
                 }
-            });
+            })
+            .await
+            {
+                warn!("SQLite persistence task join error: {}", join_err);
+            }
         }
 
         // Check alert rules

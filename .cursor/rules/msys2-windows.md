@@ -32,6 +32,7 @@
   - `rustc --version`
   - `cargo --version`
   - `cargo clippy --version`
+- MSRV note (cloud-sdk/AWS SDK): `cloud_mock_integration` requires `rustc >= 1.88`. If your `rustc --version` is lower (e.g. 1.87.0), install `rustup`+the toolchain from `rust-toolchain.toml` or upgrade the MSYS2 Rust package before running cloud tests.
 - `cl` note:
   - This project defaults to GNU toolchain (`x86_64-pc-windows-gnu`), so `cl.exe` typically is not required.
   - If you ever switch to MSVC toolchain, verify `cl.exe` is available in PATH (e.g., `where cl` in a Windows terminal) and use MSVC-compatible environment.
