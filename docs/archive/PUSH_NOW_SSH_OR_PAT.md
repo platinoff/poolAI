@@ -128,5 +128,5 @@ git status
 ---
 
 **Детальніше**: 
-- `docs/PUSH_SSH_OR_PAT.md` - детальний гайд
+- `docs/archive/PUSH_SSH_OR_PAT.md` - детальний гайд
 - `docs/troubleshooting/GIT_AUTH_FIX.md` - повна інструкція

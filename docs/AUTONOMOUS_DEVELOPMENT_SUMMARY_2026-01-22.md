@@ -81,7 +81,7 @@
 
 **Створено**:
 - `docs/status/CONTEXT_MEMORY_IMPLEMENTATION_2026-01-22.md` - звіт про реалізацію
-- `docs/PUSH_CONTEXT_MEMORY_NOW.md` - інструкції для push
+- `docs/archive/PUSH_CONTEXT_MEMORY_NOW.md` - інструкції для push
 
 ---
 
@@ -129,7 +129,7 @@ git push https://platinoff:YOUR_PAT@github.com/platinoff/poolAI.git main
 git remote set-url origin https://github.com/platinoff/poolAI.git
 ```
 
-**Детальніше**: `docs/PUSH_CONTEXT_MEMORY_NOW.md`
+**Детальніше**: `docs/archive/PUSH_CONTEXT_MEMORY_NOW.md`
 
 ---
 
@@ -170,7 +170,7 @@ git remote set-url origin https://github.com/platinoff/poolAI.git
 - **Тести**: `tests/context_memory_integration.rs`
 - **Код**: `src/monitoring/context_memory.rs`
 - **Звіт**: `docs/status/CONTEXT_MEMORY_IMPLEMENTATION_2026-01-22.md`
-- **Push**: `docs/PUSH_CONTEXT_MEMORY_NOW.md`
+- **Push**: `docs/archive/PUSH_CONTEXT_MEMORY_NOW.md`
 
 ---
 

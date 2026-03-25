@@ -206,5 +206,5 @@ git status
 ---
 
 **Детальніше**: 
-- `docs/PUSH_NOW_SSH_OR_PAT.md` - швидкий гайд
+- `docs/archive/PUSH_NOW_SSH_OR_PAT.md` - швидкий гайд
 - `docs/troubleshooting/GIT_AUTH_FIX.md` - повна інструкція

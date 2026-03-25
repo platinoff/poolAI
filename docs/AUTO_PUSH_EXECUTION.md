@@ -79,4 +79,4 @@ git push origin main
 1. **Якщо є SSH ключі**: Використай Варіант 1 (SSH)
 2. **Якщо немає SSH**: Створи PAT на GitHub та використай Варіант 2 або 3
 
-**Детальні інструкції**: `docs/PUSH_FINAL_SOLUTION.md`
+**Детальні інструкції**: `docs/archive/PUSH_FINAL_SOLUTION.md`

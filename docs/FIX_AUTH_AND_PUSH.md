@@ -176,4 +176,4 @@ git status
 
 **Детальніше**: 
 - `docs/troubleshooting/GIT_AUTH_FIX.md` - повна інструкція з аутентифікації
-- `docs/PUSH_WITH_AUTH_FIX.md` - детальний гайд з push
+- `docs/archive/PUSH_WITH_AUTH_FIX.md` - детальний гайд з push

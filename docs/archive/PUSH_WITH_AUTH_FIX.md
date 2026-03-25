@@ -161,4 +161,4 @@ git status
 
 **Детальніше**: 
 - `docs/troubleshooting/GIT_AUTH_FIX.md` - повна інструкція з аутентифікації
-- `docs/PUSH_COMMIT_NOW.md` - швидкий push
+- `docs/archive/PUSH_COMMIT_NOW.md` - швидкий push

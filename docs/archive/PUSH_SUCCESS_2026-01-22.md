@@ -49,12 +49,12 @@ To https://github.com/platinoff/poolAI.git
 ### Документація
 - ✅ `docs/SYSTEM_CHECK_REPORT.md` - звіт про перевірку
 - ✅ `docs/CHECK_SYSTEM_NOW.md` - інструкції для перевірки
-- ✅ `docs/PUSH_FINAL_SOLUTION.md` - фінальне рішення для push
-- ✅ `docs/PUSH_NOW_SSH_OR_PAT.md` - швидкий гайд
+- ✅ `docs/archive/PUSH_FINAL_SOLUTION.md` - фінальне рішення для push
+- ✅ `docs/archive/PUSH_NOW_SSH_OR_PAT.md` - швидкий гайд
 - ✅ `docs/FIX_AUTH_AND_PUSH.md` - виправлення аутентифікації
 - ✅ `docs/AUTO_PUSH_EXECUTION.md` - автоматичне виконання
 - ✅ `docs/FINAL_PUSH_READY.md` - інструкції для push
-- ✅ `docs/PUSH_SUCCESS_2026-01-22.md` - цей документ
+- ✅ `docs/archive/PUSH_SUCCESS_2026-01-22.md` - цей документ
 - ✅ І багато інших troubleshooting гайдів
 
 ---
@@ -101,7 +101,7 @@ rustc --version  # Має показати 1.92.0
 
 Всі гайди та інструкції доступні в `docs/`:
 - `docs/README.md` - головний індекс
-- `docs/PUSH_FINAL_SOLUTION.md` - рішення для push
+- `docs/archive/PUSH_FINAL_SOLUTION.md` - рішення для push
 - `docs/troubleshooting/` - troubleshooting гайди
 - `docs/NEXT_STEPS_AFTER_PUSH_2026-01-22.md` - наступні кроки
 

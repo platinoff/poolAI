@@ -142,8 +142,8 @@ rustc --version
 
 На основі результатів перевірки:
 
-- **Якщо є SSH ключі та SSH працює**: Використай `docs/PUSH_FINAL_SOLUTION.md` → Варіант 1 (SSH)
-- **Якщо немає SSH**: Використай `docs/PUSH_FINAL_SOLUTION.md` → Варіант 2 (Credentials File) або Варіант 3 (PAT в URL)
+- **Якщо є SSH ключі та SSH працює**: Використай `docs/archive/PUSH_FINAL_SOLUTION.md` → Варіант 1 (SSH)
+- **Якщо немає SSH**: Використай `docs/archive/PUSH_FINAL_SOLUTION.md` → Варіант 2 (Credentials File) або Варіант 3 (PAT в URL)
 - **Якщо Rust версія 1.87.0**: Використай `docs/troubleshooting/RUST_VERSION_FIX_2026-01-22.md`
 
 ---

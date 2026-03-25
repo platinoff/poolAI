@@ -197,14 +197,15 @@
 - ✅ **Advanced Security** - OAuth2, SAML, security policies (100% complete)
 - ✅ **Advanced Monitoring** - Real-time dashboards, alerts, metrics aggregation (100% complete)
 
-#### Stage 4.4: AI/ML Enhancement - COMPLETED ✅ (2026-01-22)
-- ✅ **Model Optimization** - Model performance optimization (ML.1 Complete: Profiling ✅, Tuning ✅, Quantization ✅, Pruning ✅)
-- ✅ **AutoML Integration** - Automated machine learning (ML.2 Complete: Model selection ✅, Hyperparameter optimization ✅, Ensemble ✅)
-- ✅ **Federated Learning** - Distributed learning capabilities (ML.3 Complete: FedAvg ✅, FedProx ✅, Round management ✅)
-- ✅ **Context Memory Monitoring** - AI context tracking and optimization (Complete: File tracking ✅, Metrics ✅, Optimization ✅)
-- ✅ **Model Versioning** - Model lifecycle management (ML.4 Complete: Version tracking ✅, Registration ✅, Comparison ✅, Tagging ✅ 2026-01-22)
-- ✅ **Experiment Tracking** - ML experiment management (ML.5 Complete: Registration ✅, Metrics tracking ✅, Comparison ✅, Best selection ✅ 2026-01-22)
-- ✅ **Pipeline Management** - ML pipeline orchestration (ML.6 Complete: Pipeline definition ✅, Execution ✅, Dependency resolution ✅, Status tracking ✅ 2026-01-22)
+#### Stage 4.4: AI/ML Enhancement — IN PROGRESS 🔄 (core scaffolding shipped 2026-01-22; pipeline & API extended 2026-03-25)
+- ✅ **Model Optimization** - Model performance optimization (ML.1: Profiling ✅, Tuning ✅, Quantization ✅, Pruning ✅)
+- ✅ **AutoML Integration** - Automated machine learning (ML.2: Model selection ✅, Hyperparameter optimization ✅, Ensemble ✅)
+- ✅ **Federated Learning** - Distributed learning (ML.3: FedAvg ✅, FedProx ✅, Round management ✅); **pipeline step `FederatedAggregation`** для агрегації в середині ML.6
+- ✅ **Context Memory Monitoring** - AI context tracking and optimization (File tracking ✅, Metrics ✅, Optimization ✅)
+- ✅ **Model Versioning** - Model lifecycle management (ML.4: Version tracking ✅, Registration ✅, Comparison ✅, Tagging ✅)
+- ✅ **Experiment Tracking** - ML experiment management (ML.5: Registration ✅, Metrics ✅, Comparison ✅, Best selection ✅)
+- ✅ **Pipeline Management (ML.6)** - Orchestration: steps include Profiling, HyperparameterTuning, Quantization, Pruning, AutoML, **FederatedAggregation**, тощо; після AutoML за замовчуванням **реєстрація моделі та запис експерименту** (`ModelVersionManager` / `ExperimentTracker`; прапор **`automl_skip_registry`** вимикає цей крок для тестів/ізоляції)
+- ✅ **Enterprise HTTP API (`enterprise` + `ml`)** - `GET/POST /api/enterprise/ai-ml/pipeline`, `GET /pipeline/{id}`, `POST /pipeline/{id}/execute`, `GET /pipeline/demo`; спільний **`MLPipelineManager`** у **`ApiContext` / `AppState`**
 
 ## 🚀 Next Phase: Stage 4.3
 
@@ -983,13 +984,13 @@ curl http://localhost:8080/api/status
 ---
 
 **PoolAI** — AI Mining Pool Management System  
-**Status**: v0.2.1 PRODUCTION READY! ✅ **First Day of PRO Package: 2026-01-16** 🚀  
-**Tests**: ✅ **437+ Tests Passing!** (102 unit + 335+ integration) **All Tests Passing on Windows & Ubuntu!** ✅  
-**Rust Version**: 1.92.0 (cargo 1.92.0, rustc 1.92.0)  
-**Next Goal**: v0.2.2 release prep → v0.3.0+ (HPA init, Mock servers, Stage 4.4 AI/ML) 🎯  
-**Architecture**: Complete Rust Architecture (All 15 modules 100% complete) ✅  
+**Status**: v0.2.2 PRODUCTION READY baseline ✅ **First Day of PRO Package: 2026-01-16** 🚀  
+**Tests**: Large integration suite; перевіряти актуальний лічильник командою `cargo test --all-features` на цій гілці  
+**Rust Version**: 1.92.x+ recommended (Edition 2021)  
+**Next Goal**: Stage 4.4 AI/ML hardening (реальні бекенди кроків пайплайну, спостережуваність); Stage 4.3 operator/SDK polish  
+**Architecture**: All 15 modules baseline complete; ML/enterprise features за feature flags  
 **Version**: v6, 2026 (PRO Edition)  
 **Creator**: Madevinc (one developer with Cursor AI)  
 **Repository**: https://github.com/platinoff/poolAI  
 **Solana Donations**: GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8 (Madevinc welcomes donations to support this crypto project)  
-**Latest Update**: 2026-01-22 - Cloud SDK 100%, AWS overrides ✅, Stage 4.4 AI/ML scaffolding ✅ (`src/ml`, `/api/enterprise/ai-ml`), stable state & next steps актуалізовано
+**Latest Update**: 2026-03-25 — docs cleanup (архів `PUSH_*` у `docs/archive/`), оновлення Stage 4.4 у концепті (ML pipeline, federated step, registry після AutoML, enterprise AI-ML REST + `ApiContext`), оновлені `README` та `file_list.csv`

@@ -48,20 +48,19 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 ---
 
 ## 🎯 Development Status
-**Current Phase**: Stage 4.3 Cloud Integration (SDK integration in progress; test suite hardening ongoing) and Stage 4.4 AI/ML (development in progress)  
+**Current Phase**: Stage 4.3 Cloud Integration (SDK + operator work continues) and **Stage 4.4 AI/ML** (pipeline orchestration, enterprise HTTP API, versioning/experiments — active development)  
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
-For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`.
+For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation map: `docs/INDEX_2026-03-17.md`.
 
-### ✅ Current Build/Test Status (2026-03-19)
-- `cargo fmt --all` — OK
-- `cargo clippy --all-targets --all-features` — OK
-- `cargo build --all-features` — OK
-- `cargo test --all-features` — FAILS (compile-time `E0282` type inference in):
-  - `tests/cloud_providers.rs`
-  - `tests/load_tests.rs`
+### ✅ Current Build/Test Status (2026-03-25)
+- `cargo fmt --all` — run in CI / before push  
+- `cargo clippy --all-targets --all-features` — expected OK on main  
+- `cargo build --all-features` — expected OK on main  
+- `cargo test --all-features` — **currently fails at compile time** with `E0282` (type inference) in several integration tests (e.g. `tests/event_sourcing_integration.rs`, `tests/distributed_replication_tests.rs`); on Windows, building the full `--all-features` test crate can also hit compiler stack limits (`STATUS_STACK_BUFFER_OVERRUN`). Prefer targeted test runs (specific crates/tests) until inference is fixed.
 
 ### Next Focus
-- Fix `E0282` type inference in those tests, then re-run `cargo test --all-features` and `cargo build --all-features`.
+- Restore a clean `cargo test --all-features` by adding the missing type annotations in affected tests (and/or splitting huge integration binaries).
+- Stage 4.4: real backends for individual pipeline steps, observability, and stronger integration tests around `/api/enterprise/ai-ml/pipeline`.
 
 ### 🚀 Development Roadmap
 
@@ -147,10 +146,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`.
 - 🔄 **SDK Integration** - Full implementation with cloud SDKs (planned)
 - 🔄 **Kubernetes Operator** - Full operator implementation (planned)
 
-#### 🔄 Stage 4.4: AI/ML Enhancement - PLANNED 🔄
-- 🔄 Model optimization, AutoML integration
-- 🔄 Federated learning, model versioning
-- 🔄 Experiment tracking, pipeline management
+#### 🔄 Stage 4.4: AI/ML Enhancement — IN PROGRESS 🔄
+- ✅ ML.1–ML.6 scaffolding in `src/ml` (optimization, AutoML, federated, context memory, versioning, experiments, **pipeline** with steps such as **FederatedAggregation**)
+- ✅ After AutoML step, default registration with **ModelVersionManager** / **ExperimentTracker** (disable via pipeline **`automl_skip_registry`** when needed)
+- ✅ Enterprise REST (**features `enterprise` + `ml`**): `/api/enterprise/ai-ml/pipeline` (list, create, get, execute), `/pipeline/demo` — shared **`MLPipelineManager`** on **`ApiContext`**
+- 🔄 Hardening: production-grade step implementations, metrics, and documentation of operational playbooks
 
 ---
 

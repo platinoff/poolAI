@@ -95,5 +95,5 @@ git status
 ---
 
 **Детальніше**: 
-- `docs/PUSH_FINAL_SOLUTION.md` - всі варіанти push
+- `docs/archive/PUSH_FINAL_SOLUTION.md` - всі варіанти push
 - `docs/troubleshooting/GIT_AUTH_FIX.md` - виправлення аутентифікації

@@ -6,8 +6,6 @@ Cargo.std.toml
 *.tmp
 *.bak
 *~
-file_list.csv
-
 # IDE files (but keep important configs)
 .vscode/
 .idea/
@@ -19,9 +17,6 @@ file_list.csv
 
 # Generated/static audit logs (do not commit/push)
 data/audit/*.log.gz
-
-# Documentation (excluded from git)
-docs/
 
 # Scripts (excluded from git)
 scripts/

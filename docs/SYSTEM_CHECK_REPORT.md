@@ -115,13 +115,13 @@ rustc --version
 
 ### Якщо немає SSH:
 1. **Варіант 1**: Створити SSH ключі (рекомендовано)
-   - Дивись: `docs/PUSH_FINAL_SOLUTION.md` → Варіант 1 (SSH)
+   - Дивись: `docs/archive/PUSH_FINAL_SOLUTION.md` → Варіант 1 (SSH)
 
 2. **Варіант 2**: Використати Credentials File
-   - Дивись: `docs/PUSH_FINAL_SOLUTION.md` → Варіант 2 (Credentials File)
+   - Дивись: `docs/archive/PUSH_FINAL_SOLUTION.md` → Варіант 2 (Credentials File)
 
 3. **Варіант 3**: PAT в URL (тимчасово)
-   - Дивись: `docs/PUSH_FINAL_SOLUTION.md` → Варіант 3 (PAT в URL)
+   - Дивись: `docs/archive/PUSH_FINAL_SOLUTION.md` → Варіант 3 (PAT в URL)
 
 ---
 
@@ -146,5 +146,5 @@ bash scripts/check_system.sh
 
 **Детальніше**: 
 - `docs/CHECK_SYSTEM_NOW.md` - детальні інструкції
-- `docs/PUSH_FINAL_SOLUTION.md` - рішення для push
+- `docs/archive/PUSH_FINAL_SOLUTION.md` - рішення для push
 - `scripts/check_system.sh` - скрипт для автоматичної перевірки
