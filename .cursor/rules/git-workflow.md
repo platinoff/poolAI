@@ -56,7 +56,7 @@ All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).
 ## Quick block (MSYS2 bash, без .sh)
 
 ```bash
-export PATH="/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+export PATH="$HOME/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
 cd /s/rust/poolAI
 rm -f .git/index.lock
 git status --short
@@ -64,11 +64,17 @@ cargo fmt --all
 cargo clippy --all-targets --all-features
 cargo test --all-features
 cargo build --all-features
-git add Cargo.toml src/ tests/ scripts/
+git add Cargo.toml src/ tests/ scripts/ .gitignore
 git add -f docs/CHANGELOG.md docs/cloud/CLOUD_SDK_STATUS.md docs/concept/poolAI_concept_root.txt docs/development/NEXT_STEPS_2026-01-19.md docs/status/STABLE_STATE_SUMMARY.md docs/troubleshooting/GIT_PUSH_FAILED.md
 git add -f .cursor/rules/ .cursor/commands/
-git commit -m "type(scope): subject" -m "Summary: cargo fmt/clippy/test/build (--all-features); updated code/docs/rules as needed"
+git commit -m "type(scope): subject" \
+  -m "Summary:" \
+  -m "- Зміни: (модулі/файли)" \
+  -m "- Перевірки: cargo fmt/clippy/test/build (--all-features)" \
+  -m "- Нотатки: не стаджити data/audit/*.log.gz; при os error 112 — cargo clean"
 git push origin main
 ```
+
+Після push: короткий самарі для чату — див. `.cursor/commands/git-push.md` (п.3b).
 
 Без скриптів. Якщо команди не відпрацьовують — перевір bash, `cd`-шлях, виконуй по одній; див. `.cursor/commands/git-push.md` (п.2 перевірка).
