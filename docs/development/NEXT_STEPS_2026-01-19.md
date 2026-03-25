@@ -43,7 +43,8 @@
 - ✅ **Context Memory** (на main) — implementation
 - ✅ **Runtime Instance library loading** (на main) — load model from library
 - ✅ **ML.6 pipeline** (на main): profiling, tuning, quantization, pruning, AutoML, federated round step; AutoML → ML.4/ML.5 registry; див. `src/ml/pipeline.rs`, `GET .../ai-ml/pipeline/demo`.  
-- ⏸️ **Далі**: збережений `MLPipelineManager` у `AppState`, повноцінні POST body для pipeline, ML.1 реальне профілювання замість stub
+- ✅ **`AppState.ml_pipeline_manager`** + `GET/POST /api/enterprise/ai-ml/pipeline`, `POST .../pipeline/{id}/execute` (enterprise+ml).  
+- ⏸️ **Далі**: ML.1 реальне профілювання; auth на ML routes; очистка/квоти сховища pipeline
 
 ### ✅ Priority 1.2: RAID Strategy - **100%** ✅
 - ✅ Metrics для BurstRAID - 100%

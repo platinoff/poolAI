@@ -2,9 +2,12 @@
 //!
 //! Serves `/api/enterprise/ai-ml` when both `enterprise` and `ml` features are enabled.
 
+use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::{routing::get, Json, Router};
+use axum::{routing::get, routing::post, Json, Router};
+use serde::Deserialize;
 use std::collections::HashMap;
+use uuid::Uuid;
 
 use crate::core::state::ApiContext;
 use crate::ml::automl::AutomlConfig;
@@ -13,8 +16,15 @@ use crate::ml::optimization::{
     apply_quantization, profile_model, suggest_hyperparams, ModelProfile, OptimizationProfile,
     QuantizationResult, TuningConfig, TuningResult,
 };
-use crate::ml::pipeline::{MLPipeline, MLPipelineManager, PipelineStep, StepType};
+use crate::ml::pipeline::{MLPipeline, PipelineStep, StepType};
 use crate::ml::AiMlStatus;
+
+/// Request body for `POST .../pipeline`.
+#[derive(Debug, Deserialize)]
+pub struct CreateMlPipelineRequest {
+    pub name: String,
+    pub steps: Vec<PipelineStep>,
+}
 
 /// Create AI/ML API routes.
 ///
@@ -26,7 +36,11 @@ use crate::ml::AiMlStatus;
 /// - `GET /optimization/quantization-result` — ML.1 quantization stub
 /// - `GET /automl` — ML.2
 /// - `GET /federated` — ML.3
-/// - `GET /pipeline/demo` — ML.6 demo (single Profiling step; ephemeral manager per request)
+/// - `GET /pipeline` — list pipelines (`MLPipelineManager`)
+/// - `POST /pipeline` — create pipeline (JSON body)
+/// - `GET /pipeline/{id}` — get pipeline by id
+/// - `POST /pipeline/{id}/execute` — run pipeline
+/// - `GET /pipeline/demo` — quick demo (Profiling); uses shared `AppState` manager
 pub fn create_ai_ml_routes() -> Router<ApiContext> {
     Router::new()
         .route("/", get(ai_ml_status_handler))
@@ -47,6 +61,12 @@ pub fn create_ai_ml_routes() -> Router<ApiContext> {
         .route("/automl", get(ai_ml_automl_handler))
         .route("/federated", get(ai_ml_federated_handler))
         .route("/pipeline/demo", get(ai_ml_pipeline_demo_handler))
+        .route(
+            "/pipeline",
+            get(list_ml_pipelines_handler).post(create_ml_pipeline_handler),
+        )
+        .route("/pipeline/{id}", get(get_ml_pipeline_handler))
+        .route("/pipeline/{id}/execute", post(execute_ml_pipeline_handler))
 }
 
 async fn ai_ml_status_handler() -> Json<AiMlStatus> {
@@ -79,24 +99,69 @@ async fn ai_ml_federated_handler() -> Json<FederatedConfig> {
     Json(FederatedConfig::default_config())
 }
 
-/// Повертає результат виконання демо-pipeline (один крок Profiling). Окремий менеджер на запит.
-async fn ai_ml_pipeline_demo_handler() -> Result<Json<MLPipeline>, StatusCode> {
-    let manager = MLPipelineManager::new();
+async fn list_ml_pipelines_handler(State(ctx): State<ApiContext>) -> Json<Vec<MLPipeline>> {
+    Json(ctx.ml_pipeline_manager.list_pipelines().await)
+}
+
+async fn create_ml_pipeline_handler(
+    State(ctx): State<ApiContext>,
+    Json(body): Json<CreateMlPipelineRequest>,
+) -> Result<Json<MLPipeline>, StatusCode> {
+    let p = ctx
+        .ml_pipeline_manager
+        .create_pipeline(&body.name, body.steps)
+        .await
+        .map_err(|_| StatusCode::BAD_REQUEST)?;
+    Ok(Json(p))
+}
+
+async fn get_ml_pipeline_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> Result<Json<MLPipeline>, StatusCode> {
+    let p = ctx
+        .ml_pipeline_manager
+        .get_pipeline(&id)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+    Ok(Json(p))
+}
+
+async fn execute_ml_pipeline_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> Result<StatusCode, StatusCode> {
+    ctx.ml_pipeline_manager
+        .execute_pipeline(&id)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// Демо: один крок Profiling на спільному `AppState.ml_pipeline_manager`.
+async fn ai_ml_pipeline_demo_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<MLPipeline>, StatusCode> {
+    let short = Uuid::new_v4().to_string();
+    let short = &short[..8];
+    let name = format!("api-demo-{short}");
     let steps = vec![PipelineStep {
         id: "profile".to_string(),
         step_type: StepType::Profiling,
         config: HashMap::new(),
         dependencies: vec![],
     }];
-    let pipeline = manager
-        .create_pipeline("api-demo", steps)
+    let pipeline = ctx
+        .ml_pipeline_manager
+        .create_pipeline(&name, steps)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    manager
+    ctx.ml_pipeline_manager
         .execute_pipeline(pipeline.id.as_str())
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let got = manager
+    let got = ctx
+        .ml_pipeline_manager
         .get_pipeline(pipeline.id.as_str())
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;

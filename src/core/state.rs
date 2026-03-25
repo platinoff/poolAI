@@ -50,6 +50,8 @@
 use crate::core::config::PoolAIConfig;
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelState, ModelStatus};
+#[cfg(feature = "ml")]
+use crate::ml::pipeline::MLPipelineManager;
 use chrono::{DateTime, Utc};
 use parking_lot::{Mutex, RwLock};
 use serde::{Deserialize, Serialize};
@@ -237,6 +239,9 @@ pub struct AppState {
     pub is_initialized: Arc<RwLock<bool>>,
     /// Mutex for synchronization
     pub state_mutex: Arc<Mutex<()>>,
+    /// ML.6 orchestration (feature `ml`); shared across `/api/enterprise/ai-ml/pipeline/*`.
+    #[cfg(feature = "ml")]
+    pub ml_pipeline_manager: Arc<MLPipelineManager>,
 }
 
 impl Default for AppState {
@@ -279,6 +284,8 @@ impl AppState {
             model_states: Arc::new(RwLock::new(HashMap::new())),
             is_initialized: Arc::new(RwLock::new(false)),
             state_mutex: Arc::new(Mutex::new(())),
+            #[cfg(feature = "ml")]
+            ml_pipeline_manager: Arc::new(MLPipelineManager::new()),
         }
     }
 
