@@ -356,10 +356,16 @@ async fn test_pipeline_with_all_step_types() {
             dependencies: vec!["prune".to_string()],
         },
         PipelineStep {
+            id: "federated".to_string(),
+            step_type: StepType::FederatedAggregation,
+            config: HashMap::new(),
+            dependencies: vec!["automl".to_string()],
+        },
+        PipelineStep {
             id: "evaluate".to_string(),
             step_type: StepType::Evaluation,
             config: HashMap::new(),
-            dependencies: vec!["automl".to_string()],
+            dependencies: vec!["federated".to_string()],
         },
         PipelineStep {
             id: "deploy".to_string(),
@@ -377,7 +383,7 @@ async fn test_pipeline_with_all_step_types() {
 
     let got: MLPipeline = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     assert_eq!(got.status, PipelineStatus::Completed);
-    assert_eq!(got.step_results.len(), 9);
+    assert_eq!(got.step_results.len(), 10);
     assert_eq!(
         got.step_results
             .get("profile")
@@ -411,6 +417,13 @@ async fn test_pipeline_with_all_step_types() {
             .and_then(|r| r.output.as_ref())
             .and_then(|o| o.get("step_kind")),
         Some(&"automl".to_string())
+    );
+    assert_eq!(
+        got.step_results
+            .get("federated")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"federated_aggregation".to_string())
     );
 }
 

@@ -37,10 +37,15 @@
 
 use crate::core::error::AppError;
 use crate::ml::automl::{AutoMLPipeline, AutomlConfig, TrainingData};
+use crate::ml::experiments::{ExperimentMetrics, ExperimentTracker};
+use crate::ml::federated::{
+    AggregationMode, ClientUpdate, FederatedConfig, FederatedLearningPipeline,
+};
 use crate::ml::optimization::{
     apply_iterative_pruning, apply_pruning, apply_quantization, profile_model, suggest_hyperparams,
     OptimizationProfile, PruningConfig, PruningStrategy, QuantizationLevel, TuningConfig,
 };
+use crate::ml::versioning::{ModelMetadata, ModelVersionManager};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -63,6 +68,8 @@ pub enum StepType {
     Pruning,
     /// ML.2 AutoML model selection (`AutoMLPipeline::train`).
     AutoMl,
+    /// ML.3 one-shot federated round: synthetic clients + `aggregate_updates` (FedAvg/FedProx).
+    FederatedAggregation,
     Evaluation,
     Deployment,
 }
@@ -145,6 +152,10 @@ pub struct MLPipeline {
 /// All methods are async and thread-safe, using `Arc<RwLock<>>` internally.
 pub struct MLPipelineManager {
     pipelines: Arc<RwLock<HashMap<String, MLPipeline>>>,
+    /// Shared ML.4 registry — updated when AutoML steps run (unless skipped in step config).
+    version_manager: Arc<ModelVersionManager>,
+    /// Shared ML.5 tracker — experiment opened/closed around successful AutoML training.
+    experiment_tracker: Arc<ExperimentTracker>,
 }
 
 impl Default for MLPipelineManager {
@@ -158,6 +169,8 @@ impl MLPipelineManager {
     pub fn new() -> Self {
         Self {
             pipelines: Arc::new(RwLock::new(HashMap::new())),
+            version_manager: Arc::new(ModelVersionManager::new()),
+            experiment_tracker: Arc::new(ExperimentTracker::new()),
         }
     }
 
@@ -379,7 +392,8 @@ impl MLPipelineManager {
             StepType::Pruning => Self::execute_pruning_step(step),
             StepType::Quantization => Self::execute_quantization_step(step),
             StepType::HyperparameterTuning => Self::execute_tuning_step(step),
-            StepType::AutoMl => Self::execute_automl_step(step).await,
+            StepType::AutoMl => self.execute_automl_step(step).await,
+            StepType::FederatedAggregation => Self::execute_federated_aggregation_step(step).await,
             _ => {
                 let mut output = HashMap::new();
                 output.insert("status".to_string(), "completed".to_string());
@@ -510,9 +524,13 @@ impl MLPipelineManager {
         Ok(output)
     }
 
-    async fn execute_automl_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
-        let data = Self::parse_automl_training_data(&step.config)?;
-        let automl_cfg = Self::automl_config_from_step(&step.config)?;
+    async fn execute_automl_step(
+        &self,
+        step: &PipelineStep,
+    ) -> Result<HashMap<String, String>, AppError> {
+        let cfg = &step.config;
+        let data = Self::parse_automl_training_data(cfg)?;
+        let automl_cfg = Self::automl_config_from_step(cfg)?;
         let pipeline = AutoMLPipeline::new(automl_cfg);
         let model = pipeline.train(data).await?;
 
@@ -527,7 +545,7 @@ impl MLPipelineManager {
         output.insert("status".to_string(), "completed".to_string());
         output.insert("step_id".to_string(), step.id.clone());
         output.insert("step_kind".to_string(), "automl".to_string());
-        output.insert("model_id".to_string(), model.model_id);
+        output.insert("model_id".to_string(), model.model_id.clone());
         output.insert("accuracy".to_string(), format!("{:.6}", model.accuracy));
         output.insert("model_type".to_string(), format!("{:?}", model.model_type));
         output.insert(
@@ -535,7 +553,177 @@ impl MLPipelineManager {
             model.training_time_ms.to_string(),
         );
         output.insert("hyperparameters_json".to_string(), hp_json);
+
+        let skip_registry = cfg
+            .get("automl_skip_registry")
+            .map(|s| matches!(s.to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(false);
+
+        if !skip_registry {
+            let registry_key = cfg
+                .get("registry_model_id")
+                .cloned()
+                .filter(|s| !s.is_empty())
+                .unwrap_or_else(|| "pipeline_automl_model".to_string());
+
+            let metadata = ModelMetadata {
+                model_type: format!("{:?}", model.model_type),
+                accuracy: model.accuracy,
+                training_time_ms: model.training_time_ms,
+                hyperparameters: model.hyperparameters.clone(),
+                description: Some(format!(
+                    "AutoML pipeline step '{}'; internal model_id={}",
+                    step.id, model.model_id
+                )),
+            };
+
+            let registered = self
+                .version_manager
+                .register_model(&registry_key, metadata)
+                .await?;
+            output.insert("ml_registered_version".to_string(), registered.version);
+            output.insert("ml_registry_model_id".to_string(), registry_key);
+
+            let exp_name = cfg
+                .get("experiment_name")
+                .cloned()
+                .filter(|s| !s.is_empty())
+                .unwrap_or_else(|| format!("automl_{}", step.id));
+
+            let exp = self
+                .experiment_tracker
+                .start_experiment(&exp_name, &format!("{:?}", model.model_type))
+                .await?;
+            self.experiment_tracker
+                .add_hyperparameters(exp.id.as_str(), model.hyperparameters.clone())
+                .await?;
+            let metrics = ExperimentMetrics {
+                accuracy: model.accuracy,
+                loss: 0.0,
+                training_time_ms: model.training_time_ms,
+                custom: HashMap::new(),
+            };
+            self.experiment_tracker
+                .log_metrics(exp.id.as_str(), metrics)
+                .await?;
+            self.experiment_tracker
+                .end_experiment(exp.id.as_str())
+                .await?;
+            output.insert("experiment_id".to_string(), exp.id);
+        }
+
         Ok(output)
+    }
+
+    async fn execute_federated_aggregation_step(
+        step: &PipelineStep,
+    ) -> Result<HashMap<String, String>, AppError> {
+        let cfg = &step.config;
+        let fl_cfg = Self::federated_config_from_step(cfg)?;
+
+        let dim: usize = cfg
+            .get("federated_weight_dim")
+            .map(|s| s.parse::<usize>())
+            .transpose()
+            .map_err(|_| {
+                AppError::ModelError(
+                    "Invalid federated_weight_dim. Suggestion: positive integer.".to_string(),
+                )
+            })?
+            .unwrap_or(3)
+            .max(1);
+
+        let mut n = fl_cfg.min_clients_per_round;
+        if let Some(s) = cfg.get("federated_synthetic_clients") {
+            n = s.parse::<u32>().map_err(|_| {
+                AppError::ModelError(format!("Invalid federated_synthetic_clients: '{}'.", s))
+            })?;
+        }
+        if n < fl_cfg.min_clients_per_round {
+            return Err(AppError::ModelError(format!(
+                "federated_synthetic_clients ({}) must be >= federated_min_clients ({}).",
+                n, fl_cfg.min_clients_per_round
+            )));
+        }
+        if n > fl_cfg.max_clients_per_round {
+            return Err(AppError::ModelError(format!(
+                "federated_synthetic_clients ({}) must be <= federated_max_clients ({}).",
+                n, fl_cfg.max_clients_per_round
+            )));
+        }
+
+        let pipeline = FederatedLearningPipeline::new(fl_cfg.clone());
+        let round = pipeline.get_current_round().await;
+
+        for i in 0..n {
+            let mut weights = vec![0.0; dim];
+            for j in 0..dim {
+                weights[j] = 0.1 * (f64::from(i) + 1.0) + 0.04 * (j as f64);
+            }
+            pipeline
+                .add_client_update(ClientUpdate {
+                    client_id: format!("synthetic_client_{}", i),
+                    model_weights: weights,
+                    sample_count: 100 + i as usize,
+                    round,
+                })
+                .await?;
+        }
+
+        let agg = pipeline.aggregate_updates().await?;
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "federated_aggregation".to_string());
+        output.insert("federated_round".to_string(), agg.round.to_string());
+        output.insert("clients_count".to_string(), agg.clients_count.to_string());
+        output.insert("total_samples".to_string(), agg.total_samples.to_string());
+        output.insert(
+            "aggregation_mode".to_string(),
+            format!("{:?}", agg.aggregation_mode),
+        );
+        output.insert("weight_dim".to_string(), agg.weights.len().to_string());
+        if !agg.weights.is_empty() {
+            output.insert(
+                "aggregated_weight_0".to_string(),
+                format!("{:.8}", agg.weights[0]),
+            );
+        }
+        Ok(output)
+    }
+
+    fn federated_config_from_step(
+        cfg: &HashMap<String, String>,
+    ) -> Result<FederatedConfig, AppError> {
+        let mut c = FederatedConfig::default_config();
+        if let Some(s) = cfg.get("federated_aggregation") {
+            c.aggregation = match s.to_ascii_lowercase().as_str() {
+                "fedprox" | "prox" => AggregationMode::FedProx,
+                _ => AggregationMode::FedAvg,
+            };
+        }
+        if let Some(s) = cfg.get("federated_min_clients") {
+            c.min_clients_per_round = s.parse::<u32>().map_err(|_| {
+                AppError::ModelError(format!("Invalid federated_min_clients: '{}'.", s))
+            })?;
+        }
+        if let Some(s) = cfg.get("federated_max_clients") {
+            c.max_clients_per_round = s.parse::<u32>().map_err(|_| {
+                AppError::ModelError(format!("Invalid federated_max_clients: '{}'.", s))
+            })?;
+        }
+        if c.min_clients_per_round < 1 {
+            return Err(AppError::ModelError(
+                "federated_min_clients must be at least 1.".to_string(),
+            ));
+        }
+        if c.max_clients_per_round < c.min_clients_per_round {
+            return Err(AppError::ModelError(
+                "federated_max_clients must be >= federated_min_clients.".to_string(),
+            ));
+        }
+        Ok(c)
     }
 
     fn parse_quantization_level(s: Option<&str>) -> Result<QuantizationLevel, AppError> {
@@ -1038,6 +1226,30 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_execute_federated_aggregation_step() {
+        let manager = MLPipelineManager::new();
+        let steps = vec![PipelineStep {
+            id: "fed1".to_string(),
+            step_type: StepType::FederatedAggregation,
+            config: HashMap::new(),
+            dependencies: vec![],
+        }];
+        let pipeline = manager.create_pipeline("pf", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let out = got.step_results["fed1"].output.as_ref().unwrap();
+        assert_eq!(
+            out.get("step_kind"),
+            Some(&"federated_aggregation".to_string())
+        );
+        assert_eq!(out.get("clients_count"), Some(&"2".to_string()));
+        assert!(out.contains_key("aggregated_weight_0"));
+    }
+
+    #[tokio::test]
     async fn test_execute_automl_step_uses_builtin_data() {
         let manager = MLPipelineManager::new();
         let steps = vec![PipelineStep {
@@ -1056,5 +1268,29 @@ mod tests {
         assert_eq!(out.get("step_kind"), Some(&"automl".to_string()));
         assert!(out.get("accuracy").unwrap().parse::<f64>().unwrap() > 0.0);
         assert!(out.contains_key("hyperparameters_json"));
+        assert!(out.contains_key("ml_registered_version"));
+        assert!(out.contains_key("experiment_id"));
+    }
+
+    #[tokio::test]
+    async fn test_execute_automl_skip_registry() {
+        let manager = MLPipelineManager::new();
+        let mut cfg = HashMap::new();
+        cfg.insert("automl_skip_registry".to_string(), "true".to_string());
+        let steps = vec![PipelineStep {
+            id: "a2".to_string(),
+            step_type: StepType::AutoMl,
+            config: cfg,
+            dependencies: vec![],
+        }];
+        let pipeline = manager.create_pipeline("pa2", steps).await.unwrap();
+        manager
+            .execute_pipeline(pipeline.id.as_str())
+            .await
+            .unwrap();
+        let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+        let out = got.step_results["a2"].output.as_ref().unwrap();
+        assert!(!out.contains_key("experiment_id"));
+        assert!(!out.contains_key("ml_registered_version"));
     }
 }
