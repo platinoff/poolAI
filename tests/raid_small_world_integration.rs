@@ -28,7 +28,7 @@ fn create_test_raid_manager() -> Arc<RwLock<RaidManager>> {
 
 /// Helper function to create a test topology manager
 fn create_test_topology_manager() -> Arc<RwLock<TopologyManager>> {
-    Arc::new(RwLock::new(TopologyManager::new()))
+    Arc::new(RwLock::new(TopologyManager::new(None)))
 }
 
 /// Helper function to create a test SmallWorld strategy
@@ -37,7 +37,7 @@ async fn create_test_strategy() -> SmallWorldStrategy {
     let topology_manager = create_test_topology_manager();
 
     // Initialize topology manager
-    let _ = initialize_global_topology_manager();
+    let _ = initialize_global_topology_manager(None);
 
     let replication_config = poolai::raid::replication::ReplicationConfig::default();
     let replication_engine = Arc::new(ReplicationEngine::new(

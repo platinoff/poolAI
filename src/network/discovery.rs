@@ -8,16 +8,19 @@
 //! Inspired by exo's automatic device discovery feature.
 
 use crate::core::error::AppError;
-use chrono::{DateTime, Utc};
+use async_trait::async_trait;
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket};
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 use tokio::net::UdpSocket as TokioUdpSocket;
 use tokio::sync::RwLock;
 use tokio::time::{interval, Duration};
 use tracing::{debug, error, info, warn};
 use uuid::Uuid;
+
+pub use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 
 /// Discovery configuration
 #[derive(Debug, Clone)]
@@ -41,47 +44,6 @@ impl Default for DiscoveryConfig {
             enabled: true,
         }
     }
-}
-
-/// Information about a discovered peer/worker
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PeerInfo {
-    /// Unique peer identifier
-    pub peer_id: String,
-    /// Peer hostname or IP address
-    pub address: String,
-    /// Peer port
-    pub port: u16,
-    /// Last seen timestamp
-    pub last_seen: DateTime<Utc>,
-    /// Peer capabilities (GPU, CPU, etc.)
-    pub capabilities: PeerCapabilities,
-    /// Peer metadata
-    pub metadata: HashMap<String, String>,
-}
-
-/// Peer capabilities
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct PeerCapabilities {
-    /// Number of CPU cores
-    pub cpu_cores: usize,
-    /// Available GPU devices
-    pub gpu_devices: Vec<usize>,
-    /// Available memory in MB
-    pub memory_mb: usize,
-    /// Whether peer supports tensor parallelism
-    pub supports_tensor_parallelism: bool,
-    /// Whether peer supports pipeline parallelism
-    pub supports_pipeline_parallelism: bool,
-    /// Current active requests count
-    #[serde(default)]
-    pub active_requests: usize,
-    /// Maximum capacity (total concurrent requests supported)
-    #[serde(default)]
-    pub capacity: usize,
-    /// Current load (0.0-1.0), calculated as active_requests / capacity
-    #[serde(default)]
-    pub current_load: f32,
 }
 
 /// Detect local system capabilities
@@ -753,26 +715,23 @@ impl DiscoveryService {
     }
 }
 
-/// Global discovery service instance
-static GLOBAL_DISCOVERY: OnceLock<Arc<DiscoveryService>> = OnceLock::new();
+#[async_trait]
+impl crate::core::discovery_handle::DiscoveryHandle for DiscoveryService {
+    async fn get_peers(&self) -> Vec<PeerInfo> {
+        DiscoveryService::get_peers(self).await
+    }
 
-/// Get or initialize the global discovery service
-pub fn get_global_discovery_service() -> Option<&'static Arc<DiscoveryService>> {
-    GLOBAL_DISCOVERY.get()
-}
+    fn local_peer_id(&self) -> String {
+        self.local_peer_id().to_string()
+    }
 
-/// Initialize the global discovery service
-pub fn initialize_global_discovery(
-    config: DiscoveryConfig,
-    local_address: SocketAddr,
-) -> Result<Arc<DiscoveryService>, AppError> {
-    let service = Arc::new(DiscoveryService::new(config, local_address));
+    async fn get_peer(&self, peer_id: &str) -> Option<PeerInfo> {
+        DiscoveryService::get_peer(self, peer_id).await
+    }
 
-    GLOBAL_DISCOVERY.set(service.clone()).map_err(|_| {
-        AppError::ConfigError("Global discovery service already initialized".to_string())
-    })?;
-
-    Ok(service)
+    async fn send_announcement(&self) -> Result<(), AppError> {
+        DiscoveryService::send_announcement(self).await
+    }
 }
 
 #[cfg(test)]

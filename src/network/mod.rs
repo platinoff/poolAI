@@ -43,17 +43,21 @@ use axum_server::tls_rustls::RustlsConfig;
 /// Configuration is read from PoolAIConfig.
 /// Discovery service is automatically started if enabled.
 pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
-    // Initialize and start discovery service
-    use crate::network::discovery::{initialize_global_discovery, DiscoveryConfig};
+    use crate::network::discovery::{DiscoveryConfig, DiscoveryService};
+    use std::sync::Arc;
 
     let discovery_config = DiscoveryConfig::default();
     if discovery_config.enabled {
-        if let Ok(discovery) = initialize_global_discovery(discovery_config, addr) {
-            if let Err(e) = discovery.start().await {
-                tracing::warn!("Failed to start discovery service: {}", e);
-            } else {
-                info!("Discovery service started successfully");
-            }
+        let service = Arc::new(DiscoveryService::new(discovery_config, addr));
+        {
+            let mut slot = app_state.discovery.write().await;
+            *slot =
+                Some(service.clone() as Arc<dyn crate::core::discovery_handle::DiscoveryHandle>);
+        }
+        if let Err(e) = service.start().await {
+            tracing::warn!("Failed to start discovery service: {}", e);
+        } else {
+            info!("Discovery service started successfully");
         }
     }
     let app = {

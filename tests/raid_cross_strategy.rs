@@ -120,7 +120,7 @@ async fn test_strategy_status() {
 #[tokio::test]
 async fn test_rebalance_across_strategies() {
     // Initialize topology manager (required for SmallWorld strategy)
-    let _ = initialize_global_topology_manager();
+    let _ = initialize_global_topology_manager(None);
 
     let temp_dir = TempDir::new().unwrap();
 

@@ -3,8 +3,9 @@
 //! This module provides automatic integration between discovered peers
 //! and the worker pool, automatically adding discovered peers as workers.
 
+use crate::core::discovery_handle::SharedDiscoverySlot;
+use crate::core::discovery_types::PeerInfo;
 use crate::core::error::AppError;
-use crate::network::discovery::{get_global_discovery_service, PeerInfo};
 use crate::pool::{worker, Pool};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -15,14 +16,16 @@ use tracing::{debug, info, warn};
 pub struct DiscoveryPoolSync {
     pool: Arc<RwLock<Pool>>,
     known_peer_ids: Arc<RwLock<std::collections::HashSet<String>>>,
+    discovery: SharedDiscoverySlot,
 }
 
 impl DiscoveryPoolSync {
     /// Creates a new discovery pool sync
-    pub fn new(pool: Arc<RwLock<Pool>>) -> Self {
+    pub fn new(pool: Arc<RwLock<Pool>>, discovery: SharedDiscoverySlot) -> Self {
         Self {
             pool,
             known_peer_ids: Arc::new(RwLock::new(std::collections::HashSet::new())),
+            discovery,
         }
     }
 
@@ -30,9 +33,10 @@ impl DiscoveryPoolSync {
     pub async fn start(&self) -> Result<(), AppError> {
         let pool = Arc::clone(&self.pool);
         let known_peer_ids = Arc::clone(&self.known_peer_ids);
+        let discovery = self.discovery.clone();
 
         // Spawn sync task
-        tokio::spawn(Self::sync_task(pool, known_peer_ids));
+        tokio::spawn(Self::sync_task(pool, known_peer_ids, discovery));
 
         info!("Discovery pool sync started");
         Ok(())
@@ -42,65 +46,72 @@ impl DiscoveryPoolSync {
     async fn sync_task(
         pool: Arc<RwLock<Pool>>,
         known_peer_ids: Arc<RwLock<std::collections::HashSet<String>>>,
+        discovery: SharedDiscoverySlot,
     ) {
         let mut interval = interval(Duration::from_secs(5)); // Sync every 5 seconds
 
         loop {
             interval.tick().await;
 
-            if let Some(discovery) = get_global_discovery_service() {
-                let peers = discovery.get_peers().await;
-                let mut known_ids = known_peer_ids.write().await;
-
-                // Add new peers as workers
-                for peer in &peers {
-                    if !known_ids.contains(&peer.peer_id) {
-                        // Convert peer to worker
-                        match Self::create_worker_from_peer(peer) {
-                            Ok((worker_id, worker)) => {
-                                let pool_guard = pool.read().await;
-                                if let Err(e) =
-                                    pool_guard.add_worker(worker_id.clone(), worker).await
-                                {
-                                    warn!("Failed to add discovered peer as worker: {}", e);
-                                } else {
-                                    info!(
-                                        "Added discovered peer {} as worker {}",
-                                        peer.peer_id, worker_id
-                                    );
-                                    known_ids.insert(peer.peer_id.clone());
-                                }
-                            }
-                            Err(e) => {
-                                warn!("Failed to create worker from peer {}: {}", peer.peer_id, e);
-                            }
-                        }
-                    }
+            let peers_opt = {
+                let guard = discovery.read().await;
+                match guard.as_ref() {
+                    Some(d) => Some(d.get_peers().await),
+                    None => None,
                 }
+            };
 
-                // Remove stale workers (peers that are no longer in discovery)
-                let current_peer_ids: std::collections::HashSet<String> =
-                    peers.iter().map(|p| p.peer_id.clone()).collect();
-                let to_remove: Vec<String> = known_ids
-                    .iter()
-                    .filter(|id| !current_peer_ids.contains(*id))
-                    .cloned()
-                    .collect();
-
-                for peer_id in to_remove {
-                    let worker_id = format!("discovered-{}", peer_id);
-                    {
-                        let pool_guard = pool.read().await;
-                        if let Err(e) = pool_guard.remove_worker(&worker_id).await {
-                            warn!("Failed to remove stale worker {}: {}", worker_id, e);
-                        } else {
-                            info!("Removed stale worker: {}", worker_id);
-                            known_ids.remove(&peer_id);
-                        }
-                    }
-                }
-            } else {
+            let Some(peers) = peers_opt else {
                 debug!("Discovery service not available, skipping sync");
+                continue;
+            };
+
+            let mut known_ids = known_peer_ids.write().await;
+
+            // Add new peers as workers
+            for peer in &peers {
+                if !known_ids.contains(&peer.peer_id) {
+                    // Convert peer to worker
+                    match Self::create_worker_from_peer(peer) {
+                        Ok((worker_id, worker)) => {
+                            let pool_guard = pool.read().await;
+                            if let Err(e) = pool_guard.add_worker(worker_id.clone(), worker).await {
+                                warn!("Failed to add discovered peer as worker: {}", e);
+                            } else {
+                                info!(
+                                    "Added discovered peer {} as worker {}",
+                                    peer.peer_id, worker_id
+                                );
+                                known_ids.insert(peer.peer_id.clone());
+                            }
+                        }
+                        Err(e) => {
+                            warn!("Failed to create worker from peer {}: {}", peer.peer_id, e);
+                        }
+                    }
+                }
+            }
+
+            // Remove stale workers (peers that are no longer in discovery)
+            let current_peer_ids: std::collections::HashSet<String> =
+                peers.iter().map(|p| p.peer_id.clone()).collect();
+            let to_remove: Vec<String> = known_ids
+                .iter()
+                .filter(|id| !current_peer_ids.contains(*id))
+                .cloned()
+                .collect();
+
+            for peer_id in to_remove {
+                let worker_id = format!("discovered-{}", peer_id);
+                {
+                    let pool_guard = pool.read().await;
+                    if let Err(e) = pool_guard.remove_worker(&worker_id).await {
+                        warn!("Failed to remove stale worker {}: {}", worker_id, e);
+                    } else {
+                        info!("Removed stale worker: {}", worker_id);
+                        known_ids.remove(&peer_id);
+                    }
+                }
             }
         }
     }

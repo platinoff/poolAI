@@ -11,6 +11,7 @@ pub mod placement;
 pub mod topology;
 pub mod worker;
 
+use crate::core::discovery_handle::SharedDiscoverySlot;
 use crate::core::error::AppError;
 use crate::core::model_interface::{ModelRequest, ModelResponse};
 use rand::prelude::IndexedRandom;
@@ -565,7 +566,7 @@ impl Pool {
 static GLOBAL_POOL: OnceLock<Arc<RwLock<Pool>>> = OnceLock::new();
 
 /// Initialize pool module
-pub async fn initialize() -> Result<(), AppError> {
+pub async fn initialize(discovery: SharedDiscoverySlot) -> Result<(), AppError> {
     info!("Initializing pool module");
 
     // Create default pool configuration
@@ -595,7 +596,7 @@ pub async fn initialize() -> Result<(), AppError> {
     // Start discovery pool sync if pool is available
     if let Some(pool_arc) = get_global_pool() {
         let pool = Arc::clone(pool_arc);
-        let sync = discovery_integration::DiscoveryPoolSync::new(pool);
+        let sync = discovery_integration::DiscoveryPoolSync::new(pool, discovery);
         if let Err(e) = sync.start().await {
             warn!("Failed to start discovery pool sync: {}", e);
         } else {
@@ -607,7 +608,10 @@ pub async fn initialize() -> Result<(), AppError> {
 }
 
 /// Initialize pool module with custom configuration
-pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> {
+pub async fn initialize_with_config(
+    config: PoolConfig,
+    discovery: SharedDiscoverySlot,
+) -> Result<(), AppError> {
     info!("Initializing pool module with custom configuration");
 
     let pool = Pool::new(config);
@@ -621,6 +625,16 @@ pub async fn initialize_with_config(config: PoolConfig) -> Result<(), AppError> 
             Note: Pool module uses OnceLock for thread-safe single initialization."
                 .to_string(),
         ))?;
+
+    if let Some(pool_arc) = get_global_pool() {
+        let pool = Arc::clone(pool_arc);
+        let sync = discovery_integration::DiscoveryPoolSync::new(pool, discovery);
+        if let Err(e) = sync.start().await {
+            warn!("Failed to start discovery pool sync: {}", e);
+        } else {
+            info!("Discovery pool sync started");
+        }
+    }
 
     info!("Pool module initialized with custom configuration successfully");
     Ok(())

@@ -7,6 +7,8 @@
 //! - Advanced monitoring
 
 #[cfg(feature = "enterprise")]
+use crate::core::oauth2_pending::{store_oauth2_pending, verify_oauth2_pending};
+#[cfg(feature = "enterprise")]
 use crate::core::state::ApiContext;
 #[cfg(feature = "enterprise")]
 use crate::enterprise;
@@ -24,15 +26,9 @@ use axum::{
     Json, Router,
 };
 #[cfg(feature = "enterprise")]
-use chrono::{Duration, Utc};
+use chrono::Utc;
 #[cfg(feature = "enterprise")]
 use serde::Deserialize;
-#[cfg(feature = "enterprise")]
-use std::collections::HashMap;
-#[cfg(feature = "enterprise")]
-use std::sync::{Arc, OnceLock};
-#[cfg(feature = "enterprise")]
-use tokio::sync::RwLock;
 #[cfg(feature = "enterprise")]
 use uuid::Uuid;
 
@@ -1512,62 +1508,8 @@ async fn security_policy_delete_handler(
 // OAuth2 Authentication Handlers
 // ============================================================================
 
-/// OAuth2 state storage (in-memory, with TTL)
-/// In production, use Redis or database-backed session storage
 #[cfg(feature = "enterprise")]
-struct OAuth2State {
-    #[allow(dead_code)]
-    state: String,
-    created_at: chrono::DateTime<Utc>,
-}
-
-#[cfg(feature = "enterprise")]
-static OAUTH2_STATES: OnceLock<Arc<RwLock<HashMap<String, OAuth2State>>>> = OnceLock::new();
-
-#[cfg(feature = "enterprise")]
-fn get_oauth2_state_store() -> Arc<RwLock<HashMap<String, OAuth2State>>> {
-    OAUTH2_STATES
-        .get_or_init(|| Arc::new(RwLock::new(HashMap::new())))
-        .clone()
-}
-
-#[cfg(feature = "enterprise")]
-async fn store_oauth2_state(state: String) {
-    let store = get_oauth2_state_store();
-    let mut states = store.write().await;
-    states.insert(
-        state.clone(),
-        OAuth2State {
-            state: state.clone(),
-            created_at: Utc::now(),
-        },
-    );
-    // Cleanup old states (older than 10 minutes)
-    let cutoff = Utc::now() - Duration::minutes(10);
-    states.retain(|_, s| s.created_at > cutoff);
-}
-
-#[cfg(feature = "enterprise")]
-async fn verify_oauth2_state(state: &str) -> bool {
-    let store = get_oauth2_state_store();
-    let mut states = store.write().await;
-
-    // Cleanup old states first
-    let cutoff = Utc::now() - Duration::minutes(10);
-    states.retain(|_, s| s.created_at > cutoff);
-
-    // Verify state exists and is not expired
-    if let Some(state_entry) = states.get(state) {
-        if state_entry.created_at > cutoff {
-            states.remove(state); // One-time use
-            return true;
-        }
-    }
-    false
-}
-
-#[cfg(feature = "enterprise")]
-async fn oauth2_github_auth_handler() -> impl IntoResponse {
+async fn oauth2_github_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     // GitHub OAuth2 authorization flow - implemented
     // 1. Generate state parameter for CSRF protection
     // 2. Get GitHub OAuth2 provider config from SecurityManager
@@ -1605,7 +1547,7 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
     let state = uuid::Uuid::new_v4().to_string();
 
     // Store state for verification in callback
-    store_oauth2_state(state.clone()).await;
+    store_oauth2_pending(&ctx.oauth2_pending_states, state.clone()).await;
 
     match manager.get_oauth2_authorization_url("github", &state).await {
         Ok(auth_url) => {
@@ -1661,7 +1603,7 @@ async fn oauth2_github_callback_handler(
     }
 
     // Verify state parameter (CSRF protection)
-    if state.is_empty() || !verify_oauth2_state(&state).await {
+    if state.is_empty() || !verify_oauth2_pending(&ctx.oauth2_pending_states, &state).await {
         return (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({

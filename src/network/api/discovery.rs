@@ -6,7 +6,7 @@
 //! - Register/unregister peer
 
 use axum::{
-    extract::Path,
+    extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
@@ -14,8 +14,8 @@ use axum::{
 };
 use serde::Serialize;
 
+use crate::core::discovery_types::PeerInfo;
 use crate::core::state::ApiContext;
-use crate::network::discovery::{get_global_discovery_service, PeerInfo};
 
 /// Discovery API response types
 #[derive(Serialize)]
@@ -39,10 +39,11 @@ pub fn create_discovery_routes() -> Router<ApiContext> {
 
 /// Handler for GET /api/v1/discovery/peers
 /// Returns list of all discovered peers
-async fn peers_handler() -> impl IntoResponse {
-    if let Some(discovery) = get_global_discovery_service() {
+async fn peers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let guard = ctx.discovery.read().await;
+    if let Some(discovery) = guard.as_ref() {
         let peers = discovery.get_peers().await;
-        let local_peer_id = discovery.local_peer_id().to_string();
+        let local_peer_id = discovery.local_peer_id();
 
         let response = PeersResponse {
             peers,
@@ -63,8 +64,12 @@ async fn peers_handler() -> impl IntoResponse {
 
 /// Handler for GET /api/v1/discovery/peers/:peer_id
 /// Returns information about a specific peer
-async fn peer_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
-    if let Some(discovery) = get_global_discovery_service() {
+async fn peer_handler(
+    State(ctx): State<ApiContext>,
+    Path(peer_id): Path<String>,
+) -> impl IntoResponse {
+    let guard = ctx.discovery.read().await;
+    if let Some(discovery) = guard.as_ref() {
         let peer = discovery.get_peer(&peer_id).await;
         let response = PeerResponse { peer };
         return (StatusCode::OK, Json(response));
@@ -77,8 +82,9 @@ async fn peer_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
 
 /// Handler for POST /api/v1/discovery/register
 /// Registers this node as a peer
-async fn register_handler() -> impl IntoResponse {
-    if let Some(discovery) = get_global_discovery_service() {
+async fn register_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let guard = ctx.discovery.read().await;
+    if let Some(discovery) = guard.as_ref() {
         if let Err(e) = discovery.send_announcement().await {
             tracing::warn!("Failed to send discovery announcement: {}", e);
             return StatusCode::INTERNAL_SERVER_ERROR;

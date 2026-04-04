@@ -56,7 +56,7 @@ async fn create_test_smallworld_strategy() -> (
         .register_node(3, "http://192.168.1.3:8080".to_string())
         .await;
 
-    let topology_manager = Arc::new(RwLock::new(TopologyManager::new()));
+    let topology_manager = Arc::new(RwLock::new(TopologyManager::new(None)));
 
     // Add some test nodes to topology
     {

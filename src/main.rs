@@ -114,7 +114,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Initialize pool module
     info!("Initializing pool module...");
-    pool::initialize().await?;
+    pool::initialize(app_state.discovery.clone()).await?;
     info!("✅ Pool module initialized");
 
     // Initialize library management module
@@ -133,7 +133,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let _runtime_manager = runtime::initialize_runtime(runtime_config).await?;
 
     // Initialize topology manager first (before instance manager so it can use topology-aware placement)
-    pool::topology::initialize_global_topology_manager()
+    pool::topology::initialize_global_topology_manager(Some(app_state.discovery.clone()))
         .map_err(|e| format!("Failed to initialize topology manager: {}", e))?;
 
     // Initialize instance manager (will use topology-aware placement if topology manager is available)

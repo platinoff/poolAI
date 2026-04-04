@@ -2,10 +2,15 @@
 //! Provides core functionality for model interface, error handling, configuration, and state management
 
 pub mod config;
+pub mod discovery_handle;
+pub mod discovery_types;
 pub mod error;
 pub mod model_interface;
 pub mod state;
 pub mod user_manager;
+
+#[cfg(feature = "enterprise")]
+pub mod oauth2_pending;
 
 use self::config::{get_config, initialize_config, PoolAIConfig};
 use self::error::AppError;

@@ -7,8 +7,9 @@
 //!
 //! Inspired by exo's topology-aware load balancing feature.
 
+use crate::core::discovery_handle::SharedDiscoverySlot;
+use crate::core::discovery_types::PeerInfo;
 use crate::core::error::AppError;
-use crate::network::discovery::{get_global_discovery_service, PeerInfo};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -63,11 +64,13 @@ pub struct TopologyManager {
     // Stored here for future use in self-managed update loops
     #[allow(dead_code)]
     update_interval_secs: u64,
+    /// Shared discovery slot from `AppState` (populated when the network server starts discovery).
+    discovery: Option<SharedDiscoverySlot>,
 }
 
 impl TopologyManager {
     /// Create a new topology manager
-    pub fn new() -> Self {
+    pub fn new(discovery: Option<SharedDiscoverySlot>) -> Self {
         Self {
             topology: Arc::new(RwLock::new(Topology {
                 latency_matrix: HashMap::new(),
@@ -77,6 +80,7 @@ impl TopologyManager {
             })),
             latency_timeout_secs: 5,
             update_interval_secs: 30,
+            discovery,
         }
     }
 
@@ -154,8 +158,13 @@ impl TopologyManager {
         info!("Updating network topology");
 
         // Get discovered peers from discovery service
-        let peers = if let Some(discovery) = get_global_discovery_service() {
-            discovery.get_peers().await
+        let peers = if let Some(slot) = &self.discovery {
+            let guard = slot.read().await;
+            if let Some(discovery) = guard.as_ref() {
+                discovery.get_peers().await
+            } else {
+                Vec::new()
+            }
         } else {
             Vec::new()
         };
@@ -224,9 +233,15 @@ impl TopologyManager {
         }
 
         // Measure latency between nodes
-        let local_peer_id = get_global_discovery_service()
-            .map(|d| d.local_peer_id().to_string())
-            .unwrap_or_else(|| "local".to_string());
+        let local_peer_id = if let Some(slot) = &self.discovery {
+            let guard = slot.read().await;
+            guard
+                .as_ref()
+                .map(|d| d.local_peer_id())
+                .unwrap_or_else(|| "local".to_string())
+        } else {
+            "local".to_string()
+        };
 
         for peer in &peers {
             if peer.peer_id == local_peer_id {
@@ -357,7 +372,7 @@ impl TopologyManager {
 
 impl Default for TopologyManager {
     fn default() -> Self {
-        Self::new()
+        Self::new(None)
     }
 }
 
@@ -365,8 +380,10 @@ impl Default for TopologyManager {
 static GLOBAL_TOPOLOGY_MANAGER: OnceLock<Arc<RwLock<TopologyManager>>> = OnceLock::new();
 
 /// Initialize global topology manager
-pub fn initialize_global_topology_manager() -> Result<(), AppError> {
-    let manager = TopologyManager::new();
+pub fn initialize_global_topology_manager(
+    discovery: Option<SharedDiscoverySlot>,
+) -> Result<(), AppError> {
+    let manager = TopologyManager::new(discovery);
     GLOBAL_TOPOLOGY_MANAGER
         .set(Arc::new(RwLock::new(manager)))
         .map_err(|_| AppError::ConfigError("Topology manager already initialized".to_string()))?;

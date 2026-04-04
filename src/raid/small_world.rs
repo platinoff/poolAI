@@ -39,7 +39,7 @@
 //! let raid_config = RaidConfig::default_for_platform();
 //! let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
 //! let replication_engine = Arc::new(ReplicationEngine::with_defaults(raid_manager, None));
-//! let topology_manager = Arc::new(RwLock::new(TopologyManager::new()));
+//! let topology_manager = Arc::new(RwLock::new(TopologyManager::new(None)));
 //! let strategy = SmallWorldStrategy::new(config, replication_engine, topology_manager, None);
 //! strategy.initialize().await?;
 //! # Ok(())

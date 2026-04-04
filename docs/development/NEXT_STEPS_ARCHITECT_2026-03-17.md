@@ -44,7 +44,7 @@
   - [x] Ввести alias `ApiContext = Arc<AppState>` для HTTP та сервісного шару.
 - [ ] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст:
   - [x] Протягнути `ApiContext` у `network::start_server` і підʼєднати до `Router` як state.
-  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `ApiContext` (через state/extractors) замість окремих глобальних доступів — **частково**: `UserManager` у `AppState::user_manager`; `/login`, `/users`, enterprise OAuth/SAML callbacks без `get_global_user_manager`.
+  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `ApiContext` (через state/extractors) замість окремих глобальних доступів — **частково**: `UserManager` + `oauth2_pending_states` (enterprise) + discovery API через `ctx.discovery`; прибрано `GLOBAL_DISCOVERY` / `OAUTH2_STATES` OnceLock. Залишаються інші глобалі (напр. `ws`, enterprise security).
   - [ ] У тестах створювати lightweight‑версію `ApiContext` для ізольованого тестування handler’ів/сервісів (`ApiContext::default()` уже для system status; розширити за потреби).
 - [ ] Оновити відповідні розділи в:
   - [ ] `docs/ARCHITECTURE_REVIEW.md` (додати опис `AppState/ApiContext`),
@@ -218,7 +218,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ## Верифікація 2026-04-03 (Cursor, toolchain, Git, тести)
 
-**Останні коміти на `main` (орієнтир)**: ML pipeline / enterprise AI-ML API, federated/automl, документація та `.cursor` (див. `git log`). **2026-04-03**: `UserManager` перенесено в `core::user_manager`, поле `AppState::user_manager`, прибрано HTTP‑синглтон `get_global_user_manager`.
+**Останні коміти на `main` (орієнтир)**: ML pipeline / enterprise AI-ML API, federated/automl, документація та `.cursor` (див. `git log`). **2026-04-03**: `UserManager` перенесено в `core::user_manager`, поле `AppState::user_manager`, прибрано HTTP‑синглтон `get_global_user_manager`. **2026-04-04**: discovery через `AppState::discovery` + `DiscoveryHandle`, OAuth2 CSRF map у `AppState::oauth2_pending_states`; `pool`/`topology` отримують той самий `SharedDiscoverySlot` з `main`.
 
 **Cursor / правила**: каталог `.cursor/rules/` (`rust-architect.md`, `ai-assistant.md`, `chat-context.md`, `.cursorrules`, …). Оновлено `rust-architect.md`: канонічний push через зовнішній MSYS2; агент/CI можуть використовувати PowerShell; опис Dependabot; узгодження з `cargo test` як у CI; примітка про MSVC vs `rust-toolchain.toml` (GNU).
 
