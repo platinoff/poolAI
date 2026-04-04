@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["VM_MANAGER_UNAVAILABLE_MESSAGE"],"enum":["VmResourceUsageError","VmServiceError"],"struct":["VmService"]};
+window.SIDEBAR_ITEMS = {"constant":["VM_MANAGER_UNAVAILABLE_MESSAGE"],"enum":["VmMutationError","VmResourceUsageError","VmServiceError"],"struct":["VmService"]};
