@@ -102,6 +102,7 @@
 //! # Modules
 //!
 //! - [`core`] - Core functionality (config, error handling, model interface)
+//! - [`services`] - Service layer orchestration above domains (RAID, …; expanding)
 //! - [`pool`] - Worker pool management
 //! - [`monitoring`] - System monitoring and metrics
 //! - [`network`] - REST API and WebSocket server
@@ -122,6 +123,7 @@ pub mod platform;
 pub mod pool;
 pub mod rewards;
 pub mod runtime;
+pub mod services;
 pub mod version;
 
 // Public modules (exposed for external use)

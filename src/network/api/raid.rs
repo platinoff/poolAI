@@ -27,19 +27,30 @@ use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
 use crate::network::validation;
 use crate::raid;
+use crate::services::raid_service::{RaidService, RaidServiceError};
 
 type RaidHttpErr = (StatusCode, AxumJson<serde_json::Value>);
+
+fn raid_manager_unavailable() -> RaidHttpErr {
+    (
+        StatusCode::SERVICE_UNAVAILABLE,
+        AxumJson(serde_json::json!({
+            "error": crate::services::raid_service::RAID_MANAGER_UNAVAILABLE_MESSAGE
+        })),
+    )
+}
+
+fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
+    match e {
+        RaidServiceError::ManagerUnavailable => raid_manager_unavailable(),
+    }
+}
 
 fn raid_http_manager(ctx: &AppState) -> Result<Arc<raid::RaidManager>, RaidHttpErr> {
     ctx.raid_manager
         .get()
         .cloned()
-        .ok_or((
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "RAID manager not initialized. Suggestion: complete application startup (raid::initialize)."
-            })),
-        ))
+        .ok_or_else(raid_manager_unavailable)
 }
 
 #[derive(Deserialize)]
@@ -196,21 +207,17 @@ pub fn create_raid_routes() -> Router<ApiContext> {
 }
 
 async fn raid_nodes_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let nodes = manager.list_nodes().await;
-    AxumJson(nodes).into_response()
+    match RaidService::list_nodes(&ctx).await {
+        Ok(nodes) => AxumJson(nodes).into_response(),
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 async fn raid_artifacts_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let artifacts = manager.list_artifacts().await;
-    AxumJson(artifacts).into_response()
+    match RaidService::list_artifacts(&ctx).await {
+        Ok(artifacts) => AxumJson(artifacts).into_response(),
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 async fn raid_artifact_create_handler(

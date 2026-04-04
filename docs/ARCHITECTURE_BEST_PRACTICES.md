@@ -38,6 +38,9 @@ src/
 │   ├── error.rs
 │   ├── state.rs
 │   └── model_interface.rs
+├── services/           # Service layer (orchestration above domains; expand per Priority 2)
+│   ├── mod.rs
+│   └── raid_service.rs
 ├── network/            # API layer (modularized)
 │   ├── mod.rs
 │   └── api/            # 8 domain-specific modules

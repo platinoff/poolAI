@@ -219,4 +219,6 @@ vm-isolation-windows = ["windows-sys"]
 vm-isolation = ["vm-isolation-linux"]
 # Full security features (when both jwt and https are available)
 # security = ["jwt", "https"]
+# Attach core managers to AppState in integration tests without full app init (see AppState::attach_*_for_test)
+test-utils = []
 

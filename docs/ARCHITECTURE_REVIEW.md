@@ -109,6 +109,19 @@
 - Sub-modules in separate files
 - Public API through re-exports
 
+## 🧩 Application state: `AppState` / `ApiContext` (оновлено 2026-04)
+
+**Призначення**: єдина точка залежностей для Axum і майбутнього сервісного шару.
+
+- **`AppState`** (`src/core/state.rs`) тримає workers, config, system/model state, **`OnceLock`** для pool / RAID / VM / libraries / instances / topology після ініціалізації модулів у `main`, а також `UserManager`, `WebSocketManager`, слот discovery, enterprise-менеджери (за feature), `MLPipelineManager` (за `ml`).
+- **`ApiContext`** = `Arc<AppState>` — тип стану роутера (`State<ApiContext>`) у `network::api/*` та enterprise UI/API.
+- **Життєвий цикл**: у `main` після `raid::initialize` / `vm::initialize` тощо викликається **`attach_core_http_singletons()`**, який копіює ті самі `Arc`, що й модульні `get_global_*`, у поля `AppState` (глобалі лишаються для фонових задач і старого коду).
+- **Discovery**: `DiscoveryService` отримує `instance_manager` з `AppState` у `network::start_server`, без прямого `get_global_instance_manager` у announce.
+- **Тести**: опційний Cargo feature **`test-utils`** — методи **`attach_*_for_test`** на `AppState`, щоб прикріпити менеджери в інтеграційних тестах без повного `main`.
+- **Сервісний шар** (Priority 2): `src/services/` — оркестрація над доменами; HTTP залишається thin (наприклад `services::raid_service::RaidService` для RAID list).
+
+Детальний покроковий план: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
+
 ## 📋 Checklist для Rust Architect
 
 ### Структура

@@ -22,8 +22,8 @@
 
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
-| **1** | **Priority 1** | **Майже закрито**: модульний REST + `AppState`; **`api_legacy.rs` видалено** (дублікат, не підключався до router); **`DiscoveryService`** отримує `instance_manager` з `AppState` (без `get_global_instance_manager` у announce). **Залишилось**: розширений тестовий `AppState`, коментарі/код **distributed RAID** ще згадують глобальний Raft — за потреби вирівняти; **`docs/ARCHITECTURE_REVIEW.md`**. |
-| **2** | **Priority 2** | Ввести **`src/services/`**, thin handlers; паралельно **Stage 4.4** — **реальні Rust-бекенди кроків ML pipeline** (не заглушки), узгоджені з enterprise AI/ML API. |
+| **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
+| **2** | **Priority 2** | Розширити **`src/services/`** (vm, enterprise, cloud, admin), тонкі handlers; **Stage 4.4** — реальні Rust-бекенди кроків ML pipeline. Почато: `RaidService` + RAID list endpoints. |
 | **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
 | **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
@@ -50,10 +50,10 @@
     - Core: `pool`, `raid_manager`, `vm_manager`, `library_manager`, `instance_manager`, `topology_manager` — `OnceLock` у `AppState`, **`attach_core_http_singletons()`** після ініціалізації модулів у `main`.
     - Handler’и: workers, raid, raid distributed, vm, libraries, instances, completions, topology, enterprise API, UI dashboards — **`State<ApiContext>`**.
     - Модульні **`get_global_*`** лишаються для старту, фонових задач і тестів; HTTP узгоджений з тими самими `Arc`, що виставляє `main`.
-  - [ ] У тестах створювати lightweight‑версію `ApiContext` для ізольованого тестування handler’ів/сервісів (`ApiContext::default()` уже для system status; розширити за потреби).
-- [ ] Оновити відповідні розділи в:
-  - [ ] `docs/ARCHITECTURE_REVIEW.md` (додати опис `AppState/ApiContext`),
-  - [ ] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` (посилання на цей план).
+  - [x] У тестах: feature **`test-utils`** — `AppState::attach_*_for_test` для прикріплення `Arc` без повного `main` (див. `core/state.rs`).
+- [x] Оновити відповідні розділи в:
+  - [x] `docs/ARCHITECTURE_REVIEW.md` — розділ `AppState` / `ApiContext`.
+  - [x] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` — посилання на цей план.
 
 **Критерії готовності**:
 - [ ] Всі публічні HTTP‑handler’и отримують залежності через `AppState/ApiContext`.
@@ -69,8 +69,8 @@
 - доменні модулі (`raid/*`, `vm/*`, `enterprise/*`, `cloud/*`, `core/*`) ⟶ примітиви та інфраструктура.
 
 **Кроки**:
-- [ ] Створити `src/services/` з сервісами:
-  - [ ] `raid_service.rs`: операції з артефактами, реплікацією, метриками.
+- [x] Створити `src/services/` з сервісами (нарощувати далі):
+  - [x] `raid_service.rs`: почато — list nodes/artifacts для HTTP; далі артефакти, реплікація, метрики.
   - [ ] `vm_service.rs`: створення/зупинка/моніторинг процесів/VM.
   - [ ] `enterprise_service.rs`: multi‑tenancy, audit, SAML/OAuth2.
   - [ ] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором.
@@ -79,8 +79,8 @@
   - [ ] Handler’и роблять мінімум: екстрактують вхідні дані, викликають метод сервісу, маплять результат у HTTP‑відповідь.
   - [ ] Сервіси отримують залежності через `AppState/ApiContext`.
 - [ ] Додати короткий опис service‑шару в:
-  - [ ] `docs/ARCHITECTURE_BEST_PRACTICES.md`,
-  - [ ] `docs/development/DEVELOPMENT_PLAN_UPDATED.md`.
+  - [x] `docs/ARCHITECTURE_BEST_PRACTICES.md` (дерево `src/services/`),
+  - [x] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план).
 
 **Критерії готовності**:
 - [ ] Кожен основний домен (RAID, VM, Cloud, Enterprise, Admin) має сервісний модуль.
@@ -239,8 +239,8 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **Наступні кроки розробки (коротко)**:
 1. Таблиця **«Наступні кроки за пріоритетом»** на початку цього файлу — головний порядок робіт.  
-2. **Priority 1 (фінал)**: легкий **`ApiContext` для тестів**; **`ARCHITECTURE_REVIEW.md`**; за бажанням — прибрати згадки глобального Raft у `raid_distributed_handlers` (коли буде дизайн).  
-3. **Priority 2**: `src/services/` + реальні ML pipeline step backends.  
+2. **Priority 1**: документація AppState + feature **`test-utils`** (`attach_*_for_test`) — зроблено; опційно — Raft/distributed без глобальних згадок.  
+3. **Priority 2**: розширити **`services/`** (VM, enterprise, …), переносити логіку з handlers; ML pipeline step backends.  
 4. **TurboQuant** — Priority 2b (`docs/ml/TURBOQUANT_INTEGRATION.md`).
 
 ---
@@ -255,8 +255,8 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Core HTTP: `attach_core_http_singletons()`; модульні маршрути `api/` (workers, raid, vm, libraries, instances, completions, topology) + distributed RAID — через `ctx`.
 
 **Наступній сесії**:
-1. **Priority 1 — документація та тестовий harness**: `ARCHITECTURE_REVIEW.md`, опційно `DEVELOPMENT_PLAN_UPDATED.md`; розширений `ApiContext`/фабрика для інтеграційних тестів без globals.
-2. **Priority 2** — `src/services/` і винесення логіки з `network/api/*`; ML pipeline steps з реальними бекендами.
+1. **Priority 2** — розширити `src/services/` (VM, enterprise, cloud, admin); переносити логіку з `network/api/*`; ML pipeline steps з реальними бекендами.
+2. За потреби інтеграційні тести з **`--features test-utils`** і `attach_*_for_test` на `AppState`.
 
 **Перевірка збірки (як у недавніх CI-прогонах)**:
 `K8S_OPENAPI_ENABLED_VERSION=1.28`  

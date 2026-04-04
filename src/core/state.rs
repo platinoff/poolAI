@@ -425,6 +425,60 @@ impl AppState {
         Ok(())
     }
 
+    /// Attach core runtime handles for integration tests (no `get_global_*` / full `main` init).
+    ///
+    /// Enable crate feature **`test-utils`**. Each `OnceLock` may only be set once.
+    #[cfg(feature = "test-utils")]
+    pub fn attach_pool_for_test(&self, pool: Arc<TokioRwLock<Pool>>) -> Result<(), String> {
+        self.pool
+            .set(pool)
+            .map_err(|_| "pool handle already attached".to_string())
+    }
+
+    #[cfg(feature = "test-utils")]
+    pub fn attach_raid_manager_for_test(&self, manager: Arc<RaidManager>) -> Result<(), String> {
+        self.raid_manager
+            .set(manager)
+            .map_err(|_| "raid_manager handle already attached".to_string())
+    }
+
+    #[cfg(feature = "test-utils")]
+    pub fn attach_vm_manager_for_test(&self, manager: Arc<VmManager>) -> Result<(), String> {
+        self.vm_manager
+            .set(manager)
+            .map_err(|_| "vm_manager handle already attached".to_string())
+    }
+
+    #[cfg(feature = "test-utils")]
+    pub fn attach_library_manager_for_test(
+        &self,
+        manager: Arc<TokioRwLock<LibraryManager>>,
+    ) -> Result<(), String> {
+        self.library_manager
+            .set(manager)
+            .map_err(|_| "library_manager handle already attached".to_string())
+    }
+
+    #[cfg(feature = "test-utils")]
+    pub fn attach_instance_manager_for_test(
+        &self,
+        manager: Arc<TokioRwLock<InstanceManager>>,
+    ) -> Result<(), String> {
+        self.instance_manager
+            .set(manager)
+            .map_err(|_| "instance_manager handle already attached".to_string())
+    }
+
+    #[cfg(feature = "test-utils")]
+    pub fn attach_topology_manager_for_test(
+        &self,
+        manager: Arc<TokioRwLock<TopologyManager>>,
+    ) -> Result<(), String> {
+        self.topology_manager
+            .set(manager)
+            .map_err(|_| "topology_manager handle already attached".to_string())
+    }
+
     /// Align legacy `get_global_*` enterprise singletons with this `AppState` (no-op if already set).
     #[cfg(feature = "enterprise")]
     pub fn sync_enterprise_globals(&self) {
