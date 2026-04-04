@@ -52,15 +52,15 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
 For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation map: `docs/INDEX_2026-03-17.md`.
 
-### ✅ Current Build/Test Status (2026-03-25)
-- `cargo fmt --all` — run in CI / before push  
-- `cargo clippy --all-targets --all-features` — expected OK on main  
-- `cargo build --all-features` — expected OK on main  
-- `cargo test --all-features` — **currently fails at compile time** with `E0282` (type inference) in several integration tests (e.g. `tests/event_sourcing_integration.rs`, `tests/distributed_replication_tests.rs`); on Windows, building the full `--all-features` test crate can also hit compiler stack limits (`STATUS_STACK_BUFFER_OVERRUN`). Prefer targeted test runs (specific crates/tests) until inference is fixed.
+### ✅ Current Build/Test Status (2026-04-03)
+- `cargo fmt --all` — CI / before push  
+- **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** on verification runs.  
+- `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
+- `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 
 ### Next Focus
-- Restore a clean `cargo test --all-features` by adding the missing type annotations in affected tests (and/or splitting huge integration binaries).
-- Stage 4.4: real backends for individual pipeline steps, observability, and stronger integration tests around `/api/enterprise/ai-ml/pipeline`.
+- За потреби: стабілізувати `cargo test --all-features` на Windows (розбиття тест-крейтів, анотації типів, або обовʼязковий GNU host).  
+- Stage 4.4: реальні бекенди кроків pipeline, observability, інтеграційні тести для `/api/enterprise/ai-ml/pipeline`.
 
 ### 🚀 Development Roadmap
 

@@ -2,13 +2,15 @@
 
 ## 🏗️ Rust Architect Workflow
 
-### ⚠️ CRITICAL: MSYS2 Bash only — No PowerShell, No cmd
+### ⚠️ Термінал: канонічно MSYS2 bash; автоматизація — з контекстом
 
-**Terminal**: `C:\msys64\usr\bin\bash.exe` (ЗАВЖДИ для автономної роботи)  
-**Environment**: MSYS2 UCRT64, `rust-toolchain.toml` (1.92.0, GNU)  
-**Do NOT use**: PowerShell, cmd.exe, Cursor integrated terminal для git
+**Для людини (git push, довгі збірки, уникнення index.lock / CreateFileMapping на Windows)**  
+**Terminal**: `C:\msys64\usr\bin\bash.exe` — **зовнішнє** вікно MSYS2 UCRT64 (див. `.cursor/commands/git-push.md`).  
+**Environment**: `rust-toolchain.toml` — канал **1.92.0**, ціль **`x86_64-pc-windows-gnu`** + компоненти `rustfmt`, `clippy`. Якщо `rustup show` показує MSVC у каталозі репо, вирівняй toolchain: `rustup override set 1.92.0-x86_64-pc-windows-gnu` у корені репо (або збірка в UCRT64 за README).
 
-**Автономна робота**: Всі команди виконуються через `C:\msys64\usr\bin\bash.exe`
+**Cursor Agent / CI-перевірки** можуть виконуватися з **PowerShell** у корені репо (як у GitHub Actions `windows-latest`). Це не замінює рекомендацію вище для ручного `git push`.
+
+**Не використовувати для push**: вбудований термінал Cursor без потреби (див. troubleshooting у `git-push.md`).
 
 ### Key Documents for Rust Architect
 
@@ -29,10 +31,11 @@
 - `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` - Architect stabilization plan (best practices)
 
 **Helper Files**:
-- `file_list.csv` - Complete project file inventory (108254+ lines)
+- `file_list.csv` — інвентар шляхів репозиторію (репо-відносні рядки, не класичний CSV)
   - Location: `S:\rust\poolAI\file_list.csv`
   - Use for: File navigation, structure analysis, finding files by name/path
-  - Format: repo-relative inventory list (часто `./path -<...>`). Використовуй як “карта файлів”, не як звичайний CSV.
+
+**Dependabot** (`.github/dependabot.yml`): щотижня понеділок 09:00 UTC — оновлення **Cargo** (групування minor/patch) та **GitHub Actions**. Перегляд відкритих PR: на GitHub → Pull requests → label `dependencies`, або `gh pr list` (якщо встановлено GitHub CLI).
 
 ### Workflow Rules
 
@@ -58,19 +61,21 @@
    - ✅ Verify information against status documents
    - ✅ Use `file_list.csv` to find specific files
 
-4. **Terminal** (MSYS2 bash only; no PS, no cmd, **без .sh** для git push):
+4. **Git / перевірки перед push** (канонічно — блок з `.cursor/commands/git-push.md` у **зовнішньому MSYS2 bash**; **без .sh** для git):
    - **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
-   - Git: copy-paste блок з `.cursor/commands/git-push.md` (fmt, add, commit, push).
+   - Мінімальний набір узгоджений з **GitHub Actions** (`.github/workflows/ci.yml`):  
+     `K8S_OPENAPI_ENABLED_VERSION=1.28` (де потрібно), далі `cargo fmt --all`, `cargo test --lib --tests --features ml,enterprise,cloud`. Повний `cargo test --all-features` на Windows MSVC може дати переповнення стеку компілятора або каскадні помилки — для повного набору фіч використовуй GNU toolchain / Linux CI або таргетовані `--test`.
    ```bash
-   cargo test --all-features && cargo build --all-features
+   export K8S_OPENAPI_ENABLED_VERSION=1.28
    cargo fmt --all
+   cargo test --lib --tests --features ml,enterprise,cloud
    cargo clippy --all-targets --all-features
    git status --short
    git add <paths> && git commit -m "type(scope): subject" && git push origin main
    ```
 
-   - IMPORTANT: keep generated/static audit logs out of staging: `data/audit/*.log.gz` should stay ignored and should NOT be included in `git add <paths>`.
-   - If `--all-features` is too slow, for this working set run (in MSYS2 bash): `cargo test --test context_memory_integration`, `cargo test --test enterprise_audit_integration --features enterprise`, `cargo test --test enterprise_monitoring_integration --features enterprise`, `cargo test --test enterprise_monitoring_sqlite_integration --features enterprise`, `cargo test --test cloud_mock_integration --features cloud,cloud-sdk -- --test-threads=1` (requires `rustc >= 1.88` for AWS SDK; also ensure enough free disk space for compilation).
+   - IMPORTANT: не стаджити `data/audit/*.log.gz`.
+   - Додатково (таргетовано): `cloud_mock_integration` з `--features cloud,cloud-sdk`, `rustc >= 1.88` для AWS SDK.
 
    See `git-workflow.md`, `git-push.md`.
 
@@ -161,9 +166,8 @@ type(scope): description
 - ✅ VM, UI, Libs (100%)
 
 **Next Steps (v0.3.0+)**:
-- ⏸️ Stage 4.4 AI/ML: Model Optimization (ML.1 ✅), AutoML (ML.2 stub), Federated Learning (ML.3 stub)
-- ⏸️ ML.2–ML.3 implementation (pipeline, aggregation)
-- ⏸️ ML.1 pruning strategies
+- Stage 4.4 AI/ML: прунінг / AutoML / federated — у коді є **pipeline** (кроки, REST, `MLPipelineManager` на `AppState`); далі — реальні бекенди кроків, спостережуваність, інтеграційні тести під `/api/enterprise/ai-ml/pipeline`.
+- Архітектурний план: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` (AppState/service layer, Grid/Job/Memory).
 
 **Patch Tools Development**:
 - Adapt scripts in `scripts/` for patch tools on machine

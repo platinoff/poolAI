@@ -1,5 +1,10 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-04-03 — Узгодження з CI та toolchain
+
+- Оновлено `.cursor/rules/rust-architect.md`: MSYS2 лишається канонічним для ручного git push; дозволено контекст PowerShell для агента/CI як у GitHub Actions; Dependabot; рекомендований набір тестів `cargo test --lib --tests --features ml,enterprise,cloud` замість обовʼязкового `cargo test --all-features` на Windows MSVC; виправлено опис `file_list.csv`.
+- Перевірено: `cargo fmt`, `cargo clippy --all-targets --all-features` (exit 0, з попередженнями), CI-еквівалент тестів після правок у `tests/ml_pruning_integration.rs` та `tests/saml_auth_flow_integration.rs`.
+
 ## 2026-01-19 - Оптимізація налаштувань
 
 ### Виправлення проблем з втратою зв'язку з агентом

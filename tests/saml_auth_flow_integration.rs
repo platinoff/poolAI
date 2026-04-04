@@ -14,15 +14,27 @@ use poolai::enterprise::security::{get_global_security_manager, SamlConfig};
 use std::collections::HashMap;
 
 #[cfg(feature = "enterprise")]
+fn unique_saml_provider_name(prefix: &str) -> String {
+    let n = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    format!("{prefix}_{n}")
+}
+
+#[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_saml_auth_handler_redirect() {
+    let provider_name = unique_saml_provider_name("redirect");
     let manager = get_global_security_manager();
     manager.initialize().await.unwrap();
 
     let config = SamlConfig {
         entity_id: "test-entity".to_string(),
         sso_url: "https://saml.example.com/sso".to_string(),
-        acs_url: Some("https://poolai.example.com/api/auth/saml/test/callback".to_string()),
+        acs_url: Some(format!(
+            "https://poolai.example.com/api/auth/saml/{provider_name}/callback"
+        )),
         slo_url: None,
         certificate: "test-cert".to_string(),
         attribute_mapping: {
@@ -34,28 +46,31 @@ async fn test_saml_auth_handler_redirect() {
     };
 
     manager
-        .register_saml_provider("test".to_string(), config)
+        .register_saml_provider(provider_name.clone(), config)
         .await
         .unwrap();
 
     // Test SSO URL generation
-    let sso_url = manager.get_saml_sso_url("test").await.unwrap();
+    let sso_url = manager.get_saml_sso_url(&provider_name).await.unwrap();
     assert!(sso_url.contains("saml.example.com/sso"));
     assert!(sso_url.contains("SAMLRequest"));
 
-    let _ = manager.delete_saml_provider("test").await;
+    let _ = manager.delete_saml_provider(&provider_name).await;
 }
 
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_saml_callback_handler_validation() {
+    let provider_name = unique_saml_provider_name("callback_ok");
     let manager = get_global_security_manager();
     manager.initialize().await.unwrap();
 
     let config = SamlConfig {
         entity_id: "test-entity".to_string(),
         sso_url: "https://saml.example.com/sso".to_string(),
-        acs_url: Some("https://poolai.example.com/api/auth/saml/test/callback".to_string()),
+        acs_url: Some(format!(
+            "https://poolai.example.com/api/auth/saml/{provider_name}/callback"
+        )),
         slo_url: None,
         certificate: "test-cert".to_string(),
         attribute_mapping: {
@@ -67,7 +82,7 @@ async fn test_saml_callback_handler_validation() {
     };
 
     manager
-        .register_saml_provider("test".to_string(), config)
+        .register_saml_provider(provider_name.clone(), config)
         .await
         .unwrap();
 
@@ -93,7 +108,7 @@ async fn test_saml_callback_handler_validation() {
     );
 
     let result = manager
-        .validate_saml_assertion("test", &mock_saml_response)
+        .validate_saml_assertion(&provider_name, &mock_saml_response)
         .await;
 
     // Should extract attributes successfully
@@ -101,44 +116,47 @@ async fn test_saml_callback_handler_validation() {
         assert!(attributes.contains_key("nameid") || attributes.contains_key("email"));
     }
 
-    let _ = manager.delete_saml_provider("test").await;
+    let _ = manager.delete_saml_provider(&provider_name).await;
 }
 
 #[cfg(feature = "enterprise")]
 #[tokio::test]
 async fn test_saml_callback_handler_invalid_response() {
+    let provider_name = unique_saml_provider_name("callback_bad");
     let manager = get_global_security_manager();
     manager.initialize().await.unwrap();
 
     let config = SamlConfig {
         entity_id: "test-entity".to_string(),
         sso_url: "https://saml.example.com/sso".to_string(),
-        acs_url: Some("https://poolai.example.com/api/auth/saml/test/callback".to_string()),
+        acs_url: Some(format!(
+            "https://poolai.example.com/api/auth/saml/{provider_name}/callback"
+        )),
         slo_url: None,
         certificate: "test-cert".to_string(),
         attribute_mapping: HashMap::new(),
     };
 
     manager
-        .register_saml_provider("test".to_string(), config)
+        .register_saml_provider(provider_name.clone(), config)
         .await
         .unwrap();
 
     // Test with invalid base64
     let invalid_response = "not-valid-base64!!!";
     let result = manager
-        .validate_saml_assertion("test", invalid_response)
+        .validate_saml_assertion(&provider_name, invalid_response)
         .await;
     assert!(result.is_err());
 
     // Test with empty response
     let empty_response = "";
     let result = manager
-        .validate_saml_assertion("test", empty_response)
+        .validate_saml_assertion(&provider_name, empty_response)
         .await;
     assert!(result.is_err());
 
-    let _ = manager.delete_saml_provider("test").await;
+    let _ = manager.delete_saml_provider(&provider_name).await;
 }
 
 #[cfg(feature = "enterprise")]

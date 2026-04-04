@@ -25,9 +25,9 @@ fn test_magnitude_based_pruning_basic() {
     let result = apply_pruning(&weights, &config);
     assert_eq!(result.strategy, PruningStrategy::MagnitudeBased);
     assert!(result.pruned_count > 0);
-    // Note: weights_after == weights_before because we zero out weights, not remove them
-    assert_eq!(result.weights_after, result.weights_before);
-    assert!(result.compression_ratio >= 1.0);
+    // weights_after = count of retained non-zero weights (same vec length, sparse zeros)
+    assert!(result.weights_after < result.weights_before);
+    assert!(result.compression_ratio > 1.0);
     assert!(result.accuracy_drop >= 0.0);
 }
 
@@ -40,9 +40,9 @@ fn test_magnitude_based_pruning_large() {
 
     let result = apply_pruning(&weights, &config);
     assert_eq!(result.pruned_count, 500);
-    // Note: weights_after == weights_before because we zero out weights
-    assert_eq!(result.weights_after, result.weights_before);
-    assert_eq!(result.weights_after, 1000);
+    assert_eq!(result.weights_before, 1000);
+    assert!(result.weights_after < result.weights_before);
+    assert!(result.weights_after > 0);
 }
 
 #[test]
@@ -89,8 +89,8 @@ fn test_pruning_full_ratio() {
 
     let result = apply_pruning(&weights, &config);
     assert!(result.pruned_count > 0);
-    // Note: weights_after == weights_before because we zero out weights
-    assert_eq!(result.weights_after, result.weights_before);
+    assert_eq!(result.weights_before, 3);
+    assert_eq!(result.weights_after, 0);
 }
 
 #[test]
@@ -175,8 +175,7 @@ fn test_pruning_all_strategies() {
         let result = apply_pruning(&weights, &config);
         assert_eq!(result.strategy, strategy);
         assert!(result.pruned_count > 0);
-        // Note: weights_after == weights_before because we zero out weights
-        assert_eq!(result.weights_after, result.weights_before);
+        assert!(result.weights_after < result.weights_before);
     }
 }
 
@@ -187,8 +186,8 @@ fn test_pruning_compression_ratio() {
     config.ratio = 0.5; // Prune 50%
 
     let result = apply_pruning(&weights, &config);
-    // Note: compression_ratio is 1.0 because we zero out weights, not remove them
-    assert!((result.compression_ratio - 1.0).abs() < 0.1);
+    assert!(result.weights_after < result.weights_before);
+    assert!(result.compression_ratio > 1.0);
 }
 
 #[test]

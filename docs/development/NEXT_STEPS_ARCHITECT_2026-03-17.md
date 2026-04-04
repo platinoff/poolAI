@@ -173,3 +173,24 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **Примітка**: Кроки 3–4 можуть виконуватись частково паралельно для різних модулів, але **AppState і Service Layer бажано стабілізувати першими**, щоб не плодити дублікати патернів.
 
+---
+
+## Верифікація 2026-04-03 (Cursor, toolchain, Git, тести)
+
+**Останні коміти на `main` (орієнтир)**: ML pipeline / enterprise AI-ML API, federated/automl, документація та `.cursor` (див. `git log`).
+
+**Cursor / правила**: каталог `.cursor/rules/` (`rust-architect.md`, `ai-assistant.md`, `chat-context.md`, `.cursorrules`, …). Оновлено `rust-architect.md`: канонічний push через зовнішній MSYS2; агент/CI можуть використовувати PowerShell; опис Dependabot; узгодження з `cargo test` як у CI; примітка про MSVC vs `rust-toolchain.toml` (GNU).
+
+**Toolchain (локально, Windows)**: `rustc`/`cargo` **1.92.0**; `rust-toolchain.toml` — GNU target + clippy/rustfmt. Перевірка: `rustup show` (за потреби `rustup override set 1.92.0-x86_64-pc-windows-gnu`).
+
+**Dependabot**: `.github/dependabot.yml` — **cargo** та **github-actions**, weekly Monday 09:00 UTC; відкриті PR залежностей дивитись на GitHub (label `dependencies`).
+
+**Тести (обовʼязковий набір як у CI)**:  
+`K8S_OPENAPI_ENABLED_VERSION=1.28`  
+`cargo test --lib --tests --features ml,enterprise,cloud` — **успішно** після виправлень: `tests/ml_pruning_integration.rs` (семантика `weights_after`), `tests/saml_auth_flow_integration.rs` (унікальні імена провайдерів для глобального `SecurityManager`).
+
+**Наступні кроки розробки (коротко)**:
+1. Пріоритети 1–2 з цього документа (`ApiContext` у всіх handlers, service layer).  
+2. Stage 4.4 — бекенди кроків ML pipeline + тести навколо enterprise AI/ML HTTP API.  
+3. За потреби — відновити/спростити повний `cargo test --all-features` на Windows (окремі крейти або GNU-only).
+
