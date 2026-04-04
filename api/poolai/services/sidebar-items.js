@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["raid_service"]};
+window.SIDEBAR_ITEMS = {"mod":["raid_service","vm_service"]};

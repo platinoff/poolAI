@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["VM_MANAGER_UNAVAILABLE_MESSAGE"],"enum":["VmResourceUsageError","VmServiceError"],"struct":["VmService"]};
