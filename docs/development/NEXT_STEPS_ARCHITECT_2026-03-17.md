@@ -22,7 +22,7 @@
 
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
-| **1** | **Priority 1** | Завершити проведення **`ApiContext` через `Router` і handlers**; прибрати зайві глобальні синглтони в HTTP-шарі; тестовий `AppState`. |
+| **1** | **Priority 1** | **Майже зроблено** для модульного API: `State<ApiContext>` + `AppState`. **Залишилось**: `api_legacy.rs`, у `discovery` — прямий `get_global_instance_manager`; далі — розширений тестовий `AppState`, docs (`ARCHITECTURE_REVIEW`). |
 | **2** | **Priority 2** | Ввести **`src/services/`**, thin handlers; паралельно **Stage 4.4** — **реальні Rust-бекенди кроків ML pipeline** (не заглушки), узгоджені з enterprise AI/ML API. |
 | **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
 | **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API. |
@@ -44,7 +44,12 @@
   - [x] Ввести alias `ApiContext = Arc<AppState>` для HTTP та сервісного шару.
 - [ ] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст:
   - [x] Протягнути `ApiContext` у `network::start_server` і підʼєднати до `Router` як state.
-  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `ApiContext` (через state/extractors) замість окремих глобальних доступів — **частково**: `UserManager` + `oauth2_pending_states` (enterprise) + discovery API через `ctx.discovery`; прибрано `GLOBAL_DISCOVERY` / `OAUTH2_STATES` OnceLock; **WebSocket hub** — `WebSocketManager` у `AppState` (`ctx.ws_manager`), без `lazy_static` у `network/ws`; **enterprise HTTP** — `tenant_manager`, `audit_logger`, `enterprise_monitoring_manager`, `security_manager` у `AppState`; **core HTTP** — `pool`, `raid_manager`, `vm_manager`, `library_manager`, `instance_manager`, `topology_manager` у `AppState` (`OnceLock`, заповнюються після ініціалізації модулів через `attach_core_http_singletons()` у `main`); handler’и workers/raid/vm/libraries/instances/completions/topology та distributed RAID — через `State<ApiContext>`; у `main` також `sync_enterprise_globals()` для enterprise `get_global_*`. Модульні `get_global_*` для pool/raid/vm/… лишаються для фонових задач і тестів.
+  - [ ] В HTTP‑шарі приймати `ApiContext` замість глобалів — **зроблено для основного REST** (`src/network/api/*` модульні файли + enterprise + WS), **не зроблено** для **`src/network/api_legacy.rs`** (VM/RAID/pool/libs досі через `get_global_*`) та фрагменту **`src/network/discovery.rs`** (`get_global_instance_manager`). Деталі вже реалізованого:
+    - `UserManager`, `oauth2_pending_states`, `discovery` slot, `ws_manager`.
+    - Enterprise: `tenant_manager`, `audit_logger`, `enterprise_monitoring_manager`, `security_manager` + `sync_enterprise_globals()` у `main`.
+    - Core: `pool`, `raid_manager`, `vm_manager`, `library_manager`, `instance_manager`, `topology_manager` — `OnceLock` у `AppState`, **`attach_core_http_singletons()`** після ініціалізації модулів у `main`.
+    - Handler’и: workers, raid, raid distributed, vm, libraries, instances, completions, topology, enterprise API, UI dashboards — **`State<ApiContext>`**.
+    - Модульні **`get_global_*`** лишаються для старту, фонових задач і тестів; HTTP узгоджений з тими самими `Arc`, що виставляє `main`.
   - [ ] У тестах створювати lightweight‑версію `ApiContext` для ізольованого тестування handler’ів/сервісів (`ApiContext::default()` уже для system status; розширити за потреби).
 - [ ] Оновити відповідні розділи в:
   - [ ] `docs/ARCHITECTURE_REVIEW.md` (додати опис `AppState/ApiContext`),
@@ -232,6 +237,29 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **Наступні кроки розробки (коротко)**:
 1. Таблиця **«Наступні кроки за пріоритетом»** на початку цього файлу — головний порядок робіт.  
-2. **TurboQuant** — лише **Rust** (`docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b).  
-3. За потреби — повний `cargo test --all-features` на Windows (GNU / розбиття тестів).
+2. **Priority 1 (догортання)**: `api_legacy` → `State<ApiContext>`; `discovery` → `ctx.instance_manager` (або єдиний шлях через `AppState`).  
+3. **TurboQuant** — лише **Rust** (`docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b).  
+4. За потреби — повний `cargo test --all-features` на Windows (GNU / розбиття тестів).
+
+---
+
+## Handoff — остання сесія (архітектура / ApiContext)
+
+**Концепція (коротко)**: один **`ApiContext` = `Arc<AppState>`** у Axum; залежності для HTTP — з полів `AppState` + `State<T>` у handler’ах. Пізнє підключення «великих» підсистем після їхніх `initialize()` — через **`OnceLock`** на `AppState` і виклики **`attach_core_http_singletons()`** / **`sync_enterprise_globals()`** у `main`, щоб HTTP і legacy **`get_global_*`** бачили той самий `Arc`.
+
+**Що вже змерджено на `main` (орієнтир по змісту, перевірка: `git log`)**:
+- WebSocket: `WebSocketManager` у `AppState`, без `lazy_static` у `network/ws`.
+- Enterprise HTTP: менеджери в `AppState`, `enterprise_api` + UI dashboards через `ctx`, `sync_enterprise_globals()`.
+- Core HTTP: `attach_core_http_singletons()`; модульні маршрути `api/` (workers, raid, vm, libraries, instances, completions, topology) + distributed RAID — через `ctx`.
+
+**Наступній сесії (перший пріоритет з Priority 1)**:
+1. Мігрувати **`network/api_legacy.rs`** на `State<ApiContext>` (або винести виклики в thin-шар і поступово вимкнути legacy-маршрути, якщо так задумано).
+2. Прибрати **`get_global_instance_manager`** з **`network/discovery.rs`** на користь `ctx`.
+3. Опційно: оновити **`docs/ARCHITECTURE_REVIEW.md`** / **`DEVELOPMENT_PLAN_UPDATED.md`** під поточну модель `AppState`.
+4. Далі за таблицею — **Priority 2** (`src/services/`, thin handlers, ML pipeline backends).
+
+**Перевірка збірки (як у недавніх CI-прогонах)**:
+`K8S_OPENAPI_ENABLED_VERSION=1.28`  
+`cargo check --all-targets --features ml,enterprise,cloud`  
+`cargo test --lib --tests --features ml,enterprise,cloud` (за потреби розширити).
 
