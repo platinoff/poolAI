@@ -5,12 +5,17 @@
 //! - Latency matrix between nodes
 //! - Node resource information
 
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, routing::get, Json, Router};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::get,
+    Json, Router,
+};
 use serde::Serialize;
 use std::collections::HashMap;
 
 use crate::core::state::ApiContext;
-use crate::pool::topology::get_global_topology_manager;
 
 /// Topology response
 #[derive(Serialize)]
@@ -71,8 +76,8 @@ pub fn create_topology_routes() -> Router<ApiContext> {
 
 /// Handler for GET /api/v1/topology
 /// Returns overview of network topology
-async fn topology_handler() -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_topology_manager() {
+async fn topology_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.topology_manager.get() {
         let manager = manager_arc.read().await;
         let topology = manager.get_topology_snapshot().await;
 
@@ -97,8 +102,8 @@ async fn topology_handler() -> impl IntoResponse {
 
 /// Handler for GET /api/v1/topology/latency
 /// Returns latency matrix between all nodes
-async fn latency_matrix_handler() -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_topology_manager() {
+async fn latency_matrix_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.topology_manager.get() {
         let manager = manager_arc.read().await;
         let topology = manager.get_topology_snapshot().await;
 
@@ -118,8 +123,8 @@ async fn latency_matrix_handler() -> impl IntoResponse {
 
 /// Handler for GET /api/v1/topology/nodes
 /// Returns resource information for all nodes
-async fn all_nodes_resources_handler() -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_topology_manager() {
+async fn all_nodes_resources_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.topology_manager.get() {
         let manager = manager_arc.read().await;
         let topology = manager.get_topology_snapshot().await;
 
@@ -153,8 +158,11 @@ async fn all_nodes_resources_handler() -> impl IntoResponse {
 
 /// Handler for GET /api/v1/topology/nodes/{node_id}
 /// Returns resource information for a specific node
-async fn node_resources_handler(Path(node_id): Path<String>) -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_topology_manager() {
+async fn node_resources_handler(
+    State(ctx): State<ApiContext>,
+    Path(node_id): Path<String>,
+) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.topology_manager.get() {
         let manager = manager_arc.read().await;
 
         if let Some(resources) = manager.get_node_resources(&node_id).await {

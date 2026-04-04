@@ -6,7 +6,7 @@
 //! - Install, uninstall, update libraries
 
 use axum::{
-    extract::{Extension, Json, Path},
+    extract::{Extension, Json, Path, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -15,7 +15,7 @@ use axum::{
 };
 
 use crate::core::state::ApiContext;
-use crate::libs::{get_global_manager, LibraryType};
+use crate::libs::LibraryType;
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 
@@ -42,8 +42,8 @@ pub fn create_libraries_routes() -> Router<ApiContext> {
         )
 }
 
-async fn libraries_list_handler() -> impl IntoResponse {
-    if let Some(manager) = get_global_manager() {
+async fn libraries_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    if let Some(manager) = ctx.library_manager.get() {
         let manager = manager.read().await;
         let libraries = manager.list_libraries().await;
         AxumJson(libraries).into_response()
@@ -58,8 +58,11 @@ async fn libraries_list_handler() -> impl IntoResponse {
     }
 }
 
-async fn library_info_handler(Path(name): Path<String>) -> impl IntoResponse {
-    if let Some(manager) = get_global_manager() {
+async fn library_info_handler(
+    State(ctx): State<ApiContext>,
+    Path(name): Path<String>,
+) -> impl IntoResponse {
+    if let Some(manager) = ctx.library_manager.get() {
         let manager = manager.read().await;
         match manager.get_library(&name).await {
             Some(lib) => AxumJson(lib).into_response(),
@@ -83,6 +86,7 @@ async fn library_info_handler(Path(name): Path<String>) -> impl IntoResponse {
 }
 
 async fn library_install_handler(
+    State(ctx): State<ApiContext>,
     Path(name): Path<String>,
     Json(payload): Json<serde_json::Value>,
 ) -> impl IntoResponse {
@@ -91,7 +95,7 @@ async fn library_install_handler(
         .and_then(|v| v.as_str())
         .unwrap_or("latest");
 
-    if let Some(manager) = get_global_manager() {
+    if let Some(manager) = ctx.library_manager.get() {
         let manager = manager.read().await;
         match manager
             .install_library(&name, version, LibraryType::ModelLibrary)
@@ -118,6 +122,7 @@ async fn library_install_handler(
 }
 
 async fn library_uninstall_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
@@ -128,7 +133,7 @@ async fn library_uninstall_handler(
         return err.into_response();
     }
 
-    if let Some(manager) = get_global_manager() {
+    if let Some(manager) = ctx.library_manager.get() {
         let manager = manager.read().await;
         match manager.uninstall_library(&name).await {
             Ok(_) => AxumJson(serde_json::json!({
@@ -155,6 +160,7 @@ async fn library_uninstall_handler(
 }
 
 async fn library_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
@@ -165,7 +171,7 @@ async fn library_update_handler(
         return err.into_response();
     }
 
-    if let Some(manager) = get_global_manager() {
+    if let Some(manager) = ctx.library_manager.get() {
         let manager = manager.read().await;
         match manager.update_library(&name).await {
             Ok(lib) => AxumJson(lib).into_response(),
@@ -196,6 +202,7 @@ struct LibraryUploadRequest {
 }
 
 async fn library_upload_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(payload): Json<LibraryUploadRequest>,
 ) -> impl IntoResponse {
@@ -206,7 +213,7 @@ async fn library_upload_handler(
         return err.into_response();
     }
 
-    if let Some(manager) = get_global_manager() {
+    if let Some(manager) = ctx.library_manager.get() {
         let manager = manager.read().await;
         match manager
             .upload_library(

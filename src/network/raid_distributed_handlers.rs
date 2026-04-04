@@ -3,10 +3,11 @@
 //! Handlers for processing protocol messages in the distributed RAID system.
 
 use crate::core::error::AppError;
-use crate::raid;
+use crate::core::state::ApiContext;
 use crate::raid::protocol::*;
 use crate::version;
 use axum::{
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
@@ -16,7 +17,10 @@ use tracing::{error, info, warn};
 use uuid::Uuid;
 
 /// Handle PutArtifact protocol message
-pub async fn put_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
+pub async fn put_artifact_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
     info!("Received PutArtifact message: {}", message.id);
 
     let payload = match message.extract_put_artifact() {
@@ -31,7 +35,14 @@ pub async fn put_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl 
         }
     };
 
-    let manager = raid::get_global_manager();
+    let Some(manager) = ctx.raid_manager.get() else {
+        return create_error_response(
+            &message,
+            ErrorCode::InvalidRequest,
+            "RAID manager not initialized".to_string(),
+        );
+    };
+    let manager = manager.clone();
 
     // Decode base64 data if present
     let artifact_data = if let Some(data_base64) = payload.data {
@@ -88,7 +99,10 @@ pub async fn put_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl 
 }
 
 /// Handle GetArtifact protocol message
-pub async fn get_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
+pub async fn get_artifact_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
     info!("Received GetArtifact message: {}", message.id);
 
     let payload = match message.extract_get_artifact() {
@@ -103,7 +117,14 @@ pub async fn get_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl 
         }
     };
 
-    let manager = raid::get_global_manager();
+    let Some(manager) = ctx.raid_manager.get() else {
+        return create_error_response(
+            &message,
+            ErrorCode::InvalidRequest,
+            "RAID manager not initialized".to_string(),
+        );
+    };
+    let manager = manager.clone();
     let artifacts = manager.list_artifacts().await;
 
     // Find artifact by ID (simplified - in real implementation, would use proper ID mapping)
@@ -185,7 +206,10 @@ pub async fn get_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl 
 }
 
 /// Handle DeleteArtifact protocol message
-pub async fn delete_artifact_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
+pub async fn delete_artifact_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
     info!("Received DeleteArtifact message: {}", message.id);
 
     let payload = match message.extract_delete_artifact() {
@@ -200,7 +224,14 @@ pub async fn delete_artifact_handler(Json(message): Json<ProtocolMessage>) -> im
         }
     };
 
-    let manager = raid::get_global_manager();
+    let Some(manager) = ctx.raid_manager.get() else {
+        return create_error_response(
+            &message,
+            ErrorCode::InvalidRequest,
+            "RAID manager not initialized".to_string(),
+        );
+    };
+    let manager = manager.clone();
     let artifacts = manager.list_artifacts().await;
 
     // Find and delete artifact (simplified - in real implementation, would use proper ID mapping)
@@ -243,7 +274,10 @@ pub async fn delete_artifact_handler(Json(message): Json<ProtocolMessage>) -> im
 }
 
 /// Handle SyncArtifacts protocol message
-pub async fn sync_artifacts_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
+pub async fn sync_artifacts_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
     info!("Received SyncArtifacts message: {}", message.id);
 
     let _payload = match message.extract_sync_artifacts() {
@@ -258,7 +292,14 @@ pub async fn sync_artifacts_handler(Json(message): Json<ProtocolMessage>) -> imp
         }
     };
 
-    let manager = raid::get_global_manager();
+    let Some(manager) = ctx.raid_manager.get() else {
+        return create_error_response(
+            &message,
+            ErrorCode::InvalidRequest,
+            "RAID manager not initialized".to_string(),
+        );
+    };
+    let manager = manager.clone();
     let artifacts = manager.list_artifacts().await;
 
     // Simplified sync implementation
@@ -297,10 +338,20 @@ pub async fn sync_artifacts_handler(Json(message): Json<ProtocolMessage>) -> imp
 }
 
 /// Handle HealthCheck protocol message
-pub async fn health_check_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
+pub async fn health_check_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
     info!("Received HealthCheck message: {}", message.id);
 
-    let manager = raid::get_global_manager();
+    let Some(manager) = ctx.raid_manager.get() else {
+        return create_error_response(
+            &message,
+            ErrorCode::InvalidRequest,
+            "RAID manager not initialized".to_string(),
+        );
+    };
+    let manager = manager.clone();
     let artifacts = manager.list_artifacts().await;
     let total_size = manager.get_total_size().await.unwrap_or(0);
 
@@ -369,7 +420,10 @@ pub async fn health_check_handler(Json(message): Json<ProtocolMessage>) -> impl 
 }
 
 /// Handle JoinCluster protocol message
-pub async fn join_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
+pub async fn join_cluster_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
     info!("Received JoinCluster message: {}", message.id);
 
     let payload = match message.extract_join_cluster() {
@@ -384,7 +438,14 @@ pub async fn join_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl 
         }
     };
 
-    let manager = raid::get_global_manager();
+    let Some(manager) = ctx.raid_manager.get() else {
+        return create_error_response(
+            &message,
+            ErrorCode::InvalidRequest,
+            "RAID manager not initialized".to_string(),
+        );
+    };
+    let manager = manager.clone();
 
     // Register the new node
     let _node = manager.register_node(payload.address.clone()).await;

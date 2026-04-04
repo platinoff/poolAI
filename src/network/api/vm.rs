@@ -8,7 +8,7 @@
 //! - Check resource limits support
 
 use axum::{
-    extract::{Extension, Json, Path},
+    extract::{Extension, Json, Path, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -16,9 +16,10 @@ use axum::{
     Json as AxumJson, Router,
 };
 use serde::Deserialize;
+use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::core::state::ApiContext;
+use crate::core::state::{ApiContext, AppState};
 use crate::network::api::common::check_permission;
 use crate::network::auth::Claims;
 use crate::vm;
@@ -118,14 +119,37 @@ pub fn create_vm_routes() -> Router<ApiContext> {
         )
 }
 
-async fn vm_instances_handler() -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+type VmHttpErr = (StatusCode, AxumJson<serde_json::Value>);
+
+fn vm_http_manager(ctx: &AppState) -> Result<Arc<vm::VmManager>, VmHttpErr> {
+    ctx.vm_manager
+        .get()
+        .cloned()
+        .ok_or((
+            StatusCode::SERVICE_UNAVAILABLE,
+            AxumJson(serde_json::json!({
+                "error": "VM manager not initialized. Suggestion: complete application startup (vm::initialize)."
+            })),
+        ))
+}
+
+async fn vm_instances_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let instances = manager.list_instances().await;
     AxumJson(instances).into_response()
 }
 
-async fn vm_instance_resources_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_instance_resources_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -150,8 +174,11 @@ async fn vm_instance_resources_handler(Path(id): Path<String>) -> impl IntoRespo
     }
 }
 
-async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_resource_limits_supported_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let supported = manager.is_resource_limits_supported();
     AxumJson(serde_json::json!({
         "supported": supported
@@ -160,6 +187,7 @@ async fn vm_resource_limits_supported_handler() -> impl IntoResponse {
 }
 
 async fn vm_instance_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(payload): Json<VmCreateRequest>,
 ) -> impl IntoResponse {
@@ -170,7 +198,10 @@ async fn vm_instance_create_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let isolation = payload.isolation.unwrap_or(vm::VmIsolation::ProcessSandbox);
     let instance_name = payload.name.clone();
 
@@ -190,6 +221,7 @@ async fn vm_instance_create_handler(
 }
 
 async fn vm_instance_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(payload): Json<VmUpdateRequest>,
@@ -201,7 +233,10 @@ async fn vm_instance_update_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -231,6 +266,7 @@ async fn vm_instance_update_handler(
 }
 
 async fn vm_instance_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -241,7 +277,10 @@ async fn vm_instance_delete_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -271,6 +310,7 @@ async fn vm_instance_delete_handler(
 }
 
 async fn vm_instance_start_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -281,7 +321,10 @@ async fn vm_instance_start_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -311,6 +354,7 @@ async fn vm_instance_start_handler(
 }
 
 async fn vm_instance_stop_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -321,7 +365,10 @@ async fn vm_instance_stop_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -351,6 +398,7 @@ async fn vm_instance_stop_handler(
 }
 
 async fn vm_instance_restart_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -361,7 +409,10 @@ async fn vm_instance_restart_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -390,8 +441,14 @@ async fn vm_instance_restart_handler(
     }
 }
 
-async fn vm_instance_health_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_instance_health_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -442,14 +499,23 @@ async fn vm_instance_health_handler(Path(id): Path<String>) -> impl IntoResponse
 // VM Templates handlers
 // ============================================================================
 
-async fn vm_templates_handler() -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_templates_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let templates = manager.list_templates().await;
     AxumJson(templates).into_response()
 }
 
-async fn vm_template_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_template_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -476,6 +542,7 @@ async fn vm_template_get_handler(Path(id): Path<String>) -> impl IntoResponse {
 }
 
 async fn vm_template_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(template): Json<vm::VmTemplate>,
 ) -> impl IntoResponse {
@@ -485,7 +552,10 @@ async fn vm_template_create_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.create_template(template.clone()).await {
         Ok(_) => AxumJson(template).into_response(),
         Err(e) => (
@@ -499,6 +569,7 @@ async fn vm_template_create_handler(
 }
 
 async fn vm_template_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(template): Json<vm::VmTemplate>,
@@ -509,7 +580,10 @@ async fn vm_template_update_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.update_template(template).await {
         Ok(_) => AxumJson(serde_json::json!({
             "message": format!("Template {} updated successfully", id)
@@ -526,6 +600,7 @@ async fn vm_template_update_handler(
 }
 
 async fn vm_template_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -535,7 +610,10 @@ async fn vm_template_delete_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -568,14 +646,23 @@ async fn vm_template_delete_handler(
 // VM Networks handlers
 // ============================================================================
 
-async fn vm_networks_handler() -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_networks_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let networks = manager.list_networks().await;
     AxumJson(networks).into_response()
 }
 
-async fn vm_network_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = vm::get_global_manager();
+async fn vm_network_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -602,6 +689,7 @@ async fn vm_network_get_handler(Path(id): Path<String>) -> impl IntoResponse {
 }
 
 async fn vm_network_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(network): Json<vm::VmNetwork>,
 ) -> impl IntoResponse {
@@ -611,7 +699,10 @@ async fn vm_network_create_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.create_network(network.clone()).await {
         Ok(_) => AxumJson(network).into_response(),
         Err(e) => (
@@ -625,6 +716,7 @@ async fn vm_network_create_handler(
 }
 
 async fn vm_network_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(network): Json<vm::VmNetwork>,
@@ -635,7 +727,10 @@ async fn vm_network_update_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.update_network(network).await {
         Ok(_) => AxumJson(serde_json::json!({
             "message": format!("Network {} updated successfully", id)
@@ -652,6 +747,7 @@ async fn vm_network_update_handler(
 }
 
 async fn vm_network_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -661,7 +757,10 @@ async fn vm_network_delete_handler(
         return err.into_response();
     }
 
-    let manager = vm::get_global_manager();
+    let manager = match vm_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {

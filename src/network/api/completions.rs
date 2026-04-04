@@ -4,7 +4,7 @@
 //! Supports both streaming and non-streaming responses.
 
 use axum::{
-    extract::Extension,
+    extract::{Extension, State},
     http::StatusCode,
     response::{sse::Event, IntoResponse, Sse},
     routing::post,
@@ -12,13 +12,14 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
+use std::sync::Arc;
 use std::time::Duration;
 use tokio_stream::{self as stream, Stream, StreamExt};
 
 use crate::core::model_interface::{ModelParameters, ModelRequest};
 use crate::core::state::ApiContext;
 use crate::network::auth::Claims;
-use crate::runtime::instance::get_global_instance_manager;
+use crate::runtime::instance::InstanceManager;
 
 /// OpenAI-compatible chat message
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -155,6 +156,7 @@ pub fn create_completions_routes() -> Router<ApiContext> {
 /// Handler for POST /v1/chat/completions
 /// OpenAI-compatible chat completions endpoint
 async fn chat_completions_handler(
+    State(ctx): State<ApiContext>,
     Extension(_claims): Extension<Claims>,
     Json(request): Json<ChatCompletionRequest>,
 ) -> impl IntoResponse {
@@ -184,29 +186,29 @@ async fn chat_completions_handler(
         timeout: Some(30),
     };
 
-    // Try to find instance by model ID
-    let instance_manager_opt = get_global_instance_manager();
+    let instance_mgr = ctx.instance_manager.get().cloned();
 
-    if let Some(manager_arc) = instance_manager_opt {
-        let manager = manager_arc.read().await;
+    if let Some(manager_arc) = instance_mgr.clone() {
+        let instance_opt = {
+            let manager = manager_arc.read().await;
+            manager.get_instance_by_model_id(&request.model).await
+        };
 
-        // Try to find instance by model_id
-        if let Some(instance) = manager.get_instance_by_model_id(&request.model).await {
-            // Use instance to process request
+        if let Some(instance) = instance_opt {
             if request.stream {
-                // Streaming response
                 let stream = create_streaming_response_from_instance(
                     &instance.instance_id,
                     &request.model,
-                    model_request,
+                    model_request.clone(),
+                    instance_mgr.clone(),
                 );
                 Sse::new(stream).into_response()
             } else {
-                // Non-streaming response
                 let response = process_chat_completion_via_instance(
                     &instance.instance_id,
                     &request.model,
                     model_request,
+                    manager_arc,
                 )
                 .await;
 
@@ -262,11 +264,8 @@ async fn process_chat_completion_via_instance(
     instance_id: &str,
     model: &str,
     request: ModelRequest,
+    manager_arc: Arc<tokio::sync::RwLock<InstanceManager>>,
 ) -> Result<ChatCompletionResponse, crate::core::error::AppError> {
-    let manager_arc = get_global_instance_manager().ok_or_else(|| {
-        crate::core::error::AppError::ConfigError("Instance manager not initialized".to_string())
-    })?;
-
     let manager = manager_arc.read().await;
 
     // Process request via instance
@@ -336,8 +335,8 @@ fn create_streaming_response_from_instance(
     instance_id: &str,
     model: &str,
     request: ModelRequest,
+    manager_opt: Option<Arc<tokio::sync::RwLock<InstanceManager>>>,
 ) -> impl Stream<Item = Result<Event, Infallible>> {
-    use crate::runtime::instance::get_global_instance_manager;
     use tokio::sync::mpsc;
 
     let instance_id = instance_id.to_string();
@@ -347,7 +346,6 @@ fn create_streaming_response_from_instance(
 
     // Use channel to process request asynchronously and stream chunks
     let (tx, rx) = mpsc::unbounded_channel();
-    let manager_opt = get_global_instance_manager();
 
     if let Some(manager_arc) = manager_opt {
         let manager_clone = manager_arc.clone();

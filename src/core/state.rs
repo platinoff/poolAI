@@ -63,13 +63,20 @@ use crate::enterprise::monitoring::MonitoringManager;
 use crate::enterprise::multi_tenancy::TenantManager;
 #[cfg(feature = "enterprise")]
 use crate::enterprise::security::SecurityManager;
+use crate::libs::LibraryManager;
 #[cfg(feature = "ml")]
 use crate::ml::pipeline::MLPipelineManager;
+use crate::pool::topology::TopologyManager;
+use crate::pool::Pool;
+use crate::raid::RaidManager;
+use crate::runtime::instance::InstanceManager;
+use crate::vm::VmManager;
 use chrono::{DateTime, Utc};
 use parking_lot::{Mutex, RwLock};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
+use tokio::sync::RwLock as TokioRwLock;
 use tracing::info;
 
 /// Shared application context for API and service layers.
@@ -258,6 +265,18 @@ pub struct AppState {
     pub ws_manager: Arc<WebSocketManager>,
     /// Discovery service registration (see `network::start_server` when `DiscoveryConfig::enabled`).
     pub discovery: SharedDiscoverySlot,
+    /// Worker pool (`pool::initialize` + `attach_core_http_singletons` before serving HTTP).
+    pub pool: OnceLock<Arc<TokioRwLock<Pool>>>,
+    /// RAID manager (`raid::initialize` + attach).
+    pub raid_manager: OnceLock<Arc<RaidManager>>,
+    /// VM manager (`vm::initialize` + attach).
+    pub vm_manager: OnceLock<Arc<VmManager>>,
+    /// Library manager (`libs::initialize` + attach).
+    pub library_manager: OnceLock<Arc<TokioRwLock<LibraryManager>>>,
+    /// Model/instance manager (`initialize_global_instance_manager` + attach).
+    pub instance_manager: OnceLock<Arc<TokioRwLock<InstanceManager>>>,
+    /// Topology manager (`initialize_global_topology_manager` + attach).
+    pub topology_manager: OnceLock<Arc<TokioRwLock<TopologyManager>>>,
     /// OAuth2 CSRF state tokens (enterprise GitHub flow).
     #[cfg(feature = "enterprise")]
     pub oauth2_pending_states: Arc<tokio::sync::RwLock<HashMap<String, OAuth2PendingEntry>>>,
@@ -321,6 +340,12 @@ impl AppState {
             user_manager: Arc::new(UserManager::new()),
             ws_manager: Arc::new(WebSocketManager::new()),
             discovery: Arc::new(tokio::sync::RwLock::new(None)),
+            pool: OnceLock::new(),
+            raid_manager: OnceLock::new(),
+            vm_manager: OnceLock::new(),
+            library_manager: OnceLock::new(),
+            instance_manager: OnceLock::new(),
+            topology_manager: OnceLock::new(),
             #[cfg(feature = "enterprise")]
             oauth2_pending_states: Arc::new(tokio::sync::RwLock::new(HashMap::new())),
             #[cfg(feature = "enterprise")]
@@ -358,6 +383,45 @@ impl AppState {
 
         *initialized = true;
         info!("Application state initialized successfully");
+        Ok(())
+    }
+
+    /// Attach pool/RAID/VM/library/instance/topology handles for HTTP handlers (after module `initialize`).
+    pub fn attach_core_http_singletons(&self) -> Result<(), String> {
+        self.pool
+            .set(
+                crate::pool::get_global_pool()
+                    .ok_or_else(|| "pool global not initialized".to_string())?
+                    .clone(),
+            )
+            .map_err(|_| "pool handle already attached".to_string())?;
+        self.raid_manager
+            .set(crate::raid::get_global_manager())
+            .map_err(|_| "raid_manager handle already attached".to_string())?;
+        self.vm_manager
+            .set(crate::vm::get_global_manager())
+            .map_err(|_| "vm_manager handle already attached".to_string())?;
+        self.library_manager
+            .set(
+                crate::libs::get_global_manager()
+                    .ok_or_else(|| "library manager global not initialized".to_string())?
+                    .clone(),
+            )
+            .map_err(|_| "library_manager handle already attached".to_string())?;
+        self.instance_manager
+            .set(
+                crate::runtime::instance::get_global_instance_manager()
+                    .ok_or_else(|| "instance manager global not initialized".to_string())?
+                    .clone(),
+            )
+            .map_err(|_| "instance_manager handle already attached".to_string())?;
+        self.topology_manager
+            .set(
+                crate::pool::topology::get_global_topology_manager()
+                    .ok_or_else(|| "topology manager global not initialized".to_string())?
+                    .clone(),
+            )
+            .map_err(|_| "topology_manager handle already attached".to_string())?;
         Ok(())
     }
 

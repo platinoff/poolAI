@@ -173,6 +173,11 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     raid::initialize().await?;
     info!("✅ RAID module initialized");
 
+    app_state
+        .attach_core_http_singletons()
+        .map_err(|e| format!("Failed to attach core HTTP singletons to AppState: {e}"))?;
+    info!("✅ Core runtime handles attached to AppState for HTTP");
+
     // Initialize UI module
     info!("Initializing UI module...");
     ui::initialize().await?;

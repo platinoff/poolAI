@@ -6,7 +6,7 @@
 //! - Delete worker
 
 use axum::{
-    extract::{Json, Path},
+    extract::{Json, Path, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{delete, get, post},
@@ -67,9 +67,9 @@ pub fn create_workers_routes() -> Router<ApiContext> {
         )
 }
 
-async fn workers_handler() -> impl IntoResponse {
+async fn workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     // Try to get real workers from pool, fallback to mock data
-    if let Some(pool) = pool::get_global_pool() {
+    if let Some(pool) = ctx.pool.get() {
         let worker_statuses = {
             let pool_guard = pool.read().await;
             pool_guard.get_worker_status().await
@@ -114,7 +114,10 @@ async fn workers_handler() -> impl IntoResponse {
     AxumJson(workers).into_response()
 }
 
-async fn worker_create_handler(Json(payload): Json<CreateWorkerRequest>) -> impl IntoResponse {
+async fn worker_create_handler(
+    State(ctx): State<ApiContext>,
+    Json(payload): Json<CreateWorkerRequest>,
+) -> impl IntoResponse {
     // Validate worker ID format
     if let Err(e) = validation::validate_worker_id(&payload.worker_id) {
         return (
@@ -126,8 +129,8 @@ async fn worker_create_handler(Json(payload): Json<CreateWorkerRequest>) -> impl
             .into_response();
     }
 
-    // Get global pool
-    let pool = match pool::get_global_pool() {
+    // Get pool from application context
+    let pool = match ctx.pool.get() {
         Some(p) => p,
         None => {
             return (
@@ -207,9 +210,11 @@ async fn worker_create_handler(Json(payload): Json<CreateWorkerRequest>) -> impl
     }
 }
 
-async fn worker_delete_handler(Path(worker_id): Path<String>) -> impl IntoResponse {
-    // Get global pool
-    let pool = match pool::get_global_pool() {
+async fn worker_delete_handler(
+    State(ctx): State<ApiContext>,
+    Path(worker_id): Path<String>,
+) -> impl IntoResponse {
+    let pool = match ctx.pool.get() {
         Some(p) => p,
         None => {
             return (

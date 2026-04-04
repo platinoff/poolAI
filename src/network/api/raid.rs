@@ -8,7 +8,7 @@
 //! - Distributed RAID protocol endpoints
 
 use axum::{
-    extract::{Extension, Json, Path, Query},
+    extract::{Extension, Json, Path, Query, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -18,14 +18,29 @@ use axum::{
 use base64::{engine::general_purpose::STANDARD as base64_engine, Engine};
 use chrono::DateTime;
 use serde::Deserialize;
+use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::core::state::ApiContext;
+use crate::core::state::{ApiContext, AppState};
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
 use crate::network::validation;
 use crate::raid;
+
+type RaidHttpErr = (StatusCode, AxumJson<serde_json::Value>);
+
+fn raid_http_manager(ctx: &AppState) -> Result<Arc<raid::RaidManager>, RaidHttpErr> {
+    ctx.raid_manager
+        .get()
+        .cloned()
+        .ok_or((
+            StatusCode::SERVICE_UNAVAILABLE,
+            AxumJson(serde_json::json!({
+                "error": "RAID manager not initialized. Suggestion: complete application startup (raid::initialize)."
+            })),
+        ))
+}
 
 #[derive(Deserialize)]
 struct CreateArtifactRequest {
@@ -180,19 +195,26 @@ pub fn create_raid_routes() -> Router<ApiContext> {
         .route("/raid/health", get(raid_health_handler))
 }
 
-async fn raid_nodes_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_nodes_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let nodes = manager.list_nodes().await;
     AxumJson(nodes).into_response()
 }
 
-async fn raid_artifacts_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_artifacts_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let artifacts = manager.list_artifacts().await;
     AxumJson(artifacts).into_response()
 }
 
 async fn raid_artifact_create_handler(
+    State(ctx): State<ApiContext>,
     Json(payload): Json<CreateArtifactRequest>,
 ) -> impl IntoResponse {
     // Validate artifact name
@@ -245,7 +267,10 @@ async fn raid_artifact_create_handler(
     }
 
     // Create artifact
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let data_size = data.len();
     match manager.put_artifact(&payload.name, &data).await {
         Ok(artifact) => {
@@ -267,7 +292,10 @@ async fn raid_artifact_create_handler(
     }
 }
 
-async fn raid_artifact_delete_handler(Path(artifact_id): Path<String>) -> impl IntoResponse {
+async fn raid_artifact_delete_handler(
+    State(ctx): State<ApiContext>,
+    Path(artifact_id): Path<String>,
+) -> impl IntoResponse {
     // Validate UUID format
     if let Err(e) = validation::validate_uuid(&artifact_id) {
         return (
@@ -283,7 +311,10 @@ async fn raid_artifact_delete_handler(Path(artifact_id): Path<String>) -> impl I
     let id = Uuid::parse_str(&artifact_id).unwrap(); // Safe after validation
 
     // Delete artifact
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.delete_artifact(id).await {
         Ok(_) => {
             let response = DeleteArtifactResponse {
@@ -302,8 +333,11 @@ async fn raid_artifact_delete_handler(Path(artifact_id): Path<String>) -> impl I
     }
 }
 
-async fn raid_quota_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_quota_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let total_size = manager.get_total_size().await.unwrap_or(0);
     let artifacts = manager.list_artifacts().await;
     let artifact_count = artifacts.len();
@@ -328,8 +362,11 @@ async fn raid_quota_handler() -> impl IntoResponse {
     .into_response()
 }
 
-async fn raid_status_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_status_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
 
     // Get basic information
     let nodes = manager.list_nodes().await;
@@ -412,8 +449,11 @@ async fn raid_status_handler() -> impl IntoResponse {
     AxumJson(response).into_response()
 }
 
-async fn raid_events_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_events_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
 
     if let Some(event_store) = manager.event_store() {
         match event_store.read().await.load_events().await {
@@ -441,8 +481,14 @@ async fn raid_events_handler() -> impl IntoResponse {
     }
 }
 
-async fn raid_events_for_artifact_handler(Path(artifact_id): Path<String>) -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_events_for_artifact_handler(
+    State(ctx): State<ApiContext>,
+    Path(artifact_id): Path<String>,
+) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
 
     if let Some(event_store) = manager.event_store() {
         match event_store
@@ -476,8 +522,14 @@ async fn raid_events_for_artifact_handler(Path(artifact_id): Path<String>) -> im
     }
 }
 
-async fn raid_events_range_handler(Query(params): Query<EventsRangeQuery>) -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_events_range_handler(
+    State(ctx): State<ApiContext>,
+    Query(params): Query<EventsRangeQuery>,
+) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
 
     if let Some(event_store) = manager.event_store() {
         let start = params
@@ -524,8 +576,11 @@ async fn raid_events_range_handler(Query(params): Query<EventsRangeQuery>) -> im
     }
 }
 
-async fn raid_snapshot_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_snapshot_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
 
     if let Some(event_store) = manager.event_store() {
         match event_store.read().await.load_snapshot().await {
@@ -556,7 +611,10 @@ async fn raid_snapshot_handler() -> impl IntoResponse {
     }
 }
 
-async fn raid_snapshot_create_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
+async fn raid_snapshot_create_handler(
+    State(ctx): State<ApiContext>,
+    Extension(claims): Extension<Claims>,
+) -> impl IntoResponse {
     // Check permission: write:all or write:raid
     if let Err(err) =
         check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
@@ -564,7 +622,10 @@ async fn raid_snapshot_create_handler(Extension(claims): Extension<Claims>) -> i
         return err.into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
 
     match manager.create_snapshot().await {
         Ok(_) => AxumJson(serde_json::json!({
@@ -582,7 +643,10 @@ async fn raid_snapshot_create_handler(Extension(claims): Extension<Claims>) -> i
     }
 }
 
-async fn raid_snapshot_restore_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
+async fn raid_snapshot_restore_handler(
+    State(ctx): State<ApiContext>,
+    Extension(claims): Extension<Claims>,
+) -> impl IntoResponse {
     // Check permission: write:all or write:raid
     if let Err(err) =
         check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
@@ -590,7 +654,10 @@ async fn raid_snapshot_restore_handler(Extension(claims): Extension<Claims>) -> 
         return err.into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.restore_from_snapshot().await {
         Ok(_) => AxumJson(serde_json::json!({
             "status": "success",
@@ -607,7 +674,10 @@ async fn raid_snapshot_restore_handler(Extension(claims): Extension<Claims>) -> 
     }
 }
 
-async fn raid_gc_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
+async fn raid_gc_handler(
+    State(ctx): State<ApiContext>,
+    Extension(claims): Extension<Claims>,
+) -> impl IntoResponse {
     // Check permission: write:all or write:raid
     if let Err(err) =
         check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
@@ -615,7 +685,10 @@ async fn raid_gc_handler(Extension(claims): Extension<Claims>) -> impl IntoRespo
         return err.into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.gc_old_artifacts().await {
         Ok(removed) => AxumJson(RaidGcResponse {
             removed_count: removed,
@@ -646,8 +719,11 @@ struct RaidWorkerResponse {
     last_seen: String,
 }
 
-async fn raid_workers_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let nodes = manager.list_nodes().await;
     let workers: Vec<RaidWorkerResponse> = nodes
         .into_iter()
@@ -660,8 +736,14 @@ async fn raid_workers_handler() -> impl IntoResponse {
     AxumJson(workers).into_response()
 }
 
-async fn raid_worker_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_worker_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -695,6 +777,7 @@ async fn raid_worker_get_handler(Path(id): Path<String>) -> impl IntoResponse {
 }
 
 async fn raid_worker_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(payload): Json<CreateRaidWorkerRequest>,
 ) -> impl IntoResponse {
@@ -714,7 +797,10 @@ async fn raid_worker_create_handler(
             .into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let node = manager.register_node(payload.address.clone()).await;
     let response = RaidWorkerResponse {
         id: node.id.to_string(),
@@ -725,6 +811,7 @@ async fn raid_worker_create_handler(
 }
 
 async fn raid_worker_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(payload): Json<CreateRaidWorkerRequest>,
@@ -735,7 +822,10 @@ async fn raid_worker_update_handler(
         return err.into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -769,6 +859,7 @@ async fn raid_worker_update_handler(
 }
 
 async fn raid_worker_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -778,7 +869,10 @@ async fn raid_worker_delete_handler(
         return err.into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -848,8 +942,11 @@ struct RaidHealthResponse {
 }
 
 /// Get strategy status for all available strategies
-async fn raid_strategies_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_strategies_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let current_mode = manager.get_mode().await;
 
     // Get status for current strategy
@@ -872,8 +969,11 @@ async fn raid_strategies_handler() -> impl IntoResponse {
 }
 
 /// Get metrics for the active RAID strategy
-async fn raid_metrics_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_metrics_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let mode = manager.get_mode().await;
     let mode_str = format!("{:?}", mode);
 
@@ -939,7 +1039,10 @@ async fn raid_metrics_handler() -> impl IntoResponse {
 }
 
 /// Trigger manual rebalancing for the active strategy
-async fn raid_rebalance_handler(Extension(claims): Extension<Claims>) -> impl IntoResponse {
+async fn raid_rebalance_handler(
+    State(ctx): State<ApiContext>,
+    Extension(claims): Extension<Claims>,
+) -> impl IntoResponse {
     // Check permission: write:all or write:raid
     if let Err(err) =
         check_permission(&claims, "write:all").or_else(|_| check_permission(&claims, "write:raid"))
@@ -947,7 +1050,10 @@ async fn raid_rebalance_handler(Extension(claims): Extension<Claims>) -> impl In
         return err.into_response();
     }
 
-    let manager = raid::get_global_manager();
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     match manager.trigger_rebalance().await {
         Ok(result) => {
             let response = RaidRebalanceResponse {
@@ -971,8 +1077,11 @@ async fn raid_rebalance_handler(Extension(claims): Extension<Claims>) -> impl In
 }
 
 /// Health check for RAID strategies
-async fn raid_health_handler() -> impl IntoResponse {
-    let manager = raid::get_global_manager();
+async fn raid_health_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = match raid_http_manager(&ctx) {
+        Ok(m) => m,
+        Err(e) => return e.into_response(),
+    };
     let mode = manager.get_mode().await;
     let mode_str = format!("{:?}", mode);
 

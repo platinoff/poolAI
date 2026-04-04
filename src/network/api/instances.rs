@@ -6,7 +6,7 @@
 //! - Get instance status
 
 use axum::{
-    extract::{Extension, Path, Query},
+    extract::{Extension, Path, Query, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -18,9 +18,8 @@ use std::collections::HashMap;
 
 use crate::core::model_interface::{GpuRequirements, ModelInfo};
 use crate::core::state::ApiContext;
-use crate::libs::get_global_manager as get_library_manager;
 use crate::network::auth::Claims;
-use crate::runtime::instance::{get_global_instance_manager, InstancePlacement};
+use crate::runtime::instance::InstancePlacement;
 
 /// Instance preview response
 #[derive(Serialize)]
@@ -91,6 +90,7 @@ pub fn create_instance_routes() -> Router<ApiContext> {
 /// Handler for GET /api/v1/instance/previews?model_id=xxx
 /// Returns placement previews for a model
 async fn instance_previews_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<HashMap<String, String>>,
 ) -> impl IntoResponse {
     let model_id = match params.get("model_id") {
@@ -104,11 +104,11 @@ async fn instance_previews_handler(
         }
     };
 
-    if let Some(manager_arc) = get_global_instance_manager() {
+    if let Some(manager_arc) = ctx.instance_manager.get() {
         let manager = manager_arc.read().await;
 
         // Get model info - try to fetch from library manager, fallback to default
-        let model_info = get_model_info(model_id).await;
+        let model_info = get_model_info(model_id, &ctx).await;
 
         match manager.get_placement_previews(model_id, &model_info).await {
             Ok(placements) => {
@@ -155,10 +155,11 @@ async fn instance_previews_handler(
 /// Handler for POST /api/v1/instance
 /// Creates a new model instance
 async fn instance_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(_claims): Extension<Claims>,
     Json(request): Json<CreateInstanceRequest>,
 ) -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_instance_manager() {
+    if let Some(manager_arc) = ctx.instance_manager.get() {
         let manager = manager_arc.read().await;
 
         // Parse placement from request (simplified)
@@ -212,8 +213,8 @@ async fn instance_create_handler(
 
 /// Handler for GET /api/v1/instance
 /// Lists all instances
-async fn instance_list_handler() -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_instance_manager() {
+async fn instance_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.instance_manager.get() {
         let manager = manager_arc.read().await;
         let instances = manager.list_instances().await;
 
@@ -245,8 +246,11 @@ async fn instance_list_handler() -> impl IntoResponse {
 
 /// Handler for GET /api/v1/instance/:id
 /// Gets a specific instance
-async fn instance_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_instance_manager() {
+async fn instance_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.instance_manager.get() {
         let manager = manager_arc.read().await;
 
         if let Some(instance) = manager.get_instance(&id).await {
@@ -278,10 +282,11 @@ async fn instance_get_handler(Path(id): Path<String>) -> impl IntoResponse {
 /// Handler for DELETE /api/v1/instance/:id
 /// Deletes an instance
 async fn instance_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(_claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_instance_manager() {
+    if let Some(manager_arc) = ctx.instance_manager.get() {
         let manager = manager_arc.read().await;
 
         match manager.delete_instance(&id).await {
@@ -307,8 +312,8 @@ async fn instance_delete_handler(
 
 /// Handler for GET /api/v1/state
 /// Returns deployment state (instances and their status)
-async fn state_handler() -> impl IntoResponse {
-    if let Some(manager_arc) = get_global_instance_manager() {
+async fn state_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    if let Some(manager_arc) = ctx.instance_manager.get() {
         let manager = manager_arc.read().await;
         let instances = manager.list_instances().await;
 
@@ -337,9 +342,9 @@ async fn state_handler() -> impl IntoResponse {
 }
 
 /// Get model information from library manager or return default
-async fn get_model_info(model_id: &str) -> ModelInfo {
+async fn get_model_info(model_id: &str, ctx: &ApiContext) -> ModelInfo {
     // Try to get model info from library manager
-    if let Some(lib_manager_arc) = get_library_manager() {
+    if let Some(lib_manager_arc) = ctx.library_manager.get() {
         let lib_manager = lib_manager_arc.read().await;
         if let Some(library) = lib_manager.get_library(model_id).await {
             // Convert LibraryInfo to ModelInfo
