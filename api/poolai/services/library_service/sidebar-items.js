@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["LIBRARY_MANAGER_UNAVAILABLE_MESSAGE"],"enum":["LibraryMutationError","LibraryServiceError"],"struct":["LibraryService"]};
