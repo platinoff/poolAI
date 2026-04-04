@@ -8,6 +8,7 @@ pub mod error;
 pub mod model_interface;
 pub mod state;
 pub mod user_manager;
+pub mod ws_manager;
 
 #[cfg(feature = "enterprise")]
 pub mod oauth2_pending;

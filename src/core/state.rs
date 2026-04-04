@@ -54,6 +54,7 @@ use crate::core::model_interface::{ModelState, ModelStatus};
 #[cfg(feature = "enterprise")]
 use crate::core::oauth2_pending::OAuth2PendingEntry;
 use crate::core::user_manager::UserManager;
+use crate::core::ws_manager::WebSocketManager;
 #[cfg(feature = "ml")]
 use crate::ml::pipeline::MLPipelineManager;
 use chrono::{DateTime, Utc};
@@ -245,6 +246,8 @@ pub struct AppState {
     pub state_mutex: Arc<Mutex<()>>,
     /// User accounts for HTTP auth (`/login`, `/users`, enterprise OAuth/SAML).
     pub user_manager: Arc<UserManager>,
+    /// WebSocket hub for `/ws/metrics` and broadcasts.
+    pub ws_manager: Arc<WebSocketManager>,
     /// Discovery service registration (see `network::start_server` when `DiscoveryConfig::enabled`).
     pub discovery: SharedDiscoverySlot,
     /// OAuth2 CSRF state tokens (enterprise GitHub flow).
@@ -296,6 +299,7 @@ impl AppState {
             is_initialized: Arc::new(RwLock::new(false)),
             state_mutex: Arc::new(Mutex::new(())),
             user_manager: Arc::new(UserManager::new()),
+            ws_manager: Arc::new(WebSocketManager::new()),
             discovery: Arc::new(tokio::sync::RwLock::new(None)),
             #[cfg(feature = "enterprise")]
             oauth2_pending_states: Arc::new(tokio::sync::RwLock::new(HashMap::new())),

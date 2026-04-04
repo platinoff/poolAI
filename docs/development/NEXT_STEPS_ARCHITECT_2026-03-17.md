@@ -44,7 +44,7 @@
   - [x] Ввести alias `ApiContext = Arc<AppState>` для HTTP та сервісного шару.
 - [ ] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст:
   - [x] Протягнути `ApiContext` у `network::start_server` і підʼєднати до `Router` як state.
-  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `ApiContext` (через state/extractors) замість окремих глобальних доступів — **частково**: `UserManager` + `oauth2_pending_states` (enterprise) + discovery API через `ctx.discovery`; прибрано `GLOBAL_DISCOVERY` / `OAUTH2_STATES` OnceLock. Залишаються інші глобалі (напр. `ws`, enterprise security).
+  - [ ] В HTTP‑шарі (`src/network/api/*.rs`) приймати `ApiContext` (через state/extractors) замість окремих глобальних доступів — **частково**: `UserManager` + `oauth2_pending_states` (enterprise) + discovery API через `ctx.discovery`; прибрано `GLOBAL_DISCOVERY` / `OAUTH2_STATES` OnceLock; **WebSocket hub** — `WebSocketManager` у `AppState` (`ctx.ws_manager`), без `lazy_static` у `network/ws`. Залишаються інші глобалі (напр. enterprise security).
   - [ ] У тестах створювати lightweight‑версію `ApiContext` для ізольованого тестування handler’ів/сервісів (`ApiContext::default()` уже для system status; розширити за потреби).
 - [ ] Оновити відповідні розділи в:
   - [ ] `docs/ARCHITECTURE_REVIEW.md` (додати опис `AppState/ApiContext`),
