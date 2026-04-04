@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["start_server"],"mod":["api","api_legacy","auth","discovery","raid_distributed_handlers","rate_limit","security_headers","tls_config","validation","ws"]};
+window.SIDEBAR_ITEMS = {"fn":["start_server"],"mod":["api","auth","discovery","raid_distributed_handlers","rate_limit","security_headers","tls_config","validation","ws"]};
