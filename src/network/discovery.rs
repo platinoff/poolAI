@@ -8,6 +8,7 @@
 //! Inspired by exo's automatic device discovery feature.
 
 use crate::core::error::AppError;
+use crate::runtime::instance::InstanceManager;
 use async_trait::async_trait;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -272,6 +273,8 @@ pub struct DiscoveryService {
     peers: Arc<RwLock<HashMap<String, PeerInfo>>>,
     /// Whether the service is running
     running: Arc<RwLock<bool>>,
+    /// Optional instance manager (same `Arc` as `AppState::instance_manager`); avoids `get_global_instance_manager` in HTTP/discovery paths.
+    instance_manager: Option<Arc<RwLock<InstanceManager>>>,
 }
 
 /// Minimal clone of discovery service for listener task
@@ -282,8 +285,15 @@ struct DiscoveryServiceClone {
 }
 
 impl DiscoveryService {
-    /// Creates a new discovery service
-    pub fn new(config: DiscoveryConfig, local_address: SocketAddr) -> Self {
+    /// Creates a new discovery service.
+    ///
+    /// Pass `instance_manager` when the runtime instance manager is already initialized
+    /// (typically `app_state.instance_manager.get().cloned()` after `attach_core_http_singletons`).
+    pub fn new(
+        config: DiscoveryConfig,
+        local_address: SocketAddr,
+        instance_manager: Option<Arc<RwLock<InstanceManager>>>,
+    ) -> Self {
         let local_peer_id = format!("poolai-{}", &Uuid::new_v4().to_string()[..8]);
 
         Self {
@@ -292,6 +302,7 @@ impl DiscoveryService {
             local_address,
             peers: Arc::new(RwLock::new(HashMap::new())),
             running: Arc::new(RwLock::new(false)),
+            instance_manager,
         }
     }
 
@@ -372,8 +383,8 @@ impl DiscoveryService {
         // Detect local system capabilities
         let mut capabilities = detect_local_capabilities();
 
-        // Update load metrics if instance manager is available
-        if let Some(instance_manager) = crate::runtime::instance::get_global_instance_manager() {
+        // Update load metrics if instance manager is available (injected from AppState)
+        if let Some(instance_manager) = self.instance_manager.as_ref() {
             let manager = instance_manager.read().await;
             let instances = manager.list_instances().await;
 
@@ -743,7 +754,7 @@ mod tests {
     async fn test_discovery_service_creation() {
         let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
         let config = DiscoveryConfig::default();
-        let service = DiscoveryService::new(config, addr);
+        let service = DiscoveryService::new(config, addr, None);
 
         assert!(!service.local_peer_id().is_empty());
         assert!(service.local_peer_id().starts_with("poolai-"));

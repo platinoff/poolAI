@@ -442,7 +442,6 @@
 ./src/network/api/users.rs
 ./src/network/api/vm.rs
 ./src/network/api/workers.rs
-./src/network/api_legacy.rs
 ./src/network/auth.rs
 ./src/network/discovery.rs
 ./src/network/enterprise_api.rs

@@ -7,7 +7,6 @@
 //! - HTTPS/TLS support with certificate management
 
 pub mod api;
-pub mod api_legacy;
 pub mod auth;
 pub mod discovery;
 pub mod raid_distributed_handlers;
@@ -48,7 +47,12 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
 
     let discovery_config = DiscoveryConfig::default();
     if discovery_config.enabled {
-        let service = Arc::new(DiscoveryService::new(discovery_config, addr));
+        let instance_manager = app_state.instance_manager.get().cloned();
+        let service = Arc::new(DiscoveryService::new(
+            discovery_config,
+            addr,
+            instance_manager,
+        ));
         {
             let mut slot = app_state.discovery.write().await;
             *slot =

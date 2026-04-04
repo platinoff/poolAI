@@ -30,11 +30,7 @@ pub mod users;
 pub mod vm;
 pub mod workers;
 
-// Re-export check_permission for backward compatibility with api_legacy.rs
 pub use common::check_permission;
-
-// All API modules have been migrated to modular structure ✅
-// api_legacy.rs is kept for backward compatibility and distributed RAID handlers
 
 use crate::core::state::ApiContext;
 use axum::Router;
@@ -43,7 +39,7 @@ use axum::Router;
 ///
 /// Composes all API endpoint modules into a single router.
 ///
-/// Composes modular `api/*` routers; `api_legacy.rs` remains for a few unmigrated paths.
+/// Composes modular `api/*` routers (canonical REST surface under `/api/v1`).
 pub fn create_api_routes() -> Router<ApiContext> {
     Router::new()
         .merge(system::create_system_routes())

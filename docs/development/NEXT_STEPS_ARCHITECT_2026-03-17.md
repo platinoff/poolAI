@@ -22,7 +22,7 @@
 
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
-| **1** | **Priority 1** | **Майже зроблено** для модульного API: `State<ApiContext>` + `AppState`. **Залишилось**: `api_legacy.rs`, у `discovery` — прямий `get_global_instance_manager`; далі — розширений тестовий `AppState`, docs (`ARCHITECTURE_REVIEW`). |
+| **1** | **Priority 1** | **Майже закрито**: модульний REST + `AppState`; **`api_legacy.rs` видалено** (дублікат, не підключався до router); **`DiscoveryService`** отримує `instance_manager` з `AppState` (без `get_global_instance_manager` у announce). **Залишилось**: розширений тестовий `AppState`, коментарі/код **distributed RAID** ще згадують глобальний Raft — за потреби вирівняти; **`docs/ARCHITECTURE_REVIEW.md`**. |
 | **2** | **Priority 2** | Ввести **`src/services/`**, thin handlers; паралельно **Stage 4.4** — **реальні Rust-бекенди кроків ML pipeline** (не заглушки), узгоджені з enterprise AI/ML API. |
 | **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
 | **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API. |
@@ -44,7 +44,7 @@
   - [x] Ввести alias `ApiContext = Arc<AppState>` для HTTP та сервісного шару.
 - [ ] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст:
   - [x] Протягнути `ApiContext` у `network::start_server` і підʼєднати до `Router` як state.
-  - [ ] В HTTP‑шарі приймати `ApiContext` замість глобалів — **зроблено для основного REST** (`src/network/api/*` модульні файли + enterprise + WS), **не зроблено** для **`src/network/api_legacy.rs`** (VM/RAID/pool/libs досі через `get_global_*`) та фрагменту **`src/network/discovery.rs`** (`get_global_instance_manager`). Деталі вже реалізованого:
+  - [x] В HTTP‑шарі приймати `ApiContext` замість глобалів — **зроблено** для основного REST (`src/network/api/*` + enterprise + WS). **`api_legacy.rs` прибрано** (не використовувався). **`discovery.rs`**: метрики на announce через **`Option<Arc<RwLock<InstanceManager>>>`**, передається з `AppState::instance_manager` у `start_server` (після `attach_core_http_singletons` у `main`). Деталі вже реалізованого:
     - `UserManager`, `oauth2_pending_states`, `discovery` slot, `ws_manager`.
     - Enterprise: `tenant_manager`, `audit_logger`, `enterprise_monitoring_manager`, `security_manager` + `sync_enterprise_globals()` у `main`.
     - Core: `pool`, `raid_manager`, `vm_manager`, `library_manager`, `instance_manager`, `topology_manager` — `OnceLock` у `AppState`, **`attach_core_http_singletons()`** після ініціалізації модулів у `main`.
@@ -223,7 +223,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ## Верифікація 2026-04-04 (Cursor, toolchain, Git, тести)
 
-**Останні коміти на `main` (орієнтир, `git log`)**: після ML pipeline / federated / AutoML — серія **Priority 1**: інʼєкція менеджерів через `AppState` (`UserManager`, discovery slot, OAuth2 pending, `WebSocketManager`, enterprise managers), далі **HTTP**: маршрути pool / RAID / VM / libraries / instances / topology через `State<ApiContext>` (`refactor(state|core|enterprise|http)`). **Залишилось для P1**: `network/api_legacy.rs` (глобалі `get_global_*`) та `network/discovery.rs` (`get_global_instance_manager`).
+**Останні коміти на `main` (орієнтир, `git log`)**: серія **Priority 1** — `AppState` + модульний HTTP; **2026-04-04+**: видалено мертвий `api_legacy.rs`; `DiscoveryService::new(..., instance_manager)` з `app_state.instance_manager.get().cloned()` замість `get_global_instance_manager` у `send_announcement`.
 
 **2026-04-03**: `UserManager` у `AppState`, без HTTP‑синглтона `get_global_user_manager`. **2026-04-04**: discovery + OAuth2 pending у `AppState`; інтеграційні тести `tests/network_api_integration.rs` для VM/RAID list очікують **не 404** (типово **503**, якщо менеджери не прикріплені до тестового `ApiContext::default()` — узгоджено з поведінкою після DI).
 
@@ -239,9 +239,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **Наступні кроки розробки (коротко)**:
 1. Таблиця **«Наступні кроки за пріоритетом»** на початку цього файлу — головний порядок робіт.  
-2. **Priority 1 (догортання)**: `api_legacy` → `State<ApiContext>`; `discovery` → `ctx.instance_manager` (або єдиний шлях через `AppState`).  
-3. **TurboQuant** — лише **Rust** (`docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b).  
-4. За потреби — повний `cargo test --all-features` на Windows (GNU / розбиття тестів).
+2. **Priority 1 (фінал)**: легкий **`ApiContext` для тестів**; **`ARCHITECTURE_REVIEW.md`**; за бажанням — прибрати згадки глобального Raft у `raid_distributed_handlers` (коли буде дизайн).  
+3. **Priority 2**: `src/services/` + реальні ML pipeline step backends.  
+4. **TurboQuant** — Priority 2b (`docs/ml/TURBOQUANT_INTEGRATION.md`).
 
 ---
 
@@ -254,11 +254,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Enterprise HTTP: менеджери в `AppState`, `enterprise_api` + UI dashboards через `ctx`, `sync_enterprise_globals()`.
 - Core HTTP: `attach_core_http_singletons()`; модульні маршрути `api/` (workers, raid, vm, libraries, instances, completions, topology) + distributed RAID — через `ctx`.
 
-**Наступній сесії (перший пріоритет з Priority 1)**:
-1. Мігрувати **`network/api_legacy.rs`** на `State<ApiContext>` (або винести виклики в thin-шар і поступово вимкнути legacy-маршрути, якщо так задумано).
-2. Прибрати **`get_global_instance_manager`** з **`network/discovery.rs`** на користь `ctx`.
-3. Опційно: оновити **`docs/ARCHITECTURE_REVIEW.md`** / **`DEVELOPMENT_PLAN_UPDATED.md`** під поточну модель `AppState`.
-4. Далі за таблицею — **Priority 2** (`src/services/`, thin handlers, ML pipeline backends).
+**Наступній сесії**:
+1. **Priority 1 — документація та тестовий harness**: `ARCHITECTURE_REVIEW.md`, опційно `DEVELOPMENT_PLAN_UPDATED.md`; розширений `ApiContext`/фабрика для інтеграційних тестів без globals.
+2. **Priority 2** — `src/services/` і винесення логіки з `network/api/*`; ML pipeline steps з реальними бекендами.
 
 **Перевірка збірки (як у недавніх CI-прогонах)**:
 `K8S_OPENAPI_ENABLED_VERSION=1.28`  
