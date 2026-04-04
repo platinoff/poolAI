@@ -6,8 +6,10 @@
 //! - Authentication flow
 //! - Fallback mode when JWT feature disabled
 
+use std::sync::Arc;
+
 use poolai::network::auth::{
-    authenticate_user, generate_token, validate_token, AuthRequest, UserRole,
+    authenticate_user, generate_token, validate_token, AuthRequest, UserManager, UserRole,
 };
 
 #[tokio::test]
@@ -69,7 +71,7 @@ async fn test_authentication_flow() {
         password: "admin123".to_string(),
     };
 
-    let response = authenticate_user(auth_req).await;
+    let response = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(
         response.is_ok(),
         "Authentication should succeed for valid credentials"
@@ -89,7 +91,7 @@ async fn test_authentication_invalid_credentials() {
         password: "invalid".to_string(),
     };
 
-    let response = authenticate_user(auth_req).await;
+    let response = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(
         response.is_err(),
         "Authentication should fail for invalid credentials"

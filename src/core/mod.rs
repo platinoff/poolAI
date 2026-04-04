@@ -5,6 +5,7 @@ pub mod config;
 pub mod error;
 pub mod model_interface;
 pub mod state;
+pub mod user_manager;
 
 use self::config::{get_config, initialize_config, PoolAIConfig};
 use self::error::AppError;

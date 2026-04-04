@@ -14,7 +14,7 @@
 //! # Example
 //!
 //! ```no_run
-//! use poolai::network::auth::{authenticate_user, AuthRequest, UserRole};
+//! use poolai::network::auth::{authenticate_user, AuthRequest, UserManager, UserRole};
 //!
 //! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 //! // Authenticate user
@@ -23,7 +23,8 @@
 //!     password: "admin123".to_string(),
 //! };
 //!
-//! let response = authenticate_user(auth_req).await.map_err(|(code, json)| {
+//! let manager = std::sync::Arc::new(UserManager::new());
+//! let response = authenticate_user(auth_req, manager).await.map_err(|(code, json)| {
 //!     format!("Authentication failed: {} - {:?}", code, json)
 //! })?;
 //! println!("Token: {}", response.token);
@@ -43,12 +44,10 @@ use base64::Engine;
 #[cfg(feature = "jwt")]
 use jsonwebtoken::{decode, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::sync::RwLock;
-use tracing::info;
-use uuid::Uuid;
+
+pub use crate::core::user_manager::{User, UserInfo, UserManager, UserRole};
 
 /// JWT Claims structure
 ///
@@ -81,53 +80,6 @@ pub struct Claims {
     pub iat: usize,               // Issued at
     pub role: UserRole,           // User role
     pub permissions: Vec<String>, // User permissions
-}
-
-/// User roles for role-based access control
-///
-/// Defines three roles with different permission levels:
-/// - **Admin**: Full access to all resources
-/// - **Operator**: Read access and write access to workers/models
-/// - **Viewer**: Read-only access to status, metrics, and models
-///
-/// # Example
-///
-/// ```rust
-/// use poolai::network::auth::UserRole;
-///
-/// let role = UserRole::Admin;
-/// let permissions = role.get_permissions();
-/// println!("Admin permissions: {:?}", permissions);
-/// ```
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
-pub enum UserRole {
-    Admin,
-    Operator,
-    Viewer,
-}
-
-impl UserRole {
-    pub fn get_permissions(&self) -> Vec<String> {
-        match self {
-            UserRole::Admin => vec![
-                "read:all".to_string(),
-                "write:all".to_string(),
-                "delete:all".to_string(),
-                "admin:all".to_string(),
-            ],
-            UserRole::Operator => vec![
-                "read:all".to_string(),
-                "write:workers".to_string(),
-                "write:models".to_string(),
-                "read:metrics".to_string(),
-            ],
-            UserRole::Viewer => vec![
-                "read:status".to_string(),
-                "read:metrics".to_string(),
-                "read:models".to_string(),
-            ],
-        }
-    }
 }
 
 /// Authentication request structure
@@ -447,7 +399,8 @@ pub async fn permission_middleware(
 ///     password: "admin123".to_string(),
 /// };
 ///
-/// let response = authenticate_user(auth_req).await.map_err(|(code, json)| {
+/// let manager = std::sync::Arc::new(UserManager::new());
+/// let response = authenticate_user(auth_req, manager).await.map_err(|(code, json)| {
 ///     format!("Authentication failed: {} - {:?}", code, json)
 /// })?;
 /// println!("Token: {}", response.token);
@@ -456,6 +409,7 @@ pub async fn permission_middleware(
 /// ```
 pub async fn authenticate_user(
     auth_req: AuthRequest,
+    user_manager: Arc<UserManager>,
 ) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
     // Future improvement: Реальна перевірка користувача з бази даних
     // 1. Підключення до бази даних (SQLite, PostgreSQL, MySQL, тощо)
@@ -482,8 +436,7 @@ pub async fn authenticate_user(
     //        return Err((StatusCode::UNAUTHORIZED, Json(json!({"error": "Invalid credentials"}))));
     //    }
     //    let role = UserRole::from_str(&user.role)?;
-    // Use UserManager for authentication
-    let manager = get_global_user_manager();
+    let manager = user_manager;
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -655,280 +608,4 @@ pub fn has_permission(req: &Request, required_permission: &str) -> bool {
                 .contains(&required_permission.to_string())
         })
         .unwrap_or(false)
-}
-
-/// User information structure
-///
-/// Represents a user account with username, password hash, role, and metadata.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct User {
-    /// Unique user identifier
-    pub id: Uuid,
-    /// Username
-    pub username: String,
-    /// Password hash (for security, never return in API responses)
-    #[serde(skip_serializing)]
-    pub password_hash: String,
-    /// User role
-    pub role: UserRole,
-    /// Whether user is active
-    pub active: bool,
-    /// Creation timestamp
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Last updated timestamp
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-/// User information for API responses (without password hash)
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UserInfo {
-    /// Unique user identifier
-    pub id: Uuid,
-    /// Username
-    pub username: String,
-    /// User role
-    pub role: UserRole,
-    /// Whether user is active
-    pub active: bool,
-    /// Creation timestamp
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    /// Last updated timestamp
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl From<User> for UserInfo {
-    fn from(user: User) -> Self {
-        Self {
-            id: user.id,
-            username: user.username,
-            role: user.role,
-            active: user.active,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
-        }
-    }
-}
-
-/// User manager for user account management
-///
-/// Manages user accounts in memory with CRUD operations.
-/// For production, this should be replaced with a database-backed implementation.
-pub struct UserManager {
-    users: Arc<RwLock<HashMap<Uuid, User>>>,
-    username_index: Arc<RwLock<HashMap<String, Uuid>>>,
-    initialized: Arc<RwLock<bool>>,
-}
-
-impl UserManager {
-    /// Creates a new user manager
-    pub fn new() -> Self {
-        Self {
-            users: Arc::new(RwLock::new(HashMap::new())),
-            username_index: Arc::new(RwLock::new(HashMap::new())),
-            initialized: Arc::new(RwLock::new(false)),
-        }
-    }
-
-    /// Initializes the user manager with default users
-    pub async fn initialize(&self) -> Result<(), String> {
-        let mut initialized = self.initialized.write().await;
-        if *initialized {
-            return Ok(());
-        }
-
-        // Create default users
-        let default_users = vec![
-            ("admin", "admin123", UserRole::Admin),
-            ("operator", "op123", UserRole::Operator),
-            ("viewer", "view123", UserRole::Viewer),
-        ];
-
-        let mut users = self.users.write().await;
-        let mut username_index = self.username_index.write().await;
-        let now = chrono::Utc::now();
-
-        for (username, password, role) in default_users {
-            let id = Uuid::new_v4();
-            let user = User {
-                id,
-                username: username.to_string(),
-                password_hash: password.to_string(), // In production, use proper password hashing
-                role,
-                active: true,
-                created_at: now,
-                updated_at: now,
-            };
-            users.insert(id, user.clone());
-            username_index.insert(username.to_string(), id);
-        }
-
-        *initialized = true;
-        info!(
-            "User manager initialized with {} default users",
-            users.len()
-        );
-        Ok(())
-    }
-
-    /// Creates a new user
-    pub async fn create_user(
-        &self,
-        username: String,
-        password: String,
-        role: UserRole,
-    ) -> Result<UserInfo, String> {
-        if username.is_empty() {
-            return Err("Username cannot be empty".to_string());
-        }
-
-        let mut users = self.users.write().await;
-        let mut username_index = self.username_index.write().await;
-
-        // Check if username already exists
-        if username_index.contains_key(&username) {
-            return Err(format!("Username '{}' already exists", username));
-        }
-
-        let now = chrono::Utc::now();
-        let id = Uuid::new_v4();
-        let user = User {
-            id,
-            username: username.clone(),
-            password_hash: password, // In production, use proper password hashing
-            role,
-            active: true,
-            created_at: now,
-            updated_at: now,
-        };
-
-        users.insert(id, user.clone());
-        username_index.insert(username, id);
-
-        info!("Created user: {} ({})", user.username, id);
-        Ok(user.into())
-    }
-
-    /// Gets a user by ID
-    pub async fn get_user(&self, id: Uuid) -> Result<Option<UserInfo>, String> {
-        let users = self.users.read().await;
-        Ok(users.get(&id).map(|u| u.clone().into()))
-    }
-
-    /// Gets a user by username
-    pub async fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String> {
-        let username_index = self.username_index.read().await;
-        if let Some(&id) = username_index.get(username) {
-            let users = self.users.read().await;
-            Ok(users.get(&id).cloned())
-        } else {
-            Ok(None)
-        }
-    }
-
-    /// Lists all users
-    pub async fn list_users(&self) -> Result<Vec<UserInfo>, String> {
-        let users = self.users.read().await;
-        Ok(users.values().map(|u| u.clone().into()).collect())
-    }
-
-    /// Updates a user
-    pub async fn update_user(
-        &self,
-        id: Uuid,
-        username: Option<String>,
-        password: Option<String>,
-        role: Option<UserRole>,
-        active: Option<bool>,
-    ) -> Result<UserInfo, String> {
-        let mut users = self.users.write().await;
-        let mut username_index = self.username_index.write().await;
-
-        let user = users.get_mut(&id).ok_or_else(|| {
-            format!("User not found: {}. Context: Cannot update non-existent user. Suggestion: Check user ID and ensure user exists.", id)
-        })?;
-
-        if let Some(new_username) = username {
-            if new_username != user.username {
-                // Check if new username already exists
-                if username_index.contains_key(&new_username) {
-                    return Err(format!("Username '{}' already exists", new_username));
-                }
-                // Update username index
-                username_index.remove(&user.username);
-                username_index.insert(new_username.clone(), id);
-                user.username = new_username;
-            }
-        }
-
-        if let Some(new_password) = password {
-            user.password_hash = new_password; // In production, use proper password hashing
-        }
-
-        if let Some(new_role) = role {
-            user.role = new_role;
-        }
-
-        if let Some(new_active) = active {
-            user.active = new_active;
-        }
-
-        user.updated_at = chrono::Utc::now();
-        let updated_user = user.clone();
-
-        info!("Updated user: {} ({})", updated_user.username, id);
-        Ok(updated_user.into())
-    }
-
-    /// Deletes a user
-    pub async fn delete_user(&self, id: Uuid) -> Result<(), String> {
-        let username = {
-            let users = self.users.read().await;
-            let user = users.get(&id).ok_or_else(|| {
-                format!("User not found: {}. Context: Cannot delete non-existent user. Suggestion: Check user ID.", id)
-            })?;
-            user.username.clone()
-        };
-
-        let mut users = self.users.write().await;
-        let mut username_index = self.username_index.write().await;
-
-        username_index.remove(&username);
-        users.remove(&id);
-
-        info!("Deleted user: {} ({})", username, id);
-        Ok(())
-    }
-
-    /// Verifies user password
-    pub async fn verify_password(&self, username: &str, password: &str) -> Result<bool, String> {
-        if let Some(user) = self.get_user_by_username(username).await? {
-            if !user.active {
-                return Ok(false);
-            }
-            // In production, use proper password verification (bcrypt, argon2, etc.)
-            Ok(user.password_hash == password)
-        } else {
-            Ok(false)
-        }
-    }
-}
-
-impl Default for UserManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Global user manager instance
-static USER_MANAGER: OnceLock<Arc<UserManager>> = OnceLock::new();
-
-/// Get global user manager instance.
-///
-/// This function returns a singleton instance of `UserManager` that can be used
-/// throughout the application. The instance is created on first access and
-/// reused for subsequent calls.
-pub fn get_global_user_manager() -> Arc<UserManager> {
-    USER_MANAGER
-        .get_or_init(|| Arc::new(UserManager::new()))
-        .clone()
 }

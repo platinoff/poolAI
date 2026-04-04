@@ -1,10 +1,10 @@
 //! Integration tests for Network Auth Module
 
-use axum::extract::Request;
 use axum::http::StatusCode;
+use std::sync::Arc;
+
 use poolai::network::auth::{
-    authenticate_user, generate_token, get_current_user, has_permission, has_role, validate_token,
-    AuthRequest, UserRole,
+    authenticate_user, generate_token, validate_token, AuthRequest, UserManager, UserRole,
 };
 
 #[tokio::test]
@@ -39,7 +39,7 @@ async fn test_authenticate_user_admin() {
         password: "admin123".to_string(),
     };
 
-    let result = authenticate_user(auth_req).await;
+    let result = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(result.is_ok());
 
     let response = result.unwrap();
@@ -55,7 +55,7 @@ async fn test_authenticate_user_operator() {
         password: "op123".to_string(),
     };
 
-    let result = authenticate_user(auth_req).await;
+    let result = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(result.is_ok());
 
     let response = result.unwrap();
@@ -69,7 +69,7 @@ async fn test_authenticate_user_viewer() {
         password: "view123".to_string(),
     };
 
-    let result = authenticate_user(auth_req).await;
+    let result = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(result.is_ok());
 
     let response = result.unwrap();
@@ -83,7 +83,7 @@ async fn test_authenticate_user_invalid() {
         password: "invalid".to_string(),
     };
 
-    let result = authenticate_user(auth_req).await;
+    let result = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(result.is_err());
 
     if let Err((status, _)) = result {

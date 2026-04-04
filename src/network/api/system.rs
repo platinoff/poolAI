@@ -611,8 +611,11 @@ async fn health_handler() -> impl IntoResponse {
     Json(health_response)
 }
 
-async fn login_handler(Json(auth_req): Json<AuthRequest>) -> impl IntoResponse {
-    match authenticate_user(auth_req).await {
+async fn login_handler(
+    State(ctx): State<ApiContext>,
+    Json(auth_req): Json<AuthRequest>,
+) -> impl IntoResponse {
+    match authenticate_user(auth_req, ctx.user_manager.clone()).await {
         Ok(auth_response) => Json(auth_response).into_response(),
         Err((status, error)) => (status, error).into_response(),
     }

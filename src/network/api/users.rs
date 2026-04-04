@@ -5,7 +5,7 @@
 //! - Create, get, update, delete users
 
 use axum::{
-    extract::{Extension, Json, Path},
+    extract::{Extension, Json, Path, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -17,7 +17,7 @@ use uuid::Uuid;
 
 use crate::core::state::ApiContext;
 use crate::network::api::common::check_permission;
-use crate::network::auth::{auth_middleware, get_global_user_manager, Claims, UserRole};
+use crate::network::auth::{auth_middleware, Claims, UserRole};
 
 #[derive(Deserialize)]
 struct UserCreateRequest {
@@ -53,8 +53,8 @@ pub fn create_users_routes() -> Router<ApiContext> {
         )
 }
 
-async fn users_list_handler() -> impl IntoResponse {
-    let manager = get_global_user_manager();
+async fn users_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.user_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -80,6 +80,7 @@ async fn users_list_handler() -> impl IntoResponse {
 }
 
 async fn user_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(req): Json<UserCreateRequest>,
 ) -> impl IntoResponse {
@@ -88,7 +89,7 @@ async fn user_create_handler(
         return err.into_response();
     }
 
-    let manager = get_global_user_manager();
+    let manager = ctx.user_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -113,8 +114,11 @@ async fn user_create_handler(
     }
 }
 
-async fn user_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = get_global_user_manager();
+async fn user_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.user_manager.clone();
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -148,6 +152,7 @@ async fn user_get_handler(Path(id): Path<String>) -> impl IntoResponse {
 }
 
 async fn user_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(req): Json<UserUpdateRequest>,
@@ -157,7 +162,7 @@ async fn user_update_handler(
         return err.into_response();
     }
 
-    let manager = get_global_user_manager();
+    let manager = ctx.user_manager.clone();
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -187,6 +192,7 @@ async fn user_update_handler(
 }
 
 async fn user_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -195,7 +201,7 @@ async fn user_delete_handler(
         return err.into_response();
     }
 
-    let manager = get_global_user_manager();
+    let manager = ctx.user_manager.clone();
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {

@@ -16,7 +16,7 @@ use crate::network::api::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
 use axum::{
-    extract::{Extension, Form, Path, Query},
+    extract::{Extension, Form, Path, Query, State},
     http::StatusCode,
     middleware,
     response::{IntoResponse, Redirect},
@@ -1625,6 +1625,7 @@ async fn oauth2_github_auth_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_github_callback_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<std::collections::HashMap<String, String>>,
 ) -> impl IntoResponse {
     // GitHub OAuth2 callback flow implementation:
@@ -1704,7 +1705,7 @@ async fn oauth2_github_callback_handler(
     };
 
     // Get or create user in PoolAI
-    let user_manager = crate::network::auth::get_global_user_manager();
+    let user_manager = ctx.user_manager.clone();
     if let Err(e) = user_manager.initialize().await {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -1821,6 +1822,7 @@ async fn oauth2_google_auth_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_google_callback_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<std::collections::HashMap<String, String>>,
 ) -> impl IntoResponse {
     let code = params.get("code").cloned().unwrap_or_default();
@@ -1881,7 +1883,7 @@ async fn oauth2_google_callback_handler(
     };
 
     // Get or create user in PoolAI
-    let user_manager = crate::network::auth::get_global_user_manager();
+    let user_manager = ctx.user_manager.clone();
     if let Err(e) = user_manager.initialize().await {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -1993,6 +1995,7 @@ async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_telegram_callback_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<std::collections::HashMap<String, String>>,
 ) -> impl IntoResponse {
     // Telegram Login Widget sends auth data via hash in URL
@@ -2062,7 +2065,7 @@ async fn oauth2_telegram_callback_handler(
     }
 
     // Get or create user in PoolAI
-    let user_manager = crate::network::auth::get_global_user_manager();
+    let user_manager = ctx.user_manager.clone();
     if let Err(e) = user_manager.initialize().await {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -2174,6 +2177,7 @@ struct SamlCallbackForm {
 
 #[cfg(feature = "enterprise")]
 async fn saml_callback_handler(
+    State(ctx): State<ApiContext>,
     Path(provider): Path<String>,
     Form(form): Form<SamlCallbackForm>,
 ) -> impl IntoResponse {
@@ -2227,7 +2231,7 @@ async fn saml_callback_handler(
         .unwrap_or_else(|| nameid.clone());
 
     // Get or create user in PoolAI
-    let user_manager = crate::network::auth::get_global_user_manager();
+    let user_manager = ctx.user_manager.clone();
     if let Err(e) = user_manager.initialize().await {
         return (
             StatusCode::INTERNAL_SERVER_ERROR,
