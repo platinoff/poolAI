@@ -39,7 +39,7 @@
 <a href=#39 id=39 data-nosnippet>39</a>//! let raid_config = RaidConfig::default_for_platform();
 <a href=#40 id=40 data-nosnippet>40</a>//! let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
 <a href=#41 id=41 data-nosnippet>41</a>//! let replication_engine = Arc::new(ReplicationEngine::with_defaults(raid_manager, None));
-<a href=#42 id=42 data-nosnippet>42</a>//! let topology_manager = Arc::new(RwLock::new(TopologyManager::new()));
+<a href=#42 id=42 data-nosnippet>42</a>//! let topology_manager = Arc::new(RwLock::new(TopologyManager::new(None)));
 <a href=#43 id=43 data-nosnippet>43</a>//! let strategy = SmallWorldStrategy::new(config, replication_engine, topology_manager, None);
 <a href=#44 id=44 data-nosnippet>44</a>//! strategy.initialize().await?;
 <a href=#45 id=45 data-nosnippet>45</a>//! # Ok(())
