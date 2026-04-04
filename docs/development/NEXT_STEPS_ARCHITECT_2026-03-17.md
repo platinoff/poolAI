@@ -66,6 +66,26 @@
 
 ---
 
+## ⭐ Priority 2b — Welcome TurboQuant (ML data-plane, після бекендів pipeline)
+
+**Мета**: зменшити **обсяг і вартість передачі ML-даних** (KV cache, ваги, векторні індекси) узгоджено з **Google Research TurboQuant** (PolarQuant + QJL), не підміняючи загальну мережеву оптимізацію RAID/API.
+
+**Чому поруч із Priority 2**: реальні **бекенди кроків ML pipeline** задають формат артефактів і точки виклику; TurboQuant — **окремий шар стиснення/квантизації** на цих артефактах або в sidecar inference. Детальний ресерч: `docs/ml/TURBOQUANT_INTEGRATION.md`.
+
+**Кроки**:
+- [ ] Зафіксувати контракт кроку pipeline (розширення `Quantization` або новий підтип `TurboQuant` / конфіг у `StepType::Quantization`) та метрики `bytes_in` / `bytes_out`, `bitrate_target`.
+- [ ] Реалізувати **опційний outbound виклик** до Python worker (PyPI `turboquant` / `turboquant-torch` / `turboquant-hf` за сценарієм) через VM/runtime; версії та GPU — у `config`/Helm.
+- [ ] Додати інтеграційний тест «dry-run» або mock worker (без обов’язкового GPU в CI), розширити документацію `docs/ml/PIPELINE_MANAGEMENT.md`.
+- [ ] Заміряти реплікацію артефактів RAID до/після (див. Priority 4 / `docs/performance/BENCHMARKS.md`).
+- [ ] Переглянути ліцензії та політику залежностей перед production.
+
+**Критерії готовності**:
+- [ ] З документації та коду зрозуміло, **коли** увімкнено TurboQuant і **який** worker відповідає.
+- [ ] Є мінімум один **автоматизований** тест шляху pipeline (реальний або з mock).
+- [ ] Метрики стиснення експортуються або логуються для спостережуваності.
+
+---
+
 ## ⭐ Priority 3 — Структурований контекст помилок (`ErrorContext` + `AppError`)
 
 **Мета**: єдина “мова помилок” для всього бекенда, сумісна з HTTP‑шаром і логуванням, у стилі продакшн Axum‑сервісів.
@@ -162,6 +182,8 @@ AppState / ApiContext (Priority 1)
     ↓
 Service Layer (Priority 2)
     ↓
+TurboQuant / ML data-plane (Priority 2b) — після контракту бекендів pipeline
+    ↓
 Error Context (Priority 3)
     ↓
 Performance Profiling (Priority 4)
@@ -171,7 +193,7 @@ Docs & Cleanup (Priority 5)
 Grid / Job / Memory / Tokenization (Priority 6)
 ```
 
-**Примітка**: Кроки 3–4 можуть виконуватись частково паралельно для різних модулів, але **AppState і Service Layer бажано стабілізувати першими**, щоб не плодити дублікати патернів.
+**Примітка**: Кроки 3–4 можуть виконуватись частково паралельно для різних модулів, але **AppState і Service Layer бажано стабілізувати першими**, щоб не плодити дублікати патернів. **Priority 2b** (TurboQuant) ортогональний сервісному шару, але **практично** стартує після того, як кроки pipeline мають стабільні артефакти та виклики worker.
 
 ---
 
@@ -192,5 +214,6 @@ Grid / Job / Memory / Tokenization (Priority 6)
 **Наступні кроки розробки (коротко)**:
 1. Пріоритети 1–2 з цього документа (`ApiContext` у всіх handlers, service layer).  
 2. Stage 4.4 — бекенди кроків ML pipeline + тести навколо enterprise AI/ML HTTP API.  
-3. За потреби — відновити/спростити повний `cargo test --all-features` на Windows (окремі крейти або GNU-only).
+3. **Welcome TurboQuant** — Priority 2b: контракт pipeline + опційний Python worker + метрики стиснення (`docs/ml/TURBOQUANT_INTEGRATION.md`).  
+4. За потреби — відновити/спростити повний `cargo test --all-features` на Windows (окремі крейти або GNU-only).
 

@@ -152,3 +152,11 @@
 **Підготовлено**: Rust Architect  
 **Дата**: 2026-01-19  
 **Версія концепції**: v7
+
+---
+
+## Доповнення 2026-04-04 — Welcome TurboQuant
+
+- У **Stage 4.4** додано плановий трек **TurboQuant** (Google Research: стиснення KV cache / ваг / векторів) для зменшення обсягу ML-артефактів і навантаження на мережу при реплікації.
+- Документація: `docs/ml/TURBOQUANT_INTEGRATION.md`; план архітектора: **Priority 2b** у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
+- Первинна інтеграція: конфіг **ML pipeline** + опційний **зовнішній worker** (Python ecosystem); ядро залишається Rust.

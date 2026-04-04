@@ -28,7 +28,8 @@
 - `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` - Cursor settings verification + next actions
 - `docs/concept/CONCEPT_UPDATE_2026-01-19.md` - Concept update (v7)
 - `docs/development/NEXT_STEPS_2026-01-19.md` - Latest next steps (v0.2.2 → v0.3.0+)
-- `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` - Architect stabilization plan (best practices)
+- `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` - Architect stabilization plan (best practices; includes **Priority 2b TurboQuant**)
+- `docs/ml/TURBOQUANT_INTEGRATION.md` - TurboQuant research + integration phases (ML data-plane)
 
 **Helper Files**:
 - `file_list.csv` — інвентар шляхів репозиторію (репо-відносні рядки, не класичний CSV)

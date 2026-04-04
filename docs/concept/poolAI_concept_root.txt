@@ -206,6 +206,7 @@
 - ✅ **Experiment Tracking** - ML experiment management (ML.5: Registration ✅, Metrics ✅, Comparison ✅, Best selection ✅)
 - ✅ **Pipeline Management (ML.6)** - Orchestration: steps include Profiling, HyperparameterTuning, Quantization, Pruning, AutoML, **FederatedAggregation**, тощо; після AutoML за замовчуванням **реєстрація моделі та запис експерименту** (`ModelVersionManager` / `ExperimentTracker`; прапор **`automl_skip_registry`** вимикає цей крок для тестів/ізоляції)
 - ✅ **Enterprise HTTP API (`enterprise` + `ml`)** - `GET/POST /api/enterprise/ai-ml/pipeline`, `GET /pipeline/{id}`, `POST /pipeline/{id}/execute`, `GET /pipeline/demo`; спільний **`MLPipelineManager`** у **`ApiContext` / `AppState`**
+- 🔄 **Welcome TurboQuant (план 2026-04)** — екстремальне стиснення **KV cache / ваг / векторів** (Google Research: TurboQuant + PolarQuant + QJL; див. `docs/ml/TURBOQUANT_INTEGRATION.md`). Інтеграція в PoolAI: **після** стабілізації бекендів кроків pipeline — опційний **Python worker** (PyPI ecosystem) + метрики + менший обсяг артефактів для **RAID/мережі**; не замінює окрему оптимізацію транспорту.
 
 ## 🚀 Next Phase: Stage 4.3
 
@@ -987,10 +988,10 @@ curl http://localhost:8080/api/status
 **Status**: v0.2.2 PRODUCTION READY baseline ✅ **First Day of PRO Package: 2026-01-16** 🚀  
 **Tests**: Large integration suite; перевіряти актуальний лічильник командою `cargo test --all-features` на цій гілці  
 **Rust Version**: 1.92.x+ recommended (Edition 2021)  
-**Next Goal**: Stage 4.4 AI/ML hardening (реальні бекенди кроків пайплайну, спостережуваність); Stage 4.3 operator/SDK polish  
+**Next Goal**: Stage 4.4 AI/ML hardening (реальні бекенди кроків пайплайну, спостережуваність); **TurboQuant track** (Priority 2b — ML data-plane стиснення); Stage 4.3 operator/SDK polish  
 **Architecture**: All 15 modules baseline complete; ML/enterprise features за feature flags  
 **Version**: v6, 2026 (PRO Edition)  
 **Creator**: Madevinc (one developer with Cursor AI)  
 **Repository**: https://github.com/platinoff/poolAI  
 **Solana Donations**: GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8 (Madevinc welcomes donations to support this crypto project)  
-**Latest Update**: 2026-03-25 — docs cleanup (архів `PUSH_*` у `docs/archive/`), оновлення Stage 4.4 у концепті (ML pipeline, federated step, registry після AutoML, enterprise AI-ML REST + `ApiContext`), оновлені `README` та `file_list.csv`
+**Latest Update**: 2026-04-04 — додано план **Welcome TurboQuant** (дослідження `docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b у `NEXT_STEPS_ARCHITECT_2026-03-17.md`): стиснення KV/ваг для меншого трафіку артефактів; інтеграція через pipeline + опційний worker
