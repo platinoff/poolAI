@@ -6,7 +6,7 @@
 //! - Theme management (custom themes)
 
 use axum::{
-    extract::{Extension, Json, Path},
+    extract::{Extension, Json, Path, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -18,7 +18,7 @@ use uuid::Uuid;
 
 use crate::core::state::ApiContext;
 #[cfg(feature = "enterprise")]
-use crate::enterprise::monitoring::{get_global_monitoring_manager, Dashboard};
+use crate::enterprise::monitoring::Dashboard;
 #[cfg(feature = "enterprise")]
 use crate::network::api::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
@@ -70,8 +70,8 @@ struct CreateDashboardRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn ui_dashboards_handler() -> impl IntoResponse {
-    let manager = get_global_monitoring_manager();
+async fn ui_dashboards_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.enterprise_monitoring_manager.clone();
     match manager.list_dashboards(None).await {
         Ok(dashboards) => AxumJson(dashboards).into_response(),
         Err(e) => (
@@ -96,8 +96,11 @@ async fn ui_dashboards_handler() -> impl IntoResponse {
 }
 
 #[cfg(feature = "enterprise")]
-async fn ui_dashboard_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = get_global_monitoring_manager();
+async fn ui_dashboard_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.enterprise_monitoring_manager.clone();
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -143,6 +146,7 @@ async fn ui_dashboard_get_handler(Path(_id): Path<String>) -> impl IntoResponse 
 
 #[cfg(feature = "enterprise")]
 async fn ui_dashboard_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(payload): Json<CreateDashboardRequest>,
 ) -> impl IntoResponse {
@@ -162,7 +166,7 @@ async fn ui_dashboard_create_handler(
             .into_response();
     }
 
-    let manager = get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
     let dashboard = Dashboard {
         id: Uuid::new_v4(),
         name: payload.name.clone(),
@@ -202,6 +206,7 @@ async fn ui_dashboard_create_handler(
 
 #[cfg(feature = "enterprise")]
 async fn ui_dashboard_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(payload): Json<CreateDashboardRequest>,
@@ -212,7 +217,7 @@ async fn ui_dashboard_update_handler(
         return err.into_response();
     }
 
-    let manager = get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {

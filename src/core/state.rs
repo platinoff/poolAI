@@ -55,6 +55,14 @@ use crate::core::model_interface::{ModelState, ModelStatus};
 use crate::core::oauth2_pending::OAuth2PendingEntry;
 use crate::core::user_manager::UserManager;
 use crate::core::ws_manager::WebSocketManager;
+#[cfg(feature = "enterprise")]
+use crate::enterprise::audit::AuditLogger;
+#[cfg(feature = "enterprise")]
+use crate::enterprise::monitoring::MonitoringManager;
+#[cfg(feature = "enterprise")]
+use crate::enterprise::multi_tenancy::TenantManager;
+#[cfg(feature = "enterprise")]
+use crate::enterprise::security::SecurityManager;
 #[cfg(feature = "ml")]
 use crate::ml::pipeline::MLPipelineManager;
 use chrono::{DateTime, Utc};
@@ -253,6 +261,18 @@ pub struct AppState {
     /// OAuth2 CSRF state tokens (enterprise GitHub flow).
     #[cfg(feature = "enterprise")]
     pub oauth2_pending_states: Arc<tokio::sync::RwLock<HashMap<String, OAuth2PendingEntry>>>,
+    /// Enterprise multi-tenant manager (`/api/enterprise/tenants/*`).
+    #[cfg(feature = "enterprise")]
+    pub tenant_manager: Arc<TenantManager>,
+    /// Enterprise audit log query (`/api/enterprise/audit/*`).
+    #[cfg(feature = "enterprise")]
+    pub audit_logger: Arc<AuditLogger>,
+    /// Enterprise monitoring (alerts, dashboards, metrics).
+    #[cfg(feature = "enterprise")]
+    pub enterprise_monitoring_manager: Arc<MonitoringManager>,
+    /// Enterprise security (OAuth2/SAML providers, policies).
+    #[cfg(feature = "enterprise")]
+    pub security_manager: Arc<SecurityManager>,
     /// ML.6 orchestration (feature `ml`); shared across `/api/enterprise/ai-ml/pipeline/*`.
     #[cfg(feature = "ml")]
     pub ml_pipeline_manager: Arc<MLPipelineManager>,
@@ -303,6 +323,14 @@ impl AppState {
             discovery: Arc::new(tokio::sync::RwLock::new(None)),
             #[cfg(feature = "enterprise")]
             oauth2_pending_states: Arc::new(tokio::sync::RwLock::new(HashMap::new())),
+            #[cfg(feature = "enterprise")]
+            tenant_manager: Arc::new(TenantManager::new()),
+            #[cfg(feature = "enterprise")]
+            audit_logger: Arc::new(AuditLogger::new()),
+            #[cfg(feature = "enterprise")]
+            enterprise_monitoring_manager: Arc::new(MonitoringManager::new()),
+            #[cfg(feature = "enterprise")]
+            security_manager: Arc::new(SecurityManager::new()),
             #[cfg(feature = "ml")]
             ml_pipeline_manager: Arc::new(MLPipelineManager::new()),
         }
@@ -331,6 +359,21 @@ impl AppState {
         *initialized = true;
         info!("Application state initialized successfully");
         Ok(())
+    }
+
+    /// Align legacy `get_global_*` enterprise singletons with this `AppState` (no-op if already set).
+    #[cfg(feature = "enterprise")]
+    pub fn sync_enterprise_globals(&self) {
+        crate::enterprise::multi_tenancy::try_install_global_tenant_manager(
+            self.tenant_manager.clone(),
+        );
+        crate::enterprise::audit::try_install_global_audit_logger(self.audit_logger.clone());
+        crate::enterprise::monitoring::try_install_global_monitoring_manager(
+            self.enterprise_monitoring_manager.clone(),
+        );
+        crate::enterprise::security::try_install_global_security_manager(
+            self.security_manager.clone(),
+        );
     }
 
     /// Cleanup state

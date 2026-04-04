@@ -897,6 +897,11 @@ mod tests {
 /// Global monitoring manager instance
 static MONITORING_MANAGER: OnceLock<Arc<MonitoringManager>> = OnceLock::new();
 
+/// Align `get_global_monitoring_manager` with [`crate::core::state::AppState::enterprise_monitoring_manager`].
+pub fn try_install_global_monitoring_manager(mgr: Arc<MonitoringManager>) {
+    let _ = MONITORING_MANAGER.set(mgr);
+}
+
 /// Get global monitoring manager instance.
 ///
 /// This function returns a singleton instance of `MonitoringManager` that can be used

@@ -731,6 +731,12 @@ mod tests {
 /// Global tenant manager instance
 static TENANT_MANAGER: OnceLock<Arc<TenantManager>> = OnceLock::new();
 
+/// If the `OnceLock` is still empty, store `mgr` so `get_global_tenant_manager` returns the same
+/// instance as [`crate::core::state::AppState::tenant_manager`]. No-op if already initialized.
+pub fn try_install_global_tenant_manager(mgr: Arc<TenantManager>) {
+    let _ = TENANT_MANAGER.set(mgr);
+}
+
 /// Get global tenant manager instance.
 ///
 /// This function returns a singleton instance of `TenantManager` that can be used

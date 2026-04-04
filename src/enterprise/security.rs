@@ -978,6 +978,11 @@ impl Default for SecurityManager {
 /// Global security manager instance
 static SECURITY_MANAGER: OnceLock<Arc<SecurityManager>> = OnceLock::new();
 
+/// Align `get_global_security_manager` with [`crate::core::state::AppState::security_manager`].
+pub fn try_install_global_security_manager(mgr: Arc<SecurityManager>) {
+    let _ = SECURITY_MANAGER.set(mgr);
+}
+
 /// Get global security manager instance.
 ///
 /// This function returns a singleton instance of `SecurityManager` that can be used

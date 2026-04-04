@@ -107,6 +107,12 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     app_state.initialize().await?;
     info!("✅ Application state initialized");
 
+    #[cfg(feature = "enterprise")]
+    {
+        app_state.sync_enterprise_globals();
+        info!("✅ Enterprise managers aligned with AppState");
+    }
+
     // Initialize monitoring module
     info!("Initializing monitoring module...");
     monitoring::initialize().await?;

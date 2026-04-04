@@ -163,8 +163,8 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
 // ============================================================================
 
 #[cfg(feature = "enterprise")]
-async fn tenants_list_handler() -> impl IntoResponse {
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+async fn tenants_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.tenant_manager.clone();
     match manager.list_tenants().await {
         Ok(tenants) => Json(tenants).into_response(),
         Err(e) => (
@@ -185,8 +185,11 @@ struct TenantCreateRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_create_handler(Json(req): Json<TenantCreateRequest>) -> impl IntoResponse {
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+async fn tenant_create_handler(
+    State(ctx): State<ApiContext>,
+    Json(req): Json<TenantCreateRequest>,
+) -> impl IntoResponse {
+    let manager = ctx.tenant_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -212,8 +215,11 @@ async fn tenant_create_handler(Json(req): Json<TenantCreateRequest>) -> impl Int
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_get_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+async fn tenant_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.tenant_manager.clone();
 
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
@@ -256,6 +262,7 @@ struct TenantUpdateRequest {
 
 #[cfg(feature = "enterprise")]
 async fn tenant_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
     Json(req): Json<TenantUpdateRequest>,
@@ -265,7 +272,7 @@ async fn tenant_update_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    let manager = ctx.tenant_manager.clone();
 
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
@@ -296,8 +303,11 @@ async fn tenant_update_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_delete_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+async fn tenant_delete_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.tenant_manager.clone();
 
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
@@ -331,8 +341,11 @@ async fn tenant_delete_handler(Path(id): Path<String>) -> impl IntoResponse {
 }
 
 #[cfg(feature = "enterprise")]
-async fn tenant_usage_handler(Path(id): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+async fn tenant_usage_handler(
+    State(ctx): State<ApiContext>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.tenant_manager.clone();
 
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
@@ -371,10 +384,11 @@ struct QuotaCheckRequest {
 
 #[cfg(feature = "enterprise")]
 async fn tenant_quota_check_handler(
+    State(ctx): State<ApiContext>,
     Path(id): Path<String>,
     Json(req): Json<QuotaCheckRequest>,
 ) -> impl IntoResponse {
-    let manager = enterprise::multi_tenancy::get_global_tenant_manager();
+    let manager = ctx.tenant_manager.clone();
 
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
@@ -431,8 +445,11 @@ struct AuditQueryParams {
 }
 
 #[cfg(feature = "enterprise")]
-async fn audit_events_query_handler(Query(params): Query<AuditQueryParams>) -> impl IntoResponse {
-    let logger = enterprise::audit::get_global_audit_logger();
+async fn audit_events_query_handler(
+    State(ctx): State<ApiContext>,
+    Query(params): Query<AuditQueryParams>,
+) -> impl IntoResponse {
+    let logger = ctx.audit_logger.clone();
 
     // Ensure logger is initialized
     if let Err(e) = logger.initialize().await {
@@ -501,9 +518,10 @@ struct MonitoringAlertsQuery {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_alerts_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<MonitoringAlertsQuery>,
 ) -> impl IntoResponse {
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -545,6 +563,7 @@ async fn monitoring_alerts_handler(
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_alert_acknowledge_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -556,7 +575,7 @@ async fn monitoring_alert_acknowledge_handler(
         }
     }
 
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -612,9 +631,10 @@ struct MonitoringDashboardsQuery {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_dashboards_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<MonitoringDashboardsQuery>,
 ) -> impl IntoResponse {
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -655,6 +675,7 @@ struct DashboardCreateRequest {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_dashboard_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(req): Json<DashboardCreateRequest>,
 ) -> impl IntoResponse {
@@ -666,7 +687,7 @@ async fn monitoring_dashboard_create_handler(
         }
     }
 
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -727,9 +748,10 @@ struct MonitoringMetricsQuery {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_metrics_handler(
+    State(ctx): State<ApiContext>,
     Query(params): Query<MonitoringMetricsQuery>,
 ) -> impl IntoResponse {
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -779,8 +801,8 @@ async fn monitoring_metrics_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn monitoring_alert_rules_handler() -> impl IntoResponse {
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+async fn monitoring_alert_rules_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -807,6 +829,7 @@ async fn monitoring_alert_rules_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_alert_rule_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(rule): Json<enterprise::monitoring::AlertRule>,
 ) -> impl IntoResponse {
@@ -818,7 +841,7 @@ async fn monitoring_alert_rule_create_handler(
         }
     }
 
-    let manager = enterprise::monitoring::get_global_monitoring_manager();
+    let manager = ctx.enterprise_monitoring_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -865,8 +888,8 @@ struct OAuth2ProviderRegisterRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_oauth2_providers_handler() -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn security_oauth2_providers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -893,6 +916,7 @@ async fn security_oauth2_providers_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn security_oauth2_provider_register_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(req): Json<OAuth2ProviderRegisterRequest>,
 ) -> impl IntoResponse {
@@ -901,7 +925,7 @@ async fn security_oauth2_provider_register_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -951,8 +975,8 @@ struct SamlProviderRegisterRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_saml_providers_handler() -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn security_saml_providers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -979,6 +1003,7 @@ async fn security_saml_providers_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn security_saml_provider_register_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(req): Json<SamlProviderRegisterRequest>,
 ) -> impl IntoResponse {
@@ -987,7 +1012,7 @@ async fn security_saml_provider_register_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1037,8 +1062,8 @@ struct SecurityPolicyCreateRequest {
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_policies_handler() -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn security_policies_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1065,6 +1090,7 @@ async fn security_policies_handler() -> impl IntoResponse {
 
 #[cfg(feature = "enterprise")]
 async fn security_policy_create_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Json(req): Json<SecurityPolicyCreateRequest>,
 ) -> impl IntoResponse {
@@ -1073,7 +1099,7 @@ async fn security_policy_create_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1105,8 +1131,11 @@ async fn security_policy_create_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_oauth2_provider_get_handler(Path(name): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn security_oauth2_provider_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(name): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1147,6 +1176,7 @@ struct OAuth2ProviderUpdateRequest {
 
 #[cfg(feature = "enterprise")]
 async fn security_oauth2_provider_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
     Json(req): Json<OAuth2ProviderUpdateRequest>,
@@ -1156,7 +1186,7 @@ async fn security_oauth2_provider_update_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1195,6 +1225,7 @@ async fn security_oauth2_provider_update_handler(
 
 #[cfg(feature = "enterprise")]
 async fn security_oauth2_provider_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
@@ -1203,7 +1234,7 @@ async fn security_oauth2_provider_delete_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1238,8 +1269,11 @@ async fn security_oauth2_provider_delete_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_saml_provider_get_handler(Path(name): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn security_saml_provider_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(name): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1280,6 +1314,7 @@ struct SamlProviderUpdateRequest {
 
 #[cfg(feature = "enterprise")]
 async fn security_saml_provider_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
     Json(req): Json<SamlProviderUpdateRequest>,
@@ -1289,7 +1324,7 @@ async fn security_saml_provider_update_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1328,6 +1363,7 @@ async fn security_saml_provider_update_handler(
 
 #[cfg(feature = "enterprise")]
 async fn security_saml_provider_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
@@ -1336,7 +1372,7 @@ async fn security_saml_provider_delete_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1371,8 +1407,11 @@ async fn security_saml_provider_delete_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn security_policy_get_handler(Path(name): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn security_policy_get_handler(
+    State(ctx): State<ApiContext>,
+    Path(name): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1406,6 +1445,7 @@ async fn security_policy_get_handler(Path(name): Path<String>) -> impl IntoRespo
 
 #[cfg(feature = "enterprise")]
 async fn security_policy_update_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
     Json(policy): Json<enterprise::security::SecurityPolicy>,
@@ -1426,7 +1466,7 @@ async fn security_policy_update_handler(
             .into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1462,6 +1502,7 @@ async fn security_policy_update_handler(
 
 #[cfg(feature = "enterprise")]
 async fn security_policy_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
@@ -1470,7 +1511,7 @@ async fn security_policy_delete_handler(
         return err.into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -1517,7 +1558,7 @@ async fn oauth2_github_auth_handler(State(ctx): State<ApiContext>) -> impl IntoR
     // 4. Store state in session/cookie for verification in callback
     // 5. Redirect to GitHub authorization URL
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     if let Err(e) = manager.initialize().await {
         return (
@@ -1613,7 +1654,7 @@ async fn oauth2_github_callback_handler(
             .into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Exchange code for token
     let token_response = match manager.exchange_oauth2_code("github", &code).await {
@@ -1720,8 +1761,8 @@ async fn oauth2_github_callback_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn oauth2_google_auth_handler() -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn oauth2_google_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     if let Err(e) = manager.initialize().await {
         return (
@@ -1791,7 +1832,7 @@ async fn oauth2_google_callback_handler(
             .into_response();
     }
 
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Exchange code for token
     let token_response = match manager.exchange_oauth2_code("google", &code).await {
@@ -1895,10 +1936,10 @@ async fn oauth2_google_callback_handler(
 }
 
 #[cfg(feature = "enterprise")]
-async fn oauth2_telegram_auth_handler() -> impl IntoResponse {
+async fn oauth2_telegram_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     // Telegram Login Widget uses a different flow - it's client-side
     // This handler can return the bot name and token for client-side widget initialization
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     if let Err(e) = manager.initialize().await {
         return (
@@ -2079,8 +2120,11 @@ async fn oauth2_telegram_callback_handler(
 // ============================================================================
 
 #[cfg(feature = "enterprise")]
-async fn saml_auth_handler(Path(provider): Path<String>) -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+async fn saml_auth_handler(
+    State(ctx): State<ApiContext>,
+    Path(provider): Path<String>,
+) -> impl IntoResponse {
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
@@ -2123,7 +2167,7 @@ async fn saml_callback_handler(
     Path(provider): Path<String>,
     Form(form): Form<SamlCallbackForm>,
 ) -> impl IntoResponse {
-    let manager = enterprise::security::get_global_security_manager();
+    let manager = ctx.security_manager.clone();
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {

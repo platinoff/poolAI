@@ -931,6 +931,11 @@ mod tests {
 /// Global audit logger instance
 static AUDIT_LOGGER: OnceLock<Arc<AuditLogger>> = OnceLock::new();
 
+/// Align `get_global_audit_logger` with [`crate::core::state::AppState::audit_logger`] when possible.
+pub fn try_install_global_audit_logger(logger: Arc<AuditLogger>) {
+    let _ = AUDIT_LOGGER.set(logger);
+}
+
 /// Get global audit logger instance.
 ///
 /// This function returns a singleton instance of `AuditLogger` that can be used
