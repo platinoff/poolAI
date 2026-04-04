@@ -43,7 +43,7 @@ use axum::Router;
 ///
 /// Composes all API endpoint modules into a single router.
 ///
-/// Currently, most routes are still in `api_legacy.rs` and will be gradually migrated.
+/// Composes modular `api/*` routers; `api_legacy.rs` remains for a few unmigrated paths.
 pub fn create_api_routes() -> Router<ApiContext> {
     Router::new()
         .merge(system::create_system_routes())
@@ -59,8 +59,6 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(completions::create_completions_routes())
         .merge(topology::create_topology_routes())
         .merge(ui::create_ui_routes())
-    // api_legacy.rs is kept for backward compatibility
-    // All handlers have been migrated to modular structure
 }
 
 // Legacy routes function removed - all handlers migrated to modules ✅

@@ -221,9 +221,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ---
 
-## Верифікація 2026-04-03 (Cursor, toolchain, Git, тести)
+## Верифікація 2026-04-04 (Cursor, toolchain, Git, тести)
 
-**Останні коміти на `main` (орієнтир)**: ML pipeline / enterprise AI-ML API, federated/automl, документація та `.cursor` (див. `git log`). **2026-04-03**: `UserManager` перенесено в `core::user_manager`, поле `AppState::user_manager`, прибрано HTTP‑синглтон `get_global_user_manager`. **2026-04-04**: discovery через `AppState::discovery` + `DiscoveryHandle`, OAuth2 CSRF map у `AppState::oauth2_pending_states`; `pool`/`topology` отримують той самий `SharedDiscoverySlot` з `main`.
+**Останні коміти на `main` (орієнтир, `git log`)**: після ML pipeline / federated / AutoML — серія **Priority 1**: інʼєкція менеджерів через `AppState` (`UserManager`, discovery slot, OAuth2 pending, `WebSocketManager`, enterprise managers), далі **HTTP**: маршрути pool / RAID / VM / libraries / instances / topology через `State<ApiContext>` (`refactor(state|core|enterprise|http)`). **Залишилось для P1**: `network/api_legacy.rs` (глобалі `get_global_*`) та `network/discovery.rs` (`get_global_instance_manager`).
+
+**2026-04-03**: `UserManager` у `AppState`, без HTTP‑синглтона `get_global_user_manager`. **2026-04-04**: discovery + OAuth2 pending у `AppState`; інтеграційні тести `tests/network_api_integration.rs` для VM/RAID list очікують **не 404** (типово **503**, якщо менеджери не прикріплені до тестового `ApiContext::default()` — узгоджено з поведінкою після DI).
 
 **Cursor / правила**: каталог `.cursor/rules/` (`rust-architect.md`, `ai-assistant.md`, `chat-context.md`, `.cursorrules`, …). Оновлено `rust-architect.md`: канонічний push через зовнішній MSYS2; агент/CI можуть використовувати PowerShell; опис Dependabot; узгодження з `cargo test` як у CI; примітка про MSVC vs `rust-toolchain.toml` (GNU).
 
@@ -233,7 +235,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **Тести (обовʼязковий набір як у CI)**:  
 `K8S_OPENAPI_ENABLED_VERSION=1.28`  
-`cargo test --lib --tests --features ml,enterprise,cloud` — **успішно** після виправлень: `tests/ml_pruning_integration.rs` (семантика `weights_after`), `tests/saml_auth_flow_integration.rs` (унікальні імена провайдерів для глобального `SecurityManager`).
+`cargo test --lib --tests --features ml,enterprise,cloud` — проганяти після змін; раніше виправлено `tests/ml_pruning_integration.rs`, `tests/saml_auth_flow_integration.rs`; **2026-04-04** — очікування для `GET /vm/instances`, `GET /raid/nodes`, `GET /raid/artifacts` у router-only тестах: маршрут існує (≠ 404), не обовʼязково 200 без ініціалізованих менеджерів.
 
 **Наступні кроки розробки (коротко)**:
 1. Таблиця **«Наступні кроки за пріоритетом»** на початку цього файлу — головний порядок робіт.  
