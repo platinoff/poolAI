@@ -102,7 +102,7 @@
 //! # Modules
 //!
 //! - [`core`] - Core functionality (config, error handling, model interface)
-//! - [`services`] - Service layer orchestration above domains (RAID, VM, …; expanding)
+//! - [`services`] - Service layer orchestration above domains (RAID, VM, libraries, …; expanding)
 //! - [`pool`] - Worker pool management
 //! - [`monitoring`] - System monitoring and metrics
 //! - [`network`] - REST API and WebSocket server

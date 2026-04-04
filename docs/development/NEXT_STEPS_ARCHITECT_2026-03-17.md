@@ -23,7 +23,7 @@
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
-| **2** | **Priority 2** | Розширити **`src/services/`** (`libraries`, enterprise, cloud, admin); **Stage 4.4** — ML pipeline backends. Є: **`RaidService`**, **`VmService`** (повний набір VM REST). |
+| **2** | **Priority 2** | Розширити **`src/services/`** (enterprise, cloud, admin); **Stage 4.4** — ML pipeline backends. Є: **`RaidService`**, **`VmService`**, **`LibraryService`** (`/libraries/*`). |
 | **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
 | **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
@@ -72,6 +72,7 @@
 - [x] Створити `src/services/` з сервісами (нарощувати далі):
   - [x] `raid_service.rs`: list nodes/artifacts; далі артефакти, реплікація, метрики.
   - [x] `vm_service.rs`: усі VM HTTP-операції через сервіс (instances lifecycle, health, templates, networks).
+  - [x] `library_service.rs`: list/get/install/uninstall/update/upload бібліотек.
   - [ ] `enterprise_service.rs`: multi‑tenancy, audit, SAML/OAuth2.
   - [ ] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором.
   - [ ] `admin_service.rs`: агрегація даних для адмін‑панелі.

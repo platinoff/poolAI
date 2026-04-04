@@ -401,6 +401,7 @@
 ./src/core/model_interface.rs
 ./src/core/state.rs
 ./src/services/mod.rs
+./src/services/library_service.rs
 ./src/services/raid_service.rs
 ./src/services/vm_service.rs
 ./src/enterprise/audit.rs

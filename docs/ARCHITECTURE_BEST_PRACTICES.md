@@ -40,6 +40,7 @@ src/
 │   └── model_interface.rs
 ├── services/           # Service layer (orchestration above domains; expand per Priority 2)
 │   ├── mod.rs
+│   ├── library_service.rs
 │   ├── raid_service.rs
 │   └── vm_service.rs
 ├── network/            # API layer (modularized)

@@ -18,6 +18,24 @@ use crate::core::state::ApiContext;
 use crate::libs::LibraryType;
 use crate::network::api::common::check_permission;
 use crate::network::auth::{auth_middleware, Claims};
+use crate::services::library_service::{LibraryMutationError, LibraryService, LibraryServiceError};
+
+type LibHttpErr = (StatusCode, AxumJson<serde_json::Value>);
+
+fn library_manager_unavailable() -> LibHttpErr {
+    (
+        StatusCode::SERVICE_UNAVAILABLE,
+        AxumJson(serde_json::json!({
+            "error": crate::services::library_service::LIBRARY_MANAGER_UNAVAILABLE_MESSAGE
+        })),
+    )
+}
+
+fn library_service_err(e: LibraryServiceError) -> LibHttpErr {
+    match e {
+        LibraryServiceError::ManagerUnavailable => library_manager_unavailable(),
+    }
+}
 
 /// Create library management routes
 pub fn create_libraries_routes() -> Router<ApiContext> {
@@ -43,18 +61,9 @@ pub fn create_libraries_routes() -> Router<ApiContext> {
 }
 
 async fn libraries_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    if let Some(manager) = ctx.library_manager.get() {
-        let manager = manager.read().await;
-        let libraries = manager.list_libraries().await;
-        AxumJson(libraries).into_response()
-    } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
-            })),
-        )
-            .into_response()
+    match LibraryService::list_libraries(&ctx).await {
+        Ok(libraries) => AxumJson(libraries).into_response(),
+        Err(e) => library_service_err(e).into_response(),
     }
 }
 
@@ -62,26 +71,16 @@ async fn library_info_handler(
     State(ctx): State<ApiContext>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
-    if let Some(manager) = ctx.library_manager.get() {
-        let manager = manager.read().await;
-        match manager.get_library(&name).await {
-            Some(lib) => AxumJson(lib).into_response(),
-            None => (
-                StatusCode::NOT_FOUND,
-                AxumJson(serde_json::json!({
-                    "error": format!("Library {} not found", name)
-                })),
-            )
-                .into_response(),
-        }
-    } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
+    match LibraryService::get_library(&ctx, &name).await {
+        Ok(Some(lib)) => AxumJson(lib).into_response(),
+        Ok(None) => (
+            StatusCode::NOT_FOUND,
             AxumJson(serde_json::json!({
-                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                "error": format!("Library {} not found", name)
             })),
         )
-            .into_response()
+            .into_response(),
+        Err(e) => library_service_err(e).into_response(),
     }
 }
 
@@ -95,29 +94,16 @@ async fn library_install_handler(
         .and_then(|v| v.as_str())
         .unwrap_or("latest");
 
-    if let Some(manager) = ctx.library_manager.get() {
-        let manager = manager.read().await;
-        match manager
-            .install_library(&name, version, LibraryType::ModelLibrary)
-            .await
-        {
-            Ok(lib) => AxumJson(lib).into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to install library. Context: Cannot install library from registry. Suggestion: Verify library name and version exist, check network connectivity, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", name, version, e)
-                })),
-            )
-                .into_response(),
-        }
-    } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
+    match LibraryService::install_library(&ctx, &name, version, LibraryType::ModelLibrary).await {
+        Ok(lib) => AxumJson(lib).into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
+        Err(LibraryMutationError::Operation(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
-                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                "error": format!("Failed to install library. Context: Cannot install library from registry. Suggestion: Verify library name and version exist, check network connectivity, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", name, version, e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 
@@ -133,29 +119,19 @@ async fn library_uninstall_handler(
         return err.into_response();
     }
 
-    if let Some(manager) = ctx.library_manager.get() {
-        let manager = manager.read().await;
-        match manager.uninstall_library(&name).await {
-            Ok(_) => AxumJson(serde_json::json!({
-                "message": format!("Library {} uninstalled successfully", name)
-            }))
-            .into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to uninstall library. Context: Cannot remove library from system. Suggestion: Verify library is installed, check for active dependencies, ensure library is not in use, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
-                })),
-            )
-                .into_response(),
-        }
-    } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
+    match LibraryService::uninstall_library(&ctx, &name).await {
+        Ok(()) => AxumJson(serde_json::json!({
+            "message": format!("Library {} uninstalled successfully", name)
+        }))
+        .into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
+        Err(LibraryMutationError::Operation(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
-                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                "error": format!("Failed to uninstall library. Context: Cannot remove library from system. Suggestion: Verify library is installed, check for active dependencies, ensure library is not in use, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 
@@ -171,26 +147,16 @@ async fn library_update_handler(
         return err.into_response();
     }
 
-    if let Some(manager) = ctx.library_manager.get() {
-        let manager = manager.read().await;
-        match manager.update_library(&name).await {
-            Ok(lib) => AxumJson(lib).into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to update library. Context: Cannot update library to newer version. Suggestion: Verify library is installed, check for available updates, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
-                })),
-            )
-                .into_response(),
-        }
-    } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
+    match LibraryService::update_library(&ctx, &name).await {
+        Ok(lib) => AxumJson(lib).into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
+        Err(LibraryMutationError::Operation(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
-                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                "error": format!("Failed to update library. Context: Cannot update library to newer version. Suggestion: Verify library is installed, check for available updates, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
 
@@ -213,33 +179,23 @@ async fn library_upload_handler(
         return err.into_response();
     }
 
-    if let Some(manager) = ctx.library_manager.get() {
-        let manager = manager.read().await;
-        match manager
-            .upload_library(
-                &payload.name,
-                &payload.version,
-                &payload.data,
-                LibraryType::ModelLibrary,
-            )
-            .await
-        {
-            Ok(lib) => AxumJson(lib).into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to upload library. Context: Cannot upload and install library from base64 data. Suggestion: Verify base64 data is valid, check disk space, ensure sufficient permissions, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", payload.name, payload.version, e)
-                })),
-            )
-                .into_response(),
-        }
-    } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
+    match LibraryService::upload_library(
+        &ctx,
+        &payload.name,
+        &payload.version,
+        &payload.data,
+        LibraryType::ModelLibrary,
+    )
+    .await
+    {
+        Ok(lib) => AxumJson(lib).into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
+        Err(LibraryMutationError::Operation(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
-                "error": "Library manager not initialized. Context: Library manager is not available. Suggestion: Ensure library manager is initialized before managing libraries. Check system startup sequence and library manager initialization status."
+                "error": format!("Failed to upload library. Context: Cannot upload and install library from base64 data. Suggestion: Verify base64 data is valid, check disk space, ensure sufficient permissions, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", payload.name, payload.version, e)
             })),
         )
-            .into_response()
+            .into_response(),
     }
 }
