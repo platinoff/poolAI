@@ -22,6 +22,7 @@ use uuid::Uuid;
 use crate::core::state::{ApiContext, AppState};
 use crate::network::api::common::check_permission;
 use crate::network::auth::Claims;
+use crate::services::vm_service::{VmResourceUsageError, VmService, VmServiceError};
 use crate::vm;
 
 #[derive(Deserialize)]
@@ -121,35 +122,39 @@ pub fn create_vm_routes() -> Router<ApiContext> {
 
 type VmHttpErr = (StatusCode, AxumJson<serde_json::Value>);
 
+fn vm_manager_unavailable() -> VmHttpErr {
+    (
+        StatusCode::SERVICE_UNAVAILABLE,
+        AxumJson(serde_json::json!({
+            "error": crate::services::vm_service::VM_MANAGER_UNAVAILABLE_MESSAGE
+        })),
+    )
+}
+
+fn vm_service_http_err(e: VmServiceError) -> VmHttpErr {
+    match e {
+        VmServiceError::ManagerUnavailable => vm_manager_unavailable(),
+    }
+}
+
 fn vm_http_manager(ctx: &AppState) -> Result<Arc<vm::VmManager>, VmHttpErr> {
     ctx.vm_manager
         .get()
         .cloned()
-        .ok_or((
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "VM manager not initialized. Suggestion: complete application startup (vm::initialize)."
-            })),
-        ))
+        .ok_or_else(vm_manager_unavailable)
 }
 
 async fn vm_instances_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let instances = manager.list_instances().await;
-    AxumJson(instances).into_response()
+    match VmService::list_instances(&ctx).await {
+        Ok(instances) => AxumJson(instances).into_response(),
+        Err(e) => vm_service_http_err(e).into_response(),
+    }
 }
 
 async fn vm_instance_resources_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -163,9 +168,10 @@ async fn vm_instance_resources_handler(
         }
     };
 
-    match manager.get_instance_resource_usage(uuid).await {
+    match VmService::get_instance_resource_usage(&ctx, uuid).await {
         Ok(usage) => AxumJson(usage).into_response(),
-        Err(e) => {
+        Err(VmResourceUsageError::ManagerUnavailable) => vm_manager_unavailable().into_response(),
+        Err(VmResourceUsageError::Query(e)) => {
             let error_response = serde_json::json!({
                 "error": e.to_string()
             });
@@ -175,15 +181,13 @@ async fn vm_instance_resources_handler(
 }
 
 async fn vm_resource_limits_supported_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let supported = manager.is_resource_limits_supported();
-    AxumJson(serde_json::json!({
-        "supported": supported
-    }))
-    .into_response()
+    match VmService::is_resource_limits_supported(&ctx) {
+        Ok(supported) => AxumJson(serde_json::json!({
+            "supported": supported
+        }))
+        .into_response(),
+        Err(e) => vm_service_http_err(e).into_response(),
+    }
 }
 
 async fn vm_instance_create_handler(
@@ -500,22 +504,16 @@ async fn vm_instance_health_handler(
 // ============================================================================
 
 async fn vm_templates_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let templates = manager.list_templates().await;
-    AxumJson(templates).into_response()
+    match VmService::list_templates(&ctx).await {
+        Ok(templates) => AxumJson(templates).into_response(),
+        Err(e) => vm_service_http_err(e).into_response(),
+    }
 }
 
 async fn vm_template_get_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -529,15 +527,16 @@ async fn vm_template_get_handler(
         }
     };
 
-    match manager.get_template(uuid).await {
-        Some(template) => AxumJson(template).into_response(),
-        None => (
+    match VmService::get_template(&ctx, uuid).await {
+        Ok(Some(template)) => AxumJson(template).into_response(),
+        Ok(None) => (
             StatusCode::NOT_FOUND,
             AxumJson(serde_json::json!({
                 "error": format!("Template not found: {}", id)
             })),
         )
             .into_response(),
+        Err(e) => vm_service_http_err(e).into_response(),
     }
 }
 
@@ -647,22 +646,16 @@ async fn vm_template_delete_handler(
 // ============================================================================
 
 async fn vm_networks_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let networks = manager.list_networks().await;
-    AxumJson(networks).into_response()
+    match VmService::list_networks(&ctx).await {
+        Ok(networks) => AxumJson(networks).into_response(),
+        Err(e) => vm_service_http_err(e).into_response(),
+    }
 }
 
 async fn vm_network_get_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = match vm_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -676,15 +669,16 @@ async fn vm_network_get_handler(
         }
     };
 
-    match manager.get_network(uuid).await {
-        Some(network) => AxumJson(network).into_response(),
-        None => (
+    match VmService::get_network(&ctx, uuid).await {
+        Ok(Some(network)) => AxumJson(network).into_response(),
+        Ok(None) => (
             StatusCode::NOT_FOUND,
             AxumJson(serde_json::json!({
                 "error": format!("Network not found: {}", id)
             })),
         )
             .into_response(),
+        Err(e) => vm_service_http_err(e).into_response(),
     }
 }
 
