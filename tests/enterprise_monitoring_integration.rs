@@ -73,11 +73,19 @@ async fn test_get_active_alerts() {
     };
     manager.record_metric(data_point).await.unwrap();
 
-    // Get active alerts
+    // Get active alerts (global manager may include alerts from parallel tests — match by metric)
     let alerts = manager.get_active_alerts(None, None, None).await.unwrap();
-    assert!(!alerts.is_empty());
-    assert_eq!(alerts[0].metric, "cpu_usage");
-    assert_eq!(alerts[0].current_value, 95.0);
+    let cpu = alerts
+        .iter()
+        .find(|a| a.metric == "cpu_usage" && a.current_value == 95.0);
+    assert!(
+        cpu.is_some(),
+        "expected active cpu_usage alert at 95.0, got: {:?}",
+        alerts
+            .iter()
+            .map(|a| (a.metric.as_str(), a.current_value))
+            .collect::<Vec<_>>()
+    );
 }
 
 #[cfg(feature = "enterprise")]
