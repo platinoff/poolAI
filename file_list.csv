@@ -1,5 +1,3 @@
-./ -5
-./ -5
 ./.cargo/config.toml
 ./.cursor/CHANGELOG.md
 ./.cursor/commands/check.md
@@ -32,7 +30,6 @@
 ./.github/workflows/release.yml
 ./.gitignore
 ./.vscode/settings.json
-./0.0
 ./benches/runtime_benchmarks.rs
 ./bin/cargo-check.sh
 ./bin/cargo-fmt.sh

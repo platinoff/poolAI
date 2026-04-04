@@ -222,11 +222,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ---
 
-## Верифікація 2026-04-04 (Cursor, toolchain, Git, тести)
+## Верифікація 2026-04-05 (Cursor, toolchain, Git, тести)
 
-**Останні коміти на `main` (орієнтир, `git log`)**: серія **Priority 1** — `AppState` + модульний HTTP; **2026-04-04+**: видалено мертвий `api_legacy.rs`; `DiscoveryService::new(..., instance_manager)` з `app_state.instance_manager.get().cloned()` замість `get_global_instance_manager` у `send_announcement`.
+**Останні коміти на `main` (орієнтир, `git log`)**: **Priority 1** — `AppState` + модульний HTTP; видалено `api_legacy.rs`; `DiscoveryService` з інжектованим `instance_manager` з `AppState`. **Priority 2 (частково)**: `src/services/` — `raid_service` (list nodes/artifacts), `vm_service` (усі VM-маршрути), `library_service` (усі `/libraries/*`); відповідні handlers у `network/api/*` через сервіси.
 
-**2026-04-03**: `UserManager` у `AppState`, без HTTP‑синглтона `get_global_user_manager`. **2026-04-04**: discovery + OAuth2 pending у `AppState`; інтеграційні тести `tests/network_api_integration.rs` для VM/RAID list очікують **не 404** (типово **503**, якщо менеджери не прикріплені до тестового `ApiContext::default()` — узгоджено з поведінкою після DI).
+**2026-04-03**: `UserManager` у `AppState`. **2026-04-04–05**: discovery + OAuth2 pending у `AppState`; інтеграційні тести `tests/network_api_integration.rs` для VM/RAID list — **не 404** (типово **503** без менеджерів на `ApiContext::default()`).
 
 **Cursor / правила**: каталог `.cursor/rules/` (`rust-architect.md`, `ai-assistant.md`, `chat-context.md`, `.cursorrules`, …). Оновлено `rust-architect.md`: канонічний push через зовнішній MSYS2; агент/CI можуть використовувати PowerShell; опис Dependabot; узгодження з `cargo test` як у CI; примітка про MSVC vs `rust-toolchain.toml` (GNU).
 
@@ -236,28 +236,28 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 **Тести (обовʼязковий набір як у CI)**:  
 `K8S_OPENAPI_ENABLED_VERSION=1.28`  
-`cargo test --lib --tests --features ml,enterprise,cloud` — проганяти після змін; раніше виправлено `tests/ml_pruning_integration.rs`, `tests/saml_auth_flow_integration.rs`; **2026-04-04** — очікування для `GET /vm/instances`, `GET /raid/nodes`, `GET /raid/artifacts` у router-only тестах: маршрут існує (≠ 404), не обовʼязково 200 без ініціалізованих менеджерів.
+`cargo test --lib --tests --features ml,enterprise,cloud` — проганяти після змін; раніше виправлено `tests/ml_pruning_integration.rs`, `tests/saml_auth_flow_integration.rs`; **2026-04-04+** — для `GET /vm/instances`, `GET /raid/nodes`, `GET /raid/artifacts`: маршрут існує (≠ 404); 200 не обовʼязково без ініціалізованих менеджерів.
 
 **Наступні кроки розробки (коротко)**:
 1. Таблиця **«Наступні кроки за пріоритетом»** на початку цього файлу — головний порядок робіт.  
-2. **Priority 1**: документація AppState + feature **`test-utils`** (`attach_*_for_test`) — зроблено; опційно — Raft/distributed без глобальних згадок.  
-3. **Priority 2**: розширити **`services/`** (VM, enterprise, …), переносити логіку з handlers; ML pipeline step backends.  
+2. **Priority 1**: документація AppState + **`test-utils`** — зроблено; опційно — Raft/distributed без глобальних згадок.  
+3. **Priority 2**: далі **`enterprise_service`**, **`cloud_service`**, розширення **RaidService** (операції крім list); ML pipeline step backends (реальні Rust-бекенди кроків). VM / libraries / RAID list — уже через сервіси.  
 4. **TurboQuant** — Priority 2b (`docs/ml/TURBOQUANT_INTEGRATION.md`).
 
 ---
 
-## Handoff — остання сесія (архітектура / ApiContext)
+## Handoff — остання сесія (2026-04-05): ApiContext + service layer
 
-**Концепція (коротко)**: один **`ApiContext` = `Arc<AppState>`** у Axum; залежності для HTTP — з полів `AppState` + `State<T>` у handler’ах. Пізнє підключення «великих» підсистем після їхніх `initialize()` — через **`OnceLock`** на `AppState` і виклики **`attach_core_http_singletons()`** / **`sync_enterprise_globals()`** у `main`, щоб HTTP і legacy **`get_global_*`** бачили той самий `Arc`.
+**Концепція (коротко)**: **`ApiContext` = `Arc<AppState>`** у Axum; HTTP залежить від полів `AppState` + `State<T>`. Пізнє підключення підсистем — **`OnceLock`** на `AppState`, **`attach_core_http_singletons()`** / **`sync_enterprise_globals()`** у `main`.
 
-**Що вже змерджено на `main` (орієнтир по змісту, перевірка: `git log`)**:
-- WebSocket: `WebSocketManager` у `AppState`, без `lazy_static` у `network/ws`.
-- Enterprise HTTP: менеджери в `AppState`, `enterprise_api` + UI dashboards через `ctx`, `sync_enterprise_globals()`.
-- Core HTTP: `attach_core_http_singletons()`; модульні маршрути `api/` (workers, raid, vm, libraries, instances, completions, topology) + distributed RAID — через `ctx`.
+**Що вже на `main` (перевірка: `git log`)**:
+- WebSocket, enterprise HTTP, core HTTP — через `ctx` / `AppState` (як раніше).
+- **Сервіси**: `VmService`, `LibraryService`, `RaidService` (list nodes/artifacts); відповідні API-модулі викликають сервіси, не прямі синглтони в handler’ах для цих маршрутів.
+- Документація: узгоджено **README**, **`docs/README.md`**, **`docs/INDEX_2026-03-17.md`**, **`file_list.csv`** (прибрано зіпсовані рядки).
 
 **Наступній сесії**:
-1. **Priority 2** — розширити `src/services/` (VM, enterprise, cloud, admin); переносити логіку з `network/api/*`; ML pipeline steps з реальними бекендами.
-2. За потреби інтеграційні тести з **`--features test-utils`** і `attach_*_for_test` на `AppState`.
+1. **Priority 2** — `enterprise_service` / `cloud_service` / admin; розширити RaidService; ML pipeline backends; інтеграційні тести з **`--features test-utils`** за потреби.
+2. **Priority 2b** — TurboQuant після стабільних контрактів pipeline (`docs/ml/TURBOQUANT_INTEGRATION.md`).
 
 **Перевірка збірки (як у недавніх CI-прогонах)**:
 `K8S_OPENAPI_ENABLED_VERSION=1.28`  

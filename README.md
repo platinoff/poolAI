@@ -1,8 +1,15 @@
 # PoolAI - AI Mining Pool Management System
 
-> 🇺🇦 Ukrainian version available: [README.uk.md](../README.md)
+> 🇺🇦 Українськомовні матеріали: концепція та індекс у [`docs/concept/`](docs/concept/) та [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md) (окремого `README.uk.md` у корені немає).
 
 PoolAI is a comprehensive distributed system for managing AI mining pools with integration of generative models, GPU optimization, and automated resource management.
+
+## Documentation map (canonical order)
+
+1. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — навігація по всьому каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
+2. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **головний** покроковий план Rust Architect (пріоритети P1–P6, TurboQuant, верифікація CI).
+3. **Concept / vision** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt), Grid/Memory/Job: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md).
+4. **Inventory** — [`file_list.csv`](file_list.csv) підтримується вручну як зріз важливих шляхів; повний список файлів репозиторію: `git ls-files`.
 
 ## 🎉 **PROJECT 100% COMPLETE! v0.2.2 RELEASED! PRO EDITION!** 🚀
 
@@ -59,9 +66,10 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 
 ### Next Focus
-- За потреби: стабілізувати `cargo test --all-features` на Windows (розбиття тест-крейтів, анотації типів, або обовʼязковий GNU host).  
-- Stage 4.4: реальні бекенди кроків pipeline, observability, інтеграційні тести для `/api/enterprise/ai-ml/pipeline`.
-- **Welcome TurboQuant** (план): стиснення KV/ваг/векторів **тільки в Rust** — `docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b + порядок пріоритетів у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
+- **Priority 2 (service layer)**: далі `enterprise_service` / `cloud_service` / розширення `RaidService`; деталі в `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`. Уже є `src/services/`: `raid_service` (list), `vm_service`, `library_service`.
+- **Stage 4.4**: реальні бекенди кроків ML pipeline, інтеграційні тести для `/api/enterprise/ai-ml/pipeline`.
+- **TurboQuant (P2b)**: лише Rust — `docs/ml/TURBOQUANT_INTEGRATION.md`.
+- За потреби: стабілізувати `cargo test --all-features` на Windows (GNU host або розбиття тестів).
 
 ### 🚀 Development Roadmap
 

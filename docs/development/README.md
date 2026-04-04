@@ -1,17 +1,19 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-01-22
+**Останнє оновлення**: 2026-04-05
 
 ---
 
 ## 🎯 Актуальні Документи
 
-### Основні плани:
-- [`NEXT_STEPS_2026-01-19.md`](./NEXT_STEPS_2026-01-19.md) - **АКТУАЛЬНІ** наступні кроки (v0.2.2 → v0.3.0+)
-- [`NEXT_STEPS_ARCHITECT_2026-01-22.md`](./NEXT_STEPS_ARCHITECT_2026-01-22.md) - Останній план Rust Architect
-- [`FUTURE_DEVELOPMENT_ROADMAP.md`](./FUTURE_DEVELOPMENT_ROADMAP.md) - Майбутній roadmap
- - [`PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`](./PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md) - **Основний план оптимізації продуктивності (bottleneck-и, бенчмарки, тюнінг Tokio/AppState/кеша)**
+### Головний план (Rust Architect, 2026-03-17+)
+- **[`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **канонічний** покроковий план (P1–P6, TurboQuant, верифікація CI). Старіші файли `NEXT_STEPS_ARCHITECT_2026-01-22.md` тощо — історичні; див. [`../archive/development/`](../archive/development/).
+
+### Інші основні плани:
+- [`NEXT_STEPS_2026-01-19.md`](./NEXT_STEPS_2026-01-19.md) — наступні кроки v0.2.2 → v0.3.0+ (контекст)
+- [`FUTURE_DEVELOPMENT_ROADMAP.md`](./FUTURE_DEVELOPMENT_ROADMAP.md) — майбутній roadmap
+- [`PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`](./PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md) — оптимізація продуктивності (Tokio/AppState/кеш)
 
 ### Допоміжні документи:
 - [`CONCEPT_IMPLEMENTATION_CHECKLIST.md`](./CONCEPT_IMPLEMENTATION_CHECKLIST.md) - Чеклист реалізації концепції
