@@ -5,6 +5,10 @@
 - Додано `docs/ml/TURBOQUANT_INTEGRATION.md` (ресерч Google TurboQuant / PolarQuant / QJL, придатність для PoolAI, фази інтеграції).
 - Оновлено `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` (**Priority 2b**), `docs/concept/poolAI_concept_root.txt`, `docs/concept/CONCEPT_UPDATE_2026-01-19.md`, `docs/INDEX_2026-03-17.md`, `docs/ml/PIPELINE_MANAGEMENT.md`, `README.md`, `.cursor/rules/rust-architect.md`.
 
+## 2026-04-04 (пізніше) — TurboQuant: лише Rust
+
+- Політика: **без Python**; імплементація в `src/ml/…`. Оновлено `TURBOQUANT_INTEGRATION.md`, Priority 2b, концепт, INDEX, PIPELINE_MANAGEMENT, README; додано таблицю **наступних кроків за пріоритетом** у `NEXT_STEPS_ARCHITECT_2026-03-17.md`.
+
 ## 2026-04-03 — Узгодження з CI та toolchain
 
 - Оновлено `.cursor/rules/rust-architect.md`: MSYS2 лишається канонічним для ручного git push; дозволено контекст PowerShell для агента/CI як у GitHub Actions; Dependabot; рекомендований набір тестів `cargo test --lib --tests --features ml,enterprise,cloud` замість обовʼязкового `cargo test --all-features` на Windows MSVC; виправлено опис `file_list.csv`.

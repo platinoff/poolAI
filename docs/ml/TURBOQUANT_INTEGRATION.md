@@ -1,20 +1,26 @@
 # TurboQuant — дослідження та інтеграція в PoolAI
 
-**Дата**: 2026-04-04  
+**Дата**: 2026-04-04 (оновлено: лише **Rust**, без Python)  
 **Статус**: планова фіча (Welcome TurboQuant track)
+
+---
+
+## Політика імплементації
+
+**У PoolAI TurboQuant реалізується виключно в Rust** (`src/ml/…`, feature `ml`). Жодних Python sidecar, subprocess до інтерпретатора чи PyPI-залежностей у runtime. Екосистемні пакети на PyPI згадуються лише як **орієнтир для валідації** (наукова відповідність), не як шар деплою.
 
 ---
 
 ## Що таке TurboQuant
 
-**TurboQuant** — сімейство алгоритмів стиснення від **Google Research** для великих мовних моделей і векторного пошуку. Публічний опис: [TurboQuant: Redefining AI efficiency with extreme compression](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/) (березень 2026). Наукова робота: [arXiv:2504.19874](https://arxiv.org/abs/2504.19874) (ICLR 2026). Пов’язані компоненти: **PolarQuant** ([arXiv:2502.02617](https://arxiv.org/abs/2502.02617)), **QJL** (Quantized Johnson–Lindenstrauss).
+**TurboQuant** — сімейство алгоритмів стиснення від **Google Research** для великих мовних моделей і векторного пошуку. Публічний опис: [TurboQuant: Redefining AI efficiency with extreme compression](https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/). Наукова робота: [arXiv:2504.19874](https://arxiv.org/abs/2504.19874). Пов’язані компоненти: **PolarQuant** ([arXiv:2502.02617](https://arxiv.org/abs/2502.02617)), **QJL** (Quantized Johnson–Lindenstrauss).
 
 ### Механіка (спрощено)
 
-1. **PolarQuant** — обертання / полярне представлення векторів, щоб застосувати ефективний квантизатор з меншим «overhead» констант квантизації.
+1. **PolarQuant** — перетворення векторів (полярні / рекурсивні кути + радіуси) для ефективної скалярної квантизації з меншим overhead констант.
 2. **QJL** — корекція залишкової похибки з мінімальним біт-бюджетом (зокрема знакові проєкції), щоб зберегти якість attention / inner product.
 
-Заявлені ефекти в блозі та пейпері: сильне зменшення **KV cache** (орієнтири **~4–6×** і менший бітрейт на елемент), покращення швидкості обчислення attention logits на GPU у порівнянні з повноточністю, застосовність до **vector search** без важкого dataset-specific тюнінгу.
+Заявлені ефекти: сильне зменшення **KV cache**, менший бітрейт на елемент, застосовність до **vector search**.
 
 ---
 
@@ -22,26 +28,28 @@
 
 | Аспект | Оцінка |
 |--------|--------|
-| **Вузьке місце «передачі даних»** | TurboQuant знижує **обсяг і пропускну потребу для ML-даних** (кеші, ваги, ембеддинги), а не замінює оптимізацію мережевого стеку RAID/TCP. Для **реплікації квантизованих артефактів** і **стримінгу inference** менший payload = менше часу на дроті. |
-| **Стек проєкту** | Ядро PoolAI — **Rust**. Готові пакети екосистеми орієнтовані на **Python** ([turboquant](https://pypi.org/project/turboquant/), [turboquant-torch](https://pypi.org/project/turboquant-torch/), [turboquant-hf](https://pypi.org/project/turboquant-hf/) на PyPI). Прямого стабільного **Rust crate** на момент огляду немає — реалістичний шлях: **окремий worker / sidecar** (Python або майбутній CUDA/JAX шар) + контракт з `MLPipelineManager`. |
-| **Зв’язок з ML.6** | Логічно лягає **після** або **поруч** з кроком **Quantization** і з реальними бекендами pipeline: вхід/вихід артефакту, метрики `bytes_before` / `bytes_after`, якість (proxy метрики). |
-| **Ризики** | Ліцензії залежностей, версії CUDA/GPU, узгодження з **enterprise** multi-tenant (ізоляція воркерів уже є в VM/runtime). |
+| **Передача даних** | Менший обсяг **ML-артефактів** (KV-буфери, квантизовані ваги, ембеддинги) → менше байтів по **RAID/мережі**; не замінює TCP/RAID tuning. |
+| **Стек** | Реалізація з **пейперів** і референс-логіки в **чистому Rust** (`no_std`-дружні шари за потреби для ядра алгоритму). Опційно пізніше: **SIMD** / окремий crate під GPU через офіційні Rust-біндинги (якщо з’являться), без Python. |
+| **ML.6** | Після стабільного контракту кроків **Quantization** / pipeline: вхід `&[f32]` / буфери артефактів, вихід стислий формат + метрики в коді. |
+| **Ризики** | Обсяг інженерії (відтворення алгоритму), чисельна валідація проти пейпера; ліцензії власного коду = MIT проєкту. |
 
-**Висновок**: для цілей PoolAI TurboQuant **доречний** як **прискорення ML data-plane** (KV / ваги / індекси), а не як універсальне рішення всіх мережевих bottleneck. Його варто **закласти в план** поряд із бекендами pipeline (Priority 2 / Stage 4.4).
+**Висновок**: TurboQuant доречний як **Rust-модуль** у ML data-plane; очікуваний шлях — **поетапна імплементація** (спрощені режими → повна відповідність пейперу).
 
 ---
 
-## План імплементації (фази)
+## План імплементації (фази, лише Rust)
 
-1. **Контракт і конфіг** — розширити тип кроку pipeline або підкрок `Quantization` (наприклад, `compression: turboquant`, `target_bits`, `mode: kv_cache | weights | vectors`). Документувати HTTP/gRPC або файловий контракт input/output артефакту.
-2. **Sidecar / VM worker** — опційний процес (Python + офіційні/підтримувані пакети) у зоні worker; PoolAI викликає його з runtime (аналогічно до інших зовнішніх ML інструментів). Логи й метрики в існуючий monitoring.
-3. **RAID / бібліотека моделей** — зберігати **вже стиснені** блоби як артефакти; порівняти P95 часу реплікації до/після на однаковому каналі (див. `docs/performance/BENCHMARKS.md`).
-4. **Довгостроково** — відстежити появу **Rust/native** біндингів або винести критичний шлях у **окремий сервіс** з GPU; не блокувати core на Python, якщо політика деплою забороняє.
+1. **Специфікація та тести** — зафіксувати внутрішній формат пакета (заголовок + квантизовані блоки), property-тести на round-trip / похибку inner product для малих розмірностей.
+2. **Модуль `src/ml/turboquant.rs` (або підмодуль)** — ізоляція від HTTP; публічні функції на зразок `compress_vectors`, `decompress_for_dot_product` (назви уточнити під API пейпера).
+3. **Інтеграція з pipeline** — розширення конфігу кроку `Quantization` / окремий прапор `turboquant: true` у `StepType` / `HashMap` конфігу кроку; виклик лише з існуючого Rust executor pipeline.
+4. **Метрики** — `bytes_in`, `bytes_out`, `target_bits` у результаті кроку (структури вже в стилі `PruningResult` / pipeline status).
+5. **Бенчмарки** — `criterion` у `benches/` або розділ у `docs/performance/BENCHMARKS.md` (Priority 4).
+6. **Опційно пізніше** — прискорення через `std::simd` / `wide` за політикою залежностей проєкту; **не** через інтерпретатори інших мов.
 
 ---
 
 ## Зв’язані документи
 
-- `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` — **Priority 2b (TurboQuant track)**.
-- `docs/ml/PIPELINE_MANAGEMENT.md` — оркестрація ML.6.
-- `docs/concept/poolAI_concept_root.txt` — Stage 4.4, оновлення «Welcome TurboQuant».
+- `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` — **Priority 2b** та блок «Наступні кроки за пріоритетом».
+- `docs/ml/PIPELINE_MANAGEMENT.md` — ML.6.
+- `docs/concept/poolAI_concept_root.txt` — Stage 4.4.

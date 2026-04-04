@@ -61,7 +61,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 ### Next Focus
 - За потреби: стабілізувати `cargo test --all-features` на Windows (розбиття тест-крейтів, анотації типів, або обовʼязковий GNU host).  
 - Stage 4.4: реальні бекенди кроків pipeline, observability, інтеграційні тести для `/api/enterprise/ai-ml/pipeline`.
-- **Welcome TurboQuant** (план): стиснення KV/ваг/векторів для меншого трафіку артефактів — `docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
+- **Welcome TurboQuant** (план): стиснення KV/ваг/векторів **тільки в Rust** — `docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b + порядок пріоритетів у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
 
 ### 🚀 Development Roadmap
 

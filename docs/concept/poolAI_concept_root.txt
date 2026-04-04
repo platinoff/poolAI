@@ -206,7 +206,7 @@
 - ✅ **Experiment Tracking** - ML experiment management (ML.5: Registration ✅, Metrics ✅, Comparison ✅, Best selection ✅)
 - ✅ **Pipeline Management (ML.6)** - Orchestration: steps include Profiling, HyperparameterTuning, Quantization, Pruning, AutoML, **FederatedAggregation**, тощо; після AutoML за замовчуванням **реєстрація моделі та запис експерименту** (`ModelVersionManager` / `ExperimentTracker`; прапор **`automl_skip_registry`** вимикає цей крок для тестів/ізоляції)
 - ✅ **Enterprise HTTP API (`enterprise` + `ml`)** - `GET/POST /api/enterprise/ai-ml/pipeline`, `GET /pipeline/{id}`, `POST /pipeline/{id}/execute`, `GET /pipeline/demo`; спільний **`MLPipelineManager`** у **`ApiContext` / `AppState`**
-- 🔄 **Welcome TurboQuant (план 2026-04)** — екстремальне стиснення **KV cache / ваг / векторів** (Google Research: TurboQuant + PolarQuant + QJL; див. `docs/ml/TURBOQUANT_INTEGRATION.md`). Інтеграція в PoolAI: **після** стабілізації бекендів кроків pipeline — опційний **Python worker** (PyPI ecosystem) + метрики + менший обсяг артефактів для **RAID/мережі**; не замінює окрему оптимізацію транспорту.
+- 🔄 **Welcome TurboQuant (план 2026-04)** — екстремальне стиснення **KV cache / ваг / векторів** (Google Research: TurboQuant + PolarQuant + QJL; див. `docs/ml/TURBOQUANT_INTEGRATION.md`). Інтеграція в PoolAI: **виключно Rust** (`src/ml/…`), **після** стабільних Rust-бекендів кроків pipeline; метрики + менший обсяг артефактів для **RAID/мережі**; **без Python**; не замінює окрему оптимізацію транспорту.
 
 ## 🚀 Next Phase: Stage 4.3
 
@@ -994,4 +994,4 @@ curl http://localhost:8080/api/status
 **Creator**: Madevinc (one developer with Cursor AI)  
 **Repository**: https://github.com/platinoff/poolAI  
 **Solana Donations**: GcdgNtdE8NEk3z9sQ5jXv2tqguZjSYqPqNAtjsjPNJx8 (Madevinc welcomes donations to support this crypto project)  
-**Latest Update**: 2026-04-04 — додано план **Welcome TurboQuant** (дослідження `docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b у `NEXT_STEPS_ARCHITECT_2026-03-17.md`): стиснення KV/ваг для меншого трафіку артефактів; інтеграція через pipeline + опційний worker
+**Latest Update**: 2026-04-04 — **Welcome TurboQuant**: лише **Rust**-імплементація, Priority 2b + таблиця пріоритетів у `NEXT_STEPS_ARCHITECT_2026-03-17.md`; `docs/ml/TURBOQUANT_INTEGRATION.md`

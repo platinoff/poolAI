@@ -298,13 +298,13 @@ Pipeline + Versioning:
 - [ ] Pipeline scheduling
 - [ ] Integration з workflow engines
 - [ ] Real step execution (замість симуляції)
-- [ ] **Welcome TurboQuant** — опційний крок/режим стиснення KV cache / ваг / векторів (Google Research); контракт pipeline + worker; див. `docs/ml/TURBOQUANT_INTEGRATION.md` та Priority 2b у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`
+- [ ] **Welcome TurboQuant** — крок/режим стиснення KV / ваг / векторів (**лише Rust** у репозиторії); див. `docs/ml/TURBOQUANT_INTEGRATION.md` та Priority 2b у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`
 
 ---
 
 ## 🔗 TurboQuant (план)
 
-Коротко: алгоритми **TurboQuant / PolarQuant / QJL** зменшують обсяг **ML-даних** (зокрема KV), що допомагає **швидшій передачі артефактів** після реплікації в RAID і inference на воркерах. Ядро PoolAI лишається Rust; первинна інтеграція — через **конфіг кроку pipeline** та **зовнішній worker** (Python ecosystem). Деталі: `TURBOQUANT_INTEGRATION.md`.
+Коротко: алгоритми **TurboQuant / PolarQuant / QJL** зменшують обсяг **ML-даних** (зокрема KV), що допомагає **швидшій передачі артефактів** після реплікації в RAID. Інтеграція — **конфіг кроку pipeline** + **Rust-модуль** у `src/ml/` (без Python). Деталі: `TURBOQUANT_INTEGRATION.md`.
 
 ---
 

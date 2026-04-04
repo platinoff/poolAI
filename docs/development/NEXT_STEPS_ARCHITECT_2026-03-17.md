@@ -16,6 +16,24 @@
 
 ---
 
+## Наступні кроки за пріоритетом (стан розробки)
+
+Упорядковано за залежностями та поточним статусом (checkbox’и в секціях нижче — джерело правди).
+
+| Порядок | Пріоритет | Що робити зараз |
+|--------:|-----------|-----------------|
+| **1** | **Priority 1** | Завершити проведення **`ApiContext` через `Router` і handlers**; прибрати зайві глобальні синглтони в HTTP-шарі; тестовий `AppState`. |
+| **2** | **Priority 2** | Ввести **`src/services/`**, thin handlers; паралельно **Stage 4.4** — **реальні Rust-бекенди кроків ML pipeline** (не заглушки), узгоджені з enterprise AI/ML API. |
+| **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
+| **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API. |
+| **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
+| **6** | **Priority 5** | Синхронізація документації та TODO після 1–4. |
+| **7** | **Priority 6** | Grid protocol / Solana-adapter у docs і коді за потреби. |
+
+*Опційно паралельно з 1–2*: стабілізація `cargo test --all-features` на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
+
+---
+
 ## ⭐ Priority 1 — Єдиний `AppState` / `ApiContext` (централізований global state + DI)
 
 **Мета**: одна точка входу для залежностей (конфіг, storage, менеджери модулів, клієнти), у стилі `AppState` в Axum‑проєктах.
@@ -66,23 +84,24 @@
 
 ---
 
-## ⭐ Priority 2b — Welcome TurboQuant (ML data-plane, після бекендів pipeline)
+## ⭐ Priority 2b — Welcome TurboQuant (ML data-plane, **лише Rust**)
 
-**Мета**: зменшити **обсяг і вартість передачі ML-даних** (KV cache, ваги, векторні індекси) узгоджено з **Google Research TurboQuant** (PolarQuant + QJL), не підміняючи загальну мережеву оптимізацію RAID/API.
+**Мета**: зменшити **обсяг ML-даних** (KV cache, ваги, векторні блоки) за ідеями **TurboQuant / PolarQuant / QJL** (Google Research), **без Python і без зовнішніх інтерпретаторів** — увесь код у дереві `poolai` на Rust.
 
-**Чому поруч із Priority 2**: реальні **бекенди кроків ML pipeline** задають формат артефактів і точки виклику; TurboQuant — **окремий шар стиснення/квантизації** на цих артефактах або в sidecar inference. Детальний ресерч: `docs/ml/TURBOQUANT_INTEGRATION.md`.
+**Чому після Priority 2 / бекендів pipeline**: стабільний **Rust-executor** кроків і формат артефактів спрощує підключення нового кроку або гілки в `Quantization`. Деталі: `docs/ml/TURBOQUANT_INTEGRATION.md`.
 
 **Кроки**:
-- [ ] Зафіксувати контракт кроку pipeline (розширення `Quantization` або новий підтип `TurboQuant` / конфіг у `StepType::Quantization`) та метрики `bytes_in` / `bytes_out`, `bitrate_target`.
-- [ ] Реалізувати **опційний outbound виклик** до Python worker (PyPI `turboquant` / `turboquant-torch` / `turboquant-hf` за сценарієм) через VM/runtime; версії та GPU — у `config`/Helm.
-- [ ] Додати інтеграційний тест «dry-run» або mock worker (без обов’язкового GPU в CI), розширити документацію `docs/ml/PIPELINE_MANAGEMENT.md`.
-- [ ] Заміряти реплікацію артефактів RAID до/після (див. Priority 4 / `docs/performance/BENCHMARKS.md`).
-- [ ] Переглянути ліцензії та політику залежностей перед production.
+- [ ] Специфікація внутрішнього бінарного формату та юніт-тести (малі розмірності, похибка dot-product / recall proxy).
+- [ ] Реалізація модуля **`src/ml/turboquant.rs`** (або `src/ml/turboquant/mod.rs`) — чистий Rust, без subprocess.
+- [ ] Контракт кроку pipeline: конфіг у `StepType::Quantization` або окремий прапор/режим; метрики `bytes_in`, `bytes_out`, `target_bits` у результаті виконання кроку.
+- [ ] Інтеграційний тест **повністю в Rust** (pipeline execute з тестовими вагами).
+- [ ] Заміри реплікації артефактів RAID до/після (Priority 4 / `docs/performance/BENCHMARKS.md`).
+- [ ] Опційно: SIMD / окремий прискорений підшлях у Rust (без залежності від інших мов).
 
 **Критерії готовності**:
-- [ ] З документації та коду зрозуміло, **коли** увімкнено TurboQuant і **який** worker відповідає.
-- [ ] Є мінімум один **автоматизований** тест шляху pipeline (реальний або з mock).
-- [ ] Метрики стиснення експортуються або логуються для спостережуваності.
+- [ ] Увімкнення TurboQuant керується лише конфігом Rust і feature flags проєкту.
+- [ ] Є **автоматизовані** тести модуля та шляху pipeline без зовнішніх binary крім `cargo test`.
+- [ ] Метрики стиснення видимі в логах або API статусу pipeline.
 
 ---
 
@@ -193,7 +212,7 @@ Docs & Cleanup (Priority 5)
 Grid / Job / Memory / Tokenization (Priority 6)
 ```
 
-**Примітка**: Кроки 3–4 можуть виконуватись частково паралельно для різних модулів, але **AppState і Service Layer бажано стабілізувати першими**, щоб не плодити дублікати патернів. **Priority 2b** (TurboQuant) ортогональний сервісному шару, але **практично** стартує після того, як кроки pipeline мають стабільні артефакти та виклики worker.
+**Примітка**: Кроки 3–4 можуть виконуватись частково паралельно для різних модулів, але **AppState і Service Layer бажано стабілізувати першими**, щоб не плодити дублікати патернів. **Priority 2b** (TurboQuant) стартує після **стабільних Rust-бекендів кроків pipeline** і контракту артефактів (усі виклики — з коду Rust).
 
 ---
 
@@ -212,8 +231,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 `cargo test --lib --tests --features ml,enterprise,cloud` — **успішно** після виправлень: `tests/ml_pruning_integration.rs` (семантика `weights_after`), `tests/saml_auth_flow_integration.rs` (унікальні імена провайдерів для глобального `SecurityManager`).
 
 **Наступні кроки розробки (коротко)**:
-1. Пріоритети 1–2 з цього документа (`ApiContext` у всіх handlers, service layer).  
-2. Stage 4.4 — бекенди кроків ML pipeline + тести навколо enterprise AI/ML HTTP API.  
-3. **Welcome TurboQuant** — Priority 2b: контракт pipeline + опційний Python worker + метрики стиснення (`docs/ml/TURBOQUANT_INTEGRATION.md`).  
-4. За потреби — відновити/спростити повний `cargo test --all-features` на Windows (окремі крейти або GNU-only).
+1. Таблиця **«Наступні кроки за пріоритетом»** на початку цього файлу — головний порядок робіт.  
+2. **TurboQuant** — лише **Rust** (`docs/ml/TURBOQUANT_INTEGRATION.md`, Priority 2b).  
+3. За потреби — повний `cargo test --all-features` на Windows (GNU / розбиття тестів).
 
