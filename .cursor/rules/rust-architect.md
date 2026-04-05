@@ -10,6 +10,8 @@
 
 **Cursor Agent / CI-перевірки** можуть виконуватися з **PowerShell** у корені репо (як у GitHub Actions `windows-latest`). Це не замінює рекомендацію вище для ручного `git push`.
 
+**Windows 11 (збірки 26100+, зокрема 26200)**: за гальмування збірок — перевірити сканування `target/` (Defender); при нестачі місця — `cargo clean` або винести артефакти через `CARGO_TARGET_DIR`.
+
 **Не використовувати для push**: вбудований термінал Cursor без потреби (див. troubleshooting у `git-push.md`).
 
 ### Key Documents for Rust Architect

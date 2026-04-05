@@ -9,8 +9,9 @@ if ($input.status -ne "completed") {
     exit 0
 }
 
-# Run cargo test
-$testResult = cargo test 2>&1
+# Align with CI required test step (.github/workflows/ci.yml)
+$env:K8S_OPENAPI_ENABLED_VERSION = "1.28"
+$testResult = cargo test --lib --tests --features ml,enterprise,cloud 2>&1
 $testExitCode = $LASTEXITCODE
 
 if ($testExitCode -eq 0) {

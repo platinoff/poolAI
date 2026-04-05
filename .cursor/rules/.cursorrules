@@ -1,0 +1,46 @@
+# Cursor Rules for PoolAI Project
+
+⚠️ **IMPORTANT**: This file is maintained for backward compatibility.  
+**All rules are now in `.cursor/rules/` directory.**
+
+## Chat / подальша робота з чатом
+
+При старті сесії або запиті «налаштуйся для роботи з чатом» — **читай `chat-context.md`** першим. Там: проект, ключові документи, термінал (MSYS2 only), git (без .sh), патчі, поточний стан і далі.
+
+## Terminal & patches
+
+- **Terminal (human / git)**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64). **Agent / CI checks** may use PowerShell in repo root (see `rust-architect.md`, `msys2-windows.md`).
+- **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
+
+## Rules Location
+
+All project rules are organized in `.cursor/rules/`:
+
+- **`chat-context.md`** - 🧭 Стартовий контекст чату (при «налаштуйся» / подальша робота)
+- **`rust-architect.md`** - ⭐ Rust Architect workflow and concept file usage (READ FIRST)
+- **`documentation.md`** - Documentation structure and file organization rules
+- **`git-workflow.md`** - Git workflow, commit format, and push order rules
+- **`msys2-windows.md`** - MSYS2 and Windows development environment rules (bash, NOT PowerShell)
+- **`scripts.md`** - Scripts structure and file listing rules
+- **`project-structure.md`** - Project organization and file naming rules
+- **`rust.md`** - Rust coding standards and patterns
+- **`ai-assistant.md`** - AI assistant rules and key document references
+
+## Quick Reference
+
+For detailed rules, see the corresponding file in `.cursor/rules/`:
+
+- Documentation: `.cursor/rules/documentation.md`
+- Git workflow: `.cursor/rules/git-workflow.md`
+- MSYS2/Windows: `.cursor/rules/msys2-windows.md`
+- Scripts: `.cursor/rules/scripts.md`
+- Project structure: `.cursor/rules/project-structure.md`
+- Rust patterns: `.cursor/rules/rust.md`
+- AI assistant: `.cursor/rules/ai-assistant.md`
+- Chat context: `.cursor/rules/chat-context.md`
+
+---
+
+**Note**: Cursor automatically loads rules from `.cursor/rules/` directory.  
+This file has been moved to `.cursor/rules/.cursorrules` for better organization.  
+All rules are now centralized in `.cursor/rules/` directory.

@@ -1,9 +1,17 @@
 # MSYS2 & Windows Development Environment
 
-## ⚠️ CRITICAL: MSYS2 Only — No PowerShell, No cmd
+## ⚠️ CRITICAL: MSYS2 for day-to-day dev & git — PowerShell only where noted below
 
-**Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64)  
-**Do NOT use**: PowerShell, cmd.exe for development or git.
+**Human / manual work (git, long builds, fewer Windows file-lock quirks)**  
+**Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64). Prefer this over cmd.
+
+**Cursor Agent / automated checks** may run from **PowerShell** in the repo root (same as GitHub Actions `windows-latest`). That does **not** replace MSYS2 for manual `git push` (see `rust-architect.md`, `git-push.md`).
+
+### Windows 11 (24H2+ / builds 26100+; e.g. 26200)
+
+- **Windows Defender** can slow or lock files under `target/` — optional exclusion for the repo `target` folder (or whole repo) if builds/tests stall.
+- **Long paths**: if `cargo` reports path length issues, enable long paths in Windows or keep the repo on a shorter path (e.g. `S:\rust\poolAI` is fine).
+- **`rust-toolchain.toml`** pins **`x86_64-pc-windows-gnu`**; the active **host** may still be MSVC (`rustc -vV` → `host: …-msvc`). For GNU linking you need MSYS2 `gcc`/`x86_64-w64-mingw32-gcc` on `PATH` (see `.cargo/config.toml`). If the host is MSVC-only, align with `rustup override` / installed toolchains.
 
 ### Project patches (конфіг)
 
@@ -21,10 +29,12 @@
 
 ### Always use MSYS2 bash for
 
-- All `cargo` commands (check, build, test, fmt, clippy)
-- All `git` operations: **copy-paste блок** з `.cursor/commands/git-push.md` (без .sh)
-- Running `scripts/*.sh` when needed (optional for git)
-- Any dev task
+- **Git** and **manual** `cargo` when you want the same environment as documented for push (see `git-push.md`).
+- Running `scripts/*.sh` when needed.
+
+### PowerShell / Agent / CI is OK for
+
+- `cargo test`, `cargo fmt`, `cargo clippy`, `cargo build` in-repo verification (matches CI on `windows-latest`).
 
 ### Tooling Checks (rustc/cargo/clippy/cl)
 
@@ -41,6 +51,11 @@
 
 - Use `/` and MSYS2 paths: `/s/rust/poolAI` for `S:\rust\poolAI`
 - Scripts: `./scripts/script.sh` or `bash scripts/script.sh`
+
+### Disk space (`target/`)
+
+- Full debug builds can use **many GB**. To reclaim space: `cargo clean` (then the next build is cold).
+- Optional: set `CARGO_TARGET_DIR` to another drive if `S:` is tight.
 
 ### Common issues
 

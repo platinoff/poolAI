@@ -1,5 +1,12 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-04-05 — Windows 11 / Cursor agent parity
+
+- Узгоджено `msys2-windows.md`, `chat-context.md`, `.cursorrules`: MSYS2 лишається канонічним для **ручного git**; **агент і CI** можуть використовувати PowerShell у корені репо.
+- Додано нотатки для **Windows 11 (24H2+, збірки 26100+)** — Defender і `target/`, long paths, відмінність **host MSVC** vs **target GNU** у `rust-toolchain.toml`.
+- Рекомендація з **місцем на диску**: `cargo clean` або `CARGO_TARGET_DIR` при великому `target/`.
+- `.cursor/commands/test.md` і `hooks/check-tests.ps1`: обовʼязковий набір як у CI — `cargo test --lib --tests --features ml,enterprise,cloud` з `K8S_OPENAPI_ENABLED_VERSION=1.28`.
+
 ## 2026-04-04 — Welcome TurboQuant (план)
 
 - Додано `docs/ml/TURBOQUANT_INTEGRATION.md` (ресерч Google TurboQuant / PolarQuant / QJL, придатність для PoolAI, фази інтеграції).
