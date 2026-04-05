@@ -16,12 +16,11 @@ scripts/
 ├── fix_gcc.sh                   # GCC fix script
 ├── install_gcc.sh               # GCC installation
 ├── setup_rust_path.sh           # Rust PATH setup
-├── setup_msvc_environment.ps1  # MSVC environment setup
-├── setup_rust_environment.ps1  # Automatic Rust environment setup
 ├── QUICK_FIX_RUST_PATH.sh       # Quick Rust PATH fix
 ├── verify_build.sh              # Build verification
 └── PUSH_COMMANDS.sh             # Git push helper
 ```
+(Приклад; у каталозі можуть бути й інші `.sh`. Нові **`.ps1` не додавати**.)
 
 ### Rules for Creating New Scripts
 
@@ -30,13 +29,13 @@ scripts/
    - Setup scripts → `scripts/`
    - Utility scripts → `scripts/`
    - CI/CD scripts → `scripts/` (or `scripts/ci/` for multiple)
-   - Bash scripts (`.sh`) → `scripts/` (preferred). Legacy `.ps1` may exist; do not add new ones.
+   - Bash scripts (`.sh`) → `scripts/` only. **Do not add `.ps1`.**
 
 2. **File naming**:
    - Use lowercase with underscores: `setup_rust_path.sh`
    - Use descriptive names: `fix_cargo_now.sh`
    - Use UPPERCASE for important scripts: `PUSH_COMMANDS.sh` (optional)
-   - Legacy `.ps1`: avoid; use bash
+   - No `.ps1` in this repo’s workflow (use bash / MSYS2).
 
 3. **When user asks to create a script**:
    - Always create in `scripts/`
@@ -45,7 +44,7 @@ scripts/
 
 ### Script References
 
-- In documentation: `scripts/script_name.sh` or `scripts/script_name.ps1`
+- In documentation: `scripts/script_name.sh`
 - In Rust code comments: `scripts/script_name.sh`
 - In CI/CD configs: `scripts/script_name.sh`
 - **When listing files**: Use descriptive names, NOT `.ps1` or `.ps` extensions in lists
@@ -62,7 +61,7 @@ scripts/
 **Examples:**
 - ❌ Bad: `setup_msvc_environment.ps1`, `setup_rust_environment.ps1`
 - ✅ Good: "MSVC environment setup script", "Rust environment setup script"
-- ✅ Good: "PowerShell scripts: setup_msvc_environment.ps1, setup_rust_environment.ps1"
+- ✅ Good: "MSVC environment setup (bash)" / посилання на `docs/` без переліку `.ps1`
 
 ## 🚫 What NOT to Do with Scripts
 

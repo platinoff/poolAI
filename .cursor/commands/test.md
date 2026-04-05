@@ -2,13 +2,17 @@
 
 Run tests for the project.
 
-**Required CI parity** (matches `.github/workflows/ci.yml` required step; set before `cargo` on Windows PowerShell: `$env:K8S_OPENAPI_ENABLED_VERSION='1.28'`):
+**Required CI parity** (matches `.github/workflows/ci.yml` required step; in **MSYS2 bash** before `cargo`):
 
-1. `cargo test --lib --tests --features ml,enterprise,cloud`
+```bash
+export K8S_OPENAPI_ENABLED_VERSION=1.28
+cargo test --lib --tests --features ml,enterprise,cloud
+```
 
-Then, as needed:
+**Steps**
 
-2. Run `cargo test --all-features` for a fuller matrix (heavy; on Windows MSVC may hit compiler stack issues — prefer GNU toolchain from `rust-toolchain.toml` or Linux CI)
+1. **Required**: run the bash block above (CI parity).
+2. **Optional**: run `cargo test --all-features` for a fuller matrix (heavy; on Windows MSVC may hit compiler stack issues — prefer GNU toolchain from `rust-toolchain.toml` or Linux CI)
 3. For context memory changes: `cargo test --test context_memory_integration`
 4. For enterprise audit logger changes: `cargo test --test enterprise_audit_integration --features enterprise`
 5. For enterprise monitoring changes: `cargo test --test enterprise_monitoring_integration --features enterprise` and `cargo test --test enterprise_monitoring_sqlite_integration --features enterprise`

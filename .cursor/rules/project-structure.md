@@ -16,7 +16,7 @@
 - Rust files: `snake_case.rs`
 - Test files: `test_*.rs` or `*_test.rs`
 - Documentation: `UPPER_CASE.md` for important docs, `lowercase.md` for guides
-- Scripts: `snake_case.sh` or `snake_case.ps1`
+- Scripts: `snake_case.sh` (у репо — лише bash у `scripts/`)
 
 ## Module Organization
 
@@ -44,7 +44,7 @@
 **When creating file lists or inventories:**
 - ❌ **NEVER** use `.ps1` or `.ps` extensions in file lists
 - ✅ Use descriptive names: "MSVC environment setup script" instead of `setup_msvc_environment.ps1`
-- ✅ Group by category: "PowerShell scripts", "Bash scripts"
+- ✅ Group by category: e.g. "Bash scripts", "Build helpers"
 - ✅ Use markdown lists or tables, not PowerShell command output
 
 ## Git

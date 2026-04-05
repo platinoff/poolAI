@@ -1,11 +1,9 @@
 # MSYS2 & Windows Development Environment
 
-## ⚠️ CRITICAL: MSYS2 for day-to-day dev & git — PowerShell only where noted below
+## ⚠️ CRITICAL: MSYS2 bash only — no PowerShell, no cmd
 
-**Human / manual work (git, long builds, fewer Windows file-lock quirks)**  
-**Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64). Prefer this over cmd.
-
-**Cursor Agent / automated checks** may run from **PowerShell** in the repo root (same as GitHub Actions `windows-latest`). That does **not** replace MSYS2 for manual `git push` (see `rust-architect.md`, `git-push.md`).
+**Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64) for **all** dev work: `cargo`, `git`, scripts, and any verification you run locally.  
+CI on GitHub uses its own runner environment; locally, stay in MSYS2 bash (see `rust-architect.md`, `git-push.md`).
 
 ### Windows 11 (24H2+ / builds 26100+; e.g. 26200)
 
@@ -16,7 +14,7 @@
 ### Project patches (конфіг)
 
 - **`rust-toolchain.toml`** — Rust 1.92.0, `x86_64-pc-windows-gnu`, rustfmt, clippy
-- **`.cursor`** — Cursor rules, commands, hooks (`rules/`, `commands/`)
+- **`.cursor`** — Cursor rules, commands, `hooks.json` (`rules/`, `commands/`); без `.ps1`
 - **`.vscode`** — Terminal profile "bash (MSYS2)", Rust Analyzer
 - **`scripts/`** — Bash scripts only (`.sh`). Run via MSYS2 bash.
 
@@ -29,12 +27,9 @@
 
 ### Always use MSYS2 bash for
 
-- **Git** and **manual** `cargo` when you want the same environment as documented for push (see `git-push.md`).
-- Running `scripts/*.sh` when needed.
-
-### PowerShell / Agent / CI is OK for
-
-- `cargo test`, `cargo fmt`, `cargo clippy`, `cargo build` in-repo verification (matches CI on `windows-latest`).
+- All `cargo` commands (check, build, test, fmt, clippy)
+- All `git` operations (copy-paste block in `.cursor/commands/git-push.md`; no `.sh` wrappers for git)
+- Running `scripts/*.sh` when needed
 
 ### Tooling Checks (rustc/cargo/clippy/cl)
 
@@ -43,9 +38,9 @@
   - `cargo --version`
   - `cargo clippy --version`
 - MSRV note (cloud-sdk/AWS SDK): `cloud_mock_integration` requires `rustc >= 1.88`. If your `rustc --version` is lower (e.g. 1.87.0), install `rustup`+the toolchain from `rust-toolchain.toml` or upgrade the MSYS2 Rust package before running cloud tests.
-- `cl` note:
-  - This project defaults to GNU toolchain (`x86_64-pc-windows-gnu`), so `cl.exe` typically is not required.
-  - If you ever switch to MSVC toolchain, verify `cl.exe` is available in PATH (e.g., `where cl` in a Windows terminal) and use MSVC-compatible environment.
+- MSVC `cl.exe` note:
+  - Default toolchain is GNU (`x86_64-pc-windows-gnu`); `cl.exe` is usually not needed.
+  - If you switch to an MSVC host/toolchain, use a Visual Studio / MSVC environment where `cl` is on `PATH`, then run `cargo` from that same environment (still avoid ad-hoc PowerShell/cmd-only workflows for this repo).
 
 ### Paths in bash
 

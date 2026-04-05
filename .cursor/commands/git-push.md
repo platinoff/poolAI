@@ -7,7 +7,7 @@ Add, commit, push — **тільки команди в MSYS2 bash**. Без ск
 **Не запускай git із терміналу Cursor.** З’являються:
 - `CreateFileMapping` / Win32 error 5
 - `index.lock`, `Permission denied` у `.git/objects`
-- Вивід обрізається («…added», кінець команди не видно), `Get-ChildItem` помилки
+- Обрізаний або некоректний вивід інтегрованого терміналу IDE
 
 **Рішення:** відкривай **MSYS2 UCRT64** з меню Пуск (окреме вікно) і виконуй команди там.
 
@@ -49,17 +49,19 @@ pwd
 ```bash
 # rustup ПЕРШИЙ — інакше візьметься MSYS2 rustc 1.87 і cloud-sdk не збереться (потрібен rustc >= 1.88)
 export PATH="$HOME/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 /c/msys64/usr/bin/rm -f .git/index.lock
 git status -sb
 cargo fmt --all
-# За потреби перед push (зміни в коді/тестах):
+# За потреби перед push (зміни в коді/тестах), як у CI:
+# cargo test --lib --tests --features ml,enterprise,cloud
 # cargo clippy --all-targets --all-features
 # cargo test --test cloud_mock_integration --features cloud,cloud-sdk -- --test-threads=1
 git add Cargo.toml src/ tests/ scripts/
 git add .gitignore
 git add -f docs/CHANGELOG.md docs/cloud/CLOUD_SDK_STATUS.md docs/concept/poolAI_concept_root.txt docs/development/NEXT_STEPS_2026-01-19.md docs/status/STABLE_STATE_SUMMARY.md docs/troubleshooting/GIT_PUSH_FAILED.md
-git add -f .cursor/rules/ .cursor/commands/
+git add -f .cursor/hooks.json .cursor/CHANGELOG.md .cursor/README.md .cursor/rules/ .cursor/commands/
 git status -sb
 git commit -m "type(scope): subject" -m "Summary:" -m "- Зміни: (модулі/файли)" -m "- Перевірки: cargo fmt; (clippy/test — що саме)" -m "- Ризики/нотатки: не стаджити data/audit/*.log.gz; при os error 112 — cargo clean"
 git push origin main

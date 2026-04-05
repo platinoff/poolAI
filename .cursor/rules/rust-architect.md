@@ -8,7 +8,7 @@
 **Terminal**: `C:\msys64\usr\bin\bash.exe` — **зовнішнє** вікно MSYS2 UCRT64 (див. `.cursor/commands/git-push.md`).  
 **Environment**: `rust-toolchain.toml` — канал **1.92.0**, ціль **`x86_64-pc-windows-gnu`** + компоненти `rustfmt`, `clippy`. Якщо `rustup show` показує MSVC у каталозі репо, вирівняй toolchain: `rustup override set 1.92.0-x86_64-pc-windows-gnu` у корені репо (або збірка в UCRT64 за README).
 
-**Cursor Agent / CI-перевірки** можуть виконуватися з **PowerShell** у корені репо (як у GitHub Actions `windows-latest`). Це не замінює рекомендацію вище для ручного `git push`.
+**Локальні перевірки** (`cargo test`, `fmt`, `clippy`) — у тому ж **MSYS2 bash**, що й git (див. блок у `git-push.md`). GitHub Actions працює на власному раннері; це не привід використовувати PowerShell/cmd у цьому репо.
 
 **Windows 11 (збірки 26100+, зокрема 26200)**: за гальмування збірок — перевірити сканування `target/` (Defender); при нестачі місця — `cargo clean` або винести артефакти через `CARGO_TARGET_DIR`.
 

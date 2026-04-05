@@ -9,7 +9,7 @@
 
 ## Terminal & patches
 
-- **Terminal (human / git)**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64). **Agent / CI checks** may use PowerShell in repo root (see `rust-architect.md`, `msys2-windows.md`).
+- **Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64) for all local `cargo`/`git`/scripts — no PowerShell, no cmd (see `rust-architect.md`, `msys2-windows.md`).
 - **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
 
 ## Rules Location

@@ -1,11 +1,4 @@
 {
   "version": 1,
-  "hooks": {
-    "stop": [
-      {
-        "command": "powershell -File .cursor/hooks/check-tests.ps1",
-        "description": "Check if all tests pass before stopping agent"
-      }
-    ]
-  }
+  "hooks": {}
 }

@@ -1,7 +1,7 @@
 # Cursor Configuration Status Check
-## Оновлено: 2026-01-19
+## Оновлено: 2026-04-06
 
-**Статус**: ✅ Конфігурація актуальна та працює
+**Статус**: ✅ Конфігурація узгоджена з політикою «лише MSYS2 bash»; PowerShell-скриптів у `.cursor/` немає
 
 ---
 
@@ -12,19 +12,12 @@
 .cursor/
 ├── README.md                    ✅ Актуальний
 ├── CHANGELOG.md                 ✅ Актуальний
-├── hooks.json                   ✅ Актуальний (version 1)
-├── hooks/
-│   └── check-tests.ps1         ✅ Актуальний
-├── rules/
-│   ├── rust.md                 ✅ Актуальний
-│   └── project-structure.md    ✅ Актуальний
-└── commands/
-    ├── check.md                ✅ Актуальний
-    ├── test.md                 ✅ Актуальний
-    ├── review.md               ✅ Актуальний
-    ├── fix-issue.md            ✅ Актуальний
-    └── pr.md                   ✅ Актуальний
+├── hooks.json                   ✅ version 1, `hooks`: {}
+├── rules/                       ✅ rust-architect, msys2-windows, тощо
+└── commands/                    ✅ check, test, git-push, …
 ```
+
+(Каталог `hooks/` з `.ps1` **не** використовується — файл видалено 2026-04-06.)
 
 ---
 
@@ -32,60 +25,32 @@
 
 ### 1. hooks.json
 - **Версія**: 1 ✅
-- **Hook**: `stop` → `check-tests.ps1` ✅
-- **Статус**: Працює коректно
+- **`hooks`**: порожній об’єкт — stop-hook **вимкнено** (перевірка тестів лише вручну в MSYS2 bash, див. `commands/git-push.md`, `commands/test.md`) ✅
 
 ### 2. rules/rust.md
 - **Команди**: `cargo fmt`, `cargo clippy`, `cargo test` ✅
-- **Feature flags**: Оновлено з актуальними features ✅
-- **Статус**: Актуальний
+- **Feature flags**: узгоджено з `Cargo.toml` ✅
 
 ### 3. rules/project-structure.md
-- **Структура директорій**: Відповідає поточному стану проекту ✅
-- **Правила документації**: Відповідають `.cursorrules` ✅
-- **Статус**: Актуальний
+- **Структура**: відповідає репо ✅
+- **Скрипти**: bash у `scripts/`, без нових `.ps1` ✅
 
 ### 4. commands/
-- **check.md**: Команди актуальні ✅
-- **test.md**: Команди актуальні ✅
-- **review.md**: Процес review актуальний ✅
-- **fix-issue.md**: Процес fix актуальний ✅
-- **pr.md**: Процес PR актуальний ✅
-
-### 5. hooks/check-tests.ps1
-- **Логіка**: Перевіряє тести перед зупинкою агента ✅
-- **Синтаксис**: PowerShell коректний ✅
-- **Статус**: Працює коректно
-
----
-
-## 🔄 Оновлення після змін проекту
-
-### Оновлено (2026-01-19):
-- ✅ `.cursorrules` - Додано MSYS2, git workflow, ключові документи
-- ✅ `rules/rust.md` - Команди актуальні
-- ✅ `rules/project-structure.md` - Структура відповідає поточному стану
-
-### Не потребує оновлення:
-- ✅ `hooks.json` - Конфігурація хуків актуальна
-- ✅ `commands/*.md` - Команди актуальні
-- ✅ `hooks/check-tests.ps1` - Скрипт працює коректно
+- **git-push.md**: MSYS2 bash, `K8S_OPENAPI_ENABLED_VERSION`, `git add -f` для `.cursor/` ✅
+- **test.md**: CI parity у bash ✅
 
 ---
 
 ## 📝 Рекомендації
 
-1. **Після оновлення Cursor**: Конфігурація `.cursor/` залишається актуальною
-2. **Після змін в проекті**: Перевірити `rules/project-structure.md` на актуальність
-3. **Після додавання нових features**: Оновити `rules/rust.md` з новими командами
+1. Локальні `cargo`/`git` — **зовнішній MSYS2 UCRT64** (див. `git-push.md`).
+2. Після змін у правилах — `git add -f .cursor/…` за потреби (частина шляхів під `.gitignore`).
 
 ---
 
 ## ✅ Висновок
 
-**Всі файли в `.cursor/` актуальні та працюють коректно.**
-
-Конфігурація відповідає поточному стану проекту та best practices Cursor Agent.
+Конфігурація `.cursor/` без PowerShell-хуків; тести перед push — за чеклістом у `git-push.md` / CI на GitHub.
 
 **Підготовлено**: Rust Architect  
-**Дата**: 2026-01-19
+**Дата останнього зведення**: 2026-04-06

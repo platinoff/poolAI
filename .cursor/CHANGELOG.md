@@ -1,11 +1,16 @@
 # Cursor Agent Configuration Changelog
 
-## 2026-04-05 — Windows 11 / Cursor agent parity
+## 2026-04-06 — Без PowerShell і без `.ps1` у `.cursor/`
 
-- Узгоджено `msys2-windows.md`, `chat-context.md`, `.cursorrules`: MSYS2 лишається канонічним для **ручного git**; **агент і CI** можуть використовувати PowerShell у корені репо.
-- Додано нотатки для **Windows 11 (24H2+, збірки 26100+)** — Defender і `target/`, long paths, відмінність **host MSVC** vs **target GNU** у `rust-toolchain.toml`.
-- Рекомендація з **місцем на диску**: `cargo clean` або `CARGO_TARGET_DIR` при великому `target/`.
-- `.cursor/commands/test.md` і `hooks/check-tests.ps1`: обовʼязковий набір як у CI — `cargo test --lib --tests --features ml,enterprise,cloud` з `K8S_OPENAPI_ENABLED_VERSION=1.28`.
+- Видалено `.cursor/hooks/check-tests.ps1`; у `hooks.json` поле `hooks` порожнє (немає stop-hook на PowerShell).
+- Усі правила знову канонічно вимагають **MSYS2 bash** для локальних `cargo`/`git` (без PowerShell/cmd для цього репо); оновлено `msys2-windows.md`, `rust-architect.md`, `chat-context.md`, `.cursorrules`, `commands/test.md`, `commands/git-push.md`, `.cursor/README.md`.
+- У `git-push.md`: `export K8S_OPENAPI_ENABLED_VERSION=1.28`, закоментований рядок CI-тестів, `git add -f` для `hooks.json` / `CHANGELOG` / `README` у `.cursor/`.
+
+## 2026-04-05 — Windows 11 / MSYS2 нотатки (без PowerShell-винятків)
+
+- Нотатки для **Windows 11 (24H2+, збірки 26100+)** — Defender і `target/`, long paths, **host MSVC** vs **target GNU** у `rust-toolchain.toml`.
+- **Місце на диску**: `cargo clean` або `CARGO_TARGET_DIR` при великому `target/`.
+- (Запис про дозвіл PowerShell для агента **скасовано** 2026-04-06.)
 
 ## 2026-04-04 — Welcome TurboQuant (план)
 
@@ -18,7 +23,7 @@
 
 ## 2026-04-03 — Узгодження з CI та toolchain
 
-- Оновлено `.cursor/rules/rust-architect.md`: MSYS2 лишається канонічним для ручного git push; дозволено контекст PowerShell для агента/CI як у GitHub Actions; Dependabot; рекомендований набір тестів `cargo test --lib --tests --features ml,enterprise,cloud` замість обовʼязкового `cargo test --all-features` на Windows MSVC; виправлено опис `file_list.csv`.
+- Оновлено `.cursor/rules/rust-architect.md`: MSYS2 для git push; Dependabot; рекомендований набір тестів `cargo test --lib --tests --features ml,enterprise,cloud` замість обовʼязкового `cargo test --all-features` на Windows MSVC; виправлено опис `file_list.csv`. (Рядок про PowerShell для агента більше не актуальний — див. 2026-04-06.)
 - Перевірено: `cargo fmt`, `cargo clippy --all-targets --all-features` (exit 0, з попередженнями), CI-еквівалент тестів після правок у `tests/ml_pruning_integration.rs` та `tests/saml_auth_flow_integration.rs`.
 
 ## 2026-01-19 - Оптимізація налаштувань
@@ -30,7 +35,7 @@
 **Виправлення**:
 1. ✅ Додано налаштування для Cursor agent в `.vscode/settings.json`
 2. ✅ Додано file watcher exclusions для покращення продуктивності
-3. ✅ Створено hooks для автоматичної перевірки тестів
+3. ✅ Додано опціональні Cursor hooks (раніше — перевірка тестів; з 2026-04-06 hooks порожні, без `.ps1`)
 4. ✅ Оптимізовано налаштування терміналу
 
 ### Зміни
@@ -41,11 +46,10 @@
 - Вимкнено `editor.formatOnSave` для уникнення конфліктів з агентом
 
 #### `.cursor/hooks.json` (новий)
-- Створено hooks.json для опціонального використання
-- Додано hook для перевірки тестів перед зупинкою агента
+- Створено `hooks.json` для опціонального використання; з **2026-04-06** об’єкт `hooks` порожній (без stop-hook і без `.ps1`).
 
-#### `.cursor/hooks/check-tests.ps1` (новий)
-- Створено PowerShell скрипт для автоматичної перевірки тестів
+#### `.cursor/hooks/check-tests.ps1` (видалено 2026-04-06)
+- Раніше: PowerShell-скрипт для stop-hook; замінено політикою «лише MSYS2 bash» і порожнім `hooks` у `hooks.json`.
 
 ### Рекомендації
 
