@@ -40,6 +40,7 @@ src/
 │   └── model_interface.rs
 ├── services/           # Service layer (orchestration above domains; expand per Priority 2)
 │   ├── mod.rs
+│   ├── enterprise_service.rs   # feature `enterprise` — tenants (and more as migrated)
 │   ├── library_service.rs
 │   ├── raid_service.rs
 │   └── vm_service.rs

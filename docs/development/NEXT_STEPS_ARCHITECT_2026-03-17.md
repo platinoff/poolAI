@@ -73,7 +73,7 @@
   - [x] `raid_service.rs`: list nodes/artifacts; далі артефакти, реплікація, метрики.
   - [x] `vm_service.rs`: усі VM HTTP-операції через сервіс (instances lifecycle, health, templates, networks).
   - [x] `library_service.rs`: list/get/install/uninstall/update/upload бібліотек.
-  - [ ] `enterprise_service.rs`: multi‑tenancy, audit, SAML/OAuth2.
+  - [ ] `enterprise_service.rs`: multi‑tenancy (tenant HTTP → `EnterpriseService` ✅), audit, SAML/OAuth2 — далі міграція.
   - [ ] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором.
   - [ ] `admin_service.rs`: агрегація даних для адмін‑панелі.
 - [ ] Поступово мігрувати логіку з `network/api/*.rs` у відповідні сервіси:

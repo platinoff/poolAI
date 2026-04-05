@@ -17,6 +17,8 @@ use crate::network::api::check_permission;
 #[cfg(feature = "enterprise")]
 use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
+use crate::services::enterprise_service::{EnterpriseService, TenantCreateError};
+#[cfg(feature = "enterprise")]
 use axum::{
     extract::{Extension, Form, Path, Query, State},
     http::StatusCode,
@@ -164,8 +166,7 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
 
 #[cfg(feature = "enterprise")]
 async fn tenants_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.tenant_manager.clone();
-    match manager.list_tenants().await {
+    match EnterpriseService::list_tenants(&ctx).await {
         Ok(tenants) => Json(tenants).into_response(),
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -189,22 +190,16 @@ async fn tenant_create_handler(
     State(ctx): State<ApiContext>,
     Json(req): Json<TenantCreateRequest>,
 ) -> impl IntoResponse {
-    let manager = ctx.tenant_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::create_tenant(&ctx, req.name, req.config).await {
+        Ok(tenant) => Json(tenant).into_response(),
+        Err(TenantCreateError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Tenant manager not initialized. Context: Cannot create tenant - tenant manager initialization failed. Suggestion: Check system startup sequence and tenant manager initialization status. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    match manager.create_tenant(req.name, req.config).await {
-        Ok(tenant) => Json(tenant).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(TenantCreateError::Create(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to create tenant. Context: Cannot create new tenant with specified configuration. Suggestion: Verify tenant name and configuration parameters. Error: {}", e)
@@ -219,8 +214,6 @@ async fn tenant_get_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.tenant_manager.clone();
-
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -234,7 +227,7 @@ async fn tenant_get_handler(
         }
     };
 
-    match manager.get_tenant(tenant_id).await {
+    match EnterpriseService::get_tenant(&ctx, tenant_id).await {
         Ok(Some(tenant)) => Json(tenant).into_response(),
         Ok(None) => (
             StatusCode::NOT_FOUND,
@@ -272,8 +265,6 @@ async fn tenant_update_handler(
         return err.into_response();
     }
 
-    let manager = ctx.tenant_manager.clone();
-
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -287,10 +278,7 @@ async fn tenant_update_handler(
         }
     };
 
-    match manager
-        .update_tenant(tenant_id, req.config, req.active)
-        .await
-    {
+    match EnterpriseService::update_tenant(&ctx, tenant_id, req.config, req.active).await {
         Ok(tenant) => Json(tenant).into_response(),
         Err(e) => (
             StatusCode::NOT_FOUND,
@@ -307,8 +295,6 @@ async fn tenant_delete_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.tenant_manager.clone();
-
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -322,7 +308,7 @@ async fn tenant_delete_handler(
         }
     };
 
-    match manager.delete_tenant(tenant_id).await {
+    match EnterpriseService::delete_tenant(&ctx, tenant_id).await {
         Ok(()) => (
             StatusCode::OK,
             Json(serde_json::json!({
@@ -345,8 +331,6 @@ async fn tenant_usage_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.tenant_manager.clone();
-
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -360,7 +344,7 @@ async fn tenant_usage_handler(
         }
     };
 
-    match manager.get_usage(tenant_id).await {
+    match EnterpriseService::get_tenant_usage(&ctx, tenant_id).await {
         Ok(usage) => Json(usage).into_response(),
         Err(e) => (
             StatusCode::NOT_FOUND,
@@ -388,8 +372,6 @@ async fn tenant_quota_check_handler(
     Path(id): Path<String>,
     Json(req): Json<QuotaCheckRequest>,
 ) -> impl IntoResponse {
-    let manager = ctx.tenant_manager.clone();
-
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -403,16 +385,16 @@ async fn tenant_quota_check_handler(
         }
     };
 
-    match manager
-        .check_quota(
-            tenant_id,
-            req.workers,
-            req.memory_mb,
-            req.cpu_cores,
-            req.storage_mb,
-            req.vm_instances,
-        )
-        .await
+    match EnterpriseService::check_tenant_quota(
+        &ctx,
+        tenant_id,
+        req.workers,
+        req.memory_mb,
+        req.cpu_cores,
+        req.storage_mb,
+        req.vm_instances,
+    )
+    .await
     {
         Ok(result) => Json(result).into_response(),
         Err(e) => (
