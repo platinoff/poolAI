@@ -1,7 +1,8 @@
 //! Criterion benchmarks for TurboQuant pack/unpack and dot product (`feature = "ml"`).
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use poolai::ml::turboquant::{dot_f32, pack_uniform_rows, unpack_to_rows};
+use std::hint::black_box;
 
 fn bench_turboquant(c: &mut Criterion) {
     let rows: Vec<Vec<f32>> = (0..64)

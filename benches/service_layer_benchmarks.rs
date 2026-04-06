@@ -2,10 +2,11 @@
 //!
 //! Run: `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils`
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use poolai::core::state::{ApiContext, AppState};
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::services::raid_service::RaidService;
+use std::hint::black_box;
 use std::sync::Arc;
 use tokio::runtime::Runtime;
 

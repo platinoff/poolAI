@@ -41,9 +41,9 @@
 
 ## 4. Наступні кроки за тим самим планом
 
-1. **P4 (продовження)** — Criterion таргети як у `BENCHMARKS.md`; **CI**: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + щотижневий cron, артефакт `criterion-report`). Далі на **референс-машині** — повні прогони та **`wrk`** на `/api/v1/health`. `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (WS manager робить `tokio::spawn`).
+1. **P4 (наступний горизонт)** — на **референс-машині**: повні прогони Criterion (усі чотири bench) та **`wrk`** на `/api/v1/health`; оновити таблицю baseline у `BENCHMARKS.md` під мітку хоста. **CI** вже є: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + неділя 06:00 UTC, артефакт `criterion-report`). `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
 2. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
-3. **P2b / доки** — оновити чекбокси TurboQuant у `NEXT_STEPS_ARCHITECT` під фактичний код у `src/ml/turboquant.rs`.
+3. **P2b** — заміри **реплікації** артефактів RAID до/після (окремий harness); зараз проксі: `raid_local_put`, `raid_protocol_put_payload` у `runtime_benchmarks`.
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
 
 Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).

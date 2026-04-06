@@ -2,8 +2,9 @@
 //!
 //! Run: `cargo bench -j 1 --bench cloud_benchmarks --features cloud`
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use poolai::cloud::{CloudConfig, CloudManager};
+use std::hint::black_box;
 use tokio::runtime::Runtime;
 
 fn bench_cloud_config_validate(c: &mut Criterion) {

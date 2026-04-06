@@ -9,13 +9,14 @@
 //! - API-shaped health JSON serialization
 
 use chrono::{TimeZone, Utc};
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use poolai::core::model_interface::{ModelParameters, ModelRequest};
 use poolai::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::runtime::{CacheManager, MemoryPool};
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use serde_json::json;
+use std::hint::black_box;
 use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::runtime::Runtime;
 

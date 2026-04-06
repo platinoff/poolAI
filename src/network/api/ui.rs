@@ -6,7 +6,7 @@
 //! - Theme management (custom themes)
 
 use axum::{
-    extract::{Extension, Json, Path, State},
+    extract::{Extension, Json, Path},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -25,6 +25,8 @@ use crate::network::api::check_permission;
 use crate::network::api::common::api_json_error;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::ui::{components, get_all_themes, get_theme};
+#[cfg(feature = "enterprise")]
+use axum::extract::State;
 
 /// Create UI management routes
 pub fn create_ui_routes() -> Router<ApiContext> {

@@ -67,10 +67,29 @@ The **dev sample** rows used a shortened Criterion profile (`--sample-size 20`, 
 | `vm_lifecycle/create_start_stop_delete` | dev-win-sample | ~5.2 µs | 2026-04-06 |
 | `raid_protocol_put_payload/serde_json_roundtrip` | dev-win-sample | ~5.6 µs | 2026-04-06 |
 | `http_health_json/serde_json_to_vec` | dev-win-sample | ~1.09 µs | 2026-04-06 |
-| `raid_service/list_artifacts` | dev-win-sample | ~221 ns | 2026-04-06 |
-| `raid_service/quota`, `cluster_status` | *run full* `service_layer_benchmarks` | — | — |
+| `raid_service/list_artifacts` | dev-win-sample | ~218 ns | 2026-04-06 |
+| `raid_service/quota` | dev-win-sample | ~74.5 µs | 2026-04-06 |
+| `raid_service/cluster_status` | dev-win-sample | ~55.2 µs | 2026-04-06 |
 | `wrk` `/api/v1/health` | *manual* | RPS / p50 / p95 | — |
 | *your ref host* / … | *e.g. ref-linux-01* | *from Criterion* | *YYYY-MM-DD* |
+
+### Target metrics (P4 roadmap, non-binding)
+
+Use these as **internal guardrails** when changing hot paths; replace with numbers from your ref host. They are **not** enforced in CI.
+
+| Area | Criterion group / function | Soft target (same machine, trend) |
+|------|---------------------------|-----------------------------------|
+| In-memory | `memory_pool/*`, `lru_cache/get_hit` | No large regression vs last saved Criterion baseline |
+| Local RAID | `raid_local_put/put_artifact_4096` | Stable median order-of-magnitude on fixed disk temp dir |
+| Service layer | `raid_service/list_*` | Sub-µs median for list/queries on tiny temp stores |
+| JSON | `http_health_json`, `raid_protocol_put_payload` | Track median; investigate if >2× prior baseline |
+| TurboQuant | `turboquant/*` (`--features ml`) | Stable pack/unpack; `dot_f32` scales linearly with dimension |
+
+### Changelog (bench docs)
+
+| Date | Note |
+|------|------|
+| 2026-04-06 | Filled `raid_service/quota` and `cluster_status` dev-sample medians; added P4 target table; benches use `std::hint::black_box`; `ui.rs` gates `State` import on `enterprise` (clean `no-enterprise` builds). |
 
 ---
 

@@ -145,12 +145,12 @@
   - [x] Criterion: `runtime_benchmarks` (memory pool, LRU, model request, cache key, local RAID put, **VM**, **RAID protocol**, **health JSON**), `turboquant_benchmarks` (`--features ml`), **`cloud_benchmarks`**, **`service_layer_benchmarks`** (`test-utils`).
 - [x] Оновити `docs/performance/BENCHMARKS.md` — команди `cargo bench`, групи Criterion, приклад CI; ілюстративні таблиці позначені як неконтрольні CI.
   - [x] Перші **числові** рядки (dev sample) у таблиці baseline — замінити на референс‑хост, коли буде стенд.
-  - [ ] Задокументувати зміни після оптимізацій.
+  - [x] Задокументувати зміни після оптимізацій (розділ *Changelog* у `BENCHMARKS.md`).
 
 **Критерії готовності**:
 - [x] Є повторюваний сценарій **локально**: `cargo bench -j 1 --bench runtime_benchmarks` та `cargo bench -j 1 --bench turboquant_benchmarks --features ml` (+ опційні `cloud_benchmarks`, `service_layer_benchmarks`).
 - [x] CI для Criterion — **опційно**: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + неділя 06:00 UTC), артефакт `target/criterion/`; baseline у `BENCHMARKS.md` — **оновлювати** вручну після зміни коду або референс‑машини.
-- [ ] Для основних сценаріїв зафіксовані **цільові** метрики (поруч із фактичними dev/ref рядками).
+- [x] Для основних сценаріїв зафіксовані **цільові** метрики (таблиця *Target metrics* у `BENCHMARKS.md`; поруч із dev/ref рядками).
 
 ---
 
