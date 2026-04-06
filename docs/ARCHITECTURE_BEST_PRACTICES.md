@@ -50,22 +50,26 @@ src/
 │   ├── raid_distributed_protocol_service.rs  # distributed RAID wire protocol (JSON messages)
 │   ├── raid_service.rs
 │   ├── rewards_service.rs     # rewards stats / progress (delegates to `rewards` module today)
-│   ├── system_service.rs      # status/health/metrics/models/GPU snapshots for `system` API
+│   ├── system_service.rs      # status/health/metrics/models/GPU snapshots for `system` API (без HTML)
 │   ├── topology_service.rs     # topology snapshot / node resources
+│   ├── ui_service.rs          # UI REST: themes/components + enterprise dashboards via EnterpriseService
 │   ├── vm_service.rs
 │   └── worker_pool_service.rs  # pool workers list / add / remove
 ├── network/            # API layer (modularized)
 │   ├── mod.rs
-│   └── api/            # REST modules (examples; see src/network/api/*.rs)
+│   └── api/            # REST modules (see src/network/api/*.rs)
 │       ├── mod.rs
 │       ├── admin.rs            # GET /admin/overview
-│       ├── system.rs
+│       ├── system.rs           # JSON endpoints; HTML status — system_status_html.rs
+│       ├── system_status_html.rs
 │       ├── workers.rs
 │       ├── vm.rs
-│       ├── raid.rs
+│       ├── raid.rs             # + raid_http.rs (спільні JSON-помилки RAID)
+│       ├── raid_http.rs
 │       ├── libraries.rs
 │       ├── users.rs
 │       ├── rewards.rs
+│       ├── ui.rs               # REST /ui/* (merge в /api/v1), делегує в UiService
 │       └── common.rs
 └── ui/                 # Presentation layer (modularized)
     ├── mod.rs

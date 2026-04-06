@@ -22,8 +22,8 @@
 
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
-| **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
-| **2** | **Priority 2** | Сервіси **`RaidService`**, **`VmService`**, **`LibraryService`**, enterprise/cloud/admin — у проді; REST `/raid/*` через **`RaidService`**; HTTP-мапінг помилок RAID — **`network/api/raid_http.rs`**. **`network/api/ui.rs`** + **`UiService`**, дашборди через **`EnterpriseService`** — зроблено. **Наступний інкремент:** уточнити залишкові «товсті» handlers / довести критерії P2 (миграція логіки, залежності сервісів лише з `ApiContext`). HTML для **`GET /status`** винесено в **`network/api/system_status_html.rs`** ( **`SystemService`** лишається без розмітки). |
+| **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
+| **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **Наступний інкремент:** зменшити обсяг **`enterprise_api.rs`** (агрегатор) або винести групи маршрутів; дрібні edge cases міграції з handlers у сервіси за потреби. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅. Далі: **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; **P4** / SIMD за потреби. |
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
@@ -42,7 +42,7 @@
 - [x] Створити структурований `AppState` / `ApiContext`:
   - [x] Окремий модуль `src/core/state.rs` з `AppState`.
   - [x] Ввести alias `ApiContext = Arc<AppState>` для HTTP та сервісного шару.
-- [ ] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст:
+- [x] Замінити розрізнаний доступ до синглтонів на інʼєкцію через цей контекст (для **HTTP**):
   - [x] Протягнути `ApiContext` у `network::start_server` і підʼєднати до `Router` як state.
   - [x] В HTTP‑шарі приймати `ApiContext` замість глобалів — **зроблено** для основного REST (`src/network/api/*` + enterprise + WS). **`api_legacy.rs` прибрано** (не використовувався). **`discovery.rs`**: метрики на announce через **`Option<Arc<RwLock<InstanceManager>>>`**, передається з `AppState::instance_manager` у `start_server` (після `attach_core_http_singletons` у `main`). Деталі вже реалізованого:
     - `UserManager`, `oauth2_pending_states`, `discovery` slot, `ws_manager`.
@@ -56,7 +56,7 @@
   - [x] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` — посилання на цей план.
 
 **Критерії готовності**:
-- [ ] Всі публічні HTTP‑handler’и отримують залежності через `AppState/ApiContext`.
+- [x] Усі публічні HTTP‑handler’и в `src/network/` отримують доменні залежності через `State<ApiContext>` / `Router<ApiContext>` + `with_state` (без прямих викликів `get_global_*` у мережевому шарі).
 - [x] Інтеграційні тести можуть підняти HTTP-стек (Axum `Router` + `create_api_routes`) із тестовим `AppState` без ініціалізації модульних globals — див. **`tests/appstate_http_injection_integration.rs`** (`--features test-utils`; у CI поряд з `ml,enterprise,cloud`).
 
 ---
@@ -76,19 +76,19 @@
   - [x] `enterprise_service.rs`: multi‑tenancy, audit, monitoring, security (OAuth2/SAML/policies + OAuth/SAML старт і callback-виклики до `SecurityManager` через сервіс) — HTTP → `EnterpriseService` ✅.
   - [x] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором (див. `AppState::cloud_manager`, `services/cloud_service.rs`).
   - [x] `admin_service.rs`: агрегація даних для адмін‑панелі (`GET /api/v1/admin/overview`, дашборд `/ui/admin`).
-- [ ] Поступово мігрувати логіку з `network/api/*.rs` у відповідні сервіси:
-  - [x] Приклади тонких шарів: **`ui.rs`** → **`UiService`** + **`EnterpriseService`** (дашборди); **`system.rs`** — JSON через **`SystemService`**, HTML **`/status`** у **`system_status_html.rs`**.
-  - [ ] Handler’и роблять мінімум: екстрактують вхідні дані, викликають метод сервісу, маплять результат у HTTP‑відповідь.
+- [x] Поступово мігрувати логіку з `network/api/*.rs` у відповідні сервіси (**основні домени** покриті; точкові розширення — за потреби):
+  - [x] Приклади тонких шарів: **`ui.rs`** → **`UiService`** + **`EnterpriseService`** (дашборди); **`system.rs`** — JSON через **`SystemService`**, HTML **`/status`** у **`system_status_html.rs`**; raid/vm/libraries/workers/… — відповідні **`services/*`**.
+  - [x] Handler’и в **`api/*.rs`** (крім великого агрегатора **`enterprise_api.rs`**) — переважно парсинг + виклик сервісу + HTTP‑мапінг.
   - [x] Спільний HTTP-мапінг помилок для **`/raid/*`** винесено в **`src/network/api/raid_http.rs`** (тонкий **`raid.rs`**).
-  - [ ] Сервіси отримують залежності через `AppState/ApiContext`.
-- [ ] Додати короткий опис service‑шару в:
+  - [x] Сервіси отримують залежності через параметр **`&ApiContext`** (або дані з нього), без глобалів у **`src/services/*.rs`** поза задокументованими винятками.
+- [x] Додати короткий опис service‑шару в:
   - [x] `docs/ARCHITECTURE_BEST_PRACTICES.md` (дерево `src/services/`),
   - [x] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план).
 
 **Критерії готовності**:
-- [ ] Кожен основний домен (RAID, VM, Cloud, Enterprise, Admin) має сервісний модуль.
-- [ ] Handler‑файли читабельні як thin‑контролери (без складної бізнес‑логіки).
-- [ ] Сервіси можна тестувати окремо від HTTP‑шару.
+- [x] Кожен основний домен має сервісний модуль у `src/services/`: RAID (+ distributed protocol), VM, Cloud, Enterprise, Admin, System, **UI** (`UiService`), Library, Instance, Chat completions, Discovery, Topology, Workers, Rewards.
+- [ ] **`enterprise_api.rs`** залишається великим файлом маршрутів — для майбутнього розбиття за доменами HTTP; інші **`api/*.rs`** — тонкі.
+- [x] Сервіси можна викликати з тестів окремо від Axum (юніт‑тести в `services/*` та інтеграція з `test-utils`).
 
 ---
 
@@ -125,7 +125,7 @@
 - [x] Базова конверсія в HTTP JSON у `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; RBAC — `AppError::Forbidden` + `api_error_response`.
 - [x] Покрити **основний** публічний REST узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }`: `src/network/api/*` (у т.ч. `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`), **повний** `enterprise_api.rs` (+ попередні модулі з попередніх комітів).
 - [x] **`src/network/auth.rs`** (логін, middleware) — `api_json_error` + `ErrorContext` (узгоджено з `json_errors.rs`).
-- [ ] За потреби спростити handler’и до `Result<T, AppError>` там, де ще ручні tuple‑відповіді.
+- [ ] За потреби спростити окремі handler’и до `Result<T, AppError>` + спільний мапінг у `IntoResponse` (зараз узгоджено через **`api_json_error`** / **`api_error_response`** — зміна не критична для релізу).
 
 **Критерії готовності**:
 - [x] Усі **основні** HTTP‑модулі в `network/api/` та enterprise router використовують `api_json_error` / `api_error_response` / `ErrorContext` для помилок.

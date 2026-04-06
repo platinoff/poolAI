@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (кроки 1–12; таксономія `docs/STRUCTURE.md`; ML integration tests під `required-features`; P2b wire harness)  
+**Оновлено:** 2026-04-07 (кроки 1–12; NEXT_STEPS: P1 HTTP→`ApiContext` ✅, P2 сервіси/критерії синхронізовані; залишок — розбиття `enterprise_api.rs`, P4 стенд)  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -43,7 +43,7 @@
 ## 4. Наступні кроки за тим самим планом
 
 1. **P4 (наступний горизонт)** — на **референс-машині**: повні прогони Criterion (усі чотири bench) та **`wrk`** на `/api/v1/health`; оновити таблицю baseline у `BENCHMARKS.md` під мітку хоста. **CI** вже є: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + неділя 06:00 UTC, артефакт `criterion-report`). `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
-2. **P2** — REST `/raid/*` через **`RaidService`**; RAID JSON-помилки — **`raid_http.rs`**. **`network/api/ui.rs`** тонкий: **`UiService`** + **`EnterpriseService`** для дашбордів. Distributed wire — **`RaidDistributedProtocolService`** + **`raid_distributed_handlers`**. **`POST /v1/chat/completions`** — **`ChatCompletionService`**. **`/api/v1/status`** (HTML) — розмітка в **`network/api/system_status_html.rs`**; JSON та інші системні точки — **`SystemService`** у **`system.rs`**. **`/api/v1/discovery/*`** — **`DiscoveryService`**; topology / workers / rewards — **`TopologyService`**, **`WorkerPoolService`**, **`RewardsService`** + **`AppState::rewards_engine`**. Далі за P2: довести критерії (усі handlers мінімальні; сервіси лише з `ApiContext`).
+2. **P2** — основний обсяг закритий (див. чекліст у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)): сервіси з **`&ApiContext`**, тонкі **`api/*.rs`**, **`ui_service`**, **`system_status_html`**. **Наступний шматок:** розбити або згрупувати **`enterprise_api.rs`** (багато маршрутів у одному файлі); optionals — дрібні переноси логіки з handlers.
 3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; in-tree harness: **`tests/distributed_raid_wire_integration.rs`** (`--features test-utils`, з `ml` — перевірка TQ01 vs raw на розмірі JSON); далі — повні заміри по мережі на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги control-plane).
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
 5. **P5** — канонічні та архівні доки + **інвентар TODO у `src/`** (2026‑04-06) зафіксовані в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md); опційно — доробка Azure/GCP під `cloud-sdk`.
