@@ -478,6 +478,35 @@ async fn test_pipeline_with_all_step_types() {
 }
 
 #[tokio::test]
+async fn test_pipeline_turboquant_quantization_step() {
+    let manager = MLPipelineManager::new();
+    let mut cfg = HashMap::new();
+    cfg.insert("turboquant".to_string(), "true".to_string());
+    cfg.insert(
+        "weight_rows".to_string(),
+        "0.1,0.2,0.3;-0.5,1.0,0.0".to_string(),
+    );
+    let steps = vec![PipelineStep {
+        id: "tq".to_string(),
+        step_type: StepType::Quantization,
+        config: cfg,
+        dependencies: vec![],
+    }];
+    let pipeline = manager.create_pipeline("tq1", steps).await.unwrap();
+    manager
+        .execute_pipeline(pipeline.id.as_str())
+        .await
+        .unwrap();
+    let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+    let out = got.step_results.get("tq").unwrap().output.as_ref().unwrap();
+    assert_eq!(out.get("step_kind"), Some(&"turboquant".to_string()));
+    assert!(out.get("bytes_in").is_some());
+    assert!(out.get("bytes_out").is_some());
+    assert!(out.get("target_bits").is_some());
+    assert!(out.get("compression_ratio").is_some());
+}
+
+#[tokio::test]
 async fn test_pipeline_step_config() {
     let manager = MLPipelineManager::new();
 

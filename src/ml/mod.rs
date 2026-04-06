@@ -12,6 +12,7 @@
 pub mod automl;
 pub mod federated;
 pub mod optimization;
+pub mod turboquant;
 
 pub mod experiments;
 pub mod pipeline;

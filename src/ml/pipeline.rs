@@ -45,6 +45,7 @@ use crate::ml::optimization::{
     apply_iterative_pruning, apply_pruning, apply_quantization, profile_model, suggest_hyperparams,
     OptimizationProfile, PruningConfig, PruningStrategy, QuantizationLevel, TuningConfig,
 };
+use crate::ml::turboquant;
 use crate::ml::versioning::{ModelMetadata, ModelVersionManager};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -605,6 +606,10 @@ impl MLPipelineManager {
 
     fn execute_quantization_step(step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
         let cfg = &step.config;
+        if Self::turboquant_enabled(cfg) {
+            return Self::execute_turboquant_quantization_step(step);
+        }
+
         let level = Self::parse_quantization_level(
             cfg.get("quantization")
                 .or_else(|| cfg.get("quantization_level"))
@@ -652,6 +657,122 @@ impl MLPipelineManager {
             "compression_ratio".to_string(),
             format!("{:.6}", q.compression_ratio),
         );
+        Ok(output)
+    }
+
+    fn turboquant_enabled(cfg: &HashMap<String, String>) -> bool {
+        if cfg
+            .get("quantization")
+            .is_some_and(|s| s.eq_ignore_ascii_case("turboquant"))
+        {
+            return true;
+        }
+        cfg.get("turboquant")
+            .or_else(|| cfg.get("use_turboquant"))
+            .is_some_and(|s| matches!(s.to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+    }
+
+    fn parse_turboquant_weights(cfg: &HashMap<String, String>) -> Result<Vec<f32>, AppError> {
+        if let Some(raw) = cfg.get("weights") {
+            let v: Vec<f32> = raw
+                .split(',')
+                .filter_map(|t| t.trim().parse::<f32>().ok())
+                .collect();
+            if !v.is_empty() {
+                return Ok(v);
+            }
+        }
+        Ok(vec![1.0, -0.5, 0.25, 2.0, -1.0, 0.0, 0.75, -0.25])
+    }
+
+    fn turboquant_rows_from_config(
+        cfg: &HashMap<String, String>,
+    ) -> Result<Vec<Vec<f32>>, AppError> {
+        if let Some(raw) = cfg.get("weight_rows") {
+            let rows: Vec<Vec<f32>> = raw
+                .split(';')
+                .map(|row| {
+                    row.split(',')
+                        .filter_map(|x| x.trim().parse::<f32>().ok())
+                        .collect::<Vec<f32>>()
+                })
+                .filter(|r| !r.is_empty())
+                .collect();
+            if rows.is_empty() {
+                return Err(AppError::ModelError(
+                    "TurboQuant step: weight_rows produced no rows. Suggestion: use `1,2;3,4`."
+                        .to_string(),
+                ));
+            }
+            let d0 = rows[0].len();
+            if d0 == 0 {
+                return Err(AppError::ModelError(
+                    "TurboQuant step: empty row in weight_rows.".to_string(),
+                ));
+            }
+            if rows.iter().any(|r| r.len() != d0) {
+                return Err(AppError::ModelError(
+                    "TurboQuant step: all weight_rows rows must have the same length.".to_string(),
+                ));
+            }
+            return Ok(rows);
+        }
+
+        let flat = Self::parse_turboquant_weights(cfg)?;
+        let n = flat.len();
+        let cols: usize = cfg
+            .get("turboquant_cols")
+            .or_else(|| cfg.get("cols"))
+            .and_then(|s| s.parse::<usize>().ok())
+            .filter(|&c| c > 0)
+            .unwrap_or_else(|| if n >= 4 { 4 } else { n.max(1) });
+
+        if n % cols != 0 {
+            return Err(AppError::ModelError(format!(
+                "TurboQuant: weights length {n} not divisible by turboquant_cols {cols}. \
+                 Suggestion: adjust weights or turboquant_cols."
+            )));
+        }
+        Ok(flat.chunks(cols).map(|c| c.to_vec()).collect())
+    }
+
+    fn execute_turboquant_quantization_step(
+        step: &PipelineStep,
+    ) -> Result<HashMap<String, String>, AppError> {
+        let rows = Self::turboquant_rows_from_config(&step.config)?;
+        let pack = turboquant::pack_uniform_rows(&rows).map_err(|e| {
+            AppError::ModelError(format!(
+                "TurboQuant pack failed: {}. Suggestion: check weight_rows / weights / turboquant_cols.",
+                e
+            ))
+        })?;
+        let back = turboquant::unpack_to_rows(&pack.bytes)
+            .map_err(|e| AppError::ModelError(format!("TurboQuant internal unpack failed: {e}")))?;
+
+        let mut max_err: f32 = 0.0;
+        for (r0, r1) in rows.iter().zip(&back) {
+            for (a, b) in r0.iter().zip(r1) {
+                max_err = max_err.max((a - b).abs());
+            }
+        }
+
+        let ratio = if pack.bytes_out == 0 {
+            1.0
+        } else {
+            pack.bytes_in as f64 / pack.bytes_out as f64
+        };
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "turboquant".to_string());
+        output.insert("bytes_in".to_string(), pack.bytes_in.to_string());
+        output.insert("bytes_out".to_string(), pack.bytes_out.to_string());
+        output.insert("target_bits".to_string(), pack.target_bits.to_string());
+        output.insert("compression_ratio".to_string(), format!("{:.6}", ratio));
+        output.insert("rows".to_string(), pack.rows.to_string());
+        output.insert("cols".to_string(), pack.cols.to_string());
+        output.insert("max_abs_recon_error".to_string(), format!("{:.6}", max_err));
         Ok(output)
     }
 
