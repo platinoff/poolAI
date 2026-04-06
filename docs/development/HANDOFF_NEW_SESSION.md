@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-07 (кроки 1–12; P4 — Criterion baseline + **`poolai_health_load`**; канонічні README/INDEX/STRUCTURE/digest узгоджені з `BENCHMARKS.md`)  
+**Оновлено:** 2026-04-06 (кроки 1–12; P3 — `IntoResponse` / `HttpAppError`, часткова міграція **`rewards.rs`**; P4 — **`poolai_health_load --json`**; зведення наступних кроків у **`FUNCTION_MANAGEMENT.md` §5.1**)  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -15,14 +15,14 @@
 | 4 | **Цей файл** — [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md): гілка, git-push, зріз P2/P3, next steps. |
 | 5 | Концепція: [`concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt), Grid/Memory/Job у `docs/concept/` та [`JOB_LAYER_CONCEPT_2026-03-17.md`](./JOB_LAYER_CONCEPT_2026-03-17.md). |
 | 6 | Архітектура: [`ARCHITECTURE_REVIEW.md`](../ARCHITECTURE_REVIEW.md), [`ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md). |
-| 7 | Продуктивність: [`performance/BENCHMARKS.md`](../performance/BENCHMARKS.md), [`performance/PROFILING.md`](../performance/PROFILING.md); опційно [`benchmarks.yml`](../../.github/workflows/benchmarks.yml). |
+| 7 | Продуктивність: [`performance/BENCHMARKS.md`](../performance/BENCHMARKS.md), [`performance/PROFILING.md`](../performance/PROFILING.md); **`poolai_health_load --json`** для baseline; опційно [`benchmarks.yml`](../../.github/workflows/benchmarks.yml). |
 | 8 | CI: [`ci.yml`](../../.github/workflows/ci.yml). |
 | 9 | Інвентар: [`file_list.csv`](../../file_list.csv) (оновлюй також `docs/catalog/` при зміні витягу); повний список: `git ls-files`. |
 | 10 | Git push (Windows): [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md). |
 | 11 | Витяг функціоналу: [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). |
-| 12 | Керування функціоналом: [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); правило [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc). |
+| 12 | Керування функціоналом: [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) (**§5.1 — наступні кроки за FM-***); правило [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc). |
 
-Індекс планів у `docs/development/`: [`README.md`](./README.md). **Таксономія каталогу `docs/`:** [`../STRUCTURE.md`](../STRUCTURE.md). OpenAPI: [`docs/openapi.yaml`](../openapi.yaml). UI↔API: [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md). **Крок 11 / витяг функціоналу:** [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). **Крок 12 / беклог:** [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md). **Project skill (Cursor):** [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
+Індекс планів у `docs/development/`: [`README.md`](./README.md). **Таксономія каталогу `docs/`:** [`../STRUCTURE.md`](../STRUCTURE.md). OpenAPI: [`docs/openapi.yaml`](../openapi.yaml). UI↔API: [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md). **Крок 11 / витяг функціоналу:** [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). **Крок 12 / беклог:** [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) (**§5.1** — наступні кроки за FM-*). **Project skill (Cursor):** [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
 
 ## 2. Git push (Windows / Cursor)
 
@@ -37,17 +37,17 @@
 - **ML pipeline (Stage 4.4)**: детерміновані Rust-бекенди для `Preprocessing`, `Training`, `Evaluation`, `Deployment` (`src/ml/pipeline.rs`).
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
 - **Priority 3 (основний HTTP-шар)**: `src/network/api/common.rs` — `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext` (+ `hint`). Узгоджені відповіді: **`raid_http.rs`** + **`raid.rs`** (мапінг `RaidServiceError` та спільні RAID JSON-помилки), **`src/network/enterprise_api/`** (хелпер **`enterprise_err`** у **`mod.rs`**), **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`**, раніше — **`ai_ml`**, **instances/libraries/vm/workers/topology/rewards**, tenant CRUD, RAID `Operation` через `api_error_response`.
-- **P3 (auth / WS / rate limit)**: **`auth.rs`**, **`ws.rs`** (upgrade + payload помилок), **`rate_limit.rs`** — узгоджено з **`api_json_error`** / **`ErrorContext`** (`src/network/json_errors.rs`); UI читає `error.message`.
+- **P3 (auth / WS / rate limit)**: **`auth.rs`**, **`ws.rs`** (upgrade + payload помилок), **`rate_limit.rs`** — узгоджено з **`api_json_error`** / **`ErrorContext`** (`src/network/json_errors.rs`); UI читає `error.message`. Додатково: **`http_status_for_app_error`** (евристики **`ResourceError`** / **`IoError`**), **`IntoResponse`** для **`AppError`** та **`HttpAppError`**; приклад **`Result<Json<_>, AppError>`** — **`src/network/api/rewards.rs`** (чотири GET; progress лишається з **`NOT_FOUND`**).
 - **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud,test-utils` (інжектований `AppState`: **`tests/appstate_http_injection_integration.rs`** поряд з **`distributed_raid_wire_integration`**). На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
 
-## 4. Наступні кроки за тим самим планом
+## 4. Наступні кроки (канон: FM-* + Architect)
 
-1. **P4** — у `BENCHMARKS.md` зафіксовано short Criterion для **`turboquant_benchmarks`**, **`runtime_benchmarks`**, **`service_layer_benchmarks`** і **`cloud_benchmarks`** (`K8S_OPENAPI_ENABLED_VERSION=1.28`) під мітками **win-msvc-*-bench-opt0-2026-04-06** (профіль **`bench`** / MSVC workaround). HTTP health: in-tree **`poolai_health_load`** (`cargo run --release --bin poolai_health_load -- …`); за бажанням **`wrk`** на реф-хості. **CI**: `.github/workflows/benchmarks.yml`. `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
-2. **P2** — сервіси з **`&ApiContext`**, тонкі **`api/*.rs`**, **`ui_service`**, **`system_status_html`**, **`enterprise_api/`** (підмодулі). Optionals — дрібні переноси логіки з handlers; далі за планом — P4 стенд.
-3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; in-tree harness: **`tests/distributed_raid_wire_integration.rs`** (`--features test-utils`, з `ml` — перевірка TQ01 vs raw на розмірі JSON); далі — повні заміри по мережі на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги control-plane).
-4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
-5. **P5** — канонічні та архівні доки + **інвентар TODO у `src/`** (2026‑04-06) зафіксовані в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md); опційно — доробка Azure/GCP під `cloud-sdk`.
+**Єдине зведення порядку робіт** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця FM-003 → FM-010). Коротко:
 
-6. **P6** — концепти **Grid Protocol** [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](./GRID_PROTOCOL_CONCEPT_2026-04-06.md) та **Solana adapter** [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](./SOLANA_ADAPTER_CONCEPT_2026-04-06.md); далі — прототип on-chain і Grid wire envelope.
+1. **Baseline / стенд (FM-003, P4, P2b)** — Criterion на реф-хості; **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md); LAN — повні заміри реплікації + TQ01.
+2. **HTTP (FM-005, Partial)** — розширити **`Result<Json<_>, AppError>`**; де потрібен стабільний **`error.code`** — не ламати контракт без рішення.
+3. **Distributed RAID (FM-007, FM-008)** — sync і leave-cluster без заглушок.
+4. **Ops (FM-011)** — `cargo test --all-features` на Windows за потреби.
+5. **Deferred** — **cloud-sdk** (FM-006), SIMD TurboQuant (FM-004); **концепт** — Grid envelope (FM-009), Solana (FM-010).
 
-Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).
+Деталі, чекбокси Architect і верифікації — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md). Індекс тікетів — таблиця **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).

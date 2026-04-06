@@ -14,10 +14,12 @@ use axum::{
     Json, Router,
 };
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::network::api::common::api_json_error;
+use crate::rewards::Reward;
 use crate::services::rewards_service::{RewardsService, TOP_USERS_DEFAULT_LIMIT};
+use std::collections::HashMap;
 
 /// Create rewards system routes
 pub fn create_rewards_routes() -> Router<ApiContext> {
@@ -29,17 +31,17 @@ pub fn create_rewards_routes() -> Router<ApiContext> {
         .route("/rewards/top", get(top_users_handler))
 }
 
-async fn rewards_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let rewards = RewardsService::reward_statistics(&ctx).await;
-    Json(rewards).into_response()
+async fn rewards_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<HashMap<String, f64>>, AppError> {
+    Ok(Json(RewardsService::reward_statistics(&ctx).await))
 }
 
 async fn user_rewards_handler(
     State(ctx): State<ApiContext>,
     Path(user_id): Path<String>,
-) -> impl IntoResponse {
-    let rewards = RewardsService::user_rewards(&ctx, &user_id).await;
-    Json(rewards).into_response()
+) -> Result<Json<Vec<Reward>>, AppError> {
+    Ok(Json(RewardsService::user_rewards(&ctx, &user_id).await))
 }
 
 async fn user_progress_handler(
@@ -60,12 +62,16 @@ async fn user_progress_handler(
     }
 }
 
-async fn rewards_statistics_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let stats = RewardsService::reward_statistics(&ctx).await;
-    Json(stats).into_response()
+async fn rewards_statistics_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<HashMap<String, f64>>, AppError> {
+    Ok(Json(RewardsService::reward_statistics(&ctx).await))
 }
 
-async fn top_users_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let top_users = RewardsService::top_users(&ctx, TOP_USERS_DEFAULT_LIMIT).await;
-    Json(top_users).into_response()
+async fn top_users_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<Vec<(String, f64)>>, AppError> {
+    Ok(Json(
+        RewardsService::top_users(&ctx, TOP_USERS_DEFAULT_LIMIT).await,
+    ))
 }

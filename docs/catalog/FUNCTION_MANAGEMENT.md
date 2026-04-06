@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-06  
+**Оновлено:** 2026-04-06 (зведення наступних кроків — **§5.1**)  
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -92,13 +92,28 @@ FM-xxx (з таблиці нижче)
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Partial / Planned | NEXT_STEPS P2 |
 | FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned | NEXT_STEPS P2b, `BENCHMARKS.md` |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
-| FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` де лишились ручні tuple-відповіді | Planned | NEXT_STEPS P3 |
+| FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` / `HttpAppError` де доречно (без зміни стабільних `error.code`) | Partial | NEXT_STEPS P3; приклад **`src/network/api/rewards.rs`** (чотири GET → `Result<Json<_>, AppError>`); **`/rewards/progress/*`** — `api_json_error` (`NOT_FOUND`) |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
 | FM-007 | Distributed RAID | Реальний sync артефактів (порівняння з віддаленим вузлом), не лише `synced_count` | Partial | `raid_distributed_handlers`, коментарі в коді |
 | FM-008 | Distributed RAID | LeaveCluster: graceful replication + оновлення membership (зараз stub) | Partial | `leave_cluster_handler`, GRID_PROTOCOL |
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
 | FM-011 | Ops | Стабілізація `cargo test --all-features` на Windows (GNU / розбиття тестів) | Planned | NEXT_STEPS (опційно паралельно) |
+
+### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
+
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри реплікації + TQ01 на стенді (P2b/P4); опційно **cloud-sdk** (Azure/GCP). Усе інше в таблиці FM-* нижче — дорожня карта без обов’язкового чекбокса.
+
+| Порядок | Фокус | FM / план | Дія |
+|--------|--------|-----------|-----|
+| 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
+| 2 | HTTP-шар | **FM-005** (Partial) | Розширити **`Result<Json<_>, AppError>`** на інші «прості» GET; де потрібен фіксований **`error.code`** — лишати **`api_json_error`** / **`api_error_response`** або погодити розширення **`AppError`**. |
+| 3 | Distributed RAID | **FM-007**, **FM-008** | Реальний sync артефактів; **LeaveCluster** без заглушки (membership / replication). |
+| 4 | Ops | **FM-011** | `cargo test --all-features` на Windows (GNU, `-j 1`) або дроблення тестів. |
+| 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
+| 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
+
+**Канонічний порядок читання доків** (кроки 1–12) — кореневий [`README.md`](../../README.md); цей файл — **крок 12**.
 
 Нові рядки додавати **вниз таблиці** з наступним вільним `FM-0xx`; дублікати з Issues закривати посиланням на PR.
 
@@ -122,8 +137,8 @@ git log -S "PutArtifact" --oneline -n 20 -- src/
 
 ## 7. Підтримка цього файлу
 
-- Оновлювати **дату** у шапці та таблицю **FM-*** після значних змін плану Architect або релізу.
-- Не дублювати довгі чеклисти з `NEXT_STEPS` — лише **посилання + агреговані тікети**.
+- Оновлювати **дату** у шапці, таблицю **FM-*** і **§5.1** після значних змін плану Architect, витягу функціоналу або релізу.
+- **§5.1** — коротка агрегація; довгі чекбокси й верифікації лишаються в `NEXT_STEPS`; HANDOFF посилається на **§5.1** як на операційний порядок.
 - Правило для Cursor: [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc).
 
 ---

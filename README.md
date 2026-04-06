@@ -64,6 +64,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **UI / UX:** [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - За потреби: `cargo test --all-features` на Windows (GNU, `-j 1`).
 - **Документація:** таксономія каталогу — [`docs/STRUCTURE.md`](docs/STRUCTURE.md); опційно — інкрементально переносити застарілі плоскі `docs/*.md` у [`docs/archive/`](docs/archive/).
+- **Наступні кроки за індексом функціоналу (FM-*):** [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) — **§5.1** (пріоритезована таблиця; деталі Architect — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)).
 - **Канонічний план:** [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md) · **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 
 ### 🚀 Development Roadmap

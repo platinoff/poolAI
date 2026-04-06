@@ -25,12 +25,14 @@
 | **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
 | **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **`network/enterprise_api/`** ( **`mod.rs`** + tenants / audit / monitoring / security / oauth / saml) — розбито з моноліту. Дрібні edge cases міграції handlers → сервіси за потреби. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅ + **портативний fast-path** (`turboquant.rs`: pack/unpack/`dot_f32`). Далі: повні заміри по мережі на стенді (чекбокс нижче). |
-| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`**, **`rate_limit.rs`**. **`http_status_for_app_error`** + **`IntoResponse`** для **`AppError`** / **`HttpAppError`** (`json_errors`, реекспорт у **`api::common`**) — 2026-04-06. |
+| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`**, **`rate_limit.rs`**. **`http_status_for_app_error`** + **`IntoResponse`**; поступово **`Result<Json<_>, AppError>`** (приклад **`api/rewards.rs`**, 2026-04-06). |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (Criterion тощо); **`poolai_health_load`** з **`--json`** на stdout для baseline / ref-хост (2026-04-06). Далі вручну: рядки таблиці **`BENCHMARKS.md`**, LAN P2b на стенді. |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
 
 *Опційно паралельно з 1–2*: стабілізація `cargo test --all-features` на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
+
+**Зведення наступних кроків за індексом функціоналу (FM-*)** — один порядок дій: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) → **§5.1**.
 
 ---
 
@@ -125,7 +127,7 @@
 - [x] Базова конверсія в HTTP JSON у `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; RBAC — `AppError::Forbidden` + `api_error_response`.
 - [x] Покрити **основний** публічний REST узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }`: `src/network/api/*` (у т.ч. `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`), **`src/network/enterprise_api/`** (+ попередні модулі з попередніх комітів).
 - [x] **`src/network/auth.rs`** (логін, middleware) — `api_json_error` + `ErrorContext` (узгоджено з `json_errors.rs`).
-- [x] Спільний мапінг у Axum **`IntoResponse`**: **`AppError`** та обгортка **`HttpAppError`** (`context` / `status_override`) у [`src/network/json_errors.rs`](../../src/network/json_errors.rs); реекспорт **`HttpAppError`** у **`network::api::common`**. Handler’и можуть поступово перейти на `Result<T, AppError>` / `Result<T, HttpAppError>` замість ручного **`api_error_response`** де доречно.
+- [x] Спільний мапінг у Axum **`IntoResponse`**: **`AppError`** та обгортка **`HttpAppError`** (`context` / `status_override`) у [`src/network/json_errors.rs`](../../src/network/json_errors.rs); реекспорт **`HttpAppError`** у **`network::api::common`**. Handler’и можуть поступово перейти на `Result<T, AppError>` / `Result<T, HttpAppError>` замість ручного **`api_error_response`** де доречно. Приклад: **`network/api/rewards.rs`** — **`Result<Json<_>, AppError>`** для **`GET /rewards`**, **`/rewards/statistics`**, **`/rewards/top`**, **`/rewards/{user_id}`**; **`/rewards/progress/{user_id}`** лишається з **`api_json_error`** (`NOT_FOUND`) для стабільного коду помилки.
 
 **Критерії готовності**:
 - [x] Усі **основні** HTTP‑модулі в `network/api/` та enterprise router використовують `api_json_error` / `api_error_response` / `ErrorContext` для помилок.
@@ -420,4 +422,14 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Код**: [`src/bin/poolai_health_load.rs`](../../src/bin/poolai_health_load.rs) — прапорець **`--json`**: один pretty-printed JSON на **stdout** (`rps_ok_only`, перцентилі, `total_ok_exceeds_sample`, …); людський вивід лишається на **stderr**. **`parse_cli_args`** + юніт-тести в тому ж файлі (`cargo test -p poolai --bin poolai_health_load`).
 - **Доки**: [`docs/performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — секція in-tree load tool + рядок *Changelog*.
+
+## Верифікація 2026-04-06 (P3 — `rewards.rs` і `Result<Json<_>, AppError>`)
+
+- **Код**: [`src/network/api/rewards.rs`](../../src/network/api/rewards.rs) — чотири GET повертають **`Result<Json<_>, AppError>`** (успіх завжди **`Ok`**); **`user_progress_handler`** без зміни контракту **`NOT_FOUND`** / **`api_json_error`**.
+- **Тести**: `cargo test -p poolai --test network_api_integration test_rewards_endpoint_exists` — ok.
+
+## Верифікація 2026-04-06 (доки — порядок «наступних кроків» за FM-*)
+
+- **Канон**: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** — пріоритезована таблиця (FM-003 … FM-010); оновлено **FM-005** (Partial, `rewards.rs`).
+- **Узгоджено**: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4, кореневий [`README.md`](../../README.md) (*Next Focus*), [`docs/README.md`](../README.md) (крок 12, Short pointers), [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (посилання після таблиці пріоритетів), [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc), [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
 

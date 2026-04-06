@@ -23,7 +23,7 @@ description: >-
 9. `file_list.csv` (оновлюй також після змін у `docs/catalog/`, `.cursor/skills/`)
 10. `.cursor/commands/git-push.md`
 11. **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** — витяг функціоналу
-12. **`docs/catalog/FUNCTION_MANAGEMENT.md`** — керування функціоналом, прогалини, тікети `FM-*`; правило **`.cursor/rules/functionality-management.mdc`**
+12. **`docs/catalog/FUNCTION_MANAGEMENT.md`** — керування функціоналом, тікети `FM-*`, **§5.1** (наступні кроки); правило **`.cursor/rules/functionality-management.mdc`**
 
 ## Витяг функціоналу (крок 11)
 
@@ -33,8 +33,8 @@ description: >-
 
 ## Керування функціоналом (крок 12)
 
-- Файл: `docs/catalog/FUNCTION_MANAGEMENT.md` — звірка з **STABLE_STATE**, таблиця **FM-***, шаблон тікета для розробки.
-- Після зміни **NEXT_STEPS** або великого релізу — онови дату та релевантні рядки `FM-*`.
+- Файл: `docs/catalog/FUNCTION_MANAGEMENT.md` — звірка з **STABLE_STATE**, таблиця **FM-***, **§5.1** — єдиний пріоритезований список наступних кроків (узгоджено з Architect-планом); шаблон тікета для розробки.
+- Після зміни **NEXT_STEPS** або великого релізу — онови дату, **§5.1** та релевантні рядки `FM-*`.
 
 ## Правила для агента
 
