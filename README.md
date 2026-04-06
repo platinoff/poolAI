@@ -72,7 +72,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus
 - **Priority 3 (добивання)**: **`auth.rs`** — відповіді логіну / middleware досі з плоским `"error": string`; за потреби узгодити з `api_json_error` і не зламати клієнтів UI. Опційно: уточнити мапінг `AppError` → HTTP (`ResourceError`, not-found) у `http_status_for_app_error`.
-- **Priority 4**: бенчмарки та профілювання hot-path (див. `docs/performance/BENCHMARKS.md`, `NEXT_STEPS_ARCHITECT_2026-03-17.md`).
+- **Priority 4**: бенчмарки та профілювання hot-path — `cargo bench -j 1 --bench runtime_benchmarks`, `cargo bench -j 1 --bench turboquant_benchmarks --features ml`; деталі в `docs/performance/BENCHMARKS.md`, `PROFILING.md`.
 - **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot, …) у `RaidService`.
 - **Priority 2b**: чекбокси TurboQuant у архітектурному плані (код уже в дереві — оновити доки/критерії «готово»).
 - За потреби: стабілізувати `cargo test --all-features` на Windows.

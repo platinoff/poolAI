@@ -29,15 +29,14 @@
 - **ML pipeline (Stage 4.4)**: детерміновані Rust-бекенди для `Preprocessing`, `Training`, `Evaluation`, `Deployment` (`src/ml/pipeline.rs`).
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
 - **Priority 3 (основний HTTP-шар)**: `src/network/api/common.rs` — `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext` (+ `hint`). Узгоджені відповіді: **`raid.rs`** (у т.ч. `raid_api_err`, `raid_event_store_unavailable`), **повний** **`enterprise_api.rs`** (хелпер **`enterprise_err`**), **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`**, раніше — **`ai_ml`**, **instances/libraries/vm/workers/topology/rewards**, tenant CRUD, RAID `Operation` через `api_error_response`.
-- **P3 залишок**: **`src/network/auth.rs`** — логін і middleware ще повертають legacy JSON з плоским ключем `error`; за бажанням вирівняти під той самий шейп, перевірити UI/тести.
+- **P3 (auth)**: **`src/network/auth.rs`** — узгоджено з **`api_json_error`** / **`ErrorContext`** (модуль **`network/json_errors.rs`**); UI читає `error.message`.
 - **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud`. На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
 
 ## 4. Наступні кроки за тим самим планом
 
-1. **P3** — **`auth.rs`** (опційно) + за потреби мапінг **`ResourceError` / not-found** у `http_status_for_app_error`.
-2. **P4** — бенчмарки / профілювання (`docs/performance/BENCHMARKS.md`).
-3. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
-4. **P2b / доки** — оновити чекбокси TurboQuant у `NEXT_STEPS_ARCHITECT` під фактичний код у `src/ml/turboquant.rs`.
-5. За потреби — `cargo test --all-features` на Windows (GNU / розбиття тестів).
+1. **P4 (продовження)** — мережевий RAID / VM / Cloud / HTTP у Criterion або окремі harness; числові baseline у `BENCHMARKS.md`; опційно CI для `cargo bench`.
+2. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
+3. **P2b / доки** — оновити чекбокси TurboQuant у `NEXT_STEPS_ARCHITECT` під фактичний код у `src/ml/turboquant.rs`.
+4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
 
 Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).

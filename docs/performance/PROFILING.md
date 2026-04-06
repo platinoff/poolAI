@@ -43,11 +43,11 @@ sudo flamegraph -- target/release/poolai
 
 #### Profile benchmarks:
 ```bash
-# Profile specific benchmark
-sudo flamegraph --bench --bench runtime_benchmarks
+# Profile a Criterion bench target (cargo-flamegraph)
+cargo flamegraph --bench runtime_benchmarks
 
-# Profile all benchmarks
-sudo flamegraph --bench
+# With sudo on Linux if required for perf
+sudo cargo flamegraph --bench runtime_benchmarks
 ```
 
 **Output:** `flamegraph.svg` - Interactive SVG flame graph showing CPU usage by function

@@ -7,6 +7,7 @@
 
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use poolai::core::model_interface::{ModelParameters, ModelRequest};
+use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::runtime::{CacheManager, MemoryPool};
 use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::runtime::Runtime;
@@ -205,11 +206,43 @@ fn bench_cache_key_generation(c: &mut Criterion) {
     group.finish();
 }
 
+/// Local RAID: small artifact write (async disk path + manifest update).
+fn bench_raid_local_put(c: &mut Criterion) {
+    let rt = Runtime::new().unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: dir.path().to_path_buf(),
+        quota_bytes: None,
+        retention_days: None,
+        gc_on_startup: false,
+    };
+    let manager = RaidManager::new(config);
+    rt.block_on(async {
+        manager.initialize().await.unwrap();
+    });
+    let payload = vec![0u8; 4096];
+    let mut group = c.benchmark_group("raid_local_put");
+    group.bench_function("put_artifact_4096", |b| {
+        let counter = AtomicU64::new(0);
+        b.to_async(&rt).iter(|| async {
+            let i = counter.fetch_add(1, Ordering::Relaxed);
+            let name = format!("bench_{}", i);
+            let _ = manager
+                .put_artifact(black_box(name.as_str()), black_box(payload.as_slice()))
+                .await;
+        });
+    });
+    group.finish();
+    let _ = rt.block_on(manager.shutdown());
+}
+
 criterion_group!(
     benches,
     bench_memory_pool_acquire_release,
     bench_lru_cache_operations,
     bench_model_request_response,
-    bench_cache_key_generation
+    bench_cache_key_generation,
+    bench_raid_local_put
 );
 criterion_main!(benches);

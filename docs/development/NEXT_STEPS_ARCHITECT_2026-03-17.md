@@ -125,7 +125,7 @@
 
 **Критерії готовності**:
 - [x] Усі **основні** HTTP‑модулі в `network/api/` та enterprise router використовують `api_json_error` / `api_error_response` / `ErrorContext` для помилок.
-- [ ] HTTP‑шар **повністю** узгоджений, коли вирівняно **`auth.rs`** (і за потреби WS/інші точки входу).
+- [x] HTTP‑шар узгоджений з **`auth.rs`** (структуровані помилки); за потреби — WS/інші точки входу.
 - [x] Для шляхів через `api_error_response` / `api_json_error` — структуровані логи (код, контекст, рівень за класом статусу).
 
 ---
@@ -136,19 +136,21 @@
 
 **Кроки**:
 - [ ] Визначити hot‑paths (на базі наявних доків і інтуїції архітектора):
+  - [x] RAID: **локальний** `put_artifact` — Criterion у `benches/runtime_benchmarks.rs` (`raid_local_put`).
   - [ ] RAID: реплікація артефактів, читання/запис через мережу.
   - [ ] VM: запуск/стоп/моніторинг процесів.
   - [ ] Cloud: Kubernetes/Cloud operations (operator, scaling, LB).
   - [ ] API: найбільш часті REST‑ендпоінти (admin dashboard, monitoring, artifacts).
-- [ ] Створити або оновити бенчмарки:
-  - [ ] Додати `benches/` для ключових операцій (RAID, VM, Cloud, API).
-  - [ ] Застосовувати критерій‑бенчмарки чи еквівалентні інструменти.
-- [ ] Зробити оновлення `docs/performance/BENCHMARKS.md`:
-  - [ ] Зафіксувати базові метрики (latency/throughput/P95) до оптимізацій.
+- [x] Створити або оновити бенчмарки (інкремент 2026‑04):
+  - [x] Criterion: `runtime_benchmarks` (memory pool, LRU, model request, cache key, **local RAID put**), `turboquant_benchmarks` (`--features ml`).
+  - [ ] Окремі таргети для VM / Cloud / HTTP (за потреби).
+- [x] Оновити `docs/performance/BENCHMARKS.md` — команди `cargo bench`, групи Criterion, приклад CI; ілюстративні таблиці позначені як неконтрольні CI.
+  - [ ] Зафіксувати **числові** базові метрики (latency/throughput/P95) після прогонів на референс‑хості.
   - [ ] Задокументувати зміни після оптимізацій.
 
 **Критерії готовності**:
-- [ ] Є повторюваний сценарій вимірювання продуктивності (локально і/або в CI).
+- [x] Є повторюваний сценарій **локально**: `cargo bench -j 1 --bench runtime_benchmarks` та `cargo bench -j 1 --bench turboquant_benchmarks --features ml`.
+- [ ] CI‑регресія бенчмарків (опційно) + числові baseline у `BENCHMARKS.md`.
 - [ ] Для основних сценаріїв зафіксовані цільові та фактичні метрики.
 
 ---

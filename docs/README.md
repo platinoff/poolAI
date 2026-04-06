@@ -15,5 +15,6 @@
 ## Short pointers
 
 - **Status / plans** — `status/`, `development/` (see [development/README.md](./development/README.md) for plan index).
-- **Unified API errors (P3)** — основний REST і **`enterprise_api.rs`** / **`raid.rs`** узгоджені: `api_json_error`, `enterprise_err`, `raid_api_err`, … Залишок: **`src/network/auth.rs`** (плоский `error`). Деталі — `development/HANDOFF_NEW_SESSION.md`.
+- **Unified API errors (P3)** — основний REST, **`enterprise_api.rs`**, **`raid.rs`**, **`auth.rs`**: структуровані помилки (`api_json_error`, `ErrorContext`, …). Деталі — `development/HANDOFF_NEW_SESSION.md`.
+- **Benchmarks (P4)** — `docs/performance/BENCHMARKS.md`: Criterion таргети `runtime_benchmarks` (у т.ч. локальний RAID put) та `turboquant_benchmarks` (`--features ml`).
 - **One-off historical notes** — `archive/` (includes former root `PUSH_*.md` files).
