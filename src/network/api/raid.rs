@@ -43,6 +43,21 @@ fn raid_manager_unavailable() -> RaidHttpErr {
 fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
     match e {
         RaidServiceError::ManagerUnavailable => raid_manager_unavailable(),
+        RaidServiceError::ArtifactNotFound { id } => (
+            StatusCode::NOT_FOUND,
+            AxumJson(serde_json::json!({
+                "error": format!(
+                    "Failed to delete artifact. Context: Cannot delete artifact from RAID storage. \
+                    Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. \
+                    Artifact ID: '{}', Error: Artifact {} not found",
+                    id, id
+                )
+            })),
+        ),
+        RaidServiceError::Operation(err) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({ "error": err.to_string() })),
+        ),
     }
 }
 
@@ -74,45 +89,8 @@ struct DeleteArtifactResponse {
 }
 
 #[derive(serde::Serialize)]
-struct RaidQuotaResponse {
-    total_size_bytes: u64,
-    quota_bytes: Option<u64>,
-    usage_percent: Option<f64>,
-    artifact_count: usize,
-}
-
-#[derive(serde::Serialize)]
 struct RaidGcResponse {
     removed_count: usize,
-}
-
-#[derive(serde::Serialize)]
-struct RaidStatusResponse {
-    cluster_status: String, // "healthy", "degraded", "unhealthy"
-    node_count: usize,
-    artifact_count: usize,
-    storage: RaidStorageStatus,
-    mode: String, // "Local", "BurstRaid", "SmallWorld"
-    #[serde(skip_serializing_if = "Option::is_none")]
-    replication_status: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    raft_status: Option<RaftStatus>,
-}
-
-#[derive(serde::Serialize)]
-struct RaidStorageStatus {
-    total_size_bytes: u64,
-    quota_bytes: Option<u64>,
-    usage_percent: Option<f64>,
-    available_bytes: Option<u64>,
-}
-
-#[derive(serde::Serialize)]
-struct RaftStatus {
-    role: String, // "leader", "follower", "candidate"
-    term: u64,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    leader_id: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -273,13 +251,8 @@ async fn raid_artifact_create_handler(
             .into_response();
     }
 
-    // Create artifact
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let data_size = data.len();
-    match manager.put_artifact(&payload.name, &data).await {
+    match RaidService::put_artifact(&ctx, &payload.name, &data).await {
         Ok(artifact) => {
             let response = CreateArtifactResponse {
                 artifact_id: artifact.id.to_string(),
@@ -289,7 +262,15 @@ async fn raid_artifact_create_handler(
             };
             (StatusCode::CREATED, AxumJson(response)).into_response()
         }
-        Err(e) => (
+        Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
+        Err(RaidServiceError::ArtifactNotFound { .. }) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": "Unexpected RAID state while creating artifact."
+            })),
+        )
+            .into_response(),
+        Err(RaidServiceError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             AxumJson(serde_json::json!({
                 "error": format!("Failed to create artifact. Context: Cannot store artifact in RAID storage. Suggestion: Check storage quota, verify RAID manager is initialized, and ensure sufficient disk space. Artifact name: '{}', Data size: {} bytes, Error: {}", artifact_name, data_size, e)
@@ -317,23 +298,36 @@ async fn raid_artifact_delete_handler(
     // Parse artifact ID
     let id = Uuid::parse_str(&artifact_id).unwrap(); // Safe after validation
 
-    // Delete artifact
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    match manager.delete_artifact(id).await {
-        Ok(_) => {
+    match RaidService::delete_artifact(&ctx, id).await {
+        Ok(()) => {
             let response = DeleteArtifactResponse {
                 artifact_id,
                 message: "Artifact deleted successfully".to_string(),
             };
             AxumJson(response).into_response()
         }
-        Err(e) => (
+        Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
+        Err(RaidServiceError::ArtifactNotFound { id }) => (
             StatusCode::NOT_FOUND,
             AxumJson(serde_json::json!({
-                "error": format!("Failed to delete artifact. Context: Cannot delete artifact from RAID storage. Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. Artifact ID: '{}', Error: {}", artifact_id, e)
+                "error": format!(
+                    "Failed to delete artifact. Context: Cannot delete artifact from RAID storage. \
+                    Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. \
+                    Artifact ID: '{}', Error: Artifact {} not found",
+                    id, id
+                )
+            })),
+        )
+            .into_response(),
+        Err(RaidServiceError::Operation(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            AxumJson(serde_json::json!({
+                "error": format!(
+                    "Failed to delete artifact. Context: Cannot delete artifact from RAID storage. \
+                    Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. \
+                    Artifact ID: '{}', Error: {}",
+                    artifact_id, e
+                )
             })),
         )
             .into_response(),
@@ -341,119 +335,17 @@ async fn raid_artifact_delete_handler(
 }
 
 async fn raid_quota_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let total_size = manager.get_total_size().await.unwrap_or(0);
-    let artifacts = manager.list_artifacts().await;
-    let artifact_count = artifacts.len();
-
-    // Get quota from config
-    let quota_bytes = manager.get_quota_bytes().await;
-
-    let usage_percent = quota_bytes.map(|quota| {
-        if quota > 0 {
-            (total_size as f64 / quota as f64) * 100.0
-        } else {
-            0.0
-        }
-    });
-
-    AxumJson(RaidQuotaResponse {
-        total_size_bytes: total_size,
-        quota_bytes,
-        usage_percent,
-        artifact_count,
-    })
-    .into_response()
+    match RaidService::quota(&ctx).await {
+        Ok(body) => AxumJson(body).into_response(),
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 async fn raid_status_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-
-    // Get basic information
-    let nodes = manager.list_nodes().await;
-    let artifacts = manager.list_artifacts().await;
-    let node_count = nodes.len();
-    let artifact_count = artifacts.len();
-
-    // Get storage information
-    let total_size = manager.get_total_size().await.unwrap_or(0);
-    let quota_bytes = manager.get_quota_bytes().await;
-    let usage_percent = quota_bytes.map(|quota| {
-        if quota > 0 {
-            (total_size as f64 / quota as f64) * 100.0
-        } else {
-            0.0
-        }
-    });
-    let available_bytes = quota_bytes.map(|quota| quota.saturating_sub(total_size));
-
-    // Get mode from config
-    let mode = format!("{:?}", manager.get_mode().await);
-
-    // Determine cluster status
-    // Healthy: nodes > 0, usage < 90%, no errors
-    // Degraded: usage >= 90%, or some nodes unavailable
-    // Unhealthy: no nodes, or critical errors
-    let cluster_status = if node_count == 0 {
-        "unhealthy".to_string()
-    } else if let Some(usage) = usage_percent {
-        if usage >= 95.0 {
-            "unhealthy".to_string()
-        } else if usage >= 90.0 {
-            "degraded".to_string()
-        } else {
-            "healthy".to_string()
-        }
-    } else {
-        "healthy".to_string()
-    };
-
-    // Check replication status (if in distributed mode)
-    let replication_status = if mode != "Local" {
-        // For distributed modes, check if replication is active
-        // Placeholder: in future, check actual replication status
-        Some("active".to_string())
-    } else {
-        None
-    };
-
-    // Check Raft status (if enabled)
-    // TODO: Implement Raft status query when Raft integration is complete
-    // Placeholder: Raft status would be queried from the global Raft node
-    #[cfg(feature = "raft")]
-    let raft_status: Option<RaftStatus> = {
-        // Future implementation:
-        // - Query Raft node for current role (leader/follower/candidate)
-        // - Get current term from Raft state
-        // - Get leader ID from Raft state
-        None
-    };
-
-    #[cfg(not(feature = "raft"))]
-    let raft_status: Option<RaftStatus> = None;
-
-    let response = RaidStatusResponse {
-        cluster_status,
-        node_count,
-        artifact_count,
-        storage: RaidStorageStatus {
-            total_size_bytes: total_size,
-            quota_bytes,
-            usage_percent,
-            available_bytes,
-        },
-        mode,
-        replication_status,
-        raft_status,
-    };
-
-    AxumJson(response).into_response()
+    match RaidService::cluster_status(&ctx).await {
+        Ok(body) => AxumJson(body).into_response(),
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 async fn raid_events_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
