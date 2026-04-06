@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["check_permission"]};
+window.SIDEBAR_ITEMS = {"fn":["api_error_response","check_permission","http_status_for_app_error"]};
