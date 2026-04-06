@@ -11,4 +11,5 @@ pub mod discovery_service;
 pub mod enterprise_service;
 pub mod library_service;
 pub mod raid_service;
+pub mod topology_service;
 pub mod vm_service;

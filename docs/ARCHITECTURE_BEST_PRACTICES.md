@@ -46,6 +46,7 @@ src/
 │   ├── enterprise_service.rs   # feature `enterprise`
 │   ├── library_service.rs
 │   ├── raid_service.rs
+│   ├── topology_service.rs     # topology snapshot / node resources
 │   └── vm_service.rs
 ├── network/            # API layer (modularized)
 │   ├── mod.rs

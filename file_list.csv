@@ -410,6 +410,7 @@
 ./src/services/mod.rs
 ./src/services/admin_service.rs
 ./src/services/discovery_service.rs
+./src/services/topology_service.rs
 ./src/services/cloud_service.rs
 ./src/services/enterprise_service.rs
 ./src/services/library_service.rs
