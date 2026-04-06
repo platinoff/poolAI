@@ -17,7 +17,10 @@ use crate::network::api::check_permission;
 #[cfg(feature = "enterprise")]
 use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
-use crate::services::enterprise_service::{EnterpriseService, TenantCreateError};
+use crate::services::enterprise_service::{
+    AuditEventsQuery, DashboardCreateInput, EnterpriseAuditError, EnterpriseMonitoringError,
+    EnterpriseService, MetricHistoryQueryInput, MonitoringAlertsQueryInput, TenantCreateError,
+};
 #[cfg(feature = "enterprise")]
 use axum::{
     extract::{Extension, Form, Path, Query, State},
@@ -27,8 +30,6 @@ use axum::{
     routing::{delete, get, post, put},
     Json, Router,
 };
-#[cfg(feature = "enterprise")]
-use chrono::Utc;
 #[cfg(feature = "enterprise")]
 use serde::Deserialize;
 #[cfg(feature = "enterprise")]
@@ -431,51 +432,28 @@ async fn audit_events_query_handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<AuditQueryParams>,
 ) -> impl IntoResponse {
-    let logger = ctx.audit_logger.clone();
-
-    // Ensure logger is initialized
-    if let Err(e) = logger.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Audit logger not initialized. Context: Audit logger is not available. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    // Build query filters from parameters
-    let filters = enterprise::audit::AuditQueryFilters {
+    let q = AuditEventsQuery {
         user_id: params.user_id,
         tenant_id: params.tenant_id,
         action: params.action,
         resource_type: params.resource_type,
         result: params.result,
-        min_level: params.min_level.as_ref().and_then(|level| {
-            match level.to_uppercase().as_str() {
-                "INFO" => Some(enterprise::audit::AuditLevel::Info),
-                "WARNING" => Some(enterprise::audit::AuditLevel::Warning),
-                "ERROR" => Some(enterprise::audit::AuditLevel::Error),
-                "CRITICAL" => Some(enterprise::audit::AuditLevel::Critical),
-                _ => None,
-            }
-        }),
-        start_time: params.start_time.and_then(|s| {
-            chrono::DateTime::parse_from_rfc3339(&s)
-                .ok()
-                .map(|dt| dt.with_timezone(&chrono::Utc))
-        }),
-        end_time: params.end_time.and_then(|s| {
-            chrono::DateTime::parse_from_rfc3339(&s)
-                .ok()
-                .map(|dt| dt.with_timezone(&chrono::Utc))
-        }),
+        min_level: params.min_level,
+        start_time: params.start_time,
+        end_time: params.end_time,
         limit: params.limit,
     };
 
-    match logger.query_events(&filters).await {
+    match EnterpriseService::query_audit_events(&ctx, q).await {
         Ok(events) => Json(events).into_response(),
-        Err(e) => (
+        Err(EnterpriseAuditError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Audit logger not initialized. Context: Audit logger is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseAuditError::Query(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to query audit events. Context: Cannot retrieve audit events. Suggestion: Check audit log directory and permissions. Error: {}", e)
@@ -503,37 +481,22 @@ async fn monitoring_alerts_handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<MonitoringAlertsQuery>,
 ) -> impl IntoResponse {
-    let manager = ctx.enterprise_monitoring_manager.clone();
+    let q = MonitoringAlertsQueryInput {
+        severity: params.severity,
+        tenant_id: params.tenant_id,
+        acknowledged: params.acknowledged,
+    };
 
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::list_monitoring_alerts(&ctx, q).await {
+        Ok(alerts) => Json(alerts).into_response(),
+        Err(EnterpriseMonitoringError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Monitoring manager not initialized. Context: Monitoring manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Parse severity filter
-    let severity = params
-        .severity
-        .as_ref()
-        .and_then(|s| match s.to_uppercase().as_str() {
-            "INFO" => Some(enterprise::monitoring::AlertSeverity::Info),
-            "WARNING" => Some(enterprise::monitoring::AlertSeverity::Warning),
-            "ERROR" => Some(enterprise::monitoring::AlertSeverity::Error),
-            "CRITICAL" => Some(enterprise::monitoring::AlertSeverity::Critical),
-            _ => None,
-        });
-
-    // Parse tenant ID filter
-    let tenant_id = params.tenant_id.and_then(|id| Uuid::parse_str(&id).ok());
-
-    match manager.get_active_alerts(severity, tenant_id, params.acknowledged).await {
-        Ok(alerts) => Json(alerts).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve alerts. Context: Cannot retrieve monitoring alerts. Suggestion: Check system logs. Error: {}", e)
@@ -557,19 +520,6 @@ async fn monitoring_alert_acknowledge_handler(
         }
     }
 
-    let manager = ctx.enterprise_monitoring_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Monitoring manager not initialized. Context: Cannot acknowledge alert - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
     let alert_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -583,7 +533,7 @@ async fn monitoring_alert_acknowledge_handler(
         }
     };
 
-    match manager.acknowledge_alert(alert_id).await {
+    match EnterpriseService::acknowledge_monitoring_alert(&ctx, alert_id).await {
         Ok(()) => {
             (
                 StatusCode::OK,
@@ -594,7 +544,14 @@ async fn monitoring_alert_acknowledge_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseMonitoringError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Monitoring manager not initialized. Context: Cannot acknowledge alert - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": format!("Failed to acknowledge alert. Context: Cannot acknowledge alert. Suggestion: Verify alert ID and ensure alert exists. Error: {}", e)
@@ -616,25 +573,16 @@ async fn monitoring_dashboards_handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<MonitoringDashboardsQuery>,
 ) -> impl IntoResponse {
-    let manager = ctx.enterprise_monitoring_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::list_monitoring_dashboards(&ctx, params.tenant_id).await {
+        Ok(dashboards) => Json(dashboards).into_response(),
+        Err(EnterpriseMonitoringError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Monitoring manager not initialized. Context: Monitoring manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Parse tenant ID filter
-    let tenant_id = params.tenant_id.and_then(|id| Uuid::parse_str(&id).ok());
-
-    match manager.list_dashboards(tenant_id).await {
-        Ok(dashboards) => Json(dashboards).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve dashboards. Context: Cannot retrieve monitoring dashboards. Suggestion: Check system logs. Error: {}", e)
@@ -669,35 +617,17 @@ async fn monitoring_dashboard_create_handler(
         }
     }
 
-    let manager = ctx.enterprise_monitoring_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Monitoring manager not initialized. Context: Cannot create dashboard - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    // Parse tenant ID if provided
-    let tenant_id = req.tenant_id.and_then(|id| Uuid::parse_str(&id).ok());
-
-    let dashboard = enterprise::monitoring::Dashboard {
-        id: Uuid::new_v4(),
+    let input = DashboardCreateInput {
         name: req.name,
-        description: req.description.unwrap_or_default(),
+        description: req.description,
         metrics: req.metrics,
-        layout: req.layout.unwrap_or_else(|| "{}".to_string()),
-        is_public: req.is_public.unwrap_or(false),
-        tenant_id,
-        created_at: Utc::now(),
+        layout: req.layout,
+        is_public: req.is_public,
+        tenant_id: req.tenant_id,
     };
 
-    match manager.create_dashboard(dashboard.clone()).await {
-        Ok(()) => {
+    match EnterpriseService::create_monitoring_dashboard(&ctx, input).await {
+        Ok(dashboard) => {
             (
                 StatusCode::CREATED,
                 Json(serde_json::json!({
@@ -707,7 +637,14 @@ async fn monitoring_dashboard_create_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseMonitoringError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Monitoring manager not initialized. Context: Cannot create dashboard - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to create dashboard. Context: Cannot create monitoring dashboard. Suggestion: Verify dashboard configuration and parameters. Error: {}", e)
@@ -733,46 +670,24 @@ async fn monitoring_metrics_handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<MonitoringMetricsQuery>,
 ) -> impl IntoResponse {
-    let manager = ctx.enterprise_monitoring_manager.clone();
+    let q = MetricHistoryQueryInput {
+        metric: params.metric,
+        start_time: params.start_time,
+        end_time: params.end_time,
+        tenant_id: params.tenant_id,
+        limit: params.limit,
+    };
 
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::query_monitoring_metric_history(&ctx, q).await {
+        Ok(metrics) => Json(metrics).into_response(),
+        Err(EnterpriseMonitoringError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Monitoring manager not initialized. Context: Monitoring manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Parse time range filters
-    let start_time = params.start_time.and_then(|s| {
-        chrono::DateTime::parse_from_rfc3339(&s)
-            .ok()
-            .map(|dt| dt.with_timezone(&chrono::Utc))
-    });
-    let end_time = params.end_time.and_then(|s| {
-        chrono::DateTime::parse_from_rfc3339(&s)
-            .ok()
-            .map(|dt| dt.with_timezone(&chrono::Utc))
-    });
-
-    // Parse tenant ID filter
-    let tenant_id = params.tenant_id.and_then(|id| Uuid::parse_str(&id).ok());
-
-    match manager
-        .get_metric_history(
-            params.metric.as_deref(),
-            start_time,
-            end_time,
-            tenant_id,
-            params.limit,
-        )
-        .await
-    {
-        Ok(metrics) => Json(metrics).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve metrics. Context: Cannot retrieve monitoring metrics. Suggestion: Check system logs. Error: {}", e)
@@ -784,22 +699,16 @@ async fn monitoring_metrics_handler(
 
 #[cfg(feature = "enterprise")]
 async fn monitoring_alert_rules_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.enterprise_monitoring_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::list_monitoring_alert_rules(&ctx).await {
+        Ok(rules) => Json(rules).into_response(),
+        Err(EnterpriseMonitoringError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Monitoring manager not initialized. Context: Monitoring manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    match manager.list_alert_rules().await {
-        Ok(rules) => Json(rules).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve alert rules. Context: Cannot retrieve monitoring alert rules. Suggestion: Check system logs. Error: {}", e)
@@ -823,31 +732,27 @@ async fn monitoring_alert_rule_create_handler(
         }
     }
 
-    let manager = ctx.enterprise_monitoring_manager.clone();
+    let rule_name = rule.name.clone();
 
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Monitoring manager not initialized. Context: Cannot create alert rule - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.create_alert_rule(rule.clone()).await {
+    match EnterpriseService::create_monitoring_alert_rule(&ctx, rule).await {
         Ok(()) => {
             (
                 StatusCode::CREATED,
                 Json(serde_json::json!({
                     "message": "Alert rule created successfully",
-                    "rule_name": rule.name
+                    "rule_name": rule_name
                 })),
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseMonitoringError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Monitoring manager not initialized. Context: Cannot create alert rule - monitoring manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to create alert rule. Context: Cannot create monitoring alert rule. Suggestion: Verify rule configuration and parameters. Error: {}", e)
