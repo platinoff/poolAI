@@ -11,14 +11,18 @@
 use chrono::{TimeZone, Utc};
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use poolai::core::model_interface::{ModelParameters, ModelRequest};
+use poolai::raid::events::EventStore;
 use poolai::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
+use poolai::raid::replication::ReplicationEngine;
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::runtime::{CacheManager, MemoryPool};
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use serde_json::json;
 use std::hint::black_box;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 use tokio::runtime::Runtime;
+use tokio::sync::RwLock;
 
 /// Benchmark memory pool acquire/release operations
 fn bench_memory_pool_acquire_release(c: &mut Criterion) {
@@ -273,6 +277,50 @@ fn bench_vm_lifecycle(c: &mut Criterion) {
     group.finish();
 }
 
+/// Replication control-plane hot paths (in-process; no real peer I/O).
+fn bench_raid_replication_engine(c: &mut Criterion) {
+    let rt = Runtime::new().unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let raid_config = RaidConfig {
+        mode: RaidMode::Local,
+        base_path: dir.path().join("raid"),
+        quota_bytes: Some(1024 * 1024 * 1024),
+        retention_days: Some(30),
+        gc_on_startup: false,
+    };
+    let raid_manager = Arc::new(RwLock::new(RaidManager::new(raid_config)));
+    rt.block_on(async {
+        raid_manager.write().await.initialize().await.unwrap();
+    });
+    let event_store = Arc::new(RwLock::new(EventStore::new(dir.path().join("events"))));
+    rt.block_on(async {
+        event_store.write().await.initialize().await.unwrap();
+    });
+    let engine = ReplicationEngine::with_defaults(raid_manager, Some(event_store));
+    rt.block_on(async {
+        for i in 1..=64_u64 {
+            engine
+                .register_node(i, format!("http://127.0.0.1:{}", 8080 + i))
+                .await;
+        }
+    });
+
+    let mut group = c.benchmark_group("raid_replication_engine");
+    group.bench_function("select_replication_nodes_factor_3", |b| {
+        b.to_async(&rt).iter(|| async {
+            let _ = engine
+                .select_replication_nodes(black_box(3), black_box(None))
+                .await;
+        });
+    });
+    group.bench_function("calculate_quorum_rf_7", |b| {
+        b.iter(|| {
+            black_box(engine.calculate_quorum(black_box(7)));
+        });
+    });
+    group.finish();
+}
+
 /// Distributed RAID wire payload: serde round-trip (no sockets).
 fn bench_raid_protocol_put_payload_serde(c: &mut Criterion) {
     let created_at = Utc.with_ymd_and_hms(2026, 4, 1, 12, 0, 0).unwrap();
@@ -337,6 +385,7 @@ criterion_group!(
     bench_model_request_response,
     bench_cache_key_generation,
     bench_raid_local_put,
+    bench_raid_replication_engine,
     bench_vm_lifecycle,
     bench_raid_protocol_put_payload_serde,
     bench_api_health_json_serialize

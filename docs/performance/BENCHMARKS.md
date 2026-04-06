@@ -20,7 +20,7 @@ Benchmarks live under `benches/` and use [Criterion](https://github.com/bheisler
 
 | Bench target | Command | Notes |
 |--------------|---------|--------|
-| `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU, model structs, cache keys, local RAID put, **VM lifecycle**, **RAID protocol JSON**, **health-shaped JSON** |
+| `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU, model structs, cache keys, local RAID put, **replication engine** (node selection + quorum), **VM lifecycle**, **RAID protocol JSON**, **health-shaped JSON** |
 | `turboquant_benchmarks` | `cargo bench -j 1 --bench turboquant_benchmarks --features ml` | TurboQuant pack/unpack and `dot_f32` (requires `ml`) |
 | `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config) |
 | `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager` |
@@ -34,6 +34,7 @@ Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) 
 - **`model_request_response`**: `create_request`, `clone_request`
 - **`cache_key_generation`**: `generate_cache_key` (hash over request fields)
 - **`raid_local_put`**: `put_artifact_4096` — temp-dir `RaidManager`, 4 KiB payload, unique logical names per iteration
+- **`raid_replication_engine`**: `select_replication_nodes_factor_3` (64 registered nodes, factor 3), `calculate_quorum_rf_7` — in-process control plane only; wire replication remains environment-specific. For **artifact byte volume** before/after compression, compare `put_artifact` payload sizes with TurboQuant/TQ01 outputs (`turboquant_benchmarks`, ML pipeline).
 - **`vm_lifecycle`**: `create_start_stop_delete` — fresh `VmManager` per iteration (initialize → create → start → stop → delete → shutdown)
 - **`raid_protocol_put_payload`**: `serde_json_roundtrip` — `PutArtifactPayload` (+ ~1 KiB `data` string); proxy for node-to-node JSON cost, not real sockets
 - **`http_health_json`**: `serde_json_to_vec` — static `serde_json::Value` shaped like `GET /api/v1/health` (serialization only; use `wrk` for end-to-end RPS)
@@ -81,6 +82,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 |------|---------------------------|-----------------------------------|
 | In-memory | `memory_pool/*`, `lru_cache/get_hit` | No large regression vs last saved Criterion baseline |
 | Local RAID | `raid_local_put/put_artifact_4096` | Stable median order-of-magnitude on fixed disk temp dir |
+| Replication (CP) | `raid_replication_engine/*` | Sub-ms median for `select_*` with ≤100 registered nodes; `calculate_quorum` nanosecond-scale |
 | Service layer | `raid_service/list_*` | Sub-µs median for list/queries on tiny temp stores |
 | JSON | `http_health_json`, `raid_protocol_put_payload` | Track median; investigate if >2× prior baseline |
 | TurboQuant | `turboquant/*` (`--features ml`) | Stable pack/unpack; `dot_f32` scales linearly with dimension |
@@ -89,7 +91,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
-| 2026-04-06 | Filled `raid_service/quota` and `cluster_status` dev-sample medians; added P4 target table; benches use `std::hint::black_box`; `ui.rs` gates `State` import on `enterprise` (clean `no-enterprise` builds). |
+| 2026-04-06 | Filled `raid_service/quota`/`cluster_status` dev-sample medians; P4 target table; `std::hint::black_box` in benches; `ui.rs` gates `State` on `enterprise`; Criterion group `raid_replication_engine` in `runtime_benchmarks` (P2b proxy vs full multi-node I/O). |
 
 ---
 

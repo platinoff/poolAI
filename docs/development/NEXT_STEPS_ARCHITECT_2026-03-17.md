@@ -101,7 +101,8 @@
 - [x] Модуль **`src/ml/turboquant.rs`** — Rust-only, без subprocess.
 - [x] Контракт кроку pipeline: гілка **`Quantization`** з конфігом `turboquant` / `quantization=turboquant`; метрики в результаті кроку.
 - [x] Інтеграційний тест **`tests/ml_pipeline_integration.rs`** (`test_pipeline_turboquant_quantization_step`) при `--features ml`.
-- [ ] Заміри реплікації артефактів RAID до/після (**Priority 4** / `docs/performance/BENCHMARKS.md`).
+- [x] Проксі замірів replication control-plane: Criterion-група **`raid_replication_engine`** у `benches/runtime_benchmarks.rs` (див. `docs/performance/BENCHMARKS.md`).
+- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4**).
 - [ ] Опційно: SIMD / прискорений підшлях у Rust.
 
 **Критерії готовності**:
@@ -138,6 +139,7 @@
 - [ ] Визначити hot‑paths (на базі наявних доків і інтуїції архітектора):
   - [x] RAID: **локальний** `put_artifact` — Criterion у `benches/runtime_benchmarks.rs` (`raid_local_put`).
   - [x] RAID: **проксі мережевого шару** — serde `PutArtifactPayload` (`raid_protocol_put_payload`); реальна реплікація з пірами — окремий harness.
+  - [x] RAID replication **control-plane** — `raid_replication_engine` у `runtime_benchmarks` (`select_replication_nodes`, `calculate_quorum`).
   - [x] VM: **ін‑процес** lifecycle — `vm_lifecycle` у `runtime_benchmarks` (не hypervisor).
   - [x] Cloud: **`cloud_benchmarks`** (`--features cloud`) — validate + init/shutdown менеджера (SDK виклики не в бенчі).
   - [x] API: **проксі** JSON health — `http_health_json` у `runtime_benchmarks`; RPS — `wrk` вручну.

@@ -42,8 +42,8 @@
 ## 4. Наступні кроки за тим самим планом
 
 1. **P4 (наступний горизонт)** — на **референс-машині**: повні прогони Criterion (усі чотири bench) та **`wrk`** на `/api/v1/health`; оновити таблицю baseline у `BENCHMARKS.md` під мітку хоста. **CI** вже є: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + неділя 06:00 UTC, артефакт `criterion-report`). `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
-2. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
-3. **P2b** — заміри **реплікації** артефактів RAID до/після (окремий harness); зараз проксі: `raid_local_put`, `raid_protocol_put_payload` у `runtime_benchmarks`.
+2. **P2** — REST `/raid/*` (workers, events, snapshot, …) уже через **`RaidService`**; опційно далі — тонкі distributed handlers у `raid_distributed_handlers` vs сервіс.
+3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; далі — wire-replication + порівняння розміру артефакта до/після TQ01 на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги).
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
 
 Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).
