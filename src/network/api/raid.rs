@@ -23,7 +23,7 @@ use uuid::Uuid;
 
 use crate::core::error::ErrorContext;
 use crate::core::state::{ApiContext, AppState};
-use crate::network::api::common::{api_error_response, check_permission};
+use crate::network::api::common::{api_error_response, api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
 use crate::network::validation;
@@ -32,34 +32,56 @@ use crate::services::raid_service::{RaidService, RaidServiceError};
 
 type RaidHttpErr = (StatusCode, AxumJson<serde_json::Value>);
 
-fn raid_manager_unavailable() -> RaidHttpErr {
-    (
+fn raid_api_err(
+    code: impl AsRef<str>,
+    message: impl Into<String>,
+    ctx: Option<ErrorContext>,
+    status: StatusCode,
+) -> RaidHttpErr {
+    let (s, j) = api_json_error(code, message, ctx, status);
+    (s, AxumJson(j.0))
+}
+
+fn raid_event_store_unavailable(operation: impl Into<String>) -> RaidHttpErr {
+    raid_api_err(
+        "EVENT_STORE_UNAVAILABLE",
+        "Event store is not initialized or accessible.",
+        Some(ErrorContext::new(operation.into()).with_hint(
+            "Enable event store in configuration and ensure initialization at startup.",
+        )),
         StatusCode::SERVICE_UNAVAILABLE,
-        AxumJson(serde_json::json!({
-            "error": crate::services::raid_service::RAID_MANAGER_UNAVAILABLE_MESSAGE
-        })),
+    )
+}
+
+fn raid_manager_unavailable() -> RaidHttpErr {
+    raid_api_err(
+        "RAID_MANAGER_UNAVAILABLE",
+        crate::services::raid_service::RAID_MANAGER_UNAVAILABLE_MESSAGE,
+        Some(
+            ErrorContext::new("raid")
+                .with_hint("Ensure RAID manager is initialized during application startup."),
+        ),
+        StatusCode::SERVICE_UNAVAILABLE,
     )
 }
 
 fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
     match e {
         RaidServiceError::ManagerUnavailable => raid_manager_unavailable(),
-        RaidServiceError::ArtifactNotFound { id } => (
+        RaidServiceError::ArtifactNotFound { id } => raid_api_err(
+            "ARTIFACT_NOT_FOUND",
+            format!("Artifact {} not found", id),
+            Some(ErrorContext::new("raid_artifact").with_resource("artifact_id", id.to_string())),
             StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!(
-                    "Failed to delete artifact. Context: Cannot delete artifact from RAID storage. \
-                    Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. \
-                    Artifact ID: '{}', Error: Artifact {} not found",
-                    id, id
-                )
-            })),
         ),
-        RaidServiceError::Operation(ref err) => api_error_response(
-            err,
-            Some(ErrorContext::new("raid")),
-            Some(StatusCode::INTERNAL_SERVER_ERROR),
-        ),
+        RaidServiceError::Operation(ref err) => {
+            let (s, j) = api_error_response(
+                err,
+                Some(ErrorContext::new("raid")),
+                Some(StatusCode::INTERNAL_SERVER_ERROR),
+            );
+            (s, AxumJson(j.0))
+        }
     }
 }
 
@@ -206,25 +228,25 @@ async fn raid_artifact_create_handler(
 ) -> impl IntoResponse {
     // Validate artifact name
     if let Err(e) = validation::validate_artifact_name(&payload.name) {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            e.to_string(),
+            Some(ErrorContext::new("raid_artifact_create").with_resource("field", "name")),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     // Validate base64 data size (max 100MB)
     const MAX_ARTIFACT_SIZE: usize = 100 * 1024 * 1024; // 100MB
     if let Err(e) = validation::validate_base64_data(&payload.data, MAX_ARTIFACT_SIZE) {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            e.to_string(),
+            Some(ErrorContext::new("raid_artifact_create").with_resource("field", "data")),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     // Decode base64 data
@@ -232,25 +254,29 @@ async fn raid_artifact_create_handler(
     let data = match base64_engine.decode(&payload.data) {
         Ok(d) => d,
         Err(e) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_BASE64",
+                format!("Cannot decode base64 artifact data: {}", e),
+                Some(
+                    ErrorContext::new("raid_artifact_create")
+                        .with_resource("artifact_name", artifact_name.clone())
+                        .with_hint("Verify payload is valid base64 and not corrupted."),
+                ),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid base64 data. Context: Cannot decode base64-encoded artifact data. Suggestion: Verify data is properly base64-encoded and not corrupted. Artifact name: '{}', Error: {}", artifact_name, e)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
     // Validate decoded data size
     if let Err(e) = validation::validate_artifact_data_size(data.len(), MAX_ARTIFACT_SIZE) {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            e.to_string(),
+            Some(ErrorContext::new("raid_artifact_create").with_resource("field", "decoded_size")),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     let data_size = data.len();
@@ -265,20 +291,29 @@ async fn raid_artifact_create_handler(
             (StatusCode::CREATED, AxumJson(response)).into_response()
         }
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(RaidServiceError::ArtifactNotFound { .. }) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": "Unexpected RAID state while creating artifact."
-            })),
-        )
-            .into_response(),
-        Err(RaidServiceError::Operation(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to create artifact. Context: Cannot store artifact in RAID storage. Suggestion: Check storage quota, verify RAID manager is initialized, and ensure sufficient disk space. Artifact name: '{}', Data size: {} bytes, Error: {}", artifact_name, data_size, e)
-            })),
-        )
-            .into_response(),
+        Err(RaidServiceError::ArtifactNotFound { .. }) => {
+            let (s, j) = api_json_error(
+                "RAID_UNEXPECTED_STATE",
+                "Unexpected RAID state while creating artifact.",
+                Some(ErrorContext::new("raid_artifact_create")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
+        Err(RaidServiceError::Operation(e)) => {
+            let (s, j) = api_json_error(
+                "RAID_ARTIFACT_CREATE_FAILED",
+                format!("Failed to store artifact in RAID: {}", e),
+                Some(
+                    ErrorContext::new("raid_artifact_create")
+                        .with_resource("artifact_name", artifact_name.clone())
+                        .with_details(format!("data_size_bytes={}", data_size))
+                        .with_hint("Check storage quota, RAID manager status, and disk space."),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -288,13 +323,16 @@ async fn raid_artifact_delete_handler(
 ) -> impl IntoResponse {
     // Validate UUID format
     if let Err(e) = validation::validate_uuid(&artifact_id) {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            e.to_string(),
+            Some(
+                ErrorContext::new("raid_artifact_delete")
+                    .with_resource("artifact_id", &artifact_id),
+            ),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     // Parse artifact ID
@@ -309,30 +347,30 @@ async fn raid_artifact_delete_handler(
             AxumJson(response).into_response()
         }
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(RaidServiceError::ArtifactNotFound { id }) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!(
-                    "Failed to delete artifact. Context: Cannot delete artifact from RAID storage. \
-                    Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. \
-                    Artifact ID: '{}', Error: Artifact {} not found",
-                    id, id
-                )
-            })),
-        )
-            .into_response(),
-        Err(RaidServiceError::Operation(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!(
-                    "Failed to delete artifact. Context: Cannot delete artifact from RAID storage. \
-                    Suggestion: Verify artifact ID exists, check RAID manager status, and ensure artifact is not locked. \
-                    Artifact ID: '{}', Error: {}",
-                    artifact_id, e
-                )
-            })),
-        )
-            .into_response(),
+        Err(RaidServiceError::ArtifactNotFound { id }) => {
+            let (s, j) = api_json_error(
+                "ARTIFACT_NOT_FOUND",
+                format!("Artifact {} not found", id),
+                Some(
+                    ErrorContext::new("raid_artifact_delete")
+                        .with_resource("artifact_id", id.to_string()),
+                ),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
+        Err(RaidServiceError::Operation(e)) => {
+            let (s, j) = api_json_error(
+                "RAID_ARTIFACT_DELETE_FAILED",
+                format!("Failed to delete artifact: {}", e),
+                Some(
+                    ErrorContext::new("raid_artifact_delete")
+                        .with_resource("artifact_id", artifact_id.clone()),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -363,22 +401,18 @@ async fn raid_events_handler(State(ctx): State<ApiContext>) -> impl IntoResponse
                 "count": events.len()
             }))
             .into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to load events. Context: Cannot retrieve events from event store. Suggestion: Verify event store is accessible, check file permissions, and ensure event store is properly initialized. Error: {}", e)
-                })),
-            )
-                .into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "RAID_EVENTS_LOAD_FAILED",
+                    format!("Failed to load events: {}", e),
+                    Some(ErrorContext::new("raid_events")),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, AxumJson(j.0)).into_response()
+            }
         }
     } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
-            })),
-        )
-            .into_response()
+        raid_event_store_unavailable("raid_events").into_response()
     }
 }
 
@@ -404,22 +438,21 @@ async fn raid_events_for_artifact_handler(
                 "count": events.len()
             }))
             .into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to load events. Context: Cannot retrieve events from event store. Suggestion: Verify event store is accessible, check file permissions, and ensure event store is properly initialized. Error: {}", e)
-                })),
-            )
-                .into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "RAID_EVENTS_LOAD_FAILED",
+                    format!("Failed to load events: {}", e),
+                    Some(
+                        ErrorContext::new("raid_events_for_artifact")
+                            .with_resource("artifact_id", artifact_id.clone()),
+                    ),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, AxumJson(j.0)).into_response()
+            }
         }
     } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
-            })),
-        )
-            .into_response()
+        raid_event_store_unavailable("raid_events_for_artifact").into_response()
     }
 }
 
@@ -458,22 +491,18 @@ async fn raid_events_range_handler(
                 "count": events.len()
             }))
             .into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to load events. Context: Cannot retrieve events from event store. Suggestion: Verify event store is accessible, check file permissions, and ensure event store is properly initialized. Error: {}", e)
-                })),
-            )
-                .into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "RAID_EVENTS_LOAD_FAILED",
+                    format!("Failed to load events: {}", e),
+                    Some(ErrorContext::new("raid_events_range")),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, AxumJson(j.0)).into_response()
+            }
         }
     } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
-            })),
-        )
-            .into_response()
+        raid_event_store_unavailable("raid_events_range").into_response()
     }
 }
 
@@ -486,29 +515,27 @@ async fn raid_snapshot_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
     if let Some(event_store) = manager.event_store() {
         match event_store.read().await.load_snapshot().await {
             Ok(Some(snapshot)) => AxumJson(snapshot).into_response(),
-            Ok(None) => (
-                StatusCode::NOT_FOUND,
-                AxumJson(serde_json::json!({
-                    "error": "No snapshot available"
-                })),
-            )
-                .into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to load snapshot. Context: Cannot retrieve snapshot from event store. Suggestion: Verify snapshot exists, check file permissions, and ensure event store is properly initialized. Error: {}", e)
-                })),
-            )
-                .into_response(),
+            Ok(None) => {
+                let (s, j) = api_json_error(
+                    "RAID_SNAPSHOT_NOT_FOUND",
+                    "No snapshot available",
+                    Some(ErrorContext::new("raid_snapshot_get")),
+                    StatusCode::NOT_FOUND,
+                );
+                (s, AxumJson(j.0)).into_response()
+            }
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "RAID_SNAPSHOT_LOAD_FAILED",
+                    format!("Failed to load snapshot: {}", e),
+                    Some(ErrorContext::new("raid_snapshot_get")),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, AxumJson(j.0)).into_response()
+            }
         }
     } else {
-        (
-            StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": "Event store not available. Context: Event store is not initialized or accessible. Suggestion: Ensure event store is enabled in configuration and properly initialized during system startup."
-            })),
-        )
-            .into_response()
+        raid_event_store_unavailable("raid_snapshot_get").into_response()
     }
 }
 
@@ -534,13 +561,15 @@ async fn raid_snapshot_create_handler(
             "message": "Snapshot created successfully"
         }))
         .into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to create snapshot. Context: Cannot create new snapshot in event store. Suggestion: Verify event store is accessible, check disk space, and ensure event store is properly initialized. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_SNAPSHOT_CREATE_FAILED",
+                format!("Failed to create snapshot: {}", e),
+                Some(ErrorContext::new("raid_snapshot_create")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -565,13 +594,15 @@ async fn raid_snapshot_restore_handler(
             "message": "RAID state restored from snapshot successfully"
         }))
         .into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to restore from snapshot. Context: Cannot restore RAID state from snapshot. Suggestion: Verify snapshot exists, check event store is accessible, and ensure event store is properly initialized. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_SNAPSHOT_RESTORE_FAILED",
+                format!("Failed to restore from snapshot: {}", e),
+                Some(ErrorContext::new("raid_snapshot_restore")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -596,10 +627,13 @@ async fn raid_gc_handler(
         })
         .into_response(),
         Err(e) => {
-            let error_response = serde_json::json!({
-                "error": format!("GC failed. Context: Cannot perform garbage collection on old artifacts. Suggestion: Verify RAID manager is accessible, check file permissions, and ensure storage is not locked. Error: {}", e)
-            });
-            (StatusCode::INTERNAL_SERVER_ERROR, AxumJson(error_response)).into_response()
+            let (s, j) = api_json_error(
+                "RAID_GC_FAILED",
+                format!("Garbage collection failed: {}", e),
+                Some(ErrorContext::new("raid_gc")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
         }
     }
 }
@@ -648,13 +682,13 @@ async fn raid_worker_get_handler(
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format: {}", id),
+                Some(ErrorContext::new("raid_worker_get").with_resource("worker_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format: {}", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -667,13 +701,15 @@ async fn raid_worker_get_handler(
             };
             AxumJson(response).into_response()
         }
-        None => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!("RAID worker not found: {}", id)
-            })),
-        )
-            .into_response(),
+        None => {
+            let (s, j) = api_json_error(
+                "RAID_WORKER_NOT_FOUND",
+                format!("RAID worker not found: {}", id),
+                Some(ErrorContext::new("raid_worker_get").with_resource("worker_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -689,13 +725,13 @@ async fn raid_worker_create_handler(
     }
 
     if payload.address.is_empty() {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            "Address cannot be empty",
+            Some(ErrorContext::new("raid_worker_create").with_resource("field", "address")),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": "Address cannot be empty".to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     let manager = match raid_http_manager(&ctx) {
@@ -730,13 +766,13 @@ async fn raid_worker_update_handler(
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format: {}", id),
+                Some(ErrorContext::new("raid_worker_update").with_resource("worker_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format: {}", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -749,13 +785,15 @@ async fn raid_worker_update_handler(
             };
             AxumJson(response).into_response()
         }
-        Err(e) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_WORKER_UPDATE_FAILED",
+                e.to_string(),
+                Some(ErrorContext::new("raid_worker_update").with_resource("worker_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -777,13 +815,13 @@ async fn raid_worker_delete_handler(
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format: {}", id),
+                Some(ErrorContext::new("raid_worker_delete").with_resource("worker_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format: {}", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -792,13 +830,15 @@ async fn raid_worker_delete_handler(
             "message": format!("RAID worker {} deleted successfully", id)
         }))
         .into_response(),
-        Err(e) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_WORKER_DELETE_FAILED",
+                e.to_string(),
+                Some(ErrorContext::new("raid_worker_delete").with_resource("worker_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -859,13 +899,15 @@ async fn raid_strategies_handler(State(ctx): State<ApiContext>) -> impl IntoResp
             };
             AxumJson(response).into_response()
         }
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to get strategy status. Context: Cannot retrieve strategy status from RAID manager. Suggestion: Verify RAID manager is initialized and strategy is properly configured. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_STRATEGY_STATUS_FAILED",
+                format!("Failed to get strategy status: {}", e),
+                Some(ErrorContext::new("raid_strategies")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -967,13 +1009,17 @@ async fn raid_rebalance_handler(
             };
             AxumJson(response).into_response()
         }
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to trigger rebalancing. Context: Cannot trigger rebalancing for RAID strategy. Suggestion: Verify RAID manager is initialized, check strategy mode (Local mode does not support rebalancing), and ensure strategy is properly configured. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_REBALANCE_FAILED",
+                format!("Failed to trigger rebalancing: {}", e),
+                Some(ErrorContext::new("raid_rebalance").with_hint(
+                    "Local RAID mode does not support rebalancing; verify strategy configuration.",
+                )),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
