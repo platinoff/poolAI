@@ -3592,17 +3592,17 @@ async fn workers_page() -> Html<String> {
       const tableDesc = document.createElement('div');
       tableDesc.id = 'workers-table-desc';
       tableDesc.className = 'sr-only';
-      tableDesc.textContent = 'Table showing workers with their IDs, status, and available actions';
+      tableDesc.textContent = 'Table showing workers: id, health, state, task, metrics, actions';
       tableDesc.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
       
       const thead = document.createElement('thead');
       const hr = document.createElement('tr');
       hr.setAttribute('role', 'row');
-      ['id', 'status', 'actions'].forEach(k => {
+      ['ID', 'Health', 'State', 'Current task', 'Requests', 'Queue', 'Actions'].forEach(label => {
         const th = document.createElement('th');
         th.setAttribute('role', 'columnheader');
         th.setAttribute('scope', 'col');
-        th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+        th.textContent = label;
         hr.appendChild(th);
       });
       thead.appendChild(hr);
@@ -3616,13 +3616,45 @@ async fn workers_page() -> Html<String> {
         const workerId = worker ? worker.id : 'unknown';
         tr.setAttribute('aria-label', 'Worker ' + workerId);
         
-        ['id', 'status'].forEach(k => {
-          const td = document.createElement('td');
-          td.setAttribute('role', 'cell');
-          const v = worker ? worker[k] : null;
-          td.textContent = (typeof v === 'object') ? JSON.stringify(v) : String(v ?? '');
-          tr.appendChild(td);
-        });
+        const tdId = document.createElement('td');
+        tdId.setAttribute('role', 'cell');
+        tdId.textContent = String(workerId);
+        tr.appendChild(tdId);
+        
+        const healthy = worker && typeof worker.is_healthy === 'boolean'
+          ? worker.is_healthy
+          : (worker && worker.status !== 'error');
+        const tdHealth = document.createElement('td');
+        tdHealth.setAttribute('role', 'cell');
+        const healthBadge = document.createElement('span');
+        healthBadge.className = 'status-badge ' + (healthy ? 'active' : 'error');
+        healthBadge.textContent = healthy ? 'Healthy' : 'Unhealthy';
+        tdHealth.appendChild(healthBadge);
+        tr.appendChild(tdHealth);
+        
+        const tdState = document.createElement('td');
+        tdState.setAttribute('role', 'cell');
+        tdState.textContent = worker && worker.status ? String(worker.status) : '—';
+        tr.appendChild(tdState);
+        
+        const tdTask = document.createElement('td');
+        tdTask.setAttribute('role', 'cell');
+        tdTask.textContent = (worker && worker.current_task) ? String(worker.current_task) : '—';
+        tr.appendChild(tdTask);
+        
+        const tdReq = document.createElement('td');
+        tdReq.setAttribute('role', 'cell');
+        tdReq.textContent = worker && typeof worker.total_requests_processed === 'number'
+          ? String(worker.total_requests_processed)
+          : '0';
+        tr.appendChild(tdReq);
+        
+        const tdQueue = document.createElement('td');
+        tdQueue.setAttribute('role', 'cell');
+        tdQueue.textContent = worker && typeof worker.queue_size === 'number'
+          ? String(worker.queue_size)
+          : '0';
+        tr.appendChild(tdQueue);
         
         // Action buttons
         const actionsTd = document.createElement('td');

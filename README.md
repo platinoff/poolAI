@@ -54,6 +54,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **P4**: baseline у [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на **іменований референс-хост**; **`wrk`** на `/api/v1/health`; опційний CI — [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml). Див. [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
 - **P2 (опційно)**: подальший переніс RAID (workers, events, snapshot, …) у `RaidService`.
 - **P2b**: фаза 1 TurboQuant у коді — див. план і `docs/ml/TURBOQUANT_INTEGRATION.md`; далі за планом — заміри RAID / опційно SIMD.
+- **UI / UX:** план покращень і автотестів контракту API — [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md) (оновлювати після аудиту admin-сторінок).
 - За потреби: стабілізувати `cargo test --all-features` на Windows (GNU toolchain, `-j 1`).
 - **Канонічний план:** [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md) · **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 

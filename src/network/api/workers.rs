@@ -24,8 +24,15 @@ use crate::pool;
 #[derive(Serialize)]
 pub struct WorkerInfo {
     id: String,
+    /// High-level state for dashboards: `idle`, `busy`, or `error`.
     status: String,
     current_task: Option<String>,
+    /// Matches admin UI and detailed panels (pool `WorkerStatus`).
+    is_healthy: bool,
+    total_requests_processed: u64,
+    queue_size: usize,
+    active_connections: usize,
+    average_response_time_ms: f64,
 }
 
 #[derive(Deserialize)]
@@ -80,9 +87,8 @@ async fn workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
         if !worker_statuses.is_empty() {
             let worker_infos: Vec<WorkerInfo> = worker_statuses
                 .iter()
-                .map(|(id, status)| WorkerInfo {
-                    id: id.clone(),
-                    status: match status.is_healthy {
+                .map(|(id, status)| {
+                    let status_label = match status.is_healthy {
                         true => {
                             if status.active_connections > 0 {
                                 "busy".to_string()
@@ -91,8 +97,17 @@ async fn workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
                             }
                         }
                         false => "error".to_string(),
-                    },
-                    current_task: status.current_task.clone(),
+                    };
+                    WorkerInfo {
+                        id: id.clone(),
+                        status: status_label,
+                        current_task: status.current_task.clone(),
+                        is_healthy: status.is_healthy,
+                        total_requests_processed: status.total_requests_processed,
+                        queue_size: status.queue_size,
+                        active_connections: status.active_connections,
+                        average_response_time_ms: status.average_response_time_ms,
+                    }
                 })
                 .collect();
 
@@ -106,11 +121,21 @@ async fn workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
             id: "worker-1".to_string(),
             status: "busy".to_string(),
             current_task: Some("text-generation".to_string()),
+            is_healthy: true,
+            total_requests_processed: 128,
+            queue_size: 0,
+            active_connections: 1,
+            average_response_time_ms: 24.5,
         },
         WorkerInfo {
             id: "worker-2".to_string(),
             status: "idle".to_string(),
             current_task: None,
+            is_healthy: true,
+            total_requests_processed: 64,
+            queue_size: 0,
+            active_connections: 0,
+            average_response_time_ms: 18.0,
         },
     ];
     AxumJson(workers).into_response()

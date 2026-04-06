@@ -3,7 +3,7 @@
 //! Tests for API endpoints, request/response handling, and error cases.
 
 use axum::{
-    body::Body,
+    body::{to_bytes, Body},
     http::{Request, StatusCode},
     Router,
 };
@@ -88,6 +88,47 @@ async fn test_workers_endpoint_exists() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+/// UI (dashboard + admin) expects these keys on each worker object when pool is empty (mock list).
+#[tokio::test]
+async fn test_workers_json_includes_ui_fields() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/workers")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    let arr = v.as_array().expect("workers response is a JSON array");
+    assert!(!arr.is_empty(), "mock workers list should be non-empty");
+    for w in arr {
+        let o = w.as_object().expect("worker is an object");
+        for key in [
+            "id",
+            "status",
+            "current_task",
+            "is_healthy",
+            "total_requests_processed",
+            "queue_size",
+            "active_connections",
+            "average_response_time_ms",
+        ] {
+            assert!(
+                o.contains_key(key),
+                "worker JSON missing key `{key}`: {o:?}"
+            );
+        }
+    }
 }
 
 #[tokio::test]

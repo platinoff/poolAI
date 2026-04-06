@@ -1079,11 +1079,29 @@ components:
           example: worker-1
         status:
           type: string
-          example: active
+          description: idle, busy, or error
+          example: idle
         current_task:
           type: string
           nullable: true
           example: task-123
+        is_healthy:
+          type: boolean
+          example: true
+        total_requests_processed:
+          type: integer
+          format: int64
+          example: 0
+        queue_size:
+          type: integer
+          example: 0
+        active_connections:
+          type: integer
+          example: 0
+        average_response_time_ms:
+          type: number
+          format: double
+          example: 0.0
 
     VmInstance:
       type: object

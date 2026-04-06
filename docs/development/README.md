@@ -20,6 +20,7 @@
 
 ### Допоміжні документи:
 - [`CONCEPT_IMPLEMENTATION_CHECKLIST.md`](./CONCEPT_IMPLEMENTATION_CHECKLIST.md) - Чеклист реалізації концепції
+- [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md) — узгодження API↔UI, автотести, E2E (план)
 
 ---
 
