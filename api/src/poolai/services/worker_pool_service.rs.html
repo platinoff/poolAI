@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/services/worker_pool_service.rs`."><title>worker_pool_service.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="poolai" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">poolai/services/</div>worker_pool_service.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Worker pool operations for the HTTP API (list, add, remove).
+<a href=#2 id=2 data-nosnippet>2</a>
+<a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span><span class="kw">crate</span>::core::error::AppError;
+<a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span><span class="kw">crate</span>::core::state::ApiContext;
+<a href=#5 id=5 data-nosnippet>5</a><span class="kw">use </span><span class="kw">crate</span>::pool;
+<a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span><span class="kw">crate</span>::pool::Pool;
+<a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span>serde::Serialize;
+<a href=#8 id=8 data-nosnippet>8</a><span class="kw">use </span>std::sync::Arc;
+<a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>tokio::sync::RwLock <span class="kw">as </span>TokioRwLock;
+<a href=#10 id=10 data-nosnippet>10</a>
+<a href=#11 id=11 data-nosnippet>11</a><span class="doccomment">/// Dashboard-friendly worker row (matches admin UI expectations).
+<a href=#12 id=12 data-nosnippet>12</a></span><span class="attr">#[derive(Debug, Clone, Serialize)]
+<a href=#13 id=13 data-nosnippet>13</a></span><span class="kw">pub struct </span>WorkerInfo {
+<a href=#14 id=14 data-nosnippet>14</a>    <span class="kw">pub </span>id: String,
+<a href=#15 id=15 data-nosnippet>15</a>    <span class="doccomment">/// High-level state for dashboards: `idle`, `busy`, or `error`.
+<a href=#16 id=16 data-nosnippet>16</a>    </span><span class="kw">pub </span>status: String,
+<a href=#17 id=17 data-nosnippet>17</a>    <span class="kw">pub </span>current_task: <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#18 id=18 data-nosnippet>18</a>    <span class="doccomment">/// Matches admin UI and detailed panels (pool `WorkerStatus`).
+<a href=#19 id=19 data-nosnippet>19</a>    </span><span class="kw">pub </span>is_healthy: bool,
+<a href=#20 id=20 data-nosnippet>20</a>    <span class="kw">pub </span>total_requests_processed: u64,
+<a href=#21 id=21 data-nosnippet>21</a>    <span class="kw">pub </span>queue_size: usize,
+<a href=#22 id=22 data-nosnippet>22</a>    <span class="kw">pub </span>active_connections: usize,
+<a href=#23 id=23 data-nosnippet>23</a>    <span class="kw">pub </span>average_response_time_ms: f64,
+<a href=#24 id=24 data-nosnippet>24</a>}
+<a href=#25 id=25 data-nosnippet>25</a>
+<a href=#26 id=26 data-nosnippet>26</a><span class="doccomment">/// Validated fields for registering a worker in the pool (HTTP layer maps requests here).
+<a href=#27 id=27 data-nosnippet>27</a></span><span class="attr">#[derive(Debug, Clone)]
+<a href=#28 id=28 data-nosnippet>28</a></span><span class="kw">pub struct </span>CreateWorkerInput {
+<a href=#29 id=29 data-nosnippet>29</a>    <span class="kw">pub </span>worker_id: String,
+<a href=#30 id=30 data-nosnippet>30</a>    <span class="kw">pub </span>max_concurrent_requests: usize,
+<a href=#31 id=31 data-nosnippet>31</a>    <span class="kw">pub </span>request_timeout_ms: u64,
+<a href=#32 id=32 data-nosnippet>32</a>    <span class="kw">pub </span>health_check_interval_ms: u64,
+<a href=#33 id=33 data-nosnippet>33</a>    <span class="kw">pub </span>enable_caching: bool,
+<a href=#34 id=34 data-nosnippet>34</a>    <span class="kw">pub </span>cache_size: usize,
+<a href=#35 id=35 data-nosnippet>35</a>    <span class="kw">pub </span>max_memory_mb: usize,
+<a href=#36 id=36 data-nosnippet>36</a>    <span class="kw">pub </span>cpu_priority: u8,
+<a href=#37 id=37 data-nosnippet>37</a>    <span class="kw">pub </span>gpu_device: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+<a href=#38 id=38 data-nosnippet>38</a>    <span class="kw">pub </span>auto_restart: bool,
+<a href=#39 id=39 data-nosnippet>39</a>    <span class="kw">pub </span>resource_monitoring: bool,
+<a href=#40 id=40 data-nosnippet>40</a>}
+<a href=#41 id=41 data-nosnippet>41</a>
+<a href=#42 id=42 data-nosnippet>42</a><span class="attr">#[derive(Debug)]
+<a href=#43 id=43 data-nosnippet>43</a></span><span class="kw">pub enum </span>AddWorkerError {
+<a href=#44 id=44 data-nosnippet>44</a>    PoolNotReady,
+<a href=#45 id=45 data-nosnippet>45</a>    Operation(AppError),
+<a href=#46 id=46 data-nosnippet>46</a>}
+<a href=#47 id=47 data-nosnippet>47</a>
+<a href=#48 id=48 data-nosnippet>48</a><span class="attr">#[derive(Debug)]
+<a href=#49 id=49 data-nosnippet>49</a></span><span class="kw">pub enum </span>RemoveWorkerError {
+<a href=#50 id=50 data-nosnippet>50</a>    PoolNotReady,
+<a href=#51 id=51 data-nosnippet>51</a>    Operation(AppError),
+<a href=#52 id=52 data-nosnippet>52</a>}
+<a href=#53 id=53 data-nosnippet>53</a>
+<a href=#54 id=54 data-nosnippet>54</a><span class="kw">pub struct </span>WorkerPoolService;
+<a href=#55 id=55 data-nosnippet>55</a>
+<a href=#56 id=56 data-nosnippet>56</a><span class="kw">impl </span>WorkerPoolService {
+<a href=#57 id=57 data-nosnippet>57</a>    <span class="kw">fn </span>status_label(is_healthy: bool, active_connections: usize) -&gt; String {
+<a href=#58 id=58 data-nosnippet>58</a>        <span class="kw">match </span>is_healthy {
+<a href=#59 id=59 data-nosnippet>59</a>            <span class="bool-val">true </span>=&gt; {
+<a href=#60 id=60 data-nosnippet>60</a>                <span class="kw">if </span>active_connections &gt; <span class="number">0 </span>{
+<a href=#61 id=61 data-nosnippet>61</a>                    <span class="string">"busy"</span>.to_string()
+<a href=#62 id=62 data-nosnippet>62</a>                } <span class="kw">else </span>{
+<a href=#63 id=63 data-nosnippet>63</a>                    <span class="string">"idle"</span>.to_string()
+<a href=#64 id=64 data-nosnippet>64</a>                }
+<a href=#65 id=65 data-nosnippet>65</a>            }
+<a href=#66 id=66 data-nosnippet>66</a>            <span class="bool-val">false </span>=&gt; <span class="string">"error"</span>.to_string(),
+<a href=#67 id=67 data-nosnippet>67</a>        }
+<a href=#68 id=68 data-nosnippet>68</a>    }
+<a href=#69 id=69 data-nosnippet>69</a>
+<a href=#70 id=70 data-nosnippet>70</a>    <span class="kw">fn </span>mock_workers() -&gt; Vec&lt;WorkerInfo&gt; {
+<a href=#71 id=71 data-nosnippet>71</a>        <span class="macro">vec!</span>[
+<a href=#72 id=72 data-nosnippet>72</a>            WorkerInfo {
+<a href=#73 id=73 data-nosnippet>73</a>                id: <span class="string">"worker-1"</span>.to_string(),
+<a href=#74 id=74 data-nosnippet>74</a>                status: <span class="string">"busy"</span>.to_string(),
+<a href=#75 id=75 data-nosnippet>75</a>                current_task: <span class="prelude-val">Some</span>(<span class="string">"text-generation"</span>.to_string()),
+<a href=#76 id=76 data-nosnippet>76</a>                is_healthy: <span class="bool-val">true</span>,
+<a href=#77 id=77 data-nosnippet>77</a>                total_requests_processed: <span class="number">128</span>,
+<a href=#78 id=78 data-nosnippet>78</a>                queue_size: <span class="number">0</span>,
+<a href=#79 id=79 data-nosnippet>79</a>                active_connections: <span class="number">1</span>,
+<a href=#80 id=80 data-nosnippet>80</a>                average_response_time_ms: <span class="number">24.5</span>,
+<a href=#81 id=81 data-nosnippet>81</a>            },
+<a href=#82 id=82 data-nosnippet>82</a>            WorkerInfo {
+<a href=#83 id=83 data-nosnippet>83</a>                id: <span class="string">"worker-2"</span>.to_string(),
+<a href=#84 id=84 data-nosnippet>84</a>                status: <span class="string">"idle"</span>.to_string(),
+<a href=#85 id=85 data-nosnippet>85</a>                current_task: <span class="prelude-val">None</span>,
+<a href=#86 id=86 data-nosnippet>86</a>                is_healthy: <span class="bool-val">true</span>,
+<a href=#87 id=87 data-nosnippet>87</a>                total_requests_processed: <span class="number">64</span>,
+<a href=#88 id=88 data-nosnippet>88</a>                queue_size: <span class="number">0</span>,
+<a href=#89 id=89 data-nosnippet>89</a>                active_connections: <span class="number">0</span>,
+<a href=#90 id=90 data-nosnippet>90</a>                average_response_time_ms: <span class="number">18.0</span>,
+<a href=#91 id=91 data-nosnippet>91</a>            },
+<a href=#92 id=92 data-nosnippet>92</a>        ]
+<a href=#93 id=93 data-nosnippet>93</a>    }
+<a href=#94 id=94 data-nosnippet>94</a>
+<a href=#95 id=95 data-nosnippet>95</a>    <span class="kw">pub async fn </span>list_workers(ctx: <span class="kw-2">&amp;</span>ApiContext) -&gt; Vec&lt;WorkerInfo&gt; {
+<a href=#96 id=96 data-nosnippet>96</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(pool) = ctx.pool.get() {
+<a href=#97 id=97 data-nosnippet>97</a>            <span class="kw">let </span>worker_statuses = {
+<a href=#98 id=98 data-nosnippet>98</a>                <span class="kw">let </span>pool_guard = pool.read().<span class="kw">await</span>;
+<a href=#99 id=99 data-nosnippet>99</a>                pool_guard.get_worker_status().<span class="kw">await
+<a href=#100 id=100 data-nosnippet>100</a>            </span>};
+<a href=#101 id=101 data-nosnippet>101</a>            <span class="kw">if </span>!worker_statuses.is_empty() {
+<a href=#102 id=102 data-nosnippet>102</a>                <span class="kw">return </span>worker_statuses
+<a href=#103 id=103 data-nosnippet>103</a>                    .iter()
+<a href=#104 id=104 data-nosnippet>104</a>                    .map(|(id, status)| WorkerInfo {
+<a href=#105 id=105 data-nosnippet>105</a>                        id: id.clone(),
+<a href=#106 id=106 data-nosnippet>106</a>                        status: <span class="self">Self</span>::status_label(status.is_healthy, status.active_connections),
+<a href=#107 id=107 data-nosnippet>107</a>                        current_task: status.current_task.clone(),
+<a href=#108 id=108 data-nosnippet>108</a>                        is_healthy: status.is_healthy,
+<a href=#109 id=109 data-nosnippet>109</a>                        total_requests_processed: status.total_requests_processed,
+<a href=#110 id=110 data-nosnippet>110</a>                        queue_size: status.queue_size,
+<a href=#111 id=111 data-nosnippet>111</a>                        active_connections: status.active_connections,
+<a href=#112 id=112 data-nosnippet>112</a>                        average_response_time_ms: status.average_response_time_ms,
+<a href=#113 id=113 data-nosnippet>113</a>                    })
+<a href=#114 id=114 data-nosnippet>114</a>                    .collect();
+<a href=#115 id=115 data-nosnippet>115</a>            }
+<a href=#116 id=116 data-nosnippet>116</a>        }
+<a href=#117 id=117 data-nosnippet>117</a>        <span class="self">Self</span>::mock_workers()
+<a href=#118 id=118 data-nosnippet>118</a>    }
+<a href=#119 id=119 data-nosnippet>119</a>
+<a href=#120 id=120 data-nosnippet>120</a>    <span class="kw">pub async fn </span>add_worker(
+<a href=#121 id=121 data-nosnippet>121</a>        ctx: <span class="kw-2">&amp;</span>ApiContext,
+<a href=#122 id=122 data-nosnippet>122</a>        input: CreateWorkerInput,
+<a href=#123 id=123 data-nosnippet>123</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), AddWorkerError&gt; {
+<a href=#124 id=124 data-nosnippet>124</a>        <span class="kw">let </span>pool: Arc&lt;TokioRwLock&lt;Pool&gt;&gt; = ctx
+<a href=#125 id=125 data-nosnippet>125</a>            .pool
+<a href=#126 id=126 data-nosnippet>126</a>            .get()
+<a href=#127 id=127 data-nosnippet>127</a>            .cloned()
+<a href=#128 id=128 data-nosnippet>128</a>            .ok_or(AddWorkerError::PoolNotReady)<span class="question-mark">?</span>;
+<a href=#129 id=129 data-nosnippet>129</a>        <span class="kw">let </span>worker_config = pool::worker::WorkerConfig {
+<a href=#130 id=130 data-nosnippet>130</a>            worker_id: input.worker_id.clone(),
+<a href=#131 id=131 data-nosnippet>131</a>            max_concurrent_requests: input.max_concurrent_requests,
+<a href=#132 id=132 data-nosnippet>132</a>            request_timeout_ms: input.request_timeout_ms,
+<a href=#133 id=133 data-nosnippet>133</a>            health_check_interval_ms: input.health_check_interval_ms,
+<a href=#134 id=134 data-nosnippet>134</a>            enable_caching: input.enable_caching,
+<a href=#135 id=135 data-nosnippet>135</a>            cache_size: input.cache_size,
+<a href=#136 id=136 data-nosnippet>136</a>            max_memory_mb: input.max_memory_mb,
+<a href=#137 id=137 data-nosnippet>137</a>            cpu_priority: input.cpu_priority,
+<a href=#138 id=138 data-nosnippet>138</a>            gpu_device: input.gpu_device,
+<a href=#139 id=139 data-nosnippet>139</a>            auto_restart: input.auto_restart,
+<a href=#140 id=140 data-nosnippet>140</a>            resource_monitoring: input.resource_monitoring,
+<a href=#141 id=141 data-nosnippet>141</a>        };
+<a href=#142 id=142 data-nosnippet>142</a>        <span class="kw">let </span>worker = pool::worker::Worker::new(worker_config);
+<a href=#143 id=143 data-nosnippet>143</a>        <span class="kw">let </span>pool_guard = pool.write().<span class="kw">await</span>;
+<a href=#144 id=144 data-nosnippet>144</a>        pool_guard
+<a href=#145 id=145 data-nosnippet>145</a>            .add_worker(input.worker_id, worker)
+<a href=#146 id=146 data-nosnippet>146</a>            .<span class="kw">await
+<a href=#147 id=147 data-nosnippet>147</a>            </span>.map_err(AddWorkerError::Operation)<span class="question-mark">?</span>;
+<a href=#148 id=148 data-nosnippet>148</a>        <span class="prelude-val">Ok</span>(())
+<a href=#149 id=149 data-nosnippet>149</a>    }
+<a href=#150 id=150 data-nosnippet>150</a>
+<a href=#151 id=151 data-nosnippet>151</a>    <span class="kw">pub async fn </span>remove_worker(ctx: <span class="kw-2">&amp;</span>ApiContext, worker_id: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), RemoveWorkerError&gt; {
+<a href=#152 id=152 data-nosnippet>152</a>        <span class="kw">let </span>pool: Arc&lt;TokioRwLock&lt;Pool&gt;&gt; = ctx
+<a href=#153 id=153 data-nosnippet>153</a>            .pool
+<a href=#154 id=154 data-nosnippet>154</a>            .get()
+<a href=#155 id=155 data-nosnippet>155</a>            .cloned()
+<a href=#156 id=156 data-nosnippet>156</a>            .ok_or(RemoveWorkerError::PoolNotReady)<span class="question-mark">?</span>;
+<a href=#157 id=157 data-nosnippet>157</a>        <span class="kw">let </span>pool_guard = pool.write().<span class="kw">await</span>;
+<a href=#158 id=158 data-nosnippet>158</a>        pool_guard
+<a href=#159 id=159 data-nosnippet>159</a>            .remove_worker(worker_id)
+<a href=#160 id=160 data-nosnippet>160</a>            .<span class="kw">await
+<a href=#161 id=161 data-nosnippet>161</a>            </span>.map_err(RemoveWorkerError::Operation)<span class="question-mark">?</span>;
+<a href=#162 id=162 data-nosnippet>162</a>        <span class="prelude-val">Ok</span>(())
+<a href=#163 id=163 data-nosnippet>163</a>    }
+<a href=#164 id=164 data-nosnippet>164</a>}</code></pre></div></section></main></body></html>

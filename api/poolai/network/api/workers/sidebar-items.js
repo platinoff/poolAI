@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["create_workers_routes"],"struct":["WorkerInfo"]};
+window.SIDEBAR_ITEMS = {"fn":["create_workers_routes"]};
