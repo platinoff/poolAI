@@ -2912,7 +2912,6 @@ dependencies = [
  "http 1.4.0",
  "jsonwebtoken",
  "k8s-openapi",
- "lazy_static",
  "lru",
  "mockito",
  "nix",
