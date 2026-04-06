@@ -425,6 +425,56 @@ async fn test_pipeline_with_all_step_types() {
             .and_then(|o| o.get("step_kind")),
         Some(&"federated_aggregation".to_string())
     );
+
+    assert_eq!(
+        got.step_results
+            .get("preprocess")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"preprocessing".to_string())
+    );
+    let pre = got
+        .step_results
+        .get("preprocess")
+        .and_then(|r| r.output.as_ref())
+        .unwrap();
+    assert!(pre.get("estimated_bytes").is_some());
+    assert_eq!(
+        got.step_results
+            .get("train")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"training".to_string())
+    );
+    assert!(got
+        .step_results
+        .get("train")
+        .and_then(|r| r.output.as_ref())
+        .and_then(|o| o.get("final_loss"))
+        .is_some());
+
+    assert_eq!(
+        got.step_results
+            .get("evaluate")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"evaluation".to_string())
+    );
+    assert_eq!(
+        got.step_results
+            .get("deploy")
+            .and_then(|r| r.output.as_ref())
+            .and_then(|o| o.get("step_kind")),
+        Some(&"deployment".to_string())
+    );
+    let dep = got
+        .step_results
+        .get("deploy")
+        .and_then(|r| r.output.as_ref())
+        .unwrap();
+    assert!(dep
+        .get("artifact_uri")
+        .is_some_and(|u| u.starts_with("poolai://artifacts/ml/")));
 }
 
 #[tokio::test]

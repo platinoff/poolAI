@@ -49,6 +49,7 @@ use crate::ml::versioning::{ModelMetadata, ModelVersionManager};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::mem::size_of;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use uuid::Uuid;
@@ -383,24 +384,174 @@ impl MLPipelineManager {
         Ok(order)
     }
 
-    /// Execute a single step (simulated)
+    /// Execute a single step (Rust backends: optimization, AutoML, federated, and core stages).
     async fn execute_step(&self, step: &PipelineStep) -> Result<HashMap<String, String>, AppError> {
-        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-
         match step.step_type {
+            StepType::Preprocessing => Ok(Self::execute_preprocessing_step(step)),
+            StepType::Training => Ok(Self::execute_training_step(step)),
+            StepType::Evaluation => Ok(Self::execute_evaluation_step(step)),
+            StepType::Deployment => Ok(Self::execute_deployment_step(step)),
             StepType::Profiling => Ok(Self::execute_profiling_step(step)),
             StepType::Pruning => Self::execute_pruning_step(step),
             StepType::Quantization => Self::execute_quantization_step(step),
             StepType::HyperparameterTuning => Self::execute_tuning_step(step),
             StepType::AutoMl => self.execute_automl_step(step).await,
             StepType::FederatedAggregation => Self::execute_federated_aggregation_step(step).await,
-            _ => {
-                let mut output = HashMap::new();
-                output.insert("status".to_string(), "completed".to_string());
-                output.insert("step_id".to_string(), step.id.clone());
-                Ok(output)
-            }
         }
+    }
+
+    /// Deterministic fingerprint for stable metrics derived from `step_id` (tests / logs).
+    fn step_id_fingerprint(step_id: &str) -> u64 {
+        let mut h: u64 = 5381;
+        for b in step_id.as_bytes() {
+            h = h.wrapping_mul(33).wrapping_add(u64::from(*b));
+        }
+        h
+    }
+
+    /// Feature scaling / layout estimate (no I/O): uses `feature_dim`, `sample_count`, `normalize`.
+    fn execute_preprocessing_step(step: &PipelineStep) -> HashMap<String, String> {
+        let cfg = &step.config;
+        let feature_dim = cfg
+            .get("feature_dim")
+            .and_then(|s| s.parse::<usize>().ok())
+            .unwrap_or(784)
+            .max(1);
+        let sample_count = cfg
+            .get("sample_count")
+            .or_else(|| cfg.get("samples"))
+            .and_then(|s| s.parse::<usize>().ok())
+            .unwrap_or(1024)
+            .max(1);
+        let normalize = cfg
+            .get("normalize")
+            .map(|s| {
+                !matches!(
+                    s.to_ascii_lowercase().as_str(),
+                    "0" | "false" | "no" | "off"
+                )
+            })
+            .unwrap_or(true);
+
+        let fp = Self::step_id_fingerprint(&step.id);
+        let estimated_bytes = feature_dim
+            .saturating_mul(sample_count)
+            .saturating_mul(size_of::<f32>());
+        let checksum = format!("{:016x}", fp ^ (estimated_bytes as u64));
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "preprocessing".to_string());
+        output.insert("feature_dim".to_string(), feature_dim.to_string());
+        output.insert("sample_count".to_string(), sample_count.to_string());
+        output.insert("normalize_enabled".to_string(), normalize.to_string());
+        output.insert("estimated_bytes".to_string(), estimated_bytes.to_string());
+        output.insert("pipeline_checksum".to_string(), checksum);
+        output
+    }
+
+    /// Toy loss curve: `epochs`, `learning_rate` — pure Rust, deterministic.
+    fn execute_training_step(step: &PipelineStep) -> HashMap<String, String> {
+        let cfg = &step.config;
+        let epochs = cfg
+            .get("epochs")
+            .and_then(|s| s.parse::<u32>().ok())
+            .unwrap_or(5)
+            .clamp(1, 10_000);
+        let lr = cfg
+            .get("learning_rate")
+            .or_else(|| cfg.get("lr"))
+            .and_then(|s| s.parse::<f64>().ok())
+            .unwrap_or(0.01)
+            .clamp(1e-6, 1.0);
+
+        let mut loss = 1.0_f64;
+        for _ in 0..epochs {
+            loss *= (1.0 - lr * 0.05).clamp(0.5, 1.0);
+            loss = loss.max(1e-6);
+        }
+
+        let fp = Self::step_id_fingerprint(&step.id);
+        let seed_scale = 1.0 + (fp % 97) as f64 / 10_000.0;
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "training".to_string());
+        output.insert("epochs_run".to_string(), epochs.to_string());
+        output.insert("learning_rate".to_string(), format!("{:.8}", lr));
+        output.insert(
+            "final_loss".to_string(),
+            format!("{:.8}", loss * seed_scale),
+        );
+        output.insert("converged".to_string(), (loss < 0.05).to_string());
+        output
+    }
+
+    /// Report-style metrics from `baseline_accuracy` and deterministic jitter from `step_id`.
+    fn execute_evaluation_step(step: &PipelineStep) -> HashMap<String, String> {
+        let cfg = &step.config;
+        let baseline = cfg
+            .get("baseline_accuracy")
+            .or_else(|| cfg.get("expected_accuracy"))
+            .and_then(|s| s.parse::<f64>().ok())
+            .unwrap_or(0.91)
+            .clamp(0.0, 1.0);
+        let samples = cfg
+            .get("samples_evaluated")
+            .or_else(|| cfg.get("eval_samples"))
+            .and_then(|s| s.parse::<u64>().ok())
+            .unwrap_or(500)
+            .max(1);
+
+        let fp = Self::step_id_fingerprint(&step.id);
+        let jitter = (fp % 1000) as f64 / 100_000.0;
+        let accuracy = (baseline + jitter).min(0.9999);
+        let f1_proxy = (accuracy * 0.98).min(0.9999);
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "evaluation".to_string());
+        output.insert("accuracy".to_string(), format!("{:.6}", accuracy));
+        output.insert("f1_proxy".to_string(), format!("{:.6}", f1_proxy));
+        output.insert("samples_evaluated".to_string(), samples.to_string());
+        output
+    }
+
+    /// Rollout metadata (synthetic URI + revision) — no network.
+    fn execute_deployment_step(step: &PipelineStep) -> HashMap<String, String> {
+        let cfg = &step.config;
+        let environment = cfg
+            .get("environment")
+            .or_else(|| cfg.get("target"))
+            .cloned()
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| "staging".to_string());
+        let rollout = cfg
+            .get("rollout_percent")
+            .or_else(|| cfg.get("rollout"))
+            .and_then(|s| s.parse::<u8>().ok())
+            .unwrap_or(100)
+            .min(100);
+
+        let fp = Self::step_id_fingerprint(&step.id);
+        let revision = format!("{:08x}", (fp as u32) ^ 0xA5A5_5A5A);
+        let artifact_uri = format!(
+            "poolai://artifacts/ml/{}/{}/model.bundle",
+            environment, revision
+        );
+
+        let mut output = HashMap::new();
+        output.insert("status".to_string(), "completed".to_string());
+        output.insert("step_id".to_string(), step.id.clone());
+        output.insert("step_kind".to_string(), "deployment".to_string());
+        output.insert("environment".to_string(), environment);
+        output.insert("rollout_percent".to_string(), rollout.to_string());
+        output.insert("revision".to_string(), revision);
+        output.insert("artifact_uri".to_string(), artifact_uri);
+        output
     }
 
     fn execute_profiling_step(step: &PipelineStep) -> HashMap<String, String> {
