@@ -1,11 +1,11 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (узгоджено канонічні кроки 1–10: кореневий README, `docs/README`, `INDEX`, цей HANDOFF, `development/README`)  
+**Оновлено:** 2026-04-06 (узгоджено канонічні кроки 1–11: кореневий README, `docs/README`, `INDEX`, цей HANDOFF, `development/README`, `docs/catalog/FUNCTIONALITY_DIGEST`)  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
 
-Той самий список, що в кореневому [`README.md`](../../README.md) (*Documentation map*) і [`docs/README.md`](../README.md) (*Canonical reading order*), кроки **1–10**.
+Той самий список, що в кореневому [`README.md`](../../README.md) (*Documentation map*) і [`docs/README.md`](../README.md) (*Canonical reading order*), кроки **1–11**.
 
 | Крок | Що читати |
 |------|-----------|
@@ -17,10 +17,11 @@
 | 6 | Архітектура: [`ARCHITECTURE_REVIEW.md`](../ARCHITECTURE_REVIEW.md), [`ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md). |
 | 7 | Продуктивність: [`performance/BENCHMARKS.md`](../performance/BENCHMARKS.md), [`performance/PROFILING.md`](../performance/PROFILING.md); опційно [`benchmarks.yml`](../../.github/workflows/benchmarks.yml). |
 | 8 | CI: [`ci.yml`](../../.github/workflows/ci.yml). |
-| 9 | Інвентар: [`file_list.csv`](../../file_list.csv); повний список: `git ls-files`. |
+| 9 | Інвентар: [`file_list.csv`](../../file_list.csv) (оновлюй також `docs/catalog/` при зміні витягу); повний список: `git ls-files`. |
 | 10 | Git push (Windows): [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md). |
+| 11 | Витяг функціоналу: [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). |
 
-Індекс планів у `docs/development/`: [`README.md`](./README.md). OpenAPI: [`docs/openapi.yaml`](../openapi.yaml). UI↔API: [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
+Індекс планів у `docs/development/`: [`README.md`](./README.md). OpenAPI: [`docs/openapi.yaml`](../openapi.yaml). UI↔API: [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md). **Крок 11 / витяг функціоналу:** [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). **Project skill (Cursor):** [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
 
 ## 2. Git push (Windows / Cursor)
 

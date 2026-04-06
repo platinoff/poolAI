@@ -8,8 +8,9 @@
   - `docs/troubleshooting/` - Troubleshooting guides (QUICK_FIX_MSYS2.md, etc.)
 - `scripts/` - Build/deployment scripts (all shell scripts, bash NOT PowerShell)
 - `docker/` - Docker files (Dockerfile, docker-compose.yml)
-- `.cursor/` - Cursor agent configuration (rules, commands, plans)
+- `.cursor/` - Cursor agent configuration (rules, commands, plans, project skills)
   - `.cursor/rules/` - All Cursor rules (including `.cursorrules` moved here)
+  - `.cursor/skills/` - Project Agent Skills (e.g. `poolai-documentation/SKILL.md` — карта доків 1–11 та витяг функціоналу)
 
 ## File Naming
 
@@ -28,6 +29,7 @@
 ## Documentation
 
 - Main docs in `docs/` directory
+- **Catalog / functionality digest:** `docs/catalog/` (canonical step **11** in root README)
 - Status reports in `docs/status/`
 - Development plans in `docs/development/`
 - Architecture docs in `docs/ARCHITECTURE_*.md`

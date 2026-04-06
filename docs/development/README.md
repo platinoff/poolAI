@@ -69,9 +69,10 @@
 
 ## 🔗 Посилання
 
-- [`../../README.md`](../../README.md) — кореневий README (швидкий старт, карта доків 1–10)
+- [`../../README.md`](../../README.md) — кореневий README (швидкий старт, карта доків 1–11)
 - [`../README.md`](../README.md) — вхід у каталог `docs/` (канонічний порядок + короткі вказівки)
 - [`../INDEX_2026-03-17.md`](../INDEX_2026-03-17.md) — повна навігація по `docs/`
+- [`../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) — витяг функціоналу (крок 11)
 - [`../openapi.yaml`](../openapi.yaml) — OpenAPI
 - [`../status/PROJECT_STATUS_REPORT_2026-01-19.md`](../status/PROJECT_STATUS_REPORT_2026-01-19.md) — статус проєкту
 - [`../concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt) — концепція

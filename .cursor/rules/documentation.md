@@ -1,5 +1,17 @@
 # Documentation Structure Rules
 
+## Canonical documentation order (PoolAI)
+
+Узгоджено з кореневим `README.md` (*Documentation map*): **кроки 1–11**. Останній крок:
+
+- **11.** `docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md` — структурований **витяг функціоналу** (модулі, features, HTTP-шари). Оновлювати після значних змін у `src/` або публічному API.
+
+Каталог `docs/catalog/` призначений для зведень і індексів, які не є «планом розробки» (`docs/development/`) і не «статусом» (`docs/status/`).
+
+**Project skill:** `.cursor/skills/poolai-documentation/SKILL.md` — стислі інструкції для агента з цього порядку та витягу.
+
+---
+
 ## 📁 Documentation Structure - STRICT RULES
 
 ### ⚠️ CRITICAL: All documentation MUST be in `docs/` directory
@@ -18,7 +30,9 @@ When creating or referencing documentation, use this structure:
 
 ```
 docs/
-├── README.md                    # Documentation index
+├── README.md                    # Documentation index (canonical steps 1–11)
+├── catalog/                     # Digests / catalogs (e.g. FUNCTIONALITY_DIGEST)
+│   └── FUNCTIONALITY_DIGEST_2026-04-06.md
 ├── STRUCTURE.md                  # This structure description
 │
 ├── status/                      # Current project status
@@ -64,6 +78,7 @@ docs/
    - Ask which category it belongs to
    - Create in appropriate `docs/` subdirectory
    - Update `docs/README.md` index if needed
+   - If the change affects **product capabilities** (modules, routes, features), update **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** (step 11) and **`file_list.csv`** if new paths were added
 
 ## 🔗 File References
 

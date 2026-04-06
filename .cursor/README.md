@@ -7,6 +7,9 @@ This directory contains configuration for Cursor's AI coding agent, following be
 - `rules/` - Static context that applies to every conversation
   - `rust.md` - Rust coding standards and patterns
   - `project-structure.md` - Project organization rules
+  - `documentation.md` - Docs layout, **canonical steps 1–11**, `docs/catalog/` digest
+- `skills/` - Project Agent Skills (optional; discoverable in Cursor)
+  - `poolai-documentation/SKILL.md` - Documentation map + functionality digest (`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`)
 - `commands/` - Reusable workflows triggered with `/` in agent input
   - `check.md` - Run comprehensive code checks
   - `test.md` - Run tests
