@@ -45,7 +45,7 @@
 |---------|----------------|--------------------------------------|
 | **Core** | `core/` | Конфіг, `AppState` / `ApiContext` (у т.ч. `rewards_engine` → `rewards::RewardSystem`), помилки (`AppError`, `ErrorContext`), користувачі, discovery-типи, WS-менеджер, інтерфейс моделі. |
 | **Pool** | `pool/` | Пул воркерів, топологія, discovery-інтеграція, розміщення. |
-| **Network** | `network/` | Axum: `/api/v1/*`, RAID-маршрути, enterprise API, auth, rate limit, JSON-помилки, WebSocket, distributed RAID handlers. |
+| **Network** | `network/` | Axum: `/api/v1/*`, RAID REST (`api/raid.rs` + **`api/raid_http.rs`** для узгоджених помилок), enterprise API, auth, rate limit, JSON-помилки, WebSocket, distributed RAID handlers. |
 | **Platform** | `platform/` | GPU / апаратний рівень. |
 | **Monitoring** | `monitoring/` | Метрики, context memory (ML-контекст). |
 | **Runtime** | `runtime/` | Інстанси, планувальник, кеш, черги, процеси, сховище, оркестратор. |

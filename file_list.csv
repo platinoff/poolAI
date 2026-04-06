@@ -458,6 +458,7 @@
 ./src/network/api/libraries.rs
 ./src/network/api/mod.rs
 ./src/network/api/raid.rs
+./src/network/api/raid_http.rs
 ./src/network/api/raid_admin.rs
 ./src/network/api/rewards.rs
 ./src/network/api/system.rs

@@ -23,9 +23,9 @@
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
-| **2** | **Priority 2** | Сервіси **`RaidService`**, **`VmService`**, **`LibraryService`**, enterprise/cloud/admin — у проді; REST `/raid/*` через **`RaidService`**. Опційно: **`raid_distributed_handlers`** vs сервісний шар. |
+| **2** | **Priority 2** | Сервіси **`RaidService`**, **`VmService`**, **`LibraryService`**, enterprise/cloud/admin — у проді; REST `/raid/*` через **`RaidService`**; HTTP-мапінг помилок RAID — **`network/api/raid_http.rs`**. **Наступний великий залишок без окремого «UI-сервісу»:** тонкі **`network/api/ui.rs`** (enterprise dashboards + themes + components). Опційно: **`raid_distributed_handlers`** vs сервісний шар. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅. Далі: **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; **P4** / SIMD за потреби. |
-| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
+| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
@@ -78,6 +78,7 @@
   - [x] `admin_service.rs`: агрегація даних для адмін‑панелі (`GET /api/v1/admin/overview`, дашборд `/ui/admin`).
 - [ ] Поступово мігрувати логіку з `network/api/*.rs` у відповідні сервіси:
   - [ ] Handler’и роблять мінімум: екстрактують вхідні дані, викликають метод сервісу, маплять результат у HTTP‑відповідь.
+  - [x] Спільний HTTP-мапінг помилок для **`/raid/*`** винесено в **`src/network/api/raid_http.rs`** (тонкий **`raid.rs`**).
   - [ ] Сервіси отримують залежності через `AppState/ApiContext`.
 - [ ] Додати короткий опис service‑шару в:
   - [x] `docs/ARCHITECTURE_BEST_PRACTICES.md` (дерево `src/services/`),
@@ -282,9 +283,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ## Верифікація 2026-04-06 (P3 — `raid.rs` + повний `enterprise_api.rs`)
 
-- **Код (`main`)**: узгоджені JSON-помилки для **`src/network/api/raid.rs`** (`raid_api_err`, `raid_event_store_unavailable`, …) та **`src/network/enterprise_api.rs`** (хелпер **`enterprise_err`**, security / OAuth / SAML / monitoring / tenant тощо). Раніше в тому ж напрямку: `users`, `ui`, `system`, `completions`, `raid_admin`.
+- **Код (`main`)**: узгоджені JSON-помилки для RAID REST — **`src/network/api/raid_http.rs`** (базовий **`raid_api_err`**, **`raid_service_http_err`**, події / snapshot / GC / strategies / rebalance тощо) + маршрути у **`src/network/api/raid.rs`**; **`src/network/enterprise_api.rs`** (хелпер **`enterprise_err`**, security / OAuth / SAML / monitoring / tenant тощо). Раніше в тому ж напрямку: `users`, `ui`, `system`, `completions`, `raid_admin`.
 - **Залишок P3**: **`src/network/auth.rs`** (плоский `"error"` у відповідях) — див. кореневий README «Next Focus» та [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md).
-- **Наступний фокус**: **P4** (бенчмарки / профілювання), опційно **P2** (RAID → `RaidService`), оновлення чекбоксів **TurboQuant** у цьому файлі під наявний код.
+- **Наступний фокус**: **P4** (бенчмарки / профілювання), **P2** — далі тонкий **`ui.rs`** (або `UiService`), оновлення чекбоксів **TurboQuant** у цьому файлі під наявний код.
 
 ## Верифікація 2026-04-06 (P4 — Criterion targets)
 
@@ -372,6 +373,12 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Код**: `src/services/discovery_service.rs` — `list_peers`, `get_peer`, `send_announcement` з `ApiContext::discovery`; `src/network/api/discovery.rs` — thin handlers.
 - **Доки**: `ARCHITECTURE_BEST_PRACTICES.md` (дерево `services/`), `FUNCTIONALITY_DIGEST` (рядок Services), `file_list.csv`.
+
+## Верифікація 2026-04-06 (P2 — `raid_http`)
+
+- **Код**: `src/network/api/raid_http.rs` — спільні JSON-відповіді та мапінг `RaidServiceError` / контекстів для `/raid/*`; `src/network/api/raid.rs` — маршрути та хендлери без дублювання цих блоків. Поведінка API не змінювалась.
+- **Доки**: `NEXT_STEPS_ARCHITECT_2026-03-17.md` (рядок Priority 2, чекбокс P2), `HANDOFF_NEW_SESSION.md`, `file_list.csv`.
+- **Порядок наступних «важких» тонких шарів (без повного нового сервісу)**: спершу **`ui.rs`**, далі інші за потреби.
 
 ## Верифікація 2026-04-06 (P1 — FM-001 інтеграційні тести без globals)
 

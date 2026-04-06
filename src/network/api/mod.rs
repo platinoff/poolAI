@@ -24,6 +24,7 @@ pub mod instances;
 pub mod libraries;
 pub mod raid;
 pub mod raid_admin;
+pub(crate) mod raid_http;
 pub mod rewards;
 pub mod system;
 pub mod topology;
