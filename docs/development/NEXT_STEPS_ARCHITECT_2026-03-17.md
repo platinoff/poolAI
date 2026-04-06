@@ -25,7 +25,7 @@
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
 | **2** | **Priority 2** | Розширити **`src/services/`** (enterprise, cloud, admin); **Stage 4.4** — ML pipeline backends. Є: **`RaidService`**, **`VmService`**, **`LibraryService`** (`/libraries/*`). |
 | **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
-| **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API. |
+| **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API (**частково**: `api_json_error`, `Forbidden`, instances/libraries/vm/workers/topology/rewards, enterprise tenants — див. HANDOFF). |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | Синхронізація документації та TODO після 1–4. |
 | **7** | **Priority 6** | Grid protocol / Solana-adapter у docs і коді за потреби. |
@@ -116,20 +116,16 @@
 **Мета**: єдина “мова помилок” для всього бекенда, сумісна з HTTP‑шаром і логуванням, у стилі продакшн Axum‑сервісів.
 
 **Кроки**:
-- [ ] Ввести доменний тип помилки, наприклад `AppError`:
-  - [ ] Розмістити в `src/core/error.rs` або аналогічному модулі.
-  - [ ] Забезпечити поля для коду помилки, джерела (`source`), контексту, можливо, `hint`.
-- [ ] Додати `ErrorContext`:
-  - [ ] Легкий struct з полями на кшталт `operation`, `resource`, `id`, `details`.
-  - [ ] Хелпери для додавання контексту при `?`‑ланцюжках.
-- [ ] Налаштувати конверсію помилок у HTTP‑відповіді:
-  - [ ] У HTTP‑шарі повертати `Result<T, AppError>` і імплементувати конверсію в стандартну помилку API.
-  - [ ] Переконатися, що чутливі деталі не витікають у зовнішні відповіді, але є в логах.
+- [x] Ввести доменний тип помилки `AppError` у `src/core/error.rs` (коди через `error_code()`, `thiserror`).
+- [x] Додати `ErrorContext` (`operation`, `resource`, `resource_id`, `details`, `hint`) та хелпери `with_*`.
+- [x] Базова конверсія в HTTP JSON у `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; RBAC — `AppError::Forbidden` + `api_error_response`.
+- [ ] Покрити **усі** публічні handlers узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }` (залишились зокрема `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`, більшість `enterprise_api.rs`).
+- [ ] За потреби спростити handler’и до `Result<T, AppError>` там, де ще ручні tuple‑відповіді.
 
 **Критерії готовності**:
-- [ ] Всі основні модулі використовують `AppError` / `ErrorContext` у публічних API.
-- [ ] HTTP‑шар завжди повертає узгоджений JSON‑формат помилок.
-- [ ] Логи містять достатньо контексту для розбору інцидентів.
+- [ ] Всі основні модулі використовують `AppError` / `ErrorContext` у публічних API (HTTP — інкрементально через `api_json_error` / `api_error_response`).
+- [ ] HTTP‑шар завжди повертає узгоджений JSON‑формат помилок (**у процесі**).
+- [x] Для шляхів через `api_error_response` / `api_json_error` — структуровані логи (код, контекст, рівень за класом статусу).
 
 ---
 
@@ -271,4 +267,10 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Доки / інвентар**: оновлено кореневий [`README.md`](../../README.md) (блок статусу та Next Focus), [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/README.md`](../README.md); у [`file_list.csv`](../../file_list.csv) додано `src/ml/turboquant.rs`.
 - **Код (вже в історії `main`)**: розширений `RaidService`; ML pipeline core steps + TurboQuant; частковий P3 — `api_error_response` для RAID operation errors та enterprise AI-ML pipeline handlers.
 - **Наступній сесії**: продовжити P3 (решта handlers), P4 benchmarks; див. HANDOFF та таблицю пріоритетів на початку цього файлу.
+
+## Верифікація 2026-04-07 (P3 розширення + доки + тести)
+
+- **Код (коміт на `main`)**: P3 — `api_json_error`, `AppError::Forbidden`; handlers: `instances`, `libraries`, `vm`, `workers`, `topology`, `rewards`, tenant CRUD у `enterprise_api.rs` (поруч із уже наявними RAID operation + `ai_ml` pipeline).
+- **Тести**: `K8S_OPENAPI_ENABLED_VERSION=1.28` `cargo test --lib --tests --features ml,enterprise,cloud` — успішний прогін з `-j 1` та `--test-threads=1` при обмеженій пам’яті на Windows.
+- **Документація**: узгоджено README, INDEX, HANDOFF, NEXT_STEPS, `docs/README.md`, `development/README.md`; інвентар `file_list.csv` без нових шляхів (ключові файли P3 уже в списку).
 

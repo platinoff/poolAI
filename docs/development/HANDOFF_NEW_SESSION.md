@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (сесія: ML pipeline / RaidService / TurboQuant / API errors)  
+**Оновлено:** 2026-04-07 (синхронізація доків після P3 JSON errors + верифікація `cargo test`)  
 **Гілка роботи:** `main` (зазвичай `git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -28,11 +28,12 @@
 - **RaidService (P2)**: крім list — `put_artifact`, `delete_artifact`, `quota`, `cluster_status`; DTO квоти/статусу в `raid_service.rs`; тонкі handlers у `src/network/api/raid.rs`.
 - **ML pipeline (Stage 4.4)**: детерміновані Rust-бекенди для `Preprocessing`, `Training`, `Evaluation`, `Deployment` (`src/ml/pipeline.rs`).
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
-- **Priority 3 (частково)**: `ErrorContext.hint`, `api_error_response` / `http_status_for_app_error` у `src/network/api/common.rs`; використання в RAID (`Operation`) та enterprise **`/api/enterprise/ai-ml/pipeline`** (`src/network/api/ai_ml.rs`).
+- **Priority 3 (частково)**: у `src/network/api/common.rs` — `api_error_response`, **`api_json_error`** (довільний `code` + той самий JSON-шейп), `http_status_for_app_error`; у `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext.hint`. Узгоджені відповіді в: RAID (`Operation`), enterprise **`/api/enterprise/ai-ml/pipeline`** (`ai_ml.rs`), **`instances`**, **`libraries`**, **`vm`**, **`workers`**, **`topology`**, **`rewards`**, блок **tenant** у `enterprise_api.rs`.
+- **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud`. На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
 
 ## 4. Наступні кроки за тим самим планом
 
-- **P3** — поширити узгоджений JSON помилок на решту HTTP handlers; за потреби уточнити статуси для окремих варіантів `AppError`.
+- **P3** — решта HTTP handlers: **`raid.rs`** (більшість legacy `"error": string`), **`ui`**, **`users`**, **`system`**, **`completions`**, **`raid_admin`**, решта **`enterprise_api.rs`**, за потреби **`auth.rs`**; уточнити статуси для окремих варіантів `AppError`.
 - **P4** — бенчмарки / профілювання ключових шляхів.
 - **P2 (опційно)** — решта RAID-маршрутів через `RaidService` (workers, events, snapshot, …).
 - За потреби — стабілізація `cargo test --all-features` на Windows.

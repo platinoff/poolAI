@@ -63,15 +63,15 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
 For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation map: `docs/INDEX_2026-03-17.md`.
 
-### ✅ Current Build/Test Status (2026-04-06)
+### ✅ Current Build/Test Status (2026-04-07)
 - `cargo fmt --all` — CI / before push  
-- **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** on verification runs.  
+- **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
 - `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
-- **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`** (артефакти, квота, статус кластера); Rust-бекенди базових кроків ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`, крок `Quantization`); частково **Priority 3** — узгоджений JSON помилок (`network/api/common.rs`: `api_error_response`) для частини RAID / enterprise AI-ML pipeline.
+- **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`** (артефакти, квота, статус кластера); Rust-бекенди базових кроків ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`, крок `Quantization`); **Priority 3 (частково)** — `api_error_response`, **`api_json_error`**, **`AppError::Forbidden`**, `http_status_for_app_error` у `network/api/common.rs`; узгоджені помилки в **instances, libraries, vm, workers, topology, rewards**, **tenant** у `enterprise_api.rs`, плюс раніше — RAID `Operation` та enterprise **AI-ML pipeline** (`ai_ml.rs`).
 
 ### Next Focus
-- **Priority 3 (продовження)**: поширити `api_error_response` / `http_status_for_app_error` на інші `network/api/*` handlers; за потреби уточнити мапінг `AppError` → HTTP для `ResourceError` / not-found.
+- **Priority 3 (продовження)**: `raid.rs` (більшість шляхів), `ui`, `users`, `system`, `completions`, `raid_admin`, решта `enterprise_api.rs`; за потреби уточнити мапінг `AppError` → HTTP для `ResourceError` / not-found.
 - **Priority 4**: бенчмарки та профілювання (див. `docs/performance/BENCHMARKS.md`, план у `NEXT_STEPS_ARCHITECT_2026-03-17.md`).
 - **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot) у `RaidService`.
 - За потреби: стабілізувати `cargo test --all-features` на Windows (GNU host або розбиття тестів).
