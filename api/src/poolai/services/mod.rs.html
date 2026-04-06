@@ -3,8 +3,10 @@
 <a href=#3 id=3 data-nosnippet>3</a>//! HTTP handlers in `network::api` should stay thin: parse input, call `services::*`, map to responses.
 <a href=#4 id=4 data-nosnippet>4</a>//! See `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` (Priority 2).
 <a href=#5 id=5 data-nosnippet>5</a>
-<a href=#6 id=6 data-nosnippet>6</a></span><span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
-<a href=#7 id=7 data-nosnippet>7</a></span><span class="kw">pub mod </span>enterprise_service;
-<a href=#8 id=8 data-nosnippet>8</a><span class="kw">pub mod </span>library_service;
-<a href=#9 id=9 data-nosnippet>9</a><span class="kw">pub mod </span>raid_service;
-<a href=#10 id=10 data-nosnippet>10</a><span class="kw">pub mod </span>vm_service;</code></pre></div></section></main></body></html>
+<a href=#6 id=6 data-nosnippet>6</a></span><span class="attr">#[cfg(feature = <span class="string">"cloud"</span>)]
+<a href=#7 id=7 data-nosnippet>7</a></span><span class="kw">pub mod </span>cloud_service;
+<a href=#8 id=8 data-nosnippet>8</a><span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
+<a href=#9 id=9 data-nosnippet>9</a></span><span class="kw">pub mod </span>enterprise_service;
+<a href=#10 id=10 data-nosnippet>10</a><span class="kw">pub mod </span>library_service;
+<a href=#11 id=11 data-nosnippet>11</a><span class="kw">pub mod </span>raid_service;
+<a href=#12 id=12 data-nosnippet>12</a><span class="kw">pub mod </span>vm_service;</code></pre></div></section></main></body></html>
