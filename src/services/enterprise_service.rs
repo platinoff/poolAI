@@ -67,6 +67,17 @@ pub struct DashboardCreateInput {
     pub tenant_id: Option<String>,
 }
 
+/// Full replace payload for an existing dashboard (used by UI/API update).
+#[derive(Debug, Clone)]
+pub struct DashboardUpdateInput {
+    pub name: String,
+    pub description: String,
+    pub metrics: Vec<String>,
+    pub layout: String,
+    pub is_public: Option<bool>,
+    pub tenant_id: Option<Uuid>,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct MetricHistoryQueryInput {
     pub metric: Option<String>,
@@ -291,6 +302,48 @@ impl EnterpriseService {
             .await
             .map_err(EnterpriseMonitoringError::Operation)?;
         Ok(dashboard)
+    }
+
+    pub async fn get_monitoring_dashboard(
+        ctx: &ApiContext,
+        id: Uuid,
+    ) -> Result<Option<Dashboard>, EnterpriseMonitoringError> {
+        Self::ensure_monitoring(ctx).await?;
+        ctx.enterprise_monitoring_manager
+            .get_dashboard(id)
+            .await
+            .map_err(EnterpriseMonitoringError::Operation)
+    }
+
+    pub async fn update_monitoring_dashboard(
+        ctx: &ApiContext,
+        id: Uuid,
+        input: DashboardUpdateInput,
+    ) -> Result<Option<Dashboard>, EnterpriseMonitoringError> {
+        Self::ensure_monitoring(ctx).await?;
+        let existing = ctx
+            .enterprise_monitoring_manager
+            .get_dashboard(id)
+            .await
+            .map_err(EnterpriseMonitoringError::Operation)?;
+        let Some(existing) = existing else {
+            return Ok(None);
+        };
+        let updated = Dashboard {
+            id: existing.id,
+            name: input.name,
+            description: input.description,
+            metrics: input.metrics,
+            layout: input.layout,
+            is_public: input.is_public.unwrap_or(existing.is_public),
+            tenant_id: input.tenant_id.or(existing.tenant_id),
+            created_at: existing.created_at,
+        };
+        ctx.enterprise_monitoring_manager
+            .create_dashboard(updated.clone())
+            .await
+            .map_err(EnterpriseMonitoringError::Operation)?;
+        Ok(Some(updated))
     }
 
     pub async fn query_monitoring_metric_history(

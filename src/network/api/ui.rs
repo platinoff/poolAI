@@ -13,20 +13,49 @@ use axum::{
     routing::{delete, get, post, put},
     Json as AxumJson, Router,
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-#[cfg(feature = "enterprise")]
-use crate::enterprise::monitoring::Dashboard;
-#[cfg(feature = "enterprise")]
-use crate::network::api::check_permission;
+#[cfg(not(feature = "enterprise"))]
 use crate::network::api::common::api_json_error;
+#[cfg(feature = "enterprise")]
+use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
-use crate::ui::{components, get_all_themes, get_theme};
+#[cfg(feature = "enterprise")]
+use crate::services::enterprise_service::{
+    DashboardCreateInput, DashboardUpdateInput, EnterpriseMonitoringError,
+};
+use crate::services::ui_service::UiService;
 #[cfg(feature = "enterprise")]
 use axum::extract::State;
+
+#[cfg(feature = "enterprise")]
+type UiHttpErr = (StatusCode, AxumJson<serde_json::Value>);
+
+#[cfg(feature = "enterprise")]
+fn ui_monitoring_http_err(
+    e: EnterpriseMonitoringError,
+    api_code: &'static str,
+    operation: &'static str,
+    message_for_operation: impl Into<String>,
+) -> UiHttpErr {
+    match e {
+        EnterpriseMonitoringError::Init(err) => api_json_error(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", err),
+            Some(ErrorContext::new(operation).with_hint("Check system startup sequence.")),
+            StatusCode::SERVICE_UNAVAILABLE,
+        ),
+        EnterpriseMonitoringError::Operation(err) => api_json_error(
+            api_code,
+            format!("{}: {}", message_for_operation.into(), err),
+            Some(ErrorContext::new(operation)),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        ),
+    }
+}
 
 /// Create UI management routes
 pub fn create_ui_routes() -> Router<ApiContext> {
@@ -75,15 +104,14 @@ struct CreateDashboardRequest {
 
 #[cfg(feature = "enterprise")]
 async fn ui_dashboards_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.enterprise_monitoring_manager.clone();
-    match manager.list_dashboards(None).await {
+    match UiService::list_dashboards(&ctx).await {
         Ok(dashboards) => AxumJson(dashboards).into_response(),
         Err(e) => {
-            let (s, j) = api_json_error(
+            let (s, j) = ui_monitoring_http_err(
+                e,
                 "LIST_DASHBOARDS_FAILED",
-                format!("Failed to list dashboards: {}", e),
-                Some(ErrorContext::new("ui_dashboards_list")),
-                StatusCode::INTERNAL_SERVER_ERROR,
+                "ui_dashboards_list",
+                "Failed to list dashboards",
             );
             (s, AxumJson(j.0)).into_response()
         }
@@ -109,7 +137,6 @@ async fn ui_dashboard_get_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.enterprise_monitoring_manager.clone();
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -123,7 +150,7 @@ async fn ui_dashboard_get_handler(
         }
     };
 
-    match manager.get_dashboard(uuid).await {
+    match UiService::get_dashboard(&ctx, uuid).await {
         Ok(Some(dashboard)) => AxumJson(dashboard).into_response(),
         Ok(None) => {
             let (s, j) = api_json_error(
@@ -135,11 +162,11 @@ async fn ui_dashboard_get_handler(
             (s, AxumJson(j.0)).into_response()
         }
         Err(e) => {
-            let (s, j) = api_json_error(
+            let (s, j) = ui_monitoring_http_err(
+                e,
                 "GET_DASHBOARD_FAILED",
-                format!("Failed to get dashboard: {}", e),
-                Some(ErrorContext::new("ui_dashboard_get").with_resource("dashboard_id", &id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
+                "ui_dashboard_get",
+                "Failed to get dashboard",
             );
             (s, AxumJson(j.0)).into_response()
         }
@@ -182,26 +209,23 @@ async fn ui_dashboard_create_handler(
         return (s, AxumJson(j.0)).into_response();
     }
 
-    let manager = ctx.enterprise_monitoring_manager.clone();
-    let dashboard = Dashboard {
-        id: Uuid::new_v4(),
-        name: payload.name.clone(),
-        description: payload.description.clone(),
-        metrics: payload.metrics.clone(),
-        layout: payload.layout.clone(),
-        is_public: payload.is_public.unwrap_or(false),
-        tenant_id: payload.tenant_id,
-        created_at: chrono::Utc::now(),
+    let input = DashboardCreateInput {
+        name: payload.name,
+        description: Some(payload.description),
+        metrics: payload.metrics,
+        layout: Some(payload.layout),
+        is_public: payload.is_public,
+        tenant_id: payload.tenant_id.map(|u| u.to_string()),
     };
 
-    match manager.create_dashboard(dashboard.clone()).await {
-        Ok(_) => (StatusCode::CREATED, AxumJson(dashboard)).into_response(),
+    match UiService::create_dashboard(&ctx, input).await {
+        Ok(dashboard) => (StatusCode::CREATED, AxumJson(dashboard)).into_response(),
         Err(e) => {
-            let (s, j) = api_json_error(
+            let (s, j) = ui_monitoring_http_err(
+                e,
                 "CREATE_DASHBOARD_FAILED",
-                format!("Failed to create dashboard: {}", e),
-                Some(ErrorContext::new("ui_dashboard_create")),
-                StatusCode::INTERNAL_SERVER_ERROR,
+                "ui_dashboard_create",
+                "Failed to create dashboard",
             );
             (s, AxumJson(j.0)).into_response()
         }
@@ -238,7 +262,6 @@ async fn ui_dashboard_update_handler(
         return err.into_response();
     }
 
-    let manager = ctx.enterprise_monitoring_manager.clone();
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -252,9 +275,17 @@ async fn ui_dashboard_update_handler(
         }
     };
 
-    // Get existing dashboard first
-    let existing = match manager.get_dashboard(uuid).await {
-        Ok(Some(d)) => d,
+    let input = DashboardUpdateInput {
+        name: payload.name,
+        description: payload.description,
+        metrics: payload.metrics,
+        layout: payload.layout,
+        is_public: payload.is_public,
+        tenant_id: payload.tenant_id,
+    };
+
+    match UiService::update_dashboard(&ctx, uuid, input).await {
+        Ok(Some(updated)) => AxumJson(updated).into_response(),
         Ok(None) => {
             let (s, j) = api_json_error(
                 "DASHBOARD_NOT_FOUND",
@@ -262,39 +293,14 @@ async fn ui_dashboard_update_handler(
                 Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
                 StatusCode::NOT_FOUND,
             );
-            return (s, AxumJson(j.0)).into_response();
+            (s, AxumJson(j.0)).into_response()
         }
         Err(e) => {
-            let (s, j) = api_json_error(
-                "GET_DASHBOARD_FAILED",
-                format!("Failed to get dashboard: {}", e),
-                Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            return (s, AxumJson(j.0)).into_response();
-        }
-    };
-
-    // Update dashboard
-    let updated = Dashboard {
-        id: existing.id,
-        name: payload.name,
-        description: payload.description,
-        metrics: payload.metrics,
-        layout: payload.layout,
-        is_public: payload.is_public.unwrap_or(existing.is_public),
-        tenant_id: payload.tenant_id.or(existing.tenant_id),
-        created_at: existing.created_at,
-    };
-
-    match manager.create_dashboard(updated.clone()).await {
-        Ok(_) => AxumJson(updated).into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
+            let (s, j) = ui_monitoring_http_err(
+                e,
                 "UPDATE_DASHBOARD_FAILED",
-                format!("Failed to update dashboard: {}", e),
-                Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
+                "ui_dashboard_update",
+                "Failed to update dashboard",
             );
             (s, AxumJson(j.0)).into_response()
         }
@@ -367,100 +373,26 @@ async fn ui_dashboard_delete_handler(
 // Theme management handlers
 // ============================================================================
 
-#[derive(Serialize)]
-struct ThemeResponse {
-    name: String,
-    css_variables: String,
-    css: String,
-}
-
 async fn ui_themes_handler() -> impl IntoResponse {
-    let themes = get_all_themes();
-    let response: Vec<ThemeResponse> = themes
-        .into_iter()
-        .map(|theme| ThemeResponse {
-            name: theme.name.to_string(),
-            css_variables: theme.to_css_variables(),
-            css: theme.to_css(),
-        })
-        .collect();
-    AxumJson(response).into_response()
+    AxumJson(UiService::list_themes()).into_response()
 }
 
 async fn ui_theme_get_handler(Path(name): Path<String>) -> impl IntoResponse {
-    let theme = get_theme(&name);
-    let response = ThemeResponse {
-        name: theme.name.to_string(),
-        css_variables: theme.to_css_variables(),
-        css: theme.to_css(),
-    };
-    AxumJson(response).into_response()
+    AxumJson(UiService::theme_by_name(&name)).into_response()
 }
 
 // ============================================================================
 // Component registry handlers
 // ============================================================================
 
-#[derive(Serialize)]
-struct ComponentInfo {
-    name: String,
-    #[serde(rename = "type")]
-    component_type: String, // "button", "card", "form", etc.
-    styles: String,
-    description: Option<String>,
-}
-
 async fn ui_components_handler() -> impl IntoResponse {
-    // Use get_component_styles() helper if available, otherwise use constants directly
-    let components = vec![
-        ComponentInfo {
-            name: "button".to_string(),
-            component_type: "button".to_string(),
-            styles: components::BUTTON_STYLES.to_string(),
-            description: Some(
-                "Button component with primary, danger, secondary variants".to_string(),
-            ),
-        },
-        ComponentInfo {
-            name: "card".to_string(),
-            component_type: "card".to_string(),
-            styles: components::CARD_STYLES.to_string(),
-            description: Some("Card component for content containers".to_string()),
-        },
-        ComponentInfo {
-            name: "form".to_string(),
-            component_type: "form".to_string(),
-            styles: components::FORM_STYLES.to_string(),
-            description: Some("Form component for input fields and validation".to_string()),
-        },
-    ];
-
-    AxumJson(components).into_response()
+    AxumJson(UiService::list_components()).into_response()
 }
 
 async fn ui_component_get_handler(Path(name): Path<String>) -> impl IntoResponse {
-    let component: ComponentInfo = match name.as_str() {
-        "button" => ComponentInfo {
-            name: "button".to_string(),
-            component_type: "button".to_string(),
-            styles: components::BUTTON_STYLES.to_string(),
-            description: Some(
-                "Button component with primary, danger, secondary variants".to_string(),
-            ),
-        },
-        "card" => ComponentInfo {
-            name: "card".to_string(),
-            component_type: "card".to_string(),
-            styles: components::CARD_STYLES.to_string(),
-            description: Some("Card component for content containers".to_string()),
-        },
-        "form" => ComponentInfo {
-            name: "form".to_string(),
-            component_type: "form".to_string(),
-            styles: components::FORM_STYLES.to_string(),
-            description: Some("Form component for input fields and validation".to_string()),
-        },
-        _ => {
+    match UiService::get_component(&name) {
+        Some(component) => AxumJson(component).into_response(),
+        None => {
             let (s, j) = api_json_error(
                 "COMPONENT_NOT_FOUND",
                 format!(
@@ -470,9 +402,7 @@ async fn ui_component_get_handler(Path(name): Path<String>) -> impl IntoResponse
                 Some(ErrorContext::new("ui_component_get").with_resource("component", &name)),
                 StatusCode::NOT_FOUND,
             );
-            return (s, AxumJson(j.0)).into_response();
+            (s, AxumJson(j.0)).into_response()
         }
-    };
-
-    AxumJson(component).into_response()
+    }
 }
