@@ -60,14 +60,24 @@ After a full run on a **named** host (CPU model, RAM, OS, disk type), paste Crit
 
 The **dev sample** rows used a shortened Criterion profile (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`) on **Windows 10**, `cargo bench` **release** profile — for regression *trends* on the same machine, not absolute SLA.
 
+The **win11-criterion-full** row set is a default Criterion profile (100 samples × ~5 s measurement each, 3 s warmup) from `cargo bench -j 1 --bench runtime_benchmarks -- --noplot` on **Windows** (release), 2026-04-06 — use as a **P4** snapshot until a named Linux ref host is recorded.
+
 | Bench / function | Host label | Median (typical Criterion centre of `[low … high]`) | Date |
 |------------------|------------|-----------------------------------------------------|------|
 | `memory_pool/acquire_release_request` | dev-win-sample | ~132 ns | 2026-04-06 |
+| `memory_pool/acquire_release_request` | win11-criterion-full-2026-04-06 | ~126 ns | 2026-04-06 |
 | `lru_cache/get_hit` | dev-win-sample | ~235 ns | 2026-04-06 |
+| `lru_cache/get_hit` | win11-criterion-full-2026-04-06 | ~238 ns | 2026-04-06 |
 | `raid_local_put/put_artifact_4096` | dev-win-sample | ~11.7 ms | 2026-04-06 |
+| `raid_local_put/put_artifact_4096` | win11-criterion-full-2026-04-06 | ~8.68 ms | 2026-04-06 |
+| `raid_replication_engine/select_replication_nodes_factor_3` | win11-criterion-full-2026-04-06 | ~229 ns | 2026-04-06 |
+| `raid_replication_engine/calculate_quorum_rf_7` | win11-criterion-full-2026-04-06 | ~0.68 ns | 2026-04-06 |
 | `vm_lifecycle/create_start_stop_delete` | dev-win-sample | ~5.2 µs | 2026-04-06 |
+| `vm_lifecycle/create_start_stop_delete` | win11-criterion-full-2026-04-06 | ~5.26 µs | 2026-04-06 |
 | `raid_protocol_put_payload/serde_json_roundtrip` | dev-win-sample | ~5.6 µs | 2026-04-06 |
+| `raid_protocol_put_payload/serde_json_roundtrip` | win11-criterion-full-2026-04-06 | ~5.28 µs | 2026-04-06 |
 | `http_health_json/serde_json_to_vec` | dev-win-sample | ~1.09 µs | 2026-04-06 |
+| `http_health_json/serde_json_to_vec` | win11-criterion-full-2026-04-06 | ~1.02 µs | 2026-04-06 |
 | `raid_service/list_artifacts` | dev-win-sample | ~218 ns | 2026-04-06 |
 | `raid_service/quota` | dev-win-sample | ~74.5 µs | 2026-04-06 |
 | `raid_service/cluster_status` | dev-win-sample | ~55.2 µs | 2026-04-06 |
@@ -92,6 +102,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | Date | Note |
 |------|------|
 | 2026-04-06 | Filled `raid_service/quota`/`cluster_status` dev-sample medians; P4 target table; `std::hint::black_box` in benches; `ui.rs` gates `State` on `enterprise`; Criterion group `raid_replication_engine` in `runtime_benchmarks` (P2b proxy vs full multi-node I/O). |
+| 2026-04-06 | P4: `runtime_benchmarks` full-profile snapshot (`win11-criterion-full-2026-04-06`); P2b: `tests/distributed_raid_wire_integration.rs` (`test-utils`, optional `ml` for TQ01 wire JSON size). |
 
 ---
 
@@ -111,6 +122,19 @@ hey -n 100000 -c 100 http://127.0.0.1:8080/api/v1/health
 ```
 
 Interpretation depends on CPU count, TLS, auth middleware, and disk; compare against your own baseline after deploy.
+
+On Windows, **`wrk` is often absent** from PATH; use WSL, a Linux ref host, or **`hey`** / **`ab`** for the same URL pattern.
+
+### P2b stand harness (in-tree)
+
+Automated **HTTP wire** path for distributed `PutArtifact` (Axum `oneshot`, temp `RaidManager`), plus an optional **TQ01 vs raw f32** JSON size check when built with **`ml`**:
+
+```bash
+cargo test -j 1 --features test-utils --test distributed_raid_wire_integration
+cargo test -j 1 --features test-utils,ml --test distributed_raid_wire_integration
+```
+
+Multi-node LAN timings remain **manual** on your stand; this test locks the handler + serde path.
 
 ---
 

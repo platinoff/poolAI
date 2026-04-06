@@ -2,6 +2,7 @@
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
+use crate::raid::admin::RaidAdmin;
 use crate::raid::events::{EventRecord, Snapshot};
 use crate::raid::{ArtifactRef, RaidManager, RaidMode, RaidNode, RebalanceResult, StrategyStatus};
 use chrono::{DateTime, Utc};
@@ -441,6 +442,61 @@ impl RaidService {
             .trigger_rebalance()
             .await
             .map_err(RaidServiceError::Operation)
+    }
+
+    /// Administrative rebalance (same outcome as [`Self::trigger_rebalance`], plus `RaidAdmin` tracing).
+    pub async fn admin_trigger_rebalance(
+        ctx: &ApiContext,
+    ) -> Result<RebalanceResult, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        RaidAdmin::new(manager)
+            .trigger_rebalance()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn admin_strategy_status(
+        ctx: &ApiContext,
+    ) -> Result<StrategyStatus, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        RaidAdmin::new(manager)
+            .get_strategy_status()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn admin_burst_raid_metrics(
+        ctx: &ApiContext,
+    ) -> Result<Option<crate::raid::burst_raid::BurstRaidMetrics>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        Ok(RaidAdmin::new(manager).get_burst_raid_metrics().await)
+    }
+
+    pub async fn admin_small_world_metrics(
+        ctx: &ApiContext,
+    ) -> Result<Option<crate::raid::small_world::SmallWorldMetrics>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        Ok(RaidAdmin::new(manager).get_small_world_metrics().await)
+    }
+
+    pub async fn admin_artifact_burst_stats(
+        ctx: &ApiContext,
+        artifact_id: Uuid,
+    ) -> Result<Option<crate::raid::burst_raid::ArtifactBurstStats>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        Ok(RaidAdmin::new(manager)
+            .get_artifact_burst_stats(artifact_id)
+            .await)
+    }
+
+    pub async fn admin_node_clustering_coefficient(
+        ctx: &ApiContext,
+        node_id: u64,
+    ) -> Result<Option<f64>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        Ok(RaidAdmin::new(manager)
+            .get_node_clustering_coefficient(node_id)
+            .await)
     }
 
     pub async fn health_overview(ctx: &ApiContext) -> Result<RaidHealthOverview, RaidServiceError> {

@@ -185,6 +185,11 @@ name = "service_layer_benchmarks"
 harness = false
 required-features = ["test-utils"]
 
+[[test]]
+name = "distributed_raid_wire_integration"
+path = "tests/distributed_raid_wire_integration.rs"
+required-features = ["test-utils"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)
