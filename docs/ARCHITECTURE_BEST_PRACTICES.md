@@ -47,7 +47,8 @@ src/
 │   ├── library_service.rs
 │   ├── raid_service.rs
 │   ├── topology_service.rs     # topology snapshot / node resources
-│   └── vm_service.rs
+│   ├── vm_service.rs
+│   └── worker_pool_service.rs  # pool workers list / add / remove
 ├── network/            # API layer (modularized)
 │   ├── mod.rs
 │   └── api/            # REST modules (examples; see src/network/api/*.rs)

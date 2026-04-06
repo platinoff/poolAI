@@ -325,6 +325,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
 
+## Верифікація 2026-04-06 (P2 — `WorkerPoolService`)
+
+- **Код**: `src/services/worker_pool_service.rs` — `list_workers`, `add_worker`, `remove_worker`; `WorkerInfo` + `CreateWorkerInput`; `src/network/api/workers.rs` — валідація + HTTP-мапінг.
+- **Доки**: `ARCHITECTURE_BEST_PRACTICES.md`, `FUNCTIONALITY_DIGEST`, `HANDOFF`, `file_list.csv`.
+
 ## Верифікація 2026-04-06 (P2 — `TopologyService`)
 
 - **Код**: `src/services/topology_service.rs` — `get_snapshot`, `get_node_resources`; `src/network/api/topology.rs` — thin handlers.
