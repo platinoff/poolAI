@@ -12,7 +12,7 @@ role and permissions. Currently uses hardcoded credentials for development.</p>
 <p>Returns <code>AuthResponse</code> with token and user information on success,
 or an error if authentication fails.</p>
 <h2 id="example"><a class="doc-anchor" href="#example">§</a>Example</h2>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>poolai::network::auth::{authenticate_user, AuthRequest};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>poolai::network::auth::{authenticate_user, AuthRequest, UserManager};
 
 <span class="kw">let </span>auth_req = AuthRequest {
     username: <span class="string">"admin"</span>.to_string(),
