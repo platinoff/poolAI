@@ -281,3 +281,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Залишок P3**: **`src/network/auth.rs`** (плоский `"error"` у відповідях) — див. кореневий README «Next Focus» та [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md).
 - **Наступний фокус**: **P4** (бенчмарки / профілювання), опційно **P2** (RAID → `RaidService`), оновлення чекбоксів **TurboQuant** у цьому файлі під наявний код.
 
+## Верифікація 2026-04-06 (P4 — Criterion targets)
+
+- **Код**: `benches/runtime_benchmarks.rs` — групи `vm_lifecycle`, `raid_protocol_put_payload`, `http_health_json`; `benches/cloud_benchmarks.rs` (`--features cloud`); `benches/service_layer_benchmarks.rs` (`--features test-utils`, `RaidService`); реєстрація в кореневому `Cargo.toml`.
+- **Документація**: `docs/performance/BENCHMARKS.md` — команди, групи, таблиця під baseline, опційні рядки CI.
+- **Залишок P4**: заповнити baseline після прогону; end-to-end HTTP — `wrk` / `hey` (див. той самий документ).
+

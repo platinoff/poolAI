@@ -30,6 +30,8 @@
 ./.gitignore
 ./.vscode/settings.json
 ./benches/runtime_benchmarks.rs
+./benches/cloud_benchmarks.rs
+./benches/service_layer_benchmarks.rs
 ./bin/cargo-check.sh
 ./bin/cargo-fmt.sh
 ./bin/cargo-test.sh

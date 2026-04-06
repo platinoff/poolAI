@@ -34,7 +34,7 @@
 
 ## 4. Наступні кроки за тим самим планом
 
-1. **P4 (продовження)** — мережевий RAID / VM / Cloud / HTTP у Criterion або окремі harness; числові baseline у `BENCHMARKS.md`; опційно CI для `cargo bench`.
+1. **P4 (продовження)** — зроблено інкремент Criterion: `runtime_benchmarks` (+ VM lifecycle, RAID protocol serde, health JSON), `cloud_benchmarks`, `service_layer_benchmarks`; далі — **числові baseline** у `BENCHMARKS.md` після прогону на референс-машині, **`wrk`** на живому сервері, опційно CI для `cargo bench`.
 2. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
 3. **P2b / доки** — оновити чекбокси TurboQuant у `NEXT_STEPS_ARCHITECT` під фактичний код у `src/ml/turboquant.rs`.
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).

@@ -175,6 +175,16 @@ name = "turboquant_benchmarks"
 harness = false
 required-features = ["ml"]
 
+[[bench]]
+name = "cloud_benchmarks"
+harness = false
+required-features = ["cloud"]
+
+[[bench]]
+name = "service_layer_benchmarks"
+harness = false
+required-features = ["test-utils"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)

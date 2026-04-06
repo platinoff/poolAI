@@ -4,11 +4,18 @@
 //! - Memory pool operations (acquire/release)
 //! - LRU cache operations (get/put)
 //! - ModelRequest/Response processing
+//! - VM lifecycle (in-process manager)
+//! - RAID protocol JSON (distributed put payload)
+//! - API-shaped health JSON serialization
 
+use chrono::{TimeZone, Utc};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use poolai::core::model_interface::{ModelParameters, ModelRequest};
+use poolai::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::runtime::{CacheManager, MemoryPool};
+use poolai::vm::{VmIsolation, VmManager, VmResources};
+use serde_json::json;
 use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::runtime::Runtime;
 
@@ -237,12 +244,100 @@ fn bench_raid_local_put(c: &mut Criterion) {
     let _ = rt.block_on(manager.shutdown());
 }
 
+/// VM: create → start → stop → delete (in-memory / health-monitor path).
+fn bench_vm_lifecycle(c: &mut Criterion) {
+    let rt = Runtime::new().unwrap();
+    let mut group = c.benchmark_group("vm_lifecycle");
+    group.bench_function("create_start_stop_delete", |b| {
+        let counter = AtomicU64::new(0);
+        b.to_async(&rt).iter(|| async {
+            let manager = VmManager::new();
+            manager.initialize().await.unwrap();
+            let i = counter.fetch_add(1, Ordering::Relaxed);
+            let inst = manager
+                .create_instance(
+                    format!("bench_vm_{}", i),
+                    VmResources::default(),
+                    VmIsolation::ProcessSandbox,
+                )
+                .await
+                .unwrap();
+            let id = inst.id;
+            manager.start_instance(id).await.unwrap();
+            manager.stop_instance(id).await.unwrap();
+            manager.delete_instance(id).await.unwrap();
+            manager.shutdown().await.unwrap();
+        });
+    });
+    group.finish();
+}
+
+/// Distributed RAID wire payload: serde round-trip (no sockets).
+fn bench_raid_protocol_put_payload_serde(c: &mut Criterion) {
+    let created_at = Utc.with_ymd_and_hms(2026, 4, 1, 12, 0, 0).unwrap();
+    let metadata = ArtifactMetadata {
+        name: "bench-artifact".to_string(),
+        version: "1.0.0".to_string(),
+        size_bytes: 4096,
+        checksum: "sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+            .to_string(),
+        created_at,
+        content_type: Some("application/octet-stream".to_string()),
+        tags: None,
+    };
+    let payload = PutArtifactPayload {
+        artifact_id: "550e8400-e29b-41d4-a716-446655440000".to_string(),
+        source_node: "node-bench-1".to_string(),
+        data: Some("a".repeat(1024)),
+        metadata,
+        replication_factor: 3,
+        sync_mode: SyncMode::Sync,
+    };
+    let mut group = c.benchmark_group("raid_protocol_put_payload");
+    group.bench_function("serde_json_roundtrip", |b| {
+        b.iter(|| {
+            let v = serde_json::to_value(black_box(&payload)).unwrap();
+            let s = serde_json::to_string(black_box(&v)).unwrap();
+            let p: PutArtifactPayload = serde_json::from_str(black_box(&s)).unwrap();
+            black_box(p);
+        });
+    });
+    group.finish();
+}
+
+/// Shape similar to `GET /api/v1/health` JSON body (serialization only).
+fn bench_api_health_json_serialize(c: &mut Criterion) {
+    let health = json!({
+        "status": "healthy",
+        "timestamp": "2026-04-01T12:00:00Z",
+        "version": "0.2.2",
+        "uptime": 3600_u64,
+        "checks": {
+            "database": { "status": "healthy", "message": "OK", "response_time_ms": 5 },
+            "memory": { "status": "healthy", "message": "45%", "response_time_ms": 2 },
+            "workers": { "status": "healthy", "message": "8/8", "response_time_ms": 3 },
+            "gpu": { "status": "healthy", "message": "65C", "response_time_ms": 8 }
+        }
+    });
+    let mut group = c.benchmark_group("http_health_json");
+    group.bench_function("serde_json_to_vec", |b| {
+        b.iter(|| {
+            let v = serde_json::to_vec(black_box(&health)).unwrap();
+            black_box(v);
+        });
+    });
+    group.finish();
+}
+
 criterion_group!(
     benches,
     bench_memory_pool_acquire_release,
     bench_lru_cache_operations,
     bench_model_request_response,
     bench_cache_key_generation,
-    bench_raid_local_put
+    bench_raid_local_put,
+    bench_vm_lifecycle,
+    bench_raid_protocol_put_payload_serde,
+    bench_api_health_json_serialize
 );
 criterion_main!(benches);

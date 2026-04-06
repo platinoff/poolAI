@@ -20,8 +20,10 @@ Benchmarks live under `benches/` and use [Criterion](https://github.com/bheisler
 
 | Bench target | Command | Notes |
 |--------------|---------|--------|
-| `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU cache, model request structs, cache-key hashing, **local RAID `put_artifact`** |
+| `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU, model structs, cache keys, local RAID put, **VM lifecycle**, **RAID protocol JSON**, **health-shaped JSON** |
 | `turboquant_benchmarks` | `cargo bench -j 1 --bench turboquant_benchmarks --features ml` | TurboQuant pack/unpack and `dot_f32` (requires `ml`) |
+| `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config) |
+| `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager` |
 
 Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) to reduce parallel link pressure.
 
@@ -32,12 +34,34 @@ Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) 
 - **`model_request_response`**: `create_request`, `clone_request`
 - **`cache_key_generation`**: `generate_cache_key` (hash over request fields)
 - **`raid_local_put`**: `put_artifact_4096` — temp-dir `RaidManager`, 4 KiB payload, unique logical names per iteration
+- **`vm_lifecycle`**: `create_start_stop_delete` — fresh `VmManager` per iteration (initialize → create → start → stop → delete → shutdown)
+- **`raid_protocol_put_payload`**: `serde_json_roundtrip` — `PutArtifactPayload` (+ ~1 KiB `data` string); proxy for node-to-node JSON cost, not real sockets
+- **`http_health_json`**: `serde_json_to_vec` — static `serde_json::Value` shaped like `GET /api/v1/health` (serialization only; use `wrk` for end-to-end RPS)
+
+### Groups in `cloud_benchmarks` (`--features cloud`)
+
+- **`cloud_config`**: `validate_default`
+- **`cloud_manager`**: `init_shutdown_default_config`
+
+### Groups in `service_layer_benchmarks` (`--features test-utils`)
+
+- **`raid_service`**: `list_artifacts`, `quota`, `cluster_status` (one warmup `put_artifact` on temp storage)
 
 ### Group in `turboquant_benchmarks` (`--features ml`)
 
 - **`turboquant`**: `pack_uniform_rows_64x256`, `unpack_to_rows_64x256`, `dot_f32_4096` (single Criterion group)
 
 Record the Criterion summary lines (or archive `target/criterion/`) when publishing regression comparisons.
+
+### Reference machine baselines (manual)
+
+After a full run on a **named** host (CPU model, RAM, OS, disk type), paste Criterion means (or a link to saved HTML) into the table below. Replace placeholders—**not** CI-enforced.
+
+| Bench / function | Host label | Mean (example) | Date |
+|------------------|------------|----------------|------|
+| `runtime_benchmarks` / … | *e.g. ref-linux-01* | *from Criterion output* | *YYYY-MM-DD* |
+| `service_layer_benchmarks` / `raid_service/*` | | | |
+| `wrk` `/api/v1/health` | | RPS / p50 / p95 | |
 
 ---
 
@@ -107,6 +131,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo bench -j 2 --bench runtime_benchmarks -- --noplot
       - run: cargo bench -j 2 --bench turboquant_benchmarks --features ml -- --noplot
+      # Optional (heavier / feature-gated):
+      # - run: cargo bench -j 2 --bench cloud_benchmarks --features cloud -- --noplot
+      # - run: cargo bench -j 2 --bench service_layer_benchmarks --features test-utils -- --noplot
 ```
 
 `--noplot` avoids plotters-related work if you only need console output; upload `target/criterion/` as an artifact if you want HTML diffs.
@@ -116,5 +143,6 @@ jobs:
 ## Notes
 
 - Micro-benchmarks isolate hot paths; end-to-end latency includes JSON, auth, and I/O.
-- Distributed RAID and cloud paths need environment-specific harnesses not covered by default Criterion targets.
+- Distributed RAID on the wire: use `raid_protocol_put_payload` for JSON CPU cost; real replication still needs topology/peers and is environment-specific.
+- Cloud SDK calls are not exercised by `cloud_benchmarks` (config + manager lifecycle only).
 - Storage and network numbers vary strongly by hardware; treat illustrative tables as non-binding.
