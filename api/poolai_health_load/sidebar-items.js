@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["DEFAULT_URL","RESERVOIR_CAP"],"fn":["main","percentile"],"struct":["Reservoir"]};
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_URL","RESERVOIR_CAP"],"fn":["main","parse_cli_args","percentile"],"struct":["LoadReport","Reservoir"]};

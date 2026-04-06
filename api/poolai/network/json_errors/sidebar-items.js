@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["api_error_response","api_json_error","http_status_for_app_error"]};
+window.SIDEBAR_ITEMS = {"fn":["api_error_response","api_json_error","http_status_for_app_error"],"struct":["HttpAppError"]};
