@@ -35,21 +35,25 @@ pub async fn admin_libs() -> Html<String> {
             </tr>
           </thead>
           <tbody>
-            ${libs.map(l => `
+            ${libs.map(l => {
+              const key = l.name || l.id || 'unknown';
+              // GET /libraries returns installed catalog entries; treat missing flag as installed.
+              const isInstalled = l.installed !== false;
+              return `
               <tr>
-                <td><strong>${l.name || l.id || 'unknown'}</strong></td>
+                <td><strong>${key}</strong></td>
                 <td>${l.version || l.installed_version || 'N/A'}</td>
-                <td><span class="status-badge ${l.installed ? 'active' : 'inactive'}">${l.installed ? 'Installed' : 'Not Installed'}</span></td>
+                <td><span class="status-badge ${isInstalled ? 'active' : 'inactive'}">${isInstalled ? 'Installed' : 'Not Installed'}</span></td>
                 <td>
-                  ${l.installed ? `
-                    <button class="btn" onclick="uninstallLibrary('${l.name || l.id}')">Uninstall</button>
-                    <button class="btn" onclick="updateLibrary('${l.name || l.id}')">Update</button>
+                  ${isInstalled ? `
+                    <button class="btn" onclick="uninstallLibrary(${JSON.stringify(key)})">Uninstall</button>
+                    <button class="btn" onclick="updateLibrary(${JSON.stringify(key)})">Update</button>
                   ` : `
-                    <button class="btn btn-primary" onclick="installLibrary('${l.name || l.id}')">Install</button>
+                    <button class="btn btn-primary" onclick="installLibrary(${JSON.stringify(key)})">Install</button>
                   `}
                 </td>
               </tr>
-            `).join('')}
+            `}).join('')}
           </tbody>
         </table>
       `;

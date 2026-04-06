@@ -75,7 +75,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         
         document.getElementById('topology-node-count').textContent = data.node_count || 0;
         document.getElementById('topology-latency-measurements').textContent = data.latency_measurements || 0;
-        document.getElementById('topology-last-updated').textContent = new Date(data.last_updated).toLocaleString() || '-';
+        document.getElementById('topology-last-updated').textContent = formatTopologyTimestamp(data.last_updated);
         
         // Load nodes
         await loadTopologyNodes();
@@ -104,13 +104,17 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         
         for (const [nodeId, node] of Object.entries(data.nodes)) {
           const row = document.createElement('tr');
+          const ag = node.available_gpu_memory_mb ?? 0;
+          const tg = node.total_gpu_memory_mb ?? 0;
+          const ac = node.available_cpu_cores ?? 0;
+          const tc = node.total_cpu_cores ?? 0;
           row.innerHTML = `
             <td>${escapeHtml(nodeId)}</td>
-            <td>${node.available_gpu_memory_mb} / ${node.total_gpu_memory_mb} MB</td>
-            <td>${node.available_cpu_cores} / ${node.total_cpu_cores}</td>
-            <td>${(node.current_load * 100).toFixed(1)}%</td>
+            <td>${ag} / ${tg} MB</td>
+            <td>${ac} / ${tc}</td>
+            <td>${formatLoadFraction(node.current_load)}</td>
             <td>
-              <button class="btn btn-sm" onclick="viewNodeResources('${escapeHtml(nodeId)}')">View Details</button>
+              <button class="btn btn-sm" onclick="viewNodeResources(${JSON.stringify(nodeId)})">View Details</button>
             </td>
           `;
           tbody.appendChild(row);
@@ -141,7 +145,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
           row.innerHTML = `
             <td>${escapeHtml(fromNode)}</td>
             <td>${escapeHtml(toNode)}</td>
-            <td>${latency.toFixed(2)} ms</td>
+            <td>${formatLatencyMs(latency)}</td>
           `;
           tbody.appendChild(row);
         }
@@ -161,19 +165,19 @@ pub async fn admin_topology() -> axum::response::Html<String> {
           <h3>Node Resources: ${escapeHtml(nodeId)}</h3>
           <div class="form-group">
             <label>GPU Memory:</label>
-            <div>${node.available_gpu_memory_mb} / ${node.total_gpu_memory_mb} MB</div>
+            <div>${node.available_gpu_memory_mb ?? 0} / ${node.total_gpu_memory_mb ?? 0} MB</div>
           </div>
           <div class="form-group">
             <label>CPU Cores:</label>
-            <div>${node.available_cpu_cores} / ${node.total_cpu_cores}</div>
+            <div>${node.available_cpu_cores ?? 0} / ${node.total_cpu_cores ?? 0}</div>
           </div>
           <div class="form-group">
             <label>System Memory:</label>
-            <div>${node.available_memory_mb} / ${node.total_memory_mb} MB</div>
+            <div>${node.available_memory_mb ?? 0} / ${node.total_memory_mb ?? 0} MB</div>
           </div>
           <div class="form-group">
             <label>Current Load:</label>
-            <div>${(node.current_load * 100).toFixed(1)}%</div>
+            <div>${formatLoadFraction(node.current_load)}</div>
           </div>
         `;
         showModal('Node Resources', modalContent);
@@ -189,8 +193,26 @@ pub async fn admin_topology() -> axum::response::Html<String> {
 
     function escapeHtml(text) {
       const div = document.createElement('div');
-      div.textContent = text;
+      div.textContent = text == null ? '' : String(text);
       return div.innerHTML;
+    }
+
+    function formatTopologyTimestamp(iso) {
+      if (iso == null || iso === '') return '-';
+      const t = Date.parse(iso);
+      return Number.isFinite(t) ? new Date(t).toLocaleString() : '-';
+    }
+
+    function formatLoadFraction(x) {
+      const n = Number(x);
+      if (!Number.isFinite(n)) return '-';
+      return (n * 100).toFixed(1) + '%';
+    }
+
+    function formatLatencyMs(latency) {
+      const n = Number(latency);
+      if (!Number.isFinite(n)) return escapeHtml(latency) + ' ms';
+      return n.toFixed(2) + ' ms';
     }
 
     // Load topology on page load

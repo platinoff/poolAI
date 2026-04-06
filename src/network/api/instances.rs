@@ -21,7 +21,7 @@ use crate::core::model_interface::{GpuRequirements, ModelInfo};
 use crate::core::state::ApiContext;
 use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
-use crate::runtime::instance::InstancePlacement;
+use crate::runtime::instance::{InstancePlacement, PlacementStrategy};
 
 /// Instance preview response
 #[derive(Serialize)]
@@ -67,7 +67,32 @@ struct InstanceInfo {
     model_id: String,
     status: String,
     created_at: String,
-    placement: InstancePlacement,
+    placement: InstancePlacementInfo,
+}
+
+/// JSON-friendly placement (admin UI expects `strategy` as a string, not an enum object).
+#[derive(Serialize)]
+struct InstancePlacementInfo {
+    strategy: String,
+    node_ids: Vec<String>,
+    memory_by_node: HashMap<String, u64>,
+    memory_delta: i64,
+    error: Option<String>,
+}
+
+fn instance_placement_info(p: &InstancePlacement) -> InstancePlacementInfo {
+    let strategy = match p.strategy {
+        PlacementStrategy::Single => "single",
+        PlacementStrategy::Pipeline => "pipeline",
+        PlacementStrategy::Tensor => "tensor",
+    };
+    InstancePlacementInfo {
+        strategy: strategy.to_string(),
+        node_ids: p.node_ids.clone(),
+        memory_by_node: p.memory_by_node.clone(),
+        memory_delta: p.memory_delta,
+        error: p.error.clone(),
+    }
 }
 
 /// Create instance routes
@@ -249,7 +274,7 @@ async fn instance_list_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
                 model_id: instance.model_id.clone(),
                 status: format!("{:?}", status),
                 created_at: instance.created_at.to_rfc3339(),
-                placement: instance.placement.clone(),
+                placement: instance_placement_info(&instance.placement),
             });
         }
 
@@ -284,7 +309,7 @@ async fn instance_get_handler(
                 model_id: instance.model_id,
                 status: format!("{:?}", status),
                 created_at: instance.created_at.to_rfc3339(),
-                placement: instance.placement,
+                placement: instance_placement_info(&instance.placement),
             };
             (StatusCode::OK, Json(info)).into_response()
         } else {
@@ -418,5 +443,24 @@ async fn get_model_info(model_id: &str, ctx: &ApiContext) -> ModelInfo {
             supported_architectures: vec!["CUDA".to_string()],
             requires_cuda: true,
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn instance_placement_info_strategy_is_json_string() {
+        let p = InstancePlacement {
+            strategy: PlacementStrategy::Pipeline,
+            node_ids: vec!["a".into()],
+            memory_by_node: HashMap::new(),
+            memory_delta: 0,
+            error: None,
+        };
+        let v = serde_json::to_value(instance_placement_info(&p)).unwrap();
+        assert_eq!(v["strategy"], json!("pipeline"));
     }
 }
