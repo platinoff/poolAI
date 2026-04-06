@@ -16,6 +16,9 @@ use serde::Serialize;
 
 use crate::core::discovery_types::PeerInfo;
 use crate::core::state::ApiContext;
+use crate::services::discovery_service::{
+    DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService,
+};
 
 /// Discovery API response types
 #[derive(Serialize)]
@@ -40,26 +43,22 @@ pub fn create_discovery_routes() -> Router<ApiContext> {
 /// Handler for GET /api/v1/discovery/peers
 /// Returns list of all discovered peers
 async fn peers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let guard = ctx.discovery.read().await;
-    if let Some(discovery) = guard.as_ref() {
-        let peers = discovery.get_peers().await;
-        let local_peer_id = discovery.local_peer_id();
-
-        let response = PeersResponse {
-            peers,
-            local_peer_id,
-        };
-
-        return (StatusCode::OK, Json(response));
+    match DiscoveryService::list_peers(&ctx).await {
+        Ok(snapshot) => {
+            let response = PeersResponse {
+                peers: snapshot.peers,
+                local_peer_id: snapshot.local_peer_id,
+            };
+            (StatusCode::OK, Json(response))
+        }
+        Err(DiscoveryNotReady) => {
+            let response = PeersResponse {
+                peers: vec![],
+                local_peer_id: "not-initialized".to_string(),
+            };
+            (StatusCode::SERVICE_UNAVAILABLE, Json(response))
+        }
     }
-
-    // Discovery service not initialized
-    let response = PeersResponse {
-        peers: vec![],
-        local_peer_id: "not-initialized".to_string(),
-    };
-
-    (StatusCode::SERVICE_UNAVAILABLE, Json(response))
 }
 
 /// Handler for GET /api/v1/discovery/peers/:peer_id
@@ -68,29 +67,24 @@ async fn peer_handler(
     State(ctx): State<ApiContext>,
     Path(peer_id): Path<String>,
 ) -> impl IntoResponse {
-    let guard = ctx.discovery.read().await;
-    if let Some(discovery) = guard.as_ref() {
-        let peer = discovery.get_peer(&peer_id).await;
-        let response = PeerResponse { peer };
-        return (StatusCode::OK, Json(response));
+    match DiscoveryService::get_peer(&ctx, &peer_id).await {
+        Ok(peer) => (StatusCode::OK, Json(PeerResponse { peer })),
+        Err(DiscoveryNotReady) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(PeerResponse { peer: None }),
+        ),
     }
-
-    // Discovery service not initialized
-    let response = PeerResponse { peer: None };
-    (StatusCode::SERVICE_UNAVAILABLE, Json(response))
 }
 
 /// Handler for POST /api/v1/discovery/register
 /// Registers this node as a peer
 async fn register_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let guard = ctx.discovery.read().await;
-    if let Some(discovery) = guard.as_ref() {
-        if let Err(e) = discovery.send_announcement().await {
+    match DiscoveryService::send_announcement(&ctx).await {
+        Ok(()) => StatusCode::OK,
+        Err(DiscoveryAnnounceError::Failed(e)) => {
             tracing::warn!("Failed to send discovery announcement: {}", e);
-            return StatusCode::INTERNAL_SERVER_ERROR;
+            StatusCode::INTERNAL_SERVER_ERROR
         }
-        return StatusCode::OK;
+        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE,
     }
-
-    StatusCode::SERVICE_UNAVAILABLE
 }

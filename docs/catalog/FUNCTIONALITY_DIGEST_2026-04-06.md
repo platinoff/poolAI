@@ -57,7 +57,7 @@
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу. |
 | **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). |
-| **Services** | `services/` | `RaidService`, `VmService`, `LibraryService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
+| **Services** | `services/` | `RaidService`, `VmService`, `LibraryService`, `DiscoveryService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | Telegram-бот (керування). |
 
 ---

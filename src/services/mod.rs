@@ -6,6 +6,7 @@
 pub mod admin_service;
 #[cfg(feature = "cloud")]
 pub mod cloud_service;
+pub mod discovery_service;
 #[cfg(feature = "enterprise")]
 pub mod enterprise_service;
 pub mod library_service;

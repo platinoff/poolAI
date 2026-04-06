@@ -41,6 +41,7 @@ src/
 ├── services/           # Service layer (orchestration above domains; Priority 2)
 │   ├── mod.rs
 │   ├── admin_service.rs        # admin overview aggregation
+│   ├── discovery_service.rs    # discovery peers / announce (ApiContext slot)
 │   ├── cloud_service.rs        # feature `cloud`
 │   ├── enterprise_service.rs   # feature `enterprise`
 │   ├── library_service.rs

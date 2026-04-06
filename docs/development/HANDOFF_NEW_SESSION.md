@@ -32,7 +32,7 @@
 
 ## 3. Що вже зроблено (орієнтир для нової сесії)
 
-- **`src/services/`**: `raid_service`, `vm_service`, `library_service`, `enterprise_service`, `cloud_service`, `admin_service` + `GET /api/v1/admin/overview` (`src/network/api/admin.rs`).
+- **`src/services/`**: `raid_service`, `vm_service`, `library_service`, **`discovery_service`** (`/api/v1/discovery/*` через `AppState::discovery`), `enterprise_service`, `cloud_service`, `admin_service` + `GET /api/v1/admin/overview` (`src/network/api/admin.rs`).
 - **RaidService (P2)**: крім list — `put_artifact`, `delete_artifact`, `quota`, `cluster_status`; DTO квоти/статусу в `raid_service.rs`; тонкі handlers у `src/network/api/raid.rs`.
 - **ML pipeline (Stage 4.4)**: детерміновані Rust-бекенди для `Preprocessing`, `Training`, `Evaluation`, `Deployment` (`src/ml/pipeline.rs`).
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
@@ -43,7 +43,7 @@
 ## 4. Наступні кроки за тим самим планом
 
 1. **P4 (наступний горизонт)** — на **референс-машині**: повні прогони Criterion (усі чотири bench) та **`wrk`** на `/api/v1/health`; оновити таблицю baseline у `BENCHMARKS.md` під мітку хоста. **CI** вже є: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + неділя 06:00 UTC, артефакт `criterion-report`). `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
-2. **P2** — REST `/raid/*` (workers, events, snapshot, …) уже через **`RaidService`**; опційно далі — тонкі distributed handlers у `raid_distributed_handlers` vs сервіс.
+2. **P2** — REST `/raid/*` (workers, events, snapshot, …) уже через **`RaidService`**; **`/api/v1/discovery/*`** — через **`DiscoveryService`**; опційно далі — тонкі distributed handlers у `raid_distributed_handlers` vs сервіс.
 3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; in-tree harness: **`tests/distributed_raid_wire_integration.rs`** (`--features test-utils`, з `ml` — перевірка TQ01 vs raw на розмірі JSON); далі — повні заміри по мережі на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги control-plane).
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
 5. **P5** — канонічні та архівні доки + **інвентар TODO у `src/`** (2026‑04-06) зафіксовані в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md); опційно — доробка Azure/GCP під `cloud-sdk`.

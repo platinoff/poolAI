@@ -325,6 +325,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
 
+## Верифікація 2026-04-06 (P2 — `DiscoveryService`)
+
+- **Код**: `src/services/discovery_service.rs` — `list_peers`, `get_peer`, `send_announcement` з `ApiContext::discovery`; `src/network/api/discovery.rs` — thin handlers.
+- **Доки**: `ARCHITECTURE_BEST_PRACTICES.md` (дерево `services/`), `FUNCTIONALITY_DIGEST` (рядок Services), `file_list.csv`.
+
 ## Верифікація 2026-04-06 (P1 — FM-001 інтеграційні тести без globals)
 
 - **Тести**: `tests/appstate_http_injection_integration.rs` — повний `create_api_routes()` + `attach_raid_manager_for_test` / `attach_vm_manager_for_test`; `GET /api/v1/raid/nodes` та `GET /api/v1/vm/instances` → **200**, JSON-масив.
