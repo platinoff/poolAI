@@ -1,6 +1,8 @@
 # 📊 PoolAI Development Plan - Детальний план у відсотках
 ## Оновлено: 2025-01-09
 
+> **Архівний зріз.** Актуальний план архітектора та пріоритети: [`../development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md). Зведення стану: [`STABLE_STATE_SUMMARY.md`](STABLE_STATE_SUMMARY.md).
+
 ---
 
 ## 🎯 Загальний прогрес проекту: **~100%** ✅

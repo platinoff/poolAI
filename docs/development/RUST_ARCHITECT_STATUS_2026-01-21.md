@@ -1,6 +1,8 @@
 # 🏗️ Rust Architect - Статус та наступні кроки
 ## Дата: 2026-01-21 (актуалізовано)
 
+> **Архівний зріз.** Актуальний покровий план: [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) (P1–P6). Передача сесії: [`HANDOFF_NEW_SESSION.md`](HANDOFF_NEW_SESSION.md).
+
 ---
 
 ## 📊 Поточний стан проекту

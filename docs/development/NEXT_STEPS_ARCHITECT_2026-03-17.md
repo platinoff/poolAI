@@ -27,7 +27,7 @@
 | **3** | **Priority 2b** | **Фаза 1 TurboQuant у коді** (`src/ml/turboquant.rs`, pipeline, інтеграційний тест). Далі: **P4**-заміри RAID, опційно SIMD; оновлення `BENCHMARKS.md`. |
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
-| **6** | **Priority 5** | Синхронізація документації та TODO після 1–4. |
+| **6** | **Priority 5** | Архівні плани з банером на Architect plan; періодично — TODO в коді / ключових модулях. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
 
 *Опційно паралельно з 1–2*: стабілізація `cargo test --all-features` на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
@@ -161,18 +161,20 @@
 **Мета**: синхронізувати код і документацію **після** виконання пріоритетів 1–4.
 
 **Кроки**:
-- [ ] Пройтися TODO по коду, зазначені в:
-  - [ ] `RUST_ARCHITECT_STATUS_2026-01-19.md`,
-  - [ ] `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md`,
-  - [ ] `PERCENTAGE_PLAN.md`.
+- [ ] Пройтися TODO у **коді** (ключові модулі) або перенести в актуальні плани — окремі проходи після змін фіч.
+- [x] Архівні зрізи планів **примарковані** посиланням на покровий план:
+  - [x] `RUST_ARCHITECT_STATUS_2026-01-19.md` — банер → `NEXT_STEPS_ARCHITECT_2026-03-17.md`.
+  - [x] `RUST_ARCHITECT_STATUS_2026-01-21.md` — те саме.
+  - [x] `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md` — те саме.
+  - [x] `docs/status/PERCENTAGE_PLAN.md` — те саме + `STABLE_STATE_SUMMARY.md`.
 - [x] Оновити або доповнити (інкремент 2026‑04):
   - [x] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` — зріз стану + посилання на цей план, `BENCHMARKS.md`, витяг функціоналу.
   - [x] `docs/status/STABLE_STATE_SUMMARY.md` — канонічні посилання (HANDOFF, Architect plan), CI/бенчі.
   - [x] `docs/ARCHITECTURE_REVIEW.md` — розділ про perf‑цикл і Criterion (доповнення до наявного блоку AppState / сервісний шар).
 
 **Критерії готовності**:
-- [ ] Усі згадані вище документи відображають фактичний стан архітектури.
-- [ ] TODO у ключових модулях або закриті, або перенесені в окремі, актуальні плани.
+- [x] Покровий план, HANDOFF, STABLE_STATE, ARCHITECTURE_REVIEW (інкремент 2026‑04) та **архівні** `RUST_ARCHITECT_*` / `PERCENTAGE_PLAN` (банер на Architect plan) узгоджені з поточною моделлю робіт.
+- [ ] TODO у ключових модулях або закриті, або перенесені в актуальні плани (окремі проходи).
 
 ---
 
@@ -305,4 +307,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Документ**: [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md) — межі core vs адаптер; мапінг `JobCompleted` / `SeedProvided` / `MemoryUpdated`; варіанти інтеграції (sidecar, черга, pull).
 - **P6 критерії готовності (концепт)**: закрито; наступний горизонт — прототип on-chain програми та schema подій core↔adapter.
 - **Залишок**: єдиний Grid wire envelope; реальний Solana crate / repo.
+
+## Верифікація 2026-04-06 (P5 — архівні плани)
+
+- **Банер** на покровий план додано до: `RUST_ARCHITECT_STATUS_2026-01-19.md`, `RUST_ARCHITECT_STATUS_2026-01-21.md`, `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md`, `docs/status/PERCENTAGE_PLAN.md`.
+- **Таблиця пріоритетів** (рядок Priority 5) оновлена під цей інкремент.
 

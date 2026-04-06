@@ -5,6 +5,8 @@
 **Поточний фокус**: v0.2.0 Optional Enhancements  
 **Статус проекту**: ✅ **STABLE - PRODUCTION READY (v0.1.0)**
 
+> **Архівний зріз (2026-01-19).** Актуальний покровий план: [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) (P1–P6). Передача сесії: [`HANDOFF_NEW_SESSION.md`](HANDOFF_NEW_SESSION.md).
+
 ---
 
 ## 📊 Поточний Стан Проекту

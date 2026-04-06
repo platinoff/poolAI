@@ -7,6 +7,8 @@
 **CI/CD**: ✅ Виправлено cloud_providers tests (коміт c4cd12d)  
 **Наступна версія**: v0.3.0 (Optional Enhancements)
 
+> **Архівний зріз.** Актуальний покровий план: [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) (P1–P6). Передача сесії: [`HANDOFF_NEW_SESSION.md`](HANDOFF_NEW_SESSION.md).
+
 **Останні зміни** (2026-01-21):
 - ✅ `0484280` - chore: remove temporary fix script
 - ✅ `3a7e279` - style: fix code formatting issues (cargo fmt)

@@ -45,7 +45,7 @@
 2. **P2** — REST `/raid/*` (workers, events, snapshot, …) уже через **`RaidService`**; опційно далі — тонкі distributed handlers у `raid_distributed_handlers` vs сервіс.
 3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; далі — wire-replication + порівняння розміру артефакта до/після TQ01 на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги).
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
-5. **P5 (доки)** — періодично синхронізувати `DEVELOPMENT_PLAN_UPDATED`, `STABLE_STATE_SUMMARY`, `ARCHITECTURE_REVIEW` з [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (інкремент 2026‑04 зроблено).
+5. **P5 (доки)** — канонічні доки синхронізовано (інкремент 2026‑04); архівні `RUST_ARCHITECT_*` та `PERCENTAGE_PLAN` мають банер на Architect plan. Далі — проходи **TODO в коді** за потреби.
 
 6. **P6** — концепти **Grid Protocol** [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](./GRID_PROTOCOL_CONCEPT_2026-04-06.md) та **Solana adapter** [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](./SOLANA_ADAPTER_CONCEPT_2026-04-06.md); далі — прототип on-chain і Grid wire envelope.
 
