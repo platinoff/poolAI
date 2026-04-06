@@ -10,15 +10,13 @@ pub async fn admin_dashboard() -> Html<String> {
     let script = r#"
     async function loadSystemOverview() {
       try {
-        const [status, metrics, alerts, audit] = await Promise.all([
-          fetchJson('/api/v1/status'),
-          fetchJson('/api/v1/metrics'),
+        const overview = await fetchJson('/api/v1/admin/overview');
+        renderSystemOverview(overview);
+        renderQuickStats(overview);
+        const [alerts, audit] = await Promise.all([
           fetchJson('/api/enterprise/monitoring/alerts?acknowledged=false&limit=5'),
           fetchJson('/api/enterprise/audit/events?limit=10')
         ]);
-        
-        renderSystemOverview(status);
-        renderQuickStats(metrics);
         renderActiveAlerts(alerts);
         renderRecentActivity(audit);
       } catch (e) {
@@ -58,20 +56,20 @@ pub async fn admin_dashboard() -> Html<String> {
       if (!el) return;
       el.innerHTML = `
         <div class="stat-item">
-          <span class="stat-label">Workers:</span>
-          <span class="stat-value">${data.workers || 0}</span>
+          <span class="stat-label">Workers (active):</span>
+          <span class="stat-value">${data.workers ?? 0} / ${data.workers_total ?? 0}</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">VM Instances:</span>
-          <span class="stat-value">${data.vm_instances || 0}</span>
+          <span class="stat-value">${data.vm_instances ?? 0}</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">CPU Usage:</span>
-          <span class="stat-value">${(data.cpu_usage_percent || 0).toFixed(1)}%</span>
+          <span class="stat-value">${(data.cpu_usage_percent ?? 0).toFixed(1)}%</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Memory Usage:</span>
-          <span class="stat-value">${(data.memory_usage_percent || 0).toFixed(1)}%</span>
+          <span class="stat-label">Memory (tracked):</span>
+          <span class="stat-value">${(data.memory_usage_mb ?? 0).toFixed(0)} MB</span>
         </div>
       `;
     }

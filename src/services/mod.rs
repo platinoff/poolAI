@@ -3,6 +3,7 @@
 //! HTTP handlers in `network::api` should stay thin: parse input, call `services::*`, map to responses.
 //! See `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` (Priority 2).
 
+pub mod admin_service;
 #[cfg(feature = "cloud")]
 pub mod cloud_service;
 #[cfg(feature = "enterprise")]

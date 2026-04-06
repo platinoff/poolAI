@@ -4,6 +4,7 @@
 //!
 //! # Modules
 //!
+//! - `admin` - Admin overview JSON (`/admin/overview`)
 //! - `system` - System endpoints (status, health, metrics, login, models, gpu)
 //! - `workers` - Worker management endpoints
 //! - `vm` - VM instance management endpoints
@@ -13,6 +14,7 @@
 //! - `rewards` - Rewards system endpoints
 //! - `common` - Shared types and utilities
 
+pub mod admin;
 #[cfg(feature = "ml")]
 pub mod ai_ml;
 pub mod common;
@@ -42,6 +44,7 @@ use axum::Router;
 /// Composes modular `api/*` routers (canonical REST surface under `/api/v1`).
 pub fn create_api_routes() -> Router<ApiContext> {
     Router::new()
+        .merge(admin::create_admin_routes())
         .merge(system::create_system_routes())
         .merge(workers::create_workers_routes())
         .merge(rewards::create_rewards_routes())

@@ -74,8 +74,8 @@
   - [x] `vm_service.rs`: усі VM HTTP-операції через сервіс (instances lifecycle, health, templates, networks).
   - [x] `library_service.rs`: list/get/install/uninstall/update/upload бібліотек.
   - [x] `enterprise_service.rs`: multi‑tenancy, audit, monitoring, security (OAuth2/SAML/policies + OAuth/SAML старт і callback-виклики до `SecurityManager` через сервіс) — HTTP → `EnterpriseService` ✅.
-  - [ ] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором.
-  - [ ] `admin_service.rs`: агрегація даних для адмін‑панелі.
+  - [x] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором (див. `AppState::cloud_manager`, `services/cloud_service.rs`).
+  - [x] `admin_service.rs`: агрегація даних для адмін‑панелі (`GET /api/v1/admin/overview`, дашборд `/ui/admin`).
 - [ ] Поступово мігрувати логіку з `network/api/*.rs` у відповідні сервіси:
   - [ ] Handler’и роблять мінімум: екстрактують вхідні дані, викликають метод сервісу, маплять результат у HTTP‑відповідь.
   - [ ] Сервіси отримують залежності через `AppState/ApiContext`.
