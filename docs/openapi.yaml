@@ -1118,7 +1118,7 @@ components:
           format: date-time
         status:
           type: string
-          enum: [Creating, Running, Stopped, Failed]
+          description: Creating, Running, Stopped, or Failed with reason as `Failed: …`
           example: Running
         resources:
           $ref: '#/components/schemas/VmResources'

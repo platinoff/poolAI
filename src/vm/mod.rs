@@ -104,7 +104,7 @@ use uuid::Uuid;
 ///     VmStatus::Failed(err) => println!("VM failed: {}", err),
 /// }
 /// ```
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum VmStatus {
     /// VM instance is being created
     Creating,
@@ -114,6 +114,63 @@ pub enum VmStatus {
     Stopped,
     /// VM instance has failed with an error message
     Failed(String),
+}
+
+fn vm_status_from_json_value(v: &serde_json::Value) -> Option<VmStatus> {
+    match v {
+        serde_json::Value::String(s) => parse_vm_status_str(s).ok(),
+        serde_json::Value::Object(map) => {
+            if map.contains_key("Creating") {
+                Some(VmStatus::Creating)
+            } else if map.contains_key("Running") {
+                Some(VmStatus::Running)
+            } else if map.contains_key("Stopped") {
+                Some(VmStatus::Stopped)
+            } else if let Some(serde_json::Value::String(msg)) = map.get("Failed") {
+                Some(VmStatus::Failed(msg.clone()))
+            } else {
+                None
+            }
+        }
+        _ => None,
+    }
+}
+
+fn parse_vm_status_str(s: &str) -> Result<VmStatus, String> {
+    match s {
+        "Creating" => Ok(VmStatus::Creating),
+        "Running" => Ok(VmStatus::Running),
+        "Stopped" => Ok(VmStatus::Stopped),
+        _ if s.starts_with("Failed:") => Ok(VmStatus::Failed(
+            s.trim_start_matches("Failed:").trim().to_string(),
+        )),
+        _ => Err(format!("unknown VmStatus string: {s}")),
+    }
+}
+
+impl Serialize for VmStatus {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            VmStatus::Creating => serializer.serialize_str("Creating"),
+            VmStatus::Running => serializer.serialize_str("Running"),
+            VmStatus::Stopped => serializer.serialize_str("Stopped"),
+            VmStatus::Failed(msg) => serializer.serialize_str(&format!("Failed: {msg}")),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for VmStatus {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let v = serde_json::Value::deserialize(deserializer)?;
+        vm_status_from_json_value(&v)
+            .ok_or_else(|| serde::de::Error::custom(format!("invalid VmStatus: {v}")))
+    }
 }
 
 /// GPU scheduling policy for VM instances
@@ -2036,6 +2093,38 @@ mod tests {
                 VmStatus::Creating | VmStatus::Running | VmStatus::Stopped | VmStatus::Failed(_)
             ));
         }
+    }
+
+    #[test]
+    fn test_vm_status_json_string_roundtrip() {
+        let cases = vec![
+            VmStatus::Creating,
+            VmStatus::Running,
+            VmStatus::Stopped,
+            VmStatus::Failed("disk full".to_string()),
+        ];
+        for s in cases {
+            let json = serde_json::to_string(&s).unwrap();
+            assert!(
+                json.starts_with('"'),
+                "VmStatus should JSON-serialize as string: {json}"
+            );
+            let back: VmStatus = serde_json::from_str(&json).unwrap();
+            match (&s, &back) {
+                (VmStatus::Creating, VmStatus::Creating) => {}
+                (VmStatus::Running, VmStatus::Running) => {}
+                (VmStatus::Stopped, VmStatus::Stopped) => {}
+                (VmStatus::Failed(a), VmStatus::Failed(b)) if a == b => {}
+                _ => panic!("roundtrip mismatch: {:?} vs {:?}", s, back),
+            }
+        }
+    }
+
+    #[test]
+    fn test_vm_status_deserializes_legacy_externally_tagged() {
+        let legacy = serde_json::json!({ "Failed": "legacy msg" });
+        let s: VmStatus = serde_json::from_value(legacy).unwrap();
+        assert!(matches!(s, VmStatus::Failed(ref m) if m == "legacy msg"));
     }
 
     #[test]

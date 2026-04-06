@@ -9,6 +9,9 @@
 - Розширено **`WorkerInfo`** у `src/network/api/workers.rs`: додано `is_healthy`, `total_requests_processed`, `queue_size`, `active_connections`, `average_response_time_ms` (з `pool::worker::WorkerStatus`); оновлено mock-відповідь.
 - Оновлено таблицю **Workers** у `src/ui/mod.rs`: колонки Health, State, Current task, Requests, Queue (узгоджено з API).
 - Інтеграційний тест форми JSON для `GET /api/v1/workers` (див. `tests/network_api_integration.rs`).
+- **`VmStatus` JSON для UI:** серіалізація як рядок (`Creating` / `Running` / `Stopped` / `Failed: …`); десеріалізація з рядка та legacy-об’єкта `{"Failed":"…"}` (`src/vm/mod.rs`, юніт-тести).
+- **Admin VM** (`src/ui/admin/vm.rs`): видалення через **`DELETE /api/v1/vm/instances/{id}`** (раніше помилково `POST …/delete`); бейдж статусу та fallback для `resources`.
+- OpenAPI: оновлено опис `VmInstance.status` під рядковий формат.
 
 ## Наступні кроки за пріоритетом
 

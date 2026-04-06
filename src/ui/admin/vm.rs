@@ -17,6 +17,13 @@ pub async fn admin_vm() -> Html<String> {
       }
     }
     
+    function vmStatusBadge(status) {
+      const s = (typeof status === 'string') ? status : JSON.stringify(status ?? '');
+      const low = s.toLowerCase();
+      const cls = low.startsWith('failed') ? 'error' : (low === 'stopped' ? 'inactive' : 'active');
+      return `<span class="status-badge ${cls}">${s}</span>`;
+    }
+    
     function renderVmInstances(instances) {
       const el = document.getElementById('vm-instances');
       if (!el) return;
@@ -38,8 +45,8 @@ pub async fn admin_vm() -> Html<String> {
             ${instances.map(i => `
               <tr>
                 <td>${i.name}</td>
-                <td><span class="status-badge ${i.status.toLowerCase()}">${i.status}</span></td>
-                <td>CPU: ${i.resources.cpu_cores}, Memory: ${i.resources.memory_mb}MB</td>
+                <td>${vmStatusBadge(i.status)}</td>
+                <td>CPU: ${i.resources ? i.resources.cpu_cores : '—'}, Memory: ${i.resources ? i.resources.memory_mb : '—'}MB</td>
                 <td>
                   <button class="btn" onclick="vmAction('${i.id}', 'start')">Start</button>
                   <button class="btn" onclick="vmAction('${i.id}', 'stop')">Stop</button>
@@ -54,7 +61,11 @@ pub async fn admin_vm() -> Html<String> {
     
     async function vmAction(id, action) {
       try {
-        await fetchJson(`/api/v1/vm/instances/${id}/${action}`, { method: 'POST' });
+        if (action === 'delete') {
+          await fetchJson(`/api/v1/vm/instances/${id}`, { method: 'DELETE' });
+        } else {
+          await fetchJson(`/api/v1/vm/instances/${id}/${action}`, { method: 'POST' });
+        }
         showNotification(`VM ${action} successful`, 'success');
         loadVmInstances();
       } catch (e) {
