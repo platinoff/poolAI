@@ -1,263 +1,58 @@
-//! OpenAI-compatible chat completions API
+//! OpenAI-compatible chat completions API.
 //!
-//! Provides `/v1/chat/completions` endpoint compatible with OpenAI API format.
-//! Supports both streaming and non-streaming responses.
+//! Handlers stay thin; orchestration lives in [`crate::services::chat_completion_service`].
 
 use axum::{
     extract::{Extension, State},
     http::StatusCode,
-    response::{sse::Event, IntoResponse, Sse},
+    response::{IntoResponse, Sse},
     routing::post,
     Json, Router,
 };
-use serde::{Deserialize, Serialize};
-use std::convert::Infallible;
-use std::sync::Arc;
-use std::time::Duration;
-use tokio_stream::{self as stream, Stream, StreamExt};
 
 use crate::core::error::ErrorContext;
-use crate::core::model_interface::{ModelParameters, ModelRequest};
 use crate::core::state::ApiContext;
 use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
-use crate::runtime::instance::InstanceManager;
+use crate::services::chat_completion_service::ChatCompletionService;
 
-/// OpenAI-compatible chat message
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ChatMessage {
-    /// Message role (system, user, assistant)
-    pub role: String,
-    /// Message content
-    pub content: String,
-}
-
-/// OpenAI-compatible chat completion request
-#[derive(Debug, Deserialize)]
-pub struct ChatCompletionRequest {
-    /// Model name/ID
-    pub model: String,
-    /// Chat messages
-    pub messages: Vec<ChatMessage>,
-    /// Temperature (0.0-2.0)
-    #[serde(default = "default_temperature")]
-    pub temperature: f32,
-    /// Max tokens
-    #[serde(default = "default_max_tokens")]
-    pub max_tokens: usize,
-    /// Stream response
-    #[serde(default)]
-    pub stream: bool,
-    /// Top-p sampling
-    #[serde(default = "default_top_p")]
-    pub top_p: f32,
-    /// Frequency penalty
-    #[serde(default)]
-    pub frequency_penalty: f32,
-    /// Presence penalty
-    #[serde(default)]
-    pub presence_penalty: f32,
-    /// Stop sequences
-    #[serde(default)]
-    pub stop: Option<Vec<String>>,
-}
-
-fn default_temperature() -> f32 {
-    1.0
-}
-
-fn default_max_tokens() -> usize {
-    2048
-}
-
-fn default_top_p() -> f32 {
-    1.0
-}
-
-/// OpenAI-compatible chat completion response
-#[derive(Debug, Serialize)]
-pub struct ChatCompletionResponse {
-    /// Response ID
-    pub id: String,
-    /// Object type
-    pub object: String,
-    /// Created timestamp
-    pub created: i64,
-    /// Model used
-    pub model: String,
-    /// Choices
-    pub choices: Vec<ChatCompletionChoice>,
-    /// Usage statistics
-    pub usage: ChatUsage,
-}
-
-/// Chat completion choice
-#[derive(Debug, Serialize)]
-pub struct ChatCompletionChoice {
-    /// Index
-    pub index: usize,
-    /// Message
-    pub message: ChatMessage,
-    /// Finish reason
-    pub finish_reason: String,
-}
-
-/// Usage statistics
-#[derive(Debug, Serialize)]
-pub struct ChatUsage {
-    /// Prompt tokens
-    pub prompt_tokens: usize,
-    /// Completion tokens
-    pub completion_tokens: usize,
-    /// Total tokens
-    pub total_tokens: usize,
-}
-
-/// Streaming chat completion chunk
-#[derive(Debug, Serialize)]
-pub struct ChatCompletionChunk {
-    /// Response ID
-    pub id: String,
-    /// Object type
-    pub object: String,
-    /// Created timestamp
-    pub created: i64,
-    /// Model used
-    pub model: String,
-    /// Choices
-    pub choices: Vec<ChatCompletionChunkChoice>,
-}
-
-/// Chat completion chunk choice
-#[derive(Debug, Serialize)]
-pub struct ChatCompletionChunkChoice {
-    /// Index
-    pub index: usize,
-    /// Delta (content change)
-    pub delta: ChatMessageDelta,
-    /// Finish reason (if finished)
-    pub finish_reason: Option<String>,
-}
-
-/// Chat message delta (for streaming)
-#[derive(Debug, Serialize)]
-pub struct ChatMessageDelta {
-    /// Role (only in first chunk)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub role: Option<String>,
-    /// Content delta
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub content: Option<String>,
-}
+pub use crate::services::chat_completion_service::{
+    ChatMessage, ChatCompletionChoice, ChatCompletionChunk, ChatCompletionChunkChoice,
+    ChatCompletionRequest, ChatCompletionResponse, ChatMessageDelta, ChatUsage,
+};
 
 /// Create completions routes
 pub fn create_completions_routes() -> Router<ApiContext> {
     Router::new().route("/v1/chat/completions", post(chat_completions_handler))
 }
 
-/// Handler for POST /v1/chat/completions
-/// OpenAI-compatible chat completions endpoint
 async fn chat_completions_handler(
     State(ctx): State<ApiContext>,
     Extension(_claims): Extension<Claims>,
     Json(request): Json<ChatCompletionRequest>,
 ) -> impl IntoResponse {
-    // Convert OpenAI request to internal ModelRequest
-    let prompt = request
-        .messages
-        .iter()
-        .map(|m| format!("{}: {}", m.role, m.content))
-        .collect::<Vec<_>>()
-        .join("\n");
+    let model_request = ChatCompletionService::build_model_request(&request);
 
-    let model_params = ModelParameters {
-        temperature: request.temperature,
-        max_tokens: request.max_tokens,
-        top_p: request.top_p,
-        frequency_penalty: request.frequency_penalty,
-        presence_penalty: request.presence_penalty,
-        stop_sequences: request.stop.unwrap_or_default(),
-        seed: None,
-    };
-
-    let model_request = ModelRequest {
-        input: prompt,
-        parameters: model_params,
-        session_id: None,
-        priority: 5,
-        timeout: Some(30),
-    };
-
-    let instance_mgr = ctx.instance_manager.get().cloned();
-
-    if let Some(manager_arc) = instance_mgr.clone() {
-        let instance_opt = {
-            let manager = manager_arc.read().await;
-            manager.get_instance_by_model_id(&request.model).await
-        };
-
-        if let Some(instance) = instance_opt {
-            if request.stream {
-                let stream = create_streaming_response_from_instance(
-                    &instance.instance_id,
-                    &request.model,
-                    model_request.clone(),
-                    instance_mgr.clone(),
-                );
-                Sse::new(stream).into_response()
-            } else {
-                let response = process_chat_completion_via_instance(
-                    &instance.instance_id,
-                    &request.model,
-                    model_request,
-                    manager_arc,
-                )
-                .await;
-
-                match response {
-                    Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-                    Err(e) => {
-                        let (s, j) = api_json_error(
-                            "internal_error",
-                            e.to_string(),
-                            Some(ErrorContext::new("chat_completion")),
-                            StatusCode::INTERNAL_SERVER_ERROR,
-                        );
-                        (s, j).into_response()
-                    }
-                }
-            }
-        } else {
-            // Fallback to simplified processing if no instance found
-            if request.stream {
-                let stream = create_streaming_response(&request.model, model_request);
-                Sse::new(stream).into_response()
-            } else {
-                let response = process_chat_completion(&request.model, model_request).await;
-
-                match response {
-                    Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-                    Err(e) => {
-                        let (s, j) = api_json_error(
-                            "internal_error",
-                            e.to_string(),
-                            Some(ErrorContext::new("chat_completion")),
-                            StatusCode::INTERNAL_SERVER_ERROR,
-                        );
-                        (s, j).into_response()
-                    }
-                }
-            }
-        }
-    } else {
-        // Fallback to simplified processing if instance manager not initialized
+    if let Some((manager_arc, instance_id)) =
+        ChatCompletionService::resolve_instance_for_model(&ctx, &request.model).await
+    {
         if request.stream {
-            let stream = create_streaming_response(&request.model, model_request);
+            let stream = ChatCompletionService::stream_from_instance(
+                &instance_id,
+                &request.model,
+                model_request.clone(),
+                Some(manager_arc),
+            );
             Sse::new(stream).into_response()
         } else {
-            let response = process_chat_completion(&request.model, model_request).await;
-
-            match response {
+            match ChatCompletionService::complete_via_instance(
+                &instance_id,
+                &request.model,
+                model_request,
+                manager_arc,
+            )
+            .await
+            {
                 Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
                 Err(e) => {
                     let (s, j) = api_json_error(
@@ -270,316 +65,21 @@ async fn chat_completions_handler(
                 }
             }
         }
-    }
-}
-
-/// Process chat completion via instance (non-streaming)
-async fn process_chat_completion_via_instance(
-    instance_id: &str,
-    model: &str,
-    request: ModelRequest,
-    manager_arc: Arc<tokio::sync::RwLock<InstanceManager>>,
-) -> Result<ChatCompletionResponse, crate::core::error::AppError> {
-    let manager = manager_arc.read().await;
-
-    // Process request via instance
-    let model_response = manager
-        .process_request_via_instance(instance_id, request.clone())
-        .await?;
-
-    let completion = ChatCompletionResponse {
-        id: format!("chatcmpl-{}", uuid::Uuid::new_v4()),
-        object: "chat.completion".to_string(),
-        created: chrono::Utc::now().timestamp(),
-        model: model.to_string(),
-        choices: vec![ChatCompletionChoice {
-            index: 0,
-            message: ChatMessage {
-                role: "assistant".to_string(),
-                content: model_response.output,
-            },
-            finish_reason: "stop".to_string(),
-        }],
-        usage: ChatUsage {
-            prompt_tokens: model_response.metrics.tokens_generated, // Approximate
-            completion_tokens: model_response.metrics.tokens_generated,
-            total_tokens: model_response.metrics.tokens_generated * 2, // Rough estimate
-        },
-    };
-
-    Ok(completion)
-}
-
-/// Process chat completion (non-streaming fallback)
-async fn process_chat_completion(
-    model: &str,
-    request: ModelRequest,
-) -> Result<ChatCompletionResponse, crate::core::error::AppError> {
-    // Simplified processing - fallback when no instance found
-    // For now, simulate processing
-    tokio::time::sleep(Duration::from_millis(100)).await;
-
-    let response_text = format!("Processed: {}", request.input);
-
-    let completion = ChatCompletionResponse {
-        id: format!("chatcmpl-{}", uuid::Uuid::new_v4()),
-        object: "chat.completion".to_string(),
-        created: chrono::Utc::now().timestamp(),
-        model: model.to_string(),
-        choices: vec![ChatCompletionChoice {
-            index: 0,
-            message: ChatMessage {
-                role: "assistant".to_string(),
-                content: response_text.clone(),
-            },
-            finish_reason: "stop".to_string(),
-        }],
-        usage: ChatUsage {
-            prompt_tokens: request.input.len() / 4, // Rough estimate
-            completion_tokens: response_text.len() / 4,
-            total_tokens: (request.input.len() + response_text.len()) / 4,
-        },
-    };
-
-    Ok(completion)
-}
-
-/// Create streaming response from instance
-fn create_streaming_response_from_instance(
-    instance_id: &str,
-    model: &str,
-    request: ModelRequest,
-    manager_opt: Option<Arc<tokio::sync::RwLock<InstanceManager>>>,
-) -> impl Stream<Item = Result<Event, Infallible>> {
-    use tokio::sync::mpsc;
-
-    let instance_id = instance_id.to_string();
-    let model = model.to_string();
-    let response_id = format!("chatcmpl-{}", uuid::Uuid::new_v4());
-    let created = chrono::Utc::now().timestamp();
-
-    // Use channel to process request asynchronously and stream chunks
-    let (tx, rx) = mpsc::unbounded_channel();
-
-    if let Some(manager_arc) = manager_opt {
-        let manager_clone = manager_arc.clone();
-        let request_clone = request.clone();
-        let instance_id_clone = instance_id.clone();
-        let model_clone = model.clone();
-        let response_id_clone = response_id.clone();
-
-        // Spawn task to process request and send chunks
-        let request_input = request_clone.input.clone();
-        tokio::spawn(async move {
-            let manager = manager_clone.read().await;
-            match manager
-                .process_request_via_instance(&instance_id_clone, request_clone)
-                .await
-            {
-                Ok(model_response) => {
-                    // Chunk the response for streaming
-                    let response_text = model_response.output;
-                    let chunks: Vec<String> = response_text
-                        .chars()
-                        .collect::<Vec<_>>()
-                        .chunks(5)
-                        .map(|chunk| chunk.iter().collect())
-                        .collect();
-
-                    let chunks_len = chunks.len();
-
-                    for (index, chunk) in chunks.into_iter().enumerate() {
-                        let is_first = index == 0;
-                        let is_last = index == chunks_len - 1;
-
-                        let chunk_data = ChatCompletionChunk {
-                            id: response_id_clone.clone(),
-                            object: "chat.completion.chunk".to_string(),
-                            created,
-                            model: model_clone.clone(),
-                            choices: vec![ChatCompletionChunkChoice {
-                                index: 0,
-                                delta: ChatMessageDelta {
-                                    role: if is_first {
-                                        Some("assistant".to_string())
-                                    } else {
-                                        None
-                                    },
-                                    content: Some(chunk),
-                                },
-                                finish_reason: if is_last {
-                                    Some("stop".to_string())
-                                } else {
-                                    None
-                                },
-                            }],
-                        };
-
-                        let json = serde_json::to_string(&chunk_data).unwrap_or_default();
-                        let _ = tx.send(Ok(Event::default().data(json)));
-                    }
-
-                    let _ = tx.send(Ok(Event::default().data("[DONE]")));
-                }
-                Err(_) => {
-                    // Fallback: send simplified response
-                    let response_text = format!("Processed: {}", request_input);
-                    let chunks: Vec<String> = response_text
-                        .chars()
-                        .collect::<Vec<_>>()
-                        .chunks(5)
-                        .map(|chunk| chunk.iter().collect())
-                        .collect();
-
-                    let chunks_len = chunks.len();
-                    for (index, chunk) in chunks.into_iter().enumerate() {
-                        let is_first = index == 0;
-                        let is_last = index == chunks_len - 1;
-
-                        let chunk_data = ChatCompletionChunk {
-                            id: response_id_clone.clone(),
-                            object: "chat.completion.chunk".to_string(),
-                            created,
-                            model: model_clone.clone(),
-                            choices: vec![ChatCompletionChunkChoice {
-                                index: 0,
-                                delta: ChatMessageDelta {
-                                    role: if is_first {
-                                        Some("assistant".to_string())
-                                    } else {
-                                        None
-                                    },
-                                    content: Some(chunk),
-                                },
-                                finish_reason: if is_last {
-                                    Some("stop".to_string())
-                                } else {
-                                    None
-                                },
-                            }],
-                        };
-
-                        let json = serde_json::to_string(&chunk_data).unwrap_or_default();
-                        let _ = tx.send(Ok(Event::default().data(json)));
-                    }
-
-                    let _ = tx.send(Ok(Event::default().data("[DONE]")));
-                }
+    } else if request.stream {
+        let stream = ChatCompletionService::stream_fallback(&request.model, model_request);
+        Sse::new(stream).into_response()
+    } else {
+        match ChatCompletionService::complete_fallback(&request.model, model_request).await {
+            Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "internal_error",
+                    e.to_string(),
+                    Some(ErrorContext::new("chat_completion")),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, j).into_response()
             }
-        });
-
-        // Convert receiver to stream
-        return tokio_stream::wrappers::UnboundedReceiverStream::new(rx);
-    }
-
-    // Fallback to simplified streaming if manager not available
-    // Use channel for consistency
-    let (tx, rx) = mpsc::unbounded_channel();
-    let model_clone = model.clone();
-    let request_input = request.input.clone();
-    let response_id_clone = response_id.clone();
-
-    tokio::spawn(async move {
-        // Simulate processing
-        tokio::time::sleep(Duration::from_millis(100)).await;
-
-        let response_text = format!("Processed: {}", request_input);
-        let chunks: Vec<String> = response_text
-            .chars()
-            .collect::<Vec<_>>()
-            .chunks(5)
-            .map(|chunk| chunk.iter().collect())
-            .collect();
-
-        let chunks_len = chunks.len();
-        for (index, chunk) in chunks.into_iter().enumerate() {
-            let is_first = index == 0;
-            let is_last = index == chunks_len - 1;
-
-            let chunk_data = ChatCompletionChunk {
-                id: response_id_clone.clone(),
-                object: "chat.completion.chunk".to_string(),
-                created,
-                model: model_clone.clone(),
-                choices: vec![ChatCompletionChunkChoice {
-                    index: 0,
-                    delta: ChatMessageDelta {
-                        role: if is_first {
-                            Some("assistant".to_string())
-                        } else {
-                            None
-                        },
-                        content: Some(chunk),
-                    },
-                    finish_reason: if is_last {
-                        Some("stop".to_string())
-                    } else {
-                        None
-                    },
-                }],
-            };
-
-            let json = serde_json::to_string(&chunk_data).unwrap_or_default();
-            let _ = tx.send(Ok(Event::default().data(json)));
         }
-
-        let _ = tx.send(Ok(Event::default().data("[DONE]")));
-    });
-
-    tokio_stream::wrappers::UnboundedReceiverStream::new(rx)
-}
-
-/// Create streaming response (fallback)
-fn create_streaming_response(
-    model: &str,
-    request: ModelRequest,
-) -> impl Stream<Item = Result<Event, Infallible>> {
-    let model = model.to_string();
-    let response_id = format!("chatcmpl-{}", uuid::Uuid::new_v4());
-    let created = chrono::Utc::now().timestamp();
-
-    // Simulate streaming by chunking the response
-    let response_text = format!("Processed: {}", request.input);
-    let chunks: Vec<String> = response_text
-        .chars()
-        .collect::<Vec<_>>()
-        .chunks(5)
-        .map(|chunk| chunk.iter().collect())
-        .collect();
-
-    let chunks_len = chunks.len();
-    let model_clone = model.clone();
-    let response_id_clone = response_id.clone();
-
-    stream::iter(chunks.into_iter().enumerate().map(move |(index, chunk)| {
-        let is_first = index == 0;
-        let is_last = index == chunks_len - 1;
-
-        let chunk_data = ChatCompletionChunk {
-            id: response_id_clone.clone(),
-            object: "chat.completion.chunk".to_string(),
-            created,
-            model: model_clone.clone(),
-            choices: vec![ChatCompletionChunkChoice {
-                index: 0,
-                delta: ChatMessageDelta {
-                    role: if is_first {
-                        Some("assistant".to_string())
-                    } else {
-                        None
-                    },
-                    content: Some(chunk),
-                },
-                finish_reason: if is_last {
-                    Some("stop".to_string())
-                } else {
-                    None
-                },
-            }],
-        };
-
-        let json = serde_json::to_string(&chunk_data).unwrap_or_default();
-        Ok(Event::default().data(json))
-    }))
-    .chain(stream::iter(vec![Ok(Event::default().data("[DONE]"))]))
+    }
 }

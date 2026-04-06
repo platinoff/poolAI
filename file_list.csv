@@ -409,6 +409,7 @@
 ./src/core/state.rs
 ./src/services/mod.rs
 ./src/services/admin_service.rs
+./src/services/chat_completion_service.rs
 ./src/services/discovery_service.rs
 ./src/services/topology_service.rs
 ./src/services/worker_pool_service.rs

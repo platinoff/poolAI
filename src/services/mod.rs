@@ -4,6 +4,7 @@
 //! See `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` (Priority 2).
 
 pub mod admin_service;
+pub mod chat_completion_service;
 #[cfg(feature = "cloud")]
 pub mod cloud_service;
 pub mod discovery_service;
