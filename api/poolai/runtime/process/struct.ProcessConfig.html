@@ -16,8 +16,8 @@ environment variables, resource limits, and timeout settings.</p>
 <span class="kw">use </span>std::path::PathBuf;
 
 <span class="kw">let </span>config = ProcessConfig {
-    command: <span class="string">"python"</span>.to_string(),
-    args: <span class="macro">vec!</span>[<span class="string">"script.py"</span>.to_string(), <span class="string">"--arg"</span>.to_string()],
+    command: <span class="string">"custom-worker"</span>.to_string(),
+    args: <span class="macro">vec!</span>[<span class="string">"run-job"</span>.to_string(), <span class="string">"--input"</span>.to_string(), <span class="string">"data.bin"</span>.to_string()],
     working_dir: <span class="prelude-val">Some</span>(PathBuf::from(<span class="string">"/tmp"</span>)),
     env: {
         <span class="kw">let </span><span class="kw-2">mut </span>env = HashMap::new();

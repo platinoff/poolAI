@@ -20,8 +20,8 @@ manager.start().<span class="kw">await</span><span class="question-mark">?</span
 
 <span class="comment">// Spawn a process
 </span><span class="kw">let </span>config = ProcessConfig {
-    command: <span class="string">"python"</span>.to_string(),
-    args: <span class="macro">vec!</span>[<span class="string">"script.py"</span>.to_string()],
+    command: <span class="string">"custom-worker"</span>.to_string(),
+    args: <span class="macro">vec!</span>[<span class="string">"run-job"</span>.to_string(), <span class="string">"--input"</span>.to_string(), <span class="string">"data.bin"</span>.to_string()],
     working_dir: <span class="prelude-val">None</span>,
     env: HashMap::new(),
     timeout_seconds: <span class="prelude-val">Some</span>(<span class="number">300</span>),
@@ -64,8 +64,8 @@ and timeout will be enforced if configured.</p>
 
 <span class="kw">let </span>manager = ProcessManager::new();
 <span class="kw">let </span>config = ProcessConfig {
-    command: <span class="string">"python"</span>.to_string(),
-    args: <span class="macro">vec!</span>[<span class="string">"script.py"</span>.to_string()],
+    command: <span class="string">"custom-worker"</span>.to_string(),
+    args: <span class="macro">vec!</span>[<span class="string">"run-job"</span>.to_string(), <span class="string">"--input"</span>.to_string(), <span class="string">"data.bin"</span>.to_string()],
     working_dir: <span class="prelude-val">None</span>,
     env: HashMap::new(),
     timeout_seconds: <span class="prelude-val">Some</span>(<span class="number">300</span>),

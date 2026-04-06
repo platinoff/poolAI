@@ -61,8 +61,8 @@
 <a href=#61 id=61 data-nosnippet>61</a>/// use std::path::PathBuf;
 <a href=#62 id=62 data-nosnippet>62</a>///
 <a href=#63 id=63 data-nosnippet>63</a>/// let config = ProcessConfig {
-<a href=#64 id=64 data-nosnippet>64</a>///     command: "python".to_string(),
-<a href=#65 id=65 data-nosnippet>65</a>///     args: vec!["script.py".to_string(), "--arg".to_string()],
+<a href=#64 id=64 data-nosnippet>64</a>///     command: "custom-worker".to_string(),
+<a href=#65 id=65 data-nosnippet>65</a>///     args: vec!["run-job".to_string(), "--input".to_string(), "data.bin".to_string()],
 <a href=#66 id=66 data-nosnippet>66</a>///     working_dir: Some(PathBuf::from("/tmp")),
 <a href=#67 id=67 data-nosnippet>67</a>///     env: {
 <a href=#68 id=68 data-nosnippet>68</a>///         let mut env = HashMap::new();
@@ -145,8 +145,8 @@
 <a href=#145 id=145 data-nosnippet>145</a>///
 <a href=#146 id=146 data-nosnippet>146</a>/// // Spawn a process
 <a href=#147 id=147 data-nosnippet>147</a>/// let config = ProcessConfig {
-<a href=#148 id=148 data-nosnippet>148</a>///     command: "python".to_string(),
-<a href=#149 id=149 data-nosnippet>149</a>///     args: vec!["script.py".to_string()],
+<a href=#148 id=148 data-nosnippet>148</a>///     command: "custom-worker".to_string(),
+<a href=#149 id=149 data-nosnippet>149</a>///     args: vec!["run-job".to_string(), "--input".to_string(), "data.bin".to_string()],
 <a href=#150 id=150 data-nosnippet>150</a>///     working_dir: None,
 <a href=#151 id=151 data-nosnippet>151</a>///     env: HashMap::new(),
 <a href=#152 id=152 data-nosnippet>152</a>///     timeout_seconds: Some(300),
@@ -252,8 +252,8 @@
 <a href=#252 id=252 data-nosnippet>252</a>    /// # async fn example() -&gt; Result&lt;(), poolai::core::error::AppError&gt; {
 <a href=#253 id=253 data-nosnippet>253</a>    /// let manager = ProcessManager::new();
 <a href=#254 id=254 data-nosnippet>254</a>    /// let config = ProcessConfig {
-<a href=#255 id=255 data-nosnippet>255</a>    ///     command: "python".to_string(),
-<a href=#256 id=256 data-nosnippet>256</a>    ///     args: vec!["script.py".to_string()],
+<a href=#255 id=255 data-nosnippet>255</a>    ///     command: "custom-worker".to_string(),
+<a href=#256 id=256 data-nosnippet>256</a>    ///     args: vec!["run-job".to_string(), "--input".to_string(), "data.bin".to_string()],
 <a href=#257 id=257 data-nosnippet>257</a>    ///     working_dir: None,
 <a href=#258 id=258 data-nosnippet>258</a>    ///     env: HashMap::new(),
 <a href=#259 id=259 data-nosnippet>259</a>    ///     timeout_seconds: Some(300),
