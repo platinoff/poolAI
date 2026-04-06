@@ -325,6 +325,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
 
+## Верифікація 2026-04-06 (P1/P2 — `rewards_engine` на `AppState`)
+
+- **Код**: `lazy_static` прибрано з `rewards`; `OnceLock<Arc<RewardSystem>>` + `shared_reward_engine()`; `AppState::rewards_engine` + `attach_rewards_engine` / `attach_rewards_engine_for_test` (`test-utils`); `RewardsService` читає слот або fallback на `shared_reward_engine`; `main` викликає attach перед HTTP.
+- **Залежності**: прямий `lazy_static` у `poolai` видалено.
+
 ## Верифікація 2026-04-06 (P2 — `RewardsService`)
 
 - **Код**: `src/services/rewards_service.rs` — обгортка над `rewards::get_*` + `TOP_USERS_DEFAULT_LIMIT`; усі маршрути `/rewards` приймають `State<ApiContext>`.

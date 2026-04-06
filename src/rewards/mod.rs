@@ -42,7 +42,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 
 /// Reward types
@@ -400,9 +400,13 @@ impl RewardSystem {
     }
 }
 
-// Global instance of the reward system
-lazy_static::lazy_static! {
-    static ref REWARD_SYSTEM: RewardSystem = RewardSystem::new();
+static REWARD_ENGINE: OnceLock<Arc<RewardSystem>> = OnceLock::new();
+
+/// Process-wide reward engine (lazy-init on first use; same handle wired into [`crate::core::state::AppState`] at startup).
+pub fn shared_reward_engine() -> Arc<RewardSystem> {
+    REWARD_ENGINE
+        .get_or_init(|| Arc::new(RewardSystem::new()))
+        .clone()
 }
 
 /// Create a new reward for a user
@@ -452,7 +456,7 @@ pub async fn create_reward(
     description: String,
     metadata: HashMap<String, String>,
 ) -> Reward {
-    REWARD_SYSTEM
+    shared_reward_engine()
         .create_reward(
             user_id,
             reward_type,
@@ -487,7 +491,7 @@ pub async fn create_reward(
 /// # }
 /// ```
 pub async fn get_user_rewards(user_id: &str) -> Vec<Reward> {
-    REWARD_SYSTEM.get_user_rewards(user_id).await
+    shared_reward_engine().get_user_rewards(user_id).await
 }
 
 /// Get user progress
@@ -518,7 +522,7 @@ pub async fn get_user_rewards(user_id: &str) -> Vec<Reward> {
 /// # }
 /// ```
 pub async fn get_user_progress(user_id: &str) -> Option<UserProgress> {
-    REWARD_SYSTEM.get_user_progress(user_id).await
+    shared_reward_engine().get_user_progress(user_id).await
 }
 
 /// Get reward statistics
@@ -543,7 +547,7 @@ pub async fn get_user_progress(user_id: &str) -> Option<UserProgress> {
 /// # }
 /// ```
 pub async fn get_reward_statistics() -> HashMap<String, f64> {
-    REWARD_SYSTEM.get_reward_statistics().await
+    shared_reward_engine().get_reward_statistics().await
 }
 
 /// Get top users by total rewards
@@ -571,7 +575,7 @@ pub async fn get_reward_statistics() -> HashMap<String, f64> {
 /// # }
 /// ```
 pub async fn get_top_users(limit: usize) -> Vec<(String, f64)> {
-    REWARD_SYSTEM.get_top_users(limit).await
+    shared_reward_engine().get_top_users(limit).await
 }
 
 /// Award performance bonus automatically

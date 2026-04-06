@@ -197,8 +197,10 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     ui::initialize().await?;
     info!("✅ UI module initialized");
 
-    // Initialize rewards system (already initialized via lazy_static)
-    info!("✅ Rewards system ready");
+    app_state
+        .attach_rewards_engine()
+        .map_err(|e| format!("Failed to attach rewards engine to AppState: {e}"))?;
+    info!("✅ Rewards engine attached to AppState for HTTP");
 
     // Start network server
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));

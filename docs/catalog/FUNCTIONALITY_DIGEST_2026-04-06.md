@@ -43,7 +43,7 @@
 
 | Область | Файли / пакет | Функціонал (за README та архітектурою) |
 |---------|----------------|--------------------------------------|
-| **Core** | `core/` | Конфіг, `AppState` / `ApiContext`, помилки (`AppError`, `ErrorContext`), користувачі, discovery-типи, WS-менеджер, інтерфейс моделі. |
+| **Core** | `core/` | Конфіг, `AppState` / `ApiContext` (у т.ч. `rewards_engine` → `rewards::RewardSystem`), помилки (`AppError`, `ErrorContext`), користувачі, discovery-типи, WS-менеджер, інтерфейс моделі. |
 | **Pool** | `pool/` | Пул воркерів, топологія, discovery-інтеграція, розміщення. |
 | **Network** | `network/` | Axum: `/api/v1/*`, RAID-маршрути, enterprise API, auth, rate limit, JSON-помилки, WebSocket, distributed RAID handlers. |
 | **Platform** | `platform/` | GPU / апаратний рівень. |
@@ -55,7 +55,7 @@
 | **Enterprise** | `enterprise/` | Тенанти, audit, monitoring, security (OAuth2, SAML, політики). |
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
-| **Rewards** | `rewards/` | Система нагород / прогресу. |
+| **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
 | **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). |
 | **Services** | `services/` | `RaidService`, `VmService`, `LibraryService`, `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | Telegram-бот (керування). |

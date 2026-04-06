@@ -71,6 +71,7 @@ use crate::ml::pipeline::MLPipelineManager;
 use crate::pool::topology::TopologyManager;
 use crate::pool::Pool;
 use crate::raid::RaidManager;
+use crate::rewards::RewardSystem;
 use crate::runtime::instance::InstanceManager;
 use crate::vm::VmManager;
 use chrono::{DateTime, Utc};
@@ -279,6 +280,8 @@ pub struct AppState {
     pub instance_manager: OnceLock<Arc<TokioRwLock<InstanceManager>>>,
     /// Topology manager (`initialize_global_topology_manager` + attach).
     pub topology_manager: OnceLock<Arc<TokioRwLock<TopologyManager>>>,
+    /// Reward system (`shared_reward_engine` + [`Self::attach_rewards_engine`] from bootstrap).
+    pub rewards_engine: OnceLock<Arc<RewardSystem>>,
     /// Cloud integration (`CloudManager::new` + `initialize` in `main`, then attach).
     #[cfg(feature = "cloud")]
     pub cloud_manager: OnceLock<Arc<CloudManager>>,
@@ -351,6 +354,7 @@ impl AppState {
             library_manager: OnceLock::new(),
             instance_manager: OnceLock::new(),
             topology_manager: OnceLock::new(),
+            rewards_engine: OnceLock::new(),
             #[cfg(feature = "cloud")]
             cloud_manager: OnceLock::new(),
             #[cfg(feature = "enterprise")]
@@ -432,6 +436,13 @@ impl AppState {
         Ok(())
     }
 
+    /// Attach the process-wide reward engine for HTTP (same `Arc` as [`crate::rewards::shared_reward_engine`]).
+    pub fn attach_rewards_engine(&self) -> Result<(), String> {
+        self.rewards_engine
+            .set(crate::rewards::shared_reward_engine())
+            .map_err(|_| "rewards_engine handle already attached".to_string())
+    }
+
     /// Attach a pre-initialized cloud manager (set from `main` after `initialize().await`).
     #[cfg(feature = "cloud")]
     pub fn attach_cloud_manager(&self, manager: Arc<CloudManager>) -> Result<(), String> {
@@ -499,6 +510,14 @@ impl AppState {
         self.cloud_manager
             .set(manager)
             .map_err(|_| "cloud_manager handle already attached".to_string())
+    }
+
+    /// Attach a custom reward engine for integration tests.
+    #[cfg(feature = "test-utils")]
+    pub fn attach_rewards_engine_for_test(&self, engine: Arc<RewardSystem>) -> Result<(), String> {
+        self.rewards_engine
+            .set(engine)
+            .map_err(|_| "rewards_engine handle already attached".to_string())
     }
 
     /// Align legacy `get_global_*` enterprise singletons with this `AppState` (no-op if already set).
