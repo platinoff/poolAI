@@ -327,7 +327,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ## Верифікація 2026-04-06 (P2 — `SystemService`)
 
-- **Код**: `src/services/system_service.rs` — snapshots для status (версія з `CARGO_PKG_VERSION`), health, metrics, models, GPU; `src/network/api/system.rs` — тонкі handlers; велика HTML-сторінка `/status` лишається в `system.rs`.
+- **Код**: `src/services/system_service.rs` — snapshots для status (версія з `CARGO_PKG_VERSION`), health, metrics, models, GPU; **`get_configuration` / `apply_configuration`**; **`login`** (делегує `authenticate_user`); `src/network/api/system.rs` — тонкі handlers (`check_permission` лишається на PUT `/config`); велика HTML-сторінка `/status` лишається в `system.rs`.
 - **Доки**: `ARCHITECTURE_BEST_PRACTICES.md`, `FUNCTIONALITY_DIGEST`, `HANDOFF`, `file_list.csv`.
 - **Тест**: `cargo test -p poolai --lib "network::api::system::tests::status_handler_works_with_api_context" -- --exact` → **ok**.
 

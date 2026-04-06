@@ -1,6 +1,15 @@
-//! System status, health, metrics, and related snapshots for HTTP handlers.
+//! System status, health, metrics, configuration, login orchestration for HTTP handlers.
 
+use std::sync::Arc;
+
+use axum::http::StatusCode;
+use axum::Json;
 use serde::Serialize;
+
+use crate::core::config::{get_config, update_config, PoolAIConfig};
+use crate::core::error::AppError;
+use crate::core::user_manager::UserManager;
+use crate::network::auth::{authenticate_user, AuthRequest, AuthResponse};
 
 #[derive(Serialize)]
 pub struct StatusResponse {
@@ -126,5 +135,20 @@ impl SystemService {
 
     pub fn gpu_snapshot() -> crate::platform::GpuInfo {
         crate::platform::get_gpu_info()
+    }
+
+    pub fn get_configuration() -> Result<PoolAIConfig, AppError> {
+        get_config()
+    }
+
+    pub fn apply_configuration(config: PoolAIConfig) -> Result<(), AppError> {
+        update_config(config)
+    }
+
+    pub async fn login(
+        auth_req: AuthRequest,
+        user_manager: Arc<UserManager>,
+    ) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
+        authenticate_user(auth_req, user_manager).await
     }
 }

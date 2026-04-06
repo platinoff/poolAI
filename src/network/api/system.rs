@@ -17,11 +17,11 @@ use axum::{
     Json, Router,
 };
 
-use crate::core::config::{get_config, update_config, PoolAIConfig};
+use crate::core::config::PoolAIConfig;
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::network::api::common::{api_json_error, check_permission};
-use crate::network::auth::{authenticate_user, AuthRequest, Claims};
+use crate::network::auth::{AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
 use crate::services::system_service::SystemService;
 
@@ -506,7 +506,7 @@ async fn login_handler(
     State(ctx): State<ApiContext>,
     Json(auth_req): Json<AuthRequest>,
 ) -> impl IntoResponse {
-    match authenticate_user(auth_req, ctx.user_manager.clone()).await {
+    match SystemService::login(auth_req, ctx.user_manager.clone()).await {
         Ok(auth_response) => Json(auth_response).into_response(),
         Err((status, error)) => (status, error).into_response(),
     }
@@ -514,7 +514,7 @@ async fn login_handler(
 
 /// Get system configuration
 async fn config_get_handler() -> impl IntoResponse {
-    match get_config() {
+    match SystemService::get_configuration() {
         Ok(config) => Json(config).into_response(),
         Err(e) => {
             let (s, j) = api_json_error(
@@ -538,7 +538,7 @@ async fn config_update_handler(
         return err.into_response();
     }
 
-    match update_config(config) {
+    match SystemService::apply_configuration(config) {
         Ok(()) => Json(serde_json::json!({
             "message": "Configuration updated successfully"
         }))
