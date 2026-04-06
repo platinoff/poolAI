@@ -419,6 +419,7 @@
 ./src/services/library_service.rs
 ./src/services/raid_service.rs
 ./src/services/rewards_service.rs
+./src/services/system_service.rs
 ./src/services/vm_service.rs
 ./src/enterprise/audit.rs
 ./src/enterprise/mod.rs

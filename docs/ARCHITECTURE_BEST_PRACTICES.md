@@ -49,6 +49,7 @@ src/
 │   ├── library_service.rs
 │   ├── raid_service.rs
 │   ├── rewards_service.rs     # rewards stats / progress (delegates to `rewards` module today)
+│   ├── system_service.rs      # status/health/metrics/models/GPU snapshots for `system` API
 │   ├── topology_service.rs     # topology snapshot / node resources
 │   ├── vm_service.rs
 │   └── worker_pool_service.rs  # pool workers list / add / remove

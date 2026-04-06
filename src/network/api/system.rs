@@ -16,7 +16,6 @@ use axum::{
     routing::{get, put},
     Json, Router,
 };
-use serde::Serialize;
 
 use crate::core::config::{get_config, update_config, PoolAIConfig};
 use crate::core::error::ErrorContext;
@@ -24,52 +23,7 @@ use crate::core::state::ApiContext;
 use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{authenticate_user, AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
-use crate::platform;
-
-#[derive(Serialize)]
-struct StatusResponse {
-    status: &'static str,
-    version: &'static str,
-    uptime: u64,
-}
-
-#[derive(Serialize)]
-struct MetricsResponse {
-    active_workers: u32,
-    total_requests: u64,
-    avg_response_time: f64,
-}
-
-#[derive(Serialize)]
-struct ModelInfo {
-    name: &'static str,
-    status: &'static str,
-    memory_usage: u64,
-}
-
-#[derive(Serialize)]
-struct HealthResponse {
-    status: &'static str,
-    timestamp: String,
-    version: &'static str,
-    uptime: u64,
-    checks: HealthChecks,
-}
-
-#[derive(Serialize)]
-struct HealthChecks {
-    database: HealthCheck,
-    memory: HealthCheck,
-    workers: HealthCheck,
-    gpu: HealthCheck,
-}
-
-#[derive(Serialize)]
-struct HealthCheck {
-    status: &'static str,
-    message: String,
-    response_time_ms: u64,
-}
+use crate::services::system_service::SystemService;
 
 #[cfg(test)]
 mod tests {
@@ -123,12 +77,7 @@ async fn status_handler(
     // Touch system state so that future extensions can use it without changing
     // the handler signature again.
     let _ = app_state.get_system_state();
-    let uptime = crate::version::get_uptime_seconds();
-    let status = StatusResponse {
-        status: "running",
-        version: "0.1.0",
-        uptime,
-    };
+    let status = SystemService::status_snapshot();
     // Check the Accept header
     let want_html = req
         .headers()
@@ -538,78 +487,19 @@ async fn status_handler(
 }
 
 async fn metrics_handler() -> impl IntoResponse {
-    let metrics = MetricsResponse {
-        active_workers: 5,
-        total_requests: 1234,
-        avg_response_time: 0.045,
-    };
-    Json(metrics)
+    Json(SystemService::metrics_snapshot())
 }
 
 async fn models_handler() -> impl IntoResponse {
-    let models = vec![
-        ModelInfo {
-            name: "llama-2-7b",
-            status: "loaded",
-            memory_usage: 8192,
-        },
-        ModelInfo {
-            name: "gpt-3.5-turbo",
-            status: "available",
-            memory_usage: 4096,
-        },
-    ];
-    Json(models)
+    Json(SystemService::models_snapshot())
 }
 
 async fn gpu_info() -> impl IntoResponse {
-    let info = platform::get_gpu_info();
-    Json(info)
+    Json(SystemService::gpu_snapshot())
 }
 
 async fn health_handler() -> impl IntoResponse {
-    use chrono::Utc;
-
-    let start_time = std::time::Instant::now();
-
-    // Simulated system health checks
-    let health_checks = HealthChecks {
-        database: HealthCheck {
-            status: "healthy",
-            message: "Database connection OK".to_string(),
-            response_time_ms: 5,
-        },
-        memory: HealthCheck {
-            status: "healthy",
-            message: "Memory usage: 45%".to_string(),
-            response_time_ms: 2,
-        },
-        workers: HealthCheck {
-            status: "healthy",
-            message: "8/8 workers active".to_string(),
-            response_time_ms: 3,
-        },
-        gpu: HealthCheck {
-            status: "healthy",
-            message: "GPU temperature: 65°C".to_string(),
-            response_time_ms: 8,
-        },
-    };
-
-    let _response_time = start_time.elapsed().as_millis() as u64;
-
-    // Get actual uptime from version module
-    let uptime = crate::version::get_uptime_seconds();
-
-    let health_response = HealthResponse {
-        status: "healthy",
-        timestamp: Utc::now().to_rfc3339(),
-        version: "0.1.0",
-        uptime,
-        checks: health_checks,
-    };
-
-    Json(health_response)
+    Json(SystemService::health_snapshot())
 }
 
 async fn login_handler(

@@ -325,6 +325,12 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
 
+## Верифікація 2026-04-06 (P2 — `SystemService`)
+
+- **Код**: `src/services/system_service.rs` — snapshots для status (версія з `CARGO_PKG_VERSION`), health, metrics, models, GPU; `src/network/api/system.rs` — тонкі handlers; велика HTML-сторінка `/status` лишається в `system.rs`.
+- **Доки**: `ARCHITECTURE_BEST_PRACTICES.md`, `FUNCTIONALITY_DIGEST`, `HANDOFF`, `file_list.csv`.
+- **Тест**: `cargo test -p poolai --lib "network::api::system::tests::status_handler_works_with_api_context" -- --exact` → **ok**.
+
 ## Верифікація 2026-04-06 (P2 — `ChatCompletionService`)
 
 - **Код**: `src/services/chat_completion_service.rs` — DTOs, `ModelRequest` mapping, non-stream + SSE streaming (instance path + fallback); `src/network/api/completions.rs` — thin handler + `pub use` типів для сумісності.
