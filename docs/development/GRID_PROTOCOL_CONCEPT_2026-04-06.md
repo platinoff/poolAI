@@ -40,7 +40,7 @@
 
 ## 4. Що залишається поза цим документом
 
-- **Solana‑adapter** (on‑chain події `JobCompleted`, `SeedProvided`, `MemoryUpdated`) — окремий підпункт P6 у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md).
+- **Solana‑adapter** — концепт і мапінг подій: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
 - Єдиний серіалізований **Grid envelope** (версія протоколу, підпис, routing) — майбутня специфікація після заморозки транспорту (HTTP vs QUIC vs інше).
 
 ## 5. Оновлення концепту Grid Node

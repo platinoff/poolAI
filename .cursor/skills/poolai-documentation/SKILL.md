@@ -16,7 +16,7 @@ description: >-
 2. `docs/INDEX_2026-03-17.md`
 3. `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`
 4. `docs/development/HANDOFF_NEW_SESSION.md`
-5. Концепція (`docs/concept/poolAI_concept_root.txt`, Grid/Memory/Job, `docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`)
+5. Концепція (`docs/concept/poolAI_concept_root.txt`, Grid/Memory/Job, `GRID_PROTOCOL_CONCEPT_2026-04-06.md`, `SOLANA_ADAPTER_CONCEPT_2026-04-06.md`)
 6. `docs/ARCHITECTURE_REVIEW.md`, `docs/ARCHITECTURE_BEST_PRACTICES.md`
 7. `docs/performance/BENCHMARKS.md`, `PROFILING.md`
 8. `.github/workflows/ci.yml`

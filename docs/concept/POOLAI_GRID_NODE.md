@@ -77,4 +77,5 @@ Grid Layer додає **протокол між нодами**, не зміню�
 - `POOLAI_MEMORY_LAYER.md` — опис AGI‑памʼяті та seeds.
 - `development/JOB_LAYER_CONCEPT_2026-03-17.md` — Job / Mining Layer.
 - `development/GRID_PROTOCOL_CONCEPT_2026-04-06.md` — **Grid Protocol** (типи повідомлень Job / Result / MemoryShard / PeerStatus і мапінг на Discovery/RAID/тести).
+- `development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md` — **Solana adapter** (on-chain події та відокремлення від Rust core).
 

@@ -28,7 +28,7 @@
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | Синхронізація документації та TODO після 1–4. |
-| **7** | **Priority 6** | Grid protocol / Solana-adapter у docs і коді за потреби. |
+| **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
 
 *Опційно паралельно з 1–2*: стабілізація `cargo test --all-features` на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
 
@@ -190,13 +190,13 @@
 - [x] Описати Grid Protocol (поверх Discovery/RAID):
   - [x] Типи повідомлень: `Job`, `Result`, `MemoryShard`, `PeerStatus` — див. [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md).
   - [x] Звʼязок із peer/discovery API (`/api/v1/discovery/*`, `DiscoveryMessage`), distributed RAID (`/raid/distributed/*`), тестами [`tests/grid_network_scalability_tests.rs`](../../tests/grid_network_scalability_tests.rs).
-- [ ] Визначити Solana‑adapter як окремий шар:
-  - [ ] У docs описати, які події (`JobCompleted`, `SeedProvided`, `MemoryUpdated`) відображаються в on‑chain події.
-  - [ ] Чітко відокремити core‑runtime (Rust) від billing/tokenization‑адаптера.
+- [x] Визначити Solana‑adapter як окремий шар:
+  - [x] У docs описати події `JobCompleted`, `SeedProvided`, `MemoryUpdated` → on‑chain семантика — див. [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
+  - [x] Відокремлення core‑runtime (Rust) від billing/tokenization‑адаптера — таблиця меж і принципи в тому ж документі.
 
 **Критерії готовності**:
-- [ ] Існують окремі, узгоджені концепт‑/development‑доки для `PoolAI Node`, Grid Layer, Job/Mining Layer, Memory Layer, Solana‑adapter.
-- [ ] Всі нові документи посилаються на вже реалізовані модулі й тести, не суперечать існуючим концептам.
+- [x] Окремі узгоджені концепт‑ та development‑доки: PoolAI Node, Grid Protocol, Job Layer, Memory Layer, Solana‑adapter (реалізація програми на Solana — поза scope концептів).
+- [x] Документи посилаються на наявні модулі / API / тести де доречно; суперечностей з базовим концептом немає (он-chain деталі — TBD до прототипу).
 
 ---
 
@@ -299,4 +299,10 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Документ**: [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md) — типи повідомлень `Job`, `Result`, `MemoryShard`, `PeerStatus`; мапінг на `/api/v1/discovery/*`, `DiscoveryMessage`, `/raid/distributed/*`, `tests/grid_network_scalability_tests.rs`.
 - **Оновлено**: [`concept/POOLAI_GRID_NODE.md`](../concept/POOLAI_GRID_NODE.md) (посилання на Grid Protocol), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), `file_list.csv`.
 - **Залишок P6**: Solana‑adapter (on‑chain mapping), опційно єдиний wire envelope для Grid.
+
+## Верифікація 2026-04-06 (P6 — Solana adapter concept)
+
+- **Документ**: [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md) — межі core vs адаптер; мапінг `JobCompleted` / `SeedProvided` / `MemoryUpdated`; варіанти інтеграції (sidecar, черга, pull).
+- **P6 критерії готовності (концепт)**: закрито; наступний горизонт — прототип on-chain програми та schema подій core↔adapter.
+- **Залишок**: єдиний Grid wire envelope; реальний Solana crate / repo.
 
