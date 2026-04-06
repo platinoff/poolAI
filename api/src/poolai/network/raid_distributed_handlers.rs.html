@@ -53,101 +53,101 @@
 <a href=#53 id=53 data-nosnippet>53</a>        <span class="prelude-val">None
 <a href=#54 id=54 data-nosnippet>54</a>    </span>};
 <a href=#55 id=55 data-nosnippet>55</a>
-<a href=#56 id=56 data-nosnippet>56</a>    <span class="comment">// Store artifact locally (same path as REST via RaidService)
-<a href=#57 id=57 data-nosnippet>57</a>    </span><span class="kw">let </span>artifact_name = <span class="macro">format!</span>(<span class="string">"{}-{}"</span>, payload.metadata.name, payload.metadata.version);
-<a href=#58 id=58 data-nosnippet>58</a>    <span class="kw">match </span>artifact_data {
-<a href=#59 id=59 data-nosnippet>59</a>        <span class="prelude-val">Some</span>(data) =&gt; <span class="kw">match </span>RaidService::put_artifact(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>artifact_name, <span class="kw-2">&amp;</span>data).<span class="kw">await </span>{
-<a href=#60 id=60 data-nosnippet>60</a>            <span class="prelude-val">Ok</span>(artifact_ref) =&gt; {
-<a href=#61 id=61 data-nosnippet>61</a>                <span class="macro">info!</span>(<span class="string">"Artifact stored successfully: {}"</span>, artifact_ref.id);
-<a href=#62 id=62 data-nosnippet>62</a>                <span class="kw">let </span>response = PutArtifactResponse {
-<a href=#63 id=63 data-nosnippet>63</a>                    status: OperationStatus::Success,
-<a href=#64 id=64 data-nosnippet>64</a>                    artifact_id: payload.artifact_id,
-<a href=#65 id=65 data-nosnippet>65</a>                    stored_at: Utc::now(),
-<a href=#66 id=66 data-nosnippet>66</a>                    error: <span class="prelude-val">None</span>,
-<a href=#67 id=67 data-nosnippet>67</a>                };
-<a href=#68 id=68 data-nosnippet>68</a>                create_success_response(<span class="kw-2">&amp;</span>message, response)
-<a href=#69 id=69 data-nosnippet>69</a>            }
-<a href=#70 id=70 data-nosnippet>70</a>            <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; create_error_response(
-<a href=#71 id=71 data-nosnippet>71</a>                <span class="kw-2">&amp;</span>message,
-<a href=#72 id=72 data-nosnippet>72</a>                ErrorCode::InvalidRequest,
-<a href=#73 id=73 data-nosnippet>73</a>                <span class="string">"RAID manager not initialized"</span>.to_string(),
-<a href=#74 id=74 data-nosnippet>74</a>            ),
-<a href=#75 id=75 data-nosnippet>75</a>            <span class="prelude-val">Err</span>(RaidServiceError::Operation(e)) =&gt; {
-<a href=#76 id=76 data-nosnippet>76</a>                <span class="macro">error!</span>(<span class="string">"Failed to store artifact: {}"</span>, e);
-<a href=#77 id=77 data-nosnippet>77</a>                create_error_response(
-<a href=#78 id=78 data-nosnippet>78</a>                    <span class="kw-2">&amp;</span>message,
-<a href=#79 id=79 data-nosnippet>79</a>                    ErrorCode::ReplicationFailed,
-<a href=#80 id=80 data-nosnippet>80</a>                    <span class="macro">format!</span>(<span class="string">"Storage failed: {}"</span>, e),
-<a href=#81 id=81 data-nosnippet>81</a>                )
-<a href=#82 id=82 data-nosnippet>82</a>            }
-<a href=#83 id=83 data-nosnippet>83</a>            <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#84 id=84 data-nosnippet>84</a>                <span class="macro">error!</span>(<span class="string">"Failed to store artifact: {:?}"</span>, e);
-<a href=#85 id=85 data-nosnippet>85</a>                create_error_response(
-<a href=#86 id=86 data-nosnippet>86</a>                    <span class="kw-2">&amp;</span>message,
-<a href=#87 id=87 data-nosnippet>87</a>                    ErrorCode::ReplicationFailed,
-<a href=#88 id=88 data-nosnippet>88</a>                    <span class="macro">format!</span>(<span class="string">"Storage failed: {:?}"</span>, e),
-<a href=#89 id=89 data-nosnippet>89</a>                )
-<a href=#90 id=90 data-nosnippet>90</a>            }
-<a href=#91 id=91 data-nosnippet>91</a>        },
-<a href=#92 id=92 data-nosnippet>92</a>        <span class="prelude-val">None </span>=&gt; {
-<a href=#93 id=93 data-nosnippet>93</a>            <span class="comment">// Metadata-only replication (data will be fetched separately)
-<a href=#94 id=94 data-nosnippet>94</a>            </span><span class="macro">warn!</span>(<span class="string">"PutArtifact without data - metadata-only replication"</span>);
-<a href=#95 id=95 data-nosnippet>95</a>            <span class="kw">let </span>response = PutArtifactResponse {
-<a href=#96 id=96 data-nosnippet>96</a>                status: OperationStatus::Success,
-<a href=#97 id=97 data-nosnippet>97</a>                artifact_id: payload.artifact_id,
-<a href=#98 id=98 data-nosnippet>98</a>                stored_at: Utc::now(),
-<a href=#99 id=99 data-nosnippet>99</a>                error: <span class="prelude-val">None</span>,
-<a href=#100 id=100 data-nosnippet>100</a>            };
-<a href=#101 id=101 data-nosnippet>101</a>            create_success_response(<span class="kw-2">&amp;</span>message, response)
-<a href=#102 id=102 data-nosnippet>102</a>        }
-<a href=#103 id=103 data-nosnippet>103</a>    }
-<a href=#104 id=104 data-nosnippet>104</a>}
-<a href=#105 id=105 data-nosnippet>105</a>
-<a href=#106 id=106 data-nosnippet>106</a><span class="doccomment">/// Handle GetArtifact protocol message
-<a href=#107 id=107 data-nosnippet>107</a></span><span class="kw">pub async fn </span>get_artifact_handler(
-<a href=#108 id=108 data-nosnippet>108</a>    State(ctx): State&lt;ApiContext&gt;,
-<a href=#109 id=109 data-nosnippet>109</a>    Json(message): Json&lt;ProtocolMessage&gt;,
-<a href=#110 id=110 data-nosnippet>110</a>) -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#111 id=111 data-nosnippet>111</a>    <span class="macro">info!</span>(<span class="string">"Received GetArtifact message: {}"</span>, message.id);
-<a href=#112 id=112 data-nosnippet>112</a>
-<a href=#113 id=113 data-nosnippet>113</a>    <span class="kw">let </span>payload = <span class="kw">match </span>message.extract_get_artifact() {
-<a href=#114 id=114 data-nosnippet>114</a>        <span class="prelude-val">Ok</span>(p) =&gt; p,
-<a href=#115 id=115 data-nosnippet>115</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#116 id=116 data-nosnippet>116</a>            <span class="macro">error!</span>(<span class="string">"Failed to extract GetArtifact payload: {}"</span>, e);
-<a href=#117 id=117 data-nosnippet>117</a>            <span class="kw">return </span>create_error_response(
-<a href=#118 id=118 data-nosnippet>118</a>                <span class="kw-2">&amp;</span>message,
-<a href=#119 id=119 data-nosnippet>119</a>                ErrorCode::InvalidRequest,
-<a href=#120 id=120 data-nosnippet>120</a>                <span class="macro">format!</span>(<span class="string">"Invalid payload: {}"</span>, e),
-<a href=#121 id=121 data-nosnippet>121</a>            );
-<a href=#122 id=122 data-nosnippet>122</a>        }
-<a href=#123 id=123 data-nosnippet>123</a>    };
-<a href=#124 id=124 data-nosnippet>124</a>
-<a href=#125 id=125 data-nosnippet>125</a>    <span class="kw">let </span>artifacts = <span class="kw">match </span>RaidService::list_artifacts(<span class="kw-2">&amp;</span>ctx).<span class="kw">await </span>{
-<a href=#126 id=126 data-nosnippet>126</a>        <span class="prelude-val">Ok</span>(a) =&gt; a,
-<a href=#127 id=127 data-nosnippet>127</a>        <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
-<a href=#128 id=128 data-nosnippet>128</a>            <span class="kw">return </span>create_error_response(
-<a href=#129 id=129 data-nosnippet>129</a>                <span class="kw-2">&amp;</span>message,
-<a href=#130 id=130 data-nosnippet>130</a>                ErrorCode::InvalidRequest,
-<a href=#131 id=131 data-nosnippet>131</a>                <span class="string">"RAID manager not initialized"</span>.to_string(),
-<a href=#132 id=132 data-nosnippet>132</a>            );
-<a href=#133 id=133 data-nosnippet>133</a>        }
-<a href=#134 id=134 data-nosnippet>134</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#135 id=135 data-nosnippet>135</a>            <span class="macro">error!</span>(<span class="string">"Failed to list artifacts: {:?}"</span>, e);
-<a href=#136 id=136 data-nosnippet>136</a>            <span class="kw">return </span>create_error_response(
-<a href=#137 id=137 data-nosnippet>137</a>                <span class="kw-2">&amp;</span>message,
-<a href=#138 id=138 data-nosnippet>138</a>                ErrorCode::ReplicationFailed,
-<a href=#139 id=139 data-nosnippet>139</a>                <span class="macro">format!</span>(<span class="string">"Storage failed: {:?}"</span>, e),
-<a href=#140 id=140 data-nosnippet>140</a>            );
-<a href=#141 id=141 data-nosnippet>141</a>        }
-<a href=#142 id=142 data-nosnippet>142</a>    };
-<a href=#143 id=143 data-nosnippet>143</a>
-<a href=#144 id=144 data-nosnippet>144</a>    <span class="comment">// Find artifact by ID (simplified - in real implementation, would use proper ID mapping)
-<a href=#145 id=145 data-nosnippet>145</a>    </span><span class="kw">let </span>artifact = artifacts
-<a href=#146 id=146 data-nosnippet>146</a>        .iter()
-<a href=#147 id=147 data-nosnippet>147</a>        .find(|a| a.id.to_string() == payload.artifact_id);
+<a href=#56 id=56 data-nosnippet>56</a>    <span class="kw">match </span>artifact_data {
+<a href=#57 id=57 data-nosnippet>57</a>        <span class="prelude-val">Some</span>(data) =&gt; <span class="kw">match </span>RaidService::put_artifact_versioned_name(
+<a href=#58 id=58 data-nosnippet>58</a>            <span class="kw-2">&amp;</span>ctx,
+<a href=#59 id=59 data-nosnippet>59</a>            <span class="kw-2">&amp;</span>payload.metadata.name,
+<a href=#60 id=60 data-nosnippet>60</a>            <span class="kw-2">&amp;</span>payload.metadata.version,
+<a href=#61 id=61 data-nosnippet>61</a>            <span class="kw-2">&amp;</span>data,
+<a href=#62 id=62 data-nosnippet>62</a>        )
+<a href=#63 id=63 data-nosnippet>63</a>        .<span class="kw">await
+<a href=#64 id=64 data-nosnippet>64</a>        </span>{
+<a href=#65 id=65 data-nosnippet>65</a>            <span class="prelude-val">Ok</span>(artifact_ref) =&gt; {
+<a href=#66 id=66 data-nosnippet>66</a>                <span class="macro">info!</span>(<span class="string">"Artifact stored successfully: {}"</span>, artifact_ref.id);
+<a href=#67 id=67 data-nosnippet>67</a>                <span class="kw">let </span>response = PutArtifactResponse {
+<a href=#68 id=68 data-nosnippet>68</a>                    status: OperationStatus::Success,
+<a href=#69 id=69 data-nosnippet>69</a>                    artifact_id: payload.artifact_id,
+<a href=#70 id=70 data-nosnippet>70</a>                    stored_at: Utc::now(),
+<a href=#71 id=71 data-nosnippet>71</a>                    error: <span class="prelude-val">None</span>,
+<a href=#72 id=72 data-nosnippet>72</a>                };
+<a href=#73 id=73 data-nosnippet>73</a>                create_success_response(<span class="kw-2">&amp;</span>message, response)
+<a href=#74 id=74 data-nosnippet>74</a>            }
+<a href=#75 id=75 data-nosnippet>75</a>            <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; create_error_response(
+<a href=#76 id=76 data-nosnippet>76</a>                <span class="kw-2">&amp;</span>message,
+<a href=#77 id=77 data-nosnippet>77</a>                ErrorCode::InvalidRequest,
+<a href=#78 id=78 data-nosnippet>78</a>                <span class="string">"RAID manager not initialized"</span>.to_string(),
+<a href=#79 id=79 data-nosnippet>79</a>            ),
+<a href=#80 id=80 data-nosnippet>80</a>            <span class="prelude-val">Err</span>(RaidServiceError::Operation(e)) =&gt; {
+<a href=#81 id=81 data-nosnippet>81</a>                <span class="macro">error!</span>(<span class="string">"Failed to store artifact: {}"</span>, e);
+<a href=#82 id=82 data-nosnippet>82</a>                create_error_response(
+<a href=#83 id=83 data-nosnippet>83</a>                    <span class="kw-2">&amp;</span>message,
+<a href=#84 id=84 data-nosnippet>84</a>                    ErrorCode::ReplicationFailed,
+<a href=#85 id=85 data-nosnippet>85</a>                    <span class="macro">format!</span>(<span class="string">"Storage failed: {}"</span>, e),
+<a href=#86 id=86 data-nosnippet>86</a>                )
+<a href=#87 id=87 data-nosnippet>87</a>            }
+<a href=#88 id=88 data-nosnippet>88</a>            <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#89 id=89 data-nosnippet>89</a>                <span class="macro">error!</span>(<span class="string">"Failed to store artifact: {:?}"</span>, e);
+<a href=#90 id=90 data-nosnippet>90</a>                create_error_response(
+<a href=#91 id=91 data-nosnippet>91</a>                    <span class="kw-2">&amp;</span>message,
+<a href=#92 id=92 data-nosnippet>92</a>                    ErrorCode::ReplicationFailed,
+<a href=#93 id=93 data-nosnippet>93</a>                    <span class="macro">format!</span>(<span class="string">"Storage failed: {:?}"</span>, e),
+<a href=#94 id=94 data-nosnippet>94</a>                )
+<a href=#95 id=95 data-nosnippet>95</a>            }
+<a href=#96 id=96 data-nosnippet>96</a>        },
+<a href=#97 id=97 data-nosnippet>97</a>        <span class="prelude-val">None </span>=&gt; {
+<a href=#98 id=98 data-nosnippet>98</a>            <span class="comment">// Metadata-only replication (data will be fetched separately)
+<a href=#99 id=99 data-nosnippet>99</a>            </span><span class="macro">warn!</span>(<span class="string">"PutArtifact without data - metadata-only replication"</span>);
+<a href=#100 id=100 data-nosnippet>100</a>            <span class="kw">let </span>response = PutArtifactResponse {
+<a href=#101 id=101 data-nosnippet>101</a>                status: OperationStatus::Success,
+<a href=#102 id=102 data-nosnippet>102</a>                artifact_id: payload.artifact_id,
+<a href=#103 id=103 data-nosnippet>103</a>                stored_at: Utc::now(),
+<a href=#104 id=104 data-nosnippet>104</a>                error: <span class="prelude-val">None</span>,
+<a href=#105 id=105 data-nosnippet>105</a>            };
+<a href=#106 id=106 data-nosnippet>106</a>            create_success_response(<span class="kw-2">&amp;</span>message, response)
+<a href=#107 id=107 data-nosnippet>107</a>        }
+<a href=#108 id=108 data-nosnippet>108</a>    }
+<a href=#109 id=109 data-nosnippet>109</a>}
+<a href=#110 id=110 data-nosnippet>110</a>
+<a href=#111 id=111 data-nosnippet>111</a><span class="doccomment">/// Handle GetArtifact protocol message
+<a href=#112 id=112 data-nosnippet>112</a></span><span class="kw">pub async fn </span>get_artifact_handler(
+<a href=#113 id=113 data-nosnippet>113</a>    State(ctx): State&lt;ApiContext&gt;,
+<a href=#114 id=114 data-nosnippet>114</a>    Json(message): Json&lt;ProtocolMessage&gt;,
+<a href=#115 id=115 data-nosnippet>115</a>) -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#116 id=116 data-nosnippet>116</a>    <span class="macro">info!</span>(<span class="string">"Received GetArtifact message: {}"</span>, message.id);
+<a href=#117 id=117 data-nosnippet>117</a>
+<a href=#118 id=118 data-nosnippet>118</a>    <span class="kw">let </span>payload = <span class="kw">match </span>message.extract_get_artifact() {
+<a href=#119 id=119 data-nosnippet>119</a>        <span class="prelude-val">Ok</span>(p) =&gt; p,
+<a href=#120 id=120 data-nosnippet>120</a>        <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#121 id=121 data-nosnippet>121</a>            <span class="macro">error!</span>(<span class="string">"Failed to extract GetArtifact payload: {}"</span>, e);
+<a href=#122 id=122 data-nosnippet>122</a>            <span class="kw">return </span>create_error_response(
+<a href=#123 id=123 data-nosnippet>123</a>                <span class="kw-2">&amp;</span>message,
+<a href=#124 id=124 data-nosnippet>124</a>                ErrorCode::InvalidRequest,
+<a href=#125 id=125 data-nosnippet>125</a>                <span class="macro">format!</span>(<span class="string">"Invalid payload: {}"</span>, e),
+<a href=#126 id=126 data-nosnippet>126</a>            );
+<a href=#127 id=127 data-nosnippet>127</a>        }
+<a href=#128 id=128 data-nosnippet>128</a>    };
+<a href=#129 id=129 data-nosnippet>129</a>
+<a href=#130 id=130 data-nosnippet>130</a>    <span class="kw">let </span>artifact = <span class="kw">match </span>RaidService::find_artifact_by_id(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>payload.artifact_id).<span class="kw">await </span>{
+<a href=#131 id=131 data-nosnippet>131</a>        <span class="prelude-val">Ok</span>(a) =&gt; a,
+<a href=#132 id=132 data-nosnippet>132</a>        <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
+<a href=#133 id=133 data-nosnippet>133</a>            <span class="kw">return </span>create_error_response(
+<a href=#134 id=134 data-nosnippet>134</a>                <span class="kw-2">&amp;</span>message,
+<a href=#135 id=135 data-nosnippet>135</a>                ErrorCode::InvalidRequest,
+<a href=#136 id=136 data-nosnippet>136</a>                <span class="string">"RAID manager not initialized"</span>.to_string(),
+<a href=#137 id=137 data-nosnippet>137</a>            );
+<a href=#138 id=138 data-nosnippet>138</a>        }
+<a href=#139 id=139 data-nosnippet>139</a>        <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#140 id=140 data-nosnippet>140</a>            <span class="macro">error!</span>(<span class="string">"Failed to resolve artifact by id: {:?}"</span>, e);
+<a href=#141 id=141 data-nosnippet>141</a>            <span class="kw">return </span>create_error_response(
+<a href=#142 id=142 data-nosnippet>142</a>                <span class="kw-2">&amp;</span>message,
+<a href=#143 id=143 data-nosnippet>143</a>                ErrorCode::ReplicationFailed,
+<a href=#144 id=144 data-nosnippet>144</a>                <span class="macro">format!</span>(<span class="string">"Storage failed: {:?}"</span>, e),
+<a href=#145 id=145 data-nosnippet>145</a>            );
+<a href=#146 id=146 data-nosnippet>146</a>        }
+<a href=#147 id=147 data-nosnippet>147</a>    };
 <a href=#148 id=148 data-nosnippet>148</a>
 <a href=#149 id=149 data-nosnippet>149</a>    <span class="kw">match </span>artifact {
-<a href=#150 id=150 data-nosnippet>150</a>        <span class="prelude-val">Some</span>(artifact_ref) =&gt; {
+<a href=#150 id=150 data-nosnippet>150</a>        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>artifact_ref) =&gt; {
 <a href=#151 id=151 data-nosnippet>151</a>            <span class="kw">let </span><span class="kw-2">mut </span>response = GetArtifactResponse {
 <a href=#152 id=152 data-nosnippet>152</a>                status: ArtifactStatus::Success,
 <a href=#153 id=153 data-nosnippet>153</a>                artifact_id: payload.artifact_id.clone(),
@@ -190,15 +190,15 @@
 <a href=#190 id=190 data-nosnippet>190</a>
 <a href=#191 id=191 data-nosnippet>191</a>            <span class="comment">// Include data if requested
 <a href=#192 id=192 data-nosnippet>192</a>            </span><span class="kw">if </span>payload.include_data {
-<a href=#193 id=193 data-nosnippet>193</a>                <span class="kw">match </span>tokio::fs::read(<span class="kw-2">&amp;</span>artifact_ref.path).<span class="kw">await </span>{
+<a href=#193 id=193 data-nosnippet>193</a>                <span class="kw">match </span>RaidService::get_artifact_data(<span class="kw-2">&amp;</span>ctx, artifact_ref).<span class="kw">await </span>{
 <a href=#194 id=194 data-nosnippet>194</a>                    <span class="prelude-val">Ok</span>(data) =&gt; {
 <a href=#195 id=195 data-nosnippet>195</a>                        <span class="kw">use </span>base64::{engine::general_purpose, Engine <span class="kw">as _</span>};
 <a href=#196 id=196 data-nosnippet>196</a>                        response.data = <span class="prelude-val">Some</span>(general_purpose::STANDARD.encode(<span class="kw-2">&amp;</span>data));
 <a href=#197 id=197 data-nosnippet>197</a>                    }
 <a href=#198 id=198 data-nosnippet>198</a>                    <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#199 id=199 data-nosnippet>199</a>                        <span class="macro">error!</span>(<span class="string">"Failed to read artifact file: {}"</span>, e);
+<a href=#199 id=199 data-nosnippet>199</a>                        <span class="macro">error!</span>(<span class="string">"Failed to read artifact file: {:?}"</span>, e);
 <a href=#200 id=200 data-nosnippet>200</a>                        response.status = ArtifactStatus::Error;
-<a href=#201 id=201 data-nosnippet>201</a>                        response.error = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"Failed to read artifact: {}"</span>, e));
+<a href=#201 id=201 data-nosnippet>201</a>                        response.error = <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">"Failed to read artifact: {:?}"</span>, e));
 <a href=#202 id=202 data-nosnippet>202</a>                    }
 <a href=#203 id=203 data-nosnippet>203</a>                }
 <a href=#204 id=204 data-nosnippet>204</a>            }
@@ -313,8 +313,8 @@
 <a href=#313 id=313 data-nosnippet>313</a>        }
 <a href=#314 id=314 data-nosnippet>314</a>    };
 <a href=#315 id=315 data-nosnippet>315</a>
-<a href=#316 id=316 data-nosnippet>316</a>    <span class="kw">let </span>artifacts = <span class="kw">match </span>RaidService::list_artifacts(<span class="kw-2">&amp;</span>ctx).<span class="kw">await </span>{
-<a href=#317 id=317 data-nosnippet>317</a>        <span class="prelude-val">Ok</span>(a) =&gt; a,
+<a href=#316 id=316 data-nosnippet>316</a>    <span class="kw">let </span>synced_count = <span class="kw">match </span>RaidService::local_artifact_count(<span class="kw-2">&amp;</span>ctx).<span class="kw">await </span>{
+<a href=#317 id=317 data-nosnippet>317</a>        <span class="prelude-val">Ok</span>(n) =&gt; n,
 <a href=#318 id=318 data-nosnippet>318</a>        <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
 <a href=#319 id=319 data-nosnippet>319</a>            <span class="kw">return </span>create_error_response(
 <a href=#320 id=320 data-nosnippet>320</a>                <span class="kw-2">&amp;</span>message,
@@ -336,7 +336,7 @@
 <a href=#336 id=336 data-nosnippet>336</a>    // In real implementation, would compare timestamps and sync accordingly
 <a href=#337 id=337 data-nosnippet>337</a>    </span><span class="kw">let </span>response = SyncArtifactsResponse {
 <a href=#338 id=338 data-nosnippet>338</a>        status: OperationStatus::Success,
-<a href=#339 id=339 data-nosnippet>339</a>        synced_count: artifacts.len() <span class="kw">as </span>u32,
+<a href=#339 id=339 data-nosnippet>339</a>        synced_count,
 <a href=#340 id=340 data-nosnippet>340</a>        <span class="comment">// Future improvement: Implement proper sync logic
 <a href=#341 id=341 data-nosnippet>341</a>        // 1. Compare local artifacts with remote node's artifact list
 <a href=#342 id=342 data-nosnippet>342</a>        //    - Request artifact list from remote node using ProtocolMessage::ListArtifacts
@@ -374,8 +374,8 @@
 <a href=#374 id=374 data-nosnippet>374</a>) -&gt; <span class="kw">impl </span>IntoResponse {
 <a href=#375 id=375 data-nosnippet>375</a>    <span class="macro">info!</span>(<span class="string">"Received HealthCheck message: {}"</span>, message.id);
 <a href=#376 id=376 data-nosnippet>376</a>
-<a href=#377 id=377 data-nosnippet>377</a>    <span class="kw">let </span>q = <span class="kw">match </span>RaidService::quota(<span class="kw-2">&amp;</span>ctx).<span class="kw">await </span>{
-<a href=#378 id=378 data-nosnippet>378</a>        <span class="prelude-val">Ok</span>(q) =&gt; q,
+<a href=#377 id=377 data-nosnippet>377</a>    <span class="kw">let </span>storage = <span class="kw">match </span>RaidService::distributed_health_storage(<span class="kw-2">&amp;</span>ctx).<span class="kw">await </span>{
+<a href=#378 id=378 data-nosnippet>378</a>        <span class="prelude-val">Ok</span>(s) =&gt; s,
 <a href=#379 id=379 data-nosnippet>379</a>        <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
 <a href=#380 id=380 data-nosnippet>380</a>            <span class="kw">return </span>create_error_response(
 <a href=#381 id=381 data-nosnippet>381</a>                <span class="kw-2">&amp;</span>message,
@@ -393,275 +393,262 @@
 <a href=#393 id=393 data-nosnippet>393</a>        }
 <a href=#394 id=394 data-nosnippet>394</a>    };
 <a href=#395 id=395 data-nosnippet>395</a>
-<a href=#396 id=396 data-nosnippet>396</a>    <span class="kw">let </span>storage_total_bytes = q.quota_bytes.unwrap_or(<span class="number">107374182400u64</span>); <span class="comment">// 100 GB default
-<a href=#397 id=397 data-nosnippet>397</a>    </span><span class="kw">let </span>storage_used_bytes = q.total_size_bytes;
-<a href=#398 id=398 data-nosnippet>398</a>
-<a href=#399 id=399 data-nosnippet>399</a>    <span class="comment">// Get actual application uptime using version module
-<a href=#400 id=400 data-nosnippet>400</a>    // Note: version::initialize_start_time() must be called at startup (already done in main.rs)
-<a href=#401 id=401 data-nosnippet>401</a>    </span><span class="kw">let </span>uptime_seconds = version::get_uptime_seconds();
-<a href=#402 id=402 data-nosnippet>402</a>
-<a href=#403 id=403 data-nosnippet>403</a>    <span class="comment">// Future improvement: Get Raft role and term (when Raft is implemented)
-<a href=#404 id=404 data-nosnippet>404</a>    // 1. Access global Raft node using raid::raft::get_global_raft_node()
-<a href=#405 id=405 data-nosnippet>405</a>    //    - Returns Arc&lt;Raft&lt;RaidRaftStateMachine, RaidRaftNetwork, RaidRaftStorage&gt;&gt;
-<a href=#406 id=406 data-nosnippet>406</a>    // 2. Get current role using raft_node.current_leader() and raft_node.current_state()
-<a href=#407 id=407 data-nosnippet>407</a>    //    - current_state() returns RaftState (Leader, Candidate, Follower)
-<a href=#408 id=408 data-nosnippet>408</a>    //    - Map RaftState to RaftRole enum (Leader, Candidate, Follower)
-<a href=#409 id=409 data-nosnippet>409</a>    // 3. Get current term using raft_node.current_term() or from HardState
-<a href=#410 id=410 data-nosnippet>410</a>    //    - HardState contains current_term and voted_for
-<a href=#411 id=411 data-nosnippet>411</a>    // 4. Handle errors gracefully if Raft is not initialized or not enabled
-<a href=#412 id=412 data-nosnippet>412</a>    //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
-<a href=#413 id=413 data-nosnippet>413</a>    //    - Fallback to RaftRole::Follower if Raft is not available
-<a href=#414 id=414 data-nosnippet>414</a>    // Example (requires #[cfg(feature = "raft")]):
-<a href=#415 id=415 data-nosnippet>415</a>    //    let raft_role = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
-<a href=#416 id=416 data-nosnippet>416</a>    //        match raft_node.current_state() {
-<a href=#417 id=417 data-nosnippet>417</a>    //            async_raft::raft::RaftState::Leader =&gt; RaftRole::Leader,
-<a href=#418 id=418 data-nosnippet>418</a>    //            async_raft::raft::RaftState::Candidate =&gt; RaftRole::Candidate,
-<a href=#419 id=419 data-nosnippet>419</a>    //            async_raft::raft::RaftState::Follower =&gt; RaftRole::Follower,
-<a href=#420 id=420 data-nosnippet>420</a>    //        }
-<a href=#421 id=421 data-nosnippet>421</a>    //    } else {
-<a href=#422 id=422 data-nosnippet>422</a>    //        RaftRole::Follower
-<a href=#423 id=423 data-nosnippet>423</a>    //    };
-<a href=#424 id=424 data-nosnippet>424</a>    </span><span class="kw">let </span>response = HealthCheckResponse {
-<a href=#425 id=425 data-nosnippet>425</a>        status: HealthStatus::Healthy,
-<a href=#426 id=426 data-nosnippet>426</a>        uptime_seconds,
-<a href=#427 id=427 data-nosnippet>427</a>        storage_used_bytes,
-<a href=#428 id=428 data-nosnippet>428</a>        storage_total_bytes,
-<a href=#429 id=429 data-nosnippet>429</a>        artifact_count: q.artifact_count <span class="kw">as </span>u32,
-<a href=#430 id=430 data-nosnippet>430</a>        raft_role: RaftRole::Follower, <span class="comment">// Placeholder until Raft integration is complete
-<a href=#431 id=431 data-nosnippet>431</a>        // Future improvement: Get actual Raft term from Raft node
-<a href=#432 id=432 data-nosnippet>432</a>        // 1. Access global Raft node using raid::raft::get_global_raft_node()
-<a href=#433 id=433 data-nosnippet>433</a>        // 2. Get current term using raft_node.current_term() or from HardState
-<a href=#434 id=434 data-nosnippet>434</a>        //    - HardState contains current_term and voted_for
-<a href=#435 id=435 data-nosnippet>435</a>        // 3. Handle errors gracefully if Raft is not initialized or not enabled
-<a href=#436 id=436 data-nosnippet>436</a>        //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
-<a href=#437 id=437 data-nosnippet>437</a>        //    - Fallback to 0 if Raft is not available
-<a href=#438 id=438 data-nosnippet>438</a>        // Example (requires #[cfg(feature = "raft")]):
-<a href=#439 id=439 data-nosnippet>439</a>        //    let raft_term = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
-<a href=#440 id=440 data-nosnippet>440</a>        //        raft_node.current_term()
-<a href=#441 id=441 data-nosnippet>441</a>        //    } else {
-<a href=#442 id=442 data-nosnippet>442</a>        //        0
-<a href=#443 id=443 data-nosnippet>443</a>        //    };
-<a href=#444 id=444 data-nosnippet>444</a>        </span>raft_term: <span class="number">0</span>,
-<a href=#445 id=445 data-nosnippet>445</a>        last_heartbeat: Utc::now(),
-<a href=#446 id=446 data-nosnippet>446</a>    };
+<a href=#396 id=396 data-nosnippet>396</a>    <span class="comment">// Get actual application uptime using version module
+<a href=#397 id=397 data-nosnippet>397</a>    // Note: version::initialize_start_time() must be called at startup (already done in main.rs)
+<a href=#398 id=398 data-nosnippet>398</a>    </span><span class="kw">let </span>uptime_seconds = version::get_uptime_seconds();
+<a href=#399 id=399 data-nosnippet>399</a>
+<a href=#400 id=400 data-nosnippet>400</a>    <span class="comment">// Future improvement: Get Raft role and term (when Raft is implemented)
+<a href=#401 id=401 data-nosnippet>401</a>    // 1. Access global Raft node using raid::raft::get_global_raft_node()
+<a href=#402 id=402 data-nosnippet>402</a>    //    - Returns Arc&lt;Raft&lt;RaidRaftStateMachine, RaidRaftNetwork, RaidRaftStorage&gt;&gt;
+<a href=#403 id=403 data-nosnippet>403</a>    // 2. Get current role using raft_node.current_leader() and raft_node.current_state()
+<a href=#404 id=404 data-nosnippet>404</a>    //    - current_state() returns RaftState (Leader, Candidate, Follower)
+<a href=#405 id=405 data-nosnippet>405</a>    //    - Map RaftState to RaftRole enum (Leader, Candidate, Follower)
+<a href=#406 id=406 data-nosnippet>406</a>    // 3. Get current term using raft_node.current_term() or from HardState
+<a href=#407 id=407 data-nosnippet>407</a>    //    - HardState contains current_term and voted_for
+<a href=#408 id=408 data-nosnippet>408</a>    // 4. Handle errors gracefully if Raft is not initialized or not enabled
+<a href=#409 id=409 data-nosnippet>409</a>    //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
+<a href=#410 id=410 data-nosnippet>410</a>    //    - Fallback to RaftRole::Follower if Raft is not available
+<a href=#411 id=411 data-nosnippet>411</a>    // Example (requires #[cfg(feature = "raft")]):
+<a href=#412 id=412 data-nosnippet>412</a>    //    let raft_role = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
+<a href=#413 id=413 data-nosnippet>413</a>    //        match raft_node.current_state() {
+<a href=#414 id=414 data-nosnippet>414</a>    //            async_raft::raft::RaftState::Leader =&gt; RaftRole::Leader,
+<a href=#415 id=415 data-nosnippet>415</a>    //            async_raft::raft::RaftState::Candidate =&gt; RaftRole::Candidate,
+<a href=#416 id=416 data-nosnippet>416</a>    //            async_raft::raft::RaftState::Follower =&gt; RaftRole::Follower,
+<a href=#417 id=417 data-nosnippet>417</a>    //        }
+<a href=#418 id=418 data-nosnippet>418</a>    //    } else {
+<a href=#419 id=419 data-nosnippet>419</a>    //        RaftRole::Follower
+<a href=#420 id=420 data-nosnippet>420</a>    //    };
+<a href=#421 id=421 data-nosnippet>421</a>    </span><span class="kw">let </span>response = HealthCheckResponse {
+<a href=#422 id=422 data-nosnippet>422</a>        status: HealthStatus::Healthy,
+<a href=#423 id=423 data-nosnippet>423</a>        uptime_seconds,
+<a href=#424 id=424 data-nosnippet>424</a>        storage_used_bytes: storage.storage_used_bytes,
+<a href=#425 id=425 data-nosnippet>425</a>        storage_total_bytes: storage.storage_total_bytes,
+<a href=#426 id=426 data-nosnippet>426</a>        artifact_count: storage.artifact_count,
+<a href=#427 id=427 data-nosnippet>427</a>        raft_role: RaftRole::Follower, <span class="comment">// Placeholder until Raft integration is complete
+<a href=#428 id=428 data-nosnippet>428</a>        // Future improvement: Get actual Raft term from Raft node
+<a href=#429 id=429 data-nosnippet>429</a>        // 1. Access global Raft node using raid::raft::get_global_raft_node()
+<a href=#430 id=430 data-nosnippet>430</a>        // 2. Get current term using raft_node.current_term() or from HardState
+<a href=#431 id=431 data-nosnippet>431</a>        //    - HardState contains current_term and voted_for
+<a href=#432 id=432 data-nosnippet>432</a>        // 3. Handle errors gracefully if Raft is not initialized or not enabled
+<a href=#433 id=433 data-nosnippet>433</a>        //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
+<a href=#434 id=434 data-nosnippet>434</a>        //    - Fallback to 0 if Raft is not available
+<a href=#435 id=435 data-nosnippet>435</a>        // Example (requires #[cfg(feature = "raft")]):
+<a href=#436 id=436 data-nosnippet>436</a>        //    let raft_term = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
+<a href=#437 id=437 data-nosnippet>437</a>        //        raft_node.current_term()
+<a href=#438 id=438 data-nosnippet>438</a>        //    } else {
+<a href=#439 id=439 data-nosnippet>439</a>        //        0
+<a href=#440 id=440 data-nosnippet>440</a>        //    };
+<a href=#441 id=441 data-nosnippet>441</a>        </span>raft_term: <span class="number">0</span>,
+<a href=#442 id=442 data-nosnippet>442</a>        last_heartbeat: Utc::now(),
+<a href=#443 id=443 data-nosnippet>443</a>    };
+<a href=#444 id=444 data-nosnippet>444</a>
+<a href=#445 id=445 data-nosnippet>445</a>    create_success_response(<span class="kw-2">&amp;</span>message, response)
+<a href=#446 id=446 data-nosnippet>446</a>}
 <a href=#447 id=447 data-nosnippet>447</a>
-<a href=#448 id=448 data-nosnippet>448</a>    create_success_response(<span class="kw-2">&amp;</span>message, response)
-<a href=#449 id=449 data-nosnippet>449</a>}
-<a href=#450 id=450 data-nosnippet>450</a>
-<a href=#451 id=451 data-nosnippet>451</a><span class="doccomment">/// Handle JoinCluster protocol message
-<a href=#452 id=452 data-nosnippet>452</a></span><span class="kw">pub async fn </span>join_cluster_handler(
-<a href=#453 id=453 data-nosnippet>453</a>    State(ctx): State&lt;ApiContext&gt;,
-<a href=#454 id=454 data-nosnippet>454</a>    Json(message): Json&lt;ProtocolMessage&gt;,
-<a href=#455 id=455 data-nosnippet>455</a>) -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#456 id=456 data-nosnippet>456</a>    <span class="macro">info!</span>(<span class="string">"Received JoinCluster message: {}"</span>, message.id);
-<a href=#457 id=457 data-nosnippet>457</a>
-<a href=#458 id=458 data-nosnippet>458</a>    <span class="kw">let </span>payload = <span class="kw">match </span>message.extract_join_cluster() {
-<a href=#459 id=459 data-nosnippet>459</a>        <span class="prelude-val">Ok</span>(p) =&gt; p,
-<a href=#460 id=460 data-nosnippet>460</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#461 id=461 data-nosnippet>461</a>            <span class="macro">error!</span>(<span class="string">"Failed to extract JoinCluster payload: {}"</span>, e);
-<a href=#462 id=462 data-nosnippet>462</a>            <span class="kw">return </span>create_error_response(
-<a href=#463 id=463 data-nosnippet>463</a>                <span class="kw-2">&amp;</span>message,
-<a href=#464 id=464 data-nosnippet>464</a>                ErrorCode::InvalidRequest,
-<a href=#465 id=465 data-nosnippet>465</a>                <span class="macro">format!</span>(<span class="string">"Invalid payload: {}"</span>, e),
-<a href=#466 id=466 data-nosnippet>466</a>            );
-<a href=#467 id=467 data-nosnippet>467</a>        }
-<a href=#468 id=468 data-nosnippet>468</a>    };
-<a href=#469 id=469 data-nosnippet>469</a>
-<a href=#470 id=470 data-nosnippet>470</a>    <span class="kw">match </span>RaidService::register_worker(<span class="kw-2">&amp;</span>ctx, payload.address.clone()).<span class="kw">await </span>{
-<a href=#471 id=471 data-nosnippet>471</a>        <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
-<a href=#472 id=472 data-nosnippet>472</a>            <span class="kw">return </span>create_error_response(
-<a href=#473 id=473 data-nosnippet>473</a>                <span class="kw-2">&amp;</span>message,
-<a href=#474 id=474 data-nosnippet>474</a>                ErrorCode::InvalidRequest,
-<a href=#475 id=475 data-nosnippet>475</a>                <span class="string">"RAID manager not initialized"</span>.to_string(),
-<a href=#476 id=476 data-nosnippet>476</a>            );
-<a href=#477 id=477 data-nosnippet>477</a>        }
-<a href=#478 id=478 data-nosnippet>478</a>        <span class="kw">_ </span>=&gt; {}
-<a href=#479 id=479 data-nosnippet>479</a>    }
-<a href=#480 id=480 data-nosnippet>480</a>
-<a href=#481 id=481 data-nosnippet>481</a>    <span class="kw">let </span>nodes = <span class="kw">match </span>RaidService::list_workers(<span class="kw-2">&amp;</span>ctx).<span class="kw">await </span>{
-<a href=#482 id=482 data-nosnippet>482</a>        <span class="prelude-val">Ok</span>(n) =&gt; n,
-<a href=#483 id=483 data-nosnippet>483</a>        <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
-<a href=#484 id=484 data-nosnippet>484</a>            <span class="kw">return </span>create_error_response(
-<a href=#485 id=485 data-nosnippet>485</a>                <span class="kw-2">&amp;</span>message,
-<a href=#486 id=486 data-nosnippet>486</a>                ErrorCode::InvalidRequest,
-<a href=#487 id=487 data-nosnippet>487</a>                <span class="string">"RAID manager not initialized"</span>.to_string(),
-<a href=#488 id=488 data-nosnippet>488</a>            );
-<a href=#489 id=489 data-nosnippet>489</a>        }
-<a href=#490 id=490 data-nosnippet>490</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#491 id=491 data-nosnippet>491</a>            <span class="macro">error!</span>(<span class="string">"Failed to list cluster nodes: {:?}"</span>, e);
-<a href=#492 id=492 data-nosnippet>492</a>            <span class="kw">return </span>create_error_response(
-<a href=#493 id=493 data-nosnippet>493</a>                <span class="kw-2">&amp;</span>message,
-<a href=#494 id=494 data-nosnippet>494</a>                ErrorCode::ReplicationFailed,
-<a href=#495 id=495 data-nosnippet>495</a>                <span class="macro">format!</span>(<span class="string">"Cluster state failed: {:?}"</span>, e),
-<a href=#496 id=496 data-nosnippet>496</a>            );
-<a href=#497 id=497 data-nosnippet>497</a>        }
-<a href=#498 id=498 data-nosnippet>498</a>    };
-<a href=#499 id=499 data-nosnippet>499</a>    <span class="kw">let </span>member_nodes: Vec&lt;ClusterNode&gt; = nodes
-<a href=#500 id=500 data-nosnippet>500</a>        .iter()
-<a href=#501 id=501 data-nosnippet>501</a>        .map(|n| {
-<a href=#502 id=502 data-nosnippet>502</a>            ClusterNode {
-<a href=#503 id=503 data-nosnippet>503</a>                node_id: n.id.to_string(),
-<a href=#504 id=504 data-nosnippet>504</a>                address: n.address.clone(),
-<a href=#505 id=505 data-nosnippet>505</a>                <span class="comment">// Future improvement: Get actual Raft role for each node
-<a href=#506 id=506 data-nosnippet>506</a>                // 1. Access global Raft node using raid::raft::get_global_raft_node()
-<a href=#507 id=507 data-nosnippet>507</a>                // 2. Get current leader using raft_node.current_leader()
-<a href=#508 id=508 data-nosnippet>508</a>                // 3. Compare node_id with current_leader to determine role:
-<a href=#509 id=509 data-nosnippet>509</a>                //    - If node_id == current_leader: RaftRole::Leader
-<a href=#510 id=510 data-nosnippet>510</a>                //    - If node_id in candidates: RaftRole::Candidate
-<a href=#511 id=511 data-nosnippet>511</a>                //    - Otherwise: RaftRole::Follower
-<a href=#512 id=512 data-nosnippet>512</a>                // 4. Handle errors gracefully if Raft is not initialized or not enabled
-<a href=#513 id=513 data-nosnippet>513</a>                //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
-<a href=#514 id=514 data-nosnippet>514</a>                //    - Fallback to RaftRole::Follower if Raft is not available
-<a href=#515 id=515 data-nosnippet>515</a>                // Example (requires #[cfg(feature = "raft")]):
-<a href=#516 id=516 data-nosnippet>516</a>                //    let role = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
-<a href=#517 id=517 data-nosnippet>517</a>                //        if raft_node.current_leader() == Some(node_id) {
-<a href=#518 id=518 data-nosnippet>518</a>                //            RaftRole::Leader
-<a href=#519 id=519 data-nosnippet>519</a>                //        } else {
-<a href=#520 id=520 data-nosnippet>520</a>                //            RaftRole::Follower
-<a href=#521 id=521 data-nosnippet>521</a>                //        }
-<a href=#522 id=522 data-nosnippet>522</a>                //    } else {
-<a href=#523 id=523 data-nosnippet>523</a>                //        RaftRole::Follower
-<a href=#524 id=524 data-nosnippet>524</a>                //    };
-<a href=#525 id=525 data-nosnippet>525</a>                </span>role: RaftRole::Follower,
-<a href=#526 id=526 data-nosnippet>526</a>                status: <span class="prelude-val">Some</span>(HealthStatus::Healthy),
-<a href=#527 id=527 data-nosnippet>527</a>                last_seen: <span class="prelude-val">Some</span>(n.last_seen),
-<a href=#528 id=528 data-nosnippet>528</a>            }
-<a href=#529 id=529 data-nosnippet>529</a>        })
-<a href=#530 id=530 data-nosnippet>530</a>        .collect();
-<a href=#531 id=531 data-nosnippet>531</a>
-<a href=#532 id=532 data-nosnippet>532</a>    <span class="kw">let </span>response = JoinClusterResponse {
-<a href=#533 id=533 data-nosnippet>533</a>        status: JoinStatus::Accepted,
-<a href=#534 id=534 data-nosnippet>534</a>        <span class="comment">// Future improvement: Use actual cluster ID from configuration or Raft
-<a href=#535 id=535 data-nosnippet>535</a>        // 1. Get cluster ID from RaidConfig (if stored in config)
-<a href=#536 id=536 data-nosnippet>536</a>        //    - Add cluster_id field to RaidConfig
-<a href=#537 id=537 data-nosnippet>537</a>        //    - Read from config file or environment variable
-<a href=#538 id=538 data-nosnippet>538</a>        // 2. Or generate cluster ID on first node and persist it
-<a href=#539 id=539 data-nosnippet>539</a>        //    - Store cluster ID in metadata file (e.g., cluster.json)
-<a href=#540 id=540 data-nosnippet>540</a>        //    - Share cluster ID with all nodes during join
-<a href=#541 id=541 data-nosnippet>541</a>        // 3. Or derive cluster ID from Raft membership configuration
-<a href=#542 id=542 data-nosnippet>542</a>        //    - Use MembershipConfig to generate stable cluster ID
-<a href=#543 id=543 data-nosnippet>543</a>        //    - Persist cluster ID with membership changes
-<a href=#544 id=544 data-nosnippet>544</a>        // 4. Ensure cluster ID is consistent across all nodes
-<a href=#545 id=545 data-nosnippet>545</a>        //    - Reject join requests if cluster ID mismatch
-<a href=#546 id=546 data-nosnippet>546</a>        // Example: let cluster_id = manager.get_cluster_id().await.unwrap_or_else(|| Uuid::new_v4().to_string());
-<a href=#547 id=547 data-nosnippet>547</a>        </span>cluster_id: Uuid::new_v4().to_string(),
-<a href=#548 id=548 data-nosnippet>548</a>        member_nodes,
-<a href=#549 id=549 data-nosnippet>549</a>        error: <span class="prelude-val">None</span>,
-<a href=#550 id=550 data-nosnippet>550</a>    };
-<a href=#551 id=551 data-nosnippet>551</a>
-<a href=#552 id=552 data-nosnippet>552</a>    create_success_response(<span class="kw-2">&amp;</span>message, response)
-<a href=#553 id=553 data-nosnippet>553</a>}
-<a href=#554 id=554 data-nosnippet>554</a>
-<a href=#555 id=555 data-nosnippet>555</a><span class="doccomment">/// Handle LeaveCluster protocol message
-<a href=#556 id=556 data-nosnippet>556</a></span><span class="kw">pub async fn </span>leave_cluster_handler(Json(message): Json&lt;ProtocolMessage&gt;) -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#557 id=557 data-nosnippet>557</a>    <span class="macro">info!</span>(<span class="string">"Received LeaveCluster message: {}"</span>, message.id);
-<a href=#558 id=558 data-nosnippet>558</a>
-<a href=#559 id=559 data-nosnippet>559</a>    <span class="kw">let </span>payload = <span class="kw">match </span>message.extract_leave_cluster() {
-<a href=#560 id=560 data-nosnippet>560</a>        <span class="prelude-val">Ok</span>(p) =&gt; p,
-<a href=#561 id=561 data-nosnippet>561</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#562 id=562 data-nosnippet>562</a>            <span class="macro">error!</span>(<span class="string">"Failed to extract LeaveCluster payload: {}"</span>, e);
-<a href=#563 id=563 data-nosnippet>563</a>            <span class="kw">return </span>create_error_response(
-<a href=#564 id=564 data-nosnippet>564</a>                <span class="kw-2">&amp;</span>message,
-<a href=#565 id=565 data-nosnippet>565</a>                ErrorCode::InvalidRequest,
-<a href=#566 id=566 data-nosnippet>566</a>                <span class="macro">format!</span>(<span class="string">"Invalid payload: {}"</span>, e),
-<a href=#567 id=567 data-nosnippet>567</a>            );
-<a href=#568 id=568 data-nosnippet>568</a>        }
-<a href=#569 id=569 data-nosnippet>569</a>    };
-<a href=#570 id=570 data-nosnippet>570</a>
-<a href=#571 id=571 data-nosnippet>571</a>    <span class="comment">// Future improvement: Implement graceful leave logic
-<a href=#572 id=572 data-nosnippet>572</a>    // 1. If graceful=true:
-<a href=#573 id=573 data-nosnippet>573</a>    //    a. Replicate all local artifacts to other nodes before leaving
-<a href=#574 id=574 data-nosnippet>574</a>    //       - Get list of all local artifacts using manager.list_artifacts()
-<a href=#575 id=575 data-nosnippet>575</a>    //       - For each artifact, use replication engine to sync to target nodes
-<a href=#576 id=576 data-nosnippet>576</a>    //       - Wait for replication to complete (with timeout)
-<a href=#577 id=577 data-nosnippet>577</a>    //    b. Update cluster membership via Raft
-<a href=#578 id=578 data-nosnippet>578</a>    //       - Create Raft operation to remove this node from membership
-<a href=#579 id=579 data-nosnippet>579</a>    //       - Wait for membership update to be applied
-<a href=#580 id=580 data-nosnippet>580</a>    //    c. Handle graceful shutdown
-<a href=#581 id=581 data-nosnippet>581</a>    //       - Stop accepting new requests
-<a href=#582 id=582 data-nosnippet>582</a>    //       - Complete in-flight requests
-<a href=#583 id=583 data-nosnippet>583</a>    //       - Close connections to other nodes
-<a href=#584 id=584 data-nosnippet>584</a>    // 2. If graceful=false:
-<a href=#585 id=585 data-nosnippet>585</a>    //    - Simply remove node from membership (other nodes will detect failure)
-<a href=#586 id=586 data-nosnippet>586</a>    //    - Don't wait for artifact replication
-<a href=#587 id=587 data-nosnippet>587</a>    // 3. Track artifact migration progress
-<a href=#588 id=588 data-nosnippet>588</a>    //    - Count artifacts successfully replicated
-<a href=#589 id=589 data-nosnippet>589</a>    //    - Return artifacts_moved count in response
-<a href=#590 id=590 data-nosnippet>590</a>    // 4. Handle errors gracefully
-<a href=#591 id=591 data-nosnippet>591</a>    //    - Log warnings for failed replications
-<a href=#592 id=592 data-nosnippet>592</a>    //    - Continue with leave even if some artifacts fail to replicate
+<a href=#448 id=448 data-nosnippet>448</a><span class="doccomment">/// Handle JoinCluster protocol message
+<a href=#449 id=449 data-nosnippet>449</a></span><span class="kw">pub async fn </span>join_cluster_handler(
+<a href=#450 id=450 data-nosnippet>450</a>    State(ctx): State&lt;ApiContext&gt;,
+<a href=#451 id=451 data-nosnippet>451</a>    Json(message): Json&lt;ProtocolMessage&gt;,
+<a href=#452 id=452 data-nosnippet>452</a>) -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#453 id=453 data-nosnippet>453</a>    <span class="macro">info!</span>(<span class="string">"Received JoinCluster message: {}"</span>, message.id);
+<a href=#454 id=454 data-nosnippet>454</a>
+<a href=#455 id=455 data-nosnippet>455</a>    <span class="kw">let </span>payload = <span class="kw">match </span>message.extract_join_cluster() {
+<a href=#456 id=456 data-nosnippet>456</a>        <span class="prelude-val">Ok</span>(p) =&gt; p,
+<a href=#457 id=457 data-nosnippet>457</a>        <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#458 id=458 data-nosnippet>458</a>            <span class="macro">error!</span>(<span class="string">"Failed to extract JoinCluster payload: {}"</span>, e);
+<a href=#459 id=459 data-nosnippet>459</a>            <span class="kw">return </span>create_error_response(
+<a href=#460 id=460 data-nosnippet>460</a>                <span class="kw-2">&amp;</span>message,
+<a href=#461 id=461 data-nosnippet>461</a>                ErrorCode::InvalidRequest,
+<a href=#462 id=462 data-nosnippet>462</a>                <span class="macro">format!</span>(<span class="string">"Invalid payload: {}"</span>, e),
+<a href=#463 id=463 data-nosnippet>463</a>            );
+<a href=#464 id=464 data-nosnippet>464</a>        }
+<a href=#465 id=465 data-nosnippet>465</a>    };
+<a href=#466 id=466 data-nosnippet>466</a>
+<a href=#467 id=467 data-nosnippet>467</a>    <span class="kw">let </span>nodes =
+<a href=#468 id=468 data-nosnippet>468</a>        <span class="kw">match </span>RaidService::join_cluster_nodes_after_register(<span class="kw-2">&amp;</span>ctx, payload.address.clone()).<span class="kw">await </span>{
+<a href=#469 id=469 data-nosnippet>469</a>            <span class="prelude-val">Ok</span>(n) =&gt; n,
+<a href=#470 id=470 data-nosnippet>470</a>            <span class="prelude-val">Err</span>(RaidServiceError::ManagerUnavailable) =&gt; {
+<a href=#471 id=471 data-nosnippet>471</a>                <span class="kw">return </span>create_error_response(
+<a href=#472 id=472 data-nosnippet>472</a>                    <span class="kw-2">&amp;</span>message,
+<a href=#473 id=473 data-nosnippet>473</a>                    ErrorCode::InvalidRequest,
+<a href=#474 id=474 data-nosnippet>474</a>                    <span class="string">"RAID manager not initialized"</span>.to_string(),
+<a href=#475 id=475 data-nosnippet>475</a>                );
+<a href=#476 id=476 data-nosnippet>476</a>            }
+<a href=#477 id=477 data-nosnippet>477</a>            <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#478 id=478 data-nosnippet>478</a>                <span class="macro">error!</span>(<span class="string">"Failed to list cluster nodes: {:?}"</span>, e);
+<a href=#479 id=479 data-nosnippet>479</a>                <span class="kw">return </span>create_error_response(
+<a href=#480 id=480 data-nosnippet>480</a>                    <span class="kw-2">&amp;</span>message,
+<a href=#481 id=481 data-nosnippet>481</a>                    ErrorCode::ReplicationFailed,
+<a href=#482 id=482 data-nosnippet>482</a>                    <span class="macro">format!</span>(<span class="string">"Cluster state failed: {:?}"</span>, e),
+<a href=#483 id=483 data-nosnippet>483</a>                );
+<a href=#484 id=484 data-nosnippet>484</a>            }
+<a href=#485 id=485 data-nosnippet>485</a>        };
+<a href=#486 id=486 data-nosnippet>486</a>    <span class="kw">let </span>member_nodes: Vec&lt;ClusterNode&gt; = nodes
+<a href=#487 id=487 data-nosnippet>487</a>        .iter()
+<a href=#488 id=488 data-nosnippet>488</a>        .map(|n| {
+<a href=#489 id=489 data-nosnippet>489</a>            ClusterNode {
+<a href=#490 id=490 data-nosnippet>490</a>                node_id: n.id.to_string(),
+<a href=#491 id=491 data-nosnippet>491</a>                address: n.address.clone(),
+<a href=#492 id=492 data-nosnippet>492</a>                <span class="comment">// Future improvement: Get actual Raft role for each node
+<a href=#493 id=493 data-nosnippet>493</a>                // 1. Access global Raft node using raid::raft::get_global_raft_node()
+<a href=#494 id=494 data-nosnippet>494</a>                // 2. Get current leader using raft_node.current_leader()
+<a href=#495 id=495 data-nosnippet>495</a>                // 3. Compare node_id with current_leader to determine role:
+<a href=#496 id=496 data-nosnippet>496</a>                //    - If node_id == current_leader: RaftRole::Leader
+<a href=#497 id=497 data-nosnippet>497</a>                //    - If node_id in candidates: RaftRole::Candidate
+<a href=#498 id=498 data-nosnippet>498</a>                //    - Otherwise: RaftRole::Follower
+<a href=#499 id=499 data-nosnippet>499</a>                // 4. Handle errors gracefully if Raft is not initialized or not enabled
+<a href=#500 id=500 data-nosnippet>500</a>                //    - Check for #[cfg(feature = "raft")] before accessing Raft APIs
+<a href=#501 id=501 data-nosnippet>501</a>                //    - Fallback to RaftRole::Follower if Raft is not available
+<a href=#502 id=502 data-nosnippet>502</a>                // Example (requires #[cfg(feature = "raft")]):
+<a href=#503 id=503 data-nosnippet>503</a>                //    let role = if let Some(raft_node) = raid::raft::get_global_raft_node_opt() {
+<a href=#504 id=504 data-nosnippet>504</a>                //        if raft_node.current_leader() == Some(node_id) {
+<a href=#505 id=505 data-nosnippet>505</a>                //            RaftRole::Leader
+<a href=#506 id=506 data-nosnippet>506</a>                //        } else {
+<a href=#507 id=507 data-nosnippet>507</a>                //            RaftRole::Follower
+<a href=#508 id=508 data-nosnippet>508</a>                //        }
+<a href=#509 id=509 data-nosnippet>509</a>                //    } else {
+<a href=#510 id=510 data-nosnippet>510</a>                //        RaftRole::Follower
+<a href=#511 id=511 data-nosnippet>511</a>                //    };
+<a href=#512 id=512 data-nosnippet>512</a>                </span>role: RaftRole::Follower,
+<a href=#513 id=513 data-nosnippet>513</a>                status: <span class="prelude-val">Some</span>(HealthStatus::Healthy),
+<a href=#514 id=514 data-nosnippet>514</a>                last_seen: <span class="prelude-val">Some</span>(n.last_seen),
+<a href=#515 id=515 data-nosnippet>515</a>            }
+<a href=#516 id=516 data-nosnippet>516</a>        })
+<a href=#517 id=517 data-nosnippet>517</a>        .collect();
+<a href=#518 id=518 data-nosnippet>518</a>
+<a href=#519 id=519 data-nosnippet>519</a>    <span class="kw">let </span>response = JoinClusterResponse {
+<a href=#520 id=520 data-nosnippet>520</a>        status: JoinStatus::Accepted,
+<a href=#521 id=521 data-nosnippet>521</a>        <span class="comment">// Future improvement: Use actual cluster ID from configuration or Raft
+<a href=#522 id=522 data-nosnippet>522</a>        // 1. Get cluster ID from RaidConfig (if stored in config)
+<a href=#523 id=523 data-nosnippet>523</a>        //    - Add cluster_id field to RaidConfig
+<a href=#524 id=524 data-nosnippet>524</a>        //    - Read from config file or environment variable
+<a href=#525 id=525 data-nosnippet>525</a>        // 2. Or generate cluster ID on first node and persist it
+<a href=#526 id=526 data-nosnippet>526</a>        //    - Store cluster ID in metadata file (e.g., cluster.json)
+<a href=#527 id=527 data-nosnippet>527</a>        //    - Share cluster ID with all nodes during join
+<a href=#528 id=528 data-nosnippet>528</a>        // 3. Or derive cluster ID from Raft membership configuration
+<a href=#529 id=529 data-nosnippet>529</a>        //    - Use MembershipConfig to generate stable cluster ID
+<a href=#530 id=530 data-nosnippet>530</a>        //    - Persist cluster ID with membership changes
+<a href=#531 id=531 data-nosnippet>531</a>        // 4. Ensure cluster ID is consistent across all nodes
+<a href=#532 id=532 data-nosnippet>532</a>        //    - Reject join requests if cluster ID mismatch
+<a href=#533 id=533 data-nosnippet>533</a>        // Example: let cluster_id = manager.get_cluster_id().await.unwrap_or_else(|| Uuid::new_v4().to_string());
+<a href=#534 id=534 data-nosnippet>534</a>        </span>cluster_id: Uuid::new_v4().to_string(),
+<a href=#535 id=535 data-nosnippet>535</a>        member_nodes,
+<a href=#536 id=536 data-nosnippet>536</a>        error: <span class="prelude-val">None</span>,
+<a href=#537 id=537 data-nosnippet>537</a>    };
+<a href=#538 id=538 data-nosnippet>538</a>
+<a href=#539 id=539 data-nosnippet>539</a>    create_success_response(<span class="kw-2">&amp;</span>message, response)
+<a href=#540 id=540 data-nosnippet>540</a>}
+<a href=#541 id=541 data-nosnippet>541</a>
+<a href=#542 id=542 data-nosnippet>542</a><span class="doccomment">/// Handle LeaveCluster protocol message
+<a href=#543 id=543 data-nosnippet>543</a></span><span class="kw">pub async fn </span>leave_cluster_handler(Json(message): Json&lt;ProtocolMessage&gt;) -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#544 id=544 data-nosnippet>544</a>    <span class="macro">info!</span>(<span class="string">"Received LeaveCluster message: {}"</span>, message.id);
+<a href=#545 id=545 data-nosnippet>545</a>
+<a href=#546 id=546 data-nosnippet>546</a>    <span class="kw">let </span>payload = <span class="kw">match </span>message.extract_leave_cluster() {
+<a href=#547 id=547 data-nosnippet>547</a>        <span class="prelude-val">Ok</span>(p) =&gt; p,
+<a href=#548 id=548 data-nosnippet>548</a>        <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#549 id=549 data-nosnippet>549</a>            <span class="macro">error!</span>(<span class="string">"Failed to extract LeaveCluster payload: {}"</span>, e);
+<a href=#550 id=550 data-nosnippet>550</a>            <span class="kw">return </span>create_error_response(
+<a href=#551 id=551 data-nosnippet>551</a>                <span class="kw-2">&amp;</span>message,
+<a href=#552 id=552 data-nosnippet>552</a>                ErrorCode::InvalidRequest,
+<a href=#553 id=553 data-nosnippet>553</a>                <span class="macro">format!</span>(<span class="string">"Invalid payload: {}"</span>, e),
+<a href=#554 id=554 data-nosnippet>554</a>            );
+<a href=#555 id=555 data-nosnippet>555</a>        }
+<a href=#556 id=556 data-nosnippet>556</a>    };
+<a href=#557 id=557 data-nosnippet>557</a>
+<a href=#558 id=558 data-nosnippet>558</a>    <span class="comment">// Future improvement: Implement graceful leave logic
+<a href=#559 id=559 data-nosnippet>559</a>    // 1. If graceful=true:
+<a href=#560 id=560 data-nosnippet>560</a>    //    a. Replicate all local artifacts to other nodes before leaving
+<a href=#561 id=561 data-nosnippet>561</a>    //       - Get list of all local artifacts using manager.list_artifacts()
+<a href=#562 id=562 data-nosnippet>562</a>    //       - For each artifact, use replication engine to sync to target nodes
+<a href=#563 id=563 data-nosnippet>563</a>    //       - Wait for replication to complete (with timeout)
+<a href=#564 id=564 data-nosnippet>564</a>    //    b. Update cluster membership via Raft
+<a href=#565 id=565 data-nosnippet>565</a>    //       - Create Raft operation to remove this node from membership
+<a href=#566 id=566 data-nosnippet>566</a>    //       - Wait for membership update to be applied
+<a href=#567 id=567 data-nosnippet>567</a>    //    c. Handle graceful shutdown
+<a href=#568 id=568 data-nosnippet>568</a>    //       - Stop accepting new requests
+<a href=#569 id=569 data-nosnippet>569</a>    //       - Complete in-flight requests
+<a href=#570 id=570 data-nosnippet>570</a>    //       - Close connections to other nodes
+<a href=#571 id=571 data-nosnippet>571</a>    // 2. If graceful=false:
+<a href=#572 id=572 data-nosnippet>572</a>    //    - Simply remove node from membership (other nodes will detect failure)
+<a href=#573 id=573 data-nosnippet>573</a>    //    - Don't wait for artifact replication
+<a href=#574 id=574 data-nosnippet>574</a>    // 3. Track artifact migration progress
+<a href=#575 id=575 data-nosnippet>575</a>    //    - Count artifacts successfully replicated
+<a href=#576 id=576 data-nosnippet>576</a>    //    - Return artifacts_moved count in response
+<a href=#577 id=577 data-nosnippet>577</a>    // 4. Handle errors gracefully
+<a href=#578 id=578 data-nosnippet>578</a>    //    - Log warnings for failed replications
+<a href=#579 id=579 data-nosnippet>579</a>    //    - Continue with leave even if some artifacts fail to replicate
+<a href=#580 id=580 data-nosnippet>580</a>
+<a href=#581 id=581 data-nosnippet>581</a>    </span><span class="kw">let </span>response = LeaveClusterResponse {
+<a href=#582 id=582 data-nosnippet>582</a>        status: OperationStatus::Success,
+<a href=#583 id=583 data-nosnippet>583</a>        replication_complete: payload.graceful,
+<a href=#584 id=584 data-nosnippet>584</a>        <span class="comment">// Future improvement: Implement artifact migration tracking
+<a href=#585 id=585 data-nosnippet>585</a>        // 1. If graceful=true, count artifacts successfully replicated during leave
+<a href=#586 id=586 data-nosnippet>586</a>        //    - Track artifacts_moved during graceful leave logic
+<a href=#587 id=587 data-nosnippet>587</a>        //    - Return actual count of artifacts migrated
+<a href=#588 id=588 data-nosnippet>588</a>        // 2. If graceful=false, return 0 (no migration performed)
+<a href=#589 id=589 data-nosnippet>589</a>        // 3. Include failed artifacts in error response if any
+<a href=#590 id=590 data-nosnippet>590</a>        // Example: artifacts_moved: if payload.graceful { migrated_count } else { 0 }
+<a href=#591 id=591 data-nosnippet>591</a>        </span>artifacts_moved: <span class="number">0</span>,
+<a href=#592 id=592 data-nosnippet>592</a>    };
 <a href=#593 id=593 data-nosnippet>593</a>
-<a href=#594 id=594 data-nosnippet>594</a>    </span><span class="kw">let </span>response = LeaveClusterResponse {
-<a href=#595 id=595 data-nosnippet>595</a>        status: OperationStatus::Success,
-<a href=#596 id=596 data-nosnippet>596</a>        replication_complete: payload.graceful,
-<a href=#597 id=597 data-nosnippet>597</a>        <span class="comment">// Future improvement: Implement artifact migration tracking
-<a href=#598 id=598 data-nosnippet>598</a>        // 1. If graceful=true, count artifacts successfully replicated during leave
-<a href=#599 id=599 data-nosnippet>599</a>        //    - Track artifacts_moved during graceful leave logic
-<a href=#600 id=600 data-nosnippet>600</a>        //    - Return actual count of artifacts migrated
-<a href=#601 id=601 data-nosnippet>601</a>        // 2. If graceful=false, return 0 (no migration performed)
-<a href=#602 id=602 data-nosnippet>602</a>        // 3. Include failed artifacts in error response if any
-<a href=#603 id=603 data-nosnippet>603</a>        // Example: artifacts_moved: if payload.graceful { migrated_count } else { 0 }
-<a href=#604 id=604 data-nosnippet>604</a>        </span>artifacts_moved: <span class="number">0</span>,
-<a href=#605 id=605 data-nosnippet>605</a>    };
-<a href=#606 id=606 data-nosnippet>606</a>
-<a href=#607 id=607 data-nosnippet>607</a>    create_success_response(<span class="kw-2">&amp;</span>message, response)
-<a href=#608 id=608 data-nosnippet>608</a>}
-<a href=#609 id=609 data-nosnippet>609</a>
-<a href=#610 id=610 data-nosnippet>610</a><span class="comment">// Helper functions
-<a href=#611 id=611 data-nosnippet>611</a>
-<a href=#612 id=612 data-nosnippet>612</a></span><span class="kw">fn </span>create_success_response&lt;T: serde::Serialize&gt;(
-<a href=#613 id=613 data-nosnippet>613</a>    original_message: <span class="kw-2">&amp;</span>ProtocolMessage,
-<a href=#614 id=614 data-nosnippet>614</a>    payload: T,
-<a href=#615 id=615 data-nosnippet>615</a>) -&gt; Response {
-<a href=#616 id=616 data-nosnippet>616</a>    <span class="kw">let </span>response_message = ProtocolMessage {
-<a href=#617 id=617 data-nosnippet>617</a>        message_type: <span class="macro">format!</span>(<span class="string">"{}_response"</span>, original_message.message_type),
-<a href=#618 id=618 data-nosnippet>618</a>        id: Uuid::new_v4().to_string(),
-<a href=#619 id=619 data-nosnippet>619</a>        timestamp: Utc::now(),
-<a href=#620 id=620 data-nosnippet>620</a>        <span class="comment">// Future improvement: Use actual node ID instead of copying from request
-<a href=#621 id=621 data-nosnippet>621</a>        // 1. Get node ID from RaidManager using manager.get_node_id().await
-<a href=#622 id=622 data-nosnippet>622</a>        //    - This returns the actual node ID from Raft configuration
-<a href=#623 id=623 data-nosnippet>623</a>        //    - More reliable than trusting client-provided node_id
-<a href=#624 id=624 data-nosnippet>624</a>        // 2. Handle errors gracefully if node ID cannot be retrieved
-<a href=#625 id=625 data-nosnippet>625</a>        //    - Fallback to original_message.node_id if get_node_id fails
-<a href=#626 id=626 data-nosnippet>626</a>        // Example: node_id: manager.get_node_id().await.to_string()
-<a href=#627 id=627 data-nosnippet>627</a>        // Note: For now, using original_message.node_id for compatibility
-<a href=#628 id=628 data-nosnippet>628</a>        </span>node_id: original_message.node_id.clone(),
-<a href=#629 id=629 data-nosnippet>629</a>        payload: serde_json::to_value(payload).unwrap_or(serde_json::Value::Null),
-<a href=#630 id=630 data-nosnippet>630</a>    };
-<a href=#631 id=631 data-nosnippet>631</a>
-<a href=#632 id=632 data-nosnippet>632</a>    (StatusCode::OK, Json(response_message)).into_response()
-<a href=#633 id=633 data-nosnippet>633</a>}
-<a href=#634 id=634 data-nosnippet>634</a>
-<a href=#635 id=635 data-nosnippet>635</a><span class="kw">fn </span>create_error_response(
-<a href=#636 id=636 data-nosnippet>636</a>    original_message: <span class="kw-2">&amp;</span>ProtocolMessage,
-<a href=#637 id=637 data-nosnippet>637</a>    error_code: ErrorCode,
-<a href=#638 id=638 data-nosnippet>638</a>    error_message: String,
-<a href=#639 id=639 data-nosnippet>639</a>) -&gt; Response {
-<a href=#640 id=640 data-nosnippet>640</a>    <span class="kw">let </span>error = ProtocolError {
-<a href=#641 id=641 data-nosnippet>641</a>        error_code,
-<a href=#642 id=642 data-nosnippet>642</a>        error_message,
-<a href=#643 id=643 data-nosnippet>643</a>        details: <span class="prelude-val">None</span>,
-<a href=#644 id=644 data-nosnippet>644</a>    };
-<a href=#645 id=645 data-nosnippet>645</a>
-<a href=#646 id=646 data-nosnippet>646</a>    <span class="kw">let </span>response_message = ProtocolMessage {
-<a href=#647 id=647 data-nosnippet>647</a>        message_type: <span class="string">"error"</span>.to_string(),
-<a href=#648 id=648 data-nosnippet>648</a>        id: Uuid::new_v4().to_string(),
-<a href=#649 id=649 data-nosnippet>649</a>        timestamp: Utc::now(),
-<a href=#650 id=650 data-nosnippet>650</a>        node_id: original_message.node_id.clone(),
-<a href=#651 id=651 data-nosnippet>651</a>        payload: serde_json::to_value(error).unwrap_or(serde_json::Value::Null),
-<a href=#652 id=652 data-nosnippet>652</a>    };
-<a href=#653 id=653 data-nosnippet>653</a>
-<a href=#654 id=654 data-nosnippet>654</a>    (StatusCode::BAD_REQUEST, Json(response_message)).into_response()
-<a href=#655 id=655 data-nosnippet>655</a>}
-<a href=#656 id=656 data-nosnippet>656</a>
-<a href=#657 id=657 data-nosnippet>657</a><span class="kw">fn </span>base64_decode(data: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, AppError&gt; {
-<a href=#658 id=658 data-nosnippet>658</a>    <span class="kw">use </span>base64::{engine::general_purpose, Engine <span class="kw">as _</span>};
-<a href=#659 id=659 data-nosnippet>659</a>    general_purpose::STANDARD
-<a href=#660 id=660 data-nosnippet>660</a>        .decode(data)
-<a href=#661 id=661 data-nosnippet>661</a>        .map_err(|e| AppError::ValidationError(<span class="macro">format!</span>(
-<a href=#662 id=662 data-nosnippet>662</a>            <span class="string">"Base64 decode error: {}. Context: Failed to decode base64-encoded artifact data. \
-<a href=#663 id=663 data-nosnippet>663</a>            Suggestion: Verify the data is valid base64 encoding. Ensure no whitespace or invalid characters are present. \
-<a href=#664 id=664 data-nosnippet>664</a>            Error details: {}, Data length: {}"</span>,
-<a href=#665 id=665 data-nosnippet>665</a>            e, e, data.len()
-<a href=#666 id=666 data-nosnippet>666</a>        )))
-<a href=#667 id=667 data-nosnippet>667</a>}</code></pre></div></section></main></body></html>
+<a href=#594 id=594 data-nosnippet>594</a>    create_success_response(<span class="kw-2">&amp;</span>message, response)
+<a href=#595 id=595 data-nosnippet>595</a>}
+<a href=#596 id=596 data-nosnippet>596</a>
+<a href=#597 id=597 data-nosnippet>597</a><span class="comment">// Helper functions
+<a href=#598 id=598 data-nosnippet>598</a>
+<a href=#599 id=599 data-nosnippet>599</a></span><span class="kw">fn </span>create_success_response&lt;T: serde::Serialize&gt;(
+<a href=#600 id=600 data-nosnippet>600</a>    original_message: <span class="kw-2">&amp;</span>ProtocolMessage,
+<a href=#601 id=601 data-nosnippet>601</a>    payload: T,
+<a href=#602 id=602 data-nosnippet>602</a>) -&gt; Response {
+<a href=#603 id=603 data-nosnippet>603</a>    <span class="kw">let </span>response_message = ProtocolMessage {
+<a href=#604 id=604 data-nosnippet>604</a>        message_type: <span class="macro">format!</span>(<span class="string">"{}_response"</span>, original_message.message_type),
+<a href=#605 id=605 data-nosnippet>605</a>        id: Uuid::new_v4().to_string(),
+<a href=#606 id=606 data-nosnippet>606</a>        timestamp: Utc::now(),
+<a href=#607 id=607 data-nosnippet>607</a>        <span class="comment">// Future improvement: Use actual node ID instead of copying from request
+<a href=#608 id=608 data-nosnippet>608</a>        // 1. Get node ID from RaidManager using manager.get_node_id().await
+<a href=#609 id=609 data-nosnippet>609</a>        //    - This returns the actual node ID from Raft configuration
+<a href=#610 id=610 data-nosnippet>610</a>        //    - More reliable than trusting client-provided node_id
+<a href=#611 id=611 data-nosnippet>611</a>        // 2. Handle errors gracefully if node ID cannot be retrieved
+<a href=#612 id=612 data-nosnippet>612</a>        //    - Fallback to original_message.node_id if get_node_id fails
+<a href=#613 id=613 data-nosnippet>613</a>        // Example: node_id: manager.get_node_id().await.to_string()
+<a href=#614 id=614 data-nosnippet>614</a>        // Note: For now, using original_message.node_id for compatibility
+<a href=#615 id=615 data-nosnippet>615</a>        </span>node_id: original_message.node_id.clone(),
+<a href=#616 id=616 data-nosnippet>616</a>        payload: serde_json::to_value(payload).unwrap_or(serde_json::Value::Null),
+<a href=#617 id=617 data-nosnippet>617</a>    };
+<a href=#618 id=618 data-nosnippet>618</a>
+<a href=#619 id=619 data-nosnippet>619</a>    (StatusCode::OK, Json(response_message)).into_response()
+<a href=#620 id=620 data-nosnippet>620</a>}
+<a href=#621 id=621 data-nosnippet>621</a>
+<a href=#622 id=622 data-nosnippet>622</a><span class="kw">fn </span>create_error_response(
+<a href=#623 id=623 data-nosnippet>623</a>    original_message: <span class="kw-2">&amp;</span>ProtocolMessage,
+<a href=#624 id=624 data-nosnippet>624</a>    error_code: ErrorCode,
+<a href=#625 id=625 data-nosnippet>625</a>    error_message: String,
+<a href=#626 id=626 data-nosnippet>626</a>) -&gt; Response {
+<a href=#627 id=627 data-nosnippet>627</a>    <span class="kw">let </span>error = ProtocolError {
+<a href=#628 id=628 data-nosnippet>628</a>        error_code,
+<a href=#629 id=629 data-nosnippet>629</a>        error_message,
+<a href=#630 id=630 data-nosnippet>630</a>        details: <span class="prelude-val">None</span>,
+<a href=#631 id=631 data-nosnippet>631</a>    };
+<a href=#632 id=632 data-nosnippet>632</a>
+<a href=#633 id=633 data-nosnippet>633</a>    <span class="kw">let </span>response_message = ProtocolMessage {
+<a href=#634 id=634 data-nosnippet>634</a>        message_type: <span class="string">"error"</span>.to_string(),
+<a href=#635 id=635 data-nosnippet>635</a>        id: Uuid::new_v4().to_string(),
+<a href=#636 id=636 data-nosnippet>636</a>        timestamp: Utc::now(),
+<a href=#637 id=637 data-nosnippet>637</a>        node_id: original_message.node_id.clone(),
+<a href=#638 id=638 data-nosnippet>638</a>        payload: serde_json::to_value(error).unwrap_or(serde_json::Value::Null),
+<a href=#639 id=639 data-nosnippet>639</a>    };
+<a href=#640 id=640 data-nosnippet>640</a>
+<a href=#641 id=641 data-nosnippet>641</a>    (StatusCode::BAD_REQUEST, Json(response_message)).into_response()
+<a href=#642 id=642 data-nosnippet>642</a>}
+<a href=#643 id=643 data-nosnippet>643</a>
+<a href=#644 id=644 data-nosnippet>644</a><span class="kw">fn </span>base64_decode(data: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, AppError&gt; {
+<a href=#645 id=645 data-nosnippet>645</a>    <span class="kw">use </span>base64::{engine::general_purpose, Engine <span class="kw">as _</span>};
+<a href=#646 id=646 data-nosnippet>646</a>    general_purpose::STANDARD
+<a href=#647 id=647 data-nosnippet>647</a>        .decode(data)
+<a href=#648 id=648 data-nosnippet>648</a>        .map_err(|e| AppError::ValidationError(<span class="macro">format!</span>(
+<a href=#649 id=649 data-nosnippet>649</a>            <span class="string">"Base64 decode error: {}. Context: Failed to decode base64-encoded artifact data. \
+<a href=#650 id=650 data-nosnippet>650</a>            Suggestion: Verify the data is valid base64 encoding. Ensure no whitespace or invalid characters are present. \
+<a href=#651 id=651 data-nosnippet>651</a>            Error details: {}, Data length: {}"</span>,
+<a href=#652 id=652 data-nosnippet>652</a>            e, e, data.len()
+<a href=#653 id=653 data-nosnippet>653</a>        )))
+<a href=#654 id=654 data-nosnippet>654</a>}</code></pre></div></section></main></body></html>
