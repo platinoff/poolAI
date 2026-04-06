@@ -15,4 +15,5 @@
 ## Short pointers
 
 - **Status / plans** — `status/`, `development/` (see [development/README.md](./development/README.md) for plan index).
+- **Unified API errors (P3, incremental)** — `src/network/api/common.rs` (`api_error_response`, `http_status_for_app_error`); `ErrorContext` + `hint` у `src/core/error.rs`.
 - **One-off historical notes** — `archive/` (includes former root `PUSH_*.md` files).

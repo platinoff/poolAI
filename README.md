@@ -63,17 +63,19 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
 For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation map: `docs/INDEX_2026-03-17.md`.
 
-### ✅ Current Build/Test Status (2026-04-03)
+### ✅ Current Build/Test Status (2026-04-06)
 - `cargo fmt --all` — CI / before push  
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** on verification runs.  
 - `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
+- **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`** (артефакти, квота, статус кластера); Rust-бекенди базових кроків ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`, крок `Quantization`); частково **Priority 3** — узгоджений JSON помилок (`network/api/common.rs`: `api_error_response`) для частини RAID / enterprise AI-ML pipeline.
 
 ### Next Focus
-- **Priority 2 (service layer)**: `enterprise_service`, `cloud_service` (feature `cloud`), `admin_service` + `/api/v1/admin/overview` — зроблено; далі розширення `RaidService`, Stage **4.4** ML pipeline, **P2b** TurboQuant — див. `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`. Базово в `src/services/`: `raid_service` (list), `vm_service`, `library_service`, `admin_service`, `enterprise_service`, `cloud_service`.
-- **Stage 4.4**: реальні бекенди кроків ML pipeline, інтеграційні тести для `/api/enterprise/ai-ml/pipeline`.
-- **TurboQuant (P2b)**: лише Rust — `docs/ml/TURBOQUANT_INTEGRATION.md`.
+- **Priority 3 (продовження)**: поширити `api_error_response` / `http_status_for_app_error` на інші `network/api/*` handlers; за потреби уточнити мапінг `AppError` → HTTP для `ResourceError` / not-found.
+- **Priority 4**: бенчмарки та профілювання (див. `docs/performance/BENCHMARKS.md`, план у `NEXT_STEPS_ARCHITECT_2026-03-17.md`).
+- **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot) у `RaidService`.
 - За потреби: стабілізувати `cargo test --all-features` на Windows (GNU host або розбиття тестів).
+- Канонічний план і чекбокси: [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт нової сесії: [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 
 ### 🚀 Development Roadmap
 

@@ -264,3 +264,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 `cargo check --all-targets --features ml,enterprise,cloud`  
 `cargo test --lib --tests --features ml,enterprise,cloud` (за потреби розширити).
 
+---
+
+## Верифікація 2026-04-06 (документація + стан гілки `main`)
+
+- **Доки / інвентар**: оновлено кореневий [`README.md`](../../README.md) (блок статусу та Next Focus), [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/README.md`](../README.md); у [`file_list.csv`](../../file_list.csv) додано `src/ml/turboquant.rs`.
+- **Код (вже в історії `main`)**: розширений `RaidService`; ML pipeline core steps + TurboQuant; частковий P3 — `api_error_response` для RAID operation errors та enterprise AI-ML pipeline handlers.
+- **Наступній сесії**: продовжити P3 (решта handlers), P4 benchmarks; див. HANDOFF та таблицю пріоритетів на початку цього файлу.
+

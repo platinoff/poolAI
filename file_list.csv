@@ -426,6 +426,7 @@
 ./src/ml/mod.rs
 ./src/ml/optimization.rs
 ./src/ml/pipeline.rs
+./src/ml/turboquant.rs
 ./src/ml/versioning.rs
 ./src/monitoring/context_memory.rs
 ./src/monitoring/metrics.rs
