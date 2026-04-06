@@ -6,7 +6,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ## Documentation map (canonical order)
 
-Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md).
+Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md).
 
 **Таксономія каталогу `docs/`** — [`docs/STRUCTURE.md`](docs/STRUCTURE.md). **Правила агента для доків** — [`.cursor/rules/documentation.md`](.cursor/rules/documentation.md).
 
@@ -21,6 +21,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`); повний список файлів: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
 11. **Витяг функціоналу** — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення можливостей за доками та кодом; OpenAPI може бути неповним).
+12. **Керування функціоналом** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) (індекс vs сталевий стан, прогалини, чернетки тікетів `FM-*`); правило агента — [`.cursor/rules/functionality-management.mdc`](.cursor/rules/functionality-management.mdc).
 
 ## Release and status
 
@@ -412,10 +413,11 @@ We welcome contributions! Please see our [Contributing Guidelines](.github/CONTR
 
 | Що відкрити | Призначення |
 |-------------|-------------|
-| [Documentation map](#documentation-map-canonical-order) (зверху) | Канонічні кроки 1–11 |
+| [Documentation map](#documentation-map-canonical-order) (зверху) | Канонічні кроки 1–12 |
 | [`docs/README.md`](docs/README.md) | Той самий порядок + короткі вказівки |
 | [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md) | Повна навігація по дереву `docs/` |
 | [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) | Витяг функціоналу (крок 11) |
+| [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) | Керування функціоналом, тікети FM-* (крок 12) |
 | [`docs/development/README.md`](docs/development/README.md) | Індекс планів у `development/` |
 | [`docs/openapi.yaml`](docs/openapi.yaml) | OpenAPI (REST) |
 
@@ -456,4 +458,4 @@ Thank you for supporting PoolAI! 🙏
 
 **PoolAI** — distributed AI mining pool management.  
 **Version:** 0.2.2 (`Cargo.toml`) · **Docs updated:** 2026-04-06 · **Repository:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
-**Наступні орієнтири:** Stage 4.3–4.4 (cloud / ML); канонічний план — [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт сесії — [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md); витяг функціоналу — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md).
+**Наступні орієнтири:** Stage 4.3–4.4 (cloud / ML); канонічний план — [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт сесії — [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md); витяг функціоналу — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md); беклог функцій — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md).

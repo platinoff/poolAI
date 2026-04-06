@@ -1,16 +1,16 @@
 ---
 name: poolai-documentation
 description: >-
-  PoolAI documentation map (steps 1–11), functionality digest, and where to
+  PoolAI documentation map (steps 1–12), functionality digest, function management, and where to
   update docs after code or API changes. Use when editing docs/, README,
-  planning features, or answering "what does PoolAI do / where is X documented".
+  planning features, functionality backlog, or answering "what does PoolAI do / where is X documented".
 ---
 
 # PoolAI — документація та витяг функціоналу
 
 ## Канонічний порядок (завжди той самий)
 
-Узгодь посилання з кореневим `README.md` → **кроки 1–11**:
+Узгодь посилання з кореневим `README.md` → **кроки 1–12**:
 
 1. Кореневий `README.md`
 2. `docs/INDEX_2026-03-17.md` (для структури папок і спадщини — **`docs/STRUCTURE.md`**)
@@ -23,6 +23,7 @@ description: >-
 9. `file_list.csv` (оновлюй також після змін у `docs/catalog/`, `.cursor/skills/`)
 10. `.cursor/commands/git-push.md`
 11. **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** — витяг функціоналу
+12. **`docs/catalog/FUNCTION_MANAGEMENT.md`** — керування функціоналом, прогалини, тікети `FM-*`; правило **`.cursor/rules/functionality-management.mdc`**
 
 ## Витяг функціоналу (крок 11)
 
@@ -30,8 +31,14 @@ description: >-
 - **Оновлюй** після суттєвих змін: модулів `src/`, публічних маршрутів, feature-прапорців у `Cargo.toml`, етапів Stage 4.x у README.
 - OpenAPI (`docs/openapi.yaml`) може бути **неповним**; для точних шляхів див. `src/network/`.
 
+## Керування функціоналом (крок 12)
+
+- Файл: `docs/catalog/FUNCTION_MANAGEMENT.md` — звірка з **STABLE_STATE**, таблиця **FM-***, шаблон тікета для розробки.
+- Після зміни **NEXT_STEPS** або великого релізу — онови дату та релевантні рядки `FM-*`.
+
 ## Правила для агента
 
 - Нові **плани / статус / концепт** — лише під `docs/` у відповідній підпапці (див. `.cursor/rules/documentation.md`).
 - Не дублюй довгі чеклисти в кореневий `README` — посилайся на `docs/development/` та витяг (крок 11).
 - Після додавання головного документа: онови `docs/README.md` або `INDEX`, за потреби `file_list.csv`.
+- Запити на **беклог, прогалини, індекс функцій** — дотримуйся `.cursor/rules/functionality-management.mdc`.

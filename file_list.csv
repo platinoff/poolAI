@@ -11,6 +11,7 @@
 ./.cursor/README.md
 ./.cursor/rules/ai-assistant.md
 ./.cursor/rules/documentation.md
+./.cursor/rules/functionality-management.mdc
 ./.cursor/rules/git-workflow.md
 ./.cursor/rules/msys2-windows.md
 ./.cursor/rules/project-structure.md
@@ -300,6 +301,7 @@
 ./docs/RAFT_LIBRARY_EVALUATION.md
 ./docs/README.md
 ./docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md
+./docs/catalog/FUNCTION_MANAGEMENT.md
 ./docs/RELEASE_NOTES_v0.1.0.md
 ./docs/RELEASE_NOTES_v0.2.0.md
 ./docs/ROOT_CLEANUP.md

@@ -2,9 +2,10 @@
 
 ## Canonical documentation order (PoolAI)
 
-Узгоджено з кореневим `README.md` (*Documentation map*): **кроки 1–11**. Останній крок:
+Узгоджено з кореневим `README.md` (*Documentation map*): **кроки 1–12**. Останні кроки:
 
 - **11.** `docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md` — структурований **витяг функціоналу** (модулі, features, HTTP-шари). Оновлювати після значних змін у `src/` або публічному API.
+- **12.** `docs/catalog/FUNCTION_MANAGEMENT.md` — **керування функціоналом**: звірка зі сталевим станом, прогалини, чернетки тікетів (`FM-*`), посилання на плани та концепти. Правило агента: `.cursor/rules/functionality-management.mdc`.
 
 Каталог `docs/catalog/` призначений для зведень і індексів, які не є «планом розробки» (`docs/development/`) і не «статусом» (`docs/status/`).
 
@@ -33,8 +34,9 @@ When creating or referencing documentation, use this structure:
 ```
 docs/
 ├── README.md                    # Documentation index (canonical steps 1–11)
-├── catalog/                     # Digests / catalogs (e.g. FUNCTIONALITY_DIGEST)
-│   └── FUNCTIONALITY_DIGEST_2026-04-06.md
+├── catalog/                     # Digests / catalogs (FUNCTIONALITY_DIGEST, FUNCTION_MANAGEMENT)
+│   ├── FUNCTIONALITY_DIGEST_2026-04-06.md
+│   └── FUNCTION_MANAGEMENT.md
 ├── STRUCTURE.md                  # This structure description
 │
 ├── status/                      # Current project status

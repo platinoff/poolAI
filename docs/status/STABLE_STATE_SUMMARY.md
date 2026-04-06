@@ -60,6 +60,7 @@
 | Головний план архітектора | `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
 | Передача новій сесії | `docs/development/HANDOFF_NEW_SESSION.md` |
 | Витяг функціоналу (крок 11) | `docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md` |
+| Керування функціоналом (крок 12) | `docs/catalog/FUNCTION_MANAGEMENT.md` |
 | Бенчмарки / perf | `docs/performance/BENCHMARKS.md`, `.github/workflows/benchmarks.yml` |
 | Наступні кроки (архів) | `docs/development/NEXT_STEPS_2026-01-19.md` |
 | Перевірка Cursor і кроки | `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` |
