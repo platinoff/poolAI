@@ -46,7 +46,9 @@ use crate::core::error::AppError;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tokio::time::{timeout, Duration};
+#[cfg(feature = "cloud-sdk")]
+use tokio::time::timeout;
+use tokio::time::Duration;
 use tracing::{info, warn};
 
 #[cfg(feature = "cloud-sdk")]
@@ -396,6 +398,11 @@ impl LoadBalancer {
                     }
                 }
             }
+        }
+
+        #[cfg(not(feature = "cloud-sdk"))]
+        {
+            let _ = (backend, config);
         }
 
         // If no health check path configured, assume healthy

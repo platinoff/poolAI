@@ -1983,6 +1983,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = (group, version);
             info!(
                 "Listing CRD resources {} (placeholder - enable cloud-sdk feature)",
                 plural
@@ -2047,6 +2048,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = (group, version);
             info!(
                 "Getting CRD resource {}/{} (placeholder - enable cloud-sdk feature)",
                 plural, name
@@ -2128,6 +2130,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = (group, version, status);
             info!(
                 "Updating CRD status for {}/{} (placeholder - enable cloud-sdk feature)",
                 plural, name
@@ -2241,6 +2244,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = quotas;
             info!(
                 "Creating/updating ResourceQuota {} (placeholder - enable cloud-sdk feature)",
                 name
@@ -2488,6 +2492,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = (deployment_name, ports, service_type);
             info!(
                 "Creating service: {} (placeholder - enable cloud-sdk feature)",
                 name
@@ -2724,6 +2729,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = storage_class;
             info!(
                 "Creating PVC: {} (placeholder - enable cloud-sdk feature)",
                 name
@@ -2808,6 +2814,7 @@ impl KubernetesManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
+            let _ = (deployment_name, ports, service_type);
             info!(
                 "Updating service: {} (placeholder - enable cloud-sdk feature)",
                 name

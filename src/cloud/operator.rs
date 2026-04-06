@@ -42,12 +42,19 @@
 //! - `PoolAITenant` - Tenant configurations
 
 use crate::core::error::AppError;
+#[cfg(feature = "cloud-sdk")]
 use serde_json::json;
 use std::sync::Arc;
+#[cfg(feature = "cloud-sdk")]
 use std::time::Duration;
-use tokio::sync::{mpsc, RwLock};
+#[cfg(feature = "cloud-sdk")]
+use tokio::sync::mpsc;
+use tokio::sync::RwLock;
+#[cfg(feature = "cloud-sdk")]
 use tokio::time::interval;
-use tracing::{error, info, warn};
+#[cfg(feature = "cloud-sdk")]
+use tracing::error;
+use tracing::{info, warn};
 
 /// CRD event type
 #[derive(Debug, Clone, PartialEq, Eq)]

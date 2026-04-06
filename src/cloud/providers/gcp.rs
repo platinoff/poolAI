@@ -173,7 +173,10 @@ impl GcpManager {
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
-            info!("GCP manager initialized (placeholder mode)");
+            info!(
+                "GCP manager initialized (placeholder mode) for project: {}",
+                project_id
+            );
             tracing::warn!(
                 "GCP integration is a placeholder - enable cloud-sdk feature for full SDK support"
             );

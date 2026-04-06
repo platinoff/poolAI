@@ -43,7 +43,9 @@
 use crate::core::error::AppError;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{info, warn};
+use tracing::info;
+#[cfg(feature = "cloud-sdk")]
+use tracing::warn;
 
 #[cfg(feature = "cloud-sdk")]
 use crate::cloud::kubernetes::KubernetesManager;
