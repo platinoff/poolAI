@@ -5,6 +5,7 @@
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::raid::protocol::*;
+use crate::raid::ArtifactRef;
 use crate::services::raid_service::{RaidService, RaidServiceError};
 use crate::version;
 use axum::{
@@ -13,6 +14,7 @@ use axum::{
     Json,
 };
 use chrono::Utc;
+use std::collections::HashSet;
 use tracing::{error, info, warn};
 use uuid::Uuid;
 
@@ -287,7 +289,7 @@ impl RaidDistributedProtocolService {
     pub async fn sync_artifacts(ctx: &ApiContext, message: ProtocolMessage) -> Response {
         info!("Received SyncArtifacts message: {}", message.id);
 
-        let _payload = match message.extract_sync_artifacts() {
+        let payload = match message.extract_sync_artifacts() {
             Ok(p) => p,
             Err(e) => {
                 error!("Failed to extract SyncArtifacts payload: {}", e);
@@ -299,8 +301,8 @@ impl RaidDistributedProtocolService {
             }
         };
 
-        let synced_count = match RaidService::local_artifact_count(ctx).await {
-            Ok(n) => n,
+        let local = match RaidService::list_artifacts(ctx).await {
+            Ok(a) => a,
             Err(RaidServiceError::ManagerUnavailable) => {
                 return create_error_response(
                     &message,
@@ -318,34 +320,15 @@ impl RaidDistributedProtocolService {
             }
         };
 
-        // Simplified sync implementation
-        // In real implementation, would compare timestamps and sync accordingly
+        let remote_slice = payload.artifact_ids.as_deref();
+        let (synced_count, missing_artifacts) =
+            diff_sync_catalog(payload.direction, &local, remote_slice);
+
         let response = SyncArtifactsResponse {
             status: OperationStatus::Success,
             synced_count,
-            // Future improvement: Implement proper sync logic
-            // 1. Compare local artifacts with remote node's artifact list
-            //    - Request artifact list from remote node using ProtocolMessage::ListArtifacts
-            //    - Compare timestamps (stored_at) to determine which artifacts are missing
-            // 2. Identify missing artifacts (present locally but not on remote)
-            //    - Create missing_artifacts list with artifact IDs and metadata
-            // 3. Optionally initiate replication for missing artifacts
-            //    - Call replication engine to sync missing artifacts to remote node
-            // 4. Track sync progress and handle failures
-            //    - Retry failed syncs with exponential backoff
-            //    - Report partial sync status if some artifacts fail to sync
-            missing_artifacts: Vec::new(),
-            // Future improvement: Implement conflict detection
-            // 1. Compare artifact versions/timestamps between local and remote
-            //    - If same artifact ID exists on both sides with different timestamps
-            //    - If same artifact ID has different checksums (data divergence)
-            // 2. Create conflict entries with:
-            //    - artifact_id: conflicting artifact ID
-            //    - local_version: local artifact version/timestamp
-            //    - remote_version: remote artifact version/timestamp
-            //    - resolution_strategy: "keep_latest", "merge", "manual_resolution"
-            // 3. Apply resolution strategy automatically or flag for manual review
-            // 4. Log conflicts for audit purposes
+            missing_artifacts,
+            // Divergence needs remote `stored_at` / checksums in the wire payload; not sent today.
             conflicts: Vec::new(),
             error: None,
         };
@@ -521,7 +504,7 @@ impl RaidDistributedProtocolService {
         create_success_response(&message, response)
     }
 
-    pub async fn leave_cluster(message: ProtocolMessage) -> Response {
+    pub async fn leave_cluster(ctx: &ApiContext, message: ProtocolMessage) -> Response {
         info!("Received LeaveCluster message: {}", message.id);
 
         let payload = match message.extract_leave_cluster() {
@@ -536,43 +519,175 @@ impl RaidDistributedProtocolService {
             }
         };
 
-        // Future improvement: Implement graceful leave logic
-        // 1. If graceful=true:
-        //    a. Replicate all local artifacts to other nodes before leaving
-        //       - Get list of all local artifacts using manager.list_artifacts()
-        //       - For each artifact, use replication engine to sync to target nodes
-        //       - Wait for replication to complete (with timeout)
-        //    b. Update cluster membership via Raft
-        //       - Create Raft operation to remove this node from membership
-        //       - Wait for membership update to be applied
-        //    c. Handle graceful shutdown
-        //       - Stop accepting new requests
-        //       - Complete in-flight requests
-        //       - Close connections to other nodes
-        // 2. If graceful=false:
-        //    - Simply remove node from membership (other nodes will detect failure)
-        //    - Don't wait for artifact replication
-        // 3. Track artifact migration progress
-        //    - Count artifacts successfully replicated
-        //    - Return artifacts_moved count in response
-        // 4. Handle errors gracefully
-        //    - Log warnings for failed replications
-        //    - Continue with leave even if some artifacts fail to replicate
+        let node_id = match Uuid::parse_str(&message.node_id) {
+            Ok(id) => id,
+            Err(e) => {
+                error!("Invalid node_id in LeaveCluster: {}", e);
+                return create_error_response(
+                    &message,
+                    ErrorCode::InvalidRequest,
+                    format!("Invalid node_id: {}", e),
+                );
+            }
+        };
+
+        let (replication_complete, artifacts_moved) = if payload.graceful {
+            match RaidService::list_artifacts(ctx).await {
+                Ok(artifacts) => {
+                    let total = artifacts.len() as u32;
+                    let mut moved = 0u32;
+                    for a in artifacts {
+                        if RaidService::replicate_stored_artifact(ctx, a.id)
+                            .await
+                            .is_ok()
+                        {
+                            moved = moved.saturating_add(1);
+                        }
+                    }
+                    let complete = total == 0 || moved == total;
+                    (complete, moved)
+                }
+                Err(RaidServiceError::ManagerUnavailable) => {
+                    return create_error_response(
+                        &message,
+                        ErrorCode::InvalidRequest,
+                        "RAID manager not initialized".to_string(),
+                    );
+                }
+                Err(e) => {
+                    error!("Graceful leave failed listing artifacts: {:?}", e);
+                    return create_error_response(
+                        &message,
+                        ErrorCode::ReplicationFailed,
+                        format!("Failed to list artifacts for graceful leave: {:?}", e),
+                    );
+                }
+            }
+        } else {
+            (true, 0)
+        };
+
+        match RaidService::delete_worker(ctx, node_id).await {
+            Ok(()) => {}
+            Err(RaidServiceError::ManagerUnavailable) => {
+                return create_error_response(
+                    &message,
+                    ErrorCode::InvalidRequest,
+                    "RAID manager not initialized".to_string(),
+                );
+            }
+            Err(RaidServiceError::Operation(AppError::ResourceError(ref msg)))
+                if msg.contains("not found") =>
+            {
+                return create_error_response(
+                    &message,
+                    ErrorCode::InvalidRequest,
+                    format!("RAID node not found: {}", node_id),
+                );
+            }
+            Err(e) => {
+                error!("LeaveCluster delete_node failed: {:?}", e);
+                return create_error_response(
+                    &message,
+                    ErrorCode::ReplicationFailed,
+                    format!("Failed to remove node from membership: {:?}", e),
+                );
+            }
+        }
 
         let response = LeaveClusterResponse {
             status: OperationStatus::Success,
-            replication_complete: payload.graceful,
-            // Future improvement: Implement artifact migration tracking
-            // 1. If graceful=true, count artifacts successfully replicated during leave
-            //    - Track artifacts_moved during graceful leave logic
-            //    - Return actual count of artifacts migrated
-            // 2. If graceful=false, return 0 (no migration performed)
-            // 3. Include failed artifacts in error response if any
-            // Example: artifacts_moved: if payload.graceful { migrated_count } else { 0 }
-            artifacts_moved: 0,
+            replication_complete,
+            artifacts_moved,
         };
 
         create_success_response(&message, response)
+    }
+}
+
+/// Compare local artifact IDs with the peer catalog from [`SyncArtifactsPayload::artifact_ids`].
+///
+/// - **Pull** — IDs present locally but absent on the peer (peer should pull from this node).
+/// - **Push** — IDs the peer has that we lack (this node should receive them).
+/// - **Bidirectional** — symmetric difference.
+/// If `remote_ids` is `None`, returns `(local.len(), [])` (no peer catalog to diff).
+fn diff_sync_catalog(
+    direction: SyncDirection,
+    local: &[ArtifactRef],
+    remote_ids: Option<&[String]>,
+) -> (u32, Vec<String>) {
+    let local_set: HashSet<String> = local.iter().map(|a| a.id.to_string()).collect();
+    let Some(remote_slice) = remote_ids else {
+        return (local.len() as u32, Vec::new());
+    };
+    let remote_set: HashSet<String> = remote_slice.iter().cloned().collect();
+    let synced = local_set.intersection(&remote_set).count() as u32;
+    let mut missing: Vec<String> = match direction {
+        SyncDirection::Pull => local_set.difference(&remote_set).cloned().collect(),
+        SyncDirection::Push => remote_set.difference(&local_set).cloned().collect(),
+        SyncDirection::Bidirectional => local_set
+            .symmetric_difference(&remote_set)
+            .cloned()
+            .collect(),
+    };
+    missing.sort();
+    (synced, missing)
+}
+
+#[cfg(test)]
+mod sync_catalog_tests {
+    use super::diff_sync_catalog;
+    use crate::raid::protocol::SyncDirection;
+    use crate::raid::ArtifactRef;
+    use chrono::Utc;
+    use std::path::PathBuf;
+    use uuid::Uuid;
+
+    fn artifact(id: &str) -> ArtifactRef {
+        ArtifactRef {
+            id: Uuid::parse_str(id).unwrap(),
+            name: "n".into(),
+            stored_at: Utc::now(),
+            path: PathBuf::from("/tmp/x"),
+        }
+    }
+
+    #[test]
+    fn pull_reports_local_only_ids_as_missing() {
+        let local = vec![
+            artifact("00000000-0000-0000-0000-000000000001"),
+            artifact("00000000-0000-0000-0000-000000000002"),
+        ];
+        let remote = vec!["00000000-0000-0000-0000-000000000001".to_string()];
+        let (synced, missing) = diff_sync_catalog(SyncDirection::Pull, &local, Some(&remote));
+        assert_eq!(synced, 1);
+        assert_eq!(
+            missing,
+            vec!["00000000-0000-0000-0000-000000000002".to_string()]
+        );
+    }
+
+    #[test]
+    fn push_reports_remote_only_ids_as_missing() {
+        let local = vec![artifact("00000000-0000-0000-0000-000000000001")];
+        let remote = vec![
+            "00000000-0000-0000-0000-000000000001".to_string(),
+            "00000000-0000-0000-0000-000000000003".to_string(),
+        ];
+        let (synced, missing) = diff_sync_catalog(SyncDirection::Push, &local, Some(&remote));
+        assert_eq!(synced, 1);
+        assert_eq!(
+            missing,
+            vec!["00000000-0000-0000-0000-000000000003".to_string()]
+        );
+    }
+
+    #[test]
+    fn no_remote_catalog_keeps_missing_empty() {
+        let local = vec![artifact("00000000-0000-0000-0000-00000000000a")];
+        let (synced, missing) = diff_sync_catalog(SyncDirection::Bidirectional, &local, None);
+        assert_eq!(synced, 1);
+        assert!(missing.is_empty());
     }
 }
 

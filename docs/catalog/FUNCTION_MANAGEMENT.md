@@ -94,8 +94,8 @@ FM-xxx (з таблиці нижче)
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
 | FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` / `HttpAppError` де доречно (без зміни стабільних `error.code`) | Partial | NEXT_STEPS P3; приклад **`src/network/api/rewards.rs`** (чотири GET → `Result<Json<_>, AppError>`); **`/rewards/progress/*`** — `api_json_error` (`NOT_FOUND`) |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
-| FM-007 | Distributed RAID | Реальний sync артефактів (порівняння з віддаленим вузлом), не лише `synced_count` | Partial | `raid_distributed_handlers`, коментарі в коді |
-| FM-008 | Distributed RAID | LeaveCluster: graceful replication + оновлення membership (зараз stub) | Partial | `leave_cluster_handler`, GRID_PROTOCOL |
+| FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); `conflicts` лишаються порожніми без remote timestamps у payload | Partial | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog` |
+| FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; помилки membership / невалідний `node_id` | Partial | `leave_cluster_handler` + `RaidManager::replicate_stored_artifact` |
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
 | FM-011 | Ops | Стабілізація `cargo test --all-features` на Windows (GNU / розбиття тестів) | Planned | NEXT_STEPS (опційно паралельно) |

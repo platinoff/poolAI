@@ -51,6 +51,9 @@ pub async fn join_cluster_handler(
     RaidDistributedProtocolService::join_cluster(&ctx, message).await
 }
 
-pub async fn leave_cluster_handler(Json(message): Json<ProtocolMessage>) -> impl IntoResponse {
-    RaidDistributedProtocolService::leave_cluster(message).await
+pub async fn leave_cluster_handler(
+    State(ctx): State<ApiContext>,
+    Json(message): Json<ProtocolMessage>,
+) -> impl IntoResponse {
+    RaidDistributedProtocolService::leave_cluster(&ctx, message).await
 }

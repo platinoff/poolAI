@@ -102,6 +102,14 @@ The **win11-criterion-full** row set is a default Criterion profile (100 samples
 | `wrk` `/api/v1/health` | *manual* | RPS / p50 / p95 | — |
 | *your ref host* / … | *e.g. ref-linux-01* | *from Criterion* | *YYYY-MM-DD* |
 
+### `poolai_health_load --json` (FM-003 / P4 baseline)
+
+After **`cargo run --release --bin poolai_health_load -- --json <URL> <seconds> <concurrency>`** against a running server on a **named ref host**, append one row per run. Paste numeric fields from the JSON object on stdout (`rps_ok_only`, `latency_p50_ms`, `latency_p95_ms`, `latency_p99_ms`, `ok_requests`, `error_requests`, `wall_seconds`). LAN / P2b replication + TQ01 volume checks stay manual on the stand (open checkbox in `NEXT_STEPS_ARCHITECT`).
+
+| Host label | URL | wall_s | workers | ok | errors | rps_ok | p50_ms | p95_ms | p99_ms | Date |
+|------------|-----|--------|---------|-----|--------|--------|--------|--------|--------|------|
+| *e.g. ref-linux-01* | `http://127.0.0.1:8080/api/v1/health` | *from JSON* | *from CLI* | *ok_requests* | *error_requests* | *rps_ok_only* | *latency_p50_ms* | *latency_p95_ms* | *latency_p99_ms* | *YYYY-MM-DD* |
+
 ### Target metrics (P4 roadmap, non-binding)
 
 Use these as **internal guardrails** when changing hot paths; replace with numbers from your ref host. They are **not** enforced in CI.
@@ -129,6 +137,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | 2026-04-06 | P4: `service_layer_benchmarks` (`--features test-utils`) — медіани під **win-msvc-service-layer-bench-opt0-2026-04-06**; колонка *Notes* у таблиці реєстрації. |
 | 2026-04-06 | P4: `cloud_benchmarks` — short Criterion + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**, медіани під **win-msvc-cloud-bench-opt0-2026-04-06** (`cloud_config/*`, `cloud_manager/*`). |
 | 2026-04-06 | P4: бінарник **`poolai_health_load`** (`src/bin/poolai_health_load.rs`) — HTTP навантаження **`GET /api/v1/health`** на Rust (`reqwest` + Tokio), без зовнішніх load-генераторів. |
+| 2026-04-06 | FM-003: таблиця **`poolai_health_load --json`** для рядків baseline на реф-хості; LAN-заміри реплікації / TQ01 — окремо на стенді. |
 
 ---
 

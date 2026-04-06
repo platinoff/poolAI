@@ -236,6 +236,18 @@ impl RaidService {
         Ok(artifacts.len() as u32)
     }
 
+    /// Replicate an already stored artifact to peers (same path as `put_artifact` replication).
+    pub async fn replicate_stored_artifact(
+        ctx: &ApiContext,
+        id: Uuid,
+    ) -> Result<(), RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .replicate_stored_artifact(id)
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
     pub async fn cluster_status(ctx: &ApiContext) -> Result<RaidStatusResponse, RaidServiceError> {
         let manager = require_raid_manager(ctx)?;
         let nodes = manager.list_nodes().await;

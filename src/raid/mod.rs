@@ -920,6 +920,26 @@ impl RaidManager {
             .await
     }
 
+    /// Re-reads a stored artifact and runs the same replication path as [`Self::put_artifact`]
+    /// (BurstRaid / SmallWorld). Local mode is a no-op. Used for graceful cluster leave.
+    pub async fn replicate_stored_artifact(&self, id: Uuid) -> Result<(), AppError> {
+        let artifact = {
+            let m = self.artifacts.read().await;
+            m.artifacts
+                .get(&id)
+                .cloned()
+                .ok_or_else(|| AppError::ResourceError(format!("Artifact not found: {}", id)))?
+        };
+        let bytes = self.get_artifact(&artifact.path).await?;
+        let name = artifact.name.as_str();
+        let mode = self.config.read().await.mode;
+        match mode {
+            RaidMode::BurstRaid => self.replicate_artifact_burst_raid(id, bytes, name).await,
+            RaidMode::SmallWorld => self.replicate_artifact_small_world(id, bytes, name).await,
+            RaidMode::Local => Ok(()),
+        }
+    }
+
     /// Reads an artifact from local storage
     ///
     /// Reads the artifact data from the specified file path.
