@@ -529,6 +529,7 @@
 ./src/vm/resources.rs
 ./src/vm/resources/linux.rs
 ./src/vm/resources/windows.rs
+./tests/appstate_http_injection_integration.rs
 ./tests/circuit_breaker_integration.rs
 ./tests/cloud_autoscaling.rs
 ./tests/cloud_config_validation.rs

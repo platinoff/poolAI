@@ -13,7 +13,7 @@
 - ✅ Всі модулі компілюються успішно
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
-- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
+- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус

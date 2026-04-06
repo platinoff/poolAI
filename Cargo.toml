@@ -191,6 +191,11 @@ path = "tests/distributed_raid_wire_integration.rs"
 required-features = ["test-utils"]
 
 [[test]]
+name = "appstate_http_injection_integration"
+path = "tests/appstate_http_injection_integration.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "ml_automl_integration"
 path = "tests/ml_automl_integration.rs"
 required-features = ["ml"]

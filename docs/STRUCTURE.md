@@ -77,7 +77,7 @@ docs/
 ## 6. Тести та документація
 
 - Рекомендований локальний прогін (узгоджено з CI-матрицею):  
-  `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test --lib --tests --features ml,enterprise,cloud`
+  `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test --lib --tests --features ml,enterprise,cloud,test-utils`
 - Інтеграційні таргети з **`required-features`** (наприклад `test-utils`, `ml`) не збираються без відповідних `--features`; див. кореневий `Cargo.toml`, секція `[[test]]`.
 - Повний `cargo test` з **doctests** на деяких Windows-конфігураціях може давати помилки лінкера; це відомий клас проблем середовища, не «канонічний» обов’язок для щоденної розробки.
 

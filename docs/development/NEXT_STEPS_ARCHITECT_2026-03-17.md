@@ -57,7 +57,7 @@
 
 **Критерії готовності**:
 - [ ] Всі публічні HTTP‑handler’и отримують залежності через `AppState/ApiContext`.
-- [ ] Інтеграційні тести можуть підняти сервер із тестовим `AppState` без глобальних синглтонів.
+- [x] Інтеграційні тести можуть підняти HTTP-стек (Axum `Router` + `create_api_routes`) із тестовим `AppState` без ініціалізації модульних globals — див. **`tests/appstate_http_injection_integration.rs`** (`--features test-utils`; у CI поряд з `ml,enterprise,cloud`).
 
 ---
 
@@ -324,6 +324,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
+
+## Верифікація 2026-04-06 (P1 — FM-001 інтеграційні тести без globals)
+
+- **Тести**: `tests/appstate_http_injection_integration.rs` — повний `create_api_routes()` + `attach_raid_manager_for_test` / `attach_vm_manager_for_test`; `GET /api/v1/raid/nodes` та `GET /api/v1/vm/instances` → **200**, JSON-масив.
+- **CI**: `.github/workflows/ci.yml` — `cargo test … --features ml,enterprise,cloud,test-utils` (підхоплює також `distributed_raid_wire_integration`).
 
 ## Верифікація 2026-04-06 (документація — таксономія та ML-тести)
 

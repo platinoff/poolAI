@@ -24,7 +24,7 @@
 | `cloud` | Хмарний модуль (автомасштабування, LB, K8s-обгортки) без повного SDK. |
 | `cloud-sdk` | Важкі залежності (K8s OpenAPI, Azure, AWS SDK, GCP-частина). |
 | `vm-isolation-linux` / `vm-isolation-windows` | Ізоляція VM на платформі. |
-| `test-utils` | `AppState::attach_*_for_test` для тестів. |
+| `test-utils` | `AppState::attach_*_for_test` для тестів; приклад повного `/api/v1` без module globals — `tests/appstate_http_injection_integration.rs`. |
 
 **Типова CI-матриця (див. `.github/workflows/ci.yml`):** `ml`, `enterprise`, `cloud` + `K8S_OPENAPI_ENABLED_VERSION=1.28` для збірки з cloud.
 

@@ -88,7 +88,7 @@ FM-xxx (з таблиці нижче)
 
 | ID | Область | Короткий опис | Стан за каноном | Джерело |
 |----|---------|---------------|-----------------|---------|
-| FM-001 | P1 / тести | Інтеграційні тести: сервер з тестовим `AppState` без глобальних синглтонів | Planned | NEXT_STEPS P1 критерії |
+| FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Partial / Planned | NEXT_STEPS P2 |
 | FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned | NEXT_STEPS P2b, `BENCHMARKS.md` |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
