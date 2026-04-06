@@ -1,11 +1,14 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-04-05
+**Останнє оновлення**: 2026-04-06
 
 ---
 
 ## 🎯 Актуальні Документи
+
+### Нова сесія / передача контексту
+- **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
 
 ### Головний план (Rust Architect, 2026-03-17+)
 - **[`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **канонічний** покроковий план (P1–P6, TurboQuant, верифікація CI). Старіші файли `NEXT_STEPS_ARCHITECT_2026-01-22.md` тощо — історичні; див. [`../archive/development/`](../archive/development/).
@@ -22,7 +25,9 @@
 
 ## 📊 Поточні Пріоритети (v0.3.0+)
 
-### Priority 2: Опціональні Features
+### Priority 2: Service layer + опціональні features
+
+- У коді: `admin_service`, `cloud_service` (feature `cloud`), `enterprise_service`, разом із `raid` / `vm` / `library` сервісами — деталі в `NEXT_STEPS_ARCHITECT_2026-03-17.md`.
 
 1. **Stage 4.4 AI/ML**:
    - ✅ ML.1 Model Optimization (profiling, tuning, quantization) - завершено

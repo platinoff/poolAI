@@ -8,7 +8,6 @@
 ./.cursor/commands/test.md
 ./.cursor/CURSOR_CONFIG_STATUS_2026-01-19.md
 ./.cursor/hooks.json
-./.cursor/hooks/check-tests.ps1
 ./.cursor/README.md
 ./.cursor/rules/ai-assistant.md
 ./.cursor/rules/documentation.md
@@ -203,6 +202,7 @@
 ./docs/development/FIXES_APPLIED_2026-01-19.md
 ./docs/development/FUTURE_DEVELOPMENT_ROADMAP.md
 ./docs/development/GIT_COMMITS_SUMMARY.md
+./docs/development/HANDOFF_NEW_SESSION.md
 ./docs/development/JOB_LAYER_CONCEPT_2026-03-17.md
 ./docs/development/MONITORING_PERSISTENCE_PLAN.md
 ./docs/development/MSYS2_CARGO_SETUP.md
@@ -398,10 +398,12 @@
 ./src/core/model_interface.rs
 ./src/core/state.rs
 ./src/services/mod.rs
+./src/services/admin_service.rs
+./src/services/cloud_service.rs
+./src/services/enterprise_service.rs
 ./src/services/library_service.rs
 ./src/services/raid_service.rs
 ./src/services/vm_service.rs
-./src/services/enterprise_service.rs
 ./src/enterprise/audit.rs
 ./src/enterprise/mod.rs
 ./src/enterprise/monitoring.rs
@@ -428,6 +430,7 @@
 ./src/monitoring/context_memory.rs
 ./src/monitoring/metrics.rs
 ./src/monitoring/mod.rs
+./src/network/api/admin.rs
 ./src/network/api/ai_ml.rs
 ./src/network/api/common.rs
 ./src/network/api/completions.rs

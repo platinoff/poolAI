@@ -38,16 +38,19 @@ src/
 │   ├── error.rs
 │   ├── state.rs
 │   └── model_interface.rs
-├── services/           # Service layer (orchestration above domains; expand per Priority 2)
+├── services/           # Service layer (orchestration above domains; Priority 2)
 │   ├── mod.rs
-│   ├── enterprise_service.rs   # feature `enterprise` — tenants (and more as migrated)
+│   ├── admin_service.rs        # admin overview aggregation
+│   ├── cloud_service.rs        # feature `cloud`
+│   ├── enterprise_service.rs   # feature `enterprise`
 │   ├── library_service.rs
 │   ├── raid_service.rs
 │   └── vm_service.rs
 ├── network/            # API layer (modularized)
 │   ├── mod.rs
-│   └── api/            # 8 domain-specific modules
+│   └── api/            # REST modules (examples; see src/network/api/*.rs)
 │       ├── mod.rs
+│       ├── admin.rs            # GET /admin/overview
 │       ├── system.rs
 │       ├── workers.rs
 │       ├── vm.rs
