@@ -14,6 +14,8 @@
 
 ## 📁 Documentation Structure - STRICT RULES
 
+**Human-readable taxonomy (Ukrainian):** `docs/STRUCTURE.md` — canonical entry points, folder meanings, legacy flat files under `docs/`, Cursor rules, inventory.
+
 ### ⚠️ CRITICAL: All documentation MUST be in `docs/` directory
 
 **NEVER create `.md` files in the root directory** (except `README.md` and `README.uk.md`)

@@ -13,7 +13,7 @@ description: >-
 Узгодь посилання з кореневим `README.md` → **кроки 1–11**:
 
 1. Кореневий `README.md`
-2. `docs/INDEX_2026-03-17.md`
+2. `docs/INDEX_2026-03-17.md` (для структури папок і спадщини — **`docs/STRUCTURE.md`**)
 3. `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`
 4. `docs/development/HANDOFF_NEW_SESSION.md`
 5. Концепція (`docs/concept/poolAI_concept_root.txt`, Grid/Memory/Job, `GRID_PROTOCOL_CONCEPT_2026-04-06.md`, `SOLANA_ADAPTER_CONCEPT_2026-04-06.md`)

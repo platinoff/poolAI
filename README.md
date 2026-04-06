@@ -8,6 +8,8 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md).
 
+**Таксономія каталогу `docs/`** — [`docs/STRUCTURE.md`](docs/STRUCTURE.md). **Правила агента для доків** — [`.cursor/rules/documentation.md`](.cursor/rules/documentation.md).
+
 1. **Кореневий [`README.md`](README.md)** (цей файл) — швидкий старт, збірка, CI, посилання нижче.
 2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
 3. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).
@@ -48,7 +50,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
 - `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
-- **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 — узгоджені JSON-помилки** — `src/network/json_errors.rs`, реекспорт у `network/api/common.rs`, **`enterprise_err`**, **`raid.rs`**, основний REST (`users`, `ui`, `system`, `completions`, `raid_admin`, instances, libraries, vm, workers, topology, rewards, `ai_ml`, tenant CRUD), а також **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**.
+- **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 — узгоджені JSON-помилки** — `src/network/json_errors.rs`, реекспорт у `network/api/common.rs`, **`enterprise_err`**, **`raid.rs`**, основний REST (`users`, `ui`, `system`, `completions`, `raid_admin`, instances, libraries, vm, workers, topology, rewards, `ai_ml`, tenant CRUD), а також **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**; інтеграційні ML-тести зібрані під **`[[test]]` + `required-features = ["ml"]`** у `Cargo.toml`; P2b wire-harness — `tests/distributed_raid_wire_integration.rs` (`test-utils`, опційно `ml`).
 
 ### Next Focus
 
@@ -60,6 +62,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **P1 (опційно)**: формальне закриття критеріїв «усі handler’и через `ApiContext`» / тести без глобалів.
 - **UI / UX:** [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - За потреби: `cargo test --all-features` на Windows (GNU, `-j 1`).
+- **Документація:** таксономія каталогу — [`docs/STRUCTURE.md`](docs/STRUCTURE.md); опційно — інкрементально переносити застарілі плоскі `docs/*.md` у [`docs/archive/`](docs/archive/).
 - **Канонічний план:** [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md) · **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 
 ### 🚀 Development Roadmap

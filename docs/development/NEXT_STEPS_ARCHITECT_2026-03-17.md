@@ -102,7 +102,8 @@
 - [x] Контракт кроку pipeline: гілка **`Quantization`** з конфігом `turboquant` / `quantization=turboquant`; метрики в результаті кроку.
 - [x] Інтеграційний тест **`tests/ml_pipeline_integration.rs`** (`test_pipeline_turboquant_quantization_step`) при `--features ml`.
 - [x] Проксі замірів replication control-plane: Criterion-група **`raid_replication_engine`** у `benches/runtime_benchmarks.rs` (див. `docs/performance/BENCHMARKS.md`).
-- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4**).
+- [x] In-tree **HTTP wire harness** для distributed `PutArtifact`: **`Cargo.toml`** `[[test]] distributed_raid_wire_integration` (`--features test-utils`; з **`ml`** — порівняння розміру JSON TQ01 vs сирий f32); команди в **`docs/performance/BENCHMARKS.md`** (секція P2b).
+- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4** / LAN-стенд; harness лише готує шлях handler+serde).
 - [ ] Опційно: SIMD / прискорений підшлях у Rust.
 
 **Критерії готовності**:
@@ -323,4 +324,10 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
+
+## Верифікація 2026-04-06 (документація — таксономія та ML-тести)
+
+- **Таксономія `docs/`**: оновлено [`docs/STRUCTURE.md`](../STRUCTURE.md) (канонічні точки входу, каталоги, політика щодо плоских `docs/*.md`, Cursor rules, інвентар, примітка про doctests на Windows).
+- **Індекси**: [`docs/README.md`](../README.md), [`docs/INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), кореневий [`README.md`](../../README.md) — посилання на `STRUCTURE.md` та `.cursor/rules/documentation.md`.
+- **Тести**: у `Cargo.toml` додано `[[test]]` з `required-features = ["ml"]` для інтеграцій **`ml_*`** (`automl`, `experiments`, `federated`, `pipeline`, `pruning`, `versioning`), щоб **`cargo test`** без `--features ml` не компілював optional `poolai::ml`.
 

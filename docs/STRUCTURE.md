@@ -1,131 +1,83 @@
-# 📁 Структура документації PoolAI
+# Структура та таксономія документації PoolAI
 
-Цей документ описує організацію документації проекту PoolAI.
-
-## 🎯 Принципи організації
-
-1. **Чистий корінь проекту**: Тільки `README.md` та `README.uk.md` залишаються в корені
-2. **Логічна структура**: Документи організовані за категоріями та призначенням
-3. **Відповідність GitHub clean structure**: Відповідає best practices для open source проектів
-4. **Легка навігація**: Чіткі каталоги та індексний файл `docs/README.md`
-
-## 📂 Структура каталогів
-
-```
-docs/
-├── README.md                    # Індекс документації
-├── STRUCTURE.md                 # Цей файл - опис структури
-│
-├── status/                      # Поточний стан проекту
-│   ├── CURRENT_STATUS.md        # Детальний поточний стан
-│   └── STABLE_STATE_SUMMARY.md  # Стабільний стан розробки
-│
-├── development/                 # Плани розробки
-│   ├── NEXT_STEPS_2026-01-19.md           # Актуальні наступні кроки (оновлений Rust Architect план)
-│   ├── NEXT_STEPS_ARCHITECT_2026-01-22.md # Останній детальний план Architect
-│   ├── FUTURE_DEVELOPMENT_ROADMAP.md      # Довгостроковий roadmap
-│   └── PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md # План оптимізації продуктивності (bottleneck-и, бенчмарки, глибока логіка)
-│
-├── concept/                     # Концепція проекту
-│   ├── poolAI_concept_root.txt  # PRIMARY концепція проекту (оновлена, v6/v7)
-│   └── CONCEPT_UPDATE_2026-01-19.md # Оновлення концепції (розширені модулі, RAID/Enterprise/Cloud/ML)
-│
-├── archive/                     # Архівні документи
-│   ├── PHASE*.md                # Статуси фаз розробки
-│   ├── WEEK*.md                 # Тижневі звіти
-│   ├── GIT_PUSH*.md             # Git push звіти
-│   └── ...                      # Інші архівні документи
-│
-├── deployment/                  # Розгортання
-│   ├── DOCKER.md
-│   ├── KUBERNETES.md
-│   └── BARE_METAL.md
-│
-├── configuration/                # Конфігурація
-│   └── PRODUCTION.md
-│
-├── monitoring/                   # Моніторинг
-│   ├── PROMETHEUS.md
-│   ├── GRAFANA.md
-│   └── ALERTS.md
-│
-├── security/                     # Безпека
-│   └── BEST_PRACTICES.md
-│
-├── performance/                  # Продуктивність
-│   ├── TUNING.md
-│   └── BENCHMARKS.md
-│
-├── troubleshooting/              # Troubleshooting
-│   └── COMMON_ISSUES.md
-│
-├── migration/                    # Міграція
-│   └── MIGRATION.md
-│
-├── vm/                          # VM Module
-│   └── ISOLATION_IMPLEMENTATION.md
-│
-└── [інші документи]             # ADR, протоколи, тощо
-```
-
-## 📝 Правила роботи з документацією
-
-### Створення нових документів
-
-1. **Визначте категорію**: Виберіть відповідний каталог або створіть новий
-2. **Використовуйте правильні назви**: 
-   - UPPERCASE для основних документів
-   - lowercase для допоміжних файлів
-   - Використовуйте підкреслення замість пробілів: `CURRENT_STATUS.md`
-3. **Оновіть індекс**: Додайте посилання в `docs/README.md`
-
-### Посилання між документами
-
-- Використовуйте відносні шляхи від поточного файлу
-- Приклад: `[Current Status](../status/CURRENT_STATUS.md)`
-- Для файлів в тому ж каталозі: `[File](./FILE.md)`
-- Для файлів в підкаталозі: `[File](./subdir/FILE.md)`
-
-### Оновлення посилань
-
-При переміщенні файлів:
-1. Оновіть всі посилання на файл
-2. Перевірте посилання в Rust коді (коментарі)
-3. Оновіть індекс `docs/README.md`
-
-## 🔍 Пошук документації
-
-### За категорією
-
-- **Статус проекту**: `docs/status/`
-- **Плани розробки**: `docs/development/`
-- **Розгортання**: `docs/deployment/`
-- **Безпека**: `docs/security/`
-- **Продуктивність**: `docs/performance/`
-
-### За типом
-
-- **ADR (Architecture Decision Records)**: `docs/ADR_*.md`
-- **Протоколи**: `docs/*_PROTOCOL.md`
-- **Roadmaps**: `docs/DEVELOPMENT_ROADMAP.md`
-- **Quick Start**: `docs/QUICK_START.md`
-
-## 🚀 Інтеграція з Cursor
-
-Файл `.cursorrules` містить правила для Cursor IDE:
-- Автоматичне створення файлів в правильних каталогах
-- Оновлення посилань при переміщенні
-- Дотримання структури документації
-
-## 📊 Статистика
-
-- **Загальна кількість документів**: 87+ файлів
-- **Активні документи**: ~20 файлів
-- **Архівні документи**: ~60 файлів
-- **Категорій**: 12+
+**Оновлено:** 2026-04-06  
+**Джерело правди для порядку читання:** кроки **1–11** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md).
 
 ---
 
-**Останнє оновлення**: 2025-12-30  
-**Версія структури**: 1.0
+## 1. Канонічні точки входу
 
+| Шар | Призначення |
+|-----|-------------|
+| **Кореневий README** | Збірка, CI, карта доків 1–11, Next Focus. |
+| **`docs/README.md`** | Короткий індекс + посилання на таксономію (цей файл). |
+| **`docs/INDEX_2026-03-17.md`** | Повна навігація по `docs/` за темами. |
+| **`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`** | Покровий план Architect (P1–P6). |
+| **`docs/development/HANDOFF_NEW_SESSION.md`** | Старт нової сесії: гілка, тести, git-push. |
+| **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** | Витяг функціоналу (крок 11). |
+| **`.cursor/rules/documentation.md`** | Правила для агента: куди класти нові `.md`. |
+| **`.cursor/skills/poolai-documentation/SKILL.md`** | Складений skill з тим самим порядком 1–11. |
+
+---
+
+## 2. Каталоги під `docs/` (що куди класти)
+
+```
+docs/
+├── README.md              # Індекс + canonical steps
+├── INDEX_2026-03-17.md    # Повна карта
+├── STRUCTURE.md           # Цей файл — таксономія
+├── openapi.yaml           # OpenAPI (може відставати від коду)
+│
+├── catalog/               # Зведення / дайджести (не плани й не статус)
+├── concept/               # Бачення продукту, Grid/Memory тощо
+├── development/           # Плани, Architect, концепти протоколів (розробка)
+├── status/               # Зрізи стану, стабільність, відсотки
+├── performance/          # BENCHMARKS, PROFILING, TUNING
+├── ml/                   # ML-специфіка (TurboQuant, pipeline, …)
+├── cloud/                # Хмарні інтеграції
+├── deployment/           # Helm, K8s, bare metal
+├── troubleshooting/      # Git, toolchain, MSYS2, push
+├── archive/              # Архівні й одноразові нотатки
+└── …                     # monitoring/, security/, vm/, runtime/ тощо
+```
+
+**Правило:** нові **плани** → `docs/development/`; **статус** → `docs/status/`; **концепт продукту** → `docs/concept/` або `development/` якщо це саме протокол/шар; **історія** → `docs/archive/`.
+
+---
+
+## 3. Плоскі файли в `docs/*.md` (спадщина)
+
+У корені `docs/` лишаються десятки історичних файлів (`EXECUTE_NOW.md`, `PUSH_*`, session summaries тощо). Вони **не** входять до канонічних кроків 1–11; користуйся ними як архівом усного контексту або шукай через `INDEX` / `rg`.
+
+**Політика на майбутнє:** нові архівні нотатки додавати в **`docs/archive/`**; масове прибирання плоских дублів — окремими інкрементами, щоб не ламати зовнішні посилання.
+
+---
+
+## 4. Правила Cursor (не в `docs/`)
+
+| Шлях | Роль |
+|------|------|
+| `.cursor/rules/documentation.md` | Куди писати доки, крок 11, каталог. |
+| `.cursor/rules/project-structure.md` | Організація `src/`, скриптів. |
+| `.cursor/commands/git-push.md` | Push, MSYS2, змінні середовища. |
+
+---
+
+## 5. Інвентар репозиторію
+
+- **`file_list.csv`** (корінь) — ручний зріз ключових шляхів; оновлюй при змінах у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`.
+- Повний перелік: `git ls-files`.
+
+---
+
+## 6. Тести та документація
+
+- Рекомендований локальний прогін (узгоджено з CI-матрицею):  
+  `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test --lib --tests --features ml,enterprise,cloud`
+- Інтеграційні таргети з **`required-features`** (наприклад `test-utils`, `ml`) не збираються без відповідних `--features`; див. кореневий `Cargo.toml`, секція `[[test]]`.
+- Повний `cargo test` з **doctests** на деяких Windows-конфігураціях може давати помилки лінкера; це відомий клас проблем середовища, не «канонічний» обов’язок для щоденної розробки.
+
+---
+
+**Версія опису структури:** 2.0 (синхронізація з Architect plan і `.cursor/rules`).
