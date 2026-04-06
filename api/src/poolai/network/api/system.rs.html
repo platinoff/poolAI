@@ -17,11 +17,11 @@
 <a href=#17 id=17 data-nosnippet>17</a>    Json, Router,
 <a href=#18 id=18 data-nosnippet>18</a>};
 <a href=#19 id=19 data-nosnippet>19</a>
-<a href=#20 id=20 data-nosnippet>20</a><span class="kw">use </span><span class="kw">crate</span>::core::config::{get_config, update_config, PoolAIConfig};
+<a href=#20 id=20 data-nosnippet>20</a><span class="kw">use </span><span class="kw">crate</span>::core::config::PoolAIConfig;
 <a href=#21 id=21 data-nosnippet>21</a><span class="kw">use </span><span class="kw">crate</span>::core::error::ErrorContext;
 <a href=#22 id=22 data-nosnippet>22</a><span class="kw">use </span><span class="kw">crate</span>::core::state::ApiContext;
 <a href=#23 id=23 data-nosnippet>23</a><span class="kw">use </span><span class="kw">crate</span>::network::api::common::{api_json_error, check_permission};
-<a href=#24 id=24 data-nosnippet>24</a><span class="kw">use </span><span class="kw">crate</span>::network::auth::{authenticate_user, AuthRequest, Claims};
+<a href=#24 id=24 data-nosnippet>24</a><span class="kw">use </span><span class="kw">crate</span>::network::auth::{AuthRequest, Claims};
 <a href=#25 id=25 data-nosnippet>25</a><span class="kw">use </span><span class="kw">crate</span>::network::ws::websocket_handler;
 <a href=#26 id=26 data-nosnippet>26</a><span class="kw">use </span><span class="kw">crate</span>::services::system_service::SystemService;
 <a href=#27 id=27 data-nosnippet>27</a>
@@ -506,7 +506,7 @@
 <a href=#506 id=506 data-nosnippet>506</a>    State(ctx): State&lt;ApiContext&gt;,
 <a href=#507 id=507 data-nosnippet>507</a>    Json(auth_req): Json&lt;AuthRequest&gt;,
 <a href=#508 id=508 data-nosnippet>508</a>) -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#509 id=509 data-nosnippet>509</a>    <span class="kw">match </span>authenticate_user(auth_req, ctx.user_manager.clone()).<span class="kw">await </span>{
+<a href=#509 id=509 data-nosnippet>509</a>    <span class="kw">match </span>SystemService::login(auth_req, ctx.user_manager.clone()).<span class="kw">await </span>{
 <a href=#510 id=510 data-nosnippet>510</a>        <span class="prelude-val">Ok</span>(auth_response) =&gt; Json(auth_response).into_response(),
 <a href=#511 id=511 data-nosnippet>511</a>        <span class="prelude-val">Err</span>((status, error)) =&gt; (status, error).into_response(),
 <a href=#512 id=512 data-nosnippet>512</a>    }
@@ -514,7 +514,7 @@
 <a href=#514 id=514 data-nosnippet>514</a>
 <a href=#515 id=515 data-nosnippet>515</a><span class="doccomment">/// Get system configuration
 <a href=#516 id=516 data-nosnippet>516</a></span><span class="kw">async fn </span>config_get_handler() -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#517 id=517 data-nosnippet>517</a>    <span class="kw">match </span>get_config() {
+<a href=#517 id=517 data-nosnippet>517</a>    <span class="kw">match </span>SystemService::get_configuration() {
 <a href=#518 id=518 data-nosnippet>518</a>        <span class="prelude-val">Ok</span>(config) =&gt; Json(config).into_response(),
 <a href=#519 id=519 data-nosnippet>519</a>        <span class="prelude-val">Err</span>(e) =&gt; {
 <a href=#520 id=520 data-nosnippet>520</a>            <span class="kw">let </span>(s, j) = api_json_error(
@@ -538,7 +538,7 @@
 <a href=#538 id=538 data-nosnippet>538</a>        <span class="kw">return </span>err.into_response();
 <a href=#539 id=539 data-nosnippet>539</a>    }
 <a href=#540 id=540 data-nosnippet>540</a>
-<a href=#541 id=541 data-nosnippet>541</a>    <span class="kw">match </span>update_config(config) {
+<a href=#541 id=541 data-nosnippet>541</a>    <span class="kw">match </span>SystemService::apply_configuration(config) {
 <a href=#542 id=542 data-nosnippet>542</a>        <span class="prelude-val">Ok</span>(()) =&gt; Json(<span class="macro">serde_json::json!</span>({
 <a href=#543 id=543 data-nosnippet>543</a>            <span class="string">"message"</span>: <span class="string">"Configuration updated successfully"
 <a href=#544 id=544 data-nosnippet>544</a>        </span>}))
