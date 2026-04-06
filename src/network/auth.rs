@@ -39,10 +39,14 @@ use axum::{
     response::Response,
     Json,
 };
+
+use crate::core::error::ErrorContext;
+use crate::network::json_errors::api_json_error;
 // JWT support (optional - enabled with feature "jwt")
+#[cfg(not(feature = "jwt"))]
 use base64::Engine;
 #[cfg(feature = "jwt")]
-use jsonwebtoken::{decode, DecodingKey, Validation};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -174,28 +178,12 @@ impl Default for JwtConfig {
 /// # Ok::<(), String>(())
 /// ```
 pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String> {
-    // Future improvement: Re-enable JWT token generation after installing gcc
-    // 1. Install gcc compiler (required by ring crate for crypto operations)
-    //    - Windows: Install MinGW-w64 or use MSVC build tools
-    //    - Linux: Install gcc via package manager (apt-get install gcc, yum install gcc)
-    //    - macOS: Install Xcode Command Line Tools (xcode-select --install)
-    // 2. Verify gcc installation: gcc --version
-    // 3. Re-enable JWT token generation code
-    //    - Uncomment JWT signing logic
-    //    - Use ring::hmac for HMAC-SHA256 signing
-    //    - Use ring::signature for RSA signing (if needed)
-    // 4. Test JWT token generation and validation
-    //    - Generate token with proper claims (sub, role, exp)
-    //    - Validate token signature and expiration
-    // Note: For now, returning placeholder token for development
-    // For now, return a simple placeholder token
     let config = JwtConfig::default();
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
         .as_secs() as usize;
 
-    // Simple base64-like encoding (NOT SECURE - for development only)
     let claims = Claims {
         sub: _username.to_string(),
         exp: now + config.expiration,
@@ -204,12 +192,25 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
         permissions: _role.get_permissions(),
     };
 
-    // Use serde_json to create a simple token (NOT a real JWT)
-    let token_json = serde_json::to_string(&claims).unwrap_or_default();
-    Ok(format!(
-        "dev_token_{}",
-        base64::engine::general_purpose::STANDARD.encode(token_json.as_bytes())
-    ))
+    #[cfg(feature = "jwt")]
+    {
+        encode(
+            &Header::default(),
+            &claims,
+            &EncodingKey::from_secret(config.secret.as_bytes()),
+        )
+        .map_err(|e| format!("JWT encode error: {}", e))
+    }
+
+    #[cfg(not(feature = "jwt"))]
+    {
+        // Dev-only opaque token (NOT a standard JWT)
+        let token_json = serde_json::to_string(&claims).unwrap_or_default();
+        Ok(format!(
+            "dev_token_{}",
+            base64::engine::general_purpose::STANDARD.encode(token_json.as_bytes())
+        ))
+    }
 }
 
 /// Validate JWT token
@@ -317,21 +318,21 @@ pub async fn auth_middleware(
         });
 
     let token = auth_header.ok_or_else(|| {
-        (
+        api_json_error(
+            "AUTH_MISSING_HEADER",
+            "Missing or invalid authorization header",
+            Some(ErrorContext::new("auth_middleware")),
             StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "error": "Missing or invalid authorization header"
-            })),
         )
     })?;
 
     // Валідуємо токен
     let claims = validate_token(&token).map_err(|_| {
-        (
+        api_json_error(
+            "AUTH_INVALID_TOKEN",
+            "Invalid or expired token",
+            Some(ErrorContext::new("auth_middleware")),
             StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "error": "Invalid or expired token"
-            })),
         )
     })?;
 
@@ -348,11 +349,11 @@ pub async fn permission_middleware(
     required_permission: &str,
 ) -> Result<Response, (StatusCode, Json<serde_json::Value>)> {
     let claims = req.extensions().get::<Claims>().ok_or_else(|| {
-        (
+        api_json_error(
+            "AUTH_NOT_AUTHENTICATED",
+            "User not authenticated",
+            Some(ErrorContext::new("permission_middleware")),
             StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "error": "User not authenticated"
-            })),
         )
     })?;
 
@@ -361,13 +362,15 @@ pub async fn permission_middleware(
         .permissions
         .contains(&required_permission.to_string())
     {
-        return Err((
+        return Err(api_json_error(
+            "AUTH_FORBIDDEN",
+            "Insufficient permissions",
+            Some(
+                ErrorContext::new("permission_middleware")
+                    .with_resource("permission", required_permission)
+                    .with_details(format!("user_permissions={:?}", claims.permissions)),
+            ),
             StatusCode::FORBIDDEN,
-            Json(serde_json::json!({
-                "error": "Insufficient permissions",
-                "required": required_permission,
-                "user_permissions": claims.permissions
-            })),
         ));
     }
 
@@ -440,11 +443,11 @@ pub async fn authenticate_user(
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
-        return Err((
+        return Err(api_json_error(
+            "AUTH_USER_MANAGER_INIT_FAILED",
+            format!("User manager initialization failed: {}", e),
+            Some(ErrorContext::new("authenticate_user")),
             StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": format!("User manager initialization failed: {}", e)
-            })),
         ));
     }
 
@@ -453,20 +456,20 @@ pub async fn authenticate_user(
         .verify_password(&auth_req.username, &auth_req.password)
         .await
         .map_err(|e| {
-            (
+            api_json_error(
+                "AUTH_INTERNAL",
+                format!("Authentication error: {}", e),
+                Some(ErrorContext::new("authenticate_user")),
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({
-                    "error": format!("Authentication error: {}", e)
-                })),
             )
         })?;
 
     if !is_valid {
-        return Err((
+        return Err(api_json_error(
+            "AUTH_INVALID_CREDENTIALS",
+            "Invalid credentials",
+            Some(ErrorContext::new("authenticate_user")),
             StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "error": "Invalid credentials"
-            })),
         ));
     }
 
@@ -475,31 +478,31 @@ pub async fn authenticate_user(
         .get_user_by_username(&auth_req.username)
         .await
         .map_err(|e| {
-            (
+            api_json_error(
+                "AUTH_INTERNAL",
+                format!("User retrieval error: {}", e),
+                Some(ErrorContext::new("authenticate_user")),
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({
-                    "error": format!("User retrieval error: {}", e)
-                })),
             )
         })?;
 
     let (role, username) = if let Some(u) = user {
         (u.role, u.username)
     } else {
-        return Err((
+        return Err(api_json_error(
+            "AUTH_INVALID_CREDENTIALS",
+            "Invalid credentials",
+            Some(ErrorContext::new("authenticate_user")),
             StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "error": "Invalid credentials"
-            })),
         ));
     };
 
     let token = generate_token(&username, role.clone()).map_err(|_| {
-        (
+        api_json_error(
+            "AUTH_TOKEN_GENERATION_FAILED",
+            "Failed to generate token",
+            Some(ErrorContext::new("authenticate_user").with_resource("username", &username)),
             StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": "Failed to generate token"
-            })),
         )
     })?;
 

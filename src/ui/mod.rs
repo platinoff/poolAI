@@ -1232,6 +1232,16 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+/** Read user-facing message from API JSON: legacy flat `error` string or structured `{ error: { code, message } }`. */
+function apiErrorMessageFromBody(payload) {
+  if (!payload || typeof payload !== 'object') return null;
+  const e = payload.error;
+  if (typeof e === 'string') return e;
+  if (e && typeof e === 'object' && typeof e.message === 'string') return e.message;
+  if (typeof payload.message === 'string') return payload.message;
+  return null;
+}
+
 // Enhanced fetchJson with retry support and better error handling
 async function fetchJsonWithRetry(url, options = {}, maxRetries = 3, retryDelay = 1000) {
   let lastError;
@@ -1952,13 +1962,13 @@ async function fetchJson(url, options = {}) {
     }
     if (!retryRes.ok) {
       const errorData = await retryRes.json().catch(() => ({}));
-      throw new Error(errorData.error || 'HTTP ' + retryRes.status);
+      throw new Error(apiErrorMessageFromBody(errorData) || 'HTTP ' + retryRes.status);
     }
     return await retryRes.json();
   }
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'HTTP ' + res.status);
+    throw new Error(apiErrorMessageFromBody(errorData) || 'HTTP ' + res.status);
   }
   return await res.json();
 }
@@ -3245,6 +3255,15 @@ async fn login_page() -> Html<String> {
       const alert = document.getElementById('alert');
       if (alert) alert.style.display = 'none';
     }
+
+    function apiErrMsg(p) {
+      if (!p || typeof p !== 'object') return null;
+      const e = p.error;
+      if (typeof e === 'string') return e;
+      if (e && typeof e === 'object' && typeof e.message === 'string') return e.message;
+      if (typeof p.message === 'string') return p.message;
+      return null;
+    }
     
     async function handleLogin(event) {
       event.preventDefault();
@@ -3266,7 +3285,7 @@ async fn login_page() -> Html<String> {
         
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(data.error || 'Login failed');
+          throw new Error(apiErrMsg(data) || 'Login failed');
         }
         
         const data = await res.json();

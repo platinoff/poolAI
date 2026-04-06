@@ -6,6 +6,16 @@ const API_BASE = '/api/v1';
 // Enterprise API base URL
 const ENTERPRISE_API_BASE = '/api/enterprise';
 
+/** Parse API error body: legacy flat `error` string or `{ error: { code, message } }`. */
+function apiErrorMessageFromBody(payload) {
+  if (!payload || typeof payload !== 'object') return null;
+  const e = payload.error;
+  if (typeof e === 'string') return e;
+  if (e && typeof e === 'object' && typeof e.message === 'string') return e.message;
+  if (typeof payload.message === 'string') return payload.message;
+  return null;
+}
+
 // Utility functions
 // Compatible with main UI module storage format
 function getUser() {
@@ -98,7 +108,9 @@ async function fetchJson(url, options = {}) {
   
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: response.statusText }));
-    throw new Error(error.error || error.message || `HTTP ${response.status}`);
+    throw new Error(
+      apiErrorMessageFromBody(error) || error.message || `HTTP ${response.status}`,
+    );
   }
   
   return response.json();
