@@ -6,12 +6,18 @@
 //! - Get user progress
 //! - Get top users
 
-use axum::{extract::Path, http::StatusCode, response::IntoResponse, routing::get, Json, Router};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::get,
+    Json, Router,
+};
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::network::api::common::api_json_error;
-use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
+use crate::services::rewards_service::{RewardsService, TOP_USERS_DEFAULT_LIMIT};
 
 /// Create rewards system routes
 pub fn create_rewards_routes() -> Router<ApiContext> {
@@ -23,19 +29,24 @@ pub fn create_rewards_routes() -> Router<ApiContext> {
         .route("/rewards/top", get(top_users_handler))
 }
 
-async fn rewards_handler() -> impl IntoResponse {
-    let rewards = get_reward_statistics().await;
+async fn rewards_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let rewards = RewardsService::reward_statistics(&ctx).await;
     Json(rewards).into_response()
 }
 
-async fn user_rewards_handler(Path(user_id): Path<String>) -> impl IntoResponse {
-    let rewards = get_user_rewards(&user_id).await;
+async fn user_rewards_handler(
+    State(ctx): State<ApiContext>,
+    Path(user_id): Path<String>,
+) -> impl IntoResponse {
+    let rewards = RewardsService::user_rewards(&ctx, &user_id).await;
     Json(rewards).into_response()
 }
 
-async fn user_progress_handler(Path(user_id): Path<String>) -> impl IntoResponse {
-    let progress = get_user_progress(&user_id).await;
-    match progress {
+async fn user_progress_handler(
+    State(ctx): State<ApiContext>,
+    Path(user_id): Path<String>,
+) -> impl IntoResponse {
+    match RewardsService::user_progress(&ctx, &user_id).await {
         Some(progress) => Json(progress).into_response(),
         None => {
             let (s, j) = api_json_error(
@@ -49,12 +60,12 @@ async fn user_progress_handler(Path(user_id): Path<String>) -> impl IntoResponse
     }
 }
 
-async fn rewards_statistics_handler() -> impl IntoResponse {
-    let stats = get_reward_statistics().await;
+async fn rewards_statistics_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let stats = RewardsService::reward_statistics(&ctx).await;
     Json(stats).into_response()
 }
 
-async fn top_users_handler() -> impl IntoResponse {
-    let top_users = get_top_users(10).await;
+async fn top_users_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let top_users = RewardsService::top_users(&ctx, TOP_USERS_DEFAULT_LIMIT).await;
     Json(top_users).into_response()
 }
