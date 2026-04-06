@@ -3,6 +3,9 @@
 //! Simplified per-row int8 uniform quantization with `f32` scale (PolarQuant/QJL-inspired
 //! data-plane placeholder; see `docs/ml/TURBOQUANT_INTEGRATION.md`). Not wire-compatible with
 //! external Google binaries — PoolAI artifact format only.
+//!
+//! Hot loops use a **portable fast path** (4-wide unrolling; pack uses `inv_scale`; unpack uses
+//! batched i8→f32×scale): stable Rust without `portable_simd` / subprocess.
 
 use std::fmt;
 
@@ -98,6 +101,70 @@ pub fn unpack_to_rows(bytes: &[u8]) -> Result<Vec<Vec<f32>>, TurboQuantError> {
     Ok(out)
 }
 
+#[inline]
+fn row_max_abs(values: &[f32]) -> f32 {
+    let n = values.len();
+    let mut m = 0.0_f32;
+    let mut i = 0;
+    while i + 4 <= n {
+        let a0 = values[i].abs();
+        let a1 = values[i + 1].abs();
+        let a2 = values[i + 2].abs();
+        let a3 = values[i + 3].abs();
+        m = m.max(a0.max(a1).max(a2.max(a3)));
+        i += 4;
+    }
+    while i < n {
+        m = m.max(values[i].abs());
+        i += 1;
+    }
+    m
+}
+
+#[inline]
+fn append_quantized_row(out: &mut Vec<u8>, row: &[f32], inv_scale: f32) {
+    let n = row.len();
+    let mut i = 0;
+    while i + 4 <= n {
+        for j in 0..4 {
+            let qf = (row[i + j] * inv_scale).round().clamp(-127.0, 127.0);
+            out.push(qf as i8 as u8);
+        }
+        i += 4;
+    }
+    while i < n {
+        let qf = (row[i] * inv_scale).round().clamp(-127.0, 127.0);
+        out.push(qf as i8 as u8);
+        i += 1;
+    }
+}
+
+/// Dequantise one row of `cols` int8 weights into `flat`; returns new `off` past consumed bytes.
+#[inline]
+fn push_dequantized_row(
+    flat: &mut Vec<f32>,
+    bytes: &[u8],
+    mut off: usize,
+    cols: usize,
+    scale: f32,
+) -> usize {
+    let mut col = 0;
+    while col + 4 <= cols {
+        flat.push(bytes[off] as i8 as f32 * scale);
+        flat.push(bytes[off + 1] as i8 as f32 * scale);
+        flat.push(bytes[off + 2] as i8 as f32 * scale);
+        flat.push(bytes[off + 3] as i8 as f32 * scale);
+        off += 4;
+        col += 4;
+    }
+    while col < cols {
+        flat.push(bytes[off] as i8 as f32 * scale);
+        off += 1;
+        col += 1;
+    }
+    off
+}
+
 fn encode_row_major(flat: &[f32], cols: u32) -> Result<Vec<u8>, TurboQuantError> {
     if cols == 0 {
         return Err(TurboQuantError::ZeroColumns);
@@ -116,13 +183,11 @@ fn encode_row_major(flat: &[f32], cols: u32) -> Result<Vec<u8>, TurboQuantError>
     out.extend_from_slice(&(rows as u32).to_le_bytes());
 
     for chunk in flat.chunks(c) {
-        let max_abs = chunk.iter().map(|x| x.abs()).fold(0.0_f32, |a, b| a.max(b));
+        let max_abs = row_max_abs(chunk);
         let scale = if max_abs > 0.0 { max_abs / 127.0 } else { 1.0 };
         out.extend_from_slice(&scale.to_le_bytes());
-        for &v in chunk {
-            let qf = (v / scale).round().clamp(-127.0, 127.0);
-            out.push(qf as i8 as u8);
-        }
+        let inv_scale = 1.0 / scale;
+        append_quantized_row(&mut out, chunk, inv_scale);
     }
     Ok(out)
 }
@@ -158,18 +223,25 @@ fn decode_row_major(bytes: &[u8]) -> Result<(Vec<f32>, u32), TurboQuantError> {
         }
         let scale = f32::from_le_bytes(bytes[off..off + 4].try_into().unwrap());
         off += 4;
-        for _ in 0..cols {
-            let q = bytes[off] as i8;
-            off += 1;
-            flat.push(q as f32 * scale);
-        }
+        off = push_dequantized_row(&mut flat, bytes, off, cols, scale);
     }
     Ok((flat, cols as u32))
 }
 
-/// Dot product (naive, for small vectors in tests / metrics).
+/// Dot product (4-wide unrolled; for tests / metrics and small vectors).
 pub fn dot_f32(a: &[f32], b: &[f32]) -> f32 {
-    a.iter().zip(b).map(|(x, y)| x * y).sum()
+    let n = a.len().min(b.len());
+    let mut sum = 0.0_f32;
+    let mut i = 0;
+    while i + 4 <= n {
+        sum += a[i] * b[i] + a[i + 1] * b[i + 1] + a[i + 2] * b[i + 2] + a[i + 3] * b[i + 3];
+        i += 4;
+    }
+    while i < n {
+        sum += a[i] * b[i];
+        i += 1;
+    }
+    sum
 }
 
 #[cfg(test)]
@@ -189,6 +261,22 @@ mod tests {
                     (o - g).abs() <= tol,
                     "reconstruction error too large: o={o} g={g} tol={tol}"
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn round_trip_five_columns_unroll_tail() {
+        let rows: Vec<Vec<f32>> = (0..4)
+            .map(|i| (0..5).map(|j| ((i * 5 + j) as f32) * 0.07 - 0.5).collect())
+            .collect();
+        let p = pack_uniform_rows(&rows).unwrap();
+        let back = unpack_to_rows(&p.bytes).unwrap();
+        assert_eq!(back.len(), rows.len());
+        for (orig, got) in rows.iter().zip(&back) {
+            for (o, g) in orig.iter().zip(got) {
+                let tol = (o.abs() * 0.02).max(5e-3);
+                assert!((o - g).abs() <= tol, "reconstruction error: o={o} g={g}");
             }
         }
     }

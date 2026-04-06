@@ -24,7 +24,7 @@
 |--------:|-----------|-----------------|
 | **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
 | **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **`network/enterprise_api/`** ( **`mod.rs`** + tenants / audit / monitoring / security / oauth / saml) — розбито з моноліту. Дрібні edge cases міграції handlers → сервіси за потреби. |
-| **3** | **Priority 2b** | TurboQuant **фаза 1** ✅. Далі: **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; **P4** / SIMD за потреби. |
+| **3** | **Priority 2b** | TurboQuant **фаза 1** ✅ + **портативний fast-path** (`turboquant.rs`: pack/unpack/`dot_f32`). Далі: повні заміри по мережі на стенді (чекбокс нижче). |
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
@@ -106,7 +106,7 @@
 - [x] Проксі замірів replication control-plane: Criterion-група **`raid_replication_engine`** у `benches/runtime_benchmarks.rs` (див. `docs/performance/BENCHMARKS.md`).
 - [x] In-tree **HTTP wire harness** для distributed `PutArtifact`: **`Cargo.toml`** `[[test]] distributed_raid_wire_integration` (`--features test-utils`; з **`ml`** — порівняння розміру JSON TQ01 vs сирий f32); команди в **`docs/performance/BENCHMARKS.md`** (секція P2b).
 - [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4** / LAN-стенд; harness лише готує шлях handler+serde).
-- [ ] Опційно: SIMD / прискорений підшлях у Rust.
+- [x] Опційно: прискорений підшлях у Rust (**портативно**: 4-wide unroll, `inv_scale` у пакуванні; без `portable_simd` і без нових crates). Нативний ISA SIMD (x86 NEON тощо) — за потреби пізніше.
 
 **Критерії готовності**:
 - [x] Увімкнення TurboQuant керується конфігом кроку pipeline (і feature **`ml`**).

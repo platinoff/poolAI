@@ -278,3 +278,11 @@ vm-isolation = ["vm-isolation-linux"]
 # Attach core managers / rewards engine to AppState in integration tests without full app init (see AppState::attach_*_for_test)
 test-utils = []
 
+# Some Windows MSVC hosts hit `rustc` STATUS_ACCESS_VIOLATION when compiling the full `poolai` lib at
+# `release` opt-level 3 (e.g. `cargo bench` / `cargo build --release`). The `bench` profile keeps
+# release settings but lowers codegen for benchmark binaries so local Criterion runs can finish.
+[profile.bench]
+inherits = "release"
+# MSVC hosts: `rustc` may AV even at opt-level 2 on the full crate; 0 keeps Criterion runnable locally.
+opt-level = 0
+
