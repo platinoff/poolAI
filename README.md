@@ -63,19 +63,20 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
 For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation map: `docs/INDEX_2026-03-17.md`.
 
-### ✅ Current Build/Test Status (2026-04-07)
+### ✅ Current Build/Test Status (2026-04-06)
 - `cargo fmt --all` — CI / before push  
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
 - `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
-- **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`** (артефакти, квота, статус кластера); Rust-бекенди базових кроків ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`, крок `Quantization`); **Priority 3 (частково)** — `api_error_response`, **`api_json_error`**, **`AppError::Forbidden`**, `http_status_for_app_error` у `network/api/common.rs`; узгоджені помилки в **instances, libraries, vm, workers, topology, rewards**, **tenant** у `enterprise_api.rs`, плюс раніше — RAID `Operation` та enterprise **AI-ML pipeline** (`ai_ml.rs`).
+- **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **Priority 3 (основний REST)** — `api_json_error` / `api_error_response` у `network/api/common.rs`, хелпер **`enterprise_err`** у `enterprise_api.rs`, узгоджені помилки в **`raid.rs`**, повному **`enterprise_api.rs`**, а також у **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`** та раніше — **instances, libraries, vm, workers, topology, rewards**, **ai_ml**, tenant CRUD.
 
 ### Next Focus
-- **Priority 3 (продовження)**: `raid.rs` (більшість шляхів), `ui`, `users`, `system`, `completions`, `raid_admin`, решта `enterprise_api.rs`; за потреби уточнити мапінг `AppError` → HTTP для `ResourceError` / not-found.
-- **Priority 4**: бенчмарки та профілювання (див. `docs/performance/BENCHMARKS.md`, план у `NEXT_STEPS_ARCHITECT_2026-03-17.md`).
-- **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot) у `RaidService`.
-- За потреби: стабілізувати `cargo test --all-features` на Windows (GNU host або розбиття тестів).
-- Канонічний план і чекбокси: [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт нової сесії: [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
+- **Priority 3 (добивання)**: **`auth.rs`** — відповіді логіну / middleware досі з плоским `"error": string`; за потреби узгодити з `api_json_error` і не зламати клієнтів UI. Опційно: уточнити мапінг `AppError` → HTTP (`ResourceError`, not-found) у `http_status_for_app_error`.
+- **Priority 4**: бенчмарки та профілювання hot-path (див. `docs/performance/BENCHMARKS.md`, `NEXT_STEPS_ARCHITECT_2026-03-17.md`).
+- **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot, …) у `RaidService`.
+- **Priority 2b**: чекбокси TurboQuant у архітектурному плані (код уже в дереві — оновити доки/критерії «готово»).
+- За потреби: стабілізувати `cargo test --all-features` на Windows.
+- Канонічний план: [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт сесії: [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 
 ### 🚀 Development Roadmap
 

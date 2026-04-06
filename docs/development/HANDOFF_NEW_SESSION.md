@@ -1,7 +1,7 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-07 (синхронізація доків після P3 JSON errors + верифікація `cargo test`)  
-**Гілка роботи:** `main` (зазвичай `git push origin main` → `origin/main`).
+**Оновлено:** 2026-04-06 (P3 по REST/enterprise/raid завершено; доки синхронізовано)  
+**Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -28,14 +28,16 @@
 - **RaidService (P2)**: крім list — `put_artifact`, `delete_artifact`, `quota`, `cluster_status`; DTO квоти/статусу в `raid_service.rs`; тонкі handlers у `src/network/api/raid.rs`.
 - **ML pipeline (Stage 4.4)**: детерміновані Rust-бекенди для `Preprocessing`, `Training`, `Evaluation`, `Deployment` (`src/ml/pipeline.rs`).
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
-- **Priority 3 (частково)**: у `src/network/api/common.rs` — `api_error_response`, **`api_json_error`** (довільний `code` + той самий JSON-шейп), `http_status_for_app_error`; у `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext.hint`. Узгоджені відповіді в: RAID (`Operation`), enterprise **`/api/enterprise/ai-ml/pipeline`** (`ai_ml.rs`), **`instances`**, **`libraries`**, **`vm`**, **`workers`**, **`topology`**, **`rewards`**, блок **tenant** у `enterprise_api.rs`.
+- **Priority 3 (основний HTTP-шар)**: `src/network/api/common.rs` — `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext` (+ `hint`). Узгоджені відповіді: **`raid.rs`** (у т.ч. `raid_api_err`, `raid_event_store_unavailable`), **повний** **`enterprise_api.rs`** (хелпер **`enterprise_err`**), **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`**, раніше — **`ai_ml`**, **instances/libraries/vm/workers/topology/rewards**, tenant CRUD, RAID `Operation` через `api_error_response`.
+- **P3 залишок**: **`src/network/auth.rs`** — логін і middleware ще повертають legacy JSON з плоским ключем `error`; за бажанням вирівняти під той самий шейп, перевірити UI/тести.
 - **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud`. На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
 
 ## 4. Наступні кроки за тим самим планом
 
-- **P3** — решта HTTP handlers: **`raid.rs`** (більшість legacy `"error": string`), **`ui`**, **`users`**, **`system`**, **`completions`**, **`raid_admin`**, решта **`enterprise_api.rs`**, за потреби **`auth.rs`**; уточнити статуси для окремих варіантів `AppError`.
-- **P4** — бенчмарки / профілювання ключових шляхів.
-- **P2 (опційно)** — решта RAID-маршрутів через `RaidService` (workers, events, snapshot, …).
-- За потреби — стабілізація `cargo test --all-features` на Windows.
+1. **P3** — **`auth.rs`** (опційно) + за потреби мапінг **`ResourceError` / not-found** у `http_status_for_app_error`.
+2. **P4** — бенчмарки / профілювання (`docs/performance/BENCHMARKS.md`).
+3. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
+4. **P2b / доки** — оновити чекбокси TurboQuant у `NEXT_STEPS_ARCHITECT` під фактичний код у `src/ml/turboquant.rs`.
+5. За потреби — `cargo test --all-features` на Windows (GNU / розбиття тестів).
 
-Деталі й чекбокси — лише в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).
+Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).

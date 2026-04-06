@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-04-07
+**Last updated:** 2026-04-06
 
 ## Canonical reading order
 
@@ -15,5 +15,5 @@
 ## Short pointers
 
 - **Status / plans** — `status/`, `development/` (see [development/README.md](./development/README.md) for plan index).
-- **Unified API errors (P3, incremental)** — `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; `src/core/error.rs`: `ErrorContext`, `hint`, **`AppError::Forbidden`**. Докладний зріз покриття handlers — `development/HANDOFF_NEW_SESSION.md`.
+- **Unified API errors (P3)** — основний REST і **`enterprise_api.rs`** / **`raid.rs`** узгоджені: `api_json_error`, `enterprise_err`, `raid_api_err`, … Залишок: **`src/network/auth.rs`** (плоский `error`). Деталі — `development/HANDOFF_NEW_SESSION.md`.
 - **One-off historical notes** — `archive/` (includes former root `PUSH_*.md` files).

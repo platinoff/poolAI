@@ -1,7 +1,7 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-04-07
+**Останнє оновлення**: 2026-04-06
 
 ---
 
@@ -25,9 +25,9 @@
 
 ## 📊 Поточні Пріоритети (v0.3.0+)
 
-### Priority 3: Узгоджені HTTP-помилки (у процесі)
+### Priority 3: Узгоджені HTTP-помилки (основа готова)
 
-- Канонічний формат і хелпери: `src/network/api/common.rs`; типи — `src/core/error.rs`. Що вже мігровано і що лишилось — **`HANDOFF_NEW_SESSION.md`** та секція P3 у **`NEXT_STEPS_ARCHITECT_2026-03-17.md`**.
+- Формат і хелпери: `src/network/api/common.rs`; типи — `src/core/error.rs`; **`enterprise_err`** — `enterprise_api.rs`. **Залишок**: вирівняти **`auth.rs`**. Джерело правди: **`HANDOFF_NEW_SESSION.md`**, секція P3 у **`NEXT_STEPS_ARCHITECT_2026-03-17.md`**.
 
 ### Priority 2: Service layer + опціональні features
 
@@ -71,4 +71,4 @@
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата**: 2026-01-22
+**Дата останнього узгодження з main**: 2026-04-06

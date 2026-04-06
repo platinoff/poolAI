@@ -24,8 +24,8 @@
 |--------:|-----------|-----------------|
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
 | **2** | **Priority 2** | Розширити **`src/services/`** (enterprise, cloud, admin); **Stage 4.4** — ML pipeline backends. Є: **`RaidService`**, **`VmService`**, **`LibraryService`** (`/libraries/*`). |
-| **3** | **Priority 2b** | **TurboQuant лише в Rust** (`src/ml/…`): спека формату, модуль, тести, потім wire у pipeline + метрики (див. `docs/ml/TURBOQUANT_INTEGRATION.md`). |
-| **4** | **Priority 3** | Узгодити **`AppError` / `ErrorContext`** і HTTP-мапінг по всьому публічному API (**частково**: `api_json_error`, `Forbidden`, instances/libraries/vm/workers/topology/rewards, enterprise tenants — див. HANDOFF). |
+| **3** | **Priority 2b** | **Фаза 1 TurboQuant у коді** (`src/ml/turboquant.rs`, pipeline, інтеграційний тест). Далі: **P4**-заміри RAID, опційно SIMD; оновлення `BENCHMARKS.md`. |
+| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Залишок**: опційно `auth.rs`, уточнення статусів для `ResourceError` / not-found — див. HANDOFF. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | Синхронізація документації та TODO після 1–4. |
 | **7** | **Priority 6** | Grid protocol / Solana-adapter у docs і коді за потреби. |
@@ -97,17 +97,17 @@
 **Чому після Priority 2 / бекендів pipeline**: стабільний **Rust-executor** кроків і формат артефактів спрощує підключення нового кроку або гілки в `Quantization`. Деталі: `docs/ml/TURBOQUANT_INTEGRATION.md`.
 
 **Кроки**:
-- [ ] Специфікація внутрішнього бінарного формату та юніт-тести (малі розмірності, похибка dot-product / recall proxy).
-- [ ] Реалізація модуля **`src/ml/turboquant.rs`** (або `src/ml/turboquant/mod.rs`) — чистий Rust, без subprocess.
-- [ ] Контракт кроку pipeline: конфіг у `StepType::Quantization` або окремий прапор/режим; метрики `bytes_in`, `bytes_out`, `target_bits` у результаті виконання кроку.
-- [ ] Інтеграційний тест **повністю в Rust** (pipeline execute з тестовими вагами).
-- [ ] Заміри реплікації артефактів RAID до/після (Priority 4 / `docs/performance/BENCHMARKS.md`).
-- [ ] Опційно: SIMD / окремий прискорений підшлях у Rust (без залежності від інших мов).
+- [x] Специфікація формату **`TQ01`** + юніт-тести в **`src/ml/turboquant.rs`** (див. також `docs/ml/TURBOQUANT_INTEGRATION.md`).
+- [x] Модуль **`src/ml/turboquant.rs`** — Rust-only, без subprocess.
+- [x] Контракт кроку pipeline: гілка **`Quantization`** з конфігом `turboquant` / `quantization=turboquant`; метрики в результаті кроку.
+- [x] Інтеграційний тест **`tests/ml_pipeline_integration.rs`** (`test_pipeline_turboquant_quantization_step`) при `--features ml`.
+- [ ] Заміри реплікації артефактів RAID до/після (**Priority 4** / `docs/performance/BENCHMARKS.md`).
+- [ ] Опційно: SIMD / прискорений підшлях у Rust.
 
 **Критерії готовності**:
-- [ ] Увімкнення TurboQuant керується лише конфігом Rust і feature flags проєкту.
-- [ ] Є **автоматизовані** тести модуля та шляху pipeline без зовнішніх binary крім `cargo test`.
-- [ ] Метрики стиснення видимі в логах або API статусу pipeline.
+- [x] Увімкнення TurboQuant керується конфігом кроку pipeline (і feature **`ml`**).
+- [x] Є автоматизовані тести модуля та шляху pipeline (`cargo test`, без зовнішніх binary).
+- [ ] Метрики стиснення стабільно зведені в API/дашборді pipeline (за потреби доробити).
 
 ---
 
@@ -119,12 +119,13 @@
 - [x] Ввести доменний тип помилки `AppError` у `src/core/error.rs` (коди через `error_code()`, `thiserror`).
 - [x] Додати `ErrorContext` (`operation`, `resource`, `resource_id`, `details`, `hint`) та хелпери `with_*`.
 - [x] Базова конверсія в HTTP JSON у `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; RBAC — `AppError::Forbidden` + `api_error_response`.
-- [ ] Покрити **усі** публічні handlers узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }` (залишились зокрема `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`, більшість `enterprise_api.rs`).
+- [x] Покрити **основний** публічний REST узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }`: `src/network/api/*` (у т.ч. `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`), **повний** `enterprise_api.rs` (+ попередні модулі з попередніх комітів).
+- [ ] Опційно: **`src/network/auth.rs`** (логін, middleware) — зараз плоский ключ `"error"` у JSON.
 - [ ] За потреби спростити handler’и до `Result<T, AppError>` там, де ще ручні tuple‑відповіді.
 
 **Критерії готовності**:
-- [ ] Всі основні модулі використовують `AppError` / `ErrorContext` у публічних API (HTTP — інкрементально через `api_json_error` / `api_error_response`).
-- [ ] HTTP‑шар завжди повертає узгоджений JSON‑формат помилок (**у процесі**).
+- [x] Усі **основні** HTTP‑модулі в `network/api/` та enterprise router використовують `api_json_error` / `api_error_response` / `ErrorContext` для помилок.
+- [ ] HTTP‑шар **повністю** узгоджений, коли вирівняно **`auth.rs`** (і за потреби WS/інші точки входу).
 - [x] Для шляхів через `api_error_response` / `api_json_error` — структуровані логи (код, контекст, рівень за класом статусу).
 
 ---
@@ -251,9 +252,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Сервіси**: `VmService`, `LibraryService`, `RaidService` (list nodes/artifacts); відповідні API-модулі викликають сервіси, не прямі синглтони в handler’ах для цих маршрутів.
 - Документація: узгоджено **README**, **`docs/README.md`**, **`docs/INDEX_2026-03-17.md`**, **`file_list.csv`** (прибрано зіпсовані рядки).
 
-**Наступній сесії**:
-1. **Priority 2** — `enterprise_service` / `cloud_service` / admin; розширити RaidService; ML pipeline backends; інтеграційні тести з **`--features test-utils`** за потреби.
-2. **Priority 2b** — TurboQuant після стабільних контрактів pipeline (`docs/ml/TURBOQUANT_INTEGRATION.md`).
+**Історично (на момент цього зрізу)** — наступним були P2/P2b; актуальний фокус див. таблицю на початку файлу та **останню** секцію «Верифікація» внизу.
 
 **Перевірка збірки (як у недавніх CI-прогонах)**:
 `K8S_OPENAPI_ENABLED_VERSION=1.28`  
@@ -266,11 +265,17 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Доки / інвентар**: оновлено кореневий [`README.md`](../../README.md) (блок статусу та Next Focus), [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/README.md`](../README.md); у [`file_list.csv`](../../file_list.csv) додано `src/ml/turboquant.rs`.
 - **Код (вже в історії `main`)**: розширений `RaidService`; ML pipeline core steps + TurboQuant; частковий P3 — `api_error_response` для RAID operation errors та enterprise AI-ML pipeline handlers.
-- **Наступній сесії**: продовжити P3 (решта handlers), P4 benchmarks; див. HANDOFF та таблицю пріоритетів на початку цього файлу.
+- **Наступні кроки (актуалізовано пізніше)**: див. верифікацію 2026-04-07 та **2026-04-06 (P3 повний)** нижче.
 
 ## Верифікація 2026-04-07 (P3 розширення + доки + тести)
 
 - **Код (коміт на `main`)**: P3 — `api_json_error`, `AppError::Forbidden`; handlers: `instances`, `libraries`, `vm`, `workers`, `topology`, `rewards`, tenant CRUD у `enterprise_api.rs` (поруч із уже наявними RAID operation + `ai_ml` pipeline).
 - **Тести**: `K8S_OPENAPI_ENABLED_VERSION=1.28` `cargo test --lib --tests --features ml,enterprise,cloud` — успішний прогін з `-j 1` та `--test-threads=1` при обмеженій пам’яті на Windows.
 - **Документація**: узгоджено README, INDEX, HANDOFF, NEXT_STEPS, `docs/README.md`, `development/README.md`; інвентар `file_list.csv` без нових шляхів (ключові файли P3 уже в списку).
+
+## Верифікація 2026-04-06 (P3 — `raid.rs` + повний `enterprise_api.rs`)
+
+- **Код (`main`)**: узгоджені JSON-помилки для **`src/network/api/raid.rs`** (`raid_api_err`, `raid_event_store_unavailable`, …) та **`src/network/enterprise_api.rs`** (хелпер **`enterprise_err`**, security / OAuth / SAML / monitoring / tenant тощо). Раніше в тому ж напрямку: `users`, `ui`, `system`, `completions`, `raid_admin`.
+- **Залишок P3**: **`src/network/auth.rs`** (плоский `"error"` у відповідях) — див. кореневий README «Next Focus» та [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md).
+- **Наступний фокус**: **P4** (бенчмарки / профілювання), опційно **P2** (RAID → `RaidService`), оновлення чекбоксів **TurboQuant** у цьому файлі під наявний код.
 
