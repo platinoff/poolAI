@@ -31,6 +31,6 @@
 - **Status / plans** — `status/`, `development/` (індекс планів: [development/README.md](./development/README.md)).
 - **REST API** — [openapi.yaml](./openapi.yaml) (OpenAPI 3).
 - **UI / admin ↔ API** — [development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md](./development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
-- **Unified API errors (P3)** — `src/network/json_errors.rs`, REST + **`enterprise_api.rs`**, **`raid.rs`**, **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Деталі — [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
+- **Unified API errors (P3)** — `src/network/json_errors.rs`, REST + **`network/enterprise_api/`**, **`raid.rs`**, **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Деталі — [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
 - **Benchmarks (P4)** — [performance/BENCHMARKS.md](./performance/BENCHMARKS.md); baseline (зараз є **dev-sample** — замінити на референс-хост); HTTP — `wrk` вручну; опційно — запуск [benchmarks.yml](../.github/workflows/benchmarks.yml) у Actions.
 - **Архів одноразових нотаток** — [archive/](./archive/) (у т.ч. колишні кореневі `PUSH_*.md`).

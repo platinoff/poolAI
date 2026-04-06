@@ -66,7 +66,7 @@
 
 - **REST під `/api/v1/`** — модульні роутери в `src/network/api/` (`system`, `workers`, `vm`, `raid`, `raid_admin`, `libraries`, `users`, `rewards`, `instances`, `completions`, `topology`, `discovery`, `ui`, `admin`, …). Див. `create_api_routes()` у `api/mod.rs`.
 - **RAID** — додаткові шляхи під `/raid/…` (артефакти, воркери, події, snapshot, GC, strategies, metrics, rebalance, health) через `raid.rs`.
-- **Enterprise** — при `feature enterprise`: маршрути в `enterprise_api.rs` (мультитенантність, audit, monitoring, security).
+- **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
 - **WebSocket** — наприклад `/ws/metrics` (JWT/безпека залежно від конфігурації).
 - **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) описує **частину** публічних шляхів; повний перелік — з коду роутерів і `src/network/mod.rs`.

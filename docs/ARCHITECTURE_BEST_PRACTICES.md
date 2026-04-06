@@ -57,6 +57,7 @@ src/
 │   └── worker_pool_service.rs  # pool workers list / add / remove
 ├── network/            # API layer (modularized)
 │   ├── mod.rs
+│   ├── enterprise_api/ # feature `enterprise`: /api/enterprise (mod.rs, tenants, audit, monitoring, security, oauth, saml)
 │   └── api/            # REST modules (see src/network/api/*.rs)
 │       ├── mod.rs
 │       ├── admin.rs            # GET /admin/overview

@@ -1,6 +1,6 @@
 //! Enterprise-facing operations for the HTTP API (multi-tenancy, audit, security, …).
 //!
-//! Handlers in `network::enterprise_api` stay thin: parse input, call `EnterpriseService`, map to HTTP.
+//! Handlers in `network::enterprise_api` (module tree) stay thin: parse input, call `EnterpriseService`, map to HTTP.
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
