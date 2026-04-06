@@ -15,8 +15,9 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::network::api::common::check_permission;
+use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims, UserRole};
 
 #[derive(Deserialize)]
@@ -58,24 +59,29 @@ async fn users_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse 
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
-        return (
+        let (s, j) = api_json_error(
+            "USER_MANAGER_UNAVAILABLE",
+            format!("User manager not initialized: {}", e),
+            Some(
+                ErrorContext::new("users_list")
+                    .with_hint("Check system startup sequence and user manager wiring."),
+            ),
             StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": format!("User manager not initialized. Context: User manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     match manager.list_users().await {
         Ok(users) => AxumJson(users).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to list users. Context: Cannot retrieve user list. Suggestion: Check system logs. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "LIST_USERS_FAILED",
+                format!("Failed to list users: {}", e),
+                Some(ErrorContext::new("users_list")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -93,24 +99,35 @@ async fn user_create_handler(
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
-        return (
+        let (s, j) = api_json_error(
+            "USER_MANAGER_UNAVAILABLE",
+            format!("User manager not initialized: {}", e),
+            Some(
+                ErrorContext::new("user_create")
+                    .with_hint("Check system startup sequence and user manager wiring."),
+            ),
             StatusCode::SERVICE_UNAVAILABLE,
-            AxumJson(serde_json::json!({
-                "error": format!("User manager not initialized. Context: Cannot create user - user manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
-    match manager.create_user(req.username, req.password, req.role).await {
+    match manager
+        .create_user(req.username, req.password, req.role)
+        .await
+    {
         Ok(user) => AxumJson(user).into_response(),
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to create user. Context: Cannot create new user with specified parameters. Suggestion: Verify username uniqueness and parameters. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "CREATE_USER_FAILED",
+                format!("Failed to create user: {}", e),
+                Some(
+                    ErrorContext::new("user_create")
+                        .with_hint("Verify username uniqueness and request parameters."),
+                ),
+                StatusCode::BAD_REQUEST,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -122,32 +139,36 @@ async fn user_get_handler(
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format for user id: {}", id),
+                Some(ErrorContext::new("user_get").with_resource("user_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
     match manager.get_user(user_id).await {
         Ok(Some(user)) => AxumJson(user).into_response(),
-        Ok(None) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!("User not found. Context: Cannot find user with specified ID. Suggestion: Verify user ID and ensure user exists. User ID: '{}'", id)
-            })),
-        )
-            .into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to retrieve user. Context: Cannot retrieve user information. Suggestion: Check system logs. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Ok(None) => {
+            let (s, j) = api_json_error(
+                "USER_NOT_FOUND",
+                format!("User not found: {}", id),
+                Some(ErrorContext::new("user_get").with_resource("user_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "GET_USER_FAILED",
+                format!("Failed to retrieve user: {}", e),
+                Some(ErrorContext::new("user_get").with_resource("user_id", &id)),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -166,13 +187,13 @@ async fn user_update_handler(
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format for user id: {}", id),
+                Some(ErrorContext::new("user_update").with_resource("user_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -181,13 +202,19 @@ async fn user_update_handler(
         .await
     {
         Ok(user) => AxumJson(user).into_response(),
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to update user. Context: Cannot update user with specified parameters. Suggestion: Verify user ID and update parameters. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "UPDATE_USER_FAILED",
+                format!("Failed to update user: {}", e),
+                Some(
+                    ErrorContext::new("user_update")
+                        .with_resource("user_id", &id)
+                        .with_hint("Verify user ID and update parameters."),
+                ),
+                StatusCode::BAD_REQUEST,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -205,13 +232,13 @@ async fn user_delete_handler(
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format for user id: {}", id),
+                Some(ErrorContext::new("user_delete").with_resource("user_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -223,12 +250,18 @@ async fn user_delete_handler(
             })),
         )
             .into_response(),
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to delete user. Context: Cannot delete user. Suggestion: Verify user ID and ensure user exists. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "DELETE_USER_FAILED",
+                format!("Failed to delete user: {}", e),
+                Some(
+                    ErrorContext::new("user_delete")
+                        .with_resource("user_id", &id)
+                        .with_hint("Verify user ID and ensure the user exists."),
+                ),
+                StatusCode::BAD_REQUEST,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }

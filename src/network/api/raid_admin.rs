@@ -17,8 +17,9 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::network::api::common::check_permission;
+use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::raid::admin::RaidAdmin;
 use crate::raid::{RaidManager, StrategyStatus};
@@ -71,14 +72,15 @@ async fn get_strategy_status_handler(
 
     match admin.get_strategy_status().await {
         Ok(status) => (StatusCode::OK, Json(StrategyStatusResponse { status })).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": "Failed to get strategy status",
-                "message": e.to_string()
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_ADMIN_STRATEGY_STATUS_FAILED",
+                format!("Failed to get strategy status: {}", e),
+                Some(ErrorContext::new("raid_admin_strategy_status")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -106,14 +108,15 @@ async fn trigger_rebalance_handler(
             }),
         )
             .into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": "Failed to trigger rebalancing",
-                "message": e.to_string()
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "RAID_ADMIN_REBALANCE_FAILED",
+                format!("Failed to trigger rebalancing: {}", e),
+                Some(ErrorContext::new("raid_admin_rebalance")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -129,14 +132,15 @@ async fn get_burst_raid_metrics_handler(
         Some(metrics) => {
             (StatusCode::OK, Json(BurstRaidMetricsResponse { metrics })).into_response()
         }
-        None => (
-            StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": "BurstRAID strategy not active",
-                "message": "BurstRAID metrics are only available when BurstRAID strategy is active"
-            })),
-        )
-            .into_response(),
+        None => {
+            let (s, j) = api_json_error(
+                "BURSTRAID_NOT_ACTIVE",
+                "BurstRAID strategy not active; metrics are only available when BurstRAID is active.",
+                Some(ErrorContext::new("raid_admin_burst_metrics")),
+                StatusCode::NOT_FOUND,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -149,17 +153,18 @@ async fn get_small_world_metrics_handler(
     let admin = RaidAdmin::new(raid_manager);
 
     match admin.get_small_world_metrics().await {
-        Some(metrics) => (
-            StatusCode::OK,
-            Json(SmallWorldMetricsResponse { metrics }),
-        ).into_response(),
-        None => (
-            StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": "SmallWorld strategy not active",
-                "message": "SmallWorld metrics are only available when SmallWorld strategy is active"
-            })),
-        ).into_response(),
+        Some(metrics) => {
+            (StatusCode::OK, Json(SmallWorldMetricsResponse { metrics })).into_response()
+        }
+        None => {
+            let (s, j) = api_json_error(
+                "SMALLWORLD_NOT_ACTIVE",
+                "SmallWorld strategy not active; metrics are only available when SmallWorld is active.",
+                Some(ErrorContext::new("raid_admin_smallworld_metrics")),
+                StatusCode::NOT_FOUND,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -173,14 +178,16 @@ async fn get_artifact_burst_stats_handler(
     let artifact_uuid = match Uuid::parse_str(&artifact_id) {
         Ok(uuid) => uuid,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_ARTIFACT_ID",
+                "Artifact ID must be a valid UUID",
+                Some(
+                    ErrorContext::new("raid_admin_artifact_burst_stats")
+                        .with_resource("artifact_id", &artifact_id),
+                ),
                 StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({
-                    "error": "Invalid artifact ID",
-                    "message": "Artifact ID must be a valid UUID"
-                })),
-            )
-                .into_response();
+            );
+            return (s, j).into_response();
         }
     };
 
@@ -188,14 +195,18 @@ async fn get_artifact_burst_stats_handler(
 
     match admin.get_artifact_burst_stats(artifact_uuid).await {
         Some(stats) => (StatusCode::OK, Json(ArtifactBurstStatsResponse { stats })).into_response(),
-        None => (
-            StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": "Artifact burst stats not found",
-                "message": "Artifact is not tracked or BurstRAID strategy is not active"
-            })),
-        )
-            .into_response(),
+        None => {
+            let (s, j) = api_json_error(
+                "ARTIFACT_BURST_STATS_NOT_FOUND",
+                "Artifact burst stats not found; artifact may be untracked or BurstRAID is not active.",
+                Some(
+                    ErrorContext::new("raid_admin_artifact_burst_stats")
+                        .with_resource("artifact_id", &artifact_id),
+                ),
+                StatusCode::NOT_FOUND,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -217,14 +228,20 @@ async fn get_node_clustering_handler(
             }),
         )
             .into_response(),
-        None => (
-            StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": "Node clustering coefficient not found",
-                "message": "Node does not exist or SmallWorld strategy is not active"
-            })),
-        )
-            .into_response(),
+        None => {
+            let (s, j) = api_json_error(
+                "NODE_CLUSTERING_NOT_FOUND",
+                "Node clustering coefficient not found; node may not exist or SmallWorld is not active.",
+                Some(
+                    ErrorContext::new("raid_admin_node_clustering").with_resource(
+                        "node_id",
+                        params.node_id.to_string(),
+                    ),
+                ),
+                StatusCode::NOT_FOUND,
+            );
+            (s, j).into_response()
+        }
     }
 }
 

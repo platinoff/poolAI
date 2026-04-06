@@ -16,8 +16,10 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio_stream::{self as stream, Stream, StreamExt};
 
+use crate::core::error::ErrorContext;
 use crate::core::model_interface::{ModelParameters, ModelRequest};
 use crate::core::state::ApiContext;
+use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
 use crate::runtime::instance::InstanceManager;
 
@@ -214,11 +216,15 @@ async fn chat_completions_handler(
 
                 match response {
                     Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-                    Err(e) => (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
-                    )
-                        .into_response(),
+                    Err(e) => {
+                        let (s, j) = api_json_error(
+                            "internal_error",
+                            e.to_string(),
+                            Some(ErrorContext::new("chat_completion")),
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                        );
+                        (s, j).into_response()
+                    }
                 }
             }
         } else {
@@ -231,11 +237,15 @@ async fn chat_completions_handler(
 
                 match response {
                     Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-                    Err(e) => (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
-                    )
-                        .into_response(),
+                    Err(e) => {
+                        let (s, j) = api_json_error(
+                            "internal_error",
+                            e.to_string(),
+                            Some(ErrorContext::new("chat_completion")),
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                        );
+                        (s, j).into_response()
+                    }
                 }
             }
         }
@@ -249,11 +259,15 @@ async fn chat_completions_handler(
 
             match response {
                 Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-                Err(e) => (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    Json(serde_json::json!({"error": {"message": e.to_string(), "type": "internal_error"}})),
-                )
-                    .into_response(),
+                Err(e) => {
+                    let (s, j) = api_json_error(
+                        "internal_error",
+                        e.to_string(),
+                        Some(ErrorContext::new("chat_completion")),
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                    );
+                    (s, j).into_response()
+                }
             }
         }
     }

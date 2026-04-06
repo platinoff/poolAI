@@ -19,8 +19,9 @@ use axum::{
 use serde::Serialize;
 
 use crate::core::config::{get_config, update_config, PoolAIConfig};
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::network::api::common::check_permission;
+use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{authenticate_user, AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
 use crate::platform;
@@ -625,13 +626,15 @@ async fn login_handler(
 async fn config_get_handler() -> impl IntoResponse {
     match get_config() {
         Ok(config) => Json(config).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": format!("Failed to get configuration: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "CONFIG_GET_FAILED",
+                format!("Failed to get configuration: {}", e),
+                Some(ErrorContext::new("config_get")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -650,12 +653,14 @@ async fn config_update_handler(
             "message": "Configuration updated successfully"
         }))
         .into_response(),
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(serde_json::json!({
-                "error": format!("Failed to update configuration: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "CONFIG_UPDATE_FAILED",
+                format!("Failed to update configuration: {}", e),
+                Some(ErrorContext::new("config_update")),
+                StatusCode::BAD_REQUEST,
+            );
+            (s, j).into_response()
+        }
     }
 }

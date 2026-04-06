@@ -16,11 +16,13 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 #[cfg(feature = "enterprise")]
 use crate::enterprise::monitoring::Dashboard;
 #[cfg(feature = "enterprise")]
 use crate::network::api::check_permission;
+use crate::network::api::common::api_json_error;
 use crate::network::auth::{auth_middleware, Claims};
 use crate::ui::{components, get_all_themes, get_theme};
 
@@ -74,25 +76,30 @@ async fn ui_dashboards_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
     let manager = ctx.enterprise_monitoring_manager.clone();
     match manager.list_dashboards(None).await {
         Ok(dashboards) => AxumJson(dashboards).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to list dashboards: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "LIST_DASHBOARDS_FAILED",
+                format!("Failed to list dashboards: {}", e),
+                Some(ErrorContext::new("ui_dashboards_list")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
 #[cfg(not(feature = "enterprise"))]
 async fn ui_dashboards_handler() -> impl IntoResponse {
-    (
+    let (s, j) = api_json_error(
+        "FEATURE_DISABLED",
+        "Dashboards API requires enterprise feature. Enable with --features enterprise",
+        Some(
+            ErrorContext::new("ui_dashboards_list")
+                .with_hint("Build or run with --features enterprise."),
+        ),
         StatusCode::NOT_IMPLEMENTED,
-        AxumJson(serde_json::json!({
-            "error": "Dashboards API requires enterprise feature. Enable with --features enterprise"
-        })),
-    )
-        .into_response()
+    );
+    (s, AxumJson(j.0)).into_response()
 }
 
 #[cfg(feature = "enterprise")]
@@ -104,44 +111,51 @@ async fn ui_dashboard_get_handler(
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format: {}", id),
+                Some(ErrorContext::new("ui_dashboard_get").with_resource("dashboard_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format: {}", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
     match manager.get_dashboard(uuid).await {
         Ok(Some(dashboard)) => AxumJson(dashboard).into_response(),
-        Ok(None) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!("Dashboard not found: {}", id)
-            })),
-        )
-            .into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to get dashboard: {}", e)
-            })),
-        )
-            .into_response(),
+        Ok(None) => {
+            let (s, j) = api_json_error(
+                "DASHBOARD_NOT_FOUND",
+                format!("Dashboard not found: {}", id),
+                Some(ErrorContext::new("ui_dashboard_get").with_resource("dashboard_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "GET_DASHBOARD_FAILED",
+                format!("Failed to get dashboard: {}", e),
+                Some(ErrorContext::new("ui_dashboard_get").with_resource("dashboard_id", &id)),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
 #[cfg(not(feature = "enterprise"))]
 async fn ui_dashboard_get_handler(Path(_id): Path<String>) -> impl IntoResponse {
-    (
+    let (s, j) = api_json_error(
+        "FEATURE_DISABLED",
+        "Dashboards API requires enterprise feature. Enable with --features enterprise",
+        Some(
+            ErrorContext::new("ui_dashboard_get")
+                .with_hint("Build or run with --features enterprise."),
+        ),
         StatusCode::NOT_IMPLEMENTED,
-        AxumJson(serde_json::json!({
-            "error": "Dashboards API requires enterprise feature. Enable with --features enterprise"
-        })),
-    )
-        .into_response()
+    );
+    (s, AxumJson(j.0)).into_response()
 }
 
 #[cfg(feature = "enterprise")]
@@ -157,13 +171,13 @@ async fn ui_dashboard_create_handler(
     }
 
     if payload.name.is_empty() {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            "Dashboard name cannot be empty",
+            Some(ErrorContext::new("ui_dashboard_create").with_resource("field", "name")),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": "Dashboard name cannot be empty".to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     let manager = ctx.enterprise_monitoring_manager.clone();
@@ -180,13 +194,15 @@ async fn ui_dashboard_create_handler(
 
     match manager.create_dashboard(dashboard.clone()).await {
         Ok(_) => (StatusCode::CREATED, AxumJson(dashboard)).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to create dashboard: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "CREATE_DASHBOARD_FAILED",
+                format!("Failed to create dashboard: {}", e),
+                Some(ErrorContext::new("ui_dashboard_create")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -195,13 +211,16 @@ async fn ui_dashboard_create_handler(
     Extension(_claims): Extension<Claims>,
     Json(_payload): Json<CreateDashboardRequest>,
 ) -> impl IntoResponse {
-    (
+    let (s, j) = api_json_error(
+        "FEATURE_DISABLED",
+        "Dashboards API requires enterprise feature. Enable with --features enterprise",
+        Some(
+            ErrorContext::new("ui_dashboard_create")
+                .with_hint("Build or run with --features enterprise."),
+        ),
         StatusCode::NOT_IMPLEMENTED,
-        AxumJson(serde_json::json!({
-            "error": "Dashboards API requires enterprise feature. Enable with --features enterprise"
-        })),
-    )
-        .into_response()
+    );
+    (s, AxumJson(j.0)).into_response()
 }
 
 #[cfg(feature = "enterprise")]
@@ -221,13 +240,13 @@ async fn ui_dashboard_update_handler(
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "INVALID_UUID",
+                format!("Invalid UUID format: {}", id),
+                Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
                 StatusCode::BAD_REQUEST,
-                AxumJson(serde_json::json!({
-                    "error": format!("Invalid UUID format: {}", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -235,22 +254,22 @@ async fn ui_dashboard_update_handler(
     let existing = match manager.get_dashboard(uuid).await {
         Ok(Some(d)) => d,
         Ok(None) => {
-            return (
+            let (s, j) = api_json_error(
+                "DASHBOARD_NOT_FOUND",
+                format!("Dashboard not found: {}", id),
+                Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
                 StatusCode::NOT_FOUND,
-                AxumJson(serde_json::json!({
-                    "error": format!("Dashboard not found: {}", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
         Err(e) => {
-            return (
+            let (s, j) = api_json_error(
+                "GET_DASHBOARD_FAILED",
+                format!("Failed to get dashboard: {}", e),
+                Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
                 StatusCode::INTERNAL_SERVER_ERROR,
-                AxumJson(serde_json::json!({
-                    "error": format!("Failed to get dashboard: {}", e)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -268,13 +287,15 @@ async fn ui_dashboard_update_handler(
 
     match manager.create_dashboard(updated.clone()).await {
         Ok(_) => AxumJson(updated).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to update dashboard: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "UPDATE_DASHBOARD_FAILED",
+                format!("Failed to update dashboard: {}", e),
+                Some(ErrorContext::new("ui_dashboard_update").with_resource("dashboard_id", &id)),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -284,13 +305,16 @@ async fn ui_dashboard_update_handler(
     Path(_id): Path<String>,
     Json(_payload): Json<CreateDashboardRequest>,
 ) -> impl IntoResponse {
-    (
+    let (s, j) = api_json_error(
+        "FEATURE_DISABLED",
+        "Dashboards API requires enterprise feature. Enable with --features enterprise",
+        Some(
+            ErrorContext::new("ui_dashboard_update")
+                .with_hint("Build or run with --features enterprise."),
+        ),
         StatusCode::NOT_IMPLEMENTED,
-        AxumJson(serde_json::json!({
-            "error": "Dashboards API requires enterprise feature. Enable with --features enterprise"
-        })),
-    )
-        .into_response()
+    );
+    (s, AxumJson(j.0)).into_response()
 }
 
 #[cfg(feature = "enterprise")]
@@ -305,15 +329,19 @@ async fn ui_dashboard_delete_handler(
     }
 
     // Note: MonitoringManager doesn't have delete_dashboard() yet
-    // For now, return not implemented
-    (
+    let (s, j) = api_json_error(
+        "NOT_IMPLEMENTED",
+        "Dashboard deletion not yet implemented; MonitoringManager.delete_dashboard() is not available.",
+        Some(
+            ErrorContext::new("ui_dashboard_delete")
+                .with_resource("dashboard_id", &id)
+                .with_hint(
+                    "Add delete_dashboard() to MonitoringManager or mark deleted via dashboard update.",
+                ),
+        ),
         StatusCode::NOT_IMPLEMENTED,
-        AxumJson(serde_json::json!({
-            "error": "Dashboard deletion not yet implemented. Context: MonitoringManager.delete_dashboard() method is not available. Suggestion: Add delete_dashboard() method to MonitoringManager or use dashboard update to mark as deleted.",
-            "message": format!("Dashboard deletion requested for: {}", id)
-        })),
-    )
-        .into_response()
+    );
+    (s, AxumJson(j.0)).into_response()
 }
 
 #[cfg(not(feature = "enterprise"))]
@@ -321,13 +349,16 @@ async fn ui_dashboard_delete_handler(
     Extension(_claims): Extension<Claims>,
     Path(_id): Path<String>,
 ) -> impl IntoResponse {
-    (
+    let (s, j) = api_json_error(
+        "FEATURE_DISABLED",
+        "Dashboards API requires enterprise feature. Enable with --features enterprise",
+        Some(
+            ErrorContext::new("ui_dashboard_delete")
+                .with_hint("Build or run with --features enterprise."),
+        ),
         StatusCode::NOT_IMPLEMENTED,
-        AxumJson(serde_json::json!({
-            "error": "Dashboards API requires enterprise feature. Enable with --features enterprise"
-        })),
-    )
-        .into_response()
+    );
+    (s, AxumJson(j.0)).into_response()
 }
 
 // ============================================================================
@@ -428,13 +459,16 @@ async fn ui_component_get_handler(Path(name): Path<String>) -> impl IntoResponse
             description: Some("Form component for input fields and validation".to_string()),
         },
         _ => {
-            return (
+            let (s, j) = api_json_error(
+                "COMPONENT_NOT_FOUND",
+                format!(
+                    "Component not found: {}. Available components: button, card, form",
+                    name
+                ),
+                Some(ErrorContext::new("ui_component_get").with_resource("component", &name)),
                 StatusCode::NOT_FOUND,
-                AxumJson(serde_json::json!({
-                    "error": format!("Component not found: {}. Available components: button, card, form", name)
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
