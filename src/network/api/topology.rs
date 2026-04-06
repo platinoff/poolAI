@@ -15,7 +15,9 @@ use axum::{
 use serde::Serialize;
 use std::collections::HashMap;
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
+use crate::network::api::common::api_json_error;
 
 /// Topology response
 #[derive(Serialize)]
@@ -92,11 +94,13 @@ async fn topology_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
 
         (StatusCode::OK, Json(response)).into_response()
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Topology manager not initialized",
+            Some(ErrorContext::new("topology").with_resource("topology_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Topology manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -113,11 +117,15 @@ async fn latency_matrix_handler(State(ctx): State<ApiContext>) -> impl IntoRespo
 
         (StatusCode::OK, Json(response)).into_response()
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Topology manager not initialized",
+            Some(
+                ErrorContext::new("topology_latency").with_resource("topology_manager", "default"),
+            ),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Topology manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -148,11 +156,13 @@ async fn all_nodes_resources_handler(State(ctx): State<ApiContext>) -> impl Into
         let response = AllNodesResourcesResponse { nodes };
         (StatusCode::OK, Json(response)).into_response()
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Topology manager not initialized",
+            Some(ErrorContext::new("topology_nodes").with_resource("topology_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Topology manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -179,17 +189,21 @@ async fn node_resources_handler(
 
             (StatusCode::OK, Json(response)).into_response()
         } else {
-            (
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                format!("Node '{}' not found", node_id),
+                Some(ErrorContext::new("node_resources").with_resource("node_id", &node_id)),
                 StatusCode::NOT_FOUND,
-                Json(serde_json::json!({"error": format!("Node '{}' not found", node_id)})),
-            )
-                .into_response()
+            );
+            (s, Json(j.0)).into_response()
         }
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Topology manager not initialized",
+            Some(ErrorContext::new("node_resources").with_resource("topology_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Topology manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }

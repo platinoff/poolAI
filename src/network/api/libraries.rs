@@ -14,20 +14,25 @@ use axum::{
     Json as AxumJson, Router,
 };
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::libs::LibraryType;
-use crate::network::api::common::check_permission;
+use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::services::library_service::{LibraryMutationError, LibraryService, LibraryServiceError};
 
 type LibHttpErr = (StatusCode, AxumJson<serde_json::Value>);
 
 fn library_manager_unavailable() -> LibHttpErr {
-    (
+    api_json_error(
+        "SUBSYSTEM_UNAVAILABLE",
+        crate::services::library_service::LIBRARY_MANAGER_UNAVAILABLE_MESSAGE,
+        Some(
+            ErrorContext::new("libraries")
+                .with_resource("library_manager", "default")
+                .with_hint("Initialize the library manager during startup."),
+        ),
         StatusCode::SERVICE_UNAVAILABLE,
-        AxumJson(serde_json::json!({
-            "error": crate::services::library_service::LIBRARY_MANAGER_UNAVAILABLE_MESSAGE
-        })),
     )
 }
 
@@ -73,13 +78,15 @@ async fn library_info_handler(
 ) -> impl IntoResponse {
     match LibraryService::get_library(&ctx, &name).await {
         Ok(Some(lib)) => AxumJson(lib).into_response(),
-        Ok(None) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!("Library {} not found", name)
-            })),
-        )
-            .into_response(),
+        Ok(None) => {
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                format!("Library {} not found", name),
+                Some(ErrorContext::new("get_library").with_resource("library", &name)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
         Err(e) => library_service_err(e).into_response(),
     }
 }
@@ -96,14 +103,27 @@ async fn library_install_handler(
 
     match LibraryService::install_library(&ctx, &name, version, LibraryType::ModelLibrary).await {
         Ok(lib) => AxumJson(lib).into_response(),
-        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
-        Err(LibraryMutationError::Operation(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to install library. Context: Cannot install library from registry. Suggestion: Verify library name and version exist, check network connectivity, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", name, version, e)
-            })),
-        )
-            .into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => {
+            library_manager_unavailable().into_response()
+        }
+        Err(LibraryMutationError::Operation(e)) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!(
+                    "Failed to install library from registry: {} (library='{}', version='{}')",
+                    e, name, version
+                ),
+                Some(
+                    ErrorContext::new("install_library")
+                        .with_resource("library", &name)
+                        .with_hint(
+                            "Verify name/version, connectivity, disk space, and manager state.",
+                        ),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -124,14 +144,22 @@ async fn library_uninstall_handler(
             "message": format!("Library {} uninstalled successfully", name)
         }))
         .into_response(),
-        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
-        Err(LibraryMutationError::Operation(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to uninstall library. Context: Cannot remove library from system. Suggestion: Verify library is installed, check for active dependencies, ensure library is not in use, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
-            })),
-        )
-            .into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => {
+            library_manager_unavailable().into_response()
+        }
+        Err(LibraryMutationError::Operation(e)) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!("Failed to uninstall library: {} (library='{}')", e, name),
+                Some(
+                    ErrorContext::new("uninstall_library")
+                        .with_resource("library", &name)
+                        .with_hint("Ensure the library is installed, not in use, and has no blocking dependencies."),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -149,14 +177,22 @@ async fn library_update_handler(
 
     match LibraryService::update_library(&ctx, &name).await {
         Ok(lib) => AxumJson(lib).into_response(),
-        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
-        Err(LibraryMutationError::Operation(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to update library. Context: Cannot update library to newer version. Suggestion: Verify library is installed, check for available updates, ensure sufficient disk space, and verify library manager is initialized. Library: '{}', Error: {}", name, e)
-            })),
-        )
-            .into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => {
+            library_manager_unavailable().into_response()
+        }
+        Err(LibraryMutationError::Operation(e)) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!("Failed to update library: {} (library='{}')", e, name),
+                Some(
+                    ErrorContext::new("update_library")
+                        .with_resource("library", &name)
+                        .with_hint("Verify the library is installed and updates are available."),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -189,13 +225,24 @@ async fn library_upload_handler(
     .await
     {
         Ok(lib) => AxumJson(lib).into_response(),
-        Err(LibraryMutationError::ManagerUnavailable) => library_manager_unavailable().into_response(),
-        Err(LibraryMutationError::Operation(e)) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to upload library. Context: Cannot upload and install library from base64 data. Suggestion: Verify base64 data is valid, check disk space, ensure sufficient permissions, and verify library manager is initialized. Library: '{}', Version: '{}', Error: {}", payload.name, payload.version, e)
-            })),
-        )
-            .into_response(),
+        Err(LibraryMutationError::ManagerUnavailable) => {
+            library_manager_unavailable().into_response()
+        }
+        Err(LibraryMutationError::Operation(e)) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!(
+                    "Failed to upload library: {} (library='{}', version='{}')",
+                    e, payload.name, payload.version
+                ),
+                Some(
+                    ErrorContext::new("upload_library")
+                        .with_resource("library", &payload.name)
+                        .with_hint("Verify base64 payload, disk space, and permissions."),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }

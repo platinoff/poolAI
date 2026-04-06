@@ -14,7 +14,9 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
+use crate::network::api::common::api_json_error;
 use crate::network::auth::auth_middleware;
 use crate::network::validation;
 use crate::pool;
@@ -120,26 +122,26 @@ async fn worker_create_handler(
 ) -> impl IntoResponse {
     // Validate worker ID format
     if let Err(e) = validation::validate_worker_id(&payload.worker_id) {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            e.to_string(),
+            Some(ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id)),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     // Get pool from application context
     let pool = match ctx.pool.get() {
         Some(p) => p,
         None => {
-            return (
+            let (s, j) = api_json_error(
+                "SUBSYSTEM_UNAVAILABLE",
+                "Pool not initialized; worker pool manager is not available",
+                Some(ErrorContext::new("create_worker").with_resource("pool", "default")),
                 StatusCode::SERVICE_UNAVAILABLE,
-                AxumJson(serde_json::json!({
-                    "error": "Pool not initialized. Context: Worker pool manager is not available. Suggestion: Ensure pool is initialized before creating or managing workers. Check system startup sequence and pool initialization status."
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -160,13 +162,13 @@ async fn worker_create_handler(
         max_memory_mb,
         cpu_priority,
     ) {
-        return (
+        let (s, j) = api_json_error(
+            "VALIDATION_ERROR",
+            e.to_string(),
+            Some(ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id)),
             StatusCode::BAD_REQUEST,
-            AxumJson(serde_json::json!({
-                "error": e.to_string()
-            })),
-        )
-            .into_response();
+        );
+        return (s, AxumJson(j.0)).into_response();
     }
 
     // Create worker config
@@ -200,13 +202,21 @@ async fn worker_create_handler(
             };
             (StatusCode::CREATED, AxumJson(response)).into_response()
         }
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to create worker. Context: Cannot add new worker to pool. Suggestion: Verify pool is initialized, check worker ID is unique, and ensure resource limits are not exceeded. Worker ID: '{}', Error: {}", payload.worker_id, e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!(
+                    "Failed to create worker: {} (worker_id='{}')",
+                    e, payload.worker_id
+                ),
+                Some(
+                    ErrorContext::new("create_worker")
+                        .with_resource("worker_id", &payload.worker_id),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }
 
@@ -217,13 +227,13 @@ async fn worker_delete_handler(
     let pool = match ctx.pool.get() {
         Some(p) => p,
         None => {
-            return (
+            let (s, j) = api_json_error(
+                "SUBSYSTEM_UNAVAILABLE",
+                "Pool not initialized; worker pool manager is not available",
+                Some(ErrorContext::new("delete_worker").with_resource("pool", "default")),
                 StatusCode::SERVICE_UNAVAILABLE,
-                AxumJson(serde_json::json!({
-                    "error": "Pool not initialized. Context: Worker pool manager is not available. Suggestion: Ensure pool is initialized before creating or managing workers. Check system startup sequence and pool initialization status."
-                })),
-            )
-                .into_response();
+            );
+            return (s, AxumJson(j.0)).into_response();
         }
     };
 
@@ -237,12 +247,14 @@ async fn worker_delete_handler(
             };
             AxumJson(response).into_response()
         }
-        Err(e) => (
-            StatusCode::NOT_FOUND,
-            AxumJson(serde_json::json!({
-                "error": format!("Failed to delete worker. Context: Cannot remove worker from pool. Suggestion: Verify worker ID exists, ensure worker is not processing critical tasks, and check pool status. Worker ID: '{}', Error: {}", worker_id, e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                format!("Failed to delete worker: {} (worker_id='{}')", e, worker_id),
+                Some(ErrorContext::new("delete_worker").with_resource("worker_id", &worker_id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
     }
 }

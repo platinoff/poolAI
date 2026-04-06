@@ -99,6 +99,8 @@ pub enum AppError {
     TimeoutError(String),
     #[error("Validation error: {0}")]
     ValidationError(String),
+    #[error("Forbidden: {0}")]
+    Forbidden(String),
     #[error("Initialization error: {0}")]
     InitializationError(String),
     #[error("Shutdown error: {0}")]
@@ -186,6 +188,7 @@ impl AppError {
             AppError::MemoryError(msg) => error!("Memory error: {}", msg),
             AppError::TimeoutError(msg) => error!("Timeout error: {}", msg),
             AppError::ValidationError(msg) => error!("Validation error: {}", msg),
+            AppError::Forbidden(msg) => warn!("Forbidden: {}", msg),
             AppError::InitializationError(msg) => error!("Initialization error: {}", msg),
             AppError::ShutdownError(msg) => error!("Shutdown error: {}", msg),
             AppError::IoError(e) => error!("IO error: {}", e),
@@ -342,6 +345,7 @@ impl AppError {
             AppError::MemoryError(_) => "MEMORY_ERROR",
             AppError::TimeoutError(_) => "TIMEOUT_ERROR",
             AppError::ValidationError(_) => "VALIDATION_ERROR",
+            AppError::Forbidden(_) => "FORBIDDEN",
             AppError::InitializationError(_) => "INITIALIZATION_ERROR",
             AppError::ShutdownError(_) => "SHUTDOWN_ERROR",
             AppError::IoError(_) => "IO_ERROR",
@@ -428,6 +432,10 @@ mod tests {
             AppError::ValidationError("test".to_string()).error_code(),
             "VALIDATION_ERROR"
         );
+        assert_eq!(
+            AppError::Forbidden("nope".to_string()).error_code(),
+            "FORBIDDEN"
+        );
         assert_eq!(AppError::Unknown.error_code(), "UNKNOWN_ERROR");
     }
 
@@ -442,6 +450,7 @@ mod tests {
         assert!(AppError::MemoryError("test".to_string()).is_recoverable());
         assert!(AppError::TimeoutError("test".to_string()).is_recoverable());
         assert!(!AppError::ValidationError("test".to_string()).is_recoverable());
+        assert!(!AppError::Forbidden("test".to_string()).is_recoverable());
         assert!(!AppError::Unknown.is_recoverable());
     }
 

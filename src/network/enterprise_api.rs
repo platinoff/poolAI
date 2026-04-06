@@ -7,6 +7,8 @@
 //! - Advanced monitoring
 
 #[cfg(feature = "enterprise")]
+use crate::core::error::ErrorContext;
+#[cfg(feature = "enterprise")]
 use crate::core::oauth2_pending::{store_oauth2_pending, verify_oauth2_pending};
 #[cfg(feature = "enterprise")]
 use crate::core::state::ApiContext;
@@ -14,6 +16,8 @@ use crate::core::state::ApiContext;
 use crate::enterprise;
 #[cfg(feature = "enterprise")]
 use crate::network::api::check_permission;
+#[cfg(feature = "enterprise")]
+use crate::network::api::common::api_json_error;
 #[cfg(feature = "enterprise")]
 use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
@@ -170,13 +174,18 @@ pub fn create_enterprise_api_routes() -> Router<ApiContext> {
 async fn tenants_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     match EnterpriseService::list_tenants(&ctx).await {
         Ok(tenants) => Json(tenants).into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": format!("Failed to list tenants. Context: Cannot retrieve tenant list. Suggestion: Check system logs and tenant manager initialization status. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!(
+                    "Failed to list tenants. Context: Cannot retrieve tenant list. Suggestion: Check system logs and tenant manager initialization status. Error: {}",
+                    e
+                ),
+                Some(ErrorContext::new("list_tenants")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -194,20 +203,30 @@ async fn tenant_create_handler(
 ) -> impl IntoResponse {
     match EnterpriseService::create_tenant(&ctx, req.name, req.config).await {
         Ok(tenant) => Json(tenant).into_response(),
-        Err(TenantCreateError::Init(e)) => (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Tenant manager not initialized. Context: Cannot create tenant - tenant manager initialization failed. Suggestion: Check system startup sequence and tenant manager initialization status. Error: {}", e)
-            })),
-        )
-            .into_response(),
-        Err(TenantCreateError::Create(e)) => (
-            StatusCode::BAD_REQUEST,
-            Json(serde_json::json!({
-                "error": format!("Failed to create tenant. Context: Cannot create new tenant with specified configuration. Suggestion: Verify tenant name and configuration parameters. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(TenantCreateError::Init(e)) => {
+            let (s, j) = api_json_error(
+                "SUBSYSTEM_UNAVAILABLE",
+                format!(
+                    "Tenant manager not initialized. Context: Cannot create tenant - tenant manager initialization failed. Suggestion: Check system startup sequence and tenant manager initialization status. Error: {}",
+                    e
+                ),
+                Some(ErrorContext::new("create_tenant").with_resource("tenant_manager", "default")),
+                StatusCode::SERVICE_UNAVAILABLE,
+            );
+            (s, j).into_response()
+        }
+        Err(TenantCreateError::Create(e)) => {
+            let (s, j) = api_json_error(
+                "VALIDATION_ERROR",
+                format!(
+                    "Failed to create tenant. Context: Cannot create new tenant with specified configuration. Suggestion: Verify tenant name and configuration parameters. Error: {}",
+                    e
+                ),
+                Some(ErrorContext::new("create_tenant")),
+                StatusCode::BAD_REQUEST,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -219,32 +238,45 @@ async fn tenant_get_handler(
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "VALIDATION_ERROR",
+                format!(
+                    "Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'",
+                    id
+                ),
+                Some(ErrorContext::new("get_tenant").with_resource("tenant_id", &id)),
                 StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({
-                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format (e.g., '550e8400-e29b-41d4-a716-446655440000'). Provided ID: '{}'", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, j).into_response();
         }
     };
 
     match EnterpriseService::get_tenant(&ctx, tenant_id).await {
         Ok(Some(tenant)) => Json(tenant).into_response(),
-        Ok(None) => (
-            StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": format!("Tenant not found. Context: Cannot find tenant with specified ID. Suggestion: Verify tenant ID and ensure tenant exists. Tenant ID: '{}'", id)
-            })),
-        )
-            .into_response(),
-        Err(e) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(serde_json::json!({
-                "error": format!("Failed to retrieve tenant. Context: Cannot retrieve tenant information. Suggestion: Check system logs and tenant manager status. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Ok(None) => {
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                format!(
+                    "Tenant not found. Context: Cannot find tenant with specified ID. Suggestion: Verify tenant ID and ensure tenant exists. Tenant ID: '{}'",
+                    id
+                ),
+                Some(ErrorContext::new("get_tenant").with_resource("tenant_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, j).into_response()
+        }
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "INTERNAL_ERROR",
+                format!(
+                    "Failed to retrieve tenant. Context: Cannot retrieve tenant information. Suggestion: Check system logs and tenant manager status. Error: {}",
+                    e
+                ),
+                Some(ErrorContext::new("get_tenant").with_resource("tenant_id", &id)),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -270,25 +302,33 @@ async fn tenant_update_handler(
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "VALIDATION_ERROR",
+                format!(
+                    "Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'",
+                    id
+                ),
+                Some(ErrorContext::new("update_tenant").with_resource("tenant_id", &id)),
                 StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({
-                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, j).into_response();
         }
     };
 
     match EnterpriseService::update_tenant(&ctx, tenant_id, req.config, req.active).await {
         Ok(tenant) => Json(tenant).into_response(),
-        Err(e) => (
-            StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": format!("Failed to update tenant. Context: Cannot update tenant. Suggestion: Verify tenant ID and ensure tenant exists. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                format!(
+                    "Failed to update tenant. Context: Cannot update tenant. Suggestion: Verify tenant ID and ensure tenant exists. Error: {}",
+                    e
+                ),
+                Some(ErrorContext::new("update_tenant").with_resource("tenant_id", &id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, j).into_response()
+        }
     }
 }
 
@@ -300,13 +340,16 @@ async fn tenant_delete_handler(
     let tenant_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            return (
+            let (s, j) = api_json_error(
+                "VALIDATION_ERROR",
+                format!(
+                    "Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'",
+                    id
+                ),
+                Some(ErrorContext::new("delete_tenant").with_resource("tenant_id", &id)),
                 StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({
-                    "error": format!("Invalid UUID format. Context: Cannot parse UUID from provided identifier. Suggestion: Ensure UUID follows standard format. Provided ID: '{}'", id)
-                })),
-            )
-                .into_response();
+            );
+            return (s, j).into_response();
         }
     };
 
@@ -318,13 +361,18 @@ async fn tenant_delete_handler(
             })),
         )
             .into_response(),
-        Err(e) => (
-            StatusCode::BAD_REQUEST,
-            Json(serde_json::json!({
-                "error": format!("Failed to delete tenant. Context: Cannot delete tenant. Suggestion: Ensure tenant has no active resources. Error: {}", e)
-            })),
-        )
-            .into_response(),
+        Err(e) => {
+            let (s, j) = api_json_error(
+                "VALIDATION_ERROR",
+                format!(
+                    "Failed to delete tenant. Context: Cannot delete tenant. Suggestion: Ensure tenant has no active resources. Error: {}",
+                    e
+                ),
+                Some(ErrorContext::new("delete_tenant").with_resource("tenant_id", &id)),
+                StatusCode::BAD_REQUEST,
+            );
+            (s, j).into_response()
+        }
     }
 }
 

@@ -16,8 +16,10 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::core::error::ErrorContext;
 use crate::core::model_interface::{GpuRequirements, ModelInfo};
 use crate::core::state::ApiContext;
+use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
 use crate::runtime::instance::InstancePlacement;
 
@@ -96,11 +98,15 @@ async fn instance_previews_handler(
     let model_id = match params.get("model_id") {
         Some(id) => id,
         None => {
-            return (
+            let (s, j) = api_json_error(
+                "VALIDATION_ERROR",
+                "model_id query parameter is required",
+                Some(
+                    ErrorContext::new("instance_previews").with_resource("query_param", "model_id"),
+                ),
                 StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({"error": "model_id parameter required"})),
-            )
-                .into_response();
+            );
+            return (s, Json(j.0)).into_response();
         }
     };
 
@@ -137,18 +143,28 @@ async fn instance_previews_handler(
                 let response = InstancePreviewResponse { previews };
                 (StatusCode::OK, Json(response)).into_response()
             }
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({"error": e.to_string()})),
-            )
-                .into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "INTERNAL_ERROR",
+                    e.to_string(),
+                    Some(
+                        ErrorContext::new("instance_previews").with_resource("model_id", model_id),
+                    ),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, Json(j.0)).into_response()
+            }
         }
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Instance manager not initialized",
+            Some(
+                ErrorContext::new("instance_previews").with_resource("instance_manager", "default"),
+            ),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Instance manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -196,18 +212,24 @@ async fn instance_create_handler(
                 };
                 (StatusCode::OK, Json(response)).into_response()
             }
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({"error": e.to_string()})),
-            )
-                .into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "INTERNAL_ERROR",
+                    e.to_string(),
+                    Some(ErrorContext::new("create_instance")),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, Json(j.0)).into_response()
+            }
         }
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Instance manager not initialized",
+            Some(ErrorContext::new("create_instance").with_resource("instance_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Instance manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -236,11 +258,13 @@ async fn instance_list_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
         };
         (StatusCode::OK, Json(response)).into_response()
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Instance manager not initialized",
+            Some(ErrorContext::new("list_instances").with_resource("instance_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Instance manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -264,18 +288,22 @@ async fn instance_get_handler(
             };
             (StatusCode::OK, Json(info)).into_response()
         } else {
-            (
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                "Instance not found",
+                Some(ErrorContext::new("get_instance").with_resource("instance_id", &id)),
                 StatusCode::NOT_FOUND,
-                Json(serde_json::json!({"error": "Instance not found"})),
-            )
-                .into_response()
+            );
+            (s, Json(j.0)).into_response()
         }
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Instance manager not initialized",
+            Some(ErrorContext::new("get_instance").with_resource("instance_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Instance manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -295,18 +323,24 @@ async fn instance_delete_handler(
                 Json(serde_json::json!({"message": "Instance deleted"})),
             )
                 .into_response(),
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({"error": e.to_string()})),
-            )
-                .into_response(),
+            Err(e) => {
+                let (s, j) = api_json_error(
+                    "INTERNAL_ERROR",
+                    e.to_string(),
+                    Some(ErrorContext::new("delete_instance").with_resource("instance_id", &id)),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                );
+                (s, Json(j.0)).into_response()
+            }
         }
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Instance manager not initialized",
+            Some(ErrorContext::new("delete_instance").with_resource("instance_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Instance manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 
@@ -333,11 +367,13 @@ async fn state_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
 
         (StatusCode::OK, Json(state)).into_response()
     } else {
-        (
+        let (s, j) = api_json_error(
+            "SUBSYSTEM_UNAVAILABLE",
+            "Instance manager not initialized",
+            Some(ErrorContext::new("state").with_resource("instance_manager", "default")),
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({"error": "Instance manager not initialized"})),
-        )
-            .into_response()
+        );
+        (s, Json(j.0)).into_response()
     }
 }
 

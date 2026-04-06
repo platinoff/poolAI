@@ -6,9 +6,11 @@
 //! - Get user progress
 //! - Get top users
 
-use axum::{extract::Path, response::IntoResponse, routing::get, Json, Router};
+use axum::{extract::Path, http::StatusCode, response::IntoResponse, routing::get, Json, Router};
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
+use crate::network::api::common::api_json_error;
 use crate::rewards::{get_reward_statistics, get_top_users, get_user_progress, get_user_rewards};
 
 /// Create rewards system routes
@@ -35,13 +37,15 @@ async fn user_progress_handler(Path(user_id): Path<String>) -> impl IntoResponse
     let progress = get_user_progress(&user_id).await;
     match progress {
         Some(progress) => Json(progress).into_response(),
-        None => (
-            axum::http::StatusCode::NOT_FOUND,
-            Json(serde_json::json!({
-                "error": "User not found"
-            })),
-        )
-            .into_response(),
+        None => {
+            let (s, j) = api_json_error(
+                "NOT_FOUND",
+                "User not found",
+                Some(ErrorContext::new("user_progress").with_resource("user_id", &user_id)),
+                StatusCode::NOT_FOUND,
+            );
+            (s, Json(j.0)).into_response()
+        }
     }
 }
 

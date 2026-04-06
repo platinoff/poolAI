@@ -15,6 +15,7 @@ pub fn http_status_for_app_error(err: &AppError) -> StatusCode {
     use AppError::*;
     match err {
         ValidationError(_) | SerializationError(_) | ModelError(_) => StatusCode::BAD_REQUEST,
+        Forbidden(_) => StatusCode::FORBIDDEN,
         TimeoutError(_) => StatusCode::GATEWAY_TIMEOUT,
         NetworkError(_) => StatusCode::BAD_GATEWAY,
         PoolError(_) | MonitoringError(_) | GpuError(_) | MemoryError(_) | ShutdownError(_) => {
@@ -68,6 +69,47 @@ pub fn api_error_response(
     (status, Json(root))
 }
 
+/// JSON error body matching [`api_error_response`], with an arbitrary machine-readable `code`.
+///
+/// Use when the failure is not represented as an [`AppError`] (e.g. subsystem unavailable strings).
+pub fn api_json_error(
+    code: impl AsRef<str>,
+    message: impl Into<String>,
+    ctx: Option<ErrorContext>,
+    status: StatusCode,
+) -> (StatusCode, Json<Value>) {
+    let message = message.into();
+    let code_ref = code.as_ref();
+    if status.is_server_error() {
+        error!(
+            code = %code_ref,
+            message = %message,
+            ?ctx,
+            "API error response (structured)"
+        );
+    } else {
+        warn!(
+            code = %code_ref,
+            message = %message,
+            ?ctx,
+            "API client error response (structured)"
+        );
+    }
+
+    let mut root = serde_json::json!({
+        "error": {
+            "code": code_ref,
+            "message": message,
+        }
+    });
+    if let Some(c) = ctx {
+        if let Ok(v) = serde_json::to_value(&c) {
+            root["context"] = v;
+        }
+    }
+    (status, Json(root))
+}
+
 /// Helper function to check RBAC permissions
 ///
 /// # Errors
@@ -81,14 +123,15 @@ pub fn check_permission(
         .permissions
         .contains(&required_permission.to_string())
     {
-        return Err((
-            StatusCode::FORBIDDEN,
-            Json(serde_json::json!({
-                "error": format!("Permission denied. Context: User does not have required permission '{}'. Suggestion: Ensure user has appropriate roles and permissions.", required_permission),
-                "required": required_permission,
-                "user_permissions": claims.permissions
-            })),
+        let err = AppError::Forbidden(format!(
+            "Missing required permission '{}'",
+            required_permission
         ));
+        let ctx = ErrorContext::new("check_permission")
+            .with_resource("permission", required_permission)
+            .with_details(format!("user_permissions={:?}", claims.permissions))
+            .with_hint("Ensure the user has a role that grants this permission.");
+        return Err(api_error_response(&err, Some(ctx), None));
     }
     Ok(())
 }
@@ -138,5 +181,25 @@ mod tests {
         let e = AppError::ModelError("x".into());
         let (st, _) = api_error_response(&e, None, Some(StatusCode::NOT_FOUND));
         assert_eq!(st, StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn http_status_forbidden() {
+        let e = AppError::Forbidden("no".into());
+        assert_eq!(http_status_for_app_error(&e), StatusCode::FORBIDDEN);
+    }
+
+    #[test]
+    fn api_json_error_shape() {
+        let (st, Json(v)) = api_json_error(
+            "NOT_FOUND",
+            "missing",
+            Some(ErrorContext::new("op")),
+            StatusCode::NOT_FOUND,
+        );
+        assert_eq!(st, StatusCode::NOT_FOUND);
+        assert_eq!(v["error"]["code"], "NOT_FOUND");
+        assert_eq!(v["error"]["message"], "missing");
+        assert!(v.get("context").is_some());
     }
 }
