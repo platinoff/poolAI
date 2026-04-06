@@ -23,8 +23,8 @@
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
-| **2** | **Priority 2** | Розширити **`src/services/`** (enterprise, cloud, admin); **Stage 4.4** — ML pipeline backends. Є: **`RaidService`**, **`VmService`**, **`LibraryService`** (`/libraries/*`). |
-| **3** | **Priority 2b** | **Фаза 1 TurboQuant у коді** (`src/ml/turboquant.rs`, pipeline, інтеграційний тест). Далі: **P4**-заміри RAID, опційно SIMD; оновлення `BENCHMARKS.md`. |
+| **2** | **Priority 2** | Сервіси **`RaidService`**, **`VmService`**, **`LibraryService`**, enterprise/cloud/admin — у проді; REST `/raid/*` через **`RaidService`**. Опційно: **`raid_distributed_handlers`** vs сервісний шар. |
+| **3** | **Priority 2b** | TurboQuant **фаза 1** ✅. Далі: **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; **P4** / SIMD за потреби. |
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
@@ -318,4 +318,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Перевірка**: пошук по `src/**/*.rs` на `TODO`, `FIXME`, `todo!(`, `unimplemented!(` (наприклад ripgrep) — маркери лише в `cloud/providers/{azure,gcp}.rs` та rustdoc у `model_interface.rs`; виконуваних заглушок немає.
 - **Критерії P5** (доки + інвентар коду): закриті; **cloud-sdk** залишається дорожньою картою optional features.
+
+## Верифікація 2026-04-06 (README — Next Focus після P5/P6)
+
+- Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
+- Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
 
