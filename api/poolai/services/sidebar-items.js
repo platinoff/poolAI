@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["admin_service","discovery_service","library_service","raid_service","vm_service"]};
+window.SIDEBAR_ITEMS = {"mod":["admin_service","discovery_service","library_service","raid_service","topology_service","vm_service"]};
