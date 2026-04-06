@@ -21,7 +21,7 @@ use serde::Deserialize;
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::{ApiContext, AppState};
 use crate::network::api::common::{api_error_response, api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
@@ -74,6 +74,15 @@ fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
             Some(ErrorContext::new("raid_artifact").with_resource("artifact_id", id.to_string())),
             StatusCode::NOT_FOUND,
         ),
+        RaidServiceError::WorkerNotFound { id } => raid_api_err(
+            "RAID_WORKER_NOT_FOUND",
+            format!("RAID worker not found: {}", id),
+            Some(ErrorContext::new("raid_worker_get").with_resource("worker_id", id.to_string())),
+            StatusCode::NOT_FOUND,
+        ),
+        RaidServiceError::EventStoreUnavailable { operation } => {
+            raid_event_store_unavailable(operation)
+        }
         RaidServiceError::Operation(ref err) => {
             let (s, j) = api_error_response(
                 err,
@@ -83,6 +92,22 @@ fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
             (s, AxumJson(j.0))
         }
     }
+}
+
+/// Worker update/delete historically return HTTP 404 with a RAID_* code (even for non-not-found errors).
+fn raid_worker_mutation_err(
+    code: &'static str,
+    err: AppError,
+    operation: &'static str,
+    worker_id: &str,
+) -> RaidHttpErr {
+    let (s, j) = api_json_error(
+        code,
+        err.to_string(),
+        Some(ErrorContext::new(operation).with_resource("worker_id", worker_id.to_string())),
+        StatusCode::NOT_FOUND,
+    );
+    (s, AxumJson(j.0))
 }
 
 fn raid_http_manager(ctx: &AppState) -> Result<Arc<raid::RaidManager>, RaidHttpErr> {
@@ -314,6 +339,7 @@ async fn raid_artifact_create_handler(
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -371,6 +397,7 @@ async fn raid_artifact_delete_handler(
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -389,30 +416,22 @@ async fn raid_status_handler(State(ctx): State<ApiContext>) -> impl IntoResponse
 }
 
 async fn raid_events_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-
-    if let Some(event_store) = manager.event_store() {
-        match event_store.read().await.load_events().await {
-            Ok(events) => AxumJson(serde_json::json!({
-                "events": events,
-                "count": events.len()
-            }))
-            .into_response(),
-            Err(e) => {
-                let (s, j) = api_json_error(
-                    "RAID_EVENTS_LOAD_FAILED",
-                    format!("Failed to load events: {}", e),
-                    Some(ErrorContext::new("raid_events")),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                );
-                (s, AxumJson(j.0)).into_response()
-            }
+    match RaidService::load_all_events(&ctx).await {
+        Ok(events) => AxumJson(serde_json::json!({
+            "events": events,
+            "count": events.len()
+        }))
+        .into_response(),
+        Err(RaidServiceError::Operation(ref err)) => {
+            let (s, j) = api_json_error(
+                "RAID_EVENTS_LOAD_FAILED",
+                format!("Failed to load events: {}", err),
+                Some(ErrorContext::new("raid_events")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
         }
-    } else {
-        raid_event_store_unavailable("raid_events").into_response()
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -420,39 +439,26 @@ async fn raid_events_for_artifact_handler(
     State(ctx): State<ApiContext>,
     Path(artifact_id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-
-    if let Some(event_store) = manager.event_store() {
-        match event_store
-            .read()
-            .await
-            .get_events_for_artifact(&artifact_id)
-            .await
-        {
-            Ok(events) => AxumJson(serde_json::json!({
-                "artifact_id": artifact_id,
-                "events": events,
-                "count": events.len()
-            }))
-            .into_response(),
-            Err(e) => {
-                let (s, j) = api_json_error(
-                    "RAID_EVENTS_LOAD_FAILED",
-                    format!("Failed to load events: {}", e),
-                    Some(
-                        ErrorContext::new("raid_events_for_artifact")
-                            .with_resource("artifact_id", artifact_id.clone()),
-                    ),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                );
-                (s, AxumJson(j.0)).into_response()
-            }
+    match RaidService::load_events_for_artifact(&ctx, &artifact_id).await {
+        Ok(events) => AxumJson(serde_json::json!({
+            "artifact_id": artifact_id,
+            "events": events,
+            "count": events.len()
+        }))
+        .into_response(),
+        Err(RaidServiceError::Operation(ref err)) => {
+            let (s, j) = api_json_error(
+                "RAID_EVENTS_LOAD_FAILED",
+                format!("Failed to load events: {}", err),
+                Some(
+                    ErrorContext::new("raid_events_for_artifact")
+                        .with_resource("artifact_id", artifact_id.clone()),
+                ),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
         }
-    } else {
-        raid_event_store_unavailable("raid_events_for_artifact").into_response()
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -460,82 +466,61 @@ async fn raid_events_range_handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<EventsRangeQuery>,
 ) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
+    let start = params
+        .start
+        .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+        .map(|dt| dt.with_timezone(&chrono::Utc))
+        .unwrap_or_else(|| chrono::Utc::now() - chrono::Duration::days(7));
 
-    if let Some(event_store) = manager.event_store() {
-        let start = params
-            .start
-            .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
-            .map(|dt| dt.with_timezone(&chrono::Utc))
-            .unwrap_or_else(|| chrono::Utc::now() - chrono::Duration::days(7));
+    let end = params
+        .end
+        .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
+        .map(|dt| dt.with_timezone(&chrono::Utc))
+        .unwrap_or_else(chrono::Utc::now);
 
-        let end = params
-            .end
-            .and_then(|s| DateTime::parse_from_rfc3339(&s).ok())
-            .map(|dt| dt.with_timezone(&chrono::Utc))
-            .unwrap_or_else(chrono::Utc::now);
-
-        match event_store
-            .read()
-            .await
-            .get_events_in_range(start, end)
-            .await
-        {
-            Ok(events) => AxumJson(serde_json::json!({
-                "start": start.to_rfc3339(),
-                "end": end.to_rfc3339(),
-                "events": events,
-                "count": events.len()
-            }))
-            .into_response(),
-            Err(e) => {
-                let (s, j) = api_json_error(
-                    "RAID_EVENTS_LOAD_FAILED",
-                    format!("Failed to load events: {}", e),
-                    Some(ErrorContext::new("raid_events_range")),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                );
-                (s, AxumJson(j.0)).into_response()
-            }
+    match RaidService::load_events_in_range(&ctx, start, end).await {
+        Ok(events) => AxumJson(serde_json::json!({
+            "start": start.to_rfc3339(),
+            "end": end.to_rfc3339(),
+            "events": events,
+            "count": events.len()
+        }))
+        .into_response(),
+        Err(RaidServiceError::Operation(ref err)) => {
+            let (s, j) = api_json_error(
+                "RAID_EVENTS_LOAD_FAILED",
+                format!("Failed to load events: {}", err),
+                Some(ErrorContext::new("raid_events_range")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
         }
-    } else {
-        raid_event_store_unavailable("raid_events_range").into_response()
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
 async fn raid_snapshot_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-
-    if let Some(event_store) = manager.event_store() {
-        match event_store.read().await.load_snapshot().await {
-            Ok(Some(snapshot)) => AxumJson(snapshot).into_response(),
-            Ok(None) => {
-                let (s, j) = api_json_error(
-                    "RAID_SNAPSHOT_NOT_FOUND",
-                    "No snapshot available",
-                    Some(ErrorContext::new("raid_snapshot_get")),
-                    StatusCode::NOT_FOUND,
-                );
-                (s, AxumJson(j.0)).into_response()
-            }
-            Err(e) => {
-                let (s, j) = api_json_error(
-                    "RAID_SNAPSHOT_LOAD_FAILED",
-                    format!("Failed to load snapshot: {}", e),
-                    Some(ErrorContext::new("raid_snapshot_get")),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                );
-                (s, AxumJson(j.0)).into_response()
-            }
+    match RaidService::load_snapshot(&ctx).await {
+        Ok(Some(snapshot)) => AxumJson(snapshot).into_response(),
+        Ok(None) => {
+            let (s, j) = api_json_error(
+                "RAID_SNAPSHOT_NOT_FOUND",
+                "No snapshot available",
+                Some(ErrorContext::new("raid_snapshot_get")),
+                StatusCode::NOT_FOUND,
+            );
+            (s, AxumJson(j.0)).into_response()
         }
-    } else {
-        raid_event_store_unavailable("raid_snapshot_get").into_response()
+        Err(RaidServiceError::Operation(ref err)) => {
+            let (s, j) = api_json_error(
+                "RAID_SNAPSHOT_LOAD_FAILED",
+                format!("Failed to load snapshot: {}", err),
+                Some(ErrorContext::new("raid_snapshot_get")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            );
+            (s, AxumJson(j.0)).into_response()
+        }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -550,26 +535,22 @@ async fn raid_snapshot_create_handler(
         return err.into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-
-    match manager.create_snapshot().await {
-        Ok(_) => AxumJson(serde_json::json!({
+    match RaidService::create_snapshot(&ctx).await {
+        Ok(()) => AxumJson(serde_json::json!({
             "status": "success",
             "message": "Snapshot created successfully"
         }))
         .into_response(),
-        Err(e) => {
+        Err(RaidServiceError::Operation(ref err)) => {
             let (s, j) = api_json_error(
                 "RAID_SNAPSHOT_CREATE_FAILED",
-                format!("Failed to create snapshot: {}", e),
+                format!("Failed to create snapshot: {}", err),
                 Some(ErrorContext::new("raid_snapshot_create")),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -584,25 +565,22 @@ async fn raid_snapshot_restore_handler(
         return err.into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    match manager.restore_from_snapshot().await {
-        Ok(_) => AxumJson(serde_json::json!({
+    match RaidService::restore_from_snapshot(&ctx).await {
+        Ok(()) => AxumJson(serde_json::json!({
             "status": "success",
             "message": "RAID state restored from snapshot successfully"
         }))
         .into_response(),
-        Err(e) => {
+        Err(RaidServiceError::Operation(ref err)) => {
             let (s, j) = api_json_error(
                 "RAID_SNAPSHOT_RESTORE_FAILED",
-                format!("Failed to restore from snapshot: {}", e),
+                format!("Failed to restore from snapshot: {}", err),
                 Some(ErrorContext::new("raid_snapshot_restore")),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -617,24 +595,21 @@ async fn raid_gc_handler(
         return err.into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    match manager.gc_old_artifacts().await {
+    match RaidService::gc_old_artifacts(&ctx).await {
         Ok(removed) => AxumJson(RaidGcResponse {
             removed_count: removed,
         })
         .into_response(),
-        Err(e) => {
+        Err(RaidServiceError::Operation(ref err)) => {
             let (s, j) = api_json_error(
                 "RAID_GC_FAILED",
-                format!("Garbage collection failed: {}", e),
+                format!("Garbage collection failed: {}", err),
                 Some(ErrorContext::new("raid_gc")),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -655,30 +630,26 @@ struct RaidWorkerResponse {
 }
 
 async fn raid_workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let nodes = manager.list_nodes().await;
-    let workers: Vec<RaidWorkerResponse> = nodes
-        .into_iter()
-        .map(|node| RaidWorkerResponse {
-            id: node.id.to_string(),
-            address: node.address,
-            last_seen: node.last_seen.to_rfc3339(),
-        })
-        .collect();
-    AxumJson(workers).into_response()
+    match RaidService::list_workers(&ctx).await {
+        Ok(nodes) => {
+            let workers: Vec<RaidWorkerResponse> = nodes
+                .into_iter()
+                .map(|node| RaidWorkerResponse {
+                    id: node.id.to_string(),
+                    address: node.address,
+                    last_seen: node.last_seen.to_rfc3339(),
+                })
+                .collect();
+            AxumJson(workers).into_response()
+        }
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 async fn raid_worker_get_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -692,8 +663,8 @@ async fn raid_worker_get_handler(
         }
     };
 
-    match manager.get_node(uuid).await {
-        Some(node) => {
+    match RaidService::get_worker(&ctx, uuid).await {
+        Ok(node) => {
             let response = RaidWorkerResponse {
                 id: node.id.to_string(),
                 address: node.address,
@@ -701,15 +672,7 @@ async fn raid_worker_get_handler(
             };
             AxumJson(response).into_response()
         }
-        None => {
-            let (s, j) = api_json_error(
-                "RAID_WORKER_NOT_FOUND",
-                format!("RAID worker not found: {}", id),
-                Some(ErrorContext::new("raid_worker_get").with_resource("worker_id", &id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -734,17 +697,17 @@ async fn raid_worker_create_handler(
         return (s, AxumJson(j.0)).into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let node = manager.register_node(payload.address.clone()).await;
-    let response = RaidWorkerResponse {
-        id: node.id.to_string(),
-        address: node.address,
-        last_seen: node.last_seen.to_rfc3339(),
-    };
-    (StatusCode::CREATED, AxumJson(response)).into_response()
+    match RaidService::register_worker(&ctx, payload.address.clone()).await {
+        Ok(node) => {
+            let response = RaidWorkerResponse {
+                id: node.id.to_string(),
+                address: node.address,
+                last_seen: node.last_seen.to_rfc3339(),
+            };
+            (StatusCode::CREATED, AxumJson(response)).into_response()
+        }
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 async fn raid_worker_update_handler(
@@ -759,10 +722,6 @@ async fn raid_worker_update_handler(
         return err.into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -776,7 +735,7 @@ async fn raid_worker_update_handler(
         }
     };
 
-    match manager.update_node(uuid, Some(payload.address)).await {
+    match RaidService::update_worker(&ctx, uuid, Some(payload.address)).await {
         Ok(node) => {
             let response = RaidWorkerResponse {
                 id: node.id.to_string(),
@@ -785,15 +744,11 @@ async fn raid_worker_update_handler(
             };
             AxumJson(response).into_response()
         }
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_WORKER_UPDATE_FAILED",
-                e.to_string(),
-                Some(ErrorContext::new("raid_worker_update").with_resource("worker_id", &id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, AxumJson(j.0)).into_response()
+        Err(RaidServiceError::Operation(e)) => {
+            raid_worker_mutation_err("RAID_WORKER_UPDATE_FAILED", e, "raid_worker_update", &id)
+                .into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
@@ -808,10 +763,6 @@ async fn raid_worker_delete_handler(
         return err.into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
     let uuid = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
@@ -825,20 +776,16 @@ async fn raid_worker_delete_handler(
         }
     };
 
-    match manager.delete_node(uuid).await {
-        Ok(_) => AxumJson(serde_json::json!({
+    match RaidService::delete_worker(&ctx, uuid).await {
+        Ok(()) => AxumJson(serde_json::json!({
             "message": format!("RAID worker {} deleted successfully", id)
         }))
         .into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_WORKER_DELETE_FAILED",
-                e.to_string(),
-                Some(ErrorContext::new("raid_worker_delete").with_resource("worker_id", &id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, AxumJson(j.0)).into_response()
+        Err(RaidServiceError::Operation(e)) => {
+            raid_worker_mutation_err("RAID_WORKER_DELETE_FAILED", e, "raid_worker_delete", &id)
+                .into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 

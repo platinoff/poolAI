@@ -2,7 +2,9 @@
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
+use crate::raid::events::{EventRecord, Snapshot};
 use crate::raid::{ArtifactRef, RaidManager, RaidNode};
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::sync::Arc;
 use uuid::Uuid;
@@ -15,7 +17,16 @@ pub const RAID_MANAGER_UNAVAILABLE_MESSAGE: &str =
 #[derive(Debug)]
 pub enum RaidServiceError {
     ManagerUnavailable,
-    ArtifactNotFound { id: Uuid },
+    ArtifactNotFound {
+        id: Uuid,
+    },
+    WorkerNotFound {
+        id: Uuid,
+    },
+    /// Event store missing (distributed RAID / event sourcing not wired).
+    EventStoreUnavailable {
+        operation: &'static str,
+    },
     Operation(AppError),
 }
 
@@ -189,5 +200,133 @@ impl RaidService {
             replication_status,
             raft_status,
         })
+    }
+
+    pub async fn load_all_events(ctx: &ApiContext) -> Result<Vec<EventRecord>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let Some(es) = manager.event_store() else {
+            return Err(RaidServiceError::EventStoreUnavailable {
+                operation: "raid_events",
+            });
+        };
+        let guard = es.read().await;
+        guard
+            .load_events()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn load_events_for_artifact(
+        ctx: &ApiContext,
+        artifact_id: &str,
+    ) -> Result<Vec<EventRecord>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let Some(es) = manager.event_store() else {
+            return Err(RaidServiceError::EventStoreUnavailable {
+                operation: "raid_events_for_artifact",
+            });
+        };
+        let guard = es.read().await;
+        guard
+            .get_events_for_artifact(artifact_id)
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn load_events_in_range(
+        ctx: &ApiContext,
+        start: DateTime<Utc>,
+        end: DateTime<Utc>,
+    ) -> Result<Vec<EventRecord>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let Some(es) = manager.event_store() else {
+            return Err(RaidServiceError::EventStoreUnavailable {
+                operation: "raid_events_range",
+            });
+        };
+        let guard = es.read().await;
+        guard
+            .get_events_in_range(start, end)
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn load_snapshot(ctx: &ApiContext) -> Result<Option<Snapshot>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let Some(es) = manager.event_store() else {
+            return Err(RaidServiceError::EventStoreUnavailable {
+                operation: "raid_snapshot_get",
+            });
+        };
+        let guard = es.read().await;
+        guard
+            .load_snapshot()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn create_snapshot(ctx: &ApiContext) -> Result<(), RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .create_snapshot()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn restore_from_snapshot(ctx: &ApiContext) -> Result<(), RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .restore_from_snapshot()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn gc_old_artifacts(ctx: &ApiContext) -> Result<usize, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .gc_old_artifacts()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn list_workers(ctx: &ApiContext) -> Result<Vec<RaidNode>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        Ok(manager.list_nodes().await)
+    }
+
+    pub async fn get_worker(ctx: &ApiContext, id: Uuid) -> Result<RaidNode, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .get_node(id)
+            .await
+            .ok_or(RaidServiceError::WorkerNotFound { id })
+    }
+
+    pub async fn register_worker(
+        ctx: &ApiContext,
+        address: String,
+    ) -> Result<RaidNode, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        Ok(manager.register_node(address).await)
+    }
+
+    pub async fn update_worker(
+        ctx: &ApiContext,
+        id: Uuid,
+        address: Option<String>,
+    ) -> Result<RaidNode, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .update_node(id, address)
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn delete_worker(ctx: &ApiContext, id: Uuid) -> Result<(), RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .delete_node(id)
+            .await
+            .map_err(RaidServiceError::Operation)
     }
 }
