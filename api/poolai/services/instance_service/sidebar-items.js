@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["InstanceServiceError"],"fn":["instance_placement_info"],"struct":["CreateInstanceRequest","CreateInstanceResponse","InstanceInfo","InstanceListResponse","InstancePlacementInfo","InstancePreview","InstancePreviewResponse","InstanceService"]};
