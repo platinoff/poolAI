@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["RAID_MANAGER_UNAVAILABLE_MESSAGE"],"enum":["RaidServiceError"],"struct":["RaidService"]};
+window.SIDEBAR_ITEMS = {"constant":["RAID_MANAGER_UNAVAILABLE_MESSAGE"],"enum":["RaidServiceError"],"struct":["RaftStatus","RaidQuotaResponse","RaidService","RaidStatusResponse","RaidStorageStatus"]};
