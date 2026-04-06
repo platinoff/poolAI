@@ -392,3 +392,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Індекси**: [`docs/README.md`](../README.md), [`docs/INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), кореневий [`README.md`](../../README.md) — посилання на `STRUCTURE.md` та `.cursor/rules/documentation.md`.
 - **Тести**: у `Cargo.toml` додано `[[test]]` з `required-features = ["ml"]` для інтеграцій **`ml_*`** (`automl`, `experiments`, `federated`, `pipeline`, `pruning`, `versioning`), щоб **`cargo test`** без `--features ml` не компілював optional `poolai::ml`.
 
+## Верифікація 2026-04-07 (P4 — `runtime_benchmarks` baseline, MSVC `bench`)
+
+- **Прогін**: `cargo bench -j 1 --bench runtime_benchmarks -- --noplot --sample-size 20 --warm-up-time 0.3 --measurement-time 0.5` (Windows MSVC, профіль **`bench`** / `opt-level = 0` у кореневому `Cargo.toml`).
+- **Доки**: [`docs/performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — медіани в таблиці під **win-msvc-runtime-bench-opt0-2026-04-06**, узагальнена нотатка MSVC для всіх `cargo bench` targets; Changelog; колонка *Notes* для `runtime_benchmarks` у таблиці реєстрації бенчів.
+- **Наступний горизонт P4**: `cloud_benchmarks` за тим самим профілем; LAN-заміри P2b (рядок 108) — на стенді; **GNU** toolchain для порівнянних з **win11-criterion-full** абсолютних цифр. **`service_layer_benchmarks`** — baseline додано в `BENCHMARKS.md` (**win-msvc-service-layer-bench-opt0-2026-04-06**).
+

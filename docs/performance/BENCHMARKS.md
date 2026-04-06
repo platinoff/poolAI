@@ -20,10 +20,10 @@ Benchmarks live under `benches/` and use [Criterion](https://github.com/bheisler
 
 | Bench target | Command | Notes |
 |--------------|---------|--------|
-| `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU, model structs, cache keys, local RAID put, **replication engine** (node selection + quorum), **VM lifecycle**, **RAID protocol JSON**, **health-shaped JSON** |
+| `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU, model structs, cache keys, local RAID put, **replication engine** (node selection + quorum), **VM lifecycle**, **RAID protocol JSON**, **health-shaped JSON**. Same workspace **`bench`** / MSVC workaround as `turboquant_benchmarks` (see baseline note). |
 | `turboquant_benchmarks` | `cargo bench -j 1 --bench turboquant_benchmarks --features ml` | TurboQuant pack/unpack and `dot_f32` (requires `ml`). Workspace **`bench`** profile uses `opt-level = 0` so `cargo bench` can complete on MSVC hosts where `rustc` otherwise AVs on the full crate (see baseline note below). |
 | `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config) |
-| `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager` |
+| `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager`. Same **`bench`** / MSVC workaround as other Criterion targets (see baseline note). |
 
 Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) to reduce parallel link pressure.
 
@@ -62,7 +62,7 @@ The **dev sample** rows used a shortened Criterion profile (`--sample-size 20`, 
 
 The **win11-criterion-full** row set is a default Criterion profile (100 samples × ~5 s measurement each, 3 s warmup) from `cargo bench -j 1 --bench runtime_benchmarks -- --noplot` on **Windows** (release), 2026-04-06 — use as a **P4** snapshot until a named Linux ref host is recorded.
 
-**TurboQuant / MSVC note:** On some Windows **MSVC** hosts, `rustc` exits with **STATUS_ACCESS_VIOLATION** when compiling the full `poolai` library at typical release-style optimization for `cargo bench`. The workspace sets **`[profile.bench]`** with **`opt-level = 0`** so Criterion targets (e.g. `turboquant_benchmarks`) can link and run. The **win-msvc-turboquant-bench-opt0** rows below used the same **short Criterion profile** as dev-sample (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`) and are useful for **before/after trends on one machine**, not for comparing absolute speed to a Linux `-O3` server build. Prefer **GNU** (`1.92.0-x86_64-pc-windows-gnu` + toolchain in PATH per repo docs) when you need release-grade bench binaries on Windows.
+**MSVC / `cargo bench` note:** On some Windows **MSVC** hosts, `rustc` exits with **STATUS_ACCESS_VIOLATION** when compiling the full `poolai` library at typical release-style optimization for `cargo bench`. The workspace sets **`[profile.bench]`** with **`opt-level = 0`** so Criterion targets (**`turboquant_benchmarks`**, **`runtime_benchmarks`**, …) can link and run. Rows labelled **win-msvc-*-bench-opt0-2026-04-06** used the **short Criterion profile** (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`) and are for **before/after trends on one machine** only — not for comparing absolute speed to **dev-win-sample** / **win11-criterion-full** (those used higher codegen). Prefer **GNU** (`1.92.0-x86_64-pc-windows-gnu` + toolchain in PATH per repo docs) when you need release-grade bench binaries on Windows.
 
 | Bench / function | Host label | Median (typical Criterion centre of `[low … high]`) | Date |
 |------------------|------------|-----------------------------------------------------|------|
@@ -80,12 +80,23 @@ The **win11-criterion-full** row set is a default Criterion profile (100 samples
 | `raid_protocol_put_payload/serde_json_roundtrip` | win11-criterion-full-2026-04-06 | ~5.28 µs | 2026-04-06 |
 | `http_health_json/serde_json_to_vec` | dev-win-sample | ~1.09 µs | 2026-04-06 |
 | `http_health_json/serde_json_to_vec` | win11-criterion-full-2026-04-06 | ~1.02 µs | 2026-04-06 |
+| `memory_pool/acquire_release_request` | win-msvc-runtime-bench-opt0-2026-04-06 | ~1.35 µs | 2026-04-06 |
+| `lru_cache/get_hit` | win-msvc-runtime-bench-opt0-2026-04-06 | ~1.94 µs | 2026-04-06 |
+| `raid_local_put/put_artifact_4096` | win-msvc-runtime-bench-opt0-2026-04-06 | ~8.64 ms | 2026-04-06 |
+| `raid_replication_engine/select_replication_nodes_factor_3` | win-msvc-runtime-bench-opt0-2026-04-06 | ~2.68 µs | 2026-04-06 |
+| `raid_replication_engine/calculate_quorum_rf_7` | win-msvc-runtime-bench-opt0-2026-04-06 | ~16.8 ns | 2026-04-06 |
+| `vm_lifecycle/create_start_stop_delete` | win-msvc-runtime-bench-opt0-2026-04-06 | ~38.5 µs | 2026-04-06 |
+| `raid_protocol_put_payload/serde_json_roundtrip` | win-msvc-runtime-bench-opt0-2026-04-06 | ~58 µs | 2026-04-06 |
+| `http_health_json/serde_json_to_vec` | win-msvc-runtime-bench-opt0-2026-04-06 | ~12.9 µs | 2026-04-06 |
 | `turboquant/pack_uniform_rows_64x256` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~491 µs | 2026-04-06 |
 | `turboquant/unpack_to_rows_64x256` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~80.5 µs | 2026-04-06 |
 | `turboquant/dot_f32_4096` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~10.2 µs | 2026-04-06 |
 | `raid_service/list_artifacts` | dev-win-sample | ~218 ns | 2026-04-06 |
 | `raid_service/quota` | dev-win-sample | ~74.5 µs | 2026-04-06 |
 | `raid_service/cluster_status` | dev-win-sample | ~55.2 µs | 2026-04-06 |
+| `raid_service/list_artifacts` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~1.40 µs | 2026-04-06 |
+| `raid_service/quota` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~61.6 µs | 2026-04-06 |
+| `raid_service/cluster_status` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~81.5 µs | 2026-04-06 |
 | `wrk` `/api/v1/health` | *manual* | RPS / p50 / p95 | — |
 | *your ref host* / … | *e.g. ref-linux-01* | *from Criterion* | *YYYY-MM-DD* |
 
@@ -110,6 +121,8 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | 2026-04-06 | P4: `runtime_benchmarks` full-profile snapshot (`win11-criterion-full-2026-04-06`); P2b: `tests/distributed_raid_wire_integration.rs` (`test-utils`, optional `ml` for TQ01 wire JSON size). |
 | 2026-04-06 | P2b: TurboQuant **decode** inner loop — 4-wide unroll + tail (`push_dequantized_row`), симетрично до pack; прогін `turboquant_benchmarks` після зміни — за бажанням на реф-хості. |
 | 2026-04-06 | P4: `turboquant_benchmarks` — фактичні медіани (short Criterion) у таблиці baseline під міткою **win-msvc-turboquant-bench-opt0-2026-04-06**; у кореневому `Cargo.toml` додано **`[profile.bench] opt-level = 0`** як обхід **MSVC rustc AV** на збірці `poolai` для `cargo bench`. |
+| 2026-04-06 | P4: `runtime_benchmarks` — той самий short Criterion + **win-msvc-runtime-bench-opt0-2026-04-06** у таблиці baseline; нотатка MSVC узагальнена для всіх `cargo bench` targets. |
+| 2026-04-06 | P4: `service_layer_benchmarks` (`--features test-utils`) — медіани під **win-msvc-service-layer-bench-opt0-2026-04-06**; колонка *Notes* у таблиці реєстрації. |
 
 ---
 
