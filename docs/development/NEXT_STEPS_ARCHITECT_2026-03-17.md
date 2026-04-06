@@ -27,7 +27,7 @@
 | **3** | **Priority 2b** | **Фаза 1 TurboQuant у коді** (`src/ml/turboquant.rs`, pipeline, інтеграційний тест). Далі: **P4**-заміри RAID, опційно SIMD; оновлення `BENCHMARKS.md`. |
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
-| **6** | **Priority 5** | Архівні плани з банером на Architect plan; періодично — TODO в коді / ключових модулях. |
+| **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
 
 *Опційно паралельно з 1–2*: стабілізація `cargo test --all-features` на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
@@ -161,7 +161,8 @@
 **Мета**: синхронізувати код і документацію **після** виконання пріоритетів 1–4.
 
 **Кроки**:
-- [ ] Пройтися TODO у **коді** (ключові модулі) або перенести в актуальні плани — окремі проходи після змін фіч.
+- [x] Інвентар **TODO/FIXME** у `src/*.rs` (2026-04-06): лише **`cloud/providers/azure.rs`** (3 маркери: credential/compute/location), **`cloud/providers/gcp.rs`** (1 — майбутній crate); **`core/model_interface.rs`** — `todo!()` тільки всередині **згорнутого** rustdoc-прикладу. У виконуваному прод-коді **`todo!()` / `unimplemented!()` немає**.
+- [ ] Опційно пізніше: реалізувати відкладені пункти Azure/GCP SDK (feature **`cloud-sdk`**) — не блокує основний CI-матрицю.
 - [x] Архівні зрізи планів **примарковані** посиланням на покровий план:
   - [x] `RUST_ARCHITECT_STATUS_2026-01-19.md` — банер → `NEXT_STEPS_ARCHITECT_2026-03-17.md`.
   - [x] `RUST_ARCHITECT_STATUS_2026-01-21.md` — те саме.
@@ -174,7 +175,7 @@
 
 **Критерії готовності**:
 - [x] Покровий план, HANDOFF, STABLE_STATE, ARCHITECTURE_REVIEW (інкремент 2026‑04) та **архівні** `RUST_ARCHITECT_*` / `PERCENTAGE_PLAN` (банер на Architect plan) узгоджені з поточною моделлю робіт.
-- [ ] TODO у ключових модулях або закриті, або перенесені в актуальні плани (окремі проходи).
+- [x] Залишкові **TODO** у дереві `src/` локалізовані (див. кроки вище); розширення cloud-sdk винесено в опційний пункт без вимоги до поточного релізу.
 
 ---
 
@@ -312,4 +313,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Банер** на покровий план додано до: `RUST_ARCHITECT_STATUS_2026-01-19.md`, `RUST_ARCHITECT_STATUS_2026-01-21.md`, `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md`, `docs/status/PERCENTAGE_PLAN.md`.
 - **Таблиця пріоритетів** (рядок Priority 5) оновлена під цей інкремент.
+
+## Верифікація 2026-04-06 (P5 — інвентар TODO у `src/`)
+
+- **Перевірка**: пошук по `src/**/*.rs` на `TODO`, `FIXME`, `todo!(`, `unimplemented!(` (наприклад ripgrep) — маркери лише в `cloud/providers/{azure,gcp}.rs` та rustdoc у `model_interface.rs`; виконуваних заглушок немає.
+- **Критерії P5** (доки + інвентар коду): закриті; **cloud-sdk** залишається дорожньою картою optional features.
 
