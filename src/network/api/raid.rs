@@ -18,16 +18,14 @@ use axum::{
 use base64::{engine::general_purpose::STANDARD as base64_engine, Engine};
 use chrono::DateTime;
 use serde::Deserialize;
-use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::core::error::{AppError, ErrorContext};
-use crate::core::state::{ApiContext, AppState};
+use crate::core::state::ApiContext;
 use crate::network::api::common::{api_error_response, api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
 use crate::network::validation;
-use crate::raid;
 use crate::services::raid_service::{RaidService, RaidServiceError};
 
 type RaidHttpErr = (StatusCode, AxumJson<serde_json::Value>);
@@ -108,13 +106,6 @@ fn raid_worker_mutation_err(
         StatusCode::NOT_FOUND,
     );
     (s, AxumJson(j.0))
-}
-
-fn raid_http_manager(ctx: &AppState) -> Result<Arc<raid::RaidManager>, RaidHttpErr> {
-    ctx.raid_manager
-        .get()
-        .cloned()
-        .ok_or_else(raid_manager_unavailable)
 }
 
 #[derive(Deserialize)]
@@ -793,139 +784,29 @@ async fn raid_worker_delete_handler(
 // Administrative Control Plane handlers
 // ============================================================================
 
-#[derive(serde::Serialize)]
-struct RaidStrategiesResponse {
-    strategies: Vec<raid::StrategyStatus>,
-    current_mode: String,
-}
-
-#[derive(serde::Serialize)]
-struct RaidMetricsResponse {
-    mode: String,
-    total_artifacts: usize,
-    total_size_bytes: u64,
-    quota_bytes: Option<u64>,
-    usage_percent: Option<f64>,
-    node_count: usize,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    replication_factor: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    clustering_coefficient: Option<f64>,
-}
-
-#[derive(serde::Serialize)]
-struct RaidRebalanceResponse {
-    success: bool,
-    artifacts_moved: usize,
-    message: String,
-}
-
-#[derive(serde::Serialize)]
-struct RaidHealthResponse {
-    status: String, // "healthy", "degraded", "unhealthy"
-    mode: String,
-    strategy_initialized: bool,
-    storage_available: bool,
-    replication_active: bool,
-}
-
 /// Get strategy status for all available strategies
 async fn raid_strategies_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let current_mode = manager.get_mode().await;
-
-    // Get status for current strategy
-    match manager.get_strategy_status().await {
-        Ok(status) => {
-            let response = RaidStrategiesResponse {
-                strategies: vec![status],
-                current_mode: format!("{:?}", current_mode),
-            };
-            AxumJson(response).into_response()
-        }
-        Err(e) => {
+    match RaidService::strategies_overview(&ctx).await {
+        Ok(body) => AxumJson(body).into_response(),
+        Err(RaidServiceError::Operation(ref err)) => {
             let (s, j) = api_json_error(
                 "RAID_STRATEGY_STATUS_FAILED",
-                format!("Failed to get strategy status: {}", e),
+                format!("Failed to get strategy status: {}", err),
                 Some(ErrorContext::new("raid_strategies")),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
 /// Get metrics for the active RAID strategy
 async fn raid_metrics_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let mode = manager.get_mode().await;
-    let mode_str = format!("{:?}", mode);
-
-    let artifacts = manager.list_artifacts().await;
-    let total_artifacts = artifacts.len();
-    let total_size = manager.get_total_size().await.unwrap_or(0);
-    let quota_bytes = manager.get_quota_bytes().await;
-    let usage_percent = quota_bytes.map(|quota| {
-        if quota > 0 {
-            (total_size as f64 / quota as f64) * 100.0
-        } else {
-            0.0
-        }
-    });
-    let nodes = manager.list_nodes().await;
-    let node_count = nodes.len();
-
-    // Strategy-specific metrics
-    let replication_factor = match mode {
-        raid::RaidMode::BurstRaid => {
-            // Get actual replication factor from BurstRAID strategy
-            if let Some(metrics) = manager.get_burst_raid_metrics().await {
-                Some(metrics.base_replication_factor)
-            } else {
-                Some(2) // Default base_replication_factor
-            }
-        }
-        raid::RaidMode::SmallWorld => {
-            // Get actual replication factor from SmallWorld strategy
-            if let Some(metrics) = manager.get_small_world_metrics().await {
-                Some(metrics.base_replication_factor)
-            } else {
-                Some(3) // Default base_replication_factor
-            }
-        }
-        _ => None,
-    };
-
-    let clustering_coefficient = match mode {
-        raid::RaidMode::SmallWorld => {
-            // Get actual clustering coefficient from SmallWorld strategy
-            if let Some(metrics) = manager.get_small_world_metrics().await {
-                Some(metrics.avg_clustering_coefficient)
-            } else {
-                None
-            }
-        }
-        _ => None,
-    };
-
-    let response = RaidMetricsResponse {
-        mode: mode_str,
-        total_artifacts,
-        total_size_bytes: total_size,
-        quota_bytes,
-        usage_percent,
-        node_count,
-        replication_factor,
-        clustering_coefficient,
-    };
-
-    AxumJson(response).into_response()
+    match RaidService::metrics_overview(&ctx).await {
+        Ok(body) => AxumJson(body).into_response(),
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }
 
 /// Trigger manual rebalancing for the active strategy
@@ -940,26 +821,20 @@ async fn raid_rebalance_handler(
         return err.into_response();
     }
 
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    match manager.trigger_rebalance().await {
-        Ok(result) => {
-            let response = RaidRebalanceResponse {
-                success: result.success,
-                artifacts_moved: result.artifacts_moved,
-                message: format!(
-                    "Rebalancing completed successfully. {} artifacts moved.",
-                    result.artifacts_moved
-                ),
-            };
-            AxumJson(response).into_response()
-        }
-        Err(e) => {
+    match RaidService::trigger_rebalance(&ctx).await {
+        Ok(result) => AxumJson(serde_json::json!({
+            "success": result.success,
+            "artifacts_moved": result.artifacts_moved,
+            "message": format!(
+                "Rebalancing completed successfully. {} artifacts moved.",
+                result.artifacts_moved
+            ),
+        }))
+        .into_response(),
+        Err(RaidServiceError::Operation(ref err)) => {
             let (s, j) = api_json_error(
                 "RAID_REBALANCE_FAILED",
-                format!("Failed to trigger rebalancing: {}", e),
+                format!("Failed to trigger rebalancing: {}", err),
                 Some(ErrorContext::new("raid_rebalance").with_hint(
                     "Local RAID mode does not support rebalancing; verify strategy configuration.",
                 )),
@@ -967,66 +842,14 @@ async fn raid_rebalance_handler(
             );
             (s, AxumJson(j.0)).into_response()
         }
+        Err(e) => raid_service_http_err(e).into_response(),
     }
 }
 
 /// Health check for RAID strategies
 async fn raid_health_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = match raid_http_manager(&ctx) {
-        Ok(m) => m,
-        Err(e) => return e.into_response(),
-    };
-    let mode = manager.get_mode().await;
-    let mode_str = format!("{:?}", mode);
-
-    // Get strategy status
-    let strategy_status = manager.get_strategy_status().await.ok();
-    let strategy_initialized = strategy_status
-        .as_ref()
-        .map(|s| s.initialized)
-        .unwrap_or(false);
-
-    // Check storage availability
-    let total_size = manager.get_total_size().await.unwrap_or(0);
-    let quota_bytes = manager.get_quota_bytes().await;
-    let storage_available = quota_bytes
-        .map(|quota| {
-            let usage_percent = if quota > 0 {
-                (total_size as f64 / quota as f64) * 100.0
-            } else {
-                0.0
-            };
-            usage_percent < 95.0 // Consider available if usage < 95%
-        })
-        .unwrap_or(true);
-
-    // Check replication status
-    let replication_active = match mode {
-        raid::RaidMode::Local => false,
-        raid::RaidMode::BurstRaid | raid::RaidMode::SmallWorld => strategy_status
-            .as_ref()
-            .map(|s| s.active && s.rebalancing_enabled)
-            .unwrap_or(false),
-    };
-
-    // Determine overall health status
-    let status = if !strategy_initialized && mode != raid::RaidMode::Local {
-        "unhealthy"
-    } else if !storage_available {
-        "degraded"
-    } else if !replication_active && mode != raid::RaidMode::Local {
-        "degraded"
-    } else {
-        "healthy"
-    };
-
-    let response = RaidHealthResponse {
-        status: status.to_string(),
-        mode: mode_str,
-        strategy_initialized,
-        storage_available,
-        replication_active,
-    };
-
-    AxumJson(response).into_response()
+    match RaidService::health_overview(&ctx).await {
+        Ok(body) => AxumJson(body).into_response(),
+        Err(e) => raid_service_http_err(e).into_response(),
+    }
 }

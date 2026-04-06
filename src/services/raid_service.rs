@@ -3,7 +3,7 @@
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::raid::events::{EventRecord, Snapshot};
-use crate::raid::{ArtifactRef, RaidManager, RaidNode};
+use crate::raid::{ArtifactRef, RaidManager, RaidMode, RaidNode, RebalanceResult, StrategyStatus};
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::sync::Arc;
@@ -82,6 +82,38 @@ pub struct RaidStatusResponse {
     pub replication_status: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub raft_status: Option<RaftStatus>,
+}
+
+/// `GET /raid/strategies` body.
+#[derive(Debug, Serialize)]
+pub struct RaidStrategiesOverview {
+    pub strategies: Vec<StrategyStatus>,
+    pub current_mode: String,
+}
+
+/// `GET /raid/metrics` body.
+#[derive(Debug, Serialize)]
+pub struct RaidMetricsOverview {
+    pub mode: String,
+    pub total_artifacts: usize,
+    pub total_size_bytes: u64,
+    pub quota_bytes: Option<u64>,
+    pub usage_percent: Option<f64>,
+    pub node_count: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replication_factor: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clustering_coefficient: Option<f64>,
+}
+
+/// `GET /raid/health` body (admin control-plane).
+#[derive(Debug, Serialize)]
+pub struct RaidHealthOverview {
+    pub status: String,
+    pub mode: String,
+    pub strategy_initialized: bool,
+    pub storage_available: bool,
+    pub replication_active: bool,
 }
 
 /// Thin orchestration over [`RaidManager`] for API use.
@@ -328,5 +360,137 @@ impl RaidService {
             .delete_node(id)
             .await
             .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn strategies_overview(
+        ctx: &ApiContext,
+    ) -> Result<RaidStrategiesOverview, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let current_mode = manager.get_mode().await;
+        let status = manager
+            .get_strategy_status()
+            .await
+            .map_err(RaidServiceError::Operation)?;
+        Ok(RaidStrategiesOverview {
+            strategies: vec![status],
+            current_mode: format!("{:?}", current_mode),
+        })
+    }
+
+    pub async fn metrics_overview(
+        ctx: &ApiContext,
+    ) -> Result<RaidMetricsOverview, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let mode = manager.get_mode().await;
+        let mode_str = format!("{:?}", mode);
+
+        let artifacts = manager.list_artifacts().await;
+        let total_artifacts = artifacts.len();
+        let total_size = manager.get_total_size().await.unwrap_or(0);
+        let quota_bytes = manager.get_quota_bytes().await;
+        let usage_percent = quota_bytes.map(|quota| {
+            if quota > 0 {
+                (total_size as f64 / quota as f64) * 100.0
+            } else {
+                0.0
+            }
+        });
+        let node_count = manager.list_nodes().await.len();
+
+        let replication_factor = match mode {
+            RaidMode::BurstRaid => {
+                if let Some(metrics) = manager.get_burst_raid_metrics().await {
+                    Some(metrics.base_replication_factor)
+                } else {
+                    Some(2)
+                }
+            }
+            RaidMode::SmallWorld => {
+                if let Some(metrics) = manager.get_small_world_metrics().await {
+                    Some(metrics.base_replication_factor)
+                } else {
+                    Some(3)
+                }
+            }
+            _ => None,
+        };
+
+        let clustering_coefficient = match mode {
+            RaidMode::SmallWorld => manager
+                .get_small_world_metrics()
+                .await
+                .map(|m| m.avg_clustering_coefficient),
+            _ => None,
+        };
+
+        Ok(RaidMetricsOverview {
+            mode: mode_str,
+            total_artifacts,
+            total_size_bytes: total_size,
+            quota_bytes,
+            usage_percent,
+            node_count,
+            replication_factor,
+            clustering_coefficient,
+        })
+    }
+
+    pub async fn trigger_rebalance(ctx: &ApiContext) -> Result<RebalanceResult, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .trigger_rebalance()
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
+    pub async fn health_overview(ctx: &ApiContext) -> Result<RaidHealthOverview, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let mode = manager.get_mode().await;
+        let mode_str = format!("{:?}", mode);
+
+        let strategy_status = manager.get_strategy_status().await.ok();
+        let strategy_initialized = strategy_status
+            .as_ref()
+            .map(|s| s.initialized)
+            .unwrap_or(false);
+
+        let total_size = manager.get_total_size().await.unwrap_or(0);
+        let quota_bytes = manager.get_quota_bytes().await;
+        let storage_available = quota_bytes
+            .map(|quota| {
+                let usage_percent = if quota > 0 {
+                    (total_size as f64 / quota as f64) * 100.0
+                } else {
+                    0.0
+                };
+                usage_percent < 95.0
+            })
+            .unwrap_or(true);
+
+        let replication_active = match mode {
+            RaidMode::Local => false,
+            RaidMode::BurstRaid | RaidMode::SmallWorld => strategy_status
+                .as_ref()
+                .map(|s| s.active && s.rebalancing_enabled)
+                .unwrap_or(false),
+        };
+
+        let status = if !strategy_initialized && mode != RaidMode::Local {
+            "unhealthy"
+        } else if !storage_available {
+            "degraded"
+        } else if !replication_active && mode != RaidMode::Local {
+            "degraded"
+        } else {
+            "healthy"
+        };
+
+        Ok(RaidHealthOverview {
+            status: status.to_string(),
+            mode: mode_str,
+            strategy_initialized,
+            storage_available,
+            replication_active,
+        })
     }
 }
