@@ -178,6 +178,20 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|e| format!("Failed to attach core HTTP singletons to AppState: {e}"))?;
     info!("✅ Core runtime handles attached to AppState for HTTP");
 
+    #[cfg(feature = "cloud")]
+    {
+        use poolai::cloud::{CloudConfig, CloudManager};
+        let cloud = Arc::new(CloudManager::new(CloudConfig::default()));
+        cloud
+            .initialize()
+            .await
+            .map_err(|e| format!("Cloud manager initialization failed: {e}"))?;
+        app_state
+            .attach_cloud_manager(cloud)
+            .map_err(|e| format!("Failed to attach cloud manager to AppState: {e}"))?;
+        info!("✅ Cloud integration initialized and attached to AppState");
+    }
+
     // Initialize UI module
     info!("Initializing UI module...");
     ui::initialize().await?;
@@ -190,9 +204,12 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     info!("🌐 Starting network server on {}", addr);
 
-    // Spawn server task
-    let server_handle = tokio::spawn(async move {
-        network::start_server(addr, app_state).await;
+    // Spawn server task (keep a handle to `AppState` for graceful shutdown hooks)
+    let server_handle = tokio::spawn({
+        let app_state = app_state.clone();
+        async move {
+            network::start_server(addr, app_state).await;
+        }
     });
 
     info!("✅ PoolAI started successfully!");
@@ -211,6 +228,15 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Graceful shutdown
     info!("🔄 Shutting down gracefully...");
+
+    #[cfg(feature = "cloud")]
+    if let Some(cm) = app_state.cloud_manager.get() {
+        if let Err(e) = cm.shutdown().await {
+            error!("Cloud manager shutdown error: {}", e);
+        } else {
+            info!("Cloud manager shut down");
+        }
+    }
 
     // Shutdown modules in reverse order
     info!("Shutting down runtime module...");

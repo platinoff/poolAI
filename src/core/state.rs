@@ -47,6 +47,8 @@
 //! # }
 //! ```
 
+#[cfg(feature = "cloud")]
+use crate::cloud::CloudManager;
 use crate::core::config::PoolAIConfig;
 use crate::core::discovery_handle::SharedDiscoverySlot;
 use crate::core::error::AppError;
@@ -277,6 +279,9 @@ pub struct AppState {
     pub instance_manager: OnceLock<Arc<TokioRwLock<InstanceManager>>>,
     /// Topology manager (`initialize_global_topology_manager` + attach).
     pub topology_manager: OnceLock<Arc<TokioRwLock<TopologyManager>>>,
+    /// Cloud integration (`CloudManager::new` + `initialize` in `main`, then attach).
+    #[cfg(feature = "cloud")]
+    pub cloud_manager: OnceLock<Arc<CloudManager>>,
     /// OAuth2 CSRF state tokens (enterprise GitHub flow).
     #[cfg(feature = "enterprise")]
     pub oauth2_pending_states: Arc<tokio::sync::RwLock<HashMap<String, OAuth2PendingEntry>>>,
@@ -346,6 +351,8 @@ impl AppState {
             library_manager: OnceLock::new(),
             instance_manager: OnceLock::new(),
             topology_manager: OnceLock::new(),
+            #[cfg(feature = "cloud")]
+            cloud_manager: OnceLock::new(),
             #[cfg(feature = "enterprise")]
             oauth2_pending_states: Arc::new(tokio::sync::RwLock::new(HashMap::new())),
             #[cfg(feature = "enterprise")]
@@ -425,6 +432,14 @@ impl AppState {
         Ok(())
     }
 
+    /// Attach a pre-initialized cloud manager (set from `main` after `initialize().await`).
+    #[cfg(feature = "cloud")]
+    pub fn attach_cloud_manager(&self, manager: Arc<CloudManager>) -> Result<(), String> {
+        self.cloud_manager
+            .set(manager)
+            .map_err(|_| "cloud_manager handle already attached".to_string())
+    }
+
     /// Attach core runtime handles for integration tests (no `get_global_*` / full `main` init).
     ///
     /// Enable crate feature **`test-utils`**. Each `OnceLock` may only be set once.
@@ -477,6 +492,13 @@ impl AppState {
         self.topology_manager
             .set(manager)
             .map_err(|_| "topology_manager handle already attached".to_string())
+    }
+
+    #[cfg(all(feature = "cloud", feature = "test-utils"))]
+    pub fn attach_cloud_manager_for_test(&self, manager: Arc<CloudManager>) -> Result<(), String> {
+        self.cloud_manager
+            .set(manager)
+            .map_err(|_| "cloud_manager handle already attached".to_string())
     }
 
     /// Align legacy `get_global_*` enterprise singletons with this `AppState` (no-op if already set).
