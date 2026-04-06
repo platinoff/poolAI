@@ -71,8 +71,8 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **Priority 3 (основний REST)** — `api_json_error` / `api_error_response` у `network/api/common.rs`, хелпер **`enterprise_err`** у `enterprise_api.rs`, узгоджені помилки в **`raid.rs`**, повному **`enterprise_api.rs`**, а також у **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`** та раніше — **instances, libraries, vm, workers, topology, rewards**, **ai_ml**, tenant CRUD.
 
 ### Next Focus
-- **Priority 3 (добивання)**: **`auth.rs`** — відповіді логіну / middleware досі з плоским `"error": string`; за потреби узгодити з `api_json_error` і не зламати клієнтів UI. Опційно: уточнити мапінг `AppError` → HTTP (`ResourceError`, not-found) у `http_status_for_app_error`.
-- **Priority 4**: бенчмарки та профілювання — `runtime_benchmarks` (у т.ч. VM, RAID protocol JSON, health JSON), `turboquant_benchmarks --features ml`, опційно `cloud_benchmarks --features cloud`, `service_layer_benchmarks --features test-utils`; далі baseline у `docs/performance/BENCHMARKS.md` + `wrk` на `/api/v1/health`. Див. також `PROFILING.md`.
+- **Priority 3 (добивання)**: **`auth.rs`** узгоджено з `api_json_error` / `ErrorContext`. Опційно: інші точки входу з плоским `"error"` (напр. `ws.rs`, `rate_limit.rs`) або уточнення `http_status_for_app_error` для `ResourceError` / not-found.
+- **Priority 4**: перенести baseline з `docs/performance/BENCHMARKS.md` на **іменований референс‑хост**; зняти **`wrk`** на `/api/v1/health`; опційно CI для `cargo bench`. Див. `PROFILING.md`.
 - **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot, …) у `RaidService`.
 - **Priority 2b**: чекбокси TurboQuant у архітектурному плані (код уже в дереві — оновити доки/критерії «готово»).
 - За потреби: стабілізувати `cargo test --all-features` на Windows.

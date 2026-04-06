@@ -24,7 +24,11 @@ fn bench_raid_service_paths(c: &mut Criterion) {
         manager.initialize().await.unwrap();
     });
 
-    let state: ApiContext = Arc::new(AppState::new());
+    // `AppState::new` builds `WebSocketManager`, which `tokio::spawn`s background tasks.
+    let state: ApiContext = {
+        let _guard = rt.enter();
+        Arc::new(AppState::new())
+    };
     state
         .attach_raid_manager_for_test(manager.clone())
         .expect("attach raid once");

@@ -120,7 +120,7 @@
 - [x] Додати `ErrorContext` (`operation`, `resource`, `resource_id`, `details`, `hint`) та хелпери `with_*`.
 - [x] Базова конверсія в HTTP JSON у `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; RBAC — `AppError::Forbidden` + `api_error_response`.
 - [x] Покрити **основний** публічний REST узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }`: `src/network/api/*` (у т.ч. `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`), **повний** `enterprise_api.rs` (+ попередні модулі з попередніх комітів).
-- [ ] Опційно: **`src/network/auth.rs`** (логін, middleware) — зараз плоский ключ `"error"` у JSON.
+- [x] **`src/network/auth.rs`** (логін, middleware) — `api_json_error` + `ErrorContext` (узгоджено з `json_errors.rs`).
 - [ ] За потреби спростити handler’и до `Result<T, AppError>` там, де ще ручні tuple‑відповіді.
 
 **Критерії готовності**:
@@ -137,21 +137,20 @@
 **Кроки**:
 - [ ] Визначити hot‑paths (на базі наявних доків і інтуїції архітектора):
   - [x] RAID: **локальний** `put_artifact` — Criterion у `benches/runtime_benchmarks.rs` (`raid_local_put`).
-  - [ ] RAID: реплікація артефактів, читання/запис через мережу.
-  - [ ] VM: запуск/стоп/моніторинг процесів.
-  - [ ] Cloud: Kubernetes/Cloud operations (operator, scaling, LB).
-  - [ ] API: найбільш часті REST‑ендпоінти (admin dashboard, monitoring, artifacts).
+  - [x] RAID: **проксі мережевого шару** — serde `PutArtifactPayload` (`raid_protocol_put_payload`); реальна реплікація з пірами — окремий harness.
+  - [x] VM: **ін‑процес** lifecycle — `vm_lifecycle` у `runtime_benchmarks` (не hypervisor).
+  - [x] Cloud: **`cloud_benchmarks`** (`--features cloud`) — validate + init/shutdown менеджера (SDK виклики не в бенчі).
+  - [x] API: **проксі** JSON health — `http_health_json` у `runtime_benchmarks`; RPS — `wrk` вручну.
 - [x] Створити або оновити бенчмарки (інкремент 2026‑04):
-  - [x] Criterion: `runtime_benchmarks` (memory pool, LRU, model request, cache key, **local RAID put**), `turboquant_benchmarks` (`--features ml`).
-  - [ ] Окремі таргети для VM / Cloud / HTTP (за потреби).
+  - [x] Criterion: `runtime_benchmarks` (memory pool, LRU, model request, cache key, local RAID put, **VM**, **RAID protocol**, **health JSON**), `turboquant_benchmarks` (`--features ml`), **`cloud_benchmarks`**, **`service_layer_benchmarks`** (`test-utils`).
 - [x] Оновити `docs/performance/BENCHMARKS.md` — команди `cargo bench`, групи Criterion, приклад CI; ілюстративні таблиці позначені як неконтрольні CI.
-  - [ ] Зафіксувати **числові** базові метрики (latency/throughput/P95) після прогонів на референс‑хості.
+  - [x] Перші **числові** рядки (dev sample) у таблиці baseline — замінити на референс‑хост, коли буде стенд.
   - [ ] Задокументувати зміни після оптимізацій.
 
 **Критерії готовності**:
-- [x] Є повторюваний сценарій **локально**: `cargo bench -j 1 --bench runtime_benchmarks` та `cargo bench -j 1 --bench turboquant_benchmarks --features ml`.
-- [ ] CI‑регресія бенчмарків (опційно) + числові baseline у `BENCHMARKS.md`.
-- [ ] Для основних сценаріїв зафіксовані цільові та фактичні метрики.
+- [x] Є повторюваний сценарій **локально**: `cargo bench -j 1 --bench runtime_benchmarks` та `cargo bench -j 1 --bench turboquant_benchmarks --features ml` (+ опційні `cloud_benchmarks`, `service_layer_benchmarks`).
+- [ ] CI‑регресія бенчмарків (опційно); baseline у `BENCHMARKS.md` — **оновлювати** після зміни коду або референс‑машини.
+- [ ] Для основних сценаріїв зафіксовані **цільові** метрики (поруч із фактичними dev/ref рядками).
 
 ---
 
@@ -286,4 +285,10 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Код**: `benches/runtime_benchmarks.rs` — групи `vm_lifecycle`, `raid_protocol_put_payload`, `http_health_json`; `benches/cloud_benchmarks.rs` (`--features cloud`); `benches/service_layer_benchmarks.rs` (`--features test-utils`, `RaidService`); реєстрація в кореневому `Cargo.toml`.
 - **Документація**: `docs/performance/BENCHMARKS.md` — команди, групи, таблиця під baseline, опційні рядки CI.
 - **Залишок P4**: заповнити baseline після прогону; end-to-end HTTP — `wrk` / `hey` (див. той самий документ).
+
+## Верифікація 2026-04-06 (P4 — baseline sample + план)
+
+- **Прогін**: `runtime_benchmarks` з `--sample-size 20 --warm-up-time 0.3 --measurement-time 0.5` (Windows, release); медіани занесені в `BENCHMARKS.md` як **dev-win-sample**.
+- **`service_layer_benchmarks`**: виправлено панік «no reactor running» — `AppState::new()` під `Runtime::enter()`.
+- **Доки**: `NEXT_STEPS` — оновлені чекбокси P3 (auth), P4 (hot-path / бенчі); README «Next Focus».
 

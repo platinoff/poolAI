@@ -16,5 +16,5 @@
 
 - **Status / plans** — `status/`, `development/` (see [development/README.md](./development/README.md) for plan index).
 - **Unified API errors (P3)** — основний REST, **`enterprise_api.rs`**, **`raid.rs`**, **`auth.rs`**: структуровані помилки (`api_json_error`, `ErrorContext`, …). Деталі — `development/HANDOFF_NEW_SESSION.md`.
-- **Benchmarks (P4)** — `docs/performance/BENCHMARKS.md`: `runtime_benchmarks` (RAID put, VM lifecycle, RAID protocol JSON, health JSON), `turboquant_benchmarks` (`--features ml`), `cloud_benchmarks` (`--features cloud`), `service_layer_benchmarks` (`--features test-utils`).
+- **Benchmarks (P4)** — `docs/performance/BENCHMARKS.md`: команди та групи Criterion; таблиця baseline (є **dev-sample** рядки — замінити на референс-хост); `wrk` вручну для HTTP.
 - **One-off historical notes** — `archive/` (includes former root `PUSH_*.md` files).

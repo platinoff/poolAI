@@ -57,11 +57,20 @@ Record the Criterion summary lines (or archive `target/criterion/`) when publish
 
 After a full run on a **named** host (CPU model, RAM, OS, disk type), paste Criterion means (or a link to saved HTML) into the table below. Replace placeholders—**not** CI-enforced.
 
-| Bench / function | Host label | Mean (example) | Date |
-|------------------|------------|----------------|------|
-| `runtime_benchmarks` / … | *e.g. ref-linux-01* | *from Criterion output* | *YYYY-MM-DD* |
-| `service_layer_benchmarks` / `raid_service/*` | | | |
-| `wrk` `/api/v1/health` | | RPS / p50 / p95 | |
+The **dev sample** rows used a shortened Criterion profile (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`) on **Windows 10**, `cargo bench` **release** profile — for regression *trends* on the same machine, not absolute SLA.
+
+| Bench / function | Host label | Median (typical Criterion centre of `[low … high]`) | Date |
+|------------------|------------|-----------------------------------------------------|------|
+| `memory_pool/acquire_release_request` | dev-win-sample | ~132 ns | 2026-04-06 |
+| `lru_cache/get_hit` | dev-win-sample | ~235 ns | 2026-04-06 |
+| `raid_local_put/put_artifact_4096` | dev-win-sample | ~11.7 ms | 2026-04-06 |
+| `vm_lifecycle/create_start_stop_delete` | dev-win-sample | ~5.2 µs | 2026-04-06 |
+| `raid_protocol_put_payload/serde_json_roundtrip` | dev-win-sample | ~5.6 µs | 2026-04-06 |
+| `http_health_json/serde_json_to_vec` | dev-win-sample | ~1.09 µs | 2026-04-06 |
+| `raid_service/list_artifacts` | dev-win-sample | ~221 ns | 2026-04-06 |
+| `raid_service/quota`, `cluster_status` | *run full* `service_layer_benchmarks` | — | — |
+| `wrk` `/api/v1/health` | *manual* | RPS / p50 / p95 | — |
+| *your ref host* / … | *e.g. ref-linux-01* | *from Criterion* | *YYYY-MM-DD* |
 
 ---
 
@@ -145,4 +154,5 @@ jobs:
 - Micro-benchmarks isolate hot paths; end-to-end latency includes JSON, auth, and I/O.
 - Distributed RAID on the wire: use `raid_protocol_put_payload` for JSON CPU cost; real replication still needs topology/peers and is environment-specific.
 - Cloud SDK calls are not exercised by `cloud_benchmarks` (config + manager lifecycle only).
+- `service_layer_benchmarks` constructs `AppState` (WebSocket manager spawns Tokio tasks); the bench uses `Runtime::enter()` around `AppState::new()` so `tokio::spawn` succeeds.
 - Storage and network numbers vary strongly by hardware; treat illustrative tables as non-binding.
