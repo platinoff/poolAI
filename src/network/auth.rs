@@ -394,7 +394,7 @@ pub async fn permission_middleware(
 /// # Example
 ///
 /// ```no_run
-/// use poolai::network::auth::{authenticate_user, AuthRequest};
+/// use poolai::network::auth::{authenticate_user, AuthRequest, UserManager};
 ///
 /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let auth_req = AuthRequest {

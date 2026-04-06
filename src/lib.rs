@@ -9,12 +9,15 @@
 //!
 //! ```no_run
 //! use poolai::network::start_server;
+//! use poolai::AppState;
+//! use std::sync::Arc;
 //! use std::net::SocketAddr;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
 //! // Start the server with default configuration
 //! let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
-//! start_server(addr).await;
+//! let app_state = Arc::new(AppState::new());
+//! start_server(addr, app_state).await;
 //! # Ok(())
 //! # }
 //! ```

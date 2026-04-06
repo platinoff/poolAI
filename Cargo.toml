@@ -190,6 +190,36 @@ name = "distributed_raid_wire_integration"
 path = "tests/distributed_raid_wire_integration.rs"
 required-features = ["test-utils"]
 
+[[test]]
+name = "ml_automl_integration"
+path = "tests/ml_automl_integration.rs"
+required-features = ["ml"]
+
+[[test]]
+name = "ml_experiments_integration"
+path = "tests/ml_experiments_integration.rs"
+required-features = ["ml"]
+
+[[test]]
+name = "ml_federated_integration"
+path = "tests/ml_federated_integration.rs"
+required-features = ["ml"]
+
+[[test]]
+name = "ml_pipeline_integration"
+path = "tests/ml_pipeline_integration.rs"
+required-features = ["ml"]
+
+[[test]]
+name = "ml_pruning_integration"
+path = "tests/ml_pruning_integration.rs"
+required-features = ["ml"]
+
+[[test]]
+name = "ml_versioning_integration"
+path = "tests/ml_versioning_integration.rs"
+required-features = ["ml"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)

@@ -19,6 +19,7 @@
 //!     accuracy: 0.95,
 //!     training_time_ms: 1000,
 //!     hyperparameters: std::collections::HashMap::new(),
+//!     description: None,
 //! };
 //!
 //! let version = manager.register_model("model1", metadata).await?;
@@ -376,7 +377,11 @@ impl ModelVersionManager {
     ///
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
     /// let manager = ModelVersionManager::new();
-    /// manager.add_tags("model1", "v1", vec!["production", "best"]).await?;
+    /// manager.add_tags(
+    ///     "model1",
+    ///     "v1",
+    ///     vec!["production".to_string(), "best".to_string()],
+    /// ).await?;
     /// # Ok(())
     /// # }
     /// ```

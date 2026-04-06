@@ -19,6 +19,7 @@
 //!     client_id: "client1".to_string(),
 //!     model_weights: vec![0.5, 0.3, 0.2],
 //!     sample_count: 100,
+//!     round: 0,
 //! };
 //!
 //! pipeline.add_client_update(update).await?;
