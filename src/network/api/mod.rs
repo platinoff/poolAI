@@ -27,6 +27,7 @@ pub mod raid_admin;
 pub(crate) mod raid_http;
 pub mod rewards;
 pub mod system;
+mod system_status_html;
 pub mod topology;
 pub mod ui;
 pub mod users;

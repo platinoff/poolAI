@@ -23,7 +23,7 @@
 | Порядок | Пріоритет | Що робити зараз |
 |--------:|-----------|-----------------|
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
-| **2** | **Priority 2** | Сервіси **`RaidService`**, **`VmService`**, **`LibraryService`**, enterprise/cloud/admin — у проді; REST `/raid/*` через **`RaidService`**; HTTP-мапінг помилок RAID — **`network/api/raid_http.rs`**. **Наступний великий залишок без окремого «UI-сервісу»:** тонкі **`network/api/ui.rs`** (enterprise dashboards + themes + components). Опційно: **`raid_distributed_handlers`** vs сервісний шар. |
+| **2** | **Priority 2** | Сервіси **`RaidService`**, **`VmService`**, **`LibraryService`**, enterprise/cloud/admin — у проді; REST `/raid/*` через **`RaidService`**; HTTP-мапінг помилок RAID — **`network/api/raid_http.rs`**. **`network/api/ui.rs`** + **`UiService`**, дашборди через **`EnterpriseService`** — зроблено. **Наступний інкремент:** уточнити залишкові «товсті» handlers / довести критерії P2 (миграція логіки, залежності сервісів лише з `ApiContext`). HTML для **`GET /status`** винесено в **`network/api/system_status_html.rs`** ( **`SystemService`** лишається без розмітки). |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅. Далі: **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; **P4** / SIMD за потреби. |
 | **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
@@ -77,6 +77,7 @@
   - [x] `cloud_service.rs`: операції з провайдерами та Kubernetes‑оператором (див. `AppState::cloud_manager`, `services/cloud_service.rs`).
   - [x] `admin_service.rs`: агрегація даних для адмін‑панелі (`GET /api/v1/admin/overview`, дашборд `/ui/admin`).
 - [ ] Поступово мігрувати логіку з `network/api/*.rs` у відповідні сервіси:
+  - [x] Приклади тонких шарів: **`ui.rs`** → **`UiService`** + **`EnterpriseService`** (дашборди); **`system.rs`** — JSON через **`SystemService`**, HTML **`/status`** у **`system_status_html.rs`**.
   - [ ] Handler’и роблять мінімум: екстрактують вхідні дані, викликають метод сервісу, маплять результат у HTTP‑відповідь.
   - [x] Спільний HTTP-мапінг помилок для **`/raid/*`** винесено в **`src/network/api/raid_http.rs`** (тонкий **`raid.rs`**).
   - [ ] Сервіси отримують залежності через `AppState/ApiContext`.
