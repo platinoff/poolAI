@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (P3 по REST/enterprise/raid завершено; доки синхронізовано)  
+**Оновлено:** 2026-04-06 (узгоджено README, `docs/README`, `INDEX`, `development/README`: карта доків, статус, P3/P4)  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -29,12 +29,12 @@
 - **ML pipeline (Stage 4.4)**: детерміновані Rust-бекенди для `Preprocessing`, `Training`, `Evaluation`, `Deployment` (`src/ml/pipeline.rs`).
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
 - **Priority 3 (основний HTTP-шар)**: `src/network/api/common.rs` — `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext` (+ `hint`). Узгоджені відповіді: **`raid.rs`** (у т.ч. `raid_api_err`, `raid_event_store_unavailable`), **повний** **`enterprise_api.rs`** (хелпер **`enterprise_err`**), **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`**, раніше — **`ai_ml`**, **instances/libraries/vm/workers/topology/rewards**, tenant CRUD, RAID `Operation` через `api_error_response`.
-- **P3 (auth)**: **`src/network/auth.rs`** — узгоджено з **`api_json_error`** / **`ErrorContext`** (модуль **`network/json_errors.rs`**); UI читає `error.message`.
+- **P3 (auth / WS / rate limit)**: **`auth.rs`**, **`ws.rs`** (upgrade + payload помилок), **`rate_limit.rs`** — узгоджено з **`api_json_error`** / **`ErrorContext`** (`src/network/json_errors.rs`); UI читає `error.message`.
 - **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud`. На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
 
 ## 4. Наступні кроки за тим самим планом
 
-1. **P4 (продовження)** — Criterion таргети як вище; у `BENCHMARKS.md` додано **перший dev-sample baseline** (скорочений профіль Criterion). Далі — ті самі команди на **референс-машині**, **`wrk`**, опційно CI для `cargo bench`. `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (WS manager робить `tokio::spawn`).
+1. **P4 (продовження)** — Criterion таргети як у `BENCHMARKS.md`; **CI**: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + щотижневий cron, артефакт `criterion-report`). Далі на **референс-машині** — повні прогони та **`wrk`** на `/api/v1/health`. `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (WS manager робить `tokio::spawn`).
 2. **P2 (опційно)** — RAID workers/events/snapshot тощо через `RaidService`.
 3. **P2b / доки** — оновити чекбокси TurboQuant у `NEXT_STEPS_ARCHITECT` під фактичний код у `src/ml/turboquant.rs`.
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).

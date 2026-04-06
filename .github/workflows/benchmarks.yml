@@ -1,0 +1,53 @@
+# Optional Criterion runs (not on every push). See docs/performance/BENCHMARKS.md.
+name: Benchmarks
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * 0"
+
+env:
+  CARGO_TERM_COLOR: always
+  K8S_OPENAPI_ENABLED_VERSION: "1.28"
+
+jobs:
+  criterion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-bench-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bench-
+
+      - name: runtime_benchmarks
+        run: cargo bench -j 1 --bench runtime_benchmarks -- --noplot
+
+      - name: turboquant_benchmarks
+        run: cargo bench -j 1 --bench turboquant_benchmarks --features ml -- --noplot
+
+      - name: cloud_benchmarks
+        run: cargo bench -j 1 --bench cloud_benchmarks --features cloud -- --noplot
+
+      - name: service_layer_benchmarks
+        run: cargo bench -j 1 --bench service_layer_benchmarks --features test-utils -- --noplot
+
+      - name: Upload Criterion HTML (artifact)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: criterion-report
+          path: target/criterion/
+          if-no-files-found: ignore

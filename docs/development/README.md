@@ -25,9 +25,13 @@
 
 ## 📊 Поточні Пріоритети (v0.3.0+)
 
-### Priority 3: Узгоджені HTTP-помилки (основа готова)
+### Priority 3: Узгоджені HTTP / транспортні помилки
 
-- Формат і хелпери: `src/network/api/common.rs`; типи — `src/core/error.rs`; **`enterprise_err`** — `enterprise_api.rs`. **Залишок**: вирівняти **`auth.rs`**. Джерело правди: **`HANDOFF_NEW_SESSION.md`**, секція P3 у **`NEXT_STEPS_ARCHITECT_2026-03-17.md`**.
+- Формат: `src/network/json_errors.rs`, реекспорт у `api/common.rs`; типи — `src/core/error.rs`; **`enterprise_err`** — `enterprise_api.rs`. Покрито основний REST, **`raid.rs`**, **`enterprise_api.rs`**, **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Опційно: тонке налаштування `http_status_for_app_error`. Джерело правди: **`HANDOFF_NEW_SESSION.md`**, **`NEXT_STEPS_ARCHITECT_2026-03-17.md`** (секція P3).
+
+### Priority 4: Продуктивність і бенчі
+
+- Команди та baseline: [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md). Опційний CI: [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml) (`workflow_dispatch` + cron).
 
 ### Priority 2: Service layer + опціональні features
 

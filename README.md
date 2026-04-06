@@ -6,55 +6,33 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ## Documentation map (canonical order)
 
-Узгоджено з [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md) та [`docs/README.md`](docs/README.md).
+Той самий порядок, що в [`docs/README.md`](docs/README.md) і [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md).
 
-1. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — навігація по всьому каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
-2. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **головний** покроковий план Rust Architect (пріоритети P1–P6, TurboQuant, верифікація CI).
-3. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт для **нової сесії**: гілка `main`, порядок доків, git-push, що зроблено в service layer, наступні кроки.
-4. **Concept / vision** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt), Grid/Memory/Job: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md).
-5. **Inventory** — [`file_list.csv`](file_list.csv) (ручний зріз ключових шляхів; синхронізуй після змін у `src/services/`, `src/network/api/`, `.cursor/`); повний список: `git ls-files`.
-6. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для CI/cloud-sdk).
+1. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
+2. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).
+3. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії**: гілка `main`, порядок доків, git-push, зріз зробленого, наступні кроки.
+4. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md).
+5. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
+6. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml).
+7. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+8. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`); повний список файлів: `git ls-files`.
+9. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
 
-## 🎉 **PROJECT 100% COMPLETE! v0.2.2 RELEASED! PRO EDITION!** 🚀
+## Release and status
 
-**Current Status**: **All 15 Modules 100% Complete!** **437+ Tests Passing!** **Production Ready!** **v0.2.2 Released!** **PRO Package Active!**  
-**Project Structure**: Optimized (Docker files in `docker/`, documentation in `docs/`)  
-**Release**: v0.2.2 - Production Ready (2026-01-22)  
-**Previous Release**: v0.2.1 (2026-01-22)  
-**Package**: PRO Edition (First Day: 2026-01-16)
+**Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-### 🆕 What's New in v0.2.2
-- ✅ **Cloud SDK 100%** - Load Balancing routing rules, Cloud LB init (K8s Service LoadBalancer)
-- ✅ **RoutingRule**, `add_routing_rule`, `get_routing_rules`, `set_cloud_lb_config`
-- ✅ **Documentation** - Stable state, roadmap, next steps (Rust Architect) aligned
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Stage 4.3–4.4** (cloud SDK/operator, ML hardening) і **архітектурний план** (service layer, перф, доки) — **поточна доробка**. Детальний зріз: [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md).
 
-### 🆕 What's New in v0.2.1
-- ✅ **Cloud SDK Auto-scaling** - Metrics API, `evaluate_and_scale`, ScalingAction
-- ✅ **Pre-push Hook** - `cargo fmt --all --check` before git push
-- ✅ **Rust Architect Rules** - `.cursor/rules/`, MSYS2 bash, concept files  
-**Repository**: [https://github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
-**Creator**: Madevinc (one developer with Cursor AI)
+**Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
----
+### Останні релізні нотатки (скорочено)
 
-## ⚡️ Architectural Improvement Plan (2025)
+**v0.2.2** — Cloud LB: routing rules, `add_routing_rule` / `get_routing_rules`, `set_cloud_lb_config`; узгодження документації з планом Architect.
 
-1. **Healthcheck endpoint** — /api/v1/health for CI/CD and monitoring ✅ **COMPLETED**
-2. **Global version/uptime state** — implemented via `version.rs` module ✅ **COMPLETED**
-3. **Public API exported only from lib.rs** — all internals private, rustdoc for public traits/structs ✅ **COMPLETED**
-4. **JWT & RBAC** — middleware for token and role checks (admin/operator/viewer) ✅ **COMPLETED**
-5. **Endpoint access restriction** — /metrics, /workers, /shutdown only for authorized users ✅ **COMPLETED**
-6. **CI/CD** — GitHub Actions workflow for tests and builds ✅ **COMPLETED**
-7. **Swagger/OpenAPI** — API spec generation and publication ✅ **COMPLETED**
-8. **Documentation** — Quick Start, curl examples, security section ✅ **COMPLETED**
-9. **Live metrics (WebSocket)** — /ws/metrics for real-time monitoring ✅ **COMPLETED**
-10. **UI/UX** — Copy buttons, security links, favicon/logo, status page improvements ✅ **COMPLETED**
-11. **UI Improvements** — Accessibility features, additional components, UX improvements, responsive design ✅ **COMPLETED**
-12. **VM Isolation** — Loopback interface setup, bind mounts, read-only mounts ✅ **COMPLETED**
-13. **Documentation Improvements** — Enhanced TODO comments with detailed implementation notes ✅ **COMPLETED**
-14. **Comprehensive Documentation** — Rustdoc documentation for all core modules (config, error, monitoring, pool, vm, raid) ✅ **COMPLETED**
-15. **Error Message Improvements** — Enhanced error messages with context and suggestions across all modules ✅ **COMPLETED**
-16. **Unit Tests** — Comprehensive unit tests for versioning, config, pool, raid, and vm modules ✅ **COMPLETED**
+**v0.2.1** — Cloud auto-scaling (metrics API, `evaluate_and_scale`, `ScalingAction`); pre-push `cargo fmt --all --check`; правила `.cursor/rules/`, MSYS2.
+
+Наступні кроки: [Next Focus](#next-focus) та [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md). Довгий нумерований чеклист архітектурних пунктів 2025 року прибрано з README як дубль — вони відображені в коді, CI та `docs/status/`.
 
 ---
 
@@ -68,15 +46,16 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
 - `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
-- **Архітектурні інкременти (гілка `main`, 2026-04)**: розширений **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **Priority 3 (основний REST)** — `api_json_error` / `api_error_response` у `network/api/common.rs`, хелпер **`enterprise_err`** у `enterprise_api.rs`, узгоджені помилки в **`raid.rs`**, повному **`enterprise_api.rs`**, а також у **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`** та раніше — **instances, libraries, vm, workers, topology, rewards**, **ai_ml**, tenant CRUD.
+- **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 — узгоджені JSON-помилки** — `src/network/json_errors.rs`, реекспорт у `network/api/common.rs`, **`enterprise_err`**, **`raid.rs`**, основний REST (`users`, `ui`, `system`, `completions`, `raid_admin`, instances, libraries, vm, workers, topology, rewards, `ai_ml`, tenant CRUD), а також **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**.
 
 ### Next Focus
-- **Priority 3 (добивання)**: **`auth.rs`** узгоджено з `api_json_error` / `ErrorContext`. Опційно: інші точки входу з плоским `"error"` (напр. `ws.rs`, `rate_limit.rs`) або уточнення `http_status_for_app_error` для `ResourceError` / not-found.
-- **Priority 4**: перенести baseline з `docs/performance/BENCHMARKS.md` на **іменований референс‑хост**; зняти **`wrk`** на `/api/v1/health`; опційно CI для `cargo bench`. Див. `PROFILING.md`.
-- **Priority 2 (опційно)**: подальше перенесення RAID (workers, events, snapshot, …) у `RaidService`.
-- **Priority 2b**: чекбокси TurboQuant у архітектурному плані (код уже в дереві — оновити доки/критерії «готово»).
-- За потреби: стабілізувати `cargo test --all-features` на Windows.
-- Канонічний план: [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт сесії: [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
+
+- **P3 (опційно)**: уточнення `http_status_for_app_error` для `ResourceError` / not-found, де потрібен інший HTTP-статус.
+- **P4**: baseline у [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на **іменований референс-хост**; **`wrk`** на `/api/v1/health`; опційний CI — [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml). Див. [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
+- **P2 (опційно)**: подальший переніс RAID (workers, events, snapshot, …) у `RaidService`.
+- **P2b**: фаза 1 TurboQuant у коді — див. план і `docs/ml/TURBOQUANT_INTEGRATION.md`; далі за планом — заміри RAID / опційно SIMD.
+- За потреби: стабілізувати `cargo test --all-features` на Windows (GNU toolchain, `-j 1`).
+- **Канонічний план:** [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md) · **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 
 ### 🚀 Development Roadmap
 
@@ -93,7 +72,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 #### ✅ Stage 3 - COMPLETED! 🎉
 - ✅ **Runtime Module** - Lifecycle management and process control
-- ✅ **Libs Module** - Model library management and version control (95% complete)
+- ✅ **Libs Module** - Model library management and version control
 - ✅ **VM Module** - Virtualization and isolation support (100% complete) 🎉
   - ✅ Process runner integration
   - ✅ Resource limits (Linux cgroups, Windows Job Objects)
@@ -208,13 +187,13 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **GPU**: NVIDIA GPU with CUDA support (optional)
 
 ### Rust Requirements
-- **Rust**: 1.70+ (stable) - **Recommended: 1.83+ (latest)**
-- **Cargo**: Included with Rust
-- **Edition**: 2021 (as specified in Cargo.toml)
-- **Toolchain**: stable-x86_64-pc-windows-gnu (Windows) or stable-x86_64-unknown-linux-gnu (Linux)
+- **Rust**: див. **`rust-toolchain.toml`** (наприклад, `1.92.0` stable); MSRV для окремих залежностей — у коментарях `Cargo.toml`.
+- **Cargo**: разом із Rust
+- **Edition**: 2021
+- **Toolchain**: для Windows у репозиторії задано `x86_64-pc-windows-gnu` у `rust-toolchain.toml`; на Linux — типовий stable для цільової ОС.
 
 ### Software Requirements
-- **Rust**: 1.70+ (latest stable)
+- **Rust**: як у `rust-toolchain.toml` / stable для вашої платформи
 - **MSYS2** (Windows): For native dependencies (gcc, dlltool)
 - **CUDA**: 11.0+ (optional, for GPU support)
 - **OpenSSL**: 1.1.1+ (for HTTPS/TLS support)
@@ -419,16 +398,11 @@ We welcome contributions! Please see our [Contributing Guidelines](.github/CONTR
 - Write tests for new functionality
 - Follow [Rust Book](https://doc.rust-lang.org/book/) best practices
 
-## 📚 Documentation
+## Documentation
 
-Вся документація проекту знаходиться в каталозі [`docs/`](./docs/). Дивіться [`docs/README.md`](./docs/README.md) для повного списку документів.
+Увесь текстовий корпус — у [`docs/`](./docs/). **Порядок читання** — у розділі [Documentation map](#documentation-map-canonical-order) зверху; детальна карта — [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md).
 
-### Основні документи:
-- [`docs/status/CURRENT_STATUS.md`](./docs/status/CURRENT_STATUS.md) - Поточний стан проекту
-- [`docs/development/NEXT_DEVELOPMENT_PHASE.md`](./docs/development/NEXT_DEVELOPMENT_PHASE.md) - Наступна фаза розробки
-- [`docs/development/NEXT_STEPS_PLAN.md`](./docs/development/NEXT_STEPS_PLAN.md) - План наступних кроків
-- [`docs/status/STABLE_STATE_SUMMARY.md`](./docs/status/STABLE_STATE_SUMMARY.md) - Стабільний стан розробки
-- [`docs/concept/poolAI_concept.txt`](./docs/concept/poolAI_concept.txt) - Концепція проекту
+**Додатково (історія та зрізи):** [`docs/status/CURRENT_STATUS.md`](docs/status/CURRENT_STATUS.md), [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md), [`docs/development/NEXT_DEVELOPMENT_PHASE.md`](docs/development/NEXT_DEVELOPMENT_PHASE.md), [`docs/development/NEXT_STEPS_PLAN.md`](docs/development/NEXT_STEPS_PLAN.md), [`docs/concept/poolAI_concept.txt`](docs/concept/poolAI_concept.txt).
 
 ## 📄 License
 
@@ -463,10 +437,6 @@ Thank you for supporting PoolAI! 🙏
 
 ---
 
-**PoolAI** - Empowering AI with distributed computing 🚀  
-**Status**: PRO Edition - All Modules Complete! 🎯  
-**Version**: v0.1.0  
-**Last Updated**: 2026-01-16  
-**Package**: PRO (First Day: 2026-01-16)  
-**Next Goal**: Stage 4.3 - Cloud Integration SDK Implementation 🚀  
-**Repository**: [https://github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
+**PoolAI** — distributed AI mining pool management.  
+**Version:** 0.2.2 (`Cargo.toml`) · **Docs updated:** 2026-04-06 · **Repository:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
+**Наступні орієнтири:** Stage 4.3–4.4 (cloud / ML) та план у [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md).

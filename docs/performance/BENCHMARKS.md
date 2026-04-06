@@ -123,29 +123,9 @@ The tables below are **example staging numbers** for documentation and roadmap d
 
 ## Continuous benchmarking (optional CI)
 
-Example weekly job sketch (adapt checkout/rust-toolchain to your org):
+У репозиторії: **[`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml)** — `workflow_dispatch` і щотижневий cron (неділя 06:00 UTC), усі чотири bench-таргети з `-j 1`, `K8S_OPENAPI_ENABLED_VERSION=1.28` для `cloud_benchmarks`, артефакт **`criterion-report`** (`target/criterion/`).
 
-```yaml
-name: Criterion benchmarks
-on:
-  schedule:
-    - cron: '0 6 * * 0'
-  workflow_dispatch: {}
-
-jobs:
-  bench:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo bench -j 2 --bench runtime_benchmarks -- --noplot
-      - run: cargo bench -j 2 --bench turboquant_benchmarks --features ml -- --noplot
-      # Optional (heavier / feature-gated):
-      # - run: cargo bench -j 2 --bench cloud_benchmarks --features cloud -- --noplot
-      # - run: cargo bench -j 2 --bench service_layer_benchmarks --features test-utils -- --noplot
-```
-
-`--noplot` avoids plotters-related work if you only need console output; upload `target/criterion/` as an artifact if you want HTML diffs.
+`--noplot` у workflow прибирає зайве від plotters, якщо достатньо консольного виводу.
 
 ---
 

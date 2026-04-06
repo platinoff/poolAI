@@ -25,7 +25,7 @@
 | **1** | **Priority 1** | **Закрито по суті**: `ARCHITECTURE_REVIEW.md` (розділ AppState), `DEVELOPMENT_PLAN_UPDATED.md` (посилання на покровий план), feature **`test-utils`** + `attach_*_for_test` на `AppState`. Опційно пізніше: distributed RAID / Raft без глобальних згадок у коментарях. |
 | **2** | **Priority 2** | Розширити **`src/services/`** (enterprise, cloud, admin); **Stage 4.4** — ML pipeline backends. Є: **`RaidService`**, **`VmService`**, **`LibraryService`** (`/libraries/*`). |
 | **3** | **Priority 2b** | **Фаза 1 TurboQuant у коді** (`src/ml/turboquant.rs`, pipeline, інтеграційний тест). Далі: **P4**-заміри RAID, опційно SIMD; оновлення `BENCHMARKS.md`. |
-| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Залишок**: опційно `auth.rs`, уточнення статусів для `ResourceError` / not-found — див. HANDOFF. |
+| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, `raid_api_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | Синхронізація документації та TODO після 1–4. |
 | **7** | **Priority 6** | Grid protocol / Solana-adapter у docs і коді за потреби. |
@@ -125,7 +125,7 @@
 
 **Критерії готовності**:
 - [x] Усі **основні** HTTP‑модулі в `network/api/` та enterprise router використовують `api_json_error` / `api_error_response` / `ErrorContext` для помилок.
-- [x] HTTP‑шар узгоджений з **`auth.rs`** (структуровані помилки); за потреби — WS/інші точки входу.
+- [x] HTTP‑шар узгоджений з **`auth.rs`** (структуровані помилки); **WS** (`websocket_handler` upgrade, невідомий `message_type` у payload) та **rate limit** 429 — той самий формат `error` / `context`.
 - [x] Для шляхів через `api_error_response` / `api_json_error` — структуровані логи (код, контекст, рівень за класом статусу).
 
 ---
@@ -149,7 +149,7 @@
 
 **Критерії готовності**:
 - [x] Є повторюваний сценарій **локально**: `cargo bench -j 1 --bench runtime_benchmarks` та `cargo bench -j 1 --bench turboquant_benchmarks --features ml` (+ опційні `cloud_benchmarks`, `service_layer_benchmarks`).
-- [ ] CI‑регресія бенчмарків (опційно); baseline у `BENCHMARKS.md` — **оновлювати** після зміни коду або референс‑машини.
+- [x] CI для Criterion — **опційно**: `.github/workflows/benchmarks.yml` (`workflow_dispatch` + неділя 06:00 UTC), артефакт `target/criterion/`; baseline у `BENCHMARKS.md` — **оновлювати** вручну після зміни коду або референс‑машини.
 - [ ] Для основних сценаріїв зафіксовані **цільові** метрики (поруч із фактичними dev/ref рядками).
 
 ---

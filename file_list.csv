@@ -24,6 +24,7 @@
 ./.github/ISSUE_TEMPLATE/feature_request.md
 ./.github/PULL_REQUEST_TEMPLATE.md
 ./.github/SECURITY.md
+./.github/workflows/benchmarks.yml
 ./.github/workflows/ci.yml
 ./.github/workflows/docs.yml
 ./.github/workflows/release.yml
