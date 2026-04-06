@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — доадаптовано 2026-03-04 (v0.2.2, Stage 4.4 AI/ML у розвитку)
+## Rust Architect — оновлено 2026-04-06 (v0.2.2; архітектурний план P1–P6, P4/P2b бенчі)
 
 ---
 
@@ -13,7 +13,8 @@
 - ✅ Всі модулі компілюються успішно
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
-- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud`; ML/enterprise/cloud інтеграційні тести збираються і проходять (2026-03-04).
+- ✅ CI/CD: Required test step з `--features ml,enterprise,cloud` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
+- ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус
 - ✅ Гілка **main**
@@ -56,7 +57,11 @@
 | Призначення | Файл |
 |-------------|------|
 | Стабільний стан | `docs/status/STABLE_STATE_SUMMARY.md` (цей файл) |
-| Наступні кроки | `docs/development/NEXT_STEPS_2026-01-19.md` |
+| Головний план архітектора | `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
+| Передача новій сесії | `docs/development/HANDOFF_NEW_SESSION.md` |
+| Витяг функціоналу (крок 11) | `docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md` |
+| Бенчмарки / perf | `docs/performance/BENCHMARKS.md`, `.github/workflows/benchmarks.yml` |
+| Наступні кроки (архів) | `docs/development/NEXT_STEPS_2026-01-19.md` |
 | Перевірка Cursor і кроки | `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` |
 | Концепт (PRIMARY) | `docs/concept/poolAI_concept_root.txt` |
 | Roadmap | `docs/DEVELOPMENT_ROADMAP.md` |

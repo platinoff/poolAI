@@ -122,6 +122,13 @@
 
 Детальний покроковий план: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
 
+## ⚡ Performance cycle і бенчмарки (2026-04)
+
+- **Мікро-бенчі**: Criterion у `benches/` — команди та групи в [`docs/performance/BENCHMARKS.md`](performance/BENCHMARKS.md) (`runtime_benchmarks`, `turboquant_benchmarks` + `ml`, `cloud_benchmarks`, `service_layer_benchmarks` + `test-utils`).
+- **CI**: опційний workflow [`.github/workflows/benchmarks.yml`](../.github/workflows/benchmarks.yml) (`workflow_dispatch`, щотижневий cron), артефакт `target/criterion/`.
+- **ML / TurboQuant**: крок pipeline **Quantization** (гілка TurboQuant) записує метрики стиснення в `StepResult.output` (`bytes_in`, `bytes_out`, `compression_ratio`, …) у `src/ml/pipeline.rs`; віддача клієнту — через enterprise ML pipeline API після виконання.
+- **Структуровані помилки HTTP**: `AppError` + `ErrorContext`, узгоджений JSON — `src/network/api/common.rs`, `src/core/error.rs` (див. той самий план архітектора, Priority 3).
+
 ## 📋 Checklist для Rust Architect
 
 ### Структура

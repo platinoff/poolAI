@@ -108,7 +108,7 @@
 **Критерії готовності**:
 - [x] Увімкнення TurboQuant керується конфігом кроку pipeline (і feature **`ml`**).
 - [x] Є автоматизовані тести модуля та шляху pipeline (`cargo test`, без зовнішніх binary).
-- [ ] Метрики стиснення стабільно зведені в API/дашборді pipeline (за потреби доробити).
+- [x] Метрики стиснення у відповіді pipeline: крок **Quantization** з TurboQuant заповнює `StepResult.output` (`bytes_in`, `bytes_out`, `compression_ratio`, `max_abs_recon_error`, …); після **`POST .../execute`** вони доступні в тілі **`GET .../pipeline/{id}`** (enterprise **`ai_ml`**). Опційно пізніше: окремий UI-дашборд під ці поля.
 
 ---
 
@@ -136,7 +136,7 @@
 **Мета**: перейти від одноразових оптимізацій до **регулярного профілювання** та вимірювань для ключових шляхів.
 
 **Кроки**:
-- [ ] Визначити hot‑paths (на базі наявних доків і інтуїції архітектора):
+- [x] Визначити hot‑paths (на базі наявних доків і інтуїції архітектора):
   - [x] RAID: **локальний** `put_artifact` — Criterion у `benches/runtime_benchmarks.rs` (`raid_local_put`).
   - [x] RAID: **проксі мережевого шару** — serde `PutArtifactPayload` (`raid_protocol_put_payload`); реальна реплікація з пірами — окремий harness.
   - [x] RAID replication **control-plane** — `raid_replication_engine` у `runtime_benchmarks` (`select_replication_nodes`, `calculate_quorum`).
@@ -165,10 +165,10 @@
   - [ ] `RUST_ARCHITECT_STATUS_2026-01-19.md`,
   - [ ] `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md`,
   - [ ] `PERCENTAGE_PLAN.md`.
-- [ ] Оновити або доповнити:
-  - [ ] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` — посилання на цей план і статус виконання.
-  - [ ] `docs/status/STABLE_STATE_SUMMARY.md` — коротке резюме після завершення архітектурних кроків.
-  - [ ] `docs/ARCHITECTURE_REVIEW.md` — новий розділ про `AppState/ApiContext`, Service Layer, ErrorContext, perf‑цикл.
+- [x] Оновити або доповнити (інкремент 2026‑04):
+  - [x] `docs/development/DEVELOPMENT_PLAN_UPDATED.md` — зріз стану + посилання на цей план, `BENCHMARKS.md`, витяг функціоналу.
+  - [x] `docs/status/STABLE_STATE_SUMMARY.md` — канонічні посилання (HANDOFF, Architect plan), CI/бенчі.
+  - [x] `docs/ARCHITECTURE_REVIEW.md` — розділ про perf‑цикл і Criterion (доповнення до наявного блоку AppState / сервісний шар).
 
 **Критерії готовності**:
 - [ ] Усі згадані вище документи відображають фактичний стан архітектури.

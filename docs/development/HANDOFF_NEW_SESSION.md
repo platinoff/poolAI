@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (узгоджено канонічні кроки 1–11: кореневий README, `docs/README`, `INDEX`, цей HANDOFF, `development/README`, `docs/catalog/FUNCTIONALITY_DIGEST`)  
+**Оновлено:** 2026-04-06 (кроки 1–11; P5-синхронізація `DEVELOPMENT_PLAN_UPDATED` / `STABLE_STATE_SUMMARY` / `ARCHITECTURE_REVIEW` з Architect plan)  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -45,5 +45,6 @@
 2. **P2** — REST `/raid/*` (workers, events, snapshot, …) уже через **`RaidService`**; опційно далі — тонкі distributed handlers у `raid_distributed_handlers` vs сервіс.
 3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; далі — wire-replication + порівняння розміру артефакта до/після TQ01 на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги).
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
+5. **P5 (доки)** — періодично синхронізувати `DEVELOPMENT_PLAN_UPDATED`, `STABLE_STATE_SUMMARY`, `ARCHITECTURE_REVIEW` з [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (інкремент 2026‑04 зроблено).
 
 Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).

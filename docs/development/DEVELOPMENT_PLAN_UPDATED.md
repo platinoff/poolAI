@@ -6,6 +6,13 @@
 > **Актуальний покровий план архітектора (AppState, сервісний шар, TurboQuant, perf):**  
 > [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) — використовуйте його як головний дорожній карта; цей файл лишається історичним описом фаз Distributed RAID та ранніх етапів.
 
+### Зріз виконання (2026-04-06)
+
+- **Архітекторський план**: [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) (P1–P6); передача контексту сесії: [`HANDOFF_NEW_SESSION.md`](HANDOFF_NEW_SESSION.md).
+- **Продуктивність**: [`docs/performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) (Criterion, у т.ч. `raid_replication_engine`), workflow [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml).
+- **Витяг функціоналу (крок 11)**: [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md).
+- **ML pipeline / TurboQuant**: крок `Quantization` з TurboQuant пише метрики стиснення в `StepResult.output` (`src/ml/pipeline.rs`); REST під enterprise `ai_ml` (див. `src/network/api/ai_ml.rs`).
+
 ---
 
 ## 📊 Поточний стан проекту
