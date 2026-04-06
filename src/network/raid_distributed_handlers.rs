@@ -122,15 +122,24 @@ pub async fn get_artifact_handler(
         }
     };
 
-    let Some(manager) = ctx.raid_manager.get() else {
-        return create_error_response(
-            &message,
-            ErrorCode::InvalidRequest,
-            "RAID manager not initialized".to_string(),
-        );
+    let artifacts = match RaidService::list_artifacts(&ctx).await {
+        Ok(a) => a,
+        Err(RaidServiceError::ManagerUnavailable) => {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                "RAID manager not initialized".to_string(),
+            );
+        }
+        Err(e) => {
+            error!("Failed to list artifacts: {:?}", e);
+            return create_error_response(
+                &message,
+                ErrorCode::ReplicationFailed,
+                format!("Storage failed: {:?}", e),
+            );
+        }
     };
-    let manager = manager.clone();
-    let artifacts = manager.list_artifacts().await;
 
     // Find artifact by ID (simplified - in real implementation, would use proper ID mapping)
     let artifact = artifacts
@@ -229,43 +238,34 @@ pub async fn delete_artifact_handler(
         }
     };
 
-    let Some(manager) = ctx.raid_manager.get() else {
-        return create_error_response(
+    let id = match Uuid::parse_str(&payload.artifact_id) {
+        Ok(id) => id,
+        Err(e) => {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                format!("Invalid artifact id: {}", e),
+            );
+        }
+    };
+
+    match RaidService::delete_artifact(&ctx, id).await {
+        Ok(()) => {
+            info!("Artifact deleted successfully: {}", payload.artifact_id);
+            let response = DeleteArtifactResponse {
+                status: OperationStatus::Success,
+                artifact_id: payload.artifact_id,
+                deleted_at: Utc::now(),
+                error: None,
+            };
+            create_success_response(&message, response)
+        }
+        Err(RaidServiceError::ManagerUnavailable) => create_error_response(
             &message,
             ErrorCode::InvalidRequest,
             "RAID manager not initialized".to_string(),
-        );
-    };
-    let manager = manager.clone();
-    let artifacts = manager.list_artifacts().await;
-
-    // Find and delete artifact (simplified - in real implementation, would use proper ID mapping)
-    let artifact = artifacts
-        .iter()
-        .find(|a| a.id.to_string() == payload.artifact_id);
-
-    match artifact {
-        Some(artifact_ref) => match tokio::fs::remove_file(&artifact_ref.path).await {
-            Ok(_) => {
-                info!("Artifact deleted successfully: {}", payload.artifact_id);
-                let response = DeleteArtifactResponse {
-                    status: OperationStatus::Success,
-                    artifact_id: payload.artifact_id,
-                    deleted_at: Utc::now(),
-                    error: None,
-                };
-                create_success_response(&message, response)
-            }
-            Err(e) => {
-                error!("Failed to delete artifact: {}", e);
-                create_error_response(
-                    &message,
-                    ErrorCode::ReplicationFailed,
-                    format!("Delete failed: {}", e),
-                )
-            }
-        },
-        None => {
+        ),
+        Err(RaidServiceError::ArtifactNotFound { .. }) => {
             warn!("Artifact not found for deletion: {}", payload.artifact_id);
             let response = DeleteArtifactResponse {
                 status: OperationStatus::Success, // Idempotent - already deleted
@@ -274,6 +274,22 @@ pub async fn delete_artifact_handler(
                 error: None,
             };
             create_success_response(&message, response)
+        }
+        Err(RaidServiceError::Operation(e)) => {
+            error!("Failed to delete artifact: {}", e);
+            create_error_response(
+                &message,
+                ErrorCode::ReplicationFailed,
+                format!("Delete failed: {}", e),
+            )
+        }
+        Err(e) => {
+            error!("Failed to delete artifact: {:?}", e);
+            create_error_response(
+                &message,
+                ErrorCode::ReplicationFailed,
+                format!("Delete failed: {:?}", e),
+            )
         }
     }
 }
@@ -297,15 +313,24 @@ pub async fn sync_artifacts_handler(
         }
     };
 
-    let Some(manager) = ctx.raid_manager.get() else {
-        return create_error_response(
-            &message,
-            ErrorCode::InvalidRequest,
-            "RAID manager not initialized".to_string(),
-        );
+    let artifacts = match RaidService::list_artifacts(&ctx).await {
+        Ok(a) => a,
+        Err(RaidServiceError::ManagerUnavailable) => {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                "RAID manager not initialized".to_string(),
+            );
+        }
+        Err(e) => {
+            error!("Failed to list artifacts: {:?}", e);
+            return create_error_response(
+                &message,
+                ErrorCode::ReplicationFailed,
+                format!("Storage failed: {:?}", e),
+            );
+        }
     };
-    let manager = manager.clone();
-    let artifacts = manager.list_artifacts().await;
 
     // Simplified sync implementation
     // In real implementation, would compare timestamps and sync accordingly
@@ -349,28 +374,27 @@ pub async fn health_check_handler(
 ) -> impl IntoResponse {
     info!("Received HealthCheck message: {}", message.id);
 
-    let Some(manager) = ctx.raid_manager.get() else {
-        return create_error_response(
-            &message,
-            ErrorCode::InvalidRequest,
-            "RAID manager not initialized".to_string(),
-        );
+    let q = match RaidService::quota(&ctx).await {
+        Ok(q) => q,
+        Err(RaidServiceError::ManagerUnavailable) => {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                "RAID manager not initialized".to_string(),
+            );
+        }
+        Err(e) => {
+            error!("Failed to read RAID quota: {:?}", e);
+            return create_error_response(
+                &message,
+                ErrorCode::ReplicationFailed,
+                format!("Storage failed: {:?}", e),
+            );
+        }
     };
-    let manager = manager.clone();
-    let artifacts = manager.list_artifacts().await;
-    let total_size = manager.get_total_size().await.unwrap_or(0);
 
-    // Future improvement: Get actual storage capacity from config
-    // 1. Use manager.get_quota_bytes().await to get configured quota
-    //    - Returns Option<u64> from RaidConfig.quota_bytes
-    // 2. If quota is None (unlimited), calculate actual disk capacity:
-    //    - Use std::fs::metadata(&config.base_path) for directory metadata (not available in std)
-    //    - Or use platform-specific APIs (sysinfo crate or similar)
-    //    - For now, use quota_bytes as storage_total_bytes if available
-    // 3. Fallback to hardcoded default if quota not configured
-    // Example: let storage_total_bytes = manager.get_quota_bytes().await.unwrap_or(107374182400u64);
-    let storage_total_bytes = manager.get_quota_bytes().await.unwrap_or(107374182400u64); // 100 GB default
-    let storage_used_bytes = total_size;
+    let storage_total_bytes = q.quota_bytes.unwrap_or(107374182400u64); // 100 GB default
+    let storage_used_bytes = q.total_size_bytes;
 
     // Get actual application uptime using version module
     // Note: version::initialize_start_time() must be called at startup (already done in main.rs)
@@ -402,7 +426,7 @@ pub async fn health_check_handler(
         uptime_seconds,
         storage_used_bytes,
         storage_total_bytes,
-        artifact_count: artifacts.len() as u32,
+        artifact_count: q.artifact_count as u32,
         raft_role: RaftRole::Follower, // Placeholder until Raft integration is complete
         // Future improvement: Get actual Raft term from Raft node
         // 1. Access global Raft node using raid::raft::get_global_raft_node()
@@ -443,20 +467,35 @@ pub async fn join_cluster_handler(
         }
     };
 
-    let Some(manager) = ctx.raid_manager.get() else {
-        return create_error_response(
-            &message,
-            ErrorCode::InvalidRequest,
-            "RAID manager not initialized".to_string(),
-        );
+    match RaidService::register_worker(&ctx, payload.address.clone()).await {
+        Err(RaidServiceError::ManagerUnavailable) => {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                "RAID manager not initialized".to_string(),
+            );
+        }
+        _ => {}
+    }
+
+    let nodes = match RaidService::list_workers(&ctx).await {
+        Ok(n) => n,
+        Err(RaidServiceError::ManagerUnavailable) => {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                "RAID manager not initialized".to_string(),
+            );
+        }
+        Err(e) => {
+            error!("Failed to list cluster nodes: {:?}", e);
+            return create_error_response(
+                &message,
+                ErrorCode::ReplicationFailed,
+                format!("Cluster state failed: {:?}", e),
+            );
+        }
     };
-    let manager = manager.clone();
-
-    // Register the new node
-    let _node = manager.register_node(payload.address.clone()).await;
-
-    // Get existing nodes
-    let nodes = manager.list_nodes().await;
     let member_nodes: Vec<ClusterNode> = nodes
         .iter()
         .map(|n| {
