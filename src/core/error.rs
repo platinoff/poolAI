@@ -126,6 +126,8 @@ pub struct ErrorContext {
     pub resource_id: Option<String>,
     /// Free-form human-readable details.
     pub details: Option<String>,
+    /// Optional hint for clients (safe to expose; no secrets).
+    pub hint: Option<String>,
 }
 
 impl ErrorContext {
@@ -147,6 +149,12 @@ impl ErrorContext {
     /// Add additional human-readable details.
     pub fn with_details(mut self, details: impl Into<String>) -> Self {
         self.details = Some(details.into());
+        self
+    }
+
+    /// Add a short, client-safe remediation hint.
+    pub fn with_hint(mut self, hint: impl Into<String>) -> Self {
+        self.hint = Some(hint.into());
         self
     }
 }
@@ -569,7 +577,8 @@ mod tests {
     fn error_context_builder_works() {
         let ctx = ErrorContext::new("create_worker")
             .with_resource("worker", "w-1")
-            .with_details("failed to validate worker config");
+            .with_details("failed to validate worker config")
+            .with_hint("Check worker JSON schema");
 
         assert_eq!(ctx.operation.as_deref(), Some("create_worker"));
         assert_eq!(ctx.resource.as_deref(), Some("worker"));
@@ -578,5 +587,6 @@ mod tests {
             ctx.details.as_deref(),
             Some("failed to validate worker config")
         );
+        assert_eq!(ctx.hint.as_deref(), Some("Check worker JSON schema"));
     }
 }

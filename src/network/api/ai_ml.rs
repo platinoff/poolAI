@@ -6,9 +6,11 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::{routing::get, routing::post, Json, Router};
 use serde::Deserialize;
+use serde_json::Value;
 use std::collections::HashMap;
 use uuid::Uuid;
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::ml::automl::AutomlConfig;
 use crate::ml::federated::FederatedConfig;
@@ -18,6 +20,7 @@ use crate::ml::optimization::{
 };
 use crate::ml::pipeline::{MLPipeline, PipelineStep, StepType};
 use crate::ml::AiMlStatus;
+use crate::network::api::common::api_error_response;
 
 /// Request body for `POST .../pipeline`.
 #[derive(Debug, Deserialize)]
@@ -106,42 +109,62 @@ async fn list_ml_pipelines_handler(State(ctx): State<ApiContext>) -> Json<Vec<ML
 async fn create_ml_pipeline_handler(
     State(ctx): State<ApiContext>,
     Json(body): Json<CreateMlPipelineRequest>,
-) -> Result<Json<MLPipeline>, StatusCode> {
+) -> Result<Json<MLPipeline>, (StatusCode, Json<Value>)> {
     let p = ctx
         .ml_pipeline_manager
         .create_pipeline(&body.name, body.steps)
         .await
-        .map_err(|_| StatusCode::BAD_REQUEST)?;
+        .map_err(|e| {
+            api_error_response(
+                &e,
+                Some(ErrorContext::new("create_ml_pipeline")),
+                Some(StatusCode::BAD_REQUEST),
+            )
+        })?;
     Ok(Json(p))
 }
 
 async fn get_ml_pipeline_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
-) -> Result<Json<MLPipeline>, StatusCode> {
+) -> Result<Json<MLPipeline>, (StatusCode, Json<Value>)> {
     let p = ctx
         .ml_pipeline_manager
         .get_pipeline(&id)
         .await
-        .map_err(|_| StatusCode::NOT_FOUND)?;
+        .map_err(|e| {
+            api_error_response(
+                &e,
+                Some(ErrorContext::new("get_ml_pipeline").with_resource("pipeline", id.clone())),
+                Some(StatusCode::NOT_FOUND),
+            )
+        })?;
     Ok(Json(p))
 }
 
 async fn execute_ml_pipeline_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
-) -> Result<StatusCode, StatusCode> {
+) -> Result<StatusCode, (StatusCode, Json<Value>)> {
     ctx.ml_pipeline_manager
         .execute_pipeline(&id)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            api_error_response(
+                &e,
+                Some(
+                    ErrorContext::new("execute_ml_pipeline").with_resource("pipeline", id.clone()),
+                ),
+                Some(StatusCode::INTERNAL_SERVER_ERROR),
+            )
+        })?;
     Ok(StatusCode::NO_CONTENT)
 }
 
 /// Демо: один крок Profiling на спільному `AppState.ml_pipeline_manager`.
 async fn ai_ml_pipeline_demo_handler(
     State(ctx): State<ApiContext>,
-) -> Result<Json<MLPipeline>, StatusCode> {
+) -> Result<Json<MLPipeline>, (StatusCode, Json<Value>)> {
     let short = Uuid::new_v4().to_string();
     let short = &short[..8];
     let name = format!("api-demo-{short}");
@@ -155,15 +178,33 @@ async fn ai_ml_pipeline_demo_handler(
         .ml_pipeline_manager
         .create_pipeline(&name, steps)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            api_error_response(
+                &e,
+                Some(ErrorContext::new("ai_ml_pipeline_demo").with_details("create_pipeline")),
+                Some(StatusCode::INTERNAL_SERVER_ERROR),
+            )
+        })?;
     ctx.ml_pipeline_manager
         .execute_pipeline(pipeline.id.as_str())
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            api_error_response(
+                &e,
+                Some(ErrorContext::new("ai_ml_pipeline_demo").with_details("execute_pipeline")),
+                Some(StatusCode::INTERNAL_SERVER_ERROR),
+            )
+        })?;
     let got = ctx
         .ml_pipeline_manager
         .get_pipeline(pipeline.id.as_str())
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            api_error_response(
+                &e,
+                Some(ErrorContext::new("ai_ml_pipeline_demo").with_details("get_pipeline")),
+                Some(StatusCode::INTERNAL_SERVER_ERROR),
+            )
+        })?;
     Ok(Json(got))
 }

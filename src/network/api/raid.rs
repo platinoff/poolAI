@@ -21,8 +21,9 @@ use serde::Deserialize;
 use std::sync::Arc;
 use uuid::Uuid;
 
+use crate::core::error::ErrorContext;
 use crate::core::state::{ApiContext, AppState};
-use crate::network::api::common::check_permission;
+use crate::network::api::common::{api_error_response, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
 use crate::network::validation;
@@ -54,9 +55,10 @@ fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
                 )
             })),
         ),
-        RaidServiceError::Operation(err) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(serde_json::json!({ "error": err.to_string() })),
+        RaidServiceError::Operation(ref err) => api_error_response(
+            err,
+            Some(ErrorContext::new("raid")),
+            Some(StatusCode::INTERNAL_SERVER_ERROR),
         ),
     }
 }
