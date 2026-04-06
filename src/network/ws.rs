@@ -7,14 +7,15 @@ pub use crate::core::ws_manager::{
     LiveMetrics, SystemEvent, WebSocketConnection, WebSocketManager, WebSocketMessage,
 };
 
+use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::network::auth::{validate_token, Claims};
+use crate::network::json_errors::api_json_error;
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
     extract::State,
     http::{Request, StatusCode},
     response::IntoResponse,
-    Json,
 };
 use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
@@ -34,21 +35,25 @@ pub async fn websocket_handler(
                 let mgr = ctx.ws_manager.clone();
                 ws.on_upgrade(move |socket| handle_websocket_connection(socket, claims, mgr))
             }
-            Err(_) => (
-                StatusCode::UNAUTHORIZED,
-                Json(serde_json::json!({
-                    "error": "Invalid authentication token"
-                })),
-            )
-                .into_response(),
+            Err(_) => {
+                let (st, json) = api_json_error(
+                    "WS_AUTH_INVALID_TOKEN",
+                    "Invalid authentication token",
+                    Some(ErrorContext::new("websocket_handler")),
+                    StatusCode::UNAUTHORIZED,
+                );
+                (st, json).into_response()
+            }
         },
-        None => (
-            StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "error": "Authentication token required"
-            })),
-        )
-            .into_response(),
+        None => {
+            let (st, json) = api_json_error(
+                "WS_AUTH_TOKEN_REQUIRED",
+                "Authentication token required",
+                Some(ErrorContext::new("websocket_handler")),
+                StatusCode::UNAUTHORIZED,
+            );
+            (st, json).into_response()
+        }
     }
 }
 
@@ -105,12 +110,22 @@ async fn handle_websocket_connection(
                             handle_events_subscription(&mgr, &connection_id, &claims).await;
                         }
                         _ => {
+                            let received = message.message_type.clone();
+                            let ctx = ErrorContext::new("websocket_message")
+                                .with_resource("message_type", &received);
+                            let mut data = serde_json::json!({
+                                "error": {
+                                    "code": "WS_UNKNOWN_MESSAGE_TYPE",
+                                    "message": "Unknown message type",
+                                },
+                                "received": received,
+                            });
+                            if let Ok(v) = serde_json::to_value(&ctx) {
+                                data["context"] = v;
+                            }
                             let error_msg = WebSocketMessage {
                                 message_type: "error".to_string(),
-                                data: serde_json::json!({
-                                    "error": "Unknown message type",
-                                    "received": message.message_type
-                                }),
+                                data,
                                 timestamp: std::time::SystemTime::now()
                                     .duration_since(std::time::UNIX_EPOCH)
                                     .unwrap()

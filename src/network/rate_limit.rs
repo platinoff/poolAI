@@ -32,10 +32,13 @@
 //! # }
 //! ```
 
+use crate::core::error::ErrorContext;
+use crate::network::json_errors::api_json_error;
 use axum::extract::Request;
 use axum::http::{HeaderValue, StatusCode};
 use axum::middleware::Next;
 use axum::response::Response;
+use axum::Json;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::sync::Arc;
@@ -209,11 +212,13 @@ fn extract_client_ip(req: &Request) -> IpAddr {
 
 /// Create rate limit exceeded response
 fn create_rate_limit_response(retry_after: Duration) -> Response {
-    let body = serde_json::json!({
-        "error": "Rate limit exceeded",
-        "message": "Too many requests. Please try again later.",
-        "retry_after": retry_after.as_secs()
-    });
+    let (_, Json(mut body)) = api_json_error(
+        "RATE_LIMIT_EXCEEDED",
+        "Too many requests. Please try again later.",
+        Some(ErrorContext::new("rate_limit_middleware")),
+        StatusCode::TOO_MANY_REQUESTS,
+    );
+    body["retry_after"] = serde_json::json!(retry_after.as_secs());
 
     Response::builder()
         .status(StatusCode::TOO_MANY_REQUESTS)
