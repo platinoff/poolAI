@@ -17,8 +17,8 @@ use crate::network::auth::Claims;
 use crate::services::chat_completion_service::ChatCompletionService;
 
 pub use crate::services::chat_completion_service::{
-    ChatMessage, ChatCompletionChoice, ChatCompletionChunk, ChatCompletionChunkChoice,
-    ChatCompletionRequest, ChatCompletionResponse, ChatMessageDelta, ChatUsage,
+    ChatCompletionChoice, ChatCompletionChunk, ChatCompletionChunkChoice, ChatCompletionRequest,
+    ChatCompletionResponse, ChatMessage, ChatMessageDelta, ChatUsage,
 };
 
 /// Create completions routes

@@ -278,7 +278,10 @@ impl ChatCompletionService {
         tokio_stream::wrappers::UnboundedReceiverStream::new(rx)
     }
 
-    pub fn stream_fallback(model: &str, request: ModelRequest) -> impl Stream<Item = Result<Event, Infallible>> {
+    pub fn stream_fallback(
+        model: &str,
+        request: ModelRequest,
+    ) -> impl Stream<Item = Result<Event, Infallible>> {
         let model = model.to_string();
         let response_id = format!("chatcmpl-{}", uuid::Uuid::new_v4());
         let created = chrono::Utc::now().timestamp();
