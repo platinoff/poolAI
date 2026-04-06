@@ -25,8 +25,8 @@
 | **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
 | **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **`network/enterprise_api/`** ( **`mod.rs`** + tenants / audit / monitoring / security / oauth / saml) — розбито з моноліту. Дрібні edge cases міграції handlers → сервіси за потреби. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅ + **портативний fast-path** (`turboquant.rs`: pack/unpack/`dot_f32`). Далі: повні заміри по мережі на стенді (чекбокс нижче). |
-| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. **`http_status_for_app_error`**: евристики для **`ResourceError`** (not-found / conflict / capacity / kill-failure) + **`IoError`**: `NotFound`→404, `PermissionDenied`→403 (2026-04-06). |
-| **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
+| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`**, **`rate_limit.rs`**. **`http_status_for_app_error`** + **`IntoResponse`** для **`AppError`** / **`HttpAppError`** (`json_errors`, реекспорт у **`api::common`**) — 2026-04-06. |
+| **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (Criterion тощо); **`poolai_health_load`** з **`--json`** на stdout для baseline / ref-хост (2026-04-06). Далі вручну: рядки таблиці **`BENCHMARKS.md`**, LAN P2b на стенді. |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
 
@@ -125,7 +125,7 @@
 - [x] Базова конверсія в HTTP JSON у `src/network/api/common.rs`: `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; RBAC — `AppError::Forbidden` + `api_error_response`.
 - [x] Покрити **основний** публічний REST узгодженим форматом `{ "error": { "code", "message" }, "context"?: … }`: `src/network/api/*` (у т.ч. `raid.rs`, `ui`, `users`, `system`, `completions`, `raid_admin`), **`src/network/enterprise_api/`** (+ попередні модулі з попередніх комітів).
 - [x] **`src/network/auth.rs`** (логін, middleware) — `api_json_error` + `ErrorContext` (узгоджено з `json_errors.rs`).
-- [ ] За потреби спростити окремі handler’и до `Result<T, AppError>` + спільний мапінг у `IntoResponse` (зараз узгоджено через **`api_json_error`** / **`api_error_response`** — зміна не критична для релізу).
+- [x] Спільний мапінг у Axum **`IntoResponse`**: **`AppError`** та обгортка **`HttpAppError`** (`context` / `status_override`) у [`src/network/json_errors.rs`](../../src/network/json_errors.rs); реекспорт **`HttpAppError`** у **`network::api::common`**. Handler’и можуть поступово перейти на `Result<T, AppError>` / `Result<T, HttpAppError>` замість ручного **`api_error_response`** де доречно.
 
 **Критерії готовності**:
 - [x] Усі **основні** HTTP‑модулі в `network/api/` та enterprise router використовують `api_json_error` / `api_error_response` / `ErrorContext` для помилок.
@@ -397,7 +397,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Прогін**: `cargo bench -j 1 --bench runtime_benchmarks -- --noplot --sample-size 20 --warm-up-time 0.3 --measurement-time 0.5` (Windows MSVC, профіль **`bench`** / `opt-level = 0` у кореневому `Cargo.toml`).
 - **Доки**: [`docs/performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — медіани в таблиці під **win-msvc-runtime-bench-opt0-2026-04-06**, узагальнена нотатка MSVC для всіх `cargo bench` targets; Changelog; колонка *Notes* для `runtime_benchmarks` у таблиці реєстрації бенчів.
 - **Прогін `cloud_benchmarks`**: `K8S_OPENAPI_ENABLED_VERSION=1.28`, short Criterion (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`); baseline **win-msvc-cloud-bench-opt0-2026-04-06** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md).
-- **Наступний горизонт P4**: baseline RPS/latency для **`GET /api/v1/health`** (in-tree **`cargo run --release --bin poolai_health_load -- …`**, за бажанням **`wrk`** на реф-хості); **GNU** toolchain для порівнянних з **win11-criterion-full** абсолютних цифр. LAN-заміри P2b (рядок 108) — поза кодом до стенду.
+- **Наступний горизонт P4**: baseline RPS/latency для **`GET /api/v1/health`** — **`poolai_health_load --json … > report.json`** (або людський режим на stderr); за бажанням **`wrk`** на реф-хості; **GNU** toolchain для порівнянних з **win11-criterion-full** абсолютних цифр. LAN-заміри P2b (рядок 108) — поза кодом до стенду.
 
 ## Верифікація 2026-04-07 (доки — канонічний порядок 1–12 і P4 HTTP)
 
@@ -409,4 +409,15 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Код**: [`src/network/json_errors.rs`](../../src/network/json_errors.rs) — `http_status_for_resource_error`: за змістом повідомлення — **409** (already exists / conflict / duplicate), **503** (quota / exhausted / limit / capacity), **500** (failed to kill / cannot terminate); фрази **not found** / **does not exist** / **no such** → **404**; інакше **404** (зворотна сумісність, напр. коротке `"missing"`). **`AppError::IoError`**: `ErrorKind::NotFound` → **404**, `PermissionDenied` → **403**, інше → **500**.
 - **Тести**: юніт-тести в тому ж модулі; повний набір як у CI — **`cargo test --lib --tests --features ml,enterprise,cloud,test-utils`** — ok.
+
+## Верифікація 2026-04-06 (P3 — `IntoResponse` для `AppError`)
+
+- **Код**: той самий [`json_errors.rs`](../../src/network/json_errors.rs) — **`IntoResponse`** для **`AppError`** (через **`api_error_response`** без контексту) та **`HttpAppError`** (`err` + опційно **`ErrorContext`** / **`status_override`**). Реекспорт **`HttpAppError`** у [`src/network/api/common.rs`](../../src/network/api/common.rs).
+- **Доки**: [`ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md) — рядок про Axum / `Result<T, AppError>`.
+- **Тести**: `network::json_errors::tests` (у т.ч. `Result<Json<Value>, AppError>` → `IntoResponse`).
+
+## Верифікація 2026-04-06 (P4 — `poolai_health_load --json`)
+
+- **Код**: [`src/bin/poolai_health_load.rs`](../../src/bin/poolai_health_load.rs) — прапорець **`--json`**: один pretty-printed JSON на **stdout** (`rps_ok_only`, перцентилі, `total_ok_exceeds_sample`, …); людський вивід лишається на **stderr**. **`parse_cli_args`** + юніт-тести в тому ж файлі (`cargo test -p poolai --bin poolai_health_load`).
+- **Доки**: [`docs/performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — секція in-tree load tool + рядок *Changelog*.
 

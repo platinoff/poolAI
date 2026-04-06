@@ -1,7 +1,7 @@
 //! Common types and utilities for API handlers
 
 pub use crate::network::json_errors::{
-    api_error_response, api_json_error, http_status_for_app_error,
+    api_error_response, api_json_error, http_status_for_app_error, HttpAppError,
 };
 
 use crate::core::error::{AppError, ErrorContext};

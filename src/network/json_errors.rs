@@ -2,9 +2,13 @@
 //!
 //! Lives beside `auth` and `api::common` so [`crate::network::auth`] can use
 //! [`api_json_error`] without importing `api::common` (which depends on `auth` for [`Claims`]).
+//!
+//! [`AppError`] and [`HttpAppError`] implement [`axum::response::IntoResponse`] for handlers that
+//! return `Result<T, _>` with the same JSON shape as [`api_error_response`].
 
 use crate::core::error::{AppError, ErrorContext};
 use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde_json::Value;
 use std::io::ErrorKind;
@@ -142,9 +146,61 @@ pub fn api_json_error(
     (status, Json(root))
 }
 
+/// [`AppError`] plus optional [`ErrorContext`] and HTTP status override for Axum [`IntoResponse`].
+///
+/// Use when a handler returns `Result<T, HttpAppError>` and needs the same JSON shape as
+/// [`api_error_response`] (including `context`), without building `(StatusCode, Json<Value>)` by hand.
+#[derive(Debug)]
+pub struct HttpAppError {
+    pub err: AppError,
+    pub context: Option<ErrorContext>,
+    pub status_override: Option<StatusCode>,
+}
+
+impl HttpAppError {
+    pub fn new(err: AppError) -> Self {
+        Self {
+            err,
+            context: None,
+            status_override: None,
+        }
+    }
+
+    pub fn with_context(mut self, ctx: ErrorContext) -> Self {
+        self.context = Some(ctx);
+        self
+    }
+
+    pub fn with_status(mut self, status: StatusCode) -> Self {
+        self.status_override = Some(status);
+        self
+    }
+}
+
+impl From<AppError> for HttpAppError {
+    fn from(err: AppError) -> Self {
+        Self::new(err)
+    }
+}
+
+impl IntoResponse for HttpAppError {
+    fn into_response(self) -> Response {
+        let (status, body) = api_error_response(&self.err, self.context, self.status_override);
+        (status, body).into_response()
+    }
+}
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let (status, body) = api_error_response(&self, None, None);
+        (status, body).into_response()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use axum::response::IntoResponse;
 
     #[test]
     fn http_status_validation_is_bad_request() {
@@ -248,5 +304,28 @@ mod tests {
         assert_eq!(v["error"]["code"], "NOT_FOUND");
         assert_eq!(v["error"]["message"], "missing");
         assert!(v.get("context").is_some());
+    }
+
+    #[test]
+    fn app_error_into_response_status_and_json_shape() {
+        let resp = AppError::Forbidden("x".into()).into_response();
+        assert_eq!(resp.status(), StatusCode::FORBIDDEN);
+    }
+
+    #[test]
+    fn http_app_error_into_response_includes_context() {
+        let e = HttpAppError::new(AppError::ConfigError("c".into()))
+            .with_context(ErrorContext::new("save").with_hint("fix"));
+        let resp = e.into_response();
+        assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    #[test]
+    fn result_ok_json_err_app_error_into_response() {
+        use serde_json::json;
+        let ok: Result<Json<Value>, AppError> = Ok(Json(json!({"k": 1})));
+        assert_eq!(ok.into_response().status(), StatusCode::OK);
+        let err: Result<Json<Value>, AppError> = Err(AppError::ValidationError("bad".into()));
+        assert_eq!(err.into_response().status(), StatusCode::BAD_REQUEST);
     }
 }

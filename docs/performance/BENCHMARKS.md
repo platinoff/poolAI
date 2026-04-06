@@ -120,6 +120,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-04-06 | P4: **`poolai_health_load --json`** — структурований звіт на stdout для baseline / `jq`; юніт-тести парсера аргументів у `src/bin/poolai_health_load.rs`. |
 | 2026-04-06 | Filled `raid_service/quota`/`cluster_status` dev-sample medians; P4 target table; `std::hint::black_box` in benches; `ui.rs` gates `State` on `enterprise`; Criterion group `raid_replication_engine` in `runtime_benchmarks` (P2b proxy vs full multi-node I/O). |
 | 2026-04-06 | P4: `runtime_benchmarks` full-profile snapshot (`win11-criterion-full-2026-04-06`); P2b: `tests/distributed_raid_wire_integration.rs` (`test-utils`, optional `ml` for TQ01 wire JSON size). |
 | 2026-04-06 | P2b: TurboQuant **decode** inner loop — 4-wide unroll + tail (`push_dequantized_row`), симетрично до pack; прогін `turboquant_benchmarks` після зміни — за бажанням на реф-хості. |
@@ -137,7 +138,7 @@ With the server running (default or configured bind address):
 
 ### In-tree Rust load tool (no wrk / hey / Python)
 
-**`poolai_health_load`** — Tokio + `reqwest`, same process style as the rest of the repo. Arguments: `URL` (optional), duration in **seconds** (default `30`), concurrent **workers** (default `400`).
+**`poolai_health_load`** — Tokio + `reqwest`, same process style as the rest of the repo. Arguments: optional **`--json`** (machine-readable report on **stdout**), then `URL` (optional), duration in **seconds** (default `30`), concurrent **workers** (default `400`). The `--json` flag may appear before or after the positional arguments.
 
 ```bash
 # Terminal 1
@@ -145,9 +146,12 @@ cargo run --release
 
 # Terminal 2 — same shape as wrk -c400 -d30s
 cargo run --release --bin poolai_health_load -- http://127.0.0.1:8080/api/v1/health 30 400
+
+# One-line baseline capture (pretty JSON)
+cargo run --release --bin poolai_health_load -- --json http://127.0.0.1:8080/api/v1/health 30 400 > health_load_report.json
 ```
 
-Prints wall time, OK count, errors, RPS (successful requests only), and latency mean / p50 / p95 / p99. Above **200k** successful requests, latencies use a **reservoir sample** (see stderr note).
+Human mode (default) prints wall time, OK count, errors, RPS (successful requests only), and latency mean / p50 / p95 / p99 to **stderr**. Above **200k** successful requests, latencies use a **reservoir sample** (see stderr note). **`--json`** writes a single JSON object to **stdout** (`rps_ok_only`, `latency_p50_ms`, `total_ok_exceeds_sample`, …) suitable for ref-host rows or `jq`.
 
 ### External tools (optional)
 
