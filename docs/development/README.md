@@ -69,9 +69,12 @@
 
 ## 🔗 Посилання
 
-- [`../status/PROJECT_STATUS_REPORT_2026-01-19.md`](../status/PROJECT_STATUS_REPORT_2026-01-19.md) - Статус проекту
-- [`../concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt) - Концепція проекту
-- [`../README.md`](../README.md) - Індекс документації
+- [`../../README.md`](../../README.md) — кореневий README (швидкий старт, карта доків 1–10)
+- [`../README.md`](../README.md) — вхід у каталог `docs/` (канонічний порядок + короткі вказівки)
+- [`../INDEX_2026-03-17.md`](../INDEX_2026-03-17.md) — повна навігація по `docs/`
+- [`../openapi.yaml`](../openapi.yaml) — OpenAPI
+- [`../status/PROJECT_STATUS_REPORT_2026-01-19.md`](../status/PROJECT_STATUS_REPORT_2026-01-19.md) — статус проєкту
+- [`../concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt) — концепція
 
 ---
 

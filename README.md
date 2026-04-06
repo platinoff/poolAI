@@ -6,17 +6,18 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ## Documentation map (canonical order)
 
-Той самий порядок, що в [`docs/README.md`](docs/README.md) і [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md).
+Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 
-1. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
-2. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).
-3. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії**: гілка `main`, порядок доків, git-push, зріз зробленого, наступні кроки.
-4. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md).
-5. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
-6. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml).
-7. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-8. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`); повний список файлів: `git ls-files`.
-9. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
+1. **Кореневий [`README.md`](README.md)** (цей файл) — швидкий старт, збірка, CI, посилання нижче.
+2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
+3. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).
+4. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії**: гілка `main`, порядок доків, git-push, зріз зробленого, наступні кроки.
+5. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md).
+6. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
+7. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml).
+8. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`); повний список файлів: `git ls-files`.
+10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
 
 ## Release and status
 
@@ -39,7 +40,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 ## 🎯 Development Status
 **Current Phase**: Stage 4.3 Cloud Integration (SDK + operator work continues) and **Stage 4.4 AI/ML** (pipeline orchestration, enterprise HTTP API, versioning/experiments — active development)  
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
-For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation map: `docs/INDEX_2026-03-17.md`.
+For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation entry points: [Documentation map](#documentation-map-canonical-order), [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md).
 
 ### ✅ Current Build/Test Status (2026-04-06)
 - `cargo fmt --all` — CI / before push  
@@ -401,7 +402,15 @@ We welcome contributions! Please see our [Contributing Guidelines](.github/CONTR
 
 ## Documentation
 
-Увесь текстовий корпус — у [`docs/`](./docs/). **Порядок читання** — у розділі [Documentation map](#documentation-map-canonical-order) зверху; детальна карта — [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md).
+Увесь текстовий корпус — у [`docs/`](./docs/).
+
+| Що відкрити | Призначення |
+|-------------|-------------|
+| [Documentation map](#documentation-map-canonical-order) (зверху) | Канонічні кроки 1–10 |
+| [`docs/README.md`](docs/README.md) | Той самий порядок + короткі вказівки |
+| [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md) | Повна навігація по дереву `docs/` |
+| [`docs/development/README.md`](docs/development/README.md) | Індекс планів у `development/` |
+| [`docs/openapi.yaml`](docs/openapi.yaml) | OpenAPI (REST) |
 
 **Додатково (історія та зрізи):** [`docs/status/CURRENT_STATUS.md`](docs/status/CURRENT_STATUS.md), [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md), [`docs/development/NEXT_DEVELOPMENT_PHASE.md`](docs/development/NEXT_DEVELOPMENT_PHASE.md), [`docs/development/NEXT_STEPS_PLAN.md`](docs/development/NEXT_STEPS_PLAN.md), [`docs/concept/poolAI_concept.txt`](docs/concept/poolAI_concept.txt).
 
@@ -440,4 +449,4 @@ Thank you for supporting PoolAI! 🙏
 
 **PoolAI** — distributed AI mining pool management.  
 **Version:** 0.2.2 (`Cargo.toml`) · **Docs updated:** 2026-04-06 · **Repository:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
-**Наступні орієнтири:** Stage 4.3–4.4 (cloud / ML) та план у [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md).
+**Наступні орієнтири:** Stage 4.3–4.4 (cloud / ML); канонічний план — [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт сесії — [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
