@@ -19,7 +19,8 @@ use crate::network::auth::{auth_middleware, Claims};
 #[cfg(feature = "enterprise")]
 use crate::services::enterprise_service::{
     AuditEventsQuery, DashboardCreateInput, EnterpriseAuditError, EnterpriseMonitoringError,
-    EnterpriseService, MetricHistoryQueryInput, MonitoringAlertsQueryInput, TenantCreateError,
+    EnterpriseOAuthStartError, EnterpriseSecurityError, EnterpriseService, MetricHistoryQueryInput,
+    MonitoringAlertsQueryInput, TenantCreateError,
 };
 #[cfg(feature = "enterprise")]
 use axum::{
@@ -776,22 +777,16 @@ struct OAuth2ProviderRegisterRequest {
 
 #[cfg(feature = "enterprise")]
 async fn security_oauth2_providers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::list_oauth2_providers(&ctx).await {
+        Ok(providers) => Json(providers).into_response(),
+        Err(EnterpriseSecurityError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    match manager.list_oauth2_providers().await {
-        Ok(providers) => Json(providers).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to list OAuth2 providers. Context: Cannot retrieve OAuth2 provider list. Suggestion: Check system logs. Error: {}", e)
@@ -812,22 +807,8 @@ async fn security_oauth2_provider_register_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot register OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.register_oauth2_provider(req.name.clone(), req.config).await {
+    match EnterpriseService::register_oauth2_provider(&ctx, req.name.clone(), req.config).await {
         Ok(()) => {
-            // Update enabled status if provided
             if let Some(enabled) = req.enabled {
                 if enabled {
                     // Provider is enabled by default when registered
@@ -843,7 +824,14 @@ async fn security_oauth2_provider_register_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot register OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to register OAuth2 provider. Context: Cannot register OAuth2 provider with specified configuration. Suggestion: Verify provider name and configuration parameters. Error: {}", e)
@@ -863,22 +851,16 @@ struct SamlProviderRegisterRequest {
 
 #[cfg(feature = "enterprise")]
 async fn security_saml_providers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::list_saml_providers(&ctx).await {
+        Ok(providers) => Json(providers).into_response(),
+        Err(EnterpriseSecurityError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    match manager.list_saml_providers().await {
-        Ok(providers) => Json(providers).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to list SAML providers. Context: Cannot retrieve SAML provider list. Suggestion: Check system logs. Error: {}", e)
@@ -899,22 +881,8 @@ async fn security_saml_provider_register_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot register SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.register_saml_provider(req.name.clone(), req.config).await {
+    match EnterpriseService::register_saml_provider(&ctx, req.name.clone(), req.config).await {
         Ok(()) => {
-            // Update enabled status if provided
             if let Some(enabled) = req.enabled {
                 if enabled {
                     // Provider is enabled by default when registered
@@ -930,7 +898,14 @@ async fn security_saml_provider_register_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot register SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to register SAML provider. Context: Cannot register SAML provider with specified configuration. Suggestion: Verify provider name and configuration parameters. Error: {}", e)
@@ -950,22 +925,16 @@ struct SecurityPolicyCreateRequest {
 
 #[cfg(feature = "enterprise")]
 async fn security_policies_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::list_security_policies(&ctx).await {
+        Ok(policies) => Json(policies).into_response(),
+        Err(EnterpriseSecurityError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    match manager.list_security_policies().await {
-        Ok(policies) => Json(policies).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to list security policies. Context: Cannot retrieve security policy list. Suggestion: Check system logs. Error: {}", e)
@@ -986,20 +955,7 @@ async fn security_policy_create_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot create security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.create_security_policy(req.policy).await {
+    match EnterpriseService::create_security_policy(&ctx, req.policy).await {
         Ok(()) => (
             StatusCode::CREATED,
             Json(serde_json::json!({
@@ -1007,7 +963,14 @@ async fn security_policy_create_handler(
             })),
         )
             .into_response(),
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot create security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to create security policy. Context: Cannot create security policy with specified parameters. Suggestion: Verify policy name and configuration. Error: {}", e)
@@ -1022,20 +985,7 @@ async fn security_oauth2_provider_get_handler(
     State(ctx): State<ApiContext>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.get_oauth2_provider(&name).await {
+    match EnterpriseService::get_oauth2_provider(&ctx, &name).await {
         Ok(Some(provider)) => Json(provider).into_response(),
         Ok(None) => (
             StatusCode::NOT_FOUND,
@@ -1044,7 +994,14 @@ async fn security_oauth2_provider_get_handler(
             })),
         )
             .into_response(),
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve OAuth2 provider. Context: Cannot retrieve OAuth2 provider information. Suggestion: Check system logs. Error: {}", e)
@@ -1073,22 +1030,7 @@ async fn security_oauth2_provider_update_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot update OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager
-        .update_oauth2_provider(name.clone(), req.config, req.enabled)
-        .await
+    match EnterpriseService::update_oauth2_provider(&ctx, name.clone(), req.config, req.enabled).await
     {
         Ok(()) => {
             (
@@ -1100,7 +1042,14 @@ async fn security_oauth2_provider_update_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot update OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": format!("Failed to update OAuth2 provider. Context: Cannot update OAuth2 provider. Suggestion: Verify provider name and ensure provider exists. Error: {}", e)
@@ -1121,20 +1070,7 @@ async fn security_oauth2_provider_delete_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot delete OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.delete_oauth2_provider(&name).await {
+    match EnterpriseService::delete_oauth2_provider(&ctx, &name).await {
         Ok(()) => {
             (
                 StatusCode::OK,
@@ -1145,7 +1081,14 @@ async fn security_oauth2_provider_delete_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot delete OAuth2 provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": format!("Failed to delete OAuth2 provider. Context: Cannot delete OAuth2 provider. Suggestion: Verify provider name and ensure provider exists. Error: {}", e)
@@ -1160,20 +1103,7 @@ async fn security_saml_provider_get_handler(
     State(ctx): State<ApiContext>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.get_saml_provider(&name).await {
+    match EnterpriseService::get_saml_provider(&ctx, &name).await {
         Ok(Some(provider)) => Json(provider).into_response(),
         Ok(None) => (
             StatusCode::NOT_FOUND,
@@ -1182,7 +1112,14 @@ async fn security_saml_provider_get_handler(
             })),
         )
             .into_response(),
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve SAML provider. Context: Cannot retrieve SAML provider information. Suggestion: Check system logs. Error: {}", e)
@@ -1211,22 +1148,7 @@ async fn security_saml_provider_update_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot update SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager
-        .update_saml_provider(name.clone(), req.config, req.enabled)
-        .await
+    match EnterpriseService::update_saml_provider(&ctx, name.clone(), req.config, req.enabled).await
     {
         Ok(()) => {
             (
@@ -1238,7 +1160,14 @@ async fn security_saml_provider_update_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot update SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": format!("Failed to update SAML provider. Context: Cannot update SAML provider. Suggestion: Verify provider name and ensure provider exists. Error: {}", e)
@@ -1259,20 +1188,7 @@ async fn security_saml_provider_delete_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot delete SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.delete_saml_provider(&name).await {
+    match EnterpriseService::delete_saml_provider(&ctx, &name).await {
         Ok(()) => {
             (
                 StatusCode::OK,
@@ -1283,7 +1199,14 @@ async fn security_saml_provider_delete_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot delete SAML provider - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": format!("Failed to delete SAML provider. Context: Cannot delete SAML provider. Suggestion: Verify provider name and ensure provider exists. Error: {}", e)
@@ -1298,20 +1221,7 @@ async fn security_policy_get_handler(
     State(ctx): State<ApiContext>,
     Path(name): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.get_security_policy(&name).await {
+    match EnterpriseService::get_security_policy(&ctx, &name).await {
         Ok(Some(policy)) => Json(policy).into_response(),
         Ok(None) => (
             StatusCode::NOT_FOUND,
@@ -1320,7 +1230,14 @@ async fn security_policy_get_handler(
             })),
         )
             .into_response(),
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to retrieve security policy. Context: Cannot retrieve security policy information. Suggestion: Check system logs. Error: {}", e)
@@ -1353,20 +1270,7 @@ async fn security_policy_update_handler(
             .into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot update security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.update_security_policy(policy.clone()).await {
+    match EnterpriseService::update_security_policy(&ctx, policy).await {
         Ok(()) => {
             (
                 StatusCode::OK,
@@ -1377,7 +1281,14 @@ async fn security_policy_update_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot update security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": format!("Failed to update security policy. Context: Cannot update security policy. Suggestion: Verify policy name and ensure policy exists. Error: {}", e)
@@ -1398,20 +1309,7 @@ async fn security_policy_delete_handler(
         return err.into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Cannot delete security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    match manager.delete_security_policy(&name).await {
+    match EnterpriseService::delete_security_policy(&ctx, &name).await {
         Ok(()) => {
             (
                 StatusCode::OK,
@@ -1422,7 +1320,14 @@ async fn security_policy_delete_handler(
             )
                 .into_response()
         }
-        Err(e) => (
+        Err(EnterpriseSecurityError::Init(e)) => (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(serde_json::json!({
+                "error": format!("Security manager not initialized. Context: Cannot delete security policy - security manager initialization failed. Suggestion: Check system startup sequence. Error: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({
                 "error": format!("Failed to delete security policy. Context: Cannot delete security policy. Suggestion: Verify policy name and ensure policy exists. Error: {}", e)
@@ -1438,52 +1343,33 @@ async fn security_policy_delete_handler(
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_github_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    // GitHub OAuth2 authorization flow - implemented
-    // 1. Generate state parameter for CSRF protection
-    // 2. Get GitHub OAuth2 provider config from SecurityManager
-    // 3. Generate authorization URL using SecurityManager::get_oauth2_authorization_url
-    // 4. Store state in session/cookie for verification in callback
-    // 5. Redirect to GitHub authorization URL
+    let state = uuid::Uuid::new_v4().to_string();
+    store_oauth2_pending(&ctx.oauth2_pending_states, state.clone()).await;
 
-    let manager = ctx.security_manager.clone();
-
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::start_oauth2_authorization(&ctx, "github", &state).await {
+        Ok(auth_url) => Redirect::temporary(&auth_url).into_response(),
+        Err(EnterpriseOAuthStartError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Check if GitHub provider is registered
-    let providers = manager.list_oauth2_providers().await.unwrap_or_default();
-    let github_provider = providers.iter().find(|p| p.name == "github");
-
-    if github_provider.is_none() {
-        return (
+            .into_response(),
+        Err(EnterpriseOAuthStartError::ListProviders(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list OAuth2 providers: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseOAuthStartError::ProviderNotConfigured) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": "GitHub OAuth2 provider not configured. Please register it in the admin panel."
             })),
         )
-            .into_response();
-    }
-
-    // Generate state (should be cryptographically random in production)
-    let state = uuid::Uuid::new_v4().to_string();
-
-    // Store state for verification in callback
-    store_oauth2_pending(&ctx.oauth2_pending_states, state.clone()).await;
-
-    match manager.get_oauth2_authorization_url("github", &state).await {
-        Ok(auth_url) => {
-            // Redirect to GitHub authorization page
-            // Note: In production, store state in session/cookie for CSRF protection
-            Redirect::temporary(&auth_url).into_response()
-        }
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseOAuthStartError::AuthUrl(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to generate authorization URL: {}", e)
@@ -1541,12 +1427,19 @@ async fn oauth2_github_callback_handler(
             .into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Exchange code for token
-    let token_response = match manager.exchange_oauth2_code("github", &code).await {
+    let token_response = match EnterpriseService::exchange_oauth2_code(&ctx, "github", &code).await
+    {
         Ok(token) => token,
-        Err(e) => {
+        Err(EnterpriseSecurityError::Init(e)) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({
+                    "error": format!("Security manager not initialized: {}", e)
+                })),
+            )
+                .into_response();
+        }
+        Err(EnterpriseSecurityError::Operation(e)) => {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
@@ -1557,22 +1450,30 @@ async fn oauth2_github_callback_handler(
         }
     };
 
-    // Get user info from GitHub
-    let user_info = match manager
-        .get_oauth2_user_info("github", &token_response.access_token)
-        .await
-    {
-        Ok(info) => info,
-        Err(e) => {
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({
-                    "error": format!("Failed to get user info from GitHub: {}", e)
-                })),
-            )
-                .into_response();
-        }
-    };
+    let user_info =
+        match EnterpriseService::get_oauth2_user_info(&ctx, "github", &token_response.access_token)
+            .await
+        {
+            Ok(info) => info,
+            Err(EnterpriseSecurityError::Init(e)) => {
+                return (
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    Json(serde_json::json!({
+                        "error": format!("Security manager not initialized: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+            Err(EnterpriseSecurityError::Operation(e)) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({
+                        "error": format!("Failed to get user info from GitHub: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+        };
 
     // Get or create user in PoolAI
     let user_manager = ctx.user_manager.clone();
@@ -1649,38 +1550,32 @@ async fn oauth2_github_callback_handler(
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_google_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
+    let state = uuid::Uuid::new_v4().to_string();
 
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::start_oauth2_authorization(&ctx, "google", &state).await {
+        Ok(auth_url) => Redirect::temporary(&auth_url).into_response(),
+        Err(EnterpriseOAuthStartError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Check if Google provider is registered
-    let providers = manager.list_oauth2_providers().await.unwrap_or_default();
-    let google_provider = providers.iter().find(|p| p.name == "google");
-
-    if google_provider.is_none() {
-        return (
+            .into_response(),
+        Err(EnterpriseOAuthStartError::ListProviders(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list OAuth2 providers: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseOAuthStartError::ProviderNotConfigured) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": "Google OAuth2 provider not configured. Please register it in the admin panel."
             })),
         )
-            .into_response();
-    }
-
-    // Generate state (should be cryptographically random in production)
-    let state = uuid::Uuid::new_v4().to_string();
-
-    match manager.get_oauth2_authorization_url("google", &state).await {
-        Ok(auth_url) => Redirect::temporary(&auth_url).into_response(),
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseOAuthStartError::AuthUrl(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to generate authorization URL: {}", e)
@@ -1719,12 +1614,19 @@ async fn oauth2_google_callback_handler(
             .into_response();
     }
 
-    let manager = ctx.security_manager.clone();
-
-    // Exchange code for token
-    let token_response = match manager.exchange_oauth2_code("google", &code).await {
+    let token_response = match EnterpriseService::exchange_oauth2_code(&ctx, "google", &code).await
+    {
         Ok(token) => token,
-        Err(e) => {
+        Err(EnterpriseSecurityError::Init(e)) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({
+                    "error": format!("Security manager not initialized: {}", e)
+                })),
+            )
+                .into_response();
+        }
+        Err(EnterpriseSecurityError::Operation(e)) => {
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(serde_json::json!({
@@ -1735,22 +1637,30 @@ async fn oauth2_google_callback_handler(
         }
     };
 
-    // Get user info from Google
-    let user_info = match manager
-        .get_oauth2_user_info("google", &token_response.access_token)
-        .await
-    {
-        Ok(info) => info,
-        Err(e) => {
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({
-                    "error": format!("Failed to get user info from Google: {}", e)
-                })),
-            )
-                .into_response();
-        }
-    };
+    let user_info =
+        match EnterpriseService::get_oauth2_user_info(&ctx, "google", &token_response.access_token)
+            .await
+        {
+            Ok(info) => info,
+            Err(EnterpriseSecurityError::Init(e)) => {
+                return (
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    Json(serde_json::json!({
+                        "error": format!("Security manager not initialized: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+            Err(EnterpriseSecurityError::Operation(e)) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(serde_json::json!({
+                        "error": format!("Failed to get user info from Google: {}", e)
+                    })),
+                )
+                    .into_response();
+            }
+        };
 
     // Get or create user in PoolAI
     let user_manager = ctx.user_manager.clone();
@@ -1824,43 +1734,43 @@ async fn oauth2_google_callback_handler(
 
 #[cfg(feature = "enterprise")]
 async fn oauth2_telegram_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    // Telegram Login Widget uses a different flow - it's client-side
-    // This handler can return the bot name and token for client-side widget initialization
-    let manager = ctx.security_manager.clone();
-
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::get_telegram_oauth_widget_info(&ctx).await {
+        Ok(info) => Json(serde_json::json!({
+            "bot_name": info.client_id,
+            "widget_url": "https://oauth.telegram.org/auth",
+            "redirect_uri": info.redirect_uri,
+            "message": "Use Telegram Login Widget on the client side. This endpoint provides configuration."
+        }))
+        .into_response(),
+        Err(EnterpriseOAuthStartError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Check if Telegram provider is registered
-    let providers = manager.list_oauth2_providers().await.unwrap_or_default();
-    let telegram_provider = providers.iter().find(|p| p.name == "telegram");
-
-    if telegram_provider.is_none() {
-        return (
+            .into_response(),
+        Err(EnterpriseOAuthStartError::ListProviders(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Failed to list OAuth2 providers: {}", e)
+            })),
+        )
+            .into_response(),
+        Err(EnterpriseOAuthStartError::ProviderNotConfigured) => (
             StatusCode::NOT_FOUND,
             Json(serde_json::json!({
                 "error": "Telegram OAuth2 provider not configured. Please register it in the admin panel."
             })),
         )
-            .into_response();
+            .into_response(),
+        Err(EnterpriseOAuthStartError::AuthUrl(e)) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(serde_json::json!({
+                "error": format!("Telegram OAuth configuration error: {}", e)
+            })),
+        )
+            .into_response(),
     }
-
-    // Return configuration for Telegram Login Widget
-    // The client will use this to initialize the widget
-    Json(serde_json::json!({
-        "bot_name": telegram_provider.unwrap().config.client_id.clone(),
-        "widget_url": "https://oauth.telegram.org/auth",
-        "redirect_uri": telegram_provider.unwrap().config.redirect_uri.clone(),
-        "message": "Use Telegram Login Widget on the client side. This endpoint provides configuration."
-    }))
-        .into_response()
 }
 
 #[cfg(feature = "enterprise")]
@@ -2011,26 +1921,16 @@ async fn saml_auth_handler(
     State(ctx): State<ApiContext>,
     Path(provider): Path<String>,
 ) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
+    match EnterpriseService::get_saml_sso_redirect_url(&ctx, &provider).await {
+        Ok(sso_url) => Redirect::temporary(&sso_url).into_response(),
+        Err(EnterpriseSecurityError::Init(e)) => (
             StatusCode::SERVICE_UNAVAILABLE,
             Json(serde_json::json!({
                 "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
             })),
         )
-            .into_response();
-    }
-
-    // Generate SAML SSO URL
-    match manager.get_saml_sso_url(&provider).await {
-        Ok(sso_url) => {
-            // Redirect to SAML Identity Provider SSO page
-            Redirect::temporary(&sso_url).into_response()
-        }
-        Err(e) => (
+            .into_response(),
+        Err(EnterpriseSecurityError::Operation(e)) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(serde_json::json!({
                 "error": format!("Failed to generate SAML SSO URL. Context: Cannot generate SSO URL for SAML provider. Suggestion: Verify SAML provider configuration. Error: {}", e)
@@ -2054,26 +1954,24 @@ async fn saml_callback_handler(
     Path(provider): Path<String>,
     Form(form): Form<SamlCallbackForm>,
 ) -> impl IntoResponse {
-    let manager = ctx.security_manager.clone();
-
-    // Ensure manager is initialized
-    if let Err(e) = manager.initialize().await {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(serde_json::json!({
-                "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
-            })),
-        )
-            .into_response();
-    }
-
-    // Validate SAML assertion and extract user attributes
-    let attributes = match manager
-        .validate_saml_assertion(&provider, &form.SAMLResponse)
-        .await
+    let attributes = match EnterpriseService::validate_saml_assertion_response(
+        &ctx,
+        &provider,
+        &form.SAMLResponse,
+    )
+    .await
     {
         Ok(attrs) => attrs,
-        Err(e) => {
+        Err(EnterpriseSecurityError::Init(e)) => {
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                Json(serde_json::json!({
+                    "error": format!("Security manager not initialized. Context: Security manager is not available. Suggestion: Check system startup sequence. Error: {}", e)
+                })),
+            )
+                .into_response();
+        }
+        Err(EnterpriseSecurityError::Operation(e)) => {
             return (
                 StatusCode::BAD_REQUEST,
                 Json(serde_json::json!({

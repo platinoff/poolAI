@@ -9,7 +9,12 @@ use crate::enterprise::monitoring::{Alert, AlertRule, AlertSeverity, Dashboard, 
 use crate::enterprise::multi_tenancy::{
     QuotaCheckResult, Tenant, TenantConfig, TenantResourceUsage,
 };
+use crate::enterprise::security::{
+    OAuth2Config, OAuth2Provider, OAuth2TokenResponse, OAuth2UserInfo, SamlConfig, SamlProvider,
+    SecurityPolicy,
+};
 use chrono::{DateTime, Utc};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 /// `create_tenant` runs `TenantManager::initialize` first; distinguish init vs create failures for HTTP mapping.
@@ -69,6 +74,26 @@ pub struct MetricHistoryQueryInput {
     pub end_time: Option<String>,
     pub tenant_id: Option<String>,
     pub limit: Option<usize>,
+}
+
+#[derive(Debug)]
+pub enum EnterpriseSecurityError {
+    Init(AppError),
+    Operation(AppError),
+}
+
+#[derive(Debug)]
+pub enum EnterpriseOAuthStartError {
+    Init(AppError),
+    ListProviders(AppError),
+    ProviderNotConfigured,
+    AuthUrl(AppError),
+}
+
+#[derive(Debug, Clone)]
+pub struct TelegramOAuthWidgetInfo {
+    pub client_id: String,
+    pub redirect_uri: String,
 }
 
 fn audit_filters_from_query(q: AuditEventsQuery) -> AuditQueryFilters {
@@ -307,5 +332,273 @@ impl EnterpriseService {
             .create_alert_rule(rule)
             .await
             .map_err(EnterpriseMonitoringError::Operation)
+    }
+
+    async fn ensure_security(ctx: &ApiContext) -> Result<(), EnterpriseSecurityError> {
+        ctx.security_manager
+            .initialize()
+            .await
+            .map_err(EnterpriseSecurityError::Init)
+    }
+
+    pub async fn list_oauth2_providers(
+        ctx: &ApiContext,
+    ) -> Result<Vec<OAuth2Provider>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .list_oauth2_providers()
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn register_oauth2_provider(
+        ctx: &ApiContext,
+        name: String,
+        config: OAuth2Config,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .register_oauth2_provider(name, config)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn get_oauth2_provider(
+        ctx: &ApiContext,
+        name: &str,
+    ) -> Result<Option<OAuth2Provider>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .get_oauth2_provider(name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn update_oauth2_provider(
+        ctx: &ApiContext,
+        name: String,
+        config: Option<OAuth2Config>,
+        enabled: Option<bool>,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .update_oauth2_provider(name, config, enabled)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn delete_oauth2_provider(
+        ctx: &ApiContext,
+        name: &str,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .delete_oauth2_provider(name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn list_saml_providers(
+        ctx: &ApiContext,
+    ) -> Result<Vec<SamlProvider>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .list_saml_providers()
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn register_saml_provider(
+        ctx: &ApiContext,
+        name: String,
+        config: SamlConfig,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .register_saml_provider(name, config)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn get_saml_provider(
+        ctx: &ApiContext,
+        name: &str,
+    ) -> Result<Option<SamlProvider>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .get_saml_provider(name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn update_saml_provider(
+        ctx: &ApiContext,
+        name: String,
+        config: Option<SamlConfig>,
+        enabled: Option<bool>,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .update_saml_provider(name, config, enabled)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn delete_saml_provider(
+        ctx: &ApiContext,
+        name: &str,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .delete_saml_provider(name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn list_security_policies(
+        ctx: &ApiContext,
+    ) -> Result<Vec<SecurityPolicy>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .list_security_policies()
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn create_security_policy(
+        ctx: &ApiContext,
+        policy: SecurityPolicy,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .create_security_policy(policy)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn get_security_policy(
+        ctx: &ApiContext,
+        name: &str,
+    ) -> Result<Option<SecurityPolicy>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .get_security_policy(name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn update_security_policy(
+        ctx: &ApiContext,
+        policy: SecurityPolicy,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .update_security_policy(policy)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn delete_security_policy(
+        ctx: &ApiContext,
+        name: &str,
+    ) -> Result<(), EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .delete_security_policy(name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    /// Authorization URL when the provider is registered and enabled.
+    pub async fn start_oauth2_authorization(
+        ctx: &ApiContext,
+        provider_name: &str,
+        state: &str,
+    ) -> Result<String, EnterpriseOAuthStartError> {
+        ctx.security_manager
+            .initialize()
+            .await
+            .map_err(EnterpriseOAuthStartError::Init)?;
+        let providers = ctx
+            .security_manager
+            .list_oauth2_providers()
+            .await
+            .map_err(EnterpriseOAuthStartError::ListProviders)?;
+        if !providers.iter().any(|p| p.name == provider_name) {
+            return Err(EnterpriseOAuthStartError::ProviderNotConfigured);
+        }
+        ctx.security_manager
+            .get_oauth2_authorization_url(provider_name, state)
+            .await
+            .map_err(EnterpriseOAuthStartError::AuthUrl)
+    }
+
+    pub async fn get_telegram_oauth_widget_info(
+        ctx: &ApiContext,
+    ) -> Result<TelegramOAuthWidgetInfo, EnterpriseOAuthStartError> {
+        ctx.security_manager
+            .initialize()
+            .await
+            .map_err(EnterpriseOAuthStartError::Init)?;
+        let providers = ctx
+            .security_manager
+            .list_oauth2_providers()
+            .await
+            .map_err(EnterpriseOAuthStartError::ListProviders)?;
+        let p = providers
+            .iter()
+            .find(|prov| prov.name == "telegram")
+            .ok_or(EnterpriseOAuthStartError::ProviderNotConfigured)?;
+        Ok(TelegramOAuthWidgetInfo {
+            client_id: p.config.client_id.clone(),
+            redirect_uri: p.config.redirect_uri.clone(),
+        })
+    }
+
+    pub async fn get_saml_sso_redirect_url(
+        ctx: &ApiContext,
+        provider_name: &str,
+    ) -> Result<String, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .get_saml_sso_url(provider_name)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn validate_saml_assertion_response(
+        ctx: &ApiContext,
+        provider_name: &str,
+        saml_response: &str,
+    ) -> Result<HashMap<String, String>, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .validate_saml_assertion(provider_name, saml_response)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn exchange_oauth2_code(
+        ctx: &ApiContext,
+        provider_name: &str,
+        code: &str,
+    ) -> Result<OAuth2TokenResponse, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .exchange_oauth2_code(provider_name, code)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
+    }
+
+    pub async fn get_oauth2_user_info(
+        ctx: &ApiContext,
+        provider_name: &str,
+        access_token: &str,
+    ) -> Result<OAuth2UserInfo, EnterpriseSecurityError> {
+        Self::ensure_security(ctx).await?;
+        ctx.security_manager
+            .get_oauth2_user_info(provider_name, access_token)
+            .await
+            .map_err(EnterpriseSecurityError::Operation)
     }
 }
