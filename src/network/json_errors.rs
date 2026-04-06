@@ -7,7 +7,34 @@ use crate::core::error::{AppError, ErrorContext};
 use axum::http::StatusCode;
 use axum::Json;
 use serde_json::Value;
+use std::io::ErrorKind;
 use tracing::{error, warn};
+
+/// HTTP status for [`AppError::ResourceError`]: many call sites encode missing entities, but some
+/// mean conflict, capacity, or an operation failure on an existing resource.
+fn http_status_for_resource_error(message: &str) -> StatusCode {
+    let m = message.to_ascii_lowercase();
+
+    if m.contains("already exists") || m.contains("conflict") || m.contains("duplicate") {
+        return StatusCode::CONFLICT;
+    }
+    if m.contains("quota")
+        || m.contains("exhausted")
+        || m.contains("limit exceeded")
+        || m.contains("capacity")
+    {
+        return StatusCode::SERVICE_UNAVAILABLE;
+    }
+    if m.contains("failed to kill") || m.contains("cannot terminate") {
+        return StatusCode::INTERNAL_SERVER_ERROR;
+    }
+
+    if m.contains("not found") || m.contains("does not exist") || m.contains("no such") {
+        return StatusCode::NOT_FOUND;
+    }
+
+    StatusCode::NOT_FOUND
+}
 
 /// Default HTTP status for an [`AppError`] when no override is needed.
 ///
@@ -23,10 +50,13 @@ pub fn http_status_for_app_error(err: &AppError) -> StatusCode {
         PoolError(_) | MonitoringError(_) | GpuError(_) | MemoryError(_) | ShutdownError(_) => {
             StatusCode::SERVICE_UNAVAILABLE
         }
-        ResourceError(_) => StatusCode::NOT_FOUND,
-        ConfigError(_) | InitializationError(_) | IoError(_) | Unknown => {
-            StatusCode::INTERNAL_SERVER_ERROR
-        }
+        ResourceError(msg) => http_status_for_resource_error(msg),
+        ConfigError(_) | InitializationError(_) | Unknown => StatusCode::INTERNAL_SERVER_ERROR,
+        IoError(e) => match e.kind() {
+            ErrorKind::NotFound => StatusCode::NOT_FOUND,
+            ErrorKind::PermissionDenied => StatusCode::FORBIDDEN,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        },
     }
 }
 
@@ -136,6 +166,41 @@ mod tests {
     fn http_status_resource_is_not_found() {
         let e = AppError::ResourceError("missing".into());
         assert_eq!(http_status_for_app_error(&e), StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn http_status_resource_not_found_phrase() {
+        let e = AppError::ResourceError("Worker 'w1' not found".into());
+        assert_eq!(http_status_for_app_error(&e), StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn http_status_resource_kill_failure_is_internal() {
+        let e = AppError::ResourceError("Failed to kill process. Context: Cannot terminate".into());
+        assert_eq!(
+            http_status_for_app_error(&e),
+            StatusCode::INTERNAL_SERVER_ERROR
+        );
+    }
+
+    #[test]
+    fn http_status_resource_conflict() {
+        let e = AppError::ResourceError("Volume already exists".into());
+        assert_eq!(http_status_for_app_error(&e), StatusCode::CONFLICT);
+    }
+
+    #[test]
+    fn http_status_io_not_found_is_404() {
+        use std::io;
+        let e = AppError::from(io::Error::new(io::ErrorKind::NotFound, "artifact.bin"));
+        assert_eq!(http_status_for_app_error(&e), StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn http_status_io_permission_denied_is_403() {
+        use std::io;
+        let e = AppError::from(io::Error::new(io::ErrorKind::PermissionDenied, "denied"));
+        assert_eq!(http_status_for_app_error(&e), StatusCode::FORBIDDEN);
     }
 
     #[test]

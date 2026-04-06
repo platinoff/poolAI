@@ -59,7 +59,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **P4**: повний прогін Criterion + baseline у [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на **референс-хост**; **`GET /api/v1/health`** — **`poolai_health_load`** (Rust) або **`wrk`** на реф-хості; workflow [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml). Див. [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
 - **P2b**: TurboQuant фаза 1 у коді ✅; далі — **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; Criterion `raid_replication_engine` уже є.
 - **P2 (опційно)**: REST `/raid/*` через `RaidService` ✅; за потреби — **`raid_distributed_handlers`** vs сервісний шар.
-- **P3 (опційно)**: уточнення `http_status_for_app_error` для `ResourceError` / not-found.
+- **P3**: `http_status_for_app_error` — уточнено для **`ResourceError`** (текст повідомлення) та **`IoError`** (`NotFound` / `PermissionDenied`); див. `src/network/json_errors.rs`.
 - **P1 (опційно)**: формальне закриття критеріїв «усі handler’и через `ApiContext`» / тести без глобалів.
 - **UI / UX:** [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - За потреби: `cargo test --all-features` на Windows (GNU, `-j 1`).

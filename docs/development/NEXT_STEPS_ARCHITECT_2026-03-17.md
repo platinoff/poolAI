@@ -25,7 +25,7 @@
 | **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
 | **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **`network/enterprise_api/`** ( **`mod.rs`** + tenants / audit / monitoring / security / oauth / saml) — розбито з моноліту. Дрібні edge cases міграції handlers → сервіси за потреби. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅ + **портативний fast-path** (`turboquant.rs`: pack/unpack/`dot_f32`). Далі: повні заміри по мережі на стенді (чекбокс нижче). |
-| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. Опційно: уточнення статусів для `ResourceError` / not-found. |
+| **4** | **Priority 3** | **REST/enterprise/raid закрито** для узгодженого JSON (`api_json_error`, `enterprise_err`, хелпери в **`raid_http`** / `enterprise_err`, …). **Також**: `auth.rs`, **`ws.rs`** (upgrade + WS error payload), **`rate_limit.rs`**. **`http_status_for_app_error`**: евристики для **`ResourceError`** (not-found / conflict / capacity / kill-failure) + **`IoError`**: `NotFound`→404, `PermissionDenied`→403 (2026-04-06). |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (у т.ч. після TurboQuant для артефактів/RAID). |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
@@ -404,4 +404,9 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Код**: `src/bin/poolai_health_load.rs` — Rust load tool для health endpoint; `src/runtime/process.rs` — приклади `ProcessConfig` без Python у док-коментах.
 - **Доки**: кореневий **`README.md`**, **`docs/README.md`**, **`docs/INDEX_2026-03-17.md`**, **`docs/STRUCTURE.md`**, **`docs/development/README.md`**, **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`**, **`.cursor/skills/poolai-documentation/SKILL.md`** — узгоджено з **`BENCHMARKS.md`** (Criterion + `poolai_health_load`).
 - **Інвентар**: **`file_list.csv`** — `poolai_health_load.rs`.
+
+## Верифікація 2026-04-06 (P3 — `http_status_for_app_error`)
+
+- **Код**: [`src/network/json_errors.rs`](../../src/network/json_errors.rs) — `http_status_for_resource_error`: за змістом повідомлення — **409** (already exists / conflict / duplicate), **503** (quota / exhausted / limit / capacity), **500** (failed to kill / cannot terminate); фрази **not found** / **does not exist** / **no such** → **404**; інакше **404** (зворотна сумісність, напр. коротке `"missing"`). **`AppError::IoError`**: `ErrorKind::NotFound` → **404**, `PermissionDenied` → **403**, інше → **500**.
+- **Тести**: юніт-тести в тому ж модулі; повний набір як у CI — **`cargo test --lib --tests --features ml,enterprise,cloud,test-utils`** — ok.
 
