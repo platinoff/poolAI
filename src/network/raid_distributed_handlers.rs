@@ -53,10 +53,15 @@ pub async fn put_artifact_handler(
         None
     };
 
-    // Store artifact locally (same path as REST via RaidService)
-    let artifact_name = format!("{}-{}", payload.metadata.name, payload.metadata.version);
     match artifact_data {
-        Some(data) => match RaidService::put_artifact(&ctx, &artifact_name, &data).await {
+        Some(data) => match RaidService::put_artifact_versioned_name(
+            &ctx,
+            &payload.metadata.name,
+            &payload.metadata.version,
+            &data,
+        )
+        .await
+        {
             Ok(artifact_ref) => {
                 info!("Artifact stored successfully: {}", artifact_ref.id);
                 let response = PutArtifactResponse {
@@ -122,7 +127,7 @@ pub async fn get_artifact_handler(
         }
     };
 
-    let artifacts = match RaidService::list_artifacts(&ctx).await {
+    let artifact = match RaidService::find_artifact_by_id(&ctx, &payload.artifact_id).await {
         Ok(a) => a,
         Err(RaidServiceError::ManagerUnavailable) => {
             return create_error_response(
@@ -132,7 +137,7 @@ pub async fn get_artifact_handler(
             );
         }
         Err(e) => {
-            error!("Failed to list artifacts: {:?}", e);
+            error!("Failed to resolve artifact by id: {:?}", e);
             return create_error_response(
                 &message,
                 ErrorCode::ReplicationFailed,
@@ -141,13 +146,8 @@ pub async fn get_artifact_handler(
         }
     };
 
-    // Find artifact by ID (simplified - in real implementation, would use proper ID mapping)
-    let artifact = artifacts
-        .iter()
-        .find(|a| a.id.to_string() == payload.artifact_id);
-
     match artifact {
-        Some(artifact_ref) => {
+        Some(ref artifact_ref) => {
             let mut response = GetArtifactResponse {
                 status: ArtifactStatus::Success,
                 artifact_id: payload.artifact_id.clone(),
@@ -190,15 +190,15 @@ pub async fn get_artifact_handler(
 
             // Include data if requested
             if payload.include_data {
-                match tokio::fs::read(&artifact_ref.path).await {
+                match RaidService::get_artifact_data(&ctx, artifact_ref).await {
                     Ok(data) => {
                         use base64::{engine::general_purpose, Engine as _};
                         response.data = Some(general_purpose::STANDARD.encode(&data));
                     }
                     Err(e) => {
-                        error!("Failed to read artifact file: {}", e);
+                        error!("Failed to read artifact file: {:?}", e);
                         response.status = ArtifactStatus::Error;
-                        response.error = Some(format!("Failed to read artifact: {}", e));
+                        response.error = Some(format!("Failed to read artifact: {:?}", e));
                     }
                 }
             }
@@ -313,8 +313,8 @@ pub async fn sync_artifacts_handler(
         }
     };
 
-    let artifacts = match RaidService::list_artifacts(&ctx).await {
-        Ok(a) => a,
+    let synced_count = match RaidService::local_artifact_count(&ctx).await {
+        Ok(n) => n,
         Err(RaidServiceError::ManagerUnavailable) => {
             return create_error_response(
                 &message,
@@ -336,7 +336,7 @@ pub async fn sync_artifacts_handler(
     // In real implementation, would compare timestamps and sync accordingly
     let response = SyncArtifactsResponse {
         status: OperationStatus::Success,
-        synced_count: artifacts.len() as u32,
+        synced_count,
         // Future improvement: Implement proper sync logic
         // 1. Compare local artifacts with remote node's artifact list
         //    - Request artifact list from remote node using ProtocolMessage::ListArtifacts
@@ -374,8 +374,8 @@ pub async fn health_check_handler(
 ) -> impl IntoResponse {
     info!("Received HealthCheck message: {}", message.id);
 
-    let q = match RaidService::quota(&ctx).await {
-        Ok(q) => q,
+    let storage = match RaidService::distributed_health_storage(&ctx).await {
+        Ok(s) => s,
         Err(RaidServiceError::ManagerUnavailable) => {
             return create_error_response(
                 &message,
@@ -392,9 +392,6 @@ pub async fn health_check_handler(
             );
         }
     };
-
-    let storage_total_bytes = q.quota_bytes.unwrap_or(107374182400u64); // 100 GB default
-    let storage_used_bytes = q.total_size_bytes;
 
     // Get actual application uptime using version module
     // Note: version::initialize_start_time() must be called at startup (already done in main.rs)
@@ -424,9 +421,9 @@ pub async fn health_check_handler(
     let response = HealthCheckResponse {
         status: HealthStatus::Healthy,
         uptime_seconds,
-        storage_used_bytes,
-        storage_total_bytes,
-        artifact_count: q.artifact_count as u32,
+        storage_used_bytes: storage.storage_used_bytes,
+        storage_total_bytes: storage.storage_total_bytes,
+        artifact_count: storage.artifact_count,
         raft_role: RaftRole::Follower, // Placeholder until Raft integration is complete
         // Future improvement: Get actual Raft term from Raft node
         // 1. Access global Raft node using raid::raft::get_global_raft_node()
@@ -467,35 +464,25 @@ pub async fn join_cluster_handler(
         }
     };
 
-    match RaidService::register_worker(&ctx, payload.address.clone()).await {
-        Err(RaidServiceError::ManagerUnavailable) => {
-            return create_error_response(
-                &message,
-                ErrorCode::InvalidRequest,
-                "RAID manager not initialized".to_string(),
-            );
-        }
-        _ => {}
-    }
-
-    let nodes = match RaidService::list_workers(&ctx).await {
-        Ok(n) => n,
-        Err(RaidServiceError::ManagerUnavailable) => {
-            return create_error_response(
-                &message,
-                ErrorCode::InvalidRequest,
-                "RAID manager not initialized".to_string(),
-            );
-        }
-        Err(e) => {
-            error!("Failed to list cluster nodes: {:?}", e);
-            return create_error_response(
-                &message,
-                ErrorCode::ReplicationFailed,
-                format!("Cluster state failed: {:?}", e),
-            );
-        }
-    };
+    let nodes =
+        match RaidService::join_cluster_nodes_after_register(&ctx, payload.address.clone()).await {
+            Ok(n) => n,
+            Err(RaidServiceError::ManagerUnavailable) => {
+                return create_error_response(
+                    &message,
+                    ErrorCode::InvalidRequest,
+                    "RAID manager not initialized".to_string(),
+                );
+            }
+            Err(e) => {
+                error!("Failed to list cluster nodes: {:?}", e);
+                return create_error_response(
+                    &message,
+                    ErrorCode::ReplicationFailed,
+                    format!("Cluster state failed: {:?}", e),
+                );
+            }
+        };
     let member_nodes: Vec<ClusterNode> = nodes
         .iter()
         .map(|n| {

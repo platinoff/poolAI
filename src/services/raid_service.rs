@@ -117,6 +117,17 @@ pub struct RaidHealthOverview {
     pub replication_active: bool,
 }
 
+/// Default total storage for distributed health when quota is unset (100 GiB).
+pub const DISTRIBUTED_HEALTH_DEFAULT_TOTAL_BYTES: u64 = 107_374_182_400;
+
+/// Storage fields for distributed RAID `HealthCheck` (from quota + defaults).
+#[derive(Debug, Clone, Copy)]
+pub struct DistributedRaidHealthStorage {
+    pub storage_total_bytes: u64,
+    pub storage_used_bytes: u64,
+    pub artifact_count: u32,
+}
+
 /// Thin orchestration over [`RaidManager`] for API use.
 pub struct RaidService;
 
@@ -131,6 +142,28 @@ impl RaidService {
         Ok(manager.list_artifacts().await)
     }
 
+    pub async fn find_artifact_by_id(
+        ctx: &ApiContext,
+        artifact_id: &str,
+    ) -> Result<Option<ArtifactRef>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        let artifacts = manager.list_artifacts().await;
+        Ok(artifacts
+            .into_iter()
+            .find(|a| a.id.to_string() == artifact_id))
+    }
+
+    pub async fn get_artifact_data(
+        ctx: &ApiContext,
+        artifact: &ArtifactRef,
+    ) -> Result<Vec<u8>, RaidServiceError> {
+        let manager = require_raid_manager(ctx)?;
+        manager
+            .get_artifact(&artifact.path)
+            .await
+            .map_err(RaidServiceError::Operation)
+    }
+
     pub async fn put_artifact(
         ctx: &ApiContext,
         name: &str,
@@ -141,6 +174,17 @@ impl RaidService {
             .put_artifact(name, data)
             .await
             .map_err(RaidServiceError::Operation)
+    }
+
+    /// Store bytes under `{logical_name}-{version}` (distributed PutArtifact naming).
+    pub async fn put_artifact_versioned_name(
+        ctx: &ApiContext,
+        logical_name: &str,
+        version: &str,
+        data: &[u8],
+    ) -> Result<ArtifactRef, RaidServiceError> {
+        let storage_name = format!("{logical_name}-{version}");
+        Self::put_artifact(ctx, &storage_name, data).await
     }
 
     pub async fn delete_artifact(ctx: &ApiContext, id: Uuid) -> Result<(), RaidServiceError> {
@@ -170,6 +214,26 @@ impl RaidService {
             usage_percent,
             artifact_count,
         })
+    }
+
+    /// Quota-derived storage snapshot for distributed protocol health.
+    pub async fn distributed_health_storage(
+        ctx: &ApiContext,
+    ) -> Result<DistributedRaidHealthStorage, RaidServiceError> {
+        let q = Self::quota(ctx).await?;
+        Ok(DistributedRaidHealthStorage {
+            storage_total_bytes: q
+                .quota_bytes
+                .unwrap_or(DISTRIBUTED_HEALTH_DEFAULT_TOTAL_BYTES),
+            storage_used_bytes: q.total_size_bytes,
+            artifact_count: q.artifact_count as u32,
+        })
+    }
+
+    /// Local artifact count for simplified distributed `SyncArtifacts`.
+    pub async fn local_artifact_count(ctx: &ApiContext) -> Result<u32, RaidServiceError> {
+        let artifacts = Self::list_artifacts(ctx).await?;
+        Ok(artifacts.len() as u32)
     }
 
     pub async fn cluster_status(ctx: &ApiContext) -> Result<RaidStatusResponse, RaidServiceError> {
@@ -341,6 +405,21 @@ impl RaidService {
     ) -> Result<RaidNode, RaidServiceError> {
         let manager = require_raid_manager(ctx)?;
         Ok(manager.register_node(address).await)
+    }
+
+    /// Register a joining node, then return current workers. Matches prior handler semantics:
+    /// only [`RaidServiceError::ManagerUnavailable`] from register aborts before listing.
+    pub async fn join_cluster_nodes_after_register(
+        ctx: &ApiContext,
+        address: String,
+    ) -> Result<Vec<RaidNode>, RaidServiceError> {
+        match Self::register_worker(ctx, address).await {
+            Err(RaidServiceError::ManagerUnavailable) => {
+                return Err(RaidServiceError::ManagerUnavailable);
+            }
+            _ => {}
+        }
+        Self::list_workers(ctx).await
     }
 
     pub async fn update_worker(
