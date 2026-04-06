@@ -12,6 +12,7 @@ pub mod discovery_service;
 pub mod enterprise_service;
 pub mod instance_service;
 pub mod library_service;
+pub mod raid_distributed_protocol_service;
 pub mod raid_service;
 pub mod rewards_service;
 pub mod system_service;

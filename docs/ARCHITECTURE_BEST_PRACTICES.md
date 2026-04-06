@@ -47,6 +47,7 @@ src/
 │   ├── enterprise_service.rs   # feature `enterprise`
 │   ├── instance_service.rs     # model instances / placement previews
 │   ├── library_service.rs
+│   ├── raid_distributed_protocol_service.rs  # distributed RAID wire protocol (JSON messages)
 │   ├── raid_service.rs
 │   ├── rewards_service.rs     # rewards stats / progress (delegates to `rewards` module today)
 │   ├── system_service.rs      # status/health/metrics/models/GPU snapshots for `system` API

@@ -325,6 +325,12 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - Оновлено блок **Next Focus** у кореневому [`README.md`](../../README.md): P5/P6 закриті на рівні доків; пріоритетний горизонт — **P4**, **P2b** (стенд), опційно **P2** distributed / **P3** / **P1**.
 - Таблицю **«Наступні кроки за пріоритетом»** у цьому файлі узгоджено з тим самим зрізом (рядки P2 / P2b).
 
+## Верифікація 2026-04-06 (P2 — `RaidDistributedProtocolService`)
+
+- **Код**: `src/services/raid_distributed_protocol_service.rs` — Put/Get/Delete artifact, sync, health, join/leave cluster over `ProtocolMessage`; `src/network/raid_distributed_handlers.rs` — лише axum-обгортки.
+- **Доки**: `ARCHITECTURE_BEST_PRACTICES.md`, `FUNCTIONALITY_DIGEST`, `HANDOFF`, `file_list.csv`.
+- **Тест**: `cargo test -p poolai --features test-utils --test distributed_raid_wire_integration` → **ok**.
+
 ## Верифікація 2026-04-06 (P2 — `SystemService`)
 
 - **Код**: `src/services/system_service.rs` — snapshots для status (версія з `CARGO_PKG_VERSION`), health, metrics, models, GPU; **`get_configuration` / `apply_configuration`**; **`login`** (делегує `authenticate_user`); `src/network/api/system.rs` — тонкі handlers (`check_permission` лишається на PUT `/config`); велика HTML-сторінка `/status` лишається в `system.rs`.
