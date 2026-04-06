@@ -5,6 +5,7 @@
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::raid::protocol::*;
+use crate::services::raid_service::{RaidService, RaidServiceError};
 use crate::version;
 use axum::{
     extract::State,
@@ -35,15 +36,6 @@ pub async fn put_artifact_handler(
         }
     };
 
-    let Some(manager) = ctx.raid_manager.get() else {
-        return create_error_response(
-            &message,
-            ErrorCode::InvalidRequest,
-            "RAID manager not initialized".to_string(),
-        );
-    };
-    let manager = manager.clone();
-
     // Decode base64 data if present
     let artifact_data = if let Some(data_base64) = payload.data {
         match base64_decode(&data_base64) {
@@ -61,10 +53,10 @@ pub async fn put_artifact_handler(
         None
     };
 
-    // Store artifact locally
+    // Store artifact locally (same path as REST via RaidService)
     let artifact_name = format!("{}-{}", payload.metadata.name, payload.metadata.version);
     match artifact_data {
-        Some(data) => match manager.put_artifact(&artifact_name, &data).await {
+        Some(data) => match RaidService::put_artifact(&ctx, &artifact_name, &data).await {
             Ok(artifact_ref) => {
                 info!("Artifact stored successfully: {}", artifact_ref.id);
                 let response = PutArtifactResponse {
@@ -75,12 +67,25 @@ pub async fn put_artifact_handler(
                 };
                 create_success_response(&message, response)
             }
-            Err(e) => {
+            Err(RaidServiceError::ManagerUnavailable) => create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                "RAID manager not initialized".to_string(),
+            ),
+            Err(RaidServiceError::Operation(e)) => {
                 error!("Failed to store artifact: {}", e);
                 create_error_response(
                     &message,
                     ErrorCode::ReplicationFailed,
                     format!("Storage failed: {}", e),
+                )
+            }
+            Err(e) => {
+                error!("Failed to store artifact: {:?}", e);
+                create_error_response(
+                    &message,
+                    ErrorCode::ReplicationFailed,
+                    format!("Storage failed: {:?}", e),
                 )
             }
         },
