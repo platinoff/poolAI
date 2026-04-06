@@ -16,7 +16,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 4. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії**: гілка `main`, порядок доків, git-push, зріз зробленого, наступні кроки.
 5. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job / tokenization: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md), [`docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [`docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
 6. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
-7. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml).
+7. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml); HTTP health load — in-tree **`poolai_health_load`** (`cargo run --release --bin poolai_health_load`, див. `BENCHMARKS.md`).
 8. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`); повний список файлів: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
@@ -56,7 +56,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 ### Next Focus
 
 - **P5 / P6 (доки)**: **закриті** на рівні плану — архівні статуси з банером, інвентар TODO у `src/`, концепти Grid + Solana; див. [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md).
-- **P4**: повний прогін Criterion + baseline у [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на **референс-хост**; **`wrk`** на `/api/v1/health`; workflow [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml). Див. [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
+- **P4**: повний прогін Criterion + baseline у [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на **референс-хост**; **`GET /api/v1/health`** — **`poolai_health_load`** (Rust) або **`wrk`** на реф-хості; workflow [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml). Див. [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
 - **P2b**: TurboQuant фаза 1 у коді ✅; далі — **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; Criterion `raid_replication_engine` уже є.
 - **P2 (опційно)**: REST `/raid/*` через `RaidService` ✅; за потреби — **`raid_distributed_handlers`** vs сервісний шар.
 - **P3 (опційно)**: уточнення `http_status_for_app_error` для `ResourceError` / not-found.

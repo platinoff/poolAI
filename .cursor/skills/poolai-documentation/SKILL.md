@@ -18,7 +18,7 @@ description: >-
 4. `docs/development/HANDOFF_NEW_SESSION.md`
 5. Концепція (`docs/concept/poolAI_concept_root.txt`, Grid/Memory/Job, `GRID_PROTOCOL_CONCEPT_2026-04-06.md`, `SOLANA_ADAPTER_CONCEPT_2026-04-06.md`)
 6. `docs/ARCHITECTURE_REVIEW.md`, `docs/ARCHITECTURE_BEST_PRACTICES.md`
-7. `docs/performance/BENCHMARKS.md`, `PROFILING.md`
+7. `docs/performance/BENCHMARKS.md`, `PROFILING.md` (Criterion + опційно **`poolai_health_load`** для `GET /api/v1/health`)
 8. `.github/workflows/ci.yml`
 9. `file_list.csv` (оновлюй також після змін у `docs/catalog/`, `.cursor/skills/`)
 10. `.cursor/commands/git-push.md`

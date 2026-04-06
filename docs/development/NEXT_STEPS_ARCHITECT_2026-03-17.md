@@ -396,5 +396,12 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Прогін**: `cargo bench -j 1 --bench runtime_benchmarks -- --noplot --sample-size 20 --warm-up-time 0.3 --measurement-time 0.5` (Windows MSVC, профіль **`bench`** / `opt-level = 0` у кореневому `Cargo.toml`).
 - **Доки**: [`docs/performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — медіани в таблиці під **win-msvc-runtime-bench-opt0-2026-04-06**, узагальнена нотатка MSVC для всіх `cargo bench` targets; Changelog; колонка *Notes* для `runtime_benchmarks` у таблиці реєстрації бенчів.
-- **Наступний горизонт P4**: `cloud_benchmarks` за тим самим профілем; LAN-заміри P2b (рядок 108) — на стенді; **GNU** toolchain для порівнянних з **win11-criterion-full** абсолютних цифр. **`service_layer_benchmarks`** — baseline додано в `BENCHMARKS.md` (**win-msvc-service-layer-bench-opt0-2026-04-06**).
+- **Прогін `cloud_benchmarks`**: `K8S_OPENAPI_ENABLED_VERSION=1.28`, short Criterion (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`); baseline **win-msvc-cloud-bench-opt0-2026-04-06** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md).
+- **Наступний горизонт P4**: baseline RPS/latency для **`GET /api/v1/health`** (in-tree **`cargo run --release --bin poolai_health_load -- …`**, за бажанням **`wrk`** на реф-хості); **GNU** toolchain для порівнянних з **win11-criterion-full** абсолютних цифр. LAN-заміри P2b (рядок 108) — поза кодом до стенду.
+
+## Верифікація 2026-04-07 (доки — канонічний порядок 1–12 і P4 HTTP)
+
+- **Код**: `src/bin/poolai_health_load.rs` — Rust load tool для health endpoint; `src/runtime/process.rs` — приклади `ProcessConfig` без Python у док-коментах.
+- **Доки**: кореневий **`README.md`**, **`docs/README.md`**, **`docs/INDEX_2026-03-17.md`**, **`docs/STRUCTURE.md`**, **`docs/development/README.md`**, **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`**, **`.cursor/skills/poolai-documentation/SKILL.md`** — узгоджено з **`BENCHMARKS.md`** (Criterion + `poolai_health_load`).
+- **Інвентар**: **`file_list.csv`** — `poolai_health_load.rs`.
 

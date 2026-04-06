@@ -1,7 +1,7 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-04-06
+**Останнє оновлення**: 2026-04-07
 
 **Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.md`](../../.cursor/rules/documentation.md)
 
@@ -34,7 +34,7 @@
 
 ### Priority 4: Продуктивність і бенчі
 
-- Команди та baseline: [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md). Опційний CI: [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml) (`workflow_dispatch` + cron).
+- Команди та baseline: [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md). Criterion (`runtime_benchmarks`, `turboquant_benchmarks` + `ml`, `cloud_benchmarks` + `cloud`, `service_layer_benchmarks` + `test-utils`) + MSVC short-profile рядки в таблиці baseline. HTTP **`GET /api/v1/health`**: in-tree **`poolai_health_load`** (`cargo run --release --bin poolai_health_load -- …`). Опційний CI: [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml) (`workflow_dispatch` + cron).
 
 ### Priority 2: Service layer + опціональні features
 
@@ -83,4 +83,4 @@
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата останнього узгодження з main**: 2026-04-06
+**Дата останнього узгодження з main**: 2026-04-07

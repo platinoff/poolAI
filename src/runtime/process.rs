@@ -61,8 +61,8 @@ pub enum ProcessStatus {
 /// use std::path::PathBuf;
 ///
 /// let config = ProcessConfig {
-///     command: "python".to_string(),
-///     args: vec!["script.py".to_string(), "--arg".to_string()],
+///     command: "custom-worker".to_string(),
+///     args: vec!["run-job".to_string(), "--input".to_string(), "data.bin".to_string()],
 ///     working_dir: Some(PathBuf::from("/tmp")),
 ///     env: {
 ///         let mut env = HashMap::new();
@@ -145,8 +145,8 @@ pub struct ProcessInfo {
 ///
 /// // Spawn a process
 /// let config = ProcessConfig {
-///     command: "python".to_string(),
-///     args: vec!["script.py".to_string()],
+///     command: "custom-worker".to_string(),
+///     args: vec!["run-job".to_string(), "--input".to_string(), "data.bin".to_string()],
 ///     working_dir: None,
 ///     env: HashMap::new(),
 ///     timeout_seconds: Some(300),
@@ -252,8 +252,8 @@ impl ProcessManager {
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
     /// let manager = ProcessManager::new();
     /// let config = ProcessConfig {
-    ///     command: "python".to_string(),
-    ///     args: vec!["script.py".to_string()],
+    ///     command: "custom-worker".to_string(),
+    ///     args: vec!["run-job".to_string(), "--input".to_string(), "data.bin".to_string()],
     ///     working_dir: None,
     ///     env: HashMap::new(),
     ///     timeout_seconds: Some(300),

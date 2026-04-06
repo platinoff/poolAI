@@ -22,7 +22,7 @@ Benchmarks live under `benches/` and use [Criterion](https://github.com/bheisler
 |--------------|---------|--------|
 | `runtime_benchmarks` | `cargo bench -j 1 --bench runtime_benchmarks` | Memory pool, LRU, model structs, cache keys, local RAID put, **replication engine** (node selection + quorum), **VM lifecycle**, **RAID protocol JSON**, **health-shaped JSON**. Same workspace **`bench`** / MSVC workaround as `turboquant_benchmarks` (see baseline note). |
 | `turboquant_benchmarks` | `cargo bench -j 1 --bench turboquant_benchmarks --features ml` | TurboQuant pack/unpack and `dot_f32` (requires `ml`). Workspace **`bench`** profile uses `opt-level = 0` so `cargo bench` can complete on MSVC hosts where `rustc` otherwise AVs on the full crate (see baseline note below). |
-| `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config) |
+| `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config). For kube OpenAPI alignment with CI, set **`K8S_OPENAPI_ENABLED_VERSION=1.28`** (see [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml)). |
 | `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager`. Same **`bench`** / MSVC workaround as other Criterion targets (see baseline note). |
 
 Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) to reduce parallel link pressure.
@@ -97,6 +97,8 @@ The **win11-criterion-full** row set is a default Criterion profile (100 samples
 | `raid_service/list_artifacts` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~1.40 µs | 2026-04-06 |
 | `raid_service/quota` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~61.6 µs | 2026-04-06 |
 | `raid_service/cluster_status` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~81.5 µs | 2026-04-06 |
+| `cloud_config/validate_default` | win-msvc-cloud-bench-opt0-2026-04-06 | ~15.6 ns | 2026-04-06 |
+| `cloud_manager/init_shutdown_default_config` | win-msvc-cloud-bench-opt0-2026-04-06 | ~2.78 µs | 2026-04-06 |
 | `wrk` `/api/v1/health` | *manual* | RPS / p50 / p95 | — |
 | *your ref host* / … | *e.g. ref-linux-01* | *from Criterion* | *YYYY-MM-DD* |
 
@@ -112,6 +114,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | Service layer | `raid_service/list_*` | Sub-µs median for list/queries on tiny temp stores |
 | JSON | `http_health_json`, `raid_protocol_put_payload` | Track median; investigate if >2× prior baseline |
 | TurboQuant | `turboquant/*` (`--features ml`) | Stable pack/unpack; `dot_f32` scales linearly with dimension |
+| Cloud (config + manager) | `cloud_config/validate_default`, `cloud_manager/init_shutdown_default_config` (`--features cloud`) | Track median; init/shutdown includes async runtime — expect low-µs order on default config |
 
 ### Changelog (bench docs)
 
@@ -123,12 +126,30 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | 2026-04-06 | P4: `turboquant_benchmarks` — фактичні медіани (short Criterion) у таблиці baseline під міткою **win-msvc-turboquant-bench-opt0-2026-04-06**; у кореневому `Cargo.toml` додано **`[profile.bench] opt-level = 0`** як обхід **MSVC rustc AV** на збірці `poolai` для `cargo bench`. |
 | 2026-04-06 | P4: `runtime_benchmarks` — той самий short Criterion + **win-msvc-runtime-bench-opt0-2026-04-06** у таблиці baseline; нотатка MSVC узагальнена для всіх `cargo bench` targets. |
 | 2026-04-06 | P4: `service_layer_benchmarks` (`--features test-utils`) — медіани під **win-msvc-service-layer-bench-opt0-2026-04-06**; колонка *Notes* у таблиці реєстрації. |
+| 2026-04-06 | P4: `cloud_benchmarks` — short Criterion + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**, медіани під **win-msvc-cloud-bench-opt0-2026-04-06** (`cloud_config/*`, `cloud_manager/*`). |
+| 2026-04-06 | P4: бінарник **`poolai_health_load`** (`src/bin/poolai_health_load.rs`) — HTTP навантаження **`GET /api/v1/health`** на Rust (`reqwest` + Tokio), без зовнішніх load-генераторів. |
 
 ---
 
 ## HTTP and system load tests (manual)
 
 With the server running (default or configured bind address):
+
+### In-tree Rust load tool (no wrk / hey / Python)
+
+**`poolai_health_load`** — Tokio + `reqwest`, same process style as the rest of the repo. Arguments: `URL` (optional), duration in **seconds** (default `30`), concurrent **workers** (default `400`).
+
+```bash
+# Terminal 1
+cargo run --release
+
+# Terminal 2 — same shape as wrk -c400 -d30s
+cargo run --release --bin poolai_health_load -- http://127.0.0.1:8080/api/v1/health 30 400
+```
+
+Prints wall time, OK count, errors, RPS (successful requests only), and latency mean / p50 / p95 / p99. Above **200k** successful requests, latencies use a **reservoir sample** (see stderr note).
+
+### External tools (optional)
 
 ```bash
 # wrk
@@ -143,7 +164,7 @@ hey -n 100000 -c 100 http://127.0.0.1:8080/api/v1/health
 
 Interpretation depends on CPU count, TLS, auth middleware, and disk; compare against your own baseline after deploy.
 
-On Windows, **`wrk` is often absent** from PATH; use WSL, a Linux ref host, or **`hey`** / **`ab`** for the same URL pattern.
+On Windows, **`wrk` is often absent** from PATH; prefer **`poolai_health_load`**, or WSL / a Linux ref host, or **`hey`** / **`ab`**.
 
 ### P2b stand harness (in-tree)
 

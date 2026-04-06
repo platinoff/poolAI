@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-07 (кроки 1–12; **`network/enterprise_api/`** розбито за доменами; P4 — baseline `runtime_benchmarks` + MSVC `bench`)  
+**Оновлено:** 2026-04-07 (кроки 1–12; P4 — Criterion baseline + **`poolai_health_load`**; канонічні README/INDEX/STRUCTURE/digest узгоджені з `BENCHMARKS.md`)  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -42,7 +42,7 @@
 
 ## 4. Наступні кроки за тим самим планом
 
-1. **P4** — у `BENCHMARKS.md` зафіксовано short Criterion для **`turboquant_benchmarks`**, **`runtime_benchmarks`** і **`service_layer_benchmarks`** під мітками **win-msvc-*-bench-opt0-2026-04-06** (профіль **`bench`** / MSVC workaround). Далі на **референс-машині**: **`cloud_benchmarks`**, повні прогони за потреби, **`wrk`** на `/api/v1/health`. **CI**: `.github/workflows/benchmarks.yml`. `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
+1. **P4** — у `BENCHMARKS.md` зафіксовано short Criterion для **`turboquant_benchmarks`**, **`runtime_benchmarks`**, **`service_layer_benchmarks`** і **`cloud_benchmarks`** (`K8S_OPENAPI_ENABLED_VERSION=1.28`) під мітками **win-msvc-*-bench-opt0-2026-04-06** (профіль **`bench`** / MSVC workaround). HTTP health: in-tree **`poolai_health_load`** (`cargo run --release --bin poolai_health_load -- …`); за бажанням **`wrk`** на реф-хості. **CI**: `.github/workflows/benchmarks.yml`. `service_layer_benchmarks`: `AppState::new` під **`rt.enter()`** (реалізовано).
 2. **P2** — сервіси з **`&ApiContext`**, тонкі **`api/*.rs`**, **`ui_service`**, **`system_status_html`**, **`enterprise_api/`** (підмодулі). Optionals — дрібні переноси логіки з handlers; далі за планом — P4 стенд.
 3. **P2b** — Criterion **`raid_replication_engine`** у `runtime_benchmarks`; in-tree harness: **`tests/distributed_raid_wire_integration.rs`** (`--features test-utils`, з `ml` — перевірка TQ01 vs raw на розмірі JSON); далі — повні заміри по мережі на стенді; також `tests/replication_benchmarks.rs` (інтеграційні таймінги control-plane).
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).

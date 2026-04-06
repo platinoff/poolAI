@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-06.
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-07.
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -36,6 +36,7 @@
 |-----------|------|
 | **`poolai` (default-run)** | Основний сервер: HTTP(S), UI, REST, WebSocket, інтеграція модулів. |
 | **`poolai-worker`** (`src/bin/poolai-worker.rs`) | Окремий воркер-процес для пулу (збірка тестів може блокувати `poolai-worker.exe` на Windows — завершувати процес перед лінком). |
+| **`poolai_health_load`** (`src/bin/poolai_health_load.rs`) | Дев-утиліта: навантажувальний **`GET /api/v1/health`** (Tokio + `reqwest`), без зовнішніх `wrk`/`hey`; див. `docs/performance/BENCHMARKS.md`. |
 
 ---
 

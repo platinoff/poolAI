@@ -393,6 +393,7 @@
 ./scripts/update_file_list.sh
 ./scripts/verify_build.sh
 ./src/bin/poolai-worker.rs
+./src/bin/poolai_health_load.rs
 ./src/cloud/autoscaling.rs
 ./src/cloud/kubernetes.rs
 ./src/cloud/loadbalancing.rs
