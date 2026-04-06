@@ -11,11 +11,10 @@ use poolai::raid::admin::RaidAdmin;
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use std::sync::Arc;
 use tempfile::TempDir;
-use tokio::sync::RwLock;
 use uuid::Uuid;
 
 /// Helper function to create a test RAID manager
-async fn create_test_raid_manager() -> Arc<RwLock<RaidManager>> {
+async fn create_test_raid_manager() -> Arc<RaidManager> {
     let temp_dir = TempDir::new().unwrap();
     let config = RaidConfig {
         mode: RaidMode::Local,
@@ -24,8 +23,8 @@ async fn create_test_raid_manager() -> Arc<RwLock<RaidManager>> {
         retention_days: None,
         gc_on_startup: false,
     };
-    let manager = Arc::new(RwLock::new(RaidManager::new(config)));
-    manager.write().await.initialize().await.unwrap();
+    let manager = Arc::new(RaidManager::new(config));
+    manager.initialize().await.unwrap();
     manager
 }
 

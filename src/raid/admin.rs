@@ -12,10 +12,9 @@
 //! use poolai::raid::admin::RaidAdmin;
 //! use poolai::raid::{RaidManager, RaidConfig, RaidMode};
 //! use std::sync::Arc;
-//! use tokio::sync::RwLock;
 //!
 //! # async fn example() -> Result<(), poolai::core::error::AppError> {
-//! let raid_manager = Arc::new(RwLock::new(RaidManager::new(RaidConfig::default_for_platform())));
+//! let raid_manager = Arc::new(RaidManager::new(RaidConfig::default_for_platform()));
 //! let admin = RaidAdmin::new(raid_manager);
 //!
 //! // Get strategy status
@@ -32,12 +31,11 @@
 use crate::core::error::AppError;
 use crate::raid::{RaidManager, RebalanceResult, StrategyStatus};
 use std::sync::Arc;
-use tokio::sync::RwLock;
 use tracing::info;
 
 /// Administrative control plane for RAID strategies
 pub struct RaidAdmin {
-    raid_manager: Arc<RwLock<RaidManager>>,
+    raid_manager: Arc<RaidManager>,
 }
 
 impl RaidAdmin {
@@ -53,12 +51,11 @@ impl RaidAdmin {
     /// use poolai::raid::admin::RaidAdmin;
     /// use poolai::raid::{RaidManager, RaidConfig};
     /// use std::sync::Arc;
-    /// use tokio::sync::RwLock;
     ///
-    /// let raid_manager = Arc::new(RwLock::new(RaidManager::new(RaidConfig::default_for_platform())));
+    /// let raid_manager = Arc::new(RaidManager::new(RaidConfig::default_for_platform()));
     /// let admin = RaidAdmin::new(raid_manager);
     /// ```
-    pub fn new(raid_manager: Arc<RwLock<RaidManager>>) -> Self {
+    pub fn new(raid_manager: Arc<RaidManager>) -> Self {
         Self { raid_manager }
     }
 
@@ -80,9 +77,8 @@ impl RaidAdmin {
     /// # use poolai::raid::admin::RaidAdmin;
     /// # use poolai::raid::{RaidManager, RaidConfig};
     /// # use std::sync::Arc;
-    /// # use tokio::sync::RwLock;
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
-    /// # let raid_manager = Arc::new(RwLock::new(RaidManager::new(RaidConfig::default_for_platform())));
+    /// # let raid_manager = Arc::new(RaidManager::new(RaidConfig::default_for_platform()));
     /// # let admin = RaidAdmin::new(raid_manager);
     /// let status = admin.get_strategy_status().await?;
     /// println!("Strategy: {}, Active: {}", status.mode, status.active);
@@ -90,8 +86,7 @@ impl RaidAdmin {
     /// # }
     /// ```
     pub async fn get_strategy_status(&self) -> Result<StrategyStatus, AppError> {
-        let manager = self.raid_manager.read().await;
-        manager.get_strategy_status().await
+        self.raid_manager.get_strategy_status().await
     }
 
     /// Trigger manual rebalancing for the active strategy
@@ -113,9 +108,8 @@ impl RaidAdmin {
     /// # use poolai::raid::admin::RaidAdmin;
     /// # use poolai::raid::{RaidManager, RaidConfig};
     /// # use std::sync::Arc;
-    /// # use tokio::sync::RwLock;
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
-    /// # let raid_manager = Arc::new(RwLock::new(RaidManager::new(RaidConfig::default_for_platform())));
+    /// # let raid_manager = Arc::new(RaidManager::new(RaidConfig::default_for_platform()));
     /// # let admin = RaidAdmin::new(raid_manager);
     /// let result = admin.trigger_rebalance().await?;
     /// println!("Rebalanced {} artifacts", result.artifacts_moved);
@@ -124,8 +118,7 @@ impl RaidAdmin {
     /// ```
     pub async fn trigger_rebalance(&self) -> Result<RebalanceResult, AppError> {
         info!("Administrative rebalance triggered");
-        let manager = self.raid_manager.read().await;
-        let result = manager.trigger_rebalance().await?;
+        let result = self.raid_manager.trigger_rebalance().await?;
         info!(
             "Rebalancing completed: {} artifacts moved, success: {}",
             result.artifacts_moved, result.success
@@ -147,9 +140,8 @@ impl RaidAdmin {
     /// # use poolai::raid::admin::RaidAdmin;
     /// # use poolai::raid::{RaidManager, RaidConfig};
     /// # use std::sync::Arc;
-    /// # use tokio::sync::RwLock;
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
-    /// # let raid_manager = Arc::new(RwLock::new(RaidManager::new(RaidConfig::default_for_platform())));
+    /// # let raid_manager = Arc::new(RaidManager::new(RaidConfig::default_for_platform()));
     /// # let admin = RaidAdmin::new(raid_manager);
     /// if let Some(metrics) = admin.get_burst_raid_metrics().await {
     ///     println!("Artifacts in burst: {}", metrics.artifacts_in_burst);
@@ -161,8 +153,7 @@ impl RaidAdmin {
     pub async fn get_burst_raid_metrics(
         &self,
     ) -> Option<crate::raid::burst_raid::BurstRaidMetrics> {
-        let manager = self.raid_manager.read().await;
-        manager.get_burst_raid_metrics().await
+        self.raid_manager.get_burst_raid_metrics().await
     }
 
     /// Get SmallWorld metrics if SmallWorld strategy is active
@@ -179,9 +170,8 @@ impl RaidAdmin {
     /// # use poolai::raid::admin::RaidAdmin;
     /// # use poolai::raid::{RaidManager, RaidConfig};
     /// # use std::sync::Arc;
-    /// # use tokio::sync::RwLock;
     /// # async fn example() -> Result<(), poolai::core::error::AppError> {
-    /// # let raid_manager = Arc::new(RwLock::new(RaidManager::new(RaidConfig::default_for_platform())));
+    /// # let raid_manager = Arc::new(RaidManager::new(RaidConfig::default_for_platform()));
     /// # let admin = RaidAdmin::new(raid_manager);
     /// if let Some(metrics) = admin.get_small_world_metrics().await {
     ///     println!("Average clustering: {:.3}", metrics.avg_clustering_coefficient);
@@ -193,8 +183,7 @@ impl RaidAdmin {
     pub async fn get_small_world_metrics(
         &self,
     ) -> Option<crate::raid::small_world::SmallWorldMetrics> {
-        let manager = self.raid_manager.read().await;
-        manager.get_small_world_metrics().await
+        self.raid_manager.get_small_world_metrics().await
     }
 
     /// Get artifact burst stats for a specific artifact (BurstRAID only)
@@ -212,8 +201,9 @@ impl RaidAdmin {
         &self,
         artifact_id: uuid::Uuid,
     ) -> Option<crate::raid::burst_raid::ArtifactBurstStats> {
-        let manager = self.raid_manager.read().await;
-        manager.get_artifact_burst_stats(artifact_id).await
+        self.raid_manager
+            .get_artifact_burst_stats(artifact_id)
+            .await
     }
 
     /// Get clustering coefficient for a specific node (SmallWorld only)
@@ -228,7 +218,8 @@ impl RaidAdmin {
     ///
     /// Returns `Some(f64)` if node exists and SmallWorld is active, `None` otherwise.
     pub async fn get_node_clustering_coefficient(&self, node_id: u64) -> Option<f64> {
-        let manager = self.raid_manager.read().await;
-        manager.get_node_clustering_coefficient(node_id).await
+        self.raid_manager
+            .get_node_clustering_coefficient(node_id)
+            .await
     }
 }

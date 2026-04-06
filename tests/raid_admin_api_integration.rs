@@ -12,10 +12,9 @@ use poolai::raid::admin::RaidAdmin;
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use std::sync::Arc;
 use tempfile::TempDir;
-use tokio::sync::RwLock;
 
 /// Helper function to create a test RAID manager
-async fn create_test_raid_manager() -> Arc<RwLock<RaidManager>> {
+async fn create_test_raid_manager() -> Arc<RaidManager> {
     let temp_dir = TempDir::new().unwrap();
     let config = RaidConfig {
         mode: RaidMode::Local,
@@ -24,8 +23,8 @@ async fn create_test_raid_manager() -> Arc<RwLock<RaidManager>> {
         retention_days: None,
         gc_on_startup: false,
     };
-    let manager = Arc::new(RwLock::new(RaidManager::new(config)));
-    manager.write().await.initialize().await.unwrap();
+    let manager = Arc::new(RaidManager::new(config));
+    manager.initialize().await.unwrap();
     manager
 }
 
@@ -43,7 +42,7 @@ async fn test_raid_admin_get_strategy_status() {
 #[tokio::test]
 async fn test_raid_admin_trigger_rebalance_local_mode() {
     let config = RaidConfig::default_for_platform();
-    let raid_manager = Arc::new(RwLock::new(RaidManager::new(config)));
+    let raid_manager = Arc::new(RaidManager::new(config));
     let admin = RaidAdmin::new(raid_manager.clone());
 
     // Trigger rebalance in local mode (should return error)
@@ -55,7 +54,7 @@ async fn test_raid_admin_trigger_rebalance_local_mode() {
 #[tokio::test]
 async fn test_raid_admin_get_burst_raid_metrics() {
     let config = RaidConfig::default_for_platform();
-    let raid_manager = Arc::new(RwLock::new(RaidManager::new(config)));
+    let raid_manager = Arc::new(RaidManager::new(config));
     let admin = RaidAdmin::new(raid_manager.clone());
 
     // Get BurstRAID metrics (may return None in local mode)
@@ -69,7 +68,7 @@ async fn test_raid_admin_get_burst_raid_metrics() {
 #[tokio::test]
 async fn test_raid_admin_get_small_world_metrics() {
     let config = RaidConfig::default_for_platform();
-    let raid_manager = Arc::new(RwLock::new(RaidManager::new(config)));
+    let raid_manager = Arc::new(RaidManager::new(config));
     let admin = RaidAdmin::new(raid_manager.clone());
 
     // Get SmallWorld metrics (may return None in local mode)
@@ -83,13 +82,12 @@ async fn test_raid_admin_get_small_world_metrics() {
 #[tokio::test]
 async fn test_raid_admin_get_artifact_burst_stats() {
     let config = RaidConfig::default_for_platform();
-    let raid_manager = Arc::new(RwLock::new(RaidManager::new(config)));
+    let raid_manager = Arc::new(RaidManager::new(config));
+    raid_manager.initialize().await.unwrap();
     let admin = RaidAdmin::new(raid_manager.clone());
 
     // Create a test artifact using put_artifact
     let artifact_ref = raid_manager
-        .write()
-        .await
         .put_artifact("test-artifact", b"test artifact data")
         .await
         .unwrap();
@@ -106,7 +104,7 @@ async fn test_raid_admin_get_artifact_burst_stats() {
 #[tokio::test]
 async fn test_raid_admin_get_node_clustering_coefficient() {
     let config = RaidConfig::default_for_platform();
-    let raid_manager = Arc::new(RwLock::new(RaidManager::new(config)));
+    let raid_manager = Arc::new(RaidManager::new(config));
     let admin = RaidAdmin::new(raid_manager.clone());
 
     // Get clustering coefficient for a node (should work even if no nodes)

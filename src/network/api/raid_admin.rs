@@ -7,7 +7,7 @@
 //! - Strategy configuration
 
 use axum::{
-    extract::{Extension, Path, Query},
+    extract::{Extension, Path, Query, State},
     http::StatusCode,
     middleware,
     response::IntoResponse,
@@ -22,7 +22,21 @@ use crate::core::state::ApiContext;
 use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::raid::admin::RaidAdmin;
-use crate::raid::{RaidManager, StrategyStatus};
+use crate::raid::StrategyStatus;
+use crate::services::raid_service::RAID_MANAGER_UNAVAILABLE_MESSAGE;
+
+fn raid_manager_unavailable() -> impl IntoResponse {
+    let (s, j) = api_json_error(
+        "RAID_MANAGER_UNAVAILABLE",
+        RAID_MANAGER_UNAVAILABLE_MESSAGE,
+        Some(
+            ErrorContext::new("raid_admin")
+                .with_hint("Ensure RAID manager is initialized during application startup."),
+        ),
+        StatusCode::SERVICE_UNAVAILABLE,
+    );
+    (s, j).into_response()
+}
 
 #[derive(serde::Serialize)]
 struct StrategyStatusResponse {
@@ -65,10 +79,11 @@ struct NodeIdQuery {
 /// Get current strategy status
 ///
 /// Returns information about the active RAID strategy.
-async fn get_strategy_status_handler(
-    Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
-) -> impl IntoResponse {
-    let admin = RaidAdmin::new(raid_manager);
+async fn get_strategy_status_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let Some(mgr) = ctx.raid_manager.get().cloned() else {
+        return raid_manager_unavailable().into_response();
+    };
+    let admin = RaidAdmin::new(mgr);
 
     match admin.get_strategy_status().await {
         Ok(status) => (StatusCode::OK, Json(StrategyStatusResponse { status })).into_response(),
@@ -88,15 +103,18 @@ async fn get_strategy_status_handler(
 ///
 /// Manually triggers rebalancing of artifacts across nodes.
 async fn trigger_rebalance_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
-    Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
 ) -> impl IntoResponse {
     // Check admin permission
     if let Err((status, json)) = check_permission(&claims, "admin") {
         return (status, json).into_response();
     }
 
-    let admin = RaidAdmin::new(raid_manager);
+    let Some(mgr) = ctx.raid_manager.get().cloned() else {
+        return raid_manager_unavailable().into_response();
+    };
+    let admin = RaidAdmin::new(mgr);
 
     match admin.trigger_rebalance().await {
         Ok(result) => (
@@ -123,10 +141,11 @@ async fn trigger_rebalance_handler(
 /// Get BurstRAID metrics
 ///
 /// Returns detailed metrics about BurstRAID strategy if active.
-async fn get_burst_raid_metrics_handler(
-    Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
-) -> impl IntoResponse {
-    let admin = RaidAdmin::new(raid_manager);
+async fn get_burst_raid_metrics_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let Some(mgr) = ctx.raid_manager.get().cloned() else {
+        return raid_manager_unavailable().into_response();
+    };
+    let admin = RaidAdmin::new(mgr);
 
     match admin.get_burst_raid_metrics().await {
         Some(metrics) => {
@@ -147,10 +166,11 @@ async fn get_burst_raid_metrics_handler(
 /// Get SmallWorld metrics
 ///
 /// Returns detailed metrics about SmallWorld strategy if active.
-async fn get_small_world_metrics_handler(
-    Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
-) -> impl IntoResponse {
-    let admin = RaidAdmin::new(raid_manager);
+async fn get_small_world_metrics_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    let Some(mgr) = ctx.raid_manager.get().cloned() else {
+        return raid_manager_unavailable().into_response();
+    };
+    let admin = RaidAdmin::new(mgr);
 
     match admin.get_small_world_metrics().await {
         Some(metrics) => {
@@ -173,7 +193,7 @@ async fn get_small_world_metrics_handler(
 /// Returns burst statistics for a specific artifact.
 async fn get_artifact_burst_stats_handler(
     Path(artifact_id): Path<String>,
-    Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
+    State(ctx): State<ApiContext>,
 ) -> impl IntoResponse {
     let artifact_uuid = match Uuid::parse_str(&artifact_id) {
         Ok(uuid) => uuid,
@@ -191,7 +211,10 @@ async fn get_artifact_burst_stats_handler(
         }
     };
 
-    let admin = RaidAdmin::new(raid_manager);
+    let Some(mgr) = ctx.raid_manager.get().cloned() else {
+        return raid_manager_unavailable().into_response();
+    };
+    let admin = RaidAdmin::new(mgr);
 
     match admin.get_artifact_burst_stats(artifact_uuid).await {
         Some(stats) => (StatusCode::OK, Json(ArtifactBurstStatsResponse { stats })).into_response(),
@@ -215,9 +238,12 @@ async fn get_artifact_burst_stats_handler(
 /// Returns clustering coefficient for a specific node.
 async fn get_node_clustering_handler(
     Query(params): Query<NodeIdQuery>,
-    Extension(raid_manager): Extension<std::sync::Arc<tokio::sync::RwLock<RaidManager>>>,
+    State(ctx): State<ApiContext>,
 ) -> impl IntoResponse {
-    let admin = RaidAdmin::new(raid_manager);
+    let Some(mgr) = ctx.raid_manager.get().cloned() else {
+        return raid_manager_unavailable().into_response();
+    };
+    let admin = RaidAdmin::new(mgr);
 
     match admin.get_node_clustering_coefficient(params.node_id).await {
         Some(coeff) => (
