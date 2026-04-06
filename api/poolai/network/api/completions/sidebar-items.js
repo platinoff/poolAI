@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["create_completions_routes"],"struct":["ChatCompletionChoice","ChatCompletionChunk","ChatCompletionChunkChoice","ChatCompletionRequest","ChatCompletionResponse","ChatMessage","ChatMessageDelta","ChatUsage"]};
+window.SIDEBAR_ITEMS = {"fn":["create_completions_routes"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["ChatCompletionChoice","ChatCompletionChunk","ChatCompletionChunkChoice","ChatCompletionRequest","ChatCompletionResponse","ChatCompletionService","ChatMessage","ChatMessageDelta","ChatUsage"]};
