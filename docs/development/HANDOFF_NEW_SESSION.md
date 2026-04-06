@@ -47,4 +47,6 @@
 4. За потреби — `cargo test --all-features` на Windows (`-j 1` при OOM лінкера).
 5. **P5 (доки)** — періодично синхронізувати `DEVELOPMENT_PLAN_UPDATED`, `STABLE_STATE_SUMMARY`, `ARCHITECTURE_REVIEW` з [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (інкремент 2026‑04 зроблено).
 
+6. **P6** — концепт **Grid Protocol**: [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](./GRID_PROTOCOL_CONCEPT_2026-04-06.md) (Solana‑adapter — наступний відкритий підпункт плану).
+
 Деталі й чекбокси — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md).

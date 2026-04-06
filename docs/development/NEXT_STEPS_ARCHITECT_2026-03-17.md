@@ -187,9 +187,9 @@
   - [x] Створити `docs/concept/POOLAI_MEMORY_LAYER.md` з моделлю “AGI‑памʼяті” та seeds‑поведінкою (аналог торентів).
 - [x] Формалізувати Job / Mining Layer в концептах:
   - [x] Додати окремий development‑док `JOB_LAYER_CONCEPT_2026-03-17.md` з описом AI‑Job (ресурси, дедлайни, тип задачі, верифікація) і життєвим циклом `submitted → scheduled → executed → verified → rewarded`.
-- [ ] Описати Grid Protocol (поверх Discovery/RAID):
-  - [ ] Типи повідомлень: `Job`, `Result`, `MemoryShard`, `PeerStatus`.
-  - [ ] Звʼязок із вже існуючими peer/discovery API та grid‑тестами RAID.
+- [x] Описати Grid Protocol (поверх Discovery/RAID):
+  - [x] Типи повідомлень: `Job`, `Result`, `MemoryShard`, `PeerStatus` — див. [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md).
+  - [x] Звʼязок із peer/discovery API (`/api/v1/discovery/*`, `DiscoveryMessage`), distributed RAID (`/raid/distributed/*`), тестами [`tests/grid_network_scalability_tests.rs`](../../tests/grid_network_scalability_tests.rs).
 - [ ] Визначити Solana‑adapter як окремий шар:
   - [ ] У docs описати, які події (`JobCompleted`, `SeedProvided`, `MemoryUpdated`) відображаються в on‑chain події.
   - [ ] Чітко відокремити core‑runtime (Rust) від billing/tokenization‑адаптера.
@@ -293,4 +293,10 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **Прогін**: `runtime_benchmarks` з `--sample-size 20 --warm-up-time 0.3 --measurement-time 0.5` (Windows, release); медіани занесені в `BENCHMARKS.md` як **dev-win-sample**.
 - **`service_layer_benchmarks`**: виправлено панік «no reactor running» — `AppState::new()` під `Runtime::enter()`.
 - **Доки**: `NEXT_STEPS` — оновлені чекбокси P3 (auth), P4 (hot-path / бенчі); README «Next Focus».
+
+## Верифікація 2026-04-06 (P6 — Grid Protocol concept)
+
+- **Документ**: [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md) — типи повідомлень `Job`, `Result`, `MemoryShard`, `PeerStatus`; мапінг на `/api/v1/discovery/*`, `DiscoveryMessage`, `/raid/distributed/*`, `tests/grid_network_scalability_tests.rs`.
+- **Оновлено**: [`concept/POOLAI_GRID_NODE.md`](../concept/POOLAI_GRID_NODE.md) (посилання на Grid Protocol), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), `file_list.csv`.
+- **Залишок P6**: Solana‑adapter (on‑chain mapping), опційно єдиний wire envelope для Grid.
 

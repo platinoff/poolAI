@@ -72,8 +72,9 @@ Grid Layer додає **протокол між нодами**, не зміню�
 - `docs/status/*` — підтверджують 100% готовність 15 модулів.
 - `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` — цей файл розширює план на Grid‑рівень.
 
-Майбутні документи:
+Пов’язані development‑доки:
 
 - `POOLAI_MEMORY_LAYER.md` — опис AGI‑памʼяті та seeds.
-- Специфікація Grid Protocol та Job Layer (development‑доки).
+- `development/JOB_LAYER_CONCEPT_2026-03-17.md` — Job / Mining Layer.
+- `development/GRID_PROTOCOL_CONCEPT_2026-04-06.md` — **Grid Protocol** (типи повідомлень Job / Result / MemoryShard / PeerStatus і мапінг на Discovery/RAID/тести).
 
