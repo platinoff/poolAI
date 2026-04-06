@@ -414,6 +414,7 @@
 ./src/services/worker_pool_service.rs
 ./src/services/cloud_service.rs
 ./src/services/enterprise_service.rs
+./src/services/instance_service.rs
 ./src/services/library_service.rs
 ./src/services/raid_service.rs
 ./src/services/rewards_service.rs

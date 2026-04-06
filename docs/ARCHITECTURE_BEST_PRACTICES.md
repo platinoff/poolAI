@@ -44,6 +44,7 @@ src/
 │   ├── discovery_service.rs    # discovery peers / announce (ApiContext slot)
 │   ├── cloud_service.rs        # feature `cloud`
 │   ├── enterprise_service.rs   # feature `enterprise`
+│   ├── instance_service.rs     # model instances / placement previews
 │   ├── library_service.rs
 │   ├── raid_service.rs
 │   ├── rewards_service.rs     # rewards stats / progress (delegates to `rewards` module today)
