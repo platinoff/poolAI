@@ -18,12 +18,12 @@
 <a href=#18 id=18 data-nosnippet>18</a>};
 <a href=#19 id=19 data-nosnippet>19</a>
 <a href=#20 id=20 data-nosnippet>20</a><span class="kw">use </span><span class="kw">crate</span>::core::config::PoolAIConfig;
-<a href=#21 id=21 data-nosnippet>21</a><span class="kw">use </span><span class="kw">crate</span>::core::error::ErrorContext;
+<a href=#21 id=21 data-nosnippet>21</a><span class="kw">use </span><span class="kw">crate</span>::core::error::{AppError, ErrorContext};
 <a href=#22 id=22 data-nosnippet>22</a><span class="kw">use </span><span class="kw">crate</span>::core::state::ApiContext;
 <a href=#23 id=23 data-nosnippet>23</a><span class="kw">use </span><span class="kw">crate</span>::network::api::common::{api_json_error, check_permission};
 <a href=#24 id=24 data-nosnippet>24</a><span class="kw">use </span><span class="kw">crate</span>::network::auth::{AuthRequest, Claims};
 <a href=#25 id=25 data-nosnippet>25</a><span class="kw">use </span><span class="kw">crate</span>::network::ws::websocket_handler;
-<a href=#26 id=26 data-nosnippet>26</a><span class="kw">use </span><span class="kw">crate</span>::services::system_service::SystemService;
+<a href=#26 id=26 data-nosnippet>26</a><span class="kw">use </span><span class="kw">crate</span>::services::system_service::{HealthResponse, MetricsResponse, ModelInfo, SystemService};
 <a href=#27 id=27 data-nosnippet>27</a>
 <a href=#28 id=28 data-nosnippet>28</a><span class="attr">#[cfg(test)]
 <a href=#29 id=29 data-nosnippet>29</a></span><span class="kw">mod </span>tests {
@@ -98,20 +98,20 @@
 <a href=#98 id=98 data-nosnippet>98</a>    }
 <a href=#99 id=99 data-nosnippet>99</a>}
 <a href=#100 id=100 data-nosnippet>100</a>
-<a href=#101 id=101 data-nosnippet>101</a><span class="kw">async fn </span>metrics_handler() -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#102 id=102 data-nosnippet>102</a>    Json(SystemService::metrics_snapshot())
+<a href=#101 id=101 data-nosnippet>101</a><span class="kw">async fn </span>metrics_handler() -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;MetricsResponse&gt;, AppError&gt; {
+<a href=#102 id=102 data-nosnippet>102</a>    <span class="prelude-val">Ok</span>(Json(SystemService::metrics_snapshot()))
 <a href=#103 id=103 data-nosnippet>103</a>}
 <a href=#104 id=104 data-nosnippet>104</a>
-<a href=#105 id=105 data-nosnippet>105</a><span class="kw">async fn </span>models_handler() -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#106 id=106 data-nosnippet>106</a>    Json(SystemService::models_snapshot())
+<a href=#105 id=105 data-nosnippet>105</a><span class="kw">async fn </span>models_handler() -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;Vec&lt;ModelInfo&gt;&gt;, AppError&gt; {
+<a href=#106 id=106 data-nosnippet>106</a>    <span class="prelude-val">Ok</span>(Json(SystemService::models_snapshot()))
 <a href=#107 id=107 data-nosnippet>107</a>}
 <a href=#108 id=108 data-nosnippet>108</a>
-<a href=#109 id=109 data-nosnippet>109</a><span class="kw">async fn </span>gpu_info() -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#110 id=110 data-nosnippet>110</a>    Json(SystemService::gpu_snapshot())
+<a href=#109 id=109 data-nosnippet>109</a><span class="kw">async fn </span>gpu_info() -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;<span class="kw">crate</span>::platform::GpuInfo&gt;, AppError&gt; {
+<a href=#110 id=110 data-nosnippet>110</a>    <span class="prelude-val">Ok</span>(Json(SystemService::gpu_snapshot()))
 <a href=#111 id=111 data-nosnippet>111</a>}
 <a href=#112 id=112 data-nosnippet>112</a>
-<a href=#113 id=113 data-nosnippet>113</a><span class="kw">async fn </span>health_handler() -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#114 id=114 data-nosnippet>114</a>    Json(SystemService::health_snapshot())
+<a href=#113 id=113 data-nosnippet>113</a><span class="kw">async fn </span>health_handler() -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;HealthResponse&gt;, AppError&gt; {
+<a href=#114 id=114 data-nosnippet>114</a>    <span class="prelude-val">Ok</span>(Json(SystemService::health_snapshot()))
 <a href=#115 id=115 data-nosnippet>115</a>}
 <a href=#116 id=116 data-nosnippet>116</a>
 <a href=#117 id=117 data-nosnippet>117</a><span class="kw">async fn </span>login_handler(
