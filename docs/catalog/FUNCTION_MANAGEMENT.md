@@ -92,7 +92,7 @@ FM-xxx (з таблиці нижче)
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Partial / Planned | NEXT_STEPS P2 |
 | FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned | NEXT_STEPS P2b, `BENCHMARKS.md` |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
-| FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` / `HttpAppError` де доречно (без зміни стабільних `error.code`) | Partial | NEXT_STEPS P3; **`rewards.rs`**, **`workers.rs`** (`GET /workers`), **`admin.rs`** (`GET /admin/overview`); **`/rewards/progress/*`** — `api_json_error` (`NOT_FOUND`) |
+| FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` / `HttpAppError` де доречно (без зміни стабільних `error.code`) | Partial | NEXT_STEPS P3; **`rewards.rs`**, **`workers.rs`**, **`admin.rs`**, **`system.rs`** (`GET /health`, `/metrics`, `/models`, `/gpu`); **`/rewards/progress/*`** — `api_json_error` (`NOT_FOUND`) |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
 | FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); `conflicts` лишаються порожніми без remote timestamps у payload | Partial | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog` |
 | FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; помилки membership / невалідний `node_id` | Partial | `leave_cluster_handler` + `RaidManager::replicate_stored_artifact` |

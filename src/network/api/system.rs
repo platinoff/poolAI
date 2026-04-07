@@ -18,12 +18,12 @@ use axum::{
 };
 
 use crate::core::config::PoolAIConfig;
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{AuthRequest, Claims};
 use crate::network::ws::websocket_handler;
-use crate::services::system_service::SystemService;
+use crate::services::system_service::{HealthResponse, MetricsResponse, ModelInfo, SystemService};
 
 #[cfg(test)]
 mod tests {
@@ -98,20 +98,20 @@ async fn status_handler(
     }
 }
 
-async fn metrics_handler() -> impl IntoResponse {
-    Json(SystemService::metrics_snapshot())
+async fn metrics_handler() -> Result<Json<MetricsResponse>, AppError> {
+    Ok(Json(SystemService::metrics_snapshot()))
 }
 
-async fn models_handler() -> impl IntoResponse {
-    Json(SystemService::models_snapshot())
+async fn models_handler() -> Result<Json<Vec<ModelInfo>>, AppError> {
+    Ok(Json(SystemService::models_snapshot()))
 }
 
-async fn gpu_info() -> impl IntoResponse {
-    Json(SystemService::gpu_snapshot())
+async fn gpu_info() -> Result<Json<crate::platform::GpuInfo>, AppError> {
+    Ok(Json(SystemService::gpu_snapshot()))
 }
 
-async fn health_handler() -> impl IntoResponse {
-    Json(SystemService::health_snapshot())
+async fn health_handler() -> Result<Json<HealthResponse>, AppError> {
+    Ok(Json(SystemService::health_snapshot()))
 }
 
 async fn login_handler(
