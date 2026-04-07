@@ -77,9 +77,9 @@
 <a href=#77 id=77 data-nosnippet>77</a><span class="kw">async fn </span>library_info_handler(
 <a href=#78 id=78 data-nosnippet>78</a>    State(ctx): State&lt;ApiContext&gt;,
 <a href=#79 id=79 data-nosnippet>79</a>    Path(name): Path&lt;String&gt;,
-<a href=#80 id=80 data-nosnippet>80</a>) -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#80 id=80 data-nosnippet>80</a>) -&gt; <span class="prelude-ty">Result</span>&lt;AxumJson&lt;LibraryInfo&gt;, LibHttpErr&gt; {
 <a href=#81 id=81 data-nosnippet>81</a>    <span class="kw">match </span>LibraryService::get_library(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>name).<span class="kw">await </span>{
-<a href=#82 id=82 data-nosnippet>82</a>        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(lib)) =&gt; AxumJson(lib).into_response(),
+<a href=#82 id=82 data-nosnippet>82</a>        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(lib)) =&gt; <span class="prelude-val">Ok</span>(AxumJson(lib)),
 <a href=#83 id=83 data-nosnippet>83</a>        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
 <a href=#84 id=84 data-nosnippet>84</a>            <span class="kw">let </span>(s, j) = api_json_error(
 <a href=#85 id=85 data-nosnippet>85</a>                <span class="string">"NOT_FOUND"</span>,
@@ -87,9 +87,9 @@
 <a href=#87 id=87 data-nosnippet>87</a>                <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"get_library"</span>).with_resource(<span class="string">"library"</span>, <span class="kw-2">&amp;</span>name)),
 <a href=#88 id=88 data-nosnippet>88</a>                StatusCode::NOT_FOUND,
 <a href=#89 id=89 data-nosnippet>89</a>            );
-<a href=#90 id=90 data-nosnippet>90</a>            (s, AxumJson(j.<span class="number">0</span>)).into_response()
+<a href=#90 id=90 data-nosnippet>90</a>            <span class="prelude-val">Err</span>((s, AxumJson(j.<span class="number">0</span>)))
 <a href=#91 id=91 data-nosnippet>91</a>        }
-<a href=#92 id=92 data-nosnippet>92</a>        <span class="prelude-val">Err</span>(e) =&gt; library_service_err(e).into_response(),
+<a href=#92 id=92 data-nosnippet>92</a>        <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(library_service_err(e)),
 <a href=#93 id=93 data-nosnippet>93</a>    }
 <a href=#94 id=94 data-nosnippet>94</a>}
 <a href=#95 id=95 data-nosnippet>95</a>

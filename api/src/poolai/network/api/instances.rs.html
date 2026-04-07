@@ -185,9 +185,9 @@
 <a href=#185 id=185 data-nosnippet>185</a><span class="kw">async fn </span>instance_get_handler(
 <a href=#186 id=186 data-nosnippet>186</a>    State(ctx): State&lt;ApiContext&gt;,
 <a href=#187 id=187 data-nosnippet>187</a>    Path(id): Path&lt;String&gt;,
-<a href=#188 id=188 data-nosnippet>188</a>) -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#188 id=188 data-nosnippet>188</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;InstanceInfo&gt;, InstanceJsonError&gt; {
 <a href=#189 id=189 data-nosnippet>189</a>    <span class="kw">match </span>InstanceService::get_instance(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>id).<span class="kw">await </span>{
-<a href=#190 id=190 data-nosnippet>190</a>        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(info)) =&gt; (StatusCode::OK, Json(info)).into_response(),
+<a href=#190 id=190 data-nosnippet>190</a>        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(info)) =&gt; <span class="prelude-val">Ok</span>(Json(info)),
 <a href=#191 id=191 data-nosnippet>191</a>        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
 <a href=#192 id=192 data-nosnippet>192</a>            <span class="kw">let </span>(s, j) = api_json_error(
 <a href=#193 id=193 data-nosnippet>193</a>                <span class="string">"NOT_FOUND"</span>,
@@ -195,7 +195,7 @@
 <a href=#195 id=195 data-nosnippet>195</a>                <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"get_instance"</span>).with_resource(<span class="string">"instance_id"</span>, <span class="kw-2">&amp;</span>id)),
 <a href=#196 id=196 data-nosnippet>196</a>                StatusCode::NOT_FOUND,
 <a href=#197 id=197 data-nosnippet>197</a>            );
-<a href=#198 id=198 data-nosnippet>198</a>            (s, Json(j.<span class="number">0</span>)).into_response()
+<a href=#198 id=198 data-nosnippet>198</a>            <span class="prelude-val">Err</span>((s, Json(j.<span class="number">0</span>)))
 <a href=#199 id=199 data-nosnippet>199</a>        }
 <a href=#200 id=200 data-nosnippet>200</a>        <span class="prelude-val">Err</span>(InstanceServiceError::ManagerUnavailable) =&gt; {
 <a href=#201 id=201 data-nosnippet>201</a>            <span class="kw">let </span>(s, j) = api_json_error(
@@ -206,7 +206,7 @@
 <a href=#206 id=206 data-nosnippet>206</a>                ),
 <a href=#207 id=207 data-nosnippet>207</a>                StatusCode::SERVICE_UNAVAILABLE,
 <a href=#208 id=208 data-nosnippet>208</a>            );
-<a href=#209 id=209 data-nosnippet>209</a>            (s, Json(j.<span class="number">0</span>)).into_response()
+<a href=#209 id=209 data-nosnippet>209</a>            <span class="prelude-val">Err</span>((s, Json(j.<span class="number">0</span>)))
 <a href=#210 id=210 data-nosnippet>210</a>        }
 <a href=#211 id=211 data-nosnippet>211</a>        <span class="prelude-val">Err</span>(InstanceServiceError::Preview(e)) | <span class="prelude-val">Err</span>(InstanceServiceError::Operation(e)) =&gt; {
 <a href=#212 id=212 data-nosnippet>212</a>            <span class="kw">let </span>(s, j) = api_json_error(
@@ -215,7 +215,7 @@
 <a href=#215 id=215 data-nosnippet>215</a>                <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"get_instance"</span>).with_resource(<span class="string">"instance_id"</span>, <span class="kw-2">&amp;</span>id)),
 <a href=#216 id=216 data-nosnippet>216</a>                StatusCode::INTERNAL_SERVER_ERROR,
 <a href=#217 id=217 data-nosnippet>217</a>            );
-<a href=#218 id=218 data-nosnippet>218</a>            (s, Json(j.<span class="number">0</span>)).into_response()
+<a href=#218 id=218 data-nosnippet>218</a>            <span class="prelude-val">Err</span>((s, Json(j.<span class="number">0</span>)))
 <a href=#219 id=219 data-nosnippet>219</a>        }
 <a href=#220 id=220 data-nosnippet>220</a>    }
 <a href=#221 id=221 data-nosnippet>221</a>}
