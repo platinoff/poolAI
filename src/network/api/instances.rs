@@ -185,9 +185,9 @@ async fn instance_list_handler(
 async fn instance_get_handler(
     State(ctx): State<ApiContext>,
     Path(id): Path<String>,
-) -> impl IntoResponse {
+) -> Result<Json<InstanceInfo>, InstanceJsonError> {
     match InstanceService::get_instance(&ctx, &id).await {
-        Ok(Some(info)) => (StatusCode::OK, Json(info)).into_response(),
+        Ok(Some(info)) => Ok(Json(info)),
         Ok(None) => {
             let (s, j) = api_json_error(
                 "NOT_FOUND",
@@ -195,7 +195,7 @@ async fn instance_get_handler(
                 Some(ErrorContext::new("get_instance").with_resource("instance_id", &id)),
                 StatusCode::NOT_FOUND,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
         Err(InstanceServiceError::ManagerUnavailable) => {
             let (s, j) = api_json_error(
@@ -206,7 +206,7 @@ async fn instance_get_handler(
                 ),
                 StatusCode::SERVICE_UNAVAILABLE,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
         Err(InstanceServiceError::Preview(e)) | Err(InstanceServiceError::Operation(e)) => {
             let (s, j) = api_json_error(
@@ -215,7 +215,7 @@ async fn instance_get_handler(
                 Some(ErrorContext::new("get_instance").with_resource("instance_id", &id)),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
     }
 }

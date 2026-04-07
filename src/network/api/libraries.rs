@@ -77,9 +77,9 @@ async fn libraries_list_handler(
 async fn library_info_handler(
     State(ctx): State<ApiContext>,
     Path(name): Path<String>,
-) -> impl IntoResponse {
+) -> Result<AxumJson<LibraryInfo>, LibHttpErr> {
     match LibraryService::get_library(&ctx, &name).await {
-        Ok(Some(lib)) => AxumJson(lib).into_response(),
+        Ok(Some(lib)) => Ok(AxumJson(lib)),
         Ok(None) => {
             let (s, j) = api_json_error(
                 "NOT_FOUND",
@@ -87,9 +87,9 @@ async fn library_info_handler(
                 Some(ErrorContext::new("get_library").with_resource("library", &name)),
                 StatusCode::NOT_FOUND,
             );
-            (s, AxumJson(j.0)).into_response()
+            Err((s, AxumJson(j.0)))
         }
-        Err(e) => library_service_err(e).into_response(),
+        Err(e) => Err(library_service_err(e)),
     }
 }
 
