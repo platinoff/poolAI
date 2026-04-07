@@ -374,6 +374,7 @@
 ./rust-toolchain.toml
 ./scripts/build-with-https.sh
 ./scripts/check_system.sh
+./scripts/check_target_disk.sh
 ./scripts/fix_cargo_now.sh
 ./scripts/fix_dlltool_msys2.sh
 ./scripts/fix_gcc.sh

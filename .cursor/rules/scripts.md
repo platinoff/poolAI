@@ -12,6 +12,7 @@
 ```
 scripts/
 ├── README.md                    # Scripts documentation
+├── check_target_disk.sh         # Free space + target/ size guard (before heavy cargo)
 ├── fix_cargo_now.sh             # Cargo fix script
 ├── fix_gcc.sh                   # GCC fix script
 ├── install_gcc.sh               # GCC installation

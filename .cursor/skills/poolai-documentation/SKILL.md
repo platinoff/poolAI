@@ -14,7 +14,7 @@ description: >-
 
 1. Кореневий `README.md`
 2. `docs/INDEX_2026-03-17.md` (для структури папок і спадщини — **`docs/STRUCTURE.md`**)
-3. `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`
+3. `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` (таблиця P1–P7 і підрозділ **«Операційний порядок»** — дзеркало **§5.1** у `FUNCTION_MANAGEMENT.md`)
 4. `docs/development/HANDOFF_NEW_SESSION.md`
 5. Концепція (`docs/concept/poolAI_concept_root.txt`, Grid/Memory/Job, `GRID_PROTOCOL_CONCEPT_2026-04-06.md`, `SOLANA_ADAPTER_CONCEPT_2026-04-06.md`)
 6. `docs/ARCHITECTURE_REVIEW.md`, `docs/ARCHITECTURE_BEST_PRACTICES.md`

@@ -1,7 +1,7 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-04-07
+**Останнє оновлення**: 2026-04-06
 
 **Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.md`](../../.cursor/rules/documentation.md)
 
@@ -13,7 +13,7 @@
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
 
 ### Головний план (Rust Architect, 2026-03-17+)
-- **[`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **канонічний** покроковий план (P1–P6, TurboQuant, верифікація CI). Старіші файли `NEXT_STEPS_ARCHITECT_2026-01-22.md` тощо — історичні; див. [`../archive/development/`](../archive/development/).
+- **[`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **канонічний** покроковий план (таблиця P1–P7, TurboQuant, верифікації CI) + підрозділ **«Операційний порядок»** (дзеркало **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md)). Старіші файли `NEXT_STEPS_ARCHITECT_2026-01-22.md` тощо — історичні; див. [`../archive/development/`](../archive/development/).
 
 ### Інші основні плани:
 - [`NEXT_STEPS_2026-01-19.md`](./NEXT_STEPS_2026-01-19.md) — наступні кроки v0.2.2 → v0.3.0+ (контекст)
@@ -28,9 +28,11 @@
 
 ## 📊 Поточні Пріоритети (v0.3.0+)
 
+**Єдиний нумерований порядок робіт** — [`../catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** (FM-003 … FM-010). Нижче — довідкові теми за P\*; деталі та чекбокси — у **`NEXT_STEPS_ARCHITECT_2026-03-17.md`**.
+
 ### Priority 3: Узгоджені HTTP / транспортні помилки
 
-- Формат: `src/network/json_errors.rs`, реекспорт у `api/common.rs`; типи — `src/core/error.rs`; **`enterprise_err`** — `network/enterprise_api/mod.rs`. Покрито основний REST, **`raid.rs`**, **`enterprise_api/`**, **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Опційно: тонке налаштування `http_status_for_app_error`. Джерело правди: **`HANDOFF_NEW_SESSION.md`**, **`NEXT_STEPS_ARCHITECT_2026-03-17.md`** (секція P3).
+- Формат: `src/network/json_errors.rs`, реекспорт у `api/common.rs`; типи — `src/core/error.rs`; **`enterprise_err`** — `network/enterprise_api/mod.rs`. Покрито основний REST, **`raid.rs`**, **`enterprise_api/`**, **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Залишок P3 — **FM-005**: поступова міграція handler’ів на **`Result<Json<_>, AppError>`** (приклад `api/rewards.rs`). Джерело правди: **`HANDOFF_NEW_SESSION.md`**, **`NEXT_STEPS_ARCHITECT_2026-03-17.md`** (секція P3).
 
 ### Priority 4: Продуктивність і бенчі
 
@@ -83,4 +85,4 @@
 ---
 
 **Підготовлено**: Rust Architect  
-**Дата останнього узгодження з main**: 2026-04-07
+**Дата останнього узгодження з main**: 2026-04-06

@@ -52,6 +52,7 @@
 
 ## Testing
 
+- Before heavy runs (`cargo test --all-features`, full clippy matrices): optional `bash scripts/check_target_disk.sh` — warns if free space on the repo volume is below **POOLAI_MIN_FREE_DISK_GB** (default 12) or `target/` exceeds **POOLAI_MAX_TARGET_DIR_GB** (default 48). Use `--enforce` or `POOLAI_ENFORCE_DISK_LIMIT=1` to fail fast. See `rust-architect.md` (target disk policy).
 - Unit tests in `tests/` directory
 - Use `#[tokio::test]` for async tests
 - Use `tempfile` crate for temporary directories in tests

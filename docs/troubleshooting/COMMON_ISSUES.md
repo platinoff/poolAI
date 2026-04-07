@@ -25,6 +25,18 @@ See [AVAST_FALSE_POSITIVE.md](./AVAST_FALSE_POSITIVE.md) for detailed instructio
 
 This is a known issue with Rust binaries triggering false positives in antivirus software.
 
+### Low disk space / oversized `target/`
+
+**Symptoms:** linker errors, `No space left on device`, intermittent `cargo test` failures, Windows `STATUS_*` during LTO.
+
+**Mitigation:**
+
+1. Free space on the volume that holds the repo (or `CARGO_TARGET_DIR`); for PoolAI, keep roughly **≥ 12 GiB** free before large builds.
+2. Run `bash scripts/check_target_disk.sh` (warns by default). To fail before tests: `bash scripts/check_target_disk.sh --enforce` or set `POOLAI_ENFORCE_DISK_LIMIT=1`. Tune thresholds with `POOLAI_MIN_FREE_DISK_GB` / `POOLAI_MAX_TARGET_DIR_GB` (see script header).
+3. `cargo clean` or point `CARGO_TARGET_DIR` at a larger disk. For one-off full feature matrices, `CARGO_INCREMENTAL=0` reduces growth.
+
+Policy for agents: `.cursor/rules/rust-architect.md` → **target/ і ліміт дискового простору**.
+
 ## Startup Issues
 
 ### Application Won't Start

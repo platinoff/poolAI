@@ -55,17 +55,26 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus
 
+**Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
+
+1. **FM-003** + **P4** + **P2b** — Criterion і **`poolai_health_load --json`** на реф-хості → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md); на LAN — повні заміри реплікації + порівняння розміру до/після TQ01.
+2. **FM-005** — розширити **`Result<Json<_>, AppError>`** на інші прості GET (приклад: `src/network/api/rewards.rs`); стабільні **`error.code`** не ламати без рішення.
+3. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** + replication; далі LAN і payload для conflicts за потреби.
+4. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів, **`-j 1`**, GNU за потреби).
+5. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+6. **Концепт → код** — **FM-009** (Grid envelope), **FM-010** (Solana).
+
+**Контекст за пріоритетами Architect (P\*)**
+
 - **P5 / P6 (доки)**: **закриті** на рівні плану — архівні статуси з банером, інвентар TODO у `src/`, концепти Grid + Solana; див. [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md).
-- **P4**: повний прогін Criterion + baseline у [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на **референс-хост**; **`GET /api/v1/health`** — **`poolai_health_load`** (опційно **`--json`** → stdout) або **`wrk`** на реф-хості; workflow [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml). Див. [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
-- **P2b**: TurboQuant фаза 1 у коді ✅; далі — **wire-reплікація** + порівняння розміру артефакта до/після TQ01 на стенді; Criterion `raid_replication_engine` уже є.
-- **P2 (опційно)**: REST `/raid/*` через `RaidService` ✅; за потреби — **`raid_distributed_handlers`** vs сервісний шар.
-- **P3**: `http_status_for_app_error` + Axum **`IntoResponse`** для **`AppError`** / **`HttpAppError`** (`ErrorContext` / override статусу); див. `src/network/json_errors.rs`, реекспорт **`HttpAppError`** у `network/api/common.rs`.
-- **P1 (опційно)**: формальне закриття критеріїв «усі handler’и через `ApiContext`» / тести без глобалів.
+- **P4**: повний прогін Criterion + baseline у `BENCHMARKS.md` на **референс-хост**; **`GET /api/v1/health`** — **`poolai_health_load`** (опційно **`--json`**) або **`wrk`**; workflow [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml); [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
+- **P2b**: TurboQuant фаза 1 у коді ✅; відкритий чекбокс у Architect-плані — **LAN-заміри** (див. пункт 1 вище); Criterion `raid_replication_engine` уже є.
+- **P2 (опційно)**: основні домени через сервіси ✅; дрібні edge cases міграції handlers → `services/*` за потреби.
+- **P3**: узгоджений JSON по REST / **`auth`** / **`ws`** / **`rate_limit`** ✅; залишок — **FM-005** (`http_status_for_app_error`, **`IntoResponse`**, `src/network/json_errors.rs`).
+- **P1 (опційно)**: Raft-шлях без зайвих глобальних згадок; формальне закриття критеріїв за потреби.
 - **UI / UX:** [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
-- За потреби: `cargo test --all-features` на Windows (GNU, `-j 1`).
-- **Документація:** таксономія каталогу — [`docs/STRUCTURE.md`](docs/STRUCTURE.md); опційно — інкрементально переносити застарілі плоскі `docs/*.md` у [`docs/archive/`](docs/archive/).
-- **Наступні кроки за індексом функціоналу (FM-*):** [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) — **§5.1** (пріоритезована таблиця; деталі Architect — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)).
-- **Канонічний план:** [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md) · **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
+- **Документація:** таксономія — [`docs/STRUCTURE.md`](docs/STRUCTURE.md); застарілі плоскі `docs/*.md` — опційно в [`docs/archive/`](docs/archive/).
+- **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) §4.
 
 ### 🚀 Development Roadmap
 

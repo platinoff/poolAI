@@ -38,6 +38,11 @@
 
 ### ✅ Verification
 
+- **`check_target_disk.sh`** — вільне місце на томі репозиторію та розмір `target/` (запобігання переповненню диска / падінню тестів)
+  - Використання: `bash scripts/check_target_disk.sh` (попередження) або `bash scripts/check_target_disk.sh --enforce` (exit 1 при порушенні порогів)
+  - Змінні: `POOLAI_MIN_FREE_DISK_GB` (default 12), `POOLAI_MAX_TARGET_DIR_GB` (default 48), `CARGO_TARGET_DIR`, `POOLAI_ENFORCE_DISK_LIMIT=1`
+  - Див. `.cursor/rules/rust-architect.md` — підрозділ **target/ і ліміт дискового простору**
+
 - **`verify_build.sh`** - Перевірка збірки
   - Використання: `bash scripts/verify_build.sh`
   - Опис: Перевіряє чи проект успішно збирається

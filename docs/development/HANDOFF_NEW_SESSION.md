@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-07 (кроки 1–12; **FM-007/008** — wire sync каталогу + LeaveCluster; **FM-011** — `[profile.test] debug = 1`, перевірка `cargo test -j1 --all-features --no-run` на MSVC; сталевий стан — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
+**Оновлено:** 2026-04-06 (кроки 1–12; порядок робіт узгоджено з **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) — підрозділ **«Операційний порядок»**; **FM-007/008** — sync каталогу + LeaveCluster; **FM-011** — `[profile.test] debug = 1`, перевірка `cargo test -j1 --all-features --no-run` на MSVC; сталевий стан — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
