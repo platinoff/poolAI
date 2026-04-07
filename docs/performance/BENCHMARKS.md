@@ -128,6 +128,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-04-07 | P2b harness **`distributed_raid_wire_integration`**: wire-тести **`SyncArtifacts`** (Push / `missing_artifacts`) та **`LeaveCluster`** (перевірка членства кластера перед graceful replication). |
 | 2026-04-06 | P4: **`poolai_health_load --json`** — структурований звіт на stdout для baseline / `jq`; юніт-тести парсера аргументів у `src/bin/poolai_health_load.rs`. |
 | 2026-04-06 | Filled `raid_service/quota`/`cluster_status` dev-sample medians; P4 target table; `std::hint::black_box` in benches; `ui.rs` gates `State` on `enterprise`; Criterion group `raid_replication_engine` in `runtime_benchmarks` (P2b proxy vs full multi-node I/O). |
 | 2026-04-06 | P4: `runtime_benchmarks` full-profile snapshot (`win11-criterion-full-2026-04-06`); P2b: `tests/distributed_raid_wire_integration.rs` (`test-utils`, optional `ml` for TQ01 wire JSON size). |

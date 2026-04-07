@@ -1,6 +1,10 @@
 //! Distributed RAID wire-protocol orchestration (Put/Get/Delete artifact, sync, health, cluster).
 //!
 //! HTTP handlers in `network::raid_distributed_handlers` delegate here.
+//!
+//! **LeaveCluster (FM-008):** when [`crate::services::raid_service::RaidService::list_nodes`] returns a
+//! non-empty list, the leaving `node_id` must match a registered member (otherwise `InvalidRequest`
+//! before replication). Empty membership keeps prior behaviour (delete may still return not-found).
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
@@ -530,6 +534,37 @@ impl RaidDistributedProtocolService {
                 );
             }
         };
+
+        // FM-008: if membership is non-empty, only registered nodes may leave (avoid pointless replication).
+        let cluster_nodes = match RaidService::list_nodes(ctx).await {
+            Ok(ns) => ns,
+            Err(RaidServiceError::ManagerUnavailable) => {
+                return create_error_response(
+                    &message,
+                    ErrorCode::InvalidRequest,
+                    "RAID manager not initialized".to_string(),
+                );
+            }
+            Err(e) => {
+                error!("LeaveCluster failed to list cluster nodes: {:?}", e);
+                return create_error_response(
+                    &message,
+                    ErrorCode::ReplicationFailed,
+                    format!("Failed to read cluster membership: {:?}", e),
+                );
+            }
+        };
+        if !cluster_nodes.is_empty() && !cluster_nodes.iter().any(|n| n.id == node_id) {
+            return create_error_response(
+                &message,
+                ErrorCode::InvalidRequest,
+                format!(
+                    "Node {} is not a cluster member ({} nodes registered)",
+                    node_id,
+                    cluster_nodes.len()
+                ),
+            );
+        }
 
         let (replication_complete, artifacts_moved) = if payload.graceful {
             match RaidService::list_artifacts(ctx).await {

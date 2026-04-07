@@ -1,22 +1,29 @@
 //! P2b harness: HTTP wire path for distributed `PutArtifact` (single-node stand-in for a peer).
 //!
 //! Run: `cargo test -j 1 --features test-utils --test distributed_raid_wire_integration`
-//! With TQ01 size check: add `--features ml` (second test is `#[cfg(feature = "ml")]`).
+//! With TQ01 size check: add `--features ml` (TQ01 test is `#[cfg(feature = "ml")]`).
+//! Covers: PutArtifact, SyncArtifacts catalog diff (FM-007), LeaveCluster membership (FM-008).
 
-use axum::body::Body;
+use axum::body::{to_bytes, Body};
 use axum::http::{Request, StatusCode};
 use axum::Router;
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use chrono::Utc;
 use poolai::core::state::{ApiContext, AppState};
 use poolai::network::api::raid::create_raid_routes;
-use poolai::raid::protocol::{ArtifactMetadata, ProtocolMessage, PutArtifactPayload, SyncMode};
+use poolai::raid::protocol::{
+    ArtifactMetadata, LeaveClusterPayload, LeaveReason, ProtocolMessage, PutArtifactPayload,
+    SyncArtifactsPayload, SyncArtifactsResponse, SyncDirection, SyncMode,
+};
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::services::raid_service::RaidService;
 use std::sync::Arc;
 use tempfile::TempDir;
 use tower::ServiceExt;
 use uuid::Uuid;
+
+/// Extra UUID present on the peer but not stored locally (Push → missing on this node).
+const REMOTE_ONLY_ID: &str = "00000000-0000-0000-0000-000000000099";
 
 async fn build_api_context(temp: &TempDir) -> ApiContext {
     let config = RaidConfig {
@@ -95,6 +102,105 @@ async fn wire_put_artifact_round_trip_over_http_json() {
         "artifact should be stored via distributed handler; got {:?}",
         artifacts
     );
+}
+
+#[tokio::test]
+async fn wire_sync_artifacts_push_reports_peer_only_ids_as_missing() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let art = RaidService::put_artifact(&ctx, "sync-lib-a", b"x")
+        .await
+        .unwrap();
+    let local_id = art.id.to_string();
+
+    let payload = SyncArtifactsPayload {
+        last_sync_timestamp: None,
+        artifact_ids: Some(vec![local_id.clone(), REMOTE_ONLY_ID.to_string()]),
+        direction: SyncDirection::Push,
+    };
+    let msg = ProtocolMessage::sync_artifacts("stand-sync-node".to_string(), payload).unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/artifacts/sync")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let inner: SyncArtifactsResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert_eq!(inner.synced_count, 1);
+    assert_eq!(inner.missing_artifacts, vec![REMOTE_ONLY_ID.to_string()]);
+    assert!(inner.conflicts.is_empty());
+}
+
+#[tokio::test]
+async fn wire_leave_cluster_rejects_unknown_node_when_membership_non_empty() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let mgr = ctx.raid_manager.get().expect("raid attached");
+    let _registered = mgr.register_node("10.0.0.1:9000".to_string()).await;
+    let stranger = Uuid::new_v4();
+
+    let msg = ProtocolMessage::leave_cluster(
+        stranger.to_string(),
+        LeaveClusterPayload {
+            reason: LeaveReason::Shutdown,
+            graceful: false,
+        },
+    )
+    .unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/cluster/leave")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
+async fn wire_leave_cluster_ok_for_registered_node() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let mgr = ctx.raid_manager.get().expect("raid attached");
+    let registered = mgr.register_node("10.0.0.2:9001".to_string()).await;
+
+    let msg = ProtocolMessage::leave_cluster(
+        registered.id.to_string(),
+        LeaveClusterPayload {
+            reason: LeaveReason::Shutdown,
+            graceful: false,
+        },
+    )
+    .unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/cluster/leave")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
 }
 
 #[tokio::test]
