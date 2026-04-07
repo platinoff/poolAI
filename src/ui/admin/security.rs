@@ -40,10 +40,11 @@ pub async fn admin_security() -> Html<String> {
       if (!el) return;
       
       try {
+        adminShowLoading('security-content', 'Loading OAuth2 providers…');
         const providers = await fetchJson('/api/enterprise/security/oauth2/providers');
         renderOAuth2Providers(providers);
       } catch (e) {
-        el.innerHTML = '<div class="muted">Error loading OAuth2 providers: ' + e.message + '</div>';
+        adminShowInlineError('security-content', e);
       }
     }
     
@@ -244,10 +245,11 @@ pub async fn admin_security() -> Html<String> {
       if (!el) return;
       
       try {
+        adminShowLoading('security-content', 'Loading SAML providers…');
         const providers = await fetchJson('/api/enterprise/security/saml/providers');
         renderSamlProviders(providers);
       } catch (e) {
-        el.innerHTML = '<div class="muted">Error loading SAML providers: ' + e.message + '</div>';
+        adminShowInlineError('security-content', e);
       }
     }
     
@@ -465,10 +467,11 @@ pub async fn admin_security() -> Html<String> {
       if (!el) return;
       
       try {
+        adminShowLoading('security-content', 'Loading security policies…');
         const policies = await fetchJson('/api/enterprise/security/policies');
         renderSecurityPolicies(policies);
       } catch (e) {
-        el.innerHTML = '<div class="muted">Error loading security policies: ' + e.message + '</div>';
+        adminShowInlineError('security-content', e);
       }
     }
     

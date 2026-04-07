@@ -18,6 +18,7 @@
 ### P1 — Узгодження API ↔ UI (1–2 тижні)
 
 - Пройти **admin**-сторінки (`src/ui/admin/*.rs`) і для кожної перевірити: які поля читає JS / шаблон, що реально повертає відповідний handler у `src/network/api/`.
+- Зведення по адмінці: [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md); тести — `tests/admin_ui_api_contracts.rs`.
 - Ввести легкі **DTO-огляди** в документації або коментарях поруч із handler’ом: «поля для UI: …».
 - Для критичних сутей (VM, RAID artifacts, libraries) — той самий підхід, що для workers.
 

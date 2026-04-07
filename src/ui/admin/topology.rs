@@ -191,12 +191,6 @@ pub async fn admin_topology() -> axum::response::Html<String> {
       showNotification('Topology refresh initiated', 'info');
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text == null ? '' : String(text);
-      return div.innerHTML;
-    }
-
     function formatTopologyTimestamp(iso) {
       if (iso == null || iso === '') return '-';
       const t = Date.parse(iso);

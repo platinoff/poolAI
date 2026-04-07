@@ -9,6 +9,7 @@ use axum::response::Html;
 pub async fn admin_monitoring() -> Html<String> {
     let script = r#"
     async function loadMonitoring() {
+      adminShowLoading('monitoring-content', 'Loading monitoring…');
       try {
         const [alerts, dashboards, metrics] = await Promise.all([
           fetchJson('/api/enterprise/monitoring/alerts?limit=20'),
@@ -17,6 +18,7 @@ pub async fn admin_monitoring() -> Html<String> {
         ]);
         renderMonitoring(alerts, dashboards, metrics);
       } catch (e) {
+        adminShowInlineError('monitoring-content', e);
         showNotification('Error loading monitoring: ' + e.message, 'error');
       }
     }

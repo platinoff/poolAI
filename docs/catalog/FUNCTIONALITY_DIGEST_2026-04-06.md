@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-06.
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-07.
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -46,7 +46,7 @@
 |---------|----------------|--------------------------------------|
 | **Core** | `core/` | Конфіг, `AppState` / `ApiContext` (у т.ч. `rewards_engine` → `rewards::RewardSystem`), помилки (`AppError`, `ErrorContext`), користувачі, discovery-типи, WS-менеджер, інтерфейс моделі. |
 | **Pool** | `pool/` | Пул воркерів, топологія, discovery-інтеграція, розміщення. |
-| **Network** | `network/` | Axum: `/api/v1/*`, RAID REST (`api/raid.rs` + **`api/raid_http.rs`**), enterprise API, auth, rate limit, WebSocket, distributed RAID handlers (`LeaveCluster`: при непорожньому membership залишати кластер може лише зареєстрований `node_id`). Узгоджені JSON-помилки: **`json_errors.rs`** (`http_status_for_app_error`, **`IntoResponse`** для **`AppError`** / **`HttpAppError`**, реекспорт **`HttpAppError`** у **`api/common.rs`**). Приклади поступової міграції handler’ів: **`api/rewards.rs`**, **`api/workers.rs`**, **`api/admin.rs`**, **`api/system.rs`** (`Result` + **`AppError`** де без зміни кодів); **`api/libraries.rs`** (`GET /libraries`, **`GET /libraries/{name}`** + **`LibHttpErr`**); **`api/instances.rs`** (`GET /instance`, **`GET /instance/{id}`**, **`GET /state`** + **`InstanceJsonError`**). |
+| **Network** | `network/` | Axum: `/api/v1/*`, RAID REST (`api/raid.rs` + **`api/raid_http.rs`**), enterprise API, auth, rate limit, WebSocket, distributed RAID handlers (`LeaveCluster`: при непорожньому membership залишати кластер може лише зареєстрований `node_id`). **`api/system.rs`**: **`POST /login`**, **`POST /refresh`** (новий access token за Bearer, у т.ч. простроченим але декодованим). Узгоджені JSON-помилки: **`json_errors.rs`** (`http_status_for_app_error`, **`IntoResponse`** для **`AppError`** / **`HttpAppError`**, реекспорт **`HttpAppError`** у **`api/common.rs`**). Приклади поступової міграції handler’ів: **`api/rewards.rs`**, **`api/workers.rs`**, **`api/admin.rs`**, **`api/system.rs`** (`Result` + **`AppError`** де без зміни кодів); **`api/libraries.rs`** (`GET /libraries`, **`GET /libraries/{name}`** + **`LibHttpErr`**); **`api/instances.rs`** (`GET /instance`, **`GET /instance/{id}`**, **`GET /state`** + **`InstanceJsonError`**). |
 | **Platform** | `platform/` | GPU / апаратний рівень. |
 | **Monitoring** | `monitoring/` | Метрики, context memory (ML-контекст). |
 | **Runtime** | `runtime/` | Інстанси, планувальник, кеш, черги, процеси, сховище, оркестратор. |
@@ -57,7 +57,7 @@
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
-| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). |
+| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | Telegram-бот (керування). |
 

@@ -301,6 +301,7 @@ pub(super) fn status_page_html(status: &StatusResponse) -> String {
           <li><b>GET</b> <code>/api/v1/status</code> — Server status (HTML/JSON)</li>
           <li><b>GET</b> <code>/api/v1/health</code> — Health check <span style='color:#50fa7b'>✨</span></li>
           <li><b>POST</b> <code>/api/v1/login</code> — Authentication <span style='color:#50fa7b'>🔐</span></li>
+          <li><b>POST</b> <code>/api/v1/refresh</code> — New access token (Bearer; expired allowed if decodable) <span style='color:#50fa7b'>🔐</span></li>
           <li><b>GET</b> <code>/api/v1/metrics</code> — Metrics</li>
           <li><b>GET</b> <code>/api/v1/models</code> — Models</li>
           <li><b>GET</b> <code>/api/v1/gpu</code> — GPU Info</li>

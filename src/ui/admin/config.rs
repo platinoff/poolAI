@@ -19,10 +19,11 @@ pub async fn admin_config() -> Html<String> {
       if (!el) return;
       
       try {
+        adminShowLoading('config-content', 'Loading configuration…');
         const config = await fetchJson('/api/v1/config');
         renderConfigTab(tabName, config);
       } catch (e) {
-        el.innerHTML = '<div class="muted">Error loading configuration: ' + e.message + '</div>';
+        adminShowInlineError('config-content', e);
       }
     }
     

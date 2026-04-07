@@ -695,3 +695,13 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.admin-fetch-error {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--danger, #ff5555);
+  color: var(--danger, #ff5555);
+  background: rgba(255, 85, 85, 0.08);
+  font-size: var(--font-size-sm, 14px);
+  line-height: var(--line-height-normal, 1.5);
+}

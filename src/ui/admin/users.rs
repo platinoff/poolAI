@@ -9,10 +9,12 @@ use axum::response::Html;
 pub async fn admin_users() -> Html<String> {
     let script = r#"
     async function loadUsers() {
+      adminShowLoading('users-list', 'Loading users…');
       try {
         const users = await fetchJson('/api/v1/users');
         renderUsers(users);
       } catch (e) {
+        adminShowInlineError('users-list', e);
         showNotification('Error loading users: ' + e.message, 'error');
       }
     }

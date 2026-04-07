@@ -61,12 +61,24 @@ pub async fn admin_instances() -> axum::response::Html<String> {
 
     let script = r#"
     async function loadInstances() {
+      const tbody = document.getElementById('instances-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="7" class="muted">Loading…</td></tr>';
       try {
-        const response = await fetch('/api/v1/instance');
-        if (!response.ok) throw new Error('Failed to load instances');
+        const token = getAuthToken();
+        const response = await fetch('/api/v1/instance', {
+          headers: token ? { Authorization: 'Bearer ' + token } : {},
+        });
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}));
+          const msg =
+            (errBody.error && errBody.error.message) ||
+            errBody.message ||
+            ('HTTP ' + response.status);
+          throw new Error(msg);
+        }
         const data = await response.json();
         
-        const tbody = document.getElementById('instances-tbody');
         tbody.innerHTML = '';
         
         if (!data.instances || data.instances.length === 0) {
@@ -92,7 +104,15 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         }
       } catch (error) {
         console.error('Error loading instances:', error);
-        document.getElementById('instances-tbody').innerHTML = '<tr><td colspan="7">Error loading instances</td></tr>';
+        const tb = document.getElementById('instances-tbody');
+        if (tb) {
+          const msg = error instanceof Error ? error.message : String(error);
+          tb.innerHTML =
+            '<tr><td colspan="7"><div class="admin-fetch-error" role="alert">' +
+            escapeHtml(msg) +
+            '</div></td></tr>';
+        }
+        showNotification('Error loading instances: ' + (error && error.message ? error.message : error), 'error');
       }
     }
 
@@ -251,7 +271,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
     }
 
     function getAuthToken() {
-      return localStorage.getItem('jwt_token') || '';
+      return localStorage.getItem('poolai_token') || '';
     }
 
     // Load instances on page load

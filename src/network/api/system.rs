@@ -21,7 +21,9 @@ use crate::core::config::PoolAIConfig;
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::network::api::common::{api_json_error, check_permission};
-use crate::network::auth::{AuthRequest, Claims};
+use crate::network::auth::{
+    bearer_token_from_authorization_header, refresh_access_token, AuthRequest, Claims,
+};
 use crate::network::ws::websocket_handler;
 use crate::services::system_service::{HealthResponse, MetricsResponse, ModelInfo, SystemService};
 
@@ -58,6 +60,7 @@ pub fn create_system_routes() -> Router<ApiContext> {
         .route("/status", get(status_handler))
         .route("/health", get(health_handler))
         .route("/login", axum::routing::post(login_handler))
+        .route("/refresh", axum::routing::post(refresh_handler))
         .route("/metrics", get(metrics_handler))
         .route("/models", get(models_handler))
         .route("/gpu", get(gpu_info))
@@ -119,6 +122,23 @@ async fn login_handler(
     Json(auth_req): Json<AuthRequest>,
 ) -> impl IntoResponse {
     match SystemService::login(auth_req, ctx.user_manager.clone()).await {
+        Ok(auth_response) => Json(auth_response).into_response(),
+        Err((status, error)) => (status, error).into_response(),
+    }
+}
+
+async fn refresh_handler(State(ctx): State<ApiContext>, req: Request) -> impl IntoResponse {
+    let Some(token) = bearer_token_from_authorization_header(&req) else {
+        let (s, j) = api_json_error(
+            "AUTH_MISSING_HEADER",
+            "Missing or invalid authorization header",
+            Some(ErrorContext::new("refresh_handler")),
+            StatusCode::UNAUTHORIZED,
+        );
+        return (s, j).into_response();
+    };
+
+    match refresh_access_token(&token, ctx.user_manager.clone()).await {
         Ok(auth_response) => Json(auth_response).into_response(),
         Err((status, error)) => (status, error).into_response(),
     }

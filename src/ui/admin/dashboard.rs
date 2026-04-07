@@ -8,7 +8,14 @@ use axum::response::Html;
 /// Admin dashboard home page
 pub async fn admin_dashboard() -> Html<String> {
     let script = r#"
+    function setDashboardLoading() {
+      ['system-overview', 'quick-stats', 'active-alerts', 'recent-activity', 'metrics-chart'].forEach(id => {
+        adminShowLoading(id, 'Loading…');
+      });
+    }
+
     async function loadSystemOverview() {
+      setDashboardLoading();
       try {
         const overview = await fetchJson('/api/v1/admin/overview');
         renderSystemOverview(overview);
@@ -20,6 +27,8 @@ pub async fn admin_dashboard() -> Html<String> {
         renderActiveAlerts(alerts);
         renderRecentActivity(audit);
       } catch (e) {
+        ['system-overview', 'quick-stats', 'active-alerts', 'recent-activity'].forEach(id => adminShowInlineError(id, e));
+        adminShowInlineError('metrics-chart', e);
         showNotification('Error loading dashboard: ' + e.message, 'error');
       }
     }

@@ -8,18 +8,34 @@ use axum::response::Html;
 /// RAID management page
 pub async fn admin_raid() -> Html<String> {
     let script = r#"
+    function raidStrategyStatusFromResponse(raw) {
+      if (!raw || typeof raw !== 'object') return null;
+      return raw.status != null ? raw.status : raw;
+    }
+    function raidMetricsFromResponse(raw) {
+      if (!raw || typeof raw !== 'object') return null;
+      return raw.metrics != null ? raw.metrics : raw;
+    }
+
     async function loadRaidData() {
+      adminShowLoading('raid-admin', 'Loading RAID admin…');
+      adminShowLoading('raid-artifacts', 'Loading artifacts…');
       try {
-        const [artifacts, snapshot, status, burstMetrics, smallworldMetrics] = await Promise.all([
+        const [artifacts, snapshot, statusRaw, burstRaw, smallworldRaw] = await Promise.all([
           fetchJson('/api/v1/raid/artifacts'),
           loadSnapshot().catch(() => null),
-          fetchJson('/api/raid/admin/status').catch(() => null),
-          fetchJson('/api/raid/admin/metrics/burst').catch(() => null),
-          fetchJson('/api/raid/admin/metrics/smallworld').catch(() => null)
+          fetchJson('/api/v1/raid/admin/status').catch(() => null),
+          fetchJson('/api/v1/raid/admin/metrics/burst').catch(() => null),
+          fetchJson('/api/v1/raid/admin/metrics/smallworld').catch(() => null)
         ]);
+        const status = raidStrategyStatusFromResponse(statusRaw);
+        const burstMetrics = raidMetricsFromResponse(burstRaw);
+        const smallworldMetrics = raidMetricsFromResponse(smallworldRaw);
         renderRaidArtifacts(artifacts, snapshot);
         renderRaidAdmin(status, burstMetrics, smallworldMetrics);
       } catch (e) {
+        adminShowInlineError('raid-admin', e);
+        adminShowInlineError('raid-artifacts', e);
         showNotification('Error loading RAID data: ' + e.message, 'error');
       }
     }
@@ -60,15 +76,15 @@ pub async fn admin_raid() -> Html<String> {
             <h3>BurstRAID Metrics</h3>
             <div class="stat-item">
               <span class="stat-label">Total Artifacts:</span>
-              <span class="stat-value">${burstMetrics.total_artifacts || 0}</span>
+              <span class="stat-value">${burstMetrics.total_artifacts ?? 0}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Burst Artifacts:</span>
-              <span class="stat-value">${burstMetrics.burst_artifacts || 0}</span>
+              <span class="stat-label">Artifacts in Burst:</span>
+              <span class="stat-value">${burstMetrics.artifacts_in_burst ?? 0}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Avg Replication Factor:</span>
-              <span class="stat-value">${(burstMetrics.avg_replication_factor || 0).toFixed(2)}</span>
+              <span class="stat-label">Replication (base / max):</span>
+              <span class="stat-value">${burstMetrics.base_replication_factor ?? 0} / ${burstMetrics.max_replication_factor ?? 0}</span>
             </div>
           </div>
         `;
@@ -79,16 +95,20 @@ pub async fn admin_raid() -> Html<String> {
           <div class="admin-card">
             <h3>SmallWorld Network Metrics</h3>
             <div class="stat-item">
+              <span class="stat-label">Total Artifacts:</span>
+              <span class="stat-value">${smallworldMetrics.total_artifacts ?? 0}</span>
+            </div>
+            <div class="stat-item">
               <span class="stat-label">Total Nodes:</span>
-              <span class="stat-value">${smallworldMetrics.total_nodes || 0}</span>
+              <span class="stat-value">${smallworldMetrics.total_nodes ?? 0}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Avg Clustering Coefficient:</span>
-              <span class="stat-value">${(smallworldMetrics.avg_clustering_coefficient || 0).toFixed(3)}</span>
+              <span class="stat-value">${(smallworldMetrics.avg_clustering_coefficient ?? 0).toFixed(3)}</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label">Avg Path Length:</span>
-              <span class="stat-value">${(smallworldMetrics.avg_path_length || 0).toFixed(2)}</span>
+              <span class="stat-label">Target Clustering:</span>
+              <span class="stat-value">${(smallworldMetrics.target_clustering_coefficient ?? 0).toFixed(3)}</span>
             </div>
           </div>
         `;
@@ -111,7 +131,7 @@ pub async fn admin_raid() -> Html<String> {
       }
       
       try {
-        await fetchJson('/api/raid/admin/rebalance', { method: 'POST' });
+        await fetchJson('/api/v1/raid/admin/rebalance', { method: 'POST' });
         showNotification('Rebalancing triggered successfully', 'success');
         setTimeout(() => loadRaidData(), 2000);
       } catch (e) {
@@ -317,12 +337,19 @@ pub async fn admin_raid() -> Html<String> {
       }
       
       try {
+        const syncBody = {
+          type: 'sync_artifacts',
+          id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()),
+          timestamp: new Date().toISOString(),
+          node_id: 'ui-admin',
+          payload: { direction: 'bidirectional' }
+        };
         await fetchJson('/api/v1/raid/distributed/artifacts/sync', {
           method: 'POST',
-          body: JSON.stringify({})
+          body: JSON.stringify(syncBody)
         });
         showNotification('Artifacts sync started', 'success');
-        setTimeout(() => loadRaidArtifacts(), 2000);
+        setTimeout(() => loadRaidData(), 2000);
       } catch (e) {
         showNotification('Error syncing artifacts: ' + e.message, 'error');
       }

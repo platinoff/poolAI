@@ -9,10 +9,12 @@ use axum::response::Html;
 pub async fn admin_vm() -> Html<String> {
     let script = r#"
     async function loadVmInstances() {
+      adminShowLoading('vm-instances', 'Loading VM instances…');
       try {
         const instances = await fetchJson('/api/v1/vm/instances');
         renderVmInstances(instances);
       } catch (e) {
+        adminShowInlineError('vm-instances', e);
         showNotification('Error loading VM instances: ' + e.message, 'error');
       }
     }

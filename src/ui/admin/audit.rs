@@ -20,9 +20,11 @@ pub async fn admin_audit() -> Html<String> {
       params.append('limit', '100');
       
       try {
+        adminShowLoading('audit-events', 'Loading audit events…');
         const events = await fetchJson(`/api/enterprise/audit/events?${params}`);
         renderAuditEvents(events);
       } catch (e) {
+        adminShowInlineError('audit-events', e);
         showNotification('Error loading audit logs: ' + e.message, 'error');
       }
     }

@@ -9,10 +9,12 @@ use axum::response::Html;
 pub async fn admin_libs() -> Html<String> {
     let script = r#"
     async function loadLibraries() {
+      adminShowLoading('libraries-list', 'Loading libraries…');
       try {
         const libs = await fetchJson('/api/v1/libraries');
         renderLibraries(libs);
       } catch (e) {
+        adminShowInlineError('libraries-list', e);
         showNotification('Error loading libraries: ' + e.message, 'error');
       }
     }

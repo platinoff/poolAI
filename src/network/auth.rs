@@ -278,6 +278,110 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
     }
 }
 
+/// Decode token claims without rejecting expired sessions (for `POST /api/v1/refresh` only).
+pub fn decode_token_claims_allow_expired(token: &str) -> Result<Claims, String> {
+    #[cfg(feature = "jwt")]
+    {
+        let config = JwtConfig::default();
+        let key = DecodingKey::from_secret(config.secret.as_ref());
+        let mut validation = Validation::default();
+        validation.validate_exp = false;
+        decode::<Claims>(token, &key, &validation)
+            .map(|data| data.claims)
+            .map_err(|e| format!("Token decode failed: {}", e))
+    }
+
+    #[cfg(not(feature = "jwt"))]
+    {
+        if !token.starts_with("dev_token_") {
+            return Err("Invalid token format".to_string());
+        }
+
+        let token_data = &token[10..];
+        let decoded = base64::engine::general_purpose::STANDARD
+            .decode(token_data)
+            .map_err(|e| format!("Decode error: {}", e))?;
+        serde_json::from_slice(&decoded).map_err(|e| format!("Parse error: {}", e))
+    }
+}
+
+pub fn bearer_token_from_authorization_header(req: &Request) -> Option<String> {
+    req.headers()
+        .get(AUTHORIZATION)
+        .and_then(|auth| auth.to_str().ok())
+        .and_then(|auth_str| {
+            auth_str
+                .strip_prefix("Bearer ")
+                .or_else(|| auth_str.strip_prefix("bearer "))
+                .map(|s| s.to_string())
+        })
+}
+
+/// Issue a new access token using a still-decodable (possibly expired) bearer token.
+pub async fn refresh_access_token(
+    token: &str,
+    user_manager: Arc<UserManager>,
+) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
+    let claims = decode_token_claims_allow_expired(token).map_err(|_| {
+        api_json_error(
+            "AUTH_INVALID_TOKEN",
+            "Invalid or unreadable token",
+            Some(ErrorContext::new("refresh_access_token")),
+            StatusCode::UNAUTHORIZED,
+        )
+    })?;
+
+    if let Err(e) = user_manager.initialize().await {
+        return Err(api_json_error(
+            "AUTH_USER_MANAGER_INIT_FAILED",
+            format!("User manager initialization failed: {}", e),
+            Some(ErrorContext::new("refresh_access_token")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        ));
+    }
+
+    let user = user_manager
+        .get_user_by_username(&claims.sub)
+        .await
+        .map_err(|e| {
+            api_json_error(
+                "AUTH_INTERNAL",
+                format!("User retrieval error: {}", e),
+                Some(ErrorContext::new("refresh_access_token")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            )
+        })?;
+
+    let Some(user) = user else {
+        return Err(api_json_error(
+            "AUTH_INVALID_TOKEN",
+            "User no longer exists",
+            Some(ErrorContext::new("refresh_access_token")),
+            StatusCode::UNAUTHORIZED,
+        ));
+    };
+
+    let role = user.role;
+    let username = user.username;
+    let new_token = generate_token(&username, role.clone()).map_err(|_| {
+        api_json_error(
+            "AUTH_TOKEN_GENERATION_FAILED",
+            "Failed to generate token",
+            Some(ErrorContext::new("refresh_access_token").with_resource("username", &username)),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+    })?;
+
+    let config = JwtConfig::default();
+
+    Ok(AuthResponse {
+        token: new_token,
+        token_type: "Bearer".to_string(),
+        expires_in: config.expiration,
+        role,
+    })
+}
+
 /// Authentication middleware
 ///
 /// Middleware that validates JWT tokens from the `Authorization` header

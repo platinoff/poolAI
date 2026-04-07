@@ -289,11 +289,11 @@ cargo run
 
 # With Admin Panel (Enterprise features)
 cargo run --features enterprise
-# Access Admin Panel at: http://localhost:8080/admin
+# Access Admin Panel at: http://localhost:8080/ui/admin (enterprise features require --features enterprise)
 
 # With Admin Panel + HTTPS + JWT (Recommended for development)
 cargo run --features enterprise,https,jwt
-# Access Admin Panel at: https://localhost:8443/admin
+# Access Admin Panel at: https://localhost:8443/ui/admin
 
 # With specific config
 POOLAI_CONFIG_PATH=./custom_config.toml cargo run --features enterprise
@@ -313,7 +313,7 @@ curl -X POST http://localhost:8080/api/v1/users \
   -d '{"username": "admin", "password": "admin123", "role": "Admin"}'
 
 # Login to get JWT token
-curl -X POST http://localhost:8080/api/v1/auth/login \
+curl -X POST http://localhost:8080/api/v1/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "admin123"}'
 ```

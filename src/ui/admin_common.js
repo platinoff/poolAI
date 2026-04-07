@@ -16,6 +16,96 @@ function apiErrorMessageFromBody(payload) {
   return null;
 }
 
+function apiErrorDetailFromBody(payload) {
+  const message = apiErrorMessageFromBody(payload);
+  let code = null;
+  let hint = null;
+  if (payload && typeof payload === 'object') {
+    const e = payload.error;
+    if (e && typeof e === 'object' && typeof e.code === 'string') code = e.code;
+    const ctx = payload.context;
+    if (ctx && typeof ctx === 'object' && typeof ctx.hint === 'string') hint = ctx.hint;
+  }
+  return { message, code, hint };
+}
+
+function hintFor503(code, message) {
+  if (code === 'RAID_MANAGER_UNAVAILABLE') {
+    return 'RAID manager is not initialized on this server.';
+  }
+  const m = message || '';
+  if (/library/i.test(m)) return 'Library subsystem may not be initialized.';
+  if (/\bvm\b/i.test(m)) return 'VM manager may not be attached.';
+  return 'A subsystem may still be starting or unavailable.';
+}
+
+function formatFetchError(status, url, payload) {
+  const { message, code, hint } = apiErrorDetailFromBody(payload);
+  const base = message || ('HTTP ' + status);
+  let extra = hint || '';
+  if (status === 403 && !extra) {
+    extra = 'You may need Admin or Operator role, or sign in again.';
+  }
+  if (status === 503 && !extra) {
+    extra = hintFor503(code, base);
+  }
+  if (status === 404 && url && url.indexOf('/api/enterprise') !== -1 && !extra) {
+    extra = 'Build and run the server with the enterprise feature for this API.';
+  }
+  if (extra) return base + ' — ' + extra;
+  return base;
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function adminShowLoading(containerId, text) {
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = '<div class="muted">' + escapeHtml(text || 'Loading…') + '</div>';
+}
+
+function adminShowInlineError(containerId, err) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const msg = err instanceof Error ? err.message : String(err);
+  el.innerHTML =
+    '<div class="admin-fetch-error" role="alert">' + escapeHtml(msg) + '</div>';
+}
+
+async function adminRefreshAccessToken() {
+  try {
+    const token = localStorage.getItem('poolai_token');
+    if (!token) return false;
+    const res = await fetch('/api/v1/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!data.token) return false;
+    localStorage.setItem('poolai_token', data.token);
+    if (data.role) {
+      const username = localStorage.getItem('poolai_user');
+      if (username) localStorage.setItem('poolai_role', data.role);
+    }
+    if (data.expires_in) {
+      const exp = Math.floor(Date.now() / 1000) + data.expires_in;
+      localStorage.setItem('poolai_token_exp', exp.toString());
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 // Utility functions
 // Compatible with main UI module storage format
 function getUser() {
@@ -89,30 +179,38 @@ async function fetchJson(url, options = {}) {
     'Content-Type': 'application/json',
     ...options.headers,
   };
-  
+
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers['Authorization'] = 'Bearer ' + token;
   }
-  
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-  
+
+  const doFetch = () =>
+    fetch(url, {
+      ...options,
+      headers,
+    });
+
+  let response = await doFetch();
+
   if (response.status === 401) {
-    // Unauthorized - redirect to login
-    clearUser();
-    window.location.href = '/ui/auth';
-    throw new Error('Unauthorized');
+    const refreshed = await adminRefreshAccessToken();
+    if (refreshed) {
+      const newTok = localStorage.getItem('poolai_token');
+      if (newTok) headers['Authorization'] = 'Bearer ' + newTok;
+      response = await doFetch();
+    }
+    if (response.status === 401) {
+      clearUser();
+      window.location.href = '/ui/auth';
+      throw new Error('Unauthorized — session expired. Please sign in again.');
+    }
   }
-  
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: response.statusText }));
-    throw new Error(
-      apiErrorMessageFromBody(error) || error.message || `HTTP ${response.status}`,
-    );
+    const error = await response.json().catch(() => ({}));
+    throw new Error(formatFetchError(response.status, url, error));
   }
-  
+
   return response.json();
 }
 
