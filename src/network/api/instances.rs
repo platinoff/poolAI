@@ -21,7 +21,8 @@ use crate::core::state::ApiContext;
 use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
 use crate::services::instance_service::{
-    CreateInstanceRequest, CreateInstanceResponse, InstanceService, InstanceServiceError,
+    CreateInstanceRequest, CreateInstanceResponse, InstanceListResponse, InstanceService,
+    InstanceServiceError,
 };
 
 // Re-exports for any external use of response shapes.
@@ -29,6 +30,8 @@ pub use crate::services::instance_service::{
     instance_placement_info, InstanceInfo, InstancePlacementInfo, InstancePreview,
     InstancePreviewResponse,
 };
+
+type InstanceJsonError = (StatusCode, Json<serde_json::Value>);
 
 #[derive(Deserialize)]
 struct CreateInstanceBody {
@@ -150,9 +153,11 @@ async fn instance_create_handler(
     }
 }
 
-async fn instance_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn instance_list_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<InstanceListResponse>, InstanceJsonError> {
     match InstanceService::list_instances(&ctx).await {
-        Ok(response) => (StatusCode::OK, Json(response)).into_response(),
+        Ok(response) => Ok(Json(response)),
         Err(InstanceServiceError::ManagerUnavailable) => {
             let (s, j) = api_json_error(
                 "SUBSYSTEM_UNAVAILABLE",
@@ -163,7 +168,7 @@ async fn instance_list_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
                 ),
                 StatusCode::SERVICE_UNAVAILABLE,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
         Err(InstanceServiceError::Preview(e)) | Err(InstanceServiceError::Operation(e)) => {
             let (s, j) = api_json_error(
@@ -172,7 +177,7 @@ async fn instance_list_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
                 Some(ErrorContext::new("list_instances")),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
     }
 }
@@ -259,9 +264,11 @@ async fn instance_delete_handler(
     }
 }
 
-async fn state_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn state_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<HashMap<String, serde_json::Value>>, InstanceJsonError> {
     match InstanceService::deployment_state(&ctx).await {
-        Ok(state) => (StatusCode::OK, Json(state)).into_response(),
+        Ok(state) => Ok(Json(state)),
         Err(InstanceServiceError::ManagerUnavailable) => {
             let (s, j) = api_json_error(
                 "SUBSYSTEM_UNAVAILABLE",
@@ -269,7 +276,7 @@ async fn state_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
                 Some(ErrorContext::new("state").with_resource("instance_manager", "default")),
                 StatusCode::SERVICE_UNAVAILABLE,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
         Err(InstanceServiceError::Preview(e)) | Err(InstanceServiceError::Operation(e)) => {
             let (s, j) = api_json_error(
@@ -278,7 +285,7 @@ async fn state_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
                 Some(ErrorContext::new("state")),
                 StatusCode::INTERNAL_SERVER_ERROR,
             );
-            (s, Json(j.0)).into_response()
+            Err((s, Json(j.0)))
         }
     }
 }

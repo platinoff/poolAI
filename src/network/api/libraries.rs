@@ -16,7 +16,7 @@ use axum::{
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::libs::LibraryType;
+use crate::libs::{LibraryInfo, LibraryType};
 use crate::network::api::common::{api_json_error, check_permission};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::services::library_service::{LibraryMutationError, LibraryService, LibraryServiceError};
@@ -65,10 +65,12 @@ pub fn create_libraries_routes() -> Router<ApiContext> {
         )
 }
 
-async fn libraries_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn libraries_list_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<AxumJson<Vec<LibraryInfo>>, LibHttpErr> {
     match LibraryService::list_libraries(&ctx).await {
-        Ok(libraries) => AxumJson(libraries).into_response(),
-        Err(e) => library_service_err(e).into_response(),
+        Ok(libraries) => Ok(AxumJson(libraries)),
+        Err(e) => Err(library_service_err(e)),
     }
 }
 
