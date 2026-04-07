@@ -1,11 +1,14 @@
 //! Admin aggregation API (JSON for `/ui/admin` and tools).
 
+use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::services::admin_service::{AdminOverview, AdminService};
 use axum::{extract::State, routing::get, Json, Router};
 
-async fn admin_overview_handler(State(ctx): State<ApiContext>) -> Json<AdminOverview> {
-    Json(AdminService::overview(&ctx).await)
+async fn admin_overview_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<AdminOverview>, AppError> {
+    Ok(Json(AdminService::overview(&ctx).await))
 }
 
 /// Routes under `/api/v1` (see `network::start_server` nest).

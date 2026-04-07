@@ -103,7 +103,7 @@ src/
 - Централізований тип `AppError` в `core::error`.
 - Допоміжна структура `ErrorContext` для збагачення логів та метрик контекстом (operation, resource, id, details).
 - API‑відповіді використовують `error_code()` з `AppError` + людиночитабельне повідомлення.
-- Axum: `AppError` та `HttpAppError` (опційно `ErrorContext` / override статусу) реалізують `IntoResponse` у `network::json_errors` — зручно для `Result<T, AppError>` у handler’ах; `HttpAppError` реекспортується з `network::api::common`. Приклад: `network/api/rewards.rs` (`Result<Json<_>, AppError>` на успішних GET; окремий шлях з `api_json_error` там, де потрібен фіксований `error.code`).
+- Axum: `AppError` та `HttpAppError` (опційно `ErrorContext` / override статусу) реалізують `IntoResponse` у `network::json_errors` — зручно для `Result<T, AppError>` у handler’ах; `HttpAppError` реекспортується з `network::api::common`. Приклади: `network/api/rewards.rs` (успішні GET → `Result<Json<_>, AppError>`; **`/rewards/progress/*`** лишається з `api_json_error` для стабільного `NOT_FOUND`), **`network/api/workers.rs`** (`GET /workers` → `Result<AxumJson<Vec<WorkerInfo>>, AppError>`), **`network/api/admin.rs`** (`GET /admin/overview` → `Result<Json<AdminOverview>, AppError>`).
 
 ```rust
 use poolai::core::error::{AppError, ErrorContext};

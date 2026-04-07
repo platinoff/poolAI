@@ -14,7 +14,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::network::api::common::api_json_error;
 use crate::network::auth::auth_middleware;
@@ -67,9 +67,10 @@ pub fn create_workers_routes() -> Router<ApiContext> {
         )
 }
 
-async fn workers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
-    let workers = WorkerPoolService::list_workers(&ctx).await;
-    AxumJson(workers).into_response()
+async fn workers_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<AxumJson<Vec<WorkerInfo>>, AppError> {
+    Ok(AxumJson(WorkerPoolService::list_workers(&ctx).await))
 }
 
 async fn worker_create_handler(
