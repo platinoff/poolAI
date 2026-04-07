@@ -6,7 +6,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ## Documentation map (canonical order)
 
-Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md).
+Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md).
 
 **Таксономія каталогу `docs/`** — [`docs/STRUCTURE.md`](docs/STRUCTURE.md). **Правила агента для доків** — [`.cursor/rules/documentation.md`](.cursor/rules/documentation.md).
 

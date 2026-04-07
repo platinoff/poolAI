@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-04-06
+**Last updated:** 2026-04-07
 
 ## Canonical reading order
 
@@ -19,6 +19,8 @@
 11. **Витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення за доками та кодом).
 12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.1 — пріоритезовані наступні кроки**); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
 
+**Сталевий стан (декларація CI / збірки / модулів)** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md). Звіряти разом із кроком 12 (**§5.1**); операційний зріз — [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
+
 ## Таксономія та правила
 
 - **Де що лежить у `docs/`** — [STRUCTURE.md](./STRUCTURE.md) (каталоги, спадщина плоских `.md`, інвентар, тести vs doctests).
@@ -28,6 +30,7 @@
 
 - **Каталог / витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (крок 11; оновлюй при змінах модулів або публічного API).
 - **Беклог і тікети** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (крок 12; **§5.1** — порядок наступних кроків за FM-*).
+- **Сталевий стан** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md).
 - **Status / plans** — `status/`, `development/` (індекс планів: [development/README.md](./development/README.md)).
 - **REST API** — [openapi.yaml](./openapi.yaml) (OpenAPI 3).
 - **UI / admin ↔ API** — [development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md](./development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).

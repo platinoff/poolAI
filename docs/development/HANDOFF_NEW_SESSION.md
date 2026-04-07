@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (кроки 1–12; P3 — `IntoResponse` / `HttpAppError`, часткова міграція **`rewards.rs`**; P4 — **`poolai_health_load --json`**; зведення наступних кроків у **`FUNCTION_MANAGEMENT.md` §5.1**)  
+**Оновлено:** 2026-04-07 (кроки 1–12; **FM-007/008** — wire sync каталогу + LeaveCluster; **FM-011** — `[profile.test] debug = 1`, перевірка `cargo test -j1 --all-features --no-run` на MSVC; сталевий стан — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -46,8 +46,8 @@
 
 1. **Baseline / стенд (FM-003, P4, P2b)** — Criterion на реф-хості; **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md); LAN — повні заміри реплікації + TQ01.
 2. **HTTP (FM-005, Partial)** — розширити **`Result<Json<_>, AppError>`**; де потрібен стабільний **`error.code`** — не ламати контракт без рішення.
-3. **Distributed RAID (FM-007, FM-008)** — sync і leave-cluster без заглушок.
-4. **Ops (FM-011)** — `cargo test --all-features` на Windows за потреби.
+3. **Distributed RAID (FM-007, FM-008)** — у коді: порівняння каталогів у **`SyncArtifacts`**, **`LeaveCluster`** з replication + **`delete_worker`**; далі за потреби: LAN-заміри, **`conflicts`** у payload (remote timestamps), глибша multi-hop реплікація.
+4. **Ops (FM-011)** — `Cargo.toml` **`[profile.test] debug = 1`**; повна збірка тестів: `-j 1`, опційно `CARGO_INCREMENTAL=0`; GNU toolchain або дроблення features за потреби.
 5. **Deferred** — **cloud-sdk** (FM-006), SIMD TurboQuant (FM-004); **концепт** — Grid envelope (FM-009), Solana (FM-010).
 
 Деталі, чекбокси Architect і верифікації — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md). Індекс тікетів — таблиця **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).

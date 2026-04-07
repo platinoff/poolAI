@@ -286,3 +286,8 @@ inherits = "release"
 # MSVC hosts: `rustc` may AV even at opt-level 2 on the full crate; 0 keeps Criterion runnable locally.
 opt-level = 0
 
+# Windows MSVC: `cargo test --all-features` links many large test binaries; full debuginfo (default) can
+# trigger LINK LNK1318 (Unexpected PDB error; LIMIT). Line tables only keeps PDBs small enough (FM-011).
+[profile.test]
+debug = 1
+

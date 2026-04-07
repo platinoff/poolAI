@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-04-06 (v0.2.2; архітектурний план P1–P6, P4/P2b бенчі)
+## Rust Architect — оновлено 2026-04-07 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
 
 ---
 
@@ -14,13 +14,13 @@
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
 - ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
+- ✅ **Windows MSVC / FM-011:** у `Cargo.toml` профіль **`[profile.test] debug = 1`** зменшує PDB для великої кількості тестових exe (обхід **LNK1318**). Повна збірка тестових бінарників: `cargo test -j 1 --all-features --no-run` (за потреби `CARGO_INCREMENTAL=0`) — **перевірено локально** (2026-04-07).
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус
-- ✅ Гілка **main**
-- ⚠️ Можливо **ahead of origin** (локальні коміти не запушені) — перевіряти: `git status --short`, `git log origin/main..HEAD --oneline`
+- ✅ Гілка **main**; після кожного push — `git fetch` і `git status` (очікувано *up to date with 'origin/main'*).
 - ✅ Pre-push hook: `cargo fmt --all --check` перед push
-- **Рекомендація**: push тільки з зовнішнього MSYS2 bash; перед операціями завжди перевіряти статус
+- **Рекомендація**: push — зовнішній MSYS2 bash (див. [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md)); перед комітом — `git status --short`
 
 ### Завершені модулі (100%)
 1. ✅ Core Module
@@ -32,7 +32,7 @@
 7. ✅ Rewards System
 8. ✅ TGBot Module
 9. ✅ Security Module (JWT/HTTPS)
-10. ✅ **Distributed RAID System** — **НОВЕ ЗАВЕРШЕННЯ** 🎉
+10. ✅ **Distributed RAID System** — ядро та wire-протокол (див. також **FM-007 / FM-008** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md)) 🎉
     - ✅ Phase 1: Raft Setup
     - ✅ Phase 2: Raft Integration
     - ✅ Phase 3: Event Sourcing
@@ -90,25 +90,17 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 
 ## 🎯 Наступні кроки (Rust Architect)
 
-**Детально**: `docs/development/NEXT_STEPS_2026-01-19.md`
+**Єдиний порядок пріоритетів (FM-* + чекбокси Architect):** [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** → деталі в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md). Операційний зріз сесії: [`HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md).
 
-**Коротко за пріоритетами:**
+**Коротко:** baseline/P4 (`poolai_health_load --json`, Criterion) + LAN/P2b; HTTP FM-005; залишки distributed RAID (LAN, conflicts у payload); FM-011 за потреби; deferred — cloud-sdk SIMD, Grid/Solana концепти.
 
-1. **P0 (операційно)**  
-   - Перевірити `git status --short`; якщо main **ahead of origin** — вирішити push у зовнішньому MSYS2 bash (PAT/SSH).  
-   - Перед push: `cargo fmt --all`, `cargo test` (або повний набір тестів).
+**Архівний план (історично):** `docs/development/NEXT_STEPS_2026-01-19.md`.
 
-2. **P1 — v0.2.2**  
-   - ✅ Завершено (Changelog, README, version bump, Cloud SDK 100%, HPA init, Load Balancing).
+**Стабільний зріз**: v0.2.2 ✅ | Cloud SDK / RAID / Enterprise / UI — як у таблицях вище | Stage 4.4 AI/ML (TurboQuant TQ01, pipeline) — див. DIGEST.
 
-3. **P2 — v0.3.0+ (наступні кроки розробки)**  
-   - **ML на main (якщо вже закомічено)**: ML.4 Model Versioning, ML.5 Experiment Tracking, ML.6 Pipeline Management, Context Memory, Runtime Instance library loading — підтвердити тестами, при потребі оновити CHANGELOG і випустити v0.3.0.  
-   - **Далі по ML**: ML.1 pruning strategies; ML.2/ML.3 — повна реалізація pipeline/aggregation для AutoML і Federated Learning.  
-   - **Опціонально**: Mock server e2e покращення, performance (connection pooling, API cache, SQLite), UI (Chart.js, таблиці, пошук).
+**Базові команди** (MSYS2 bash): `cargo check`, `cargo test`, `cargo fmt --all`; git — [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md). Pre-push: `cargo fmt --all --check`.
 
-**Стабільний стан**: v0.2.2 ✅ | Cloud SDK 100% ✅ | HPA init ✅ | RAID/Enterprise 100% ✅ | Load Balancing ✅ | Stage 4.4 AI/ML (stubs + ML.4–ML.6 у розвитку/на main).
-
-**Базові команди** (MSYS2 bash only): `cargo check`, `cargo test`, `cargo fmt --all`; git — copy-paste блок з `.cursor/commands/git-push.md` (без .sh). Pre-push hook: `cargo fmt --all --check`.
+_Нижче — історичні мітки тижнів / модулів; не замінюють порядок **§5.1** у `FUNCTION_MANAGEMENT.md`._
 
 ---
 
@@ -175,7 +167,7 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 
 **Статус**: ✅ **STABLE - PRODUCTION READY**  
 **Версія**: v0.2.2 ✅ (у репо; на main можуть бути коміти для v0.3.0)  
-**Дата документу**: 2026-03-04 (доадаптація)  
+**Дата документу**: 2026-04-07 (узгоджено з HANDOFF / FUNCTION_MANAGEMENT)  
 **Підготовлено**: Rust Architect  
 
 **Останні досягнення (орієнтир)**:
@@ -183,7 +175,8 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 - ✅ **RAID Strategy 100%** — BurstRAID, SmallWorld, Admin Control Plane
 - ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO
 - ✅ **UI/UX, Admin Panel 100%**
-- ✅ **Stage 4.4 AI/ML** — scaffolding, ML.1 (optimization, profiling, tuning, quantization), ML.2/ML.3 stubs; на гілці main можуть бути реалізації ML.4 Model Versioning, ML.5 Experiment Tracking, ML.6 Pipeline Management, Context Memory, Runtime Instance library loading — перевіряти `git log -5 --oneline`.
+- ✅ **Stage 4.4 AI/ML** — TurboQuant **TQ01** (`src/ml/turboquant.rs`), pipeline кроки; ML.4–ML.6 / Context Memory — див. [`FUNCTIONALITY_DIGEST`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) та `git log`.
+- ✅ **Distributed wire (2026-04)** — `SyncArtifacts`: порівняння каталогів за напрямком; `LeaveCluster`: graceful replication path + видалення вузла з membership (дет. **FM-007 / FM-008**).
 
 ---
 

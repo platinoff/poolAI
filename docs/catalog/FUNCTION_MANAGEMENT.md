@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-06 (зведення наступних кроків — **§5.1**)  
+**Оновлено:** 2026-04-07 (зведення наступних кроків — **§5.1**; узгоджено зі [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -28,7 +28,7 @@
 | Тег | Значення |
 |-----|----------|
 | **Implemented** | Є в коді + згадка в DIGEST / STABLE; покрито тестами або явно позначено як MVP. |
-| **Partial** | Є API або заглушка; логіка спрощена (наприклад distributed sync «лише лічильник»). |
+| **Partial** | Є API; частина логіки спрощена або без повного wire (наприклад sync без remote metadata для conflicts). |
 | **Planned** | Відкритий пункт у `NEXT_STEPS_ARCHITECT` або README Next Focus. |
 | **Concept-only** | Описано в концепті / протоколі; немає цільової реалізації в `src/`. |
 | **Deferred** | `cloud-sdk`, SIMD, on-chain — явно optional у планах. |
@@ -98,7 +98,7 @@ FM-xxx (з таблиці нижче)
 | FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; помилки membership / невалідний `node_id` | Partial | `leave_cluster_handler` + `RaidManager::replicate_stored_artifact` |
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
-| FM-011 | Ops | Стабілізація `cargo test --all-features` на Windows (GNU / розбиття тестів) | Planned | NEXT_STEPS (опційно паралельно) |
+| FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); збірка `cargo test -j1 --all-features --no-run` (+ опційно `CARGO_INCREMENTAL=0`) — перевірено; GNU / дроблення features — за потреби | Partial | `Cargo.toml`, NEXT_STEPS |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -108,8 +108,8 @@ FM-xxx (з таблиці нижче)
 |--------|--------|-----------|-----|
 | 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
 | 2 | HTTP-шар | **FM-005** (Partial) | Розширити **`Result<Json<_>, AppError>`** на інші «прості» GET; де потрібен фіксований **`error.code`** — лишати **`api_json_error`** / **`api_error_response`** або погодити розширення **`AppError`**. |
-| 3 | Distributed RAID | **FM-007**, **FM-008** | Реальний sync артефактів; **LeaveCluster** без заглушки (membership / replication). |
-| 4 | Ops | **FM-011** | `cargo test --all-features` на Windows (GNU, `-j 1`) або дроблення тестів. |
+| 3 | Distributed RAID | **FM-007**, **FM-008** | Код: каталог sync + leave з replication/membership; далі — LAN, conflicts у протоколі, поглиблена реплікація. |
+| 4 | Ops | **FM-011** | Тримати збірку `--all-features` стабільною (профіль тестів, `-j 1`, incremental, GNU за потреби). |
 | 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
 | 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 
