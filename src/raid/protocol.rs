@@ -318,6 +318,8 @@ pub struct LeaveClusterResponse {
     pub status: OperationStatus,
     pub replication_complete: bool,
     pub artifacts_moved: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<String>,
 }
 
 /// Operation status

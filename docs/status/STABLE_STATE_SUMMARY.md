@@ -177,7 +177,7 @@ _Нижче — історичні мітки тижнів / модулів; н�
 - ✅ **Enterprise 100%** — SQLite, OAuth2, SAML SSO
 - ✅ **UI/UX, Admin Panel 100%**
 - ✅ **Stage 4.4 AI/ML** — TurboQuant **TQ01** (`src/ml/turboquant.rs`), pipeline кроки; ML.4–ML.6 / Context Memory — див. [`FUNCTIONALITY_DIGEST`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) та `git log`.
-- ✅ **Distributed wire (2026-04)** — `SyncArtifacts`: порівняння каталогів за напрямком; `LeaveCluster`: graceful replication path + видалення вузла з membership (дет. **FM-007 / FM-008**).
+- ✅ **Distributed wire (2026-04)** — `SyncArtifacts`: порівняння каталогів за напрямком + `conflicts` за `remote_versions`; `LeaveCluster`: graceful replication path + видалення вузла з membership, а без peer-вузлів для артефактів повертається `replication_complete=false` (дет. **FM-007 / FM-008**).
 
 ---
 

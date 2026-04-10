@@ -570,17 +570,28 @@ impl RaidDistributedProtocolService {
             match RaidService::list_artifacts(ctx).await {
                 Ok(artifacts) => {
                     let total = artifacts.len() as u32;
-                    let mut moved = 0u32;
-                    for a in artifacts {
-                        if RaidService::replicate_stored_artifact(ctx, a.id)
-                            .await
-                            .is_ok()
-                        {
-                            moved = moved.saturating_add(1);
+                    // FM-008: graceful leave is considered incomplete when there are artifacts
+                    // but no peer nodes to replicate to.
+                    let can_replicate_to_peers = cluster_nodes.len() > 1;
+                    if total > 0 && !can_replicate_to_peers {
+                        warn!(
+                            "Graceful leave requested with {} artifacts but no peer nodes available",
+                            total
+                        );
+                        (false, 0)
+                    } else {
+                        let mut moved = 0u32;
+                        for a in artifacts {
+                            if RaidService::replicate_stored_artifact(ctx, a.id)
+                                .await
+                                .is_ok()
+                            {
+                                moved = moved.saturating_add(1);
+                            }
                         }
+                        let complete = total == 0 || moved == total;
+                        (complete, moved)
                     }
-                    let complete = total == 0 || moved == total;
-                    (complete, moved)
                 }
                 Err(RaidServiceError::ManagerUnavailable) => {
                     return create_error_response(
@@ -634,6 +645,14 @@ impl RaidDistributedProtocolService {
             status: OperationStatus::Success,
             replication_complete,
             artifacts_moved,
+            details: if payload.graceful && !replication_complete {
+                Some(
+                    "No peer nodes available for graceful replication; artifacts remain local"
+                        .to_string(),
+                )
+            } else {
+                None
+            },
         };
 
         create_success_response(&message, response)
