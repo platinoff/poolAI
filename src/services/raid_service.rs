@@ -7,6 +7,7 @@ use crate::raid::events::{EventRecord, Snapshot};
 use crate::raid::{ArtifactRef, RaidManager, RaidMode, RaidNode, RebalanceResult, StrategyStatus};
 use chrono::{DateTime, Utc};
 use serde::Serialize;
+use std::collections::HashMap;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -234,6 +235,19 @@ impl RaidService {
     pub async fn local_artifact_count(ctx: &ApiContext) -> Result<u32, RaidServiceError> {
         let artifacts = Self::list_artifacts(ctx).await?;
         Ok(artifacts.len() as u32)
+    }
+
+    /// Local artifact versions for distributed sync conflict detection.
+    ///
+    /// Returns a map `artifact_id -> stored_at` matching `SyncArtifactsPayload.remote_versions`.
+    pub async fn local_artifact_versions(
+        ctx: &ApiContext,
+    ) -> Result<HashMap<String, DateTime<Utc>>, RaidServiceError> {
+        let artifacts = Self::list_artifacts(ctx).await?;
+        Ok(artifacts
+            .into_iter()
+            .map(|a| (a.id.to_string(), a.stored_at))
+            .collect())
     }
 
     /// Replicate an already stored artifact to peers (same path as `put_artifact` replication).

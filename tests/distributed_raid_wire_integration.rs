@@ -235,6 +235,33 @@ async fn wire_sync_artifacts_reports_remote_newer_conflict() {
 }
 
 #[tokio::test]
+async fn raid_service_local_artifact_versions_matches_catalog() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+
+    let a1 = RaidService::put_artifact(&ctx, "versions-a", b"a")
+        .await
+        .unwrap();
+    let a2 = RaidService::put_artifact(&ctx, "versions-b", b"b")
+        .await
+        .unwrap();
+
+    let versions = RaidService::local_artifact_versions(&ctx).await.unwrap();
+    assert_eq!(versions.len(), 2);
+    assert!(versions.contains_key(&a1.id.to_string()));
+    assert!(versions.contains_key(&a2.id.to_string()));
+
+    let listed = RaidService::list_artifacts(&ctx).await.unwrap();
+    for art in listed {
+        assert_eq!(
+            versions.get(&art.id.to_string()).copied(),
+            Some(art.stored_at),
+            "version map must mirror current artifact catalog"
+        );
+    }
+}
+
+#[tokio::test]
 async fn wire_leave_cluster_rejects_unknown_node_when_membership_non_empty() {
     let temp = TempDir::new().unwrap();
     let ctx = build_api_context(&temp).await;
