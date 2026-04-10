@@ -20,7 +20,7 @@
 <a href=#20 id=20 data-nosnippet>20</a><span class="kw">use </span><span class="kw">crate</span>::core::config::PoolAIConfig;
 <a href=#21 id=21 data-nosnippet>21</a><span class="kw">use </span><span class="kw">crate</span>::core::error::{AppError, ErrorContext};
 <a href=#22 id=22 data-nosnippet>22</a><span class="kw">use </span><span class="kw">crate</span>::core::state::ApiContext;
-<a href=#23 id=23 data-nosnippet>23</a><span class="kw">use </span><span class="kw">crate</span>::network::api::common::{api_json_error, check_permission};
+<a href=#23 id=23 data-nosnippet>23</a><span class="kw">use </span><span class="kw">crate</span>::network::api::common::{check_permission, HttpAppError};
 <a href=#24 id=24 data-nosnippet>24</a><span class="kw">use </span><span class="kw">crate</span>::network::auth::{
 <a href=#25 id=25 data-nosnippet>25</a>    bearer_token_from_authorization_header, refresh_access_token, AuthRequest, Claims,
 <a href=#26 id=26 data-nosnippet>26</a>};
@@ -102,13 +102,13 @@
 <a href=#102 id=102 data-nosnippet>102</a>
 <a href=#103 id=103 data-nosnippet>103</a><span class="kw">async fn </span>refresh_handler(State(ctx): State&lt;ApiContext&gt;, req: Request) -&gt; <span class="kw">impl </span>IntoResponse {
 <a href=#104 id=104 data-nosnippet>104</a>    <span class="kw">let </span><span class="prelude-val">Some</span>(token) = bearer_token_from_authorization_header(<span class="kw-2">&amp;</span>req) <span class="kw">else </span>{
-<a href=#105 id=105 data-nosnippet>105</a>        <span class="kw">let </span>(s, j) = api_json_error(
-<a href=#106 id=106 data-nosnippet>106</a>            <span class="string">"AUTH_MISSING_HEADER"</span>,
-<a href=#107 id=107 data-nosnippet>107</a>            <span class="string">"Missing or invalid authorization header"</span>,
-<a href=#108 id=108 data-nosnippet>108</a>            <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"refresh_handler"</span>)),
-<a href=#109 id=109 data-nosnippet>109</a>            StatusCode::UNAUTHORIZED,
-<a href=#110 id=110 data-nosnippet>110</a>        );
-<a href=#111 id=111 data-nosnippet>111</a>        <span class="kw">return </span>(s, j).into_response();
+<a href=#105 id=105 data-nosnippet>105</a>        <span class="kw">return </span>HttpAppError::new(AppError::RestError {
+<a href=#106 id=106 data-nosnippet>106</a>            code: <span class="string">"AUTH_MISSING_HEADER"</span>,
+<a href=#107 id=107 data-nosnippet>107</a>            message: <span class="string">"Missing or invalid authorization header"</span>.to_string(),
+<a href=#108 id=108 data-nosnippet>108</a>        })
+<a href=#109 id=109 data-nosnippet>109</a>        .with_context(ErrorContext::new(<span class="string">"refresh_handler"</span>))
+<a href=#110 id=110 data-nosnippet>110</a>        .with_status(StatusCode::UNAUTHORIZED)
+<a href=#111 id=111 data-nosnippet>111</a>        .into_response();
 <a href=#112 id=112 data-nosnippet>112</a>    };
 <a href=#113 id=113 data-nosnippet>113</a>
 <a href=#114 id=114 data-nosnippet>114</a>    <span class="kw">match </span>refresh_access_token(<span class="kw-2">&amp;</span>token, ctx.user_manager.clone()).<span class="kw">await </span>{
@@ -118,71 +118,65 @@
 <a href=#118 id=118 data-nosnippet>118</a>}
 <a href=#119 id=119 data-nosnippet>119</a>
 <a href=#120 id=120 data-nosnippet>120</a><span class="doccomment">/// Get system configuration
-<a href=#121 id=121 data-nosnippet>121</a></span><span class="kw">async fn </span>config_get_handler() -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#121 id=121 data-nosnippet>121</a></span><span class="kw">async fn </span>config_get_handler() -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;PoolAIConfig&gt;, HttpAppError&gt; {
 <a href=#122 id=122 data-nosnippet>122</a>    <span class="kw">match </span>SystemService::get_configuration() {
-<a href=#123 id=123 data-nosnippet>123</a>        <span class="prelude-val">Ok</span>(config) =&gt; Json(config).into_response(),
-<a href=#124 id=124 data-nosnippet>124</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#125 id=125 data-nosnippet>125</a>            <span class="kw">let </span>(s, j) = api_json_error(
-<a href=#126 id=126 data-nosnippet>126</a>                <span class="string">"CONFIG_GET_FAILED"</span>,
-<a href=#127 id=127 data-nosnippet>127</a>                <span class="macro">format!</span>(<span class="string">"Failed to get configuration: {}"</span>, e),
-<a href=#128 id=128 data-nosnippet>128</a>                <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"config_get"</span>)),
-<a href=#129 id=129 data-nosnippet>129</a>                StatusCode::INTERNAL_SERVER_ERROR,
-<a href=#130 id=130 data-nosnippet>130</a>            );
-<a href=#131 id=131 data-nosnippet>131</a>            (s, j).into_response()
-<a href=#132 id=132 data-nosnippet>132</a>        }
-<a href=#133 id=133 data-nosnippet>133</a>    }
-<a href=#134 id=134 data-nosnippet>134</a>}
-<a href=#135 id=135 data-nosnippet>135</a>
-<a href=#136 id=136 data-nosnippet>136</a><span class="doccomment">/// Update system configuration
-<a href=#137 id=137 data-nosnippet>137</a></span><span class="kw">async fn </span>config_update_handler(
-<a href=#138 id=138 data-nosnippet>138</a>    Extension(claims): Extension&lt;Claims&gt;,
-<a href=#139 id=139 data-nosnippet>139</a>    Json(config): Json&lt;PoolAIConfig&gt;,
-<a href=#140 id=140 data-nosnippet>140</a>) -&gt; <span class="kw">impl </span>IntoResponse {
-<a href=#141 id=141 data-nosnippet>141</a>    <span class="comment">// Check permission: admin:all
-<a href=#142 id=142 data-nosnippet>142</a>    </span><span class="kw">if let </span><span class="prelude-val">Err</span>(err) = check_permission(<span class="kw-2">&amp;</span>claims, <span class="string">"admin:all"</span>) {
-<a href=#143 id=143 data-nosnippet>143</a>        <span class="kw">return </span>err.into_response();
-<a href=#144 id=144 data-nosnippet>144</a>    }
-<a href=#145 id=145 data-nosnippet>145</a>
-<a href=#146 id=146 data-nosnippet>146</a>    <span class="kw">match </span>SystemService::apply_configuration(config) {
-<a href=#147 id=147 data-nosnippet>147</a>        <span class="prelude-val">Ok</span>(()) =&gt; Json(<span class="macro">serde_json::json!</span>({
-<a href=#148 id=148 data-nosnippet>148</a>            <span class="string">"message"</span>: <span class="string">"Configuration updated successfully"
-<a href=#149 id=149 data-nosnippet>149</a>        </span>}))
-<a href=#150 id=150 data-nosnippet>150</a>        .into_response(),
-<a href=#151 id=151 data-nosnippet>151</a>        <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#152 id=152 data-nosnippet>152</a>            <span class="kw">let </span>(s, j) = api_json_error(
-<a href=#153 id=153 data-nosnippet>153</a>                <span class="string">"CONFIG_UPDATE_FAILED"</span>,
-<a href=#154 id=154 data-nosnippet>154</a>                <span class="macro">format!</span>(<span class="string">"Failed to update configuration: {}"</span>, e),
-<a href=#155 id=155 data-nosnippet>155</a>                <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"config_update"</span>)),
-<a href=#156 id=156 data-nosnippet>156</a>                StatusCode::BAD_REQUEST,
-<a href=#157 id=157 data-nosnippet>157</a>            );
-<a href=#158 id=158 data-nosnippet>158</a>            (s, j).into_response()
-<a href=#159 id=159 data-nosnippet>159</a>        }
-<a href=#160 id=160 data-nosnippet>160</a>    }
-<a href=#161 id=161 data-nosnippet>161</a>}
-<a href=#162 id=162 data-nosnippet>162</a>
-<a href=#163 id=163 data-nosnippet>163</a><span class="attr">#[cfg(test)]
-<a href=#164 id=164 data-nosnippet>164</a></span><span class="kw">mod </span>tests {
-<a href=#165 id=165 data-nosnippet>165</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#166 id=166 data-nosnippet>166</a>    <span class="kw">use </span>axum::body::Body;
-<a href=#167 id=167 data-nosnippet>167</a>    <span class="kw">use </span>axum::http::{Request <span class="kw">as </span>HttpRequest, StatusCode};
-<a href=#168 id=168 data-nosnippet>168</a>    <span class="kw">use </span>tower::ServiceExt;
+<a href=#123 id=123 data-nosnippet>123</a>        <span class="prelude-val">Ok</span>(config) =&gt; <span class="prelude-val">Ok</span>(Json(config)),
+<a href=#124 id=124 data-nosnippet>124</a>        <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(HttpAppError::new(AppError::RestError {
+<a href=#125 id=125 data-nosnippet>125</a>            code: <span class="string">"CONFIG_GET_FAILED"</span>,
+<a href=#126 id=126 data-nosnippet>126</a>            message: <span class="macro">format!</span>(<span class="string">"Failed to get configuration: {}"</span>, e),
+<a href=#127 id=127 data-nosnippet>127</a>        })
+<a href=#128 id=128 data-nosnippet>128</a>        .with_context(ErrorContext::new(<span class="string">"config_get"</span>))),
+<a href=#129 id=129 data-nosnippet>129</a>    }
+<a href=#130 id=130 data-nosnippet>130</a>}
+<a href=#131 id=131 data-nosnippet>131</a>
+<a href=#132 id=132 data-nosnippet>132</a><span class="doccomment">/// Update system configuration
+<a href=#133 id=133 data-nosnippet>133</a></span><span class="kw">async fn </span>config_update_handler(
+<a href=#134 id=134 data-nosnippet>134</a>    Extension(claims): Extension&lt;Claims&gt;,
+<a href=#135 id=135 data-nosnippet>135</a>    Json(config): Json&lt;PoolAIConfig&gt;,
+<a href=#136 id=136 data-nosnippet>136</a>) -&gt; <span class="kw">impl </span>IntoResponse {
+<a href=#137 id=137 data-nosnippet>137</a>    <span class="comment">// Check permission: admin:all
+<a href=#138 id=138 data-nosnippet>138</a>    </span><span class="kw">if let </span><span class="prelude-val">Err</span>(err) = check_permission(<span class="kw-2">&amp;</span>claims, <span class="string">"admin:all"</span>) {
+<a href=#139 id=139 data-nosnippet>139</a>        <span class="kw">return </span>err.into_response();
+<a href=#140 id=140 data-nosnippet>140</a>    }
+<a href=#141 id=141 data-nosnippet>141</a>
+<a href=#142 id=142 data-nosnippet>142</a>    <span class="kw">match </span>SystemService::apply_configuration(config) {
+<a href=#143 id=143 data-nosnippet>143</a>        <span class="prelude-val">Ok</span>(()) =&gt; Json(<span class="macro">serde_json::json!</span>({
+<a href=#144 id=144 data-nosnippet>144</a>            <span class="string">"message"</span>: <span class="string">"Configuration updated successfully"
+<a href=#145 id=145 data-nosnippet>145</a>        </span>}))
+<a href=#146 id=146 data-nosnippet>146</a>        .into_response(),
+<a href=#147 id=147 data-nosnippet>147</a>        <span class="prelude-val">Err</span>(e) =&gt; HttpAppError::new(AppError::RestError {
+<a href=#148 id=148 data-nosnippet>148</a>            code: <span class="string">"CONFIG_UPDATE_FAILED"</span>,
+<a href=#149 id=149 data-nosnippet>149</a>            message: <span class="macro">format!</span>(<span class="string">"Failed to update configuration: {}"</span>, e),
+<a href=#150 id=150 data-nosnippet>150</a>        })
+<a href=#151 id=151 data-nosnippet>151</a>        .with_context(ErrorContext::new(<span class="string">"config_update"</span>))
+<a href=#152 id=152 data-nosnippet>152</a>        .with_status(StatusCode::BAD_REQUEST)
+<a href=#153 id=153 data-nosnippet>153</a>        .into_response(),
+<a href=#154 id=154 data-nosnippet>154</a>    }
+<a href=#155 id=155 data-nosnippet>155</a>}
+<a href=#156 id=156 data-nosnippet>156</a>
+<a href=#157 id=157 data-nosnippet>157</a><span class="attr">#[cfg(test)]
+<a href=#158 id=158 data-nosnippet>158</a></span><span class="kw">mod </span>tests {
+<a href=#159 id=159 data-nosnippet>159</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#160 id=160 data-nosnippet>160</a>    <span class="kw">use </span>axum::body::Body;
+<a href=#161 id=161 data-nosnippet>161</a>    <span class="kw">use </span>axum::http::{Request <span class="kw">as </span>HttpRequest, StatusCode};
+<a href=#162 id=162 data-nosnippet>162</a>    <span class="kw">use </span>tower::ServiceExt;
+<a href=#163 id=163 data-nosnippet>163</a>
+<a href=#164 id=164 data-nosnippet>164</a>    <span class="attr">#[tokio::test]
+<a href=#165 id=165 data-nosnippet>165</a>    </span><span class="kw">async fn </span>status_handler_works_with_api_context() {
+<a href=#166 id=166 data-nosnippet>166</a>        <span class="kw">let </span>app_state = ApiContext::default();
+<a href=#167 id=167 data-nosnippet>167</a>
+<a href=#168 id=168 data-nosnippet>168</a>        <span class="kw">let </span>app = create_system_routes().with_state(app_state);
 <a href=#169 id=169 data-nosnippet>169</a>
-<a href=#170 id=170 data-nosnippet>170</a>    <span class="attr">#[tokio::test]
-<a href=#171 id=171 data-nosnippet>171</a>    </span><span class="kw">async fn </span>status_handler_works_with_api_context() {
-<a href=#172 id=172 data-nosnippet>172</a>        <span class="kw">let </span>app_state = ApiContext::default();
-<a href=#173 id=173 data-nosnippet>173</a>
-<a href=#174 id=174 data-nosnippet>174</a>        <span class="kw">let </span>app = create_system_routes().with_state(app_state);
-<a href=#175 id=175 data-nosnippet>175</a>
-<a href=#176 id=176 data-nosnippet>176</a>        <span class="kw">let </span>response = app
-<a href=#177 id=177 data-nosnippet>177</a>            .oneshot(
-<a href=#178 id=178 data-nosnippet>178</a>                HttpRequest::builder()
-<a href=#179 id=179 data-nosnippet>179</a>                    .uri(<span class="string">"/status"</span>)
-<a href=#180 id=180 data-nosnippet>180</a>                    .body(Body::empty())
-<a href=#181 id=181 data-nosnippet>181</a>                    .unwrap(),
-<a href=#182 id=182 data-nosnippet>182</a>            )
-<a href=#183 id=183 data-nosnippet>183</a>            .<span class="kw">await
-<a href=#184 id=184 data-nosnippet>184</a>            </span>.expect(<span class="string">"request should succeed"</span>);
-<a href=#185 id=185 data-nosnippet>185</a>
-<a href=#186 id=186 data-nosnippet>186</a>        <span class="macro">assert_eq!</span>(response.status(), StatusCode::OK);
-<a href=#187 id=187 data-nosnippet>187</a>    }
-<a href=#188 id=188 data-nosnippet>188</a>}</code></pre></div></section></main></body></html>
+<a href=#170 id=170 data-nosnippet>170</a>        <span class="kw">let </span>response = app
+<a href=#171 id=171 data-nosnippet>171</a>            .oneshot(
+<a href=#172 id=172 data-nosnippet>172</a>                HttpRequest::builder()
+<a href=#173 id=173 data-nosnippet>173</a>                    .uri(<span class="string">"/status"</span>)
+<a href=#174 id=174 data-nosnippet>174</a>                    .body(Body::empty())
+<a href=#175 id=175 data-nosnippet>175</a>                    .unwrap(),
+<a href=#176 id=176 data-nosnippet>176</a>            )
+<a href=#177 id=177 data-nosnippet>177</a>            .<span class="kw">await
+<a href=#178 id=178 data-nosnippet>178</a>            </span>.expect(<span class="string">"request should succeed"</span>);
+<a href=#179 id=179 data-nosnippet>179</a>
+<a href=#180 id=180 data-nosnippet>180</a>        <span class="macro">assert_eq!</span>(response.status(), StatusCode::OK);
+<a href=#181 id=181 data-nosnippet>181</a>    }
+<a href=#182 id=182 data-nosnippet>182</a>}</code></pre></div></section></main></body></html>

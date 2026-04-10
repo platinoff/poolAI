@@ -10,9 +10,9 @@
 <a href=#10 id=10 data-nosnippet>10</a>    Json, Router,
 <a href=#11 id=11 data-nosnippet>11</a>};
 <a href=#12 id=12 data-nosnippet>12</a>
-<a href=#13 id=13 data-nosnippet>13</a><span class="kw">use </span><span class="kw">crate</span>::core::error::ErrorContext;
+<a href=#13 id=13 data-nosnippet>13</a><span class="kw">use </span><span class="kw">crate</span>::core::error::{AppError, ErrorContext};
 <a href=#14 id=14 data-nosnippet>14</a><span class="kw">use </span><span class="kw">crate</span>::core::state::ApiContext;
-<a href=#15 id=15 data-nosnippet>15</a><span class="kw">use </span><span class="kw">crate</span>::network::api::common::api_json_error;
+<a href=#15 id=15 data-nosnippet>15</a><span class="kw">use </span><span class="kw">crate</span>::network::api::common::HttpAppError;
 <a href=#16 id=16 data-nosnippet>16</a><span class="kw">use </span><span class="kw">crate</span>::network::auth::Claims;
 <a href=#17 id=17 data-nosnippet>17</a><span class="kw">use </span><span class="kw">crate</span>::services::chat_completion_service::ChatCompletionService;
 <a href=#18 id=18 data-nosnippet>18</a>
@@ -54,32 +54,26 @@
 <a href=#54 id=54 data-nosnippet>54</a>            .<span class="kw">await
 <a href=#55 id=55 data-nosnippet>55</a>            </span>{
 <a href=#56 id=56 data-nosnippet>56</a>                <span class="prelude-val">Ok</span>(completion) =&gt; (StatusCode::OK, Json(completion)).into_response(),
-<a href=#57 id=57 data-nosnippet>57</a>                <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#58 id=58 data-nosnippet>58</a>                    <span class="kw">let </span>(s, j) = api_json_error(
-<a href=#59 id=59 data-nosnippet>59</a>                        <span class="string">"internal_error"</span>,
-<a href=#60 id=60 data-nosnippet>60</a>                        e.to_string(),
-<a href=#61 id=61 data-nosnippet>61</a>                        <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"chat_completion"</span>)),
-<a href=#62 id=62 data-nosnippet>62</a>                        StatusCode::INTERNAL_SERVER_ERROR,
-<a href=#63 id=63 data-nosnippet>63</a>                    );
-<a href=#64 id=64 data-nosnippet>64</a>                    (s, j).into_response()
-<a href=#65 id=65 data-nosnippet>65</a>                }
-<a href=#66 id=66 data-nosnippet>66</a>            }
-<a href=#67 id=67 data-nosnippet>67</a>        }
-<a href=#68 id=68 data-nosnippet>68</a>    } <span class="kw">else if </span>request.stream {
-<a href=#69 id=69 data-nosnippet>69</a>        <span class="kw">let </span>stream = ChatCompletionService::stream_fallback(<span class="kw-2">&amp;</span>request.model, model_request);
-<a href=#70 id=70 data-nosnippet>70</a>        Sse::new(stream).into_response()
-<a href=#71 id=71 data-nosnippet>71</a>    } <span class="kw">else </span>{
-<a href=#72 id=72 data-nosnippet>72</a>        <span class="kw">match </span>ChatCompletionService::complete_fallback(<span class="kw-2">&amp;</span>request.model, model_request).<span class="kw">await </span>{
-<a href=#73 id=73 data-nosnippet>73</a>            <span class="prelude-val">Ok</span>(completion) =&gt; (StatusCode::OK, Json(completion)).into_response(),
-<a href=#74 id=74 data-nosnippet>74</a>            <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#75 id=75 data-nosnippet>75</a>                <span class="kw">let </span>(s, j) = api_json_error(
-<a href=#76 id=76 data-nosnippet>76</a>                    <span class="string">"internal_error"</span>,
-<a href=#77 id=77 data-nosnippet>77</a>                    e.to_string(),
-<a href=#78 id=78 data-nosnippet>78</a>                    <span class="prelude-val">Some</span>(ErrorContext::new(<span class="string">"chat_completion"</span>)),
-<a href=#79 id=79 data-nosnippet>79</a>                    StatusCode::INTERNAL_SERVER_ERROR,
-<a href=#80 id=80 data-nosnippet>80</a>                );
-<a href=#81 id=81 data-nosnippet>81</a>                (s, j).into_response()
-<a href=#82 id=82 data-nosnippet>82</a>            }
-<a href=#83 id=83 data-nosnippet>83</a>        }
-<a href=#84 id=84 data-nosnippet>84</a>    }
-<a href=#85 id=85 data-nosnippet>85</a>}</code></pre></div></section></main></body></html>
+<a href=#57 id=57 data-nosnippet>57</a>                <span class="prelude-val">Err</span>(e) =&gt; HttpAppError::new(AppError::RestError {
+<a href=#58 id=58 data-nosnippet>58</a>                    code: <span class="string">"internal_error"</span>,
+<a href=#59 id=59 data-nosnippet>59</a>                    message: e.to_string(),
+<a href=#60 id=60 data-nosnippet>60</a>                })
+<a href=#61 id=61 data-nosnippet>61</a>                .with_context(ErrorContext::new(<span class="string">"chat_completion"</span>))
+<a href=#62 id=62 data-nosnippet>62</a>                .into_response(),
+<a href=#63 id=63 data-nosnippet>63</a>            }
+<a href=#64 id=64 data-nosnippet>64</a>        }
+<a href=#65 id=65 data-nosnippet>65</a>    } <span class="kw">else if </span>request.stream {
+<a href=#66 id=66 data-nosnippet>66</a>        <span class="kw">let </span>stream = ChatCompletionService::stream_fallback(<span class="kw-2">&amp;</span>request.model, model_request);
+<a href=#67 id=67 data-nosnippet>67</a>        Sse::new(stream).into_response()
+<a href=#68 id=68 data-nosnippet>68</a>    } <span class="kw">else </span>{
+<a href=#69 id=69 data-nosnippet>69</a>        <span class="kw">match </span>ChatCompletionService::complete_fallback(<span class="kw-2">&amp;</span>request.model, model_request).<span class="kw">await </span>{
+<a href=#70 id=70 data-nosnippet>70</a>            <span class="prelude-val">Ok</span>(completion) =&gt; (StatusCode::OK, Json(completion)).into_response(),
+<a href=#71 id=71 data-nosnippet>71</a>            <span class="prelude-val">Err</span>(e) =&gt; HttpAppError::new(AppError::RestError {
+<a href=#72 id=72 data-nosnippet>72</a>                code: <span class="string">"internal_error"</span>,
+<a href=#73 id=73 data-nosnippet>73</a>                message: e.to_string(),
+<a href=#74 id=74 data-nosnippet>74</a>            })
+<a href=#75 id=75 data-nosnippet>75</a>            .with_context(ErrorContext::new(<span class="string">"chat_completion"</span>))
+<a href=#76 id=76 data-nosnippet>76</a>            .into_response(),
+<a href=#77 id=77 data-nosnippet>77</a>        }
+<a href=#78 id=78 data-nosnippet>78</a>    }
+<a href=#79 id=79 data-nosnippet>79</a>}</code></pre></div></section></main></body></html>
