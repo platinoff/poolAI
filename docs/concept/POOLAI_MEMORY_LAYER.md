@@ -60,7 +60,7 @@ Memory Layer додає **семантику AGI‑памʼяті** поверх
 
 Таким чином, ML‑модулі = **фабрика оновлень памʼяті**, RAID = **носій**, ноди = **сідси**.
 
-**Операційний доступ (2026‑03)**: за фічами `enterprise` + `ml` HTTP **`/api/enterprise/ai-ml/pipeline`** дозволяє оголошувати й виконувати пайплайни на спільному **`MLPipelineManager`** у контексті API (див. `src/network/api/ai_ml.rs`).
+**Операційний доступ (2026‑03)**: за фічами `enterprise` + `ml` HTTP **`/api/enterprise/ai-ml/pipeline`** дозволяє оголошувати й виконувати пайплайни на спільному **`MLPipelineManager`** у контексті API (див. `src/network/api/ai_ml.rs`). Помилки цих маршрутів — той самий JSON-конверт **`error` / `context`**, що й для `/api/v1/*` (**`HttpAppError`**, **`RestError`** за FM-005; див. `docs/catalog/FUNCTION_MANAGEMENT.md`).
 
 ## 5. Звʼязок з Grid / Job Layer
 

@@ -160,3 +160,12 @@
 - У **Stage 4.4** додано плановий трек **TurboQuant** (Google Research: стиснення KV cache / ваг / векторів) для зменшення обсягу ML-артефактів і навантаження на мережу при реплікації.
 - Документація: `docs/ml/TURBOQUANT_INTEGRATION.md`; план архітектора: **Priority 2b** + таблиця **наступних кроків за пріоритетом** у `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
 - **Політика**: імплементація **тільки на Rust** (`src/ml/…`), без Python sidecar і без PyPI runtime.
+
+---
+
+## Доповнення 2026-04-10 — узгодження концепту з FM-005 (HTTP-помилки)
+
+- **Єдиний контракт JSON** для більшості REST: `{ "error": { "code", "message" }, "context"?: … }` — `src/network/json_errors.rs` (`HttpAppError`, `AppError`, **`AppError::RestError`** для стабільних `error.code`).
+- **Оновлені концепт-доки**: `docs/concept/poolAI_concept_root.txt` (Stage 2 + окремий розділ про контракт), `poolAI_concept.txt`, `poolAI_concept_workspace.txt` (§4.4); у кореневому концепті виправлено шляхи RAID/UI під **`/api/v1/…`**.
+- **Стан міграції**: основний `api/*.rs` + **`raid`/`raid_http`/`raid_admin`** — через **`raid_api_err`**; **залишок** — `src/network/enterprise_api/*` (`enterprise_err`), окремо **`login`/`refresh`** та RBAC **`check_permission`**.
+- **Канон плану**: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **FM-005**, **§5.1**; деталі моделі помилок — [`docs/ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md).

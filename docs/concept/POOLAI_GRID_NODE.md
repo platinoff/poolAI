@@ -42,6 +42,7 @@ Grid‑рівень спирається на вже реалізовані ча
 - **Discovery / Peer API**:
   - API для реєстрації peers та отримання інформації про них.
   - Інтеграція з Worker Pool (peers як workers).
+  - Помилки HTTP — узгоджені з загальним REST-конвертом PoolAI (`json_errors`, FM-005 у `docs/catalog/FUNCTION_MANAGEMENT.md`).
 
 Grid Layer додає **протокол між нодами**, не змінюючи існуючі модулі:
 

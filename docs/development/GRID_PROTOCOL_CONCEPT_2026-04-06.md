@@ -38,6 +38,10 @@
 
 - Інтеграційні сценарії: [`tests/grid_network_scalability_tests.rs`](../../tests/grid_network_scalability_tests.rs) (топологія багатьох нод, replication engine, статистика мережі).
 
+### Помилки HTTP (узгодження з REST-площиною, 2026-04-10)
+
+Усі згадані HTTP-маршрути живуть під загальним nest **`/api/v1`** (крім **`/api/enterprise/*`**, якщо увімкнено feature `enterprise`). **Невдачі** цих викликів для клієнта мають той самий логічний конверт, що й решта PoolAI REST: поле **`error`** з **`code`** та **`message`**, опційно **`context`** — реалізація [`src/network/json_errors.rs`](../../src/network/json_errors.rs) (**`HttpAppError`**, **`AppError::RestError`** там, де потрібен стабільний machine-readable код; див. **FM-005** у [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md)). Майбутній **Grid envelope** не скасовує цей шар — він може обгортати payload поверх уже узгодженого JSON.
+
 ## 4. Що залишається поза цим документом
 
 - **Solana‑adapter** — концепт і мапінг подій: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md).

@@ -11,6 +11,7 @@
 
 #### Stage 2 - COMPLETED ✅
 - ✅ **Network Module** - REST API and WebSocket with HTTPS/TLS
+- ✅ **REST error envelope (FM-005, 2026-04-10)** — JSON `{ "error": { "code", "message" }, "context"?: … }` у `src/network/json_errors.rs`: `AppError`, `HttpAppError`, стабільні клієнтські коди через `AppError::RestError`; основний `api/*.rs` + **`raid`/`raid_http`/`raid_admin`** (**`raid_api_err`**). Залишок міграції: `enterprise_api/` (`enterprise_err`), окремо `login`/`refresh` та RBAC `check_permission`. Канон: `docs/catalog/FUNCTION_MANAGEMENT.md` (FM-005), `docs/ARCHITECTURE_BEST_PRACTICES.md`.
 - ✅ **Platform Module** - GPU management and optimization
 - ✅ **TGBot Module** - Telegram bot for management
 - ✅ **Security Module** - JWT authentication, rate limiting, RBAC
@@ -752,9 +753,11 @@ content_security_policy = "default-src 'self'"
 ### **RAID System API** (Stage 3 — In Progress)
 - `/api/v1/raid/nodes` — RAID nodes (read-only) ✅
 - `/api/v1/raid/artifacts` — RAID artifacts (read-only) ✅
-- `/api/raid/workers` — RAID workers 🔄
-- `/api/raid/status` — RAID status 🔄
-- `/api/raid/snapshots` — Snapshot management 🔄
+- `/api/v1/raid/workers` — RAID workers CRUD ✅
+- `/api/v1/raid/status` — RAID / cluster status ✅
+- `/api/v1/raid/snapshot` (+ create/restore), `/api/v1/raid/gc`, `/api/v1/raid/events` — snapshot / GC / events ✅
+- `/api/v1/raid/distributed/*` — distributed RAID protocol ✅
+- `/api/v1/raid/admin/*` — admin control plane (BurstRAID / SmallWorld metrics) ✅
 
 ### **UI Management API** (Planned)
 ### **UI (Stage 3 — Read-only implemented)**
@@ -766,9 +769,17 @@ content_security_policy = "default-src 'self'"
 - `/ui/libs` — Libraries ✅
 - `/ui/vm` — VM ✅
 - `/ui/raid` — RAID ✅
-- `/api/ui/dashboards` — Dashboard management 🔄
-- `/api/ui/components` — UI components 🔄
-- `/api/ui/themes` — Theme management 🔄
+- `/api/v1/ui/dashboards` — Dashboard management (enterprise) 🔄
+- `/api/v1/ui/components` — UI components ✅
+- `/api/v1/ui/themes` — Theme management ✅
+
+## 📡 REST API: client error contract (update 2026-04-10)
+
+- **Body shape**: `{ "error": { "code", "message" }, "context"?: … }` — implemented in `src/network/json_errors.rs` (`api_error_response`, `HttpAppError`, `IntoResponse` for `AppError`).
+- **Stable machine-readable `error.code`**: `AppError::RestError { code, message }` with HTTP status via `HttpAppError::with_status` where not the default mapping (see **FM-005** in `docs/catalog/FUNCTION_MANAGEMENT.md`).
+- **Coverage**: most `src/network/api/*.rs`, RAID modules (**`raid_api_err`**), UI/users/ML pipeline handlers, etc.
+- **Remaining FM-005**: `src/network/enterprise_api/*` (`enterprise_err` / `api_json_error`); auth success/error paths for **`login`/`refresh`** and **`check_permission`** denials stay on their existing response types but same JSON shape for clients.
+- **Implementation detail**: `docs/ARCHITECTURE_BEST_PRACTICES.md` — *Structured Error Model*; documentation steps 11–12 in root `README.md`.
 
 ## 🚀 Deployment
 

@@ -228,6 +228,14 @@ content_security_policy = "default-src 'self'"
 - Rate limiting для WebSocket соединений
 - Heartbeat для обнаружения разрывов соединения
 
+### 4.4 Узгоджений контракт помилок HTTP (актуалізація 2026-04-10)
+
+- Тіло помилки: `{ "error": { "code", "message" }, "context"?: … }` — реалізація в `src/network/json_errors.rs`: типи **`AppError`**, **`HttpAppError`**, для стабільних кодів клієнта — **`AppError::RestError { code, message }`** (ініціатива **FM-005**, див. [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md)).
+- Основний REST під `/api/v1/*`, модулі RAID (**`raid_api_err`** у `raid_http.rs`), UI, користувачі, ML pipeline тощо вже на цьому контурі.
+- Маршрути **`/api/enterprise/*`** ще частково через **`enterprise_err`** / `api_json_error` — залишок FM-005.
+- Відповіді **`login`/`refresh`** та відмова RBAC (**`check_permission`**) узгоджені за формою JSON з тим самим полем `error`, але типи відповіді в коді окремі.
+- Деталі: [`docs/ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md) (Structured Error Model).
+
 ## 5. API
 
 ### 5.1 Управление библиотеками
@@ -334,7 +342,7 @@ content_security_policy = "default-src 'self'"
 
 **1.4 API Endpoints Enhancement - 100%** ✅
 - ✅ VM Management API (`/api/vm/templates`, `/api/vm/networks`)
-- ✅ RAID System API (`/api/raid/workers`, `/api/raid/status`)
+- ✅ RAID System API (`/api/v1/raid/workers`, `/api/v1/raid/status`, distributed та admin під `/api/v1/raid/…`)
 - ✅ UI Management API (`/api/ui/dashboards`, `/api/ui/components`, `/api/ui/themes`)
 - ✅ Enterprise API Endpoints (всі endpoints реалізовані)
 
@@ -646,7 +654,7 @@ poolAI/
 - ✅ Snapshot & Restore
 - ✅ BurstRAID Strategy: 95% (core implementation 100%, metrics pending)
 - ✅ SmallWorld Network Strategy: 95% (core implementation 100%, metrics pending)
-- ✅ API endpoints: GET /api/v1/raid/quota, POST /api/v1/raid/gc, `/api/raid/workers`, `/api/raid/status`
+- ✅ API endpoints: GET `/api/v1/raid/quota`, POST `/api/v1/raid/gc`, `/api/v1/raid/workers`, `/api/v1/raid/status`, `/api/v1/raid/distributed/*`, `/api/v1/raid/admin/*`
 - ✅ 122+ tests passing (4 тести для GC/quota + integration tests)
 
 **Прогрес RAID Strategy Enhancements**: 95% (Priority 1.2 для v0.2.0)
