@@ -18,7 +18,7 @@ use std::collections::HashMap;
 
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::{api_json_error, HttpAppError};
+use crate::network::api::common::HttpAppError;
 use crate::network::auth::Claims;
 use crate::services::instance_service::{
     CreateInstanceRequest, CreateInstanceResponse, InstanceListResponse, InstanceService,
@@ -58,54 +58,32 @@ pub fn create_instance_routes() -> Router<ApiContext> {
 async fn instance_previews_handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<HashMap<String, String>>,
-) -> impl IntoResponse {
+) -> Result<Json<InstancePreviewResponse>, HttpAppError> {
     let model_id = match params.get("model_id") {
         Some(id) => id.as_str(),
         None => {
-            let (s, j) = api_json_error(
-                "VALIDATION_ERROR",
-                "model_id query parameter is required",
-                Some(
-                    ErrorContext::new("instance_previews").with_resource("query_param", "model_id"),
-                ),
-                StatusCode::BAD_REQUEST,
-            );
-            return (s, Json(j.0)).into_response();
+            return Err(HttpAppError::new(AppError::ValidationError(
+                "model_id query parameter is required".to_string(),
+            ))
+            .with_context(
+                ErrorContext::new("instance_previews").with_resource("query_param", "model_id"),
+            ));
         }
     };
 
     match InstanceService::placement_previews(&ctx, model_id).await {
-        Ok(response) => (StatusCode::OK, Json(response)).into_response(),
-        Err(InstanceServiceError::ManagerUnavailable) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Instance manager not initialized",
-                Some(
-                    ErrorContext::new("instance_previews")
-                        .with_resource("instance_manager", "default"),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
-        Err(InstanceServiceError::Preview(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                e.to_string(),
-                Some(ErrorContext::new("instance_previews").with_resource("model_id", model_id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, Json(j.0)).into_response()
-        }
-        Err(InstanceServiceError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                e.to_string(),
-                Some(ErrorContext::new("instance_previews").with_resource("model_id", model_id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, Json(j.0)).into_response()
-        }
+        Ok(response) => Ok(Json(response)),
+        Err(InstanceServiceError::ManagerUnavailable) => Err(HttpAppError::new(
+            AppError::SubsystemUnavailable("Instance manager not initialized".to_string()),
+        )
+        .with_context(
+            ErrorContext::new("instance_previews").with_resource("instance_manager", "default"),
+        )),
+        Err(InstanceServiceError::Preview(e) | InstanceServiceError::Operation(e)) => Err(
+            HttpAppError::new(AppError::InternalError(e.to_string())).with_context(
+                ErrorContext::new("instance_previews").with_resource("model_id", model_id),
+            ),
+        ),
     }
 }
 
@@ -113,40 +91,28 @@ async fn instance_create_handler(
     State(ctx): State<ApiContext>,
     Extension(_claims): Extension<Claims>,
     Json(body): Json<CreateInstanceBody>,
-) -> impl IntoResponse {
+) -> Result<Json<CreateInstanceResponse>, HttpAppError> {
     let request = CreateInstanceRequest {
         instance: body.instance,
     };
     match InstanceService::create_instance(&ctx, &request).await {
         Ok(instance_id) => {
             let command_id = uuid::Uuid::new_v4().to_string();
-            let response = CreateInstanceResponse {
+            Ok(Json(CreateInstanceResponse {
                 message: "Command received.".to_string(),
                 command_id,
                 instance_id,
-            };
-            (StatusCode::OK, Json(response)).into_response()
+            }))
         }
-        Err(InstanceServiceError::ManagerUnavailable) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Instance manager not initialized",
-                Some(
-                    ErrorContext::new("create_instance")
-                        .with_resource("instance_manager", "default"),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
-        Err(InstanceServiceError::Operation(e)) | Err(InstanceServiceError::Preview(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                e.to_string(),
-                Some(ErrorContext::new("create_instance")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, Json(j.0)).into_response()
+        Err(InstanceServiceError::ManagerUnavailable) => Err(HttpAppError::new(
+            AppError::SubsystemUnavailable("Instance manager not initialized".to_string()),
+        )
+        .with_context(
+            ErrorContext::new("create_instance").with_resource("instance_manager", "default"),
+        )),
+        Err(InstanceServiceError::Operation(e) | InstanceServiceError::Preview(e)) => {
+            Err(HttpAppError::new(AppError::InternalError(e.to_string()))
+                .with_context(ErrorContext::new("create_instance")))
         }
     }
 }
@@ -203,35 +169,19 @@ async fn instance_delete_handler(
             Json(serde_json::json!({"message": "Instance deleted"})),
         )
             .into_response(),
-        Err(InstanceServiceError::ManagerUnavailable) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Instance manager not initialized",
-                Some(
-                    ErrorContext::new("delete_instance")
-                        .with_resource("instance_manager", "default"),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
-        Err(InstanceServiceError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                e.to_string(),
-                Some(ErrorContext::new("delete_instance").with_resource("instance_id", &id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, Json(j.0)).into_response()
-        }
-        Err(InstanceServiceError::Preview(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                e.to_string(),
-                Some(ErrorContext::new("delete_instance").with_resource("instance_id", &id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, Json(j.0)).into_response()
+        Err(InstanceServiceError::ManagerUnavailable) => HttpAppError::new(
+            AppError::SubsystemUnavailable("Instance manager not initialized".to_string()),
+        )
+        .with_context(
+            ErrorContext::new("delete_instance").with_resource("instance_manager", "default"),
+        )
+        .into_response(),
+        Err(InstanceServiceError::Operation(e) | InstanceServiceError::Preview(e)) => {
+            HttpAppError::new(AppError::InternalError(e.to_string()))
+                .with_context(
+                    ErrorContext::new("delete_instance").with_resource("instance_id", &id),
+                )
+                .into_response()
         }
     }
 }

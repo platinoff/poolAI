@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
+use crate::network::api::common::HttpAppError;
 use crate::network::auth::auth_middleware;
 use crate::network::validation;
 use crate::services::worker_pool_service::{
@@ -78,13 +78,11 @@ async fn worker_create_handler(
     Json(payload): Json<CreateWorkerRequest>,
 ) -> impl IntoResponse {
     if let Err(e) = validation::validate_worker_id(&payload.worker_id) {
-        let (s, j) = api_json_error(
-            "VALIDATION_ERROR",
-            e.to_string(),
-            Some(ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id)),
-            StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        return HttpAppError::new(AppError::ValidationError(e.to_string()))
+            .with_context(
+                ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id),
+            )
+            .into_response();
     }
 
     let max_concurrent_requests = payload.max_concurrent_requests.unwrap_or(10);
@@ -102,13 +100,11 @@ async fn worker_create_handler(
         max_memory_mb,
         cpu_priority,
     ) {
-        let (s, j) = api_json_error(
-            "VALIDATION_ERROR",
-            e.to_string(),
-            Some(ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id)),
-            StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        return HttpAppError::new(AppError::ValidationError(e.to_string()))
+            .with_context(
+                ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id),
+            )
+            .into_response();
     }
 
     let input = CreateWorkerInput {
@@ -133,30 +129,19 @@ async fn worker_create_handler(
             };
             (StatusCode::CREATED, AxumJson(response)).into_response()
         }
-        Err(AddWorkerError::PoolNotReady) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Pool not initialized; worker pool manager is not available",
-                Some(ErrorContext::new("create_worker").with_resource("pool", "default")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
-        Err(AddWorkerError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                format!(
-                    "Failed to create worker: {} (worker_id='{}')",
-                    e, payload.worker_id
-                ),
-                Some(
-                    ErrorContext::new("create_worker")
-                        .with_resource("worker_id", &payload.worker_id),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(AddWorkerError::PoolNotReady) => HttpAppError::new(AppError::SubsystemUnavailable(
+            "Pool not initialized; worker pool manager is not available".to_string(),
+        ))
+        .with_context(ErrorContext::new("create_worker").with_resource("pool", "default"))
+        .into_response(),
+        Err(AddWorkerError::Operation(e)) => HttpAppError::new(AppError::InternalError(format!(
+            "Failed to create worker: {} (worker_id='{}')",
+            e, payload.worker_id
+        )))
+        .with_context(
+            ErrorContext::new("create_worker").with_resource("worker_id", &payload.worker_id),
+        )
+        .into_response(),
     }
 }
 
@@ -172,23 +157,16 @@ async fn worker_delete_handler(
             };
             AxumJson(response).into_response()
         }
-        Err(RemoveWorkerError::PoolNotReady) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Pool not initialized; worker pool manager is not available",
-                Some(ErrorContext::new("delete_worker").with_resource("pool", "default")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
-        Err(RemoveWorkerError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "NOT_FOUND",
-                format!("Failed to delete worker: {} (worker_id='{}')", e, worker_id),
-                Some(ErrorContext::new("delete_worker").with_resource("worker_id", &worker_id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(RemoveWorkerError::PoolNotReady) => HttpAppError::new(AppError::SubsystemUnavailable(
+            "Pool not initialized; worker pool manager is not available".to_string(),
+        ))
+        .with_context(ErrorContext::new("delete_worker").with_resource("pool", "default"))
+        .into_response(),
+        Err(RemoveWorkerError::Operation(e)) => HttpAppError::new(AppError::ApiNotFound(format!(
+            "Failed to delete worker: {} (worker_id='{}')",
+            e, worker_id
+        )))
+        .with_context(ErrorContext::new("delete_worker").with_resource("worker_id", &worker_id))
+        .into_response(),
     }
 }

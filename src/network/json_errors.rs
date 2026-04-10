@@ -52,6 +52,7 @@ pub fn http_status_for_app_error(err: &AppError) -> StatusCode {
         ApiNotFound(_) => StatusCode::NOT_FOUND,
         SubsystemUnavailable(_) => StatusCode::SERVICE_UNAVAILABLE,
         InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        RestError { .. } => StatusCode::INTERNAL_SERVER_ERROR,
         TimeoutError(_) => StatusCode::GATEWAY_TIMEOUT,
         NetworkError(_) => StatusCode::BAD_GATEWAY,
         PoolError(_) | MonitoringError(_) | GpuError(_) | MemoryError(_) | ShutdownError(_) => {
@@ -317,6 +318,42 @@ mod tests {
             http_status_for_app_error(&e),
             StatusCode::INTERNAL_SERVER_ERROR
         );
+    }
+
+    #[test]
+    fn http_status_rest_error_defaults_to_internal() {
+        let e = AppError::RestError {
+            code: "internal_error",
+            message: "x".into(),
+        };
+        assert_eq!(
+            http_status_for_app_error(&e),
+            StatusCode::INTERNAL_SERVER_ERROR
+        );
+    }
+
+    #[test]
+    fn api_error_response_rest_error_custom_code() {
+        let e = AppError::RestError {
+            code: "internal_error",
+            message: "boom".into(),
+        };
+        let (st, Json(v)) = api_error_response(&e, None, None);
+        assert_eq!(st, StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(v["error"]["code"], "internal_error");
+        assert_eq!(v["error"]["message"], "boom");
+    }
+
+    #[test]
+    fn http_app_error_rest_error_unauthorized_override() {
+        let e = AppError::RestError {
+            code: "AUTH_MISSING_HEADER",
+            message: "Missing".into(),
+        };
+        let resp = HttpAppError::new(e)
+            .with_status(StatusCode::UNAUTHORIZED)
+            .into_response();
+        assert_eq!(resp.status(), StatusCode::UNAUTHORIZED);
     }
 
     #[test]

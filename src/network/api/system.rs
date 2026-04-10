@@ -20,7 +20,7 @@ use axum::{
 use crate::core::config::PoolAIConfig;
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::{api_json_error, check_permission};
+use crate::network::api::common::{check_permission, HttpAppError};
 use crate::network::auth::{
     bearer_token_from_authorization_header, refresh_access_token, AuthRequest, Claims,
 };
@@ -102,13 +102,13 @@ async fn login_handler(
 
 async fn refresh_handler(State(ctx): State<ApiContext>, req: Request) -> impl IntoResponse {
     let Some(token) = bearer_token_from_authorization_header(&req) else {
-        let (s, j) = api_json_error(
-            "AUTH_MISSING_HEADER",
-            "Missing or invalid authorization header",
-            Some(ErrorContext::new("refresh_handler")),
-            StatusCode::UNAUTHORIZED,
-        );
-        return (s, j).into_response();
+        return HttpAppError::new(AppError::RestError {
+            code: "AUTH_MISSING_HEADER",
+            message: "Missing or invalid authorization header".to_string(),
+        })
+        .with_context(ErrorContext::new("refresh_handler"))
+        .with_status(StatusCode::UNAUTHORIZED)
+        .into_response();
     };
 
     match refresh_access_token(&token, ctx.user_manager.clone()).await {
@@ -118,18 +118,14 @@ async fn refresh_handler(State(ctx): State<ApiContext>, req: Request) -> impl In
 }
 
 /// Get system configuration
-async fn config_get_handler() -> impl IntoResponse {
+async fn config_get_handler() -> Result<Json<PoolAIConfig>, HttpAppError> {
     match SystemService::get_configuration() {
-        Ok(config) => Json(config).into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "CONFIG_GET_FAILED",
-                format!("Failed to get configuration: {}", e),
-                Some(ErrorContext::new("config_get")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Ok(config) => Ok(Json(config)),
+        Err(e) => Err(HttpAppError::new(AppError::RestError {
+            code: "CONFIG_GET_FAILED",
+            message: format!("Failed to get configuration: {}", e),
+        })
+        .with_context(ErrorContext::new("config_get"))),
     }
 }
 
@@ -148,15 +144,13 @@ async fn config_update_handler(
             "message": "Configuration updated successfully"
         }))
         .into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "CONFIG_UPDATE_FAILED",
-                format!("Failed to update configuration: {}", e),
-                Some(ErrorContext::new("config_update")),
-                StatusCode::BAD_REQUEST,
-            );
-            (s, j).into_response()
-        }
+        Err(e) => HttpAppError::new(AppError::RestError {
+            code: "CONFIG_UPDATE_FAILED",
+            message: format!("Failed to update configuration: {}", e),
+        })
+        .with_context(ErrorContext::new("config_update"))
+        .with_status(StatusCode::BAD_REQUEST)
+        .into_response(),
     }
 }
 

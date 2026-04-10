@@ -10,9 +10,9 @@ use axum::{
     Json, Router,
 };
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
+use crate::network::api::common::HttpAppError;
 use crate::network::auth::Claims;
 use crate::services::chat_completion_service::ChatCompletionService;
 
@@ -54,15 +54,12 @@ async fn chat_completions_handler(
             .await
             {
                 Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-                Err(e) => {
-                    let (s, j) = api_json_error(
-                        "internal_error",
-                        e.to_string(),
-                        Some(ErrorContext::new("chat_completion")),
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                    );
-                    (s, j).into_response()
-                }
+                Err(e) => HttpAppError::new(AppError::RestError {
+                    code: "internal_error",
+                    message: e.to_string(),
+                })
+                .with_context(ErrorContext::new("chat_completion"))
+                .into_response(),
             }
         }
     } else if request.stream {
@@ -71,15 +68,12 @@ async fn chat_completions_handler(
     } else {
         match ChatCompletionService::complete_fallback(&request.model, model_request).await {
             Ok(completion) => (StatusCode::OK, Json(completion)).into_response(),
-            Err(e) => {
-                let (s, j) = api_json_error(
-                    "internal_error",
-                    e.to_string(),
-                    Some(ErrorContext::new("chat_completion")),
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                );
-                (s, j).into_response()
-            }
+            Err(e) => HttpAppError::new(AppError::RestError {
+                code: "internal_error",
+                message: e.to_string(),
+            })
+            .with_context(ErrorContext::new("chat_completion"))
+            .into_response(),
         }
     }
 }

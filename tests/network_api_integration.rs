@@ -259,6 +259,10 @@ async fn test_instance_previews_requires_model_id() {
 
     // Should return BAD_REQUEST if model_id is missing
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["error"]["code"], "VALIDATION_ERROR");
+    assert!(v["error"]["message"].as_str().unwrap().contains("model_id"));
 }
 
 #[tokio::test]
@@ -299,6 +303,55 @@ async fn test_state_endpoint_exists() {
 
     // Endpoint exists if it returns something other than 404
     assert_ne!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn test_config_get_endpoint_registered() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/config")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    let status = response.status();
+    assert_ne!(status, StatusCode::NOT_FOUND);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    if status == StatusCode::INTERNAL_SERVER_ERROR {
+        assert_eq!(v["error"]["code"], "CONFIG_GET_FAILED");
+    } else {
+        assert_eq!(status, StatusCode::OK);
+        assert!(v.get("system").is_some() || v.get("pool").is_some());
+    }
+}
+
+#[tokio::test]
+async fn test_refresh_without_auth_header_returns_401_shape() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/refresh")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["error"]["code"], "AUTH_MISSING_HEADER");
 }
 
 #[tokio::test]

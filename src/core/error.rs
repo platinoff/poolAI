@@ -110,6 +110,9 @@ pub enum AppError {
     /// REST JSON `error.code`: `INTERNAL_ERROR`.
     #[error("{0}")]
     InternalError(String),
+    /// Arbitrary stable JSON `error.code` (e.g. `internal_error`, `CONFIG_GET_FAILED`) with HTTP status from [`HttpAppError::with_status`] when not 500.
+    #[error("{message}")]
+    RestError { code: &'static str, message: String },
     #[error("Initialization error: {0}")]
     InitializationError(String),
     #[error("Shutdown error: {0}")]
@@ -201,6 +204,9 @@ impl AppError {
             AppError::ApiNotFound(msg) => warn!("API not found: {}", msg),
             AppError::SubsystemUnavailable(msg) => error!("Subsystem unavailable: {}", msg),
             AppError::InternalError(msg) => error!("Internal error: {}", msg),
+            AppError::RestError { code, message } => {
+                error!("REST error {}: {}", code, message);
+            }
             AppError::InitializationError(msg) => error!("Initialization error: {}", msg),
             AppError::ShutdownError(msg) => error!("Shutdown error: {}", msg),
             AppError::IoError(e) => error!("IO error: {}", e),
@@ -361,6 +367,7 @@ impl AppError {
             AppError::ApiNotFound(_) => "NOT_FOUND",
             AppError::SubsystemUnavailable(_) => "SUBSYSTEM_UNAVAILABLE",
             AppError::InternalError(_) => "INTERNAL_ERROR",
+            AppError::RestError { code, .. } => code,
             AppError::InitializationError(_) => "INITIALIZATION_ERROR",
             AppError::ShutdownError(_) => "SHUTDOWN_ERROR",
             AppError::IoError(_) => "IO_ERROR",
@@ -460,6 +467,14 @@ mod tests {
         assert_eq!(
             AppError::InternalError("x".into()).error_code(),
             "INTERNAL_ERROR"
+        );
+        assert_eq!(
+            AppError::RestError {
+                code: "internal_error",
+                message: "m".into(),
+            }
+            .error_code(),
+            "internal_error"
         );
     }
 
