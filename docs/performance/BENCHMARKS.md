@@ -109,6 +109,7 @@ After **`cargo run --release --bin poolai_health_load -- --json <URL> <seconds> 
 | Host label | URL | wall_s | workers | ok | errors | rps_ok | p50_ms | p95_ms | p99_ms | Date |
 |------------|-----|--------|---------|-----|--------|--------|--------|--------|--------|------|
 | *e.g. ref-linux-01* | `http://127.0.0.1:8080/api/v1/health` | *from JSON* | *from CLI* | *ok_requests* | *error_requests* | *rps_ok_only* | *latency_p50_ms* | *latency_p95_ms* | *latency_p99_ms* | *YYYY-MM-DD* |
+| win10-local-26200 | `http://127.0.0.1:8080/api/v1/health` | 5.006 | 50 | 149858 | 0 | 29934.63 | 1.568 | 2.704 | 3.623 | 2026-04-10 |
 
 ### Target metrics (P4 roadmap, non-binding)
 
