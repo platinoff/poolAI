@@ -1,7 +1,7 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-04-06
+**Останнє оновлення**: 2026-04-10
 
 **Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.md`](../../.cursor/rules/documentation.md)
 
@@ -32,7 +32,7 @@
 
 ### Priority 3: Узгоджені HTTP / транспортні помилки
 
-- Формат: `src/network/json_errors.rs`, реекспорт у `api/common.rs`; типи — `src/core/error.rs`; **`enterprise_err`** — `network/enterprise_api/mod.rs`. Покрито основний REST, **`raid.rs`**, **`enterprise_api/`**, **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Залишок P3 — **FM-005**: поступова міграція handler’ів на **`Result<Json<_>, AppError>`** (приклад `api/rewards.rs`). Джерело правди: **`HANDOFF_NEW_SESSION.md`**, **`NEXT_STEPS_ARCHITECT_2026-03-17.md`** (секція P3).
+- Формат: `src/network/json_errors.rs`, реекспорт **`HttpAppError`** у `api/common.rs`; **`AppError::RestError`** для стабільних REST-кодів; **`enterprise_err`** — `network/enterprise_api/mod.rs`. **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`** узгоджені. **FM-005 (Partial)**: більшість **`api/*.rs`** на **`HttpAppError`/`RestError`**; лишаються **`raid*`**, **`enterprise_api/`**. Джерело правди: **`HANDOFF_NEW_SESSION.md`**, **`NEXT_STEPS_ARCHITECT_2026-03-17.md`**, **`FUNCTION_MANAGEMENT.md` §5.1**.
 
 ### Priority 4: Продуктивність і бенчі
 

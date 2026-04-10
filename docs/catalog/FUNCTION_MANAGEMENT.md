@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-10 (FM-005: `ui` (dashboards/themes/components), `users`, `ai_ml` pipeline, `workers`, `instances`, `system`, `completions`; `AppError::RestError`; таблиця **FM-***; **§5.1** без зміни порядку)  
+**Оновлено:** 2026-04-10 (FM-005 узгоджено в доках з кодом: `HttpAppError` + `RestError` для стабільних `error.code`; зроблено: `ui`, `users`, `ai_ml`, `workers`, `instances`, `system`, `completions` та ін.; залишок — `raid*`, `enterprise_api/`, login/refresh)  
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -109,7 +109,7 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
-| 2 | HTTP-шар | **FM-005** (Partial) | Розширити **`Result<Json<_>, AppError>`** на інші «прості» GET; де потрібен фіксований **`error.code`** — лишати **`api_json_error`** / **`api_error_response`** або погодити розширення **`AppError`**. |
+| 2 | HTTP-шар | **FM-005** (Partial) | Довести міграцію: **`Result<_, HttpAppError>`** / **`impl IntoResponse`** + **`AppError::RestError { code, message }`** для стабільних кодів (як у `users` / `ui`). Залишок без зміни контракту: **`raid.rs`**, **`raid_admin.rs`**, **`raid_http.rs`**, **`network/enterprise_api/`**; **`login` / `refresh`** і **`check_permission`** — окремо. |
 | 3 | Distributed RAID | **FM-007**, **FM-008** | Код: каталог sync + leave з replication/membership; далі — LAN, conflicts у протоколі, поглиблена реплікація. |
 | 4 | Ops | **FM-011** | Тримати збірку `--all-features` стабільною (профіль тестів, `-j 1`, incremental, GNU за потреби). |
 | 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
