@@ -30,7 +30,7 @@
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
 
-*Опційно паралельно з 1–2*: стабілізація `cargo test --all-features` на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
+*Опційно паралельно з 1–2*: **`cargo clippy` з `-D warnings` за матрицями `.github/workflows/ci.yml`** (без default features, `jwt,https`, `cloud,cloud-sdk`) — **закрито на `main` (2026-04-10)**. Далі: стабілізація **`cargo test --all-features`** на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
 
 **Зведення наступних кроків за індексом функціоналу (FM-*)** — один порядок дій: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) → **§5.1**.
 

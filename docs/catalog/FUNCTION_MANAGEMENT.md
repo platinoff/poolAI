@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-06 (зведення наступних кроків — **§5.1**; узгоджено зі [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md); кореневий README *Next Focus* і [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) — підрозділ **«Операційний порядок»**)  
+**Оновлено:** 2026-04-10 (зведення наступних кроків — **§5.1**; узгоджено зі [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md); кореневий README *Next Focus* і [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) — підрозділ **«Операційний порядок»**; **якість:** Clippy `-D warnings` за матрицями `ci.yml` — зелено на `main` з 2026-04-10)  
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -101,6 +101,8 @@ FM-xxx (з таблиці нижче)
 | FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); збірка `cargo test -j1 --all-features --no-run` (+ опційно `CARGO_INCREMENTAL=0`) — перевірено; GNU / дроблення features — за потреби | Partial | `Cargo.toml`, NEXT_STEPS |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
+
+**Якість збірки (не змінює порядок FM):** репозиторій проходить **`cargo clippy --all-targets … -- -D warnings`** для тих самих feature-матриць, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (`--no-default-features`, `jwt,https`, `cloud,cloud-sdk` + `K8S_OPENAPI_ENABLED_VERSION`) — станом на **2026-04-10**. Далі за пріоритетом лишаються продуктові пункти нижче, не «полювання на clippy».
 
 **Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри реплікації + TQ01 на стенді (P2b/P4); опційно **cloud-sdk** (Azure/GCP). Усе інше в таблиці FM-* нижче — дорожня карта без обов’язкового чекбокса.
 

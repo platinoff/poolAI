@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-06 (кроки 1–12; порядок робіт узгоджено з **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) — підрозділ **«Операційний порядок»**; **FM-007/008** — sync каталогу + LeaveCluster; **FM-011** — `[profile.test] debug = 1`, перевірка `cargo test -j1 --all-features --no-run` на MSVC; сталевий стан — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
+**Оновлено:** 2026-04-10 (кроки 1–12; порядок робіт узгоджено з **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) — підрозділ **«Операційний порядок»**; **FM-007/008** — sync каталогу + LeaveCluster; **FM-011** — `[profile.test] debug = 1`, перевірка `cargo test -j1 --all-features --no-run` на MSVC; **Clippy `-D warnings`** — три матриці як у `ci.yml` (див. §3); сталевий стан — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -39,6 +39,7 @@
 - **Priority 3 (основний HTTP-шар)**: `src/network/api/common.rs` — `api_error_response`, **`api_json_error`**, `http_status_for_app_error`; `src/core/error.rs` — **`AppError::Forbidden`**, `ErrorContext` (+ `hint`). Узгоджені відповіді: **`raid_http.rs`** + **`raid.rs`** (мапінг `RaidServiceError` та спільні RAID JSON-помилки), **`src/network/enterprise_api/`** (хелпер **`enterprise_err`** у **`mod.rs`**), **`users`**, **`ui`**, **`system`**, **`completions`**, **`raid_admin`**, раніше — **`ai_ml`**, **instances/libraries/vm/workers/topology/rewards**, tenant CRUD, RAID `Operation` через `api_error_response`.
 - **P3 (auth / WS / rate limit)**: **`auth.rs`**, **`ws.rs`** (upgrade + payload помилок), **`rate_limit.rs`** — узгоджено з **`api_json_error`** / **`ErrorContext`** (`src/network/json_errors.rs`); UI читає `error.message`. Додатково: **`http_status_for_app_error`** (евристики **`ResourceError`** / **`IoError`**), **`IntoResponse`** для **`AppError`** та **`HttpAppError`**; приклад **`Result<Json<_>, AppError>`** — **`src/network/api/rewards.rs`** (чотири GET; progress лишається з **`NOT_FOUND`**).
 - **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud,test-utils` (інжектований `AppState`: **`tests/appstate_http_injection_integration.rs`** поряд з **`distributed_raid_wire_integration`**). На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
+- **Clippy (2026-04-10):** перед push доцільно прогнати ті самі команди, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml): `cargo clippy --all-targets --no-default-features -- -D warnings`, `cargo clippy --all-targets --features jwt,https -- -D warnings`, і з `K8S_OPENAPI_ENABLED_VERSION=1.28` — `cargo clippy --all-targets --features cloud,cloud-sdk -- -D warnings`. Код і `tests/*` вирівняні під ці матриці.
 
 ## 4. Наступні кроки (канон: FM-* + Architect)
 

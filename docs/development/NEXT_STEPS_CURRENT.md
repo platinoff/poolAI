@@ -1,5 +1,8 @@
 # 🚀 PoolAI - Наступні кроки (Поточний стан)
-## Детальний план дій - 2026-01-17
+
+> **Канон на 2026-04-10:** порядок робіт — лише **[`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.1** та **[`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)** (операційний підрозділ). Нижче — **історичний зріз 2026-01-17** (BurstRAID/етапи); не використовуй його як єдине джерело пріоритетів. **Останнє:** Clippy `-D warnings` за CI-матрицями + тести — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md).
+
+## Детальний план дій - 2026-01-17 (архівний зріз)
 
 ---
 

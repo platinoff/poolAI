@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-04-07 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
+## Rust Architect — оновлено 2026-04-10 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
 
 ---
 
@@ -14,6 +14,7 @@
 - ✅ Production Deployment Documentation — **ЗАВЕРШЕНО** (100% готово) 🎉
 - ✅ Rustdoc Documentation Improvements — **ЗАВЕРШЕНО** (usage examples added) 🎉
 - ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
+- ✅ **Clippy (як у CI, `-D warnings`):** `cargo clippy --all-targets` для `--no-default-features`, `--features jwt,https` та `--features cloud,cloud-sdk` (остання матриця — з `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **без попереджень на `main` (2026-04-10)**; інтеграційні тести під ті самі правила вирівняні з `ci.yml`.
 - ✅ **Windows MSVC / FM-011:** у `Cargo.toml` профіль **`[profile.test] debug = 1`** зменшує PDB для великої кількості тестових exe (обхід **LNK1318**). Повна збірка тестових бінарників: `cargo test -j 1 --all-features --no-run` (за потреби `CARGO_INCREMENTAL=0`) — **перевірено локально** (2026-04-07).
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 

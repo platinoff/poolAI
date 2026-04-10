@@ -33,7 +33,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ### Останні релізні нотатки (скорочено)
 
-**v0.2.2** — Cloud LB: routing rules, `add_routing_rule` / `get_routing_rules`, `set_cloud_lb_config`; узгодження документації з планом Architect.
+**v0.2.2** — Cloud LB: routing rules, `add_routing_rule` / `get_routing_rules`, `set_cloud_lb_config`; узгодження документації з планом Architect. **Оновлення 2026-04-10:** Clippy `-D warnings` по CI-матрицях + прибирання інтеграційних тестів під ті самі правила (`TlsVersion` `FromStr`/`Display`, дрібні правки cloud-sdk тощо).
 
 **v0.2.1** — Cloud auto-scaling (metrics API, `evaluate_and_scale`, `ScalingAction`); pre-push `cargo fmt --all --check`; правила `.cursor/rules/`, MSYS2.
 
@@ -46,10 +46,10 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 **Target**: Advanced AI Mining Pool with Enterprise Features and Cloud/ML optimization  
 For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentation entry points: [Documentation map](#documentation-map-canonical-order), [`docs/README.md`](docs/README.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md).
 
-### ✅ Current Build/Test Status (2026-04-06)
+### ✅ Current Build/Test Status (2026-04-10)
 - `cargo fmt --all` — CI / before push  
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud,test-utils` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
-- `cargo clippy --all-targets --all-features` — completes (warnings allowed locally; CI uses narrower `-D warnings` matrices).  
+- **`cargo clippy` з `-D warnings`** узгоджено з матрицями CI (`.github/workflows/ci.yml`): `--all-targets` + `--no-default-features`, `--features jwt,https`, `--features cloud,cloud-sdk` (для останнього потрібен `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **чисто на `main` (2026-04-10)**. Повний `--all-features` локально може відрізнятися за набором крейтів; орієнтир — ті самі три кроки, що в CI.  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 — узгоджені JSON-помилки** — `src/network/json_errors.rs`, реекспорт у `network/api/common.rs`, **`enterprise_err`**, **`raid.rs`**, основний REST (`users`, `ui`, `system`, `completions`, `raid_admin`, instances, libraries, vm, workers, topology, rewards, `ai_ml`, tenant CRUD), а також **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**; інтеграційні ML-тести зібрані під **`[[test]]` + `required-features = ["ml"]`** у `Cargo.toml`; P2b wire-harness — `tests/distributed_raid_wire_integration.rs` (`test-utils`, опційно `ml`).
 
