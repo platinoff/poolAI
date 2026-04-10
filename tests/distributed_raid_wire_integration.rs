@@ -12,8 +12,8 @@ use chrono::Utc;
 use poolai::core::state::{ApiContext, AppState};
 use poolai::network::api::raid::create_raid_routes;
 use poolai::raid::protocol::{
-    ArtifactMetadata, LeaveClusterPayload, LeaveReason, ProtocolMessage, PutArtifactPayload,
-    SyncArtifactsPayload, SyncArtifactsResponse, SyncDirection, SyncMode,
+    ArtifactMetadata, LeaveClusterPayload, LeaveClusterResponse, LeaveReason, ProtocolMessage,
+    PutArtifactPayload, SyncArtifactsPayload, SyncArtifactsResponse, SyncDirection, SyncMode,
 };
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use poolai::services::raid_service::RaidService;
@@ -239,7 +239,7 @@ async fn wire_leave_cluster_ok_for_registered_node() {
 
     let app = Router::new()
         .nest("/api/v1", create_raid_routes())
-        .with_state(ctx);
+        .with_state(ctx.clone());
     let req = Request::builder()
         .method("POST")
         .uri("/api/v1/raid/distributed/cluster/leave")
@@ -248,6 +248,137 @@ async fn wire_leave_cluster_ok_for_registered_node() {
         .unwrap();
     let res = app.oneshot(req).await.unwrap();
     assert_eq!(res.status(), StatusCode::OK);
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let leave: LeaveClusterResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert!(leave.replication_complete);
+    assert_eq!(leave.artifacts_moved, 0);
+    let nodes_after = RaidService::list_nodes(&ctx).await.unwrap();
+    assert!(
+        !nodes_after.iter().any(|n| n.id == registered.id),
+        "leaving node should be removed from membership"
+    );
+}
+
+#[tokio::test]
+async fn wire_leave_cluster_graceful_without_artifacts_is_complete() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let mgr = ctx.raid_manager.get().expect("raid attached");
+    let registered = mgr.register_node("10.0.0.3:9002".to_string()).await;
+
+    let msg = ProtocolMessage::leave_cluster(
+        registered.id.to_string(),
+        LeaveClusterPayload {
+            reason: LeaveReason::Maintenance,
+            graceful: true,
+        },
+    )
+    .unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx.clone());
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/cluster/leave")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let leave: LeaveClusterResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert!(leave.replication_complete);
+    assert_eq!(leave.artifacts_moved, 0);
+    let nodes_after = RaidService::list_nodes(&ctx).await.unwrap();
+    assert!(!nodes_after.iter().any(|n| n.id == registered.id));
+}
+
+#[tokio::test]
+async fn wire_leave_cluster_graceful_with_artifacts_reports_moved_count() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let mgr = ctx.raid_manager.get().expect("raid attached");
+    let registered = mgr.register_node("10.0.0.4:9003".to_string()).await;
+
+    // Keep one local artifact to verify graceful mode reports moved artifact count.
+    let _ = RaidService::put_artifact(&ctx, "leave-graceful-artifact", b"payload")
+        .await
+        .unwrap();
+
+    let msg = ProtocolMessage::leave_cluster(
+        registered.id.to_string(),
+        LeaveClusterPayload {
+            reason: LeaveReason::Shutdown,
+            graceful: true,
+        },
+    )
+    .unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx.clone());
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/cluster/leave")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let leave: LeaveClusterResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert!(leave.replication_complete);
+    assert_eq!(leave.artifacts_moved, 1);
+    let nodes_after = RaidService::list_nodes(&ctx).await.unwrap();
+    assert!(!nodes_after.iter().any(|n| n.id == registered.id));
+}
+
+#[tokio::test]
+async fn wire_leave_cluster_non_graceful_with_artifacts_skips_replication() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let mgr = ctx.raid_manager.get().expect("raid attached");
+    let registered = mgr.register_node("10.0.0.5:9004".to_string()).await;
+
+    let _ = RaidService::put_artifact(&ctx, "leave-fast-artifact", b"payload")
+        .await
+        .unwrap();
+
+    let msg = ProtocolMessage::leave_cluster(
+        registered.id.to_string(),
+        LeaveClusterPayload {
+            reason: LeaveReason::Maintenance,
+            graceful: false,
+        },
+    )
+    .unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx.clone());
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/cluster/leave")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let leave: LeaveClusterResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert!(leave.replication_complete);
+    assert_eq!(leave.artifacts_moved, 0);
 }
 
 #[tokio::test]
