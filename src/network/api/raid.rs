@@ -22,12 +22,12 @@ use uuid::Uuid;
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::network::api::common::{api_json_error, check_permission};
+use crate::network::api::common::check_permission;
 use crate::network::api::raid_http::{
-    raid_events_load_failed, raid_gc_failed, raid_invalid_worker_uuid, raid_manager_unavailable,
-    raid_rebalance_failed, raid_service_http_err, raid_snapshot_create_failed,
-    raid_snapshot_load_failed, raid_snapshot_not_found, raid_snapshot_restore_failed,
-    raid_strategy_status_failed, raid_worker_mutation_err,
+    raid_api_err, raid_events_load_failed, raid_gc_failed, raid_invalid_worker_uuid,
+    raid_manager_unavailable, raid_rebalance_failed, raid_service_http_err,
+    raid_snapshot_create_failed, raid_snapshot_load_failed, raid_snapshot_not_found,
+    raid_snapshot_restore_failed, raid_strategy_status_failed, raid_worker_mutation_err,
 };
 use crate::network::auth::{auth_middleware, Claims};
 use crate::network::raid_distributed_handlers::*;
@@ -170,25 +170,25 @@ async fn raid_artifact_create_handler(
 ) -> impl IntoResponse {
     // Validate artifact name
     if let Err(e) = validation::validate_artifact_name(&payload.name) {
-        let (s, j) = api_json_error(
+        return raid_api_err(
             "VALIDATION_ERROR",
             e.to_string(),
             Some(ErrorContext::new("raid_artifact_create").with_resource("field", "name")),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        )
+        .into_response();
     }
 
     // Validate base64 data size (max 100MB)
     const MAX_ARTIFACT_SIZE: usize = 100 * 1024 * 1024; // 100MB
     if let Err(e) = validation::validate_base64_data(&payload.data, MAX_ARTIFACT_SIZE) {
-        let (s, j) = api_json_error(
+        return raid_api_err(
             "VALIDATION_ERROR",
             e.to_string(),
             Some(ErrorContext::new("raid_artifact_create").with_resource("field", "data")),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        )
+        .into_response();
     }
 
     // Decode base64 data
@@ -196,7 +196,7 @@ async fn raid_artifact_create_handler(
     let data = match base64_engine.decode(&payload.data) {
         Ok(d) => d,
         Err(e) => {
-            let (s, j) = api_json_error(
+            return raid_api_err(
                 "INVALID_BASE64",
                 format!("Cannot decode base64 artifact data: {}", e),
                 Some(
@@ -205,20 +205,20 @@ async fn raid_artifact_create_handler(
                         .with_hint("Verify payload is valid base64 and not corrupted."),
                 ),
                 StatusCode::BAD_REQUEST,
-            );
-            return (s, AxumJson(j.0)).into_response();
+            )
+            .into_response();
         }
     };
 
     // Validate decoded data size
     if let Err(e) = validation::validate_artifact_data_size(data.len(), MAX_ARTIFACT_SIZE) {
-        let (s, j) = api_json_error(
+        return raid_api_err(
             "VALIDATION_ERROR",
             e.to_string(),
             Some(ErrorContext::new("raid_artifact_create").with_resource("field", "decoded_size")),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        )
+        .into_response();
     }
 
     let data_size = data.len();
@@ -233,29 +233,25 @@ async fn raid_artifact_create_handler(
             (StatusCode::CREATED, AxumJson(response)).into_response()
         }
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(RaidServiceError::ArtifactNotFound { .. }) => {
-            let (s, j) = api_json_error(
-                "RAID_UNEXPECTED_STATE",
-                "Unexpected RAID state while creating artifact.",
-                Some(ErrorContext::new("raid_artifact_create")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
-        Err(RaidServiceError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "RAID_ARTIFACT_CREATE_FAILED",
-                format!("Failed to store artifact in RAID: {}", e),
-                Some(
-                    ErrorContext::new("raid_artifact_create")
-                        .with_resource("artifact_name", artifact_name.clone())
-                        .with_details(format!("data_size_bytes={}", data_size))
-                        .with_hint("Check storage quota, RAID manager status, and disk space."),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(RaidServiceError::ArtifactNotFound { .. }) => raid_api_err(
+            "RAID_UNEXPECTED_STATE",
+            "Unexpected RAID state while creating artifact.",
+            Some(ErrorContext::new("raid_artifact_create")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
+        Err(RaidServiceError::Operation(e)) => raid_api_err(
+            "RAID_ARTIFACT_CREATE_FAILED",
+            format!("Failed to store artifact in RAID: {}", e),
+            Some(
+                ErrorContext::new("raid_artifact_create")
+                    .with_resource("artifact_name", artifact_name.clone())
+                    .with_details(format!("data_size_bytes={}", data_size))
+                    .with_hint("Check storage quota, RAID manager status, and disk space."),
+            ),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
         Err(e) => raid_service_http_err(e).into_response(),
     }
 }
@@ -266,7 +262,7 @@ async fn raid_artifact_delete_handler(
 ) -> impl IntoResponse {
     // Validate UUID format
     if let Err(e) = validation::validate_uuid(&artifact_id) {
-        let (s, j) = api_json_error(
+        return raid_api_err(
             "VALIDATION_ERROR",
             e.to_string(),
             Some(
@@ -274,8 +270,8 @@ async fn raid_artifact_delete_handler(
                     .with_resource("artifact_id", &artifact_id),
             ),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        )
+        .into_response();
     }
 
     // Parse artifact ID
@@ -290,30 +286,26 @@ async fn raid_artifact_delete_handler(
             AxumJson(response).into_response()
         }
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(RaidServiceError::ArtifactNotFound { id }) => {
-            let (s, j) = api_json_error(
-                "ARTIFACT_NOT_FOUND",
-                format!("Artifact {} not found", id),
-                Some(
-                    ErrorContext::new("raid_artifact_delete")
-                        .with_resource("artifact_id", id.to_string()),
-                ),
-                StatusCode::NOT_FOUND,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
-        Err(RaidServiceError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "RAID_ARTIFACT_DELETE_FAILED",
-                format!("Failed to delete artifact: {}", e),
-                Some(
-                    ErrorContext::new("raid_artifact_delete")
-                        .with_resource("artifact_id", artifact_id.clone()),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(RaidServiceError::ArtifactNotFound { id }) => raid_api_err(
+            "ARTIFACT_NOT_FOUND",
+            format!("Artifact {} not found", id),
+            Some(
+                ErrorContext::new("raid_artifact_delete")
+                    .with_resource("artifact_id", id.to_string()),
+            ),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
+        Err(RaidServiceError::Operation(e)) => raid_api_err(
+            "RAID_ARTIFACT_DELETE_FAILED",
+            format!("Failed to delete artifact: {}", e),
+            Some(
+                ErrorContext::new("raid_artifact_delete")
+                    .with_resource("artifact_id", artifact_id.clone()),
+            ),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
         Err(e) => raid_service_http_err(e).into_response(),
     }
 }
@@ -543,13 +535,13 @@ async fn raid_worker_create_handler(
     }
 
     if payload.address.is_empty() {
-        let (s, j) = api_json_error(
+        return raid_api_err(
             "VALIDATION_ERROR",
             "Address cannot be empty",
             Some(ErrorContext::new("raid_worker_create").with_resource("field", "address")),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        )
+        .into_response();
     }
 
     match RaidService::register_worker(&ctx, payload.address.clone()).await {

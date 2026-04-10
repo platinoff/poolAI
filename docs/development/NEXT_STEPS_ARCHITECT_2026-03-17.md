@@ -25,7 +25,7 @@
 | **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
 | **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **`network/enterprise_api/`** ( **`mod.rs`** + tenants / audit / monitoring / security / oauth / saml) — розбито з моноліту. Дрібні edge cases міграції handlers → сервіси за потреби. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅ + **портативний fast-path** (`turboquant.rs`: pack/unpack/`dot_f32`). Далі: повні заміри по мережі на стенді (чекбокс нижче). |
-| **4** | **Priority 3** | Узгоджений JSON: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**, **`http_status_for_app_error`**, **`HttpAppError`**, **`AppError::RestError`**. **FM-005 (Partial)**: більшість **`api/*.rs`** переведено на **`HttpAppError`/`RestError`**; лишаються **`raid*`**, **`enterprise_api/`** (попередньо **`api_json_error`** / **`enterprise_err`**). |
+| **4** | **Priority 3** | Узгоджений JSON: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**, **`HttpAppError`**, **`AppError::RestError`**. **FM-005 (Partial)**: **`raid*`** + основний REST на **`HttpAppError`/`RestError`**; лишається **`enterprise_api/`** (**`enterprise_err`** / **`api_json_error`**). |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (Criterion тощо); **`poolai_health_load`** з **`--json`** на stdout для baseline / ref-хост (2026-04-06). Далі вручну: рядки таблиці **`BENCHMARKS.md`**, LAN P2b на стенді. |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
@@ -39,7 +39,7 @@
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
 1. **FM-003** + **P4** + **P2b** — baseline на реф-хості (Criterion, **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md)); на LAN-стенді — повні заміри реплікації артефактів і порівняння обсягу до/після TQ01 (єдиний відкритий чекбокс P2b у секції TurboQuant нижче).
-2. **FM-005** (Partial) — закінчити міграцію **`raid.rs`**, **`raid_admin.rs`**, **`raid_http.rs`**, **`network/enterprise_api/`** на **`HttpAppError`** + **`AppError::RestError`** (стабільні **`error.code`**); **`login`/`refresh`** і **`check_permission`** не змішувати без окремого рішення.
+2. **FM-005** (Partial) — закінчити **`network/enterprise_api/`** на **`HttpAppError`** + **`AppError::RestError`**; **`raid*`** зроблено (**`raid_api_err`**); **`login`/`refresh`** і **`check_permission`** — окремо.
 3. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** з replication; далі — LAN, **`conflicts`** у payload (remote metadata), за потреби глибша реплікація.
 4. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів у `Cargo.toml`, **`-j 1`**, опційно **`CARGO_INCREMENTAL=0`**, GNU toolchain).
 5. **Відкладено** — **FM-006** (`cloud-sdk` Azure/GCP), **FM-004** (SIMD TurboQuant).
@@ -300,7 +300,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 ## Верифікація 2026-04-06 (P3 — `raid.rs` + повний `enterprise_api/`)
 
 - **Код (`main`)**: узгоджені JSON-помилки для RAID REST — **`src/network/api/raid_http.rs`** (базовий **`raid_api_err`**, **`raid_service_http_err`**, події / snapshot / GC / strategies / rebalance тощо) + маршрути у **`src/network/api/raid.rs`**; **`src/network/enterprise_api/`** (хелпер **`enterprise_err`** у **`mod.rs`**, security / OAuth / SAML / monitoring / tenant тощо). Раніше в тому ж напрямку: `users`, `ui`, `system`, `completions`, `raid_admin`.
-- **Примітка (актуалізація плану, 2026-04-06)**: раніше тут зазначався залишок для **`auth.rs`**. **Закрито** у верифікації **2026-04-07**: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Поточний залишок P3 — **FM-005** (Partial): **`HttpAppError`** + **`AppError::RestError`** для решти **`raid*`** та **`enterprise_api/`**; див. **«Операційний порядок»** та **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+- **Примітка (актуалізація плану, 2026-04-06)**: раніше тут зазначався залишок для **`auth.rs`**. **Закрито** у верифікації **2026-04-07**: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Поточний залишок **FM-005** (Partial): **`enterprise_api/`**; **`raid*`** переведено на **`HttpAppError`/`RestError`** (**`raid_api_err`**); див. **«Операційний порядок»** та **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 - **Наступний фокус (історичний зріз цього абзацу)**: **P4** / **P2b** на стенді; **P2** — дрібні edge cases сервісного шару; див. актуальну таблицю на початку файлу та **§5.1**.
 
 ## Верифікація 2026-04-06 (P4 — Criterion targets)

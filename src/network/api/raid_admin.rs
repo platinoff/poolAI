@@ -19,25 +19,11 @@ use uuid::Uuid;
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::network::api::common::{api_json_error, check_permission};
+use crate::network::api::common::check_permission;
+use crate::network::api::raid_http::{raid_api_err, raid_manager_unavailable};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::raid::StrategyStatus;
-use crate::services::raid_service::{
-    RaidService, RaidServiceError, RAID_MANAGER_UNAVAILABLE_MESSAGE,
-};
-
-fn raid_manager_unavailable() -> impl IntoResponse {
-    let (s, j) = api_json_error(
-        "RAID_MANAGER_UNAVAILABLE",
-        RAID_MANAGER_UNAVAILABLE_MESSAGE,
-        Some(
-            ErrorContext::new("raid_admin")
-                .with_hint("Ensure RAID manager is initialized during application startup."),
-        ),
-        StatusCode::SERVICE_UNAVAILABLE,
-    );
-    (s, j).into_response()
-}
+use crate::services::raid_service::{RaidService, RaidServiceError};
 
 #[derive(serde::Serialize)]
 struct StrategyStatusResponse {
@@ -84,24 +70,20 @@ async fn get_strategy_status_handler(State(ctx): State<ApiContext>) -> impl Into
     match RaidService::admin_strategy_status(&ctx).await {
         Ok(status) => (StatusCode::OK, Json(StrategyStatusResponse { status })).into_response(),
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(RaidServiceError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_STRATEGY_STATUS_FAILED",
-                format!("Failed to get strategy status: {}", e),
-                Some(ErrorContext::new("raid_admin_strategy_status")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_STRATEGY_STATUS_FAILED",
-                format!("Unexpected RAID service error: {:?}", e),
-                Some(ErrorContext::new("raid_admin_strategy_status")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(RaidServiceError::Operation(e)) => raid_api_err(
+            "RAID_ADMIN_STRATEGY_STATUS_FAILED",
+            format!("Failed to get strategy status: {}", e),
+            Some(ErrorContext::new("raid_admin_strategy_status")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
+        Err(e) => raid_api_err(
+            "RAID_ADMIN_STRATEGY_STATUS_FAILED",
+            format!("Unexpected RAID service error: {:?}", e),
+            Some(ErrorContext::new("raid_admin_strategy_status")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -112,9 +94,8 @@ async fn trigger_rebalance_handler(
     State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
 ) -> impl IntoResponse {
-    // Check admin permission
-    if let Err((status, json)) = check_permission(&claims, "admin") {
-        return (status, json).into_response();
+    if let Err(err) = check_permission(&claims, "admin") {
+        return err.into_response();
     }
 
     match RaidService::admin_trigger_rebalance(&ctx).await {
@@ -128,24 +109,20 @@ async fn trigger_rebalance_handler(
         )
             .into_response(),
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(RaidServiceError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_REBALANCE_FAILED",
-                format!("Failed to trigger rebalancing: {}", e),
-                Some(ErrorContext::new("raid_admin_rebalance")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_REBALANCE_FAILED",
-                format!("Unexpected RAID service error: {:?}", e),
-                Some(ErrorContext::new("raid_admin_rebalance")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(RaidServiceError::Operation(e)) => raid_api_err(
+            "RAID_ADMIN_REBALANCE_FAILED",
+            format!("Failed to trigger rebalancing: {}", e),
+            Some(ErrorContext::new("raid_admin_rebalance")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
+        Err(e) => raid_api_err(
+            "RAID_ADMIN_REBALANCE_FAILED",
+            format!("Unexpected RAID service error: {:?}", e),
+            Some(ErrorContext::new("raid_admin_rebalance")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -157,25 +134,21 @@ async fn get_burst_raid_metrics_handler(State(ctx): State<ApiContext>) -> impl I
         Ok(Some(metrics)) => {
             (StatusCode::OK, Json(BurstRaidMetricsResponse { metrics })).into_response()
         }
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "BURSTRAID_NOT_ACTIVE",
-                "BurstRAID strategy not active; metrics are only available when BurstRAID is active.",
-                Some(ErrorContext::new("raid_admin_burst_metrics")),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Ok(None) => raid_api_err(
+            "BURSTRAID_NOT_ACTIVE",
+            "BurstRAID strategy not active; metrics are only available when BurstRAID is active.",
+            Some(ErrorContext::new("raid_admin_burst_metrics")),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_BURST_METRICS_FAILED",
-                format!("Unexpected RAID service error: {:?}", e),
-                Some(ErrorContext::new("raid_admin_burst_metrics")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(e) => raid_api_err(
+            "RAID_ADMIN_BURST_METRICS_FAILED",
+            format!("Unexpected RAID service error: {:?}", e),
+            Some(ErrorContext::new("raid_admin_burst_metrics")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -187,25 +160,21 @@ async fn get_small_world_metrics_handler(State(ctx): State<ApiContext>) -> impl 
         Ok(Some(metrics)) => {
             (StatusCode::OK, Json(SmallWorldMetricsResponse { metrics })).into_response()
         }
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "SMALLWORLD_NOT_ACTIVE",
-                "SmallWorld strategy not active; metrics are only available when SmallWorld is active.",
-                Some(ErrorContext::new("raid_admin_smallworld_metrics")),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Ok(None) => raid_api_err(
+            "SMALLWORLD_NOT_ACTIVE",
+            "SmallWorld strategy not active; metrics are only available when SmallWorld is active.",
+            Some(ErrorContext::new("raid_admin_smallworld_metrics")),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_SMALLWORLD_METRICS_FAILED",
-                format!("Unexpected RAID service error: {:?}", e),
-                Some(ErrorContext::new("raid_admin_smallworld_metrics")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(e) => raid_api_err(
+            "RAID_ADMIN_SMALLWORLD_METRICS_FAILED",
+            format!("Unexpected RAID service error: {:?}", e),
+            Some(ErrorContext::new("raid_admin_smallworld_metrics")),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -219,7 +188,7 @@ async fn get_artifact_burst_stats_handler(
     let artifact_uuid = match Uuid::parse_str(&artifact_id) {
         Ok(uuid) => uuid,
         Err(_) => {
-            let (s, j) = api_json_error(
+            return raid_api_err(
                 "INVALID_ARTIFACT_ID",
                 "Artifact ID must be a valid UUID",
                 Some(
@@ -227,8 +196,8 @@ async fn get_artifact_burst_stats_handler(
                         .with_resource("artifact_id", &artifact_id),
                 ),
                 StatusCode::BAD_REQUEST,
-            );
-            return (s, j).into_response();
+            )
+            .into_response();
         }
     };
 
@@ -236,31 +205,27 @@ async fn get_artifact_burst_stats_handler(
         Ok(Some(stats)) => {
             (StatusCode::OK, Json(ArtifactBurstStatsResponse { stats })).into_response()
         }
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "ARTIFACT_BURST_STATS_NOT_FOUND",
-                "Artifact burst stats not found; artifact may be untracked or BurstRAID is not active.",
-                Some(
-                    ErrorContext::new("raid_admin_artifact_burst_stats")
-                        .with_resource("artifact_id", &artifact_id),
-                ),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Ok(None) => raid_api_err(
+            "ARTIFACT_BURST_STATS_NOT_FOUND",
+            "Artifact burst stats not found; artifact may be untracked or BurstRAID is not active.",
+            Some(
+                ErrorContext::new("raid_admin_artifact_burst_stats")
+                    .with_resource("artifact_id", &artifact_id),
+            ),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_ARTIFACT_BURST_STATS_FAILED",
-                format!("Unexpected RAID service error: {:?}", e),
-                Some(
-                    ErrorContext::new("raid_admin_artifact_burst_stats")
-                        .with_resource("artifact_id", &artifact_id),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(e) => raid_api_err(
+            "RAID_ADMIN_ARTIFACT_BURST_STATS_FAILED",
+            format!("Unexpected RAID service error: {:?}", e),
+            Some(
+                ErrorContext::new("raid_admin_artifact_burst_stats")
+                    .with_resource("artifact_id", &artifact_id),
+            ),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -280,33 +245,29 @@ async fn get_node_clustering_handler(
             }),
         )
             .into_response(),
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "NODE_CLUSTERING_NOT_FOUND",
-                "Node clustering coefficient not found; node may not exist or SmallWorld is not active.",
-                Some(
-                    ErrorContext::new("raid_admin_node_clustering").with_resource(
-                        "node_id",
-                        params.node_id.to_string(),
-                    ),
+        Ok(None) => raid_api_err(
+            "NODE_CLUSTERING_NOT_FOUND",
+            "Node clustering coefficient not found; node may not exist or SmallWorld is not active.",
+            Some(
+                ErrorContext::new("raid_admin_node_clustering").with_resource(
+                    "node_id",
+                    params.node_id.to_string(),
                 ),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+            ),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(RaidServiceError::ManagerUnavailable) => raid_manager_unavailable().into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "RAID_ADMIN_NODE_CLUSTERING_FAILED",
-                format!("Unexpected RAID service error: {:?}", e),
-                Some(
-                    ErrorContext::new("raid_admin_node_clustering")
-                        .with_resource("node_id", params.node_id.to_string()),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(e) => raid_api_err(
+            "RAID_ADMIN_NODE_CLUSTERING_FAILED",
+            format!("Unexpected RAID service error: {:?}", e),
+            Some(
+                ErrorContext::new("raid_admin_node_clustering")
+                    .with_resource("node_id", params.node_id.to_string()),
+            ),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 

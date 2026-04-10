@@ -1,24 +1,29 @@
-//! RAID REST helpers: JSON error mapping for `RaidService` and shared HTTP error tuples.
+//! RAID REST helpers: JSON error mapping for `RaidService` and shared HTTP errors (`HttpAppError`).
 
-use axum::{http::StatusCode, Json as AxumJson};
+use axum::http::StatusCode;
 
 use crate::core::error::{AppError, ErrorContext};
-use crate::network::api::common::{api_error_response, api_json_error};
+use crate::network::api::common::HttpAppError;
 use crate::services::raid_service::{RaidServiceError, RAID_MANAGER_UNAVAILABLE_MESSAGE};
 
-pub(crate) type RaidHttpErr = (StatusCode, AxumJson<serde_json::Value>);
-
 pub(crate) fn raid_api_err(
-    code: impl AsRef<str>,
+    code: &'static str,
     message: impl Into<String>,
     ctx: Option<ErrorContext>,
     status: StatusCode,
-) -> RaidHttpErr {
-    let (s, j) = api_json_error(code, message, ctx, status);
-    (s, AxumJson(j.0))
+) -> HttpAppError {
+    let mut h = HttpAppError::new(AppError::RestError {
+        code,
+        message: message.into(),
+    })
+    .with_status(status);
+    if let Some(c) = ctx {
+        h = h.with_context(c);
+    }
+    h
 }
 
-pub(crate) fn raid_event_store_unavailable(operation: impl Into<String>) -> RaidHttpErr {
+pub(crate) fn raid_event_store_unavailable(operation: impl Into<String>) -> HttpAppError {
     raid_api_err(
         "EVENT_STORE_UNAVAILABLE",
         "Event store is not initialized or accessible.",
@@ -29,7 +34,7 @@ pub(crate) fn raid_event_store_unavailable(operation: impl Into<String>) -> Raid
     )
 }
 
-pub(crate) fn raid_manager_unavailable() -> RaidHttpErr {
+pub(crate) fn raid_manager_unavailable() -> HttpAppError {
     raid_api_err(
         "RAID_MANAGER_UNAVAILABLE",
         RAID_MANAGER_UNAVAILABLE_MESSAGE,
@@ -41,7 +46,7 @@ pub(crate) fn raid_manager_unavailable() -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
+pub(crate) fn raid_service_http_err(e: RaidServiceError) -> HttpAppError {
     match e {
         RaidServiceError::ManagerUnavailable => raid_manager_unavailable(),
         RaidServiceError::ArtifactNotFound { id } => raid_api_err(
@@ -59,14 +64,9 @@ pub(crate) fn raid_service_http_err(e: RaidServiceError) -> RaidHttpErr {
         RaidServiceError::EventStoreUnavailable { operation } => {
             raid_event_store_unavailable(operation)
         }
-        RaidServiceError::Operation(ref err) => {
-            let (s, j) = api_error_response(
-                err,
-                Some(ErrorContext::new("raid")),
-                Some(StatusCode::INTERNAL_SERVER_ERROR),
-            );
-            (s, AxumJson(j.0))
-        }
+        RaidServiceError::Operation(err) => HttpAppError::new(err)
+            .with_context(ErrorContext::new("raid"))
+            .with_status(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
@@ -76,17 +76,16 @@ pub(crate) fn raid_worker_mutation_err(
     err: AppError,
     operation: &'static str,
     worker_id: &str,
-) -> RaidHttpErr {
-    let (s, j) = api_json_error(
+) -> HttpAppError {
+    HttpAppError::new(AppError::RestError {
         code,
-        err.to_string(),
-        Some(ErrorContext::new(operation).with_resource("worker_id", worker_id.to_string())),
-        StatusCode::NOT_FOUND,
-    );
-    (s, AxumJson(j.0))
+        message: err.to_string(),
+    })
+    .with_context(ErrorContext::new(operation).with_resource("worker_id", worker_id.to_string()))
+    .with_status(StatusCode::NOT_FOUND)
 }
 
-pub(crate) fn raid_invalid_worker_uuid(id: &str, operation: &'static str) -> RaidHttpErr {
+pub(crate) fn raid_invalid_worker_uuid(id: &str, operation: &'static str) -> HttpAppError {
     raid_api_err(
         "INVALID_UUID",
         format!("Invalid UUID format: {}", id),
@@ -95,7 +94,7 @@ pub(crate) fn raid_invalid_worker_uuid(id: &str, operation: &'static str) -> Rai
     )
 }
 
-pub(crate) fn raid_events_load_failed(err: &AppError, ctx: ErrorContext) -> RaidHttpErr {
+pub(crate) fn raid_events_load_failed(err: &AppError, ctx: ErrorContext) -> HttpAppError {
     raid_api_err(
         "RAID_EVENTS_LOAD_FAILED",
         format!("Failed to load events: {}", err),
@@ -104,7 +103,7 @@ pub(crate) fn raid_events_load_failed(err: &AppError, ctx: ErrorContext) -> Raid
     )
 }
 
-pub(crate) fn raid_snapshot_not_found() -> RaidHttpErr {
+pub(crate) fn raid_snapshot_not_found() -> HttpAppError {
     raid_api_err(
         "RAID_SNAPSHOT_NOT_FOUND",
         "No snapshot available",
@@ -113,7 +112,7 @@ pub(crate) fn raid_snapshot_not_found() -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_snapshot_load_failed(err: &AppError) -> RaidHttpErr {
+pub(crate) fn raid_snapshot_load_failed(err: &AppError) -> HttpAppError {
     raid_api_err(
         "RAID_SNAPSHOT_LOAD_FAILED",
         format!("Failed to load snapshot: {}", err),
@@ -122,7 +121,7 @@ pub(crate) fn raid_snapshot_load_failed(err: &AppError) -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_snapshot_create_failed(err: &AppError) -> RaidHttpErr {
+pub(crate) fn raid_snapshot_create_failed(err: &AppError) -> HttpAppError {
     raid_api_err(
         "RAID_SNAPSHOT_CREATE_FAILED",
         format!("Failed to create snapshot: {}", err),
@@ -131,7 +130,7 @@ pub(crate) fn raid_snapshot_create_failed(err: &AppError) -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_snapshot_restore_failed(err: &AppError) -> RaidHttpErr {
+pub(crate) fn raid_snapshot_restore_failed(err: &AppError) -> HttpAppError {
     raid_api_err(
         "RAID_SNAPSHOT_RESTORE_FAILED",
         format!("Failed to restore from snapshot: {}", err),
@@ -140,7 +139,7 @@ pub(crate) fn raid_snapshot_restore_failed(err: &AppError) -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_gc_failed(err: &AppError) -> RaidHttpErr {
+pub(crate) fn raid_gc_failed(err: &AppError) -> HttpAppError {
     raid_api_err(
         "RAID_GC_FAILED",
         format!("Garbage collection failed: {}", err),
@@ -149,7 +148,7 @@ pub(crate) fn raid_gc_failed(err: &AppError) -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_strategy_status_failed(err: &AppError) -> RaidHttpErr {
+pub(crate) fn raid_strategy_status_failed(err: &AppError) -> HttpAppError {
     raid_api_err(
         "RAID_STRATEGY_STATUS_FAILED",
         format!("Failed to get strategy status: {}", err),
@@ -158,7 +157,7 @@ pub(crate) fn raid_strategy_status_failed(err: &AppError) -> RaidHttpErr {
     )
 }
 
-pub(crate) fn raid_rebalance_failed(err: &AppError) -> RaidHttpErr {
+pub(crate) fn raid_rebalance_failed(err: &AppError) -> HttpAppError {
     raid_api_err(
         "RAID_REBALANCE_FAILED",
         format!("Failed to trigger rebalancing: {}", err),

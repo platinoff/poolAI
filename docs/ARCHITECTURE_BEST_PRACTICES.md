@@ -103,7 +103,7 @@ src/
 - Централізований тип `AppError` в `core::error`.
 - Допоміжна структура `ErrorContext` для збагачення логів та метрик контекстом (operation, resource, id, details).
 - API‑відповіді використовують `error_code()` з `AppError` + людиночитабельне повідомлення.
-- Axum: `AppError` та `HttpAppError` (опційно `ErrorContext` / override статусу) реалізують `IntoResponse` у `network::json_errors`; `HttpAppError` реекспортується з `network::api::common`. **`AppError::RestError { code, message }`** — стабільні machine-readable **`error.code`** (див. FM-005 у `FUNCTION_MANAGEMENT.md`). Приклади: **`rewards.rs`** (більшість GET → `Result<Json<_>, AppError>`; progress → `Result<_, HttpAppError>`), **`workers.rs`**, **`libraries.rs`**, **`instances.rs`**, **`users.rs`**, **`ui.rs`**. Залишок на **`api_json_error`**: **`raid*`**, **`enterprise_api/`**; **`check_permission`** повертає **`(StatusCode, Json<Value>)`**.
+- Axum: `AppError` та `HttpAppError` (опційно `ErrorContext` / override статусу) реалізують `IntoResponse` у `network::json_errors`; `HttpAppError` реекспортується з `network::api::common`. **`AppError::RestError { code, message }`** — стабільні machine-readable **`error.code`** (див. FM-005 у `FUNCTION_MANAGEMENT.md`). Приклади: **`rewards.rs`** (більшість GET → `Result<Json<_>, AppError>`; progress → `Result<_, HttpAppError>`), **`workers.rs`**, **`libraries.rs`**, **`instances.rs`**, **`users.rs`**, **`ui.rs`**. Залишок на **`api_json_error`** / **`enterprise_err`**: **`enterprise_api/`**; **`check_permission`** повертає **`(StatusCode, Json<Value>)`**; **`raid*`** — через **`raid_api_err`** (**`RestError`**).
 
 ```rust
 use poolai::core::error::{AppError, ErrorContext};
