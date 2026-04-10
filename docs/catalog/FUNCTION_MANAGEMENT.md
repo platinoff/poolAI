@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-10 (FM-005: `users`, `ai_ml` pipeline handlers, `workers` POST/DELETE, `instances` previews/create/delete, `system` config/refresh, `completions`; `AppError::RestError`; таблиця **FM-***; **§5.1** без зміни порядку)  
+**Оновлено:** 2026-04-10 (FM-005: `ui` (dashboards/themes/components), `users`, `ai_ml` pipeline, `workers`, `instances`, `system`, `completions`; `AppError::RestError`; таблиця **FM-***; **§5.1** без зміни порядку)  
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -92,7 +92,7 @@ FM-xxx (з таблиці нижче)
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Partial / Planned | NEXT_STEPS P2 |
 | FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned | NEXT_STEPS P2b, `BENCHMARKS.md` |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
-| FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` / `HttpAppError` де доречно (без зміни стабільних `error.code`) | Partial | NEXT_STEPS P3; зроблено також: **`users`**, **`ai_ml`** (pipeline), **`workers`**, **`instances`** (previews/create/delete), **`system`** (`/config`, `/refresh` без токена), **`completions`** (`internal_error` через `RestError`); лишаються **`ui`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`enterprise`**, login/refresh `(status, Json)` з auth |
+| FM-005 | P3 | Спрощення handler’ів до `Result<T, AppError>` / `HttpAppError` де доречно (без зміни стабільних `error.code`) | Partial | NEXT_STEPS P3; зроблено також: **`ui`** (dashboards, themes/components), **`users`**, **`ai_ml`** (pipeline), **`workers`**, **`instances`**, **`system`**, **`completions`**; лишаються **`raid`**, **`raid_admin`**, **`raid_http`**, решта **`enterprise`** HTTP поза `ui`, login/refresh `(status, Json)` з auth |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
 | FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); `conflicts` лишаються порожніми без remote timestamps у payload | Partial | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog`; wire-тест **`tests/distributed_raid_wire_integration.rs`** (`wire_sync_artifacts_push_*`) |
 | FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; помилки membership / невалідний `node_id` | Partial | Якщо `list_nodes` непорожній — `node_id` має бути членом кластера (інакше `InvalidRequest` до replication); wire-тести leave у **`tests/distributed_raid_wire_integration.rs`** |
