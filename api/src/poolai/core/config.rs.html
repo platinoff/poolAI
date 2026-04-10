@@ -576,21 +576,20 @@
 <a href=#576 id=576 data-nosnippet>576</a>        <span class="comment">// Reset CONFIG to None for testing
 <a href=#577 id=577 data-nosnippet>577</a>        // Note: OnceLock doesn't support reset, so this test may fail if
 <a href=#578 id=578 data-nosnippet>578</a>        // config was already initialized in a previous test
-<a href=#579 id=579 data-nosnippet>579</a>        </span><span class="kw">let </span>result = get_config();
-<a href=#580 id=580 data-nosnippet>580</a>        <span class="comment">// This might fail if config was already set, which is OK
-<a href=#581 id=581 data-nosnippet>581</a>        </span><span class="kw">if </span>result.is_err() {
-<a href=#582 id=582 data-nosnippet>582</a>            <span class="macro">assert!</span>(result.unwrap_err().to_string().contains(<span class="string">"not initialized"</span>));
-<a href=#583 id=583 data-nosnippet>583</a>        }
-<a href=#584 id=584 data-nosnippet>584</a>    }
-<a href=#585 id=585 data-nosnippet>585</a>
-<a href=#586 id=586 data-nosnippet>586</a>    <span class="attr">#[test]
-<a href=#587 id=587 data-nosnippet>587</a>    </span><span class="kw">fn </span>test_initialize_and_get_config() {
-<a href=#588 id=588 data-nosnippet>588</a>        <span class="kw">let </span>config = PoolAIConfig::default();
-<a href=#589 id=589 data-nosnippet>589</a>        <span class="comment">// Try to initialize - might fail if already initialized
-<a href=#590 id=590 data-nosnippet>590</a>        </span><span class="kw">if </span>initialize_config(config.clone()).is_ok() {
-<a href=#591 id=591 data-nosnippet>591</a>            <span class="kw">let </span>retrieved = get_config().unwrap();
-<a href=#592 id=592 data-nosnippet>592</a>            <span class="macro">assert_eq!</span>(retrieved.system.name, config.system.name);
-<a href=#593 id=593 data-nosnippet>593</a>            <span class="macro">assert_eq!</span>(retrieved.system.max_workers, config.system.max_workers);
-<a href=#594 id=594 data-nosnippet>594</a>        }
-<a href=#595 id=595 data-nosnippet>595</a>    }
-<a href=#596 id=596 data-nosnippet>596</a>}</code></pre></div></section></main></body></html>
+<a href=#579 id=579 data-nosnippet>579</a>        // This might fail if config was already set, which is OK
+<a href=#580 id=580 data-nosnippet>580</a>        </span><span class="kw">if let </span><span class="prelude-val">Err</span>(e) = get_config() {
+<a href=#581 id=581 data-nosnippet>581</a>            <span class="macro">assert!</span>(e.to_string().contains(<span class="string">"not initialized"</span>));
+<a href=#582 id=582 data-nosnippet>582</a>        }
+<a href=#583 id=583 data-nosnippet>583</a>    }
+<a href=#584 id=584 data-nosnippet>584</a>
+<a href=#585 id=585 data-nosnippet>585</a>    <span class="attr">#[test]
+<a href=#586 id=586 data-nosnippet>586</a>    </span><span class="kw">fn </span>test_initialize_and_get_config() {
+<a href=#587 id=587 data-nosnippet>587</a>        <span class="kw">let </span>config = PoolAIConfig::default();
+<a href=#588 id=588 data-nosnippet>588</a>        <span class="comment">// Try to initialize - might fail if already initialized
+<a href=#589 id=589 data-nosnippet>589</a>        </span><span class="kw">if </span>initialize_config(config.clone()).is_ok() {
+<a href=#590 id=590 data-nosnippet>590</a>            <span class="kw">let </span>retrieved = get_config().unwrap();
+<a href=#591 id=591 data-nosnippet>591</a>            <span class="macro">assert_eq!</span>(retrieved.system.name, config.system.name);
+<a href=#592 id=592 data-nosnippet>592</a>            <span class="macro">assert_eq!</span>(retrieved.system.max_workers, config.system.max_workers);
+<a href=#593 id=593 data-nosnippet>593</a>        }
+<a href=#594 id=594 data-nosnippet>594</a>    }
+<a href=#595 id=595 data-nosnippet>595</a>}</code></pre></div></section></main></body></html>

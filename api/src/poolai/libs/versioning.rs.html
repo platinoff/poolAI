@@ -8,7 +8,7 @@
 <a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">use </span><span class="kw">crate</span>::core::error::AppError;
 <a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>serde::{Deserialize, Serialize};
 <a href=#10 id=10 data-nosnippet>10</a><span class="kw">use </span>std::collections::HashMap;
-<a href=#11 id=11 data-nosnippet>11</a><span class="kw">use </span>std::path::PathBuf;
+<a href=#11 id=11 data-nosnippet>11</a><span class="kw">use </span>std::path::{Path, PathBuf};
 <a href=#12 id=12 data-nosnippet>12</a><span class="kw">use </span>tracing::info;
 <a href=#13 id=13 data-nosnippet>13</a>
 <a href=#14 id=14 data-nosnippet>14</a><span class="doccomment">/// Version Manager - Manages library versions
@@ -38,7 +38,7 @@
 <a href=#38 id=38 data-nosnippet>38</a>        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
 <a href=#39 id=39 data-nosnippet>39</a>        name: <span class="kw-2">&amp;</span>str,
 <a href=#40 id=40 data-nosnippet>40</a>        version: <span class="kw-2">&amp;</span>str,
-<a href=#41 id=41 data-nosnippet>41</a>        path: <span class="kw-2">&amp;</span>PathBuf,
+<a href=#41 id=41 data-nosnippet>41</a>        path: <span class="kw-2">&amp;</span>Path,
 <a href=#42 id=42 data-nosnippet>42</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), AppError&gt; {
 <a href=#43 id=43 data-nosnippet>43</a>        <span class="kw">let </span>versions = <span class="self">self</span>.versions.entry(name.to_string()).or_default();
 <a href=#44 id=44 data-nosnippet>44</a>
@@ -58,7 +58,7 @@
 <a href=#58 id=58 data-nosnippet>58</a>        <span class="comment">// Add new version as active
 <a href=#59 id=59 data-nosnippet>59</a>        </span>versions.push(VersionInfo {
 <a href=#60 id=60 data-nosnippet>60</a>            version: version.to_string(),
-<a href=#61 id=61 data-nosnippet>61</a>            path: path.clone(),
+<a href=#61 id=61 data-nosnippet>61</a>            path: path.to_path_buf(),
 <a href=#62 id=62 data-nosnippet>62</a>            installed_at: chrono::Utc::now(),
 <a href=#63 id=63 data-nosnippet>63</a>            is_active: <span class="bool-val">true</span>,
 <a href=#64 id=64 data-nosnippet>64</a>        });

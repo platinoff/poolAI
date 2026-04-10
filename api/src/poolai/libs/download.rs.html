@@ -100,7 +100,7 @@
 <a href=#100 id=100 data-nosnippet>100</a>
 <a href=#101 id=101 data-nosnippet>101</a>        <span class="comment">// Update progress
 <a href=#102 id=102 data-nosnippet>102</a>        </span>downloaded += chunk.len() <span class="kw">as </span>u64;
-<a href=#103 id=103 data-nosnippet>103</a>        <span class="kw">if </span>content_length &gt; <span class="number">0 </span>&amp;&amp; downloaded % (content_length / <span class="number">10</span>).max(<span class="number">1</span>) == <span class="number">0 </span>{
+<a href=#103 id=103 data-nosnippet>103</a>        <span class="kw">if </span>content_length &gt; <span class="number">0 </span>&amp;&amp; downloaded.is_multiple_of((content_length / <span class="number">10</span>).max(<span class="number">1</span>)) {
 <a href=#104 id=104 data-nosnippet>104</a>            <span class="kw">let </span>progress = (downloaded * <span class="number">100</span>) / content_length;
 <a href=#105 id=105 data-nosnippet>105</a>            <span class="macro">info!</span>(<span class="string">"Download progress: {}%"</span>, progress);
 <a href=#106 id=106 data-nosnippet>106</a>        }
