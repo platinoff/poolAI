@@ -87,6 +87,7 @@ fn test_sync_artifacts_message_flow() {
     let payload = SyncArtifactsPayload {
         last_sync_timestamp: Some(last_sync),
         artifact_ids: Some(vec!["artifact-1".to_string(), "artifact-2".to_string()]),
+        remote_versions: None,
         direction: SyncDirection::Bidirectional,
     };
 

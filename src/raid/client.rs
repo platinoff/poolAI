@@ -407,6 +407,7 @@ impl ProtocolClient {
         let payload = SyncArtifactsPayload {
             last_sync_timestamp,
             artifact_ids,
+            remote_versions: None,
             direction,
         };
 

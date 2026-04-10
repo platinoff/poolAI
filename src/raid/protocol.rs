@@ -5,6 +5,7 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 /// Protocol message wrapper
@@ -178,6 +179,9 @@ pub struct SyncArtifactsPayload {
     pub last_sync_timestamp: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artifact_ids: Option<Vec<String>>,
+    /// Optional peer versions (`artifact_id` -> `stored_at`) used to detect conflicts.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remote_versions: Option<HashMap<String, DateTime<Utc>>>,
     pub direction: SyncDirection,
 }
 

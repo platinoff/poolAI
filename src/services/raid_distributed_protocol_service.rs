@@ -18,7 +18,7 @@ use axum::{
     Json,
 };
 use chrono::Utc;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use tracing::{error, info, warn};
 use uuid::Uuid;
 
@@ -327,13 +327,13 @@ impl RaidDistributedProtocolService {
         let remote_slice = payload.artifact_ids.as_deref();
         let (synced_count, missing_artifacts) =
             diff_sync_catalog(payload.direction, &local, remote_slice);
+        let conflicts = build_sync_conflicts(&local, payload.remote_versions.as_ref());
 
         let response = SyncArtifactsResponse {
             status: OperationStatus::Success,
             synced_count,
             missing_artifacts,
-            // Divergence needs remote `stored_at` / checksums in the wire payload; not sent today.
-            conflicts: Vec::new(),
+            conflicts,
             error: None,
         };
 
@@ -670,6 +670,38 @@ fn diff_sync_catalog(
     (synced, missing)
 }
 
+/// Detect conflicts for artifacts that exist on both sides with different timestamps.
+fn build_sync_conflicts(
+    local: &[ArtifactRef],
+    remote_versions: Option<&HashMap<String, chrono::DateTime<Utc>>>,
+) -> Vec<ArtifactConflict> {
+    let Some(remote) = remote_versions else {
+        return Vec::new();
+    };
+    let mut conflicts = Vec::new();
+    for a in local {
+        let id = a.id.to_string();
+        let Some(remote_ts) = remote.get(&id) else {
+            continue;
+        };
+        if a.stored_at != *remote_ts {
+            let reason = if a.stored_at > *remote_ts {
+                "local_newer_than_remote"
+            } else {
+                "remote_newer_than_local"
+            };
+            conflicts.push(ArtifactConflict {
+                artifact_id: id,
+                reason: reason.to_string(),
+                local_version: a.stored_at,
+                remote_version: *remote_ts,
+            });
+        }
+    }
+    conflicts.sort_by(|l, r| l.artifact_id.cmp(&r.artifact_id));
+    conflicts
+}
+
 fn create_success_response<T: serde::Serialize>(
     original_message: &ProtocolMessage,
     payload: T,
@@ -729,10 +761,11 @@ fn base64_decode(data: &str) -> Result<Vec<u8>, AppError> {
 
 #[cfg(test)]
 mod sync_catalog_tests {
-    use super::diff_sync_catalog;
+    use super::{build_sync_conflicts, diff_sync_catalog};
     use crate::raid::protocol::SyncDirection;
     use crate::raid::ArtifactRef;
     use chrono::Utc;
+    use std::collections::HashMap;
     use std::path::PathBuf;
     use uuid::Uuid;
 
@@ -781,5 +814,23 @@ mod sync_catalog_tests {
         let (synced, missing) = diff_sync_catalog(SyncDirection::Bidirectional, &local, None);
         assert_eq!(synced, 1);
         assert!(missing.is_empty());
+    }
+
+    #[test]
+    fn conflicts_report_timestamp_divergence_when_remote_versions_present() {
+        let local = vec![artifact("00000000-0000-0000-0000-00000000000b")];
+        let mut remote_versions = HashMap::new();
+        let local_ts = local[0].stored_at;
+        remote_versions.insert(
+            "00000000-0000-0000-0000-00000000000b".to_string(),
+            local_ts - chrono::Duration::seconds(1),
+        );
+        let conflicts = build_sync_conflicts(&local, Some(&remote_versions));
+        assert_eq!(conflicts.len(), 1);
+        assert_eq!(
+            conflicts[0].artifact_id,
+            "00000000-0000-0000-0000-00000000000b"
+        );
+        assert_eq!(conflicts[0].reason, "local_newer_than_remote");
     }
 }
