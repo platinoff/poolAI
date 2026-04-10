@@ -49,6 +49,9 @@ pub fn http_status_for_app_error(err: &AppError) -> StatusCode {
     match err {
         ValidationError(_) | SerializationError(_) | ModelError(_) => StatusCode::BAD_REQUEST,
         Forbidden(_) => StatusCode::FORBIDDEN,
+        ApiNotFound(_) => StatusCode::NOT_FOUND,
+        SubsystemUnavailable(_) => StatusCode::SERVICE_UNAVAILABLE,
+        InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         TimeoutError(_) => StatusCode::GATEWAY_TIMEOUT,
         NetworkError(_) => StatusCode::BAD_GATEWAY,
         PoolError(_) | MonitoringError(_) | GpuError(_) | MemoryError(_) | ShutdownError(_) => {
@@ -290,6 +293,30 @@ mod tests {
     fn http_status_forbidden() {
         let e = AppError::Forbidden("no".into());
         assert_eq!(http_status_for_app_error(&e), StatusCode::FORBIDDEN);
+    }
+
+    #[test]
+    fn http_status_api_not_found() {
+        let e = AppError::ApiNotFound("missing".into());
+        assert_eq!(http_status_for_app_error(&e), StatusCode::NOT_FOUND);
+    }
+
+    #[test]
+    fn http_status_subsystem_unavailable() {
+        let e = AppError::SubsystemUnavailable("down".into());
+        assert_eq!(
+            http_status_for_app_error(&e),
+            StatusCode::SERVICE_UNAVAILABLE
+        );
+    }
+
+    #[test]
+    fn http_status_internal_error() {
+        let e = AppError::InternalError("boom".into());
+        assert_eq!(
+            http_status_for_app_error(&e),
+            StatusCode::INTERNAL_SERVER_ERROR
+        );
     }
 
     #[test]

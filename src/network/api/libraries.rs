@@ -7,36 +7,31 @@
 
 use axum::{
     extract::{Extension, Json, Path, State},
-    http::StatusCode,
     middleware,
     response::IntoResponse,
     routing::{get, post},
     Json as AxumJson, Router,
 };
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
 use crate::libs::{LibraryInfo, LibraryType};
-use crate::network::api::common::{api_json_error, check_permission};
+use crate::network::api::common::{check_permission, HttpAppError};
 use crate::network::auth::{auth_middleware, Claims};
 use crate::services::library_service::{LibraryMutationError, LibraryService, LibraryServiceError};
 
-type LibHttpErr = (StatusCode, AxumJson<serde_json::Value>);
-
-fn library_manager_unavailable() -> LibHttpErr {
-    api_json_error(
-        "SUBSYSTEM_UNAVAILABLE",
-        crate::services::library_service::LIBRARY_MANAGER_UNAVAILABLE_MESSAGE,
-        Some(
-            ErrorContext::new("libraries")
-                .with_resource("library_manager", "default")
-                .with_hint("Initialize the library manager during startup."),
-        ),
-        StatusCode::SERVICE_UNAVAILABLE,
+fn library_manager_unavailable() -> HttpAppError {
+    HttpAppError::new(AppError::SubsystemUnavailable(
+        crate::services::library_service::LIBRARY_MANAGER_UNAVAILABLE_MESSAGE.to_string(),
+    ))
+    .with_context(
+        ErrorContext::new("libraries")
+            .with_resource("library_manager", "default")
+            .with_hint("Initialize the library manager during startup."),
     )
 }
 
-fn library_service_err(e: LibraryServiceError) -> LibHttpErr {
+fn library_service_err(e: LibraryServiceError) -> HttpAppError {
     match e {
         LibraryServiceError::ManagerUnavailable => library_manager_unavailable(),
     }
@@ -67,7 +62,7 @@ pub fn create_libraries_routes() -> Router<ApiContext> {
 
 async fn libraries_list_handler(
     State(ctx): State<ApiContext>,
-) -> Result<AxumJson<Vec<LibraryInfo>>, LibHttpErr> {
+) -> Result<AxumJson<Vec<LibraryInfo>>, HttpAppError> {
     match LibraryService::list_libraries(&ctx).await {
         Ok(libraries) => Ok(AxumJson(libraries)),
         Err(e) => Err(library_service_err(e)),
@@ -77,18 +72,14 @@ async fn libraries_list_handler(
 async fn library_info_handler(
     State(ctx): State<ApiContext>,
     Path(name): Path<String>,
-) -> Result<AxumJson<LibraryInfo>, LibHttpErr> {
+) -> Result<AxumJson<LibraryInfo>, HttpAppError> {
     match LibraryService::get_library(&ctx, &name).await {
         Ok(Some(lib)) => Ok(AxumJson(lib)),
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "NOT_FOUND",
-                format!("Library {} not found", name),
-                Some(ErrorContext::new("get_library").with_resource("library", &name)),
-                StatusCode::NOT_FOUND,
-            );
-            Err((s, AxumJson(j.0)))
-        }
+        Ok(None) => Err(HttpAppError::new(AppError::ApiNotFound(format!(
+            "Library {} not found",
+            name
+        )))
+        .with_context(ErrorContext::new("get_library").with_resource("library", &name))),
         Err(e) => Err(library_service_err(e)),
     }
 }
@@ -109,22 +100,16 @@ async fn library_install_handler(
             library_manager_unavailable().into_response()
         }
         Err(LibraryMutationError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                format!(
-                    "Failed to install library from registry: {} (library='{}', version='{}')",
-                    e, name, version
-                ),
-                Some(
-                    ErrorContext::new("install_library")
-                        .with_resource("library", &name)
-                        .with_hint(
-                            "Verify name/version, connectivity, disk space, and manager state.",
-                        ),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
+            HttpAppError::new(AppError::InternalError(format!(
+                "Failed to install library from registry: {} (library='{}', version='{}')",
+                e, name, version
+            )))
+            .with_context(
+                ErrorContext::new("install_library")
+                    .with_resource("library", &name)
+                    .with_hint("Verify name/version, connectivity, disk space, and manager state."),
+            )
+            .into_response()
         }
     }
 }
@@ -149,19 +134,17 @@ async fn library_uninstall_handler(
         Err(LibraryMutationError::ManagerUnavailable) => {
             library_manager_unavailable().into_response()
         }
-        Err(LibraryMutationError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                format!("Failed to uninstall library: {} (library='{}')", e, name),
-                Some(
-                    ErrorContext::new("uninstall_library")
-                        .with_resource("library", &name)
-                        .with_hint("Ensure the library is installed, not in use, and has no blocking dependencies."),
+        Err(LibraryMutationError::Operation(e)) => HttpAppError::new(AppError::InternalError(
+            format!("Failed to uninstall library: {} (library='{}')", e, name),
+        ))
+        .with_context(
+            ErrorContext::new("uninstall_library")
+                .with_resource("library", &name)
+                .with_hint(
+                    "Ensure the library is installed, not in use, and has no blocking dependencies.",
                 ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        )
+        .into_response(),
     }
 }
 
@@ -182,19 +165,15 @@ async fn library_update_handler(
         Err(LibraryMutationError::ManagerUnavailable) => {
             library_manager_unavailable().into_response()
         }
-        Err(LibraryMutationError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                format!("Failed to update library: {} (library='{}')", e, name),
-                Some(
-                    ErrorContext::new("update_library")
-                        .with_resource("library", &name)
-                        .with_hint("Verify the library is installed and updates are available."),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(LibraryMutationError::Operation(e)) => HttpAppError::new(AppError::InternalError(
+            format!("Failed to update library: {} (library='{}')", e, name),
+        ))
+        .with_context(
+            ErrorContext::new("update_library")
+                .with_resource("library", &name)
+                .with_hint("Verify the library is installed and updates are available."),
+        )
+        .into_response(),
     }
 }
 
@@ -231,20 +210,16 @@ async fn library_upload_handler(
             library_manager_unavailable().into_response()
         }
         Err(LibraryMutationError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "INTERNAL_ERROR",
-                format!(
-                    "Failed to upload library: {} (library='{}', version='{}')",
-                    e, payload.name, payload.version
-                ),
-                Some(
-                    ErrorContext::new("upload_library")
-                        .with_resource("library", &payload.name)
-                        .with_hint("Verify base64 payload, disk space, and permissions."),
-                ),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
+            HttpAppError::new(AppError::InternalError(format!(
+                "Failed to upload library: {} (library='{}', version='{}')",
+                e, payload.name, payload.version
+            )))
+            .with_context(
+                ErrorContext::new("upload_library")
+                    .with_resource("library", &payload.name)
+                    .with_hint("Verify base64 payload, disk space, and permissions."),
+            )
+            .into_response()
         }
     }
 }

@@ -101,6 +101,15 @@ pub enum AppError {
     ValidationError(String),
     #[error("Forbidden: {0}")]
     Forbidden(String),
+    /// REST JSON `error.code`: `NOT_FOUND` (stable contract for clients).
+    #[error("{0}")]
+    ApiNotFound(String),
+    /// REST JSON `error.code`: `SUBSYSTEM_UNAVAILABLE`.
+    #[error("{0}")]
+    SubsystemUnavailable(String),
+    /// REST JSON `error.code`: `INTERNAL_ERROR`.
+    #[error("{0}")]
+    InternalError(String),
     #[error("Initialization error: {0}")]
     InitializationError(String),
     #[error("Shutdown error: {0}")]
@@ -189,6 +198,9 @@ impl AppError {
             AppError::TimeoutError(msg) => error!("Timeout error: {}", msg),
             AppError::ValidationError(msg) => error!("Validation error: {}", msg),
             AppError::Forbidden(msg) => warn!("Forbidden: {}", msg),
+            AppError::ApiNotFound(msg) => warn!("API not found: {}", msg),
+            AppError::SubsystemUnavailable(msg) => error!("Subsystem unavailable: {}", msg),
+            AppError::InternalError(msg) => error!("Internal error: {}", msg),
             AppError::InitializationError(msg) => error!("Initialization error: {}", msg),
             AppError::ShutdownError(msg) => error!("Shutdown error: {}", msg),
             AppError::IoError(e) => error!("IO error: {}", e),
@@ -346,6 +358,9 @@ impl AppError {
             AppError::TimeoutError(_) => "TIMEOUT_ERROR",
             AppError::ValidationError(_) => "VALIDATION_ERROR",
             AppError::Forbidden(_) => "FORBIDDEN",
+            AppError::ApiNotFound(_) => "NOT_FOUND",
+            AppError::SubsystemUnavailable(_) => "SUBSYSTEM_UNAVAILABLE",
+            AppError::InternalError(_) => "INTERNAL_ERROR",
             AppError::InitializationError(_) => "INITIALIZATION_ERROR",
             AppError::ShutdownError(_) => "SHUTDOWN_ERROR",
             AppError::IoError(_) => "IO_ERROR",
@@ -437,6 +452,15 @@ mod tests {
             "FORBIDDEN"
         );
         assert_eq!(AppError::Unknown.error_code(), "UNKNOWN_ERROR");
+        assert_eq!(AppError::ApiNotFound("x".into()).error_code(), "NOT_FOUND");
+        assert_eq!(
+            AppError::SubsystemUnavailable("x".into()).error_code(),
+            "SUBSYSTEM_UNAVAILABLE"
+        );
+        assert_eq!(
+            AppError::InternalError("x".into()).error_code(),
+            "INTERNAL_ERROR"
+        );
     }
 
     #[test]
