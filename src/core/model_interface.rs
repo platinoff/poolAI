@@ -203,19 +203,14 @@ pub struct ModelState {
 }
 
 /// Model status
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum ModelStatus {
+    #[default]
     Initializing,
     Ready,
     Busy,
     Error,
     Shutdown,
-}
-
-impl Default for ModelStatus {
-    fn default() -> Self {
-        ModelStatus::Initializing
-    }
 }
 
 impl Default for ModelState {
@@ -405,8 +400,8 @@ impl ModelManager {
     }
 
     /// Get a model by name
-    pub fn get_model(&self, name: &str) -> Option<&Box<dyn ModelInterface + Send + Sync>> {
-        self.models.get(name)
+    pub fn get_model(&self, name: &str) -> Option<&(dyn ModelInterface + Send + Sync)> {
+        self.models.get(name).map(|m| m.as_ref())
     }
 
     /// Get all models

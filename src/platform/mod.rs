@@ -173,6 +173,6 @@ mod tests {
     fn test_gpu_info_memory_usage() {
         let info = get_gpu_info();
         let usage_percent = (info.memory_used as f32 / info.memory_total as f32) * 100.0;
-        assert!(usage_percent >= 0.0 && usage_percent <= 100.0);
+        assert!((0.0..=100.0).contains(&usage_percent));
     }
 }

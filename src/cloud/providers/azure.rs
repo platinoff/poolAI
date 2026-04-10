@@ -341,7 +341,7 @@ impl AzureManager {
 
         // Get full token response with expiration info
         let output = Command::new("az")
-            .args(&[
+            .args([
                 "account",
                 "get-access-token",
                 "-o",

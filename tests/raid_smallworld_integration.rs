@@ -61,14 +61,14 @@ async fn create_test_smallworld_strategy() -> (
     // Add some test nodes to topology
     {
         let manager = topology_manager.write().await;
-        (&*manager).test_add_node("1", "192.168.1.1:8080").await;
-        (&*manager).test_add_node("2", "192.168.1.2:8080").await;
-        (&*manager).test_add_node("3", "192.168.1.3:8080").await;
+        manager.test_add_node("1", "192.168.1.1:8080").await;
+        manager.test_add_node("2", "192.168.1.2:8080").await;
+        manager.test_add_node("3", "192.168.1.3:8080").await;
 
         // Add latency information
-        (&*manager).test_update_latency("1", "2", 10.0).await;
-        (&*manager).test_update_latency("2", "3", 15.0).await;
-        (&*manager).test_update_latency("1", "3", 20.0).await;
+        manager.test_update_latency("1", "2", 10.0).await;
+        manager.test_update_latency("2", "3", 15.0).await;
+        manager.test_update_latency("1", "3", 20.0).await;
     }
 
     let smallworld_config = SmallWorldConfig {
@@ -104,7 +104,7 @@ async fn test_clustering_coefficient_with_real_topology() {
     const EPS: f64 = 1e-9;
     if let Some(coeff_value) = coeff {
         assert!(
-            coeff_value >= -EPS && coeff_value <= 1.0 + EPS,
+            (-EPS..=1.0 + EPS).contains(&coeff_value),
             "Clustering coefficient should be in [0, 1], got {}",
             coeff_value
         );

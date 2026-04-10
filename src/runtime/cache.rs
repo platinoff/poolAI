@@ -229,6 +229,11 @@ impl CacheManager {
         cache.len()
     }
 
+    /// Returns true if the cache has no entries.
+    pub async fn is_empty(&self) -> bool {
+        self.len().await == 0
+    }
+
     /// Get the cache capacity (maximum number of entries)
     pub fn capacity(&self) -> usize {
         self.size_limit

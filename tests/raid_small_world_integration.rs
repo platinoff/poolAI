@@ -57,9 +57,7 @@ async fn create_test_strategy() -> SmallWorldStrategy {
 
 #[tokio::test]
 async fn test_small_world_strategy_creation() {
-    let strategy = create_test_strategy().await;
-    // Strategy should be created successfully
-    assert!(true); // Basic creation test
+    let _strategy = create_test_strategy().await;
 }
 
 #[tokio::test]
@@ -121,5 +119,4 @@ async fn test_small_world_strategy_shutdown() {
 
     // Shutdown should succeed
     strategy.shutdown().await;
-    assert!(true); // Shutdown test
 }

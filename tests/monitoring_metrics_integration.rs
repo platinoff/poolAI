@@ -111,7 +111,7 @@ async fn test_historical_metrics_time_filter() -> Result<(), Box<dyn std::error:
     let recent = collector
         .get_historical_metrics(Duration::from_secs(1))
         .await;
-    assert!(recent.len() >= 1);
+    assert!(!recent.is_empty());
 
     // Get metrics from a time window in the past (should be empty)
     let old = collector

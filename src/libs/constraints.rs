@@ -40,40 +40,40 @@ impl VersionConstraint {
     pub fn parse(constraint: &str) -> Result<Self, AppError> {
         let constraint = constraint.trim();
 
-        if constraint.starts_with(">=") {
+        if let Some(rest) = constraint.strip_prefix(">=") {
             Ok(Self {
                 operator: ConstraintOp::GreaterEqual,
-                version: constraint[2..].to_string(),
+                version: rest.to_string(),
             })
-        } else if constraint.starts_with("<=") {
+        } else if let Some(rest) = constraint.strip_prefix("<=") {
             Ok(Self {
                 operator: ConstraintOp::LessEqual,
-                version: constraint[2..].to_string(),
+                version: rest.to_string(),
             })
-        } else if constraint.starts_with("==") {
+        } else if let Some(rest) = constraint.strip_prefix("==") {
             Ok(Self {
                 operator: ConstraintOp::Exact,
-                version: constraint[2..].to_string(),
+                version: rest.to_string(),
             })
-        } else if constraint.starts_with("~") {
+        } else if let Some(rest) = constraint.strip_prefix('~') {
             Ok(Self {
                 operator: ConstraintOp::Compatible,
-                version: constraint[1..].to_string(),
+                version: rest.to_string(),
             })
-        } else if constraint.starts_with("^") {
+        } else if let Some(rest) = constraint.strip_prefix('^') {
             Ok(Self {
                 operator: ConstraintOp::Caret,
-                version: constraint[1..].to_string(),
+                version: rest.to_string(),
             })
-        } else if constraint.starts_with(">") {
+        } else if let Some(rest) = constraint.strip_prefix('>') {
             Ok(Self {
                 operator: ConstraintOp::Greater,
-                version: constraint[1..].to_string(),
+                version: rest.to_string(),
             })
-        } else if constraint.starts_with("<") {
+        } else if let Some(rest) = constraint.strip_prefix('<') {
             Ok(Self {
                 operator: ConstraintOp::Less,
-                version: constraint[1..].to_string(),
+                version: rest.to_string(),
             })
         } else {
             // Default to exact match

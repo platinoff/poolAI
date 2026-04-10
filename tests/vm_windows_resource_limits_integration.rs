@@ -9,7 +9,7 @@
 //! Note: These tests will only work on Windows systems.
 //! On other platforms, they will test the fallback behavior.
 
-use poolai::vm::{ResourceLimiter, ResourceLimits, ResourceUsage};
+use poolai::vm::{ResourceLimiter, ResourceLimits};
 use poolai::vm::{VmIsolation, VmManager, VmResources};
 use uuid::Uuid;
 
@@ -42,7 +42,7 @@ async fn test_register_process_pid_windows() {
     use poolai::vm::PlatformResourceLimiter;
     let limiter: Box<dyn ResourceLimiter> = Box::new(PlatformResourceLimiter::new());
     let _process_id = Uuid::new_v4();
-    let pid = 12345u32;
+    let _pid = 12345u32;
 
     // Test applying limits to a command
     let limits = ResourceLimits {

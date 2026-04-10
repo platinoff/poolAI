@@ -19,11 +19,9 @@ use poolai::network::security_headers::{security_headers_middleware, SecurityHea
 use tower::ServiceExt; // for `call`, `oneshot`, and `ready`
 
 async fn setup_app() -> Router {
-    let router = Router::new()
+    Router::new()
         .route("/test", get(|| async { "test response" }))
-        .layer(axum::middleware::from_fn(security_headers_middleware));
-
-    router
+        .layer(axum::middleware::from_fn(security_headers_middleware))
 }
 
 #[tokio::test]

@@ -14,8 +14,6 @@ use tower::ServiceExt;
 #[tokio::test]
 async fn test_api_routes_creation() {
     let _router = create_api_routes();
-    // Router is created successfully
-    assert!(true);
 }
 
 #[tokio::test]

@@ -4,14 +4,10 @@
 //! to verify authentication flows without requiring real credentials.
 
 #[cfg(feature = "cloud-sdk")]
-use super::mock_servers::{MockAzureServer, MockGcpServer};
+use super::mock_servers::MockGcpServer;
 
 #[cfg(feature = "cloud-sdk")]
 use poolai::cloud::providers::azure::AzureManager;
-#[cfg(feature = "cloud-sdk")]
-use poolai::cloud::providers::gcp::GcpManager;
-#[cfg(feature = "cloud-sdk")]
-use poolai::core::error::AppError;
 
 // Azure Token Acquisition Tests
 

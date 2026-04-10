@@ -1263,23 +1263,23 @@ impl KubernetesManager {
                 })
                 .unwrap_or(0);
 
-            return Ok(PodStatus {
+            Ok(PodStatus {
                 name,
                 phase,
                 ready,
                 restart_count,
-            });
+            })
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
             // Placeholder implementation (when cloud-sdk feature is not enabled)
-            return Ok(PodStatus {
+            Ok(PodStatus {
                 name: pod_name.to_string(),
                 phase: "Running".to_string(),
                 ready: true,
                 restart_count: 0,
-            });
+            })
         }
     }
 
@@ -1373,27 +1373,27 @@ impl KubernetesManager {
             // Deployment is ready if all replicas are available
             let ready = available_replicas == replicas && replicas > 0;
 
-            return Ok(DeploymentStatus {
+            Ok(DeploymentStatus {
                 name,
                 replicas,
                 ready_replicas,
                 available_replicas,
                 unavailable_replicas,
                 ready,
-            });
+            })
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
             // Placeholder implementation (when cloud-sdk feature is not enabled)
-            return Ok(DeploymentStatus {
+            Ok(DeploymentStatus {
                 name: deployment_name.to_string(),
                 replicas: 1,
                 ready_replicas: 1,
                 available_replicas: 1,
                 unavailable_replicas: 0,
                 ready: true,
-            });
+            })
         }
     }
 
@@ -1469,7 +1469,7 @@ impl KubernetesManager {
             let mut events: Vec<DeploymentEvent> = events_array
                 .iter()
                 .take(limit)
-                .filter_map(|event_json| {
+                .map(|event_json| {
                     let reason = event_json
                         .get("reason")
                         .and_then(|r| r.as_str())
@@ -1493,12 +1493,12 @@ impl KubernetesManager {
                         .and_then(|t| t.as_str())
                         .map(|s| s.to_string());
 
-                    Some(DeploymentEvent {
+                    DeploymentEvent {
                         reason,
                         message,
                         event_type,
                         first_timestamp,
-                    })
+                    }
                 })
                 .collect();
 
@@ -1510,13 +1510,13 @@ impl KubernetesManager {
                 events.len(),
                 deployment_name
             );
-            return Ok(events);
+            Ok(events)
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
             // Placeholder implementation (when cloud-sdk feature is not enabled)
-            return Ok(vec![]);
+            Ok(vec![])
         }
     }
 
@@ -1679,13 +1679,13 @@ impl KubernetesManager {
                 })
                 .collect();
 
-            return Ok(names);
+            Ok(names)
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
             // Placeholder implementation (when cloud-sdk feature is not enabled)
-            return Ok(vec![]);
+            Ok(vec![])
         }
     }
 
@@ -1770,13 +1770,13 @@ impl KubernetesManager {
                 names.len(),
                 deployment_name
             );
-            return Ok(names);
+            Ok(names)
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
             // Placeholder implementation (when cloud-sdk feature is not enabled)
-            return Ok(vec![]);
+            Ok(vec![])
         }
     }
 
@@ -1929,13 +1929,13 @@ impl KubernetesManager {
                 })
                 .collect();
 
-            return Ok(names);
+            Ok(names)
         }
 
         #[cfg(not(feature = "cloud-sdk"))]
         {
             // Placeholder implementation (when cloud-sdk feature is not enabled)
-            return Ok(vec![]);
+            Ok(vec![])
         }
     }
 

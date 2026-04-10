@@ -2,7 +2,6 @@
 //!
 //! Tests for worker pool functionality, worker management, and worker lifecycle.
 
-use chrono;
 use poolai::pool::worker::{Worker, WorkerConfig, WorkerStatus};
 
 #[test]
@@ -48,7 +47,7 @@ fn test_worker_status_debug() {
 
 #[test]
 fn test_worker_status_fields() {
-    let mut status = WorkerStatus {
+    let status = WorkerStatus {
         is_healthy: true,
         active_connections: 5,
         queue_size: 10,
@@ -89,9 +88,7 @@ fn test_worker_creation() {
         auto_restart: true,
         resource_monitoring: true,
     };
-    let worker = Worker::new(config);
-    // Worker is created successfully
-    assert!(true);
+    let _worker = Worker::new(config);
 }
 
 #[test]
@@ -109,9 +106,7 @@ fn test_worker_with_gpu() {
         auto_restart: true,
         resource_monitoring: true,
     };
-    let worker = Worker::new(config);
-    // Worker with GPU created successfully
-    assert!(true);
+    let _worker = Worker::new(config);
 }
 
 #[test]
@@ -129,7 +124,5 @@ fn test_worker_without_gpu() {
         auto_restart: true,
         resource_monitoring: true,
     };
-    let worker = Worker::new(config);
-    // Worker without GPU created successfully
-    assert!(true);
+    let _worker = Worker::new(config);
 }

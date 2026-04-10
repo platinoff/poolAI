@@ -5,11 +5,8 @@
 //! - Quota enforcement removes oldest artifacts when exceeded
 //! - Total size calculation
 
-use chrono::{Duration, Utc};
-use poolai::raid::{ArtifactRef, RaidConfig, RaidManager, RaidMode};
-use std::path::PathBuf;
+use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use tempfile::TempDir;
-use uuid::Uuid;
 
 #[tokio::test]
 async fn test_gc_removes_old_artifacts() {
@@ -58,18 +55,9 @@ async fn test_quota_enforcement() {
     manager.initialize().await.unwrap();
 
     // Add artifacts that exceed quota
-    manager
-        .put_artifact("artifact1", &vec![0u8; 50])
-        .await
-        .unwrap();
-    manager
-        .put_artifact("artifact2", &vec![0u8; 50])
-        .await
-        .unwrap();
-    manager
-        .put_artifact("artifact3", &vec![0u8; 50])
-        .await
-        .unwrap();
+    manager.put_artifact("artifact1", &[0u8; 50]).await.unwrap();
+    manager.put_artifact("artifact2", &[0u8; 50]).await.unwrap();
+    manager.put_artifact("artifact3", &[0u8; 50]).await.unwrap();
 
     // Total is 150 bytes, quota is 100 bytes
     let total_before = manager.get_total_size().await.unwrap();
@@ -99,9 +87,9 @@ async fn test_get_total_size() {
     manager.initialize().await.unwrap();
 
     // Add artifacts
-    manager.put_artifact("a1", &vec![0u8; 100]).await.unwrap();
-    manager.put_artifact("a2", &vec![0u8; 200]).await.unwrap();
-    manager.put_artifact("a3", &vec![0u8; 50]).await.unwrap();
+    manager.put_artifact("a1", &[0u8; 100]).await.unwrap();
+    manager.put_artifact("a2", &[0u8; 200]).await.unwrap();
+    manager.put_artifact("a3", &[0u8; 50]).await.unwrap();
 
     let total = manager.get_total_size().await.unwrap();
     assert_eq!(total, 350, "Total size should be sum of all artifacts");

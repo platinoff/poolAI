@@ -16,7 +16,7 @@ fn engine(ctx: &ApiContext) -> Arc<RewardSystem> {
     ctx.rewards_engine
         .get()
         .cloned()
-        .unwrap_or_else(|| shared_reward_engine())
+        .unwrap_or_else(shared_reward_engine)
 }
 
 pub struct RewardsService;

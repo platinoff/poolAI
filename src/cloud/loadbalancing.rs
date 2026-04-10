@@ -295,14 +295,14 @@ impl LoadBalancer {
                         }
                     } else {
                         health.consecutive_failures += 1;
-                        if health.consecutive_failures >= health_config.failure_threshold {
-                            if health.healthy {
-                                health.healthy = false;
-                                warn!(
-                                    "Backend {} marked as unhealthy after {} consecutive failures",
-                                    backend.id, health.consecutive_failures
-                                );
-                            }
+                        if health.consecutive_failures >= health_config.failure_threshold
+                            && health.healthy
+                        {
+                            health.healthy = false;
+                            warn!(
+                                "Backend {} marked as unhealthy after {} consecutive failures",
+                                backend.id, health.consecutive_failures
+                            );
                         }
                     }
 
@@ -386,15 +386,13 @@ impl LoadBalancer {
                     .build();
 
                 if let Ok(client) = client {
-                    if let Ok(result) = timeout(
+                    if let Ok(Ok(response)) = timeout(
                         Duration::from_secs(config.timeout_secs),
                         client.get(&url).send(),
                     )
                     .await
                     {
-                        if let Ok(response) = result {
-                            return response.status().is_success();
-                        }
+                        return response.status().is_success();
                     }
                 }
             }

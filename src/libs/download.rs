@@ -100,7 +100,7 @@ pub async fn download_library(
 
         // Update progress
         downloaded += chunk.len() as u64;
-        if content_length > 0 && downloaded % (content_length / 10).max(1) == 0 {
+        if content_length > 0 && downloaded.is_multiple_of((content_length / 10).max(1)) {
             let progress = (downloaded * 100) / content_length;
             info!("Download progress: {}%", progress);
         }

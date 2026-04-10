@@ -6,14 +6,12 @@
 //! - Metrics collection
 //! - Replication factor changes based on burst state
 
-use poolai::core::error::AppError;
 use poolai::raid::burst_raid::{BurstRaidConfig, BurstRaidStrategy};
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
 use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;
 use tokio::time::{sleep, Duration};
-use uuid::Uuid;
 
 /// Helper function to create a test BurstRAID strategy
 async fn create_test_burst_strategy() -> (BurstRaidStrategy, Arc<RwLock<RaidManager>>) {
@@ -116,7 +114,7 @@ async fn test_burst_cooldown() {
 
     // After cooldown, burst should end
     // Note: This test may be flaky due to timing, but tests the cooldown logic
-    let replication_factor = strategy.get_replication_factor(artifact_id).await;
+    let _replication_factor = strategy.get_replication_factor(artifact_id).await;
     // Replication factor should return to base after cooldown
     // (may still be in burst if accessed recently)
 }

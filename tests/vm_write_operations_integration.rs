@@ -33,7 +33,7 @@ async fn test_create_vm_instance() {
     assert_eq!(instance.name, "test-vm-create");
     assert_eq!(instance.resources.cpu_cores, 2);
     assert_eq!(instance.resources.memory_mb, 1024);
-    assert_eq!(instance.resources.gpu_required, false);
+    assert!(!instance.resources.gpu_required);
     assert!(matches!(
         instance.status,
         VmStatus::Creating | VmStatus::Stopped
@@ -81,7 +81,7 @@ async fn test_update_vm_instance() {
     assert_eq!(updated.name, "test-vm-updated");
     assert_eq!(updated.resources.cpu_cores, 4);
     assert_eq!(updated.resources.memory_mb, 2048);
-    assert_eq!(updated.resources.gpu_required, true);
+    assert!(updated.resources.gpu_required);
 }
 
 #[tokio::test]

@@ -69,16 +69,12 @@ async fn test_filesystem_isolation_config_custom() {
 
 #[tokio::test]
 async fn test_platform_network_isolator_creation() {
-    let isolator = PlatformNetworkIsolator::new();
-    // Should not panic
-    assert!(true);
+    let _isolator = PlatformNetworkIsolator::new();
 }
 
 #[tokio::test]
 async fn test_platform_filesystem_isolator_creation() {
-    let isolator = PlatformFilesystemIsolator::new();
-    // Should not panic
-    assert!(true);
+    let _isolator = PlatformFilesystemIsolator::new();
 }
 
 #[tokio::test]

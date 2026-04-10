@@ -40,9 +40,9 @@ async fn test_library_install_stores_artifact_in_raid() {
     // Override base_path for test
     // Note: LibraryManager doesn't expose base_path setter, so we'll test via actual install
 
-    // This test would require actual library download, which is complex
-    // For now, we'll test the artifact storage logic separately
-    assert!(true); // Placeholder - full test requires mock registry
+    // Full install path needs a mock registry; here we assert RAID + dirs exist.
+    assert!(libs_dir.exists());
+    assert!(raid_dir.exists());
 }
 
 #[tokio::test]

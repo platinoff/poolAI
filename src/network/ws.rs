@@ -235,11 +235,5 @@ fn extract_token_from_request(req: &Request<axum::body::Body>) -> Option<String>
     req.headers()
         .get("Sec-WebSocket-Protocol")
         .and_then(|h| h.to_str().ok())
-        .and_then(|protocol| {
-            if protocol.starts_with("token.") {
-                Some(protocol[6..].to_string())
-            } else {
-                None
-            }
-        })
+        .and_then(|protocol| protocol.strip_prefix("token.").map(|s| s.to_string()))
 }

@@ -3,7 +3,7 @@
 //! Tests the context memory monitoring functionality including
 //! file tracking, metrics collection, and optimization suggestions.
 
-use poolai::monitoring::context_memory::{ChangeType, ContextMemoryMonitor, ContextMetrics};
+use poolai::monitoring::context_memory::{ChangeType, ContextMemoryMonitor};
 use std::time::Duration;
 use tokio::time::sleep;
 
@@ -196,7 +196,7 @@ async fn test_get_changes_in_window() {
         .get_changes_in_window(Duration::from_millis(1))
         .await;
     // Should have at least the most recent change
-    assert!(changes.len() >= 1);
+    assert!(!changes.is_empty());
 }
 
 #[tokio::test]

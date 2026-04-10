@@ -211,7 +211,7 @@ mod tests {
     #[test]
     fn http_status_io_is_internal() {
         use std::io;
-        let e = AppError::from(io::Error::new(io::ErrorKind::Other, "x"));
+        let e = AppError::from(io::Error::other("x"));
         assert_eq!(
             http_status_for_app_error(&e),
             StatusCode::INTERNAL_SERVER_ERROR

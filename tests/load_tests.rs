@@ -8,17 +8,9 @@
 //! - Stress testing with many artifacts
 //! - Concurrent read operations
 
-use chrono::Utc;
 use poolai::raid::{
-    events::{EventStore, RaidEvent},
-    protocol::ArtifactMetadata,
-    replication::{
-        ConflictResolutionStrategy, ReadConsistencyLevel, ReplicationConfig, ReplicationEngine,
-    },
-    RaidConfig, RaidManager, RaidMode,
+    events::EventStore, replication::ReplicationEngine, RaidConfig, RaidManager, RaidMode,
 };
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;

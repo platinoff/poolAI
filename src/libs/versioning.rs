@@ -8,7 +8,7 @@
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tracing::info;
 
 /// Version Manager - Manages library versions
@@ -38,7 +38,7 @@ impl VersionManager {
         &mut self,
         name: &str,
         version: &str,
-        path: &PathBuf,
+        path: &Path,
     ) -> Result<(), AppError> {
         let versions = self.versions.entry(name.to_string()).or_default();
 
@@ -58,7 +58,7 @@ impl VersionManager {
         // Add new version as active
         versions.push(VersionInfo {
             version: version.to_string(),
-            path: path.clone(),
+            path: path.to_path_buf(),
             installed_at: chrono::Utc::now(),
             is_active: true,
         });

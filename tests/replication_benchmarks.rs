@@ -7,13 +7,9 @@
 //! - Metadata operations performance
 //! - Conflict resolution performance
 
-use chrono::Utc;
 use poolai::raid::{
-    events::{EventStore, RaidEvent},
-    protocol::ArtifactMetadata,
-    replication::{
-        ConflictResolutionStrategy, ReadConsistencyLevel, ReplicationConfig, ReplicationEngine,
-    },
+    events::EventStore,
+    replication::{ConflictResolutionStrategy, ReadConsistencyLevel, ReplicationEngine},
     RaidConfig, RaidManager, RaidMode,
 };
 use std::sync::Arc;

@@ -548,7 +548,7 @@ impl PoolAIOperator {
                                 }
 
                                 // Detect deleted resources
-                                for (name, _) in &last_resources {
+                                for name in last_resources.keys() {
                                     if !current_resources.contains_key(name) {
                                         // Resource deleted
                                         let _ = event_tx.send(CrdEvent {
@@ -564,7 +564,7 @@ impl PoolAIOperator {
                             } else {
                                 // No items in response (empty list)
                                 // Check for deleted resources
-                                for (name, _) in &last_resources {
+                                for name in last_resources.keys() {
                                     let _ = event_tx.send(CrdEvent {
                                         event_type: CrdEventType::Deleted,
                                         resource_type: resource_type.clone(),

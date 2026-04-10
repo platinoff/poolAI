@@ -7,8 +7,6 @@
 //! - Process status tracking
 
 use poolai::vm::{VmIsolation, VmManager, VmResources};
-use std::path::PathBuf;
-use tempfile::TempDir;
 
 #[tokio::test]
 async fn test_vm_create_instance_with_command() {
@@ -19,7 +17,7 @@ async fn test_vm_create_instance_with_command() {
 
     // Use platform-specific command
     #[cfg(target_os = "windows")]
-    let (cmd, args) = (
+    let (_cmd, _args) = (
         "cmd",
         vec![
             "/C".to_string(),
@@ -29,7 +27,7 @@ async fn test_vm_create_instance_with_command() {
         ],
     );
     #[cfg(not(target_os = "windows"))]
-    let (cmd, args) = ("echo", vec!["Hello".to_string(), "World".to_string()]);
+    let (_cmd, _args) = ("echo", vec!["Hello".to_string(), "World".to_string()]);
 
     let instance = manager
         .create_instance(
@@ -52,12 +50,12 @@ async fn test_vm_start_stop_instance() {
 
     // Use platform-specific command
     #[cfg(target_os = "windows")]
-    let (cmd, args) = (
+    let (_cmd, _args) = (
         "cmd",
         vec!["/C".to_string(), "echo".to_string(), "test".to_string()],
     );
     #[cfg(not(target_os = "windows"))]
-    let (cmd, args) = ("echo", vec!["test".to_string()]);
+    let (_cmd, _args) = ("echo", vec!["test".to_string()]);
 
     let instance = manager
         .create_instance(
@@ -121,7 +119,7 @@ async fn test_vm_get_instance_logs() {
 
     // Use a command that produces output
     #[cfg(target_os = "windows")]
-    let (cmd, args) = (
+    let (_cmd, _args) = (
         "cmd",
         vec![
             "/C".to_string(),
@@ -130,7 +128,7 @@ async fn test_vm_get_instance_logs() {
         ],
     );
     #[cfg(not(target_os = "windows"))]
-    let (cmd, args) = ("echo", vec!["test output".to_string()]);
+    let (_cmd, _args) = ("echo", vec!["test output".to_string()]);
 
     let instance = manager
         .create_instance(

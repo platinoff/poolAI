@@ -454,8 +454,8 @@ impl AutoScaler {
 
                     // Calculate average CPU and memory usage across all pods
                     if pod_count > 0 {
-                        total_cpu_usage = total_cpu_usage / pod_count as f64;
-                        total_memory_usage = total_memory_usage / pod_count as f64;
+                        total_cpu_usage /= pod_count as f64;
+                        total_memory_usage /= pod_count as f64;
                     }
                 }
 

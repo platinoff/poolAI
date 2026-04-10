@@ -70,7 +70,7 @@ async fn test_websocket_manager_connection_management() {
 
     // Test connection management (these are async operations that require actual WebSocket connections)
     // For now, we just verify the manager can be created and methods exist
-    let connection_id = "test_connection".to_string();
+    let _connection_id = "test_connection".to_string();
 
     // These would require actual WebSocket connections to test fully
     // manager.add_connection(...).await;

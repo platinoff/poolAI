@@ -425,11 +425,9 @@ impl RaidService {
         ctx: &ApiContext,
         address: String,
     ) -> Result<Vec<RaidNode>, RaidServiceError> {
-        match Self::register_worker(ctx, address).await {
-            Err(RaidServiceError::ManagerUnavailable) => {
-                return Err(RaidServiceError::ManagerUnavailable);
-            }
-            _ => {}
+        if let Err(RaidServiceError::ManagerUnavailable) = Self::register_worker(ctx, address).await
+        {
+            return Err(RaidServiceError::ManagerUnavailable);
         }
         Self::list_workers(ctx).await
     }
@@ -624,9 +622,7 @@ impl RaidService {
 
         let status = if !strategy_initialized && mode != RaidMode::Local {
             "unhealthy"
-        } else if !storage_available {
-            "degraded"
-        } else if !replication_active && mode != RaidMode::Local {
+        } else if !storage_available || (!replication_active && mode != RaidMode::Local) {
             "degraded"
         } else {
             "healthy"

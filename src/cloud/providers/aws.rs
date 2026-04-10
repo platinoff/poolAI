@@ -367,7 +367,7 @@ impl AwsManager {
                 )
             })?;
 
-            let query_params = vec![
+            let query_params = [
                 ("Action", "RunInstances"),
                 ("Version", "2016-11-15"),
                 ("InstanceType", instance_type),
@@ -412,10 +412,10 @@ impl AwsManager {
                     if let Some(end) = response_text[start..].find("</instanceId>") {
                         response_text[start..start + end].to_string()
                     } else {
-                        format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string())
+                        format!("i-{}", &uuid::Uuid::new_v4().to_string()[..8])
                     }
                 } else {
-                    format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string())
+                    format!("i-{}", &uuid::Uuid::new_v4().to_string()[..8])
                 };
                 info!("EC2 instance created (mock): {}", instance_id);
                 return Ok(instance_id);
@@ -552,12 +552,12 @@ impl AwsManager {
                 } else {
                     // Fallback: generate instance ID if parsing fails
                     warn!("Failed to parse instance ID from EC2 response, using generated ID");
-                    format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string())
+                    format!("i-{}", &uuid::Uuid::new_v4().to_string()[..8])
                 }
             } else {
                 // Fallback: generate instance ID if response format is unexpected
                 warn!("EC2 response format unexpected, using generated ID");
-                format!("i-{}", uuid::Uuid::new_v4().to_string()[..8].to_string())
+                format!("i-{}", &uuid::Uuid::new_v4().to_string()[..8])
             };
 
             info!("EC2 instance created successfully: {}", instance_id);
@@ -572,10 +572,7 @@ impl AwsManager {
                 image_id,
                 self.region.as_deref().unwrap_or("default")
             );
-            Ok(format!(
-                "i-{}",
-                uuid::Uuid::new_v4().to_string()[..8].to_string()
-            ))
+            Ok(format!("i-{}", &uuid::Uuid::new_v4().to_string()[..8]))
         }
     }
 

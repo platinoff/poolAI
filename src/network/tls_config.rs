@@ -4,6 +4,8 @@
 //! Prepared for TLS 2.0 when it becomes available.
 
 use crate::core::error::AppError;
+use std::fmt;
+use std::str::FromStr;
 
 /// TLS version enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -14,9 +16,10 @@ pub enum TlsVersion {
     Tls2_0,
 }
 
-impl TlsVersion {
-    /// Parse TLS version from string
-    pub fn from_str(s: &str) -> Result<Self, AppError> {
+impl FromStr for TlsVersion {
+    type Err = AppError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "1.3" => Ok(TlsVersion::Tls1_3),
             "2.0" => Ok(TlsVersion::Tls2_0),
@@ -26,12 +29,13 @@ impl TlsVersion {
             ))),
         }
     }
+}
 
-    /// Convert to string representation
-    pub fn to_string(&self) -> String {
+impl fmt::Display for TlsVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            TlsVersion::Tls1_3 => "1.3".to_string(),
-            TlsVersion::Tls2_0 => "2.0".to_string(),
+            TlsVersion::Tls1_3 => f.write_str("1.3"),
+            TlsVersion::Tls2_0 => f.write_str("2.0"),
         }
     }
 }

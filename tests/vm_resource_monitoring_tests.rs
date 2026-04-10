@@ -6,10 +6,7 @@
 //! - Resource alert thresholds
 //! - History limits (FIFO)
 
-use poolai::vm::{
-    ResourceAlertThresholds, ResourceUsage, ResourceUsageHistoryEntry, VmIsolation, VmManager,
-    VmResources,
-};
+use poolai::vm::{ResourceAlertThresholds, ResourceUsage, VmIsolation, VmManager, VmResources};
 
 #[tokio::test]
 async fn test_record_resource_usage() {

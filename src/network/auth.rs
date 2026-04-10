@@ -413,13 +413,7 @@ pub async fn auth_middleware(
         .headers()
         .get(AUTHORIZATION)
         .and_then(|auth| auth.to_str().ok())
-        .and_then(|auth_str| {
-            if auth_str.starts_with("Bearer ") {
-                Some(auth_str[7..].to_string())
-            } else {
-                None
-            }
-        });
+        .and_then(|auth_str| auth_str.strip_prefix("Bearer ").map(|s| s.to_string()));
 
     let token = auth_header.ok_or_else(|| {
         api_json_error(

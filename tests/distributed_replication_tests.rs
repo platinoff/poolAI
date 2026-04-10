@@ -11,15 +11,13 @@
 use chrono::Utc;
 use poolai::core::error::AppError;
 use poolai::raid::{
-    client::ProtocolClient,
-    events::{EventStore, RaidEvent},
+    events::EventStore,
     protocol::ArtifactMetadata,
     replication::{
         ConflictResolutionStrategy, ReadConsistencyLevel, ReplicationConfig, ReplicationEngine,
     },
     RaidConfig, RaidManager, RaidMode,
 };
-use std::collections::HashMap;
 use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;
@@ -46,7 +44,7 @@ fn create_test_event_store(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<Event
 async fn create_replication_engine(
     raid_manager: Arc<RwLock<RaidManager>>,
     event_store: Option<Arc<RwLock<EventStore>>>,
-    config: Option<ReplicationConfig>,
+    _config: Option<ReplicationConfig>,
 ) -> ReplicationEngine {
     ReplicationEngine::with_defaults(raid_manager, event_store)
 }
@@ -74,7 +72,7 @@ async fn test_multi_node_synchronous_replication() {
     event_store3.write().await.initialize().await.unwrap();
 
     // Create replication engine on node 1
-    let mut engine1 =
+    let engine1 =
         create_replication_engine(raid_manager1.clone(), Some(event_store1.clone()), None).await;
 
     // Register nodes
@@ -91,7 +89,7 @@ async fn test_multi_node_synchronous_replication() {
     // Create test artifact
     let artifact_id = "test-artifact-multi-node".to_string();
     let artifact_data = b"test data for multi-node replication".to_vec();
-    let metadata = ArtifactMetadata {
+    let _metadata = ArtifactMetadata {
         name: "test-artifact".to_string(),
         version: "1.0.0".to_string(),
         size_bytes: artifact_data.len() as u64,
@@ -126,7 +124,7 @@ async fn test_quorum_based_replication() {
     let event_store = create_test_event_store(&temp_dir, 1);
     event_store.write().await.initialize().await.unwrap();
 
-    let mut engine = create_replication_engine(raid_manager, Some(event_store), None).await;
+    let engine = create_replication_engine(raid_manager, Some(event_store), None).await;
 
     // Register 5 nodes
     for i in 1..=5 {
@@ -299,7 +297,7 @@ async fn test_read_consistency_levels() {
     let event_store = create_test_event_store(&temp_dir, 1);
     event_store.write().await.initialize().await.unwrap();
 
-    let engine = create_replication_engine(raid_manager, Some(event_store), None).await;
+    let _engine = create_replication_engine(raid_manager, Some(event_store), None).await;
 
     // Test consistency level enum
     let eventual = ReadConsistencyLevel::Eventual;

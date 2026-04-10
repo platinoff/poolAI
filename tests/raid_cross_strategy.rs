@@ -7,10 +7,7 @@
 
 use poolai::pool::topology::initialize_global_topology_manager;
 use poolai::raid::{RaidConfig, RaidManager, RaidMode};
-use std::sync::Arc;
 use tempfile::TempDir;
-use tokio::sync::RwLock;
-use tokio::time::{sleep, Duration};
 
 #[tokio::test]
 async fn test_strategy_switching() {
@@ -65,11 +62,11 @@ async fn test_strategy_switching() {
     let artifacts_burst = manager_burst.list_artifacts().await;
 
     assert!(
-        artifacts_local.len() >= 1,
+        !artifacts_local.is_empty(),
         "Local manager should have artifacts"
     );
     assert!(
-        artifacts_burst.len() >= 1,
+        !artifacts_burst.is_empty(),
         "BurstRaid manager should have artifacts"
     );
 }

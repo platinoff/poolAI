@@ -645,6 +645,7 @@ impl RaidDistributedProtocolService {
 /// - **Pull** — IDs present locally but absent on the peer (peer should pull from this node).
 /// - **Push** — IDs the peer has that we lack (this node should receive them).
 /// - **Bidirectional** — symmetric difference.
+///
 /// If `remote_ids` is `None`, returns `(local.len(), [])` (no peer catalog to diff).
 fn diff_sync_catalog(
     direction: SyncDirection,
@@ -667,63 +668,6 @@ fn diff_sync_catalog(
     };
     missing.sort();
     (synced, missing)
-}
-
-#[cfg(test)]
-mod sync_catalog_tests {
-    use super::diff_sync_catalog;
-    use crate::raid::protocol::SyncDirection;
-    use crate::raid::ArtifactRef;
-    use chrono::Utc;
-    use std::path::PathBuf;
-    use uuid::Uuid;
-
-    fn artifact(id: &str) -> ArtifactRef {
-        ArtifactRef {
-            id: Uuid::parse_str(id).unwrap(),
-            name: "n".into(),
-            stored_at: Utc::now(),
-            path: PathBuf::from("/tmp/x"),
-        }
-    }
-
-    #[test]
-    fn pull_reports_local_only_ids_as_missing() {
-        let local = vec![
-            artifact("00000000-0000-0000-0000-000000000001"),
-            artifact("00000000-0000-0000-0000-000000000002"),
-        ];
-        let remote = vec!["00000000-0000-0000-0000-000000000001".to_string()];
-        let (synced, missing) = diff_sync_catalog(SyncDirection::Pull, &local, Some(&remote));
-        assert_eq!(synced, 1);
-        assert_eq!(
-            missing,
-            vec!["00000000-0000-0000-0000-000000000002".to_string()]
-        );
-    }
-
-    #[test]
-    fn push_reports_remote_only_ids_as_missing() {
-        let local = vec![artifact("00000000-0000-0000-0000-000000000001")];
-        let remote = vec![
-            "00000000-0000-0000-0000-000000000001".to_string(),
-            "00000000-0000-0000-0000-000000000003".to_string(),
-        ];
-        let (synced, missing) = diff_sync_catalog(SyncDirection::Push, &local, Some(&remote));
-        assert_eq!(synced, 1);
-        assert_eq!(
-            missing,
-            vec!["00000000-0000-0000-0000-000000000003".to_string()]
-        );
-    }
-
-    #[test]
-    fn no_remote_catalog_keeps_missing_empty() {
-        let local = vec![artifact("00000000-0000-0000-0000-00000000000a")];
-        let (synced, missing) = diff_sync_catalog(SyncDirection::Bidirectional, &local, None);
-        assert_eq!(synced, 1);
-        assert!(missing.is_empty());
-    }
 }
 
 fn create_success_response<T: serde::Serialize>(
@@ -781,4 +725,61 @@ fn base64_decode(data: &str) -> Result<Vec<u8>, AppError> {
             Error details: {}, Data length: {}",
             e, e, data.len()
         )))
+}
+
+#[cfg(test)]
+mod sync_catalog_tests {
+    use super::diff_sync_catalog;
+    use crate::raid::protocol::SyncDirection;
+    use crate::raid::ArtifactRef;
+    use chrono::Utc;
+    use std::path::PathBuf;
+    use uuid::Uuid;
+
+    fn artifact(id: &str) -> ArtifactRef {
+        ArtifactRef {
+            id: Uuid::parse_str(id).unwrap(),
+            name: "n".into(),
+            stored_at: Utc::now(),
+            path: PathBuf::from("/tmp/x"),
+        }
+    }
+
+    #[test]
+    fn pull_reports_local_only_ids_as_missing() {
+        let local = vec![
+            artifact("00000000-0000-0000-0000-000000000001"),
+            artifact("00000000-0000-0000-0000-000000000002"),
+        ];
+        let remote = vec!["00000000-0000-0000-0000-000000000001".to_string()];
+        let (synced, missing) = diff_sync_catalog(SyncDirection::Pull, &local, Some(&remote));
+        assert_eq!(synced, 1);
+        assert_eq!(
+            missing,
+            vec!["00000000-0000-0000-0000-000000000002".to_string()]
+        );
+    }
+
+    #[test]
+    fn push_reports_remote_only_ids_as_missing() {
+        let local = vec![artifact("00000000-0000-0000-0000-000000000001")];
+        let remote = vec![
+            "00000000-0000-0000-0000-000000000001".to_string(),
+            "00000000-0000-0000-0000-000000000003".to_string(),
+        ];
+        let (synced, missing) = diff_sync_catalog(SyncDirection::Push, &local, Some(&remote));
+        assert_eq!(synced, 1);
+        assert_eq!(
+            missing,
+            vec!["00000000-0000-0000-0000-000000000003".to_string()]
+        );
+    }
+
+    #[test]
+    fn no_remote_catalog_keeps_missing_empty() {
+        let local = vec![artifact("00000000-0000-0000-0000-00000000000a")];
+        let (synced, missing) = diff_sync_catalog(SyncDirection::Bidirectional, &local, None);
+        assert_eq!(synced, 1);
+        assert!(missing.is_empty());
+    }
 }

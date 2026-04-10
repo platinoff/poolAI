@@ -233,7 +233,7 @@ impl RewardSystem {
             id: uuid::Uuid::new_v4().to_string(),
             user_id: user_id.clone(),
             reward_type: reward_type.clone(),
-            level: level,
+            level,
             amount,
             description,
             timestamp: Utc::now(),

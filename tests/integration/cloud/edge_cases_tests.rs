@@ -321,7 +321,7 @@ async fn test_concurrent_initialization() {
         .iter()
         .filter(|r| r.is_ok() && r.as_ref().unwrap().is_ok())
         .count();
-    let fail_count = results.len() - success_count;
+    let _fail_count = results.len() - success_count;
 
     // Either all succeed or all fail (no partial state)
     assert!(

@@ -18,15 +18,6 @@ use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;
 
-// Simple checksum calculation
-fn calculate_checksum(data: &[u8]) -> String {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-    let mut hasher = DefaultHasher::new();
-    data.hash(&mut hasher);
-    format!("sha256-{:x}", hasher.finish())
-}
-
 /// Calculate factorial (N!)
 fn factorial(n: u32) -> u32 {
     match n {
@@ -40,15 +31,14 @@ struct GridNode {
     node_id: u64,
     port: u16,
     raid_manager: Arc<RwLock<RaidManager>>,
-    event_store: Arc<RwLock<EventStore>>,
     replication_engine: ReplicationEngine,
 }
 
 /// Grid network test harness
 struct GridNetwork {
     nodes: Vec<GridNode>,
-    base_port: u16,
-    temp_dir: TempDir,
+    _base_port: u16,
+    _temp_dir: TempDir,
 }
 
 impl GridNetwork {
@@ -83,14 +73,13 @@ impl GridNetwork {
             event_store.write().await.initialize().await?;
 
             // Create replication engine
-            let mut replication_engine =
-                ReplicationEngine::with_defaults(raid_manager.clone(), Some(event_store.clone()));
+            let replication_engine =
+                ReplicationEngine::with_defaults(raid_manager.clone(), Some(event_store));
 
             nodes.push(GridNode {
                 node_id,
                 port,
                 raid_manager,
-                event_store,
                 replication_engine,
             });
         }
@@ -110,8 +99,8 @@ impl GridNetwork {
 
         Ok(Self {
             nodes,
-            base_port,
-            temp_dir,
+            _base_port: base_port,
+            _temp_dir: temp_dir,
         })
     }
 
@@ -149,40 +138,6 @@ impl GridNetwork {
         // In a real distributed system, replication would happen via network calls
 
         Ok(artifact.id.to_string())
-    }
-
-    /// Verify artifact exists on all nodes
-    async fn verify_artifact_replication(&self, artifact_id: &str) -> Result<bool, AppError> {
-        let mut all_present = true;
-
-        for node in &self.nodes {
-            // Find artifact by ID in list
-            let artifacts = node.raid_manager.read().await.list_artifacts().await;
-            let artifact_found = artifacts.iter().any(|a| a.id.to_string() == artifact_id);
-
-            if !artifact_found {
-                all_present = false;
-                break;
-            }
-
-            // Try to read artifact data
-            if let Some(artifact) = artifacts.iter().find(|a| a.id.to_string() == artifact_id) {
-                let path = artifact.path.clone();
-                let result = node.raid_manager.read().await.get_artifact(&path).await;
-
-                match result {
-                    Ok(_) => {
-                        // Artifact exists and is readable on this node
-                    }
-                    Err(_) => {
-                        all_present = false;
-                        break;
-                    }
-                }
-            }
-        }
-
-        Ok(all_present)
     }
 
     /// Get grid statistics
@@ -266,6 +221,7 @@ async fn test_grid_network_medium_scale() {
     let stats = grid.get_statistics().await;
     assert_eq!(stats.node_count, 10);
     assert!(stats.total_artifacts >= 5);
+    assert!(stats.total_size_bytes > 0);
 }
 
 #[tokio::test]
@@ -334,6 +290,7 @@ async fn test_grid_network_maximum_scale() {
     let stats = grid.get_statistics().await;
     assert_eq!(stats.node_count, 120);
     assert!(stats.total_artifacts >= 1);
+    assert!(stats.total_size_bytes > 0);
 }
 
 #[tokio::test]
@@ -370,6 +327,7 @@ async fn test_grid_network_concurrent_operations() {
     // Verify statistics
     let stats = grid.get_statistics().await;
     assert!(stats.total_artifacts >= 5);
+    assert!(stats.total_size_bytes > 0);
 }
 
 #[tokio::test]
@@ -437,5 +395,6 @@ async fn test_grid_network_factorial_scaling() {
         // Verify statistics
         let stats = grid.get_statistics().await;
         assert_eq!(stats.node_count, fact as usize);
+        assert!(stats.total_size_bytes > 0);
     }
 }

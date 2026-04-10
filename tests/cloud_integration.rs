@@ -7,10 +7,10 @@ use poolai::cloud::{CloudConfig, CloudManager};
 #[cfg(feature = "cloud")]
 use poolai::core::error::AppError;
 
-// Timeout constants for different test scenarios
-const INIT_TIMEOUT_SECS: u64 = 5; // For initialization (may try real HTTP)
-const MOCK_TIMEOUT_SECS: u64 = 2; // For mock server tests (should be fast)
-const OPERATION_TIMEOUT_SECS: u64 = 3; // For cloud operations
+#[cfg(feature = "cloud")]
+const INIT_TIMEOUT_SECS: u64 = 5;
+#[cfg(feature = "cloud")]
+const OPERATION_TIMEOUT_SECS: u64 = 3;
 
 #[cfg(feature = "cloud")]
 #[tokio::test]

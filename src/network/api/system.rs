@@ -27,33 +27,6 @@ use crate::network::auth::{
 use crate::network::ws::websocket_handler;
 use crate::services::system_service::{HealthResponse, MetricsResponse, ModelInfo, SystemService};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use axum::body::Body;
-    use axum::http::{Request as HttpRequest, StatusCode};
-    use tower::ServiceExt;
-
-    #[tokio::test]
-    async fn status_handler_works_with_api_context() {
-        let app_state = ApiContext::default();
-
-        let app = create_system_routes().with_state(app_state);
-
-        let response = app
-            .oneshot(
-                HttpRequest::builder()
-                    .uri("/status")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
-            .await
-            .expect("request should succeed");
-
-        assert_eq!(response.status(), StatusCode::OK);
-    }
-}
-
 /// Create system routes
 pub fn create_system_routes() -> Router<ApiContext> {
     Router::new()
@@ -184,5 +157,32 @@ async fn config_update_handler(
             );
             (s, j).into_response()
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::body::Body;
+    use axum::http::{Request as HttpRequest, StatusCode};
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn status_handler_works_with_api_context() {
+        let app_state = ApiContext::default();
+
+        let app = create_system_routes().with_state(app_state);
+
+        let response = app
+            .oneshot(
+                HttpRequest::builder()
+                    .uri("/status")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .expect("request should succeed");
+
+        assert_eq!(response.status(), StatusCode::OK);
     }
 }

@@ -40,6 +40,8 @@ use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 use uuid::Uuid;
 
+type ArtifactRequestCounters = HashMap<Uuid, (u64, DateTime<Utc>)>;
+
 /// Configuration for BurstRAID strategy
 #[derive(Debug, Clone)]
 pub struct BurstRaidConfig {
@@ -120,7 +122,7 @@ struct BurstRaidStrategyForTask {
     config: BurstRaidConfig,
     replication_engine: Arc<ReplicationEngine>,
     burst_states: Arc<RwLock<HashMap<Uuid, BurstState>>>,
-    request_counters: Arc<RwLock<HashMap<Uuid, (u64, DateTime<Utc>)>>>,
+    request_counters: Arc<RwLock<ArtifactRequestCounters>>,
 }
 
 impl BurstRaidStrategyForTask {
@@ -343,7 +345,7 @@ pub struct BurstRaidStrategy {
     /// Burst state per artifact
     burst_states: Arc<RwLock<HashMap<Uuid, BurstState>>>,
     /// Request counters for burst detection
-    request_counters: Arc<RwLock<HashMap<Uuid, (u64, DateTime<Utc>)>>>,
+    request_counters: Arc<RwLock<ArtifactRequestCounters>>,
     /// Background rebalancing task handle
     rebalancing_handle: Arc<RwLock<Option<tokio::task::JoinHandle<()>>>>,
     /// Background cleanup task handle

@@ -16,9 +16,11 @@ async fn test_cloud_config_default_valid() {
 #[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_cloud_config_kubernetes_empty_namespace() {
-    let mut config = CloudConfig::default();
-    config.kubernetes_enabled = true;
-    config.kubernetes_namespace = String::new();
+    let config = CloudConfig {
+        kubernetes_enabled: true,
+        kubernetes_namespace: String::new(),
+        ..Default::default()
+    };
 
     let result = config.validate();
     assert!(result.is_err());
@@ -30,9 +32,11 @@ async fn test_cloud_config_kubernetes_empty_namespace() {
 #[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_cloud_config_kubernetes_valid() {
-    let mut config = CloudConfig::default();
-    config.kubernetes_enabled = true;
-    config.kubernetes_namespace = "poolai".to_string();
+    let config = CloudConfig {
+        kubernetes_enabled: true,
+        kubernetes_namespace: "poolai".to_string(),
+        ..Default::default()
+    };
 
     assert!(config.validate().is_ok());
 }
@@ -40,9 +44,11 @@ async fn test_cloud_config_kubernetes_valid() {
 #[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_cloud_config_aws_no_region() {
-    let mut config = CloudConfig::default();
-    config.aws_enabled = true;
-    config.aws_region = None;
+    let config = CloudConfig {
+        aws_enabled: true,
+        aws_region: None,
+        ..Default::default()
+    };
 
     // Clear environment variable for test
     std::env::remove_var("AWS_REGION");
@@ -57,9 +63,11 @@ async fn test_cloud_config_aws_no_region() {
 #[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_cloud_config_aws_with_region() {
-    let mut config = CloudConfig::default();
-    config.aws_enabled = true;
-    config.aws_region = Some("us-east-1".to_string());
+    let config = CloudConfig {
+        aws_enabled: true,
+        aws_region: Some("us-east-1".to_string()),
+        ..Default::default()
+    };
 
     assert!(config.validate().is_ok());
 }
@@ -67,9 +75,11 @@ async fn test_cloud_config_aws_with_region() {
 #[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_cloud_config_azure_no_subscription() {
-    let mut config = CloudConfig::default();
-    config.azure_enabled = true;
-    config.azure_subscription_id = None;
+    let config = CloudConfig {
+        azure_enabled: true,
+        azure_subscription_id: None,
+        ..Default::default()
+    };
 
     // Clear environment variable for test
     std::env::remove_var("AZURE_SUBSCRIPTION_ID");
@@ -84,9 +94,11 @@ async fn test_cloud_config_azure_no_subscription() {
 #[cfg(feature = "cloud")]
 #[tokio::test]
 async fn test_cloud_config_gcp_no_project() {
-    let mut config = CloudConfig::default();
-    config.gcp_enabled = true;
-    config.gcp_project_id = None;
+    let config = CloudConfig {
+        gcp_enabled: true,
+        gcp_project_id: None,
+        ..Default::default()
+    };
 
     // Clear environment variable for test
     std::env::remove_var("GCP_PROJECT_ID");
@@ -103,9 +115,11 @@ async fn test_cloud_config_gcp_no_project() {
 async fn test_cloud_manager_initialization_validates_config() {
     use poolai::cloud::CloudManager;
 
-    let mut config = CloudConfig::default();
-    config.kubernetes_enabled = true;
-    config.kubernetes_namespace = String::new(); // Invalid
+    let config = CloudConfig {
+        kubernetes_enabled: true,
+        kubernetes_namespace: String::new(), // Invalid
+        ..Default::default()
+    };
 
     let manager = CloudManager::new(config);
     let result = manager.initialize().await;

@@ -8,20 +8,13 @@
 //! - Circuit breaker integration with failures
 //! - Quorum availability during failures
 
-use chrono::Utc;
 use poolai::core::error::AppError;
 use poolai::raid::{
     circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitState},
-    client::ProtocolClient,
-    events::{EventStore, RaidEvent},
-    protocol::ArtifactMetadata,
-    replication::{
-        ConflictResolutionStrategy, ReadConsistencyLevel, ReplicationConfig, ReplicationEngine,
-        ReplicationStatus,
-    },
+    events::EventStore,
+    replication::{ReadConsistencyLevel, ReplicationConfig, ReplicationEngine, ReplicationStatus},
     RaidConfig, RaidManager, RaidMode,
 };
-use std::collections::HashMap;
 use std::sync::Arc;
 use tempfile::TempDir;
 use tokio::sync::RwLock;
@@ -48,7 +41,7 @@ fn create_test_event_store(temp_dir: &TempDir, node_id: u64) -> Arc<RwLock<Event
 async fn create_replication_engine(
     raid_manager: Arc<RwLock<RaidManager>>,
     event_store: Option<Arc<RwLock<EventStore>>>,
-    config: Option<ReplicationConfig>,
+    _config: Option<ReplicationConfig>,
 ) -> ReplicationEngine {
     ReplicationEngine::with_defaults(raid_manager, event_store)
 }
@@ -323,7 +316,7 @@ async fn test_read_consistency_with_failures() {
     let event_store = create_test_event_store(&temp_dir, 1);
     event_store.write().await.initialize().await.unwrap();
 
-    let engine = create_replication_engine(raid_manager, Some(event_store), None).await;
+    let _engine = create_replication_engine(raid_manager, Some(event_store), None).await;
 
     // Test that different consistency levels handle failures differently
     let eventual = ReadConsistencyLevel::Eventual;
@@ -394,7 +387,7 @@ async fn test_network_partition_scenario() {
     // Partition 2 (nodes 4,5) has 2 nodes >= quorum 2, but this is a split-brain scenario
 
     // Test that we can still select nodes from partition 1
-    let partition1_nodes = vec![1, 2, 3];
+    let partition1_nodes = [1, 2, 3];
     let selected = engine
         .select_replication_nodes(3, Some(vec![4, 5])) // Exclude partitioned nodes
         .await

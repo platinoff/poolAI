@@ -9,7 +9,6 @@
 
 use poolai::runtime::health::HealthStatus;
 use poolai::vm::{VmIsolation, VmManager, VmResources};
-use tokio::time::{sleep, Duration};
 
 #[tokio::test]
 async fn test_health_check_registration_on_start() {
@@ -74,7 +73,7 @@ async fn test_health_check_unregistration_on_stop() {
 
     // Health check should still exist but instance is stopped
     // (HealthMonitor keeps the entry, but instance status is Stopped)
-    let health_stopped = manager.get_instance_health(instance.id).await.unwrap();
+    let _health_stopped = manager.get_instance_health(instance.id).await.unwrap();
     // Note: HealthMonitor may keep the entry, so we check instance status instead
     let instance_after = manager.get_instance(instance.id).await;
     assert!(instance_after.is_some());

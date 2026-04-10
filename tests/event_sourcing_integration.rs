@@ -56,7 +56,7 @@ async fn test_event_append_and_load() {
 
     let record = event_store.append_event(event).await.unwrap();
     assert_eq!(record.sequence, 1);
-    assert!(record.event_id.to_string().len() > 0);
+    assert!(!record.event_id.to_string().is_empty());
 
     // Load events
     let events = event_store.load_events().await.unwrap();

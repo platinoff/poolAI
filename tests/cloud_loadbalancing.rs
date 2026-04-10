@@ -259,7 +259,7 @@ async fn test_add_and_get_routing_rules() -> Result<(), AppError> {
     .await;
     lb.initialize().await?;
     let rules = lb.get_routing_rules().await;
-    assert!(rules.len() >= 1);
+    assert!(!rules.is_empty());
     let api = rules.iter().find(|r| r.path_prefix == "/api").unwrap();
     assert_eq!(api.host.as_deref(), Some("api.example.com"));
     assert_eq!(api.priority, 1);

@@ -3,6 +3,8 @@
 //! Provides mock servers for AWS, Azure, and GCP APIs to enable testing
 //! without requiring real cloud credentials or making actual API calls.
 
+#![allow(dead_code)] // Helpers reserved for expanded cloud integration tests
+
 #[cfg(feature = "cloud-sdk")]
 use mockito::{Mock, Server, ServerGuard};
 

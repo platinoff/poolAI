@@ -34,8 +34,10 @@ async fn test_circuit_breaker_closed_to_open() {
 
 #[tokio::test]
 async fn test_circuit_breaker_open_to_half_open() {
-    let mut config = CircuitBreakerConfig::default();
-    config.timeout_seconds = 1; // Short timeout for testing
+    let config = CircuitBreakerConfig {
+        timeout_seconds: 1, // Short timeout for testing
+        ..Default::default()
+    };
     let breaker = CircuitBreaker::new(1, config.clone());
 
     // Open the circuit
@@ -55,9 +57,11 @@ async fn test_circuit_breaker_open_to_half_open() {
 
 #[tokio::test]
 async fn test_circuit_breaker_half_open_to_closed() {
-    let mut config = CircuitBreakerConfig::default();
-    config.timeout_seconds = 1;
-    config.success_threshold = 2;
+    let config = CircuitBreakerConfig {
+        timeout_seconds: 1,
+        success_threshold: 2,
+        ..Default::default()
+    };
     let breaker = CircuitBreaker::new(1, config.clone());
 
     // Open the circuit
@@ -83,8 +87,10 @@ async fn test_circuit_breaker_half_open_to_closed() {
 
 #[tokio::test]
 async fn test_circuit_breaker_half_open_to_open() {
-    let mut config = CircuitBreakerConfig::default();
-    config.timeout_seconds = 1;
+    let config = CircuitBreakerConfig {
+        timeout_seconds: 1,
+        ..Default::default()
+    };
     let breaker = CircuitBreaker::new(1, config.clone());
 
     // Open the circuit

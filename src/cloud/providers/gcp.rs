@@ -355,6 +355,7 @@ impl GcpManager {
     /// 2. Create JWT assertion with claims (iss, sub, aud, exp, iat)
     /// 3. Sign JWT with RSA private key from service account
     /// 4. Exchange JWT for access token via Google OAuth2 token endpoint
+    ///
     /// Returns tuple of (token, expires_in_seconds)
     async fn get_token_from_service_account(
         &self,
@@ -365,6 +366,7 @@ impl GcpManager {
 
         // Step 1: Parse service account JSON key file
         #[derive(Deserialize)]
+        #[allow(dead_code)] // JSON fields not all used after parse
         struct ServiceAccountKey {
             #[serde(rename = "type")]
             key_type: String,

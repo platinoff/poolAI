@@ -112,6 +112,6 @@ async fn test_raid_admin_get_node_clustering_coefficient() {
     let coefficient = admin.get_node_clustering_coefficient(node_id).await;
     // Coefficient may be None if node doesn't exist, or between 0.0 and 1.0 if it does
     if let Some(coefficient) = coefficient {
-        assert!(coefficient >= 0.0 && coefficient <= 1.0);
+        assert!((0.0..=1.0).contains(&coefficient));
     }
 }

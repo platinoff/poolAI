@@ -182,22 +182,17 @@ pub async fn check_libtorch_compatibility(
 }
 
 /// Auto-update policy
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum AutoUpdatePolicy {
     /// Never auto-update (manual updates only)
     Never,
     /// Auto-update on startup
     OnStartup,
     /// Auto-update on compatibility mismatch
+    #[default]
     OnMismatch,
     /// Auto-update on startup and on mismatch
     OnStartupAndMismatch,
-}
-
-impl Default for AutoUpdatePolicy {
-    fn default() -> Self {
-        Self::OnMismatch
-    }
 }
 
 /// Auto-update libraries if needed based on policy

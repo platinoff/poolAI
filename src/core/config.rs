@@ -576,10 +576,9 @@ mod tests {
         // Reset CONFIG to None for testing
         // Note: OnceLock doesn't support reset, so this test may fail if
         // config was already initialized in a previous test
-        let result = get_config();
         // This might fail if config was already set, which is OK
-        if result.is_err() {
-            assert!(result.unwrap_err().to_string().contains("not initialized"));
+        if let Err(e) = get_config() {
+            assert!(e.to_string().contains("not initialized"));
         }
     }
 
