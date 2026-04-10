@@ -8,16 +8,14 @@
 
 use axum::{
     extract::{Path, State},
-    http::StatusCode,
-    response::IntoResponse,
     routing::get,
     Json, Router,
 };
 
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
-use crate::rewards::Reward;
+use crate::network::api::common::HttpAppError;
+use crate::rewards::{Reward, UserProgress};
 use crate::services::rewards_service::{RewardsService, TOP_USERS_DEFAULT_LIMIT};
 use std::collections::HashMap;
 
@@ -47,18 +45,14 @@ async fn user_rewards_handler(
 async fn user_progress_handler(
     State(ctx): State<ApiContext>,
     Path(user_id): Path<String>,
-) -> impl IntoResponse {
+) -> Result<Json<UserProgress>, HttpAppError> {
     match RewardsService::user_progress(&ctx, &user_id).await {
-        Some(progress) => Json(progress).into_response(),
-        None => {
-            let (s, j) = api_json_error(
-                "NOT_FOUND",
-                "User not found",
-                Some(ErrorContext::new("user_progress").with_resource("user_id", &user_id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, Json(j.0)).into_response()
-        }
+        Some(progress) => Ok(Json(progress)),
+        None => Err(
+            HttpAppError::new(AppError::ApiNotFound("User not found".to_string())).with_context(
+                ErrorContext::new("user_progress").with_resource("user_id", &user_id),
+            ),
+        ),
     }
 }
 

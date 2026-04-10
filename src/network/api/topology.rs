@@ -7,17 +7,15 @@
 
 use axum::{
     extract::{Path, State},
-    http::StatusCode,
-    response::IntoResponse,
     routing::get,
     Json, Router,
 };
 use serde::Serialize;
 use std::collections::HashMap;
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
+use crate::network::api::common::HttpAppError;
 use crate::services::topology_service::{TopologyNotReady, TopologyService};
 
 /// Topology response
@@ -79,58 +77,49 @@ pub fn create_topology_routes() -> Router<ApiContext> {
 
 /// Handler for GET /api/v1/topology
 /// Returns overview of network topology
-async fn topology_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn topology_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<TopologyResponse>, HttpAppError> {
     match TopologyService::get_snapshot(&ctx).await {
         Ok(topology) => {
             let node_ids: Vec<String> = topology.node_resources.keys().cloned().collect();
-            let response = TopologyResponse {
+            Ok(Json(TopologyResponse {
                 node_count: topology.node_resources.len(),
                 latency_measurements: topology.latency_matrix.len(),
                 last_updated: topology.last_updated.to_rfc3339(),
                 node_ids,
-            };
-            (StatusCode::OK, Json(response)).into_response()
+            }))
         }
-        Err(TopologyNotReady) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Topology manager not initialized",
-                Some(ErrorContext::new("topology").with_resource("topology_manager", "default")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
+        Err(TopologyNotReady) => Err(HttpAppError::new(AppError::SubsystemUnavailable(
+            "Topology manager not initialized".to_string(),
+        ))
+        .with_context(ErrorContext::new("topology").with_resource("topology_manager", "default"))),
     }
 }
 
 /// Handler for GET /api/v1/topology/latency
 /// Returns latency matrix between all nodes
-async fn latency_matrix_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn latency_matrix_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<LatencyMatrixResponse>, HttpAppError> {
     match TopologyService::get_snapshot(&ctx).await {
-        Ok(topology) => {
-            let response = LatencyMatrixResponse {
-                latency_matrix: topology.latency_matrix.clone(),
-            };
-            (StatusCode::OK, Json(response)).into_response()
-        }
-        Err(TopologyNotReady) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Topology manager not initialized",
-                Some(
-                    ErrorContext::new("topology_latency")
-                        .with_resource("topology_manager", "default"),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
+        Ok(topology) => Ok(Json(LatencyMatrixResponse {
+            latency_matrix: topology.latency_matrix.clone(),
+        })),
+        Err(TopologyNotReady) => Err(HttpAppError::new(AppError::SubsystemUnavailable(
+            "Topology manager not initialized".to_string(),
+        ))
+        .with_context(
+            ErrorContext::new("topology_latency").with_resource("topology_manager", "default"),
+        )),
     }
 }
 
 /// Handler for GET /api/v1/topology/nodes
 /// Returns resource information for all nodes
-async fn all_nodes_resources_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn all_nodes_resources_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<Json<AllNodesResourcesResponse>, HttpAppError> {
     match TopologyService::get_snapshot(&ctx).await {
         Ok(topology) => {
             let mut nodes = HashMap::new();
@@ -149,21 +138,14 @@ async fn all_nodes_resources_handler(State(ctx): State<ApiContext>) -> impl Into
                     },
                 );
             }
-            let response = AllNodesResourcesResponse { nodes };
-            (StatusCode::OK, Json(response)).into_response()
+            Ok(Json(AllNodesResourcesResponse { nodes }))
         }
-        Err(TopologyNotReady) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Topology manager not initialized",
-                Some(
-                    ErrorContext::new("topology_nodes")
-                        .with_resource("topology_manager", "default"),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
+        Err(TopologyNotReady) => Err(HttpAppError::new(AppError::SubsystemUnavailable(
+            "Topology manager not initialized".to_string(),
+        ))
+        .with_context(
+            ErrorContext::new("topology_nodes").with_resource("topology_manager", "default"),
+        )),
     }
 }
 
@@ -172,41 +154,28 @@ async fn all_nodes_resources_handler(State(ctx): State<ApiContext>) -> impl Into
 async fn node_resources_handler(
     State(ctx): State<ApiContext>,
     Path(node_id): Path<String>,
-) -> impl IntoResponse {
+) -> Result<Json<NodeResourcesResponse>, HttpAppError> {
     match TopologyService::get_node_resources(&ctx, &node_id).await {
-        Ok(Some(resources)) => {
-            let response = NodeResourcesResponse {
-                node_id: resources.node_id.clone(),
-                available_gpu_memory_mb: resources.available_gpu_memory_mb,
-                total_gpu_memory_mb: resources.total_gpu_memory_mb,
-                available_cpu_cores: resources.available_cpu_cores,
-                total_cpu_cores: resources.total_cpu_cores,
-                available_memory_mb: resources.available_memory_mb,
-                total_memory_mb: resources.total_memory_mb,
-                current_load: resources.current_load,
-            };
-            (StatusCode::OK, Json(response)).into_response()
-        }
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "NOT_FOUND",
-                format!("Node '{}' not found", node_id),
-                Some(ErrorContext::new("node_resources").with_resource("node_id", &node_id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, Json(j.0)).into_response()
-        }
-        Err(TopologyNotReady) => {
-            let (s, j) = api_json_error(
-                "SUBSYSTEM_UNAVAILABLE",
-                "Topology manager not initialized",
-                Some(
-                    ErrorContext::new("node_resources")
-                        .with_resource("topology_manager", "default"),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, Json(j.0)).into_response()
-        }
+        Ok(Some(resources)) => Ok(Json(NodeResourcesResponse {
+            node_id: resources.node_id.clone(),
+            available_gpu_memory_mb: resources.available_gpu_memory_mb,
+            total_gpu_memory_mb: resources.total_gpu_memory_mb,
+            available_cpu_cores: resources.available_cpu_cores,
+            total_cpu_cores: resources.total_cpu_cores,
+            available_memory_mb: resources.available_memory_mb,
+            total_memory_mb: resources.total_memory_mb,
+            current_load: resources.current_load,
+        })),
+        Ok(None) => Err(HttpAppError::new(AppError::ApiNotFound(format!(
+            "Node '{}' not found",
+            node_id
+        )))
+        .with_context(ErrorContext::new("node_resources").with_resource("node_id", &node_id))),
+        Err(TopologyNotReady) => Err(HttpAppError::new(AppError::SubsystemUnavailable(
+            "Topology manager not initialized".to_string(),
+        ))
+        .with_context(
+            ErrorContext::new("node_resources").with_resource("topology_manager", "default"),
+        )),
     }
 }
