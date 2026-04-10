@@ -404,10 +404,22 @@ impl ProtocolClient {
         artifact_ids: Option<Vec<String>>,
         direction: SyncDirection,
     ) -> Result<SyncArtifactsResponse, AppError> {
+        self.sync_artifacts_with_versions(last_sync_timestamp, artifact_ids, None, direction)
+            .await
+    }
+
+    /// Synchronize artifacts and optionally include remote versions for conflict detection.
+    pub async fn sync_artifacts_with_versions(
+        &self,
+        last_sync_timestamp: Option<chrono::DateTime<chrono::Utc>>,
+        artifact_ids: Option<Vec<String>>,
+        remote_versions: Option<std::collections::HashMap<String, chrono::DateTime<chrono::Utc>>>,
+        direction: SyncDirection,
+    ) -> Result<SyncArtifactsResponse, AppError> {
         let payload = SyncArtifactsPayload {
             last_sync_timestamp,
             artifact_ids,
-            remote_versions: None,
+            remote_versions,
             direction,
         };
 

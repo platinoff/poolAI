@@ -190,6 +190,51 @@ async fn wire_sync_artifacts_reports_conflict_when_remote_version_differs() {
 }
 
 #[tokio::test]
+async fn wire_sync_artifacts_reports_remote_newer_conflict() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let art = RaidService::put_artifact(&ctx, "sync-conflict-b", b"x")
+        .await
+        .unwrap();
+    let local_id = art.id.to_string();
+
+    let mut remote_versions = HashMap::new();
+    remote_versions.insert(
+        local_id.clone(),
+        art.stored_at + chrono::Duration::seconds(5),
+    );
+    let payload = SyncArtifactsPayload {
+        last_sync_timestamp: None,
+        artifact_ids: Some(vec![local_id.clone()]),
+        remote_versions: Some(remote_versions),
+        direction: SyncDirection::Bidirectional,
+    };
+    let msg = ProtocolMessage::sync_artifacts("stand-sync-node".to_string(), payload).unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/artifacts/sync")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let inner: SyncArtifactsResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert_eq!(inner.synced_count, 1);
+    assert!(inner.missing_artifacts.is_empty());
+    assert_eq!(inner.conflicts.len(), 1);
+    assert_eq!(inner.conflicts[0].artifact_id, local_id);
+    assert_eq!(inner.conflicts[0].reason, "remote_newer_than_local");
+}
+
+#[tokio::test]
 async fn wire_leave_cluster_rejects_unknown_node_when_membership_non_empty() {
     let temp = TempDir::new().unwrap();
     let ctx = build_api_context(&temp).await;
