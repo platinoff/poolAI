@@ -3,7 +3,6 @@
 use crate::core::error::ErrorContext;
 use crate::core::oauth2_pending::{store_oauth2_pending, verify_oauth2_pending};
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
 use crate::services::enterprise_service::{
     EnterpriseOAuthStartError, EnterpriseSecurityError, EnterpriseService,
 };
@@ -12,7 +11,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Redirect};
 use axum::Json;
 
-use super::enterprise_err;
+use super::{enterprise_err, enterprise_json_err};
 pub(super) async fn oauth2_github_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     let state = uuid::Uuid::new_v4().to_string();
     store_oauth2_pending(&ctx.oauth2_pending_states, state.clone()).await;
@@ -67,34 +66,34 @@ pub(super) async fn oauth2_github_callback_handler(
     let error = params.get("error").cloned();
 
     if let Some(error) = error {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "OAUTH2_PROVIDER_ERROR",
             format!("OAuth2 error: {}", error),
-            Some(ErrorContext::new("oauth2_github_callback")),
+            ErrorContext::new("oauth2_github_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     if code.is_empty() {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "OAUTH2_MISSING_CODE",
             "Missing authorization code",
-            Some(ErrorContext::new("oauth2_github_callback")),
+            ErrorContext::new("oauth2_github_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     // Verify state parameter (CSRF protection)
     if state.is_empty() || !verify_oauth2_pending(&ctx.oauth2_pending_states, &state).await {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "OAUTH2_INVALID_STATE",
             "Invalid or expired state parameter. Please try again.",
-            Some(ErrorContext::new("oauth2_github_callback")),
+            ErrorContext::new("oauth2_github_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     let token_response = match EnterpriseService::exchange_oauth2_code(&ctx, "github", &code).await
@@ -263,23 +262,23 @@ pub(super) async fn oauth2_google_callback_handler(
     let error = params.get("error").cloned();
 
     if let Some(error) = error {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "OAUTH2_PROVIDER_ERROR",
             format!("OAuth2 error: {}", error),
-            Some(ErrorContext::new("oauth2_google_callback")),
+            ErrorContext::new("oauth2_google_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     if code.is_empty() {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "OAUTH2_MISSING_CODE",
             "Missing authorization code",
-            Some(ErrorContext::new("oauth2_google_callback")),
+            ErrorContext::new("oauth2_google_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     let token_response = match EnterpriseService::exchange_oauth2_code(&ctx, "google", &code).await
@@ -461,40 +460,39 @@ pub(super) async fn oauth2_telegram_callback_handler(
     let error = params.get("error").cloned();
 
     if let Some(error) = error {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "TELEGRAM_AUTH_ERROR",
             format!("Telegram authentication error: {}", error),
-            Some(ErrorContext::new("oauth2_telegram_callback")),
+            ErrorContext::new("oauth2_telegram_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     if auth_data.is_empty() || hash.is_empty() {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "TELEGRAM_MISSING_AUTH_DATA",
             "Missing authentication data from Telegram",
-            Some(ErrorContext::new("oauth2_telegram_callback")),
+            ErrorContext::new("oauth2_telegram_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     // Parse auth_data (it's typically URL-encoded JSON)
     // In a production environment, you should verify the hash using Telegram's bot token
-    let user_data: Result<serde_json::Value, _> = serde_json::from_str(&auth_data);
-
-    if let Err(_) = user_data {
-        let (s, j) = api_json_error(
-            "TELEGRAM_INVALID_AUTH_FORMAT",
-            "Invalid authentication data format from Telegram",
-            Some(ErrorContext::new("oauth2_telegram_callback")),
-            StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
-    }
-
-    let user_data = user_data.unwrap();
+    let user_data = match serde_json::from_str::<serde_json::Value>(&auth_data) {
+        Ok(v) => v,
+        Err(_) => {
+            return enterprise_json_err(
+                "TELEGRAM_INVALID_AUTH_FORMAT",
+                "Invalid authentication data format from Telegram",
+                ErrorContext::new("oauth2_telegram_callback"),
+                StatusCode::BAD_REQUEST,
+            )
+            .into_response();
+        }
+    };
     let telegram_id = user_data
         .get("id")
         .and_then(|v| v.as_u64())
@@ -511,13 +509,13 @@ pub(super) async fn oauth2_telegram_callback_handler(
         .map(|s| s.to_string());
 
     if telegram_id.is_empty() {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "TELEGRAM_MISSING_USER_ID",
             "Missing user ID in Telegram authentication data",
-            Some(ErrorContext::new("oauth2_telegram_callback")),
+            ErrorContext::new("oauth2_telegram_callback"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     // Get or create user in PoolAI

@@ -4,7 +4,6 @@ use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::enterprise;
 use crate::network::api::check_permission;
-use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
 use crate::services::enterprise_service::{
     DashboardCreateInput, EnterpriseMonitoringError, EnterpriseService, MetricHistoryQueryInput,
@@ -15,6 +14,8 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use serde::Deserialize;
 use uuid::Uuid;
+
+use super::enterprise_json_err;
 
 #[derive(Deserialize)]
 #[allow(dead_code)]
@@ -36,27 +37,20 @@ pub(super) async fn monitoring_alerts_handler(
 
     match EnterpriseService::list_monitoring_alerts(&ctx, q).await {
         Ok(alerts) => Json(alerts).into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(
-                    ErrorContext::new("monitoring_alerts")
-                        .with_hint("Check system startup sequence."),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_ALERTS_FAILED",
-                format!("Failed to retrieve alerts: {}", e),
-                Some(ErrorContext::new("monitoring_alerts")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_alerts").with_hint("Check system startup sequence."),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_ALERTS_FAILED",
+            format!("Failed to retrieve alerts: {}", e),
+            ErrorContext::new("monitoring_alerts"),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -76,13 +70,13 @@ pub(super) async fn monitoring_alert_acknowledge_handler(
     let alert_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            let (s, j) = api_json_error(
+            return enterprise_json_err(
                 "INVALID_UUID",
                 format!("Invalid UUID format for alert id: {}", id),
-                Some(ErrorContext::new("monitoring_alert_ack").with_resource("alert_id", &id)),
+                ErrorContext::new("monitoring_alert_ack").with_resource("alert_id", &id),
                 StatusCode::BAD_REQUEST,
-            );
-            return (s, j).into_response();
+            )
+            .into_response();
         }
     };
 
@@ -95,24 +89,20 @@ pub(super) async fn monitoring_alert_acknowledge_handler(
             })),
         )
             .into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(ErrorContext::new("monitoring_alert_ack")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_ALERT_ACK_FAILED",
-                format!("Failed to acknowledge alert: {}", e),
-                Some(ErrorContext::new("monitoring_alert_ack").with_resource("alert_id", &id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_alert_ack"),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_ALERT_ACK_FAILED",
+            format!("Failed to acknowledge alert: {}", e),
+            ErrorContext::new("monitoring_alert_ack").with_resource("alert_id", &id),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
     }
 }
 
@@ -128,24 +118,20 @@ pub(super) async fn monitoring_dashboards_handler(
 ) -> impl IntoResponse {
     match EnterpriseService::list_monitoring_dashboards(&ctx, params.tenant_id).await {
         Ok(dashboards) => Json(dashboards).into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(ErrorContext::new("monitoring_dashboards_list")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_DASHBOARDS_FAILED",
-                format!("Failed to retrieve dashboards: {}", e),
-                Some(ErrorContext::new("monitoring_dashboards_list")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_dashboards_list"),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_DASHBOARDS_FAILED",
+            format!("Failed to retrieve dashboards: {}", e),
+            ErrorContext::new("monitoring_dashboards_list"),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -190,24 +176,20 @@ pub(super) async fn monitoring_dashboard_create_handler(
             })),
         )
             .into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(ErrorContext::new("monitoring_dashboard_create")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_DASHBOARD_CREATE_FAILED",
-                format!("Failed to create dashboard: {}", e),
-                Some(ErrorContext::new("monitoring_dashboard_create")),
-                StatusCode::BAD_REQUEST,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_dashboard_create"),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_DASHBOARD_CREATE_FAILED",
+            format!("Failed to create dashboard: {}", e),
+            ErrorContext::new("monitoring_dashboard_create"),
+            StatusCode::BAD_REQUEST,
+        )
+        .into_response(),
     }
 }
 
@@ -235,24 +217,20 @@ pub(super) async fn monitoring_metrics_handler(
 
     match EnterpriseService::query_monitoring_metric_history(&ctx, q).await {
         Ok(metrics) => Json(metrics).into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(ErrorContext::new("monitoring_metrics")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_METRICS_FAILED",
-                format!("Failed to retrieve metrics: {}", e),
-                Some(ErrorContext::new("monitoring_metrics")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_metrics"),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_METRICS_FAILED",
+            format!("Failed to retrieve metrics: {}", e),
+            ErrorContext::new("monitoring_metrics"),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -261,24 +239,20 @@ pub(super) async fn monitoring_alert_rules_handler(
 ) -> impl IntoResponse {
     match EnterpriseService::list_monitoring_alert_rules(&ctx).await {
         Ok(rules) => Json(rules).into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(ErrorContext::new("monitoring_alert_rules_list")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_ALERT_RULES_FAILED",
-                format!("Failed to retrieve alert rules: {}", e),
-                Some(ErrorContext::new("monitoring_alert_rules_list")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_alert_rules_list"),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_ALERT_RULES_FAILED",
+            format!("Failed to retrieve alert rules: {}", e),
+            ErrorContext::new("monitoring_alert_rules_list"),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
@@ -306,23 +280,19 @@ pub(super) async fn monitoring_alert_rule_create_handler(
             })),
         )
             .into_response(),
-        Err(EnterpriseMonitoringError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_MANAGER_UNAVAILABLE",
-                format!("Monitoring manager not initialized: {}", e),
-                Some(ErrorContext::new("monitoring_alert_rule_create")),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseMonitoringError::Operation(e)) => {
-            let (s, j) = api_json_error(
-                "MONITORING_ALERT_RULE_CREATE_FAILED",
-                format!("Failed to create alert rule: {}", e),
-                Some(ErrorContext::new("monitoring_alert_rule_create")),
-                StatusCode::BAD_REQUEST,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseMonitoringError::Init(e)) => enterprise_json_err(
+            "MONITORING_MANAGER_UNAVAILABLE",
+            format!("Monitoring manager not initialized: {}", e),
+            ErrorContext::new("monitoring_alert_rule_create"),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseMonitoringError::Operation(e)) => enterprise_json_err(
+            "MONITORING_ALERT_RULE_CREATE_FAILED",
+            format!("Failed to create alert rule: {}", e),
+            ErrorContext::new("monitoring_alert_rule_create"),
+            StatusCode::BAD_REQUEST,
+        )
+        .into_response(),
     }
 }

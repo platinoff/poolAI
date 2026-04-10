@@ -9,13 +9,13 @@ mod saml;
 mod security;
 mod tenants;
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
+use crate::network::api::common::HttpAppError;
 use crate::network::auth::auth_middleware;
 use axum::http::StatusCode;
 use axum::routing::{delete, get, post, put};
-use axum::{middleware, Json, Router};
+use axum::{middleware, Router};
 
 use audit::*;
 use monitoring::*;
@@ -24,19 +24,34 @@ use saml::*;
 use security::*;
 use tenants::*;
 
-/// Shorthand for structured enterprise API errors (same shape as [`api_json_error`]).
+/// Shorthand for structured enterprise API errors (same JSON shape as legacy [`api_json_error`]).
 pub(super) fn enterprise_err(
-    code: impl AsRef<str>,
+    code: &'static str,
     message: impl Into<String>,
     operation: impl Into<String>,
     status: StatusCode,
-) -> (StatusCode, Json<serde_json::Value>) {
-    api_json_error(
+) -> HttpAppError {
+    HttpAppError::new(AppError::RestError {
         code,
-        message,
-        Some(ErrorContext::new(operation.into())),
-        status,
-    )
+        message: message.into(),
+    })
+    .with_context(ErrorContext::new(operation.into()))
+    .with_status(status)
+}
+
+/// Structured error with explicit [`ErrorContext`].
+pub(super) fn enterprise_json_err(
+    code: &'static str,
+    message: impl Into<String>,
+    ctx: ErrorContext,
+    status: StatusCode,
+) -> HttpAppError {
+    HttpAppError::new(AppError::RestError {
+        code,
+        message: message.into(),
+    })
+    .with_context(ctx)
+    .with_status(status)
 }
 
 /// Build the enterprise REST router (requires Cargo feature `enterprise`).

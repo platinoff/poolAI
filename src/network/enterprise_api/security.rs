@@ -4,7 +4,6 @@ use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
 use crate::enterprise;
 use crate::network::api::check_permission;
-use crate::network::api::common::api_json_error;
 use crate::network::auth::Claims;
 use crate::services::enterprise_service::{EnterpriseSecurityError, EnterpriseService};
 use axum::extract::{Extension, Json, Path, State};
@@ -12,7 +11,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use serde::Deserialize;
 
-use super::enterprise_err;
+use super::{enterprise_err, enterprise_json_err};
 
 #[derive(Deserialize)]
 pub(super) struct OAuth2ProviderRegisterRequest {
@@ -228,17 +227,13 @@ pub(super) async fn security_oauth2_provider_get_handler(
 ) -> impl IntoResponse {
     match EnterpriseService::get_oauth2_provider(&ctx, &name).await {
         Ok(Some(provider)) => Json(provider).into_response(),
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "OAUTH2_PROVIDER_NOT_FOUND",
-                format!("OAuth2 provider not found: {}", name),
-                Some(
-                    ErrorContext::new("security_oauth2_provider_get").with_resource("name", &name),
-                ),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Ok(None) => enterprise_json_err(
+            "OAUTH2_PROVIDER_NOT_FOUND",
+            format!("OAuth2 provider not found: {}", name),
+            ErrorContext::new("security_oauth2_provider_get").with_resource("name", &name),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(EnterpriseSecurityError::Init(e)) => enterprise_err(
             "SECURITY_MANAGER_UNAVAILABLE",
             format!("Security manager not initialized: {}", e),
@@ -343,15 +338,13 @@ pub(super) async fn security_saml_provider_get_handler(
 ) -> impl IntoResponse {
     match EnterpriseService::get_saml_provider(&ctx, &name).await {
         Ok(Some(provider)) => Json(provider).into_response(),
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "SAML_PROVIDER_NOT_FOUND",
-                format!("SAML provider not found: {}", name),
-                Some(ErrorContext::new("security_saml_provider_get").with_resource("name", &name)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Ok(None) => enterprise_json_err(
+            "SAML_PROVIDER_NOT_FOUND",
+            format!("SAML provider not found: {}", name),
+            ErrorContext::new("security_saml_provider_get").with_resource("name", &name),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(EnterpriseSecurityError::Init(e)) => enterprise_err(
             "SECURITY_MANAGER_UNAVAILABLE",
             format!("Security manager not initialized: {}", e),
@@ -455,15 +448,13 @@ pub(super) async fn security_policy_get_handler(
 ) -> impl IntoResponse {
     match EnterpriseService::get_security_policy(&ctx, &name).await {
         Ok(Some(policy)) => Json(policy).into_response(),
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "SECURITY_POLICY_NOT_FOUND",
-                format!("Security policy not found: {}", name),
-                Some(ErrorContext::new("security_policy_get").with_resource("name", &name)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, j).into_response()
-        }
+        Ok(None) => enterprise_json_err(
+            "SECURITY_POLICY_NOT_FOUND",
+            format!("Security policy not found: {}", name),
+            ErrorContext::new("security_policy_get").with_resource("name", &name),
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
         Err(EnterpriseSecurityError::Init(e)) => enterprise_err(
             "SECURITY_MANAGER_UNAVAILABLE",
             format!("Security manager not initialized: {}", e),
@@ -494,16 +485,16 @@ pub(super) async fn security_policy_update_handler(
 
     // Ensure policy name matches path
     if policy.name != name {
-        let (s, j) = api_json_error(
+        return enterprise_json_err(
             "POLICY_NAME_MISMATCH",
             format!(
                 "Policy name in body '{}' does not match path parameter '{}'",
                 policy.name, name
             ),
-            Some(ErrorContext::new("security_policy_update")),
+            ErrorContext::new("security_policy_update"),
             StatusCode::BAD_REQUEST,
-        );
-        return (s, j).into_response();
+        )
+        .into_response();
     }
 
     match EnterpriseService::update_security_policy(&ctx, policy).await {

@@ -2,7 +2,6 @@
 
 use crate::core::error::ErrorContext;
 use crate::core::state::ApiContext;
-use crate::network::api::common::api_json_error;
 use crate::services::enterprise_service::{
     AuditEventsQuery, EnterpriseAuditError, EnterpriseService,
 };
@@ -10,6 +9,8 @@ use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
+
+use super::enterprise_json_err;
 use serde::Deserialize;
 #[derive(Deserialize)]
 #[allow(dead_code)]
@@ -43,26 +44,20 @@ pub(super) async fn audit_events_query_handler(
 
     match EnterpriseService::query_audit_events(&ctx, q).await {
         Ok(events) => Json(events).into_response(),
-        Err(EnterpriseAuditError::Init(e)) => {
-            let (s, j) = api_json_error(
-                "AUDIT_LOGGER_UNAVAILABLE",
-                format!("Audit logger not initialized: {}", e),
-                Some(
-                    ErrorContext::new("audit_events_query")
-                        .with_hint("Check system startup sequence and audit logger wiring."),
-                ),
-                StatusCode::SERVICE_UNAVAILABLE,
-            );
-            (s, j).into_response()
-        }
-        Err(EnterpriseAuditError::Query(e)) => {
-            let (s, j) = api_json_error(
-                "AUDIT_QUERY_FAILED",
-                format!("Failed to query audit events: {}", e),
-                Some(ErrorContext::new("audit_events_query")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, j).into_response()
-        }
+        Err(EnterpriseAuditError::Init(e)) => enterprise_json_err(
+            "AUDIT_LOGGER_UNAVAILABLE",
+            format!("Audit logger not initialized: {}", e),
+            ErrorContext::new("audit_events_query")
+                .with_hint("Check system startup sequence and audit logger wiring."),
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
+        .into_response(),
+        Err(EnterpriseAuditError::Query(e)) => enterprise_json_err(
+            "AUDIT_QUERY_FAILED",
+            format!("Failed to query audit events: {}", e),
+            ErrorContext::new("audit_events_query"),
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
