@@ -15,9 +15,10 @@ use axum::{
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
-use crate::network::api::common::{api_json_error, check_permission};
+use crate::core::user_manager::UserInfo;
+use crate::network::api::common::{check_permission, HttpAppError};
 use crate::network::auth::{auth_middleware, Claims, UserRole};
 
 #[derive(Deserialize)]
@@ -54,34 +55,30 @@ pub fn create_users_routes() -> Router<ApiContext> {
         )
 }
 
-async fn users_list_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+async fn users_list_handler(
+    State(ctx): State<ApiContext>,
+) -> Result<AxumJson<Vec<UserInfo>>, HttpAppError> {
     let manager = ctx.user_manager.clone();
 
-    // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
-        let (s, j) = api_json_error(
-            "USER_MANAGER_UNAVAILABLE",
-            format!("User manager not initialized: {}", e),
-            Some(
-                ErrorContext::new("users_list")
-                    .with_hint("Check system startup sequence and user manager wiring."),
-            ),
-            StatusCode::SERVICE_UNAVAILABLE,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        return Err(HttpAppError::new(AppError::RestError {
+            code: "USER_MANAGER_UNAVAILABLE",
+            message: format!("User manager not initialized: {}", e),
+        })
+        .with_context(
+            ErrorContext::new("users_list")
+                .with_hint("Check system startup sequence and user manager wiring."),
+        )
+        .with_status(StatusCode::SERVICE_UNAVAILABLE));
     }
 
     match manager.list_users().await {
-        Ok(users) => AxumJson(users).into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "LIST_USERS_FAILED",
-                format!("Failed to list users: {}", e),
-                Some(ErrorContext::new("users_list")),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Ok(users) => Ok(AxumJson(users)),
+        Err(e) => Err(HttpAppError::new(AppError::RestError {
+            code: "LIST_USERS_FAILED",
+            message: format!("Failed to list users: {}", e),
+        })
+        .with_context(ErrorContext::new("users_list"))),
     }
 }
 
@@ -99,16 +96,16 @@ async fn user_create_handler(
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
-        let (s, j) = api_json_error(
-            "USER_MANAGER_UNAVAILABLE",
-            format!("User manager not initialized: {}", e),
-            Some(
-                ErrorContext::new("user_create")
-                    .with_hint("Check system startup sequence and user manager wiring."),
-            ),
-            StatusCode::SERVICE_UNAVAILABLE,
-        );
-        return (s, AxumJson(j.0)).into_response();
+        return HttpAppError::new(AppError::RestError {
+            code: "USER_MANAGER_UNAVAILABLE",
+            message: format!("User manager not initialized: {}", e),
+        })
+        .with_context(
+            ErrorContext::new("user_create")
+                .with_hint("Check system startup sequence and user manager wiring."),
+        )
+        .with_status(StatusCode::SERVICE_UNAVAILABLE)
+        .into_response();
     }
 
     match manager
@@ -116,18 +113,16 @@ async fn user_create_handler(
         .await
     {
         Ok(user) => AxumJson(user).into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "CREATE_USER_FAILED",
-                format!("Failed to create user: {}", e),
-                Some(
-                    ErrorContext::new("user_create")
-                        .with_hint("Verify username uniqueness and request parameters."),
-                ),
-                StatusCode::BAD_REQUEST,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(e) => HttpAppError::new(AppError::RestError {
+            code: "CREATE_USER_FAILED",
+            message: format!("Failed to create user: {}", e),
+        })
+        .with_context(
+            ErrorContext::new("user_create")
+                .with_hint("Verify username uniqueness and request parameters."),
+        )
+        .with_status(StatusCode::BAD_REQUEST)
+        .into_response(),
     }
 }
 
@@ -139,36 +134,31 @@ async fn user_get_handler(
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            let (s, j) = api_json_error(
-                "INVALID_UUID",
-                format!("Invalid UUID format for user id: {}", id),
-                Some(ErrorContext::new("user_get").with_resource("user_id", &id)),
-                StatusCode::BAD_REQUEST,
-            );
-            return (s, AxumJson(j.0)).into_response();
+            return HttpAppError::new(AppError::RestError {
+                code: "INVALID_UUID",
+                message: format!("Invalid UUID format for user id: {}", id),
+            })
+            .with_context(ErrorContext::new("user_get").with_resource("user_id", &id))
+            .with_status(StatusCode::BAD_REQUEST)
+            .into_response();
         }
     };
 
     match manager.get_user(user_id).await {
         Ok(Some(user)) => AxumJson(user).into_response(),
-        Ok(None) => {
-            let (s, j) = api_json_error(
-                "USER_NOT_FOUND",
-                format!("User not found: {}", id),
-                Some(ErrorContext::new("user_get").with_resource("user_id", &id)),
-                StatusCode::NOT_FOUND,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "GET_USER_FAILED",
-                format!("Failed to retrieve user: {}", e),
-                Some(ErrorContext::new("user_get").with_resource("user_id", &id)),
-                StatusCode::INTERNAL_SERVER_ERROR,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Ok(None) => HttpAppError::new(AppError::RestError {
+            code: "USER_NOT_FOUND",
+            message: format!("User not found: {}", id),
+        })
+        .with_context(ErrorContext::new("user_get").with_resource("user_id", &id))
+        .with_status(StatusCode::NOT_FOUND)
+        .into_response(),
+        Err(e) => HttpAppError::new(AppError::RestError {
+            code: "GET_USER_FAILED",
+            message: format!("Failed to retrieve user: {}", e),
+        })
+        .with_context(ErrorContext::new("user_get").with_resource("user_id", &id))
+        .into_response(),
     }
 }
 
@@ -187,13 +177,13 @@ async fn user_update_handler(
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            let (s, j) = api_json_error(
-                "INVALID_UUID",
-                format!("Invalid UUID format for user id: {}", id),
-                Some(ErrorContext::new("user_update").with_resource("user_id", &id)),
-                StatusCode::BAD_REQUEST,
-            );
-            return (s, AxumJson(j.0)).into_response();
+            return HttpAppError::new(AppError::RestError {
+                code: "INVALID_UUID",
+                message: format!("Invalid UUID format for user id: {}", id),
+            })
+            .with_context(ErrorContext::new("user_update").with_resource("user_id", &id))
+            .with_status(StatusCode::BAD_REQUEST)
+            .into_response();
         }
     };
 
@@ -202,19 +192,17 @@ async fn user_update_handler(
         .await
     {
         Ok(user) => AxumJson(user).into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "UPDATE_USER_FAILED",
-                format!("Failed to update user: {}", e),
-                Some(
-                    ErrorContext::new("user_update")
-                        .with_resource("user_id", &id)
-                        .with_hint("Verify user ID and update parameters."),
-                ),
-                StatusCode::BAD_REQUEST,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(e) => HttpAppError::new(AppError::RestError {
+            code: "UPDATE_USER_FAILED",
+            message: format!("Failed to update user: {}", e),
+        })
+        .with_context(
+            ErrorContext::new("user_update")
+                .with_resource("user_id", &id)
+                .with_hint("Verify user ID and update parameters."),
+        )
+        .with_status(StatusCode::BAD_REQUEST)
+        .into_response(),
     }
 }
 
@@ -232,13 +220,13 @@ async fn user_delete_handler(
     let user_id = match Uuid::parse_str(&id) {
         Ok(u) => u,
         Err(_) => {
-            let (s, j) = api_json_error(
-                "INVALID_UUID",
-                format!("Invalid UUID format for user id: {}", id),
-                Some(ErrorContext::new("user_delete").with_resource("user_id", &id)),
-                StatusCode::BAD_REQUEST,
-            );
-            return (s, AxumJson(j.0)).into_response();
+            return HttpAppError::new(AppError::RestError {
+                code: "INVALID_UUID",
+                message: format!("Invalid UUID format for user id: {}", id),
+            })
+            .with_context(ErrorContext::new("user_delete").with_resource("user_id", &id))
+            .with_status(StatusCode::BAD_REQUEST)
+            .into_response();
         }
     };
 
@@ -250,18 +238,16 @@ async fn user_delete_handler(
             })),
         )
             .into_response(),
-        Err(e) => {
-            let (s, j) = api_json_error(
-                "DELETE_USER_FAILED",
-                format!("Failed to delete user: {}", e),
-                Some(
-                    ErrorContext::new("user_delete")
-                        .with_resource("user_id", &id)
-                        .with_hint("Verify user ID and ensure the user exists."),
-                ),
-                StatusCode::BAD_REQUEST,
-            );
-            (s, AxumJson(j.0)).into_response()
-        }
+        Err(e) => HttpAppError::new(AppError::RestError {
+            code: "DELETE_USER_FAILED",
+            message: format!("Failed to delete user: {}", e),
+        })
+        .with_context(
+            ErrorContext::new("user_delete")
+                .with_resource("user_id", &id)
+                .with_hint("Verify user ID and ensure the user exists."),
+        )
+        .with_status(StatusCode::BAD_REQUEST)
+        .into_response(),
     }
 }
