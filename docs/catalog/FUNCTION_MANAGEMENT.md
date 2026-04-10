@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-10 (FM-005 ✅: узгоджений JSON-помилок на **`HttpAppError`/`RestError`** — `api/*`, `raid*`, **`enterprise_api`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**)  
+**Оновлено:** 2026-04-10 (FM-005 ✅: узгоджений JSON-помилок на **`HttpAppError`/`RestError`** — `api/*`, `raid*`, **`enterprise_api`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**; додано FM-012: UX-апгрейд UI/Admin + Telegram login)
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -99,6 +99,7 @@ FM-xxx (з таблиці нижче)
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
 | FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); `cargo test -j1 --all-features --no-run` і `cargo test --all-features --lib --tests -j 1` — перевірено (2026-04-10); `cargo test --all-features` впирається у `doctest` на Windows через paging file (`os error 1455`) | Partial | `Cargo.toml`, NEXT_STEPS, `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
+| FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: єдина UX-система (навігація, стани, дії, i18n UA/EN), плюс авторизація через Telegram (JWT/RBAC-сумісно, audit, policy/allowlist, fallback на класичний login) | Planned | `src/ui/*`, `src/network/api/ui.rs`, `src/ui/admin/*`, `src/network/auth.rs`, `src/tgbot/mod.rs`, `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -113,8 +114,9 @@ FM-xxx (з таблиці нижче)
 | 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
 | 2 | Distributed RAID | **FM-007**, **FM-008** | Код: каталог sync + leave з replication/membership; далі — LAN, conflicts у протоколі, поглиблена реплікація. |
 | 3 | Ops | **FM-011** | Тримати збірку `--all-features` стабільною (профіль тестів, `-j 1`, incremental, GNU за потреби); на Windows фіксувати сигнал як `--lib --tests` (doctest може падати через paging file, `os error 1455`). |
-| 4 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
-| 5 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
+| 4 | Product UX | **FM-012** | Єдиний UX-план для `/ui` + `/ui/admin/*`: IA, швидкі дії, уніфіковані стани/помилки, i18n UA/EN; Telegram login у чинний JWT/RBAC (MVP → hardening). |
+| 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
+| 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 
 **Канонічний порядок читання доків** (кроки 1–12) — кореневий [`README.md`](../../README.md); цей файл — **крок 12**.
 

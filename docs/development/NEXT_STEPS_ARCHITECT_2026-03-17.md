@@ -41,8 +41,9 @@
 1. **FM-003** + **P4** + **P2b** — baseline на реф-хості (Criterion, **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md)); на LAN-стенді — повні заміри реплікації артефактів і порівняння обсягу до/після TQ01 (єдиний відкритий чекбокс P2b у секції TurboQuant нижче).
 2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** з replication; далі — LAN, **`conflicts`** у payload (remote metadata), за потреби глибша реплікація.
 3. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів у `Cargo.toml`, **`-j 1`**, опційно **`CARGO_INCREMENTAL=0`**, GNU toolchain).
-4. **Відкладено** — **FM-006** (`cloud-sdk` Azure/GCP), **FM-004** (SIMD TurboQuant).
-5. **Концепт → код (поза обов’язковим горизонтом)** — **FM-009** (єдиний Grid wire envelope), **FM-010** (on-chain / Solana прототип).
+4. **FM-012** — апгрейд UX для **`/ui`** і **`/ui/admin/*`** + Telegram login (JWT/RBAC-сумісно, audit/security policy, fallback на класичний login), фокус на user-friendly сценаріях і повному покритті чинних робочих функцій.
+5. **Відкладено** — **FM-006** (`cloud-sdk` Azure/GCP), **FM-004** (SIMD TurboQuant).
+6. **Концепт → код (поза обов’язковим горизонтом)** — **FM-009** (єдиний Grid wire envelope), **FM-010** (on-chain / Solana прототип).
 
 **FM-005** ✅ (узгоджений JSON, включно **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**) — закрито **2026-04-10**.
 

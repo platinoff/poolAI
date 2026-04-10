@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-10 (узгодження з FM-005 у **`FUNCTION_MANAGEMENT`**).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-10 (узгодження з FM-012: UX-апгрейд UI/Admin + Telegram login roadmap у **`FUNCTION_MANAGEMENT`**).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -59,7 +59,7 @@
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
 | **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
-| **TGBot** | `tgbot/` | Telegram-бот (керування). |
+| **TGBot** | `tgbot/` | Telegram-бот / інтеграція (поточний placeholder + roadmap на auth/login через Telegram у межах чинного JWT/RBAC, див. FM-012). |
 
 ---
 
@@ -70,6 +70,7 @@
 - **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
 - **WebSocket** — наприклад `/ws/metrics` (JWT/безпека залежно від конфігурації).
+- **UI/Admin UX roadmap** — пріоритетний план апгрейду `/ui` + `/ui/admin/*` (єдина IA/компоненти/стани, user-friendly flows, i18n UA/EN) і Telegram login без ламання поточних API-контрактів; джерело пріоритетів — `FUNCTION_MANAGEMENT.md` (FM-012).
 - **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) описує **частину** публічних шляхів; повний перелік — з коду роутерів і `src/network/mod.rs`.
 
 ---
