@@ -327,7 +327,11 @@ impl RaidDistributedProtocolService {
         let remote_slice = payload.artifact_ids.as_deref();
         let (synced_count, missing_artifacts) =
             diff_sync_catalog(payload.direction, &local, remote_slice);
-        let conflicts = build_sync_conflicts(&local, payload.remote_versions.as_ref());
+        let conflicts = build_sync_conflicts(
+            &local,
+            payload.artifact_ids.as_deref(),
+            payload.remote_versions.as_ref(),
+        );
 
         let response = SyncArtifactsResponse {
             status: OperationStatus::Success,
@@ -692,14 +696,22 @@ fn diff_sync_catalog(
 /// Detect conflicts for artifacts that exist on both sides with different timestamps.
 fn build_sync_conflicts(
     local: &[ArtifactRef],
+    remote_ids: Option<&[String]>,
     remote_versions: Option<&HashMap<String, chrono::DateTime<Utc>>>,
 ) -> Vec<ArtifactConflict> {
     let Some(remote) = remote_versions else {
         return Vec::new();
     };
+    let remote_catalog =
+        remote_ids.map(|ids| ids.iter().map(String::as_str).collect::<HashSet<_>>());
     let mut conflicts = Vec::new();
     for a in local {
         let id = a.id.to_string();
+        if let Some(ref catalog) = remote_catalog {
+            if !catalog.contains(id.as_str()) {
+                continue;
+            }
+        }
         let Some(remote_ts) = remote.get(&id) else {
             continue;
         };
@@ -844,12 +856,29 @@ mod sync_catalog_tests {
             "00000000-0000-0000-0000-00000000000b".to_string(),
             local_ts - chrono::Duration::seconds(1),
         );
-        let conflicts = build_sync_conflicts(&local, Some(&remote_versions));
+        let conflicts = build_sync_conflicts(&local, None, Some(&remote_versions));
         assert_eq!(conflicts.len(), 1);
         assert_eq!(
             conflicts[0].artifact_id,
             "00000000-0000-0000-0000-00000000000b"
         );
         assert_eq!(conflicts[0].reason, "local_newer_than_remote");
+    }
+
+    #[test]
+    fn conflicts_ignore_remote_versions_for_ids_outside_remote_catalog() {
+        let local = vec![artifact("00000000-0000-0000-0000-00000000000c")];
+        let mut remote_versions = HashMap::new();
+        remote_versions.insert(
+            "00000000-0000-0000-0000-00000000000c".to_string(),
+            local[0].stored_at - chrono::Duration::seconds(1),
+        );
+        let remote_catalog = vec!["00000000-0000-0000-0000-00000000000d".to_string()];
+        let conflicts = build_sync_conflicts(
+            &local,
+            Some(remote_catalog.as_slice()),
+            Some(&remote_versions),
+        );
+        assert!(conflicts.is_empty());
     }
 }
