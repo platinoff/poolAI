@@ -2,14 +2,13 @@
 
 use std::sync::Arc;
 
-use axum::http::StatusCode;
-use axum::Json;
 use serde::Serialize;
 
 use crate::core::config::{get_config, update_config, PoolAIConfig};
 use crate::core::error::AppError;
 use crate::core::user_manager::UserManager;
 use crate::network::auth::{authenticate_user, AuthRequest, AuthResponse};
+use crate::network::json_errors::HttpAppError;
 
 #[derive(Serialize)]
 pub struct StatusResponse {
@@ -148,7 +147,7 @@ impl SystemService {
     pub async fn login(
         auth_req: AuthRequest,
         user_manager: Arc<UserManager>,
-    ) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
+    ) -> Result<AuthResponse, HttpAppError> {
         authenticate_user(auth_req, user_manager).await
     }
 }

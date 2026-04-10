@@ -24,9 +24,7 @@
 //! };
 //!
 //! let manager = std::sync::Arc::new(UserManager::new());
-//! let response = authenticate_user(auth_req, manager).await.map_err(|(code, json)| {
-//!     format!("Authentication failed: {} - {:?}", code, json)
-//! })?;
+//! let response = authenticate_user(auth_req, manager).await.expect("authenticate");
 //! println!("Token: {}", response.token);
 //! println!("Role: {:?}", response.role);
 //! # Ok(())
@@ -37,11 +35,24 @@ use axum::{
     http::{header::AUTHORIZATION, StatusCode},
     middleware::Next,
     response::Response,
-    Json,
 };
 
-use crate::core::error::ErrorContext;
-use crate::network::json_errors::api_json_error;
+use crate::core::error::{AppError, ErrorContext};
+use crate::network::json_errors::HttpAppError;
+
+fn auth_http_err(
+    code: &'static str,
+    message: impl Into<String>,
+    ctx: ErrorContext,
+    status: StatusCode,
+) -> HttpAppError {
+    HttpAppError::new(AppError::RestError {
+        code,
+        message: message.into(),
+    })
+    .with_context(ctx)
+    .with_status(status)
+}
 // JWT support (optional - enabled with feature "jwt")
 #[cfg(not(feature = "jwt"))]
 use base64::Engine;
@@ -321,21 +332,21 @@ pub fn bearer_token_from_authorization_header(req: &Request) -> Option<String> {
 pub async fn refresh_access_token(
     token: &str,
     user_manager: Arc<UserManager>,
-) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<AuthResponse, HttpAppError> {
     let claims = decode_token_claims_allow_expired(token).map_err(|_| {
-        api_json_error(
+        auth_http_err(
             "AUTH_INVALID_TOKEN",
             "Invalid or unreadable token",
-            Some(ErrorContext::new("refresh_access_token")),
+            ErrorContext::new("refresh_access_token"),
             StatusCode::UNAUTHORIZED,
         )
     })?;
 
     if let Err(e) = user_manager.initialize().await {
-        return Err(api_json_error(
+        return Err(auth_http_err(
             "AUTH_USER_MANAGER_INIT_FAILED",
             format!("User manager initialization failed: {}", e),
-            Some(ErrorContext::new("refresh_access_token")),
+            ErrorContext::new("refresh_access_token"),
             StatusCode::INTERNAL_SERVER_ERROR,
         ));
     }
@@ -344,19 +355,19 @@ pub async fn refresh_access_token(
         .get_user_by_username(&claims.sub)
         .await
         .map_err(|e| {
-            api_json_error(
+            auth_http_err(
                 "AUTH_INTERNAL",
                 format!("User retrieval error: {}", e),
-                Some(ErrorContext::new("refresh_access_token")),
+                ErrorContext::new("refresh_access_token"),
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
         })?;
 
     let Some(user) = user else {
-        return Err(api_json_error(
+        return Err(auth_http_err(
             "AUTH_INVALID_TOKEN",
             "User no longer exists",
-            Some(ErrorContext::new("refresh_access_token")),
+            ErrorContext::new("refresh_access_token"),
             StatusCode::UNAUTHORIZED,
         ));
     };
@@ -364,10 +375,10 @@ pub async fn refresh_access_token(
     let role = user.role;
     let username = user.username;
     let new_token = generate_token(&username, role.clone()).map_err(|_| {
-        api_json_error(
+        auth_http_err(
             "AUTH_TOKEN_GENERATION_FAILED",
             "Failed to generate token",
-            Some(ErrorContext::new("refresh_access_token").with_resource("username", &username)),
+            ErrorContext::new("refresh_access_token").with_resource("username", &username),
             StatusCode::INTERNAL_SERVER_ERROR,
         )
     })?;
@@ -404,10 +415,7 @@ pub async fn refresh_access_token(
 ///     .route("/api/workers", post(handler))
 ///     .layer(middleware::from_fn(auth_middleware));
 /// ```
-pub async fn auth_middleware(
-    mut req: Request,
-    next: Next,
-) -> Result<Response, (StatusCode, Json<serde_json::Value>)> {
+pub async fn auth_middleware(mut req: Request, next: Next) -> Result<Response, HttpAppError> {
     // Отримуємо токен з заголовка Authorization
     let auth_header = req
         .headers()
@@ -416,20 +424,20 @@ pub async fn auth_middleware(
         .and_then(|auth_str| auth_str.strip_prefix("Bearer ").map(|s| s.to_string()));
 
     let token = auth_header.ok_or_else(|| {
-        api_json_error(
+        auth_http_err(
             "AUTH_MISSING_HEADER",
             "Missing or invalid authorization header",
-            Some(ErrorContext::new("auth_middleware")),
+            ErrorContext::new("auth_middleware"),
             StatusCode::UNAUTHORIZED,
         )
     })?;
 
     // Валідуємо токен
     let claims = validate_token(&token).map_err(|_| {
-        api_json_error(
+        auth_http_err(
             "AUTH_INVALID_TOKEN",
             "Invalid or expired token",
-            Some(ErrorContext::new("auth_middleware")),
+            ErrorContext::new("auth_middleware"),
             StatusCode::UNAUTHORIZED,
         )
     })?;
@@ -445,12 +453,12 @@ pub async fn permission_middleware(
     req: Request,
     next: Next,
     required_permission: &str,
-) -> Result<Response, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<Response, HttpAppError> {
     let claims = req.extensions().get::<Claims>().ok_or_else(|| {
-        api_json_error(
+        auth_http_err(
             "AUTH_NOT_AUTHENTICATED",
             "User not authenticated",
-            Some(ErrorContext::new("permission_middleware")),
+            ErrorContext::new("permission_middleware"),
             StatusCode::UNAUTHORIZED,
         )
     })?;
@@ -460,14 +468,12 @@ pub async fn permission_middleware(
         .permissions
         .contains(&required_permission.to_string())
     {
-        return Err(api_json_error(
+        return Err(auth_http_err(
             "AUTH_FORBIDDEN",
             "Insufficient permissions",
-            Some(
-                ErrorContext::new("permission_middleware")
-                    .with_resource("permission", required_permission)
-                    .with_details(format!("user_permissions={:?}", claims.permissions)),
-            ),
+            ErrorContext::new("permission_middleware")
+                .with_resource("permission", required_permission)
+                .with_details(format!("user_permissions={:?}", claims.permissions)),
             StatusCode::FORBIDDEN,
         ));
     }
@@ -501,9 +507,7 @@ pub async fn permission_middleware(
 /// };
 ///
 /// let manager = std::sync::Arc::new(UserManager::new());
-/// let response = authenticate_user(auth_req, manager).await.map_err(|(code, json)| {
-///     format!("Authentication failed: {} - {:?}", code, json)
-/// })?;
+/// let response = authenticate_user(auth_req, manager).await?;
 /// println!("Token: {}", response.token);
 /// # Ok(())
 /// # }
@@ -511,7 +515,7 @@ pub async fn permission_middleware(
 pub async fn authenticate_user(
     auth_req: AuthRequest,
     user_manager: Arc<UserManager>,
-) -> Result<AuthResponse, (StatusCode, Json<serde_json::Value>)> {
+) -> Result<AuthResponse, HttpAppError> {
     // Future improvement: Реальна перевірка користувача з бази даних
     // 1. Підключення до бази даних (SQLite, PostgreSQL, MySQL, тощо)
     //    - Використовувати async database driver (sqlx, diesel, sea-orm)
@@ -541,10 +545,10 @@ pub async fn authenticate_user(
 
     // Ensure manager is initialized
     if let Err(e) = manager.initialize().await {
-        return Err(api_json_error(
+        return Err(auth_http_err(
             "AUTH_USER_MANAGER_INIT_FAILED",
             format!("User manager initialization failed: {}", e),
-            Some(ErrorContext::new("authenticate_user")),
+            ErrorContext::new("authenticate_user"),
             StatusCode::INTERNAL_SERVER_ERROR,
         ));
     }
@@ -554,19 +558,19 @@ pub async fn authenticate_user(
         .verify_password(&auth_req.username, &auth_req.password)
         .await
         .map_err(|e| {
-            api_json_error(
+            auth_http_err(
                 "AUTH_INTERNAL",
                 format!("Authentication error: {}", e),
-                Some(ErrorContext::new("authenticate_user")),
+                ErrorContext::new("authenticate_user"),
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
         })?;
 
     if !is_valid {
-        return Err(api_json_error(
+        return Err(auth_http_err(
             "AUTH_INVALID_CREDENTIALS",
             "Invalid credentials",
-            Some(ErrorContext::new("authenticate_user")),
+            ErrorContext::new("authenticate_user"),
             StatusCode::UNAUTHORIZED,
         ));
     }
@@ -576,10 +580,10 @@ pub async fn authenticate_user(
         .get_user_by_username(&auth_req.username)
         .await
         .map_err(|e| {
-            api_json_error(
+            auth_http_err(
                 "AUTH_INTERNAL",
                 format!("User retrieval error: {}", e),
-                Some(ErrorContext::new("authenticate_user")),
+                ErrorContext::new("authenticate_user"),
                 StatusCode::INTERNAL_SERVER_ERROR,
             )
         })?;
@@ -587,19 +591,19 @@ pub async fn authenticate_user(
     let (role, username) = if let Some(u) = user {
         (u.role, u.username)
     } else {
-        return Err(api_json_error(
+        return Err(auth_http_err(
             "AUTH_INVALID_CREDENTIALS",
             "Invalid credentials",
-            Some(ErrorContext::new("authenticate_user")),
+            ErrorContext::new("authenticate_user"),
             StatusCode::UNAUTHORIZED,
         ));
     };
 
     let token = generate_token(&username, role.clone()).map_err(|_| {
-        api_json_error(
+        auth_http_err(
             "AUTH_TOKEN_GENERATION_FAILED",
             "Failed to generate token",
-            Some(ErrorContext::new("authenticate_user").with_resource("username", &username)),
+            ErrorContext::new("authenticate_user").with_resource("username", &username),
             StatusCode::INTERNAL_SERVER_ERROR,
         )
     })?;

@@ -93,7 +93,7 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 
 **Єдиний порядок пріоритетів (FM-* + чекбокси Architect):** [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** → деталі в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md). Операційний зріз сесії: [`HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md).
 
-**Коротко:** baseline/P4 (`poolai_health_load --json`, Criterion) + LAN/P2b; HTTP FM-005; залишки distributed RAID (LAN, conflicts у payload); FM-011 за потреби; deferred — cloud-sdk SIMD, Grid/Solana концепти.
+**Коротко:** baseline/P4 (`poolai_health_load --json`, Criterion) + LAN/P2b; HTTP **FM-005** ✅; залишки distributed RAID (LAN, conflicts у payload); FM-011 за потреби; deferred — cloud-sdk SIMD, Grid/Solana концепти.
 
 **Архівний план (історично):** `docs/development/NEXT_STEPS_2026-01-19.md`.
 

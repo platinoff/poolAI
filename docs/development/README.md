@@ -32,7 +32,7 @@
 
 ### Priority 3: Узгоджені HTTP / транспортні помилки
 
-- Формат: `src/network/json_errors.rs`, **`HttpAppError`**, **`AppError::RestError`**; **`enterprise_err`** — `network/enterprise_api/mod.rs` (залишок FM-005). **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`** узгоджені. **FM-005**: **`raid*`** + основний REST на **`HttpAppError`/`RestError`**. Джерело правди: **`HANDOFF`**, **`NEXT_STEPS_ARCHITECT`**, **`FUNCTION_MANAGEMENT.md` §5.1**.
+- Формат: `src/network/json_errors.rs`, **`HttpAppError`**, **`AppError::RestError`**; **`enterprise_err`** / **`enterprise_json_err`** — `network/enterprise_api/mod.rs`. **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`** узгоджені. **FM-005** ✅. Джерело правди: **`HANDOFF`**, **`NEXT_STEPS_ARCHITECT`**, **`FUNCTION_MANAGEMENT.md` §5.1**.
 
 ### Priority 4: Продуктивність і бенчі
 

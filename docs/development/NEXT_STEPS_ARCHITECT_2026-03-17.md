@@ -25,7 +25,7 @@
 | **1** | **Priority 1** | **Закрито по суті**: центральний **`ApiContext`** у роутері (`with_state`), HTTP без **`get_global_*`** у `src/network/`, `ARCHITECTURE_REVIEW.md`, **`test-utils`**, `attach_*_for_test`. Глобалі лишаються для старту/фонових задач/unittests — див. P1 у тексті нижче. Опційно пізніше: Raft-шлях без зайвих глобальних згадок. |
 | **2** | **Priority 2** | Сервісний шар покриває основні домени (RAID/VM/cloud/enterprise/admin/UI/…); **`network/api/ui.rs`** + **`UiService`** ✅; HTML **`/status`** — **`system_status_html.rs`**. **`network/enterprise_api/`** ( **`mod.rs`** + tenants / audit / monitoring / security / oauth / saml) — розбито з моноліту. Дрібні edge cases міграції handlers → сервіси за потреби. |
 | **3** | **Priority 2b** | TurboQuant **фаза 1** ✅ + **портативний fast-path** (`turboquant.rs`: pack/unpack/`dot_f32`). Далі: повні заміри по мережі на стенді (чекбокс нижче). |
-| **4** | **Priority 3** | Узгоджений JSON: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**, **`HttpAppError`**, **`AppError::RestError`**. **FM-005 (Partial)**: **`raid*`** + **`enterprise_api/`** + основний REST на **`HttpAppError`/`RestError`**; лишаються **`login`/`refresh`**, **`check_permission`**. |
+| **4** | **Priority 3** | Узгоджений JSON: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**, **`HttpAppError`**, **`AppError::RestError`**. **FM-005** ✅: **`raid*`** + **`enterprise_api/`** + основний REST + **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (Criterion тощо); **`poolai_health_load`** з **`--json`** на stdout для baseline / ref-хост (2026-04-06). Далі вручну: рядки таблиці **`BENCHMARKS.md`**, LAN P2b на стенді. |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
@@ -39,11 +39,12 @@
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
 1. **FM-003** + **P4** + **P2b** — baseline на реф-хості (Criterion, **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md)); на LAN-стенді — повні заміри реплікації артефактів і порівняння обсягу до/після TQ01 (єдиний відкритий чекбокс P2b у секції TurboQuant нижче).
-2. **FM-005** (Partial) — закінчити **`login`/`refresh`** і **`check_permission`** на **`HttpAppError`** + **`AppError::RestError`** де доречно; **`raid*`** (**`raid_api_err`**) та **`network/enterprise_api/`** (**`enterprise_err`** / **`enterprise_json_err`**) — зроблено.
-3. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** з replication; далі — LAN, **`conflicts`** у payload (remote metadata), за потреби глибша реплікація.
-4. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів у `Cargo.toml`, **`-j 1`**, опційно **`CARGO_INCREMENTAL=0`**, GNU toolchain).
-5. **Відкладено** — **FM-006** (`cloud-sdk` Azure/GCP), **FM-004** (SIMD TurboQuant).
-6. **Концепт → код (поза обов’язковим горизонтом)** — **FM-009** (єдиний Grid wire envelope), **FM-010** (on-chain / Solana прототип).
+2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** з replication; далі — LAN, **`conflicts`** у payload (remote metadata), за потреби глибша реплікація.
+3. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів у `Cargo.toml`, **`-j 1`**, опційно **`CARGO_INCREMENTAL=0`**, GNU toolchain).
+4. **Відкладено** — **FM-006** (`cloud-sdk` Azure/GCP), **FM-004** (SIMD TurboQuant).
+5. **Концепт → код (поза обов’язковим горизонтом)** — **FM-009** (єдиний Grid wire envelope), **FM-010** (on-chain / Solana прототип).
+
+**FM-005** ✅ (узгоджений JSON, включно **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**) — закрито **2026-04-10**.
 
 Деталі тікетів і шаблон Issue — таблиця **FM-*** у тому ж файлі; операційний зріз сесії — [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4.
 
@@ -300,7 +301,7 @@ Grid / Job / Memory / Tokenization (Priority 6)
 ## Верифікація 2026-04-06 (P3 — `raid.rs` + повний `enterprise_api/`)
 
 - **Код (`main`)**: узгоджені JSON-помилки для RAID REST — **`src/network/api/raid_http.rs`** (базовий **`raid_api_err`**, **`raid_service_http_err`**, події / snapshot / GC / strategies / rebalance тощо) + маршрути у **`src/network/api/raid.rs`**; **`src/network/enterprise_api/`** (**`enterprise_err`** / **`enterprise_json_err`** у **`mod.rs`** → **`HttpAppError`**, security / OAuth / SAML / monitoring / tenant тощо). Раніше в тому ж напрямку: `users`, `ui`, `system`, `completions`, `raid_admin`.
-- **Примітка (актуалізація плану, 2026-04-06)**: раніше тут зазначався залишок для **`auth.rs`**. **Закрито** у верифікації **2026-04-07**: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. Поточний залишок **FM-005** (Partial): **`login`/`refresh`**, **`check_permission`**; **`raid*`** та **`enterprise_api/`** переведено на **`HttpAppError`/`RestError`**; див. **«Операційний порядок»** та **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+- **Примітка (актуалізація плану, 2026-04-06)**: раніше тут зазначався залишок для **`auth.rs`**. **Закрито** у верифікації **2026-04-07**: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**. **FM-005** ✅ (2026-04-10): також **`login`/`refresh`**, **`check_permission`**, **`authenticate_user`**, **`refresh_access_token`**, **`auth_middleware`**; див. **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 - **Наступний фокус (історичний зріз цього абзацу)**: **P4** / **P2b** на стенді; **P2** — дрібні edge cases сервісного шару; див. актуальну таблицю на початку файлу та **§5.1**.
 
 ## Верифікація 2026-04-06 (P4 — Criterion targets)
@@ -443,13 +444,13 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 ## Верифікація 2026-04-06 (доки — порядок «наступних кроків» за FM-*)
 
-- **Канон**: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** — пріоритезована таблиця (FM-003 … FM-010); оновлено **FM-005** (Partial, `rewards.rs`).
+- **Канон**: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** — пріоритезована таблиця (FM-003 … FM-010); **FM-005** ✅ (актуалізація **2026-04-10**; історично Partial після `rewards.rs`).
 - **Узгоджено**: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4, кореневий [`README.md`](../../README.md) (*Next Focus*), [`docs/README.md`](../README.md) (крок 12, Short pointers), [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md) (посилання після таблиці пріоритетів), [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc), [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
 
 ## Верифікація 2026-04-06 (планові доки — операційний порядок §5.1)
 
 - **NEXT_STEPS**: після посилання на **§5.1** додано підрозділ **«Операційний порядок»** (FM-003 → FM-010) — швидкий старт без дублювання повної таблиці в `FUNCTION_MANAGEMENT.md`.
-- **NEXT_STEPS**: у верифікації **P3 (`raid.rs` + enterprise)** виправлено застарілий рядок про **`auth.rs`**; актуальний залишок P3 — **FM-005**.
+- **NEXT_STEPS**: у верифікації **P3 (`raid.rs` + enterprise)** виправлено застарілий рядок про **`auth.rs`**; **FM-005** закрито **2026-04-10** (див. актуальний **§5.1**).
 - **README** (*Next Focus*): перший блок — нумерований порядок за **§5.1**; далі — деталі P4 / P2b / P3 та посилання на Architect / HANDOFF.
 - **Шапки дат**: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md), [`docs/README.md`](../README.md) — **2026-04-06**.
 

@@ -1,9 +1,10 @@
 //! Integration tests for Network Auth Module
 
 use axum::http::StatusCode;
-use axum::Json;
 use std::sync::Arc;
 
+use poolai::core::error::AppError;
+use poolai::network::api::common::HttpAppError;
 use poolai::network::auth::{
     authenticate_user, generate_token, validate_token, AuthRequest, UserManager, UserRole,
 };
@@ -93,11 +94,17 @@ async fn test_authenticate_user_invalid() {
     let result = authenticate_user(auth_req, Arc::new(UserManager::new())).await;
     assert!(result.is_err());
 
-    if let Err((status, Json(body))) = result {
-        assert_eq!(status, StatusCode::UNAUTHORIZED);
-        assert_eq!(body["error"]["code"], "AUTH_INVALID_CREDENTIALS");
-        assert!(body["error"]["message"].is_string());
-        assert!(body.get("context").is_some());
+    if let Err(e) = result {
+        let e: HttpAppError = e;
+        assert_eq!(e.status_override, Some(StatusCode::UNAUTHORIZED));
+        match &e.err {
+            AppError::RestError { code, message } => {
+                assert_eq!(*code, "AUTH_INVALID_CREDENTIALS");
+                assert_eq!(message, "Invalid credentials");
+            }
+            other => panic!("expected RestError, got {:?}", other),
+        }
+        assert!(e.context.is_some());
     } else {
         panic!("expected authentication error");
     }

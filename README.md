@@ -51,18 +51,19 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud,test-utils` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
 - **`cargo clippy` з `-D warnings`** узгоджено з матрицями CI (`.github/workflows/ci.yml`): `--all-targets` + `--no-default-features`, `--features jwt,https`, `--features cloud,cloud-sdk` (для останнього потрібен `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **чисто на `main` (2026-04-10)**. Повний `--all-features` локально може відрізнятися за набором крейтів; орієнтир — ті самі три кроки, що в CI.  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
-- **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 — JSON-помилки** — `src/network/json_errors.rs`, **`HttpAppError`/`RestError`**, основний REST + **`raid*`** (**`raid_api_err`**), **`enterprise_api/`** ще частково на **`enterprise_err`**; **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**; інтеграційні ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs` (`test-utils`, опційно `ml`).
+- **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 / FM-005** — `src/network/json_errors.rs`, **`HttpAppError`/`RestError`** по основному REST, **`raid*`** (**`raid_api_err`**), **`enterprise_api/`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`** ✅; інтеграційні ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs` (`test-utils`, опційно `ml`).
 
 ### Next Focus
 
 **Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
 
 1. **FM-003** + **P4** + **P2b** — Criterion і **`poolai_health_load --json`** на реф-хості → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md); на LAN — повні заміри реплікації + порівняння розміру до/після TQ01.
-2. **FM-005** (Partial) — закінчити **`network/enterprise_api/`**; **`raid*`** уже на **`HttpAppError`/`RestError`**; стабільні **`error.code`** не змінювати без рішення; **`login`/`refresh`** окремо.
-3. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** + replication; далі LAN і payload для conflicts за потреби.
-4. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів, **`-j 1`**, GNU за потреби).
-5. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-6. **Концепт → код** — **FM-009** (Grid envelope), **FM-010** (Solana).
+2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** + replication; далі LAN і payload для conflicts за потреби.
+3. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів, **`-j 1`**, GNU за потреби).
+4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+5. **Концепт → код** — **FM-009** (Grid envelope), **FM-010** (Solana).
+
+**FM-005** ✅ — узгоджений JSON на **`HttpAppError`/`RestError`** (див. [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1**).
 
 **Контекст за пріоритетами Architect (P\*)**
 
@@ -70,7 +71,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **P4**: повний прогін Criterion + baseline у `BENCHMARKS.md` на **референс-хост**; **`GET /api/v1/health`** — **`poolai_health_load`** (опційно **`--json`**) або **`wrk`**; workflow [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml); [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md).
 - **P2b**: TurboQuant фаза 1 у коді ✅; відкритий чекбокс у Architect-плані — **LAN-заміри** (див. пункт 1 вище); Criterion `raid_replication_engine` уже є.
 - **P2 (опційно)**: основні домени через сервіси ✅; дрібні edge cases міграції handlers → `services/*` за потреби.
-- **P3**: узгоджений JSON по **`auth`** / **`ws`** / **`rate_limit`** ✅; майже весь REST + **`raid*`** на **`HttpAppError`/`RestError`** ✅; залишок **FM-005** — **`enterprise_api/`** (`src/network/json_errors.rs`).
+- **P3 / FM-005** ✅: узгоджений JSON по **`auth`** / **`ws`** / **`rate_limit`**, REST + **`raid*`**, **`enterprise_api`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`** — **`HttpAppError`/`RestError`** (`src/network/json_errors.rs`).
 - **P1 (опційно)**: Raft-шлях без зайвих глобальних згадок; формальне закриття критеріїв за потреби.
 - **UI / UX:** [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - **Документація:** таксономія — [`docs/STRUCTURE.md`](docs/STRUCTURE.md); застарілі плоскі `docs/*.md` — опційно в [`docs/archive/`](docs/archive/).

@@ -167,5 +167,5 @@
 
 - **Єдиний контракт JSON** для більшості REST: `{ "error": { "code", "message" }, "context"?: … }` — `src/network/json_errors.rs` (`HttpAppError`, `AppError`, **`AppError::RestError`** для стабільних `error.code`).
 - **Оновлені концепт-доки**: `docs/concept/poolAI_concept_root.txt` (Stage 2 + окремий розділ про контракт), `poolAI_concept.txt`, `poolAI_concept_workspace.txt` (§4.4); у кореневому концепті виправлено шляхи RAID/UI під **`/api/v1/…`**.
-- **Стан міграції**: основний `api/*.rs` + **`raid`/`raid_http`/`raid_admin`** — через **`raid_api_err`**; **залишок** — `src/network/enterprise_api/*` (`enterprise_err`), окремо **`login`/`refresh`** та RBAC **`check_permission`**.
+- **Стан міграції**: основний `api/*.rs` + **`raid*`** + **`enterprise_api/*`** + **`login`/`refresh`** ( **`authenticate_user`** / **`refresh_access_token`** ) + RBAC **`check_permission`** + **`auth_middleware`** — узгоджений JSON через **`HttpAppError`/`RestError`** (FM-005 ✅).
 - **Канон плану**: [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **FM-005**, **§5.1**; деталі моделі помилок — [`docs/ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md).

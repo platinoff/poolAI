@@ -96,7 +96,7 @@ async fn login_handler(
 ) -> impl IntoResponse {
     match SystemService::login(auth_req, ctx.user_manager.clone()).await {
         Ok(auth_response) => Json(auth_response).into_response(),
-        Err((status, error)) => (status, error).into_response(),
+        Err(e) => e.into_response(),
     }
 }
 
@@ -113,7 +113,7 @@ async fn refresh_handler(State(ctx): State<ApiContext>, req: Request) -> impl In
 
     match refresh_access_token(&token, ctx.user_manager.clone()).await {
         Ok(auth_response) => Json(auth_response).into_response(),
-        Err((status, error)) => (status, error).into_response(),
+        Err(e) => e.into_response(),
     }
 }
 
