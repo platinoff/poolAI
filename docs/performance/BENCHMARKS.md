@@ -88,6 +88,14 @@ The **win11-criterion-full** row set is a default Criterion profile (100 samples
 | `vm_lifecycle/create_start_stop_delete` | win-msvc-runtime-bench-opt0-2026-04-06 | ~38.5 µs | 2026-04-06 |
 | `raid_protocol_put_payload/serde_json_roundtrip` | win-msvc-runtime-bench-opt0-2026-04-06 | ~58 µs | 2026-04-06 |
 | `http_health_json/serde_json_to_vec` | win-msvc-runtime-bench-opt0-2026-04-06 | ~12.9 µs | 2026-04-06 |
+| `memory_pool/acquire_release_request` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~1.25 µs | 2026-04-10 |
+| `lru_cache/get_hit` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~1.64 µs | 2026-04-10 |
+| `raid_local_put/put_artifact_4096` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~14.9 ms | 2026-04-10 |
+| `raid_replication_engine/select_replication_nodes_factor_3` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~2.20 µs | 2026-04-10 |
+| `raid_replication_engine/calculate_quorum_rf_7` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~13.8 ns | 2026-04-10 |
+| `vm_lifecycle/create_start_stop_delete` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~22.3 µs | 2026-04-10 |
+| `raid_protocol_put_payload/serde_json_roundtrip` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~44.4 µs | 2026-04-10 |
+| `http_health_json/serde_json_to_vec` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~10.6 µs | 2026-04-10 |
 | `turboquant/pack_uniform_rows_64x256` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~491 µs | 2026-04-06 |
 | `turboquant/unpack_to_rows_64x256` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~80.5 µs | 2026-04-06 |
 | `turboquant/dot_f32_4096` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~10.2 µs | 2026-04-06 |
@@ -129,6 +137,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-04-10 | FM-003 / P4: `cargo bench -j 1 --bench runtime_benchmarks -- --noplot` на **win10-local-26200**; додано baseline-рядки `win10-local-26200-runtime-bench-opt0-2026-04-10` + `poolai_health_load --json` рядок у таблицю. |
 | 2026-04-07 | P2b harness **`distributed_raid_wire_integration`**: wire-тести **`SyncArtifacts`** (Push / `missing_artifacts`) та **`LeaveCluster`** (перевірка членства кластера перед graceful replication). |
 | 2026-04-06 | P4: **`poolai_health_load --json`** — структурований звіт на stdout для baseline / `jq`; юніт-тести парсера аргументів у `src/bin/poolai_health_load.rs`. |
 | 2026-04-06 | Filled `raid_service/quota`/`cluster_status` dev-sample medians; P4 target table; `std::hint::black_box` in benches; `ui.rs` gates `State` on `enterprise`; Criterion group `raid_replication_engine` in `runtime_benchmarks` (P2b proxy vs full multi-node I/O). |
