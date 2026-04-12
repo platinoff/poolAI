@@ -881,4 +881,16 @@
 <a href=#881 id=881 data-nosnippet>881</a>        );
 <a href=#882 id=882 data-nosnippet>882</a>        <span class="macro">assert!</span>(conflicts.is_empty());
 <a href=#883 id=883 data-nosnippet>883</a>    }
-<a href=#884 id=884 data-nosnippet>884</a>}</code></pre></div></section></main></body></html>
+<a href=#884 id=884 data-nosnippet>884</a>
+<a href=#885 id=885 data-nosnippet>885</a>    <span class="attr">#[test]
+<a href=#886 id=886 data-nosnippet>886</a>    </span><span class="kw">fn </span>no_conflict_when_local_and_remote_timestamps_equal() {
+<a href=#887 id=887 data-nosnippet>887</a>        <span class="kw">let </span>local = <span class="macro">vec!</span>[artifact(<span class="string">"00000000-0000-0000-0000-00000000000d"</span>)];
+<a href=#888 id=888 data-nosnippet>888</a>        <span class="kw">let </span>ts = local[<span class="number">0</span>].stored_at;
+<a href=#889 id=889 data-nosnippet>889</a>        <span class="kw">let </span><span class="kw-2">mut </span>remote_versions = HashMap::new();
+<a href=#890 id=890 data-nosnippet>890</a>        remote_versions.insert(<span class="string">"00000000-0000-0000-0000-00000000000d"</span>.to_string(), ts);
+<a href=#891 id=891 data-nosnippet>891</a>        <span class="kw">let </span>catalog = <span class="macro">vec!</span>[<span class="string">"00000000-0000-0000-0000-00000000000d"</span>.to_string()];
+<a href=#892 id=892 data-nosnippet>892</a>        <span class="kw">let </span>conflicts =
+<a href=#893 id=893 data-nosnippet>893</a>            build_sync_conflicts(<span class="kw-2">&amp;</span>local, <span class="prelude-val">Some</span>(catalog.as_slice()), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>remote_versions));
+<a href=#894 id=894 data-nosnippet>894</a>        <span class="macro">assert!</span>(conflicts.is_empty());
+<a href=#895 id=895 data-nosnippet>895</a>    }
+<a href=#896 id=896 data-nosnippet>896</a>}</code></pre></div></section></main></body></html>
