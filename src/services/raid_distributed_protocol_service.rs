@@ -881,4 +881,16 @@ mod sync_catalog_tests {
         );
         assert!(conflicts.is_empty());
     }
+
+    #[test]
+    fn no_conflict_when_local_and_remote_timestamps_equal() {
+        let local = vec![artifact("00000000-0000-0000-0000-00000000000d")];
+        let ts = local[0].stored_at;
+        let mut remote_versions = HashMap::new();
+        remote_versions.insert("00000000-0000-0000-0000-00000000000d".to_string(), ts);
+        let catalog = vec!["00000000-0000-0000-0000-00000000000d".to_string()];
+        let conflicts =
+            build_sync_conflicts(&local, Some(catalog.as_slice()), Some(&remote_versions));
+        assert!(conflicts.is_empty());
+    }
 }

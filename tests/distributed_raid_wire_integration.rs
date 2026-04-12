@@ -2,7 +2,8 @@
 //!
 //! Run: `cargo test -j 1 --features test-utils --test distributed_raid_wire_integration`
 //! With TQ01 size check: add `--features ml` (TQ01 test is `#[cfg(feature = "ml")]`).
-//! Covers: PutArtifact, SyncArtifacts catalog diff (FM-007), LeaveCluster membership (FM-008).
+//! Covers: PutArtifact, SyncArtifacts catalog diff — Push / Pull / Bidirectional, conflicts (FM-007),
+//! LeaveCluster membership (FM-008).
 
 use axum::body::{to_bytes, Body};
 use axum::http::{Request, StatusCode};
@@ -141,6 +142,132 @@ async fn wire_sync_artifacts_push_reports_peer_only_ids_as_missing() {
     let inner: SyncArtifactsResponse = serde_json::from_value(resp_msg.payload).unwrap();
     assert_eq!(inner.synced_count, 1);
     assert_eq!(inner.missing_artifacts, vec![REMOTE_ONLY_ID.to_string()]);
+    assert!(inner.conflicts.is_empty());
+}
+
+#[tokio::test]
+async fn wire_sync_artifacts_pull_reports_local_only_ids_as_missing() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let keep = RaidService::put_artifact(&ctx, "sync-pull-keep", b"a")
+        .await
+        .unwrap();
+    let orphan = RaidService::put_artifact(&ctx, "sync-pull-orphan", b"b")
+        .await
+        .unwrap();
+    let keep_id = keep.id.to_string();
+
+    let payload = SyncArtifactsPayload {
+        last_sync_timestamp: None,
+        artifact_ids: Some(vec![keep_id.clone()]),
+        remote_versions: None,
+        direction: SyncDirection::Pull,
+    };
+    let msg = ProtocolMessage::sync_artifacts("stand-pull-node".to_string(), payload).unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/artifacts/sync")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let inner: SyncArtifactsResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert_eq!(inner.synced_count, 1);
+    assert_eq!(inner.missing_artifacts, vec![orphan.id.to_string()]);
+    assert!(inner.conflicts.is_empty());
+}
+
+#[tokio::test]
+async fn wire_sync_artifacts_bidirectional_lists_symmetric_missing_sorted() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let on_both = RaidService::put_artifact(&ctx, "sync-bidir-shared", b"x")
+        .await
+        .unwrap();
+    let local_only = RaidService::put_artifact(&ctx, "sync-bidir-local-only", b"y")
+        .await
+        .unwrap();
+    let shared_id = on_both.id.to_string();
+
+    let payload = SyncArtifactsPayload {
+        last_sync_timestamp: None,
+        artifact_ids: Some(vec![shared_id.clone(), REMOTE_ONLY_ID.to_string()]),
+        remote_versions: None,
+        direction: SyncDirection::Bidirectional,
+    };
+    let msg = ProtocolMessage::sync_artifacts("stand-bidir-node".to_string(), payload).unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/artifacts/sync")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let inner: SyncArtifactsResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert_eq!(inner.synced_count, 1);
+    let mut expected = vec![local_only.id.to_string(), REMOTE_ONLY_ID.to_string()];
+    expected.sort();
+    assert_eq!(inner.missing_artifacts, expected);
+    assert!(inner.conflicts.is_empty());
+}
+
+#[tokio::test]
+async fn wire_sync_artifacts_equal_remote_version_yields_no_conflict() {
+    let temp = TempDir::new().unwrap();
+    let ctx = build_api_context(&temp).await;
+    let art = RaidService::put_artifact(&ctx, "sync-same-ts", b"x")
+        .await
+        .unwrap();
+    let local_id = art.id.to_string();
+
+    let mut remote_versions = HashMap::new();
+    remote_versions.insert(local_id.clone(), art.stored_at);
+    let payload = SyncArtifactsPayload {
+        last_sync_timestamp: None,
+        artifact_ids: Some(vec![local_id.clone()]),
+        remote_versions: Some(remote_versions),
+        direction: SyncDirection::Pull,
+    };
+    let msg = ProtocolMessage::sync_artifacts("stand-same-ts-node".to_string(), payload).unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+
+    let app = Router::new()
+        .nest("/api/v1", create_raid_routes())
+        .with_state(ctx);
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/artifacts/sync")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let bytes = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let resp_msg: ProtocolMessage = serde_json::from_slice(&bytes).unwrap();
+    let inner: SyncArtifactsResponse = serde_json::from_value(resp_msg.payload).unwrap();
+    assert_eq!(inner.synced_count, 1);
+    assert!(inner.missing_artifacts.is_empty());
     assert!(inner.conflicts.is_empty());
 }
 

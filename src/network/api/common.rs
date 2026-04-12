@@ -12,6 +12,7 @@ use crate::network::auth::Claims;
 /// # Errors
 ///
 /// Returns [`HttpAppError`] (403, `FORBIDDEN`) if permission is denied.
+#[allow(clippy::result_large_err)] // `HttpAppError` carries `ErrorContext`; API stays `Result<(), _>`.
 pub fn check_permission(claims: &Claims, required_permission: &str) -> Result<(), HttpAppError> {
     if !claims
         .permissions

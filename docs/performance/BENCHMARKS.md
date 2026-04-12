@@ -96,15 +96,29 @@ The **win11-criterion-full** row set is a default Criterion profile (100 samples
 | `vm_lifecycle/create_start_stop_delete` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~22.3 µs | 2026-04-10 |
 | `raid_protocol_put_payload/serde_json_roundtrip` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~44.4 µs | 2026-04-10 |
 | `http_health_json/serde_json_to_vec` | win10-local-26200-runtime-bench-opt0-2026-04-10 | ~10.6 µs | 2026-04-10 |
+| `memory_pool/acquire_release_request` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~1.28 µs | 2026-04-12 |
+| `lru_cache/get_hit` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~1.66 µs | 2026-04-12 |
+| `raid_local_put/put_artifact_4096` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~7.89 ms | 2026-04-12 |
+| `raid_replication_engine/select_replication_nodes_factor_3` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~2.18 µs | 2026-04-12 |
+| `raid_replication_engine/calculate_quorum_rf_7` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~13.7 ns | 2026-04-12 |
+| `vm_lifecycle/create_start_stop_delete` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~23.8 µs | 2026-04-12 |
+| `raid_protocol_put_payload/serde_json_roundtrip` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~43.3 µs | 2026-04-12 |
+| `http_health_json/serde_json_to_vec` | win10-local-26200-runtime-bench-opt0-2026-04-12 | ~10.5 µs | 2026-04-12 |
 | `turboquant/pack_uniform_rows_64x256` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~491 µs | 2026-04-06 |
 | `turboquant/unpack_to_rows_64x256` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~80.5 µs | 2026-04-06 |
 | `turboquant/dot_f32_4096` | win-msvc-turboquant-bench-opt0-2026-04-06 | ~10.2 µs | 2026-04-06 |
+| `turboquant/pack_uniform_rows_64x256` | win10-local-26200-turboquant-bench-opt0-2026-04-12 | ~438 µs | 2026-04-12 |
+| `turboquant/unpack_to_rows_64x256` | win10-local-26200-turboquant-bench-opt0-2026-04-12 | ~68.7 µs | 2026-04-12 |
+| `turboquant/dot_f32_4096` | win10-local-26200-turboquant-bench-opt0-2026-04-12 | ~8.33 µs | 2026-04-12 |
 | `raid_service/list_artifacts` | dev-win-sample | ~218 ns | 2026-04-06 |
 | `raid_service/quota` | dev-win-sample | ~74.5 µs | 2026-04-06 |
 | `raid_service/cluster_status` | dev-win-sample | ~55.2 µs | 2026-04-06 |
 | `raid_service/list_artifacts` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~1.40 µs | 2026-04-06 |
 | `raid_service/quota` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~61.6 µs | 2026-04-06 |
 | `raid_service/cluster_status` | win-msvc-service-layer-bench-opt0-2026-04-06 | ~81.5 µs | 2026-04-06 |
+| `raid_service/list_artifacts` | win10-local-26200-service-layer-bench-opt0-2026-04-12 | ~1.30 µs | 2026-04-12 |
+| `raid_service/quota` | win10-local-26200-service-layer-bench-opt0-2026-04-12 | ~60.4 µs | 2026-04-12 |
+| `raid_service/cluster_status` | win10-local-26200-service-layer-bench-opt0-2026-04-12 | ~71.2 µs | 2026-04-12 |
 | `cloud_config/validate_default` | win-msvc-cloud-bench-opt0-2026-04-06 | ~15.6 ns | 2026-04-06 |
 | `cloud_manager/init_shutdown_default_config` | win-msvc-cloud-bench-opt0-2026-04-06 | ~2.78 µs | 2026-04-06 |
 | `wrk` `/api/v1/health` | *manual* | RPS / p50 / p95 | — |
@@ -137,6 +151,8 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-04-12 | FM-007 / P2b harness **`distributed_raid_wire_integration`**: додано wire-тести **`SyncArtifacts`** — **Pull** (`missing_artifacts`), **Bidirectional** (симетрична різниця, відсортована), відсутність conflict при однаковому `stored_at` у `remote_versions`; юніт-тест **`no_conflict_when_local_and_remote_timestamps_equal`** у `raid_distributed_protocol_service`. |
+| 2026-04-12 | FM-003 / P4: short Criterion (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`) на **win10-local-26200** — `runtime_benchmarks`, `service_layer_benchmarks` (`--features test-utils`), `turboquant_benchmarks` (`--features ml`); рядки **`win10-local-26200-*-bench-opt0-2026-04-12`** у таблиці baseline. |
 | 2026-04-10 | FM-003 / P4: `cargo bench -j 1 --bench runtime_benchmarks -- --noplot` на **win10-local-26200**; додано baseline-рядки `win10-local-26200-runtime-bench-opt0-2026-04-10` + `poolai_health_load --json` рядок у таблицю. |
 | 2026-04-07 | P2b harness **`distributed_raid_wire_integration`**: wire-тести **`SyncArtifacts`** (Push / `missing_artifacts`) та **`LeaveCluster`** (перевірка членства кластера перед graceful replication). |
 | 2026-04-06 | P4: **`poolai_health_load --json`** — структурований звіт на stdout для baseline / `jq`; юніт-тести парсера аргументів у `src/bin/poolai_health_load.rs`. |
