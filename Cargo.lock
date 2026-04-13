@@ -2909,6 +2909,7 @@ dependencies = [
  "flate2",
  "futures-util",
  "hex",
+ "hmac",
  "http 1.4.0",
  "jsonwebtoken",
  "k8s-openapi",

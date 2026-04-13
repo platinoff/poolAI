@@ -54,6 +54,7 @@ async fn test_authenticate_user_admin() {
     assert_eq!(response.role, UserRole::Admin);
     assert_eq!(response.token_type, "Bearer");
     assert!(response.expires_in > 0);
+    assert!(response.bootstrap_default_admin);
 }
 
 #[tokio::test]
@@ -68,6 +69,7 @@ async fn test_authenticate_user_operator() {
 
     let response = result.unwrap();
     assert_eq!(response.role, UserRole::Operator);
+    assert!(!response.bootstrap_default_admin);
 }
 
 #[tokio::test]
@@ -82,6 +84,7 @@ async fn test_authenticate_user_viewer() {
 
     let response = result.unwrap();
     assert_eq!(response.role, UserRole::Viewer);
+    assert!(!response.bootstrap_default_admin);
 }
 
 #[tokio::test]

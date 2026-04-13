@@ -39,6 +39,7 @@ async fn test_oauth2_provider_crud() {
         token_url: "https://oauth.example.com/token".to_string(),
         redirect_uri: "https://poolai.example.com/callback".to_string(),
         scopes: vec!["openid".to_string(), "profile".to_string()],
+        telegram_allow_user_ids: vec![],
     };
 
     assert!(manager
@@ -66,6 +67,7 @@ async fn test_oauth2_provider_crud() {
         token_url: config.token_url,
         redirect_uri: config.redirect_uri,
         scopes: config.scopes,
+        telegram_allow_user_ids: vec![],
     };
 
     assert!(manager
@@ -101,6 +103,7 @@ async fn test_oauth2_provider_validation() {
         token_url: "https://oauth.example.com/token".to_string(),
         redirect_uri: "https://poolai.example.com/callback".to_string(),
         scopes: vec![],
+        telegram_allow_user_ids: vec![],
     };
 
     let result = manager
@@ -137,6 +140,7 @@ async fn test_oauth2_authorization_url() {
         token_url: "https://oauth.example.com/token".to_string(),
         redirect_uri: "https://poolai.example.com/callback".to_string(),
         scopes: vec!["openid".to_string(), "profile".to_string()],
+        telegram_allow_user_ids: vec![],
     };
 
     manager
@@ -447,6 +451,7 @@ async fn test_oauth2_provider_update_nonexistent() {
         token_url: "https://oauth.example.com/token".to_string(),
         redirect_uri: "https://poolai.example.com/callback".to_string(),
         scopes: vec![],
+        telegram_allow_user_ids: vec![],
     };
 
     let result = manager

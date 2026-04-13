@@ -81,6 +81,7 @@ async fn test_authentication_flow() {
     assert_eq!(auth_response.token_type, "Bearer");
     assert_eq!(auth_response.role, UserRole::Admin);
     assert!(auth_response.expires_in > 0);
+    assert!(auth_response.bootstrap_default_admin);
 }
 
 #[tokio::test]

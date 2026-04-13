@@ -78,6 +78,11 @@ impl From<User> for UserInfo {
     }
 }
 
+/// Built-in administrator username seeded on first [`UserManager::initialize`].
+pub const DEFAULT_DEV_ADMIN_USERNAME: &str = "admin";
+/// Built-in administrator password (dev / first-run; in-memory store uses plaintext today).
+pub const DEFAULT_DEV_ADMIN_PASSWORD: &str = "admin123";
+
 /// User manager for user account management
 pub struct UserManager {
     users: Arc<RwLock<HashMap<Uuid, User>>>,
@@ -101,7 +106,11 @@ impl UserManager {
         }
 
         let default_users = vec![
-            ("admin", "admin123", UserRole::Admin),
+            (
+                DEFAULT_DEV_ADMIN_USERNAME,
+                DEFAULT_DEV_ADMIN_PASSWORD,
+                UserRole::Admin,
+            ),
             ("operator", "op123", UserRole::Operator),
             ("viewer", "view123", UserRole::Viewer),
         ];
@@ -259,6 +268,17 @@ impl UserManager {
                 return Ok(false);
             }
             Ok(user.password_hash == password)
+        } else {
+            Ok(false)
+        }
+    }
+
+    /// `true` if this account is still the seeded admin with the default password (first-run / dev).
+    pub async fn is_default_bootstrap_admin_account(&self, username: &str) -> Result<bool, String> {
+        if let Some(user) = self.get_user_by_username(username).await? {
+            Ok(user.username == DEFAULT_DEV_ADMIN_USERNAME
+                && matches!(user.role, UserRole::Admin)
+                && user.password_hash == DEFAULT_DEV_ADMIN_PASSWORD)
         } else {
             Ok(false)
         }

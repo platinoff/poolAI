@@ -60,7 +60,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 1. **FM-003** + **P4** + **P2b** — Criterion і **`poolai_health_load --json`** на реф-хості → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md); на LAN — повні заміри реплікації + порівняння розміру до/після TQ01.
 2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** + replication; далі LAN і payload для conflicts за потреби.
 3. **FM-011** — стабільні тести на Windows: профіль **`[profile.test]`**, **`cargo test-ci`** (як CI: `--lib` + `--tests`), **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; **`-j 1`** за потреби.
-4. **FM-012** — UX/UI: i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, admin shell + enterprise admin **monitoring/config/security/instances/topology** + **tenants/VM/workers/libs/users/RAID**); далі — решта `/ui/*`, Telegram OAuth hardening.
+4. **FM-012** — UX/UI: i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, admin shell + enterprise admin **monitoring/config/security/instances/topology** + **tenants/VM/workers/libs/users/RAID**); перший вхід — банер для дефолтного `admin` + поле **`bootstrap_default_admin`** у **`login`/`refresh`**; далі — решта `/ui/*`, подальше загострення Telegram OAuth (частково: HMAC перевірка віджета, allowlist, audit).
 5. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
 6. **Концепт → код** — **FM-009** (Grid envelope), **FM-010** (Solana).
 
@@ -304,15 +304,17 @@ POOLAI_CONFIG_PATH=./custom_config.toml cargo run --features enterprise
 RUST_LOG=debug cargo run --features enterprise
 ```
 
-### Creating Admin User
+### Default users and first login
 
-After starting the server, create an admin user via API:
+On first startup the server seeds built-in accounts (see `UserManager::initialize` in `src/core/user_manager.rs`): **Admin** `admin` / `admin123`, plus operator and viewer test users. For a fresh dev install you can sign in at `/ui/auth` with those credentials; you do **not** need to create the primary admin via API first.
+
+Successful **`POST /api/v1/login`** and **`POST /api/v1/refresh`** responses include optional JSON field **`bootstrap_default_admin`** (`true` when the logged-in user still matches the default seeded admin credentials). The web UI shows a first-run banner until the admin password is changed (e.g. under **Users** in the enterprise admin panel). Change all default passwords before production.
 
 ```bash
-# Create admin user
+# Optional: create an additional admin or user via API (when permitted)
 curl -X POST http://localhost:8080/api/v1/users \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "admin123", "role": "Admin"}'
+  -d '{"username": "admin2", "password": "change-me", "role": "Admin"}'
 
 # Login to get JWT token
 curl -X POST http://localhost:8080/api/v1/login \
@@ -320,7 +322,7 @@ curl -X POST http://localhost:8080/api/v1/login \
   -d '{"username": "admin", "password": "admin123"}'
 ```
 
-The JWT token will be stored in localStorage or cookie after login for accessing the admin panel.
+The JWT token is stored in localStorage (and refreshed via `/api/v1/refresh`) for the admin UI.
 
 ### Current Features (Stage 3)
 

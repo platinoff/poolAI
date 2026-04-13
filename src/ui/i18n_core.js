@@ -24,6 +24,12 @@
       'auth.testAdmin': 'Admin: admin / admin123',
       'auth.testOperator': 'Operator: operator / op123',
       'auth.testViewer': 'Viewer: viewer / view123',
+      'auth.bootstrapLine1':
+        'First launch: you are signed in as the built-in administrator. Login: admin — password: admin123.',
+      'auth.bootstrapLine2':
+        'Change the password in Admin → Users, or continue with the default and update it anytime in settings.',
+      'auth.bootstrapUsersLink': 'Admin → Users',
+      'auth.bootstrapDismiss': 'Got it',
       'auth.lang.en': 'EN',
       'auth.lang.uk': 'UA',
 
@@ -769,6 +775,12 @@
       'auth.testAdmin': 'Адмін: admin / admin123',
       'auth.testOperator': 'Оператор: operator / op123',
       'auth.testViewer': 'Глядач: viewer / view123',
+      'auth.bootstrapLine1':
+        'Перший запуск: ви увійшли як вбудований адміністратор. Логін: admin — пароль: admin123.',
+      'auth.bootstrapLine2':
+        'Змініть пароль у Адмінка → Користувачі або продовжуйте зі штатним паролем і оновіть його будь-коли в налаштуваннях.',
+      'auth.bootstrapUsersLink': 'Адмінка → Користувачі',
+      'auth.bootstrapDismiss': 'Зрозуміло',
       'auth.lang.en': 'EN',
       'auth.lang.uk': 'UA',
 
@@ -1580,6 +1592,46 @@
     });
   }
 
+  var LS_BOOTSTRAP_SHOW = 'poolai_bootstrap_admin_show';
+  var LS_BOOTSTRAP_ACK = 'poolai_bootstrap_admin_ack';
+
+  /** First-run reminder when default admin password is still in use (see AuthResponse.bootstrap_default_admin). */
+  function initBootstrapBanner() {
+    var host = document.getElementById('poolai-bootstrap-banner-host');
+    if (!host) return;
+    try {
+      var role = localStorage.getItem('poolai_role');
+      if (role !== 'Admin') return;
+      if (localStorage.getItem(LS_BOOTSTRAP_ACK) === '1') return;
+      if (localStorage.getItem(LS_BOOTSTRAP_SHOW) !== '1') return;
+    } catch (e) {
+      return;
+    }
+    host.removeAttribute('hidden');
+    host.innerHTML =
+      '<div class="poolai-bootstrap-inner">' +
+      '<div class="poolai-bootstrap-text">' +
+      '<div data-i18n="auth.bootstrapLine1"></div>' +
+      '<div data-i18n="auth.bootstrapLine2" style="margin-top:6px;opacity:0.92;"></div>' +
+      '</div>' +
+      '<div class="poolai-bootstrap-actions">' +
+      '<a class="btn btn-primary" href="/ui/admin/users" data-i18n="auth.bootstrapUsersLink"></a>' +
+      '<button type="button" class="btn" data-i18n="auth.bootstrapDismiss"></button>' +
+      '</div>' +
+      '</div>';
+    apply(host);
+    var dismiss = host.querySelector('.poolai-bootstrap-actions button');
+    if (dismiss) {
+      dismiss.addEventListener('click', function () {
+        try {
+          localStorage.setItem(LS_BOOTSTRAP_ACK, '1');
+        } catch (e2) {}
+        host.setAttribute('hidden', '');
+        host.innerHTML = '';
+      });
+    }
+  }
+
   /** Admin header: expects #poolai-lang-toggle container */
   function initAdminShell() {
     var host = document.getElementById('poolai-lang-toggle');
@@ -1592,6 +1644,7 @@
     bindLangSegment(host.querySelector('[data-lang-set="en"]'), 'en');
     bindLangSegment(host.querySelector('[data-lang-set="uk"]'), 'uk');
     syncLangToggleActive();
+    initBootstrapBanner();
   }
 
   function initAuthPage() {
@@ -1618,6 +1671,7 @@
     bindLangSegment(host.querySelector('[data-lang-set="en"]'), 'en');
     bindLangSegment(host.querySelector('[data-lang-set="uk"]'), 'uk');
     syncLangToggleActive();
+    initBootstrapBanner();
   }
 
   document.documentElement.lang = getLang() === 'uk' ? 'uk' : 'en';

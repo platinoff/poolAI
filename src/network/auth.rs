@@ -132,6 +132,7 @@ pub struct AuthRequest {
 ///     token_type: "Bearer".to_string(),
 ///     expires_in: 3600,
 ///     role: UserRole::Admin,
+///     bootstrap_default_admin: false,
 /// };
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
@@ -140,6 +141,9 @@ pub struct AuthResponse {
     pub token_type: String,
     pub expires_in: usize,
     pub role: UserRole,
+    /// When `true`, the UI may show a first-run reminder to change the default admin password.
+    #[serde(default)]
+    pub bootstrap_default_admin: bool,
 }
 
 // Структура для перевірки прав доступу
@@ -385,11 +389,24 @@ pub async fn refresh_access_token(
 
     let config = JwtConfig::default();
 
+    let bootstrap_default_admin = user_manager
+        .is_default_bootstrap_admin_account(&username)
+        .await
+        .map_err(|e| {
+            auth_http_err(
+                "AUTH_INTERNAL",
+                format!("User lookup error: {}", e),
+                ErrorContext::new("refresh_access_token"),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            )
+        })?;
+
     Ok(AuthResponse {
         token: new_token,
         token_type: "Bearer".to_string(),
         expires_in: config.expiration,
         role,
+        bootstrap_default_admin,
     })
 }
 
@@ -610,11 +627,24 @@ pub async fn authenticate_user(
 
     let config = JwtConfig::default();
 
+    let bootstrap_default_admin = manager
+        .is_default_bootstrap_admin_account(&username)
+        .await
+        .map_err(|e| {
+            auth_http_err(
+                "AUTH_INTERNAL",
+                format!("User lookup error: {}", e),
+                ErrorContext::new("authenticate_user"),
+                StatusCode::INTERNAL_SERVER_ERROR,
+            )
+        })?;
+
     Ok(AuthResponse {
         token,
         token_type: "Bearer".to_string(),
         expires_in: config.expiration,
         role,
+        bootstrap_default_admin,
     })
 }
 

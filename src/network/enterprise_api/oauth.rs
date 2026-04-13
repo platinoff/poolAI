@@ -1,17 +1,35 @@
 //! Enterprise API: OAuth2 browser flows (GitHub, Google, Telegram).
 
-use crate::core::error::ErrorContext;
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::oauth2_pending::{store_oauth2_pending, verify_oauth2_pending};
 use crate::core::state::ApiContext;
+use crate::enterprise::audit::{AuditEvent, AuditLevel};
 use crate::services::enterprise_service::{
     EnterpriseOAuthStartError, EnterpriseSecurityError, EnterpriseService,
 };
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
-use axum::response::{IntoResponse, Redirect};
-use axum::Json;
+use axum::response::{Html, IntoResponse, Redirect};
+use std::collections::HashMap;
 
 use super::{enterprise_err, enterprise_json_err};
+
+fn escape_html_attr(s: &str) -> String {
+    s.chars().fold(String::new(), |mut acc, c| {
+        match c {
+            '&' => acc.push_str("&amp;"),
+            '"' => acc.push_str("&quot;"),
+            '<' => acc.push_str("&lt;"),
+            _ => acc.push(c),
+        }
+        acc
+    })
+}
+
+async fn audit_telegram_event(ctx: &ApiContext, event: AuditEvent) {
+    let _ = ctx.audit_logger.initialize().await;
+    let _ = ctx.audit_logger.log_event(event).await;
+}
 pub(super) async fn oauth2_github_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     let state = uuid::Uuid::new_v4().to_string();
     store_oauth2_pending(&ctx.oauth2_pending_states, state.clone()).await;
@@ -403,63 +421,80 @@ pub(super) async fn oauth2_telegram_auth_handler(
     State(ctx): State<ApiContext>,
 ) -> impl IntoResponse {
     match EnterpriseService::get_telegram_oauth_widget_info(&ctx).await {
-        Ok(info) => Json(serde_json::json!({
-            "bot_name": info.client_id,
-            "widget_url": "https://oauth.telegram.org/auth",
-            "redirect_uri": info.redirect_uri,
-            "message": "Use Telegram Login Widget on the client side. This endpoint provides configuration."
-        }))
+        Ok(info) => {
+            let login = escape_html_attr(info.client_id.trim());
+            let auth_url = escape_html_attr(info.redirect_uri.trim());
+            Html(format!(
+                r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telegram sign-in</title>
+</head>
+<body style="font-family:system-ui,sans-serif;text-align:center;padding:2rem;background:#0f1216;color:#e8e8e8;">
+  <p style="color:#a8b0bf;">Sign in with Telegram</p>
+  <script async src="https://telegram.org/js/telegram-widget.js?22"
+    data-telegram-login="{login}"
+    data-size="large"
+    data-auth-url="{auth_url}"
+    data-request-access="write"></script>
+  <p style="margin-top:1.5rem;font-size:0.9em;color:#a8b0bf;">You can close this page after signing in.</p>
+</body>
+</html>"#
+            ))
+            .into_response()
+        }
+        Err(EnterpriseOAuthStartError::Init(e)) => enterprise_err(
+            "SECURITY_MANAGER_UNAVAILABLE",
+            format!("Security manager not initialized: {}", e),
+            "oauth2_telegram_auth",
+            StatusCode::SERVICE_UNAVAILABLE,
+        )
         .into_response(),
-        Err(EnterpriseOAuthStartError::Init(e)) => {
-            enterprise_err(
-                "SECURITY_MANAGER_UNAVAILABLE",
-                format!("Security manager not initialized: {}", e),
-                "oauth2_telegram_auth",
-                StatusCode::SERVICE_UNAVAILABLE,
-            )
-            .into_response()
-        }
-        Err(EnterpriseOAuthStartError::ListProviders(e)) => {
-            enterprise_err(
-                "OAUTH2_LIST_PROVIDERS_FAILED",
-                format!("Failed to list OAuth2 providers: {}", e),
-                "oauth2_telegram_auth",
-                StatusCode::INTERNAL_SERVER_ERROR,
-            )
-            .into_response()
-        }
-        Err(EnterpriseOAuthStartError::ProviderNotConfigured) => {
-            enterprise_err(
-                "OAUTH2_PROVIDER_NOT_CONFIGURED",
-                "Telegram OAuth2 provider not configured. Register it in the admin panel.",
-                "oauth2_telegram_auth",
-                StatusCode::NOT_FOUND,
-            )
-            .into_response()
-        }
-        Err(EnterpriseOAuthStartError::AuthUrl(e)) => {
-            enterprise_err(
-                "OAUTH2_TELEGRAM_CONFIG_FAILED",
-                format!("Telegram OAuth configuration error: {}", e),
-                "oauth2_telegram_auth",
-                StatusCode::INTERNAL_SERVER_ERROR,
-            )
-            .into_response()
-        }
+        Err(EnterpriseOAuthStartError::ListProviders(e)) => enterprise_err(
+            "OAUTH2_LIST_PROVIDERS_FAILED",
+            format!("Failed to list OAuth2 providers: {}", e),
+            "oauth2_telegram_auth",
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
+        Err(EnterpriseOAuthStartError::ProviderNotConfigured) => enterprise_err(
+            "OAUTH2_PROVIDER_NOT_CONFIGURED",
+            "Telegram OAuth2 provider not configured. Register it in the admin panel.",
+            "oauth2_telegram_auth",
+            StatusCode::NOT_FOUND,
+        )
+        .into_response(),
+        Err(EnterpriseOAuthStartError::AuthUrl(e)) => enterprise_err(
+            "OAUTH2_TELEGRAM_CONFIG_FAILED",
+            format!("Telegram OAuth configuration error: {}", e),
+            "oauth2_telegram_auth",
+            StatusCode::INTERNAL_SERVER_ERROR,
+        )
+        .into_response(),
     }
 }
 
 pub(super) async fn oauth2_telegram_callback_handler(
     State(ctx): State<ApiContext>,
-    Query(params): Query<std::collections::HashMap<String, String>>,
+    Query(params): Query<HashMap<String, String>>,
 ) -> impl IntoResponse {
-    // Telegram Login Widget sends auth data via hash in URL
-    // This needs to be handled client-side, then sent to this endpoint
-    let auth_data = params.get("auth_data").cloned().unwrap_or_default();
-    let hash = params.get("hash").cloned().unwrap_or_default();
-    let error = params.get("error").cloned();
+    let tg_id_hint = params.get("id").cloned().unwrap_or_default();
 
-    if let Some(error) = error {
+    if let Some(error) = params.get("error").cloned() {
+        audit_telegram_event(
+            &ctx,
+            AuditEvent::new(
+                AuditLevel::Warning,
+                "oauth_telegram_login".to_string(),
+                "authentication".to_string(),
+                "provider_error".to_string(),
+            )
+            .with_metadata("telegram_id".to_string(), tg_id_hint.clone())
+            .with_metadata("detail".to_string(), error.clone()),
+        )
+        .await;
         return enterprise_json_err(
             "TELEGRAM_AUTH_ERROR",
             format!("Telegram authentication error: {}", error),
@@ -469,56 +504,77 @@ pub(super) async fn oauth2_telegram_callback_handler(
         .into_response();
     }
 
-    if auth_data.is_empty() || hash.is_empty() {
-        return enterprise_json_err(
-            "TELEGRAM_MISSING_AUTH_DATA",
-            "Missing authentication data from Telegram",
-            ErrorContext::new("oauth2_telegram_callback"),
-            StatusCode::BAD_REQUEST,
+    if let Err(e) = ctx.security_manager.initialize().await {
+        return enterprise_err(
+            "SECURITY_MANAGER_UNAVAILABLE",
+            format!("Security manager not initialized: {}", e),
+            "oauth2_telegram_callback",
+            StatusCode::SERVICE_UNAVAILABLE,
         )
         .into_response();
     }
 
-    // Parse auth_data (it's typically URL-encoded JSON)
-    // In a production environment, you should verify the hash using Telegram's bot token
-    let user_data = match serde_json::from_str::<serde_json::Value>(&auth_data) {
-        Ok(v) => v,
-        Err(_) => {
+    let verify = ctx
+        .security_manager
+        .verify_telegram_oauth_callback(&params)
+        .await;
+    let (telegram_id, username) = match verify {
+        Ok(pair) => pair,
+        Err(AppError::Forbidden(msg)) => {
+            audit_telegram_event(
+                &ctx,
+                AuditEvent::new(
+                    AuditLevel::Warning,
+                    "oauth_telegram_login".to_string(),
+                    "authentication".to_string(),
+                    "denied_allowlist".to_string(),
+                )
+                .with_metadata("telegram_id".to_string(), tg_id_hint.clone())
+                .with_metadata("detail".to_string(), msg.clone()),
+            )
+            .await;
             return enterprise_json_err(
-                "TELEGRAM_INVALID_AUTH_FORMAT",
-                "Invalid authentication data format from Telegram",
+                "TELEGRAM_USER_NOT_ALLOWED",
+                msg,
+                ErrorContext::new("oauth2_telegram_callback"),
+                StatusCode::FORBIDDEN,
+            )
+            .into_response();
+        }
+        Err(AppError::ValidationError(msg)) => {
+            audit_telegram_event(
+                &ctx,
+                AuditEvent::new(
+                    AuditLevel::Warning,
+                    "oauth_telegram_login".to_string(),
+                    "authentication".to_string(),
+                    "invalid_request".to_string(),
+                )
+                .with_metadata("telegram_id".to_string(), tg_id_hint.clone())
+                .with_metadata("detail".to_string(), msg.clone()),
+            )
+            .await;
+            return enterprise_json_err(
+                "TELEGRAM_AUTH_INVALID",
+                msg,
                 ErrorContext::new("oauth2_telegram_callback"),
                 StatusCode::BAD_REQUEST,
             )
             .into_response();
         }
+        Err(e) => {
+            return enterprise_err(
+                "TELEGRAM_AUTH_FAILED",
+                e.to_string(),
+                "oauth2_telegram_callback",
+                StatusCode::INTERNAL_SERVER_ERROR,
+            )
+            .into_response();
+        }
     };
-    let telegram_id = user_data
-        .get("id")
-        .and_then(|v| v.as_u64())
-        .map(|v| v.to_string())
-        .unwrap_or_default();
-    let username = user_data
-        .get("username")
-        .and_then(|v| v.as_str())
-        .unwrap_or("telegram_user")
-        .to_string();
-    let _first_name = user_data
-        .get("first_name")
-        .and_then(|v| v.as_str())
-        .map(|s| s.to_string());
 
-    if telegram_id.is_empty() {
-        return enterprise_json_err(
-            "TELEGRAM_MISSING_USER_ID",
-            "Missing user ID in Telegram authentication data",
-            ErrorContext::new("oauth2_telegram_callback"),
-            StatusCode::BAD_REQUEST,
-        )
-        .into_response();
-    }
+    let telegram_id_str = telegram_id.to_string();
 
-    // Get or create user in PoolAI
     let user_manager = ctx.user_manager.clone();
     if let Err(e) = user_manager.initialize().await {
         return enterprise_err(
@@ -530,7 +586,6 @@ pub(super) async fn oauth2_telegram_callback_handler(
         .into_response();
     }
 
-    // Try to find existing user by username
     let poolai_user = user_manager
         .get_user_by_username(&username)
         .await
@@ -539,11 +594,10 @@ pub(super) async fn oauth2_telegram_callback_handler(
     let (final_username, role) = if let Some(user) = poolai_user {
         (user.username.clone(), user.role)
     } else {
-        // Create new user with Viewer role by default
         match user_manager
             .create_user(
                 username.clone(),
-                format!("oauth2_telegram_{}", telegram_id),
+                format!("oauth2_telegram_{}", telegram_id_str),
                 crate::network::auth::UserRole::Viewer,
             )
             .await
@@ -561,7 +615,6 @@ pub(super) async fn oauth2_telegram_callback_handler(
         }
     };
 
-    // Generate PoolAI JWT token
     let poolai_token = match crate::network::auth::generate_token(&final_username, role.clone()) {
         Ok(token) => token,
         Err(e) => {
@@ -575,7 +628,19 @@ pub(super) async fn oauth2_telegram_callback_handler(
         }
     };
 
-    // Redirect to UI with token
+    audit_telegram_event(
+        &ctx,
+        AuditEvent::new(
+            AuditLevel::Info,
+            "oauth_telegram_login".to_string(),
+            "authentication".to_string(),
+            "success".to_string(),
+        )
+        .with_user_id(final_username.clone())
+        .with_metadata("telegram_id".to_string(), telegram_id_str),
+    )
+    .await;
+
     let redirect_url = format!(
         "/ui/auth?token={}&username={}&role={:?}&expires_in=3600",
         urlencoding::encode(&poolai_token),

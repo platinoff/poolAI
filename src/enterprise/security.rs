@@ -27,6 +27,7 @@
 //!     token_url: "https://oauth.example.com/token".to_string(),
 //!     redirect_uri: "https://poolai.example.com/callback".to_string(),
 //!     scopes: vec!["openid".to_string(), "profile".to_string()],
+//!     telegram_allow_user_ids: vec![],
 //! };
 //!
 //! manager.register_oauth2_provider("google", oauth2_config).await?;
@@ -36,12 +37,93 @@
 
 use crate::core::error::AppError;
 use base64::Engine;
+use hmac::{Hmac, Mac};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 use tokio::sync::RwLock;
 use tracing::info;
 use uuid::Uuid;
+
+type HmacSha256 = Hmac<Sha256>;
+
+fn build_telegram_data_check_string(query: &HashMap<String, String>) -> Result<String, AppError> {
+    let mut keys: Vec<&String> = query.keys().filter(|k| k.as_str() != "hash").collect();
+    keys.sort();
+    let mut pairs = Vec::with_capacity(keys.len());
+    for k in keys {
+        let v = query.get(k).ok_or_else(|| {
+            AppError::ValidationError(
+                "Telegram auth: inconsistent query map (missing value)".to_string(),
+            )
+        })?;
+        pairs.push(format!("{}={}", k, v));
+    }
+    Ok(pairs.join("\n"))
+}
+
+fn telegram_login_hmac_digest(
+    bot_token: &str,
+    data_check_string: &str,
+) -> Result<Vec<u8>, AppError> {
+    let secret_key = Sha256::digest(bot_token.as_bytes());
+    let mut mac = HmacSha256::new_from_slice(&secret_key).map_err(|_| {
+        AppError::ValidationError("Telegram auth: invalid HMAC key length (internal)".to_string())
+    })?;
+    mac.update(data_check_string.as_bytes());
+    Ok(mac.finalize().into_bytes().to_vec())
+}
+
+/// Verifies [Telegram Login Widget](https://core.telegram.org/widgets/login#checking-authorization) callback query parameters.
+pub fn verify_telegram_widget_query(
+    bot_token: &str,
+    query: &HashMap<String, String>,
+) -> Result<(u64, String), AppError> {
+    let hash_received = query.get("hash").ok_or_else(|| {
+        AppError::ValidationError(
+            "Telegram auth: missing hash (widget callback incomplete)".to_string(),
+        )
+    })?;
+
+    let data_check_string = build_telegram_data_check_string(query)?;
+    let expected = telegram_login_hmac_digest(bot_token, &data_check_string)?;
+    let expected_hex = hex::encode(&expected);
+    if expected_hex != *hash_received {
+        return Err(AppError::ValidationError(
+            "Telegram auth: invalid hash (possible tampering)".to_string(),
+        ));
+    }
+
+    let auth_date_str = query
+        .get("auth_date")
+        .ok_or_else(|| AppError::ValidationError("Telegram auth: missing auth_date".to_string()))?;
+    let auth_date: i64 = auth_date_str
+        .parse()
+        .map_err(|_| AppError::ValidationError("Telegram auth: invalid auth_date".to_string()))?;
+    let now = chrono::Utc::now().timestamp();
+    if (now - auth_date).abs() > 86400 {
+        return Err(AppError::ValidationError(
+            "Telegram auth: auth_date expired (max 24h skew allowed)".to_string(),
+        ));
+    }
+
+    let id_str = query
+        .get("id")
+        .ok_or_else(|| AppError::ValidationError("Telegram auth: missing id".to_string()))?;
+    let id: u64 = id_str
+        .parse()
+        .map_err(|_| AppError::ValidationError("Telegram auth: invalid user id".to_string()))?;
+
+    let username = query
+        .get("username")
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| format!("tg_{id}"));
+
+    Ok((id, username))
+}
 
 // OAuth2 token exchange response from provider
 #[derive(Debug, Deserialize)]
@@ -73,6 +155,10 @@ pub struct OAuth2Config {
     pub redirect_uri: String,
     /// Requested OAuth2 scopes
     pub scopes: Vec<String>,
+    /// For provider name `telegram` only: numeric Telegram user IDs allowed to sign in.
+    /// Empty = any Telegram user that passes [widget hash verification](https://core.telegram.org/widgets/login#checking-authorization).
+    #[serde(default)]
+    pub telegram_allow_user_ids: Vec<String>,
 }
 
 /// OAuth2 provider information
@@ -867,6 +953,45 @@ impl SecurityManager {
         Ok(())
     }
 
+    /// Verifies Telegram Login Widget redirect: HMAC hash, `auth_date` freshness, optional allowlist.
+    pub async fn verify_telegram_oauth_callback(
+        &self,
+        query: &HashMap<String, String>,
+    ) -> Result<(u64, String), AppError> {
+        let (bot_token, allow) = {
+            let providers = self.oauth2_providers.read().await;
+            let provider = providers.get("telegram").ok_or_else(|| {
+                AppError::ValidationError("Telegram OAuth2 provider not configured".to_string())
+            })?;
+            if !provider.enabled {
+                return Err(AppError::ValidationError(
+                    "Telegram OAuth2 provider is disabled".to_string(),
+                ));
+            }
+            let token = provider.config.client_secret.trim().to_string();
+            if token.is_empty() {
+                return Err(AppError::ValidationError(
+                    "Telegram OAuth2: bot token (client_secret) is empty".to_string(),
+                ));
+            }
+            (token, provider.config.telegram_allow_user_ids.clone())
+        };
+
+        let (id, username) = verify_telegram_widget_query(&bot_token, query)?;
+
+        if !allow.is_empty() {
+            let sid = id.to_string();
+            if !allow.iter().any(|a| a == &sid) {
+                return Err(AppError::Forbidden(format!(
+                    "Telegram user id {} is not allowed for this provider",
+                    sid
+                )));
+            }
+        }
+
+        Ok((id, username))
+    }
+
     /// Lists all SAML providers
     pub async fn list_saml_providers(&self) -> Result<Vec<SamlProvider>, AppError> {
         let providers = self.saml_providers.read().await;
@@ -1017,6 +1142,7 @@ mod tests {
             token_url: "https://oauth.example.com/token".to_string(),
             redirect_uri: "https://poolai.example.com/callback".to_string(),
             scopes: vec!["openid".to_string(), "profile".to_string()],
+            telegram_allow_user_ids: vec![],
         };
 
         assert!(manager
@@ -1037,6 +1163,7 @@ mod tests {
             token_url: "https://oauth.example.com/token".to_string(),
             redirect_uri: "https://poolai.example.com/callback".to_string(),
             scopes: vec!["openid".to_string()],
+            telegram_allow_user_ids: vec![],
         };
 
         manager
@@ -1071,5 +1198,23 @@ mod tests {
         let retrieved = manager.get_security_policy("test-policy").await.unwrap();
         assert!(retrieved.is_some());
         assert_eq!(retrieved.unwrap().require_mfa, true);
+    }
+
+    #[test]
+    fn telegram_widget_verify_roundtrip() {
+        let token = "1234567:AAbb_ccDDeeFF_gghh";
+        let mut q = HashMap::new();
+        q.insert(
+            "auth_date".into(),
+            chrono::Utc::now().timestamp().to_string(),
+        );
+        q.insert("first_name".into(), "Ann".into());
+        q.insert("id".into(), "424242".into());
+        let dcs = build_telegram_data_check_string(&q).unwrap();
+        let digest = telegram_login_hmac_digest(token, &dcs).unwrap();
+        q.insert("hash".into(), hex::encode(digest));
+        let (id, name) = verify_telegram_widget_query(token, &q).unwrap();
+        assert_eq!(id, 424242);
+        assert_eq!(name, "tg_424242");
     }
 }

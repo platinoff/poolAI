@@ -115,6 +115,13 @@ async function adminRefreshAccessToken() {
     const data = await res.json();
     if (!data.token) return false;
     localStorage.setItem('poolai_token', data.token);
+    try {
+      if (data.bootstrap_default_admin === true) {
+        localStorage.setItem('poolai_bootstrap_admin_show', '1');
+      } else if (data.bootstrap_default_admin === false) {
+        localStorage.removeItem('poolai_bootstrap_admin_show');
+      }
+    } catch (e) { /* ignore */ }
     if (data.role) {
       const username = localStorage.getItem('poolai_user');
       if (username) localStorage.setItem('poolai_role', data.role);

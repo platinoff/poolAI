@@ -159,6 +159,19 @@ pub async fn admin_users() -> Html<String> {
         });
         
         showNotification(T('admin.usr.updatedOk', 'User updated successfully'), 'success');
+        const editedName = document.getElementById('editUserUsername').value;
+        const newPwd = document.getElementById('editUserPassword').value;
+        if (editedName === 'admin' && newPwd) {
+          try {
+            localStorage.removeItem('poolai_bootstrap_admin_show');
+            localStorage.setItem('poolai_bootstrap_admin_ack', '1');
+          } catch (e) {}
+          var bh = document.getElementById('poolai-bootstrap-banner-host');
+          if (bh) {
+            bh.setAttribute('hidden', '');
+            bh.innerHTML = '';
+          }
+        }
         hideModal('editUserModal');
         form.reset();
         loadUsers();

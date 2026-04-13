@@ -86,6 +86,7 @@ zip = { version = "7.0", default-features = false, features = ["deflate", "time"
 
 # Checksum verification
 sha2 = "0.10"
+hmac = "0.12"
 hex = "0.4"
 
 # SQLite database for enterprise monitoring persistence

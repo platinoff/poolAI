@@ -618,6 +618,33 @@ const BASE_CSS: &str = r#"
   .grid .item:nth-child(3) { animation-delay: 0.15s; }
   .grid .item:nth-child(4) { animation-delay: 0.2s; }
 
+  /* First-run: default admin password reminder */
+  .poolai-bootstrap-banner-host {
+    margin: 0 0 var(--spacing-3, 12px);
+    padding: var(--spacing-3, 12px) var(--spacing-4, 16px);
+    border-radius: var(--radius-lg, 12px);
+    border: 1px solid rgba(255, 193, 7, 0.45);
+    background: rgba(255, 193, 7, 0.12);
+    color: var(--text, #e8e8e8);
+    font-size: var(--font-size-sm, 14px);
+    line-height: 1.45;
+  }
+  .poolai-bootstrap-banner-host .poolai-bootstrap-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-3, 12px);
+  }
+  .poolai-bootstrap-banner-host .poolai-bootstrap-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2, 8px);
+    margin-left: auto;
+  }
+  .poolai-bootstrap-banner-host code {
+    font-size: 0.9em;
+  }
+
   /* FM-012: language toggle (login + shared with admin .btn-lang) */
   .poolai-lang-auth {
     display: flex;
@@ -752,6 +779,7 @@ fn layout(
 
     <main class="content" id="{main_content_id}" role="main">
       <div class="card">
+        <div id="poolai-bootstrap-banner-host" class="poolai-bootstrap-banner-host" hidden></div>
         <div class="row">
           <div>
             <h2 style="margin:0 0 6px" data-i18n="{title_key}">{title_fallback}</h2>
@@ -3475,6 +3503,13 @@ async fn login_page() -> Html<String> {
         const data = await res.json();
         setToken(data.token);
         setUser(username, data.role);
+        try {
+          if (data.bootstrap_default_admin === true) {
+            localStorage.setItem('poolai_bootstrap_admin_show', '1');
+          } else {
+            localStorage.removeItem('poolai_bootstrap_admin_show');
+          }
+        } catch (e) { /* ignore */ }
         
         // Store token expiration time
         if (data.expires_in) {

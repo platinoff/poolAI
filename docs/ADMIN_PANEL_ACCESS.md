@@ -55,6 +55,8 @@ cargo build --features enterprise
    - Username: `admin`
    - Password: `admin123`
 
+   Обліковка `admin` / `admin123` створюється автоматично при першій ініціалізації сховища користувачів (немає окремого кроку «створити admin» для типового dev-запуску). Відповіді **`POST /api/v1/login`** і **`POST /api/v1/refresh`** можуть містити **`"bootstrap_default_admin": true`** — тоді в UI з’являється банер з нагадуванням змінити пароль; після зміни пароля для `admin` у розділі **Users** банер зникає.
+
 4. **Після успішної авторизації перейдіть на:**
    ```
    http://localhost:8080/ui/admin

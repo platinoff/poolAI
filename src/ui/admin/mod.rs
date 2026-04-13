@@ -120,6 +120,7 @@ pub fn admin_layout(
       </header>
       
       <div class="admin-content">
+        <div id="poolai-bootstrap-banner-host" class="poolai-bootstrap-banner-host" hidden></div>
         {body}
       </div>
     </main>
