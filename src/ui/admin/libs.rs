@@ -209,6 +209,7 @@ pub async fn admin_libs() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.libs",
         "Library Management",
         r#"
         <div class="admin-section">

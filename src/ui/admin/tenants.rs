@@ -225,6 +225,7 @@ pub async fn admin_tenants() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.tenants",
         "Tenant Management",
         r#"
         <div class="admin-section">

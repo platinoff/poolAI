@@ -278,5 +278,5 @@ pub async fn admin_instances() -> axum::response::Html<String> {
     loadInstances();
   "#;
 
-    admin_layout("Model Instances", body, script)
+    admin_layout("admin.page.instances", "Model Instances", body, script)
 }

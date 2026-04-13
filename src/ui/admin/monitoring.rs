@@ -359,6 +359,7 @@ pub async fn admin_monitoring() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.monitoring",
         "Monitoring Dashboard",
         r#"
         <div class="admin-section">

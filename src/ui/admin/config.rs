@@ -323,6 +323,7 @@ pub async fn admin_config() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.config",
         "System Configuration",
         r#"
         <div class="admin-section">

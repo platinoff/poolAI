@@ -382,6 +382,7 @@ pub async fn admin_raid() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.raid",
         "RAID Management",
         r#"
         <div class="admin-section">

@@ -66,7 +66,12 @@ pub fn create_admin_routes() -> Router<ApiContext> {
 }
 
 /// Admin panel layout function - shared across all admin pages
-pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
+pub fn admin_layout(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
     let base_css = include_str!("../admin_styles.css");
     let i18n_js = include_str!("../i18n_core.js");
     let common_js = include_str!("../admin_common.js");
@@ -77,7 +82,7 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title} - PoolAI Admin</title>
+  <title>PoolAI Admin</title>
   <style>{base_css}</style>
 </head>
 <body>
@@ -106,7 +111,7 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
     
     <main class="admin-main" role="main">
       <header class="admin-header-bar">
-        <h2>{title}</h2>
+        <h2 data-i18n="{title_key}">{title_fallback}</h2>
         <div class="admin-user-menu">
           <div id="poolai-lang-toggle" class="admin-lang-bar"></div>
           <span id="admin-user-name">Admin</span>
@@ -124,9 +129,21 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
   <script>{common_js}</script>
   <script>
     (function() {{
+      function adminSyncDocTitle() {{
+        var h2 = document.querySelector('.admin-header-bar h2');
+        if (h2 && typeof PoolAiI18n !== 'undefined') {{
+          document.title = h2.textContent.trim() + PoolAiI18n.t('admin.browserSuffix');
+        }}
+      }}
       if (typeof PoolAiI18n !== 'undefined') {{
+        document.documentElement.lang = PoolAiI18n.getLang() === 'uk' ? 'uk' : 'en';
         PoolAiI18n.apply(document.body);
         PoolAiI18n.initAdminShell();
+        adminSyncDocTitle();
+        document.addEventListener('poolai:langchange', function() {{
+          PoolAiI18n.apply(document.body);
+          adminSyncDocTitle();
+        }});
       }}
       if (!requireAdmin()) {{
         return;
@@ -136,7 +153,8 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
   </script>
 </body>
 </html>"#,
-        title = title,
+        title_key = title_i18n_key,
+        title_fallback = title_fallback,
         base_css = base_css,
         body = body_html,
         i18n_js = i18n_js,

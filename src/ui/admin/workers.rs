@@ -134,6 +134,7 @@ pub async fn admin_workers() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.workers",
         "Worker Management",
         r#"
         <div class="admin-section">

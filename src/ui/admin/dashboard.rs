@@ -8,9 +8,13 @@ use axum::response::Html;
 /// Admin dashboard home page
 pub async fn admin_dashboard() -> Html<String> {
     let script = r#"
+    function T(k, fb) {
+      return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb;
+    }
+
     function setDashboardLoading() {
       ['system-overview', 'quick-stats', 'active-alerts', 'recent-activity', 'metrics-chart'].forEach(id => {
-        adminShowLoading(id, 'Loading…');
+        adminShowLoading(id);
       });
     }
 
@@ -29,7 +33,7 @@ pub async fn admin_dashboard() -> Html<String> {
       } catch (e) {
         ['system-overview', 'quick-stats', 'active-alerts', 'recent-activity'].forEach(id => adminShowInlineError(id, e));
         adminShowInlineError('metrics-chart', e);
-        showNotification('Error loading dashboard: ' + e.message, 'error');
+        showNotification(T('admin.dash.errLoad', 'Error loading dashboard: ') + e.message, 'error');
       }
     }
     
@@ -38,11 +42,11 @@ pub async fn admin_dashboard() -> Html<String> {
       if (!el) return;
       el.innerHTML = `
         <div class="stat-item">
-          <span class="stat-label">Status:</span>
+          <span class="stat-label">${T('admin.dash.label.status', 'Status:')}</span>
           <span class="stat-value status-badge ${data.status === 'healthy' ? 'active' : 'error'}">${data.status || 'unknown'}</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Uptime:</span>
+          <span class="stat-label">${T('admin.dash.label.uptime', 'Uptime:')}</span>
           <span class="stat-value">${formatUptime(data.uptime_seconds || 0)}</span>
         </div>
       `;
@@ -65,19 +69,19 @@ pub async fn admin_dashboard() -> Html<String> {
       if (!el) return;
       el.innerHTML = `
         <div class="stat-item">
-          <span class="stat-label">Workers (active):</span>
+          <span class="stat-label">${T('admin.dash.quick.workers', 'Workers (active):')}</span>
           <span class="stat-value">${data.workers ?? 0} / ${data.workers_total ?? 0}</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">VM Instances:</span>
+          <span class="stat-label">${T('admin.dash.quick.vm', 'VM Instances:')}</span>
           <span class="stat-value">${data.vm_instances ?? 0}</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">CPU Usage:</span>
+          <span class="stat-label">${T('admin.dash.quick.cpu', 'CPU Usage:')}</span>
           <span class="stat-value">${(data.cpu_usage_percent ?? 0).toFixed(1)}%</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">Memory (tracked):</span>
+          <span class="stat-label">${T('admin.dash.quick.memory', 'Memory (tracked):')}</span>
           <span class="stat-value">${(data.memory_usage_mb ?? 0).toFixed(0)} MB</span>
         </div>
       `;
@@ -104,8 +108,8 @@ pub async fn admin_dashboard() -> Html<String> {
       if (cpuData.length > 0 || memData.length > 0) {
         el.innerHTML = `
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px;">
-            ${cpuData.length > 0 ? renderSparkline('CPU Usage', cpuData.map(d => d.value || 0)) : ''}
-            ${memData.length > 0 ? renderSparkline('Memory Usage', memData.map(d => d.value || 0)) : ''}
+            ${cpuData.length > 0 ? renderSparkline(T('admin.dash.spark.cpu', 'CPU Usage'), cpuData.map(d => d.value || 0)) : ''}
+            ${memData.length > 0 ? renderSparkline(T('admin.dash.spark.memory', 'Memory Usage'), memData.map(d => d.value || 0)) : ''}
           </div>
         `;
       }
@@ -138,7 +142,7 @@ pub async fn admin_dashboard() -> Html<String> {
             <polyline points="${points}" fill="none" stroke="var(--primary, #67e480)" stroke-width="1.5" />
           </svg>
           <div style="font-size: 0.9em; margin-top: 4px;">
-            <span style="color: var(--text-muted, #a8b0bf);">Avg: </span>
+            <span style="color: var(--text-muted, #a8b0bf);">${T('admin.dash.avg', 'Avg: ')}</span>
             <strong style="color: var(--text, #e8e8e8);">${avg.toFixed(1)}</strong>
           </div>
         </div>
@@ -149,7 +153,7 @@ pub async fn admin_dashboard() -> Html<String> {
       const el = document.getElementById('active-alerts');
       if (!el) return;
       if (!data || data.length === 0) {
-        el.innerHTML = '<div class="muted">No active alerts</div>';
+        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.dash.noAlerts', 'No active alerts')) + '</div>';
         return;
       }
       el.innerHTML = data.map(alert => `
@@ -164,7 +168,7 @@ pub async fn admin_dashboard() -> Html<String> {
       const el = document.getElementById('recent-activity');
       if (!el) return;
       if (!data || data.length === 0) {
-        el.innerHTML = '<div class="muted">No recent activity</div>';
+        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.dash.noActivity', 'No recent activity')) + '</div>';
         return;
       }
       el.innerHTML = data.map(event => `
@@ -189,27 +193,28 @@ pub async fn admin_dashboard() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.dashboard",
         "Admin Dashboard",
         r#"
         <div class="admin-grid">
           <div class="admin-card">
-            <h3>System Overview</h3>
+            <h3 data-i18n="admin.dash.card.overview">System Overview</h3>
             <div id="system-overview"></div>
           </div>
           <div class="admin-card">
-            <h3>Quick Stats</h3>
+            <h3 data-i18n="admin.dash.card.quickStats">Quick Stats</h3>
             <div id="quick-stats"></div>
           </div>
           <div class="admin-card">
-            <h3>Active Alerts</h3>
+            <h3 data-i18n="admin.dash.card.alerts">Active Alerts</h3>
             <div id="active-alerts"></div>
           </div>
           <div class="admin-card">
-            <h3>Recent Activity</h3>
+            <h3 data-i18n="admin.dash.card.activity">Recent Activity</h3>
             <div id="recent-activity"></div>
           </div>
           <div class="admin-card">
-            <h3>Metrics Overview (Last Hour)</h3>
+            <h3 data-i18n="admin.dash.card.metrics">Metrics Overview (Last Hour)</h3>
             <div id="metrics-chart"></div>
           </div>
         </div>

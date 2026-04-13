@@ -671,6 +671,7 @@ pub async fn admin_security() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.security",
         "Security Management",
         r#"
         <div class="admin-section">

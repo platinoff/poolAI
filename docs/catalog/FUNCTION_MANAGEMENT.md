@@ -2,7 +2,7 @@
 
 **Оновлено:** 2026-04-12.
 
-**Останній зріз:** FM-012 **Partial** — i18n **UA/EN** (`src/ui/i18n_core.js`, `/ui/auth`, layout `/ui/*`, **Workers/Libs/VM/RAID** (таблиці, модалки, підтвердження, спільні `showLoading` / `showConfirmDialog`), admin shell, підказки в `admin_common.js`). FM-011 — alias **`cargo test-ci`** (`.cargo/config.toml`). FM-003 / P4 — рядки baseline **2026-04-12** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md). FM-007 — додаткові wire-тести **`SyncArtifacts`**. FM-005 ✅ — узгоджений JSON **`HttpAppError`/`RestError`** по REST, **`enterprise_api`**, auth middleware.
+**Останній зріз:** FM-012 **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout `/ui/*`, write-flow, **enterprise admin**: `admin_layout` (заголовок сторінки + `<title>`, `poolai:langchange`), **dashboard** + **audit** картки/фільтри/таблиця; решта admin сторінок — англійські тіла з перекладеним лише заголовком у header. FM-011 — alias **`cargo test-ci`** (`.cargo/config.toml`). FM-003 / P4 — рядки baseline **2026-04-12** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md). FM-007 — додаткові wire-тести **`SyncArtifacts`**. FM-005 ✅ — узгоджений JSON **`HttpAppError`/`RestError`** по REST, **`enterprise_api`**, auth middleware.
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -102,7 +102,7 @@ FM-xxx (з таблиці нижче)
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
 | FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); alias **`cargo test-ci`** у **`.cargo/config.toml`** = CI-прогін (`--lib` + `--tests`, без doctests) + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; `cargo test -j1 --all-features --no-run` / `--lib --tests` — перевірено (2026-04-10); повний `cargo test --all-features` з doc-тестами на Windows може дати paging file (**os error 1455**) | Partial | `Cargo.toml`, `.cargo/config.toml`, HANDOFF, NEXT_STEPS |
-| FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout `/ui/*`, **write-flow** Workers/Libraries/VM/RAID + спільні діалоги в `common_js`), admin shell + `admin_common.js`; далі — enterprise admin сторінки, Telegram hardening, audit/allowlist | Partial | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/mod.rs`, `src/ui/admin_common.js`, `src/network/enterprise_api/oauth.rs` |
+| FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout `/ui/*`, write-flow, **admin** — `admin_layout` + заголовки всіх сторінок, **dashboard** + **audit**; далі — інші admin модулі (tenants, security, …), Telegram hardening, audit/allowlist | Partial | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/`, `src/ui/admin_common.js`, `src/network/enterprise_api/oauth.rs` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -117,7 +117,7 @@ FM-xxx (з таблиці нижче)
 | 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
 | 2 | Distributed RAID | **FM-007**, **FM-008** | Код: каталог sync + leave з replication/membership; далі — LAN, conflicts у протоколі, поглиблена реплікація. |
 | 3 | Ops | **FM-011** | Тримати збірку `--all-features` стабільною (профіль тестів, `-j 1`, incremental, GNU за потреби); на Windows фіксувати сигнал як `--lib --tests` (doctest може падати через paging file, `os error 1455`). |
-| 4 | Product UX | **FM-012** | **Зроблено (Partial):** i18n **UA/EN** (`i18n_core.js`), `/ui/auth`, dashboard під `/ui/*`, **Workers / Libraries / VM / RAID** (таблиці, модалки, підтвердження), спільні `showConfirmDialog` / `showLoading` / `renderTable` / VM actions у `common_js`, admin sidebar, `admin_common.js`. **Далі:** решта enterprise `/ui/admin/*` сторінок; Telegram OAuth — hardening (allowlist, audit). |
+| 4 | Product UX | **FM-012** | **Зроблено (Partial):** як вище + **admin** `admin_layout` (`admin.page.*`, `admin.browserSuffix`, `poolai:langchange`), **dashboard** та **audit** контент. **Далі:** i18n для tenants/security/monitoring/…; Telegram OAuth hardening (allowlist, audit). |
 | 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
 | 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 

@@ -134,6 +134,7 @@ pub async fn admin_vm() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.vm",
         "VM Management",
         r#"
         <div class="admin-section">

@@ -213,5 +213,5 @@ pub async fn admin_topology() -> axum::response::Html<String> {
     loadTopology();
   "#;
 
-    admin_layout("Topology", body, script)
+    admin_layout("admin.page.topology", "Topology", body, script)
 }

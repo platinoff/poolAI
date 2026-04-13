@@ -8,6 +8,10 @@ use axum::response::Html;
 /// Audit logs viewer page
 pub async fn admin_audit() -> Html<String> {
     let script = r#"
+    function Ta(k, fb) {
+      return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb;
+    }
+
     async function queryAuditLogs() {
       const level = document.getElementById('audit-level').value;
       const startDate = document.getElementById('audit-start-date').value;
@@ -20,12 +24,12 @@ pub async fn admin_audit() -> Html<String> {
       params.append('limit', '100');
       
       try {
-        adminShowLoading('audit-events', 'Loading audit events…');
+        adminShowLoading('audit-events', Ta('admin.audit.loading', 'Loading audit events…'));
         const events = await fetchJson(`/api/enterprise/audit/events?${params}`);
         renderAuditEvents(events);
       } catch (e) {
         adminShowInlineError('audit-events', e);
-        showNotification('Error loading audit logs: ' + e.message, 'error');
+        showNotification(Ta('admin.audit.errLoad', 'Error loading audit logs: ') + e.message, 'error');
       }
     }
     
@@ -33,19 +37,20 @@ pub async fn admin_audit() -> Html<String> {
       const el = document.getElementById('audit-events');
       if (!el) return;
       if (!events || events.length === 0) {
-        el.innerHTML = '<div class="muted">No audit events found</div>';
+        el.innerHTML =
+          '<div class="muted">' + escapeHtml(Ta('admin.audit.empty', 'No audit events found')) + '</div>';
         return;
       }
       el.innerHTML = `
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Timestamp</th>
-              <th>Level</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Resource</th>
-              <th>Result</th>
+              <th>${escapeHtml(Ta('admin.audit.col.time', 'Timestamp'))}</th>
+              <th>${escapeHtml(Ta('admin.audit.col.level', 'Level'))}</th>
+              <th>${escapeHtml(Ta('admin.audit.col.user', 'User'))}</th>
+              <th>${escapeHtml(Ta('admin.audit.col.action', 'Action'))}</th>
+              <th>${escapeHtml(Ta('admin.audit.col.resource', 'Resource'))}</th>
+              <th>${escapeHtml(Ta('admin.audit.col.result', 'Result'))}</th>
             </tr>
           </thead>
           <tbody>
@@ -68,23 +73,24 @@ pub async fn admin_audit() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.audit",
         "Audit Logs",
         r#"
         <div class="admin-section">
           <div class="admin-header">
-            <h2>Audit Events</h2>
+            <h2 data-i18n="admin.audit.sectionTitle">Audit Events</h2>
             <div class="admin-filters">
-              <input type="text" id="audit-search" placeholder="Search..." />
+              <input type="text" id="audit-search" data-i18n-placeholder="admin.audit.searchPh" placeholder="Search…" />
               <select id="audit-level">
-                <option value="">All Levels</option>
-                <option value="Info">Info</option>
-                <option value="Warning">Warning</option>
-                <option value="Error">Error</option>
-                <option value="Critical">Critical</option>
+                <option value="" data-i18n="admin.audit.levelAll">All Levels</option>
+                <option value="Info" data-i18n="admin.audit.levelInfo">Info</option>
+                <option value="Warning" data-i18n="admin.audit.levelWarning">Warning</option>
+                <option value="Error" data-i18n="admin.audit.levelError">Error</option>
+                <option value="Critical" data-i18n="admin.audit.levelCritical">Critical</option>
               </select>
               <input type="date" id="audit-start-date" />
               <input type="date" id="audit-end-date" />
-              <button class="btn" onclick="queryAuditLogs()">Query</button>
+              <button type="button" class="btn" onclick="queryAuditLogs()" data-i18n="admin.audit.query">Query</button>
             </div>
           </div>
           <div id="audit-events"></div>

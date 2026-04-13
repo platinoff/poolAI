@@ -193,6 +193,7 @@ pub async fn admin_users() -> Html<String> {
     "#;
 
     admin_layout(
+        "admin.page.users",
         "User Management",
         r#"
         <div class="admin-section">
