@@ -680,6 +680,15 @@ fn layout(
     let ui_raid = "/ui/raid";
     let style_select = "padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.9em; cursor: pointer;";
 
+    #[cfg(feature = "enterprise")]
+    let nav_admin_desktop = r#"<a href="/ui/admin" data-i18n="dash.nav.admin" data-i18n-aria="dash.aria.admin">Admin</a>"#;
+    #[cfg(not(feature = "enterprise"))]
+    let nav_admin_desktop = "";
+    #[cfg(feature = "enterprise")]
+    let nav_admin_mobile = r#"<a href="/ui/admin" class="mobile-nav-item" data-i18n="dash.nav.admin" data-i18n-aria="dash.aria.admin">Admin</a>"#;
+    #[cfg(not(feature = "enterprise"))]
+    let nav_admin_mobile = "";
+
     let i18n_js = include_str!("i18n_core.js");
     let i18n_boot = r#"
 (function(){
@@ -730,6 +739,7 @@ fn layout(
         <a href="{ui_libs}" data-i18n="dash.nav.libs" data-i18n-aria="dash.aria.libs">Libs</a>
         <a href="{ui_vm}" data-i18n="dash.nav.vm" data-i18n-aria="dash.aria.vm">VM</a>
         <a href="{ui_raid}" data-i18n="dash.nav.raid" data-i18n-aria="dash.aria.raid">RAID</a>
+        {nav_admin_desktop}
         <select id="themeSelector" data-i18n-aria="dash.aria.theme" style="{style_select}">
           <option value="dark" data-i18n="dash.themeOptDark">🌙 Dark</option>
           <option value="light" data-i18n="dash.themeOptLight">☀️ Light</option>
@@ -769,6 +779,7 @@ fn layout(
       <a href="{ui_libs}" class="mobile-nav-item" data-i18n="dash.nav.libs" data-i18n-aria="dash.aria.libs">Libs</a>
       <a href="{ui_vm}" class="mobile-nav-item" data-i18n="dash.nav.vm" data-i18n-aria="dash.aria.vm">VM</a>
       <a href="{ui_raid}" class="mobile-nav-item" data-i18n="dash.nav.raid" data-i18n-aria="dash.aria.raid">RAID</a>
+      {nav_admin_mobile}
       <div class="mobile-nav-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
         <label for="mobileThemeSelector" style="font-size: 0.9em; color: var(--text-muted, #a8b0bf);" data-i18n="dash.themeLabel">Theme:</label>
         <select id="mobileThemeSelector" data-i18n-aria="dash.aria.theme" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9em;">
@@ -809,6 +820,8 @@ fn layout(
         ui_libs = ui_libs,
         ui_vm = ui_vm,
         ui_raid = ui_raid,
+        nav_admin_desktop = nav_admin_desktop,
+        nav_admin_mobile = nav_admin_mobile,
         style_select = style_select,
         high_contrast_value = high_contrast_value,
         main_content_id = main_content_id
@@ -3676,9 +3689,11 @@ async fn home_handler() -> Html<String> {
 "#,
         common_js()
     );
-    layout(
-        "dash.title.home",
-        "Home",
+    #[cfg(feature = "enterprise")]
+    let home_admin_quick = r#" · <a href="/ui/admin" data-i18n="dash.nav.admin">Admin</a>"#;
+    #[cfg(not(feature = "enterprise"))]
+    let home_admin_quick = "";
+    let home_body = format!(
         r#"
 <div class="grid">
   <div class="item">
@@ -3699,7 +3714,7 @@ async fn home_handler() -> Html<String> {
     <a href="/ui/workers" data-i18n="dash.nav.workers">Workers</a> ·
     <a href="/ui/libs" data-i18n="dash.nav.libs">Libs</a> ·
     <a href="/ui/vm" data-i18n="dash.nav.vm">VM</a> ·
-    <a href="/ui/raid" data-i18n="dash.nav.raid">RAID</a>
+    <a href="/ui/raid" data-i18n="dash.nav.raid">RAID</a>{home_admin_quick}
   </div></div>
   <div class="item">
     <div><b data-i18n="home.notesTitle">Notes</b></div>
@@ -3707,8 +3722,9 @@ async fn home_handler() -> Html<String> {
   </div>
 </div>
 "#,
-        &script,
-    )
+        home_admin_quick = home_admin_quick
+    );
+    layout("dash.title.home", "Home", &home_body, &script)
 }
 
 async fn status_page() -> Html<String> {
