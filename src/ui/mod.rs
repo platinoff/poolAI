@@ -962,7 +962,11 @@ async function requireAuth(requiredRole = null) {
     const requiredLevel = roleHierarchy[requiredRole] || 0;
     
     if (userLevel < requiredLevel) {
-      alert('Insufficient permissions. Required role: ' + requiredRole);
+      const p =
+        typeof poolaiT === 'function'
+          ? poolaiT('err.insufficientRole', 'Insufficient permissions. Required role: ')
+          : 'Insufficient permissions. Required role: ';
+      alert(p + requiredRole);
       window.location.href = '/ui';
       return false;
     }
@@ -1067,31 +1071,37 @@ function removeNotification(notificationId) {
 }
 
 // Enhanced loading functions with skeleton support and accessibility
-function showLoading(elementId, message = 'Loading...', useSkeleton = false, progress = null) {
+function showLoading(elementId, message, useSkeleton = false, progress = null) {
   const el = document.getElementById(elementId);
   if (!el) return;
+  const msg =
+    message != null && message !== ''
+      ? message
+      : typeof poolaiT === 'function'
+        ? poolaiT('common.loading', 'Loading…')
+        : 'Loading...';
   el.dataset.loading = 'true';
   
   if (useSkeleton) {
-    el.innerHTML = createSkeletonLoader(message);
+    el.innerHTML = createSkeletonLoader(msg);
   } else {
     const loadingId = 'loading-' + elementId + '-' + Date.now();
     let progressHtml = '';
     if (progress !== null) {
       progressHtml = `
         <div class="progress-bar" style="margin-top: 12px; max-width: 300px; margin-left: auto; margin-right: auto;">
-          <div class="progress-bar-fill" style="width: ${Math.min(100, Math.max(0, progress))}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" role="progressbar" aria-label="${message}: ${progress}%"></div>
+          <div class="progress-bar-fill" style="width: ${Math.min(100, Math.max(0, progress))}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" role="progressbar" aria-label="${escapeHtml(msg)}: ${progress}%"></div>
         </div>
       `;
     }
     el.innerHTML = `
       <div role="status" aria-live="polite" aria-busy="true" id="${loadingId}" style="text-align:center; padding:20px; color:var(--text-muted, #a8b0bf);">
         <div class="spinner" aria-hidden="true"></div>
-        <div style="margin-top:12px;">${escapeHtml(message)}</div>
+        <div style="margin-top:12px;">${escapeHtml(msg)}</div>
         ${progressHtml}
       </div>
     `;
-    el.setAttribute('aria-label', message);
+    el.setAttribute('aria-label', msg);
   }
 }
 
@@ -1114,7 +1124,13 @@ function updateLoadingProgress(elementId, progress, message = null) {
   if (progressBar) {
     progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
     progressBar.setAttribute('aria-valuenow', progress);
-    progressBar.setAttribute('aria-label', (message || 'Loading') + ': ' + progress + '%');
+    progressBar.setAttribute(
+      'aria-label',
+      (message || (typeof poolaiT === 'function' ? poolaiT('common.loading', 'Loading…') : 'Loading')) +
+        ': ' +
+        progress +
+        '%',
+    );
   }
   
   if (messageDiv && message) {
@@ -1124,7 +1140,13 @@ function updateLoadingProgress(elementId, progress, message = null) {
   // Announce to screen readers
   if (el.querySelector('[role="status"]')) {
     const statusEl = el.querySelector('[role="status"]');
-    statusEl.setAttribute('aria-label', (message || 'Loading') + ': ' + progress + '%');
+    statusEl.setAttribute(
+      'aria-label',
+      (message || (typeof poolaiT === 'function' ? poolaiT('common.loading', 'Loading…') : 'Loading')) +
+        ': ' +
+        progress +
+        '%',
+    );
   }
 }
 
@@ -1945,6 +1967,17 @@ function showConfirmDialog(message, onConfirm, onCancel = null) {
   
   document.getElementById('confirmMessage').textContent = message;
   const confirmBtn = document.getElementById('confirmBtn');
+  const t = typeof poolaiT === 'function' ? poolaiT : function (_k, d) { return d; };
+  const titleEl = document.getElementById('confirmDialogTitle');
+  if (titleEl) titleEl.textContent = t('ui.confirmTitle', 'Confirm Action');
+  if (confirmBtn) confirmBtn.textContent = t('ui.confirmBtn', 'Confirm');
+  const footer = dialog.querySelector('.modal-footer');
+  if (footer) {
+    const cancelBtn = footer.querySelector('.btn:not(.btn-danger)');
+    if (cancelBtn) cancelBtn.textContent = t('ui.cancel', 'Cancel');
+  }
+  const closeAria = dialog.querySelector('.modal-close');
+  if (closeAria) closeAria.setAttribute('aria-label', t('ui.closeDialogAria', 'Close dialog'));
   const oldHandler = confirmBtn.onclick;
   confirmBtn.onclick = function() {
     hideModal(dialogId);
@@ -1974,7 +2007,9 @@ async function fetchJson(url, options = {}) {
       if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
         window.location.href = '/ui/auth';
       }
-      throw new Error('Unauthorized');
+      throw new Error(
+        typeof poolaiT === 'function' ? poolaiT('err.unauthorized', 'Unauthorized') : 'Unauthorized',
+      );
     }
     // Retry with new token
     headers['authorization'] = 'Bearer ' + getToken();
@@ -1985,7 +2020,9 @@ async function fetchJson(url, options = {}) {
       if (window.location.pathname !== '/ui/auth' && window.location.pathname !== '/ui/login') {
         window.location.href = '/ui/auth';
       }
-      throw new Error('Unauthorized');
+      throw new Error(
+        typeof poolaiT === 'function' ? poolaiT('err.unauthorized', 'Unauthorized') : 'Unauthorized',
+      );
     }
     if (!retryRes.ok) {
       const errorData = await retryRes.json().catch(() => ({}));
@@ -2027,7 +2064,11 @@ function renderTable(containerId, data) {
   }
 
   if (data.length === 0) {
-    el.innerHTML = '<div class=\"muted\">No items.</div>';
+    const empty =
+      typeof poolaiT === 'function'
+        ? poolaiT('ui.noItems', 'No items.')
+        : 'No items.';
+    el.innerHTML = '<div class=\"muted\">' + escapeHtml(empty) + '</div>';
     return;
   }
 
@@ -2077,8 +2118,13 @@ function renderTable(containerId, data) {
       if (status !== 'Running') {
         const startBtn = document.createElement('button');
         startBtn.className = 'btn btn-primary';
-        startBtn.textContent = 'Start';
-        startBtn.setAttribute('aria-label', `Start VM instance ${instanceId}`);
+        startBtn.textContent =
+          typeof poolaiT === 'function' ? poolaiT('vm.start', 'Start') : 'Start';
+        const startAria =
+          typeof poolaiT === 'function'
+            ? poolaiT('vm.startAria', 'Start VM instance {id}').replace(/\{id\}/g, instanceId)
+            : `Start VM instance ${instanceId}`;
+        startBtn.setAttribute('aria-label', startAria);
         startBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
         startBtn.onclick = () => handleVmAction(instanceId, 'start');
         actionsTd.appendChild(startBtn);
@@ -2088,8 +2134,13 @@ function renderTable(containerId, data) {
       if (status === 'Running') {
         const stopBtn = document.createElement('button');
         stopBtn.className = 'btn';
-        stopBtn.textContent = 'Stop';
-        stopBtn.setAttribute('aria-label', `Stop VM instance ${instanceId}`);
+        stopBtn.textContent =
+          typeof poolaiT === 'function' ? poolaiT('vm.stop', 'Stop') : 'Stop';
+        const stopAria =
+          typeof poolaiT === 'function'
+            ? poolaiT('vm.stopAria', 'Stop VM instance {id}').replace(/\{id\}/g, instanceId)
+            : `Stop VM instance ${instanceId}`;
+        stopBtn.setAttribute('aria-label', stopAria);
         stopBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
         stopBtn.onclick = () => handleVmAction(instanceId, 'stop');
         actionsTd.appendChild(stopBtn);
@@ -2099,8 +2150,13 @@ function renderTable(containerId, data) {
       if (status === 'Running') {
         const restartBtn = document.createElement('button');
         restartBtn.className = 'btn';
-        restartBtn.textContent = 'Restart';
-        restartBtn.setAttribute('aria-label', `Restart VM instance ${instanceId}`);
+        restartBtn.textContent =
+          typeof poolaiT === 'function' ? poolaiT('vm.restart', 'Restart') : 'Restart';
+        const restartAria =
+          typeof poolaiT === 'function'
+            ? poolaiT('vm.restartAria', 'Restart VM instance {id}').replace(/\{id\}/g, instanceId)
+            : `Restart VM instance ${instanceId}`;
+        restartBtn.setAttribute('aria-label', restartAria);
         restartBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
         restartBtn.onclick = () => handleVmAction(instanceId, 'restart');
         actionsTd.appendChild(restartBtn);
@@ -2109,8 +2165,13 @@ function renderTable(containerId, data) {
       // Delete button
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn btn-danger';
-      deleteBtn.textContent = 'Delete';
-      deleteBtn.setAttribute('aria-label', `Delete VM instance ${instanceId}`);
+      deleteBtn.textContent =
+        typeof poolaiT === 'function' ? poolaiT('ui.delete', 'Delete') : 'Delete';
+      const delAria =
+        typeof poolaiT === 'function'
+          ? poolaiT('vm.deleteAria', 'Delete VM instance {id}').replace(/\{id\}/g, instanceId)
+          : `Delete VM instance ${instanceId}`;
+      deleteBtn.setAttribute('aria-label', delAria);
       deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
       deleteBtn.onclick = () => handleVmDelete(instanceId, row.name || instanceId);
       actionsTd.appendChild(deleteBtn);
@@ -2330,24 +2391,72 @@ function updateWizardProgress(wizard, current, total) {
 async function handleVmAction(instanceId, action) {
   const user = getUser();
   if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-    showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+    showNotification(
+      typeof poolaiT === 'function'
+        ? poolaiT(
+            'err.insufficientPermissionsAdminOp',
+            'Insufficient permissions. Admin or Operator role required.',
+          )
+        : 'Insufficient permissions. Admin or Operator role required.',
+      'error',
+    );
     return;
   }
   
   try {
-    showLoading('data', `${action.charAt(0).toUpperCase() + action.slice(1)}ing VM instance...`);
+    const loadKey =
+      action === 'start'
+        ? 'vm.loadingStart'
+        : action === 'stop'
+          ? 'vm.loadingStop'
+          : action === 'restart'
+            ? 'vm.loadingRestart'
+            : 'vm.loadingGeneric';
+    const loadFb =
+      action === 'start'
+        ? 'Starting VM instance…'
+        : action === 'stop'
+          ? 'Stopping VM instance…'
+          : action === 'restart'
+            ? 'Restarting VM instance…'
+            : 'Processing VM instance…';
+    showLoading(
+      'data',
+      typeof poolaiT === 'function' ? poolaiT(loadKey, loadFb) : loadFb,
+    );
     
     const res = await fetchJson(`/api/v1/vm/instances/${instanceId}/${action}`, {
       method: 'POST'
     });
     
-    showNotification(res.message || `VM instance ${action}ed successfully`, 'success');
+    const okKey =
+      action === 'start'
+        ? 'vm.successStart'
+        : action === 'stop'
+          ? 'vm.successStop'
+          : action === 'restart'
+            ? 'vm.successRestart'
+            : 'vm.successGeneric';
+    const okFb =
+      action === 'start'
+        ? 'VM instance started successfully'
+        : action === 'stop'
+          ? 'VM instance stopped successfully'
+          : action === 'restart'
+            ? 'VM instance restarted successfully'
+            : 'Operation completed successfully';
+    showNotification(
+      res.message || (typeof poolaiT === 'function' ? poolaiT(okKey, okFb) : okFb),
+      'success',
+    );
     setTimeout(() => {
       const refreshFn = window.refreshVmInstances || (() => location.reload());
       refreshFn();
     }, 1000);
   } catch (e) {
-    showNotification('Error: ' + e.message, 'error');
+    const ep =
+      typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+    showNotification(ep + e.message, 'error');
     hideLoading('data');
   }
 }
@@ -2355,27 +2464,56 @@ async function handleVmAction(instanceId, action) {
 async function handleVmDelete(instanceId, instanceName) {
   const user = getUser();
   if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-    showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+    showNotification(
+      typeof poolaiT === 'function'
+        ? poolaiT(
+            'err.insufficientPermissionsAdminOp',
+            'Insufficient permissions. Admin or Operator role required.',
+          )
+        : 'Insufficient permissions. Admin or Operator role required.',
+      'error',
+    );
     return;
   }
   
+  const confirmMsg =
+    typeof poolaiT === 'function'
+      ? poolaiT(
+          'vm.confirmDelete',
+          'Are you sure you want to delete VM instance "{name}" ({id})? This action cannot be undone.',
+        )
+          .replace(/\{name\}/g, instanceName)
+          .replace(/\{id\}/g, instanceId)
+      : `Are you sure you want to delete VM instance "${instanceName}" (${instanceId})? This action cannot be undone.`;
   showConfirmDialog(
-    `Are you sure you want to delete VM instance "${instanceName}" (${instanceId})? This action cannot be undone.`,
+    confirmMsg,
     async () => {
       try {
-        showLoading('data', 'Deleting VM instance...');
+        showLoading(
+          'data',
+          typeof poolaiT === 'function'
+            ? poolaiT('vm.deletingLoad', 'Deleting VM instance…')
+            : 'Deleting VM instance...',
+        );
         
         await fetchJson(`/api/v1/vm/instances/${instanceId}`, {
           method: 'DELETE'
         });
         
-        showNotification('VM instance deleted successfully', 'success');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('vm.deletedOk', 'VM instance deleted successfully')
+            : 'VM instance deleted successfully',
+          'success',
+        );
         setTimeout(() => {
           const refreshFn = window.refreshVmInstances || (() => location.reload());
           refreshFn();
         }, 1000);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        const ep =
+          typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+        showNotification(ep + e.message, 'error');
         hideLoading('data');
       }
     }
@@ -2521,7 +2659,11 @@ async function requireAuth(requiredRole = null) {
     const requiredLevel = roleHierarchy[requiredRole] || 0;
     
     if (userLevel < requiredLevel) {
-      alert('Insufficient permissions. Required role: ' + requiredRole);
+      const p =
+        typeof poolaiT === 'function'
+          ? poolaiT('err.insufficientRole', 'Insufficient permissions. Required role: ')
+          : 'Insufficient permissions. Required role: ';
+      alert(p + requiredRole);
       window.location.href = '/ui';
       return false;
     }
@@ -3622,28 +3764,50 @@ async fn workers_page() -> Html<String> {
       }
       
       if (data.length === 0) {
-        el.innerHTML = '<div class="muted">No workers available.</div>';
+        const empty =
+          typeof poolaiT === 'function'
+            ? poolaiT('workers.empty', 'No workers available.')
+            : 'No workers available.';
+        el.innerHTML = '<div class="muted">' + empty + '</div>';
         return;
       }
       
       const table = document.createElement('table');
       table.setAttribute('role', 'table');
-      table.setAttribute('aria-label', 'Workers list');
+      table.setAttribute(
+        'aria-label',
+        typeof poolaiT === 'function' ? poolaiT('workers.listAria', 'Workers list') : 'Workers list',
+      );
       table.setAttribute('aria-describedby', 'workers-table-desc');
       const tableDesc = document.createElement('div');
       tableDesc.id = 'workers-table-desc';
       tableDesc.className = 'sr-only';
-      tableDesc.textContent = 'Table showing workers: id, health, state, task, metrics, actions';
+      tableDesc.textContent =
+        typeof poolaiT === 'function'
+          ? poolaiT(
+              'workers.tableDesc',
+              'Table showing workers: id, health, state, task, metrics, actions',
+            )
+          : 'Table showing workers: id, health, state, task, metrics, actions';
       tableDesc.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
       
       const thead = document.createElement('thead');
       const hr = document.createElement('tr');
       hr.setAttribute('role', 'row');
-      ['ID', 'Health', 'State', 'Current task', 'Requests', 'Queue', 'Actions'].forEach(label => {
+      const wcols = [
+        ['workers.col.id', 'ID'],
+        ['workers.col.health', 'Health'],
+        ['workers.col.state', 'State'],
+        ['workers.col.task', 'Current task'],
+        ['workers.col.requests', 'Requests'],
+        ['workers.col.queue', 'Queue'],
+        ['workers.col.actions', 'Actions'],
+      ];
+      wcols.forEach(([key, fb]) => {
         const th = document.createElement('th');
         th.setAttribute('role', 'columnheader');
         th.setAttribute('scope', 'col');
-        th.textContent = label;
+        th.textContent = typeof poolaiT === 'function' ? poolaiT(key, fb) : fb;
         hr.appendChild(th);
       });
       thead.appendChild(hr);
@@ -3655,7 +3819,9 @@ async fn workers_page() -> Html<String> {
         const tr = document.createElement('tr');
         tr.setAttribute('role', 'row');
         const workerId = worker ? worker.id : 'unknown';
-        tr.setAttribute('aria-label', 'Worker ' + workerId);
+        const rowPrefix =
+          typeof poolaiT === 'function' ? poolaiT('workers.rowAriaPrefix', 'Worker') : 'Worker';
+        tr.setAttribute('aria-label', rowPrefix + ' ' + workerId);
         
         const tdId = document.createElement('td');
         tdId.setAttribute('role', 'cell');
@@ -3669,7 +3835,13 @@ async fn workers_page() -> Html<String> {
         tdHealth.setAttribute('role', 'cell');
         const healthBadge = document.createElement('span');
         healthBadge.className = 'status-badge ' + (healthy ? 'active' : 'error');
-        healthBadge.textContent = healthy ? 'Healthy' : 'Unhealthy';
+        healthBadge.textContent = healthy
+          ? typeof poolaiT === 'function'
+            ? poolaiT('workers.healthy', 'Healthy')
+            : 'Healthy'
+          : typeof poolaiT === 'function'
+            ? poolaiT('workers.unhealthy', 'Unhealthy')
+            : 'Unhealthy';
         tdHealth.appendChild(healthBadge);
         tr.appendChild(tdHealth);
         
@@ -3711,9 +3883,15 @@ async fn workers_page() -> Html<String> {
           // Delete button
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'btn btn-danger';
-          deleteBtn.textContent = 'Delete';
+          deleteBtn.textContent =
+            typeof poolaiT === 'function' ? poolaiT('ui.delete', 'Delete') : 'Delete';
           deleteBtn.setAttribute('type', 'button');
-          deleteBtn.setAttribute('aria-label', `Delete worker ${workerId}`);
+          deleteBtn.setAttribute(
+            'aria-label',
+            typeof poolaiT === 'function'
+              ? poolaiT('workers.deleteAria', 'Delete worker {id}').replace(/\{id\}/g, workerId)
+              : `Delete worker ${workerId}`,
+          );
           deleteBtn.setAttribute('aria-describedby', `worker-${workerId}-desc`);
           deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           deleteBtn.onclick = () => handleWorkerDelete(workerId);
@@ -3729,11 +3907,22 @@ async fn workers_page() -> Html<String> {
           const desc = document.createElement('span');
           desc.id = `worker-${workerId}-desc`;
           desc.className = 'sr-only';
-          desc.textContent = `Permanently delete worker ${workerId}`;
+          desc.textContent =
+            typeof poolaiT === 'function'
+              ? poolaiT('workers.permDeleteDesc', 'Permanently delete worker {id}').replace(
+                  /\{id\}/g,
+                  workerId,
+                )
+              : `Permanently delete worker ${workerId}`;
           desc.style.cssText = 'position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;';
           actionsTd.appendChild(desc);
         } else {
-          actionsTd.setAttribute('aria-label', 'No actions available for your role');
+          actionsTd.setAttribute(
+            'aria-label',
+            typeof poolaiT === 'function'
+              ? poolaiT('workers.noActionsRole', 'No actions available for your role')
+              : 'No actions available for your role',
+          );
           actionsTd.textContent = '—';
         }
         
@@ -3752,7 +3941,15 @@ async fn workers_page() -> Html<String> {
     async function showCreateWorkerModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT(
+                'err.insufficientPermissionsAdminOp',
+                'Insufficient permissions. Admin or Operator role required.',
+              )
+            : 'Insufficient permissions. Admin or Operator role required.',
+          'error',
+        );
         return;
       }
       showModal('createWorkerModal');
@@ -3762,12 +3959,22 @@ async fn workers_page() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.insufficientPermissions', 'Insufficient permissions.')
+            : 'Insufficient permissions.',
+          'error',
+        );
         return;
       }
       
       if (!validateForm('createWorkerForm')) {
-        showNotification('Please fill in all required fields correctly.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.fillRequiredFields', 'Please fill in all required fields correctly.')
+            : 'Please fill in all required fields correctly.',
+          'error',
+        );
         return;
       }
       
@@ -3776,7 +3983,8 @@ async fn workers_page() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent =
+        typeof poolaiT === 'function' ? poolaiT('workers.creatingSubmit', 'Creating…') : 'Creating...';
       
       try {
         const payload = {
@@ -3798,7 +4006,12 @@ async fn workers_page() -> Html<String> {
           body: JSON.stringify(payload)
         });
         
-        showNotification('Worker created successfully', 'success');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('workers.createdOk', 'Worker created successfully')
+            : 'Worker created successfully',
+          'success',
+        );
         hideModal('createWorkerModal');
         form.reset();
         
@@ -3806,7 +4019,9 @@ async fn workers_page() -> Html<String> {
           window.refreshWorkers();
         }, 500);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        const ep =
+          typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+        showNotification(ep + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -3816,26 +4031,53 @@ async fn workers_page() -> Html<String> {
     async function handleWorkerDelete(workerId) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT(
+                'err.insufficientPermissionsAdminOp',
+                'Insufficient permissions. Admin or Operator role required.',
+              )
+            : 'Insufficient permissions. Admin or Operator role required.',
+          'error',
+        );
         return;
       }
       
+      const confirmMsg =
+        typeof poolaiT === 'function'
+          ? poolaiT(
+              'workers.confirmDelete',
+              'Are you sure you want to delete worker "{id}"? This action cannot be undone.',
+            ).replace(/\{id\}/g, workerId)
+          : `Are you sure you want to delete worker "${workerId}"? This action cannot be undone.`;
       showConfirmDialog(
-        `Are you sure you want to delete worker "${workerId}"? This action cannot be undone.`,
+        confirmMsg,
         async () => {
           try {
-            showLoading('data', 'Deleting worker...');
+            showLoading(
+              'data',
+              typeof poolaiT === 'function'
+                ? poolaiT('workers.deletingLoad', 'Deleting worker…')
+                : 'Deleting worker...',
+            );
             
             await fetchJson(`/api/v1/workers/${workerId}`, {
               method: 'DELETE'
             });
             
-            showNotification('Worker deleted successfully', 'success');
+            showNotification(
+              typeof poolaiT === 'function'
+                ? poolaiT('workers.deletedOk', 'Worker deleted successfully')
+                : 'Worker deleted successfully',
+              'success',
+            );
             setTimeout(() => {
               window.refreshWorkers();
             }, 1000);
           } catch (e) {
-            showNotification('Error: ' + e.message, 'error');
+            const ep =
+              typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+            showNotification(ep + e.message, 'error');
             hideLoading('data');
           }
         }
@@ -3855,8 +4097,8 @@ async fn workers_page() -> Html<String> {
         "Workers",
         r#"
 <div class="row" style="margin-bottom:16px;">
-  <div class="muted">Source: <code>/api/v1/workers</code></div>
-  <button class="btn btn-primary" onclick="showCreateWorkerModal()" aria-label="Create new worker">Create Worker</button>
+  <div class="muted"><span data-i18n="ui.sourceLabel">Source:</span> <code>/api/v1/workers</code></div>
+  <button class="btn btn-primary" onclick="showCreateWorkerModal()" data-i18n="workers.createBtn" data-i18n-aria="workers.createBtnAria">Create Worker</button>
 </div>
 <div id="data"></div>
 
@@ -3864,63 +4106,63 @@ async fn workers_page() -> Html<String> {
 <div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="true" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 id="createWorkerModalTitle">Create Worker</h3>
-      <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createWorkerModal')">&times;</button>
+      <h3 id="createWorkerModalTitle" data-i18n="workers.modalTitle">Create Worker</h3>
+      <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createWorkerModal')">&times;</button>
     </div>
     <form id="createWorkerForm" onsubmit="handleCreateWorker(event)">
       <div class="form-group">
-        <label for="workerId">Worker ID</label>
-        <input type="text" id="workerId" name="worker_id" required placeholder="worker-1" />
+        <label for="workerId" data-i18n="workers.label.id">Worker ID</label>
+        <input type="text" id="workerId" name="worker_id" required data-i18n-placeholder="workers.ph.id" placeholder="worker-1" />
       </div>
       <div class="form-group">
-        <label for="workerMaxConcurrent">Max Concurrent Requests</label>
+        <label for="workerMaxConcurrent" data-i18n="workers.label.maxConcurrent">Max Concurrent Requests</label>
         <input type="number" id="workerMaxConcurrent" name="max_concurrent_requests" min="1" max="100" value="10" />
       </div>
       <div class="form-group">
-        <label for="workerTimeout">Request Timeout (ms)</label>
+        <label for="workerTimeout" data-i18n="workers.label.timeout">Request Timeout (ms)</label>
         <input type="number" id="workerTimeout" name="request_timeout_ms" min="1000" max="60000" value="5000" />
       </div>
       <div class="form-group">
-        <label for="workerHealthInterval">Health Check Interval (ms)</label>
+        <label for="workerHealthInterval" data-i18n="workers.label.healthInterval">Health Check Interval (ms)</label>
         <input type="number" id="workerHealthInterval" name="health_check_interval_ms" min="100" max="10000" value="1000" />
       </div>
       <div class="form-group">
-        <label for="workerMaxMemory">Max Memory (MB)</label>
+        <label for="workerMaxMemory" data-i18n="workers.label.maxMemory">Max Memory (MB)</label>
         <input type="number" id="workerMaxMemory" name="max_memory_mb" min="256" max="131072" value="2048" />
       </div>
       <div class="form-group">
-        <label for="workerCpuPriority">CPU Priority (1-10)</label>
+        <label for="workerCpuPriority" data-i18n="workers.label.cpuPriority">CPU Priority (1-10)</label>
         <input type="number" id="workerCpuPriority" name="cpu_priority" min="1" max="10" value="5" />
       </div>
       <div class="form-group">
-        <label for="workerGpuDevice">GPU Device ID (optional)</label>
-        <input type="number" id="workerGpuDevice" name="gpu_device" min="0" placeholder="Leave empty for no GPU" />
+        <label for="workerGpuDevice" data-i18n="workers.label.gpuDevice">GPU Device ID (optional)</label>
+        <input type="number" id="workerGpuDevice" name="gpu_device" min="0" data-i18n-placeholder="workers.ph.gpu" placeholder="Leave empty for no GPU" />
       </div>
       <div class="form-group">
         <label for="workerEnableCache">
           <input type="checkbox" id="workerEnableCache" name="enable_caching" checked />
-          Enable Caching
+          <span data-i18n="workers.enableCache">Enable Caching</span>
         </label>
       </div>
       <div class="form-group">
-        <label for="workerCacheSize">Cache Size</label>
+        <label for="workerCacheSize" data-i18n="workers.label.cacheSize">Cache Size</label>
         <input type="number" id="workerCacheSize" name="cache_size" min="100" max="10000" value="1000" />
       </div>
       <div class="form-group">
         <label for="workerAutoRestart">
           <input type="checkbox" id="workerAutoRestart" name="auto_restart" checked />
-          Auto Restart on Failure
+          <span data-i18n="workers.autoRestart">Auto Restart on Failure</span>
         </label>
       </div>
       <div class="form-group">
         <label for="workerResourceMonitoring">
           <input type="checkbox" id="workerResourceMonitoring" name="resource_monitoring" checked />
-          Resource Monitoring
+          <span data-i18n="workers.resourceMonitoring">Resource Monitoring</span>
         </label>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" onclick="hideModal('createWorkerModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn" onclick="hideModal('createWorkerModal')" data-i18n="ui.cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
       </div>
     </form>
   </div>
@@ -3947,16 +4189,27 @@ async fn libs_page() -> Html<String> {
       }
       
       if (data.length === 0) {
-        el.innerHTML = '<div class="muted">No libraries installed.</div>';
+        const empty =
+          typeof poolaiT === 'function'
+            ? poolaiT('libs.empty', 'No libraries installed.')
+            : 'No libraries installed.';
+        el.innerHTML = '<div class="muted">' + empty + '</div>';
         return;
       }
       
       const table = document.createElement('table');
       const thead = document.createElement('thead');
       const hr = document.createElement('tr');
-      ['name', 'version', 'type', 'status', 'actions'].forEach(k => {
+      const lcols = [
+        ['libs.col.name', 'Name'],
+        ['libs.col.version', 'Version'],
+        ['libs.col.type', 'Type'],
+        ['libs.col.status', 'Status'],
+        ['libs.col.actions', 'Actions'],
+      ];
+      lcols.forEach(([key, fb]) => {
         const th = document.createElement('th');
-        th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+        th.textContent = typeof poolaiT === 'function' ? poolaiT(key, fb) : fb;
         hr.appendChild(th);
       });
       thead.appendChild(hr);
@@ -3986,8 +4239,14 @@ async fn libs_page() -> Html<String> {
           // Update button
           const updateBtn = document.createElement('button');
           updateBtn.className = 'btn';
-          updateBtn.textContent = 'Update';
-          updateBtn.setAttribute('aria-label', `Update library ${libName}`);
+          updateBtn.textContent =
+            typeof poolaiT === 'function' ? poolaiT('ui.update', 'Update') : 'Update';
+          updateBtn.setAttribute(
+            'aria-label',
+            typeof poolaiT === 'function'
+              ? poolaiT('libs.updateAria', 'Update library {name}').replace(/\{name\}/g, libName)
+              : `Update library ${libName}`,
+          );
           updateBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           updateBtn.onclick = () => handleLibraryAction(libName, 'update');
           actionsTd.appendChild(updateBtn);
@@ -3995,8 +4254,17 @@ async fn libs_page() -> Html<String> {
           // Uninstall button
           const uninstallBtn = document.createElement('button');
           uninstallBtn.className = 'btn btn-danger';
-          uninstallBtn.textContent = 'Uninstall';
-          uninstallBtn.setAttribute('aria-label', `Uninstall library ${libName}`);
+          uninstallBtn.textContent =
+            typeof poolaiT === 'function' ? poolaiT('ui.uninstall', 'Uninstall') : 'Uninstall';
+          uninstallBtn.setAttribute(
+            'aria-label',
+            typeof poolaiT === 'function'
+              ? poolaiT('libs.uninstallAria', 'Uninstall library {name}').replace(
+                  /\{name\}/g,
+                  libName,
+                )
+              : `Uninstall library ${libName}`,
+          );
           uninstallBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           uninstallBtn.onclick = () => handleLibraryUninstall(libName);
           actionsTd.appendChild(uninstallBtn);
@@ -4017,7 +4285,15 @@ async fn libs_page() -> Html<String> {
     async function showInstallLibraryModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT(
+                'err.insufficientPermissionsAdminOp',
+                'Insufficient permissions. Admin or Operator role required.',
+              )
+            : 'Insufficient permissions. Admin or Operator role required.',
+          'error',
+        );
         return;
       }
       showModal('installLibraryModal');
@@ -4027,12 +4303,22 @@ async fn libs_page() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.insufficientPermissions', 'Insufficient permissions.')
+            : 'Insufficient permissions.',
+          'error',
+        );
         return;
       }
       
       if (!validateForm('installLibraryForm')) {
-        showNotification('Please fill in all required fields correctly.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.fillRequiredFields', 'Please fill in all required fields correctly.')
+            : 'Please fill in all required fields correctly.',
+          'error',
+        );
         return;
       }
       
@@ -4041,7 +4327,8 @@ async fn libs_page() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Installing...';
+      btn.textContent =
+        typeof poolaiT === 'function' ? poolaiT('libs.installingSubmit', 'Installing…') : 'Installing...';
       
       try {
         const libName = document.getElementById('libName').value;
@@ -4052,7 +4339,12 @@ async fn libs_page() -> Html<String> {
           body: JSON.stringify({ version })
         });
         
-        showNotification('Library installed successfully', 'success');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('libs.installedOk', 'Library installed successfully')
+            : 'Library installed successfully',
+          'success',
+        );
         hideModal('installLibraryModal');
         form.reset();
         
@@ -4060,7 +4352,9 @@ async fn libs_page() -> Html<String> {
           window.refreshLibraries();
         }, 500);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        const ep =
+          typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+        showNotification(ep + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -4070,23 +4364,46 @@ async fn libs_page() -> Html<String> {
     async function handleLibraryAction(libName, action) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.insufficientPermissions', 'Insufficient permissions.')
+            : 'Insufficient permissions.',
+          'error',
+        );
         return;
       }
       
       try {
-        showLoading('data', `${action.charAt(0).toUpperCase() + action.slice(1)}ing library...`);
+        const loadMsg =
+          action === 'update'
+            ? typeof poolaiT === 'function'
+              ? poolaiT('libs.updatingLoad', 'Updating library…')
+              : 'Updating library...'
+            : typeof poolaiT === 'function'
+              ? poolaiT('libs.processingLoad', 'Processing library…')
+              : 'Processing library...';
+        showLoading('data', loadMsg);
         
         const result = await fetchJson(`/api/v1/libraries/${libName}/${action}`, {
           method: 'POST'
         });
         
-        showNotification(result.message || `Library ${action}d successfully`, 'success');
+        const okMsg =
+          action === 'update'
+            ? typeof poolaiT === 'function'
+              ? poolaiT('libs.updatedOk', 'Library updated successfully')
+              : 'Library updated successfully'
+            : typeof poolaiT === 'function'
+              ? poolaiT('libs.processingOk', 'Operation completed successfully')
+              : 'Operation completed successfully';
+        showNotification(result.message || okMsg, 'success');
         setTimeout(() => {
           window.refreshLibraries();
         }, 1000);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        const ep =
+          typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+        showNotification(ep + e.message, 'error');
         hideLoading('data');
       }
     }
@@ -4094,26 +4411,50 @@ async fn libs_page() -> Html<String> {
     async function handleLibraryUninstall(libName) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.insufficientPermissions', 'Insufficient permissions.')
+            : 'Insufficient permissions.',
+          'error',
+        );
         return;
       }
       
+      const confirmMsg =
+        typeof poolaiT === 'function'
+          ? poolaiT(
+              'libs.confirmUninstall',
+              'Are you sure you want to uninstall library "{name}"? This action cannot be undone.',
+            ).replace(/\{name\}/g, libName)
+          : `Are you sure you want to uninstall library "${libName}"? This action cannot be undone.`;
       showConfirmDialog(
-        `Are you sure you want to uninstall library "${libName}"? This action cannot be undone.`,
+        confirmMsg,
         async () => {
           try {
-            showLoading('data', 'Uninstalling library...');
+            showLoading(
+              'data',
+              typeof poolaiT === 'function'
+                ? poolaiT('libs.uninstallingLoad', 'Uninstalling library…')
+                : 'Uninstalling library...',
+            );
             
             await fetchJson(`/api/v1/libraries/${libName}/uninstall`, {
               method: 'POST'
             });
             
-            showNotification('Library uninstalled successfully', 'success');
+            showNotification(
+              typeof poolaiT === 'function'
+                ? poolaiT('libs.uninstalledOk', 'Library uninstalled successfully')
+                : 'Library uninstalled successfully',
+              'success',
+            );
             setTimeout(() => {
               window.refreshLibraries();
             }, 1000);
           } catch (e) {
-            showNotification('Error: ' + e.message, 'error');
+            const ep =
+              typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+            showNotification(ep + e.message, 'error');
             hideLoading('data');
           }
         }
@@ -4133,8 +4474,8 @@ async fn libs_page() -> Html<String> {
         "Libraries",
         r#"
 <div class="row" style="margin-bottom:16px;">
-  <div class="muted">Source: <code>/api/v1/libraries</code></div>
-  <button class="btn btn-primary" onclick="showInstallLibraryModal()">Install Library</button>
+  <div class="muted"><span data-i18n="ui.sourceLabel">Source:</span> <code>/api/v1/libraries</code></div>
+  <button class="btn btn-primary" onclick="showInstallLibraryModal()" data-i18n="libs.installBtn">Install Library</button>
 </div>
 <div id="data"></div>
 
@@ -4142,21 +4483,21 @@ async fn libs_page() -> Html<String> {
 <div id="installLibraryModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h3>Install Library</h3>
-      <button class="modal-close" onclick="hideModal('installLibraryModal')">&times;</button>
+      <h3 data-i18n="libs.modalTitle">Install Library</h3>
+      <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('installLibraryModal')">&times;</button>
     </div>
     <form id="installLibraryForm" onsubmit="handleInstallLibrary(event)">
       <div class="form-group">
-        <label for="libName">Library Name</label>
-        <input type="text" id="libName" name="name" required placeholder="libtorch" />
+        <label for="libName" data-i18n="libs.label.name">Library Name</label>
+        <input type="text" id="libName" name="name" required data-i18n-placeholder="libs.ph.name" placeholder="libtorch" />
       </div>
       <div class="form-group">
-        <label for="libVersion">Version (optional, defaults to latest)</label>
-        <input type="text" id="libVersion" name="version" placeholder="1.13.0" />
+        <label for="libVersion" data-i18n="libs.label.version">Version (optional, defaults to latest)</label>
+        <input type="text" id="libVersion" name="version" data-i18n-placeholder="libs.ph.version" placeholder="1.13.0" />
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" onclick="hideModal('installLibraryModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Install</button>
+        <button type="button" class="btn" onclick="hideModal('installLibraryModal')" data-i18n="ui.cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" data-i18n="ui.install">Install</button>
       </div>
     </form>
   </div>
@@ -4175,7 +4516,15 @@ async fn vm_page() -> Html<String> {
     async function showCreateVmModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT(
+                'err.insufficientPermissionsAdminOp',
+                'Insufficient permissions. Admin or Operator role required.',
+              )
+            : 'Insufficient permissions. Admin or Operator role required.',
+          'error',
+        );
         return;
       }
       showModal('createVmModal');
@@ -4185,12 +4534,22 @@ async fn vm_page() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.insufficientPermissions', 'Insufficient permissions.')
+            : 'Insufficient permissions.',
+          'error',
+        );
         return;
       }
       
       if (!validateForm('createVmForm')) {
-        showNotification('Please fill in all required fields correctly.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.fillRequiredFields', 'Please fill in all required fields correctly.')
+            : 'Please fill in all required fields correctly.',
+          'error',
+        );
         return;
       }
       
@@ -4199,7 +4558,8 @@ async fn vm_page() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent =
+        typeof poolaiT === 'function' ? poolaiT('ui.creating', 'Creating…') : 'Creating...';
       
       try {
         const payload = {
@@ -4217,7 +4577,12 @@ async fn vm_page() -> Html<String> {
           body: JSON.stringify(payload)
         });
         
-        showNotification('VM instance created successfully', 'success');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('vm.createdOk', 'VM instance created successfully')
+            : 'VM instance created successfully',
+          'success',
+        );
         hideModal('createVmModal');
         form.reset();
         
@@ -4225,7 +4590,9 @@ async fn vm_page() -> Html<String> {
           window.refreshVmInstances();
         }, 500);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        const ep =
+          typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+        showNotification(ep + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -4245,8 +4612,8 @@ async fn vm_page() -> Html<String> {
         "VM Instances",
         r#"
 <div class="row" style="margin-bottom:16px;">
-  <div class="muted">Source: <code>/api/v1/vm/instances</code></div>
-  <button class="btn btn-primary" onclick="showCreateVmModal()" aria-label="Create new VM instance">Create VM Instance</button>
+  <div class="muted"><span data-i18n="ui.sourceLabel">Source:</span> <code>/api/v1/vm/instances</code></div>
+  <button class="btn btn-primary" onclick="showCreateVmModal()" data-i18n="vm.createBtn" data-i18n-aria="vm.createBtnAria">Create VM Instance</button>
 </div>
 <div id="data"></div>
 
@@ -4254,38 +4621,38 @@ async fn vm_page() -> Html<String> {
 <div id="createVmModal" class="modal" role="dialog" aria-labelledby="createVmModalTitle" aria-modal="true" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 id="createVmModalTitle">Create VM Instance</h3>
-      <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createVmModal')">&times;</button>
+      <h3 id="createVmModalTitle" data-i18n="vm.modalTitle">Create VM Instance</h3>
+      <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createVmModal')">&times;</button>
     </div>
     <form id="createVmForm" onsubmit="handleCreateVm(event)">
       <div class="form-group">
-        <label for="vmName">Instance Name</label>
-        <input type="text" id="vmName" name="name" required placeholder="my-vm-instance" />
+        <label for="vmName" data-i18n="vm.label.name">Instance Name</label>
+        <input type="text" id="vmName" name="name" required data-i18n-placeholder="vm.ph.name" placeholder="my-vm-instance" />
       </div>
       <div class="form-group">
-        <label for="vmCpuCores">CPU Cores</label>
+        <label for="vmCpuCores" data-i18n="vm.label.cpu">CPU Cores</label>
         <input type="number" id="vmCpuCores" name="cpu_cores" required min="1" max="64" value="2" />
       </div>
       <div class="form-group">
-        <label for="vmMemoryMb">Memory (MB)</label>
+        <label for="vmMemoryMb" data-i18n="vm.label.memory">Memory (MB)</label>
         <input type="number" id="vmMemoryMb" name="memory_mb" required min="256" max="131072" value="2048" />
       </div>
       <div class="form-group">
         <label for="vmGpuRequired">
           <input type="checkbox" id="vmGpuRequired" name="gpu_required" />
-          GPU Required
+          <span data-i18n="vm.label.gpu">GPU Required</span>
         </label>
       </div>
       <div class="form-group">
-        <label for="vmIsolation">Isolation Type</label>
+        <label for="vmIsolation" data-i18n="vm.label.isolation">Isolation Type</label>
         <select id="vmIsolation" name="isolation" required>
-          <option value="ProcessSandbox">Process Sandbox</option>
-          <option value="HardwareVm">Hardware VM</option>
+          <option value="ProcessSandbox" data-i18n="vm.iso.process">Process Sandbox</option>
+          <option value="HardwareVm" data-i18n="vm.iso.hardware">Hardware VM</option>
         </select>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" onclick="hideModal('createVmModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn" onclick="hideModal('createVmModal')" data-i18n="ui.cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
       </div>
     </form>
   </div>
@@ -4312,16 +4679,26 @@ async fn raid_page() -> Html<String> {
       }
       
       if (data.length === 0) {
-        el.innerHTML = '<div class="muted">No artifacts stored.</div>';
+        const empty =
+          typeof poolaiT === 'function'
+            ? poolaiT('raid.empty', 'No artifacts stored.')
+            : 'No artifacts stored.';
+        el.innerHTML = '<div class="muted">' + empty + '</div>';
         return;
       }
       
       const table = document.createElement('table');
       const thead = document.createElement('thead');
       const hr = document.createElement('tr');
-      ['id', 'name', 'stored_at', 'actions'].forEach(k => {
+      const rcols = [
+        ['raid.col.id', 'ID'],
+        ['raid.col.name', 'Name'],
+        ['raid.col.storedAt', 'Stored at'],
+        ['raid.col.actions', 'Actions'],
+      ];
+      rcols.forEach(([key, fb]) => {
         const th = document.createElement('th');
-        th.textContent = k.charAt(0).toUpperCase() + k.slice(1).replace('_', ' ');
+        th.textContent = typeof poolaiT === 'function' ? poolaiT(key, fb) : fb;
         hr.appendChild(th);
       });
       thead.appendChild(hr);
@@ -4360,8 +4737,14 @@ async fn raid_page() -> Html<String> {
           // Delete button
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'btn btn-danger';
-          deleteBtn.textContent = 'Delete';
-          deleteBtn.setAttribute('aria-label', `Delete artifact ${artifactName}`);
+          deleteBtn.textContent =
+            typeof poolaiT === 'function' ? poolaiT('ui.delete', 'Delete') : 'Delete';
+          deleteBtn.setAttribute(
+            'aria-label',
+            typeof poolaiT === 'function'
+              ? poolaiT('raid.deleteAria', 'Delete artifact {name}').replace(/\{name\}/g, artifactName)
+              : `Delete artifact ${artifactName}`,
+          );
           deleteBtn.style.cssText = 'padding: 4px 8px; font-size: 0.85em;';
           deleteBtn.onclick = () => handleArtifactDelete(artifactId, artifactName);
           actionsTd.appendChild(deleteBtn);
@@ -4382,7 +4765,15 @@ async fn raid_page() -> Html<String> {
     async function showCreateArtifactModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT(
+                'err.insufficientPermissionsAdminOp',
+                'Insufficient permissions. Admin or Operator role required.',
+              )
+            : 'Insufficient permissions. Admin or Operator role required.',
+          'error',
+        );
         return;
       }
       showModal('createArtifactModal');
@@ -4392,12 +4783,22 @@ async fn raid_page() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.insufficientPermissions', 'Insufficient permissions.')
+            : 'Insufficient permissions.',
+          'error',
+        );
         return;
       }
       
       if (!validateForm('createArtifactForm')) {
-        showNotification('Please fill in all required fields correctly.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT('err.fillRequiredFields', 'Please fill in all required fields correctly.')
+            : 'Please fill in all required fields correctly.',
+          'error',
+        );
         return;
       }
       
@@ -4406,14 +4807,20 @@ async fn raid_page() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent =
+        typeof poolaiT === 'function' ? poolaiT('raid.creatingSubmit', 'Creating…') : 'Creating...';
       
       try {
         const name = document.getElementById('artifactName').value;
         const fileInput = document.getElementById('artifactFile');
         
         if (!fileInput.files || fileInput.files.length === 0) {
-          showNotification('Please select a file to upload.', 'error');
+          showNotification(
+            typeof poolaiT === 'function'
+              ? poolaiT('err.selectFileUpload', 'Please select a file to upload.')
+              : 'Please select a file to upload.',
+            'error',
+          );
           btn.disabled = false;
           btn.textContent = originalText;
           return;
@@ -4435,7 +4842,12 @@ async fn raid_page() -> Html<String> {
               })
             });
             
-            showNotification('Artifact created successfully', 'success');
+            showNotification(
+              typeof poolaiT === 'function'
+                ? poolaiT('raid.createdOk', 'Artifact created successfully')
+                : 'Artifact created successfully',
+              'success',
+            );
             hideModal('createArtifactModal');
             form.reset();
             
@@ -4443,7 +4855,9 @@ async fn raid_page() -> Html<String> {
               window.refreshRaidArtifacts();
             }, 500);
           } catch (err) {
-            showNotification('Error: ' + err.message, 'error');
+            const ep =
+              typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+            showNotification(ep + err.message, 'error');
           } finally {
             btn.disabled = false;
             btn.textContent = originalText;
@@ -4451,14 +4865,21 @@ async fn raid_page() -> Html<String> {
         };
         
         reader.onerror = function() {
-          showNotification('Error reading file', 'error');
+          showNotification(
+            typeof poolaiT === 'function'
+              ? poolaiT('err.readFileFailed', 'Error reading file')
+              : 'Error reading file',
+            'error',
+          );
           btn.disabled = false;
           btn.textContent = originalText;
         };
         
         reader.readAsArrayBuffer(file);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        const ep =
+          typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+        showNotification(ep + e.message, 'error');
         btn.disabled = false;
         btn.textContent = originalText;
       }
@@ -4467,26 +4888,55 @@ async fn raid_page() -> Html<String> {
     async function handleArtifactDelete(artifactId, artifactName) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(
+          typeof poolaiT === 'function'
+            ? poolaiT(
+                'err.insufficientPermissionsAdminOp',
+                'Insufficient permissions. Admin or Operator role required.',
+              )
+            : 'Insufficient permissions. Admin or Operator role required.',
+          'error',
+        );
         return;
       }
       
+      const confirmMsg =
+        typeof poolaiT === 'function'
+          ? poolaiT(
+              'raid.confirmDelete',
+              'Are you sure you want to delete artifact "{name}" ({id})? This action cannot be undone.',
+            )
+              .replace(/\{name\}/g, artifactName)
+              .replace(/\{id\}/g, artifactId)
+          : `Are you sure you want to delete artifact "${artifactName}" (${artifactId})? This action cannot be undone.`;
       showConfirmDialog(
-        `Are you sure you want to delete artifact "${artifactName}" (${artifactId})? This action cannot be undone.`,
+        confirmMsg,
         async () => {
           try {
-            showLoading('artifacts', 'Deleting artifact...');
+            showLoading(
+              'artifacts',
+              typeof poolaiT === 'function'
+                ? poolaiT('raid.deletingLoad', 'Deleting artifact…')
+                : 'Deleting artifact...',
+            );
             
             await fetchJson(`/api/v1/raid/artifacts/${artifactId}`, {
               method: 'DELETE'
             });
             
-            showNotification('Artifact deleted successfully', 'success');
+            showNotification(
+              typeof poolaiT === 'function'
+                ? poolaiT('raid.deletedOk', 'Artifact deleted successfully')
+                : 'Artifact deleted successfully',
+              'success',
+            );
             setTimeout(() => {
               window.refreshRaidArtifacts();
             }, 1000);
           } catch (e) {
-            showNotification('Error: ' + e.message, 'error');
+            const ep =
+              typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: ';
+            showNotification(ep + e.message, 'error');
             hideLoading('artifacts');
           }
         }
@@ -4507,17 +4957,17 @@ async fn raid_page() -> Html<String> {
         "RAID",
         r#"
 <div class="row" style="margin-bottom:16px;">
-  <div class="muted">Artifacts: <code>/api/v1/raid/artifacts</code></div>
-  <button class="btn btn-primary" onclick="showCreateArtifactModal()" aria-label="Create new artifact">Create Artifact</button>
+  <div class="muted"><span data-i18n="raid.sectionArtifacts">Artifacts:</span> <code>/api/v1/raid/artifacts</code></div>
+  <button class="btn btn-primary" onclick="showCreateArtifactModal()" data-i18n="raid.createBtn" data-i18n-aria="raid.createBtnAria">Create Artifact</button>
 </div>
 
 <div class="grid">
   <div class="item">
-    <div class="muted">Nodes: <code>/api/v1/raid/nodes</code></div>
+    <div class="muted"><span data-i18n="raid.sectionNodes">Nodes:</span> <code>/api/v1/raid/nodes</code></div>
     <div id="nodes"></div>
   </div>
   <div class="item">
-    <div class="muted">Artifacts: <code>/api/v1/raid/artifacts</code></div>
+    <div class="muted"><span data-i18n="raid.sectionArtifacts">Artifacts:</span> <code>/api/v1/raid/artifacts</code></div>
     <div id="artifacts"></div>
   </div>
 </div>
@@ -4526,21 +4976,21 @@ async fn raid_page() -> Html<String> {
 <div id="createArtifactModal" class="modal" role="dialog" aria-labelledby="createArtifactModalTitle" aria-modal="true" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 id="createArtifactModalTitle">Create Artifact</h3>
-      <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createArtifactModal')">&times;</button>
+      <h3 id="createArtifactModalTitle" data-i18n="raid.modalTitle">Create Artifact</h3>
+      <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createArtifactModal')">&times;</button>
     </div>
     <form id="createArtifactForm" onsubmit="handleCreateArtifact(event)">
       <div class="form-group">
-        <label for="artifactName">Artifact Name</label>
-        <input type="text" id="artifactName" name="name" required placeholder="my-artifact" />
+        <label for="artifactName" data-i18n="raid.label.name">Artifact Name</label>
+        <input type="text" id="artifactName" name="name" required data-i18n-placeholder="raid.ph.name" placeholder="my-artifact" />
       </div>
       <div class="form-group">
-        <label for="artifactFile">File</label>
+        <label for="artifactFile" data-i18n="raid.label.file">File</label>
         <input type="file" id="artifactFile" name="file" required />
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" onclick="hideModal('createArtifactModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn" onclick="hideModal('createArtifactModal')" data-i18n="ui.cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
       </div>
     </form>
   </div>
