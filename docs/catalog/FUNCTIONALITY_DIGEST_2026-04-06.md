@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-10 (узгодження з FM-012: UX-апгрейд UI/Admin + Telegram login roadmap у **`FUNCTION_MANAGEMENT`**).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-04-12 (FM-012 **Partial**: i18n у `i18n_core.js`; узгоджено з **`FUNCTION_MANAGEMENT`** / **HANDOFF**).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -57,7 +57,7 @@
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
-| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
+| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 Partial:** i18n **UA/EN** (`i18n_core.js`), `/ui/auth`, enterprise admin shell. Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | Telegram-бот / інтеграція (поточний placeholder + roadmap на auth/login через Telegram у межах чинного JWT/RBAC, див. FM-012). |
 

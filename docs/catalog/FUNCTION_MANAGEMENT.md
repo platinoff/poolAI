@@ -1,6 +1,9 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-12 (FM-012 **Partial**: i18n **UA/EN** у `i18n_core.js` + `/ui/auth` + admin; FM-011: **`cargo test-ci`**; FM-005 ✅: **`HttpAppError`/`RestError`** …)
+**Оновлено:** 2026-04-12.
+
+**Останній зріз:** FM-012 **Partial** — i18n **UA/EN** (`src/ui/i18n_core.js`, `/ui/auth`, admin shell, підказки в `admin_common.js`). FM-011 — alias **`cargo test-ci`** (`.cargo/config.toml`). FM-003 / P4 — рядки baseline **2026-04-12** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md). FM-007 — додаткові wire-тести **`SyncArtifacts`**. FM-005 ✅ — узгоджений JSON **`HttpAppError`/`RestError`** по REST, **`enterprise_api`**, auth middleware.
+
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -103,7 +106,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Якість збірки (не змінює порядок FM):** репозиторій проходить **`cargo clippy --all-targets … -- -D warnings`** для тих самих feature-матриць, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (`--no-default-features`, `jwt,https`, `cloud,cloud-sdk` + `K8S_OPENAPI_ENABLED_VERSION`) — станом на **2026-04-10**. Далі за пріоритетом лишаються продуктові пункти нижче, не «полювання на clippy».
+**Якість збірки (не змінює порядок FM):** репозиторій проходить **`cargo clippy --all-targets … -- -D warnings`** для тих самих feature-матриць, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (`--no-default-features`, `jwt,https`, `cloud,cloud-sdk` + `K8S_OPENAPI_ENABLED_VERSION`); для змін під **`enterprise`** корисно додатково **`cargo clippy -p poolai --features enterprise -- -D warnings`**. Орієнтир узгодження з CI — **2026-04-12**. Далі за пріоритетом лишаються продуктові пункти нижче, не «полювання на clippy».
 
 **Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри реплікації + TQ01 на стенді (P2b/P4); опційно **cloud-sdk** (Azure/GCP). Усе інше в таблиці FM-* нижче — дорожня карта без обов’язкового чекбокса.
 
@@ -114,7 +117,7 @@ FM-xxx (з таблиці нижче)
 | 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
 | 2 | Distributed RAID | **FM-007**, **FM-008** | Код: каталог sync + leave з replication/membership; далі — LAN, conflicts у протоколі, поглиблена реплікація. |
 | 3 | Ops | **FM-011** | Тримати збірку `--all-features` стабільною (профіль тестів, `-j 1`, incremental, GNU за потреби); на Windows фіксувати сигнал як `--lib --tests` (doctest може падати через paging file, `os error 1455`). |
-| 4 | Product UX | **FM-012** | Єдиний UX-план для `/ui` + `/ui/admin/*`: IA, швидкі дії, уніфіковані стани/помилки, i18n UA/EN; Telegram login у чинний JWT/RBAC (MVP → hardening). |
+| 4 | Product UX | **FM-012** | **Зроблено (Partial):** i18n **UA/EN** (`i18n_core.js`), `/ui/auth`, admin sidebar, підказки fetch у `admin_common.js`. **Далі:** решта сторінок `/ui/*`, IA / швидкі дії, уніфіковані стани; Telegram OAuth — hardening (allowlist, audit) поверх enterprise widget. |
 | 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
 | 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 

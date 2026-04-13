@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-04-10
+**Last updated:** 2026-04-12
 
 ## Canonical reading order
 
