@@ -1,6 +1,6 @@
 /**
  * PoolAI UI i18n (FM-012): Ukrainian / English via localStorage `poolai_ui_lang` (`en` | `uk`).
- * Exposes: PoolAiI18n.{ getLang, setLang, t, apply, initAdminShell, initAuthPage }
+ * Exposes: PoolAiI18n.{ getLang, setLang, t, apply, initAdminShell, initAuthPage, initDashboardShell }
  */
 (function () {
   'use strict';
@@ -55,6 +55,60 @@
       'err.hint503.vm': 'VM manager may not be attached.',
       'err.hint404.enterprise':
         'Build and run the server with the enterprise feature for this API.',
+
+      'dash.brand': 'PoolAI UI',
+      'dash.subtitle': 'Dashboard with write operations (Stage 3)',
+      'dash.skipMain': 'Skip to main content',
+      'dash.skipNav': 'Skip to navigation',
+      'dash.nav.home': 'Home',
+      'dash.nav.status': 'Status',
+      'dash.nav.health': 'Health',
+      'dash.nav.metrics': 'Metrics',
+      'dash.nav.workers': 'Workers',
+      'dash.nav.libs': 'Libs',
+      'dash.nav.vm': 'VM',
+      'dash.nav.raid': 'RAID',
+      'dash.aria.mainNav': 'Main navigation',
+      'dash.aria.home': 'Home page',
+      'dash.aria.status': 'System status',
+      'dash.aria.health': 'Health check',
+      'dash.aria.metrics': 'System metrics',
+      'dash.aria.workers': 'Worker management',
+      'dash.aria.libs': 'Library management',
+      'dash.aria.vm': 'VM instance management',
+      'dash.aria.raid': 'RAID artifact management',
+      'dash.aria.mobileNav': 'Mobile navigation',
+      'dash.aria.openMenu': 'Open navigation menu',
+      'dash.aria.closeMenu': 'Close navigation menu',
+      'dash.menuTitle': 'Menu',
+      'dash.themeLabel': 'Theme:',
+      'dash.aria.theme': 'Select theme',
+      'dash.themeOptDark': '🌙 Dark',
+      'dash.themeOptLight': '☀️ Light',
+      'dash.themeOptHC': '🔆 High Contrast',
+      'dash.login': 'Login',
+      'dash.logout': 'Logout',
+      'dash.pageAutoRefresh':
+        'Auto-refresh is enabled (5s). Write operations are available for authenticated users with appropriate permissions.',
+      'dash.title.home': 'Home',
+      'dash.title.status': 'Status',
+      'dash.title.health': 'Health',
+      'dash.title.metrics': 'Metrics',
+      'dash.title.workers': 'Workers',
+      'dash.title.libraries': 'Libraries',
+      'dash.title.vm': 'VM Instances',
+      'dash.title.raid': 'RAID',
+      'dash.updatedPrefix': 'Updated:',
+
+      'home.apiTitle': 'API',
+      'home.apiBase': 'Base:',
+      'home.uiTitle': 'UI',
+      'home.uiHint': 'Pages under',
+      'home.openDashboard': 'Open read-only dashboard',
+      'home.quickLinks': 'Quick links',
+      'home.notesTitle': 'Notes',
+      'home.notesBody':
+        'Write operations are available for authenticated users with appropriate permissions.',
     },
     uk: {
       'auth.pageTitle': 'Вхід - PoolAI',
@@ -103,6 +157,60 @@
       'err.hint503.vm': 'VM-менеджер може бути не підключено.',
       'err.hint404.enterprise':
         'Зберіть і запустіть сервер з функцією enterprise для цього API.',
+
+      'dash.brand': 'PoolAI UI',
+      'dash.subtitle': 'Панель з операціями запису (етап 3)',
+      'dash.skipMain': 'Перейти до основного вмісту',
+      'dash.skipNav': 'Перейти до навігації',
+      'dash.nav.home': 'Головна',
+      'dash.nav.status': 'Статус',
+      'dash.nav.health': 'Здоров’я',
+      'dash.nav.metrics': 'Метрики',
+      'dash.nav.workers': 'Воркери',
+      'dash.nav.libs': 'Бібліотеки',
+      'dash.nav.vm': 'VM',
+      'dash.nav.raid': 'RAID',
+      'dash.aria.mainNav': 'Головна навігація',
+      'dash.aria.home': 'Головна сторінка',
+      'dash.aria.status': 'Статус системи',
+      'dash.aria.health': 'Перевірка здоров’я',
+      'dash.aria.metrics': 'Метрики системи',
+      'dash.aria.workers': 'Керування воркерами',
+      'dash.aria.libs': 'Керування бібліотеками',
+      'dash.aria.vm': 'Керування інстансами VM',
+      'dash.aria.raid': 'Керування артефактами RAID',
+      'dash.aria.mobileNav': 'Мобільна навігація',
+      'dash.aria.openMenu': 'Відкрити меню навігації',
+      'dash.aria.closeMenu': 'Закрити меню навігації',
+      'dash.menuTitle': 'Меню',
+      'dash.themeLabel': 'Тема:',
+      'dash.aria.theme': 'Обрати тему',
+      'dash.themeOptDark': '🌙 Темна',
+      'dash.themeOptLight': '☀️ Світла',
+      'dash.themeOptHC': '🔆 Високий контраст',
+      'dash.login': 'Увійти',
+      'dash.logout': 'Вийти',
+      'dash.pageAutoRefresh':
+        'Автооновлення кожні 5 с. Операції запису доступні автентифікованим користувачам з відповідними правами.',
+      'dash.title.home': 'Головна',
+      'dash.title.status': 'Статус',
+      'dash.title.health': 'Здоров’я',
+      'dash.title.metrics': 'Метрики',
+      'dash.title.workers': 'Воркери',
+      'dash.title.libraries': 'Бібліотеки',
+      'dash.title.vm': 'Інстанси VM',
+      'dash.title.raid': 'RAID',
+      'dash.updatedPrefix': 'Оновлено:',
+
+      'home.apiTitle': 'API',
+      'home.apiBase': 'База:',
+      'home.uiTitle': 'UI',
+      'home.uiHint': 'Сторінки під',
+      'home.openDashboard': 'Відкрити панель лише для читання',
+      'home.quickLinks': 'Швидкі посилання',
+      'home.notesTitle': 'Нотатки',
+      'home.notesBody':
+        'Операції запису доступні автентифікованим користувачам з відповідними правами.',
     },
   };
 
@@ -217,6 +325,20 @@
     syncLangToggleActive();
   }
 
+  /** Main `/ui/*` layout: `#poolai-lang-toggle-dash` in topbar */
+  function initDashboardShell() {
+    var host = document.getElementById('poolai-lang-toggle-dash');
+    if (!host) return;
+    host.innerHTML =
+      '<span class="admin-lang-label" data-i18n="admin.lang.label"></span> ' +
+      '<button type="button" class="btn-lang" data-lang-set="en" data-i18n="auth.lang.en"></button>' +
+      '<button type="button" class="btn-lang" data-lang-set="uk" data-i18n="auth.lang.uk"></button>';
+    apply(host);
+    bindLangSegment(host.querySelector('[data-lang-set="en"]'), 'en');
+    bindLangSegment(host.querySelector('[data-lang-set="uk"]'), 'uk');
+    syncLangToggleActive();
+  }
+
   document.documentElement.lang = getLang() === 'uk' ? 'uk' : 'en';
 
   window.PoolAiI18n = {
@@ -227,6 +349,7 @@
     STRINGS: STRINGS,
     initAdminShell: initAdminShell,
     initAuthPage: initAuthPage,
+    initDashboardShell: initDashboardShell,
   };
 
   /** Fallback for inline scripts: second arg is English default if key missing */

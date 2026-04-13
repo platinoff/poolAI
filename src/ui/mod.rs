@@ -645,16 +645,26 @@ const BASE_CSS: &str = r#"
   }
 "#;
 
-fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
+fn layout(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    script_js: &str,
+) -> Html<String> {
     let auth_url = "/ui/auth";
-    let nav_auth_link = format!(r#"<a href="{}" id="authLoginBtn">Login</a>"#, auth_url);
-    let user_info_html = "<div class=\"user-info\" id=\"userInfo\" style=\"display:none;\">\n          <span class=\"role\" id=\"userRole\"></span>\n          <a href=\"#\" id=\"logoutBtn\">Logout</a>\n        </div>";
+    let nav_auth_link = format!(
+        r#"<a href="{}" id="authLoginBtn" data-i18n="dash.login">Login</a>"#,
+        auth_url
+    );
+    let user_info_html = r##"<div class="user-info" id="userInfo" style="display:none;">
+          <span class="role" id="userRole"></span>
+          <a href="#" id="logoutBtn" data-i18n="dash.logout">Logout</a>
+        </div>"##;
     let component_styles = get_component_styles();
     let theme = DARK_THEME; // Default theme
     let theme_css = theme.to_css();
     let high_contrast_value = "high-contrast";
 
-    // Prepare navigation links and attributes with dashes
     let nav_id = "navigation";
     let main_content_id = "main_content";
     let skip_link_class = "skip_link";
@@ -668,18 +678,21 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let ui_libs = "/ui/libs";
     let ui_vm = "/ui/vm";
     let ui_raid = "/ui/raid";
-    let aria_label_nav = "Main navigation";
-    let aria_label_home = "Home page";
-    let aria_label_status = "System status";
-    let aria_label_health = "Health check";
-    let aria_label_metrics = "System metrics";
-    let aria_label_workers = "Worker management";
-    let aria_label_libs = "Library management";
-    let aria_label_vm = "VM instance management";
-    let aria_label_raid = "RAID artifact management";
-    let aria_label_theme = "Select theme";
-    let title_theme = "Select theme";
     let style_select = "padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 0.9em; cursor: pointer;";
+
+    let i18n_js = include_str!("i18n_core.js");
+    let i18n_boot = r#"
+(function(){
+  if (typeof PoolAiI18n !== 'undefined') {
+    document.documentElement.lang = PoolAiI18n.getLang() === 'uk' ? 'uk' : 'en';
+    PoolAiI18n.apply(document.documentElement);
+    PoolAiI18n.initDashboardShell();
+  }
+  document.addEventListener('poolai:langchange', function(){
+    if (typeof PoolAiI18n !== 'undefined') PoolAiI18n.apply(document.documentElement);
+  });
+})();"#;
+    let full_script = format!("{}\n{}\n{}", i18n_js, script_js, i18n_boot);
 
     let html = format!(
         r#"<!DOCTYPE html>
@@ -687,40 +700,40 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title}</title>
+  <title data-i18n="{title_key}">{title_fallback}</title>
   <style>{base_css}
 {component_css}
 {theme_css}</style>
 </head>
 <body>
-  <!-- Skip links for accessibility -->
-  <a href="{skip_to_main_href}" class="{skip_link_class}">Skip to main content</a>
-  <a href="{skip_to_nav_href}" class="{skip_link_class}">Skip to navigation</a>
+  <a href="{skip_to_main_href}" class="{skip_link_class}" data-i18n="dash.skipMain">Skip to main content</a>
+  <a href="{skip_to_nav_href}" class="{skip_link_class}" data-i18n="dash.skipNav">Skip to navigation</a>
   
   <div class="wrap">
     <header class="topbar" role="banner">
       <div class="brand">
         <div>
-          <h1>PoolAI UI</h1>
-          <div class="muted">Dashboard with Write Operations (Stage 3)</div>
+          <h1 data-i18n="dash.brand">PoolAI UI</h1>
+          <div class="muted" data-i18n="dash.subtitle">Dashboard with write operations (Stage 3)</div>
         </div>
       </div>
-      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open navigation menu" aria-expanded="false">
+      <div id="poolai-lang-toggle-dash" class="poolai-lang-auth"></div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" data-i18n-aria="dash.aria.openMenu" aria-expanded="false">
         ☰
       </button>
-      <nav class="nav" id="{nav_id}" role="navigation" aria-label="{aria_label_nav}">
-        <a href="{ui_base}" aria-label="{aria_label_home}">Home</a>
-        <a href="{ui_status}" aria-label="{aria_label_status}">Status</a>
-        <a href="{ui_health}" aria-label="{aria_label_health}">Health</a>
-        <a href="{ui_metrics}" aria-label="{aria_label_metrics}">Metrics</a>
-        <a href="{ui_workers}" aria-label="{aria_label_workers}">Workers</a>
-        <a href="{ui_libs}" aria-label="{aria_label_libs}">Libs</a>
-        <a href="{ui_vm}" aria-label="{aria_label_vm}">VM</a>
-        <a href="{ui_raid}" aria-label="{aria_label_raid}">RAID</a>
-        <select id="themeSelector" aria-label="{aria_label_theme}" style="{style_select}" title="{title_theme}">
-          <option value="dark">🌙 Dark</option>
-          <option value="light">☀️ Light</option>
-          <option value="{high_contrast_value}">🔆 High Contrast</option>
+      <nav class="nav" id="{nav_id}" role="navigation" data-i18n-aria="dash.aria.mainNav">
+        <a href="{ui_base}" data-i18n="dash.nav.home" data-i18n-aria="dash.aria.home">Home</a>
+        <a href="{ui_status}" data-i18n="dash.nav.status" data-i18n-aria="dash.aria.status">Status</a>
+        <a href="{ui_health}" data-i18n="dash.nav.health" data-i18n-aria="dash.aria.health">Health</a>
+        <a href="{ui_metrics}" data-i18n="dash.nav.metrics" data-i18n-aria="dash.aria.metrics">Metrics</a>
+        <a href="{ui_workers}" data-i18n="dash.nav.workers" data-i18n-aria="dash.aria.workers">Workers</a>
+        <a href="{ui_libs}" data-i18n="dash.nav.libs" data-i18n-aria="dash.aria.libs">Libs</a>
+        <a href="{ui_vm}" data-i18n="dash.nav.vm" data-i18n-aria="dash.aria.vm">VM</a>
+        <a href="{ui_raid}" data-i18n="dash.nav.raid" data-i18n-aria="dash.aria.raid">RAID</a>
+        <select id="themeSelector" data-i18n-aria="dash.aria.theme" style="{style_select}">
+          <option value="dark" data-i18n="dash.themeOptDark">🌙 Dark</option>
+          <option value="light" data-i18n="dash.themeOptLight">☀️ Light</option>
+          <option value="{high_contrast_value}" data-i18n="dash.themeOptHC">🔆 High Contrast</option>
         </select>
         {user_info_html}
         {nav_auth_link}
@@ -731,8 +744,8 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
       <div class="card">
         <div class="row">
           <div>
-            <h2 style="margin:0 0 6px">{title}</h2>
-            <div class="muted">Auto-refresh is enabled (5s). Write operations available for authenticated users with appropriate permissions.</div>
+            <h2 style="margin:0 0 6px" data-i18n="{title_key}">{title_fallback}</h2>
+            <div class="muted" data-i18n="dash.pageAutoRefresh">Auto-refresh is enabled (5s). Write operations are available for authenticated users with appropriate permissions.</div>
           </div>
           <div class="pill" id="last_updated" aria-live="polite" aria-atomic="true">—</div>
         </div>
@@ -741,28 +754,27 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     </main>
   </div>
 
-  <!-- Mobile Navigation Drawer -->
   <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-  <div class="mobile-nav-drawer" id="mobileNavDrawer" role="navigation" aria-label="Mobile navigation">
+  <div class="mobile-nav-drawer" id="mobileNavDrawer" role="navigation" data-i18n-aria="dash.aria.mobileNav">
     <div class="mobile-nav-header">
-      <h2 style="margin: 0; color: var(--primary, #67e480);">Menu</h2>
-      <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close navigation menu">×</button>
+      <h2 style="margin: 0; color: var(--primary, #67e480);" data-i18n="dash.menuTitle">Menu</h2>
+      <button class="mobile-nav-close" id="mobileNavClose" data-i18n-aria="dash.aria.closeMenu">×</button>
     </div>
     <div class="mobile-nav-content">
-      <a href="{ui_base}" class="mobile-nav-item" aria-label="{aria_label_home}">Home</a>
-      <a href="{ui_status}" class="mobile-nav-item" aria-label="{aria_label_status}">Status</a>
-      <a href="{ui_health}" class="mobile-nav-item" aria-label="{aria_label_health}">Health</a>
-      <a href="{ui_metrics}" class="mobile-nav-item" aria-label="{aria_label_metrics}">Metrics</a>
-      <a href="{ui_workers}" class="mobile-nav-item" aria-label="{aria_label_workers}">Workers</a>
-      <a href="{ui_libs}" class="mobile-nav-item" aria-label="{aria_label_libs}">Libs</a>
-      <a href="{ui_vm}" class="mobile-nav-item" aria-label="{aria_label_vm}">VM</a>
-      <a href="{ui_raid}" class="mobile-nav-item" aria-label="{aria_label_raid}">RAID</a>
+      <a href="{ui_base}" class="mobile-nav-item" data-i18n="dash.nav.home" data-i18n-aria="dash.aria.home">Home</a>
+      <a href="{ui_status}" class="mobile-nav-item" data-i18n="dash.nav.status" data-i18n-aria="dash.aria.status">Status</a>
+      <a href="{ui_health}" class="mobile-nav-item" data-i18n="dash.nav.health" data-i18n-aria="dash.aria.health">Health</a>
+      <a href="{ui_metrics}" class="mobile-nav-item" data-i18n="dash.nav.metrics" data-i18n-aria="dash.aria.metrics">Metrics</a>
+      <a href="{ui_workers}" class="mobile-nav-item" data-i18n="dash.nav.workers" data-i18n-aria="dash.aria.workers">Workers</a>
+      <a href="{ui_libs}" class="mobile-nav-item" data-i18n="dash.nav.libs" data-i18n-aria="dash.aria.libs">Libs</a>
+      <a href="{ui_vm}" class="mobile-nav-item" data-i18n="dash.nav.vm" data-i18n-aria="dash.aria.vm">VM</a>
+      <a href="{ui_raid}" class="mobile-nav-item" data-i18n="dash.nav.raid" data-i18n-aria="dash.aria.raid">RAID</a>
       <div class="mobile-nav-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-        <label for="mobileThemeSelector" style="font-size: 0.9em; color: var(--text-muted, #a8b0bf);">Theme:</label>
-        <select id="mobileThemeSelector" aria-label="{aria_label_theme}" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9em;">
-          <option value="dark">🌙 Dark</option>
-          <option value="light">☀️ Light</option>
-          <option value="high-contrast">🔆 High Contrast</option>
+        <label for="mobileThemeSelector" style="font-size: 0.9em; color: var(--text-muted, #a8b0bf);" data-i18n="dash.themeLabel">Theme:</label>
+        <select id="mobileThemeSelector" data-i18n-aria="dash.aria.theme" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9em;">
+          <option value="dark" data-i18n="dash.themeOptDark">🌙 Dark</option>
+          <option value="light" data-i18n="dash.themeOptLight">☀️ Light</option>
+          <option value="{high_contrast_value}" data-i18n="dash.themeOptHC">🔆 High Contrast</option>
         </select>
       </div>
       {user_info_html}
@@ -770,7 +782,6 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     </div>
   </div>
 
-  <!-- ARIA live region for notifications -->
   <div id="aria_live_region" aria-live="polite" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
 
   <script>
@@ -778,37 +789,27 @@ fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
   </script>
 </body>
 </html>"#,
-        title = title,
+        title_key = title_i18n_key,
+        title_fallback = title_fallback,
         base_css = BASE_CSS,
         component_css = component_styles,
         body = body_html,
-        script = script_js,
+        script = full_script,
         nav_auth_link = nav_auth_link,
         user_info_html = user_info_html,
         skip_to_main_href = skip_to_main_href,
         skip_link_class = skip_link_class,
         skip_to_nav_href = skip_to_nav_href,
         nav_id = nav_id,
-        aria_label_nav = aria_label_nav,
         ui_base = ui_base,
-        aria_label_home = aria_label_home,
         ui_status = ui_status,
-        aria_label_status = aria_label_status,
         ui_health = ui_health,
-        aria_label_health = aria_label_health,
         ui_metrics = ui_metrics,
-        aria_label_metrics = aria_label_metrics,
         ui_workers = ui_workers,
-        aria_label_workers = aria_label_workers,
         ui_libs = ui_libs,
-        aria_label_libs = aria_label_libs,
         ui_vm = ui_vm,
-        aria_label_vm = aria_label_vm,
         ui_raid = ui_raid,
-        aria_label_raid = aria_label_raid,
-        aria_label_theme = aria_label_theme,
         style_select = style_select,
-        title_theme = title_theme,
         high_contrast_value = high_contrast_value,
         main_content_id = main_content_id
     );
@@ -2001,7 +2002,9 @@ async function fetchJson(url, options = {}) {
 
 function setUpdated() {
   const el = document.getElementById('last_updated');
-  if (el) el.textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  if (!el) return;
+  const p = typeof poolaiT === 'function' ? poolaiT('dash.updatedPrefix', 'Updated: ') : 'Updated: ';
+  el.textContent = p + new Date().toLocaleTimeString();
 }
 
 function renderJsonPre(containerId, data) {
@@ -3532,32 +3535,33 @@ async fn home_handler() -> Html<String> {
         common_js()
     );
     layout(
+        "dash.title.home",
         "Home",
         r#"
 <div class="grid">
   <div class="item">
-    <div><b>API</b></div>
-    <div class="muted">Base: <code>/api/v1</code></div>
+    <div><b data-i18n="home.apiTitle">API</b></div>
+    <div class="muted"><span data-i18n="home.apiBase">Base:</span> <code>/api/v1</code></div>
     <div style="margin-top:8px"><a href="/api/v1/status">/api/v1/status</a></div>
   </div>
   <div class="item">
-    <div><b>UI</b></div>
-    <div class="muted">Pages under <code>/ui</code></div>
-    <div style="margin-top:8px"><a href="/ui/status">Open read-only dashboard</a></div>
+    <div><b data-i18n="home.uiTitle">UI</b></div>
+    <div class="muted"><span data-i18n="home.uiHint">Pages under</span> <code>/ui</code></div>
+    <div style="margin-top:8px"><a href="/ui/status" data-i18n="home.openDashboard">Open read-only dashboard</a></div>
   </div>
 </div>
 
 <div class="grid">
-  <div class="item"><b>Quick links</b><div style="margin-top:8px">
-    <a href="/ui/metrics">Metrics</a> ·
-    <a href="/ui/workers">Workers</a> ·
-    <a href="/ui/libs">Libs</a> ·
-    <a href="/ui/vm">VM</a> ·
-    <a href="/ui/raid">RAID</a>
+  <div class="item"><b data-i18n="home.quickLinks">Quick links</b><div style="margin-top:8px">
+    <a href="/ui/metrics" data-i18n="dash.nav.metrics">Metrics</a> ·
+    <a href="/ui/workers" data-i18n="dash.nav.workers">Workers</a> ·
+    <a href="/ui/libs" data-i18n="dash.nav.libs">Libs</a> ·
+    <a href="/ui/vm" data-i18n="dash.nav.vm">VM</a> ·
+    <a href="/ui/raid" data-i18n="dash.nav.raid">RAID</a>
   </div></div>
   <div class="item">
-    <div><b>Notes</b></div>
-          <div class="muted">Write operations are available for authenticated users with appropriate permissions.</div>
+    <div><b data-i18n="home.notesTitle">Notes</b></div>
+          <div class="muted" data-i18n="home.notesBody">Write operations are available for authenticated users with appropriate permissions.</div>
   </div>
 </div>
 "#,
@@ -3567,6 +3571,7 @@ async fn home_handler() -> Html<String> {
 
 async fn status_page() -> Html<String> {
     layout(
+        "dash.title.status",
         "Status",
         r#"<div id="data"></div>"#,
         &format!(
@@ -3578,6 +3583,7 @@ async fn status_page() -> Html<String> {
 
 async fn health_page() -> Html<String> {
     layout(
+        "dash.title.health",
         "Health",
         r#"<div id="data"></div>"#,
         &format!(
@@ -3589,6 +3595,7 @@ async fn health_page() -> Html<String> {
 
 async fn metrics_page() -> Html<String> {
     layout(
+        "dash.title.metrics",
         "Metrics",
         r#"<div id="data"></div>"#,
         &format!(
@@ -3844,6 +3851,7 @@ async fn workers_page() -> Html<String> {
     "#;
 
     layout(
+        "dash.title.workers",
         "Workers",
         r#"
 <div class="row" style="margin-bottom:16px;">
@@ -4121,6 +4129,7 @@ async fn libs_page() -> Html<String> {
     "#;
 
     layout(
+        "dash.title.libraries",
         "Libraries",
         r#"
 <div class="row" style="margin-bottom:16px;">
@@ -4232,6 +4241,7 @@ async fn vm_page() -> Html<String> {
     "#;
 
     layout(
+        "dash.title.vm",
         "VM Instances",
         r#"
 <div class="row" style="margin-bottom:16px;">
@@ -4493,6 +4503,7 @@ async fn raid_page() -> Html<String> {
     "#;
 
     layout(
+        "dash.title.raid",
         "RAID",
         r#"
 <div class="row" style="margin-bottom:16px;">
