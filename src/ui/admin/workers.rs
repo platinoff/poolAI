@@ -8,14 +8,17 @@ use axum::response::Html;
 /// Worker management page
 pub async fn admin_workers() -> Html<String> {
     let script = r#"
+    function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
+    function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
+
     async function loadWorkers() {
-      adminShowLoading('workers-list', 'Loading workers…');
+      adminShowLoading('workers-list', T('admin.wrk.loading', 'Loading workers…'));
       try {
         const workers = await fetchJson('/api/v1/workers');
         renderWorkers(workers);
       } catch (e) {
         adminShowInlineError('workers-list', e);
-        showNotification('Error loading workers: ' + e.message, 'error');
+        showNotification(T('admin.wrk.errLoad', 'Error loading workers: ') + e.message, 'error');
       }
     }
     
@@ -23,50 +26,53 @@ pub async fn admin_workers() -> Html<String> {
       const el = document.getElementById('workers-list');
       if (!el) return;
       if (!workers || workers.length === 0) {
-        el.innerHTML = '<div class="muted">No workers found</div>';
+        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.wrk.empty', 'No workers found')) + '</div>';
         return;
       }
       el.innerHTML = `
         <table class="admin-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Status</th>
-              <th>Metrics</th>
-              <th>Actions</th>
+              <th>${escapeHtml(T('admin.wrk.col.id', 'ID'))}</th>
+              <th>${escapeHtml(T('admin.wrk.col.status', 'Status'))}</th>
+              <th>${escapeHtml(T('admin.wrk.col.metrics', 'Metrics'))}</th>
+              <th>${escapeHtml(T('admin.wrk.col.actions', 'Actions'))}</th>
             </tr>
           </thead>
           <tbody>
-            ${workers.map(w => `
+            ${workers.map(w => {
+              const wid = w.id || w.worker_id || 'unknown';
+              return `
               <tr>
-                <td>${w.id || w.worker_id || 'unknown'}</td>
-                <td><span class="status-badge ${w.is_healthy ? 'active' : 'error'}">${w.is_healthy ? 'Healthy' : 'Unhealthy'}</span></td>
-                <td>Requests: ${w.total_requests_processed || 0}</td>
+                <td>${escapeHtml(String(wid))}</td>
+                <td><span class="status-badge ${w.is_healthy ? 'active' : 'error'}">${w.is_healthy ? escapeHtml(T('workers.healthy', 'Healthy')) : escapeHtml(T('workers.unhealthy', 'Unhealthy'))}</span></td>
+                <td>${escapeHtml(T('admin.wrk.reqLabel', 'Requests:'))} ${w.total_requests_processed || 0}</td>
                 <td>
-                  <button class="btn btn-danger" onclick="deleteWorker('${w.id || w.worker_id}')">Delete</button>
+                  <button type="button" class="btn btn-danger" onclick="deleteWorker(${JSON.stringify(wid)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
                 </td>
               </tr>
-            `).join('')}
+            `;
+            }).join('')}
           </tbody>
         </table>
       `;
     }
     
     async function deleteWorker(id) {
-      if (!confirm('Delete worker ' + id + '?')) return;
+      if (!confirm(T('admin.wrk.confirmDel', 'Delete worker {id}?').replace(/\{id\}/g, id))) return;
       try {
-        await fetchJson(`/api/v1/workers/${id}`, { method: 'DELETE' });
-        showNotification('Worker deleted', 'success');
+        await fetchJson(`/api/v1/workers/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        showNotification(T('admin.wrk.deletedOk', 'Worker deleted'), 'success');
         loadWorkers();
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       }
     }
     
     function showCreateWorkerModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
         return;
       }
       showModal('createWorkerModal');
@@ -76,7 +82,7 @@ pub async fn admin_workers() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
         return;
       }
       
@@ -85,7 +91,7 @@ pub async fn admin_workers() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent = T('workers.creatingSubmit', 'Creating…');
       
       try {
         const payload = {
@@ -102,19 +108,18 @@ pub async fn admin_workers() -> Html<String> {
           resource_monitoring: document.getElementById('workerResourceMonitoring').checked
         };
         
-        // Remove undefined fields
         Object.keys(payload).forEach(key => {
           if (payload[key] === undefined) {
             delete payload[key];
           }
         });
         
-        const result = await fetchJson('/api/v1/workers', {
+        await fetchJson('/api/v1/workers', {
           method: 'POST',
           body: JSON.stringify(payload)
         });
         
-        showNotification('Worker created successfully', 'success');
+        showNotification(T('workers.createdOk', 'Worker created successfully'), 'success');
         hideModal('createWorkerModal');
         form.reset();
         
@@ -122,7 +127,7 @@ pub async fn admin_workers() -> Html<String> {
           loadWorkers();
         }, 500);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -139,74 +144,73 @@ pub async fn admin_workers() -> Html<String> {
         r#"
         <div class="admin-section">
           <div class="admin-header">
-            <h2>Workers</h2>
-            <button class="btn btn-primary" onclick="showCreateWorkerModal()" aria-label="Create new worker">Create Worker</button>
+            <h2 data-i18n="admin.wrk.section">Workers</h2>
+            <button type="button" class="btn btn-primary" onclick="showCreateWorkerModal()" data-i18n="admin.wrk.createBtn" data-i18n-aria="workers.createBtnAria">Create Worker</button>
           </div>
           <div id="workers-list"></div>
         </div>
         
-        <!-- Create Worker Modal -->
         <div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="true" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
-              <h3 id="createWorkerModalTitle">Create Worker</h3>
-              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createWorkerModal')">&times;</button>
+              <h3 id="createWorkerModalTitle" data-i18n="admin.wrk.title">Create Worker</h3>
+              <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createWorkerModal')">&times;</button>
             </div>
             <form id="createWorkerForm" onsubmit="handleCreateWorker(event)">
               <div class="form-group">
-                <label for="workerId">Worker ID <span class="required">*</span></label>
-                <input type="text" id="workerId" name="worker_id" required placeholder="worker-001" pattern="[a-zA-Z0-9_-]+" />
-                <small class="form-hint">Alphanumeric, hyphens, and underscores only</small>
+                <label for="workerId"><span data-i18n="workers.label.id">Worker ID</span> <span class="required">*</span></label>
+                <input type="text" id="workerId" name="worker_id" required data-i18n-placeholder="workers.ph.id" placeholder="worker-001" pattern="[a-zA-Z0-9_-]+" />
+                <small class="form-hint" data-i18n="admin.wrk.hintId">Alphanumeric, hyphens, and underscores only</small>
               </div>
               <div class="form-group">
-                <label for="workerMaxConcurrent">Max Concurrent Requests</label>
+                <label for="workerMaxConcurrent" data-i18n="workers.label.maxConcurrent">Max Concurrent Requests</label>
                 <input type="number" id="workerMaxConcurrent" name="max_concurrent_requests" min="1" max="1000" value="10" />
               </div>
               <div class="form-group">
-                <label for="workerTimeout">Request Timeout (ms)</label>
+                <label for="workerTimeout" data-i18n="workers.label.timeout">Request Timeout (ms)</label>
                 <input type="number" id="workerTimeout" name="request_timeout_ms" min="100" max="300000" value="5000" />
               </div>
               <div class="form-group">
-                <label for="workerHealthCheck">Health Check Interval (ms)</label>
+                <label for="workerHealthCheck" data-i18n="workers.label.healthInterval">Health Check Interval (ms)</label>
                 <input type="number" id="workerHealthCheck" name="health_check_interval_ms" min="100" max="60000" value="1000" />
               </div>
               <div class="form-group">
                 <label for="workerEnableCaching">
                   <input type="checkbox" id="workerEnableCaching" name="enable_caching" checked />
-                  Enable Caching
+                  <span data-i18n="workers.enableCache">Enable Caching</span>
                 </label>
               </div>
               <div class="form-group">
-                <label for="workerCacheSize">Cache Size</label>
+                <label for="workerCacheSize" data-i18n="workers.label.cacheSize">Cache Size</label>
                 <input type="number" id="workerCacheSize" name="cache_size" min="0" max="100000" value="1000" />
               </div>
               <div class="form-group">
-                <label for="workerMaxMemory">Max Memory (MB)</label>
+                <label for="workerMaxMemory" data-i18n="workers.label.maxMemory">Max Memory (MB)</label>
                 <input type="number" id="workerMaxMemory" name="max_memory_mb" min="128" max="131072" value="2048" />
               </div>
               <div class="form-group">
-                <label for="workerCpuPriority">CPU Priority (0-10)</label>
+                <label for="workerCpuPriority" data-i18n="workers.label.cpuPriority">CPU Priority (0-10)</label>
                 <input type="number" id="workerCpuPriority" name="cpu_priority" min="0" max="10" value="5" />
               </div>
               <div class="form-group">
-                <label for="workerGpuDevice">GPU Device ID (optional)</label>
-                <input type="number" id="workerGpuDevice" name="gpu_device" min="0" />
+                <label for="workerGpuDevice" data-i18n="workers.label.gpuDevice">GPU Device ID (optional)</label>
+                <input type="number" id="workerGpuDevice" name="gpu_device" min="0" data-i18n-placeholder="workers.ph.gpu" placeholder="Leave empty for no GPU" />
               </div>
               <div class="form-group">
                 <label for="workerAutoRestart">
                   <input type="checkbox" id="workerAutoRestart" name="auto_restart" checked />
-                  Auto Restart
+                  <span data-i18n="admin.wrk.autoRestart">Auto Restart</span>
                 </label>
               </div>
               <div class="form-group">
                 <label for="workerResourceMonitoring">
                   <input type="checkbox" id="workerResourceMonitoring" name="resource_monitoring" checked />
-                  Resource Monitoring
+                  <span data-i18n="admin.wrk.resourceMon">Resource Monitoring</span>
                 </label>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn" onclick="hideModal('createWorkerModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn" onclick="hideModal('createWorkerModal')" data-i18n="ui.cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
               </div>
             </form>
           </div>

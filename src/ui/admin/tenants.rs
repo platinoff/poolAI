@@ -8,14 +8,17 @@ use axum::response::Html;
 /// Tenant management page
 pub async fn admin_tenants() -> Html<String> {
     let script = r#"
+    function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
+    function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
+
     async function loadTenants() {
-      adminShowLoading('tenants-list', 'Loading tenants…');
+      adminShowLoading('tenants-list', T('admin.tenants.loading', 'Loading tenants…'));
       try {
         const tenants = await fetchJson('/api/enterprise/tenants');
         renderTenants(tenants);
       } catch (e) {
         adminShowInlineError('tenants-list', e);
-        showNotification('Error loading tenants: ' + e.message, 'error');
+        showNotification(T('admin.tenants.errLoad', 'Error loading tenants: ') + e.message, 'error');
       }
     }
     
@@ -23,30 +26,30 @@ pub async fn admin_tenants() -> Html<String> {
       const el = document.getElementById('tenants-list');
       if (!el) return;
       if (!tenants || tenants.length === 0) {
-        el.innerHTML = '<div class="muted">No tenants found</div>';
+        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.tenants.empty', 'No tenants found')) + '</div>';
         return;
       }
       el.innerHTML = `
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>ID</th>
-              <th>Status</th>
-              <th>Resources</th>
-              <th>Actions</th>
+              <th>${escapeHtml(T('admin.tenants.col.name', 'Name'))}</th>
+              <th>${escapeHtml(T('admin.tenants.col.id', 'ID'))}</th>
+              <th>${escapeHtml(T('admin.tenants.col.status', 'Status'))}</th>
+              <th>${escapeHtml(T('admin.tenants.col.resources', 'Resources'))}</th>
+              <th>${escapeHtml(T('admin.tenants.col.actions', 'Actions'))}</th>
             </tr>
           </thead>
           <tbody>
             ${tenants.map(t => `
               <tr>
-                <td>${t.name}</td>
-                <td><code>${t.id}</code></td>
-                <td><span class="status-badge ${t.config.active ? 'active' : 'inactive'}">${t.config.active ? 'Active' : 'Inactive'}</span></td>
-                <td>Workers: ${t.usage.workers}/${t.config.max_workers || '∞'}, Memory: ${t.usage.memory_mb}MB/${t.config.max_memory_mb || '∞'}MB</td>
+                <td>${escapeHtml(t.name)}</td>
+                <td><code>${escapeHtml(t.id)}</code></td>
+                <td><span class="status-badge ${t.config.active ? 'active' : 'inactive'}">${t.config.active ? escapeHtml(T('admin.status.active', 'Active')) : escapeHtml(T('admin.status.inactive', 'Inactive'))}</span></td>
+                <td>${escapeHtml(T('admin.tenants.resWorkers', 'Workers:'))} ${t.usage.workers}/${t.config.max_workers || '∞'}, ${escapeHtml(T('admin.tenants.resMemory', 'Memory:'))} ${t.usage.memory_mb}MB/${t.config.max_memory_mb || '∞'}MB</td>
                 <td>
-                  <button class="btn" onclick="editTenant('${t.id}')">Edit</button>
-                  <button class="btn btn-danger" onclick="deleteTenant('${t.id}')">Delete</button>
+                  <button type="button" class="btn" onclick="editTenant(${JSON.stringify(t.id)})">${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                  <button type="button" class="btn btn-danger" onclick="deleteTenant(${JSON.stringify(t.id)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
                 </td>
               </tr>
             `).join('')}
@@ -58,7 +61,7 @@ pub async fn admin_tenants() -> Html<String> {
     function showCreateTenantModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
         return;
       }
       showModal('createTenantModal');
@@ -68,7 +71,7 @@ pub async fn admin_tenants() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
         return;
       }
       
@@ -77,7 +80,7 @@ pub async fn admin_tenants() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent = T('admin.tenants.creating', 'Creating…');
       
       try {
         const payload = {
@@ -92,19 +95,18 @@ pub async fn admin_tenants() -> Html<String> {
           }
         };
         
-        // Remove null fields
         Object.keys(payload.config).forEach(key => {
           if (payload.config[key] === null) {
             delete payload.config[key];
           }
         });
         
-        const result = await fetchJson('/api/enterprise/tenants', {
+        await fetchJson('/api/enterprise/tenants', {
           method: 'POST',
           body: JSON.stringify(payload)
         });
         
-        showNotification('Tenant created successfully', 'success');
+        showNotification(T('admin.tenants.createdOk', 'Tenant created successfully'), 'success');
         hideModal('createTenantModal');
         form.reset();
         
@@ -112,7 +114,7 @@ pub async fn admin_tenants() -> Html<String> {
           loadTenants();
         }, 500);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -122,14 +124,13 @@ pub async fn admin_tenants() -> Html<String> {
     async function editTenant(id) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
         return;
       }
       
       try {
         const tenant = await fetchJson(`/api/enterprise/tenants/${id}`);
         
-        // Populate edit form
         document.getElementById('editTenantId').value = tenant.id;
         document.getElementById('editTenantName').value = tenant.name;
         document.getElementById('editTenantMaxWorkers').value = tenant.config.max_workers || '';
@@ -141,7 +142,7 @@ pub async fn admin_tenants() -> Html<String> {
         
         showModal('editTenantModal');
       } catch (e) {
-        showNotification('Error loading tenant: ' + e.message, 'error');
+        showNotification(T('admin.tenants.loadErr', 'Error loading tenant: ') + e.message, 'error');
       }
     }
     
@@ -149,7 +150,7 @@ pub async fn admin_tenants() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
         return;
       }
       
@@ -159,7 +160,7 @@ pub async fn admin_tenants() -> Html<String> {
       const tenantId = document.getElementById('editTenantId').value;
       
       btn.disabled = true;
-      btn.textContent = 'Updating...';
+      btn.textContent = T('admin.tenants.updating', 'Updating…');
       
       try {
         const payload = {
@@ -174,19 +175,18 @@ pub async fn admin_tenants() -> Html<String> {
           }
         };
         
-        // Remove null fields
         Object.keys(payload.config).forEach(key => {
           if (payload.config[key] === null) {
             delete payload.config[key];
           }
         });
         
-        const result = await fetchJson(`/api/enterprise/tenants/${tenantId}`, {
+        await fetchJson(`/api/enterprise/tenants/${tenantId}`, {
           method: 'POST',
           body: JSON.stringify(payload)
         });
         
-        showNotification('Tenant updated successfully', 'success');
+        showNotification(T('admin.tenants.updatedOk', 'Tenant updated successfully'), 'success');
         hideModal('editTenantModal');
         form.reset();
         
@@ -194,7 +194,7 @@ pub async fn admin_tenants() -> Html<String> {
           loadTenants();
         }, 500);
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -204,20 +204,20 @@ pub async fn admin_tenants() -> Html<String> {
     async function deleteTenant(id) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
         return;
       }
       
-      if (!confirm('Are you sure you want to delete this tenant? This action cannot be undone.')) {
+      if (!confirm(T('admin.tenants.confirmDel', 'Are you sure you want to delete this tenant? This action cannot be undone.'))) {
         return;
       }
       
       try {
         await fetchJson(`/api/enterprise/tenants/${id}`, { method: 'DELETE' });
-        showNotification('Tenant deleted successfully', 'success');
+        showNotification(T('admin.tenants.deletedOk', 'Tenant deleted successfully'), 'success');
         loadTenants();
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       }
     }
     
@@ -230,110 +230,108 @@ pub async fn admin_tenants() -> Html<String> {
         r#"
         <div class="admin-section">
           <div class="admin-header">
-            <h2>Tenants</h2>
-            <button class="btn btn-primary" onclick="showCreateTenantModal()" aria-label="Create new tenant">Create Tenant</button>
+            <h2 data-i18n="admin.tenants.section">Tenants</h2>
+            <button class="btn btn-primary" onclick="showCreateTenantModal()" data-i18n="admin.tenants.createBtn" data-i18n-aria="admin.tenants.createBtn">Create Tenant</button>
           </div>
           <div id="tenants-list"></div>
         </div>
         
-        <!-- Create Tenant Modal -->
         <div id="createTenantModal" class="modal" role="dialog" aria-labelledby="createTenantModalTitle" aria-modal="true" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
-              <h3 id="createTenantModalTitle">Create Tenant</h3>
-              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createTenantModal')">&times;</button>
+              <h3 id="createTenantModalTitle" data-i18n="admin.tenants.createTitle">Create Tenant</h3>
+              <button class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createTenantModal')">&times;</button>
             </div>
             <form id="createTenantForm" onsubmit="handleCreateTenant(event)">
               <div class="form-group">
-                <label for="tenantName">Tenant Name <span class="required">*</span></label>
-                <input type="text" id="tenantName" name="name" required placeholder="tenant-abc" />
+                <label for="tenantName"><span data-i18n="admin.tenants.label.name">Tenant Name</span> <span class="required">*</span></label>
+                <input type="text" id="tenantName" name="name" required data-i18n-placeholder="admin.tenants.ph.name" placeholder="tenant-abc" />
               </div>
               <div class="form-group">
-                <label for="tenantMaxWorkers">Max Workers</label>
+                <label for="tenantMaxWorkers" data-i18n="admin.tenants.label.maxWorkers">Max Workers</label>
                 <input type="number" id="tenantMaxWorkers" name="max_workers" min="0" placeholder="10" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="tenantMaxMemory">Max Memory (MB)</label>
+                <label for="tenantMaxMemory" data-i18n="admin.tenants.label.maxMem">Max Memory (MB)</label>
                 <input type="number" id="tenantMaxMemory" name="max_memory_mb" min="0" placeholder="1024" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="tenantMaxCpuCores">Max CPU Cores</label>
+                <label for="tenantMaxCpuCores" data-i18n="admin.tenants.label.maxCpu">Max CPU Cores</label>
                 <input type="number" id="tenantMaxCpuCores" name="max_cpu_cores" min="0" placeholder="4" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="tenantMaxStorage">Max Storage (MB)</label>
+                <label for="tenantMaxStorage" data-i18n="admin.tenants.label.maxStorage">Max Storage (MB)</label>
                 <input type="number" id="tenantMaxStorage" name="max_storage_mb" min="0" placeholder="10000" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="tenantMaxVmInstances">Max VM Instances</label>
+                <label for="tenantMaxVmInstances" data-i18n="admin.tenants.label.maxVm">Max VM Instances</label>
                 <input type="number" id="tenantMaxVmInstances" name="max_vm_instances" min="0" placeholder="5" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
                 <label for="tenantActive">
                   <input type="checkbox" id="tenantActive" name="active" checked />
-                  Active
+                  <span data-i18n="admin.tenants.active">Active</span>
                 </label>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn" onclick="hideModal('createTenantModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn" onclick="hideModal('createTenantModal')" data-i18n="ui.cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
               </div>
             </form>
           </div>
         </div>
         
-        <!-- Edit Tenant Modal -->
         <div id="editTenantModal" class="modal" role="dialog" aria-labelledby="editTenantModalTitle" aria-modal="true" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
-              <h3 id="editTenantModalTitle">Edit Tenant</h3>
-              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('editTenantModal')">&times;</button>
+              <h3 id="editTenantModalTitle" data-i18n="admin.tenants.editTitle">Edit Tenant</h3>
+              <button class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('editTenantModal')">&times;</button>
             </div>
             <form id="editTenantForm" onsubmit="handleEditTenant(event)">
               <input type="hidden" id="editTenantId" />
               <div class="form-group">
-                <label for="editTenantName">Tenant Name <span class="required">*</span></label>
+                <label for="editTenantName"><span data-i18n="admin.tenants.label.name">Tenant Name</span> <span class="required">*</span></label>
                 <input type="text" id="editTenantName" name="name" required />
               </div>
               <div class="form-group">
-                <label for="editTenantMaxWorkers">Max Workers</label>
+                <label for="editTenantMaxWorkers" data-i18n="admin.tenants.label.maxWorkers">Max Workers</label>
                 <input type="number" id="editTenantMaxWorkers" name="max_workers" min="0" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="editTenantMaxMemory">Max Memory (MB)</label>
+                <label for="editTenantMaxMemory" data-i18n="admin.tenants.label.maxMem">Max Memory (MB)</label>
                 <input type="number" id="editTenantMaxMemory" name="max_memory_mb" min="0" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="editTenantMaxCpuCores">Max CPU Cores</label>
+                <label for="editTenantMaxCpuCores" data-i18n="admin.tenants.label.maxCpu">Max CPU Cores</label>
                 <input type="number" id="editTenantMaxCpuCores" name="max_cpu_cores" min="0" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="editTenantMaxStorage">Max Storage (MB)</label>
+                <label for="editTenantMaxStorage" data-i18n="admin.tenants.label.maxStorage">Max Storage (MB)</label>
                 <input type="number" id="editTenantMaxStorage" name="max_storage_mb" min="0" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
-                <label for="editTenantMaxVmInstances">Max VM Instances</label>
+                <label for="editTenantMaxVmInstances" data-i18n="admin.tenants.label.maxVm">Max VM Instances</label>
                 <input type="number" id="editTenantMaxVmInstances" name="max_vm_instances" min="0" />
-                <small class="form-hint">Leave empty for unlimited</small>
+                <small class="form-hint" data-i18n="admin.tenants.hint.unlimited">Leave empty for unlimited</small>
               </div>
               <div class="form-group">
                 <label for="editTenantActive">
                   <input type="checkbox" id="editTenantActive" name="active" />
-                  Active
+                  <span data-i18n="admin.tenants.active">Active</span>
                 </label>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn" onclick="hideModal('editTenantModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="button" class="btn" onclick="hideModal('editTenantModal')" data-i18n="ui.cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" data-i18n="ui.update">Update</button>
               </div>
             </form>
           </div>
