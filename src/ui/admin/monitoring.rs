@@ -8,8 +8,11 @@ use axum::response::Html;
 /// Monitoring dashboard page
 pub async fn admin_monitoring() -> Html<String> {
     let script = r#"
+    function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
+    function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
+
     async function loadMonitoring() {
-      adminShowLoading('monitoring-content', 'Loading monitoring…');
+      adminShowLoading('monitoring-content', T('admin.mon.loading', 'Loading monitoring…'));
       try {
         const [alerts, dashboards, metrics] = await Promise.all([
           fetchJson('/api/enterprise/monitoring/alerts?limit=20'),
@@ -19,7 +22,7 @@ pub async fn admin_monitoring() -> Html<String> {
         renderMonitoring(alerts, dashboards, metrics);
       } catch (e) {
         adminShowInlineError('monitoring-content', e);
-        showNotification('Error loading monitoring: ' + e.message, 'error');
+        showNotification(T('admin.mon.errLoad', 'Error loading monitoring: ') + e.message, 'error');
       }
     }
     
@@ -38,10 +41,9 @@ pub async fn admin_monitoring() -> Html<String> {
     
     function renderMetricChart(metricName, data) {
       if (!data || data.length === 0) {
-        return '<div class="muted">No data available</div>';
+        return '<div class="muted">' + escapeHtml(T('admin.mon.noData', 'No data available')) + '</div>';
       }
       
-      // Simple SVG-based line chart (no external dependencies)
       const width = 600;
       const height = 200;
       const padding = 40;
@@ -59,19 +61,19 @@ pub async fn admin_monitoring() -> Html<String> {
         return `${x},${y}`;
       }).join(' ');
       
-      const path = `M ${points}`;
+      const pointsLabel = T('admin.mon.chartPoints', '{n} points').replace(/\{n\}/g, String(data.length));
       
       return `
         <div class="metric-chart-container">
-          <h4>${metricName}</h4>
+          <h4>${escapeHtml(metricName)}</h4>
           <svg width="${width}" height="${height}" style="max-width: 100%; height: auto;">
             <defs>
-              <linearGradient id="grad-${metricName}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <linearGradient id="grad-${metricName.replace(/[^a-zA-Z0-9_-]/g, '_')}" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" style="stop-color:var(--primary, #67e480);stop-opacity:0.3" />
                 <stop offset="100%" style="stop-color:var(--primary, #67e480);stop-opacity:0.05" />
               </linearGradient>
             </defs>
-            <rect x="${padding}" y="${padding}" width="${chartWidth}" height="${chartHeight}" fill="url(#grad-${metricName})" />
+            <rect x="${padding}" y="${padding}" width="${chartWidth}" height="${chartHeight}" fill="url(#grad-${metricName.replace(/[^a-zA-Z0-9_-]/g, '_')})" />
             <polyline points="${points}" fill="none" stroke="var(--primary, #67e480)" stroke-width="2" />
             ${values.map((v, i) => {
               const x = padding + (i / (values.length - 1 || 1)) * chartWidth;
@@ -80,12 +82,12 @@ pub async fn admin_monitoring() -> Html<String> {
             }).join('')}
             <text x="${padding}" y="${padding - 10}" fill="var(--text, #f8f8f2)" font-size="12">${max.toFixed(1)}</text>
             <text x="${padding}" y="${height - padding + 20}" fill="var(--text, #f8f8f2)" font-size="12">${min.toFixed(1)}</text>
-            <text x="${width - padding}" y="${height - padding + 20}" fill="var(--text-muted, #a8b0bf)" font-size="10" text-anchor="end">${data.length} points</text>
+            <text x="${width - padding}" y="${height - padding + 20}" fill="var(--text-muted, #a8b0bf)" font-size="10" text-anchor="end">${escapeHtml(pointsLabel)}</text>
           </svg>
           <div class="metric-stats" style="margin-top: 8px; display: flex; gap: 16px; font-size: 0.9em;">
-            <span>Min: <strong>${min.toFixed(2)}</strong></span>
-            <span>Max: <strong>${max.toFixed(2)}</strong></span>
-            <span>Avg: <strong>${(values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)}</strong></span>
+            <span>${escapeHtml(T('admin.mon.statMin', 'Min:'))} <strong>${min.toFixed(2)}</strong></span>
+            <span>${escapeHtml(T('admin.mon.statMax', 'Max:'))} <strong>${max.toFixed(2)}</strong></span>
+            <span>${escapeHtml(T('admin.mon.statAvg', 'Avg:'))} <strong>${(values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)}</strong></span>
           </div>
         </div>
       `;
@@ -105,7 +107,6 @@ pub async fn admin_monitoring() -> Html<String> {
       const el = document.getElementById('monitoring-content');
       if (!el) return;
       
-      // Load metric history for visualization
       const commonMetrics = ['cpu_usage', 'memory_usage', 'request_rate'];
       const metricCharts = {};
       for (const metric of commonMetrics) {
@@ -116,30 +117,30 @@ pub async fn admin_monitoring() -> Html<String> {
       }
       
       const alertsHtml = alerts.length === 0 
-        ? '<div class="muted">No active alerts</div>'
+        ? '<div class="muted">' + escapeHtml(T('admin.mon.noAlerts', 'No active alerts')) + '</div>'
         : `
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Severity</th>
-                <th>Metric</th>
-                <th>Current Value</th>
-                <th>Threshold</th>
-                <th>Triggered</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>${escapeHtml(T('admin.mon.col.severity', 'Severity'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.metric', 'Metric'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.currentVal', 'Current Value'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.threshold', 'Threshold'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.triggered', 'Triggered'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.statusCol', 'Status'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.actions', 'Actions'))}</th>
               </tr>
             </thead>
             <tbody>
               ${alerts.map(a => `
                 <tr>
-                  <td><span class="status-badge ${a.severity?.toLowerCase() || 'warning'}">${a.severity || 'WARNING'}</span></td>
-                  <td><strong>${a.metric || 'unknown'}</strong></td>
-                  <td>${a.current_value || 'N/A'}</td>
-                  <td>${a.threshold || 'N/A'}</td>
-                  <td>${a.triggered_at ? new Date(a.triggered_at).toLocaleString() : 'N/A'}</td>
-                  <td>${a.acknowledged ? '<span class="muted">Acknowledged</span>' : '<span class="status-badge active">Active</span>'}</td>
-                  <td>${a.acknowledged ? '' : '<button class="btn btn-sm" onclick="acknowledgeAlert(\'' + a.id + '\')">Acknowledge</button>'}</td>
+                  <td><span class="status-badge ${a.severity?.toLowerCase() || 'warning'}">${escapeHtml(a.severity || 'WARNING')}</span></td>
+                  <td><strong>${escapeHtml(a.metric || 'unknown')}</strong></td>
+                  <td>${escapeHtml(String(a.current_value != null ? a.current_value : T('admin.na', 'N/A')))}</td>
+                  <td>${escapeHtml(String(a.threshold != null ? a.threshold : T('admin.na', 'N/A')))}</td>
+                  <td>${a.triggered_at ? escapeHtml(new Date(a.triggered_at).toLocaleString()) : escapeHtml(T('admin.na', 'N/A'))}</td>
+                  <td>${a.acknowledged ? '<span class="muted">' + escapeHtml(T('admin.mon.statusAck', 'Acknowledged')) + '</span>' : '<span class="status-badge active">' + escapeHtml(T('admin.mon.statusActiveLbl', 'Active')) + '</span>'}</td>
+                  <td>${a.acknowledged ? '' : '<button type="button" class="btn btn-sm" onclick="acknowledgeAlert(' + JSON.stringify(a.id) + ')">' + escapeHtml(T('admin.mon.ackBtn', 'Acknowledge')) + '</button>'}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -147,26 +148,26 @@ pub async fn admin_monitoring() -> Html<String> {
         `;
       
       const dashboardsHtml = dashboards.length === 0
-        ? '<div class="muted">No dashboards created</div>'
+        ? '<div class="muted">' + escapeHtml(T('admin.mon.noDashboards', 'No dashboards created')) + '</div>'
         : `
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Metrics</th>
-                <th>Public</th>
-                <th>Created</th>
+                <th>${escapeHtml(T('admin.mon.col.name', 'Name'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.description', 'Description'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.metrics', 'Metrics'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.public', 'Public'))}</th>
+                <th>${escapeHtml(T('admin.mon.col.created', 'Created'))}</th>
               </tr>
             </thead>
             <tbody>
               ${dashboards.map(d => `
                 <tr>
-                  <td><strong>${d.name || 'unnamed'}</strong></td>
-                  <td>${d.description || '—'}</td>
-                  <td>${d.metrics?.length || 0} metrics</td>
-                  <td><span class="status-badge ${d.is_public ? 'active' : 'inactive'}">${d.is_public ? 'Public' : 'Private'}</span></td>
-                  <td>${d.created_at ? new Date(d.created_at).toLocaleDateString() : 'N/A'}</td>
+                  <td><strong>${escapeHtml(d.name || 'unnamed')}</strong></td>
+                  <td>${escapeHtml(d.description || T('admin.sec.emDash', '—'))}</td>
+                  <td>${escapeHtml(T('admin.mon.metricsN', '{n} metrics').replace(/\{n\}/g, String(d.metrics?.length || 0)))}</td>
+                  <td><span class="status-badge ${d.is_public ? 'active' : 'inactive'}">${d.is_public ? escapeHtml(T('admin.mon.public', 'Public')) : escapeHtml(T('admin.mon.private', 'Private'))}</span></td>
+                  <td>${d.created_at ? escapeHtml(new Date(d.created_at).toLocaleDateString()) : escapeHtml(T('admin.na', 'N/A'))}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -176,7 +177,7 @@ pub async fn admin_monitoring() -> Html<String> {
       const chartsHtml = Object.keys(metricCharts).length > 0
         ? `
           <div class="admin-card">
-            <h3>Metrics Visualization (Last 24 Hours)</h3>
+            <h3>${escapeHtml(T('admin.mon.vizTitle', 'Metrics Visualization (Last 24 Hours)'))}</h3>
             <div class="metrics-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
               ${Object.values(metricCharts).join('')}
             </div>
@@ -187,41 +188,40 @@ pub async fn admin_monitoring() -> Html<String> {
       el.innerHTML = `
         ${chartsHtml}
         <div class="admin-card">
-          <h3>Active Alerts (${alerts.length})</h3>
+          <h3>${escapeHtml(T('admin.mon.activeAlertsTitle', 'Active Alerts'))} (${alerts.length})</h3>
           ${alertsHtml}
         </div>
         <div class="admin-card">
-          <h3>Dashboards (${dashboards.length})</h3>
+          <h3>${escapeHtml(T('admin.mon.dashboardsTitle', 'Dashboards'))} (${dashboards.length})</h3>
           ${dashboardsHtml}
         </div>
       `;
       
-      // Load alert rules asynchronously
       loadAlertRules().then(rules => {
         if (rules && rules.length > 0) {
           const rulesHtml = `
             <div class="admin-card">
-              <h3>Alert Rules (${rules.length})</h3>
+              <h3>${escapeHtml(T('admin.mon.alertRulesTitle', 'Alert Rules'))} (${rules.length})</h3>
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Metric</th>
-                    <th>Operator</th>
-                    <th>Threshold</th>
-                    <th>Severity</th>
-                    <th>Status</th>
+                    <th>${escapeHtml(T('admin.mon.col.name', 'Name'))}</th>
+                    <th>${escapeHtml(T('admin.mon.col.metric', 'Metric'))}</th>
+                    <th>${escapeHtml(T('admin.mon.col.operator', 'Operator'))}</th>
+                    <th>${escapeHtml(T('admin.mon.lbl.threshold', 'Threshold'))}</th>
+                    <th>${escapeHtml(T('admin.mon.lbl.severity', 'Severity'))}</th>
+                    <th>${escapeHtml(T('admin.mon.col.ruleStatus', 'Status'))}</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${rules.map(r => `
                     <tr>
-                      <td><strong>${r.name || 'unnamed'}</strong></td>
-                      <td>${r.metric || 'N/A'}</td>
-                      <td><code>${r.operator || '>'}</code></td>
-                      <td>${r.threshold || 'N/A'}</td>
-                      <td><span class="status-badge ${r.severity?.toLowerCase() || 'warning'}">${r.severity || 'WARNING'}</span></td>
-                      <td><span class="status-badge ${r.enabled ? 'active' : 'inactive'}">${r.enabled ? 'Enabled' : 'Disabled'}</span></td>
+                      <td><strong>${escapeHtml(r.name || 'unnamed')}</strong></td>
+                      <td>${escapeHtml(String(r.metric || T('admin.na', 'N/A')))}</td>
+                      <td><code>${escapeHtml(String(r.operator || '>'))}</code></td>
+                      <td>${escapeHtml(String(r.threshold != null ? r.threshold : T('admin.na', 'N/A')))}</td>
+                      <td><span class="status-badge ${r.severity?.toLowerCase() || 'warning'}">${escapeHtml(r.severity || 'WARNING')}</span></td>
+                      <td><span class="status-badge ${r.enabled ? 'active' : 'inactive'}">${r.enabled ? escapeHtml(T('admin.mon.enabled', 'Enabled')) : escapeHtml(T('admin.mon.disabled', 'Disabled'))}</span></td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -236,7 +236,7 @@ pub async fn admin_monitoring() -> Html<String> {
     function showCreateDashboardModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
         return;
       }
       showModal('createDashboardModal');
@@ -246,7 +246,7 @@ pub async fn admin_monitoring() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
         return;
       }
       
@@ -255,7 +255,7 @@ pub async fn admin_monitoring() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent = T('admin.mon.creatingDash', 'Creating…');
       
       try {
         const metrics = document.getElementById('dashboardMetrics').value.split(',').map(s => s.trim()).filter(s => s);
@@ -273,12 +273,12 @@ pub async fn admin_monitoring() -> Html<String> {
           body: JSON.stringify(payload)
         });
         
-        showNotification('Dashboard created successfully', 'success');
+        showNotification(T('admin.mon.dashCreatedOk', 'Dashboard created successfully'), 'success');
         hideModal('createDashboardModal');
         form.reset();
         loadMonitoring();
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -288,7 +288,7 @@ pub async fn admin_monitoring() -> Html<String> {
     function showCreateAlertRuleModal() {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions. Admin or Operator role required.', 'error');
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
         return;
       }
       showModal('createAlertRuleModal');
@@ -298,7 +298,7 @@ pub async fn admin_monitoring() -> Html<String> {
       event.preventDefault();
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
         return;
       }
       
@@ -307,7 +307,7 @@ pub async fn admin_monitoring() -> Html<String> {
       const originalText = btn.textContent;
       
       btn.disabled = true;
-      btn.textContent = 'Creating...';
+      btn.textContent = T('admin.mon.creatingRule', 'Creating…');
       
       try {
         const payload = {
@@ -324,12 +324,12 @@ pub async fn admin_monitoring() -> Html<String> {
           body: JSON.stringify(payload)
         });
         
-        showNotification('Alert rule created successfully', 'success');
+        showNotification(T('admin.mon.ruleCreatedOk', 'Alert rule created successfully'), 'success');
         hideModal('createAlertRuleModal');
         form.reset();
         loadMonitoring();
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -339,18 +339,18 @@ pub async fn admin_monitoring() -> Html<String> {
     async function acknowledgeAlert(id) {
       const user = getUser();
       if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
-        showNotification('Insufficient permissions.', 'error');
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
         return;
       }
       
       try {
-        await fetchJson(`/api/enterprise/monitoring/alerts/${id}/acknowledge`, {
+        await fetchJson(`/api/enterprise/monitoring/alerts/${encodeURIComponent(id)}/acknowledge`, {
           method: 'POST'
         });
-        showNotification('Alert acknowledged', 'success');
+        showNotification(T('admin.mon.alertAckOk', 'Alert acknowledged'), 'success');
         loadMonitoring();
       } catch (e) {
-        showNotification('Error: ' + e.message, 'error');
+        showNotification(Ep() + e.message, 'error');
       }
     }
     
@@ -364,84 +364,82 @@ pub async fn admin_monitoring() -> Html<String> {
         r#"
         <div class="admin-section">
           <div class="admin-header">
-            <h2>Monitoring</h2>
-            <button class="btn btn-primary" onclick="showCreateDashboardModal()" aria-label="Create dashboard">Create Dashboard</button>
-            <button class="btn" onclick="showCreateAlertRuleModal()" aria-label="Create alert rule">Create Alert Rule</button>
+            <h2 data-i18n="admin.mon.section">Monitoring</h2>
+            <button type="button" class="btn btn-primary" onclick="showCreateDashboardModal()" data-i18n="admin.mon.createDashBtn" data-i18n-aria="admin.mon.createDashBtn">Create Dashboard</button>
+            <button type="button" class="btn" onclick="showCreateAlertRuleModal()" data-i18n="admin.mon.createRuleBtn" data-i18n-aria="admin.mon.createRuleBtn">Create Alert Rule</button>
           </div>
           <div id="monitoring-content"></div>
         </div>
 
-        <!-- Create Dashboard Modal -->
         <div id="createDashboardModal" class="modal" role="dialog" aria-labelledby="createDashboardModalTitle" aria-modal="true" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
-              <h3 id="createDashboardModalTitle">Create Dashboard</h3>
-              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createDashboardModal')">&times;</button>
+              <h3 id="createDashboardModalTitle" data-i18n="admin.mon.modalCreateDash">Create Dashboard</h3>
+              <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createDashboardModal')">&times;</button>
             </div>
             <form id="createDashboardForm" onsubmit="handleCreateDashboard(event)">
               <div class="form-group">
-                <label for="dashboardName">Dashboard Name <span class="required">*</span></label>
-                <input type="text" id="dashboardName" name="name" required placeholder="My Dashboard" />
+                <label for="dashboardName"><span data-i18n="admin.mon.lbl.dashName">Dashboard Name</span> <span class="required">*</span></label>
+                <input type="text" id="dashboardName" name="name" required data-i18n-placeholder="admin.mon.ph.dashboard" placeholder="My Dashboard" />
               </div>
               <div class="form-group">
-                <label for="dashboardDescription">Description</label>
-                <textarea id="dashboardDescription" name="description" rows="3" placeholder="Dashboard description"></textarea>
+                <label for="dashboardDescription" data-i18n="admin.mon.lbl.dashDesc">Description</label>
+                <textarea id="dashboardDescription" name="description" rows="3" data-i18n-placeholder="admin.mon.ph.dashDesc" placeholder="Dashboard description"></textarea>
               </div>
               <div class="form-group">
-                <label for="dashboardMetrics">Metrics (comma-separated) <span class="required">*</span></label>
-                <input type="text" id="dashboardMetrics" name="metrics" required placeholder="cpu_usage, memory_usage, request_rate" />
-                <small class="form-hint">Enter metric names separated by commas</small>
+                <label for="dashboardMetrics"><span data-i18n="admin.mon.lbl.dashMetrics">Metrics (comma-separated)</span> <span class="required">*</span></label>
+                <input type="text" id="dashboardMetrics" name="metrics" required data-i18n-placeholder="admin.mon.ph.metricsCsv" placeholder="cpu_usage, memory_usage, request_rate" />
+                <small class="form-hint" data-i18n="admin.mon.hint.dashMetrics">Enter metric names separated by commas</small>
               </div>
               <div class="form-group">
-                <label for="dashboardLayout">Layout (JSON, optional)</label>
-                <textarea id="dashboardLayout" name="layout" rows="5" placeholder='{"widgets": []}'></textarea>
+                <label for="dashboardLayout" data-i18n="admin.mon.lbl.dashLayout">Layout (JSON, optional)</label>
+                <textarea id="dashboardLayout" name="layout" rows="5" data-i18n-placeholder="admin.mon.ph.layoutJson" placeholder='{"widgets": []}'></textarea>
               </div>
               <div class="form-group">
                 <label for="dashboardIsPublic">
                   <input type="checkbox" id="dashboardIsPublic" name="is_public" />
-                  Public Dashboard
+                  <span data-i18n="admin.mon.lbl.dashPublic">Public Dashboard</span>
                 </label>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn" onclick="hideModal('createDashboardModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn" onclick="hideModal('createDashboardModal')" data-i18n="ui.cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
               </div>
             </form>
           </div>
         </div>
 
-        <!-- Create Alert Rule Modal -->
         <div id="createAlertRuleModal" class="modal" role="dialog" aria-labelledby="createAlertRuleModalTitle" aria-modal="true" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
-              <h3 id="createAlertRuleModalTitle">Create Alert Rule</h3>
-              <button class="modal-close" aria-label="Close dialog" onclick="hideModal('createAlertRuleModal')">&times;</button>
+              <h3 id="createAlertRuleModalTitle" data-i18n="admin.mon.modalCreateRule">Create Alert Rule</h3>
+              <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('createAlertRuleModal')">&times;</button>
             </div>
             <form id="createAlertRuleForm" onsubmit="handleCreateAlertRule(event)">
               <div class="form-group">
-                <label for="alertRuleName">Rule Name <span class="required">*</span></label>
-                <input type="text" id="alertRuleName" name="name" required placeholder="high-cpu-alert" />
+                <label for="alertRuleName"><span data-i18n="admin.mon.lbl.ruleName">Rule Name</span> <span class="required">*</span></label>
+                <input type="text" id="alertRuleName" name="name" required data-i18n-placeholder="admin.mon.ph.ruleName" placeholder="high-cpu-alert" />
               </div>
               <div class="form-group">
-                <label for="alertRuleMetric">Metric Name <span class="required">*</span></label>
-                <input type="text" id="alertRuleMetric" name="metric" required placeholder="cpu_usage" />
+                <label for="alertRuleMetric"><span data-i18n="admin.mon.lbl.metricName">Metric Name</span> <span class="required">*</span></label>
+                <input type="text" id="alertRuleMetric" name="metric" required data-i18n-placeholder="admin.mon.ph.metric" placeholder="cpu_usage" />
               </div>
               <div class="form-group">
-                <label for="alertRuleOperator">Operator <span class="required">*</span></label>
+                <label for="alertRuleOperator"><span data-i18n="admin.mon.lbl.operator">Operator</span> <span class="required">*</span></label>
                 <select id="alertRuleOperator" name="operator" required>
-                  <option value=">">Greater than (&gt;)</option>
-                  <option value="<">Less than (&lt;)</option>
-                  <option value=">=">Greater or equal (&gt;=)</option>
-                  <option value="<=">Less or equal (&lt;=)</option>
-                  <option value="==">Equal (==)</option>
+                  <option value=">" data-i18n="admin.mon.op.gt">Greater than (&gt;)</option>
+                  <option value="<" data-i18n="admin.mon.op.lt">Less than (&lt;)</option>
+                  <option value=">=" data-i18n="admin.mon.op.ge">Greater or equal (&gt;=)</option>
+                  <option value="<=" data-i18n="admin.mon.op.le">Less or equal (&lt;=)</option>
+                  <option value="==" data-i18n="admin.mon.op.eq">Equal (==)</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="alertRuleThreshold">Threshold <span class="required">*</span></label>
+                <label for="alertRuleThreshold"><span data-i18n="admin.mon.lbl.threshold">Threshold</span> <span class="required">*</span></label>
                 <input type="number" id="alertRuleThreshold" name="threshold" required step="0.1" placeholder="90.0" />
               </div>
               <div class="form-group">
-                <label for="alertRuleSeverity">Severity <span class="required">*</span></label>
+                <label for="alertRuleSeverity"><span data-i18n="admin.mon.lbl.severity">Severity</span> <span class="required">*</span></label>
                 <select id="alertRuleSeverity" name="severity" required>
                   <option value="Info">Info</option>
                   <option value="Warning" selected>Warning</option>
@@ -452,12 +450,12 @@ pub async fn admin_monitoring() -> Html<String> {
               <div class="form-group">
                 <label for="alertRuleEnabled">
                   <input type="checkbox" id="alertRuleEnabled" name="enabled" checked />
-                  Enabled
+                  <span data-i18n="admin.mon.lbl.ruleEnabled">Enabled</span>
                 </label>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn" onclick="hideModal('createAlertRuleModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" class="btn" onclick="hideModal('createAlertRuleModal')" data-i18n="ui.cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
               </div>
             </form>
           </div>

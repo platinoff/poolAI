@@ -6,53 +6,53 @@ use super::admin_layout;
 pub async fn admin_instances() -> axum::response::Html<String> {
     let body = r#"
     <div class="admin-section">
-      <h3>Model Instances</h3>
-      <p>Manage AI model instances, placement, and lifecycle.</p>
+      <h3 data-i18n="admin.inst.title">Model Instances</h3>
+      <p data-i18n="admin.inst.intro">Manage AI model instances, placement, and lifecycle.</p>
       
       <div class="admin-section-header">
-        <h4>Instances</h4>
-        <button class="btn btn-primary" onclick="showCreateInstanceModal()">Create Instance</button>
+        <h4 data-i18n="admin.inst.sectionInst">Instances</h4>
+        <button type="button" class="btn btn-primary" onclick="showCreateInstanceModal()" data-i18n="admin.inst.createBtn">Create Instance</button>
       </div>
       
       <div id="instances-list" class="admin-table-container">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Instance ID</th>
-              <th>Model ID</th>
-              <th>Status</th>
-              <th>Strategy</th>
-              <th>Nodes</th>
-              <th>Created</th>
-              <th>Actions</th>
+              <th data-i18n="admin.inst.col.instanceId">Instance ID</th>
+              <th data-i18n="admin.inst.col.modelId">Model ID</th>
+              <th data-i18n="admin.inst.col.status">Status</th>
+              <th data-i18n="admin.inst.col.strategy">Strategy</th>
+              <th data-i18n="admin.inst.col.nodes">Nodes</th>
+              <th data-i18n="admin.inst.col.created">Created</th>
+              <th data-i18n="admin.inst.col.actions">Actions</th>
             </tr>
           </thead>
           <tbody id="instances-tbody">
-            <tr><td colspan="7">Loading...</td></tr>
+            <tr><td colspan="7" data-i18n="admin.inst.loadingRow">Loading…</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="admin-section-header">
-        <h4>Placement Preview</h4>
+        <h4 data-i18n="admin.inst.sectionPreview">Placement Preview</h4>
       </div>
       <div class="form-group">
-        <label for="preview-model-id">Model ID:</label>
-        <input type="text" id="preview-model-id" placeholder="Enter model ID" />
-        <button class="btn btn-primary" onclick="previewPlacement()">Preview Placement</button>
+        <label for="preview-model-id" data-i18n="admin.inst.modelIdLbl">Model ID:</label>
+        <input type="text" id="preview-model-id" data-i18n-placeholder="admin.inst.ph.modelId" placeholder="Enter model ID" />
+        <button type="button" class="btn btn-primary" onclick="previewPlacement()" data-i18n="admin.inst.previewBtn">Preview Placement</button>
       </div>
       <div id="placement-previews" class="admin-table-container">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Strategy</th>
-              <th>Nodes</th>
-              <th>Memory Delta</th>
-              <th>Error</th>
+              <th data-i18n="admin.inst.col.strategy">Strategy</th>
+              <th data-i18n="admin.inst.col.nodes">Nodes</th>
+              <th data-i18n="admin.inst.col.memDelta">Memory Delta</th>
+              <th data-i18n="admin.inst.col.placementErr">Error</th>
             </tr>
           </thead>
           <tbody id="placement-previews-tbody">
-            <tr><td colspan="4">Enter a model ID and click Preview</td></tr>
+            <tr><td colspan="4" data-i18n="admin.inst.previewHint">Enter a model ID and click Preview</td></tr>
           </tbody>
         </table>
       </div>
@@ -60,10 +60,13 @@ pub async fn admin_instances() -> axum::response::Html<String> {
   "#;
 
     let script = r#"
+    function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
+    function Ep() { return typeof poolaiT === 'function' ? poolaiT('err.errorPrefix', 'Error: ') : 'Error: '; }
+
     async function loadInstances() {
       const tbody = document.getElementById('instances-tbody');
       if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="7" class="muted">Loading…</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="muted">' + escapeHtml(T('admin.inst.loadingRow', 'Loading…')) + '</td></tr>';
       try {
         const token = getAuthToken();
         const response = await fetch('/api/v1/instance', {
@@ -82,22 +85,23 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         tbody.innerHTML = '';
         
         if (!data.instances || data.instances.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7">No instances found</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7">' + escapeHtml(T('admin.inst.empty', 'No instances found')) + '</td></tr>';
           return;
         }
         
         for (const instance of data.instances) {
           const row = document.createElement('tr');
+          const iid = instance.instance_id;
           row.innerHTML = `
             <td>${escapeHtml(instance.instance_id)}</td>
             <td>${escapeHtml(instance.model_id)}</td>
             <td><span class="badge">${escapeHtml(instance.status)}</span></td>
             <td>${escapeHtml(instance.placement.strategy)}</td>
             <td>${instance.placement.node_ids.join(', ')}</td>
-            <td>${new Date(instance.created_at).toLocaleString()}</td>
+            <td>${escapeHtml(new Date(instance.created_at).toLocaleString())}</td>
             <td>
-              <button class="btn btn-sm" onclick="viewInstance('${escapeHtml(instance.instance_id)}')">View</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteInstance('${escapeHtml(instance.instance_id)}')">Delete</button>
+              <button type="button" class="btn btn-sm" onclick="viewInstance(${JSON.stringify(iid)})">${escapeHtml(T('admin.inst.viewBtn', 'View'))}</button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="deleteInstance(${JSON.stringify(iid)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
             </td>
           `;
           tbody.appendChild(row);
@@ -112,14 +116,14 @@ pub async fn admin_instances() -> axum::response::Html<String> {
             escapeHtml(msg) +
             '</div></td></tr>';
         }
-        showNotification('Error loading instances: ' + (error && error.message ? error.message : error), 'error');
+        showNotification(T('admin.inst.errLoad', 'Error loading instances: ') + (error && error.message ? error.message : error), 'error');
       }
     }
 
     async function previewPlacement() {
       const modelId = document.getElementById('preview-model-id').value.trim();
       if (!modelId) {
-        showNotification('Please enter a model ID', 'error');
+        showNotification(T('admin.inst.needModelId', 'Please enter a model ID'), 'error');
         return;
       }
 
@@ -132,7 +136,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         tbody.innerHTML = '';
         
         if (!data.previews || data.previews.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4">No placement options available</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="4">' + escapeHtml(T('admin.inst.previewEmpty', 'No placement options available')) + '</td></tr>';
           return;
         }
         
@@ -140,7 +144,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${escapeHtml(preview.sharding)}</td>
-            <td>${Object.keys(preview.memory_delta_by_node || {}).join(', ') || 'N/A'}</td>
+            <td>${Object.keys(preview.memory_delta_by_node || {}).join(', ') || escapeHtml(T('admin.na', 'N/A'))}</td>
             <td>${Object.values(preview.memory_delta_by_node || {}).reduce((a, b) => a + b, 0)} MB</td>
             <td>${preview.error ? escapeHtml(preview.error) : '-'}</td>
           `;
@@ -148,7 +152,7 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         }
       } catch (error) {
         console.error('Error getting placement previews:', error);
-        showNotification('Error getting placement previews: ' + error.message, 'error');
+        showNotification(T('admin.inst.previewErr', 'Error getting placement previews: ') + error.message, 'error');
       }
     }
 
@@ -159,36 +163,36 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         const instance = await response.json();
         
         const modalContent = `
-          <h3>Instance: ${escapeHtml(instanceId)}</h3>
+          <h3>${escapeHtml(T('admin.inst.modalTitle', 'Instance Details'))}: ${escapeHtml(instanceId)}</h3>
           <div class="form-group">
-            <label>Model ID:</label>
+            <label>${escapeHtml(T('admin.inst.lbl.modelId', 'Model ID:'))}</label>
             <div>${escapeHtml(instance.model_id)}</div>
           </div>
           <div class="form-group">
-            <label>Status:</label>
+            <label>${escapeHtml(T('admin.inst.col.status', 'Status'))}</label>
             <div>${escapeHtml(instance.status)}</div>
           </div>
           <div class="form-group">
-            <label>Strategy:</label>
+            <label>${escapeHtml(T('admin.inst.col.strategy', 'Strategy'))}</label>
             <div>${escapeHtml(instance.placement.strategy)}</div>
           </div>
           <div class="form-group">
-            <label>Nodes:</label>
+            <label>${escapeHtml(T('admin.inst.col.nodes', 'Nodes'))}</label>
             <div>${instance.placement.node_ids.join(', ')}</div>
           </div>
           <div class="form-group">
-            <label>Created:</label>
-            <div>${new Date(instance.created_at).toLocaleString()}</div>
+            <label>${escapeHtml(T('admin.inst.col.created', 'Created'))}</label>
+            <div>${escapeHtml(new Date(instance.created_at).toLocaleString())}</div>
           </div>
         `;
-        showModal('Instance Details', modalContent);
+        showModal(T('admin.inst.modalTitle', 'Instance Details'), modalContent);
       } catch (error) {
-        showNotification('Error loading instance: ' + error.message, 'error');
+        showNotification(T('admin.inst.errLoadOne', 'Error loading instance: ') + error.message, 'error');
       }
     }
 
     async function deleteInstance(instanceId) {
-      if (!confirm(`Are you sure you want to delete instance ${instanceId}?`)) {
+      if (!confirm(T('admin.inst.confirmDel', 'Are you sure you want to delete instance {id}?').replace(/\{id\}/g, instanceId))) {
         return;
       }
 
@@ -203,10 +207,10 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         
         if (!response.ok) throw new Error('Failed to delete instance');
         
-        showNotification('Instance deleted successfully', 'success');
+        showNotification(T('admin.inst.deletedOk', 'Instance deleted successfully'), 'success');
         loadInstances();
       } catch (error) {
-        showNotification('Error deleting instance: ' + error.message, 'error');
+        showNotification(T('admin.inst.errDel', 'Error deleting instance: ') + error.message, 'error');
       }
     }
 
@@ -214,20 +218,20 @@ pub async fn admin_instances() -> axum::response::Html<String> {
       const modalContent = `
         <form id="create-instance-form" onsubmit="createInstance(event)">
           <div class="form-group">
-            <label for="create-model-id">Model ID:</label>
+            <label for="create-model-id">${escapeHtml(T('admin.inst.lbl.modelId', 'Model ID:'))}</label>
             <input type="text" id="create-model-id" required />
           </div>
           <div class="form-group">
-            <label>Placement (JSON):</label>
+            <label>${escapeHtml(T('admin.inst.lbl.placementJson', 'Placement (JSON):'))}</label>
             <textarea id="create-placement" rows="5" required>{"model_id": "", "strategy": "Single", "node_ids": ["local"]}</textarea>
           </div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Create</button>
-            <button type="button" class="btn" onclick="hideModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>
+            <button type="button" class="btn" onclick="hideModal()" data-i18n="ui.cancel">Cancel</button>
           </div>
         </form>
       `;
-      showModal('Create Instance', modalContent);
+      showModal(T('admin.inst.modalCreateTitle', 'Create Instance'), modalContent);
     }
 
     async function createInstance(event) {
@@ -256,25 +260,18 @@ pub async fn admin_instances() -> axum::response::Html<String> {
         if (!response.ok) throw new Error('Failed to create instance');
         const data = await response.json();
         
-        showNotification('Instance created successfully: ' + data.instance_id, 'success');
+        showNotification(T('admin.inst.createdOk', 'Instance created successfully: ') + data.instance_id, 'success');
         hideModal();
         loadInstances();
       } catch (error) {
-        showNotification('Error creating instance: ' + error.message, 'error');
+        showNotification(T('admin.inst.errCreate', 'Error creating instance: ') + error.message, 'error');
       }
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
     }
 
     function getAuthToken() {
       return localStorage.getItem('poolai_token') || '';
     }
 
-    // Load instances on page load
     loadInstances();
   "#;
 

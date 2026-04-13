@@ -27,4 +27,6 @@ Thumbs.db
 
 # Build artifacts (if not already in .gitignore)
 target/
+# Alternate CARGO_TARGET_DIR from local test runs (e.g. FM-007)
+target-fm007-test/
 **/*.pdb

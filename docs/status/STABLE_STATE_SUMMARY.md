@@ -16,7 +16,7 @@
 - ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
 - ✅ **Clippy (як у CI, `-D warnings`):** `cargo clippy --all-targets` для `--no-default-features`, `--features jwt,https` та `--features cloud,cloud-sdk` (остання матриця — з `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **без попереджень на `main` (2026-04-10)**; інтеграційні тести під ті самі правила вирівняні з `ci.yml`.
 - ✅ **Windows MSVC / FM-011:** у `Cargo.toml` профіль **`[profile.test] debug = 1`** зменшує PDB для великої кількості тестових exe (обхід **LNK1318**). Канонічний прогін як у CI: **`cargo test-ci`** у **`.cargo/config.toml`** (`--lib` + `--tests`, без doctests). Повна збірка тестових бінарників: `cargo test -j 1 --all-features --no-run` (за потреби `CARGO_INCREMENTAL=0`) — **перевірено локально** (2026-04-07).
-- ◆ **FM-012 (Partial, 2026-04-12):** i18n **UA/EN** — `i18n_core.js`, **`/ui/auth`**, admin shell; повнотекстовий переклад admin-сторінок **tenants**, **VM**, **workers**, **libs**, **users**, **RAID**; **залишок** — monitoring/config/security/instances/topology та інші `/ui/*`.
+- ◆ **FM-012 (Partial, 2026-04-12):** i18n **UA/EN** — `i18n_core.js`, **`/ui/auth`**, admin shell; повнотекстовий переклад enterprise admin (**dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID**); **залишок** — інші `/ui/*` та Telegram OAuth hardening (див. **`FUNCTION_MANAGEMENT`** FM-012).
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус
@@ -94,7 +94,7 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 
 **Єдиний порядок пріоритетів (FM-* + чекбокси Architect):** [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** → деталі в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md). Операційний зріз сесії: [`HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md).
 
-**Коротко:** baseline/P4 (`poolai_health_load --json`, Criterion) + LAN/P2b; HTTP **FM-005** ✅; distributed RAID (LAN за потреби); **FM-011** (`test-ci`, профіль тестів); **FM-012 Partial** (i18n auth + admin shell + tenants/VM/workers/libs/users/RAID); deferred — cloud-sdk, SIMD, Grid/Solana концепти.
+**Коротко:** baseline/P4 (`poolai_health_load --json`, Criterion) + LAN/P2b; HTTP **FM-005** ✅; distributed RAID (LAN за потреби); **FM-011** (`test-ci`, профіль тестів); **FM-012 Partial** (i18n auth + admin shell + повний перелік enterprise admin-сторінок, див. HANDOFF); deferred — cloud-sdk, SIMD, Grid/Solana концепти.
 
 **Архівний план (історично):** `docs/development/NEXT_STEPS_2026-01-19.md`.
 

@@ -6,60 +6,60 @@ use super::admin_layout;
 pub async fn admin_topology() -> axum::response::Html<String> {
     let body = r#"
     <div class="admin-section">
-      <h3>Network Topology</h3>
-      <p>View network topology, latency matrix, and node resources.</p>
+      <h3 data-i18n="admin.topo.title">Network Topology</h3>
+      <p data-i18n="admin.topo.intro">View network topology, latency matrix, and node resources.</p>
       
       <div class="admin-stats-grid">
         <div class="admin-stat-card">
           <div class="stat-value" id="topology-node-count">-</div>
-          <div class="stat-label">Nodes</div>
+          <div class="stat-label" data-i18n="admin.topo.stat.nodes">Nodes</div>
         </div>
         <div class="admin-stat-card">
           <div class="stat-value" id="topology-latency-measurements">-</div>
-          <div class="stat-label">Latency Measurements</div>
+          <div class="stat-label" data-i18n="admin.topo.stat.latencyMs">Latency Measurements</div>
         </div>
         <div class="admin-stat-card">
           <div class="stat-value" id="topology-last-updated">-</div>
-          <div class="stat-label">Last Updated</div>
+          <div class="stat-label" data-i18n="admin.topo.stat.lastUpd">Last Updated</div>
         </div>
       </div>
 
       <div class="admin-section-header">
-        <h4>Topology Overview</h4>
-        <button class="btn btn-primary" onclick="refreshTopology()">Refresh</button>
+        <h4 data-i18n="admin.topo.sectionOverview">Topology Overview</h4>
+        <button type="button" class="btn btn-primary" onclick="refreshTopology()" data-i18n="admin.topo.refresh">Refresh</button>
       </div>
       
       <div id="topology-nodes-list" class="admin-table-container">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Node ID</th>
-              <th>Available GPU Memory</th>
-              <th>Available CPU Cores</th>
-              <th>Current Load</th>
-              <th>Actions</th>
+              <th data-i18n="admin.topo.col.nodeId">Node ID</th>
+              <th data-i18n="admin.topo.col.gpuMem">Available GPU Memory</th>
+              <th data-i18n="admin.topo.col.cpu">Available CPU Cores</th>
+              <th data-i18n="admin.topo.col.load">Current Load</th>
+              <th data-i18n="admin.topo.col.actions">Actions</th>
             </tr>
           </thead>
           <tbody id="topology-nodes-tbody">
-            <tr><td colspan="5">Loading...</td></tr>
+            <tr><td colspan="5" data-i18n="admin.topo.loading">Loading…</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="admin-section-header">
-        <h4>Latency Matrix</h4>
+        <h4 data-i18n="admin.topo.sectionLatency">Latency Matrix</h4>
       </div>
       <div id="topology-latency-matrix" class="admin-table-container">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>From Node</th>
-              <th>To Node</th>
-              <th>Latency (ms)</th>
+              <th data-i18n="admin.topo.col.from">From Node</th>
+              <th data-i18n="admin.topo.col.to">To Node</th>
+              <th data-i18n="admin.topo.col.latency">Latency (ms)</th>
             </tr>
           </thead>
           <tbody id="topology-latency-tbody">
-            <tr><td colspan="3">Loading...</td></tr>
+            <tr><td colspan="3" data-i18n="admin.topo.loading">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -67,6 +67,8 @@ pub async fn admin_topology() -> axum::response::Html<String> {
   "#;
 
     let script = r#"
+    function T(k, fb) { return typeof poolaiT === 'function' ? poolaiT(k, fb) : fb; }
+
     async function loadTopology() {
       try {
         const response = await fetch('/api/v1/topology');
@@ -77,14 +79,11 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         document.getElementById('topology-latency-measurements').textContent = data.latency_measurements || 0;
         document.getElementById('topology-last-updated').textContent = formatTopologyTimestamp(data.last_updated);
         
-        // Load nodes
         await loadTopologyNodes();
-        
-        // Load latency matrix
         await loadLatencyMatrix();
       } catch (error) {
         console.error('Error loading topology:', error);
-        showNotification('Error loading topology: ' + error.message, 'error');
+        showNotification(T('admin.topo.errLoad', 'Error loading topology: ') + error.message, 'error');
       }
     }
 
@@ -98,7 +97,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         tbody.innerHTML = '';
         
         if (Object.keys(data.nodes || {}).length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5">No nodes found</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5">' + escapeHtml(T('admin.topo.noNodes', 'No nodes found')) + '</td></tr>';
           return;
         }
         
@@ -114,14 +113,14 @@ pub async fn admin_topology() -> axum::response::Html<String> {
             <td>${ac} / ${tc}</td>
             <td>${formatLoadFraction(node.current_load)}</td>
             <td>
-              <button class="btn btn-sm" onclick="viewNodeResources(${JSON.stringify(nodeId)})">View Details</button>
+              <button type="button" class="btn btn-sm" onclick="viewNodeResources(${JSON.stringify(nodeId)})">${escapeHtml(T('admin.topo.viewDetails', 'View Details'))}</button>
             </td>
           `;
           tbody.appendChild(row);
         }
       } catch (error) {
         console.error('Error loading nodes:', error);
-        document.getElementById('topology-nodes-tbody').innerHTML = '<tr><td colspan="5">Error loading nodes</td></tr>';
+        document.getElementById('topology-nodes-tbody').innerHTML = '<tr><td colspan="5">' + escapeHtml(T('admin.topo.errNodesRow', 'Error loading nodes')) + '</td></tr>';
       }
     }
 
@@ -135,7 +134,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         tbody.innerHTML = '';
         
         if (Object.keys(data.latency_matrix || {}).length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3">No latency measurements available</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="3">' + escapeHtml(T('admin.topo.noLatency', 'No latency measurements available')) + '</td></tr>';
           return;
         }
         
@@ -151,7 +150,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         }
       } catch (error) {
         console.error('Error loading latency matrix:', error);
-        document.getElementById('topology-latency-tbody').innerHTML = '<tr><td colspan="3">Error loading latency matrix</td></tr>';
+        document.getElementById('topology-latency-tbody').innerHTML = '<tr><td colspan="3">' + escapeHtml(T('admin.topo.errLatencyRow', 'Error loading latency matrix')) + '</td></tr>';
       }
     }
 
@@ -162,33 +161,33 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         const node = await response.json();
         
         const modalContent = `
-          <h3>Node Resources: ${escapeHtml(nodeId)}</h3>
+          <h3>${escapeHtml(T('admin.topo.modalNodeTitle', 'Node Resources'))}: ${escapeHtml(nodeId)}</h3>
           <div class="form-group">
-            <label>GPU Memory:</label>
+            <label>${escapeHtml(T('admin.topo.lbl.gpu', 'GPU Memory:'))}</label>
             <div>${node.available_gpu_memory_mb ?? 0} / ${node.total_gpu_memory_mb ?? 0} MB</div>
           </div>
           <div class="form-group">
-            <label>CPU Cores:</label>
+            <label>${escapeHtml(T('admin.topo.lbl.cpu', 'CPU Cores:'))}</label>
             <div>${node.available_cpu_cores ?? 0} / ${node.total_cpu_cores ?? 0}</div>
           </div>
           <div class="form-group">
-            <label>System Memory:</label>
+            <label>${escapeHtml(T('admin.topo.lbl.sysMem', 'System Memory:'))}</label>
             <div>${node.available_memory_mb ?? 0} / ${node.total_memory_mb ?? 0} MB</div>
           </div>
           <div class="form-group">
-            <label>Current Load:</label>
+            <label>${escapeHtml(T('admin.topo.lbl.load', 'Current Load:'))}</label>
             <div>${formatLoadFraction(node.current_load)}</div>
           </div>
         `;
-        showModal('Node Resources', modalContent);
+        showModal(T('admin.topo.modalNodeTitle', 'Node Resources'), modalContent);
       } catch (error) {
-        showNotification('Error loading node resources: ' + error.message, 'error');
+        showNotification(T('admin.topo.errNodeRes', 'Error loading node resources: ') + error.message, 'error');
       }
     }
 
     function refreshTopology() {
       loadTopology();
-      showNotification('Topology refresh initiated', 'info');
+      showNotification(T('admin.topo.refreshInfo', 'Topology refresh initiated'), 'info');
     }
 
     function formatTopologyTimestamp(iso) {
@@ -205,11 +204,10 @@ pub async fn admin_topology() -> axum::response::Html<String> {
 
     function formatLatencyMs(latency) {
       const n = Number(latency);
-      if (!Number.isFinite(n)) return escapeHtml(latency) + ' ms';
+      if (!Number.isFinite(n)) return escapeHtml(String(latency)) + ' ms';
       return n.toFixed(2) + ' ms';
     }
 
-    // Load topology on page load
     loadTopology();
   "#;
 

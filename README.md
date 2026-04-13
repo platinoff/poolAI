@@ -60,7 +60,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 1. **FM-003** + **P4** + **P2b** — Criterion і **`poolai_health_load --json`** на реф-хості → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md); на LAN — повні заміри реплікації + порівняння розміру до/після TQ01.
 2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** + replication; далі LAN і payload для conflicts за потреби.
 3. **FM-011** — стабільні тести на Windows: профіль **`[profile.test]`**, **`cargo test-ci`** (як CI: `--lib` + `--tests`), **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; **`-j 1`** за потреби.
-4. **FM-012** — UX/UI: i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, admin shell, **tenants/VM/workers/libs/users/RAID**); далі — admin **monitoring/config/security/instances/topology**, решта `/ui/*`, Telegram OAuth hardening.
+4. **FM-012** — UX/UI: i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, admin shell + enterprise admin **monitoring/config/security/instances/topology** + **tenants/VM/workers/libs/users/RAID**); далі — решта `/ui/*`, Telegram OAuth hardening.
 5. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
 6. **Концепт → код** — **FM-009** (Grid envelope), **FM-010** (Solana).
 
