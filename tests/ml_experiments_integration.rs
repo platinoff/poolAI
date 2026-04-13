@@ -128,7 +128,7 @@ mod tests {
         let e1 = tracker.start_experiment("e1", "NN").await.unwrap();
         tracker.end_experiment(e1.id.as_str()).await.unwrap();
 
-        let e2 = tracker.start_experiment("e2", "NN").await.unwrap();
+        let _e2 = tracker.start_experiment("e2", "NN").await.unwrap();
         // e2 still running
 
         let completed = tracker

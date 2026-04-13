@@ -9,7 +9,7 @@ use poolai::core::error::AppError;
 
 #[cfg(feature = "cloud")]
 const INIT_TIMEOUT_SECS: u64 = 5;
-#[cfg(feature = "cloud")]
+#[cfg(all(feature = "cloud", feature = "cloud-sdk"))]
 const OPERATION_TIMEOUT_SECS: u64 = 3;
 
 #[cfg(feature = "cloud")]

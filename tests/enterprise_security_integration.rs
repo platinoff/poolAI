@@ -11,8 +11,7 @@
 use poolai::core::error::AppError;
 #[cfg(feature = "enterprise")]
 use poolai::enterprise::security::{
-    get_global_security_manager, OAuth2Config, OAuth2Provider, SamlConfig, SamlProvider,
-    SecurityManager, SecurityPolicy,
+    get_global_security_manager, OAuth2Config, SamlConfig, SecurityManager, SecurityPolicy,
 };
 
 #[cfg(feature = "enterprise")]
@@ -117,7 +116,7 @@ async fn test_oauth2_provider_validation() {
         .register_oauth2_provider("duplicate-test".to_string(), config.clone())
         .await
         .unwrap();
-    let result = manager
+    let _dup = manager
         .register_oauth2_provider("duplicate-test".to_string(), config)
         .await;
     // Should either succeed (update) or fail (duplicate check)

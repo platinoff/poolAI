@@ -13,8 +13,7 @@ use chrono::Utc;
 use poolai::core::error::AppError;
 #[cfg(feature = "enterprise")]
 use poolai::enterprise::monitoring::{
-    get_global_monitoring_manager, Alert, AlertRule, AlertSeverity, Dashboard, MetricDataPoint,
-    MonitoringManager,
+    get_global_monitoring_manager, AlertRule, AlertSeverity, Dashboard, MetricDataPoint,
 };
 #[cfg(feature = "enterprise")]
 use uuid::Uuid;

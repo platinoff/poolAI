@@ -10,9 +10,7 @@
 #[cfg(feature = "enterprise")]
 use poolai::core::error::AppError;
 #[cfg(feature = "enterprise")]
-use poolai::enterprise::multi_tenancy::{
-    get_global_tenant_manager, Tenant, TenantConfig, TenantManager,
-};
+use poolai::enterprise::multi_tenancy::{get_global_tenant_manager, TenantConfig};
 #[cfg(feature = "enterprise")]
 use uuid::Uuid;
 

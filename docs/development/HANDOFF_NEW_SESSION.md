@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-04-12 (кроки 1–12; **FM-003** / P4 — short Criterion + рядки **`win10-local-26200-*-2026-04-12`** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md); **FM-007** — розширені wire-тести **`SyncArtifacts`** (Pull, Bidirectional, рівні timestamp) у **`distributed_raid_wire_integration`**; **FM-005** ✅ — **`HttpAppError`/`RestError`** по REST + **`enterprise_api`** + **`login`/`refresh`** + **`check_permission`** + **`auth_middleware`**; **§5.1** — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); **«Операційний порядок»** — [`NEXT_STEPS_ARCHITECT`](./NEXT_STEPS_ARCHITECT_2026-03-17.md); **FM-007/008**; **FM-011**; Clippy / [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
+**Оновлено:** 2026-04-12 (кроки 1–12; **FM-011** — alias **`cargo test-ci`** (`.cargo/config.toml`) + прибрані warnings у integration-тестах; **FM-003** / P4 — short Criterion + рядки **`win10-local-26200-*-2026-04-12`** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md); **FM-007** — розширені wire-тести **`SyncArtifacts`** (Pull, Bidirectional, рівні timestamp) у **`distributed_raid_wire_integration`**; **FM-005** ✅ — **`HttpAppError`/`RestError`** по REST + **`enterprise_api`** + **`login`/`refresh`** + **`check_permission`** + **`auth_middleware`**; **§5.1** — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); **«Операційний порядок»** — [`NEXT_STEPS_ARCHITECT`](./NEXT_STEPS_ARCHITECT_2026-03-17.md); **FM-007/008**; **FM-011**; Clippy / [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md))  
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
 ## 1. Канонічний порядок документації та планів
@@ -47,7 +47,7 @@
 
 1. **Baseline / стенд (FM-003, P4, P2b)** — Criterion на реф-хості; **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md); LAN — повні заміри реплікації + TQ01.
 2. **Distributed RAID (FM-007, FM-008)** — у коді: порівняння каталогів у **`SyncArtifacts`**, **`LeaveCluster`** з replication + **`delete_worker`**; далі за потреби: LAN-заміри, **`conflicts`** у payload (remote timestamps), глибша multi-hop реплікація.
-3. **Ops (FM-011)** — `Cargo.toml` **`[profile.test] debug = 1`**; повна збірка тестів: `-j 1`, опційно `CARGO_INCREMENTAL=0`; GNU toolchain або дроблення features за потреби.
+3. **Ops (FM-011)** — `Cargo.toml` **`[profile.test] debug = 1`**; канонічний прогін як у CI: **`cargo test-ci`** (alias у **`.cargo/config.toml`**) після **`K8S_OPENAPI_ENABLED_VERSION=1.28`** — лише **`--lib` + `--tests`**, без doctests (на Windows повний **`cargo test`** з doc-тестами може дати **os error 1455**). Інакше: `-j 1`, опційно `CARGO_INCREMENTAL=0`; GNU toolchain або дроблення features за потреби.
 4. **Deferred** — **cloud-sdk** (FM-006), SIMD TurboQuant (FM-004); **концепт** — Grid envelope (FM-009), Solana (FM-010).
 
 **FM-005** ✅ (узгоджений JSON) — закрито; див. таблицю **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).

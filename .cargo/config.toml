@@ -18,4 +18,9 @@ linker = "x86_64-w64-mingw32-gcc"
 # or run scripts/setup_msys2_path.ps1 before building
 CXXFLAGS = "-std=c++17"
 LIBTORCH = "/home/rust/libtorch"
-LD_LIBRARY_PATH = "/home/rust/libtorch/lib" 
+LD_LIBRARY_PATH = "/home/rust/libtorch/lib"
+
+# FM-011: same shape as CI "Run tests (default)" — `lib` + `tests/` only (skips doctests; avoids Windows
+# paging-file failures on full `cargo test`). Set K8S_OPENAPI_ENABLED_VERSION=1.28 when cloud code paths compile.
+[alias]
+test-ci = "test -j 1 --lib --tests --features ml,enterprise,cloud,test-utils -- --test-threads=1"

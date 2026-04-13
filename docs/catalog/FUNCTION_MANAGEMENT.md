@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-04-10 (FM-005 ✅: узгоджений JSON-помилок на **`HttpAppError`/`RestError`** — `api/*`, `raid*`, **`enterprise_api`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**; додано FM-012: UX-апгрейд UI/Admin + Telegram login)
+**Оновлено:** 2026-04-12 (FM-011: **`cargo test-ci`** у `.cargo/config.toml`; FM-005 ✅: узгоджений JSON-помилок на **`HttpAppError`/`RestError`** — `api/*`, `raid*`, **`enterprise_api`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**; додано FM-012: UX-апгрейд UI/Admin + Telegram login)
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
 **Пов’язані кроки канону:** [крок 11 — витяг](./FUNCTIONALITY_DIGEST_2026-04-06.md) · **крок 12 — цей файл** (керування та беклог).
@@ -98,7 +98,7 @@ FM-xxx (з таблиці нижче)
 | FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; якщо немає peer-вузлів і є артефакти — `replication_complete=false`; помилки membership / невалідний `node_id` | Partial | Якщо `list_nodes` непорожній — `node_id` має бути членом кластера (інакше `InvalidRequest` до replication); wire-тести leave у **`tests/distributed_raid_wire_integration.rs`** |
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
-| FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); `cargo test -j1 --all-features --no-run` і `cargo test --all-features --lib --tests -j 1` — перевірено (2026-04-10); `cargo test --all-features` впирається у `doctest` на Windows через paging file (`os error 1455`) | Partial | `Cargo.toml`, NEXT_STEPS, `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
+| FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); alias **`cargo test-ci`** у **`.cargo/config.toml`** = CI-прогін (`--lib` + `--tests`, без doctests) + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; `cargo test -j1 --all-features --no-run` / `--lib --tests` — перевірено (2026-04-10); повний `cargo test --all-features` з doc-тестами на Windows може дати paging file (**os error 1455**) | Partial | `Cargo.toml`, `.cargo/config.toml`, HANDOFF, NEXT_STEPS |
 | FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: єдина UX-система (навігація, стани, дії, i18n UA/EN), плюс авторизація через Telegram (JWT/RBAC-сумісно, audit, policy/allowlist, fallback на класичний login) | Planned | `src/ui/*`, `src/network/api/ui.rs`, `src/ui/admin/*`, `src/network/auth.rs`, `src/tgbot/mod.rs`, `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
