@@ -210,6 +210,40 @@ body {
   gap: 15px;
 }
 
+.admin-lang-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-right: 8px;
+}
+
+.admin-lang-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.admin-lang-bar .btn-lang {
+  padding: 4px 10px;
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.admin-lang-bar .btn-lang:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.admin-lang-bar .btn-lang.active {
+  background: var(--primary);
+  color: #0f1216;
+  border-color: var(--primary);
+}
+
 .admin-content {
   flex: 1;
   padding: 30px;

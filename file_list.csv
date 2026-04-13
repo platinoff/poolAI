@@ -529,6 +529,7 @@
 ./src/ui/admin/vm.rs
 ./src/ui/admin/workers.rs
 ./src/ui/admin_common.js
+./src/ui/i18n_core.js
 ./src/ui/admin_styles.css
 ./src/ui/components.rs
 ./src/ui/mod.rs

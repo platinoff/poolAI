@@ -617,6 +617,32 @@ const BASE_CSS: &str = r#"
   .grid .item:nth-child(2) { animation-delay: 0.1s; }
   .grid .item:nth-child(3) { animation-delay: 0.15s; }
   .grid .item:nth-child(4) { animation-delay: 0.2s; }
+
+  /* FM-012: language toggle (login + shared with admin .btn-lang) */
+  .poolai-lang-auth {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: auto;
+  }
+  .btn-lang {
+    padding: 4px 10px;
+    font-size: var(--font-size-sm, 14px);
+    border: 1px solid var(--border, #262b36);
+    border-radius: 8px;
+    background: var(--surface-secondary, #1e2329);
+    color: var(--text, #e8e8e8);
+    cursor: pointer;
+  }
+  .btn-lang:hover {
+    border-color: var(--primary, #67e480);
+    color: var(--primary, #67e480);
+  }
+  .btn-lang.active {
+    background: var(--primary, #67e480);
+    color: #0f1216;
+    border-color: var(--primary, #67e480);
+  }
 "#;
 
 fn layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
@@ -3274,7 +3300,7 @@ async fn login_page() -> Html<String> {
       const btn = document.getElementById('loginBtn');
       
       btn.disabled = true;
-      btn.textContent = 'Logging in...';
+      btn.textContent = poolaiT('auth.loggingIn', 'Logging in…');
       
       try {
         const res = await fetch('/api/v1/login', {
@@ -3285,7 +3311,7 @@ async fn login_page() -> Html<String> {
         
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(apiErrMsg(data) || 'Login failed');
+          throw new Error(apiErrMsg(data) || poolaiT('auth.loginFailed', 'Login failed'));
         }
         
         const data = await res.json();
@@ -3302,10 +3328,10 @@ async fn login_page() -> Html<String> {
         
         window.location.href = '/ui';
       } catch (e) {
-        showAlert(e.message || 'Login failed', 'error');
+        showAlert(e.message || poolaiT('auth.loginFailed', 'Login failed'), 'error');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Login';
+        btn.textContent = poolaiT('auth.submit', 'Login');
       }
     }
     
@@ -3316,7 +3342,7 @@ async fn login_page() -> Html<String> {
         // Redirect to OAuth2 provider
         window.location.href = '/api/enterprise/auth/' + provider;
       } catch (e) {
-        showAlert('Failed to start OAuth2 login: ' + e.message, 'error');
+        showAlert(poolaiT('auth.oauthStartFail', 'Failed to start OAuth2 login: ') + e.message, 'error');
       }
     }
     
@@ -3327,7 +3353,7 @@ async fn login_page() -> Html<String> {
       const error = urlParams.get('error');
       
       if (error) {
-        showAlert('OAuth2 authentication failed: ' + error, 'error');
+        showAlert(poolaiT('auth.oauthFail', 'OAuth2 authentication failed: ') + error, 'error');
         // Clean URL
         window.history.replaceState({}, document.title, '/ui/auth');
         return;
@@ -3361,7 +3387,7 @@ async fn login_page() -> Html<String> {
           window.history.replaceState({}, document.title, '/ui');
           window.location.href = '/ui';
         } catch (e) {
-          showAlert('Failed to process OAuth2 token: ' + e.message, 'error');
+          showAlert(poolaiT('auth.oauthTokenFail', 'Failed to process OAuth2 token: ') + e.message, 'error');
         }
       }
     }
@@ -3385,7 +3411,8 @@ async fn login_page() -> Html<String> {
           return;
         }
         
-        let buttonsHtml = '<div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border, #262b36);"><div style="margin-bottom: 12px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">Or sign in with:</div><div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">';
+        const oauthOr = poolaiT('auth.oauthOr', 'Or sign in with:');
+        let buttonsHtml = '<div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border, #262b36);"><div style="margin-bottom: 12px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">' + oauthOr + '</div><div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">';
         
         availableProviders.forEach(provider => {
           const providerName = provider.name.toLowerCase();
@@ -3418,27 +3445,16 @@ async fn login_page() -> Html<String> {
       updateUI();
       window.location.href = '/ui/auth';
     }
-    
-    if (getUser()) {
-      window.location.href = '/ui';
-    }
-    
-    // Check for OAuth2 callback on page load
-    checkOAuth2Callback();
-    
-    // Load OAuth2 providers
-    loadOAuth2Providers();
-    
-    document.getElementById('loginForm').addEventListener('submit', handleLogin);
     "#;
 
+    let i18n_js = include_str!("i18n_core.js");
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - PoolAI</title>
+  <title data-i18n="auth.pageTitle">Login - PoolAI</title>
   <style>{css}</style>
 </head>
 <body>
@@ -3447,39 +3463,57 @@ async fn login_page() -> Html<String> {
       <div class="brand">
         <h1>PoolAI</h1>
       </div>
+      <div id="poolai-lang-toggle-auth" class="poolai-lang-auth"></div>
     </div>
     <div class="content">
       <div class="card" style="max-width: 400px; margin: 40px auto;">
-        <h2 style="margin:0 0 20px">Login</h2>
+        <h2 style="margin:0 0 20px" data-i18n="auth.cardTitle">Login</h2>
         <div id="alert"></div>
         <form id="loginForm">
           <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username" data-i18n="auth.username">Username</label>
             <input type="text" id="username" name="username" required autocomplete="username" />
           </div>
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password" data-i18n="auth.password">Password</label>
             <input type="password" id="password" name="password" required autocomplete="current-password" />
           </div>
-          <button type="submit" class="btn" id="loginBtn">Login</button>
+          <button type="submit" class="btn" id="loginBtn" data-i18n="auth.submit">Login</button>
         </form>
         <div id="oauth2-providers" style="display: none;"></div>
         <div style="margin-top: 20px; font-size: 0.9em; color:#a8b0bf;">
-          <div><strong>Test accounts:</strong></div>
-          <div>Admin: admin / admin123</div>
-          <div>Operator: operator / op123</div>
-          <div>Viewer: viewer / view123</div>
+          <div><strong data-i18n="auth.testAccounts">Test accounts:</strong></div>
+          <div data-i18n="auth.testAdmin">Admin: admin / admin123</div>
+          <div data-i18n="auth.testOperator">Operator: operator / op123</div>
+          <div data-i18n="auth.testViewer">Viewer: viewer / view123</div>
         </div>
       </div>
     </div>
   </div>
   <script>
+    {i18n_js}
     {common_js}
     {login_js}
+    (function() {{
+      if (getUser()) {{
+        window.location.href = '/ui';
+        return;
+      }}
+      checkOAuth2Callback();
+      if (typeof PoolAiI18n !== 'undefined') {{
+        PoolAiI18n.apply(document.documentElement);
+        PoolAiI18n.initAuthPage();
+      }}
+      loadOAuth2Providers();
+      document.addEventListener('poolai:langchange', function() {{ loadOAuth2Providers(); }});
+      var _lf = document.getElementById('loginForm');
+      if (_lf) _lf.addEventListener('submit', handleLogin);
+    }})();
   </script>
 </body>
 </html>"#,
         css = BASE_CSS,
+        i18n_js = i18n_js,
         common_js = common_js(),
         login_js = login_js
     );

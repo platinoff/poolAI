@@ -68,6 +68,7 @@ pub fn create_admin_routes() -> Router<ApiContext> {
 /// Admin panel layout function - shared across all admin pages
 pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<String> {
     let base_css = include_str!("../admin_styles.css");
+    let i18n_js = include_str!("../i18n_core.js");
     let common_js = include_str!("../admin_common.js");
 
     let html = format!(
@@ -83,23 +84,23 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
   <div class="admin-wrapper">
     <aside class="admin-sidebar" role="navigation" aria-label="Admin navigation">
       <div class="admin-brand">
-        <h1>PoolAI Admin</h1>
+        <h1 data-i18n="admin.brand">PoolAI Admin</h1>
         <div class="admin-version">v0.1.0</div>
       </div>
       <nav class="admin-nav">
-        <a href="/ui/admin" class="admin-nav-item">Dashboard</a>
-        <a href="/ui/admin/tenants" class="admin-nav-item">Tenants</a>
-        <a href="/ui/admin/security" class="admin-nav-item">Security</a>
-        <a href="/ui/admin/audit" class="admin-nav-item">Audit Logs</a>
-        <a href="/ui/admin/monitoring" class="admin-nav-item">Monitoring</a>
-        <a href="/ui/admin/vm" class="admin-nav-item">VM Instances</a>
-        <a href="/ui/admin/workers" class="admin-nav-item">Workers</a>
-        <a href="/ui/admin/libs" class="admin-nav-item">Libraries</a>
-        <a href="/ui/admin/raid" class="admin-nav-item">RAID</a>
-        <a href="/ui/admin/instances" class="admin-nav-item">Model Instances</a>
-        <a href="/ui/admin/topology" class="admin-nav-item">Topology</a>
-        <a href="/ui/admin/users" class="admin-nav-item">Users</a>
-        <a href="/ui/admin/config" class="admin-nav-item">Configuration</a>
+        <a href="/ui/admin" class="admin-nav-item" data-i18n="admin.nav.dashboard">Dashboard</a>
+        <a href="/ui/admin/tenants" class="admin-nav-item" data-i18n="admin.nav.tenants">Tenants</a>
+        <a href="/ui/admin/security" class="admin-nav-item" data-i18n="admin.nav.security">Security</a>
+        <a href="/ui/admin/audit" class="admin-nav-item" data-i18n="admin.nav.audit">Audit Logs</a>
+        <a href="/ui/admin/monitoring" class="admin-nav-item" data-i18n="admin.nav.monitoring">Monitoring</a>
+        <a href="/ui/admin/vm" class="admin-nav-item" data-i18n="admin.nav.vm">VM Instances</a>
+        <a href="/ui/admin/workers" class="admin-nav-item" data-i18n="admin.nav.workers">Workers</a>
+        <a href="/ui/admin/libs" class="admin-nav-item" data-i18n="admin.nav.libs">Libraries</a>
+        <a href="/ui/admin/raid" class="admin-nav-item" data-i18n="admin.nav.raid">RAID</a>
+        <a href="/ui/admin/instances" class="admin-nav-item" data-i18n="admin.nav.instances">Model Instances</a>
+        <a href="/ui/admin/topology" class="admin-nav-item" data-i18n="admin.nav.topology">Topology</a>
+        <a href="/ui/admin/users" class="admin-nav-item" data-i18n="admin.nav.users">Users</a>
+        <a href="/ui/admin/config" class="admin-nav-item" data-i18n="admin.nav.config">Configuration</a>
       </nav>
     </aside>
     
@@ -107,8 +108,9 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
       <header class="admin-header-bar">
         <h2>{title}</h2>
         <div class="admin-user-menu">
+          <div id="poolai-lang-toggle" class="admin-lang-bar"></div>
           <span id="admin-user-name">Admin</span>
-          <button class="btn-icon" onclick="logout()" aria-label="Logout">🚪</button>
+          <button type="button" class="btn-icon" onclick="logout()" data-i18n-aria="admin.logout" aria-label="Log out">🚪</button>
         </div>
       </header>
       
@@ -118,14 +120,17 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
     </main>
   </div>
   
+  <script>{i18n_js}</script>
   <script>{common_js}</script>
   <script>
-    // Check admin access on page load
     (function() {{
+      if (typeof PoolAiI18n !== 'undefined') {{
+        PoolAiI18n.apply(document.body);
+        PoolAiI18n.initAdminShell();
+      }}
       if (!requireAdmin()) {{
         return;
       }}
-      // Initialize admin panel
       {script}
     }})();
   </script>
@@ -134,6 +139,7 @@ pub fn admin_layout(title: &str, body_html: &str, script_js: &str) -> Html<Strin
         title = title,
         base_css = base_css,
         body = body_html,
+        i18n_js = i18n_js,
         common_js = common_js,
         script = script_js
     );

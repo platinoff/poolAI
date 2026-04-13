@@ -1,5 +1,14 @@
 // Admin Panel Common JavaScript
 
+/** i18n (FM-012): `PoolAiI18n` from i18n_core.js loaded before this file. */
+function poolaiT(key, enFallback) {
+  if (typeof PoolAiI18n !== 'undefined' && PoolAiI18n.t) {
+    const v = PoolAiI18n.t(key);
+    if (v !== key || enFallback === undefined) return v;
+  }
+  return enFallback !== undefined ? enFallback : key;
+}
+
 // API base URL
 const API_BASE = '/api/v1';
 
@@ -31,12 +40,16 @@ function apiErrorDetailFromBody(payload) {
 
 function hintFor503(code, message) {
   if (code === 'RAID_MANAGER_UNAVAILABLE') {
-    return 'RAID manager is not initialized on this server.';
+    return poolaiT(
+      'err.hint503.raid',
+      'RAID manager is not initialized on this server.',
+    );
   }
   const m = message || '';
-  if (/library/i.test(m)) return 'Library subsystem may not be initialized.';
-  if (/\bvm\b/i.test(m)) return 'VM manager may not be attached.';
-  return 'A subsystem may still be starting or unavailable.';
+  if (/library/i.test(m))
+    return poolaiT('err.hint503.library', 'Library subsystem may not be initialized.');
+  if (/\bvm\b/i.test(m)) return poolaiT('err.hint503.vm', 'VM manager may not be attached.');
+  return poolaiT('err.hint503.generic', 'A subsystem may still be starting or unavailable.');
 }
 
 function formatFetchError(status, url, payload) {
@@ -44,13 +57,19 @@ function formatFetchError(status, url, payload) {
   const base = message || ('HTTP ' + status);
   let extra = hint || '';
   if (status === 403 && !extra) {
-    extra = 'You may need Admin or Operator role, or sign in again.';
+    extra = poolaiT(
+      'err.hint403',
+      'You may need Admin or Operator role, or sign in again.',
+    );
   }
   if (status === 503 && !extra) {
     extra = hintFor503(code, base);
   }
   if (status === 404 && url && url.indexOf('/api/enterprise') !== -1 && !extra) {
-    extra = 'Build and run the server with the enterprise feature for this API.';
+    extra = poolaiT(
+      'err.hint404.enterprise',
+      'Build and run the server with the enterprise feature for this API.',
+    );
   }
   if (extra) return base + ' — ' + extra;
   return base;
@@ -66,7 +85,11 @@ function escapeHtml(s) {
 
 function adminShowLoading(containerId, text) {
   const el = document.getElementById(containerId);
-  if (el) el.innerHTML = '<div class="muted">' + escapeHtml(text || 'Loading…') + '</div>';
+  if (el)
+    el.innerHTML =
+      '<div class="muted">' +
+      escapeHtml(text || poolaiT('common.loading', 'Loading…')) +
+      '</div>';
 }
 
 function adminShowInlineError(containerId, err) {
@@ -164,7 +187,7 @@ function requireAdmin() {
     return false;
   }
   if (!isAdmin()) {
-    alert('Admin access required');
+    alert(poolaiT('admin.accessRequired', 'Admin access required'));
     window.location.href = '/ui/auth';
     return false;
   }
@@ -202,7 +225,12 @@ async function fetchJson(url, options = {}) {
     if (response.status === 401) {
       clearUser();
       window.location.href = '/ui/auth';
-      throw new Error('Unauthorized — session expired. Please sign in again.');
+      throw new Error(
+        poolaiT(
+          'common.unauthorized',
+          'Unauthorized — session expired. Please sign in again.',
+        ),
+      );
     }
   }
 
@@ -437,6 +465,11 @@ document.addEventListener('DOMContentLoaded', () => {
       userNameEl.textContent = user.username || 'Admin';
     }
   }
+
+  document.addEventListener('poolai:langchange', () => {
+    if (typeof PoolAiI18n !== 'undefined') PoolAiI18n.apply(document.body);
+    if (typeof PoolAiI18n !== 'undefined') PoolAiI18n.initAdminShell();
+  });
 });
 
 // Add CSS animations

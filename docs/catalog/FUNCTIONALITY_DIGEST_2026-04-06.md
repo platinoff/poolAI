@@ -70,7 +70,7 @@
 - **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
 - **WebSocket** — наприклад `/ws/metrics` (JWT/безпека залежно від конфігурації).
-- **UI/Admin UX roadmap** — пріоритетний план апгрейду `/ui` + `/ui/admin/*` (єдина IA/компоненти/стани, user-friendly flows, i18n UA/EN) і Telegram login без ламання поточних API-контрактів; джерело пріоритетів — `FUNCTION_MANAGEMENT.md` (FM-012).
+- **UI/Admin UX roadmap** — пріоритетний план апгрейду `/ui` + `/ui/admin/*` (єдина IA/компоненти/стани, user-friendly flows, i18n UA/EN) і Telegram login без ламання поточних API-контрактів; джерело пріоритетів — `FUNCTION_MANAGEMENT.md` (FM-012). **Інкремент 2026-04-12:** `src/ui/i18n_core.js` — перемикач EN/UA (`localStorage` `poolai_ui_lang`), сторінка `/ui/auth` і сайдбар admin (`admin/mod.rs` + `admin_common.js` підказки помилок).
 - **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) описує **частину** публічних шляхів; повний перелік — з коду роутерів і `src/network/mod.rs`.
 
 ---

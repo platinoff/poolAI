@@ -285,7 +285,7 @@ impl SecurityManager {
             "&redirect_uri={}",
             urlencoding::encode(&provider.config.redirect_uri)
         ));
-        url.push_str(&format!("&response_type=code"));
+        url.push_str("&response_type=code");
         url.push_str(&format!("&state={}", urlencoding::encode(state)));
 
         if !provider.config.scopes.is_empty() {
