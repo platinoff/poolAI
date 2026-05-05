@@ -1,0 +1,28 @@
+---
+description: Cursor environment baseline and update checks
+globs: .cursor/**/*
+alwaysApply: false
+---
+
+# Cursor Environment Baseline
+
+- Keep Cursor workflows aligned with the installed local stack before making automation changes.
+- Baseline for this machine (verified 2026-05-05):
+  - `cursor`: 3.2.21
+  - `rustc`: 1.92.0
+  - `cargo`: 1.92.0
+  - `git`: 2.54.0.windows.1
+
+## Update-aware checks
+
+- When updating `.cursor/commands/`, `.cursor/hooks.json`, or `.cursor/rules/`, validate current CLI output first.
+- Re-check tool versions after OS/package updates using:
+  - `cursor --version`
+  - `rustc --version`
+  - `cargo --version`
+  - `git --version`
+
+## Cursor release alignment (latest known)
+
+- Account for Cursor 3.x agent-first workflows (Agents Window, tiled layout, improved diff-to-file navigation).
+- Prefer rules that are resilient to UI updates: focus on repository conventions, not fragile UI click paths.

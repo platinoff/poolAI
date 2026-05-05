@@ -10,6 +10,8 @@
 ./.cursor/hooks.json
 ./.cursor/README.md
 ./.cursor/rules/ai-assistant.md
+./.cursor/rules/ci-scripts-maintenance.mdc
+./.cursor/rules/cursor-environment-baseline.mdc
 ./.cursor/rules/documentation.md
 ./.cursor/rules/functionality-management.mdc
 ./.cursor/rules/git-workflow.md
@@ -17,6 +19,7 @@
 ./.cursor/rules/project-structure.md
 ./.cursor/rules/rust.md
 ./.cursor/rules/rust-architect.md
+./.cursor/rules/rust-toolchain-baseline.mdc
 ./.cursor/rules/scripts.md
 ./.cursor/skills/poolai-documentation/SKILL.md
 ./.gitattributes
@@ -204,6 +207,7 @@
 ./docs/development/DEVELOPMENT_UPDATE_2026-01-19.md
 ./docs/development/EASIEST_TASKS.md
 ./docs/development/ENTERPRISE_FEATURES_COMPLETE_2026-01-19.md
+./docs/development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md
 ./docs/development/FIXES_APPLIED_2026-01-19.md
 ./docs/development/FUTURE_DEVELOPMENT_ROADMAP.md
 ./docs/development/GIT_COMMITS_SUMMARY.md

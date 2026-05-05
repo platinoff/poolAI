@@ -1,0 +1,21 @@
+---
+description: CI and script maintenance after software updates
+globs: "{.github/workflows/**,scripts/**,bin/**}"
+alwaysApply: false
+---
+
+# CI and Scripts Maintenance
+
+- After toolchain or package updates, re-check CI scripts and local helper scripts for outdated flags or assumptions.
+- Keep commands shell-consistent for this repository; avoid adding one-off execution paths that diverge from documented workflow.
+
+## For changes in CI/workflows and scripts
+
+- Confirm commands still work with current local versions (`rustc`, `cargo`, `git`, `cursor`).
+- Prefer explicit, reproducible commands over implicit environment assumptions.
+- If a script or workflow behavior changes, add/update matching doc under `docs/development/` and link it from `docs/README.md` when broadly useful.
+
+## Cleanup policy
+
+- Remove dead scripts and obsolete workflow steps when they no longer provide value.
+- Keep `file_list.csv` in sync when adding/removing tracked files in these areas.

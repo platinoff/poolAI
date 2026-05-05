@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-04-12
+**Last updated:** 2026-05-05
 
 ## Canonical reading order
 
@@ -32,6 +32,7 @@
 - **Беклог і тікети** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (крок 12; **§5.1** — порядок наступних кроків за FM-*).
 - **Сталевий стан** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md).
 - **Status / plans** — `status/`, `development/` (індекс планів: [development/README.md](./development/README.md)).
+- **Середовище та Cursor-оновлення** — [development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md](./development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md).
 - **REST API** — [openapi.yaml](./openapi.yaml) (OpenAPI 3).
 - **UI / admin ↔ API** — [development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md](./development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - **Unified API errors (P3 / FM-005)** ✅ — `src/network/json_errors.rs` (**`HttpAppError`**, **`RestError`**), **`auth.rs`** (включно **`login`/`refresh`** ланцюжок), **`ws.rs`**, **`rate_limit.rs`**, **`enterprise_api/`**, **`check_permission`**. Див. **FM-005** у [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md); [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).

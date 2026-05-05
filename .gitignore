@@ -14,6 +14,9 @@ Cargo.std.toml
 
 # Cursor IDE files
 .cursor/
+!.cursor/
+!.cursor/rules/
+!.cursor/rules/*.mdc
 
 # Generated/static audit logs (do not commit/push)
 data/audit/*.log.gz

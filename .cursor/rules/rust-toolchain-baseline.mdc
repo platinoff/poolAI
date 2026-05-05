@@ -1,0 +1,24 @@
+---
+description: Rust toolchain baseline for project config updates
+globs: "{Cargo.toml,Cargo.lock,rust-toolchain.toml,.cargo/config.toml}"
+alwaysApply: false
+---
+
+# Rust Toolchain Baseline
+
+- For dependency, feature, or build config edits, preserve compatibility with installed baseline:
+  - `rustc 1.92.0`
+  - `cargo 1.92.0`
+  - target profile from `rust-toolchain.toml` and `.cargo/config.toml`
+
+## Required validation when changing project config
+
+- If `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`, or `.cargo/config.toml` is updated:
+  - verify `cargo check`
+  - verify `cargo clippy --all-features -- -D warnings` when practical
+  - document important toolchain impacts in `docs/development/`
+
+## Dependency hygiene
+
+- Prefer latest compatible crates unless project policy pins a version.
+- Remove unused dependencies/features after updates to keep CI stable and faster.
