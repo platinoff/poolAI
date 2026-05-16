@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-16 (FM-012 **Partial**: i18n у `i18n_core.js` + layout/shared JS у **`mod.rs`** (пошук, confirm/retry, форми, ролі) + write-flow **Workers/Libs/VM/RAID** + enterprise admin (**monitoring/config/security/instances/topology**, **tenants/VM/workers/libs/users/RAID**, dashboard/audit); **login/refresh** — **`bootstrap_default_admin`**; **Telegram** — частково HMAC/`auth_date`/allowlist; узгоджено з **`FUNCTION_MANAGEMENT`** / **HANDOFF**).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-16 (FM-012 ✅: i18n UA/EN + Telegram OAuth hardening; FM-007/008 wire; FM-002/011 — див. **`FUNCTION_MANAGEMENT`** / **HANDOFF**).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -57,7 +57,7 @@
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
-| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 Partial:** i18n **UA/EN** (`i18n_core.js`), `/ui/auth`, layout + shared JS у **`mod.rs`**, write-flow **Workers/Libs/VM/RAID**, enterprise **admin** (заголовки, dashboard, audit, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID** — `poolaiT` / `data-i18n`); банер + **`bootstrap_default_admin`** з **`login`/`refresh`**. Залишок FM-012: загострення Telegram/OAuth. Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
+| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget UA/EN). Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService` — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | Telegram-бот / інтеграція (поточний placeholder + roadmap на auth/login через Telegram у межах чинного JWT/RBAC, див. FM-012). |
 
@@ -70,7 +70,7 @@
 - **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
 - **WebSocket** — наприклад `/ws/metrics` (JWT/безпека залежно від конфігурації).
-- **UI/Admin UX roadmap** — пріоритетний план апгрейду `/ui` + `/ui/admin/*` (єдина IA/компоненти/стани, user-friendly flows, i18n UA/EN) і Telegram login без ламання поточних API-контрактів; джерело пріоритетів — `FUNCTION_MANAGEMENT.md` (FM-012). **Інкремент 2026-04-12–13:** `i18n_core.js` + `/ui/auth`, admin shell; повнотекстовий i18n для **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID** (`admin/mod.rs`, `admin_common.js`); банер **`bootstrap_default_admin`**; enterprise Telegram callback — часткова перевірка підпису та allowlist (див. FM-012 у **`FUNCTION_MANAGEMENT`**).
+- **UI/Admin UX** — FM-012 закрито (2026-05-16): i18n UA/EN + Telegram OAuth; LAN perf — FM-003 ops ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)).
 - **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) описує **частину** публічних шляхів; повний перелік — з коду роутерів і `src/network/mod.rs`.
 
 ---

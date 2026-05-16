@@ -8,8 +8,10 @@ use crate::services::enterprise_service::{
     EnterpriseOAuthStartError, EnterpriseSecurityError, EnterpriseService,
 };
 use axum::extract::{Query, State};
-use axum::http::StatusCode;
+use axum::http::header::ACCEPT_LANGUAGE;
+use axum::http::{HeaderMap, StatusCode};
 use axum::response::{Html, IntoResponse, Redirect};
+use serde::Deserialize;
 use std::collections::HashMap;
 
 use super::{enterprise_err, enterprise_json_err};
@@ -29,6 +31,46 @@ fn escape_html_attr(s: &str) -> String {
 async fn audit_telegram_event(ctx: &ApiContext, event: AuditEvent) {
     let _ = ctx.audit_logger.initialize().await;
     let _ = ctx.audit_logger.log_event(event).await;
+}
+
+#[derive(Debug, Default, Deserialize)]
+pub(super) struct TelegramAuthPageQuery {
+    #[serde(default)]
+    lang: Option<String>,
+}
+
+fn resolve_telegram_page_lang(headers: &HeaderMap, query_lang: Option<&str>) -> &'static str {
+    if let Some(raw) = query_lang {
+        let l = raw.trim().to_lowercase();
+        if l == "uk" || l == "ua" || l.starts_with("uk-") {
+            return "uk";
+        }
+        if l == "en" || l.starts_with("en-") {
+            return "en";
+        }
+    }
+    if let Some(v) = headers.get(ACCEPT_LANGUAGE).and_then(|h| h.to_str().ok()) {
+        let lower = v.to_lowercase();
+        if lower.contains("uk") || lower.contains("ua") {
+            return "uk";
+        }
+    }
+    "en"
+}
+
+fn telegram_auth_page_copy(lang: &str) -> (&'static str, &'static str, &'static str) {
+    match lang {
+        "uk" => (
+            "Вхід через Telegram",
+            "Увійдіть через Telegram",
+            "Після входу цю сторінку можна закрити.",
+        ),
+        _ => (
+            "Telegram sign-in",
+            "Sign in with Telegram",
+            "You can close this page after signing in.",
+        ),
+    }
 }
 pub(super) async fn oauth2_github_auth_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     let state = uuid::Uuid::new_v4().to_string();
@@ -419,27 +461,32 @@ pub(super) async fn oauth2_google_callback_handler(
 
 pub(super) async fn oauth2_telegram_auth_handler(
     State(ctx): State<ApiContext>,
+    headers: HeaderMap,
+    Query(page): Query<TelegramAuthPageQuery>,
 ) -> impl IntoResponse {
     match EnterpriseService::get_telegram_oauth_widget_info(&ctx).await {
         Ok(info) => {
             let login = escape_html_attr(info.client_id.trim());
             let auth_url = escape_html_attr(info.redirect_uri.trim());
+            let lang = resolve_telegram_page_lang(&headers, page.lang.as_deref());
+            let (title, lead, footer) = telegram_auth_page_copy(lang);
+            let html_lang = if lang == "uk" { "uk" } else { "en" };
             Html(format!(
                 r#"<!DOCTYPE html>
-<html lang="en">
+<html lang="{html_lang}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Telegram sign-in</title>
+  <title>{title}</title>
 </head>
 <body style="font-family:system-ui,sans-serif;text-align:center;padding:2rem;background:#0f1216;color:#e8e8e8;">
-  <p style="color:#a8b0bf;">Sign in with Telegram</p>
+  <p style="color:#a8b0bf;">{lead}</p>
   <script async src="https://telegram.org/js/telegram-widget.js?22"
     data-telegram-login="{login}"
     data-size="large"
     data-auth-url="{auth_url}"
     data-request-access="write"></script>
-  <p style="margin-top:1.5rem;font-size:0.9em;color:#a8b0bf;">You can close this page after signing in.</p>
+  <p style="margin-top:1.5rem;font-size:0.9em;color:#a8b0bf;">{footer}</p>
 </body>
 </html>"#
             ))

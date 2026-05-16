@@ -1217,4 +1217,72 @@ mod tests {
         assert_eq!(id, 424242);
         assert_eq!(name, "tg_424242");
     }
+
+    fn telegram_widget_query_for_id(token: &str, id: u64) -> HashMap<String, String> {
+        let mut q = HashMap::new();
+        q.insert(
+            "auth_date".into(),
+            chrono::Utc::now().timestamp().to_string(),
+        );
+        q.insert("id".into(), id.to_string());
+        let dcs = build_telegram_data_check_string(&q).unwrap();
+        let digest = telegram_login_hmac_digest(token, &dcs).unwrap();
+        q.insert("hash".into(), hex::encode(digest));
+        q
+    }
+
+    #[test]
+    fn telegram_widget_rejects_expired_auth_date() {
+        let token = "1234567:AAbb_ccDDeeFF_gghh";
+        let mut q = HashMap::new();
+        q.insert("auth_date".into(), "1".into());
+        q.insert("id".into(), "424242".into());
+        let dcs = build_telegram_data_check_string(&q).unwrap();
+        let digest = telegram_login_hmac_digest(token, &dcs).unwrap();
+        q.insert("hash".into(), hex::encode(digest));
+        let err = verify_telegram_widget_query(token, &q).unwrap_err();
+        assert!(matches!(err, AppError::ValidationError(_)));
+    }
+
+    #[tokio::test]
+    async fn telegram_oauth_callback_honors_allowlist() {
+        let manager = SecurityManager::new();
+        manager.initialize().await.unwrap();
+        let token = "7654321:ZZyy_xxWWvvUU_ttSS";
+        let config = OAuth2Config {
+            client_id: "poolai_bot".to_string(),
+            client_secret: token.to_string(),
+            authorization_url: "https://oauth.example.com/authorize".to_string(),
+            token_url: "https://oauth.example.com/token".to_string(),
+            redirect_uri: "https://poolai.example.com/callback".to_string(),
+            scopes: vec![],
+            telegram_allow_user_ids: vec!["99".to_string()],
+        };
+        manager
+            .register_oauth2_provider("telegram".to_string(), config)
+            .await
+            .unwrap();
+
+        let allowed = telegram_widget_query_for_id(token, 99);
+        let (id, _) = manager
+            .verify_telegram_oauth_callback(&allowed)
+            .await
+            .unwrap();
+        assert_eq!(id, 99);
+
+        let denied = telegram_widget_query_for_id(token, 424242);
+        let err = manager
+            .verify_telegram_oauth_callback(&denied)
+            .await
+            .unwrap_err();
+        assert!(matches!(err, AppError::Forbidden(_)));
+    }
+
+    #[test]
+    fn telegram_viewer_role_lacks_admin_permission() {
+        use crate::core::user_manager::UserRole;
+        let perms = UserRole::Viewer.get_permissions();
+        assert!(!perms.iter().any(|p| p == "admin:all"));
+        assert!(!perms.iter().any(|p| p == "write:all"));
+    }
 }

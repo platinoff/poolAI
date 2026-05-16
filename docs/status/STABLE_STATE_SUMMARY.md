@@ -16,7 +16,10 @@
 - ✅ CI/CD: Required test step з `--features ml,enterprise,cloud,test-utils` та `K8S_OPENAPI_ENABLED_VERSION=1.28`; інтеграційні тести проходять (перевіряти локально з `-j 1` на Windows при тиску лінкера).
 - ✅ **Clippy (як у CI, `-D warnings`):** `cargo clippy --all-targets` для `--no-default-features`, `--features jwt,https` та `--features cloud,cloud-sdk` (остання матриця — з `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **без попереджень на `main` (2026-04-10)**; інтеграційні тести під ті самі правила вирівняні з `ci.yml`.
 - ✅ **Windows MSVC / FM-011:** у `Cargo.toml` профіль **`[profile.test] debug = 1`** зменшує PDB для великої кількості тестових exe (обхід **LNK1318**). Канонічний прогін як у CI: **`cargo test-ci`** у **`.cargo/config.toml`** (`--lib` + `--tests`, без doctests). Повна збірка тестових бінарників: `cargo test -j 1 --all-features --no-run` (за потреби `CARGO_INCREMENTAL=0`) — **перевірено локально** (2026-04-07).
-- ◆ **FM-012 (Partial, 2026-05-16):** i18n **UA/EN** — `i18n_core.js`, **`/ui/auth`**, layout + shared JS у **`mod.rs`** (пошук, confirm/retry, форми, ролі, workers/libs/vm/raid write-flow), enterprise admin (**dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID**); нагадування про дефолтний `admin` (**банер** + **`bootstrap_default_admin`** у **`login`/`refresh`**); **Telegram (enterprise)** — частково: HMAC/`auth_date`/allowlist/audit; **залишок** — подальше загострення Telegram/OAuth (див. **`FUNCTION_MANAGEMENT`** FM-012).
+- ✅ **FM-012 (2026-05-16):** i18n UA/EN + Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget UA/EN, Viewer RBAC).
+- ✅ **FM-007 / FM-008 (2026-05-16):** distributed RAID wire — 15 тестів `distributed_raid_wire_integration`.
+- ✅ **FM-002 / FM-011 (2026-05-16):** service layer audit (`api/` без `get_global_*`); **`cargo test-ci`**.
+- ◆ **FM-003 (Planned ops):** LAN-заміри — [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md); baseline `poolai_health_load` — **2026-04-10** у `BENCHMARKS.md`.
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус
@@ -94,7 +97,7 @@ CL (Conventional Commits): `feat(scope): subject`. Див. `.cursor/rules/git-wo
 
 **Єдиний порядок пріоритетів (FM-* + чекбокси Architect):** [`docs/catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** → деталі в [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md). Операційний зріз сесії: [`HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md). **Автономний прогін до 100% продукту:** [`AUTO_RUN_SESSION_2026-05-16.md`](../development/AUTO_RUN_SESSION_2026-05-16.md).
 
-**Коротко:** baseline/P4 (`poolai_health_load --json`, Criterion) + **LAN/P2b (відкритий чекбокс)**; HTTP **FM-005** ✅; distributed RAID wire (FM-007/008) + LAN-заміри за потреби; **FM-011** (`test-ci`); **FM-012 Partial** (i18n `/ui/*` + admin — див. HANDOFF; залишок Telegram/OAuth); deferred — cloud-sdk, SIMD, Grid/Solana концепти.
+**Коротко:** автопрогін 2026-05-16 закрив FM-002/007/008/011/012 у обсязі продукту; **FM-003 LAN** — ops runbook; deferred — FM-004/006; concept — FM-009/010.
 
 **Архівний план (історично):** `docs/development/NEXT_STEPS_2026-01-19.md`.
 

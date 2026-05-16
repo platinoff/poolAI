@@ -151,6 +151,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-05-16 | FM-003 ops: [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) (два вузли LAN, replication + TQ01); baseline `poolai_health_load` — рядок **2026-04-10** лишається чинним до нового прогону на стенді. |
 | 2026-04-12 | FM-007 / P2b harness **`distributed_raid_wire_integration`**: додано wire-тести **`SyncArtifacts`** — **Pull** (`missing_artifacts`), **Bidirectional** (симетрична різниця, відсортована), відсутність conflict при однаковому `stored_at` у `remote_versions`; юніт-тест **`no_conflict_when_local_and_remote_timestamps_equal`** у `raid_distributed_protocol_service`. |
 | 2026-04-12 | FM-003 / P4: short Criterion (`--sample-size 20`, `--warm-up-time 0.3`, `--measurement-time 0.5`) на **win10-local-26200** — `runtime_benchmarks`, `service_layer_benchmarks` (`--features test-utils`), `turboquant_benchmarks` (`--features ml`); рядки **`win10-local-26200-*-bench-opt0-2026-04-12`** у таблиці baseline. |
 | 2026-04-10 | FM-003 / P4: `cargo bench -j 1 --bench runtime_benchmarks -- --noplot` на **win10-local-26200**; додано baseline-рядки `win10-local-26200-runtime-bench-opt0-2026-04-10` + `poolai_health_load --json` рядок у таблицю. |

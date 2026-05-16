@@ -778,7 +778,7 @@ content_security_policy = "default-src 'self'"
 - **Body shape**: `{ "error": { "code", "message" }, "context"?: … }` — implemented in `src/network/json_errors.rs` (`api_error_response`, `HttpAppError`, `IntoResponse` for `AppError`).
 - **Stable machine-readable `error.code`**: `AppError::RestError { code, message }` with HTTP status via `HttpAppError::with_status` where not the default mapping (see **FM-005** in `docs/catalog/FUNCTION_MANAGEMENT.md`).
 - **Coverage**: `src/network/api/*.rs`, RAID modules (**`raid_api_err`**), **`enterprise_api/`**, UI/users/ML pipeline, **`login`/`refresh`**, **`check_permission`**, auth middleware — **FM-005 закрито (2026-04-10)**.
-- **FM-012 (Partial, 2026-05)**: i18n UA/EN — `i18n_core.js`, `/ui/auth`, layout + shared JS у `mod.rs`, enterprise admin; залишок — загострення Telegram/OAuth за політикою (див. **FM-012** у `FUNCTION_MANAGEMENT.md`).
+- **FM-012 ✅ (2026-05-16)**: i18n UA/EN + Telegram OAuth (HMAC, `auth_date`, allowlist, audit, Viewer RBAC) — див. **FM-012** у `FUNCTION_MANAGEMENT.md`.
 - **Implementation detail**: `docs/ARCHITECTURE_BEST_PRACTICES.md` — *Structured Error Model*; documentation steps 11–12 in root `README.md`.
 
 ## 🚀 Deployment

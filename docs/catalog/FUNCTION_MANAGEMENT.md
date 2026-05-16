@@ -1,10 +1,10 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-16.
+**Оновлено:** 2026-05-16 (автопрогін S1–S6).
 
-**Звірка з комітами (лют–трав 2026):** реалізація узгоджена з концептом для P1–P3, P2b (TurboQuant in-tree), FM-005 ✅, FM-007/008 wire, FM-011, FM-012 Partial; **відкрито** лише LAN-заміри (FM-003/P2b чекбокс), Telegram/OAuth hardening (FM-012), concept-only FM-009/010. CHANGELOG `[Unreleased]` доповнено; concept root виправлено (FM-005 «залишок» прибрано).
+**Звірка з комітами (лют–трав 2026):** P1–P3, P2b, FM-005 ✅, FM-007/008 ✅, FM-011 ✅, FM-012 ✅, FM-002 ✅; **Planned (ops)** — FM-003 LAN-заміри ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)); concept-only FM-009/010; Deferred FM-004/006.
 
-**Останній зріз:** FM-012 **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout + shared JS у `mod.rs`, write-flow, enterprise admin повний перелік); **залишок FM-012:** загострення Telegram/OAuth. **Автопрогін:** [`AUTO_RUN_SESSION_2026-05-16.md`](../development/AUTO_RUN_SESSION_2026-05-16.md). FM-011 — alias **`cargo test-ci`**. FM-003 / P4 — baseline **2026-04-12** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md). FM-007 — wire-тести **`SyncArtifacts`**. FM-005 ✅ — **`HttpAppError`/`RestError`**.
+**Останній зріз:** FM-012 **Implemented** — Telegram OAuth: HMAC/`auth_date`/allowlist/audit; UA/EN widget HTML (`Accept-Language` / `?lang=`); RBAC Viewer для нових Telegram-юзерів; тести в `enterprise/security.rs`. FM-007/008 **Implemented** — 15 wire-тестів `distributed_raid_wire_integration`. FM-002 **Implemented** — `get_global_*` у `src/network/api/` = 0; виняток задокументовано в `discovery.rs`. FM-011 **Implemented** — `cargo test-ci` (2026-05-16). FM-003 — baseline **2026-04-10** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md); LAN — runbook.
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -94,34 +94,29 @@ FM-xxx (з таблиці нижче)
 | ID | Область | Короткий опис | Стан за каноном | Джерело |
 |----|---------|---------------|-----------------|---------|
 | FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
-| FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Partial / Planned | NEXT_STEPS P2 |
-| FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned | NEXT_STEPS P2b, `BENCHMARKS.md` |
+| FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Implemented | `src/network/api/*` без `get_global_*`; `discovery.rs` — optional `instance_manager` з `AppState` (коментар); `services/*` — лише закоментовані Raft placeholders |
+| FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned (ops) | NEXT_STEPS P2b, `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
-| FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); за наявності `remote_versions` (`artifact_id` -> timestamp) формується `conflicts` | Partial | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog`, `build_sync_conflicts`; wire-тести **`tests/distributed_raid_wire_integration.rs`** (`wire_sync_artifacts_*`) |
-| FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; якщо немає peer-вузлів і є артефакти — `replication_complete=false`; помилки membership / невалідний `node_id` | Partial | Якщо `list_nodes` непорожній — `node_id` має бути членом кластера (інакше `InvalidRequest` до replication); wire-тести leave у **`tests/distributed_raid_wire_integration.rs`** |
+| FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); за наявності `remote_versions` (`artifact_id` -> timestamp) формується `conflicts` | Implemented | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog`, `build_sync_conflicts`; wire-тести **`tests/distributed_raid_wire_integration.rs`** (15 tests, 2026-05-16) |
+| FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; якщо немає peer-вузлів і є артефакти — `replication_complete=false`; помилки membership / невалідний `node_id` | Implemented | Membership + graceful/non-graceful leave; wire-тести у **`tests/distributed_raid_wire_integration.rs`** |
 | FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
-| FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); alias **`cargo test-ci`** у **`.cargo/config.toml`** = CI-прогін (`--lib` + `--tests`, без doctests) + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; `cargo test -j1 --all-features --no-run` / `--lib --tests` — перевірено (2026-04-10); повний `cargo test --all-features` з doc-тестами на Windows може дати paging file (**os error 1455**) | Partial | `Cargo.toml`, `.cargo/config.toml`, HANDOFF, NEXT_STEPS |
-| FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout + shared JS у **`mod.rs`** (пошук, confirm, retry/error boundary, форми, ролі, workers/libs/vm/raid write-flow), **admin** — `admin_layout`, **dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID**; **перший вхід** — банер для дефолтного `admin`, **`bootstrap_default_admin`** у **`login`/`refresh`** (`src/network/auth.rs`); **Telegram (enterprise)** — частково: HMAC перевірка query віджета, `auth_date`, allowlist **`telegram_allow_user_ids`**, audit; **далі** — подальше загострення Telegram/OAuth за політикою | Partial | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/`, `src/ui/admin_common.js`, `src/core/user_manager.rs`, `src/network/auth.rs`, `src/network/enterprise_api/oauth.rs`, `src/enterprise/security.rs` |
+| FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); alias **`cargo test-ci`** у **`.cargo/config.toml`** = CI-прогін (`--lib` + `--tests`, без doctests) + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; clippy матриці як у `ci.yml` — на `main` (2026-04-10); локально **`cargo test-ci`** — 2026-05-16; повний `cargo test` з doctests на Windows може дати **os error 1455** | Implemented | `Cargo.toml`, `.cargo/config.toml`, HANDOFF, NEXT_STEPS |
+| FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: i18n **UA/EN**; **Telegram OAuth** — HMAC/`auth_date`/allowlist/audit; widget HTML UA/EN; нові Telegram-юзери → **Viewer** (без `admin:all`); тести allowlist/expiry/RBAC | Implemented | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/`, `src/network/enterprise_api/oauth.rs`, `src/enterprise/security.rs` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Якість збірки (не змінює порядок FM):** репозиторій проходить **`cargo clippy --all-targets … -- -D warnings`** для тих самих feature-матриць, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (`--no-default-features`, `jwt,https`, `cloud,cloud-sdk` + `K8S_OPENAPI_ENABLED_VERSION`); для змін під **`enterprise`** корисно додатково **`cargo clippy -p poolai --features enterprise -- -D warnings`**. Орієнтир узгодження з CI — **2026-05-16** (`cargo test-ci` після FM-012 push). Далі за пріоритетом лишаються продуктові пункти нижче, не «полювання на clippy».
+**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-16 (автопрогін). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
 
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри реплікації + TQ01 на стенді (P2b/P4); опційно **cloud-sdk** (Azure/GCP). Усе інше в таблиці FM-* нижче — дорожня карта без обов’язкового чекбокса.
-
-**FM-005** (узгоджений JSON **`HttpAppError`/`RestError`**) — **закрито** станом на **2026-04-10**.
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 ops — [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)); опційно **cloud-sdk** (FM-006). FM-005/007/008/011/012/002 — закрито в обсязі автопрогону.
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Baseline і мережа | **FM-003**, P4, P2b чекбокс | Референс-хост: Criterion + **`poolai_health_load --json`** → рядки [`BENCHMARKS.md`](../performance/BENCHMARKS.md); на LAN-стенді — повні заміри реплікації та порівняння розміру до/після TQ01. |
-| 2 | Distributed RAID | **FM-007**, **FM-008** | Код: каталог sync + leave з replication/membership; далі — LAN, conflicts у протоколі, поглиблена реплікація. |
-| 3 | Ops | **FM-011** | Тримати збірку `--all-features` стабільною (профіль тестів, `-j 1`, incremental, GNU за потреби); на Windows фіксувати сигнал як `--lib --tests` (doctest може падати через paging file, `os error 1455`). |
-| 4 | Product UX | **FM-012** | **Зроблено (Partial):** як вище + **admin** `admin_layout`, **dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID** (ключі `admin.*` / `workers.*` / `vm.*` тощо, динамічний текст через `poolaiT`); shared shell у **`mod.rs`** (глобальний пошук, confirm/retry, валідація форм, ролі); банер першого входу для сідженого `admin` + **`bootstrap_default_admin`** у **`login`/`refresh`**; Telegram widget callback — перевірка підпису, `auth_date`, allowlist, audit. **Далі:** подальше загострення Telegram/OAuth за політикою. |
-| 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
-| 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
+| 1 | LAN / perf (ops) | **FM-003** | [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md); оновити `BENCHMARKS.md` після стенду. |
+| 2 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
+| 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 
 ### 5.2 Автономний прогін (сесія → git push)
 
@@ -129,12 +124,12 @@ FM-xxx (з таблиці нижче)
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|
-| S1 | FM-012 | Telegram/OAuth hardening → **Implemented** |
-| S2 | FM-007, FM-008 | wire-тести зелені → **Implemented** |
-| S3 | FM-002 | аудит `get_global_*` / сервіси → **Implemented** або задокументований виняток |
-| S4 | FM-003 | baseline рядок + LAN runbook якщо немає стенду |
-| S5 | FM-011 | `test-ci` + clippy матриці → **Implemented** |
-| S6 | docs | STABLE_STATE, CHANGELOG, DIGEST, §5.1 оновлені |
+| S1 | FM-012 | ✅ Telegram/OAuth → **Implemented** (2026-05-16) |
+| S2 | FM-007, FM-008 | ✅ 15 wire-тестів → **Implemented** |
+| S3 | FM-002 | ✅ `api/` без `get_global_*` → **Implemented** |
+| S4 | FM-003 | ✅ baseline 2026-04-10 + [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) — **Planned (ops)** |
+| S5 | FM-011 | ✅ `cargo test-ci` 2026-05-16 → **Implemented** |
+| S6 | docs | ✅ STABLE_STATE, CHANGELOG, DIGEST, §5.1 |
 
 **Поза автопрогоном:** FM-004, FM-006, FM-009, FM-010.
 

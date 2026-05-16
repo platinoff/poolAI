@@ -3656,6 +3656,7 @@ async fn login_page() -> Html<String> {
             icon = '🔴';
           } else if (providerName === 'telegram') {
             icon = '✈️';
+            label = poolaiT('auth.providerTelegram', 'Telegram');
           }
           
           const signInAria = escapeHtml(
