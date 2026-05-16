@@ -2,6 +2,8 @@
 
 **Оновлено:** 2026-05-16 (кроки документації 1–12 узгоджено з кореневим [`README.md`](../../README.md)).
 
+**Автономний прогін наступної сесії:** [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) — спринти S0–S6, критерії «100% продукту», copy-paste промпт для агента, git push з Summary.
+
 **Зріз робіт:** **FM-012 Partial** — i18n UA/EN (`i18n_core.js`, `/ui/auth`, **shared shell** у `mod.rs`: пошук, confirm, retry/error boundary, форми, ролі, workers/libs/vm/raid write-flow) + **admin** сторінки **dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID** (`src/ui/admin/*.rs`, `admin_common.js`); **перший вхід** — банер для сідженого `admin`, поле **`bootstrap_default_admin`** у **`POST /api/v1/login`** / **`POST /api/v1/refresh`** (`src/network/auth.rs`, `user_manager.rs`); **Telegram OAuth (enterprise)** — частково: HMAC query віджета, `auth_date`, allowlist **`telegram_allow_user_ids`**, audit (`oauth.rs`, `enterprise/security.rs`). **FM-011** — **`cargo test-ci`**. **FM-003** / P4 — baseline у [`BENCHMARKS.md`](../performance/BENCHMARKS.md) (**2026-04-12**). **FM-007** — wire **`SyncArtifacts`**. **FM-005** ✅ — **`HttpAppError`/`RestError`**. Наступний порядок: **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md); Architect — [`NEXT_STEPS_ARCHITECT`](./NEXT_STEPS_ARCHITECT_2026-03-17.md); сталевий стан — [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md).
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
@@ -58,3 +60,11 @@
 **FM-005** ✅ (узгоджений JSON) — закрито; див. таблицю **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 Деталі, чекбокси Architect і верифікації — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md). Індекс тікетів — таблиця **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+
+## 5. Автономний режим (наступна сесія → git push)
+
+1. Відкрити [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) і вставити **стартовий промпт** з §2 у чат агента.
+2. Агент виконує **S1→S6** без пауз; після кожного спринту з кодом — `cargo fmt` + `cargo test-ci`.
+3. **Ціль:** закрити FM-012, FM-007/008, FM-002 (аудит), FM-003 (baseline/runbook), FM-011 (clippy parity); оновити STABLE_STATE / FUNCTION_MANAGEMENT / CHANGELOG.
+4. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
+5. **Push:** MSYS2 bash, [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md), commit із **Summary** (шаблон у AUTO_RUN §5).

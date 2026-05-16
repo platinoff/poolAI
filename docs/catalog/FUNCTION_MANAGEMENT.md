@@ -2,7 +2,9 @@
 
 **Оновлено:** 2026-05-16.
 
-**Останній зріз:** FM-012 **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout `/ui/*` + shared JS у `mod.rs` (пошук, confirm, retry, форми, workers/libs/vm/raid), write-flow, **enterprise admin**: `admin_layout` (заголовок + `<title>`, `poolai:langchange`), **dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, а також **tenants**, **VM**, **workers**, **libs**, **users**, **RAID** (`poolaiT` / `data-i18n` у тілах сторінок). **Залишок FM-012:** решта `/ui/*` (поза enterprise admin), IA/стани за потреби; Telegram OAuth hardening. FM-011 — alias **`cargo test-ci`**. FM-003 / P4 — baseline **2026-04-12** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md). FM-007 — wire-тести **`SyncArtifacts`**. FM-005 ✅ — **`HttpAppError`/`RestError`**.
+**Звірка з комітами (лют–трав 2026):** реалізація узгоджена з концептом для P1–P3, P2b (TurboQuant in-tree), FM-005 ✅, FM-007/008 wire, FM-011, FM-012 Partial; **відкрито** лише LAN-заміри (FM-003/P2b чекбокс), Telegram/OAuth hardening (FM-012), concept-only FM-009/010. CHANGELOG `[Unreleased]` доповнено; concept root виправлено (FM-005 «залишок» прибрано).
+
+**Останній зріз:** FM-012 **Partial** — i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, layout + shared JS у `mod.rs`, write-flow, enterprise admin повний перелік); **залишок FM-012:** загострення Telegram/OAuth. **Автопрогін:** [`AUTO_RUN_SESSION_2026-05-16.md`](../development/AUTO_RUN_SESSION_2026-05-16.md). FM-011 — alias **`cargo test-ci`**. FM-003 / P4 — baseline **2026-04-12** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md). FM-007 — wire-тести **`SyncArtifacts`**. FM-005 ✅ — **`HttpAppError`/`RestError`**.
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -106,7 +108,7 @@ FM-xxx (з таблиці нижче)
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Якість збірки (не змінює порядок FM):** репозиторій проходить **`cargo clippy --all-targets … -- -D warnings`** для тих самих feature-матриць, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (`--no-default-features`, `jwt,https`, `cloud,cloud-sdk` + `K8S_OPENAPI_ENABLED_VERSION`); для змін під **`enterprise`** корисно додатково **`cargo clippy -p poolai --features enterprise -- -D warnings`**. Орієнтир узгодження з CI — **2026-04-13** (доки / FM-012 зріз). Далі за пріоритетом лишаються продуктові пункти нижче, не «полювання на clippy».
+**Якість збірки (не змінює порядок FM):** репозиторій проходить **`cargo clippy --all-targets … -- -D warnings`** для тих самих feature-матриць, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (`--no-default-features`, `jwt,https`, `cloud,cloud-sdk` + `K8S_OPENAPI_ENABLED_VERSION`); для змін під **`enterprise`** корисно додатково **`cargo clippy -p poolai --features enterprise -- -D warnings`**. Орієнтир узгодження з CI — **2026-05-16** (`cargo test-ci` після FM-012 push). Далі за пріоритетом лишаються продуктові пункти нижче, не «полювання на clippy».
 
 **Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри реплікації + TQ01 на стенді (P2b/P4); опційно **cloud-sdk** (Azure/GCP). Усе інше в таблиці FM-* нижче — дорожня карта без обов’язкового чекбокса.
 
@@ -120,6 +122,21 @@ FM-xxx (з таблиці нижче)
 | 4 | Product UX | **FM-012** | **Зроблено (Partial):** як вище + **admin** `admin_layout`, **dashboard**, **audit**, **monitoring**, **config**, **security**, **instances**, **topology**, **tenants**, **VM**, **workers**, **libs**, **users**, **RAID** (ключі `admin.*` / `workers.*` / `vm.*` тощо, динамічний текст через `poolaiT`); shared shell у **`mod.rs`** (глобальний пошук, confirm/retry, валідація форм, ролі); банер першого входу для сідженого `admin` + **`bootstrap_default_admin`** у **`login`/`refresh`**; Telegram widget callback — перевірка підпису, `auth_date`, allowlist, audit. **Далі:** подальше загострення Telegram/OAuth за політикою. |
 | 5 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
 | 6 | Концепт → код (поза спринтом) | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
+
+### 5.2 Автономний прогін (сесія → git push)
+
+**Документ:** [`AUTO_RUN_SESSION_2026-05-16.md`](../development/AUTO_RUN_SESSION_2026-05-16.md).
+
+| Спринт | FM | Результат для «100% продукту» |
+|--------|-----|-------------------------------|
+| S1 | FM-012 | Telegram/OAuth hardening → **Implemented** |
+| S2 | FM-007, FM-008 | wire-тести зелені → **Implemented** |
+| S3 | FM-002 | аудит `get_global_*` / сервіси → **Implemented** або задокументований виняток |
+| S4 | FM-003 | baseline рядок + LAN runbook якщо немає стенду |
+| S5 | FM-011 | `test-ci` + clippy матриці → **Implemented** |
+| S6 | docs | STABLE_STATE, CHANGELOG, DIGEST, §5.1 оновлені |
+
+**Поза автопрогоном:** FM-004, FM-006, FM-009, FM-010.
 
 **Канонічний порядок читання доків** (кроки 1–12) — кореневий [`README.md`](../../README.md); цей файл — **крок 12**.
 

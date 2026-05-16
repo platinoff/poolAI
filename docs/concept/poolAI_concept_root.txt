@@ -11,7 +11,7 @@
 
 #### Stage 2 - COMPLETED ✅
 - ✅ **Network Module** - REST API and WebSocket with HTTPS/TLS
-- ✅ **REST error envelope (FM-005, 2026-04-10)** — JSON `{ "error": { "code", "message" }, "context"?: … }` у `src/network/json_errors.rs`: `AppError`, `HttpAppError`, стабільні клієнтські коди через `AppError::RestError`; основний `api/*.rs` + **`raid`/`raid_http`/`raid_admin`** (**`raid_api_err`**). Залишок міграції: `enterprise_api/` (`enterprise_err`), окремо `login`/`refresh` та RBAC `check_permission`. Канон: `docs/catalog/FUNCTION_MANAGEMENT.md` (FM-005), `docs/ARCHITECTURE_BEST_PRACTICES.md`.
+- ✅ **REST error envelope (FM-005, 2026-04-10)** — JSON `{ "error": { "code", "message" }, "context"?: … }` у `src/network/json_errors.rs`: `AppError`, `HttpAppError`, стабільні клієнтські коди через `AppError::RestError`; покриття: основний `api/*.rs`, **`raid`/`raid_http`/`raid_admin`**, **`enterprise_api/`**, **`login`/`refresh`**, **`check_permission`**, auth middleware. Канон: `docs/catalog/FUNCTION_MANAGEMENT.md` (FM-005 ✅), `docs/ARCHITECTURE_BEST_PRACTICES.md`.
 - ✅ **Platform Module** - GPU management and optimization
 - ✅ **TGBot Module** - Telegram bot for management
 - ✅ **Security Module** - JWT authentication, rate limiting, RBAC
@@ -777,8 +777,8 @@ content_security_policy = "default-src 'self'"
 
 - **Body shape**: `{ "error": { "code", "message" }, "context"?: … }` — implemented in `src/network/json_errors.rs` (`api_error_response`, `HttpAppError`, `IntoResponse` for `AppError`).
 - **Stable machine-readable `error.code`**: `AppError::RestError { code, message }` with HTTP status via `HttpAppError::with_status` where not the default mapping (see **FM-005** in `docs/catalog/FUNCTION_MANAGEMENT.md`).
-- **Coverage**: most `src/network/api/*.rs`, RAID modules (**`raid_api_err`**), UI/users/ML pipeline handlers, etc.
-- **Remaining FM-005**: `src/network/enterprise_api/*` (`enterprise_err` / `api_json_error`); auth success/error paths for **`login`/`refresh`** and **`check_permission`** denials stay on their existing response types but same JSON shape for clients.
+- **Coverage**: `src/network/api/*.rs`, RAID modules (**`raid_api_err`**), **`enterprise_api/`**, UI/users/ML pipeline, **`login`/`refresh`**, **`check_permission`**, auth middleware — **FM-005 закрито (2026-04-10)**.
+- **FM-012 (Partial, 2026-05)**: i18n UA/EN — `i18n_core.js`, `/ui/auth`, layout + shared JS у `mod.rs`, enterprise admin; залишок — загострення Telegram/OAuth за політикою (див. **FM-012** у `FUNCTION_MANAGEMENT.md`).
 - **Implementation detail**: `docs/ARCHITECTURE_BEST_PRACTICES.md` — *Structured Error Model*; documentation steps 11–12 in root `README.md`.
 
 ## 🚀 Deployment

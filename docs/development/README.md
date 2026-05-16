@@ -11,6 +11,7 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
+- **[`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md)** — **автономний прогін** до git push (спринти S0–S6, критерії 100% продукту, стартовий промпт для агента).
 
 ### Головний план (Rust Architect, 2026-03-17+)
 - **[`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)** — **канонічний** покроковий план (таблиця P1–P7, TurboQuant, верифікації CI) + підрозділ **«Операційний порядок»** (дзеркало **§5.1** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md)). Старіші файли `NEXT_STEPS_ARCHITECT_2026-01-22.md` тощо — історичні; див. [`../archive/development/`](../archive/development/).

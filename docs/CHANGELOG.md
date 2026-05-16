@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-012 — UI i18n UA/EN (2026-04 → 2026-05)** — `i18n_core.js`, `/ui/auth`, layout `/ui/*`, write-flow Workers/Libs/VM/RAID, enterprise admin (`src/ui/admin/*`, `admin_common.js`); shared shell у `mod.rs` (глобальний пошук, confirm/retry, error boundary, валідація форм, ролі).
+- **FM-012 — перший вхід** — банер для сідженого `admin`, поле **`bootstrap_default_admin`** у **`POST /api/v1/login`** / **`POST /api/v1/refresh`**.
+- **Enterprise Telegram OAuth (partial)** — HMAC query віджета, `auth_date`, allowlist `telegram_allow_user_ids`, audit.
+- **Distributed RAID (FM-007 / FM-008, wire)** — sync каталогів, `conflicts` за remote versions, LeaveCluster з replication/membership; інтеграційні тести `distributed_raid_wire_integration`.
+- **FM-011** — alias **`cargo test-ci`** (`--lib` + `--tests`, без doctests); профіль **`[profile.test] debug = 1`**.
+- **P4 / perf** — рядки baseline у `BENCHMARKS.md` (Criterion, `poolai_health_load --json`).
+- **FM-005 ✅** — узгоджений JSON помилок (`HttpAppError` / `AppError::RestError`) по REST, RAID, enterprise API, auth/login/refresh, middleware.
+- **P2 service layer** — `SystemService`, `UiService`, `RaidDistributedProtocolService`, `ChatCompletionService`, `RewardsService`, `WorkerPoolService`, `TopologyService`, `DiscoveryService`, тощо; тонкі handlers у `network/api/*`.
 - **HPA (Horizontal Pod Autoscaler) init for Kubernetes** 🎉
   - `KubernetesManager::hpa_exists(name)`, `create_hpa(name, deployment, min, max, target_cpu%)`
   - `AutoScaler::ensure_hpa_for(deployment_name)` — create HPA from scaler min/max, CPU 70%
