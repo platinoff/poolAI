@@ -882,6 +882,14 @@ function getUser() {
   return user ? { username: user, role: role || 'Viewer' } : null;
 }
 
+function localizedRoleName(role) {
+  const t = typeof poolaiT === 'function' ? poolaiT : function (_k, d) { return d; };
+  if (role === 'Admin') return t('role.admin', 'Admin');
+  if (role === 'Operator') return t('role.operator', 'Operator');
+  if (role === 'Viewer') return t('role.viewer', 'Viewer');
+  return role || '';
+}
+
 function setUser(username, role) {
   localStorage.setItem('poolai_user', username);
   localStorage.setItem('poolai_role', role);
@@ -1007,7 +1015,7 @@ async function requireAuth(requiredRole = null) {
         typeof poolaiT === 'function'
           ? poolaiT('err.insufficientRole', 'Insufficient permissions. Required role: ')
           : 'Insufficient permissions. Required role: ';
-      alert(p + requiredRole);
+      alert(p + localizedRoleName(requiredRole));
       window.location.href = '/ui';
       return false;
     }
@@ -1057,7 +1065,7 @@ function showNotification(message, type = 'info', duration = 3000, actions = nul
   closeBtn.innerHTML = '&times;';
   closeBtn.style.cssText = 'background: none; border: none; color: inherit; font-size: 20px; cursor: pointer; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;';
   closeBtn.onclick = () => removeNotification(notificationId);
-  closeBtn.setAttribute('aria-label', 'Close notification');
+  closeBtn.setAttribute('aria-label', T('ui.closeNotificationAria', 'Close notification'));
   notificationContent.appendChild(closeBtn);
   
   notification.appendChild(notificationContent);
@@ -1232,9 +1240,12 @@ function createSkeletonLoader(type = 'table') {
   return `<div class="skeleton skeleton-text"></div>`;
 }
 
-function showSpinner(containerId, message = 'Loading...', size = 'medium') {
+function showSpinner(containerId, message, size = 'medium') {
   const container = document.getElementById(containerId);
   if (!container) return;
+  if (message === undefined) {
+    message = T('common.loading', 'Loading…');
+  }
   
   const sizeClass = size === 'small' ? 'spinner-small' : size === 'large' ? 'spinner-large' : '';
   container.innerHTML = `
@@ -1245,7 +1256,10 @@ function showSpinner(containerId, message = 'Loading...', size = 'medium') {
   `;
 }
 
-function showLoadingOverlay(message = 'Loading...') {
+function showLoadingOverlay(message) {
+  if (message === undefined) {
+    message = T('common.loading', 'Loading…');
+  }
   const overlay = document.createElement('div');
   overlay.id = 'loadingOverlay';
   overlay.className = 'loading-overlay';
@@ -1279,7 +1293,7 @@ function showErrorBoundary(containerId, error, retryFn = null, suggestions = nul
   if (suggestions && Array.isArray(suggestions) && suggestions.length > 0) {
     suggestionsHtml = `
       <div class="error-suggestions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border, #262b36);">
-        <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">Suggestions:</div>
+        <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">${escapeHtml(T('err.suggestions', 'Suggestions:'))}</div>
         <ul style="margin: 0; padding-left: 20px; color: var(--text-muted, #a8b0bf); font-size: 0.9em;">
           ${suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
         </ul>
@@ -1289,18 +1303,18 @@ function showErrorBoundary(containerId, error, retryFn = null, suggestions = nul
   
   container.innerHTML = `
     <div class="error-boundary" role="alert" aria-live="assertive" id="${errorId}">
-      <div class="error-boundary-title">⚠️ Error</div>
+      <div class="error-boundary-title">⚠️ ${escapeHtml(T('err.title', 'Error'))}</div>
       <div class="error-boundary-message">${escapeHtml(errorMessage)}</div>
       ${showDetails ? `
         <details style="margin-top: 12px;">
-          <summary style="cursor: pointer; color: var(--text-muted, #a8b0bf); font-size: 0.85em;">Show details</summary>
+          <summary style="cursor: pointer; color: var(--text-muted, #a8b0bf); font-size: 0.85em;">${escapeHtml(T('err.showDetails', 'Show details'))}</summary>
           <pre style="margin-top: 8px; padding: 8px; background: var(--bg, #0b0d10); border: 1px solid var(--border, #262b36); border-radius: 6px; font-size: 0.8em; overflow-x: auto; max-height: 200px; overflow-y: auto;">${escapeHtml(errorDetails)}</pre>
         </details>
       ` : ''}
       ${suggestionsHtml}
       ${retryFn ? `
         <div class="error-boundary-actions">
-          <button class="error-retry" type="button" onclick="(${retryFn.toString()})()" aria-label="Retry the operation that failed">Retry</button>
+          <button class="error-retry" type="button" onclick="(${retryFn.toString()})()" aria-label="${escapeHtml(T('ui.retryFailedOpAria', 'Retry the operation that failed'))}">${escapeHtml(T('ui.retry', 'Retry'))}</button>
         </div>
       ` : ''}
     </div>
@@ -1309,7 +1323,7 @@ function showErrorBoundary(containerId, error, retryFn = null, suggestions = nul
   // Announce error to screen readers
   const ariaLiveRegion = document.getElementById('aria_live_region');
   if (ariaLiveRegion) {
-    ariaLiveRegion.textContent = 'Error: ' + errorMessage;
+    ariaLiveRegion.textContent = T('err.errorPrefix', 'Error: ') + errorMessage;
     setTimeout(() => {
       ariaLiveRegion.textContent = '';
     }, 1000);
@@ -1342,7 +1356,10 @@ async function fetchJsonWithRetry(url, options = {}, maxRetries = 3, retryDelay 
       const res = await fetchJson(url, options);
       // Clear any retry notifications on success
       if (attempt > 0) {
-        showNotification(`Request succeeded after ${attempt} ${attempt === 1 ? 'retry' : 'retries'}`, 'success', 2000);
+        const successMsg = T('ui.requestSucceededAfter', 'Request succeeded after {count} {unit}')
+          .replace('{count}', String(attempt))
+          .replace('{unit}', attempt === 1 ? T('ui.retryUnit.one', 'retry') : T('ui.retryUnit.many', 'retries'));
+        showNotification(successMsg, 'success', 2000);
       }
       return res;
     } catch (error) {
@@ -1352,11 +1369,11 @@ async function fetchJsonWithRetry(url, options = {}, maxRetries = 3, retryDelay 
       if (attempt < maxRetries) {
         // Exponential backoff with notification
         const delay = retryDelay * Math.pow(2, attempt);
-        showNotification(
-          `Request failed. Retrying in ${(delay / 1000).toFixed(1)}s... (${attempt + 1}/${maxRetries})`,
-          'warning',
-          2000
-        );
+        const retryingMsg = T('ui.requestRetrying', 'Request failed. Retrying in {seconds}s... ({attempt}/{max})')
+          .replace('{seconds}', (delay / 1000).toFixed(1))
+          .replace('{attempt}', String(attempt + 1))
+          .replace('{max}', String(maxRetries));
+        showNotification(retryingMsg, 'warning', 2000);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
@@ -1365,15 +1382,15 @@ async function fetchJsonWithRetry(url, options = {}, maxRetries = 3, retryDelay 
   
   // Create enhanced error with context
   const enhancedError = {
-    message: lastError.message || 'Request failed after all retries',
+    message: lastError.message || T('ui.requestFailedAllRetries', 'Request failed after all retries'),
     originalError: lastError,
     attempts: maxRetries + 1,
     url: url,
     suggestions: [
-      'Check your internet connection',
-      'Verify the server is running',
-      'Try refreshing the page',
-      'Contact support if the problem persists'
+      T('ui.suggestion.checkInternet', 'Check your internet connection'),
+      T('ui.suggestion.verifyServer', 'Verify the server is running'),
+      T('ui.suggestion.refreshPage', 'Try refreshing the page'),
+      T('ui.suggestion.contactSupport', 'Contact support if the problem persists')
     ]
   };
   
@@ -1422,7 +1439,7 @@ function initSearchFilter(searchInputId, tableId, filterOptions = {}) {
     clearButton = document.createElement('button');
     clearButton.className = 'search-clear';
     clearButton.type = 'button';
-    clearButton.setAttribute('aria-label', 'Clear search');
+    clearButton.setAttribute('aria-label', T('ui.clearSearchAria', 'Clear search'));
     clearButton.innerHTML = '×';
     clearButton.style.cssText = 'position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted, #a8b0bf); cursor: pointer; font-size: 20px; width: 24px; height: 24px; display: none; padding: 0;';
     clearButton.onclick = () => {
@@ -1436,7 +1453,7 @@ function initSearchFilter(searchInputId, tableId, filterOptions = {}) {
   }
   
   // Enhanced accessibility
-  searchInput.setAttribute('aria-label', filterOptions.ariaLabel || 'Search table');
+  searchInput.setAttribute('aria-label', filterOptions.ariaLabel || T('ui.searchTableAria', 'Search table'));
   searchInput.setAttribute('role', 'searchbox');
   searchInput.setAttribute('aria-controls', tableId);
   
@@ -1470,8 +1487,15 @@ function initSearchFilter(searchInputId, tableId, filterOptions = {}) {
       searchInput.removeAttribute('aria-busy');
       
       // Announce to screen readers
-      const statusMsg = query ? `${visibleCount} of ${originalData.length} results found` : 'All results shown';
-      searchInput.setAttribute('aria-label', (filterOptions.ariaLabel || 'Search table') + ': ' + statusMsg);
+      const statusMsg = query
+        ? T('ui.searchStatusFound', '{visible} of {total} results found')
+            .replace('{visible}', String(visibleCount))
+            .replace('{total}', String(originalData.length))
+        : T('ui.searchStatusAll', 'All results shown');
+      searchInput.setAttribute(
+        'aria-label',
+        (filterOptions.ariaLabel || T('ui.searchTableAria', 'Search table')) + ': ' + statusMsg
+      );
     }, debounceDelay);
   });
   
@@ -1508,7 +1532,9 @@ function updateSearchStatus(table, visibleCount, totalCount, query = '') {
       statusRow.setAttribute('aria-live', 'polite');
       const statusCell = document.createElement('td');
       statusCell.colSpan = table.querySelectorAll('th').length;
-      statusCell.textContent = `${visibleCount} of ${totalCount} results`;
+      statusCell.textContent = T('ui.searchStatusSimple', '{visible} of {total} results')
+        .replace('{visible}', String(visibleCount))
+        .replace('{total}', String(totalCount));
       statusCell.style.cssText = 'text-align: center; padding: 12px; color: var(--text-muted, #a8b0bf); font-size: 0.9em; border-top: 1px solid var(--border, #262b36);';
       statusRow.appendChild(statusCell);
       tbody.appendChild(statusRow);
@@ -1583,13 +1609,14 @@ function filterTable(table, query, options = {}) {
       noResultsRow.setAttribute('aria-live', 'polite');
       const td = document.createElement('td');
       td.colSpan = table.querySelectorAll('th').length;
-      td.textContent = `No results found for "${query}"`;
+      td.textContent = T('ui.searchNoResultsFor', 'No results found for "{query}"').replace('{query}', query);
       td.style.cssText = 'text-align: center; padding: 20px; color: var(--text-muted, #a8b0bf);';
       noResultsRow.appendChild(td);
       tbody.appendChild(noResultsRow);
     }
     noResultsRow.style.display = '';
-    noResultsRow.querySelector('td').textContent = `No results found for "${query}"`;
+    noResultsRow.querySelector('td').textContent =
+      T('ui.searchNoResultsFor', 'No results found for "{query}"').replace('{query}', query);
   } else if (noResultsRow) {
     noResultsRow.style.display = 'none';
   }
@@ -1815,12 +1842,12 @@ function showSearchModal() {
     modal.innerHTML = `
       <div class="modal-content" style="max-width: 600px;">
         <div class="modal-header">
-          <h3 id="searchModalTitle">Search</h3>
-          <button class="modal-close" aria-label="Close search dialog" onclick="hideModal('${modalId}')">&times;</button>
+          <h3 id="searchModalTitle">${escapeHtml(T('dash.search.title', 'Search'))}</h3>
+          <button class="modal-close" aria-label="${escapeHtml(T('dash.search.closeAria', 'Close search dialog'))}" onclick="hideModal('${modalId}')">&times;</button>
         </div>
         <div class="modal-body">
           <div class="search-container">
-            <input type="text" id="globalSearchInput" class="search-input" placeholder="Search pages, workers, artifacts..." autofocus aria-label="Search input" />
+            <input type="text" id="globalSearchInput" class="search-input" placeholder="${escapeHtml(T('dash.search.placeholder', 'Search pages, workers, artifacts...'))}" autofocus aria-label="${escapeHtml(T('dash.search.inputAria', 'Search input'))}" />
             <span class="search-icon">🔍</span>
           </div>
           <div id="searchResults" style="margin-top: 16px; max-height: 400px; overflow-y: auto;"></div>
@@ -1834,14 +1861,14 @@ function showSearchModal() {
     
     // Search pages and navigation
     const searchableItems = [
-      { name: 'Home', url: '/ui', category: 'Page' },
-      { name: 'Status', url: '/ui/status', category: 'Page' },
-      { name: 'Health', url: '/ui/health', category: 'Page' },
-      { name: 'Metrics', url: '/ui/metrics', category: 'Page' },
-      { name: 'Workers', url: '/ui/workers', category: 'Page' },
-      { name: 'Libraries', url: '/ui/libs', category: 'Page' },
-      { name: 'VM Instances', url: '/ui/vm', category: 'Page' },
-      { name: 'RAID', url: '/ui/raid', category: 'Page' },
+      { name: T('dash.search.item.home', 'Home'), url: '/ui', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.status', 'Status'), url: '/ui/status', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.health', 'Health'), url: '/ui/health', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.metrics', 'Metrics'), url: '/ui/metrics', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.workers', 'Workers'), url: '/ui/workers', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.libs', 'Libraries'), url: '/ui/libs', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.vm', 'VM Instances'), url: '/ui/vm', category: T('dash.search.category.page', 'Page') },
+      { name: T('dash.search.item.raid', 'RAID'), url: '/ui/raid', category: T('dash.search.category.page', 'Page') },
     ];
     
     let selectedIndex = -1;
@@ -1851,7 +1878,7 @@ function showSearchModal() {
       selectedIndex = -1;
       
       if (query.length === 0) {
-        resultsContainer.innerHTML = '<div class="muted" role="status" aria-live="polite">Type to search...</div>';
+        resultsContainer.innerHTML = `<div class="muted" role="status" aria-live="polite">${escapeHtml(T('dash.search.typeToSearch', 'Type to search...'))}</div>`;
         return;
       }
       
@@ -1861,12 +1888,12 @@ function showSearchModal() {
       );
       
       if (results.length === 0) {
-        resultsContainer.innerHTML = '<div class="muted" role="status" aria-live="polite">No results found</div>';
+        resultsContainer.innerHTML = `<div class="muted" role="status" aria-live="polite">${escapeHtml(T('dash.search.noResults', 'No results found'))}</div>`;
         return;
       }
       
       resultsContainer.setAttribute('role', 'listbox');
-      resultsContainer.setAttribute('aria-label', 'Search results');
+      resultsContainer.setAttribute('aria-label', T('dash.search.resultsAria', 'Search results'));
       resultsContainer.innerHTML = results.map((item, index) => `
         <div class="search-result-item" 
              role="option" 
@@ -1887,8 +1914,15 @@ function showSearchModal() {
       `).join('');
       
       // Announce results count to screen readers
-      const statusMsg = results.length === 1 ? '1 result found' : results.length + ' results found';
-      resultsContainer.setAttribute('aria-label', 'Search results: ' + statusMsg);
+      const oneResultMsg = T('dash.search.oneResult', '1 result found');
+      const manyResultsTemplate = T('dash.search.manyResults', '{count} results found');
+      const statusMsg = results.length === 1
+        ? oneResultMsg
+        : manyResultsTemplate.replace('{count}', String(results.length));
+      resultsContainer.setAttribute(
+        'aria-label',
+        T('dash.search.resultsWithCount', 'Search results: {status}').replace('{status}', statusMsg)
+      );
     });
     
     // Enhanced keyboard navigation for search modal
@@ -1981,6 +2015,7 @@ function confirmAction(message, onConfirm) {
 function showConfirmDialog(message, onConfirm, onCancel = null) {
   const dialogId = 'confirmDialog';
   let dialog = document.getElementById(dialogId);
+  const t = typeof poolaiT === 'function' ? poolaiT : function (_k, d) { return d; };
   
   if (!dialog) {
     dialog = document.createElement('div');
@@ -1993,13 +2028,13 @@ function showConfirmDialog(message, onConfirm, onCancel = null) {
     dialog.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="confirmDialogTitle">Confirm Action</h3>
-          <button class="modal-close" aria-label="Close dialog" onclick="hideModal('${dialogId}')">&times;</button>
+          <h3 id="confirmDialogTitle">${escapeHtml(t('ui.confirmTitle', 'Confirm Action'))}</h3>
+          <button class="modal-close" aria-label="${escapeHtml(t('ui.closeDialogAria', 'Close dialog'))}" onclick="hideModal('${dialogId}')">&times;</button>
         </div>
         <div id="confirmMessage" style="margin-bottom:20px; color:#e8e8e8;"></div>
         <div class="modal-footer">
-          <button class="btn" onclick="hideModal('${dialogId}')">Cancel</button>
-          <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+          <button class="btn" onclick="hideModal('${dialogId}')">${escapeHtml(t('ui.cancel', 'Cancel'))}</button>
+          <button class="btn btn-danger" id="confirmBtn">${escapeHtml(t('ui.confirmBtn', 'Confirm'))}</button>
         </div>
       </div>
     `;
@@ -2008,7 +2043,6 @@ function showConfirmDialog(message, onConfirm, onCancel = null) {
   
   document.getElementById('confirmMessage').textContent = message;
   const confirmBtn = document.getElementById('confirmBtn');
-  const t = typeof poolaiT === 'function' ? poolaiT : function (_k, d) { return d; };
   const titleEl = document.getElementById('confirmDialogTitle');
   if (titleEl) titleEl.textContent = t('ui.confirmTitle', 'Confirm Action');
   if (confirmBtn) confirmBtn.textContent = t('ui.confirmBtn', 'Confirm');
@@ -2262,7 +2296,7 @@ function validateField(input) {
   // Required validation
   if (input.hasAttribute('required') && !input.value.trim()) {
     isValid = false;
-    errorMessage = 'This field is required';
+    errorMessage = T('form.fieldRequired', 'This field is required');
   }
   
   // Number validation
@@ -2273,13 +2307,13 @@ function validateField(input) {
     
     if (isNaN(value)) {
       isValid = false;
-      errorMessage = 'Please enter a valid number';
+      errorMessage = T('form.validNumber', 'Please enter a valid number');
     } else if (min && value < parseFloat(min)) {
       isValid = false;
-      errorMessage = `Value must be at least ${min}`;
+      errorMessage = T('form.valueMin', 'Value must be at least {min}').replace('{min}', min);
     } else if (max && value > parseFloat(max)) {
       isValid = false;
-      errorMessage = `Value must be at most ${max}`;
+      errorMessage = T('form.valueMax', 'Value must be at most {max}').replace('{max}', max);
     }
   }
   
@@ -2288,7 +2322,7 @@ function validateField(input) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(input.value)) {
       isValid = false;
-      errorMessage = 'Please enter a valid email address';
+      errorMessage = T('form.validEmail', 'Please enter a valid email address');
     }
   }
   
@@ -2297,7 +2331,7 @@ function validateField(input) {
     const pattern = new RegExp(input.getAttribute('pattern'));
     if (!pattern.test(input.value)) {
       isValid = false;
-      errorMessage = input.getAttribute('data-pattern-error') || 'Invalid format';
+      errorMessage = input.getAttribute('data-pattern-error') || T('form.invalidFormat', 'Invalid format');
     }
   }
   
@@ -2424,7 +2458,9 @@ function updateWizardProgress(wizard, current, total) {
   
   const stepIndicator = wizard.querySelector('.wizard-step-indicator');
   if (stepIndicator) {
-    stepIndicator.textContent = `Step ${current + 1} of ${total}`;
+    stepIndicator.textContent = T('ui.stepOfTotal', 'Step {current} of {total}')
+      .replace('{current}', String(current + 1))
+      .replace('{total}', String(total));
   }
 }
 
@@ -2597,7 +2633,9 @@ async function poll(url, renderFn, containerId, retries = 3) {
       const el = document.getElementById(containerId);
       if (el) {
         const errorMsg = String(e);
-        el.innerHTML = '<div style="color:#ff5555; padding:12px; border:1px solid #ff5555; border-radius:8px;">Error: ' + errorMsg + '<br><button onclick="location.reload()" style="margin-top:8px; padding:6px 12px; background:#ff5555; color:white; border:none; border-radius:4px; cursor:pointer;">Retry</button></div>';
+        const retryLabel = escapeHtml(T('ui.retry', 'Retry'));
+        const errorPrefix = escapeHtml(T('err.errorPrefix', 'Error: '));
+        el.innerHTML = '<div style="color:#ff5555; padding:12px; border:1px solid #ff5555; border-radius:8px;">' + errorPrefix + errorMsg + '<br><button onclick="location.reload()" style="margin-top:8px; padding:6px 12px; background:#ff5555; color:white; border:none; border-radius:4px; cursor:pointer;">' + retryLabel + '</button></div>';
       }
       console.error('Poll error (max retries reached):', e);
     }
@@ -2704,7 +2742,7 @@ async function requireAuth(requiredRole = null) {
         typeof poolaiT === 'function'
           ? poolaiT('err.insufficientRole', 'Insufficient permissions. Required role: ')
           : 'Insufficient permissions. Required role: ';
-      alert(p + requiredRole);
+      alert(p + localizedRoleName(requiredRole));
       window.location.href = '/ui';
       return false;
     }
@@ -3021,7 +3059,7 @@ function initTabs() {
     const tabsId = 'tabs-' + containerIndex;
     
     container.setAttribute('role', 'tablist');
-    container.setAttribute('aria-label', container.getAttribute('aria-label') || 'Tabs');
+    container.setAttribute('aria-label', container.getAttribute('aria-label') || T('ui.tabsAria', 'Tabs'));
     
     tabs.forEach((tab, index) => {
       const contentId = tab.getAttribute('data-tab') || ('tab-content-' + containerIndex + '-' + index);
@@ -3620,7 +3658,13 @@ async fn login_page() -> Html<String> {
             icon = '✈️';
           }
           
-          buttonsHtml += `<button type="button" class="btn oauth2-btn" style="min-width: 120px;" onclick="handleOAuth2Login('${providerName}')" aria-label="Sign in with ${label}">${icon} ${label}</button>`;
+          const signInAria = escapeHtml(
+            (typeof poolaiT === 'function' ? poolaiT : function (_k, d) { return d; })(
+              'auth.signInWithAria',
+              'Sign in with {provider}'
+            ).replace('{provider}', label)
+          );
+          buttonsHtml += `<button type="button" class="btn oauth2-btn" style="min-width: 120px;" onclick="handleOAuth2Login('${providerName}')" aria-label="${signInAria}">${icon} ${label}</button>`;
         });
         
         buttonsHtml += '</div></div>';
