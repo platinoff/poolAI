@@ -31,14 +31,14 @@
 <a href=#31 id=31 data-nosnippet>31</a>
 <a href=#32 id=32 data-nosnippet>32</a><span class="kw">async fn </span>rewards_handler(
 <a href=#33 id=33 data-nosnippet>33</a>    State(ctx): State&lt;ApiContext&gt;,
-<a href=#34 id=34 data-nosnippet>34</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;HashMap&lt;String, f64&gt;&gt;, AppError&gt; {
+<a href=#34 id=34 data-nosnippet>34</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;HashMap&lt;String, f64&gt;&gt;, HttpAppError&gt; {
 <a href=#35 id=35 data-nosnippet>35</a>    <span class="prelude-val">Ok</span>(Json(RewardsService::reward_statistics(<span class="kw-2">&amp;</span>ctx).<span class="kw">await</span>))
 <a href=#36 id=36 data-nosnippet>36</a>}
 <a href=#37 id=37 data-nosnippet>37</a>
 <a href=#38 id=38 data-nosnippet>38</a><span class="kw">async fn </span>user_rewards_handler(
 <a href=#39 id=39 data-nosnippet>39</a>    State(ctx): State&lt;ApiContext&gt;,
 <a href=#40 id=40 data-nosnippet>40</a>    Path(user_id): Path&lt;String&gt;,
-<a href=#41 id=41 data-nosnippet>41</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;Vec&lt;Reward&gt;&gt;, AppError&gt; {
+<a href=#41 id=41 data-nosnippet>41</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;Vec&lt;Reward&gt;&gt;, HttpAppError&gt; {
 <a href=#42 id=42 data-nosnippet>42</a>    <span class="prelude-val">Ok</span>(Json(RewardsService::user_rewards(<span class="kw-2">&amp;</span>ctx, <span class="kw-2">&amp;</span>user_id).<span class="kw">await</span>))
 <a href=#43 id=43 data-nosnippet>43</a>}
 <a href=#44 id=44 data-nosnippet>44</a>
@@ -58,13 +58,13 @@
 <a href=#58 id=58 data-nosnippet>58</a>
 <a href=#59 id=59 data-nosnippet>59</a><span class="kw">async fn </span>rewards_statistics_handler(
 <a href=#60 id=60 data-nosnippet>60</a>    State(ctx): State&lt;ApiContext&gt;,
-<a href=#61 id=61 data-nosnippet>61</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;HashMap&lt;String, f64&gt;&gt;, AppError&gt; {
+<a href=#61 id=61 data-nosnippet>61</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;HashMap&lt;String, f64&gt;&gt;, HttpAppError&gt; {
 <a href=#62 id=62 data-nosnippet>62</a>    <span class="prelude-val">Ok</span>(Json(RewardsService::reward_statistics(<span class="kw-2">&amp;</span>ctx).<span class="kw">await</span>))
 <a href=#63 id=63 data-nosnippet>63</a>}
 <a href=#64 id=64 data-nosnippet>64</a>
 <a href=#65 id=65 data-nosnippet>65</a><span class="kw">async fn </span>top_users_handler(
 <a href=#66 id=66 data-nosnippet>66</a>    State(ctx): State&lt;ApiContext&gt;,
-<a href=#67 id=67 data-nosnippet>67</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;Vec&lt;(String, f64)&gt;&gt;, AppError&gt; {
+<a href=#67 id=67 data-nosnippet>67</a>) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;Vec&lt;(String, f64)&gt;&gt;, HttpAppError&gt; {
 <a href=#68 id=68 data-nosnippet>68</a>    <span class="prelude-val">Ok</span>(Json(
 <a href=#69 id=69 data-nosnippet>69</a>        RewardsService::top_users(<span class="kw-2">&amp;</span>ctx, TOP_USERS_DEFAULT_LIMIT).<span class="kw">await</span>,
 <a href=#70 id=70 data-nosnippet>70</a>    ))
