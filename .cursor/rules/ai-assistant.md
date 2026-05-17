@@ -12,15 +12,18 @@
 
 **Main active documents** (ALWAYS reference these):
 - **Chat context** (session start / «налаштуйся»): `.cursor/rules/chat-context.md`
-- **PRIMARY Concept Document**: `docs/concept/poolAI_concept_root.txt` (USE THIS FIRST - most comprehensive)
-- **Alternative Concept**: `docs/concept/poolAI_concept.txt` (Ukrainian, detailed dev environment)
-- **Current Project Status**: `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` (most up-to-date)
+- **Session handoff (кроки 1–12)**: `docs/development/HANDOFF_NEW_SESSION.md`
+- **Autonomous run (orchestrator)**: newest `docs/development/AUTO_RUN_SESSION_*.md` (зараз `AUTO_RUN_SESSION_2026-05-17.md`)
+- **Dev patterns registry**: `docs/development/AUTO_DEV_PATTERNS.md`
+- **Functionality manager (крок 12)**: `docs/catalog/FUNCTION_MANAGEMENT.md` §5.1; rule `.cursor/rules/functionality-management.mdc`
+- **Orchestrator rule**: `.cursor/rules/autonomous-orchestrator.mdc`
+- **PRIMARY Concept**: `docs/concept/poolAI_concept_root.txt`
 - **Stable State**: `docs/status/STABLE_STATE_SUMMARY.md`
-- **Development Plans**: `docs/development/NEXT_STEPS_PLAN.md` or `docs/development/NEXT_STEPS_2026-01-19.md` (і за потреби: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`)
-- **Cursor & next steps verification**: `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` (Cursor settings, doc cleanup list, next steps)
+- **Architect plan**: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`
+- **Docs taxonomy**: `docs/STRUCTURE.md`
 - **Project README**: `README.md` (in root)
 - **Documentation Index**: `docs/README.md`
-- **Helper File**: `file_list.csv` (108254+ lines, file inventory for navigation)
+- **Helper File**: `file_list.csv`
 
 **When answering questions about**:
 - **Module status/completion**: Check `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` FIRST

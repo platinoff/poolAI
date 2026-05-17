@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Автопрогін 2026-05-17 (AUTO_RUN_SESSION)** — P0: [`AUTO_DEV_PATTERNS.md`](development/AUTO_DEV_PATTERNS.md) (25 записів `path:line`); оркестратор [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); FM-003 runbook звірка без LAN-стенду.
 - **Автопрогін 2026-05-16 (AUTO_RUN_SESSION)** — FM-012 Telegram/OAuth ✅; FM-007/008 wire ✅; FM-002 service audit ✅; FM-011 `cargo test-ci` ✅; [`LAN_BENCHMARK_RUNBOOK.md`](performance/LAN_BENCHMARK_RUNBOOK.md) (FM-003 ops).
 - **FM-012 — UI i18n UA/EN (2026-04 → 2026-05)** — `i18n_core.js`, `/ui/auth`, layout `/ui/*`, write-flow Workers/Libs/VM/RAID, enterprise admin (`src/ui/admin/*`, `admin_common.js`); shared shell у `mod.rs` (глобальний пошук, confirm/retry, error boundary, валідація форм, ролі).
 - **FM-012 — перший вхід** — банер для сідженого `admin`, поле **`bootstrap_default_admin`** у **`POST /api/v1/login`** / **`POST /api/v1/refresh`**.

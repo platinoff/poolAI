@@ -36,9 +36,15 @@ description: >-
 - Файл: `docs/catalog/FUNCTION_MANAGEMENT.md` — звірка з **STABLE_STATE**, таблиця **FM-***, **§5.1** — єдиний пріоритезований список наступних кроків (узгоджено з Architect-планом); шаблон тікета для розробки.
 - Після зміни **NEXT_STEPS** або великого релізу — онови дату, **§5.1** та релевантні рядки `FM-*`.
 
+## Авторозробка та оркестратор
+
+- Найновіший **`docs/development/AUTO_RUN_SESSION_*.md`** — черга спринтів і copy-paste промпт.
+- **`docs/development/AUTO_DEV_PATTERNS.md`** — реєстр конкретних патернів (оновлювати після P0/S6).
+- Правила: **`.cursor/rules/autonomous-orchestrator.mdc`** (субагенти `explore` / `shell`), **`.cursor/rules/functionality-management.mdc`** (охоплення docs за `STRUCTURE.md`).
+
 ## Правила для агента
 
 - Нові **плани / статус / концепт** — лише під `docs/` у відповідній підпапці (див. `.cursor/rules/documentation.md`).
 - Не дублюй довгі чеклисти в кореневий `README` — посилайся на `docs/development/` та витяг (крок 11).
 - Після додавання головного документа: онови `docs/README.md` або `INDEX`, за потреби `file_list.csv`.
-- Запити на **беклог, прогалини, індекс функцій** — дотримуйся `.cursor/rules/functionality-management.mdc`.
+- Запити на **беклог, прогалини, індекс функцій, охоплення docs** — `.cursor/rules/functionality-management.mdc`.

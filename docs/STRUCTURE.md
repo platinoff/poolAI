@@ -16,9 +16,10 @@
 | **`docs/development/HANDOFF_NEW_SESSION.md`** | Старт нової сесії: гілка, тести, git-push. |
 | **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** | Витяг функціоналу (крок 11). |
 | **`docs/catalog/FUNCTION_MANAGEMENT.md`** | Керування функціоналом, беклог тікетів FM-* (крок 12). |
-| **`.cursor/rules/functionality-management.mdc`** | Алгоритм агента для беклогу / прогалин. |
+| **`.cursor/rules/functionality-management.mdc`** | Менеджер функціоналу: FM-*, охоплення docs за `STRUCTURE.md`. |
+| **`.cursor/rules/autonomous-orchestrator.mdc`** | Оркестратор авторозробки: субагенти, AUTO_RUN, push. |
 | **`.cursor/rules/documentation.md`** | Правила для агента: куди класти нові `.md`. |
-| **`.cursor/skills/poolai-documentation/SKILL.md`** | Складений skill з тим самим порядком 1–12. |
+| **`.cursor/skills/poolai-documentation/SKILL.md`** | Складений skill з тим самим порядком 1–12 + AUTO_RUN / патерни. |
 
 ---
 
@@ -62,6 +63,7 @@ docs/
 |------|------|
 | `.cursor/rules/documentation.md` | Куди писати доки, кроки 11–12, каталог. |
 | `.cursor/rules/functionality-management.mdc` | Беклог функцій, прогалини, тікети FM-* (агент). |
+| `.cursor/rules/autonomous-orchestrator.mdc` | Автономний прогін: оркестратор, Task subagents, спринти. |
 | `.cursor/rules/project-structure.md` | Організація `src/`, скриптів. |
 | `.cursor/commands/git-push.md` | Push, MSYS2, змінні середовища. |
 

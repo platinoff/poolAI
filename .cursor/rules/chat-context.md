@@ -17,13 +17,18 @@
 
 | Призначення | Файл |
 |-------------|------|
+| **Старт сесії / handoff** | `docs/development/HANDOFF_NEW_SESSION.md` (кроки 1–12) |
+| **Авторозробка (оркестратор)** | `docs/development/AUTO_RUN_SESSION_2026-05-17.md` (найновіший `AUTO_RUN_SESSION_*.md`) |
+| **Патерни для автопрогону** | `docs/development/AUTO_DEV_PATTERNS.md` |
+| **FM / беклог (крок 12)** | `docs/catalog/FUNCTION_MANAGEMENT.md` §5.1 |
 | **Концепт (PRIMARY)** | `docs/concept/poolAI_concept_root.txt` |
-| **Статус** | `docs/status/STABLE_STATE_SUMMARY.md`, `docs/status/PROJECT_STATUS_REPORT_2026-01-19.md` |
-| **Наступні кроки** | `docs/development/NEXT_STEPS_2026-01-19.md`, `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
-| **Перевірка Cursor і кроки** | `docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md` |
-| **Знімок контексту сесії** | `docs/CONTEXT_SNAPSHOT_2026-03-04.md` (локально); корінь репо: `CONTEXT_SNAPSHOT_2026-03-04.md` |
+| **Статус** | `docs/status/STABLE_STATE_SUMMARY.md` |
+| **Architect-план** | `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
+| **Таксономія docs** | `docs/STRUCTURE.md` |
 | **Git push** | `.cursor/commands/git-push.md`, `docs/troubleshooting/GIT_PUSH_FAILED.md` |
 | **Помічник по файлах** | `file_list.csv` |
+
+**Правила Cursor:** `.cursor/rules/autonomous-orchestrator.mdc`, `.cursor/rules/functionality-management.mdc`, skill `.cursor/skills/poolai-documentation/SKILL.md`
 
 ---
 
@@ -50,16 +55,17 @@
 
 ## Поточний стан і далі
 
-- **Стабільний**: Cloud SDK 100%, HPA init ✅, Stage 4.4 AI/ML у коді з `feature ml`.  
-- **ML.6 pipeline**: кроки Profiling, Tuning, Quantization, Pruning, AutoML, **FederatedAggregation**, Evaluation, Deployment; AutoML за замовчуванням пише в **ML.4/ML.5** (реєстр + експеримент), `automl_skip_registry=true` щоб вимкнути.  
-- **HTTP**: `GET /api/enterprise/ai-ml/pipeline/demo` (enterprise+ml) — демо одного кроку без спільного стану.  
-- **Док-плани**: тримати узгодженими `NEXT_STEPS_*.md` з фактичним `src/ml/`.
+- **Автопрогін 2026-05-16:** FM-012, 007/008, 002, 011 ✅; FM-003 **Planned (ops)** — LAN runbook.  
+- **Наступна авторозробка:** `AUTO_RUN_SESSION_2026-05-17.md` — P0 збір патернів → `AUTO_DEV_PATTERNS.md`, далі FM-003 / Architect §5.1.  
+- **Тести (канон):** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci` (не повний `cargo test` з doctests на Windows без потреби).  
+- **Пріоритети:** `FUNCTION_MANAGEMENT.md` §5.1 → Architect → HANDOFF.
 
 ---
 
 ## Правила для AI
 
-1. Спочатку звірятися з `docs/concept/poolAI_concept_root.txt` і `NEXT_STEPS_2026-01-19.md`.  
-2. Оновлювати концепт/статус/плани узгоджено (концепт → статус → NEXT_STEPS).  
-3. **Git і cargo** — у зовнішньому MSYS2 bash (блок з `git-push.md`), зокрема тести як у CI: `export K8S_OPENAPI_ENABLED_VERSION=1.28` і `cargo test --lib --tests --features ml,enterprise,cloud`.  
-4. При git push — давати блок з `git-push.md`; якщо не виходить — посилати на `GIT_PUSH_FAILED.md`.
+1. Старт: `HANDOFF_NEW_SESSION.md` + `FUNCTION_MANAGEMENT.md` §5.1; авторозробка — `autonomous-orchestrator.mdc` + найновіший `AUTO_RUN_SESSION_*.md`.  
+2. Менеджер функціоналу: `functionality-management.mdc` (охоплення docs за `STRUCTURE.md`, не весь репо).  
+3. Оновлювати концепт/статус/FM/DIGEST узгоджено після змін API.  
+4. **Git і cargo** — зовнішній MSYS2 bash; `cargo test-ci` як у CI.  
+5. Push — `git-push.md`; помилки — `GIT_PUSH_FAILED.md`.

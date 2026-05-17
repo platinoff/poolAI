@@ -1,22 +1,41 @@
 ---
-description: PoolAI — роль «менеджера функціоналу»: індекс vs сталевий стан, прогалини, тікети
+description: PoolAI — менеджер функціоналу (FM-*, охоплення docs 1–12, прогалини, тікети)
 alwaysApply: false
 globs: docs/**/*.md
 ---
 
 # Менеджер функціоналу (PoolAI)
 
-Коли користувач просить **звірити функції, беклог, прогалини, тікети або наступні кроки**, спершу відкрий **`docs/catalog/FUNCTION_MANAGEMENT.md`** (таблиця **FM-*** і **§5.1** — пріоритезований порядок робіт).
+Коли користувач просить **звірити функції, беклог, прогалини, тікети, наступні кроки** або **охопити документацію** — спершу **`docs/catalog/FUNCTION_MANAGEMENT.md`** (таблиця **FM-*** і **§5.1**).
 
 ## Короткий алгоритм
 
-1. **Що вважається «зроблено»** — [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md) + факт коду (`src/network/`, `src/services/`, `Cargo.toml` features).
+1. **Що вважається «зроблено»** — [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md) + код (`src/network/`, `src/services/`, `Cargo.toml` features).
 2. **Індекс можливостей** — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (крок 11).
-3. **Плани й пріоритети** — **§5.1** у [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md); деталі Architect — [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); операційний зріз — [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
-4. **Горизонт (немає в коді)** — `docs/concept/*`, [`docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [`docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
-5. **Якщо в доках порожньо** — `git log --oneline -n 30`, пошук у `docs/archive/`, `rg TODO\|FIXME` у `src/` (маркери зведені в `NEXT_STEPS` P5).
+3. **Пріоритети** — **§5.1** у [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md); Architect — [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); операційний зріз — [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
+4. **Горизонт (немає в коді)** — `docs/concept/*`, Grid/Solana концепти в `docs/development/`.
+5. **Якщо в доках порожньо** — `git log --oneline -n 30`, `docs/archive/`, `rg TODO|FIXME` у `src/`.
+
+## Охоплення docs (без повного читання всього репо)
+
+Таксономія: [`docs/STRUCTURE.md`](docs/STRUCTURE.md). Обхід **за шарами**, не всіма `.md` підряд:
+
+| Шар | Шляхи | Навіщо |
+|-----|--------|--------|
+| **Канон 1–12** | `README.md`, `docs/INDEX_2026-03-17.md`, `docs/development/NEXT_STEPS_ARCHITECT_*`, `HANDOFF_*`, `docs/catalog/*`, `docs/ARCHITECTURE_*`, `docs/performance/*`, `.github/workflows/ci.yml`, `file_list.csv` | Єдиний порядок і пріоритети |
+| **Статус** | `docs/status/STABLE_STATE_SUMMARY.md`, `CURRENT_STATUS.md` (якщо потрібен зріз %) | Заявлений стабільний стан |
+| **Розробка** | `docs/development/AUTO_RUN_SESSION_*.md` (найновіший), `AUTO_DEV_PATTERNS.md`, `docs/development/README.md` | Авторозробка + патерни |
+| **Концепт** | `docs/concept/poolAI_concept_root.txt`, `GRID_*`, `SOLANA_*`, `JOB_LAYER_*` | Concept-only vs код |
+| **Спадщина** | `docs/archive/`, плоскі `docs/*.md` | Лише через `rg`/посилання з INDEX; не канон |
+
+**OpenAPI** (`docs/openapi.yaml`) — довідково; маршрути — `src/network/`.
 
 ## Вихід для розробки
 
-- Нові пункти додавай у **чернетку тікетів** у `FUNCTION_MANAGEMENT.md` (ID `FM-xxx`) або оформлюй як GitHub Issue за шаблоном з того ж файлу.
-- Після зміни **публічного API / модулів** оновлюй **витяг** (`FUNCTIONALITY_DIGEST`), не дублюй повні таблиці в README.
+- Нові пункти → чернетка **FM-xxx** у `FUNCTION_MANAGEMENT.md` або GitHub Issue (шаблон у тому ж файлі).
+- Після зміни **публічного API** → онови **FUNCTIONALITY_DIGEST**; не дублюй таблиці в README.
+- Повторювані рішення після автопрогону → [`docs/development/AUTO_DEV_PATTERNS.md`](docs/development/AUTO_DEV_PATTERNS.md).
+
+## Зв’язок з оркестратором
+
+Автономний прогін: [`.cursor/rules/autonomous-orchestrator.mdc`](.cursor/rules/autonomous-orchestrator.mdc) + найновіший `AUTO_RUN_SESSION_*.md`. Менеджер функціоналу дає **що робити** (§5.1); оркестратор — **як виконувати** (субагенти, спринти, push).

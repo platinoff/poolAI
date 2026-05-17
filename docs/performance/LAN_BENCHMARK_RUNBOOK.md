@@ -78,4 +78,6 @@ Append one row per host to the **`poolai_health_load --json`** table in [`BENCHM
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 
-**Last updated:** 2026-05-16 (AUTO_RUN_SESSION S4).
+**Last updated:** 2026-05-17 (AUTO_RUN_SESSION 2026-05-17 S1 — runbook звірено; LAN-стенд відсутній, FM-003 лишається **Planned (ops)**).
+
+**Сесія 2026-05-17:** один хост — кроки §1–§3 задокументовані; прийняття §4 відкладено до двох вузлів. Локальний baseline: рядок **2026-04-10** у [`BENCHMARKS.md`](./BENCHMARKS.md) (`poolai_health_load --json`).

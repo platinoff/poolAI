@@ -1,0 +1,47 @@
+---
+description: PoolAI — оркестратор автономної розробки (Cursor 3.x, субагенти, спринти, git push)
+alwaysApply: false
+---
+
+# Оркестратор автономної розробки (PoolAI)
+
+Застосовуй, коли користувач запускає **авторозробку**, **автономний прогін**, посилається на **`AUTO_RUN_SESSION_*.md`** або просить «оркестратор».
+
+## Роль головного агента
+
+Ти **оркестратор**, не єдиний виконавець усього репо:
+
+1. **S0 — зріз (сам):** `git fetch && git status -sb`; прочитай [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1–5.2**, актуальний [`AUTO_RUN_SESSION_*.md`](docs/development/) (найновіший за датою в імені).
+2. **Менеджер функціоналу (сам або subagent `explore`):** звірка FM-* ↔ код; не дублюй повний обхід `docs/` — див. `.cursor/rules/functionality-management.mdc` **§ «Охоплення docs»**.
+3. **Код / тести (subagent `shell` або сам):** `cargo fmt`, `cargo test-ci`, clippy-матриці лише після змін у `src/`/`tests/` (як у CI / AUTO_RUN §3).
+4. **Паралельно:** незалежні області (наприклад `src/ui/` + `src/services/`) — окремі Task subagents з чітким `prompt` і очікуваним артефактом (файли, тести, рядки FM).
+5. **Збір патернів (обов’язково в кінці P0 або S6):** доповни [`docs/development/AUTO_DEV_PATTERNS.md`](docs/development/AUTO_DEV_PATTERNS.md) — конкретні шляхи, сигнатури, команди (не загальні поради).
+
+## Субагенти (Cursor Task)
+
+| Тип | Коли делегувати |
+|-----|-----------------|
+| `explore` | Широкий пошук по `docs/`, `rg` по FM/Architect, інвентар маршрутів без повного читання файлів |
+| `shell` | MSYS2 bash: `cargo test-ci`, git, бенч `poolai_health_load` |
+| `generalPurpose` | Ізольована фіча з acceptance criteria (один FM або один модуль) |
+
+**Не делегуй:** git push, оновлення §5.1 FM, фінальний Summary коміта — залишай собі.
+
+## Черга спринтів
+
+- Канон черги — **найновіший** `docs/development/AUTO_RUN_SESSION_YYYY-MM-DD.md`.
+- Після кожного спринту з кодом: `cargo fmt` → `cargo test-ci` (`K8S_OPENAPI_ENABLED_VERSION=1.28`).
+- **Не стаджити** `data/audit/*.log.gz`.
+- **Push:** зовнішній MSYS2 UCRT64, [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md), тіло з **Summary** (шаблон у AUTO_RUN).
+
+## Поза обсягом (без явного запиту)
+
+FM-004, FM-006 (Deferred), FM-009, FM-010 (Concept-only) — не реалізовувати в автопрогоні.
+
+## BLOCKED
+
+LAN без двох хостів → лише runbook / оновлення `BENCHMARKS.md`, не блокувати інші спринти (див. AUTO_RUN §6).
+
+## Документи після прогону
+
+Онови: `HANDOFF`, `FUNCTION_MANAGEMENT` (§5.1, таблиця FM-*), `STABLE_STATE_SUMMARY`, `CHANGELOG`, за змін API — `FUNCTIONALITY_DIGEST`.

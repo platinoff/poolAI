@@ -25,6 +25,8 @@ All project rules are organized in `.cursor/rules/`:
 - **`project-structure.md`** - Project organization and file naming rules
 - **`rust.md`** - Rust coding standards and patterns
 - **`ai-assistant.md`** - AI assistant rules and key document references
+- **`autonomous-orchestrator.mdc`** - Автономна розробка: оркестратор, субагенти, AUTO_RUN
+- **`functionality-management.mdc`** - Менеджер функціоналу: FM-*, охоплення docs, §5.1
 
 ## Quick Reference
 

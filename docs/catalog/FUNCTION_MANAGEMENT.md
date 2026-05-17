@@ -108,9 +108,11 @@ FM-xxx (з таблиці нижче)
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-16 (автопрогін). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
+**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-17 (автопрогін 2026-05-17, docs-only). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
 
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 ops — [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)); опційно **cloud-sdk** (FM-006). FM-005/007/008/011/012/002 — закрито в обсязі автопрогону.
+**P0 (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів з `path:line`; регресія `rg "get_global_" src/network/api` → 0.
+
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 ops — runbook оновлено 2026-05-17, стенд відсутній); **cloud-sdk** (FM-006, Deferred). FM-005/007/008/011/012/002 — закрито.
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
@@ -120,7 +122,9 @@ FM-xxx (з таблиці нижче)
 
 ### 5.2 Автономний прогін (сесія → git push)
 
-**Документ:** [`AUTO_RUN_SESSION_2026-05-16.md`](../development/AUTO_RUN_SESSION_2026-05-16.md).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-17.md`](../development/AUTO_RUN_SESSION_2026-05-17.md) (P0 патерни, S1 FM-003 doc, S2–S4 docs).
+
+**Попередній:** [`AUTO_RUN_SESSION_2026-05-16.md`](../development/AUTO_RUN_SESSION_2026-05-16.md).
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|

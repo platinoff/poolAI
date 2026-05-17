@@ -1,10 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-16 (кроки документації 1–12 узгоджено з кореневим [`README.md`](../../README.md)).
+**Оновлено:** 2026-05-17 (автопрогін P0–S4: патерни + FM-003 ops doc; LAN-стенд відсутній).
 
-**Автономний прогін наступної сесії:** [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) — спринти S0–S6, критерії «100% продукту», copy-paste промпт для агента, git push з Summary.
+**Автономний прогін наступної сесії:** [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) — **P0** патерни → [`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md), **S1–S4**, оркестратор [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc).
 
-**Зріз робіт (автопрогін 2026-05-16):** **FM-012 ✅** — i18n UA/EN + Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget HTML UA/EN, Viewer RBAC, тести); **FM-007/008 ✅** — 15 wire-тестів `distributed_raid_wire_integration`; **FM-002 ✅** — `get_global_*` у `network/api` = 0; **FM-011 ✅** — `cargo test-ci`; **FM-003** — baseline **2026-04-10** + [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) (ops). **FM-005 ✅**. Далі: LAN на стенді (FM-003), FM-004/006/009/010 поза обсягом. Канон: **§5.1** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**Попередній прогін (завершено):** [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) — S1–S6, FM-012/007/008/002/011.
+
+**Зріз робіт (автопрогін 2026-05-17):** **P0 ✅** — [`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md) (25 записів `path:line`; `get_global_` у `api/` = 0; `HttpAppError|RestError` у `network` = 216); **S1 FM-003** — runbook/BENCHMARKS оновлено, LAN-стенд **немає** → **Planned (ops)**; **S2** — Architect `- [ ]`: LAN → FM-003, cloud-sdk → FM-006 (поза обсягом); **S3** — `cargo fmt` + `cargo test-ci` (дата в §5.1 FM). Попередній прогін **2026-05-16:** FM-012/007/008/002/011 ✅. **FM-005 ✅**. Далі: LAN на 2+ хостах (FM-003). FM-004/006/009/010 поза обсягом. Канон: **§5.1** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
@@ -61,8 +63,8 @@
 
 ## 5. Автономний режим (наступна сесія → git push)
 
-1. Відкрити [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) і вставити **стартовий промпт** з §2 у чат агента.
-2. Агент виконує **S1→S6** без пауз; після кожного спринту з кодом — `cargo fmt` + `cargo test-ci`.
-3. **Ціль:** закрити FM-012, FM-007/008, FM-002 (аудит), FM-003 (baseline/runbook), FM-011 (clippy parity); оновити STABLE_STATE / FUNCTION_MANAGEMENT / CHANGELOG.
+1. Відкрити [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) і вставити **стартовий промпт** з §2.
+2. Агент працює як **оркестратор** (`autonomous-orchestrator.mdc`): **P0** збір патернів (subagent `explore`) → **S1–S4**; після коду — `cargo fmt` + `cargo test-ci`.
+3. **Ціль:** `AUTO_DEV_PATTERNS.md` (≥15 записів з `path:line`); FM-003 LAN або runbook; Architect `- [ ]`; оновити HANDOFF / FUNCTION_MANAGEMENT §5.1.
 4. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
-5. **Push:** MSYS2 bash, [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md), commit із **Summary** (шаблон у AUTO_RUN §5).
+5. **Push:** MSYS2 bash, [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md), **Summary** (шаблон AUTO_RUN 2026-05-17 §8).
