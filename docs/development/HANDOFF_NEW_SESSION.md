@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (автопрогін FM-013 admin API contracts; FM-003 ops без LAN).
+**Оновлено:** 2026-05-19 (автопрогін FM-014 + rewards HttpAppError).
 
-**Автономний прогін наступної сесії:** [`AUTO_RUN_SESSION_2026-05-18.md`](./AUTO_RUN_SESSION_2026-05-18.md) — завершено; далі **FM-003** (LAN стенд) або новий `AUTO_RUN_SESSION_*`.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-19.md`](./AUTO_RUN_SESSION_2026-05-19.md) — завершено; далі **FM-003** (LAN) або admin contracts фаза 3.
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) (P0 патерни), [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) (FM-012/007/008/002/011).
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-18.md`](./AUTO_RUN_SESSION_2026-05-18.md) (FM-013), [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) (P0 патерни).
 
-**Зріз робіт (автопрогін 2026-05-18):** **FM-013 ✅** — 12 тестів `admin_ui_api_contracts` (libraries/topology/vm/workers + `test-utils` attach); libs UI: `metadata.installed_at` для статусу; **FM-003** — **Planned (ops)**, LAN-стенд відсутній; **S3** — `cargo test-ci` 2026-05-18. Канон: **§5.1** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**Зріз (2026-05-19):** **FM-014 ✅** — 15 тестів `admin_ui_api_contracts` (+config/users/topology/nodes); **rewards** → `HttpAppError`; **FM-003** Planned (ops). **`cargo test-ci`** 2026-05-19. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 

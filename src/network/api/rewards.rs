@@ -31,14 +31,14 @@ pub fn create_rewards_routes() -> Router<ApiContext> {
 
 async fn rewards_handler(
     State(ctx): State<ApiContext>,
-) -> Result<Json<HashMap<String, f64>>, AppError> {
+) -> Result<Json<HashMap<String, f64>>, HttpAppError> {
     Ok(Json(RewardsService::reward_statistics(&ctx).await))
 }
 
 async fn user_rewards_handler(
     State(ctx): State<ApiContext>,
     Path(user_id): Path<String>,
-) -> Result<Json<Vec<Reward>>, AppError> {
+) -> Result<Json<Vec<Reward>>, HttpAppError> {
     Ok(Json(RewardsService::user_rewards(&ctx, &user_id).await))
 }
 
@@ -58,13 +58,13 @@ async fn user_progress_handler(
 
 async fn rewards_statistics_handler(
     State(ctx): State<ApiContext>,
-) -> Result<Json<HashMap<String, f64>>, AppError> {
+) -> Result<Json<HashMap<String, f64>>, HttpAppError> {
     Ok(Json(RewardsService::reward_statistics(&ctx).await))
 }
 
 async fn top_users_handler(
     State(ctx): State<ApiContext>,
-) -> Result<Json<Vec<(String, f64)>>, AppError> {
+) -> Result<Json<Vec<(String, f64)>>, HttpAppError> {
     Ok(Json(
         RewardsService::top_users(&ctx, TOP_USERS_DEFAULT_LIMIT).await,
     ))

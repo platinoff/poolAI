@@ -22,8 +22,8 @@
 | Libraries | `libs.rs` | `GET /api/v1/libraries` | `name`, `version`, `metadata` (об’єкт; **`metadata.installed_at`** → статус «Installed» у UI); опційно `installed` у майбутніх DTO. 503 → `{ "error": … }`. |
 | Instances | `instances.rs` | `GET /api/v1/instance`, previews | Поля списку інстансів і прев’ю — див. `instances.rs` API. |
 | Topology | `topology.rs` | `GET /api/v1/topology`, `/nodes`, `/latency` | `node_count`, `latency_measurements`, `last_updated`; вузли: `nodes.{id}.available_gpu_memory_mb`, `total_gpu_memory_mb`, `available_cpu_cores`, `current_load`. |
-| Users | `users.rs` | `GET /api/v1/users` | Поля користувача з `users` API. |
-| Config | `config.rs` | `GET /api/v1/config` | Вкладена структура `config.system`, `config.performance`, … |
+| Config | `config.rs` | `GET /api/v1/config` | `system`, `gpu`, `pool`, `monitoring`, `version`, `health`, `https`; UI читає `config.system.name`, `log_level`, `max_workers`, … (потрібен `initialize_config` при старті). |
+| Users | `users.rs` | `GET /api/v1/users` | `id`, `username`, `role`, `active`, `created_at` (масив). |
 | RAID | `raid.rs` | `GET /api/v1/raid/artifacts`, snapshot | Артефакти: `id` / `artifact_id`, `name`, `size`. |
 | | | `GET /api/v1/raid/admin/status` | Обгортка **`{ "status": { "mode", "initialized", "active", "rebalancing_enabled" } }`**. |
 | | | `GET …/metrics/burst`, `…/smallworld` | **`{ "metrics": { … } }`**: burst — `total_artifacts`, `artifacts_in_burst`, `base_replication_factor`, `max_replication_factor`; smallworld — `total_artifacts`, `total_nodes`, `avg_clustering_coefficient`, `target_clustering_coefficient`. |

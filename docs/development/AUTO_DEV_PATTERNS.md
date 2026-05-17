@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-17 (P0 автопрогін — 25 записів з `path:line`; регресія `get_global_` у `api/` = 0).
+**Оновлено:** 2026-05-19 (FM-014 admin contracts + rewards HttpAppError).
 
 ---
 
@@ -64,11 +64,19 @@
 - **Патерн:** `api_json_error("RATE_LIMIT_EXCEEDED", …)` + `retry_after` у тілі відповіді
 - **Перевірка:** `rg -n "RATE_LIMIT_EXCEEDED" src/network/rate_limit.rs`
 
-### [HTTP] Змішаний стиль rewards
-- **Де:** `src/network/api/rewards.rs:32-56`
-- **Сигнал:** більшість handlers → `AppError`; `user_progress_handler` → `HttpAppError` + `ApiNotFound`
-- **Патерн:** нові GET без складного контексту — `AppError`; коли потрібен `NOT_FOUND` з override — `HttpAppError`
-- **Перевірка:** `rg -n "Result<.*HttpAppError>" src/network/api/rewards.rs`
+### [HTTP] Rewards → HttpAppError
+- **Де:** `src/network/api/rewards.rs:32-71`
+- **Сигнал:** усі handlers → `Result<_, HttpAppError>`; `user_progress` → `ApiNotFound` + `ErrorContext`
+- **Патерн:** узгоджено з FM-005; `From<AppError>` для `HttpAppError` у `json_errors.rs`
+- **Перевірка:** `rg "Result<.*AppError>" src/network/api/rewards.rs` → 0
+- **FM:** FM-005 ✅, FM-014 ✅
+
+### [UI] Admin JSON contract tests
+- **Де:** `tests/admin_ui_api_contracts.rs`
+- **Сигнал:** `cargo test --test admin_ui_api_contracts --features test-utils,enterprise`
+- **Патерн:** `oneshot` на `/api/v1/*`; 503 → `error` object; `attach_*_for_test` для 200 shapes
+- **Перевірка:** 15+ tests (config, users, topology/nodes, …)
+- **FM:** FM-013, FM-014 ✅
 
 ---
 

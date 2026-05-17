@@ -173,6 +173,81 @@ async fn topology_overview_unavailable_has_structured_error() {
 }
 
 #[tokio::test]
+async fn config_get_json_shape_for_admin() {
+    use poolai::core::config::{initialize_config, PoolAIConfig};
+    let _ = initialize_config(PoolAIConfig::default());
+
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/config")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("config JSON");
+    let o = v.as_object().expect("config object");
+    for key in [
+        "system",
+        "gpu",
+        "pool",
+        "monitoring",
+        "version",
+        "health",
+        "https",
+    ] {
+        assert!(o.contains_key(key), "config missing `{key}`: {o:?}");
+    }
+    let system = o
+        .get("system")
+        .and_then(|s| s.as_object())
+        .expect("config.system object");
+    for key in ["name", "log_level", "max_workers", "queue_size"] {
+        assert!(
+            system.contains_key(key),
+            "config.system missing `{key}`: {system:?}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn users_list_json_shape_for_admin() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/users")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("users JSON");
+    let arr = v.as_array().expect("users array");
+    assert!(!arr.is_empty(), "seeded users list should be non-empty");
+    if let Some(first) = arr.first() {
+        let o = first.as_object().expect("user object");
+        for key in ["id", "username", "role", "active", "created_at"] {
+            assert!(o.contains_key(key), "user missing `{key}`: {o:?}");
+        }
+    }
+}
+
+#[tokio::test]
 async fn vm_instances_unavailable_has_structured_error() {
     let app = Router::new()
         .nest("/api/v1", create_api_routes())
@@ -234,6 +309,38 @@ mod attached_managers {
                 assert!(o.contains_key(key), "library missing `{key}`: {o:?}");
             }
         }
+    }
+
+    #[tokio::test]
+    async fn topology_nodes_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        state
+            .attach_topology_manager_for_test(Arc::new(TokioRwLock::new(TopologyManager::new(
+                None,
+            ))))
+            .expect("attach topology manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/topology/nodes")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("topology nodes JSON");
+        let o = v.as_object().expect("topology nodes object");
+        assert!(
+            o.contains_key("nodes"),
+            "topology nodes missing `nodes`: {o:?}"
+        );
     }
 
     #[tokio::test]
