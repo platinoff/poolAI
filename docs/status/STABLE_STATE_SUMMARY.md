@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-05-17 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
+## Rust Architect — оновлено 2026-05-18 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
 
 ---
 
@@ -21,6 +21,7 @@
 - ✅ **FM-002 / FM-011 (2026-05-16):** service layer audit (`api/` без `get_global_*`); **`cargo test-ci`**.
 - ◆ **FM-003 (Planned ops):** LAN-заміри — [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) (звірка runbook **2026-05-17**, стенд 2+ хостів відсутній); baseline `poolai_health_load` — **2026-04-10** у `BENCHMARKS.md`.
 - ✅ **P0 docs (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів для авторозробки.
+- ✅ **FM-013 (2026-05-18):** admin UI ↔ API JSON contracts — `tests/admin_ui_api_contracts.rs` (12 tests).
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус

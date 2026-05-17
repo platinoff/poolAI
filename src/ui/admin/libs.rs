@@ -42,7 +42,9 @@ pub async fn admin_libs() -> Html<String> {
           <tbody>
             ${libs.map(l => {
               const key = l.name || l.id || 'unknown';
-              const isInstalled = l.installed !== false;
+              const isInstalled =
+                l.installed === true ||
+                Boolean(l.metadata && l.metadata.installed_at);
               const keyJs = JSON.stringify(key);
               return `
               <tr>

@@ -1,5 +1,6 @@
 //! JSON shape checks for admin dashboard and RAID admin HTTP API.
 //! Enterprise dashboard slices are tested when built with `--features enterprise`.
+//! FM-013: libraries, topology, VM, workers — keys expected by `src/ui/admin/*.rs`.
 
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
@@ -8,6 +9,13 @@ use poolai::core::state::ApiContext;
 use poolai::network::api::create_api_routes;
 use serde_json::Value;
 use tower::ServiceExt;
+
+fn assert_structured_error(v: &Value) {
+    assert!(
+        v.get("error").is_some(),
+        "expected structured JSON error: {v:?}"
+    );
+}
 
 #[tokio::test]
 async fn admin_overview_includes_dashboard_keys() {
@@ -78,10 +86,246 @@ async fn raid_admin_status_json_shape() {
         }
     } else {
         assert_eq!(status, StatusCode::SERVICE_UNAVAILABLE);
-        assert!(
-            v.get("error").is_some(),
-            "expected structured JSON error for RAID admin 503: {v:?}"
-        );
+        assert_structured_error(&v);
+    }
+}
+
+#[tokio::test]
+async fn workers_list_json_shape_for_admin() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/workers")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("workers JSON");
+    let arr = v.as_array().expect("workers array");
+    assert!(!arr.is_empty(), "mock workers list should be non-empty");
+    if let Some(first) = arr.first() {
+        let o = first.as_object().expect("worker object");
+        for key in [
+            "id",
+            "status",
+            "current_task",
+            "is_healthy",
+            "total_requests_processed",
+            "queue_size",
+            "active_connections",
+            "average_response_time_ms",
+        ] {
+            assert!(o.contains_key(key), "worker missing `{key}`: {o:?}");
+        }
+    }
+}
+
+#[tokio::test]
+async fn libraries_list_unavailable_has_structured_error() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/libraries")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("libraries error JSON");
+    assert_structured_error(&v);
+}
+
+#[tokio::test]
+async fn topology_overview_unavailable_has_structured_error() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/topology")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("topology error JSON");
+    assert_structured_error(&v);
+}
+
+#[tokio::test]
+async fn vm_instances_unavailable_has_structured_error() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/vm/instances")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("vm instances error JSON");
+    assert_structured_error(&v);
+}
+
+#[cfg(feature = "test-utils")]
+mod attached_managers {
+    use super::*;
+    use poolai::core::state::AppState;
+    use poolai::libs::LibraryManager;
+    use poolai::pool::topology::TopologyManager;
+    use poolai::vm::{VmIsolation, VmManager, VmResources};
+    use std::sync::Arc;
+    use tokio::sync::RwLock as TokioRwLock;
+
+    #[tokio::test]
+    async fn libraries_list_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        state
+            .attach_library_manager_for_test(Arc::new(TokioRwLock::new(LibraryManager::new())))
+            .expect("attach library manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/libraries")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("libraries JSON");
+        let arr = v.as_array().expect("libraries array");
+        if let Some(first) = arr.first() {
+            let o = first.as_object().expect("library object");
+            for key in ["name", "version", "metadata"] {
+                assert!(o.contains_key(key), "library missing `{key}`: {o:?}");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn topology_overview_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        state
+            .attach_topology_manager_for_test(Arc::new(TokioRwLock::new(TopologyManager::new(
+                None,
+            ))))
+            .expect("attach topology manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/topology")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("topology JSON");
+        let o = v.as_object().expect("topology object");
+        for key in [
+            "node_count",
+            "latency_measurements",
+            "last_updated",
+            "node_ids",
+        ] {
+            assert!(o.contains_key(key), "topology missing `{key}`: {o:?}");
+        }
+    }
+
+    #[tokio::test]
+    async fn vm_instances_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        let manager = Arc::new(VmManager::new());
+        manager.initialize().await.expect("vm init");
+        manager
+            .create_instance(
+                "admin-contract-vm".to_string(),
+                VmResources {
+                    cpu_cores: 1,
+                    memory_mb: 512,
+                    gpu_required: false,
+                    gpu_scheduling_policy: None,
+                },
+                VmIsolation::ProcessSandbox,
+            )
+            .await
+            .expect("create vm");
+        state
+            .attach_vm_manager_for_test(manager)
+            .expect("attach vm manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/vm/instances")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("vm instances JSON");
+        let arr = v.as_array().expect("vm instances array");
+        assert!(!arr.is_empty(), "expected at least one VM instance");
+        let o = arr[0].as_object().expect("vm instance object");
+        for key in ["id", "name", "status", "resources"] {
+            assert!(o.contains_key(key), "vm instance missing `{key}`: {o:?}");
+        }
+        let resources = o
+            .get("resources")
+            .and_then(|r| r.as_object())
+            .expect("resources object");
+        for key in ["cpu_cores", "memory_mb"] {
+            assert!(
+                resources.contains_key(key),
+                "vm resources missing `{key}`: {resources:?}"
+            );
+        }
     }
 }
 

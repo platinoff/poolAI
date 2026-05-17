@@ -19,7 +19,7 @@
 | | | `GET /api/enterprise/monitoring/metrics?…` | Масив точок: `metric`, `value` → графіки (очікується `cpu_usage`, `memory_usage`). |
 | Workers | `workers.rs` | `GET /api/v1/workers` | `id` / `worker_id`, `is_healthy`, `total_requests_processed` → таблиця. |
 | VM | `vm.rs` | `GET /api/v1/vm/instances` | `name`, `status` (рядок), `resources.cpu_cores`, `resources.memory_mb`, `id` → таблиця та дії. |
-| Libraries | `libs.rs` | `GET /api/v1/libraries` | Поля з `LibraryInfo` (назва, версія тощо) — див. handler `libraries.rs`. |
+| Libraries | `libs.rs` | `GET /api/v1/libraries` | `name`, `version`, `metadata` (об’єкт; **`metadata.installed_at`** → статус «Installed» у UI); опційно `installed` у майбутніх DTO. 503 → `{ "error": … }`. |
 | Instances | `instances.rs` | `GET /api/v1/instance`, previews | Поля списку інстансів і прев’ю — див. `instances.rs` API. |
 | Topology | `topology.rs` | `GET /api/v1/topology`, `/nodes`, `/latency` | `node_count`, `latency_measurements`, `last_updated`; вузли: `nodes.{id}.available_gpu_memory_mb`, `total_gpu_memory_mb`, `available_cpu_cores`, `current_load`. |
 | Users | `users.rs` | `GET /api/v1/users` | Поля користувача з `users` API. |

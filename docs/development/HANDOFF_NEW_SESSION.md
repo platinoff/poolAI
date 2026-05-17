@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-17 (автопрогін P0–S4: патерни + FM-003 ops doc; LAN-стенд відсутній).
+**Оновлено:** 2026-05-18 (автопрогін FM-013 admin API contracts; FM-003 ops без LAN).
 
-**Автономний прогін наступної сесії:** [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) — **P0** патерни → [`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md), **S1–S4**, оркестратор [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc).
+**Автономний прогін наступної сесії:** [`AUTO_RUN_SESSION_2026-05-18.md`](./AUTO_RUN_SESSION_2026-05-18.md) — завершено; далі **FM-003** (LAN стенд) або новий `AUTO_RUN_SESSION_*`.
 
-**Попередній прогін (завершено):** [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) — S1–S6, FM-012/007/008/002/011.
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) (P0 патерни), [`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md) (FM-012/007/008/002/011).
 
-**Зріз робіт (автопрогін 2026-05-17):** **P0 ✅** — [`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md) (25 записів `path:line`; `get_global_` у `api/` = 0; `HttpAppError|RestError` у `network` = 216); **S1 FM-003** — runbook/BENCHMARKS оновлено, LAN-стенд **немає** → **Planned (ops)**; **S2** — Architect `- [ ]`: LAN → FM-003, cloud-sdk → FM-006 (поза обсягом); **S3** — `cargo fmt` + `cargo test-ci` (дата в §5.1 FM). Попередній прогін **2026-05-16:** FM-012/007/008/002/011 ✅. **FM-005 ✅**. Далі: LAN на 2+ хостах (FM-003). FM-004/006/009/010 поза обсягом. Канон: **§5.1** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**Зріз робіт (автопрогін 2026-05-18):** **FM-013 ✅** — 12 тестів `admin_ui_api_contracts` (libraries/topology/vm/workers + `test-utils` attach); libs UI: `metadata.installed_at` для статусу; **FM-003** — **Planned (ops)**, LAN-стенд відсутній; **S3** — `cargo test-ci` 2026-05-18. Канон: **§5.1** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
