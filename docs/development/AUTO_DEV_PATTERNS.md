@@ -345,9 +345,9 @@
 
 ### [FM-019] pa11y CI (workflow_dispatch)
 - **Де:** `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml`
-- **Патерн:** `bash bin/pa11y-ci.sh --start` — release poolai + strict `/ui/login` (`PA11Y_THRESHOLD=0`, runner `axe`); admin URLs optional (не валять exit)
-- **Перевірка:** GitHub Actions → **A11y (pa11y)** → Run workflow
-- **FM:** FM-019 Partial (pa11y CI)
+- **Патерн:** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — login actions (`#username`, `#password`, `#loginBtn`) then strict admin URLs; creds `PA11Y_USER`/`PA11Y_PASSWORD` (default `admin`/`admin123`)
+- **Перевірка:** `cargo test --test pa11y_ci_script`; GitHub Actions → **A11y (pa11y)**
+- **FM:** FM-019 Partial (pa11y auth)
 
 ### [FM-019] Dashboard modals (workers/libs/vm/raid)
 - **Де:** `src/ui/mod.rs` (`showModal`, `keepFocusInModal`, `attachDashModalA11y`)

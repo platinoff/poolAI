@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-019 (partial, 2026-05-18)** — pa11y auth fixture: `PA11Y_ADMIN_STRICT`, login actions for admin URLs; `tests/pa11y_ci_script.rs`.
 - **FM-019 (partial, 2026-05-18)** — pa11y CI: `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml` (strict login, optional admin).
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **AUTO_RUN 2026-06-11** — FM-019 pa11y auth fixture; runbook §3; HANDOFF/FM synced.
 - **AUTO_RUN 2026-06-10** — FM-019 pa11y CI; runbook §3; HANDOFF/FM synced.
 - **AUTO_RUN 2026-06-09** — FM-019 dashboard modals; runbook §2/§5; HANDOFF/FM/STABLE synced.
 - **AUTO_RUN 2026-06-08 / P4 (2026-05-18)** — `poolai_health_load --json` (release, MSYS2) → новий рядок у `BENCHMARKS.md`; §5.1 next FM-019/FM-003; HANDOFF/STABLE/README/FM synced.

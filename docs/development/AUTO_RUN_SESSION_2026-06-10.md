@@ -8,7 +8,7 @@
 - [x] `bin/pa11y-ci.sh` — strict `/ui/login`, optional admin/workers
 - [x] `.github/workflows/a11y.yml` — `workflow_dispatch`
 - [x] `ADMIN_A11Y_RUNBOOK.md` §3 оновлено
-- [ ] push (MSYS2)
+- [x] push — `8c5dc1df`
 
 **BLOCKED:** FM-003 §4 LAN (2 хости).
 
@@ -26,4 +26,4 @@ S0: git fetch && git status -sb; HANDOFF + FUNCTION_MANAGEMENT §5.1–5.3.
 
 **Артефакти:** `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml`.
 
-**Далі:** підняти strict поріг для admin після auth fixture; FM-003 §4 (BLOCKED).
+**Далі:** [`AUTO_RUN_SESSION_2026-06-11.md`](./AUTO_RUN_SESSION_2026-06-11.md) (auth fixture).

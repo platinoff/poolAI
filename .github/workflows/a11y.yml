@@ -8,6 +8,9 @@ env:
   CARGO_TERM_COLOR: always
   K8S_OPENAPI_ENABLED_VERSION: "1.28"
   POOLAI_HTTP_PORT: "8080"
+  PA11Y_ADMIN_STRICT: "1"
+  PA11Y_USER: admin
+  PA11Y_PASSWORD: admin123
 
 jobs:
   pa11y:
@@ -38,5 +41,5 @@ jobs:
       - name: Build poolai (enterprise)
         run: cargo build --release --features enterprise,ml,cloud,test-utils
 
-      - name: Run pa11y (login strict; admin optional)
+      - name: Run pa11y (login + authenticated admin strict)
         run: bash bin/pa11y-ci.sh --start

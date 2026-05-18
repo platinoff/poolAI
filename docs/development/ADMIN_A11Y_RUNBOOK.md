@@ -41,17 +41,20 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ## 3. pa11y (локально + CI)
 
-**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; optional (не валить exit): admin users/security, `/ui/workers`.
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — admin users/security + `/ui/workers` після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`).
 
 ```bash
 # MSYS2: poolai вже на :8080
 bash bin/pa11y-ci.sh
 
+# strict admin (login fixture через pa11y actions)
+PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh
+
 # або зібрати + підняти poolai, потім scan
 bash bin/pa11y-ci.sh --start
 ```
 
-**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch` only; Ubuntu; `pa11y@9` + runner `axe`.
+**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch`; `PA11Y_ADMIN_STRICT=1`.
 
 Ручний одиночний URL:
 
@@ -79,7 +82,7 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 ## 5. Backlog (поза baseline)
 
 - ~~Повний прохід dashboard modals (workers, libs, VM, RAID)~~ — **Partial ✅ 2026-05-18** (`src/ui/mod.rs`, `ui::dashboard_a11y_tests`).
-- ~~`pa11y` / axe у CI~~ — **Partial ✅** `a11y.yml` + `bin/pa11y-ci.sh` (strict login; admin optional).
+- ~~`pa11y` / axe у CI~~ — **Partial ✅** `a11y.yml` + `bin/pa11y-ci.sh` (login + `PA11Y_ADMIN_STRICT` auth actions).
 - Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (історичний чеклист).
 
 **Last updated:** 2026-05-18 — FM-019 pa11y CI partial (`a11y.yml`, `bin/pa11y-ci.sh`).
