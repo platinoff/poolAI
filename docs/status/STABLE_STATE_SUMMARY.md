@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-06-07 (v0.2.2; FM-019 baseline; §5.3 audit)
+## Rust Architect — оновлено 2026-05-18 (v0.2.2; P4 health_load; FM-019 baseline)
 
 ---
 
@@ -19,7 +19,8 @@
 - ✅ **FM-012 (2026-05-16):** i18n UA/EN + Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget UA/EN, Viewer RBAC).
 - ✅ **FM-007 / FM-008 (2026-05-16):** distributed RAID wire — 15 тестів `distributed_raid_wire_integration`.
 - ✅ **FM-002 / FM-011 (2026-05-16):** service layer audit (`api/` без `get_global_*`); **`cargo test-ci`**.
-- ◆ **FM-003 §4 (BLOCKED):** реальний LAN — немає 2 хостів; ops зріз **2026-06-01** у `BENCHMARKS.md` / `LAN_BENCHMARK_RUNBOOK.md`; dev stand §5.1 + `verify-dev-stand`; baseline `poolai_health_load` — **2026-04-10**.
+- ◆ **FM-003 §4 (BLOCKED):** реальний LAN — немає 2 хостів; ops зріз **2026-06-01** у `BENCHMARKS.md` / `LAN_BENCHMARK_RUNBOOK.md`; dev stand §5.1 + `verify-dev-stand`.
+- ✅ **P4 (2026-05-18):** `poolai_health_load --json` на **win10-local-26200** → рядок у `BENCHMARKS.md` (історичний baseline **2026-04-10** лишається).
 - ✅ **P0 docs (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів для авторозробки.
 - ✅ **FM-013 (2026-05-18):** admin UI ↔ API JSON contracts — `tests/admin_ui_api_contracts.rs` (12 tests).
 - ✅ **FM-014 (2026-05-19):** admin contracts фаза 2 (config/users/topology) + rewards `HttpAppError` (15 tests).

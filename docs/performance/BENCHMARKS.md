@@ -132,6 +132,7 @@ After **`cargo run --release --bin poolai_health_load -- --json <URL> <seconds> 
 |------------|-----|--------|---------|-----|--------|--------|--------|--------|--------|------|
 | *e.g. ref-linux-01* | `http://127.0.0.1:8080/api/v1/health` | *from JSON* | *from CLI* | *ok_requests* | *error_requests* | *rps_ok_only* | *latency_p50_ms* | *latency_p95_ms* | *latency_p99_ms* | *YYYY-MM-DD* |
 | win10-local-26200 | `http://127.0.0.1:8080/api/v1/health` | 5.006 | 50 | 149858 | 0 | 29934.63 | 1.568 | 2.704 | 3.623 | 2026-04-10 |
+| win10-local-26200 | `http://127.0.0.1:8080/api/v1/health` | 5.016 | 50 | 18221 | 0 | 3632.46 | 12.136 | 24.848 | 34.903 | 2026-05-18 |
 
 ### Target metrics (P4 roadmap, non-binding)
 
@@ -151,6 +152,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-05-18 | AUTO_RUN 2026-06-08 S1: **P4** `poolai_health_load --json` (release, MSYS2 UCRT64) на **win10-local-26200** — рядок у таблиці `poolai_health_load`; coordinator already on `:8080`; FM-003 §4 лишається **BLOCKED**. |
 | 2026-06-01 | AUTO_RUN 2026-06-01: FM-003 §4 **BLOCKED** (2 фізичні хости відсутні); [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) §6 оновлено; dev stand §5.1 (`verify-dev-stand`) — канон для однієї машини; **без** нового `poolai_health_load` / LAN replication row (baseline **2026-04-10** чинний). |
 | 2026-05-17 | AUTO_RUN 2026-05-17 S1: LAN-стенд недоступний (1 хост); runbook оновлено; FM-003 **Planned (ops)** — без нового рядка `poolai_health_load` (baseline **2026-04-10** чинний). |
 | 2026-05-16 | FM-003 ops: [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) (два вузли LAN, replication + TQ01); baseline `poolai_health_load` — рядок **2026-04-10** лишається чинним до нового прогону на стенді. |
