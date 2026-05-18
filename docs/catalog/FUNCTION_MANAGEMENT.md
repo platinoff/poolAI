@@ -110,7 +110,7 @@ FM-xxx (з таблиці нижче)
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
 | FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Partial | `discovery.rs` ✅; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
-| FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current; dashboard вже мав skip/ARIA | Partial | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs` |
+| FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current; dashboard вже мав skip/ARIA | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -121,7 +121,7 @@ FM-xxx (з таблиці нижче)
 | 1 | HTTP errors (worker-safe) | **FM-017** | ✅ discovery JSON errors; virtual-nodes status-only задокументовано; за потреби dual format пізніше |
 | 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
 | 3 | ML ops | **DIGEST §ML** | Pipeline hardening, метрики, runbook (не новий FM поки не оформлено Issue) |
-| 4 | UI accessibility | **FM-018** | ✅ admin/login a11y slice; далі — повний WCAG з [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
+| 4 | UI accessibility | **FM-018** ✅ | Повний WCAG — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (окремі спринти) |
 | 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` (`TODO` у `azure.rs`/`gcp.rs`) |
 | 6 | Концепт | **FM-009**, **FM-010** | Grid envelope; Solana — поза автопрогоном |
 
@@ -149,7 +149,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** наступний спринт — FM-003 §4 (BLOCKED) або FM-018 a11y.
+**Поточний:** [`AUTO_RUN_SESSION_2026-05-31.md`](../development/AUTO_RUN_SESSION_2026-05-31.md) — DIGEST §ML pipeline hardening.
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-30.md`](../development/AUTO_RUN_SESSION_2026-05-30.md) (FM-018 a11y ✅).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-28.md`](../development/AUTO_RUN_SESSION_2026-05-28.md) (ops hygiene, test-ci).
 

@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (FM-014 admin contracts + rewards HttpAppError).
+**Оновлено:** 2026-05-18 (FM-018 admin a11y + nav aria-current).
 
 ---
 
@@ -296,10 +296,11 @@
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
 - **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
 
-### [FM-018] Admin/login a11y (partial)
-- **Де:** `src/ui/admin/mod.rs`, `admin_styles.css`, `admin_common.js`; login у `src/ui/mod.rs` (`login_page`)
-- **Патерн:** skip links; `aria-live` для помилок; `aria-current="page"` на nav; у `format!` **не** літерал `#fragment` — лише `{skip_href}` з `"#admin_main_content"`
-- **Перевірка:** `cargo check -p poolai --features enterprise`
+### [FM-018] Admin/login a11y
+- **Де:** `src/ui/admin/mod.rs:89-130`, `admin_styles.css:770-808`, `admin_common.js` (`adminMarkCurrentNav`, `adminAnnounceLive`); login у `src/ui/mod.rs`
+- **Патерн:** skip links → `#admin_main_content` / `#admin_nav`; `aria-live` для помилок; `aria-current="page"` через `adminMarkCurrentNav()` (DOMContentLoaded + inline shell); у `format!` **не** літерал `#fragment`
+- **Перевірка:** `cargo test -p poolai --features enterprise ui::admin::a11y_tests`
+- **FM:** FM-018 ✅
 
 ### [FM-017] Discovery HttpAppError + virtual-node status-only
 - **Де:** `src/network/api/discovery.rs` (`discovery_not_ready`, `discovery_validation`, …); `virtual_nodes.rs` — status-only (коментар FM-017)

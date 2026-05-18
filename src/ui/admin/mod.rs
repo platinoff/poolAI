@@ -144,9 +144,11 @@ pub fn admin_layout(
         PoolAiI18n.apply(document.body);
         PoolAiI18n.initAdminShell();
         adminSyncDocTitle();
+        if (typeof adminMarkCurrentNav === 'function') adminMarkCurrentNav();
         document.addEventListener('poolai:langchange', function() {{
           PoolAiI18n.apply(document.body);
           adminSyncDocTitle();
+          if (typeof adminMarkCurrentNav === 'function') adminMarkCurrentNav();
         }});
       }}
       if (!requireAdmin()) {{
@@ -169,4 +171,21 @@ pub fn admin_layout(
     );
 
     Html(html)
+}
+
+#[cfg(all(test, feature = "enterprise"))]
+mod a11y_tests {
+    use super::admin_layout;
+
+    #[test]
+    fn admin_layout_includes_skip_links_and_live_region() {
+        let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+        let body = html.0;
+        assert!(body.contains("class=\"skip_link\""));
+        assert!(body.contains("id=\"admin_main_content\""));
+        assert!(body.contains("id=\"admin_nav\""));
+        assert!(body.contains("id=\"admin-aria-live\""));
+        assert!(body.contains("role=\"navigation\""));
+        assert!(body.contains("role=\"main\""));
+    }
 }

@@ -456,15 +456,8 @@ function logout() {
   window.location.href = '/ui/auth';
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-  // Check admin access
-  if (!requireAdmin()) return;
-  
-  // Initialize tabs
-  initTabs();
-  
-  // Set active nav item
+/** FM-018: highlight current nav link for screen readers and keyboard users. */
+function adminMarkCurrentNav() {
   const currentPath = window.location.pathname;
   document.querySelectorAll('.admin-nav-item').forEach(item => {
     const isCurrent = item.getAttribute('href') === currentPath;
@@ -475,8 +468,12 @@ document.addEventListener('DOMContentLoaded', () => {
       item.removeAttribute('aria-current');
     }
   });
-  
-  // Set user name
+}
+
+function adminShellOnReady() {
+  if (!requireAdmin()) return;
+  initTabs();
+  adminMarkCurrentNav();
   const user = getUser();
   if (user) {
     const userNameEl = document.getElementById('admin-user-name');
@@ -484,12 +481,18 @@ document.addEventListener('DOMContentLoaded', () => {
       userNameEl.textContent = user.username || 'Admin';
     }
   }
-
   document.addEventListener('poolai:langchange', () => {
     if (typeof PoolAiI18n !== 'undefined') PoolAiI18n.apply(document.body);
     if (typeof PoolAiI18n !== 'undefined') PoolAiI18n.initAdminShell();
+    adminMarkCurrentNav();
   });
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', adminShellOnReady);
+} else {
+  adminShellOnReady();
+}
 
 // Add CSS animations
 const style = document.createElement('style');
