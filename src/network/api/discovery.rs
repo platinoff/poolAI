@@ -22,6 +22,7 @@ use crate::services::discovery_service::{
     VirtualNodeStatus,
 };
 use crate::services::virtual_node_task_service::VirtualNodeTaskService;
+use crate::services::virtual_node_telegram_binding_service::VirtualNodeTelegramBindingService;
 
 /// Discovery API response types
 #[derive(Serialize)]
@@ -147,6 +148,8 @@ async fn register_remote_handler(
         return StatusCode::BAD_REQUEST.into_response();
     }
     let is_virtual_node = payload.metadata.get("role").map(String::as_str) == Some("virtual_node");
+    let telegram_id = payload.metadata.get("telegram_id").cloned();
+    let telegram_chat_id = payload.metadata.get("telegram_chat_id").cloned();
     let peer_id = payload.peer_id.clone();
     match DiscoveryService::register_remote_peer(
         &ctx,
@@ -161,6 +164,9 @@ async fn register_remote_handler(
         Ok(()) => {
             if is_virtual_node {
                 VirtualNodeTaskService::enqueue_bootstrap_tasks(&peer_id);
+                if let Some(tg) = telegram_id {
+                    VirtualNodeTelegramBindingService::bind(&tg, telegram_chat_id, &peer_id);
+                }
             }
             (
                 StatusCode::OK,

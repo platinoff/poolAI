@@ -108,7 +108,7 @@ FM-xxx (з таблиці нижче)
 | FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок: libraries, topology, VM, workers; узгодження `installed` у libs UI з `metadata.installed_at` | Implemented | `tests/admin_ui_api_contracts.rs`, [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md), `src/ui/admin/libs.rs` |
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
-| FM-016 | Workers / Telegram | **Virtual nodes:** register/heartbeat, task poll/complete, RAID wire `health_check`; `poolai-worker` на device; далі — Telegram bot binding + повний pool workload | Implemented (core) | `virtual_node_task_service`, `api/virtual_nodes.rs`, `poolai-worker`, integration tests |
+| FM-016 | Workers / Telegram | **Virtual nodes:** register/heartbeat, tasks, RAID wire; Telegram bind/webhook (`/virtual-nodes/telegram/*`), file store `POOLAI_VIRTUAL_NODE_DATA_DIR`; `poolai-worker` + `POOLAI_TELEGRAM_ID`; далі — teloxide bot, pool workload | Implemented (core + binding) | `virtual_node_*_service`, `api/virtual_nodes.rs`, `poolai-worker`, integration tests |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -128,7 +128,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Telegram / device binding | **FM-016+** | Telegram bot ↔ worker binding, production task store; FM-016 core ✅ |
+| 1 | Telegram bot runtime | **FM-016++** | teloxide long-poll/webhook bot; FM-016+ bind/webhook/store ✅ |
 | 2 | Real LAN | **FM-003** | Після device workers у проді; `BENCHMARKS.md` §4 |
 | 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |

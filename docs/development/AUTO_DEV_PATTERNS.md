@@ -247,6 +247,17 @@
 - **Патерн:** env `POOLAI_COORDINATOR_URL` + periodic re-register on heartbeat failure
 - **Перевірка:** `cargo build --bin poolai-worker`; manual: coordinator + worker health `GET /health`
 
+### [Workers] Telegram bind + webhook → task
+- **Де:** `src/network/api/virtual_nodes.rs` (bind/webhook handlers), `src/services/virtual_node_telegram_binding_service.rs`
+- **Патерн:** webhook resolves `telegram_user_id` → `peer_id` → `VirtualNodeTaskService::enqueue`
+- **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration`
+- **FM:** FM-016+ ✅
+
+### [Workers] Virtual node file store
+- **Де:** `src/services/virtual_node_store.rs`, env `POOLAI_VIRTUAL_NODE_DATA_DIR`
+- **Патерн:** `telegram_bindings.json` + `tasks/{peer_id}.json` (atomic write)
+- **Перевірка:** coordinator restart with dir set; tasks/bindings survive
+
 ### [Workers] Discovery remote register test harness
 - **Де:** `tests/discovery_remote_register_integration.rs`, `tests/virtual_node_tasks_integration.rs:18-40`
 - **Патерн:** `attach_raid_manager_for_test` + `DiscoveryService` у `ApiContext` → `create_api_routes().with_state(ctx)`

@@ -183,6 +183,40 @@ async fn register_remote(client: &reqwest::Client, args: &Args) -> Result<(), St
         let text = response.text().await.unwrap_or_default();
         return Err(format!("register-remote HTTP {status}: {text}"));
     }
+    if let Some(tg) = &args.telegram_id {
+        bind_telegram_remote(client, args, tg).await?;
+    }
+    Ok(())
+}
+
+async fn bind_telegram_remote(
+    client: &reqwest::Client,
+    args: &Args,
+    telegram_user_id: &str,
+) -> Result<(), String> {
+    let url = format!(
+        "{}/api/v1/virtual-nodes/telegram/bind",
+        args.coordinator_url
+    );
+    let body = serde_json::json!({
+        "telegram_user_id": telegram_user_id,
+        "peer_id": args.worker_id,
+    });
+    let response = client
+        .post(&url)
+        .json(&body)
+        .send()
+        .await
+        .map_err(|e| format!("telegram bind request failed: {e}"))?;
+    if !response.status().is_success() {
+        let status = response.status();
+        let text = response.text().await.unwrap_or_default();
+        return Err(format!("telegram bind HTTP {status}: {text}"));
+    }
+    info!(
+        "Telegram user {} bound to worker {}",
+        telegram_user_id, args.worker_id
+    );
     Ok(())
 }
 

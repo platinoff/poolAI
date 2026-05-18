@@ -6,11 +6,12 @@
 
 **Поза обсягом:** FM-003 (real LAN), FM-004, FM-006, FM-009, FM-010.
 
-**Критерії (чернетка):**
-- [ ] Маршрут або сервіс прив’язки Telegram user/chat → `worker_id` / virtual node
-- [ ] Документований env/конфіг для coordinator + worker (без секретів у репо)
-- [ ] Інтеграційний тест binding або poll path (mock Telegram webhook)
-- [ ] `cargo fmt` + `cargo test-ci` зелені; push MSYS2 з Summary
+**Критерії:**
+- [x] `POST/GET/DELETE /virtual-nodes/telegram/bind*` + `POST /virtual-nodes/telegram/webhook`
+- [x] `VirtualNodeTelegramBindingService`; auto-bind з `metadata.telegram_id` при register-remote
+- [x] `POOLAI_VIRTUAL_NODE_DATA_DIR`, `POOLAI_TELEGRAM_WEBHOOK_SECRET`, worker `POOLAI_TELEGRAM_ID`
+- [x] `tests/virtual_node_telegram_binding_integration.rs` (2 tests)
+- [ ] `cargo test-ci` + push MSYS2 з Summary
 
 **Стартовий промпт (оркестратор):**
 

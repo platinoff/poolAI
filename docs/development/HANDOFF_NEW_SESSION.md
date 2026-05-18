@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (FM-016 core закрито; наступний прогін FM-016+).
+**Оновлено:** 2026-05-18 (FM-016+ Telegram binding + file store).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-22.md`](./AUTO_RUN_SESSION_2026-05-22.md) — **FM-016+** Telegram binding.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-22.md`](./AUTO_RUN_SESSION_2026-05-22.md) — **FM-016+** in progress (binding ✅; push pending).
 
 **FM-003 (реальний LAN):** відкладено до **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
 
-**FM-016 ✅ (core):** register/heartbeat, virtual-nodes, task poll/complete, RAID `health_check` wire; `poolai-worker` на device; `cargo test-ci` 2026-05-18. **Далі:** FM-016+ bot binding, production task store.
+**FM-016 ✅ (core):** register/heartbeat, virtual-nodes, task poll/complete, RAID wire; `poolai-worker`. **FM-016+ ✅:** Telegram bind/webhook API, file store (`POOLAI_VIRTUAL_NODE_DATA_DIR`), worker `POOLAI_TELEGRAM_ID` → bind. **Далі:** teloxide bot, FM-003 real LAN.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -32,6 +32,17 @@
 | 12 | Керування функціоналом: [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) (**§5.1 — наступні кроки за FM-***); правило [`.cursor/rules/functionality-management.mdc`](../../.cursor/rules/functionality-management.mdc). |
 
 Індекс планів у `docs/development/`: [`README.md`](./README.md). **Таксономія каталогу `docs/`:** [`../STRUCTURE.md`](../STRUCTURE.md). OpenAPI: [`docs/openapi.yaml`](../openapi.yaml). UI↔API: [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md). **Крок 11 / витяг функціоналу:** [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). **Крок 12 / беклог:** [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) (**§5.1** — наступні кроки за FM-*). **Project skill (Cursor):** [`.cursor/skills/poolai-documentation/SKILL.md`](../../.cursor/skills/poolai-documentation/SKILL.md).
+
+## 2a. Virtual node / Telegram env (FM-016+)
+
+| Змінна | Де | Призначення |
+|--------|-----|-------------|
+| `POOLAI_COORDINATOR_URL` | worker | Base URL coordinator (без trailing `/`) |
+| `POOLAI_TELEGRAM_ID` | worker | Telegram user id → `POST .../telegram/bind` після register |
+| `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |
+| `POOLAI_TELEGRAM_WEBHOOK_SECRET` | coordinator | Опційно: header `X-Telegram-Webhook-Secret` для webhook |
+
+Секрети бота (`TELEGRAM_BOT_TOKEN`) — лише в env на хості, не в репо.
 
 ## 2. Git push (Windows / Cursor)
 

@@ -1,17 +1,20 @@
-//! Virtual-node worker task API (FM-016 phase 3).
+//! Virtual-node worker task API (FM-016 phase 3) and Telegram binding (FM-016+).
 
 use axum::{
-    extract::{Path, State},
-    http::StatusCode,
+    extract::Path,
+    http::{HeaderMap, StatusCode},
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 use crate::core::state::ApiContext;
 use crate::services::virtual_node_task_service::{VirtualNodeTask, VirtualNodeTaskService};
+use crate::services::virtual_node_telegram_binding_service::{
+    TelegramBinding, VirtualNodeTelegramBindingService,
+};
 
 #[derive(Serialize)]
 struct PollTasksResponse {
@@ -50,6 +53,60 @@ struct VirtualNodeTaskStatusResponse {
     completed: usize,
 }
 
+#[derive(Deserialize)]
+struct BindTelegramRequest {
+    telegram_user_id: String,
+    peer_id: String,
+    #[serde(default)]
+    chat_id: Option<String>,
+}
+
+#[derive(Serialize)]
+struct BindTelegramResponse {
+    binding: TelegramBinding,
+}
+
+#[derive(Serialize)]
+struct TelegramBindingsListResponse {
+    bindings: Vec<TelegramBinding>,
+}
+
+#[derive(Deserialize)]
+struct TelegramWebhookUpdate {
+    #[serde(default)]
+    update_id: i64,
+    #[serde(default)]
+    message: Option<TelegramWebhookMessage>,
+}
+
+#[derive(Deserialize)]
+struct TelegramWebhookMessage {
+    #[serde(default)]
+    from: Option<TelegramWebhookUser>,
+    #[serde(default)]
+    chat: Option<TelegramWebhookChat>,
+    #[serde(default)]
+    text: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct TelegramWebhookUser {
+    id: i64,
+}
+
+#[derive(Deserialize)]
+struct TelegramWebhookChat {
+    id: i64,
+}
+
+#[derive(Serialize)]
+struct TelegramWebhookResponse {
+    ok: bool,
+    peer_id: Option<String>,
+    task: Option<VirtualNodeTask>,
+    detail: Option<String>,
+}
+
 pub fn create_virtual_node_routes() -> Router<ApiContext> {
     Router::new()
         .route(
@@ -64,6 +121,19 @@ pub fn create_virtual_node_routes() -> Router<ApiContext> {
         .route(
             "/virtual-nodes/{peer_id}/tasks/status",
             get(task_status_handler),
+        )
+        .route("/virtual-nodes/telegram/bind", post(bind_telegram_handler))
+        .route(
+            "/virtual-nodes/telegram/bindings",
+            get(list_telegram_bindings_handler),
+        )
+        .route(
+            "/virtual-nodes/telegram/bindings/{telegram_user_id}",
+            get(get_telegram_binding_handler).delete(unbind_telegram_handler),
+        )
+        .route(
+            "/virtual-nodes/telegram/webhook",
+            post(telegram_webhook_handler),
         )
 }
 
@@ -113,4 +183,127 @@ async fn task_status_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
             completed,
         }),
     )
+}
+
+async fn bind_telegram_handler(Json(body): Json<BindTelegramRequest>) -> impl IntoResponse {
+    if body.telegram_user_id.trim().is_empty() || body.peer_id.trim().is_empty() {
+        return StatusCode::BAD_REQUEST.into_response();
+    }
+    let binding = VirtualNodeTelegramBindingService::bind(
+        body.telegram_user_id.trim(),
+        body.chat_id,
+        body.peer_id.trim(),
+    );
+    (StatusCode::OK, Json(BindTelegramResponse { binding })).into_response()
+}
+
+async fn list_telegram_bindings_handler() -> impl IntoResponse {
+    (
+        StatusCode::OK,
+        Json(TelegramBindingsListResponse {
+            bindings: VirtualNodeTelegramBindingService::list(),
+        }),
+    )
+}
+
+async fn get_telegram_binding_handler(Path(telegram_user_id): Path<String>) -> impl IntoResponse {
+    match VirtualNodeTelegramBindingService::lookup(&telegram_user_id) {
+        Some(binding) => (StatusCode::OK, Json(binding)).into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
+async fn unbind_telegram_handler(Path(telegram_user_id): Path<String>) -> impl IntoResponse {
+    if VirtualNodeTelegramBindingService::unbind(&telegram_user_id) {
+        StatusCode::NO_CONTENT.into_response()
+    } else {
+        StatusCode::NOT_FOUND.into_response()
+    }
+}
+
+fn webhook_secret_ok(headers: &HeaderMap) -> bool {
+    let expected = match std::env::var("POOLAI_TELEGRAM_WEBHOOK_SECRET") {
+        Ok(s) if !s.trim().is_empty() => s,
+        _ => return true,
+    };
+    headers
+        .get("x-telegram-webhook-secret")
+        .and_then(|v| v.to_str().ok())
+        == Some(expected.as_str())
+}
+
+async fn telegram_webhook_handler(
+    headers: HeaderMap,
+    Json(update): Json<TelegramWebhookUpdate>,
+) -> impl IntoResponse {
+    if !webhook_secret_ok(&headers) {
+        return StatusCode::UNAUTHORIZED.into_response();
+    }
+
+    let message = match update.message {
+        Some(m) => m,
+        None => {
+            return (
+                StatusCode::OK,
+                Json(TelegramWebhookResponse {
+                    ok: true,
+                    peer_id: None,
+                    task: None,
+                    detail: Some("ignored: no message".into()),
+                }),
+            )
+                .into_response();
+        }
+    };
+
+    let user_id = message
+        .from
+        .as_ref()
+        .map(|u| u.id.to_string())
+        .or_else(|| message.chat.as_ref().map(|c| c.id.to_string()));
+
+    let Some(telegram_user_id) = user_id else {
+        return StatusCode::BAD_REQUEST.into_response();
+    };
+
+    let binding = match VirtualNodeTelegramBindingService::lookup(&telegram_user_id) {
+        Some(b) => b,
+        None => {
+            return (
+                StatusCode::NOT_FOUND,
+                Json(TelegramWebhookResponse {
+                    ok: false,
+                    peer_id: None,
+                    task: None,
+                    detail: Some(format!("no binding for telegram user {telegram_user_id}")),
+                }),
+            )
+                .into_response();
+        }
+    };
+
+    let text = message.text.unwrap_or_default();
+    let task_type = if text.starts_with('/') {
+        "telegram_command"
+    } else {
+        "telegram_message"
+    };
+    let payload = json!({
+        "telegram_user_id": telegram_user_id,
+        "chat_id": message.chat.as_ref().map(|c| c.id),
+        "text": text,
+        "update_id": update.update_id,
+    });
+    let task = VirtualNodeTaskService::enqueue(&binding.peer_id, task_type, payload);
+
+    (
+        StatusCode::OK,
+        Json(TelegramWebhookResponse {
+            ok: true,
+            peer_id: Some(binding.peer_id),
+            task: Some(task),
+            detail: None,
+        }),
+    )
+        .into_response()
 }

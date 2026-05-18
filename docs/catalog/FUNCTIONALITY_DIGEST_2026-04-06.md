@@ -67,6 +67,7 @@
 
 - **REST під `/api/v1/`** — модульні роутери в `src/network/api/` (`system`, `workers`, `vm`, `raid`, `raid_admin`, `libraries`, `users`, `rewards`, `instances`, `completions`, `topology`, `discovery`, **`virtual_nodes`**, `ui`, `admin`, …). Див. `create_api_routes()` у `api/mod.rs`.
 - **FM-016 virtual nodes** — `POST /api/v1/discovery/register-remote`, `heartbeat-remote`, `GET /discovery/virtual-nodes`; `GET/POST /api/v1/virtual-nodes/{id}/tasks/*`, probe health; тести `discovery_remote_register_integration`, `virtual_node_tasks_integration`.
+- **FM-016+ Telegram** — `POST/GET/DELETE /api/v1/virtual-nodes/telegram/bind*`, `POST .../telegram/webhook` → task на bound `peer_id`; env: `POOLAI_VIRTUAL_NODE_DATA_DIR`, `POOLAI_TELEGRAM_WEBHOOK_SECRET`, worker `POOLAI_TELEGRAM_ID`.
 - **RAID** — додаткові шляхи під `/raid/…` (артефакти, воркери, події, snapshot, GC, strategies, metrics, rebalance, health) через `raid.rs`.
 - **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
