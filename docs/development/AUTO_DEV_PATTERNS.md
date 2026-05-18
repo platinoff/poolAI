@@ -275,6 +275,12 @@
 - **Патерн:** sync з `src/network/api/virtual_nodes.rs`, `discovery.rs` register-remote / heartbeat / list
 - **Перевірка:** ручна звірка маршрутів; `rg virtual-nodes docs/openapi.yaml`
 
+### [FM-012] Telegram OAuth widget verification
+- **Де:** `src/enterprise/security.rs` (`verify_telegram_widget_query`, `verify_telegram_oauth_callback`)
+- **Патерн:** HMAC-SHA256 + constant-time hash; `POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS`; allowlist trim
+- **HTTP:** `GET /api/enterprise/auth/telegram/callback` — `tests/telegram_oauth_callback_integration.rs`
+- **Перевірка:** `cargo test --lib enterprise::security::tests --features enterprise`
+
 ### [FM-012] Telegram webhook payload guard
 - **Де:** `src/network/api/virtual_nodes.rs` (`TELEGRAM_WEBHOOK_MAX_TEXT`, `webhook_secret_ok`)
 - **Патерн:** optional `POOLAI_TELEGRAM_WEBHOOK_SECRET` → header `X-Telegram-Webhook-Secret`; truncate `message.text` before enqueue

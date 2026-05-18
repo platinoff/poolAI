@@ -48,6 +48,27 @@ use uuid::Uuid;
 
 type HmacSha256 = Hmac<Sha256>;
 
+const DEFAULT_TELEGRAM_AUTH_MAX_AGE_SECS: i64 = 86_400;
+
+fn telegram_auth_max_age_secs() -> i64 {
+    std::env::var("POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or(DEFAULT_TELEGRAM_AUTH_MAX_AGE_SECS)
+}
+
+fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut acc = 0u8;
+    for (x, y) in a.iter().zip(b.iter()) {
+        acc |= x ^ y;
+    }
+    acc == 0
+}
+
 fn build_telegram_data_check_string(query: &HashMap<String, String>) -> Result<String, AppError> {
     let mut keys: Vec<&String> = query.keys().filter(|k| k.as_str() != "hash").collect();
     keys.sort();
@@ -88,8 +109,12 @@ pub fn verify_telegram_widget_query(
 
     let data_check_string = build_telegram_data_check_string(query)?;
     let expected = telegram_login_hmac_digest(bot_token, &data_check_string)?;
-    let expected_hex = hex::encode(&expected);
-    if expected_hex != *hash_received {
+    let received = hex::decode(hash_received).map_err(|_| {
+        AppError::ValidationError(
+            "Telegram auth: invalid hash encoding (possible tampering)".to_string(),
+        )
+    })?;
+    if !constant_time_eq(&expected, &received) {
         return Err(AppError::ValidationError(
             "Telegram auth: invalid hash (possible tampering)".to_string(),
         ));
@@ -102,10 +127,11 @@ pub fn verify_telegram_widget_query(
         .parse()
         .map_err(|_| AppError::ValidationError("Telegram auth: invalid auth_date".to_string()))?;
     let now = chrono::Utc::now().timestamp();
-    if (now - auth_date).abs() > 86400 {
-        return Err(AppError::ValidationError(
-            "Telegram auth: auth_date expired (max 24h skew allowed)".to_string(),
-        ));
+    let max_age = telegram_auth_max_age_secs();
+    if (now - auth_date).abs() > max_age {
+        return Err(AppError::ValidationError(format!(
+            "Telegram auth: auth_date expired (max {max_age}s skew allowed)"
+        )));
     }
 
     let id_str = query
@@ -123,6 +149,21 @@ pub fn verify_telegram_widget_query(
         .unwrap_or_else(|| format!("tg_{id}"));
 
     Ok((id, username))
+}
+
+/// Signs Telegram Login Widget callback fields (adds `hash`). For integration tests and tooling.
+pub fn sign_telegram_login_widget_query(
+    bot_token: &str,
+    query: HashMap<String, String>,
+) -> Result<HashMap<String, String>, AppError> {
+    let mut signed = query;
+    if signed.contains_key("hash") {
+        signed.remove("hash");
+    }
+    let dcs = build_telegram_data_check_string(&signed)?;
+    let digest = telegram_login_hmac_digest(bot_token, &dcs)?;
+    signed.insert("hash".into(), hex::encode(digest));
+    Ok(signed)
 }
 
 // OAuth2 token exchange response from provider
@@ -981,7 +1022,12 @@ impl SecurityManager {
 
         if !allow.is_empty() {
             let sid = id.to_string();
-            if !allow.iter().any(|a| a == &sid) {
+            let permitted = allow
+                .iter()
+                .map(|a| a.trim())
+                .filter(|a| !a.is_empty())
+                .any(|a| a == sid.as_str());
+            if !permitted {
                 return Err(AppError::Forbidden(format!(
                     "Telegram user id {} is not allowed for this provider",
                     sid
@@ -1232,6 +1278,32 @@ mod tests {
     }
 
     #[test]
+    fn telegram_auth_max_age_respects_env() {
+        const KEY: &str = "POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS";
+        std::env::set_var(KEY, "60");
+        assert_eq!(telegram_auth_max_age_secs(), 60);
+        std::env::remove_var(KEY);
+        assert_eq!(
+            telegram_auth_max_age_secs(),
+            DEFAULT_TELEGRAM_AUTH_MAX_AGE_SECS
+        );
+    }
+
+    #[test]
+    fn sign_telegram_login_widget_query_roundtrip() {
+        let token = "1234567:AAbb_ccDDeeFF_gghh";
+        let mut q = HashMap::new();
+        q.insert(
+            "auth_date".into(),
+            chrono::Utc::now().timestamp().to_string(),
+        );
+        q.insert("id".into(), "1001".into());
+        let signed = sign_telegram_login_widget_query(token, q).unwrap();
+        let (id, _) = verify_telegram_widget_query(token, &signed).unwrap();
+        assert_eq!(id, 1001);
+    }
+
+    #[test]
     fn telegram_widget_rejects_expired_auth_date() {
         let token = "1234567:AAbb_ccDDeeFF_gghh";
         let mut q = HashMap::new();
@@ -1276,6 +1348,28 @@ mod tests {
             .await
             .unwrap_err();
         assert!(matches!(err, AppError::Forbidden(_)));
+    }
+
+    #[tokio::test]
+    async fn telegram_allowlist_trims_whitespace() {
+        let manager = SecurityManager::new();
+        manager.initialize().await.unwrap();
+        let token = "7654321:ZZyy_xxWWvvUU_ttSS_trim";
+        let config = OAuth2Config {
+            client_id: "poolai_bot".to_string(),
+            client_secret: token.to_string(),
+            authorization_url: "https://oauth.example.com/authorize".to_string(),
+            token_url: "https://oauth.example.com/token".to_string(),
+            redirect_uri: "https://poolai.example.com/callback".to_string(),
+            scopes: vec![],
+            telegram_allow_user_ids: vec!["  77  ".to_string()],
+        };
+        manager
+            .register_oauth2_provider("telegram".to_string(), config)
+            .await
+            .unwrap();
+        let q = telegram_widget_query_for_id(token, 77);
+        assert!(manager.verify_telegram_oauth_callback(&q).await.is_ok());
     }
 
     #[test]
