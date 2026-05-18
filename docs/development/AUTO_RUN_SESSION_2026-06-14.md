@@ -9,7 +9,7 @@
 - [x] `ADMIN_A11Y_RUNBOOK.md` §3.1 — матриця strict / planned URLs
 - [x] `FUNCTION_MANAGEMENT` §5.3 — `UI_IMPROVEMENTS_PLAN` → Archived
 - [x] HANDOFF / CHANGELOG / `AUTO_DEV_PATTERNS` sync
-- [ ] push
+- [x] push — `c1b2b24e`
 
 ## S4 — виконання (2026-05-18)
 
