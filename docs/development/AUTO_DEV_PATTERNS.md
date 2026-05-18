@@ -349,6 +349,12 @@
 - **Перевірка:** `cargo test --test pa11y_ci_script`; GitHub Actions → **A11y (pa11y)**
 - **FM:** FM-019 Partial (pa11y auth)
 
+### [FM-016] Virtual-node integration tests + test-utils feature
+- **Де:** `tests/virtual_node_pool_join_integration.rs`, `tests/virtual_node_tasks_integration.rs`, `Cargo.toml` `[[test]]`
+- **Патерн:** `required-features = ["test-utils"]` — інакше `attach_*_for_test` не компілюється; `cargo test-ci` уже з `--features …,test-utils`
+- **Перевірка:** `cargo test --test virtual_node_pool_join_integration --test virtual_node_tasks_integration --features test-utils`
+- **FM:** FM-016+++ ops
+
 ### [FM-019] pa11y tune — contrast + dashboard shell IDs
 - **Де:** `src/ui/admin_styles.css`, `src/ui/themes.rs`, `src/ui/components.rs` (`--danger: #c62828`); `src/ui/mod.rs` (`mobileUserInfo`, `mobileAuthLoginBtn`, `aria-label` на `#themeSelector`)
 - **Сигнал:** `rg 'mobileUserInfo' src/ui/mod.rs`; `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` → 0 errors

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **FM-016 / test-utils (2026-05-18)** — `virtual_node_pool_join_integration` and `virtual_node_tasks_integration` gated with `required-features = ["test-utils"]` in `Cargo.toml`.
 - **FM-019 (partial, 2026-05-18)** — pa11y strict URLs 0 errors: `--danger` contrast (`#c62828`), unique mobile/desktop auth IDs, theme selector `aria-label`; `write_pa11y_simple_config` for login scan (pa11y v9).
 
 ### Added

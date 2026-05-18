@@ -10,7 +10,7 @@
 - [x] `cargo test-ci`
 - [x] `cargo test --test pa11y_ci_script`; `ui::admin` + `dashboard_shell_auth_ids_unique`
 - [x] `AUTO_DEV_PATTERNS.md`
-- [ ] push (MSYS2)
+- [x] push — `ded58c10`
 
 **BLOCKED:** FM-003 §4 LAN.
 

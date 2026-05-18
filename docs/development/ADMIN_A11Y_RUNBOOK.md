@@ -41,7 +41,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ## 3. pa11y (локально + CI)
 
-**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — admin users/security + `/ui/workers` після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`).
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — admin users/security + `/ui/workers` після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). **Зріз 2026-05-18:** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** (commit `ded58c10`).
 
 ```bash
 # MSYS2: poolai вже на :8080
@@ -85,4 +85,4 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~`pa11y` / axe у CI~~ — **Partial ✅** `a11y.yml` + `bin/pa11y-ci.sh` (login + `PA11Y_ADMIN_STRICT` auth actions).
 - Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (історичний чеклист).
 
-**Last updated:** 2026-05-18 — FM-019 pa11y CI partial (`a11y.yml`, `bin/pa11y-ci.sh`).
+**Last updated:** 2026-05-18 — FM-019 strict pa11y pass (`ded58c10`); CI partial (`a11y.yml`, `bin/pa11y-ci.sh`).

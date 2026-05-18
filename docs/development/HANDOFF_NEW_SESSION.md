@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-12.md`](./AUTO_RUN_SESSION_2026-06-12.md) — FM-019 pa11y tune).
+**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-13.md`](./AUTO_RUN_SESSION_2026-06-13.md) — FM-019 ops + test-utils).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-12.md`](./AUTO_RUN_SESSION_2026-06-12.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-13.md`](./AUTO_RUN_SESSION_2026-06-13.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
