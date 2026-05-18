@@ -371,7 +371,7 @@ pub async fn admin_monitoring() -> Html<String> {
           <div id="monitoring-content"></div>
         </div>
 
-        <div id="createDashboardModal" class="modal" role="dialog" aria-labelledby="createDashboardModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createDashboardModal" class="modal" role="dialog" aria-labelledby="createDashboardModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createDashboardModalTitle" data-i18n="admin.mon.modalCreateDash">Create Dashboard</h3>
@@ -409,7 +409,7 @@ pub async fn admin_monitoring() -> Html<String> {
           </div>
         </div>
 
-        <div id="createAlertRuleModal" class="modal" role="dialog" aria-labelledby="createAlertRuleModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createAlertRuleModal" class="modal" role="dialog" aria-labelledby="createAlertRuleModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createAlertRuleModalTitle" data-i18n="admin.mon.modalCreateRule">Create Alert Rule</h3>

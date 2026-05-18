@@ -310,10 +310,10 @@
 - **Перевірка:** `cargo test --test ml_pipeline_integration --features ml test_pipeline_turboquant_quantization_step test_pipeline_standard_quantization_metrics`
 - **FM:** DIGEST §ML ✅
 
-### [FM-019] Admin modal focus trap (users/security)
-- **Де:** `src/ui/admin_common.js` (`showModal`, `trapModalFocus`, `keepFocusInModal`, `handleModalEscape`, `adminDynamicModal`)
-- **Сигнал:** `rg "keepFocusInModal|ADMIN_DYNAMIC_MODAL_ID" src/ui/admin_common.js`
-- **Патерн:** закритий модал — `aria-modal="false"` + `aria-hidden="true"` у розмітці; відкриття — `attachModalA11y`, Tab циклічно, Esc → `hideModal()`; динамічний контент — `showModal(title, html)` (instances/topology)
+### [FM-019] Admin modal focus trap + closed aria-modal
+- **Де:** `src/ui/admin_common.js`; розмітка — `rg 'aria-modal="false" aria-hidden="true"' src/ui/admin`
+- **Сигнал:** `keepFocusInModal`, `ADMIN_DYNAMIC_MODAL_ID` у `admin_common.js`
+- **Патерн:** закритий static modal — `aria-modal="false"` (не `true` при hidden); відкриття — `attachModalA11y`, Tab/Esc; dynamic — `showModal(title, html)`
 - **Перевірка:** `cargo test -p poolai --features enterprise ui::admin --lib`
 - **FM:** FM-019 Partial
 

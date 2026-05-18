@@ -236,7 +236,7 @@ pub async fn admin_tenants() -> Html<String> {
           <div id="tenants-list"></div>
         </div>
         
-        <div id="createTenantModal" class="modal" role="dialog" aria-labelledby="createTenantModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createTenantModal" class="modal" role="dialog" aria-labelledby="createTenantModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createTenantModalTitle" data-i18n="admin.tenants.createTitle">Create Tenant</h3>
@@ -286,7 +286,7 @@ pub async fn admin_tenants() -> Html<String> {
           </div>
         </div>
         
-        <div id="editTenantModal" class="modal" role="dialog" aria-labelledby="editTenantModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="editTenantModal" class="modal" role="dialog" aria-labelledby="editTenantModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="editTenantModalTitle" data-i18n="admin.tenants.editTitle">Edit Tenant</h3>

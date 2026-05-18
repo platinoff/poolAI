@@ -216,4 +216,13 @@ mod a11y_tests {
         assert!(html.contains("id=\"editPolicyModal\""));
         assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
     }
+
+    #[tokio::test]
+    async fn workers_modal_closed_aria_state() {
+        use crate::ui::admin::workers::admin_workers;
+        let html = admin_workers().await.0;
+        assert!(html.contains("id=\"createWorkerModal\""));
+        assert!(!html.contains("aria-modal=\"true\" aria-hidden=\"true\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
 }

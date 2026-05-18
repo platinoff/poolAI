@@ -150,7 +150,7 @@ pub async fn admin_workers() -> Html<String> {
           <div id="workers-list"></div>
         </div>
         
-        <div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createWorkerModalTitle" data-i18n="admin.wrk.title">Create Worker</h3>

@@ -149,7 +149,7 @@ pub async fn admin_vm() -> Html<String> {
           <div id="vm-instances"></div>
         </div>
         
-        <div id="createVmModal" class="modal" role="dialog" aria-labelledby="createVmModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createVmModal" class="modal" role="dialog" aria-labelledby="createVmModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createVmModalTitle" data-i18n="vm.modalTitle">Create VM Instance</h3>

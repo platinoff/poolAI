@@ -409,7 +409,7 @@ pub async fn admin_raid() -> Html<String> {
           <div id="raid-artifacts"></div>
         </div>
         
-        <div id="uploadArtifactModal" class="modal" role="dialog" aria-labelledby="uploadArtifactModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="uploadArtifactModal" class="modal" role="dialog" aria-labelledby="uploadArtifactModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="uploadArtifactModalTitle" data-i18n="admin.raidadm.uploadTitle">Upload Artifact</h3>

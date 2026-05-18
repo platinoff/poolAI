@@ -160,14 +160,14 @@ FM-xxx (з таблиці нижче)
 | Ctrl+K global search, Esc modals/drawer | `src/ui/mod.rs` keyboard handlers |
 | `aria-live` notifications / errors | dashboard, admin, login |
 | `aria-current` nav (admin + dashboard) | `adminMarkCurrentNav`, `dashMarkCurrentNav` |
-| Admin modals focus trap (users/security) | `admin_common.js` — `trapModalFocus`, Esc, `adminDynamicModal` |
+| Admin modals focus trap + closed `aria-modal` | `admin_common.js`; static modals у `src/ui/admin/*.rs` |
 | i18n UA/EN shell | `i18n_core.js` |
 
 ### 5.2 Автономний прогін (сесія → git push)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-03.md`](../development/AUTO_RUN_SESSION_2026-06-03.md) — FM-019 modals / P4 health load.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-04.md`](../development/AUTO_RUN_SESSION_2026-06-04.md) — FM-019 решта admin modals / forms.
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) (§5.3 audit + FM-019 nav).
 

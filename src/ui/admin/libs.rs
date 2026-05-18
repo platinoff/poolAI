@@ -228,7 +228,7 @@ pub async fn admin_libs() -> Html<String> {
           <div id="libraries-list"></div>
         </div>
 
-        <div id="uploadLibraryModal" class="modal" role="dialog" aria-labelledby="uploadLibraryModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="uploadLibraryModal" class="modal" role="dialog" aria-labelledby="uploadLibraryModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="uploadLibraryModalTitle" data-i18n="admin.lib.uploadTitle">Upload Library</h3>

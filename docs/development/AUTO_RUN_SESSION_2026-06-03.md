@@ -7,7 +7,7 @@
 **Критерії:**
 - [x] Admin modals (users/security): `aria-modal` when closed, focus trap + `keepFocusInModal`, Esc — `admin_common.js`; тести `ui::admin::*`
 - [x] `cargo test-ci` (MSYS2 UCRT64, 2026-06-03)
-- [ ] push (зовнішній MSYS2, Summary у коміті)
+- [x] push — `02ea146` (MSYS2; subject hook — перевірити `git log -1`)
 
 **BLOCKED:** FM-003 §4 LAN (2 хости).
 
