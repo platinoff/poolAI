@@ -24,5 +24,7 @@ bash bin/cargo-fmt.sh
 | `cargo-check.sh` | `cargo check --no-default-features --lib` |
 | `cargo-test.sh` | `cargo test --lib`; з аргументом `raid` — raid_cross + raid_smallworld |
 | `cargo-fmt.sh` | `cargo fmt --all` |
+| `run-lan-nodes.sh` | 2+ PoolAI вузли на одному хості (FM-003 dev stand; `POOLAI_HTTP_PORT`) |
+| `run-lan-nodes.ps1` | Те саме для Windows PowerShell |
 
-Детальніша інформація: `docs/status/STABLE_STATE_SUMMARY.md`.
+Детальніша інформація: `docs/status/STABLE_STATE_SUMMARY.md`, `docs/performance/LAN_BENCHMARK_RUNBOOK.md` §5.

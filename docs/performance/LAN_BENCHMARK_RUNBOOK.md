@@ -70,14 +70,43 @@ Append one row per host to the **`poolai_health_load --json`** table in [`BENCHM
 
 ---
 
-## 5. When blocked
+## 5. Single machine (dev stand)
+
+Два вузли на **одній** машині (різні порти, окремі RAID-шляхи) — для розробки wire/sync до повного LAN sign-off §4.
+
+| Node | URL | Env |
+|------|-----|-----|
+| A | `http://127.0.0.1:8080` | `POOLAI_HTTP_PORT=8080`, `POOLAI_RAID_BASE_PATH=.../node-A/raid` |
+| B | `http://127.0.0.1:8081` | `POOLAI_HTTP_PORT=8081`, `POOLAI_RAID_BASE_PATH=.../node-B/raid` |
+
+**Windows (PowerShell, repo root):**
+
+```powershell
+.\bin\run-lan-nodes.ps1
+# health after ~15s:
+Invoke-WebRequest http://127.0.0.1:8080/api/v1/health
+Invoke-WebRequest http://127.0.0.1:8081/api/v1/health
+Stop-Process -Name poolai -Force -ErrorAction SilentlyContinue
+```
+
+**MSYS2 bash:**
+
+```bash
+bash bin/run-lan-nodes.sh
+curl -s http://127.0.0.1:8080/api/v1/health
+curl -s http://127.0.0.1:8081/api/v1/health
+```
+
+Дані стенду: `data/lan-stand/` (gitignored). Discovery може бачити peer на сусідньому порту; **§4 acceptance** (Push/Pull timings у `BENCHMARKS.md`) — лише після ops-прогону.
+
+---
+
+## 6. When blocked
 
 | Situation | Action |
 |-----------|--------|
-| Single machine only | Keep FM-003 **Planned (ops)**; use local `poolai_health_load` + Criterion rows only. |
+| No second physical host | Use §5 dev stand; FM-003 залишається **Planned (ops)** до §4 sign-off. |
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 
-**Last updated:** 2026-05-17 (AUTO_RUN_SESSION 2026-05-17 S1 — runbook звірено; LAN-стенд відсутній, FM-003 лишається **Planned (ops)**).
-
-**Сесія 2026-05-17:** один хост — кроки §1–§3 задокументовані; прийняття §4 відкладено до двох вузлів. Локальний baseline: рядок **2026-04-10** у [`BENCHMARKS.md`](./BENCHMARKS.md) (`poolai_health_load --json`).
+**Last updated:** 2026-05-18 — `POOLAI_HTTP_PORT` / `POOLAI_RAID_BASE_PATH` у коді; `bin/run-lan-nodes.*`; dev stand 8080+8081 перевірено локально.

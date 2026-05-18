@@ -35,6 +35,32 @@ $env:POOLAI_CONFIG_PATH=".\custom_config.toml"; cargo run
 POOLAI_DATA_PATH=/var/lib/poolai cargo run
 ```
 
+#### `POOLAI_HTTP_PORT`
+HTTP-порт API-сервера (за замовчуванням: `8080`). Потрібен для **кількох вузлів на одній машині** (LAN dev stand, FM-003).
+
+```powershell
+# Windows — node B on 8081
+$env:POOLAI_HTTP_PORT="8081"
+$env:POOLAI_RAID_BASE_PATH="S:\rust\poolAI\data\lan-stand\node-B\raid"
+cargo run --features enterprise,ml,cloud,test-utils
+```
+
+```bash
+# MSYS2 — node A on 8080
+POOLAI_HTTP_PORT=8080 POOLAI_RAID_BASE_PATH=./data/lan-stand/node-A/raid cargo run --features enterprise,ml,cloud,test-utils
+```
+
+Або скрипт: **`bin/run-lan-nodes.ps1`** (PowerShell) / **`bin/run-lan-nodes.sh`** (bash).
+
+#### `POOLAI_RAID_BASE_PATH`
+Базова директорія RAID-артефактів (за замовчуванням: `C:\poolai\raid` на Windows, `/var/lib/poolai/raid` на Linux, `./data/raid` інакше). **Окремий шлях на кожен вузол** при multi-node на одному хості.
+
+```bash
+export POOLAI_RAID_BASE_PATH=/var/lib/poolai/raid-node-b
+```
+
+Див. [`performance/LAN_BENCHMARK_RUNBOOK.md`](performance/LAN_BENCHMARK_RUNBOOK.md).
+
 #### `RUST_LOG`
 Рівень логування (за замовчуванням: `info`)
 

@@ -95,7 +95,7 @@ FM-xxx (з таблиці нижче)
 |----|---------|---------------|-----------------|---------|
 | FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Implemented | `src/network/api/*` без `get_global_*`; `discovery.rs` — optional `instance_manager` з `AppState` (коментар); `services/*` — лише закоментовані Raft placeholders |
-| FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді | Planned (ops) | NEXT_STEPS P2b, `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) |
+| FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді; **dev stand** — 2+ вузли на одній машині (`POOLAI_HTTP_PORT`, `bin/run-lan-nodes.*`, runbook §5) | Planned (ops) | NEXT_STEPS P2b, `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
@@ -110,6 +110,8 @@ FM-xxx (з таблиці нижче)
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
+
+**FM-003 (2026-05-18):** dev stand на одній машині — `bin/run-lan-nodes.ps1` / `.sh`, env `POOLAI_HTTP_PORT` + `POOLAI_RAID_BASE_PATH`; §4 LAN runbook (Push/Pull у `BENCHMARKS.md`) — ще ops.
 
 **Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-20 (автопрогін FM-015). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
 

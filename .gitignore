@@ -21,6 +21,9 @@ Cargo.std.toml
 # Generated/static audit logs (do not commit/push)
 data/audit/*.log.gz
 
+# Local multi-node LAN dev stand (bin/run-lan-nodes.*)
+data/lan-stand/
+
 # Scripts (excluded from git)
 scripts/
 

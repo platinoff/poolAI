@@ -185,12 +185,22 @@ pub struct RaidConfig {
 
 impl RaidConfig {
     pub fn default_for_platform() -> Self {
-        #[cfg(target_os = "windows")]
-        let base_path = PathBuf::from("C:\\poolai\\raid");
-        #[cfg(target_os = "linux")]
-        let base_path = PathBuf::from("/var/lib/poolai/raid");
-        #[cfg(not(any(target_os = "windows", target_os = "linux")))]
-        let base_path = PathBuf::from("./data/raid");
+        let base_path = std::env::var("POOLAI_RAID_BASE_PATH")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| {
+                #[cfg(target_os = "windows")]
+                {
+                    PathBuf::from("C:\\poolai\\raid")
+                }
+                #[cfg(target_os = "linux")]
+                {
+                    PathBuf::from("/var/lib/poolai/raid")
+                }
+                #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+                {
+                    PathBuf::from("./data/raid")
+                }
+            });
 
         Self {
             mode: RaidMode::Local,
@@ -1543,6 +1553,16 @@ mod tests {
         assert!(config.quota_bytes.is_some());
         assert!(config.retention_days.is_some());
         assert!(config.gc_on_startup);
+    }
+
+    #[test]
+    fn test_raid_config_respects_poolai_raid_base_path_env() {
+        const KEY: &str = "POOLAI_RAID_BASE_PATH";
+        let custom = PathBuf::from("./data/test-raid-env-override");
+        std::env::set_var(KEY, custom.as_os_str());
+        let config = RaidConfig::default_for_platform();
+        std::env::remove_var(KEY);
+        assert_eq!(config.base_path, custom);
     }
 
     #[test]
