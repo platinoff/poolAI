@@ -8,7 +8,7 @@
 - [x] `bin/pa11y-ci.sh` — login actions + strict admin URLs
 - [x] `a11y.yml` — `PA11Y_ADMIN_STRICT=1`, dev credentials env
 - [x] `tests/pa11y_ci_script.rs`
-- [ ] push (MSYS2)
+- [x] push — `92e99fc6`
 
 **BLOCKED:** FM-003 §4 LAN.
 
