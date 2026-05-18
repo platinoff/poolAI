@@ -124,16 +124,35 @@ write_pa11y_config() {
 JSON
 }
 
+write_pa11y_simple_config() {
+  local target="$1"
+  local cfg="$2"
+  cat >"${cfg}" <<JSON
+{
+  "standard": "${STANDARD}",
+  "runner": "${RUNNER}",
+  "threshold": ${THRESHOLD},
+  "chromeLaunchConfig": {
+    "args": ["--no-sandbox", "--disable-dev-shm-usage"]
+  },
+  "actions": [
+    "navigate to ${target}",
+    "wait for element body to be visible"
+  ]
+}
+JSON
+}
+
 run_pa11y() {
   local url="$1"
   local optional="${2:-0}"
+  PA11Y_CFG_DIR="${PA11Y_CFG_DIR:-${TMPDIR:-/tmp}/poolai-pa11y-cfg-$$}"
+  mkdir -p "${PA11Y_CFG_DIR}"
+  local cfg="${PA11Y_CFG_DIR}/$(echo "${url}" | tr '/:' '__').json"
+  write_pa11y_simple_config "${url}" "${cfg}"
   echo "--- pa11y ${url} (runner=${RUNNER}, threshold=${THRESHOLD}) ---"
   set +e
-  ${PA11Y} "${url}" \
-    --runner "${RUNNER}" \
-    --standard "${STANDARD}" \
-    --threshold "${THRESHOLD}" \
-    --chromeLaunchConfig '{"args":["--no-sandbox","--disable-dev-shm-usage"]}'
+  ${PA11Y} "${url}" --config "${cfg}"
   local code=$?
   set -e
   if [[ "${code}" -ne 0 ]]; then

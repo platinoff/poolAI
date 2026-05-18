@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **FM-019 (partial, 2026-05-18)** — pa11y strict URLs 0 errors: `--danger` contrast (`#c62828`), unique mobile/desktop auth IDs, theme selector `aria-label`; `write_pa11y_simple_config` for login scan (pa11y v9).
+
 ### Added
 - **FM-019 (partial, 2026-05-18)** — pa11y auth fixture: `PA11Y_ADMIN_STRICT`, login actions for admin URLs; `tests/pa11y_ci_script.rs`.
 - **FM-019 (partial, 2026-05-18)** — pa11y CI: `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml` (strict login, optional admin).

@@ -32,12 +32,12 @@ pub const BUTTON_STYLES: &str = r#"
     background: var(--primary-hover, #67e480); 
   }
   .btn-danger { 
-    background: var(--danger, #ff5555); 
+    background: var(--danger, #c62828); 
     color: #fff; 
-    border-color: var(--danger, #ff5555); 
+    border-color: var(--danger, #c62828); 
   }
   .btn-danger:hover { 
-    background: var(--danger-hover, #ff6e6e); 
+    background: var(--danger-hover, #e53935); 
   }
   .btn-secondary {
     background: var(--secondary, #6272a4);

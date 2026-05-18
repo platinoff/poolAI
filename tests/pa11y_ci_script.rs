@@ -6,5 +6,6 @@ fn pa11y_ci_script_has_admin_strict_auth_actions() {
     assert!(script.contains("PA11Y_ADMIN_STRICT"));
     assert!(script.contains("run_pa11y_authenticated"));
     assert!(script.contains("write_pa11y_config"));
+    assert!(script.contains("write_pa11y_simple_config"));
     assert!(script.contains("PA11Y_PASSWORD"));
 }

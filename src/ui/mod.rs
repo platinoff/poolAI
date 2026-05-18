@@ -685,9 +685,17 @@ fn layout(
         r#"<a href="{}" id="authLoginBtn" data-i18n="dash.login">Login</a>"#,
         auth_url
     );
+    let mobile_nav_auth_link = format!(
+        r#"<a href="{}" id="mobileAuthLoginBtn" data-i18n="dash.login">Login</a>"#,
+        auth_url
+    );
     let user_info_html = r##"<div class="user-info" id="userInfo" style="display:none;">
           <span class="role" id="userRole"></span>
           <a href="#" id="logoutBtn" data-i18n="dash.logout">Logout</a>
+        </div>"##;
+    let mobile_user_info_html = r##"<div class="user-info" id="mobileUserInfo" style="display:none;">
+          <span class="role" id="mobileUserRole"></span>
+          <a href="#" id="mobileLogoutBtn" data-i18n="dash.logout">Logout</a>
         </div>"##;
     let component_styles = get_component_styles();
     let theme = DARK_THEME; // Default theme
@@ -771,7 +779,8 @@ fn layout(
         <a href="{ui_vm}" data-i18n="dash.nav.vm" data-i18n-aria="dash.aria.vm">VM</a>
         <a href="{ui_raid}" data-i18n="dash.nav.raid" data-i18n-aria="dash.aria.raid">RAID</a>
         {nav_admin_desktop}
-        <select id="themeSelector" data-i18n-aria="dash.aria.theme" style="{style_select}">
+        <label for="themeSelector" class="sr-only" data-i18n="dash.themeLabel">Theme:</label>
+        <select id="themeSelector" aria-label="Select theme" data-i18n-aria="dash.aria.theme" style="{style_select}">
           <option value="dark" data-i18n="dash.themeOptDark">🌙 Dark</option>
           <option value="light" data-i18n="dash.themeOptLight">☀️ Light</option>
           <option value="{high_contrast_value}" data-i18n="dash.themeOptHC">🔆 High Contrast</option>
@@ -814,14 +823,14 @@ fn layout(
       {nav_admin_mobile}
       <div class="mobile-nav-item" style="flex-direction: column; align-items: flex-start; gap: 8px;">
         <label for="mobileThemeSelector" style="font-size: 0.9em; color: var(--text-muted, #a8b0bf);" data-i18n="dash.themeLabel">Theme:</label>
-        <select id="mobileThemeSelector" data-i18n-aria="dash.aria.theme" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9em;">
+        <select id="mobileThemeSelector" aria-label="Select theme" data-i18n-aria="dash.aria.theme" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.9em;">
           <option value="dark" data-i18n="dash.themeOptDark">🌙 Dark</option>
           <option value="light" data-i18n="dash.themeOptLight">☀️ Light</option>
           <option value="{high_contrast_value}" data-i18n="dash.themeOptHC">🔆 High Contrast</option>
         </select>
       </div>
-      {user_info_html}
-      {nav_auth_link}
+      {mobile_user_info_html}
+      {mobile_nav_auth_link}
     </div>
   </div>
 
@@ -839,7 +848,9 @@ fn layout(
         body = body_html,
         script = full_script,
         nav_auth_link = nav_auth_link,
+        mobile_nav_auth_link = mobile_nav_auth_link,
         user_info_html = user_info_html,
+        mobile_user_info_html = mobile_user_info_html,
         skip_to_main_href = skip_to_main_href,
         skip_link_class = skip_link_class,
         skip_to_nav_href = skip_to_nav_href,
@@ -901,19 +912,17 @@ function setUser(username, role) {
 
 function updateUI() {
   const user = getUser();
-  const userInfo = document.getElementById('userInfo');
-  const loginLinkEl = document.getElementById('authLoginBtn');
-  const userRole = document.getElementById('userRole');
+  const userInfos = document.querySelectorAll('#userInfo, #mobileUserInfo');
+  const loginLinks = document.querySelectorAll('#authLoginBtn, #mobileAuthLoginBtn');
+  const userRoles = document.querySelectorAll('#userRole, #mobileUserRole');
   
   if (user) {
-    if (userInfo) {
-      userInfo.style.display = 'flex';
-      if (userRole) userRole.textContent = user.role;
-    }
-    if (loginLinkEl) loginLinkEl.style.display = 'none';
+    userInfos.forEach(function(el) { el.style.display = 'flex'; });
+    userRoles.forEach(function(el) { el.textContent = user.role; });
+    loginLinks.forEach(function(el) { el.style.display = 'none'; });
   } else {
-    if (userInfo) userInfo.style.display = 'none';
-    if (loginLinkEl) loginLinkEl.style.display = 'inline';
+    userInfos.forEach(function(el) { el.style.display = 'none'; });
+    loginLinks.forEach(function(el) { el.style.display = 'inline'; });
   }
 }
 
@@ -3507,15 +3516,14 @@ window.addEventListener('resize', function() {
 
 // Setup logout link and theme selector
 document.addEventListener('DOMContentLoaded', function() {
-  const logoutLink = document.getElementById('logoutBtn');
-  if (logoutLink) {
+  document.querySelectorAll('#logoutBtn, #mobileLogoutBtn').forEach(function(logoutLink) {
     logoutLink.addEventListener('click', function(e) {
       e.preventDefault();
       removeToken();
       updateUI();
       window.location.href = '/ui/auth';
     });
-  }
+  });
   
   // Setup theme selector
   const themeSelector = document.getElementById('themeSelector');
@@ -5168,6 +5176,16 @@ mod dashboard_a11y_tests {
         assert!(html.contains("id=\"createWorkerModal\""));
         assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
         assert!(!html.contains("aria-modal=\"true\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn dashboard_shell_auth_ids_unique_per_viewport() {
+        let html = workers_page().await.0;
+        assert_eq!(html.matches("id=\"userInfo\"").count(), 1);
+        assert_eq!(html.matches("id=\"mobileUserInfo\"").count(), 1);
+        assert_eq!(html.matches("id=\"authLoginBtn\"").count(), 1);
+        assert_eq!(html.matches("id=\"mobileAuthLoginBtn\"").count(), 1);
+        assert!(html.contains("aria-label=\"Select theme\""));
     }
 
     #[tokio::test]
