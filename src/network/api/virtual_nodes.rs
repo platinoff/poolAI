@@ -302,6 +302,17 @@ async fn unbind_telegram_handler(Path(telegram_user_id): Path<String>) -> impl I
     }
 }
 
+/// Telegram message text cap (DoS guard for task queue payloads).
+const TELEGRAM_WEBHOOK_MAX_TEXT: usize = 4096;
+
+fn truncate_webhook_text(text: String) -> String {
+    if text.chars().count() <= TELEGRAM_WEBHOOK_MAX_TEXT {
+        text
+    } else {
+        text.chars().take(TELEGRAM_WEBHOOK_MAX_TEXT).collect()
+    }
+}
+
 fn webhook_secret_ok(headers: &HeaderMap) -> bool {
     let expected = match std::env::var("POOLAI_TELEGRAM_WEBHOOK_SECRET") {
         Ok(s) if !s.trim().is_empty() => s,
@@ -363,7 +374,7 @@ async fn telegram_webhook_handler(
         }
     };
 
-    let text = message.text.unwrap_or_default();
+    let text = truncate_webhook_text(message.text.unwrap_or_default());
     let task_type = if text.starts_with('/') {
         "telegram_command"
     } else {

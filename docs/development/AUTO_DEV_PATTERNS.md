@@ -270,6 +270,11 @@
 - **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration`
 - **FM:** FM-016+ ✅
 
+### [FM-012] Telegram webhook payload guard
+- **Де:** `src/network/api/virtual_nodes.rs` (`TELEGRAM_WEBHOOK_MAX_TEXT`, `webhook_secret_ok`)
+- **Патерн:** optional `POOLAI_TELEGRAM_WEBHOOK_SECRET` → header `X-Telegram-Webhook-Secret`; truncate `message.text` before enqueue
+- **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration --features test-utils`
+
 ### [Workers] Local artifact cache on device (FM-016+++)
 - **Де:** `src/workers/artifact_cache.rs`, env `POOLAI_WORKER_CACHE_DIR`
 - **Патерн:** після успішного PutArtifact wire → `store_probe` у `{cache}/artifacts/{name}-{ts}.bin`; health → `cached_artifacts`

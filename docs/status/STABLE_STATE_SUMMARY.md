@@ -19,7 +19,7 @@
 - ✅ **FM-012 (2026-05-16):** i18n UA/EN + Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget UA/EN, Viewer RBAC).
 - ✅ **FM-007 / FM-008 (2026-05-16):** distributed RAID wire — 15 тестів `distributed_raid_wire_integration`.
 - ✅ **FM-002 / FM-011 (2026-05-16):** service layer audit (`api/` без `get_global_*`); **`cargo test-ci`**.
-- ◆ **FM-003 (Planned ops, gated):** реальний LAN — після **Telegram workers** як virtual nodes; зараз — dev stand §5 runbook (`bin/run-lan-nodes.*`); baseline `poolai_health_load` — **2026-04-10** у `BENCHMARKS.md`.
+- ◆ **FM-003 §4 (BLOCKED):** реальний LAN — немає 2 хостів (2026-05-25); dev stand §5.1 + `verify-dev-stand` e2e; baseline `poolai_health_load` — **2026-04-10** у `BENCHMARKS.md`.
 - ✅ **P0 docs (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів для авторозробки.
 - ✅ **FM-013 (2026-05-18):** admin UI ↔ API JSON contracts — `tests/admin_ui_api_contracts.rs` (12 tests).
 - ✅ **FM-014 (2026-05-19):** admin contracts фаза 2 (config/users/topology) + rewards `HttpAppError` (15 tests).
@@ -27,7 +27,8 @@
 - ✅ **FM-016 (2026-05-18):** virtual nodes — register/heartbeat, tasks, RAID wire; `poolai-worker`.
 - ✅ **FM-016+ (2026-05-18):** Telegram bind/webhook API, file store.
 - ✅ **FM-016++ (2026-05-18):** `poolai-telegram-bot`, `tgbot/coordinator`, `tests/tgbot_coordinator_bridge_integration.rs`.
-- ◆ **FM-003 (Planned ops):** dev stand scripts (`run-lan-nodes`, `run-virtual-node-dev`, `verify-dev-stand`); real LAN §4 gated.
+- ✅ **FM-016+++ (2026-05-25):** pool join, `raid_artifact_probe`, `POOLAI_WORKER_CACHE_DIR`, verify-dev-stand bootstrap e2e.
+- ✅ **FM-012 webhook (2026-05-26):** secret header + 4096 text cap on virtual-node Telegram webhook.
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус

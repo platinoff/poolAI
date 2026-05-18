@@ -127,7 +127,7 @@ Env: `POOLAI_VIRTUAL_NODE_DATA_DIR` у coordinator (`data/lan-stand/virtual-node
 
 | Situation | Action |
 |-----------|--------|
-| No second physical host | Use §5 dev stand; FM-003 залишається **Planned (ops)** до §4 sign-off. |
+| No second physical host | Use §5.1 virtual-node dev stand + `verify-dev-stand`; FM-003 §4 **BLOCKED** (немає 2 хостів, 2026-05-25) — не блокує інші FM. |
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 

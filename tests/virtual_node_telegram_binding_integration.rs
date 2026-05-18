@@ -11,8 +11,32 @@ use poolai::services::virtual_node_task_service::VirtualNodeTaskService;
 use poolai::services::virtual_node_telegram_binding_service::VirtualNodeTelegramBindingService;
 use serde_json::Value;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use tower::ServiceExt;
+
+static WEBHOOK_SECRET_ENV_LOCK: Mutex<()> = Mutex::new(());
+
+struct WebhookSecretEnvGuard {
+    _lock: std::sync::MutexGuard<'static, ()>,
+}
+
+impl WebhookSecretEnvGuard {
+    fn install(secret: Option<&str>) -> Self {
+        let lock = WEBHOOK_SECRET_ENV_LOCK.lock().unwrap();
+        if let Some(value) = secret {
+            std::env::set_var("POOLAI_TELEGRAM_WEBHOOK_SECRET", value);
+        } else {
+            let _ = std::env::remove_var("POOLAI_TELEGRAM_WEBHOOK_SECRET");
+        }
+        Self { _lock: lock }
+    }
+}
+
+impl Drop for WebhookSecretEnvGuard {
+    fn drop(&mut self) {
+        let _ = std::env::remove_var("POOLAI_TELEGRAM_WEBHOOK_SECRET");
+    }
+}
 
 async fn app_with_discovery() -> Router {
     let discovery = Arc::new(DiscoveryService::new(
@@ -70,6 +94,7 @@ async fn register_remote_auto_binds_telegram_metadata() {
 
 #[tokio::test]
 async fn telegram_webhook_enqueues_task_for_bound_peer() {
+    let _env = WebhookSecretEnvGuard::install(None);
     let peer = "tg-webhook-peer";
     VirtualNodeTelegramBindingService::clear_all();
     VirtualNodeTaskService::clear_peer(peer);
@@ -110,6 +135,61 @@ async fn telegram_webhook_enqueues_task_for_bound_peer() {
     let poll_v: Value = serde_json::from_slice(&poll_body).unwrap();
     let task = poll_v["task"].as_object().expect("telegram task");
     assert_eq!(task["task_type"], "telegram_command");
+
+    VirtualNodeTelegramBindingService::clear_all();
+    VirtualNodeTaskService::clear_peer(peer);
+}
+
+#[tokio::test]
+async fn telegram_webhook_rejects_missing_secret_when_configured() {
+    let _env = WebhookSecretEnvGuard::install(Some("integration-test-secret"));
+    let app = app_with_discovery().await;
+    VirtualNodeTelegramBindingService::bind("555", None, "secret-peer");
+
+    let webhook = Request::builder()
+        .method("POST")
+        .uri("/api/v1/virtual-nodes/telegram/webhook")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{"update_id":1,"message":{"from":{"id":555},"text":"hi"}}"#,
+        ))
+        .unwrap();
+    let res = app.clone().oneshot(webhook).await.unwrap();
+    assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
+
+    VirtualNodeTelegramBindingService::clear_all();
+}
+
+#[tokio::test]
+async fn telegram_webhook_truncates_oversized_message_text() {
+    let _env = WebhookSecretEnvGuard::install(None);
+    VirtualNodeTelegramBindingService::clear_all();
+    let peer = "tg-truncate-peer";
+    VirtualNodeTaskService::clear_peer(peer);
+    let app = app_with_discovery().await;
+    VirtualNodeTelegramBindingService::bind("7777", None, peer);
+
+    let long_text = "x".repeat(5000);
+    let body =
+        format!(r#"{{"update_id":9,"message":{{"from":{{"id":7777}},"text":"{long_text}"}}}}"#);
+    let webhook = Request::builder()
+        .method("POST")
+        .uri("/api/v1/virtual-nodes/telegram/webhook")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.clone().oneshot(webhook).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let poll = Request::builder()
+        .uri(format!("/api/v1/virtual-nodes/{peer}/tasks/poll"))
+        .body(Body::empty())
+        .unwrap();
+    let poll_res = app.oneshot(poll).await.unwrap();
+    let poll_body = to_bytes(poll_res.into_body(), usize::MAX).await.unwrap();
+    let poll_v: Value = serde_json::from_slice(&poll_body).unwrap();
+    let text = poll_v["task"]["payload"]["text"].as_str().expect("text");
+    assert_eq!(text.chars().count(), 4096);
 
     VirtualNodeTelegramBindingService::clear_all();
     VirtualNodeTaskService::clear_peer(peer);

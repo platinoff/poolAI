@@ -2,13 +2,12 @@
 
 **Попередній:** [`AUTO_RUN_SESSION_2026-05-24.md`](./AUTO_RUN_SESSION_2026-05-24.md) (FM-016+++ ✅, FM-003 dev verify ✅).
 
-**Ціль:** **FM-003 §4** real LAN (два хости) **або** FM-016+++ local artifact cache on device.
+**Ціль:** FM-016+++ local cache ✅; FM-003 §4 **BLOCKED** (немає real LAN).
 
 **Критерії:**
-- [ ] Manual: `run-virtual-node-dev` + `verify-dev-stand` on stand
-- [x] Local probe cache dir on worker (`POOLAI_WORKER_CACHE_DIR`)
+- [x] Local probe cache (`POOLAI_WORKER_CACHE_DIR`, push `0456aff`)
 - [x] `cargo test-ci`
-- [ ] push MSYS2 Summary
+- [x] FM-003 §4 задокументовано як BLOCKED; наступний — [`AUTO_RUN_SESSION_2026-05-26.md`](./AUTO_RUN_SESSION_2026-05-26.md)
 
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010.
 

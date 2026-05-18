@@ -128,18 +128,18 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Pool workload on device | **FM-016+++** ✅ | pool join, raid probe wire, `POOLAI_WORKER_CACHE_DIR`; далі — FM-003 §4 LAN (gated) |
-| 2 | Real LAN sign-off | **FM-003 §4** | Два хости; Push/Pull timings у `BENCHMARKS.md` |
+| 1 | Telegram webhook hardening | **FM-012** | secret header, text cap 4096; OAuth allowlist — далі за політикою |
+| 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 хостів; dev stand §5.1 достатній |
 | 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 
 ### 5.2 Автономний прогін (сесія → git push)
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md) (FM-016+++ + verify-dev-stand).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md) (FM-016+++ cache; FM-003 §4 BLOCKED).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md) (local cache / FM-003 LAN gated).
+**Поточний:** [`AUTO_RUN_SESSION_2026-05-26.md`](../development/AUTO_RUN_SESSION_2026-05-26.md) (FM-012 webhook hardening).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-23.md`](../development/AUTO_RUN_SESSION_2026-05-23.md), [`AUTO_RUN_SESSION_2026-05-21.md`](../development/AUTO_RUN_SESSION_2026-05-21.md).
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md), [`AUTO_RUN_SESSION_2026-05-23.md`](../development/AUTO_RUN_SESSION_2026-05-23.md).
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|
