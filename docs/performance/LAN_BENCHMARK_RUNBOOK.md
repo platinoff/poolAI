@@ -1,6 +1,6 @@
 # LAN benchmark runbook (FM-003 / P2b)
 
-**Status:** Planned (ops) — **реальний LAN відкладено** до Telegram-воркерів як віртуальних нод на пристроях (повний worker-функціонал). Для розробки достатньо **§5 single-machine dev stand**; §4 sign-off — після воркерів + реального стенду.
+**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **§4 sign-off** лишається **BLOCKED** без двох фізичних хостів. Для розробки достатньо **§5.1 virtual-node dev stand** (`verify-dev-stand`).
 
 **Related:** [`BENCHMARKS.md`](./BENCHMARKS.md) (Criterion + `poolai_health_load`), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) (P2b LAN checkbox).
 

@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-05-18 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
+## Rust Architect — оновлено 2026-05-18 (v0.2.2; AUTO_RUN 2026-05-28; FM-* / HANDOFF)
 
 ---
 
@@ -29,6 +29,8 @@
 - ✅ **FM-016++ (2026-05-18):** `poolai-telegram-bot`, `tgbot/coordinator`, `tests/tgbot_coordinator_bridge_integration.rs`.
 - ✅ **FM-016+++ (2026-05-25):** pool join, `raid_artifact_probe`, `POOLAI_WORKER_CACHE_DIR`, verify-dev-stand bootstrap e2e.
 - ✅ **FM-012 webhook (2026-05-26):** secret header + 4096 text cap on virtual-node Telegram webhook.
+- ✅ **FM-012 OAuth (2026-05-27):** constant-time hash, `POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS`, HTTP callback tests (`telegram_oauth_callback_integration`).
+- ✅ **AUTO_RUN 2026-05-28:** `cargo test-ci` зріз; FM-003 §4 BLOCKED; docs sync.
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус

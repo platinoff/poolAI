@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (FM-016+++ pool workload + Telegram tasks).
+**Оновлено:** 2026-05-18 (AUTO_RUN 2026-05-28: ops hygiene, test-ci).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-24.md`](./AUTO_RUN_SESSION_2026-05-24.md) — **FM-016+++** у роботі; **FM-003** real LAN gated.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-28.md`](./AUTO_RUN_SESSION_2026-05-28.md) — закрито; **FM-003 §4** BLOCKED (2 хости).
 
-**FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — gated (два хости).
+**FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ (частково):** pool join, `raid_artifact_probe`, telegram tasks, `virtual_node_executor`. **Далі:** push artifact probe; FM-003 real LAN (gated).
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, `virtual_node_executor`, verify-dev-stand e2e. **FM-012 ✅:** OAuth hardening (2026-05-27). **Далі:** FM-003 §4 LAN sign-off (gated); FM-009/010 concept.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

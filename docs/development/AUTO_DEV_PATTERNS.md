@@ -279,7 +279,7 @@
 - **Де:** `src/enterprise/security.rs` (`verify_telegram_widget_query`, `verify_telegram_oauth_callback`)
 - **Патерн:** HMAC-SHA256 + constant-time hash; `POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS`; allowlist trim
 - **HTTP:** `GET /api/enterprise/auth/telegram/callback` — `tests/telegram_oauth_callback_integration.rs`
-- **Перевірка:** `cargo test --lib enterprise::security::tests --features enterprise`
+- **Перевірка:** `cargo test --test telegram_oauth_callback_integration --features enterprise`; `cargo test --lib enterprise::security::tests --features enterprise`
 
 ### [FM-012] Telegram webhook payload guard
 - **Де:** `src/network/api/virtual_nodes.rs` (`TELEGRAM_WEBHOOK_MAX_TEXT`, `webhook_secret_ok`)
