@@ -8,21 +8,31 @@ use uuid::Uuid;
 
 const DEFAULT_PROBE_BYTES: &[u8] = b"poolai-vn-artifact-probe";
 
+/// Logical name for a probe task payload.
+pub fn probe_logical_name(task_payload: &Value) -> &str {
+    task_payload
+        .get("name")
+        .and_then(|v| v.as_str())
+        .unwrap_or("vn-probe")
+}
+
+/// Bytes to upload for a probe (from payload or default).
+pub fn probe_bytes(task_payload: &Value) -> Result<Vec<u8>, String> {
+    task_payload
+        .get("data_b64")
+        .and_then(|v| v.as_str())
+        .map(|s| B64.decode(s).map_err(|e| e.to_string()))
+        .transpose()
+        .map(|opt| opt.unwrap_or_else(|| DEFAULT_PROBE_BYTES.to_vec()))
+}
+
 /// Small PutArtifact wire message for coordinator RAID replicate endpoint.
 pub fn build_probe_message(
     worker_id: &str,
     task_payload: &Value,
 ) -> Result<ProtocolMessage, String> {
-    let logical_name = task_payload
-        .get("name")
-        .and_then(|v| v.as_str())
-        .unwrap_or("vn-probe");
-    let bytes = task_payload
-        .get("data_b64")
-        .and_then(|v| v.as_str())
-        .map(|s| B64.decode(s).map_err(|e| e.to_string()))
-        .transpose()?
-        .unwrap_or_else(|| DEFAULT_PROBE_BYTES.to_vec());
+    let logical_name = probe_logical_name(task_payload);
+    let bytes = probe_bytes(task_payload)?;
 
     let metadata = ArtifactMetadata {
         name: logical_name.to_string(),

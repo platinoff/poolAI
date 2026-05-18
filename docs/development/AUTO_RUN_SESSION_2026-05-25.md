@@ -6,8 +6,9 @@
 
 **Критерії:**
 - [ ] Manual: `run-virtual-node-dev` + `verify-dev-stand` on stand
-- [ ] Local probe cache dir on worker (`POOLAI_WORKER_CACHE_DIR`)
-- [ ] `cargo test-ci` + push MSYS2 Summary
+- [x] Local probe cache dir on worker (`POOLAI_WORKER_CACHE_DIR`)
+- [x] `cargo test-ci`
+- [ ] push MSYS2 Summary
 
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010.
 

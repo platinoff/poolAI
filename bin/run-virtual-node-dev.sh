@@ -32,8 +32,9 @@ STAND="$ROOT/data/lan-stand/virtual-node"
 COORD_DATA="$STAND/coordinator"
 RAID_PATH="$COORD_DATA/raid"
 VN_STORE="$STAND/vn-store"
+WORKER_CACHE="$STAND/worker-cache"
 LOG_DIR="$STAND/logs"
-mkdir -p "$RAID_PATH" "$VN_STORE" "$LOG_DIR"
+mkdir -p "$RAID_PATH" "$VN_STORE" "$WORKER_CACHE" "$LOG_DIR"
 
 COORD_URL="http://127.0.0.1:${COORD_PORT}"
 
@@ -52,6 +53,7 @@ POOLAI_WORKER_ADDRESS=127.0.0.1 \
 POOLAI_WORKER_PORT="$WORKER_PORT" \
 POOLAI_WORKER_CHANNEL=dev \
 POOLAI_TELEGRAM_ID=dev-stand-user \
+POOLAI_WORKER_CACHE_DIR="$WORKER_CACHE" \
 nohup "$WORKER" --worker-id vn-dev-stand >"$LOG_DIR/worker-${WORKER_PORT}.log" 2>&1 &
 
 echo ""

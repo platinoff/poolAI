@@ -270,6 +270,11 @@
 - **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration`
 - **FM:** FM-016+ ✅
 
+### [Workers] Local artifact cache on device (FM-016+++)
+- **Де:** `src/workers/artifact_cache.rs`, env `POOLAI_WORKER_CACHE_DIR`
+- **Патерн:** після успішного PutArtifact wire → `store_probe` у `{cache}/artifacts/{name}-{ts}.bin`; health → `cached_artifacts`
+- **Перевірка:** `cargo test --lib workers::artifact_cache`; `verify-dev-stand` (cached_artifacts >= 1)
+
 ### [Workers] RAID artifact probe on virtual node (FM-016+++)
 - **Де:** `src/workers/raid_artifact_probe.rs`, task `raid_artifact_probe`, `POST /raid/distributed/artifacts/replicate`
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire

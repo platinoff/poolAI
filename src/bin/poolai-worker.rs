@@ -6,11 +6,13 @@
 
 use axum::{extract::State, routing::get, Json, Router};
 use poolai::raid::protocol::ProtocolMessage;
-use poolai::workers::raid_artifact_probe::build_probe_message;
+use poolai::workers::artifact_cache::{count_cached_probes, resolve_cache_dir, store_probe};
+use poolai::workers::raid_artifact_probe::{build_probe_message, probe_bytes, probe_logical_name};
 use poolai::workers::virtual_node_executor::{complete_task as resolve_task_outcome, TaskRuntime};
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -28,6 +30,7 @@ struct Args {
     heartbeat_interval_secs: u64,
     channel: String,
     telegram_id: Option<String>,
+    cache_dir: Option<PathBuf>,
 }
 
 #[derive(Clone)]
@@ -53,6 +56,8 @@ struct WorkerHealthResponse {
     tasks_polled: u64,
     tasks_completed: u64,
     last_task: Option<String>,
+    cache_dir: Option<String>,
+    cached_artifacts: usize,
 }
 
 #[derive(Deserialize)]
@@ -140,6 +145,7 @@ fn parse_args() -> Args {
         heartbeat_interval_secs,
         channel,
         telegram_id,
+        cache_dir: resolve_cache_dir(),
     }
 }
 
@@ -326,6 +332,13 @@ async fn run_raid_artifact_probe(
     args: &Args,
     payload: &serde_json::Value,
 ) -> bool {
+    let bytes = match probe_bytes(payload) {
+        Ok(b) => b,
+        Err(e) => {
+            warn!("RAID artifact probe bytes failed: {}", e);
+            return false;
+        }
+    };
     let message = match build_probe_message(&args.worker_id, payload) {
         Ok(m) => m,
         Err(e) => {
@@ -337,13 +350,23 @@ async fn run_raid_artifact_probe(
         "{}/api/v1/raid/distributed/artifacts/replicate",
         args.coordinator_url
     );
-    match client.post(&url).json(&message).send().await {
+    let wire_ok = match client.post(&url).json(&message).send().await {
         Ok(response) => response.status().is_success(),
         Err(e) => {
             warn!("RAID wire put_artifact probe failed: {}", e);
             false
         }
+    };
+    if wire_ok {
+        if let Some(cache) = &args.cache_dir {
+            let name = probe_logical_name(payload);
+            match store_probe(cache, name, &bytes) {
+                Ok(path) => info!("Cached probe artifact at {}", path.display()),
+                Err(e) => warn!("Local artifact cache write failed: {}", e),
+            }
+        }
     }
+    wire_ok
 }
 
 async fn fetch_pool_worker_count(client: &reqwest::Client, args: &Args) -> usize {
@@ -465,6 +488,13 @@ async fn health_handler(State(rt): State<Arc<WorkerRuntime>>) -> Json<WorkerHeal
         tasks_polled: rt.tasks_polled.load(Ordering::Relaxed),
         tasks_completed: rt.tasks_completed.load(Ordering::Relaxed),
         last_task: rt.last_task.read().await.clone(),
+        cache_dir: rt.args.cache_dir.as_ref().map(|p| p.display().to_string()),
+        cached_artifacts: rt
+            .args
+            .cache_dir
+            .as_ref()
+            .map(|p| count_cached_probes(p))
+            .unwrap_or(0),
     })
 }
 

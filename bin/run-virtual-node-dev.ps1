@@ -38,7 +38,9 @@ $StandRoot = Join-Path $RepoRoot "data\lan-stand\virtual-node"
 $CoordData = Join-Path $StandRoot "coordinator"
 $RaidPath = Join-Path $CoordData "raid"
 New-Item -ItemType Directory -Force -Path $RaidPath | Out-Null
+$WorkerCache = Join-Path $StandRoot "worker-cache"
 $LogDir = Join-Path $StandRoot "logs"
+New-Item -ItemType Directory -Force -Path $WorkerCache | Out-Null
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
 $coordUrl = "http://127.0.0.1:$CoordinatorPort"
@@ -63,6 +65,7 @@ Set-Location '$RepoRoot'
 `$env:POOLAI_WORKER_PORT='$WorkerPort'
 `$env:POOLAI_WORKER_CHANNEL='dev'
 `$env:POOLAI_TELEGRAM_ID='dev-stand-user'
+`$env:POOLAI_WORKER_CACHE_DIR='$WorkerCache'
 & '$WorkerExe' --worker-id vn-dev-stand *>&1 | Tee-Object -FilePath '$workerLog'
 "@
 

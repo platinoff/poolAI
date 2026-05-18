@@ -85,6 +85,16 @@ if [[ "${completed:-0}" -lt "$MIN_COMPLETED" ]]; then
   fail=1
 fi
 
+health_json="$(curl -sf --max-time "$TIMEOUT" "http://127.0.0.1:${WORKER_PORT}/health" || true)"
+cached="$(echo "$health_json" | sed -n 's/.*"cached_artifacts":\s*\([0-9][0-9]*\).*/\1/p' | head -1)"
+cached="${cached:-0}"
+if [[ "$cached" -ge 1 ]]; then
+  echo "OK  worker cache -> cached_artifacts=${cached}"
+else
+  echo "FAIL worker cache: cached_artifacts=${cached} (need >= 1 after raid_artifact_probe)"
+  fail=1
+fi
+
 if [[ "$fail" -ne 0 ]]; then
   echo "Dev stand verification failed."
   exit 1

@@ -128,7 +128,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Pool workload on device | **FM-016+++** | pool join + `raid_artifact_probe` PutArtifact wire; далі — local artifact cache on device |
+| 1 | Pool workload on device | **FM-016+++** ✅ | pool join, raid probe wire, `POOLAI_WORKER_CACHE_DIR`; далі — FM-003 §4 LAN (gated) |
 | 2 | Real LAN sign-off | **FM-003 §4** | Два хости; Push/Pull timings у `BENCHMARKS.md` |
 | 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |

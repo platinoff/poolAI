@@ -96,5 +96,18 @@ if ($completed -lt $MinCompleted) {
     $fail = 1
 }
 
+try {
+    $health = Invoke-RestMethod -Uri "http://127.0.0.1:$WorkerPort/health" -TimeoutSec $TimeoutSec
+    if ([int]$health.cached_artifacts -ge 1) {
+        Write-Host "OK  worker cache -> cached_artifacts=$($health.cached_artifacts)" -ForegroundColor Green
+    } else {
+        Write-Host "FAIL worker cache: cached_artifacts=$($health.cached_artifacts)" -ForegroundColor Red
+        $fail = 1
+    }
+} catch {
+    Write-Host "FAIL worker /health for cache check ($($_.Exception.Message))" -ForegroundColor Red
+    $fail = 1
+}
+
 if ($fail -ne 0) { exit 1 }
 Write-Host "Dev stand verification passed (health + virtual-node bootstrap)." -ForegroundColor Cyan

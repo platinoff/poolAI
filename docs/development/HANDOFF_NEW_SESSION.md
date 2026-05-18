@@ -39,6 +39,7 @@
 |--------|-----|-------------|
 | `POOLAI_COORDINATOR_URL` | worker | Base URL coordinator (без trailing `/`) |
 | `POOLAI_TELEGRAM_ID` | worker | Telegram user id → `POST .../telegram/bind` після register |
+| `POOLAI_WORKER_CACHE_DIR` | worker | Локальний кеш probe-артефактів після успішного `raid_artifact_probe` |
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |
 | `POOLAI_TELEGRAM_WEBHOOK_SECRET` | coordinator | Опційно: header `X-Telegram-Webhook-Secret` для webhook |
 | `TELEGRAM_BOT_TOKEN` | `poolai-telegram-bot` | Token від @BotFather |
