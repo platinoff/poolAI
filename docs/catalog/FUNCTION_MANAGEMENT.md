@@ -95,7 +95,7 @@ FM-xxx (з таблиці нижче)
 |----|---------|---------------|-----------------|---------|
 | FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Implemented | `src/network/api/*` без `get_global_*`; `discovery.rs` — optional `instance_manager` з `AppState` (коментар); `services/*` — лише закоментовані Raft placeholders |
-| FM-003 | P2b / RAID | Повні заміри реплікації по **реальному LAN**; TQ01 на стенді. **Зараз:** dev stand (`bin/run-lan-nodes.*`, §5 runbook). **Реальний LAN** — після **Telegram-воркерів** як віртуальних нод на пристроях (повний функціонал worker) | Planned (ops, gated) | `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md); блокер: Telegram workers → virtual nodes |
+| FM-003 | P2b / RAID | Dev stand: `run-lan-nodes.*`, `run-virtual-node-dev.*`, `verify-dev-stand.*`, §5.1 runbook. **Реальний LAN** §4 sign-off — gated (два хости + ops timings) | Planned (ops, gated) | `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
@@ -129,7 +129,7 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Pool workload on device | **FM-016+++** | повний pool/RAID на virtual node; FM-016++ bot ✅ |
-| 2 | Real LAN | **FM-003** | Після device workers у проді; `BENCHMARKS.md` §4 |
+| 2 | Real LAN sign-off | **FM-003 §4** | Два хости; Push/Pull timings у `BENCHMARKS.md` |
 | 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 

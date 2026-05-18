@@ -2,6 +2,7 @@
 //! Provides core functionality for model interface, error handling, configuration, and state management
 
 pub mod config;
+pub mod dev_stand;
 pub mod discovery_handle;
 pub mod discovery_types;
 pub mod error;

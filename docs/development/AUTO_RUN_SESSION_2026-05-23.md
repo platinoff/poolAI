@@ -2,9 +2,15 @@
 
 **Попередній:** [`AUTO_RUN_SESSION_2026-05-22.md`](./AUTO_RUN_SESSION_2026-05-22.md) (FM-016+ ✅), FM-016++ teloxide (`poolai-telegram-bot`).
 
-**Ціль:** **FM-003** ops / dev stand hardening або док runbook (real LAN — два хости, gated).
+**Ціль:** **FM-003** ops / dev stand hardening або doc runbook (real LAN — два хости, gated).
 
-**Поза обсягом:** FM-004, FM-006, FM-009, FM-010.
+**Критерії:**
+- [x] `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`
+- [x] `core::dev_stand::resolve_http_port` + unit tests
+- [x] LAN runbook §5.1 virtual-node stack
+- [x] `cargo test-ci` + push MSYS2 Summary
+
+**Поза обсягом:** FM-004, FM-006, FM-009, FM-010; real LAN §4 sign-off.
 
 **Стартовий промпт:**
 

@@ -27,6 +27,7 @@
 - ✅ **FM-016 (2026-05-18):** virtual nodes — register/heartbeat, tasks, RAID wire; `poolai-worker`.
 - ✅ **FM-016+ (2026-05-18):** Telegram bind/webhook API, file store.
 - ✅ **FM-016++ (2026-05-18):** `poolai-telegram-bot`, `tgbot/coordinator`, `tests/tgbot_coordinator_bridge_integration.rs`.
+- ◆ **FM-003 (Planned ops):** dev stand scripts (`run-lan-nodes`, `run-virtual-node-dev`, `verify-dev-stand`); real LAN §4 gated.
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус

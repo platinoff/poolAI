@@ -247,6 +247,16 @@
 - **Патерн:** env `POOLAI_COORDINATOR_URL` + periodic re-register on heartbeat failure
 - **Перевірка:** `cargo build --bin poolai-worker`; manual: coordinator + worker health `GET /health`
 
+### [FM-003] Dev stand HTTP port
+- **Де:** `src/core/dev_stand.rs`, `src/main.rs`
+- **Патерн:** `POOLAI_HTTP_PORT` → `resolve_http_port()` (default 8080)
+- **Перевірка:** `cargo test --lib dev_stand`
+
+### [FM-003] Virtual-node dev stand scripts
+- **Де:** `bin/run-virtual-node-dev.sh`, `bin/verify-dev-stand.sh`
+- **Патерн:** coordinator :8080 + worker :9090; `POOLAI_VIRTUAL_NODE_DATA_DIR` under `data/lan-stand/virtual-node`
+- **Перевірка:** bash `bin/run-virtual-node-dev.sh`; sleep 15; `bin/verify-dev-stand.sh`
+
 ### [Workers] Telegram bot → coordinator webhook
 - **Де:** `src/tgbot/coordinator.rs`, `src/bin/poolai-telegram-bot.rs`
 - **Патерн:** teloxide handler → `forward_message` → `POST /virtual-nodes/telegram/webhook`

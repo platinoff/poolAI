@@ -99,6 +99,30 @@ curl -s http://127.0.0.1:8081/api/v1/health
 
 Дані стенду: `data/lan-stand/` (gitignored). Discovery може бачити peer на сусідньому порту; **§4 acceptance** (Push/Pull timings у `BENCHMARKS.md`) — лише після ops-прогону.
 
+### 5.1 Virtual node stack (FM-016 на одній машині)
+
+Coordinator + `poolai-worker` (реєстрація, tasks, RAID wire) без другого фізичного хоста:
+
+| Процес | URL | Скрипт |
+|--------|-----|--------|
+| Coordinator | `http://127.0.0.1:8080` | `bin/run-virtual-node-dev.ps1` / `.sh` |
+| Worker health | `http://127.0.0.1:9090/health` | те саме |
+| Telegram bot (опційно) | long-poll → coordinator | `poolai-telegram-bot --features tgbot` + `TELEGRAM_BOT_TOKEN` |
+
+```powershell
+.\bin\run-virtual-node-dev.ps1
+Start-Sleep -Seconds 15
+.\bin\verify-dev-stand.ps1
+```
+
+```bash
+bash bin/run-virtual-node-dev.sh
+sleep 15
+bash bin/verify-dev-stand.sh
+```
+
+Env: `POOLAI_VIRTUAL_NODE_DATA_DIR` у coordinator (`data/lan-stand/virtual-node/vn-store`), worker `POOLAI_TELEGRAM_ID=dev-stand-user` → auto-bind. Див. HANDOFF §2a.
+
 ---
 
 ## 6. When blocked
@@ -109,4 +133,4 @@ curl -s http://127.0.0.1:8081/api/v1/health
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 
-**Last updated:** 2026-05-18 — `POOLAI_HTTP_PORT` / `POOLAI_RAID_BASE_PATH` у коді; `bin/run-lan-nodes.*`; dev stand 8080+8081 перевірено локально.
+**Last updated:** 2026-05-18 — `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`; §5.1 virtual-node stack; `core::dev_stand::resolve_http_port`.

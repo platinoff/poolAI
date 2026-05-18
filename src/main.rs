@@ -203,10 +203,7 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     info!("✅ Rewards engine attached to AppState for HTTP");
 
     // Start network server (override with POOLAI_HTTP_PORT for multi-node on one host)
-    let http_port: u16 = std::env::var("POOLAI_HTTP_PORT")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(8080);
+    let http_port = core::dev_stand::resolve_http_port();
     let addr = SocketAddr::from(([0, 0, 0, 0], http_port));
     info!("🌐 Starting network server on {}", addr);
 

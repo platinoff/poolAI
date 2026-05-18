@@ -2,9 +2,9 @@
 
 **Оновлено:** 2026-05-18 (FM-016++ teloxide bot bridge).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-23.md`](./AUTO_RUN_SESSION_2026-05-23.md) — **FM-003** / ops (після workers).
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-23.md`](./AUTO_RUN_SESSION_2026-05-23.md) — **FM-003** dev stand ✅; real LAN gated.
 
-**FM-003 (реальний LAN):** відкладено до **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
+**FM-003:** dev stand — `bin/run-lan-nodes.*`, `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`. Real LAN §4 — gated (два хости).
 
 **FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot` (feature `tgbot`), coordinator bridge. **Далі:** FM-003 real LAN.
 
@@ -46,6 +46,16 @@
 Збірка бота: `cargo build --bin poolai-telegram-bot --features tgbot`. Запуск: `TELEGRAM_BOT_TOKEN=... POOLAI_COORDINATOR_URL=http://127.0.0.1:8080 poolai-telegram-bot`.
 
 Секрети — лише в env на хості, не в репо.
+
+## 2b. FM-003 dev stand (одна машина)
+
+| Скрипт | Призначення |
+|--------|-------------|
+| `bin/run-lan-nodes.ps1` / `.sh` | Два `poolai` на 8080+8081 |
+| `bin/run-virtual-node-dev.ps1` / `.sh` | Coordinator + `poolai-worker` |
+| `bin/verify-dev-stand.ps1` / `.sh` | Health curl після старту |
+
+Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) §5–5.1.
 
 ## 2. Git push (Windows / Cursor)
 
