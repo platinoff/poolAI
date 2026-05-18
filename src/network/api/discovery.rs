@@ -18,7 +18,8 @@ use std::collections::HashMap;
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::state::ApiContext;
 use crate::services::discovery_service::{
-    DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService,
+    DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService, RemoteHealthProbe,
+    VirtualNodeStatus,
 };
 
 /// Discovery API response types
@@ -50,6 +51,25 @@ struct RegisterRemotePeerResponse {
     registered: bool,
 }
 
+#[derive(Deserialize)]
+struct HeartbeatRemotePeerRequest {
+    peer_id: String,
+    #[serde(default)]
+    capabilities: Option<PeerCapabilities>,
+}
+
+#[derive(Serialize)]
+struct HeartbeatRemotePeerResponse {
+    peer_id: String,
+    ok: bool,
+}
+
+#[derive(Serialize)]
+struct VirtualNodesResponse {
+    nodes: Vec<VirtualNodeStatus>,
+    stale_threshold_secs: i64,
+}
+
 /// Create discovery routes
 pub fn create_discovery_routes() -> Router<ApiContext> {
     Router::new()
@@ -57,6 +77,15 @@ pub fn create_discovery_routes() -> Router<ApiContext> {
         .route("/discovery/peers/{peer_id}", get(peer_handler))
         .route("/discovery/register", post(register_handler))
         .route("/discovery/register-remote", post(register_remote_handler))
+        .route(
+            "/discovery/heartbeat-remote",
+            post(heartbeat_remote_handler),
+        )
+        .route("/discovery/virtual-nodes", get(virtual_nodes_handler))
+        .route(
+            "/discovery/virtual-nodes/{peer_id}/health",
+            get(probe_virtual_node_health_handler),
+        )
 }
 
 /// Handler for GET /api/v1/discovery/peers
@@ -137,6 +166,80 @@ async fn register_remote_handler(
         Err(DiscoveryAnnounceError::Failed(e)) => {
             tracing::warn!("Failed to register remote peer: {}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    }
+}
+
+/// POST /api/v1/discovery/heartbeat-remote — refresh virtual node liveness (FM-016 phase 2).
+async fn heartbeat_remote_handler(
+    State(ctx): State<ApiContext>,
+    Json(payload): Json<HeartbeatRemotePeerRequest>,
+) -> impl IntoResponse {
+    if payload.peer_id.trim().is_empty() {
+        return StatusCode::BAD_REQUEST.into_response();
+    }
+    match DiscoveryService::heartbeat_remote_peer(&ctx, &payload.peer_id, payload.capabilities)
+        .await
+    {
+        Ok(()) => (
+            StatusCode::OK,
+            Json(HeartbeatRemotePeerResponse {
+                peer_id: payload.peer_id,
+                ok: true,
+            }),
+        )
+            .into_response(),
+        Err(DiscoveryAnnounceError::Failed(e)) => {
+            tracing::warn!("heartbeat-remote failed: {}", e);
+            StatusCode::NOT_FOUND.into_response()
+        }
+        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    }
+}
+
+/// GET /api/v1/discovery/virtual-nodes — Telegram / device workers (FM-016 phase 2).
+async fn virtual_nodes_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
+    const STALE_SECS: i64 = 90;
+    match DiscoveryService::list_virtual_nodes(&ctx, STALE_SECS).await {
+        Ok(nodes) => (
+            StatusCode::OK,
+            Json(VirtualNodesResponse {
+                nodes,
+                stale_threshold_secs: STALE_SECS,
+            }),
+        )
+            .into_response(),
+        Err(DiscoveryNotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    }
+}
+
+/// GET /api/v1/discovery/virtual-nodes/:peer_id/health — probe worker HTTP /health.
+async fn probe_virtual_node_health_handler(
+    State(ctx): State<ApiContext>,
+    Path(peer_id): Path<String>,
+) -> impl IntoResponse {
+    match DiscoveryService::probe_remote_health(&ctx, &peer_id).await {
+        Ok(probe) => {
+            let status = if probe.reachable {
+                StatusCode::OK
+            } else {
+                StatusCode::SERVICE_UNAVAILABLE
+            };
+            (status, Json(probe)).into_response()
+        }
+        Err(DiscoveryAnnounceError::Failed(e)) => {
+            tracing::warn!("probe virtual node health failed: {}", e);
+            (
+                StatusCode::NOT_FOUND,
+                Json(RemoteHealthProbe {
+                    peer_id,
+                    reachable: false,
+                    http_status: None,
+                    detail: Some(e.to_string()),
+                }),
+            )
+                .into_response()
         }
         Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
     }

@@ -10,4 +10,5 @@
 - [x] `POST /api/v1/discovery/register-remote`
 - [x] `poolai-worker` — `POOLAI_COORDINATOR_URL`, періодична реєстрація
 - [x] `tests/discovery_remote_register_integration.rs`
-- [ ] Фаза 2: worker виконує pool tasks + RAID wire proxy (окрема сесія)
+- [x] Фаза 2: `heartbeat-remote`, `GET /discovery/virtual-nodes`, probe `/virtual-nodes/{id}/health`; `poolai-worker` `GET /health` + pool API link check
+- [ ] Фаза 3: виконання pool tasks на device + RAID wire proxy (окрема сесія)

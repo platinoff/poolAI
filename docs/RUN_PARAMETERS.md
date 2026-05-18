@@ -52,6 +52,20 @@ POOLAI_HTTP_PORT=8080 POOLAI_RAID_BASE_PATH=./data/lan-stand/node-A/raid cargo r
 
 Або скрипт: **`bin/run-lan-nodes.ps1`** (PowerShell) / **`bin/run-lan-nodes.sh`** (bash).
 
+**Virtual node worker (`poolai-worker`, FM-016):**
+
+| Змінна | Опис |
+|--------|------|
+| `POOLAI_COORDINATOR_URL` | Coordinator, напр. `http://127.0.0.1:8080` |
+| `POOLAI_WORKER_ADDRESS` / `POOLAI_WORKER_PORT` | Адреса для `GET /health` (probe з coordinator) |
+| `POOLAI_HEARTBEAT_INTERVAL_SECS` | Інтервал `heartbeat-remote` (default `10`) |
+| `POOLAI_REGISTER_INTERVAL_SECS` | Повна re-register (default `120`) |
+| `POOLAI_TELEGRAM_ID` | Metadata для Telegram-воркера |
+
+```powershell
+cargo run --bin poolai-worker -- --worker-id tg-1 --port 9090 --telegram-id 12345
+```
+
 #### `POOLAI_RAID_BASE_PATH`
 Базова директорія RAID-артефактів (за замовчуванням: `C:\poolai\raid` на Windows, `/var/lib/poolai/raid` на Linux, `./data/raid` інакше). **Окремий шлях на кожен вузол** при multi-node на одному хості.
 

@@ -629,6 +629,24 @@ impl DiscoveryService {
         }
     }
 
+    /// Refresh last-seen (and optional capabilities) for an HTTP-registered peer.
+    pub async fn heartbeat_remote_peer(
+        &self,
+        peer_id: &str,
+        capabilities: Option<PeerCapabilities>,
+    ) -> Result<(), AppError> {
+        let mut peers = self.peers.write().await;
+        let peer = peers.get_mut(peer_id).ok_or_else(|| {
+            AppError::ApiNotFound(format!("remote peer not registered: {peer_id}"))
+        })?;
+        peer.last_seen = Utc::now();
+        if let Some(cap) = capabilities {
+            peer.capabilities = cap;
+        }
+        debug!("Heartbeat from remote peer: {}", peer_id);
+        Ok(())
+    }
+
     /// Register a remote peer announced over HTTP (virtual node / Telegram worker).
     pub async fn register_remote_peer(&self, peer: PeerInfo) -> Result<(), AppError> {
         let peer_id = peer.peer_id.clone();
@@ -766,6 +784,14 @@ impl crate::core::discovery_handle::DiscoveryHandle for DiscoveryService {
     async fn register_remote_peer(&self, peer: PeerInfo) -> Result<(), AppError> {
         DiscoveryService::register_remote_peer(self, peer).await
     }
+
+    async fn heartbeat_remote_peer(
+        &self,
+        peer_id: &str,
+        capabilities: Option<PeerCapabilities>,
+    ) -> Result<(), AppError> {
+        DiscoveryService::heartbeat_remote_peer(self, peer_id, capabilities).await
+    }
 }
 
 #[cfg(test)]
@@ -781,6 +807,28 @@ mod tests {
 
         assert!(!service.local_peer_id().is_empty());
         assert!(service.local_peer_id().starts_with("poolai-"));
+    }
+
+    #[tokio::test]
+    async fn test_heartbeat_remote_peer_updates_last_seen() {
+        let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
+        let service = DiscoveryService::new(DiscoveryConfig::default(), addr, None);
+        let peer = PeerInfo {
+            peer_id: "tg-worker-hb".to_string(),
+            address: "10.0.0.6".to_string(),
+            port: 9091,
+            last_seen: Utc::now() - chrono::Duration::seconds(120),
+            capabilities: PeerCapabilities::default(),
+            metadata: HashMap::from([("role".to_string(), "virtual_node".to_string())]),
+        };
+        service.register_remote_peer(peer).await.unwrap();
+        tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+        service
+            .heartbeat_remote_peer("tg-worker-hb", None)
+            .await
+            .unwrap();
+        let updated = service.get_peer("tg-worker-hb").await.expect("peer");
+        assert!(updated.last_seen > Utc::now() - chrono::Duration::seconds(5));
     }
 
     #[tokio::test]

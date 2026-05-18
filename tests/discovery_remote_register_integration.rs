@@ -72,3 +72,49 @@ async fn register_remote_peer_lists_in_discovery_peers() {
         "expected tg-worker-test in peers: {arr:?}"
     );
 }
+
+#[tokio::test]
+async fn heartbeat_remote_and_virtual_nodes_list() {
+    let app = app_with_discovery().await;
+
+    let register = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/register-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{
+                "peer_id": "tg-hb-node",
+                "address": "127.0.0.1",
+                "port": 19090,
+                "metadata": { "channel": "telegram", "role": "virtual_node" }
+            }"#,
+        ))
+        .unwrap();
+    let reg = app.clone().oneshot(register).await.unwrap();
+    assert_eq!(reg.status(), StatusCode::OK);
+
+    let hb = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/heartbeat-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(r#"{"peer_id":"tg-hb-node"}"#))
+        .unwrap();
+    let hb_resp = app.clone().oneshot(hb).await.unwrap();
+    assert_eq!(hb_resp.status(), StatusCode::OK);
+
+    let vn_req = Request::builder()
+        .uri("/api/v1/discovery/virtual-nodes")
+        .body(Body::empty())
+        .unwrap();
+    let vn_resp = app.oneshot(vn_req).await.unwrap();
+    assert_eq!(vn_resp.status(), StatusCode::OK);
+    let vn_body = to_bytes(vn_resp.into_body(), usize::MAX).await.unwrap();
+    let vn: Value = serde_json::from_slice(&vn_body).unwrap();
+    let nodes = vn["nodes"].as_array().expect("nodes");
+    assert!(
+        nodes
+            .iter()
+            .any(|n| n["peer"]["peer_id"] == "tg-hb-node" && n["stale"] == false),
+        "virtual node list: {vn:?}"
+    );
+}

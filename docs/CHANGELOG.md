@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-003** — реальний LAN відкладено до **Telegram-воркерів** як віртуальних нод; dev stand §5 runbook лишається для розробки.
 
 ### Added
+- **FM-016 фаза 2** — `heartbeat-remote`, `GET /discovery/virtual-nodes`, probe health; `poolai-worker` HTTP `/health` + перевірка pool API.
 - **FM-016 фаза 1** — `POST /api/v1/discovery/register-remote`; `poolai-worker` реєстрація на coordinator (`POOLAI_COORDINATOR_URL`); тест `discovery_remote_register_integration`.
 - **FM-003 dev stand (одна машина)** — `POOLAI_HTTP_PORT`, `POOLAI_RAID_BASE_PATH`; `bin/run-lan-nodes.ps1` / `bin/run-lan-nodes.sh`; §5 у [`LAN_BENCHMARK_RUNBOOK.md`](performance/LAN_BENCHMARK_RUNBOOK.md).
 - **Автопрогін 2026-05-20 (AUTO_RUN_SESSION)** — **FM-015 ✅**: admin contracts фаза 3 (`/instance`, `/raid/artifacts`, smallworld metrics; 20 tests).
