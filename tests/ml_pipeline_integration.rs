@@ -500,9 +500,41 @@ async fn test_pipeline_turboquant_quantization_step() {
     let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
     let out = got.step_results.get("tq").unwrap().output.as_ref().unwrap();
     assert_eq!(out.get("step_kind"), Some(&"turboquant".to_string()));
-    assert!(out.get("bytes_in").is_some());
-    assert!(out.get("bytes_out").is_some());
+    let bytes_in: u64 = out.get("bytes_in").unwrap().parse().unwrap();
+    let bytes_out: u64 = out.get("bytes_out").unwrap().parse().unwrap();
+    assert!(bytes_in > 0);
+    assert!(bytes_out > 0);
+    // Small payloads may expand after TQ01 header; ratio is still reported in output.
+    assert_eq!(out.get("rows"), Some(&"2".to_string()));
+    assert_eq!(out.get("cols"), Some(&"3".to_string()));
     assert!(out.get("target_bits").is_some());
+    assert!(out.get("compression_ratio").is_some());
+    let max_err: f32 = out.get("max_abs_recon_error").unwrap().parse().unwrap();
+    assert!(max_err >= 0.0);
+}
+
+#[tokio::test]
+async fn test_pipeline_standard_quantization_metrics() {
+    let manager = MLPipelineManager::new();
+    let mut cfg = HashMap::new();
+    cfg.insert("quantization".to_string(), "int8".to_string());
+    let steps = vec![PipelineStep {
+        id: "q".to_string(),
+        step_type: StepType::Quantization,
+        config: cfg,
+        dependencies: vec![],
+    }];
+    let pipeline = manager.create_pipeline("q1", steps).await.unwrap();
+    manager
+        .execute_pipeline(pipeline.id.as_str())
+        .await
+        .unwrap();
+    let got = manager.get_pipeline(pipeline.id.as_str()).await.unwrap();
+    let out = got.step_results.get("q").unwrap().output.as_ref().unwrap();
+    assert_eq!(out.get("step_kind"), Some(&"quantization".to_string()));
+    assert!(out.get("quantization_level").is_some());
+    assert!(out.get("size_mb_before").is_some());
+    assert!(out.get("size_mb_after").is_some());
     assert!(out.get("compression_ratio").is_some());
 }
 

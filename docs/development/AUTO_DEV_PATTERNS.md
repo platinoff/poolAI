@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-18 (FM-018 admin a11y + nav aria-current).
+**Оновлено:** 2026-05-18 (DIGEST §ML pipeline metrics runbook).
 
 ---
 
@@ -295,6 +295,13 @@
 - **Де:** `src/workers/raid_artifact_probe.rs`, task `raid_artifact_probe`, `POST /raid/distributed/artifacts/replicate`
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
 - **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
+
+### [ML] Pipeline step output metrics
+- **Де:** `src/ml/pipeline.rs` (`execute_*_step`), `docs/ml/PIPELINE_MANAGEMENT.md` § «Ключі output кроків»
+- **Сигнал:** `step_results[step_id].output["step_kind"]` — `turboquant` vs `quantization`
+- **Патерн:** TurboQuant: `turboquant=true` + `weight_rows`; метрики `bytes_in`, `bytes_out`, `max_abs_recon_error`; стандартна квантизація — `size_mb_before` / `size_mb_after`
+- **Перевірка:** `cargo test --test ml_pipeline_integration --features ml test_pipeline_turboquant_quantization_step test_pipeline_standard_quantization_metrics`
+- **FM:** DIGEST §ML ✅
 
 ### [FM-018] Admin/login a11y
 - **Де:** `src/ui/admin/mod.rs:89-130`, `admin_styles.css:770-808`, `admin_common.js` (`adminMarkCurrentNav`, `adminAnnounceLive`); login у `src/ui/mod.rs`

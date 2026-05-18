@@ -120,7 +120,7 @@ FM-xxx (з таблиці нижче)
 |--------|--------|-----------|-----|
 | 1 | HTTP errors (worker-safe) | **FM-017** | ✅ discovery JSON errors; virtual-nodes status-only задокументовано; за потреби dual format пізніше |
 | 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
-| 3 | ML ops | **DIGEST §ML** | Pipeline hardening, метрики, runbook (не новий FM поки не оформлено Issue) |
+| 3 | ML ops | **DIGEST §ML** ✅ | Runbook метрик у `PIPELINE_MANAGEMENT.md`; turboquant + standard quant tests |
 | 4 | UI accessibility | **FM-018** ✅ | Повний WCAG — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (окремі спринти) |
 | 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` (`TODO` у `azure.rs`/`gcp.rs`) |
 | 6 | Концепт | **FM-009**, **FM-010** | Grid envelope; Solana — поза автопрогоном |
@@ -141,7 +141,7 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | |
 | FM-005 | JSON errors на discovery/VN/admin | **Partial** → **FM-017** | `rg HttpAppError src/network/api` — немає у `discovery`/`virtual_nodes`/`admin` |
 | FM-009/010 | Grid / Solana | **Concept-only** | |
-| DIGEST | ML pipeline hardening | **Partial** | Операційні інструкції |
+| DIGEST | ML pipeline hardening | **Implemented** (runbook) | `docs/ml/PIPELINE_MANAGEMENT.md` § метрик; FM-004 SIMD deferred |
 | `UI_IMPROVEMENTS_PLAN` | a11y, keyboard, ARIA | **Planned** → **FM-018** | Архівні `docs/archive/*` — не канон |
 | README *Next Focus* | Застарілі FM-007/011/012 | **Docs debt** | Синхронізовано в цій сесії |
 
@@ -149,7 +149,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-05-31.md`](../development/AUTO_RUN_SESSION_2026-05-31.md) — DIGEST §ML pipeline hardening.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-01.md`](../development/AUTO_RUN_SESSION_2026-06-01.md) — FM-003 §4 runbook (BLOCKED) / BENCHMARKS зріз.
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-31.md`](../development/AUTO_RUN_SESSION_2026-05-31.md) (DIGEST §ML metrics ✅).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-30.md`](../development/AUTO_RUN_SESSION_2026-05-30.md) (FM-018 a11y ✅).
 

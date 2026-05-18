@@ -119,6 +119,52 @@ println!("Status: {:?}", got.status);
 
 ---
 
+## 📏 Ключі output кроків (runbook метрик)
+
+Після `execute_pipeline` результати кожного кроку — у `pipeline.step_results[step_id].output` (`HashMap<String, String>`). Усі успішні кроки містять **`status`** (`completed`) та **`step_id`**.
+
+| `step_kind` | `StepType` | Ключі метрик (додатково) | Конфіг (приклад) |
+|-------------|------------|--------------------------|------------------|
+| `preprocessing` | `Preprocessing` | `feature_dim`, `sample_count`, `normalize_enabled`, `estimated_bytes`, `pipeline_checksum` | `feature_dim`, `sample_count`, `normalize` |
+| `training` | `Training` | `epochs_run`, `learning_rate`, `final_loss`, `converged` | `epochs`, `learning_rate` / `lr` |
+| `evaluation` | `Evaluation` | `accuracy`, `f1_proxy`, `samples_evaluated` | `baseline_accuracy`, `samples_evaluated` |
+| `deployment` | `Deployment` | `environment`, `rollout_percent`, `revision`, `artifact_uri` | `environment`, `rollout_percent` |
+| `profiling` | `Profiling` | `latency_ms`, `memory_mb`, `flops` | — |
+| `pruning` | `Pruning` | `pruned_count`, `sparsity_ratio`, `accuracy_drop_est`, … | `ratio`, `target_sparsity` |
+| `quantization` | `Quantization` | `quantization_level`, `size_mb_before`, `size_mb_after`, `compression_ratio` | `quantization` / `level` = `int8`, `fp16`, … |
+| **`turboquant`** | `Quantization` | **`bytes_in`**, **`bytes_out`**, `target_bits`, `compression_ratio`, `rows`, `cols`, `max_abs_recon_error` | `turboquant=true` або `quantization=turboquant`; `weight_rows` (`1,2;3,4`) або `weights` + `turboquant_cols` |
+| `hyperparameter_tuning` | `HyperparameterTuning` | `suggested_learning_rate`, `suggested_batch_size`, … | `lr_min`, `lr_max`, … |
+| `automl` | `AutoMl` | `model_id`, `accuracy`, `model_type`, `hyperparameters_json`, … | AutoML config |
+| `federated_aggregation` | `FederatedAggregation` | `federated_round`, `clients_count`, `total_samples`, `weight_dim`, … | `round`, `client_weights` |
+
+### TurboQuant (операційний зріз)
+
+Увімкнення: `turboquant` / `use_turboquant` = `true`, або `quantization=turboquant` (див. `MLPipeline::turboquant_enabled` у `src/ml/pipeline.rs`).
+
+```rust
+let mut cfg = HashMap::new();
+cfg.insert("turboquant".to_string(), "true".to_string());
+cfg.insert("weight_rows".to_string(), "0.1,0.2,0.3;-0.5,1.0,0.0".to_string());
+// крок StepType::Quantization → output["step_kind"] == "turboquant"
+```
+
+Інтерпретація:
+
+| Ключ | Значення |
+|------|----------|
+| `bytes_in` | Розмір сирих `f32` рядків перед пакуванням TQ01 |
+| `bytes_out` | Розмір стислого буфера після `turboquant::pack_uniform_rows` |
+| `compression_ratio` | `bytes_in / bytes_out` (1.0 якщо `bytes_out == 0`; для малих матриць `bytes_out` може перевищувати `bytes_in` через заголовок TQ01) |
+| `max_abs_recon_error` | Макс. \|оригінал − unpack\| по елементах (sanity для тестів/логів) |
+
+Деталі формату TQ01: [`TURBOQUANT_INTEGRATION.md`](./TURBOQUANT_INTEGRATION.md). Інтеграційний тест: `tests/ml_pipeline_integration.rs` → `test_pipeline_turboquant_quantization_step`.
+
+### Стандартна квантизація (без TurboQuant)
+
+`quantization` ≠ turboquant → `step_kind` = `quantization`, метрики `size_mb_*` / `compression_ratio` з `apply_quantization` (`src/ml/optimization.rs`).
+
+---
+
 ## 🧪 Тестування
 
 ```bash

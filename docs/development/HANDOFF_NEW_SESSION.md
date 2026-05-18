@@ -2,11 +2,11 @@
 
 **Оновлено:** 2026-05-18 (FM-018 ✅; наступний — DIGEST §ML).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-31.md`](./AUTO_RUN_SESSION_2026-05-31.md) — pipeline metrics/runbook. **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-01.md`](./AUTO_RUN_SESSION_2026-06-01.md) — FM-003 runbook/BENCHMARKS. **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** **DIGEST §ML** pipeline hardening → FM-003 §4 (2 хости, BLOCKED) → FM-004/006 deferred → FM-009/010 concept. **FM-017/018** ✅.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** FM-003 §4 runbook (BLOCKED) → FM-004/006 deferred → FM-009/010 concept. **FM-017/018**, **DIGEST §ML runbook** ✅.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

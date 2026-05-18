@@ -6,6 +6,9 @@
 //! - Dependency management
 //! - Step status tracking
 //!
+//! Step output keys (metrics runbook): [`PIPELINE_MANAGEMENT.md`](../../docs/ml/PIPELINE_MANAGEMENT.md)
+//! (§ «Ключі output кроків»).
+//!
 //! # Example
 //!
 //! ```rust,no_run
