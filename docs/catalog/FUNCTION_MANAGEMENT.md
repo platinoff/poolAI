@@ -137,9 +137,11 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md) (FM-016+++ cache; FM-003 §4 BLOCKED).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-05-26.md`](../development/AUTO_RUN_SESSION_2026-05-26.md) (FM-012 webhook hardening).
+**Поточний:** [`AUTO_RUN_SESSION_2026-05-27.md`](../development/AUTO_RUN_SESSION_2026-05-27.md) (FM-012 OAuth / Architect).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md), [`AUTO_RUN_SESSION_2026-05-23.md`](../development/AUTO_RUN_SESSION_2026-05-23.md).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-26.md`](../development/AUTO_RUN_SESSION_2026-05-26.md) (webhook + OpenAPI).
+
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md), [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md).
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|
