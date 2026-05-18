@@ -111,14 +111,12 @@ Coordinator + `poolai-worker` (реєстрація, tasks, RAID wire) без д
 
 ```powershell
 .\bin\run-virtual-node-dev.ps1
-Start-Sleep -Seconds 15
-.\bin\verify-dev-stand.ps1
+.\bin\verify-dev-stand.ps1   # default warmup 50s + bootstrap task retries
 ```
 
 ```bash
 bash bin/run-virtual-node-dev.sh
-sleep 15
-bash bin/verify-dev-stand.sh
+bash bin/verify-dev-stand.sh   # checks health, discovery, pool join, >=4 tasks completed
 ```
 
 Env: `POOLAI_VIRTUAL_NODE_DATA_DIR` у coordinator (`data/lan-stand/virtual-node/vn-store`), worker `POOLAI_TELEGRAM_ID=dev-stand-user` → auto-bind. Див. HANDOFF §2a.

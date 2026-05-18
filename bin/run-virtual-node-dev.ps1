@@ -80,10 +80,8 @@ $workerProc = Start-Process powershell.exe -ArgumentList @(
 
 Write-Host ""
 Write-Host "Coordinator PID: $($coordProc.Id)  Worker PID: $($workerProc.Id)" -ForegroundColor Cyan
-Write-Host "Verify (~10s):" -ForegroundColor Cyan
-Write-Host "  Invoke-WebRequest $coordUrl/api/v1/health"
-Write-Host "  Invoke-WebRequest http://127.0.0.1:$WorkerPort/health"
-Write-Host "  Invoke-WebRequest $coordUrl/api/v1/discovery/virtual-nodes"
+Write-Host "Verify after bootstrap:" -ForegroundColor Cyan
+Write-Host "  .\bin\verify-dev-stand.ps1"
 Write-Host "Stop:" -ForegroundColor Yellow
 Write-Host "  Stop-Process -Id $($coordProc.Id),$($workerProc.Id) -Force -ErrorAction SilentlyContinue"
 Write-Host "  Stop-Process -Name poolai,poolai-worker -Force -ErrorAction SilentlyContinue"

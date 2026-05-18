@@ -53,7 +53,7 @@
 |--------|-------------|
 | `bin/run-lan-nodes.ps1` / `.sh` | Два `poolai` на 8080+8081 |
 | `bin/run-virtual-node-dev.ps1` / `.sh` | Coordinator + `poolai-worker` |
-| `bin/verify-dev-stand.ps1` / `.sh` | Health curl після старту |
+| `bin/verify-dev-stand.ps1` / `.sh` | Health + discovery + pool join + bootstrap tasks (>=4 completed) |
 
 Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) §5–5.1.
 

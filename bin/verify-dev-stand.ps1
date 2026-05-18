@@ -1,12 +1,18 @@
-# FM-003: health checks for local dev stand (after run-lan-nodes or run-virtual-node-dev).
+# FM-003 / FM-016+++: health + virtual-node bootstrap checks for local dev stand.
 param(
     [int]$CoordinatorPort = 8080,
     [int]$WorkerPort = 9090,
     [int]$NodeBPort = 8081,
-    [int]$TimeoutSec = 5
+    [string]$WorkerId = "vn-dev-stand",
+    [int]$TimeoutSec = 5,
+    [int]$WarmupSecs = 50,
+    [int]$TaskRetries = 12,
+    [int]$TaskSleepSecs = 5,
+    [int]$MinCompleted = 4
 )
 
 $ErrorActionPreference = "Continue"
+$CoordUrl = "http://127.0.0.1:$CoordinatorPort"
 $fail = 0
 
 function Test-Endpoint {
@@ -28,9 +34,67 @@ function Test-Endpoint {
     }
 }
 
-Test-Endpoint "coordinator" "http://127.0.0.1:$CoordinatorPort/api/v1/health"
+Test-Endpoint "coordinator" "$CoordUrl/api/v1/health"
 Test-Endpoint "node-B" "http://127.0.0.1:$NodeBPort/api/v1/health" -Optional
 Test-Endpoint "virtual worker" "http://127.0.0.1:$WorkerPort/health"
 
 if ($fail -ne 0) { exit 1 }
-Write-Host "Dev stand health checks passed." -ForegroundColor Cyan
+
+Write-Host "Waiting ${WarmupSecs}s for worker bootstrap tasks..." -ForegroundColor Cyan
+Start-Sleep -Seconds $WarmupSecs
+
+try {
+    $vn = Invoke-RestMethod -Uri "$CoordUrl/api/v1/discovery/virtual-nodes" -TimeoutSec $TimeoutSec
+    $found = @($vn.nodes | Where-Object { $_.peer.peer_id -eq $WorkerId }).Count -gt 0
+    if ($found) {
+        Write-Host "OK  discovery virtual-node -> $WorkerId" -ForegroundColor Green
+    } else {
+        Write-Host "FAIL discovery virtual-node missing $WorkerId" -ForegroundColor Red
+        $fail = 1
+    }
+} catch {
+    Write-Host "FAIL discovery virtual-nodes ($($_.Exception.Message))" -ForegroundColor Red
+    $fail = 1
+}
+
+try {
+    $workers = Invoke-RestMethod -Uri "$CoordUrl/api/v1/workers" -TimeoutSec $TimeoutSec
+    $inPool = @($workers | Where-Object { $_.id -eq $WorkerId }).Count -gt 0
+    if ($inPool) {
+        Write-Host "OK  pool join -> worker $WorkerId in /workers" -ForegroundColor Green
+    } else {
+        Write-Host "FAIL pool join: $WorkerId not in /workers" -ForegroundColor Red
+        $fail = 1
+    }
+} catch {
+    Write-Host "FAIL /workers ($($_.Exception.Message))" -ForegroundColor Red
+    $fail = 1
+}
+
+$completed = 0
+for ($i = 0; $i -lt $TaskRetries; $i++) {
+    try {
+        $status = Invoke-RestMethod -Uri "$CoordUrl/api/v1/virtual-nodes/$WorkerId/tasks/status" -TimeoutSec $TimeoutSec
+        $completed = [int]$status.completed
+        $pending = $status.pending
+        if ($completed -ge $MinCompleted) {
+            Write-Host "OK  bootstrap tasks -> completed=$completed pending=$pending" -ForegroundColor Green
+            break
+        }
+        if ($i -lt ($TaskRetries - 1)) {
+            Write-Host "  ... tasks completed=$completed/$MinCompleted, retry in ${TaskSleepSecs}s" -ForegroundColor DarkGray
+            Start-Sleep -Seconds $TaskSleepSecs
+        }
+    } catch {
+        Write-Host "  ... tasks status error: $($_.Exception.Message)" -ForegroundColor DarkYellow
+        Start-Sleep -Seconds $TaskSleepSecs
+    }
+}
+
+if ($completed -lt $MinCompleted) {
+    Write-Host "FAIL bootstrap tasks: completed=$completed (need >= $MinCompleted)" -ForegroundColor Red
+    $fail = 1
+}
+
+if ($fail -ne 0) { exit 1 }
+Write-Host "Dev stand verification passed (health + virtual-node bootstrap)." -ForegroundColor Cyan

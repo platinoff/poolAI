@@ -55,8 +55,7 @@ POOLAI_TELEGRAM_ID=dev-stand-user \
 nohup "$WORKER" --worker-id vn-dev-stand >"$LOG_DIR/worker-${WORKER_PORT}.log" 2>&1 &
 
 echo ""
-echo "Verify (~10s):"
-echo "  curl -s $COORD_URL/api/v1/health"
-echo "  curl -s http://127.0.0.1:${WORKER_PORT}/health"
-echo "  curl -s $COORD_URL/api/v1/discovery/virtual-nodes"
+echo "Verify after bootstrap (~50s):"
+echo "  bash bin/verify-dev-stand.sh"
+echo "  # or: VERIFY_WARMUP_SECS=0 bash bin/verify-dev-stand.sh  # if already warm"
 echo "Stop: pkill -f 'poolai|poolai-worker' || taskkill //IM poolai.exe //F"

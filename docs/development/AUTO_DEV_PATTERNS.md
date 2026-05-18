@@ -255,7 +255,7 @@
 ### [FM-003] Virtual-node dev stand scripts
 - **Де:** `bin/run-virtual-node-dev.sh`, `bin/verify-dev-stand.sh`
 - **Патерн:** coordinator :8080 + worker :9090; `POOLAI_VIRTUAL_NODE_DATA_DIR` under `data/lan-stand/virtual-node`
-- **Перевірка:** bash `bin/run-virtual-node-dev.sh`; sleep 15; `bin/verify-dev-stand.sh`
+- **Перевірка:** `bash bin/run-virtual-node-dev.sh`; `bash bin/verify-dev-stand.sh` (warmup 50s, checks discovery/pool/tasks>=4)
 
 ### [Workers] Telegram bot → coordinator webhook
 - **Де:** `src/tgbot/coordinator.rs`, `src/bin/poolai-telegram-bot.rs`

@@ -10,7 +10,8 @@
 - [x] `src/workers/virtual_node_executor.rs` + unit tests
 - [x] `cargo test-ci` + push (`6b0d76d`)
 - [x] `POST /virtual-nodes/{id}/pool/join` + worker auto-join (push `864bd63`)
-- [x] `raid_artifact_probe` bootstrap + PutArtifact wire on coordinator
-- [ ] push artifact-probe increment
+- [x] `raid_artifact_probe` bootstrap + PutArtifact wire on coordinator (push `4419502`)
+- [x] `verify-dev-stand.*` — discovery + pool join + >=4 bootstrap tasks
+- [ ] push verify increment; close FM-016+++ → FM-003 §4 gated
 
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010. Real LAN §4 — gated (два хости).
