@@ -1,6 +1,6 @@
 # LAN benchmark runbook (FM-003 / P2b)
 
-**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **§4 sign-off** лишається **BLOCKED** без двох фізичних хостів. Для розробки достатньо **§5.1 virtual-node dev stand** (`verify-dev-stand`).
+**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **§4 sign-off** — **BLOCKED** (немає 2 фізичних хостів; зріз **AUTO_RUN 2026-06-01**). Для розробки: **§5** dual-port LAN на одній машині або **§5.1** `verify-dev-stand`.
 
 **Related:** [`BENCHMARKS.md`](./BENCHMARKS.md) (Criterion + `poolai_health_load`), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) (P2b LAN checkbox).
 
@@ -127,8 +127,8 @@ Env: `POOLAI_VIRTUAL_NODE_DATA_DIR` у coordinator (`data/lan-stand/virtual-node
 
 | Situation | Action |
 |-----------|--------|
-| No second physical host | Use §5.1 virtual-node dev stand + `verify-dev-stand`; FM-003 §4 **BLOCKED** (немає 2 хостів, 2026-05-25) — не блокує інші FM. |
+| No second physical host | Use §5.1 virtual-node dev stand + `verify-dev-stand`; FM-003 §4 **BLOCKED** — не блокує інші FM. Оновлення зрізу: **2026-06-01** (без нових LAN-рядків у `BENCHMARKS.md`; baseline `poolai_health_load` **2026-04-10** чинний). |
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 
-**Last updated:** 2026-05-18 — `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`; §5.1 virtual-node stack; `core::dev_stand::resolve_http_port`.
+**Last updated:** 2026-06-01 — AUTO_RUN ops: §4 BLOCKED задокументовано; §6 When blocked; посилання на `BENCHMARKS.md` changelog. Раніше: 2026-05-18 — `run-virtual-node-dev.*`, `verify-dev-stand.*`, §5.1.

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Docs
+- **FM-003 ops (2026-06-01)** — `LAN_BENCHMARK_RUNBOOK` §6 + `BENCHMARKS.md` changelog: §4 LAN sign-off BLOCKED (no second host); dev stand §5.1 remains canonical.
+
 ### Added
 - **DIGEST §ML** — pipeline step output metrics runbook in `docs/ml/PIPELINE_MANAGEMENT.md`; tests `test_pipeline_standard_quantization_metrics` and stronger turboquant assertions.
 - **FM-018** — admin panel skip links, focus-visible, aria-live/aria-current; `adminMarkCurrentNav`; unit test `ui::admin::a11y_tests`; login skip + alert live region.

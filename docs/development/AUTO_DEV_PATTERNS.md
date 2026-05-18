@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-18 (DIGEST §ML pipeline metrics runbook).
+**Оновлено:** 2026-06-01 (FM-003 §4 BLOCKED ops slice).
 
 ---
 
@@ -295,6 +295,13 @@
 - **Де:** `src/workers/raid_artifact_probe.rs`, task `raid_artifact_probe`, `POST /raid/distributed/artifacts/replicate`
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
 - **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
+
+### [FM-003] LAN §4 BLOCKED — ops only
+- **Де:** `docs/performance/LAN_BENCHMARK_RUNBOOK.md` §6, `docs/performance/BENCHMARKS.md` changelog
+- **Сигнал:** немає 2 фізичних хостів → не додавати LAN replication row; `poolai_health_load` baseline **2026-04-10** лишається
+- **Патерн:** dev stand §5.1 (`bin/verify-dev-stand.*`) + §5 dual-port на одній машині; §4 acceptance — лише після ops-прогону
+- **Перевірка:** docs-only спринт; `cargo test-ci` для регресії
+- **FM:** FM-003 §4 BLOCKED
 
 ### [ML] Pipeline step output metrics
 - **Де:** `src/ml/pipeline.rs` (`execute_*_step`), `docs/ml/PIPELINE_MANAGEMENT.md` § «Ключі output кроків»

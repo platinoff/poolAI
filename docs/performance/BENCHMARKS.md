@@ -151,6 +151,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-06-01 | AUTO_RUN 2026-06-01: FM-003 §4 **BLOCKED** (2 фізичні хости відсутні); [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) §6 оновлено; dev stand §5.1 (`verify-dev-stand`) — канон для однієї машини; **без** нового `poolai_health_load` / LAN replication row (baseline **2026-04-10** чинний). |
 | 2026-05-17 | AUTO_RUN 2026-05-17 S1: LAN-стенд недоступний (1 хост); runbook оновлено; FM-003 **Planned (ops)** — без нового рядка `poolai_health_load` (baseline **2026-04-10** чинний). |
 | 2026-05-16 | FM-003 ops: [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) (два вузли LAN, replication + TQ01); baseline `poolai_health_load` — рядок **2026-04-10** лишається чинним до нового прогону на стенді. |
 | 2026-04-12 | FM-007 / P2b harness **`distributed_raid_wire_integration`**: додано wire-тести **`SyncArtifacts`** — **Pull** (`missing_artifacts`), **Bidirectional** (симетрична різниця, відсортована), відсутність conflict при однаковому `stored_at` у `remote_versions`; юніт-тест **`no_conflict_when_local_and_remote_timestamps_equal`** у `raid_distributed_protocol_service`. |

@@ -109,7 +109,7 @@ FM-xxx (з таблиці нижче)
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
-| FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Partial | `discovery.rs` ✅; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
+| FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Implemented | `discovery.rs`; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
 | FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current; dashboard вже мав skip/ARIA | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
@@ -137,9 +137,9 @@ FM-xxx (з таблиці нижче)
 |---------|--------|------|----------|
 | Architect L125 | LAN replication + TQ01 size compare | **BLOCKED** | FM-003 §4; 2 хости |
 | Architect L185 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006 |
-| FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅ |
+| FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops зріз **2026-06-01** у `BENCHMARKS.md` |
+| FM-005 | JSON errors discovery/VN | **Implemented** | FM-017 ✅; VN status-only by design |
 | FM-004 | SIMD TurboQuant | **Deferred** | |
-| FM-005 | JSON errors на discovery/VN/admin | **Partial** → **FM-017** | `rg HttpAppError src/network/api` — немає у `discovery`/`virtual_nodes`/`admin` |
 | FM-009/010 | Grid / Solana | **Concept-only** | |
 | DIGEST | ML pipeline hardening | **Implemented** (runbook) | `docs/ml/PIPELINE_MANAGEMENT.md` § метрик; FM-004 SIMD deferred |
 | `UI_IMPROVEMENTS_PLAN` | a11y, keyboard, ARIA | **Planned** → **FM-018** | Архівні `docs/archive/*` — не канон |
@@ -149,7 +149,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-01.md`](../development/AUTO_RUN_SESSION_2026-06-01.md) — FM-003 §4 runbook (BLOCKED) / BENCHMARKS зріз.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) — §5.3 docs debt / UI WCAG slice.
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-01.md`](../development/AUTO_RUN_SESSION_2026-06-01.md) (FM-003 §4 BLOCKED ops).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-31.md`](../development/AUTO_RUN_SESSION_2026-05-31.md) (DIGEST §ML metrics ✅).
 
