@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main","parse_args"],"struct":["Args"]};
+window.SIDEBAR_ITEMS = {"fn":["main","parse_args","register_remote"],"struct":["Args"]};
