@@ -1,8 +1,8 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-13.md`](./AUTO_RUN_SESSION_2026-06-13.md) — FM-019 ops + test-utils).
+**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-14.md`](./AUTO_RUN_SESSION_2026-06-14.md) — FM-019 docs S4).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-13.md`](./AUTO_RUN_SESSION_2026-06-13.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-14.md`](./AUTO_RUN_SESSION_2026-06-14.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
@@ -84,7 +84,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | Пріоритет | Що | Стан |
 |-----------|-----|------|
 | 1 | **FM-003 §4** — реальний LAN sign-off | **BLOCKED** (2 хости) |
-| 2 | **FM-019** — tune pa11y / WCAG auto | auth fixture ✅ |
+| 2 | **FM-019** — pa11y `/ui` + `/ui/admin/config` (код) | runbook §3.1 planned; strict URLs ✅ |
 | — | **P4** — `poolai_health_load` | ✅ **2026-05-18** (`BENCHMARKS.md`) |
 | — | FM-004/006 | Deferred, поза автопрогоном |
 | — | FM-009/010 | Concept-only |

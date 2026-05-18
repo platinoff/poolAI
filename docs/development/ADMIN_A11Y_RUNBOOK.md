@@ -43,6 +43,19 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 **Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — admin users/security + `/ui/workers` після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). **Зріз 2026-05-18:** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** (commit `ded58c10`).
 
+### 3.1 Матриця URL (strict / planned)
+
+| URL | Режим | Стан у `pa11y-ci.sh` | Примітка |
+|-----|--------|----------------------|----------|
+| `/ui/login` | unauthenticated | **strict** | `STRICT_URLS` |
+| `/ui/admin/users` | auth actions | **strict** (`PA11Y_ADMIN_STRICT=1`) | `ADMIN_URLS` |
+| `/ui/admin/security` | auth actions | **strict** | tablist OAuth2/SAML |
+| `/ui/workers` | auth actions | **strict** | dashboard modal slice |
+| `/ui` | auth actions | **planned** | dashboard shell; ручна клавіатура §2 ✅ |
+| `/ui/admin/config` | auth actions | **planned** | tablist General…Health; ручна §2 ✅ |
+
+Наступний кодовий slice: додати **planned** рядки в `ADMIN_URLS`, прогін `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` → **0 errors**, оновити `tests/pa11y_ci_script.rs` за потреби.
+
 ```bash
 # MSYS2: poolai вже на :8080
 bash bin/pa11y-ci.sh
@@ -83,6 +96,7 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 
 - ~~Повний прохід dashboard modals (workers, libs, VM, RAID)~~ — **Partial ✅ 2026-05-18** (`src/ui/mod.rs`, `ui::dashboard_a11y_tests`).
 - ~~`pa11y` / axe у CI~~ — **Partial ✅** `a11y.yml` + `bin/pa11y-ci.sh` (login + `PA11Y_ADMIN_STRICT` auth actions).
-- Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (історичний чеклист).
+- ~~Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md)~~ — **Archived ✅ 2026-05-18** (S4 docs; канон §5.4 + цей runbook).
+- Розширити `ADMIN_URLS`: `/ui`, `/ui/admin/config` — **planned** (див. §3.1).
 
-**Last updated:** 2026-05-18 — FM-019 strict pa11y pass (`ded58c10`); CI partial (`a11y.yml`, `bin/pa11y-ci.sh`).
+**Last updated:** 2026-05-18 — S4 docs: `UI_IMPROVEMENTS_PLAN` archival; pa11y URL matrix §3.1; strict pass `ded58c10`.

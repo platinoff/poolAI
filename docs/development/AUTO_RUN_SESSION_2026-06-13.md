@@ -8,7 +8,7 @@
 - [x] `Cargo.toml` — `required-features = ["test-utils"]` для `virtual_node_*_integration`
 - [x] `ADMIN_A11Y_RUNBOOK.md` + `FUNCTION_MANAGEMENT` §5.3 — strict pa11y 0 errors
 - [x] `cargo test-ci`
-- [ ] push (MSYS2)
+- [x] push — `d70c3d33`
 
 ## S1 — виконання (2026-05-18)
 
@@ -25,3 +25,5 @@ S0: git fetch && git status -sb; HANDOFF + FUNCTION_MANAGEMENT §5.1.
 Пріоритет: FM-019 docs + test-utils gates. Не робити: FM-004/006/009/010.
 Після коду: cargo fmt → cargo test-ci; push MSYS2.
 ```
+
+**Наступний:** [`AUTO_RUN_SESSION_2026-06-14.md`](./AUTO_RUN_SESSION_2026-06-14.md) — S4 docs: `UI_IMPROVEMENTS_PLAN` archival + pa11y URL roadmap.

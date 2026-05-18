@@ -349,6 +349,12 @@
 - **Перевірка:** `cargo test --test pa11y_ci_script`; GitHub Actions → **A11y (pa11y)**
 - **FM:** FM-019 Partial (pa11y auth)
 
+### [FM-019] pa11y URL matrix + UI plan archival (docs S4)
+- **Де:** [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.1; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (архів)
+- **Патерн:** strict сьогодні — login + `ADMIN_URLS` (users, security, workers); **planned** — `/ui`, `/ui/admin/config` (додати в `ADMIN_URLS` лише після 0-error прогону)
+- **Не канон:** історичні `[ ]` у `UI_IMPROVEMENTS_PLAN` — не пріоритизувати; канон FM §5.4 + runbook
+- **FM:** FM-019 Partial (docs)
+
 ### [FM-016] Virtual-node integration tests + test-utils feature
 - **Де:** `tests/virtual_node_pool_join_integration.rs`, `tests/virtual_node_tasks_integration.rs`, `Cargo.toml` `[[test]]`
 - **Патерн:** `required-features = ["test-utils"]` — інакше `attach_*_for_test` не компілюється; `cargo test-ci` уже з `--features …,test-utils`
