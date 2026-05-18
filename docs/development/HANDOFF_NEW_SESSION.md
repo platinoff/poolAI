@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-21 (FM-016 фаза 1: virtual node registration).
+**Оновлено:** 2026-05-18 (FM-016 core закрито; наступний прогін FM-016+).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-21.md`](./AUTO_RUN_SESSION_2026-05-21.md) — **FM-016** in progress.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-22.md`](./AUTO_RUN_SESSION_2026-05-22.md) — **FM-016+** Telegram binding.
 
-**FM-003 (реальний LAN):** відкладено до повних **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
+**FM-003 (реальний LAN):** відкладено до **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
 
-**FM-016 ✅ (core):** register/heartbeat, virtual-nodes, task poll/complete, RAID `health_check` wire; `poolai-worker` на device. **Далі:** Telegram bot binding, FM-003 real LAN.
+**FM-016 ✅ (core):** register/heartbeat, virtual-nodes, task poll/complete, RAID `health_check` wire; `poolai-worker` на device; `cargo test-ci` 2026-05-18. **Далі:** FM-016+ bot binding, production task store.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

@@ -135,9 +135,11 @@ FM-xxx (з таблиці нижче)
 
 ### 5.2 Автономний прогін (сесія → git push)
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-05-20.md`](../development/AUTO_RUN_SESSION_2026-05-20.md) (FM-015).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-21.md`](../development/AUTO_RUN_SESSION_2026-05-21.md) (FM-016 core).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-19.md`](../development/AUTO_RUN_SESSION_2026-05-19.md), [`AUTO_RUN_SESSION_2026-05-18.md`](../development/AUTO_RUN_SESSION_2026-05-18.md).
+**Поточний:** [`AUTO_RUN_SESSION_2026-05-22.md`](../development/AUTO_RUN_SESSION_2026-05-22.md) (FM-016+).
+
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-20.md`](../development/AUTO_RUN_SESSION_2026-05-20.md), [`AUTO_RUN_SESSION_2026-05-19.md`](../development/AUTO_RUN_SESSION_2026-05-19.md).
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|

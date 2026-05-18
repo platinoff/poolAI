@@ -234,6 +234,24 @@
 - **Патерн:** `distributed_raid_wire_integration`, `appstate_http_injection_integration` потребують `test-utils`
 - **Перевірка:** `rg -n "appstate_http_injection_integration" Cargo.toml`
 
+### [Workers] Virtual node task API
+- **Де:** `src/network/api/virtual_nodes.rs:1-50`
+- **Сигнал:** `VirtualNodeTaskService`, `poll` / `complete` routes
+- **Патерн:** thin Axum handlers → `VirtualNodeTaskService`; bootstrap tasks (`ping`, `raid_health_check`) у `virtual_node_task_service.rs`
+- **Перевірка:** `cargo test --test virtual_node_tasks_integration --features test-utils`
+- **FM:** FM-016 ✅
+
+### [Workers] poolai-worker coordinator loop
+- **Де:** `src/bin/poolai-worker.rs:392-419`
+- **Сигнал:** `register_remote`, `heartbeat_remote`, `poll_and_run_tasks`
+- **Патерн:** env `POOLAI_COORDINATOR_URL` + periodic re-register on heartbeat failure
+- **Перевірка:** `cargo build --bin poolai-worker`; manual: coordinator + worker health `GET /health`
+
+### [Workers] Discovery remote register test harness
+- **Де:** `tests/discovery_remote_register_integration.rs`, `tests/virtual_node_tasks_integration.rs:18-40`
+- **Патерн:** `attach_raid_manager_for_test` + `DiscoveryService` у `ApiContext` → `create_api_routes().with_state(ctx)`
+- **Перевірка:** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`
+
 ---
 
 ## Документація (кроки 1–12)

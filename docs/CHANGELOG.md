@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Docs
+- **Автопрогін 2026-05-21 закрито** — FM-016 core ✅; `cargo test-ci` 2026-05-18; наступний — FM-016+ ([`AUTO_RUN_SESSION_2026-05-22.md`](development/AUTO_RUN_SESSION_2026-05-22.md)).
+
 ### Changed
 - **FM-003** — реальний LAN відкладено до **Telegram-воркерів** як віртуальних нод; dev stand §5 runbook лишається для розробки.
 
