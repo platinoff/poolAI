@@ -296,10 +296,10 @@
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
 - **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
 
-### [FM-017] Virtual-node API errors (planned)
-- **Де:** `src/network/api/virtual_nodes.rs`, `discovery.rs`, `admin.rs`
-- **Патерн:** сьогодні — `StatusCode` + plain text (worker перевіряє лише `is_success()`); admin/discovery — кандидати на `HttpAppError` (FM-005 залишок)
-- **Перевірка:** `rg "HttpAppError" src/network/api/virtual_nodes.rs` → 0; після FM-017 — інтеграційні тести worker не ламаються
+### [FM-017] Discovery HttpAppError + virtual-node status-only
+- **Де:** `src/network/api/discovery.rs` (`discovery_not_ready`, `discovery_validation`, …); `virtual_nodes.rs` — status-only (коментар FM-017)
+- **Патерн:** worker (`poolai-worker`) — `is_success()` без parse body; discovery помилки — `{ "error": { "code", "message" }, "context"? }`
+- **Перевірка:** `cargo test --test discovery_remote_register_integration`; `rg "HttpAppError" src/network/api/virtual_nodes.rs` → 0
 
 ### [Workers] Virtual node pool join (FM-016+++)
 - **Де:** `src/network/api/virtual_nodes.rs` (`POST .../pool/join`), `poolai-worker` after `register-remote`

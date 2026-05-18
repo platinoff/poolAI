@@ -118,3 +118,30 @@ async fn heartbeat_remote_and_virtual_nodes_list() {
         "virtual node list: {vn:?}"
     );
 }
+
+#[tokio::test]
+async fn register_remote_empty_peer_id_returns_json_error() {
+    let app = app_with_discovery().await;
+
+    let register = Request::builder()
+        .method("POST")
+        .uri("/api/v1/discovery/register-remote")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{"peer_id":"","address":"127.0.0.1","port":9090}"#,
+        ))
+        .unwrap();
+
+    let response = app.oneshot(register).await.unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["error"]["code"], "VALIDATION_ERROR");
+    assert!(
+        v["error"]["message"]
+            .as_str()
+            .unwrap_or("")
+            .contains("peer_id"),
+        "expected peer_id validation message: {v:?}"
+    );
+}

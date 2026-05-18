@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-017 (partial)** — discovery API errors via `HttpAppError`; virtual-node routes stay status-only for `poolai-worker`.
 - **FM-012 OAuth hardening** — constant-time Telegram widget hash check; `POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS`; allowlist trim; HTTP callback integration tests.
 - **OpenAPI** — Discovery + VirtualNodes paths (`register-remote`, tasks, pool/join, Telegram webhook).
 - **FM-012 webhook hardening** — Telegram webhook text capped at 4096 chars; tests for secret header and truncation.

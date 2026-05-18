@@ -1,4 +1,8 @@
 //! Virtual-node worker task API (FM-016 phase 3) and Telegram binding (FM-016+).
+//!
+//! **FM-017:** error responses stay **HTTP status only** (no `HttpAppError` JSON) so
+//! `poolai-worker` can keep using `response.status().is_success()` without parsing bodies.
+//! Discovery/admin routes use structured JSON errors per FM-005.
 
 use axum::{
     extract::{Path, State},

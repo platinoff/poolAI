@@ -5,11 +5,17 @@
 **Ціль:** **FM-017** — FM-005 залишок (`discovery` / `virtual_nodes` / `admin`) **або** docs-only якщо worker-compat потребує окремого дизайну.
 
 **Критерії FM-017 (мінімум):**
-- [ ] Документовано контракт помилок для `poolai-worker` (status-only vs JSON)
-- [ ] `discovery` або `admin` — хоча б один маршрут на `HttpAppError` + тест
-- [ ] `cargo test-ci` + push
+- [x] Контракт worker: `virtual_nodes` status-only (коментар у `virtual_nodes.rs`)
+- [x] `discovery` — `HttpAppError` + тест `register_remote_empty_peer_id_returns_json_error`
+- [x] `cargo test-ci` + push
 
 **BLOCKED (не старт):** FM-003 §4 LAN — 2 фізичні хости.
+
+---
+
+## Результат (2026-05-18)
+
+FM-017 **Partial** — discovery ✅; virtual-nodes worker-safe; admin вже `AppError`.
 
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010, FM-018 (окремий спринт).
 

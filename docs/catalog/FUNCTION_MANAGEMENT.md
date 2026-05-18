@@ -109,7 +109,7 @@ FM-xxx (з таблиці нижче)
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
-| FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery`, `virtual_nodes`, `admin` — plain `StatusCode` / text, без `HttpAppError` JSON (`error.message`) | Planned | `src/network/api/discovery.rs`, `virtual_nodes.rs`, `admin.rs`; `poolai-worker` перевіряє лише HTTP status |
+| FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Partial | `discovery.rs` ✅; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
 | FM-018 | UI / a11y | WCAG 2.1 AA, keyboard/ARIA (план UI improvements) | Planned | [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md); не блокує FM-003/017 |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
@@ -118,7 +118,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | HTTP errors (worker-safe) | **FM-017** | Опційний JSON для admin/discovery; virtual-nodes — лишити status-only або dual format; тести worker |
+| 1 | HTTP errors (worker-safe) | **FM-017** | ✅ discovery JSON errors; virtual-nodes status-only задокументовано; за потреби dual format пізніше |
 | 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
 | 3 | ML ops | **DIGEST §ML** | Pipeline hardening, метрики, runbook (не новий FM поки не оформлено Issue) |
 | 4 | UI accessibility | **FM-018** | Клавіатура, ARIA, focus — за [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
@@ -147,7 +147,9 @@ FM-xxx (з таблиці нижче)
 
 ### 5.2 Автономний прогін (сесія → git push)
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 або docs sync).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
+
+**Поточний:** наступний спринт — FM-003 §4 (BLOCKED) або FM-018 a11y.
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-28.md`](../development/AUTO_RUN_SESSION_2026-05-28.md) (ops hygiene, test-ci).
 

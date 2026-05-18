@@ -2,7 +2,7 @@
 
 **Оновлено:** 2026-05-18 (менеджер функціоналу — §5.3 аудит, FM-017/018).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md) — **FM-017** (HttpAppError залишок). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md) — FM-017 discovery ✅ (partial). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 

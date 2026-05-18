@@ -16,7 +16,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
+use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
+use crate::network::api::common::HttpAppError;
 use crate::services::discovery_service::{
     DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService, RemoteHealthProbe,
     VirtualNodeStatus,
@@ -90,6 +92,35 @@ pub fn create_discovery_routes() -> Router<ApiContext> {
         )
 }
 
+fn discovery_not_ready(op: &'static str) -> HttpAppError {
+    HttpAppError::new(AppError::SubsystemUnavailable(
+        "Discovery service is not initialized".to_string(),
+    ))
+    .with_context(ErrorContext::new(op))
+    .with_status(StatusCode::SERVICE_UNAVAILABLE)
+}
+
+fn discovery_validation(op: &'static str, message: impl Into<String>) -> HttpAppError {
+    HttpAppError::new(AppError::ValidationError(message.into())).with_context(ErrorContext::new(op))
+}
+
+fn discovery_announce_failed(op: &'static str, e: impl std::fmt::Display) -> HttpAppError {
+    tracing::warn!("{op} failed: {e}");
+    HttpAppError::new(AppError::InternalError(format!("{op} failed: {e}")))
+        .with_context(ErrorContext::new(op))
+}
+
+fn discovery_peer_not_found(
+    op: &'static str,
+    peer_id: &str,
+    e: impl std::fmt::Display,
+) -> HttpAppError {
+    tracing::warn!("{op} failed for {peer_id}: {e}");
+    HttpAppError::new(AppError::ApiNotFound(format!("{op} failed: {e}")))
+        .with_context(ErrorContext::new(op).with_resource("peer_id", peer_id))
+        .with_status(StatusCode::NOT_FOUND)
+}
+
 /// Handler for GET /api/v1/discovery/peers
 /// Returns list of all discovered peers
 async fn peers_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
@@ -130,12 +161,13 @@ async fn peer_handler(
 /// Registers this node as a peer
 async fn register_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     match DiscoveryService::send_announcement(&ctx).await {
-        Ok(()) => StatusCode::OK,
+        Ok(()) => StatusCode::OK.into_response(),
         Err(DiscoveryAnnounceError::Failed(e)) => {
-            tracing::warn!("Failed to send discovery announcement: {}", e);
-            StatusCode::INTERNAL_SERVER_ERROR
+            discovery_announce_failed("discovery_register", e).into_response()
         }
-        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE,
+        Err(DiscoveryAnnounceError::NotReady) => {
+            discovery_not_ready("discovery_register").into_response()
+        }
     }
 }
 
@@ -145,7 +177,8 @@ async fn register_remote_handler(
     Json(payload): Json<RegisterRemotePeerRequest>,
 ) -> impl IntoResponse {
     if payload.peer_id.trim().is_empty() {
-        return StatusCode::BAD_REQUEST.into_response();
+        return discovery_validation("register_remote", "peer_id must not be empty")
+            .into_response();
     }
     let is_virtual_node = payload.metadata.get("role").map(String::as_str) == Some("virtual_node");
     let telegram_id = payload.metadata.get("telegram_id").cloned();
@@ -178,10 +211,11 @@ async fn register_remote_handler(
                 .into_response()
         }
         Err(DiscoveryAnnounceError::Failed(e)) => {
-            tracing::warn!("Failed to register remote peer: {}", e);
-            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+            discovery_announce_failed("register_remote", e).into_response()
         }
-        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+        Err(DiscoveryAnnounceError::NotReady) => {
+            discovery_not_ready("register_remote").into_response()
+        }
     }
 }
 
@@ -191,24 +225,22 @@ async fn heartbeat_remote_handler(
     Json(payload): Json<HeartbeatRemotePeerRequest>,
 ) -> impl IntoResponse {
     if payload.peer_id.trim().is_empty() {
-        return StatusCode::BAD_REQUEST.into_response();
+        return discovery_validation("heartbeat_remote", "peer_id must not be empty")
+            .into_response();
     }
-    match DiscoveryService::heartbeat_remote_peer(&ctx, &payload.peer_id, payload.capabilities)
-        .await
-    {
+    let peer_id = payload.peer_id.clone();
+    match DiscoveryService::heartbeat_remote_peer(&ctx, &peer_id, payload.capabilities).await {
         Ok(()) => (
             StatusCode::OK,
-            Json(HeartbeatRemotePeerResponse {
-                peer_id: payload.peer_id,
-                ok: true,
-            }),
+            Json(HeartbeatRemotePeerResponse { peer_id, ok: true }),
         )
             .into_response(),
         Err(DiscoveryAnnounceError::Failed(e)) => {
-            tracing::warn!("heartbeat-remote failed: {}", e);
-            StatusCode::NOT_FOUND.into_response()
+            discovery_peer_not_found("heartbeat_remote", &peer_id, e).into_response()
         }
-        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+        Err(DiscoveryAnnounceError::NotReady) => {
+            discovery_not_ready("heartbeat_remote").into_response()
+        }
     }
 }
 
@@ -224,7 +256,7 @@ async fn virtual_nodes_handler(State(ctx): State<ApiContext>) -> impl IntoRespon
             }),
         )
             .into_response(),
-        Err(DiscoveryNotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+        Err(DiscoveryNotReady) => discovery_not_ready("virtual_nodes_list").into_response(),
     }
 }
 
@@ -243,7 +275,7 @@ async fn probe_virtual_node_health_handler(
             (status, Json(probe)).into_response()
         }
         Err(DiscoveryAnnounceError::Failed(e)) => {
-            tracing::warn!("probe virtual node health failed: {}", e);
+            tracing::warn!("probe virtual node health failed for {peer_id}: {e}");
             (
                 StatusCode::NOT_FOUND,
                 Json(RemoteHealthProbe {
@@ -255,6 +287,8 @@ async fn probe_virtual_node_health_handler(
             )
                 .into_response()
         }
-        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+        Err(DiscoveryAnnounceError::NotReady) => {
+            discovery_not_ready("probe_virtual_node_health").into_response()
+        }
     }
 }
