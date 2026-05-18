@@ -6,7 +6,7 @@
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — gated (два хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ (частково):** `pool_workers_probe`, telegram task execution, `virtual_node_executor`. **Далі:** `cargo test-ci` + push; FM-003 real LAN.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ (частково):** pool join, `raid_artifact_probe`, telegram tasks, `virtual_node_executor`. **Далі:** push artifact probe; FM-003 real LAN (gated).
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

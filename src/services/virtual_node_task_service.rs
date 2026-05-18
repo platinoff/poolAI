@@ -5,7 +5,7 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::collections::{HashMap, VecDeque};
 use std::sync::{Mutex, OnceLock};
 use uuid::Uuid;
@@ -134,6 +134,11 @@ impl VirtualNodeTaskService {
             peer_id,
             "pool_workers_probe",
             Value::Object(Default::default()),
+        );
+        Self::enqueue(
+            peer_id,
+            "raid_artifact_probe",
+            json!({ "name": "vn-bootstrap-probe" }),
         );
     }
 

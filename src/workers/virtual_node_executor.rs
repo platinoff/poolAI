@@ -6,6 +6,7 @@ use serde_json::Value;
 #[derive(Debug, Clone, Default)]
 pub struct TaskRuntime {
     pub raid_wire_ok: Option<bool>,
+    pub raid_artifact_ok: Option<bool>,
     pub pool_worker_count: Option<usize>,
 }
 
@@ -27,6 +28,17 @@ pub fn complete_task(task_type: &str, payload: &Value, rt: &TaskRuntime) -> (Str
         "pool_workers_probe" => {
             let count = rt.pool_worker_count.unwrap_or(0);
             (format!("pool_workers:{count}"), true)
+        }
+        "raid_artifact_probe" => {
+            let ok = rt.raid_artifact_ok.unwrap_or(false);
+            (
+                if ok {
+                    "raid_artifact_ok".to_string()
+                } else {
+                    "raid_artifact_failed".to_string()
+                },
+                ok,
+            )
         }
         "telegram_command" => handle_telegram_command(payload, rt),
         "telegram_message" => {
@@ -95,10 +107,23 @@ mod tests {
     }
 
     #[test]
+    fn raid_artifact_probe_outcome() {
+        let ok = TaskRuntime {
+            raid_artifact_ok: Some(true),
+            ..Default::default()
+        };
+        assert_eq!(
+            complete_task("raid_artifact_probe", &Value::Null, &ok),
+            ("raid_artifact_ok".into(), true)
+        );
+    }
+
+    #[test]
     fn telegram_status_command() {
         let payload = serde_json::json!({ "text": "/status" });
         let rt = TaskRuntime {
             raid_wire_ok: Some(true),
+            raid_artifact_ok: None,
             pool_worker_count: Some(2),
         };
         let (status, ok) = complete_task("telegram_command", &payload, &rt);

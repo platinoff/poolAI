@@ -270,6 +270,11 @@
 - **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration`
 - **FM:** FM-016+ ✅
 
+### [Workers] RAID artifact probe on virtual node (FM-016+++)
+- **Де:** `src/workers/raid_artifact_probe.rs`, task `raid_artifact_probe`, `POST /raid/distributed/artifacts/replicate`
+- **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
+- **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
+
 ### [Workers] Virtual node pool join (FM-016+++)
 - **Де:** `src/network/api/virtual_nodes.rs` (`POST .../pool/join`), `poolai-worker` after `register-remote`
 - **Патерн:** peer must exist in discovery with `metadata.role = virtual_node` → `WorkerPoolService::add_worker` (no JWT)

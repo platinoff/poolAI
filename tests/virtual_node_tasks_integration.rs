@@ -3,17 +3,20 @@
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
 use axum::{body::Body, Router};
+use base64::{engine::general_purpose::STANDARD as B64, Engine};
+use chrono::Utc;
 use poolai::core::discovery_handle::DiscoveryHandle;
 use poolai::core::state::ApiContext;
 use poolai::network::api::create_api_routes;
 use poolai::network::discovery::{DiscoveryConfig, DiscoveryService};
-use poolai::raid::protocol::ProtocolMessage;
+use poolai::raid::protocol::{ArtifactMetadata, ProtocolMessage, PutArtifactPayload, SyncMode};
 use poolai::services::virtual_node_task_service::VirtualNodeTaskService;
 use serde_json::Value;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::sync::Arc;
 use tempfile::TempDir;
 use tower::ServiceExt;
+use uuid::Uuid;
 
 async fn app_with_raid_and_discovery() -> (Router, TempDir) {
     let temp = TempDir::new().unwrap();
@@ -117,6 +120,46 @@ async fn raid_health_check_wire_from_virtual_node_task() {
     let req = Request::builder()
         .method("POST")
         .uri("/api/v1/raid/distributed/health")
+        .header("content-type", "application/json")
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.oneshot(req).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn raid_artifact_probe_wire_from_virtual_node_task() {
+    let peer = "vn-artifact-peer";
+    VirtualNodeTaskService::clear_peer(peer);
+    VirtualNodeTaskService::enqueue(
+        peer,
+        "raid_artifact_probe",
+        serde_json::json!({ "name": "integration-probe" }),
+    );
+
+    let (app, _temp) = app_with_raid_and_discovery().await;
+
+    let payload = PutArtifactPayload {
+        artifact_id: format!("artifact-{}", Uuid::new_v4()),
+        source_node: peer.to_string(),
+        data: Some(B64.encode(b"vn-wire-probe")),
+        metadata: ArtifactMetadata {
+            name: "integration-probe".to_string(),
+            version: "probe-1".to_string(),
+            size_bytes: 13,
+            checksum: "probe".to_string(),
+            created_at: Utc::now(),
+            content_type: None,
+            tags: None,
+        },
+        replication_factor: 1,
+        sync_mode: SyncMode::Async,
+    };
+    let msg = ProtocolMessage::put_artifact(peer.to_string(), payload).unwrap();
+    let body = serde_json::to_vec(&msg).unwrap();
+    let req = Request::builder()
+        .method("POST")
+        .uri("/api/v1/raid/distributed/artifacts/replicate")
         .header("content-type", "application/json")
         .body(Body::from(body))
         .unwrap();

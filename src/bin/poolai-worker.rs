@@ -6,6 +6,7 @@
 
 use axum::{extract::State, routing::get, Json, Router};
 use poolai::raid::protocol::ProtocolMessage;
+use poolai::workers::raid_artifact_probe::build_probe_message;
 use poolai::workers::virtual_node_executor::{complete_task as resolve_task_outcome, TaskRuntime};
 use serde::Deserialize;
 use serde::Serialize;
@@ -320,6 +321,31 @@ async fn run_raid_health_check(client: &reqwest::Client, args: &Args) -> bool {
     }
 }
 
+async fn run_raid_artifact_probe(
+    client: &reqwest::Client,
+    args: &Args,
+    payload: &serde_json::Value,
+) -> bool {
+    let message = match build_probe_message(&args.worker_id, payload) {
+        Ok(m) => m,
+        Err(e) => {
+            warn!("RAID artifact probe build failed: {}", e);
+            return false;
+        }
+    };
+    let url = format!(
+        "{}/api/v1/raid/distributed/artifacts/replicate",
+        args.coordinator_url
+    );
+    match client.post(&url).json(&message).send().await {
+        Ok(response) => response.status().is_success(),
+        Err(e) => {
+            warn!("RAID wire put_artifact probe failed: {}", e);
+            false
+        }
+    }
+}
+
 async fn fetch_pool_worker_count(client: &reqwest::Client, args: &Args) -> usize {
     let url = format!("{}/api/v1/workers", args.coordinator_url);
     let Ok(response) = client.get(&url).send().await else {
@@ -351,14 +377,19 @@ async fn execute_task(
     let task_type = task.task_type.as_str();
     let mut runtime = TaskRuntime::default();
 
-    let run_raid = matches!(task_type, "raid_health_check")
+    let run_raid_health = matches!(task_type, "raid_health_check")
         || (task_type == "telegram_command" && telegram_command_is(&task.payload, "/raid"));
-    if run_raid {
+    if run_raid_health {
         let ok = run_raid_health_check(client, &rt.args).await;
         *rt.raid_wire_ok.write().await = ok;
         runtime.raid_wire_ok = Some(ok);
     } else if task_type == "telegram_command" && telegram_command_is(&task.payload, "/status") {
         runtime.raid_wire_ok = Some(*rt.raid_wire_ok.read().await);
+    }
+
+    if matches!(task_type, "raid_artifact_probe") {
+        let ok = run_raid_artifact_probe(client, &rt.args, &task.payload).await;
+        runtime.raid_artifact_ok = Some(ok);
     }
 
     if matches!(task_type, "pool_workers_probe" | "telegram_command") {
