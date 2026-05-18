@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **FM-019 (partial)** — dashboard `dashMarkCurrentNav` + `aria-current` on main/mobile nav; §5.3–5.4 functionality audit.
+
 ### Docs
 - **FM-003 ops (2026-06-01)** — `LAN_BENCHMARK_RUNBOOK` §6 + `BENCHMARKS.md` changelog: §4 LAN sign-off BLOCKED (no second host); dev stand §5.1 remains canonical.
+- **§5.3 audit (2026-06-02)** — expanded backlog table; README/Architect Next Focus synced; stale banner on `CONCEPT_PENDING_FEATURES.md`; `UI_IMPROVEMENTS_PLAN` FM-019 baseline table.
 
 ### Added
 - **DIGEST §ML** — pipeline step output metrics runbook in `docs/ml/PIPELINE_MANAGEMENT.md`; tests `test_pipeline_standard_quantization_metrics` and stronger turboquant assertions.

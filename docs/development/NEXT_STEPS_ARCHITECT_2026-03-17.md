@@ -38,13 +38,12 @@
 
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
-1. **FM-017** — **FM-005 залишок:** `HttpAppError` для `discovery` / `admin`; `virtual_nodes` — узгодити з `poolai-worker` (лише HTTP status сьогодні).
-2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; відкритий чекбокс P2b нижче ≈ цей пункт.
-3. **FM-018** — UI a11y (WCAG, keyboard/ARIA) — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md).
-4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-5. **Концепт** — **FM-009**, **FM-010**.
+1. **FM-019** — повний WCAG / UI audit — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md); базовий a11y slice ✅ (FM-018).
+2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; ops **2026-06-01**; чекбокс P2b нижче ≈ цей пункт.
+3. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+4. **Концепт** — **FM-009**, **FM-010**.
 
-**Закрито:** **FM-005** ✅ (2026-04-10, admin REST); **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅ (2026-05-27 OAuth); **FM-013–016** ✅.
+**Закрито:** **FM-017/018** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
 
 Деталі тікетів і шаблон Issue — таблиця **FM-*** у тому ж файлі; операційний зріз сесії — [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4.
 
@@ -121,7 +120,7 @@
 - [x] Інтеграційний тест **`tests/ml_pipeline_integration.rs`** (`test_pipeline_turboquant_quantization_step`) при `--features ml`.
 - [x] Проксі замірів replication control-plane: Criterion-група **`raid_replication_engine`** у `benches/runtime_benchmarks.rs` (див. `docs/performance/BENCHMARKS.md`).
 - [x] In-tree **HTTP wire harness** для distributed `PutArtifact`: **`Cargo.toml`** `[[test]] distributed_raid_wire_integration` (`--features test-utils`; з **`ml`** — порівняння розміру JSON TQ01 vs сирий f32); команди в **`docs/performance/BENCHMARKS.md`** (секція P2b).
-- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4** / LAN-стенд; harness лише готує шлях handler+serde).
+- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4** / LAN-стенд; harness ✅ — **BLOCKED** без 2 фізичних хостів, див. FM-003 §4).
 - [x] Опційно: прискорений підшлях у Rust (**портативно**: 4-wide unroll, `inv_scale` у пакуванні; без `portable_simd` і без нових crates). Нативний ISA SIMD (x86 NEON тощо) — за потреби пізніше.
 
 **Критерії готовності**:

@@ -1,6 +1,18 @@
 # 🎨 UI Improvements Plan
 ## Rust Architect Analysis - 2025-12-30
 
+**Оновлено (канон FM-019, 2026-06-02):** базовий a11y slice **вже в коді** — не дублювати в спринтах. Деталі: [`FUNCTION_MANAGEMENT.md`](catalog/FUNCTION_MANAGEMENT.md) §5.4.
+
+| Реалізовано (FM-018 / dashboard) | Файл |
+|----------------------------------|------|
+| Skip links | `src/ui/mod.rs`, `admin/mod.rs`, login |
+| Ctrl+K search, Esc modals/mobile drawer | `src/ui/mod.rs` |
+| `aria-live` (notifications, errors) | dashboard, admin, login |
+| `aria-current` nav | `adminMarkCurrentNav`, `dashMarkCurrentNav` |
+| i18n UA/EN | `i18n_core.js` |
+
+**Залишилось (FM-019):** повний audit modals/forms, pa11y, semantic pass — чеклисти нижче частково застарілі.
+
 ---
 
 ## 📊 Поточний стан UI Module

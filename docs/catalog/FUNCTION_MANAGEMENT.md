@@ -110,7 +110,8 @@ FM-xxx (з таблиці нижче)
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
 | FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Implemented | `discovery.rs`; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
-| FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current; dashboard вже мав skip/ARIA | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
+| FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
+| FM-019 | UI / a11y | Повний WCAG: modals audit, forms, pa11y; dashboard `dashMarkCurrentNav` | Partial | `src/ui/mod.rs`; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -121,7 +122,7 @@ FM-xxx (з таблиці нижче)
 | 1 | HTTP errors (worker-safe) | **FM-017** | ✅ discovery JSON errors; virtual-nodes status-only задокументовано; за потреби dual format пізніше |
 | 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
 | 3 | ML ops | **DIGEST §ML** ✅ | Runbook метрик у `PIPELINE_MANAGEMENT.md`; turboquant + standard quant tests |
-| 4 | UI accessibility | **FM-018** ✅ | Повний WCAG — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (окремі спринти) |
+| 4 | UI accessibility | **FM-019** | Базовий slice ✅ (FM-018); повний WCAG — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
 | 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` (`TODO` у `azure.rs`/`gcp.rs`) |
 | 6 | Концепт | **FM-009**, **FM-010** | Grid envelope; Solana — поза автопрогоном |
 
@@ -131,25 +132,43 @@ FM-xxx (з таблиці нижче)
 
 **Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри (≈ FM-003 §4, BLOCKED); cloud-sdk (FM-006, Deferred).
 
-### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
+### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-06-02)
 
 | Джерело | Пункт | Стан | Примітка |
 |---------|--------|------|----------|
-| Architect L125 | LAN replication + TQ01 size compare | **BLOCKED** | FM-003 §4; 2 хости |
-| Architect L185 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006 |
-| FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops зріз **2026-06-01** у `BENCHMARKS.md` |
-| FM-005 | JSON errors discovery/VN | **Implemented** | FM-017 ✅; VN status-only by design |
-| FM-004 | SIMD TurboQuant | **Deferred** | |
-| FM-009/010 | Grid / Solana | **Concept-only** | |
-| DIGEST | ML pipeline hardening | **Implemented** (runbook) | `docs/ml/PIPELINE_MANAGEMENT.md` § метрик; FM-004 SIMD deferred |
-| `UI_IMPROVEMENTS_PLAN` | a11y, keyboard, ARIA | **Planned** → **FM-018** | Архівні `docs/archive/*` — не канон |
-| README *Next Focus* | Застарілі FM-007/011/012 | **Docs debt** | Синхронізовано в цій сесії |
+| Architect L124 | LAN replication + TQ01 на стенді | **BLOCKED** | FM-003 §4; 2 фізичні хости; wire harness ✅ |
+| Architect L185 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006; `TODO` у `azure.rs`/`gcp.rs` |
+| FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops **2026-06-01** |
+| FM-004 | SIMD TurboQuant | **Deferred** | NEXT_STEPS P2b |
+| FM-006 | cloud-sdk гілки | **Deferred** | не блокує CI |
+| FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
+| FM-019 | Повний WCAG / modals / forms | **Partial** | FM-018 ✅; `dashMarkCurrentNav` dashboard |
+| `UI_IMPROVEMENTS_PLAN` | Чеклист a11y (не оновлений) | **Partial** | багато `[ ]` — див. FM-019 baseline у §5.4 |
+| `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки admin/auth | **Planned** | не канон; окремий спринт |
+| `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | застарілий зріз v0.1; канон — STABLE + DIGEST |
+| README / Architect §операційний | Next Focus / порядок FM | **Synced** | 2026-06-02 |
+| DIGEST §ML | Pipeline metrics runbook | **Implemented** | `PIPELINE_MANAGEMENT.md` |
+| OpenAPI | VirtualNodes / Discovery paths | **Implemented** | 2026-05; звірка при нових маршрутах |
+| P4 | Новий `poolai_health_load` на ref-host | **Planned (ops)** | baseline **2026-04-10** чинний |
+| `docs/archive/*` | Плоскі legacy `.md` | **Archive** | не канон — [`STRUCTURE.md`](../STRUCTURE.md) |
+
+### 5.4 FM-019 baseline (вже в коді, 2026-06-02)
+
+| Можливість | Де |
+|------------|-----|
+| Skip links (dashboard, admin, login) | `src/ui/mod.rs`, `admin/mod.rs` |
+| Ctrl+K global search, Esc modals/drawer | `src/ui/mod.rs` keyboard handlers |
+| `aria-live` notifications / errors | dashboard, admin, login |
+| `aria-current` nav (admin + dashboard) | `adminMarkCurrentNav`, `dashMarkCurrentNav` |
+| i18n UA/EN shell | `i18n_core.js` |
 
 ### 5.2 Автономний прогін (сесія → git push)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) — §5.3 docs debt / UI WCAG slice.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-03.md`](../development/AUTO_RUN_SESSION_2026-06-03.md) — FM-019 modals / P4 health load.
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) (§5.3 audit + FM-019 nav).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-01.md`](../development/AUTO_RUN_SESSION_2026-06-01.md) (FM-003 §4 BLOCKED ops).
 

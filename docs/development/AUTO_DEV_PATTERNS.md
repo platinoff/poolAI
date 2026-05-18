@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-06-01 (FM-003 §4 BLOCKED ops slice).
+**Оновлено:** 2026-06-02 (§5.3 audit + FM-019 dashboard nav).
 
 ---
 
@@ -309,6 +309,13 @@
 - **Патерн:** TurboQuant: `turboquant=true` + `weight_rows`; метрики `bytes_in`, `bytes_out`, `max_abs_recon_error`; стандартна квантизація — `size_mb_before` / `size_mb_after`
 - **Перевірка:** `cargo test --test ml_pipeline_integration --features ml test_pipeline_turboquant_quantization_step test_pipeline_standard_quantization_metrics`
 - **FM:** DIGEST §ML ✅
+
+### [FM-019] Dashboard nav aria-current
+- **Де:** `src/ui/mod.rs` (`dashMarkCurrentNav`, CSS `.nav a[aria-current="page"]`)
+- **Сигнал:** `rg "dashMarkCurrentNav" src/ui/mod.rs`
+- **Патерн:** як `adminMarkCurrentNav`; виклик після `initDashboardShell` і на `poolai:langchange`
+- **Перевірка:** `cargo check -p poolai --features enterprise` (UI в `mod.rs` завжди)
+- **FM:** FM-019 Partial
 
 ### [FM-018] Admin/login a11y
 - **Де:** `src/ui/admin/mod.rs:89-130`, `admin_styles.css:770-808`, `admin_common.js` (`adminMarkCurrentNav`, `adminAnnounceLive`); login у `src/ui/mod.rs`

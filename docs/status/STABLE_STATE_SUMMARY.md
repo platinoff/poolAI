@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-05-18 (v0.2.2; AUTO_RUN 2026-05-28; FM-* / HANDOFF)
+## Rust Architect — оновлено 2026-06-02 (v0.2.2; FM-019 partial; §5.3 audit)
 
 ---
 

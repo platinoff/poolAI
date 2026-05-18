@@ -486,8 +486,10 @@ const BASE_CSS: &str = r#"
     animation: pulse 1.5s ease-in-out infinite;
   }
   
-  /* Enhanced navigation link active state */
-  .nav a.active {
+  /* Enhanced navigation link active state (FM-019 slice) */
+  .nav a.active,
+  .nav a[aria-current="page"],
+  .mobile-nav-item[aria-current="page"] {
     background: var(--primary, #50fa7b);
     color: var(--bg, #0f1216);
     font-weight: 600;
@@ -724,8 +726,10 @@ fn layout(
     PoolAiI18n.apply(document.documentElement);
     PoolAiI18n.initDashboardShell();
   }
+  if (typeof dashMarkCurrentNav === 'function') dashMarkCurrentNav();
   document.addEventListener('poolai:langchange', function(){
     if (typeof PoolAiI18n !== 'undefined') PoolAiI18n.apply(document.documentElement);
+    if (typeof dashMarkCurrentNav === 'function') dashMarkCurrentNav();
   });
 })();"#;
     let full_script = format!("{}\n{}\n{}", i18n_js, script_js, i18n_boot);
@@ -1810,6 +1814,23 @@ function trapModalFocus(e) {
       firstElement.focus();
     }
   }
+}
+
+/** FM-019: highlight current dashboard nav link (desktop + mobile drawer). */
+function dashMarkCurrentNav() {
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
+  document.querySelectorAll('nav.nav a[href], .mobile-nav-drawer a.mobile-nav-item[href]').forEach(function(item) {
+    const href = item.getAttribute('href');
+    if (!href || href.indexOf('#') === 0) return;
+    const normalized = href.replace(/\/$/, '') || '/';
+    const isCurrent = path === normalized;
+    item.classList.toggle('active', isCurrent);
+    if (isCurrent) {
+      item.setAttribute('aria-current', 'page');
+    } else {
+      item.removeAttribute('aria-current');
+    }
+  });
 }
 
 // Keyboard shortcuts
@@ -3487,6 +3508,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initMobileNavigation();
   initTouchGestures();
   initResponsiveTables();
+  dashMarkCurrentNav();
 });
 "#
 }

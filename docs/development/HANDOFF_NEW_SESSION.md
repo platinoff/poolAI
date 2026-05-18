@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (FM-018 ✅; наступний — DIGEST §ML).
+**Оновлено:** 2026-06-02 (§5.3 audit; FM-019 Partial).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-02.md`](./AUTO_RUN_SESSION_2026-06-02.md). **FM-003 §4** BLOCKED (ops зріз 2026-06-01 ✅).
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-03.md`](./AUTO_RUN_SESSION_2026-06-03.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** §5.3 docs / UI WCAG slice → FM-004/006 deferred → FM-009/010 concept. **FM-003 §4** BLOCKED; **FM-017/018**, **DIGEST §ML** ✅.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** **FM-019** modals/focus → FM-004/006 deferred → FM-009/010. **FM-003 §4** BLOCKED. **FM-017/018**, **DIGEST §ML** ✅. Повний backlog «не зроблено» — FM **§5.3–5.4**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

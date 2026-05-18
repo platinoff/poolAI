@@ -57,13 +57,12 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
 
-1. **FM-017** — **FM-005 залишок:** `HttpAppError` JSON для `discovery` / `admin`; `virtual_nodes` — worker-safe (status-only або dual); див. [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
-2. **FM-003 §4** — реальний LAN sign-off (**BLOCKED** без 2 хостів); dev stand §5.1 + `verify-dev-stand` ✅; baseline → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
-3. **FM-018** — UI accessibility (WCAG, keyboard/ARIA) за [`docs/UI_IMPROVEMENTS_PLAN.md`](docs/UI_IMPROVEMENTS_PLAN.md).
-4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-5. **Концепт** — **FM-009** (Grid), **FM-010** (Solana).
+1. **FM-019** — повний WCAG / keyboard / modals audit за [`docs/UI_IMPROVEMENTS_PLAN.md`](docs/UI_IMPROVEMENTS_PLAN.md) (базовий slice ✅: skip links, Ctrl+K, Esc, `aria-current` nav).
+2. **FM-003 §4** — реальний LAN sign-off (**BLOCKED** без 2 хостів); dev stand §5.1 + `verify-dev-stand` ✅; ops зріз **2026-06-01** → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
+3. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+4. **Концепт** — **FM-009** (Grid), **FM-010** (Solana).
 
-**Закрито:** **FM-005** ✅ (admin REST, raid, enterprise, auth); **FM-007/008** ✅ wire; **FM-011** ✅ `cargo test-ci`; **FM-012** ✅ i18n + Telegram OAuth; **FM-013–016** ✅ admin contracts + virtual nodes.
+**Закрито:** **FM-017/018** ✅; **DIGEST §ML** runbook ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅ virtual nodes + admin contracts.
 
 **Контекст за пріоритетами Architect (P\*)**
 
