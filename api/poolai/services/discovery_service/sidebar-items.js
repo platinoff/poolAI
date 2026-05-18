@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DiscoveryAnnounceError"],"struct":["DiscoveryNotReady","DiscoveryPeersSnapshot","DiscoveryService"]};
+window.SIDEBAR_ITEMS = {"enum":["DiscoveryAnnounceError"],"struct":["DiscoveryNotReady","DiscoveryPeersSnapshot","DiscoveryService","RemoteHealthProbe","VirtualNodeStatus"]};

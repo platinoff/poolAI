@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main","parse_args","register_remote"],"struct":["Args"]};
+window.SIDEBAR_ITEMS = {"fn":["health_handler","heartbeat_remote","http_client","main","parse_args","poll_coordinator_links","register_remote","registration_body","run_health_server"],"struct":["Args","WorkerHealthResponse","WorkerRuntime"]};
