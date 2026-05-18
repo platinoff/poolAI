@@ -107,10 +107,13 @@ FM-xxx (з таблиці нижче)
 | FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: i18n **UA/EN**; **Telegram OAuth** — HMAC/`auth_date`/allowlist/audit; widget HTML UA/EN; нові Telegram-юзери → **Viewer** (без `admin:all`); тести allowlist/expiry/RBAC | Implemented | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/`, `src/network/enterprise_api/oauth.rs`, `src/enterprise/security.rs` |
 | FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок: libraries, topology, VM, workers; узгодження `installed` у libs UI з `metadata.installed_at` | Implemented | `tests/admin_ui_api_contracts.rs`, [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md), `src/ui/admin/libs.rs` |
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
+| FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-19 (автопрогін FM-014). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
+**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-20 (автопрогін FM-015). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
+
+**FM-015 (2026-05-20):** admin contracts фаза 3 — 20 tests (`instance`, `raid/artifacts`, smallworld metrics).
 
 **FM-014 (2026-05-19):** admin contracts фаза 2 + rewards `HttpAppError` — 15 tests у `admin_ui_api_contracts.rs`.
 
@@ -118,7 +121,7 @@ FM-xxx (з таблиці нижче)
 
 **P0 (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів; `rg "get_global_" src/network/api` → 0.
 
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 ops); **cloud-sdk** (FM-006, Deferred). FM-005/007/008/011/012/002/013/014 — закрито.
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 ops); **cloud-sdk** (FM-006, Deferred). FM-005/007/008/011/012/002/013/014/015 — закрито.
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
@@ -128,9 +131,9 @@ FM-xxx (з таблиці нижче)
 
 ### 5.2 Автономний прогін (сесія → git push)
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-05-19.md`](../development/AUTO_RUN_SESSION_2026-05-19.md) (FM-014).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-20.md`](../development/AUTO_RUN_SESSION_2026-05-20.md) (FM-015).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-18.md`](../development/AUTO_RUN_SESSION_2026-05-18.md), [`AUTO_RUN_SESSION_2026-05-17.md`](../development/AUTO_RUN_SESSION_2026-05-17.md).
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-19.md`](../development/AUTO_RUN_SESSION_2026-05-19.md), [`AUTO_RUN_SESSION_2026-05-18.md`](../development/AUTO_RUN_SESSION_2026-05-18.md).
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|

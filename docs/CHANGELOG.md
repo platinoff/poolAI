@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Автопрогін 2026-05-20 (AUTO_RUN_SESSION)** — **FM-015 ✅**: admin contracts фаза 3 (`/instance`, `/raid/artifacts`, smallworld metrics; 20 tests).
 - **Автопрогін 2026-05-19 (AUTO_RUN_SESSION)** — **FM-014 ✅**: admin contracts (config, users, topology/nodes; 15 tests); `rewards.rs` → `HttpAppError` (FM-005).
 - **Автопрогін 2026-05-18 (AUTO_RUN_SESSION)** — **FM-013 ✅**: розширено `tests/admin_ui_api_contracts.rs` (libraries, topology, VM, workers; 12 tests); admin libs UI — статус «Installed» з `metadata.installed_at`.
 - **Автопрогін 2026-05-17 (AUTO_RUN_SESSION)** — P0: [`AUTO_DEV_PATTERNS.md`](development/AUTO_DEV_PATTERNS.md) (25 записів `path:line`); оркестратор [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); FM-003 runbook звірка без LAN-стенду.

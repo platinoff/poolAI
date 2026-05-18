@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 (автопрогін FM-014 + rewards HttpAppError).
+**Оновлено:** 2026-05-20 (автопрогін FM-015 admin contracts фаза 3).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-19.md`](./AUTO_RUN_SESSION_2026-05-19.md) — завершено; далі **FM-003** (LAN) або admin contracts фаза 3.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-20.md`](./AUTO_RUN_SESSION_2026-05-20.md) — завершено; далі **FM-003** (LAN стенд).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-18.md`](./AUTO_RUN_SESSION_2026-05-18.md) (FM-013), [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) (P0 патерни).
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-19.md`](./AUTO_RUN_SESSION_2026-05-19.md) (FM-014), [`AUTO_RUN_SESSION_2026-05-18.md`](./AUTO_RUN_SESSION_2026-05-18.md) (FM-013).
 
-**Зріз (2026-05-19):** **FM-014 ✅** — 15 тестів `admin_ui_api_contracts` (+config/users/topology/nodes); **rewards** → `HttpAppError`; **FM-003** Planned (ops). **`cargo test-ci`** 2026-05-19. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**Зріз (2026-05-20):** **FM-015 ✅** — 20 тестів `admin_ui_api_contracts` (instance, raid artifacts, smallworld); **FM-003** Planned (ops). **`cargo test-ci`** 2026-05-20. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 

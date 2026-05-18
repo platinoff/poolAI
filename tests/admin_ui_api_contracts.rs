@@ -1,6 +1,6 @@
 //! JSON shape checks for admin dashboard and RAID admin HTTP API.
 //! Enterprise dashboard slices are tested when built with `--features enterprise`.
-//! FM-013: libraries, topology, VM, workers — keys expected by `src/ui/admin/*.rs`.
+//! FM-013/014/015: admin UI JSON contracts — keys expected by `src/ui/admin/*.rs`.
 
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
@@ -248,6 +248,50 @@ async fn users_list_json_shape_for_admin() {
 }
 
 #[tokio::test]
+async fn instance_list_unavailable_has_structured_error() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/instance")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("instance list error JSON");
+    assert_structured_error(&v);
+}
+
+#[tokio::test]
+async fn raid_artifacts_list_unavailable_has_structured_error() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/raid/artifacts")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("raid artifacts error JSON");
+    assert_structured_error(&v);
+}
+
+#[tokio::test]
 async fn vm_instances_unavailable_has_structured_error() {
     let app = Router::new()
         .nest("/api/v1", create_api_routes())
@@ -275,8 +319,11 @@ mod attached_managers {
     use poolai::core::state::AppState;
     use poolai::libs::LibraryManager;
     use poolai::pool::topology::TopologyManager;
+    use poolai::raid::{RaidConfig, RaidManager, RaidMode};
+    use poolai::runtime::instance::InstanceManager;
     use poolai::vm::{VmIsolation, VmManager, VmResources};
     use std::sync::Arc;
+    use tempfile::TempDir;
     use tokio::sync::RwLock as TokioRwLock;
 
     #[tokio::test]
@@ -380,6 +427,105 @@ mod attached_managers {
     }
 
     #[tokio::test]
+    async fn instance_list_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        state
+            .attach_instance_manager_for_test(Arc::new(TokioRwLock::new(InstanceManager::new())))
+            .expect("attach instance manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/instance")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("instance list JSON");
+        let o = v.as_object().expect("instance list object");
+        assert!(
+            o.get("instances").and_then(|x| x.as_array()).is_some(),
+            "instance list missing `instances` array: {o:?}"
+        );
+        if let Some(first) = o
+            .get("instances")
+            .and_then(|a| a.as_array())
+            .and_then(|a| a.first())
+        {
+            let inst = first.as_object().expect("instance object");
+            for key in [
+                "instance_id",
+                "model_id",
+                "status",
+                "created_at",
+                "placement",
+            ] {
+                assert!(inst.contains_key(key), "instance missing `{key}`: {inst:?}");
+            }
+            let placement = inst
+                .get("placement")
+                .and_then(|p| p.as_object())
+                .expect("placement object");
+            for key in ["strategy", "node_ids"] {
+                assert!(
+                    placement.contains_key(key),
+                    "placement missing `{key}`: {placement:?}"
+                );
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn raid_artifacts_list_json_shape_when_manager_attached() {
+        let temp = TempDir::new().expect("tempdir");
+        let config = RaidConfig {
+            mode: RaidMode::Local,
+            base_path: temp.path().to_path_buf(),
+            quota_bytes: None,
+            retention_days: None,
+            gc_on_startup: false,
+        };
+        let manager = Arc::new(RaidManager::new(config));
+        manager.initialize().await.expect("raid init");
+
+        let state = Arc::new(AppState::default());
+        state
+            .attach_raid_manager_for_test(manager)
+            .expect("attach raid manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/raid/artifacts")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("raid artifacts JSON");
+        let arr = v.as_array().expect("raid artifacts array");
+        if let Some(first) = arr.first() {
+            let o = first.as_object().expect("artifact object");
+            for key in ["id", "name", "stored_at", "path"] {
+                assert!(o.contains_key(key), "artifact missing `{key}`: {o:?}");
+            }
+        }
+    }
+
+    #[tokio::test]
     async fn vm_instances_json_shape_when_manager_attached() {
         let state = Arc::new(AppState::default());
         let manager = Arc::new(VmManager::new());
@@ -471,6 +617,48 @@ async fn raid_admin_burst_metrics_json_shape() {
         }
     } else {
         assert_eq!(status, StatusCode::SERVICE_UNAVAILABLE);
+    }
+}
+
+#[tokio::test]
+async fn raid_admin_smallworld_metrics_json_shape() {
+    let app = Router::new()
+        .nest("/api/v1", create_api_routes())
+        .with_state(ApiContext::default());
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/api/v1/raid/admin/metrics/smallworld")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    let status = response.status();
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).expect("smallworld metrics JSON");
+
+    if status == StatusCode::OK {
+        let m = v
+            .get("metrics")
+            .and_then(|x| x.as_object())
+            .expect("`metrics` object when 200");
+        for key in [
+            "total_artifacts",
+            "total_nodes",
+            "avg_clustering_coefficient",
+            "target_clustering_coefficient",
+        ] {
+            assert!(
+                m.contains_key(key),
+                "smallworld metrics missing `{key}`: {m:?}"
+            );
+        }
+    } else {
+        assert_eq!(status, StatusCode::SERVICE_UNAVAILABLE);
+        assert_structured_error(&v);
     }
 }
 

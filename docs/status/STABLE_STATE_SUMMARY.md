@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-05-19 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
+## Rust Architect — оновлено 2026-05-20 (v0.2.2; сталевий стан узгоджено з FM-* / HANDOFF)
 
 ---
 
@@ -23,6 +23,7 @@
 - ✅ **P0 docs (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів для авторозробки.
 - ✅ **FM-013 (2026-05-18):** admin UI ↔ API JSON contracts — `tests/admin_ui_api_contracts.rs` (12 tests).
 - ✅ **FM-014 (2026-05-19):** admin contracts фаза 2 (config/users/topology) + rewards `HttpAppError` (15 tests).
+- ✅ **FM-015 (2026-05-20):** admin contracts фаза 3 (instance, raid artifacts, smallworld; 20 tests).
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус
