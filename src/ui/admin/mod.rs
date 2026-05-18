@@ -173,9 +173,20 @@ pub fn admin_layout(
     Html(html)
 }
 
+#[test]
+fn admin_common_fm019_modal_a11y_helpers() {
+    let js = include_str!("../admin_common.js");
+    assert!(js.contains("function keepFocusInModal"));
+    assert!(js.contains("function showModalContent"));
+    assert!(js.contains("ADMIN_DYNAMIC_MODAL_ID"));
+    assert!(js.contains("function handleModalEscape"));
+}
+
 #[cfg(all(test, feature = "enterprise"))]
 mod a11y_tests {
     use super::admin_layout;
+    use crate::ui::admin::security::admin_security;
+    use crate::ui::admin::users::admin_users;
 
     #[test]
     fn admin_layout_includes_skip_links_and_live_region() {
@@ -187,5 +198,22 @@ mod a11y_tests {
         assert!(body.contains("id=\"admin-aria-live\""));
         assert!(body.contains("role=\"navigation\""));
         assert!(body.contains("role=\"main\""));
+    }
+
+    #[tokio::test]
+    async fn users_modals_closed_aria_state() {
+        let html = admin_users().await.0;
+        assert!(html.contains("id=\"createUserModal\""));
+        assert!(html.contains("id=\"editUserModal\""));
+        assert!(html.contains("role=\"dialog\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn security_modals_closed_aria_state() {
+        let html = admin_security().await.0;
+        assert!(html.contains("id=\"createOAuth2Modal\""));
+        assert!(html.contains("id=\"editPolicyModal\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
     }
 }

@@ -5,8 +5,9 @@
 **Ціль:** **FM-019** — modals focus trap audit (admin security/users) **або** **P4** `poolai_health_load` рядок на ref-host (якщо сервер піднято локально).
 
 **Критерії:**
-- [ ] Один модал admin: `aria-modal`, focus trap, Esc (документовано в `UI_BUGFIXES` або код)
-- [ ] `cargo test-ci` + push
+- [x] Admin modals (users/security): `aria-modal` when closed, focus trap + `keepFocusInModal`, Esc — `admin_common.js`; тести `ui::admin::*`
+- [x] `cargo test-ci` (MSYS2 UCRT64, 2026-06-03)
+- [ ] push (зовнішній MSYS2, Summary у коміті)
 
 **BLOCKED:** FM-003 §4 LAN (2 хости).
 

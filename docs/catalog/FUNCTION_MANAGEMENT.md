@@ -111,7 +111,7 @@ FM-xxx (з таблиці нижче)
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
 | FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Implemented | `discovery.rs`; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
 | FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
-| FM-019 | UI / a11y | Повний WCAG: modals audit, forms, pa11y; dashboard `dashMarkCurrentNav` | Partial | `src/ui/mod.rs`; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
+| FM-019 | UI / a11y | Повний WCAG: modals audit (admin users/security ✅ focus trap), forms, pa11y; dashboard `dashMarkCurrentNav` | Partial | `src/ui/admin_common.js`, `admin/users.rs`, `admin/security.rs` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -142,7 +142,7 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | NEXT_STEPS P2b |
 | FM-006 | cloud-sdk гілки | **Deferred** | не блокує CI |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | Повний WCAG / modals / forms | **Partial** | FM-018 ✅; `dashMarkCurrentNav` dashboard |
+| FM-019 | Повний WCAG / modals / forms | **Partial** | admin modals focus trap (users/security); forms/pa11y — далі |
 | `UI_IMPROVEMENTS_PLAN` | Чеклист a11y (не оновлений) | **Partial** | багато `[ ]` — див. FM-019 baseline у §5.4 |
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки admin/auth | **Planned** | не канон; окремий спринт |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | застарілий зріз v0.1; канон — STABLE + DIGEST |
@@ -160,6 +160,7 @@ FM-xxx (з таблиці нижче)
 | Ctrl+K global search, Esc modals/drawer | `src/ui/mod.rs` keyboard handlers |
 | `aria-live` notifications / errors | dashboard, admin, login |
 | `aria-current` nav (admin + dashboard) | `adminMarkCurrentNav`, `dashMarkCurrentNav` |
+| Admin modals focus trap (users/security) | `admin_common.js` — `trapModalFocus`, Esc, `adminDynamicModal` |
 | i18n UA/EN shell | `i18n_core.js` |
 
 ### 5.2 Автономний прогін (сесія → git push)

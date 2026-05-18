@@ -219,7 +219,7 @@ pub async fn admin_users() -> Html<String> {
           <div id="users-list"></div>
         </div>
         
-        <div id="createUserModal" class="modal" role="dialog" aria-labelledby="createUserModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createUserModal" class="modal" role="dialog" aria-labelledby="createUserModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createUserModalTitle" data-i18n="admin.usr.createTitle">Create New User</h3>
@@ -250,7 +250,7 @@ pub async fn admin_users() -> Html<String> {
           </div>
         </div>
         
-        <div id="editUserModal" class="modal" role="dialog" aria-labelledby="editUserModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="editUserModal" class="modal" role="dialog" aria-labelledby="editUserModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="editUserModalTitle" data-i18n="admin.usr.editTitle">Edit User</h3>

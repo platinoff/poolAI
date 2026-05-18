@@ -696,7 +696,7 @@ pub async fn admin_security() -> Html<String> {
         </div>
         
         <!-- Create OAuth2 Provider Modal -->
-        <div id="createOAuth2Modal" class="modal" role="dialog" aria-labelledby="createOAuth2ModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createOAuth2Modal" class="modal" role="dialog" aria-labelledby="createOAuth2ModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createOAuth2ModalTitle" data-i18n="admin.sec.oauthCreateTitle">Register OAuth2 Provider</h3>
@@ -746,7 +746,7 @@ pub async fn admin_security() -> Html<String> {
         </div>
         
         <!-- Edit OAuth2 Provider Modal -->
-        <div id="editOAuth2Modal" class="modal" role="dialog" aria-labelledby="editOAuth2ModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="editOAuth2Modal" class="modal" role="dialog" aria-labelledby="editOAuth2ModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="editOAuth2ModalTitle" data-i18n="admin.sec.oauthEditTitle">Edit OAuth2 Provider</h3>
@@ -793,7 +793,7 @@ pub async fn admin_security() -> Html<String> {
         </div>
         
         <!-- Create SAML Provider Modal -->
-        <div id="createSamlModal" class="modal" role="dialog" aria-labelledby="createSamlModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createSamlModal" class="modal" role="dialog" aria-labelledby="createSamlModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createSamlModalTitle" data-i18n="admin.sec.samlCreateTitle">Register SAML Provider</h3>
@@ -839,7 +839,7 @@ pub async fn admin_security() -> Html<String> {
         </div>
         
         <!-- Edit SAML Provider Modal -->
-        <div id="editSamlModal" class="modal" role="dialog" aria-labelledby="editSamlModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="editSamlModal" class="modal" role="dialog" aria-labelledby="editSamlModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="editSamlModalTitle" data-i18n="admin.sec.samlEditTitle">Edit SAML Provider</h3>
@@ -882,7 +882,7 @@ pub async fn admin_security() -> Html<String> {
         </div>
         
         <!-- Create Security Policy Modal -->
-        <div id="createPolicyModal" class="modal" role="dialog" aria-labelledby="createPolicyModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="createPolicyModal" class="modal" role="dialog" aria-labelledby="createPolicyModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="createPolicyModalTitle" data-i18n="admin.sec.policyCreateTitle">Create Security Policy</h3>
@@ -924,7 +924,7 @@ pub async fn admin_security() -> Html<String> {
         </div>
         
         <!-- Edit Security Policy Modal -->
-        <div id="editPolicyModal" class="modal" role="dialog" aria-labelledby="editPolicyModalTitle" aria-modal="true" aria-hidden="true">
+        <div id="editPolicyModal" class="modal" role="dialog" aria-labelledby="editPolicyModalTitle" aria-modal="false" aria-hidden="true">
           <div class="modal-content">
             <div class="modal-header">
               <h3 id="editPolicyModalTitle" data-i18n="admin.sec.policyEditTitle">Edit Security Policy</h3>

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-019 (partial, 2026-06-03)** — admin modal a11y in `admin_common.js`: focus trap, `keepFocusInModal`, Esc, dynamic `adminDynamicModal`; closed-state `aria-modal="false"` on users/security modals; tests `ui::admin::*`.
 - **FM-019 (partial)** — dashboard `dashMarkCurrentNav` + `aria-current` on main/mobile nav; §5.3–5.4 functionality audit.
 
 ### Docs

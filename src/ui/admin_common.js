@@ -283,148 +283,206 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// Modal system - Enhanced with overlay support and accessibility
+// Modal system — FM-019: overlay, aria-modal, focus trap, Esc (admin users/security + dynamic)
+const MODAL_FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const ADMIN_DYNAMIC_MODAL_ID = 'adminDynamicModal';
+
 let activeModal = null;
 let activeOverlay = null;
 let previousActiveElement = null;
 
-function showModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    console.warn('Modal not found:', modalId);
+function getModalFocusableElements(modal) {
+  return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)).filter(
+    (el) => el.offsetParent !== null || el === document.activeElement,
+  );
+}
+
+function focusInitialModalElement(modal) {
+  const focusable = getModalFocusableElements(modal);
+  if (focusable.length > 0) {
+    focusable[0].focus();
     return;
   }
-  
-  // Store previous active element for focus restoration
-  previousActiveElement = document.activeElement;
-  
-  // Check if modal is already in an overlay
-  let overlay = modal.closest('.modal-overlay');
-  
-  // Create overlay if it doesn't exist
-  if (!overlay) {
-    overlay = createModalOverlay(modal);
+  if (!modal.hasAttribute('tabindex')) {
+    modal.setAttribute('tabindex', '-1');
   }
-  
-  // Set ARIA attributes
-  modal.setAttribute('aria-hidden', 'false');
-  modal.setAttribute('aria-modal', 'true');
-  overlay.classList.add('active');
-  
-  activeModal = modal;
-  activeOverlay = overlay;
-  
-  // Prevent body scroll
-  document.body.style.overflow = 'hidden';
-  
-  // Focus first focusable element after a short delay
-  setTimeout(() => {
-    const focusableElements = modal.querySelectorAll(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusableElements.length > 0) {
-      focusableElements[0].focus();
-    }
-  }, 100);
-  
-  // Trap focus within modal
+  modal.focus();
+}
+
+function attachModalA11y(modal) {
+  modal.removeEventListener('keydown', trapModalFocus);
+  modal.removeEventListener('focusin', keepFocusInModal);
   modal.addEventListener('keydown', trapModalFocus);
-  
-  // Close on Escape key (global listener already handled in main UI)
+  modal.addEventListener('focusin', keepFocusInModal);
+  document.removeEventListener('keydown', handleModalEscape);
   document.addEventListener('keydown', handleModalEscape);
 }
 
-function hideModal(modalId) {
+function detachModalA11y(modal) {
+  if (modal) {
+    modal.removeEventListener('keydown', trapModalFocus);
+    modal.removeEventListener('focusin', keepFocusInModal);
+  }
+  document.removeEventListener('keydown', handleModalEscape);
+}
+
+/** Static modal by id, or dynamic: showModal(title, htmlContent) for instances/topology. */
+function showModal(modalIdOrTitle, optionalContent) {
+  if (typeof optionalContent === 'string') {
+    showModalContent(modalIdOrTitle, optionalContent);
+    return;
+  }
+  const modalId = modalIdOrTitle;
   const modal = document.getElementById(modalId);
   if (!modal) {
     console.warn('Modal not found:', modalId);
     return;
   }
-  
-  // Remove ARIA attributes
+
+  if (activeModal && activeModal !== modal) {
+    detachModalA11y(activeModal);
+    activeModal.setAttribute('aria-hidden', 'true');
+    activeModal.setAttribute('aria-modal', 'false');
+  }
+
+  previousActiveElement = document.activeElement;
+
+  let overlay = modal.closest('.modal-overlay');
+  if (!overlay) {
+    overlay = createModalOverlay(modal);
+  }
+
+  modal.setAttribute('aria-hidden', 'false');
+  modal.setAttribute('aria-modal', 'true');
+  overlay.classList.add('active');
+  activeModal = modal;
+  activeOverlay = overlay;
+  document.body.style.overflow = 'hidden';
+
+  attachModalA11y(modal);
+  setTimeout(() => focusInitialModalElement(modal), 100);
+}
+
+function hideModal(modalId) {
+  const id = modalId || (activeModal && activeModal.id);
+  if (!id) return;
+  const modal = document.getElementById(id);
+  if (!modal) {
+    console.warn('Modal not found:', id);
+    return;
+  }
+
   modal.setAttribute('aria-hidden', 'true');
   modal.setAttribute('aria-modal', 'false');
-  
-  // Hide overlay
+
   const overlay = modal.closest('.modal-overlay');
   if (overlay) {
     overlay.classList.remove('active');
   }
-  
-  // Remove focus trap
-  if (activeModal) {
-    activeModal.removeEventListener('keydown', trapModalFocus);
-  }
-  
-  document.removeEventListener('keydown', handleModalEscape);
-  
-  // Restore previous focus
-  if (previousActiveElement) {
+
+  detachModalA11y(modal);
+
+  if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
     previousActiveElement.focus();
-    previousActiveElement = null;
   }
-  
+  previousActiveElement = null;
   activeModal = null;
   activeOverlay = null;
-  
-  // Restore body scroll
   document.body.style.overflow = '';
 }
 
+function ensureAdminDynamicModal() {
+  let modal = document.getElementById(ADMIN_DYNAMIC_MODAL_ID);
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.id = ADMIN_DYNAMIC_MODAL_ID;
+  modal.className = 'modal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-labelledby', 'adminDynamicModalTitle');
+  modal.setAttribute('aria-modal', 'false');
+  modal.setAttribute('aria-hidden', 'true');
+  modal.innerHTML =
+    '<div class="modal-content">' +
+    '<div class="modal-header">' +
+    '<h3 id="adminDynamicModalTitle"></h3>' +
+    '<button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal(\'' +
+    ADMIN_DYNAMIC_MODAL_ID +
+    '\')">&times;</button>' +
+    '</div>' +
+    '<div id="adminDynamicModalBody" class="modal-body"></div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function showModalContent(title, bodyHtml) {
+  ensureAdminDynamicModal();
+  const titleEl = document.getElementById('adminDynamicModalTitle');
+  const bodyEl = document.getElementById('adminDynamicModalBody');
+  if (titleEl) titleEl.textContent = title;
+  if (bodyEl) bodyEl.innerHTML = bodyHtml;
+  showModal(ADMIN_DYNAMIC_MODAL_ID);
+}
+
 function createModalOverlay(modal) {
-  // Check if overlay already exists
   let overlay = document.getElementById('modal-overlay-global');
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'modal-overlay-global';
     overlay.className = 'modal-overlay';
     document.body.appendChild(overlay);
-    
-    // Close modal on backdrop click
-    overlay.addEventListener('click', function(e) {
+    overlay.addEventListener('click', function (e) {
       if (e.target === overlay && activeModal) {
         hideModal(activeModal.id);
       }
     });
   }
-  
-  // Move modal to overlay if not already there
   if (modal.parentElement !== overlay) {
     overlay.appendChild(modal);
   }
-  
   return overlay;
+}
+
+function keepFocusInModal(e) {
+  if (!activeModal || activeModal.contains(e.target)) return;
+  const focusable = getModalFocusableElements(activeModal);
+  if (focusable.length > 0) {
+    focusable[0].focus();
+  } else {
+    focusInitialModalElement(activeModal);
+  }
 }
 
 function trapModalFocus(e) {
   if (!activeModal || e.key !== 'Tab') return;
-  
-  const focusableElements = Array.from(activeModal.querySelectorAll(
-    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  ));
-  
-  if (focusableElements.length === 0) return;
-  
-  const firstElement = focusableElements[0];
-  const lastElement = focusableElements[focusableElements.length - 1];
-  
+
+  const focusable = getModalFocusableElements(activeModal);
+  if (focusable.length === 0) {
+    e.preventDefault();
+    focusInitialModalElement(activeModal);
+    return;
+  }
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const active = document.activeElement;
+  const inside = activeModal.contains(active);
+
   if (e.shiftKey) {
-    // Shift + Tab
-    if (document.activeElement === firstElement) {
+    if (!inside || active === first) {
       e.preventDefault();
-      lastElement.focus();
+      last.focus();
     }
-  } else {
-    // Tab
-    if (document.activeElement === lastElement) {
-      e.preventDefault();
-      firstElement.focus();
-    }
+  } else if (!inside || active === last) {
+    e.preventDefault();
+    first.focus();
   }
 }
 
 function handleModalEscape(e) {
   if (e.key === 'Escape' && activeModal) {
+    e.preventDefault();
     hideModal(activeModal.id);
   }
 }
