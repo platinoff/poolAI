@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["raid_artifact_probe","virtual_node_executor"]};
+window.SIDEBAR_ITEMS = {"mod":["artifact_cache","raid_artifact_probe","virtual_node_executor"]};

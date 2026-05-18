@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["build_probe_message"]};
+window.SIDEBAR_ITEMS = {"fn":["build_probe_message","probe_bytes","probe_logical_name"]};
