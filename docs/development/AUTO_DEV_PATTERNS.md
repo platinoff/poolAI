@@ -343,6 +343,12 @@
 - **Перевірка:** `cargo test -p poolai --features enterprise ui::admin --lib`
 - **FM:** FM-019 Partial
 
+### [FM-019] pa11y CI (workflow_dispatch)
+- **Де:** `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml`
+- **Патерн:** `bash bin/pa11y-ci.sh --start` — release poolai + strict `/ui/login` (`PA11Y_THRESHOLD=0`, runner `axe`); admin URLs optional (не валять exit)
+- **Перевірка:** GitHub Actions → **A11y (pa11y)** → Run workflow
+- **FM:** FM-019 Partial (pa11y CI)
+
 ### [FM-019] Dashboard modals (workers/libs/vm/raid)
 - **Де:** `src/ui/mod.rs` (`showModal`, `keepFocusInModal`, `attachDashModalA11y`)
 - **Патерн:** closed state `aria-modal="false" aria-hidden="true"`; open → trap + Esc via `handleDashModalEscape`

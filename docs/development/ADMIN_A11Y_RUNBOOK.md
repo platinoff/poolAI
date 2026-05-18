@@ -39,16 +39,27 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ---
 
-## 3. Опційно: pa11y (локально)
+## 3. pa11y (локально + CI)
 
-Потрібен запущений UI на `http://127.0.0.1:8080` (порт за вашим конфігом).
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; optional (не валить exit): admin users/security, `/ui/workers`.
 
 ```bash
-npx pa11y http://127.0.0.1:8080/ui/admin/users
-npx pa11y http://127.0.0.1:8080/ui/admin/security
+# MSYS2: poolai вже на :8080
+bash bin/pa11y-ci.sh
+
+# або зібрати + підняти poolai, потім scan
+bash bin/pa11y-ci.sh --start
 ```
 
-Поріг для baseline-спринту: **0 critical** на цих двох URL; warnings — у backlog FM-019 (повний WCAG).
+**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch` only; Ubuntu; `pa11y@9` + runner `axe`.
+
+Ручний одиночний URL:
+
+```bash
+npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
+```
+
+Поріг strict URL: **0 errors** (`PA11Y_THRESHOLD`, default `0`). Admin без сесії може давати додаткові findings — optional крок у скрипті.
 
 ---
 
@@ -68,7 +79,7 @@ npx pa11y http://127.0.0.1:8080/ui/admin/security
 ## 5. Backlog (поза baseline)
 
 - ~~Повний прохід dashboard modals (workers, libs, VM, RAID)~~ — **Partial ✅ 2026-05-18** (`src/ui/mod.rs`, `ui::dashboard_a11y_tests`).
-- `pa11y` / axe у CI (окремий FM або розширення FM-019).
+- ~~`pa11y` / axe у CI~~ — **Partial ✅** `a11y.yml` + `bin/pa11y-ci.sh` (strict login; admin optional).
 - Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (історичний чеклист).
 
-**Last updated:** 2026-05-18 — FM-019 dashboard modals partial (AUTO_RUN 2026-06-09).
+**Last updated:** 2026-05-18 — FM-019 pa11y CI partial (`a11y.yml`, `bin/pa11y-ci.sh`).

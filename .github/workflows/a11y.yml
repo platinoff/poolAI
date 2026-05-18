@@ -1,0 +1,42 @@
+# Optional pa11y scans (FM-019). See docs/development/ADMIN_A11Y_RUNBOOK.md §3.
+name: A11y (pa11y)
+
+on:
+  workflow_dispatch: {}
+
+env:
+  CARGO_TERM_COLOR: always
+  K8S_OPENAPI_ENABLED_VERSION: "1.28"
+  POOLAI_HTTP_PORT: "8080"
+
+jobs:
+  pa11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-a11y-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-a11y-
+
+      - name: Build poolai (enterprise)
+        run: cargo build --release --features enterprise,ml,cloud,test-utils
+
+      - name: Run pa11y (login strict; admin optional)
+        run: bash bin/pa11y-ci.sh --start

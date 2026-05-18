@@ -8,7 +8,7 @@
 - [x] Dashboard `showModal`/`hideModal`: `keepFocusInModal`, `attachDashModalA11y`, Esc
 - [x] Static modals: `aria-modal="false"` when closed; `installLibraryModal` + `role="dialog"`
 - [x] `cargo fmt` + `cargo test-ci`
-- [ ] push (MSYS2)
+- [x] push — `08c704fe`
 
 **BLOCKED:** FM-003 §4 LAN (2 хости).
 
@@ -26,4 +26,4 @@ S0: git fetch && git status -sb; HANDOFF + FUNCTION_MANAGEMENT §5.1–5.3.
 
 **Код:** `src/ui/mod.rs` — dashboard modal JS + HTML (4 modals); тести `ui::dashboard_a11y_tests` (4) + `dashboard_shared_js_modal_a11y_helpers`.
 
-**Далі:** pa11y/axe CI; FM-003 §4 (BLOCKED).
+**Далі:** [`AUTO_RUN_SESSION_2026-06-10.md`](./AUTO_RUN_SESSION_2026-06-10.md) (pa11y CI).
