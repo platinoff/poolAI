@@ -130,6 +130,11 @@ impl VirtualNodeTaskService {
             "raid_health_check",
             Value::Object(Default::default()),
         );
+        Self::enqueue(
+            peer_id,
+            "pool_workers_probe",
+            Value::Object(Default::default()),
+        );
     }
 
     pub fn poll(peer_id: &str) -> Option<VirtualNodeTask> {

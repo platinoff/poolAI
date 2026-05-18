@@ -270,6 +270,12 @@
 - **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration`
 - **FM:** FM-016+ ✅
 
+### [Workers] Virtual node task executor (FM-016+++)
+- **Де:** `src/workers/virtual_node_executor.rs`, `src/bin/poolai-worker.rs`
+- **Патерн:** HTTP I/O у worker → `TaskRuntime` → `complete_task(task_type, payload, rt)`; bootstrap + `pool_workers_probe`
+- **Telegram:** `/status`, `/raid` у `telegram_command` payload (`text`)
+- **Перевірка:** `cargo test --lib workers::virtual_node_executor`; `cargo build --bin poolai-worker`
+
 ### [Workers] Virtual node file store
 - **Де:** `src/services/virtual_node_store.rs`, env `POOLAI_VIRTUAL_NODE_DATA_DIR`
 - **Патерн:** `telegram_bindings.json` + `tasks/{peer_id}.json` (atomic write)

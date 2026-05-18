@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (FM-016++ teloxide bot bridge).
+**Оновлено:** 2026-05-18 (FM-016+++ pool workload + Telegram tasks).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-23.md`](./AUTO_RUN_SESSION_2026-05-23.md) — **FM-003** dev stand ✅; real LAN gated.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-24.md`](./AUTO_RUN_SESSION_2026-05-24.md) — **FM-016+++** у роботі; **FM-003** real LAN gated.
 
-**FM-003:** dev stand — `bin/run-lan-nodes.*`, `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`. Real LAN §4 — gated (два хости).
+**FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — gated (два хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot` (feature `tgbot`), coordinator bridge. **Далі:** FM-003 real LAN.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ (частково):** `pool_workers_probe`, telegram task execution, `virtual_node_executor`. **Далі:** `cargo test-ci` + push; FM-003 real LAN.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

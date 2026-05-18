@@ -6,6 +6,7 @@
 
 use axum::{extract::State, routing::get, Json, Router};
 use poolai::raid::protocol::ProtocolMessage;
+use poolai::workers::virtual_node_executor::{complete_task as resolve_task_outcome, TaskRuntime};
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -63,6 +64,8 @@ struct PollTasksResponse {
 struct VirtualNodeTaskDto {
     id: String,
     task_type: String,
+    #[serde(default)]
+    payload: serde_json::Value,
 }
 
 fn parse_args() -> Args {
@@ -285,27 +288,52 @@ async fn run_raid_health_check(client: &reqwest::Client, args: &Args) -> bool {
     }
 }
 
+async fn fetch_pool_worker_count(client: &reqwest::Client, args: &Args) -> usize {
+    let url = format!("{}/api/v1/workers", args.coordinator_url);
+    let Ok(response) = client.get(&url).send().await else {
+        return 0;
+    };
+    if !response.status().is_success() {
+        return 0;
+    }
+    let Ok(body) = response.json::<Vec<serde_json::Value>>().await else {
+        return 0;
+    };
+    body.len()
+}
+
+fn telegram_command_is(payload: &serde_json::Value, cmd: &str) -> bool {
+    let text = payload
+        .get("text")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .trim();
+    text.split_whitespace().next().unwrap_or(text) == cmd
+}
+
 async fn execute_task(
     client: &reqwest::Client,
     rt: &WorkerRuntime,
     task: VirtualNodeTaskDto,
 ) -> (String, bool) {
-    match task.task_type.as_str() {
-        "ping" => ("ok".to_string(), true),
-        "raid_health_check" => {
-            let ok = run_raid_health_check(client, &rt.args).await;
-            *rt.raid_wire_ok.write().await = ok;
-            (
-                if ok {
-                    "raid_ok".to_string()
-                } else {
-                    "raid_failed".to_string()
-                },
-                ok,
-            )
-        }
-        other => (format!("unsupported:{other}"), false),
+    let task_type = task.task_type.as_str();
+    let mut runtime = TaskRuntime::default();
+
+    let run_raid = matches!(task_type, "raid_health_check")
+        || (task_type == "telegram_command" && telegram_command_is(&task.payload, "/raid"));
+    if run_raid {
+        let ok = run_raid_health_check(client, &rt.args).await;
+        *rt.raid_wire_ok.write().await = ok;
+        runtime.raid_wire_ok = Some(ok);
+    } else if task_type == "telegram_command" && telegram_command_is(&task.payload, "/status") {
+        runtime.raid_wire_ok = Some(*rt.raid_wire_ok.read().await);
     }
+
+    if matches!(task_type, "pool_workers_probe" | "telegram_command") {
+        runtime.pool_worker_count = Some(fetch_pool_worker_count(client, &rt.args).await);
+    }
+
+    resolve_task_outcome(task_type, &task.payload, &runtime)
 }
 
 async fn poll_and_run_tasks(client: &reqwest::Client, rt: &WorkerRuntime) {

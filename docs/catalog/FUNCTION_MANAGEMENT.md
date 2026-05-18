@@ -128,7 +128,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Pool workload on device | **FM-016+++** | повний pool/RAID на virtual node; FM-016++ bot ✅ |
+| 1 | Pool workload on device | **FM-016+++** | `pool_workers_probe` + telegram `/status`/`/raid`; далі — повний pool join / RAID artifacts |
 | 2 | Real LAN sign-off | **FM-003 §4** | Два хости; Push/Pull timings у `BENCHMARKS.md` |
 | 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |

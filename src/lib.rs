@@ -128,6 +128,7 @@ pub mod rewards;
 pub mod runtime;
 pub mod services;
 pub mod version;
+pub mod workers;
 
 // Public modules (exposed for external use)
 pub mod libs;
