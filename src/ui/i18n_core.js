@@ -39,6 +39,8 @@
       'auth.lang.uk': 'UA',
 
       'admin.brand': 'PoolAI Admin',
+      'admin.skipMain': 'Skip to main content',
+      'admin.skipNav': 'Skip to navigation',
       'admin.nav.dashboard': 'Dashboard',
       'admin.nav.tenants': 'Tenants',
       'admin.nav.security': 'Security',
@@ -847,6 +849,8 @@
       'auth.lang.uk': 'UA',
 
       'admin.brand': 'PoolAI Адмін',
+      'admin.skipMain': 'Перейти до основного вмісту',
+      'admin.skipNav': 'Перейти до навігації',
       'admin.nav.dashboard': 'Панель',
       'admin.nav.tenants': 'Орендарі',
       'admin.nav.security': 'Безпека',

@@ -3696,6 +3696,7 @@ async fn login_page() -> Html<String> {
   <style>{css}</style>
 </head>
 <body>
+  <a href="{skip_auth_href}" class="skip_link" data-i18n="dash.skipMain">Skip to main content</a>
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
@@ -3703,10 +3704,10 @@ async fn login_page() -> Html<String> {
       </div>
       <div id="poolai-lang-toggle-auth" class="poolai-lang-auth"></div>
     </div>
-    <div class="content">
+    <div class="content" id="auth_main" role="main">
       <div class="card" style="max-width: 400px; margin: 40px auto;">
         <h2 style="margin:0 0 20px" data-i18n="auth.cardTitle">Login</h2>
-        <div id="alert"></div>
+        <div id="alert" role="alert" aria-live="assertive"></div>
         <form id="loginForm">
           <div class="form-group">
             <label for="username" data-i18n="auth.username">Username</label>
@@ -3751,6 +3752,7 @@ async fn login_page() -> Html<String> {
 </body>
 </html>"#,
         css = BASE_CSS,
+        skip_auth_href = "#auth_main",
         i18n_js = i18n_js,
         common_js = common_js(),
         login_js = login_js

@@ -86,13 +86,15 @@ pub fn admin_layout(
   <style>{base_css}</style>
 </head>
 <body>
+  <a href="{skip_admin_main_href}" class="skip_link" data-i18n="admin.skipMain">Skip to main content</a>
+  <a href="{skip_admin_nav_href}" class="skip_link" data-i18n="admin.skipNav">Skip to navigation</a>
   <div class="admin-wrapper">
     <aside class="admin-sidebar" role="navigation" aria-label="Admin navigation">
       <div class="admin-brand">
         <h1 data-i18n="admin.brand">PoolAI Admin</h1>
         <div class="admin-version">v0.1.0</div>
       </div>
-      <nav class="admin-nav">
+      <nav class="admin-nav" id="admin_nav">
         <a href="/ui/admin" class="admin-nav-item" data-i18n="admin.nav.dashboard">Dashboard</a>
         <a href="/ui/admin/tenants" class="admin-nav-item" data-i18n="admin.nav.tenants">Tenants</a>
         <a href="/ui/admin/security" class="admin-nav-item" data-i18n="admin.nav.security">Security</a>
@@ -119,12 +121,13 @@ pub fn admin_layout(
         </div>
       </header>
       
-      <div class="admin-content">
+      <div id="admin_main_content" class="admin-content" tabindex="-1">
         <div id="poolai-bootstrap-banner-host" class="poolai-bootstrap-banner-host" hidden></div>
         {body}
       </div>
     </main>
   </div>
+  <div id="admin-aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
   
   <script>{i18n_js}</script>
   <script>{common_js}</script>
@@ -156,6 +159,8 @@ pub fn admin_layout(
 </html>"#,
         title_key = title_i18n_key,
         title_fallback = title_fallback,
+        skip_admin_main_href = "#admin_main_content",
+        skip_admin_nav_href = "#admin_nav",
         base_css = base_css,
         body = body_html,
         i18n_js = i18n_js,

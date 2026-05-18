@@ -296,6 +296,11 @@
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
 - **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
 
+### [FM-018] Admin/login a11y (partial)
+- **Де:** `src/ui/admin/mod.rs`, `admin_styles.css`, `admin_common.js`; login у `src/ui/mod.rs` (`login_page`)
+- **Патерн:** skip links; `aria-live` для помилок; `aria-current="page"` на nav; у `format!` **не** літерал `#fragment` — лише `{skip_href}` з `"#admin_main_content"`
+- **Перевірка:** `cargo check -p poolai --features enterprise`
+
 ### [FM-017] Discovery HttpAppError + virtual-node status-only
 - **Де:** `src/network/api/discovery.rs` (`discovery_not_ready`, `discovery_validation`, …); `virtual_nodes.rs` — status-only (коментар FM-017)
 - **Патерн:** worker (`poolai-worker`) — `is_success()` без parse body; discovery помилки — `{ "error": { "code", "message" }, "context"? }`

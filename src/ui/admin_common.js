@@ -92,12 +92,20 @@ function adminShowLoading(containerId, text) {
       '</div>';
 }
 
+function adminAnnounceLive(message, priority) {
+  const live = document.getElementById('admin-aria-live');
+  if (!live || !message) return;
+  live.setAttribute('aria-live', priority === 'assertive' ? 'assertive' : 'polite');
+  live.textContent = message;
+}
+
 function adminShowInlineError(containerId, err) {
   const el = document.getElementById(containerId);
   if (!el) return;
   const msg = err instanceof Error ? err.message : String(err);
   el.innerHTML =
     '<div class="admin-fetch-error" role="alert">' + escapeHtml(msg) + '</div>';
+  adminAnnounceLive(msg, 'assertive');
 }
 
 async function adminRefreshAccessToken() {
@@ -459,8 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set active nav item
   const currentPath = window.location.pathname;
   document.querySelectorAll('.admin-nav-item').forEach(item => {
-    if (item.getAttribute('href') === currentPath) {
-      item.classList.add('active');
+    const isCurrent = item.getAttribute('href') === currentPath;
+    item.classList.toggle('active', isCurrent);
+    if (isCurrent) {
+      item.setAttribute('aria-current', 'page');
+    } else {
+      item.removeAttribute('aria-current');
     }
   });
   
