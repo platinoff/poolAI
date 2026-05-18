@@ -14,4 +14,6 @@ pub trait DiscoveryHandle: Send + Sync {
     fn local_peer_id(&self) -> String;
     async fn get_peer(&self, peer_id: &str) -> Option<PeerInfo>;
     async fn send_announcement(&self) -> Result<(), AppError>;
+    /// Register a peer that connected over HTTP (e.g. Telegram / virtual node worker).
+    async fn register_remote_peer(&self, peer: PeerInfo) -> Result<(), AppError>;
 }

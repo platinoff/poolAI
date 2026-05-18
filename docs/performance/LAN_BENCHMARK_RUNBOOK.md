@@ -1,6 +1,6 @@
 # LAN benchmark runbook (FM-003 / P2b)
 
-**Status:** Planned (ops) — requires two PoolAI nodes on the same LAN. Autonomous dev sessions without a stand document steps here; they do not block code merges.
+**Status:** Planned (ops) — **реальний LAN відкладено** до Telegram-воркерів як віртуальних нод на пристроях (повний worker-функціонал). Для розробки достатньо **§5 single-machine dev stand**; §4 sign-off — після воркерів + реального стенду.
 
 **Related:** [`BENCHMARKS.md`](./BENCHMARKS.md) (Criterion + `poolai_health_load`), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) (P2b LAN checkbox).
 

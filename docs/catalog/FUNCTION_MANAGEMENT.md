@@ -95,7 +95,7 @@ FM-xxx (з таблиці нижче)
 |----|---------|---------------|-----------------|---------|
 | FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Implemented | `src/network/api/*` без `get_global_*`; `discovery.rs` — optional `instance_manager` з `AppState` (коментар); `services/*` — лише закоментовані Raft placeholders |
-| FM-003 | P2b / RAID | Повні заміри реплікації артефактів по мережі; порівняння розміру до/після TQ01 на стенді; **dev stand** — 2+ вузли на одній машині (`POOLAI_HTTP_PORT`, `bin/run-lan-nodes.*`, runbook §5) | Planned (ops) | NEXT_STEPS P2b, `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) |
+| FM-003 | P2b / RAID | Повні заміри реплікації по **реальному LAN**; TQ01 на стенді. **Зараз:** dev stand (`bin/run-lan-nodes.*`, §5 runbook). **Реальний LAN** — після **Telegram-воркерів** як віртуальних нод на пристроях (повний функціонал worker) | Planned (ops, gated) | `BENCHMARKS.md`, [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md); блокер: Telegram workers → virtual nodes |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
@@ -108,10 +108,11 @@ FM-xxx (з таблиці нижче)
 | FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок: libraries, topology, VM, workers; узгодження `installed` у libs UI з `metadata.installed_at` | Implemented | `tests/admin_ui_api_contracts.rs`, [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md), `src/ui/admin/libs.rs` |
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
+| FM-016 | Workers / Telegram | **Virtual nodes:** HTTP `POST /discovery/register-remote`, `poolai-worker` heartbeat до coordinator; далі — повний worker (pool, RAID wire), прив’язка Telegram device | In progress | `src/network/api/discovery.rs`, `src/bin/poolai-worker.rs`, `tests/discovery_remote_register_integration.rs` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**FM-003 (2026-05-18):** dev stand на одній машині — `bin/run-lan-nodes.ps1` / `.sh`, env `POOLAI_HTTP_PORT` + `POOLAI_RAID_BASE_PATH`; §4 LAN runbook (Push/Pull у `BENCHMARKS.md`) — ще ops.
+**FM-003 (2026-05-18):** dev stand на одній машині достатній; **реальний LAN і §4 sign-off відкладені** до Telegram-воркерів як віртуальних нод на девайсах (не блокує інші FM).
 
 **Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-20 (автопрогін FM-015). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
 
@@ -123,12 +124,12 @@ FM-xxx (з таблиці нижче)
 
 **P0 (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів; `rg "get_global_" src/network/api` → 0.
 
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 ops); **cloud-sdk** (FM-006, Deferred). FM-005/007/008/011/012/002/013/014/015 — закрито.
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 — після Telegram workers); **cloud-sdk** (FM-006, Deferred). FM-005/007/008/011/012/002/013/014/015 — закрито.
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | LAN / perf (ops) | **FM-003** | [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md); оновити `BENCHMARKS.md` після стенду. |
-| 2 | Відкладено | **FM-006**, **FM-004** | **cloud-sdk** (Azure/GCP); SIMD TurboQuant. |
+| 1 | Telegram workers → virtual nodes | **FM-016** | Фаза 1 ✅ register-remote + `poolai-worker`; фаза 2 — pool/RAID на device; потім FM-003 реальний LAN. |
+| 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
 
 ### 5.2 Автономний прогін (сесія → git push)

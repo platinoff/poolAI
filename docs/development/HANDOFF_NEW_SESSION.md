@@ -1,12 +1,14 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (FM-003 LAN dev stand: multi-node на одній машині).
+**Оновлено:** 2026-05-21 (FM-016 фаза 1: virtual node registration).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-20.md`](./AUTO_RUN_SESSION_2026-05-20.md) — FM-015 завершено; **FM-003** — dev stand `bin/run-lan-nodes.*`, ops sign-off §4 LAN runbook ще відкритий.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-21.md`](./AUTO_RUN_SESSION_2026-05-21.md) — **FM-016** in progress.
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-19.md`](./AUTO_RUN_SESSION_2026-05-19.md) (FM-014), [`AUTO_RUN_SESSION_2026-05-18.md`](./AUTO_RUN_SESSION_2026-05-18.md) (FM-013).
+**FM-003 (реальний LAN):** відкладено до повних **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
 
-**Зріз (2026-05-18):** **FM-015 ✅**; **FM-003** Planned (ops) — локально 2 вузли `127.0.0.1:8080` + `:8081` (`POOLAI_HTTP_PORT`, `POOLAI_RAID_BASE_PATH`). §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**FM-016 фаза 1 ✅:** `POST /discovery/register-remote`, `poolai-worker` + env (`POOLAI_COORDINATOR_URL`). **Фаза 2:** task execution на device.
+
+**Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
@@ -53,8 +55,8 @@
 
 **Єдине зведення порядку робіт** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця FM-003 → FM-012 та далі). Коротко:
 
-1. **LAN / perf (FM-003, ops)** — [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md); після стенду — рядки в [`BENCHMARKS.md`](../performance/BENCHMARKS.md).
-2. **Відкладено** — **cloud-sdk** (FM-006), SIMD TurboQuant (FM-004).
+1. **Telegram workers → virtual nodes** (майбутній **FM-016**) — воркери на пристроях з discovery/pool/RAID; потім FM-003 реальний LAN.
+2. **Відкладено** — **FM-003 (real LAN)**, **cloud-sdk** (FM-006), SIMD TurboQuant (FM-004).
 3. **Концепт** — Grid envelope (FM-009), Solana (FM-010).
 
 **FM-005** ✅ (узгоджений JSON) — закрито; див. таблицю **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).

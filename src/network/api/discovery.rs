@@ -12,9 +12,10 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
-use crate::core::discovery_types::PeerInfo;
+use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::state::ApiContext;
 use crate::services::discovery_service::{
     DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService,
@@ -32,12 +33,30 @@ struct PeerResponse {
     peer: Option<PeerInfo>,
 }
 
+#[derive(Deserialize)]
+struct RegisterRemotePeerRequest {
+    peer_id: String,
+    address: String,
+    port: u16,
+    #[serde(default)]
+    capabilities: PeerCapabilities,
+    #[serde(default)]
+    metadata: HashMap<String, String>,
+}
+
+#[derive(Serialize)]
+struct RegisterRemotePeerResponse {
+    peer_id: String,
+    registered: bool,
+}
+
 /// Create discovery routes
 pub fn create_discovery_routes() -> Router<ApiContext> {
     Router::new()
         .route("/discovery/peers", get(peers_handler))
         .route("/discovery/peers/{peer_id}", get(peer_handler))
         .route("/discovery/register", post(register_handler))
+        .route("/discovery/register-remote", post(register_remote_handler))
 }
 
 /// Handler for GET /api/v1/discovery/peers
@@ -86,5 +105,39 @@ async fn register_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
             StatusCode::INTERNAL_SERVER_ERROR
         }
         Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE,
+    }
+}
+
+/// POST /api/v1/discovery/register-remote — HTTP registration for virtual nodes (FM-016).
+async fn register_remote_handler(
+    State(ctx): State<ApiContext>,
+    Json(payload): Json<RegisterRemotePeerRequest>,
+) -> impl IntoResponse {
+    if payload.peer_id.trim().is_empty() {
+        return StatusCode::BAD_REQUEST.into_response();
+    }
+    match DiscoveryService::register_remote_peer(
+        &ctx,
+        payload.peer_id.clone(),
+        payload.address,
+        payload.port,
+        payload.capabilities,
+        payload.metadata,
+    )
+    .await
+    {
+        Ok(()) => (
+            StatusCode::OK,
+            Json(RegisterRemotePeerResponse {
+                peer_id: payload.peer_id,
+                registered: true,
+            }),
+        )
+            .into_response(),
+        Err(DiscoveryAnnounceError::Failed(e)) => {
+            tracing::warn!("Failed to register remote peer: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+        Err(DiscoveryAnnounceError::NotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
     }
 }

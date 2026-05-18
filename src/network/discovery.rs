@@ -629,6 +629,25 @@ impl DiscoveryService {
         }
     }
 
+    /// Register a remote peer announced over HTTP (virtual node / Telegram worker).
+    pub async fn register_remote_peer(&self, peer: PeerInfo) -> Result<(), AppError> {
+        let peer_id = peer.peer_id.clone();
+        let mut peers = self.peers.write().await;
+        if peers.contains_key(&peer_id) {
+            debug!(
+                "Updated remote peer: {} at {}:{}",
+                peer_id, peer.address, peer.port
+            );
+        } else {
+            info!(
+                "Registered remote peer: {} at {}:{}",
+                peer_id, peer.address, peer.port
+            );
+        }
+        peers.insert(peer_id, peer);
+        Ok(())
+    }
+
     /// Gets all discovered peers
     pub async fn get_peers(&self) -> Vec<PeerInfo> {
         let peers = self.peers.read().await;
@@ -743,6 +762,10 @@ impl crate::core::discovery_handle::DiscoveryHandle for DiscoveryService {
     async fn send_announcement(&self) -> Result<(), AppError> {
         DiscoveryService::send_announcement(self).await
     }
+
+    async fn register_remote_peer(&self, peer: PeerInfo) -> Result<(), AppError> {
+        DiscoveryService::register_remote_peer(self, peer).await
+    }
 }
 
 #[cfg(test)]
@@ -758,6 +781,28 @@ mod tests {
 
         assert!(!service.local_peer_id().is_empty());
         assert!(service.local_peer_id().starts_with("poolai-"));
+    }
+
+    #[tokio::test]
+    async fn test_register_remote_peer() {
+        let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::LOCALHOST, 8080));
+        let service = DiscoveryService::new(DiscoveryConfig::default(), addr, None);
+        let peer = PeerInfo {
+            peer_id: "tg-worker-1".to_string(),
+            address: "10.0.0.5".to_string(),
+            port: 9090,
+            last_seen: Utc::now(),
+            capabilities: PeerCapabilities::default(),
+            metadata: HashMap::from([("channel".to_string(), "telegram".to_string())]),
+        };
+        service.register_remote_peer(peer).await.unwrap();
+        let peers = service.get_peers().await;
+        assert_eq!(peers.len(), 1);
+        assert_eq!(peers[0].peer_id, "tg-worker-1");
+        assert_eq!(
+            peers[0].metadata.get("channel").map(String::as_str),
+            Some("telegram")
+        );
     }
 
     #[tokio::test]
