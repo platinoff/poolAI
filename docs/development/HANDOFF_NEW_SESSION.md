@@ -6,7 +6,7 @@
 
 **FM-003 (реальний LAN):** відкладено до повних **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
 
-**FM-016 фаза 1–2 ✅:** register-remote, heartbeat-remote, virtual-nodes + health probe; `poolai-worker` `/health` + pool link. **Фаза 3:** task execution + RAID wire на device.
+**FM-016 ✅ (core):** register/heartbeat, virtual-nodes, task poll/complete, RAID `health_check` wire; `poolai-worker` на device. **Далі:** Telegram bot binding, FM-003 real LAN.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

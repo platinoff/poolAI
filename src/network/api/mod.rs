@@ -31,6 +31,7 @@ mod system_status_html;
 pub mod topology;
 pub mod ui;
 pub mod users;
+pub mod virtual_nodes;
 pub mod vm;
 pub mod workers;
 
@@ -56,6 +57,7 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(libraries::create_libraries_routes())
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
+        .merge(virtual_nodes::create_virtual_node_routes())
         .merge(instances::create_instance_routes())
         .merge(completions::create_completions_routes())
         .merge(topology::create_topology_routes())

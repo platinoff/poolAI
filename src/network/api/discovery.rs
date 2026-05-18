@@ -21,6 +21,7 @@ use crate::services::discovery_service::{
     DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService, RemoteHealthProbe,
     VirtualNodeStatus,
 };
+use crate::services::virtual_node_task_service::VirtualNodeTaskService;
 
 /// Discovery API response types
 #[derive(Serialize)]
@@ -145,9 +146,11 @@ async fn register_remote_handler(
     if payload.peer_id.trim().is_empty() {
         return StatusCode::BAD_REQUEST.into_response();
     }
+    let is_virtual_node = payload.metadata.get("role").map(String::as_str) == Some("virtual_node");
+    let peer_id = payload.peer_id.clone();
     match DiscoveryService::register_remote_peer(
         &ctx,
-        payload.peer_id.clone(),
+        peer_id.clone(),
         payload.address,
         payload.port,
         payload.capabilities,
@@ -155,14 +158,19 @@ async fn register_remote_handler(
     )
     .await
     {
-        Ok(()) => (
-            StatusCode::OK,
-            Json(RegisterRemotePeerResponse {
-                peer_id: payload.peer_id,
-                registered: true,
-            }),
-        )
-            .into_response(),
+        Ok(()) => {
+            if is_virtual_node {
+                VirtualNodeTaskService::enqueue_bootstrap_tasks(&peer_id);
+            }
+            (
+                StatusCode::OK,
+                Json(RegisterRemotePeerResponse {
+                    peer_id,
+                    registered: true,
+                }),
+            )
+                .into_response()
+        }
         Err(DiscoveryAnnounceError::Failed(e)) => {
             tracing::warn!("Failed to register remote peer: {}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()

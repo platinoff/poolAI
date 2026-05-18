@@ -1,9 +1,12 @@
 //! PoolAI worker — virtual node client (FM-016).
 //!
 //! Phase 1: `POST /api/v1/discovery/register-remote`
-//! Phase 2: local `GET /health`, `POST /discovery/heartbeat-remote`, pool API link check
+//! Phase 2: `GET /health`, `POST /discovery/heartbeat-remote`
+//! Phase 3: poll/complete virtual-node tasks + RAID distributed health wire
 
 use axum::{extract::State, routing::get, Json, Router};
+use poolai::raid::protocol::ProtocolMessage;
+use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -29,8 +32,11 @@ struct Args {
 struct WorkerRuntime {
     args: Args,
     tasks_polled: Arc<AtomicU64>,
+    tasks_completed: Arc<AtomicU64>,
     coordinator_reachable: Arc<RwLock<bool>>,
     pool_api_reachable: Arc<RwLock<bool>>,
+    raid_wire_ok: Arc<RwLock<bool>>,
+    last_task: Arc<RwLock<Option<String>>>,
 }
 
 #[derive(Serialize)]
@@ -41,7 +47,22 @@ struct WorkerHealthResponse {
     channel: String,
     coordinator_reachable: bool,
     pool_api_reachable: bool,
+    raid_wire_ok: bool,
     tasks_polled: u64,
+    tasks_completed: u64,
+    last_task: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct PollTasksResponse {
+    task: Option<VirtualNodeTaskDto>,
+    pending: usize,
+}
+
+#[derive(Deserialize)]
+struct VirtualNodeTaskDto {
+    id: String,
+    task_type: String,
 }
 
 fn parse_args() -> Args {
@@ -120,7 +141,7 @@ fn parse_args() -> Args {
 
 fn http_client() -> Result<reqwest::Client, String> {
     reqwest::Client::builder()
-        .timeout(Duration::from_secs(10))
+        .timeout(Duration::from_secs(15))
         .build()
         .map_err(|e| e.to_string())
 }
@@ -195,7 +216,104 @@ async fn heartbeat_remote(client: &reqwest::Client, args: &Args) -> Result<(), S
     Ok(())
 }
 
-/// Phase 2: verify coordinator pool API is reachable (task path stub).
+async fn complete_task(
+    client: &reqwest::Client,
+    args: &Args,
+    task_id: &str,
+    status: &str,
+    detail: Option<String>,
+) -> Result<(), String> {
+    let url = format!(
+        "{}/api/v1/virtual-nodes/{}/tasks/{}/complete",
+        args.coordinator_url, args.worker_id, task_id
+    );
+    let response = client
+        .post(&url)
+        .json(&serde_json::json!({ "status": status, "detail": detail }))
+        .send()
+        .await
+        .map_err(|e| format!("task complete failed: {e}"))?;
+    if !response.status().is_success() {
+        return Err(format!("task complete HTTP {}", response.status()));
+    }
+    Ok(())
+}
+
+async fn run_raid_health_check(client: &reqwest::Client, args: &Args) -> bool {
+    let message = ProtocolMessage::health_check(args.worker_id.clone());
+    let url = format!("{}/api/v1/raid/distributed/health", args.coordinator_url);
+    match client.post(&url).json(&message).send().await {
+        Ok(response) => response.status().is_success(),
+        Err(e) => {
+            warn!("RAID wire health_check failed: {}", e);
+            false
+        }
+    }
+}
+
+async fn execute_task(
+    client: &reqwest::Client,
+    rt: &WorkerRuntime,
+    task: VirtualNodeTaskDto,
+) -> (String, bool) {
+    match task.task_type.as_str() {
+        "ping" => ("ok".to_string(), true),
+        "raid_health_check" => {
+            let ok = run_raid_health_check(client, &rt.args).await;
+            *rt.raid_wire_ok.write().await = ok;
+            (
+                if ok {
+                    "raid_ok".to_string()
+                } else {
+                    "raid_failed".to_string()
+                },
+                ok,
+            )
+        }
+        other => (format!("unsupported:{other}"), false),
+    }
+}
+
+async fn poll_and_run_tasks(client: &reqwest::Client, rt: &WorkerRuntime) {
+    let url = format!(
+        "{}/api/v1/virtual-nodes/{}/tasks/poll",
+        rt.args.coordinator_url, rt.args.worker_id
+    );
+    let Ok(response) = client.get(&url).send().await else {
+        return;
+    };
+    if !response.status().is_success() {
+        return;
+    }
+    let Ok(body) = response.json::<PollTasksResponse>().await else {
+        return;
+    };
+    rt.tasks_polled.fetch_add(1, Ordering::Relaxed);
+
+    let Some(task) = body.task else {
+        return;
+    };
+
+    let task_id = task.id.clone();
+    let task_type = task.task_type.clone();
+    info!("Running task {} ({})", task_id, task_type);
+    let (status, _ok) = execute_task(client, rt, task).await;
+    if complete_task(
+        client,
+        &rt.args,
+        &task_id,
+        &status,
+        Some(task_type.clone()),
+    )
+    .await
+    .is_ok()
+    {
+        rt.tasks_completed.fetch_add(1, Ordering::Relaxed);
+        *rt.last_task.write().await = Some(format!("{task_type}:{status}"));
+        info!("Task {} completed ({})", task_id, status);
+    }
+}
+
 async fn poll_coordinator_links(client: &reqwest::Client, rt: &WorkerRuntime) {
     let health_url = format!("{}/api/v1/health", rt.args.coordinator_url);
     let health_ok = client
@@ -214,9 +332,6 @@ async fn poll_coordinator_links(client: &reqwest::Client, rt: &WorkerRuntime) {
         .map(|r| r.status().is_success())
         .unwrap_or(false);
     *rt.pool_api_reachable.write().await = pool_ok;
-    if pool_ok {
-        rt.tasks_polled.fetch_add(1, Ordering::Relaxed);
-    }
 }
 
 async fn health_handler(State(rt): State<Arc<WorkerRuntime>>) -> Json<WorkerHealthResponse> {
@@ -227,7 +342,10 @@ async fn health_handler(State(rt): State<Arc<WorkerRuntime>>) -> Json<WorkerHeal
         channel: rt.args.channel.clone(),
         coordinator_reachable: *rt.coordinator_reachable.read().await,
         pool_api_reachable: *rt.pool_api_reachable.read().await,
+        raid_wire_ok: *rt.raid_wire_ok.read().await,
         tasks_polled: rt.tasks_polled.load(Ordering::Relaxed),
+        tasks_completed: rt.tasks_completed.load(Ordering::Relaxed),
+        last_task: rt.last_task.read().await.clone(),
     })
 }
 
@@ -258,8 +376,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rt = Arc::new(WorkerRuntime {
         args: args.clone(),
         tasks_polled: Arc::new(AtomicU64::new(0)),
+        tasks_completed: Arc::new(AtomicU64::new(0)),
         coordinator_reachable: Arc::new(RwLock::new(false)),
         pool_api_reachable: Arc::new(RwLock::new(false)),
+        raid_wire_ok: Arc::new(RwLock::new(false)),
+        last_task: Arc::new(RwLock::new(None)),
     });
 
     info!(
@@ -276,16 +397,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = http_client()?;
     register_remote(&client, &args).await?;
-    info!("Registered with coordinator");
+    info!("Registered with coordinator (bootstrap tasks queued)");
 
     let mut ticks: u64 = 0;
     loop {
         poll_coordinator_links(&client, &rt).await;
+        poll_and_run_tasks(&client, &rt).await;
 
         match heartbeat_remote(&client, &args).await {
             Ok(()) => tracing::debug!("Heartbeat OK"),
             Err(e) => {
-                warn!("Heartbeat failed (will re-register on interval): {}", e);
+                warn!("Heartbeat failed (will re-register): {}", e);
                 if let Err(reg_err) = register_remote(&client, &args).await {
                     error!("Re-register failed: {}", reg_err);
                 }
