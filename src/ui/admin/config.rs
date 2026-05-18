@@ -13,7 +13,11 @@ pub async fn admin_config() -> Html<String> {
 
     function showTab(tabName) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      const active = document.querySelector(`[data-tab="${tabName}"]`);
+      if (active) active.classList.add('active');
+      if (typeof adminSyncTabA11y === 'function') {
+        adminSyncTabA11y(document.querySelector('.admin-tabs'));
+      }
       loadConfigTab(tabName);
     }
     
@@ -328,15 +332,15 @@ pub async fn admin_config() -> Html<String> {
         "System Configuration",
         r#"
         <div class="admin-section">
-          <div class="admin-tabs">
-            <button type="button" class="tab active" data-tab="general" data-i18n="admin.cfg.tab.general">General</button>
-            <button type="button" class="tab" data-tab="performance" data-i18n="admin.cfg.tab.performance">Performance</button>
-            <button type="button" class="tab" data-tab="gpu" data-i18n="admin.cfg.tab.gpu">GPU</button>
-            <button type="button" class="tab" data-tab="security" data-i18n="admin.cfg.tab.security">Security</button>
-            <button type="button" class="tab" data-tab="monitoring" data-i18n="admin.cfg.tab.monitoring">Monitoring</button>
-            <button type="button" class="tab" data-tab="health" data-i18n="admin.cfg.tab.health">Health</button>
+          <div class="admin-tabs" role="tablist" aria-label="System configuration">
+            <button type="button" class="tab active" id="config-tab-general" role="tab" aria-selected="true" aria-controls="config-content" data-tab="general" data-i18n="admin.cfg.tab.general">General</button>
+            <button type="button" class="tab" id="config-tab-performance" role="tab" aria-selected="false" aria-controls="config-content" tabindex="-1" data-tab="performance" data-i18n="admin.cfg.tab.performance">Performance</button>
+            <button type="button" class="tab" id="config-tab-gpu" role="tab" aria-selected="false" aria-controls="config-content" tabindex="-1" data-tab="gpu" data-i18n="admin.cfg.tab.gpu">GPU</button>
+            <button type="button" class="tab" id="config-tab-security" role="tab" aria-selected="false" aria-controls="config-content" tabindex="-1" data-tab="security" data-i18n="admin.cfg.tab.security">Security</button>
+            <button type="button" class="tab" id="config-tab-monitoring" role="tab" aria-selected="false" aria-controls="config-content" tabindex="-1" data-tab="monitoring" data-i18n="admin.cfg.tab.monitoring">Monitoring</button>
+            <button type="button" class="tab" id="config-tab-health" role="tab" aria-selected="false" aria-controls="config-content" tabindex="-1" data-tab="health" data-i18n="admin.cfg.tab.health">Health</button>
           </div>
-          <div id="config-content"></div>
+          <div id="config-content" role="tabpanel" aria-labelledby="config-tab-general" tabindex="0"></div>
         </div>
         "#,
         script,

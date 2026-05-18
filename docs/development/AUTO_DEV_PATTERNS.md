@@ -310,6 +310,13 @@
 - **Перевірка:** `cargo test --test ml_pipeline_integration --features ml test_pipeline_turboquant_quantization_step test_pipeline_standard_quantization_metrics`
 - **FM:** DIGEST §ML ✅
 
+### [FM-019] Admin tablist + dynamic tables (semantic)
+- **Де:** `src/ui/admin/security.rs`, `config.rs` (static `role="tablist"`); `admin_common.js` (`adminSyncTabA11y`, `adminEnhanceTablesA11y`, `adminObserveDynamicA11y`)
+- **Сигнал:** `rg 'role="tablist"' src/ui/admin/security.rs`
+- **Патерн:** tabs — `aria-selected`, `aria-controls`, `tabindex="-1"` на неактивних; tables — `th scope="col"`, `aria-label` з `h3`
+- **Перевірка:** `cargo test -p poolai --features enterprise ui::admin --lib`
+- **FM:** FM-019 Partial
+
 ### [FM-019] Admin form a11y (aria-required, labels)
 - **Де:** `src/ui/admin_common.js` (`adminEnhanceFormA11y`); приклад static — `src/ui/admin/users.rs`
 - **Сигнал:** `rg "adminEnhanceFormA11y" src/ui/admin_common.js`

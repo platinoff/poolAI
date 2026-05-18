@@ -16,7 +16,11 @@ pub async fn admin_security() -> Html<String> {
     function showTab(tabName) {
       currentTab = tabName;
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      const active = document.querySelector(`[data-tab="${tabName}"]`);
+      if (active) active.classList.add('active');
+      if (typeof adminSyncTabA11y === 'function') {
+        adminSyncTabA11y(document.querySelector('.admin-tabs'));
+      }
       loadTabContent(tabName);
     }
     
@@ -687,12 +691,12 @@ pub async fn admin_security() -> Html<String> {
         "Security Management",
         r#"
         <div class="admin-section">
-          <div class="admin-tabs">
-            <button type="button" class="tab active" data-tab="oauth2" data-i18n="admin.sec.tab.oauth">OAuth2 Providers</button>
-            <button type="button" class="tab" data-tab="saml" data-i18n="admin.sec.tab.saml">SAML Providers</button>
-            <button type="button" class="tab" data-tab="policies" data-i18n="admin.sec.tab.policies">Security Policies</button>
+          <div class="admin-tabs" role="tablist" aria-label="Security management">
+            <button type="button" class="tab active" id="security-tab-oauth2" role="tab" aria-selected="true" aria-controls="security-content" data-tab="oauth2" data-i18n="admin.sec.tab.oauth">OAuth2 Providers</button>
+            <button type="button" class="tab" id="security-tab-saml" role="tab" aria-selected="false" aria-controls="security-content" tabindex="-1" data-tab="saml" data-i18n="admin.sec.tab.saml">SAML Providers</button>
+            <button type="button" class="tab" id="security-tab-policies" role="tab" aria-selected="false" aria-controls="security-content" tabindex="-1" data-tab="policies" data-i18n="admin.sec.tab.policies">Security Policies</button>
           </div>
-          <div id="security-content"></div>
+          <div id="security-content" role="tabpanel" aria-labelledby="security-tab-oauth2" tabindex="0"></div>
         </div>
         
         <!-- Create OAuth2 Provider Modal -->

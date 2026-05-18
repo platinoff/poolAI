@@ -142,7 +142,7 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | NEXT_STEPS P2b |
 | FM-006 | cloud-sdk гілки | **Deferred** | не блокує CI |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | Повний WCAG / modals / forms | **Partial** | admin modals focus trap (users/security); forms/pa11y — далі |
+| FM-019 | Повний WCAG / modals / forms | **Partial** | modals/forms/tabs ✅; pa11y runbook — опційно |
 | `UI_IMPROVEMENTS_PLAN` | Чеклист a11y (не оновлений) | **Partial** | багато `[ ]` — див. FM-019 baseline у §5.4 |
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки admin/auth | **Planned** | не канон; окремий спринт |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | застарілий зріз v0.1; канон — STABLE + DIGEST |
@@ -161,13 +161,15 @@ FM-xxx (з таблиці нижче)
 | `aria-live` notifications / errors | dashboard, admin, login |
 | `aria-current` nav (admin + dashboard) | `adminMarkCurrentNav`, `dashMarkCurrentNav` |
 | Admin modals focus trap + closed `aria-modal` | `admin_common.js`; static modals у `src/ui/admin/*.rs` |
+| Admin forms `aria-required`, tablist ARIA | `adminEnhanceFormA11y`, security/config `role="tab*"` |
+| Dynamic tables `scope=col` | `adminEnhanceTablesA11y` + `adminObserveDynamicA11y` |
 | i18n UA/EN shell | `i18n_core.js` |
 
 ### 5.2 Автономний прогін (сесія → git push)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-05.md`](../development/AUTO_RUN_SESSION_2026-06-05.md) — FM-019 admin forms a11y.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-06.md`](../development/AUTO_RUN_SESSION_2026-06-06.md) — FM-019 semantic tabs + tables.
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) (§5.3 audit + FM-019 nav).
 

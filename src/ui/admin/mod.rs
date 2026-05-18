@@ -181,11 +181,15 @@ fn admin_common_fm019_modal_a11y_helpers() {
     assert!(js.contains("ADMIN_DYNAMIC_MODAL_ID"));
     assert!(js.contains("function handleModalEscape"));
     assert!(js.contains("function adminEnhanceFormA11y"));
+    assert!(js.contains("function adminSyncTabA11y"));
+    assert!(js.contains("function adminEnhanceTablesA11y"));
+    assert!(js.contains("function adminObserveDynamicA11y"));
 }
 
 #[cfg(all(test, feature = "enterprise"))]
 mod a11y_tests {
     use super::admin_layout;
+    use crate::ui::admin::config::admin_config;
     use crate::ui::admin::security::admin_security;
     use crate::ui::admin::users::admin_users;
 
@@ -218,6 +222,23 @@ mod a11y_tests {
         assert!(html.contains("autocomplete=\"username\""));
         assert!(html.contains("autocomplete=\"new-password\""));
         assert!(html.contains("class=\"required\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn security_tablist_semantic_roles() {
+        let html = admin_security().await.0;
+        assert!(html.contains("role=\"tablist\""));
+        assert!(html.contains("role=\"tabpanel\""));
+        assert!(html.contains("id=\"security-tab-oauth2\""));
+        assert!(html.contains("aria-controls=\"security-content\""));
+    }
+
+    #[tokio::test]
+    async fn config_tablist_semantic_roles() {
+        let html = admin_config().await.0;
+        assert!(html.contains("role=\"tablist\""));
+        assert!(html.contains("id=\"config-tab-general\""));
+        assert!(html.contains("aria-labelledby=\"config-tab-general\""));
     }
 
     #[tokio::test]

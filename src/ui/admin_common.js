@@ -491,25 +491,67 @@ function handleModalEscape(e) {
   }
 }
 
-// Tab system
+/** FM-019: sync aria-selected / aria-labelledby after tab change (security, config). */
+function adminSyncTabA11y(tablist) {
+  if (!tablist) return;
+  const panelId = tablist.querySelector('.tab[aria-controls]')?.getAttribute('aria-controls');
+  const panel = panelId ? document.getElementById(panelId) : null;
+  tablist.querySelectorAll('.tab').forEach((tab) => {
+    const selected = tab.classList.contains('active');
+    tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+    tab.setAttribute('tabindex', selected ? '0' : '-1');
+    if (selected && panel && tab.id) {
+      panel.setAttribute('aria-labelledby', tab.id);
+    }
+  });
+}
+
 function initTabs() {
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const tabGroup = tab.closest('.admin-tabs');
-      const contentId = tab.dataset.tab;
-      
-      // Update active tab
-      tabGroup.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      
-      // Show corresponding content
-      const contentArea = document.getElementById('security-content') || 
-                         document.getElementById('config-content');
-      if (contentArea) {
-        contentArea.setAttribute('data-active-tab', contentId);
+  document.querySelectorAll('.admin-tabs').forEach((tablist) => {
+    const section = tablist.closest('.admin-section');
+    if (!section) return;
+    const panel = section.querySelector('#security-content, #config-content');
+    if (!panel || !panel.id) return;
+    if (!tablist.getAttribute('role')) tablist.setAttribute('role', 'tablist');
+    panel.setAttribute('role', 'tabpanel');
+    tablist.querySelectorAll('.tab').forEach((tab) => {
+      if (!tab.id && tab.dataset.tab) {
+        tab.id = panel.id + '-tab-' + tab.dataset.tab;
       }
+      if (!tab.getAttribute('role')) tab.setAttribute('role', 'tab');
+      if (!tab.getAttribute('aria-controls')) tab.setAttribute('aria-controls', panel.id);
+    });
+    adminSyncTabA11y(tablist);
+  });
+}
+
+/** FM-019: scope on th, aria-label from section heading for dynamic admin tables. */
+function adminEnhanceTablesA11y(root) {
+  const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+  scope.querySelectorAll('table.admin-table').forEach((table) => {
+    if (!table.getAttribute('aria-label') && !table.querySelector('caption')) {
+      const heading = table.closest('.admin-section, .admin-header')?.querySelector('h3, h2');
+      if (heading && heading.textContent.trim()) {
+        table.setAttribute('aria-label', heading.textContent.trim());
+      }
+    }
+    table.querySelectorAll('thead th').forEach((th) => {
+      if (!th.getAttribute('scope')) th.setAttribute('scope', 'col');
     });
   });
+}
+
+function adminObserveDynamicA11y() {
+  const root = document.getElementById('admin_main_content');
+  if (!root || root.dataset.poolaiA11yObs === '1') return;
+  const obs = new MutationObserver(function () {
+    adminEnhanceTablesA11y(root);
+    adminEnhanceFormA11y(root);
+  });
+  obs.observe(root, { childList: true, subtree: true });
+  root.dataset.poolaiA11yObs = '1';
+  adminEnhanceTablesA11y(root);
+  adminEnhanceFormA11y(root);
 }
 
 // Logout
@@ -558,7 +600,7 @@ function adminMarkCurrentNav() {
 function adminShellOnReady() {
   if (!requireAdmin()) return;
   initTabs();
-  adminEnhanceFormA11y(document.body);
+  adminObserveDynamicA11y();
   adminMarkCurrentNav();
   const user = getUser();
   if (user) {

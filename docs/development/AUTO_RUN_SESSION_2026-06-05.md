@@ -6,7 +6,7 @@
 
 **Критерії:**
 - [x] `adminEnhanceFormA11y` у `admin_common.js`; users create form static a11y; instances placement `for=`
-- [ ] `cargo test-ci` + push
+- [x] `cargo test-ci` + push — `cf431a79`
 
 **BLOCKED:** FM-003 §4 LAN (2 хости).
 
