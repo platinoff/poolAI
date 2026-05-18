@@ -6,7 +6,7 @@
 
 **Критерії:**
 - [x] `role="tablist/tab/tabpanel"`, `adminSyncTabA11y`, `adminEnhanceTablesA11y`, `adminObserveDynamicA11y`
-- [ ] `cargo test-ci` + push
+- [x] `cargo test-ci` + push — `d04088e8`
 
 **BLOCKED:** FM-003 §4 LAN.
 
