@@ -343,6 +343,12 @@
 - **Перевірка:** `cargo test -p poolai --features enterprise ui::admin --lib`
 - **FM:** FM-019 Partial
 
+### [FM-019] Dashboard modals (workers/libs/vm/raid)
+- **Де:** `src/ui/mod.rs` (`showModal`, `keepFocusInModal`, `attachDashModalA11y`)
+- **Патерн:** closed state `aria-modal="false" aria-hidden="true"`; open → trap + Esc via `handleDashModalEscape`
+- **Перевірка:** `cargo test -p poolai dashboard_a11y --lib`
+- **FM:** FM-019 Partial (dashboard)
+
 ### [FM-019] Dashboard nav aria-current
 - **Де:** `src/ui/mod.rs` (`dashMarkCurrentNav`, CSS `.nav a[aria-current="page"]`)
 - **Сигнал:** `rg "dashMarkCurrentNav" src/ui/mod.rs`

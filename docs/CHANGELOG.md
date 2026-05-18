@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
+
 ### Docs
+- **AUTO_RUN 2026-06-09** — FM-019 dashboard modals; runbook §2/§5; HANDOFF/FM/STABLE synced.
 - **AUTO_RUN 2026-06-08 / P4 (2026-05-18)** — `poolai_health_load --json` (release, MSYS2) → новий рядок у `BENCHMARKS.md`; §5.1 next FM-019/FM-003; HANDOFF/STABLE/README/FM synced.
 - **Functionality manager (2026-06-07)** — `FUNCTION_MANAGEMENT` §5.3 audit (зроблено/не зроблено); §5.1 next P4/FM-003; `AUTO_RUN_SESSION_2026-06-08`; HANDOFF/STABLE/README synced.
 

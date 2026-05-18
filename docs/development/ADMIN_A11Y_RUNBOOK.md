@@ -33,6 +33,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | Security | `/ui/admin/security` | Tab між OAuth2/SAML/Policies (`aria-selected`); modals OAuth2/SAML/Policy |
 | Config | `/ui/admin/config` | Tab General…Health; фокус на панелі |
 | Dashboard | `/ui` | Skip links; Ctrl+K search; Esc закриває modals |
+| Workers / Libraries / VM / RAID | `/ui/workers`, `/ui/libraries`, `/ui/vm`, `/ui/raid` | Create/Install modals: Tab у діалозі; Esc; closed `aria-modal="false"` |
 
 **Критерій pass:** жоден Tab не «втикає» фокус під overlay; активна вкладка оголошується візуально + через `aria-selected`.
 
@@ -66,8 +67,8 @@ npx pa11y http://127.0.0.1:8080/ui/admin/security
 
 ## 5. Backlog (поза baseline)
 
-- Повний прохід dashboard modals (workers, VM, RAID) тими ж критеріями, що admin.
+- ~~Повний прохід dashboard modals (workers, libs, VM, RAID)~~ — **Partial ✅ 2026-05-18** (`src/ui/mod.rs`, `ui::dashboard_a11y_tests`).
 - `pa11y` / axe у CI (окремий FM або розширення FM-019).
 - Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (історичний чеклист).
 
-**Last updated:** 2026-06-07 — AUTO_RUN FM-019 baseline closure.
+**Last updated:** 2026-05-18 — FM-019 dashboard modals partial (AUTO_RUN 2026-06-09).

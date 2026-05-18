@@ -1689,11 +1689,48 @@ function initTableSorting(tableId) {
   });
 }
 
-// Modal dialog functions with keyboard navigation
+// Modal dialog — FM-019: overlay, aria-modal, focus trap, keepFocusInModal, Esc (dashboard)
+const DASH_MODAL_FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 let activeModal = null;
 let activeOverlay = null;
-let modalFocusableElements = [];
 let previousActiveElement = null;
+
+function getDashModalFocusableElements(modal) {
+  return Array.from(modal.querySelectorAll(DASH_MODAL_FOCUSABLE_SELECTOR)).filter(
+    (el) => el.offsetParent !== null || el === document.activeElement,
+  );
+}
+
+function focusInitialDashModalElement(modal) {
+  const focusable = getDashModalFocusableElements(modal);
+  if (focusable.length > 0) {
+    focusable[0].focus();
+    return;
+  }
+  if (!modal.hasAttribute('tabindex')) {
+    modal.setAttribute('tabindex', '-1');
+  }
+  modal.focus();
+}
+
+function attachDashModalA11y(modal) {
+  modal.removeEventListener('keydown', trapModalFocus);
+  modal.removeEventListener('focusin', keepFocusInModal);
+  modal.addEventListener('keydown', trapModalFocus);
+  modal.addEventListener('focusin', keepFocusInModal);
+  document.removeEventListener('keydown', handleDashModalEscape);
+  document.addEventListener('keydown', handleDashModalEscape);
+}
+
+function detachDashModalA11y(modal) {
+  if (modal) {
+    modal.removeEventListener('keydown', trapModalFocus);
+    modal.removeEventListener('focusin', keepFocusInModal);
+  }
+  document.removeEventListener('keydown', handleDashModalEscape);
+}
 
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
@@ -1701,11 +1738,15 @@ function showModal(modalId) {
     console.warn('Modal not found:', modalId);
     return;
   }
-  
-  // Store previous active element for focus restoration
+
+  if (activeModal && activeModal !== modal) {
+    detachDashModalA11y(activeModal);
+    activeModal.setAttribute('aria-hidden', 'true');
+    activeModal.setAttribute('aria-modal', 'false');
+  }
+
   previousActiveElement = document.activeElement;
-  
-  // Create or get overlay
+
   let overlay = document.getElementById('modal-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -1732,87 +1773,81 @@ function showModal(modalId) {
   overlay.classList.add('active');
   activeModal = modal;
   activeOverlay = overlay;
-  
-  // Get all focusable elements in modal
-  modalFocusableElements = Array.from(modal.querySelectorAll(
-    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  ));
-  
-  // Focus first focusable element after a short delay to ensure modal is visible
-  setTimeout(() => {
-    if (modalFocusableElements.length > 0) {
-      modalFocusableElements[0].focus();
-    }
-  }, 100);
-  
-  // Trap focus within modal
-  modal.addEventListener('keydown', trapModalFocus);
-  
-  // Prevent body scroll
   document.body.style.overflow = 'hidden';
+
+  attachDashModalA11y(modal);
+  setTimeout(() => focusInitialDashModalElement(modal), 100);
 }
 
 function hideModal(modalId) {
-  const modal = document.getElementById(modalId);
+  const id = modalId || (activeModal && activeModal.id);
+  if (!id) return;
+  const modal = document.getElementById(id);
   if (!modal) {
-    console.warn('Modal not found:', modalId);
+    console.warn('Modal not found:', id);
     return;
   }
-  
+
   const overlay = document.getElementById('modal-overlay');
-  
-  // Remove ARIA attributes
+
   modal.setAttribute('aria-hidden', 'true');
   modal.setAttribute('aria-modal', 'false');
-  
-  // Hide overlay
+
   if (overlay) {
     overlay.classList.remove('active');
   }
-  
-  // Remove focus trap
-  if (activeModal) {
-    activeModal.removeEventListener('keydown', trapModalFocus);
-  }
-  
-  // Restore previous focus
-  if (previousActiveElement) {
+
+  detachDashModalA11y(modal);
+
+  if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
     previousActiveElement.focus();
-    previousActiveElement = null;
   }
-  
+  previousActiveElement = null;
   activeModal = null;
   activeOverlay = null;
-  modalFocusableElements = [];
-  
-  // Restore body scroll
   document.body.style.overflow = '';
+}
+
+function keepFocusInModal(e) {
+  if (!activeModal || activeModal.contains(e.target)) return;
+  const focusable = getDashModalFocusableElements(activeModal);
+  if (focusable.length > 0) {
+    focusable[0].focus();
+  } else {
+    focusInitialDashModalElement(activeModal);
+  }
 }
 
 function trapModalFocus(e) {
   if (!activeModal || e.key !== 'Tab') return;
-  
-  const focusableElements = Array.from(activeModal.querySelectorAll(
-    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  ));
-  
-  if (focusableElements.length === 0) return;
-  
-  const firstElement = focusableElements[0];
-  const lastElement = focusableElements[focusableElements.length - 1];
-  
+
+  const focusable = getDashModalFocusableElements(activeModal);
+  if (focusable.length === 0) {
+    e.preventDefault();
+    focusInitialDashModalElement(activeModal);
+    return;
+  }
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const active = document.activeElement;
+  const inside = activeModal.contains(active);
+
   if (e.shiftKey) {
-    // Shift + Tab
-    if (document.activeElement === firstElement) {
+    if (!inside || active === first) {
       e.preventDefault();
-      lastElement.focus();
+      last.focus();
     }
-  } else {
-    // Tab
-    if (document.activeElement === lastElement) {
-      e.preventDefault();
-      firstElement.focus();
-    }
+  } else if (!inside || active === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+function handleDashModalEscape(e) {
+  if (e.key === 'Escape' && activeModal) {
+    e.preventDefault();
+    hideModal(activeModal.id);
   }
 }
 
@@ -1835,11 +1870,6 @@ function dashMarkCurrentNav() {
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
-  // Esc key closes modals
-  if (e.key === 'Escape' && activeModal) {
-    hideModal(activeModal.id);
-  }
-  
   // Ctrl+K or Cmd+K for global search
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
@@ -1858,7 +1888,7 @@ function showSearchModal() {
     modal.className = 'modal';
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-labelledby', 'searchModalTitle');
-    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-modal', 'false');
     modal.setAttribute('aria-hidden', 'true');
     modal.innerHTML = `
       <div class="modal-content" style="max-width: 600px;">
@@ -4223,7 +4253,7 @@ async fn workers_page() -> Html<String> {
 <div id="data"></div>
 
 <!-- Create Worker Modal -->
-<div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="true" aria-hidden="true">
+<div id="createWorkerModal" class="modal" role="dialog" aria-labelledby="createWorkerModalTitle" aria-modal="false" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
       <h3 id="createWorkerModalTitle" data-i18n="workers.modalTitle">Create Worker</h3>
@@ -4600,10 +4630,10 @@ async fn libs_page() -> Html<String> {
 <div id="data"></div>
 
 <!-- Install Library Modal -->
-<div id="installLibraryModal" class="modal">
+<div id="installLibraryModal" class="modal" role="dialog" aria-labelledby="installLibraryModalTitle" aria-modal="false" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 data-i18n="libs.modalTitle">Install Library</h3>
+      <h3 id="installLibraryModalTitle" data-i18n="libs.modalTitle">Install Library</h3>
       <button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal('installLibraryModal')">&times;</button>
     </div>
     <form id="installLibraryForm" onsubmit="handleInstallLibrary(event)">
@@ -4738,7 +4768,7 @@ async fn vm_page() -> Html<String> {
 <div id="data"></div>
 
 <!-- Create VM Modal -->
-<div id="createVmModal" class="modal" role="dialog" aria-labelledby="createVmModalTitle" aria-modal="true" aria-hidden="true">
+<div id="createVmModal" class="modal" role="dialog" aria-labelledby="createVmModalTitle" aria-modal="false" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
       <h3 id="createVmModalTitle" data-i18n="vm.modalTitle">Create VM Instance</h3>
@@ -5093,7 +5123,7 @@ async fn raid_page() -> Html<String> {
 </div>
 
 <!-- Create Artifact Modal -->
-<div id="createArtifactModal" class="modal" role="dialog" aria-labelledby="createArtifactModalTitle" aria-modal="true" aria-hidden="true">
+<div id="createArtifactModal" class="modal" role="dialog" aria-labelledby="createArtifactModalTitle" aria-modal="false" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
       <h3 id="createArtifactModalTitle" data-i18n="raid.modalTitle">Create Artifact</h3>
@@ -5118,6 +5148,50 @@ async fn raid_page() -> Html<String> {
 "#,
         &format!("{}\n{}", common_js(), raid_js),
     )
+}
+
+#[test]
+fn dashboard_shared_js_modal_a11y_helpers() {
+    let src = include_str!("mod.rs");
+    assert!(src.contains("function keepFocusInModal"));
+    assert!(src.contains("function attachDashModalA11y"));
+    assert!(src.contains("function handleDashModalEscape"));
+}
+
+#[cfg(test)]
+mod dashboard_a11y_tests {
+    use super::{libs_page, raid_page, vm_page, workers_page};
+
+    #[tokio::test]
+    async fn dashboard_workers_modal_closed_aria_state() {
+        let html = workers_page().await.0;
+        assert!(html.contains("id=\"createWorkerModal\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+        assert!(!html.contains("aria-modal=\"true\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn dashboard_libs_modal_closed_aria_state() {
+        let html = libs_page().await.0;
+        assert!(html.contains("id=\"installLibraryModal\""));
+        assert!(html.contains("role=\"dialog\""));
+        assert!(html.contains("id=\"installLibraryModalTitle\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn dashboard_vm_modal_closed_aria_state() {
+        let html = vm_page().await.0;
+        assert!(html.contains("id=\"createVmModal\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn dashboard_raid_modal_closed_aria_state() {
+        let html = raid_page().await.0;
+        assert!(html.contains("id=\"createArtifactModal\""));
+        assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
 }
 
 pub async fn initialize() -> Result<(), AppError> {
