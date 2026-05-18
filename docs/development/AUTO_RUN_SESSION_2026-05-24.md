@@ -12,6 +12,7 @@
 - [x] `POST /virtual-nodes/{id}/pool/join` + worker auto-join (push `864bd63`)
 - [x] `raid_artifact_probe` bootstrap + PutArtifact wire on coordinator (push `4419502`)
 - [x] `verify-dev-stand.*` — discovery + pool join + >=4 bootstrap tasks
-- [ ] push verify increment; close FM-016+++ → FM-003 §4 gated
+- [x] verify-dev-stand e2e (push `a899ad5`)
+- [x] FM-016+++ закрито; наступний — [`AUTO_RUN_SESSION_2026-05-25.md`](./AUTO_RUN_SESSION_2026-05-25.md)
 
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010. Real LAN §4 — gated (два хости).
