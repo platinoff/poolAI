@@ -7,7 +7,7 @@
 **Критерії:**
 - [x] Runbook: автотести + ручна клавіатура + опційно pa11y
 - [x] `FUNCTION_MANAGEMENT`: FM-019 → Baseline Implemented
-- [x] `ui::admin` 8 tests; push після commit
+- [x] `ui::admin` 8 tests + push — `31266be9`
 
 **BLOCKED:** FM-003 §4 LAN.
 
