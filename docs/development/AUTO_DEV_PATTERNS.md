@@ -270,6 +270,11 @@
 - **Перевірка:** `cargo test --test virtual_node_telegram_binding_integration`
 - **FM:** FM-016+ ✅
 
+### [Docs] OpenAPI virtual-nodes surface
+- **Де:** `docs/openapi.yaml` — tags `Discovery`, `VirtualNodes`
+- **Патерн:** sync з `src/network/api/virtual_nodes.rs`, `discovery.rs` register-remote / heartbeat / list
+- **Перевірка:** ручна звірка маршрутів; `rg virtual-nodes docs/openapi.yaml`
+
 ### [FM-012] Telegram webhook payload guard
 - **Де:** `src/network/api/virtual_nodes.rs` (`TELEGRAM_WEBHOOK_MAX_TEXT`, `webhook_secret_ok`)
 - **Патерн:** optional `POOLAI_TELEGRAM_WEBHOOK_SECRET` → header `X-Telegram-Webhook-Secret`; truncate `message.text` before enqueue

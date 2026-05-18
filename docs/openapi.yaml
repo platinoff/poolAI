@@ -53,6 +53,10 @@ tags:
     description: Distributed storage management
   - name: WebSocket
     description: Real-time WebSocket endpoints
+  - name: Discovery
+    description: Peer discovery and virtual-node registration (FM-016)
+  - name: VirtualNodes
+    description: Virtual-node workers, tasks, pool join, Telegram bridge (FM-016+)
 
 paths:
   /status:
@@ -195,6 +199,223 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkerInfo'
+
+  /discovery/register-remote:
+    post:
+      tags:
+        - Discovery
+      summary: Register a remote virtual node
+      description: HTTP registration for device workers (`metadata.role` = `virtual_node`). Queues bootstrap tasks.
+      operationId: registerRemotePeer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRemotePeerRequest'
+      responses:
+        '200':
+          description: Peer registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterRemotePeerResponse'
+        '400':
+          description: Invalid request
+
+  /discovery/heartbeat-remote:
+    post:
+      tags:
+        - Discovery
+      summary: Heartbeat from a remote peer
+      operationId: heartbeatRemotePeer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartbeatRemotePeerRequest'
+      responses:
+        '200':
+          description: Heartbeat accepted
+
+  /discovery/virtual-nodes:
+    get:
+      tags:
+        - Discovery
+      summary: List registered virtual nodes
+      operationId: listVirtualNodes
+      responses:
+        '200':
+          description: Virtual node list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualNodesListResponse'
+
+  /virtual-nodes/{peer_id}/tasks/poll:
+    get:
+      tags:
+        - VirtualNodes
+      summary: Poll next task for a virtual node
+      operationId: pollVirtualNodeTask
+      parameters:
+        - $ref: '#/components/parameters/PeerId'
+      responses:
+        '200':
+          description: Poll result (task may be null)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollVirtualNodeTasksResponse'
+
+  /virtual-nodes/{peer_id}/tasks/status:
+    get:
+      tags:
+        - VirtualNodes
+      summary: Task queue status for a peer
+      operationId: virtualNodeTaskStatus
+      parameters:
+        - $ref: '#/components/parameters/PeerId'
+      responses:
+        '200':
+          description: Pending and completed counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualNodeTaskStatusResponse'
+
+  /virtual-nodes/{peer_id}/tasks:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Enqueue a task for a virtual node
+      operationId: enqueueVirtualNodeTask
+      parameters:
+        - $ref: '#/components/parameters/PeerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnqueueVirtualNodeTaskRequest'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnqueueVirtualNodeTaskResponse'
+
+  /virtual-nodes/{peer_id}/tasks/{task_id}/complete:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Report task completion
+      operationId: completeVirtualNodeTask
+      parameters:
+        - $ref: '#/components/parameters/PeerId'
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteVirtualNodeTaskRequest'
+      responses:
+        '200':
+          description: Completion recorded
+
+  /virtual-nodes/{peer_id}/pool/join:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Join coordinator worker pool
+      description: Requires peer registered as virtual_node in discovery. No JWT.
+      operationId: virtualNodePoolJoin
+      parameters:
+        - $ref: '#/components/parameters/PeerId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VirtualNodePoolJoinRequest'
+      responses:
+        '201':
+          description: Joined pool
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualNodePoolJoinResponse'
+        '403':
+          description: Peer is not a virtual node
+        '404':
+          description: Peer not found
+        '503':
+          description: Pool not initialized
+
+  /virtual-nodes/telegram/bind:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Bind Telegram user to virtual node peer
+      operationId: bindTelegramVirtualNode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindTelegramVirtualNodeRequest'
+      responses:
+        '200':
+          description: Binding created
+
+  /virtual-nodes/telegram/bindings/{telegram_user_id}:
+    get:
+      tags:
+        - VirtualNodes
+      summary: Lookup Telegram binding
+      operationId: getTelegramVirtualNodeBinding
+      parameters:
+        - name: telegram_user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Binding found
+        '404':
+          description: No binding
+
+  /virtual-nodes/telegram/webhook:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Telegram bot webhook (enqueue task)
+      description: Optional header `X-Telegram-Webhook-Secret` when `POOLAI_TELEGRAM_WEBHOOK_SECRET` is set. Message text capped at 4096 chars.
+      operationId: telegramVirtualNodeWebhook
+      parameters:
+        - name: X-Telegram-Webhook-Secret
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramWebhookUpdate'
+      responses:
+        '200':
+          description: Update processed
+        '401':
+          description: Invalid webhook secret
 
   /gpu:
     get:
@@ -980,6 +1201,15 @@ components:
       bearerFormat: JWT
       description: JWT token obtained from /login endpoint
 
+  parameters:
+    PeerId:
+      name: peer_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Virtual node / worker peer identifier
+
   schemas:
     StatusResponse:
       type: object
@@ -1239,6 +1469,169 @@ components:
         removed_count:
           type: integer
           example: 42
+
+    RegisterRemotePeerRequest:
+      type: object
+      required:
+        - peer_id
+        - address
+        - port
+      properties:
+        peer_id:
+          type: string
+        address:
+          type: string
+        port:
+          type: integer
+        capabilities:
+          type: object
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Include `role=virtual_node` for device workers
+
+    RegisterRemotePeerResponse:
+      type: object
+      properties:
+        peer_id:
+          type: string
+        registered:
+          type: boolean
+
+    HeartbeatRemotePeerRequest:
+      type: object
+      required:
+        - peer_id
+      properties:
+        peer_id:
+          type: string
+        capabilities:
+          type: object
+
+    VirtualNodesListResponse:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+        stale_threshold_secs:
+          type: integer
+
+    VirtualNodeTask:
+      type: object
+      properties:
+        id:
+          type: string
+        task_type:
+          type: string
+          example: ping
+        payload:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    PollVirtualNodeTasksResponse:
+      type: object
+      properties:
+        task:
+          $ref: '#/components/schemas/VirtualNodeTask'
+          nullable: true
+        pending:
+          type: integer
+
+    VirtualNodeTaskStatusResponse:
+      type: object
+      properties:
+        peer_id:
+          type: string
+        pending:
+          type: integer
+        completed:
+          type: integer
+
+    EnqueueVirtualNodeTaskRequest:
+      type: object
+      required:
+        - task_type
+      properties:
+        task_type:
+          type: string
+        payload:
+          type: object
+
+    EnqueueVirtualNodeTaskResponse:
+      type: object
+      properties:
+        task:
+          $ref: '#/components/schemas/VirtualNodeTask'
+
+    CompleteVirtualNodeTaskRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+        detail:
+          type: string
+          nullable: true
+
+    VirtualNodePoolJoinRequest:
+      type: object
+      properties:
+        max_memory_mb:
+          type: integer
+        max_concurrent_requests:
+          type: integer
+
+    VirtualNodePoolJoinResponse:
+      type: object
+      properties:
+        peer_id:
+          type: string
+        joined:
+          type: boolean
+        message:
+          type: string
+
+    BindTelegramVirtualNodeRequest:
+      type: object
+      required:
+        - telegram_user_id
+        - peer_id
+      properties:
+        telegram_user_id:
+          type: string
+        peer_id:
+          type: string
+        chat_id:
+          type: string
+          nullable: true
+
+    TelegramWebhookUpdate:
+      type: object
+      properties:
+        update_id:
+          type: integer
+        message:
+          type: object
+          properties:
+            from:
+              type: object
+              properties:
+                id:
+                  type: integer
+            chat:
+              type: object
+              properties:
+                id:
+                  type: integer
+            text:
+              type: string
+              maxLength: 4096
 
     ErrorResponse:
       type: object

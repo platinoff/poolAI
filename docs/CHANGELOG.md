@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **OpenAPI** — Discovery + VirtualNodes paths (`register-remote`, tasks, pool/join, Telegram webhook).
 - **FM-012 webhook hardening** — Telegram webhook text capped at 4096 chars; tests for secret header and truncation.
 - **FM-016+++** — `POOLAI_WORKER_CACHE_DIR`, `POST .../pool/join`, `raid_artifact_probe`, extended `verify-dev-stand`.
 - **FM-003 dev stand** — `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`; `core::dev_stand::resolve_http_port`; LAN runbook §5.1 (coordinator + worker).
