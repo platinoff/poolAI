@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-019 (baseline, 2026-06-07)** — `ADMIN_A11Y_RUNBOOK.md`; FM-019 → Baseline Implemented in FUNCTION_MANAGEMENT §5.4; UI_IMPROVEMENTS_PLAN synced.
 - **FM-019 (partial, 2026-06-06)** — ARIA tablist on security/config; `adminSyncTabA11y`, `adminEnhanceTablesA11y`, `adminObserveDynamicA11y`.
 - **FM-019 (partial, 2026-06-05)** — `adminEnhanceFormA11y`; users create form `aria-required`/`autocomplete`; instances label `for`; security required asterisk `aria-hidden`.
 - **FM-019 (partial, 2026-06-03)** — admin modal a11y in `admin_common.js`: focus trap, `keepFocusInModal`, Esc, dynamic `adminDynamicModal`; closed-state `aria-modal="false"` on users/security modals; tests `ui::admin::*`.

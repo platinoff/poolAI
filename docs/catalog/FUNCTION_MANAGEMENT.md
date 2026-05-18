@@ -111,7 +111,7 @@ FM-xxx (з таблиці нижче)
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
 | FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Implemented | `discovery.rs`; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
 | FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
-| FM-019 | UI / a11y | Повний WCAG: modals audit (admin users/security ✅ focus trap), forms, pa11y; dashboard `dashMarkCurrentNav` | Partial | `src/ui/admin_common.js`, `admin/users.rs`, `admin/security.rs` |
+| FM-019 | UI / a11y | **Baseline:** admin modals/forms/tabs, dashboard nav, runbook; повний WCAG/pa11y CI — backlog | Baseline Implemented | [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md), §5.4 |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -122,7 +122,7 @@ FM-xxx (з таблиці нижче)
 | 1 | HTTP errors (worker-safe) | **FM-017** | ✅ discovery JSON errors; virtual-nodes status-only задокументовано; за потреби dual format пізніше |
 | 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
 | 3 | ML ops | **DIGEST §ML** ✅ | Runbook метрик у `PIPELINE_MANAGEMENT.md`; turboquant + standard quant tests |
-| 4 | UI accessibility | **FM-019** | Базовий slice ✅ (FM-018); повний WCAG — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
+| 4 | UI accessibility | **FM-019** | **Baseline ✅** (2026-06-07): runbook + §5.4; повний WCAG/pa11y CI — backlog |
 | 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` (`TODO` у `azure.rs`/`gcp.rs`) |
 | 6 | Концепт | **FM-009**, **FM-010** | Grid envelope; Solana — поза автопрогоном |
 
@@ -142,8 +142,8 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | NEXT_STEPS P2b |
 | FM-006 | cloud-sdk гілки | **Deferred** | не блокує CI |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | Повний WCAG / modals / forms | **Partial** | modals/forms/tabs ✅; pa11y runbook — опційно |
-| `UI_IMPROVEMENTS_PLAN` | Чеклист a11y (не оновлений) | **Partial** | багато `[ ]` — див. FM-019 baseline у §5.4 |
+| FM-019 | Повний WCAG / pa11y CI | **Baseline Implemented** | код + [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md); CI pa11y — backlog |
+| `UI_IMPROVEMENTS_PLAN` | Чеклист a11y (історичний) | **Baseline / stale `[ ]`** | канон — §5.4 + runbook, не дублювати спринти |
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки admin/auth | **Planned** | не канон; окремий спринт |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | застарілий зріз v0.1; канон — STABLE + DIGEST |
 | README / Architect §операційний | Next Focus / порядок FM | **Synced** | 2026-06-02 |
@@ -152,7 +152,9 @@ FM-xxx (з таблиці нижче)
 | P4 | Новий `poolai_health_load` на ref-host | **Planned (ops)** | baseline **2026-04-10** чинний |
 | `docs/archive/*` | Плоскі legacy `.md` | **Archive** | не канон — [`STRUCTURE.md`](../STRUCTURE.md) |
 
-### 5.4 FM-019 baseline (вже в коді, 2026-06-02)
+### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
+
+**Верифікація:** [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md) — `cargo test-ci`, `ui::admin` tests, ручна клавіатура, опційно `pa11y`.
 
 | Можливість | Де |
 |------------|-----|
@@ -169,7 +171,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-06.md`](../development/AUTO_RUN_SESSION_2026-06-06.md) — FM-019 semantic tabs + tables.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-07.md`](../development/AUTO_RUN_SESSION_2026-06-07.md) — FM-019 baseline closure + runbook.
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-06.md`](../development/AUTO_RUN_SESSION_2026-06-06.md) (semantic tabs + tables).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) (§5.3 audit + FM-019 nav).
 

@@ -310,6 +310,12 @@
 - **Перевірка:** `cargo test --test ml_pipeline_integration --features ml test_pipeline_turboquant_quantization_step test_pipeline_standard_quantization_metrics`
 - **FM:** DIGEST §ML ✅
 
+### [FM-019] Baseline verification runbook
+- **Де:** `docs/development/ADMIN_A11Y_RUNBOOK.md`
+- **Сигнал:** `rg "cargo test-ci" docs/development/ADMIN_A11Y_RUNBOOK.md`
+- **Патерн:** після змін `src/ui/` — `cargo test-ci` + `cargo test -p poolai --features enterprise ui::admin --lib`; ручна клавіатура admin; опційно `npx pa11y` на users/security
+- **FM:** FM-019 Baseline Implemented
+
 ### [FM-019] Admin tablist + dynamic tables (semantic)
 - **Де:** `src/ui/admin/security.rs`, `config.rs` (static `role="tablist"`); `admin_common.js` (`adminSyncTabA11y`, `adminEnhanceTablesA11y`, `adminObserveDynamicA11y`)
 - **Сигнал:** `rg 'role="tablist"' src/ui/admin/security.rs`
