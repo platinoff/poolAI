@@ -298,15 +298,9 @@ async fn poll_and_run_tasks(client: &reqwest::Client, rt: &WorkerRuntime) {
     let task_type = task.task_type.clone();
     info!("Running task {} ({})", task_id, task_type);
     let (status, _ok) = execute_task(client, rt, task).await;
-    if complete_task(
-        client,
-        &rt.args,
-        &task_id,
-        &status,
-        Some(task_type.clone()),
-    )
-    .await
-    .is_ok()
+    if complete_task(client, &rt.args, &task_id, &status, Some(task_type.clone()))
+        .await
+        .is_ok()
     {
         rt.tasks_completed.fetch_add(1, Ordering::Relaxed);
         *rt.last_task.write().await = Some(format!("{task_type}:{status}"));
