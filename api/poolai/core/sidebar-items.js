@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_system_config","health_check","initialize","initialize_with_config","shutdown","update_system_config"],"mod":["config","discovery_handle","discovery_types","error","model_interface","state","user_manager","ws_manager"]};
+window.SIDEBAR_ITEMS = {"fn":["get_system_config","health_check","initialize","initialize_with_config","shutdown","update_system_config"],"mod":["config","dev_stand","discovery_handle","discovery_types","error","model_interface","state","user_manager","ws_manager"]};
