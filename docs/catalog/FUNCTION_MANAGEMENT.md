@@ -128,7 +128,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Telegram webhook hardening | **FM-012** | secret header, text cap 4096; OAuth allowlist — далі за політикою |
+| 1 | Ops / Architect | **—** | thin-layer, STABLE_STATE sync; FM-012 OAuth/webhook ✅ |
 | 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 хостів; dev stand §5.1 достатній |
 | 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
 | 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
@@ -137,9 +137,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md) (FM-016+++ cache; FM-003 §4 BLOCKED).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-05-27.md`](../development/AUTO_RUN_SESSION_2026-05-27.md) (FM-012 OAuth / Architect).
+**Поточний:** [`AUTO_RUN_SESSION_2026-05-28.md`](../development/AUTO_RUN_SESSION_2026-05-28.md).
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-05-26.md`](../development/AUTO_RUN_SESSION_2026-05-26.md) (webhook + OpenAPI).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-27.md`](../development/AUTO_RUN_SESSION_2026-05-27.md) (FM-012 OAuth hardening).
 
 **Попередні:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md), [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md).
 
