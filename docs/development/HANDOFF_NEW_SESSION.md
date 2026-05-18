@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-07 (FM-019 baseline + ADMIN_A11Y_RUNBOOK).
+**Оновлено:** 2026-06-07 (менеджер функціоналу §5.3; підготовка [`AUTO_RUN_SESSION_2026-06-08.md`](./AUTO_RUN_SESSION_2026-06-08.md)).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-07.md`](./AUTO_RUN_SESSION_2026-06-07.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-08.md`](./AUTO_RUN_SESSION_2026-06-08.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** **FM-019** baseline ✅; наступний фокус — FM-004/006 deferred, FM-003 §4 BLOCKED, FM-009/010 concept. **FM-003 §4** BLOCKED. **FM-017/018**, **DIGEST §ML** ✅. Повний backlog «не зроблено» — FM **§5.3–5.4**.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** **P4** `poolai_health_load` (ops) **або** FM-003 runbook (BLOCKED); FM-019 backlog (pa11y CI / dashboard modals). **Не в автопрогоні:** FM-004/006/009/010. Звірка «не зроблено» — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -79,20 +79,22 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 4. Наступні кроки (канон: FM-* + Architect)
 
-**Єдине зведення порядку робіт** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця FM-003 → FM-012 та далі). Коротко:
+**Єдине зведення** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** та аудит **§5.3**.
 
-1. **Telegram workers → virtual nodes** (майбутній **FM-016**) — воркери на пристроях з discovery/pool/RAID; потім FM-003 реальний LAN.
-2. **Відкладено** — **FM-003 (real LAN)**, **cloud-sdk** (FM-006), SIMD TurboQuant (FM-004).
-3. **Концепт** — Grid envelope (FM-009), Solana (FM-010).
+| Пріоритет | Що | Стан |
+|-----------|-----|------|
+| 1 | **P4** — `poolai_health_load` на ref-host → `BENCHMARKS.md` | Planned (ops) |
+| 2 | **FM-003 §4** — реальний LAN sign-off | **BLOCKED** (2 хости) |
+| 3 | **FM-019 backlog** — pa11y CI, dashboard modals | після baseline ✅ |
+| — | FM-004/006 | Deferred, поза автопрогоном |
+| — | FM-009/010 | Concept-only |
 
-**FM-005** ✅ (узгоджений JSON) — закрито; див. таблицю **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
-
-Деталі, чекбокси Architect і верифікації — [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md). Індекс тікетів — таблиця **FM-*** у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
+**Закрито:** FM-001–019 baseline; FM-005/007/008/011/012–018 ✅. Деталі — §5.3 у FUNCTION_MANAGEMENT.
 
 ## 5. Автономний режим (наступна сесія → git push)
 
-1. Відкрити [`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md) і вставити **стартовий промпт** з §2.
-2. Агент працює як **оркестратор** (`autonomous-orchestrator.mdc`): **P0** збір патернів (subagent `explore`) → **S1–S4**; після коду — `cargo fmt` + `cargo test-ci`.
-3. **Ціль:** `AUTO_DEV_PATTERNS.md` (≥15 записів з `path:line`); FM-003 LAN або runbook; Architect `- [ ]`; оновити HANDOFF / FUNCTION_MANAGEMENT §5.1.
-4. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
-5. **Push:** MSYS2 bash, [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md), **Summary** (шаблон AUTO_RUN 2026-05-17 §8).
+1. Старт: [`AUTO_RUN_SESSION_2026-06-08.md`](./AUTO_RUN_SESSION_2026-06-08.md) — промпт у файлі.
+2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після коду — `cargo fmt` + `cargo test-ci`.
+3. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
+4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); `git -c commit.template= commit -F msgfile`.
+5. Не стаджити `data/audit/*.log.gz`.

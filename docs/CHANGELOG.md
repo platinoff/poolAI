@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Docs
+- **Functionality manager (2026-06-07)** — `FUNCTION_MANAGEMENT` §5.3 audit (зроблено/не зроблено); §5.1 next P4/FM-003; `AUTO_RUN_SESSION_2026-06-08`; HANDOFF/STABLE/README synced.
+
 ### Added
 - **FM-019 (baseline, 2026-06-07)** — `ADMIN_A11Y_RUNBOOK.md`; FM-019 → Baseline Implemented in FUNCTION_MANAGEMENT §5.4; UI_IMPROVEMENTS_PLAN synced.
 - **FM-019 (partial, 2026-06-06)** — ARIA tablist on security/config; `adminSyncTabA11y`, `adminEnhanceTablesA11y`, `adminObserveDynamicA11y`.

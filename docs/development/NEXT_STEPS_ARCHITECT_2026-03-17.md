@@ -38,12 +38,15 @@
 
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
-1. **FM-019** — повний WCAG / UI audit — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md); базовий a11y slice ✅ (FM-018).
+1. **P4 (ops)** — `poolai_health_load` на ref-host → [`BENCHMARKS.md`](../performance/BENCHMARKS.md) (baseline **2026-04-10** чинний).
 2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; ops **2026-06-01**; чекбокс P2b нижче ≈ цей пункт.
-3. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-4. **Концепт** — **FM-009**, **FM-010**.
+3. **FM-019 backlog** — pa11y/axe CI, dashboard modals — [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md); **baseline Implemented** ✅ (2026-06-07).
+4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+5. **Концепт** — **FM-009**, **FM-010**.
 
-**Закрито:** **FM-017/018** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
+**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3** (2026-06-07).
+
+**Закрито:** **FM-017/018/019 baseline** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
 
 Деталі тікетів і шаблон Issue — таблиця **FM-*** у тому ж файлі; операційний зріз сесії — [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4.
 

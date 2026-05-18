@@ -57,12 +57,12 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
 
-1. **FM-019** — **baseline Implemented** ✅ ([`ADMIN_A11Y_RUNBOOK.md`](docs/development/ADMIN_A11Y_RUNBOOK.md), [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) §5.4); повний WCAG/pa11y CI — backlog.
-2. **FM-003 §4** — реальний LAN sign-off (**BLOCKED** без 2 хостів); dev stand §5.1 + `verify-dev-stand` ✅; ops зріз **2026-06-01** → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
-3. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-4. **Концепт** — **FM-009** (Grid), **FM-010** (Solana).
+1. **P4 (ops)** — новий рядок `poolai_health_load` у [`BENCHMARKS.md`](docs/performance/BENCHMARKS.md) на ref-host (baseline **2026-04-10** чинний).
+2. **FM-003 §4** — реальний LAN (**BLOCKED**, 2 хости); dev stand §5.1 + `verify-dev-stand` ✅.
+3. **FM-019** — **baseline Implemented** ✅ ([`ADMIN_A11Y_RUNBOOK.md`](docs/development/ADMIN_A11Y_RUNBOOK.md)); backlog: pa11y CI, dashboard modals.
+4. **Відкладено** — **FM-004**, **FM-006**; **концепт** — **FM-009**, **FM-010**.
 
-**Закрито:** **FM-017/018** ✅; **DIGEST §ML** runbook ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅ virtual nodes + admin contracts.
+**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3** (2026-06-07).
 
 **Контекст за пріоритетами Architect (P\*)**
 

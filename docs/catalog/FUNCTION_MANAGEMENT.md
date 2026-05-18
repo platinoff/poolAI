@@ -1,10 +1,12 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-18 (звірка менеджера функціоналу — §5.3).
+**Оновлено:** 2026-06-07 (менеджер функціоналу — повний §5.3 audit, підготовка сесії 2026-06-08).
 
-**Звірка з комітами (лют–трав 2026):** P1–P3, P2b, FM-002/005/007/008/011/012/013/014/015/016 ✅; **Planned (ops)** — FM-003 §4 LAN sign-off (**BLOCKED**, 2 хости); **Partial** — FM-005 (worker/discovery API), ML hardening; **Deferred** — FM-004/006; **Concept** — FM-009/010.
+**Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
-**Останній зріз:** FM-016+++ ✅ (`raid_artifact_probe`, pool join, verify-dev-stand). FM-012 OAuth hardening ✅ (2026-05-27). FM-003 dev stand §5.1 ✅; §4 — runbook, без двох хостів. **`cargo test-ci`** — 2026-05-28.
+**Не зроблено / backlog:** FM-003 §4 LAN (**BLOCKED**); P4 новий `poolai_health_load` row; FM-019 повний WCAG/pa11y CI; FM-004/006 **Deferred**; FM-009/010 **Concept-only**.
+
+**Останній `cargo test-ci`:** 2026-06-07 (FM-019 спринти); clippy — CI на `main`.
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -119,38 +121,55 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | HTTP errors (worker-safe) | **FM-017** | ✅ discovery JSON errors; virtual-nodes status-only задокументовано; за потреби dual format пізніше |
-| 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
-| 3 | ML ops | **DIGEST §ML** ✅ | Runbook метрик у `PIPELINE_MANAGEMENT.md`; turboquant + standard quant tests |
-| 4 | UI accessibility | **FM-019** | **Baseline ✅** (2026-06-07): runbook + §5.4; повний WCAG/pa11y CI — backlog |
-| 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` (`TODO` у `azure.rs`/`gcp.rs`) |
-| 6 | Концепт | **FM-009**, **FM-010** | Grid envelope; Solana — поза автопрогоном |
+| 1 | Ops / benchmarks | **P4** | Новий рядок `poolai_health_load` у `BENCHMARKS.md` на ref-host (baseline **2026-04-10** чинний без змін) |
+| 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
+| 3 | UI a11y backlog | **FM-019** | Baseline ✅; backlog: pa11y/axe CI, dashboard modals audit — [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md) §5 |
+| 4 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
+| 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
+| 6 | Концепт | **FM-009**, **FM-010** | Grid / Solana — поза автопрогоном |
 
-**Закрито (не в черзі):** FM-001–016 (крім FM-003 §4), FM-005 для admin REST / enterprise / raid / auth.
+**Закрито (не в черзі):** FM-001–018; FM-019 baseline; FM-005 admin/enterprise/raid/auth JSON.
 
 **Якість збірки:** **`cargo test-ci`** + `cargo fmt` — зріз 2026-05-28; clippy — CI (`ci.yml`).
 
 **Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри (≈ FM-003 §4, BLOCKED); cloud-sdk (FM-006, Deferred).
 
-### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-06-02)
+### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-06-07)
+
+#### Зроблено в автопрогоні (червень 2026) — не повторювати
+
+| Спринт | Результат | Коміти (орієнтир) |
+|--------|-----------|-------------------|
+| FM-019 modals | focus trap, `aria-modal`, `adminDynamicModal` | `02ea146`, `7d500db0` |
+| FM-019 forms | `adminEnhanceFormA11y`, users/instances | `cf431a79` |
+| FM-019 tabs/tables | tablist ARIA, `adminObserveDynamicA11y` | `d04088e8` |
+| FM-019 baseline docs | `ADMIN_A11Y_RUNBOOK.md`, §5.4 | `31266be9` |
+
+#### Не зроблено (канон backlog)
 
 | Джерело | Пункт | Стан | Примітка |
 |---------|--------|------|----------|
-| Architect L124 | LAN replication + TQ01 на стенді | **BLOCKED** | FM-003 §4; 2 фізичні хости; wire harness ✅ |
-| Architect L185 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006; `TODO` у `azure.rs`/`gcp.rs` |
+| Architect L123 | LAN replication + TQ01 на стенді | **BLOCKED** | FM-003 §4; 2 фізичні хости; wire harness ✅ |
+| Architect L183 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006; `TODO` у `azure.rs`/`gcp.rs` |
 | FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops **2026-06-01** |
-| FM-004 | SIMD TurboQuant | **Deferred** | NEXT_STEPS P2b |
-| FM-006 | cloud-sdk гілки | **Deferred** | не блокує CI |
+| FM-004 | SIMD TurboQuant | **Deferred** | поза автопрогоном |
+| FM-006 | cloud-sdk гілки | **Deferred** | поза автопрогоном |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | Повний WCAG / pa11y CI | **Baseline Implemented** | код + [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md); CI pa11y — backlog |
-| `UI_IMPROVEMENTS_PLAN` | Чеклист a11y (історичний) | **Baseline / stale `[ ]`** | канон — §5.4 + runbook, не дублювати спринти |
-| `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки admin/auth | **Planned** | не канон; окремий спринт |
-| `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | застарілий зріз v0.1; канон — STABLE + DIGEST |
-| README / Architect §операційний | Next Focus / порядок FM | **Synced** | 2026-06-02 |
-| DIGEST §ML | Pipeline metrics runbook | **Implemented** | `PIPELINE_MANAGEMENT.md` |
-| OpenAPI | VirtualNodes / Discovery paths | **Implemented** | 2026-05; звірка при нових маршрутах |
-| P4 | Новий `poolai_health_load` на ref-host | **Planned (ops)** | baseline **2026-04-10** чинний |
-| `docs/archive/*` | Плоскі legacy `.md` | **Archive** | не канон — [`STRUCTURE.md`](../STRUCTURE.md) |
+| FM-019 | pa11y/axe у CI; dashboard modals повний audit | **Backlog** | baseline ✅ — runbook §5 |
+| FM-019 | Повний WCAG 2.2 AA автомат | **Backlog** | не блокує реліз baseline |
+| P4 | Новий `poolai_health_load` → `BENCHMARKS.md` | **Planned (ops)** | baseline **2026-04-10** без змін |
+| `UI_IMPROVEMENTS_PLAN` | Історичні `[ ]` | **Stale** | канон §5.4 + runbook |
+| `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Stale / не канон** | FM-019 baseline покрив admin modals |
+| `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | канон STABLE + DIGEST |
+| `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
+| OpenAPI | Синхронізація при нових маршрутах | **Ongoing** | звіряти при API diff |
+| `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
+
+#### Рекомендований наступний спринт (2026-06-08)
+
+1. **P4 (ops)** — якщо є ref-host: `poolai_health_load --json` → changelog `BENCHMARKS.md`.
+2. **Інакше docs-only / BLOCKED runbook** — оновити FM-003 §6 без нових LAN-рядків.
+3. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
@@ -171,7 +190,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-07.md`](../development/AUTO_RUN_SESSION_2026-06-07.md) — FM-019 baseline closure + runbook.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-08.md`](../development/AUTO_RUN_SESSION_2026-06-08.md) — менеджер функціоналу + наступний спринт (P4 / BLOCKED).
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-07.md`](../development/AUTO_RUN_SESSION_2026-06-07.md) (FM-019 baseline + runbook).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-06.md`](../development/AUTO_RUN_SESSION_2026-06-06.md) (semantic tabs + tables).
 
