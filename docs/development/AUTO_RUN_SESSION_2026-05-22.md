@@ -11,7 +11,14 @@
 - [x] `VirtualNodeTelegramBindingService`; auto-bind з `metadata.telegram_id` при register-remote
 - [x] `POOLAI_VIRTUAL_NODE_DATA_DIR`, `POOLAI_TELEGRAM_WEBHOOK_SECRET`, worker `POOLAI_TELEGRAM_ID`
 - [x] `tests/virtual_node_telegram_binding_integration.rs` (2 tests)
-- [ ] `cargo test-ci` + push MSYS2 з Summary
+- [x] `cargo test-ci` + push MSYS2 з Summary (`de8eb415`)
+
+## FM-016++ (2026-05-18, та сама гілка)
+
+- [x] `src/tgbot/coordinator.rs` — bridge до webhook
+- [x] Feature `tgbot` + `poolai-telegram-bot` (teloxide)
+- [x] `tests/tgbot_coordinator_bridge_integration.rs`
+- [x] `cargo test-ci` зелений
 
 **Стартовий промпт (оркестратор):**
 

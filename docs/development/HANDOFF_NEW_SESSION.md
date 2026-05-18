@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (FM-016+ Telegram binding + file store).
+**Оновлено:** 2026-05-18 (FM-016++ teloxide bot bridge).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-22.md`](./AUTO_RUN_SESSION_2026-05-22.md) — **FM-016+** in progress (binding ✅; push pending).
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-23.md`](./AUTO_RUN_SESSION_2026-05-23.md) — **FM-003** / ops (після workers).
 
 **FM-003 (реальний LAN):** відкладено до **Telegram-воркерів** на пристроях (pool + RAID wire). Dev stand: `bin/run-lan-nodes.*`.
 
-**FM-016 ✅ (core):** register/heartbeat, virtual-nodes, task poll/complete, RAID wire; `poolai-worker`. **FM-016+ ✅:** Telegram bind/webhook API, file store (`POOLAI_VIRTUAL_NODE_DATA_DIR`), worker `POOLAI_TELEGRAM_ID` → bind. **Далі:** teloxide bot, FM-003 real LAN.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot` (feature `tgbot`), coordinator bridge. **Далі:** FM-003 real LAN.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -41,8 +41,11 @@
 | `POOLAI_TELEGRAM_ID` | worker | Telegram user id → `POST .../telegram/bind` після register |
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |
 | `POOLAI_TELEGRAM_WEBHOOK_SECRET` | coordinator | Опційно: header `X-Telegram-Webhook-Secret` для webhook |
+| `TELEGRAM_BOT_TOKEN` | `poolai-telegram-bot` | Token від @BotFather |
 
-Секрети бота (`TELEGRAM_BOT_TOKEN`) — лише в env на хості, не в репо.
+Збірка бота: `cargo build --bin poolai-telegram-bot --features tgbot`. Запуск: `TELEGRAM_BOT_TOKEN=... POOLAI_COORDINATOR_URL=http://127.0.0.1:8080 poolai-telegram-bot`.
+
+Секрети — лише в env на хості, не в репо.
 
 ## 2. Git push (Windows / Cursor)
 

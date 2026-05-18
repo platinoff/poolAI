@@ -77,6 +77,9 @@ lru = "0.16"
 # Using default features without native-tls to avoid zstd-sys compilation issues
 reqwest = { version = "0.13", features = ["stream", "json"], default-features = false }
 
+# Telegram bot (FM-016++, optional)
+teloxide = { version = "0.13", optional = true, default-features = false, features = ["macros", "ctrlc_handler", "rustls"] }
+
 # Archive extraction
 flate2 = "1.0"
 tar = "0.4"
@@ -163,6 +166,11 @@ criterion = { version = "0.8", features = ["async_tokio"] }
 k8s-openapi = { version = "0.24", features = ["v1_28"] }
 # Mock HTTP server for integration tests
 mockito = "1.4"
+
+[[bin]]
+name = "poolai-telegram-bot"
+path = "src/bin/poolai-telegram-bot.rs"
+required-features = ["tgbot"]
 
 [[bench]]
 name = "runtime_benchmarks"
@@ -278,6 +286,8 @@ vm-isolation = ["vm-isolation-linux"]
 # security = ["jwt", "https"]
 # Attach core managers / rewards engine to AppState in integration tests without full app init (see AppState::attach_*_for_test)
 test-utils = []
+# Telegram bot runtime (teloxide) — `poolai-telegram-bot` binary
+tgbot = ["teloxide"]
 
 # Some Windows MSVC hosts hit `rustc` STATUS_ACCESS_VIOLATION when compiling the full `poolai` lib at
 # `release` opt-level 3 (e.g. `cargo bench` / `cargo build --release`). The `bench` profile keeps

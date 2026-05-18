@@ -247,6 +247,13 @@
 - **Патерн:** env `POOLAI_COORDINATOR_URL` + periodic re-register on heartbeat failure
 - **Перевірка:** `cargo build --bin poolai-worker`; manual: coordinator + worker health `GET /health`
 
+### [Workers] Telegram bot → coordinator webhook
+- **Де:** `src/tgbot/coordinator.rs`, `src/bin/poolai-telegram-bot.rs`
+- **Патерн:** teloxide handler → `forward_message` → `POST /virtual-nodes/telegram/webhook`
+- **Збірка:** `cargo build --bin poolai-telegram-bot --features tgbot`
+- **Перевірка:** `cargo test --test tgbot_coordinator_bridge_integration`
+- **FM:** FM-016++ ✅
+
 ### [Workers] Telegram bind + webhook → task
 - **Де:** `src/network/api/virtual_nodes.rs` (bind/webhook handlers), `src/services/virtual_node_telegram_binding_service.rs`
 - **Патерн:** webhook resolves `telegram_user_id` → `peer_id` → `VirtualNodeTaskService::enqueue`
