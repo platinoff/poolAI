@@ -1,132 +1,83 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/tgbot/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="poolai" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">poolai/tgbot/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Telegram Bot module for PoolAI management
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/tgbot/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="poolai" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">poolai/tgbot/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Telegram Bot module for PoolAI (FM-016++).
 <a href=#2 id=2 data-nosnippet>2</a>//!
-<a href=#3 id=3 data-nosnippet>3</a>//! This module provides Telegram bot integration for system management,
-<a href=#4 id=4 data-nosnippet>4</a>//! command handling, and notifications.
+<a href=#3 id=3 data-nosnippet>3</a>//! - **`coordinator`**: forwards messages to `POST /api/v1/virtual-nodes/telegram/webhook`
+<a href=#4 id=4 data-nosnippet>4</a>//! - **`runtime`** (feature `tgbot`): teloxide long-poll bot (`poolai-telegram-bot` binary)
 <a href=#5 id=5 data-nosnippet>5</a>//!
-<a href=#6 id=6 data-nosnippet>6</a>//! # Features (planned)
+<a href=#6 id=6 data-nosnippet>6</a>//! # Environment
 <a href=#7 id=7 data-nosnippet>7</a>//!
-<a href=#8 id=8 data-nosnippet>8</a>//! - **Command Handling**: `/status`, `/metrics`, `/gpu` commands
-<a href=#9 id=9 data-nosnippet>9</a>//! - **Notification System**: Send notifications to configured chat IDs
-<a href=#10 id=10 data-nosnippet>10</a>//! - **Real-time Updates**: Receive real-time system updates via Telegram
-<a href=#11 id=11 data-nosnippet>11</a>//! - **System Monitoring**: Query system status and metrics via bot commands
-<a href=#12 id=12 data-nosnippet>12</a>//!
-<a href=#13 id=13 data-nosnippet>13</a>//! # Implementation Notes
-<a href=#14 id=14 data-nosnippet>14</a>//!
-<a href=#15 id=15 data-nosnippet>15</a>//! This module will use the `teloxide` crate for Telegram Bot API integration.
-<a href=#16 id=16 data-nosnippet>16</a>//! Future implementation will include:
-<a href=#17 id=17 data-nosnippet>17</a>//! - Bot initialization with token authentication
-<a href=#18 id=18 data-nosnippet>18</a>//! - Command dispatcher for handling bot commands
-<a href=#19 id=19 data-nosnippet>19</a>//! - Webhook or long polling for receiving updates
-<a href=#20 id=20 data-nosnippet>20</a>//! - Message sending for notifications
-<a href=#21 id=21 data-nosnippet>21</a>//! - Integration with PoolAI API for system data
-<a href=#22 id=22 data-nosnippet>22</a>//!
-<a href=#23 id=23 data-nosnippet>23</a>//! # Example (future implementation)
-<a href=#24 id=24 data-nosnippet>24</a>//!
-<a href=#25 id=25 data-nosnippet>25</a>//! ```no_run
-<a href=#26 id=26 data-nosnippet>26</a>//! use poolai::tgbot::start_bot;
-<a href=#27 id=27 data-nosnippet>27</a>//!
-<a href=#28 id=28 data-nosnippet>28</a>//! # async fn example() {
-<a href=#29 id=29 data-nosnippet>29</a>//! // Start bot with token from environment or config
-<a href=#30 id=30 data-nosnippet>30</a>//! let token = std::env::var("TELEGRAM_BOT_TOKEN")
-<a href=#31 id=31 data-nosnippet>31</a>//!     .expect("TELEGRAM_BOT_TOKEN must be set");
-<a href=#32 id=32 data-nosnippet>32</a>//!
-<a href=#33 id=33 data-nosnippet>33</a>//! start_bot(&amp;token).await;
-<a href=#34 id=34 data-nosnippet>34</a>//! // Bot will handle commands:
-<a href=#35 id=35 data-nosnippet>35</a>//! // - /status - Get system status
-<a href=#36 id=36 data-nosnippet>36</a>//! // - /metrics - Get system metrics
-<a href=#37 id=37 data-nosnippet>37</a>//! // - /gpu - Get GPU information
-<a href=#38 id=38 data-nosnippet>38</a>//! # }
-<a href=#39 id=39 data-nosnippet>39</a>//! ```
-<a href=#40 id=40 data-nosnippet>40</a>//!
-<a href=#41 id=41 data-nosnippet>41</a>//! # Notification Example (future)
-<a href=#42 id=42 data-nosnippet>42</a>//!
-<a href=#43 id=43 data-nosnippet>43</a>//! ```no_run
-<a href=#44 id=44 data-nosnippet>44</a>//! use poolai::tgbot::send_notification;
-<a href=#45 id=45 data-nosnippet>45</a>//!
-<a href=#46 id=46 data-nosnippet>46</a>//! # async fn example() {
-<a href=#47 id=47 data-nosnippet>47</a>//! // Send alert notification
-<a href=#48 id=48 data-nosnippet>48</a>//! send_notification(
-<a href=#49 id=49 data-nosnippet>49</a>//!     "123456789", // Chat ID
-<a href=#50 id=50 data-nosnippet>50</a>//!     "⚠️ System Alert: High CPU usage detected (95%)"
-<a href=#51 id=51 data-nosnippet>51</a>//! ).await;
-<a href=#52 id=52 data-nosnippet>52</a>//! # }
-<a href=#53 id=53 data-nosnippet>53</a>//! ```
-<a href=#54 id=54 data-nosnippet>54</a>
-<a href=#55 id=55 data-nosnippet>55</a></span><span class="kw">use </span>tracing;
-<a href=#56 id=56 data-nosnippet>56</a>
-<a href=#57 id=57 data-nosnippet>57</a><span class="doccomment">/// Start the Telegram bot with the provided token
-<a href=#58 id=58 data-nosnippet>58</a>///
-<a href=#59 id=59 data-nosnippet>59</a>/// # Arguments
-<a href=#60 id=60 data-nosnippet>60</a>///
-<a href=#61 id=61 data-nosnippet>61</a>/// * `token` - Telegram Bot API token (obtained from @BotFather)
-<a href=#62 id=62 data-nosnippet>62</a>///
-<a href=#63 id=63 data-nosnippet>63</a>/// # Future Implementation
-<a href=#64 id=64 data-nosnippet>64</a>///
-<a href=#65 id=65 data-nosnippet>65</a>/// This will:
-<a href=#66 id=66 data-nosnippet>66</a>/// 1. Initialize teloxide Bot with the provided token
-<a href=#67 id=67 data-nosnippet>67</a>/// 2. Set up command dispatcher for /status, /metrics, /gpu commands
-<a href=#68 id=68 data-nosnippet>68</a>/// 3. Start webhook or long polling to receive updates
-<a href=#69 id=69 data-nosnippet>69</a>/// 4. Handle incoming messages and commands
-<a href=#70 id=70 data-nosnippet>70</a>/// 5. Integrate with PoolAI API to fetch system status and metrics
-<a href=#71 id=71 data-nosnippet>71</a>///
-<a href=#72 id=72 data-nosnippet>72</a>/// # Example (future)
-<a href=#73 id=73 data-nosnippet>73</a>///
-<a href=#74 id=74 data-nosnippet>74</a>/// ```no_run
-<a href=#75 id=75 data-nosnippet>75</a>/// # async fn example() {
-<a href=#76 id=76 data-nosnippet>76</a>/// use poolai::tgbot::start_bot;
-<a href=#77 id=77 data-nosnippet>77</a>/// start_bot("123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11").await;
-<a href=#78 id=78 data-nosnippet>78</a>/// # }
-<a href=#79 id=79 data-nosnippet>79</a>/// ```
-<a href=#80 id=80 data-nosnippet>80</a></span><span class="kw">pub async fn </span>start_bot(token: <span class="kw-2">&amp;</span>str) {
-<a href=#81 id=81 data-nosnippet>81</a>    <span class="comment">// Future improvement: Implement Telegram bot using teloxide crate
-<a href=#82 id=82 data-nosnippet>82</a>    // 1. Initialize Bot with token: let bot = Bot::new(token)
-<a href=#83 id=83 data-nosnippet>83</a>    // 2. Set up command dispatcher: Dispatcher::builder(bot, ...)
-<a href=#84 id=84 data-nosnippet>84</a>    // 3. Register command handlers for /status, /metrics, /gpu
-<a href=#85 id=85 data-nosnippet>85</a>    // 4. Start webhook or long polling: bot.set_my_commands(...).await
-<a href=#86 id=86 data-nosnippet>86</a>    // 5. Integrate with PoolAI API to fetch real system data
-<a href=#87 id=87 data-nosnippet>87</a>
-<a href=#88 id=88 data-nosnippet>88</a>    </span><span class="macro">tracing::info!</span>(
-<a href=#89 id=89 data-nosnippet>89</a>        <span class="string">"[tgbot] Starting bot with token: {} (placeholder - not yet implemented)"</span>,
-<a href=#90 id=90 data-nosnippet>90</a>        token
-<a href=#91 id=91 data-nosnippet>91</a>    );
-<a href=#92 id=92 data-nosnippet>92</a>    <span class="macro">tracing::info!</span>(<span class="string">"[tgbot] Bot would handle commands: /status, /metrics, /gpu"</span>);
-<a href=#93 id=93 data-nosnippet>93</a>}
-<a href=#94 id=94 data-nosnippet>94</a>
-<a href=#95 id=95 data-nosnippet>95</a><span class="doccomment">/// Send a notification to a specific chat ID
-<a href=#96 id=96 data-nosnippet>96</a>///
-<a href=#97 id=97 data-nosnippet>97</a>/// # Arguments
-<a href=#98 id=98 data-nosnippet>98</a>///
-<a href=#99 id=99 data-nosnippet>99</a>/// * `chat_id` - Telegram chat ID (user or channel)
-<a href=#100 id=100 data-nosnippet>100</a>/// * `message` - Message text to send
-<a href=#101 id=101 data-nosnippet>101</a>///
-<a href=#102 id=102 data-nosnippet>102</a>/// # Future Implementation
-<a href=#103 id=103 data-nosnippet>103</a>///
-<a href=#104 id=104 data-nosnippet>104</a>/// This will:
-<a href=#105 id=105 data-nosnippet>105</a>/// 1. Initialize Bot with stored token (from config or environment)
-<a href=#106 id=106 data-nosnippet>106</a>/// 2. Parse chat_id as i64 or String
-<a href=#107 id=107 data-nosnippet>107</a>/// 3. Send message using bot.send_message(chat_id, message).await
-<a href=#108 id=108 data-nosnippet>108</a>/// 4. Handle errors (invalid chat_id, network errors, rate limits)
-<a href=#109 id=109 data-nosnippet>109</a>/// 5. Retry on transient failures
-<a href=#110 id=110 data-nosnippet>110</a>///
-<a href=#111 id=111 data-nosnippet>111</a>/// # Example (future)
-<a href=#112 id=112 data-nosnippet>112</a>///
-<a href=#113 id=113 data-nosnippet>113</a>/// ```no_run
-<a href=#114 id=114 data-nosnippet>114</a>/// # async fn example() {
-<a href=#115 id=115 data-nosnippet>115</a>/// use poolai::tgbot::send_notification;
-<a href=#116 id=116 data-nosnippet>116</a>/// send_notification("123456789", "System alert: High CPU usage").await;
-<a href=#117 id=117 data-nosnippet>117</a>/// # }
-<a href=#118 id=118 data-nosnippet>118</a>/// ```
-<a href=#119 id=119 data-nosnippet>119</a></span><span class="kw">pub async fn </span>send_notification(chat_id: <span class="kw-2">&amp;</span>str, message: <span class="kw-2">&amp;</span>str) {
-<a href=#120 id=120 data-nosnippet>120</a>    <span class="comment">// Future improvement: Implement notification sending using teloxide crate
-<a href=#121 id=121 data-nosnippet>121</a>    // 1. Get bot instance (from global state or initialize from config)
-<a href=#122 id=122 data-nosnippet>122</a>    // 2. Parse chat_id: let chat_id = chat_id.parse::&lt;i64&gt;().unwrap_or_else(|_| chat_id.to_string())
-<a href=#123 id=123 data-nosnippet>123</a>    // 3. Send message: bot.send_message(chat_id, message).await
-<a href=#124 id=124 data-nosnippet>124</a>    // 4. Handle errors with retry logic for transient failures
-<a href=#125 id=125 data-nosnippet>125</a>    // 5. Log success/failure for monitoring
-<a href=#126 id=126 data-nosnippet>126</a>
-<a href=#127 id=127 data-nosnippet>127</a>    </span><span class="macro">tracing::info!</span>(
-<a href=#128 id=128 data-nosnippet>128</a>        <span class="string">"[tgbot] Sending notification to {}: {} (placeholder - not yet implemented)"</span>,
-<a href=#129 id=129 data-nosnippet>129</a>        chat_id,
-<a href=#130 id=130 data-nosnippet>130</a>        message
-<a href=#131 id=131 data-nosnippet>131</a>    );
-<a href=#132 id=132 data-nosnippet>132</a>}</code></pre></div></section></main></body></html>
+<a href=#8 id=8 data-nosnippet>8</a>//! | Variable | Required | Description |
+<a href=#9 id=9 data-nosnippet>9</a>//! |----------|----------|-------------|
+<a href=#10 id=10 data-nosnippet>10</a>//! | `TELEGRAM_BOT_TOKEN` | bot process | From @BotFather |
+<a href=#11 id=11 data-nosnippet>11</a>//! | `POOLAI_COORDINATOR_URL` | bot process | Coordinator base URL |
+<a href=#12 id=12 data-nosnippet>12</a>//! | `POOLAI_TELEGRAM_WEBHOOK_SECRET` | optional | Same as coordinator |
+<a href=#13 id=13 data-nosnippet>13</a>
+<a href=#14 id=14 data-nosnippet>14</a></span><span class="kw">pub mod </span>coordinator;
+<a href=#15 id=15 data-nosnippet>15</a>
+<a href=#16 id=16 data-nosnippet>16</a><span class="attr">#[cfg(feature = <span class="string">"tgbot"</span>)]
+<a href=#17 id=17 data-nosnippet>17</a></span><span class="kw">mod </span>runtime;
+<a href=#18 id=18 data-nosnippet>18</a>
+<a href=#19 id=19 data-nosnippet>19</a><span class="kw">pub use </span>coordinator::{
+<a href=#20 id=20 data-nosnippet>20</a>    forward_message, forward_payload, message_to_webhook_payload, CoordinatorConfig, ForwardResult,
+<a href=#21 id=21 data-nosnippet>21</a>};
+<a href=#22 id=22 data-nosnippet>22</a>
+<a href=#23 id=23 data-nosnippet>23</a><span class="attr">#[cfg(feature = <span class="string">"tgbot"</span>)]
+<a href=#24 id=24 data-nosnippet>24</a></span><span class="kw">pub use </span>runtime::run_bot;
+<a href=#25 id=25 data-nosnippet>25</a>
+<a href=#26 id=26 data-nosnippet>26</a><span class="doccomment">/// Legacy entry: logs in tests / without `tgbot` feature; with feature + non-empty token runs bot.
+<a href=#27 id=27 data-nosnippet>27</a></span><span class="kw">pub async fn </span>start_bot(token: <span class="kw-2">&amp;</span>str) {
+<a href=#28 id=28 data-nosnippet>28</a>    <span class="kw">if </span>token.trim().is_empty() || <span class="macro">cfg!</span>(test) {
+<a href=#29 id=29 data-nosnippet>29</a>        <span class="macro">tracing::info!</span>(<span class="string">"[tgbot] dry-run (empty token or test build)"</span>);
+<a href=#30 id=30 data-nosnippet>30</a>        <span class="kw">return</span>;
+<a href=#31 id=31 data-nosnippet>31</a>    }
+<a href=#32 id=32 data-nosnippet>32</a>
+<a href=#33 id=33 data-nosnippet>33</a>    <span class="attr">#[cfg(feature = <span class="string">"tgbot"</span>)]
+<a href=#34 id=34 data-nosnippet>34</a>    </span>{
+<a href=#35 id=35 data-nosnippet>35</a>        <span class="kw">match </span>CoordinatorConfig::from_env() {
+<a href=#36 id=36 data-nosnippet>36</a>            <span class="prelude-val">Ok</span>(cfg) =&gt; {
+<a href=#37 id=37 data-nosnippet>37</a>                <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = runtime::run_bot(token, cfg).<span class="kw">await </span>{
+<a href=#38 id=38 data-nosnippet>38</a>                    <span class="macro">tracing::error!</span>(<span class="string">"[tgbot] bot exited: {e}"</span>);
+<a href=#39 id=39 data-nosnippet>39</a>                }
+<a href=#40 id=40 data-nosnippet>40</a>            }
+<a href=#41 id=41 data-nosnippet>41</a>            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">tracing::error!</span>(<span class="string">"[tgbot] config error: {e}"</span>),
+<a href=#42 id=42 data-nosnippet>42</a>        }
+<a href=#43 id=43 data-nosnippet>43</a>    }
+<a href=#44 id=44 data-nosnippet>44</a>
+<a href=#45 id=45 data-nosnippet>45</a>    <span class="attr">#[cfg(not(feature = <span class="string">"tgbot"</span>))]
+<a href=#46 id=46 data-nosnippet>46</a>    </span>{
+<a href=#47 id=47 data-nosnippet>47</a>        <span class="macro">tracing::info!</span>(
+<a href=#48 id=48 data-nosnippet>48</a>            <span class="string">"[tgbot] feature `tgbot` disabled — rebuild with `--features tgbot` for teloxide runtime"
+<a href=#49 id=49 data-nosnippet>49</a>        </span>);
+<a href=#50 id=50 data-nosnippet>50</a>    }
+<a href=#51 id=51 data-nosnippet>51</a>}
+<a href=#52 id=52 data-nosnippet>52</a>
+<a href=#53 id=53 data-nosnippet>53</a><span class="doccomment">/// Send a notification to a Telegram chat (requires `tgbot` + `TELEGRAM_BOT_TOKEN`).
+<a href=#54 id=54 data-nosnippet>54</a></span><span class="kw">pub async fn </span>send_notification(chat_id: <span class="kw-2">&amp;</span>str, message: <span class="kw-2">&amp;</span>str) {
+<a href=#55 id=55 data-nosnippet>55</a>    <span class="kw">if </span>chat_id.trim().is_empty() || message.is_empty() {
+<a href=#56 id=56 data-nosnippet>56</a>        <span class="macro">tracing::warn!</span>(<span class="string">"[tgbot] send_notification skipped: empty chat_id or message"</span>);
+<a href=#57 id=57 data-nosnippet>57</a>        <span class="kw">return</span>;
+<a href=#58 id=58 data-nosnippet>58</a>    }
+<a href=#59 id=59 data-nosnippet>59</a>
+<a href=#60 id=60 data-nosnippet>60</a>    <span class="attr">#[cfg(feature = <span class="string">"tgbot"</span>)]
+<a href=#61 id=61 data-nosnippet>61</a>    </span>{
+<a href=#62 id=62 data-nosnippet>62</a>        <span class="kw">let </span><span class="prelude-val">Ok</span>(token) = std::env::var(<span class="string">"TELEGRAM_BOT_TOKEN"</span>) <span class="kw">else </span>{
+<a href=#63 id=63 data-nosnippet>63</a>            <span class="macro">tracing::warn!</span>(<span class="string">"[tgbot] TELEGRAM_BOT_TOKEN not set"</span>);
+<a href=#64 id=64 data-nosnippet>64</a>            <span class="kw">return</span>;
+<a href=#65 id=65 data-nosnippet>65</a>        };
+<a href=#66 id=66 data-nosnippet>66</a>        <span class="kw">use </span>teloxide::prelude::<span class="kw-2">*</span>;
+<a href=#67 id=67 data-nosnippet>67</a>        <span class="kw">let </span>bot = Bot::new(token);
+<a href=#68 id=68 data-nosnippet>68</a>        <span class="kw">let </span>chat: ChatId = <span class="kw">match </span>chat_id.parse::&lt;i64&gt;() {
+<a href=#69 id=69 data-nosnippet>69</a>            <span class="prelude-val">Ok</span>(id) =&gt; ChatId(id),
+<a href=#70 id=70 data-nosnippet>70</a>            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+<a href=#71 id=71 data-nosnippet>71</a>                <span class="macro">tracing::warn!</span>(<span class="string">"[tgbot] invalid chat_id (expected numeric): {chat_id}"</span>);
+<a href=#72 id=72 data-nosnippet>72</a>                <span class="kw">return</span>;
+<a href=#73 id=73 data-nosnippet>73</a>            }
+<a href=#74 id=74 data-nosnippet>74</a>        };
+<a href=#75 id=75 data-nosnippet>75</a>        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = bot.send_message(chat, message).<span class="kw">await </span>{
+<a href=#76 id=76 data-nosnippet>76</a>            <span class="macro">tracing::error!</span>(<span class="string">"[tgbot] send failed: {e}"</span>);
+<a href=#77 id=77 data-nosnippet>77</a>        }
+<a href=#78 id=78 data-nosnippet>78</a>        <span class="kw">return</span>;
+<a href=#79 id=79 data-nosnippet>79</a>    }
+<a href=#80 id=80 data-nosnippet>80</a>
+<a href=#81 id=81 data-nosnippet>81</a>    <span class="attr">#[cfg(not(feature = <span class="string">"tgbot"</span>))]
+<a href=#82 id=82 data-nosnippet>82</a>    </span><span class="macro">tracing::info!</span>(<span class="string">"[tgbot] notification to {chat_id}: {message} (feature `tgbot` disabled)"</span>);
+<a href=#83 id=83 data-nosnippet>83</a>}</code></pre></div></section></main></body></html>

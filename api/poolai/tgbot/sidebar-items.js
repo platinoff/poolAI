@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["send_notification","start_bot"]};
+window.SIDEBAR_ITEMS = {"fn":["send_notification","start_bot"],"mod":["coordinator"]};

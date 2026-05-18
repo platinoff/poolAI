@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["format_reply","forward_message","forward_payload","message_to_webhook_payload"],"struct":["CoordinatorConfig","ForwardResult"]};
