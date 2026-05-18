@@ -6,7 +6,7 @@
 
 **Критерії:**
 - [x] Усі admin `.modal` у `src/ui/admin/*.rs`: `aria-modal="false"` при `aria-hidden="true"`
-- [ ] `cargo test-ci` + push
+- [x] `cargo test-ci` + push — `7d500db0`
 
 **BLOCKED:** FM-003 §4 LAN (2 хости).
 

@@ -310,6 +310,13 @@
 - **Перевірка:** `cargo test --test ml_pipeline_integration --features ml test_pipeline_turboquant_quantization_step test_pipeline_standard_quantization_metrics`
 - **FM:** DIGEST §ML ✅
 
+### [FM-019] Admin form a11y (aria-required, labels)
+- **Де:** `src/ui/admin_common.js` (`adminEnhanceFormA11y`); приклад static — `src/ui/admin/users.rs`
+- **Сигнал:** `rg "adminEnhanceFormA11y" src/ui/admin_common.js`
+- **Патерн:** `[required]` → `aria-required="true"`; `.required` → `aria-hidden="true"`; orphan label у `.form-group` → `for={id}`; виклик на `DOMContentLoaded` і після `showModal` / `showModalContent`
+- **Перевірка:** `cargo test -p poolai --features enterprise ui::admin --lib`
+- **FM:** FM-019 Partial
+
 ### [FM-019] Admin modal focus trap + closed aria-modal
 - **Де:** `src/ui/admin_common.js`; розмітка — `rg 'aria-modal="false" aria-hidden="true"' src/ui/admin`
 - **Сигнал:** `keepFocusInModal`, `ADMIN_DYNAMIC_MODAL_ID` у `admin_common.js`

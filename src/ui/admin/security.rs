@@ -704,27 +704,27 @@ pub async fn admin_security() -> Html<String> {
             </div>
             <form id="createOAuth2Form" onsubmit="handleCreateOAuth2(event)">
               <div class="form-group">
-                <label for="oauth2Name"><span data-i18n="admin.sec.lbl.providerName">Provider Name</span> <span class="required">*</span></label>
+                <label for="oauth2Name"><span data-i18n="admin.sec.lbl.providerName">Provider Name</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="oauth2Name" name="name" required data-i18n-placeholder="admin.sec.ph.google" placeholder="google" />
               </div>
               <div class="form-group">
-                <label for="oauth2ClientId"><span data-i18n="admin.sec.lbl.clientId">Client ID</span> <span class="required">*</span></label>
+                <label for="oauth2ClientId"><span data-i18n="admin.sec.lbl.clientId">Client ID</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="oauth2ClientId" name="client_id" required />
               </div>
               <div class="form-group">
-                <label for="oauth2ClientSecret"><span data-i18n="admin.sec.lbl.clientSecret">Client Secret</span> <span class="required">*</span></label>
+                <label for="oauth2ClientSecret"><span data-i18n="admin.sec.lbl.clientSecret">Client Secret</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="password" id="oauth2ClientSecret" name="client_secret" required />
               </div>
               <div class="form-group">
-                <label for="oauth2AuthUrl"><span data-i18n="admin.sec.lbl.authUrl">Authorization URL</span> <span class="required">*</span></label>
+                <label for="oauth2AuthUrl"><span data-i18n="admin.sec.lbl.authUrl">Authorization URL</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="oauth2AuthUrl" name="authorization_url" required placeholder="https://accounts.google.com/o/oauth2/auth" />
               </div>
               <div class="form-group">
-                <label for="oauth2TokenUrl"><span data-i18n="admin.sec.lbl.tokenUrl">Token URL</span> <span class="required">*</span></label>
+                <label for="oauth2TokenUrl"><span data-i18n="admin.sec.lbl.tokenUrl">Token URL</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="oauth2TokenUrl" name="token_url" required placeholder="https://oauth2.googleapis.com/token" />
               </div>
               <div class="form-group">
-                <label for="oauth2RedirectUri"><span data-i18n="admin.sec.lbl.redirectUri">Redirect URI</span> <span class="required">*</span></label>
+                <label for="oauth2RedirectUri"><span data-i18n="admin.sec.lbl.redirectUri">Redirect URI</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="oauth2RedirectUri" name="redirect_uri" required placeholder="https://poolai.example.com/callback" />
               </div>
               <div class="form-group">
@@ -755,23 +755,23 @@ pub async fn admin_security() -> Html<String> {
             <form id="editOAuth2Form" onsubmit="handleEditOAuth2(event)">
               <input type="hidden" id="editOAuth2Name" />
               <div class="form-group">
-                <label for="editOAuth2ClientId"><span data-i18n="admin.sec.lbl.clientId">Client ID</span> <span class="required">*</span></label>
+                <label for="editOAuth2ClientId"><span data-i18n="admin.sec.lbl.clientId">Client ID</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="editOAuth2ClientId" name="client_id" required />
               </div>
               <div class="form-group">
-                <label for="editOAuth2ClientSecret"><span data-i18n="admin.sec.lbl.clientSecret">Client Secret</span> <span class="required">*</span></label>
+                <label for="editOAuth2ClientSecret"><span data-i18n="admin.sec.lbl.clientSecret">Client Secret</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="password" id="editOAuth2ClientSecret" name="client_secret" required />
               </div>
               <div class="form-group">
-                <label for="editOAuth2AuthUrl"><span data-i18n="admin.sec.lbl.authUrl">Authorization URL</span> <span class="required">*</span></label>
+                <label for="editOAuth2AuthUrl"><span data-i18n="admin.sec.lbl.authUrl">Authorization URL</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="editOAuth2AuthUrl" name="authorization_url" required />
               </div>
               <div class="form-group">
-                <label for="editOAuth2TokenUrl"><span data-i18n="admin.sec.lbl.tokenUrl">Token URL</span> <span class="required">*</span></label>
+                <label for="editOAuth2TokenUrl"><span data-i18n="admin.sec.lbl.tokenUrl">Token URL</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="editOAuth2TokenUrl" name="token_url" required />
               </div>
               <div class="form-group">
-                <label for="editOAuth2RedirectUri"><span data-i18n="admin.sec.lbl.redirectUri">Redirect URI</span> <span class="required">*</span></label>
+                <label for="editOAuth2RedirectUri"><span data-i18n="admin.sec.lbl.redirectUri">Redirect URI</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="editOAuth2RedirectUri" name="redirect_uri" required />
               </div>
               <div class="form-group">
@@ -801,15 +801,15 @@ pub async fn admin_security() -> Html<String> {
             </div>
             <form id="createSamlForm" onsubmit="handleCreateSaml(event)">
               <div class="form-group">
-                <label for="samlName"><span data-i18n="admin.sec.lbl.providerName">Provider Name</span> <span class="required">*</span></label>
+                <label for="samlName"><span data-i18n="admin.sec.lbl.providerName">Provider Name</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="samlName" name="name" required data-i18n-placeholder="admin.sec.ph.okta" placeholder="okta" />
               </div>
               <div class="form-group">
-                <label for="samlEntityId"><span data-i18n="admin.sec.lbl.entityId">Entity ID</span> <span class="required">*</span></label>
+                <label for="samlEntityId"><span data-i18n="admin.sec.lbl.entityId">Entity ID</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="samlEntityId" name="entity_id" required />
               </div>
               <div class="form-group">
-                <label for="samlSsoUrl"><span data-i18n="admin.sec.lbl.ssoUrl">SSO URL</span> <span class="required">*</span></label>
+                <label for="samlSsoUrl"><span data-i18n="admin.sec.lbl.ssoUrl">SSO URL</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="samlSsoUrl" name="sso_url" required />
               </div>
               <div class="form-group">
@@ -817,7 +817,7 @@ pub async fn admin_security() -> Html<String> {
                 <input type="url" id="samlSloUrl" name="slo_url" />
               </div>
               <div class="form-group">
-                <label for="samlCertificate"><span data-i18n="admin.sec.lbl.cert">X.509 Certificate</span> <span class="required">*</span></label>
+                <label for="samlCertificate"><span data-i18n="admin.sec.lbl.cert">X.509 Certificate</span> <span class="required" aria-hidden="true">*</span></label>
                 <textarea id="samlCertificate" name="certificate" required rows="5" data-i18n-placeholder="admin.sec.ph.cert" placeholder="-----BEGIN CERTIFICATE-----..."></textarea>
               </div>
               <div class="form-group">
@@ -848,11 +848,11 @@ pub async fn admin_security() -> Html<String> {
             <form id="editSamlForm" onsubmit="handleEditSaml(event)">
               <input type="hidden" id="editSamlName" />
               <div class="form-group">
-                <label for="editSamlEntityId"><span data-i18n="admin.sec.lbl.entityId">Entity ID</span> <span class="required">*</span></label>
+                <label for="editSamlEntityId"><span data-i18n="admin.sec.lbl.entityId">Entity ID</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="editSamlEntityId" name="entity_id" required />
               </div>
               <div class="form-group">
-                <label for="editSamlSsoUrl"><span data-i18n="admin.sec.lbl.ssoUrl">SSO URL</span> <span class="required">*</span></label>
+                <label for="editSamlSsoUrl"><span data-i18n="admin.sec.lbl.ssoUrl">SSO URL</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="url" id="editSamlSsoUrl" name="sso_url" required />
               </div>
               <div class="form-group">
@@ -860,7 +860,7 @@ pub async fn admin_security() -> Html<String> {
                 <input type="url" id="editSamlSloUrl" name="slo_url" />
               </div>
               <div class="form-group">
-                <label for="editSamlCertificate"><span data-i18n="admin.sec.lbl.cert">X.509 Certificate</span> <span class="required">*</span></label>
+                <label for="editSamlCertificate"><span data-i18n="admin.sec.lbl.cert">X.509 Certificate</span> <span class="required" aria-hidden="true">*</span></label>
                 <textarea id="editSamlCertificate" name="certificate" required rows="5"></textarea>
               </div>
               <div class="form-group">
@@ -890,7 +890,7 @@ pub async fn admin_security() -> Html<String> {
             </div>
             <form id="createPolicyForm" onsubmit="handleCreatePolicy(event)">
               <div class="form-group">
-                <label for="policyName"><span data-i18n="admin.sec.lbl.policyName">Policy Name</span> <span class="required">*</span></label>
+                <label for="policyName"><span data-i18n="admin.sec.lbl.policyName">Policy Name</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="text" id="policyName" name="name" required data-i18n-placeholder="admin.sec.ph.policy" placeholder="strict-policy" />
               </div>
               <div class="form-group">
@@ -908,11 +908,11 @@ pub async fn admin_security() -> Html<String> {
                 </label>
               </div>
               <div class="form-group">
-                <label for="policySessionTimeout"><span data-i18n="admin.sec.lbl.sessionTimeout">Session Timeout (seconds)</span> <span class="required">*</span></label>
+                <label for="policySessionTimeout"><span data-i18n="admin.sec.lbl.sessionTimeout">Session Timeout (seconds)</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="number" id="policySessionTimeout" name="session_timeout" required min="60" value="3600" />
               </div>
               <div class="form-group">
-                <label for="policyMaxFailedAttempts"><span data-i18n="admin.sec.lbl.maxFailed">Max Failed Login Attempts</span> <span class="required">*</span></label>
+                <label for="policyMaxFailedAttempts"><span data-i18n="admin.sec.lbl.maxFailed">Max Failed Login Attempts</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="number" id="policyMaxFailedAttempts" name="max_failed_attempts" required min="1" value="5" />
               </div>
               <div class="modal-footer">
@@ -947,11 +947,11 @@ pub async fn admin_security() -> Html<String> {
                 </label>
               </div>
               <div class="form-group">
-                <label for="editPolicySessionTimeout"><span data-i18n="admin.sec.lbl.sessionTimeout">Session Timeout (seconds)</span> <span class="required">*</span></label>
+                <label for="editPolicySessionTimeout"><span data-i18n="admin.sec.lbl.sessionTimeout">Session Timeout (seconds)</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="number" id="editPolicySessionTimeout" name="session_timeout" required min="60" />
               </div>
               <div class="form-group">
-                <label for="editPolicyMaxFailedAttempts"><span data-i18n="admin.sec.lbl.maxFailed">Max Failed Login Attempts</span> <span class="required">*</span></label>
+                <label for="editPolicyMaxFailedAttempts"><span data-i18n="admin.sec.lbl.maxFailed">Max Failed Login Attempts</span> <span class="required" aria-hidden="true">*</span></label>
                 <input type="number" id="editPolicyMaxFailedAttempts" name="max_failed_attempts" required min="1" />
               </div>
               <div class="modal-footer">

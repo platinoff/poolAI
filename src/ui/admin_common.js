@@ -361,7 +361,10 @@ function showModal(modalIdOrTitle, optionalContent) {
   document.body.style.overflow = 'hidden';
 
   attachModalA11y(modal);
-  setTimeout(() => focusInitialModalElement(modal), 100);
+  setTimeout(() => {
+    focusInitialModalElement(modal);
+    adminEnhanceFormA11y(modal);
+  }, 100);
 }
 
 function hideModal(modalId) {
@@ -422,6 +425,7 @@ function showModalContent(title, bodyHtml) {
   const bodyEl = document.getElementById('adminDynamicModalBody');
   if (titleEl) titleEl.textContent = title;
   if (bodyEl) bodyEl.innerHTML = bodyHtml;
+  adminEnhanceFormA11y(modal);
   showModal(ADMIN_DYNAMIC_MODAL_ID);
 }
 
@@ -514,6 +518,29 @@ function logout() {
   window.location.href = '/ui/auth';
 }
 
+/** FM-019: required fields, decorative asterisks, label for= in admin forms. */
+function adminEnhanceFormA11y(root) {
+  const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+  scope.querySelectorAll('form').forEach((form) => {
+    form.querySelectorAll('input, select, textarea').forEach((field) => {
+      if (field.hasAttribute('required') && field.getAttribute('aria-required') !== 'true') {
+        field.setAttribute('aria-required', 'true');
+      }
+    });
+    form.querySelectorAll('label .required').forEach((star) => {
+      star.setAttribute('aria-hidden', 'true');
+    });
+    form.querySelectorAll('.form-group').forEach((group) => {
+      const label = group.querySelector('label:not([for])');
+      if (!label) return;
+      const control = group.querySelector('input, select, textarea');
+      if (control && control.id) {
+        label.setAttribute('for', control.id);
+      }
+    });
+  });
+}
+
 /** FM-018: highlight current nav link for screen readers and keyboard users. */
 function adminMarkCurrentNav() {
   const currentPath = window.location.pathname;
@@ -531,6 +558,7 @@ function adminMarkCurrentNav() {
 function adminShellOnReady() {
   if (!requireAdmin()) return;
   initTabs();
+  adminEnhanceFormA11y(document.body);
   adminMarkCurrentNav();
   const user = getUser();
   if (user) {

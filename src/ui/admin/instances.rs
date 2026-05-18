@@ -218,12 +218,12 @@ pub async fn admin_instances() -> axum::response::Html<String> {
       const modalContent = `
         <form id="create-instance-form" onsubmit="createInstance(event)">
           <div class="form-group">
-            <label for="create-model-id">${escapeHtml(T('admin.inst.lbl.modelId', 'Model ID:'))}</label>
-            <input type="text" id="create-model-id" required />
+            <label for="create-model-id">${escapeHtml(T('admin.inst.lbl.modelId', 'Model ID:'))} <span class="required" aria-hidden="true">*</span></label>
+            <input type="text" id="create-model-id" required aria-required="true" />
           </div>
           <div class="form-group">
-            <label>${escapeHtml(T('admin.inst.lbl.placementJson', 'Placement (JSON):'))}</label>
-            <textarea id="create-placement" rows="5" required>{"model_id": "", "strategy": "Single", "node_ids": ["local"]}</textarea>
+            <label for="create-placement">${escapeHtml(T('admin.inst.lbl.placementJson', 'Placement (JSON):'))} <span class="required" aria-hidden="true">*</span></label>
+            <textarea id="create-placement" rows="5" required aria-required="true">{"model_id": "", "strategy": "Single", "node_ids": ["local"]}</textarea>
           </div>
           <div class="form-actions">
             <button type="submit" class="btn btn-primary" data-i18n="ui.create">Create</button>

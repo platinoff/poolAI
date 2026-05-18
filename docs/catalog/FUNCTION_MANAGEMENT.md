@@ -167,7 +167,7 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 discovery HttpAppError, partial).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-04.md`](../development/AUTO_RUN_SESSION_2026-06-04.md) — FM-019 решта admin modals / forms.
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-05.md`](../development/AUTO_RUN_SESSION_2026-06-05.md) — FM-019 admin forms a11y.
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-02.md`](../development/AUTO_RUN_SESSION_2026-06-02.md) (§5.3 audit + FM-019 nav).
 

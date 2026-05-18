@@ -180,6 +180,7 @@ fn admin_common_fm019_modal_a11y_helpers() {
     assert!(js.contains("function showModalContent"));
     assert!(js.contains("ADMIN_DYNAMIC_MODAL_ID"));
     assert!(js.contains("function handleModalEscape"));
+    assert!(js.contains("function adminEnhanceFormA11y"));
 }
 
 #[cfg(all(test, feature = "enterprise"))]
@@ -207,6 +208,16 @@ mod a11y_tests {
         assert!(html.contains("id=\"editUserModal\""));
         assert!(html.contains("role=\"dialog\""));
         assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn users_create_form_a11y_attributes() {
+        let html = admin_users().await.0;
+        assert!(html.contains("id=\"userUsername\""));
+        assert!(html.contains("aria-required=\"true\""));
+        assert!(html.contains("autocomplete=\"username\""));
+        assert!(html.contains("autocomplete=\"new-password\""));
+        assert!(html.contains("class=\"required\" aria-hidden=\"true\""));
     }
 
     #[tokio::test]

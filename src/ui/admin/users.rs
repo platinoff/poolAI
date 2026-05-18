@@ -227,16 +227,16 @@ pub async fn admin_users() -> Html<String> {
             </div>
             <form id="createUserForm" onsubmit="handleCreateUser(event)">
               <div class="form-group">
-                <label for="userUsername" data-i18n="admin.usr.label.user">Username</label>
-                <input type="text" id="userUsername" name="username" required data-i18n-placeholder="admin.usr.ph.user" placeholder="newuser" />
+                <label for="userUsername"><span data-i18n="admin.usr.label.user">Username</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="text" id="userUsername" name="username" required aria-required="true" autocomplete="username" data-i18n-placeholder="admin.usr.ph.user" placeholder="newuser" />
               </div>
               <div class="form-group">
-                <label for="userPassword" data-i18n="admin.usr.label.pw">Password</label>
-                <input type="password" id="userPassword" name="password" required data-i18n-placeholder="admin.usr.ph.pw" placeholder="Enter password" />
+                <label for="userPassword"><span data-i18n="admin.usr.label.pw">Password</span> <span class="required" aria-hidden="true">*</span></label>
+                <input type="password" id="userPassword" name="password" required aria-required="true" autocomplete="new-password" data-i18n-placeholder="admin.usr.ph.pw" placeholder="Enter password" />
               </div>
               <div class="form-group">
-                <label for="userRole" data-i18n="admin.usr.label.role">Role</label>
-                <select id="userRole" name="role" required>
+                <label for="userRole"><span data-i18n="admin.usr.label.role">Role</span> <span class="required" aria-hidden="true">*</span></label>
+                <select id="userRole" name="role" required aria-required="true">
                   <option value="Admin">Admin</option>
                   <option value="Operator">Operator</option>
                   <option value="Viewer" selected>Viewer</option>
@@ -260,15 +260,15 @@ pub async fn admin_users() -> Html<String> {
               <input type="hidden" id="editUserId" name="id" />
               <div class="form-group">
                 <label for="editUserUsername" data-i18n="admin.usr.label.user">Username</label>
-                <input type="text" id="editUserUsername" name="username" required />
+                <input type="text" id="editUserUsername" name="username" required aria-required="true" autocomplete="username" />
               </div>
               <div class="form-group">
                 <label for="editUserPassword" data-i18n="admin.usr.label.pwNew">New Password (leave empty to keep current)</label>
-                <input type="password" id="editUserPassword" name="password" data-i18n-placeholder="admin.usr.ph.pwNew" placeholder="Enter new password" />
+                <input type="password" id="editUserPassword" name="password" autocomplete="new-password" data-i18n-placeholder="admin.usr.ph.pwNew" placeholder="Enter new password" />
               </div>
               <div class="form-group">
                 <label for="editUserRole" data-i18n="admin.usr.label.role">Role</label>
-                <select id="editUserRole" name="role" required>
+                <select id="editUserRole" name="role" required aria-required="true">
                   <option value="Admin">Admin</option>
                   <option value="Operator">Operator</option>
                   <option value="Viewer">Viewer</option>
