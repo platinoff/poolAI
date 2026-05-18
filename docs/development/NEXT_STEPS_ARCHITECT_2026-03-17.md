@@ -38,14 +38,13 @@
 
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
-1. **FM-003** + **P4** + **P2b** — baseline на реф-хості (Criterion, **`poolai_health_load --json`** → [`BENCHMARKS.md`](../performance/BENCHMARKS.md)); на LAN-стенді — повні заміри реплікації артефактів і порівняння обсягу до/після TQ01 (єдиний відкритий чекбокс P2b у секції TurboQuant нижче).
-2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** з replication; далі — LAN, **`conflicts`** у payload (remote metadata), за потреби глибша реплікація.
-3. **FM-011** — стабільна збірка **`cargo test --all-features`** на Windows (профіль тестів у `Cargo.toml`, **`-j 1`**, опційно **`CARGO_INCREMENTAL=0`**, GNU toolchain).
-4. **FM-012** — **Partial (2026-05):** i18n UA/EN для **`/ui/*`** (layout, auth, shared JS у **`mod.rs`**, write-flow workers/libs/vm/raid) і **`/ui/admin/*`** (повний перелік enterprise admin-сторінок); **перший вхід** — **`bootstrap_default_admin`** + банер; **Telegram** — частково (HMAC, `auth_date`, allowlist, audit). **Далі:** загострення Telegram/OAuth за політикою безопасності (не блокує FM-003/007).
-5. **Відкладено** — **FM-006** (`cloud-sdk` Azure/GCP), **FM-004** (SIMD TurboQuant).
-6. **Концепт → код (поза обов’язковим горизонтом)** — **FM-009** (єдиний Grid wire envelope), **FM-010** (on-chain / Solana прототип).
+1. **FM-017** — **FM-005 залишок:** `HttpAppError` для `discovery` / `admin`; `virtual_nodes` — узгодити з `poolai-worker` (лише HTTP status сьогодні).
+2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; відкритий чекбокс P2b нижче ≈ цей пункт.
+3. **FM-018** — UI a11y (WCAG, keyboard/ARIA) — [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md).
+4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+5. **Концепт** — **FM-009**, **FM-010**.
 
-**FM-005** ✅ (узгоджений JSON, включно **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**) — закрито **2026-04-10**.
+**Закрито:** **FM-005** ✅ (2026-04-10, admin REST); **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅ (2026-05-27 OAuth); **FM-013–016** ✅.
 
 Деталі тікетів і шаблон Issue — таблиця **FM-*** у тому ж файлі; операційний зріз сесії — [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4.
 

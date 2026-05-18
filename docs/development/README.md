@@ -11,7 +11,8 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
-- **[`AUTO_RUN_SESSION_2026-05-17.md`](./AUTO_RUN_SESSION_2026-05-17.md)** — **наступний автопрогін** (оркестратор, P0 патерни, S1–S4, стартовий промпт).
+- **[`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md)** — **поточний автопрогін** (FM-017 HttpAppError залишок).
+- **[`AUTO_RUN_SESSION_2026-05-28.md`](./AUTO_RUN_SESSION_2026-05-28.md)** — попередній (ops hygiene ✅).
 - **[`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md)** — реєстр патернів для авторозробки.
 - **[`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md)** — попередній прогін (S0–S6, завершено).
 

@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 (AUTO_RUN 2026-05-28: ops hygiene, test-ci).
+**Оновлено:** 2026-05-18 (менеджер функціоналу — §5.3 аудит, FM-017/018).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-28.md`](./AUTO_RUN_SESSION_2026-05-28.md) — закрито; **FM-003 §4** BLOCKED (2 хости).
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md) — **FM-017** (HttpAppError залишок). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, `virtual_node_executor`, verify-dev-stand e2e. **FM-012 ✅:** OAuth hardening (2026-05-27). **Далі:** FM-003 §4 LAN sign-off (gated); FM-009/010 concept.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **Далі (§5.1):** **FM-017** HttpAppError залишок → FM-003 §4 (2 хости) → FM-018 a11y → FM-004/006 deferred → FM-009/010 concept.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 

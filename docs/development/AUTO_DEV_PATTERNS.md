@@ -296,6 +296,11 @@
 - **Патерн:** bootstrap enqueue → worker builds `PutArtifact` probe → coordinator RAID wire
 - **Перевірка:** `cargo test --lib workers::raid_artifact_probe`; `cargo test --test virtual_node_tasks_integration --features test-utils`
 
+### [FM-017] Virtual-node API errors (planned)
+- **Де:** `src/network/api/virtual_nodes.rs`, `discovery.rs`, `admin.rs`
+- **Патерн:** сьогодні — `StatusCode` + plain text (worker перевіряє лише `is_success()`); admin/discovery — кандидати на `HttpAppError` (FM-005 залишок)
+- **Перевірка:** `rg "HttpAppError" src/network/api/virtual_nodes.rs` → 0; після FM-017 — інтеграційні тести worker не ламаються
+
 ### [Workers] Virtual node pool join (FM-016+++)
 - **Де:** `src/network/api/virtual_nodes.rs` (`POST .../pool/join`), `poolai-worker` after `register-remote`
 - **Патерн:** peer must exist in discovery with `metadata.role = virtual_node` → `WorkerPoolService::add_worker` (no JWT)

@@ -1,10 +1,10 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-16 (автопрогін S1–S6).
+**Оновлено:** 2026-05-18 (звірка менеджера функціоналу — §5.3).
 
-**Звірка з комітами (лют–трав 2026):** P1–P3, P2b, FM-005 ✅, FM-007/008 ✅, FM-011 ✅, FM-012 ✅, FM-002 ✅; **Planned (ops)** — FM-003 LAN-заміри ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)); concept-only FM-009/010; Deferred FM-004/006.
+**Звірка з комітами (лют–трав 2026):** P1–P3, P2b, FM-002/005/007/008/011/012/013/014/015/016 ✅; **Planned (ops)** — FM-003 §4 LAN sign-off (**BLOCKED**, 2 хости); **Partial** — FM-005 (worker/discovery API), ML hardening; **Deferred** — FM-004/006; **Concept** — FM-009/010.
 
-**Останній зріз:** FM-012 **Implemented** — Telegram OAuth: HMAC/`auth_date`/allowlist/audit; UA/EN widget HTML (`Accept-Language` / `?lang=`); RBAC Viewer для нових Telegram-юзерів; тести в `enterprise/security.rs`. FM-007/008 **Implemented** — 15 wire-тестів `distributed_raid_wire_integration`. FM-002 **Implemented** — `get_global_*` у `src/network/api/` = 0; виняток задокументовано в `discovery.rs`. FM-011 **Implemented** — `cargo test-ci` (2026-05-16). FM-003 — baseline **2026-04-10** у [`BENCHMARKS.md`](../performance/BENCHMARKS.md); LAN — runbook.
+**Останній зріз:** FM-016+++ ✅ (`raid_artifact_probe`, pool join, verify-dev-stand). FM-012 OAuth hardening ✅ (2026-05-27). FM-003 dev stand §5.1 ✅; §4 — runbook, без двох хостів. **`cargo test-ci`** — 2026-05-28.
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -108,40 +108,52 @@ FM-xxx (з таблиці нижче)
 | FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок: libraries, topology, VM, workers; узгодження `installed` у libs UI з `metadata.installed_at` | Implemented | `tests/admin_ui_api_contracts.rs`, [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md), `src/ui/admin/libs.rs` |
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
-| FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); далі — pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
+| FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
+| FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery`, `virtual_nodes`, `admin` — plain `StatusCode` / text, без `HttpAppError` JSON (`error.message`) | Planned | `src/network/api/discovery.rs`, `virtual_nodes.rs`, `admin.rs`; `poolai-worker` перевіряє лише HTTP status |
+| FM-018 | UI / a11y | WCAG 2.1 AA, keyboard/ARIA (план UI improvements) | Planned | [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md); не блокує FM-003/017 |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**FM-003 (2026-05-18):** dev stand на одній машині достатній; **реальний LAN і §4 sign-off відкладені** до Telegram-воркерів як віртуальних нод на девайсах (не блокує інші FM).
-
-**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — 2026-05-20 (автопрогін FM-015). Clippy матриці — CI на GitHub (`ci.yml`, baseline 2026-04-10); локально MSYS `link.exe` може блокувати `cargo clippy` у зовнішньому bash — див. AUTO_RUN §6.
-
-**FM-015 (2026-05-20):** admin contracts фаза 3 — 20 tests (`instance`, `raid/artifacts`, smallworld metrics).
-
-**FM-014 (2026-05-19):** admin contracts фаза 2 + rewards `HttpAppError` — 15 tests у `admin_ui_api_contracts.rs`.
-
-**FM-013 (2026-05-18):** admin UI JSON contracts — `tests/admin_ui_api_contracts.rs` (12 tests).
-
-**P0 (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів; `rg "get_global_" src/network/api` → 0.
-
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): **LAN-заміри** (FM-003 — після Telegram workers); **cloud-sdk** (FM-006, Deferred). FM-005/007/008/011/012/002/013/014/015 — закрито.
+**Канон черги** — таблиця нижче; детальний аудит «що не зроблено» — **§5.3**.
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Ops / Architect | **—** | thin-layer, STABLE_STATE sync; FM-012 OAuth/webhook ✅ |
-| 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 хостів; dev stand §5.1 достатній |
-| 2 | Відкладено | **FM-003 (real LAN)**, **FM-006**, **FM-004** | Реальний LAN + `BENCHMARKS.md` §4 — після п.1; cloud-sdk; SIMD TurboQuant. |
-| 3 | Концепт | **FM-009**, **FM-010** | Grid wire envelope; Solana / on-chain прототип. |
+| 1 | HTTP errors (worker-safe) | **FM-017** | Опційний JSON для admin/discovery; virtual-nodes — лишити status-only або dual format; тести worker |
+| 2 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — немає 2 фізичних хостів; dev stand §5.1 + `verify-dev-stand` достатні |
+| 3 | ML ops | **DIGEST §ML** | Pipeline hardening, метрики, runbook (не новий FM поки не оформлено Issue) |
+| 4 | UI accessibility | **FM-018** | Клавіатура, ARIA, focus — за [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) |
+| 5 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` (`TODO` у `azure.rs`/`gcp.rs`) |
+| 6 | Концепт | **FM-009**, **FM-010** | Grid envelope; Solana — поза автопрогоном |
+
+**Закрито (не в черзі):** FM-001–016 (крім FM-003 §4), FM-005 для admin REST / enterprise / raid / auth.
+
+**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — зріз 2026-05-28; clippy — CI (`ci.yml`).
+
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри (≈ FM-003 §4, BLOCKED); cloud-sdk (FM-006, Deferred).
+
+### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
+
+| Джерело | Пункт | Стан | Примітка |
+|---------|--------|------|----------|
+| Architect L125 | LAN replication + TQ01 size compare | **BLOCKED** | FM-003 §4; 2 хости |
+| Architect L185 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006 |
+| FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅ |
+| FM-004 | SIMD TurboQuant | **Deferred** | |
+| FM-005 | JSON errors на discovery/VN/admin | **Partial** → **FM-017** | `rg HttpAppError src/network/api` — немає у `discovery`/`virtual_nodes`/`admin` |
+| FM-009/010 | Grid / Solana | **Concept-only** | |
+| DIGEST | ML pipeline hardening | **Partial** | Операційні інструкції |
+| `UI_IMPROVEMENTS_PLAN` | a11y, keyboard, ARIA | **Planned** → **FM-018** | Архівні `docs/archive/*` — не канон |
+| README *Next Focus* | Застарілі FM-007/011/012 | **Docs debt** | Синхронізовано в цій сесії |
 
 ### 5.2 Автономний прогін (сесія → git push)
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-05-28.md`](../development/AUTO_RUN_SESSION_2026-05-28.md) (ops hygiene, test-ci; FM-003 §4 BLOCKED).
+**Поточний:** [`AUTO_RUN_SESSION_2026-05-29.md`](../development/AUTO_RUN_SESSION_2026-05-29.md) (FM-017 або docs sync).
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-05-27.md`](../development/AUTO_RUN_SESSION_2026-05-27.md) (FM-012 OAuth hardening).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-28.md`](../development/AUTO_RUN_SESSION_2026-05-28.md) (ops hygiene, test-ci).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md) (FM-016+++ cache).
+**Завершено:** [`AUTO_RUN_SESSION_2026-05-27.md`](../development/AUTO_RUN_SESSION_2026-05-27.md) (FM-012 OAuth).
 
-**Попередні:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md), [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md).
+**Попередні:** [`AUTO_RUN_SESSION_2026-05-25.md`](../development/AUTO_RUN_SESSION_2026-05-25.md) (FM-016+++), [`AUTO_RUN_SESSION_2026-05-24.md`](../development/AUTO_RUN_SESSION_2026-05-24.md).
 
 | Спринт | FM | Результат для «100% продукту» |
 |--------|-----|-------------------------------|

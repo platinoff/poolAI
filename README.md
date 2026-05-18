@@ -57,14 +57,13 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
 
-1. **FM-003** + **P4** + **P2b** — Criterion і **`poolai_health_load --json`** на реф-хості → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md); на LAN — повні заміри реплікації + порівняння розміру до/після TQ01.
-2. **FM-007**, **FM-008** — distributed RAID: sync каталогів, **LeaveCluster** + replication; далі LAN і payload для conflicts за потреби.
-3. **FM-011** — стабільні тести на Windows: профіль **`[profile.test]`**, **`cargo test-ci`** (як CI: `--lib` + `--tests`), **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; **`-j 1`** за потреби.
-4. **FM-012** — UX/UI: i18n **UA/EN** (`i18n_core.js`, `/ui/auth`, admin shell + enterprise admin **monitoring/config/security/instances/topology** + **tenants/VM/workers/libs/users/RAID**); перший вхід — банер для дефолтного `admin` + поле **`bootstrap_default_admin`** у **`login`/`refresh`**; далі — решта `/ui/*`, подальше загострення Telegram OAuth (частково: HMAC перевірка віджета, allowlist, audit).
-5. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-6. **Концепт → код** — **FM-009** (Grid envelope), **FM-010** (Solana).
+1. **FM-017** — **FM-005 залишок:** `HttpAppError` JSON для `discovery` / `admin`; `virtual_nodes` — worker-safe (status-only або dual); див. [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
+2. **FM-003 §4** — реальний LAN sign-off (**BLOCKED** без 2 хостів); dev stand §5.1 + `verify-dev-stand` ✅; baseline → [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
+3. **FM-018** — UI accessibility (WCAG, keyboard/ARIA) за [`docs/UI_IMPROVEMENTS_PLAN.md`](docs/UI_IMPROVEMENTS_PLAN.md).
+4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
+5. **Концепт** — **FM-009** (Grid), **FM-010** (Solana).
 
-**FM-005** ✅ — узгоджений JSON на **`HttpAppError`/`RestError`** (див. [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1**).
+**Закрито:** **FM-005** ✅ (admin REST, raid, enterprise, auth); **FM-007/008** ✅ wire; **FM-011** ✅ `cargo test-ci`; **FM-012** ✅ i18n + Telegram OAuth; **FM-013–016** ✅ admin contracts + virtual nodes.
 
 **Контекст за пріоритетами Architect (P\*)**
 
