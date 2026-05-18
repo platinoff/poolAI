@@ -1,7 +1,7 @@
 //! Virtual-node worker task API (FM-016 phase 3) and Telegram binding (FM-016+).
 
 use axum::{
-    extract::Path,
+    extract::{Path, State},
     http::{HeaderMap, StatusCode},
     response::IntoResponse,
     routing::{get, post},
@@ -10,11 +10,15 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+use crate::core::discovery_types::PeerInfo;
 use crate::core::state::ApiContext;
+use crate::network::validation;
+use crate::services::discovery_service::{DiscoveryNotReady, DiscoveryService};
 use crate::services::virtual_node_task_service::{VirtualNodeTask, VirtualNodeTaskService};
 use crate::services::virtual_node_telegram_binding_service::{
     TelegramBinding, VirtualNodeTelegramBindingService,
 };
+use crate::services::worker_pool_service::{AddWorkerError, CreateWorkerInput, WorkerPoolService};
 
 #[derive(Serialize)]
 struct PollTasksResponse {
@@ -107,6 +111,19 @@ struct TelegramWebhookResponse {
     detail: Option<String>,
 }
 
+#[derive(Deserialize, Default)]
+struct PoolJoinRequest {
+    max_memory_mb: Option<usize>,
+    max_concurrent_requests: Option<usize>,
+}
+
+#[derive(Serialize)]
+struct PoolJoinResponse {
+    peer_id: String,
+    joined: bool,
+    message: String,
+}
+
 pub fn create_virtual_node_routes() -> Router<ApiContext> {
     Router::new()
         .route(
@@ -135,6 +152,70 @@ pub fn create_virtual_node_routes() -> Router<ApiContext> {
             "/virtual-nodes/telegram/webhook",
             post(telegram_webhook_handler),
         )
+        .route(
+            "/virtual-nodes/{peer_id}/pool/join",
+            post(pool_join_handler),
+        )
+}
+
+fn is_virtual_node_peer(peer: &PeerInfo) -> bool {
+    peer.metadata.get("role").map(String::as_str) == Some("virtual_node")
+}
+
+async fn pool_join_handler(
+    State(ctx): State<ApiContext>,
+    Path(peer_id): Path<String>,
+    Json(body): Json<PoolJoinRequest>,
+) -> impl IntoResponse {
+    if let Err(e) = validation::validate_worker_id(&peer_id) {
+        return (StatusCode::BAD_REQUEST, e.to_string()).into_response();
+    }
+
+    let peer = match DiscoveryService::get_peer(&ctx, &peer_id).await {
+        Ok(Some(p)) if is_virtual_node_peer(&p) => p,
+        Ok(Some(_)) => {
+            return (
+                StatusCode::FORBIDDEN,
+                "peer is not a registered virtual node",
+            )
+                .into_response();
+        }
+        Ok(None) => return StatusCode::NOT_FOUND.into_response(),
+        Err(DiscoveryNotReady) => return StatusCode::SERVICE_UNAVAILABLE.into_response(),
+    };
+
+    let max_memory_mb = body
+        .max_memory_mb
+        .unwrap_or(peer.capabilities.memory_mb.max(512));
+    let max_concurrent_requests = body.max_concurrent_requests.unwrap_or(10);
+
+    let input = CreateWorkerInput {
+        worker_id: peer_id.clone(),
+        max_concurrent_requests,
+        request_timeout_ms: 5000,
+        health_check_interval_ms: 1000,
+        enable_caching: true,
+        cache_size: 1000,
+        max_memory_mb,
+        cpu_priority: 5,
+        gpu_device: None,
+        auto_restart: true,
+        resource_monitoring: true,
+    };
+
+    match WorkerPoolService::add_worker(&ctx, input).await {
+        Ok(()) => (
+            StatusCode::CREATED,
+            Json(PoolJoinResponse {
+                peer_id,
+                joined: true,
+                message: "virtual node joined worker pool".to_string(),
+            }),
+        )
+            .into_response(),
+        Err(AddWorkerError::PoolNotReady) => StatusCode::SERVICE_UNAVAILABLE.into_response(),
+        Err(AddWorkerError::Operation(_)) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+    }
 }
 
 async fn poll_tasks_handler(Path(peer_id): Path<String>) -> impl IntoResponse {

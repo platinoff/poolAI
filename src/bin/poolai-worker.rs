@@ -189,7 +189,39 @@ async fn register_remote(client: &reqwest::Client, args: &Args) -> Result<(), St
     if let Some(tg) = &args.telegram_id {
         bind_telegram_remote(client, args, tg).await?;
     }
+    join_worker_pool(client, args).await?;
     Ok(())
+}
+
+async fn join_worker_pool(client: &reqwest::Client, args: &Args) -> Result<(), String> {
+    let url = format!(
+        "{}/api/v1/virtual-nodes/{}/pool/join",
+        args.coordinator_url, args.worker_id
+    );
+    let body = serde_json::json!({
+        "max_memory_mb": args.max_memory_mb,
+        "max_concurrent_requests": 10,
+    });
+    let response = client
+        .post(&url)
+        .json(&body)
+        .send()
+        .await
+        .map_err(|e| format!("pool join request failed: {e}"))?;
+    match response.status() {
+        reqwest::StatusCode::CREATED => {
+            info!("Joined coordinator worker pool as {}", args.worker_id);
+            Ok(())
+        }
+        reqwest::StatusCode::SERVICE_UNAVAILABLE => {
+            warn!("Coordinator pool not ready; worker stays discovery-only");
+            Ok(())
+        }
+        status => {
+            let text = response.text().await.unwrap_or_default();
+            Err(format!("pool join HTTP {status}: {text}"))
+        }
+    }
 }
 
 async fn bind_telegram_remote(
