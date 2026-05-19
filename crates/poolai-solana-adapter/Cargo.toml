@@ -1,0 +1,20 @@
+[package]
+name = "poolai-solana-adapter"
+version = "0.1.0"
+edition = "2021"
+authors = ["PoolAI Team"]
+description = "PoolAI Solana sidecar — domain event schema v1 (no solana-sdk in poolai main)"
+license = "MIT"
+repository = "https://github.com/poolai/poolai"
+publish = false
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[[bin]]
+name = "poolai-solana-adapter"
+path = "src/bin/poolai-solana-adapter.rs"

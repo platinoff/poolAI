@@ -47,7 +47,7 @@
 ## 4. Що залишається поза цим документом
 
 - **Solana‑adapter** — концепт і мапінг подій: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
-- Єдиний серіалізований **Grid envelope** (версія протоколу, підпис, routing) — майбутня специфікація після заморозки транспорту (HTTP vs QUIC vs інше).
+- **Grid envelope v1 (JSON)** — реалізовано в **`src/grid/`** (`GridEnvelope`, `GridMessage`); підпис/routing — майбутнє.
 
 ## 5. Оновлення концепту Grid Node
 

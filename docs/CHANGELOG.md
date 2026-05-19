@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Horizon S35–S37 (2026-05-19)** — FM-004 `turboquant-simd` (`wide`); FM-009 `src/grid/` `GridEnvelope` v1; FM-010 `crates/poolai-solana-adapter` schema v1 + sidecar stub (no `solana-sdk` in main). Fix: `UiService::delete_dashboard` `#[cfg(enterprise)]`.
+
 ### Docs
+- **Horizon S35–S37 (2026-05-19)** — FM §5.6, `DEVELOPMENT_PROGRESS` C≈50%, HANDOFF/NEXT_SESSION, `TURBOQUANT_INTEGRATION` §SIMD, Grid/Solana concepts.
 - **Horizon prep (2026-05-19)** — `HORIZON_TO_100_PLAN.md`, `AUTO_RUN_SESSION_2026_HORIZON.md` (S35–S40); `NEXT_SESSION_PROMPT` для Layer C → project 100%; FM §5.6.
 - **Прогрес (2026-05-19, S34)** — autoprogon **100%** (шар A+B): docs harmonization, Playwright libs, `NEXT_SESSION` post-100%, `data/dev/` gitignore.
 - **Прогрес (2026-05-19, S33)** — шар A autoprogon **100%**: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](status/DEVELOPMENT_PROGRESS_2026-05-19.md); OpenAPI `RaidDistributed*` schemas; axe + vm/workers E2E.

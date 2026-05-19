@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 (autoprogon **100%** A+B — S34; S33 OpenAPI/axe/E2E; S32 [`RUN_LOCAL.md`](./RUN_LOCAL.md)).
+**Оновлено:** 2026-05-19 (Horizon **S35–S37** ✅; autoprogon A+B **100%** S34).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
 **FM-003:** dev stand ✅; LAN §4 — **BLOCKED** (2 хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅ (S7–S12):** pa11y 18 auth + login; `PA11Y_WCAG22=1`; `a11y.yml` PR; `ci.yml` `pa11y-contract`. **OpenAPI (S14–S21)** ✅. **FM-019 CI (S22)** ✅ — `ci.yml` `pa11y-contract` + `pa11y-wcag22` (paths-filter → reusable `a11y.yml`). **S23 ✅:** Playwright smoke. **S24 ✅:** `DELETE /ui/dashboards/{id}` → 204. **S25 ✅:** UI_QUALITY P1 — tenants, OAuth2, dashboards (+3 tests). **S26 ✅:** metrics, alert-rules, SAML, policies (+4 tests; **UI_QUALITY P1 закрито**, 27 contract tests). **S27 ✅:** Playwright admin E2E — tenants + monitoring. **S28 ✅:** OpenAPI gap audit — [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md). **S29 ✅:** Playwright — `/ui/admin/security`, `/ui/admin/audit` (`admin.spec.ts`). **S30 ✅:** FM legacy docs — [`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md), stale banners. **S33 ✅:** OpenAPI DTO, axe, E2E vm/workers. **S34 ✅:** docs sync A+B 100%, Playwright libs, `data/dev/` gitignore. **Прогрес autoprogon:** **100%** (A+B). **Horizon (наступна сесія):** S35 FM-004 SIMD → S40 project **100%** — [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md). **Ops:** FM-003 §4 LAN (2 хости). **BLOCKED:** FM-003 §4 (2 хости). **Не в автопрогоні:** FM-004/006/009/010. Звірка — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅ (S7–S12):** pa11y 18 auth + login; `PA11Y_WCAG22=1`; `a11y.yml` PR; `ci.yml` `pa11y-contract`. **OpenAPI (S14–S21)** ✅. **FM-019 CI (S22)** ✅ — `ci.yml` `pa11y-contract` + `pa11y-wcag22` (paths-filter → reusable `a11y.yml`). **S23 ✅:** Playwright smoke. **S24 ✅:** `DELETE /ui/dashboards/{id}` → 204. **S25 ✅:** UI_QUALITY P1 — tenants, OAuth2, dashboards (+3 tests). **S26 ✅:** metrics, alert-rules, SAML, policies (+4 tests; **UI_QUALITY P1 закрито**, 27 contract tests). **S27 ✅:** Playwright admin E2E — tenants + monitoring. **S28 ✅:** OpenAPI gap audit — [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md). **S29 ✅:** Playwright — `/ui/admin/security`, `/ui/admin/audit` (`admin.spec.ts`). **S30 ✅:** FM legacy docs — [`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md), stale banners. **S33 ✅:** OpenAPI DTO, axe, E2E vm/workers. **S34 ✅:** docs sync A+B 100%, Playwright libs, `data/dev/` gitignore. **Прогрес autoprogon:** **100%** (A+B). **Horizon:** S35–S37 ✅ (2026-05-19); **наступний** S38 Job/Memory → S40 — [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md). **Ops:** FM-003 §4 LAN (2 хости). **BLOCKED:** FM-003 §4 (2 хости). **Horizon закрито:** FM-004 (SIMD), FM-009 (Grid), FM-010 (Solana adapter). **Відкрито:** S38–S40; **Deferred:** FM-006. Звірка — FM **§5.3**, **§5.6**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -94,10 +94,10 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 **Закрито:** FM-001–019 baseline; FM-005/007/008/011/012–018 ✅. Деталі — §5.3 у FUNCTION_MANAGEMENT.
 
-## 5. Автономний режим (наступна сесія → git push)
+## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) — backlog «не зроблено» + черга S21+ (за замовчуванням OpenAPI gap audit).
-2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після коду — `cargo fmt` + `cargo test-ci`.
-3. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
-4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); `git -c commit.template= commit -F msgfile`.
-5. Не стаджити `data/audit/*.log.gz`.
+1. Старт: [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) — черга S38+ (Job/Memory, cloud, closure).
+2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci`.
+3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; FM-006 deep — S39.
+4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); Summary у тілі коміта.
+5. Не стаджити `data/audit/*.log.gz`, `data/dev/`, `.commit-msg-*.txt`.

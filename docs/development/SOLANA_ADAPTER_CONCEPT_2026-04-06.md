@@ -50,8 +50,17 @@
 - Вибір мережі (mainnet / L2) і версія Anchor — після прототипу.
 - Звірка з **існуючим** `rewards` модулем: уникати дублювання бізнес-правил; single source of truth для «хто заслуговує винагороду» — бажано в core, адаптер лише **виконує** вже затверджені рішення.
 
-## 6. Наступні кроки (поза цим документом)
+## 6. Реалізація MVP (S37)
+
+| Що | Де |
+|----|-----|
+| Crate | `crates/poolai-solana-adapter/` |
+| Schema v1 | `events.rs` — `JobCompleted`, `SeedProvided`, `MemoryUpdated` |
+| Sidecar | `poolai-solana-adapter` binary (NDJSON stdin → ack stdout) |
+| Main `poolai` | **без** `solana-sdk` / без залежності на adapter |
+
+## 7. Наступні кроки (поза S37)
 
 - Прототип Solana program (minimal) + тестнет.
-- Контракт подій між core і адаптером (schema версія `1`).
+- RPC submit у sidecar (після заморозки schema v1).
 - Оновлення [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) при появі реального crate / репозиторію адаптера.

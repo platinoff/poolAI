@@ -5,7 +5,8 @@
 //! external Google binaries — PoolAI artifact format only.
 //!
 //! Hot loops use a **portable fast path** (4-wide unrolling; pack uses `inv_scale`; unpack uses
-//! batched i8→f32×scale): stable Rust without `portable_simd` / subprocess.
+//! batched i8→f32×scale). With **`--features turboquant-simd`**, the same loops use `wide::f32x4`
+//! (FM-004 / Horizon S35). Default build stays scalar-only — no nightly `portable_simd`.
 
 use std::fmt;
 
@@ -15,6 +16,12 @@ const FORMAT_VERSION: u8 = 1;
 
 /// Target storage bits per weight after quantization (int8 payload).
 pub const TARGET_BITS_PER_WEIGHT: u8 = 8;
+
+/// `true` when this binary was built with `turboquant-simd` (FM-004).
+#[inline]
+pub const fn simd_fast_path_enabled() -> bool {
+    cfg!(feature = "turboquant-simd")
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TurboQuantError {
@@ -103,6 +110,19 @@ pub fn unpack_to_rows(bytes: &[u8]) -> Result<Vec<Vec<f32>>, TurboQuantError> {
 
 #[inline]
 fn row_max_abs(values: &[f32]) -> f32 {
+    #[cfg(feature = "turboquant-simd")]
+    {
+        return row_max_abs_simd(values);
+    }
+    #[cfg(not(feature = "turboquant-simd"))]
+    {
+        row_max_abs_scalar(values)
+    }
+}
+
+#[cfg_attr(feature = "turboquant-simd", allow(dead_code))]
+#[inline]
+fn row_max_abs_scalar(values: &[f32]) -> f32 {
     let n = values.len();
     let mut m = 0.0_f32;
     let mut i = 0;
@@ -121,8 +141,43 @@ fn row_max_abs(values: &[f32]) -> f32 {
     m
 }
 
+#[cfg(feature = "turboquant-simd")]
+#[inline]
+fn row_max_abs_simd(values: &[f32]) -> f32 {
+    use wide::f32x4;
+
+    let n = values.len();
+    let mut m = f32x4::splat(0.0);
+    let mut i = 0;
+    while i + 4 <= n {
+        let chunk = f32x4::new([values[i], values[i + 1], values[i + 2], values[i + 3]]);
+        m = m.max(chunk.abs());
+        i += 4;
+    }
+    let mut scalar = m.to_array().into_iter().fold(0.0_f32, |a, b| a.max(b));
+    while i < n {
+        scalar = scalar.max(values[i].abs());
+        i += 1;
+    }
+    scalar
+}
+
 #[inline]
 fn append_quantized_row(out: &mut Vec<u8>, row: &[f32], inv_scale: f32) {
+    #[cfg(feature = "turboquant-simd")]
+    {
+        append_quantized_row_simd(out, row, inv_scale);
+        return;
+    }
+    #[cfg(not(feature = "turboquant-simd"))]
+    {
+        append_quantized_row_scalar(out, row, inv_scale);
+    }
+}
+
+#[cfg_attr(feature = "turboquant-simd", allow(dead_code))]
+#[inline]
+fn append_quantized_row_scalar(out: &mut Vec<u8>, row: &[f32], inv_scale: f32) {
     let n = row.len();
     let mut i = 0;
     while i + 4 <= n {
@@ -139,9 +194,54 @@ fn append_quantized_row(out: &mut Vec<u8>, row: &[f32], inv_scale: f32) {
     }
 }
 
+#[cfg(feature = "turboquant-simd")]
+#[inline]
+fn append_quantized_row_simd(out: &mut Vec<u8>, row: &[f32], inv_scale: f32) {
+    use wide::f32x4;
+
+    let inv = f32x4::splat(inv_scale);
+    let lo = f32x4::splat(-127.0);
+    let hi = f32x4::splat(127.0);
+    let n = row.len();
+    let mut i = 0;
+    while i + 4 <= n {
+        let v = f32x4::new([row[i], row[i + 1], row[i + 2], row[i + 3]]) * inv;
+        let rounded = v.round();
+        let q = rounded.max(lo).min(hi).to_array();
+        for qf in q {
+            out.push(qf as i8 as u8);
+        }
+        i += 4;
+    }
+    while i < n {
+        let qf = (row[i] * inv_scale).round().clamp(-127.0, 127.0);
+        out.push(qf as i8 as u8);
+        i += 1;
+    }
+}
+
 /// Dequantise one row of `cols` int8 weights into `flat`; returns new `off` past consumed bytes.
 #[inline]
 fn push_dequantized_row(
+    flat: &mut Vec<f32>,
+    bytes: &[u8],
+    off: usize,
+    cols: usize,
+    scale: f32,
+) -> usize {
+    #[cfg(feature = "turboquant-simd")]
+    {
+        return push_dequantized_row_simd(flat, bytes, off, cols, scale);
+    }
+    #[cfg(not(feature = "turboquant-simd"))]
+    {
+        push_dequantized_row_scalar(flat, bytes, off, cols, scale)
+    }
+}
+
+#[cfg_attr(feature = "turboquant-simd", allow(dead_code))]
+#[inline]
+fn push_dequantized_row_scalar(
     flat: &mut Vec<f32>,
     bytes: &[u8],
     mut off: usize,
@@ -154,6 +254,39 @@ fn push_dequantized_row(
         flat.push(bytes[off + 1] as i8 as f32 * scale);
         flat.push(bytes[off + 2] as i8 as f32 * scale);
         flat.push(bytes[off + 3] as i8 as f32 * scale);
+        off += 4;
+        col += 4;
+    }
+    while col < cols {
+        flat.push(bytes[off] as i8 as f32 * scale);
+        off += 1;
+        col += 1;
+    }
+    off
+}
+
+#[cfg(feature = "turboquant-simd")]
+#[inline]
+fn push_dequantized_row_simd(
+    flat: &mut Vec<f32>,
+    bytes: &[u8],
+    mut off: usize,
+    cols: usize,
+    scale: f32,
+) -> usize {
+    use wide::f32x4;
+
+    let s = f32x4::splat(scale);
+    let mut col = 0;
+    while col + 4 <= cols {
+        let q = f32x4::new([
+            bytes[off] as i8 as f32,
+            bytes[off + 1] as i8 as f32,
+            bytes[off + 2] as i8 as f32,
+            bytes[off + 3] as i8 as f32,
+        ]);
+        let deq = (q * s).to_array();
+        flat.extend_from_slice(&deq);
         off += 4;
         col += 4;
     }
@@ -228,8 +361,21 @@ fn decode_row_major(bytes: &[u8]) -> Result<(Vec<f32>, u32), TurboQuantError> {
     Ok((flat, cols as u32))
 }
 
-/// Dot product (4-wide unrolled; for tests / metrics and small vectors).
+/// Dot product (4-wide; SIMD when `turboquant-simd` is enabled).
 pub fn dot_f32(a: &[f32], b: &[f32]) -> f32 {
+    #[cfg(feature = "turboquant-simd")]
+    {
+        return dot_f32_simd(a, b);
+    }
+    #[cfg(not(feature = "turboquant-simd"))]
+    {
+        dot_f32_scalar(a, b)
+    }
+}
+
+#[cfg_attr(feature = "turboquant-simd", allow(dead_code))]
+#[inline]
+fn dot_f32_scalar(a: &[f32], b: &[f32]) -> f32 {
     let n = a.len().min(b.len());
     let mut sum = 0.0_f32;
     let mut i = 0;
@@ -242,6 +388,28 @@ pub fn dot_f32(a: &[f32], b: &[f32]) -> f32 {
         i += 1;
     }
     sum
+}
+
+#[cfg(feature = "turboquant-simd")]
+#[inline]
+fn dot_f32_simd(a: &[f32], b: &[f32]) -> f32 {
+    use wide::f32x4;
+
+    let n = a.len().min(b.len());
+    let mut sum = f32x4::splat(0.0);
+    let mut i = 0;
+    while i + 4 <= n {
+        let va = f32x4::new([a[i], a[i + 1], a[i + 2], a[i + 3]]);
+        let vb = f32x4::new([b[i], b[i + 1], b[i + 2], b[i + 3]]);
+        sum += va * vb;
+        i += 4;
+    }
+    let mut scalar = sum.to_array().into_iter().fold(0.0_f32, |a, b| a + b);
+    while i < n {
+        scalar += a[i] * b[i];
+        i += 1;
+    }
+    scalar
 }
 
 #[cfg(test)]
@@ -306,6 +474,51 @@ mod tests {
         let mut b = pack_uniform_rows(&[vec![1.0_f32]]).unwrap().bytes;
         b[0] = b'X';
         assert!(matches!(unpack_to_rows(&b), Err(TurboQuantError::BadMagic)));
+    }
+
+    #[cfg(feature = "turboquant-simd")]
+    #[test]
+    fn simd_pack_matches_scalar_reference() {
+        let rows: Vec<Vec<f32>> = (0..6)
+            .map(|i| (0..7).map(|j| ((i * 7 + j) as f32) * 0.11 - 2.0).collect())
+            .collect();
+        let flat: Vec<f32> = rows.iter().flatten().copied().collect();
+        let cols = rows[0].len() as u32;
+
+        let simd_bytes = super::encode_row_major(&flat, cols).expect("simd encode");
+        let scalar_bytes = encode_row_major_scalar(&flat, cols).expect("scalar encode");
+        assert_eq!(simd_bytes, scalar_bytes);
+
+        let simd_back = unpack_to_rows(&simd_bytes).unwrap();
+        let scalar_back = unpack_to_rows(&scalar_bytes).unwrap();
+        assert_eq!(simd_back, scalar_back);
+    }
+
+    /// Scalar-only encode for parity test when `turboquant-simd` is on.
+    #[cfg(feature = "turboquant-simd")]
+    fn encode_row_major_scalar(flat: &[f32], cols: u32) -> Result<Vec<u8>, TurboQuantError> {
+        if cols == 0 {
+            return Err(TurboQuantError::ZeroColumns);
+        }
+        let c = cols as usize;
+        if flat.len() % c != 0 {
+            return Err(TurboQuantError::SizeMismatch);
+        }
+        let rows = flat.len() / c;
+        let row_bytes = 4 + c;
+        let mut out = Vec::with_capacity(4 + 1 + 4 + 4 + rows * row_bytes);
+        out.extend_from_slice(FORMAT_MAGIC);
+        out.push(FORMAT_VERSION);
+        out.extend_from_slice(&cols.to_le_bytes());
+        out.extend_from_slice(&(rows as u32).to_le_bytes());
+        for chunk in flat.chunks(c) {
+            let max_abs = row_max_abs_scalar(chunk);
+            let scale = if max_abs > 0.0 { max_abs / 127.0 } else { 1.0 };
+            out.extend_from_slice(&scale.to_le_bytes());
+            let inv_scale = 1.0 / scale;
+            append_quantized_row_scalar(&mut out, chunk, inv_scale);
+        }
+        Ok(out)
     }
 
     #[test]

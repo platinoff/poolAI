@@ -1,7 +1,7 @@
 # TurboQuant — дослідження та інтеграція в PoolAI
 
 **Дата**: 2026-04-04 (оновлено: лише **Rust**, без Python)  
-**Статус**: фаза 1 у коді ✅; **Horizon S35 (FM-004)** — SIMD fast-path → [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md)
+**Статус**: фаза 1 у коді ✅; **FM-004 SIMD** ✅ (Horizon S35) — feature `turboquant-simd`, `wide::f32x4`
 
 ---
 
@@ -44,7 +44,22 @@
 3. **Інтеграція з pipeline** — розширення конфігу кроку `Quantization` / окремий прапор `turboquant: true` у `StepType` / `HashMap` конфігу кроку; виклик лише з існуючого Rust executor pipeline.
 4. **Метрики** — `bytes_in`, `bytes_out`, `target_bits` у результаті кроку (структури вже в стилі `PruningResult` / pipeline status).
 5. **Бенчмарки** — `criterion` у `benches/` або розділ у `docs/performance/BENCHMARKS.md` (Priority 4).
-6. **Опційно пізніше** — прискорення через `std::simd` / `wide` за політикою залежностей проєкту; **не** через інтерпретатори інших мов.
+6. **SIMD (FM-004)** — опційний feature **`turboquant-simd`** (`wide`); див. § SIMD нижче.
+
+---
+
+## SIMD (FM-004, Horizon S35)
+
+| Що | Де |
+|----|-----|
+| Feature | `Cargo.toml`: `turboquant-simd = ["dep:wide"]` |
+| Код | `src/ml/turboquant.rs` — `row_max_abs`, `append_quantized_row`, `push_dequantized_row`, `dot_f32` |
+| API | `turboquant::simd_fast_path_enabled()` → `true` лише з feature |
+| Збірка | `cargo build --features ml,turboquant-simd` |
+| Тести | `cargo test turboquant --lib --features ml,turboquant-simd` (parity `simd_pack_matches_scalar_reference`) |
+| Бенч | `cargo bench --bench turboquant_benchmarks --features ml,turboquant-simd` |
+
+Без feature залишається **scalar 4-wide unroll** (стабільний default, CI `cargo test-ci` без `turboquant-simd`).
 
 ---
 

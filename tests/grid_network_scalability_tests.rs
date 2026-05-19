@@ -10,7 +10,11 @@
 //! - Network topology validation
 //! - Performance testing with varying node counts
 
+use poolai::core::discovery_types::{PeerCapabilities, PeerInfo};
 use poolai::core::error::AppError;
+use poolai::grid::{
+    envelope_from_peer_info, peer_info_from_envelope, GridEnvelope, GRID_ENVELOPE_VERSION,
+};
 use poolai::raid::{
     events::EventStore, replication::ReplicationEngine, RaidConfig, RaidManager, RaidMode,
 };
@@ -375,6 +379,35 @@ async fn test_grid_network_topology_validation() {
     for i in 1..=10 {
         assert!(grid.get_node(i).is_some());
     }
+}
+
+#[test]
+fn test_grid_envelope_v1_peer_status_on_network_nodes() {
+    // FM-009: wire envelope maps discovery PeerInfo for grid nodes.
+    let peer = PeerInfo {
+        peer_id: "grid-node-1".into(),
+        address: "127.0.0.1".into(),
+        port: 9400,
+        last_seen: chrono::Utc::now(),
+        capabilities: PeerCapabilities {
+            cpu_cores: 2,
+            gpu_devices: vec![],
+            memory_mb: 4096,
+            supports_tensor_parallelism: false,
+            supports_pipeline_parallelism: false,
+            active_requests: 0,
+            capacity: 4,
+            current_load: 0.1,
+        },
+        metadata: Default::default(),
+    };
+    let env = envelope_from_peer_info(&peer);
+    assert_eq!(env.v, GRID_ENVELOPE_VERSION);
+    let json = env.to_json().unwrap();
+    let parsed = GridEnvelope::from_json(&json).unwrap();
+    let back = peer_info_from_envelope(&parsed).expect("peer_status round-trip");
+    assert_eq!(back.peer_id, peer.peer_id);
+    assert_eq!(back.port, peer.port);
 }
 
 #[tokio::test]

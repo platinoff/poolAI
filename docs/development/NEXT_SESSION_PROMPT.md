@@ -34,7 +34,7 @@ Autoprogon A+B = 100% (S34). Не повторювати S21–S34.
 | S39 | FM-006 | cloud-sdk Azure/GCP | TODO closure або documented scope |
 | S40 | C | 100% closure | DEVELOPMENT_PROGRESS C=100%, project 100% |
 
-Почни з першого незакритого [ ] у AUTO_RUN_SESSION_2026_HORIZON.md §4.
+Почни з першого незакритого [ ] у AUTO_RUN_SESSION_2026_HORIZON.md §4 (після S37 → **S38** Job/Memory).
 
 Концепти (перед кодом):
 - GRID_PROTOCOL_CONCEPT_2026-04-06.md
@@ -63,4 +63,4 @@ commit + push MSYS2 з Summary (subject + 3–5 рядків).
 | [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | % по шарах |
 | [`RUN_LOCAL.md`](./RUN_LOCAL.md) | Запуск |
 
-**До зустрічі** — наступна сесія стартує з **S35** (FM-004 SIMD), якщо чеклист horizon §4 порожній для S35.
+**До зустрічі** — наступна сесія стартує з **S38** (Job/Memory types). S35–S37 ✅.

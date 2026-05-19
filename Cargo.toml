@@ -1,3 +1,7 @@
+[workspace]
+resolver = "2"
+members = [".", "crates/poolai-solana-adapter"]
+
 [package]
 name = "poolai"
 version = "0.2.2"
@@ -72,6 +76,9 @@ parking_lot = "0.12"
 
 # LRU cache
 lru = "0.16"
+
+# Portable f32 SIMD for TurboQuant fast-path (`feature = "turboquant-simd"`)
+wide = { version = "0.7", optional = true }
 
 # HTTP client for library downloads
 # Using default features without native-tls to avoid zstd-sys compilation issues
@@ -260,6 +267,8 @@ enterprise = []
 # Stage 4.4 AI/ML (v0.3.0+) — Model Optimization, AutoML, Federated Learning
 # Use: cargo build --features ml (also enable enterprise for /api/enterprise/ai-ml)
 ml = []
+# FM-004 / Horizon S35: SIMD pack/unpack/dot via `wide` (requires `ml` for turboquant module)
+turboquant-simd = ["dep:wide"]
 # Cloud integration features (optional)
 # Use: cargo build --features cloud
 # Note: SDK dependencies are optional and can be added when needed

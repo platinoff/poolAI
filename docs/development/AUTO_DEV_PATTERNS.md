@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S30 FM legacy docs audit).
+**Оновлено:** 2026-05-19 (S37 FM-010 Solana adapter crate).
 
 ---
 
@@ -226,7 +226,14 @@
 - **Сигнал:** `execute_turboquant_quantization_step`
 - **Патерн:** `turboquant=true` → `turboquant::pack_uniform_rows`, тег `step_kind=turboquant`
 - **Перевірка:** `cargo test --test ml_pipeline_integration --features ml`
-- **FM:** FM-004 (SIMD deferred) — логіка без SIMD у автопрогоні
+- **FM:** FM-004 ✅ (scalar default; SIMD опційно)
+
+### [ML] TurboQuant SIMD fast-path (FM-004, S35)
+- **Де:** `src/ml/turboquant.rs` — `row_max_abs_simd`, `append_quantized_row_simd`, `push_dequantized_row_simd`, `dot_f32_simd`
+- **Сигнал:** `cfg!(feature = "turboquant-simd")` / `simd_fast_path_enabled()`
+- **Патерн:** feature `turboquant-simd` → `wide::f32x4`; CI `cargo test-ci` без feature; parity `simd_pack_matches_scalar_reference`
+- **Перевірка:** `cargo test turboquant --lib --features ml,enterprise,cloud,test-utils,turboquant-simd`
+- **FM:** FM-004 ✅
 
 ### [ML] Demo handler AppState
 - **Де:** `src/network/api/ai_ml.rs:170-180`
@@ -513,7 +520,21 @@
 
 - **Де:** `docs/development/HORIZON_TO_100_PLAN.md`, `AUTO_RUN_SESSION_2026_HORIZON.md`, FM §5.6
 - **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
-- **Черга:** S35 FM-004 → S36 Grid → S37 Solana → S38 Job/Memory → S39 cloud → S40 closure
+- **Черга:** S35 ✅ → S36 ✅ → S37 ✅ → S38 Job/Memory → S39 cloud → S40 closure
+
+### [Solana] Adapter crate schema v1 (FM-010, S37)
+- **Де:** `crates/poolai-solana-adapter/src/events.rs`, `src/sidecar.rs`, bin `poolai-solana-adapter`
+- **Сигнал:** `DomainEventEnvelope::from_json`, `process_event_line`
+- **Патерн:** workspace member; **no** `solana-sdk` у `poolai`; NDJSON stdin → ack stdout
+- **Перевірка:** `cargo test -p poolai-solana-adapter` (не повний test-ci, якщо main `src/` не змінювався)
+- **FM:** FM-010 ✅
+
+### [Grid] Envelope v1 JSON (FM-009, S36)
+- **Де:** `src/grid/envelope.rs`, `src/grid/map.rs`
+- **Сигнал:** `GridEnvelope::from_json`, `envelope_from_peer_info`, `envelope_from_put_artifact`
+- **Патерн:** поле `v: 1`; `type` = `job` | `result` | `memory_shard` | `peer_status`; map ↔ `PeerInfo` / `PutArtifactPayload`
+- **Перевірка:** `cargo test grid --lib`; `cargo test --test grid_network_scalability_tests test_grid_envelope`
+- **FM:** FM-009 ✅
 - **Концепти перед кодом:** `GRID_PROTOCOL_CONCEPT`, `SOLANA_ADAPTER_CONCEPT`, `JOB_LAYER_CONCEPT`
 - **Перевірка:** `cargo test-ci` після кожного спринту з `src/`
 - **Поза scope:** FM-003 §4 LAN (2 хости), mainnet Solana

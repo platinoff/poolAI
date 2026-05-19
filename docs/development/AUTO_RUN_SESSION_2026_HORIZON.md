@@ -55,14 +55,40 @@ cargo test-ci
 
 ## 4. Чеклист сесії
 
-- [ ] S35 FM-004
-- [ ] S36 FM-009
-- [ ] S37 FM-010
+- [x] S35 FM-004
+- [x] S36 FM-009
+- [x] S37 FM-010
 - [ ] S38 Job/Memory
 - [ ] S39 FM-006
 - [ ] S40 Layer C **100%** + project **100%**
 - [ ] `AUTO_DEV_PATTERNS.md` — шляхи horizon
 - [ ] push MSYS2 + Summary
+
+---
+
+## S37 — виконання (2026-05-19)
+
+**FM-010:** workspace member `crates/poolai-solana-adapter/` — schema v1 (`JobCompleted`, `SeedProvided`, `MemoryUpdated`); sidecar binary NDJSON; **no** `solana-sdk` у `poolai`.
+
+**Перевірка:** `cargo test -p poolai-solana-adapter` ✅ (~1 хв). Повний `test-ci` — лише після змін у `src/` main.
+
+---
+
+## S36 — виконання (2026-05-19)
+
+**FM-009:** `src/grid/` — `GridEnvelope` v1 JSON; `GridMessage` (Job, Result, MemoryShard, PeerStatus); map ↔ `PeerInfo` / `PutArtifactPayload`; unit + `grid_network_scalability_tests` envelope test.
+
+**test-ci:** ✅ MSYS2 (~9 хв).
+
+---
+
+## S35 — виконання (2026-05-19)
+
+**FM-004:** Cargo feature `turboquant-simd` (`wide`); SIMD у `src/ml/turboquant.rs` (`row_max_abs`, pack/unpack row, `dot_f32`); `simd_fast_path_enabled()`; parity test `simd_pack_matches_scalar_reference`; `docs/ml/TURBOQUANT_INTEGRATION.md` §SIMD.
+
+**test-ci:** ✅ MSYS2 (`K8S_OPENAPI_ENABLED_VERSION=1.28`).
+
+**Додатково:** `UiService::delete_dashboard` — `#[cfg(feature = "enterprise")]` (збірка lib без enterprise).
 
 ---
 

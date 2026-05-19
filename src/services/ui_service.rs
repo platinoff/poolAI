@@ -136,6 +136,7 @@ impl UiService {
         EnterpriseService::update_monitoring_dashboard(ctx, id, input).await
     }
 
+    #[cfg(feature = "enterprise")]
     pub async fn delete_dashboard(
         ctx: &ApiContext,
         id: uuid::Uuid,

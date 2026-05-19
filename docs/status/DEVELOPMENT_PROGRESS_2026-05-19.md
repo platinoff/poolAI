@@ -1,6 +1,6 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-05-19 (після **S34**) · **Гілка:** `main`
+**Оновлено:** 2026-05-19 (після **S37** Horizon) · **Гілка:** `main`
 
 ---
 
@@ -11,8 +11,8 @@
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | Код + CI + harness; LAN sign-off і cloud-sdk deep — поза scope |
 | **A+B (офіційний autoprogon)** | **100%** | HANDOFF / README / FM §5.5 |
-| **C. Horizon (код P6)** | **~21%** → **100%** | S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
-| **Проєкт (A+B+C)/3** | **~93%** → **100%** | після S40 |
+| **C. Horizon (код P6)** | **~50%** → **100%** | S35–S37 ✅; S38–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
+| **Проєкт (A+B+C)/3** | **~83%** → **100%** | після S40 |
 
 **Наступна фаза:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md) · промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -51,11 +51,17 @@
 
 ## Horizon → 100% (S35–S40)
 
+| Спринт | FM | Статус |
+|--------|-----|--------|
+| S35 | FM-004 SIMD | ✅ |
+| S36 | FM-009 Grid | ✅ |
+| S37 | FM-010 Solana MVP | ✅ |
+
 | Спринт | FM | % внеску C (орієнтир) |
 |--------|-----|----------------------|
-| S35 | FM-004 SIMD | +15% |
-| S36 | FM-009 Grid | +25% |
-| S37 | FM-010 Solana MVP | +20% |
+| S35 | FM-004 SIMD | +15% ✅ |
+| S36 | FM-009 Grid | +25% ✅ |
+| S37 | FM-010 Solana MVP | +20% ✅ |
 | S38 | Job/Memory wire | +15% |
 | S39 | FM-006 cloud-sdk | +15% |
 | S40 | docs closure | +10% |
