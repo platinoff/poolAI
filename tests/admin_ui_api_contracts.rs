@@ -666,10 +666,11 @@ async fn raid_admin_smallworld_metrics_json_shape() {
 mod enterprise_admin_contract_slices {
     use super::*;
     use chrono::Utc;
-    use poolai::enterprise::monitoring::Dashboard;
+    use poolai::enterprise::monitoring::{AlertRule, AlertSeverity, Dashboard, MetricDataPoint};
     use poolai::enterprise::multi_tenancy::TenantConfig;
-    use poolai::enterprise::security::OAuth2Config;
+    use poolai::enterprise::security::{OAuth2Config, SamlConfig, SecurityPolicy};
     use poolai::network::enterprise_api::create_enterprise_api_routes;
+    use std::collections::HashMap;
     use uuid::Uuid;
 
     #[tokio::test]
@@ -871,6 +872,210 @@ mod enterprise_admin_contract_slices {
             "created_at",
         ] {
             assert!(o.contains_key(key), "dashboard missing `{key}`: {o:?}");
+        }
+    }
+
+    #[tokio::test]
+    async fn enterprise_monitoring_metrics_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.enterprise_monitoring_manager
+            .initialize()
+            .await
+            .unwrap();
+        ctx.enterprise_monitoring_manager
+            .record_metric(MetricDataPoint {
+                timestamp: Utc::now(),
+                metric: "cpu_usage".to_string(),
+                value: 42.5,
+                tags: HashMap::new(),
+                tenant_id: None,
+            })
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/monitoring/metrics?metric=cpu_usage&limit=10")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("metrics JSON");
+        let arr = v.as_array().expect("metrics response is array");
+        assert!(!arr.is_empty(), "seeded metrics list should be non-empty");
+        let o = arr[0].as_object().expect("metric data point object");
+        for key in ["timestamp", "metric", "value"] {
+            assert!(o.contains_key(key), "metric point missing `{key}`: {o:?}");
+        }
+        assert_eq!(o.get("metric").and_then(|x| x.as_str()), Some("cpu_usage"));
+    }
+
+    #[tokio::test]
+    async fn enterprise_monitoring_alert_rules_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.enterprise_monitoring_manager
+            .initialize()
+            .await
+            .unwrap();
+        ctx.enterprise_monitoring_manager
+            .create_alert_rule(AlertRule {
+                name: "admin-contract-rule".to_string(),
+                metric: "memory_usage".to_string(),
+                threshold: 80.0,
+                operator: ">".to_string(),
+                severity: AlertSeverity::Warning,
+                enabled: true,
+                tenant_id: None,
+            })
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/monitoring/alert-rules")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("alert rules JSON");
+        let arr = v.as_array().expect("alert rules response is array");
+        assert!(
+            !arr.is_empty(),
+            "seeded alert rules list should be non-empty"
+        );
+        let o = arr[0].as_object().expect("alert rule object");
+        for key in [
+            "name",
+            "metric",
+            "threshold",
+            "operator",
+            "severity",
+            "enabled",
+        ] {
+            assert!(o.contains_key(key), "alert rule missing `{key}`: {o:?}");
+        }
+    }
+
+    #[tokio::test]
+    async fn enterprise_saml_providers_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.security_manager.initialize().await.unwrap();
+        ctx.security_manager
+            .register_saml_provider(
+                "admin-contract-saml".to_string(),
+                SamlConfig {
+                    entity_id: "https://idp.example.com/entity".to_string(),
+                    sso_url: "https://idp.example.com/sso".to_string(),
+                    acs_url: None,
+                    slo_url: None,
+                    certificate: "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----"
+                        .to_string(),
+                    attribute_mapping: HashMap::new(),
+                },
+            )
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/security/saml/providers")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("saml providers JSON");
+        let arr = v.as_array().expect("saml providers response is array");
+        assert!(!arr.is_empty(), "seeded saml list should be non-empty");
+        let o = arr[0].as_object().expect("saml provider object");
+        for key in ["name", "config", "enabled"] {
+            assert!(o.contains_key(key), "saml provider missing `{key}`: {o:?}");
+        }
+        let config = o.get("config").and_then(|x| x.as_object()).expect("config");
+        for key in ["entity_id", "sso_url", "certificate"] {
+            assert!(
+                config.contains_key(key),
+                "saml config missing `{key}`: {config:?}"
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn enterprise_security_policies_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.security_manager.initialize().await.unwrap();
+        ctx.security_manager
+            .create_security_policy(SecurityPolicy {
+                name: "admin-contract-policy".to_string(),
+                description: "contract test policy".to_string(),
+                allowed_ip_ranges: vec![],
+                require_mfa: true,
+                session_timeout: 3600,
+                max_failed_attempts: 5,
+            })
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/security/policies")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("security policies JSON");
+        let arr = v.as_array().expect("security policies response is array");
+        assert!(
+            !arr.is_empty(),
+            "seeded security policies list should be non-empty"
+        );
+        let o = arr[0].as_object().expect("security policy object");
+        for key in [
+            "name",
+            "description",
+            "require_mfa",
+            "session_timeout",
+            "max_failed_attempts",
+        ] {
+            assert!(
+                o.contains_key(key),
+                "security policy missing `{key}`: {o:?}"
+            );
         }
     }
 

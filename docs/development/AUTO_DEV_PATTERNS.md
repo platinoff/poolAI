@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S25 admin JSON contracts — tenants, OAuth2, dashboards).
+**Оновлено:** 2026-05-19 (S26 — metrics, alert-rules, SAML, policies; P1 closed).
 
 ---
 
@@ -73,7 +73,7 @@
 
 ### [UI] Admin JSON contract tests
 - **Де:** `tests/admin_ui_api_contracts.rs`
-- **Сигнал:** `rg "async fn.*_" tests/admin_ui_api_contracts.rs` → 23 tests (2026-05-19)
+- **Сигнал:** `rg "async fn.*_" tests/admin_ui_api_contracts.rs` → 27 tests (2026-05-19, S26)
 - **Патерн:** `Router::new().nest("/api/v1", create_api_routes()).with_state(ApiContext::default())`; 503 → `assert_structured_error`; модуль `attached_managers` — `attach_*_for_test` для 200 shapes
 - **Перевірка:** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test --test admin_ui_api_contracts --features ml,enterprise,cloud,test-utils -j 1 -- --test-threads=1`
 - **Доки:** [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md) — колонка **Тест**
@@ -88,6 +88,20 @@
   - dashboards — `ctx.enterprise_monitoring_manager.create_dashboard(Dashboard { ... })` → `GET .../monitoring/dashboards` (`id`, `name`, `metrics`, `is_public`, `created_at`).
 - **Перевірка:** `cargo test-ci`; UI читає ті самі поля в `src/ui/admin/{tenants,security,monitoring}.rs`
 - **FM:** FM-013 (розширення), UI_QUALITY P1
+
+### [UI] Enterprise metrics + alert-rules contracts (S26)
+- **Де:** `tests/admin_ui_api_contracts.rs` — `enterprise_monitoring_metrics_json_shape`, `enterprise_monitoring_alert_rules_json_shape`
+- **Сигнал:** `rg "enterprise_monitoring_metrics|enterprise_monitoring_alert_rules" tests/admin_ui_api_contracts.rs`
+- **Патерн:** `record_metric(MetricDataPoint { metric, value, timestamp, … })` → `GET .../monitoring/metrics?metric=…`; `create_alert_rule(AlertRule { name, metric, operator, threshold, severity, enabled })` → `GET .../alert-rules`
+- **Перевірка:** UI `dashboard.rs` / `monitoring.rs` читають `metric`, `value`, `timestamp` та поля rule table
+- **FM:** FM-013, UI_QUALITY P1 ✅
+
+### [UI] Enterprise SAML + security policies contracts (S26)
+- **Де:** `tests/admin_ui_api_contracts.rs` — `enterprise_saml_providers_json_shape`, `enterprise_security_policies_json_shape`
+- **Сигнал:** `rg "enterprise_saml_providers|enterprise_security_policies" tests/admin_ui_api_contracts.rs`
+- **Патерн:** `security_manager.register_saml_provider` / `create_security_policy` → `GET .../security/saml/providers` та `GET .../security/policies`
+- **Перевірка:** `src/ui/admin/security.rs` — `config.entity_id`, `require_mfa`, `session_timeout`
+- **FM:** FM-012/013, UI_QUALITY P1 ✅
 
 ---
 

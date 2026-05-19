@@ -147,6 +147,7 @@ FM-xxx (з таблиці нижче)
 | FM-019 baseline docs | `ADMIN_A11Y_RUNBOOK.md`, §5.4 | `31266be9` |
 | S21–S24 | OpenAPI ai-ml; pa11y CI; Playwright smoke; dashboard DELETE | `fa96a6b4`…`56edbce9` |
 | **S25** | UI_QUALITY P1 — tenants, OAuth2, dashboards contracts (+3 tests) | `2720c3d3` |
+| **S26** | UI_QUALITY P1 close — metrics, alert-rules, SAML, policies (+4 tests) | (push) |
 
 #### Не зроблено (канон backlog)
 
@@ -184,8 +185,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **UI_QUALITY P1** | **Partial ✅** S25 — tenants, OAuth2, dashboards; backlog: metrics, SAML/policies, alert-rules |
-| — | **S21–S25** | ✅ OpenAPI, FM-019 CI, Playwright, dashboard DELETE, admin contracts (2026-05-19) |
+| 1 | **UI_QUALITY P1** | **✅** S25–S26 — 27 contract tests; [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md) |
+| — | **S21–S26** | ✅ OpenAPI, FM-019 CI, Playwright, dashboard DELETE, admin contracts P1 (2026-05-19) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.

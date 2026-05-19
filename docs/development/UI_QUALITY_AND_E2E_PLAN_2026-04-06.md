@@ -19,8 +19,12 @@
 
 ## S25 (2026-05-19)
 
-- **Admin JSON contracts (P1):** +3 тести в `tests/admin_ui_api_contracts.rs` — `GET /api/enterprise/tenants`, `GET …/security/oauth2/providers`, `GET …/monitoring/dashboards` (ключі для `tenants.rs`, `security.rs`, `monitoring.rs`).
-- Таблиця покриття — [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md). Backlog: metrics, SAML/policies, alert-rules.
+- **Admin JSON contracts (P1):** +3 тести — tenants, OAuth2, dashboards.
+
+## S26 (2026-05-19)
+
+- **Admin JSON contracts (P1 закрито):** +4 тести — metrics, alert-rules, SAML providers, security policies (**27** tests total).
+- Таблиця покриття — [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md). **P1 ✅**
 
 ## Наступні кроки за пріоритетом
 

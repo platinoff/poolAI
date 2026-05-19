@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Added
+- **UI admin JSON contracts P1 complete (2026-05-19, S26)** — +4 tests: `enterprise_monitoring_metrics_json_shape`, `enterprise_monitoring_alert_rules_json_shape`, `enterprise_saml_providers_json_shape`, `enterprise_security_policies_json_shape` (27 total).
 - **UI admin JSON contracts (2026-05-19, S25)** — `tests/admin_ui_api_contracts.rs`: `enterprise_tenants_list_json_shape`, `enterprise_oauth2_providers_json_shape`, `enterprise_monitoring_dashboards_json_shape`; [`ADMIN_UI_JSON_CONTRACTS.md`](development/ADMIN_UI_JSON_CONTRACTS.md) coverage column; [`AUTO_DEV_PATTERNS.md`](development/AUTO_DEV_PATTERNS.md) enterprise slice pattern; `STABLE_STATE_SUMMARY` (23 tests).
 - **UI dashboards (2026-05-19, S24)** — `MonitoringManager.delete_dashboard()`; `DELETE /api/v1/ui/dashboards/{id}` returns 204; integration test `test_delete_dashboard`.
 - **UI E2E (2026-05-19, S23)** — Playwright smoke: `e2e/tests/smoke.spec.ts`, `bin/e2e-playwright.sh`, `docs/development/E2E_PLAYWRIGHT.md`, `.github/workflows/e2e.yml` (`workflow_dispatch`).

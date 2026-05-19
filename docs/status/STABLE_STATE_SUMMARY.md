@@ -22,8 +22,8 @@
 - ◆ **FM-003 §4 (BLOCKED):** реальний LAN — немає 2 хостів; ops зріз **2026-06-01** у `BENCHMARKS.md` / `LAN_BENCHMARK_RUNBOOK.md`; dev stand §5.1 + `verify-dev-stand`.
 - ✅ **P4 (2026-05-18):** `poolai_health_load --json` на **win10-local-26200** → рядок у `BENCHMARKS.md` (історичний baseline **2026-04-10** лишається).
 - ✅ **P0 docs (2026-05-17):** [`AUTO_DEV_PATTERNS.md`](../development/AUTO_DEV_PATTERNS.md) — 25 патернів для авторозробки.
-- ✅ **FM-013–015 (2026-05-19):** admin UI ↔ API JSON contracts — `tests/admin_ui_api_contracts.rs` (**23 tests**); v1 + enterprise slices; [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md).
-- ✅ **S25 (2026-05-19):** UI_QUALITY P1 — enterprise contracts: tenants, OAuth2 providers, monitoring dashboards (`2720c3d3`).
+- ✅ **FM-013–015 (2026-05-19):** admin UI ↔ API JSON contracts — `tests/admin_ui_api_contracts.rs` (**27 tests**); UI_QUALITY P1 ✅; [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md).
+- ✅ **S25–S26 (2026-05-19):** UI_QUALITY P1 — enterprise contracts повний набір (tenants, security, monitoring).
 - ✅ **FM-016 (2026-05-18):** virtual nodes — register/heartbeat, tasks, RAID wire; `poolai-worker`.
 - ✅ **FM-016+ (2026-05-18):** Telegram bind/webhook API, file store.
 - ✅ **FM-016++ (2026-05-18):** `poolai-telegram-bot`, `tgbot/coordinator`, `tests/tgbot_coordinator_bridge_integration.rs`.
