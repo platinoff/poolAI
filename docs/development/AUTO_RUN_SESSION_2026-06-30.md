@@ -17,4 +17,4 @@
 
 **Поза обсягом:** Playwright E2E; FM-004/006/009/010; enterprise `/ai-ml/optimization*` stubs (optional).
 
-**Далі:** OpenAPI gap audit (`rg` enterprise routes vs yaml); Playwright smoke.
+**Далі:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) — зведений backlog + S21+.

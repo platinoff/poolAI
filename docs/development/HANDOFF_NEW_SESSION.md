@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 ([`AUTO_RUN_SESSION_2026-06-30.md`](./AUTO_RUN_SESSION_2026-06-30.md) — OpenAPI security policies S20).
+**Оновлено:** 2026-05-19 ([`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) — зведений backlog + черга S21+).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-30.md`](./AUTO_RUN_SESSION_2026-06-30.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅ (S7–S12):** pa11y 18 auth + login; `PA11Y_WCAG22=1`; `a11y.yml` PR; `ci.yml` `pa11y-contract`. **OpenAPI (S14–S20):** … S19 tenants/audit/SAML; **S20** — `/security/policies*`. Enterprise surface ~complete; gap audit + Playwright E2E — опційно; [`AUTO_RUN_SESSION_2026-06-30.md`](./AUTO_RUN_SESSION_2026-06-30.md). **Не в автопрогоні:** FM-004/006/009/010. Звірка — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅ (S7–S12):** pa11y 18 auth + login; `PA11Y_WCAG22=1`; `a11y.yml` PR; `ci.yml` `pa11y-contract`. **OpenAPI (S14–S20):** enterprise REST ✅. **Наступне:** gap audit (`/ai-ml/optimization*`), Playwright, FM-019 CI — [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) §1–2. **Не в автопрогоні:** FM-004/006/009/010. Звірка — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -95,7 +95,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (наступна сесія → git push)
 
-1. Старт: [`AUTO_RUN_SESSION_2026-06-30.md`](./AUTO_RUN_SESSION_2026-06-30.md) — push S17–S20; gap audit / Playwright.
+1. Старт: [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) — backlog «не зроблено» + черга S21+ (за замовчуванням OpenAPI gap audit).
 2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після коду — `cargo fmt` + `cargo test-ci`.
 3. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
 4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); `git -c commit.template= commit -F msgfile`.

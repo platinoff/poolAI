@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-18 (§5.3 S13 — legacy docs audit; [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md)).
+**Оновлено:** 2026-05-19 (§5.1 backlog S21+; [`AUTO_RUN_SESSION_2026-07-01.md`](../development/AUTO_RUN_SESSION_2026-07-01.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -177,15 +177,19 @@ FM-xxx (з таблиці нижче)
 
 Див. [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md) — аудит січень–квітень 2026 планів.
 
-#### Рекомендований наступний спринт (2026-05-18, після S13)
+#### Рекомендований наступний спринт (2026-05-19, після OpenAPI S14–S20)
 
-1. **FM-003 §4** — **BLOCKED** (2 хости); dev stand + runbook only.
-2. **OpenAPI** — sync з `src/network/` при наявності API diff (S14–S16 ✅; ai_ml pipeline — ongoing).
-3. **UI E2E** — Playwright smoke (`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`) — опційно.
-4. **Virtual nodes / ML** — hardening за DIGEST + `PIPELINE_MANAGEMENT.md` — за пріоритетом продукту.
-5. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+Повний backlog — [`AUTO_RUN_SESSION_2026-07-01.md`](../development/AUTO_RUN_SESSION_2026-07-01.md).
 
-Детальна матриця — [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md).
+| Порядок | Спринт | Фокус |
+|--------|--------|--------|
+| 1 | **S21** | OpenAPI gap: `/ai-ml/optimization*`, `automl`, `federated` |
+| 2 | **S22** | FM-019: pa11y merge gate / CI hardening |
+| 3 | **S23** | Playwright smoke (опційно) |
+| 4 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
+| — | **FM-003 §4** | **BLOCKED** (2 хости) |
+
+**Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
