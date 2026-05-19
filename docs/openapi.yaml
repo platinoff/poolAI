@@ -57,6 +57,12 @@ tags:
     description: Peer discovery and virtual-node registration (FM-016)
   - name: VirtualNodes
     description: Virtual-node workers, tasks, pool join, Telegram bridge (FM-016+)
+  - name: Admin
+    description: Admin dashboard aggregation JSON
+  - name: Topology
+    description: Network topology and node resources
+  - name: Instances
+    description: ML model instance placement and lifecycle
 
 paths:
   /status:
@@ -541,6 +547,223 @@ paths:
           description: Update processed
         '401':
           description: Invalid webhook secret
+
+  /admin/overview:
+    get:
+      tags:
+        - Admin
+      summary: Admin dashboard overview
+      description: Aggregated counts and subsystem flags for `/ui/admin`.
+      operationId: getAdminOverview
+      responses:
+        '200':
+          description: Overview snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminOverview'
+
+  /topology:
+    get:
+      tags:
+        - Topology
+      summary: Network topology snapshot
+      operationId: getTopology
+      responses:
+        '200':
+          description: Topology overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopologyOverviewResponse'
+        '503':
+          description: Topology service not ready
+
+  /topology/latency:
+    get:
+      tags:
+        - Topology
+      summary: Latency matrix between nodes
+      operationId: getTopologyLatencyMatrix
+      responses:
+        '200':
+          description: Latency matrix (ms), keys `node_a:node_b`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopologyLatencyMatrixResponse'
+        '503':
+          description: Topology service not ready
+
+  /topology/nodes:
+    get:
+      tags:
+        - Topology
+      summary: Resources for all topology nodes
+      operationId: getTopologyAllNodeResources
+      responses:
+        '200':
+          description: Per-node resource snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopologyAllNodesResourcesResponse'
+        '503':
+          description: Topology service not ready
+
+  /topology/nodes/{node_id}:
+    get:
+      tags:
+        - Topology
+      summary: Resources for one topology node
+      operationId: getTopologyNodeResources
+      parameters:
+        - name: node_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Node resources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopologyNodeResourcesResponse'
+        '404':
+          description: Node not found
+        '503':
+          description: Topology service not ready
+
+  /instance/previews:
+    get:
+      tags:
+        - Instances
+      summary: Placement previews for a model
+      operationId: getInstancePreviews
+      parameters:
+        - name: model_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Preview rows per sharding strategy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstancePreviewResponse'
+        '400':
+          description: Missing model_id
+        '503':
+          description: Instance manager not initialized
+
+  /instance:
+    get:
+      tags:
+        - Instances
+      summary: List model instances
+      operationId: listModelInstances
+      responses:
+        '200':
+          description: Instance list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceListResponse'
+        '503':
+          description: Instance manager not initialized
+    post:
+      tags:
+        - Instances
+      summary: Create a model instance
+      operationId: createModelInstance
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateModelInstanceRequest'
+      responses:
+        '200':
+          description: Create command accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateModelInstanceResponse'
+        '503':
+          description: Instance manager not initialized
+
+  /instance/{id}:
+    get:
+      tags:
+        - Instances
+      summary: Get model instance by id
+      operationId: getModelInstance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Instance details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelInstanceInfo'
+        '404':
+          description: Instance not found
+        '503':
+          description: Instance manager not initialized
+    delete:
+      tags:
+        - Instances
+      summary: Delete model instance
+      operationId: deleteModelInstance
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Instance deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Instance deleted
+        '503':
+          description: Instance manager not initialized
+
+  /state:
+    get:
+      tags:
+        - Instances
+      summary: Deployment state map
+      description: Per-instance deployment state from the instance manager.
+      operationId: getInstanceDeploymentState
+      responses:
+        '200':
+          description: State keyed by instance id
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '503':
+          description: Instance manager not initialized
 
   /gpu:
     get:
@@ -1686,6 +1909,212 @@ components:
         detail:
           type: string
           nullable: true
+
+    AdminSubsystemFlags:
+      type: object
+      properties:
+        pool:
+          type: boolean
+        raid:
+          type: boolean
+        vm:
+          type: boolean
+        library:
+          type: boolean
+        instance_manager:
+          type: boolean
+        topology:
+          type: boolean
+
+    AdminOverview:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+        uptime_seconds:
+          type: integer
+          format: int64
+        version:
+          type: string
+        workers:
+          type: integer
+        workers_total:
+          type: integer
+        workers_registered:
+          type: integer
+        vm_instances:
+          type: integer
+        active_models:
+          type: integer
+        cpu_usage_percent:
+          type: number
+          format: float
+        memory_usage_mb:
+          type: number
+          format: float
+        gpu_usage_percent:
+          type: number
+          format: float
+        total_requests:
+          type: integer
+          format: int64
+        libraries:
+          type: integer
+        raid_nodes:
+          type: integer
+        raid_artifacts:
+          type: integer
+        subsystems:
+          $ref: '#/components/schemas/AdminSubsystemFlags'
+
+    TopologyOverviewResponse:
+      type: object
+      properties:
+        node_count:
+          type: integer
+        latency_measurements:
+          type: integer
+        last_updated:
+          type: string
+          format: date-time
+        node_ids:
+          type: array
+          items:
+            type: string
+
+    TopologyLatencyMatrixResponse:
+      type: object
+      properties:
+        latency_matrix:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+
+    TopologyNodeResourcesResponse:
+      type: object
+      properties:
+        node_id:
+          type: string
+        available_gpu_memory_mb:
+          type: integer
+          format: int64
+        total_gpu_memory_mb:
+          type: integer
+          format: int64
+        available_cpu_cores:
+          type: integer
+        total_cpu_cores:
+          type: integer
+        available_memory_mb:
+          type: integer
+          format: int64
+        total_memory_mb:
+          type: integer
+          format: int64
+        current_load:
+          type: number
+          format: float
+
+    TopologyAllNodesResourcesResponse:
+      type: object
+      properties:
+        nodes:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TopologyNodeResourcesResponse'
+
+    InstancePreview:
+      type: object
+      properties:
+        model_id:
+          type: string
+        sharding:
+          type: string
+        instance_meta:
+          type: string
+        instance:
+          type: object
+        memory_delta_by_node:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        error:
+          type: string
+          nullable: true
+
+    InstancePreviewResponse:
+      type: object
+      properties:
+        previews:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstancePreview'
+
+    CreateModelInstanceRequest:
+      type: object
+      required:
+        - instance
+      properties:
+        instance:
+          type: object
+          description: Opaque instance spec (model, placement, resources)
+
+    CreateModelInstanceResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        command_id:
+          type: string
+        instance_id:
+          type: string
+
+    ModelInstancePlacementInfo:
+      type: object
+      properties:
+        strategy:
+          type: string
+          example: single
+        node_ids:
+          type: array
+          items:
+            type: string
+        memory_by_node:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        memory_delta:
+          type: integer
+          format: int64
+        error:
+          type: string
+          nullable: true
+
+    ModelInstanceInfo:
+      type: object
+      properties:
+        instance_id:
+          type: string
+        model_id:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+        placement:
+          $ref: '#/components/schemas/ModelInstancePlacementInfo'
+
+    InstanceListResponse:
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelInstanceInfo'
 
     RegisterRemotePeerRequest:
       type: object

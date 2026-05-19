@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **OpenAPI (2026-05-18, S16)** — admin/overview, topology (4 paths), model instance CRUD + previews + `/state`.
+- **AUTO_RUN 2026-06-26 (S16)** — OpenAPI admin/topology/instances; HANDOFF/FM §5.3.
 - **OpenAPI (2026-05-18, S15)** — FM-016 discovery: peers list/get, local register, virtual-node health probe; schemas `PeerInfo`, `RemoteHealthProbe`.
 - **AUTO_RUN 2026-06-25 (S15)** — OpenAPI discovery sync; HANDOFF/FM §5.3.
 - **OpenAPI (2026-05-18, S14)** — FM-016+ Telegram: `GET /virtual-nodes/telegram/bindings`, `DELETE .../bindings/{id}`; schemas `TelegramBinding`, list/bind responses.

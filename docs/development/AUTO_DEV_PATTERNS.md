@@ -435,6 +435,13 @@
 - **Перевірка:** docs-only — `cargo test-ci` зріз; при зміні handlers — integration `virtual_node_*`
 - **FM:** FM-016+
 
+### [OpenAPI] Admin, topology, model instances
+- **Де:** `src/network/api/admin.rs`, `topology.rs`, `instances.rs`; `docs/openapi.yaml`
+- **Сигнал:** `rg '\.route\(' src/network/api/{admin,topology,instances}.rs` vs `rg '^  /(admin|topology|instance|state)' docs/openapi.yaml`
+- **Патерн:** `GET /admin/overview` → `AdminOverview`; topology 4 GET paths; instance previews require `model_id` query; POST/DELETE `/instance` need `bearerAuth`
+- **Перевірка:** `cargo test-ci`; `tests/admin_ui_api_contracts.rs`
+- **FM:** FM-013–015 (contracts), admin UI
+
 ### [OpenAPI] Discovery FM-016 routes sync
 - **Де:** `src/network/api/discovery.rs` (`create_discovery_routes`), `docs/openapi.yaml`
 - **Сигнал:** `rg '\.route\(' src/network/api/discovery.rs` vs `rg '^  /discovery' docs/openapi.yaml`
