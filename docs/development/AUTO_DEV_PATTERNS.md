@@ -350,11 +350,11 @@
 - **FM:** FM-019 Partial (pa11y auth)
 
 ### [FM-019] pa11y WCAG 2.2 profile (PA11Y_WCAG22)
-- **Де:** `bin/pa11y-ci.sh` — `validate_pa11y_standard`, `pa11y_axe_wcag22_json`
+- **Де:** `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml` (`PA11Y_WCAG22: "1"`)
 - **Сигнал:** `PA11Y_STANDARD=WCAG22AA` → exit 2 (pa11y v9); `PA11Y_WCAG22=1` → axe tags `wcag22aa`
-- **Патерн:** `PA11Y_WCAG22=1 PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — 0 errors (18 auth + login)
+- **Патерн:** CI + локально: `PA11Y_WCAG22=1 PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — 0 errors
 - **Перевірка:** audit filters — `<label for="audit-*">` у `src/ui/admin/audit.rs`
-- **FM:** FM-019 Partial (WCAG 2.2)
+- **FM:** FM-019 Partial (WCAG 2.2 CI)
 
 ### [FM-019] pa11y URL matrix + UI plan archival (docs S4)
 - **Де:** [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.1; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (архів)

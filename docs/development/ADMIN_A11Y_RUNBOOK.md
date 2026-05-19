@@ -119,6 +119,8 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md)~~ — **Archived ✅ 2026-05-18** (S4 docs; канон §5.4 + цей runbook).
 - ~~Розширити `ADMIN_URLS`: `/ui`, `/ui/admin/config`~~ — **Partial ✅ 2026-05-18** (S5; 6 auth URLs strict).
 
-- Admin subpages (tenants, audit, monitoring, topology…) — **backlog** (не в strict `ADMIN_URLS`).
+- ~~Admin subpages у `ADMIN_URLS`~~ — **Partial ✅ 2026-05-18** (S8–S9: tenants, audit, monitoring, instances, topology; 18 auth URLs).
+- ~~WCAG 2.2 локально~~ — **Partial ✅ S10** (`PA11Y_WCAG22=1`, 0 errors).
+- ~~`PA11Y_WCAG22` у CI~~ — **Partial ✅ S11** (`a11y.yml` env).
 
-**Last updated:** 2026-05-18 — S7 pa11y: status/health/metrics + `/ui/admin`; 13 auth URLs 0 errors.
+**Last updated:** 2026-05-18 — S11: CI `PA11Y_WCAG22=1`; 18 auth + login strict.

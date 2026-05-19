@@ -1,6 +1,6 @@
 # 📋 Нереалізовані Features з Концепції - PoolAI
 
-> **⚠️ Застарілий зріз (2026-01-17).** Не використовуй як канон прогресу. Актуально: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.3. Багато пунктів нижче (ML pipeline, TurboQuant, distributed RAID) **вже в `src/`**.
+> **⚠️ Архів / не канон (2026-05-18, S11).** Історичний список «не реалізовано» від 2026-01-17. Канон: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.3. ML pipeline, TurboQuant, distributed RAID — **Implemented** у `src/`.
 
 **Дата створення**: 2026-01-17  
 **Версія**: 1.0  

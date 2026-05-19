@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **AUTO_RUN 2026-06-21 (S11)** — `PA11Y_WCAG22` у `a11y.yml` CI; `CONCEPT_PENDING_FEATURES` archival; runbook §5 sync.
 - **AUTO_RUN 2026-06-20 (S10)** — `PA11Y_WCAG22` profile; audit a11y; a11y.yml PR paths.
 - **AUTO_RUN 2026-06-19 (S9)** — pa11y instances/topology; runbook 18 URLs; FM pa11y matrix complete.
 - **AUTO_RUN 2026-06-18 (S8)** — pa11y admin subpages tenants/audit/monitoring; runbook 16 URLs.

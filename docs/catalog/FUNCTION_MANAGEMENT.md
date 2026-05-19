@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-18 (§5.3 S10 — `PA11Y_WCAG22` WCAG 2.2 axe; [`AUTO_RUN_SESSION_2026-06-20.md`](../development/AUTO_RUN_SESSION_2026-06-20.md)).
+**Оновлено:** 2026-05-18 (§5.3 S11 — `PA11Y_WCAG22` у CI; [`AUTO_RUN_SESSION_2026-06-21.md`](../development/AUTO_RUN_SESSION_2026-06-21.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -122,7 +122,7 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
-| 2 | UI a11y backlog | **FM-019** | pa11y 18 auth ✅; `PA11Y_WCAG22=1` ✅ (S10); `a11y.yml` PR ✅; опційно WCAG22 у default CI job |
+| 2 | UI a11y backlog | **FM-019** | pa11y 18 auth + `PA11Y_WCAG22` CI ✅ (S11); merge gate у `ci.yml` — backlog |
 | 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
 | — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
 | 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
@@ -155,12 +155,12 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | поза автопрогоном |
 | FM-006 | cloud-sdk гілки | **Deferred** | поза автопрогоном |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | pa11y/axe у CI | **Partial** | 18 auth + login; `PA11Y_WCAG22=1` 0 errors (S10); PR trigger `src/ui/**` |
-| FM-019 | WCAG 2.2 у default CI | **Partial** | локально `PA11Y_WCAG22=1`; pa11y v9 без `WCAG22AA` standard |
+| FM-019 | pa11y/axe у CI | **Partial** | `a11y.yml`: PR + `PA11Y_WCAG22=1` (S11); 18 auth 0 errors |
+| FM-019 | a11y merge gate у `ci.yml` | **Backlog** | окремий workflow, не блокує `main` CI |
 | P4 | `poolai_health_load` → `BENCHMARKS.md` | **Implemented (ops)** | рядок **2026-05-18**; baseline **2026-04-10** для порівняння |
 | `UI_IMPROVEMENTS_PLAN` | Історичні `[ ]` | **Archived** | S4 2026-05-18; канон §5.4 + runbook §3.1 |
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
-| `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | канон STABLE + DIGEST |
+| `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
 | OpenAPI | Синхронізація при нових маршрутах | **Ongoing** | звіряти при API diff |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
@@ -168,10 +168,10 @@ FM-xxx (з таблиці нижче)
 #### Рекомендований наступний спринт (2026-05-18)
 
 1. **FM-003 §4** — **BLOCKED** (2 хости).
-2. **FM-019** — опційно `PA11Y_WCAG22=1` у `a11y.yml` job (зараз лише `WCAG2AA` default).
+2. **FM-019** — опційно required check `a11y` у `ci.yml` (зараз окремий workflow).
 3. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
 
-Детальна матриця прогалин — [`AUTO_RUN_SESSION_2026-06-20.md`](../development/AUTO_RUN_SESSION_2026-06-20.md).
+Детальна матриця прогалин — [`AUTO_RUN_SESSION_2026-06-21.md`](../development/AUTO_RUN_SESSION_2026-06-21.md).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
@@ -198,9 +198,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-10.md`](../development/AUTO_RUN_SESSION_2026-06-10.md) (pa11y CI `8c5dc1df`).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-20.md`](../development/AUTO_RUN_SESSION_2026-06-20.md) (FM-019 WCAG 2.2 S10).
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-21.md`](../development/AUTO_RUN_SESSION_2026-06-21.md) (FM-019 a11y CI WCAG22 S11).
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-06-19.md`](../development/AUTO_RUN_SESSION_2026-06-19.md) (FM-019 pa11y S9 `1b261ea7`).
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-20.md`](../development/AUTO_RUN_SESSION_2026-06-20.md) (FM-019 WCAG 2.2 S10 `9a53c53b`).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-16.md`](../development/AUTO_RUN_SESSION_2026-06-16.md) (FM-019 pa11y S6 `73c702a9`).
 
