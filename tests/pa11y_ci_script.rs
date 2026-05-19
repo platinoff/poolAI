@@ -18,23 +18,36 @@ fn pa11y_ci_script_has_admin_strict_auth_actions() {
         .and_then(|s| s.split(')').next())
         .expect("ADMIN_URLS block");
     assert!(admin_urls.contains("\"${BASE}/ui\""));
-    for path in [
+    const ADMIN_PATHS: &[&str] = &[
+        "/ui",
         "/ui/status",
         "/ui/health",
         "/ui/metrics",
         "/ui/admin",
+        "/ui/admin/users",
+        "/ui/admin/security",
+        "/ui/admin/config",
         "/ui/admin/tenants",
         "/ui/admin/audit",
         "/ui/admin/monitoring",
         "/ui/admin/instances",
         "/ui/admin/topology",
+        "/ui/workers",
         "/ui/libs",
         "/ui/vm",
         "/ui/raid",
-    ] {
+    ];
+    for path in ADMIN_PATHS {
         assert!(
             admin_urls.contains(&format!("\"${{BASE}}{path}\"")),
             "missing ADMIN_URLS entry for {path}"
         );
     }
+    let url_lines = admin_urls.lines().filter(|l| l.contains("${BASE}")).count();
+    assert_eq!(
+        url_lines,
+        ADMIN_PATHS.len(),
+        "ADMIN_URLS must list exactly {} auth paths (runbook §3.1)",
+        ADMIN_PATHS.len()
+    );
 }

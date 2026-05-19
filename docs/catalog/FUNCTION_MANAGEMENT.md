@@ -156,8 +156,7 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | поза автопрогоном |
 | FM-006 | cloud-sdk гілки | **Deferred** | поза автопрогоном |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | pa11y/axe у CI | **Partial** | `a11y.yml`: PR + `PA11Y_WCAG22=1` (S11); 18 auth 0 errors |
-| FM-019 | a11y merge gate у `ci.yml` | **Partial** | job `pa11y-contract` (S12); повний pa11y — `a11y.yml` path-filter |
+| FM-019 | pa11y/axe у CI | **Partial ✅** | S22: `ci.yml` `pa11y-wcag22` (paths-filter) + `pa11y-contract`; `PA11Y_WCAG22=1`; 18 auth URLs |
 | P4 | `poolai_health_load` → `BENCHMARKS.md` | **Implemented (ops)** | рядок **2026-05-18**; baseline **2026-04-10** для порівняння |
 | `UI_IMPROVEMENTS_PLAN` | Історичні `[ ]` | **Archived** | S4 2026-05-18; канон §5.4 + runbook §3.1 |
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
@@ -183,10 +182,10 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **S22** | FM-019: pa11y merge gate / CI hardening |
+| 1 | **S23** | Playwright smoke (опційно) |
 | — | **S21** | ✅ OpenAPI `/ai-ml/optimization*`, `automl`, `federated` (2026-05-19) |
-| 3 | **S23** | Playwright smoke (опційно) |
-| 4 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
+| — | **S22** | ✅ FM-019 CI merge gate (`pa11y-wcag22` + contract, 2026-05-19) |
+| 2 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.

@@ -19,7 +19,7 @@
 
 | ID | Пункт | Що лишилось | Джерело |
 |----|--------|-------------|---------|
-| **FM-019** | WCAG 2.2 / pa11y | Повний merge gate pa11y в `ci.yml` (зараз `pa11y-contract` + path-filter `a11y.yml`); розширення strict URL; axe у CI | FM §5.3, `ADMIN_A11Y_RUNBOOK.md` |
+| **FM-019** | WCAG 2.2 / pa11y | ~~merge gate~~ **S22 ✅** (`pa11y-contract` + `pa11y-wcag22` paths-filter); axe Playwright — backlog S23 | FM §5.3 |
 | **OpenAPI** | Дрібні прогалини | ~~`/ai-ml/optimization*`, `automl`, `federated`~~ — **S21 ✅** (2026-05-19); повний `rg` enterprise — backlog за потреби | — |
 | **UI_QUALITY P1** | API ↔ admin UI | Точкова звірка полів JS ↔ JSON для сторінок поза contract tests | `UI_QUALITY_AND_E2E_PLAN_2026-04-06.md` P1 |
 | **FM-016 / ML** | Pipeline ops | Hardening за `PIPELINE_MANAGEMENT.md` (метрики кроків, стенд) — продуктовий пріоритет | DIGEST §ML, FM §5.1 |
@@ -73,7 +73,7 @@
 | Спринт | Фокус | Критерій готовності | Поза обсягом |
 |--------|--------|---------------------|---------------|
 | **S21** | OpenAPI gap audit | ✅ `ai-ml/optimization*`, `automl`, `federated` у yaml (2026-05-19) | — |
-| **S22** | FM-019 CI | pa11y job у `ci.yml` або документований gate; 0 errors на runbook URL set | LAN |
+| **S22** | FM-019 CI | ✅ `pa11y-wcag22` + `pa11y-contract` у `ci.yml` (2026-05-19); runbook §3.2 | LAN |
 | **S23** | Playwright (опційно) | `e2e/` smoke: login + 1 admin route; `workflow_dispatch` або local script | FM-004/006/009/010 |
 | **S24** | UI dashboard DELETE або UI_QUALITY P1 | Реалізація `delete_dashboard` **або** 1 admin contract test + doc | cloud-sdk |
 | **—** | FM-003 §4 | Лише при 2 хостах | — |
@@ -101,7 +101,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 ## 4. Критерії сесії (чеклист)
 
 - [x] **S21** OpenAPI gap audit (optimization/automl/federated)
-- [ ] Обрано наступний спринт з §2 (**S22** FM-019 CI за замовчуванням)
+- [x] **S22** FM-019 CI merge gate (`pa11y-wcag22` + contract)
+- [ ] Наступний спринт: **S23** Playwright (опційно) або **S24**
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`

@@ -87,7 +87,18 @@ PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh
 bash bin/pa11y-ci.sh --start
 ```
 
-**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch` + `pull_request` на `src/ui/**`; `PA11Y_WCAG22=1`. Контракт скрипта на кожен PR: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) job **`pa11y-contract`**.
+### 3.2 CI merge gate (FM-019, S22)
+
+| Job (workflow **CI**) | Коли | Що перевіряє |
+|------------------------|------|----------------|
+| **`pa11y-contract`** | Кожен push/PR на `main` | `cargo test --test pa11y_ci_script` — 17 `ADMIN_URLS` + `PA11Y_WCAG22` / login fixture у `bin/pa11y-ci.sh` |
+| **`pa11y-wcag22`** | PR/push, якщо змінились `src/ui/**`, `bin/pa11y-ci.sh`, workflows, `tests/pa11y_ci_script.rs` | Reusable [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml): `PA11Y_WCAG22=1`, `PA11Y_ADMIN_STRICT=1`, **0 errors** на login + 18 auth URLs |
+
+Ручний повний прогін: `workflow_dispatch` у workflow **A11y (pa11y)**.
+
+**Branch protection (рекомендація):** required checks `Pa11y script contract` + `Pa11y WCAG 2.2` (коли UI paths змінені).
+
+**CI (канон):** [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) — `pa11y-contract` + `pa11y-wcag22`; reusable scan — [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml); `PA11Y_WCAG22=1`.
 
 Ручний одиночний URL:
 
@@ -122,5 +133,6 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~Admin subpages у `ADMIN_URLS`~~ — **Partial ✅ 2026-05-18** (S8–S9: tenants, audit, monitoring, instances, topology; 18 auth URLs).
 - ~~WCAG 2.2 локально~~ — **Partial ✅ S10** (`PA11Y_WCAG22=1`, 0 errors).
 - ~~`PA11Y_WCAG22` у CI~~ — **Partial ✅ S11** (`a11y.yml` env).
+- ~~Повний merge gate у `ci.yml`~~ — **Partial ✅ S22** (`pa11y-wcag22` + `pa11y-contract`; paths-filter).
 
-**Last updated:** 2026-05-18 — S11: CI `PA11Y_WCAG22=1`; 18 auth + login strict.
+**Last updated:** 2026-05-19 — S22: CI merge gate matrix §3.2; `pa11y-wcag22` reusable workflow.

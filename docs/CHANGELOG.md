@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — pa11y CI: `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml` (strict login, optional admin).
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
+### Added
+- **FM-019 (2026-05-19, S22)** — CI merge gate: `ci.yml` jobs `ui-changes`, `pa11y-wcag22` (reusable `a11y.yml`, paths-filter); strengthened `pa11y_ci_script` (17 ADMIN_URLs); runbook §3.2.
+
 ### Docs
 - **OpenAPI (2026-05-19, S21)** — `/ai-ml/optimization`, `/optimization/profile`, `/optimization/tuning`, `/optimization/quantization-result`, `/automl`, `/federated`; schemas ML.1–ML.3.
 - **AUTO_RUN 2026-07-01** — зведений backlog «не зроблено» + черга S21–S24; HANDOFF/FM §5.1.

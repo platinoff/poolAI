@@ -57,9 +57,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
 
-1. **S22** — FM-019 pa11y CI hardening — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
+1. **S23** — Playwright smoke (опційно) або **S24** UI — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
 2. **FM-003 §4** — реальний LAN (**BLOCKED**, 2 хости); dev stand + `verify-dev-stand` ✅.
-3. **FM-019** — pa11y **Partial ✅** (18 auth, `PA11Y_WCAG22`, [`a11y.yml`](.github/workflows/a11y.yml), `ci.yml` `pa11y-contract`); Playwright — S23 backlog.
+3. **FM-019** — pa11y **Partial ✅** (S22: `ci.yml` `pa11y-contract` + `pa11y-wcag22`; 18 auth, `PA11Y_WCAG22`); Playwright — S23 backlog.
 4. **P4** — ✅ `poolai_health_load` **2026-05-18** у [`BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
 5. **Відкладено** — **FM-004**, **FM-006**; **концепт** — **FM-009**, **FM-010**.
 

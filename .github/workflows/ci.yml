@@ -121,6 +121,35 @@ jobs:
       - name: Check compilation (without optional deps)
         run: cargo check --no-default-features --lib
 
+  ui-changes:
+    name: Detect UI / pa11y changes
+    runs-on: ubuntu-latest
+    outputs:
+      ui: ${{ steps.filter.outputs.ui }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        timeout-minutes: 5
+
+      - name: Paths filter
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            ui:
+              - 'src/ui/**'
+              - 'bin/pa11y-ci.sh'
+              - '.github/workflows/a11y.yml'
+              - '.github/workflows/ci.yml'
+              - 'tests/pa11y_ci_script.rs'
+
+  pa11y-wcag22:
+    name: Pa11y WCAG 2.2
+    needs: ui-changes
+    if: needs.ui-changes.outputs.ui == 'true'
+    uses: ./.github/workflows/a11y.yml
+    secrets: inherit
+
   pa11y-contract:
     name: Pa11y script contract
     runs-on: ubuntu-latest
