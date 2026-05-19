@@ -349,6 +349,13 @@
 - **Перевірка:** `cargo test --test pa11y_ci_script`; GitHub Actions → **A11y (pa11y)**
 - **FM:** FM-019 Partial (pa11y auth)
 
+### [FM-019] pa11y WCAG 2.2 profile (PA11Y_WCAG22)
+- **Де:** `bin/pa11y-ci.sh` — `validate_pa11y_standard`, `pa11y_axe_wcag22_json`
+- **Сигнал:** `PA11Y_STANDARD=WCAG22AA` → exit 2 (pa11y v9); `PA11Y_WCAG22=1` → axe tags `wcag22aa`
+- **Патерн:** `PA11Y_WCAG22=1 PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — 0 errors (18 auth + login)
+- **Перевірка:** audit filters — `<label for="audit-*">` у `src/ui/admin/audit.rs`
+- **FM:** FM-019 Partial (WCAG 2.2)
+
 ### [FM-019] pa11y URL matrix + UI plan archival (docs S4)
 - **Де:** [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.1; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (архів)
 - **Патерн:** strict — login + 18 `ADMIN_URLS` (dashboard + status/health/metrics + admin home + users/security/config + tenants/audit/monitoring/instances/topology + workers/libs/vm/raid); бібліотеки — **`/ui/libs`**

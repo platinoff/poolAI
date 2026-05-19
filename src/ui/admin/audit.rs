@@ -80,7 +80,9 @@ pub async fn admin_audit() -> Html<String> {
           <div class="admin-header">
             <h2 data-i18n="admin.audit.sectionTitle">Audit Events</h2>
             <div class="admin-filters">
+              <label for="audit-search" data-i18n="admin.audit.label.search">Search</label>
               <input type="text" id="audit-search" data-i18n-placeholder="admin.audit.searchPh" placeholder="Search…" />
+              <label for="audit-level" data-i18n="admin.audit.label.level">Level</label>
               <select id="audit-level">
                 <option value="" data-i18n="admin.audit.levelAll">All Levels</option>
                 <option value="Info" data-i18n="admin.audit.levelInfo">Info</option>
@@ -88,7 +90,9 @@ pub async fn admin_audit() -> Html<String> {
                 <option value="Error" data-i18n="admin.audit.levelError">Error</option>
                 <option value="Critical" data-i18n="admin.audit.levelCritical">Critical</option>
               </select>
+              <label for="audit-start-date" data-i18n="admin.audit.label.startDate">Start date</label>
               <input type="date" id="audit-start-date" />
+              <label for="audit-end-date" data-i18n="admin.audit.label.endDate">End date</label>
               <input type="date" id="audit-end-date" />
               <button type="button" class="btn" onclick="queryAuditLogs()" data-i18n="admin.audit.query">Query</button>
             </div>

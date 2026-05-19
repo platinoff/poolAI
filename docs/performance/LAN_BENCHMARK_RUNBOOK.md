@@ -1,6 +1,6 @@
 # LAN benchmark runbook (FM-003 / P2b)
 
-**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **§4 sign-off** — **BLOCKED** (немає 2 фізичних хостів; зріз **AUTO_RUN 2026-06-01**). Для розробки: **§5** dual-port LAN на одній машині або **§5.1** `verify-dev-stand`.
+**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **§4 sign-off** — **BLOCKED** (немає 2 фізичних хостів). Для розробки: **§5** dual-port LAN на одній машині або **§5.1** `verify-dev-stand`. Автопрогін: [`AUTO_RUN_SESSION_2026-06-20.md`](../development/AUTO_RUN_SESSION_2026-06-20.md) (FM-003 не блокує інші спринти).
 
 **Related:** [`BENCHMARKS.md`](./BENCHMARKS.md) (Criterion + `poolai_health_load`), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) (P2b LAN checkbox).
 

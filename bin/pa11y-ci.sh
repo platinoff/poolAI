@@ -6,6 +6,8 @@
 # Env:
 #   PA11Y_ADMIN_STRICT=1  — admin URLs with login actions (default in CI)
 #   PA11Y_USER / PA11Y_PASSWORD — dev defaults admin / admin123 (see user_manager.rs)
+#   PA11Y_STANDARD — WCAG2A | WCAG2AA | WCAG2AAA (pa11y v9; not WCAG22AA)
+#   PA11Y_WCAG22=1 — axe runOnly wcag22aa tags (use with WCAG2AA standard)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,6 +23,31 @@ STANDARD="${PA11Y_STANDARD:-WCAG2AA}"
 PA11Y_USER="${PA11Y_USER:-admin}"
 PA11Y_PASSWORD="${PA11Y_PASSWORD:-admin123}"
 PA11Y_ADMIN_STRICT="${PA11Y_ADMIN_STRICT:-0}"
+PA11Y_WCAG22="${PA11Y_WCAG22:-0}"
+
+validate_pa11y_standard() {
+  case "${STANDARD}" in
+    WCAG2A|WCAG2AA|WCAG2AAA) ;;
+    *)
+      echo "FAIL invalid PA11Y_STANDARD=${STANDARD} (pa11y v9: WCAG2A|WCAG2AA|WCAG2AAA only)" >&2
+      echo "      For WCAG 2.2 axe tags set PA11Y_WCAG22=1 (keeps standard=${STANDARD})." >&2
+      exit 2
+      ;;
+  esac
+}
+
+pa11y_axe_wcag22_json() {
+  if [[ "${PA11Y_WCAG22}" == "1" ]]; then
+    printf '%s\n' '  ,"axe": {
+    "runOnly": {
+      "type": "tag",
+      "values": ["wcag2a", "wcag21a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"]
+    }
+  }'
+  fi
+}
+
+validate_pa11y_standard
 
 STRICT_URLS=(
   "${BASE}/ui/login"
@@ -116,6 +143,8 @@ start_poolai() {
 write_pa11y_config() {
   local target="$1"
   local cfg="$2"
+  local axe_extra
+  axe_extra="$(pa11y_axe_wcag22_json)"
   cat >"${cfg}" <<JSON
 {
   "standard": "${STANDARD}",
@@ -133,7 +162,7 @@ write_pa11y_config() {
     "wait for path to be /ui",
     "navigate to ${target}",
     "wait for element body to be visible"
-  ]
+  ]${axe_extra}
 }
 JSON
 }
@@ -141,6 +170,8 @@ JSON
 write_pa11y_simple_config() {
   local target="$1"
   local cfg="$2"
+  local axe_extra
+  axe_extra="$(pa11y_axe_wcag22_json)"
   cat >"${cfg}" <<JSON
 {
   "standard": "${STANDARD}",
@@ -152,7 +183,7 @@ write_pa11y_simple_config() {
   "actions": [
     "navigate to ${target}",
     "wait for element body to be visible"
-  ]
+  ]${axe_extra}
 }
 JSON
 }
@@ -164,7 +195,7 @@ run_pa11y() {
   mkdir -p "${PA11Y_CFG_DIR}"
   local cfg="${PA11Y_CFG_DIR}/$(echo "${url}" | tr '/:' '__').json"
   write_pa11y_simple_config "${url}" "${cfg}"
-  echo "--- pa11y ${url} (runner=${RUNNER}, threshold=${THRESHOLD}) ---"
+  echo "--- pa11y ${url} (runner=${RUNNER}, standard=${STANDARD}, wcag22=${PA11Y_WCAG22}, threshold=${THRESHOLD}) ---"
   set +e
   ${PA11Y} "${url}" --config "${cfg}"
   local code=$?

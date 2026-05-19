@@ -92,6 +92,10 @@
 
       'admin.audit.sectionTitle': 'Audit Events',
       'admin.audit.searchPh': 'Search…',
+      'admin.audit.label.search': 'Search',
+      'admin.audit.label.level': 'Level',
+      'admin.audit.label.startDate': 'Start date',
+      'admin.audit.label.endDate': 'End date',
       'admin.audit.levelAll': 'All Levels',
       'admin.audit.levelInfo': 'Info',
       'admin.audit.levelWarning': 'Warning',
@@ -902,6 +906,10 @@
 
       'admin.audit.sectionTitle': 'Події аудиту',
       'admin.audit.searchPh': 'Пошук…',
+      'admin.audit.label.search': 'Пошук',
+      'admin.audit.label.level': 'Рівень',
+      'admin.audit.label.startDate': 'Дата початку',
+      'admin.audit.label.endDate': 'Дата кінця',
       'admin.audit.levelAll': 'Усі рівні',
       'admin.audit.levelInfo': 'Info',
       'admin.audit.levelWarning': 'Warning',

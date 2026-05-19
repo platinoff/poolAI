@@ -66,7 +66,15 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | `/ui/vm` | auth actions | **strict** | VM instances |
 | `/ui/raid` | auth actions | **strict** | RAID artifacts table |
 
-**Зріз 2026-05-18 (S9):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 18 auth URLs (instances, topology).
+**Зріз 2026-05-18 (S9):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 18 auth URLs.
+
+**WCAG 2.2 (S10):** pa11y v9 не приймає `PA11Y_STANDARD=WCAG22AA`; використовуй `PA11Y_WCAG22=1` (axe `wcag22aa` tags + `WCAG2AA`):
+
+```bash
+PA11Y_WCAG22=1 PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start
+```
+
+**Зріз S10:** **0 errors** на login + 18 auth URLs (audit filter labels).
 
 ```bash
 # MSYS2: poolai вже на :8080
@@ -79,7 +87,7 @@ PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh
 bash bin/pa11y-ci.sh --start
 ```
 
-**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch`; `PA11Y_ADMIN_STRICT=1`.
+**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch` + `pull_request` на `src/ui/**`; `PA11Y_ADMIN_STRICT=1`; WCAG 2.2 локально — `PA11Y_WCAG22=1`.
 
 Ручний одиночний URL:
 
