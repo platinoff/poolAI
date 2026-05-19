@@ -11,7 +11,7 @@
 - [x] `cargo test --test pa11y_ci_script`
 - [x] `cargo test-ci`
 - [x] runbook / FM / HANDOFF / CHANGELOG sync
-- [ ] push
+- [x] push — `e368ba11`
 
 ## S5 — виконання (2026-05-18)
 
