@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GRID_ENVELOPE_VERSION"],"enum":["GridEnvelopeError","GridMessage","GridResultStatus"],"fn":["envelope_from_peer_info","envelope_from_put_artifact","memory_shard_from_put_artifact","peer_info_from_envelope","put_artifact_from_memory_shard"],"struct":["GridEnvelope","GridJobBody","GridMemoryShardBody","GridPeerStatusBody","GridResultBody"]};
