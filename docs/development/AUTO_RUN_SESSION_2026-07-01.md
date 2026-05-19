@@ -21,7 +21,7 @@
 |----|--------|-------------|---------|
 | **FM-019** | WCAG 2.2 / pa11y | ~~merge gate~~ **S22 ✅** (`pa11y-contract` + `pa11y-wcag22` paths-filter); axe Playwright — backlog S23 | FM §5.3 |
 | **OpenAPI** | Дрібні прогалини | ~~`/ai-ml/optimization*`, `automl`, `federated`~~ — **S21 ✅** (2026-05-19); повний `rg` enterprise — backlog за потреби | — |
-| **UI_QUALITY P1** | API ↔ admin UI | Точкова звірка полів JS ↔ JSON для сторінок поза contract tests | `UI_QUALITY_AND_E2E_PLAN_2026-04-06.md` P1 |
+| **UI_QUALITY P1** | API ↔ admin UI | **✅ S25–S26** (27 contract tests) | `ADMIN_UI_JSON_CONTRACTS.md` |
 | **FM-016 / ML** | Pipeline ops | Hardening за `PIPELINE_MANAGEMENT.md` (метрики кроків, стенд) — продуктовий пріоритет | DIGEST §ML, FM §5.1 |
 
 ### 1.3 Backlog (заплановано, коду немає або опційно)
@@ -78,6 +78,8 @@
 | **S24** | UI dashboard DELETE | ✅ `delete_dashboard` + HTTP 204 (2026-05-19) | cloud-sdk |
 | **S25** | UI_QUALITY P1 | ✅ tenants, OAuth2, dashboards (+3 tests) | — |
 | **S26** | UI_QUALITY P1 (close) | ✅ metrics, alert-rules, SAML, policies (+4 tests; 27 total) | — |
+| **S27** | Playwright E2E розширення | 1–2 admin сценарії після smoke | FM-003 §4 |
+| **S28** | OpenAPI gap audit | `rg` routes vs yaml | LAN |
 | **—** | FM-003 §4 | Лише при 2 хостах | — |
 
 **Після кожного спринту з кодом/доками:** `cargo fmt` → `cargo test-ci` (MSYS2) → `git -c commit.template= commit -F …` → push (зовнішній MSYS2).
@@ -108,7 +110,9 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [x] **S24** `DELETE /ui/dashboards/{id}` (MonitoringManager)
 - [x] **S25** UI_QUALITY P1 — tenants, OAuth2, monitoring dashboards contracts
 - [x] **S26** UI_QUALITY P1 — metrics, alert-rules, SAML, security policies
-- [ ] Наступний: FM-003 §4 (BLOCKED) або Playwright/E2E розширення / OpenAPI gap audit
+- [x] Прогрес-аудит: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) (**93%** шар A)
+- [ ] **S27** Playwright E2E розширення (див. [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md))
+- [ ] FM-003 §4 (BLOCKED) / S28 OpenAPI gap audit
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`

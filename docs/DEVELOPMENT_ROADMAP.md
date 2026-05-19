@@ -36,6 +36,8 @@ This document outlines the development roadmap for PoolAI, including completed m
 
 ## Current Status
 
+**Прогрес продукту (менеджер функціоналу, 2026-05-19):** **93%** (шар A — FM у scope автопрогону). Повний звіт: [`docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md`](status/DEVELOPMENT_PROGRESS_2026-05-19.md). Наступний спринт: **S27** Playwright E2E — [`docs/development/NEXT_SESSION_PROMPT.md`](development/NEXT_SESSION_PROMPT.md).
+
 ### Module Completion Status
 
 | Module | Status | Progress |

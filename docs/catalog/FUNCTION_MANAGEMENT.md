@@ -1,12 +1,14 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-19 (§5.1 backlog S21+; [`AUTO_RUN_SESSION_2026-07-01.md`](../development/AUTO_RUN_SESSION_2026-07-01.md)).
+**Оновлено:** 2026-05-19 (§5.5 прогрес 93%; S26 UI_QUALITY P1 ✅; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
 **Не зроблено / backlog:** FM-003 §4 LAN (**BLOCKED**); FM-019 повний WCAG/pa11y CI; FM-004/006 **Deferred**; FM-009/010 **Concept-only**. **P4:** рядок `poolai_health_load` **2026-05-18** у `BENCHMARKS.md` (baseline **2026-04-10** лишається для порівняння).
 
-**Останній `cargo test-ci`:** 2026-05-18 (FM-019 pa11y S6/S7); clippy — CI на `main`.
+**Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); clippy — CI на `main`.
+
+**Прогрес продукту (шар A):** **93%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -107,7 +109,7 @@ FM-xxx (з таблиці нижче)
 | FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
 | FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); alias **`cargo test-ci`** у **`.cargo/config.toml`** = CI-прогін (`--lib` + `--tests`, без doctests) + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; clippy матриці як у `ci.yml` — на `main` (2026-04-10); локально **`cargo test-ci`** — 2026-05-16; повний `cargo test` з doctests на Windows може дати **os error 1455** | Implemented | `Cargo.toml`, `.cargo/config.toml`, HANDOFF, NEXT_STEPS |
 | FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: i18n **UA/EN**; **Telegram OAuth** — HMAC/`auth_date`/allowlist/audit; widget HTML UA/EN; нові Telegram-юзери → **Viewer** (без `admin:all`); тести allowlist/expiry/RBAC | Implemented | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/`, `src/network/enterprise_api/oauth.rs`, `src/enterprise/security.rs` |
-| FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок: libraries, topology, VM, workers; S25 — tenants, OAuth2, dashboards | Implemented | `tests/admin_ui_api_contracts.rs` (23 tests), [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md) |
+| FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок (v1 + enterprise); S25–S26 закрили P1 | Implemented | `tests/admin_ui_api_contracts.rs` (**27 tests**), [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md) |
 | FM-014 | UI / Admin API | Фаза 2 контрактів: `GET /config`, `GET /users`, `GET /topology/nodes`; rewards API → `HttpAppError` (FM-005) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/network/api/rewards.rs` |
 | FM-015 | UI / Admin API | Фаза 3: `GET /instance`, `GET /raid/artifacts`, `GET /raid/admin/metrics/smallworld` (20 contract tests) | Implemented | `tests/admin_ui_api_contracts.rs`, `src/ui/admin/instances.rs`, `src/ui/admin/raid.rs` |
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
@@ -121,15 +123,18 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
-| 2 | UI a11y | **FM-019** | **Partial ✅** S7–S12: 18 auth, WCAG22, `a11y.yml`, `pa11y-contract`; E2E Playwright — backlog |
-| 2b | UI E2E | **UI_QUALITY plan** | **Partial ✅** S23 Playwright smoke — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
-| 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
-| — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
-| 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
-| 5 | Концепт | **FM-009**, **FM-010** | Grid / Solana — поза автопрогоном |
+| 1 | Playwright E2E | **S27** | Розширити smoke → 1–2 admin сценарії — [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) |
+| 2 | OpenAPI gap audit | **S28** | `rg` routes vs `docs/openapi.yaml` |
+| — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
+| — | UI a11y CI | **FM-019** | **Partial ✅** pa11y merge gate; axe Playwright — backlog |
+| — | UI_QUALITY P1 | **FM-013** | **✅** S25–S26 (27 contract tests) |
+| — | ML ops | **DIGEST §ML** | ✅ `PIPELINE_MANAGEMENT.md` |
+| — | Відкладено | **FM-004**, **FM-006** | поза автопрогоном |
+| — | Концепт | **FM-009**, **FM-010** | поза автопрогоном |
 
-**Закрито (не в черзі):** FM-001–018; FM-019 baseline; FM-005 admin/enterprise/raid/auth JSON.
+**Прогрес:** **93%** (шар A) — **§5.5**, [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+
+**Закрито (не в черзі):** FM-001–018; UI_QUALITY P1; FM-019 baseline; S21–S26.
 
 **Якість збірки:** **`cargo test-ci`** + `cargo fmt` — зріз 2026-05-28; clippy — CI (`ci.yml`).
 
@@ -147,7 +152,7 @@ FM-xxx (з таблиці нижче)
 | FM-019 baseline docs | `ADMIN_A11Y_RUNBOOK.md`, §5.4 | `31266be9` |
 | S21–S24 | OpenAPI ai-ml; pa11y CI; Playwright smoke; dashboard DELETE | `fa96a6b4`…`56edbce9` |
 | **S25** | UI_QUALITY P1 — tenants, OAuth2, dashboards contracts (+3 tests) | `2720c3d3` |
-| **S26** | UI_QUALITY P1 close — metrics, alert-rules, SAML, policies (+4 tests) | (push) |
+| **S26** | UI_QUALITY P1 close — metrics, alert-rules, SAML, policies (+4 tests) | `285b898d` |
 
 #### Не зроблено (канон backlog)
 
@@ -185,11 +190,26 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **UI_QUALITY P1** | **✅** S25–S26 — 27 contract tests; [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md) |
-| — | **S21–S26** | ✅ OpenAPI, FM-019 CI, Playwright, dashboard DELETE, admin contracts P1 (2026-05-19) |
+| 1 | **S27** Playwright E2E розширення | [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md), [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
+| 2 | **S28** OpenAPI gap audit | `rg` routes vs yaml |
+| — | **S21–S26** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+
+### 5.5 Прогрес розробки (аудит менеджера функціоналу, 2026-05-19)
+
+**Канонічний звіт:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+
+| Шар | % | Коментар |
+|-----|---|----------|
+| **A. Продукт (автопрогін)** | **93%** | FM-001…019 без Concept-only; FM-003 §4 і FM-019 — partial |
+| **B. Architect P1–P5** | **97%** | 1 відкритий чекбокс P2b LAN (BLOCKED) |
+| **C. Повна візія** | **79%** | P6 Grid/Solana, Deferred SIMD/cloud-sdk |
+
+**Ніколи не зроблено (підтверджено):** FM-003 §4 LAN sign-off; FM-004 SIMD; FM-006 Azure/GCP deep; FM-009/010; P6 layers; axe Playwright; повний OpenAPI `rg` audit.
+
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) (S27 Playwright за замовчуванням).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 

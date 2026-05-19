@@ -1,6 +1,8 @@
 # PoolAI Concept (v6, 2026) - Complete Rust Architecture! 🚀 PRO Edition
 
-## 🎯 Architecture sync 2026-05-19 (код + docs; див. HANDOFF / FUNCTION_MANAGEMENT §5.1)
+## 🎯 Architecture sync 2026-05-19 (код + docs; прогрес **93%** — DEVELOPMENT_PROGRESS_2026-05-19.md)
+
+**Прогрес (шар A, FM автопрогін):** ~**93%**. Ніколи не зроблено: FM-003 §4 LAN (2 хости), FM-004/006 Deferred, FM-009/010 Concept-only. Наступна сесія: S27 Playwright — NEXT_SESSION_PROMPT.md.
 
 - **FM-016 Virtual nodes ✅:** `poolai-worker`, `poolai-telegram-bot` (`--features tgbot`); coordinator API — discovery `register-remote` / `heartbeat-remote`, `GET /discovery/virtual-nodes`; `virtual_nodes` tasks, Telegram bind/webhook, `pool/join`, bootstrap + `raid_artifact_probe`; services `virtual_node_store`, `virtual_node_task_service`, `virtual_node_telegram_binding_service`; dev stand `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`, `core::dev_stand`.
 - **Service layer (P2) ✅:** тонкі handlers у `src/network/api/*` → `src/services/*` (system, discovery, ui, raid, enterprise, cloud, virtual nodes, …).

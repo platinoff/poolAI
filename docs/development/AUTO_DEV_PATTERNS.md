@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S26 — metrics, alert-rules, SAML, policies; P1 closed).
+**Оновлено:** 2026-05-19 (прогрес-аудит 93%; S26 P1 closed).
 
 ---
 
@@ -501,6 +501,12 @@
 - **Патерн:** `POST /security/policies` body `{ name, policy }`; `PUT .../{name}` body = full `SecurityPolicy` with matching `name`; delete returns 200 JSON (не 204)
 - **Перевірка:** `cargo test-ci`; wave S17–S20 push одним `git push origin main`
 - **FM:** FM-012 (enterprise security)
+
+### [FM] Прогрес і «ніколи не зроблено» (аудит 2026-05-19)
+- **Де:** `docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5
+- **Сигнал:** шар A **93%**; BLOCKED FM-003 §4; Concept FM-009/010; Deferred FM-004/006
+- **Патерн:** legacy `[ ]` у `docs/archive/` і січневих планах — **не канон**; черга S27+ у `NEXT_SESSION_PROMPT.md`
+- **Перевірка:** `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` → 2 (LAN BLOCKED, cloud-sdk optional)
 
 ## Документація (кроки 1–12)
 

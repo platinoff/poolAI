@@ -44,7 +44,7 @@
 4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
 5. **Концепт** — **FM-009**, **FM-010**.
 
-**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3** (2026-06-07).
+**Звірка «не зроблено» / прогрес %:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**, **§5.5**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) (**93%** шар A).
 
 **Закрито:** **FM-017/018/019 baseline** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
 
