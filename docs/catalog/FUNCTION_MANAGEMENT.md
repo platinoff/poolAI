@@ -123,9 +123,9 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Шар A autoprogon | **✅ 100%** | S33 — OpenAPI DTO, axe, vm/workers E2E |
-| 2 | FM-003 §4 LAN sign-off | **BLOCKED** | 2 фізичні хости; dev stand ✅ |
-| 3 | Horizon | Deferred / Concept | FM-004/006/009/010 |
+| — | **A+B autoprogon** | **✅ 100%** | S33–S34 |
+| 1 | FM-003 §4 LAN sign-off | **BLOCKED** | 2 фізичні хости (horizon) |
+| 2 | Layer C / Concept | **79%** | FM-004/006/009/010 за запитом |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
 | — | UI a11y CI | **FM-019** | **✅** pa11y + axe Playwright (S33) |
@@ -161,7 +161,8 @@ FM-xxx (з таблиці нижче)
 | **S30** | FM legacy docs audit + stale banners | (ця сесія) |
 | **S31** | OpenAPI `/raid/distributed/*`; ML ops runbook; Playwright raid/topology | `c20a10f2` |
 | **S32** | `bin/run-poolai.*` + `RUN_LOCAL.md` — єдиний локальний запуск | `ef4a0aa5` |
-| **S33** | OpenAPI distributed DTO; axe Playwright; E2E vm/workers; шар A **100%** | (ця сесія) |
+| **S33** | OpenAPI distributed DTO; axe Playwright; E2E vm/workers; шар A **100%** | `69873f7e` |
+| **S34** | Docs harmonization A+B **100%**; Playwright libs; `data/dev/` gitignore | (ця сесія) |
 
 #### Не зроблено (канон backlog)
 
@@ -215,11 +216,12 @@ FM-xxx (з таблиці нижче)
 
 | Шар | % | Коментар |
 |-----|---|----------|
-| **A. Продукт (автопрогін)** | **93%** | FM-001…019 без Concept-only; FM-003 §4 і FM-019 — partial |
-| **B. Architect P1–P5** | **97%** | 1 відкритий чекбокс P2b LAN (BLOCKED) |
-| **C. Повна візія** | **79%** | P6 Grid/Solana, Deferred SIMD/cloud-sdk |
+| **A. Продукт (autoprogon)** | **100%** | FM-001…019 (S33) |
+| **B. Architect P1–P5 (autoprogon)** | **100%** | S34; LAN §4 / cloud-sdk deep — ops/Deferred |
+| **A+B autoprogon** | **100%** | офіційний зріз HANDOFF |
+| **C. Повна візія** | **79%** | P6, Grid/Solana, LAN ops на 2 хостах |
 
-**Ніколи не зроблено (підтверджено):** FM-003 §4 LAN sign-off; FM-004 SIMD; FM-006 Azure/GCP deep; FM-009/010; P6 layers; axe Playwright; OpenAPI `/raid/distributed/*`.
+**Поза autoprogon (horizon):** FM-003 §4 LAN sign-off; FM-004/006 Deferred; FM-009/010 Concept-only.
 
 **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

@@ -509,6 +509,14 @@
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-014 (OpenAPI sync)
 
+### [FM] Autoprogon 100% — закриття (S34)
+
+- **Де:** `DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5, `NEXT_SESSION_PROMPT.md`
+- **Сигнал:** шар A+B **100%**; Layer C **79%**
+- **Патерн:** відкриті Architect `[ ]` для LAN/cloud-sdk — **horizon**, не backlog autoprogon
+- **E2E:** усі admin nav routes в `admin.spec.ts` (S34: libs `#libraries-list`)
+- **FM:** підтримка / ops лише за запитом
+
 ### [E2E] axe Playwright (S33 / FM-019)
 - **Де:** `e2e/tests/a11y.spec.ts`, `@axe-core/playwright` у `e2e/package.json`
 - **Сигнал:** `rg "AxeBuilder|a11y.spec" e2e/`

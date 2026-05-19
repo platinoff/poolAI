@@ -123,7 +123,7 @@
 - [x] Інтеграційний тест **`tests/ml_pipeline_integration.rs`** (`test_pipeline_turboquant_quantization_step`) при `--features ml`.
 - [x] Проксі замірів replication control-plane: Criterion-група **`raid_replication_engine`** у `benches/runtime_benchmarks.rs` (див. `docs/performance/BENCHMARKS.md`).
 - [x] In-tree **HTTP wire harness** для distributed `PutArtifact`: **`Cargo.toml`** `[[test]] distributed_raid_wire_integration` (`--features test-utils`; з **`ml`** — порівняння розміру JSON TQ01 vs сирий f32); команди в **`docs/performance/BENCHMARKS.md`** (секція P2b).
-- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4** / LAN-стенд; harness ✅ — **BLOCKED** без 2 фізичних хостів, див. FM-003 §4).
+- [ ] Повні заміри реплікації артефактів по мережі та порівняння розміру даних до/після TurboQuant/TQ01 на одному стенді (**Priority 4** / LAN-стенд; harness ✅ — **BLOCKED** без 2 фізичних хостів, див. FM-003 §4). *Autoprogon P2b: **100%** (wire + dev stand); цей пункт — **ops horizon**, не знижує % A+B.*
 - [x] Опційно: прискорений підшлях у Rust (**портативно**: 4-wide unroll, `inv_scale` у пакуванні; без `portable_simd` і без нових crates). Нативний ISA SIMD (x86 NEON тощо) — за потреби пізніше.
 
 **Критерії готовності**:

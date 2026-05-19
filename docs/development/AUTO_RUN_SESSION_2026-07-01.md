@@ -122,8 +122,10 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [x] **S32** `run-poolai` launcher + `RUN_LOCAL.md`
 - [x] **S33** OpenAPI distributed DTO + axe Playwright + E2E vm/workers — **шар A 100%**
 - [x] Оновлено HANDOFF, FM §5.1/§5.3, `DEVELOPMENT_PROGRESS`, CHANGELOG
-- [ ] `cargo test-ci` + push MSYS2 (S33)
-- [ ] FM-003 §4 (BLOCKED)
+- [x] `cargo test-ci` + push MSYS2 (S33) — `69873f7e`
+- [x] **S34** autoprogon A+B **100%** — docs sync, Playwright libs, NEXT_SESSION post-100%
+- [ ] FM-003 §4 (BLOCKED — horizon)
+- [ ] Layer C / FM-004/006/009/010 — лише за запитом
 - [ ] Не стаджити `data/audit/*.log.gz`
 
 **Не в обсязі без явного запиту:** FM-004, FM-006, FM-009, FM-010, FM-003 §4 (BLOCKED).

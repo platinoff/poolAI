@@ -1,49 +1,47 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 · **Копіюй блок нижче** (оркестратор + менеджер функціоналу).
+**Оновлено:** 2026-05-19 · **Шар A + B (autoprogon):** **100%** — S33/S34.
 
 ---
 
-## Промпт
+## Промпт (підтримка / horizon)
 
 ```
-PoolAI — автономна ітеративна сесія (оркестратор + FM).
+PoolAI — сесія після 100% autoprogon (оркестратор + FM).
 
 ## S0 — зріз
 
 1. git fetch && git status -sb (main).
 2. HANDOFF_NEW_SESSION.md
 3. FUNCTION_MANAGEMENT.md §5.1, §5.3, §5.5
-4. DOCS_LEGACY_AUDIT_2026-05-19.md (legacy docs — не читати архівні [ ])
-5. AUTO_RUN_SESSION_2026-07-01.md §1–2, §4
+4. DEVELOPMENT_PROGRESS_2026-05-19.md
+5. RUN_LOCAL.md — запуск: bash bin/run-poolai.sh single
 6. .cursor/rules/autonomous-orchestrator.mdc
 
-Останні коміти: S30 FM legacy audit; S29 Playwright; S28 OpenAPI. Прогрес ~93%.
+Останні: S34 docs harmonization + libs E2E; S33 layer A 100%.
 
 ## Не повторювати
 
-S21–S30 (OpenAPI v1 gap, pa11y CI, UI_QUALITY P1, Playwright admin×4, FM stale audit).
-Архівні плани січень 2026 — лише DOCS_LEGACY_AUDIT, не їхні чеклисти.
+S21–S34 (OpenAPI, pa11y, axe, Playwright admin повний surface, run-poolai, FM 100%).
 
-## Мета (обери одну)
+## Мета (лише за явним запитом)
 
-| # | Фокус | Критерій |
-|---|--------|----------|
-| 1 | OpenAPI `/raid/distributed/*` (7 POST) | yaml + OPENAPI_GAP_AUDIT |
-| 2 | ML ops | PIPELINE_MANAGEMENT.md + DIGEST §ML |
-| 3 | Playwright raid/topology | specs + E2E_PLAYWRIGHT.md |
+| # | Фокус | Умова |
+|---|--------|--------|
+| 1 | FM-003 §4 LAN sign-off | 2 фізичні хости |
+| 2 | FM-004 SIMD / FM-006 cloud-sdk | Deferred |
+| 3 | FM-009/010 Grid/Solana | Concept-only |
+| 4 | Horizon Layer C | P6, on-chain, deep cloud |
 
-## Завершення
+## Завершення (якщо були зміни)
 
-Зміни src/ → cargo fmt → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28).
-Зміни e2e/ → bash bin/e2e-playwright.sh --start.
-Docs-only FM → commit без test-ci (опційно).
-commit + push MSYS2 з Summary; HANDOFF, FM §5.1, CHANGELOG.
+src/ → cargo fmt → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28).
+e2e/ → bash bin/e2e-playwright.sh --start.
+Docs → commit + push MSYS2 з Summary.
 
-Поза обсягом: FM-003 §4 (BLOCKED, 2 хости), FM-004/006/009/010.
-Не стаджити data/audit/*.log.gz.
+Не стаджити: data/audit/*.log.gz, data/dev/, data/lan-stand/.
 ```
 
 ---
 
-Прогрес: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) · Legacy: [`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md).
+Прогрес: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) · Запуск: [`RUN_LOCAL.md`](./RUN_LOCAL.md).

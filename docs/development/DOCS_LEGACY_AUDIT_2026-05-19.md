@@ -46,34 +46,23 @@
 
 ---
 
-## 3. Не зроблено (підтверджено FM, 2026-05-19)
+## 3. Autoprogon 100% (S33–S34) — не повторювати
 
-| ID / область | Стан | Наступна сесія |
-|--------------|------|----------------|
-| **FM-003 §4** LAN sign-off | **BLOCKED** (2 хости) | runbook only |
-| **FM-004** SIMD TurboQuant | **Deferred** | за запитом |
-| **FM-006** Azure/GCP deep | **Deferred** | `CLOUD_SDK_STATUS.md` |
-| **FM-009/010** Grid/Solana | **Concept-only** | `docs/concept/` |
-| **OpenAPI** `/raid/distributed/*` | **✅ S31** (7 POST, `ProtocolMessage`) | payload schemas backlog |
-| **FM-019** axe Playwright | backlog | після стабілізації E2E |
-| **Playwright** raid/topology | **✅ S31** | vm/workers backlog |
-| **ML ops** pipeline metrics | **✅ S31** | `PIPELINE_MANAGEMENT.md` §Ops verification |
-| **P6** Grid/Job/Memory layers | Concept | Architect §7 |
+| Область | Стан |
+|---------|------|
+| FM-001…019, OpenAPI, pa11y, axe, Playwright admin (усі маршрути) | **✅** |
+| `run-poolai`, RUN_LOCAL, Layer A+B docs | **✅** |
 
-**Закрито S21–S29 (не повторювати):** OpenAPI enterprise+ai-ml+gap v1; pa11y CI; UI_QUALITY P1 (27 tests); Playwright smoke + admin (tenants, monitoring, security, audit).
+## 4. Horizon (поза autoprogon)
 
----
+| ID / область | Стан |
+|--------------|------|
+| **FM-003 §4** LAN sign-off | **BLOCKED** (2 хости) |
+| **FM-004/006** | **Deferred** |
+| **FM-009/010**, **P6** | **Concept-only** |
+| **Layer C** | **79%** |
 
-## 4. Рекомендований порядок наступних спринтів
-
-| Порядок | Фокус | Критерій |
-|--------|--------|----------|
-| 1 | OpenAPI `/raid/distributed/*` | yaml + оновити `OPENAPI_GAP_AUDIT` |
-| 2 | ML ops | `PIPELINE_MANAGEMENT.md` + DIGEST §ML |
-| 3 | Playwright raid/topology | +1–2 specs, `E2E_PLAYWRIGHT.md` |
-| — | FM-003 §4 | лише при 2 хостах |
-
-**Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) (підтримка / horizon).
 
 ---
 

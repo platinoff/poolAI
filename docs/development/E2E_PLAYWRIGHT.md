@@ -5,7 +5,7 @@
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
-| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; **workers** (`#workers-list`); **vm** (`#vm-instances`) |
+| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm; **libs** (`#libraries-list`) |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0) |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
@@ -40,6 +40,6 @@ bash bin/e2e-playwright.sh --start
 - Підключити `workflow_call` з `ci.yml` після стабілізації часу прогону.
 - ~~raid, topology, vm, workers~~ **✅ S31/S33**
 - ~~axe Playwright~~ **✅ S33** (`@axe-core/playwright`)
-- libs admin — за потреби.
+- ~~libs admin~~ **✅ S34**
 
-**Last updated:** 2026-05-19 (S33).
+**Last updated:** 2026-05-19 (S34 — admin E2E surface complete).

@@ -24,6 +24,9 @@ data/audit/*.log.gz
 # Local multi-node LAN dev stand (bin/run-lan-nodes.*)
 data/lan-stand/
 
+# Single-node dev launcher (bin/run-poolai.sh single --bg)
+data/dev/
+
 # Virtual-node coordinator persistence (FM-016+)
 data/virtual_nodes/
 
