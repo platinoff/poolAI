@@ -27,8 +27,10 @@ STRICT_URLS=(
 )
 OPTIONAL_URLS=()
 ADMIN_URLS=(
+  "${BASE}/ui"
   "${BASE}/ui/admin/users"
   "${BASE}/ui/admin/security"
+  "${BASE}/ui/admin/config"
   "${BASE}/ui/workers"
 )
 

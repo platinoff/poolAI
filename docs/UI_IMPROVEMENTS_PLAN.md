@@ -20,12 +20,12 @@
 | Admin modals / forms / tabs / tables | `admin_common.js`, `src/ui/admin/*.rs` |
 | Dashboard modals (workers, libs, VM, RAID) | `src/ui/mod.rs`, `ui::dashboard_a11y_tests` |
 | i18n UA/EN | `i18n_core.js` |
-| pa11y strict (login + admin users/security + workers) | `bin/pa11y-ci.sh`, `PA11Y_ADMIN_STRICT=1` — **0 errors** (`ded58c10`) |
+| pa11y strict (login + `/ui` + admin users/security/config + workers) | `bin/pa11y-ci.sh`, `PA11Y_ADMIN_STRICT=1` — **0 errors** (S5 2026-05-18) |
 
 ## Backlog (не baseline)
 
 - Повний **WCAG 2.2 AA** автомат у CI — backlog FM-019.
-- **Розширення pa11y strict URLs** (після наступного коду/зрізу): `/ui` (dashboard shell), `/ui/admin/config` — див. runbook §3.1.
+- ~~Розширення pa11y `/ui`, `/ui/admin/config`~~ — **Partial ✅** runbook §3.1.
 - Не в автопрогоні: FM-004, FM-006, FM-009, FM-010.
 
 ## Історичний контекст (2025-12-30)

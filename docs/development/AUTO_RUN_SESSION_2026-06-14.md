@@ -28,4 +28,4 @@ S0: git fetch && git status -sb; HANDOFF + FUNCTION_MANAGEMENT §5.1.
 Після docs: push MSYS2.
 ```
 
-**Наступний:** кодовий slice — додати `/ui` + `/ui/admin/config` у `ADMIN_URLS` після `PA11Y_ADMIN_STRICT=1` прогону 0 errors.
+**Наступний:** [`AUTO_RUN_SESSION_2026-06-15.md`](./AUTO_RUN_SESSION_2026-06-15.md) — pa11y `/ui` + `/ui/admin/config` у `ADMIN_URLS`.

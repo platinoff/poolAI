@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **FM-019 (partial, 2026-05-18)** — pa11y strict: `/ui` dashboard + `/ui/admin/config` у `ADMIN_URLS`; `PA11Y_ADMIN_STRICT=1` — 0 errors (6 auth + login).
 - **FM-016 / test-utils (2026-05-18)** — `virtual_node_pool_join_integration` and `virtual_node_tasks_integration` gated with `required-features = ["test-utils"]` in `Cargo.toml`.
 - **FM-019 (partial, 2026-05-18)** — pa11y strict URLs 0 errors: `--danger` contrast (`#c62828`), unique mobile/desktop auth IDs, theme selector `aria-label`; `write_pa11y_simple_config` for login scan (pa11y v9).
 
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **AUTO_RUN 2026-06-15 (S5)** — pa11y `/ui` + `/ui/admin/config` strict; runbook §3.1; FM/HANDOFF synced.
 - **AUTO_RUN 2026-06-14 (S4)** — `UI_IMPROVEMENTS_PLAN.md` archival; `ADMIN_A11Y_RUNBOOK` §3.1 pa11y URL matrix (`/ui`, `/ui/admin/config` planned); FM §5.3.
 - **AUTO_RUN 2026-06-11** — FM-019 pa11y auth fixture; runbook §3; HANDOFF/FM synced.
 - **AUTO_RUN 2026-06-10** — FM-019 pa11y CI; runbook §3; HANDOFF/FM synced.
