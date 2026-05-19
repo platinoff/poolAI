@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **FM-019 (partial, 2026-05-18)** — pa11y strict: `/ui/admin/instances`, `/ui/admin/topology`; 0 errors (18 auth + login).
 - **FM-019 (partial, 2026-05-18)** — pa11y strict: `/ui/admin/tenants`, `/ui/admin/audit`, `/ui/admin/monitoring`; 0 errors (16 auth + login).
 - **FM-019 (partial, 2026-05-18)** — pa11y strict: `/ui/status`, `/ui/health`, `/ui/metrics`, `/ui/admin`; 0 errors (13 auth + login).
 - **FM-019 (partial, 2026-05-18)** — pa11y strict: `/ui/libs`, `/ui/vm`, `/ui/raid`; dark theme `applyTheme` danger `#c62828` (raid Delete contrast); 0 errors (9 auth + login).
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **AUTO_RUN 2026-06-19 (S9)** — pa11y instances/topology; runbook 18 URLs; FM pa11y matrix complete.
 - **AUTO_RUN 2026-06-18 (S8)** — pa11y admin subpages tenants/audit/monitoring; runbook 16 URLs.
 - **AUTO_RUN 2026-06-17 (S7)** — §5.3 backlog audit; pa11y status/health/metrics/admin; `UI_BUGFIXES` archival.
 - **AUTO_RUN 2026-06-16 (S6)** — pa11y libs/vm/raid; runbook §3.1; FM/HANDOFF synced.

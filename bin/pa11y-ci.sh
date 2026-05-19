@@ -38,6 +38,8 @@ ADMIN_URLS=(
   "${BASE}/ui/admin/tenants"
   "${BASE}/ui/admin/audit"
   "${BASE}/ui/admin/monitoring"
+  "${BASE}/ui/admin/instances"
+  "${BASE}/ui/admin/topology"
   "${BASE}/ui/workers"
   "${BASE}/ui/libs"
   "${BASE}/ui/vm"

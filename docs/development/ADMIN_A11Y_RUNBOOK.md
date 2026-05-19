@@ -41,7 +41,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ## 3. pa11y (локально + CI)
 
-**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — 16 auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — 18 auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
 
 ### 3.1 Матриця URL (strict / planned)
 
@@ -60,11 +60,13 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | `/ui/admin/tenants` | auth actions | **strict** (S8) | tenant management |
 | `/ui/admin/audit` | auth actions | **strict** (S8) | audit logs viewer |
 | `/ui/admin/monitoring` | auth actions | **strict** (S8) | monitoring dashboard |
+| `/ui/admin/instances` | auth actions | **strict** (S9) | model instances admin |
+| `/ui/admin/topology` | auth actions | **strict** (S9) | topology admin |
 | `/ui/libs` | auth actions | **strict** | libraries dashboard (маршрут `/ui/libs`, не `/ui/libraries`) |
 | `/ui/vm` | auth actions | **strict** | VM instances |
 | `/ui/raid` | auth actions | **strict** | RAID artifacts table |
 
-**Зріз 2026-05-18 (S8):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 16 auth URLs (tenants, audit, monitoring).
+**Зріз 2026-05-18 (S9):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 18 auth URLs (instances, topology).
 
 ```bash
 # MSYS2: poolai вже на :8080

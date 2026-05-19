@@ -23,6 +23,8 @@ fn pa11y_ci_script_has_admin_strict_auth_actions() {
         "/ui/admin/tenants",
         "/ui/admin/audit",
         "/ui/admin/monitoring",
+        "/ui/admin/instances",
+        "/ui/admin/topology",
         "/ui/libs",
         "/ui/vm",
         "/ui/raid",

@@ -351,7 +351,7 @@
 
 ### [FM-019] pa11y URL matrix + UI plan archival (docs S4)
 - **Де:** [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.1; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (архів)
-- **Патерн:** strict — login + 16 `ADMIN_URLS` (dashboard + status/health/metrics + admin home + users/security/config + tenants/audit/monitoring + workers/libs/vm/raid); бібліотеки — **`/ui/libs`**; instances/topology — backlog
+- **Патерн:** strict — login + 18 `ADMIN_URLS` (dashboard + status/health/metrics + admin home + users/security/config + tenants/audit/monitoring/instances/topology + workers/libs/vm/raid); бібліотеки — **`/ui/libs`**
 - **Перевірка:** `cargo test --test pa11y_ci_script`
 - **FM:** FM-019 Partial (pa11y strict URLs)
 

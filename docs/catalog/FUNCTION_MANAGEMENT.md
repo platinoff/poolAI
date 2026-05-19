@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-18 (§5.3 S8 — pa11y 16 auth URLs; [`AUTO_RUN_SESSION_2026-06-18.md`](../development/AUTO_RUN_SESSION_2026-06-18.md)).
+**Оновлено:** 2026-05-18 (§5.3 S9 — pa11y 18 auth URLs; admin subpage matrix complete; [`AUTO_RUN_SESSION_2026-06-19.md`](../development/AUTO_RUN_SESSION_2026-06-19.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -122,7 +122,7 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
-| 2 | UI a11y backlog | **FM-019** | pa11y strict 16 auth + login ✅ (S8); instances/topology — backlog; WCAG 2.2 AA — backlog |
+| 2 | UI a11y backlog | **FM-019** | pa11y strict 18 auth + login ✅ (S9); WCAG 2.2 AA / `a11y.yml` на PR — backlog |
 | 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
 | — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
 | 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
@@ -155,7 +155,7 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | поза автопрогоном |
 | FM-006 | cloud-sdk гілки | **Deferred** | поза автопрогоном |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | pa11y/axe у CI | **Partial** | strict login + 16 auth URLs 0 errors (S8); `PA11Y_ADMIN_STRICT`; `tests/pa11y_ci_script.rs` |
+| FM-019 | pa11y/axe у CI | **Partial** | strict login + 18 auth URLs 0 errors (S9); admin subpages matrix complete; `PA11Y_ADMIN_STRICT` |
 | FM-019 | Повний WCAG 2.2 AA автомат | **Backlog** | не блокує реліз baseline |
 | P4 | `poolai_health_load` → `BENCHMARKS.md` | **Implemented (ops)** | рядок **2026-05-18**; baseline **2026-04-10** для порівняння |
 | `UI_IMPROVEMENTS_PLAN` | Історичні `[ ]` | **Archived** | S4 2026-05-18; канон §5.4 + runbook §3.1 |
@@ -168,10 +168,10 @@ FM-xxx (з таблиці нижче)
 #### Рекомендований наступний спринт (2026-05-18)
 
 1. **FM-003 §4** — **BLOCKED** (2 хости).
-2. **FM-019** — опційно pa11y `/ui/admin/instances`, `/ui/admin/topology`; WCAG 2.2 AA (`PA11Y_STANDARD`); `a11y.yml` на PR — backlog.
+2. **FM-019** — WCAG 2.2 AA (`PA11Y_STANDARD`); `a11y.yml` у main CI (workflow_dispatch зараз) — backlog.
 3. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
 
-Детальна матриця прогалин — [`AUTO_RUN_SESSION_2026-06-18.md`](../development/AUTO_RUN_SESSION_2026-06-18.md).
+Детальна матриця прогалин — [`AUTO_RUN_SESSION_2026-06-19.md`](../development/AUTO_RUN_SESSION_2026-06-19.md).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
@@ -198,9 +198,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-10.md`](../development/AUTO_RUN_SESSION_2026-06-10.md) (pa11y CI `8c5dc1df`).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-18.md`](../development/AUTO_RUN_SESSION_2026-06-18.md) (FM-019 pa11y S8 admin subpages).
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-19.md`](../development/AUTO_RUN_SESSION_2026-06-19.md) (FM-019 pa11y S9 instances/topology).
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-06-17.md`](../development/AUTO_RUN_SESSION_2026-06-17.md) (FM-019 pa11y S7 `c016d239`).
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-18.md`](../development/AUTO_RUN_SESSION_2026-06-18.md) (FM-019 pa11y S8 `0af5a021`).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-16.md`](../development/AUTO_RUN_SESSION_2026-06-16.md) (FM-019 pa11y S6 `73c702a9`).
 
