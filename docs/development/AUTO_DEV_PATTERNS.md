@@ -509,6 +509,13 @@
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-014 (OpenAPI sync)
 
+### [Ops] Локальний запуск — `run-poolai` (S32)
+- **Де:** `bin/run-poolai.sh`, `bin/run-poolai.ps1`, `docs/development/RUN_LOCAL.md`
+- **Сигнал:** `bash bin/run-poolai.sh help`
+- **Патерн:** `single` (1× poolai :8080) | `virtual-node` | `lan` | `docker` | `stop` | `status`; dev features `enterprise,ml,cloud,test-utils`
+- **Не стаджити:** `data/dev/` (runtime), `data/audit/*.log*`
+- **Перевірка:** `bash bin/run-poolai.sh single --bg --skip-build` → `curl -sf http://127.0.0.1:8080/api/v1/health`
+
 ### [OpenAPI] Distributed RAID wire protocol (S31)
 - **Де:** `docs/openapi.yaml` tag `RAID Distributed`; handlers `src/network/raid_distributed_handlers.rs`
 - **Сигнал:** `rg "raid/distributed" docs/openapi.yaml src/network/api/raid.rs`

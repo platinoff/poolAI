@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 (прогрес **93%** — [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md); **S31 ✅** OpenAPI distributed + ML ops + Playwright raid/topology).
+**Оновлено:** 2026-05-19 (прогрес **93%**; **S31 ✅** OpenAPI/ML/E2E; **S32 ✅** єдиний лаунчер [`RUN_LOCAL.md`](./RUN_LOCAL.md), `bin/run-poolai.*`).
 
 **Автономний прогін:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md). **FM-003 §4** BLOCKED.
 
@@ -57,7 +57,7 @@
 | `bin/run-virtual-node-dev.ps1` / `.sh` | Coordinator + `poolai-worker` |
 | `bin/verify-dev-stand.ps1` / `.sh` | Health + discovery + pool join + bootstrap tasks (>=4 completed) |
 
-Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) §5–5.1.
+Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) §5–5.1. **Запуск усього проєкту:** [`RUN_LOCAL.md`](./RUN_LOCAL.md) (`bin/run-poolai.sh`).
 
 ## 2. Git push (Windows / Cursor)
 

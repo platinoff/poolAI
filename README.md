@@ -268,39 +268,40 @@ Then restart your terminal.
    openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -days 365 -nodes
    ```
 
-5. **Run the application**
+5. **Run the application** — канон: [`docs/development/RUN_LOCAL.md`](docs/development/RUN_LOCAL.md)
    ```bash
-   # Basic run (standard UI)
-   cargo run
-   
-   # With Admin Panel (Enterprise features)
-   cargo run --features enterprise
-   
-   # With Admin Panel + HTTPS + JWT
-   cargo run --features enterprise,https,jwt
+   # MSYS2 UCRT64 (рекомендовано на Windows)
+   export PATH="$HOME/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+   export K8S_OPENAPI_ENABLED_VERSION=1.28
+   cd /s/rust/poolAI
+
+   bash bin/run-poolai.sh build
+   bash bin/run-poolai.sh single    # http://127.0.0.1:8080/ui  admin/admin123
    ```
 
 ## 🚀 Usage
 
 ### Starting the System
 
+**Єдиний лаунчер** (single / LAN / virtual-node / Docker):
+
 ```bash
-# Basic run (standard UI at http://localhost:8080/ui)
-cargo run
+bash bin/run-poolai.sh help
+bash bin/run-poolai.sh single
+bash bin/run-poolai.sh virtual-node
+bash bin/run-poolai.sh lan
+bash bin/run-poolai.sh stop
+```
 
-# With Admin Panel (Enterprise features)
-cargo run --features enterprise
-# Access Admin Panel at: http://localhost:8080/ui/admin (enterprise features require --features enterprise)
+Повний runbook: [`docs/development/RUN_LOCAL.md`](docs/development/RUN_LOCAL.md).
 
-# With Admin Panel + HTTPS + JWT (Recommended for development)
-cargo run --features enterprise,https,jwt
-# Access Admin Panel at: https://localhost:8443/ui/admin
+**Альтернатива — cargo напряму:**
 
-# With specific config
-POOLAI_CONFIG_PATH=./custom_config.toml cargo run --features enterprise
-
-# With logging
-RUST_LOG=debug cargo run --features enterprise
+```bash
+cargo run --features enterprise,ml,cloud
+# Admin: http://localhost:8080/ui/admin
+# HTTPS + JWT: cargo run --features enterprise,https,jwt
+POOLAI_CONFIG_PATH=./custom_config.toml RUST_LOG=debug cargo run --features enterprise
 ```
 
 ### Default users and first login

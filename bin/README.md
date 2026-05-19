@@ -1,8 +1,23 @@
-# Bin – git, cargo, тести (без PowerShell)
+# Bin – git, cargo, запуск, тести
 
-Скрипти для швидкого запуску **git**, **cargo**, **тестів**. Використовуй **bash** (MSYS2, Git Bash, WSL).
+Скрипти для **запуску проєкту**, **git**, **cargo**, **тестів**. Bash — MSYS2 / Git Bash / WSL; PowerShell — `*.ps1`.
 
-## Як запускати
+## Запуск усього проєкту (канон)
+
+Детально: [`docs/development/RUN_LOCAL.md`](../docs/development/RUN_LOCAL.md).
+
+```bash
+bash bin/run-poolai.sh single          # 1 вузол, UI + Admin :8080
+bash bin/run-poolai.sh virtual-node    # coordinator + worker
+bash bin/run-poolai.sh lan             # 2+ вузли (FM-003)
+bash bin/run-poolai.sh single --bg     # у фоні
+bash bin/run-poolai.sh stop
+bash bin/run-poolai.sh status
+```
+
+PowerShell: `.\bin\run-poolai.ps1 single`
+
+## Git / cargo / тести
 
 З кореня проєкту `poolAI`:
 
@@ -20,6 +35,8 @@ bash bin/cargo-fmt.sh
 
 | Скрипт | Дія |
 |--------|-----|
+| **`run-poolai.sh`** | **Єдиний лаунчер:** single / lan / virtual-node / docker / build / stop / status |
+| `run-poolai.ps1` | Те саме для PowerShell |
 | `git-status.sh` | `git status --short`, `git log -5`, поточна гілка |
 | `cargo-check.sh` | `cargo check --no-default-features --lib` |
 | `cargo-test.sh` | `cargo test --lib`; з аргументом `raid` — raid_cross + raid_smallworld |
