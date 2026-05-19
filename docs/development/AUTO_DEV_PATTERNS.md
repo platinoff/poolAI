@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (OpenAPI S20 security policies; enterprise wave S17–S20).
+**Оновлено:** 2026-05-19 (S25 admin JSON contracts — tenants, OAuth2, dashboards).
 
 ---
 
@@ -73,10 +73,21 @@
 
 ### [UI] Admin JSON contract tests
 - **Де:** `tests/admin_ui_api_contracts.rs`
-- **Сигнал:** `cargo test --test admin_ui_api_contracts --features test-utils,enterprise`
-- **Патерн:** `oneshot` на `/api/v1/*`; 503 → `error` object; `attach_*_for_test` для 200 shapes
-- **Перевірка:** 15+ tests (config, users, topology/nodes, …)
-- **FM:** FM-013, FM-014 ✅
+- **Сигнал:** `rg "async fn.*_" tests/admin_ui_api_contracts.rs` → 23 tests (2026-05-19)
+- **Патерн:** `Router::new().nest("/api/v1", create_api_routes()).with_state(ApiContext::default())`; 503 → `assert_structured_error`; модуль `attached_managers` — `attach_*_for_test` для 200 shapes
+- **Перевірка:** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test --test admin_ui_api_contracts --features ml,enterprise,cloud,test-utils -j 1 -- --test-threads=1`
+- **Доки:** [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md) — колонка **Тест**
+- **FM:** FM-013–015 ✅
+
+### [UI] Enterprise admin contract slices (S25)
+- **Де:** `tests/admin_ui_api_contracts.rs` — `mod enterprise_admin_contract_slices` (після `#[cfg(feature = "enterprise")]`)
+- **Сигнал:** `rg "enterprise_tenants_list|enterprise_oauth2|enterprise_monitoring_dashboards" tests/admin_ui_api_contracts.rs`
+- **Патерн:** seed через `ApiContext` managers, потім `nest("/api/enterprise", create_enterprise_api_routes())`:
+  - tenants — `ctx.tenant_manager.initialize()` + `create_tenant(...)` → `GET /api/enterprise/tenants` (ключі `config.active`, `usage.workers`);
+  - OAuth2 — `ctx.security_manager.register_oauth2_provider(...)` → `GET .../security/oauth2/providers` (`name`, `config.client_id`, `enabled`);
+  - dashboards — `ctx.enterprise_monitoring_manager.create_dashboard(Dashboard { ... })` → `GET .../monitoring/dashboards` (`id`, `name`, `metrics`, `is_public`, `created_at`).
+- **Перевірка:** `cargo test-ci`; UI читає ті самі поля в `src/ui/admin/{tenants,security,monitoring}.rs`
+- **FM:** FM-013 (розширення), UI_QUALITY P1
 
 ---
 

@@ -145,6 +145,8 @@ FM-xxx (з таблиці нижче)
 | FM-019 forms | `adminEnhanceFormA11y`, users/instances | `cf431a79` |
 | FM-019 tabs/tables | tablist ARIA, `adminObserveDynamicA11y` | `d04088e8` |
 | FM-019 baseline docs | `ADMIN_A11Y_RUNBOOK.md`, §5.4 | `31266be9` |
+| S21–S24 | OpenAPI ai-ml; pa11y CI; Playwright smoke; dashboard DELETE | `fa96a6b4`…`56edbce9` |
+| **S25** | UI_QUALITY P1 — tenants, OAuth2, dashboards contracts (+3 tests) | `2720c3d3` |
 
 #### Не зроблено (канон backlog)
 
