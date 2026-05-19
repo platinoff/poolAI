@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **OpenAPI (2026-05-19, S20)** — `/security/policies` CRUD; enterprise OpenAPI wave S17–S20 complete.
+- **AUTO_RUN 2026-06-30 (S20)** — security policies OpenAPI; push S17–S20.
 - **OpenAPI (2026-05-18, S19)** — `/tenants*` (CRUD, usage, quota); `/audit/events`; `/auth/saml/{provider}` (+ callback); `/security/saml/providers*`.
 - **AUTO_RUN 2026-06-29 (S19)** — OpenAPI tenants/audit/SAML; HANDOFF/FM §5.3.
 - **OpenAPI (2026-05-18, S18)** — enterprise `/auth/github|google|telegram` (+ callbacks); `/monitoring/alerts|dashboards|metrics|alert-rules`; `/security/oauth2/providers*`.

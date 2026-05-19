@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-18 (OpenAPI S19 tenants/audit/SAML).
+**Оновлено:** 2026-05-19 (OpenAPI S20 security policies; enterprise wave S17–S20).
 
 ---
 
@@ -469,6 +469,13 @@
 - **Патерн:** tenants `POST /tenants/{id}` = update (не PUT); quota `POST .../quota` + `QuotaCheckRequest`; audit `GET /audit/events` + 8 query filters; SAML `POST .../callback` form `SAMLResponse`/`RelayState`
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-012 (SAML SSO), multi-tenancy
+
+### [OpenAPI] Enterprise security policies (S20)
+- **Де:** `src/network/enterprise_api/security.rs`; `docs/openapi.yaml`
+- **Сигнал:** `rg 'security/policies' src/network/enterprise_api/mod.rs docs/openapi.yaml`
+- **Патерн:** `POST /security/policies` body `{ name, policy }`; `PUT .../{name}` body = full `SecurityPolicy` with matching `name`; delete returns 200 JSON (не 204)
+- **Перевірка:** `cargo test-ci`; wave S17–S20 push одним `git push origin main`
+- **FM:** FM-012 (enterprise security)
 
 ## Документація (кроки 1–12)
 

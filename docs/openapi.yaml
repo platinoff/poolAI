@@ -2848,6 +2848,173 @@ paths:
         '404':
           description: Provider not found
 
+  /security/policies:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: List security policies
+      operationId: listSecurityPolicies
+      responses:
+        '200':
+          description: Policy list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityPolicy'
+        '503':
+          description: Security manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - EnterpriseSecurity
+      summary: Create security policy
+      description: Requires `admin:all`. Body includes wrapper `name` plus full `policy` object.
+      operationId: createSecurityPolicy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityPolicyCreateRequest'
+      responses:
+        '201':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '503':
+          description: Security manager unavailable
+
+  /security/policies/{name}:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: Get security policy by name
+      operationId: getSecurityPolicy
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityPolicy'
+        '404':
+          description: Policy not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Security manager unavailable
+    put:
+      tags:
+        - EnterpriseSecurity
+      summary: Update security policy
+      description: Requires `admin:all`. `policy.name` must match path `{name}`.
+      operationId: updateSecurityPolicy
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityPolicy'
+      responses:
+        '200':
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: Policy name mismatch or invalid body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Policy not found
+        '503':
+          description: Security manager unavailable
+    delete:
+      tags:
+        - EnterpriseSecurity
+      summary: Delete security policy
+      operationId: deleteSecurityPolicy
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Policy deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: Delete failed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '503':
+          description: Security manager unavailable
+
   /ai-ml/:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -4281,6 +4448,41 @@ components:
           type: object
           description: SAML IdP config (`enterprise::security::SamlConfig`)
           additionalProperties: true
+
+    SecurityPolicy:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        allowed_ip_ranges:
+          type: array
+          items:
+            type: string
+          description: CIDR notation
+        require_mfa:
+          type: boolean
+        session_timeout:
+          type: integer
+          format: int64
+          description: Session timeout in seconds
+        max_failed_attempts:
+          type: integer
+
+    SecurityPolicyCreateRequest:
+      type: object
+      required:
+        - name
+        - policy
+      properties:
+        name:
+          type: string
+        policy:
+          $ref: '#/components/schemas/SecurityPolicy'
 
     ErrorResponse:
       type: object
