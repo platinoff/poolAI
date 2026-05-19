@@ -4,7 +4,7 @@
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
-**Поза шаром A:** FM-003 §4 LAN sign-off (**BLOCKED**, 2 хости); FM-004/006 **Deferred**; FM-009/010 **Concept-only**. **P4:** рядок `poolai_health_load` **2026-05-18** у `BENCHMARKS.md` (baseline **2026-04-10** лишається для порівняння).
+**Horizon (Layer C → 100%):** FM-004, FM-009, FM-010, Job/Memory, FM-006 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md), [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
 
 **Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); E2E S29 — `bash bin/e2e-playwright.sh --start` (5 passed); clippy — CI на `main`.
 
@@ -100,13 +100,13 @@ FM-xxx (з таблиці нижче)
 | FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Implemented | `src/network/api/*` без `get_global_*`; `discovery.rs` — optional `instance_manager` з `AppState` (коментар); `services/*` — лише закоментовані Raft placeholders |
 | FM-003 | P2b / RAID | Dev stand ✅; wire harness ✅. **LAN §4 sign-off** — ops gated (2 хости) | Implemented (scope A) | `LAN_BENCHMARK_RUNBOOK.md` §5.1 |
-| FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
+| FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | **Horizon S35** | `HORIZON_TO_100_PLAN.md`, `turboquant.rs` |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
 | FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); за наявності `remote_versions` (`artifact_id` -> timestamp) формується `conflicts` | Implemented | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog`, `build_sync_conflicts`; wire-тести **`tests/distributed_raid_wire_integration.rs`** (15 tests, 2026-05-16) |
 | FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; якщо немає peer-вузлів і є артефакти — `replication_complete=false`; помилки membership / невалідний `node_id` | Implemented | Membership + graceful/non-graceful leave; wire-тести у **`tests/distributed_raid_wire_integration.rs`** |
-| FM-009 | Grid | Єдиний wire envelope для Grid protocol (згадано як залишок P6) | Concept-only | GRID_PROTOCOL_CONCEPT |
-| FM-010 | Tokenization | On-chain прототип / crate Solana за адаптер-концептом | Concept-only | SOLANA_ADAPTER_CONCEPT |
+| FM-009 | Grid | Єдиний wire envelope Grid v1 | **Horizon S36** | `GRID_PROTOCOL_CONCEPT`, `src/grid/` (planned) |
+| FM-010 | Tokenization | Solana adapter MVP (sidecar, schema v1) | **Horizon S37** | `SOLANA_ADAPTER_CONCEPT`, `crates/poolai-solana-adapter` (planned) |
 | FM-011 | Ops | MSVC: **`[profile.test] debug = 1`** у `Cargo.toml` (менший PDB, обхід LNK1318); alias **`cargo test-ci`** у **`.cargo/config.toml`** = CI-прогін (`--lib` + `--tests`, без doctests) + **`K8S_OPENAPI_ENABLED_VERSION=1.28`**; clippy матриці як у `ci.yml` — на `main` (2026-04-10); локально **`cargo test-ci`** — 2026-05-16; повний `cargo test` з doctests на Windows може дати **os error 1455** | Implemented | `Cargo.toml`, `.cargo/config.toml`, HANDOFF, NEXT_STEPS |
 | FM-012 | UI / Auth UX | Апгрейд `/ui` і `/ui/admin/*`: i18n **UA/EN**; **Telegram OAuth** — HMAC/`auth_date`/allowlist/audit; widget HTML UA/EN; нові Telegram-юзери → **Viewer** (без `admin:all`); тести allowlist/expiry/RBAC | Implemented | `src/ui/i18n_core.js`, `src/ui/mod.rs`, `src/ui/admin/`, `src/network/enterprise_api/oauth.rs`, `src/enterprise/security.rs` |
 | FM-013 | UI / Admin API | Контрактні тести JSON для admin-сторінок (v1 + enterprise); S25–S26 закрили P1 | Implemented | `tests/admin_ui_api_contracts.rs` (**27 tests**), [`ADMIN_UI_JSON_CONTRACTS.md`](../development/ADMIN_UI_JSON_CONTRACTS.md) |
@@ -123,9 +123,10 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| — | **A+B autoprogon** | **✅ 100%** | S33–S34 |
-| 1 | FM-003 §4 LAN sign-off | **BLOCKED** | 2 фізичні хости (horizon) |
-| 2 | Layer C / Concept | **79%** | FM-004/006/009/010 за запитом |
+| 1 | **Horizon S35** | FM-004 SIMD | `HORIZON_TO_100_PLAN.md` |
+| 2 | **Horizon S36–S40** | Grid, Solana, Job/Memory, cloud | `AUTO_RUN_SESSION_2026_HORIZON.md` |
+| — | **A+B autoprogon** | **✅ 100%** | S34 |
+| — | FM-003 §4 LAN | **BLOCKED** | 2 хости (ops) |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
 | — | UI a11y CI | **FM-019** | **✅** pa11y + axe Playwright (S33) |
@@ -208,7 +209,20 @@ FM-xxx (з таблиці нижче)
 | — | **S21–S30** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
-**Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+**Не стартувати без інфраструктури:** FM-003 §4 (2 хости).
+
+### 5.6 Horizon — Layer C → 100% (2026-05-19)
+
+**Канон:** [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) · **черга:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md) · **промпт:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+
+| Спринт | FM / P6 | Статус |
+|--------|---------|--------|
+| S35 | FM-004 SIMD | [ ] |
+| S36 | FM-009 Grid envelope | [ ] |
+| S37 | FM-010 Solana adapter MVP | [ ] |
+| S38 | Job/Memory wire | [ ] |
+| S39 | FM-006 cloud-sdk | [ ] |
+| S40 | Layer C + project 100% docs | [ ] |
 
 ### 5.5 Прогрес розробки (аудит менеджера функціоналу, 2026-05-19)
 
@@ -219,7 +233,8 @@ FM-xxx (з таблиці нижче)
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 (S33) |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | S34; LAN §4 / cloud-sdk deep — ops/Deferred |
 | **A+B autoprogon** | **100%** | офіційний зріз HANDOFF |
-| **C. Повна візія** | **79%** | P6, Grid/Solana, LAN ops на 2 хостах |
+| **C. Horizon** | **~21%** → **100%** | S35–S40; LAN §4 поза C% |
+| **Проєкт (A+B+C)/3** | **~93%** → **100%** | після S40 |
 
 **Поза autoprogon (horizon):** FM-003 §4 LAN sign-off; FM-004/006 Deferred; FM-009/010 Concept-only.
 

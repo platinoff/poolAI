@@ -11,7 +11,10 @@
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | Код + CI + harness; LAN sign-off і cloud-sdk deep — поза scope |
 | **A+B (офіційний autoprogon)** | **100%** | HANDOFF / README / FM §5.5 |
-| **C. Повна візія (P6 + concept)** | **79%** | Grid/Solana, SIMD, LAN ops на 2 хостах |
+| **C. Horizon (код P6)** | **~21%** → **100%** | S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
+| **Проєкт (A+B+C)/3** | **~93%** → **100%** | після S40 |
+
+**Наступна фаза:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md) · промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ---
 
@@ -46,19 +49,33 @@
 
 ---
 
-## Поза autoprogon (не «незакритий продукт»)
+## Horizon → 100% (S35–S40)
+
+| Спринт | FM | % внеску C (орієнтир) |
+|--------|-----|----------------------|
+| S35 | FM-004 SIMD | +15% |
+| S36 | FM-009 Grid | +25% |
+| S37 | FM-010 Solana MVP | +20% |
+| S38 | Job/Memory wire | +15% |
+| S39 | FM-006 cloud-sdk | +15% |
+| S40 | docs closure | +10% |
+
+**LAN §4** — ops BLOCKED; не входить у C%.
+
+---
+
+## Поза horizon-кодом
 
 | ID | Пункт |
 |----|--------|
 | FM-003 §4 | LAN sign-off — **2 фізичні хости** |
-| FM-004, FM-006 | Deferred |
-| FM-009, FM-010, P6 | Concept-only |
-| Layer C | 79% — повна візія продукту |
 
 ---
 
 ## Посилання
 
-- [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.1, §5.3, §5.5  
+- [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md)  
+- [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md)  
+- [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.1, §5.6  
 - [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md)  
 - [`RUN_LOCAL.md`](../development/RUN_LOCAL.md)

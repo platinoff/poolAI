@@ -41,10 +41,10 @@
 1. **P4 (ops)** — `poolai_health_load` на ref-host → [`BENCHMARKS.md`](../performance/BENCHMARKS.md) (baseline **2026-04-10** чинний).
 2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; ops **2026-06-01**; чекбокс P2b нижче ≈ цей пункт.
 3. **FM-019 backlog** — pa11y/axe CI, dashboard modals — [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md); **baseline Implemented** ✅ (2026-06-07).
-4. **Відкладено** — **FM-006** (`cloud-sdk`), **FM-004** (SIMD TurboQuant).
-5. **Концепт** — **FM-009**, **FM-010**.
+4. **Horizon (активна черга)** — **FM-004**, **FM-009**, **FM-010**, **FM-006** — [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) S35–S40.
+5. **Ops BLOCKED** — **FM-003 §4** (2 хости).
 
-**Звірка «не зроблено» / прогрес %:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**, **§5.5**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) (**93%** шар A).
+**Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Закрито:** **FM-017/018/019 baseline** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
 

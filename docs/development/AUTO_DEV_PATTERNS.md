@@ -509,6 +509,15 @@
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-014 (OpenAPI sync)
 
+### [Horizon] Layer C → 100% (S35+)
+
+- **Де:** `docs/development/HORIZON_TO_100_PLAN.md`, `AUTO_RUN_SESSION_2026_HORIZON.md`, FM §5.6
+- **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
+- **Черга:** S35 FM-004 → S36 Grid → S37 Solana → S38 Job/Memory → S39 cloud → S40 closure
+- **Концепти перед кодом:** `GRID_PROTOCOL_CONCEPT`, `SOLANA_ADAPTER_CONCEPT`, `JOB_LAYER_CONCEPT`
+- **Перевірка:** `cargo test-ci` після кожного спринту з `src/`
+- **Поза scope:** FM-003 §4 LAN (2 хости), mainnet Solana
+
 ### [FM] Autoprogon 100% — закриття (S34)
 
 - **Де:** `DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5, `NEXT_SESSION_PROMPT.md`

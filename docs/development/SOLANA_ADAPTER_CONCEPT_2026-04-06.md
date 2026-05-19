@@ -1,5 +1,7 @@
 # Solana adapter — концепт окремого шару (v1, 2026-04-06)
 
+> **Horizon (авторозробка):** реалізація **FM-010** — спринт **S37** у [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md) · [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md).
+
 ## 1. Мета
 
 Описати **billing / tokenization / on-chain anchoring** як **окремий адаптер** поверх уже реалізованого **PoolAI core** (Rust runtime, RAID, VM, Rewards у сенсі внутрішньої логіки). Цей документ **не** додає залежність `solana-sdk` у дерево `poolai` і **не** фіксує фінальну схему акаунтів — лише межі відповідальності та мапінг доменних подій.

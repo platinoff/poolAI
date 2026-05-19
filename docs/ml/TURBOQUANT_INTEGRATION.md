@@ -1,7 +1,7 @@
 # TurboQuant — дослідження та інтеграція в PoolAI
 
 **Дата**: 2026-04-04 (оновлено: лише **Rust**, без Python)  
-**Статус**: планова фіча (Welcome TurboQuant track)
+**Статус**: фаза 1 у коді ✅; **Horizon S35 (FM-004)** — SIMD fast-path → [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md)
 
 ---
 
