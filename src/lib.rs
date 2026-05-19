@@ -112,6 +112,8 @@
 //! - [`vm`] - Virtual machine instance management
 //! - [`raid`] - Distributed artifact storage
 //! - [`grid`] - Grid envelope v1 (Job/Result/MemoryShard/PeerStatus wire types)
+//! - [`job`] - Job layer wire types (JobSpec, JobStatus)
+//! - [`memory`] - Memory shard references (RAID / Grid)
 //! - [`ui`] - Web dashboard interface
 //! - [`runtime`] - Advanced runtime management (Stage 4.1)
 //! - [`platform`] - Cross-platform GPU and system information
@@ -123,6 +125,8 @@
 // Core modules
 pub mod core;
 pub mod grid;
+pub mod job;
+pub mod memory;
 pub mod monitoring;
 pub mod platform;
 pub mod pool;

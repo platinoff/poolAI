@@ -58,11 +58,19 @@ cargo test-ci
 - [x] S35 FM-004
 - [x] S36 FM-009
 - [x] S37 FM-010
-- [ ] S38 Job/Memory
+- [x] S38 Job/Memory
 - [ ] S39 FM-006
 - [ ] S40 Layer C **100%** + project **100%**
 - [ ] `AUTO_DEV_PATTERNS.md` — шляхи horizon
 - [ ] push MSYS2 + Summary
+
+---
+
+## S38 — виконання (2026-05-19)
+
+**P6:** `src/job/` (`JobSpec`, `JobStatus`, Grid map); `src/memory/` (`MemoryShardRef`); HTTP stub `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}`.
+
+**Перевірка:** `cargo test --lib round_trip` (job + memory + grid).
 
 ---
 

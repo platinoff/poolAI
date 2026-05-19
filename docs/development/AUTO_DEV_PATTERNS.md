@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S37 FM-010 Solana adapter crate).
+**Оновлено:** 2026-05-19 (S38 Job/Memory wire types).
 
 ---
 
@@ -520,7 +520,13 @@
 
 - **Де:** `docs/development/HORIZON_TO_100_PLAN.md`, `AUTO_RUN_SESSION_2026_HORIZON.md`, FM §5.6
 - **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
-- **Черга:** S35 ✅ → S36 ✅ → S37 ✅ → S38 Job/Memory → S39 cloud → S40 closure
+- **Черга:** S35–S38 ✅ → S39 cloud → S40 closure
+
+### [Job] Wire types + API stub (S38, P6)
+- **Де:** `src/job/types.rs`, `src/memory/types.rs`, `src/network/api/jobs.rs`
+- **Сигнал:** `JobSpec`, `MemoryShardRef`, `envelope_from_job_spec`
+- **Патерн:** in-process `JOB_STORE`; `POST /api/v1/jobs` → 201; map ↔ `GridEnvelope`
+- **Перевірка:** `cargo test --lib round_trip`; `cargo test-ci` після змін у `src/`
 
 ### [Solana] Adapter crate schema v1 (FM-010, S37)
 - **Де:** `crates/poolai-solana-adapter/src/events.rs`, `src/sidecar.rs`, bin `poolai-solana-adapter`

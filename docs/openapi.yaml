@@ -317,6 +317,71 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /jobs:
+    get:
+      tags:
+        - Jobs
+      summary: List jobs (Horizon S38 stub)
+      description: In-process job store; no scheduler yet.
+      operationId: listJobs
+      responses:
+        '200':
+          description: Job list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobsListResponse'
+    post:
+      tags:
+        - Jobs
+      summary: Submit a job (stub)
+      operationId: createJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRequest'
+      responses:
+        '201':
+          description: Job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobSummary'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /jobs/{id}:
+    get:
+      tags:
+        - Jobs
+      summary: Get job by id
+      operationId: getJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDetailResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /users:
     get:
       tags:
@@ -4790,6 +4855,76 @@ components:
           type: number
           format: double
           example: 0.0
+
+    JobKind:
+      type: string
+      enum:
+        - inference
+        - training
+        - fine_tune
+        - indexing
+        - embeddings
+        - memory
+        - system
+
+    JobStatus:
+      type: string
+      enum:
+        - submitted
+        - scheduled
+        - executing
+        - verifying
+        - rewarded
+        - completed
+        - failed
+
+    JobSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: '#/components/schemas/JobKind'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        created_at:
+          type: string
+          format: date-time
+
+    JobsListResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobSummary'
+
+    CreateJobRequest:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          $ref: '#/components/schemas/JobKind'
+        priority:
+          type: integer
+          minimum: 0
+          maximum: 255
+          default: 0
+        input_artifact_ids:
+          type: array
+          items:
+            type: string
+        verification_policy:
+          type: string
+          nullable: true
+
+    JobDetailResponse:
+      type: object
+      properties:
+        job:
+          type: object
+          description: Full JobRecord (spec + status + created_at)
 
     VmInstance:
       type: object

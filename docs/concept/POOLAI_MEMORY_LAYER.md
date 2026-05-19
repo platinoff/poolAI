@@ -88,5 +88,5 @@ Memory Layer додає **семантику AGI‑памʼяті** поверх
 - конвертуватись у винагороди для нод;
 - використовуватись для обліку внеску в **AGI‑памʼять**.
 
-Цей документ описує **ідеологію шару**; деталі протоколу/адаптера будуть визначені в окремих development‑доках.
+**Wire types (S38):** `src/memory/` (`MemoryShardRef`) ↔ `GridEnvelope` memory_shard. Деталі адаптера — [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
 

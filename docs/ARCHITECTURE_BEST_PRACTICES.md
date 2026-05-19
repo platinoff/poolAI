@@ -1,5 +1,5 @@
 # 🏗️ PoolAI Architecture Best Practices
-## Rust Architect Analysis - 2026-01-22
+## Rust Architect Analysis - 2026-01-22 (оновлено Horizon 2026-05-19)
 
 ---
 
@@ -75,7 +75,20 @@ src/
 │       ├── rewards.rs
 │       ├── ui.rs               # REST /ui/* (merge в /api/v1), делегує в UiService
 │       ├── virtual_nodes.rs    # FM-016: tasks, pool join, telegram (worker-safe paths)
+│       ├── jobs.rs             # Horizon S38: GET/POST /jobs stub (Job layer)
 │       └── common.rs
+├── grid/               # Horizon S36: GridEnvelope v1 (Job/Result/MemoryShard/PeerStatus)
+│   ├── mod.rs
+│   ├── envelope.rs
+│   └── map.rs          # ↔ PeerInfo, PutArtifactPayload
+├── job/                # Horizon S38: JobSpec, JobStatus, map ↔ Grid
+│   ├── mod.rs
+│   ├── types.rs
+│   └── map.rs
+├── memory/             # Horizon S38: MemoryShardRef, map ↔ Grid
+│   ├── mod.rs
+│   ├── types.rs
+│   └── map.rs
 └── ui/                 # Presentation layer (modularized)
     ├── mod.rs
     └── admin/          # 11 domain-specific modules
@@ -92,6 +105,8 @@ src/
         ├── raid.rs
         └── config.rs
 ```
+
+**Workspace (Horizon):** `crates/poolai-solana-adapter/` — sidecar schema v1 (`JobCompleted`, `SeedProvided`, `MemoryUpdated`); **без** `solana-sdk` у головному crate `poolai`. Опційно: `turboquant-simd` feature (`wide`) у `src/ml/turboquant.rs`.
 
 ### 2. **Error Handling** ✅
 

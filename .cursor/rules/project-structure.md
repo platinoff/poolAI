@@ -25,6 +25,7 @@
 - Sub-modules in separate files (e.g., `src/raid/burst_raid.rs`)
 - Public API exported through `pub use` in `mod.rs`
 - See `src/lib.rs` for public API structure
+- Horizon wire modules: `src/grid/`, `src/job/`, `src/memory/`; workspace crate `crates/poolai-solana-adapter/`
 
 ## Documentation
 

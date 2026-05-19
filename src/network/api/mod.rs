@@ -21,6 +21,7 @@ pub mod common;
 pub mod completions;
 pub mod discovery;
 pub mod instances;
+pub mod jobs;
 pub mod libraries;
 pub mod raid;
 pub mod raid_admin;
@@ -57,6 +58,7 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(libraries::create_libraries_routes())
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
+        .merge(jobs::create_jobs_routes())
         .merge(virtual_nodes::create_virtual_node_routes())
         .merge(instances::create_instance_routes())
         .merge(completions::create_completions_routes())

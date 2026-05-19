@@ -1,6 +1,6 @@
 # 🏗️ Architecture Review для Rust Architect
 
-> **Історичний зріз (2025-12-30).** Актуальна архітектура: [`ARCHITECTURE_BEST_PRACTICES.md`](./ARCHITECTURE_BEST_PRACTICES.md), [`development/HANDOFF_NEW_SESSION.md`](./development/HANDOFF_NEW_SESSION.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). Ключові доповнення 2026-05: сервісний шар `src/services/` (у т.ч. `virtual_node_*`, `ui_service`), **FM-016** (`poolai-worker`, `virtual_nodes` API), **FM-005** JSON-помилки, OpenAPI S14–S20.
+> **Історичний зріз (2025-12-30).** Актуальна архітектура: [`ARCHITECTURE_BEST_PRACTICES.md`](./ARCHITECTURE_BEST_PRACTICES.md), [`development/HANDOFF_NEW_SESSION.md`](./development/HANDOFF_NEW_SESSION.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md). Ключові доповнення 2026-05: сервісний шар `src/services/`, **FM-016**, **FM-005**, OpenAPI S14–S33; **Horizon (S35–S38):** `src/grid/`, `src/job/`, `src/memory/`, `turboquant-simd`, `crates/poolai-solana-adapter`, stub `GET/POST /api/v1/jobs`.
 
 **Дата**: 2025-12-30  
 **Статус**: ✅ Перевірка завершена (базова структура; див. банер вище для оновлень)

@@ -123,8 +123,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | **Horizon S38** | Job/Memory wire types | `JOB_LAYER_CONCEPT`, `AUTO_RUN_SESSION_2026_HORIZON.md` |
-| 2 | **Horizon S39–S40** | cloud-sdk, Layer C closure | `HORIZON_TO_100_PLAN.md` |
+| 1 | **Horizon S39** | FM-006 cloud-sdk | `AUTO_RUN_SESSION_2026_HORIZON.md` |
+| 2 | **Horizon S40** | Layer C + project 100% closure | `HORIZON_TO_100_PLAN.md` |
 | — | **A+B autoprogon** | **✅ 100%** | S34 |
 | — | FM-003 §4 LAN | **BLOCKED** | 2 хости (ops) |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
@@ -167,6 +167,7 @@ FM-xxx (з таблиці нижче)
 | **S35** | FM-004 `turboquant-simd` feature + tests | Horizon |
 | **S36** | FM-009 `GridEnvelope` v1 + map discovery/RAID | Horizon |
 | **S37** | FM-010 `poolai-solana-adapter` crate + event schema v1 | Horizon |
+| **S38** | P6 `src/job` + `src/memory` + `/api/v1/jobs` stub | Horizon |
 
 #### Не зроблено (канон backlog)
 
@@ -224,7 +225,7 @@ FM-xxx (з таблиці нижче)
 | S35 | FM-004 SIMD | [x] ✅ |
 | S36 | FM-009 Grid envelope | [x] ✅ |
 | S37 | FM-010 Solana adapter MVP | [x] ✅ |
-| S38 | Job/Memory wire | [ ] |
+| S38 | Job/Memory wire | [x] ✅ |
 | S39 | FM-006 cloud-sdk | [ ] |
 | S40 | Layer C + project 100% docs | [ ] |
 
@@ -237,8 +238,8 @@ FM-xxx (з таблиці нижче)
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 (S33) |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | S34; LAN §4 / cloud-sdk deep — ops/Deferred |
 | **A+B autoprogon** | **100%** | офіційний зріз HANDOFF |
-| **C. Horizon** | **~50%** → **100%** | S35–S37 ✅; S38–S40 відкрито |
-| **Проєкт (A+B+C)/3** | **~83%** → **100%** | після S40 |
+| **C. Horizon** | **~65%** → **100%** | S35–S38 ✅; S39–S40 відкрито |
+| **Проєкт (A+B+C)/3** | **~88%** → **100%** | після S40 |
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**); FM-006 deep — S39 **Deferred**.
 

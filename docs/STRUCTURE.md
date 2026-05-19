@@ -1,6 +1,6 @@
 # Структура та таксономія документації PoolAI
 
-**Оновлено:** 2026-05-19  
+**Оновлено:** 2026-05-19 (Horizon S38 — архітектура `src/grid`, `src/job`, `src/memory`)  
 **Джерело правди для порядку читання:** кроки **1–12** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md). **Legacy / stale плани:** [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md).
 
 ---

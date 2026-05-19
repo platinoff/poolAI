@@ -108,6 +108,16 @@
 | [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md) | Grid protocol: типи повідомлень, Discovery/RAID/тести. |
 | [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) | Solana adapter: core vs on-chain, події Job/Memory. |
 
+### Horizon wire-шар (код, S35–S38)
+
+| Модуль / crate | Призначення | HTTP / wire |
+|----------------|-------------|-------------|
+| `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus | JSON; map ↔ discovery/RAID |
+| `src/job/` | `JobSpec`, `JobStatus`, lifecycle types | `POST/GET /api/v1/jobs` (stub) |
+| `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
+| `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
+| `crates/poolai-solana-adapter/` | Domain events v1, NDJSON sidecar | без `solana-sdk` у `poolai` |
+
 ---
 
 ## Безпека та спостережуваність (за доками)

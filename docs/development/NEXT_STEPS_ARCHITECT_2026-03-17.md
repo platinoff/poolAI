@@ -28,7 +28,7 @@
 | **4** | **Priority 3** | Узгоджений JSON: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`**, **`HttpAppError`**, **`AppError::RestError`**. **FM-005** ✅: **`raid*`** + **`enterprise_api/`** + основний REST + **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`**. |
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (Criterion тощо); **`poolai_health_load`** з **`--json`** на stdout для baseline / ref-хост (2026-04-06). Далі вручну: рядки таблиці **`BENCHMARKS.md`**, LAN P2b на стенді. |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
-| **7** | **Priority 6** | Grid / Job / Memory / Solana **концепти** у `docs/` — зроблено; код/on-chain прототип — за потреби. |
+| **7** | **Priority 6** | Grid / Job / Memory / Solana — **концепти** ✅ + **wire код** S35–S38 (`src/grid`, `src/job`, `src/memory`, adapter crate); on-chain RPC — майбутнє. |
 
 *Опційно паралельно з 1–2*: **`cargo clippy` з `-D warnings` за матрицями `.github/workflows/ci.yml`** (без default features, `jwt,https`, `cloud,cloud-sdk`) — **закрито на `main` (2026-04-10)**. Далі: стабілізація **`cargo test --all-features`** на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
 
@@ -41,12 +41,14 @@
 1. **P4 (ops)** — `poolai_health_load` на ref-host → [`BENCHMARKS.md`](../performance/BENCHMARKS.md) (baseline **2026-04-10** чинний).
 2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; ops **2026-06-01**; чекбокс P2b нижче ≈ цей пункт.
 3. **FM-019 backlog** — pa11y/axe CI, dashboard modals — [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md); **baseline Implemented** ✅ (2026-06-07).
-4. **Horizon (активна черга)** — **FM-004**, **FM-009**, **FM-010**, **FM-006** — [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) S35–S40.
+4. **Horizon (активна черга)** — **S39** FM-006 cloud-sdk → **S40** closure — [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md).
 5. **Ops BLOCKED** — **FM-003 §4** (2 хости).
 
-**Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+**Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C **~65%** (S35–S38 ✅) — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
-**Закрито:** **FM-017/018/019 baseline** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
+**Закрито (Horizon код):** **FM-004/009/010** ✅ (S35–S37); **P6 Job/Memory wire** ✅ (S38: `src/job/`, `src/memory/`, `/api/v1/jobs`).
+
+**Закрито (autoprogon):** **FM-017/018/019 baseline** ✅; **DIGEST §ML** ✅; **FM-005** ✅; **FM-007/008** ✅; **FM-011** ✅; **FM-012** ✅; **FM-013–016** ✅.
 
 Деталі тікетів і шаблон Issue — таблиця **FM-*** у тому ж файлі; операційний зріз сесії — [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) §4.
 
@@ -222,6 +224,14 @@
 - [x] Окремі узгоджені концепт‑ та development‑доки: PoolAI Node, Grid Protocol, Job Layer, Memory Layer, Solana‑adapter (реалізація програми на Solana — поза scope концептів).
 - [x] Документи посилаються на наявні модулі / API / тести де доречно; суперечностей з базовим концептом немає (он-chain деталі — TBD до прототипу).
 
+**Horizon — wire-реалізація (2026-05-19, S35–S38)**:
+- [x] `src/grid/` — `GridEnvelope` v1 JSON; map discovery/RAID.
+- [x] `src/job/`, `src/memory/` — `JobSpec`, `MemoryShardRef`; map ↔ Grid.
+- [x] `src/ml/turboquant.rs` — optional `turboquant-simd` (`wide`).
+- [x] `crates/poolai-solana-adapter/` — domain events schema v1 + NDJSON sidecar (без `solana-sdk` у `poolai`).
+- [x] `src/network/api/jobs.rs` — stub `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}`.
+- [ ] Персистентний job store, scheduler, on-chain submit — після S40 / окремі спринти.
+
 ---
 
 ## 🧩 Взаємозалежності між кроками
@@ -322,13 +332,13 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Документ**: [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md) — типи повідомлень `Job`, `Result`, `MemoryShard`, `PeerStatus`; мапінг на `/api/v1/discovery/*`, `DiscoveryMessage`, `/raid/distributed/*`, `tests/grid_network_scalability_tests.rs`.
 - **Оновлено**: [`concept/POOLAI_GRID_NODE.md`](../concept/POOLAI_GRID_NODE.md) (посилання на Grid Protocol), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), `file_list.csv`.
-- **Залишок P6**: Solana‑adapter (on‑chain mapping), опційно єдиний wire envelope для Grid.
+- **Залишок P6 (історичний)**: wire envelope + adapter MVP — **закрито S35–S37**; залишок — scheduler, on-chain RPC.
 
 ## Верифікація 2026-04-06 (P6 — Solana adapter concept)
 
 - **Документ**: [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md) — межі core vs адаптер; мапінг `JobCompleted` / `SeedProvided` / `MemoryUpdated`; варіанти інтеграції (sidecar, черга, pull).
 - **P6 критерії готовності (концепт)**: закрито; наступний горизонт — прототип on-chain програми та schema подій core↔adapter.
-- **Залишок**: єдиний Grid wire envelope; реальний Solana crate / repo.
+- **Залишок**: on-chain RPC у sidecar; job scheduler / persistent store (S38 stub лише in-process).
 
 ## Верифікація 2026-04-06 (P5 — архівні плани)
 
@@ -455,4 +465,11 @@ Grid / Job / Memory / Tokenization (Priority 6)
 - **NEXT_STEPS**: у верифікації **P3 (`raid.rs` + enterprise)** виправлено застарілий рядок про **`auth.rs`**; **FM-005** закрито **2026-04-10** (див. актуальний **§5.1**).
 - **README** (*Next Focus*): перший блок — нумерований порядок за **§5.1**; далі — деталі P4 / P2b / P3 та посилання на Architect / HANDOFF.
 - **Шапки дат**: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md), [`docs/README.md`](../README.md) — **2026-04-06**.
+
+## Верифікація 2026-05-19 (Horizon S38 — Job/Memory wire + архітектура)
+
+- **Код**: `src/job/` (`JobSpec`, `JobStatus`), `src/memory/` (`MemoryShardRef`); `src/job/map.rs`, `src/memory/map.rs` ↔ `GridEnvelope`; `src/network/api/jobs.rs` — `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}`.
+- **Доки**: `JOB_LAYER_CONCEPT` §5, `ARCHITECTURE_BEST_PRACTICES` (grid/job/memory), `FUNCTIONALITY_DIGEST` §Horizon wire, `openapi.yaml` `/jobs`.
+- **Тести**: `cargo test-ci`; `cargo test --lib round_trip` (job/memory/grid).
+- **Наступний горизонт**: S39 FM-006, S40 closure.
 

@@ -68,8 +68,16 @@ PoolAI вже реалізує:
 
 Цей документ описує логіку Job / Mining Layer; реалізація протоколу й типів повідомлень описується в `GRID_PROTOCOL` (планується).
 
-## 5. Наступні кроки
+## 5. Реалізація MVP (S38)
 
-- Ввести lightweight Rust‑типи (`JobId`, `JobKind`, `JobSpec`, `JobStatus`) у `core::job` модулі.
-- Не змінювати існуючі модулі, поки Job Layer не буде повністю описаний у концептах та планах.
+| Тип | Модуль |
+|-----|--------|
+| `JobId`, `JobKind`, `JobSpec`, `JobStatus` | `src/job/` |
+| Grid map | `src/job/map.rs` ↔ `GridEnvelope` Job |
+| HTTP stub | `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}` — `src/network/api/jobs.rs` |
+
+## 6. Наступні кроки
+
+- Scheduler / VM binding для JobSpec.
+- Персистентний job store (SQLite / RAID).
 
