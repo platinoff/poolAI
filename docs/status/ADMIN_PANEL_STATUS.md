@@ -1,6 +1,8 @@
 # 📋 Admin Panel Status Report
 ## PoolAI Project - Admin Panel Analysis - 2026-01-19
 
+> **⚠️ Stale / не канон (2026-05-19).** Admin UI реалізовано в `src/ui/admin/` (модулі за маршрутами); a11y — [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md); E2E — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) (S23–S29). Канон: [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.1, [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md).
+
 ---
 
 ## 🎯 Поточний стан адмін панелі

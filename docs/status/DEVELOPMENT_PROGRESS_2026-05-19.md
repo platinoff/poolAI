@@ -1,6 +1,6 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-05-19 · **Гілка:** `main` · **Зріз комітів:** S29 (Playwright security + audit)  
+**Оновлено:** 2026-05-19 · **Гілка:** `main` · **Зріз комітів:** S30 (FM legacy docs audit)  
 **Метод:** звірка FM-001…019, Architect P1–P6, `STABLE_STATE`, `FUNCTIONALITY_DIGEST`, відкриті `[ ]` у канонічних планах, `rg TODO` у `src/`, legacy docs (`docs/archive/`, січень–квітень 2026) — **не канон** для черги.
 
 ---
@@ -129,6 +129,7 @@
 | 1 | OpenAPI `/raid/distributed/*` або ML ops | за `NEXT_SESSION_PROMPT.md` |
 | — | **S28** OpenAPI gap audit | ✅ [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md) |
 | — | **S29** Playwright security + audit | ✅ `e2e/tests/admin.spec.ts` (+2 tests) |
+| — | **S30** FM legacy docs audit | ✅ [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
 | — | **FM-003 §4** LAN sign-off | **BLOCKED** (2 хости) |
 | — | FM-004/006/009/010 | Лише за явним запитом |
 

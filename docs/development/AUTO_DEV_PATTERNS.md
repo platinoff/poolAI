@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S29 Playwright security + audit).
+**Оновлено:** 2026-05-19 (S30 FM legacy docs audit).
 
 ---
 
@@ -516,6 +516,13 @@
 - **S29:** `/ui/admin/security` → `#oauth2-providers-list` + кнопка `/register|зареєстр/i` (i18n UA); `/ui/admin/audit` → `#audit-events` (auto `queryAuditLogs()`)
 - **Перевірка:** `bash bin/e2e-playwright.sh --start` (MSYS2; `enterprise,ml,cloud,test-utils`); CI — `.github/workflows/e2e.yml` `workflow_dispatch`
 - **FM:** FM-019 (UI E2E backlog)
+
+### [FM] Legacy docs — не канон (S30)
+- **Де:** `docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.3
+- **Сигнал:** `rg "Stale|Archived|не канон" docs/status docs/development --glob '*.md'`
+- **Патерн:** січневі `STATUS_*`, `ADMIN_PANEL_*`, `UI_UX_*` — банер → STABLE/FM/DOCS_LEGACY_AUDIT; пріоритети лише з §5.1
+- **Перевірка:** не `rg "\- \[ \]" docs/status` для черги автопрогону
+- **FM:** крок 12
 
 ### [FM] Прогрес і «ніколи не зроблено» (аудит 2026-05-19)
 - **Де:** `docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5

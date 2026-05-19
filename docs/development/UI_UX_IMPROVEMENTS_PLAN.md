@@ -1,6 +1,8 @@
 # 🎨 UI/UX Improvement Plan - PoolAI Admin Panel
 ## Comprehensive Design & Functionality Enhancement - 2026-01-16
 
+> **⚠️ Stale / не канон (2026-05-19).** Monitoring UI — `src/ui/admin/monitoring.rs`; UX/E2E канон — [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](./UI_QUALITY_AND_E2E_PLAN_2026-04-06.md), FM-019 §5.4. Не використовувати `[ ]` нижче для автопрогону. Див. [`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md).
+
 ---
 
 ## 🎯 Current Status

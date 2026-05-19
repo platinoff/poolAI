@@ -1,12 +1,12 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-19 (§5.5 прогрес 93%; S28 OpenAPI gap audit ✅; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md)).
+**Оновлено:** 2026-05-19 (§5.5 прогрес 93%; S29 Playwright ✅; FM legacy audit — [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
 **Не зроблено / backlog:** FM-003 §4 LAN (**BLOCKED**); FM-019 повний WCAG/pa11y CI; FM-004/006 **Deferred**; FM-009/010 **Concept-only**. **P4:** рядок `poolai_health_load` **2026-05-18** у `BENCHMARKS.md` (baseline **2026-04-10** лишається для порівняння).
 
-**Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); clippy — CI на `main`.
+**Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); E2E S29 — `bash bin/e2e-playwright.sh --start` (5 passed); clippy — CI на `main`.
 
 **Прогрес продукту (шар A):** **93%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
@@ -123,8 +123,10 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Playwright E2E розширення | **Partial ✅** S29 | security + audit ✅; raid/topology — backlog — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
-| — | OpenAPI gap audit | **S28 ✅** | v1 Users/RAID/VM; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md) |
+| 1 | OpenAPI `/raid/distributed/*` | backlog | 7 POST; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md) |
+| 2 | ML ops | Planned | [`ml/PIPELINE_MANAGEMENT.md`](../ml/PIPELINE_MANAGEMENT.md) |
+| 3 | Playwright E2E | **Partial ✅** S29 | tenants/monitoring/security/audit ✅; raid/topology — backlog |
+| — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
 | — | UI a11y CI | **FM-019** | **Partial ✅** pa11y merge gate; axe Playwright — backlog |
 | — | UI_QUALITY P1 | **FM-013** | **✅** S25–S26 (27 contract tests) |
@@ -155,7 +157,8 @@ FM-xxx (з таблиці нижче)
 | **S26** | UI_QUALITY P1 close — metrics, alert-rules, SAML, policies (+4 tests) | `285b898d` |
 | **S27** | Playwright admin E2E — tenants, monitoring (`admin.spec.ts`, `helpers.ts`) | `862cd016` |
 | **S28** | OpenAPI gap audit — Users, workers, RAID, VM templates/networks | `46a299c5` |
-| **S29** | Playwright — security + audit admin routes | (ця сесія) |
+| **S29** | Playwright — security + audit admin routes | `73a5e965` |
+| **S30** | FM legacy docs audit + stale banners | (ця сесія) |
 
 #### Не зроблено (канон backlog)
 
@@ -186,16 +189,18 @@ FM-xxx (з таблиці нижче)
 
 #### Legacy docs (повна таблиця)
 
-Див. [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md) — аудит січень–квітень 2026 планів.
+**Канон:** [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md). Історичний S13: [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md).
 
-#### Рекомендований наступний спринт (2026-05-19, після OpenAPI S14–S20)
+#### Рекомендований наступний спринт (2026-05-19, після S29)
 
-Повний backlog — [`AUTO_RUN_SESSION_2026-07-01.md`](../development/AUTO_RUN_SESSION_2026-07-01.md).
+Повний backlog — [`AUTO_RUN_SESSION_2026-07-01.md`](../development/AUTO_RUN_SESSION_2026-07-01.md), §4 у [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md).
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | Playwright / ML ops | за запитом |
-| — | **S21–S28** | ✅ (див. §5.3) |
+| 1 | OpenAPI distributed | `/raid/distributed/*` у yaml |
+| 2 | ML ops | `PIPELINE_MANAGEMENT.md` |
+| 3 | Playwright raid/topology | за `E2E_PLAYWRIGHT.md` |
+| — | **S21–S30** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.

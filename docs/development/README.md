@@ -11,7 +11,8 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
-- **[`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md)** — **поточний автопрогін** (backlog S21+: OpenAPI gap audit, FM-019 CI, Playwright).
+- **[`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md)** — **поточний автопрогін** (S21–S29 ✅; backlog: OpenAPI distributed, ML ops, Playwright raid).
+- **[`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md)** — менеджер функціоналу: stale docs, не повторювати архівні `[ ]`.
 - **[`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md)** — попередній (FM-017 ✅).
 - **[`AUTO_RUN_SESSION_2026-05-28.md`](./AUTO_RUN_SESSION_2026-05-28.md)** — ops hygiene ✅.
 - **[`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md)** — реєстр патернів для авторозробки.

@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — pa11y CI: `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml` (strict login, optional admin).
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
+### Docs
+- **FM legacy audit (2026-05-19, S30)** — [`DOCS_LEGACY_AUDIT_2026-05-19.md`](development/DOCS_LEGACY_AUDIT_2026-05-19.md): stale/archive таблиця, backlog після S29; банери на `ADMIN_PANEL_STATUS`, `UI_UX_IMPROVEMENTS_PLAN`; оновлено `STRUCTURE`, `INDEX`, FM §5.1/§5.3, `development/README.md`.
+
 ### Added
 - **UI E2E (2026-05-19, S29)** — Playwright admin: security (`#security-content`, OAuth2 tab) + audit (`#audit-events`); monitoring locator `.first()` for strict mode; [`E2E_PLAYWRIGHT.md`](development/E2E_PLAYWRIGHT.md).
 - **OpenAPI (2026-05-19, S28)** — gap audit: Users CRUD, pool workers POST/DELETE, `/libraries/upload`, RAID status/workers/events/snapshot/admin, VM templates/networks; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](development/OPENAPI_GAP_AUDIT_2026-05-19.md).
