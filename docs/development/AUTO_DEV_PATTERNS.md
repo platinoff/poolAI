@@ -345,13 +345,13 @@
 
 ### [FM-019] pa11y CI (workflow_dispatch)
 - **Де:** `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml`
-- **Патерн:** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — login actions then `ADMIN_URLS`: `/ui`, `/ui/admin/users`, `/ui/admin/security`, `/ui/admin/config`, `/ui/workers`; creds `PA11Y_USER`/`PA11Y_PASSWORD` (default `admin`/`admin123`); unauthenticated — `write_pa11y_simple_config` + `--config` (pa11y v9)
+- **Патерн:** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — login actions then 9 `ADMIN_URLS` (dashboard + admin + libs/vm/raid); creds `PA11Y_USER`/`PA11Y_PASSWORD` (default `admin`/`admin123`); unauthenticated — `write_pa11y_simple_config` + `--config` (pa11y v9)
 - **Перевірка:** `cargo test --test pa11y_ci_script`; GitHub Actions → **A11y (pa11y)**
 - **FM:** FM-019 Partial (pa11y auth)
 
 ### [FM-019] pa11y URL matrix + UI plan archival (docs S4)
 - **Де:** [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.1; [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md) (архів)
-- **Патерн:** strict — login + `ADMIN_URLS` (`/ui`, users, security, config, workers); `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` → 0 errors
+- **Патерн:** strict — login + `ADMIN_URLS` (`/ui`, admin users/security/config, workers, libs, vm, raid); маршрут бібліотек — **`/ui/libs`**; `applyTheme` dark `danger` = `#c62828` як `themes.rs`
 - **Перевірка:** `cargo test --test pa11y_ci_script`
 - **FM:** FM-019 Partial (pa11y strict URLs)
 

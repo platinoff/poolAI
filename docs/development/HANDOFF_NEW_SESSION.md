@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-15.md`](./AUTO_RUN_SESSION_2026-06-15.md) — FM-019 pa11y S5).
+**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-16.md`](./AUTO_RUN_SESSION_2026-06-16.md) — FM-019 pa11y S6).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-15.md`](./AUTO_RUN_SESSION_2026-06-15.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-16.md`](./AUTO_RUN_SESSION_2026-06-16.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅:** dashboard modals; pa11y CI + auth fixture; strict login + 6 auth URLs (`/ui`, users, security, config, workers) 0 errors. **Далі (§5.1):** WCAG 2.2 AA auto (backlog); FM-003 §4 (BLOCKED). **Не в автопрогоні:** FM-004/006/009/010. Звірка «не зроблено» — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅:** dashboard modals; pa11y strict login + 9 auth URLs (admin + `/ui`, workers, libs, vm, raid) 0 errors; dark theme danger sync. **Далі (§5.1):** WCAG 2.2 AA auto (backlog); FM-003 §4 (BLOCKED). **Не в автопрогоні:** FM-004/006/009/010. Звірка «не зроблено» — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -84,7 +84,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | Пріоритет | Що | Стан |
 |-----------|-----|------|
 | 1 | **FM-003 §4** — реальний LAN sign-off | **BLOCKED** (2 хости) |
-| 2 | **FM-019** — WCAG 2.2 AA auto | pa11y strict 6 auth + login ✅ |
+| 2 | **FM-019** — WCAG 2.2 AA auto | pa11y strict 9 auth + login ✅ |
 | — | **P4** — `poolai_health_load` | ✅ **2026-05-18** (`BENCHMARKS.md`) |
 | — | FM-004/006 | Deferred, поза автопрогоном |
 | — | FM-009/010 | Concept-only |

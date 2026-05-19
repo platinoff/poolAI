@@ -122,7 +122,7 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
-| 2 | UI a11y backlog | **FM-019** | pa11y strict 6 auth URLs + login ✅ (S5); WCAG 2.2 AA auto — backlog |
+| 2 | UI a11y backlog | **FM-019** | pa11y strict 9 auth URLs + login ✅ (S6); WCAG 2.2 AA auto — backlog |
 | 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
 | — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
 | 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
@@ -155,7 +155,7 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | поза автопрогоном |
 | FM-006 | cloud-sdk гілки | **Deferred** | поза автопрогоном |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | pa11y/axe у CI | **Partial** | strict login + 6 auth URLs 0 errors (S5); `PA11Y_ADMIN_STRICT`; `tests/pa11y_ci_script.rs` |
+| FM-019 | pa11y/axe у CI | **Partial** | strict login + 9 auth URLs 0 errors (S6); `PA11Y_ADMIN_STRICT`; `tests/pa11y_ci_script.rs` |
 | FM-019 | Повний WCAG 2.2 AA автомат | **Backlog** | не блокує реліз baseline |
 | P4 | `poolai_health_load` → `BENCHMARKS.md` | **Implemented (ops)** | рядок **2026-05-18**; baseline **2026-04-10** для порівняння |
 | `UI_IMPROVEMENTS_PLAN` | Історичні `[ ]` | **Archived** | S4 2026-05-18; канон §5.4 + runbook §3.1 |
@@ -196,7 +196,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-10.md`](../development/AUTO_RUN_SESSION_2026-06-10.md) (pa11y CI `8c5dc1df`).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-15.md`](../development/AUTO_RUN_SESSION_2026-06-15.md) (FM-019 pa11y `/ui` + config).
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-16.md`](../development/AUTO_RUN_SESSION_2026-06-16.md) (FM-019 pa11y libs/vm/raid).
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-15.md`](../development/AUTO_RUN_SESSION_2026-06-15.md) (FM-019 pa11y S5 `e368ba11`).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-14.md`](../development/AUTO_RUN_SESSION_2026-06-14.md) (FM-019 docs S4 `c1b2b24e`).
 

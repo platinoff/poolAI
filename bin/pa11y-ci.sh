@@ -32,6 +32,9 @@ ADMIN_URLS=(
   "${BASE}/ui/admin/security"
   "${BASE}/ui/admin/config"
   "${BASE}/ui/workers"
+  "${BASE}/ui/libs"
+  "${BASE}/ui/vm"
+  "${BASE}/ui/raid"
 )
 
 if [[ "${PA11Y_ADMIN_STRICT}" == "1" ]]; then

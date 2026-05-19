@@ -27,3 +27,5 @@ S0: git fetch && git status -sb; HANDOFF + FUNCTION_MANAGEMENT §5.1.
 Не робити: FM-004/006/009/010.
 Після коду: cargo fmt → cargo test-ci → push MSYS2.
 ```
+
+**Наступний:** [`AUTO_RUN_SESSION_2026-06-16.md`](./AUTO_RUN_SESSION_2026-06-16.md) — pa11y `/ui/libs`, `/ui/vm`, `/ui/raid`.

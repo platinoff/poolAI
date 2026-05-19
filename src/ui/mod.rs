@@ -2846,7 +2846,7 @@ function applyTheme(themeName) {
       bg: '#0f1216', surface: '#171b22', surfaceSecondary: '#0f1216',
       text: '#e8e8e8', textMuted: '#a8b0bf', border: '#262b36',
       primary: '#50fa7b', primaryHover: '#67e480',
-      danger: '#ff5555', dangerHover: '#ff6e6e',
+      danger: '#c62828', dangerHover: '#e53935',
       secondary: '#6272a4', secondaryHover: '#7a8bc4',
       success: '#50fa7b', warning: '#f1fa8c', info: '#8be9fd',
       link: '#77c7ff', linkHover: '#8bd5ff'
@@ -5209,6 +5209,13 @@ mod dashboard_a11y_tests {
         let html = raid_page().await.0;
         assert!(html.contains("id=\"createArtifactModal\""));
         assert!(html.contains("aria-modal=\"false\" aria-hidden=\"true\""));
+    }
+
+    #[tokio::test]
+    async fn dashboard_dark_theme_danger_matches_rust_canon() {
+        let html = workers_page().await.0;
+        assert!(html.contains("danger: '#c62828'"));
+        assert!(!html.contains("danger: '#ff5555'"));
     }
 }
 

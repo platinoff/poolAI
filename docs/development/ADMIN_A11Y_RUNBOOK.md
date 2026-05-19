@@ -33,7 +33,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | Security | `/ui/admin/security` | Tab між OAuth2/SAML/Policies (`aria-selected`); modals OAuth2/SAML/Policy |
 | Config | `/ui/admin/config` | Tab General…Health; фокус на панелі |
 | Dashboard | `/ui` | Skip links; Ctrl+K search; Esc закриває modals |
-| Workers / Libraries / VM / RAID | `/ui/workers`, `/ui/libraries`, `/ui/vm`, `/ui/raid` | Create/Install modals: Tab у діалозі; Esc; closed `aria-modal="false"` |
+| Workers / Libraries / VM / RAID | `/ui/workers`, `/ui/libs`, `/ui/vm`, `/ui/raid` | Create/Install modals: Tab у діалозі; Esc; closed `aria-modal="false"` |
 
 **Критерій pass:** жоден Tab не «втикає» фокус під overlay; активна вкладка оголошується візуально + через `aria-selected`.
 
@@ -41,7 +41,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ## 3. pa11y (локально + CI)
 
-**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — admin users/security + `/ui/workers` після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). **Зріз 2026-05-18:** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** (commit `ded58c10`).
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — 9 auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
 
 ### 3.1 Матриця URL (strict / planned)
 
@@ -53,8 +53,11 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | `/ui/workers` | auth actions | **strict** | dashboard modal slice |
 | `/ui` | auth actions | **strict** | dashboard shell |
 | `/ui/admin/config` | auth actions | **strict** | tablist General…Health |
+| `/ui/libs` | auth actions | **strict** | libraries dashboard (маршрут `/ui/libs`, не `/ui/libraries`) |
+| `/ui/vm` | auth actions | **strict** | VM instances |
+| `/ui/raid` | auth actions | **strict** | RAID artifacts table |
 
-**Зріз 2026-05-18 (S5):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 6 auth URLs.
+**Зріз 2026-05-18 (S6):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 9 auth URLs.
 
 ```bash
 # MSYS2: poolai вже на :8080
@@ -99,4 +102,4 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md)~~ — **Archived ✅ 2026-05-18** (S4 docs; канон §5.4 + цей runbook).
 - ~~Розширити `ADMIN_URLS`: `/ui`, `/ui/admin/config`~~ — **Partial ✅ 2026-05-18** (S5; 6 auth URLs strict).
 
-**Last updated:** 2026-05-18 — S5 pa11y: `/ui`, `/ui/admin/config` у strict `ADMIN_URLS`; 0 errors.
+**Last updated:** 2026-05-18 — S6 pa11y: `/ui/libs`, `/ui/vm`, `/ui/raid`; dark theme `--danger` sync; 0 errors.
