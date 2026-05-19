@@ -604,6 +604,19 @@ impl MonitoringManager {
         Ok(dashboards.get(&id).cloned())
     }
 
+    /// Deletes a dashboard by id.
+    ///
+    /// Returns `Ok(true)` if a dashboard was removed, `Ok(false)` if not found.
+    pub async fn delete_dashboard(&self, id: Uuid) -> Result<bool, AppError> {
+        let mut dashboards = self.dashboards.write().await;
+        if dashboards.remove(&id).is_some() {
+            info!("Deleted dashboard: {}", id);
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
     /// Lists all dashboards
     ///
     /// # Arguments

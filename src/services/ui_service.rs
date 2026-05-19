@@ -135,4 +135,11 @@ impl UiService {
     ) -> Result<Option<Dashboard>, EnterpriseMonitoringError> {
         EnterpriseService::update_monitoring_dashboard(ctx, id, input).await
     }
+
+    pub async fn delete_dashboard(
+        ctx: &ApiContext,
+        id: uuid::Uuid,
+    ) -> Result<bool, EnterpriseMonitoringError> {
+        EnterpriseService::delete_monitoring_dashboard(ctx, id).await
+    }
 }

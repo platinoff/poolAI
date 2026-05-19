@@ -252,6 +252,31 @@ async fn test_list_dashboards_with_tenant_filter() {
 
 #[cfg(feature = "enterprise")]
 #[tokio::test]
+async fn test_delete_dashboard() {
+    let manager = get_global_monitoring_manager();
+    manager.initialize().await.unwrap();
+
+    let dashboard = Dashboard {
+        id: Uuid::new_v4(),
+        name: "delete-me".to_string(),
+        description: "To be deleted".to_string(),
+        metrics: vec!["cpu_usage".to_string()],
+        layout: "{}".to_string(),
+        is_public: false,
+        tenant_id: None,
+        created_at: Utc::now(),
+    };
+
+    manager.create_dashboard(dashboard.clone()).await.unwrap();
+    assert!(manager.get_dashboard(dashboard.id).await.unwrap().is_some());
+
+    assert!(manager.delete_dashboard(dashboard.id).await.unwrap());
+    assert!(manager.get_dashboard(dashboard.id).await.unwrap().is_none());
+    assert!(!manager.delete_dashboard(dashboard.id).await.unwrap());
+}
+
+#[cfg(feature = "enterprise")]
+#[tokio::test]
 async fn test_get_metric_history() {
     let manager = get_global_monitoring_manager();
     manager.initialize().await.unwrap();

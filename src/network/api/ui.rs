@@ -318,6 +318,7 @@ async fn ui_dashboard_update_handler(
 
 #[cfg(feature = "enterprise")]
 async fn ui_dashboard_delete_handler(
+    State(ctx): State<ApiContext>,
     Extension(claims): Extension<Claims>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
@@ -327,20 +328,38 @@ async fn ui_dashboard_delete_handler(
         return err.into_response();
     }
 
-    // Note: MonitoringManager doesn't have delete_dashboard() yet
-    HttpAppError::new(AppError::RestError {
-        code: "NOT_IMPLEMENTED",
-        message: "Dashboard deletion not yet implemented; MonitoringManager.delete_dashboard() is not available.".to_string(),
-    })
-    .with_context(
-        ErrorContext::new("ui_dashboard_delete")
-            .with_resource("dashboard_id", &id)
-            .with_hint(
-                "Add delete_dashboard() to MonitoringManager or mark deleted via dashboard update.",
-            ),
-    )
-    .with_status(StatusCode::NOT_IMPLEMENTED)
-    .into_response()
+    let uuid = match Uuid::parse_str(&id) {
+        Ok(u) => u,
+        Err(_) => {
+            return HttpAppError::new(AppError::RestError {
+                code: "INVALID_UUID",
+                message: format!("Invalid UUID format: {}", id),
+            })
+            .with_context(
+                ErrorContext::new("ui_dashboard_delete").with_resource("dashboard_id", &id),
+            )
+            .with_status(StatusCode::BAD_REQUEST)
+            .into_response();
+        }
+    };
+
+    match UiService::delete_dashboard(&ctx, uuid).await {
+        Ok(true) => StatusCode::NO_CONTENT.into_response(),
+        Ok(false) => HttpAppError::new(AppError::RestError {
+            code: "DASHBOARD_NOT_FOUND",
+            message: format!("Dashboard not found: {}", id),
+        })
+        .with_context(ErrorContext::new("ui_dashboard_delete").with_resource("dashboard_id", &id))
+        .with_status(StatusCode::NOT_FOUND)
+        .into_response(),
+        Err(e) => ui_monitoring_http_err(
+            e,
+            "DELETE_DASHBOARD_FAILED",
+            "ui_dashboard_delete",
+            "Failed to delete dashboard",
+        )
+        .into_response(),
+    }
 }
 
 #[cfg(not(feature = "enterprise"))]

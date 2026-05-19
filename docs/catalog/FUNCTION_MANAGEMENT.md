@@ -182,8 +182,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
-| — | **S21–S23** | ✅ OpenAPI gap, FM-019 CI, Playwright smoke (2026-05-19) |
+| 1 | **UI_QUALITY P1** | Admin JSON contracts (`admin_ui_api_contracts.rs`) |
+| — | **S21–S24** | ✅ OpenAPI, FM-019 CI, Playwright, dashboard DELETE (2026-05-19) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.

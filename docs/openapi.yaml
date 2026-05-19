@@ -1728,7 +1728,7 @@ paths:
       tags:
         - UI
       summary: Delete dashboard
-      description: Currently returns 501 — deletion not implemented in MonitoringManager.
+      description: Removes dashboard from enterprise MonitoringManager (in-memory).
       operationId: deleteUiDashboard
       security:
         - bearerAuth: []
@@ -1740,12 +1740,18 @@ paths:
             type: string
             format: uuid
       responses:
-        '501':
-          description: Not implemented
+        '204':
+          description: Dashboard deleted
+        '400':
+          description: Invalid UUID
         '401':
           description: Unauthorized
         '403':
-          description: Forbidden
+          description: Forbidden — requires delete:all or write:monitoring
+        '404':
+          description: Dashboard not found
+        '501':
+          description: Enterprise feature disabled
 
   /ui/themes:
     get:

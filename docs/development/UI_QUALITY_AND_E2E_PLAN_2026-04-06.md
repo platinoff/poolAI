@@ -13,6 +13,10 @@
 - **Admin VM** (`src/ui/admin/vm.rs`): видалення через **`DELETE /api/v1/vm/instances/{id}`** (раніше помилково `POST …/delete`); бейдж статусу та fallback для `resources`.
 - OpenAPI: оновлено опис `VmInstance.status` під рядковий формат.
 
+## S24 (2026-05-19)
+
+- **`DELETE /ui/dashboards/{id}`** — реалізовано: `MonitoringManager.delete_dashboard()`, `UiService::delete_dashboard`, HTTP **204**; OpenAPI оновлено; тест `test_delete_dashboard` у `enterprise_monitoring_integration.rs`.
+
 ## Наступні кроки за пріоритетом
 
 ### P1 — Узгодження API ↔ UI (1–2 тижні)

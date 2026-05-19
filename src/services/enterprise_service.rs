@@ -346,6 +346,17 @@ impl EnterpriseService {
         Ok(Some(updated))
     }
 
+    pub async fn delete_monitoring_dashboard(
+        ctx: &ApiContext,
+        id: Uuid,
+    ) -> Result<bool, EnterpriseMonitoringError> {
+        Self::ensure_monitoring(ctx).await?;
+        ctx.enterprise_monitoring_manager
+            .delete_dashboard(id)
+            .await
+            .map_err(EnterpriseMonitoringError::Operation)
+    }
+
     pub async fn query_monitoring_metric_history(
         ctx: &ApiContext,
         q: MetricHistoryQueryInput,
