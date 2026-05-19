@@ -663,9 +663,14 @@ async fn raid_admin_smallworld_metrics_json_shape() {
 }
 
 #[cfg(feature = "enterprise")]
-mod enterprise_dashboard_slices {
+mod enterprise_admin_contract_slices {
     use super::*;
+    use chrono::Utc;
+    use poolai::enterprise::monitoring::Dashboard;
+    use poolai::enterprise::multi_tenancy::TenantConfig;
+    use poolai::enterprise::security::OAuth2Config;
     use poolai::network::enterprise_api::create_enterprise_api_routes;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn enterprise_monitoring_alerts_json_shape() {
@@ -701,6 +706,171 @@ mod enterprise_dashboard_slices {
             ] {
                 assert!(o.contains_key(key), "alert missing `{key}`: {o:?}");
             }
+        }
+    }
+
+    #[tokio::test]
+    async fn enterprise_tenants_list_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.tenant_manager.initialize().await.unwrap();
+        ctx.tenant_manager
+            .create_tenant("admin-contract-tenant".to_string(), TenantConfig::default())
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/tenants")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("tenants JSON");
+        let arr = v.as_array().expect("tenants response is array");
+        assert!(!arr.is_empty(), "seeded tenant list should be non-empty");
+        let o = arr[0].as_object().expect("tenant object");
+        for key in ["id", "name", "config", "usage", "created_at", "updated_at"] {
+            assert!(o.contains_key(key), "tenant missing `{key}`: {o:?}");
+        }
+        let config = o.get("config").and_then(|x| x.as_object()).expect("config");
+        for key in ["active", "max_workers", "max_memory_mb"] {
+            assert!(
+                config.contains_key(key),
+                "tenant.config missing `{key}`: {config:?}"
+            );
+        }
+        let usage = o.get("usage").and_then(|x| x.as_object()).expect("usage");
+        for key in ["workers", "memory_mb", "cpu_cores"] {
+            assert!(
+                usage.contains_key(key),
+                "tenant.usage missing `{key}`: {usage:?}"
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn enterprise_oauth2_providers_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.security_manager.initialize().await.unwrap();
+        ctx.security_manager
+            .register_oauth2_provider(
+                "admin-contract-oauth2".to_string(),
+                OAuth2Config {
+                    client_id: "contract-client".to_string(),
+                    client_secret: "secret".to_string(),
+                    authorization_url: "https://oauth.example.com/authorize".to_string(),
+                    token_url: "https://oauth.example.com/token".to_string(),
+                    redirect_uri: "https://poolai.example.com/callback".to_string(),
+                    scopes: vec!["openid".to_string()],
+                    telegram_allow_user_ids: vec![],
+                },
+            )
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/security/oauth2/providers")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("oauth2 providers JSON");
+        let arr = v.as_array().expect("oauth2 providers response is array");
+        assert!(!arr.is_empty(), "seeded oauth2 list should be non-empty");
+        let o = arr[0].as_object().expect("oauth2 provider object");
+        for key in ["name", "config", "enabled"] {
+            assert!(
+                o.contains_key(key),
+                "oauth2 provider missing `{key}`: {o:?}"
+            );
+        }
+        let config = o.get("config").and_then(|x| x.as_object()).expect("config");
+        for key in [
+            "client_id",
+            "authorization_url",
+            "token_url",
+            "redirect_uri",
+        ] {
+            assert!(
+                config.contains_key(key),
+                "oauth2 config missing `{key}`: {config:?}"
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn enterprise_monitoring_dashboards_json_shape() {
+        let ctx = ApiContext::default();
+        ctx.enterprise_monitoring_manager
+            .initialize()
+            .await
+            .unwrap();
+        let dashboard = Dashboard {
+            id: Uuid::new_v4(),
+            name: "admin-contract-dashboard".to_string(),
+            description: "contract test".to_string(),
+            metrics: vec!["cpu_usage".to_string()],
+            layout: "{}".to_string(),
+            is_public: false,
+            tenant_id: None,
+            created_at: Utc::now(),
+        };
+        ctx.enterprise_monitoring_manager
+            .create_dashboard(dashboard)
+            .await
+            .unwrap();
+
+        let app = Router::new()
+            .nest("/api/enterprise", create_enterprise_api_routes())
+            .with_state(ctx);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/enterprise/monitoring/dashboards")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("dashboards JSON");
+        let arr = v.as_array().expect("dashboards response is array");
+        assert!(
+            !arr.is_empty(),
+            "seeded dashboards list should be non-empty"
+        );
+        let o = arr[0].as_object().expect("dashboard object");
+        for key in [
+            "id",
+            "name",
+            "description",
+            "metrics",
+            "is_public",
+            "created_at",
+        ] {
+            assert!(o.contains_key(key), "dashboard missing `{key}`: {o:?}");
         }
     }
 

@@ -17,6 +17,11 @@
 
 - **`DELETE /ui/dashboards/{id}`** — реалізовано: `MonitoringManager.delete_dashboard()`, `UiService::delete_dashboard`, HTTP **204**; OpenAPI оновлено; тест `test_delete_dashboard` у `enterprise_monitoring_integration.rs`.
 
+## S25 (2026-05-19)
+
+- **Admin JSON contracts (P1):** +3 тести в `tests/admin_ui_api_contracts.rs` — `GET /api/enterprise/tenants`, `GET …/security/oauth2/providers`, `GET …/monitoring/dashboards` (ключі для `tenants.rs`, `security.rs`, `monitoring.rs`).
+- Таблиця покриття — [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md). Backlog: metrics, SAML/policies, alert-rules.
+
 ## Наступні кроки за пріоритетом
 
 ### P1 — Узгодження API ↔ UI (1–2 тижні)

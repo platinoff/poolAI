@@ -76,6 +76,7 @@
 | **S22** | FM-019 CI | ✅ `pa11y-wcag22` + `pa11y-contract` у `ci.yml` (2026-05-19); runbook §3.2 | LAN |
 | **S23** | Playwright (опційно) | ✅ smoke login → `/ui/admin/users` (2026-05-19); `E2E_PLAYWRIGHT.md` | FM-004/006/009/010 |
 | **S24** | UI dashboard DELETE | ✅ `delete_dashboard` + HTTP 204 (2026-05-19) | cloud-sdk |
+| **S25** | UI_QUALITY P1 | ✅ admin contracts: tenants, OAuth2, dashboards (+3 tests) | — |
 | **—** | FM-003 §4 | Лише при 2 хостах | — |
 
 **Після кожного спринту з кодом/доками:** `cargo fmt` → `cargo test-ci` (MSYS2) → `git -c commit.template= commit -F …` → push (зовнішній MSYS2).
@@ -104,7 +105,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [x] **S22** FM-019 CI merge gate (`pa11y-wcag22` + contract)
 - [x] **S23** Playwright smoke E2E
 - [x] **S24** `DELETE /ui/dashboards/{id}` (MonitoringManager)
-- [ ] Наступний: UI_QUALITY P1 (admin JSON contracts) або FM-003 §4 (BLOCKED)
+- [x] **S25** UI_QUALITY P1 — tenants, OAuth2, monitoring dashboards contracts
+- [ ] Наступний: UI_QUALITY P1 backlog (metrics/SAML/alert-rules) або FM-003 §4 (BLOCKED)
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`
