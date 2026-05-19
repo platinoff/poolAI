@@ -87,7 +87,7 @@ PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh
 bash bin/pa11y-ci.sh --start
 ```
 
-**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch` + `pull_request` на `src/ui/**`; `PA11Y_ADMIN_STRICT=1`; WCAG 2.2 локально — `PA11Y_WCAG22=1`.
+**CI:** [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) — `workflow_dispatch` + `pull_request` на `src/ui/**`; `PA11Y_WCAG22=1`. Контракт скрипта на кожен PR: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) job **`pa11y-contract`**.
 
 Ручний одиночний URL:
 

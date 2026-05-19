@@ -127,7 +127,7 @@ Env: `POOLAI_VIRTUAL_NODE_DATA_DIR` у coordinator (`data/lan-stand/virtual-node
 
 | Situation | Action |
 |-----------|--------|
-| No second physical host | Use §5.1 virtual-node dev stand + `verify-dev-stand`; FM-003 §4 **BLOCKED** — не блокує інші FM. Оновлення зрізу: **2026-06-01** (без нових LAN-рядків у `BENCHMARKS.md`; baseline `poolai_health_load` **2026-04-10** чинний). |
+| No second physical host | Use §5.1 virtual-node dev stand + `verify-dev-stand`; FM-003 §4 **BLOCKED** — не блокує інші FM (див. [`AUTO_RUN_SESSION_2026-06-22.md`](../development/AUTO_RUN_SESSION_2026-06-22.md)). Повний pa11y — [`a11y.yml`](../../.github/workflows/a11y.yml) на PR `src/ui/**`; контракт скрипта — `ci.yml` job `pa11y-contract`. |
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 

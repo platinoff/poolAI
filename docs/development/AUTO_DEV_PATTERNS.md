@@ -349,6 +349,13 @@
 - **Перевірка:** `cargo test --test pa11y_ci_script`; GitHub Actions → **A11y (pa11y)**
 - **FM:** FM-019 Partial (pa11y auth)
 
+### [FM-019] pa11y contract у main CI
+- **Де:** `.github/workflows/ci.yml` — job `pa11y-contract`
+- **Сигнал:** `cargo test --test pa11y_ci_script`
+- **Патерн:** перевірка `bin/pa11y-ci.sh` (ADMIN_URLS, PA11Y_WCAG22, validate) без Node; повний scan — `a11y.yml`
+- **Перевірка:** PR/push на `main` → job зелений
+- **FM:** FM-019 Partial
+
 ### [FM-019] pa11y WCAG 2.2 profile (PA11Y_WCAG22)
 - **Де:** `bin/pa11y-ci.sh`, `.github/workflows/a11y.yml` (`PA11Y_WCAG22: "1"`)
 - **Сигнал:** `PA11Y_STANDARD=WCAG22AA` → exit 2 (pa11y v9); `PA11Y_WCAG22=1` → axe tags `wcag22aa`

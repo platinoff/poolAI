@@ -33,7 +33,7 @@
 - ✅ **FM-012 OAuth (2026-05-27):** constant-time hash, `POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS`, HTTP callback tests (`telegram_oauth_callback_integration`).
 - ✅ **AUTO_RUN 2026-05-28:** `cargo test-ci` зріз; FM-003 §4 BLOCKED; docs sync.
 - ✅ **FM-017/018/019 (2026-06-07):** discovery HttpAppError; admin a11y baseline + [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md); `ui::admin` a11y tests (8).
-- ✅ **FM-019 partial (2026-05-18):** dashboard modals a11y; pa11y strict 9 auth URLs + login; dark theme danger sync; `UI_IMPROVEMENTS_PLAN` archival.
+- ✅ **FM-019 partial (2026-05-18):** dashboard modals a11y; pa11y strict 18 auth URLs + login; `PA11Y_WCAG22=1` (WCAG 2.2 axe); `a11y.yml` PR + `ci.yml` `pa11y-contract`; audit filter labels; `UI_IMPROVEMENTS_PLAN` archival.
 - ✅ Опційні Criterion-бенчі: `runtime_benchmarks` (у т.ч. `raid_replication_engine`), `turboquant_benchmarks` (`ml`), `cloud_benchmarks`, `service_layer_benchmarks` (`test-utils`) — див. `docs/performance/BENCHMARKS.md`.
 
 ### Git статус

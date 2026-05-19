@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-21.md`](./AUTO_RUN_SESSION_2026-06-21.md) — FM-019 a11y CI WCAG22 S11).
+**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-22.md`](./AUTO_RUN_SESSION_2026-06-22.md) — FM-019 pa11y-contract S12).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-21.md`](./AUTO_RUN_SESSION_2026-06-21.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-22.md`](./AUTO_RUN_SESSION_2026-06-22.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅:** pa11y 18 auth; `PA11Y_WCAG22=1` у CI (`a11y.yml`) + локально 0 errors. **Далі (§5.1):** FM-003 §4 (BLOCKED); merge gate a11y у `ci.yml` — backlog. **Не в автопрогоні:** FM-004/006/009/010. Звірка «не зроблено» — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅:** pa11y 18 auth; WCAG22 у `a11y.yml`; `ci.yml` job `pa11y-contract`. **Далі (§5.1):** FM-003 §4 (BLOCKED); інші FM за пріоритетом. **Не в автопрогоні:** FM-004/006/009/010. Звірка «не зроблено» — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
