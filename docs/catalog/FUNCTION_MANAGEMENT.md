@@ -123,9 +123,9 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | OpenAPI `/raid/distributed/*` | backlog | 7 POST; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md) |
-| 2 | ML ops | Planned | [`ml/PIPELINE_MANAGEMENT.md`](../ml/PIPELINE_MANAGEMENT.md) |
-| 3 | Playwright E2E | **Partial ✅** S29 | tenants/monitoring/security/audit ✅; raid/topology — backlog |
+| 1 | OpenAPI distributed payloads | backlog | S31 ✅ 7 POST + `ProtocolMessage`; деталізація DTO |
+| 2 | ML ops | **✅ S31** | [`ml/PIPELINE_MANAGEMENT.md`](../ml/PIPELINE_MANAGEMENT.md) §Ops verification |
+| 3 | Playwright E2E | **Partial ✅** S31 | raid/topology ✅; vm/workers — backlog |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
 | — | UI a11y CI | **FM-019** | **Partial ✅** pa11y merge gate; axe Playwright — backlog |
@@ -159,6 +159,7 @@ FM-xxx (з таблиці нижче)
 | **S28** | OpenAPI gap audit — Users, workers, RAID, VM templates/networks | `46a299c5` |
 | **S29** | Playwright — security + audit admin routes | `73a5e965` |
 | **S30** | FM legacy docs audit + stale banners | (ця сесія) |
+| **S31** | OpenAPI `/raid/distributed/*`; ML ops runbook; Playwright raid/topology | (ця сесія) |
 
 #### Не зроблено (канон backlog)
 
@@ -176,8 +177,8 @@ FM-xxx (з таблиці нижче)
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
-| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S28: enterprise + v1 Users/RAID/VM; backlog `/raid/distributed/*` |
-| UI E2E | Playwright | **Partial ✅** | S23 smoke; S27–S29 tenants/monitoring/security/audit; raid/topology — backlog |
+| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S31: + `/raid/distributed/*`; backlog payload schemas |
+| UI E2E | Playwright | **Partial ✅** | S23 smoke; S27–S31 + raid/topology; vm/workers — backlog |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
@@ -197,9 +198,9 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | OpenAPI distributed | `/raid/distributed/*` у yaml |
-| 2 | ML ops | `PIPELINE_MANAGEMENT.md` |
-| 3 | Playwright raid/topology | за `E2E_PLAYWRIGHT.md` |
+| 1 | OpenAPI payload schemas | distributed DTO у yaml |
+| 2 | axe Playwright | FM-019 backlog |
+| 3 | Playwright vm/workers | за `E2E_PLAYWRIGHT.md` |
 | — | **S21–S30** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 

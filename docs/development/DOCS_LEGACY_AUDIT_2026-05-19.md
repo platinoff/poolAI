@@ -54,10 +54,10 @@
 | **FM-004** SIMD TurboQuant | **Deferred** | за запитом |
 | **FM-006** Azure/GCP deep | **Deferred** | `CLOUD_SDK_STATUS.md` |
 | **FM-009/010** Grid/Solana | **Concept-only** | `docs/concept/` |
-| **OpenAPI** `/raid/distributed/*` | backlog (7 POST) | S30+ dev |
+| **OpenAPI** `/raid/distributed/*` | **✅ S31** (7 POST, `ProtocolMessage`) | payload schemas backlog |
 | **FM-019** axe Playwright | backlog | після стабілізації E2E |
-| **Playwright** raid/topology/vm | backlog | `E2E_PLAYWRIGHT.md` |
-| **ML ops** pipeline metrics | Planned | `ml/PIPELINE_MANAGEMENT.md` |
+| **Playwright** raid/topology | **✅ S31** | vm/workers backlog |
+| **ML ops** pipeline metrics | **✅ S31** | `PIPELINE_MANAGEMENT.md` §Ops verification |
 | **P6** Grid/Job/Memory layers | Concept | Architect §7 |
 
 **Закрито S21–S29 (не повторювати):** OpenAPI enterprise+ai-ml+gap v1; pa11y CI; UI_QUALITY P1 (27 tests); Playwright smoke + admin (tenants, monitoring, security, audit).

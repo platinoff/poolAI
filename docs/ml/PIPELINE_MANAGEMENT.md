@@ -165,6 +165,34 @@ cfg.insert("weight_rows".to_string(), "0.1,0.2,0.3;-0.5,1.0,0.0".to_string());
 
 ---
 
+## ⚙️ Ops verification (runbook)
+
+Операційний зріз після змін у `src/ml/pipeline.rs` або кроках TurboQuant:
+
+```bash
+export K8S_OPENAPI_ENABLED_VERSION=1.28
+# Повний зріз як CI (рекомендовано перед push):
+cargo test-ci
+# Або лише ML pipeline:
+cargo test --test ml_pipeline_integration --features ml
+cargo test pipeline:: --lib --features ml
+```
+
+**Перевірка метрик кроку** (після `execute_pipeline`):
+
+```rust
+let got = manager.get_pipeline(pipeline.id.as_str()).await?;
+let out = &got.step_results["quantize"].output;
+assert_eq!(out.get("status").map(String::as_str), Some("completed"));
+assert!(out.contains_key("step_kind")); // turboquant | quantization | training | …
+```
+
+Ключі output — таблиця [«Ключі output кроків»](#-ключі-output-кроків-runbook-метрик) вище. Інтеграція з RAID-артефактами: після `deployment` перевір `artifact_uri` у output; реплікація — distributed RAID (`/raid/distributed/*`, OpenAPI tag **RAID Distributed**).
+
+**Last ops review:** 2026-05-19 (автопрогін S31).
+
+---
+
 ## 🧪 Тестування
 
 ```bash
@@ -354,6 +382,6 @@ Pipeline + Versioning:
 
 ---
 
-**Версія**: v0.2.2  
-**Дата**: 2026-01-22 (оновлено 2026-04-04 — TurboQuant у плані)  
+**Версія**: v0.2.3  
+**Дата**: 2026-01-22 (оновлено 2026-05-19 — ops runbook, `cargo test-ci`)  
 **Статус**: ✅ Реалізовано (Priority 7 - ML.6)

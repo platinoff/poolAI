@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Docs
+- **OpenAPI (2026-05-19, S31)** — `/raid/distributed/*` (7 POST): tag `RAID Distributed`, `ProtocolMessage` schema; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](development/OPENAPI_GAP_AUDIT_2026-05-19.md).
+- **ML ops (2026-05-19, S31)** — [`PIPELINE_MANAGEMENT.md`](ml/PIPELINE_MANAGEMENT.md) §Ops verification (`cargo test-ci`, step output keys); DIGEST §ML hardening.
+- **UI E2E (2026-05-19, S31)** — Playwright `admin.spec.ts`: `/ui/admin/raid`, `/ui/admin/topology`; [`E2E_PLAYWRIGHT.md`](development/E2E_PLAYWRIGHT.md).
+
 ### Fixed
 - **FM-019 (partial, 2026-05-18)** — WCAG 2.2 pa11y profile `PA11Y_WCAG22=1` (axe wcag22aa); audit filter labels; `a11y.yml` on PR for `src/ui/**`.
 - **FM-019 (partial, 2026-05-18)** — pa11y strict: `/ui/admin/instances`, `/ui/admin/topology`; 0 errors (18 auth + login).

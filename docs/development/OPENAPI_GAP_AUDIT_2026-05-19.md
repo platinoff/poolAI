@@ -14,12 +14,12 @@
 | VM templates/networks | 0 paths | `/vm/templates*`, `/vm/networks*` ✅ |
 | `/api/enterprise` | aligned | без змін (S14–S21) |
 
-## Залишок (backlog, не блокує S28)
+## Залишок (backlog після S31)
 
 | Шлях | Призначення | Примітка |
 |------|-------------|----------|
-| `/raid/distributed/*` (6 POST) | Inter-node RAID protocol | Опційно; tag `x-internal` або окремий doc |
-| Детальні request/response schemas | RAID artifact body, VM template DTO | Поступове уточнення schemas |
+| ~~`/raid/distributed/*` (7 POST)~~ | Inter-node RAID protocol | **✅ S31** — tag `RAID Distributed`, `ProtocolMessage` schema |
+| Детальні request/response schemas | RAID artifact body, VM template DTO | Поступове уточнення payload schemas |
 
 ## Перевірка
 
@@ -29,4 +29,4 @@ rg '^  /users' docs/openapi.yaml
 rg '^  /raid/admin' docs/openapi.yaml
 ```
 
-**Наступний спринт:** Playwright security/audit або ML ops (`PIPELINE_MANAGEMENT.md`).
+**Наступний спринт:** деталізація distributed payload schemas або axe Playwright (FM-019 backlog).

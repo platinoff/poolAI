@@ -509,11 +509,20 @@
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-014 (OpenAPI sync)
 
-### [E2E] Playwright admin після smoke (S27 / S29)
+### [OpenAPI] Distributed RAID wire protocol (S31)
+- **Де:** `docs/openapi.yaml` tag `RAID Distributed`; handlers `src/network/raid_distributed_handlers.rs`
+- **Сигнал:** `rg "raid/distributed" docs/openapi.yaml src/network/api/raid.rs`
+- **Патерн:** 7× `POST`, body `ProtocolMessage` (`type`, `id`, `timestamp`, `node_id`, `payload`); response `{type}_response` + typed payload in `payload`
+- **Без JWT** — node-to-node; не плутати з `/raid/artifacts` (authenticated REST)
+- **Перевірка:** `rg '^  /raid/distributed' docs/openapi.yaml | wc -l` → 7
+- **FM:** FM-007/008 distributed RAID
+
+### [E2E] Playwright admin після smoke (S27 / S29 / S31)
 - **Де:** `e2e/tests/admin.spec.ts`, `e2e/tests/helpers.ts`, `e2e/tests/smoke.spec.ts`
 - **Сигнал:** `rg "loginAsAdmin|#tenants-list|#security-content|#audit-events" e2e/`
 - **Патерн:** `loginAsAdmin(page)` → admin routes; контейнер з `.admin-table`, `.muted`, або `.admin-fetch-error` — **`.first()`** якщо кілька `.muted` (monitoring: alerts + dashboards)
 - **S29:** `/ui/admin/security` → `#oauth2-providers-list` + кнопка `/register|зареєстр/i` (i18n UA); `/ui/admin/audit` → `#audit-events` (auto `queryAuditLogs()`)
+- **S31:** `/ui/admin/raid` → `#raid-admin` + `#raid-artifacts` + Upload button; `/ui/admin/topology` → `#topology-node-count`, `#topology-nodes-list`
 - **Перевірка:** `bash bin/e2e-playwright.sh --start` (MSYS2; `enterprise,ml,cloud,test-utils`); CI — `.github/workflows/e2e.yml` `workflow_dispatch`
 - **FM:** FM-019 (UI E2E backlog)
 

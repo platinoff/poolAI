@@ -118,7 +118,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [x] **S29** Playwright — security + audit (`e2e/tests/admin.spec.ts`)
 - [x] **S30** FM legacy docs — [`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md)
 - [ ] FM-003 §4 (BLOCKED)
-- [ ] Наступний dev-спринт: OpenAPI `/raid/distributed/*` або ML ops (див. §5.1 FM)
+- [x] **S31** OpenAPI `/raid/distributed/*` + ML ops runbook + Playwright raid/topology
+- [ ] Наступний dev-спринт: distributed payload schemas або axe Playwright (див. §5.1 FM)
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`

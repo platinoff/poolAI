@@ -1,11 +1,11 @@
 # Playwright E2E smoke (S23 / S27 / S29)
 
-**Status:** Smoke + admin tenants/monitoring/security/audit (`e2e/tests/smoke.spec.ts`, `e2e/tests/admin.spec.ts`).
+**Status:** Smoke + admin tenants/monitoring/security/audit/raid/topology (`e2e/tests/smoke.spec.ts`, `e2e/tests/admin.spec.ts`).
 
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
-| `admin.spec.ts` | tenants (`#tenants-list`); monitoring (`#monitoring-content`); security (`#security-content`, OAuth2 tab); audit (`#audit-events`) |
+| `admin.spec.ts` | tenants (`#tenants-list`); monitoring (`#monitoring-content`); security (`#security-content`, OAuth2 tab); audit (`#audit-events`); raid (`#raid-admin`, `#raid-artifacts`); topology (`#topology-node-count`, `#topology-nodes-list`) |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
@@ -37,6 +37,7 @@ bash bin/e2e-playwright.sh --start
 
 - axe Playwright (FM-019 backlog).
 - Підключити `workflow_call` з `ci.yml` після стабілізації часу прогону.
-- Додаткові admin routes (raid, topology, vm) — за потреби.
+- ~~raid, topology~~ **✅ S31** (`admin.spec.ts`)
+- Додаткові admin routes (vm, workers, libs) — за потреби.
 
-**Last updated:** 2026-05-19 (S29).
+**Last updated:** 2026-05-19 (S31).

@@ -59,6 +59,11 @@ tags:
     description: Distributed storage management
   - name: RAID Admin
     description: RAID strategy control plane (`src/network/api/raid_admin.rs`)
+  - name: RAID Distributed
+    description: |
+      Inter-node distributed RAID wire protocol (`src/network/raid_distributed_handlers.rs`).
+      No JWT — intended for node-to-node replication on a trusted LAN.
+      x-internal
   - name: WebSocket
     description: Real-time WebSocket endpoints
   - name: Discovery
@@ -2571,6 +2576,171 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /raid/distributed/artifacts/replicate:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Replicate artifact to this node (PutArtifact)
+      description: |
+        Distributed wire protocol: accepts a `ProtocolMessage` with `type: put_artifact`.
+        Handler: `put_artifact_handler` → `RaidDistributedProtocolService::put_artifact`.
+      operationId: distributedRaidPutArtifact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+            example:
+              type: put_artifact
+              id: 550e8400-e29b-41d4-a716-446655440000
+              timestamp: '2026-05-19T12:00:00Z'
+              node_id: node-a
+              payload:
+                artifact_id: art-1
+                source_node: node-a
+                metadata:
+                  name: model.bin
+                  version: '1.0.0'
+                  size_bytes: 1024
+                  checksum: sha256:abc
+                  created_at: '2026-05-19T12:00:00Z'
+                replication_factor: 3
+                sync_mode: sync
+      responses:
+        '200':
+          description: Protocol response (`type` suffixed with `_response`)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
+  /raid/distributed/artifacts/get:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Fetch artifact metadata or data (GetArtifact)
+      description: `type: get_artifact` in request body.
+      operationId: distributedRaidGetArtifact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+      responses:
+        '200':
+          description: Protocol response with GetArtifact payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
+  /raid/distributed/artifacts/delete:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Delete artifact on this node (DeleteArtifact)
+      description: `type: delete_artifact` in request body.
+      operationId: distributedRaidDeleteArtifact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+      responses:
+        '200':
+          description: Protocol response with DeleteArtifact payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
+  /raid/distributed/artifacts/sync:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Synchronize artifacts between nodes (SyncArtifacts)
+      description: `type: sync_artifacts` in request body.
+      operationId: distributedRaidSyncArtifacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+      responses:
+        '200':
+          description: Protocol response with SyncArtifacts payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
+  /raid/distributed/health:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Node health probe (HealthCheck)
+      description: `type: health_check` with empty payload object.
+      operationId: distributedRaidHealthCheck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+      responses:
+        '200':
+          description: Protocol response with HealthCheck payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
+  /raid/distributed/cluster/join:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Join distributed RAID cluster (JoinCluster)
+      description: `type: join_cluster` in request body.
+      operationId: distributedRaidJoinCluster
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+      responses:
+        '200':
+          description: Protocol response with JoinCluster payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
+  /raid/distributed/cluster/leave:
+    post:
+      tags:
+        - RAID Distributed
+      summary: Leave distributed RAID cluster (LeaveCluster)
+      description: `type: leave_cluster` in request body.
+      operationId: distributedRaidLeaveCluster
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtocolMessage'
+      responses:
+        '200':
+          description: Protocol response with LeaveCluster payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtocolMessage'
+
   /config:
     get:
       tags:
@@ -4732,6 +4902,37 @@ components:
         removed_count:
           type: integer
           example: 42
+
+    ProtocolMessage:
+      type: object
+      description: |
+        Distributed RAID wire envelope (`src/raid/protocol.rs`).
+        Request and response bodies use the same shape; responses set `type` to `{request_type}_response`.
+      required:
+        - type
+        - id
+        - timestamp
+        - node_id
+        - payload
+      properties:
+        type:
+          type: string
+          description: |
+            Message kind, e.g. `put_artifact`, `get_artifact`, `delete_artifact`, `sync_artifacts`,
+            `health_check`, `join_cluster`, `leave_cluster`, or `*_response` for replies.
+        id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        node_id:
+          type: string
+          description: Originating node identifier
+        payload:
+          type: object
+          additionalProperties: true
+          description: Type-specific JSON (see `src/raid/protocol.rs` payload structs)
 
     PeerCapabilities:
       type: object

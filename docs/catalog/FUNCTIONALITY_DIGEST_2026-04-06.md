@@ -84,7 +84,7 @@
 |---------|----------------------------|
 | ML.1–ML.6 каркас у `src/ml` | Є (оптимізація, AutoML, federated, context memory, versioning, experiments, pipeline). |
 | TurboQuant | Фаза 1 у коді (`turboquant.rs`, крок pipeline); див. [`docs/ml/TURBOQUANT_INTEGRATION.md`](../ml/TURBOQUANT_INTEGRATION.md). |
-| Hardening | У доробці: продакшн-кроки, метрики, операційні інструкції. |
+| Hardening / ops | ✅ Runbook метрик + `cargo test-ci` — [`docs/ml/PIPELINE_MANAGEMENT.md`](../ml/PIPELINE_MANAGEMENT.md) §Ops verification (2026-05-19). |
 
 ---
 
