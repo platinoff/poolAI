@@ -13,6 +13,7 @@
 ./.cursor/rules/ci-scripts-maintenance.mdc
 ./.cursor/rules/cursor-environment-baseline.mdc
 ./.cursor/rules/documentation.md
+./.cursor/rules/autonomous-orchestrator.mdc
 ./.cursor/rules/functionality-management.mdc
 ./.cursor/rules/git-workflow.md
 ./.cursor/rules/msys2-windows.md
@@ -29,6 +30,7 @@
 ./.github/ISSUE_TEMPLATE/feature_request.md
 ./.github/PULL_REQUEST_TEMPLATE.md
 ./.github/SECURITY.md
+./.github/workflows/a11y.yml
 ./.github/workflows/benchmarks.yml
 ./.github/workflows/ci.yml
 ./.github/workflows/docs.yml
@@ -42,7 +44,14 @@
 ./bin/cargo-fmt.sh
 ./bin/cargo-test.sh
 ./bin/git-status.sh
+./bin/pa11y-ci.sh
 ./bin/README.md
+./bin/run-lan-nodes.ps1
+./bin/run-lan-nodes.sh
+./bin/run-virtual-node-dev.ps1
+./bin/run-virtual-node-dev.sh
+./bin/verify-dev-stand.ps1
+./bin/verify-dev-stand.sh
 ./build.rs
 ./Cargo.lock
 ./Cargo.toml
@@ -182,6 +191,9 @@
 ./docs/deployment/helm/templates/serviceaccount.yaml
 ./docs/deployment/helm/values.yaml
 ./docs/deployment/KUBERNETES.md
+./docs/development/ADMIN_A11Y_RUNBOOK.md
+./docs/development/AUTO_DEV_PATTERNS.md
+./docs/development/AUTO_RUN_SESSION_2026-07-01.md
 ./docs/development/ARCHITECT_PLAN_EXO_INTEGRATION_2026-01-17.md
 ./docs/development/ARCHITECT_SUMMARY_2026-01-16.md
 ./docs/development/ARCHITECT_SUMMARY_2026-01-21.md
@@ -399,6 +411,7 @@
 ./scripts/test_deployment.sh
 ./scripts/update_file_list.sh
 ./scripts/verify_build.sh
+./src/bin/poolai-telegram-bot.rs
 ./src/bin/poolai-worker.rs
 ./src/bin/poolai_health_load.rs
 ./src/cloud/autoscaling.rs
@@ -411,6 +424,7 @@
 ./src/cloud/providers/gcp.rs
 ./src/cloud/providers/mod.rs
 ./src/core/config.rs
+./src/core/dev_stand.rs
 ./src/core/error.rs
 ./src/core/mod.rs
 ./src/core/model_interface.rs
@@ -420,6 +434,10 @@
 ./src/services/chat_completion_service.rs
 ./src/services/discovery_service.rs
 ./src/services/topology_service.rs
+./src/services/ui_service.rs
+./src/services/virtual_node_store.rs
+./src/services/virtual_node_task_service.rs
+./src/services/virtual_node_telegram_binding_service.rs
 ./src/services/worker_pool_service.rs
 ./src/services/cloud_service.rs
 ./src/services/enterprise_service.rs
@@ -473,6 +491,7 @@
 ./src/network/api/topology.rs
 ./src/network/api/ui.rs
 ./src/network/api/users.rs
+./src/network/api/virtual_nodes.rs
 ./src/network/api/vm.rs
 ./src/network/api/workers.rs
 ./src/network/auth.rs
@@ -511,13 +530,16 @@
 ./src/runtime/instance.rs
 ./src/runtime/memory_pool.rs
 ./src/runtime/mod.rs
+./src/workers/virtual_node_executor.rs
 ./src/runtime/orchestrator.rs
 ./src/runtime/process.rs
 ./src/runtime/queue.rs
 ./src/runtime/scheduler.rs
 ./src/runtime/storage.rs
 ./src/runtime/worker.rs
+./src/tgbot/coordinator.rs
 ./src/tgbot/mod.rs
+./src/tgbot/runtime.rs
 ./src/ui/admin/audit.rs
 ./src/ui/admin/config.rs
 ./src/ui/admin/dashboard.rs
@@ -619,6 +641,9 @@
 ./tests/saml_auth_flow_integration.rs
 ./tests/security_headers_integration.rs
 ./tests/security_integration.rs
+./tests/virtual_node_pool_join_integration.rs
+./tests/virtual_node_tasks_integration.rs
+./tests/virtual_node_telegram_binding_integration.rs
 ./tests/tgbot_integration.rs
 ./tests/ui_components_integration.rs
 ./tests/ui_write_operations_integration.rs

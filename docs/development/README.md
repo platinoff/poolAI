@@ -1,7 +1,7 @@
 # 🚀 Плани Розробки PoolAI
 
 **Версія**: v0.2.2 → v0.3.0+  
-**Останнє оновлення**: 2026-04-10
+**Останнє оновлення**: 2026-05-19
 
 **Структура доків і правила агента:** [`../STRUCTURE.md`](../STRUCTURE.md) · [`.cursor/rules/documentation.md`](../../.cursor/rules/documentation.md)
 
@@ -11,8 +11,9 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
-- **[`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md)** — **поточний автопрогін** (FM-017 HttpAppError залишок).
-- **[`AUTO_RUN_SESSION_2026-05-28.md`](./AUTO_RUN_SESSION_2026-05-28.md)** — попередній (ops hygiene ✅).
+- **[`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md)** — **поточний автопрогін** (backlog S21+: OpenAPI gap audit, FM-019 CI, Playwright).
+- **[`AUTO_RUN_SESSION_2026-05-29.md`](./AUTO_RUN_SESSION_2026-05-29.md)** — попередній (FM-017 ✅).
+- **[`AUTO_RUN_SESSION_2026-05-28.md`](./AUTO_RUN_SESSION_2026-05-28.md)** — ops hygiene ✅.
 - **[`AUTO_DEV_PATTERNS.md`](./AUTO_DEV_PATTERNS.md)** — реєстр патернів для авторозробки.
 - **[`AUTO_RUN_SESSION_2026-05-16.md`](./AUTO_RUN_SESSION_2026-05-16.md)** — попередній прогін (S0–S6, завершено).
 
@@ -46,11 +47,9 @@
 
 - У коді: `admin_service`, `cloud_service` (feature `cloud`), `enterprise_service`, разом із `raid` / `vm` / `library` сервісами — деталі в `NEXT_STEPS_ARCHITECT_2026-03-17.md`.
 
-1. **Stage 4.4 AI/ML**:
-   - ✅ ML.1 Model Optimization (profiling, tuning, quantization) - завершено
-   - ⏸️ ML.2 AutoML - stub готовий, потрібна implementation
-   - ⏸️ ML.3 Federated Learning - stub готовий, потрібна implementation
-   - ⏸️ ML.1 pruning strategies
+1. **Stage 4.4 AI/ML** (див. [`FUNCTIONALITY_DIGEST`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) §ML):
+   - ✅ ML.1–ML.6 scaffolding + pipeline orchestration (enterprise HTTP)
+   - 🔄 Hardening: метрики кроків, operational playbooks — [`ml/PIPELINE_MANAGEMENT.md`](../ml/PIPELINE_MANAGEMENT.md)
 
 2. **Mock Server Integration**:
    - ✅ Harness + Azure + GCP + AWS base_url_override - завершено

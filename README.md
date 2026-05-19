@@ -33,7 +33,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 ### Останні релізні нотатки (скорочено)
 
-**v0.2.2** — Cloud LB: routing rules, `add_routing_rule` / `get_routing_rules`, `set_cloud_lb_config`; узгодження документації з планом Architect. **Оновлення 2026-04-10:** Clippy `-D warnings` по CI-матрицях + прибирання інтеграційних тестів під ті самі правила (`TlsVersion` `FromStr`/`Display`, дрібні правки cloud-sdk тощо).
+**v0.2.2 (2026-05)** — **FM-016** virtual nodes: `poolai-worker`, `poolai-telegram-bot` (`tgbot`), discovery/register-remote, Telegram bind/webhook, pool join, `raid_artifact_probe`, `bin/verify-dev-stand.*`; **OpenAPI** S14–S20 (v1 + enterprise REST); **FM-012** OAuth/Telegram; **FM-019** pa11y baseline (18 auth URLs, `a11y.yml`). **2026-04-10:** Clippy `-D warnings` по CI-матрицях. **2026-04:** Cloud LB routing rules; service layer + **FM-005** JSON errors.
 
 **v0.2.1** — Cloud auto-scaling (metrics API, `evaluate_and_scale`, `ScalingAction`); pre-push `cargo fmt --all --check`; правила `.cursor/rules/`, MSYS2.
 
@@ -51,18 +51,19 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **Required in CI** (`.github/workflows/ci.yml`): `cargo test --lib --tests --features ml,enterprise,cloud,test-utils` with `K8S_OPENAPI_ENABLED_VERSION=1.28` — **passing** (верифікація включно з `-j 1` та `--test-threads=1` на Windows при обмеженій RAM / OOM лінкера).  
 - **`cargo clippy` з `-D warnings`** узгоджено з матрицями CI (`.github/workflows/ci.yml`): `--all-targets` + `--no-default-features`, `--features jwt,https`, `--features cloud,cloud-sdk` (для останнього потрібен `K8S_OPENAPI_ENABLED_VERSION=1.28`) — **чисто на `main` (2026-04-10)**. Повний `--all-features` локально може відрізнятися за набором крейтів; орієнтир — ті самі три кроки, що в CI.  
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
-- **Архітектурні інкременти (`main`, 2026-04)**: **`RaidService`**; ML pipeline + **TurboQuant** (`src/ml/turboquant.rs`); **P3 / FM-005** — `src/network/json_errors.rs`, **`HttpAppError`/`RestError`** по основному REST, **`raid*`** (**`raid_api_err`**), **`enterprise_api/`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`** ✅; інтеграційні ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs` (`test-utils`, опційно `ml`).
+- **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
 ### Next Focus
 
 **Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
 
-1. **FM-003 §4** — реальний LAN (**BLOCKED**, 2 хости); dev stand §5.1 + `verify-dev-stand` ✅.
-2. **FM-019** — pa11y **Partial ✅** (18 auth, `PA11Y_WCAG22`, [`a11y.yml`](.github/workflows/a11y.yml), `ci.yml` `pa11y-contract`); UI E2E — backlog.
-3. **P4** — ✅ рядок `poolai_health_load` **2026-05-18** у [`BENCHMARKS.md`](docs/performance/BENCHMARKS.md) (baseline **2026-04-10** для порівняння).
-4. **Відкладено** — **FM-004**, **FM-006**; **концепт** — **FM-009**, **FM-010**.
+1. **S21** — OpenAPI gap audit (`/ai-ml/optimization*`, automl, federated) — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
+2. **FM-003 §4** — реальний LAN (**BLOCKED**, 2 хости); dev stand + `verify-dev-stand` ✅.
+3. **FM-019** — pa11y **Partial ✅** (18 auth, `PA11Y_WCAG22`, [`a11y.yml`](.github/workflows/a11y.yml), `ci.yml` `pa11y-contract`); повний CI gate / Playwright — backlog.
+4. **P4** — ✅ `poolai_health_load` **2026-05-18** у [`BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
+5. **Відкладено** — **FM-004**, **FM-006**; **концепт** — **FM-009**, **FM-010**.
 
-**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3** (2026-05-18).
+**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**; автопрогін — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
 
 **Контекст за пріоритетами Architect (P\*)**
 
@@ -469,5 +470,5 @@ Thank you for supporting PoolAI! 🙏
 ---
 
 **PoolAI** — distributed AI mining pool management.  
-**Version:** 0.2.2 (`Cargo.toml`) · **Docs updated:** 2026-04-06 · **Repository:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
+**Version:** 0.2.2 (`Cargo.toml`) · **Docs updated:** 2026-05-19 · **Repository:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)  
 **Наступні орієнтири:** Stage 4.3–4.4 (cloud / ML); канонічний план — [`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md); старт сесії — [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md); витяг функціоналу — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md); беклог функцій — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md).

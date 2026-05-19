@@ -53,6 +53,9 @@ src/
 │   ├── system_service.rs      # status/health/metrics/models/GPU snapshots for `system` API (без HTML)
 │   ├── topology_service.rs     # topology snapshot / node resources
 │   ├── ui_service.rs          # UI REST: themes/components + enterprise dashboards via EnterpriseService
+│   ├── virtual_node_store.rs           # FM-016: persisted tasks/bindings
+│   ├── virtual_node_task_service.rs    # FM-016: task queue / bootstrap / probe
+│   ├── virtual_node_telegram_binding_service.rs  # FM-016+: Telegram bind/webhook
 │   ├── vm_service.rs
 │   └── worker_pool_service.rs  # pool workers list / add / remove
 ├── network/            # API layer (modularized)
@@ -71,6 +74,7 @@ src/
 │       ├── users.rs
 │       ├── rewards.rs
 │       ├── ui.rs               # REST /ui/* (merge в /api/v1), делегує в UiService
+│       ├── virtual_nodes.rs    # FM-016: tasks, pool join, telegram (worker-safe paths)
 │       └── common.rs
 └── ui/                 # Presentation layer (modularized)
     ├── mod.rs
