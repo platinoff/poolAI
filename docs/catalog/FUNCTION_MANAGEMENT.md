@@ -159,7 +159,8 @@ FM-xxx (з таблиці нижче)
 | **S28** | OpenAPI gap audit — Users, workers, RAID, VM templates/networks | `46a299c5` |
 | **S29** | Playwright — security + audit admin routes | `73a5e965` |
 | **S30** | FM legacy docs audit + stale banners | (ця сесія) |
-| **S31** | OpenAPI `/raid/distributed/*`; ML ops runbook; Playwright raid/topology | (ця сесія) |
+| **S31** | OpenAPI `/raid/distributed/*`; ML ops runbook; Playwright raid/topology | `c20a10f2` |
+| **S32** | `bin/run-poolai.*` + `RUN_LOCAL.md` — єдиний локальний запуск | `ef4a0aa5` |
 
 #### Не зроблено (канон backlog)
 
