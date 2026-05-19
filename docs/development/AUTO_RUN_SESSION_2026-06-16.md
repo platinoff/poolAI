@@ -16,3 +16,5 @@
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010.
 
 **BLOCKED:** FM-003 §4 LAN.
+
+**Наступний:** [`AUTO_RUN_SESSION_2026-06-17.md`](./AUTO_RUN_SESSION_2026-06-17.md) — audit + pa11y status/health/metrics/admin.

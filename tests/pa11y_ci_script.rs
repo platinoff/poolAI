@@ -15,7 +15,15 @@ fn pa11y_ci_script_has_admin_strict_auth_actions() {
         .and_then(|s| s.split(')').next())
         .expect("ADMIN_URLS block");
     assert!(admin_urls.contains("\"${BASE}/ui\""));
-    for path in ["/ui/libs", "/ui/vm", "/ui/raid"] {
+    for path in [
+        "/ui/status",
+        "/ui/health",
+        "/ui/metrics",
+        "/ui/admin",
+        "/ui/libs",
+        "/ui/vm",
+        "/ui/raid",
+    ] {
         assert!(
             admin_urls.contains(&format!("\"${{BASE}}{path}\"")),
             "missing ADMIN_URLS entry for {path}"

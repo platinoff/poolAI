@@ -41,7 +41,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ## 3. pa11y (локально + CI)
 
-**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — 9 auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — 13 auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
 
 ### 3.1 Матриця URL (strict / planned)
 
@@ -51,13 +51,17 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | `/ui/admin/users` | auth actions | **strict** (`PA11Y_ADMIN_STRICT=1`) | `ADMIN_URLS` |
 | `/ui/admin/security` | auth actions | **strict** | tablist OAuth2/SAML |
 | `/ui/workers` | auth actions | **strict** | dashboard modal slice |
-| `/ui` | auth actions | **strict** | dashboard shell |
+| `/ui` | auth actions | **strict** | dashboard home |
+| `/ui/status` | auth actions | **strict** | status page |
+| `/ui/health` | auth actions | **strict** | health page |
+| `/ui/metrics` | auth actions | **strict** | metrics page |
+| `/ui/admin` | auth actions | **strict** | admin dashboard home |
 | `/ui/admin/config` | auth actions | **strict** | tablist General…Health |
 | `/ui/libs` | auth actions | **strict** | libraries dashboard (маршрут `/ui/libs`, не `/ui/libraries`) |
 | `/ui/vm` | auth actions | **strict** | VM instances |
 | `/ui/raid` | auth actions | **strict** | RAID artifacts table |
 
-**Зріз 2026-05-18 (S6):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 9 auth URLs.
+**Зріз 2026-05-18 (S7):** `PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — **0 errors** на login + 13 auth URLs.
 
 ```bash
 # MSYS2: poolai вже на :8080
@@ -102,4 +106,6 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md)~~ — **Archived ✅ 2026-05-18** (S4 docs; канон §5.4 + цей runbook).
 - ~~Розширити `ADMIN_URLS`: `/ui`, `/ui/admin/config`~~ — **Partial ✅ 2026-05-18** (S5; 6 auth URLs strict).
 
-**Last updated:** 2026-05-18 — S6 pa11y: `/ui/libs`, `/ui/vm`, `/ui/raid`; dark theme `--danger` sync; 0 errors.
+- Admin subpages (tenants, audit, monitoring, topology…) — **backlog** (не в strict `ADMIN_URLS`).
+
+**Last updated:** 2026-05-18 — S7 pa11y: status/health/metrics + `/ui/admin`; 13 auth URLs 0 errors.

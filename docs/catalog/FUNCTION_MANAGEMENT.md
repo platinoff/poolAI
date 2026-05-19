@@ -1,12 +1,12 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-07 (менеджер функціоналу — повний §5.3 audit, підготовка сесії 2026-06-08).
+**Оновлено:** 2026-05-18 (§5.3 audit S7 — pa11y 13 auth URLs; backlog matrix у [`AUTO_RUN_SESSION_2026-06-17.md`](../development/AUTO_RUN_SESSION_2026-06-17.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
 **Не зроблено / backlog:** FM-003 §4 LAN (**BLOCKED**); FM-019 повний WCAG/pa11y CI; FM-004/006 **Deferred**; FM-009/010 **Concept-only**. **P4:** рядок `poolai_health_load` **2026-05-18** у `BENCHMARKS.md` (baseline **2026-04-10** лишається для порівняння).
 
-**Останній `cargo test-ci`:** 2026-05-18 (FM-019 pa11y tune `ded58c10`); clippy — CI на `main`.
+**Останній `cargo test-ci`:** 2026-05-18 (FM-019 pa11y S6/S7); clippy — CI на `main`.
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -122,7 +122,7 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
-| 2 | UI a11y backlog | **FM-019** | pa11y strict 9 auth URLs + login ✅ (S6); WCAG 2.2 AA auto — backlog |
+| 2 | UI a11y backlog | **FM-019** | pa11y strict 13 auth + login ✅ (S7); admin subpages (tenants, audit…) — backlog; WCAG 2.2 AA — backlog |
 | 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
 | — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
 | 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
@@ -155,21 +155,23 @@ FM-xxx (з таблиці нижче)
 | FM-004 | SIMD TurboQuant | **Deferred** | поза автопрогоном |
 | FM-006 | cloud-sdk гілки | **Deferred** | поза автопрогоном |
 | FM-009/010 | Grid / Solana | **Concept-only** | поза автопрогоном |
-| FM-019 | pa11y/axe у CI | **Partial** | strict login + 9 auth URLs 0 errors (S6); `PA11Y_ADMIN_STRICT`; `tests/pa11y_ci_script.rs` |
+| FM-019 | pa11y/axe у CI | **Partial** | strict login + 13 auth URLs 0 errors (S7); `PA11Y_ADMIN_STRICT`; `tests/pa11y_ci_script.rs` |
 | FM-019 | Повний WCAG 2.2 AA автомат | **Backlog** | не блокує реліз baseline |
 | P4 | `poolai_health_load` → `BENCHMARKS.md` | **Implemented (ops)** | рядок **2026-05-18**; baseline **2026-04-10** для порівняння |
 | `UI_IMPROVEMENTS_PLAN` | Історичні `[ ]` | **Archived** | S4 2026-05-18; канон §5.4 + runbook §3.1 |
-| `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Stale / не канон** | FM-019 baseline покрив admin modals |
+| `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Stale** | канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
 | OpenAPI | Синхронізація при нових маршрутах | **Ongoing** | звіряти при API diff |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 
-#### Рекомендований наступний спринт (2026-06-08)
+#### Рекомендований наступний спринт (2026-05-18)
 
-1. **FM-003 §4** — **BLOCKED** (2 хости); dev stand §5.1 — канон на одній машині.
-2. **FM-019** — знизити pa11y errors на admin (після auth fixture); WCAG 2.2 AA auto.
+1. **FM-003 §4** — **BLOCKED** (2 хости).
+2. **FM-019** — опційно pa11y admin subpages (`/ui/admin/tenants`, audit, monitoring…); WCAG 2.2 AA (`PA11Y_STANDARD`); `a11y.yml` на PR — backlog.
 3. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+
+Детальна матриця прогалин — [`AUTO_RUN_SESSION_2026-06-17.md`](../development/AUTO_RUN_SESSION_2026-06-17.md).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
@@ -196,7 +198,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-10.md`](../development/AUTO_RUN_SESSION_2026-06-10.md) (pa11y CI `8c5dc1df`).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-16.md`](../development/AUTO_RUN_SESSION_2026-06-16.md) (FM-019 pa11y libs/vm/raid).
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-17.md`](../development/AUTO_RUN_SESSION_2026-06-17.md) (FM-019 audit + pa11y S7).
+
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-16.md`](../development/AUTO_RUN_SESSION_2026-06-16.md) (FM-019 pa11y S6 `73c702a9`).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-15.md`](../development/AUTO_RUN_SESSION_2026-06-15.md) (FM-019 pa11y S5 `e368ba11`).
 

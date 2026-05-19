@@ -1,4 +1,7 @@
 # 🐛 UI Bug Fixes & OAuth2 Integration Plan
+
+> **⚠️ Архів / не канон (2026-05-18).** Admin modals/OAuth — **FM-012** ✅, **FM-019** baseline ✅. Верифікація: [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.4. Чеклисти нижче — історичні.
+
 ## Comprehensive Fixes Based on Quick Click Testing - 2026-01-16
 
 ---
