@@ -200,6 +200,57 @@ paths:
                 items:
                   $ref: '#/components/schemas/WorkerInfo'
 
+  /discovery/peers:
+    get:
+      tags:
+        - Discovery
+      summary: List discovered peers
+      operationId: listDiscoveryPeers
+      responses:
+        '200':
+          description: Peer snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryPeersResponse'
+        '503':
+          description: Discovery not initialized (empty peers, local_peer_id not-initialized)
+
+  /discovery/peers/{peer_id}:
+    get:
+      tags:
+        - Discovery
+      summary: Get a single peer by id
+      operationId: getDiscoveryPeer
+      parameters:
+        - name: peer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Peer lookup result (peer may be null)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoveryPeerResponse'
+        '503':
+          description: Discovery not initialized
+
+  /discovery/register:
+    post:
+      tags:
+        - Discovery
+      summary: Announce this coordinator as a peer
+      description: Sends discovery announcement for the local node.
+      operationId: registerDiscoveryLocal
+      responses:
+        '200':
+          description: Announcement sent
+        '503':
+          description: Discovery service not ready
+
   /discovery/register-remote:
     post:
       tags:
@@ -238,6 +289,10 @@ paths:
       responses:
         '200':
           description: Heartbeat accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartbeatRemotePeerResponse'
 
   /discovery/virtual-nodes:
     get:
@@ -252,6 +307,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VirtualNodesListResponse'
+
+  /discovery/virtual-nodes/{peer_id}/health:
+    get:
+      tags:
+        - Discovery
+      summary: Probe virtual node worker HTTP health
+      operationId: probeVirtualNodeHealth
+      parameters:
+        - name: peer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Worker reachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteHealthProbe'
+        '404':
+          description: Peer not found or unreachable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteHealthProbe'
+        '503':
+          description: Probe failed (unreachable) or discovery not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteHealthProbe'
 
   /virtual-nodes/{peer_id}/tasks/poll:
     get:
@@ -1508,6 +1595,98 @@ components:
           type: integer
           example: 42
 
+    PeerCapabilities:
+      type: object
+      properties:
+        cpu_cores:
+          type: integer
+        gpu_devices:
+          type: array
+          items:
+            type: integer
+        memory_mb:
+          type: integer
+        supports_tensor_parallelism:
+          type: boolean
+        supports_pipeline_parallelism:
+          type: boolean
+        active_requests:
+          type: integer
+        capacity:
+          type: integer
+        current_load:
+          type: number
+          format: float
+
+    PeerInfo:
+      type: object
+      properties:
+        peer_id:
+          type: string
+        address:
+          type: string
+        port:
+          type: integer
+        last_seen:
+          type: string
+          format: date-time
+        capabilities:
+          $ref: '#/components/schemas/PeerCapabilities'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+    DiscoveryPeersResponse:
+      type: object
+      properties:
+        peers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeerInfo'
+        local_peer_id:
+          type: string
+
+    DiscoveryPeerResponse:
+      type: object
+      properties:
+        peer:
+          $ref: '#/components/schemas/PeerInfo'
+          nullable: true
+
+    HeartbeatRemotePeerResponse:
+      type: object
+      properties:
+        peer_id:
+          type: string
+        ok:
+          type: boolean
+
+    VirtualNodeStatus:
+      type: object
+      properties:
+        peer:
+          $ref: '#/components/schemas/PeerInfo'
+        stale:
+          type: boolean
+        last_seen_age_secs:
+          type: integer
+          format: int64
+
+    RemoteHealthProbe:
+      type: object
+      properties:
+        peer_id:
+          type: string
+        reachable:
+          type: boolean
+        http_status:
+          type: integer
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+
     RegisterRemotePeerRequest:
       type: object
       required:
@@ -1553,7 +1732,7 @@ components:
         nodes:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/VirtualNodeStatus'
         stale_threshold_secs:
           type: integer
 

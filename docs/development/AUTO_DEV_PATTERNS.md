@@ -435,6 +435,13 @@
 - **Перевірка:** docs-only — `cargo test-ci` зріз; при зміні handlers — integration `virtual_node_*`
 - **FM:** FM-016+
 
+### [OpenAPI] Discovery FM-016 routes sync
+- **Де:** `src/network/api/discovery.rs` (`create_discovery_routes`), `docs/openapi.yaml`
+- **Сигнал:** `rg '\.route\(' src/network/api/discovery.rs` vs `rg '^  /discovery' docs/openapi.yaml`
+- **Патерн:** peers `GET /discovery/peers`, `GET .../peers/{peer_id}`; local announce `POST /discovery/register` (200/503); health `GET .../virtual-nodes/{peer_id}/health` → `RemoteHealthProbe` (200/404/503)
+- **Перевірка:** `cargo test-ci`; `discovery_remote_register_integration`, `virtual_node_*`
+- **FM:** FM-016
+
 ## Документація (кроки 1–12)
 
 | Крок | Файл | Коли оновлювати |
