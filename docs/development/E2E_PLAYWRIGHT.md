@@ -1,6 +1,13 @@
-# Playwright E2E smoke (S23 / UI_QUALITY P2-C)
+# Playwright E2E smoke (S23 / S27)
 
-**Status:** Baseline smoke — login → `/ui` → `/ui/admin/users` (`e2e/tests/smoke.spec.ts`).
+**Status:** Smoke + admin tenants/monitoring (`e2e/tests/smoke.spec.ts`, `e2e/tests/admin.spec.ts`).
+
+| Spec | Сценарії |
+|------|----------|
+| `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
+| `admin.spec.ts` | login → `/ui/admin/tenants` (`#tenants-list`); login → `/ui/admin/monitoring` (`#monitoring-content`, Create Dashboard) |
+
+Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
 ## Локально (MSYS2 / Linux)
 
@@ -28,7 +35,8 @@ bash bin/e2e-playwright.sh --start
 
 ## Розширення backlog
 
-- Додаткові admin routes після P1 (`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`).
+- Додаткові admin routes (security, audit) після стабілізації часу прогону.
+- axe Playwright (FM-019 backlog).
 - Підключити `workflow_call` з `ci.yml` після стабілізації часу прогону.
 
-**Last updated:** 2026-05-19 (S23).
+**Last updated:** 2026-05-19 (S27).

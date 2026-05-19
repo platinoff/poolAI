@@ -4,7 +4,7 @@
 
 ---
 
-## Промпт (S27 за замовчуванням)
+## Промпт (S28 за замовчуванням)
 
 ```
 PoolAI — автономна ітеративна сесія (оркестратор).
@@ -18,7 +18,7 @@ PoolAI — автономна ітеративна сесія (оркестра�
    - docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md
    - docs/catalog/FUNCTION_MANAGEMENT.md §5.1, §5.3, §5.5
    - .cursor/rules/autonomous-orchestrator.mdc
-3. Останні коміти: S25–S26 (2720c3d3…285b898d); прогрес продукту ~93% (шар A).
+3. Останні коміти: S27 Playwright admin E2E; прогрес продукту ~93% (шар A).
 
 ## Що вже закрито (не повторювати)
 
@@ -29,19 +29,19 @@ PoolAI — автономна ітеративна сесія (оркестра�
 | S23 | Playwright smoke login → admin users |
 | S24 | DELETE /ui/dashboards/{id} → 204 |
 | S25–S26 | UI_QUALITY P1 ✅ — 27 admin JSON contract tests |
+| S27 | Playwright admin tenants + monitoring E2E |
 
-## Мета сесії — S27: Playwright E2E розширення (за замовчуванням)
+## Мета сесії — S28: OpenAPI gap audit (за замовчуванням)
 
-**Фокус:** розширити `e2e/tests/smoke.spec.ts` або додати 1 spec — login + відкриття 1–2 admin сторінок (tenants або monitoring); узгодити з `E2E_PLAYWRIGHT.md`.
+**Фокус:** `rg '\.route\(' src/network` vs `docs/openapi.yaml` — закрити прогалини v1 + enterprise.
 
-**Альтернатива (якщо E2E недоцільно):** S28 OpenAPI gap audit — `rg '\.route\(' src/network` vs `docs/openapi.yaml`.
+**Альтернатива:** розширити Playwright (security, audit) або ML ops за `PIPELINE_MANAGEMENT.md`.
 
-**Критерій готовності S27:**
-- [ ] 1–2 нові Playwright сценарії (або стабілізація smoke) + оновлення `E2E_PLAYWRIGHT.md`
-- [ ] `bin/e2e-playwright.sh` / `e2e.yml` за потреби
+**Критерій готовності S28:**
+- [ ] Звіт прогалин + патчі yaml (або явний backlog у FM)
 - [ ] cargo fmt → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28)
 - [ ] Commit + push MSYS2 (.cursor/commands/git-push.md) з Summary у тілі
-- [ ] HANDOFF, FM §5.1, CHANGELOG, AUTO_DEV_PATTERNS, DEVELOPMENT_PROGRESS
+- [ ] HANDOFF, FM §5.1, CHANGELOG, AUTO_DEV_PATTERNS
 
 **Поза обсягом:** FM-003 §4 (BLOCKED, 2 хости), FM-004/006/009/010.
 
@@ -54,7 +54,7 @@ PoolAI — автономна ітеративна сесія (оркестра�
 
 | Запит | Спринт | Док |
 |-------|--------|-----|
-| OpenAPI | S28 | `rg` routes vs yaml |
+| Playwright | — | `E2E_PLAYWRIGHT.md` (S27 ✅) |
 | LAN | — | BLOCKED до 2 хостів |
 | ML ops | — | `PIPELINE_MANAGEMENT.md` |
 | SIMD / cloud-sdk deep | — | FM-004/006, Deferred |

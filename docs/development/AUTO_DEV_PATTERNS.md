@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (прогрес-аудит 93%; S26 P1 closed).
+**Оновлено:** 2026-05-19 (S27 Playwright admin E2E).
 
 ---
 
@@ -502,10 +502,17 @@
 - **Перевірка:** `cargo test-ci`; wave S17–S20 push одним `git push origin main`
 - **FM:** FM-012 (enterprise security)
 
+### [E2E] Playwright admin після smoke (S27)
+- **Де:** `e2e/tests/admin.spec.ts`, `e2e/tests/helpers.ts`, `e2e/tests/smoke.spec.ts`
+- **Сигнал:** `rg "loginAsAdmin|#tenants-list|#monitoring-content" e2e/`
+- **Патерн:** `loginAsAdmin(page)` → `goto` `/ui/admin/tenants` або `/ui/admin/monitoring`; очікувати `#tenants-list` / `#monitoring-content` з `.admin-table`, `.muted`, або `.admin-fetch-error` після `fetchJson`
+- **Перевірка:** `bash bin/e2e-playwright.sh --start` (MSYS2; `enterprise,ml,cloud,test-utils`); CI — `.github/workflows/e2e.yml` `workflow_dispatch`
+- **FM:** FM-019 (UI E2E backlog)
+
 ### [FM] Прогрес і «ніколи не зроблено» (аудит 2026-05-19)
 - **Де:** `docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5
 - **Сигнал:** шар A **93%**; BLOCKED FM-003 §4; Concept FM-009/010; Deferred FM-004/006
-- **Патерн:** legacy `[ ]` у `docs/archive/` і січневих планах — **не канон**; черга S27+ у `NEXT_SESSION_PROMPT.md`
+- **Патерн:** legacy `[ ]` у `docs/archive/` і січневих планах — **не канон**; черга S28+ у `NEXT_SESSION_PROMPT.md`
 - **Перевірка:** `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` → 2 (LAN BLOCKED, cloud-sdk optional)
 
 ## Документація (кроки 1–12)

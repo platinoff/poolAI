@@ -1,6 +1,6 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-05-19 · **Гілка:** `main` · **Зріз комітів:** `285b898d` (S26)  
+**Оновлено:** 2026-05-19 · **Гілка:** `main` · **Зріз комітів:** S27 (Playwright admin E2E)  
 **Метод:** звірка FM-001…019, Architect P1–P6, `STABLE_STATE`, `FUNCTIONALITY_DIGEST`, відкриті `[ ]` у канонічних планах, `rg TODO` у `src/`, legacy docs (`docs/archive/`, січень–квітень 2026) — **не канон** для черги.
 
 ---
@@ -84,7 +84,7 @@
 | Область | Стан | Джерело |
 |---------|------|---------|
 | OpenAPI повний `rg` audit | Partial ✅ S14–S21 | enterprise + ai-ml; дрібні прогалини можливі |
-| Playwright E2E | Smoke ✅ S23 | Розширені сценарії admin CRUD — ні |
+| Playwright E2E | Partial ✅ S23–S27 | Smoke + tenants/monitoring; admin CRUD / axe — backlog |
 | FM-019 axe у Playwright | Ні | pa11y CI ✅; axe — backlog |
 | BurstRAID metrics v0.2+ | Ні | Stale `RUST_ARCHITECT_STATUS` |
 | VM Windows AppContainer / post-spawn limits | Stub | `vm/isolation/windows.rs`, `vm/resources.rs` |
@@ -126,8 +126,8 @@
 
 | Порядок | Спринт | Умова |
 |--------|--------|--------|
-| 1 | **S27** Playwright E2E розширення (admin CRUD smoke) | За [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
-| 2 | **S28** OpenAPI gap audit (`rg` routes vs yaml) | Без 2 хостів |
+| 1 | **S28** OpenAPI gap audit (`rg` routes vs yaml) | Без 2 хостів |
+| — | **S27** Playwright admin E2E | ✅ tenants + monitoring |
 | — | **FM-003 §4** LAN sign-off | **BLOCKED** (2 хости) |
 | — | FM-004/006/009/010 | Лише за явним запитом |
 

@@ -78,7 +78,7 @@
 | **S24** | UI dashboard DELETE | ✅ `delete_dashboard` + HTTP 204 (2026-05-19) | cloud-sdk |
 | **S25** | UI_QUALITY P1 | ✅ tenants, OAuth2, dashboards (+3 tests) | — |
 | **S26** | UI_QUALITY P1 (close) | ✅ metrics, alert-rules, SAML, policies (+4 tests; 27 total) | — |
-| **S27** | Playwright E2E розширення | 1–2 admin сценарії після smoke | FM-003 §4 |
+| **S27** | Playwright E2E розширення | ✅ tenants + monitoring (`admin.spec.ts`) | FM-003 §4 |
 | **S28** | OpenAPI gap audit | `rg` routes vs yaml | LAN |
 | **—** | FM-003 §4 | Лише при 2 хостах | — |
 
@@ -111,8 +111,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [x] **S25** UI_QUALITY P1 — tenants, OAuth2, monitoring dashboards contracts
 - [x] **S26** UI_QUALITY P1 — metrics, alert-rules, SAML, security policies
 - [x] Прогрес-аудит: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) (**93%** шар A)
-- [ ] **S27** Playwright E2E розширення (див. [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md))
-- [ ] FM-003 §4 (BLOCKED) / S28 OpenAPI gap audit
+- [x] **S27** Playwright E2E розширення — `e2e/tests/admin.spec.ts` (tenants, monitoring)
+- [ ] FM-003 §4 (BLOCKED) / **S28** OpenAPI gap audit
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`

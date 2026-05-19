@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-19 (§5.5 прогрес 93%; S26 UI_QUALITY P1 ✅; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md)).
+**Оновлено:** 2026-05-19 (§5.5 прогрес 93%; S27 Playwright admin E2E ✅; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -123,8 +123,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Playwright E2E | **S27** | Розширити smoke → 1–2 admin сценарії — [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) |
-| 2 | OpenAPI gap audit | **S28** | `rg` routes vs `docs/openapi.yaml` |
+| 1 | OpenAPI gap audit | **S28** | `rg` routes vs `docs/openapi.yaml` |
+| — | Playwright E2E | **S27 ✅** | tenants + monitoring — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
 | — | UI a11y CI | **FM-019** | **Partial ✅** pa11y merge gate; axe Playwright — backlog |
 | — | UI_QUALITY P1 | **FM-013** | **✅** S25–S26 (27 contract tests) |
@@ -134,7 +134,7 @@ FM-xxx (з таблиці нижче)
 
 **Прогрес:** **93%** (шар A) — **§5.5**, [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
-**Закрито (не в черзі):** FM-001–018; UI_QUALITY P1; FM-019 baseline; S21–S26.
+**Закрито (не в черзі):** FM-001–018; UI_QUALITY P1; FM-019 baseline; S21–S27.
 
 **Якість збірки:** **`cargo test-ci`** + `cargo fmt` — зріз 2026-05-28; clippy — CI (`ci.yml`).
 
@@ -153,6 +153,7 @@ FM-xxx (з таблиці нижче)
 | S21–S24 | OpenAPI ai-ml; pa11y CI; Playwright smoke; dashboard DELETE | `fa96a6b4`…`56edbce9` |
 | **S25** | UI_QUALITY P1 — tenants, OAuth2, dashboards contracts (+3 tests) | `2720c3d3` |
 | **S26** | UI_QUALITY P1 close — metrics, alert-rules, SAML, policies (+4 tests) | `285b898d` |
+| **S27** | Playwright admin E2E — tenants, monitoring (`admin.spec.ts`, `helpers.ts`) | (ця сесія) |
 
 #### Не зроблено (канон backlog)
 
@@ -170,7 +171,8 @@ FM-xxx (з таблиці нижче)
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
-| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S21: enterprise REST + `/ai-ml/optimization*`, `/automl`, `/federated`; Playwright/E2E — backlog |
+| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S21: enterprise REST + `/ai-ml/optimization*`, `/automl`, `/federated`; S28 gap audit — backlog |
+| UI E2E | Playwright | **Partial ✅** | S23 smoke; **S27** tenants + monitoring; axe / CRUD — backlog |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
@@ -190,9 +192,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **S27** Playwright E2E розширення | [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md), [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
-| 2 | **S28** OpenAPI gap audit | `rg` routes vs yaml |
-| — | **S21–S26** | ✅ (див. §5.3) |
+| 1 | **S28** OpenAPI gap audit | `rg` routes vs yaml |
+| — | **S21–S27** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
@@ -209,7 +210,7 @@ FM-xxx (з таблиці нижче)
 
 **Ніколи не зроблено (підтверджено):** FM-003 §4 LAN sign-off; FM-004 SIMD; FM-006 Azure/GCP deep; FM-009/010; P6 layers; axe Playwright; повний OpenAPI `rg` audit.
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) (S27 Playwright за замовчуванням).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) (S28 OpenAPI gap audit за замовчуванням).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
