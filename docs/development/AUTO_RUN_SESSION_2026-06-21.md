@@ -11,6 +11,6 @@
 - [x] `ADMIN_A11Y_RUNBOOK.md` §5 backlog sync
 - [x] `cargo fmt --all` (docs/workflow only; test-ci не потрібен)
 - [x] FM + HANDOFF + CHANGELOG + AUTO_DEV_PATTERNS
-- [ ] push
+- [x] push — `f08b628f` (2026-05-18)
 
 **Поза обсягом:** FM-003 §4 (BLOCKED); merge gate a11y у `ci.yml`; FM-004/006/009/010.

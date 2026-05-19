@@ -14,8 +14,8 @@ pa11y v9 **не** підтримує `PA11Y_STANDARD=WCAG22AA` → додано 
 - [x] `PA11Y_WCAG22=1 PA11Y_ADMIN_STRICT=1 bash bin/pa11y-ci.sh --start` — 0 errors
 - [x] audit labels — `src/ui/admin/audit.rs`, i18n
 - [x] `a11y.yml` — `pull_request` paths `src/ui/**`
-- [ ] `cargo test-ci`
+- [x] `cargo test-ci` (exit 0)
 - [x] runbook + FM + HANDOFF + AUTO_DEV_PATTERNS
-- [ ] push
+- [x] push — `9a53c53b` (2026-05-18)
 
 **Поза обсягом:** FM-003 §4 (BLOCKED); FM-004/006/009/010; merge gate `a11y` у `ci.yml`.

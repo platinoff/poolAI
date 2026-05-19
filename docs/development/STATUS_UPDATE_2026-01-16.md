@@ -1,4 +1,7 @@
 # 📊 PoolAI Status Update - 2026-01-16
+
+> **⚠️ Архів / не канон (2026-05-18).** Cloud SDK `[ ]` → **FM-006 Deferred**. Канон: [`STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.3.
+
 ## Rust Architect Analysis - Перший день пакету PRO 🚀 (ОНОВЛЕНО)
 
 ---

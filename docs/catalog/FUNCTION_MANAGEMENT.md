@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-18 (§5.3 S12 — `pa11y-contract` у `ci.yml`; [`AUTO_RUN_SESSION_2026-06-22.md`](../development/AUTO_RUN_SESSION_2026-06-22.md)).
+**Оновлено:** 2026-05-18 (§5.3 S13 — legacy docs audit; [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -122,7 +122,8 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
 | 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
-| 2 | UI a11y backlog | **FM-019** | pa11y 18 auth + WCAG22 CI ✅; `ci.yml` `pa11y-contract` ✅ (S12); повний pa11y лише `a11y.yml` |
+| 2 | UI a11y | **FM-019** | **Partial ✅** S7–S12: 18 auth, WCAG22, `a11y.yml`, `pa11y-contract`; E2E Playwright — backlog |
+| 2b | UI E2E | **UI_QUALITY plan** | Playwright smoke — backlog (див. §5.3 legacy) |
 | 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
 | — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
 | 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
@@ -164,14 +165,27 @@ FM-xxx (з таблиці нижче)
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
 | OpenAPI | Синхронізація при нових маршрутах | **Ongoing** | звіряти при API diff |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
+| `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
+| `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
+| `STABLE_STATE_UPDATE_2026-01-19.md` | % / cloud tests | **Stale** | → `STABLE_STATE_SUMMARY.md` |
+| `PERCENTAGE_PLAN.md` | GlobalState % | **Stale** | не канон |
+| `ADMIN_PANEL_STATUS.md` | Admin partial | **Stale** | код + `ADMIN_A11Y_RUNBOOK` |
+| `UI_UX_IMPROVEMENTS_PLAN.md` | Monitoring UI | **Stale** | звірити `admin/monitoring.rs` |
+| `RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md` | Дубль плану | **Superseded** | → Architect 2026-03-17 |
 
-#### Рекомендований наступний спринт (2026-05-18)
+#### Legacy docs (повна таблиця)
 
-1. **FM-003 §4** — **BLOCKED** (2 хости).
-2. **FM-019** — опційно повний pa11y у `ci.yml` (зараз `pa11y-contract` + окремий `a11y.yml`).
-3. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+Див. [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md) — аудит січень–квітень 2026 планів.
 
-Детальна матриця прогалин — [`AUTO_RUN_SESSION_2026-06-22.md`](../development/AUTO_RUN_SESSION_2026-06-22.md).
+#### Рекомендований наступний спринт (2026-05-18, після S13)
+
+1. **FM-003 §4** — **BLOCKED** (2 хости); dev stand + runbook only.
+2. **OpenAPI** — sync з `src/network/` при наявності API diff.
+3. **UI E2E** — Playwright smoke (`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`) — опційно.
+4. **Virtual nodes / ML** — hardening за DIGEST + `PIPELINE_MANAGEMENT.md` — за пріоритетом продукту.
+5. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.
+
+Детальна матриця — [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 
@@ -198,9 +212,9 @@ FM-xxx (з таблиці нижче)
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-10.md`](../development/AUTO_RUN_SESSION_2026-06-10.md) (pa11y CI `8c5dc1df`).
 
-**Поточний:** [`AUTO_RUN_SESSION_2026-06-22.md`](../development/AUTO_RUN_SESSION_2026-06-22.md) (FM-019 pa11y-contract S12).
+**Поточний:** [`AUTO_RUN_SESSION_2026-06-23.md`](../development/AUTO_RUN_SESSION_2026-06-23.md) (§5.3 legacy docs audit S13).
 
-**Завершено:** [`AUTO_RUN_SESSION_2026-06-21.md`](../development/AUTO_RUN_SESSION_2026-06-21.md) (FM-019 a11y CI WCAG22 S11 `f08b628f`).
+**Завершено:** [`AUTO_RUN_SESSION_2026-06-22.md`](../development/AUTO_RUN_SESSION_2026-06-22.md) (FM-019 pa11y-contract S12 `e9729152`).
 
 **Завершено:** [`AUTO_RUN_SESSION_2026-06-16.md`](../development/AUTO_RUN_SESSION_2026-06-16.md) (FM-019 pa11y S6 `73c702a9`).
 

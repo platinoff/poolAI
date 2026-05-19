@@ -1,4 +1,7 @@
 # 📊 Актуалізація Стабільного Стану - PoolAI
+
+> **⚠️ Архів / не канон (2026-05-18).** Канон: [`STABLE_STATE_SUMMARY.md`](./STABLE_STATE_SUMMARY.md), [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.3.
+
 ## Оновлено: 2026-01-19
 
 **Статус**: ✅ **STABLE - PRODUCTION READY**  
