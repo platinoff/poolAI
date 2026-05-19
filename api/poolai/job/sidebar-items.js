@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["JobKind","JobStatus"],"fn":["envelope_from_job_spec","grid_result_from_status","job_spec_from_envelope","job_spec_from_grid_job","job_spec_to_grid_job"],"struct":["JobId","JobRecord","JobResources","JobSpec"]};

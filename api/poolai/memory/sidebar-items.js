@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["envelope_from_memory_shard","memory_shard_from_envelope","memory_shard_from_grid_body","memory_shard_to_grid_body"],"struct":["MemoryShardId","MemoryShardRef"]};
