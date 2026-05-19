@@ -4930,9 +4930,339 @@ components:
           type: string
           description: Originating node identifier
         payload:
+          description: |
+            Type-specific body. Request kinds map to `RaidDistributed*Payload` schemas;
+            responses use matching `*ResponsePayload` inside `{type}_response` messages.
+          oneOf:
+            - $ref: '#/components/schemas/RaidDistributedPutArtifactPayload'
+            - $ref: '#/components/schemas/RaidDistributedGetArtifactPayload'
+            - $ref: '#/components/schemas/RaidDistributedDeleteArtifactPayload'
+            - $ref: '#/components/schemas/RaidDistributedSyncArtifactsPayload'
+            - $ref: '#/components/schemas/RaidDistributedHealthCheckPayload'
+            - $ref: '#/components/schemas/RaidDistributedJoinClusterPayload'
+            - $ref: '#/components/schemas/RaidDistributedLeaveClusterPayload'
+            - $ref: '#/components/schemas/RaidDistributedPutArtifactResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedGetArtifactResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedDeleteArtifactResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedSyncArtifactsResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedHealthCheckResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedJoinClusterResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedLeaveClusterResponsePayload'
+            - $ref: '#/components/schemas/RaidDistributedProtocolError'
+
+    RaidDistributedSyncMode:
+      type: string
+      enum: [sync, async]
+
+    RaidDistributedSyncDirection:
+      type: string
+      enum: [pull, push, bidirectional]
+
+    RaidDistributedOperationStatus:
+      type: string
+      enum: [success, error]
+
+    RaidDistributedArtifactStatus:
+      type: string
+      enum: [success, not_found, error]
+
+    RaidDistributedHealthStatus:
+      type: string
+      enum: [healthy, degraded, unhealthy]
+
+    RaidDistributedRaftRole:
+      type: string
+      enum: [leader, follower, candidate]
+
+    RaidDistributedJoinStatus:
+      type: string
+      enum: [accepted, rejected]
+
+    RaidDistributedLeaveReason:
+      type: string
+      enum: [shutdown, maintenance, error]
+
+    RaidDistributedErrorCode:
+      type: string
+      enum:
+        - ARTIFACT_NOT_FOUND
+        - NODE_UNAVAILABLE
+        - REPLICATION_FAILED
+        - INSUFFICIENT_STORAGE
+        - AUTHENTICATION_FAILED
+        - AUTHORIZATION_FAILED
+        - INVALID_REQUEST
+        - CLUSTER_FULL
+        - RAFT_ERROR
+
+    RaidDistributedArtifactMetadata:
+      type: object
+      required: [name, version, size_bytes, checksum, created_at]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        size_bytes:
+          type: integer
+          format: int64
+        checksum:
+          type: string
+          description: SHA-256 hash
+        created_at:
+          type: string
+          format: date-time
+        content_type:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    RaidDistributedPutArtifactPayload:
+      type: object
+      required: [artifact_id, source_node, metadata, replication_factor, sync_mode]
+      properties:
+        artifact_id:
+          type: string
+        source_node:
+          type: string
+        data:
+          type: string
+          description: Base64-encoded artifact bytes (optional)
+        metadata:
+          $ref: '#/components/schemas/RaidDistributedArtifactMetadata'
+        replication_factor:
+          type: integer
+          format: int32
+        sync_mode:
+          $ref: '#/components/schemas/RaidDistributedSyncMode'
+
+    RaidDistributedPutArtifactResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedOperationStatus'
+        artifact_id:
+          type: string
+        stored_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+
+    RaidDistributedGetArtifactPayload:
+      type: object
+      required: [artifact_id, include_data]
+      properties:
+        artifact_id:
+          type: string
+        include_data:
+          type: boolean
+
+    RaidDistributedGetArtifactResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedArtifactStatus'
+        artifact_id:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/RaidDistributedArtifactMetadata'
+        data:
+          type: string
+          description: Base64-encoded data when requested
+        error:
+          type: string
+
+    RaidDistributedDeleteArtifactPayload:
+      type: object
+      required: [artifact_id, propagate]
+      properties:
+        artifact_id:
+          type: string
+        propagate:
+          type: boolean
+
+    RaidDistributedDeleteArtifactResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedOperationStatus'
+        artifact_id:
+          type: string
+        deleted_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+
+    RaidDistributedSyncArtifactsPayload:
+      type: object
+      required: [direction]
+      properties:
+        last_sync_timestamp:
+          type: string
+          format: date-time
+        artifact_ids:
+          type: array
+          items:
+            type: string
+        remote_versions:
+          type: object
+          additionalProperties:
+            type: string
+            format: date-time
+        direction:
+          $ref: '#/components/schemas/RaidDistributedSyncDirection'
+
+    RaidDistributedArtifactConflict:
+      type: object
+      properties:
+        artifact_id:
+          type: string
+        reason:
+          type: string
+        local_version:
+          type: string
+          format: date-time
+        remote_version:
+          type: string
+          format: date-time
+
+    RaidDistributedSyncArtifactsResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedOperationStatus'
+        synced_count:
+          type: integer
+          format: int32
+        missing_artifacts:
+          type: array
+          items:
+            type: string
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/RaidDistributedArtifactConflict'
+        error:
+          type: string
+
+    RaidDistributedHealthCheckPayload:
+      type: object
+      description: Empty object for health_check requests
+
+    RaidDistributedHealthCheckResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedHealthStatus'
+        uptime_seconds:
+          type: integer
+          format: int64
+        storage_used_bytes:
+          type: integer
+          format: int64
+        storage_total_bytes:
+          type: integer
+          format: int64
+        artifact_count:
+          type: integer
+          format: int32
+        raft_role:
+          $ref: '#/components/schemas/RaidDistributedRaftRole'
+        raft_term:
+          type: integer
+          format: int64
+        last_heartbeat:
+          type: string
+          format: date-time
+
+    RaidDistributedNodeInfo:
+      type: object
+      required: [storage_capacity_bytes]
+      properties:
+        storage_capacity_bytes:
+          type: integer
+          format: int64
+        region:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    RaidDistributedJoinClusterPayload:
+      type: object
+      required: [address, node_info]
+      properties:
+        address:
+          type: string
+        node_info:
+          $ref: '#/components/schemas/RaidDistributedNodeInfo'
+
+    RaidDistributedClusterNode:
+      type: object
+      properties:
+        node_id:
+          type: string
+        address:
+          type: string
+        role:
+          $ref: '#/components/schemas/RaidDistributedRaftRole'
+        status:
+          $ref: '#/components/schemas/RaidDistributedHealthStatus'
+        last_seen:
+          type: string
+          format: date-time
+
+    RaidDistributedJoinClusterResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedJoinStatus'
+        cluster_id:
+          type: string
+        member_nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RaidDistributedClusterNode'
+        error:
+          type: string
+
+    RaidDistributedLeaveClusterPayload:
+      type: object
+      required: [reason, graceful]
+      properties:
+        reason:
+          $ref: '#/components/schemas/RaidDistributedLeaveReason'
+        graceful:
+          type: boolean
+
+    RaidDistributedLeaveClusterResponsePayload:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/RaidDistributedOperationStatus'
+        replication_complete:
+          type: boolean
+        artifacts_moved:
+          type: integer
+          format: int32
+        details:
+          type: string
+
+    RaidDistributedProtocolError:
+      type: object
+      properties:
+        error_code:
+          $ref: '#/components/schemas/RaidDistributedErrorCode'
+        error_message:
+          type: string
+        details:
           type: object
           additionalProperties: true
-          description: Type-specific JSON (see `src/raid/protocol.rs` payload structs)
 
     PeerCapabilities:
       type: object

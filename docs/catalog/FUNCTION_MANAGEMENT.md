@@ -1,14 +1,14 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-19 (§5.5 прогрес 93%; S29 Playwright ✅; FM legacy audit — [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md)).
+**Оновлено:** 2026-05-19 (§5.5 прогрес **100%** шар A, S33; [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
-**Не зроблено / backlog:** FM-003 §4 LAN (**BLOCKED**); FM-019 повний WCAG/pa11y CI; FM-004/006 **Deferred**; FM-009/010 **Concept-only**. **P4:** рядок `poolai_health_load` **2026-05-18** у `BENCHMARKS.md` (baseline **2026-04-10** лишається для порівняння).
+**Поза шаром A:** FM-003 §4 LAN sign-off (**BLOCKED**, 2 хости); FM-004/006 **Deferred**; FM-009/010 **Concept-only**. **P4:** рядок `poolai_health_load` **2026-05-18** у `BENCHMARKS.md` (baseline **2026-04-10** лишається для порівняння).
 
 **Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); E2E S29 — `bash bin/e2e-playwright.sh --start` (5 passed); clippy — CI на `main`.
 
-**Прогрес продукту (шар A):** **93%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+**Прогрес продукту (шар A):** **100%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Роль документа:** операційна інструкція для людини й агента («менеджер функціоналу»): звірка з **сталевим станом**, пошук **недоробленого**, пріоритизація, **чернетки тікетів** для передачі в розробку.
 
@@ -99,7 +99,7 @@ FM-xxx (з таблиці нижче)
 |----|---------|---------------|-----------------|---------|
 | FM-001 | P1 / тести | Інтеграційні тести: повний nest `/api/v1` + інжектований `AppState` (`attach_*_for_test`), без `raid::`/`vm::` globals | Implemented | `tests/appstate_http_injection_integration.rs`, CI `--features …,test-utils` |
 | FM-002 | P2 | Доробити service layer: тонкі handler’и, логіка в `services/*` для решти доменів | Implemented | `src/network/api/*` без `get_global_*`; `discovery.rs` — optional `instance_manager` з `AppState` (коментар); `services/*` — лише закоментовані Raft placeholders |
-| FM-003 | P2b / RAID | Dev stand: `run-virtual-node-dev.*`, `verify-dev-stand.*` (health + VN bootstrap). **Реальний LAN** §4 — gated (два хости) | Planned (ops, gated) | `LAN_BENCHMARK_RUNBOOK.md` §5.1 |
+| FM-003 | P2b / RAID | Dev stand ✅; wire harness ✅. **LAN §4 sign-off** — ops gated (2 хости) | Implemented (scope A) | `LAN_BENCHMARK_RUNBOOK.md` §5.1 |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | Deferred | NEXT_STEPS P2b |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
 | FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
@@ -115,7 +115,7 @@ FM-xxx (з таблиці нижче)
 | FM-016 | Workers / Telegram | **Virtual nodes** + Telegram: bind/webhook/store, `poolai-worker`, **`poolai-telegram-bot`** (`--features tgbot`); pool workload на device | Implemented | `virtual_node_*`, `tgbot/coordinator`, `poolai-telegram-bot`, integration tests |
 | FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Implemented | `discovery.rs`; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
 | FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
-| FM-019 | UI / a11y | **Baseline:** admin modals/forms/tabs, dashboard nav, runbook; повний WCAG/pa11y CI — backlog | Baseline Implemented | [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md), §5.4 |
+| FM-019 | UI / a11y | pa11y CI ✅; axe Playwright ✅ (S33); admin baseline | Implemented (scope A) | [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md), `e2e/tests/a11y.spec.ts` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -123,18 +123,18 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | OpenAPI distributed payloads | backlog | S31 ✅ 7 POST + `ProtocolMessage`; деталізація DTO |
-| 2 | ML ops | **✅ S31** | [`ml/PIPELINE_MANAGEMENT.md`](../ml/PIPELINE_MANAGEMENT.md) §Ops verification |
-| 3 | Playwright E2E | **Partial ✅** S31 | raid/topology ✅; vm/workers — backlog |
+| 1 | Шар A autoprogon | **✅ 100%** | S33 — OpenAPI DTO, axe, vm/workers E2E |
+| 2 | FM-003 §4 LAN sign-off | **BLOCKED** | 2 фізичні хости; dev stand ✅ |
+| 3 | Horizon | Deferred / Concept | FM-004/006/009/010 |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
-| — | UI a11y CI | **FM-019** | **Partial ✅** pa11y merge gate; axe Playwright — backlog |
+| — | UI a11y CI | **FM-019** | **✅** pa11y + axe Playwright (S33) |
 | — | UI_QUALITY P1 | **FM-013** | **✅** S25–S26 (27 contract tests) |
 | — | ML ops | **DIGEST §ML** | ✅ `PIPELINE_MANAGEMENT.md` |
 | — | Відкладено | **FM-004**, **FM-006** | поза автопрогоном |
 | — | Концепт | **FM-009**, **FM-010** | поза автопрогоном |
 
-**Прогрес:** **93%** (шар A) — **§5.5**, [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+**Прогрес:** **100%** (шар A, S33) — **§5.5**, [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Закрито (не в черзі):** FM-001–018; UI_QUALITY P1; FM-019 baseline; S21–S28.
 
@@ -161,6 +161,7 @@ FM-xxx (з таблиці нижче)
 | **S30** | FM legacy docs audit + stale banners | (ця сесія) |
 | **S31** | OpenAPI `/raid/distributed/*`; ML ops runbook; Playwright raid/topology | `c20a10f2` |
 | **S32** | `bin/run-poolai.*` + `RUN_LOCAL.md` — єдиний локальний запуск | `ef4a0aa5` |
+| **S33** | OpenAPI distributed DTO; axe Playwright; E2E vm/workers; шар A **100%** | (ця сесія) |
 
 #### Не зроблено (канон backlog)
 
@@ -178,8 +179,9 @@ FM-xxx (з таблиці нижче)
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
-| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S31: + `/raid/distributed/*`; backlog payload schemas |
-| UI E2E | Playwright | **Partial ✅** | S23 smoke; S27–S31 + raid/topology; vm/workers — backlog |
+| OpenAPI | Синхронізація при нових маршрутах | **✅** | S14–S33: distributed DTO schemas |
+| UI E2E | Playwright | **✅** | S23–S33: admin routes + axe `a11y.spec.ts` |
+| FM-019 | axe Playwright | **✅ S33** | `e2e/tests/a11y.spec.ts` |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
@@ -199,9 +201,9 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | OpenAPI payload schemas | distributed DTO у yaml |
-| 2 | axe Playwright | FM-019 backlog |
-| 3 | Playwright vm/workers | за `E2E_PLAYWRIGHT.md` |
+| — | **S33** | ✅ шар A 100% |
+| 1 | FM-003 §4 LAN | **BLOCKED** (2 хости) |
+| 2 | Horizon | FM-004/006/009/010 за запитом |
 | — | **S21–S30** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 

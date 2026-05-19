@@ -14,12 +14,12 @@
 | VM templates/networks | 0 paths | `/vm/templates*`, `/vm/networks*` ✅ |
 | `/api/enterprise` | aligned | без змін (S14–S21) |
 
-## Залишок (backlog після S31)
+## Залишок (backlog після S33)
 
 | Шлях | Призначення | Примітка |
 |------|-------------|----------|
-| ~~`/raid/distributed/*` (7 POST)~~ | Inter-node RAID protocol | **✅ S31** — tag `RAID Distributed`, `ProtocolMessage` schema |
-| Детальні request/response schemas | RAID artifact body, VM template DTO | Поступове уточнення payload schemas |
+| ~~`/raid/distributed/*`~~ | Inter-node RAID protocol | **✅ S31–S33** paths + `RaidDistributed*` DTO schemas |
+| VM template body schemas | Дрібні DTO | Поступове уточнення за потреби |
 
 ## Перевірка
 

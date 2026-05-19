@@ -509,6 +509,13 @@
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-014 (OpenAPI sync)
 
+### [E2E] axe Playwright (S33 / FM-019)
+- **Де:** `e2e/tests/a11y.spec.ts`, `@axe-core/playwright` у `e2e/package.json`
+- **Сигнал:** `rg "AxeBuilder|a11y.spec" e2e/`
+- **Патерн:** `critical` + `serious` violations → `[]`; tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`; login + `loginAsAdmin` → `/ui/admin/users`
+- **Перевірка:** `bash bin/e2e-playwright.sh --start` (потрібен poolai + `npm install` у `e2e/`)
+- **FM:** FM-019 ✅ (scope A)
+
 ### [Ops] Локальний запуск — `run-poolai` (S32)
 - **Де:** `bin/run-poolai.sh`, `bin/run-poolai.ps1`, `docs/development/RUN_LOCAL.md`
 - **Сигнал:** `bash bin/run-poolai.sh help`

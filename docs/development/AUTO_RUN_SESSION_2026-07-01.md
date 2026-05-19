@@ -120,9 +120,10 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [ ] FM-003 §4 (BLOCKED)
 - [x] **S31** OpenAPI `/raid/distributed/*` + ML ops runbook + Playwright raid/topology
 - [x] **S32** `run-poolai` launcher + `RUN_LOCAL.md`
-- [ ] Наступний dev-спринт: distributed payload schemas або axe Playwright (див. §5.1 FM)
-- [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
-- [ ] `cargo test-ci` + push MSYS2
+- [x] **S33** OpenAPI distributed DTO + axe Playwright + E2E vm/workers — **шар A 100%**
+- [x] Оновлено HANDOFF, FM §5.1/§5.3, `DEVELOPMENT_PROGRESS`, CHANGELOG
+- [ ] `cargo test-ci` + push MSYS2 (S33)
+- [ ] FM-003 §4 (BLOCKED)
 - [ ] Не стаджити `data/audit/*.log.gz`
 
 **Не в обсязі без явного запиту:** FM-004, FM-006, FM-009, FM-010, FM-003 §4 (BLOCKED).

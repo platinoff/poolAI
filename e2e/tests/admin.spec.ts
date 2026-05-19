@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { loginAsAdmin } from "./helpers";
 
-test.describe("PoolAI admin E2E (S27 / S29 / S31)", () => {
+test.describe("PoolAI admin E2E (S27 / S29 / S31 / S33)", () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
@@ -81,5 +81,29 @@ test.describe("PoolAI admin E2E (S27 / S29 / S31)", () => {
     await expect(
       page.locator("#topology-nodes-tbody .admin-table, tr, .muted").first(),
     ).toBeVisible({ timeout: 20_000 });
+  });
+
+  test("workers page loads list container", async ({ page }) => {
+    await page.goto("/ui/admin/workers");
+    const list = page.locator("#workers-list");
+    await expect(list).toBeVisible({ timeout: 20_000 });
+    await expect(
+      list.locator(".admin-table, .muted, .admin-fetch-error").first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /create worker/i }),
+    ).toBeVisible();
+  });
+
+  test("vm page loads instances container", async ({ page }) => {
+    await page.goto("/ui/admin/vm");
+    const instances = page.locator("#vm-instances");
+    await expect(instances).toBeVisible({ timeout: 20_000 });
+    await expect(
+      instances.locator(".admin-table, .muted, .admin-fetch-error").first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /create vm instance/i }),
+    ).toBeVisible();
   });
 });
