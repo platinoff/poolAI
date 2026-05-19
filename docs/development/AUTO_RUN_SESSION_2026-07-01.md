@@ -20,7 +20,7 @@
 | ID | Пункт | Що лишилось | Джерело |
 |----|--------|-------------|---------|
 | **FM-019** | WCAG 2.2 / pa11y | Повний merge gate pa11y в `ci.yml` (зараз `pa11y-contract` + path-filter `a11y.yml`); розширення strict URL; axe у CI | FM §5.3, `ADMIN_A11Y_RUNBOOK.md` |
-| **OpenAPI** | Дрібні прогалини | `/ai-ml/optimization*`, `/automl`, `/federated` — є в `ai_ml.rs`, **немає** в `openapi.yaml` (pipeline ✅ S17) | S20 «Далі», gap audit |
+| **OpenAPI** | Дрібні прогалини | ~~`/ai-ml/optimization*`, `automl`, `federated`~~ — **S21 ✅** (2026-05-19); повний `rg` enterprise — backlog за потреби | — |
 | **UI_QUALITY P1** | API ↔ admin UI | Точкова звірка полів JS ↔ JSON для сторінок поза contract tests | `UI_QUALITY_AND_E2E_PLAN_2026-04-06.md` P1 |
 | **FM-016 / ML** | Pipeline ops | Hardening за `PIPELINE_MANAGEMENT.md` (метрики кроків, стенд) — продуктовий пріоритет | DIGEST §ML, FM §5.1 |
 
@@ -72,7 +72,7 @@
 
 | Спринт | Фокус | Критерій готовності | Поза обсягом |
 |--------|--------|---------------------|---------------|
-| **S21** | OpenAPI gap audit | `ai-ml/optimization`, `automl`, `federated` у yaml; `rg` без критичних прогалин enterprise | — |
+| **S21** | OpenAPI gap audit | ✅ `ai-ml/optimization*`, `automl`, `federated` у yaml (2026-05-19) | — |
 | **S22** | FM-019 CI | pa11y job у `ci.yml` або документований gate; 0 errors на runbook URL set | LAN |
 | **S23** | Playwright (опційно) | `e2e/` smoke: login + 1 admin route; `workflow_dispatch` або local script | FM-004/006/009/010 |
 | **S24** | UI dashboard DELETE або UI_QUALITY P1 | Реалізація `delete_dashboard` **або** 1 admin contract test + doc | cloud-sdk |
@@ -100,7 +100,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 
 ## 4. Критерії сесії (чеклист)
 
-- [ ] Обрано 1–2 спринти з таблиці §2 (за замовчуванням: **S21**)
+- [x] **S21** OpenAPI gap audit (optimization/automl/federated)
+- [ ] Обрано наступний спринт з §2 (**S22** FM-019 CI за замовчуванням)
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`

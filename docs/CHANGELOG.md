@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **OpenAPI (2026-05-19, S21)** — `/ai-ml/optimization`, `/optimization/profile`, `/optimization/tuning`, `/optimization/quantization-result`, `/automl`, `/federated`; schemas ML.1–ML.3.
 - **AUTO_RUN 2026-07-01** — зведений backlog «не зроблено» + черга S21–S24; HANDOFF/FM §5.1.
 - **OpenAPI (2026-05-19, S20)** — `/security/policies` CRUD; enterprise OpenAPI wave S17–S20 complete.
 - **AUTO_RUN 2026-06-30 (S20)** — security policies OpenAPI; push S17–S20.

@@ -5,7 +5,7 @@
 - **FM-016 Virtual nodes ✅:** `poolai-worker`, `poolai-telegram-bot` (`--features tgbot`); coordinator API — discovery `register-remote` / `heartbeat-remote`, `GET /discovery/virtual-nodes`; `virtual_nodes` tasks, Telegram bind/webhook, `pool/join`, bootstrap + `raid_artifact_probe`; services `virtual_node_store`, `virtual_node_task_service`, `virtual_node_telegram_binding_service`; dev stand `bin/run-virtual-node-dev.*`, `bin/verify-dev-stand.*`, `core::dev_stand`.
 - **Service layer (P2) ✅:** тонкі handlers у `src/network/api/*` → `src/services/*` (system, discovery, ui, raid, enterprise, cloud, virtual nodes, …).
 - **FM-005 REST errors ✅:** `src/network/json_errors.rs` — `{ "error": { "code", "message" }, "context"?: … }` по REST, enterprise, auth, raid.
-- **OpenAPI S14–S20 ✅:** v1 + `/api/enterprise/*` у `docs/openapi.yaml` (дрібні прогалини `/ai-ml/optimization*` — backlog S21).
+- **OpenAPI S14–S21 ✅:** v1 + `/api/enterprise/*` у `docs/openapi.yaml` (optimization/automl/federated ML.1–ML.3).
 - **FM-019 a11y Partial ✅:** pa11y 18 auth URLs, `PA11Y_WCAG22`, `.github/workflows/a11y.yml`, `ci.yml` `pa11y-contract`.
 - **P4 ✅:** `poolai_health_load` → `docs/performance/BENCHMARKS.md` (2026-05-18).
 - **Concept-only (не в `src/`):** FM-009 Grid wire, FM-010 Solana adapter — `GRID_PROTOCOL_CONCEPT_2026-04-06.md`, `SOLANA_ADAPTER_CONCEPT_2026-04-06.md`.

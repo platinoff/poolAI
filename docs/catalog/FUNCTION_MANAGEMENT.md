@@ -163,7 +163,7 @@ FM-xxx (з таблиці нижче)
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
-| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S20 enterprise REST (config/ui/completions/ai-ml/OAuth/monitoring/tenants/audit/SAML/policies); stubs/E2E — backlog |
+| OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S21: enterprise REST + `/ai-ml/optimization*`, `/automl`, `/federated`; Playwright/E2E — backlog |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
@@ -183,8 +183,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **S21** | OpenAPI gap: `/ai-ml/optimization*`, `automl`, `federated` |
-| 2 | **S22** | FM-019: pa11y merge gate / CI hardening |
+| 1 | **S22** | FM-019: pa11y merge gate / CI hardening |
+| — | **S21** | ✅ OpenAPI `/ai-ml/optimization*`, `automl`, `federated` (2026-05-19) |
 | 3 | **S23** | Playwright smoke (опційно) |
 | 4 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |

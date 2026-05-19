@@ -3051,6 +3051,109 @@ paths:
               schema:
                 $ref: '#/components/schemas/AiMlStatus'
 
+  /ai-ml/optimization:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseML
+      summary: Default optimization profile (ML.1)
+      description: Returns balanced optimization profile (quantization + pruning ratio).
+      operationId: getAiMlOptimizationProfile
+      responses:
+        '200':
+          description: Optimization profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationProfile'
+
+  /ai-ml/optimization/profile:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseML
+      summary: Model performance profile (ML.1 profiling)
+      operationId: getAiMlModelProfile
+      responses:
+        '200':
+          description: Placeholder model profile metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelProfile'
+
+  /ai-ml/optimization/tuning:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseML
+      summary: Hyperparameter tuning suggestion (ML.1)
+      operationId: getAiMlTuningSuggestion
+      responses:
+        '200':
+          description: Suggested learning rate, batch size, epochs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TuningResult'
+
+  /ai-ml/optimization/quantization-result:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseML
+      summary: Quantization result from default profile (ML.1)
+      operationId: getAiMlQuantizationResult
+      responses:
+        '200':
+          description: Placeholder quantization metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuantizationResult'
+
+  /ai-ml/automl:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseML
+      summary: AutoML configuration (ML.2)
+      operationId: getAiMlAutomlConfig
+      responses:
+        '200':
+          description: Default AutoML config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomlConfig'
+
+  /ai-ml/federated:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseML
+      summary: Federated learning configuration (ML.3)
+      operationId: getAiMlFederatedConfig
+      responses:
+        '200':
+          description: Default federated learning config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FederatedConfig'
+
   /ai-ml/pipeline:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -4178,6 +4281,106 @@ components:
         step_results:
           type: object
           additionalProperties: true
+
+    QuantizationLevel:
+      type: string
+      enum:
+        - None
+        - Int8
+        - Int4
+
+    OptimizationProfile:
+      type: object
+      properties:
+        quantization:
+          $ref: '#/components/schemas/QuantizationLevel'
+        pruning_ratio:
+          type: number
+          format: float
+
+    ModelProfile:
+      type: object
+      properties:
+        latency_ms:
+          type: number
+          format: double
+        memory_mb:
+          type: number
+          format: double
+        flops:
+          type: integer
+          format: int64
+
+    TuningResult:
+      type: object
+      properties:
+        learning_rate:
+          type: number
+          format: double
+        batch_size:
+          type: integer
+          format: int32
+        suggested_epochs:
+          type: integer
+          format: int32
+
+    QuantizationResult:
+      type: object
+      properties:
+        level:
+          $ref: '#/components/schemas/QuantizationLevel'
+        size_mb_before:
+          type: number
+          format: double
+        size_mb_after:
+          type: number
+          format: double
+        compression_ratio:
+          type: number
+          format: double
+
+    AutomlConfig:
+      type: object
+      properties:
+        auto_feature_engineering:
+          type: boolean
+        max_trials:
+          type: integer
+          format: int32
+        timeout_seconds:
+          type: integer
+          format: int64
+        ensemble_size:
+          type: integer
+        cross_validation_folds:
+          type: integer
+          format: int32
+
+    AggregationMode:
+      type: string
+      enum:
+        - FedAvg
+        - FedProx
+
+    FederatedConfig:
+      type: object
+      properties:
+        aggregation:
+          $ref: '#/components/schemas/AggregationMode'
+        min_clients_per_round:
+          type: integer
+          format: int32
+        max_clients_per_round:
+          type: integer
+          format: int32
+        rounds:
+          type: integer
+          format: int32
+        privacy_budget:
+          type: number
+          format: double
+        secure_aggregation:
+          type: boolean
 
     MonitoringAlert:
       type: object
