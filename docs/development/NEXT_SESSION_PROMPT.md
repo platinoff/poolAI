@@ -1,59 +1,38 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 · **Фаза:** **Horizon** (Layer C → 100%) · **Autoprogon A+B:** ✅ S34 · **Horizon S35–S39:** ✅
+**Оновлено:** 2026-05-19 · **Фаза:** **Maintenance** (Horizon S35–S40 ✅ · A+B+C **100%**)
 
-**Копіюй блок нижче** в нову сесію (один спринт за ітерацію).
+**Копіюй блок нижче** в нову сесію (утримання `main`, без нових horizon-спринтів без явного запиту).
 
 ---
 
 ## Промпт
 
 ```
-PoolAI — Horizon: довести Layer C і проєкт до 100% (оркестратор + FM).
+PoolAI — maintenance: утримувати main (test-ci, FM-003 §4 лише з 2 хостами).
 
-## S0 — зріз (обов’язково)
+## S0 — зріз
 
 1. git fetch && git status -sb (main).
 2. HANDOFF_NEW_SESSION.md
-3. FUNCTION_MANAGEMENT.md §5.1, §5.6, §5.3
-4. HORIZON_TO_100_PLAN.md
-5. AUTO_RUN_SESSION_2026_HORIZON.md — перший [ ] у §4
-6. .cursor/rules/autonomous-orchestrator.mdc
-7. NEXT_STEPS_ARCHITECT_2026-03-17.md — операційний порядок + P6 wire
+3. FUNCTION_MANAGEMENT.md §5.1, §5.6
+4. DEVELOPMENT_PROGRESS_2026-05-19.md — A+B+C **100%**
 
-Autoprogon S21–S34 і Horizon S35–S39 — не повторювати.
+Horizon S35–S40 — не повторювати.
 
-## Мета ітерації (одна за сесію)
+## Мета ітерації
 
-| Спринт | FM | Фокус | Критерій |
-|--------|-----|--------|----------|
-| S40 | C | 100% closure | DEVELOPMENT_PROGRESS C=100%, project 100%, FM §5.6, CHANGELOG, NEXT_SESSION → maintenance |
+- `cargo test-ci` (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28) після змін у src/tests.
+- Нові FM-* — лише за запитом користувача або регресія.
+- FM-003 §4 LAN sign-off — **BLOCKED** (2 фізичні хости); runbook only.
 
-Почни з S40 (перший незакритий у AUTO_RUN_SESSION_2026_HORIZON.md §4).
+Поза обсягом: mainnet Solana, KYC, FM-004/006/009/010 re-implementation без запиту.
 
-Перед кодом S40:
-- HORIZON_TO_100_PLAN.md §«Перевірка Layer C = 100%»
-- DEVELOPMENT_PROGRESS_2026-05-19.md
-- FUNCTION_MANAGEMENT §5.6
+## Завершення (якщо були зміни)
 
-Архітектура (вже в коді, лише утримувати):
-- src/grid/, src/job/, src/memory/
-- crates/poolai-solana-adapter/
-- turboquant-simd feature
-
-## Завершення ітерації
-
-1. Зміни src/ → cargo fmt --all → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28).
-2. Нові/змінені API → docs/openapi.yaml (+ OPENAPI_GAP_AUDIT за потреби).
-3. Оновити: AUTO_RUN §Sxx, FM §5.6, HANDOFF, DEVELOPMENT_PROGRESS, AUTO_DEV_PATTERNS.
-4. commit + push MSYS2 з Summary (subject + 3–5 рядків); git -c commit.template= commit -F msgfile.
-
-Не стаджити: data/audit/*.log.gz, data/dev/, data/lan-stand/, .commit-msg-*.txt.
-Поза обсягом: FM-003 §4 LAN (2 хости), mainnet Solana, KYC.
-
-## Після S40 (maintenance)
-
-NEXT_SESSION → режим утримання: test-ci на main, FM-003 §4 лише з 2 хостами.
+1. cargo fmt --all → test-ci за потреби.
+2. Оновити HANDOFF / CHANGELOG / FM лише при зміні продукту.
+3. commit + push MSYS2 з Summary; не стаджити data/audit/*.log.gz, .commit-msg-*.txt.
 ```
 
 ---
@@ -62,10 +41,10 @@ NEXT_SESSION → режим утримання: test-ci на main, FM-003 §4 л
 
 | Документ | Роль |
 |----------|------|
-| [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md) | Методика C→100% |
-| [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) | Черга S39–S40 |
-| [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | C **~80%**, проєкт **~93%** |
-| [`ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md) | Дерево `src/` + workspace |
+| [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
+| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) | FM-* канон |
+| [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | A+B+C **100%** |
+| [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) | Horizon — **закрито** S35–S40 |
 | [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bash bin/run-poolai.sh single` |
 
-**Наступна сесія:** **S40** (Layer C + project 100% closure). Після S40 — maintenance mode.
+**Horizon закрито 2026-05-19 (S40).** Наступні епіки — лише за явним запитом.

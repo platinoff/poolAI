@@ -44,7 +44,7 @@
 4. **Horizon (активна черга)** — **S39** FM-006 cloud-sdk → **S40** closure — [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md).
 5. **Ops BLOCKED** — **FM-003 §4** (2 хости).
 
-**Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C **~65%** (S35–S38 ✅) — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+**Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C **100%** (S35–S40 ✅) — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Закрито (Horizon код):** **FM-004/009/010** ✅ (S35–S37); **P6 Job/Memory wire** ✅ (S38: `src/job/`, `src/memory/`, `/api/v1/jobs`).
 

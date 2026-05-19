@@ -12,8 +12,8 @@
 |-----|-------|------|
 | **A** (FM-001…019) | **100%** | утримувати |
 | **B** (Architect P1–P5) | **100%** | утримувати |
-| **C** (Horizon) | **~80%** → **100%** | S35–S39 ✅; S40 |
-| **Проєкт (зважено)** | **~93%** | **100%** після S40 |
+| **C** (Horizon) | **100%** | S35–S40 ✅ (2026-05-19) |
+| **Проєкт (зважено)** | **100%** | (A+B+C)/3 |
 
 **Формула проєкту (орієнтир):** `(A + B + C) / 3` → при C=100% і A=B=100% → **100%**.
 
@@ -74,12 +74,12 @@ flowchart LR
 
 ## Перевірка Layer C = 100%
 
-- [ ] FM-004, FM-009, FM-010 — **Implemented** у таблиці FM-* (не Concept-only)
-- [ ] Job/Memory — мінімальні типи в `src/` + тести
+- [x] FM-004, FM-009, FM-010 — **Implemented** у таблиці FM-* (S35–S37)
+- [x] Job/Memory — мінімальні типи в `src/` + тести (S38)
 - [x] FM-006 — Implemented за scope S39 (`CLOUD_SDK_STATUS.md`)
-- [ ] `DEVELOPMENT_PROGRESS` — Layer C **100%**, проєкт **100%**
-- [ ] Немає суперечностей 93% у STABLE_STATE / Architect §операційний порядок
+- [x] `DEVELOPMENT_PROGRESS` — Layer C **100%**, проєкт **100%** (S40)
+- [x] Architect §операційний порядок — horizon queue закрито; LAN §4 залишається ops BLOCKED
 
 ---
 
-**Last updated:** 2026-05-19 (підготовка до S35).
+**Last updated:** 2026-05-19 (S40 closure — Layer C + project **100%**).

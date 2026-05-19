@@ -60,9 +60,17 @@ cargo test-ci
 - [x] S37 FM-010
 - [x] S38 Job/Memory
 - [x] S39 FM-006
-- [ ] S40 Layer C **100%** + project **100%**
-- [ ] `AUTO_DEV_PATTERNS.md` — шляхи horizon
-- [ ] push MSYS2 + Summary
+- [x] S40 Layer C **100%** + project **100%**
+- [x] `AUTO_DEV_PATTERNS.md` — шляхи horizon
+- [x] push MSYS2 + Summary (S39 `956a8aef`, S40 — ця сесія)
+
+---
+
+## S40 — виконання (2026-05-19)
+
+**Closure:** `DEVELOPMENT_PROGRESS` C=100%, project=100%; FM §5.6 S40 ✅; `HORIZON_TO_100_PLAN` checkboxes; `NEXT_SESSION_PROMPT` → maintenance; README/FM/Architect зріз.
+
+**Перевірка:** docs-only (без змін `src/`).
 
 ---
 

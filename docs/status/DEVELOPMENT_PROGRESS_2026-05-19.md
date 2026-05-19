@@ -1,6 +1,6 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-05-19 (після **S39** Horizon) · **Гілка:** `main`
+**Оновлено:** 2026-05-19 (після **S40** Horizon closure) · **Гілка:** `main`
 
 ---
 
@@ -11,10 +11,10 @@
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | Код + CI + harness; LAN sign-off і cloud-sdk deep — поза scope |
 | **A+B (офіційний autoprogon)** | **100%** | HANDOFF / README / FM §5.5 |
-| **C. Horizon (код P6)** | **~80%** → **100%** | S35–S39 ✅; S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
-| **Проєкт (A+B+C)/3** | **~93%** → **100%** | після S40 |
+| **C. Horizon (код P6)** | **100%** | S35–S40 ✅ — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
+| **Проєкт (A+B+C)/3** | **100%** | офіційний зріз після S40 |
 
-**Наступна фаза:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md) · промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна фаза:** **maintenance** — [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md); ops: FM-003 §4 LAN (**BLOCKED**, 2 хости).
 
 ---
 
@@ -58,6 +58,7 @@
 | S37 | FM-010 Solana MVP | ✅ |
 | S38 | Job/Memory wire | ✅ |
 | S39 | FM-006 cloud-sdk | ✅ |
+| S40 | Layer C + project closure | ✅ |
 
 | Спринт | FM | % внеску C (орієнтир) |
 |--------|-----|----------------------|
@@ -66,9 +67,9 @@
 | S37 | FM-010 Solana MVP | +20% ✅ |
 | S38 | Job/Memory wire | +15% ✅ |
 | S39 | FM-006 cloud-sdk | +15% ✅ |
-| S40 | docs closure | +10% |
+| S40 | docs closure | +10% ✅ |
 
-**LAN §4** — ops BLOCKED; не входить у C%.
+**Розрахунок C:** S35–S40 = **100%**. **LAN §4** — ops BLOCKED; не входить у C%.
 
 ---
 

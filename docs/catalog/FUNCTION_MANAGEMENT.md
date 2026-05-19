@@ -1,10 +1,10 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-19 (Horizon S35–S37 ✅; Layer C **~50%**; [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md)).
+**Оновлено:** 2026-05-19 (Horizon S35–S40 ✅; Layer C + проєкт **100%**; [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
-**Horizon (Layer C → 100%):** FM-004, FM-009, FM-010, Job/Memory, FM-006 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md), [`AUTO_RUN_SESSION_2026_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_HORIZON.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
+**Horizon (Layer C):** **100%** ✅ S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
 
 **Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); E2E S29 — `bash bin/e2e-playwright.sh --start` (5 passed); clippy — CI на `main`.
 
@@ -123,7 +123,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | **Horizon S40** | Layer C + project 100% closure | `HORIZON_TO_100_PLAN.md` |
+| 1 | **Maintenance** | `cargo test-ci` на `main`; нові FM — за запитом | `NEXT_SESSION_PROMPT.md` |
 | — | **A+B autoprogon** | **✅ 100%** | S34 |
 | — | FM-003 §4 LAN | **BLOCKED** | 2 хости (ops) |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
@@ -226,7 +226,7 @@ FM-xxx (з таблиці нижче)
 | S37 | FM-010 Solana adapter MVP | [x] ✅ |
 | S38 | Job/Memory wire | [x] ✅ |
 | S39 | FM-006 cloud-sdk | [x] ✅ |
-| S40 | Layer C + project 100% docs | [ ] |
+| S40 | Layer C + project 100% docs | [x] ✅ |
 
 ### 5.5 Прогрес розробки (аудит менеджера функціоналу, 2026-05-19)
 
@@ -237,8 +237,8 @@ FM-xxx (з таблиці нижче)
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 (S33) |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | S34; LAN §4 / cloud-sdk deep — ops/Deferred |
 | **A+B autoprogon** | **100%** | офіційний зріз HANDOFF |
-| **C. Horizon** | **~80%** → **100%** | S35–S39 ✅; S40 відкрито |
-| **Проєкт (A+B+C)/3** | **~93%** → **100%** | після S40 |
+| **C. Horizon** | **100%** | S35–S40 ✅ |
+| **Проєкт (A+B+C)/3** | **100%** | офіційний зріз S40 |
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 

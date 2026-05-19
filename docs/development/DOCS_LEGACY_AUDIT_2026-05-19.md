@@ -60,7 +60,7 @@
 | **FM-003 §4** LAN sign-off | **BLOCKED** (2 хости) |
 | **FM-004/006** | **Deferred** |
 | **FM-009/010**, **P6** | **Concept-only** |
-| **Layer C** | **79%** |
+| **Layer C** | **100%** (S40; було 79% до Horizon S35–S40) |
 
 **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) (підтримка / horizon).
 

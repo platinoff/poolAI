@@ -520,7 +520,12 @@
 
 - **Де:** `docs/development/HORIZON_TO_100_PLAN.md`, `AUTO_RUN_SESSION_2026_HORIZON.md`, FM §5.6
 - **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
-- **Черга:** S35–S39 ✅ → S40 closure
+- **Черга:** S35–S40 ✅ — **Horizon закрито**; далі maintenance (`NEXT_SESSION_PROMPT.md`)
+
+### [Horizon] S40 closure — Layer C + project 100% (docs)
+- **Де:** `DEVELOPMENT_PROGRESS_2026-05-19.md`, `HORIZON_TO_100_PLAN.md` §перевірка, FM §5.6, `NEXT_SESSION_PROMPT.md`
+- **Сигнал:** C=100%, (A+B+C)/3=100%; S40 [x] у `AUTO_RUN_SESSION_2026_HORIZON.md`
+- **Патерн:** без змін `src/`; ops BLOCKED (FM-003 §4 LAN) не знижує %
 
 ### [Cloud] FM-006 Azure/GCP REST scope (S39)
 - **Де:** `src/cloud/providers/azure.rs`, `gcp.rs`, `docs/cloud/CLOUD_SDK_STATUS.md`
@@ -555,7 +560,7 @@
 ### [FM] Autoprogon 100% — закриття (S34)
 
 - **Де:** `DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5, `NEXT_SESSION_PROMPT.md`
-- **Сигнал:** шар A+B **100%**; Layer C **79%**
+- **Сигнал:** шар A+B **100%**; Layer C **100%** (S40)
 - **Патерн:** відкриті Architect `[ ]` для LAN/cloud-sdk — **horizon**, не backlog autoprogon
 - **E2E:** усі admin nav routes в `admin.spec.ts` (S34: libs `#libraries-list`)
 - **FM:** підтримка / ops лише за запитом
