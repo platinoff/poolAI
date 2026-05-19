@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-18 (OpenAPI FM-016+ Telegram S14).
+**Оновлено:** 2026-05-18 (OpenAPI S17 config/ui/completions/ai-ml).
 
 ---
 
@@ -448,6 +448,13 @@
 - **Патерн:** peers `GET /discovery/peers`, `GET .../peers/{peer_id}`; local announce `POST /discovery/register` (200/503); health `GET .../virtual-nodes/{peer_id}/health` → `RemoteHealthProbe` (200/404/503)
 - **Перевірка:** `cargo test-ci`; `discovery_remote_register_integration`, `virtual_node_*`
 - **FM:** FM-016
+
+### [OpenAPI] Config, UI, completions, enterprise ML pipeline
+- **Де:** `src/network/api/{system,ui,completions,ai_ml}.rs`; `docs/openapi.yaml`
+- **Сигнал:** `rg '\.route\(' src/network/api/{system,ui,completions,ai_ml}.rs` vs `rg '^  /(config|ui/|v1/chat|ai-ml/)' docs/openapi.yaml`
+- **Патерн:** v1 base — `/config` GET public, PUT `admin:all`; `/ui/*` dashboards need `enterprise`; chat at `/v1/chat/completions` → full URL `/api/v1/v1/chat/completions`; `/ai-ml/*` — path-level `servers: /api/enterprise` (features `enterprise`+`ml`)
+- **Перевірка:** `cargo test-ci`; `tests/admin_ui_api_contracts.rs` (`config_get`); `tests/network_api_integration.rs` (`test_config_get`, chat completions URI)
+- **FM:** FM-014 (config), FM-012/013 (UI), DIGEST §ML
 
 ## Документація (кроки 1–12)
 

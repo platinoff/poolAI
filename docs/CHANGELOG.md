@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **OpenAPI (2026-05-18, S17)** — `GET/PUT /config`; `/ui/dashboards|themes|components`; `POST /v1/chat/completions`; enterprise `/ai-ml/pipeline*` (+ demo, execute).
+- **AUTO_RUN 2026-06-27 (S17)** — OpenAPI config/ui/completions/ai-ml; HANDOFF/FM §5.3.
 - **OpenAPI (2026-05-18, S16)** — admin/overview, topology (4 paths), model instance CRUD + previews + `/state`.
 - **AUTO_RUN 2026-06-26 (S16)** — OpenAPI admin/topology/instances; HANDOFF/FM §5.3.
 - **OpenAPI (2026-05-18, S15)** — FM-016 discovery: peers list/get, local register, virtual-node health probe; schemas `PeerInfo`, `RemoteHealthProbe`.
