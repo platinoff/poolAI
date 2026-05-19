@@ -13,6 +13,6 @@
 - [x] OpenAPI ↔ `admin.rs`, `topology.rs`, `instances.rs`
 - [x] HANDOFF + FM §5.1/§5.3
 - [x] `cargo fmt` + `cargo test-ci`
-- [x] push
+- [x] push — `fe712c7d`
 
 **Поза обсягом:** FM-003 §4; `ai_ml/pipeline`; FM-004/006/009/010.
