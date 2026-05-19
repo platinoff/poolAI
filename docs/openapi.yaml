@@ -81,6 +81,10 @@ tags:
     description: Alerts, dashboards, metrics, alert rules (`enterprise_api/monitoring.rs`)
   - name: EnterpriseSecurity
     description: OAuth2/SAML provider registry and policies (`enterprise_api/security.rs`)
+  - name: EnterpriseTenants
+    description: Multi-tenant lifecycle and quotas (`enterprise_api/tenants.rs`)
+  - name: EnterpriseAudit
+    description: Audit log query (`enterprise_api/audit.rs`)
 
 paths:
   /status:
@@ -1864,6 +1868,273 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /tenants:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseTenants
+      summary: List tenants
+      operationId: listTenants
+      responses:
+        '200':
+          description: Tenant list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tenant'
+    post:
+      tags:
+        - EnterpriseTenants
+      summary: Create tenant
+      operationId: createTenant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCreateRequest'
+      responses:
+        '200':
+          description: Created tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '503':
+          description: Tenant manager unavailable
+
+  /tenants/{id}:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseTenants
+      summary: Get tenant by id
+      operationId: getTenant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '400':
+          description: Invalid UUID
+        '404':
+          description: Tenant not found
+    post:
+      tags:
+        - EnterpriseTenants
+      summary: Update tenant
+      description: Requires JWT with `admin:all` (`POST`, not PUT).
+      operationId: updateTenant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantUpdateRequest'
+      responses:
+        '200':
+          description: Updated tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+    delete:
+      tags:
+        - EnterpriseTenants
+      summary: Delete tenant
+      operationId: deleteTenant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tenant deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid UUID
+        '401':
+          description: Unauthorized
+
+  /tenants/{id}/usage:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseTenants
+      summary: Get tenant resource usage
+      operationId: getTenantUsage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Current usage snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResourceUsage'
+        '400':
+          description: Invalid UUID
+        '404':
+          description: Tenant not found
+
+  /tenants/{id}/quota:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    post:
+      tags:
+        - EnterpriseTenants
+      summary: Check tenant quota for requested resources
+      operationId: checkTenantQuota
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaCheckRequest'
+      responses:
+        '200':
+          description: Quota check result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaCheckResult'
+        '400':
+          description: Invalid UUID
+        '404':
+          description: Tenant not found
+
+  /audit/events:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAudit
+      summary: Query audit events
+      operationId: queryAuditEvents
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: resource_type
+          in: query
+          schema:
+            type: string
+        - name: result
+          in: query
+          schema:
+            type: string
+        - name: min_level
+          in: query
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Matching audit events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+        '503':
+          description: Audit logger unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Query failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /auth/github:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -2022,6 +2293,60 @@ paths:
           description: Invalid Telegram signature or expired auth_date
         '403':
           description: User not in allowlist
+
+  /auth/saml/{provider}:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: Start SAML SSO flow
+      description: Redirects to IdP SSO URL for the named provider (`saml_auth_handler`).
+      operationId: samlAuth
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to IdP
+        '503':
+          description: Security manager unavailable
+        '500':
+          description: Failed to build SSO URL
+
+  /auth/saml/{provider}/callback:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    post:
+      tags:
+        - EnterpriseAuth
+      summary: SAML assertion consumer
+      description: Validates `SAMLResponse`, creates/finds user, redirects to `/ui/auth` (or `RelayState`).
+      operationId: samlCallback
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SamlCallbackForm'
+      responses:
+        '302':
+          description: Redirect to UI with JWT
+        '400':
+          description: Invalid SAML assertion
+        '503':
+          description: Security manager unavailable
 
   /monitoring/alerts:
     servers:
@@ -2375,6 +2700,136 @@ paths:
         - EnterpriseSecurity
       summary: Delete OAuth2 provider
       operationId: deleteOAuth2Provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Provider removed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Provider not found
+
+  /security/saml/providers:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: List SAML provider configs
+      operationId: listSamlProviders
+      responses:
+        '200':
+          description: SAML providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SamlProviderInfo'
+        '503':
+          description: Security manager unavailable
+    post:
+      tags:
+        - EnterpriseSecurity
+      summary: Register SAML provider
+      description: Requires `admin:all`.
+      operationId: registerSamlProvider
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SamlProviderRegisterRequest'
+      responses:
+        '201':
+          description: Provider registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: Invalid config
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /security/saml/providers/{name}:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: Get SAML provider by name
+      operationId: getSamlProvider
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Provider config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SamlProviderInfo'
+        '404':
+          description: Provider not found
+        '503':
+          description: Security manager unavailable
+    put:
+      tags:
+        - EnterpriseSecurity
+      summary: Update SAML provider
+      operationId: updateSamlProvider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SamlProviderRegisterRequest'
+      responses:
+        '200':
+          description: Provider updated
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Provider not found
+    delete:
+      tags:
+        - EnterpriseSecurity
+      summary: Delete SAML provider
+      operationId: deleteSamlProvider
       security:
         - bearerAuth: []
       parameters:
@@ -3650,6 +4105,182 @@ components:
               type: array
               items:
                 type: string
+
+    TenantConfig:
+      type: object
+      properties:
+        max_workers:
+          type: integer
+          nullable: true
+        max_memory_mb:
+          type: integer
+          format: int64
+          nullable: true
+        max_cpu_cores:
+          type: integer
+          nullable: true
+        max_storage_mb:
+          type: integer
+          format: int64
+          nullable: true
+        max_vm_instances:
+          type: integer
+          nullable: true
+        active:
+          type: boolean
+
+    TenantResourceUsage:
+      type: object
+      properties:
+        workers:
+          type: integer
+        memory_mb:
+          type: integer
+          format: int64
+        cpu_cores:
+          type: integer
+        storage_mb:
+          type: integer
+          format: int64
+        vm_instances:
+          type: integer
+
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        config:
+          $ref: '#/components/schemas/TenantConfig'
+        usage:
+          $ref: '#/components/schemas/TenantResourceUsage'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    TenantCreateRequest:
+      type: object
+      required:
+        - name
+        - config
+      properties:
+        name:
+          type: string
+        config:
+          $ref: '#/components/schemas/TenantConfig'
+
+    TenantUpdateRequest:
+      type: object
+      properties:
+        config:
+          $ref: '#/components/schemas/TenantConfig'
+        active:
+          type: boolean
+
+    QuotaCheckRequest:
+      type: object
+      required:
+        - workers
+        - memory_mb
+        - cpu_cores
+      properties:
+        workers:
+          type: integer
+        memory_mb:
+          type: integer
+          format: int64
+        cpu_cores:
+          type: integer
+        storage_mb:
+          type: integer
+          format: int64
+          nullable: true
+        vm_instances:
+          type: integer
+          nullable: true
+
+    QuotaCheckResult:
+      type: object
+      properties:
+        allowed:
+          type: boolean
+        reason:
+          type: string
+          nullable: true
+        projected_usage:
+          $ref: '#/components/schemas/TenantResourceUsage'
+
+    AuditEvent:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        level:
+          type: string
+        user_id:
+          type: string
+          nullable: true
+        tenant_id:
+          type: string
+          nullable: true
+        action:
+          type: string
+        resource_type:
+          type: string
+        resource_id:
+          type: string
+          nullable: true
+        result:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+    SamlCallbackForm:
+      type: object
+      required:
+        - SAMLResponse
+      properties:
+        SAMLResponse:
+          type: string
+        RelayState:
+          type: string
+          nullable: true
+
+    SamlProviderInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        entity_id:
+          type: string
+        sso_url:
+          type: string
+
+    SamlProviderRegisterRequest:
+      type: object
+      required:
+        - name
+        - config
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        config:
+          type: object
+          description: SAML IdP config (`enterprise::security::SamlConfig`)
+          additionalProperties: true
 
     ErrorResponse:
       type: object

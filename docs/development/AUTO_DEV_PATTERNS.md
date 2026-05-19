@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-18 (OpenAPI S18 enterprise OAuth/monitoring).
+**Оновлено:** 2026-05-18 (OpenAPI S19 tenants/audit/SAML).
 
 ---
 
@@ -462,6 +462,13 @@
 - **Патерн:** base `/api/enterprise`; OAuth `GET /auth/{github,google,telegram}` → 302/HTML; callbacks → `/ui/auth?token=`; monitoring alerts query `severity|tenant_id|acknowledged`; `POST .../alerts/{id}/acknowledge` needs JWT; security OAuth2 CRUD `admin:all`
 - **Перевірка:** `cargo test-ci`; unit tests у `oauth.rs` (Telegram HMAC/allowlist)
 - **FM:** FM-012 (OAuth/Telegram)
+
+### [OpenAPI] Enterprise tenants, audit, SAML
+- **Де:** `src/network/enterprise_api/{tenants,audit,saml,security}.rs`; `docs/openapi.yaml`
+- **Сигнал:** `rg '\.route\(' src/network/enterprise_api/mod.rs` vs `rg '^  /(tenants|audit/|auth/saml|security/saml)' docs/openapi.yaml`
+- **Патерн:** tenants `POST /tenants/{id}` = update (не PUT); quota `POST .../quota` + `QuotaCheckRequest`; audit `GET /audit/events` + 8 query filters; SAML `POST .../callback` form `SAMLResponse`/`RelayState`
+- **Перевірка:** `cargo test-ci` (docs-only OK)
+- **FM:** FM-012 (SAML SSO), multi-tenancy
 
 ## Документація (кроки 1–12)
 
