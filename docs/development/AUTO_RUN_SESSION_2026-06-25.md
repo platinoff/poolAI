@@ -16,7 +16,7 @@
 
 - [x] OpenAPI ↔ `discovery.rs`
 - [x] HANDOFF + FM §5.1/§5.3
-- [ ] `cargo fmt` + `cargo test-ci`
-- [ ] push
+- [x] `cargo fmt` + `cargo test-ci`
+- [x] push — `c54b2690`
 
 **Поза обсягом:** FM-003 §4; FM-004/006/009/010; `data/audit/*`.
