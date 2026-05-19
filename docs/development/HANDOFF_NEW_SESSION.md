@@ -1,12 +1,12 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-27.md`](./AUTO_RUN_SESSION_2026-06-27.md) — OpenAPI config/ui/completions/ai-ml S17).
+**Оновлено:** 2026-05-18 ([`AUTO_RUN_SESSION_2026-06-28.md`](./AUTO_RUN_SESSION_2026-06-28.md) — OpenAPI enterprise OAuth/monitoring S18).
 
-**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-27.md`](./AUTO_RUN_SESSION_2026-06-27.md). **FM-003 §4** BLOCKED.
+**Автономний прогін:** [`AUTO_RUN_SESSION_2026-06-28.md`](./AUTO_RUN_SESSION_2026-06-28.md). **FM-003 §4** BLOCKED.
 
 **FM-003:** dev stand ✅ (`bin/run-virtual-node-dev.*`, `verify-dev-stand.*`, `core::dev_stand`). Real LAN §4 — **BLOCKED** (два фізичні хости).
 
-**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅ (S7–S12):** pa11y 18 auth + login; `PA11Y_WCAG22=1`; `a11y.yml` PR; `ci.yml` `pa11y-contract`. **OpenAPI (S14–S17):** FM-016 discovery/Telegram; admin/topology/instances; **S17** — `/config`, `/ui/*`, `/v1/chat/completions`, `/api/enterprise/ai-ml/pipeline*`. **Далі (§5.1):** enterprise OAuth/monitoring OpenAPI; Playwright E2E — опційно; див. [`AUTO_RUN_SESSION_2026-06-27.md`](./AUTO_RUN_SESSION_2026-06-27.md). **Не в автопрогоні:** FM-004/006/009/010. Звірка — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
+**FM-016 ✅:** virtual nodes + `poolai-worker`. **FM-016+ ✅:** bind/webhook/store. **FM-016++ ✅:** `poolai-telegram-bot`. **FM-016+++ ✅:** pool join, `raid_artifact_probe`, artifact cache, verify-dev-stand e2e. **FM-012 ✅:** OAuth (2026-05-27). **P4 ✅ (2026-05-18):** `poolai_health_load` → [`BENCHMARKS.md`](../performance/BENCHMARKS.md). **FM-019 partial ✅ (S7–S12):** pa11y 18 auth + login; `PA11Y_WCAG22=1`; `a11y.yml` PR; `ci.yml` `pa11y-contract`. **OpenAPI (S14–S18):** FM-016 discovery/Telegram; admin/topology/instances; S17 config/ui/completions/ai-ml; **S18** — enterprise `/auth/*`, `/monitoring/*`, `/security/oauth2/providers*`. **Далі (§5.1):** tenants/audit/SAML OpenAPI; Playwright E2E — опційно; [`AUTO_RUN_SESSION_2026-06-28.md`](./AUTO_RUN_SESSION_2026-06-28.md). **Не в автопрогоні:** FM-004/006/009/010. Звірка — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
 **Зріз:** FM-015 ✅, FM-012 ✅. §5.1 [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md).
 
@@ -86,7 +86,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | 1 | **FM-003 §4** — реальний LAN sign-off | **BLOCKED** (2 хости) |
 | 2 | **FM-019** — pa11y / WCAG 2.2 | **Partial ✅** S7–S12 (18 auth, WCAG22, CI) |
 | 2b | **UI E2E** — Playwright | backlog — `UI_QUALITY_AND_E2E_PLAN` |
-| 3 | **OpenAPI** sync | **Partial** — S14–S17 config/ui/completions/ai-ml pipeline; enterprise OAuth/monitoring — ongoing |
+| 3 | **OpenAPI** sync | **Partial** — S14–S18 OAuth/monitoring/security; tenants/audit/SAML — ongoing |
 | — | **P4** — `poolai_health_load` | ✅ **2026-05-18** (`BENCHMARKS.md`) |
 | — | FM-004/006 | Deferred, поза автопрогоном |
 | — | FM-009/010 | Concept-only |
@@ -95,7 +95,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (наступна сесія → git push)
 
-1. Старт: [`AUTO_RUN_SESSION_2026-06-27.md`](./AUTO_RUN_SESSION_2026-06-27.md) — OpenAPI / наступний пункт з рекомендацій.
+1. Старт: [`AUTO_RUN_SESSION_2026-06-28.md`](./AUTO_RUN_SESSION_2026-06-28.md) — OpenAPI / push S17+S18 з MSYS2.
 2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після коду — `cargo fmt` + `cargo test-ci`.
 3. **Не в обсязі:** FM-004, FM-006, FM-009, FM-010.
 4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); `git -c commit.template= commit -F msgfile`.

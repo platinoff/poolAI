@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-18 (OpenAPI S17 config/ui/completions/ai-ml).
+**Оновлено:** 2026-05-18 (OpenAPI S18 enterprise OAuth/monitoring).
 
 ---
 
@@ -455,6 +455,13 @@
 - **Патерн:** v1 base — `/config` GET public, PUT `admin:all`; `/ui/*` dashboards need `enterprise`; chat at `/v1/chat/completions` → full URL `/api/v1/v1/chat/completions`; `/ai-ml/*` — path-level `servers: /api/enterprise` (features `enterprise`+`ml`)
 - **Перевірка:** `cargo test-ci`; `tests/admin_ui_api_contracts.rs` (`config_get`); `tests/network_api_integration.rs` (`test_config_get`, chat completions URI)
 - **FM:** FM-014 (config), FM-012/013 (UI), DIGEST §ML
+
+### [OpenAPI] Enterprise OAuth, monitoring, OAuth2 providers
+- **Де:** `src/network/enterprise_api/{oauth,monitoring,security}.rs`, `mod.rs`; `docs/openapi.yaml`
+- **Сигнал:** `rg '\.route\(' src/network/enterprise_api/mod.rs` vs `rg '^  /(auth/|monitoring/|security/oauth2)' docs/openapi.yaml`
+- **Патерн:** base `/api/enterprise`; OAuth `GET /auth/{github,google,telegram}` → 302/HTML; callbacks → `/ui/auth?token=`; monitoring alerts query `severity|tenant_id|acknowledged`; `POST .../alerts/{id}/acknowledge` needs JWT; security OAuth2 CRUD `admin:all`
+- **Перевірка:** `cargo test-ci`; unit tests у `oauth.rs` (Telegram HMAC/allowlist)
+- **FM:** FM-012 (OAuth/Telegram)
 
 ## Документація (кроки 1–12)
 

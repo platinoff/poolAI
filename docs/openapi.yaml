@@ -75,6 +75,12 @@ tags:
     description: OpenAI-compatible chat completions
   - name: EnterpriseML
     description: Stage 4.4 AI/ML (`src/network/api/ai_ml.rs`, requires `enterprise` + `ml`)
+  - name: EnterpriseAuth
+    description: OAuth2/SAML browser flows (`src/network/enterprise_api/oauth.rs`, `saml.rs`)
+  - name: EnterpriseMonitoring
+    description: Alerts, dashboards, metrics, alert rules (`enterprise_api/monitoring.rs`)
+  - name: EnterpriseSecurity
+    description: OAuth2/SAML provider registry and policies (`enterprise_api/security.rs`)
 
 paths:
   /status:
@@ -1858,6 +1864,535 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /auth/github:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: Start GitHub OAuth2 flow
+      description: Issues CSRF `state`, redirects to GitHub authorization URL (`oauth2_github_auth_handler`).
+      operationId: oauth2GithubAuth
+      responses:
+        '302':
+          description: Redirect to GitHub
+        '404':
+          description: Provider not configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Security manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/github/callback:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: GitHub OAuth2 callback
+      description: Exchanges `code`, verifies `state`, creates/finds user, redirects to `/ui/auth?token=...`.
+      operationId: oauth2GithubCallback
+      parameters:
+        - name: code
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to UI with JWT query params
+        '400':
+          description: Missing or invalid OAuth parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/google:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: Start Google OAuth2 flow
+      operationId: oauth2GoogleAuth
+      responses:
+        '302':
+          description: Redirect to Google
+        '404':
+          description: Provider not configured
+        '503':
+          description: Security manager unavailable
+
+  /auth/google/callback:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: Google OAuth2 callback
+      operationId: oauth2GoogleCallback
+      parameters:
+        - name: code
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to `/ui/auth` with JWT
+        '400':
+          description: Invalid callback parameters
+
+  /auth/telegram:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: Telegram Login Widget page
+      description: HTML page with Telegram widget; optional `lang` query (`uk`/`en`) or `Accept-Language`.
+      operationId: oauth2TelegramAuthPage
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: string
+            enum: [uk, ua, en]
+      responses:
+        '200':
+          description: HTML login page
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Telegram provider not configured
+
+  /auth/telegram/callback:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseAuth
+      summary: Telegram Login Widget callback
+      description: Validates HMAC/`auth_date`, allowlist, assigns Viewer role for new users (FM-012).
+      operationId: oauth2TelegramCallback
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: first_name
+          in: query
+          schema:
+            type: string
+        - name: auth_date
+          in: query
+          schema:
+            type: string
+        - name: hash
+          in: query
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to `/ui/auth` with JWT
+        '401':
+          description: Invalid Telegram signature or expired auth_date
+        '403':
+          description: User not in allowlist
+
+  /monitoring/alerts:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseMonitoring
+      summary: List monitoring alerts
+      operationId: listMonitoringAlerts
+      parameters:
+        - name: severity
+          in: query
+          schema:
+            type: string
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: acknowledged
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Alert list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MonitoringAlert'
+        '503':
+          description: Monitoring manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /monitoring/alerts/{id}/acknowledge:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    post:
+      tags:
+        - EnterpriseMonitoring
+      summary: Acknowledge alert
+      description: Requires `admin:all` or `write:monitoring`.
+      operationId: acknowledgeMonitoringAlert
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Alert acknowledged
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  alert_id:
+                    type: string
+        '400':
+          description: Invalid alert UUID
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Alert not found
+        '503':
+          description: Monitoring manager unavailable
+
+  /monitoring/dashboards:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseMonitoring
+      summary: List monitoring dashboards
+      operationId: listMonitoringDashboards
+      parameters:
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Dashboard list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '503':
+          description: Monitoring manager unavailable
+    post:
+      tags:
+        - EnterpriseMonitoring
+      summary: Create monitoring dashboard
+      operationId: createMonitoringDashboard
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UiDashboardCreateRequest'
+      responses:
+        '201':
+          description: Dashboard created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  dashboard_id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '503':
+          description: Monitoring manager unavailable
+
+  /monitoring/metrics:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseMonitoring
+      summary: Query metric history
+      operationId: queryMonitoringMetrics
+      parameters:
+        - name: metric
+          in: query
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          schema:
+            type: string
+        - name: tenant_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Metric samples
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '503':
+          description: Monitoring manager unavailable
+
+  /monitoring/alert-rules:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseMonitoring
+      summary: List alert rules
+      operationId: listMonitoringAlertRules
+      responses:
+        '200':
+          description: Alert rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MonitoringAlertRule'
+        '503':
+          description: Monitoring manager unavailable
+    post:
+      tags:
+        - EnterpriseMonitoring
+      summary: Create alert rule
+      operationId: createMonitoringAlertRule
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitoringAlertRule'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  rule_name:
+                    type: string
+        '400':
+          description: Invalid rule
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '503':
+          description: Monitoring manager unavailable
+
+  /security/oauth2/providers:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: List OAuth2 provider configs
+      operationId: listOAuth2Providers
+      responses:
+        '200':
+          description: Provider list (secrets redacted in responses)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OAuth2ProviderInfo'
+        '503':
+          description: Security manager unavailable
+    post:
+      tags:
+        - EnterpriseSecurity
+      summary: Register OAuth2 provider
+      description: Requires `admin:all`.
+      operationId: registerOAuth2Provider
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2ProviderRegisterRequest'
+      responses:
+        '201':
+          description: Provider registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  name:
+                    type: string
+        '400':
+          description: Invalid config
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /security/oauth2/providers/{name}:
+    servers:
+      - url: http://localhost:8080/api/enterprise
+      - url: https://your-domain.com/api/enterprise
+    get:
+      tags:
+        - EnterpriseSecurity
+      summary: Get OAuth2 provider by name
+      operationId: getOAuth2Provider
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: github
+      responses:
+        '200':
+          description: Provider config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuth2ProviderInfo'
+        '404':
+          description: Provider not found
+        '503':
+          description: Security manager unavailable
+    put:
+      tags:
+        - EnterpriseSecurity
+      summary: Update OAuth2 provider
+      operationId: updateOAuth2Provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuth2ProviderRegisterRequest'
+      responses:
+        '200':
+          description: Provider updated
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Provider not found
+    delete:
+      tags:
+        - EnterpriseSecurity
+      summary: Delete OAuth2 provider
+      operationId: deleteOAuth2Provider
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Provider removed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Provider not found
+
   /ai-ml/:
     servers:
       - url: http://localhost:8080/api/enterprise
@@ -3021,6 +3556,100 @@ components:
         step_results:
           type: object
           additionalProperties: true
+
+    MonitoringAlert:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        severity:
+          type: string
+        message:
+          type: string
+        acknowledged:
+          type: boolean
+        tenant_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    MonitoringAlertRule:
+      type: object
+      required:
+        - name
+        - metric
+        - threshold
+        - operator
+      properties:
+        name:
+          type: string
+        metric:
+          type: string
+        threshold:
+          type: number
+          format: double
+        operator:
+          type: string
+          example: ">"
+        severity:
+          type: string
+          enum: [info, warning, critical]
+        enabled:
+          type: boolean
+          default: true
+        tenant_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    OAuth2ProviderInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        client_id:
+          type: string
+        redirect_uri:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+
+    OAuth2ProviderRegisterRequest:
+      type: object
+      required:
+        - name
+        - config
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        config:
+          type: object
+          description: OAuth2 client config (`enterprise::security::OAuth2Config`)
+          properties:
+            client_id:
+              type: string
+            client_secret:
+              type: string
+            auth_url:
+              type: string
+            token_url:
+              type: string
+            redirect_uri:
+              type: string
+            scopes:
+              type: array
+              items:
+                type: string
 
     ErrorResponse:
       type: object
