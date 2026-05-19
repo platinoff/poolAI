@@ -22,6 +22,6 @@
 - [x] `tests/pa11y_ci_script.rs`
 - [x] `cargo test-ci` (2026-05-18, exit 0)
 - [x] `FUNCTION_MANAGEMENT` §5.3 + runbook §3.1; `UI_BUGFIXES` archival
-- [ ] push (MSYS2 UCRT64 — [`git-push.md`](../../.cursor/commands/git-push.md))
+- [x] push — `c016d239` (2026-05-18)
 
 **Поза обсягом:** FM-004, FM-006, FM-009, FM-010.
