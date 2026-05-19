@@ -31,6 +31,7 @@
 ./.github/PULL_REQUEST_TEMPLATE.md
 ./.github/SECURITY.md
 ./.github/workflows/a11y.yml
+./.github/workflows/e2e.yml
 ./.github/workflows/benchmarks.yml
 ./.github/workflows/ci.yml
 ./.github/workflows/docs.yml
@@ -44,6 +45,7 @@
 ./bin/cargo-fmt.sh
 ./bin/cargo-test.sh
 ./bin/git-status.sh
+./bin/e2e-playwright.sh
 ./bin/pa11y-ci.sh
 ./bin/README.md
 ./bin/run-lan-nodes.ps1
@@ -71,6 +73,9 @@
 ./data/audit/audit_20260118_085809.log.gz
 ./data/audit/audit_20260119_234500.log.gz
 ./data/audit/audit_20260122_034137.log.gz
+./e2e/package.json
+./e2e/playwright.config.ts
+./e2e/tests/smoke.spec.ts
 ./docker/.dockerignore
 ./docker/docker-compose.yml
 ./docker/Dockerfile
@@ -192,6 +197,7 @@
 ./docs/deployment/helm/values.yaml
 ./docs/deployment/KUBERNETES.md
 ./docs/development/ADMIN_A11Y_RUNBOOK.md
+./docs/development/E2E_PLAYWRIGHT.md
 ./docs/development/AUTO_DEV_PATTERNS.md
 ./docs/development/AUTO_RUN_SESSION_2026-07-01.md
 ./docs/development/ARCHITECT_PLAN_EXO_INTEGRATION_2026-01-17.md

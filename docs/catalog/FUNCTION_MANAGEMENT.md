@@ -123,7 +123,7 @@ FM-xxx (з таблиці нижче)
 |--------|--------|-----------|-----|
 | 1 | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости; dev stand §5.1 + `verify-dev-stand` ✅ |
 | 2 | UI a11y | **FM-019** | **Partial ✅** S7–S12: 18 auth, WCAG22, `a11y.yml`, `pa11y-contract`; E2E Playwright — backlog |
-| 2b | UI E2E | **UI_QUALITY plan** | Playwright smoke — backlog (див. §5.3 legacy) |
+| 2b | UI E2E | **UI_QUALITY plan** | **Partial ✅** S23 Playwright smoke — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
 | 3 | ML ops | **DIGEST §ML** | ✅ runbook у `PIPELINE_MANAGEMENT.md` |
 | — | Ops / benchmarks | **P4** | ✅ рядок `poolai_health_load` **2026-05-18** (`win10-local-26200`); **2026-04-10** — історичний baseline |
 | 4 | Відкладено | **FM-004**, **FM-006** | SIMD TurboQuant; Azure/GCP `cloud-sdk` — поза автопрогоном |
@@ -182,10 +182,8 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Спринт | Фокус |
 |--------|--------|--------|
-| 1 | **S23** | Playwright smoke (опційно) |
-| — | **S21** | ✅ OpenAPI `/ai-ml/optimization*`, `automl`, `federated` (2026-05-19) |
-| — | **S22** | ✅ FM-019 CI merge gate (`pa11y-wcag22` + contract, 2026-05-19) |
-| 2 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
+| 1 | **S24** | `DELETE /ui/dashboards` або UI_QUALITY P1 |
+| — | **S21–S23** | ✅ OpenAPI gap, FM-019 CI, Playwright smoke (2026-05-19) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
 **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.

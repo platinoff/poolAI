@@ -26,5 +26,7 @@ bash bin/cargo-fmt.sh
 | `cargo-fmt.sh` | `cargo fmt --all` |
 | `run-lan-nodes.sh` | 2+ PoolAI вузли на одному хості (FM-003 dev stand; `POOLAI_HTTP_PORT`) |
 | `run-lan-nodes.ps1` | Те саме для Windows PowerShell |
+| `e2e-playwright.sh` | Playwright smoke: login → `/ui/admin/users` (S23; див. `docs/development/E2E_PLAYWRIGHT.md`) |
+| `pa11y-ci.sh` | pa11y WCAG 2.2 (FM-019; `ADMIN_A11Y_RUNBOOK.md`) |
 
 Детальніша інформація: `docs/status/STABLE_STATE_SUMMARY.md`, `docs/performance/LAN_BENCHMARK_RUNBOOK.md` §5.

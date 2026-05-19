@@ -1,0 +1,49 @@
+# S23: optional Playwright smoke (login → admin users). See docs/development/E2E_PLAYWRIGHT.md
+name: E2E (Playwright)
+
+on:
+  workflow_dispatch: {}
+
+env:
+  CARGO_TERM_COLOR: always
+  K8S_OPENAPI_ENABLED_VERSION: "1.28"
+  POOLAI_HTTP_PORT: "8080"
+  POOLAI_E2E_USER: admin
+  POOLAI_E2E_PASSWORD: admin123
+  CI: "true"
+
+jobs:
+  playwright-smoke:
+    name: Playwright smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-e2e-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-
+
+      - name: Install Playwright (e2e/)
+        working-directory: e2e
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Build poolai and run smoke tests
+        run: bash bin/e2e-playwright.sh --start

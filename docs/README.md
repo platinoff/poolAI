@@ -37,6 +37,7 @@
 - **Середовище та Cursor-оновлення** — [development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md](./development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md).
 - **REST API** — [openapi.yaml](./openapi.yaml) (OpenAPI 3).
 - **UI / admin ↔ API** — [development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md](./development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
+- **Playwright E2E (S23)** — [development/E2E_PLAYWRIGHT.md](./development/E2E_PLAYWRIGHT.md); `e2e/tests/smoke.spec.ts`, `bin/e2e-playwright.sh`.
 - **Unified API errors (P3 / FM-005)** ✅ — `src/network/json_errors.rs` (**`HttpAppError`**, **`RestError`**), **`auth.rs`** (включно **`login`/`refresh`** ланцюжок), **`ws.rs`**, **`rate_limit.rs`**, **`enterprise_api/`**, **`check_permission`**. Див. **FM-005** у [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md); [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
 - **Benchmarks (P4)** — [performance/BENCHMARKS.md](./performance/BENCHMARKS.md); baseline (зараз є **dev-sample** — замінити на референс-хост); HTTP **`/api/v1/health`** — **`poolai_health_load`** (**`--json`** для збереження звіту) або **`wrk`**; опційно — [benchmarks.yml](../.github/workflows/benchmarks.yml).
 - **Архів одноразових нотаток** — [archive/](./archive/) (у т.ч. колишні кореневі `PUSH_*.md`).

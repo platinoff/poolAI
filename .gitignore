@@ -34,6 +34,13 @@ scripts/
 .DS_Store
 Thumbs.db
 
+# Playwright E2E (S23)
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
+e2e/blob-report/
+e2e/.cache/
+
 # Build artifacts (if not already in .gitignore)
 target/
 # Alternate CARGO_TARGET_DIR from local test runs (e.g. FM-007)

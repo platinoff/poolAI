@@ -28,7 +28,7 @@
 
 | ID | Пункт | Джерело |
 |----|--------|---------|
-| **UI E2E** | Playwright smoke: login → `/ui` → admin дія | `UI_QUALITY_AND_E2E_PLAN` P2-C, HANDOFF §4 |
+| **UI E2E** | Playwright smoke | **S23 ✅** `e2e/tests/smoke.spec.ts`, `bin/e2e-playwright.sh`, `e2e.yml` dispatch |
 | **OpenAPI gap audit** | `rg '\.route\(' src/network` vs `docs/openapi.yaml` (v1 + enterprise) | AUTO_RUN S20 |
 | **Dashboard DELETE** | `DELETE /ui/dashboards/{id}` → 501 | `ui.rs` — `MonitoringManager.delete_dashboard()` |
 | **BurstRAID metrics** | Опційно v0.2+ | `RUST_ARCHITECT_STATUS` (stale, FM §5.3) |
@@ -74,7 +74,7 @@
 |--------|--------|---------------------|---------------|
 | **S21** | OpenAPI gap audit | ✅ `ai-ml/optimization*`, `automl`, `federated` у yaml (2026-05-19) | — |
 | **S22** | FM-019 CI | ✅ `pa11y-wcag22` + `pa11y-contract` у `ci.yml` (2026-05-19); runbook §3.2 | LAN |
-| **S23** | Playwright (опційно) | `e2e/` smoke: login + 1 admin route; `workflow_dispatch` або local script | FM-004/006/009/010 |
+| **S23** | Playwright (опційно) | ✅ smoke login → `/ui/admin/users` (2026-05-19); `E2E_PLAYWRIGHT.md` | FM-004/006/009/010 |
 | **S24** | UI dashboard DELETE або UI_QUALITY P1 | Реалізація `delete_dashboard` **або** 1 admin contract test + doc | cloud-sdk |
 | **—** | FM-003 §4 | Лише при 2 хостах | — |
 
@@ -102,7 +102,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 
 - [x] **S21** OpenAPI gap audit (optimization/automl/federated)
 - [x] **S22** FM-019 CI merge gate (`pa11y-wcag22` + contract)
-- [ ] Наступний спринт: **S23** Playwright (опційно) або **S24**
+- [x] **S23** Playwright smoke E2E
+- [ ] Наступний спринт: **S24** UI dashboard DELETE або UI_QUALITY P1
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`
