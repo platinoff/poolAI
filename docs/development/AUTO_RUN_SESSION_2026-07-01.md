@@ -79,7 +79,7 @@
 | **S25** | UI_QUALITY P1 | ✅ tenants, OAuth2, dashboards (+3 tests) | — |
 | **S26** | UI_QUALITY P1 (close) | ✅ metrics, alert-rules, SAML, policies (+4 tests; 27 total) | — |
 | **S27** | Playwright E2E розширення | ✅ tenants + monitoring (`admin.spec.ts`) | FM-003 §4 |
-| **S28** | OpenAPI gap audit | `rg` routes vs yaml | LAN |
+| **S28** | OpenAPI gap audit | ✅ v1 Users/RAID/VM + audit doc | LAN |
 | **—** | FM-003 §4 | Лише при 2 хостах | — |
 
 **Після кожного спринту з кодом/доками:** `cargo fmt` → `cargo test-ci` (MSYS2) → `git -c commit.template= commit -F …` → push (зовнішній MSYS2).
@@ -112,7 +112,8 @@ rg "TODO|not yet implemented|NOT_IMPLEMENTED" src/network src/ui src/vm --glob '
 - [x] **S26** UI_QUALITY P1 — metrics, alert-rules, SAML, security policies
 - [x] Прогрес-аудит: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) (**93%** шар A)
 - [x] **S27** Playwright E2E розширення — `e2e/tests/admin.spec.ts` (tenants, monitoring)
-- [ ] FM-003 §4 (BLOCKED) / **S28** OpenAPI gap audit
+- [x] **S28** OpenAPI gap audit — [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md)
+- [ ] FM-003 §4 (BLOCKED)
 - [ ] Оновлено `HANDOFF_NEW_SESSION.md`, FM §5.1/§5.3, `CHANGELOG.md` (якщо публічний API/доки)
 - [ ] `cargo test-ci` + push MSYS2
 - [ ] Не стаджити `data/audit/*.log.gz`

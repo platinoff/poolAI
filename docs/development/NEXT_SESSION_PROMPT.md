@@ -4,59 +4,38 @@
 
 ---
 
-## Промпт (S28 за замовчуванням)
+## Промпт (наступна сесія)
 
 ```
 PoolAI — автономна ітеративна сесія (оркестратор).
 
-## S0 — зріз (обов’язково спочатку)
+## S0 — зріз
 
-1. `git fetch && git status -sb` (гілка main).
-2. Прочитай (кроки 1–12, не весь docs/):
-   - docs/development/HANDOFF_NEW_SESSION.md
-   - docs/development/AUTO_RUN_SESSION_2026-07-01.md (§1–2, §4)
-   - docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md
-   - docs/catalog/FUNCTION_MANAGEMENT.md §5.1, §5.3, §5.5
-   - .cursor/rules/autonomous-orchestrator.mdc
-3. Останні коміти: S27 Playwright admin E2E; прогрес продукту ~93% (шар A).
+1. `git fetch && git status -sb` (main).
+2. HANDOFF_NEW_SESSION.md, AUTO_RUN_SESSION_2026-07-01.md (§1–2, §4),
+   DEVELOPMENT_PROGRESS_2026-05-19.md, FUNCTION_MANAGEMENT.md §5.1/§5.3/§5.5,
+   .cursor/rules/autonomous-orchestrator.mdc
+3. Останній коміт S28 (OpenAPI gap audit); прогрес ~93%.
 
-## Що вже закрито (не повторювати)
+## Не повторювати
 
-| Спринт | Результат |
-|--------|-----------|
-| S21–S21 | OpenAPI ai-ml optimization/automl/federated |
-| S22 | FM-019 CI pa11y-wcag22 + pa11y-contract |
-| S23 | Playwright smoke login → admin users |
-| S24 | DELETE /ui/dashboards/{id} → 204 |
-| S25–S26 | UI_QUALITY P1 ✅ — 27 admin JSON contract tests |
-| S27 | Playwright admin tenants + monitoring E2E |
+S21–S28 (OpenAPI enterprise+ai-ml, pa11y CI, Playwright S23–S27, UI_QUALITY P1, OpenAPI v1 gaps).
 
-## Мета сесії — S28: OpenAPI gap audit (за замовчуванням)
+## Мета (обери одну)
 
-**Фокус:** `rg '\.route\(' src/network` vs `docs/openapi.yaml` — закрити прогалини v1 + enterprise.
+| Пріоритет | Фокус | Критерій |
+|-----------|--------|----------|
+| A | Playwright — `/ui/admin/security`, `/ui/admin/audit` | 1–2 specs + E2E_PLAYWRIGHT.md |
+| B | OpenAPI — `/raid/distributed/*` (6 POST) | yaml + OPENAPI_GAP_AUDIT |
+| C | ML ops | PIPELINE_MANAGEMENT.md hardening |
 
-**Альтернатива:** розширити Playwright (security, audit) або ML ops за `PIPELINE_MANAGEMENT.md`.
+## Завершення
 
-**Критерій готовності S28:**
-- [ ] Звіт прогалин + патчі yaml (або явний backlog у FM)
-- [ ] cargo fmt → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28)
-- [ ] Commit + push MSYS2 (.cursor/commands/git-push.md) з Summary у тілі
-- [ ] HANDOFF, FM §5.1, CHANGELOG, AUTO_DEV_PATTERNS
+cargo fmt → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28) → commit + push MSYS2 з Summary.
 
-**Поза обсягом:** FM-003 §4 (BLOCKED, 2 хости), FM-004/006/009/010.
-
-**Не стаджити:** data/audit/*.log.gz
+Поза обсягом: FM-003 §4 (BLOCKED), FM-004/006/009/010. Не стаджити data/audit/*.log.gz.
 ```
 
 ---
 
-## Якщо користувач просить інший фокус
-
-| Запит | Спринт | Док |
-|-------|--------|-----|
-| Playwright | — | `E2E_PLAYWRIGHT.md` (S27 ✅) |
-| LAN | — | BLOCKED до 2 хостів |
-| ML ops | — | `PIPELINE_MANAGEMENT.md` |
-| SIMD / cloud-sdk deep | — | FM-004/006, Deferred |
-
-Прогрес і «ніколи не зроблено»: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+Прогрес: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).

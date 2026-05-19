@@ -45,6 +45,8 @@ tags:
     description: System metrics and monitoring
   - name: Workers
     description: Worker pool management
+  - name: Users
+    description: User accounts and RBAC (`src/network/api/users.rs`)
   - name: GPU
     description: GPU information and management
   - name: Rewards
@@ -55,6 +57,8 @@ tags:
     description: Virtual machine instance management
   - name: RAID
     description: Distributed storage management
+  - name: RAID Admin
+    description: RAID strategy control plane (`src/network/api/raid_admin.rs`)
   - name: WebSocket
     description: Real-time WebSocket endpoints
   - name: Discovery
@@ -227,6 +231,270 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WorkerInfo'
+    post:
+      tags:
+        - Workers
+      summary: Register a worker in the pool
+      description: Creates a worker entry (`src/network/api/workers.rs`). Requires JWT.
+      operationId: createWorker
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkerRequest'
+      responses:
+        '201':
+          description: Worker created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorkerResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Worker pool not initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /workers/{id}:
+    delete:
+      tags:
+        - Workers
+      summary: Remove a worker from the pool
+      operationId: deleteWorker
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Worker identifier
+      responses:
+        '200':
+          description: Worker removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWorkerResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Worker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Worker pool not initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List users
+      description: Returns all user accounts (no password fields). `GET` is public when user manager is initialized.
+      operationId: listUsers
+      responses:
+        '200':
+          description: User list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInfo'
+        '503':
+          description: User manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: Requires `admin:all` permission.
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '200':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: User manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by id
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: User manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Requires `admin:all` permission.
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Requires `admin:all` permission.
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /discovery/peers:
     get:
@@ -909,6 +1177,49 @@ paths:
                 items:
                   type: object
 
+  /libraries/upload:
+    post:
+      tags:
+        - Libraries
+      summary: Upload library archive
+      description: |
+        Upload a library from base64-encoded archive data (`src/network/api/libraries.rs`).
+        Requires `write:all` or `write:libs`.
+      operationId: uploadLibrary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryUploadRequest'
+      responses:
+        '200':
+          description: Library uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Library manager unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /libraries:
     get:
       tags:
@@ -1466,6 +1777,218 @@ paths:
                   supported:
                     type: boolean
 
+  /vm/templates:
+    get:
+      tags:
+        - VM
+      summary: List VM templates
+      operationId: listVmTemplates
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    post:
+      tags:
+        - VM
+      summary: Create VM template
+      operationId: createVmTemplate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /vm/templates/{id}:
+    get:
+      tags:
+        - VM
+      summary: Get VM template
+      operationId: getVmTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags:
+        - VM
+      summary: Update VM template
+      operationId: updateVmTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+        - VM
+      summary: Delete VM template
+      operationId: deleteVmTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /vm/networks:
+    get:
+      tags:
+        - VM
+      summary: List VM networks
+      operationId: listVmNetworks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Networks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    post:
+      tags:
+        - VM
+      summary: Create VM network
+      operationId: createVmNetwork
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Network created
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /vm/networks/{id}:
+    get:
+      tags:
+        - VM
+      summary: Get VM network
+      operationId: getVmNetwork
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Network
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags:
+        - VM
+      summary: Update VM network
+      operationId: updateVmNetwork
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+        - VM
+      summary: Delete VM network
+      operationId: deleteVmNetwork
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+
   /raid/nodes:
     get:
       tags:
@@ -1503,6 +2026,504 @@ paths:
                 type: array
                 items:
                   type: object
+    post:
+      tags:
+        - RAID
+      summary: Create or store a RAID artifact
+      description: Registers an artifact in RAID storage (Operator/Admin).
+      operationId: createRaidArtifact
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Artifact metadata and payload (see `RaidService::put_artifact`)
+      responses:
+        '200':
+          description: Artifact stored
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /raid/artifacts/{id}:
+    delete:
+      tags:
+        - RAID
+      summary: Delete RAID artifact
+      operationId: deleteRaidArtifact
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Artifact deleted
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /raid/status:
+    get:
+      tags:
+        - RAID
+      summary: RAID cluster status
+      description: Returns `RaidStatusResponse` from `RaidService::cluster_status`.
+      operationId: getRaidStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cluster status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RaidStatusResponse'
+        '503':
+          description: RAID subsystem unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /raid/workers:
+    get:
+      tags:
+        - RAID
+      summary: List RAID storage workers
+      operationId: listRaidWorkers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: RAID workers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    post:
+      tags:
+        - RAID
+      summary: Register RAID worker node
+      operationId: createRaidWorker
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Worker registered
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /raid/workers/{id}:
+    get:
+      tags:
+        - RAID
+      summary: Get RAID worker
+      operationId: getRaidWorker
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Worker details
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags:
+        - RAID
+      summary: Update RAID worker
+      operationId: updateRaidWorker
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Worker updated
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      tags:
+        - RAID
+      summary: Delete RAID worker
+      operationId: deleteRaidWorker
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Worker removed
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/events:
+    get:
+      tags:
+        - RAID
+      summary: List all RAID events
+      operationId: listRaidEvents
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Event log
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items:
+                      type: object
+                  count:
+                    type: integer
+
+  /raid/events/{artifact_id}:
+    get:
+      tags:
+        - RAID
+      summary: Events for one artifact
+      operationId: listRaidEventsForArtifact
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: artifact_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Filtered events
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/events/range:
+    get:
+      tags:
+        - RAID
+      summary: RAID events in time range
+      operationId: listRaidEventsInRange
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Events in range
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/snapshot:
+    get:
+      tags:
+        - RAID
+      summary: Current RAID snapshot metadata
+      operationId: getRaidSnapshot
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Snapshot info
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/snapshot/create:
+    post:
+      tags:
+        - RAID
+      summary: Create RAID snapshot
+      operationId: createRaidSnapshot
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Snapshot created
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/snapshot/restore:
+    post:
+      tags:
+        - RAID
+      summary: Restore RAID from snapshot
+      operationId: restoreRaidSnapshot
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Snapshot restored
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/strategies:
+    get:
+      tags:
+        - RAID
+      summary: RAID replication strategies overview
+      operationId: getRaidStrategies
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Strategies
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/metrics:
+    get:
+      tags:
+        - RAID
+      summary: RAID metrics
+      operationId: getRaidMetrics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Metrics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/health:
+    get:
+      tags:
+        - RAID
+      summary: RAID health check
+      operationId: getRaidHealth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Health
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/rebalance:
+    post:
+      tags:
+        - RAID
+      summary: Trigger RAID rebalance
+      operationId: rebalanceRaid
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rebalance started or completed
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/admin/status:
+    get:
+      tags:
+        - RAID Admin
+      summary: RAID strategy status (admin)
+      description: Wraps `{ "status": { mode, initialized, active, rebalancing_enabled } }` per admin UI contract.
+      operationId: getRaidAdminStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Strategy status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: object
+
+  /raid/admin/rebalance:
+    post:
+      tags:
+        - RAID Admin
+      summary: Trigger admin rebalance
+      operationId: triggerRaidAdminRebalance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rebalance triggered
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/admin/metrics/burst:
+    get:
+      tags:
+        - RAID Admin
+      summary: BurstRAID metrics
+      operationId: getRaidBurstMetrics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: `{ "metrics": { ... } }`
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/admin/metrics/smallworld:
+    get:
+      tags:
+        - RAID Admin
+      summary: Small-world RAID metrics
+      operationId: getRaidSmallWorldMetrics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: `{ "metrics": { ... } }`
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/admin/artifacts/{id}/burst:
+    get:
+      tags:
+        - RAID Admin
+      summary: Per-artifact burst stats
+      operationId: getRaidArtifactBurstStats
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Burst stats
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /raid/admin/nodes/clustering:
+    get:
+      tags:
+        - RAID Admin
+      summary: Node clustering coefficients
+      operationId: getRaidNodeClustering
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Clustering metrics
+          content:
+            application/json:
+              schema:
+                type: object
 
   /raid/quota:
     get:
@@ -3426,6 +4447,147 @@ components:
           type: integer
           format: int64
           example: 8192
+
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          example: admin
+        role:
+          type: string
+          enum: [Admin, Operator, Viewer]
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserCreateRequest:
+      type: object
+      required:
+        - username
+        - password
+        - role
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum: [Admin, Operator, Viewer]
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum: [Admin, Operator, Viewer]
+        active:
+          type: boolean
+
+    CreateWorkerRequest:
+      type: object
+      required:
+        - worker_id
+      properties:
+        worker_id:
+          type: string
+        max_concurrent_requests:
+          type: integer
+        request_timeout_ms:
+          type: integer
+          format: int64
+        health_check_interval_ms:
+          type: integer
+          format: int64
+        enable_caching:
+          type: boolean
+        cache_size:
+          type: integer
+        max_memory_mb:
+          type: integer
+        cpu_priority:
+          type: integer
+        gpu_device:
+          type: integer
+        auto_restart:
+          type: boolean
+        resource_monitoring:
+          type: boolean
+
+    CreateWorkerResponse:
+      type: object
+      properties:
+        worker_id:
+          type: string
+        message:
+          type: string
+
+    DeleteWorkerResponse:
+      type: object
+      properties:
+        worker_id:
+          type: string
+        message:
+          type: string
+
+    LibraryUploadRequest:
+      type: object
+      required:
+        - name
+        - version
+        - data
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        data:
+          type: string
+          description: Base64-encoded library archive
+
+    RaidStatusResponse:
+      type: object
+      properties:
+        cluster_status:
+          type: string
+        node_count:
+          type: integer
+        artifact_count:
+          type: integer
+        storage:
+          type: object
+        mode:
+          type: string
+        replication_status:
+          type: string
+          nullable: true
+        raft_status:
+          type: object
+          nullable: true
+          properties:
+            role:
+              type: string
+            term:
+              type: integer
+              format: int64
+            leader_id:
+              type: string
+              nullable: true
 
     WorkerInfo:
       type: object

@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S27 Playwright admin E2E).
+**Оновлено:** 2026-05-19 (S28 OpenAPI gap audit).
 
 ---
 
@@ -501,6 +501,13 @@
 - **Патерн:** `POST /security/policies` body `{ name, policy }`; `PUT .../{name}` body = full `SecurityPolicy` with matching `name`; delete returns 200 JSON (не 204)
 - **Перевірка:** `cargo test-ci`; wave S17–S20 push одним `git push origin main`
 - **FM:** FM-012 (enterprise security)
+
+### [OpenAPI] Gap audit v1 surface (S28)
+- **Де:** `docs/openapi.yaml`, `docs/development/OPENAPI_GAP_AUDIT_2026-05-19.md`
+- **Сигнал:** `rg '\.route\(' src/network/api/users.rs`; `rg '^  /users' docs/openapi.yaml`
+- **Патерн:** enterprise/ai-ml вже в yaml (S14–S21); S28 закрив v1 Users, `POST/DELETE /workers`, `/libraries/upload`, RAID+admin, VM templates/networks; backlog — `/raid/distributed/*`
+- **Перевірка:** `cargo test-ci` (docs-only OK)
+- **FM:** FM-014 (OpenAPI sync)
 
 ### [E2E] Playwright admin після smoke (S27)
 - **Де:** `e2e/tests/admin.spec.ts`, `e2e/tests/helpers.ts`, `e2e/tests/smoke.spec.ts`
