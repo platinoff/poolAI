@@ -33,17 +33,9 @@ use tracing::info;
 #[cfg(feature = "cloud-sdk")]
 use chrono::{DateTime, Utc};
 
-// Note: Azure SDK 0.30 API differs from expected structure
-// azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
-// This version mismatch requires using REST API directly via reqwest instead of SDK clients
-// Using REST API approach similar to GCP integration to avoid version conflicts
-// Note: DefaultAzureCredential may not be directly importable in azure_identity 0.30
-// Using REST API with manual token acquisition as fallback
-// Note: azure_identity 0.30 - DefaultAzureCredential API structure verification needed
-// Currently using REST API approach with manual token acquisition
-// Tokens can be obtained via Azure CLI, environment variables, or Managed Identity
-#[cfg(feature = "cloud-sdk")]
-use azure_mgmt_compute::Client as ComputeClient;
+// FM-006 scope (S39): Management API via REST + reqwest. Native `azure_mgmt_compute` /
+// `DefaultAzureCredential` remain out of scope while azure_core 0.21 vs 0.30 conflict exists.
+// Tokens: `AZURE_ACCESS_TOKEN`, Azure CLI, or Managed Identity (IMDS).
 #[cfg(feature = "cloud-sdk")]
 use reqwest::Client as HttpClient;
 
@@ -51,15 +43,6 @@ use reqwest::Client as HttpClient;
 pub struct AzureManager {
     subscription_id: Option<String>,
     initialized: Arc<RwLock<bool>>,
-    #[cfg(feature = "cloud-sdk")]
-    /// Azure credential for authentication
-    /// Note: Using REST API approach, credential storage not needed for now
-    /// TODO: Re-enable when DefaultAzureCredential import path is verified
-    // credential: Arc<RwLock<Option<DefaultAzureCredential>>>,
-    #[cfg(feature = "cloud-sdk")]
-    /// Azure Compute client for VM Scale Sets and VM management
-    /// Note: azure_mgmt_compute 0.21 uses azure_core 0.21, may need API verification
-    compute_client: Arc<RwLock<Option<ComputeClient>>>,
     #[cfg(feature = "cloud-sdk")]
     /// HTTP client for Azure REST API calls (used as fallback when SDK has version conflicts)
     http_client: Arc<RwLock<Option<HttpClient>>>,
@@ -99,9 +82,6 @@ impl AzureManager {
                 .or_else(|| std::env::var("AZURE_SUBSCRIPTION_ID").ok()),
             initialized: Arc::new(RwLock::new(false)),
             // #[cfg(feature = "cloud-sdk")]
-            // credential: Arc::new(RwLock::new(None)),
-            #[cfg(feature = "cloud-sdk")]
-            compute_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
             http_client: Arc::new(RwLock::new(None)),
             #[cfg(feature = "cloud-sdk")]
@@ -163,12 +143,6 @@ impl AzureManager {
                 subscription_id
             );
 
-            // Initialize Azure credentials
-            // Note: Using REST API approach - tokens obtained via get_azure_access_token()
-            // DefaultAzureCredential API structure needs verification for azure_identity 0.30
-            // For now, using environment-based authentication via REST API
-            // Credential will be obtained on-demand when needed for API calls
-
             // Initialize HTTP client with connection pooling for REST API calls
             // Connection pooling improves performance by reusing connections
             let http_client = reqwest::Client::builder()
@@ -183,19 +157,8 @@ impl AzureManager {
                 )))?;
             *self.http_client.write().await = Some(http_client);
 
-            // TODO: Initialize Compute client once API is verified
-            // Note: azure_mgmt_compute 0.21 uses azure_core 0.21, while azure_identity 0.30 uses azure_core 0.30
-            // This version mismatch may cause compilation errors. Need to verify API compatibility.
-            // For now, using REST API approach (similar to GCP) to avoid version conflicts.
-            // Expected API (needs verification):
-            // let compute_client = ComputeClient::builder()
-            //     .subscription_id(subscription_id.to_string())
-            //     .credential(credential.clone())
-            //     .build();
-            // *self.compute_client.write().await = Some(compute_client);
-
             info!(
-                "Azure credential and HTTP client initialized for subscription: {} (Compute SDK client initialization pending API verification)",
+                "Azure HTTP client initialized for subscription: {} (REST Management API)",
                 subscription_id
             );
         }
@@ -232,8 +195,6 @@ impl AzureManager {
     pub async fn shutdown(&self) -> Result<(), AppError> {
         #[cfg(feature = "cloud-sdk")]
         {
-            // Clear clients and cached token
-            *self.compute_client.write().await = None;
             *self.http_client.write().await = None;
             *self.cached_token.write().await = None;
         }
@@ -526,10 +487,12 @@ impl AzureManager {
             // Get access token via REST API with fallback methods
             let token = self.get_azure_access_token().await?;
 
+            let location = resolve_azure_location();
+
             // Prepare VM Scale Set configuration
             // Note: Minimal configuration for now, can be extended later
             let vmss_config = serde_json::json!({
-                "location": "eastus", // TODO: Make location configurable
+                "location": location,
                 "sku": {
                     "name": "Standard_DS1_v2",
                     "tier": "Standard",
@@ -636,5 +599,43 @@ impl AzureManager {
             );
             Ok(uuid::Uuid::new_v4().to_string())
         }
+    }
+}
+
+/// Azure region for VM Scale Set payloads (`AZURE_LOCATION`, default `eastus`).
+#[cfg(feature = "cloud-sdk")]
+fn resolve_azure_location() -> String {
+    std::env::var("AZURE_LOCATION").unwrap_or_else(|_| "eastus".to_string())
+}
+
+#[cfg(all(test, feature = "cloud-sdk"))]
+mod location_tests {
+    use super::resolve_azure_location;
+
+    fn with_azure_location<F: FnOnce()>(value: Option<&str>, f: F) {
+        let prev = std::env::var("AZURE_LOCATION").ok();
+        match value {
+            Some(v) => std::env::set_var("AZURE_LOCATION", v),
+            None => std::env::remove_var("AZURE_LOCATION"),
+        }
+        f();
+        match prev {
+            Some(v) => std::env::set_var("AZURE_LOCATION", v),
+            None => std::env::remove_var("AZURE_LOCATION"),
+        }
+    }
+
+    #[test]
+    fn default_location_is_eastus() {
+        with_azure_location(None, || {
+            assert_eq!(resolve_azure_location(), "eastus");
+        });
+    }
+
+    #[test]
+    fn location_from_env() {
+        with_azure_location(Some("westeurope"), || {
+            assert_eq!(resolve_azure_location(), "westeurope");
+        });
     }
 }

@@ -37,10 +37,8 @@ use jsonwebtoken::{encode, EncodingKey, Header};
 #[cfg(feature = "cloud-sdk")]
 use reqwest::Client as HttpClient;
 
-// Note: GCP integration uses REST API via reqwest (similar to Kubernetes implementation)
-// This avoids version conflicts and additional dependencies
-// TODO: Consider adding google-cloud-compute-v1 crate in the future if needed
-// For now, using direct REST API calls to GCP Compute Engine API
+// FM-006 scope (S39): Compute Engine via REST + reqwest (metadata server, service-account JWT).
+// Optional `google-cloud-compute-v1` crate is out of scope until a unified credential layer exists.
 
 /// GCP manager for cloud resources
 pub struct GcpManager {

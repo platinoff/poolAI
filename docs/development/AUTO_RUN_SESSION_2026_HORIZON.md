@@ -59,10 +59,18 @@ cargo test-ci
 - [x] S36 FM-009
 - [x] S37 FM-010
 - [x] S38 Job/Memory
-- [ ] S39 FM-006
+- [x] S39 FM-006
 - [ ] S40 Layer C **100%** + project **100%**
 - [ ] `AUTO_DEV_PATTERNS.md` — шляхи horizon
 - [ ] push MSYS2 + Summary
+
+---
+
+## S39 — виконання (2026-05-19)
+
+**FM-006:** `azure.rs` / `gcp.rs` — закрито `TODO` (scope comments); `AZURE_LOCATION`; прибрано невикористаний `azure_mgmt_compute`; [`CLOUD_SDK_STATUS.md`](../cloud/CLOUD_SDK_STATUS.md) v2.2; mock e2e + `resolve_azure_location` unit tests.
+
+**Перевірка:** `cargo test --test cloud_mock_integration --features cloud,cloud-sdk` + `cargo test --lib location_tests --features cloud,cloud-sdk`.
 
 ---
 

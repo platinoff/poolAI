@@ -1,6 +1,6 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-19 · **Фаза:** **Horizon** (Layer C → 100%) · **Autoprogon A+B:** ✅ S34 · **Horizon S35–S38:** ✅
+**Оновлено:** 2026-05-19 · **Фаза:** **Horizon** (Layer C → 100%) · **Autoprogon A+B:** ✅ S34 · **Horizon S35–S39:** ✅
 
 **Копіюй блок нижче** в нову сесію (один спринт за ітерацію).
 
@@ -21,21 +21,20 @@ PoolAI — Horizon: довести Layer C і проєкт до 100% (оркес
 6. .cursor/rules/autonomous-orchestrator.mdc
 7. NEXT_STEPS_ARCHITECT_2026-03-17.md — операційний порядок + P6 wire
 
-Autoprogon S21–S34 і Horizon S35–S38 — не повторювати.
+Autoprogon S21–S34 і Horizon S35–S39 — не повторювати.
 
 ## Мета ітерації (одна за сесію)
 
 | Спринт | FM | Фокус | Критерій |
 |--------|-----|--------|----------|
-| S39 | FM-006 | cloud-sdk Azure/GCP | закрити TODO в azure.rs/gcp.rs або scope + CLOUD_SDK_STATUS; mock tests |
-| S40 | C | 100% closure | DEVELOPMENT_PROGRESS C=100%, project 100%, FM §5.6, CHANGELOG |
+| S40 | C | 100% closure | DEVELOPMENT_PROGRESS C=100%, project 100%, FM §5.6, CHANGELOG, NEXT_SESSION → maintenance |
 
-Почни з S39 (перший незакритий у AUTO_RUN_SESSION_2026_HORIZON.md §4).
+Почни з S40 (перший незакритий у AUTO_RUN_SESSION_2026_HORIZON.md §4).
 
-Перед кодом S39:
-- src/cloud/providers/azure.rs, gcp.rs
-- docs/cloud/CLOUD_SDK_STATUS.md (якщо є)
-- FUNCTION_MANAGEMENT FM-006
+Перед кодом S40:
+- HORIZON_TO_100_PLAN.md §«Перевірка Layer C = 100%»
+- DEVELOPMENT_PROGRESS_2026-05-19.md
+- FUNCTION_MANAGEMENT §5.6
 
 Архітектура (вже в коді, лише утримувати):
 - src/grid/, src/job/, src/memory/
@@ -65,8 +64,8 @@ NEXT_SESSION → режим утримання: test-ci на main, FM-003 §4 л
 |----------|------|
 | [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md) | Методика C→100% |
 | [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) | Черга S39–S40 |
-| [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | C **~65%**, проєкт **~88%** |
+| [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | C **~80%**, проєкт **~93%** |
 | [`ARCHITECTURE_BEST_PRACTICES.md`](../ARCHITECTURE_BEST_PRACTICES.md) | Дерево `src/` + workspace |
 | [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bash bin/run-poolai.sh single` |
 
-**Наступна сесія:** **S39** (FM-006 cloud-sdk). Після S40 — Layer C **100%**.
+**Наступна сесія:** **S40** (Layer C + project 100% closure). Після S40 — maintenance mode.

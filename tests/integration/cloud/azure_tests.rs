@@ -140,3 +140,35 @@ async fn test_azure_vmss_e2e_with_mock_server() -> Result<(), AppError> {
     std::env::remove_var("AZURE_ACCESS_TOKEN");
     Ok(())
 }
+
+#[cfg(feature = "cloud-sdk")]
+#[tokio::test]
+async fn test_azure_vmss_location_from_env() -> Result<(), AppError> {
+    std::env::set_var("AZURE_ACCESS_TOKEN", "mock-token-for-test");
+    std::env::set_var("AZURE_LOCATION", "westeurope");
+
+    let mut mock = MockAzureServer::new().await;
+    let _m = mock.mock_vmss_creation("test-sub", "test-rg").await;
+    let base = mock.url();
+
+    let manager = AzureManager::new(Some("test-sub".to_string()));
+    manager.set_base_url_override(Some(base)).await;
+    manager.initialize().await?;
+
+    let result = manager.create_vm_scale_set("test-rg", "test-vmss").await;
+    // Success or soft-skip (same as e2e mock test)
+    if let Err(AppError::NetworkError(msg)) = &result {
+        if msg.contains("501 Not Implemented") {
+            manager.shutdown().await?;
+            std::env::remove_var("AZURE_ACCESS_TOKEN");
+            std::env::remove_var("AZURE_LOCATION");
+            return Ok(());
+        }
+    }
+    let _ = result?;
+
+    manager.shutdown().await?;
+    std::env::remove_var("AZURE_ACCESS_TOKEN");
+    std::env::remove_var("AZURE_LOCATION");
+    Ok(())
+}

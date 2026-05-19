@@ -102,7 +102,7 @@ FM-xxx (з таблиці нижче)
 | FM-003 | P2b / RAID | Dev stand ✅; wire harness ✅. **LAN §4 sign-off** — ops gated (2 хости) | Implemented (scope A) | `LAN_BENCHMARK_RUNBOOK.md` §5.1 |
 | FM-004 | ML | SIMD / прискорений шлях TurboQuant у Rust | **Implemented ✅ S35** | `turboquant-simd` feature, `src/ml/turboquant.rs`, `TURBOQUANT_INTEGRATION.md` §SIMD |
 | FM-005 | P3 | Узгоджений JSON-помилок: `HttpAppError` / `AppError::RestError` (без зміни стабільних `error.code`) | Implemented | NEXT_STEPS P3; зроблено: **`ui`**, **`users`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid`**, **`raid_admin`**, **`raid_http`**, **`network/enterprise_api/`**, **`authenticate_user`** / **`refresh_access_token`** / **`SystemService::login`**, **`check_permission`**, **`auth_middleware`**, **`permission_middleware`** |
-| FM-006 | Cloud | Реалізація відкладених гілок Azure/GCP під `cloud-sdk` (credential/compute/location тощо) | Partial / Deferred | P5, `src/cloud/providers/azure.rs`, `gcp.rs` |
+| FM-006 | Cloud | Azure/GCP під `cloud-sdk`: REST paths, token cache, `AZURE_LOCATION`, mock e2e; native Compute SDK — out of scope | **Implemented ✅ S39** | `azure.rs`, `gcp.rs`, [`CLOUD_SDK_STATUS.md`](../cloud/CLOUD_SDK_STATUS.md) |
 | FM-007 | Distributed RAID | Sync: порівняння локального каталогу з peer `artifact_ids` за напрямком (Pull/Push/Bidirectional); за наявності `remote_versions` (`artifact_id` -> timestamp) формується `conflicts` | Implemented | `RaidDistributedProtocolService::sync_artifacts`, `diff_sync_catalog`, `build_sync_conflicts`; wire-тести **`tests/distributed_raid_wire_integration.rs`** (15 tests, 2026-05-16) |
 | FM-008 | Distributed RAID | LeaveCluster: `graceful` — `replicate_stored_artifact` по всіх локальних артефактах, далі `delete_worker`; якщо немає peer-вузлів і є артефакти — `replication_complete=false`; помилки membership / невалідний `node_id` | Implemented | Membership + graceful/non-graceful leave; wire-тести у **`tests/distributed_raid_wire_integration.rs`** |
 | FM-009 | Grid | Єдиний wire envelope Grid v1 | **Implemented ✅ S36** | `src/grid/`, `GRID_PROTOCOL_CONCEPT` |
@@ -123,8 +123,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | **Horizon S39** | FM-006 cloud-sdk | `AUTO_RUN_SESSION_2026_HORIZON.md` |
-| 2 | **Horizon S40** | Layer C + project 100% closure | `HORIZON_TO_100_PLAN.md` |
+| 1 | **Horizon S40** | Layer C + project 100% closure | `HORIZON_TO_100_PLAN.md` |
 | — | **A+B autoprogon** | **✅ 100%** | S34 |
 | — | FM-003 §4 LAN | **BLOCKED** | 2 хости (ops) |
 | — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
@@ -132,7 +131,7 @@ FM-xxx (з таблиці нижче)
 | — | UI a11y CI | **FM-019** | **✅** pa11y + axe Playwright (S33) |
 | — | UI_QUALITY P1 | **FM-013** | **✅** S25–S26 (27 contract tests) |
 | — | ML ops | **DIGEST §ML** | ✅ `PIPELINE_MANAGEMENT.md` |
-| — | Відкладено | **FM-004**, **FM-006** | поза автопрогоном |
+| — | Відкладено | **FM-004** (✅ S35) | — |
 | — | Концепт | **FM-009**, **FM-010** | поза автопрогоном |
 
 **Прогрес:** **100%** (шар A, S33) — **§5.5**, [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
@@ -141,7 +140,7 @@ FM-xxx (з таблиці нижче)
 
 **Якість збірки:** **`cargo test-ci`** + `cargo fmt` — зріз 2026-05-28; clippy — CI (`ci.yml`).
 
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри (≈ FM-003 §4, BLOCKED); cloud-sdk (FM-006, Deferred).
+**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри (≈ FM-003 §4, BLOCKED); cloud-sdk (FM-006 ✅ S39).
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -174,10 +173,10 @@ FM-xxx (з таблиці нижче)
 | Джерело | Пункт | Стан | Примітка |
 |---------|--------|------|----------|
 | Architect L123 | LAN replication + TQ01 на стенді | **BLOCKED** | FM-003 §4; 2 фізичні хости; wire harness ✅ |
-| Architect L183 | Azure/GCP `cloud-sdk` | **Deferred** | FM-006; `TODO` у `azure.rs`/`gcp.rs` |
+| Architect L183 | Azure/GCP `cloud-sdk` | **✅ S39** | REST + mock tests; `CLOUD_SDK_STATUS.md` |
 | FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops **2026-06-01** |
 | FM-004 | SIMD TurboQuant | **✅ S35** | `turboquant-simd` feature |
-| FM-006 | cloud-sdk гілки | **Deferred** | S39 horizon |
+| FM-006 | cloud-sdk гілки | **✅ S39** | REST scope; `AZURE_LOCATION` |
 | FM-009 | Grid envelope v1 | **✅ S36** | `src/grid/` |
 | FM-010 | Solana adapter MVP | **✅ S37** | `crates/poolai-solana-adapter/` |
 | FM-019 | pa11y/axe у CI | **Partial ✅** | S22: `ci.yml` `pa11y-wcag22` (paths-filter) + `pa11y-contract`; `PA11Y_WCAG22=1`; 18 auth URLs |
@@ -210,7 +209,7 @@ FM-xxx (з таблиці нижче)
 |--------|--------|--------|
 | — | **S33** | ✅ шар A 100% |
 | 1 | FM-003 §4 LAN | **BLOCKED** (2 хости) |
-| 2 | Horizon S38+ | Job/Memory, FM-006, closure |
+| 2 | Horizon S40 | Layer C closure |
 | — | **S21–S30** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 
@@ -226,7 +225,7 @@ FM-xxx (з таблиці нижче)
 | S36 | FM-009 Grid envelope | [x] ✅ |
 | S37 | FM-010 Solana adapter MVP | [x] ✅ |
 | S38 | Job/Memory wire | [x] ✅ |
-| S39 | FM-006 cloud-sdk | [ ] |
+| S39 | FM-006 cloud-sdk | [x] ✅ |
 | S40 | Layer C + project 100% docs | [ ] |
 
 ### 5.5 Прогрес розробки (аудит менеджера функціоналу, 2026-05-19)
@@ -238,10 +237,10 @@ FM-xxx (з таблиці нижче)
 | **A. Продукт (autoprogon)** | **100%** | FM-001…019 (S33) |
 | **B. Architect P1–P5 (autoprogon)** | **100%** | S34; LAN §4 / cloud-sdk deep — ops/Deferred |
 | **A+B autoprogon** | **100%** | офіційний зріз HANDOFF |
-| **C. Horizon** | **~65%** → **100%** | S35–S38 ✅; S39–S40 відкрито |
-| **Проєкт (A+B+C)/3** | **~88%** → **100%** | після S40 |
+| **C. Horizon** | **~80%** → **100%** | S35–S39 ✅; S40 відкрито |
+| **Проєкт (A+B+C)/3** | **~93%** → **100%** | після S40 |
 
-**Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**); FM-006 deep — S39 **Deferred**.
+**Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
 **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 

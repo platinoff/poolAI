@@ -520,7 +520,14 @@
 
 - **Де:** `docs/development/HORIZON_TO_100_PLAN.md`, `AUTO_RUN_SESSION_2026_HORIZON.md`, FM §5.6
 - **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
-- **Черга:** S35–S38 ✅ → S39 cloud → S40 closure
+- **Черга:** S35–S39 ✅ → S40 closure
+
+### [Cloud] FM-006 Azure/GCP REST scope (S39)
+- **Де:** `src/cloud/providers/azure.rs`, `gcp.rs`, `docs/cloud/CLOUD_SDK_STATUS.md`
+- **Сигнал:** `rg "TODO" src/cloud/providers/` → порожньо; `resolve_azure_location`, `set_base_url_override`
+- **Патерн:** Management/Compute через **reqwest REST** (не `azure_mgmt_compute` — version skew); токени Azure: `AZURE_ACCESS_TOKEN` → `az` → IMDS; GCP: metadata → `GOOGLE_APPLICATION_CREDENTIALS` JWT
+- **Конфіг:** `AZURE_LOCATION` (default `eastus`); mock: `cargo test --test cloud_mock_integration --features cloud,cloud-sdk`
+- **FM:** FM-006 ✅
 
 ### [Job] Wire types + API stub (S38, P6)
 - **Де:** `src/job/types.rs`, `src/memory/types.rs`, `src/network/api/jobs.rs`

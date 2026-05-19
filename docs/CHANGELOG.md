@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Horizon S39 (2026-05-19)** — FM-006: Azure/GCP `cloud-sdk` REST scope closed; `AZURE_LOCATION`; removed unused `azure_mgmt_compute`; mock e2e + location unit tests; `CLOUD_SDK_STATUS.md` v2.2.
 - **Horizon S38 (2026-05-19)** — `src/job/`, `src/memory/` wire types; Grid map; HTTP stub `/api/v1/jobs`; OpenAPI `/jobs`; архітектура в BEST_PRACTICES / DIGEST / Architect P6.
 
 ### Docs
+- **Horizon S39 (2026-05-19)** — FM-006 Implemented; NEXT_SESSION → S40; DEVELOPMENT_PROGRESS C~80%, project ~93%.
 - **Horizon S38 (2026-05-19)** — Architect P6 wire checkboxes; NEXT_SESSION_PROMPT → S39; DEVELOPMENT_PROGRESS C~65%.
 - **Horizon S35–S37 (2026-05-19)** — FM-004 `turboquant-simd` (`wide`); FM-009 `src/grid/` `GridEnvelope` v1; FM-010 `crates/poolai-solana-adapter` schema v1 + sidecar stub (no `solana-sdk` in main). Fix: `UiService::delete_dashboard` `#[cfg(enterprise)]`.
 

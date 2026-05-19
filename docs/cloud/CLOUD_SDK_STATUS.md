@@ -1,9 +1,9 @@
 # ☁️ Cloud SDK Implementation Status
 ## Поточний стан інтеграції з cloud providers
 
-**Дата оновлення**: 2026-01-22  
-**Версія**: 2.1  
-**Статус**: Infrastructure 100% ✅, SDK Implementation 100% ✅ (Metrics, Scaling Rules, Routing Rules, Cloud LB init, **HPA init** ✅)
+**Дата оновлення**: 2026-05-19 (Horizon **S39** / FM-006)  
+**Версія**: 2.2  
+**Статус**: Infrastructure 100% ✅, Azure/GCP REST paths 100% ✅ (FM-006 scope closed; native Azure Compute SDK deferred)
 
 ---
 
@@ -21,10 +21,12 @@
 
 ## 🔵 Azure SDK (100% Complete) ✅
 
-### ✅ Реалізовано (100%):
+### ✅ Реалізовано (FM-006 scope, S39):
 - HTTP client з connection pooling
-- REST API підхід (обійшов version conflicts)
+- REST API підхід (обійшов `azure_core` 0.21 vs 0.30 version conflicts)
 - VM Scale Set creation через Azure Management REST API
+- Регіон VMSS: `AZURE_LOCATION` (default `eastus`)
+- `set_base_url_override` для mock/integration tests
 - **Token Acquisition: 100%** ✅
   - Environment variable (`AZURE_ACCESS_TOKEN`)
   - Azure CLI (`az account get-access-token`) з expiration parsing
@@ -53,6 +55,10 @@ let vmss_id = manager.create_vm_scale_set(
 - Azure CLI: `az login` (для отримання token)
 - Managed Identity (коли running на Azure)
 
+### ⏸️ Поза scope FM-006 (навмисно відкладено):
+- `azure_mgmt_compute` SDK client (`DefaultAzureCredential`) — конфлікт версій; канон — REST у `azure.rs`
+- Додаткові сервіси (Blob, ACI) — окремі епіки
+
 ---
 
 ## 🟢 GCP SDK (100% Complete) ✅
@@ -72,10 +78,10 @@ let vmss_id = manager.create_vm_scale_set(
 - Error handling та response parsing
 - Integration tests
 
-### ⏳ TODO:
-- [ ] Service account key file authentication (JWT signing)
-- [ ] Application Default Credentials (ADC) via gcloud CLI
-- [ ] Додати більше GCP services (Cloud Storage, Cloud Functions)
+### ⏸️ Поза scope FM-006 (навмисно відкладено):
+- `google-cloud-compute-v1` Rust crate — REST канон у `gcp.rs`
+- ADC через `gcloud auth application-default login` без service account / metadata
+- Cloud Storage, Cloud Functions — окремі епіки
 
 ### 📝 Приклад використання:
 
@@ -93,9 +99,9 @@ let instance_id = manager.create_compute_instance(
 ```
 
 ### 🔑 Authentication:
-- Metadata server (коли running на GCP)
-- Service account key file: `GOOGLE_APPLICATION_CREDENTIALS` (TODO: JWT signing)
-- Application Default Credentials (ADC) - placeholder
+- Metadata server (коли running на GCP) + `set_base_url_override` для тестів
+- Service account key file: `GOOGLE_APPLICATION_CREDENTIALS` (JWT RS256 + OAuth2 exchange) ✅
+- ADC via gcloud — не в scope S39 (metadata + service account покривають CI/staging)
 
 ---
 
