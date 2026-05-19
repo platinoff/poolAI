@@ -17,6 +17,6 @@
 - [x] OpenAPI ↔ `virtual_nodes.rs` (Telegram bindings)
 - [x] HANDOFF + FM §5.1/§5.3
 - [x] `cargo fmt` + `cargo test-ci`
-- [ ] push
+- [x] push — `8138a70b`
 
 **Поза обсягом:** FM-003 §4 sign-off; FM-004/006/009/010; `data/audit/*`.
