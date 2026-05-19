@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# S23/S27: Playwright E2E (smoke + admin tenants/monitoring).
+# S23/S27/S29: Playwright E2E (smoke + admin tenants/monitoring/security/audit).
 # Usage:
 #   bash bin/e2e-playwright.sh              # expects poolai on :8080
 #   bash bin/e2e-playwright.sh --start      # build release, start poolai, run tests, stop

@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Added
+- **UI E2E (2026-05-19, S29)** — Playwright admin: security (`#security-content`, OAuth2 tab) + audit (`#audit-events`); monitoring locator `.first()` for strict mode; [`E2E_PLAYWRIGHT.md`](development/E2E_PLAYWRIGHT.md).
 - **OpenAPI (2026-05-19, S28)** — gap audit: Users CRUD, pool workers POST/DELETE, `/libraries/upload`, RAID status/workers/events/snapshot/admin, VM templates/networks; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](development/OPENAPI_GAP_AUDIT_2026-05-19.md).
 - **UI E2E (2026-05-19, S27)** — Playwright admin: `e2e/tests/admin.spec.ts` (tenants, monitoring), `e2e/tests/helpers.ts`; smoke reuses `loginAsAdmin`; [`E2E_PLAYWRIGHT.md`](development/E2E_PLAYWRIGHT.md).
 - **Прогрес розробки (2026-05-19)** — аудит менеджера функціоналу: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](status/DEVELOPMENT_PROGRESS_2026-05-19.md) (**93%** шар A, **97%** Architect P1–P5); FM §5.5; [`NEXT_SESSION_PROMPT.md`](development/NEXT_SESSION_PROMPT.md) (S28).

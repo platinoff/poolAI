@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S28 OpenAPI gap audit).
+**Оновлено:** 2026-05-19 (S29 Playwright security + audit).
 
 ---
 
@@ -509,10 +509,11 @@
 - **Перевірка:** `cargo test-ci` (docs-only OK)
 - **FM:** FM-014 (OpenAPI sync)
 
-### [E2E] Playwright admin після smoke (S27)
+### [E2E] Playwright admin після smoke (S27 / S29)
 - **Де:** `e2e/tests/admin.spec.ts`, `e2e/tests/helpers.ts`, `e2e/tests/smoke.spec.ts`
-- **Сигнал:** `rg "loginAsAdmin|#tenants-list|#monitoring-content" e2e/`
-- **Патерн:** `loginAsAdmin(page)` → `goto` `/ui/admin/tenants` або `/ui/admin/monitoring`; очікувати `#tenants-list` / `#monitoring-content` з `.admin-table`, `.muted`, або `.admin-fetch-error` після `fetchJson`
+- **Сигнал:** `rg "loginAsAdmin|#tenants-list|#security-content|#audit-events" e2e/`
+- **Патерн:** `loginAsAdmin(page)` → admin routes; контейнер з `.admin-table`, `.muted`, або `.admin-fetch-error` — **`.first()`** якщо кілька `.muted` (monitoring: alerts + dashboards)
+- **S29:** `/ui/admin/security` → `#oauth2-providers-list` + кнопка `/register|зареєстр/i` (i18n UA); `/ui/admin/audit` → `#audit-events` (auto `queryAuditLogs()`)
 - **Перевірка:** `bash bin/e2e-playwright.sh --start` (MSYS2; `enterprise,ml,cloud,test-utils`); CI — `.github/workflows/e2e.yml` `workflow_dispatch`
 - **FM:** FM-019 (UI E2E backlog)
 

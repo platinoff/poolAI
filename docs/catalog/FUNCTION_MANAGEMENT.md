@@ -123,7 +123,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM / план | Дія |
 |--------|--------|-----------|-----|
-| 1 | Playwright E2E розширення | backlog | security, audit — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
+| 1 | Playwright E2E розширення | **Partial ✅** S29 | security + audit ✅; raid/topology — backlog — [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md) |
 | — | OpenAPI gap audit | **S28 ✅** | v1 Users/RAID/VM; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md) |
 | — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
 | — | UI a11y CI | **FM-019** | **Partial ✅** pa11y merge gate; axe Playwright — backlog |
@@ -154,7 +154,8 @@ FM-xxx (з таблиці нижче)
 | **S25** | UI_QUALITY P1 — tenants, OAuth2, dashboards contracts (+3 tests) | `2720c3d3` |
 | **S26** | UI_QUALITY P1 close — metrics, alert-rules, SAML, policies (+4 tests) | `285b898d` |
 | **S27** | Playwright admin E2E — tenants, monitoring (`admin.spec.ts`, `helpers.ts`) | `862cd016` |
-| **S28** | OpenAPI gap audit — Users, workers, RAID, VM templates/networks | (ця сесія) |
+| **S28** | OpenAPI gap audit — Users, workers, RAID, VM templates/networks | `46a299c5` |
+| **S29** | Playwright — security + audit admin routes | (ця сесія) |
 
 #### Не зроблено (канон backlog)
 
@@ -173,7 +174,7 @@ FM-xxx (з таблиці нижче)
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
 | OpenAPI | Синхронізація при нових маршрутах | **Partial ✅** | S14–S28: enterprise + v1 Users/RAID/VM; backlog `/raid/distributed/*` |
-| UI E2E | Playwright | **Partial ✅** | S23 smoke; S27 tenants + monitoring; security/audit — backlog |
+| UI E2E | Playwright | **Partial ✅** | S23 smoke; S27–S29 tenants/monitoring/security/audit; raid/topology — backlog |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |

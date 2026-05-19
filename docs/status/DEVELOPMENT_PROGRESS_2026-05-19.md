@@ -1,6 +1,6 @@
 # Прогрес розробки PoolAI (менеджер функціоналу)
 
-**Оновлено:** 2026-05-19 · **Гілка:** `main` · **Зріз комітів:** S28 (OpenAPI gap audit)  
+**Оновлено:** 2026-05-19 · **Гілка:** `main` · **Зріз комітів:** S29 (Playwright security + audit)  
 **Метод:** звірка FM-001…019, Architect P1–P6, `STABLE_STATE`, `FUNCTIONALITY_DIGEST`, відкриті `[ ]` у канонічних планах, `rg TODO` у `src/`, legacy docs (`docs/archive/`, січень–квітень 2026) — **не канон** для черги.
 
 ---
@@ -84,7 +84,7 @@
 | Область | Стан | Джерело |
 |---------|------|---------|
 | OpenAPI повний `rg` audit | Partial ✅ S14–S28 | v1 Users/RAID/VM; backlog `/raid/distributed/*` |
-| Playwright E2E | Partial ✅ S23–S27 | Smoke + tenants/monitoring; admin CRUD / axe — backlog |
+| Playwright E2E | Partial ✅ S23–S29 | Smoke + tenants/monitoring/security/audit; raid/topology / axe — backlog |
 | FM-019 axe у Playwright | Ні | pa11y CI ✅; axe — backlog |
 | BurstRAID metrics v0.2+ | Ні | Stale `RUST_ARCHITECT_STATUS` |
 | VM Windows AppContainer / post-spawn limits | Stub | `vm/isolation/windows.rs`, `vm/resources.rs` |
@@ -126,8 +126,9 @@
 
 | Порядок | Спринт | Умова |
 |--------|--------|--------|
-| 1 | Playwright security/audit E2E | за `E2E_PLAYWRIGHT.md` |
+| 1 | OpenAPI `/raid/distributed/*` або ML ops | за `NEXT_SESSION_PROMPT.md` |
 | — | **S28** OpenAPI gap audit | ✅ [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md) |
+| — | **S29** Playwright security + audit | ✅ `e2e/tests/admin.spec.ts` (+2 tests) |
 | — | **FM-003 §4** LAN sign-off | **BLOCKED** (2 хости) |
 | — | FM-004/006/009/010 | Лише за явним запитом |
 
