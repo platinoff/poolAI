@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-06-02 (§5.3 audit + FM-019 dashboard nav).
+**Оновлено:** 2026-05-18 (OpenAPI FM-016+ Telegram S14).
 
 ---
 
@@ -427,6 +427,13 @@
 - **Перевірка:** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`
 
 ---
+
+### [OpenAPI] Virtual-node Telegram routes sync
+- **Де:** `src/network/api/virtual_nodes.rs` (`create_virtual_node_routes`), `docs/openapi.yaml`
+- **Сигнал:** `rg '\.route\(' src/network/api/virtual_nodes.rs` vs `rg 'virtual-nodes/telegram' docs/openapi.yaml`
+- **Патерн:** шляхи в OpenAPI без префікса `/api/v1` (servers.url вже задає base); FM-016+ list `GET .../telegram/bindings`, unbind `DELETE .../bindings/{telegram_user_id}` → 204
+- **Перевірка:** docs-only — `cargo test-ci` зріз; при зміні handlers — integration `virtual_node_*`
+- **FM:** FM-016+
 
 ## Документація (кроки 1–12)
 

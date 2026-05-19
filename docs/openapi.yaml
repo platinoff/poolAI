@@ -373,6 +373,24 @@ paths:
       responses:
         '200':
           description: Binding created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindTelegramVirtualNodeResponse'
+
+  /virtual-nodes/telegram/bindings:
+    get:
+      tags:
+        - VirtualNodes
+      summary: List all Telegram bindings
+      operationId: listTelegramVirtualNodeBindings
+      responses:
+        '200':
+          description: Binding list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramBindingsListResponse'
 
   /virtual-nodes/telegram/bindings/{telegram_user_id}:
     get:
@@ -389,6 +407,26 @@ paths:
       responses:
         '200':
           description: Binding found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelegramBinding'
+        '404':
+          description: No binding
+    delete:
+      tags:
+        - VirtualNodes
+      summary: Remove Telegram binding
+      operationId: unbindTelegramVirtualNode
+      parameters:
+        - name: telegram_user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Binding removed
         '404':
           description: No binding
 
@@ -1596,6 +1634,34 @@ components:
           type: boolean
         message:
           type: string
+
+    TelegramBinding:
+      type: object
+      properties:
+        telegram_user_id:
+          type: string
+        chat_id:
+          type: string
+          nullable: true
+        peer_id:
+          type: string
+        bound_at:
+          type: string
+          format: date-time
+
+    BindTelegramVirtualNodeResponse:
+      type: object
+      properties:
+        binding:
+          $ref: '#/components/schemas/TelegramBinding'
+
+    TelegramBindingsListResponse:
+      type: object
+      properties:
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelegramBinding'
 
     BindTelegramVirtualNodeRequest:
       type: object

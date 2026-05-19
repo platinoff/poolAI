@@ -163,7 +163,7 @@ FM-xxx (з таблиці нижче)
 | `UI_BUGFIXES_AND_OAUTH_PLAN` | Модалки 2026-01 | **Archived** | S7 2026-05-18; FM-012/FM-019 канон |
 | `CONCEPT_PENDING_FEATURES.md` | «ML не реалізовано» | **Archived** | S11 2026-05-18; канон STABLE + DIGEST |
 | `HANDOFF` §5 | Посилання на AUTO_RUN 2026-05-17 | **Fixed 2026-06-07** | → AUTO_RUN 2026-06-08 |
-| OpenAPI | Синхронізація при нових маршрутах | **Ongoing** | звіряти при API diff |
+| OpenAPI | Синхронізація при нових маршрутах | **Partial** | S14: FM-016+ Telegram `bindings` GET/DELETE у `openapi.yaml`; повний diff — ongoing |
 | `docs/archive/*` | Legacy `.md` | **Archive** | [`STRUCTURE.md`](../STRUCTURE.md) |
 | `STATUS_UPDATE_2026-01-16.md` | Cloud SDK `[ ]` | **Stale** | FM-006 Deferred; канон CI |
 | `RUST_ARCHITECT_STATUS_2026-01-19.md` | BurstRAID metrics `[ ]` | **Stale** | опційно v0.2+ |
@@ -180,7 +180,7 @@ FM-xxx (з таблиці нижче)
 #### Рекомендований наступний спринт (2026-05-18, після S13)
 
 1. **FM-003 §4** — **BLOCKED** (2 хости); dev stand + runbook only.
-2. **OpenAPI** — sync з `src/network/` при наявності API diff.
+2. **OpenAPI** — sync з `src/network/` при наявності API diff (S14 ✅ Telegram bindings; решта — ongoing).
 3. **UI E2E** — Playwright smoke (`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`) — опційно.
 4. **Virtual nodes / ML** — hardening за DIGEST + `PIPELINE_MANAGEMENT.md` — за пріоритетом продукту.
 5. **Не стартувати без запиту:** FM-004, FM-006, FM-009, FM-010.

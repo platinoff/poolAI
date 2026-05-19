@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **FM-019 (partial, 2026-05-18)** — dashboard modals: `keepFocusInModal`, closed `aria-modal="false"` (workers/libs/vm/raid); `ui::dashboard_a11y_tests` (4).
 
 ### Docs
+- **OpenAPI (2026-05-18, S14)** — FM-016+ Telegram: `GET /virtual-nodes/telegram/bindings`, `DELETE .../bindings/{id}`; schemas `TelegramBinding`, list/bind responses.
+- **AUTO_RUN 2026-06-24 (S14)** — OpenAPI virtual-node Telegram sync; HANDOFF/FM §5.3.
 - **AUTO_RUN 2026-06-23 (S13)** — §5.3 legacy docs audit (січень–квітень плани); HANDOFF/README next sprint.
 - **AUTO_RUN 2026-06-22 (S12)** — `ci.yml` job `pa11y-contract`; STABLE/FM/LAN runbook sync.
 - **AUTO_RUN 2026-06-21 (S11)** — `PA11Y_WCAG22` у `a11y.yml` CI; `CONCEPT_PENDING_FEATURES` archival; runbook §5 sync.
