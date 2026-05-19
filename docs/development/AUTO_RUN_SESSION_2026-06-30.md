@@ -13,7 +13,7 @@
 - [x] OpenAPI ↔ `enterprise_api/security.rs` (policies CRUD)
 - [x] HANDOFF + FM §5.3
 - [x] `cargo fmt` + `cargo test-ci` (MSYS2, 2026-05-19)
-- [ ] push S17–S20
+- [x] push — `a2749689` (S17–S20)
 
 **Поза обсягом:** Playwright E2E; FM-004/006/009/010; enterprise `/ai-ml/optimization*` stubs (optional).
 

@@ -13,7 +13,7 @@
 - [x] OpenAPI ↔ `system.rs`, `ui.rs`, `completions.rs`, `ai_ml.rs`
 - [x] HANDOFF + FM §5.3
 - [x] `cargo test-ci` (MSYS2, разом із S18)
-- [ ] push (разом із S18, ahead 2)
+- [x] push — `a2749689` (wave S17–S20)
 
 **Поза обсягом:** FM-003 §4; Playwright E2E (опційно); FM-004/006/009/010.
 

@@ -13,7 +13,7 @@
 - [x] OpenAPI ↔ `enterprise_api/{oauth,monitoring,security}.rs`
 - [x] HANDOFF + FM §5.3
 - [x] `cargo fmt` + `cargo test-ci` (MSYS2, 2026-05-18)
-- [ ] push (S17+S18, ahead 2)
+- [x] push — `a2749689` (wave S17–S20)
 
 **Поза обсягом:** FM-003 §4; tenants/audit/SAML OpenAPI (S19); Playwright E2E; FM-004/006/009/010.
 
