@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-031 WCAG admin URL expand (2026-05-20)** — `bin/pa11y-ci.sh`: `/ui/admin/{vm,workers,libs,raid}` (21 auth URLs); Playwright `a11y.spec.ts` axe matrix + `wcag22aa`; `tests/pa11y_ci_script.rs` contract.
 - **FM-030 Monitoring persistence MVP (2026-05-20)** — `POOLAI_MONITORING_DATA_DIR` → `monitoring.db`; coordinator `MonitoringManager::new_from_env()`; SQLite metrics (existing) + persist/reload dashboards and alert_rules; `data/monitoring/` gitignored.
 - **FM-029 Job store SQLite (2026-05-20)** — `feature job-store-sqlite`; `POOLAI_JOB_STORE=sqlite` + `POOLAI_JOB_DATA_DIR` → `jobs.db`; auto-migrate `jobs.json` → `jobs.json.migrated`; `src/job/store_sqlite.rs`; `test-ci` includes feature.
 - **Repository layout (2026-05-20)** — `docs/development/REPOSITORY_LAYOUT.md`; канон `bin/` (ops) vs `src/bin/` (Cargo) vs `scripts/` (toolchain); `scripts/` знято з `.gitignore`; forwarder `scripts/run-lan-nodes.ps1` → `bin/`.

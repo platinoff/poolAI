@@ -1,33 +1,31 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-20 · **Фаза:** **Post-Horizon** (FM-020…) · **A+B+C:** **100%**
+**Оновлено:** 2026-05-20 · **Фаза:** Post-Horizon **FM-020…031 ✅** · **A+B+C:** **100%**
 
 ---
 
 ## Промпт
 
 ```
-PoolAI — Post-Horizon: FM-031 (оркестратор + менеджер функціоналу).
+PoolAI — Post-Horizon закрито (FM-020…031). Maintenance / ops.
 
 ## S0 — зріз
 
 1. git fetch && git status -sb
-2. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1, §5.7
-3. AUTO_RUN_SESSION_2026_POST_HORIZON.md §4
-4. autonomous-orchestrator.mdc · runtime-stack-policy.mdc
+2. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1
+3. runtime-stack-policy.mdc · autonomous-orchestrator.mdc
 
-Не повторювати: FM-001…030 baseline.
+Не повторювати: FM-020…031 (job/memory/grid/SQLite/monitoring/a11y).
 
-## Мета (одна FM)
+## Мета (на вибір)
 
-| FM | Фокус | Критерій |
-|----|--------|----------|
-| — | FM-020…030 | ✅ |
-| 12 | FM-031 | WCAG expand admin URLs |
+| Пріоритет | Фокус | Стан |
+|-----------|--------|------|
+| Ops | FM-003 §4 LAN sign-off | **BLOCKED** (2 хости) |
+| QA | cargo test-ci зріз | періодично |
+| Docs | Architect P6 залишок / on-chain | за планом |
 
-Почни з FM-031. Див. `ADMIN_A11Y_RUNBOOK.md`, `e2e/tests/a11y.spec.ts`, FM-019.
-
-Завершення: cargo fmt → cargo test-ci (якщо `src/`); оновити FM/HANDOFF/CHANGELOG/AUTO_DEV_PATTERNS; commit+push MSYS2 з Summary.
+Завершення: якщо `src/` — cargo fmt → cargo test-ci; commit+push з Summary при змінах коду.
 ```
 
-**Наступна сесія:** **FM-031** (WCAG expand admin URLs).
+**Post-Horizon черга:** закрита. **Ops:** FM-003 §4 LAN (**BLOCKED**, 2 фізичні хости).

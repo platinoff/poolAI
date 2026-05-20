@@ -549,6 +549,12 @@
 - **Сигнал:** `JobSpec`, `MemoryShardRef`, `envelope_from_job_spec`
 - **Патерн:** `JobStore::global()`; `POOLAI_JOB_DATA_DIR` → `jobs.json` (atomic write); без env — in-memory; `POST /api/v1/jobs` → 201; map ↔ `GridEnvelope`
 
+### [UI] WCAG admin URL expand (FM-031)
+- **Де:** `bin/pa11y-ci.sh` `ADMIN_URLS`, `e2e/tests/a11y.spec.ts`, `tests/pa11y_ci_script.rs`
+- **Сигнал:** 21 auth URLs (login + strict); `/ui/admin/vm|workers|libs|raid` у pa11y + axe
+- **Перевірка:** `cargo test --test pa11y_ci_script`; CI `pa11y-wcag22` / `a11y.yml`
+- **FM:** FM-031 ✅
+
 ### [Enterprise] Monitoring SQLite MVP (FM-030)
 - **Де:** `src/enterprise/monitoring.rs`, `EnterpriseManager::new_from_env`, `AppState::enterprise_monitoring_manager`
 - **Сигнал:** `POOLAI_MONITORING_DATA_DIR=data/monitoring`; `monitoring.db`; `initialize()` loads dashboards + alert_rules

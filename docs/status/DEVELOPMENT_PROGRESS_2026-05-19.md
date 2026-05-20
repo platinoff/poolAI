@@ -89,7 +89,7 @@
 | FM-028 | P2b single-host metrics | [x] |
 | FM-029 Job SQLite | `job-store-sqlite` | [x] |
 | FM-030 Monitoring SQLite MVP | `POOLAI_MONITORING_DATA_DIR` | [x] |
-| FM-031 | див. FM §5.1 | [ ] |
+| FM-031 WCAG admin URLs | pa11y 21 + axe | [x] |
 
 **Канон черги:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md).
 

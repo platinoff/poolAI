@@ -41,7 +41,7 @@ cargo test -p poolai --features enterprise ui::admin --lib
 
 ## 3. pa11y (локально + CI)
 
-**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — 18 auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
+**Скрипт:** `bin/pa11y-ci.sh` — strict: `/ui/login`; з `PA11Y_ADMIN_STRICT=1` (CI default) — **21** auth URLs після login actions (`admin` / `admin123`, див. `DEFAULT_DEV_ADMIN_*` у `user_manager.rs`). Див. §3.1.
 
 ### 3.1 Матриця URL (strict / planned)
 
@@ -62,6 +62,10 @@ cargo test -p poolai --features enterprise ui::admin --lib
 | `/ui/admin/monitoring` | auth actions | **strict** (S8) | monitoring dashboard |
 | `/ui/admin/instances` | auth actions | **strict** (S9) | model instances admin |
 | `/ui/admin/topology` | auth actions | **strict** (S9) | topology admin |
+| `/ui/admin/vm` | auth actions | **strict** (FM-031) | admin VM shell |
+| `/ui/admin/workers` | auth actions | **strict** (FM-031) | admin workers shell |
+| `/ui/admin/libs` | auth actions | **strict** (FM-031) | admin libraries shell |
+| `/ui/admin/raid` | auth actions | **strict** (FM-031) | admin RAID shell |
 | `/ui/libs` | auth actions | **strict** | libraries dashboard (маршрут `/ui/libs`, не `/ui/libraries`) |
 | `/ui/vm` | auth actions | **strict** | VM instances |
 | `/ui/raid` | auth actions | **strict** | RAID artifacts table |
@@ -91,8 +95,8 @@ bash bin/pa11y-ci.sh --start
 
 | Job (workflow **CI**) | Коли | Що перевіряє |
 |------------------------|------|----------------|
-| **`pa11y-contract`** | Кожен push/PR на `main` | `cargo test --test pa11y_ci_script` — 17 `ADMIN_URLS` + `PA11Y_WCAG22` / login fixture у `bin/pa11y-ci.sh` |
-| **`pa11y-wcag22`** | PR/push, якщо змінились `src/ui/**`, `bin/pa11y-ci.sh`, workflows, `tests/pa11y_ci_script.rs` | Reusable [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml): `PA11Y_WCAG22=1`, `PA11Y_ADMIN_STRICT=1`, **0 errors** на login + 18 auth URLs |
+| **`pa11y-contract`** | Кожен push/PR на `main` | `cargo test --test pa11y_ci_script` — **21** `ADMIN_URLS` + `PA11Y_WCAG22` / login fixture у `bin/pa11y-ci.sh` |
+| **`pa11y-wcag22`** | PR/push, якщо змінились `src/ui/**`, `bin/pa11y-ci.sh`, workflows, `tests/pa11y_ci_script.rs` | Reusable [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml): `PA11Y_WCAG22=1`, `PA11Y_ADMIN_STRICT=1`, **0 errors** на login + 21 auth URLs |
 
 Ручний повний прогін: `workflow_dispatch` у workflow **A11y (pa11y)**.
 
@@ -130,9 +134,10 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~Оновлення застарілих `[ ]` у [`UI_IMPROVEMENTS_PLAN.md`](../UI_IMPROVEMENTS_PLAN.md)~~ — **Archived ✅ 2026-05-18** (S4 docs; канон §5.4 + цей runbook).
 - ~~Розширити `ADMIN_URLS`: `/ui`, `/ui/admin/config`~~ — **Partial ✅ 2026-05-18** (S5; 6 auth URLs strict).
 
-- ~~Admin subpages у `ADMIN_URLS`~~ — **Partial ✅ 2026-05-18** (S8–S9: tenants, audit, monitoring, instances, topology; 18 auth URLs).
+- ~~Admin subpages у `ADMIN_URLS`~~ — **Partial ✅ 2026-05-18** (S8–S9: tenants, audit, monitoring, instances, topology).
+- ~~Admin vm/workers/libs/raid у `ADMIN_URLS` + axe Playwright~~ — **✅ FM-031** (2026-05-20; 21 auth URLs).
 - ~~WCAG 2.2 локально~~ — **Partial ✅ S10** (`PA11Y_WCAG22=1`, 0 errors).
 - ~~`PA11Y_WCAG22` у CI~~ — **Partial ✅ S11** (`a11y.yml` env).
 - ~~Повний merge gate у `ci.yml`~~ — **Partial ✅ S22** (`pa11y-wcag22` + `pa11y-contract`; paths-filter).
 
-**Last updated:** 2026-05-19 — S22: CI merge gate matrix §3.2; `pa11y-wcag22` reusable workflow.
+**Last updated:** 2026-05-20 — FM-031: `/ui/admin/{vm,workers,libs,raid}` у pa11y + axe Playwright matrix.

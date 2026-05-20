@@ -127,7 +127,7 @@ FM-xxx (з таблиці нижче)
 | FM-028 | P2b / perf | Single-host TQ01+RAID metrics → `BENCHMARKS.md` | **Implemented ✅** | `capture-p2b-single-host-metrics.*`, `poolai-p2b-tq01-snapshot` |
 | FM-029 | Job layer | SQLite job store (optional feature) | **Implemented ✅** | `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, `src/job/store_sqlite.rs` |
 | FM-030 | Enterprise | Monitoring metrics persistence MVP | **Implemented ✅** | `POOLAI_MONITORING_DATA_DIR`, `monitoring.db`, dashboards/alert_rules |
-| FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | Partial | `ADMIN_A11Y_RUNBOOK.md` |
+| FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | **Implemented ✅** | `pa11y-ci.sh` 21 URLs; `e2e/tests/a11y.spec.ts` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -146,7 +146,7 @@ FM-xxx (з таблиці нижче)
 | — | P2b single-host metrics | **FM-028** ✅ | dual-port health_load + TQ01 → `BENCHMARKS.md` |
 | — | Job store SQLite | **FM-029** ✅ | `job-store-sqlite`; JSON→SQLite migrate |
 | — | Monitoring persistence | **FM-030** ✅ | env + SQLite reload dashboards/rules |
-| 9 | WCAG automation expand | **FM-031** | |
+| — | WCAG automation expand | **FM-031** ✅ | admin vm/workers/libs/raid + axe matrix |
 
 **Закрито (не в черзі):** FM-001…019; Horizon S35–S40; job store JSON (`cd1aaad`).
 
@@ -254,7 +254,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-031** (WCAG expand).
+**Наступна сесія:** Post-Horizon FM-020…031 **закрито** — maintenance / ops (FM-003 §4 LAN **BLOCKED**).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
@@ -270,7 +270,7 @@ FM-xxx (з таблиці нижче)
 | FM-028 | **✅** | dual-port stand metrics in `BENCHMARKS.md` |
 | FM-029 | **✅** | `job-store-sqlite`, `jobs.db`, migrate `jobs.json` |
 | FM-030 | **✅** | `POOLAI_MONITORING_DATA_DIR`, metrics + config SQLite |
-| FM-031 | Planned | WCAG admin URLs expand |
+| FM-031 | **✅** | 21 pa11y auth URLs; axe Playwright admin matrix |
 
 **Одна FM за автономну сесію** — commit + push MSYS2 з Summary.
 

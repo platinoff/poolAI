@@ -66,8 +66,8 @@ cargo test-ci
 - [x] FM-028 P2b metrics
 - [x] FM-029 Job SQLite
 - [x] FM-030 Monitoring persist
-- [ ] FM-031 WCAG expand
-- [ ] push MSYS2 + Summary
+- [x] FM-031 WCAG expand
+- [x] push MSYS2 + Summary
 
 ---
 

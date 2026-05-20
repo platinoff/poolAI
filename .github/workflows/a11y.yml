@@ -17,7 +17,7 @@ env:
 
 jobs:
   pa11y:
-    name: Pa11y WCAG 2.2 (login + 18 auth URLs)
+    name: Pa11y WCAG 2.2 (login + 21 auth URLs)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -45,5 +45,5 @@ jobs:
       - name: Build poolai (enterprise)
         run: cargo build --release --features enterprise,ml,cloud,test-utils
 
-      - name: Run pa11y (WCAG 2.2 axe + login + 18 auth URLs)
+      - name: Run pa11y (WCAG 2.2 axe + login + 21 auth URLs)
         run: bash bin/pa11y-ci.sh --start

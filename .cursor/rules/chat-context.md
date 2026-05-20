@@ -57,7 +57,7 @@
 
 ## Поточний стан і далі
 
-- **Post-Horizon:** FM-020…030 ✅; наступна — **FM-031** (`NEXT_SESSION_PROMPT.md`).  
+- **Post-Horizon:** FM-020…031 ✅; далі maintenance / FM-003 §4 LAN (**BLOCKED**, 2 хости).  
 - **Черга:** `AUTO_RUN_SESSION_2026_POST_HORIZON.md` §4.  
 - **Тести (канон):** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci` (не повний `cargo test` з doctests на Windows без потреби).  
 - **Не робити:** Python / `.py` у репо (0 файлів); OpenAPI audit — `cargo run --bin poolai-openapi-gap-audit`.  
