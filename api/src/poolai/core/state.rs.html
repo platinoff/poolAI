@@ -364,7 +364,7 @@
 <a href=#364 id=364 data-nosnippet>364</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
 <a href=#365 id=365 data-nosnippet>365</a>            </span>audit_logger: Arc::new(AuditLogger::new()),
 <a href=#366 id=366 data-nosnippet>366</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
-<a href=#367 id=367 data-nosnippet>367</a>            </span>enterprise_monitoring_manager: Arc::new(MonitoringManager::new()),
+<a href=#367 id=367 data-nosnippet>367</a>            </span>enterprise_monitoring_manager: Arc::new(MonitoringManager::new_from_env()),
 <a href=#368 id=368 data-nosnippet>368</a>            <span class="attr">#[cfg(feature = <span class="string">"enterprise"</span>)]
 <a href=#369 id=369 data-nosnippet>369</a>            </span>security_manager: Arc::new(SecurityManager::new()),
 <a href=#370 id=370 data-nosnippet>370</a>            <span class="attr">#[cfg(feature = <span class="string">"ml"</span>)]
