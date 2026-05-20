@@ -1,5 +1,11 @@
 # Cursor Agent Configuration Changelog
 
+## 2026-05-20 — Runtime stack policy (block Python)
+
+- Додано **`.cursor/rules/runtime-stack-policy.mdc`** (`alwaysApply: true`) — Rust primary; заборона Python runtime; dev-only `bin/openapi-gap-audit.py`.
+- Оновлено: `project-structure.md`, `rust.md`, `rust-architect.md`, `ai-assistant.md`, `chat-context.md`, `autonomous-orchestrator.mdc`, `.cursorrules`, `poolai-documentation/SKILL.md`.
+- Доки: `docs/STRUCTURE.md` §7, `ARCHITECTURE_BEST_PRACTICES.md` § Technology stack, `README.md`, `HANDOFF`, `NEXT_SESSION_PROMPT`.
+
 ## 2026-04-06 — Без PowerShell і без `.ps1` у `.cursor/`
 
 - Видалено `.cursor/hooks/check-tests.ps1`; у `hooks.json` поле `hooks` порожнє (немає stop-hook на PowerShell).

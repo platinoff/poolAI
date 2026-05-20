@@ -8,6 +8,11 @@ description: >-
 
 # PoolAI — документація та витяг функціоналу
 
+## Runtime stack (перед будь-якою імплементацією)
+
+- Читай **`.cursor/rules/runtime-stack-policy.mdc`** — Rust primary; **no Python runtime**.
+- ML/TurboQuant — `src/ml/` (Rust). Архівні docs з Python — не план імплементації.
+
 ## Канонічний порядок (завжди той самий)
 
 Узгодь посилання з кореневим `README.md` → **кроки 1–12**:

@@ -5,6 +5,7 @@ This directory contains configuration for Cursor's AI coding agent, following be
 ## Structure
 
 - `rules/` - Static context that applies to every conversation
+  - `runtime-stack-policy.mdc` - **alwaysApply:** Rust primary; no Python runtime
   - `rust.md` - Rust coding standards and patterns
   - `project-structure.md` - Project organization rules
   - `documentation.md` - Docs layout, **canonical steps 1–11**, `docs/catalog/` digest; see also repo **`docs/STRUCTURE.md`**

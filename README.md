@@ -10,6 +10,17 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Таксономія каталогу `docs/`** — [`docs/STRUCTURE.md`](docs/STRUCTURE.md). **Правила агента для доків** — [`.cursor/rules/documentation.md`](.cursor/rules/documentation.md).
 
+### Technology stack
+
+| Layer | Stack |
+|-------|--------|
+| **Product** | **Rust** — `src/`, `tests/`, `crates/` |
+| **Admin UI** | HTML + JavaScript — `src/ui/` |
+| **E2E** | TypeScript — `e2e/` |
+| **Ops** | Bash — `scripts/`, MSYS2 |
+
+**No Python runtime** in PoolAI (ML/TurboQuant — `src/ml/` on Rust). One dev-only script: `bin/openapi-gap-audit.py`. Cursor agents: [`.cursor/rules/runtime-stack-policy.mdc`](.cursor/rules/runtime-stack-policy.mdc).
+
 1. **Кореневий [`README.md`](README.md)** (цей файл) — швидкий старт, збірка, CI, посилання нижче.
 2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
 3. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).

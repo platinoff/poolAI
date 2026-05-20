@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Runtime stack policy (2026-05-20)** — `.cursor/rules/runtime-stack-policy.mdc` (alwaysApply): Rust primary, no Python runtime; `STRUCTURE.md` §7, `ARCHITECTURE_BEST_PRACTICES` § Technology stack; `bin/openapi-gap-audit.py` marked dev-only.
 - **FM-025 OpenAPI VM template DTO (2026-05-20)** — `VmTemplate`, `VmTemplateMessageResponse`, `GpuSchedulingPolicy`; `/vm/templates*` bodies in `openapi.yaml`; `OPENAPI_GAP_AUDIT` backlog closed for templates.
 - **FM-024 Solana RPC stub (2026-05-20)** — `crates/poolai-solana-adapter`: `config/devnet.toml`, `AdapterConfig` (`POOLAI_SOLANA_*`), `MockRpcClient` + `SidecarProcessor` (NDJSON ack + `rpc` block); mainnet rejected; no `solana-sdk`.
 - **FM-023 Grid integration (2026-05-20)** — `grid/dispatch::ingest_envelope`; `POST /api/v1/grid/envelope` + `POST /api/v1/discovery/grid/envelope`; Job→store+scheduler, Result→`force_status`, MemoryShard→memory store; OpenAPI Grid tag.

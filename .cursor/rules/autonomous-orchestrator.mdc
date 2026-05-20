@@ -38,6 +38,8 @@ alwaysApply: false
 
 FM-004, FM-006 (Deferred), FM-009, FM-010 (Concept-only) — не реалізовувати в автопрогоні.
 
+**Runtime stack:** `.cursor/rules/runtime-stack-policy.mdc` — **без Python** у продукті; ML/API лише Rust. Не відновлювати Python з архівних docs.
+
 ## BLOCKED
 
 LAN без двох хостів → лише runbook / оновлення `BENCHMARKS.md`, не блокувати інші спринти (див. AUTO_RUN §6).

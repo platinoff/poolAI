@@ -15,6 +15,22 @@
 
 ---
 
+## Technology stack (canonical)
+
+| Layer | Technology | Location |
+|-------|------------|----------|
+| **Server / API / domains** | **Rust** 2021, `tokio`, `axum` | `src/`, `tests/` |
+| **Horizon wire + sidecar** | Rust modules + `crates/poolai-solana-adapter` | `src/grid`, `src/job`, `src/memory`, `crates/` |
+| **Admin UI** | Static HTML + **JavaScript** | `src/ui/` |
+| **E2E** | TypeScript / Playwright | `e2e/` |
+| **Ops** | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
+
+**Not in product runtime:** Python (no `solana-sdk` in main, no ML Python, no subprocess to interpreter). Single dev tool: `bin/openapi-gap-audit.py` (OpenAPI route audit only). **Java:** not present in tree.
+
+**Agent policy:** `.cursor/rules/runtime-stack-policy.mdc`. ML quantization: `src/ml/turboquant.rs` (Rust); see `docs/ml/TURBOQUANT_INTEGRATION.md`.
+
+---
+
 ## 🎯 Rust Best Practices Implementation
 
 ### 1. **Module Organization** ✅

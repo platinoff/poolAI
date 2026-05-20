@@ -11,6 +11,8 @@
 
 **Project skill:** `.cursor/skills/poolai-documentation/SKILL.md` — стислі інструкції для агента з цього порядку та витягу.
 
+**Runtime stack:** `.cursor/rules/runtime-stack-policy.mdc` — Rust primary; Python заборонено в продукті (архівні docs не канон).
+
 **Авторозробка:** найновіший `docs/development/AUTO_RUN_SESSION_*.md`, реєстр патернів `docs/development/AUTO_DEV_PATTERNS.md`, правила `.cursor/rules/autonomous-orchestrator.mdc` та `.cursor/rules/functionality-management.mdc`.
 
 ---

@@ -8,12 +8,17 @@
 
 ## 📚 Quick Reference - Key Documents for AI Assistant
 
+### ⚠️ CRITICAL: Runtime stack (read first)
+
+- **`.cursor/rules/runtime-stack-policy.mdc`** — Rust primary; **no Python runtime**; JS UI + bash ops only.
+- Не пропонуй Python/sidecar/PyPI для ML чи API. Застарілі згадки в `docs/archive/` — не канон.
+
 ### ⚠️ CRITICAL: Always check these documents first when answering questions
 
 **Main active documents** (ALWAYS reference these):
 - **Chat context** (session start / «налаштуйся»): `.cursor/rules/chat-context.md`
 - **Session handoff (кроки 1–12)**: `docs/development/HANDOFF_NEW_SESSION.md`
-- **Autonomous run (orchestrator)**: newest `docs/development/AUTO_RUN_SESSION_*.md` (зараз `AUTO_RUN_SESSION_2026-05-17.md`)
+- **Autonomous run (orchestrator)**: newest `docs/development/AUTO_RUN_SESSION_*.md` (Post-Horizon: `AUTO_RUN_SESSION_2026_POST_HORIZON.md`)
 - **Dev patterns registry**: `docs/development/AUTO_DEV_PATTERNS.md`
 - **Functionality manager (крок 12)**: `docs/catalog/FUNCTION_MANAGEMENT.md` §5.1; rule `.cursor/rules/functionality-management.mdc`
 - **Orchestrator rule**: `.cursor/rules/autonomous-orchestrator.mdc`

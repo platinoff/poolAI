@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Compare Axum .route() paths under src/network with docs/openapi.yaml paths."""
+"""DEV-ONLY: Compare Axum .route() paths with docs/openapi.yaml.
+
+Not part of PoolAI runtime (see .cursor/rules/runtime-stack-policy.mdc).
+Run manually for OpenAPI gap audits; product stack is Rust-only.
+"""
 from __future__ import annotations
 
 import re

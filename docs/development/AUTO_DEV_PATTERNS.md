@@ -585,6 +585,13 @@
 - **Перевірка:** `cargo test -p poolai-solana-adapter` (не повний test-ci, якщо main `src/` не змінювався)
 - **FM:** FM-010 ✅
 
+### [Cursor] Runtime stack — no Python (policy 2026-05-20)
+- **Де:** `.cursor/rules/runtime-stack-policy.mdc` (**alwaysApply**), `docs/STRUCTURE.md` §7, `docs/ARCHITECTURE_BEST_PRACTICES.md` § Technology stack
+- **Сигнал:** агент пропонує `python`, `requirements.txt`, PyPI sidecar — **відхилити**
+- **Патерн:** продукт = Rust (`src/`, `tests/`, `crates/`); UI = `src/ui/` JS; єдиний `.py` = `bin/openapi-gap-audit.py` (dev audit)
+- **Архів:** `docs/archive/*` з Python — не канон імплементації
+- **FM:** policy (усі Post-Horizon сесії)
+
 ### [OpenAPI] VM template DTO (FM-025)
 - **Де:** `docs/openapi.yaml` — `VmTemplate`, `VmTemplateMessageResponse`, `GpuSchedulingPolicy`
 - **Сигнал:** `rg "VmTemplate:" docs/openapi.yaml`; paths `/vm/templates`

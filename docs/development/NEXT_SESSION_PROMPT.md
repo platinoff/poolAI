@@ -1,6 +1,6 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-20 · **Фаза:** **Post-Horizon розробка** (FM-020…) · **A+B+C:** **100%** · **job store JSON:** ✅ `cd1aaad`
+**Оновлено:** 2026-05-20 · **Фаза:** **Post-Horizon розробка** (FM-020…) · **A+B+C:** **100%**
 
 **Копіюй блок нижче** в нову сесію (одна FM за ітерацію).
 
@@ -18,22 +18,19 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 3. FUNCTION_MANAGEMENT.md §5.1, §5.7, §5.3
 4. AUTO_RUN_SESSION_2026_POST_HORIZON.md — перший [ ] у §4
 5. .cursor/rules/autonomous-orchestrator.mdc
-6. JOB_LAYER_CONCEPT_2026-03-17.md (FM-020)
-7. NEXT_STEPS_ARCHITECT_2026-03-17.md — P6 залишок (scheduler, on-chain)
+6. .cursor/rules/runtime-stack-policy.mdc — Rust primary; NO Python runtime
+7. JOB_LAYER_CONCEPT_2026-03-17.md (FM-026 jobs QA)
 
-Не повторювати: autoprogon S21–S34, Horizon S35–S40, FM-001…019 baseline, job store JSON (закрито).
+Не повторювати: autoprogon S21–S34, Horizon S35–S40, FM-001…025 baseline.
+
+Не використовувати архівні docs з Python sidecar як план імплементації.
 
 ## Мета ітерації (одна FM за сесію)
 
 | Пор. | FM | Фокус | Критерій |
 |------|-----|--------|----------|
-| — | FM-020 | Job scheduler MVP | ✅ `scheduler.rs`, `POST /jobs/schedule` |
-| — | FM-021 | Jobs PATCH + OpenAPI | ✅ `PATCH /jobs/{id}`, `JobRecord` schemas |
-| — | FM-022 | Memory API | ✅ `GET/POST /memory/shards`, RAID map |
-| — | FM-023 | Grid integration | ✅ `POST /grid/envelope`, `/discovery/grid/envelope` |
-| — | FM-024 | Solana RPC stub | ✅ devnet config; mock RPC; crate only |
-| — | FM-025 | OpenAPI DTO | ✅ VM template bodies |
-| 1 | FM-026 | Jobs QA | contract або Playwright |
+| — | FM-020…025 | … | ✅ |
+| 1 | FM-026 | Jobs QA | contract або Playwright `/jobs` |
 | 8 | FM-027 | LAN runbook | 2-host checklist (**BLOCKED** без хостів) |
 | 9 | FM-028 | P2b metrics | single-host TQ01+RAID → BENCHMARKS |
 | 10 | FM-029 | Job SQLite | optional backend |
@@ -43,7 +40,7 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 Почни з FM-026 (перший [ ] у AUTO_RUN §4).
 
 Перед кодом FM-026:
-- tests/admin_ui_api_contracts.rs або e2e для `/api/v1/jobs`
+- tests/admin_ui_api_contracts.rs, e2e/tests/ для `/api/v1/jobs`
 
 ## Завершення ітерації
 
@@ -53,7 +50,7 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 4. commit + push MSYS2 з Summary; git -c commit.template= commit -F msgfile.
 
 Не стаджити: data/audit/*.log.gz, data/dev/, data/lan-stand/, .commit-msg-*.txt.
-Поза обсягом: FM-003 §4 sign-off без 2 хостів; mainnet Solana; KYC.
+Поза обсягом: FM-003 §4 sign-off без 2 хостів; mainnet Solana; KYC; Python runtime.
 ```
 
 ---
@@ -64,8 +61,8 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 |----------|------|
 | [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](./AUTO_RUN_SESSION_2026_POST_HORIZON.md) | Черга FM-020…031 |
 | [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) | FM-* §5.1, §5.7 |
-| [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | A+B+C **100%** |
+| [`runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc) | Rust-only; block Python |
+| [`STRUCTURE.md`](../STRUCTURE.md) | §7 — мови стеку |
 | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
-| [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bin/run-poolai.sh` |
 
 **Наступна сесія:** **FM-026** (Jobs contract/E2E).

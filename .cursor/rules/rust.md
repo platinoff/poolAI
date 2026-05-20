@@ -1,5 +1,7 @@
 # Rust Project Rules
 
+**Stack policy:** PoolAI product code is **Rust-only** (plus `src/ui/` JS). Do not add Python runtime, `requirements.txt`, or Python sidecars. See `.cursor/rules/runtime-stack-policy.mdc`.
+
 ## Commands
 
 - `cargo check`: Check code compilation without building

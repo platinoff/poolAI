@@ -10,6 +10,7 @@
 - **Версія**: v0.2.2 (Rust 1.92.0)  
 - **Корінь**: `S:\rust\poolAI`  
 - **Роль**: Rust Architect — концепт, статус, плани, код.
+- **Стек (канон):** Rust (`src/`, `tests/`, `crates/`); UI — JS у `src/ui/`; **без Python runtime** (див. `runtime-stack-policy.mdc`).
 
 ---
 
@@ -18,7 +19,8 @@
 | Призначення | Файл |
 |-------------|------|
 | **Старт сесії / handoff** | `docs/development/HANDOFF_NEW_SESSION.md` (кроки 1–12) |
-| **Авторозробка (оркестратор)** | `docs/development/AUTO_RUN_SESSION_2026-05-17.md` (найновіший `AUTO_RUN_SESSION_*.md`) |
+| **Авторозробка (оркестратор)** | `docs/development/AUTO_RUN_SESSION_2026_POST_HORIZON.md` |
+| **Стек / no Python** | `.cursor/rules/runtime-stack-policy.mdc` |
 | **Патерни для автопрогону** | `docs/development/AUTO_DEV_PATTERNS.md` |
 | **FM / беклог (крок 12)** | `docs/catalog/FUNCTION_MANAGEMENT.md` §5.1 |
 | **Концепт (PRIMARY)** | `docs/concept/poolAI_concept_root.txt` |
@@ -55,9 +57,10 @@
 
 ## Поточний стан і далі
 
-- **Автопрогін 2026-05-16:** FM-012, 007/008, 002, 011 ✅; FM-003 **Planned (ops)** — LAN runbook.  
-- **Наступна авторозробка:** `AUTO_RUN_SESSION_2026-05-17.md` — P0 збір патернів → `AUTO_DEV_PATTERNS.md`, далі FM-003 / Architect §5.1.  
+- **Post-Horizon:** FM-020…025 ✅; наступна — **FM-026** (`NEXT_SESSION_PROMPT.md`).  
+- **Черга:** `AUTO_RUN_SESSION_2026_POST_HORIZON.md` §4.  
 - **Тести (канон):** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci` (не повний `cargo test` з doctests на Windows без потреби).  
+- **Не робити:** Python runtime, нові `.py`, посилання на архівні Python-плани як на імплементацію.  
 - **Пріоритети:** `FUNCTION_MANAGEMENT.md` §5.1 → Architect → HANDOFF.
 
 ---

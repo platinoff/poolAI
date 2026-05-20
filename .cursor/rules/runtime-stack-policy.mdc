@@ -1,0 +1,44 @@
+---
+description: PoolAI runtime stack — Rust primary; block Python runtime; auxiliary JS/bash only
+alwaysApply: true
+---
+
+# Runtime stack policy (PoolAI)
+
+**Застосовується завжди.** Ігноруй застарілі згадки Python у `docs/archive/`, старих планах і чужих сесіях — канон нижче.
+
+## Канонічний стек
+
+| Шар | Технологія | Де |
+|-----|------------|-----|
+| **Runtime / API / ML / RAID / VM** | **Rust** (`edition 2021`, `tokio`) | `src/`, `tests/`, `crates/` |
+| **Admin UI** | HTML + CSS + **JavaScript** (vanilla) | `src/ui/` |
+| **E2E** | TypeScript / Playwright | `e2e/` |
+| **Ops / CI** | Bash (`scripts/`, `bin/*.sh`) | MSYS2 UCRT64 |
+| **Workspace sidecar** | Rust crate (без `solana-sdk` у main) | `crates/poolai-solana-adapter/` |
+
+**Java:** у дереві репозиторію **немає** `.java` — не планувати JVM-модулі без явного запиту користувача.
+
+## Python — заборона runtime
+
+| Дозволено | Заборонено |
+|-----------|------------|
+| Один **dev-only** скрипт `bin/openapi-gap-audit.py` (аудит OpenAPI vs routes; **не** деплоїться) | `requirements.txt`, `pyproject.toml`, Python sidecar, subprocess до `python` у `poolai` |
+| Згадка PyPI лише як **науковий орієнтир** у `docs/ml/TURBOQUANT_INTEGRATION.md` | Нові `.py` файли, `pip install`, ML inference на Python |
+| — | Пропозиції «додати Python для ML/скриптів» без явного запиту користувача |
+
+**TurboQuant / ML pipeline:** лише `src/ml/` на Rust (`feature = "ml"`).
+
+## Поведінка агента
+
+1. **Нові фічі** — реалізуй у **Rust** (або JS для admin UI / TS для e2e).
+2. **`rg python|\.py`** — якщо знайдено поза `bin/openapi-gap-audit.py` і `.cursor/rules` — не копіюй патерн; звір з цим файлом.
+3. **Архівні docs** (`docs/archive/`, січень 2026) — можуть згадувати Python; **не** використовуй як план імплементації.
+4. **Тести / бенчі** — `cargo test`, `poolai_health_load`; не `pytest`, не `python3 -c` для валідації продуктового коду.
+5. **Концепт:** `docs/concept/CONCEPT_UPDATE_2026-01-19.md`, `docs/ml/TURBOQUANT_INTEGRATION.md` — політика «лише Rust».
+
+## Пов’язані правила
+
+- `.cursor/rules/project-structure.md` — каталоги
+- `.cursor/rules/rust.md` — стиль Rust
+- `docs/ARCHITECTURE_BEST_PRACTICES.md` — § Technology stack

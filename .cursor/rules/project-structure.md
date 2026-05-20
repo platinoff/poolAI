@@ -1,5 +1,13 @@
 # Project Structure Rules
 
+## Runtime stack (канон)
+
+- **Primary:** Rust — `src/`, `tests/`, `crates/` (див. `.cursor/rules/runtime-stack-policy.mdc`, **alwaysApply**).
+- **UI:** JavaScript у `src/ui/`; E2E — `e2e/` (TypeScript).
+- **Python:** **заборонено** в runtime; єдиний виняток — `bin/openapi-gap-audit.py` (dev audit, не продукт).
+- **Java:** у репо немає; не додавати без явного запиту.
+- Архівні docs з Python — ігнорувати для імплементації.
+
 ## Directory Organization
 
 - `src/` - Source code (all Rust modules)

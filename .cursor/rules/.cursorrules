@@ -12,10 +12,15 @@
 - **Terminal**: `C:\msys64\usr\bin\bash.exe` (MSYS2 UCRT64) for all local `cargo`/`git`/scripts — no PowerShell, no cmd (see `rust-architect.md`, `msys2-windows.md`).
 - **Patches**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`
 
+## Runtime stack
+
+- **`runtime-stack-policy.mdc`** — **alwaysApply:** Rust primary; **no Python runtime**; JS UI; dev-only `bin/openapi-gap-audit.py`.
+
 ## Rules Location
 
 All project rules are organized in `.cursor/rules/`:
 
+- **`runtime-stack-policy.mdc`** - ⛔ Rust-only runtime; block Python proposals (always on)
 - **`chat-context.md`** - 🧭 Стартовий контекст чату (при «налаштуйся» / подальша робота)
 - **`rust-architect.md`** - ⭐ Rust Architect workflow and concept file usage (READ FIRST)
 - **`documentation.md`** - Documentation structure and file organization rules

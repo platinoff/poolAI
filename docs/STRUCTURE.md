@@ -87,4 +87,22 @@ docs/
 
 ---
 
-**Версія опису структури:** 2.0 (синхронізація з Architect plan і `.cursor/rules`).
+## 7. Runtime stack (мови та заборони)
+
+| Шар | Канон | Шлях |
+|-----|--------|------|
+| Продукт | **Rust** | `src/`, `tests/`, `crates/` |
+| Admin UI | HTML/CSS/JS | `src/ui/` |
+| E2E | TypeScript (Playwright) | `e2e/` |
+| Ops | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
+| Dev audit | Python **1 файл** | `bin/openapi-gap-audit.py` (не runtime) |
+
+**Заборонено в продукті:** Python sidecar, `requirements.txt`, PyPI runtime, нові `.py` без явного рішення архітектора.
+
+**Агент Cursor:** `.cursor/rules/runtime-stack-policy.mdc` (**alwaysApply**). Архівні `docs/archive/*` з Python — історія, не план.
+
+**Java:** у репозиторії немає `.java`; допоміжні JVM-артефакти поза scope, якщо не додано окремим епіком.
+
+---
+
+**Версія опису структури:** 2.1 (runtime stack policy, Post-Horizon FM-026+).
