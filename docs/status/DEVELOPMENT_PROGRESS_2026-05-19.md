@@ -84,7 +84,10 @@
 | FM-023 | Grid integration | [x] |
 | FM-024 | Solana mock RPC stub | ✅ |
 | FM-025 | OpenAPI VM template DTO | ✅ |
-| FM-026…031 | див. FM §5.1 | [ ] |
+| FM-026 | Jobs API contracts | [x] |
+| FM-027 | LAN sign-off prep | [x] |
+| FM-028 | P2b single-host metrics | [x] |
+| FM-029…031 | див. FM §5.1 | [ ] |
 
 **Канон черги:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md).
 

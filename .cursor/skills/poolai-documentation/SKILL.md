@@ -13,6 +13,11 @@ description: >-
 - Читай **`.cursor/rules/runtime-stack-policy.mdc`** — Rust primary; **no Python runtime**.
 - ML/TurboQuant — `src/ml/` (Rust). Архівні docs з Python — не план імплементації.
 
+## Код репозиторію (не плутати папки)
+
+- **`docs/development/REPOSITORY_LAYOUT.md`** — `src/` vs `src/bin/` vs `bin/` vs `scripts/` vs `tests/` vs `crates/`.
+- Нові dev launchers → **`bin/`**; toolchain → **`scripts/`**; Rust CLI → **`src/bin/`**.
+
 ## Канонічний порядок (завжди той самий)
 
 Узгодь посилання з кореневим `README.md` → **кроки 1–12**:

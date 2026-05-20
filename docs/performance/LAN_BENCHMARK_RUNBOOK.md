@@ -1,6 +1,6 @@
 # LAN benchmark runbook (FM-003 / P2b)
 
-**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **§4 sign-off** — **BLOCKED** (немає 2 фізичних хостів). Для розробки: **§5** dual-port LAN на одній машині або **§5.1** `verify-dev-stand`. Автопрогін: [`AUTO_RUN_SESSION_2026-06-20.md`](../development/AUTO_RUN_SESSION_2026-06-20.md) (FM-003 не блокує інші спринти).
+**Status:** Planned (ops) — **FM-016 virtual nodes / worker ✅** (2026-05-25). **FM-027 prep ✅** (2026-05-20): [`LAN_SIGNOFF_CHECKLIST.md`](./LAN_SIGNOFF_CHECKLIST.md), `bin/verify-lan-prep.*`. **§4 sign-off** — **BLOCKED** (немає 2 фізичних хостів). Для розробки: **§5** dual-port LAN на одній машині або **§5.1** `verify-dev-stand`. Автопрогін: Post-Horizon FM-027+ (FM-003 не блокує інші спринти).
 
 **Related:** [`BENCHMARKS.md`](./BENCHMARKS.md) (Criterion + `poolai_health_load`), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) (P2b LAN checkbox).
 
@@ -63,10 +63,32 @@ Append one row per host to the **`poolai_health_load --json`** table in [`BENCHM
 
 ## 4. Acceptance (ops sign-off)
 
+**Повний чеклист (2 фізичні хости):** [`LAN_SIGNOFF_CHECKLIST.md`](./LAN_SIGNOFF_CHECKLIST.md) — FM-027.
+
+**Pre-flight (перед §3 metrics):**
+
+```bash
+# Two physical hosts (from ops laptop or node A):
+export POOLAI_NODE_A_URL=http://192.168.1.10:8080
+export POOLAI_NODE_B_URL=http://192.168.1.11:8080
+bash bin/verify-lan-prep.sh
+```
+
+```powershell
+$env:POOLAI_NODE_A_URL = "http://192.168.1.10:8080"
+$env:POOLAI_NODE_B_URL = "http://192.168.1.11:8080"
+.\bin\verify-lan-prep.ps1
+```
+
+**Single-machine dual-port (dev, не замінює §4):** `bash bin/run-lan-nodes.sh` → `bash bin/verify-lan-prep.sh` (default `127.0.0.1:8080` + `:8081`).
+
+### 4.1 Sign-off gate (коротко)
+
 - [ ] Two nodes reach each other over LAN (health + wire route).
 - [ ] At least one **Push** and one **Pull** sync logged with timings in `BENCHMARKS.md` or an attached ops note.
 - [ ] TQ01 artifact: documented size ratio (uncompressed / compressed) on the stand.
 - [ ] LeaveCluster graceful: artifacts replicated before `delete_worker` when peers exist (see `distributed_raid_wire_integration` for expected JSON fields).
+- [ ] Metadata table (§0 checklist) + ops sign-off line filled in `LAN_SIGNOFF_CHECKLIST.md`.
 
 ---
 
@@ -99,6 +121,8 @@ curl -s http://127.0.0.1:8081/api/v1/health
 
 Дані стенду: `data/lan-stand/` (gitignored). Discovery може бачити peer на сусідньому порту; **§4 acceptance** (Push/Pull timings у `BENCHMARKS.md`) — лише після ops-прогону.
 
+**FM-028 (single-host metrics, не §4 sign-off):** `bash bin/capture-p2b-single-host-metrics.sh` — health_load на обох портах + TQ01 snapshot → [`BENCHMARKS.md`](./BENCHMARKS.md) § P2b single-host.
+
 ### 5.1 Virtual node stack (FM-016 на одній машині)
 
 Coordinator + `poolai-worker` (реєстрація, tasks, RAID wire) без другого фізичного хоста:
@@ -127,8 +151,8 @@ Env: `POOLAI_VIRTUAL_NODE_DATA_DIR` у coordinator (`data/lan-stand/virtual-node
 
 | Situation | Action |
 |-----------|--------|
-| No second physical host | Use §5.1 virtual-node dev stand + `verify-dev-stand`; FM-003 §4 **BLOCKED** — не блокує інші FM (див. [`AUTO_RUN_SESSION_2026-06-22.md`](../development/AUTO_RUN_SESSION_2026-06-22.md)). Повний pa11y — [`a11y.yml`](../../.github/workflows/a11y.yml) на PR `src/ui/**`; контракт скрипта — `ci.yml` job `pa11y-contract`. |
+| No second physical host | `bin/verify-lan-prep.*` (dual-port) + §5.1 `verify-dev-stand`; FM-003 §4 **BLOCKED** — не блокує інші FM. Чеклист — [`LAN_SIGNOFF_CHECKLIST.md`](./LAN_SIGNOFF_CHECKLIST.md) §5. |
 | Firewall | Open TCP between nodes on API port; document rules in ops note. |
 | No `ml` feature on stand | Skip TQ01 LAN row; run wire test with `ml` on CI instead. |
 
-**Last updated:** 2026-06-01 — AUTO_RUN ops: §4 BLOCKED задокументовано; §6 When blocked; посилання на `BENCHMARKS.md` changelog. Раніше: 2026-05-18 — `run-virtual-node-dev.*`, `verify-dev-stand.*`, §5.1.
+**Last updated:** 2026-05-20 — FM-027: `LAN_SIGNOFF_CHECKLIST.md`, `bin/verify-lan-prep.*`, §4 pre-flight. Раніше: 2026-06-01 — §4 BLOCKED; 2026-05-18 — `verify-dev-stand.*`, §5.1.

@@ -1,6 +1,22 @@
-# 🔧 PoolAI Scripts
+# PoolAI `scripts/` — toolchain & deploy
 
-Цей каталог містить всі shell скрипти для проекту PoolAI.
+**Не плутати з `bin/`.** Канонічна карта: [`docs/development/REPOSITORY_LAYOUT.md`](../docs/development/REPOSITORY_LAYOUT.md).
+
+| Каталог | Призначення |
+|---------|-------------|
+| **`bin/`** | Запуск PoolAI, LAN stand, verify-dev-stand, e2e, pa11y, метрики FM-028 |
+| **`scripts/`** (цей) | MSYS/PATH, gcc, verify_build, deployment, git-push shell helpers |
+| **`src/bin/`** | Rust binaries (`cargo run --bin …`) |
+
+## Dev launch (use `bin/`, not here)
+
+- `bin/run-poolai.sh` / `.ps1` — single, lan, virtual-node
+- `bin/run-lan-nodes.sh` — FM-003 dual-port (канон; `scripts/run-lan-nodes.ps1` лише forwarder)
+- `bin/verify-dev-stand.sh`, `bin/verify-lan-prep.sh`, `bin/capture-p2b-single-host-metrics.sh`
+
+---
+
+Цей каталог — **toolchain і deploy** shell-скрипти.
 
 ## 📋 Список скриптів
 
@@ -56,15 +72,22 @@
   - Використання: `bash scripts/PUSH_COMMANDS.sh`
   - Опис: Допоміжні команди для Git push
 
-## 📝 Правила створення нових скриптів
+## Правила створення нових скриптів
 
-1. **Створюйте в `scripts/`**:
+1. **Куди класти:**
+   - Запуск / verify / e2e / LAN → **`bin/`**
+   - MSYS, gcc, deploy, git helper → **`scripts/`**
+   - Rust CLI → **`src/bin/`** + `Cargo.toml`
+
    ```bash
-   # ✅ ПРАВИЛЬНО
-   scripts/my_script.sh
-   
-   # ❌ НЕПРАВИЛЬНО
-   my_script.sh (в корені)
+   # ✅ toolchain
+   scripts/my_setup.sh
+
+   # ✅ dev launcher
+   bin/my_verify.sh
+
+   # ❌ корінь репо
+   my_script.sh
    ```
 
 2. **Додавайте shebang**:

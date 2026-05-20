@@ -28,7 +28,7 @@
 **File Organization**:
 - All documentation → `docs/` directory
 - All Cursor rules → `.cursor/rules/` directory
-- All scripts → `scripts/` directory
+- Dev/ops launchers → `bin/`; toolchain/deploy → `scripts/`; Rust CLIs → `src/bin/` (see `docs/development/REPOSITORY_LAYOUT.md`)
 - Troubleshooting guides → `docs/troubleshooting/`
 
 ### Directory Structure

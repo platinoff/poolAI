@@ -1,4 +1,8 @@
-# Bin – git, cargo, запуск, тести
+# `bin/` — dev & ops launchers (shell)
+
+**Це не `src/bin/`.** Тут лише **bash/PowerShell** для людей. Rust-виконувані файли — у **`src/bin/`** (`cargo run --bin poolai_health_load`, …).
+
+Повна карта репозиторію: [`docs/development/REPOSITORY_LAYOUT.md`](../docs/development/REPOSITORY_LAYOUT.md). Toolchain (MSYS, gcc) — каталог **`scripts/`**.
 
 Скрипти для **запуску проєкту**, **git**, **cargo**, **тестів**. Bash — MSYS2 / Git Bash / WSL; PowerShell — `*.ps1`.
 

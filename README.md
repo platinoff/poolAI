@@ -17,7 +17,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 | **Product** | **Rust** — `src/`, `tests/`, `crates/` |
 | **Admin UI** | HTML + JavaScript — `src/ui/` |
 | **E2E** | TypeScript — `e2e/` |
-| **Ops** | Bash — `scripts/`, MSYS2 |
+| **Ops** | `bin/` (launch/LAN/verify), `scripts/` (toolchain), MSYS2 — [`REPOSITORY_LAYOUT.md`](docs/development/REPOSITORY_LAYOUT.md) |
 
 **No Python** in the repository (0× `.py`; ML/TurboQuant — `src/ml/` on Rust). OpenAPI route audit: `cargo run --bin poolai-openapi-gap-audit`. Cursor agents: [`.cursor/rules/runtime-stack-policy.mdc`](.cursor/rules/runtime-stack-policy.mdc).
 

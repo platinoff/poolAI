@@ -61,9 +61,9 @@ cargo test-ci
 - [x] FM-023 Grid integration
 - [x] FM-024 Solana RPC stub
 - [x] FM-025 OpenAPI DTO
-- [ ] FM-026 Jobs E2E
-- [ ] FM-027 LAN runbook (prep)
-- [ ] FM-028 P2b metrics
+- [x] FM-026 Jobs E2E
+- [x] FM-027 LAN runbook (prep)
+- [x] FM-028 P2b metrics
 - [ ] FM-029 Job SQLite
 - [ ] FM-030 Monitoring persist
 - [ ] FM-031 WCAG expand

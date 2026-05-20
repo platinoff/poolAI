@@ -178,6 +178,11 @@ name = "poolai-openapi-gap-audit"
 path = "src/bin/poolai_openapi_gap_audit.rs"
 
 [[bin]]
+name = "poolai-p2b-tq01-snapshot"
+path = "src/bin/poolai_p2b_tq01_snapshot.rs"
+required-features = ["ml"]
+
+[[bin]]
 name = "poolai-telegram-bot"
 path = "src/bin/poolai-telegram-bot.rs"
 required-features = ["tgbot"]

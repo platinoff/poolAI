@@ -32,8 +32,8 @@ data/virtual_nodes/
 data/jobs/
 data/memory/
 
-# Scripts (excluded from git)
-scripts/
+# Legacy one-off commit message drafts (do not commit)
+docs/development/.commit-msg-*.txt
 
 # OS files
 .DS_Store

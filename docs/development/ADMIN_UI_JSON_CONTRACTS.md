@@ -6,6 +6,8 @@
 
 **Contract tests:** `tests/admin_ui_api_contracts.rs` (`cargo test-ci`, feature `enterprise`). Колонка **Тест** — ім’я `async fn` у файлі.
 
+**Jobs API (без UI, FM-026):** `tests/jobs_api_contracts.rs` — `GET/POST/PATCH /api/v1/jobs`, `POST /jobs/schedule` (4 tests; `JobStore::global()`).
+
 ## Загальні примітки
 
 - Публічний REST: префікс **`/api/v1`**. Enterprise: **`/api/enterprise`** (потрібен збір/запуск з `--features enterprise`).

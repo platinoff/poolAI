@@ -122,9 +122,9 @@ FM-xxx (з таблиці нижче)
 | FM-023 | Grid | Wire Job/Result у discovery або distributed path | **Implemented ✅** | `grid/dispatch.rs`, `POST /grid/envelope`, `POST /discovery/grid/envelope` |
 | FM-024 | Solana | Sidecar devnet RPC stub (без mainnet) | **Implemented ✅** | `config/devnet.toml`, `rpc/mock.rs`, `SidecarProcessor` |
 | FM-025 | OpenAPI | VM template body schemas (gap audit) | **Implemented ✅** | `VmTemplate`, `GpuSchedulingPolicy` in `openapi.yaml` |
-| FM-026 | QA | Contract або Playwright для `/api/v1/jobs` | Planned | `tests/`, `E2E_PLAYWRIGHT.md` |
-| FM-027 | Ops / LAN | 2-host sign-off runbook + checklist | **BLOCKED** (2 хости) | `LAN_BENCHMARK_RUNBOOK.md` §4 |
-| FM-028 | P2b / perf | Single-host TQ01+RAID metrics → `BENCHMARKS.md` | Planned | `run-lan-nodes`, TurboQuant |
+| FM-026 | QA | Contract або Playwright для `/api/v1/jobs` | **Implemented ✅** | `tests/jobs_api_contracts.rs` (4 tests) |
+| FM-027 | Ops / LAN | 2-host sign-off runbook + checklist | **Prep ✅** (sign-off **BLOCKED**, 2 хости) | `LAN_SIGNOFF_CHECKLIST.md`, `bin/verify-lan-prep.*` |
+| FM-028 | P2b / perf | Single-host TQ01+RAID metrics → `BENCHMARKS.md` | **Implemented ✅** | `capture-p2b-single-host-metrics.*`, `poolai-p2b-tq01-snapshot` |
 | FM-029 | Job layer | SQLite job store (optional feature) | Planned | `JOB_LAYER_CONCEPT` §6 |
 | FM-030 | Enterprise | Monitoring metrics persistence MVP | Planned | `MONITORING_PERSISTENCE_PLAN.md` |
 | FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | Partial | `ADMIN_A11Y_RUNBOOK.md` |
@@ -141,9 +141,9 @@ FM-xxx (з таблиці нижче)
 | — | Memory API stub | **FM-022** ✅ | `GET/POST /memory/shards`, RAID filter |
 | — | Grid wire integration | **FM-023** ✅ | `ingest_envelope`, discovery + grid paths |
 | — | OpenAPI DTO backlog | **FM-025** ✅ | `VmTemplate` schemas |
-| 4 | Jobs E2E/contract | **FM-026** | |
-| 5 | LAN §4 runbook prep | **FM-027** | **BLOCKED** (2 хости) |
-| 6 | P2b single-host metrics | **FM-028** | |
+| — | Jobs E2E/contract | **FM-026** ✅ | `tests/jobs_api_contracts.rs` |
+| — | LAN §4 runbook prep | **FM-027** ✅ | checklist + `verify-lan-prep`; sign-off **BLOCKED** |
+| — | P2b single-host metrics | **FM-028** ✅ | dual-port health_load + TQ01 → `BENCHMARKS.md` |
 | 7 | Job store SQLite | **FM-029** | |
 | 8 | Monitoring persistence | **FM-030** | |
 | 9 | WCAG automation expand | **FM-031** | |
@@ -254,7 +254,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-026**.
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-029** (Job store SQLite).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
@@ -265,9 +265,10 @@ FM-xxx (з таблиці нижче)
 | FM-020…023 | **✅** | jobs + memory + grid ingress |
 | FM-024 | **✅** | devnet config + mock RPC (crate only) |
 | FM-025 | **✅** | `VmTemplate` / `GpuSchedulingPolicy` OpenAPI |
-| FM-026 | Planned | Jobs contract/E2E |
-| FM-027 | **BLOCKED** | 2 фізичні хости |
-| FM-028…031 | Planned | perf / SQLite / monitoring / a11y |
+| FM-026 | **✅** | `tests/jobs_api_contracts.rs` (4 tests) |
+| FM-027 | **Prep ✅** | checklist + verify-lan-prep; §4 sign-off **BLOCKED** |
+| FM-028 | **✅** | dual-port stand metrics in `BENCHMARKS.md` |
+| FM-029…031 | Planned | SQLite / monitoring / a11y |
 
 **Одна FM за автономну сесію** — commit + push MSYS2 з Summary.
 

@@ -578,6 +578,27 @@
 - **Перевірка:** `cargo test job --lib --features ml,enterprise,cloud,test-utils`
 - **FM:** FM-021 ✅
 
+### [Perf] P2b single-host dual-port metrics (FM-028)
+- **Де:** `bin/capture-p2b-single-host-metrics.sh`, `src/bin/poolai_p2b_tq01_snapshot.rs`, `BENCHMARKS.md` § «P2b single-host dual-port stand»
+- **Сигнал:** `rg "FM-028|poolai-p2b-tq01-snapshot" docs/performance/BENCHMARKS.md`
+- **Патерн:** `run-lan-nodes` → `verify-lan-prep` → `poolai_health_load --json` на `:8080` і `:8081` → `poolai-p2b-tq01-snapshot` (64×256 TQ01 + wire JSON sizes); merged JSON у `data/lan-stand/metrics-fm028-YYYYMMDD.json` (gitignored)
+- **Перевірка:** `bash bin/capture-p2b-single-host-metrics.sh`; не замінює FM-003 §4 (2 physical hosts)
+- **FM:** FM-028 ✅
+
+### [Ops] LAN sign-off prep (FM-027)
+- **Де:** `docs/performance/LAN_SIGNOFF_CHECKLIST.md`, `bin/verify-lan-prep.sh`, `bin/verify-lan-prep.ps1`, `LAN_BENCHMARK_RUNBOOK.md` §4
+- **Сигнал:** `rg "verify-lan-prep|LAN_SIGNOFF" docs/performance`
+- **Патерн:** 2-host: `POOLAI_NODE_A_URL` + `POOLAI_NODE_B_URL` → health + optional `discovery/peers`; 1-host: default `8080`/`8081` після `run-lan-nodes`; **§4 sign-off BLOCKED** без 2 фізичних хостів
+- **Перевірка:** `bash bin/verify-lan-prep.sh` (після `run-lan-nodes` або на стенді)
+- **FM:** FM-027 prep ✅
+
+### [Job] HTTP API contracts (FM-026)
+- **Де:** `tests/jobs_api_contracts.rs`
+- **Сигнал:** `rg "jobs_.*_json_shape|jobs_create_get" tests/jobs_api_contracts.rs` → 4 tests
+- **Патерн:** axum `Router::nest("/api/v1", create_api_routes())` + `ApiContext::default()`; `POST /jobs` → 201 + `status: scheduled`; `PATCH` valid/invalid; `GET` unknown → 404; немає jobs UI → без Playwright
+- **Перевірка:** `cargo test --test jobs_api_contracts --features ml,enterprise,cloud,test-utils -j 1 -- --test-threads=1`; входить у `cargo test-ci`
+- **FM:** FM-026 ✅
+
 ### [Solana] Adapter crate schema v1 (FM-010, S37)
 - **Де:** `crates/poolai-solana-adapter/src/events.rs`, `src/sidecar.rs`, bin `poolai-solana-adapter`
 - **Сигнал:** `DomainEventEnvelope::from_json`, `process_event_line`

@@ -36,7 +36,7 @@
 
 ## Термінал і середовище
 
-- **Усі локальні команди** (`cargo`, `git`, скрипти): **MSYS2 bash** — `C:\msys64\usr\bin\bash.exe` (UCRT64). Для push — зовнішнє вікно MSYS2, не інтегрований термінал Cursor (див. `git-push.md`).  
+- **Усі локальні команди** (`cargo`, `git`, скрипти): **MSYS2 bash** · dev launch → **`bin/`**, toolchain → **`scripts/`**, Rust bins → **`src/bin/`** ([`REPOSITORY_LAYOUT.md`](docs/development/REPOSITORY_LAYOUT.md)) — `C:\msys64\usr\bin\bash.exe` (UCRT64). Для push — зовнішнє вікно MSYS2, не інтегрований термінал Cursor (див. `git-push.md`).  
 - **CI** на GitHub — окреме середовище; локально PowerShell/cmd для цього репо **не** використовуємо.  
 - **Патчі**: `rust-toolchain.toml`, `.cursor`, `.vscode`, `scripts/`.  
 - **PATH у bash** (для `cargo`/`rustc` з rustup і MSYS2 gcc):  
@@ -57,7 +57,7 @@
 
 ## Поточний стан і далі
 
-- **Post-Horizon:** FM-020…025 ✅; наступна — **FM-026** (`NEXT_SESSION_PROMPT.md`).  
+- **Post-Horizon:** FM-020…028 ✅; наступна — **FM-029** (`NEXT_SESSION_PROMPT.md`).  
 - **Черга:** `AUTO_RUN_SESSION_2026_POST_HORIZON.md` §4.  
 - **Тести (канон):** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci` (не повний `cargo test` з doctests на Windows без потреби).  
 - **Не робити:** Python / `.py` у репо (0 файлів); OpenAPI audit — `cargo run --bin poolai-openapi-gap-audit`.  

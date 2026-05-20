@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Repository layout (2026-05-20)** — `docs/development/REPOSITORY_LAYOUT.md`; канон `bin/` (ops) vs `src/bin/` (Cargo) vs `scripts/` (toolchain); `scripts/` знято з `.gitignore`; forwarder `scripts/run-lan-nodes.ps1` → `bin/`.
+- **FM-028 P2b single-host metrics (2026-05-20)** — `bin/capture-p2b-single-host-metrics.*`, `poolai-p2b-tq01-snapshot`; dual-port `poolai_health_load` + TQ01/wire JSON table in `BENCHMARKS.md`; artifact `data/lan-stand/metrics-fm028-*.json`.
+- **FM-027 LAN sign-off prep (2026-05-20)** — `docs/performance/LAN_SIGNOFF_CHECKLIST.md`; `bin/verify-lan-prep.sh` / `.ps1`; runbook §4 pre-flight; FM-003 §4 sign-off still **BLOCKED** without 2 physical hosts.
+- **FM-026 Jobs API contracts (2026-05-20)** — `tests/jobs_api_contracts.rs`: list/create/get/PATCH lifecycle, schedule tick, 400/404; no jobs UI → contract-only (not Playwright).
 - **OpenAPI gap audit bin (2026-05-20)** — `poolai-openapi-gap-audit` replaces `bin/openapi-gap-audit.py`; repository has **zero** `.py` files.
 - **Runtime stack policy (2026-05-20)** — `.cursor/rules/runtime-stack-policy.mdc` (alwaysApply): Rust primary, no Python runtime; `STRUCTURE.md` §7, `ARCHITECTURE_BEST_PRACTICES` § Technology stack; `bin/openapi-gap-audit.py` marked dev-only.
 - **FM-025 OpenAPI VM template DTO (2026-05-20)** — `VmTemplate`, `VmTemplateMessageResponse`, `GpuSchedulingPolicy`; `/vm/templates*` bodies in `openapi.yaml`; `OPENAPI_GAP_AUDIT` backlog closed for templates.

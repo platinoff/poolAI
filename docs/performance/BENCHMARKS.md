@@ -133,6 +133,24 @@ After **`cargo run --release --bin poolai_health_load -- --json <URL> <seconds> 
 | *e.g. ref-linux-01* | `http://127.0.0.1:8080/api/v1/health` | *from JSON* | *from CLI* | *ok_requests* | *error_requests* | *rps_ok_only* | *latency_p50_ms* | *latency_p95_ms* | *latency_p99_ms* | *YYYY-MM-DD* |
 | win10-local-26200 | `http://127.0.0.1:8080/api/v1/health` | 5.006 | 50 | 149858 | 0 | 29934.63 | 1.568 | 2.704 | 3.623 | 2026-04-10 |
 | win10-local-26200 | `http://127.0.0.1:8080/api/v1/health` | 5.016 | 50 | 18221 | 0 | 3632.46 | 12.136 | 24.848 | 34.903 | 2026-05-18 |
+| win10-local-26200-dual-stand / node-A | `http://127.0.0.1:8080/api/v1/health` | 10.017 | 50 | 35145 | 0 | 3508.67 | 12.310 | 27.391 | 41.334 | 2026-05-20 |
+| win10-local-26200-dual-stand / node-B | `http://127.0.0.1:8081/api/v1/health` | 10.013 | 50 | 37458 | 0 | 3740.84 | 11.982 | 23.918 | 31.976 | 2026-05-20 |
+
+### P2b single-host dual-port stand (FM-028)
+
+Captured via **`bin/capture-p2b-single-host-metrics.sh`** after **`bin/run-lan-nodes.sh`** (`enterprise,ml,cloud,test-utils`, debug `poolai` on `:8080` + `:8081`). Raw JSON: `data/lan-stand/metrics-fm028-YYYYMMDD.json` (gitignored). **Not** a substitute for FM-003 §4 two-physical-host sign-off.
+
+| Metric | Node A (`:8080`) | Node B (`:8081`) | Notes |
+|--------|------------------|------------------|-------|
+| `poolai_health_load` wall_s | 10.017 | 10.013 | concurrency 50 |
+| `rps_ok_only` | 3508.67 | 3740.84 | release load gen → debug servers |
+| `latency_p50_ms` | 12.31 | 11.98 | |
+| `latency_p95_ms` | 27.39 | 23.92 | |
+| TQ01 64×256 `bytes_in` → `bytes_out` | — | — | 65536 → 16653 (ratio **3.94×**) |
+| Wire JSON PutArtifact (base64 payload) | — | — | TQ01 **22651** B vs raw f32 **87830** B (**74.2%** smaller) |
+| Host label | `win10-local-26200-dual-stand` | same stand | 2026-05-20 |
+
+TQ01 numbers from **`cargo run --bin poolai-p2b-tq01-snapshot --features ml`** (same matrix as `distributed_raid_wire_integration`).
 
 ### Target metrics (P4 roadmap, non-binding)
 
@@ -153,6 +171,8 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | Date | Note |
 |------|------|
 | 2026-05-18 | AUTO_RUN 2026-06-08 S1: **P4** `poolai_health_load --json` (release, MSYS2 UCRT64) на **win10-local-26200** — рядок у таблиці `poolai_health_load`; coordinator already on `:8080`; FM-003 §4 лишається **BLOCKED**. |
+| 2026-05-20 | **FM-028:** single-host dual-port stand — `capture-p2b-single-host-metrics.sh`, `poolai-p2b-tq01-snapshot`; health_load rows **node-A/B** + TQ01 table above; artifact `data/lan-stand/metrics-fm028-*.json`. |
+| 2026-05-20 | FM-027: LAN sign-off prep — [`LAN_SIGNOFF_CHECKLIST.md`](./LAN_SIGNOFF_CHECKLIST.md), `bin/verify-lan-prep.*`; §4 sign-off **BLOCKED** (2 physical hosts); без нового health_load row. |
 | 2026-06-01 | AUTO_RUN 2026-06-01: FM-003 §4 **BLOCKED** (2 фізичні хости відсутні); [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) §6 оновлено; dev stand §5.1 (`verify-dev-stand`) — канон для однієї машини; **без** нового `poolai_health_load` / LAN replication row (baseline **2026-04-10** чинний). |
 | 2026-05-17 | AUTO_RUN 2026-05-17 S1: LAN-стенд недоступний (1 хост); runbook оновлено; FM-003 **Planned (ops)** — без нового рядка `poolai_health_load` (baseline **2026-04-10** чинний). |
 | 2026-05-16 | FM-003 ops: [`LAN_BENCHMARK_RUNBOOK.md`](./LAN_BENCHMARK_RUNBOOK.md) (два вузли LAN, replication + TQ01); baseline `poolai_health_load` — рядок **2026-04-10** лишається чинним до нового прогону на стенді. |

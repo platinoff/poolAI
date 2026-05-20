@@ -14,7 +14,7 @@ alwaysApply: true
 | **Runtime / API / ML / RAID / VM / tools** | **Rust** (`edition 2021`, `tokio`) | `src/`, `tests/`, `crates/`, `cargo run --bin …` |
 | **Admin UI** | HTML + CSS + **JavaScript** (vanilla) | `src/ui/` |
 | **E2E** | TypeScript / Playwright | `e2e/` |
-| **Ops / CI** | Bash (`scripts/`, `bin/*.sh`) | MSYS2 UCRT64 |
+| **Ops / CI** | Bash — dev launch **`bin/`**, toolchain **`scripts/`** (див. `REPOSITORY_LAYOUT.md`) | MSYS2 UCRT64 |
 | **Workspace sidecar** | Rust crate (без `solana-sdk` у main) | `crates/poolai-solana-adapter/` |
 
 **Java:** у дереві репозиторію **немає** `.java` — не планувати JVM-модулі без явного запиту користувача.

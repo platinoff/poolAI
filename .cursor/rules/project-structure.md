@@ -8,13 +8,29 @@
 - **Java:** у репо немає; не додавати без явного запиту.
 - Архівні docs з Python — ігнорувати для імплементації.
 
+## Repository layout (люди vs Cargo)
+
+**Повний опис:** `docs/development/REPOSITORY_LAYOUT.md`.
+
+| Шлях | Призначення |
+|------|-------------|
+| `src/` | Rust product code (library + `main`) |
+| `src/bin/` | **Cargo binaries only** — `cargo run --bin NAME` |
+| `bin/` | **Dev/ops launchers** — `.sh` / `.ps1` (run, LAN, verify, e2e) |
+| `scripts/` | **Toolchain / deploy** — MSYS PATH, gcc, build verify, git helpers |
+| `tests/` | Integration tests (Rust convention) |
+| `crates/*/src/` | Workspace members (e.g. `poolai-solana-adapter`) |
+
+**Не плутати:** кореневий `bin/` ≠ `src/bin/`. Rust `.rs` binaries **тільки** в `src/bin/`.
+
 ## Directory Organization
 
 - `src/` - Source code (all Rust modules)
 - `tests/` - Integration tests (all test files)
 - `docs/` - Documentation (all markdown files)
   - `docs/troubleshooting/` - Troubleshooting guides (QUICK_FIX_MSYS2.md, etc.)
-- `scripts/` - Build/deployment scripts (all shell scripts, bash NOT PowerShell)
+- `bin/` - Dev/ops shell scripts (launch, LAN stand, verify, cargo helpers)
+- `scripts/` - Toolchain, MSYS setup, deployment helpers
 - `docker/` - Docker files (Dockerfile, docker-compose.yml)
 - `.cursor/` - Cursor agent configuration (rules, commands, plans, project skills)
   - `.cursor/rules/` - All Cursor rules (including `.cursorrules` moved here)
@@ -25,7 +41,7 @@
 - Rust files: `snake_case.rs`
 - Test files: `test_*.rs` or `*_test.rs`
 - Documentation: `UPPER_CASE.md` for important docs, `lowercase.md` for guides
-- Scripts: `snake_case.sh` (у репо — лише bash у `scripts/`)
+- Ops scripts: `snake_case.sh` / `kebab-case.ps1` in `bin/` or `scripts/`
 
 ## Module Organization
 
@@ -39,22 +55,28 @@
 
 - Main docs in `docs/` directory
 - **Catalog / functionality digest:** `docs/catalog/` (canonical step **11** in root README)
+- **Layout for humans:** `docs/development/REPOSITORY_LAYOUT.md`
 - Status reports in `docs/status/`
 - Development plans in `docs/development/`
 - Architecture docs in `docs/ARCHITECTURE_*.md`
 - Never create markdown files in root (except README.md, LICENSE)
 
-## Scripts
+## Scripts policy
 
-- All scripts MUST be in `scripts/` directory
-- Never create `.sh` or `.ps1` files in root directory
-- See `scripts/README.md` for script documentation
+| Куди | Що |
+|------|-----|
+| **`bin/`** | run-poolai, LAN nodes, verify-dev-stand, e2e-playwright, pa11y, capture metrics |
+| **`scripts/`** | setup_rust_path, fix_gcc, verify_build, deployment, git-push shell helpers |
+
+- Never create `.sh` / `.ps1` in repo root.
+- No duplicate logic: one canonical file; old path → forwarder with `DEPRECATED` comment.
+- See `bin/README.md` and `scripts/README.md`.
 
 ## File Listing Rules
 
 **When creating file lists or inventories:**
 - ❌ **NEVER** use `.ps1` or `.ps` extensions in file lists
-- ✅ Use descriptive names: "MSVC environment setup script" instead of `setup_msvc_environment.ps1`
+- ✅ Use descriptive names: "MSYS environment setup script" instead of `setup_msvc_environment.ps1`
 - ✅ Group by category: e.g. "Bash scripts", "Build helpers"
 - ✅ Use markdown lists or tables, not PowerShell command output
 

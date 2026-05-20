@@ -94,7 +94,9 @@ docs/
 | Продукт | **Rust** | `src/`, `tests/`, `crates/` |
 | Admin UI | HTML/CSS/JS | `src/ui/` |
 | E2E | TypeScript (Playwright) | `e2e/` |
-| Ops | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
+| Ops (dev launch) | Bash / PowerShell | **`bin/`** — run, LAN, verify, e2e |
+| Ops (toolchain) | Bash (MSYS2) | **`scripts/`** — PATH, gcc, deploy |
+| Cargo binaries | Rust | **`src/bin/`** — `cargo run --bin …` |
 | Dev audit | Rust bin | `poolai-openapi-gap-audit` (`src/bin/poolai_openapi_gap_audit.rs`) |
 
 **Заборонено в репозиторії:** будь-які `.py`, Python sidecar, `requirements.txt`, PyPI runtime.
@@ -105,4 +107,8 @@ docs/
 
 ---
 
-**Версія опису структури:** 2.1 (runtime stack policy, Post-Horizon FM-026+).
+## 8. Код репозиторію (не `docs/`)
+
+Людська карта шляхів (`src/` vs `src/bin/` vs `bin/` vs `scripts/` vs `tests/` vs `crates/`): **[`development/REPOSITORY_LAYOUT.md`](./development/REPOSITORY_LAYOUT.md)**.
+
+**Версія опису структури:** 2.2 (repository layout clarity, 2026-05-20).

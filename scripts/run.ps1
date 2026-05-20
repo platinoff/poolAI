@@ -1,3 +1,4 @@
+# DEPRECATED: use bin/run-poolai.ps1 (see docs/development/REPOSITORY_LAYOUT.md).
 # Run PoolAI with enterprise features
 # Automatically stops any running poolai process before starting
 
