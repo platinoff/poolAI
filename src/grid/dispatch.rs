@@ -5,8 +5,8 @@ use chrono::Utc;
 use crate::core::error::AppError;
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
-    job_spec_from_grid_job, job_status_from_grid_result, schedule_pending, JobId, JobRecord,
-    JobStatus, JobStore,
+    job_spec_from_grid_job, job_status_from_grid_result, schedule_pending, JobRecord, JobStatus,
+    JobStore,
 };
 use crate::memory::{memory_shard_from_grid_body, MemoryShardStore};
 

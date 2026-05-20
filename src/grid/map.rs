@@ -1,9 +1,7 @@
 //! Map Grid envelope bodies ↔ existing discovery / RAID DTOs.
 
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
-use crate::grid::envelope::{
-    GridEnvelope, GridMemoryShardBody, GridMessage, GridPeerStatusBody, GRID_ENVELOPE_VERSION,
-};
+use crate::grid::envelope::{GridEnvelope, GridMemoryShardBody, GridMessage, GridPeerStatusBody};
 use crate::raid::protocol::{ArtifactMetadata, PutArtifactPayload, SyncMode};
 use chrono::Utc;
 use std::collections::HashMap;
