@@ -557,6 +557,13 @@
 - **Перевірка:** `cargo test job --lib --features ml,enterprise,cloud,test-utils`
 - **FM:** FM-020 ✅
 
+### [Memory] Shard refs HTTP (FM-022)
+- **Де:** `src/memory/store.rs`, `src/memory/map.rs` (`memory_shard_from_raid`), `src/network/api/memory.rs`
+- **Сигнал:** `POOLAI_MEMORY_DATA_DIR`, `GET /api/v1/memory/shards?raid_logical_name=`
+- **Патерн:** `POST` з `raid_logical_name`+`artifact_id`+`version` → `shard_id`=`{name}:{version}`; upsert by `shard_id`; `shards.json` atomic persist
+- **Перевірка:** `cargo test memory --lib --features ml,enterprise,cloud,test-utils`
+- **FM:** FM-022 ✅
+
 ### [Job] PATCH lifecycle (FM-021)
 - **Де:** `src/job/lifecycle.rs` (`allows_transition`), `JobStore::update_status`, `PATCH /api/v1/jobs/{id}`
 - **Сигнал:** `rg "patch_job|PatchJobRequest" src/network/api/jobs.rs`

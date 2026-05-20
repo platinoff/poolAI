@@ -66,6 +66,10 @@ tags:
       x-internal
   - name: WebSocket
     description: Real-time WebSocket endpoints
+  - name: Jobs
+    description: Job / mining layer HTTP stub (P6, FM-020+)
+  - name: Memory
+    description: AGI memory shard refs mapped to RAID artifacts (FM-022)
   - name: Discovery
     description: Peer discovery and virtual-node registration (FM-016)
   - name: VirtualNodes
@@ -442,6 +446,86 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /memory/shards:
+    get:
+      tags:
+        - Memory
+      summary: List memory shard refs
+      description: Optional filter by RAID logical name (`raid_logical_name` query).
+      operationId: listMemoryShards
+      parameters:
+        - name: raid_logical_name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter shards mapped to this RAID logical name
+      responses:
+        '200':
+          description: Shard list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryShardsListResponse'
+    post:
+      tags:
+        - Memory
+      summary: Register memory shard ref
+      description: Links AGI memory shard to RAID `artifact_id`. Provide `raid_logical_name` (builds `shard_id`) or explicit `shard_id`.
+      operationId: registerMemoryShard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterMemoryShardRequest'
+      responses:
+        '201':
+          description: Shard registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryShardResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /memory/shards/{shard_id}:
+    get:
+      tags:
+        - Memory
+      summary: Get memory shard ref by id
+      operationId: getMemoryShard
+      parameters:
+        - name: shard_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Shard id (e.g. `weights:1.0.0`; URL-encode `:` as `%3A`)
+      responses:
+        '200':
+          description: Shard ref
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryShardResponse'
+        '404':
+          description: Shard not found
           content:
             application/json:
               schema:
@@ -5078,6 +5162,69 @@ components:
           type: integer
           minimum: 0
           description: Count of jobs promoted from submitted to scheduled in this tick
+
+    MemoryShardRef:
+      type: object
+      required:
+        - shard_id
+        - artifact_id
+        - version
+      properties:
+        shard_id:
+          type: string
+          description: Shard id (often `{raid_logical_name}:{version}`)
+        artifact_id:
+          type: string
+          description: RAID artifact UUID or stable id
+        version:
+          type: string
+        raid_logical_name:
+          type: string
+          nullable: true
+          description: RAID logical name for map/filter queries
+        seed_hints:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+    MemoryShardsListResponse:
+      type: object
+      properties:
+        shards:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemoryShardRef'
+
+    MemoryShardResponse:
+      type: object
+      required:
+        - shard
+      properties:
+        shard:
+          $ref: '#/components/schemas/MemoryShardRef'
+
+    RegisterMemoryShardRequest:
+      type: object
+      required:
+        - artifact_id
+        - version
+      properties:
+        artifact_id:
+          type: string
+        version:
+          type: string
+        shard_id:
+          type: string
+          description: Explicit shard id; omit when using `raid_logical_name` builder
+        raid_logical_name:
+          type: string
+          description: Builds `shard_id` as `{raid_logical_name}:{version}`
+        seed_hints:
+          type: array
+          items:
+            type: string
+          nullable: true
 
     VmInstance:
       type: object

@@ -30,6 +30,7 @@ data/dev/
 # Virtual-node coordinator persistence (FM-016+)
 data/virtual_nodes/
 data/jobs/
+data/memory/
 
 # Scripts (excluded from git)
 scripts/

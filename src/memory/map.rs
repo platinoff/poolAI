@@ -37,9 +37,33 @@ pub fn memory_shard_from_envelope(env: &GridEnvelope) -> Option<MemoryShardRef> 
     }
 }
 
+/// Build shard ref from RAID logical name + artifact id (FM-022 RAID map).
+pub fn memory_shard_from_raid(
+    raid_logical_name: impl Into<String>,
+    artifact_id: impl Into<String>,
+    version: impl Into<String>,
+) -> MemoryShardRef {
+    let raid_logical_name = raid_logical_name.into();
+    let version = version.into();
+    MemoryShardRef {
+        shard_id: MemoryShardId::new(format!("{raid_logical_name}:{version}")),
+        artifact_id: artifact_id.into(),
+        version,
+        raid_logical_name: Some(raid_logical_name),
+        seed_hints: None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn memory_shard_from_raid_builds_id() {
+        let shard = memory_shard_from_raid("weights", "art-uuid", "1.0.0");
+        assert_eq!(shard.shard_id.0, "weights:1.0.0");
+        assert_eq!(shard.raid_logical_name.as_deref(), Some("weights"));
+    }
 
     #[test]
     fn memory_shard_grid_round_trip() {

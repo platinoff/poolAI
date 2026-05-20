@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-022 Memory API (2026-05-20)** — `MemoryShardStore` + `POOLAI_MEMORY_DATA_DIR`; `GET/POST /api/v1/memory/shards`, `GET /memory/shards/{shard_id}`; RAID map via `raid_logical_name` query / `memory_shard_from_raid`; OpenAPI Memory tag.
 - **FM-021 Jobs PATCH + OpenAPI (2026-05-20)** — `PATCH /api/v1/jobs/{id}` (`status`); `src/job/lifecycle.rs` transition rules; `JobStore::update_status`; OpenAPI `JobRecord`, `JobSpec`, `PatchJobRequest`.
 - **FM-020 Job scheduler MVP (2026-05-20)** — `src/job/scheduler.rs`; `JobStore::promote_submitted_to_scheduled`; `POST /api/v1/jobs/schedule`; `POST /jobs` auto-schedules `submitted`→`scheduled`; OpenAPI `/jobs/schedule`.
 - **Post-Horizon backlog (2026-05-20)** — FM-020…031 (12 задач); `AUTO_RUN_SESSION_2026_POST_HORIZON.md`; FM §5.7; `NEXT_SESSION_PROMPT` → FM-021.

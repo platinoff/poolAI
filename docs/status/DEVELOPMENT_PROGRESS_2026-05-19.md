@@ -80,7 +80,8 @@
 | — | Job store JSON (`POOLAI_JOB_DATA_DIR`) | ✅ `cd1aaad` |
 | FM-020 | Scheduler MVP | [x] |
 | FM-021 | Jobs PATCH + OpenAPI | [x] |
-| FM-022…031 | див. FM §5.1 | [ ] |
+| FM-022 | Memory API | [x] |
+| FM-023…031 | див. FM §5.1 | [ ] |
 
 **Канон черги:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md).
 

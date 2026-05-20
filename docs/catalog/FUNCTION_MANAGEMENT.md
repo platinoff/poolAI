@@ -118,7 +118,7 @@ FM-xxx (з таблиці нижче)
 | FM-019 | UI / a11y | pa11y CI ✅; axe Playwright ✅ (S33); admin baseline | Implemented (scope A) | [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md), `e2e/tests/a11y.spec.ts` |
 | FM-020 | Job layer | Scheduler MVP: `Submitted`→`Scheduled`, in-process tick, persist via store | **Implemented ✅** | `src/job/scheduler.rs`, `POST /jobs/schedule`, `AUTO_RUN_POST_HORIZON` |
 | FM-021 | Job layer | `PATCH /api/v1/jobs/{id}` (status); OpenAPI `/jobs` schemas | **Implemented ✅** | `lifecycle.rs`, `PATCH /jobs/{id}`, `JobRecord` OpenAPI |
-| FM-022 | Memory layer | HTTP stub shard refs / RAID map | Planned | `POOLAI_MEMORY_LAYER.md`, `src/memory/` |
+| FM-022 | Memory layer | HTTP stub shard refs / RAID map | **Implemented ✅** | `memory/store.rs`, `GET/POST /memory/shards`, `POOLAI_MEMORY_DATA_DIR` |
 | FM-023 | Grid | Wire Job/Result у discovery або distributed path | Planned | `src/grid/`, `GRID_PROTOCOL_CONCEPT` |
 | FM-024 | Solana | Sidecar devnet RPC stub (без mainnet) | Planned | `poolai-solana-adapter`, `SOLANA_ADAPTER_CONCEPT` |
 | FM-025 | OpenAPI | VM template body schemas (gap audit) | Planned | `OPENAPI_GAP_AUDIT_2026-05-19.md` |
@@ -135,19 +135,18 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
-| 1 | Memory API stub | **FM-022** | `AUTO_RUN_POST_HORIZON` §2 |
+| 1 | Grid wire integration | **FM-023** | `AUTO_RUN_POST_HORIZON` §2 |
 | — | Job scheduler MVP | **FM-020** ✅ | `scheduler.rs`, `POST /jobs/schedule` |
 | — | Jobs PATCH + OpenAPI | **FM-021** ✅ | `lifecycle.rs`, `PATCH /jobs/{id}` |
-| 3 | Memory API stub | **FM-022** | |
-| 4 | Grid wire integration | **FM-023** | |
-| 5 | Solana RPC stub | **FM-024** | |
-| 6 | OpenAPI DTO backlog | **FM-025** | |
-| 7 | Jobs E2E/contract | **FM-026** | |
-| 8 | LAN §4 runbook prep | **FM-027** | **BLOCKED** (2 хости) |
-| 9 | P2b single-host metrics | **FM-028** | |
-| 10 | Job store SQLite | **FM-029** | |
-| 11 | Monitoring persistence | **FM-030** | |
-| 12 | WCAG automation expand | **FM-031** | |
+| — | Memory API stub | **FM-022** ✅ | `GET/POST /memory/shards`, RAID filter |
+| 2 | Solana RPC stub | **FM-024** | |
+| 3 | OpenAPI DTO backlog | **FM-025** | |
+| 4 | Jobs E2E/contract | **FM-026** | |
+| 5 | LAN §4 runbook prep | **FM-027** | **BLOCKED** (2 хости) |
+| 6 | P2b single-host metrics | **FM-028** | |
+| 7 | Job store SQLite | **FM-029** | |
+| 8 | Monitoring persistence | **FM-030** | |
+| 9 | WCAG automation expand | **FM-031** | |
 
 **Закрито (не в черзі):** FM-001…019; Horizon S35–S40; job store JSON (`cd1aaad`).
 
@@ -255,7 +254,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-022**.
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-023**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
@@ -263,8 +262,8 @@ FM-xxx (з таблиці нижче)
 
 | FM | Статус | Коментар |
 |----|--------|----------|
-| FM-020…021 | **✅** | scheduler + PATCH lifecycle |
-| FM-022…026 | Planned | код + OpenAPI + QA |
+| FM-020…022 | **✅** | jobs + memory HTTP |
+| FM-023…026 | Planned | код + OpenAPI + QA |
 | FM-027 | **BLOCKED** | 2 фізичні хости |
 | FM-028…031 | Planned | perf / SQLite / monitoring / a11y |
 

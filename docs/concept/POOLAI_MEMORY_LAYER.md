@@ -90,3 +90,5 @@ Memory Layer додає **семантику AGI‑памʼяті** поверх
 
 **Wire types (S38):** `src/memory/` (`MemoryShardRef`) ↔ `GridEnvelope` memory_shard. Деталі адаптера — [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
 
+**HTTP (FM-022):** `GET/POST /api/v1/memory/shards`, `GET /api/v1/memory/shards/{shard_id}`; `POOLAI_MEMORY_DATA_DIR` → `shards.json`; filter `?raid_logical_name=` для RAID map.
+

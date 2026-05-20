@@ -23,6 +23,7 @@ pub mod discovery;
 pub mod instances;
 pub mod jobs;
 pub mod libraries;
+pub mod memory;
 pub mod raid;
 pub mod raid_admin;
 pub(crate) mod raid_http;
@@ -59,6 +60,7 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
         .merge(jobs::create_jobs_routes())
+        .merge(memory::create_memory_routes())
         .merge(virtual_nodes::create_virtual_node_routes())
         .merge(instances::create_instance_routes())
         .merge(completions::create_completions_routes())
