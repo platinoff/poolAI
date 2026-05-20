@@ -31,6 +31,7 @@ data/dev/
 data/virtual_nodes/
 data/jobs/
 data/memory/
+data/monitoring/
 
 # Legacy one-off commit message drafts (do not commit)
 docs/development/.commit-msg-*.txt

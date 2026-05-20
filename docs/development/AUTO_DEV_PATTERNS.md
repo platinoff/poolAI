@@ -548,6 +548,19 @@
 - **Де:** `src/job/types.rs`, `src/memory/types.rs`, `src/network/api/jobs.rs`
 - **Сигнал:** `JobSpec`, `MemoryShardRef`, `envelope_from_job_spec`
 - **Патерн:** `JobStore::global()`; `POOLAI_JOB_DATA_DIR` → `jobs.json` (atomic write); без env — in-memory; `POST /api/v1/jobs` → 201; map ↔ `GridEnvelope`
+
+### [Enterprise] Monitoring SQLite MVP (FM-030)
+- **Де:** `src/enterprise/monitoring.rs`, `EnterpriseManager::new_from_env`, `AppState::enterprise_monitoring_manager`
+- **Сигнал:** `POOLAI_MONITORING_DATA_DIR=data/monitoring`; `monitoring.db`; `initialize()` loads dashboards + alert_rules
+- **Патерн:** metrics INSERT + 30d cleanup (unchanged); `create_alert_rule` / `create_dashboard` / `delete_dashboard` → SQLite; in-memory cache 1000 points
+- **Перевірка:** `cargo test enterprise::monitoring --lib --features enterprise`; `cargo test --test enterprise_monitoring_sqlite_integration --features enterprise`
+- **FM:** FM-030 ✅
+
+### [Job] SQLite store (FM-029)
+- **Де:** `src/job/store_sqlite.rs`, `src/job/store.rs` (`POOLAI_JOB_STORE=sqlite`)
+- **Сигнал:** `cargo test job::store --features …,job-store-sqlite`; `jobs.db` у `POOLAI_JOB_DATA_DIR`
+- **Патерн:** feature `job-store-sqlite`; перший open імпортує порожній DB з `jobs.json` → `jobs.json.migrated`; default без feature/env — JSON як раніше
+- **FM:** FM-029 ✅
 - **Перевірка:** `cargo test --lib round_trip`; `cargo test-ci` після змін у `src/`
 
 ### [Job] Scheduler MVP (FM-020)

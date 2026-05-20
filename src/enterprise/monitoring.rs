@@ -45,6 +45,9 @@ use tokio::sync::RwLock;
 use tracing::{info, warn};
 use uuid::Uuid;
 
+/// SQLite file under `POOLAI_MONITORING_DATA_DIR` (FM-030).
+pub const MONITORING_DB_FILE: &str = "monitoring.db";
+
 /// Alert severity level
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum AlertSeverity {
@@ -182,14 +185,12 @@ impl MonitoringManager {
     /// Metrics are stored in-memory by default. For persistent storage,
     /// use `new_with_persistence()` or configure persistence in `initialize()`.
     pub fn new() -> Self {
-        Self {
-            alert_rules: Arc::new(RwLock::new(HashMap::new())),
-            active_alerts: Arc::new(RwLock::new(HashMap::new())),
-            metrics_history: Arc::new(RwLock::new(Vec::new())),
-            dashboards: Arc::new(RwLock::new(HashMap::new())),
-            initialized: Arc::new(RwLock::new(false)),
-            db_path: None,
-        }
+        Self::new_with_persistence(None)
+    }
+
+    /// Coordinator persistence when `POOLAI_MONITORING_DATA_DIR` is set (e.g. `data/monitoring`).
+    pub fn new_from_env() -> Self {
+        Self::new_with_persistence(db_path_from_env())
     }
 
     /// Creates a new monitoring manager with SQLite persistence
@@ -279,6 +280,139 @@ impl MonitoringManager {
         Ok(())
     }
 
+    fn load_persisted_config(
+        conn: &Connection,
+    ) -> Result<(HashMap<String, AlertRule>, HashMap<Uuid, Dashboard>), String> {
+        let mut rules = HashMap::new();
+        let mut rule_stmt = conn
+            .prepare(
+                "SELECT name, metric, threshold, operator, severity, enabled, tenant_id FROM alert_rules",
+            )
+            .map_err(|e| format!("prepare alert_rules: {e}"))?;
+        let rule_rows = rule_stmt
+            .query_map([], |row| {
+                let name: String = row.get(0)?;
+                let metric: String = row.get(1)?;
+                let threshold: f64 = row.get(2)?;
+                let operator: String = row.get(3)?;
+                let severity_str: String = row.get(4)?;
+                let enabled: i64 = row.get(5)?;
+                let tenant_id_str: Option<String> = row.get(6)?;
+                Ok(AlertRule {
+                    name,
+                    metric,
+                    threshold,
+                    operator,
+                    severity: severity_from_str(&severity_str),
+                    enabled: enabled != 0,
+                    tenant_id: tenant_id_str.and_then(|s| Uuid::parse_str(&s).ok()),
+                })
+            })
+            .map_err(|e| format!("query alert_rules: {e}"))?;
+        for row in rule_rows {
+            let rule = row.map_err(|e| format!("read alert_rule row: {e}"))?;
+            rules.insert(rule.name.clone(), rule);
+        }
+
+        let mut dashboards = HashMap::new();
+        let mut dash_stmt = conn
+            .prepare(
+                "SELECT id, name, description, metrics, layout, is_public, tenant_id, created_at FROM dashboards",
+            )
+            .map_err(|e| format!("prepare dashboards: {e}"))?;
+        let dash_rows = dash_stmt
+            .query_map([], |row| {
+                let id_str: String = row.get(0)?;
+                let name: String = row.get(1)?;
+                let description: String = row.get(2)?;
+                let metrics_json: String = row.get(3)?;
+                let layout: String = row.get(4)?;
+                let is_public: i64 = row.get(5)?;
+                let tenant_id_str: Option<String> = row.get(6)?;
+                let created_at_str: String = row.get(7)?;
+                let id = Uuid::parse_str(&id_str).map_err(|_| {
+                    rusqlite::Error::InvalidColumnType(0, "id".into(), rusqlite::types::Type::Text)
+                })?;
+                let metrics: Vec<String> = serde_json::from_str(&metrics_json).unwrap_or_default();
+                let created_at = DateTime::parse_from_rfc3339(&created_at_str)
+                    .map_err(|_| {
+                        rusqlite::Error::InvalidColumnType(
+                            7,
+                            "created_at".into(),
+                            rusqlite::types::Type::Text,
+                        )
+                    })?
+                    .with_timezone(&Utc);
+                Ok(Dashboard {
+                    id,
+                    name,
+                    description,
+                    metrics,
+                    layout,
+                    is_public: is_public != 0,
+                    tenant_id: tenant_id_str.and_then(|s| Uuid::parse_str(&s).ok()),
+                    created_at,
+                })
+            })
+            .map_err(|e| format!("query dashboards: {e}"))?;
+        for row in dash_rows {
+            let dashboard = row.map_err(|e| format!("read dashboard row: {e}"))?;
+            dashboards.insert(dashboard.id, dashboard);
+        }
+
+        Ok((rules, dashboards))
+    }
+
+    fn upsert_alert_rule_conn(conn: &Connection, rule: &AlertRule) -> Result<(), String> {
+        let tenant_id_str = rule.tenant_id.map(|id| id.to_string());
+        conn.execute(
+            "INSERT OR REPLACE INTO alert_rules (name, metric, threshold, operator, severity, enabled, tenant_id)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+            params![
+                &rule.name,
+                &rule.metric,
+                rule.threshold,
+                &rule.operator,
+                rule.severity.as_str(),
+                i64::from(rule.enabled),
+                tenant_id_str,
+            ],
+        )
+        .map_err(|e| format!("upsert alert_rule {}: {e}", rule.name))?;
+        Ok(())
+    }
+
+    fn upsert_dashboard_conn(conn: &Connection, dashboard: &Dashboard) -> Result<(), String> {
+        let metrics_json = serde_json::to_string(&dashboard.metrics)
+            .map_err(|e| format!("serialize metrics: {e}"))?;
+        let tenant_id_str = dashboard.tenant_id.map(|id| id.to_string());
+        conn.execute(
+            "INSERT OR REPLACE INTO dashboards (id, name, description, metrics, layout, is_public, tenant_id, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+            params![
+                dashboard.id.to_string(),
+                &dashboard.name,
+                &dashboard.description,
+                metrics_json,
+                &dashboard.layout,
+                i64::from(dashboard.is_public),
+                tenant_id_str,
+                dashboard.created_at.to_rfc3339(),
+            ],
+        )
+        .map_err(|e| format!("upsert dashboard {}: {e}", dashboard.id))?;
+        Ok(())
+    }
+
+    fn delete_dashboard_conn(conn: &Connection, id: Uuid) -> Result<(), String> {
+        conn.execute(
+            "DELETE FROM dashboards WHERE id = ?1",
+            params![id.to_string()],
+        )
+        .map_err(|e| format!("delete dashboard {id}: {e}"))?;
+        Ok(())
+    }
+
     /// Initializes the monitoring manager
     pub async fn initialize(&self) -> Result<(), AppError> {
         let mut initialized = self.initialized.write().await;
@@ -295,21 +429,28 @@ impl MonitoringManager {
                 })?;
             }
 
-            // Initialize schema using spawn_blocking (rusqlite is blocking)
             let db_path_clone = db_path.clone();
-            tokio::task::spawn_blocking(move || {
+            let loaded = tokio::task::spawn_blocking(move || -> Result<
+                (HashMap<String, AlertRule>, HashMap<Uuid, Dashboard>),
+                AppError,
+            > {
                 let conn = Connection::open(&db_path_clone).map_err(|e| {
                     AppError::ConfigError(format!("Failed to open SQLite database: {}", e))
                 })?;
                 Self::init_database_schema(&conn).map_err(|e| {
                     AppError::ConfigError(format!("Failed to initialize database schema: {}", e))
                 })?;
-                Ok::<(), AppError>(())
+                Self::load_persisted_config(&conn).map_err(|e| {
+                    AppError::ConfigError(format!("Failed to load monitoring config: {}", e))
+                })
             })
             .await
             .map_err(|e| {
                 AppError::ConfigError(format!("Database initialization task failed: {}", e))
             })??;
+
+            *self.alert_rules.write().await = loaded.0;
+            *self.dashboards.write().await = loaded.1;
 
             info!("SQLite database initialized at: {}", db_path);
         }
@@ -499,6 +640,22 @@ impl MonitoringManager {
 
         let mut rules = self.alert_rules.write().await;
         rules.insert(rule.name.clone(), rule.clone());
+        drop(rules);
+
+        if let Some(ref db_path) = self.db_path {
+            let db_path = db_path.clone();
+            let rule = rule.clone();
+            match tokio::task::spawn_blocking(move || {
+                let conn = Connection::open(&db_path).map_err(|e| format!("open db: {e}"))?;
+                Self::upsert_alert_rule_conn(&conn, &rule)
+            })
+            .await
+            {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => warn!("Failed to persist alert rule: {}", e),
+                Err(join_err) => warn!("alert_rule persistence join error: {}", join_err),
+            }
+        }
 
         info!("Created alert rule: {}", rule.name);
         Ok(())
@@ -593,6 +750,22 @@ impl MonitoringManager {
 
         let mut dashboards = self.dashboards.write().await;
         dashboards.insert(dashboard.id, dashboard.clone());
+        drop(dashboards);
+
+        if let Some(ref db_path) = self.db_path {
+            let db_path = db_path.clone();
+            let dashboard = dashboard.clone();
+            match tokio::task::spawn_blocking(move || {
+                let conn = Connection::open(&db_path).map_err(|e| format!("open db: {e}"))?;
+                Self::upsert_dashboard_conn(&conn, &dashboard)
+            })
+            .await
+            {
+                Ok(Ok(())) => {}
+                Ok(Err(e)) => warn!("Failed to persist dashboard: {}", e),
+                Err(join_err) => warn!("dashboard persistence join error: {}", join_err),
+            }
+        }
 
         info!("Created dashboard: {} ({})", dashboard.name, dashboard.id);
         Ok(())
@@ -609,7 +782,23 @@ impl MonitoringManager {
     /// Returns `Ok(true)` if a dashboard was removed, `Ok(false)` if not found.
     pub async fn delete_dashboard(&self, id: Uuid) -> Result<bool, AppError> {
         let mut dashboards = self.dashboards.write().await;
-        if dashboards.remove(&id).is_some() {
+        let removed = dashboards.remove(&id).is_some();
+        drop(dashboards);
+
+        if removed {
+            if let Some(ref db_path) = self.db_path {
+                let db_path = db_path.clone();
+                match tokio::task::spawn_blocking(move || {
+                    let conn = Connection::open(&db_path).map_err(|e| format!("open db: {e}"))?;
+                    Self::delete_dashboard_conn(&conn, id)
+                })
+                .await
+                {
+                    Ok(Ok(())) => {}
+                    Ok(Err(e)) => warn!("Failed to delete dashboard from db: {}", e),
+                    Err(join_err) => warn!("dashboard delete join error: {}", join_err),
+                }
+            }
             info!("Deleted dashboard: {}", id);
             Ok(true)
         } else {
@@ -905,6 +1094,55 @@ mod tests {
 
         assert!(manager.create_dashboard(dashboard).await.is_ok());
     }
+
+    #[tokio::test]
+    async fn test_sqlite_persists_dashboards_and_rules_across_init() {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let db_path = tmp
+            .path()
+            .join(MONITORING_DB_FILE)
+            .to_string_lossy()
+            .into_owned();
+
+        let rule = AlertRule {
+            name: "high-mem".to_string(),
+            metric: "memory_usage".to_string(),
+            threshold: 90.0,
+            operator: ">".to_string(),
+            severity: AlertSeverity::Critical,
+            enabled: true,
+            tenant_id: None,
+        };
+        let dashboard = Dashboard {
+            id: Uuid::new_v4(),
+            name: "ops".to_string(),
+            description: "ops board".to_string(),
+            metrics: vec!["cpu_usage".to_string()],
+            layout: "{}".to_string(),
+            is_public: true,
+            tenant_id: None,
+            created_at: Utc::now(),
+        };
+
+        {
+            let manager = MonitoringManager::new_with_persistence(Some(db_path.clone()));
+            manager.initialize().await.expect("init");
+            manager.create_alert_rule(rule.clone()).await.expect("rule");
+            manager
+                .create_dashboard(dashboard.clone())
+                .await
+                .expect("dashboard");
+        }
+
+        let reloaded = MonitoringManager::new_with_persistence(Some(db_path));
+        reloaded.initialize().await.expect("reinit");
+        let rules = reloaded.list_alert_rules().await.expect("rules");
+        assert_eq!(rules.len(), 1);
+        assert_eq!(rules[0].name, "high-mem");
+        let dashboards = reloaded.list_dashboards(None).await.expect("dashboards");
+        assert_eq!(dashboards.len(), 1);
+        assert_eq!(dashboards[0].id, dashboard.id);
+    }
 }
 
 /// Global monitoring manager instance
@@ -940,6 +1178,34 @@ pub fn try_install_global_monitoring_manager(mgr: Arc<MonitoringManager>) {
 /// ```
 pub fn get_global_monitoring_manager() -> Arc<MonitoringManager> {
     MONITORING_MANAGER
-        .get_or_init(|| Arc::new(MonitoringManager::new()))
+        .get_or_init(|| Arc::new(MonitoringManager::new_from_env()))
         .clone()
+}
+
+/// Directory for SQLite persistence (`POOLAI_MONITORING_DATA_DIR`).
+pub fn data_dir_from_env() -> Option<String> {
+    std::env::var("POOLAI_MONITORING_DATA_DIR")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .map(|s| s.trim().to_string())
+}
+
+/// Full path to `monitoring.db` when env is set.
+pub fn db_path_from_env() -> Option<String> {
+    data_dir_from_env().map(|dir| {
+        Path::new(&dir)
+            .join(MONITORING_DB_FILE)
+            .to_string_lossy()
+            .into_owned()
+    })
+}
+
+fn severity_from_str(s: &str) -> AlertSeverity {
+    match s {
+        "INFO" => AlertSeverity::Info,
+        "WARNING" => AlertSeverity::Warning,
+        "ERROR" => AlertSeverity::Error,
+        "CRITICAL" => AlertSeverity::Critical,
+        _ => AlertSeverity::Warning,
+    }
 }

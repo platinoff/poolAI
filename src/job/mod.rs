@@ -4,6 +4,8 @@ mod lifecycle;
 mod map;
 pub mod scheduler;
 mod store;
+#[cfg(feature = "job-store-sqlite")]
+mod store_sqlite;
 mod types;
 
 pub use lifecycle::allows_transition;

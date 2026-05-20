@@ -1,5 +1,8 @@
 //! File-backed job store (post-S38). Set `POOLAI_JOB_DATA_DIR` (e.g. `data/jobs`) to persist
 //! across coordinator restarts; when unset, in-memory only (same as S38 stub).
+//!
+//! Default backend: JSON (`jobs.json`). With `feature = "job-store-sqlite"` and
+//! `POOLAI_JOB_STORE=sqlite`, uses `jobs.db` and migrates legacy `jobs.json` on first open.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -8,17 +11,25 @@ use std::sync::{LazyLock, Mutex};
 use crate::core::error::AppError;
 use crate::job::{allows_transition, JobRecord, JobStatus};
 
-const JOBS_FILE: &str = "jobs.json";
+pub(crate) const JOBS_FILE: &str = "jobs.json";
 
-#[derive(Debug, serde::Serialize, serde::Deserialize, Default)]
-struct JobsFile {
-    jobs: Vec<JobRecord>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum PersistBackend {
+    Json,
+    #[cfg(feature = "job-store-sqlite")]
+    Sqlite,
 }
 
-/// In-process job registry with optional JSON persistence.
+#[derive(Debug, serde::Serialize, serde::Deserialize, Default)]
+pub(crate) struct JobsFile {
+    pub jobs: Vec<JobRecord>,
+}
+
+/// In-process job registry with optional JSON or SQLite persistence.
 pub struct JobStore {
     jobs: Mutex<Vec<JobRecord>>,
     data_dir: Option<PathBuf>,
+    backend: PersistBackend,
 }
 
 impl JobStore {
@@ -34,14 +45,18 @@ impl JobStore {
     }
 
     fn open(data_dir: Option<PathBuf>) -> Self {
+        let backend = persist_backend_from_env();
         let jobs = data_dir
             .as_ref()
-            .map(|d| d.join(JOBS_FILE))
-            .and_then(|p| load_jobs_file(&p).ok())
+            .map(|d| load_persisted_jobs(d, backend))
+            .transpose()
+            .ok()
+            .flatten()
             .unwrap_or_default();
         Self {
             jobs: Mutex::new(jobs),
             data_dir,
+            backend,
         }
     }
 
@@ -148,11 +163,7 @@ impl JobStore {
             .jobs
             .lock()
             .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
-        let path = dir.join(JOBS_FILE);
-        let snapshot = JobsFile {
-            jobs: guard.clone(),
-        };
-        write_json_atomic(&path, &snapshot)
+        persist_jobs(dir, self.backend, &guard)
             .map_err(|e| AppError::InternalError(format!("persist jobs: {e}")))
     }
 }
@@ -164,7 +175,50 @@ pub fn data_dir_from_env() -> Option<PathBuf> {
         .map(PathBuf::from)
 }
 
-fn load_jobs_file(path: &Path) -> Result<Vec<JobRecord>, String> {
+fn persist_backend_from_env() -> PersistBackend {
+    let want_sqlite = std::env::var("POOLAI_JOB_STORE")
+        .map(|v| v.trim().eq_ignore_ascii_case("sqlite"))
+        .unwrap_or(false);
+    #[cfg(feature = "job-store-sqlite")]
+    {
+        if want_sqlite {
+            return PersistBackend::Sqlite;
+        }
+    }
+    #[cfg(not(feature = "job-store-sqlite"))]
+    let _ = want_sqlite;
+    if want_sqlite {
+        tracing::warn!("POOLAI_JOB_STORE=sqlite ignored: rebuild with --features job-store-sqlite");
+    }
+    PersistBackend::Json
+}
+
+fn load_persisted_jobs(dir: &Path, backend: PersistBackend) -> Result<Vec<JobRecord>, String> {
+    match backend {
+        PersistBackend::Json => {
+            let path = dir.join(JOBS_FILE);
+            load_jobs_file(&path)
+        }
+        #[cfg(feature = "job-store-sqlite")]
+        PersistBackend::Sqlite => super::store_sqlite::load(dir),
+    }
+}
+
+fn persist_jobs(dir: &Path, backend: PersistBackend, jobs: &[JobRecord]) -> Result<(), String> {
+    match backend {
+        PersistBackend::Json => {
+            let path = dir.join(JOBS_FILE);
+            let snapshot = JobsFile {
+                jobs: jobs.to_vec(),
+            };
+            write_json_atomic(&path, &snapshot)
+        }
+        #[cfg(feature = "job-store-sqlite")]
+        PersistBackend::Sqlite => super::store_sqlite::persist(dir, jobs),
+    }
+}
+
+pub(crate) fn load_jobs_file(path: &Path) -> Result<Vec<JobRecord>, String> {
     if !path.exists() {
         return Ok(Vec::new());
     }
@@ -287,5 +341,42 @@ mod tests {
             .update_status("job-bad", JobStatus::Completed)
             .expect_err("invalid");
         assert!(matches!(err, AppError::ValidationError(_)));
+    }
+
+    #[cfg(feature = "job-store-sqlite")]
+    #[test]
+    fn sqlite_backend_persists_via_job_store() {
+        let _guard = env_lock();
+        let tmp = TempDir::new().expect("tempdir");
+        let dir = tmp.path().to_path_buf();
+        std::env::set_var("POOLAI_JOB_STORE", "sqlite");
+
+        let record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("job-sqlite-store"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Submitted,
+            created_at: Utc::now(),
+        };
+
+        {
+            let store = JobStore::open_for_test(Some(dir.clone()));
+            store.push(record).expect("push");
+        }
+
+        std::env::remove_var("POOLAI_JOB_STORE");
+        std::env::set_var("POOLAI_JOB_STORE", "sqlite");
+        let reloaded = JobStore::open_for_test(Some(dir));
+        let jobs = reloaded.list().expect("list");
+        std::env::remove_var("POOLAI_JOB_STORE");
+        assert_eq!(jobs.len(), 1);
+        assert_eq!(jobs[0].spec.id.0, "job-sqlite-store");
     }
 }

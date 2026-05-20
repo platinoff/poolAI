@@ -364,7 +364,7 @@ impl AppState {
             #[cfg(feature = "enterprise")]
             audit_logger: Arc::new(AuditLogger::new()),
             #[cfg(feature = "enterprise")]
-            enterprise_monitoring_manager: Arc::new(MonitoringManager::new()),
+            enterprise_monitoring_manager: Arc::new(MonitoringManager::new_from_env()),
             #[cfg(feature = "enterprise")]
             security_manager: Arc::new(SecurityManager::new()),
             #[cfg(feature = "ml")]

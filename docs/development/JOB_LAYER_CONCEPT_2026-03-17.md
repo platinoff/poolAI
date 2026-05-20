@@ -83,5 +83,6 @@ PoolAI вже реалізує:
 - [x] HTTP contract tests — `tests/jobs_api_contracts.rs`, FM-026 (2026-05-20).
 - VM binding для JobSpec — FM-023+.
 - [x] Персистентний job store (JSON file) — `POOLAI_JOB_DATA_DIR`, `src/job/store.rs` (2026-05-20).
-- SQLite / RAID-backed store — FM-029.
+- [x] SQLite job store (optional `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, migrate JSON) — FM-029 (2026-05-20).
+- RAID-backed store — deferred.
 

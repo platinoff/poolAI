@@ -49,15 +49,15 @@
 
 - **Без .sh**: git — copy-paste блок з `.cursor/commands/git-push.md`.  
 - **Push**: **тільки зовнішній MSYS2 UCRT64** (ніколи термінал Cursor — CreateFileMapping, index.lock, обрізаний вивід). Закрити Source Control.  
-- **Формат комітів**: Conventional Commits (`feat(scope): subject`) + **тіло з Summary** (кілька `-m` або абзаци): що змінено, які тести, нотатки (див. `git-push.md` п.3a).  
-- **Після push**: короткий самарі для чату — `git-push.md` п.3b.  
+- **Формат комітів**: Conventional Commits (`feat(scope): subject`). **Якщо в коміті є код** (`src/`, `tests/`, `crates/`, `Cargo.toml`) — обов’язкове тіло **Summary** (з реального diff + які `cargo` прогнані); docs-only — короткий Summary рекомендовано (`git-push.md` п.3, 3a).
+- **Після push**: якщо пушив код — короткий самарі в чат (`git-push.md` п.3b).
 - **Перед push**: `cargo fmt --all`; pre-push hook перевіряє формат.
 
 ---
 
 ## Поточний стан і далі
 
-- **Post-Horizon:** FM-020…028 ✅; наступна — **FM-029** (`NEXT_SESSION_PROMPT.md`).  
+- **Post-Horizon:** FM-020…030 ✅; наступна — **FM-031** (`NEXT_SESSION_PROMPT.md`).  
 - **Черга:** `AUTO_RUN_SESSION_2026_POST_HORIZON.md` §4.  
 - **Тести (канон):** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci` (не повний `cargo test` з doctests на Windows без потреби).  
 - **Не робити:** Python / `.py` у репо (0 файлів); OpenAPI audit — `cargo run --bin poolai-openapi-gap-audit`.  

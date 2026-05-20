@@ -125,8 +125,8 @@ FM-xxx (з таблиці нижче)
 | FM-026 | QA | Contract або Playwright для `/api/v1/jobs` | **Implemented ✅** | `tests/jobs_api_contracts.rs` (4 tests) |
 | FM-027 | Ops / LAN | 2-host sign-off runbook + checklist | **Prep ✅** (sign-off **BLOCKED**, 2 хости) | `LAN_SIGNOFF_CHECKLIST.md`, `bin/verify-lan-prep.*` |
 | FM-028 | P2b / perf | Single-host TQ01+RAID metrics → `BENCHMARKS.md` | **Implemented ✅** | `capture-p2b-single-host-metrics.*`, `poolai-p2b-tq01-snapshot` |
-| FM-029 | Job layer | SQLite job store (optional feature) | Planned | `JOB_LAYER_CONCEPT` §6 |
-| FM-030 | Enterprise | Monitoring metrics persistence MVP | Planned | `MONITORING_PERSISTENCE_PLAN.md` |
+| FM-029 | Job layer | SQLite job store (optional feature) | **Implemented ✅** | `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, `src/job/store_sqlite.rs` |
+| FM-030 | Enterprise | Monitoring metrics persistence MVP | **Implemented ✅** | `POOLAI_MONITORING_DATA_DIR`, `monitoring.db`, dashboards/alert_rules |
 | FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | Partial | `ADMIN_A11Y_RUNBOOK.md` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
@@ -144,8 +144,8 @@ FM-xxx (з таблиці нижче)
 | — | Jobs E2E/contract | **FM-026** ✅ | `tests/jobs_api_contracts.rs` |
 | — | LAN §4 runbook prep | **FM-027** ✅ | checklist + `verify-lan-prep`; sign-off **BLOCKED** |
 | — | P2b single-host metrics | **FM-028** ✅ | dual-port health_load + TQ01 → `BENCHMARKS.md` |
-| 7 | Job store SQLite | **FM-029** | |
-| 8 | Monitoring persistence | **FM-030** | |
+| — | Job store SQLite | **FM-029** ✅ | `job-store-sqlite`; JSON→SQLite migrate |
+| — | Monitoring persistence | **FM-030** ✅ | env + SQLite reload dashboards/rules |
 | 9 | WCAG automation expand | **FM-031** | |
 
 **Закрито (не в черзі):** FM-001…019; Horizon S35–S40; job store JSON (`cd1aaad`).
@@ -254,7 +254,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-029** (Job store SQLite).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-031** (WCAG expand).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
@@ -268,7 +268,9 @@ FM-xxx (з таблиці нижче)
 | FM-026 | **✅** | `tests/jobs_api_contracts.rs` (4 tests) |
 | FM-027 | **Prep ✅** | checklist + verify-lan-prep; §4 sign-off **BLOCKED** |
 | FM-028 | **✅** | dual-port stand metrics in `BENCHMARKS.md` |
-| FM-029…031 | Planned | SQLite / monitoring / a11y |
+| FM-029 | **✅** | `job-store-sqlite`, `jobs.db`, migrate `jobs.json` |
+| FM-030 | **✅** | `POOLAI_MONITORING_DATA_DIR`, metrics + config SQLite |
+| FM-031 | Planned | WCAG admin URLs expand |
 
 **Одна FM за автономну сесію** — commit + push MSYS2 з Summary.
 

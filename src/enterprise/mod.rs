@@ -76,7 +76,7 @@ impl EnterpriseManager {
             audit_logger: Arc::new(audit::AuditLogger::new()),
             tenant_manager: Arc::new(multi_tenancy::TenantManager::new()),
             security_manager: Arc::new(security::SecurityManager::new()),
-            monitoring_manager: Arc::new(monitoring::MonitoringManager::new()),
+            monitoring_manager: Arc::new(monitoring::MonitoringManager::new_from_env()),
         }
     }
 

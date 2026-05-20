@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-030 Monitoring persistence MVP (2026-05-20)** — `POOLAI_MONITORING_DATA_DIR` → `monitoring.db`; coordinator `MonitoringManager::new_from_env()`; SQLite metrics (existing) + persist/reload dashboards and alert_rules; `data/monitoring/` gitignored.
+- **FM-029 Job store SQLite (2026-05-20)** — `feature job-store-sqlite`; `POOLAI_JOB_STORE=sqlite` + `POOLAI_JOB_DATA_DIR` → `jobs.db`; auto-migrate `jobs.json` → `jobs.json.migrated`; `src/job/store_sqlite.rs`; `test-ci` includes feature.
 - **Repository layout (2026-05-20)** — `docs/development/REPOSITORY_LAYOUT.md`; канон `bin/` (ops) vs `src/bin/` (Cargo) vs `scripts/` (toolchain); `scripts/` знято з `.gitignore`; forwarder `scripts/run-lan-nodes.ps1` → `bin/`.
 - **FM-028 P2b single-host metrics (2026-05-20)** — `bin/capture-p2b-single-host-metrics.*`, `poolai-p2b-tq01-snapshot`; dual-port `poolai_health_load` + TQ01/wire JSON table in `BENCHMARKS.md`; artifact `data/lan-stand/metrics-fm028-*.json`.
 - **FM-027 LAN sign-off prep (2026-05-20)** — `docs/performance/LAN_SIGNOFF_CHECKLIST.md`; `bin/verify-lan-prep.sh` / `.ps1`; runbook §4 pre-flight; FM-003 §4 sign-off still **BLOCKED** without 2 physical hosts.

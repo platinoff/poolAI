@@ -10,8 +10,16 @@ All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).
 1. **`git status --short`** — check modified/unstaged first.
 2. **Read/modify files** before `git add` if needed (AI: avoid staging files you still need to edit).
 3. **`git add <paths>`** or `git add -A` (use with care).
-4. **`git commit -m "type(scope): subject"`** — use **CL (Conventional Commits)** format.
+4. **`git commit`** — **CL (Conventional Commits)** subject + **Summary у тілі**, якщо в коміті є код (див. нижче).
 5. **`git push`** — pre-push hook runs `cargo fmt --all --check`; fix format then re-commit if it fails.
+
+### Summary у коміті (якщо є зміни коду)
+
+Перед `git commit` перевір staged diff (`git diff --cached --stat`).
+
+- Є зміни в **`src/`**, **`tests/`**, **`crates/`**, **`Cargo.toml`** → commit **з обов’язковим** тілом `Summary:` (кілька `-m` або HEREDOC): що змінено, які `cargo` команди прогнані, FM/scope за наявності.
+- Лише **`docs/`**, **`.cursor/`**, README без коду → subject + короткий Summary (рекомендовано).
+- Шаблон і приклад — `.cursor/commands/git-push.md` п.3a; після push — самарі в чат п.3b.
 
 ## Commit format (CL = Conventional Commits)
 
@@ -27,9 +35,10 @@ All git commands run in **MSYS2 bash** (`C:\msys64\usr\bin\bash.exe`).
 **Scope examples**: `vm`, `ui`, `raid`, `network`, `cloud`, `ml`, `docs`, `scripts`, `concept`  
 **Subject**: imperative, lowercase, ~50 chars.
 
-**Commit summary/body (2-4 bullets)**:
-- що саме зроблено (1-2 рядки сумарно)
-- які перевірки виконані (наприклад: `cargo fmt`, `cargo clippy`, `cargo test`, `cargo build` з `--all-features`)
+**Commit summary/body (2–4 bullets)** — **обов’язково**, якщо коміт містить код (див. вище):
+- що саме зроблено (модулі, FM-id)
+- які перевірки виконані (`cargo fmt`, `cargo test-ci`, clippy — що реально запускали)
+- нотатки (features, env, не стаджити `data/audit/*.log.gz`)
 
 **Examples**:
 - `feat(cloud): AWS EC2/ECS base_url_override`

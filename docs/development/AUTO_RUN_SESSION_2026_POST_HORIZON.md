@@ -64,8 +64,8 @@ cargo test-ci
 - [x] FM-026 Jobs E2E
 - [x] FM-027 LAN runbook (prep)
 - [x] FM-028 P2b metrics
-- [ ] FM-029 Job SQLite
-- [ ] FM-030 Monitoring persist
+- [x] FM-029 Job SQLite
+- [x] FM-030 Monitoring persist
 - [ ] FM-031 WCAG expand
 - [ ] push MSYS2 + Summary
 

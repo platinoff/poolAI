@@ -328,7 +328,7 @@ paths:
       tags:
         - Jobs
       summary: List jobs
-      description: In-process job store (`POOLAI_JOB_DATA_DIR` optional JSON persist).
+      description: In-process job store (`POOLAI_JOB_DATA_DIR`; JSON default or `POOLAI_JOB_STORE=sqlite` with `job-store-sqlite` feature).
       operationId: listJobs
       responses:
         '200':

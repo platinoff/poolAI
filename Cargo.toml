@@ -314,6 +314,8 @@ vm-isolation = ["vm-isolation-linux"]
 test-utils = []
 # Telegram bot runtime (teloxide) — `poolai-telegram-bot` binary
 tgbot = ["teloxide"]
+# FM-029: SQLite job store (`POOLAI_JOB_STORE=sqlite` + `POOLAI_JOB_DATA_DIR`)
+job-store-sqlite = []
 
 # Some Windows MSVC hosts hit `rustc` STATUS_ACCESS_VIOLATION when compiling the full `poolai` lib at
 # `release` opt-level 3 (e.g. `cargo bench` / `cargo build --release`). The `bench` profile keeps

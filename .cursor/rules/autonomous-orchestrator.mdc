@@ -32,7 +32,7 @@ alwaysApply: false
 - Канон черги — **найновіший** `docs/development/AUTO_RUN_SESSION_YYYY-MM-DD.md`.
 - Після кожного спринту з кодом: `cargo fmt` → `cargo test-ci` (`K8S_OPENAPI_ENABLED_VERSION=1.28`).
 - **Не стаджити** `data/audit/*.log.gz`.
-- **Push:** зовнішній MSYS2 UCRT64, [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md), тіло з **Summary** (шаблон у AUTO_RUN).
+- **Push:** зовнішній MSYS2 UCRT64, [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md). Якщо в коміті є **`src/` / `tests/` / `crates/` / `Cargo.toml`** — subject + **Summary** у тілі (з `git diff --cached`); після push — короткий самарі в чат (git-push п.3b). Docs-only — короткий Summary за бажанням.
 
 ## Поза обсягом (без явного запиту)
 
