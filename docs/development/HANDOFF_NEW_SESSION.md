@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-20 (Post-Horizon **FM-020…031**; FM-029 ✅; runtime stack policy · Horizon S35–S40 ✅ · A+B+C **100%**).
+**Оновлено:** 2026-05-20 (legacy audit → **FM-032…042**; Post-Horizon **FM-020…031** ✅; HEAD `f00bb1d4`; A+B+C **100%**).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-20):** `cargo test-ci` — **ok** після `cd1aaad` (job store, GNU ~8.5 хв). **`POOLAI_JOB_DATA_DIR`** — `src/job/store.rs`, `data/jobs/` gitignored.
+**Maintenance (2026-05-20):** `cargo test-ci` — **ok** після `f00bb1d4` (GNU ~16 хв). **Наступна розробка:** **FM-032** OpenAPI VM network schemas (§5.1 FM).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -93,24 +93,25 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 4. Наступні кроки (канон: FM-* + Architect)
 
-**Єдине зведення** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** та аудит **§5.3**.
+**Єдине зведення** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** (черга **FM-032…042**), legacy audit **§5.8**, «не зроблено» **§5.3**.
 
-| Пріоритет | Що | Стан |
-|-----------|-----|------|
-| 1 | **FM-003 §4** — реальний LAN sign-off | **BLOCKED** (2 хости) |
-| 2 | **FM-019** — pa11y / WCAG 2.2 | **Partial ✅** S7–S22 (`pa11y-wcag22` merge gate + contract) |
-| 2b | **UI E2E** — Playwright | **Partial ✅** S23–S31 — [`E2E_PLAYWRIGHT.md`](./E2E_PLAYWRIGHT.md) |
-| 2c | **UI_QUALITY P1** — admin JSON contracts | **✅** S25–S26 (27 tests); [`ADMIN_UI_JSON_CONTRACTS.md`](./ADMIN_UI_JSON_CONTRACTS.md) |
-| 3 | **OpenAPI** sync | **Partial ✅** S14–S31 (v1 + enterprise + `/raid/distributed/*`); backlog payload schemas |
-| — | **P4** — `poolai_health_load` | ✅ **2026-05-18** (`BENCHMARKS.md`) |
-| — | FM-004/006 | Deferred, поза автопрогоном |
-| — | FM-009/010 | Concept-only |
+| Порядок | FM | Що | Стан |
+|--------|-----|-----|------|
+| — | **FM-003** | LAN §4 sign-off | **BLOCKED** (2 хости); prep ✅ FM-027 |
+| **1** | **FM-032** | OpenAPI `VmNetwork` / `NetworkIsolationConfig` | **Planned** — наступна сесія |
+| **2** | **FM-033** | Solana on-chain + real RPC | **Planned** |
+| **3** | **FM-035** | Real model loading (EXO) | **Planned** |
+| **4** | **FM-034** | Job scheduler → VM/worker | **Planned** |
+| **5–10** | **FM-036…042** | Sharding, UI audit, topology graph, Playwright CI, OTel, perf | Planned / Partial |
+| **11** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 
-**Закрито:** FM-001–019 baseline; FM-005/007/008/011/012–018 ✅. Деталі — §5.3 у FUNCTION_MANAGEMENT.
+**Закрито:** FM-001…031 (Post-Horizon + autoprogon). **Не повторювати** FM-020…031.
+
+**Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — maintenance / ops (Post-Horizon закрито).
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-032** (OpenAPI VM network); ops LAN **BLOCKED**.
 2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci`.
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.
 4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); якщо в коміті є `src/`/`tests/`/`crates/`/`Cargo.toml` — **обов’язковий** Summary у тілі + самарі в чат після push.

@@ -20,7 +20,7 @@
 |------|-------------|----------|
 | ~~`/raid/distributed/*`~~ | Inter-node RAID protocol | **✅ S31–S33** paths + `RaidDistributed*` DTO schemas |
 | ~~VM template body schemas~~ | `VmTemplate`, `GpuSchedulingPolicy` | **✅ FM-025** (2026-05-20) |
-| VM network body schemas | `VmNetwork`, `NetworkIsolationConfig` | Поступове уточнення (поза FM-025) |
+| VM network body schemas | `VmNetwork`, `NetworkIsolationConfig` | **FM-032** — наступна сесія (§5.1 FM) |
 
 ## Перевірка
 
@@ -33,4 +33,4 @@ rg '^  /users' docs/openapi.yaml
 rg '^  /raid/admin' docs/openapi.yaml
 ```
 
-**Наступний спринт:** деталізація distributed payload schemas або axe Playwright (FM-019 backlog).
+**Наступний спринт:** **FM-032** VM network body schemas (`NEXT_SESSION_PROMPT.md`).

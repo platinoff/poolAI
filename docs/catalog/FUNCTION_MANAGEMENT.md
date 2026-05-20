@@ -1,12 +1,12 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-20 (Post-Horizon FM-020…031; job store JSON ✅; [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md)).
+**Оновлено:** 2026-05-20 (legacy backlog audit → **FM-032…042**; Post-Horizon FM-020…031 ✅; HEAD `f00bb1d4`).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
 **Horizon (Layer C):** **100%** ✅ S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
 
-**Останній `cargo test-ci`:** 2026-05-20 (після `cd1aaad` job store); GNU, `K8S_OPENAPI_ENABLED_VERSION=1.28` — **ok** (~8.5 хв). Clippy — CI на `main`.
+**Останній `cargo test-ci`:** 2026-05-20 (після `f00bb1d4`); GNU, `K8S_OPENAPI_ENABLED_VERSION=1.28` — **ok** (~16 хв). Clippy — CI на `main`.
 
 **Прогрес продукту (шар A):** **100%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
@@ -128,29 +128,40 @@ FM-xxx (з таблиці нижче)
 | FM-029 | Job layer | SQLite job store (optional feature) | **Implemented ✅** | `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, `src/job/store_sqlite.rs` |
 | FM-030 | Enterprise | Monitoring metrics persistence MVP | **Implemented ✅** | `POOLAI_MONITORING_DATA_DIR`, `monitoring.db`, dashboards/alert_rules |
 | FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | **Implemented ✅** | `pa11y-ci.sh` 21 URLs; `e2e/tests/a11y.spec.ts` |
+| FM-032 | OpenAPI | `VmNetwork` + `NetworkIsolationConfig` body schemas | **Planned** | `OPENAPI_GAP_AUDIT` §залишок; `src/vm/mod.rs` types exist |
+| FM-033 | Solana | On-chain program prototype + real devnet RPC submit | **Planned** | post FM-024 stub; `SOLANA_ADAPTER_CONCEPT` §8 |
+| FM-034 | Job layer | Scheduler → VM/worker binding (beyond in-process tick) | **Planned** | `scheduler.rs` «without VM binding»; Architect P6 |
+| FM-035 | Runtime / ML | Real model loading (libtorch/onnx path, not metadata-only) | **Planned** | `ARCHITECT_PLAN_EXO_INTEGRATION`; `instance.rs` placeholder |
+| FM-036 | Runtime | Tensor / pipeline parallelism (`sharding`, inter-worker sync) | **Planned** | EXO plan §3.1–3.2; no `sharding.rs` yet |
+| FM-037 | UI | Cluster topology graph (D3/vis + latency matrix) | **Partial** | API + table UI ✅; graph viz — backlog |
+| FM-038 | Observability | OpenTelemetry distributed tracing | **Planned** | `NEXT_STEPS_2026-01-16`; no `opentelemetry` in `src/` |
+| FM-039 | CI / E2E | Playwright admin suite у `ci.yml` (`workflow_call`) | **Partial** | `e2e.yml` = `workflow_dispatch` only |
+| FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Partial** | extend FM-013…015; `UI_QUALITY_AND_E2E_PLAN` §P1 |
+| FM-041 | Cloud | SDK hardening (GCP SA JWT, Azure OAuth refresh, IT suites) | **Deferred** | post FM-006 REST; `CLOUD_SDK_PROGRESS_2026-01-19` |
+| FM-042 | P4 / perf | Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot) | **Planned** | `PERCENTAGE_PLAN`; FM-028 = single-host TQ01 only |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Канон черги Post-Horizon** — **§5.7** + [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md). Аудит закритого — **§5.3**.
+**Канон черги розробки** — таблиця нижче (аудит legacy 2026-05-20, **§5.8**). Post-Horizon закрито — **§5.7**. Не повторювати FM-020…031.
 
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
-| — | Solana RPC stub | **FM-024** ✅ | `config/devnet.toml`, mock RPC ack |
-| — | Job scheduler MVP | **FM-020** ✅ | `scheduler.rs`, `POST /jobs/schedule` |
-| — | Jobs PATCH + OpenAPI | **FM-021** ✅ | `lifecycle.rs`, `PATCH /jobs/{id}` |
-| — | Memory API stub | **FM-022** ✅ | `GET/POST /memory/shards`, RAID filter |
-| — | Grid wire integration | **FM-023** ✅ | `ingest_envelope`, discovery + grid paths |
-| — | OpenAPI DTO backlog | **FM-025** ✅ | `VmTemplate` schemas |
-| — | Jobs E2E/contract | **FM-026** ✅ | `tests/jobs_api_contracts.rs` |
-| — | LAN §4 runbook prep | **FM-027** ✅ | checklist + `verify-lan-prep`; sign-off **BLOCKED** |
-| — | P2b single-host metrics | **FM-028** ✅ | dual-port health_load + TQ01 → `BENCHMARKS.md` |
-| — | Job store SQLite | **FM-029** ✅ | `job-store-sqlite`; JSON→SQLite migrate |
-| — | Monitoring persistence | **FM-030** ✅ | env + SQLite reload dashboards/rules |
-| — | WCAG automation expand | **FM-031** ✅ | admin vm/workers/libs/raid + axe matrix |
+| — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
+| **1** | OpenAPI VM network DTO | **FM-032** | `VmNetwork`, `NetworkIsolationConfig` у `openapi.yaml`; `poolai-openapi-gap-audit` |
+| **2** | Solana on-chain + RPC | **FM-033** | program prototype; real submit після `program_id` |
+| **3** | Real model loading | **FM-035** | backend load у `runtime/instance` (EXO plan) |
+| **4** | Job → VM/worker | **FM-034** | bind scheduler output до pool/worker |
+| **5** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
+| **6** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
+| **7** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
+| **8** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
+| **9** | OpenTelemetry | **FM-038** | tracing middleware + export |
+| **10** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
+| **11** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…019; Horizon S35–S40; job store JSON (`cd1aaad`).
+**Закрито (не в черзі):** FM-001…031; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
 
-**Якість збірки:** `cargo test-ci` після `src/` — останній зріз 2026-05-20 (`cecd9785`).
+**Якість збірки:** `cargo test-ci` після `src/` — останній зріз 2026-05-20 (`f00bb1d4`).
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -180,11 +191,22 @@ FM-xxx (з таблиці нижче)
 | **S37** | FM-010 `poolai-solana-adapter` crate + event schema v1 | Horizon |
 | **S38** | P6 `src/job` + `src/memory` + `/api/v1/jobs` stub | Horizon |
 
-#### Не зроблено (канон backlog)
+#### Не зроблено (канон backlog) — оновлено 2026-05-20 (legacy audit)
 
-| Джерело | Пункт | Стан | Примітка |
-|---------|--------|------|----------|
-| Architect L123 | LAN replication + TQ01 на стенді | **BLOCKED** | FM-003 §4; 2 фізичні хости; wire harness ✅ |
+| Джерело | Пункт | FM | Стан |
+|---------|--------|-----|------|
+| `OPENAPI_GAP_AUDIT` §залишок | VM network body schemas | **FM-032** | **Planned** |
+| `SOLANA_ADAPTER_CONCEPT` §8 | On-chain program + devnet deploy | **FM-033** | **Planned** (stub FM-024 ✅) |
+| `ARCHITECT_PLAN_EXO` §Real Model Loading | libtorch/onnx load | **FM-035** | **Planned** |
+| `ARCHITECT_PLAN_EXO` §3.1–3.2 | Tensor sharding runtime | **FM-036** | **Planned** |
+| `ARCHITECT_PLAN_EXO` §4.1 | Topology graph viz | **FM-037** | **Partial** |
+| `NEXT_STEPS_2026-01-16` | OpenTelemetry tracing | **FM-038** | **Planned** |
+| `E2E_PLAYWRIGHT.md` | Playwright у main CI | **FM-039** | **Partial** |
+| `UI_QUALITY_AND_E2E_PLAN` §P1 | Admin field audit | **FM-040** | **Partial** |
+| `CLOUD_SDK_PROGRESS_2026-01-19` | GCP/Azure auth deep | **FM-041** | **Deferred** |
+| `PERCENTAGE_PLAN` / P4 | Hot-path profiling | **FM-042** | **Planned** |
+| `NEXT_STEPS_ARCHITECT` L234 | Job scheduler → VM bind | **FM-034** | **Planned** |
+| Architect L123 | LAN replication + TQ01 на стенді | **FM-003** | **BLOCKED** |
 | Architect L183 | Azure/GCP `cloud-sdk` | **✅ S39** | REST + mock tests; `CLOUD_SDK_STATUS.md` |
 | FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops **2026-06-01** |
 | FM-004 | SIMD TurboQuant | **✅ S35** | `turboquant-simd` feature |
@@ -254,7 +276,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** Post-Horizon FM-020…031 **закрито** — maintenance / ops (FM-003 §4 LAN **BLOCKED**).
+**Наступна сесія:** **FM-032** (OpenAPI VM network) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
@@ -273,6 +295,18 @@ FM-xxx (з таблиці нижче)
 | FM-031 | **✅** | 21 pa11y auth URLs; axe Playwright admin matrix |
 
 **Одна FM за автономну сесію** — commit + push MSYS2 з Summary.
+
+### 5.8 Legacy backlog audit (2026-05-20)
+
+**Метод:** менеджер функціоналу — звірка старіших планів (`RUST_ARCHITECT_*`, `PERCENTAGE_PLAN`, `UI_*_PLAN`, `CONCEPT_PENDING_FEATURES`, `OPENAPI_GAP_AUDIT`, `ARCHITECT_PLAN_EXO_INTEGRATION`, `PIPELINE_MANAGEMENT` future) з кодом і FM-001…031. **Не** брати `[ ]` з `docs/archive/` для автопрогону.
+
+| Результат | Кількість |
+|-----------|-----------|
+| Нові тікети **FM-032…042** | 11 (розробка + Deferred FM-041) |
+| **Stale / Already done** | GlobalState, ML modules, BurstRAID, distributed OpenAPI, axe Playwright — див. git log / §5.3 |
+| **BLOCKED** | FM-003 §4 LAN (2 хости) |
+
+**Канон пріоритетів розробки:** **§5.1** (порядок 1–11). **Джерела:** [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md), [`OPENAPI_GAP_AUDIT_2026-05-19.md`](../development/OPENAPI_GAP_AUDIT_2026-05-19.md).
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 

@@ -14,7 +14,7 @@
 | **C. Horizon (код P6)** | **100%** | S35–S40 ✅ — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
 | **Проєкт (A+B+C)/3** | **100%** | офіційний зріз після S40 |
 
-**Наступна фаза:** **Post-Horizon** FM-020…031 — [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops **BLOCKED:** FM-003 §4 / FM-027 (2 хости).
+**Наступна фаза (2026-05-20):** Legacy backlog audit → **FM-032…042** — [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.1, §5.8 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) (**FM-032**). Post-Horizon FM-020…031 **✅**. Ops **BLOCKED:** FM-003 §4 (2 хости).
 
 ---
 

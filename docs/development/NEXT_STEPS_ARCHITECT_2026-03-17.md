@@ -38,11 +38,12 @@
 
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
-1. **Post-Horizon** — **FM-020…031** (одна FM/сесію) — [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](./AUTO_RUN_SESSION_2026_POST_HORIZON.md), FM **§5.7**.
-2. **FM-020** — Job scheduler MVP (перша в черзі).
-3. **FM-003 §4 / FM-027** — LAN sign-off (**BLOCKED**, 2 хости); dev stand ✅; `bin/run-lan-nodes.ps1`.
-4. **FM-028** — single-host P2b metrics → [`BENCHMARKS.md`](../performance/BENCHMARKS.md).
-5. **FM-031** — WCAG automation expand (backlog FM-019).
+1. **FM-003 §4 / FM-027** — LAN sign-off (**BLOCKED**, 2 хости); dev stand ✅; `bin/run-lan-nodes.ps1`.
+2. **FM-032** — OpenAPI `VmNetwork` / `NetworkIsolationConfig` schemas (перша в черзі розробки).
+3. **FM-033** — Solana on-chain program + real devnet RPC (post FM-024 stub).
+4. **FM-035** → **FM-034** → **FM-036** — model load, job→VM bind, tensor sharding (EXO / P6).
+5. **FM-040, FM-037, FM-039, FM-038, FM-042** — UI audit, topology graph, Playwright CI, OTel, perf.
+6. **Post-Horizon FM-020…031** — **✅ закрито** (не повторювати).
 
 **Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C **100%** (S35–S40 ✅) — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
