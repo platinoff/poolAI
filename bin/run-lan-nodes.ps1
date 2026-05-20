@@ -43,6 +43,7 @@ for ($i = 0; $i -lt $NodeCount; $i++) {
     New-Item -ItemType Directory -Force -Path $raidPath | Out-Null
 
     $logOut = Join-Path $LogDir "$nodeName-$port.log"
+    $logErr = Join-Path $LogDir "$nodeName-$port.err.log"
 
     $cmd = @"
 Set-Location '$RepoRoot'
@@ -51,14 +52,14 @@ Set-Location '$RepoRoot'
 `$env:POOLAI_DATA_PATH='$dataRoot'
 `$env:K8S_OPENAPI_ENABLED_VERSION='$($env:K8S_OPENAPI_ENABLED_VERSION)'
 `$env:RUST_LOG='$($env:RUST_LOG)'
-& '$Exe' *>&1 | Tee-Object -FilePath '$logOut'
+& '$Exe' > '$logOut' 2> '$logErr'
 "@
 
     Write-Host "Starting $nodeName -> http://127.0.0.1:$port" -ForegroundColor Green
     $p = Start-Process -FilePath "powershell.exe" -ArgumentList @(
         "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $cmd
     ) -PassThru -WindowStyle Hidden
-    $started += [PSCustomObject]@{ Name = $nodeName; Port = $port; Pid = $p.Id; Log = $logOut }
+    $started += [PSCustomObject]@{ Name = $nodeName; Port = $port; Pid = $p.Id; Log = $logOut; ErrLog = $logErr }
     Start-Sleep -Seconds 3
 }
 
