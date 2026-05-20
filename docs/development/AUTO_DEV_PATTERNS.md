@@ -585,10 +585,16 @@
 - **Перевірка:** `cargo test -p poolai-solana-adapter` (не повний test-ci, якщо main `src/` не змінювався)
 - **FM:** FM-010 ✅
 
+### [Ops] OpenAPI gap audit bin (2026-05-20)
+- **Де:** `src/bin/poolai_openapi_gap_audit.rs`, `cargo run --bin poolai-openapi-gap-audit`
+- **Сигнал:** порівняння `.route("` у `src/network` vs `docs/openapi.yaml` paths
+- **Патерн:** exit `1` + список missing; nest prefix `/ai-ml/` для ai_ml routes
+- **FM:** заміна legacy `openapi-gap-audit.py`
+
 ### [Cursor] Runtime stack — no Python (policy 2026-05-20)
 - **Де:** `.cursor/rules/runtime-stack-policy.mdc` (**alwaysApply**), `docs/STRUCTURE.md` §7, `docs/ARCHITECTURE_BEST_PRACTICES.md` § Technology stack
 - **Сигнал:** агент пропонує `python`, `requirements.txt`, PyPI sidecar — **відхилити**
-- **Патерн:** продукт = Rust (`src/`, `tests/`, `crates/`); UI = `src/ui/` JS; єдиний `.py` = `bin/openapi-gap-audit.py` (dev audit)
+- **Патерн:** продукт = Rust (`src/`, `tests/`, `crates/`); UI = `src/ui/` JS; **0× `.py`**; OpenAPI audit = `cargo run --bin poolai-openapi-gap-audit`
 - **Архів:** `docs/archive/*` з Python — не канон імплементації
 - **FM:** policy (усі Post-Horizon сесії)
 

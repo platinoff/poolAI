@@ -25,6 +25,9 @@
 ## Перевірка
 
 ```bash
+cargo run --bin poolai-openapi-gap-audit
+# exit 0 = all routes documented; exit 1 = prints missing paths
+
 rg '\.route\(' src/network/api/users.rs
 rg '^  /users' docs/openapi.yaml
 rg '^  /raid/admin' docs/openapi.yaml

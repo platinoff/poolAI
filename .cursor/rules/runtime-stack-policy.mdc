@@ -1,5 +1,5 @@
 ---
-description: PoolAI runtime stack — Rust primary; block Python runtime; auxiliary JS/bash only
+description: PoolAI runtime stack — Rust primary; zero Python in repo; auxiliary JS/bash only
 alwaysApply: true
 ---
 
@@ -11,7 +11,7 @@ alwaysApply: true
 
 | Шар | Технологія | Де |
 |-----|------------|-----|
-| **Runtime / API / ML / RAID / VM** | **Rust** (`edition 2021`, `tokio`) | `src/`, `tests/`, `crates/` |
+| **Runtime / API / ML / RAID / VM / tools** | **Rust** (`edition 2021`, `tokio`) | `src/`, `tests/`, `crates/`, `cargo run --bin …` |
 | **Admin UI** | HTML + CSS + **JavaScript** (vanilla) | `src/ui/` |
 | **E2E** | TypeScript / Playwright | `e2e/` |
 | **Ops / CI** | Bash (`scripts/`, `bin/*.sh`) | MSYS2 UCRT64 |
@@ -19,23 +19,26 @@ alwaysApply: true
 
 **Java:** у дереві репозиторію **немає** `.java` — не планувати JVM-модулі без явного запиту користувача.
 
-## Python — заборона runtime
+## Python — повна заборона в репозиторії
 
-| Дозволено | Заборонено |
-|-----------|------------|
-| Один **dev-only** скрипт `bin/openapi-gap-audit.py` (аудит OpenAPI vs routes; **не** деплоїться) | `requirements.txt`, `pyproject.toml`, Python sidecar, subprocess до `python` у `poolai` |
-| Згадка PyPI лише як **науковий орієнтир** у `docs/ml/TURBOQUANT_INTEGRATION.md` | Нові `.py` файли, `pip install`, ML inference на Python |
-| — | Пропозиції «додати Python для ML/скриптів» без явного запиту користувача |
+| Заборонено | Дозволено замість |
+|------------|-------------------|
+| Будь-які `.py` файли в репо | Rust bins: `poolai-openapi-gap-audit`, `poolai_health_load`, … |
+| `requirements.txt`, `pyproject.toml`, venv | `cargo test`, `cargo run --bin …` |
+| Python sidecar, `subprocess` до `python` | Dev audit: `cargo run --bin poolai-openapi-gap-audit` |
+| `pytest`, `python3 -c` для продукту | Unit tests у `tests/`, `#[cfg(test)]` у bins |
+| Пропозиції «додати Python для ML/скриптів» | `src/ml/` (Rust, `feature = "ml"`) |
 
-**TurboQuant / ML pipeline:** лише `src/ml/` на Rust (`feature = "ml"`).
+Згадка **PyPI** лише як науковий орієнтир у `docs/ml/TURBOQUANT_INTEGRATION.md` — **не** шар деплою.
+
+**Перевірка перед сесією:** `git ls-files '*.py'` має бути порожнім.
 
 ## Поведінка агента
 
-1. **Нові фічі** — реалізуй у **Rust** (або JS для admin UI / TS для e2e).
-2. **`rg python|\.py`** — якщо знайдено поза `bin/openapi-gap-audit.py` і `.cursor/rules` — не копіюй патерн; звір з цим файлом.
-3. **Архівні docs** (`docs/archive/`, січень 2026) — можуть згадувати Python; **не** використовуй як план імплементації.
-4. **Тести / бенчі** — `cargo test`, `poolai_health_load`; не `pytest`, не `python3 -c` для валідації продуктового коду.
-5. **Концепт:** `docs/concept/CONCEPT_UPDATE_2026-01-19.md`, `docs/ml/TURBOQUANT_INTEGRATION.md` — політика «лише Rust».
+1. **Нові фічі** — Rust (або JS/TS для UI/e2e).
+2. **`rg '\.py$|python3|pytest'`** у репо — не додавати; архівні docs не канон.
+3. **OpenAPI gap audit** — `cargo run --bin poolai-openapi-gap-audit` (див. `OPENAPI_GAP_AUDIT_2026-05-19.md`).
+4. **Концепт:** `docs/concept/CONCEPT_UPDATE_2026-01-19.md`, `docs/ml/TURBOQUANT_INTEGRATION.md` — лише Rust.
 
 ## Пов’язані правила
 

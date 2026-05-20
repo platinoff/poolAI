@@ -95,9 +95,9 @@ docs/
 | Admin UI | HTML/CSS/JS | `src/ui/` |
 | E2E | TypeScript (Playwright) | `e2e/` |
 | Ops | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
-| Dev audit | Python **1 файл** | `bin/openapi-gap-audit.py` (не runtime) |
+| Dev audit | Rust bin | `poolai-openapi-gap-audit` (`src/bin/poolai_openapi_gap_audit.rs`) |
 
-**Заборонено в продукті:** Python sidecar, `requirements.txt`, PyPI runtime, нові `.py` без явного рішення архітектора.
+**Заборонено в репозиторії:** будь-які `.py`, Python sidecar, `requirements.txt`, PyPI runtime.
 
 **Агент Cursor:** `.cursor/rules/runtime-stack-policy.mdc` (**alwaysApply**). Архівні `docs/archive/*` з Python — історія, не план.
 

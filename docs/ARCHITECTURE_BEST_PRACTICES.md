@@ -25,7 +25,7 @@
 | **E2E** | TypeScript / Playwright | `e2e/` |
 | **Ops** | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
 
-**Not in product runtime:** Python (no `solana-sdk` in main, no ML Python, no subprocess to interpreter). Single dev tool: `bin/openapi-gap-audit.py` (OpenAPI route audit only). **Java:** not present in tree.
+**No Python in repo:** 0× `.py`; no `solana-sdk` in main; ML in `src/ml/`. Dev OpenAPI audit: `cargo run --bin poolai-openapi-gap-audit`. **Java:** not present in tree.
 
 **Agent policy:** `.cursor/rules/runtime-stack-policy.mdc`. ML quantization: `src/ml/turboquant.rs` (Rust); see `docs/ml/TURBOQUANT_INTEGRATION.md`.
 

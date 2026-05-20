@@ -4,7 +4,7 @@
 
 - **Primary:** Rust — `src/`, `tests/`, `crates/` (див. `.cursor/rules/runtime-stack-policy.mdc`, **alwaysApply**).
 - **UI:** JavaScript у `src/ui/`; E2E — `e2e/` (TypeScript).
-- **Python:** **заборонено** в runtime; єдиний виняток — `bin/openapi-gap-audit.py` (dev audit, не продукт).
+- **Python:** **заборонено** в репозиторії (0× `.py`); OpenAPI audit — `cargo run --bin poolai-openapi-gap-audit`.
 - **Java:** у репо немає; не додавати без явного запиту.
 - Архівні docs з Python — ігнорувати для імплементації.
 

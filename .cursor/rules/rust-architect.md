@@ -4,7 +4,7 @@
 
 - **Product:** Rust only (`src/`, `tests/`, `crates/`). Admin UI: `src/ui/` (JavaScript). E2E: `e2e/` (TypeScript).
 - **No Python** in runtime, ML, or API layers. Do not cite archived docs that suggest Python sidecars.
-- **Exception:** `bin/openapi-gap-audit.py` — one-off dev audit tool, not deployed.
+- **Dev audit:** `cargo run --bin poolai-openapi-gap-audit` — OpenAPI vs Axum routes (`src/bin/poolai_openapi_gap_audit.rs`).
 - Full policy: `.cursor/rules/runtime-stack-policy.mdc` (**alwaysApply**).
 
 ## 🏗️ Rust Architect Workflow

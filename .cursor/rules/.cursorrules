@@ -14,7 +14,7 @@
 
 ## Runtime stack
 
-- **`runtime-stack-policy.mdc`** — **alwaysApply:** Rust primary; **no Python runtime**; JS UI; dev-only `bin/openapi-gap-audit.py`.
+- **`runtime-stack-policy.mdc`** — **alwaysApply:** Rust primary; **zero `.py` in repo**; JS UI; `poolai-openapi-gap-audit` bin.
 
 ## Rules Location
 

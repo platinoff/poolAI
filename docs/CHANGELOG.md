@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **OpenAPI gap audit bin (2026-05-20)** — `poolai-openapi-gap-audit` replaces `bin/openapi-gap-audit.py`; repository has **zero** `.py` files.
 - **Runtime stack policy (2026-05-20)** — `.cursor/rules/runtime-stack-policy.mdc` (alwaysApply): Rust primary, no Python runtime; `STRUCTURE.md` §7, `ARCHITECTURE_BEST_PRACTICES` § Technology stack; `bin/openapi-gap-audit.py` marked dev-only.
 - **FM-025 OpenAPI VM template DTO (2026-05-20)** — `VmTemplate`, `VmTemplateMessageResponse`, `GpuSchedulingPolicy`; `/vm/templates*` bodies in `openapi.yaml`; `OPENAPI_GAP_AUDIT` backlog closed for templates.
 - **FM-024 Solana RPC stub (2026-05-20)** — `crates/poolai-solana-adapter`: `config/devnet.toml`, `AdapterConfig` (`POOLAI_SOLANA_*`), `MockRpcClient` + `SidecarProcessor` (NDJSON ack + `rpc` block); mainnet rejected; no `solana-sdk`.
