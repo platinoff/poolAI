@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["GridIngestKind"],"fn":["ingest_envelope"],"struct":["GridIngestOutcome"]};
