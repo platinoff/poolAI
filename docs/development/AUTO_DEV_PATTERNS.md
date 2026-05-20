@@ -585,6 +585,21 @@
 - **Перевірка:** `cargo test -p poolai-solana-adapter` (не повний test-ci, якщо main `src/` не змінювався)
 - **FM:** FM-010 ✅
 
+### [OpenAPI] VM template DTO (FM-025)
+- **Де:** `docs/openapi.yaml` — `VmTemplate`, `VmTemplateMessageResponse`, `GpuSchedulingPolicy`
+- **Сигнал:** `rg "VmTemplate:" docs/openapi.yaml`; paths `/vm/templates`
+- **Патерн:** bodies `$ref` components; update/delete → `{ "message": "…" }`; `GpuSchedulingPolicy` oneOf (serde externally tagged)
+- **Перевірка:** `rg '\$ref.*VmTemplate' docs/openapi.yaml`
+- **FM:** FM-025 ✅
+
+### [Solana] Devnet mock RPC stub (FM-024)
+- **Де:** `crates/poolai-solana-adapter/config/devnet.toml`, `src/config.rs`, `src/rpc/mock.rs`, `SidecarProcessor`
+- **Сигнал:** `AdapterConfig::from_env`, `MockRpcClient::submit_event`, ack field `rpc`
+- **Патерн:** `mainnet-beta` rejected at config load; mock signature `mocksig{hash}`; duplicate `event_id` → `rpc.status=duplicate`
+- **Env:** `POOLAI_SOLANA_CONFIG`, `POOLAI_SOLANA_CLUSTER`, `POOLAI_SOLANA_RPC_URL`, `POOLAI_SOLANA_MOCK_RPC`
+- **Перевірка:** `cargo test -p poolai-solana-adapter -j 1`
+- **FM:** FM-024 ✅
+
 ### [Grid] Envelope v1 JSON (FM-009, S36)
 - **Де:** `src/grid/envelope.rs`, `src/grid/map.rs`
 - **Сигнал:** `GridEnvelope::from_json`, `envelope_from_peer_info`, `envelope_from_put_artifact`

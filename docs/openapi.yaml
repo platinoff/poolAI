@@ -2077,7 +2077,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
+                  $ref: '#/components/schemas/VmTemplate'
     post:
       tags:
         - VM
@@ -2090,14 +2090,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/VmTemplate'
       responses:
         '200':
           description: Template created
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmTemplate'
 
   /vm/templates/{id}:
     get:
@@ -2113,13 +2113,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Template
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmTemplate'
     put:
       tags:
         - VM
@@ -2133,19 +2134,20 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/VmTemplate'
       responses:
         '200':
           description: Updated
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmTemplateMessageResponse'
     delete:
       tags:
         - VM
@@ -2159,13 +2161,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Deleted
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmTemplateMessageResponse'
 
   /vm/networks:
     get:
@@ -5381,6 +5384,41 @@ components:
         gpu_required:
           type: boolean
           example: true
+        gpu_scheduling_policy:
+          $ref: '#/components/schemas/GpuSchedulingPolicy'
+          nullable: true
+
+    GpuSchedulingPolicy:
+      description: |
+        GPU scheduler policy (`src/vm/mod.rs`). Serde **externally tagged** JSON, e.g.
+        `{"RoundRobin":null}`, `{"PriorityBased":{"priority":10}}`.
+      oneOf:
+        - type: object
+          required: [RoundRobin]
+          properties:
+            RoundRobin:
+              type: 'null'
+        - type: object
+          required: [PriorityBased]
+          properties:
+            PriorityBased:
+              type: object
+              required: [priority]
+              properties:
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+        - type: object
+          required: [LoadBased]
+          properties:
+            LoadBased:
+              type: 'null'
+        - type: object
+          required: [Exclusive]
+          properties:
+            Exclusive:
+              type: 'null'
 
     VmIsolation:
       type: string
@@ -5411,6 +5449,45 @@ components:
           $ref: '#/components/schemas/VmResources'
         isolation:
           $ref: '#/components/schemas/VmIsolation'
+
+    VmTemplate:
+      type: object
+      description: VM template (`src/vm/mod.rs` `VmTemplate`)
+      required:
+        - id
+        - name
+        - description
+        - resources
+        - isolation
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          example: "standard-vm"
+        description:
+          type: string
+          example: "Standard VM template with 2 CPU cores and 4GB RAM"
+        resources:
+          $ref: '#/components/schemas/VmResources'
+        isolation:
+          $ref: '#/components/schemas/VmIsolation'
+        created_at:
+          type: string
+          format: date-time
+
+    VmTemplateMessageResponse:
+      type: object
+      description: Success message for template update/delete (`vm_template_*_handler`)
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Template 550e8400-e29b-41d4-a716-446655440000 updated successfully"
 
     ResourceUsage:
       type: object

@@ -59,8 +59,8 @@ cargo test-ci
 - [x] FM-021 Jobs PATCH + OpenAPI
 - [x] FM-022 Memory API
 - [x] FM-023 Grid integration
-- [ ] FM-024 Solana RPC stub
-- [ ] FM-025 OpenAPI DTO
+- [x] FM-024 Solana RPC stub
+- [x] FM-025 OpenAPI DTO
 - [ ] FM-026 Jobs E2E
 - [ ] FM-027 LAN runbook (prep)
 - [ ] FM-028 P2b metrics

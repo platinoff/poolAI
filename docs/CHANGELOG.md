@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-025 OpenAPI VM template DTO (2026-05-20)** — `VmTemplate`, `VmTemplateMessageResponse`, `GpuSchedulingPolicy`; `/vm/templates*` bodies in `openapi.yaml`; `OPENAPI_GAP_AUDIT` backlog closed for templates.
+- **FM-024 Solana RPC stub (2026-05-20)** — `crates/poolai-solana-adapter`: `config/devnet.toml`, `AdapterConfig` (`POOLAI_SOLANA_*`), `MockRpcClient` + `SidecarProcessor` (NDJSON ack + `rpc` block); mainnet rejected; no `solana-sdk`.
 - **FM-023 Grid integration (2026-05-20)** — `grid/dispatch::ingest_envelope`; `POST /api/v1/grid/envelope` + `POST /api/v1/discovery/grid/envelope`; Job→store+scheduler, Result→`force_status`, MemoryShard→memory store; OpenAPI Grid tag.
 - **FM-022 Memory API (2026-05-20)** — `MemoryShardStore` + `POOLAI_MEMORY_DATA_DIR`; `GET/POST /api/v1/memory/shards`, `GET /memory/shards/{shard_id}`; RAID map via `raid_logical_name` query / `memory_shard_from_raid`; OpenAPI Memory tag.
 - **FM-021 Jobs PATCH + OpenAPI (2026-05-20)** — `PATCH /api/v1/jobs/{id}` (`status`); `src/job/lifecycle.rs` transition rules; `JobStore::update_status`; OpenAPI `JobRecord`, `JobSpec`, `PatchJobRequest`.

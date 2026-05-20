@@ -106,7 +106,7 @@ src/
         └── config.rs
 ```
 
-**Workspace (Horizon):** `crates/poolai-solana-adapter/` — sidecar schema v1 (`JobCompleted`, `SeedProvided`, `MemoryUpdated`); **без** `solana-sdk` у головному crate `poolai`. Опційно: `turboquant-simd` feature (`wide`) у `src/ml/turboquant.rs`.
+**Workspace (Horizon):** `crates/poolai-solana-adapter/` — sidecar schema v1 + FM-024 devnet mock RPC stub; **без** `solana-sdk` у головному crate `poolai`. **OpenAPI:** `VmTemplate` DTO для `/vm/templates*` (FM-025). Опційно: `turboquant-simd` feature (`wide`) у `src/ml/turboquant.rs`.
 
 ### 2. **Error Handling** ✅
 

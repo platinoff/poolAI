@@ -31,19 +31,19 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | — | FM-021 | Jobs PATCH + OpenAPI | ✅ `PATCH /jobs/{id}`, `JobRecord` schemas |
 | — | FM-022 | Memory API | ✅ `GET/POST /memory/shards`, RAID map |
 | — | FM-023 | Grid integration | ✅ `POST /grid/envelope`, `/discovery/grid/envelope` |
-| 1 | FM-024 | Solana RPC stub | devnet config; sidecar only |
-| 6 | FM-025 | OpenAPI DTO | VM template bodies |
-| 7 | FM-026 | Jobs QA | contract або Playwright |
+| — | FM-024 | Solana RPC stub | ✅ devnet config; mock RPC; crate only |
+| — | FM-025 | OpenAPI DTO | ✅ VM template bodies |
+| 1 | FM-026 | Jobs QA | contract або Playwright |
 | 8 | FM-027 | LAN runbook | 2-host checklist (**BLOCKED** без хостів) |
 | 9 | FM-028 | P2b metrics | single-host TQ01+RAID → BENCHMARKS |
 | 10 | FM-029 | Job SQLite | optional backend |
 | 11 | FM-030 | Monitoring persist | MONITORING_PERSISTENCE_PLAN MVP |
 | 12 | FM-031 | WCAG expand | pa11y/axe URLs |
 
-Почни з FM-024 (перший [ ] у AUTO_RUN §4).
+Почни з FM-026 (перший [ ] у AUTO_RUN §4).
 
-Перед кодом FM-024:
-- crates/poolai-solana-adapter/, docs/development/SOLANA_ADAPTER_CONCEPT.md
+Перед кодом FM-026:
+- tests/admin_ui_api_contracts.rs або e2e для `/api/v1/jobs`
 
 ## Завершення ітерації
 
@@ -68,4 +68,4 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
 | [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bin/run-poolai.sh` |
 
-**Наступна сесія:** **FM-024** (Solana RPC stub).
+**Наступна сесія:** **FM-026** (Jobs contract/E2E).

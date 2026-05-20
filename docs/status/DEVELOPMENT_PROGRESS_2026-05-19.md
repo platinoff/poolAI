@@ -82,7 +82,9 @@
 | FM-021 | Jobs PATCH + OpenAPI | [x] |
 | FM-022 | Memory API | [x] |
 | FM-023 | Grid integration | [x] |
-| FM-024…031 | див. FM §5.1 | [ ] |
+| FM-024 | Solana mock RPC stub | ✅ |
+| FM-025 | OpenAPI VM template DTO | ✅ |
+| FM-026…031 | див. FM §5.1 | [ ] |
 
 **Канон черги:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md).
 

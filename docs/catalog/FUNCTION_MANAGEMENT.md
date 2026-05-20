@@ -120,8 +120,8 @@ FM-xxx (з таблиці нижче)
 | FM-021 | Job layer | `PATCH /api/v1/jobs/{id}` (status); OpenAPI `/jobs` schemas | **Implemented ✅** | `lifecycle.rs`, `PATCH /jobs/{id}`, `JobRecord` OpenAPI |
 | FM-022 | Memory layer | HTTP stub shard refs / RAID map | **Implemented ✅** | `memory/store.rs`, `GET/POST /memory/shards`, `POOLAI_MEMORY_DATA_DIR` |
 | FM-023 | Grid | Wire Job/Result у discovery або distributed path | **Implemented ✅** | `grid/dispatch.rs`, `POST /grid/envelope`, `POST /discovery/grid/envelope` |
-| FM-024 | Solana | Sidecar devnet RPC stub (без mainnet) | Planned | `poolai-solana-adapter`, `SOLANA_ADAPTER_CONCEPT` |
-| FM-025 | OpenAPI | VM template body schemas (gap audit) | Planned | `OPENAPI_GAP_AUDIT_2026-05-19.md` |
+| FM-024 | Solana | Sidecar devnet RPC stub (без mainnet) | **Implemented ✅** | `config/devnet.toml`, `rpc/mock.rs`, `SidecarProcessor` |
+| FM-025 | OpenAPI | VM template body schemas (gap audit) | **Implemented ✅** | `VmTemplate`, `GpuSchedulingPolicy` in `openapi.yaml` |
 | FM-026 | QA | Contract або Playwright для `/api/v1/jobs` | Planned | `tests/`, `E2E_PLAYWRIGHT.md` |
 | FM-027 | Ops / LAN | 2-host sign-off runbook + checklist | **BLOCKED** (2 хости) | `LAN_BENCHMARK_RUNBOOK.md` §4 |
 | FM-028 | P2b / perf | Single-host TQ01+RAID metrics → `BENCHMARKS.md` | Planned | `run-lan-nodes`, TurboQuant |
@@ -135,12 +135,12 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
-| 1 | Solana RPC stub | **FM-024** | `AUTO_RUN_POST_HORIZON` §2 |
+| — | Solana RPC stub | **FM-024** ✅ | `config/devnet.toml`, mock RPC ack |
 | — | Job scheduler MVP | **FM-020** ✅ | `scheduler.rs`, `POST /jobs/schedule` |
 | — | Jobs PATCH + OpenAPI | **FM-021** ✅ | `lifecycle.rs`, `PATCH /jobs/{id}` |
 | — | Memory API stub | **FM-022** ✅ | `GET/POST /memory/shards`, RAID filter |
 | — | Grid wire integration | **FM-023** ✅ | `ingest_envelope`, discovery + grid paths |
-| 3 | OpenAPI DTO backlog | **FM-025** | |
+| — | OpenAPI DTO backlog | **FM-025** ✅ | `VmTemplate` schemas |
 | 4 | Jobs E2E/contract | **FM-026** | |
 | 5 | LAN §4 runbook prep | **FM-027** | **BLOCKED** (2 хости) |
 | 6 | P2b single-host metrics | **FM-028** | |
@@ -254,16 +254,18 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-024**.
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-026**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
-**Канон:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md) · **Architect P6 залишок:** on-chain (FM-024), Memory wire (FM-022).
+**Канон:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md) · **Architect P6 залишок:** on-chain program (post FM-024 stub), VM network DTO (опційно).
 
 | FM | Статус | Коментар |
 |----|--------|----------|
 | FM-020…023 | **✅** | jobs + memory + grid ingress |
-| FM-024…026 | Planned | код + OpenAPI + QA |
+| FM-024 | **✅** | devnet config + mock RPC (crate only) |
+| FM-025 | **✅** | `VmTemplate` / `GpuSchedulingPolicy` OpenAPI |
+| FM-026 | Planned | Jobs contract/E2E |
 | FM-027 | **BLOCKED** | 2 фізичні хости |
 | FM-028…031 | Planned | perf / SQLite / monitoring / a11y |
 

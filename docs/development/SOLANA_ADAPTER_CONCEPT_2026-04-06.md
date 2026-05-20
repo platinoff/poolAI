@@ -59,8 +59,19 @@
 | Sidecar | `poolai-solana-adapter` binary (NDJSON stdin → ack stdout) |
 | Main `poolai` | **без** `solana-sdk` / без залежності на adapter |
 
-## 7. Наступні кроки (поза S37)
+## 7. FM-024 — mock RPC stub (2026-05-20)
 
-- Прототип Solana program (minimal) + тестнет.
-- RPC submit у sidecar (після заморозки schema v1).
-- Оновлення [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](NEXT_STEPS_ARCHITECT_2026-03-17.md) при появі реального crate / репозиторію адаптера.
+| Що | Де |
+|----|-----|
+| Devnet config | `crates/poolai-solana-adapter/config/devnet.toml`, `src/config.rs` |
+| Mock RPC | `src/rpc/mock.rs` — idempotent `event_id` → `mocksig…` |
+| Sidecar | `SidecarProcessor` + bin `poolai-solana-adapter` (stdout ack + optional `rpc`) |
+| Env | `POOLAI_SOLANA_CONFIG`, `POOLAI_SOLANA_CLUSTER`, `POOLAI_SOLANA_RPC_URL`, `POOLAI_SOLANA_MOCK_RPC` |
+
+**Обмеження:** без мережевого I/O, без `mainnet-beta`, без `solana-sdk` у `poolai`.
+
+## 8. Наступні кроки (поза FM-024)
+
+- Прототип Solana program (minimal) + devnet deploy.
+- Реальний RPC submit (після program id).
+- Оновлення Architect P6 при появі on-chain program.
