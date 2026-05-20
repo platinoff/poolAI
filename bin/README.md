@@ -17,6 +17,13 @@ bash bin/run-poolai.sh status
 
 PowerShell: `.\bin\run-poolai.ps1 single`
 
+## Dev tools (Rust bins)
+
+```bash
+cargo run --bin poolai-openapi-gap-audit   # Axum routes vs docs/openapi.yaml (exit 1 = gaps)
+cargo run --bin poolai_health_load -- http://127.0.0.1:8080/api/v1/health 10 100
+```
+
 ## Git / cargo / тести
 
 З кореня проєкту `poolAI`:

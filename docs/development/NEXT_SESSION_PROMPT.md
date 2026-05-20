@@ -18,7 +18,7 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 3. FUNCTION_MANAGEMENT.md §5.1, §5.7, §5.3
 4. AUTO_RUN_SESSION_2026_POST_HORIZON.md — перший [ ] у §4
 5. .cursor/rules/autonomous-orchestrator.mdc
-6. .cursor/rules/runtime-stack-policy.mdc — Rust primary; NO Python runtime
+6. .cursor/rules/runtime-stack-policy.mdc — Rust primary; `git ls-files '*.py'` must be empty
 7. JOB_LAYER_CONCEPT_2026-03-17.md (FM-026 jobs QA)
 
 Не повторювати: autoprogon S21–S34, Horizon S35–S40, FM-001…025 baseline.
