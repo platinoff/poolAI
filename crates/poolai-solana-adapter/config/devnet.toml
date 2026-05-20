@@ -1,0 +1,7 @@
+# Default Solana adapter profile (FM-024) — devnet + mock RPC (no mainnet).
+cluster = "devnet"
+rpc_url = "https://api.devnet.solana.com"
+commitment = "confirmed"
+mock_rpc = true
+# Placeholder program id until an on-chain program is deployed.
+program_id = "11111111111111111111111111111111"
