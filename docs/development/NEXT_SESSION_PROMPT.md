@@ -1,38 +1,60 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-20 · **Фаза:** **Maintenance** (Horizon S35–S40 ✅ · A+B+C **100%** · job store `cd1aaad`)
+**Оновлено:** 2026-05-20 · **Фаза:** **Post-Horizon розробка** (FM-020…) · **A+B+C:** **100%** · **job store JSON:** ✅ `cd1aaad`
 
-**Копіюй блок нижче** в нову сесію (утримання `main`, без нових horizon-спринтів без явного запиту).
+**Копіюй блок нижче** в нову сесію (одна FM за ітерацію).
 
 ---
 
 ## Промпт
 
 ```
-PoolAI — maintenance: утримувати main (test-ci, FM-003 §4 лише з 2 хостами).
+PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер функціоналу).
 
-## S0 — зріз
+## S0 — зріз (обов’язково)
 
 1. git fetch && git status -sb (main).
 2. HANDOFF_NEW_SESSION.md
-3. FUNCTION_MANAGEMENT.md §5.1, §5.6
-4. DEVELOPMENT_PROGRESS_2026-05-19.md — A+B+C **100%**
+3. FUNCTION_MANAGEMENT.md §5.1, §5.7, §5.3
+4. AUTO_RUN_SESSION_2026_POST_HORIZON.md — перший [ ] у §4
+5. .cursor/rules/autonomous-orchestrator.mdc
+6. JOB_LAYER_CONCEPT_2026-03-17.md (FM-020)
+7. NEXT_STEPS_ARCHITECT_2026-03-17.md — P6 залишок (scheduler, on-chain)
 
-Horizon S35–S40 — не повторювати.
+Не повторювати: autoprogon S21–S34, Horizon S35–S40, FM-001…019 baseline, job store JSON (закрито).
 
-## Мета ітерації
+## Мета ітерації (одна FM за сесію)
 
-- `cargo test-ci` (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28) після змін у src/tests.
-- Нові FM-* — лише за запитом користувача або регресія.
-- FM-003 §4 LAN sign-off — **BLOCKED** (2 фізичні хости); runbook only.
+| Пор. | FM | Фокус | Критерій |
+|------|-----|--------|----------|
+| 1 | FM-020 | Job scheduler MVP | Submitted→Scheduled; unit tests; store persist |
+| 2 | FM-021 | Jobs PATCH + OpenAPI | PATCH status; openapi /jobs |
+| 3 | FM-022 | Memory API | shard refs HTTP або RAID map |
+| 4 | FM-023 | Grid integration | Job/Result на discovery/distributed path |
+| 5 | FM-024 | Solana RPC stub | devnet config; sidecar only |
+| 6 | FM-025 | OpenAPI DTO | VM template bodies |
+| 7 | FM-026 | Jobs QA | contract або Playwright |
+| 8 | FM-027 | LAN runbook | 2-host checklist (**BLOCKED** без хостів) |
+| 9 | FM-028 | P2b metrics | single-host TQ01+RAID → BENCHMARKS |
+| 10 | FM-029 | Job SQLite | optional backend |
+| 11 | FM-030 | Monitoring persist | MONITORING_PERSISTENCE_PLAN MVP |
+| 12 | FM-031 | WCAG expand | pa11y/axe URLs |
 
-Поза обсягом: mainnet Solana, KYC, FM-004/006/009/010 re-implementation без запиту.
+Почни з FM-020 (перший [ ] у AUTO_RUN §4).
 
-## Завершення (якщо були зміни)
+Перед кодом FM-020:
+- src/job/store.rs, src/network/api/jobs.rs
+- docs/development/JOB_LAYER_CONCEPT_2026-03-17.md §2.2, §6
 
-1. cargo fmt --all → test-ci за потреби.
-2. Оновити HANDOFF / CHANGELOG / FM лише при зміні продукту.
-3. commit + push MSYS2 з Summary; не стаджити data/audit/*.log.gz, .commit-msg-*.txt.
+## Завершення ітерації
+
+1. Зміни src/ → cargo fmt --all → cargo test-ci (MSYS2, K8S_OPENAPI_ENABLED_VERSION=1.28).
+2. Нові/змінені API → docs/openapi.yaml.
+3. Оновити: AUTO_RUN §FM, FM §5.1/§5.7, HANDOFF, CHANGELOG, AUTO_DEV_PATTERNS.
+4. commit + push MSYS2 з Summary; git -c commit.template= commit -F msgfile.
+
+Не стаджити: data/audit/*.log.gz, data/dev/, data/lan-stand/, .commit-msg-*.txt.
+Поза обсягом: FM-003 §4 sign-off без 2 хостів; mainnet Solana; KYC.
 ```
 
 ---
@@ -41,10 +63,10 @@ Horizon S35–S40 — не повторювати.
 
 | Документ | Роль |
 |----------|------|
-| [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
-| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) | FM-* канон |
+| [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](./AUTO_RUN_SESSION_2026_POST_HORIZON.md) | Черга FM-020…031 |
+| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) | FM-* §5.1, §5.7 |
 | [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md) | A+B+C **100%** |
-| [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) | Horizon — **закрито** S35–S40 |
-| [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bash bin/run-poolai.sh single` |
+| [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
+| [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bin/run-poolai.sh` |
 
-**Horizon закрито 2026-05-19 (S40).** Наступні епіки — лише за явним запитом.
+**Наступна сесія:** **FM-020** (Job scheduler MVP).

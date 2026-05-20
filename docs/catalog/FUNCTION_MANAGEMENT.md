@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-19 (Horizon S35–S40 ✅; Layer C + проєкт **100%**; [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md)).
+**Оновлено:** 2026-05-20 (Post-Horizon FM-020…031; job store JSON ✅; [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md)).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -116,31 +116,43 @@ FM-xxx (з таблиці нижче)
 | FM-017 | P3 / HTTP | **FM-005 залишок:** `discovery` → `HttpAppError` JSON; `virtual_nodes` — status-only (worker); `admin` — `AppError` ✅ | Implemented | `discovery.rs`; `virtual_nodes.rs` worker-safe; `tests/discovery_remote_register_integration.rs` |
 | FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
 | FM-019 | UI / a11y | pa11y CI ✅; axe Playwright ✅ (S33); admin baseline | Implemented (scope A) | [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md), `e2e/tests/a11y.spec.ts` |
+| FM-020 | Job layer | Scheduler MVP: `Submitted`→`Scheduled`, in-process tick, persist via store | Planned | `JOB_LAYER_CONCEPT`, `src/job/`, `AUTO_RUN_POST_HORIZON` |
+| FM-021 | Job layer | `PATCH /api/v1/jobs/{id}` (status); OpenAPI `/jobs` schemas | Planned | `jobs.rs`, `openapi.yaml` |
+| FM-022 | Memory layer | HTTP stub shard refs / RAID map | Planned | `POOLAI_MEMORY_LAYER.md`, `src/memory/` |
+| FM-023 | Grid | Wire Job/Result у discovery або distributed path | Planned | `src/grid/`, `GRID_PROTOCOL_CONCEPT` |
+| FM-024 | Solana | Sidecar devnet RPC stub (без mainnet) | Planned | `poolai-solana-adapter`, `SOLANA_ADAPTER_CONCEPT` |
+| FM-025 | OpenAPI | VM template body schemas (gap audit) | Planned | `OPENAPI_GAP_AUDIT_2026-05-19.md` |
+| FM-026 | QA | Contract або Playwright для `/api/v1/jobs` | Planned | `tests/`, `E2E_PLAYWRIGHT.md` |
+| FM-027 | Ops / LAN | 2-host sign-off runbook + checklist | **BLOCKED** (2 хости) | `LAN_BENCHMARK_RUNBOOK.md` §4 |
+| FM-028 | P2b / perf | Single-host TQ01+RAID metrics → `BENCHMARKS.md` | Planned | `run-lan-nodes`, TurboQuant |
+| FM-029 | Job layer | SQLite job store (optional feature) | Planned | `JOB_LAYER_CONCEPT` §6 |
+| FM-030 | Enterprise | Monitoring metrics persistence MVP | Planned | `MONITORING_PERSISTENCE_PLAN.md` |
+| FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | Partial | `ADMIN_A11Y_RUNBOOK.md` |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
-**Канон черги** — таблиця нижче; детальний аудит «що не зроблено» — **§5.3**.
+**Канон черги Post-Horizon** — **§5.7** + [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md). Аудит закритого — **§5.3**.
 
-| Порядок | Фокус | FM / план | Дія |
-|--------|--------|-----------|-----|
-| 1 | **Maintenance** | `cargo test-ci` на `main`; нові FM — за запитом | `NEXT_SESSION_PROMPT.md` |
-| — | **A+B autoprogon** | **✅ 100%** | S34 |
-| — | FM-003 §4 LAN | **BLOCKED** | 2 хости (ops) |
-| — | Legacy docs FM | **✅ S30** | [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) |
-| — | Real LAN sign-off | **FM-003 §4** | **BLOCKED** — 2 фізичні хости |
-| — | UI a11y CI | **FM-019** | **✅** pa11y + axe Playwright (S33) |
-| — | UI_QUALITY P1 | **FM-013** | **✅** S25–S26 (27 contract tests) |
-| — | ML ops | **DIGEST §ML** | ✅ `PIPELINE_MANAGEMENT.md` |
-| — | Відкладено | **FM-004** (✅ S35) | — |
-| — | Концепт | **FM-009**, **FM-010** | поза автопрогоном |
+| Порядок | Фокус | FM | Дія |
+|--------|--------|-----|-----|
+| 1 | Job scheduler MVP | **FM-020** | `AUTO_RUN_POST_HORIZON` §2 |
+| 2 | Jobs PATCH + OpenAPI | **FM-021** | |
+| 3 | Memory API stub | **FM-022** | |
+| 4 | Grid wire integration | **FM-023** | |
+| 5 | Solana RPC stub | **FM-024** | |
+| 6 | OpenAPI DTO backlog | **FM-025** | |
+| 7 | Jobs E2E/contract | **FM-026** | |
+| 8 | LAN §4 runbook prep | **FM-027** | **BLOCKED** (2 хости) |
+| 9 | P2b single-host metrics | **FM-028** | |
+| 10 | Job store SQLite | **FM-029** | |
+| 11 | Monitoring persistence | **FM-030** | |
+| 12 | WCAG automation expand | **FM-031** | |
 
-**Прогрес:** **100%** (шар A, S33) — **§5.5**, [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+**Закрито (не в черзі):** FM-001…019; Horizon S35–S40; job store JSON (`cd1aaad`).
 
-**Закрито (не в черзі):** FM-001–018; UI_QUALITY P1; FM-019 baseline; S21–S28.
+**Якість збірки:** `cargo test-ci` після `src/` — останній зріз 2026-05-20 (`cecd9785`).
 
-**Якість збірки:** **`cargo test-ci`** + `cargo fmt` — зріз 2026-05-28; clippy — CI (`ci.yml`).
-
-**Відкриті чекбокси** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md): LAN-заміри (≈ FM-003 §4, BLOCKED); cloud-sdk (FM-006 ✅ S39).
+**Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -242,7 +254,19 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-020**.
+
+### 5.7 Post-Horizon backlog (2026-05-20)
+
+**Канон:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md) · **Architect P6 залишок:** scheduler, on-chain (FM-024), Memory wire (FM-022).
+
+| FM | Статус | Коментар |
+|----|--------|----------|
+| FM-020…026 | Planned | код + OpenAPI + QA |
+| FM-027 | **BLOCKED** | 2 фізичні хости |
+| FM-028…031 | Planned | perf / SQLite / monitoring / a11y |
+
+**Одна FM за автономну сесію** — commit + push MSYS2 з Summary.
 
 ### 5.4 FM-019 baseline (вже в коді; runbook 2026-06-07)
 

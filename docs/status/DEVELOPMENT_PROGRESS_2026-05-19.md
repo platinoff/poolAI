@@ -14,7 +14,7 @@
 | **C. Horizon (код P6)** | **100%** | S35–S40 ✅ — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md) |
 | **Проєкт (A+B+C)/3** | **100%** | офіційний зріз після S40 |
 
-**Наступна фаза:** **maintenance** — [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md); ops: FM-003 §4 LAN (**BLOCKED**, 2 хости).
+**Наступна фаза:** **Post-Horizon** FM-020…031 — [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops **BLOCKED:** FM-003 §4 / FM-027 (2 хости).
 
 ---
 
@@ -70,6 +70,18 @@
 | S40 | docs closure | +10% ✅ |
 
 **Розрахунок C:** S35–S40 = **100%**. **LAN §4** — ops BLOCKED; не входить у C%.
+
+---
+
+## Post-Horizon (FM-020…031, 2026-05-20)
+
+| FM | Фокус | Статус |
+|----|--------|--------|
+| — | Job store JSON (`POOLAI_JOB_DATA_DIR`) | ✅ `cd1aaad` |
+| FM-020 | Scheduler MVP | [ ] |
+| FM-021…031 | див. FM §5.1 | [ ] |
+
+**Канон черги:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md).
 
 ---
 

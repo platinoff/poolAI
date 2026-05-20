@@ -522,6 +522,11 @@
 - **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
 - **Черга:** S35–S40 ✅ — **Horizon закрито**; далі maintenance (`NEXT_SESSION_PROMPT.md`)
 
+### [Post-Horizon] FM-020…031 — одна FM за сесію
+- **Де:** `AUTO_RUN_SESSION_2026_POST_HORIZON.md`, FM §5.1/§5.7, `NEXT_SESSION_PROMPT.md`
+- **Черга:** FM-020 scheduler → FM-021 OpenAPI jobs → … → FM-031 WCAG
+- **BLOCKED:** FM-027 (2 хости) — лише runbook без sign-off
+
 ### [Maintenance] test-ci на main (після Horizon)
 - **Команда:** `export K8S_OPENAPI_ENABLED_VERSION=1.28`; `rustup run stable-x86_64-pc-windows-gnu cargo test-ci` (PATH з `~/.cargo/bin`, MSYS2 UCRT64)
 - **Коли:** після змін у `src/`/`tests/` або періодичний зріз `main` (~14 хв локально)

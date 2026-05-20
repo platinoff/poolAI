@@ -38,11 +38,11 @@
 
 Таблиця **P1–P7** вище — архітектурні пріоритети й залежності; **конкретна черга робіт** для сесії/спринту — у **`FUNCTION_MANAGEMENT.md` §5.1** (таблиця з колонками *Порядок / Фокус / FM / Дія*). Коротко той самий порядок:
 
-1. **P4 (ops)** — `poolai_health_load` на ref-host → [`BENCHMARKS.md`](../performance/BENCHMARKS.md) (baseline **2026-04-10** чинний).
-2. **FM-003 §4** — LAN sign-off (**BLOCKED**, 2 хости); dev stand §5.1 ✅; ops **2026-06-01**; чекбокс P2b нижче ≈ цей пункт.
-3. **FM-019 backlog** — pa11y/axe CI, dashboard modals — [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md); **baseline Implemented** ✅ (2026-06-07).
-4. **Horizon (активна черга)** — **S39** FM-006 cloud-sdk → **S40** closure — [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md).
-5. **Ops BLOCKED** — **FM-003 §4** (2 хости).
+1. **Post-Horizon** — **FM-020…031** (одна FM/сесію) — [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](./AUTO_RUN_SESSION_2026_POST_HORIZON.md), FM **§5.7**.
+2. **FM-020** — Job scheduler MVP (перша в черзі).
+3. **FM-003 §4 / FM-027** — LAN sign-off (**BLOCKED**, 2 хости); dev stand ✅; `bin/run-lan-nodes.ps1`.
+4. **FM-028** — single-host P2b metrics → [`BENCHMARKS.md`](../performance/BENCHMARKS.md).
+5. **FM-031** — WCAG automation expand (backlog FM-019).
 
 **Звірка прогресу:** autoprogon A+B **100%** (S34); horizon Layer C **100%** (S35–S40 ✅) — [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md), FM **§5.6**; [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
