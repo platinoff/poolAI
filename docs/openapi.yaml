@@ -321,8 +321,8 @@ paths:
     get:
       tags:
         - Jobs
-      summary: List jobs (Horizon S38 stub)
-      description: In-process job store; no scheduler yet.
+      summary: List jobs
+      description: In-process job store (`POOLAI_JOB_DATA_DIR` optional JSON persist).
       operationId: listJobs
       responses:
         '200':
@@ -334,7 +334,8 @@ paths:
     post:
       tags:
         - Jobs
-      summary: Submit a job (stub)
+      summary: Submit a job
+      description: Creates job as `submitted`, then in-process scheduler promotes to `scheduled` (FM-020 MVP; no VM bind).
       operationId: createJob
       requestBody:
         required: true
@@ -349,6 +350,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobSummary'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /jobs/schedule:
+    post:
+      tags:
+        - Jobs
+      summary: Run scheduler tick
+      description: Promotes all `submitted` jobs to `scheduled` (priority descending). Idempotent for already scheduled rows.
+      operationId: scheduleJobs
+      responses:
+        '200':
+          description: Scheduler tick result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleJobsResponse'
         '500':
           description: Internal error
           content:
@@ -4925,6 +4947,14 @@ components:
         job:
           type: object
           description: Full JobRecord (spec + status + created_at)
+
+    ScheduleJobsResponse:
+      type: object
+      properties:
+        scheduled:
+          type: integer
+          minimum: 0
+          description: Count of jobs promoted from submitted to scheduled in this tick
 
     VmInstance:
       type: object

@@ -27,8 +27,8 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 
 | Пор. | FM | Фокус | Критерій |
 |------|-----|--------|----------|
-| 1 | FM-020 | Job scheduler MVP | Submitted→Scheduled; unit tests; store persist |
-| 2 | FM-021 | Jobs PATCH + OpenAPI | PATCH status; openapi /jobs |
+| — | FM-020 | Job scheduler MVP | ✅ `scheduler.rs`, `POST /jobs/schedule` |
+| 1 | FM-021 | Jobs PATCH + OpenAPI | PATCH status; openapi /jobs |
 | 3 | FM-022 | Memory API | shard refs HTTP або RAID map |
 | 4 | FM-023 | Grid integration | Job/Result на discovery/distributed path |
 | 5 | FM-024 | Solana RPC stub | devnet config; sidecar only |
@@ -40,7 +40,7 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | 11 | FM-030 | Monitoring persist | MONITORING_PERSISTENCE_PLAN MVP |
 | 12 | FM-031 | WCAG expand | pa11y/axe URLs |
 
-Почни з FM-020 (перший [ ] у AUTO_RUN §4).
+Почни з FM-021 (перший [ ] у AUTO_RUN §4).
 
 Перед кодом FM-020:
 - src/job/store.rs, src/network/api/jobs.rs
@@ -69,4 +69,4 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
 | [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bin/run-poolai.sh` |
 
-**Наступна сесія:** **FM-020** (Job scheduler MVP).
+**Наступна сесія:** **FM-021** (Jobs PATCH + OpenAPI).

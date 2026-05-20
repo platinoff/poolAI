@@ -78,7 +78,8 @@ PoolAI вже реалізує:
 
 ## 6. Наступні кроки
 
-- Scheduler / VM binding для JobSpec.
+- [x] Scheduler MVP (`Submitted`→`Scheduled`) — `src/job/scheduler.rs`, `POST /api/v1/jobs/schedule` (FM-020, 2026-05-20).
+- VM binding для JobSpec — FM-021+.
 - [x] Персистентний job store (JSON file) — `POOLAI_JOB_DATA_DIR`, `src/job/store.rs` (2026-05-20).
-- SQLite / RAID-backed store — опційно пізніше.
+- SQLite / RAID-backed store — FM-029.
 

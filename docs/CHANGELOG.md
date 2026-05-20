@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Post-Horizon backlog (2026-05-20)** — FM-020…031 (12 задач); `AUTO_RUN_SESSION_2026_POST_HORIZON.md`; FM §5.7; `NEXT_SESSION_PROMPT` → FM-020.
+- **FM-020 Job scheduler MVP (2026-05-20)** — `src/job/scheduler.rs`; `JobStore::promote_submitted_to_scheduled`; `POST /api/v1/jobs/schedule`; `POST /jobs` auto-schedules `submitted`→`scheduled`; OpenAPI `/jobs/schedule`.
+- **Post-Horizon backlog (2026-05-20)** — FM-020…031 (12 задач); `AUTO_RUN_SESSION_2026_POST_HORIZON.md`; FM §5.7; `NEXT_SESSION_PROMPT` → FM-021.
 - **Job store persistence (2026-05-20)** — `POOLAI_JOB_DATA_DIR` + `src/job/store.rs` (JSON `jobs.json`); HTTP `/api/v1/jobs` uses `JobStore::global()`.
 - **Horizon S39 (2026-05-19)** — FM-006: Azure/GCP `cloud-sdk` REST scope closed; `AZURE_LOCATION`; removed unused `azure_mgmt_compute`; mock e2e + location unit tests; `CLOUD_SDK_STATUS.md` v2.2.
 - **Horizon S38 (2026-05-19)** — `src/job/`, `src/memory/` wire types; Grid map; HTTP stub `/api/v1/jobs`; OpenAPI `/jobs`; архітектура в BEST_PRACTICES / DIGEST / Architect P6.

@@ -550,6 +550,13 @@
 - **Патерн:** `JobStore::global()`; `POOLAI_JOB_DATA_DIR` → `jobs.json` (atomic write); без env — in-memory; `POST /api/v1/jobs` → 201; map ↔ `GridEnvelope`
 - **Перевірка:** `cargo test --lib round_trip`; `cargo test-ci` після змін у `src/`
 
+### [Job] Scheduler MVP (FM-020)
+- **Де:** `src/job/scheduler.rs`, `src/job/store.rs` (`promote_submitted_to_scheduled`), `src/network/api/jobs.rs`
+- **Сигнал:** `schedule_pending`, `POST /api/v1/jobs/schedule` → `{ "scheduled": N }`
+- **Патерн:** `POST /jobs` push + tick → response `status: scheduled`; priority desc; без VM bind; persist одним `persist()` після batch
+- **Перевірка:** `cargo test job --lib --features ml,enterprise,cloud,test-utils`
+- **FM:** FM-020 ✅
+
 ### [Solana] Adapter crate schema v1 (FM-010, S37)
 - **Де:** `crates/poolai-solana-adapter/src/events.rs`, `src/sidecar.rs`, bin `poolai-solana-adapter`
 - **Сигнал:** `DomainEventEnvelope::from_json`, `process_event_line`

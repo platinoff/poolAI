@@ -78,7 +78,7 @@
 | FM | Фокус | Статус |
 |----|--------|--------|
 | — | Job store JSON (`POOLAI_JOB_DATA_DIR`) | ✅ `cd1aaad` |
-| FM-020 | Scheduler MVP | [ ] |
+| FM-020 | Scheduler MVP | [x] |
 | FM-021…031 | див. FM §5.1 | [ ] |
 
 **Канон черги:** [`AUTO_RUN_SESSION_2026_POST_HORIZON.md`](../development/AUTO_RUN_SESSION_2026_POST_HORIZON.md).

@@ -1,9 +1,9 @@
-//! Jobs API (P6) — optional file-backed store via `POOLAI_JOB_DATA_DIR`.
+//! Jobs API (P6 / FM-020) — file-backed store via `POOLAI_JOB_DATA_DIR`; scheduler promotes `submitted` → `scheduled`.
 
 use axum::{
     extract::{Path, State},
     http::StatusCode,
-    routing::get,
+    routing::{get, post},
     Json, Router,
 };
 use chrono::Utc;
@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
-use crate::job::{JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
+use crate::job::{schedule_pending, JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
 use crate::network::api::common::HttpAppError;
 
 #[derive(Deserialize)]
@@ -43,6 +43,11 @@ struct JobDetailResponse {
     job: JobRecord,
 }
 
+#[derive(Serialize)]
+struct ScheduleJobsResponse {
+    scheduled: usize,
+}
+
 fn store() -> &'static JobStore {
     JobStore::global()
 }
@@ -50,6 +55,7 @@ fn store() -> &'static JobStore {
 pub fn create_jobs_routes() -> Router<ApiContext> {
     Router::new()
         .route("/jobs", get(list_jobs).post(create_job))
+        .route("/jobs/schedule", post(schedule_jobs))
         .route("/jobs/{id}", get(get_job))
 }
 
@@ -87,14 +93,25 @@ async fn create_job(
         status: JobStatus::Submitted,
         created_at: Utc::now(),
     };
+    store().push(record)?;
+    schedule_pending(store())?;
+    let scheduled = store()
+        .get(&id.0)?
+        .ok_or_else(|| AppError::InternalError("job missing after create".into()))?;
     let summary = JobSummary {
         id: id.0.clone(),
-        kind: record.spec.kind,
-        status: record.status,
-        created_at: record.created_at.to_rfc3339(),
+        kind: scheduled.spec.kind,
+        status: scheduled.status,
+        created_at: scheduled.created_at.to_rfc3339(),
     };
-    store().push(record)?;
     Ok((StatusCode::CREATED, Json(summary)))
+}
+
+async fn schedule_jobs(
+    State(_ctx): State<ApiContext>,
+) -> Result<Json<ScheduleJobsResponse>, HttpAppError> {
+    let scheduled = schedule_pending(store())?;
+    Ok(Json(ScheduleJobsResponse { scheduled }))
 }
 
 async fn get_job(

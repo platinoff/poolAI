@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 
 use crate::core::error::AppError;
-use crate::job::JobRecord;
+use crate::job::{JobRecord, JobStatus};
 
 const JOBS_FILE: &str = "jobs.json";
 
@@ -70,6 +70,32 @@ impl JobStore {
             guard.push(record);
         }
         self.persist()
+    }
+
+    /// FM-020: transition all `Submitted` rows to `Scheduled` (priority desc), then persist once.
+    pub fn promote_submitted_to_scheduled(&self) -> Result<usize, AppError> {
+        let scheduled = {
+            let mut guard = self
+                .jobs
+                .lock()
+                .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
+            let mut indices: Vec<usize> = guard
+                .iter()
+                .enumerate()
+                .filter(|(_, r)| r.status == JobStatus::Submitted)
+                .map(|(i, _)| i)
+                .collect();
+            indices.sort_by(|&a, &b| guard[b].spec.priority.cmp(&guard[a].spec.priority));
+            let count = indices.len();
+            for i in indices {
+                guard[i].status = JobStatus::Scheduled;
+            }
+            count
+        };
+        if scheduled > 0 {
+            self.persist()?;
+        }
+        Ok(scheduled)
     }
 
     fn persist(&self) -> Result<(), AppError> {
