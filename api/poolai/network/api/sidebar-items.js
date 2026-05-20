@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["create_api_routes"],"mod":["admin","common","completions","discovery","instances","jobs","libraries","raid","raid_admin","rewards","system","topology","ui","users","virtual_nodes","vm","workers"]};
+window.SIDEBAR_ITEMS = {"fn":["create_api_routes"],"mod":["admin","common","completions","discovery","instances","jobs","libraries","memory","raid","raid_admin","rewards","system","topology","ui","users","virtual_nodes","vm","workers"]};
