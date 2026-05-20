@@ -6,7 +6,7 @@
 
 **Horizon (Layer C):** **100%** ✅ S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
 
-**Останній `cargo test-ci`:** 2026-05-20 (maintenance, `5383dec`+); GNU toolchain, `K8S_OPENAPI_ENABLED_VERSION=1.28` — **ok** (~14 хв). Clippy — CI на `main`.
+**Останній `cargo test-ci`:** 2026-05-20 (після `cd1aaad` job store); GNU, `K8S_OPENAPI_ENABLED_VERSION=1.28` — **ok** (~8.5 хв). Clippy — CI на `main`.
 
 **Прогрес продукту (шар A):** **100%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 

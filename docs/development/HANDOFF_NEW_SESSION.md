@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-20):** `cargo test-ci` на `main` — **ok** (GNU, ~14 хв); без змін `src/`.
+**Maintenance (2026-05-20):** `cargo test-ci` — **ok** після `cd1aaad` (job store, GNU ~8.5 хв). **`POOLAI_JOB_DATA_DIR`** — `src/job/store.rs`, `data/jobs/` gitignored.
 
 ## 1. Канонічний порядок документації та планів
 
