@@ -403,6 +403,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - Jobs
+      summary: Update job status
+      description: Lifecycle transition per JOB_LAYER_CONCEPT §2.2 (forward path + `failed` from non-terminal states).
+      operationId: patchJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchJobRequest'
+      responses:
+        '200':
+          description: Updated job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDetailResponse'
+        '400':
+          description: Invalid lifecycle transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /users:
     get:
@@ -4941,12 +4984,92 @@ components:
           type: string
           nullable: true
 
-    JobDetailResponse:
+    JobResources:
       type: object
       properties:
+        cpu_threads:
+          type: integer
+          minimum: 1
+          nullable: true
+        gpu_memory_mb:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+        ram_mb:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+        disk_mb:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+
+    JobSpec:
+      type: object
+      required:
+        - id
+        - kind
+      properties:
+        id:
+          type: string
+        kind:
+          $ref: '#/components/schemas/JobKind'
+        resources:
+          $ref: '#/components/schemas/JobResources'
+        priority:
+          type: integer
+          minimum: 0
+          maximum: 255
+          default: 0
+        max_duration_secs:
+          type: integer
+          format: int64
+          nullable: true
+        input_artifact_ids:
+          type: array
+          items:
+            type: string
+        verification_policy:
+          type: string
+          nullable: true
+        deadline:
+          type: string
+          format: date-time
+          nullable: true
+
+    JobRecord:
+      type: object
+      required:
+        - spec
+        - status
+        - created_at
+      properties:
+        spec:
+          $ref: '#/components/schemas/JobSpec'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        created_at:
+          type: string
+          format: date-time
+
+    JobDetailResponse:
+      type: object
+      required:
+        - job
+      properties:
         job:
-          type: object
-          description: Full JobRecord (spec + status + created_at)
+          $ref: '#/components/schemas/JobRecord'
+
+    PatchJobRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/JobStatus'
 
     ScheduleJobsResponse:
       type: object

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-021 Jobs PATCH + OpenAPI (2026-05-20)** — `PATCH /api/v1/jobs/{id}` (`status`); `src/job/lifecycle.rs` transition rules; `JobStore::update_status`; OpenAPI `JobRecord`, `JobSpec`, `PatchJobRequest`.
 - **FM-020 Job scheduler MVP (2026-05-20)** — `src/job/scheduler.rs`; `JobStore::promote_submitted_to_scheduled`; `POST /api/v1/jobs/schedule`; `POST /jobs` auto-schedules `submitted`→`scheduled`; OpenAPI `/jobs/schedule`.
 - **Post-Horizon backlog (2026-05-20)** — FM-020…031 (12 задач); `AUTO_RUN_SESSION_2026_POST_HORIZON.md`; FM §5.7; `NEXT_SESSION_PROMPT` → FM-021.
 - **Job store persistence (2026-05-20)** — `POOLAI_JOB_DATA_DIR` + `src/job/store.rs` (JSON `jobs.json`); HTTP `/api/v1/jobs` uses `JobStore::global()`.

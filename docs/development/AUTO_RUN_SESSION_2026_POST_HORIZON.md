@@ -56,7 +56,7 @@ cargo test-ci
 ## 4. Чеклист сесії
 
 - [x] FM-020 Job scheduler
-- [ ] FM-021 Jobs PATCH + OpenAPI
+- [x] FM-021 Jobs PATCH + OpenAPI
 - [ ] FM-022 Memory API
 - [ ] FM-023 Grid integration
 - [ ] FM-024 Solana RPC stub

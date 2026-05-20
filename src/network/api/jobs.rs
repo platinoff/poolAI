@@ -1,4 +1,4 @@
-//! Jobs API (P6 / FM-020) — file-backed store via `POOLAI_JOB_DATA_DIR`; scheduler promotes `submitted` → `scheduled`.
+//! Jobs API (P6 / FM-020–021) — store + scheduler; `PATCH` lifecycle status updates.
 
 use axum::{
     extract::{Path, State},
@@ -48,6 +48,11 @@ struct ScheduleJobsResponse {
     scheduled: usize,
 }
 
+#[derive(Deserialize)]
+struct PatchJobRequest {
+    status: JobStatus,
+}
+
 fn store() -> &'static JobStore {
     JobStore::global()
 }
@@ -56,7 +61,7 @@ pub fn create_jobs_routes() -> Router<ApiContext> {
     Router::new()
         .route("/jobs", get(list_jobs).post(create_job))
         .route("/jobs/schedule", post(schedule_jobs))
-        .route("/jobs/{id}", get(get_job))
+        .route("/jobs/{id}", get(get_job).patch(patch_job))
 }
 
 async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListResponse>, HttpAppError> {
@@ -121,5 +126,14 @@ async fn get_job(
     let job = store()
         .get(&id)?
         .ok_or_else(|| HttpAppError::new(AppError::ApiNotFound(format!("job '{id}' not found"))))?;
+    Ok(Json(JobDetailResponse { job }))
+}
+
+async fn patch_job(
+    State(_ctx): State<ApiContext>,
+    Path(id): Path<String>,
+    Json(body): Json<PatchJobRequest>,
+) -> Result<Json<JobDetailResponse>, HttpAppError> {
+    let job = store().update_status(&id, body.status)?;
     Ok(Json(JobDetailResponse { job }))
 }

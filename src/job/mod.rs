@@ -1,9 +1,12 @@
 //! Job / mining layer wire types (P6 / Horizon S38).
 
+mod lifecycle;
 mod map;
 pub mod scheduler;
 mod store;
 mod types;
+
+pub use lifecycle::allows_transition;
 
 pub use map::{
     envelope_from_job_spec, grid_result_from_status, job_spec_from_envelope,

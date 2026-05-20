@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 
 use crate::core::error::AppError;
-use crate::job::{JobRecord, JobStatus};
+use crate::job::{allows_transition, JobRecord, JobStatus};
 
 const JOBS_FILE: &str = "jobs.json";
 
@@ -70,6 +70,30 @@ impl JobStore {
             guard.push(record);
         }
         self.persist()
+    }
+
+    /// FM-021: update job status when lifecycle transition is valid; persists on success.
+    pub fn update_status(&self, id: &str, status: JobStatus) -> Result<JobRecord, AppError> {
+        let updated = {
+            let mut guard = self
+                .jobs
+                .lock()
+                .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
+            let record = guard
+                .iter_mut()
+                .find(|r| r.spec.id.0 == id)
+                .ok_or_else(|| AppError::ApiNotFound(format!("job '{id}' not found")))?;
+            if !allows_transition(record.status, status) {
+                return Err(AppError::ValidationError(format!(
+                    "cannot transition job '{id}' from {:?} to {:?}",
+                    record.status, status
+                )));
+            }
+            record.status = status;
+            record.clone()
+        };
+        self.persist()?;
+        Ok(updated)
     }
 
     /// FM-020: transition all `Submitted` rows to `Scheduled` (priority desc), then persist once.
@@ -187,5 +211,63 @@ mod tests {
         let jobs = reloaded.list().expect("list");
         assert_eq!(jobs.len(), 1);
         assert_eq!(jobs[0].spec.id.0, "job-persist-1");
+    }
+
+    #[test]
+    fn update_status_persists() {
+        let _guard = env_lock();
+        let tmp = TempDir::new().expect("tempdir");
+        let dir = tmp.path().to_path_buf();
+
+        let record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("job-patch-1"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+        };
+
+        {
+            let store = JobStore::open_for_test(Some(dir.clone()));
+            store.push(record).expect("push");
+            store
+                .update_status("job-patch-1", JobStatus::Executing)
+                .expect("patch");
+        }
+
+        let reloaded = JobStore::open_for_test(Some(dir));
+        let job = reloaded.get("job-patch-1").expect("get").expect("row");
+        assert_eq!(job.status, JobStatus::Executing);
+    }
+
+    #[test]
+    fn update_status_rejects_invalid_transition() {
+        let store = JobStore::open_for_test(None);
+        let record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("job-bad"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Submitted,
+            created_at: Utc::now(),
+        };
+        store.push(record).expect("push");
+        let err = store
+            .update_status("job-bad", JobStatus::Completed)
+            .expect_err("invalid");
+        assert!(matches!(err, AppError::ValidationError(_)));
     }
 }

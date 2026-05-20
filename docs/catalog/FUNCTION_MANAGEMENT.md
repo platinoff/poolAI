@@ -117,7 +117,7 @@ FM-xxx (з таблиці нижче)
 | FM-018 | UI / a11y | Admin/login skip links, focus-visible, aria-live, aria-current | Implemented | `admin/mod.rs`, `admin_styles.css`, `admin_common.js`, login `mod.rs`; `admin::a11y_tests` |
 | FM-019 | UI / a11y | pa11y CI ✅; axe Playwright ✅ (S33); admin baseline | Implemented (scope A) | [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md), `e2e/tests/a11y.spec.ts` |
 | FM-020 | Job layer | Scheduler MVP: `Submitted`→`Scheduled`, in-process tick, persist via store | **Implemented ✅** | `src/job/scheduler.rs`, `POST /jobs/schedule`, `AUTO_RUN_POST_HORIZON` |
-| FM-021 | Job layer | `PATCH /api/v1/jobs/{id}` (status); OpenAPI `/jobs` schemas | Planned | `jobs.rs`, `openapi.yaml` |
+| FM-021 | Job layer | `PATCH /api/v1/jobs/{id}` (status); OpenAPI `/jobs` schemas | **Implemented ✅** | `lifecycle.rs`, `PATCH /jobs/{id}`, `JobRecord` OpenAPI |
 | FM-022 | Memory layer | HTTP stub shard refs / RAID map | Planned | `POOLAI_MEMORY_LAYER.md`, `src/memory/` |
 | FM-023 | Grid | Wire Job/Result у discovery або distributed path | Planned | `src/grid/`, `GRID_PROTOCOL_CONCEPT` |
 | FM-024 | Solana | Sidecar devnet RPC stub (без mainnet) | Planned | `poolai-solana-adapter`, `SOLANA_ADAPTER_CONCEPT` |
@@ -135,8 +135,9 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
-| 1 | Jobs PATCH + OpenAPI | **FM-021** | `AUTO_RUN_POST_HORIZON` §2 |
+| 1 | Memory API stub | **FM-022** | `AUTO_RUN_POST_HORIZON` §2 |
 | — | Job scheduler MVP | **FM-020** ✅ | `scheduler.rs`, `POST /jobs/schedule` |
+| — | Jobs PATCH + OpenAPI | **FM-021** ✅ | `lifecycle.rs`, `PATCH /jobs/{id}` |
 | 3 | Memory API stub | **FM-022** | |
 | 4 | Grid wire integration | **FM-023** | |
 | 5 | Solana RPC stub | **FM-024** | |
@@ -254,7 +255,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-021**.
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) — **FM-022**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
@@ -262,8 +263,8 @@ FM-xxx (з таблиці нижче)
 
 | FM | Статус | Коментар |
 |----|--------|----------|
-| FM-020 | **✅** | scheduler MVP |
-| FM-021…026 | Planned | код + OpenAPI + QA |
+| FM-020…021 | **✅** | scheduler + PATCH lifecycle |
+| FM-022…026 | Planned | код + OpenAPI + QA |
 | FM-027 | **BLOCKED** | 2 фізичні хости |
 | FM-028…031 | Planned | perf / SQLite / monitoring / a11y |
 

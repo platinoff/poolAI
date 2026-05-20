@@ -557,6 +557,13 @@
 - **Перевірка:** `cargo test job --lib --features ml,enterprise,cloud,test-utils`
 - **FM:** FM-020 ✅
 
+### [Job] PATCH lifecycle (FM-021)
+- **Де:** `src/job/lifecycle.rs` (`allows_transition`), `JobStore::update_status`, `PATCH /api/v1/jobs/{id}`
+- **Сигнал:** `rg "patch_job|PatchJobRequest" src/network/api/jobs.rs`
+- **Патерн:** forward path + `failed` з non-terminal; terminal (`completed`/`failed`) immutable; 400 `ValidationError` на skip; OpenAPI `JobRecord`/`JobSpec`
+- **Перевірка:** `cargo test job --lib --features ml,enterprise,cloud,test-utils`
+- **FM:** FM-021 ✅
+
 ### [Solana] Adapter crate schema v1 (FM-010, S37)
 - **Де:** `crates/poolai-solana-adapter/src/events.rs`, `src/sidecar.rs`, bin `poolai-solana-adapter`
 - **Сигнал:** `DomainEventEnvelope::from_json`, `process_event_line`
