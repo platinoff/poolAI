@@ -20,6 +20,7 @@ pub mod ai_ml;
 pub mod common;
 pub mod completions;
 pub mod discovery;
+pub mod grid;
 pub mod instances;
 pub mod jobs;
 pub mod libraries;
@@ -59,6 +60,7 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(libraries::create_libraries_routes())
         .merge(users::create_users_routes())
         .merge(discovery::create_discovery_routes())
+        .merge(grid::create_grid_routes())
         .merge(jobs::create_jobs_routes())
         .merge(memory::create_memory_routes())
         .merge(virtual_nodes::create_virtual_node_routes())

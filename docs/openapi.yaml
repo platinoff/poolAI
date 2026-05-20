@@ -70,6 +70,8 @@ tags:
     description: Job / mining layer HTTP stub (P6, FM-020+)
   - name: Memory
     description: AGI memory shard refs mapped to RAID artifacts (FM-022)
+  - name: Grid
+    description: Grid envelope v1 ingress — Job/Result/MemoryShard wire (FM-023)
   - name: Discovery
     description: Peer discovery and virtual-node registration (FM-016)
   - name: VirtualNodes
@@ -446,6 +448,69 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /grid/envelope:
+    post:
+      tags:
+        - Grid
+      summary: Ingest Grid envelope v1
+      description: |
+        Dispatches `GridEnvelope` by `type`: `job` → job store + scheduler;
+        `result` → job status update; `memory_shard` → memory store; `peer_status` → ack only.
+      operationId: ingestGridEnvelope
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridEnvelope'
+      responses:
+        '200':
+          description: Envelope processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridIngestResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Referenced job not found (result ingress)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /discovery/grid/envelope:
+    post:
+      tags:
+        - Grid
+        - Discovery
+      summary: Ingest Grid envelope (discovery plane)
+      description: Same handler as `POST /grid/envelope` for peers on the discovery path (FM-023).
+      operationId: ingestGridEnvelopeDiscovery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GridEnvelope'
+      responses:
+        '200':
+          description: Envelope processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridIngestResponse'
+        '400':
+          description: Validation error
           content:
             application/json:
               schema:
@@ -5162,6 +5227,56 @@ components:
           type: integer
           minimum: 0
           description: Count of jobs promoted from submitted to scheduled in this tick
+
+    GridEnvelope:
+      type: object
+      description: Grid wire container v1 (`src/grid/envelope.rs`)
+      required:
+        - v
+        - type
+        - sent_at
+      properties:
+        v:
+          type: integer
+          example: 1
+        sent_at:
+          type: string
+          format: date-time
+        source_peer_id:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum:
+            - job
+            - result
+            - memory_shard
+            - peer_status
+      additionalProperties: true
+
+    GridIngestResponse:
+      type: object
+      required:
+        - ok
+        - type
+      properties:
+        ok:
+          type: boolean
+        type:
+          type: string
+          enum:
+            - job
+            - result
+            - memory_shard
+            - peer_status
+        job_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        shard_id:
+          type: string
+        peer_id:
+          type: string
 
     MemoryShardRef:
       type: object

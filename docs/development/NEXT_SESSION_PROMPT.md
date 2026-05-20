@@ -30,8 +30,8 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | — | FM-020 | Job scheduler MVP | ✅ `scheduler.rs`, `POST /jobs/schedule` |
 | — | FM-021 | Jobs PATCH + OpenAPI | ✅ `PATCH /jobs/{id}`, `JobRecord` schemas |
 | — | FM-022 | Memory API | ✅ `GET/POST /memory/shards`, RAID map |
-| 1 | FM-023 | Grid integration | Job/Result на discovery/distributed path |
-| 5 | FM-024 | Solana RPC stub | devnet config; sidecar only |
+| — | FM-023 | Grid integration | ✅ `POST /grid/envelope`, `/discovery/grid/envelope` |
+| 1 | FM-024 | Solana RPC stub | devnet config; sidecar only |
 | 6 | FM-025 | OpenAPI DTO | VM template bodies |
 | 7 | FM-026 | Jobs QA | contract або Playwright |
 | 8 | FM-027 | LAN runbook | 2-host checklist (**BLOCKED** без хостів) |
@@ -40,11 +40,10 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | 11 | FM-030 | Monitoring persist | MONITORING_PERSISTENCE_PLAN MVP |
 | 12 | FM-031 | WCAG expand | pa11y/axe URLs |
 
-Почни з FM-023 (перший [ ] у AUTO_RUN §4).
+Почни з FM-024 (перший [ ] у AUTO_RUN §4).
 
-Перед кодом FM-023:
-- src/grid/, src/job/map.rs, discovery або distributed RAID path
-- docs/development/GRID_PROTOCOL_CONCEPT.md
+Перед кодом FM-024:
+- crates/poolai-solana-adapter/, docs/development/SOLANA_ADAPTER_CONCEPT.md
 
 ## Завершення ітерації
 
@@ -69,4 +68,4 @@ PoolAI — Post-Horizon: FM-020…031 (оркестратор + менеджер
 | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) | Операційний зріз |
 | [`RUN_LOCAL.md`](./RUN_LOCAL.md) | `bin/run-poolai.sh` |
 
-**Наступна сесія:** **FM-023** (Grid integration).
+**Наступна сесія:** **FM-024** (Solana RPC stub).

@@ -58,7 +58,7 @@ cargo test-ci
 - [x] FM-020 Job scheduler
 - [x] FM-021 Jobs PATCH + OpenAPI
 - [x] FM-022 Memory API
-- [ ] FM-023 Grid integration
+- [x] FM-023 Grid integration
 - [ ] FM-024 Solana RPC stub
 - [ ] FM-025 OpenAPI DTO
 - [ ] FM-026 Jobs E2E

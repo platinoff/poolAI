@@ -37,6 +37,14 @@ pub fn job_spec_from_envelope(env: &GridEnvelope) -> Option<JobSpec> {
     }
 }
 
+pub fn job_status_from_grid_result(status: GridResultStatus) -> JobStatus {
+    match status {
+        GridResultStatus::Completed => JobStatus::Completed,
+        GridResultStatus::Failed => JobStatus::Failed,
+        GridResultStatus::Verified => JobStatus::Verifying,
+    }
+}
+
 pub fn grid_result_from_status(
     job_id: &JobId,
     status: JobStatus,

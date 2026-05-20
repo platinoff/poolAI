@@ -4,9 +4,11 @@
 //! for transport over HTTP/WebSocket or future QUIC. See
 //! `docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`.
 
+pub mod dispatch;
 mod envelope;
 mod map;
 
+pub use dispatch::{ingest_envelope, GridIngestKind, GridIngestOutcome};
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,
     GridPeerStatusBody, GridResultBody, GridResultStatus, GRID_ENVELOPE_VERSION,

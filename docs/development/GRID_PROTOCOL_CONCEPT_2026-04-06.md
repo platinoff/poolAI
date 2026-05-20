@@ -47,7 +47,8 @@
 ## 4. Що залишається поза цим документом
 
 - **Solana‑adapter** — концепт і мапінг подій: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
-- **Grid envelope v1 (JSON)** — реалізовано в **`src/grid/`** (`GridEnvelope`, `GridMessage`); підпис/routing — майбутнє.
+- **Grid envelope v1 (JSON)** — реалізовано в **`src/grid/`** (`GridEnvelope`, `GridMessage`).
+- **HTTP ingress (FM-023):** `POST /api/v1/grid/envelope`, `POST /api/v1/discovery/grid/envelope` — `grid/dispatch::ingest_envelope` (Job/Result/MemoryShard); підпис/routing — майбутнє.
 
 ## 5. Оновлення концепту Grid Node
 

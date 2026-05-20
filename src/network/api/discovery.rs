@@ -18,7 +18,9 @@ use std::collections::HashMap;
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
+use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
+use crate::network::api::grid::ingest_grid_envelope_handler;
 use crate::services::discovery_service::{
     DiscoveryAnnounceError, DiscoveryNotReady, DiscoveryService, RemoteHealthProbe,
     VirtualNodeStatus,
@@ -90,6 +92,23 @@ pub fn create_discovery_routes() -> Router<ApiContext> {
             "/discovery/virtual-nodes/{peer_id}/health",
             get(probe_virtual_node_health_handler),
         )
+        .route(
+            "/discovery/grid/envelope",
+            post(grid_ingest_envelope_handler),
+        )
+}
+
+async fn grid_ingest_envelope_handler(
+    State(_ctx): State<ApiContext>,
+    envelope: Json<GridEnvelope>,
+) -> Result<
+    (
+        StatusCode,
+        Json<crate::network::api::grid::GridIngestResponse>,
+    ),
+    HttpAppError,
+> {
+    ingest_grid_envelope_handler(envelope).await
 }
 
 fn discovery_not_ready(op: &'static str) -> HttpAppError {

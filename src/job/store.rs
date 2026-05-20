@@ -72,6 +72,24 @@ impl JobStore {
         self.persist()
     }
 
+    /// FM-023: set status without lifecycle checks (grid `Result` ingress).
+    pub fn force_status(&self, id: &str, status: JobStatus) -> Result<JobRecord, AppError> {
+        {
+            let mut guard = self
+                .jobs
+                .lock()
+                .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
+            let record = guard
+                .iter_mut()
+                .find(|r| r.spec.id.0 == id)
+                .ok_or_else(|| AppError::ApiNotFound(format!("job '{id}' not found")))?;
+            record.status = status;
+        }
+        self.persist()?;
+        self.get(id)?
+            .ok_or_else(|| AppError::InternalError("job missing after force_status".into()))
+    }
+
     /// FM-021: update job status when lifecycle transition is valid; persists on success.
     pub fn update_status(&self, id: &str, status: JobStatus) -> Result<JobRecord, AppError> {
         let updated = {

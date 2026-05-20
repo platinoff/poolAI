@@ -557,6 +557,13 @@
 - **Перевірка:** `cargo test job --lib --features ml,enterprise,cloud,test-utils`
 - **FM:** FM-020 ✅
 
+### [Grid] Envelope ingress (FM-023)
+- **Де:** `src/grid/dispatch.rs`, `src/network/api/grid.rs`, `discovery.rs` (`/discovery/grid/envelope`)
+- **Сигнал:** `ingest_envelope`, `JobStore::force_status` для grid `result`
+- **Патерн:** `type: job` → push + `schedule_pending`; `result` → force terminal status; `memory_shard` → `MemoryShardStore::upsert`; `peer_status` → ack
+- **Перевірка:** `cargo test grid::dispatch --lib --features ml,enterprise,cloud,test-utils`
+- **FM:** FM-023 ✅
+
 ### [Memory] Shard refs HTTP (FM-022)
 - **Де:** `src/memory/store.rs`, `src/memory/map.rs` (`memory_shard_from_raid`), `src/network/api/memory.rs`
 - **Сигнал:** `POOLAI_MEMORY_DATA_DIR`, `GET /api/v1/memory/shards?raid_logical_name=`

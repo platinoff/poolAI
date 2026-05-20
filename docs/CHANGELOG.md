@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **FM-023 Grid integration (2026-05-20)** — `grid/dispatch::ingest_envelope`; `POST /api/v1/grid/envelope` + `POST /api/v1/discovery/grid/envelope`; Job→store+scheduler, Result→`force_status`, MemoryShard→memory store; OpenAPI Grid tag.
 - **FM-022 Memory API (2026-05-20)** — `MemoryShardStore` + `POOLAI_MEMORY_DATA_DIR`; `GET/POST /api/v1/memory/shards`, `GET /memory/shards/{shard_id}`; RAID map via `raid_logical_name` query / `memory_shard_from_raid`; OpenAPI Memory tag.
 - **FM-021 Jobs PATCH + OpenAPI (2026-05-20)** — `PATCH /api/v1/jobs/{id}` (`status`); `src/job/lifecycle.rs` transition rules; `JobStore::update_status`; OpenAPI `JobRecord`, `JobSpec`, `PatchJobRequest`.
 - **FM-020 Job scheduler MVP (2026-05-20)** — `src/job/scheduler.rs`; `JobStore::promote_submitted_to_scheduled`; `POST /api/v1/jobs/schedule`; `POST /jobs` auto-schedules `submitted`→`scheduled`; OpenAPI `/jobs/schedule`.
