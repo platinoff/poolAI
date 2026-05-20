@@ -522,6 +522,11 @@
 - **Сигнал:** `rg "Horizon S35|GridEnvelope|poolai-solana-adapter" docs/ src/`
 - **Черга:** S35–S40 ✅ — **Horizon закрито**; далі maintenance (`NEXT_SESSION_PROMPT.md`)
 
+### [Maintenance] test-ci на main (після Horizon)
+- **Команда:** `export K8S_OPENAPI_ENABLED_VERSION=1.28`; `rustup run stable-x86_64-pc-windows-gnu cargo test-ci` (PATH з `~/.cargo/bin`, MSYS2 UCRT64)
+- **Коли:** після змін у `src/`/`tests/` або періодичний зріз `main` (~14 хв локально)
+- **Сигнал:** оновити FM «Останній cargo test-ci» + HANDOFF §maintenance
+
 ### [Horizon] S40 closure — Layer C + project 100% (docs)
 - **Де:** `DEVELOPMENT_PROGRESS_2026-05-19.md`, `HORIZON_TO_100_PLAN.md` §перевірка, FM §5.6, `NEXT_SESSION_PROMPT.md`
 - **Сигнал:** C=100%, (A+B+C)/3=100%; S40 [x] у `AUTO_RUN_SESSION_2026_HORIZON.md`

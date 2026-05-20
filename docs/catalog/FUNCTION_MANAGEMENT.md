@@ -6,7 +6,7 @@
 
 **Horizon (Layer C):** **100%** ✅ S35–S40 — [`HORIZON_TO_100_PLAN.md`](../development/HORIZON_TO_100_PLAN.md). **Поза кодом:** FM-003 §4 LAN (**BLOCKED**, 2 хости).
 
-**Останній `cargo test-ci`:** 2026-05-19 (S26, `285b898d`); E2E S29 — `bash bin/e2e-playwright.sh --start` (5 passed); clippy — CI на `main`.
+**Останній `cargo test-ci`:** 2026-05-20 (maintenance, `5383dec`+); GNU toolchain, `K8S_OPENAPI_ENABLED_VERSION=1.28` — **ok** (~14 хв). Clippy — CI на `main`.
 
 **Прогрес продукту (шар A):** **100%** — див. **§5.5** та [`DEVELOPMENT_PROGRESS_2026-05-19.md`](../status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
@@ -209,7 +209,7 @@ FM-xxx (з таблиці нижче)
 |--------|--------|--------|
 | — | **S33** | ✅ шар A 100% |
 | 1 | FM-003 §4 LAN | **BLOCKED** (2 хости) |
-| 2 | Horizon S40 | Layer C closure |
+| — | Horizon S35–S40 | **✅** Layer C + project **100%** |
 | — | **S21–S30** | ✅ (див. §5.3) |
 | — | **FM-003 §4** | **BLOCKED** (2 хости) |
 

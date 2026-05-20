@@ -184,8 +184,8 @@
 **Мета**: синхронізувати код і документацію **після** виконання пріоритетів 1–4.
 
 **Кроки**:
-- [x] Інвентар **TODO/FIXME** у `src/*.rs` (2026-04-06): лише **`cloud/providers/azure.rs`** (3 маркери: credential/compute/location), **`cloud/providers/gcp.rs`** (1 — майбутній crate); **`core/model_interface.rs`** — `todo!()` тільки всередині **згорнутого** rustdoc-прикладу. У виконуваному прод-коді **`todo!()` / `unimplemented!()` немає**.
-- [ ] Опційно пізніше: реалізувати відкладені пункти Azure/GCP SDK (feature **`cloud-sdk`**) — не блокує основний CI-матрицю.
+- [x] Інвентар **TODO/FIXME** у `src/*.rs` (2026-05-20): **`cloud/providers/azure.rs`**, **`gcp.rs`** — без `TODO` (FM-006 S39, REST scope); **`core/model_interface.rs`** — `todo!()` лише в rustdoc-прикладі. У виконуваному прод-коді **`todo!()` / `unimplemented!()` немає**.
+- [x] Azure/GCP під **`cloud-sdk`**: REST + mock tests (S39); нативний `azure_mgmt_compute` / ADC — опційно пізніше, не блокує CI.
 - [x] Архівні зрізи планів **примарковані** посиланням на покровий план:
   - [x] `RUST_ARCHITECT_STATUS_2026-01-19.md` — банер → `NEXT_STEPS_ARCHITECT_2026-03-17.md`.
   - [x] `RUST_ARCHITECT_STATUS_2026-01-21.md` — те саме.
@@ -230,7 +230,7 @@
 - [x] `src/ml/turboquant.rs` — optional `turboquant-simd` (`wide`).
 - [x] `crates/poolai-solana-adapter/` — domain events schema v1 + NDJSON sidecar (без `solana-sdk` у `poolai`).
 - [x] `src/network/api/jobs.rs` — stub `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}`.
-- [ ] Персистентний job store, scheduler, on-chain submit — після S40 / окремі спринти.
+- [ ] Персистентний job store, scheduler, on-chain submit — **окремі епіки** (поза Horizon S40; за запитом).
 
 ---
 

@@ -12,6 +12,8 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
+**Maintenance (2026-05-20):** `cargo test-ci` на `main` — **ok** (GNU, ~14 хв); без змін `src/`.
+
 ## 1. Канонічний порядок документації та планів
 
 Той самий список, що в кореневому [`README.md`](../../README.md) (*Documentation map*) і [`docs/README.md`](../README.md) (*Canonical reading order*), кроки **1–12**.
