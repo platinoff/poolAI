@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["IGNORE_ROUTES","NETWORK_DIR","OPENAPI_FILE"],"fn":["collect_openapi_paths","collect_routes","extract_route_literals","is_ignored","main","nest_prefix_map","openapi_path_for_route","parse_openapi_path_line","parse_route_string_literal","repo_root","walk_rs"]};
