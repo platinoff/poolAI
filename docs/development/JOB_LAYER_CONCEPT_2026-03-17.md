@@ -79,5 +79,6 @@ PoolAI вже реалізує:
 ## 6. Наступні кроки
 
 - Scheduler / VM binding для JobSpec.
-- Персистентний job store (SQLite / RAID).
+- [x] Персистентний job store (JSON file) — `POOLAI_JOB_DATA_DIR`, `src/job/store.rs` (2026-05-20).
+- SQLite / RAID-backed store — опційно пізніше.
 

@@ -230,7 +230,8 @@
 - [x] `src/ml/turboquant.rs` — optional `turboquant-simd` (`wide`).
 - [x] `crates/poolai-solana-adapter/` — domain events schema v1 + NDJSON sidecar (без `solana-sdk` у `poolai`).
 - [x] `src/network/api/jobs.rs` — stub `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}`.
-- [ ] Персистентний job store, scheduler, on-chain submit — **окремі епіки** (поза Horizon S40; за запитом).
+- [x] Персистентний job store (JSON, `POOLAI_JOB_DATA_DIR`) — 2026-05-20.
+- [ ] Scheduler / on-chain submit — **окремі епіки** (за запитом).
 
 ---
 

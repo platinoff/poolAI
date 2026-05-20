@@ -542,7 +542,7 @@
 ### [Job] Wire types + API stub (S38, P6)
 - **Де:** `src/job/types.rs`, `src/memory/types.rs`, `src/network/api/jobs.rs`
 - **Сигнал:** `JobSpec`, `MemoryShardRef`, `envelope_from_job_spec`
-- **Патерн:** in-process `JOB_STORE`; `POST /api/v1/jobs` → 201; map ↔ `GridEnvelope`
+- **Патерн:** `JobStore::global()`; `POOLAI_JOB_DATA_DIR` → `jobs.json` (atomic write); без env — in-memory; `POST /api/v1/jobs` → 201; map ↔ `GridEnvelope`
 - **Перевірка:** `cargo test --lib round_trip`; `cargo test-ci` після змін у `src/`
 
 ### [Solana] Adapter crate schema v1 (FM-010, S37)

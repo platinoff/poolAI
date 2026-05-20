@@ -1,4 +1,4 @@
-//! Jobs API stub (P6 / Horizon S38) — in-process store, no scheduler yet.
+//! Jobs API (P6) — optional file-backed store via `POOLAI_JOB_DATA_DIR`.
 
 use axum::{
     extract::{Path, State},
@@ -8,14 +8,11 @@ use axum::{
 };
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use std::sync::{LazyLock, Mutex};
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
-use crate::job::{JobId, JobKind, JobRecord, JobSpec, JobStatus};
+use crate::job::{JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
 use crate::network::api::common::HttpAppError;
-
-static JOB_STORE: LazyLock<Mutex<Vec<JobRecord>>> = LazyLock::new(|| Mutex::new(Vec::new()));
 
 #[derive(Deserialize)]
 struct CreateJobRequest {
@@ -46,10 +43,8 @@ struct JobDetailResponse {
     job: JobRecord,
 }
 
-fn lock_store() -> Result<std::sync::MutexGuard<'static, Vec<JobRecord>>, HttpAppError> {
-    JOB_STORE
-        .lock()
-        .map_err(|_| AppError::InternalError("job store lock poisoned".into()).into())
+fn store() -> &'static JobStore {
+    JobStore::global()
 }
 
 pub fn create_jobs_routes() -> Router<ApiContext> {
@@ -59,9 +54,9 @@ pub fn create_jobs_routes() -> Router<ApiContext> {
 }
 
 async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListResponse>, HttpAppError> {
-    let store = lock_store()?;
-    let jobs = store
-        .iter()
+    let jobs = store()
+        .list()?
+        .into_iter()
         .map(|r| JobSummary {
             id: r.spec.id.0.clone(),
             kind: r.spec.kind,
@@ -98,7 +93,7 @@ async fn create_job(
         status: record.status,
         created_at: record.created_at.to_rfc3339(),
     };
-    lock_store()?.push(record);
+    store().push(record)?;
     Ok((StatusCode::CREATED, Json(summary)))
 }
 
@@ -106,11 +101,8 @@ async fn get_job(
     State(_ctx): State<ApiContext>,
     Path(id): Path<String>,
 ) -> Result<Json<JobDetailResponse>, HttpAppError> {
-    let store = lock_store()?;
-    let job = store
-        .iter()
-        .find(|r| r.spec.id.0 == id)
-        .cloned()
+    let job = store()
+        .get(&id)?
         .ok_or_else(|| HttpAppError::new(AppError::ApiNotFound(format!("job '{id}' not found"))))?;
     Ok(Json(JobDetailResponse { job }))
 }
