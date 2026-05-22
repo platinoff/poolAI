@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon **FM-020…033** ✅; HEAD `1b1681aa+`; A+B+C **100%**).
+**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon **FM-020…033** ✅; HEAD `ea91031`; A+B+C **100%**).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 

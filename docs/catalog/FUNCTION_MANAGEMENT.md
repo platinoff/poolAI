@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon FM-020…033 ✅; HEAD `1b1681aa+`).
+**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon FM-020…033 ✅; HEAD `ea91031`).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
