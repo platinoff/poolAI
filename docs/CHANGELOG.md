@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Docs
+- **FM-032 OpenAPI VM network DTO (2026-05-22)** — `VmNetwork`, `NetworkIsolationConfig`, `VmNetworkMessageResponse`; `/vm/networks*` request/response `$ref`; `OPENAPI_GAP_AUDIT` backlog closed; `poolai-openapi-gap-audit` exit 0.
 - **Legacy backlog audit (2026-05-20)** — менеджер функціоналу: звірка старіших планів → **FM-032…042**; §5.1 FM пріоритети розробки; `NEXT_SESSION_PROMPT` → FM-032; HANDOFF §4; FM §5.8.
 
 ### Added

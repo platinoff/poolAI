@@ -20,7 +20,7 @@
 |------|-------------|----------|
 | ~~`/raid/distributed/*`~~ | Inter-node RAID protocol | **✅ S31–S33** paths + `RaidDistributed*` DTO schemas |
 | ~~VM template body schemas~~ | `VmTemplate`, `GpuSchedulingPolicy` | **✅ FM-025** (2026-05-20) |
-| VM network body schemas | `VmNetwork`, `NetworkIsolationConfig` | **FM-032** — наступна сесія (§5.1 FM) |
+| ~~VM network body schemas~~ | `VmNetwork`, `NetworkIsolationConfig` | **✅ FM-032** (2026-05-22) |
 
 ## Перевірка
 
@@ -33,4 +33,4 @@ rg '^  /users' docs/openapi.yaml
 rg '^  /raid/admin' docs/openapi.yaml
 ```
 
-**Наступний спринт:** **FM-032** VM network body schemas (`NEXT_SESSION_PROMPT.md`).
+**Наступний спринт:** **FM-033** Solana on-chain + devnet RPC (`NEXT_SESSION_PROMPT.md`). OpenAPI gap backlog **закрито** (FM-032 ✅).

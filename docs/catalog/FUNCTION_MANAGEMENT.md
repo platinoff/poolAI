@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-20 (legacy backlog audit → **FM-032…042**; Post-Horizon FM-020…031 ✅; HEAD `f00bb1d4`).
+**Оновлено:** 2026-05-22 (FM-032 ✅ OpenAPI VM network; наступна **FM-033**; Post-Horizon FM-020…032 ✅; HEAD `e49e92ef+`).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -128,7 +128,7 @@ FM-xxx (з таблиці нижче)
 | FM-029 | Job layer | SQLite job store (optional feature) | **Implemented ✅** | `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, `src/job/store_sqlite.rs` |
 | FM-030 | Enterprise | Monitoring metrics persistence MVP | **Implemented ✅** | `POOLAI_MONITORING_DATA_DIR`, `monitoring.db`, dashboards/alert_rules |
 | FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | **Implemented ✅** | `pa11y-ci.sh` 21 URLs; `e2e/tests/a11y.spec.ts` |
-| FM-032 | OpenAPI | `VmNetwork` + `NetworkIsolationConfig` body schemas | **Planned** | `OPENAPI_GAP_AUDIT` §залишок; `src/vm/mod.rs` types exist |
+| FM-032 | OpenAPI | `VmNetwork` + `NetworkIsolationConfig` body schemas | **Implemented ✅** | `openapi.yaml` components + `/vm/networks*` refs; gap audit exit 0 |
 | FM-033 | Solana | On-chain program prototype + real devnet RPC submit | **Planned** | post FM-024 stub; `SOLANA_ADAPTER_CONCEPT` §8 |
 | FM-034 | Job layer | Scheduler → VM/worker binding (beyond in-process tick) | **Planned** | `scheduler.rs` «without VM binding»; Architect P6 |
 | FM-035 | Runtime / ML | Real model loading (libtorch/onnx path, not metadata-only) | **Planned** | `ARCHITECT_PLAN_EXO_INTEGRATION`; `instance.rs` placeholder |
@@ -147,17 +147,16 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
-| **1** | OpenAPI VM network DTO | **FM-032** | `VmNetwork`, `NetworkIsolationConfig` у `openapi.yaml`; `poolai-openapi-gap-audit` |
-| **2** | Solana on-chain + RPC | **FM-033** | program prototype; real submit після `program_id` |
-| **3** | Real model loading | **FM-035** | backend load у `runtime/instance` (EXO plan) |
-| **4** | Job → VM/worker | **FM-034** | bind scheduler output до pool/worker |
-| **5** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
-| **6** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
-| **7** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
-| **8** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
-| **9** | OpenTelemetry | **FM-038** | tracing middleware + export |
-| **10** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
-| **11** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| **1** | Solana on-chain + RPC | **FM-033** | program prototype; real submit після `program_id` |
+| **2** | Real model loading | **FM-035** | backend load у `runtime/instance` (EXO plan) |
+| **3** | Job → VM/worker | **FM-034** | bind scheduler output до pool/worker |
+| **4** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
+| **5** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
+| **6** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
+| **7** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
+| **8** | OpenTelemetry | **FM-038** | tracing middleware + export |
+| **9** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
+| **10** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
 **Закрито (не в черзі):** FM-001…031; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
 
@@ -195,7 +194,7 @@ FM-xxx (з таблиці нижче)
 
 | Джерело | Пункт | FM | Стан |
 |---------|--------|-----|------|
-| `OPENAPI_GAP_AUDIT` §залишок | VM network body schemas | **FM-032** | **Planned** |
+| `OPENAPI_GAP_AUDIT` §залишок | VM network body schemas | **FM-032** | **✅** |
 | `SOLANA_ADAPTER_CONCEPT` §8 | On-chain program + devnet deploy | **FM-033** | **Planned** (stub FM-024 ✅) |
 | `ARCHITECT_PLAN_EXO` §Real Model Loading | libtorch/onnx load | **FM-035** | **Planned** |
 | `ARCHITECT_PLAN_EXO` §3.1–3.2 | Tensor sharding runtime | **FM-036** | **Planned** |
@@ -276,7 +275,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-032** (OpenAPI VM network) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
+**Наступна сесія:** **FM-033** (Solana on-chain + devnet RPC) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

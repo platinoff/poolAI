@@ -2186,7 +2186,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
+                  $ref: '#/components/schemas/VmNetwork'
     post:
       tags:
         - VM
@@ -2199,14 +2199,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/VmNetwork'
       responses:
         '200':
           description: Network created
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmNetwork'
 
   /vm/networks/{id}:
     get:
@@ -2222,13 +2222,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Network
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmNetwork'
     put:
       tags:
         - VM
@@ -2242,19 +2243,20 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/VmNetwork'
       responses:
         '200':
           description: Updated
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmNetworkMessageResponse'
     delete:
       tags:
         - VM
@@ -2268,13 +2270,14 @@ paths:
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Deleted
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/VmNetworkMessageResponse'
 
   /raid/nodes:
     get:
@@ -5488,6 +5491,80 @@ components:
         message:
           type: string
           example: "Template 550e8400-e29b-41d4-a716-446655440000 updated successfully"
+
+    NetworkIsolationConfig:
+      type: object
+      description: Network isolation settings (`src/vm/isolation.rs` `NetworkIsolationConfig`)
+      required:
+        - enabled
+        - allowed_interfaces
+        - allowed_ports
+        - allow_loopback
+        - strict
+      properties:
+        enabled:
+          type: boolean
+          description: Whether network isolation is enabled
+          example: true
+        allowed_interfaces:
+          type: array
+          description: Allowed network interfaces (empty = all blocked when enabled)
+          items:
+            type: string
+          example: ["eth0"]
+        allowed_ports:
+          type: array
+          description: Allowed ports (empty = all blocked when enabled)
+          items:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 65535
+          example: [80, 443]
+        allow_loopback:
+          type: boolean
+          description: Allow loopback (`lo`) in the network namespace
+          example: true
+        strict:
+          type: boolean
+          description: Fail if isolation cannot be applied (default false = graceful degradation)
+          example: false
+
+    VmNetwork:
+      type: object
+      description: VM network configuration (`src/vm/mod.rs` `VmNetwork`)
+      required:
+        - id
+        - name
+        - description
+        - isolation_config
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        name:
+          type: string
+          example: "isolated-network"
+        description:
+          type: string
+          example: "Network with isolation enabled"
+        isolation_config:
+          $ref: '#/components/schemas/NetworkIsolationConfig'
+        created_at:
+          type: string
+          format: date-time
+
+    VmNetworkMessageResponse:
+      type: object
+      description: Success message for network update/delete (`vm_network_*_handler`)
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Network 550e8400-e29b-41d4-a716-446655440001 updated successfully"
 
     ResourceUsage:
       type: object
