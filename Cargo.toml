@@ -1,6 +1,10 @@
 [workspace]
 resolver = "2"
-members = [".", "crates/poolai-solana-adapter"]
+members = [
+    ".",
+    "crates/poolai-solana-adapter",
+    "crates/poolai-solana-adapter/program/poolai-events",
+]
 
 [package]
 name = "poolai"

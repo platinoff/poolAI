@@ -1,6 +1,6 @@
-//! Sidecar: read domain events (NDJSON on stdin), write acks (+ mock RPC metadata) on stdout.
+//! Sidecar: read domain events (NDJSON on stdin), write acks (+ RPC metadata) on stdout.
 //!
-//! FM-024: loads devnet config (`config/devnet.toml` or `POOLAI_SOLANA_CONFIG`); mock RPC only.
+//! FM-024 mock RPC (`POOLAI_SOLANA_MOCK_RPC=1`); FM-033 devnet JSON-RPC when mock is off.
 
 use poolai_solana_adapter::config::AdapterConfig;
 use poolai_solana_adapter::sidecar::SidecarProcessor;

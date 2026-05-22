@@ -108,7 +108,8 @@ mod tests {
 
     #[test]
     fn submit_is_idempotent_on_event_id() {
-        let config = AdapterConfig::devnet_defaults();
+        let mut config = AdapterConfig::devnet_defaults();
+        config.mock_rpc = true;
         let mut rpc = MockRpcClient::new();
         let env = DomainEventEnvelope::new(
             "evt-dup",

@@ -653,6 +653,14 @@
 - **Перевірка:** `cargo test -p poolai-solana-adapter -j 1`
 - **FM:** FM-024 ✅
 
+### [Solana] On-chain program + devnet RPC (FM-033)
+- **Де:** `program/poolai-events/`, `src/instruction.rs`, `src/rpc/devnet.rs`, `SidecarProcessor` (`rpc` / `rpc_error`)
+- **Сигнал:** `DevnetRpcClient::submit_event`, `build_submit_instruction`, `PLACEHOLDER_PROGRAM_ID` → Memo program
+- **Патерн:** bundled `mock_rpc=false`; granular Solana crates (no `solana-sdk` → no openssl); `RpcTransport` trait for tests
+- **Env:** `POOLAI_SOLANA_KEYPAIR_PATH`, `POOLAI_SOLANA_PROGRAM_ID`, `POOLAI_SOLANA_MOCK_RPC=1` for FM-024 path
+- **Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1`
+- **FM:** FM-033 ✅
+
 ### [Grid] Envelope v1 JSON (FM-009, S36)
 - **Де:** `src/grid/envelope.rs`, `src/grid/map.rs`
 - **Сигнал:** `GridEnvelope::from_json`, `envelope_from_peer_info`, `envelope_from_put_artifact`

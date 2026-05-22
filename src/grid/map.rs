@@ -112,6 +112,7 @@ pub fn put_artifact_from_memory_shard(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::grid::GRID_ENVELOPE_VERSION;
 
     #[test]
     fn peer_info_round_trip_via_envelope() {

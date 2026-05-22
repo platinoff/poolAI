@@ -87,7 +87,7 @@ fn ingest_result(body: GridResultBody, jobs: &JobStore) -> Result<GridIngestOutc
 mod tests {
     use super::*;
     use crate::grid::{GridEnvelope, GridJobBody, GridMessage, GridResultStatus};
-    use crate::job::{JobKind, JobSpec, JobStatus};
+    use crate::job::{JobId, JobKind, JobSpec, JobStatus};
     use chrono::Utc;
 
     #[test]

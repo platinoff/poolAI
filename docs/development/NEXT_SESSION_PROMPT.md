@@ -1,39 +1,38 @@
 # Промпт наступної автономної сесії (PoolAI)
 
-**Оновлено:** 2026-05-22 · **Фаза:** Legacy backlog → **FM-033…042** · Post-Horizon **FM-020…032 ✅**
+**Оновлено:** 2026-05-22 · **Фаза:** Legacy backlog → **FM-035…042** · Post-Horizon **FM-020…033 ✅**
 
 ---
 
 ## Промпт
 
 ```
-PoolAI — розробка FM-033 (наступна в §5.1). Post-Horizon + FM-032 закрито. HEAD e49e92ef+.
+PoolAI — розробка FM-035 (наступна в §5.1). Post-Horizon + FM-033 закрито. HEAD 1b1681aa+.
 
 ## S0 — зріз
 
 1. git fetch && git status -sb
-2. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1 (черга FM-033…042)
+2. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1 (черга FM-035…042)
 3. runtime-stack-policy.mdc · autonomous-orchestrator.mdc
 
-Не повторювати: FM-020…032; OpenAPI VM network schemas (FM-032).
+Не повторювати: FM-020…033; Solana adapter FM-033 (on-chain + devnet RPC).
 
-## Мета сесії — FM-033
+## Мета сесії — FM-035
 
-Solana: on-chain program prototype + real devnet RPC submit
-(після FM-024 stub; `SOLANA_ADAPTER_CONCEPT` §8, `crates/poolai-solana-adapter/`).
+Real model loading (libtorch/onnx path, not metadata-only)
+(`ARCHITECT_PLAN_EXO_INTEGRATION`, `runtime/instance.rs`).
 
-## Черга після FM-033 (одна FM / сесію)
+## Черга після FM-035 (одна FM / сесію)
 
 | # | FM | Фокус |
 |---|-----|--------|
-| 2 | FM-035 | Real model loading (EXO) |
-| 3 | FM-034 | Job scheduler → VM/worker |
-| 4 | FM-036 | Tensor sharding runtime |
-| 5–9 | FM-040,037,039,038,042 | UI audit, topology graph, Playwright CI, OTel, perf |
+| 2 | FM-034 | Job scheduler → VM/worker |
+| 3 | FM-036 | Tensor sharding runtime |
+| 4–8 | FM-040,037,039,038,042 | UI audit, topology graph, Playwright CI, OTel, perf |
 
 Ops BLOCKED: FM-003 §4 LAN (2 хости) — лише verify-lan-prep / runbook.
 
-Завершення: src/ → cargo fmt → cargo test-ci; push MSYS2 з Summary (не git commit з Cursor — див. git-push.md).
+Завершення: src/ → cargo fmt → cargo test-ci; push MSYS2 з Summary (git-push.md).
 ```
 
 **§5.1 канон:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md). **Legacy audit:** §5.8.

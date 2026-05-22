@@ -70,8 +70,19 @@
 
 **Обмеження:** без мережевого I/O, без `mainnet-beta`, без `solana-sdk` у `poolai`.
 
-## 8. Наступні кроки (поза FM-024)
+## 8. FM-033 — on-chain program + devnet RPC (2026-05-22)
 
-- Прототип Solana program (minimal) + devnet deploy.
-- Реальний RPC submit (після program id).
-- Оновлення Architect P6 при появі on-chain program.
+| Що | Де |
+|----|-----|
+| BPF prototype | `crates/poolai-solana-adapter/program/poolai-events/` (`PoolAiInstruction` Borsh) |
+| Instruction builder | `src/instruction.rs` — custom program or Memo fallback (`1111…` placeholder) |
+| Devnet JSON-RPC | `src/rpc/devnet.rs` — `getLatestBlockhash`, `sendTransaction`, `getSignatureStatuses` |
+| Sidecar | `mock_rpc=false` у bundled `devnet.toml`; ack `rpc` або `rpc_error` |
+| Env | `POOLAI_SOLANA_KEYPAIR_PATH`, `POOLAI_SOLANA_PROGRAM_ID`, `POOLAI_SOLANA_MOCK_RPC=1` для stub |
+
+**Обмеження:** без `solana-sdk` у `poolai`; без mainnet; deploy програми — Solana CLI (див. `program/README.md`).
+
+## 9. Наступні кроки (поза FM-033)
+
+- Devnet deploy `poolai-events.so` + оновити `program_id` у конфігу.
+- Batch / merkle виплати; звірка з `rewards` модулем core.

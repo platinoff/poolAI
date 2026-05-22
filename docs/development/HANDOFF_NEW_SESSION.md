@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-22 (FM-032 ✅ OpenAPI VM network; наступна **FM-033**; Post-Horizon **FM-020…032** ✅; HEAD `e49e92ef+`; A+B+C **100%**).
+**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon **FM-020…033** ✅; HEAD `1b1681aa+`; A+B+C **100%**).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-22):** FM-032 — `poolai-openapi-gap-audit` exit 0 (docs-only; без `src/`). **Наступна розробка:** **FM-033** Solana on-chain + devnet RPC (§5.1 FM).
+**Maintenance (2026-05-22):** FM-033 — `poolai-events` BPF prototype + devnet JSON-RPC sidecar (`POOLAI_SOLANA_KEYPAIR_PATH`, mock off by default). **Наступна розробка:** **FM-035** real model loading (§5.1 FM).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -50,7 +50,9 @@
 | `POOLAI_MONITORING_DATA_DIR` | coordinator | Enterprise monitoring SQLite (`monitoring.db`: metrics, dashboards, alert_rules) |
 | `POOLAI_SOLANA_CONFIG` | sidecar | Шлях до TOML (default: bundled `config/devnet.toml`) |
 | `POOLAI_SOLANA_CLUSTER` | sidecar | `devnet` / `localnet` (mainnet rejected) |
-| `POOLAI_SOLANA_MOCK_RPC` | sidecar | `1` — mock submit у stdout ack (`rpc` block) |
+| `POOLAI_SOLANA_MOCK_RPC` | sidecar | `1` — mock submit у stdout ack (`rpc` block); default **off** (FM-033 real RPC) |
+| `POOLAI_SOLANA_KEYPAIR_PATH` | sidecar | Solana CLI JSON keypair для devnet `sendTransaction` |
+| `POOLAI_SOLANA_PROGRAM_ID` | sidecar | Deployed `poolai-events` program id (інакше Memo fallback) |
 
 **Стек (агенти):** Rust-only runtime — [`.cursor/rules/runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc); `docs/STRUCTURE.md` §7. **Не** пропонувати Python для ML/API.
 | `POOLAI_TELEGRAM_WEBHOOK_SECRET` | coordinator | Опційно: header `X-Telegram-Webhook-Secret` для webhook |
@@ -98,19 +100,18 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | Порядок | FM | Що | Стан |
 |--------|-----|-----|------|
 | — | **FM-003** | LAN §4 sign-off | **BLOCKED** (2 хости); prep ✅ FM-027 |
-| **1** | **FM-033** | Solana on-chain + real RPC | **Planned** — наступна сесія |
-| **2** | **FM-035** | Real model loading (EXO) | **Planned** |
-| **3** | **FM-034** | Job scheduler → VM/worker | **Planned** |
-| **4–9** | **FM-036…042** | Sharding, UI audit, topology graph, Playwright CI, OTel, perf | Planned / Partial |
-| **10** | **FM-041** | Cloud SDK deep auth | **Deferred** |
+| **1** | **FM-035** | Real model loading (EXO) | **Planned** — наступна сесія |
+| **2** | **FM-034** | Job scheduler → VM/worker | **Planned** |
+| **3–8** | **FM-036…042** | Sharding, UI audit, topology graph, Playwright CI, OTel, perf | Planned / Partial |
+| **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 
-**Закрито:** FM-001…032 (Post-Horizon + autoprogon). **Не повторювати** FM-020…032.
+**Закрито:** FM-001…033 (Post-Horizon + autoprogon). **Не повторювати** FM-020…033.
 
 **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-033** (Solana); ops LAN **BLOCKED**.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-035** (EXO model load); ops LAN **BLOCKED**.
 2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci`.
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.
 4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); якщо в коміті є `src/`/`tests/`/`crates/`/`Cargo.toml` — **обов’язковий** Summary у тілі + самарі в чат після push.

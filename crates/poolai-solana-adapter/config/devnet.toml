@@ -1,7 +1,8 @@
-# Default Solana adapter profile (FM-024) — devnet + mock RPC (no mainnet).
+# Default Solana adapter profile (FM-033) — devnet real RPC (no mainnet).
 cluster = "devnet"
 rpc_url = "https://api.devnet.solana.com"
 commitment = "confirmed"
-mock_rpc = true
-# Placeholder program id until an on-chain program is deployed.
+# Real JSON-RPC submit; set POOLAI_SOLANA_MOCK_RPC=1 for FM-024 in-process mock.
+mock_rpc = false
+# Placeholder → Memo program anchor until deploy; override via POOLAI_SOLANA_PROGRAM_ID.
 program_id = "11111111111111111111111111111111"

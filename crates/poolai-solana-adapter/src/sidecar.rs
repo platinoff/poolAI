@@ -1,8 +1,8 @@
-//! Sidecar: validate NDJSON domain events and optional mock RPC submit (FM-024).
+//! Sidecar: validate NDJSON domain events and optional RPC submit (FM-024 mock / FM-033 devnet).
 
 use crate::config::AdapterConfig;
 use crate::events::DomainEventEnvelope;
-use crate::rpc::{MockRpcClient, MockSubmitResult, RpcSubmitStatus};
+use crate::rpc::{DevnetRpcClient, MockRpcClient, MockSubmitResult, RpcSubmitStatus};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -20,6 +20,8 @@ pub struct SidecarAck {
     pub error: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rpc: Option<RpcAck>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rpc_error: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -43,18 +45,20 @@ impl From<MockSubmitResult> for RpcAck {
     }
 }
 
-/// Stateful processor: schema validation + mock RPC when enabled in config.
+/// Stateful processor: schema validation + mock or devnet RPC submit.
 #[derive(Debug)]
 pub struct SidecarProcessor {
     config: AdapterConfig,
-    rpc: MockRpcClient,
+    mock_rpc: MockRpcClient,
+    devnet_rpc: DevnetRpcClient,
 }
 
 impl SidecarProcessor {
     pub fn new(config: AdapterConfig) -> Self {
         Self {
             config,
-            rpc: MockRpcClient::new(),
+            mock_rpc: MockRpcClient::new(),
+            devnet_rpc: DevnetRpcClient::default(),
         }
     }
 
@@ -72,22 +76,22 @@ impl SidecarProcessor {
             return ack;
         }
 
-        if !self.config.mock_rpc {
-            return ack;
-        }
-
         let trimmed = line.trim();
         let Ok(env) = DomainEventEnvelope::from_json(trimmed) else {
             return ack;
         };
 
-        match self.rpc.submit_event(&self.config, &env) {
-            Ok(result) => {
-                ack.rpc = Some(result.into());
+        if self.config.mock_rpc {
+            match self.mock_rpc.submit_event(&self.config, &env) {
+                Ok(result) => ack.rpc = Some(result.into()),
+                Err(_) => {}
             }
-            Err(_) => {
-                // mock disabled despite config — leave ack without rpc block
-            }
+            return ack;
+        }
+
+        match self.devnet_rpc.submit_event(&self.config, &env) {
+            Ok(result) => ack.rpc = Some(result.into()),
+            Err(e) => ack.rpc_error = Some(e.to_string()),
         }
         ack
     }
@@ -102,6 +106,7 @@ pub fn process_event_line(line: &str) -> SidecarAck {
             event_id: String::new(),
             error: Some("empty line".into()),
             rpc: None,
+            rpc_error: None,
         };
     }
     match DomainEventEnvelope::from_json(trimmed) {
@@ -110,12 +115,14 @@ pub fn process_event_line(line: &str) -> SidecarAck {
             event_id: env.event_id,
             error: None,
             rpc: None,
+            rpc_error: None,
         },
         Err(e) => SidecarAck {
             status: SidecarAckStatus::Rejected,
             event_id: extract_event_id_fallback(trimmed).unwrap_or_default(),
             error: Some(e.to_string()),
             rpc: None,
+            rpc_error: None,
         },
     }
 }
@@ -149,6 +156,12 @@ mod tests {
         .unwrap()
     }
 
+    fn devnet_config_mock_enabled() -> AdapterConfig {
+        let mut cfg = AdapterConfig::devnet_defaults();
+        cfg.mock_rpc = true;
+        cfg
+    }
+
     #[test]
     fn acks_valid_job_completed_line() {
         let line = job_completed_line("id-99");
@@ -166,20 +179,21 @@ mod tests {
     }
 
     #[test]
-    fn processor_attaches_mock_rpc_on_devnet() {
+    fn processor_attaches_mock_rpc_when_enabled() {
         let line = job_completed_line("rpc-1");
-        let mut proc = SidecarProcessor::with_devnet_defaults();
+        let mut proc = SidecarProcessor::new(devnet_config_mock_enabled());
         let ack = proc.process_line(&line);
         assert_eq!(ack.status, SidecarAckStatus::Acked);
         let rpc = ack.rpc.expect("mock rpc block");
         assert_eq!(rpc.status, RpcSubmitStatus::Submitted);
         assert!(rpc.signature.starts_with("mocksig"));
+        assert!(ack.rpc_error.is_none());
     }
 
     #[test]
     fn processor_rpc_duplicate_on_replay() {
         let line = job_completed_line("rpc-dup");
-        let mut proc = SidecarProcessor::with_devnet_defaults();
+        let mut proc = SidecarProcessor::new(devnet_config_mock_enabled());
         let first = proc.process_line(&line);
         let second = proc.process_line(&line);
         assert_eq!(
@@ -190,5 +204,11 @@ mod tests {
             second.rpc.map(|r| r.status),
             Some(RpcSubmitStatus::Duplicate)
         );
+    }
+
+    #[test]
+    fn bundled_devnet_profile_uses_real_rpc_by_default() {
+        let cfg = AdapterConfig::devnet_defaults();
+        assert!(!cfg.mock_rpc);
     }
 }

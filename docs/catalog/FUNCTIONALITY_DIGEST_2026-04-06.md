@@ -116,7 +116,7 @@
 | `src/job/` | `JobSpec`, `JobStatus`, lifecycle types | `POST/GET /api/v1/jobs` (stub) |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
-| `crates/poolai-solana-adapter/` | Domain events v1, NDJSON sidecar, devnet mock RPC (FM-024) | без `solana-sdk` у `poolai` |
+| `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |
 
 ---
 

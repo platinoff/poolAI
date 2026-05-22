@@ -1,6 +1,6 @@
-//! Devnet-oriented RPC configuration for the sidecar (FM-024).
+//! Devnet-oriented RPC configuration for the sidecar (FM-024 / FM-033).
 //!
-//! **No mainnet** in this stub — `mainnet-beta` is rejected at load time.
+//! **No mainnet** — `mainnet-beta` is rejected at load time.
 
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -131,6 +131,13 @@ impl AdapterConfig {
             cfg.mock_rpc = matches!(mock.trim(), "1" | "true" | "yes" | "on");
         }
 
+        if let Ok(program_id) = env::var(crate::rpc::ENV_PROGRAM_ID) {
+            let trimmed = program_id.trim();
+            if !trimmed.is_empty() {
+                cfg.program_id = trimmed.to_string();
+            }
+        }
+
         cfg.validate()?;
         Ok(cfg)
     }
@@ -168,7 +175,7 @@ mod tests {
         let cfg = AdapterConfig::devnet_defaults();
         assert_eq!(cfg.cluster, SolanaCluster::Devnet);
         assert_eq!(cfg.rpc_url, DEFAULT_DEVNET_RPC_URL);
-        assert!(cfg.mock_rpc);
+        assert!(!cfg.mock_rpc);
     }
 
     #[test]
