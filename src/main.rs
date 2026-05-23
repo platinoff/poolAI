@@ -68,10 +68,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize tracing subscriber for logging
-    tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-        .init();
+    // Initialize tracing subscriber (fmt + optional OpenTelemetry OTLP export)
+    let _otel_guard = poolai::observability::init_tracing();
 
     // Log runtime configuration for debugging
     let worker_threads = std::env::var("TOKIO_WORKER_THREADS")

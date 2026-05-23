@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-23 (FM-039 ✅ Playwright у CI; наступна **FM-038**; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
+**Оновлено:** 2026-05-23 (FM-038 ✅ OpenTelemetry tracing; наступна **FM-042**; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** FM-039 — `ci.yml` job **Playwright admin E2E** (`workflow_call` → `e2e.yml`, paths-filter `ui`/`e2e`). FM-037 — topology graph UI. **Наступна розробка:** **FM-038** OpenTelemetry (§5.1 FM).
+**Maintenance (2026-05-23):** FM-038 — `src/observability/`: HTTP TraceLayer + feature `otel` (OTLP export, W3C traceparent). FM-039 — Playwright CI. **Наступна розробка:** **FM-042** hot-path perf (§5.1 FM).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -53,6 +53,8 @@
 | `POOLAI_SOLANA_MOCK_RPC` | sidecar | `1` — mock submit у stdout ack (`rpc` block); default **off** (FM-033 real RPC) |
 | `POOLAI_SOLANA_KEYPAIR_PATH` | sidecar | Solana CLI JSON keypair для devnet `sendTransaction` |
 | `POOLAI_SOLANA_PROGRAM_ID` | sidecar | Deployed `poolai-events` program id (інакше Memo fallback) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | coordinator | OTLP HTTP collector URL (feature `otel`; export off if unset) |
+| `OTEL_SERVICE_NAME` | coordinator | OTel `service.name` (default `poolai`) |
 
 **Стек (агенти):** Rust-only runtime — [`.cursor/rules/runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc); `docs/STRUCTURE.md` §7. **Не** пропонувати Python для ML/API.
 | `POOLAI_TELEGRAM_WEBHOOK_SECRET` | coordinator | Опційно: header `X-Telegram-Webhook-Secret` для webhook |
@@ -100,8 +102,8 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | Порядок | FM | Що | Стан |
 |--------|-----|-----|------|
 | — | **FM-003** | LAN §4 sign-off | **BLOCKED** (2 хости); prep ✅ FM-027 |
-| **1** | **FM-038** | OpenTelemetry tracing | **Planned** — наступна сесія |
-| **2–3** | **FM-042…041** | perf, cloud deep | Planned / Deferred |
+| **1** | **FM-042** | Hot-path perf / Criterion | **Planned** — наступна сесія |
+| **2** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 | **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 
 **Закрито:** FM-001…033 (Post-Horizon + autoprogon). **Не повторювати** FM-020…033.
@@ -110,7 +112,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-038** (OpenTelemetry); ops LAN **BLOCKED**.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-042** (hot-path perf); ops LAN **BLOCKED**.
 2. Ітерація: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) — S0, MSYS2 bash, `df -h /s`, один FM, staging/commit/push.
 3. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci` (після `cargo clean` якщо диск S: повний).
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.

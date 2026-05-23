@@ -149,6 +149,10 @@ azure_identity = { version = "0.30", optional = true }
 # Use: cargo build --features vm-isolation-windows
 # Note: Requires administrator privileges for some features
 windows-sys = { version = "0.61.2", optional = true, features = ["Win32_Foundation", "Win32_System_JobObjects", "Win32_System_Threading", "Win32_System_ProcessStatus"] }
+opentelemetry = { version = "0.28", optional = true }
+opentelemetry_sdk = { version = "0.28", features = ["rt-tokio"], optional = true }
+opentelemetry-otlp = { version = "0.28", features = ["http-proto", "reqwest-blocking-client"], optional = true }
+tracing-opentelemetry = { version = "0.29", optional = true }
 
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
@@ -269,6 +273,11 @@ name = "job_scheduler_pool_binding"
 path = "tests/job_scheduler_pool_binding.rs"
 required-features = ["test-utils"]
 
+[[test]]
+name = "observability_otel"
+path = "tests/observability_otel.rs"
+required-features = ["otel"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)
@@ -329,6 +338,15 @@ test-utils = []
 tgbot = ["teloxide"]
 # FM-029: SQLite job store (`POOLAI_JOB_STORE=sqlite` + `POOLAI_JOB_DATA_DIR`)
 job-store-sqlite = []
+# FM-038: OpenTelemetry distributed tracing (OTLP export + W3C trace context)
+# Use: cargo build --features otel
+# Env: OTEL_EXPORTER_OTLP_ENDPOINT (required to export), OTEL_SERVICE_NAME (default poolai)
+otel = [
+    "dep:opentelemetry",
+    "dep:opentelemetry_sdk",
+    "dep:opentelemetry-otlp",
+    "dep:tracing-opentelemetry",
+]
 
 # Some Windows MSVC hosts hit `rustc` STATUS_ACCESS_VIOLATION when compiling the full `poolai` lib at
 # `release` opt-level 3 (e.g. `cargo bench` / `cargo build --release`). The `bench` profile keeps

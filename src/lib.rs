@@ -109,6 +109,7 @@
 //! - [`pool`] - Worker pool management
 //! - [`monitoring`] - System monitoring and metrics
 //! - [`network`] - REST API and WebSocket server
+//! - [`observability`] - HTTP tracing + optional OpenTelemetry (FM-038)
 //! - [`vm`] - Virtual machine instance management
 //! - [`raid`] - Distributed artifact storage
 //! - [`grid`] - Grid envelope v1 (Job/Result/MemoryShard/PeerStatus wire types)
@@ -128,6 +129,7 @@ pub mod grid;
 pub mod job;
 pub mod memory;
 pub mod monitoring;
+pub mod observability;
 pub mod platform;
 pub mod pool;
 pub mod rewards;

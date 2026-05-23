@@ -21,6 +21,7 @@ pub mod ws;
 pub mod enterprise_api;
 
 use crate::core::state::ApiContext;
+use crate::observability;
 use crate::ui;
 use axum::middleware;
 use axum::response::Redirect;
@@ -83,7 +84,7 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
             enterprise_api::create_enterprise_api_routes(),
         );
 
-        router.with_state(app_state)
+        observability::apply_http_trace(router.with_state(app_state))
     };
 
     // Read HTTPS configuration from config file
