@@ -150,8 +150,8 @@ Instance також підтримує ModelManager:
 
 ## 📈 Майбутні Покращення
 
-- [ ] Реальна реалізація ModelInterface для library models
-- [ ] Інтеграція з libtorch, onnxruntime
+- [x] Реальна реалізація ModelInterface для library models (FM-035 — `model_loader.rs`)
+- [x] Інтеграція з libtorch, onnx path detect + weight validation (native inference — optional future feature)
 - [ ] Lazy loading моделей
 - [ ] Model caching
 - [ ] Performance optimization

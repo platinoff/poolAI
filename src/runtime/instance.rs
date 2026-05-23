@@ -238,7 +238,7 @@ impl InstanceManager {
             }
         }
 
-        // Try to find model library in LibraryManager
+        // Try to find model library in LibraryManager and load weights (FM-035)
         if let Some(lib_manager) = crate::libs::get_global_manager() {
             let manager = lib_manager.read().await;
             if let Some(library) = manager.get_library(model_id).await {
@@ -247,28 +247,49 @@ impl InstanceManager {
                     model_id, instance_id, library.path
                 );
 
-                // Mark library as available for this instance
-                // The actual model loading will happen when processing requests
-                // This allows instances to reference library models even if they're not
-                // directly loaded into ModelManager
-                let mut instances = self.instances.write().await;
-                if let Some(instance) = instances.get_mut(instance_id) {
-                    instance.metadata.insert(
-                        "library_path".to_string(),
-                        library.path.to_string_lossy().to_string(),
-                    );
-                    instance
-                        .metadata
-                        .insert("library_version".to_string(), library.version.clone());
-                    instance
-                        .metadata
-                        .insert("library_loaded".to_string(), "true".to_string());
+                match crate::runtime::model_loader::load_from_library(model_id, &library).await {
+                    Ok(handle) => {
+                        let report = handle.report;
+                        let mut instances = self.instances.write().await;
+                        if let Some(instance) = instances.get_mut(instance_id) {
+                            instance.model = Some(handle.model);
+                            instance.metadata.insert(
+                                "library_path".to_string(),
+                                library.path.to_string_lossy().to_string(),
+                            );
+                            instance
+                                .metadata
+                                .insert("library_version".to_string(), library.version.clone());
+                            instance.metadata.insert(
+                                "model_backend".to_string(),
+                                report.backend.as_str().to_string(),
+                            );
+                            instance.metadata.insert(
+                                "model_fingerprint".to_string(),
+                                report.fingerprint.clone(),
+                            );
+                            instance.metadata.insert(
+                                "model_bytes_loaded".to_string(),
+                                report.bytes_loaded.to_string(),
+                            );
+                            instance.metadata.insert(
+                                "model_artifact".to_string(),
+                                report.artifact_path.to_string_lossy().to_string(),
+                            );
+                            instance
+                                .metadata
+                                .insert("library_loaded".to_string(), "true".to_string());
+                        }
+                        return Ok(());
+                    }
+                    Err(e) => {
+                        warn!(
+                            "FM-035 model load failed for {} (instance {}): {}",
+                            model_id, instance_id, e
+                        );
+                        return Err(e);
+                    }
                 }
-
-                // Note: Full ModelInterface implementation for library models requires
-                // integration with specific model backends (libtorch, onnxruntime, etc.)
-                // This is a placeholder that marks the library as available
-                return Ok(());
             }
         }
 
@@ -419,63 +440,6 @@ impl InstanceManager {
 
                 return Ok(response);
             }
-        }
-
-        // Try to use library model if available
-        if let Some(library_path) = instance.metadata.get("library_path") {
-            // Update last activity
-            {
-                let mut last_activity = instance.last_activity.write().await;
-                *last_activity = Utc::now();
-            }
-
-            // Update status to Active
-            {
-                let mut status = instance.status.write().await;
-                if *status != InstanceStatus::Error(String::new()) {
-                    *status = InstanceStatus::Active;
-                }
-            }
-
-            info!(
-                "Processing request for instance {} using library model at: {}",
-                instance_id, library_path
-            );
-
-            // For library models, we create a basic response
-            // In production, this would load and execute the actual model from the library
-            // This is a placeholder implementation that acknowledges the library model
-            let response = crate::core::model_interface::ModelResponse {
-                output: format!(
-                    "[Library Model Response] Model '{}' from library at '{}' would process: {}",
-                    instance.model_id, library_path, request.input
-                ),
-                metrics: crate::core::model_interface::ModelMetrics {
-                    processing_time_ms: 0,
-                    tokens_generated: 0,
-                    gpu_utilization: 0.0,
-                    memory_usage_mb: 0.0,
-                    throughput_tokens_per_sec: 0.0,
-                    cpu_utilization: 0.0,
-                    gpu_temperature: 0.0,
-                    gpu_power_watts: 0.0,
-                    queue_length: 0,
-                    average_latency_ms: 0.0,
-                },
-                session_id: request.session_id.clone(),
-                status: crate::core::model_interface::ResponseStatus::Success,
-                errors: vec![],
-            };
-
-            // Update status back to Ready
-            {
-                let mut status = instance.status.write().await;
-                if *status == InstanceStatus::Active {
-                    *status = InstanceStatus::Ready;
-                }
-            }
-
-            return Ok(response);
         }
 
         Err(AppError::ModelError(format!(

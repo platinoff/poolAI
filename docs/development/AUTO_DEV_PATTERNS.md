@@ -2,7 +2,7 @@
 
 **Призначення:** реєстр **конкретних** повторюваних рішень для наступних сесій авторозробки. Оркестратор доповнює цей файл після P0 (збір) і S6 (закриття).
 
-**Оновлено:** 2026-05-19 (S38 Job/Memory wire types).
+**Оновлено:** 2026-05-22 (FM-035 model_loader).
 
 ---
 
@@ -716,6 +716,13 @@
 - **Патерн:** січневі `STATUS_*`, `ADMIN_PANEL_*`, `UI_UX_*` — банер → STABLE/FM/DOCS_LEGACY_AUDIT; пріоритети лише з §5.1
 - **Перевірка:** не `rg "\- \[ \]" docs/status` для черги автопрогону
 - **FM:** крок 12
+
+### [Runtime] FM-035 real model load (library → instance)
+- **Де:** `src/runtime/model_loader.rs`, `src/runtime/instance.rs` (`load_model_for_instance`)
+- **Сигнал:** `rg "load_from_library|model_backend|LoadedLibraryModel" src/runtime`
+- **Патерн:** `LibraryManager` hit → `scan_and_load` (`.onnx` / `.pt` / `poolai-model.json`) → SHA256 fingerprint → `LoadedModelHandle { model: Arc<dyn ModelInterface>, report }` on `instance.model`; metadata `model_backend`, `model_fingerprint`, `model_bytes_loaded`
+- **Перевірка:** `cargo test runtime_model_loader -j 1 -- --test-threads=1` (MSYS2); unit tests in `model_loader::tests`
+- **FM:** FM-035 ✅
 
 ### [FM] Прогрес і «ніколи не зроблено» (аудит 2026-05-19)
 - **Де:** `docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md`, `FUNCTION_MANAGEMENT.md` §5.5

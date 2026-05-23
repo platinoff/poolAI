@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Legacy backlog audit (2026-05-20)** — менеджер функціоналу: звірка старіших планів → **FM-032…042**; §5.1 FM пріоритети розробки; `NEXT_SESSION_PROMPT` → FM-032; HANDOFF §4; FM §5.8.
 
 ### Added
+- **FM-035 Real model loading (2026-05-22)** — `src/runtime/model_loader.rs`: libtorch/onnx/`poolai-model.json` artifact detect, SHA256 fingerprint, `LoadedLibraryModel` (`ModelInterface`); `instance.rs` stores `Arc<dyn ModelInterface>` + `model_backend` metadata; `tests/runtime_model_loader_integration.rs`.
 - **FM-033 Solana on-chain + devnet RPC (2026-05-22)** — `program/poolai-events` BPF prototype; `rpc/devnet.rs` JSON-RPC submit; `instruction.rs` (Borsh + Memo fallback); bundled `devnet.toml` `mock_rpc=false`; env `POOLAI_SOLANA_KEYPAIR_PATH`, `POOLAI_SOLANA_PROGRAM_ID`; `solana-sdk` only in sidecar crate.
 - **FM-031 WCAG admin URL expand (2026-05-20)** — `bin/pa11y-ci.sh`: `/ui/admin/{vm,workers,libs,raid}` (21 auth URLs); Playwright `a11y.spec.ts` axe matrix + `wcag22aa`; `tests/pa11y_ci_script.rs` contract.
 - **FM-030 Monitoring persistence MVP (2026-05-20)** — `POOLAI_MONITORING_DATA_DIR` → `monitoring.db`; coordinator `MonitoringManager::new_from_env()`; SQLite metrics (existing) + persist/reload dashboards and alert_rules; `data/monitoring/` gitignored.

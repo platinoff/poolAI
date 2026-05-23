@@ -50,6 +50,7 @@ pub mod cache;
 pub mod health;
 pub mod instance;
 pub mod memory_pool;
+pub mod model_loader;
 pub mod orchestrator;
 pub mod process;
 pub mod queue;

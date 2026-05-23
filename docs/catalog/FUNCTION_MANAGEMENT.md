@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon FM-020…033 ✅; HEAD `ea91031`).
+**Оновлено:** 2026-05-22 (FM-035 ✅ real model loading; наступна **FM-034**; Post-Horizon FM-020…035 ✅).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -131,7 +131,7 @@ FM-xxx (з таблиці нижче)
 | FM-032 | OpenAPI | `VmNetwork` + `NetworkIsolationConfig` body schemas | **Implemented ✅** | `openapi.yaml` components + `/vm/networks*` refs; gap audit exit 0 |
 | FM-033 | Solana | On-chain program prototype + real devnet RPC submit | **Implemented ✅** | `program/poolai-events`, `rpc/devnet.rs`, `POOLAI_SOLANA_KEYPAIR_PATH` |
 | FM-034 | Job layer | Scheduler → VM/worker binding (beyond in-process tick) | **Planned** | `scheduler.rs` «without VM binding»; Architect P6 |
-| FM-035 | Runtime / ML | Real model loading (libtorch/onnx path, not metadata-only) | **Planned** | `ARCHITECT_PLAN_EXO_INTEGRATION`; `instance.rs` placeholder |
+| FM-035 | Runtime / ML | Real model loading (libtorch/onnx path, not metadata-only) | **Implemented ✅** | `src/runtime/model_loader.rs`, `instance.rs` (`LoadedModelHandle`, SHA256 fingerprint) |
 | FM-036 | Runtime | Tensor / pipeline parallelism (`sharding`, inter-worker sync) | **Planned** | EXO plan §3.1–3.2; no `sharding.rs` yet |
 | FM-037 | UI | Cluster topology graph (D3/vis + latency matrix) | **Partial** | API + table UI ✅; graph viz — backlog |
 | FM-038 | Observability | OpenTelemetry distributed tracing | **Planned** | `NEXT_STEPS_2026-01-16`; no `opentelemetry` in `src/` |
@@ -147,17 +147,16 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
-| **1** | Real model loading | **FM-035** | backend load у `runtime/instance` (EXO plan) |
-| **2** | Job → VM/worker | **FM-034** | bind scheduler output до pool/worker |
-| **3** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
-| **4** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
-| **5** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
-| **6** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
-| **7** | OpenTelemetry | **FM-038** | tracing middleware + export |
-| **8** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
-| **9** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| **1** | Job → VM/worker | **FM-034** | bind scheduler output до pool/worker |
+| **2** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
+| **3** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
+| **4** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
+| **5** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
+| **6** | OpenTelemetry | **FM-038** | tracing middleware + export |
+| **7** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
+| **8** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…033; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
+**Закрито (не в черзі):** FM-001…035; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
 
 **Якість збірки:** `cargo test-ci` після `src/` — останній зріз 2026-05-20 (`f00bb1d4`).
 
@@ -195,7 +194,7 @@ FM-xxx (з таблиці нижче)
 |---------|--------|-----|------|
 | `OPENAPI_GAP_AUDIT` §залишок | VM network body schemas | **FM-032** | **✅** |
 | `SOLANA_ADAPTER_CONCEPT` §8–9 | On-chain program + devnet RPC | **FM-033** | **✅** (`poolai-events`, `rpc/devnet.rs`) |
-| `ARCHITECT_PLAN_EXO` §Real Model Loading | libtorch/onnx load | **FM-035** | **Planned** |
+| `ARCHITECT_PLAN_EXO` §Real Model Loading | libtorch/onnx load | **FM-035** | **✅** (`model_loader.rs`) |
 | `ARCHITECT_PLAN_EXO` §3.1–3.2 | Tensor sharding runtime | **FM-036** | **Planned** |
 | `ARCHITECT_PLAN_EXO` §4.1 | Topology graph viz | **FM-037** | **Partial** |
 | `NEXT_STEPS_2026-01-16` | OpenTelemetry tracing | **FM-038** | **Planned** |
@@ -274,7 +273,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-035** (real model loading / EXO) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
+**Наступна сесія:** **FM-034** (job scheduler → VM/worker) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

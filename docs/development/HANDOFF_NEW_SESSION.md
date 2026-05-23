@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-22 (FM-033 ✅ Solana on-chain + devnet RPC; наступна **FM-035**; Post-Horizon **FM-020…033** ✅; HEAD `ea91031`; A+B+C **100%**).
+**Оновлено:** 2026-05-22 (FM-035 ✅ real model loading; наступна **FM-034**; Post-Horizon **FM-020…035** ✅; A+B+C **100%**).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-22):** FM-033 — `poolai-events` BPF prototype + devnet JSON-RPC sidecar (`POOLAI_SOLANA_KEYPAIR_PATH`, mock off by default). **Наступна розробка:** **FM-035** real model loading (§5.1 FM).
+**Maintenance (2026-05-22):** FM-035 — `src/runtime/model_loader.rs`: libtorch/onnx artifact detect, SHA256 fingerprint, `LoadedLibraryModel` on instance (`model_backend`, `model_fingerprint` metadata). **Наступна розробка:** **FM-034** job scheduler → VM/worker (§5.1 FM).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -100,8 +100,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | Порядок | FM | Що | Стан |
 |--------|-----|-----|------|
 | — | **FM-003** | LAN §4 sign-off | **BLOCKED** (2 хости); prep ✅ FM-027 |
-| **1** | **FM-035** | Real model loading (EXO) | **Planned** — наступна сесія |
-| **2** | **FM-034** | Job scheduler → VM/worker | **Planned** |
+| **1** | **FM-034** | Job scheduler → VM/worker | **Planned** — наступна сесія |
 | **3–8** | **FM-036…042** | Sharding, UI audit, topology graph, Playwright CI, OTel, perf | Planned / Partial |
 | **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 
@@ -111,7 +110,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-035** (EXO model load); ops LAN **BLOCKED**.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-034** (job → VM/worker); ops LAN **BLOCKED**.
 2. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci`.
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.
 4. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); якщо в коміті є `src/`/`tests/`/`crates/`/`Cargo.toml` — **обов’язковий** Summary у тілі + самарі в чат після push.
