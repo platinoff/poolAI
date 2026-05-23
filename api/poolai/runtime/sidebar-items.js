@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["initialize_runtime"],"mod":["cache","health","instance","memory_pool","model_loader","orchestrator","process","queue","scheduler","storage","worker"],"struct":["RuntimeConfig","RuntimeManager","RuntimeStatus"]};
+window.SIDEBAR_ITEMS = {"fn":["initialize_runtime"],"mod":["cache","health","instance","memory_pool","model_loader","orchestrator","process","queue","scheduler","sharding","storage","worker"],"struct":["RuntimeConfig","RuntimeManager","RuntimeStatus"]};

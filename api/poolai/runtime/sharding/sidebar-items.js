@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MIN_TENSOR_BANDWIDTH_MBPS"],"enum":["ShardSyncOp"],"fn":["build_tensor_shard_plan","estimated_tensor_speedup","meets_tensor_bandwidth","split_memory_across_nodes","tensor_placement_from_nodes"],"struct":["ShardSyncBus","ShardSyncMessage","TensorShardPlan","TensorShardSpec"]};
