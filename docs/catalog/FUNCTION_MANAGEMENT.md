@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-23 (FM-036 ✅ tensor sharding runtime; наступна **FM-040**; Post-Horizon FM-020…036 ✅).
+**Оновлено:** 2026-05-23 (FM-040 ✅ admin UI field audit; наступна **FM-037**; Post-Horizon FM-020…040 ✅).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -136,7 +136,7 @@ FM-xxx (з таблиці нижче)
 | FM-037 | UI | Cluster topology graph (D3/vis + latency matrix) | **Partial** | API + table UI ✅; graph viz — backlog |
 | FM-038 | Observability | OpenTelemetry distributed tracing | **Planned** | `NEXT_STEPS_2026-01-16`; no `opentelemetry` in `src/` |
 | FM-039 | CI / E2E | Playwright admin suite у `ci.yml` (`workflow_call`) | **Partial** | `e2e.yml` = `workflow_dispatch` only |
-| FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Partial** | extend FM-013…015; `UI_QUALITY_AND_E2E_PLAN` §P1 |
+| FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Implemented ✅** | [`ADMIN_UI_FIELD_AUDIT_2026-05-23.md`](../development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md); +5 contract tests (31 total) |
 | FM-041 | Cloud | SDK hardening (GCP SA JWT, Azure OAuth refresh, IT suites) | **Deferred** | post FM-006 REST; `CLOUD_SDK_PROGRESS_2026-01-19` |
 | FM-042 | P4 / perf | Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot) | **Planned** | `PERCENTAGE_PLAN`; FM-028 = single-host TQ01 only |
 
@@ -147,16 +147,15 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
-| **1** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
-| **2** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
-| **3** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
-| **4** | OpenTelemetry | **FM-038** | tracing middleware + export |
-| **5** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
-| **6** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| **1** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
+| **2** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
+| **3** | OpenTelemetry | **FM-038** | tracing middleware + export |
+| **4** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
+| **5** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…036; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
+**Закрито (не в черзі):** FM-001…040; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
 
-**Якість збірки:** `cargo test-ci` після `src/` — останній зріз FM-036 (2026-05-23).
+**Якість збірки:** `cargo test-ci` після `src/` — останній зріз FM-040 (2026-05-23).
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -197,7 +196,7 @@ FM-xxx (з таблиці нижче)
 | `ARCHITECT_PLAN_EXO` §4.1 | Topology graph viz | **FM-037** | **Partial** |
 | `NEXT_STEPS_2026-01-16` | OpenTelemetry tracing | **FM-038** | **Planned** |
 | `E2E_PLAYWRIGHT.md` | Playwright у main CI | **FM-039** | **Partial** |
-| `UI_QUALITY_AND_E2E_PLAN` §P1 | Admin field audit | **FM-040** | **Partial** |
+| `UI_QUALITY_AND_E2E_PLAN` §P1 | Admin field audit | **FM-040** | **✅** |
 | `CLOUD_SDK_PROGRESS_2026-01-19` | GCP/Azure auth deep | **FM-041** | **Deferred** |
 | `PERCENTAGE_PLAN` / P4 | Hot-path profiling | **FM-042** | **Planned** |
 | `NEXT_STEPS_ARCHITECT` L234 | Job scheduler → VM bind | **FM-034** | **✅** |
@@ -271,7 +270,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-040** (admin UI field audit) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
+**Наступна сесія:** **FM-037** (topology graph UI) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

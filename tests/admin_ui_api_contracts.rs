@@ -1,6 +1,7 @@
 //! JSON shape checks for admin dashboard and RAID admin HTTP API.
 //! Enterprise dashboard slices are tested when built with `--features enterprise`.
-//! FM-013/014/015: admin UI JSON contracts — keys expected by `src/ui/admin/*.rs`.
+//! FM-013/014/015 + **FM-040**: admin UI field audit — keys expected by `src/ui/admin/*.rs`.
+//! Manifest: `docs/development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md`.
 
 use axum::body::to_bytes;
 use axum::http::{Request, StatusCode};
@@ -320,8 +321,9 @@ mod attached_managers {
     use poolai::libs::LibraryManager;
     use poolai::pool::topology::TopologyManager;
     use poolai::raid::{RaidConfig, RaidManager, RaidMode};
-    use poolai::runtime::instance::InstanceManager;
+    use poolai::runtime::instance::{InstanceManager, InstancePlacement, PlacementStrategy};
     use poolai::vm::{VmIsolation, VmManager, VmResources};
+    use std::collections::HashMap;
     use std::sync::Arc;
     use tempfile::TempDir;
     use tokio::sync::RwLock as TokioRwLock;
@@ -355,16 +357,31 @@ mod attached_managers {
             for key in ["name", "version", "metadata"] {
                 assert!(o.contains_key(key), "library missing `{key}`: {o:?}");
             }
+            let meta = o
+                .get("metadata")
+                .expect("metadata present")
+                .as_object()
+                .expect("metadata object for admin libs UI");
+            if meta.contains_key("installed_at") {
+                assert!(
+                    meta.get("installed_at").and_then(|x| x.as_str()).is_some(),
+                    "metadata.installed_at should be string when present: {meta:?}"
+                );
+            }
         }
     }
 
     #[tokio::test]
     async fn topology_nodes_json_shape_when_manager_attached() {
         let state = Arc::new(AppState::default());
+        let topology = Arc::new(TokioRwLock::new(TopologyManager::new(None)));
+        {
+            let guard = topology.read().await;
+            guard.test_add_node("audit-node-a", "127.0.0.1:1").await;
+            guard.test_add_node("audit-node-b", "127.0.0.1:2").await;
+        }
         state
-            .attach_topology_manager_for_test(Arc::new(TokioRwLock::new(TopologyManager::new(
-                None,
-            ))))
+            .attach_topology_manager_for_test(topology)
             .expect("attach topology manager");
         let app = Router::new()
             .nest("/api/v1", create_api_routes())
@@ -384,10 +401,27 @@ mod attached_managers {
         let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
         let v: Value = serde_json::from_slice(&body).expect("topology nodes JSON");
         let o = v.as_object().expect("topology nodes object");
-        assert!(
-            o.contains_key("nodes"),
-            "topology nodes missing `nodes`: {o:?}"
-        );
+        let nodes = o
+            .get("nodes")
+            .and_then(|x| x.as_object())
+            .expect("topology nodes map");
+        assert!(!nodes.is_empty(), "expected seeded topology nodes");
+        let node = nodes
+            .get("audit-node-a")
+            .and_then(|x| x.as_object())
+            .expect("audit-node-a entry");
+        for key in [
+            "available_gpu_memory_mb",
+            "total_gpu_memory_mb",
+            "available_cpu_cores",
+            "total_cpu_cores",
+            "current_load",
+        ] {
+            assert!(
+                node.contains_key(key),
+                "topology node resource missing `{key}`: {node:?}"
+            );
+        }
     }
 
     #[tokio::test]
@@ -473,12 +507,194 @@ mod attached_managers {
                 .get("placement")
                 .and_then(|p| p.as_object())
                 .expect("placement object");
-            for key in ["strategy", "node_ids"] {
+            for key in ["strategy", "node_ids", "memory_by_node", "memory_delta"] {
                 assert!(
                     placement.contains_key(key),
                     "placement missing `{key}`: {placement:?}"
                 );
             }
+        }
+    }
+
+    #[tokio::test]
+    async fn instance_previews_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        state
+            .attach_instance_manager_for_test(Arc::new(TokioRwLock::new(InstanceManager::new())))
+            .expect("attach instance manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/instance/previews?model_id=audit-preview-model")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("instance previews JSON");
+        let previews = v
+            .get("previews")
+            .and_then(|x| x.as_array())
+            .expect("previews array");
+        assert!(
+            !previews.is_empty(),
+            "expected at least one placement preview"
+        );
+        let row = previews[0].as_object().expect("preview object");
+        for key in ["model_id", "sharding", "memory_delta_by_node"] {
+            assert!(row.contains_key(key), "preview missing `{key}`: {row:?}");
+        }
+    }
+
+    #[tokio::test]
+    async fn instance_get_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        let manager = Arc::new(TokioRwLock::new(InstanceManager::new()));
+        let placement = InstancePlacement {
+            strategy: PlacementStrategy::Single,
+            node_ids: vec!["local".into()],
+            memory_by_node: HashMap::from([("local".into(), 1024)]),
+            memory_delta: 1024,
+            error: None,
+        };
+        let instance_id = manager
+            .write()
+            .await
+            .create_instance("audit-instance-model".into(), placement, HashMap::new())
+            .await
+            .expect("create instance");
+        state
+            .attach_instance_manager_for_test(manager)
+            .expect("attach instance manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/api/v1/instance/{instance_id}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let inst = serde_json::from_slice::<Value>(&body).expect("instance JSON");
+        let o = inst.as_object().expect("instance object");
+        for key in [
+            "instance_id",
+            "model_id",
+            "status",
+            "created_at",
+            "placement",
+        ] {
+            assert!(o.contains_key(key), "instance GET missing `{key}`: {o:?}");
+        }
+        let placement = o
+            .get("placement")
+            .and_then(|p| p.as_object())
+            .expect("placement object");
+        assert!(
+            placement.get("strategy").and_then(|s| s.as_str()).is_some(),
+            "placement.strategy string for admin modal: {placement:?}"
+        );
+        assert!(
+            placement
+                .get("node_ids")
+                .and_then(|n| n.as_array())
+                .is_some(),
+            "placement.node_ids for admin modal"
+        );
+    }
+
+    #[tokio::test]
+    async fn topology_latency_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        let topology = Arc::new(TokioRwLock::new(TopologyManager::new(None)));
+        {
+            let guard = topology.read().await;
+            guard.test_add_node("lat-a", "127.0.0.1:1").await;
+            guard.test_add_node("lat-b", "127.0.0.1:2").await;
+            guard.test_update_latency("lat-a", "lat-b", 15.0).await;
+        }
+        state
+            .attach_topology_manager_for_test(topology)
+            .expect("attach topology manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/topology/latency")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("topology latency JSON");
+        let matrix = v
+            .get("latency_matrix")
+            .and_then(|x| x.as_object())
+            .expect("latency_matrix object for admin topology UI");
+        assert!(
+            !matrix.is_empty(),
+            "expected seeded latency_matrix entries: {matrix:?}"
+        );
+    }
+
+    #[tokio::test]
+    async fn topology_node_detail_json_shape_when_manager_attached() {
+        let state = Arc::new(AppState::default());
+        let topology = Arc::new(TokioRwLock::new(TopologyManager::new(None)));
+        {
+            let guard = topology.read().await;
+            guard.test_add_node("detail-node", "127.0.0.1:9").await;
+        }
+        state
+            .attach_topology_manager_for_test(topology)
+            .expect("attach topology manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/topology/nodes/detail-node")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let node = serde_json::from_slice::<Value>(&body).expect("node detail JSON");
+        let o = node.as_object().expect("node object");
+        for key in [
+            "node_id",
+            "available_gpu_memory_mb",
+            "total_gpu_memory_mb",
+            "available_cpu_cores",
+            "total_cpu_cores",
+            "current_load",
+        ] {
+            assert!(o.contains_key(key), "node detail missing `{key}`: {o:?}");
         }
     }
 
@@ -1104,8 +1320,10 @@ mod enterprise_admin_contract_slices {
             for key in [
                 "timestamp",
                 "level",
+                "user_id",
                 "action",
                 "resource_type",
+                "resource_id",
                 "result",
                 "metadata",
             ] {
