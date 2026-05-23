@@ -145,6 +145,7 @@ pub fn admin_layout(
         }}
       }}
       if (typeof PoolAiI18n !== 'undefined') {{
+        if (typeof poolaiInitThemeFromStorage === 'function') poolaiInitThemeFromStorage();
         document.documentElement.lang = PoolAiI18n.getLang() === 'uk' ? 'uk' : 'en';
         PoolAiI18n.apply(document.body);
         PoolAiI18n.initAdminShell();

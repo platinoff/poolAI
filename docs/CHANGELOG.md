@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **PH-S11…S12 visual E2E (2026-05-23)** — `e2e/tests/visual.spec.ts`: 11 admin/login baselines + 12 theme×i18n matrix; `poolaiApplyTheme` in `admin_common.js`; [`VISUAL_REGRESSION_E2E.md`](development/VISUAL_REGRESSION_E2E.md).
 - **FM-045 Admin design system (2026-05-23)** — `src/ui/design_tokens.css`; unified `admin-table` / `admin-form`; `adminApplyDesignSystem`, `adminRenderTable`, `adminFormFieldHtml` in `admin_common.js`; [`DESIGN_SYSTEM.md`](development/DESIGN_SYSTEM.md).
 - **FM-044 TLS 1.3 rollout (2026-05-23)** — `src/network/tls_config.rs` rustls `ServerConfig`, TLS 1.3 default (optional 1.2), HSTS from config, `HTTPS_CERT_RELOAD_SECS`; [`security/TLS.md`](security/TLS.md); `tests/tls_https_integration.rs`.
 - **FM-043 Prometheus metrics (2026-05-23)** — `GET /metrics` text exposition (`feature = prometheus`); `src/observability/prometheus_export.rs`; HTTP middleware counters; `cargo test-ci` includes `prometheus`; [`PROMETHEUS_METRICS.md`](development/PROMETHEUS_METRICS.md).

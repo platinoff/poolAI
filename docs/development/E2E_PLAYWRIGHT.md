@@ -1,12 +1,13 @@
-# Playwright E2E smoke (S23 / S27 / S29)
+# Playwright E2E smoke (S23 / S27 / S29 / PH-S11)
 
-**Status:** Smoke + admin (повний P1 surface) + axe (`smoke.spec.ts`, `admin.spec.ts`, `a11y.spec.ts`).
+**Status:** Smoke + admin (повний P1 surface) + axe + **visual regression** (`smoke.spec.ts`, `admin.spec.ts`, `a11y.spec.ts`, `visual.spec.ts`).
 
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
 | `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm; **libs** (`#libraries-list`) |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0) |
+| `visual.spec.ts` | **PH-S11:** `toHaveScreenshot` baselines — login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
@@ -24,6 +25,9 @@ bash bin/e2e-playwright.sh
 
 # Варіант B: збірка + старт + тести
 bash bin/e2e-playwright.sh --start
+
+# PH-S11: оновити visual baselines
+bash bin/e2e-playwright.sh --start --update-snapshots
 ```
 
 **Env:** `POOLAI_HTTP_PORT`, `POOLAI_BASE_URL`, `POOLAI_E2E_USER`, `POOLAI_E2E_PASSWORD` (dev defaults `admin` / `admin123` — `user_manager.rs`).
@@ -45,5 +49,7 @@ bash bin/e2e-playwright.sh --start
 - ~~raid, topology, vm, workers~~ **✅ S31/S33**
 - ~~axe Playwright~~ **✅ S33** (`@axe-core/playwright`)
 - ~~libs admin~~ **✅ S34**
+- ~~visual regression (Playwright snapshots)~~ **✅ PH-S11** — [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)
+- ~~theme/i18n visual matrix~~ **✅ PH-S12**
 
-**Last updated:** 2026-05-23 (FM-039 — Playwright у main CI via `workflow_call`).
+**Last updated:** 2026-05-23 (PH-S12 theme/i18n visual matrix).

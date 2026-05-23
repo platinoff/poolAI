@@ -152,11 +152,34 @@ FM-xxx (з таблиці нижче)
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S09** ✅.
+**Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
 **Якість збірки:** `cargo test-ci`; `cargo bench --no-run --bench http_hotpath_benchmarks` (FM-042).
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+
+### 5.9 Post-Horizon PH спринти (maintenance, 2026-05-23)
+
+**Канон черги PH-S01…S14** — одна сесія = один PH-S*; джерела: §5.1, [`UI_UX_IMPROVEMENTS_PLAN.md`](../development/UI_UX_IMPROVEMENTS_PLAN.md), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md), archive Raft/VM plans.
+
+| Sprint | Фокус | FM / джерело | Стан |
+|--------|--------|--------------|------|
+| **PH-S01** | Cloud SDK deep (GCP SA JWT, Azure OAuth refresh) | **FM-041** | **Deferred** |
+| **PH-S02** | LAN §4 sign-off (2-host replication + TQ01) | **FM-003** | **BLOCKED** (2 хости) |
+| **PH-S03** | VM admin E2E + write-op contracts (`vm_write_operations`) | UI_QUALITY §P2, `vm_service` | **Open** |
+| **PH-S04** | Raft feature wire tests (`--features raft`) | Architect L325, `NEXT_STEPS_2026-01-19` | **Open** |
+| **PH-S05** | RAID admin: raft role / cluster status UI | OpenAPI `RaidDistributedRaftRole` | **Open** |
+| **PH-S06** | Multi-node Raft harness (single-host simulation) | archive WEEK12, FM-027 prep | **Open** |
+| **PH-S07** | Prometheus `GET /metrics` | **FM-043** | **✅** |
+| **PH-S08** | TLS 1.3 / cert reload | **FM-044** | **✅** |
+| **PH-S09** | Admin design system tokens | **FM-045** | **✅** |
+| **PH-S10** | Admin metrics charts (`admin_charts.js`) | DESIGN_SYSTEM | **✅** |
+| **PH-S11** | Playwright visual regression baselines | [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md) | **✅** |
+| **PH-S12** | Theme (dark/light) × i18n (EN/UK) visual matrix | `themes.rs`, `i18n_core.js` | **✅** |
+| **PH-S13** | Topology graph masked SVG visual baseline | `topology_graph.js`, PH-S11 scope | **← наступна** |
+| **PH-S14** | High-contrast theme + axe contrast CI fixes | UI_UX §102, `a11y.spec.ts` | **Open** |
+
+**Відкрито (10):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S03…S06, PH-S13…S14. **Не повторювати:** PH-S07…S12.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -269,7 +292,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S07** (Prometheus metrics) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
+**Наступна сесія:** **PH-S13** (topology visual) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

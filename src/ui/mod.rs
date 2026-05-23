@@ -3803,6 +3803,9 @@ async fn login_page() -> Html<String> {
         PoolAiI18n.apply(document.documentElement);
         PoolAiI18n.initAuthPage();
       }}
+      if (typeof getTheme === 'function' && typeof applyTheme === 'function') {{
+        applyTheme(getTheme());
+      }}
       loadOAuth2Providers();
       document.addEventListener('poolai:langchange', function() {{ loadOAuth2Providers(); }});
       var _lf = document.getElementById('loginForm');

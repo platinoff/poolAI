@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "test:visual": "playwright test visual",
+    "test:visual:update": "playwright test visual --update-snapshots"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.1",

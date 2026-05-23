@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# S23–S33: Playwright E2E (smoke + admin + axe a11y).
+# S23–S34 + PH-S11: Playwright E2E (smoke + admin + axe + visual).
 # Usage:
 #   bash bin/e2e-playwright.sh              # expects poolai on :8080
 #   bash bin/e2e-playwright.sh --start      # build release, start poolai, run tests, stop
+#   bash bin/e2e-playwright.sh --update-snapshots   # refresh visual baselines (PH-S11)
 # Env: POOLAI_HTTP_PORT, POOLAI_E2E_USER, POOLAI_E2E_PASSWORD (defaults admin / admin123)
 set -euo pipefail
 
@@ -67,11 +68,19 @@ start_poolai() {
   wait_health 90
 }
 
-if [[ "${1:-}" == "--start" ]]; then
+PLAYWRIGHT_ARGS=()
+DO_START=false
+for arg in "$@"; do
+  case "$arg" in
+    --update-snapshots) PLAYWRIGHT_ARGS+=(--update-snapshots) ;;
+    --start) DO_START=true ;;
+  esac
+done
+
+if [[ "$DO_START" == true ]]; then
   export PATH="${HOME}/.cargo/bin:/usr/bin:${PATH}"
   cargo build --release --features "${FEATURES}"
   start_poolai
-  shift
 fi
 
 if ! curl -sf --max-time 2 "${POOLAI_BASE_URL}/api/v1/health" >/dev/null; then
@@ -86,4 +95,8 @@ if [[ ! -d node_modules/@playwright/test ]]; then
   npx playwright install chromium
 fi
 
-npm test
+if [[ ${#PLAYWRIGHT_ARGS[@]} -gt 0 ]]; then
+  npx playwright test visual "${PLAYWRIGHT_ARGS[@]}"
+else
+  npm test
+fi
