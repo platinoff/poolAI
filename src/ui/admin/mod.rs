@@ -78,6 +78,7 @@ pub fn admin_layout(
     );
     let i18n_js = include_str!("../i18n_core.js");
     let common_js = include_str!("../admin_common.js");
+    let charts_js = include_str!("../admin_charts.js");
 
     let html = format!(
         r#"<!DOCTYPE html>
@@ -134,6 +135,7 @@ pub fn admin_layout(
   
   <script>{i18n_js}</script>
   <script>{common_js}</script>
+  <script>{charts_js}</script>
   <script>
     (function() {{
       function adminSyncDocTitle() {{
@@ -170,10 +172,27 @@ pub fn admin_layout(
         body = body_html,
         i18n_js = i18n_js,
         common_js = common_js,
+        charts_js = charts_js,
         script = script_js
     );
 
     Html(html)
+}
+
+#[test]
+fn admin_charts_layer_exports() {
+    let js = include_str!("../admin_charts.js");
+    assert!(js.contains("function poolaiFetchMetricHistory"));
+    assert!(js.contains("function poolaiRenderLineChart"));
+    assert!(js.contains("function poolaiRenderSparkline"));
+    assert!(js.contains("function poolaiRenderMetricsChartGrid"));
+    assert!(js.contains("function poolaiStartMetricsPolling"));
+}
+
+#[test]
+fn admin_layout_includes_charts_script() {
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains("function poolaiRenderLineChart"));
 }
 
 #[test]

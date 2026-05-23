@@ -763,6 +763,50 @@ body {
   }
 }
 
+.metric-chart-svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.metrics-sparklines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-4, 16px);
+  margin-top: var(--spacing-4, 16px);
+}
+
+.metric-sparkline-card {
+  background: var(--surface, #171b22);
+  border: 1px solid var(--border, #262b36);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--spacing-3, 12px);
+}
+
+.metric-sparkline-label {
+  font-size: var(--font-size-sm, 14px);
+  color: var(--text-muted, #a8b0bf);
+  margin-bottom: var(--spacing-1, 4px);
+}
+
+.metric-sparkline-svg {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+}
+
+.metric-sparkline-avg {
+  font-size: var(--font-size-sm, 14px);
+  margin-top: var(--spacing-1, 4px);
+}
+
+.metric-sparkline-avg-label {
+  color: var(--text-muted, #a8b0bf);
+}
+
+.metric-sparkline-avg strong {
+  color: var(--text, #e8e8e8);
+}
+
 .admin-fetch-error {
   padding: 12px;
   border-radius: 8px;

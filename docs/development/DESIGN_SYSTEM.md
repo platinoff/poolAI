@@ -28,7 +28,9 @@ concat!(include_str!("../design_tokens.css"), include_str!("../admin_styles.css"
 | `btn-primary` / `btn-secondary` / `btn-danger` / `btn-ghost` | Actions |
 | `admin-card` | Section panel |
 
-## JavaScript helpers (`admin_common.js`)
+## JavaScript helpers
+
+### `admin_common.js`
 
 | Function | Purpose |
 |----------|---------|
@@ -37,6 +39,22 @@ concat!(include_str!("../design_tokens.css"), include_str!("../admin_styles.css"
 | `adminFormFieldHtml(spec)` | One `form-group` field (`type`: text, select, textarea) |
 
 Called from `adminObserveDynamicA11y()` on each admin page load and DOM mutations.
+
+### `admin_charts.js` (PH-S10)
+
+Loaded after `admin_common.js` in `admin_layout`. SVG-only charts; data from `GET /api/enterprise/monitoring/metrics`.
+
+| Function | Purpose |
+|----------|---------|
+| `poolaiFetchMetricHistory(name, { hours, limit })` | Single-metric time series |
+| `poolaiFetchMetricsWindow({ hours, limit })` | All metrics in a window |
+| `poolaiGroupMetricsByName(metrics)` | Group API rows by `metric` |
+| `poolaiRenderLineChart(name, data, opts)` | Full chart (`metric-chart-container`) |
+| `poolaiRenderSparkline(label, values, opts)` | Compact dashboard sparkline |
+| `poolaiRenderMetricsChartGrid(names, opts)` | Async card + grid for monitoring |
+| `poolaiStartMetricsPolling(fn, ms)` | `setInterval` wrapper; returns `stop()` |
+
+CSS: `.metric-chart-container`, `.metrics-charts-grid`, `.metrics-sparklines-grid`, `.metric-sparkline-card` in `admin_styles.css`.
 
 ## Example
 
@@ -47,4 +65,4 @@ document.getElementById('list').innerHTML = adminRenderTable(
 );
 ```
 
-**Last updated:** 2026-05-23 (PH-S09).
+**Last updated:** 2026-05-23 (PH-S10 charts layer).

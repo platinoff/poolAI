@@ -699,6 +699,7 @@ src/ui/admin/topology.rs
 src/ui/admin/users.rs
 src/ui/admin/vm.rs
 src/ui/admin/workers.rs
+src/ui/admin_charts.js
 src/ui/admin_common.js
 src/ui/admin_styles.css
 src/ui/components.rs

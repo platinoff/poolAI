@@ -14,84 +14,17 @@ pub async fn admin_monitoring() -> Html<String> {
     async function loadMonitoring() {
       adminShowLoading('monitoring-content', T('admin.mon.loading', 'Loading monitoring…'));
       try {
-        const [alerts, dashboards, metrics] = await Promise.all([
+        const [alerts, dashboards] = await Promise.all([
           fetchJson('/api/enterprise/monitoring/alerts?limit=20'),
-          fetchJson('/api/enterprise/monitoring/dashboards'),
-          fetchJson('/api/enterprise/monitoring/metrics?limit=100')
+          fetchJson('/api/enterprise/monitoring/dashboards')
         ]);
-        renderMonitoring(alerts, dashboards, metrics);
+        renderMonitoring(alerts, dashboards);
       } catch (e) {
         adminShowInlineError('monitoring-content', e);
         showNotification(T('admin.mon.errLoad', 'Error loading monitoring: ') + e.message, 'error');
       }
     }
     
-    async function loadMetricHistory(metricName, hours = 24) {
-      try {
-        const endTime = new Date().toISOString();
-        const startTime = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
-        const url = `/api/enterprise/monitoring/metrics?metric=${encodeURIComponent(metricName)}&start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}&limit=200`;
-        const data = await fetchJson(url);
-        return data || [];
-      } catch (e) {
-        console.error('Error loading metric history:', e);
-        return [];
-      }
-    }
-    
-    function renderMetricChart(metricName, data) {
-      if (!data || data.length === 0) {
-        return '<div class="muted">' + escapeHtml(T('admin.mon.noData', 'No data available')) + '</div>';
-      }
-      
-      const width = 600;
-      const height = 200;
-      const padding = 40;
-      const chartWidth = width - padding * 2;
-      const chartHeight = height - padding * 2;
-      
-      const values = data.map(d => d.value || 0);
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      const range = max - min || 1;
-      
-      const points = values.map((v, i) => {
-        const x = padding + (i / (values.length - 1 || 1)) * chartWidth;
-        const y = padding + chartHeight - ((v - min) / range) * chartHeight;
-        return `${x},${y}`;
-      }).join(' ');
-      
-      const pointsLabel = T('admin.mon.chartPoints', '{n} points').replace(/\{n\}/g, String(data.length));
-      
-      return `
-        <div class="metric-chart-container">
-          <h4>${escapeHtml(metricName)}</h4>
-          <svg width="${width}" height="${height}" style="max-width: 100%; height: auto;">
-            <defs>
-              <linearGradient id="grad-${metricName.replace(/[^a-zA-Z0-9_-]/g, '_')}" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:var(--primary, #67e480);stop-opacity:0.3" />
-                <stop offset="100%" style="stop-color:var(--primary, #67e480);stop-opacity:0.05" />
-              </linearGradient>
-            </defs>
-            <rect x="${padding}" y="${padding}" width="${chartWidth}" height="${chartHeight}" fill="url(#grad-${metricName.replace(/[^a-zA-Z0-9_-]/g, '_')})" />
-            <polyline points="${points}" fill="none" stroke="var(--primary, #67e480)" stroke-width="2" />
-            ${values.map((v, i) => {
-              const x = padding + (i / (values.length - 1 || 1)) * chartWidth;
-              const y = padding + chartHeight - ((v - min) / range) * chartHeight;
-              return `<circle cx="${x}" cy="${y}" r="3" fill="var(--primary, #67e480)" />`;
-            }).join('')}
-            <text x="${padding}" y="${padding - 10}" fill="var(--text, #f8f8f2)" font-size="12">${max.toFixed(1)}</text>
-            <text x="${padding}" y="${height - padding + 20}" fill="var(--text, #f8f8f2)" font-size="12">${min.toFixed(1)}</text>
-            <text x="${width - padding}" y="${height - padding + 20}" fill="var(--text-muted, #a8b0bf)" font-size="10" text-anchor="end">${escapeHtml(pointsLabel)}</text>
-          </svg>
-          <div class="metric-stats" style="margin-top: 8px; display: flex; gap: 16px; font-size: 0.9em;">
-            <span>${escapeHtml(T('admin.mon.statMin', 'Min:'))} <strong>${min.toFixed(2)}</strong></span>
-            <span>${escapeHtml(T('admin.mon.statMax', 'Max:'))} <strong>${max.toFixed(2)}</strong></span>
-            <span>${escapeHtml(T('admin.mon.statAvg', 'Avg:'))} <strong>${(values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)}</strong></span>
-          </div>
-        </div>
-      `;
-    }
     
     async function loadAlertRules() {
       try {
@@ -103,18 +36,14 @@ pub async fn admin_monitoring() -> Html<String> {
       }
     }
     
-    async function renderMonitoring(alerts, dashboards, metrics) {
+    async function renderMonitoring(alerts, dashboards) {
       const el = document.getElementById('monitoring-content');
       if (!el) return;
       
-      const commonMetrics = ['cpu_usage', 'memory_usage', 'request_rate'];
-      const metricCharts = {};
-      for (const metric of commonMetrics) {
-        const history = await loadMetricHistory(metric, 24);
-        if (history.length > 0) {
-          metricCharts[metric] = renderMetricChart(metric, history);
-        }
-      }
+      const chartsHtml = await poolaiRenderMetricsChartGrid(
+        ['cpu_usage', 'memory_usage', 'request_rate'],
+        { hours: 24, title: T('admin.mon.vizTitle', 'Metrics Visualization (Last 24 Hours)') }
+      );
       
       const alertsHtml = alerts.length === 0 
         ? '<div class="muted">' + escapeHtml(T('admin.mon.noAlerts', 'No active alerts')) + '</div>'
@@ -173,17 +102,6 @@ pub async fn admin_monitoring() -> Html<String> {
             </tbody>
           </table>
         `;
-      
-      const chartsHtml = Object.keys(metricCharts).length > 0
-        ? `
-          <div class="admin-card">
-            <h3>${escapeHtml(T('admin.mon.vizTitle', 'Metrics Visualization (Last 24 Hours)'))}</h3>
-            <div class="metrics-charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-              ${Object.values(metricCharts).join('')}
-            </div>
-          </div>
-        `
-        : '';
       
       el.innerHTML = `
         ${chartsHtml}
@@ -355,7 +273,7 @@ pub async fn admin_monitoring() -> Html<String> {
     }
     
     loadMonitoring();
-    setInterval(loadMonitoring, 5000);
+    poolaiStartMetricsPolling(loadMonitoring, 5000);
     "#;
 
     admin_layout(
