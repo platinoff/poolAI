@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ModelBackendKind"],"fn":["detect_backend","load_from_library","scan_and_load"],"struct":["LoadedLibraryModel","LoadedModelHandle","ModelLoadReport"]};
