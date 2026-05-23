@@ -7,7 +7,7 @@
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
 | `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm; **libs** (`#libraries-list`) |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0) |
-| `visual.spec.ts` | **PH-S11:** `toHaveScreenshot` baselines — login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
+| `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
@@ -51,5 +51,6 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 - ~~libs admin~~ **✅ S34**
 - ~~visual regression (Playwright snapshots)~~ **✅ PH-S11** — [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)
 - ~~theme/i18n visual matrix~~ **✅ PH-S12**
+- ~~topology masked visual~~ **✅ PH-S13**
 
-**Last updated:** 2026-05-23 (PH-S12 theme/i18n visual matrix).
+**Last updated:** 2026-05-23 (PH-S13 topology visual baseline).

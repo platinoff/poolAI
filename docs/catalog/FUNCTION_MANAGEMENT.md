@@ -176,10 +176,10 @@ FM-xxx (з таблиці нижче)
 | **PH-S10** | Admin metrics charts (`admin_charts.js`) | DESIGN_SYSTEM | **✅** |
 | **PH-S11** | Playwright visual regression baselines | [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md) | **✅** |
 | **PH-S12** | Theme (dark/light) × i18n (EN/UK) visual matrix | `themes.rs`, `i18n_core.js` | **✅** |
-| **PH-S13** | Topology graph masked SVG visual baseline | `topology_graph.js`, PH-S11 scope | **← наступна** |
-| **PH-S14** | High-contrast theme + axe contrast CI fixes | UI_UX §102, `a11y.spec.ts` | **Open** |
+| **PH-S13** | Topology graph masked SVG visual baseline | `topology_graph.js`, PH-S11 scope | **✅** |
+| **PH-S14** | High-contrast theme + axe contrast CI fixes | UI_UX §102, `a11y.spec.ts` | **← наступна** |
 
-**Відкрито (10):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S03…S06, PH-S13…S14. **Не повторювати:** PH-S07…S12.
+**Відкрито (9):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S03…S06, PH-S14. **Не повторювати:** PH-S07…S13.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -292,7 +292,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S13** (topology visual) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
+**Наступна сесія:** **PH-S14** (high-contrast / axe contrast) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

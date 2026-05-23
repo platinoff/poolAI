@@ -65,7 +65,19 @@ export async function waitForAdminContentReady(
   await page.evaluate(() => document.fonts?.ready);
 }
 
-/** Mask live charts / topology SVG before visual snapshots (PH-S11). */
+/**
+ * Mask force-layout SVG and live topology data (PH-S13).
+ * Shell (headers, graph frame, table columns, Refresh) stays in the baseline.
+ */
+export const TOPOLOGY_VISUAL_MASKS = [
+  "#topology-graph-svg",
+  "#topology-latency-heatmap",
+  "#topology-nodes-tbody",
+  "#topology-latency-tbody",
+  ".admin-stats-grid",
+] as const;
+
+/** Mask live charts / dynamic regions before visual snapshots (PH-S11 / PH-S13). */
 export function visualMaskLocators(page: Page, selectors: string[]): Locator[] {
   return selectors.map((sel) => page.locator(sel));
 }

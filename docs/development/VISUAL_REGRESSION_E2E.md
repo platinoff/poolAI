@@ -1,4 +1,4 @@
-# Visual regression E2E (PH-S11 / PH-S12)
+# Visual regression E2E (PH-S11 / PH-S12 / PH-S13)
 
 **Status:** Playwright `toHaveScreenshot` baselines in `e2e/tests/visual.spec.ts` (no Percy/Chromatic — local/CI snapshots only).
 
@@ -6,11 +6,22 @@
 
 | Spec | Screenshots |
 |------|-------------|
-| **PH-S11** | Login (`login.png`); admin `main.admin-main` for dashboard + 9 admin routes (default dark + EN) |
+| **PH-S11** | Login (`login.png`); admin `main.admin-main` for dashboard + 10 admin routes (default dark + EN) |
 | **PH-S12** | Theme × i18n matrix: `login-{dark\|light}-{en\|uk}.png`, `users-*`, `dashboard-*` (12 baselines) |
-| Masks | Live metrics charts (`#metrics-chart`, `.metrics-charts-grid`, `.metric-chart-svg`); RAID dynamic panels |
+| **PH-S13** | Topology (`topology.png`) — masked SVG graph + live node/latency data |
+| Masks | Live metrics charts (`#metrics-chart`, `.metrics-charts-grid`, `.metric-chart-svg`); RAID dynamic panels; topology (`TOPOLOGY_VISUAL_MASKS` in `helpers.ts`) |
 
-Topology is **out of scope** (force-layout SVG is non-deterministic across runs).
+### Topology masks (PH-S13)
+
+Force-layout node positions in `topology_graph.js` vary by viewport and iteration; E2E masks dynamic regions and snapshots the stable admin shell (section titles, Refresh, graph frame/legend, table headers).
+
+| Selector | Reason |
+|----------|--------|
+| `#topology-graph-svg` | Force-layout SVG (non-deterministic) |
+| `#topology-latency-heatmap` | Latency-colored heatmap cells |
+| `#topology-nodes-tbody` | Live node rows from `/topology/nodes` |
+| `#topology-latency-tbody` | Live latency matrix rows |
+| `.admin-stats-grid` | Node count / measurements / last-updated stats |
 
 ## Theme + i18n (PH-S12)
 
@@ -52,4 +63,4 @@ cd e2e && npm run test:visual
 
 Included in the existing **Playwright admin** job ([`e2e.yml`](../../.github/workflows/e2e.yml)) via `bin/e2e-playwright.sh --start` → full `npm test` (smoke + admin + a11y + visual).
 
-**Last updated:** 2026-05-23 (PH-S12 theme/i18n matrix).
+**Last updated:** 2026-05-23 (PH-S13 topology masked visual).

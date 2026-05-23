@@ -4,6 +4,7 @@ import {
   matrixSnapshotName,
   primeUiPrefs,
   expectVisualLang,
+  TOPOLOGY_VISUAL_MASKS,
   visualMaskLocators,
   waitForAdminContentReady,
   type VisualLang,
@@ -71,6 +72,13 @@ const ADMIN_VISUAL_PAGES: Array<{
     path: "/ui/admin/libs",
     name: "libs",
     content: "#libraries-list",
+  },
+  {
+    path: "/ui/admin/topology",
+    name: "topology",
+    content: "#topology-nodes-list",
+    masks: [...TOPOLOGY_VISUAL_MASKS],
+    afterReady: "#topology-graph-svg",
   },
 ];
 
