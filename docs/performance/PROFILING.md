@@ -122,13 +122,15 @@ Based on code analysis, the following paths are likely hot paths (frequently exe
   - `put()` - Cache insertion with LRU eviction
 
 #### 4. HTTP Request Handling
-- **Location**: `src/network/api/`
+- **Location**: `src/network/api/`, `src/network/json_errors.rs`, `src/observability/http_trace.rs`
 - **Frequency**: Called for every HTTP request
 - **Operations**:
   - Route matching
   - Request deserialization
   - Response serialization
   - Authentication/authorization checks
+  - **FM-038:** `make_http_span` + optional W3C traceparent (feature `otel`)
+  - **FM-042 Criterion:** `cargo bench --bench http_hotpath_benchmarks` (`http_json_errors`, `http_trace`)
 
 #### 5. Tokio Runtime Tasks
 - **Location**: `src/main.rs` - Tokio runtime configuration
@@ -145,6 +147,7 @@ Based on code analysis, the following paths are likely hot paths (frequently exe
 Run benchmarks to establish baseline:
 ```bash
 cargo bench --bench runtime_benchmarks
+cargo bench --bench http_hotpath_benchmarks
 ```
 
 Record:
@@ -345,5 +348,5 @@ sudo sysctl -w kernel.perf_event_paranoid=1
 
 ---
 
-**Last Updated**: 2026-01-16  
-**Version**: 1.0 - Initial profiling guide
+**Last Updated**: 2026-05-23 (FM-042 — `http_hotpath_benchmarks`, observability span path)  
+**Version**: 1.1

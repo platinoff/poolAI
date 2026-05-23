@@ -1,13 +1,13 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-23 · **Фаза:** FM-042…041 · Post-Horizon **FM-020…038 ✅**
+**Оновлено:** 2026-05-23 · **Фаза:** Post-Horizon **FM-020…042 ✅** · §5.1 code queue порожня (лише Deferred / BLOCKED)
 
 Скопіюй блок нижче в новий чат Cursor (Agent mode, MSYS2 bash для git/cargo).
 
 ---
 
 ```
-PoolAI — розробка FM-042 (наступна в §5.1). FM-038 закрито (OpenTelemetry tracing).
+PoolAI — наступна сесія після FM-042 (hot-path Criterion закрито).
 
 ## S0 — зріз
 
@@ -15,24 +15,20 @@ PoolAI — розробка FM-042 (наступна в §5.1). FM-038 закр�
 2. df -h /s (якщо Avail <5G → cargo clean перед test-ci)
 3. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1 · poolai-session-iteration.mdc
 
-Не повторювати: FM-020…038; FM-039 Playwright CI; FM-038 OpenTelemetry.
+Не повторювати: FM-020…042; FM-038 OTel; FM-039 Playwright CI.
 
-## Мета сесії — FM-042
+## Мета сесії (обрати одну)
 
-Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot).
-Канон: `PERCENTAGE_PLAN`, `BENCHMARKS.md`, FM-042 у `FUNCTION_MANAGEMENT.md`.
+| Пріоритет | FM | Фокус | Примітка |
+|-----------|-----|--------|----------|
+| Deferred | **FM-041** | Cloud SDK deep (GCP SA JWT, Azure OAuth) | лише за явним запитом |
+| Ops BLOCKED | **FM-003** | LAN §4 sign-off | 2 фізичні хости — verify-lan-prep / runbook |
 
-## Черга після FM-042 (одна FM / сесію)
-
-| # | FM | Фокус |
-|---|-----|--------|
-| — | FM-041 | Cloud SDK deep (Deferred) |
-
-Ops BLOCKED: FM-003 §4 LAN (2 хости) — лише verify-lan-prep / runbook.
+Або maintenance: docs sync, OpenAPI gap audit, невеликі багфікси.
 
 ## Завершення
 
 src/ → cargo fmt --all → cargo test-ci (K8S_OPENAPI_ENABLED_VERSION=1.28)
-git: MSYS2, staging лише FM-042, GIT_EDITOR=true, git log -1 перевірка subject
+git: MSYS2, staging лише поточного FM, GIT_EDITOR=true, git log -1 перевірка subject
 push + Summary у коміті (git-push.md) · оновити HANDOFF + §5.1
 ```

@@ -24,6 +24,8 @@ Benchmarks live under `benches/` and use [Criterion](https://github.com/bheisler
 | `turboquant_benchmarks` | `cargo bench -j 1 --bench turboquant_benchmarks --features ml` | TurboQuant pack/unpack and `dot_f32` (requires `ml`). Workspace **`bench`** profile uses `opt-level = 0` so `cargo bench` can complete on MSVC hosts where `rustc` otherwise AVs on the full crate (see baseline note below). |
 | `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config). For kube OpenAPI alignment with CI, set **`K8S_OPENAPI_ENABLED_VERSION=1.28`** (see [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml)). |
 | `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager`. Same **`bench`** / MSVC workaround as other Criterion targets (see baseline note). |
+| `http_hotpath_benchmarks` | `cargo bench -j 1 --bench http_hotpath_benchmarks` | **FM-042:** `http_json_errors` (`api_error_response`, status map), `http_trace` (`make_http_span`). |
+| `sharding_benchmarks` | `cargo bench -j 1 --bench sharding_benchmarks` | FM-036: `tensor_shard_plan_build_4_nodes`, `shard_sync_bus/all_reduce_step_4_nodes`. |
 
 Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) to reduce parallel link pressure.
 
@@ -51,6 +53,16 @@ Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) 
 ### Group in `turboquant_benchmarks` (`--features ml`)
 
 - **`turboquant`**: `pack_uniform_rows_64x256`, `unpack_to_rows_64x256`, `dot_f32_4096` (single Criterion group)
+
+### Groups in `http_hotpath_benchmarks` (FM-042)
+
+- **`http_json_errors`**: `http_status_for_app_error_not_found`, `api_error_response_not_found`, `api_error_response_validation` (JSON body serialize to `Vec<u8>`)
+- **`http_trace`**: `make_http_span_health` — per-request span from FM-038 `TraceLayer` (no OTLP)
+
+### Groups in `sharding_benchmarks` (FM-036)
+
+- **`tensor_shard_plan_build_4_nodes`**: `build_tensor_shard_plan` for 4 nodes
+- **`shard_sync_bus`**: `all_reduce_step_4_nodes` — in-process sync bus step
 
 Record the Criterion summary lines (or archive `target/criterion/`) when publishing regression comparisons.
 
@@ -162,7 +174,9 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 | Local RAID | `raid_local_put/put_artifact_4096` | Stable median order-of-magnitude on fixed disk temp dir |
 | Replication (CP) | `raid_replication_engine/*` | Sub-ms median for `select_*` with ≤100 registered nodes; `calculate_quorum` nanosecond-scale |
 | Service layer | `raid_service/list_*` | Sub-µs median for list/queries on tiny temp stores |
-| JSON | `http_health_json`, `raid_protocol_put_payload` | Track median; investigate if >2× prior baseline |
+| JSON | `http_health_json`, `raid_protocol_put_payload`, **`http_json_errors/*`** | Track median; investigate if >2× prior baseline |
+| HTTP trace | `http_trace/make_http_span_health` | FM-038 span overhead — track trend on same host |
+| Sharding | `tensor_shard_plan_build_*`, `shard_sync_bus/*` | FM-036 — no large regression vs prior baseline |
 | TurboQuant | `turboquant/*` (`--features ml`) | Stable pack/unpack; `dot_f32` scales linearly with dimension |
 | Cloud (config + manager) | `cloud_config/validate_default`, `cloud_manager/init_shutdown_default_config` (`--features cloud`) | Track median; init/shutdown includes async runtime — expect low-µs order on default config |
 
@@ -170,6 +184,7 @@ Use these as **internal guardrails** when changing hot paths; replace with numbe
 
 | Date | Note |
 |------|------|
+| 2026-05-23 | **FM-042:** `http_hotpath_benchmarks` (JSON errors + `make_http_span`); `sharding_benchmarks` у [`benchmarks.yml`](../../.github/workflows/benchmarks.yml); PROFILING.md § FM-042. |
 | 2026-05-18 | AUTO_RUN 2026-06-08 S1: **P4** `poolai_health_load --json` (release, MSYS2 UCRT64) на **win10-local-26200** — рядок у таблиці `poolai_health_load`; coordinator already on `:8080`; FM-003 §4 лишається **BLOCKED**. |
 | 2026-05-20 | **FM-028:** single-host dual-port stand — `capture-p2b-single-host-metrics.sh`, `poolai-p2b-tq01-snapshot`; health_load rows **node-A/B** + TQ01 table above; artifact `data/lan-stand/metrics-fm028-*.json`. |
 | 2026-05-20 | FM-027: LAN sign-off prep — [`LAN_SIGNOFF_CHECKLIST.md`](./LAN_SIGNOFF_CHECKLIST.md), `bin/verify-lan-prep.*`; §4 sign-off **BLOCKED** (2 physical hosts); без нового health_load row. |

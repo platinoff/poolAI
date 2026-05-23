@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-23 (FM-038 ✅ OpenTelemetry tracing; наступна **FM-042**; Post-Horizon FM-020…039 ✅).
+**Оновлено:** 2026-05-23 (FM-042 ✅ hot-path Criterion; Post-Horizon FM-020…039 ✅; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -138,7 +138,7 @@ FM-xxx (з таблиці нижче)
 | FM-039 | CI / E2E | Playwright admin suite у `ci.yml` (`workflow_call`) | **Implemented ✅** | `ci.yml` `playwright-admin` → `e2e.yml` (paths-filter `ui`/`e2e`) |
 | FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Implemented ✅** | [`ADMIN_UI_FIELD_AUDIT_2026-05-23.md`](../development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md); +5 contract tests (31 total) |
 | FM-041 | Cloud | SDK hardening (GCP SA JWT, Azure OAuth refresh, IT suites) | **Deferred** | post FM-006 REST; `CLOUD_SDK_PROGRESS_2026-01-19` |
-| FM-042 | P4 / perf | Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot) | **Planned** | `PERCENTAGE_PLAN`; FM-028 = single-host TQ01 only |
+| FM-042 | P4 / perf | Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot) | **Implemented ✅** | `benches/http_hotpath_benchmarks.rs`, `benchmarks.yml`, `BENCHMARKS.md` § FM-042 |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -147,12 +147,11 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
-| **1** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
-| **2** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…040, FM-037, FM-038, FM-039; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
+**Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042; Horizon S35–S40.
 
-**Якість збірки:** `cargo test-ci` + `cargo test --test observability_otel --features otel` (FM-038).
+**Якість збірки:** `cargo test-ci`; `cargo bench --no-run --bench http_hotpath_benchmarks` (FM-042).
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -195,7 +194,7 @@ FM-xxx (з таблиці нижче)
 | `E2E_PLAYWRIGHT.md` | Playwright у main CI | **FM-039** | **✅** |
 | `UI_QUALITY_AND_E2E_PLAN` §P1 | Admin field audit | **FM-040** | **✅** |
 | `CLOUD_SDK_PROGRESS_2026-01-19` | GCP/Azure auth deep | **FM-041** | **Deferred** |
-| `PERCENTAGE_PLAN` / P4 | Hot-path profiling | **FM-042** | **Planned** |
+| `PERCENTAGE_PLAN` / P4 | Hot-path profiling | **FM-042** | **✅** |
 | `NEXT_STEPS_ARCHITECT` L234 | Job scheduler → VM bind | **FM-034** | **✅** |
 | Architect L123 | LAN replication + TQ01 на стенді | **FM-003** | **BLOCKED** |
 | Architect L183 | Azure/GCP `cloud-sdk` | **✅ S39** | REST + mock tests; `CLOUD_SDK_STATUS.md` |
@@ -267,7 +266,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-042** (hot-path perf / Criterion) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
+**Наступна сесія:** **FM-041** (Cloud SDK deep, **Deferred**) або ops FM-003 §4 (**BLOCKED**). Див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

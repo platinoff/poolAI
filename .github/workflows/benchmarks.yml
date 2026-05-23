@@ -44,6 +44,12 @@ jobs:
       - name: service_layer_benchmarks
         run: cargo bench -j 1 --bench service_layer_benchmarks --features test-utils -- --noplot
 
+      - name: http_hotpath_benchmarks
+        run: cargo bench -j 1 --bench http_hotpath_benchmarks -- --noplot
+
+      - name: sharding_benchmarks
+        run: cargo bench -j 1 --bench sharding_benchmarks -- --noplot
+
       - name: Upload Criterion HTML (artifact)
         uses: actions/upload-artifact@v4
         if: always()

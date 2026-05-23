@@ -7,7 +7,7 @@
 mod http_trace;
 mod tracing_init;
 
-pub use http_trace::apply_http_trace;
+pub use http_trace::{apply_http_trace, make_http_span};
 pub use tracing_init::{init_tracing, OtelGuard};
 
 #[cfg(test)]

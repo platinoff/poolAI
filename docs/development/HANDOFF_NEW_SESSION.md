@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-23 (FM-038 ✅ OpenTelemetry tracing; наступна **FM-042**; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
+**Оновлено:** 2026-05-23 (FM-042 ✅ hot-path Criterion; FM-041 Deferred; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** FM-038 — `src/observability/`: HTTP TraceLayer + feature `otel` (OTLP export, W3C traceparent). FM-039 — Playwright CI. **Наступна розробка:** **FM-042** hot-path perf (§5.1 FM).
+**Maintenance (2026-05-23):** FM-042 — `benches/http_hotpath_benchmarks.rs` (JSON errors + HTTP trace spans); `benchmarks.yml` + `sharding_benchmarks`. FM-038/039 — OTel + Playwright CI. **Наступна розробка:** **FM-041** Deferred або ops LAN (**BLOCKED**).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -101,9 +101,8 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 | Порядок | FM | Що | Стан |
 |--------|-----|-----|------|
-| — | **FM-003** | LAN §4 sign-off | **BLOCKED** (2 хости); prep ✅ FM-027 |
-| **1** | **FM-042** | Hot-path perf / Criterion | **Planned** — наступна сесія |
-| **2** | **FM-041** | Cloud SDK deep auth | **Deferred** |
+| — | **FM-003** | LAN §4 sign-off | **BLOCKED** |
+| — | **FM-041** | Cloud SDK deep | **Deferred** |
 | **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 
 **Закрито:** FM-001…033 (Post-Horizon + autoprogon). **Не повторювати** FM-020…033.
@@ -112,7 +111,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-042** (hot-path perf); ops LAN **BLOCKED**.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-041** (Deferred) / ops LAN **BLOCKED**.
 2. Ітерація: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) — S0, MSYS2 bash, `df -h /s`, один FM, staging/commit/push.
 3. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci` (після `cargo clean` якщо диск S: повний).
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.
