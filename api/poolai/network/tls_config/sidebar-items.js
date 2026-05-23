@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["TlsVersion"],"struct":["TlsConfig"]};
+window.SIDEBAR_ITEMS = {"enum":["TlsVersion"],"fn":["cert_reload_loop","load_server_config_from_pem_files","spawn_cert_reload_if_configured"],"struct":["CertificatePaths","TlsConfig","TlsServeContext"]};
