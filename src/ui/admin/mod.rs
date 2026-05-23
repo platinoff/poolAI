@@ -72,7 +72,10 @@ pub fn admin_layout(
     body_html: &str,
     script_js: &str,
 ) -> Html<String> {
-    let base_css = include_str!("../admin_styles.css");
+    let base_css = concat!(
+        include_str!("../design_tokens.css"),
+        include_str!("../admin_styles.css"),
+    );
     let i18n_js = include_str!("../i18n_core.js");
     let common_js = include_str!("../admin_common.js");
 
@@ -184,6 +187,17 @@ fn admin_common_fm019_modal_a11y_helpers() {
     assert!(js.contains("function adminSyncTabA11y"));
     assert!(js.contains("function adminEnhanceTablesA11y"));
     assert!(js.contains("function adminObserveDynamicA11y"));
+    assert!(js.contains("function adminApplyDesignSystem"));
+    assert!(js.contains("function adminRenderTable"));
+    assert!(js.contains("function adminFormFieldHtml"));
+}
+
+#[test]
+fn admin_layout_includes_design_tokens_css() {
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    let body = html.0;
+    assert!(body.contains("--spacing-1: 4px"));
+    assert!(body.contains("admin-table--striped"));
 }
 
 #[cfg(all(test, feature = "enterprise"))]

@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** FM-042 — `benches/http_hotpath_benchmarks.rs` (JSON errors + HTTP trace spans); `benchmarks.yml` + `sharding_benchmarks`. FM-038/039 — OTel + Playwright CI. **Наступна розробка:** **FM-041** Deferred або ops LAN (**BLOCKED**).
+**Maintenance (2026-05-23):** FM-045 / **PH-S09** — design tokens + admin table/form helpers. FM-044 TLS · FM-043 Prometheus. Кодова черга FM-001…045 **закрита**. **Наступна:** **PH-S10** admin charts (`NEXT_SESSION_PROMPT.md`).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -55,6 +55,9 @@
 | `POOLAI_SOLANA_PROGRAM_ID` | sidecar | Deployed `poolai-events` program id (інакше Memo fallback) |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | coordinator | OTLP HTTP collector URL (feature `otel`; export off if unset) |
 | `OTEL_SERVICE_NAME` | coordinator | OTel `service.name` (default `poolai`) |
+| *(build)* `prometheus` feature | coordinator | Enables `GET /metrics` Prometheus text scrape (FM-043; included in `cargo test-ci`) |
+| `HTTPS_CERT_PATH` / `HTTPS_KEY_PATH` | coordinator | PEM paths when `https.enabled` (FM-044) |
+| `HTTPS_CERT_RELOAD_SECS` | coordinator | Optional hot reload interval for TLS certificates |
 
 **Стек (агенти):** Rust-only runtime — [`.cursor/rules/runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc); `docs/STRUCTURE.md` §7. **Не** пропонувати Python для ML/API.
 | `POOLAI_TELEGRAM_WEBHOOK_SECRET` | coordinator | Опційно: header `X-Telegram-Webhook-Secret` для webhook |
@@ -101,6 +104,8 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 | Порядок | FM | Що | Стан |
 |--------|-----|-----|------|
+| — | **PH-S07** | Prometheus `/metrics` | **✅ FM-043** — [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) |
+| — | **PH-S08** | TLS 1.3 / cert rotation | **✅ FM-044** — [`security/TLS.md`](../security/TLS.md) |
 | — | **FM-003** | LAN §4 sign-off | **BLOCKED** |
 | — | **FM-041** | Cloud SDK deep | **Deferred** |
 | **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
@@ -111,7 +116,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-041** (Deferred) / ops LAN **BLOCKED**.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S10** (admin charts); черга PH-S01…S14; ops LAN **BLOCKED**.
 2. Ітерація: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) — S0, MSYS2 bash, `df -h /s`, один FM, staging/commit/push.
 3. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci` (після `cargo clean` якщо диск S: повний).
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.

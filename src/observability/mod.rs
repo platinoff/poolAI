@@ -1,14 +1,25 @@
 //! FM-038: HTTP request tracing and optional OpenTelemetry export.
+//! FM-043 / PH-S07: Prometheus pull metrics (`feature = "prometheus"`).
 //!
 //! - Always: `tower-http` [`TraceLayer`] spans (`http.request`) bridged to `tracing`.
 //! - Feature `otel`: W3C `traceparent` extraction + OTLP export when
 //!   `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
+//! - Feature `prometheus`: `GET /metrics` text exposition (complements OTLP, not a duplicate).
 
 mod http_trace;
 mod tracing_init;
 
+#[cfg(feature = "prometheus")]
+pub mod prometheus_export;
+
 pub use http_trace::{apply_http_trace, make_http_span};
 pub use tracing_init::{init_tracing, OtelGuard};
+
+#[cfg(feature = "prometheus")]
+pub use prometheus_export::{
+    apply_prometheus_http_layer, encode_metrics_text, init_prometheus, metrics_handler,
+    record_http_request,
+};
 
 #[cfg(test)]
 mod tests {

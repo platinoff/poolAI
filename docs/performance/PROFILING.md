@@ -294,6 +294,10 @@ Based on benchmarks, target performance:
 - **Request processing**: < 1ms (excluding model inference)
 - **Response serialization**: < 100μs
 
+## Production metrics (Prometheus)
+
+For **pull-model** counters/gauges/histograms at runtime (HTTP volume, uptime, worker gauges), scrape **`GET /metrics`** with feature `prometheus` — see [`../development/PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md). That path is separate from Criterion micro-benchmarks and from FM-038 OTLP traces.
+
 ## Continuous Profiling
 
 ### CI/CD Integration

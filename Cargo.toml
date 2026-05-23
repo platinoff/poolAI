@@ -50,6 +50,7 @@ jsonwebtoken = { version = "10.2", optional = true, features = ["rust_crypto"] }
 # Use: cargo build --features https
 # Note: Requires native toolchain (gcc/dlltool on Windows GNU)
 axum-server = { version = "0.8", optional = true, features = ["tls-rustls"] }
+rustls = { version = "0.23", optional = true, default-features = false, features = ["ring", "std", "tls12"] }
 
 # Using base64 for temporary token encoding (dev only or fallback)
 base64 = { version = "0.22", features = ["alloc"] }
@@ -153,6 +154,8 @@ opentelemetry = { version = "0.28", optional = true }
 opentelemetry_sdk = { version = "0.28", features = ["rt-tokio"], optional = true }
 opentelemetry-otlp = { version = "0.28", features = ["http-proto", "reqwest-blocking-client"], optional = true }
 tracing-opentelemetry = { version = "0.29", optional = true }
+# PH-S07 / FM-043: Prometheus text exposition at GET /metrics
+prometheus = { version = "0.14", optional = true, features = ["process"] }
 
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
@@ -282,6 +285,16 @@ name = "observability_otel"
 path = "tests/observability_otel.rs"
 required-features = ["otel"]
 
+[[test]]
+name = "observability_prometheus"
+path = "tests/observability_prometheus.rs"
+required-features = ["prometheus", "enterprise"]
+
+[[test]]
+name = "tls_https_integration"
+path = "tests/tls_https_integration.rs"
+required-features = ["https"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)
@@ -291,7 +304,7 @@ jwt = ["jsonwebtoken"]
 # HTTPS/TLS support (optional - requires native toolchain: gcc/dlltool on Windows GNU)
 # Use: cargo build --features https
 # Note: Without this feature, server runs in HTTP mode
-https = ["axum-server"]
+https = ["axum-server", "dep:rustls"]
 # Raft consensus for distributed RAID (optional)
 # Use: cargo build --features raft
 raft = ["async-raft", "anyhow"]
@@ -351,6 +364,9 @@ otel = [
     "dep:opentelemetry-otlp",
     "dep:tracing-opentelemetry",
 ]
+# PH-S07 / FM-043: Prometheus pull metrics at GET /metrics (OTLP tracing stays on `otel`)
+# Use: cargo build --features prometheus,enterprise
+prometheus = ["dep:prometheus"]
 
 # Some Windows MSVC hosts hit `rustc` STATUS_ACCESS_VIOLATION when compiling the full `poolai` lib at
 # `release` opt-level 3 (e.g. `cargo bench` / `cargo build --release`). The `bench` profile keeps

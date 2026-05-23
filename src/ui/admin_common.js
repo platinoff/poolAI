@@ -541,15 +541,130 @@ function adminEnhanceTablesA11y(root) {
   });
 }
 
+/** PH-S09: apply canonical admin-table / admin-form classes to dynamic markup. */
+function adminApplyDesignSystem(root) {
+  const scope =
+    root && typeof root.querySelectorAll === 'function'
+      ? root
+      : document.getElementById('admin_main_content') || document;
+
+  scope.querySelectorAll('table').forEach((table) => {
+    if (!table.closest('.admin-wrapper')) return;
+    table.classList.add('admin-table', 'admin-table--striped');
+    const parent = table.parentElement;
+    if (parent && !parent.classList.contains('admin-table-container')) {
+      const wrap = document.createElement('div');
+      wrap.className = 'admin-table-container';
+      parent.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    }
+  });
+
+  scope.querySelectorAll('form').forEach((form) => {
+    if (!form.closest('.admin-wrapper')) return;
+    form.classList.add('admin-form');
+  });
+}
+
+/** PH-S09: build a striped data table from header labels and row cell HTML. */
+function adminRenderTable(headers, rows) {
+  const cols = (headers || []).map((h) =>
+    typeof h === 'string' ? { label: h } : h,
+  );
+  let html = '<div class="admin-table-container"><table class="admin-table admin-table--striped">';
+  html += '<thead><tr>';
+  cols.forEach((c) => {
+    html += '<th scope="col">' + escapeHtml(c.label || '') + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  (rows || []).forEach((row) => {
+    html += '<tr>';
+    (row || []).forEach((cell) => {
+      html += '<td>' + (cell == null ? '' : cell) + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+/** PH-S09: one labeled field using design-system form-group markup. */
+function adminFormFieldHtml(spec) {
+  const id =
+    spec.id ||
+    'fld_' + Math.random().toString(36).slice(2, 11);
+  const name = escapeHtml(spec.name || id);
+  const required = spec.required
+    ? ' required aria-required="true"'
+    : '';
+  let label =
+    '<label for="' +
+    id +
+    '">' +
+    escapeHtml(spec.label || '');
+  if (spec.required) {
+    label += ' <span class="required" aria-hidden="true">*</span>';
+  }
+  label += '</label>';
+
+  let control = '';
+  if (spec.type === 'select') {
+    control =
+      '<select id="' +
+      id +
+      '" name="' +
+      name +
+      '"' +
+      required +
+      '>';
+    (spec.options || []).forEach((o) => {
+      control +=
+        '<option value="' +
+        escapeHtml(o.value) +
+        '">' +
+        escapeHtml(o.label) +
+        '</option>';
+    });
+    control += '</select>';
+  } else if (spec.type === 'textarea') {
+    control =
+      '<textarea id="' +
+      id +
+      '" name="' +
+      name +
+      '"' +
+      required +
+      '></textarea>';
+  } else {
+    control =
+      '<input type="' +
+      escapeHtml(spec.type || 'text') +
+      '" id="' +
+      id +
+      '" name="' +
+      name +
+      '"' +
+      required;
+    if (spec.placeholder) {
+      control +=
+        ' placeholder="' + escapeHtml(spec.placeholder) + '"';
+    }
+    control += ' />';
+  }
+  return '<div class="form-group">' + label + control + '</div>';
+}
+
 function adminObserveDynamicA11y() {
   const root = document.getElementById('admin_main_content');
   if (!root || root.dataset.poolaiA11yObs === '1') return;
   const obs = new MutationObserver(function () {
+    adminApplyDesignSystem(root);
     adminEnhanceTablesA11y(root);
     adminEnhanceFormA11y(root);
   });
   obs.observe(root, { childList: true, subtree: true });
   root.dataset.poolaiA11yObs = '1';
+  adminApplyDesignSystem(root);
   adminEnhanceTablesA11y(root);
   adminEnhanceFormA11y(root);
 }

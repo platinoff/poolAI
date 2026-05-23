@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-18 (FM-016 ✅ virtual nodes + `poolai-worker`; FM-012/015 — див. **`FUNCTION_MANAGEMENT`** / **HANDOFF**).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-23 (FM-043…045: Prometheus `/metrics`, TLS 1.3 rustls, admin design tokens).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -25,8 +25,10 @@
 | `cloud-sdk` | Важкі залежності (K8s OpenAPI, Azure, AWS SDK, GCP-частина). |
 | `vm-isolation-linux` / `vm-isolation-windows` | Ізоляція VM на платформі. |
 | `test-utils` | `AppState::attach_*_for_test` для тестів; приклад повного `/api/v1` без module globals — `tests/appstate_http_injection_integration.rs`. |
+| `prometheus` | Pull-model `GET /metrics` (text exposition); див. [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md). |
+| `otel` | OpenTelemetry OTLP export + W3C trace context; див. [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md). |
 
-**Типова CI-матриця (див. `.github/workflows/ci.yml`):** `ml`, `enterprise`, `cloud` + `K8S_OPENAPI_ENABLED_VERSION=1.28` для збірки з cloud.
+**Типова CI-матриця (див. `.github/workflows/ci.yml`):** `ml`, `enterprise`, `cloud`, `prometheus`, `job-store-sqlite` + `K8S_OPENAPI_ENABLED_VERSION=1.28` для збірки з cloud; локально — `cargo test-ci` (див. `.cargo/config.toml`).
 
 ---
 
@@ -57,7 +59,8 @@
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
-| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth (HMAC/`auth_date`/allowlist/audit, widget UA/EN). Мапінг JSON адмінки → екран: `docs/development/ADMIN_UI_JSON_CONTRACTS.md`. |
+| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth. **FM-045 ✅:** `design_tokens.css` + уніфіковані `admin-table` / `admin-form` / `adminRenderTable` / `adminFormFieldHtml` — [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md). |
+| **Observability** | `observability/` | HTTP trace spans; **FM-038** OTLP (`otel`); **FM-043** Prometheus scrape at **`GET /metrics`** (окремо від JSON `/api/v1/metrics`). |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService`, **`VirtualNodeTaskService`** (FM-016) — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | **FM-016++:** `coordinator` bridge + `poolai-telegram-bot` (`--features tgbot`); OAuth login — FM-012. |
 
@@ -73,6 +76,8 @@
 - **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
 - **WebSocket** — наприклад `/ws/metrics` (JWT/безпека залежно від конфігурації).
+- **Prometheus (FM-043)** — `GET /metrics` (root, `feature = prometheus`); enterprise gauges on scrape; JSON metrics лишаються на `/api/v1/metrics`.
+- **HTTPS (FM-044)** — `feature = https`: rustls TLS 1.3 (опційно 1.2), HSTS з config, `HTTPS_CERT_RELOAD_SECS` — [`security/TLS.md`](../security/TLS.md).
 - **UI/Admin UX** — FM-012 закрито (2026-05-16): i18n UA/EN + Telegram OAuth; LAN perf — FM-003 ops ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)).
 - **OpenAPI** — [`docs/openapi.yaml`](../openapi.yaml) описує **частину** публічних шляхів; повний перелік — з коду роутерів і `src/network/mod.rs`.
 
@@ -122,8 +127,9 @@
 
 ## Безпека та спостережуваність (за доками)
 
-- JWT, HTTPS, RBAC, rate limiting, security headers — див. кореневий README та `docs/security/*`.
-- Audit, алерти, метрики enterprise — `enterprise/` + доки `monitoring/`.
+- JWT, HTTPS (**FM-044** TLS 1.3 + cert reload), RBAC, rate limiting, security headers — [`security/TLS.md`](../security/TLS.md), кореневий README.
+- **FM-043** Prometheus pull — [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md); **FM-038** OTLP — [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md).
+- Audit, алерти, метрики enterprise — `enterprise/` + `POOLAI_MONITORING_DATA_DIR` (FM-030).
 
 ---
 

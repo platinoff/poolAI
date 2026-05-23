@@ -5,6 +5,7 @@
 This document ties together **reproducible micro-benchmarks** (Criterion, in-tree) and **higher-level targets** (HTTP, RAID throughput) used for design and capacity planning.
 
 - **How to profile hot paths**: [`PROFILING.md`](./PROFILING.md)
+- **Prometheus scrape (`GET /metrics`)**: [`../development/PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md) (PH-S07 / FM-043)
 - **Runtime / Tokio tuning**: [`TUNING.md`](./TUNING.md)
 - **Architecture-oriented measurement backlog**: [`../development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md`](../development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md)
 

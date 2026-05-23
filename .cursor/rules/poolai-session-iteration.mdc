@@ -1,0 +1,83 @@
+---
+description: PoolAI — ітераційна сесія (S0, FM, MSYS2, диск, commit/push); застосовуй на кожній розробці та автопрогоні
+alwaysApply: true
+---
+
+# Ітераційна сесія PoolAI (канон)
+
+Узгоджено з [`.cursor/commands/git-push.md`](../commands/git-push.md), [`.cursor/rules/autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc), [`HANDOFF_NEW_SESSION.md`](../../docs/development/HANDOFF_NEW_SESSION.md).
+
+## Одна сесія = один FM
+
+| Правило | Дія |
+|--------|-----|
+| Черга | **§5.1** у [`FUNCTION_MANAGEMENT.md`](../../docs/catalog/FUNCTION_MANAGEMENT.md) — єдиний порядок |
+| Scope | Лише файли поточного FM; **не** повторювати закриті FM з промпта сесії |
+| Завершення | Закрити FM у FM-таблиці + §5.1 + `HANDOFF` + `NEXT_SESSION_PROMPT` → **наступний FM** |
+
+## S0 — зріз (обов’язково на старті)
+
+1. **Git:** лише **MSYS2 UCRT64 bash** (див. нижче) — `git fetch`; `git status -sb`; `git log -1 --oneline`.
+2. **Доки:** `HANDOFF_NEW_SESSION.md` · `FUNCTION_MANAGEMENT.md` §5.1 · `NEXT_SESSION_PROMPT.md`.
+3. **Диск S:** перед `cargo test-ci` / великим `git add`:
+   ```bash
+   df -h /s | tail -1
+   du -sh target 2>/dev/null
+   ```
+   - **Avail &lt; 5G** або **Use% 100%** → `cargo clean`, потім збірка. Не редагувати великі docs, поки диск не звільнено.
+   - Після os error **112** / порожній `CHANGELOG.md` → `git checkout HEAD -- <file>` і зміни заново.
+4. **Правила:** `runtime-stack-policy.mdc` · `autonomous-orchestrator.mdc` (якщо автопрогін).
+
+## Shell / cargo / git — тільки MSYS2 bash
+
+| ❌ Не використовувати | ✅ Використовувати |
+|---------------------|-------------------|
+| PowerShell / cmd у Cursor для `git`, `cargo` | `C:\msys64\usr\bin\bash.exe -lc '…'` або зовнішнє вікно MSYS2 UCRT64 |
+| `&&` у PowerShell | `;` у PowerShell **або** один виклик `bash -lc 'cd /s/rust/poolAI && …'` |
+| `git` з інтегрованого терміналу Cursor без потреби | Зовнішній MSYS2 для push (менше `index.lock`) |
+
+**PATH у bash (на початку блоку):**
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export K8S_OPENAPI_ENABLED_VERSION=1.28
+cd /s/rust/poolAI || cd "S:/rust/poolAI"
+```
+
+**Після змін у `src/` / `tests/` / `crates/`:**
+```bash
+cargo fmt --all
+cargo test-ci
+```
+
+## Staging і коміт
+
+- **Не** `git add -A` без відбору.
+- **Не стаджити:** `data/audit/*.log.gz`, `data/dev/`, `.commit-msg-*.txt`, посторонні зміни з інших FM.
+- Staging лише файли **поточного FM** + супутні docs.
+- Коміт з кількома `-m` (subject + Summary) — див. git-push §3a.
+- Якщо hook ламає message (`Co-authored-by:` без subject):
+  ```bash
+  export GIT_EDITOR=true EDITOR=true
+  git commit -m "feat(scope): subject" -m "Summary:" -m "- …"
+  git log -1 --format=%B   # перевірка перед push
+  ```
+- **Не** `git commit --amend` після push без явного запиту користувача.
+
+## Push
+
+- Канон: [`.cursor/commands/git-push.md`](../commands/git-push.md).
+- Після push з кодом — самарі в чат (branch, hash, subject, тести, known issues).
+
+## Типові помилки (з останніх ітерацій)
+
+| Симптом | Дія |
+|--------|-----|
+| `Out of diskspace` / error 112 | `cargo clean`; `df -h /s` |
+| `link.exe not found` | MSYS2 GNU toolchain, не MSVC shell |
+| FM-034 vs `runtime/scheduler.rs` | Job layer: **`src/job/scheduler.rs`**, не `src/runtime/scheduler.rs` |
+| Placeholder «metadata-only» | Реальний код + тести, не лише metadata в instance |
+| Commit subject = лише `Co-authored-by:` | `GIT_EDITOR=true`; перевір `git log -1` |
+
+## Промпт нової сесії
+
+Копіюй блок з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) — оновлюй після кожного закритого FM (HEAD, «не повторювати», наступний FM).

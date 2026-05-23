@@ -30,9 +30,6 @@ use axum::Router;
 use std::net::SocketAddr;
 use tracing::info;
 
-#[cfg(feature = "https")]
-use axum_server::tls_rustls::RustlsConfig;
-
 /// Start the network server (HTTP or HTTPS)
 ///
 /// # Arguments
@@ -84,6 +81,15 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
             enterprise_api::create_enterprise_api_routes(),
         );
 
+        #[cfg(feature = "prometheus")]
+        let router = {
+            observability::init_prometheus();
+            router.route("/metrics", get(observability::metrics_handler))
+        };
+
+        #[cfg(feature = "prometheus")]
+        let router = observability::apply_prometheus_http_layer(router);
+
         observability::apply_http_trace(router.with_state(app_state))
     };
 
@@ -110,28 +116,34 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
             return;
         }
 
-        // Get certificate paths from config or environment variables
-        let cert_path = https_config
-            .cert_path
-            .or_else(|| std::env::var("HTTPS_CERT_PATH").ok())
-            .unwrap_or_else(|| "certs/cert.pem".to_string());
-        let key_path = https_config
-            .key_path
-            .or_else(|| std::env::var("HTTPS_KEY_PATH").ok())
-            .unwrap_or_else(|| "certs/key.pem".to_string());
+        let tls_policy = match tls_config::TlsConfig::from_https_config(&https_config) {
+            Ok(policy) => policy,
+            Err(e) => {
+                warn!("Invalid TLS policy: {}. Falling back to HTTP.", e);
+                let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+                axum::serve(listener, app).await.unwrap();
+                return;
+            }
+        };
 
-        match RustlsConfig::from_pem_file(cert_path.clone(), key_path.clone()).await {
-            Ok(config) => {
-                info!("Starting HTTPS server on {}", addr);
-                axum_server::bind_rustls(addr, config)
+        let cert_paths = tls_config::TlsConfig::resolve_cert_paths(&https_config);
+
+        match tls_config::TlsServeContext::from_pem_files(cert_paths.clone(), tls_policy).await {
+            Ok(ctx) => {
+                info!(
+                    "Starting HTTPS server on {} (TLS {}..{})",
+                    addr, ctx.policy.min_version, ctx.policy.max_version
+                );
+                tls_config::spawn_cert_reload_if_configured(ctx.clone());
+                axum_server::bind_rustls(addr, ctx.rustls)
                     .serve(app.into_make_service())
                     .await
                     .unwrap();
             }
             Err(e) => {
                 warn!(
-                    "Failed to load HTTPS certificates ({}): {}. Falling back to HTTP.",
-                    cert_path, e
+                    "Failed to load TLS certificates (cert={}, key={}): {}. Falling back to HTTP.",
+                    cert_paths.cert, cert_paths.key, e
                 );
                 info!("Starting HTTP server on {}", addr);
                 let listener = tokio::net::TcpListener::bind(addr).await.unwrap();

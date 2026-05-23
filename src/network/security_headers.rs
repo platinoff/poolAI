@@ -76,10 +76,27 @@ impl SecurityHeadersConfig {
     }
 }
 
+/// Build security headers from application config (HSTS only when HTTPS is enabled).
+pub fn security_headers_from_app_config() -> SecurityHeadersConfig {
+    let mut config = SecurityHeadersConfig::default();
+    if let Ok(pool_config) = crate::core::config::get_config() {
+        if pool_config.https.enabled {
+            if let Ok(tls) =
+                crate::network::tls_config::TlsConfig::from_https_config(&pool_config.https)
+            {
+                config.strict_transport_security = tls.hsts_header();
+            }
+        } else {
+            config.strict_transport_security = None;
+        }
+    }
+    config
+}
+
 /// Middleware function to add security headers to responses
 pub async fn security_headers_middleware(req: Request, next: Next) -> Response {
     let mut response = next.run(req).await;
-    let config = SecurityHeadersConfig::default();
+    let config = security_headers_from_app_config();
 
     // Add Content-Security-Policy header
     if let Some(ref csp) = config.content_security_policy {

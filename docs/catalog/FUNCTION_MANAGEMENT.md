@@ -139,6 +139,9 @@ FM-xxx (з таблиці нижче)
 | FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Implemented ✅** | [`ADMIN_UI_FIELD_AUDIT_2026-05-23.md`](../development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md); +5 contract tests (31 total) |
 | FM-041 | Cloud | SDK hardening (GCP SA JWT, Azure OAuth refresh, IT suites) | **Deferred** | post FM-006 REST; `CLOUD_SDK_PROGRESS_2026-01-19` |
 | FM-042 | P4 / perf | Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot) | **Implemented ✅** | `benches/http_hotpath_benchmarks.rs`, `benchmarks.yml`, `BENCHMARKS.md` § FM-042 |
+| FM-043 | Observability | Prometheus `/metrics` text export (pull model; complements FM-038 OTLP) | **Implemented ✅** | `src/observability/prometheus_export.rs`, feature `prometheus`, [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md) |
+| FM-044 | Security / TLS | TLS 1.3 rustls rollout, HSTS from config, cert reload (`HTTPS_CERT_RELOAD_SECS`) | **Implemented ✅** | `src/network/tls_config.rs`, feature `https`, [`security/TLS.md`](../security/TLS.md) |
+| FM-045 | UI / Admin | Design system tokens + unified tables/forms (`admin_common.js`) | **Implemented ✅** | `design_tokens.css`, `admin_styles.css`, [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md) |
 
 ### 5.1 Пріоритезовані наступні кроки (зведення FM-* і Architect-плану)
 
@@ -149,7 +152,7 @@ FM-xxx (з таблиці нижче)
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042; Horizon S35–S40.
+**Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S09** ✅.
 
 **Якість збірки:** `cargo test-ci`; `cargo bench --no-run --bench http_hotpath_benchmarks` (FM-042).
 
@@ -266,7 +269,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-041** (Cloud SDK deep, **Deferred**) або ops FM-003 §4 (**BLOCKED**). Див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S07** (Prometheus metrics) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

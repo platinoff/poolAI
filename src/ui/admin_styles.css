@@ -23,67 +23,9 @@
   --warning: #ffb86c;
   --info: #8be9fd;
   --success: #50fa7b;
-  
-  /* Typography Scale (based on 16px base) */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 24px;
-  --font-size-2xl: 32px;
-  
-  /* Line Heights */
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.75;
-  
-  /* Font Weights */
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  
-  /* Spacing Scale (4px base unit) */
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
-  --spacing-8: 32px;
-  --spacing-10: 40px;
-  --spacing-12: 48px;
-  --spacing-16: 64px;
-  
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
-  
-  /* Shadows (0-4 levels) */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  
-  /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.2s ease;
-  --transition-slow: 0.3s ease;
-  --transition-slower: 0.5s ease;
-  
-  /* Z-index Scale */
-  --z-dropdown: 1000;
-  --z-sticky: 1020;
-  --z-fixed: 1030;
-  --z-modal-backdrop: 1040;
-  --z-modal: 1050;
-  --z-popover: 1060;
-  --z-tooltip: 1070;
-  
+
+  /* Structural tokens: design_tokens.css (included before this file in admin_layout) */
+
   /* Admin-specific variables */
   --admin-sidebar-width: 260px;
   
@@ -103,10 +45,11 @@
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: var(--font-size-base);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: var(--line-height-normal);
+  transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
 .admin-wrapper {
@@ -436,66 +379,84 @@ body {
 }
 
 /* Tables */
+.admin-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
+  margin: 0;
+  font-size: var(--font-size-sm);
 }
 
 .admin-table th,
 .admin-table td {
-  padding: 12px;
+  padding: var(--spacing-3) var(--spacing-4);
   text-align: left;
   border-bottom: 1px solid var(--border);
-  transition: all 0.2s ease;
+  vertical-align: top;
 }
 
 .admin-table th {
   background: var(--surface-secondary);
   color: var(--primary);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
 }
 
-.admin-table tr {
-  transition: all 0.2s ease;
+.admin-table--striped tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--surface-secondary) 55%, transparent);
 }
 
-.admin-table tr:hover {
+.admin-table--compact th,
+.admin-table--compact td {
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+.admin-table tbody tr:hover {
   background: var(--surface-secondary);
-  transform: scale(1.01);
-  box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
 
 /* Forms */
 .admin-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-4);
+  max-width: 48rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--spacing-1);
 }
 
 .form-group label {
   color: var(--admin-text);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px;
+  padding: var(--spacing-2) var(--spacing-3);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--bg);
   color: var(--text);
   font-family: inherit;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .form-group input:focus,
@@ -504,8 +465,53 @@ body {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-color: var(--primary);
-  transform: scale(1.02);
-  box-shadow: 0 0 0 3px rgba(103, 228, 128, 0.2);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-group .required {
+  color: var(--danger);
+  margin-left: var(--spacing-1);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+/* Buttons (design system) */
+.btn-secondary {
+  background: var(--surface-secondary);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background: var(--surface-secondary);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-4);
 }
 
 /* Tabs */

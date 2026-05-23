@@ -38,4 +38,6 @@ cargo run --features enterprise,ml,cloud,otel
 
 Code: `src/observability/` (`tracing_init.rs`, `http_trace.rs`).
 
-**Last updated:** 2026-05-23 (FM-038).
+**Metrics (pull model):** FM-043 adds Prometheus text at `GET /metrics` (`feature = prometheus`) — see [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md). OTLP and Prometheus are complementary.
+
+**Last updated:** 2026-05-23 (FM-038, FM-043 cross-link).
