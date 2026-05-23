@@ -14,6 +14,9 @@
 <a href=#14 id=14 data-nosnippet>14</a>    envelope_from_job_spec, grid_result_from_status, job_spec_from_envelope,
 <a href=#15 id=15 data-nosnippet>15</a>    job_spec_from_grid_job, job_spec_to_grid_job, job_status_from_grid_result,
 <a href=#16 id=16 data-nosnippet>16</a>};
-<a href=#17 id=17 data-nosnippet>17</a><span class="kw">pub use </span>scheduler::schedule_pending;
-<a href=#18 id=18 data-nosnippet>18</a><span class="kw">pub use </span>store::{data_dir_from_env, JobStore};
-<a href=#19 id=19 data-nosnippet>19</a><span class="kw">pub use </span>types::{JobId, JobKind, JobRecord, JobResources, JobSpec, JobStatus};</code></pre></div></section></main></body></html>
+<a href=#17 id=17 data-nosnippet>17</a><span class="kw">pub use </span>scheduler::{
+<a href=#18 id=18 data-nosnippet>18</a>    schedule_from_context, schedule_pending, schedule_with_workers, ScheduleOutcome, VmCandidate,
+<a href=#19 id=19 data-nosnippet>19</a>    WorkerCandidate,
+<a href=#20 id=20 data-nosnippet>20</a>};
+<a href=#21 id=21 data-nosnippet>21</a><span class="kw">pub use </span>store::{data_dir_from_env, JobStore};
+<a href=#22 id=22 data-nosnippet>22</a><span class="kw">pub use </span>types::{JobId, JobKind, JobRecord, JobResources, JobScheduleBinding, JobSpec, JobStatus};</code></pre></div></section></main></body></html>
