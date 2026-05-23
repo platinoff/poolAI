@@ -806,3 +806,42 @@ textarea:focus-visible,
   font-weight: var(--font-weight-semibold, 600);
   border-left: 3px solid var(--primary, #67e480);
 }
+
+/* FM-037 — topology graph + latency heatmap */
+.topology-graph-wrap {
+  width: 100%;
+  min-height: 360px;
+  margin-bottom: var(--spacing-6, 24px);
+  padding: var(--spacing-4, 16px);
+  background: var(--surface-secondary, #1e2329);
+  border: 1px solid var(--border, #262b36);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+.topology-graph-wrap svg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+.topology-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-4, 16px);
+  margin-top: var(--spacing-3, 12px);
+  font-size: var(--font-size-sm, 14px);
+  color: var(--text-muted, #a8b0bf);
+}
+.topology-heatmap-table th,
+.topology-heatmap-table td {
+  text-align: center;
+  font-size: var(--font-size-sm, 14px);
+  min-width: 4rem;
+}
+.topo-heat-cell {
+  font-variant-numeric: tabular-nums;
+}
+.topo-heat-diagonal,
+.topo-heat-empty {
+  color: var(--text-muted, #a8b0bf);
+}

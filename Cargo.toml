@@ -264,6 +264,11 @@ name = "ml_versioning_integration"
 path = "tests/ml_versioning_integration.rs"
 required-features = ["ml"]
 
+[[test]]
+name = "job_scheduler_pool_binding"
+path = "tests/job_scheduler_pool_binding.rs"
+required-features = ["test-utils"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)

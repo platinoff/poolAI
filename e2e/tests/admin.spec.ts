@@ -72,11 +72,13 @@ test.describe("PoolAI admin E2E (S27–S34)", () => {
     ).toBeVisible();
   });
 
-  test("topology page loads stats and nodes table", async ({ page }) => {
+  test("topology page loads stats, graph, and nodes table", async ({ page }) => {
     await page.goto("/ui/admin/topology");
     await expect(page.locator("#topology-node-count")).toBeVisible({
       timeout: 20_000,
     });
+    await expect(page.locator("#topology-graph-svg")).toBeVisible();
+    await expect(page.locator("#topology-latency-heatmap")).toBeVisible();
     await expect(page.locator("#topology-nodes-list")).toBeVisible();
     await expect(
       page.locator("#topology-nodes-tbody .admin-table, tr, .muted").first(),
