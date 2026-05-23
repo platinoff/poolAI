@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** FM-045 / **PH-S09** — design tokens + admin table/form helpers. FM-044 TLS · FM-043 Prometheus. Кодова черга FM-001…045 **закрита**. **Наступна:** **PH-S10** admin charts (`NEXT_SESSION_PROMPT.md`).
+**Maintenance (2026-05-23):** `54543028` — PH-S07…S09 (FM-043 Prometheus, FM-044 TLS, FM-045 design system). Кодова черга FM-001…045 **закрита**. **Наступна:** **PH-S10** admin charts (`NEXT_SESSION_PROMPT.md`).
 
 ## 1. Канонічний порядок документації та планів
 

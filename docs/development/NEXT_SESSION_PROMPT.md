@@ -1,13 +1,13 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-23 · **HEAD:** _(після push — `git log -1 --oneline`)_ · **FM-001…045 ✅**
+**Оновлено:** 2026-05-23 · **HEAD:** `54543028` · **FM-001…045 ✅**
 
 Скопіюй блок нижче в новий чат (Agent mode, MSYS2 bash).
 
 ---
 
 ```
-PoolAI — PH-S10 (admin charts / real-time graphs). FM-020…045 закрито на main.
+PoolAI — PH-S10 (admin charts / real-time graphs). FM-020…045 на main @ 54543028.
 
 ## S0
 1. MSYS2 bash: git fetch; git status -sb; git log -1 --oneline
