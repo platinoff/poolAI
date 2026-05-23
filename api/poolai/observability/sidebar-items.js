@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["apply_http_trace","init_tracing"],"struct":["OtelGuard"]};
+window.SIDEBAR_ITEMS = {"fn":["apply_http_trace","init_tracing","make_http_span"],"struct":["OtelGuard"]};
