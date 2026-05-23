@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 
 use crate::core::error::AppError;
-use crate::job::{allows_transition, JobRecord, JobStatus};
+use crate::job::{allows_transition, JobRecord, JobSpec, JobStatus};
 
 pub(crate) const JOBS_FILE: &str = "jobs.json";
 
@@ -131,7 +131,20 @@ impl JobStore {
 
     /// FM-020: transition all `Submitted` rows to `Scheduled` (priority desc), then persist once.
     pub fn promote_submitted_to_scheduled(&self) -> Result<usize, AppError> {
-        let scheduled = {
+        let (scheduled, _, _) = self
+            .promote_submitted_to_scheduled_with(|_| crate::job::JobScheduleBinding::default())?;
+        Ok(scheduled)
+    }
+
+    /// FM-034: promote `Submitted` → `Scheduled` and apply optional worker/VM bindings.
+    pub fn promote_submitted_to_scheduled_with<F>(
+        &self,
+        mut assign: F,
+    ) -> Result<(usize, usize, usize), AppError>
+    where
+        F: FnMut(&JobSpec) -> crate::job::JobScheduleBinding,
+    {
+        let (scheduled, bound_workers, bound_vms) = {
             let mut guard = self
                 .jobs
                 .lock()
@@ -144,15 +157,26 @@ impl JobStore {
                 .collect();
             indices.sort_by(|&a, &b| guard[b].spec.priority.cmp(&guard[a].spec.priority));
             let count = indices.len();
+            let mut bound_workers = 0usize;
+            let mut bound_vms = 0usize;
             for i in indices {
+                let binding = assign(&guard[i].spec);
                 guard[i].status = JobStatus::Scheduled;
+                if binding.worker_id.is_some() {
+                    bound_workers += 1;
+                }
+                if binding.vm_id.is_some() {
+                    bound_vms += 1;
+                }
+                guard[i].worker_id = binding.worker_id;
+                guard[i].vm_id = binding.vm_id;
             }
-            count
+            (count, bound_workers, bound_vms)
         };
         if scheduled > 0 {
             self.persist()?;
         }
-        Ok(scheduled)
+        Ok((scheduled, bound_workers, bound_vms))
     }
 
     fn persist(&self) -> Result<(), AppError> {
@@ -272,6 +296,8 @@ mod tests {
             },
             status: JobStatus::Submitted,
             created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
         };
 
         {
@@ -304,6 +330,8 @@ mod tests {
             },
             status: JobStatus::Scheduled,
             created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
         };
 
         {
@@ -335,6 +363,8 @@ mod tests {
             },
             status: JobStatus::Submitted,
             created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
         };
         store.push(record).expect("push");
         let err = store
@@ -364,6 +394,8 @@ mod tests {
             },
             status: JobStatus::Submitted,
             created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
         };
 
         {

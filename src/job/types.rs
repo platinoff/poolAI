@@ -86,10 +86,25 @@ pub struct JobSpec {
     pub deadline: Option<DateTime<Utc>>,
 }
 
+/// Optional VM/worker target chosen by the scheduler (FM-034).
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct JobScheduleBinding {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vm_id: Option<String>,
+}
+
 /// Stored job row for HTTP stub / metrics.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct JobRecord {
     pub spec: JobSpec,
     pub status: JobStatus,
     pub created_at: DateTime<Utc>,
+    /// Pool worker assigned at schedule time (FM-034).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub worker_id: Option<String>,
+    /// Running VM instance assigned at schedule time (FM-034).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub vm_id: Option<String>,
 }

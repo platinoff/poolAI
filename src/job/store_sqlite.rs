@@ -117,6 +117,8 @@ mod tests {
             },
             status: JobStatus::Submitted,
             created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
         }
     }
 

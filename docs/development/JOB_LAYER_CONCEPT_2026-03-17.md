@@ -81,7 +81,7 @@ PoolAI вже реалізує:
 - [x] Scheduler MVP (`Submitted`→`Scheduled`) — `src/job/scheduler.rs`, `POST /api/v1/jobs/schedule` (FM-020, 2026-05-20).
 - [x] `PATCH /api/v1/jobs/{id}` lifecycle status — `lifecycle.rs`, FM-021 (2026-05-20).
 - [x] HTTP contract tests — `tests/jobs_api_contracts.rs`, FM-026 (2026-05-20).
-- VM binding для JobSpec — FM-023+.
+- [x] VM/worker binding on schedule — FM-034 (`JobRecord.worker_id`/`vm_id`, pool/VM placement).
 - [x] Персистентний job store (JSON file) — `POOLAI_JOB_DATA_DIR`, `src/job/store.rs` (2026-05-20).
 - [x] SQLite job store (optional `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, migrate JSON) — FM-029 (2026-05-20).
 - RAID-backed store — deferred.

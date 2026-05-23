@@ -60,6 +60,8 @@ fn ingest_job(
         spec,
         status: JobStatus::Submitted,
         created_at: Utc::now(),
+        worker_id: None,
+        vm_id: None,
     };
     jobs.push(record)?;
     schedule_pending(jobs)?;
@@ -131,6 +133,8 @@ mod tests {
             },
             status: JobStatus::Scheduled,
             created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
         })
         .expect("push");
 

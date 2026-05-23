@@ -1,37 +1,39 @@
-# Промпт наступної автономної сесії (PoolAI)
+# Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-22 · **Фаза:** Legacy backlog → **FM-034…042** · Post-Horizon **FM-020…035 ✅**
+**Оновлено:** 2026-05-23 · **Фаза:** FM-036…042 · Post-Horizon **FM-020…035 ✅** · FM-034 ✅ (цей push)
+
+Скопіюй блок нижче в новий чат Cursor (Agent mode, MSYS2 bash для git/cargo).
 
 ---
 
-## Промпт
-
 ```
-PoolAI — розробка FM-034 (наступна в §5.1). Post-Horizon + FM-035 закрито.
+PoolAI — розробка FM-036 (наступна в §5.1). FM-034 закрито (job scheduler → VM/worker binding).
 
 ## S0 — зріз
 
-1. git fetch && git status -sb
-2. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1 (черга FM-034…042)
-3. runtime-stack-policy.mdc · autonomous-orchestrator.mdc
+1. MSYS2 bash: git fetch; git status -sb; git log -1 --oneline
+2. df -h /s (якщо Avail <5G → cargo clean перед test-ci)
+3. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1 · poolai-session-iteration.mdc
 
-Не повторювати: FM-020…035; Solana adapter FM-033; FM-035 model_loader.
+Не повторювати: FM-020…035; FM-033 Solana; FM-034 job scheduler binding.
 
-## Мета сесії — FM-034
+## Мета сесії — FM-036
 
-Job scheduler → VM/worker binding (beyond in-process tick)
-(`src/runtime/scheduler.rs`, Architect P6).
+Tensor sharding runtime (`sharding.rs`, inter-worker sync, benches).
+Канон: EXO plan §3.1–3.2, Architect P6.
 
-## Черга після FM-034 (одна FM / сесію)
+## Черга після FM-036 (одна FM / сесію)
 
 | # | FM | Фокус |
 |---|-----|--------|
-| 2 | FM-036 | Tensor sharding runtime |
-| 3–7 | FM-040,037,039,038,042 | UI audit, topology graph, Playwright CI, OTel, perf |
+| 2 | FM-040 | Admin UI field audit |
+| 3–6 | FM-037,039,038,042 | Topology graph, Playwright CI, OTel, perf |
 
 Ops BLOCKED: FM-003 §4 LAN (2 хости) — лише verify-lan-prep / runbook.
 
-Завершення: src/ → cargo fmt → cargo test-ci; push MSYS2 з Summary (git-push.md).
-```
+## Завершення
 
-**§5.1 канон:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md). **Legacy audit:** §5.8.
+src/ → cargo fmt --all → cargo test-ci (K8S_OPENAPI_ENABLED_VERSION=1.28)
+git: MSYS2, staging лише FM-036, GIT_EDITOR=true, git log -1 перевірка subject
+push + Summary у коміті (git-push.md) · оновити HANDOFF + §5.1 → FM-040 next
+```

@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
-use crate::job::{schedule_pending, JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
+use crate::job::{schedule_from_context, JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
 use crate::network::api::common::HttpAppError;
 
 #[derive(Deserialize)]
@@ -31,6 +31,10 @@ struct JobSummary {
     kind: JobKind,
     status: JobStatus,
     created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    worker_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    vm_id: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -46,6 +50,8 @@ struct JobDetailResponse {
 #[derive(Serialize)]
 struct ScheduleJobsResponse {
     scheduled: usize,
+    bound_workers: usize,
+    bound_vms: usize,
 }
 
 #[derive(Deserialize)]
@@ -73,13 +79,15 @@ async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListRespon
             kind: r.spec.kind,
             status: r.status,
             created_at: r.created_at.to_rfc3339(),
+            worker_id: r.worker_id,
+            vm_id: r.vm_id,
         })
         .collect();
     Ok(Json(JobsListResponse { jobs }))
 }
 
 async fn create_job(
-    State(_ctx): State<ApiContext>,
+    State(ctx): State<ApiContext>,
     Json(body): Json<CreateJobRequest>,
 ) -> Result<(StatusCode, Json<JobSummary>), HttpAppError> {
     let id = JobId::new(uuid::Uuid::new_v4().to_string());
@@ -97,9 +105,11 @@ async fn create_job(
         spec: spec.clone(),
         status: JobStatus::Submitted,
         created_at: Utc::now(),
+        worker_id: None,
+        vm_id: None,
     };
     store().push(record)?;
-    schedule_pending(store())?;
+    schedule_from_context(&ctx, store()).await?;
     let scheduled = store()
         .get(&id.0)?
         .ok_or_else(|| AppError::InternalError("job missing after create".into()))?;
@@ -108,15 +118,21 @@ async fn create_job(
         kind: scheduled.spec.kind,
         status: scheduled.status,
         created_at: scheduled.created_at.to_rfc3339(),
+        worker_id: scheduled.worker_id,
+        vm_id: scheduled.vm_id,
     };
     Ok((StatusCode::CREATED, Json(summary)))
 }
 
 async fn schedule_jobs(
-    State(_ctx): State<ApiContext>,
+    State(ctx): State<ApiContext>,
 ) -> Result<Json<ScheduleJobsResponse>, HttpAppError> {
-    let scheduled = schedule_pending(store())?;
-    Ok(Json(ScheduleJobsResponse { scheduled }))
+    let outcome = schedule_from_context(&ctx, store()).await?;
+    Ok(Json(ScheduleJobsResponse {
+        scheduled: outcome.scheduled,
+        bound_workers: outcome.bound_workers,
+        bound_vms: outcome.bound_vms,
+    }))
 }
 
 async fn get_job(

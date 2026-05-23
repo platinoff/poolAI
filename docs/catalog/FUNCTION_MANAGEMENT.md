@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-22 (FM-035 ✅ real model loading; наступна **FM-034**; Post-Horizon FM-020…035 ✅).
+**Оновлено:** 2026-05-23 (FM-034 ✅ job scheduler VM/worker binding; наступна **FM-036**; Post-Horizon FM-020…035 ✅).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -130,7 +130,7 @@ FM-xxx (з таблиці нижче)
 | FM-031 | UI / a11y | Розширення pa11y/axe admin URLs | **Implemented ✅** | `pa11y-ci.sh` 21 URLs; `e2e/tests/a11y.spec.ts` |
 | FM-032 | OpenAPI | `VmNetwork` + `NetworkIsolationConfig` body schemas | **Implemented ✅** | `openapi.yaml` components + `/vm/networks*` refs; gap audit exit 0 |
 | FM-033 | Solana | On-chain program prototype + real devnet RPC submit | **Implemented ✅** | `program/poolai-events`, `rpc/devnet.rs`, `POOLAI_SOLANA_KEYPAIR_PATH` |
-| FM-034 | Job layer | Scheduler → VM/worker binding (beyond in-process tick) | **Planned** | `scheduler.rs` «without VM binding»; Architect P6 |
+| FM-034 | Job layer | Scheduler → VM/worker binding (beyond in-process tick) | **Implemented ✅** | `src/job/scheduler.rs`, `JobRecord.worker_id`/`vm_id`, `tests/job_scheduler_pool_binding.rs` |
 | FM-035 | Runtime / ML | Real model loading (libtorch/onnx path, not metadata-only) | **Implemented ✅** | `src/runtime/model_loader.rs`, `instance.rs` (`LoadedModelHandle`, SHA256 fingerprint) |
 | FM-036 | Runtime | Tensor / pipeline parallelism (`sharding`, inter-worker sync) | **Planned** | EXO plan §3.1–3.2; no `sharding.rs` yet |
 | FM-037 | UI | Cluster topology graph (D3/vis + latency matrix) | **Partial** | API + table UI ✅; graph viz — backlog |
@@ -147,18 +147,17 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
-| **1** | Job → VM/worker | **FM-034** | bind scheduler output до pool/worker |
-| **2** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
-| **3** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
-| **4** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
-| **5** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
-| **6** | OpenTelemetry | **FM-038** | tracing middleware + export |
-| **7** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
-| **8** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| **1** | Tensor sharding runtime | **FM-036** | `sharding.rs`, sync, benches |
+| **2** | Admin UI field audit | **FM-040** | звірка полів vs API; +contract tests |
+| **3** | Topology graph UI | **FM-037** | D3/vis на `admin/topology.rs` |
+| **4** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
+| **5** | OpenTelemetry | **FM-038** | tracing middleware + export |
+| **6** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
+| **7** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
 **Закрито (не в черзі):** FM-001…035; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
 
-**Якість збірки:** `cargo test-ci` після `src/` — останній зріз 2026-05-20 (`f00bb1d4`).
+**Якість збірки:** `cargo test-ci` після `src/` — останній зріз FM-034 (2026-05-23).
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -202,7 +201,7 @@ FM-xxx (з таблиці нижче)
 | `UI_QUALITY_AND_E2E_PLAN` §P1 | Admin field audit | **FM-040** | **Partial** |
 | `CLOUD_SDK_PROGRESS_2026-01-19` | GCP/Azure auth deep | **FM-041** | **Deferred** |
 | `PERCENTAGE_PLAN` / P4 | Hot-path profiling | **FM-042** | **Planned** |
-| `NEXT_STEPS_ARCHITECT` L234 | Job scheduler → VM bind | **FM-034** | **Planned** |
+| `NEXT_STEPS_ARCHITECT` L234 | Job scheduler → VM bind | **FM-034** | **✅** |
 | Architect L123 | LAN replication + TQ01 на стенді | **FM-003** | **BLOCKED** |
 | Architect L183 | Azure/GCP `cloud-sdk` | **✅ S39** | REST + mock tests; `CLOUD_SDK_STATUS.md` |
 | FM-003 | §4 acceptance у runbook | **BLOCKED** | §5.1 dev stand ✅; ops **2026-06-01** |
@@ -273,7 +272,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-034** (job scheduler → VM/worker) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
+**Наступна сесія:** **FM-036** (tensor sharding runtime) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

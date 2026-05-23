@@ -341,7 +341,7 @@ paths:
       tags:
         - Jobs
       summary: Submit a job
-      description: Creates job as `submitted`, then in-process scheduler promotes to `scheduled` (FM-020 MVP; no VM bind).
+      description: Creates job as `submitted`, then scheduler promotes to `scheduled` and binds to pool worker / running VM when available (FM-034).
       operationId: createJob
       requestBody:
         required: true
@@ -368,7 +368,7 @@ paths:
       tags:
         - Jobs
       summary: Run scheduler tick
-      description: Promotes all `submitted` jobs to `scheduled` (priority descending). Idempotent for already scheduled rows.
+      description: Promotes all `submitted` jobs to `scheduled` (priority descending) and binds to pool workers / running VM instances when available (FM-034). Idempotent for already scheduled rows.
       operationId: scheduleJobs
       responses:
         '200':
@@ -5110,6 +5110,14 @@ components:
         created_at:
           type: string
           format: date-time
+        worker_id:
+          type: string
+          nullable: true
+          description: Pool worker bound at schedule time (FM-034)
+        vm_id:
+          type: string
+          nullable: true
+          description: Running VM instance bound at schedule time (FM-034)
 
     JobsListResponse:
       type: object
@@ -5209,6 +5217,14 @@ components:
         created_at:
           type: string
           format: date-time
+        worker_id:
+          type: string
+          nullable: true
+          description: Pool worker bound at schedule time (FM-034)
+        vm_id:
+          type: string
+          nullable: true
+          description: Running VM instance bound at schedule time (FM-034)
 
     JobDetailResponse:
       type: object
@@ -5233,6 +5249,14 @@ components:
           type: integer
           minimum: 0
           description: Count of jobs promoted from submitted to scheduled in this tick
+        bound_workers:
+          type: integer
+          minimum: 0
+          description: Count of jobs assigned a pool worker in this tick (FM-034)
+        bound_vms:
+          type: integer
+          minimum: 0
+          description: Count of jobs assigned a running VM instance in this tick (FM-034)
 
     GridEnvelope:
       type: object
