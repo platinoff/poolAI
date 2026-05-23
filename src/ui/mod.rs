@@ -2862,7 +2862,7 @@ function applyTheme(themeName) {
     },
     'high-contrast': {
       bg: '#000000', surface: '#1a1a1a', surfaceSecondary: '#000000',
-      text: '#ffffff', textMuted: '#cccccc', border: '#ffffff',
+      text: '#ffffff', textMuted: '#e0e0e0', border: '#ffffff',
       primary: '#00ff00', primaryHover: '#00cc00',
       danger: '#ff0000', dangerHover: '#cc0000',
       secondary: '#ffff00', secondaryHover: '#cccc00',
@@ -2891,6 +2891,7 @@ function applyTheme(themeName) {
   root.style.setProperty('--info', theme.info);
   root.style.setProperty('--link', theme.link);
   root.style.setProperty('--link-hover', theme.linkHover);
+  document.documentElement.dataset.poolaiTheme = themeName;
 }
 
 // Progress Bar functions

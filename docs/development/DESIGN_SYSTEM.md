@@ -34,6 +34,8 @@ concat!(include_str!("../design_tokens.css"), include_str!("../admin_styles.css"
 
 | Function | Purpose |
 |----------|---------|
+| `poolaiApplyTheme` | Applies dark / light / **high-contrast** CSS variables (PH-S12 / PH-S14) |
+| `poolaiNormalizeTheme` | Maps stored `poolai_theme` to supported admin theme id |
 | `adminApplyDesignSystem(root)` | Adds table/form classes to dynamic admin DOM |
 | `adminRenderTable(headers, rows)` | HTML for striped table |
 | `adminFormFieldHtml(spec)` | One `form-group` field (`type`: text, select, textarea) |
@@ -65,4 +67,14 @@ document.getElementById('list').innerHTML = adminRenderTable(
 );
 ```
 
-**Last updated:** 2026-05-23 (PH-S10 charts layer).
+**Last updated:** 2026-05-23 (PH-S14 high-contrast admin theme + axe contrast).
+
+## Themes (PH-S14)
+
+| Theme | Admin (`admin_common.js`) | Dashboard (`mod.rs` / `themes.rs`) |
+|-------|---------------------------|-------------------------------------|
+| `dark` | default | default |
+| `light` | ✅ | ✅ |
+| `high-contrast` | ✅ PH-S14 | ✅ |
+
+E2E: `e2e/tests/a11y.spec.ts` — axe `color-contrast` with `localStorage.poolai_theme=high-contrast` on login + admin routes.

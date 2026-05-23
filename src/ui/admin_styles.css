@@ -183,7 +183,7 @@ body {
 
 .admin-lang-bar .btn-lang.active {
   background: var(--primary);
-  color: #0f1216;
+  color: var(--bg);
   border-color: var(--primary);
 }
 
@@ -212,6 +212,61 @@ body {
 }
 .poolai-bootstrap-banner-host code {
   font-size: 0.9em;
+}
+
+[data-poolai-theme="high-contrast"] .poolai-bootstrap-banner-host {
+  border-color: var(--warning);
+  background: var(--surface);
+  color: var(--text);
+}
+
+[data-poolai-theme="high-contrast"] .admin-fetch-error {
+  background: var(--surface);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* PH-S14: high-contrast — solid buttons; no ripple/hover color bleed (axe color-contrast) */
+[data-poolai-theme="high-contrast"] .btn::before {
+  display: none !important;
+}
+
+[data-poolai-theme="high-contrast"] .btn:hover {
+  color: var(--text);
+  background: var(--surface-secondary);
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
+}
+
+[data-poolai-theme="high-contrast"] .btn-primary,
+[data-poolai-theme="high-contrast"] .btn-primary:hover {
+  background: #004400 !important;
+  color: #ffffff !important;
+  border-color: #00ff00 !important;
+  box-shadow: none !important;
+}
+
+[data-poolai-theme="high-contrast"] .btn-danger,
+[data-poolai-theme="high-contrast"] .btn-danger:hover {
+  background: #990000 !important;
+  color: #ffffff !important;
+  border-color: #ff0000 !important;
+  box-shadow: none !important;
+}
+
+[data-poolai-theme="high-contrast"] .admin-nav-item.active,
+[data-poolai-theme="high-contrast"] .admin-nav-item[aria-current="page"] {
+  background: #004400 !important;
+  color: #ffffff !important;
+  border-color: #00ff00 !important;
+  box-shadow: none !important;
+}
+
+[data-poolai-theme="high-contrast"] .admin-lang-bar .btn-lang.active {
+  background: #004400 !important;
+  color: #ffffff !important;
+  border-color: #00ff00 !important;
 }
 
 .admin-content {
@@ -352,7 +407,7 @@ body {
 
 .btn-danger {
   background: var(--danger);
-  color: white;
+  color: #fff;
   border-color: var(--danger);
   font-weight: 600;
 }

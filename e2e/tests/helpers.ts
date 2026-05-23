@@ -3,13 +3,15 @@ import { expect, type Locator, type Page } from "@playwright/test";
 export const e2eUser = process.env.POOLAI_E2E_USER ?? "admin";
 export const e2ePassword = process.env.POOLAI_E2E_PASSWORD ?? "admin123";
 
-export type VisualTheme = "dark" | "light";
+export type UiTheme = "dark" | "light" | "high-contrast";
+/** @deprecated use UiTheme */
+export type VisualTheme = UiTheme;
 export type VisualLang = "en" | "uk";
 
 /** Set theme/locale in localStorage before the first navigation. */
 export async function primeUiPrefs(
   page: Page,
-  prefs: { theme?: VisualTheme; lang?: VisualLang },
+  prefs: { theme?: UiTheme; lang?: VisualLang },
 ): Promise<void> {
   await page.addInitScript((p) => {
     if (p.theme) localStorage.setItem("poolai_theme", p.theme);
@@ -28,7 +30,7 @@ export function matrixSnapshotName(
 /** Log in via /ui/login and wait for dashboard. */
 export async function loginAsAdmin(
   page: Page,
-  prefs?: { theme?: VisualTheme; lang?: VisualLang },
+  prefs?: { theme?: UiTheme; lang?: VisualLang },
 ): Promise<void> {
   if (prefs) {
     await primeUiPrefs(page, prefs);

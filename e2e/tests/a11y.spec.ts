@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { loginAsAdmin } from "./helpers";
+import { loginAsAdmin, primeUiPrefs } from "./helpers";
 
 /** FM-019 S33 + FM-031: axe in Playwright (complements pa11y CI). */
 const criticalAndSerious = (violations: { impact?: string | null }[]) =>
@@ -30,6 +30,17 @@ const ADMIN_AXE_PAGES: { path: string; waitFor: string }[] = [
   { path: "/ui/admin/raid", waitFor: "#raid-admin" },
 ];
 
+/** PH-S14: representative pages for high-contrast axe (login + admin shell). */
+const HC_AXE_PAGES: {
+  path: string;
+  waitFor: string;
+  auth?: boolean;
+}[] = [
+  { path: "/ui/login", waitFor: "#loginForm", auth: false },
+  { path: "/ui/admin/users", waitFor: "#users-list", auth: true },
+  { path: "/ui/admin/monitoring", waitFor: "#monitoring-content", auth: true },
+];
+
 test.describe("axe accessibility (S33, FM-031)", () => {
   test("login page — no critical/serious violations", async ({ page }) => {
     await page.goto("/ui/login");
@@ -43,6 +54,34 @@ test.describe("axe accessibility (S33, FM-031)", () => {
       await page.goto(path);
       await page.locator(waitFor).waitFor({ state: "visible", timeout: 20_000 });
       const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+      expect(criticalAndSerious(results.violations)).toEqual([]);
+    });
+  }
+});
+
+test.describe("axe high-contrast color-contrast (PH-S14)", () => {
+  for (const { path, waitFor, auth = false } of HC_AXE_PAGES) {
+    test(`${path} high-contrast — no critical/serious contrast violations`, async ({
+      page,
+    }) => {
+      await primeUiPrefs(page, { theme: "high-contrast" });
+      if (auth) {
+        await loginAsAdmin(page, { theme: "high-contrast" });
+      }
+      await page.goto(path);
+      await page.locator(waitFor).waitFor({ state: "visible", timeout: 20_000 });
+      if (auth) {
+        await page.evaluate(() => {
+          const w = window as Window & {
+            poolaiApplyTheme?: (t: string) => void;
+          };
+          w.poolaiApplyTheme?.("high-contrast");
+        });
+      }
+      const results = await new AxeBuilder({ page })
+        .withTags(AXE_TAGS)
+        .withRules(["color-contrast"])
+        .analyze();
       expect(criticalAndSerious(results.violations)).toEqual([]);
     });
   }

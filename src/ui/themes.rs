@@ -82,7 +82,7 @@ pub const HIGH_CONTRAST_THEME: Theme = Theme {
     surface: "#1a1a1a",
     surface_secondary: "#000000",
     text: "#ffffff",
-    text_muted: "#cccccc",
+    text_muted: "#e0e0e0",
     border: "#ffffff",
     primary: "#00ff00",
     primary_hover: "#00cc00",
@@ -166,6 +166,16 @@ impl Theme {
     border-color: var(--primary);
     color: var(--bg);
   }}
+  [data-poolai-theme="high-contrast"] .btn-primary {{
+    background: #006600;
+    border-color: #00ff00;
+    color: #ffffff;
+  }}
+  [data-poolai-theme="high-contrast"] .btn-danger {{
+    background: #cc0000;
+    border-color: #ff0000;
+    color: #ffffff;
+  }}
   .btn-primary:hover {{
     background: var(--primary-hover);
   }}
@@ -180,7 +190,7 @@ impl Theme {
   .btn-secondary {{
     background: var(--secondary);
     border-color: var(--secondary);
-    color: #fff;
+    color: var(--bg);
   }}
   .btn-secondary:hover {{
     background: var(--secondary-hover);

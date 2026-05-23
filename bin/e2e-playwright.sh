@@ -97,6 +97,9 @@ fi
 
 if [[ ${#PLAYWRIGHT_ARGS[@]} -gt 0 ]]; then
   npx playwright test visual "${PLAYWRIGHT_ARGS[@]}"
+elif [[ -n "${POOLAI_E2E_FILTER:-}" ]]; then
+  # shellcheck disable=SC2086
+  npx playwright test ${POOLAI_E2E_FILTER}
 else
   npm test
 fi

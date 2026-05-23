@@ -140,4 +140,4 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 - ~~`PA11Y_WCAG22` у CI~~ — **Partial ✅ S11** (`a11y.yml` env).
 - ~~Повний merge gate у `ci.yml`~~ — **Partial ✅ S22** (`pa11y-wcag22` + `pa11y-contract`; paths-filter).
 
-**Last updated:** 2026-05-20 — FM-031: `/ui/admin/{vm,workers,libs,raid}` у pa11y + axe Playwright matrix.
+**Last updated:** 2026-05-23 — PH-S14 high-contrast theme + Playwright axe `color-contrast` (`e2e/tests/a11y.spec.ts`, `bin/e2e-a11y-hc.sh`).

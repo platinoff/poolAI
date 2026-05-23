@@ -9,7 +9,7 @@ function poolaiT(key, enFallback) {
   return enFallback !== undefined ? enFallback : key;
 }
 
-/** PH-S12 / themes.rs: dark + light tokens for admin shell (CSS variables). */
+/** PH-S12 / PH-S14: dark + light + high-contrast tokens (aligned with themes.rs). */
 const POOLAI_UI_THEMES = {
   dark: {
     bg: '#0f1216',
@@ -20,6 +20,8 @@ const POOLAI_UI_THEMES = {
     border: '#262b36',
     primary: '#67e480',
     primaryHover: '#50fa7b',
+    secondary: '#6272a4',
+    secondaryHover: '#7a8bc4',
     danger: '#c62828',
     dangerHover: '#e53935',
     warning: '#ffb86c',
@@ -37,6 +39,8 @@ const POOLAI_UI_THEMES = {
     border: '#d0d0d0',
     primary: '#00a86b',
     primaryHover: '#00c47a',
+    secondary: '#6c757d',
+    secondaryHover: '#5a6268',
     danger: '#dc3545',
     dangerHover: '#c82333',
     warning: '#ffc107',
@@ -45,10 +49,35 @@ const POOLAI_UI_THEMES = {
     link: '#007bff',
     linkHover: '#0056b3',
   },
+  'high-contrast': {
+    bg: '#000000',
+    surface: '#1a1a1a',
+    surfaceSecondary: '#000000',
+    text: '#ffffff',
+    textMuted: '#e0e0e0',
+    border: '#ffffff',
+    primary: '#00ff00',
+    primaryHover: '#00cc00',
+    secondary: '#ffff00',
+    secondaryHover: '#cccc00',
+    danger: '#ff0000',
+    dangerHover: '#cc0000',
+    warning: '#ffff00',
+    info: '#00ffff',
+    success: '#00ff00',
+    link: '#00aaff',
+    linkHover: '#0088cc',
+  },
 };
 
+function poolaiNormalizeTheme(name) {
+  if (name === 'light' || name === 'high-contrast') return name;
+  return 'dark';
+}
+
 function poolaiApplyTheme(themeName) {
-  const theme = POOLAI_UI_THEMES[themeName] || POOLAI_UI_THEMES.dark;
+  const normalized = poolaiNormalizeTheme(themeName);
+  const theme = POOLAI_UI_THEMES[normalized] || POOLAI_UI_THEMES.dark;
   const root = document.documentElement;
   root.style.setProperty('--bg', theme.bg);
   root.style.setProperty('--surface', theme.surface);
@@ -58,6 +87,8 @@ function poolaiApplyTheme(themeName) {
   root.style.setProperty('--border', theme.border);
   root.style.setProperty('--primary', theme.primary);
   root.style.setProperty('--primary-hover', theme.primaryHover);
+  root.style.setProperty('--secondary', theme.secondary);
+  root.style.setProperty('--secondary-hover', theme.secondaryHover);
   root.style.setProperty('--danger', theme.danger);
   root.style.setProperty('--danger-hover', theme.dangerHover);
   root.style.setProperty('--warning', theme.warning);
@@ -65,6 +96,7 @@ function poolaiApplyTheme(themeName) {
   root.style.setProperty('--success', theme.success);
   root.style.setProperty('--link', theme.link);
   root.style.setProperty('--link-hover', theme.linkHover);
+  root.dataset.poolaiTheme = normalized;
 }
 
 function poolaiInitThemeFromStorage() {
@@ -74,12 +106,12 @@ function poolaiInitThemeFromStorage() {
   } catch (e) {
     name = 'dark';
   }
-  if (name !== 'light') name = 'dark';
-  poolaiApplyTheme(name);
+  poolaiApplyTheme(poolaiNormalizeTheme(name));
 }
 
 window.poolaiApplyTheme = poolaiApplyTheme;
 window.poolaiInitThemeFromStorage = poolaiInitThemeFromStorage;
+window.poolaiNormalizeTheme = poolaiNormalizeTheme;
 
 // API base URL
 const API_BASE = '/api/v1';

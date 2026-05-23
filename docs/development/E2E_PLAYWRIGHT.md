@@ -6,7 +6,7 @@
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
 | `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm; **libs** (`#libraries-list`) |
-| `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0) |
+| `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).

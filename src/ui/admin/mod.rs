@@ -213,6 +213,14 @@ fn admin_common_fm019_modal_a11y_helpers() {
 }
 
 #[test]
+fn admin_common_ph_s14_high_contrast_theme() {
+    let js = include_str!("../admin_common.js");
+    assert!(js.contains("'high-contrast'"));
+    assert!(js.contains("function poolaiNormalizeTheme"));
+    assert!(js.contains("POOLAI_UI_THEMES['high-contrast']") || js.contains("'high-contrast': {"));
+}
+
+#[test]
 fn admin_layout_includes_design_tokens_css() {
     let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
     let body = html.0;
