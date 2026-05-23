@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** `54543028` — PH-S07…S09 (FM-043 Prometheus, FM-044 TLS, FM-045 design system). **PH-S10 ✅** — `admin_charts.js` (line/sparkline charts, polling), `monitoring.rs` + `dashboard.rs` refactor, `DESIGN_SYSTEM.md`. **PH-S11 ✅** — Playwright visual regression (`e2e/tests/visual.spec.ts`, 11 baselines, [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)). **PH-S12 ✅** — theme (dark/light) + i18n (EN/UK) matrix (+12 snapshots; `admin_common.js` `poolaiApplyTheme`). **PH-S13 ✅** — topology admin masked SVG visual (`topology.png`, `TOPOLOGY_VISUAL_MASKS`). **Наступна:** **PH-S14** high-contrast / axe contrast (`NEXT_SESSION_PROMPT.md`).
+**Maintenance (2026-05-23):** `54543028` — PH-S07…S09 (FM-043 Prometheus, FM-044 TLS, FM-045 design system). **PH-S10 ✅** — `admin_charts.js` (line/sparkline charts, polling), `monitoring.rs` + `dashboard.rs` refactor, `DESIGN_SYSTEM.md`. **PH-S11 ✅** — Playwright visual regression (`e2e/tests/visual.spec.ts`, 11 baselines, [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)). **PH-S12 ✅** — theme (dark/light) + i18n (EN/UK) matrix (+12 snapshots; `admin_common.js` `poolaiApplyTheme`). **PH-S13 ✅** — topology admin masked SVG visual (`topology.png`, `TOPOLOGY_VISUAL_MASKS`; commit `d37210f7`). **Наступна:** **PH-S14** high-contrast / axe contrast (`NEXT_SESSION_PROMPT.md`).
 
 ## 1. Канонічний порядок документації та планів
 
