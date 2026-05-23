@@ -30,16 +30,20 @@ bash bin/e2e-playwright.sh --start
 
 ## CI
 
-[`.github/workflows/e2e.yml`](../../.github/workflows/e2e.yml) — **`workflow_dispatch`** only (не блокує merge на `main`; pa11y залишається каноном a11y).
+| Workflow | Тригер | Job у `ci.yml` |
+|----------|--------|----------------|
+| [`.github/workflows/e2e.yml`](../../.github/workflows/e2e.yml) | `workflow_call` + `workflow_dispatch` | **Playwright admin E2E** (paths-filter: `ui` або `e2e`) |
+| [`.github/workflows/a11y.yml`](../../.github/workflows/a11y.yml) | `workflow_call` + `workflow_dispatch` | **Pa11y WCAG 2.2** (paths-filter: `ui`) |
 
-Рекомендовані required checks на `main`: `Pa11y script contract`, `Pa11y WCAG 2.2` (при зміні UI) — див. [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.2.
+**Paths-filter (`ci.yml` → `ui-changes`):** `e2e/**`, `bin/e2e-playwright.sh`, `src/ui/**`, `.github/workflows/e2e.yml`. Завжди на PR/push: **Pa11y script contract** (Rust-тест скрипта).
+
+Рекомендовані required checks на `main`: `Pa11y script contract`, `Pa11y WCAG 2.2` (при зміні UI), **Playwright admin E2E** (при зміні UI/e2e) — див. [`ADMIN_A11Y_RUNBOOK.md`](./ADMIN_A11Y_RUNBOOK.md) §3.2.
 
 ## Розширення backlog
 
-- axe Playwright (FM-019 backlog).
-- Підключити `workflow_call` з `ci.yml` після стабілізації часу прогону.
+- ~~`workflow_call` з `ci.yml`~~ **✅ FM-039** (2026-05-23)
 - ~~raid, topology, vm, workers~~ **✅ S31/S33**
 - ~~axe Playwright~~ **✅ S33** (`@axe-core/playwright`)
 - ~~libs admin~~ **✅ S34**
 
-**Last updated:** 2026-05-19 (S34 — admin E2E surface complete).
+**Last updated:** 2026-05-23 (FM-039 — Playwright у main CI via `workflow_call`).

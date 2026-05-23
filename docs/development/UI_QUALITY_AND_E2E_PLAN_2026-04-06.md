@@ -41,7 +41,7 @@
 |--------|-----------|-------------|
 | **A. API контракт** | Перевірка наявності ключів у JSON після змін handler’ів | `tests/*_integration.rs`, `serde_json::Value` |
 | **B. З авторизацією** | POST/PATCH/DELETE під Bearer (dev JWT або тестовий user) | Існуючі патерни `network_auth_integration` |
-| **C. E2E браузер (опційно)** | Сценарії «відкрити /ui → логін → дія» | **Partial ✅ S23:** Playwright у `e2e/`, `bin/e2e-playwright.sh`, [E2E_PLAYWRIGHT.md](./E2E_PLAYWRIGHT.md), workflow `e2e.yml` (`workflow_dispatch`) |
+| **C. E2E браузер** | Сценарії «відкрити /ui → логін → дія» | **✅ FM-039:** Playwright у `e2e/`, `bin/e2e-playwright.sh`, [E2E_PLAYWRIGHT.md](./E2E_PLAYWRIGHT.md), `ci.yml` → `e2e.yml` (`workflow_call`) |
 
 Рекомендація: тримати **A** в обов’язковому CI; **B** розширювати точково; **C** — коли стабілізується P1.
 

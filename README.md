@@ -70,7 +70,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 1. **UI_QUALITY P1** — admin JSON contracts — [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md); черга — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
 2. **FM-003 §4** — реальний LAN (**BLOCKED**, 2 хости); dev stand + `verify-dev-stand` ✅.
-3. **FM-019** — pa11y **Partial ✅** (S22: `ci.yml` `pa11y-contract` + `pa11y-wcag22`; 18 auth, `PA11Y_WCAG22`); Playwright — S23 backlog.
+3. **FM-019** — pa11y **Partial ✅** (S22: `ci.yml` `pa11y-contract` + `pa11y-wcag22`; 18 auth, `PA11Y_WCAG22`); Playwright admin E2E — **FM-039 ✅** (`ci.yml` → `e2e.yml`).
 4. **P4** — ✅ `poolai_health_load` **2026-05-18** у [`BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
 5. **Відкладено** — **FM-004**, **FM-006**; **концепт** — **FM-009**, **FM-010**.
 

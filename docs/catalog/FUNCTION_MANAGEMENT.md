@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-23 (FM-037 ✅ topology graph UI; наступна **FM-039**; Post-Horizon FM-020…040 ✅).
+**Оновлено:** 2026-05-23 (FM-039 ✅ Playwright у CI; наступна **FM-038**; Post-Horizon FM-020…040 ✅).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -135,7 +135,7 @@ FM-xxx (з таблиці нижче)
 | FM-036 | Runtime | Tensor / pipeline parallelism (`sharding`, inter-worker sync) | **Implemented ✅** | `src/runtime/sharding.rs`, `tests/sharding_tests.rs`, `benches/sharding_benchmarks.rs`; `pool/placement.rs` uses `tensor_placement_from_nodes` |
 | FM-037 | UI | Cluster topology graph (SVG force layout + latency heatmap) | **Implemented ✅** | `src/ui/topology_graph.js`, `admin/topology.rs`; Playwright topology graph |
 | FM-038 | Observability | OpenTelemetry distributed tracing | **Planned** | `NEXT_STEPS_2026-01-16`; no `opentelemetry` in `src/` |
-| FM-039 | CI / E2E | Playwright admin suite у `ci.yml` (`workflow_call`) | **Partial** | `e2e.yml` = `workflow_dispatch` only |
+| FM-039 | CI / E2E | Playwright admin suite у `ci.yml` (`workflow_call`) | **Implemented ✅** | `ci.yml` `playwright-admin` → `e2e.yml` (paths-filter `ui`/`e2e`) |
 | FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Implemented ✅** | [`ADMIN_UI_FIELD_AUDIT_2026-05-23.md`](../development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md); +5 contract tests (31 total) |
 | FM-041 | Cloud | SDK hardening (GCP SA JWT, Azure OAuth refresh, IT suites) | **Deferred** | post FM-006 REST; `CLOUD_SDK_PROGRESS_2026-01-19` |
 | FM-042 | P4 / perf | Hot-path profiling + Criterion benchmarks (beyond FM-028 snapshot) | **Planned** | `PERCENTAGE_PLAN`; FM-028 = single-host TQ01 only |
@@ -147,14 +147,13 @@ FM-xxx (з таблиці нижче)
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
-| **1** | Playwright у CI | **FM-039** | `workflow_call` з `ci.yml` |
-| **2** | OpenTelemetry | **FM-038** | tracing middleware + export |
-| **3** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
-| **4** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| **1** | OpenTelemetry | **FM-038** | tracing middleware + export |
+| **2** | Hot-path perf | **FM-042** | profiling + Criterion (P4) |
+| **3** | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
-**Закрито (не в черзі):** FM-001…040, FM-037; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
+**Закрито (не в черзі):** FM-001…040, FM-037, FM-039; Horizon S35–S40; grid import cleanup (`f00bb1d4`).
 
-**Якість збірки:** `cargo test-ci` після `src/` — останній зріз FM-037 (2026-05-23).
+**Якість збірки:** `cargo test-ci` після `src/` — останній зріз FM-037 (2026-05-23); FM-039 = CI workflows only.
 
 **Промпт сесії:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
@@ -194,7 +193,7 @@ FM-xxx (з таблиці нижче)
 | `ARCHITECT_PLAN_EXO` §3.1–3.2 | Tensor sharding runtime | **FM-036** | **✅** |
 | `ARCHITECT_PLAN_EXO` §4.1 | Topology graph viz | **FM-037** | **✅** |
 | `NEXT_STEPS_2026-01-16` | OpenTelemetry tracing | **FM-038** | **Planned** |
-| `E2E_PLAYWRIGHT.md` | Playwright у main CI | **FM-039** | **Partial** |
+| `E2E_PLAYWRIGHT.md` | Playwright у main CI | **FM-039** | **✅** |
 | `UI_QUALITY_AND_E2E_PLAN` §P1 | Admin field audit | **FM-040** | **✅** |
 | `CLOUD_SDK_PROGRESS_2026-01-19` | GCP/Azure auth deep | **FM-041** | **Deferred** |
 | `PERCENTAGE_PLAN` / P4 | Hot-path profiling | **FM-042** | **Planned** |
@@ -269,7 +268,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **FM-039** (Playwright у CI) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
+**Наступна сесія:** **FM-038** (OpenTelemetry tracing) — див. [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md). Ops: FM-003 §4 **BLOCKED**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

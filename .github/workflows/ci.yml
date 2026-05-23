@@ -122,10 +122,11 @@ jobs:
         run: cargo check --no-default-features --lib
 
   ui-changes:
-    name: Detect UI / pa11y changes
+    name: Detect UI / pa11y / E2E changes
     runs-on: ubuntu-latest
     outputs:
       ui: ${{ steps.filter.outputs.ui }}
+      e2e: ${{ steps.filter.outputs.e2e }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -142,12 +143,25 @@ jobs:
               - '.github/workflows/a11y.yml'
               - '.github/workflows/ci.yml'
               - 'tests/pa11y_ci_script.rs'
+            e2e:
+              - 'e2e/**'
+              - 'bin/e2e-playwright.sh'
+              - '.github/workflows/e2e.yml'
+              - 'src/ui/**'
+              - '.github/workflows/ci.yml'
 
   pa11y-wcag22:
     name: Pa11y WCAG 2.2
     needs: ui-changes
     if: needs.ui-changes.outputs.ui == 'true'
     uses: ./.github/workflows/a11y.yml
+    secrets: inherit
+
+  playwright-admin:
+    name: Playwright admin E2E
+    needs: ui-changes
+    if: needs.ui-changes.outputs.ui == 'true' || needs.ui-changes.outputs.e2e == 'true'
+    uses: ./.github/workflows/e2e.yml
     secrets: inherit
 
   pa11y-contract:
