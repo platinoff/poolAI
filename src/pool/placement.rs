@@ -7,6 +7,7 @@ use crate::core::error::AppError;
 use crate::core::model_interface::ModelInfo;
 use crate::pool::topology::get_global_topology_manager;
 use crate::runtime::instance::{InstancePlacement, PlacementCalculator, PlacementStrategy};
+use crate::runtime::sharding::tensor_placement_from_nodes;
 use std::collections::HashMap;
 
 /// Topology-aware placement calculator
@@ -143,47 +144,22 @@ async fn calculate_pipeline_placement(
     })
 }
 
-/// Calculate tensor parallelism placement
+/// Calculate tensor parallelism placement (FM-036 sharding runtime).
 async fn calculate_tensor_placement(
     topology: &crate::pool::topology::TopologyManager,
     _model_info: &ModelInfo,
     required_memory: u64,
 ) -> Option<InstancePlacement> {
-    // Tensor parallelism requires high bandwidth between nodes
-    // Split model tensors across multiple GPUs
-
-    let memory_per_node = required_memory / 2; // Split between 2 nodes
-
+    let memory_per_node = required_memory / 2;
     let candidates = topology.find_best_nodes(memory_per_node, 1, 2).await;
-
     if candidates.len() < 2 {
         return None;
     }
 
-    // Check bandwidth between nodes (tensor parallelism requires high bandwidth)
     let node1 = &candidates[0];
     let node2 = &candidates[1];
     let bandwidth = topology.get_bandwidth(node1, node2).await;
-
-    if let Some(bw) = bandwidth {
-        if bw < 100.0 {
-            // Bandwidth too low for tensor parallelism (< 100 Mbps)
-            return None;
-        }
-    }
-
-    let mut memory_by_node = HashMap::new();
-    for node_id in &candidates {
-        memory_by_node.insert(node_id.clone(), memory_per_node);
-    }
-
-    Some(InstancePlacement {
-        strategy: PlacementStrategy::Tensor,
-        node_ids: candidates,
-        memory_by_node,
-        memory_delta: required_memory as i64,
-        error: None,
-    })
+    tensor_placement_from_nodes(candidates, required_memory, bandwidth)
 }
 
 /// Calculate placement score (lower is better)

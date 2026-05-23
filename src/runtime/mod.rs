@@ -55,6 +55,7 @@ pub mod orchestrator;
 pub mod process;
 pub mod queue;
 pub mod scheduler;
+pub mod sharding;
 pub mod storage;
 pub mod worker;
 
@@ -66,6 +67,11 @@ pub use orchestrator::ResourceOrchestrator;
 pub use process::{ProcessConfig, ProcessLogs, ProcessManager, ProcessStatus};
 pub use queue::TaskQueue;
 pub use scheduler::TaskScheduler;
+pub use sharding::{
+    build_tensor_shard_plan, estimated_tensor_speedup, meets_tensor_bandwidth,
+    split_memory_across_nodes, ShardSyncBus, ShardSyncMessage, ShardSyncOp, TensorShardPlan,
+    TensorShardSpec, MIN_TENSOR_BANDWIDTH_MBPS,
+};
 pub use storage::StorageManager;
 pub use worker::Worker;
 

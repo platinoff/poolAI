@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-23 (FM-034 ✅ job scheduler → VM/worker binding; наступна **FM-036**; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
+**Оновлено:** 2026-05-23 (FM-036 ✅ tensor sharding runtime; наступна **FM-040**; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** FM-034 — `src/job/scheduler.rs`: least-connections pool worker + running VM binding on `Submitted`→`Scheduled`; `JobRecord.worker_id` / `vm_id`; `schedule_from_context`, `POST /jobs/schedule` → `{ scheduled, bound_workers, bound_vms }`. **Наступна розробка:** **FM-036** tensor sharding (§5.1 FM).
+**Maintenance (2026-05-23):** FM-036 — `src/runtime/sharding.rs`: `TensorShardPlan`, `ShardSyncBus` (all-reduce step simulation), EXO speedup estimates; `pool/placement.rs` → `tensor_placement_from_nodes`; `tests/sharding_tests.rs`, `benches/sharding_benchmarks.rs`. **Наступна розробка:** **FM-040** admin UI field audit (§5.1 FM).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -100,8 +100,8 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 | Порядок | FM | Що | Стан |
 |--------|-----|-----|------|
 | — | **FM-003** | LAN §4 sign-off | **BLOCKED** (2 хости); prep ✅ FM-027 |
-| **1** | **FM-036** | Tensor sharding runtime | **Planned** — наступна сесія |
-| **3–8** | **FM-036…042** | Sharding, UI audit, topology graph, Playwright CI, OTel, perf | Planned / Partial |
+| **1** | **FM-040** | Admin UI field audit | **Planned** — наступна сесія |
+| **2–6** | **FM-037…042** | Topology graph, Playwright CI, OTel, perf | Planned / Partial |
 | **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
 
 **Закрито:** FM-001…033 (Post-Horizon + autoprogon). **Не повторювати** FM-020…033.
@@ -110,7 +110,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-036** (tensor sharding); ops LAN **BLOCKED**.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-040** (admin UI field audit); ops LAN **BLOCKED**.
 2. Ітерація: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) — S0, MSYS2 bash, `df -h /s`, один FM, staging/commit/push.
 3. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci` (після `cargo clean` якщо диск S: повний).
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.
