@@ -302,9 +302,19 @@ impl RaidService {
             None
         };
 
-        // Placeholder until Raft status is wired to the manager.
         #[cfg(feature = "raft")]
-        let raft_status: Option<RaftStatus> = None;
+        let raft_status = if let Some(node) = ctx.raft_node() {
+            let role = node.current_role().await;
+            let term = node.current_term().await;
+            let leader_id = node.get_current_leader().await.map(|id| id.to_string());
+            Some(RaftStatus {
+                role,
+                term,
+                leader_id,
+            })
+        } else {
+            None
+        };
 
         #[cfg(not(feature = "raft"))]
         let raft_status: Option<RaftStatus> = None;

@@ -70,6 +70,8 @@ use crate::libs::LibraryManager;
 use crate::ml::pipeline::MLPipelineManager;
 use crate::pool::topology::TopologyManager;
 use crate::pool::Pool;
+#[cfg(feature = "raft")]
+use crate::raid::raft::RaidRaftNode;
 use crate::raid::RaidManager;
 use crate::rewards::RewardSystem;
 use crate::runtime::instance::InstanceManager;
@@ -272,6 +274,9 @@ pub struct AppState {
     pub pool: OnceLock<Arc<TokioRwLock<Pool>>>,
     /// RAID manager (`raid::initialize` + attach).
     pub raid_manager: OnceLock<Arc<RaidManager>>,
+    /// Optional Raft node (`--features raft`; wired for cluster status / consensus).
+    #[cfg(feature = "raft")]
+    pub raft_node: OnceLock<Arc<RaidRaftNode>>,
     /// VM manager (`vm::initialize` + attach).
     pub vm_manager: OnceLock<Arc<VmManager>>,
     /// Library manager (`libs::initialize` + attach).
@@ -350,6 +355,8 @@ impl AppState {
             discovery: Arc::new(tokio::sync::RwLock::new(None)),
             pool: OnceLock::new(),
             raid_manager: OnceLock::new(),
+            #[cfg(feature = "raft")]
+            raft_node: OnceLock::new(),
             vm_manager: OnceLock::new(),
             library_manager: OnceLock::new(),
             instance_manager: OnceLock::new(),
@@ -466,6 +473,20 @@ impl AppState {
         self.raid_manager
             .set(manager)
             .map_err(|_| "raid_manager handle already attached".to_string())
+    }
+
+    /// Attach a Raft node for integration tests (feature **`raft`** + **`test-utils`**).
+    #[cfg(all(feature = "raft", feature = "test-utils"))]
+    pub fn attach_raft_node_for_test(&self, node: Arc<RaidRaftNode>) -> Result<(), String> {
+        self.raft_node
+            .set(node)
+            .map_err(|_| "raft_node handle already attached".to_string())
+    }
+
+    /// Raft node handle when attached at startup or via [`Self::attach_raft_node_for_test`].
+    #[cfg(feature = "raft")]
+    pub fn raft_node(&self) -> Option<Arc<RaidRaftNode>> {
+        self.raft_node.get().cloned()
     }
 
     #[cfg(feature = "test-utils")]
