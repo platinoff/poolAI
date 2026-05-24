@@ -166,7 +166,7 @@ FM-xxx (з таблиці нижче)
 |--------|--------|--------------|------|
 | **PH-S01** | Cloud SDK deep (GCP SA JWT, Azure OAuth refresh) | **FM-041** | **Deferred** |
 | **PH-S02** | LAN §4 sign-off (2-host replication + TQ01) | **FM-003** | **BLOCKED** (2 хости) |
-| **PH-S03** | VM admin E2E + write-op contracts (`vm_write_operations`) | UI_QUALITY §P2, `vm_service` | **Open** |
+| **PH-S03** | VM admin E2E + write-op contracts (`vm_write_operations`) | UI_QUALITY §P2, `vm_service` | **✅** |
 | **PH-S04** | Raft feature wire tests (`--features raft`) | Architect L325, `NEXT_STEPS_2026-01-19` | **Open** |
 | **PH-S05** | RAID admin: raft role / cluster status UI | OpenAPI `RaidDistributedRaftRole` | **Open** |
 | **PH-S06** | Multi-node Raft harness (single-host simulation) | archive WEEK12, FM-027 prep | **Open** |
@@ -178,9 +178,9 @@ FM-xxx (з таблиці нижче)
 | **PH-S12** | Theme (dark/light) × i18n (EN/UK) visual matrix | `themes.rs`, `i18n_core.js` | **✅** |
 | **PH-S13** | Topology graph masked SVG visual baseline | `topology_graph.js`, PH-S11 scope | **✅** |
 | **PH-S14** | High-contrast theme + axe contrast CI fixes | UI_UX §102, `a11y.spec.ts` | **✅** |
-| **PH-S03** | VM admin E2E + write-op contracts | UI_QUALITY §P2, `vm_service` | **← наступна** |
+| **PH-S04** | Raft feature wire tests | Architect L325 | **← наступна** |
 
-**Відкрито (8):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S03…S06. **Не повторювати:** PH-S07…S14.
+**Відкрито (7):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S04…S06. **Не повторювати:** PH-S03, PH-S07…S14.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -293,7 +293,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S03** (VM admin E2E) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
+**Наступна сесія:** **PH-S04** (Raft wire tests) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

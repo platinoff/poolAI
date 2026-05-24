@@ -109,6 +109,31 @@ test.describe("PoolAI admin E2E (S27–S34)", () => {
     ).toBeVisible();
   });
 
+  test("vm page creates instance via modal (PH-S03)", async ({ page }) => {
+    const vmName = `e2e-vm-${Date.now()}`;
+    await page.goto("/ui/admin/vm");
+    await page
+      .getByRole("button", { name: /create vm instance/i })
+      .click();
+    const modal = page.locator("#createVmModal");
+    await expect(modal).toBeVisible({ timeout: 10_000 });
+    await page.locator("#vmName").fill(vmName);
+    await page.locator("#createVmForm").evaluate((form) => {
+      (form as HTMLFormElement).requestSubmit();
+    });
+    await expect(page.locator("#vm-instances")).toContainText(vmName, {
+      timeout: 20_000,
+    });
+
+    const row = page.locator("#vm-instances tr", { hasText: vmName });
+    await row
+      .getByRole("button", { name: /delete|видалити/i })
+      .click();
+    await expect(page.locator("#vm-instances")).not.toContainText(vmName, {
+      timeout: 20_000,
+    });
+  });
+
   test("libs page loads libraries list", async ({ page }) => {
     await page.goto("/ui/admin/libs");
     const list = page.locator("#libraries-list");

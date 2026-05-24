@@ -5,7 +5,7 @@
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
-| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm; **libs** (`#libraries-list`) |
+| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm (+ **PH-S03** create/delete modal); **libs** (`#libraries-list`) |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 
@@ -53,4 +53,4 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 - ~~theme/i18n visual matrix~~ **✅ PH-S12**
 - ~~topology masked visual~~ **✅ PH-S13**
 
-**Last updated:** 2026-05-23 (PH-S13 topology visual baseline).
+**Last updated:** 2026-05-24 (PH-S03 VM admin write E2E).
