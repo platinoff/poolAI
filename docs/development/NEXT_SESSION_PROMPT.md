@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-24 · **HEAD (origin/main):** після push PH-S06 · **PH-S01…S14:** закрито (S01 Deferred, S02 BLOCKED)
+**Оновлено:** 2026-05-24 · **HEAD (origin/main):** `e343aab3` · **PH-S01…S14:** закрито (S01 Deferred, S02 BLOCKED)
 
 Скопіюй блок нижче в новий чат (Agent mode, MSYS2 bash).
 
