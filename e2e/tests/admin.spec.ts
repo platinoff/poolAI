@@ -72,6 +72,22 @@ test.describe("PoolAI admin E2E (S27–S34)", () => {
     ).toBeVisible();
   });
 
+  test("raid page shows cluster and raft status card (PH-S05)", async ({
+    page,
+  }) => {
+    await page.goto("/ui/admin/raid");
+    const cluster = page.locator("#raid-cluster-status");
+    await expect(cluster).toBeVisible({ timeout: 20_000 });
+    await expect(
+      cluster.getByRole("heading", {
+        name: /cluster status|статус кластера/i,
+      }),
+    ).toBeVisible();
+    await expect(
+      cluster.getByText(/raft consensus|raft консенсус/i),
+    ).toBeVisible();
+  });
+
   test("topology page loads stats, graph, and nodes table", async ({ page }) => {
     await page.goto("/ui/admin/topology");
     await expect(page.locator("#topology-node-count")).toBeVisible({

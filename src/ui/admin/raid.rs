@@ -19,15 +19,28 @@ pub async fn admin_raid() -> Html<String> {
       if (!raw || typeof raw !== 'object') return null;
       return raw.metrics != null ? raw.metrics : raw;
     }
+    function raidClusterBadgeClass(status) {
+      const s = String(status || '').toLowerCase();
+      if (s === 'healthy') return 'active';
+      if (s === 'degraded') return 'pending';
+      return 'inactive';
+    }
+    function raftRoleBadgeClass(role) {
+      const r = String(role || '').toLowerCase();
+      if (r === 'leader') return 'active';
+      if (r === 'candidate') return 'pending';
+      return 'inactive';
+    }
 
     async function loadRaidData() {
       adminShowLoading('raid-admin', T('admin.raidadm.loading', 'Loading RAID admin…'));
       adminShowLoading('raid-artifacts', T('admin.raidadm.loadingArt', 'Loading artifacts…'));
       try {
-        const [artifacts, snapshot, statusRaw, burstRaw, smallworldRaw] = await Promise.all([
+        const [artifacts, snapshot, statusRaw, clusterRaw, burstRaw, smallworldRaw] = await Promise.all([
           fetchJson('/api/v1/raid/artifacts'),
           loadSnapshot().catch(() => null),
           fetchJson('/api/v1/raid/admin/status').catch(() => null),
+          fetchJson('/api/v1/raid/status').catch(() => null),
           fetchJson('/api/v1/raid/admin/metrics/burst').catch(() => null),
           fetchJson('/api/v1/raid/admin/metrics/smallworld').catch(() => null)
         ]);
@@ -35,7 +48,7 @@ pub async fn admin_raid() -> Html<String> {
         const burstMetrics = raidMetricsFromResponse(burstRaw);
         const smallworldMetrics = raidMetricsFromResponse(smallworldRaw);
         renderRaidArtifacts(artifacts, snapshot);
-        renderRaidAdmin(status, burstMetrics, smallworldMetrics);
+        renderRaidAdmin(status, clusterRaw, burstMetrics, smallworldMetrics);
       } catch (e) {
         adminShowInlineError('raid-admin', e);
         adminShowInlineError('raid-artifacts', e);
@@ -43,11 +56,64 @@ pub async fn admin_raid() -> Html<String> {
       }
     }
     
-    function renderRaidAdmin(status, burstMetrics, smallworldMetrics) {
+    function renderRaidAdmin(status, cluster, burstMetrics, smallworldMetrics) {
       const el = document.getElementById('raid-admin');
       if (!el) return;
       
       let html = '';
+
+      if (cluster && typeof cluster === 'object') {
+        const raft = cluster.raft_status;
+        const storage = cluster.storage || {};
+        const usagePct = storage.usage_percent != null
+          ? Number(storage.usage_percent).toFixed(1) + '%'
+          : T('admin.na', 'N/A');
+        html += `
+          <div class="admin-card" id="raid-cluster-status">
+            <h3>${escapeHtml(T('admin.raidadm.clusterTitle', 'Cluster status'))}</h3>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.cluster', 'Cluster:'))}</span>
+              <span class="stat-value status-badge ${raidClusterBadgeClass(cluster.cluster_status)}">${escapeHtml(cluster.cluster_status || T('admin.raidadm.unknown', 'Unknown'))}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.mode', 'Mode:'))}</span>
+              <span class="stat-value">${escapeHtml(cluster.mode || T('admin.raidadm.unknown', 'Unknown'))}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.nodes', 'Nodes:'))}</span>
+              <span class="stat-value">${cluster.node_count ?? 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.artCount', 'Artifacts:'))}</span>
+              <span class="stat-value">${cluster.artifact_count ?? 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.storageUse', 'Storage used:'))}</span>
+              <span class="stat-value">${escapeHtml(usagePct)}</span>
+            </div>
+            ${cluster.replication_status ? `
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.replStatus', 'Replication:'))}</span>
+              <span class="stat-value">${escapeHtml(cluster.replication_status)}</span>
+            </div>` : ''}
+            <h4>${escapeHtml(T('admin.raidadm.raftTitle', 'Raft consensus'))}</h4>
+            ${raft && typeof raft === 'object' ? `
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.raftRole', 'Role:'))}</span>
+              <span class="stat-value status-badge ${raftRoleBadgeClass(raft.role)}">${escapeHtml(raft.role || T('admin.raidadm.unknown', 'Unknown'))}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.raftTerm', 'Term:'))}</span>
+              <span class="stat-value">${raft.term ?? 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.raftLeader', 'Leader ID:'))}</span>
+              <span class="stat-value">${escapeHtml(raft.leader_id != null ? String(raft.leader_id) : T('admin.na', 'N/A'))}</span>
+            </div>` : `
+            <div class="muted">${escapeHtml(T('admin.raidadm.raftAbsent', 'Raft not attached (build without consensus or node not initialized).'))}</div>`}
+          </div>
+        `;
+      }
       
       if (status) {
         html += `

@@ -168,7 +168,7 @@ FM-xxx (з таблиці нижче)
 | **PH-S02** | LAN §4 sign-off (2-host replication + TQ01) | **FM-003** | **BLOCKED** (2 хости) |
 | **PH-S03** | VM admin E2E + write-op contracts (`vm_write_operations`) | UI_QUALITY §P2, `vm_service` | **✅** |
 | **PH-S04** | Raft feature wire tests (`--features raft`) | Architect L325, `NEXT_STEPS_2026-01-19` | **✅** |
-| **PH-S05** | RAID admin: raft role / cluster status UI | OpenAPI `RaidDistributedRaftRole` | **Open** |
+| **PH-S05** | RAID admin: raft role / cluster status UI | OpenAPI `RaidDistributedRaftRole` | **✅** |
 | **PH-S06** | Multi-node Raft harness (single-host simulation) | archive WEEK12, FM-027 prep | **Open** |
 | **PH-S07** | Prometheus `GET /metrics` | **FM-043** | **✅** |
 | **PH-S08** | TLS 1.3 / cert reload | **FM-044** | **✅** |
@@ -178,9 +178,9 @@ FM-xxx (з таблиці нижче)
 | **PH-S12** | Theme (dark/light) × i18n (EN/UK) visual matrix | `themes.rs`, `i18n_core.js` | **✅** |
 | **PH-S13** | Topology graph masked SVG visual baseline | `topology_graph.js`, PH-S11 scope | **✅** |
 | **PH-S14** | High-contrast theme + axe contrast CI fixes | UI_UX §102, `a11y.spec.ts` | **✅** |
-| **PH-S05** | RAID admin: raft role / cluster status UI | OpenAPI `RaidDistributedRaftRole` | **← наступна** |
+| **PH-S06** | Multi-node Raft harness (single-host simulation) | archive WEEK12, FM-027 prep | **← наступна** |
 
-**Відкрито (6):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S05…S06. **Не повторювати:** PH-S03…S04, PH-S07…S14.
+**Відкрито (5):** PH-S01 (Deferred), PH-S02 (BLOCKED), PH-S06. **Не повторювати:** PH-S03…S05, PH-S07…S14.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -293,7 +293,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S05** (RAID raft role UI) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
+**Наступна сесія:** **PH-S06** (multi-node Raft harness) — черга **PH-S01…S14** у [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · **§5.9**. Ops: **FM-003** §4 **BLOCKED**; **FM-041** **Deferred**.
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

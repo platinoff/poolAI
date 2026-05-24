@@ -699,6 +699,57 @@ mod attached_managers {
     }
 
     #[tokio::test]
+    async fn raid_cluster_status_json_shape_when_manager_attached() {
+        let temp = TempDir::new().expect("tempdir");
+        let config = RaidConfig {
+            mode: RaidMode::Local,
+            base_path: temp.path().to_path_buf(),
+            quota_bytes: None,
+            retention_days: None,
+            gc_on_startup: false,
+        };
+        let manager = Arc::new(RaidManager::new(config));
+        manager.initialize().await.expect("raid init");
+
+        let state = Arc::new(AppState::default());
+        state
+            .attach_raid_manager_for_test(manager)
+            .expect("attach raid manager");
+        let app = Router::new()
+            .nest("/api/v1", create_api_routes())
+            .with_state(state);
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/v1/raid/status")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let v: Value = serde_json::from_slice(&body).expect("raid cluster status JSON");
+        let o = v.as_object().expect("raid status object");
+        for key in [
+            "cluster_status",
+            "node_count",
+            "artifact_count",
+            "mode",
+            "storage",
+        ] {
+            assert!(o.contains_key(key), "raid status missing `{key}`: {o:?}");
+        }
+        let storage = o
+            .get("storage")
+            .and_then(|x| x.as_object())
+            .expect("storage");
+        assert!(storage.contains_key("total_size_bytes"));
+    }
+
+    #[tokio::test]
     async fn raid_artifacts_list_json_shape_when_manager_attached() {
         let temp = TempDir::new().expect("tempdir");
         let config = RaidConfig {
