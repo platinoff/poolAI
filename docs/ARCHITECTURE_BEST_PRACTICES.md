@@ -86,6 +86,7 @@ src/
 │       ├── vm.rs
 │       ├── raid.rs             # + raid_http.rs (спільні JSON-помилки RAID)
 │       ├── raid_http.rs
+│       ├── raid_rpc.rs         # feature `raft`: inbound /raft/* RPC
 │       ├── libraries.rs
 │       ├── users.rs
 │       ├── rewards.rs

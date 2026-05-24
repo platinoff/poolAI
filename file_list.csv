@@ -599,6 +599,7 @@ src/network/api/mod.rs
 src/network/api/raid.rs
 src/network/api/raid_admin.rs
 src/network/api/raid_http.rs
+src/network/api/raid_rpc.rs
 src/network/api/rewards.rs
 src/network/api/system.rs
 src/network/api/system_status_html.rs
@@ -778,6 +779,8 @@ tests/pa11y_ci_script.rs
 tests/platform_integration.rs
 tests/pool_worker_tests.rs
 tests/raft_integration.rs
+tests/raft_multi_node_harness.rs
+tests/raft_wire_integration.rs
 tests/raid_admin_api_integration.rs
 tests/raid_admin_integration.rs
 tests/raid_burst_integration.rs
@@ -811,6 +814,7 @@ tests/ui_write_operations_integration.rs
 tests/virtual_node_pool_join_integration.rs
 tests/virtual_node_tasks_integration.rs
 tests/virtual_node_telegram_binding_integration.rs
+tests/vm_api_contracts.rs
 tests/vm_auto_recovery_tests.rs
 tests/vm_health_integration.rs
 tests/vm_integration.rs

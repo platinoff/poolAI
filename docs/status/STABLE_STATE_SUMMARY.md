@@ -1,5 +1,5 @@
 # 📊 Стабільний стан розробки PoolAI
-## Rust Architect — оновлено 2026-05-19 (v0.2.2; autoprogon **100%** A+B; S34)
+## Rust Architect — оновлено 2026-05-24 (v0.2.2; PH-S03…S06 ✅; PH черга закрита)
 
 **Прогрес розробки:** [`DEVELOPMENT_PROGRESS_2026-05-19.md`](./DEVELOPMENT_PROGRESS_2026-05-19.md) · **Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md)
 
@@ -30,7 +30,7 @@
 - ✅ **FM-016+ (2026-05-18):** Telegram bind/webhook API, file store.
 - ✅ **FM-016++ (2026-05-18):** `poolai-telegram-bot`, `tgbot/coordinator`, `tests/tgbot_coordinator_bridge_integration.rs`.
 - ✅ **FM-016+++ (2026-05-25):** pool join, `raid_artifact_probe`, `POOLAI_WORKER_CACHE_DIR`, verify-dev-stand bootstrap e2e.
-- ✅ **FM-012 webhook (2026-05-26):** secret header + 4096 text cap on virtual-node Telegram webhook.
+- ✅ **PH-S03…S06 (2026-05-24):** VM write API contracts (`vm_api_contracts.rs`); Raft wire (`raft_wire_integration`, `AppState::raft_node`); RAID admin cluster/raft UI; multi-node harness (`raft_multi_node_harness`, `raft_rpc`) — **`cargo test-raft-ci`**.
 - ✅ **FM-012 OAuth (2026-05-27):** constant-time hash, `POOLAI_TELEGRAM_AUTH_MAX_AGE_SECS`, HTTP callback tests (`telegram_oauth_callback_integration`).
 - ✅ **AUTO_RUN 2026-05-28:** `cargo test-ci` зріз; FM-003 §4 BLOCKED; docs sync.
 - ✅ **FM-017/018/019 (2026-06-07):** discovery HttpAppError; admin a11y baseline + [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md); `ui::admin` a11y tests (8).

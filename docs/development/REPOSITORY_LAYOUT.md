@@ -1,6 +1,6 @@
 # Repository layout (code & ops)
 
-**Оновлено:** 2026-05-20 · Для людей і онбордингу. Канон стеку — [`STRUCTURE.md`](../STRUCTURE.md) §7, [`.cursor/rules/project-structure.md`](../../.cursor/rules/project-structure.md).
+**Оновлено:** 2026-05-24 · Для людей і онбордингу. Канон стеку — [`STRUCTURE.md`](../STRUCTURE.md) §7, [`.cursor/rules/project-structure.md`](../../.cursor/rules/project-structure.md).
 
 ---
 
@@ -38,7 +38,8 @@ poolAI/
 | Новий CLI/tool на Rust | `src/bin/` + `Cargo.toml` `[[bin]]` |
 | Запуск стенду, verify, метрики ops | **`bin/`** |
 | MSYS, PATH, gcc, старий git-push shell | **`scripts/`** |
-| HTTP/JSON контракт проти API | `tests/` |
+| HTTP/JSON контракт проти API | `tests/` (`admin_ui_api_contracts.rs`, `vm_api_contracts.rs`, `distributed_raid_wire_integration.rs`, …) |
+| Raft wire + multi-node harness (`feature raft`) | `tests/raft_wire_integration.rs`, `tests/raft_multi_node_harness.rs` — **`cargo test-raft-ci`** |
 | Sidecar без `solana-sdk` у main | `crates/poolai-solana-adapter/` |
 
 **Не створювати** кореневий `bin/` для `.rs` — лише `src/bin/`.

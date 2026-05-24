@@ -64,17 +64,21 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus
+### Next Focus (2026-05-24)
 
-**Єдиний порядок робіт** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** (таблиця *Порядок / Фокус / FM*). Коротко (той самий список, що підрозділ **«Операційний порядок»** у [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)):
+**PH-S01…S14 закрито** (лише **PH-S01** Deferred, **PH-S02** BLOCKED). Єдиний беклог — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** / **§5.9**.
 
-1. **UI_QUALITY P1** — admin JSON contracts — [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md); черга — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
-2. **FM-003 §4** — реальний LAN (**BLOCKED**, 2 хости); dev stand + `verify-dev-stand` ✅.
-3. **FM-019** — pa11y **Partial ✅** (S22: `ci.yml` `pa11y-contract` + `pa11y-wcag22`; 18 auth, `PA11Y_WCAG22`); Playwright admin E2E — **FM-039 ✅** (`ci.yml` → `e2e.yml`).
-4. **P4** — ✅ `poolai_health_load` **2026-05-18** у [`BENCHMARKS.md`](docs/performance/BENCHMARKS.md).
-5. **Відкладено** — **FM-004**, **FM-006**; **концепт** — **FM-009**, **FM-010**.
+| Пріоритет | Фокус | Стан |
+|-----------|--------|------|
+| 1 | **a11y HC** — btn-primary contrast на admin (axe 13/16) | Open |
+| 2 | **FM-003** §4 LAN sign-off | **BLOCKED** (2 хости) |
+| 3 | **FM-041** Cloud SDK deep | **Deferred** |
 
-**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**; автопрогін — [`AUTO_RUN_SESSION_2026-07-01.md`](docs/development/AUTO_RUN_SESSION_2026-07-01.md).
+**Старт сесії:** [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
+
+**Нещодавно (PH-S03…S06):** VM write contracts + admin E2E; Raft `GET /api/v1/raid/status`, admin `#raid-cluster-status`, `raft_rpc` + multi-node harness — **`cargo test-raft-ci`**.
+
+**Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
 **Контекст за пріоритетами Architect (P\*)**
 
@@ -83,7 +87,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - **P2b**: TurboQuant фаза 1 у коді ✅; відкритий чекбокс у Architect-плані — **LAN-заміри** (див. пункт 1 вище); Criterion `raid_replication_engine` уже є.
 - **P2 (опційно)**: основні домени через сервіси ✅; дрібні edge cases міграції handlers → `services/*` за потреби.
 - **P3 / FM-005** ✅: узгоджений JSON по **`auth`** / **`ws`** / **`rate_limit`**, REST + **`raid*`**, **`enterprise_api`**, **`login`/`refresh`**, **`check_permission`**, **`auth_middleware`** — **`HttpAppError`/`RestError`** (`src/network/json_errors.rs`).
-- **P1 (опційно)**: Raft-шлях без зайвих глобальних згадок; формальне закриття критеріїв за потреби.
+- **P1 (опційно)**: Raft wire ✅ (PH-S04…S06) — `AppState::raft_node`, `raft_rpc`, `cargo test-raft-ci`; production mount `/raft/*` на coordinator — за потреби.
 - **UI / UX:** [`docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md).
 - **Документація:** таксономія — [`docs/STRUCTURE.md`](docs/STRUCTURE.md); застарілі плоскі `docs/*.md` — опційно в [`docs/archive/`](docs/archive/).
 - **Старт сесії:** [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) §4.

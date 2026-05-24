@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-23 (FM-042 ✅ hot-path Criterion; FM-041 Deferred; ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
+**Оновлено:** 2026-05-24 (PH-S03…S06 ✅ Raft/VM; PH черга закрита; HEAD `a308e333`) · ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -94,23 +94,21 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 - **TurboQuant (P2b, фаза 1)**: `src/ml/turboquant.rs` (формат `TQ01`), інтеграція в крок `Quantization` за конфігом; див. `docs/ml/TURBOQUANT_INTEGRATION.md`.
 - **Priority 3 / FM-005 (HTTP-шар)** ✅: `json_errors.rs` — **`HttpAppError`**, **`IntoResponse`**; **`AppError::RestError`**. Покриття: **`api/*`**, **`raid*`** (**`raid_api_err`**), **`enterprise_api`**, **`authenticate_user`** / **`refresh_access_token`** / **`login`/`refresh` handlers**, **`check_permission`**, **`auth_middleware`** / **`permission_middleware`**.
 - **P3 (auth / WS / rate limit)**: **`auth.rs`**, **`ws.rs`**, **`rate_limit.rs`** — той самий JSON-формат помилок (`src/network/json_errors.rs`); UI читає `error.message`. **`http_status_for_app_error`**, **`IntoResponse`** для **`AppError`** / **`HttpAppError`**. Приклад змішаного стилю: **`api/rewards.rs`** — частина GET → **`Result<Json<_>, AppError>`**, **`/rewards/progress/*`** → **`Result<_, HttpAppError>`** (**`ApiNotFound`** / **`NOT_FOUND`**).
-- **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test --lib --tests --features ml,enterprise,cloud,test-utils` (інжектований `AppState`: **`tests/appstate_http_injection_integration.rs`** поряд з **`distributed_raid_wire_integration`**). На Windows при OOM лінкера: `cargo test ... -j 1 -- --test-threads=1`.
+- **Перевірка тестів (як CI)**: `K8S_OPENAPI_ENABLED_VERSION=1.28` + `cargo test-ci` (alias у `.cargo/config.toml`: `ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus`). **Raft (PH-S04…S06):** `cargo test-raft-ci` — `raft_wire_integration` + `raft_multi_node_harness` (`--features raft,test-utils`). Інжектований `AppState`: `tests/appstate_http_injection_integration.rs`, `vm_api_contracts.rs`, `distributed_raid_wire_integration`. На Windows при OOM: `-j 1 -- --test-threads=1`.
 - **Clippy (2026-04-10):** перед push доцільно прогнати ті самі команди, що в [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml): `cargo clippy --all-targets --no-default-features -- -D warnings`, `cargo clippy --all-targets --features jwt,https -- -D warnings`, і з `K8S_OPENAPI_ENABLED_VERSION=1.28` — `cargo clippy --all-targets --features cloud,cloud-sdk -- -D warnings`. Для змін у **enterprise** / UI — також `cargo clippy -p poolai --features enterprise -- -D warnings`. Код і `tests/*` вирівняні під ці матриці.
 - **FM-012 ✅ (2026-05-16):** i18n UA/EN + Telegram OAuth hardening — [`oauth.rs`](../../src/network/enterprise_api/oauth.rs), [`security.rs`](../../src/enterprise/security.rs), [`i18n_core.js`](../../src/ui/i18n_core.js); unit-тести allowlist/expiry/RBAC.
 
 ## 4. Наступні кроки (канон: FM-* + Architect)
 
-**Єдине зведення** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1** (черга **FM-033…042**), legacy audit **§5.8**, «не зроблено» **§5.3**.
+**PH-S01…S14 закрито** (лише **PH-S01** Deferred, **PH-S02** BLOCKED). **Єдине зведення FM** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1**, **§5.9**, legacy **§5.8**, «не зроблено» **§5.3**.
 
-| Порядок | FM | Що | Стан |
-|--------|-----|-----|------|
-| — | **PH-S07** | Prometheus `/metrics` | **✅ FM-043** — [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md) |
-| — | **PH-S08** | TLS 1.3 / cert rotation | **✅ FM-044** — [`security/TLS.md`](../security/TLS.md) |
-| — | **FM-003** | LAN §4 sign-off | **BLOCKED** |
-| — | **FM-041** | Cloud SDK deep | **Deferred** |
-| **9** | **FM-041** | Cloud SDK deep auth | **Deferred** |
+| Порядок | Фокус | Стан |
+|--------|--------|------|
+| **1** | **a11y HC** — btn-primary contrast на admin (13/16 axe fail) | Open |
+| **2** | **FM-003** §4 LAN sign-off | **BLOCKED** (2 хости) |
+| **3** | **FM-041** Cloud SDK deep | **Deferred** |
 
-**Закрито:** FM-001…033 (Post-Horizon + autoprogon). **Не повторювати** FM-020…033.
+**Закрито:** FM-001…045 (Post-Horizon); PH-S03…S14 (Raft wire/UI/harness, VM contracts, maintenance UI). **Не повторювати** FM-020…045, PH-S03…S14.
 
 **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 

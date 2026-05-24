@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-23 (FM-043…045: Prometheus `/metrics`, TLS 1.3 rustls, admin design tokens).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-24 (PH-S03…S06: VM write contracts, Raft wire/UI/harness; PH черга закрита).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -18,7 +18,7 @@
 |---------|-------------|
 | `jwt` | JWT для API (потрібен нативний toolchain на Windows GNU). |
 | `https` | TLS (axum-server). |
-| `raft` | Розподілений RAID / Raft (опційно). |
+| `raft` | Розподілений RAID / Raft (`async-raft`): `RaidRaftNode`, HTTP transport (`raft_transport.rs`), inbound RPC (`network/api/raft_rpc.rs` — `/raft/*`); `AppState::raft_node` + `GET /api/v1/raid/status` → `raft_status`; тести — `cargo test-raft-ci`. |
 | `enterprise` | Мультитенантність, audit, monitoring, security (OAuth2/SAML), enterprise REST. |
 | `ml` | ML-модулі, пайплайн, TurboQuant-гілка в квантизації тощо. |
 | `cloud` | Хмарний модуль (автомасштабування, LB, K8s-обгортки) без повного SDK. |
@@ -28,7 +28,7 @@
 | `prometheus` | Pull-model `GET /metrics` (text exposition); див. [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md). |
 | `otel` | OpenTelemetry OTLP export + W3C trace context; див. [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md). |
 
-**Типова CI-матриця (див. `.github/workflows/ci.yml`):** `ml`, `enterprise`, `cloud`, `prometheus`, `job-store-sqlite` + `K8S_OPENAPI_ENABLED_VERSION=1.28` для збірки з cloud; локально — `cargo test-ci` (див. `.cargo/config.toml`).
+**Типова CI-матриця (див. `.github/workflows/ci.yml`):** `ml`, `enterprise`, `cloud`, `prometheus`, `job-store-sqlite` + `K8S_OPENAPI_ENABLED_VERSION=1.28` для збірки з cloud; локально — **`cargo test-ci`** (див. `.cargo/config.toml`); Raft wire/harness — **`cargo test-raft-ci`** (`raft`, `test-utils`).
 
 ---
 
@@ -48,18 +48,18 @@
 |---------|----------------|--------------------------------------|
 | **Core** | `core/` | Конфіг, `AppState` / `ApiContext` (у т.ч. `rewards_engine` → `rewards::RewardSystem`), помилки (`AppError`, `ErrorContext`), користувачі, discovery-типи, WS-менеджер, інтерфейс моделі. |
 | **Pool** | `pool/` | Пул воркерів, топологія, discovery-інтеграція, розміщення. |
-| **Network** | `network/` | Axum: `/api/v1/*`, RAID REST (`api/raid.rs` + **`api/raid_http.rs`** + **`raid_admin.rs`**), enterprise API, auth, rate limit, WebSocket, distributed RAID handlers (`LeaveCluster`: при непорожньому membership залишати кластер може лише зареєстрований `node_id`). **`api/system.rs`**: **`POST /login`**, **`POST /refresh`** — у відповіді (JWT) опційно **`bootstrap_default_admin`** для UI першого входу. Узгоджені JSON-помилки: **`json_errors.rs`** — **`HttpAppError`**, **`AppError::RestError`**. FM-005 ✅: **`users`**, **`ui`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid*`** (**`raid_api_err`**), **`enterprise_api`**, **`authenticate_user`** / **`refresh_access_token`**, **`check_permission`**, **`auth_middleware`**. |
+| **Network** | `network/` | Axum: `/api/v1/*`, RAID REST (`api/raid.rs` + **`api/raid_http.rs`** + **`api/raid_rpc.rs`** [`feature raft`] + **`raid_admin.rs`**), enterprise API, auth, rate limit, WebSocket, distributed RAID handlers (`LeaveCluster`: при непорожньому membership залишати кластер може лише зареєстрований `node_id`). **`api/system.rs`**: **`POST /login`**, **`POST /refresh`** — у відповіді (JWT) опційно **`bootstrap_default_admin`** для UI першого входу. Узгоджені JSON-помилки: **`json_errors.rs`** — **`HttpAppError`**, **`AppError::RestError`**. FM-005 ✅: **`users`**, **`ui`**, **`ai_ml`**, **`workers`**, **`instances`**, **`libraries`**, **`vm`**, **`topology`**, **`rewards`**, **`system`**, **`completions`**, **`admin`**, **`raid*`** (**`raid_api_err`**), **`enterprise_api`**, **`authenticate_user`** / **`refresh_access_token`**, **`check_permission`**, **`auth_middleware`**. |
 | **Platform** | `platform/` | GPU / апаратний рівень. |
 | **Monitoring** | `monitoring/` | Метрики, context memory (ML-контекст). |
 | **Runtime** | `runtime/` | Інстанси, планувальник, кеш, черги, процеси, сховище, оркестратор. |
 | **Libs** | `libs/` | Реєстр бібліотек моделей, версіонування, залежності. |
-| **VM** | `vm/` | Менеджер VM, ресурси, ізоляція (Linux/Windows за фічами). |
-| **RAID** | `raid/` | Локальний і розподілений RAID, протокол, реплікація, BurstRAID, SmallWorld, події, snapshot, адмін-стратегії. |
+| **VM** | `vm/` | Менеджер VM, ресурси, ізоляція (Linux/Windows за фічами). **PH-S03:** write lifecycle + RBAC — `tests/vm_api_contracts.rs`; admin modal create/delete — `e2e/tests/admin.spec.ts`. |
+| **RAID** | `raid/` | Локальний і розподілений RAID, протокол, реплікація, BurstRAID, SmallWorld, події, snapshot, адмін-стратегії. **PH-S04…S06 (`feature raft`):** `RaidRaftNode`, `HttpRaftTransport`, cluster status (`RaidService::cluster_status` → `raft_status`), multi-node harness (`tests/raft_multi_node_harness.rs`). |
 | **Enterprise** | `enterprise/` | Тенанти, audit, monitoring, security (OAuth2, SAML, політики). |
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
-| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth. **FM-045 ✅:** `design_tokens.css` + уніфіковані `admin-table` / `admin-form` / `adminRenderTable` / `adminFormFieldHtml` — [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md). |
+| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth. **FM-045 ✅:** `design_tokens.css` + уніфіковані `admin-table` / `admin-form` / `adminRenderTable` / `adminFormFieldHtml` — [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md). **PH-S05:** `/ui/admin/raid` — `#raid-cluster-status` (`cluster_status` + `raft_status` з `GET /api/v1/raid/status`). |
 | **Observability** | `observability/` | HTTP trace spans; **FM-038** OTLP (`otel`); **FM-043** Prometheus scrape at **`GET /metrics`** (окремо від JSON `/api/v1/metrics`). |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService`, **`VirtualNodeTaskService`** (FM-016) — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | **FM-016++:** `coordinator` bridge + `poolai-telegram-bot` (`--features tgbot`); OAuth login — FM-012. |
@@ -72,7 +72,8 @@
 - **FM-016 virtual nodes** — `POST /api/v1/discovery/register-remote`, `heartbeat-remote`, `GET /discovery/virtual-nodes`; `GET/POST /api/v1/virtual-nodes/{id}/tasks/*`, probe health; тести `discovery_remote_register_integration`, `virtual_node_tasks_integration`.
 - **FM-016+ Telegram** — `POST/GET/DELETE /api/v1/virtual-nodes/telegram/bind*`, `POST .../telegram/webhook` → task на bound `peer_id`; env: `POOLAI_VIRTUAL_NODE_DATA_DIR`, `POOLAI_TELEGRAM_WEBHOOK_SECRET`, worker `POOLAI_TELEGRAM_ID`.
 - **FM-016+++** — `POST /virtual-nodes/{id}/pool/join`; bootstrap tasks + `raid_artifact_probe`; worker `POOLAI_WORKER_CACHE_DIR`, health `cached_artifacts`; `bin/verify-dev-stand.*` e2e.
-- **RAID** — додаткові шляхи під `/raid/…` (артефакти, воркери, події, snapshot, GC, strategies, metrics, rebalance, health) через `raid.rs`.
+- **RAID** — додаткові шляхи під `/raid/…` (артефакти, воркери, події, snapshot, GC, strategies, metrics, rebalance, health) через `raid.rs`; **`GET /api/v1/raid/status`** — `RaidStatusResponse` з опційним **`raft_status`** (role, term, leader_id).
+- **Raft RPC (`feature raft`)** — `POST /raft/append-entries`, `/raft/vote`, `/raft/install-snapshot` (`raft_rpc.rs`; використовується `HttpRaftTransport` і PH-S06 harness).
 - **Enterprise** — при `feature enterprise`: маршрути в **`src/network/enterprise_api/`** (`mod.rs` + tenants, audit, monitoring, security, oauth, saml).
 - **ML enterprise** — при `enterprise` + `ml`: `/api/enterprise/ai-ml/…` (пайплайн), див. `ai_ml.rs`.
 - **WebSocket** — наприклад `/ws/metrics` (JWT/безпека залежно від конфігурації).

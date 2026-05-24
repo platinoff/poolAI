@@ -115,12 +115,20 @@
 
 **Призначення**: єдина точка залежностей для Axum і майбутнього сервісного шару.
 
-- **`AppState`** (`src/core/state.rs`) тримає workers, config, system/model state, **`OnceLock`** для pool / RAID / VM / libraries / instances / topology після ініціалізації модулів у `main`, а також `UserManager`, `WebSocketManager`, слот discovery, enterprise-менеджери (за feature), `MLPipelineManager` (за `ml`).
+- **`AppState`** (`src/core/state.rs`) тримає workers, config, system/model state, **`OnceLock`** для pool / RAID / VM / libraries / instances / topology після ініціалізації модулів у `main`, опційно **`raft_node`** (`feature raft`), а також `UserManager`, `WebSocketManager`, слот discovery, enterprise-менеджери (за feature), `MLPipelineManager` (за `ml`).
 - **`ApiContext`** = `Arc<AppState>` — тип стану роутера (`State<ApiContext>`) у `network::api/*` та enterprise UI/API.
 - **Життєвий цикл**: у `main` після `raid::initialize` / `vm::initialize` тощо викликається **`attach_core_http_singletons()`**, який копіює ті самі `Arc`, що й модульні `get_global_*`, у поля `AppState` (глобалі лишаються для фонових задач і старого коду).
 - **Discovery**: `DiscoveryService` отримує `instance_manager` з `AppState` у `network::start_server`, без прямого `get_global_instance_manager` у announce.
-- **Тести**: опційний Cargo feature **`test-utils`** — методи **`attach_*_for_test`** на `AppState`, щоб прикріпити менеджери в інтеграційних тестах без повного `main`.
-- **Сервісний шар** (Priority 2): `src/services/` — оркестрація над доменами; HTTP залишається thin (наприклад `services::raid_service::RaidService` для RAID list).
+- **Тести**: опційний Cargo feature **`test-utils`** — методи **`attach_*_for_test`** на `AppState` (у т.ч. **`attach_raft_node_for_test`** за `raft` + `test-utils`), щоб прикріпити менеджери в інтеграційних тестах без повного `main`.
+- **Сервісний шар** (Priority 2): `src/services/` — оркестрація над доменами; HTTP залишається thin (наприклад `services::raid_service::RaidService` для RAID list і **`cluster_status`** з **`raft_status`**).
+
+### Raft consensus (PH-S04…S06, `feature raft`, 2026-05)
+
+- **`src/raid/raft.rs`** — `RaidRaftNode`, storage, state machine; inbound **`handle_append_entries` / `handle_vote` / `handle_install_snapshot`**.
+- **`src/raid/raft_transport.rs`** — `HttpRaftTransport` (`RaftNetwork`) → peer `POST {base}/raft/*`.
+- **`src/network/api/raft_rpc.rs`** — Axum routes для inbound RPC (harness і майбутній production wire).
+- **`RaidService::cluster_status`** — `GET /api/v1/raid/status` → `raft_status` коли `AppState::raft_node` прикріплено.
+- **Тести:** `tests/raft_wire_integration.rs`, `tests/raft_multi_node_harness.rs` (2-node single-host); alias **`cargo test-raft-ci`** — див. `docs/performance/BENCHMARKS.md`.
 
 Детальний покроковий план: `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`.
 
