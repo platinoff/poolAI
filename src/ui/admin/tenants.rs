@@ -48,8 +48,8 @@ pub async fn admin_tenants() -> Html<String> {
                 <td><span class="status-badge ${t.config.active ? 'active' : 'inactive'}">${t.config.active ? escapeHtml(T('admin.status.active', 'Active')) : escapeHtml(T('admin.status.inactive', 'Inactive'))}</span></td>
                 <td>${escapeHtml(T('admin.tenants.resWorkers', 'Workers:'))} ${t.usage.workers}/${t.config.max_workers || '∞'}, ${escapeHtml(T('admin.tenants.resMemory', 'Memory:'))} ${t.usage.memory_mb}MB/${t.config.max_memory_mb || '∞'}MB</td>
                 <td>
-                  <button type="button" class="btn" onclick="editTenant(${JSON.stringify(t.id)})">${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
-                  <button type="button" class="btn btn-danger" onclick="deleteTenant(${JSON.stringify(t.id)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+                  <button type="button" class="btn" onclick='editTenant(${JSON.stringify(t.id)})'>${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                  <button type="button" class="btn btn-danger" onclick='deleteTenant(${JSON.stringify(t.id)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                 </td>
               </tr>
             `).join('')}

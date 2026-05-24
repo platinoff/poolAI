@@ -16,6 +16,8 @@ export async function primeUiPrefs(
   await page.addInitScript((p) => {
     if (p.theme) localStorage.setItem("poolai_theme", p.theme);
     if (p.lang) localStorage.setItem("poolai_ui_lang", p.lang);
+    // Default-admin bootstrap banner adds noisy axe targets; ack for E2E.
+    localStorage.setItem("poolai_bootstrap_admin_ack", "1");
   }, prefs);
 }
 
@@ -32,6 +34,9 @@ export async function loginAsAdmin(
   page: Page,
   prefs?: { theme?: UiTheme; lang?: VisualLang },
 ): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem("poolai_bootstrap_admin_ack", "1");
+  });
   if (prefs) {
     await primeUiPrefs(page, prefs);
   }
@@ -51,6 +56,52 @@ export async function expectVisualLang(
   await expect(page.locator("html")).toHaveAttribute(
     "lang",
     lang === "uk" ? "uk" : "en",
+  );
+}
+
+/** Wait until admin region finished loading and danger buttons have stable contrast. */
+export async function waitForAdminAxeReady(
+  page: Page,
+  contentSelector: string,
+): Promise<void> {
+  const root = contentSelector.startsWith("#")
+    ? contentSelector.slice(1)
+    : contentSelector;
+  await page.evaluate(() => document.fonts?.ready);
+  await page.waitForFunction(
+    (regionId: string) => {
+      const region = document.getElementById(regionId);
+      if (!region) return false;
+      const settled =
+        region.querySelector(".admin-table tbody tr") ||
+        region.querySelector(".admin-fetch-error") ||
+        region.querySelector(".admin-card") ||
+        region.querySelector(".admin-form") ||
+        region.querySelector("form") ||
+        (region.querySelector(".muted") &&
+          !/loading/i.test(region.textContent ?? ""));
+      if (!settled) return false;
+      const buttons = region.querySelectorAll<HTMLButtonElement>(
+        "button.btn.btn-danger",
+      );
+      if (!buttons.length) return true;
+      return Array.from(buttons).every((el) => {
+        const s = getComputedStyle(el);
+        return (
+          s.color === "rgb(255, 255, 255)" &&
+          s.webkitTextFillColor === "rgb(255, 255, 255)" &&
+          Number(s.opacity) === 1
+        );
+      });
+    },
+    root,
+    { timeout: 20_000 },
+  );
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      }),
   );
 }
 

@@ -117,6 +117,10 @@
     svgEl.setAttribute('width', String(width));
     svgEl.setAttribute('height', String(height));
     svgEl.innerHTML = '';
+    const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    titleEl.setAttribute('id', 'topology-graph-title');
+    titleEl.textContent = opts.graphTitle || 'Cluster topology graph';
+    svgEl.appendChild(titleEl);
 
     const graph = layoutGraph(buildGraph(nodesMap, latencyMatrix), width, height, opts.iterations);
     if (!graph.nodes.length) {

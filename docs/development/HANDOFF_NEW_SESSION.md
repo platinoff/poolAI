@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-24 (PH-S03…S06 ✅ Raft/VM; PH черга закрита; HEAD `a308e333`) · ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
+**Оновлено:** 2026-05-24 (post-PH a11y push; PH-S15…S24 черга) · ітераційні правила — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -100,21 +100,22 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 4. Наступні кроки (канон: FM-* + Architect)
 
-**PH-S01…S14 закрито** (лише **PH-S01** Deferred, **PH-S02** BLOCKED). **Єдине зведення FM** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1**, **§5.9**, legacy **§5.8**, «не зроблено» **§5.3**.
+**PH-S03…S14 закрито** (лише **PH-S01/PH-S15** Deferred, **PH-S02/PH-S16** BLOCKED). **Єдине зведення FM** — [`catalog/FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) **§5.1**, **§5.9**, legacy **§5.8**, «не зроблено» **§5.3**.
 
 | Порядок | Фокус | Стан |
 |--------|--------|------|
-| **1** | **a11y HC** — btn-primary contrast на admin (13/16 axe fail) | Open |
-| **2** | **FM-003** §4 LAN sign-off | **BLOCKED** (2 хости) |
-| **3** | **FM-041** Cloud SDK deep | **Deferred** |
+| **1** | **PH-S17** ML pipeline ops | **Planned** (перший у черзі PH-S15…S24) |
+| **2–8** | PH-S18…S24 | **Planned** — див. FM **§5.9** |
+| — | **PH-S16** / **FM-003** LAN §4 | **BLOCKED** (2 хости) |
+| — | **PH-S15** / **FM-041** Cloud SDK | **Deferred** |
 
-**Закрито:** FM-001…045 (Post-Horizon); PH-S03…S14 (Raft wire/UI/harness, VM contracts, maintenance UI). **Не повторювати** FM-020…045, PH-S03…S14.
+**Закрито (2026-05-24 push):** post-PH **a11y** — `a11y.spec.ts` **16/16**, `waitForAdminAxeReady`, admin contrast/onclick/HC. **Не повторювати** FM-020…045, PH-S03…S14, post-PH a11y slice.
 
 **Промпт:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — PH черга закрита; ops LAN **BLOCKED**; a11y HC або FM-041 Deferred.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — PH закрито; a11y axe **16/16**; ops LAN **BLOCKED**; FM-041 Deferred.
 2. Ітерація: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) — S0, MSYS2 bash, `df -h /s`, один FM, staging/commit/push.
 3. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci` (після `cargo clean` якщо диск S: повний).
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.

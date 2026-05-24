@@ -48,8 +48,8 @@ pub async fn admin_users() -> Html<String> {
                 <td><span class="status-badge ${u.active !== false ? 'active' : 'error'}">${u.active !== false ? escapeHtml(T('admin.status.active', 'Active')) : escapeHtml(T('admin.status.inactive', 'Inactive'))}</span></td>
                 <td>${u.created_at ? escapeHtml(new Date(u.created_at).toLocaleDateString()) : escapeHtml(T('admin.na', 'N/A'))}</td>
                 <td>
-                  <button type="button" class="btn" onclick="editUser(${JSON.stringify(u.id)})">${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
-                  <button type="button" class="btn btn-danger" onclick="deleteUser(${JSON.stringify(u.id)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+                  <button type="button" class="btn" onclick='editUser(${JSON.stringify(u.id)})'>${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                  <button type="button" class="btn btn-danger" onclick='deleteUser(${JSON.stringify(u.id)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                 </td>
               </tr>
             `).join('')}

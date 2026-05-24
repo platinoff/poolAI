@@ -88,8 +88,8 @@ pub async fn admin_security() -> Html<String> {
                     <td><code>${escapeHtml(p.config?.authorization_url || T('admin.na', 'N/A'))}</code></td>
                     <td><span class="status-badge ${p.enabled ? 'active' : 'inactive'}">${p.enabled ? escapeHtml(T('admin.mon.enabled', 'Enabled')) : escapeHtml(T('admin.mon.disabled', 'Disabled'))}</span></td>
                     <td>
-                      <button type="button" class="btn" onclick="editOAuth2Provider(${pn})">${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
-                      <button type="button" class="btn btn-danger" onclick="deleteOAuth2Provider(${pn})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+                      <button type="button" class="btn" onclick='editOAuth2Provider(${pn})'>${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                      <button type="button" class="btn btn-danger" onclick='deleteOAuth2Provider(${pn})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                     </td>
                   </tr>
                 `;
@@ -296,8 +296,8 @@ pub async fn admin_security() -> Html<String> {
                     <td><code>${escapeHtml(p.config?.sso_url || T('admin.na', 'N/A'))}</code></td>
                     <td><span class="status-badge ${p.enabled ? 'active' : 'inactive'}">${p.enabled ? escapeHtml(T('admin.mon.enabled', 'Enabled')) : escapeHtml(T('admin.mon.disabled', 'Disabled'))}</span></td>
                     <td>
-                      <button type="button" class="btn" onclick="editSamlProvider(${pn})">${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
-                      <button type="button" class="btn btn-danger" onclick="deleteSamlProvider(${pn})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+                      <button type="button" class="btn" onclick='editSamlProvider(${pn})'>${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                      <button type="button" class="btn btn-danger" onclick='deleteSamlProvider(${pn})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                     </td>
                   </tr>
                 `;
@@ -523,8 +523,8 @@ pub async fn admin_security() -> Html<String> {
                     <td>${p.session_timeout || 0}s</td>
                     <td>${p.max_failed_attempts || 0}</td>
                     <td>
-                      <button type="button" class="btn" onclick="editSecurityPolicy(${pn})">${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
-                      <button type="button" class="btn btn-danger" onclick="deleteSecurityPolicy(${pn})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+                      <button type="button" class="btn" onclick='editSecurityPolicy(${pn})'>${escapeHtml(T('admin.btn.edit', 'Edit'))}</button>
+                      <button type="button" class="btn btn-danger" onclick='deleteSecurityPolicy(${pn})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                     </td>
                   </tr>
                 `;

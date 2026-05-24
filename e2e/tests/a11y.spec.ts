@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { loginAsAdmin, primeUiPrefs } from "./helpers";
+import { loginAsAdmin, primeUiPrefs, waitForAdminAxeReady } from "./helpers";
 
 /** FM-019 S33 + FM-031: axe in Playwright (complements pa11y CI). */
 const criticalAndSerious = (violations: { impact?: string | null }[]) =>
@@ -53,7 +53,11 @@ test.describe("axe accessibility (S33, FM-031)", () => {
       await loginAsAdmin(page);
       await page.goto(path);
       await page.locator(waitFor).waitFor({ state: "visible", timeout: 20_000 });
-      const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+      await waitForAdminAxeReady(page, waitFor);
+      const results = await new AxeBuilder({ page })
+        .withTags(AXE_TAGS)
+        .exclude('.modal[aria-hidden="true"], #poolai-bootstrap-banner-host[hidden]')
+        .analyze();
       expect(criticalAndSerious(results.violations)).toEqual([]);
     });
   }
@@ -77,10 +81,14 @@ test.describe("axe high-contrast color-contrast (PH-S14)", () => {
           };
           w.poolaiApplyTheme?.("high-contrast");
         });
+        await waitForAdminAxeReady(page, waitFor);
       }
       const results = await new AxeBuilder({ page })
         .withTags(AXE_TAGS)
         .withRules(["color-contrast"])
+        .exclude(
+          '.modal[aria-hidden="true"], #poolai-bootstrap-banner-host[hidden]',
+        )
         .analyze();
       expect(criticalAndSerious(results.violations)).toEqual([]);
     });

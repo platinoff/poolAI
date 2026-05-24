@@ -242,7 +242,7 @@ pub async fn admin_raid() -> Html<String> {
                   <td>${escapeHtml(a.name || 'unnamed')}</td>
                   <td>${escapeHtml(formatBytes(a.size || 0))}</td>
                   <td>
-                    <button type="button" class="btn btn-danger" onclick="deleteArtifact(${JSON.stringify(aid)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+                    <button type="button" class="btn btn-danger" onclick='deleteArtifact(${JSON.stringify(aid)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
                   </td>
                 </tr>
               `;

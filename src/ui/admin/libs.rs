@@ -53,10 +53,10 @@ pub async fn admin_libs() -> Html<String> {
                 <td><span class="status-badge ${isInstalled ? 'active' : 'inactive'}">${isInstalled ? escapeHtml(T('admin.lib.installed', 'Installed')) : escapeHtml(T('admin.lib.notInstalled', 'Not Installed'))}</span></td>
                 <td>
                   ${isInstalled ? `
-                    <button type="button" class="btn" onclick="uninstallLibrary(${keyJs})">${escapeHtml(T('ui.uninstall', 'Uninstall'))}</button>
-                    <button type="button" class="btn" onclick="updateLibrary(${keyJs})">${escapeHtml(T('ui.update', 'Update'))}</button>
+                    <button type="button" class="btn" onclick='uninstallLibrary(${keyJs})'>${escapeHtml(T('ui.uninstall', 'Uninstall'))}</button>
+                    <button type="button" class="btn" onclick='updateLibrary(${keyJs})'>${escapeHtml(T('ui.update', 'Update'))}</button>
                   ` : `
-                    <button type="button" class="btn btn-primary" onclick="installLibrary(${keyJs})">${escapeHtml(T('ui.install', 'Install'))}</button>
+                    <button type="button" class="btn btn-primary" onclick='installLibrary(${keyJs})'>${escapeHtml(T('ui.install', 'Install'))}</button>
                   `}
                 </td>
               </tr>

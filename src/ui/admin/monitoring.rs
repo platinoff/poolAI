@@ -69,7 +69,7 @@ pub async fn admin_monitoring() -> Html<String> {
                   <td>${escapeHtml(String(a.threshold != null ? a.threshold : T('admin.na', 'N/A')))}</td>
                   <td>${a.triggered_at ? escapeHtml(new Date(a.triggered_at).toLocaleString()) : escapeHtml(T('admin.na', 'N/A'))}</td>
                   <td>${a.acknowledged ? '<span class="muted">' + escapeHtml(T('admin.mon.statusAck', 'Acknowledged')) + '</span>' : '<span class="status-badge active">' + escapeHtml(T('admin.mon.statusActiveLbl', 'Active')) + '</span>'}</td>
-                  <td>${a.acknowledged ? '' : '<button type="button" class="btn btn-sm" onclick="acknowledgeAlert(' + JSON.stringify(a.id) + ')">' + escapeHtml(T('admin.mon.ackBtn', 'Acknowledge')) + '</button>'}</td>
+                  <td>${a.acknowledged ? '' : '<button type="button" class="btn btn-sm" onclick=\'acknowledgeAlert(' + JSON.stringify(a.id) + ')\'>' + escapeHtml(T('admin.mon.ackBtn', 'Acknowledge')) + '</button>'}</td>
                 </tr>
               `).join('')}
             </tbody>

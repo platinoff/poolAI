@@ -124,6 +124,7 @@ npx pa11y http://127.0.0.1:8080/ui/admin/users --runner axe
 | Dynamic tables | `adminEnhanceTablesA11y`, `adminObserveDynamicA11y` |
 | Dashboard nav / search | `src/ui/mod.rs` (`dashMarkCurrentNav`, Ctrl+K) |
 | Skip links / live regions | `admin/mod.rs`, FM-018 |
+| Playwright axe 16/16 + stable contrast | `e2e/tests/a11y.spec.ts`, `helpers.ts` (`waitForAdminAxeReady`) |
 
 ---
 

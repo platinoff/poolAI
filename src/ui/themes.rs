@@ -167,6 +167,11 @@ impl Theme {
     color: var(--bg);
   }}
   [data-poolai-theme="high-contrast"] .btn-primary {{
+    background: #004400;
+    border-color: #00ff00;
+    color: #ffffff;
+  }}
+  [data-poolai-theme="high-contrast"] .btn-primary:hover {{
     background: #006600;
     border-color: #00ff00;
     color: #ffffff;

@@ -228,6 +228,27 @@ fn admin_layout_includes_design_tokens_css() {
     assert!(body.contains("admin-table--striped"));
 }
 
+#[test]
+fn admin_styles_btn_primary_contrast_rules() {
+    let css = include_str!("../admin_styles.css");
+    assert!(
+        css.contains(".btn:not(.btn-primary):not(.btn-danger):not(.btn-secondary):hover"),
+        "generic .btn:hover must not recolor solid variants"
+    );
+    assert!(
+        css.contains(".btn.btn-primary:hover"),
+        "btn-primary hover must pin foreground to --bg"
+    );
+    assert!(
+        css.contains(".btn-primary::before"),
+        "btn-primary ripple overlay disabled for axe contrast"
+    );
+    assert!(
+        css.contains(".modal[aria-hidden=\"true\"]"),
+        "closed modals hidden from layout/axe"
+    );
+}
+
 #[cfg(all(test, feature = "enterprise"))]
 mod a11y_tests {
     use super::admin_layout;

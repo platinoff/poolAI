@@ -100,8 +100,8 @@ pub async fn admin_instances() -> axum::response::Html<String> {
             <td>${instance.placement.node_ids.join(', ')}</td>
             <td>${escapeHtml(new Date(instance.created_at).toLocaleString())}</td>
             <td>
-              <button type="button" class="btn btn-sm" onclick="viewInstance(${JSON.stringify(iid)})">${escapeHtml(T('admin.inst.viewBtn', 'View'))}</button>
-              <button type="button" class="btn btn-sm btn-danger" onclick="deleteInstance(${JSON.stringify(iid)})">${escapeHtml(T('ui.delete', 'Delete'))}</button>
+              <button type="button" class="btn btn-sm" onclick='viewInstance(${JSON.stringify(iid)})'>${escapeHtml(T('admin.inst.viewBtn', 'View'))}</button>
+              <button type="button" class="btn btn-sm btn-danger" onclick='deleteInstance(${JSON.stringify(iid)})'>${escapeHtml(T('ui.delete', 'Delete'))}</button>
             </td>
           `;
           tbody.appendChild(row);

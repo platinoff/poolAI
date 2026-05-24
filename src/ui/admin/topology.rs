@@ -139,7 +139,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
             <td>${{ac}} / ${{tc}}</td>
             <td>${{formatLoadFraction(node.current_load)}}</td>
             <td>
-              <button type="button" class="btn btn-sm" onclick="viewNodeResources(${{JSON.stringify(nodeId)}})">${{escapeHtml(T('admin.topo.viewDetails', 'View Details'))}}</button>
+              <button type="button" class="btn btn-sm" onclick='viewNodeResources(${{JSON.stringify(nodeId)}})'>${{escapeHtml(T('admin.topo.viewDetails', 'View Details'))}}</button>
             </td>
           `;
           tbody.appendChild(row);
@@ -190,6 +190,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
       PoolAiTopologyGraph.render(svg, topologyNodesCache, topologyLatencyCache, {{
         width: width,
         height: 360,
+        graphTitle: T('admin.topo.graphTitle', 'Cluster topology graph'),
         emptyLabel: T('admin.topo.noNodes', 'No nodes found'),
         onNodeClick: function (nodeId) {{ viewNodeResources(nodeId); }},
       }});
