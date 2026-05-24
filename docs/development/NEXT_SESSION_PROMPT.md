@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-24 · **HEAD:** `462dbc74` · **PH-S03…S14:** ✅ · **PH-S15…S24:** черга legacy
+**Оновлено:** 2026-05-24 · **HEAD:** `d162ca33` · **PH-S03…S14:** ✅ · **PH-S15…S24:** черга legacy
 
 Скопіюй блок нижче в новий чат (Agent mode, MSYS2 bash).
 
@@ -15,7 +15,7 @@ PoolAI — PH-S17 (перший Planned) або ops FM-003 / FM-041 за зап�
 3. HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.1 · §5.9 · poolai-session-iteration.mdc
 
 ## Стан репо (2026-05-24)
-- **Гілка:** main · **HEAD:** `462dbc74` feat(ui): post-PH a11y axe 16/16
+- **Гілка:** main · **HEAD:** `d162ca33` feat(ui): post-PH a11y axe 16/16
 - **PH-S03…S14:** ✅ (post-PH a11y закрито в останньому push)
 - **a11y:** `e2e/tests/a11y.spec.ts` — **16/16** (MSYS2 + poolai :8080)
 - **FM-001…045:** ✅ (лише FM-041 Deferred, FM-003 §4 BLOCKED)
