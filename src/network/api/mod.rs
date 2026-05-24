@@ -25,6 +25,8 @@ pub mod instances;
 pub mod jobs;
 pub mod libraries;
 pub mod memory;
+#[cfg(feature = "raft")]
+pub mod raft_rpc;
 pub mod raid;
 pub mod raid_admin;
 pub(crate) mod raid_http;

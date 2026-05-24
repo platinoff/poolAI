@@ -258,6 +258,16 @@ cargo test -j 1 --features test-utils,ml --test distributed_raid_wire_integratio
 
 Multi-node LAN timings remain **manual** on your stand; this test locks the handler + serde path.
 
+### Raft multi-node harness (PH-S06, `--features raft`)
+
+Single-host simulation: two ephemeral HTTP listeners expose `/raft/{append-entries,vote,install-snapshot}` and wire `HttpRaftTransport` peer addresses (FM-027 / LAN prep):
+
+```bash
+cargo test-raft-ci
+# or:
+cargo test -j 1 --test raft_multi_node_harness --features raft,test-utils -- --test-threads=1
+```
+
 ---
 
 ## Illustrative design targets (not CI-guarded)

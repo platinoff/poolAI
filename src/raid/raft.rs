@@ -12,9 +12,13 @@ use anyhow::Result;
 #[cfg(feature = "raft")]
 use async_raft::{
     config::Config,
-    raft::{ClientWriteRequest, Entry, MembershipConfig},
+    raft::{
+        AppendEntriesRequest, AppendEntriesResponse, ClientWriteRequest, Entry,
+        InstallSnapshotRequest, InstallSnapshotResponse, MembershipConfig, VoteRequest,
+        VoteResponse,
+    },
     storage::{CurrentSnapshotData, HardState, InitialState, RaftStorage},
-    AppData, AppDataResponse, NodeId, Raft,
+    AppData, AppDataResponse, NodeId, Raft, RaftError,
 };
 #[cfg(feature = "raft")]
 use async_trait::async_trait;
@@ -1135,6 +1139,45 @@ impl RaidRaftNode {
                 "Failed to load Raft log entries. Context: Cannot load log entries from Raft storage. Suggestion: Verify Raft storage is accessible and log file integrity. Error: {}",
                 e
             )))
+    }
+
+    /// Handle inbound AppendEntries RPC (HTTP wire / harness).
+    pub async fn handle_append_entries(
+        &self,
+        rpc: AppendEntriesRequest<RaidRaftOperation>,
+    ) -> Result<AppendEntriesResponse, AppError> {
+        let guard = self.raft_instance.read().await;
+        let raft = guard
+            .as_ref()
+            .ok_or_else(|| AppError::ConfigError("Raft instance not initialized".to_string()))?;
+        raft.append_entries(rpc)
+            .await
+            .map_err(|e: RaftError| AppError::ConfigError(format!("Raft append_entries: {e}")))
+    }
+
+    /// Handle inbound RequestVote RPC (HTTP wire / harness).
+    pub async fn handle_vote(&self, rpc: VoteRequest) -> Result<VoteResponse, AppError> {
+        let guard = self.raft_instance.read().await;
+        let raft = guard
+            .as_ref()
+            .ok_or_else(|| AppError::ConfigError("Raft instance not initialized".to_string()))?;
+        raft.vote(rpc)
+            .await
+            .map_err(|e: RaftError| AppError::ConfigError(format!("Raft vote: {e}")))
+    }
+
+    /// Handle inbound InstallSnapshot RPC (HTTP wire / harness).
+    pub async fn handle_install_snapshot(
+        &self,
+        rpc: InstallSnapshotRequest,
+    ) -> Result<InstallSnapshotResponse, AppError> {
+        let guard = self.raft_instance.read().await;
+        let raft = guard
+            .as_ref()
+            .ok_or_else(|| AppError::ConfigError("Raft instance not initialized".to_string()))?;
+        raft.install_snapshot(rpc)
+            .await
+            .map_err(|e: RaftError| AppError::ConfigError(format!("Raft install_snapshot: {e}")))
     }
 }
 
