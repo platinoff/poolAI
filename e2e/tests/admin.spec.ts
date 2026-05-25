@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
+  e2eUser,
   gotoAdminReady,
   loginAsAdmin,
   waitForAdminContentReady,
@@ -28,6 +29,17 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: /create dashboard/i }),
+    ).toBeVisible();
+  });
+
+  test("security page loads secret rotation tab (PH-S27)", async ({ page }) => {
+    await page.goto("/ui/admin/security");
+    await page.locator("#security-tab-rotation").click();
+    const content = page.locator("#security-content");
+    await expect(content).toBeVisible({ timeout: 20_000 });
+    await expect(content.locator(".admin-table")).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole("button", { name: /reload jwt|jwt.*env/i }),
     ).toBeVisible();
   });
 
@@ -106,41 +118,33 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
   });
 
   test("workers page loads list container", async ({ page }) => {
-    await page.goto("/ui/admin/workers");
-    const list = page.locator("#workers-list");
-    await expect(list).toBeVisible({ timeout: 20_000 });
-    await expect(
-      list.locator(".admin-table, .muted, .admin-fetch-error").first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /create worker/i }),
-    ).toBeVisible();
+    await gotoAdminReady(page, "/ui/admin/workers", "#workers-list");
+    await expect(page.locator('[data-i18n="admin.wrk.createBtn"]')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test("vm page loads instances container", async ({ page }) => {
-    await page.goto("/ui/admin/vm");
-    const instances = page.locator("#vm-instances");
-    await expect(instances).toBeVisible({ timeout: 20_000 });
-    await expect(
-      instances.locator(".admin-table, .muted, .admin-fetch-error").first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /create vm instance/i }),
-    ).toBeVisible();
+    await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
+    await expect(page.locator('[data-i18n="admin.vmadm.createBtn"]')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test("vm page creates instance via modal (PH-S03)", async ({ page }) => {
     const vmName = `e2e-vm-${Date.now()}`;
-    await page.goto("/ui/admin/vm");
-    await page
-      .getByRole("button", { name: /create vm instance/i })
-      .click();
+    await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
+    await page.evaluate((user) => {
+      localStorage.setItem("poolai_user", user);
+      localStorage.setItem("poolai_role", "Admin");
+      showModal("createVmModal");
+    }, e2eUser);
     const modal = page.locator("#createVmModal");
-    await expect(modal).toBeVisible({ timeout: 10_000 });
-    await page.locator("#vmName").fill(vmName);
-    await page.locator("#createVmForm").evaluate((form) => {
-      (form as HTMLFormElement).requestSubmit();
+    await expect(modal).toHaveAttribute("aria-hidden", "false", {
+      timeout: 10_000,
     });
+    await page.locator("#vmName").fill(vmName);
+    await page.locator('#createVmForm button[type="submit"]').click();
     await expect(page.locator("#vm-instances")).toContainText(vmName, {
       timeout: 20_000,
     });
@@ -155,15 +159,10 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
   });
 
   test("libs page loads libraries list", async ({ page }) => {
-    await page.goto("/ui/admin/libs");
-    const list = page.locator("#libraries-list");
-    await expect(list).toBeVisible({ timeout: 20_000 });
-    await expect(
-      list.locator(".admin-table, .muted, .admin-fetch-error").first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /upload library/i }),
-    ).toBeVisible();
+    await gotoAdminReady(page, "/ui/admin/libs", "#libraries-list");
+    await expect(page.locator('[data-i18n="admin.lib.uploadBtn"]')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test("admin dashboard loads overview panels (PH-S23)", async ({ page }) => {
