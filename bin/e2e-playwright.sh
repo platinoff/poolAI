@@ -42,12 +42,19 @@ wait_health() {
 }
 
 resolve_poolai_bin() {
-  if [[ -x "$ROOT/target/release/poolai" ]]; then
-    echo "$ROOT/target/release/poolai"
-  elif [[ -x "$ROOT/target/release/poolai.exe" ]]; then
-    echo "$ROOT/target/release/poolai.exe"
+  local profile="${POOLAI_E2E_PROFILE:-}"
+  if [[ -z "${profile}" && "${CI:-}" == "true" ]]; then
+    profile="debug"
+  fi
+  if [[ -z "${profile}" ]]; then
+    profile="release"
+  fi
+  if [[ -x "$ROOT/target/${profile}/poolai" ]]; then
+    echo "$ROOT/target/${profile}/poolai"
+  elif [[ -x "$ROOT/target/${profile}/poolai.exe" ]]; then
+    echo "$ROOT/target/${profile}/poolai.exe"
   else
-    echo "poolai binary not found; run: cargo build --release --features ${FEATURES}" >&2
+    echo "poolai binary not found; run: cargo build --${profile} --features ${FEATURES}" >&2
     return 1
   fi
 }
@@ -81,7 +88,12 @@ done
 
 if [[ "$DO_START" == true ]]; then
   export PATH="${HOME}/.cargo/bin:/usr/bin:${PATH}"
-  cargo build --release --features "${FEATURES}"
+  E2E_PROFILE="release"
+  if [[ "${CI:-}" == "true" ]]; then
+    E2E_PROFILE="debug"
+  fi
+  export POOLAI_E2E_PROFILE="${E2E_PROFILE}"
+  cargo build "--${E2E_PROFILE}" --features "${FEATURES}"
   start_poolai
 fi
 

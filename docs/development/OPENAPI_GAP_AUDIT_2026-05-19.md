@@ -18,6 +18,8 @@
 
 | Шлях | Призначення | Примітка |
 |------|-------------|----------|
+| ~~`/admin/secrets/rotation`~~ | Secret rotation status (PH-S24/S37b) | **✅ PH-S47** |
+| ~~`/admin/secrets/rotate`~~ | Run rotation hooks (admin RBAC) | **✅ PH-S47** |
 | ~~`/raid/distributed/*`~~ | Inter-node RAID protocol | **✅ S31–S33** paths + `RaidDistributed*` DTO schemas |
 | ~~VM template body schemas~~ | `VmTemplate`, `GpuSchedulingPolicy` | **✅ FM-025** (2026-05-20) |
 | ~~VM network body schemas~~ | `VmNetwork`, `NetworkIsolationConfig` | **✅ FM-032** (2026-05-22) |

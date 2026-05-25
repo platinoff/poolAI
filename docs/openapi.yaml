@@ -1137,6 +1137,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/AdminOverview'
 
+  /admin/secrets/rotation:
+    get:
+      tags:
+        - Admin
+      summary: Secret rotation status
+      description: |
+        Lists rotatable secret kinds (JWT, TLS, Telegram webhook) without exposing values.
+        Used by `/ui/admin/security` rotation tab (PH-S24 / PH-S37b).
+      operationId: getAdminSecretsRotationStatus
+      responses:
+        '200':
+          description: Rotation status per kind
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecretRotationStatusEntry'
+
+  /admin/secrets/rotate:
+    post:
+      tags:
+        - Admin
+      summary: Run secret rotation hooks
+      description: Requires `admin:all`. Runs registered reload hooks for the given kind.
+      operationId: postAdminSecretsRotate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotateSecretRequest'
+      responses:
+        '200':
+          description: Rotation report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretRotationRunReport'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error (unknown kind)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /topology:
     get:
       tags:
@@ -6099,6 +6159,68 @@ components:
           type: boolean
         topology:
           type: boolean
+
+    SecretKind:
+      type: string
+      enum:
+        - jwt
+        - tls_certificate
+        - telegram_webhook
+      description: Rotatable secret kind (PH-S24)
+
+    SecretRotationStatusEntry:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/SecretKind'
+        configured:
+          type: boolean
+        last_rotated_unix:
+          type: integer
+          format: int64
+          nullable: true
+        rotation_count:
+          type: integer
+          format: int64
+        grace_active:
+          type: boolean
+        hook_count:
+          type: integer
+          format: int64
+
+    RotateSecretRequest:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+          description: Secret kind (`jwt`, `tls_certificate`, `telegram_webhook`)
+          example: jwt
+
+    SecretRotationHookResult:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int64
+        ok:
+          type: boolean
+        message:
+          type: string
+          nullable: true
+
+    SecretRotationRunReport:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/SecretKind'
+        success:
+          type: boolean
+        hooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecretRotationHookResult'
 
     AdminOverview:
       type: object

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-25 (PH-S35…S44 legacy backlog §5.10; E2E login fix; FM-041 Deferred).
+**Оновлено:** 2026-05-25 (PH-S47 CI red fix §5.11; PH-S35…S44 §5.10; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -226,26 +226,26 @@ FM-xxx (з таблиці нижче)
 | **PH-S43** | Monitoring / ML step metrics UI | UI_UX §monitoring, DIGEST §ML | **Відкрито** |
 | **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **Відкрито** — після S37 |
 
-**Наступна сесія (код/CI):** **PH-S37** (PNG) → **PH-S44** → **§5.11** (див. таблицю нижче). **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
+**Наступна сесія (код/CI):** **PH-S47** (CI green) → **PH-S37** (PNG) → **PH-S44**. **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
 
-### 5.11 Наступні 10 спринтів PH-S37…S46 (код, 2026-05-25)
+### 5.11 Наступні 10 спринтів PH-S47…S46 (код, 2026-05-25)
 
-**Джерела (пріоритет):** §5.10 → [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) → [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md) (P6 on-chain, LAN) → [`UI_UX_IMPROVEMENTS_PLAN.md`](../development/UI_UX_IMPROVEMENTS_PLAN.md) (tables/monitoring, stale) → [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md). **Одна сесія = один PH-S*.**
+**Джерела (пріоритет):** CI failures on `main` (2026-05-25) → §5.10 → [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) → Architect / UI_UX / [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md). **Одна сесія = один PH-S*.**
 
 | # | Sprint | Фокус | Джерело | Стан |
 |---|--------|--------|---------|------|
-| 1 | **PH-S37** | Linux visual baselines (`visual.spec.ts-snapshots`) | §5.10, `VISUAL_REGRESSION_E2E.md` | **Відкрито** — Actions workflow + PR job; merge PNG |
-| 2 | **PH-S44** | CI gate: visual + axe required on UI PRs | §5.10, `ci.yml` paths-filter | **Відкрито** |
-| 3 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
-| 4 | **PH-S42** | Admin tables UX (sort/filter/export, empty states) | §5.10, `UI_UX_IMPROVEMENTS_PLAN` §tables | **Відкрито** |
-| 5 | **PH-S43** | Monitoring / ML step metrics admin UI | §5.10, DIGEST §ML, `admin/monitoring.rs` | **Відкрито** |
-| 6 | **PH-S45** | E2E stability: VM create modal + axe `/ui/admin/audit` | `admin.spec.ts`, `a11y.spec.ts` (локальні fails) | **Відкрито** |
-| 7 | **PH-S38** | Job scheduler hardening + on-chain submit epics | §5.10, Architect L236, `src/job/` | **Відкрито** |
-| 8 | **PH-S46** | Solana on-chain program / events (post FM-024 mock RPC) | §5.7, `SOLANA_ADAPTER_CONCEPT`, crate sidecar | **Відкрито** |
-| 9 | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **Відкрито** |
-| 10 | **PH-S40** | Hardware VM isolation (великий scope) | §5.10, Architect 2026-01-22 | **Відкрито** |
+| 1 | **PH-S47** | CI red: OpenAPI `/admin/secrets/*`, `raid_admin_api_integration` TempDir, E2E debug build (rustc SIGSEGV) | `ci.yml`, PH-S24/S37b routes | **Відкрито** |
+| 2 | **PH-S37** | Linux visual baselines (`visual.spec.ts-snapshots`) | §5.10, `VISUAL_REGRESSION_E2E.md` | **Відкрито** — merge PNG після S47 |
+| 3 | **PH-S44** | CI gate: visual + axe required on UI PRs | §5.10, `ci.yml` paths-filter | **Відкрито** |
+| 4 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
+| 5 | **PH-S42** | Admin tables UX (sort/filter/export, empty states) | §5.10, `UI_UX_IMPROVEMENTS_PLAN` §tables | **Відкрито** |
+| 6 | **PH-S43** | Monitoring / ML step metrics admin UI | §5.10, DIGEST §ML, `admin/monitoring.rs` | **Відкрито** |
+| 7 | **PH-S45** | E2E stability: VM create modal + axe `/ui/admin/audit` | `admin.spec.ts`, `a11y.spec.ts` | **Відкрито** |
+| 8 | **PH-S38** | Job scheduler hardening + on-chain submit epics | §5.10, Architect L236, `src/job/` | **Відкрито** |
+| 9 | **PH-S46** | Solana on-chain program / events (post FM-024 mock RPC) | §5.7, `SOLANA_ADAPTER_CONCEPT` | **Відкрито** |
+| 10 | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **Відкрито** |
 
-**Поза чергою 10 (ops / за запитом):** **PH-S35** LAN §4 (**BLOCKED**, 2 хости) · **PH-S36** Cloud SDK deep (**Deferred**, FM-041).
+**Поза чергою:** **PH-S35** LAN (**BLOCKED**) · **PH-S36** Cloud SDK (**Deferred**, FM-041) · **PH-S40** hardware VM (великий scope).
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
