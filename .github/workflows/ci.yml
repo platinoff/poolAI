@@ -14,6 +14,9 @@ jobs:
   test:
     name: Test Suite
     runs-on: ${{ matrix.os }}
+    env:
+      CARGO_BUILD_JOBS: "1"
+      CARGO_INCREMENTAL: "0"
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -39,8 +42,9 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-test-ph-s47f-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
+            ${{ runner.os }}-cargo-test-ph-s47f-
             ${{ runner.os }}-cargo-
       
       - name: Normalize line endings

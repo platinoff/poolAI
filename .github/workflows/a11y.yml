@@ -14,6 +14,10 @@ env:
   PA11Y_WCAG22: "1"
   PA11Y_USER: admin
   PA11Y_PASSWORD: admin123
+  CI: "true"
+  CARGO_BUILD_JOBS: "1"
+  CARGO_INCREMENTAL: "0"
+  POOLAI_FEATURES: enterprise,cloud,test-utils
 
 jobs:
   pa11y:
@@ -38,12 +42,10 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-a11y-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-a11y-ph-s47f-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
+            ${{ runner.os }}-a11y-ph-s47f-
             ${{ runner.os }}-a11y-
-
-      - name: Build poolai (enterprise)
-        run: cargo build --release --features enterprise,ml,cloud,test-utils
 
       - name: Run pa11y (WCAG 2.2 axe + login + 21 auth URLs)
         run: bash bin/pa11y-ci.sh --start

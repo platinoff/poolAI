@@ -15,7 +15,11 @@ cd "$ROOT"
 
 PORT="${POOLAI_HTTP_PORT:-8080}"
 BASE="http://127.0.0.1:${PORT}"
-FEATURES="${POOLAI_FEATURES:-enterprise,ml,cloud,test-utils}"
+if [[ "${CI:-}" == "true" ]]; then
+  FEATURES="${POOLAI_FEATURES:-enterprise,cloud,test-utils}"
+else
+  FEATURES="${POOLAI_FEATURES:-enterprise,ml,cloud,test-utils}"
+fi
 PA11Y="${PA11Y:-npx --yes pa11y@9}"
 THRESHOLD="${PA11Y_THRESHOLD:-0}"
 RUNNER="${PA11Y_RUNNER:-axe}"
@@ -113,16 +117,16 @@ wait_health() {
 }
 
 resolve_poolai_bin() {
-  if [[ -x "$ROOT/target/release/poolai" ]]; then
-    echo "$ROOT/target/release/poolai"
-  elif [[ -x "$ROOT/target/release/poolai.exe" ]]; then
-    echo "$ROOT/target/release/poolai.exe"
-  elif [[ -x "$ROOT/target/debug/poolai" ]]; then
-    echo "$ROOT/target/debug/poolai"
-  elif [[ -x "$ROOT/target/debug/poolai.exe" ]]; then
-    echo "$ROOT/target/debug/poolai.exe"
+  local profile="release"
+  if [[ "${CI:-}" == "true" ]]; then
+    profile="debug"
+  fi
+  if [[ -x "$ROOT/target/${profile}/poolai" ]]; then
+    echo "$ROOT/target/${profile}/poolai"
+  elif [[ -x "$ROOT/target/${profile}/poolai.exe" ]]; then
+    echo "$ROOT/target/${profile}/poolai.exe"
   else
-    echo "poolai binary not found; run: cargo build --release --features ${FEATURES}" >&2
+    echo "poolai binary not found; run: cargo build --${profile} --features ${FEATURES}" >&2
     return 1
   fi
 }
@@ -240,7 +244,13 @@ run_pa11y_authenticated() {
 
 if [[ "${1:-}" == "--start" ]]; then
   export PATH="${HOME}/.cargo/bin:/usr/bin:${PATH}"
-  cargo build --release --features "${FEATURES}"
+  PA11Y_PROFILE="release"
+  if [[ "${CI:-}" == "true" ]]; then
+    PA11Y_PROFILE="debug"
+    export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-1}"
+    export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
+  fi
+  cargo build "--${PA11Y_PROFILE}" --features "${FEATURES}"
   start_poolai
   shift
 fi

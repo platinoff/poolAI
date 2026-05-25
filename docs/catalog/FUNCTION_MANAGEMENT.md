@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-25 (PH-S47 CI red fix §5.11; PH-S35…S44 §5.10; FM-041 Deferred).
+**Оновлено:** 2026-05-25 (PH-S47 CI fixes §5.11; PH-S37…S44 §5.10; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -152,7 +152,7 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
-| 1 | **PH-S47** CI green: OpenAPI/raid_admin/E2E fixes + `test-ci`/`CARGO_BUILD_JOBS=1` | **§5.11** | **Відкрито** — HEAD `c624d189`; дочекатись зеленого CI |
+| 1 | **PH-S47** CI green: OpenAPI, raid_admin, ProcessCollector, test-ci, E2E/pa11y debug (no release+ml SIGSEGV) | **§5.11** | **Відкрито** — HEAD `164adf30`+PH-S47f; ubuntu + openapi-gap + Playwright |
 | 2 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — merge Linux PNG після S47 |
 | 3 | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **Відкрито** — після S37 |
 | 4 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
@@ -234,7 +234,7 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Стан |
 |---|--------|--------|---------|------|
-| 1 | **PH-S47** | CI green: OpenAPI secrets, raid_admin TempDir, E2E debug + `cargo test-ci` / `CARGO_BUILD_JOBS=1` (`c624d189`) | `ci.yml`, `e2e.yml` | **Відкрито** — CI run |
+| 1 | **PH-S47** | CI green: secrets OpenAPI, raid_admin TempDir, ProcessCollector Linux, test-ci inline, E2E/pa11y debug (`PH-S47f`) | `ci.yml`, `e2e.yml`, `a11y.yml` | **Відкрито** — SIGSEGV release+ml mitigated |
 | 2 | **PH-S37** | Linux visual baselines (`visual.spec.ts-snapshots`) | §5.10, `VISUAL_REGRESSION_E2E.md` | **Відкрито** — merge PNG після S47 |
 | 3 | **PH-S44** | CI gate: visual + axe required on UI PRs | §5.10, `ci.yml` paths-filter | **Відкрито** |
 | 4 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
@@ -358,7 +358,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S37** (merge Linux PNG) · **§5.11** наступні 10 спринтів · ops PH-S35/S36 BLOCKED/Deferred · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S47** (CI green) → **PH-S37** (Linux PNG) → **PH-S44** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
