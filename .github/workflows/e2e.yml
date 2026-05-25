@@ -13,8 +13,10 @@ env:
   POOLAI_E2E_USER: admin
   POOLAI_E2E_PASSWORD: admin123
   CI: "true"
-  # PH-S47: single rustc job (avoids exit 101 under memory/thread pressure on runners)
+  # PH-S47: single rustc job; no ml; visual deferred to PH-S37 Linux PNG
   CARGO_BUILD_JOBS: "1"
+  CARGO_INCREMENTAL: "0"
+  POOLAI_FEATURES: enterprise,cloud,test-utils
 
 jobs:
   playwright-admin:
@@ -39,8 +41,9 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-e2e-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-e2e-ph-s47c-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
+            ${{ runner.os }}-e2e-ph-s47c-
             ${{ runner.os }}-e2e-
 
       - name: Install Playwright (e2e/)
