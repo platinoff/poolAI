@@ -147,7 +147,8 @@ fn build_prometheus() -> PoolAiPrometheus {
     };
 
     #[cfg(target_os = "linux")]
-    if let Ok(collector) = prometheus::process_collector::ProcessCollector::for_self() {
+    {
+        let collector = prometheus::process_collector::ProcessCollector::for_self();
         let _ = registry.register(Box::new(collector));
     }
 
