@@ -42,7 +42,13 @@ use tracing::info;
 /// Discovery service is automatically started if enabled.
 pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
     use crate::network::discovery::{DiscoveryConfig, DiscoveryService};
+    use crate::security::secret_rotation::{
+        init_default_rotation_hooks, spawn_jwt_env_poll_if_configured,
+    };
     use std::sync::Arc;
+
+    init_default_rotation_hooks();
+    spawn_jwt_env_poll_if_configured();
 
     let discovery_config = DiscoveryConfig::default();
     if discovery_config.enabled {
@@ -130,6 +136,10 @@ pub async fn start_server(addr: SocketAddr, app_state: ApiContext) {
 
         match tls_config::TlsServeContext::from_pem_files(cert_paths.clone(), tls_policy).await {
             Ok(ctx) => {
+                let tls_ctx = ctx.clone();
+                crate::security::secret_rotation::register_tls_reload_hook(move || {
+                    tls_ctx.reload_certificates().map_err(|e| e.to_string())
+                });
                 info!(
                     "Starting HTTPS server on {} (TLS {}..{})",
                     addr, ctx.policy.min_version, ctx.policy.max_version

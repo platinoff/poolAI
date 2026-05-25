@@ -153,19 +153,13 @@ pub struct PermissionCheck {
     pub action: String,
 }
 
-// Глобальні налаштування JWT
-pub struct JwtConfig {
-    pub secret: String,
-    pub expiration: usize,
-}
-
-impl Default for JwtConfig {
-    fn default() -> Self {
-        Self {
-            secret: "your-super-secret-key-change-in-production".to_string(),
-            expiration: 3600, // 1 година
-        }
-    }
+/// JWT token lifetime (seconds). Override with `POOLAI_JWT_EXPIRATION_SECS`.
+pub fn jwt_expiration_secs() -> usize {
+    std::env::var("POOLAI_JWT_EXPIRATION_SECS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or(3600)
 }
 
 /// Generate JWT token for a user
@@ -193,7 +187,7 @@ impl Default for JwtConfig {
 /// # Ok::<(), String>(())
 /// ```
 pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String> {
-    let config = JwtConfig::default();
+    let expiration = jwt_expiration_secs();
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
@@ -201,7 +195,7 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
 
     let claims = Claims {
         sub: _username.to_string(),
-        exp: now + config.expiration,
+        exp: now + expiration,
         iat: now,
         role: _role.clone(),
         permissions: _role.get_permissions(),
@@ -209,10 +203,11 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
 
     #[cfg(feature = "jwt")]
     {
+        let secret = crate::security::jwt_secrets::jwt_store().read().current.clone();
         encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(config.secret.as_bytes()),
+            &EncodingKey::from_secret(secret.as_bytes()),
         )
         .map_err(|e| format!("JWT encode error: {}", e))
     }
@@ -255,14 +250,17 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
 pub fn validate_token(token: &str) -> Result<Claims, String> {
     #[cfg(feature = "jwt")]
     {
-        // Real JWT token validation
-        let config = JwtConfig::default();
-        let key = DecodingKey::from_secret(config.secret.as_ref());
+        let state = crate::security::jwt_secrets::jwt_store().read();
         let validation = Validation::default();
-
-        decode::<Claims>(token, &key, &validation)
-            .map(|data| data.claims)
-            .map_err(|e| format!("Token validation failed: {}", e))
+        let mut last_err = String::from("Token validation failed");
+        for secret in state.decoding_secrets() {
+            let key = DecodingKey::from_secret(secret.as_bytes());
+            match decode::<Claims>(token, &key, &validation) {
+                Ok(data) => return Ok(data.claims),
+                Err(e) => last_err = format!("Token validation failed: {}", e),
+            }
+        }
+        Err(last_err)
     }
 
     #[cfg(not(feature = "jwt"))]
@@ -297,13 +295,18 @@ pub fn validate_token(token: &str) -> Result<Claims, String> {
 pub fn decode_token_claims_allow_expired(token: &str) -> Result<Claims, String> {
     #[cfg(feature = "jwt")]
     {
-        let config = JwtConfig::default();
-        let key = DecodingKey::from_secret(config.secret.as_ref());
+        let state = crate::security::jwt_secrets::jwt_store().read();
         let mut validation = Validation::default();
         validation.validate_exp = false;
-        decode::<Claims>(token, &key, &validation)
-            .map(|data| data.claims)
-            .map_err(|e| format!("Token decode failed: {}", e))
+        let mut last_err = String::from("Token decode failed");
+        for secret in state.decoding_secrets() {
+            let key = DecodingKey::from_secret(secret.as_bytes());
+            match decode::<Claims>(token, &key, &validation) {
+                Ok(data) => return Ok(data.claims),
+                Err(e) => last_err = format!("Token decode failed: {}", e),
+            }
+        }
+        Err(last_err)
     }
 
     #[cfg(not(feature = "jwt"))]
@@ -387,8 +390,6 @@ pub async fn refresh_access_token(
         )
     })?;
 
-    let config = JwtConfig::default();
-
     let bootstrap_default_admin = user_manager
         .is_default_bootstrap_admin_account(&username)
         .await
@@ -404,7 +405,7 @@ pub async fn refresh_access_token(
     Ok(AuthResponse {
         token: new_token,
         token_type: "Bearer".to_string(),
-        expires_in: config.expiration,
+        expires_in: jwt_expiration_secs(),
         role,
         bootstrap_default_admin,
     })
@@ -625,8 +626,6 @@ pub async fn authenticate_user(
         )
     })?;
 
-    let config = JwtConfig::default();
-
     let bootstrap_default_admin = manager
         .is_default_bootstrap_admin_account(&username)
         .await
@@ -642,7 +641,7 @@ pub async fn authenticate_user(
     Ok(AuthResponse {
         token,
         token_type: "Bearer".to_string(),
-        expires_in: config.expiration,
+        expires_in: jwt_expiration_secs(),
         role,
         bootstrap_default_admin,
     })

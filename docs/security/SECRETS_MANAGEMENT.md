@@ -153,26 +153,39 @@ stringData:
 - Use environment variables from secrets
 - Access via Kubernetes API (for operators)
 
-### 4. Secret Rotation
+### 4. Secret Rotation (PH-S24 ✅)
+
+**Implementation:** `src/security/secret_rotation.rs`, `src/security/jwt_secrets.rs`
+
+| Mechanism | Description |
+|-----------|-------------|
+| **Rotation hooks** | Pluggable per `SecretKind` (`jwt`, `tls_certificate`, `telegram_webhook`) |
+| **Admin API** | `GET /api/v1/admin/secrets/rotation` (status), `POST /api/v1/admin/secrets/rotate` (admin only) |
+| **JWT dual-key** | `POOLAI_JWT_SECRET` + `POOLAI_JWT_SECRET_PREVIOUS` during `POOLAI_JWT_ROTATION_GRACE_SECS` (default 86400) |
+| **Env poll** | `POOLAI_SECRET_ROTATION_POLL_SECS` — periodic JWT reload from env |
+| **TLS reload** | `HTTPS_CERT_RELOAD_SECS` + rotation hook on HTTPS startup (FM-044) |
 
 #### JWT Secret Rotation
 
-**Current Status**: ❌ No automatic rotation
+**Ops workflow:**
 
-**Recommendations**:
-1. **Manual Rotation**:
-   ```bash
-   # Generate new secret
-   export POOLAI_JWT_SECRET=$(openssl rand -hex 32)
-   
-   # Restart application
-   systemctl restart poolai
-   ```
+```bash
+# 1. Generate new secret; keep old as PREVIOUS for grace window
+export POOLAI_JWT_SECRET_PREVIOUS="$POOLAI_JWT_SECRET"
+export POOLAI_JWT_SECRET=$(openssl rand -hex 32)
+export POOLAI_JWT_ROTATION_GRACE_SECS=86400
 
-2. **Automatic Rotation** (Future):
-   - Implement token blacklist during rotation
-   - Graceful transition period
-   - Dual-key signing (old + new keys)
+# 2. Trigger reload (no full restart) — admin Bearer token required
+curl -s -X POST http://127.0.0.1:8080/api/v1/admin/secrets/rotate \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"kind":"jwt"}'
+
+# 3. After grace expires, unset PREVIOUS
+unset POOLAI_JWT_SECRET_PREVIOUS
+```
+
+**Pen-test:** see [`PEN_TEST_CHECKLIST.md`](./PEN_TEST_CHECKLIST.md) §5.
 
 #### Certificate Rotation
 

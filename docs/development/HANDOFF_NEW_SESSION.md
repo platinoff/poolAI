@@ -12,7 +12,7 @@
 
 **Гілка роботи:** `main` (`git push origin main` → `origin/main`).
 
-**Maintenance (2026-05-23):** `54543028` — PH-S07…S09 (FM-043 Prometheus, FM-044 TLS, FM-045 design system). **PH-S10 ✅** — `admin_charts.js` (line/sparkline charts, polling), `monitoring.rs` + `dashboard.rs` refactor, `DESIGN_SYSTEM.md`. **PH-S11 ✅** — Playwright visual regression (`e2e/tests/visual.spec.ts`, 11 baselines, [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)). **PH-S12 ✅** — theme (dark/light) + i18n (EN/UK) matrix (+12 snapshots; `admin_common.js` `poolaiApplyTheme`). **PH-S13 ✅** — topology admin masked SVG visual (`topology.png`, `TOPOLOGY_VISUAL_MASKS`; commit `d37210f7`). **PH-S14 ✅** — high-contrast admin theme (`poolaiNormalizeTheme`, HC CSS) + axe `color-contrast` E2E. **PH-S03 ✅** — `tests/vm_api_contracts.rs` (VM write lifecycle + RBAC); Playwright VM create/delete (`admin.spec.ts`). **PH-S04 ✅** — `tests/raft_wire_integration.rs` (`GET /api/v1/raid/status` + `AppState::raft_node`); `cargo test-raft-ci`. **PH-S05 ✅** — `/ui/admin/raid` `#raid-cluster-status`. **PH-S06 ✅** — `tests/raft_multi_node_harness.rs` + `raft_rpc` HTTP; `cargo test-raft-ci`. **PH-S01…S14 закрито** (лише S01 Deferred, S02 BLOCKED). **PH-S17…S20 ✅** (2026-05-24). **Наступна:** **PH-S21** (`NEXT_SESSION_PROMPT.md`).
+**Maintenance (2026-05-23):** `54543028` — PH-S07…S09 (FM-043 Prometheus, FM-044 TLS, FM-045 design system). **PH-S10 ✅** — `admin_charts.js` (line/sparkline charts, polling), `monitoring.rs` + `dashboard.rs` refactor, `DESIGN_SYSTEM.md`. **PH-S11 ✅** — Playwright visual regression (`e2e/tests/visual.spec.ts`, 11 baselines, [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)). **PH-S12 ✅** — theme (dark/light) + i18n (EN/UK) matrix (+12 snapshots; `admin_common.js` `poolaiApplyTheme`). **PH-S13 ✅** — topology admin masked SVG visual (`topology.png`, `TOPOLOGY_VISUAL_MASKS`; commit `d37210f7`). **PH-S14 ✅** — high-contrast admin theme (`poolaiNormalizeTheme`, HC CSS) + axe `color-contrast` E2E. **PH-S03 ✅** — `tests/vm_api_contracts.rs` (VM write lifecycle + RBAC); Playwright VM create/delete (`admin.spec.ts`). **PH-S04 ✅** — `tests/raft_wire_integration.rs` (`GET /api/v1/raid/status` + `AppState::raft_node`); `cargo test-raft-ci`. **PH-S05 ✅** — `/ui/admin/raid` `#raid-cluster-status`. **PH-S06 ✅** — `tests/raft_multi_node_harness.rs` + `raft_rpc` HTTP; `cargo test-raft-ci`. **PH-S01…S14 закрито** (лише S01 Deferred, S02 BLOCKED). **PH-S17…S24 ✅** (2026-05-24). **PH-S24:** secret rotation hooks + [`PEN_TEST_CHECKLIST.md`](../security/PEN_TEST_CHECKLIST.md). **Наступна:** ops FM-003 / FM-041 (`NEXT_SESSION_PROMPT.md`).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -104,7 +104,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 | Порядок | Фокус | Стан |
 |--------|--------|------|
-| **1** | **PH-S24** Security ops | **Planned** (останній у черзі PH-S15…S24) |
+| — | **PH-S24** Security ops | **✅** (rotation hooks + pen-test checklist) |
 | — | **PH-S16** / **FM-003** LAN §4 | **BLOCKED** (2 хости) |
 | — | **PH-S15** / **FM-041** Cloud SDK | **Deferred** |
 
@@ -114,7 +114,7 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 
 ## 5. Автономний режим (Horizon → git push)
 
-1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — PH-S24; PH-S23 ✅; ops LAN **BLOCKED**; FM-041 Deferred.
+1. Старт: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — PH-S24 ✅; черга PH-S15…S24 закрита; ops LAN **BLOCKED**; FM-041 Deferred.
 2. Ітерація: [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc) — S0, MSYS2 bash, `df -h /s`, один FM, staging/commit/push.
 3. Оркестратор: [`.cursor/rules/autonomous-orchestrator.mdc`](../../.cursor/rules/autonomous-orchestrator.mdc); після змін у `src/` — `cargo fmt` + `cargo test-ci` (після `cargo clean` якщо диск S: повний).
 3. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.

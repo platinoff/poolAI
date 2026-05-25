@@ -315,6 +315,11 @@ name = "tls_https_integration"
 path = "tests/tls_https_integration.rs"
 required-features = ["https"]
 
+[[test]]
+name = "secret_rotation_integration"
+path = "tests/secret_rotation_integration.rs"
+required-features = ["enterprise"]
+
 [features]
 default = []
 # JWT authentication (optional - requires native toolchain: gcc/dlltool on Windows GNU)

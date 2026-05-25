@@ -105,7 +105,7 @@ curl -H "Authorization: Bearer viewer-token" http://localhost:8080/api/v1/admin/
 - [ ] **Weak Secrets**: Check for weak/default secrets (✅ documented in secrets guide)
 - [ ] **Plaintext Transmission**: Verify no sensitive data over HTTP
 - [ ] **Certificate Pinning**: Implement certificate pinning for API clients
-- [ ] **Secret Rotation**: Implement automatic secret rotation (✅ documented)
+- [x] **Secret Rotation**: Hooks + admin API + JWT dual-key (PH-S24; see [`SECRETS_MANAGEMENT.md`](./SECRETS_MANAGEMENT.md), [`PEN_TEST_CHECKLIST.md`](./PEN_TEST_CHECKLIST.md))
 
 #### Penetration Testing
 

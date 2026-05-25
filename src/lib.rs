@@ -134,6 +134,7 @@ pub mod platform;
 pub mod pool;
 pub mod rewards;
 pub mod runtime;
+pub mod security;
 pub mod services;
 pub mod version;
 pub mod workers;

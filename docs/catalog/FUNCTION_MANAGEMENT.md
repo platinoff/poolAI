@@ -149,7 +149,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
-| **1** | **PH-S24** Security ops | **§5.9** | **Planned** |
+| — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
@@ -195,7 +195,7 @@ FM-xxx (з таблиці нижче)
 | **PH-S21** | Raft membership з log/snapshot | `raid/raft.rs`, `tests/raft_membership_log.rs` | **✅** (2026-05-24) |
 | **PH-S22** | Topology live updates (WebSocket) | `ws_manager`, `topology.rs` admin | **✅** (2026-05-24) |
 | **PH-S23** | Playwright admin flows expand | `e2e/tests/admin.spec.ts`, `helpers.ts` | **✅** (2026-05-24) |
-| **PH-S24** | Security ops (secret rotation, pen-test checklist) | `ARCHITECT_SUMMARY` security `[ ]` | **Planned** |
+| **PH-S24** | Security ops (secret rotation hooks, pen-test checklist) | `src/security/`, `docs/security/PEN_TEST_CHECKLIST.md` | **✅** |
 
 **Одна сесія = один PH-S*** (або FM-003/FM-041 за §5.1). Промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
