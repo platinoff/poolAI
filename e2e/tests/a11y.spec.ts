@@ -20,6 +20,7 @@ const ADMIN_AXE_PAGES: { path: string; waitFor: string }[] = [
   { path: "/ui/admin/security", waitFor: "#security-content" },
   { path: "/ui/admin/config", waitFor: "#config-content" },
   { path: "/ui/admin/tenants", waitFor: "#tenants-list" },
+  /** PH-S45: audit filters + table enhance; settled via `waitForAdminAxeReady`. */
   { path: "/ui/admin/audit", waitFor: "#audit-events" },
   { path: "/ui/admin/monitoring", waitFor: "#monitoring-content" },
   { path: "/ui/admin/instances", waitFor: "#instances-list" },

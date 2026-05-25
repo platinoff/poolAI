@@ -95,14 +95,18 @@ export async function waitForAdminAxeReady(
     (regionId: string) => {
       const region = document.getElementById(regionId);
       if (!region) return false;
+      const section = region.closest(".admin-section") ?? region.parentElement;
       const settled =
         region.querySelector(".admin-table tbody tr") ||
+        region.querySelector("#audit-events-table") ||
         region.querySelector(".admin-fetch-error") ||
         region.querySelector(".admin-card") ||
         region.querySelector(".admin-form") ||
         region.querySelector("form") ||
         (region.querySelector(".muted") &&
-          !/loading/i.test(region.textContent ?? ""));
+          !/loading/i.test(region.textContent ?? "")) ||
+        (section?.querySelector(".admin-filters input, .admin-filters select") &&
+          region.querySelector(".admin-table-container, .admin-table"));
       if (!settled) return false;
       const buttons = region.querySelectorAll<HTMLButtonElement>(
         "button.btn.btn-danger",

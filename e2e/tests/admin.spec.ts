@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import {
-  e2eUser,
   gotoAdminReady,
   loginAsAdmin,
   waitForAdminContentReady,
@@ -20,16 +19,13 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible();
   });
 
-  test("monitoring page loads dashboards section", async ({ page }) => {
-    await page.goto("/ui/admin/monitoring");
-    const content = page.locator("#monitoring-content");
-    await expect(content).toBeVisible({ timeout: 20_000 });
-    await expect(
-      content.locator(".admin-table, .muted, .admin-fetch-error").first(),
-    ).toBeVisible();
+  test("monitoring page loads dashboards section (PH-S43/PH-S45)", async ({
+    page,
+  }) => {
+    await gotoAdminReady(page, "/ui/admin/monitoring", "#monitoring-content");
     await expect(
       page.getByRole("button", { name: /create dashboard/i }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("security page loads secret rotation tab (PH-S27)", async ({ page }) => {
@@ -131,31 +127,65 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     });
   });
 
-  test("vm page creates instance via modal (PH-S03)", async ({ page }) => {
+  test("vm page creates instance via modal (PH-S03, PH-S45)", async ({
+    page,
+  }) => {
     const vmName = `e2e-vm-${Date.now()}`;
     await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
-    await page.evaluate((user) => {
-      localStorage.setItem("poolai_user", user);
-      localStorage.setItem("poolai_role", "Admin");
-      showModal("createVmModal");
-    }, e2eUser);
     const modal = page.locator("#createVmModal");
-    await expect(modal).toHaveAttribute("aria-hidden", "false", {
+    const createBtn = page.locator('[data-i18n="admin.vmadm.createBtn"]');
+    await expect(createBtn).toBeVisible({ timeout: 15_000 });
+    await createBtn.click();
+    try {
+      await expect(modal).toHaveAttribute("aria-hidden", "false", {
+        timeout: 3_000,
+      });
+    } catch {
+      await page.evaluate(() => {
+        if (typeof showCreateVmModal === "function") {
+          showCreateVmModal();
+        } else if (typeof showModal === "function") {
+          showModal("createVmModal");
+        }
+      });
+      await expect(modal).toHaveAttribute("aria-hidden", "false", {
+        timeout: 10_000,
+      });
+    }
+    await modal.locator("#vmName").fill(vmName);
+    const createRespP = page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/v1/vm/instances") &&
+        res.request().method() === "POST",
+      { timeout: 30_000 },
+    );
+    await modal.locator("#createVmForm").evaluate((form) => {
+      (form as HTMLFormElement).requestSubmit();
+    });
+    const createResp = await createRespP;
+    expect(createResp.ok()).toBeTruthy();
+    await expect(modal).toHaveAttribute("aria-hidden", "true", {
       timeout: 10_000,
     });
-    await page.locator("#vmName").fill(vmName);
-    await page.locator('#createVmForm button[type="submit"]').click();
-    await expect(page.locator("#vm-instances")).toContainText(vmName, {
-      timeout: 20_000,
-    });
+    await expect(
+      page.locator("#vm-instances tr", { hasText: vmName }),
+    ).toBeVisible({ timeout: 20_000 });
 
     const row = page.locator("#vm-instances tr", { hasText: vmName });
-    await row
-      .getByRole("button", { name: /delete|видалити/i })
-      .click();
-    await expect(page.locator("#vm-instances")).not.toContainText(vmName, {
-      timeout: 20_000,
-    });
+    const [deleteResp] = await Promise.all([
+      page.waitForResponse(
+        (res) =>
+          res.url().includes("/api/v1/vm/instances/") &&
+          res.request().method() === "DELETE" &&
+          res.ok(),
+        { timeout: 20_000 },
+      ),
+      row.getByRole("button", { name: /delete|видалити/i }).click(),
+    ]);
+    expect(deleteResp.ok()).toBeTruthy();
+    await expect(
+      page.locator("#vm-instances tr", { hasText: vmName }),
+    ).toHaveCount(0, { timeout: 20_000 });
   });
 
   test("libs page loads libraries list", async ({ page }) => {

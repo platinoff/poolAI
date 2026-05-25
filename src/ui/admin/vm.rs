@@ -122,10 +122,7 @@ pub async fn admin_vm() -> Html<String> {
         showNotification(T('vm.createdOk', 'VM instance created successfully'), 'success');
         hideModal('createVmModal');
         form.reset();
-        
-        setTimeout(() => {
-          loadVmInstances();
-        }, 500);
+        await loadVmInstances();
       } catch (e) {
         showNotification(Ep() + e.message, 'error');
       } finally {
@@ -135,6 +132,13 @@ pub async fn admin_vm() -> Html<String> {
     }
     
     loadVmInstances();
+
+    // admin_layout wraps page scripts in an IIFE; inline onclick/onsubmit need globals.
+    const _g = typeof globalThis !== 'undefined' ? globalThis : window;
+    _g.showCreateVmModal = showCreateVmModal;
+    _g.handleCreateVm = handleCreateVm;
+    _g.loadVmInstances = loadVmInstances;
+    _g.vmAction = vmAction;
     "#;
 
     admin_layout(

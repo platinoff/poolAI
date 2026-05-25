@@ -17,7 +17,8 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
-    viewport: { width: 1280, height: 720 },
+    // Tall viewport so element screenshots capture full admin scroll areas (PH-S45).
+    viewport: { width: 1280, height: 1920 },
     deviceScaleFactor: 1,
   },
   reporter: [["list"]],

@@ -66,12 +66,12 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-05-25)
 
-**PH-S03…S47, PH-S37 infra, PH-S44, PH-S42, PH-S43 закрито.** Канон черги — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **§5.11**.
+**PH-S03…S47, PH-S37 infra, PH-S44, PH-S42, PH-S43, PH-S45 закрито.** Канон черги — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **§5.11**.
 
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S45** | E2E vm modal + axe audit |
-| 2–4 | **PH-S38…S41** | job/on-chain, Solana, macvlan — див. §5.11 |
+| 1 | **PH-S38** | Job scheduler + on-chain epics |
+| 2–3 | **PH-S46…S41** | Solana, macvlan — див. §5.11 |
 
 **Ops (поза 10):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

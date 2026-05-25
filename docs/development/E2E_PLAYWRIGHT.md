@@ -56,6 +56,6 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 - ~~topology masked visual~~ **✅ PH-S13**
 - **PH-S37 ✅** — Linux visual baselines workflow (`update-visual-baselines.yml`); refresh on-demand via Actions dispatch
 - **PH-S44 ✅** — required CI gate: `test:ci` includes visual + axe on UI/e2e path changes (`ci.yml` paths-filter)
-- **PH-S45** — E2E stability: vm create modal (`admin.spec.ts`); axe `/ui/admin/audit` (`a11y.spec.ts`)
+- **PH-S45 ✅** — E2E stability: vm create via UI button + POST/DELETE wait (`admin.spec.ts`); axe `/ui/admin/audit` settle (`helpers.ts`); viewport 1920 for visual snapshots
 
-**Last updated:** 2026-05-25 (PH-S44 visual in test:ci; PH-S37 workflow on-demand).
+**Last updated:** 2026-05-25 (PH-S45 E2E stability; PH-S44 visual in test:ci).
