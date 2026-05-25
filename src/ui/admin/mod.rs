@@ -188,6 +188,19 @@ fn admin_charts_layer_exports() {
     assert!(js.contains("function poolaiRenderSparkline"));
     assert!(js.contains("function poolaiRenderMetricsChartGrid"));
     assert!(js.contains("function poolaiStartMetricsPolling"));
+    assert!(js.contains("function poolaiRenderMlPipelineMetricsPanel"));
+    assert!(js.contains("function poolaiFetchMlPipelines"));
+    assert!(js.contains("POOLAI_ML_METRIC_KEYS"));
+}
+
+#[tokio::test]
+async fn admin_monitoring_ph_s43_ml_metrics_panel() {
+    let html = monitoring::admin_monitoring().await.0;
+    assert!(html.contains("id=\"ml-demo-btn\""));
+    assert!(html.contains("runMlPipelineDemo"));
+    assert!(html.contains("poolaiFetchMlPipelines"));
+    assert!(html.contains("poolaiRenderMlPipelineMetricsPanel"));
+    assert!(html.contains("ml-pipeline-metrics-panel"));
 }
 
 #[test]

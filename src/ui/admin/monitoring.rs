@@ -14,14 +14,40 @@ pub async fn admin_monitoring() -> Html<String> {
     async function loadMonitoring() {
       adminShowLoading('monitoring-content', T('admin.mon.loading', 'Loading monitoring…'));
       try {
-        const [alerts, dashboards] = await Promise.all([
+        const [alerts, dashboards, mlPipelines] = await Promise.all([
           fetchJson('/api/enterprise/monitoring/alerts?limit=20'),
-          fetchJson('/api/enterprise/monitoring/dashboards')
+          fetchJson('/api/enterprise/monitoring/dashboards'),
+          poolaiFetchMlPipelines(),
         ]);
-        renderMonitoring(alerts, dashboards);
+        await renderMonitoring(alerts, dashboards, mlPipelines);
       } catch (e) {
         adminShowInlineError('monitoring-content', e);
         showNotification(T('admin.mon.errLoad', 'Error loading monitoring: ') + e.message, 'error');
+      }
+    }
+    
+    async function runMlPipelineDemo() {
+      const user = getUser();
+      if (!user || (user.role !== 'Admin' && user.role !== 'Operator')) {
+        showNotification(T('err.insufficientPermissionsAdminOp', 'Insufficient permissions. Admin or Operator role required.'), 'error');
+        return;
+      }
+      const btn = document.getElementById('ml-demo-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = T('admin.mon.mlDemoRunning', 'Running demo…');
+      }
+      try {
+        await poolaiRunMlPipelineDemo();
+        showNotification(T('admin.mon.mlDemoOk', 'ML demo pipeline completed'), 'success');
+        loadMonitoring();
+      } catch (e) {
+        showNotification(Ep() + e.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = T('admin.mon.mlDemoBtn', 'Run ML Demo');
+        }
       }
     }
     
@@ -36,7 +62,7 @@ pub async fn admin_monitoring() -> Html<String> {
       }
     }
     
-    async function renderMonitoring(alerts, dashboards) {
+    async function renderMonitoring(alerts, dashboards, mlPipelines) {
       const el = document.getElementById('monitoring-content');
       if (!el) return;
       
@@ -44,11 +70,25 @@ pub async fn admin_monitoring() -> Html<String> {
         ['cpu_usage', 'memory_usage', 'request_rate'],
         { hours: 24, title: T('admin.mon.vizTitle', 'Metrics Visualization (Last 24 Hours)') }
       );
+
+      const mlPanelHtml =
+        mlPipelines === null
+          ? '<div class="admin-card ml-pipeline-metrics-panel"><h3>' +
+            escapeHtml(T('admin.mon.mlTitle', 'ML Pipeline Step Metrics')) +
+            '</h3>' +
+            adminEmptyStateHtml(T('admin.mon.mlUnavailable', 'ML pipeline API unavailable'), {
+              hint: T('admin.mon.mlUnavailableHint', 'Build with enterprise + ml features to enable AI/ML pipelines.'),
+              icon: '🧠',
+            }) +
+            '</div>'
+          : poolaiRenderMlPipelineMetricsPanel(mlPipelines, {
+              title: T('admin.mon.mlTitle', 'ML Pipeline Step Metrics'),
+            });
       
       const alertsHtml = alerts.length === 0 
-        ? '<div class="muted">' + escapeHtml(T('admin.mon.noAlerts', 'No active alerts')) + '</div>'
+        ? adminEmptyStateHtml(T('admin.mon.noAlerts', 'No active alerts'), { icon: '✅' })
         : `
-          <table class="admin-table">
+          <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.mon.activeAlertsTitle', 'Active Alerts'))}">
             <thead>
               <tr>
                 <th>${escapeHtml(T('admin.mon.col.severity', 'Severity'))}</th>
@@ -57,7 +97,7 @@ pub async fn admin_monitoring() -> Html<String> {
                 <th>${escapeHtml(T('admin.mon.col.threshold', 'Threshold'))}</th>
                 <th>${escapeHtml(T('admin.mon.col.triggered', 'Triggered'))}</th>
                 <th>${escapeHtml(T('admin.mon.col.statusCol', 'Status'))}</th>
-                <th>${escapeHtml(T('admin.mon.col.actions', 'Actions'))}</th>
+                <th class="admin-table-actions-col" data-no-sort="1">${escapeHtml(T('admin.mon.col.actions', 'Actions'))}</th>
               </tr>
             </thead>
             <tbody>
@@ -73,13 +113,13 @@ pub async fn admin_monitoring() -> Html<String> {
                 </tr>
               `).join('')}
             </tbody>
-          </table>
+          </table></div>
         `;
       
       const dashboardsHtml = dashboards.length === 0
-        ? '<div class="muted">' + escapeHtml(T('admin.mon.noDashboards', 'No dashboards created')) + '</div>'
+        ? adminEmptyStateHtml(T('admin.mon.noDashboards', 'No dashboards created'), { icon: '📊' })
         : `
-          <table class="admin-table">
+          <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.mon.dashboardsTitle', 'Dashboards'))}">
             <thead>
               <tr>
                 <th>${escapeHtml(T('admin.mon.col.name', 'Name'))}</th>
@@ -100,11 +140,12 @@ pub async fn admin_monitoring() -> Html<String> {
                 </tr>
               `).join('')}
             </tbody>
-          </table>
+          </table></div>
         `;
       
       el.innerHTML = `
         ${chartsHtml}
+        ${mlPanelHtml}
         <div class="admin-card">
           <h3>${escapeHtml(T('admin.mon.activeAlertsTitle', 'Active Alerts'))} (${alerts.length})</h3>
           ${alertsHtml}
@@ -120,7 +161,7 @@ pub async fn admin_monitoring() -> Html<String> {
           const rulesHtml = `
             <div class="admin-card">
               <h3>${escapeHtml(T('admin.mon.alertRulesTitle', 'Alert Rules'))} (${rules.length})</h3>
-              <table class="admin-table">
+              <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.mon.alertRulesTitle', 'Alert Rules'))}">
                 <thead>
                   <tr>
                     <th>${escapeHtml(T('admin.mon.col.name', 'Name'))}</th>
@@ -143,12 +184,16 @@ pub async fn admin_monitoring() -> Html<String> {
                     </tr>
                   `).join('')}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           `;
           el.innerHTML += rulesHtml;
         }
-      }).catch(e => console.error('Error loading alert rules:', e));
+        adminInitTablesIn(el);
+      }).catch(e => {
+        console.error('Error loading alert rules:', e);
+        adminInitTablesIn(el);
+      });
     }
     
     function showCreateDashboardModal() {
@@ -283,6 +328,7 @@ pub async fn admin_monitoring() -> Html<String> {
         <div class="admin-section">
           <div class="admin-header">
             <h2 data-i18n="admin.mon.section">Monitoring</h2>
+            <button type="button" class="btn btn-secondary" id="ml-demo-btn" onclick="runMlPipelineDemo()" data-i18n="admin.mon.mlDemoBtn" data-i18n-aria="admin.mon.mlDemoBtn">Run ML Demo</button>
             <button type="button" class="btn btn-primary" onclick="showCreateDashboardModal()" data-i18n="admin.mon.createDashBtn" data-i18n-aria="admin.mon.createDashBtn">Create Dashboard</button>
             <button type="button" class="btn" onclick="showCreateAlertRuleModal()" data-i18n="admin.mon.createRuleBtn" data-i18n-aria="admin.mon.createRuleBtn">Create Alert Rule</button>
           </div>

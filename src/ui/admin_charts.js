@@ -305,3 +305,196 @@ function poolaiStartMetricsPolling(fn, intervalMs) {
     clearInterval(id);
   };
 }
+
+/** PH-S43: numeric output keys from PIPELINE_MANAGEMENT runbook. */
+var POOLAI_ML_METRIC_KEYS = [
+  'latency_ms',
+  'memory_mb',
+  'flops',
+  'compression_ratio',
+  'bytes_in',
+  'bytes_out',
+  'accuracy',
+  'final_loss',
+  'f1_proxy',
+  'epochs_run',
+  'size_mb_before',
+  'size_mb_after',
+  'max_abs_recon_error',
+  'samples_evaluated',
+  'pruned_count',
+  'sparsity_ratio',
+  'feature_dim',
+  'sample_count',
+];
+
+function poolaiParseMlNumeric(val) {
+  if (val == null || val === '') return null;
+  var n = parseFloat(String(val));
+  return isNaN(n) ? null : n;
+}
+
+/** Flatten `step_results` from pipeline list API into table rows. */
+function poolaiFlattenMlStepRows(pipelines) {
+  var rows = [];
+  (pipelines || []).forEach(function (p) {
+    var results = p && p.step_results ? p.step_results : {};
+    Object.keys(results).forEach(function (stepId) {
+      var sr = results[stepId] || {};
+      var out = sr.output || {};
+      rows.push({
+        pipelineId: p.id || '',
+        pipelineName: p.name || p.id || 'pipeline',
+        pipelineStatus: p.status || '',
+        stepId: stepId,
+        stepStatus: sr.status || '',
+        stepKind: out.step_kind || out.step_id || stepId,
+        output: out,
+      });
+    });
+  });
+  return rows;
+}
+
+function poolaiFormatMlMetricSummary(output) {
+  if (!output || typeof output !== 'object') return '—';
+  var parts = [];
+  POOLAI_ML_METRIC_KEYS.forEach(function (key) {
+    if (output[key] == null || output[key] === '') return;
+    parts.push(key + '=' + output[key]);
+  });
+  if (parts.length === 0 && output.status) {
+    parts.push('status=' + output.status);
+  }
+  return parts.length ? parts.slice(0, 4).join(', ') : '—';
+}
+
+function poolaiCollectMlSparklineSeries(rows) {
+  var series = {};
+  (rows || []).forEach(function (row) {
+    var kind = row.stepKind || 'step';
+    POOLAI_ML_METRIC_KEYS.forEach(function (key) {
+      var n = poolaiParseMlNumeric(row.output && row.output[key]);
+      if (n == null) return;
+      var label = kind + ' · ' + key;
+      if (!series[label]) series[label] = [];
+      series[label].push(n);
+    });
+  });
+  return series;
+}
+
+/**
+ * PH-S43: ML pipeline step metrics panel (table + sparklines).
+ * @param {Array<object>} pipelines
+ * @param {{ title?: string, emptyMessage?: string }} [opts]
+ */
+function poolaiRenderMlPipelineMetricsPanel(pipelines, opts) {
+  opts = opts || {};
+  var rows = poolaiFlattenMlStepRows(pipelines);
+  var title =
+    opts.title ||
+    poolaiChartT('admin.mon.mlTitle', 'ML Pipeline Step Metrics');
+  if (!rows.length) {
+    return (
+      '<div class="admin-card ml-pipeline-metrics-panel">' +
+      '<h3>' +
+      escapeHtml(title) +
+      '</h3>' +
+      (typeof adminEmptyStateHtml === 'function'
+        ? adminEmptyStateHtml(
+            opts.emptyMessage ||
+              poolaiChartT('admin.mon.mlEmpty', 'No ML pipeline step metrics yet'),
+            {
+              hint: poolaiChartT(
+                'admin.mon.mlEmptyHint',
+                'Run the demo pipeline or execute a pipeline via the AI/ML API.',
+              ),
+              icon: '🧠',
+            },
+          )
+        : '<div class="muted">' +
+          escapeHtml(
+            opts.emptyMessage ||
+              poolaiChartT('admin.mon.mlEmpty', 'No ML pipeline step metrics yet'),
+          ) +
+          '</div>') +
+      '</div>'
+    );
+  }
+
+  var series = poolaiCollectMlSparklineSeries(rows);
+  var sparkParts = [];
+  Object.keys(series)
+    .slice(0, 6)
+    .forEach(function (label) {
+      var values = series[label];
+      if (values.length) {
+        sparkParts.push(poolaiRenderSparkline(label, values, { width: 220, height: 44 }));
+      }
+    });
+
+  var tableRows = rows.map(function (r) {
+    var statusCls =
+      String(r.stepStatus).toLowerCase() === 'completed'
+        ? 'active'
+        : String(r.stepStatus).toLowerCase() === 'failed'
+          ? 'error'
+          : 'warning';
+    return [
+      escapeHtml(r.pipelineName),
+      escapeHtml(r.stepId),
+      '<code>' + escapeHtml(String(r.stepKind)) + '</code>',
+      '<span class="status-badge ' +
+        statusCls +
+        '">' +
+        escapeHtml(String(r.stepStatus || '—')) +
+        '</span>',
+      escapeHtml(poolaiFormatMlMetricSummary(r.output)),
+    ];
+  });
+
+  var tableHtml =
+    typeof adminRenderTable === 'function'
+      ? adminRenderTable(
+          [
+            poolaiChartT('admin.mon.mlCol.pipeline', 'Pipeline'),
+            poolaiChartT('admin.mon.mlCol.step', 'Step'),
+            poolaiChartT('admin.mon.mlCol.kind', 'Kind'),
+            poolaiChartT('admin.mon.mlCol.status', 'Status'),
+            poolaiChartT('admin.mon.mlCol.metrics', 'Metrics'),
+          ],
+          tableRows,
+        )
+      : '';
+
+  return (
+    '<div class="admin-card ml-pipeline-metrics-panel">' +
+    '<h3>' +
+    escapeHtml(title) +
+    ' (' +
+    rows.length +
+    ')</h3>' +
+    (sparkParts.length
+      ? '<div class="metrics-sparklines-grid ml-step-sparklines">' +
+        sparkParts.join('') +
+        '</div>'
+      : '') +
+    tableHtml +
+    '</div>'
+  );
+}
+
+async function poolaiFetchMlPipelines() {
+  try {
+    var data = await fetchJson('/api/enterprise/ai-ml/pipeline');
+    return data || [];
+  } catch (e) {
+    console.warn('poolaiFetchMlPipelines:', e);
+    return null;
+  }
+}
+
+async function poolaiRunMlPipelineDemo() {
+  return fetchJson('/api/enterprise/ai-ml/pipeline/demo');
+}

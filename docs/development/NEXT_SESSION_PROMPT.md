@@ -1,11 +1,11 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** (після PH-S42) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
+**Оновлено:** 2026-05-25 · **HEAD** (після PH-S43) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
 
 ---
 
 ```
-PoolAI — PH-S43 ML/monitoring metrics admin UI.
+PoolAI — PH-S45 E2E stability (vm modal + axe audit).
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -29,31 +29,30 @@ cargo test-ci
 # бенч лише якщо спринт чіпає perf → BENCHMARKS.md / poolai_health_load
 
 ## Стан
-- **PH-S03…S47, PH-S37 infra, PH-S39, PH-S44, PH-S42:** ✅
-- **Черга §5.11:** PH-S43 → S45 → S38 → S46 → S41
+- **PH-S03…S47, PH-S37 infra, PH-S39, PH-S44, PH-S42, PH-S43:** ✅
+- **Черга §5.11:** PH-S45 → S38 → S46 → S41
 - **BLOCKED:** PH-S35/S16 LAN (2 хости) · **Deferred:** PH-S36/S01 Cloud SDK (FM-041)
 
-## PH-S43 — ця сесія
-- Monitoring / ML step metrics admin UI (`admin/monitoring.rs`, DIGEST §ML, `admin_charts.js`)
-- Джерела: FM §5.10, `UI_UX_MONITORING_IMPROVEMENTS_2026-01-21.md`
+## PH-S45 — ця сесія
+- E2E stability: VM create modal + axe `/ui/admin/audit` (`admin.spec.ts`, `a11y.spec.ts`, `E2E_PLAYWRIGHT.md`)
+- Джерела: FM §5.10, PH-S44 CI gate scope
 
 ## Завершення сесії
-1. Закрити PH-S43 у FM §5.11 + HANDOFF
-2. Оновити NEXT_SESSION_PROMPT → наступний PH-S45
+1. Закрити PH-S45 у FM §5.11 + HANDOFF
+2. Оновити NEXT_SESSION_PROMPT → наступний PH-S38
 3. git push (зовнішній MSYS2) + самарі: hash, subject, test-ci, known issues
 4. Не стаджити: data/audit/*.log, .commit-msg-*, bin/commit-*.sh, target/
 
 ## Не повторювати
-PH-S03…S47 · PH-S37/PH-S39/PH-S44/PH-S42 · повний `cargo test-ci --verbose` без змін коду
+PH-S03…S47 · PH-S37/PH-S39/PH-S44/PH-S42/PH-S43 · повний `cargo test-ci --verbose` без змін коду
 
 ## Наступні спринти (§5.11, max 10 у черзі)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S43** | ML/monitoring metrics admin UI ← ПОТОЧНИЙ |
-| 2 | **PH-S45** | E2E vm modal + axe audit |
-| 3 | **PH-S38** | Job scheduler + on-chain epics |
-| 4 | **PH-S46** | Solana on-chain program |
-| 5 | **PH-S41** | macvlan (Linux) |
+| 1 | **PH-S45** | E2E vm modal + axe audit ← ПОТОЧНИЙ |
+| 2 | **PH-S38** | Job scheduler + on-chain epics |
+| 3 | **PH-S46** | Solana on-chain program |
+| 4 | **PH-S41** | macvlan (Linux) |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK · PH-S40 hardware VM (великий scope)
 ```

@@ -60,8 +60,10 @@ Loaded after `admin_common.js` in `admin_layout`. SVG-only charts; data from `GE
 | `poolaiRenderSparkline(label, values, opts)` | Compact dashboard sparkline |
 | `poolaiRenderMetricsChartGrid(names, opts)` | Async card + grid for monitoring |
 | `poolaiStartMetricsPolling(fn, ms)` | `setInterval` wrapper; returns `stop()` |
+| `poolaiRenderMlPipelineMetricsPanel(pipelines, opts)` | PH-S43: step metrics table + sparklines from `step_results` |
+| `poolaiFetchMlPipelines()` / `poolaiRunMlPipelineDemo()` | List pipelines / run demo via `/api/enterprise/ai-ml/pipeline*` |
 
-CSS: `.metric-chart-container`, `.metrics-charts-grid`, `.metrics-sparklines-grid`, `.metric-sparkline-card` in `admin_styles.css`.
+CSS: `.metric-chart-container`, `.metrics-charts-grid`, `.metrics-sparklines-grid`, `.metric-sparkline-card`, `.ml-pipeline-metrics-panel` in `admin_styles.css`.
 
 ## Example
 
@@ -72,7 +74,7 @@ document.getElementById('list').innerHTML = adminRenderTable(
 );
 ```
 
-**Last updated:** 2026-05-25 (PH-S42 admin table sort/filter/export + empty states).
+**Last updated:** 2026-05-25 (PH-S43 ML step metrics admin panel).
 
 ## Themes (PH-S14)
 

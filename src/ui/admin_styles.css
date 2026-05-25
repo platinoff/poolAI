@@ -977,6 +977,14 @@ button.btn.btn-danger:focus-visible,
   margin-top: var(--spacing-4, 16px);
 }
 
+.ml-pipeline-metrics-panel {
+  margin-top: var(--spacing-4);
+}
+
+.ml-step-sparklines {
+  margin-bottom: var(--spacing-4);
+}
+
 .metric-sparkline-card {
   background: var(--surface, #171b22);
   border: 1px solid var(--border, #262b36);
