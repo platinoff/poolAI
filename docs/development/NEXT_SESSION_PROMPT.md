@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `c624d189` · **§5.11** — PH-S47 (дочекатись CI)
+**Оновлено:** 2026-05-25 · **HEAD** `28bcb91f` · **§5.11** — PH-S47 (дочекатись CI)
 
 ---
 
@@ -13,7 +13,7 @@ df -h /s — Use% ≥99% → cargo clean перед cargo test-ci
 
 ## Стан
 - **PH-S03…S34:** ✅
-- **CI main:** push `c624d189` (`test-ci` + `CARGO_BUILD_JOBS=1`); `160a1f59` — OpenAPI/raid_admin/E2E debug ✅ в коді; **дочекатись зеленого** ubuntu + openapi-gap + Playwright → **PH-S47**
+- **CI main:** `28bcb91f` PH-S47c (E2E без ml, `test:ci` без visual); `c624d189` test-ci; **дочекатись зеленого** ubuntu + openapi-gap + Playwright → **PH-S47**
 - **PH-S37:** workflow YAML ✅ (`a6f14cb2`); **PNG** — merge PR після зеленого CI
 - **PH-S35/S16, FM-003 LAN §4:** BLOCKED (2 хости)
 - **PH-S36/S15, FM-041:** Deferred
