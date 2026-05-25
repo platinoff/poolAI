@@ -88,8 +88,8 @@ jobs:
         continue-on-error: true
       
       - name: Run tests (default) - Required
-        # FM-011 / PH-S47: -j 1 + --test-threads=1 (same as .cargo/config.toml test-ci; avoids rustc 101 on CI)
-        run: cargo test-ci --verbose
+        # FM-011 / PH-S47: same as `cargo test-ci` (.cargo/config.toml); --verbose must be before `--`
+        run: cargo test -j 1 --verbose --lib --tests --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus -- --test-threads=1
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
           CARGO_BUILD_JOBS: "1"
