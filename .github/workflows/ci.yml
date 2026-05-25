@@ -88,9 +88,11 @@ jobs:
         continue-on-error: true
       
       - name: Run tests (default) - Required
-        run: cargo test --verbose --lib --tests --features ml,enterprise,cloud,test-utils
+        # FM-011 / PH-S47: -j 1 + --test-threads=1 (same as .cargo/config.toml test-ci; avoids rustc 101 on CI)
+        run: cargo test-ci --verbose
         env:
           K8S_OPENAPI_ENABLED_VERSION: "1.28"
+          CARGO_BUILD_JOBS: "1"
       
       - name: Run tests (cloud-sdk feature)
         run: cargo test --verbose --features cloud,cloud-sdk

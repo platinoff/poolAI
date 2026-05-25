@@ -13,6 +13,8 @@ env:
   POOLAI_E2E_USER: admin
   POOLAI_E2E_PASSWORD: admin123
   CI: "true"
+  # PH-S47: single rustc job (avoids exit 101 under memory/thread pressure on runners)
+  CARGO_BUILD_JOBS: "1"
 
 jobs:
   playwright-admin:

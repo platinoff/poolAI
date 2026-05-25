@@ -91,6 +91,7 @@ if [[ "$DO_START" == true ]]; then
   E2E_PROFILE="release"
   if [[ "${CI:-}" == "true" ]]; then
     E2E_PROFILE="debug"
+    export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-1}"
   fi
   export POOLAI_E2E_PROFILE="${E2E_PROFILE}"
   cargo build "--${E2E_PROFILE}" --features "${FEATURES}"
