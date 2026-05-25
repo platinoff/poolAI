@@ -2,10 +2,13 @@
 //!
 //! **No mainnet** — `mainnet-beta` is rejected at load time.
 
+use crate::instruction::{is_placeholder_program_id, PLACEHOLDER_PROGRAM_ID};
 use serde::{Deserialize, Serialize};
+use solana_pubkey::Pubkey;
 use std::env;
 use std::fmt;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 
 pub const DEFAULT_DEVNET_RPC_URL: &str = "https://api.devnet.solana.com";
 pub const ENV_CONFIG_PATH: &str = "POOLAI_SOLANA_CONFIG";
@@ -69,6 +72,7 @@ pub enum ConfigError {
     MainnetNotAllowed,
     Io(String),
     Toml(String),
+    InvalidProgramId(String),
 }
 
 impl fmt::Display for ConfigError {
@@ -82,6 +86,7 @@ impl fmt::Display for ConfigError {
             }
             Self::Io(e) => write!(f, "config io error: {e}"),
             Self::Toml(e) => write!(f, "config toml error: {e}"),
+            Self::InvalidProgramId(e) => write!(f, "invalid program_id: {e}"),
         }
     }
 }
@@ -149,7 +154,27 @@ impl AdapterConfig {
         if self.rpc_url.trim().is_empty() {
             return Err(ConfigError::Toml("rpc_url must not be empty".into()));
         }
+        if !is_placeholder_program_id(&self.program_id)
+            && Pubkey::from_str(self.program_id.trim()).is_err()
+        {
+            return Err(ConfigError::InvalidProgramId(format!(
+                "program_id must be a valid base58 pubkey or placeholder {PLACEHOLDER_PROGRAM_ID}"
+            )));
+        }
         Ok(())
+    }
+
+    /// Resolved program id for submit (env `POOLAI_SOLANA_PROGRAM_ID` overrides TOML).
+    pub fn resolved_program_id(&self) -> String {
+        std::env::var(crate::rpc::ENV_PROGRAM_ID)
+            .ok()
+            .filter(|s| !s.trim().is_empty())
+            .unwrap_or_else(|| self.program_id.clone())
+    }
+
+    /// `true` when a deployed `poolai-events` program id is configured (not Memo fallback).
+    pub fn uses_custom_program(&self) -> bool {
+        !is_placeholder_program_id(&self.resolved_program_id())
     }
 
     pub fn bundled_devnet_path() -> PathBuf {
@@ -191,6 +216,36 @@ program_id = "11111111111111111111111111111111"
         )
         .unwrap_err();
         assert_eq!(err, ConfigError::MainnetNotAllowed);
+    }
+
+    #[test]
+    fn rejects_invalid_deployed_program_id() {
+        let err = AdapterConfig::from_toml(
+            r#"
+cluster = "devnet"
+rpc_url = "https://api.devnet.solana.com"
+commitment = "confirmed"
+mock_rpc = false
+program_id = "not-a-valid-pubkey"
+"#,
+        )
+        .unwrap_err();
+        assert!(matches!(err, ConfigError::InvalidProgramId(_)));
+    }
+
+    #[test]
+    fn uses_custom_program_when_pubkey_set() {
+        let cfg = AdapterConfig::from_toml(
+            r#"
+cluster = "devnet"
+rpc_url = "https://api.devnet.solana.com"
+commitment = "confirmed"
+mock_rpc = false
+program_id = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+"#,
+        )
+        .unwrap();
+        assert!(cfg.uses_custom_program());
     }
 
     #[test]

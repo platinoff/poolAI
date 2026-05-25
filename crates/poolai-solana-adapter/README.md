@@ -1,6 +1,6 @@
 # poolai-solana-adapter
 
-Sidecar crate for **FM-010** (Horizon S37), **FM-024** (devnet mock RPC stub), and **FM-033** (on-chain program + real devnet JSON-RPC).
+Sidecar crate for **FM-010** (Horizon S37), **FM-024** (devnet mock RPC stub), **FM-033** (on-chain program + real devnet JSON-RPC), and **PH-S46** (wire limits + production devnet deploy path).
 
 ## Scope
 
@@ -9,6 +9,7 @@ Sidecar crate for **FM-010** (Horizon S37), **FM-024** (devnet mock RPC stub), a
 | v0.1 (FM-010) | JSON schema **v1**: `JobCompleted`, `SeedProvided`, `MemoryUpdated` |
 | v0.2 (FM-024) | Devnet config (`config/devnet.toml`), mock RPC submit on valid events |
 | v0.3 (FM-033) | `poolai-events` BPF prototype, HTTP `sendTransaction` to devnet, Memo fallback |
+| v0.4 (PH-S46) | Shared `wire/limits.rs`, envelope validation, `anchor_mode` in RPC ack, deploy script |
 | Always | **`solana-sdk` only in this crate** — main `poolai` has no Solana dependency |
 | Out of scope | Mainnet, `solana-client` crate |
 
@@ -19,7 +20,7 @@ cargo test -p poolai-solana-adapter -p poolai-events -j 1
 cargo build -p poolai-solana-adapter --release
 ```
 
-On-chain program: see [`program/README.md`](program/README.md).
+On-chain program: see [`program/README.md`](program/README.md). Devnet deploy: [`scripts/deploy-poolai-events-devnet.sh`](../../scripts/deploy-poolai-events-devnet.sh) (MSYS2 bash + Solana CLI).
 
 ## Configuration
 
@@ -56,6 +57,15 @@ export POOLAI_SOLANA_MOCK_RPC=1
 ```
 
 Stdout ack includes `rpc` block with `mocksig…` signature.
+
+### Production devnet path (PH-S46)
+
+1. Deploy: `bash scripts/deploy-poolai-events-devnet.sh` → copy `POOLAI_SOLANA_PROGRAM_ID`.
+2. Optional profile: [`config/devnet.deployed.toml.example`](config/devnet.deployed.toml.example).
+3. Pipe core NDJSON: `tail -f data/onchain/events.ndjson | poolai-solana-adapter`
+4. RPC ack includes `anchor_mode`: `memo` (placeholder program id) or `program` (deployed BPF).
+
+Wire limits (`wire/limits.rs`): `event_id` ≤128, domain ids ≤256 — validated in sidecar, instruction builder, and BPF.
 
 ## Docs
 

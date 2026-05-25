@@ -2,6 +2,7 @@
 
 use crate::config::{AdapterConfig, SolanaCluster};
 use crate::events::DomainEventEnvelope;
+use crate::instruction::AnchorMode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
@@ -21,6 +22,12 @@ pub struct MockSubmitResult {
     pub rpc_url: String,
     pub signature: String,
     pub slot: u64,
+    #[serde(default = "default_anchor_mode")]
+    pub anchor_mode: String,
+}
+
+fn default_anchor_mode() -> String {
+    AnchorMode::Memo.as_wire_str().to_string()
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -79,6 +86,9 @@ impl MockRpcClient {
             rpc_url: config.rpc_url.clone(),
             signature,
             slot,
+            anchor_mode: AnchorMode::for_program_id(&config.resolved_program_id())
+                .as_wire_str()
+                .to_string(),
         };
         self.by_event_id
             .insert(envelope.event_id.clone(), result.clone());

@@ -1,11 +1,11 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** (після PH-S38) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
+**Оновлено:** 2026-05-25 · **HEAD** (після PH-S46) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
 
 ---
 
 ```
-PoolAI — PH-S46 Solana on-chain program.
+PoolAI — PH-S41 macvlan network isolation (Linux).
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -18,39 +18,36 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 git fetch; git status -sb; git log -1 --oneline
 df -h /s | tail -1   # Use% ≥99% або Avail <5G → cargo clean
-HANDOFF · FM §5.11 · concept root (напрям) · ARCHITECTURE_BEST_PRACTICES
+HANDOFF · FM §5.11 · vm/isolation/linux.rs
 
 ## Локальний CI (канон — GitHub CI ігнорувати для «готово»)
 cargo fmt --all
 cargo test-ci
-# за scope Solana: cargo test -p poolai-solana-adapter
+# за scope Linux VM only: cargo test vm::isolation --features …
 # за змін API: cargo run --bin poolai-openapi-gap-audit  # 0 errors
-# за змін UI/e2e: cd e2e && npm run test:ci
-# бенч лише якщо спринт чіпає perf → BENCHMARKS.md / poolai_health_load
 
 ## Стан
-- **PH-S03…S47, PH-S37 infra, PH-S39, PH-S44, PH-S42, PH-S43, PH-S45, PH-S38:** ✅
-- **Черга §5.11:** PH-S46 → S41
+- **PH-S03…S47, PH-S37 infra, PH-S39, PH-S44, PH-S42, PH-S43, PH-S45, PH-S38, PH-S46:** ✅
+- **Черга §5.11:** PH-S41 (єдиний відкритий кодовий)
 - **BLOCKED:** PH-S35/S16 LAN (2 хости) · **Deferred:** PH-S36/S01 Cloud SDK (FM-041)
 
-## PH-S46 — ця сесія
-- Solana on-chain program hardening + production devnet path (`crates/poolai-solana-adapter/`, FM-033)
-- Джерела: FM §5.7, §5.11, `SOLANA_ADAPTER_CONCEPT` §8–9
+## PH-S41 — ця сесія
+- macvlan network isolation (Linux) — `src/vm/isolation/linux.rs`, FM §5.10
+- Джерела: FM §5.11, Architect / UI plans за scope VM network
 
 ## Завершення сесії
-1. Закрити PH-S46 у FM §5.11 + HANDOFF
-2. Оновити NEXT_SESSION_PROMPT → наступний PH-S41
+1. Закрити PH-S41 у FM §5.11 + HANDOFF
+2. Оновити NEXT_SESSION_PROMPT → research sprint (черга <3) або наступний PH-S*
 3. git push (зовнішній MSYS2) + самарі: hash, subject, test-ci, known issues
 4. Не стаджити: data/audit/*.log, .commit-msg-*, bin/commit-*.sh, target/
 
 ## Не повторювати
-PH-S03…S47 · PH-S37/PH-S39/PH-S44/PH-S42/PH-S43/PH-S45/PH-S38 · повний `cargo test-ci --verbose` без змін коду
+PH-S03…S47 · PH-S46 Solana adapter · PH-S37/39/44/42/43/45/38 · повний cargo test-ci --verbose без змін коду
 
-## Наступні спринти (§5.11, max 10 у черзі)
+## Наступні спринти (§5.11)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S46** | Solana on-chain program ← ПОТОЧНИЙ |
-| 2 | **PH-S41** | macvlan (Linux) |
+| 1 | **PH-S41** | macvlan (Linux) ← ПОТОЧНИЙ |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK · PH-S40 hardware VM (великий scope)
 ```

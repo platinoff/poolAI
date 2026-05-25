@@ -24,6 +24,12 @@ fn main() {
         cluster = ?config.cluster,
         rpc_url = %config.rpc_url,
         mock_rpc = config.mock_rpc,
+        anchor = if config.uses_custom_program() {
+            "program"
+        } else {
+            "memo"
+        },
+        program_id = %config.resolved_program_id(),
         "poolai-solana-adapter started"
     );
 

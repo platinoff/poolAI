@@ -93,9 +93,20 @@
 
 **Pipe to sidecar:** `tail -f data/onchain/events.ndjson | poolai-solana-adapter` (devnet config / mock RPC).
 
-## 10. Наступні кроки (поза PH-S38)
+## 10. PH-S46 — wire hardening + production devnet path (2026-05-25) ✅
 
-- Devnet deploy `poolai-events.so` + оновити `program_id` у конфігу.
+| Що | Де |
+|----|-----|
+| Shared wire limits | `crates/poolai-solana-adapter/wire/limits.rs` (included by adapter + BPF) |
+| Envelope validation | `src/wire_limits.rs`, `DomainEventEnvelope::validate`, sidecar reject |
+| BPF checks | `program/poolai-events/src/lib.rs` — empty/oversized fields, instruction data cap |
+| Deploy script | `scripts/deploy-poolai-events-devnet.sh` |
+| Deployed profile example | `config/devnet.deployed.toml.example` |
+| RPC ack | `anchor_mode`: `memo` \| `program` |
+
+**Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1`
+
+## 11. Наступні кроки
+
 - Batch / merkle виплати; звірка з `rewards` модулем core.
-
-**Спринт PH-S46** (§5.11 FM): on-chain program hardening + production devnet path — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.11, [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
+- **Наступний спринт:** **PH-S41** macvlan (Linux) — [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).

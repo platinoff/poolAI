@@ -2,7 +2,7 @@
 
 use crate::config::AdapterConfig;
 use crate::events::DomainEventEnvelope;
-use crate::instruction::build_submit_instruction;
+use crate::instruction::{build_submit_instruction, AnchorMode};
 use crate::rpc::{MockSubmitResult, RpcSubmitStatus};
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use serde_json::{json, Value};
@@ -146,7 +146,10 @@ impl<T: RpcTransport> DevnetRpcClient<T> {
         }
 
         let keypair = load_keypair_from_env()?;
-        let program_id = resolve_program_id(config);
+        let program_id = config.resolved_program_id();
+        let anchor_mode = AnchorMode::for_program_id(&program_id)
+            .as_wire_str()
+            .to_string();
         let payer = keypair.pubkey();
         let ix = build_submit_instruction(&program_id, &payer, envelope)
             .map_err(|e| DevnetRpcError::Build(e.to_string()))?;
@@ -164,6 +167,7 @@ impl<T: RpcTransport> DevnetRpcClient<T> {
             rpc_url: config.rpc_url.clone(),
             signature,
             slot,
+            anchor_mode,
         };
         self.by_event_id
             .insert(envelope.event_id.clone(), result.clone());
@@ -175,8 +179,9 @@ impl<T: RpcTransport> DevnetRpcClient<T> {
     }
 }
 
+/// Legacy helper — prefer [`AdapterConfig::resolved_program_id`].
 pub fn resolve_program_id(config: &AdapterConfig) -> String {
-    std::env::var(ENV_PROGRAM_ID).unwrap_or_else(|_| config.program_id.clone())
+    config.resolved_program_id()
 }
 
 pub fn load_keypair_from_env() -> Result<Keypair, DevnetRpcError> {
@@ -351,6 +356,7 @@ mod tests {
         assert_eq!(result.status, RpcSubmitStatus::Submitted);
         assert_eq!(result.signature.len(), 88);
         assert_eq!(result.slot, 42);
+        assert_eq!(result.anchor_mode, "memo");
 
         let calls = transport.calls.lock().unwrap();
         assert!(calls.iter().any(|m| m == "getLatestBlockhash"));

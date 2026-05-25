@@ -335,13 +335,13 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Документ**: [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md) — типи повідомлень `Job`, `Result`, `MemoryShard`, `PeerStatus`; мапінг на `/api/v1/discovery/*`, `DiscoveryMessage`, `/raid/distributed/*`, `tests/grid_network_scalability_tests.rs`.
 - **Оновлено**: [`concept/POOLAI_GRID_NODE.md`](../concept/POOLAI_GRID_NODE.md) (посилання на Grid Protocol), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), `file_list.csv`.
-- **Залишок P6 (історичний)**: wire envelope + adapter MVP — **закрито S35–S37**; scheduler + core on-chain epics — **PH-S38 ✅**; залишок — program hardening (**PH-S46**).
+- **Залишок P6 (історичний)**: wire envelope + adapter MVP — **закрито S35–S37**; scheduler + core on-chain epics — **PH-S38 ✅**; program hardening — **PH-S46 ✅**.
 
 ## Верифікація 2026-04-06 (P6 — Solana adapter concept)
 
 - **Документ**: [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md) — межі core vs адаптер; мапінг `JobCompleted` / `SeedProvided` / `MemoryUpdated`; варіанти інтеграції (sidecar, черга, pull).
 - **P6 критерії готовності (концепт)**: закрито; наступний горизонт — прототип on-chain програми та schema подій core↔adapter.
-- **Залишок**: on-chain program hardening у sidecar (**PH-S46**); job store RAID-backed — deferred.
+- **Залишок**: job store RAID-backed — deferred; **PH-S46** Solana hardening ✅.
 
 ## Верифікація 2026-04-06 (P5 — архівні плани)
 

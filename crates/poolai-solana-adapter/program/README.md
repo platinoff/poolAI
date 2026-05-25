@@ -1,6 +1,6 @@
-# PoolAI on-chain program (FM-033)
+# PoolAI on-chain program (FM-033 / PH-S46)
 
-Minimal BPF program **`poolai-events`** logs domain event anchors (`JobCompleted`, `SeedProvided`, `MemoryUpdated`).
+Minimal BPF program **`poolai-events`** logs domain event anchors (`JobCompleted`, `SeedProvided`, `MemoryUpdated`). PH-S46 adds on-chain wire validation (shared `wire/limits.rs`).
 
 ## Layout
 
@@ -13,9 +13,17 @@ Minimal BPF program **`poolai-events`** logs domain event anchors (`JobCompleted
 
 Requires [Solana CLI](https://docs.solanalabs.com/cli/install) and devnet keypair with SOL (airdrop).
 
+From repo root (MSYS2 bash):
+
+```bash
+bash scripts/deploy-poolai-events-devnet.sh
+```
+
+Manual:
+
 ```bash
 cd crates/poolai-solana-adapter/program/poolai-events
-cargo build-sbf   # or: cargo build --release (library tests only)
+cargo build-sbf
 solana program deploy target/deploy/poolai_events.so --url devnet
 ```
 

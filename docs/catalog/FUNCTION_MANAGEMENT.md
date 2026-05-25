@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-25 (PH-S38 ✅ Job scheduler + on-chain epics · PH-S45 ✅ · §5.11 PH-S46…S41; FM-041 Deferred).
+**Оновлено:** 2026-05-25 (PH-S46 ✅ Solana wire hardening + devnet deploy path · §5.11 PH-S41; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -159,8 +159,8 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S42** Admin tables UX | **§5.11** | **✅** — sort/filter/export, `adminEmptyStateHtml`, auto-init |
 | — | **PH-S43** ML/monitoring metrics UI | **§5.11** | **✅** — ML step metrics panel, demo btn, sparklines |
 | — | **PH-S45** E2E stability (vm modal, axe audit) | **§5.11** | **✅** — VM onclick globals, E2E POST/DELETE wait, audit axe settle, viewport 1920 |
-| 1 | **PH-S46** Solana on-chain program (post FM-024) | **§5.11** | **Відкрито** — Architect P6, §5.7 |
-| 2 | **PH-S41** macvlan (Linux) | **§5.11** | **Відкрито** |
+| — | **PH-S46** Solana on-chain program hardening + devnet deploy | **§5.11** | **✅** — `wire/limits.rs`, deploy script, `anchor_mode` |
+| 1 | **PH-S41** macvlan (Linux) | **§5.11** | **Відкрито** |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
@@ -225,7 +225,7 @@ FM-xxx (з таблиці нижче)
 | **PH-S43** | Monitoring / ML step metrics UI | UI_UX §monitoring, DIGEST §ML | **✅** |
 | **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **✅** — `e2e/package.json` `test:ci` + `ci.yml` paths-filter |
 
-**Наступна сесія (код/CI):** **PH-S46** (Solana on-chain program) → **PH-S41**. **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
+**Наступна сесія (код/CI):** **PH-S41** (macvlan Linux). **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
 
 ### 5.11 Наступні 10 спринтів PH-S47…S46 (код, 2026-05-25)
 
@@ -243,8 +243,8 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S43** | Monitoring / ML step metrics admin UI | §5.10, DIGEST §ML, `admin/monitoring.rs` | **✅** |
 | — | **PH-S45** | E2E stability: VM create modal + axe `/ui/admin/audit` | `admin.spec.ts`, `a11y.spec.ts`, `vm.rs` globals | **✅** |
 | — | **PH-S38** | Job scheduler hardening + on-chain submit epics | §5.10, `src/job/` | **✅** |
-| 1 | **PH-S46** | Solana on-chain program / events (post FM-024 mock RPC) | §5.7, `SOLANA_ADAPTER_CONCEPT` | **Відкрито** |
-| 2 | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **Відкрито** |
+| — | **PH-S46** | Solana wire hardening + production devnet deploy path | §5.7, `SOLANA_ADAPTER_CONCEPT` §10 | **✅** |
+| 1 | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **Відкрито** |
 
 **Поза чергою:** **PH-S35** LAN (**BLOCKED**) · **PH-S36** Cloud SDK (**Deferred**, FM-041) · **PH-S40** hardware VM (великий scope).
 
@@ -359,7 +359,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S46** (Solana on-chain program) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S41** (macvlan Linux) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

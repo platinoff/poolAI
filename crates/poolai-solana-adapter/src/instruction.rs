@@ -1,6 +1,7 @@
 //! Borsh instruction encoding — must match `program/poolai-events/src/lib.rs`.
 
 use crate::events::{DomainEvent, DomainEventEnvelope};
+use crate::wire_limits::{self, validate_instruction_data, WireValidationError};
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_instruction::{account_meta::AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
@@ -12,6 +13,35 @@ pub const MEMO_PROGRAM_ID: &str = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr";
 
 /// Bundled placeholder until `POOLAI_SOLANA_PROGRAM_ID` / deploy.
 pub const PLACEHOLDER_PROGRAM_ID: &str = "11111111111111111111111111111111";
+
+/// `true` when sidecar should use Memo fallback (no custom program deployed).
+pub fn is_placeholder_program_id(program_id: &str) -> bool {
+    program_id.trim() == PLACEHOLDER_PROGRAM_ID
+}
+
+/// Anchor mode for RPC ack metadata.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnchorMode {
+    Memo,
+    Program,
+}
+
+impl AnchorMode {
+    pub fn as_wire_str(self) -> &'static str {
+        match self {
+            Self::Memo => "memo",
+            Self::Program => "program",
+        }
+    }
+
+    pub fn for_program_id(program_id: &str) -> Self {
+        if is_placeholder_program_id(program_id) {
+            Self::Memo
+        } else {
+            Self::Program
+        }
+    }
+}
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone, PartialEq, Eq)]
 pub enum PoolAiInstruction {
@@ -57,14 +87,20 @@ pub enum InstructionBuildError {
     Borsh(String),
     InvalidProgramId(String),
     InvalidPayer(String),
+    WireValidation(WireValidationError),
+    MemoTooLong { len: usize, max: usize },
 }
 
 impl std::fmt::Display for InstructionBuildError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Borsh(e) => write!(f, "instruction borsh error: {e}"),
             Self::InvalidProgramId(e) => write!(f, "invalid program_id: {e}"),
             Self::InvalidPayer(e) => write!(f, "invalid payer pubkey: {e}"),
+            Self::WireValidation(e) => write!(f, "wire validation: {e}"),
+            Self::MemoTooLong { len, max } => {
+                write!(f, "memo anchor length {len} exceeds max {max}")
+            }
         }
     }
 }
@@ -77,14 +113,17 @@ pub fn build_submit_instruction(
     payer: &Pubkey,
     envelope: &DomainEventEnvelope,
 ) -> Result<Instruction, InstructionBuildError> {
-    if program_id_str == PLACEHOLDER_PROGRAM_ID {
+    wire_limits::validate_envelope(envelope).map_err(InstructionBuildError::WireValidation)?;
+
+    if is_placeholder_program_id(program_id_str) {
         return build_memo_instruction(payer, envelope);
     }
 
-    let program_id = Pubkey::from_str(program_id_str)
+    let program_id = Pubkey::from_str(program_id_str.trim())
         .map_err(|e| InstructionBuildError::InvalidProgramId(e.to_string()))?;
     let pool_ix = PoolAiInstruction::from_envelope(envelope);
     let data = pool_ix.encode()?;
+    validate_instruction_data(&data).map_err(InstructionBuildError::WireValidation)?;
     Ok(Instruction::new_with_bytes(
         program_id,
         &data,
@@ -103,6 +142,13 @@ fn build_memo_instruction(
         envelope.event_id,
         event_type_tag(&envelope.event)
     );
+    let len = memo.len();
+    if len > wire_limits::MAX_MEMO_ANCHOR_LEN {
+        return Err(InstructionBuildError::MemoTooLong {
+            len,
+            max: wire_limits::MAX_MEMO_ANCHOR_LEN,
+        });
+    }
     Ok(Instruction::new_with_bytes(
         memo_program,
         memo.as_bytes(),
@@ -150,6 +196,34 @@ mod tests {
         assert_eq!(ix.program_id.to_string(), MEMO_PROGRAM_ID);
         let data = String::from_utf8_lossy(&ix.data);
         assert!(data.contains("evt-memo"));
+    }
+
+    #[test]
+    fn rejects_oversized_envelope_before_submit() {
+        let payer = Pubkey::new_unique();
+        let env = DomainEventEnvelope::new(
+            "evt",
+            DomainEvent::JobCompleted(JobCompletedEvent {
+                job_id: "x".repeat(wire_limits::MAX_DOMAIN_ID_LEN + 1),
+                executor_peer_id: "p".into(),
+                payout_lamports: None,
+                verification_digest: None,
+            }),
+        );
+        let err = build_submit_instruction(PLACEHOLDER_PROGRAM_ID, &payer, &env).unwrap_err();
+        assert!(matches!(err, InstructionBuildError::WireValidation(_)));
+    }
+
+    #[test]
+    fn anchor_mode_for_program_id() {
+        assert_eq!(
+            AnchorMode::for_program_id(PLACEHOLDER_PROGRAM_ID),
+            AnchorMode::Memo
+        );
+        assert_eq!(
+            AnchorMode::for_program_id(&Pubkey::new_unique().to_string()),
+            AnchorMode::Program
+        );
     }
 
     #[test]

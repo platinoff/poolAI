@@ -1,0 +1,9 @@
+# PH-S46 — copy after `scripts/deploy-poolai-events-devnet.sh` (or manual deploy).
+# Usage: export POOLAI_SOLANA_CONFIG=/path/to/devnet.deployed.toml
+
+cluster = "devnet"
+rpc_url = "https://api.devnet.solana.com"
+commitment = "confirmed"
+mock_rpc = false
+# Replace with output of `solana program deploy …`:
+program_id = "REPLACE_WITH_DEPLOYED_PROGRAM_PUBKEY"

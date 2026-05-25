@@ -668,6 +668,13 @@
 - **Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1`
 - **FM:** FM-033 ✅
 
+### [Solana] PH-S46 wire hardening + devnet deploy path
+- **Де:** `crates/poolai-solana-adapter/wire/limits.rs`, `src/wire_limits.rs`, `program/poolai-events/`, `scripts/deploy-poolai-events-devnet.sh`
+- **Сигнал:** `validate_envelope`, `anchor_mode` у RPC ack, `AdapterConfig::uses_custom_program`
+- **Патерн:** shared limits included у adapter + BPF; placeholder `1111…` → Memo; deployed pubkey → `poolai-events` instruction
+- **Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1`
+- **PH-S46** ✅
+
 ### [Grid] Envelope v1 JSON (FM-009, S36)
 - **Де:** `src/grid/envelope.rs`, `src/grid/map.rs`
 - **Сигнал:** `GridEnvelope::from_json`, `envelope_from_peer_info`, `envelope_from_put_artifact`

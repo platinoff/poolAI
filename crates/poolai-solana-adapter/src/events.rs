@@ -89,7 +89,8 @@ impl DomainEventEnvelope {
                 self.schema_version,
             ));
         }
-        Ok(())
+        crate::wire_limits::validate_envelope(self)
+            .map_err(|e| EventParseError::Json(e.to_string()))
     }
 
     pub fn to_json(&self) -> Result<String, EventParseError> {
@@ -123,6 +124,20 @@ mod tests {
         let back = DomainEventEnvelope::from_json(&env.to_json().unwrap()).unwrap();
         assert_eq!(back.event_id, "evt-1");
         assert!(matches!(back.event, DomainEvent::JobCompleted(_)));
+    }
+
+    #[test]
+    fn rejects_oversized_event_id_on_validate() {
+        let env = DomainEventEnvelope::new(
+            "x".repeat(crate::wire_limits::MAX_EVENT_ID_LEN + 1),
+            DomainEvent::JobCompleted(JobCompletedEvent {
+                job_id: "j".into(),
+                executor_peer_id: "p".into(),
+                payout_lamports: None,
+                verification_digest: None,
+            }),
+        );
+        assert!(env.validate().is_err());
     }
 
     #[test]

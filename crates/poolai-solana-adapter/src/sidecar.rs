@@ -31,6 +31,8 @@ pub struct RpcAck {
     pub slot: u64,
     pub cluster: String,
     pub rpc_url: String,
+    /// `memo` (placeholder program id) or `program` (deployed `poolai-events`).
+    pub anchor_mode: String,
 }
 
 impl From<MockSubmitResult> for RpcAck {
@@ -41,6 +43,7 @@ impl From<MockSubmitResult> for RpcAck {
             slot: r.slot,
             cluster: r.cluster.as_wire_str().to_string(),
             rpc_url: r.rpc_url,
+            anchor_mode: r.anchor_mode,
         }
     }
 }
@@ -187,7 +190,27 @@ mod tests {
         let rpc = ack.rpc.expect("mock rpc block");
         assert_eq!(rpc.status, RpcSubmitStatus::Submitted);
         assert!(rpc.signature.starts_with("mocksig"));
+        assert_eq!(rpc.anchor_mode, "memo");
         assert!(ack.rpc_error.is_none());
+    }
+
+    #[test]
+    fn processor_rejects_oversized_wire_fields() {
+        let env = DomainEventEnvelope::new(
+            "evt-big",
+            DomainEvent::JobCompleted(JobCompletedEvent {
+                job_id: "x".repeat(crate::wire_limits::MAX_DOMAIN_ID_LEN + 1),
+                executor_peer_id: "p".into(),
+                payout_lamports: None,
+                verification_digest: None,
+            }),
+        );
+        let line = serde_json::to_string(&env).unwrap();
+        let mut proc = SidecarProcessor::new(devnet_config_mock_enabled());
+        let ack = proc.process_line(&line);
+        assert_eq!(ack.status, SidecarAckStatus::Rejected);
+        assert!(ack.error.is_some());
+        assert!(ack.rpc.is_none());
     }
 
     #[test]
