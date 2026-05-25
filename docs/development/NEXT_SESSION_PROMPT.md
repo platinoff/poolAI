@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-24 · **PH-S23:** ✅ · **PH-S24:** черга legacy
+**Оновлено:** 2026-05-25 · **HEAD** `ed6ea45a` · **PH-S23:** ✅ · **PH-S24:** черга legacy
 
 ---
 
@@ -11,7 +11,8 @@ PoolAI — PH-S24 (перший Planned) або ops FM-003 / FM-041 за зап�
 MSYS2 bash · HANDOFF · FM §5.1 · §5.9
 
 ## Стан
-- **PH-S03…S23:** ✅ (PH-S23: Playwright admin flows — dashboard, users, config, instances, topology refresh)
+- **HEAD:** `ed6ea45a` — PH-S17…S23 pushed
+- **PH-S03…S23:** ✅ (останній push: Playwright admin + topology WS + Raft membership)
 - **Наступний:** **PH-S24** Security ops (rotation, pen-test checklist)
 
 ## Черга PH-S15…S24
