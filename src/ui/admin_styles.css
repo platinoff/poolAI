@@ -496,6 +496,109 @@ button.btn.btn-danger:focus-visible,
   background: var(--surface-secondary);
 }
 
+/* PH-S42: table toolbar, sort, filter, empty states */
+.admin-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-secondary);
+}
+
+.admin-table-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-left: auto;
+}
+
+.admin-table-search {
+  flex: 1 1 12rem;
+  min-width: 10rem;
+  max-width: 24rem;
+}
+
+.admin-table-search-input {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+}
+
+.admin-table th.admin-table-sortable {
+  cursor: pointer;
+  user-select: none;
+  padding-right: calc(var(--spacing-4) + 0.75rem);
+  position: relative;
+}
+
+.admin-table th.admin-table-sortable::after {
+  content: '⇅';
+  position: absolute;
+  right: var(--spacing-2);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.45;
+  font-size: 0.75em;
+}
+
+.admin-table th.admin-table-sortable[data-sort='asc']::after {
+  content: '↑';
+  opacity: 1;
+  color: var(--primary);
+}
+
+.admin-table th.admin-table-sortable[data-sort='desc']::after {
+  content: '↓';
+  opacity: 1;
+  color: var(--primary);
+}
+
+.admin-table-highlight {
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--text);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.admin-empty-state {
+  text-align: center;
+  padding: var(--spacing-8) var(--spacing-4);
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin-top: var(--spacing-4);
+}
+
+.admin-empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-2);
+  opacity: 0.85;
+}
+
+.admin-empty-state-title {
+  margin: 0 0 var(--spacing-2);
+  font-size: var(--font-size-md);
+  color: var(--text);
+}
+
+.admin-empty-state-hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.btn-sm {
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-xs);
+}
+
 /* Forms */
 .admin-form {
   display: flex;

@@ -670,15 +670,448 @@ function adminApplyDesignSystem(root) {
   });
 }
 
-/** PH-S09: build a striped data table from header labels and row cell HTML. */
-function adminRenderTable(headers, rows) {
+function adminEscapeRegex(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function adminTableDataRows(table) {
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return [];
+  return Array.from(
+    tbody.querySelectorAll('tr:not(.no-results-row):not(.search-status-row)'),
+  );
+}
+
+function adminFilterTable(table, query, options) {
+  const opts = options || {};
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return 0;
+
+  const rows = adminTableDataRows(table);
+  let visibleCount = 0;
+  const highlightMatches = opts.highlightMatches !== false;
+  const matchColumns = opts.matchColumns || null;
+  const q = (query || '').toLowerCase().trim();
+
+  rows.forEach((row) => {
+    let matches;
+    if (matchColumns && Array.isArray(matchColumns)) {
+      const rowText = Array.from(row.cells)
+        .filter((cell, index) => matchColumns.includes(index))
+        .map((cell) => cell.textContent)
+        .join(' ')
+        .toLowerCase();
+      matches = !q || rowText.includes(q);
+    } else {
+      matches = !q || row.textContent.toLowerCase().includes(q);
+    }
+
+    if (matches) {
+      row.style.display = '';
+      row.setAttribute('aria-hidden', 'false');
+      visibleCount++;
+
+      if (highlightMatches && q) {
+        row.querySelectorAll('td').forEach((cell) => {
+          const originalText = cell.dataset.originalText || cell.textContent;
+          if (!cell.dataset.originalText) {
+            cell.dataset.originalText = cell.textContent;
+          }
+          const regex = new RegExp('(' + adminEscapeRegex(q) + ')', 'gi');
+          const highlighted = originalText.replace(
+            regex,
+            '<mark class="admin-table-highlight">$1</mark>',
+          );
+          cell.innerHTML = highlighted;
+        });
+      } else {
+        row.querySelectorAll('td').forEach((cell) => {
+          if (cell.dataset.originalText) {
+            cell.textContent = cell.dataset.originalText;
+            delete cell.dataset.originalText;
+          }
+        });
+      }
+    } else {
+      row.style.display = 'none';
+      row.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  let noResultsRow = tbody.querySelector('.no-results-row');
+  if (visibleCount === 0 && q) {
+    const colCount = table.querySelectorAll('thead th').length || 1;
+    if (!noResultsRow) {
+      noResultsRow = document.createElement('tr');
+      noResultsRow.className = 'no-results-row';
+      noResultsRow.setAttribute('role', 'status');
+      noResultsRow.setAttribute('aria-live', 'polite');
+      const td = document.createElement('td');
+      td.colSpan = colCount;
+      noResultsRow.appendChild(td);
+      tbody.appendChild(noResultsRow);
+    }
+    noResultsRow.querySelector('td').textContent = poolaiT(
+      'ui.searchNoResultsFor',
+      'No results found for "{query}"',
+    ).replace('{query}', query);
+    noResultsRow.style.display = '';
+  } else if (noResultsRow) {
+    noResultsRow.style.display = 'none';
+  }
+
+  return visibleCount;
+}
+
+function adminUpdateTableSearchStatus(table, visibleCount, totalCount, query) {
+  const existingStatus = table.querySelector('.search-status-row');
+  if (existingStatus) existingStatus.remove();
+
+  if (!query) return;
+
+  const tbody = table.querySelector('tbody');
+  const colCount = table.querySelectorAll('thead th').length || 1;
+  if (!tbody) return;
+
+  const statusRow = document.createElement('tr');
+  statusRow.className = 'search-status-row';
+  statusRow.setAttribute('role', 'status');
+  statusRow.setAttribute('aria-live', 'polite');
+  const statusCell = document.createElement('td');
+  statusCell.colSpan = colCount;
+  statusCell.textContent = poolaiT('ui.searchStatusSimple', '{visible} of {total} results')
+    .replace('{visible}', String(visibleCount))
+    .replace('{total}', String(totalCount));
+  statusRow.appendChild(statusCell);
+  tbody.appendChild(statusRow);
+}
+
+function adminSortTable(table, columnIndex, ascending) {
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+
+  const rows = adminTableDataRows(table);
+  const isNumeric = rows.every((row) => {
+    const cell = row.cells[columnIndex];
+    return cell && !isNaN(parseFloat(cell.textContent));
+  });
+
+  rows.sort((a, b) => {
+    const aCell = a.cells[columnIndex];
+    const bCell = b.cells[columnIndex];
+    if (!aCell || !bCell) return 0;
+
+    const aValue = isNumeric
+      ? parseFloat(aCell.textContent)
+      : aCell.textContent.trim().toLowerCase();
+    const bValue = isNumeric
+      ? parseFloat(bCell.textContent)
+      : bCell.textContent.trim().toLowerCase();
+
+    if (aValue < bValue) return ascending ? -1 : 1;
+    if (aValue > bValue) return ascending ? 1 : -1;
+    return 0;
+  });
+
+  rows.forEach((row) => row.remove());
+  rows.forEach((row) => tbody.appendChild(row));
+
+  table.querySelectorAll('thead th').forEach((header, index) => {
+    if (index === columnIndex) {
+      header.setAttribute('data-sort', ascending ? 'asc' : 'desc');
+      header.setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
+    } else {
+      header.removeAttribute('data-sort');
+      header.setAttribute('aria-sort', 'none');
+    }
+  });
+}
+
+function adminInitTableSorting(table) {
+  if (!table || table.dataset.poolaiTableSort === '1') return;
+  table.dataset.poolaiTableSort = '1';
+
+  table.querySelectorAll('thead th').forEach((header, index) => {
+    if (header.dataset.noSort === '1' || header.classList.contains('admin-table-actions-col')) {
+      return;
+    }
+    const label = (header.textContent || '').trim().toLowerCase();
+    if (label === 'actions' || label === 'дії') {
+      header.classList.add('admin-table-actions-col');
+      return;
+    }
+
+    header.classList.add('admin-table-sortable');
+    header.setAttribute('tabindex', '0');
+    header.setAttribute('role', 'columnheader');
+    header.setAttribute('aria-sort', 'none');
+
+    const activateSort = () => {
+      const currentSort = header.getAttribute('data-sort');
+      const ascending = currentSort !== 'asc';
+      adminSortTable(table, index, ascending);
+      adminAnnounceLive(
+        poolaiT('admin.table.sortedBy', 'Sorted by {column} {direction}')
+          .replace('{column}', header.textContent.trim())
+          .replace('{direction}', ascending ? '↑' : '↓'),
+        'polite',
+      );
+    };
+
+    header.addEventListener('click', activateSort);
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activateSort();
+      }
+    });
+  });
+}
+
+function adminTableVisibleRows(table) {
+  return adminTableDataRows(table).filter(
+    (row) => row.style.display !== 'none' && row.getAttribute('aria-hidden') !== 'true',
+  );
+}
+
+function adminExportTableCsv(table, filename) {
+  const headers = Array.from(table.querySelectorAll('thead th')).map((th) =>
+    th.textContent.trim(),
+  );
+  const rows = adminTableVisibleRows(table).map((row) =>
+    Array.from(row.cells).map((cell) => {
+      const text = cell.dataset.originalText || cell.textContent.trim();
+      if (/[",\n]/.test(text)) return '"' + text.replace(/"/g, '""') + '"';
+      return text;
+    }),
+  );
+  const lines = [headers.join(',')].concat(rows.map((r) => r.join(',')));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || 'poolai-export.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showNotification(poolaiT('admin.table.exportedCsv', 'Table exported as CSV'), 'success');
+}
+
+function adminExportTableJson(table, filename) {
+  const headers = Array.from(table.querySelectorAll('thead th')).map((th) =>
+    th.textContent.trim(),
+  );
+  const data = adminTableVisibleRows(table).map((row) => {
+    const obj = {};
+    headers.forEach((h, i) => {
+      const cell = row.cells[i];
+      obj[h] = cell ? (cell.dataset.originalText || cell.textContent.trim()) : '';
+    });
+    return obj;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: 'application/json;charset=utf-8',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || 'poolai-export.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showNotification(poolaiT('admin.table.exportedJson', 'Table exported as JSON'), 'success');
+}
+
+function adminCreateTableToolbar(table, options) {
+  const opts = options || {};
+  const container = table.closest('.admin-table-container') || table.parentElement;
+  if (!container || container.querySelector('.admin-table-toolbar')) return null;
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'admin-table-toolbar';
+
+  let searchInput = null;
+  if (!opts.noFilter) {
+    const searchWrap = document.createElement('div');
+    searchWrap.className = 'admin-table-search';
+    searchInput = document.createElement('input');
+    searchInput.type = 'search';
+    searchInput.className = 'admin-table-search-input';
+    searchInput.placeholder = poolaiT('admin.table.searchPh', 'Filter table…');
+    searchInput.setAttribute('aria-label', poolaiT('ui.searchTableAria', 'Search table'));
+    searchInput.setAttribute('role', 'searchbox');
+    searchWrap.appendChild(searchInput);
+    toolbar.appendChild(searchWrap);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'admin-table-toolbar-actions';
+
+  if (!opts.noExport) {
+    const csvBtn = document.createElement('button');
+    csvBtn.type = 'button';
+    csvBtn.className = 'btn btn-secondary btn-sm';
+    csvBtn.textContent = poolaiT('admin.table.exportCsv', 'Export CSV');
+    csvBtn.setAttribute(
+      'aria-label',
+      poolaiT('admin.table.exportCsvAria', 'Export visible rows as CSV'),
+    );
+    csvBtn.addEventListener('click', () => {
+      const name =
+        (table.getAttribute('aria-label') || 'poolai-table').replace(/\s+/g, '-').toLowerCase() +
+        '.csv';
+      adminExportTableCsv(table, name);
+    });
+
+    const jsonBtn = document.createElement('button');
+    jsonBtn.type = 'button';
+    jsonBtn.className = 'btn btn-secondary btn-sm';
+    jsonBtn.textContent = poolaiT('admin.table.exportJson', 'Export JSON');
+    jsonBtn.setAttribute(
+      'aria-label',
+      poolaiT('admin.table.exportJsonAria', 'Export visible rows as JSON'),
+    );
+    jsonBtn.addEventListener('click', () => {
+      const name =
+        (table.getAttribute('aria-label') || 'poolai-table').replace(/\s+/g, '-').toLowerCase() +
+        '.json';
+      adminExportTableJson(table, name);
+    });
+
+    actions.appendChild(csvBtn);
+    actions.appendChild(jsonBtn);
+  }
+
+  toolbar.appendChild(actions);
+  container.insertBefore(toolbar, table);
+
+  if (searchInput) {
+    adminBindTableSearch(searchInput, table, opts.filterOptions);
+  }
+
+  return toolbar;
+}
+
+function adminBindTableSearch(searchInputOrId, tableOrId, filterOptions) {
+  const searchInput =
+    typeof searchInputOrId === 'string'
+      ? document.getElementById(searchInputOrId)
+      : searchInputOrId;
+  const table =
+    typeof tableOrId === 'string' ? document.getElementById(tableOrId) : tableOrId;
+  if (!searchInput || !table) return;
+
+  const opts = filterOptions || {};
+  const debounceDelay = opts.debounceDelay || 300;
+  let debounceTimer = null;
+  const totalCount = adminTableDataRows(table).length;
+
+  searchInput.setAttribute('role', 'searchbox');
+  if (table.id) searchInput.setAttribute('aria-controls', table.id);
+
+  searchInput.addEventListener('input', function (e) {
+    const query = e.target.value.trim();
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const visibleCount = adminFilterTable(table, query, opts);
+      adminUpdateTableSearchStatus(table, visibleCount, totalCount, query);
+      adminAnnounceLive(
+        query
+          ? poolaiT('ui.searchStatusFound', '{visible} of {total} results found')
+              .replace('{visible}', String(visibleCount))
+              .replace('{total}', String(totalCount))
+          : poolaiT('ui.searchStatusAll', 'All results shown'),
+        'polite',
+      );
+    }, debounceDelay);
+  });
+
+  searchInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && searchInput.value) {
+      searchInput.value = '';
+      adminFilterTable(table, '', opts);
+      adminUpdateTableSearchStatus(table, totalCount, totalCount, '');
+      searchInput.focus();
+    }
+  });
+}
+
+function adminEnhanceAdminTable(table, options) {
+  if (!table || table.dataset.poolaiTableEnhanced === '1') return;
+  if (table.classList.contains('topology-heatmap-table')) return;
+  if (table.dataset.poolaiTableStatic === '1') return;
+
+  const opts = options || {};
+  table.dataset.poolaiTableEnhanced = '1';
+
+  if (!opts.noSort) adminInitTableSorting(table);
+  if (!opts.noToolbar && !opts.externalSearchEl) {
+    adminCreateTableToolbar(table, opts);
+  } else if (opts.externalSearchEl) {
+    adminBindTableSearch(opts.externalSearchEl, table, opts.filterOptions);
+  }
+}
+
+function adminInitTablesIn(root) {
+  const scope =
+    root && typeof root.querySelectorAll === 'function'
+      ? root
+      : document.getElementById('admin_main_content') || document;
+  scope.querySelectorAll('table.admin-table').forEach((table) => {
+    adminEnhanceAdminTable(table);
+  });
+}
+
+window.adminEmptyStateHtml = adminEmptyStateHtml;
+window.adminFilterTable = adminFilterTable;
+window.adminSortTable = adminSortTable;
+window.adminInitTableSorting = adminInitTableSorting;
+window.adminBindTableSearch = adminBindTableSearch;
+window.adminEnhanceAdminTable = adminEnhanceAdminTable;
+window.adminInitTablesIn = adminInitTablesIn;
+window.adminExportTableCsv = adminExportTableCsv;
+window.adminExportTableJson = adminExportTableJson;
+
+/** PH-S42: canonical empty state for admin lists/tables. */
+function adminEmptyStateHtml(message, options) {
+  const opts = options || {};
+  const title = escapeHtml(message || poolaiT('admin.table.empty', 'No data to display'));
+  const hint = opts.hint
+    ? '<p class="admin-empty-state-hint">' + escapeHtml(opts.hint) + '</p>'
+    : '';
+  const action = opts.actionHtml
+    ? '<div class="admin-empty-state-action">' + opts.actionHtml + '</div>'
+    : '';
+  return (
+    '<div class="admin-empty-state" role="status">' +
+    '<div class="admin-empty-state-icon" aria-hidden="true">' +
+    (opts.icon || '📋') +
+    '</div>' +
+    '<p class="admin-empty-state-title">' +
+    title +
+    '</p>' +
+    hint +
+    action +
+    '</div>'
+  );
+}
+
+/** PH-S09 / PH-S42: build a striped data table from header labels and row cell HTML. */
+function adminRenderTable(headers, rows, options) {
+  const opts = options || {};
+  if (!rows || rows.length === 0) {
+    return adminEmptyStateHtml(
+      opts.emptyMessage || poolaiT('admin.table.empty', 'No data to display'),
+      opts.emptyOptions,
+    );
+  }
   const cols = (headers || []).map((h) =>
     typeof h === 'string' ? { label: h } : h,
   );
   let html = '<div class="admin-table-container"><table class="admin-table admin-table--striped">';
   html += '<thead><tr>';
   cols.forEach((c) => {
-    html += '<th scope="col">' + escapeHtml(c.label || '') + '</th>';
+    const noSort = c.noSort ? ' data-no-sort="1"' : '';
+    const cls = c.actions ? ' class="admin-table-actions-col"' : '';
+    html += '<th scope="col"' + noSort + cls + '>' + escapeHtml(c.label || '') + '</th>';
   });
   html += '</tr></thead><tbody>';
   (rows || []).forEach((row) => {
@@ -765,12 +1198,14 @@ function adminObserveDynamicA11y() {
     adminApplyDesignSystem(root);
     adminEnhanceTablesA11y(root);
     adminEnhanceFormA11y(root);
+    adminInitTablesIn(root);
   });
   obs.observe(root, { childList: true, subtree: true });
   root.dataset.poolaiA11yObs = '1';
   adminApplyDesignSystem(root);
   adminEnhanceTablesA11y(root);
   adminEnhanceFormA11y(root);
+  adminInitTablesIn(root);
 }
 
 // Logout

@@ -112,6 +112,16 @@
       'admin.audit.loading': 'Loading audit events…',
       'admin.audit.errLoad': 'Error loading audit logs: ',
 
+      'admin.table.empty': 'No data to display',
+      'admin.table.searchPh': 'Filter table…',
+      'admin.table.exportCsv': 'Export CSV',
+      'admin.table.exportJson': 'Export JSON',
+      'admin.table.exportCsvAria': 'Export visible rows as CSV',
+      'admin.table.exportJsonAria': 'Export visible rows as JSON',
+      'admin.table.exportedCsv': 'Table exported as CSV',
+      'admin.table.exportedJson': 'Table exported as JSON',
+      'admin.table.sortedBy': 'Sorted by {column} {direction}',
+
       'err.insufficientAdmin': 'Insufficient permissions. Admin role required.',
       'admin.status.active': 'Active',
       'admin.status.inactive': 'Inactive',
@@ -968,6 +978,16 @@
       'admin.audit.empty': 'Подій аудиту не знайдено',
       'admin.audit.loading': 'Завантаження подій аудиту…',
       'admin.audit.errLoad': 'Помилка завантаження журналу: ',
+
+      'admin.table.empty': 'Немає даних для відображення',
+      'admin.table.searchPh': 'Фільтр таблиці…',
+      'admin.table.exportCsv': 'Експорт CSV',
+      'admin.table.exportJson': 'Експорт JSON',
+      'admin.table.exportCsvAria': 'Експортувати видимі рядки як CSV',
+      'admin.table.exportJsonAria': 'Експортувати видимі рядки як JSON',
+      'admin.table.exportedCsv': 'Таблицю експортовано у CSV',
+      'admin.table.exportedJson': 'Таблицю експортовано у JSON',
+      'admin.table.sortedBy': 'Сортування: {column} {direction}',
 
       'err.insufficientAdmin': 'Недостатньо прав. Потрібна роль Admin.',
       'admin.status.active': 'Активний',

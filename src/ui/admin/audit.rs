@@ -37,12 +37,11 @@ pub async fn admin_audit() -> Html<String> {
       const el = document.getElementById('audit-events');
       if (!el) return;
       if (!events || events.length === 0) {
-        el.innerHTML =
-          '<div class="muted">' + escapeHtml(Ta('admin.audit.empty', 'No audit events found')) + '</div>';
+        el.innerHTML = adminEmptyStateHtml(Ta('admin.audit.empty', 'No audit events found'));
         return;
       }
       el.innerHTML = `
-        <table class="admin-table">
+        <div class="admin-table-container"><table class="admin-table" id="audit-events-table" aria-label="${escapeHtml(Ta('admin.audit.sectionTitle', 'Audit Events'))}">
           <thead>
             <tr>
               <th>${escapeHtml(Ta('admin.audit.col.time', 'Timestamp'))}</th>
@@ -65,8 +64,15 @@ pub async fn admin_audit() -> Html<String> {
               </tr>
             `).join('')}
           </tbody>
-        </table>
+        </table></div>
       `;
+      const table = el.querySelector('#audit-events-table');
+      if (table) {
+        adminEnhanceAdminTable(table, {
+          noToolbar: true,
+          externalSearchEl: document.getElementById('audit-search'),
+        });
+      }
     }
     
     queryAuditLogs();

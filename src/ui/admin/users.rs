@@ -26,18 +26,18 @@ pub async fn admin_users() -> Html<String> {
       const el = document.getElementById('users-list');
       if (!el) return;
       if (!users || users.length === 0) {
-        el.innerHTML = '<div class="muted">' + escapeHtml(T('admin.usr.empty', 'No users found')) + '</div>';
+        el.innerHTML = adminEmptyStateHtml(T('admin.usr.empty', 'No users found'));
         return;
       }
       el.innerHTML = `
-        <table class="admin-table">
+        <div class="admin-table-container"><table class="admin-table" aria-label="${escapeHtml(T('admin.usr.section', 'Users'))}">
           <thead>
             <tr>
               <th>${escapeHtml(T('admin.usr.col.user', 'Username'))}</th>
               <th>${escapeHtml(T('admin.usr.col.role', 'Role'))}</th>
               <th>${escapeHtml(T('admin.usr.col.status', 'Status'))}</th>
               <th>${escapeHtml(T('admin.usr.col.created', 'Created'))}</th>
-              <th>${escapeHtml(T('admin.usr.col.actions', 'Actions'))}</th>
+              <th class="admin-table-actions-col" data-no-sort="1">${escapeHtml(T('admin.usr.col.actions', 'Actions'))}</th>
             </tr>
           </thead>
           <tbody>
@@ -54,8 +54,9 @@ pub async fn admin_users() -> Html<String> {
               </tr>
             `).join('')}
           </tbody>
-        </table>
+        </table></div>
       `;
+      adminInitTablesIn(el);
     }
     
     function showCreateUserModal() {

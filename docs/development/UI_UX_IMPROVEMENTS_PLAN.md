@@ -45,8 +45,8 @@
 
 **Priority 4: Advanced Features** - **0% Complete** ⏳
 - ⏳ Data Visualization: **0%** ⏳
-- ⏳ Advanced Tables & Data Management: **0%** ⏳
-- ⏳ Search & Filtering Enhancements: **0%** ⏳
+- ✅ Advanced Tables & Data Management (admin): **PH-S42** — sort/filter/export, empty states in `admin_common.js`
+- ⏳ Search & Filtering Enhancements (dashboard global): **0%** ⏳
 - ⏳ User Preferences & Customization: **0%** ⏳
 
 **Priority 5: Design Polish & Animations** - **0% Complete** ⏳
@@ -234,12 +234,12 @@
 ### 3.2 Advanced Tables & Data Management (3-4 days)
 
 **Завдання**:
-- [ ] Sortable columns (ascending, descending)
-- [ ] Column filtering (text, number, date, select)
+- [x] Sortable columns (ascending, descending) — admin `adminInitTableSorting`
+- [x] Column filtering (text search, debounce) — admin toolbar + `adminBindTableSearch`
 - [ ] Column visibility toggle (show/hide columns)
 - [ ] Bulk actions (select all, multi-select, actions)
 - [ ] Pagination (page size, page numbers, total count)
-- [ ] Export to CSV/JSON (filtered/selected data)
+- [x] Export to CSV/JSON (visible/filtered rows) — `adminExportTableCsv` / `adminExportTableJson`
 - [ ] Inline editing (double-click to edit)
 
 **Implementation**:
@@ -354,7 +354,7 @@
 **Завдання**:
 - [ ] Icon system (consistent icon library, SVG sprites)
 - [ ] Logo and branding (favicon, app icon)
-- [ ] Empty states (illustrations, helpful messages)
+- [x] Empty states (illustrations, helpful messages) — `adminEmptyStateHtml` (PH-S42)
 - [ ] Error illustrations (404, 500, network error)
 - [ ] Loading illustrations (initial load, skeleton)
 - [ ] Success illustrations (confirmations, achievements)

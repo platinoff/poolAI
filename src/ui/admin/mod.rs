@@ -213,6 +213,20 @@ fn admin_common_fm019_modal_a11y_helpers() {
 }
 
 #[test]
+fn admin_common_ph_s42_table_ux_helpers() {
+    let js = include_str!("../admin_common.js");
+    assert!(js.contains("function adminEmptyStateHtml"));
+    assert!(js.contains("function adminFilterTable"));
+    assert!(js.contains("function adminSortTable"));
+    assert!(js.contains("function adminExportTableCsv"));
+    assert!(js.contains("function adminExportTableJson"));
+    assert!(js.contains("function adminEnhanceAdminTable"));
+    assert!(js.contains("function adminInitTablesIn"));
+    assert!(js.contains("admin-table-toolbar"));
+    assert!(js.contains("admin-empty-state"));
+}
+
+#[test]
 fn admin_common_ph_s14_high_contrast_theme() {
     let js = include_str!("../admin_common.js");
     assert!(js.contains("'high-contrast'"));
@@ -226,6 +240,8 @@ fn admin_layout_includes_design_tokens_css() {
     let body = html.0;
     assert!(body.contains("--spacing-1: 4px"));
     assert!(body.contains("admin-table--striped"));
+    assert!(body.contains("admin-table-toolbar"));
+    assert!(body.contains("admin-empty-state"));
 }
 
 #[test]

@@ -37,10 +37,15 @@ concat!(include_str!("../design_tokens.css"), include_str!("../admin_styles.css"
 | `poolaiApplyTheme` | Applies dark / light / **high-contrast** CSS variables (PH-S12 / PH-S14) |
 | `poolaiNormalizeTheme` | Maps stored `poolai_theme` to supported admin theme id |
 | `adminApplyDesignSystem(root)` | Adds table/form classes to dynamic admin DOM |
-| `adminRenderTable(headers, rows)` | HTML for striped table |
+| `adminRenderTable(headers, rows, options?)` | HTML for striped table; empty rows → `adminEmptyStateHtml` |
+| `adminEmptyStateHtml(message, options?)` | Centered empty state (PH-S42) |
+| `adminEnhanceAdminTable(table, options?)` | Sortable headers, filter toolbar, CSV/JSON export |
+| `adminInitTablesIn(root?)` | Auto-enhance all `.admin-table` in admin content |
+| `adminBindTableSearch(input, table)` | Wire page-level search input to a table |
+| `adminExportTableCsv` / `adminExportTableJson` | Export visible (filtered) rows |
 | `adminFormFieldHtml(spec)` | One `form-group` field (`type`: text, select, textarea) |
 
-Called from `adminObserveDynamicA11y()` on each admin page load and DOM mutations.
+Called from `adminObserveDynamicA11y()` on each admin page load and DOM mutations (includes `adminInitTablesIn`).
 
 ### `admin_charts.js` (PH-S10)
 
@@ -67,7 +72,7 @@ document.getElementById('list').innerHTML = adminRenderTable(
 );
 ```
 
-**Last updated:** 2026-05-23 (PH-S14 high-contrast admin theme + axe contrast).
+**Last updated:** 2026-05-25 (PH-S42 admin table sort/filter/export + empty states).
 
 ## Themes (PH-S14)
 
