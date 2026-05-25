@@ -12,7 +12,7 @@ cd "$ROOT"
 
 PORT="${POOLAI_HTTP_PORT:-8080}"
 export POOLAI_BASE_URL="${POOLAI_BASE_URL:-http://127.0.0.1:${PORT}}"
-# CI: skip `ml` + visual until PH-S37 Linux PNG (smoke/admin/a11y only; rustc exit 101 on full matrix)
+# CI: skip `ml` feature (PH-S47 rustc/memory); full Playwright incl. visual (PH-S44 gate)
 if [[ "${CI:-}" == "true" ]]; then
   FEATURES="${POOLAI_FEATURES:-enterprise,cloud,test-utils}"
 else
@@ -122,7 +122,6 @@ elif [[ -n "${POOLAI_E2E_FILTER:-}" ]]; then
   # shellcheck disable=SC2086
   npx playwright test ${POOLAI_E2E_FILTER}
 elif [[ "${CI:-}" == "true" ]]; then
-  # PH-S47: visual baselines refreshed in PH-S37 workflow (Linux PNG)
   npm run test:ci
 else
   npm test

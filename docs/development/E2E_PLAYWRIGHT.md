@@ -25,7 +25,7 @@ bash bin/e2e-playwright.sh
 
 # Варіант B: збірка + старт + тести
 bash bin/e2e-playwright.sh --start
-# GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y, без visual до PH-S37).
+# GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y+visual, PH-S44 gate).
 # Windows + AV: виключення для `target/` і `~/.cargo`; локально `export CARGO_BUILD_JOBS=1` перед `--start`.
 
 # PH-S11: оновити visual baselines
@@ -54,8 +54,8 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 - ~~visual regression (Playwright snapshots)~~ **✅ PH-S11** — [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)
 - ~~theme/i18n visual matrix~~ **✅ PH-S12**
 - ~~topology masked visual~~ **✅ PH-S13**
-- **PH-S37** — Linux visual baselines refresh (workflow `update-visual-baselines.yml`, merge PR) — [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)
-- **PH-S44** — required CI gate: visual + axe on UI PRs (`ci.yml`)
+- **PH-S37 ✅** — Linux visual baselines workflow (`update-visual-baselines.yml`); refresh on-demand via Actions dispatch
+- **PH-S44 ✅** — required CI gate: `test:ci` includes visual + axe on UI/e2e path changes (`ci.yml` paths-filter)
 - **PH-S45** — E2E stability: vm create modal (`admin.spec.ts`); axe `/ui/admin/audit` (`a11y.spec.ts`)
 
-**Last updated:** 2026-05-25 (PH-S37b rotation tab; §5.11 backlog).
+**Last updated:** 2026-05-25 (PH-S44 visual in test:ci; PH-S37 workflow on-demand).

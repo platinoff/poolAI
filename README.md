@@ -66,13 +66,12 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-05-25)
 
-**PH-S03…S34 закрито.** Канон черги коду — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **§5.11** (наступні **10 спринтів** PH-S37…S46).
+**PH-S03…S47, PH-S37 infra, PH-S44 закрито.** Канон черги — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **§5.11**.
 
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S37** | Merge Linux visual PNG (Actions workflow) |
-| 2 | **PH-S44** | CI gate: visual + axe on UI PRs |
-| 3–10 | **PH-S39…S40** | VM limits, tables UX, ML UI, E2E fixes, job/on-chain, Solana program, macvlan, HW VM — див. §5.11 |
+| 1 | **PH-S39** | VM Windows CPU/memory limits |
+| 2–7 | **PH-S42…S41** | Tables UX, ML UI, E2E fixes, job/on-chain, Solana, macvlan — див. §5.11 |
 
 **Ops (поза 10):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

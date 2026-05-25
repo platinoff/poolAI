@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-25 (PH-S47 ✅ CI #1213; §5.11 PH-S37…S44; FM-041 Deferred).
+**Оновлено:** 2026-05-25 (PH-S37 infra ✅ · PH-S44 ✅ · §5.11 PH-S39…S46; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -153,15 +153,15 @@ FM-xxx (з таблиці нижче)
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 | — | **PH-S47** CI green + локально test-ci | **§5.11** | **✅** — `0fe21bf1`; CI #1213 green (ubuntu+windows Test Suite, openapi-gap) |
-| 1 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — Actions workflow → merge PR Linux PNG |
-| 2 | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **Відкрито** — після S37 |
-| 3 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
-| 4 | **PH-S42** Admin tables UX | **§5.11** | **Відкрито** |
-| 5 | **PH-S43** ML/monitoring metrics UI | **§5.11** | **Відкрито** |
-| 6 | **PH-S45** E2E stability (vm modal, axe audit) | **§5.11** | **Відкрито** — `E2E_PLAYWRIGHT.md` backlog |
-| 7 | **PH-S38** Job scheduler + on-chain epics | **§5.11** | **Відкрито** |
-| 8 | **PH-S46** Solana on-chain program (post FM-024) | **§5.11** | **Відкрито** — Architect P6, §5.7 |
-| 9 | **PH-S41** macvlan (Linux) | **§5.11** | **Відкрито** |
+| — | **PH-S37** Visual baselines workflow | **§5.10** | **✅ infra** — `update-visual-baselines.yml`; PNG refresh on-demand |
+| — | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **✅** — `test:ci` incl. visual; paths-filter → Playwright + Pa11y |
+| 1 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
+| 2 | **PH-S42** Admin tables UX | **§5.11** | **Відкрито** |
+| 3 | **PH-S43** ML/monitoring metrics UI | **§5.11** | **Відкрито** |
+| 4 | **PH-S45** E2E stability (vm modal, axe audit) | **§5.11** | **Відкрито** — `E2E_PLAYWRIGHT.md` backlog |
+| 5 | **PH-S38** Job scheduler + on-chain epics | **§5.11** | **Відкрито** |
+| 6 | **PH-S46** Solana on-chain program (post FM-024) | **§5.11** | **Відкрито** — Architect P6, §5.7 |
+| 7 | **PH-S41** macvlan (Linux) | **§5.11** | **Відкрито** |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
@@ -217,16 +217,16 @@ FM-xxx (з таблиці нижче)
 |--------|--------|------------------|------|
 | **PH-S35** | LAN §4 sign-off (2-host + TQ01) | Architect L130, FM-003 | **BLOCKED** (2 хости) |
 | **PH-S36** | Cloud SDK deep (GCP SA JWT, Azure OAuth) | FM-041, `CLOUD_SDK_PROGRESS` | **Deferred** |
-| **PH-S37** | Playwright visual baselines refresh (**Linux CI**) | `VISUAL_REGRESSION_E2E.md`, `update-visual-baselines.yml` (`create_pr`) | **Відкрито** — merge PR / artifact PNGs; infra ✅ |
+| **PH-S37** | Playwright visual baselines refresh (**Linux CI**) | `VISUAL_REGRESSION_E2E.md`, `update-visual-baselines.yml` | **✅ infra** — workflow + snapshots in repo; refresh on-demand |
 | **PH-S38** | Job scheduler hardening + on-chain submit epics | Architect L236 | **Відкрито** (MVP ✅ FM-020–034) |
 | **PH-S39** | VM Windows CPU/memory limits post-spawn | `vm/resources.rs`, AUTO_RUN §1.6 | **Відкрито** |
 | **PH-S40** | Hardware VM isolation | `vm/mod.rs`, Architect 2026-01-22 | **Відкрито** (великий scope) |
 | **PH-S41** | macvlan network isolation (Linux) | `vm/isolation/linux.rs`, NEXT_STEPS 01-17 | **Відкрито** |
 | **PH-S42** | Admin tables UX (sort/filter/export, empty states) | `UI_UX_IMPROVEMENTS_PLAN` §tables | **Відкрито** |
 | **PH-S43** | Monitoring / ML step metrics UI | UI_UX §monitoring, DIGEST §ML | **Відкрито** |
-| **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **Відкрито** — після S37 |
+| **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **✅** — `e2e/package.json` `test:ci` + `ci.yml` paths-filter |
 
-**Наступна сесія (код/CI):** **PH-S37** (Linux PNG merge) → **PH-S44**. **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
+**Наступна сесія (код/CI):** **PH-S39** (VM Windows limits) → **PH-S45** / **PH-S42**. **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
 
 ### 5.11 Наступні 10 спринтів PH-S47…S46 (код, 2026-05-25)
 
@@ -234,16 +234,16 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Стан |
 |---|--------|--------|---------|------|
-| — | **PH-S47** | CI green; локально `cargo test-ci` + gap audit | `ci.yml`, tests | **✅** — CI #1213 (`0fe21bf1`) ubuntu+windows+openapi-gap |
-| 1 | **PH-S37** | Linux visual baselines (`visual.spec.ts-snapshots`) | §5.10, `VISUAL_REGRESSION_E2E.md` | **Відкрито** — workflow `update-visual-baselines.yml` |
-| 2 | **PH-S44** | CI gate: visual + axe required on UI PRs | §5.10, `ci.yml` paths-filter | **Відкрито** |
-| 3 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
-| 4 | **PH-S42** | Admin tables UX (sort/filter/export, empty states) | §5.10, `UI_UX_IMPROVEMENTS_PLAN` §tables | **Відкрито** |
-| 5 | **PH-S43** | Monitoring / ML step metrics admin UI | §5.10, DIGEST §ML, `admin/monitoring.rs` | **Відкрито** |
-| 6 | **PH-S45** | E2E stability: VM create modal + axe `/ui/admin/audit` | `admin.spec.ts`, `a11y.spec.ts` | **Відкрито** |
-| 7 | **PH-S38** | Job scheduler hardening + on-chain submit epics | §5.10, Architect L236, `src/job/` | **Відкрито** |
-| 8 | **PH-S46** | Solana on-chain program / events (post FM-024 mock RPC) | §5.7, `SOLANA_ADAPTER_CONCEPT` | **Відкрито** |
-| 9 | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **Відкрито** |
+| — | **PH-S47** | CI green; локально `cargo test-ci` + gap audit | `ci.yml`, tests | **✅** — CI #1213 (`0fe21bf1`) |
+| — | **PH-S37** | Linux visual baselines workflow | §5.10, `update-visual-baselines.yml` | **✅ infra** — on-demand PNG refresh |
+| — | **PH-S44** | CI gate: visual + axe on UI/e2e changes | §5.10, `ci.yml`, `e2e/package.json` | **✅** |
+| 1 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
+| 2 | **PH-S42** | Admin tables UX (sort/filter/export, empty states) | §5.10, `UI_UX_IMPROVEMENTS_PLAN` §tables | **Відкрито** |
+| 3 | **PH-S43** | Monitoring / ML step metrics admin UI | §5.10, DIGEST §ML, `admin/monitoring.rs` | **Відкрито** |
+| 4 | **PH-S45** | E2E stability: VM create modal + axe `/ui/admin/audit` | `admin.spec.ts`, `a11y.spec.ts` | **Відкрито** |
+| 5 | **PH-S38** | Job scheduler hardening + on-chain submit epics | §5.10, Architect L236, `src/job/` | **Відкрито** |
+| 6 | **PH-S46** | Solana on-chain program / events (post FM-024 mock RPC) | §5.7, `SOLANA_ADAPTER_CONCEPT` | **Відкрито** |
+| 7 | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **Відкрито** |
 
 **Поза чергою:** **PH-S35** LAN (**BLOCKED**) · **PH-S36** Cloud SDK (**Deferred**, FM-041) · **PH-S40** hardware VM (великий scope).
 
@@ -358,7 +358,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S37** (Linux PNG merge) → **PH-S44** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S39** (VM Windows limits) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
