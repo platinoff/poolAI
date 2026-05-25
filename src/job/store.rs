@@ -9,6 +9,9 @@ use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 
 use crate::core::error::AppError;
+use chrono::Utc;
+
+use crate::job::onchain::emit_job_completed_if_anchor;
 use crate::job::{allows_transition, JobRecord, JobSpec, JobStatus};
 
 pub(crate) const JOBS_FILE: &str = "jobs.json";
@@ -101,8 +104,11 @@ impl JobStore {
             record.status = status;
         }
         self.persist()?;
-        self.get(id)?
-            .ok_or_else(|| AppError::InternalError("job missing after force_status".into()))
+        let row = self
+            .get(id)?
+            .ok_or_else(|| AppError::InternalError("job missing after force_status".into()))?;
+        emit_job_completed_if_anchor(&row);
+        Ok(row)
     }
 
     /// FM-021: update job status when lifecycle transition is valid; persists on success.
@@ -126,25 +132,26 @@ impl JobStore {
             record.clone()
         };
         self.persist()?;
+        emit_job_completed_if_anchor(&updated);
         Ok(updated)
     }
 
     /// FM-020: transition all `Submitted` rows to `Scheduled` (priority desc), then persist once.
     pub fn promote_submitted_to_scheduled(&self) -> Result<usize, AppError> {
-        let (scheduled, _, _) = self
+        let (scheduled, _, _, _) = self
             .promote_submitted_to_scheduled_with(|_| crate::job::JobScheduleBinding::default())?;
         Ok(scheduled)
     }
 
-    /// FM-034: promote `Submitted` → `Scheduled` and apply optional worker/VM bindings.
+    /// FM-034 / PH-S38: promote `Submitted` → `Scheduled` (or `Failed` when past deadline).
     pub fn promote_submitted_to_scheduled_with<F>(
         &self,
         mut assign: F,
-    ) -> Result<(usize, usize, usize), AppError>
+    ) -> Result<(usize, usize, usize, usize), AppError>
     where
         F: FnMut(&JobSpec) -> crate::job::JobScheduleBinding,
     {
-        let (scheduled, bound_workers, bound_vms) = {
+        let (scheduled, bound_workers, bound_vms, expired) = {
             let mut guard = self
                 .jobs
                 .lock()
@@ -156,12 +163,20 @@ impl JobStore {
                 .map(|(i, _)| i)
                 .collect();
             indices.sort_by(|&a, &b| guard[b].spec.priority.cmp(&guard[a].spec.priority));
-            let count = indices.len();
+            let mut scheduled = 0usize;
             let mut bound_workers = 0usize;
             let mut bound_vms = 0usize;
+            let mut expired = 0usize;
+            let now = Utc::now();
             for i in indices {
+                if job_past_deadline(&guard[i].spec, now) {
+                    guard[i].status = JobStatus::Failed;
+                    expired += 1;
+                    continue;
+                }
                 let binding = assign(&guard[i].spec);
                 guard[i].status = JobStatus::Scheduled;
+                scheduled += 1;
                 if binding.worker_id.is_some() {
                     bound_workers += 1;
                 }
@@ -171,12 +186,12 @@ impl JobStore {
                 guard[i].worker_id = binding.worker_id;
                 guard[i].vm_id = binding.vm_id;
             }
-            (count, bound_workers, bound_vms)
+            (scheduled, bound_workers, bound_vms, expired)
         };
-        if scheduled > 0 {
+        if scheduled > 0 || expired > 0 {
             self.persist()?;
         }
-        Ok((scheduled, bound_workers, bound_vms))
+        Ok((scheduled, bound_workers, bound_vms, expired))
     }
 
     fn persist(&self) -> Result<(), AppError> {
@@ -190,6 +205,10 @@ impl JobStore {
         persist_jobs(dir, self.backend, &guard)
             .map_err(|e| AppError::InternalError(format!("persist jobs: {e}")))
     }
+}
+
+fn job_past_deadline(spec: &JobSpec, now: chrono::DateTime<Utc>) -> bool {
+    spec.deadline.is_some_and(|d| d < now)
 }
 
 pub fn data_dir_from_env() -> Option<PathBuf> {

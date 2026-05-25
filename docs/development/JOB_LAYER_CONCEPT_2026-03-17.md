@@ -84,5 +84,5 @@ PoolAI вже реалізує:
 - [x] VM/worker binding on schedule — FM-034 (`JobRecord.worker_id`/`vm_id`, pool/VM placement).
 - [x] Персистентний job store (JSON file) — `POOLAI_JOB_DATA_DIR`, `src/job/store.rs` (2026-05-20).
 - [x] SQLite job store (optional `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, migrate JSON) — FM-029 (2026-05-20).
-- RAID-backed store — deferred.
+- [x] On-chain submit epics (core NDJSON → sidecar schema v1) — `src/job/domain_events.rs`, `onchain.rs`, `POOLAI_ONCHAIN_EVENTS_DIR` (PH-S38, 2026-05-25).
 

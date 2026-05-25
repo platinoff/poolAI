@@ -11,7 +11,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
-use crate::job::{schedule_from_context, JobId, JobKind, JobRecord, JobSpec, JobStatus, JobStore};
+use crate::job::{
+    schedule_from_context, JobId, JobKind, JobRecord, JobResources, JobSpec, JobStatus, JobStore,
+};
 use crate::network::api::common::HttpAppError;
 
 #[derive(Deserialize)]
@@ -19,6 +21,8 @@ struct CreateJobRequest {
     kind: JobKind,
     #[serde(default)]
     priority: u8,
+    #[serde(default)]
+    resources: JobResources,
     #[serde(default)]
     input_artifact_ids: Vec<String>,
     #[serde(default)]
@@ -52,6 +56,7 @@ struct ScheduleJobsResponse {
     scheduled: usize,
     bound_workers: usize,
     bound_vms: usize,
+    expired: usize,
 }
 
 #[derive(Deserialize)]
@@ -94,7 +99,7 @@ async fn create_job(
     let spec = JobSpec {
         id: id.clone(),
         kind: body.kind,
-        resources: Default::default(),
+        resources: body.resources,
         priority: body.priority,
         max_duration_secs: None,
         input_artifact_ids: body.input_artifact_ids,
@@ -132,6 +137,7 @@ async fn schedule_jobs(
         scheduled: outcome.scheduled,
         bound_workers: outcome.bound_workers,
         bound_vms: outcome.bound_vms,
+        expired: outcome.expired,
     }))
 }
 

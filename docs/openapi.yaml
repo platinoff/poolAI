@@ -5199,6 +5199,8 @@ components:
           minimum: 0
           maximum: 255
           default: 0
+        resources:
+          $ref: '#/components/schemas/JobResources'
         input_artifact_ids:
           type: array
           items:
@@ -5317,6 +5319,10 @@ components:
           type: integer
           minimum: 0
           description: Count of jobs assigned a running VM instance in this tick (FM-034)
+        expired:
+          type: integer
+          minimum: 0
+          description: Count of submitted jobs past deadline marked failed (PH-S38)
 
     GridEnvelope:
       type: object

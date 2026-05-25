@@ -1,4 +1,4 @@
-//! Job scheduler: `Submitted` → `Scheduled` with optional pool worker / VM binding (FM-034).
+//! Job scheduler: `Submitted` → `Scheduled` with optional pool worker / VM binding (FM-034, PH-S38).
 
 use std::collections::{HashMap, HashSet};
 
@@ -17,6 +17,8 @@ pub struct WorkerCandidate {
     pub active_connections: usize,
     pub is_healthy: bool,
     pub free_memory_mb: u64,
+    /// Pool worker has a GPU device configured (PH-S38).
+    pub has_gpu: bool,
 }
 
 /// Running VM instance eligible for job binding.
@@ -24,14 +26,18 @@ pub struct WorkerCandidate {
 pub struct VmCandidate {
     pub id: String,
     pub memory_mb: u64,
+    /// VM instance was created with `gpu_required` (PH-S38).
+    pub gpu_capable: bool,
 }
 
-/// Scheduler tick result (FM-020 + FM-034).
+/// Scheduler tick result (FM-020 + FM-034 + PH-S38).
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ScheduleOutcome {
     pub scheduled: usize,
     pub bound_workers: usize,
     pub bound_vms: usize,
+    /// Jobs past `spec.deadline` marked `failed` instead of scheduled.
+    pub expired: usize,
 }
 
 /// FM-020 compat: promote without binding when no pool/VM context is available.
@@ -48,16 +54,40 @@ pub fn schedule_with_workers(
 ) -> Result<ScheduleOutcome, AppError> {
     let mut taken_workers = HashSet::new();
     let mut taken_vms = HashSet::new();
-    let (scheduled, bound_workers, bound_vms) =
-        store.promote_submitted_to_scheduled_with(|spec: &JobSpec| {
-            let worker_id = pick_worker(workers, &spec.resources, &mut taken_workers);
-            let vm_id = pick_vm(vms, &spec.resources, &mut taken_vms);
-            JobScheduleBinding { worker_id, vm_id }
+    let (scheduled, bound_workers, bound_vms, expired) = store
+        .promote_submitted_to_scheduled_with(|spec: &JobSpec| {
+            pick_schedule_binding(
+                workers,
+                vms,
+                &spec.resources,
+                &mut taken_workers,
+                &mut taken_vms,
+            )
         })?;
     Ok(ScheduleOutcome {
         scheduled,
         bound_workers,
         bound_vms,
+        expired,
+    })
+}
+
+/// Grid ingress: schedule with optional originating peer as executor hint.
+pub fn schedule_with_grid_peer(
+    store: &JobStore,
+    source_peer_id: Option<&str>,
+) -> Result<ScheduleOutcome, AppError> {
+    let peer_binding = source_peer_id.map(|id| JobScheduleBinding {
+        worker_id: Some(id.to_string()),
+        vm_id: None,
+    });
+    let (scheduled, bound_workers, bound_vms, expired) =
+        store.promote_submitted_to_scheduled_with(|_| peer_binding.clone().unwrap_or_default())?;
+    Ok(ScheduleOutcome {
+        scheduled,
+        bound_workers,
+        bound_vms,
+        expired,
     })
 }
 
@@ -81,6 +111,7 @@ pub fn worker_candidates_from_pool_status(
             active_connections: status.active_connections,
             is_healthy: status.is_healthy,
             free_memory_mb: worker_free_memory_mb(status.memory_usage_mb),
+            has_gpu: status.gpu_usage.is_some(),
         })
         .collect()
 }
@@ -104,6 +135,7 @@ async fn gather_worker_candidates(ctx: &ApiContext) -> Vec<WorkerCandidate> {
             active_connections: w.active_models.len(),
             is_healthy: true,
             free_memory_mb: worker_free_memory_mb(w.metrics.memory_usage_mb),
+            has_gpu: w.metrics.gpu_utilization > 0.0 || w.metrics.gpu_temperature > 0.0,
         })
         .collect()
 }
@@ -118,6 +150,7 @@ async fn gather_vm_candidates(ctx: &ApiContext) -> Vec<VmCandidate> {
         .map(|inst| VmCandidate {
             id: inst.id.to_string(),
             memory_mb: inst.resources.memory_mb as u64,
+            gpu_capable: inst.resources.gpu_required,
         })
         .collect()
 }
@@ -125,6 +158,33 @@ async fn gather_vm_candidates(ctx: &ApiContext) -> Vec<VmCandidate> {
 fn worker_free_memory_mb(used_mb: f32) -> u64 {
     const DEFAULT_CAPACITY_MB: f32 = 8192.0;
     (DEFAULT_CAPACITY_MB - used_mb).max(0.0) as u64
+}
+
+fn pick_schedule_binding(
+    workers: &[WorkerCandidate],
+    vms: &[VmCandidate],
+    resources: &JobResources,
+    taken_workers: &mut HashSet<String>,
+    taken_vms: &mut HashSet<String>,
+) -> JobScheduleBinding {
+    if resources.gpu_memory_mb.is_some() {
+        if let Some(vm_id) = pick_vm(vms, resources, taken_vms) {
+            return JobScheduleBinding {
+                worker_id: None,
+                vm_id: Some(vm_id),
+            };
+        }
+        if let Some(worker_id) = pick_worker(workers, resources, taken_workers) {
+            return JobScheduleBinding {
+                worker_id: Some(worker_id),
+                vm_id: None,
+            };
+        }
+        return JobScheduleBinding::default();
+    }
+    let worker_id = pick_worker(workers, resources, taken_workers);
+    let vm_id = pick_vm(vms, resources, taken_vms);
+    JobScheduleBinding { worker_id, vm_id }
 }
 
 fn pick_worker(
@@ -136,6 +196,7 @@ fn pick_worker(
         .iter()
         .filter(|w| w.is_healthy && !taken.contains(&w.id))
         .filter(|w| worker_meets_resources(w, resources))
+        .filter(|w| worker_meets_gpu(w, resources))
         .collect();
     eligible.sort_by(|a, b| {
         a.active_connections
@@ -156,6 +217,7 @@ fn pick_vm(
         .iter()
         .filter(|v| !taken.contains(&v.id))
         .filter(|v| vm_meets_resources(v, resources))
+        .filter(|v| vm_meets_gpu(v, resources))
         .collect();
     eligible.sort_by(|a, b| a.memory_mb.cmp(&b.memory_mb).then_with(|| a.id.cmp(&b.id)));
     let id = eligible.first().map(|v| v.id.clone())?;
@@ -177,6 +239,20 @@ fn vm_meets_resources(vm: &VmCandidate, resources: &JobResources) -> bool {
         if vm.memory_mb < ram {
             return false;
         }
+    }
+    true
+}
+
+fn worker_meets_gpu(worker: &WorkerCandidate, resources: &JobResources) -> bool {
+    if resources.gpu_memory_mb.is_some() {
+        return worker.has_gpu;
+    }
+    true
+}
+
+fn vm_meets_gpu(vm: &VmCandidate, resources: &JobResources) -> bool {
+    if resources.gpu_memory_mb.is_some() {
+        return vm.gpu_capable;
     }
     true
 }
@@ -207,12 +283,13 @@ mod tests {
         }
     }
 
-    fn worker(id: &str, connections: usize) -> WorkerCandidate {
+    fn worker(id: &str, connections: usize, has_gpu: bool) -> WorkerCandidate {
         WorkerCandidate {
             id: id.into(),
             active_connections: connections,
             is_healthy: true,
             free_memory_mb: 16_384,
+            has_gpu,
         }
     }
 
@@ -239,7 +316,7 @@ mod tests {
         let store = JobStore::open_for_test(None);
         store.push(sample_record("job-a", 0)).expect("push");
 
-        let workers = vec![worker("busy", 5), worker("idle", 0)];
+        let workers = vec![worker("busy", 5, false), worker("idle", 0, false)];
         let outcome = schedule_with_workers(&store, &workers, &[]).expect("schedule");
         assert_eq!(outcome.scheduled, 1);
         assert_eq!(outcome.bound_workers, 1);
@@ -255,7 +332,7 @@ mod tests {
         store.push(sample_record("job-1", 0)).expect("push");
         store.push(sample_record("job-2", 0)).expect("push");
 
-        let workers = vec![worker("w1", 0), worker("w2", 1)];
+        let workers = vec![worker("w1", 0, false), worker("w2", 1, false)];
         schedule_with_workers(&store, &workers, &[]).expect("schedule");
 
         let j1 = store.get("job-1").expect("get").expect("row");
@@ -271,7 +348,7 @@ mod tests {
         {
             let store = JobStore::open_for_test(Some(dir.clone()));
             store.push(sample_record("job-1", 0)).expect("push");
-            schedule_with_workers(&store, &[worker("w1", 0)], &[]).expect("schedule");
+            schedule_with_workers(&store, &[worker("w1", 0, false)], &[]).expect("schedule");
         }
 
         let reloaded = JobStore::open_for_test(Some(dir));
@@ -287,7 +364,8 @@ mod tests {
         record.status = JobStatus::Executing;
         store.push(record).expect("push");
 
-        let outcome = schedule_with_workers(&store, &[worker("w1", 0)], &[]).expect("schedule");
+        let outcome =
+            schedule_with_workers(&store, &[worker("w1", 0, false)], &[]).expect("schedule");
         assert_eq!(outcome.scheduled, 0);
         assert_eq!(
             store.get("done").expect("get").expect("row").status,
@@ -307,6 +385,7 @@ mod tests {
             active_connections: 0,
             is_healthy: true,
             free_memory_mb: 4096,
+            has_gpu: false,
         }];
         let outcome = schedule_with_workers(&store, &workers, &[]).expect("schedule");
         assert_eq!(outcome.scheduled, 1);
@@ -317,5 +396,47 @@ mod tests {
             .expect("row")
             .worker_id
             .is_none());
+    }
+
+    #[test]
+    fn expired_deadline_in_promote() {
+        let store = JobStore::open_for_test(None);
+        let mut record = sample_record("expired", 0);
+        record.spec.deadline = Some(Utc::now() - chrono::Duration::minutes(5));
+        store.push(record).expect("push");
+
+        let outcome = schedule_with_workers(&store, &[], &[]).expect("schedule");
+        assert_eq!(outcome.scheduled, 0);
+        assert_eq!(outcome.expired, 1);
+    }
+
+    #[test]
+    fn gpu_job_prefers_gpu_vm_over_worker() {
+        let store = JobStore::open_for_test(None);
+        let mut record = sample_record("gpu-job", 0);
+        record.spec.resources.gpu_memory_mb = Some(4096);
+        store.push(record).expect("push");
+
+        let workers = vec![worker("cpu-worker", 0, false)];
+        let vms = vec![VmCandidate {
+            id: "gpu-vm".into(),
+            memory_mb: 8192,
+            gpu_capable: true,
+        }];
+        let outcome = schedule_with_workers(&store, &workers, &vms).expect("schedule");
+        assert_eq!(outcome.bound_vms, 1);
+        assert_eq!(outcome.bound_workers, 0);
+        let row = store.get("gpu-job").expect("get").expect("row");
+        assert_eq!(row.vm_id.as_deref(), Some("gpu-vm"));
+    }
+
+    #[test]
+    fn grid_peer_binds_worker_on_schedule() {
+        let store = JobStore::open_for_test(None);
+        store.push(sample_record("grid-1", 0)).expect("push");
+        let outcome = schedule_with_grid_peer(&store, Some("peer-grid-a")).expect("schedule");
+        assert_eq!(outcome.bound_workers, 1);
+        let row = store.get("grid-1").expect("get").expect("row");
+        assert_eq!(row.worker_id.as_deref(), Some("peer-grid-a"));
     }
 }

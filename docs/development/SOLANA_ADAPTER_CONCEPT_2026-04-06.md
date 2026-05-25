@@ -82,7 +82,18 @@
 
 **Обмеження:** без `solana-sdk` у `poolai`; без mainnet; deploy програми — Solana CLI (див. `program/README.md`).
 
-## 9. Наступні кроки (поза FM-033)
+## 9. PH-S38 — core on-chain submit epics (2026-05-25)
+
+| Що | Де |
+|----|-----|
+| Schema v1 (core mirror) | `src/job/domain_events.rs` — same JSON as sidecar |
+| NDJSON sink | `src/job/onchain.rs` — `POOLAI_ONCHAIN_EVENTS_DIR` → `events.ndjson` |
+| Emit hooks | `JobStore::update_status` / `force_status` → `JobCompleted`; grid `MemoryShard` → `MemoryUpdated` / `SeedProvided` |
+| Tests | `tests/job_onchain_events.rs`; `cargo test job::` unit tests |
+
+**Pipe to sidecar:** `tail -f data/onchain/events.ndjson | poolai-solana-adapter` (devnet config / mock RPC).
+
+## 10. Наступні кроки (поза PH-S38)
 
 - Devnet deploy `poolai-events.so` + оновити `program_id` у конфігу.
 - Batch / merkle виплати; звірка з `rewards` модулем core.

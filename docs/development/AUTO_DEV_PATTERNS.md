@@ -618,6 +618,13 @@
 - **Перевірка:** `cargo test --test jobs_api_contracts --features ml,enterprise,cloud,test-utils -j 1 -- --test-threads=1`; входить у `cargo test-ci`
 - **FM:** FM-026 ✅
 
+### [Job] Scheduler hardening + on-chain epics (PH-S38)
+- **Де:** `src/job/scheduler.rs`, `src/job/domain_events.rs`, `src/job/onchain.rs`, `src/grid/dispatch.rs`
+- **Сигнал:** `ScheduleOutcome.expired`, `POOLAI_ONCHAIN_EVENTS_DIR`, `schedule_with_grid_peer`
+- **Патерн:** GPU jobs → VM `gpu_capable` before worker `has_gpu`; past `spec.deadline` → `failed`; `PATCH` to `rewarded`/`completed` → NDJSON `job_completed`; grid memory → `memory_updated` / `seed_provided`
+- **Перевірка:** `cargo test job:: --lib`; `cargo test --test job_onchain_events`; `cargo test-ci`
+- **FM:** PH-S38 ✅
+
 ### [Solana] Adapter crate schema v1 (FM-010, S37)
 - **Де:** `crates/poolai-solana-adapter/src/events.rs`, `src/sidecar.rs`, bin `poolai-solana-adapter`
 - **Сигнал:** `DomainEventEnvelope::from_json`, `process_event_line`

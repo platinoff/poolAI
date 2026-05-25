@@ -233,7 +233,7 @@
 - [x] `crates/poolai-solana-adapter/` — domain events schema v1 + NDJSON sidecar (без `solana-sdk` у `poolai`).
 - [x] `src/network/api/jobs.rs` — stub `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}`.
 - [x] Персистентний job store (JSON, `POOLAI_JOB_DATA_DIR`) — 2026-05-20.
-- [ ] Scheduler / on-chain submit — **окремі епіки** (за запитом).
+- [x] Scheduler / on-chain submit epics — PH-S38 (`src/job/scheduler.rs`, `domain_events.rs`, `onchain.rs`).
 
 ---
 
@@ -335,13 +335,13 @@ Grid / Job / Memory / Tokenization (Priority 6)
 
 - **Документ**: [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](GRID_PROTOCOL_CONCEPT_2026-04-06.md) — типи повідомлень `Job`, `Result`, `MemoryShard`, `PeerStatus`; мапінг на `/api/v1/discovery/*`, `DiscoveryMessage`, `/raid/distributed/*`, `tests/grid_network_scalability_tests.rs`.
 - **Оновлено**: [`concept/POOLAI_GRID_NODE.md`](../concept/POOLAI_GRID_NODE.md) (посилання на Grid Protocol), [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md), [`catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), `file_list.csv`.
-- **Залишок P6 (історичний)**: wire envelope + adapter MVP — **закрито S35–S37**; залишок — scheduler, on-chain RPC.
+- **Залишок P6 (історичний)**: wire envelope + adapter MVP — **закрито S35–S37**; scheduler + core on-chain epics — **PH-S38 ✅**; залишок — program hardening (**PH-S46**).
 
 ## Верифікація 2026-04-06 (P6 — Solana adapter concept)
 
 - **Документ**: [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](SOLANA_ADAPTER_CONCEPT_2026-04-06.md) — межі core vs адаптер; мапінг `JobCompleted` / `SeedProvided` / `MemoryUpdated`; варіанти інтеграції (sidecar, черга, pull).
 - **P6 критерії готовності (концепт)**: закрито; наступний горизонт — прототип on-chain програми та schema подій core↔adapter.
-- **Залишок**: on-chain RPC у sidecar; job scheduler / persistent store (S38 stub лише in-process).
+- **Залишок**: on-chain program hardening у sidecar (**PH-S46**); job store RAID-backed — deferred.
 
 ## Верифікація 2026-04-06 (P5 — архівні плани)
 

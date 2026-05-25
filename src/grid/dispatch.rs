@@ -5,8 +5,8 @@ use chrono::Utc;
 use crate::core::error::AppError;
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
-    job_spec_from_grid_job, job_status_from_grid_result, schedule_pending, JobRecord, JobStatus,
-    JobStore,
+    emit_memory_updated, emit_seed_provided, job_spec_from_grid_job, job_status_from_grid_result,
+    memory_content_digest, schedule_with_grid_peer, JobRecord, JobStatus, JobStore,
 };
 use crate::memory::{memory_shard_from_grid_body, MemoryShardStore};
 
@@ -32,12 +32,29 @@ pub fn ingest_envelope(
     env.validate()
         .map_err(|e: GridEnvelopeError| AppError::ValidationError(e.to_string()))?;
     match env.msg {
-        GridMessage::Job(body) => ingest_job(body, jobs),
+        GridMessage::Job(body) => ingest_job(body, env.source_peer_id.as_deref(), jobs),
         GridMessage::Result(body) => ingest_result(body, jobs),
         GridMessage::MemoryShard(body) => {
             let shard = memory_shard_from_grid_body(&body);
             let shard_id = shard.shard_id.0.clone();
             memory.upsert(shard)?;
+            let provider = env.source_peer_id.as_deref().unwrap_or("coordinator");
+            let digest = memory_content_digest(&body.artifact_id, &body.version);
+            emit_memory_updated(
+                &body.artifact_id,
+                &body.version,
+                &digest,
+                body.raid_logical_name.as_deref(),
+                format!("memory:{}:{}", shard_id, body.version),
+            );
+            if body.seed_hints.as_ref().is_some_and(|h| !h.is_empty()) {
+                emit_seed_provided(
+                    &shard_id,
+                    provider,
+                    &body.artifact_id,
+                    format!("seed:{}:{}", shard_id, provider),
+                );
+            }
             Ok(GridIngestOutcome {
                 kind: GridIngestKind::MemoryShard { shard_id },
             })
@@ -52,6 +69,7 @@ pub fn ingest_envelope(
 
 fn ingest_job(
     body: crate::grid::GridJobBody,
+    source_peer_id: Option<&str>,
     jobs: &JobStore,
 ) -> Result<GridIngestOutcome, AppError> {
     let spec = job_spec_from_grid_job(&body);
@@ -64,7 +82,7 @@ fn ingest_job(
         vm_id: None,
     };
     jobs.push(record)?;
-    schedule_pending(jobs)?;
+    schedule_with_grid_peer(jobs, source_peer_id)?;
     let row = jobs
         .get(&job_id)?
         .ok_or_else(|| AppError::InternalError("job missing after grid ingest".into()))?;
