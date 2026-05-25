@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `160a1f59` · **§5.11** — PH-S47 першим
+**Оновлено:** 2026-05-25 · **HEAD** `c624d189` · **§5.11** — PH-S47 (дочекатись CI)
 
 ---
 
@@ -13,7 +13,7 @@ df -h /s — Use% ≥99% → cargo clean перед cargo test-ci
 
 ## Стан
 - **PH-S03…S34:** ✅
-- **CI main (red):** `raid_admin_api_integration` (Linux `/var/lib/poolai`) · OpenAPI gap `/admin/secrets/*` · E2E `rustc` SIGSEGV (release+ml) → **PH-S47**
+- **CI main:** push `c624d189` (`test-ci` + `CARGO_BUILD_JOBS=1`); `160a1f59` — OpenAPI/raid_admin/E2E debug ✅ в коді; **дочекатись зеленого** ubuntu + openapi-gap + Playwright → **PH-S47**
 - **PH-S37:** workflow YAML ✅ (`a6f14cb2`); **PNG** — merge PR після зеленого CI
 - **PH-S35/S16, FM-003 LAN §4:** BLOCKED (2 хости)
 - **PH-S36/S15, FM-041:** Deferred
@@ -21,8 +21,8 @@ df -h /s — Use% ≥99% → cargo clean перед cargo test-ci
 ## PH-S47 — закрити (перша черга)
 1. OpenAPI: `/admin/secrets/rotation`, `/admin/secrets/rotate` + schemas → `poolai-openapi-gap-audit` exit 0
 2. `tests/raid_admin_api_integration.rs` — TempDir (не `default_for_platform` на CI)
-3. `bin/e2e-playwright.sh` — `CI=true` → `cargo build` debug (уникнути SIGSEGV release+ml)
-4. `cargo test-ci` · push · перевірити Actions (Test Suite ubuntu, openapi-gap, Playwright)
+3. `bin/e2e-playwright.sh` + `e2e.yml` — `CI=true` → debug + `CARGO_BUILD_JOBS=1` (`c624d189`)
+4. `ci.yml` — `cargo test-ci` на ubuntu (`c624d189`) · перевірити Actions (Test Suite ubuntu, openapi-gap, Playwright)
 
 ## PH-S37 — після S47
 1. Actions → **Update visual baselines (PH-S37)** → Run workflow

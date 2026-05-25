@@ -152,7 +152,7 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
-| 1 | **PH-S47** CI red: OpenAPI secrets, `raid_admin` TempDir, E2E debug | **§5.11** | **Відкрито** — push `160a1f59`; дочекатись зеленого CI |
+| 1 | **PH-S47** CI green: OpenAPI/raid_admin/E2E fixes + `test-ci`/`CARGO_BUILD_JOBS=1` | **§5.11** | **Відкрито** — HEAD `c624d189`; дочекатись зеленого CI |
 | 2 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — merge Linux PNG після S47 |
 | 3 | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **Відкрито** — після S37 |
 | 4 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
@@ -234,7 +234,7 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Стан |
 |---|--------|--------|---------|------|
-| 1 | **PH-S47** | CI red: OpenAPI `/admin/secrets/*`, `raid_admin_api_integration` TempDir, E2E debug build (rustc SIGSEGV) | `ci.yml`, PH-S24/S37b routes | **Відкрито** |
+| 1 | **PH-S47** | CI green: OpenAPI secrets, raid_admin TempDir, E2E debug + `cargo test-ci` / `CARGO_BUILD_JOBS=1` (`c624d189`) | `ci.yml`, `e2e.yml` | **Відкрито** — CI run |
 | 2 | **PH-S37** | Linux visual baselines (`visual.spec.ts-snapshots`) | §5.10, `VISUAL_REGRESSION_E2E.md` | **Відкрито** — merge PNG після S47 |
 | 3 | **PH-S44** | CI gate: visual + axe required on UI PRs | §5.10, `ci.yml` paths-filter | **Відкрито** |
 | 4 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
