@@ -29,7 +29,7 @@ export function matrixSnapshotName(
   return `${pageName}-${theme}-${lang}.png`;
 }
 
-/** Log in via /ui/login and wait for dashboard. */
+/** Log in via /ui/login; capture POST /api/v1/login before redirect (PH-S25, Windows-safe). */
 export async function loginAsAdmin(
   page: Page,
   prefs?: { theme?: UiTheme; lang?: VisualLang },
@@ -43,30 +43,25 @@ export async function loginAsAdmin(
   await page.goto("/ui/login");
   await page.locator("#username").fill(e2eUser);
   await page.locator("#password").fill(e2ePassword);
-  const loginResponse = page.waitForResponse(
-    (res) =>
-      res.url().includes("/api/v1/login") &&
-      res.request().method() === "POST" &&
-      res.ok(),
-  );
-  await page.locator("#loginForm").evaluate((form) => {
-    (form as HTMLFormElement).requestSubmit();
-  });
-  const loginJson = await (await loginResponse).json() as {
-    token?: string;
-    role?: string;
-  };
+  const [loginResp] = await Promise.all([
+    page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/v1/login") &&
+        res.request().method() === "POST" &&
+        res.ok(),
+      { timeout: 20_000 },
+    ),
+    page.locator("#loginForm").evaluate((form) => {
+      (form as HTMLFormElement).requestSubmit();
+    }),
+  ]);
+  expect(loginResp.ok()).toBeTruthy();
   await page.waitForURL(/\/ui\/?$/, { timeout: 20_000 });
-  if (loginJson.token) {
-    await page.evaluate(
-      ({ token, role, user }) => {
-        localStorage.setItem("poolai_token", token);
-        if (role) localStorage.setItem("poolai_role", role);
-        localStorage.setItem("poolai_user", user);
-      },
-      { token: loginJson.token, role: loginJson.role ?? "Admin", user: e2eUser },
-    );
-  }
+  await page.waitForFunction(
+    () => !!localStorage.getItem("poolai_token"),
+    null,
+    { timeout: 20_000 },
+  );
   await page.evaluate((user) => {
     if (!localStorage.getItem("poolai_role")) {
       localStorage.setItem("poolai_role", "Admin");

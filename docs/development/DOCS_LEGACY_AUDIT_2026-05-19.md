@@ -62,7 +62,7 @@
 | **FM-009/010**, **P6** | **Concept-only** |
 | **Layer C** | **100%** (S40; було 79% до Horizon S35–S40) |
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **FM-032** (legacy audit 2026-05-20 → FM-032…042 у FM §5.1, §5.8).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S37** (visual Linux CI); backlog **§5.10** PH-S35…S44 (legacy audit 2026-05-25).
 
 ---
 

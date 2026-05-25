@@ -54,7 +54,9 @@ resolve_poolai_bin() {
 
 start_poolai() {
   export K8S_OPENAPI_ENABLED_VERSION="${K8S_OPENAPI_ENABLED_VERSION:-1.28}"
-  STAND_ROOT="${TMPDIR:-/tmp}/poolai-e2e-$$"
+  export TMPDIR="${TMPDIR:-/tmp}"
+  export TEMP="${TEMP:-/tmp}"
+  STAND_ROOT="/tmp/poolai-e2e-$$"
   mkdir -p "${STAND_ROOT}/raid" "${STAND_ROOT}/data"
   local bin
   bin="$(resolve_poolai_bin)"

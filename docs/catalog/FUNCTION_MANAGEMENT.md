@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-24 (PH-S19 ✅; PH-S20 ✅; PH-S15…S24 legacy черга; FM-041 Deferred).
+**Оновлено:** 2026-05-25 (PH-S35…S44 legacy backlog §5.10; E2E login fix; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -152,6 +152,8 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
+| 1 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — drift після PH-S25…S34 |
+| 2 | **PH-S44** E2E/CI visual + axe gate | **§5.10** | **Відкрито** — після S37 |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
@@ -198,6 +200,25 @@ FM-xxx (з таблиці нижче)
 | **PH-S24** | Security ops (secret rotation hooks, pen-test checklist) | `src/security/`, `docs/security/PEN_TEST_CHECKLIST.md` | **✅** |
 
 **Одна сесія = один PH-S*** (або FM-003/FM-041 за §5.1). Промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+
+### 5.10 Post-PH backlog PH-S35…S44 (legacy audit 2026-05-25)
+
+**Джерела:** [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md), [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](../development/NEXT_STEPS_ARCHITECT_2026-03-17.md), [`UI_UX_IMPROVEMENTS_PLAN.md`](../development/UI_UX_IMPROVEMENTS_PLAN.md), [`UI_QUALITY_AND_E2E_PLAN_2026-04-06.md`](../development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md), [`AUTO_RUN_SESSION_2026-07-01.md`](../development/AUTO_RUN_SESSION_2026-07-01.md). **Не плутати** з Horizon **S35–S40** (✅) та закритими **PH-S03…S34**.
+
+| Sprint | Фокус | Джерело (legacy) | Стан |
+|--------|--------|------------------|------|
+| **PH-S35** | LAN §4 sign-off (2-host + TQ01) | Architect L130, FM-003 | **BLOCKED** (2 хости) |
+| **PH-S36** | Cloud SDK deep (GCP SA JWT, Azure OAuth) | FM-041, `CLOUD_SDK_PROGRESS` | **Deferred** |
+| **PH-S37** | Playwright visual baselines refresh (**Linux CI**) | `VISUAL_REGRESSION_E2E.md`, post S25–S34 UI | **Відкрито** — пріоритет 1 |
+| **PH-S38** | Job scheduler hardening + on-chain submit epics | Architect L236 | **Відкрито** (MVP ✅ FM-020–034) |
+| **PH-S39** | VM Windows CPU/memory limits post-spawn | `vm/resources.rs`, AUTO_RUN §1.6 | **Відкрито** |
+| **PH-S40** | Hardware VM isolation | `vm/mod.rs`, Architect 2026-01-22 | **Відкрито** (великий scope) |
+| **PH-S41** | macvlan network isolation (Linux) | `vm/isolation/linux.rs`, NEXT_STEPS 01-17 | **Відкрито** |
+| **PH-S42** | Admin tables UX (sort/filter/export, empty states) | `UI_UX_IMPROVEMENTS_PLAN` §tables | **Відкрито** |
+| **PH-S43** | Monitoring / ML step metrics UI | UI_UX §monitoring, DIGEST §ML | **Відкрито** |
+| **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **Відкрито** — після S37 |
+
+**Наступна сесія (код/CI):** **PH-S37** → **PH-S44** → **PH-S39** (див. §5.1). **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -310,7 +331,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH черга закрита** (лише PH-S01 Deferred, PH-S02 BLOCKED) — ops / a11y HC contrast / FM-041 за §5.1 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S37** (visual baselines Linux) · **§5.10** PH-S35…S44 · ops PH-S35/S36 BLOCKED/Deferred · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

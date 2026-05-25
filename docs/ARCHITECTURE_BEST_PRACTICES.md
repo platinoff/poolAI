@@ -1,5 +1,5 @@
 # 🏗️ PoolAI Architecture Best Practices
-## Rust Architect Analysis - 2026-01-22 (оновлено Horizon 2026-05-19)
+## Rust Architect Analysis - 2026-01-22 (оновлено Horizon 2026-05-19; post-PH §5.10 2026-05-25)
 
 ---
 
