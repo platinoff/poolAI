@@ -10,6 +10,8 @@
 //! On other platforms, they will test the fallback behavior.
 
 use poolai::vm::{ResourceLimiter, ResourceLimits};
+#[cfg(target_os = "windows")]
+use poolai::vm::{VmIsolation, VmManager, VmResources};
 use uuid::Uuid;
 
 #[cfg(target_os = "windows")]
