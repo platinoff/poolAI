@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `260858ea` · **§5.11** — наступні 10 спринтів PH-S37…S46
+**Оновлено:** 2026-05-25 · **HEAD** `83b9a4a3` (+ YAML fix pending push) · **§5.11** — PH-S37…S46
 
 ---
 
@@ -9,6 +9,7 @@ PoolAI — PH-S37 merge Linux PNG → PH-S44; §5.11 черга 10 спринт�
 
 ## S0
 MSYS2 bash · HANDOFF · FM §5.1 · §5.10 · §5.11
+df -h /s — Use% ≥99% → cargo clean перед cargo test-ci
 
 ## Стан
 - **PH-S03…S34:** ✅
@@ -16,10 +17,11 @@ MSYS2 bash · HANDOFF · FM §5.1 · §5.10 · §5.11
 - **PH-S35/S16, FM-003 LAN §4:** BLOCKED (2 хости)
 - **PH-S36/S15, FM-041:** Deferred
 
-## PH-S37 — закрити (сьогодні)
-1. Actions → **Update visual baselines (PH-S37)** → Run workflow
+## PH-S37 — закрити
+0. Push `fix(ci): PH-S37 visual baseline workflow YAML` (heredoc у workflow ламав валідацію)
+1. Actions → **Update visual baselines (PH-S37)** → **Run workflow** (workflow_dispatch)
 2. Merge PR `test(e2e): Linux visual baselines (PH-S37)`
-3. FM §5.10 / §5.11 #1 → ✅
+3. FM §5.10 / §5.11 #1 → ✅ → HANDOFF + NEXT_SESSION **PH-S44**
 
 ## Не повторювати
 PH-S03…S34; PH-S37 infra (workflow, rotation tab, `record_secret_rotation`); docs §5.11 sync
