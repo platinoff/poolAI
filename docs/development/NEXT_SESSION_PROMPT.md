@@ -1,57 +1,70 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `4460b282` · **§5.11** — PH-S47 → PH-S37
+**Оновлено:** 2026-05-25 · **HEAD** `0fe21bf1` · **§5.11** — PH-S47 → PH-S37
 
 ---
 
 ```
-PoolAI — PH-S47 CI green → PH-S37 PNG merge → PH-S44.
+PoolAI — локально без помилок → PH-S47 CI green → PH-S37 PNG → PH-S44.
 
 ## S0
-MSYS2 bash · HANDOFF · FM §5.1 · §5.10 · §5.11
-df -h /s — Use% ≥99% → cargo clean перед cargo test-ci
-Локально: CARGO_BUILD_JOBS=1; AV exclusion для target/ + ~/.cargo
+MSYS2 UCRT64 bash (не PowerShell для git/cargo) · HANDOFF · FM §5.1 · §5.10 · §5.11
+df -h /s — Use% ≥99% → cargo clean
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export K8S_OPENAPI_ENABLED_VERSION=1.28
+export CARGO_BUILD_JOBS=1   # AV/памʼять; обовʼязково перед test-ci / e2e build
+
+## Принцип сесії
+GitHub CI на main часто червоний (rustc 101, Windows matrix, pa11y) — **не блокує локальну розробку**.
+Перед кожним push: локально **0 errors** (fmt + test-ci + openapi-gap). CI — підтвердження; pa11y WCAG — окремий тікет.
 
 ## Стан
 - **PH-S03…S34:** ✅
-- **PH-S47 (відкрито):** OpenAPI secrets ✅ (`160a1f59`) · raid_admin TempDir ✅ · ProcessCollector Linux ✅ (`6dfe8b4e`) · test-ci inline (`164adf30`) · E2E `test:ci` без visual (`28bcb91f`) · pa11y/E2E debug без ml (`PH-S47f` push)
-- **CI red (2026-05-25):** rustc SIGSEGV `release+ml` (pa11y/a11y job); Playwright build 101 — фікси в `PH-S47f`; pa11y WCAG окремий тікет якщо лишиться червоним
-- **PH-S37:** workflow YAML ✅ (`a6f14cb2`); **PNG** — merge PR після зеленого CI
-- **PH-S35/S16, FM-003 LAN §4:** BLOCKED (2 хости)
-- **PH-S36/S15, FM-041:** Deferred
+- **PH-S47 (відкрито):** `160a1f59` OpenAPI/raid_admin/E2E debug · `6dfe8b4e` ProcessCollector · `164adf30` test-ci · `28bcb91f` E2E test:ci · `4460b282` pa11y debug · `0fe21bf1` Windows vm test imports
+- **CI #1213** (`0fe21bf1`) — in progress; ubuntu часто green після S47f; Windows — `vm_windows` imports fixed
+- **PH-S37:** workflow ✅ (`a6f14cb2`); Linux PNG merge після зеленого PH-S47
+- **PH-S35/S16, FM-003 LAN §4:** BLOCKED · **PH-S36/FM-041:** Deferred
 
-## PH-S47 — закрити (перша черга)
-1. Дочекатись зеленого CI: **ubuntu Test Suite**, **openapi-gap**, **Playwright** (smoke+admin+a11y)
-2. Перевірити HEAD після `PH-S47f`: pa11y/a11y debug build, `CARGO_BUILD_JOBS=1`, cache keys
-3. Pa11y WCAG 2.2 — не блокер gap/raid (окремий тікет якщо red)
+## PH-S47 — закрити (перша черга, CI)
+1. Дочекатись **зеленого** CI на HEAD: ubuntu Test Suite, openapi-gap, Playwright (`test:ci` smoke+admin+a11y)
+2. Якщо red — лише мінімальний fix; не `cargo test-ci --verbose` (alias ламає `--`)
+3. **Pa11y WCAG 2.2** — не блокер gap/raid (окремий FM/ticket)
 
-## PH-S37 — після S47
+## Локальна розробка (обовʼязково перед push)
+```bash
+cd /s/rust/poolAI
+cargo fmt --all
+cargo test-ci
+cargo test-raft-ci          # якщо чіпали raft
+cargo run --bin poolai-openapi-gap-audit   # exit 0
+# опційно E2E: bash bin/e2e-playwright.sh --start  # повний npm test локально
+```
+- **Без Python** у репо (runtime-stack-policy)
+- **cfg imports:** типи лише для windows-тестів → `#[cfg(target_os = "windows")] use …`
+- Commit: MSYS2 + commit-tree якщо hook ламає subject (`GIT_EDITOR=true`)
+
+## PH-S37 — після зеленого PH-S47
 1. Actions → **Update visual baselines (PH-S37)** → Run workflow
 2. Merge PR `test(e2e): Linux visual baselines (PH-S37)`
-3. Повернути full `npm test` + visual у CI (PH-S44)
+3. PH-S44: повернути visual + axe gate на UI PR
 
 ## Не повторювати
-PH-S03…S34; PH-S37 infra (rotation tab, workflow `a6f14cb2`); gap audit без нових routes; `cargo test-ci --verbose` (alias)
+PH-S03…S34 · PH-S37 infra (rotation tab, workflow `a6f14cb2`) · gap audit без нових routes
+OpenAPI/raid_admin/ProcessCollector/test-ci/E2E pa11y debug (S47 серія) · `cargo test-ci --verbose`
 
 ## Наступні 10 спринтів (§5.11)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S47** | CI green: OpenAPI, raid_admin, test-ci, E2E/pa11y debug (no release+ml SIGSEGV) |
+| 1 | **PH-S47** | CI green (ubuntu + openapi-gap + Playwright); локально test-ci |
 | 2 | **PH-S37** | Linux visual PNG merge |
-| 3 | **PH-S44** | CI: visual + axe gate на UI PR |
+| 3 | **PH-S44** | CI visual + axe gate на UI PR |
 | 4 | **PH-S39** | VM Windows CPU/memory limits |
 | 5 | **PH-S42** | Admin tables UX |
 | 6 | **PH-S43** | ML/monitoring metrics admin UI |
-| 7 | **PH-S45** | E2E: vm modal + axe audit |
+| 7 | **PH-S45** | E2E vm modal + axe audit |
 | 8 | **PH-S38** | Job scheduler + on-chain |
 | 9 | **PH-S46** | Solana on-chain program |
 | 10 | **PH-S41** | macvlan (Linux) |
 
 **Поза чергою:** PH-S35 LAN (BLOCKED) · PH-S36 Cloud SDK (Deferred) · PH-S40 hardware VM
-
-## Перевірки
-cargo fmt --all
-cargo test-ci
-cargo run --bin poolai-openapi-gap-audit
-# E2E локально: export CARGO_BUILD_JOBS=1; bash bin/e2e-playwright.sh --start
 ```

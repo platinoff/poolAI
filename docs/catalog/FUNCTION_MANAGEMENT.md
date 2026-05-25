@@ -152,7 +152,7 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
-| 1 | **PH-S47** CI green: OpenAPI, raid_admin, ProcessCollector, test-ci, E2E/pa11y debug (no release+ml SIGSEGV) | **§5.11** | **Відкрито** — HEAD `164adf30`+PH-S47f; ubuntu + openapi-gap + Playwright |
+| 1 | **PH-S47** CI green + локально test-ci без помилок | **§5.11** | **Відкрито** — HEAD `0fe21bf1`; CI #1213; push лише після локальних перевірок |
 | 2 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — merge Linux PNG після S47 |
 | 3 | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **Відкрито** — після S37 |
 | 4 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
@@ -234,7 +234,7 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Стан |
 |---|--------|--------|---------|------|
-| 1 | **PH-S47** | CI green: secrets OpenAPI, raid_admin TempDir, ProcessCollector Linux, test-ci inline, E2E/pa11y debug (`PH-S47f`) | `ci.yml`, `e2e.yml`, `a11y.yml` | **Відкрито** — SIGSEGV release+ml mitigated |
+| 1 | **PH-S47** | CI green; локально `cargo test-ci` + gap audit; код S47 серія ✅ | `ci.yml`, `e2e.yml`, `a11y.yml`, tests | **Відкрито** — `0fe21bf1` Windows imports |
 | 2 | **PH-S37** | Linux visual baselines (`visual.spec.ts-snapshots`) | §5.10, `VISUAL_REGRESSION_E2E.md` | **Відкрито** — merge PNG після S47 |
 | 3 | **PH-S44** | CI gate: visual + axe required on UI PRs | §5.10, `ci.yml` paths-filter | **Відкрито** |
 | 4 | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources.rs` | **Відкрито** |
