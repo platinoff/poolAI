@@ -25,6 +25,7 @@ bash bin/e2e-playwright.sh
 
 # Варіант B: збірка + старт + тести
 bash bin/e2e-playwright.sh --start
+# GitHub Actions (CI=true): debug build — менше навантаження на rustc (уникнути SIGSEGV release+ml).
 
 # PH-S11: оновити visual baselines
 bash bin/e2e-playwright.sh --start --update-snapshots

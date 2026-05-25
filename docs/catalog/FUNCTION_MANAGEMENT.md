@@ -152,16 +152,16 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
-| 1 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — workflow + rotation tab ✅; merge Linux PNG PR |
-| 2 | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **Відкрито** — після S37 |
-| 3 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
-| 4 | **PH-S42** Admin tables UX | **§5.11** | **Відкрито** |
-| 5 | **PH-S43** ML/monitoring metrics UI | **§5.11** | **Відкрито** |
-| 6 | **PH-S45** E2E stability (vm modal, axe audit) | **§5.11** | **Відкрито** — `E2E_PLAYWRIGHT.md` backlog |
-| 7 | **PH-S38** Job scheduler + on-chain epics | **§5.11** | **Відкрито** |
-| 8 | **PH-S46** Solana on-chain program (post FM-024) | **§5.11** | **Відкрито** — Architect P6, §5.7 |
-| 9 | **PH-S41** macvlan (Linux) | **§5.11** | **Відкрито** |
-| 10 | **PH-S40** Hardware VM isolation | **§5.11** | **Відкрито** |
+| 1 | **PH-S47** CI red: OpenAPI secrets, `raid_admin` TempDir, E2E debug | **§5.11** | **Відкрито** — push `160a1f59`; дочекатись зеленого CI |
+| 2 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — merge Linux PNG після S47 |
+| 3 | **PH-S44** E2E/CI visual + axe gate | **§5.11** | **Відкрито** — після S37 |
+| 4 | **PH-S39** VM Windows resource limits | **§5.11** | **Відкрито** |
+| 5 | **PH-S42** Admin tables UX | **§5.11** | **Відкрито** |
+| 6 | **PH-S43** ML/monitoring metrics UI | **§5.11** | **Відкрито** |
+| 7 | **PH-S45** E2E stability (vm modal, axe audit) | **§5.11** | **Відкрито** — `E2E_PLAYWRIGHT.md` backlog |
+| 8 | **PH-S38** Job scheduler + on-chain epics | **§5.11** | **Відкрито** |
+| 9 | **PH-S46** Solana on-chain program (post FM-024) | **§5.11** | **Відкрито** — Architect P6, §5.7 |
+| 10 | **PH-S41** macvlan (Linux) | **§5.11** | **Відкрито** |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
