@@ -53,7 +53,7 @@
 | Область | Де | Примітка |
 |---------|-----|----------|
 | VM isolation (Windows) | `src/vm/isolation/windows.rs` | AppContainer/Firewall — validated stub |
-| VM resources (Windows) | `src/vm/resources.rs` | CPU/memory limits post-spawn |
+| VM resources (Windows) | `src/vm/resources/windows.rs` | **✅ PH-S39** — Job Object post-spawn (`apply_limits_post_spawn`); native API with `vm-isolation-windows` |
 | Hardware VM isolation | `src/vm/mod.rs` | «not yet implemented» |
 | Cloud SDK deep paths | `src/cloud/providers/azure.rs`, `gcp.rs` | FM-006 Deferred |
 | Raft membership from log | `src/raid/raft.rs` | snapshot/log extraction |

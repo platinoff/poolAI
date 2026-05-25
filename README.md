@@ -70,8 +70,8 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S39** | VM Windows CPU/memory limits |
-| 2–7 | **PH-S42…S41** | Tables UX, ML UI, E2E fixes, job/on-chain, Solana, macvlan — див. §5.11 |
+| 1 | **PH-S42** | Admin tables UX (sort/filter/export, empty states) |
+| 2–6 | **PH-S43…S41** | ML UI, E2E fixes, job/on-chain, Solana, macvlan — див. §5.11 |
 
 **Ops (поза 10):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

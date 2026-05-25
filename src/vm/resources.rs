@@ -1,29 +1,26 @@
-//! Resource Limits Enforcement for VM instances
+//! Resource limits enforcement for VM instances.
 //!
-//! This module provides resource limits enforcement for VM instances.
-//!
-//! ## Platform-specific implementations:
-//!
-//! - **Windows**: Job Objects (planned for future implementation)
-//!   - Windows Job Objects allow fine-grained control over process resources
-//!   - Will provide CPU and memory limits enforcement
-//!   - Requires Windows API integration
-//!
-//! - **Linux**: cgroups v2 (planned for future implementation)
-//!   - Modern cgroups v2 interface for resource control
-//!   - Will provide CPU, memory, and I/O limits enforcement
-//!   - Requires systemd or direct cgroup filesystem access
-//!
-//! - **Cross-platform**: Basic validation and monitoring (current implementation)
-//!   - Validates resource limits configuration
-//!   - Monitors resource usage through platform APIs
-//!   - Provides fallback behavior when platform-specific enforcement is not available
+//! Pre-spawn: validation (and Linux env hints). Post-spawn: platform limiters
+//! (Windows Job Objects, Linux cgroups) when PID is available.
 
 use crate::core::error::AppError;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
 
-/// Resource limits configuration for a VM instance
+#[cfg(target_os = "linux")]
+mod linux;
+#[cfg(target_os = "windows")]
+mod windows;
+
+#[cfg(target_os = "linux")]
+pub use linux::LinuxCgroupLimiter;
+#[cfg(target_os = "windows")]
+pub use windows::{JobObjectState, WindowsJobObjectLimiter};
+
+/// Minimum enforced memory limit (MB) when a finite limit is set.
+pub const MIN_MEMORY_LIMIT_MB: u32 = 64;
+
+/// Resource limits configuration for a VM instance.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ResourceLimits {
     /// CPU cores limit (0 = unlimited)
@@ -48,47 +45,17 @@ impl From<crate::vm::VmResources> for ResourceLimits {
     }
 }
 
-/// Resource limiter trait for platform-specific implementations
-#[async_trait::async_trait]
-pub trait ResourceLimiter: Send + Sync {
-    /// Apply resource limits to a command before spawning
-    ///
-    /// This is called before the process is spawned. For platforms like Linux cgroups,
-    /// this may only set environment variables, and actual limits should be applied
-    /// post-spawn using `apply_limits_post_spawn()`.
-    async fn apply_limits(
-        &self,
-        command: &mut Command,
-        limits: &ResourceLimits,
-    ) -> Result<(), AppError>;
-
-    /// Apply resource limits to a process after spawning
-    ///
-    /// This is called after the process is spawned and PID is available.
-    /// Used by platforms like Linux cgroups that require process PID.
-    ///
-    /// # Arguments
-    /// * `process_id` - VM instance ID (Uuid)
-    /// * `pid` - Process ID (u32)
-    /// * `limits` - Resource limits to apply
-    async fn apply_limits_post_spawn(
-        &self,
-        _process_id: uuid::Uuid,
-        _pid: u32,
-        _limits: &ResourceLimits,
-    ) -> Result<(), AppError> {
-        // Default implementation: no-op (limits applied in apply_limits)
-        Ok(())
+/// Validate limit values (shared pre/post spawn).
+pub fn validate_resource_limits(limits: &ResourceLimits) -> Result<(), AppError> {
+    if limits.memory_mb > 0 && limits.memory_mb < MIN_MEMORY_LIMIT_MB {
+        return Err(AppError::ValidationError(format!(
+            "Memory limit too low (minimum {MIN_MEMORY_LIMIT_MB} MB)"
+        )));
     }
-
-    /// Get current resource usage for a process
-    async fn get_usage(&self, process_id: u32) -> Result<ResourceUsage, AppError>;
-
-    /// Check if limits are enforced (platform support)
-    fn is_supported(&self) -> bool;
+    Ok(())
 }
 
-/// Current resource usage for a process
+/// Current resource usage for a process.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResourceUsage {
     pub cpu_percent: f32,
@@ -96,8 +63,36 @@ pub struct ResourceUsage {
     pub gpu_utilization: Option<f32>,
 }
 
-/// Platform-specific resource limiter implementation
-pub struct PlatformResourceLimiter;
+/// Platform-specific resource limiter.
+#[async_trait::async_trait]
+pub trait ResourceLimiter: Send + Sync {
+    /// Apply resource limits to a command before spawning (validation / env hints).
+    async fn apply_limits(
+        &self,
+        command: &mut Command,
+        limits: &ResourceLimits,
+    ) -> Result<(), AppError>;
+
+    /// Apply resource limits after spawn when PID is known.
+    async fn apply_limits_post_spawn(
+        &self,
+        process_id: uuid::Uuid,
+        pid: u32,
+        limits: &ResourceLimits,
+    ) -> Result<(), AppError>;
+
+    async fn get_usage(&self, process_id: u32) -> Result<ResourceUsage, AppError>;
+
+    fn is_supported(&self) -> bool;
+}
+
+/// Default limiter — delegates to OS-specific backends.
+pub struct PlatformResourceLimiter {
+    #[cfg(target_os = "windows")]
+    windows: std::sync::Arc<WindowsJobObjectLimiter>,
+    #[cfg(target_os = "linux")]
+    linux: std::sync::Arc<LinuxCgroupLimiter>,
+}
 
 impl Default for PlatformResourceLimiter {
     fn default() -> Self {
@@ -107,7 +102,22 @@ impl Default for PlatformResourceLimiter {
 
 impl PlatformResourceLimiter {
     pub fn new() -> Self {
-        Self
+        Self {
+            #[cfg(target_os = "windows")]
+            windows: std::sync::Arc::new(
+                WindowsJobObjectLimiter::new().expect("Windows Job Object limiter"),
+            ),
+            #[cfg(target_os = "linux")]
+            linux: std::sync::Arc::new(LinuxCgroupLimiter::new().unwrap_or_else(|e| {
+                tracing::warn!("Linux cgroup limiter unavailable: {e}");
+                LinuxCgroupLimiter::disabled()
+            })),
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn windows_limiter(&self) -> &WindowsJobObjectLimiter {
+        &self.windows
     }
 }
 
@@ -118,21 +128,47 @@ impl ResourceLimiter for PlatformResourceLimiter {
         command: &mut Command,
         limits: &ResourceLimits,
     ) -> Result<(), AppError> {
-        // Platform-specific implementation
+        validate_resource_limits(limits)?;
+
+        #[cfg(target_os = "linux")]
+        {
+            linux::apply_linux_pre_spawn(command, limits).await?;
+        }
+
         #[cfg(target_os = "windows")]
         {
-            windows::apply_windows_limits(command, limits).await
+            let _ = command;
+            // Limits are enforced post-spawn via Job Objects.
+        }
+
+        Ok(())
+    }
+
+    async fn apply_limits_post_spawn(
+        &self,
+        process_id: uuid::Uuid,
+        pid: u32,
+        limits: &ResourceLimits,
+    ) -> Result<(), AppError> {
+        #[cfg(target_os = "windows")]
+        {
+            return self.windows.apply_limits(process_id, pid, limits).await;
         }
 
         #[cfg(target_os = "linux")]
         {
-            linux::apply_linux_limits(command, limits).await
+            if self.linux.is_available() {
+                return self.linux.apply_limits(process_id, pid, limits).await;
+            }
+            validate_resource_limits(limits)?;
+            let _ = (process_id, pid);
+            return Ok(());
         }
 
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         {
-            // Fallback: basic validation only
-            // Resource limits not supported on this platform, only validation will be performed
+            validate_resource_limits(limits)?;
+            let _ = (process_id, pid);
             Ok(())
         }
     }
@@ -140,12 +176,21 @@ impl ResourceLimiter for PlatformResourceLimiter {
     async fn get_usage(&self, process_id: u32) -> Result<ResourceUsage, AppError> {
         #[cfg(target_os = "windows")]
         {
-            windows::get_windows_usage(process_id).await
+            return Ok(ResourceUsage {
+                cpu_percent: 0.0,
+                memory_mb: 0,
+                gpu_utilization: None,
+            });
         }
 
         #[cfg(target_os = "linux")]
         {
-            linux::get_linux_usage(process_id).await
+            let _ = process_id;
+            return Ok(ResourceUsage {
+                cpu_percent: 0.0,
+                memory_mb: 0,
+                gpu_utilization: None,
+            });
         }
 
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
@@ -161,209 +206,9 @@ impl ResourceLimiter for PlatformResourceLimiter {
         {
             true
         }
-
         #[cfg(not(any(target_os = "windows", target_os = "linux")))]
         {
             false
         }
-    }
-}
-
-// Platform-specific modules (stubs for now)
-
-#[cfg(target_os = "windows")]
-mod windows {
-    use super::*;
-    use tracing::warn;
-
-    pub async fn apply_windows_limits(
-        _command: &mut Command,
-        limits: &ResourceLimits,
-    ) -> Result<(), AppError> {
-        // Future improvement: Implement Windows Job Objects for CPU/memory limits
-        // 1. Create Job Object using CreateJobObjectW Windows API
-        //    - Call CreateJobObjectW(NULL, job_name) to create a new job object
-        //    - Store job handle for later use
-        //    - Requires windows-sys or winapi crate bindings
-        // 2. Configure CPU limits using JOBOBJECT_CPU_RATE_CONTROL_INFORMATION
-        //    - Set ControlFlags to JOB_OBJECT_CPU_RATE_CONTROL_ENABLE
-        //    - Set CpuRate to percentage (0-100) for CPU cores limit
-        //    - Use SetInformationJobObject() with JobObjectCpuRateControlInformation
-        // 3. Configure memory limits using JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-        //    - Set JobMemoryLimit to memory_mb * 1024 * 1024 (bytes)
-        //    - Set LimitFlags to include JOB_OBJECT_LIMIT_JOB_MEMORY
-        //    - Use SetInformationJobObject() with JobObjectExtendedLimitInformation
-        // 4. Assign process to job using AssignProcessToJobObject()
-        //    - Call AssignProcessToJobObject(job_handle, process_handle)
-        //    - Process must not already be in a job object
-        //    - Process must be created suspended (CREATE_SUSPENDED flag)
-        //
-        // This requires:
-        // - Windows API bindings (windows-sys crate or winapi crate)
-        // - Administrator privileges for some job object features
-        // - Understanding of Windows Job Objects API
-        if limits.cpu_cores > 0 || limits.memory_mb > 0 {
-            warn!(
-                "Windows resource limits not yet implemented (CPU: {}, Memory: {} MB)",
-                limits.cpu_cores, limits.memory_mb
-            );
-            // For now, just validate
-            if limits.memory_mb > 0 && limits.memory_mb < 64 {
-                return Err(AppError::ValidationError(
-                    "Memory limit too low (minimum 64 MB)".to_string(),
-                ));
-            }
-        }
-        Ok(())
-    }
-
-    /// Apply Windows resource limits to an already-spawned process
-    ///
-    /// Placeholder for future Windows Job Objects integration. Currently only validates
-    /// configuration and logs intent; real enforcement is not wired yet.
-    #[allow(dead_code)]
-    pub async fn apply_windows_limits_post_spawn(
-        process_id: uuid::Uuid,
-        pid: u32,
-        limits: &ResourceLimits,
-    ) -> Result<(), AppError> {
-        let _ = (process_id, pid); // suppress unused warnings in placeholder implementation
-
-        if limits.memory_mb > 0 && limits.memory_mb < 64 {
-            return Err(AppError::ValidationError(
-                "Memory limit too low (minimum 64 MB)".to_string(),
-            ));
-        }
-
-        if limits.cpu_cores > 0 || limits.memory_mb > 0 {
-            warn!(
-                "Windows resource limits post-spawn not yet implemented (CPU: {}, Memory: {} MB)",
-                limits.cpu_cores, limits.memory_mb
-            );
-        }
-
-        Ok(())
-    }
-
-    pub async fn get_windows_usage(_process_id: u32) -> Result<ResourceUsage, AppError> {
-        // Future improvement: Implement Windows process resource usage query
-        // 1. Open process handle using OpenProcess() Windows API
-        //    - Use PROCESS_QUERY_INFORMATION | PROCESS_VM_READ access rights
-        //    - Handle must be closed with CloseHandle() when done
-        // 2. Query CPU usage using GetProcessTimes() Windows API
-        //    - Get kernel time and user time
-        //    - Calculate CPU percentage based on elapsed time and process time
-        //    - Requires tracking previous times for percentage calculation
-        // 3. Query memory usage using PROCESS_MEMORY_COUNTERS_EX structure
-        //    - Use GetProcessMemoryInfo() to get PROCESS_MEMORY_COUNTERS_EX
-        //    - Read PrivateUsage field for process memory in bytes
-        //    - Convert bytes to MB for ResourceUsage struct
-        // 4. Query GPU usage (optional, requires vendor-specific APIs)
-        //    - Use NVIDIA Management Library (NVML) or AMD ADL API
-        //    - Map process_id to GPU context
-        //    - Query GPU utilization percentage
-        //
-        // This requires:
-        // - Windows API bindings (windows-sys crate or winapi crate)
-        // - Process handle management (proper cleanup)
-        // - Time tracking for CPU percentage calculation
-        // - Optional GPU vendor SDKs for GPU usage
-        Ok(ResourceUsage {
-            cpu_percent: 0.0,
-            memory_mb: 0,
-            gpu_utilization: None,
-        })
-    }
-}
-
-#[cfg(target_os = "linux")]
-mod linux {
-    use super::*;
-
-    pub async fn apply_linux_limits(
-        command: &mut Command,
-        limits: &ResourceLimits,
-    ) -> Result<(), AppError> {
-        // Validate limits
-        if limits.memory_mb > 0 && limits.memory_mb < 64 {
-            return Err(AppError::ValidationError(
-                "Memory limit too low (minimum 64 MB)".to_string(),
-            ));
-        }
-
-        // Try to initialize LinuxCgroupLimiter to check if cgroups are available
-        // Note: We can't use LinuxCgroupLimiter::apply_limits() here because it requires
-        // a process_id (Uuid) and pid (u32), which we don't have yet (process not spawned)
-        //
-        // Actual cgroup limits should be applied in VmManager after process spawn:
-        // 1. Spawn process and get PID
-        // 2. Create LinuxCgroupLimiter instance
-        // 3. Apply limits using limiter.apply_limits(process_id, pid, limits)
-        //
-        // For now, store limits in environment variables as a hint that limits should be applied
-        if limits.cpu_cores > 0 {
-            command.env("POOLAI_CPU_LIMIT", limits.cpu_cores.to_string());
-        }
-        if limits.memory_mb > 0 {
-            command.env("POOLAI_MEMORY_LIMIT_MB", limits.memory_mb.to_string());
-        }
-
-        // Note: Actual cgroup enforcement requires post-spawn application
-        // This is a limitation of cgroups - they need the process PID
-        // See LinuxCgroupLimiter::apply_limits() for actual implementation
-        Ok(())
-    }
-
-    pub async fn get_linux_usage(_process_id: u32) -> Result<ResourceUsage, AppError> {
-        // Future improvement: Implement Linux process resource usage query
-        // 1. Read CPU usage from /proc/{pid}/stat file
-        //    - Parse utime (user time) and stime (system time) fields (positions 14 and 15)
-        //    - Read /proc/stat for system uptime to calculate CPU percentage
-        //    - Calculate: ((utime + stime) / (system_uptime * clock_ticks)) * 100
-        //    - Requires tracking previous times for accurate percentage calculation
-        // 2. Read memory usage from /proc/{pid}/status file
-        //    - Parse VmRSS (Resident Set Size) field for physical memory
-        //    - Parse VmSize field for virtual memory (optional)
-        //    - Convert KB to MB for ResourceUsage struct
-        //    - Example: VmRSS: 123456 kB -> 120 MB
-        // 3. Read CPU and memory from /proc/{pid}/statm file (alternative)
-        //    - First field: total program size (pages)
-        //    - Second field: resident set size (pages)
-        //    - Convert pages to bytes: pages * page_size (getconf PAGESIZE)
-        // 4. Query GPU usage (optional, requires vendor-specific APIs)
-        //    - Use nvidia-smi for NVIDIA GPUs (parse command output)
-        //    - Use rocm-smi for AMD GPUs (parse command output)
-        //    - Map process_id to GPU context using vendor APIs
-        //
-        // This requires:
-        // - Reading from /proc filesystem (available on all Linux systems)
-        // - Parsing /proc/{pid}/stat and /proc/{pid}/status files
-        // - Time tracking for CPU percentage calculation
-        // - Optional GPU vendor tools for GPU usage
-        // - Understanding of Linux proc filesystem format
-        Ok(ResourceUsage {
-            cpu_percent: 0.0,
-            memory_mb: 0,
-            gpu_utilization: None,
-        })
-    }
-}
-
-#[cfg(not(any(target_os = "windows", target_os = "linux")))]
-mod fallback {
-    use super::*;
-    use tracing::warn;
-
-    pub async fn apply_fallback_limits(
-        _command: &mut Command,
-        limits: &ResourceLimits,
-    ) -> Result<(), AppError> {
-        warn!("Resource limits not supported on this platform");
-        if limits.memory_mb > 0 && limits.memory_mb < 64 {
-            return Err(AppError::ValidationError(
-                "Memory limit too low (minimum 64 MB)".to_string(),
-            ));
-        }
-        Ok(())
     }
 }

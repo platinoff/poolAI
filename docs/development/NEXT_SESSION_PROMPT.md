@@ -1,53 +1,60 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `f11d3d4e` · **§5.11** — PH-S39
+**Оновлено:** 2026-05-25 · **HEAD** (після PH-S39) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
 
 ---
 
 ```
-PoolAI — PH-S39 VM Windows resource limits (post-spawn).
+PoolAI — PH-S42 Admin tables UX (sort/filter/export, empty states).
 
-## S0
-MSYS2 UCRT64 bash · HANDOFF · FM §5.1 · §5.11
-df -h /s — Use% ≥99% → cargo clean
+## Ролі (VDT)
+- Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
+- Ти: оркестратор Rust — один PH-S*, субагенти для explore/shell/модуль
+- Правила: virtual-development-team.mdc · poolai-session-iteration.mdc · runtime-stack-policy.mdc
+
+## S0 (MSYS2 UCRT64 bash)
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
 export K8S_OPENAPI_ENABLED_VERSION=1.28
-export CARGO_BUILD_JOBS=1
-
-## Принцип сесії
-Перед push: fmt + test-ci + openapi-gap (0 errors). CI — підтвердження.
-
-## Стан
-- **PH-S03…S34, PH-S47:** ✅
-- **PH-S37 ✅ infra:** `update-visual-baselines.yml` — Linux PNG refresh on-demand (Actions dispatch)
-- **PH-S44 ✅:** `test:ci` = smoke+admin+a11y+visual; `ci.yml` paths-filter → Playwright + Pa11y WCAG on UI/e2e PR
-- **PH-S35/S16, FM-003 LAN:** BLOCKED · **PH-S36/FM-041:** Deferred
-
-## PH-S39 — перша черга
-- VM Windows CPU/memory limits post-spawn (`vm/resources.rs`, `vm_windows_resource_limits_integration`)
-- Див. AUTO_RUN §1.6, §5.10 FM
-
-## Локально перед push
-```bash
 cd /s/rust/poolAI
+git fetch; git status -sb; git log -1 --oneline
+df -h /s | tail -1   # Use% ≥99% або Avail <5G → cargo clean
+HANDOFF · FM §5.11 · concept root (напрям) · ARCHITECTURE_BEST_PRACTICES
+
+## Локальний CI (канон — GitHub CI ігнорувати для «готово»)
 cargo fmt --all
 cargo test-ci
-cargo run --bin poolai-openapi-gap-audit
-```
+# за scope Raft: cargo test-raft-ci
+# за змін API: cargo run --bin poolai-openapi-gap-audit  # 0 errors
+# за змін UI/e2e: cd e2e && npm run test:ci
+# бенч лише якщо спринт чіпає perf → BENCHMARKS.md / poolai_health_load
+
+## Стан
+- **PH-S03…S47, PH-S37 infra, PH-S39, PH-S44:** ✅
+- **Черга §5.11:** PH-S42 → S43 → S45 → S38 → S46 → S41
+- **BLOCKED:** PH-S35/S16 LAN (2 хости) · **Deferred:** PH-S36/S01 Cloud SDK (FM-041)
+
+## PH-S42 — ця сесія
+- Admin tables UX: sort/filter/export, empty states (`UI_UX_IMPROVEMENTS_PLAN` §tables, `admin_common.js`)
+- Джерела: FM §5.10, `src/ui/admin/`
+
+## Завершення сесії
+1. Закрити PH-S42 у FM §5.11 + HANDOFF
+2. Оновити NEXT_SESSION_PROMPT → наступний PH-S43
+3. git push (зовнішній MSYS2) + самарі: hash, subject, test-ci, known issues
+4. Не стаджити: data/audit/*.log, .commit-msg-*, bin/commit-*.sh, target/
 
 ## Не повторювати
-PH-S03…S47 · PH-S37/PH-S44 (e2e test:ci visual gate) · `cargo test-ci --verbose`
+PH-S03…S47 · PH-S37/PH-S39/PH-S44 · повний `cargo test-ci --verbose` без змін коду
 
-## Наступні спринти (§5.11)
+## Наступні спринти (§5.11, max 10 у черзі)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S39** | VM Windows CPU/memory limits |
-| 2 | **PH-S42** | Admin tables UX |
-| 3 | **PH-S43** | ML/monitoring metrics admin UI |
-| 4 | **PH-S45** | E2E vm modal + axe audit |
-| 5 | **PH-S38** | Job scheduler + on-chain |
-| 6 | **PH-S46** | Solana on-chain program |
-| 7 | **PH-S41** | macvlan (Linux) |
+| 1 | **PH-S42** | Admin tables UX ← ПОТОЧНИЙ |
+| 2 | **PH-S43** | ML/monitoring metrics admin UI |
+| 3 | **PH-S45** | E2E vm modal + axe audit |
+| 4 | **PH-S38** | Job scheduler + on-chain epics |
+| 5 | **PH-S46** | Solana on-chain program |
+| 6 | **PH-S41** | macvlan (Linux) |
 
-**Поза чергою:** PH-S35 LAN (BLOCKED) · PH-S36 Cloud SDK (Deferred) · PH-S40 hardware VM
+**Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK · PH-S40 hardware VM (великий scope)
 ```

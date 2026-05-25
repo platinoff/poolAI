@@ -68,7 +68,12 @@
 //! - Resource optimization primitives (basic)
 
 mod resources;
-pub use resources::{PlatformResourceLimiter, ResourceLimiter, ResourceLimits, ResourceUsage};
+pub use resources::{
+    validate_resource_limits, PlatformResourceLimiter, ResourceLimiter, ResourceLimits,
+    ResourceUsage, MIN_MEMORY_LIMIT_MB,
+};
+#[cfg(target_os = "windows")]
+pub use resources::{JobObjectState, WindowsJobObjectLimiter};
 
 mod isolation;
 pub use isolation::windows_plan;
@@ -1430,6 +1435,23 @@ impl VmManager {
 
         let limits = ResourceLimits::from(instance.resources.clone());
         self.resource_limiter.apply_limits(command, &limits).await
+    }
+
+    /// Apply resource limits after the VM process is spawned (Job Objects / cgroups).
+    pub async fn apply_instance_resource_limits_post_spawn(
+        &self,
+        instance_id: Uuid,
+        pid: u32,
+    ) -> Result<(), AppError> {
+        let instances = self.instances.read().await;
+        let instance = instances.get(&instance_id).ok_or_else(|| {
+            AppError::ValidationError(format!("VM instance {instance_id} not found"))
+        })?;
+        let limits = ResourceLimits::from(instance.resources.clone());
+        drop(instances);
+        self.resource_limiter
+            .apply_limits_post_spawn(instance_id, pid, &limits)
+            .await
     }
 
     /// Get resource usage for a VM instance
