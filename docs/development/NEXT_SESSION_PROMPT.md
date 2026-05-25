@@ -1,28 +1,31 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `407d8798` (`4b1c21a4` — feat PH-S24) · **PH-S24:** ✅ · **PH черга S15…S24:** закрита
+**Оновлено:** 2026-05-25 · **HEAD** `476c5c20` (`5f41a919` — PH-S25 E2E; `476c5c20` — PH-S26…S34) · **PH-S25…S34:** ✅
 
 ---
 
 ```
-PoolAI — ops FM-003 §4 / FM-041 за запитом (PH-S15…S24 закрито).
+PoolAI — ops FM-003 §4 / FM-041 за запитом (PH-S25…S34 закрито).
 
 ## S0
-MSYS2 bash · HANDOFF · FM §5.1 · §5.9
+MSYS2 bash · HANDOFF · FM §5.1 · §5.10
 
 ## Стан
-- **PH-S03…S24:** ✅
-- **PH-S01 / FM-041:** Deferred
-- **PH-S02 / FM-003 LAN §4:** BLOCKED (2 хости)
+- **PH-S03…S34:** ✅
+- **PH-S01/S15, FM-041:** Deferred
+- **PH-S02/S16, FM-003 LAN §4:** BLOCKED (2 хости)
 
-## Наступний (за §5.1)
-- **FM-003** LAN §4 sign-off — лише з 2 фізичними хостами
-- **FM-041** Cloud SDK deep — лише за явним запитом
+## Останнє (PH-S25…S34)
+- E2E admin token + selectors (S25)
+- OpenAPI `/admin/secrets/*` (S26)
+- Admin security rotation tab (S27)
+- Prometheus alerts + `poolai_secret_rotations_total` (S28–S29)
+- `bin/update-visual-baselines.sh` (S31)
 
-## Останнє (PH-S24)
-- `src/security/secret_rotation.rs` — hooks + admin API
-- `src/security/jwt_secrets.rs` — dual-key grace
-- `docs/security/PEN_TEST_CHECKLIST.md`
+## Наступний (§5.1)
+- **FM-003** LAN §4 — 2 фізичні хости
+- **FM-041** Cloud SDK — за явним запитом
+- **E2E visual:** `bash bin/update-visual-baselines.sh` (зупинити poolai на :8080)
 
 ## Перевірки
 cargo fmt --all

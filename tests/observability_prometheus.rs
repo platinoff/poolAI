@@ -87,3 +87,23 @@ async fn http_middleware_records_request_counters() {
     let text = String::from_utf8(body.to_vec()).unwrap();
     assert!(text.contains("poolai_http_requests_total"));
 }
+
+#[tokio::test]
+async fn secret_rotation_counter_exported() {
+    poolai::observability::record_secret_rotation("jwt", true);
+    let app = test_app();
+    let scrape = app
+        .oneshot(
+            Request::builder()
+                .uri("/metrics")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    let body = axum::body::to_bytes(scrape.into_body(), usize::MAX)
+        .await
+        .unwrap();
+    let text = String::from_utf8(body.to_vec()).unwrap();
+    assert!(text.contains("poolai_secret_rotations_total"));
+}
