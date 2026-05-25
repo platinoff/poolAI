@@ -203,7 +203,10 @@ pub fn generate_token(_username: &str, _role: UserRole) -> Result<String, String
 
     #[cfg(feature = "jwt")]
     {
-        let secret = crate::security::jwt_secrets::jwt_store().read().current.clone();
+        let secret = crate::security::jwt_secrets::jwt_store()
+            .read()
+            .current
+            .clone();
         encode(
             &Header::default(),
             &claims,
