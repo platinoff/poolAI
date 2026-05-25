@@ -146,7 +146,9 @@ jobs:
             e2e:
               - 'e2e/**'
               - 'bin/e2e-playwright.sh'
+              - 'bin/update-visual-baselines.sh'
               - '.github/workflows/e2e.yml'
+              - '.github/workflows/update-visual-baselines.yml'
               - 'src/ui/**'
               - '.github/workflows/ci.yml'
 

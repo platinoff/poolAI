@@ -18,7 +18,7 @@ pub use tracing_init::{init_tracing, OtelGuard};
 #[cfg(feature = "prometheus")]
 pub use prometheus_export::{
     apply_prometheus_http_layer, encode_metrics_text, init_prometheus, metrics_handler,
-    record_http_request,
+    record_http_request, record_secret_rotation,
 };
 
 #[cfg(test)]

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# PH-S31: Refresh Playwright visual baselines (requires running poolai on POOLAI_HTTP_PORT).
+# PH-S31 / PH-S37: Refresh Playwright visual baselines (requires running poolai on POOLAI_HTTP_PORT).
+# Canonical PNGs: generate on Linux (CI workflow update-visual-baselines.yml or ubuntu host).
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -8,8 +9,18 @@ export TMPDIR="${TMPDIR:-/tmp}"
 export TEMP="${TEMP:-/tmp}"
 export PATH="${HOME}/.cargo/bin:/usr/bin:${PATH}"
 export K8S_OPENAPI_ENABLED_VERSION="${K8S_OPENAPI_ENABLED_VERSION:-1.28}"
-taskkill //F //IM poolai.exe 2>/dev/null || true
-taskkill //F //IM poolai-worker.exe 2>/dev/null || true
+
+stop_stray_poolai() {
+  if command -v taskkill >/dev/null 2>&1; then
+    taskkill //F //IM poolai.exe 2>/dev/null || true
+    taskkill //F //IM poolai-worker.exe 2>/dev/null || true
+  elif command -v pkill >/dev/null 2>&1; then
+    pkill -f '[/]target/release/poolai' 2>/dev/null || true
+    pkill -f 'poolai-worker' 2>/dev/null || true
+  fi
+}
+
+stop_stray_poolai
 sleep 2
 cargo build --release --bin poolai --features enterprise,ml,cloud,test-utils
 bash bin/e2e-playwright.sh --start --update-snapshots

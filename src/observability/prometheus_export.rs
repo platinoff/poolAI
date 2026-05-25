@@ -23,6 +23,7 @@ pub struct PoolAiPrometheus {
     registry: Registry,
     http_requests_total: IntCounterVec,
     http_request_duration_seconds: HistogramVec,
+    secret_rotations_total: IntCounterVec,
     workers_active: IntGauge,
     system_total_requests: IntGauge,
     uptime_seconds: IntGauge,
@@ -66,6 +67,18 @@ fn build_prometheus() -> PoolAiPrometheus {
     registry
         .register(Box::new(http_request_duration_seconds.clone()))
         .expect("register poolai_http_request_duration_seconds");
+
+    let secret_rotations_total = IntCounterVec::new(
+        Opts::new(
+            "poolai_secret_rotations_total",
+            "Secret rotation hook runs (PH-S24 / PH-S29)",
+        ),
+        &["kind", "success"],
+    )
+    .expect("poolai_secret_rotations_total");
+    registry
+        .register(Box::new(secret_rotations_total.clone()))
+        .expect("register poolai_secret_rotations_total");
 
     let workers_active = IntGauge::with_opts(Opts::new(
         "poolai_workers_active",
@@ -142,6 +155,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         registry,
         http_requests_total,
         http_request_duration_seconds,
+        secret_rotations_total,
         workers_active,
         system_total_requests,
         uptime_seconds,
@@ -151,6 +165,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         #[cfg(feature = "enterprise")]
         monitoring_dashboards,
     }
+}
+
+/// Record a secret rotation attempt (called from `security::secret_rotation`).
+pub fn record_secret_rotation(kind: &str, success: bool) {
+    let prom = init_prometheus();
+    let success_label = if success { "true" } else { "false" };
+    prom.secret_rotations_total
+        .with_label_values(&[kind, success_label])
+        .inc();
 }
 
 /// Record one completed HTTP request (called from middleware).

@@ -87,6 +87,8 @@ impl Registry {
             }
         }
         let all_ok = hook_results.iter().all(|r| r.ok);
+        #[cfg(feature = "prometheus")]
+        crate::observability::record_secret_rotation(kind.as_str(), all_ok);
         if all_ok {
             let now = unix_now();
             let mut meta = self.meta.write();

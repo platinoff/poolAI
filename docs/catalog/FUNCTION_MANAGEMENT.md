@@ -152,7 +152,7 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S24** Security ops | **§5.9** | **✅** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
-| 1 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — drift після PH-S25…S34 |
+| 1 | **PH-S37** Visual baselines (Linux CI) | **§5.10** | **Відкрито** — workflow `update-visual-baselines.yml`; commit Linux PNG artifact |
 | 2 | **PH-S44** E2E/CI visual + axe gate | **§5.10** | **Відкрито** — після S37 |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
@@ -209,7 +209,7 @@ FM-xxx (з таблиці нижче)
 |--------|--------|------------------|------|
 | **PH-S35** | LAN §4 sign-off (2-host + TQ01) | Architect L130, FM-003 | **BLOCKED** (2 хости) |
 | **PH-S36** | Cloud SDK deep (GCP SA JWT, Azure OAuth) | FM-041, `CLOUD_SDK_PROGRESS` | **Deferred** |
-| **PH-S37** | Playwright visual baselines refresh (**Linux CI**) | `VISUAL_REGRESSION_E2E.md`, post S25–S34 UI | **Відкрито** — пріоритет 1 |
+| **PH-S37** | Playwright visual baselines refresh (**Linux CI**) | `VISUAL_REGRESSION_E2E.md`, `.github/workflows/update-visual-baselines.yml` | **Відкрито** — run workflow → commit artifact PNGs |
 | **PH-S38** | Job scheduler hardening + on-chain submit epics | Architect L236 | **Відкрито** (MVP ✅ FM-020–034) |
 | **PH-S39** | VM Windows CPU/memory limits post-spawn | `vm/resources.rs`, AUTO_RUN §1.6 | **Відкрито** |
 | **PH-S40** | Hardware VM isolation | `vm/mod.rs`, Architect 2026-01-22 | **Відкрито** (великий scope) |

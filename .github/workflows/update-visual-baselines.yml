@@ -1,0 +1,65 @@
+# PH-S37: Regenerate Playwright visual snapshots on Linux (ubuntu-latest).
+# Do not commit Windows-generated PNGs — download artifact and commit from maintainer machine.
+# Manual: Actions → "Update visual baselines (PH-S37)" → Run workflow.
+name: Update visual baselines (PH-S37)
+
+on:
+  workflow_dispatch: {}
+
+env:
+  CARGO_TERM_COLOR: always
+  K8S_OPENAPI_ENABLED_VERSION: "1.28"
+  POOLAI_HTTP_PORT: "8080"
+  POOLAI_E2E_USER: admin
+  POOLAI_E2E_PASSWORD: admin123
+  CI: "true"
+
+jobs:
+  refresh-linux-snapshots:
+    name: Refresh visual.spec.ts snapshots (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-visual-baselines-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-visual-baselines-
+
+      - name: Install Playwright (e2e/)
+        working-directory: e2e
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Regenerate visual baselines
+        run: bash bin/update-visual-baselines.sh
+
+      - name: Upload snapshot artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-spec-snapshots-linux
+          path: e2e/tests/visual.spec.ts-snapshots/*.png
+          if-no-files-found: error
+
+      - name: Summary (commit instructions)
+        run: |
+          echo "Download artifact **visual-spec-snapshots-linux** and copy PNGs to:"
+          echo "  e2e/tests/visual.spec.ts-snapshots/"
+          echo "Then: git add e2e/tests/visual.spec.ts-snapshots/*.png"
+          echo "Commit subject: test(e2e): refresh Linux visual baselines (PH-S37)"

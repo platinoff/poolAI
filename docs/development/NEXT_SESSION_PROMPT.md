@@ -1,45 +1,45 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `b34bb90d` · **PH-S03…S34:** ✅ · **Черга:** **PH-S37** (§5.10)
+**Оновлено:** 2026-05-25 · **HEAD** `68340ece` · **PH-S03…S34:** ✅ · **PH-S37:** workflow готовий, PNG — після Linux CI
 
 ---
 
 ```
-PoolAI — PH-S37 visual baselines (Linux CI); §5.10 PH-S35…S44.
+PoolAI — закрити PH-S37 (Linux PNG) → PH-S44; §5.10 PH-S35…S44.
 
 ## S0
 MSYS2 bash · HANDOFF · FM §5.1 · §5.10
 
 ## Стан
 - **PH-S03…S34:** ✅
+- **PH-S37:** workflow `update-visual-baselines.yml` + docs; **PNG ще не в main**
 - **PH-S35/S16, FM-003 LAN §4:** BLOCKED (2 хости)
 - **PH-S36/S15, FM-041:** Deferred
-- **E2E login (Windows):** ✅ helpers Promise.all + localStorage
 
-## Останнє (push цієї сесії)
-- `e2e/tests/helpers.ts` — стабільний loginAsAdmin (Windows)
-- `bin/e2e-playwright.sh`, `bin/update-visual-baselines.sh` — STAND_ROOT=/tmp
-- FM **§5.10** — 10 спринтів PH-S35…S44 з legacy audit
-- HANDOFF + FUNCTION_MANAGEMENT синхрон
+## PH-S37 — закрити
+1. Push (якщо ще не на origin): `.github/workflows/update-visual-baselines.yml`, `bin/update-visual-baselines.sh`, `VISUAL_REGRESSION_E2E.md`, prometheus `record_secret_rotation`
+2. GitHub → **Actions** → **Update visual baselines (PH-S37)** → Run workflow
+3. Artifact `visual-spec-snapshots-linux` → `e2e/tests/visual.spec.ts-snapshots/`
+4. Commit: `test(e2e): refresh Linux visual baselines (PH-S37)` — **лише** Linux PNG
+5. FM §5.10 PH-S37 → ✅; HANDOFF → **PH-S44**
 
 ## Не повторювати
-PH-S03…S34; E2E login fix; §5.10 audit (доки)
+PH-S03…S34; workflow/docs PH-S37 (без PNG); `record_secret_rotation` wiring
 
 ## Наступний (§5.1 / §5.10)
-1. **PH-S37** — `bash bin/update-visual-baselines.sh` на **Linux** (CI snapshots); не комітити Windows PNG
-2. **PH-S44** — visual + axe gate у `ci.yml` / e2e policy (після S37)
-3. **PH-S39** — VM Windows resource limits (`vm/resources.rs`)
-4. **PH-S42** — admin tables UX (sort/filter/export)
-5. **PH-S43** — ML/monitoring metrics UI
-6. **PH-S38** — job scheduler / on-chain epics (за запитом)
-7. **PH-S41** — macvlan (Linux)
-8. **PH-S40** — hardware VM isolation (великий scope)
-9. **PH-S35** — LAN §4 (2 хости)
-10. **PH-S36** — FM-041 (явний запит)
+1. **PH-S44** — visual + axe gate у `ci.yml` / e2e policy
+2. **PH-S39** — VM Windows resource limits
+3. **PH-S42** — admin tables UX
+4. **PH-S43** — ML/monitoring metrics UI
+5. **PH-S38** — job scheduler / on-chain (за запитом)
+6. **PH-S41** — macvlan (Linux)
+7. **PH-S40** — hardware VM isolation
+8. **PH-S35** — LAN §4 (2 хости)
+9. **PH-S36** — FM-041 (явний запит)
 
 ## Перевірки
 cargo fmt --all
 cargo test-ci
 bash bin/e2e-playwright.sh --start
-# visual only: cd e2e && npm run test:visual
+# Windows: visual drift очікуваний до Linux PNG commit
 ```

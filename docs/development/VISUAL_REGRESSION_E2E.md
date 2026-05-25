@@ -51,6 +51,20 @@ cd e2e && npm run test:visual:update
 
 **CI:** baselines are generated on **Linux** (GitHub `ubuntu-latest`). Refresh on Windows only for local debugging; commit Linux snapshots for `main`.
 
+### PH-S37 — refresh on Linux CI
+
+1. Push workflow [`.github/workflows/update-visual-baselines.yml`](../../.github/workflows/update-visual-baselines.yml) (if not on `main` yet).
+2. GitHub → **Actions** → **Update visual baselines (PH-S37)** → **Run workflow**.
+3. Download artifact `visual-spec-snapshots-linux` → copy into `e2e/tests/visual.spec.ts-snapshots/`.
+4. Commit only those PNGs (do not commit Windows-local `--update-snapshots` output).
+
+```bash
+# On a Linux host (same as CI):
+export PATH="$HOME/.cargo/bin:/usr/bin:$PATH"
+cd /path/to/poolAI
+bash bin/update-visual-baselines.sh
+```
+
 ## Local
 
 Same prerequisites as [E2E_PLAYWRIGHT.md](./E2E_PLAYWRIGHT.md):
