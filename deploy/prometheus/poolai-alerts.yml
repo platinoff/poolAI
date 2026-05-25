@@ -1,0 +1,34 @@
+# PoolAI example Prometheus alert rules (PH-S28)
+# Mount into Prometheus: rule_files: [/etc/prometheus/poolai-alerts.yml]
+
+groups:
+  - name: poolai_security
+    rules:
+      - alert: PoolAIHighErrorRate
+        expr: |
+          sum(rate(poolai_http_requests_total{status=~"5.."}[5m]))
+            / sum(rate(poolai_http_requests_total[5m])) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: PoolAI HTTP 5xx rate above 5%
+          description: Check coordinator logs and upstream dependencies.
+
+      - alert: PoolAISecretRotationFailed
+        expr: increase(poolai_secret_rotations_total{success="false"}[1h]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: Secret rotation hook failure
+          description: Review admin rotation API or env reload logs for kind={{ $labels.kind }}.
+
+      - alert: PoolAIWorkersDegraded
+        expr: poolai_workers_active == 0
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: No active workers reported
+          description: Verify worker pool registration and discovery.

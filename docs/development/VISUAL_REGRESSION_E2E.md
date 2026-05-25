@@ -44,6 +44,7 @@ Regenerate after intentional UI/CSS changes:
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
 cd /s/rust/poolAI
 bash bin/e2e-playwright.sh --start --update-snapshots
+# or (PH-S31): bash bin/update-visual-baselines.sh
 # or visual only:
 cd e2e && npm run test:visual:update
 ```
