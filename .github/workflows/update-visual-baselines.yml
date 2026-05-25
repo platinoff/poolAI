@@ -1,10 +1,15 @@
 # PH-S37: Regenerate Playwright visual snapshots on Linux (ubuntu-latest).
-# Do not commit Windows-generated PNGs — download artifact and commit from maintainer machine.
 # Manual: Actions → "Update visual baselines (PH-S37)" → Run workflow.
+# Default create_pr=true opens a PR with Linux PNGs (do not commit Windows snapshots).
 name: Update visual baselines (PH-S37)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      create_pr:
+        description: Open PR with refreshed Linux snapshots
+        type: boolean
+        default: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -57,9 +62,62 @@ jobs:
           path: e2e/tests/visual.spec.ts-snapshots/*.png
           if-no-files-found: error
 
-      - name: Summary (commit instructions)
+      - name: Summary (manual download)
+        if: ${{ !inputs.create_pr }}
         run: |
-          echo "Download artifact **visual-spec-snapshots-linux** and copy PNGs to:"
-          echo "  e2e/tests/visual.spec.ts-snapshots/"
-          echo "Then: git add e2e/tests/visual.spec.ts-snapshots/*.png"
-          echo "Commit subject: test(e2e): refresh Linux visual baselines (PH-S37)"
+          echo "Download artifact visual-spec-snapshots-linux → e2e/tests/visual.spec.ts-snapshots/"
+          echo "Commit: test(e2e): refresh Linux visual baselines (PH-S37)"
+
+  open-pr-with-snapshots:
+    name: Open PR with Linux snapshots
+    needs: refresh-linux-snapshots
+    if: ${{ inputs.create_pr }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: visual-spec-snapshots-linux
+          path: artifact-snapshots
+
+      - name: Copy snapshots into tree
+        run: |
+          cp -f artifact-snapshots/*.png e2e/tests/visual.spec.ts-snapshots/
+          git add e2e/tests/visual.spec.ts-snapshots/*.png
+          git diff --cached --stat
+
+      - name: Create branch and PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if git diff --cached --quiet; then
+            echo "No snapshot diff — baselines already match Linux render."
+            exit 0
+          fi
+          BRANCH="ci/visual-baselines-ph-s37-$(date -u +%Y%m%d%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git commit -m "test(e2e): refresh Linux visual baselines (PH-S37)" \
+            -m "Summary:" \
+            -m "- Playwright visual.spec.ts snapshots from ubuntu-latest workflow" \
+            -m "- Regenerate after UI drift (PH-S25…S34)"
+          git push origin "$BRANCH"
+          gh pr create --title "test(e2e): Linux visual baselines (PH-S37)" \
+            --body "$(cat <<'EOF'
+## Summary
+- Refreshes `e2e/tests/visual.spec.ts-snapshots/*.png` from **ubuntu-latest** (PH-S37 workflow).
+- Do not merge Windows-local snapshot updates.
+
+## Test plan
+- [ ] CI Playwright admin job green on this PR
+- [ ] Visual diff review (masked charts/topology unchanged in intent)
+
+EOF
+)" --base main --head "$BRANCH"

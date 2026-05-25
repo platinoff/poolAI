@@ -311,6 +311,11 @@ path = "tests/observability_prometheus.rs"
 required-features = ["prometheus", "enterprise"]
 
 [[test]]
+name = "vm_api_contracts"
+path = "tests/vm_api_contracts.rs"
+required-features = ["test-utils"]
+
+[[test]]
 name = "tls_https_integration"
 path = "tests/tls_https_integration.rs"
 required-features = ["https"]

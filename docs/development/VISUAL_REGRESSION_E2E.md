@@ -54,9 +54,9 @@ cd e2e && npm run test:visual:update
 ### PH-S37 — refresh on Linux CI
 
 1. Push workflow [`.github/workflows/update-visual-baselines.yml`](../../.github/workflows/update-visual-baselines.yml) (if not on `main` yet).
-2. GitHub → **Actions** → **Update visual baselines (PH-S37)** → **Run workflow**.
-3. Download artifact `visual-spec-snapshots-linux` → copy into `e2e/tests/visual.spec.ts-snapshots/`.
-4. Commit only those PNGs (do not commit Windows-local `--update-snapshots` output).
+2. GitHub → **Actions** → **Update visual baselines (PH-S37)** → **Run workflow** (default `create_pr=true` opens a PR with Linux PNGs).
+3. **Or** download artifact `visual-spec-snapshots-linux` → copy into `e2e/tests/visual.spec.ts-snapshots/` and commit locally.
+4. Commit only Linux PNGs (do not commit Windows-local `--update-snapshots` output).
 
 ```bash
 # On a Linux host (same as CI):

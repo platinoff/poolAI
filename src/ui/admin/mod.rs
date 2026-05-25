@@ -293,6 +293,7 @@ mod a11y_tests {
         assert!(html.contains("role=\"tablist\""));
         assert!(html.contains("role=\"tabpanel\""));
         assert!(html.contains("id=\"security-tab-oauth2\""));
+        assert!(html.contains("id=\"security-tab-rotation\""));
         assert!(html.contains("aria-controls=\"security-content\""));
     }
 

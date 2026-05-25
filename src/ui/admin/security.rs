@@ -38,6 +38,9 @@ pub async fn admin_security() -> Html<String> {
         case 'policies':
           await loadSecurityPolicies();
           break;
+        case 'rotation':
+          await loadSecretRotation();
+          break;
       }
     }
     
@@ -678,6 +681,111 @@ pub async fn admin_security() -> Html<String> {
         showNotification(Ep() + e.message, 'error');
       }
     }
+
+    function formatRotationKind(kind) {
+      const labels = {
+        jwt: T('admin.sec.rot.kind.jwt', 'JWT signing secret'),
+        tls_certificate: T('admin.sec.rot.kind.tls', 'TLS certificate'),
+        telegram_webhook: T('admin.sec.rot.kind.telegram', 'Telegram webhook secret'),
+      };
+      return labels[kind] || kind;
+    }
+
+    function formatUnixTime(ts) {
+      if (!ts) return T('admin.sec.rot.never', 'Never');
+      try {
+        return new Date(ts * 1000).toLocaleString();
+      } catch (_) {
+        return String(ts);
+      }
+    }
+
+    async function loadSecretRotation() {
+      const el = document.getElementById('security-content');
+      if (!el) return;
+      try {
+        adminShowLoading('security-content', T('admin.sec.rot.loading', 'Loading secret rotation status…'));
+        const rows = await fetchJson('/api/v1/admin/secrets/rotation');
+        renderSecretRotation(Array.isArray(rows) ? rows : []);
+      } catch (e) {
+        adminShowInlineError('security-content', e);
+      }
+    }
+
+    function renderSecretRotation(rows) {
+      const el = document.getElementById('security-content');
+      if (!el) return;
+      el.innerHTML = `
+        <div class="admin-header">
+          <h3>${escapeHtml(T('admin.sec.rot.heading', 'Secret rotation'))}</h3>
+          <button type="button" class="btn" onclick="loadSecretRotation()">${escapeHtml(T('admin.topo.refresh', 'Refresh'))}</button>
+        </div>
+        <table class="admin-table" id="secret-rotation-table">
+          <thead>
+            <tr>
+              <th>${escapeHtml(T('admin.sec.rot.col.kind', 'Secret'))}</th>
+              <th>${escapeHtml(T('admin.mon.col.statusCol', 'Status'))}</th>
+              <th>${escapeHtml(T('admin.sec.rot.col.hooks', 'Hooks'))}</th>
+              <th>${escapeHtml(T('admin.sec.rot.col.last', 'Last rotated'))}</th>
+              <th>${escapeHtml(T('admin.sec.rot.col.count', 'Count'))}</th>
+              <th>${escapeHtml(T('admin.sec.rot.col.grace', 'JWT grace'))}</th>
+              <th>${escapeHtml(T('admin.mon.col.actions', 'Actions'))}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((r) => {
+              const kind = r.kind || '';
+              const kindJson = JSON.stringify(kind);
+              const configured = !!r.configured;
+              const statusBadge = configured
+                ? '<span class="status-badge active">' + escapeHtml(T('admin.sec.rot.configured', 'Configured')) + '</span>'
+                : '<span class="status-badge inactive">' + escapeHtml(T('admin.sec.rot.notConfigured', 'Not configured')) + '</span>';
+              let actionBtn = '';
+              if (kind === 'jwt') {
+                actionBtn = `<button type="button" class="btn btn-primary" onclick='rotateSecret(${kindJson})'>${escapeHtml(T('admin.sec.rot.reloadJwt', 'Reload JWT from env'))}</button>`;
+              } else if (configured && (r.hook_count || 0) > 0) {
+                actionBtn = `<button type="button" class="btn" onclick='rotateSecret(${kindJson})'>${escapeHtml(T('admin.sec.rot.run', 'Run rotation'))}</button>`;
+              } else {
+                actionBtn = '<span class="muted">' + escapeHtml(T('admin.na', 'N/A')) + '</span>';
+              }
+              return `
+              <tr>
+                <td><strong>${escapeHtml(formatRotationKind(kind))}</strong><br><code>${escapeHtml(kind)}</code></td>
+                <td>${statusBadge}</td>
+                <td>${escapeHtml(String(r.hook_count ?? 0))}</td>
+                <td>${escapeHtml(formatUnixTime(r.last_rotated_unix))}</td>
+                <td>${escapeHtml(String(r.rotation_count ?? 0))}</td>
+                <td>${r.grace_active ? escapeHtml(T('admin.mon.enabled', 'Enabled')) : escapeHtml(T('admin.mon.disabled', 'Disabled'))}</td>
+                <td>${actionBtn}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <p class="muted">${escapeHtml(T('admin.sec.rot.hint', 'Rotation runs registered hooks only; env vars must be set on the coordinator host.'))}</p>
+      `;
+    }
+
+    async function rotateSecret(kind) {
+      const user = getUser();
+      if (!user || user.role !== 'Admin') {
+        showNotification(T('err.insufficientPermissions', 'Insufficient permissions.'), 'error');
+        return;
+      }
+      try {
+        const report = await fetchJson('/api/v1/admin/secrets/rotate', {
+          method: 'POST',
+          body: JSON.stringify({ kind }),
+        });
+        if (report && report.success) {
+          showNotification(T('admin.sec.rot.ok', 'Secret rotation completed'), 'success');
+        } else {
+          showNotification(T('admin.sec.rot.partial', 'Rotation finished with hook errors'), 'warning');
+        }
+        loadSecretRotation();
+      } catch (e) {
+        showNotification(Ep() + e.message, 'error');
+      }
+    }
     
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => showTab(tab.dataset.tab));
@@ -695,6 +803,7 @@ pub async fn admin_security() -> Html<String> {
             <button type="button" class="tab active" id="security-tab-oauth2" role="tab" aria-selected="true" aria-controls="security-content" data-tab="oauth2" data-i18n="admin.sec.tab.oauth">OAuth2 Providers</button>
             <button type="button" class="tab" id="security-tab-saml" role="tab" aria-selected="false" aria-controls="security-content" tabindex="-1" data-tab="saml" data-i18n="admin.sec.tab.saml">SAML Providers</button>
             <button type="button" class="tab" id="security-tab-policies" role="tab" aria-selected="false" aria-controls="security-content" tabindex="-1" data-tab="policies" data-i18n="admin.sec.tab.policies">Security Policies</button>
+            <button type="button" class="tab" id="security-tab-rotation" role="tab" aria-selected="false" aria-controls="security-content" tabindex="-1" data-tab="rotation" data-i18n="admin.sec.tab.rotation">Secret rotation</button>
           </div>
           <div id="security-content" role="tabpanel" aria-labelledby="security-tab-oauth2" tabindex="0"></div>
         </div>
