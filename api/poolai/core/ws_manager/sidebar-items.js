@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["LiveMetrics","SystemEvent","WebSocketConnection","WebSocketManager","WebSocketMessage"]};
+window.SIDEBAR_ITEMS = {"struct":["LiveMetrics","SystemEvent","TopologyLiveUpdate","WebSocketConnection","WebSocketManager","WebSocketMessage"]};

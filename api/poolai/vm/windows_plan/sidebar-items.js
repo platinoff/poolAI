@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["WindowsIsolationMode"],"fn":["plan_filesystem_isolation","plan_firewall_rules","plan_network_isolation","profile_name_for_process"],"struct":["AppContainerState","FirewallRulePlan"]};
