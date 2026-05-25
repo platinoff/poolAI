@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `68340ece` · **PH-S03…S34:** ✅ · **PH-S37:** workflow готовий, PNG — після Linux CI
+**Оновлено:** 2026-05-25 · **HEAD** `ba346b4f` · **PH-S03…S34:** ✅ · **PH-S37:** workflow на main; PNG — Actions artifact
 
 ---
 
