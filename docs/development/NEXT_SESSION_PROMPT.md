@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** `ba346b4f` · **PH-S03…S34:** ✅ · **PH-S37:** workflow на main; PNG — Actions artifact
+**Оновлено:** 2026-05-25 · **HEAD** `24108c15` · **PH-S37:** workflow + rotation tab; **закрити** — Run workflow → merge PR PNG
 
 ---
 
@@ -17,11 +17,9 @@ MSYS2 bash · HANDOFF · FM §5.1 · §5.10
 - **PH-S36/S15, FM-041:** Deferred
 
 ## PH-S37 — закрити
-1. Push (якщо ще не на origin): `.github/workflows/update-visual-baselines.yml`, `bin/update-visual-baselines.sh`, `VISUAL_REGRESSION_E2E.md`, prometheus `record_secret_rotation`
-2. GitHub → **Actions** → **Update visual baselines (PH-S37)** → Run workflow
-3. Artifact `visual-spec-snapshots-linux` → `e2e/tests/visual.spec.ts-snapshots/`
-4. Commit: `test(e2e): refresh Linux visual baselines (PH-S37)` — **лише** Linux PNG
-5. FM §5.10 PH-S37 → ✅; HANDOFF → **PH-S44**
+1. GitHub → **Actions** → **Update visual baselines (PH-S37)** → **Run workflow** (`create_pr=true` за замовч.)
+2. Merge PR `test(e2e): Linux visual baselines (PH-S37)` (або artifact вручну)
+3. FM §5.10 PH-S37 → ✅; HANDOFF → **PH-S44**
 
 ## Не повторювати
 PH-S03…S34; workflow/docs PH-S37 (без PNG); `record_secret_rotation` wiring
