@@ -92,6 +92,122 @@ pub async fn admin_topology() -> axum::response::Html<String> {
 
     let topologyNodesCache = {{}};
     let topologyLatencyCache = {{}};
+    let topologyWs = null;
+    let topologyWsRetryMs = 1000;
+    let topologyWsMaxRetryMs = 30000;
+
+    function renderNodesTableFromCache() {{
+      const tbody = document.getElementById('topology-nodes-tbody');
+      tbody.innerHTML = '';
+      if (Object.keys(topologyNodesCache).length === 0) {{
+        tbody.innerHTML = '<tr><td colspan="5">' + escapeHtml(T('admin.topo.noNodes', 'No nodes found')) + '</td></tr>';
+        return;
+      }}
+      for (const [nodeId, node] of Object.entries(topologyNodesCache)) {{
+        const row = document.createElement('tr');
+        const ag = node.available_gpu_memory_mb ?? 0;
+        const tg = node.total_gpu_memory_mb ?? 0;
+        const ac = node.available_cpu_cores ?? 0;
+        const tc = node.total_cpu_cores ?? 0;
+        row.innerHTML = `
+          <td>${{escapeHtml(nodeId)}}</td>
+          <td>${{ag}} / ${{tg}} MB</td>
+          <td>${{ac}} / ${{tc}}</td>
+          <td>${{formatLoadFraction(node.current_load)}}</td>
+          <td>
+            <button type="button" class="btn btn-sm" onclick='viewNodeResources(${{JSON.stringify(nodeId)}})'>${{escapeHtml(T('admin.topo.viewDetails', 'View Details'))}}</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      }}
+    }}
+
+    function renderLatencyTableFromCache() {{
+      const tbody = document.getElementById('topology-latency-tbody');
+      tbody.innerHTML = '';
+      if (Object.keys(topologyLatencyCache).length === 0) {{
+        tbody.innerHTML = '<tr><td colspan="3">' + escapeHtml(T('admin.topo.noLatency', 'No latency measurements available')) + '</td></tr>';
+        return;
+      }}
+      for (const [key, latency] of Object.entries(topologyLatencyCache)) {{
+        const [fromNode, toNode] = key.split(':');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${{escapeHtml(fromNode)}}</td>
+          <td>${{escapeHtml(toNode)}}</td>
+          <td>${{formatLatencyMs(latency)}}</td>
+        `;
+        tbody.appendChild(row);
+      }}
+    }}
+
+    function applyTopologyLiveUpdate(data) {{
+      if (!data) return;
+      document.getElementById('topology-node-count').textContent = data.node_count || 0;
+      document.getElementById('topology-latency-measurements').textContent = data.latency_measurements || 0;
+      document.getElementById('topology-last-updated').textContent = formatTopologyTimestamp(data.last_updated);
+      topologyNodesCache = data.nodes || {{}};
+      topologyLatencyCache = data.latency_matrix || {{}};
+      renderNodesTableFromCache();
+      renderLatencyTableFromCache();
+      renderTopologyVisualizations();
+    }}
+
+    function topologyWsUrl() {{
+      const token = localStorage.getItem('poolai_token');
+      if (!token) return null;
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return proto + '//' + location.host + '/api/v1/ws/metrics?token=' + encodeURIComponent(token);
+    }}
+
+    function connectTopologyWebSocket() {{
+      const url = topologyWsUrl();
+      if (!url) return;
+      if (topologyWs && (topologyWs.readyState === WebSocket.OPEN || topologyWs.readyState === WebSocket.CONNECTING)) {{
+        return;
+      }}
+      try {{
+        topologyWs = new WebSocket(url);
+      }} catch (err) {{
+        console.warn('Topology WebSocket connect failed:', err);
+        scheduleTopologyWsReconnect();
+        return;
+      }}
+      topologyWs.onopen = function () {{
+        topologyWsRetryMs = 1000;
+        topologyWs.send(JSON.stringify({{
+          message_type: 'subscribe_topology',
+          data: {{}},
+          timestamp: Math.floor(Date.now() / 1000),
+        }}));
+      }};
+      topologyWs.onmessage = function (event) {{
+        try {{
+          const msg = JSON.parse(event.data);
+          if (msg && msg.message_type === 'topology_update') {{
+            applyTopologyLiveUpdate(msg.data);
+          }}
+        }} catch (err) {{
+          console.warn('Topology WebSocket message parse error:', err);
+        }}
+      }};
+      topologyWs.onclose = function () {{
+        topologyWs = null;
+        scheduleTopologyWsReconnect();
+      }};
+      topologyWs.onerror = function () {{
+        if (topologyWs) {{
+          topologyWs.close();
+        }}
+      }};
+    }}
+
+    function scheduleTopologyWsReconnect() {{
+      setTimeout(function () {{
+        connectTopologyWebSocket();
+      }}, topologyWsRetryMs);
+      topologyWsRetryMs = Math.min(topologyWsMaxRetryMs, topologyWsRetryMs * 2);
+    }}
 
     async function loadTopology() {{
       try {{
@@ -118,32 +234,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         if (!response.ok) throw new Error('Failed to load nodes');
         const data = await response.json();
         topologyNodesCache = data.nodes || {{}};
-        
-        const tbody = document.getElementById('topology-nodes-tbody');
-        tbody.innerHTML = '';
-        
-        if (Object.keys(topologyNodesCache).length === 0) {{
-          tbody.innerHTML = '<tr><td colspan="5">' + escapeHtml(T('admin.topo.noNodes', 'No nodes found')) + '</td></tr>';
-          return;
-        }}
-        
-        for (const [nodeId, node] of Object.entries(topologyNodesCache)) {{
-          const row = document.createElement('tr');
-          const ag = node.available_gpu_memory_mb ?? 0;
-          const tg = node.total_gpu_memory_mb ?? 0;
-          const ac = node.available_cpu_cores ?? 0;
-          const tc = node.total_cpu_cores ?? 0;
-          row.innerHTML = `
-            <td>${{escapeHtml(nodeId)}}</td>
-            <td>${{ag}} / ${{tg}} MB</td>
-            <td>${{ac}} / ${{tc}}</td>
-            <td>${{formatLoadFraction(node.current_load)}}</td>
-            <td>
-              <button type="button" class="btn btn-sm" onclick='viewNodeResources(${{JSON.stringify(nodeId)}})'>${{escapeHtml(T('admin.topo.viewDetails', 'View Details'))}}</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        }}
+        renderNodesTableFromCache();
       }} catch (error) {{
         console.error('Error loading nodes:', error);
         document.getElementById('topology-nodes-tbody').innerHTML = '<tr><td colspan="5">' + escapeHtml(T('admin.topo.errNodesRow', 'Error loading nodes')) + '</td></tr>';
@@ -156,25 +247,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
         if (!response.ok) throw new Error('Failed to load latency matrix');
         const data = await response.json();
         topologyLatencyCache = data.latency_matrix || {{}};
-        
-        const tbody = document.getElementById('topology-latency-tbody');
-        tbody.innerHTML = '';
-        
-        if (Object.keys(topologyLatencyCache).length === 0) {{
-          tbody.innerHTML = '<tr><td colspan="3">' + escapeHtml(T('admin.topo.noLatency', 'No latency measurements available')) + '</td></tr>';
-          return;
-        }}
-        
-        for (const [key, latency] of Object.entries(topologyLatencyCache)) {{
-          const [fromNode, toNode] = key.split(':');
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${{escapeHtml(fromNode)}}</td>
-            <td>${{escapeHtml(toNode)}}</td>
-            <td>${{formatLatencyMs(latency)}}</td>
-          `;
-          tbody.appendChild(row);
-        }}
+        renderLatencyTableFromCache();
       }} catch (error) {{
         console.error('Error loading latency matrix:', error);
         document.getElementById('topology-latency-tbody').innerHTML = '<tr><td colspan="3">' + escapeHtml(T('admin.topo.errLatencyRow', 'Error loading latency matrix')) + '</td></tr>';
@@ -256,6 +329,7 @@ pub async fn admin_topology() -> axum::response::Html<String> {
 
     {graph_js}
     loadTopology();
+    connectTopologyWebSocket();
     "#,
         graph_js = graph_js
     );
@@ -274,5 +348,7 @@ mod fm037_tests {
         assert!(html.contains("id=\"topology-latency-heatmap\""));
         assert!(html.contains("PoolAiTopologyGraph"));
         assert!(html.contains("renderTopologyVisualizations"));
+        assert!(html.contains("connectTopologyWebSocket"));
+        assert!(html.contains("subscribe_topology"));
     }
 }

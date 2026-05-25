@@ -6,6 +6,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 
+use crate::pool::topology::{NodeResources, Topology};
+
 /// WebSocket message structure
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WebSocketMessage {
@@ -34,6 +36,31 @@ pub struct SystemEvent {
     pub timestamp: u64,
 }
 
+/// Live topology snapshot pushed to WebSocket subscribers (PH-S22).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopologyLiveUpdate {
+    pub node_count: usize,
+    pub latency_measurements: usize,
+    pub last_updated: String,
+    pub node_ids: Vec<String>,
+    pub nodes: HashMap<String, NodeResources>,
+    pub latency_matrix: HashMap<String, f64>,
+}
+
+impl TopologyLiveUpdate {
+    pub fn from_topology(topology: &Topology) -> Self {
+        let node_ids: Vec<String> = topology.node_resources.keys().cloned().collect();
+        Self {
+            node_count: topology.node_resources.len(),
+            latency_measurements: topology.latency_matrix.len(),
+            last_updated: topology.last_updated.to_rfc3339(),
+            node_ids,
+            nodes: topology.node_resources.clone(),
+            latency_matrix: topology.latency_matrix.clone(),
+        }
+    }
+}
+
 /// WebSocket connection information
 #[derive(Debug, Clone)]
 pub struct WebSocketConnection {
@@ -49,6 +76,7 @@ pub struct WebSocketManager {
     pub(crate) senders: Arc<RwLock<HashMap<String, mpsc::UnboundedSender<Message>>>>,
     metrics_subscriptions: Arc<RwLock<HashMap<String, bool>>>,
     events_subscriptions: Arc<RwLock<HashMap<String, bool>>>,
+    topology_subscriptions: Arc<RwLock<HashMap<String, bool>>>,
 }
 
 impl Default for WebSocketManager {
@@ -64,6 +92,7 @@ impl WebSocketManager {
             senders: Arc::new(RwLock::new(HashMap::new())),
             metrics_subscriptions: Arc::new(RwLock::new(HashMap::new())),
             events_subscriptions: Arc::new(RwLock::new(HashMap::new())),
+            topology_subscriptions: Arc::new(RwLock::new(HashMap::new())),
         };
 
         let metrics_subs = manager.metrics_subscriptions.clone();
@@ -138,6 +167,13 @@ impl WebSocketManager {
         metrics_subs.remove(connection_id);
         let mut events_subs = self.events_subscriptions.write().await;
         events_subs.remove(connection_id);
+        let mut topology_subs = self.topology_subscriptions.write().await;
+        topology_subs.remove(connection_id);
+    }
+
+    pub async fn subscribe_topology(&self, connection_id: &str) {
+        let mut subs = self.topology_subscriptions.write().await;
+        subs.insert(connection_id.to_string(), true);
     }
 
     pub async fn subscribe_metrics(&self, connection_id: &str) {
@@ -243,6 +279,42 @@ impl WebSocketManager {
                 .as_secs(),
         };
         self.broadcast(ws_message).await;
+    }
+
+    pub async fn broadcast_topology_update(&self, update: TopologyLiveUpdate) {
+        let subs = self.topology_subscriptions.read().await;
+        if subs.is_empty() {
+            return;
+        }
+
+        let ws_message = WebSocketMessage {
+            message_type: "topology_update".to_string(),
+            data: serde_json::to_value(&update).unwrap_or_default(),
+            timestamp: std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        };
+        let message_json = match serde_json::to_string(&ws_message) {
+            Ok(json) => json,
+            Err(e) => {
+                tracing::warn!("Failed to serialize topology WebSocket message: {}", e);
+                return;
+            }
+        };
+
+        let senders = self.senders.read().await;
+        for (connection_id, _) in subs.iter() {
+            if let Some(sender) = senders.get(connection_id) {
+                if let Err(e) = sender.send(Message::Text(message_json.clone().into())) {
+                    tracing::warn!(
+                        "Failed to send topology update to connection {}: {}",
+                        connection_id,
+                        e
+                    );
+                }
+            }
+        }
     }
 }
 

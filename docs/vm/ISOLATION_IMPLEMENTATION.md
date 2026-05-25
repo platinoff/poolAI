@@ -262,7 +262,18 @@ cargo build --features vm-isolation-linux
 ## References
 
 - Linux namespaces: https://man7.org/linux/man-pages/man7/namespaces.7.html
-- Windows AppContainers: https://docs.microsoft.com/en-us/windows/win32/secauthz/appcontainer-isolation
+## Windows (PH-S20)
+
+- **Plan engine:** `src/vm/isolation/windows_plan.rs` — AppContainer profile name, firewall rule plans, SID placeholders.
+- **Apply:** `src/vm/isolation/windows.rs` stores plan per process; **`vm-isolation-windows`** enables `windows_native.rs` hooks on Windows.
+- **Verify:** `cargo test --test vm_isolation_integration test_windows_plan` · on Windows also `test_windows_network_isolator_tracks_plan`.
+
+```bash
+cargo test --test vm_isolation_integration test_windows_plan
+cargo build --features vm-isolation-windows   # Windows host only
+```
+
+**Last updated:** 2026-05-24 (PH-S20 plan + state tracking).
 - nix crate: https://docs.rs/nix/
 - winapi crate: https://docs.rs/winapi/
 

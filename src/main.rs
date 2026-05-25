@@ -147,12 +147,27 @@ async fn async_main() -> Result<(), Box<dyn std::error::Error>> {
     // Start topology update task (simplified - just trigger periodic updates)
     if let Some(topology_manager) = pool::topology::get_global_topology_manager() {
         let topology_manager_clone = topology_manager.clone();
+        let ws_manager = app_state.ws_manager.clone();
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(std::time::Duration::from_secs(30));
             loop {
                 interval.tick().await;
-                if let Ok(()) = topology_manager_clone.read().await.update_topology().await {
+                if topology_manager_clone
+                    .read()
+                    .await
+                    .update_topology()
+                    .await
+                    .is_ok()
+                {
                     info!("Topology updated successfully");
+                    let snapshot = topology_manager_clone
+                        .read()
+                        .await
+                        .get_topology_snapshot()
+                        .await;
+                    let update =
+                        poolai::core::ws_manager::TopologyLiveUpdate::from_topology(&snapshot);
+                    ws_manager.broadcast_topology_update(update).await;
                 }
             }
         });

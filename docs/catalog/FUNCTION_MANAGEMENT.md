@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-24 (post-PH a11y ✅; PH-S15…S24 legacy черга; FM-041 Deferred).
+**Оновлено:** 2026-05-24 (PH-S19 ✅; PH-S20 ✅; PH-S15…S24 legacy черга; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -149,6 +149,7 @@ FM-xxx (з таблиці нижче)
 
 | Порядок | Фокус | FM | Дія |
 |--------|--------|-----|-----|
+| **1** | **PH-S24** Security ops | **§5.9** | **Planned** |
 | — | **Ops** LAN §4 sign-off | **FM-003** | **BLOCKED** (2 фізичні хости); prep ✅ FM-027 |
 | — | Cloud SDK deep | **FM-041** | **Deferred** — без явного запиту |
 
@@ -187,13 +188,13 @@ FM-xxx (з таблиці нижче)
 |--------|--------|-------------------------|------|
 | **PH-S15** | Cloud SDK deep (GCP SA JWT, Azure OAuth refresh) | PH-S01, FM-041, `CLOUD_SDK_PROGRESS` | **Deferred** |
 | **PH-S16** | LAN §4 sign-off (2-host replication + TQ01) | PH-S02, FM-003, Architect L130 | **BLOCKED** (2 хости) |
-| **PH-S17** | ML pipeline ops (step metrics, stand verify) | AUTO_RUN §1.2, DIGEST §ML | **Planned** |
-| **PH-S18** | BurstRAID/SmallWorld admin metrics polish | `RUST_ARCHITECT_STATUS`, raid admin UI | **Planned** |
-| **PH-S19** | OpenAPI gap audit gate у CI | `poolai-openapi-gap-audit`, OPENAPI_GAP | **Planned** |
-| **PH-S20** | VM Windows isolation (AppContainer/firewall) | `vm/isolation/windows.rs` stubs | **Planned** |
-| **PH-S21** | Raft membership з log/snapshot | `raid/raft.rs` TODO | **Planned** |
-| **PH-S22** | Topology live updates (WebSocket) | `ARCHITECT_PLAN_EXO` §4.1 | **Planned** |
-| **PH-S23** | Playwright admin flows expand | `UI_QUALITY`, post-S14 a11y | **Planned** |
+| **PH-S17** | ML pipeline ops (step metrics, stand verify) | AUTO_RUN §1.2, DIGEST §ML | **✅** (2026-05-24) |
+| **PH-S18** | BurstRAID/SmallWorld admin metrics polish | `RUST_ARCHITECT_STATUS`, raid admin UI | **✅** (2026-05-24) |
+| **PH-S19** | OpenAPI gap audit gate у CI | `poolai-openapi-gap-audit`, OPENAPI_GAP | **✅** (2026-05-24) |
+| **PH-S20** | VM Windows isolation (AppContainer/firewall) | `vm/isolation/windows.rs` stubs | **✅** (2026-05-24) |
+| **PH-S21** | Raft membership з log/snapshot | `raid/raft.rs`, `tests/raft_membership_log.rs` | **✅** (2026-05-24) |
+| **PH-S22** | Topology live updates (WebSocket) | `ws_manager`, `topology.rs` admin | **✅** (2026-05-24) |
+| **PH-S23** | Playwright admin flows expand | `e2e/tests/admin.spec.ts`, `helpers.ts` | **✅** (2026-05-24) |
 | **PH-S24** | Security ops (secret rotation, pen-test checklist) | `ARCHITECT_SUMMARY` security `[ ]` | **Planned** |
 
 **Одна сесія = один PH-S*** (або FM-003/FM-041 за §5.1). Промпт: [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).

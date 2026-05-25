@@ -4,7 +4,8 @@
 //! Types and connection hub live in [`crate::core::ws_manager`].
 
 pub use crate::core::ws_manager::{
-    LiveMetrics, SystemEvent, WebSocketConnection, WebSocketManager, WebSocketMessage,
+    LiveMetrics, SystemEvent, TopologyLiveUpdate, WebSocketConnection, WebSocketManager,
+    WebSocketMessage,
 };
 
 use crate::core::error::ErrorContext;
@@ -109,6 +110,9 @@ async fn handle_websocket_connection(
                         "subscribe_events" => {
                             handle_events_subscription(&mgr, &connection_id, &claims).await;
                         }
+                        "subscribe_topology" => {
+                            handle_topology_subscription(&mgr, &connection_id, &claims).await;
+                        }
                         _ => {
                             let received = message.message_type.clone();
                             let ctx = ErrorContext::new("websocket_message")
@@ -188,7 +192,7 @@ async fn update_heartbeat(mgr: &WebSocketManager, connection_id: &str) {
 }
 
 async fn handle_metrics_subscription(mgr: &WebSocketManager, connection_id: &str, claims: &Claims) {
-    if !claims.permissions.contains(&"read:metrics".to_string()) {
+    if !claims_can_read(claims, "read:metrics") {
         return;
     }
 
@@ -197,12 +201,36 @@ async fn handle_metrics_subscription(mgr: &WebSocketManager, connection_id: &str
 }
 
 async fn handle_events_subscription(mgr: &WebSocketManager, connection_id: &str, claims: &Claims) {
-    if !claims.permissions.contains(&"read:events".to_string()) {
+    if !claims_can_read(claims, "read:events") {
         return;
     }
 
     mgr.subscribe_events(connection_id).await;
     tracing::info!("User {} subscribed to system events", claims.sub);
+}
+
+async fn handle_topology_subscription(
+    mgr: &WebSocketManager,
+    connection_id: &str,
+    claims: &Claims,
+) {
+    if !claims_can_read(claims, "read:topology") {
+        return;
+    }
+
+    mgr.subscribe_topology(connection_id).await;
+    tracing::info!("User {} subscribed to topology updates", claims.sub);
+
+    if let Some(topology_manager) = crate::pool::topology::get_global_topology_manager() {
+        let snapshot = topology_manager.read().await.get_topology_snapshot().await;
+        let update = TopologyLiveUpdate::from_topology(&snapshot);
+        mgr.broadcast_topology_update(update).await;
+    }
+}
+
+fn claims_can_read(claims: &Claims, permission: &str) -> bool {
+    claims.permissions.contains(&"read:all".to_string())
+        || claims.permissions.contains(&permission.to_string())
 }
 
 /// Broadcast system update to all connected WebSocket clients (uses shared manager).

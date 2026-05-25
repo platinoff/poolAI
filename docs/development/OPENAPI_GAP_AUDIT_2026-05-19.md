@@ -22,6 +22,12 @@
 | ~~VM template body schemas~~ | `VmTemplate`, `GpuSchedulingPolicy` | **✅ FM-025** (2026-05-20) |
 | ~~VM network body schemas~~ | `VmNetwork`, `NetworkIsolationConfig` | **✅ FM-032** (2026-05-22) |
 
+## CI (PH-S19)
+
+Job **`openapi-gap-audit`** у [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) — `cargo run --bin poolai-openapi-gap-audit` (fail PR/push on exit 1).
+
+**Ігнор аудиту (не публічний REST):** префікси `/ui/`, `/raft/` (Raft wire з `raft_rpc.rs`); exact `/api/workers`.
+
 ## Перевірка
 
 ```bash

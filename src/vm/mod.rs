@@ -71,10 +71,14 @@ mod resources;
 pub use resources::{PlatformResourceLimiter, ResourceLimiter, ResourceLimits, ResourceUsage};
 
 mod isolation;
+pub use isolation::windows_plan;
 pub use isolation::{
     FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
     PlatformFilesystemIsolator, PlatformNetworkIsolator,
 };
+
+#[cfg(target_os = "windows")]
+pub use isolation::windows::WindowsNetworkIsolator;
 
 use crate::core::error::AppError;
 use crate::runtime::health::{HealthMonitor, HealthStatus};

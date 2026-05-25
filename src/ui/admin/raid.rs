@@ -32,6 +32,85 @@ pub async fn admin_raid() -> Html<String> {
       return 'inactive';
     }
 
+    var raidBurstPctHistory = [];
+    var raidSwClusterHistory = [];
+    var RAID_METRICS_SPARK_MAX = 20;
+
+    function raidHistoryPush(buf, val) {
+      const n = Number(val);
+      if (!Number.isFinite(n)) return;
+      buf.push(n);
+      if (buf.length > RAID_METRICS_SPARK_MAX) buf.shift();
+    }
+
+    function raidMetricBar(pct) {
+      const p = Math.max(0, Math.min(100, Number(pct) || 0));
+      return '<div class="raid-metric-bar" role="progressbar" aria-valuenow="' + p + '" aria-valuemin="0" aria-valuemax="100">'
+        + '<div class="raid-metric-bar-fill" style="width:' + p + '%"></div></div>';
+    }
+
+    function renderRaidBurstSection(burstMetrics) {
+      const title = escapeHtml(T('admin.raidadm.burstTitle', 'BurstRAID Metrics'));
+      if (!burstMetrics) {
+        return '<div class="admin-card raid-metrics-card" id="raid-burst-metrics">'
+          + '<h3>' + title + '</h3>'
+          + '<p class="muted">' + escapeHtml(T('admin.raidadm.burstInactive', 'BurstRAID strategy not active on this node.')) + '</p></div>';
+      }
+      const total = burstMetrics.total_artifacts ?? 0;
+      const inBurst = burstMetrics.artifacts_in_burst ?? 0;
+      const burstPct = total > 0 ? (inBurst / total) * 100 : 0;
+      raidHistoryPush(raidBurstPctHistory, burstPct);
+      const spark = typeof poolaiRenderSparkline === 'function'
+        ? poolaiRenderSparkline(T('admin.raidadm.sparkBurstPct', 'Burst load %'), raidBurstPctHistory.slice())
+        : '';
+      return '<div class="admin-card raid-metrics-card" id="raid-burst-metrics">'
+        + '<h3>' + title + '</h3>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.totalArt', 'Total Artifacts:')) + '</span>'
+        + '<span class="stat-value">' + total + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.artBurst', 'Artifacts in Burst:')) + '</span>'
+        + '<span class="stat-value">' + inBurst + ' (' + burstPct.toFixed(1) + '%)</span></div>'
+        + raidMetricBar(burstPct)
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.totalReq', 'Total Requests:')) + '</span>'
+        + '<span class="stat-value">' + (burstMetrics.total_requests ?? 0) + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.burstRps', 'Burst threshold (RPS):')) + '</span>'
+        + '<span class="stat-value">' + Number(burstMetrics.burst_threshold_rps ?? 0).toFixed(2) + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.repl', 'Replication (base / max):')) + '</span>'
+        + '<span class="stat-value">' + (burstMetrics.base_replication_factor ?? 0) + ' / ' + (burstMetrics.max_replication_factor ?? 0) + '</span></div>'
+        + (spark ? '<div class="metrics-sparklines-grid">' + spark + '</div>' : '')
+        + '</div>';
+    }
+
+    function renderRaidSmallworldSection(smallworldMetrics) {
+      const title = escapeHtml(T('admin.raidadm.swTitle', 'SmallWorld Network Metrics'));
+      if (!smallworldMetrics) {
+        return '<div class="admin-card raid-metrics-card" id="raid-smallworld-metrics">'
+          + '<h3>' + title + '</h3>'
+          + '<p class="muted">' + escapeHtml(T('admin.raidadm.swInactive', 'SmallWorld strategy not active on this node.')) + '</p></div>';
+      }
+      const avg = smallworldMetrics.avg_clustering_coefficient ?? 0;
+      const tgt = smallworldMetrics.target_clustering_coefficient ?? 0;
+      const clustPct = tgt > 0 ? Math.min(100, (avg / tgt) * 100) : 0;
+      raidHistoryPush(raidSwClusterHistory, avg * 100);
+      const spark = typeof poolaiRenderSparkline === 'function'
+        ? poolaiRenderSparkline(T('admin.raidadm.sparkClust', 'Avg clustering ×100'), raidSwClusterHistory.slice())
+        : '';
+      return '<div class="admin-card raid-metrics-card" id="raid-smallworld-metrics">'
+        + '<h3>' + title + '</h3>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.totalArt', 'Total Artifacts:')) + '</span>'
+        + '<span class="stat-value">' + (smallworldMetrics.total_artifacts ?? 0) + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.totalNodes', 'Total Nodes:')) + '</span>'
+        + '<span class="stat-value">' + (smallworldMetrics.total_nodes ?? 0) + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.avgClust', 'Avg Clustering Coefficient:')) + '</span>'
+        + '<span class="stat-value">' + avg.toFixed(3) + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.tgtClust', 'Target Clustering:')) + '</span>'
+        + '<span class="stat-value">' + tgt.toFixed(3) + '</span></div>'
+        + '<div class="stat-item"><span class="stat-label">' + escapeHtml(T('admin.raidadm.label.swRepl', 'Base replication:')) + '</span>'
+        + '<span class="stat-value">' + (smallworldMetrics.base_replication_factor ?? 0) + '</span></div>'
+        + raidMetricBar(clustPct)
+        + (spark ? '<div class="metrics-sparklines-grid">' + spark + '</div>' : '')
+        + '</div>';
+    }
+
     async function loadRaidData() {
       adminShowLoading('raid-admin', T('admin.raidadm.loading', 'Loading RAID admin…'));
       adminShowLoading('raid-artifacts', T('admin.raidadm.loadingArt', 'Loading artifacts…'));
@@ -139,50 +218,9 @@ pub async fn admin_raid() -> Html<String> {
         `;
       }
       
-      if (burstMetrics) {
-        html += `
-          <div class="admin-card">
-            <h3>${escapeHtml(T('admin.raidadm.burstTitle', 'BurstRAID Metrics'))}</h3>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.totalArt', 'Total Artifacts:'))}</span>
-              <span class="stat-value">${burstMetrics.total_artifacts ?? 0}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.artBurst', 'Artifacts in Burst:'))}</span>
-              <span class="stat-value">${burstMetrics.artifacts_in_burst ?? 0}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.repl', 'Replication (base / max):'))}</span>
-              <span class="stat-value">${burstMetrics.base_replication_factor ?? 0} / ${burstMetrics.max_replication_factor ?? 0}</span>
-            </div>
-          </div>
-        `;
-      }
-      
-      if (smallworldMetrics) {
-        html += `
-          <div class="admin-card">
-            <h3>${escapeHtml(T('admin.raidadm.swTitle', 'SmallWorld Network Metrics'))}</h3>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.totalArt', 'Total Artifacts:'))}</span>
-              <span class="stat-value">${smallworldMetrics.total_artifacts ?? 0}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.totalNodes', 'Total Nodes:'))}</span>
-              <span class="stat-value">${smallworldMetrics.total_nodes ?? 0}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.avgClust', 'Avg Clustering Coefficient:'))}</span>
-              <span class="stat-value">${(smallworldMetrics.avg_clustering_coefficient ?? 0).toFixed(3)}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">${escapeHtml(T('admin.raidadm.label.tgtClust', 'Target Clustering:'))}</span>
-              <span class="stat-value">${(smallworldMetrics.target_clustering_coefficient ?? 0).toFixed(3)}</span>
-            </div>
-          </div>
-        `;
-      }
-      
+      html += renderRaidBurstSection(burstMetrics);
+      html += renderRaidSmallworldSection(smallworldMetrics);
+
       if (html) {
         el.innerHTML = html;
       }
@@ -469,6 +507,7 @@ pub async fn admin_raid() -> Html<String> {
               <button type="button" class="btn" onclick="createSnapshot()" data-i18n="admin.raidadm.btn.snapshot" data-i18n-aria="admin.raidadm.btn.snapshot">Create Snapshot</button>
               <button type="button" class="btn" onclick="syncArtifacts()" data-i18n="admin.raidadm.btn.sync" data-i18n-aria="admin.raidadm.btn.sync">Sync Artifacts</button>
               <button type="button" class="btn" onclick="runGc()" data-i18n="admin.raidadm.btn.gc" data-i18n-aria="admin.raidadm.btn.gc">Run GC</button>
+              <button type="button" class="btn" onclick="triggerRebalance()" data-i18n="admin.raidadm.btn.rebalance" data-i18n-aria="admin.raidadm.btn.rebalance">Rebalance</button>
             </div>
           </div>
           <div id="raid-admin"></div>

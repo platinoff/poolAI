@@ -189,7 +189,28 @@ assert!(out.contains_key("step_kind")); // turboquant | quantization | training 
 
 Ключі output — таблиця [«Ключі output кроків»](#-ключі-output-кроків-runbook-метрик) вище. Інтеграція з RAID-артефактами: після `deployment` перевір `artifact_uri` у output; реплікація — distributed RAID (`/raid/distributed/*`, OpenAPI tag **RAID Distributed**).
 
-**Last ops review:** 2026-05-19 (автопрогін S31).
+### Dev stand (PH-S17)
+
+Після `bin/run-virtual-node-dev.*` (coordinator `:8080` + worker `:9090`):
+
+```bash
+bash bin/verify-dev-stand.sh
+# Windows: .\bin\verify-dev-stand.ps1
+# Вимкнути ML demo: VERIFY_ML_PIPELINE=0 bash bin/verify-dev-stand.sh
+```
+
+Скрипт перевіряє health, virtual-node bootstrap (≥4 tasks), worker `cached_artifacts`, і **`GET /api/enterprise/ai-ml/pipeline/demo`** — у відповіді `step_results.profile.output` має містити `step_kind=profiling` та `status=completed`. Якщо endpoint недоступний (збірка без `enterprise`+`ml`), крок **SKIP** (не fail).
+
+HTTP baseline coordinator (опційно, окремий термінал):
+
+```bash
+cargo run --release --bin poolai_health_load -- --json \
+  http://127.0.0.1:8080/api/v1/health 10 50
+```
+
+Збережи JSON у `data/dev/` або додай рядок у [`BENCHMARKS.md`](../performance/BENCHMARKS.md) §P4.
+
+**Last ops review:** 2026-05-24 (PH-S17: verify-dev-stand ML demo + dev stand runbook).
 
 ---
 

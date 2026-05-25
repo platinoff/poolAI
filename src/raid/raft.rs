@@ -13,7 +13,7 @@ use anyhow::Result;
 use async_raft::{
     config::Config,
     raft::{
-        AppendEntriesRequest, AppendEntriesResponse, ClientWriteRequest, Entry,
+        AppendEntriesRequest, AppendEntriesResponse, ClientWriteRequest, Entry, EntryPayload,
         InstallSnapshotRequest, InstallSnapshotResponse, MembershipConfig, VoteRequest,
         VoteResponse,
     },
@@ -239,6 +239,130 @@ impl RaidRaftStorage {
         file.sync_all().await?;
         Ok(())
     }
+
+    fn membership_cache_path(&self) -> std::path::PathBuf {
+        self.storage_path.join("membership.json")
+    }
+
+    async fn save_membership_cache(&self, membership: &MembershipConfig) -> Result<()> {
+        let path = self.membership_cache_path();
+        let contents = serde_json::to_string_pretty(membership)
+            .map_err(|e| anyhow::anyhow!("Failed to serialize membership cache: {}", e))?;
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&path)
+            .await?;
+        file.write_all(contents.as_bytes()).await?;
+        file.sync_all().await?;
+        Ok(())
+    }
+
+    async fn load_membership_cache(&self) -> Result<Option<MembershipConfig>> {
+        let path = self.membership_cache_path();
+        if !path.exists() {
+            return Ok(None);
+        }
+        let mut file = File::open(&path).await?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).await?;
+        let membership: MembershipConfig = serde_json::from_str(&contents)
+            .map_err(|e| anyhow::anyhow!("Failed to parse membership cache: {}", e))?;
+        Ok(Some(membership))
+    }
+
+    async fn load_membership_from_snapshot_metadata(&self) -> Result<Option<MembershipConfig>> {
+        if self.get_current_snapshot().await?.is_none() {
+            return Ok(None);
+        }
+
+        let snapshot_dir = &self.storage_path;
+        let mut metadata_files = Vec::new();
+
+        if let Ok(mut entries) = tokio::fs::read_dir(snapshot_dir).await {
+            while let Ok(Some(entry)) = entries.next_entry().await {
+                let path = entry.path();
+                if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
+                    if file_name.contains("_metadata") && file_name.ends_with(".snap") {
+                        metadata_files.push(path);
+                    }
+                }
+            }
+        }
+
+        metadata_files.sort_by(|a, b| {
+            let a_name = a.file_name().and_then(|n| n.to_str()).unwrap_or("");
+            let b_name = b.file_name().and_then(|n| n.to_str()).unwrap_or("");
+            b_name.cmp(a_name)
+        });
+
+        for metadata_path in metadata_files {
+            if let Ok(mut file) = File::open(&metadata_path).await {
+                let mut contents = String::new();
+                if file.read_to_string(&mut contents).await.is_ok() {
+                    if let Ok(metadata) = serde_json::from_str::<serde_json::Value>(&contents) {
+                        if let Some(membership_json) = metadata.get("membership") {
+                            if let Ok(membership) =
+                                serde_json::from_value::<MembershipConfig>(membership_json.clone())
+                            {
+                                return Ok(Some(membership));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(None)
+    }
+
+    fn persist_membership_from_entry(&self, entry: &Entry<RaidRaftOperation>) {
+        if let Some(membership) = membership_from_entry_payload(&entry.payload) {
+            let storage = self.clone();
+            tokio::spawn(async move {
+                if let Err(e) = storage.save_membership_cache(&membership).await {
+                    warn!("Failed to persist membership cache: {}", e);
+                }
+            });
+        }
+    }
+}
+
+/// Returns true if the log contains Raft membership-bearing entries.
+#[cfg(feature = "raft")]
+pub fn log_has_membership_entry(entries: &[Entry<RaidRaftOperation>]) -> bool {
+    entries.iter().any(|entry| {
+        matches!(
+            entry.payload,
+            EntryPayload::ConfigChange(_) | EntryPayload::SnapshotPointer(_)
+        )
+    })
+}
+
+/// Scan log entries (newest first) for the latest membership config.
+#[cfg(feature = "raft")]
+pub fn extract_membership_from_log(
+    entries: &[Entry<RaidRaftOperation>],
+    fallback_node_id: NodeId,
+) -> MembershipConfig {
+    for entry in entries.iter().rev() {
+        if let Some(membership) = membership_from_entry_payload(&entry.payload) {
+            return membership;
+        }
+    }
+    MembershipConfig::new_initial(fallback_node_id)
+}
+
+#[cfg(feature = "raft")]
+fn membership_from_entry_payload(
+    payload: &EntryPayload<RaidRaftOperation>,
+) -> Option<MembershipConfig> {
+    match payload {
+        EntryPayload::ConfigChange(change) => Some(change.membership.clone()),
+        EntryPayload::SnapshotPointer(pointer) => Some(pointer.membership.clone()),
+        EntryPayload::Blank | EntryPayload::Normal(_) => None,
+    }
 }
 
 /// Implement RaftStorage trait for RaidRaftStorage
@@ -249,68 +373,30 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
     type ShutdownError = AppError;
 
     async fn get_membership_config(&self) -> Result<MembershipConfig> {
-        // Try to get membership config from snapshot metadata first
-        // This is the most reliable source if snapshot exists
-        if let Ok(Some(_snapshot_data)) = self.get_current_snapshot().await {
-            // Find the latest snapshot metadata file
-            let snapshot_dir = &self.storage_path;
-            let mut metadata_files = Vec::new();
-
-            if let Ok(mut entries) = tokio::fs::read_dir(snapshot_dir).await {
-                while let Ok(Some(entry)) = entries.next_entry().await {
-                    let path = entry.path();
-                    if let Some(file_name) = path.file_name().and_then(|n| n.to_str()) {
-                        if file_name.contains("_metadata") && file_name.ends_with(".snap") {
-                            metadata_files.push(path);
-                        }
-                    }
-                }
-            }
-
-            // Sort by filename (newest first, assuming UUID-based names)
-            metadata_files.sort_by(|a, b| {
-                let a_name = a.file_name().and_then(|n| n.to_str()).unwrap_or("");
-                let b_name = b.file_name().and_then(|n| n.to_str()).unwrap_or("");
-                b_name.cmp(a_name)
-            });
-
-            // Try to load membership from the latest metadata file
-            for metadata_path in metadata_files {
-                if let Ok(mut file) = File::open(&metadata_path).await {
-                    let mut contents = String::new();
-                    if file.read_to_string(&mut contents).await.is_ok() {
-                        if let Ok(metadata) = serde_json::from_str::<serde_json::Value>(&contents) {
-                            if let Some(membership_json) = metadata.get("membership") {
-                                if let Ok(membership) = serde_json::from_value::<MembershipConfig>(
-                                    membership_json.clone(),
-                                ) {
-                                    info!("Loaded membership config from snapshot metadata");
-                                    return Ok(membership);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if let Some(membership) = self.load_membership_from_snapshot_metadata().await? {
+            info!("Loaded membership config from snapshot metadata");
+            return Ok(membership);
         }
 
-        // If no snapshot membership found, search log entries in reverse order
-        // for membership config changes (entries with membership information)
         let entries = self.load_log_entries().await?;
+        if log_has_membership_entry(&entries) {
+            let membership = extract_membership_from_log(&entries, self.node_id);
+            info!(
+                "Loaded membership config from log (nodes={})",
+                membership.all_nodes().len()
+            );
+            return Ok(membership);
+        }
 
-        // Note: In async-raft, membership changes are stored in Entry struct,
-        // but they may be at the Raft protocol level, not in application data.
-        // For now, we'll use the last entry's membership if available,
-        // otherwise fall back to initial membership.
-        //
-        // Future improvement: When async-raft API is confirmed, extract membership
-        // from Entry struct by searching backwards through log entries and checking
-        // the Entry::membership field for membership change entries.
-        // This would allow us to recover the actual membership config even without
-        // a snapshot.
+        if let Some(membership) = self.load_membership_cache().await? {
+            info!("Loaded membership config from cache file");
+            return Ok(membership);
+        }
 
-        // For now, return initial membership as a safe default
-        info!("Using initial membership config (node_id: {}) - no snapshot membership found, log entries membership extraction not yet implemented", self.node_id);
+        info!(
+            "Using initial membership config (node_id: {})",
+            self.node_id
+        );
         Ok(MembershipConfig::new_initial(self.node_id))
     }
 
@@ -377,7 +463,9 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
     async fn append_entry_to_log(&self, entry: &Entry<RaidRaftOperation>) -> Result<()> {
         let mut entries = self.load_log_entries().await?;
         entries.push(entry.clone());
-        self.save_log_entries(&entries).await
+        self.save_log_entries(&entries).await?;
+        self.persist_membership_from_entry(entry);
+        Ok(())
     }
 
     async fn replicate_to_log(&self, entries: &[Entry<RaidRaftOperation>]) -> Result<()> {
@@ -385,7 +473,11 @@ impl RaftStorage<RaidRaftOperation, RaidRaftResponse> for RaidRaftStorage {
         let mut all_entries = self.load_log_entries().await?;
         all_entries.reserve(entries.len());
         all_entries.extend_from_slice(entries);
-        self.save_log_entries(&all_entries).await
+        self.save_log_entries(&all_entries).await?;
+        for entry in entries {
+            self.persist_membership_from_entry(entry);
+        }
+        Ok(())
     }
 
     async fn apply_entry_to_state_machine(

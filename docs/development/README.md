@@ -13,7 +13,7 @@
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
-- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — PH-S17…S24 (legacy backlog); PH-S15/16 Deferred/BLOCKED; a11y 16/16 ✅.
+- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — PH-S20…S24; PH-S17…S19 ✅; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md) §CI.
 - **[`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md)** · **[`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md)** · **[`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)** · **[`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)** · **[`../security/TLS.md`](../security/TLS.md)** — PH-S07…S14 ✅; **PH-S03…S06** ✅ (VM, Raft); черга PH закрита — FM **§5.9**.
 - **[`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md)** — autoprogon S21–S34 ✅ (архів черги).
 - **[`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md)** — менеджер функціоналу: stale docs, не повторювати архівні `[ ]`.

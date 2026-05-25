@@ -25,4 +25,4 @@ LD_LIBRARY_PATH = "/home/rust/libtorch/lib"
 [alias]
 test-ci = "test -j 1 --lib --tests --features ml,enterprise,cloud,test-utils,job-store-sqlite,prometheus -- --test-threads=1"
 # PH-S04: Raft HTTP wire (`GET /api/v1/raid/status`); run after `test-ci`.
-test-raft-ci = "test -j 1 --test raft_wire_integration --test raft_multi_node_harness --features raft,test-utils -- --test-threads=1"
+test-raft-ci = "test -j 1 --test raft_wire_integration --test raft_multi_node_harness --test raft_membership_log --features raft,test-utils -- --test-threads=1"

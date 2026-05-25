@@ -906,6 +906,25 @@ button.btn.btn-danger:focus-visible,
   color: var(--text, #e8e8e8);
 }
 
+.raid-metrics-card {
+  margin-bottom: var(--spacing-4, 16px);
+}
+
+.raid-metric-bar {
+  height: 8px;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--border, #262b36);
+  margin: var(--spacing-2, 8px) 0 var(--spacing-3, 12px);
+  overflow: hidden;
+}
+
+.raid-metric-bar-fill {
+  height: 100%;
+  background: var(--primary, #67e480);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
 .admin-fetch-error {
   padding: 12px;
   border-radius: 8px;

@@ -8,7 +8,8 @@ param(
     [int]$WarmupSecs = 50,
     [int]$TaskRetries = 12,
     [int]$TaskSleepSecs = 5,
-    [int]$MinCompleted = 4
+    [int]$MinCompleted = 4,
+    [int]$VerifyMlPipeline = 1
 )
 
 $ErrorActionPreference = "Continue"
@@ -109,5 +110,24 @@ try {
     $fail = 1
 }
 
+if ($VerifyMlPipeline -eq 1) {
+    $mlUrl = "$CoordUrl/api/enterprise/ai-ml/pipeline/demo"
+    try {
+        $demo = Invoke-RestMethod -Uri $mlUrl -TimeoutSec $TimeoutSec
+        $profile = $demo.step_results.profile
+        $out = $profile.output
+        $kind = $out.step_kind
+        $status = $out.status
+        if ($kind -eq "profiling" -and $status -eq "completed") {
+            Write-Host "OK  ML pipeline demo -> step_kind=profiling status=completed" -ForegroundColor Green
+        } else {
+            Write-Host "FAIL ML pipeline demo: step_kind=$kind status=$status" -ForegroundColor Red
+            $fail = 1
+        }
+    } catch {
+        Write-Host "SKIP ML pipeline demo -> $mlUrl ($($_.Exception.Message))" -ForegroundColor DarkYellow
+    }
+}
+
 if ($fail -ne 0) { exit 1 }
-Write-Host "Dev stand verification passed (health + virtual-node bootstrap)." -ForegroundColor Cyan
+Write-Host "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled)." -ForegroundColor Cyan

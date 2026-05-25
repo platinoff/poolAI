@@ -11,8 +11,10 @@ WARMUP_SECS="${VERIFY_WARMUP_SECS:-50}"
 TASK_RETRIES="${VERIFY_TASK_RETRIES:-12}"
 TASK_SLEEP="${VERIFY_TASK_SLEEP:-5}"
 MIN_COMPLETED="${VERIFY_MIN_COMPLETED:-4}"
+VERIFY_ML_PIPELINE="${VERIFY_ML_PIPELINE:-1}"
 
 COORD_URL="http://127.0.0.1:${COORD_PORT}"
+ML_DEMO_URL="${COORD_URL}/api/enterprise/ai-ml/pipeline/demo"
 
 check() {
   local name="$1"
@@ -95,8 +97,21 @@ else
   fail=1
 fi
 
+if [[ "$VERIFY_ML_PIPELINE" == "1" ]]; then
+  ml_demo="$(curl -sf --max-time "$TIMEOUT" "$ML_DEMO_URL" 2>/dev/null || true)"
+  if [[ -z "$ml_demo" ]]; then
+    echo "SKIP ML pipeline demo -> ${ML_DEMO_URL} (endpoint unavailable; build with enterprise+ml or set VERIFY_ML_PIPELINE=0)"
+  elif echo "$ml_demo" | grep -q '"step_kind":"profiling"' \
+    && echo "$ml_demo" | grep -q '"status":"completed"'; then
+    echo "OK  ML pipeline demo -> step_kind=profiling status=completed"
+  else
+    echo "FAIL ML pipeline demo: missing profiling step metrics in response"
+    fail=1
+  fi
+fi
+
 if [[ "$fail" -ne 0 ]]; then
   echo "Dev stand verification failed."
   exit 1
 fi
-echo "Dev stand verification passed (health + virtual-node bootstrap)."
+echo "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled)."

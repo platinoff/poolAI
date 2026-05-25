@@ -412,3 +412,43 @@ async fn test_filesystem_isolation_apply_enabled() {
         "Applying filesystem isolation should succeed (placeholder)"
     );
 }
+
+#[test]
+fn test_windows_plan_firewall_rules_from_config() {
+    use poolai::vm::windows_plan::{plan_firewall_rules, plan_network_isolation};
+
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec!["Ethernet".to_string()],
+        allowed_ports: vec![8080],
+        allow_loopback: true,
+        strict: false,
+    };
+    let rules = plan_firewall_rules(1001, &config);
+    assert!(rules.len() >= 3);
+    let state = plan_network_isolation(1001, &config);
+    assert_eq!(state.profile_name, "PoolAI-VM-1001");
+    assert_eq!(state.firewall_rules.len(), rules.len());
+}
+
+#[cfg(target_os = "windows")]
+#[tokio::test]
+async fn test_windows_network_isolator_tracks_plan() {
+    use poolai::vm::WindowsNetworkIsolator;
+
+    let isolator = WindowsNetworkIsolator::new();
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_ports: vec![8080],
+        allow_loopback: true,
+        ..Default::default()
+    };
+    isolator.apply_network_isolation(4242, &config).unwrap();
+    let state = isolator
+        .get_appcontainer_state(4242)
+        .expect("state tracked");
+    assert_eq!(state.profile_name, "PoolAI-VM-4242");
+    assert!(!state.firewall_rules.is_empty());
+    isolator.remove_network_isolation(4242).unwrap();
+    assert!(isolator.get_appcontainer_state(4242).is_none());
+}

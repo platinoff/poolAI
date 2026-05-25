@@ -164,6 +164,32 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     secrets: inherit
 
+  openapi-gap-audit:
+    name: OpenAPI gap audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        timeout-minutes: 5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-openapi-gap-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-openapi-gap-
+
+      - name: Axum routes vs docs/openapi.yaml
+        run: cargo run --bin poolai-openapi-gap-audit
+
   pa11y-contract:
     name: Pa11y script contract
     runs-on: ubuntu-latest

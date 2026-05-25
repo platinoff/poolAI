@@ -1,7 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { loginAsAdmin } from "./helpers";
+import {
+  gotoAdminReady,
+  loginAsAdmin,
+  waitForAdminContentReady,
+} from "./helpers";
 
-test.describe("PoolAI admin E2E (S27–S34)", () => {
+test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
   test.beforeEach(async ({ page }) => {
     await loginAsAdmin(page);
   });
@@ -160,5 +164,77 @@ test.describe("PoolAI admin E2E (S27–S34)", () => {
     await expect(
       page.getByRole("button", { name: /upload library/i }),
     ).toBeVisible();
+  });
+
+  test("admin dashboard loads overview panels (PH-S23)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin", "#system-overview");
+    await expect(page.locator("#quick-stats")).toBeVisible();
+    await expect(page.locator("#active-alerts")).toBeVisible();
+    await expect(page.locator("#recent-activity")).toBeVisible();
+    await expect(page.locator("#metrics-chart")).toBeVisible();
+  });
+
+  test("users page loads list and create action (PH-S23)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/users", "#users-list");
+    await expect(
+      page.getByRole("button", { name: /create user|створити користувача/i }),
+    ).toBeVisible();
+    await expect(
+      page.locator("#users-list .admin-table, #users-list .muted").first(),
+    ).toBeVisible();
+  });
+
+  test("users page opens create modal (PH-S23)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/users", "#users-list");
+    await page.evaluate(() => {
+      if (typeof showModal === "function") {
+        showModal("createUserModal");
+      }
+    });
+    await expect(page.locator("#createUserModal")).toHaveAttribute(
+      "aria-hidden",
+      "false",
+    );
+    await expect(page.locator("#userUsername")).toBeVisible();
+    await expect(page.locator("#userPassword")).toBeVisible();
+    await expect(page.locator("#userRole")).toBeVisible();
+  });
+
+  test("config page loads general tab form (PH-S23)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/config", "#config-content");
+    await expect(page.locator("#config-tab-general")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(page.locator("#generalConfigForm")).toBeVisible();
+    await page.locator("#config-tab-performance").click();
+    await expect(page.locator("#config-tab-performance")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(page.locator("#performanceConfigForm")).toBeVisible();
+  });
+
+  test("instances page loads list and create action (PH-S23)", async ({
+    page,
+  }) => {
+    await gotoAdminReady(page, "/ui/admin/instances", "#instances-list");
+    await expect(
+      page.getByRole("button", { name: /create instance|створити/i }),
+    ).toBeVisible();
+    await expect(page.locator("#instances-tbody")).toBeVisible();
+    await expect(page.locator("#placement-previews")).toBeVisible();
+  });
+
+  test("topology refresh keeps graph visible (PH-S22/PH-S23)", async ({
+    page,
+  }) => {
+    await page.goto("/ui/admin/topology");
+    await waitForAdminContentReady(page, "#topology-nodes-list");
+    await page
+      .getByRole("button", { name: /refresh|оновити/i })
+      .click();
+    await expect(page.locator("#topology-graph-svg")).toBeVisible();
+    await expect(page.locator("#topology-node-count")).not.toHaveText("-");
   });
 });

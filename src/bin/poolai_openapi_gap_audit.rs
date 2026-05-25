@@ -32,7 +32,11 @@ fn nest_prefix_map() -> HashMap<&'static str, &'static str> {
     ])
 }
 
-const IGNORE_ROUTES: &[&str] = &["/ui/", "/api/workers"];
+/// Exact paths excluded from the public OpenAPI contract.
+const IGNORE_ROUTES_EXACT: &[&str] = &["/api/workers"];
+
+/// Prefixes excluded (HTML UI, inter-node Raft wire — not customer REST).
+const IGNORE_ROUTE_PREFIXES: &[&str] = &["/ui/", "/raft/"];
 
 fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -137,7 +141,10 @@ fn openapi_path_for_route(route: &str, nest: &HashMap<&str, &str>) -> String {
 }
 
 fn is_ignored(route: &str) -> bool {
-    IGNORE_ROUTES.iter().any(|ig| route == *ig)
+    IGNORE_ROUTES_EXACT.iter().any(|ig| route == *ig)
+        || IGNORE_ROUTE_PREFIXES
+            .iter()
+            .any(|pfx| route.starts_with(pfx))
 }
 
 fn main() -> ExitCode {
@@ -208,5 +215,12 @@ mod tests {
             parse_openapi_path_line("  /vm/templates:"),
             Some("/vm/templates".into())
         );
+    }
+
+    #[test]
+    fn ignores_raft_wire_routes() {
+        assert!(is_ignored("/raft/vote"));
+        assert!(is_ignored("/raft/append-entries"));
+        assert!(!is_ignored("/api/v1/health"));
     }
 }

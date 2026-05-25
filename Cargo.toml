@@ -246,6 +246,11 @@ path = "tests/raft_multi_node_harness.rs"
 required-features = ["raft", "test-utils"]
 
 [[test]]
+name = "raft_membership_log"
+path = "tests/raft_membership_log.rs"
+required-features = ["raft", "test-utils"]
+
+[[test]]
 name = "appstate_http_injection_integration"
 path = "tests/appstate_http_injection_integration.rs"
 required-features = ["test-utils"]

@@ -287,7 +287,7 @@
 ### [FM-003] Virtual-node dev stand scripts
 - **Де:** `bin/run-virtual-node-dev.sh`, `bin/verify-dev-stand.sh`
 - **Патерн:** coordinator :8080 + worker :9090; `POOLAI_VIRTUAL_NODE_DATA_DIR` under `data/lan-stand/virtual-node`
-- **Перевірка:** `bash bin/run-virtual-node-dev.sh`; `bash bin/verify-dev-stand.sh` (warmup 50s, checks discovery/pool/tasks>=4)
+- **Перевірка:** `bash bin/run-virtual-node-dev.sh`; `bash bin/verify-dev-stand.sh` (warmup 50s, discovery/pool/tasks>=4, optional ML demo `VERIFY_ML_PIPELINE=1`)
 
 ### [Workers] Telegram bot → coordinator webhook
 - **Де:** `src/tgbot/coordinator.rs`, `src/bin/poolai-telegram-bot.rs`
@@ -626,9 +626,9 @@
 - **FM:** FM-010 ✅
 
 ### [Ops] OpenAPI gap audit bin (2026-05-20)
-- **Де:** `src/bin/poolai_openapi_gap_audit.rs`, `cargo run --bin poolai-openapi-gap-audit`
+- **Де:** `src/bin/poolai_openapi_gap_audit.rs`, `cargo run --bin poolai-openapi-gap-audit`, CI job `openapi-gap-audit` у `ci.yml` (PH-S19)
 - **Сигнал:** порівняння `.route("` у `src/network` vs `docs/openapi.yaml` paths
-- **Патерн:** exit `1` + список missing; nest prefix `/ai-ml/` для ai_ml routes
+- **Патерн:** exit `1` + список missing; nest prefix `/ai-ml/` для ai_ml routes; ignore `/ui/`, `/raft/` (wire), exact `/api/workers`
 - **FM:** заміна legacy `openapi-gap-audit.py`
 
 ### [Cursor] Runtime stack — no Python (policy 2026-05-20)
@@ -707,6 +707,7 @@
 - **Патерн:** `loginAsAdmin(page)` → admin routes; контейнер з `.admin-table`, `.muted`, або `.admin-fetch-error` — **`.first()`** якщо кілька `.muted` (monitoring: alerts + dashboards)
 - **S29:** `/ui/admin/security` → `#oauth2-providers-list` + кнопка `/register|зареєстр/i` (i18n UA); `/ui/admin/audit` → `#audit-events` (auto `queryAuditLogs()`)
 - **S31:** `/ui/admin/raid` → `#raid-admin` + `#raid-artifacts` + Upload button; `/ui/admin/topology` → `#topology-node-count`, `#topology-nodes-list`
+- **PH-S23:** `/ui/admin` dashboard panels; `/ui/admin/users` list + create modal; `/ui/admin/config` tab switch; `/ui/admin/instances` list; topology Refresh (PH-S22 WS)
 - **Перевірка:** `bash bin/e2e-playwright.sh --start` (MSYS2; `enterprise,ml,cloud,test-utils`); CI — `.github/workflows/e2e.yml` `workflow_dispatch`
 - **FM:** FM-019 (UI E2E backlog)
 

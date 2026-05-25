@@ -47,6 +47,14 @@ export async function loginAsAdmin(
     (form as HTMLFormElement).requestSubmit();
   });
   await page.waitForURL(/\/ui\/?$/, { timeout: 20_000 });
+  await page.evaluate((user) => {
+    if (!localStorage.getItem("poolai_role")) {
+      localStorage.setItem("poolai_role", "Admin");
+    }
+    if (!localStorage.getItem("poolai_user")) {
+      localStorage.setItem("poolai_user", user);
+    }
+  }, e2eUser);
 }
 
 export async function expectVisualLang(
@@ -113,9 +121,24 @@ export async function waitForAdminContentReady(
   const content = page.locator(contentSelector);
   await expect(content).toBeVisible({ timeout: 20_000 });
   await expect(
-    content.locator(".admin-table, .muted, .admin-fetch-error, .admin-card").first(),
+    content.locator(".admin-table, .muted, .admin-fetch-error, .admin-card, .admin-form, form, .stat-item").first(),
   ).toBeVisible({ timeout: 20_000 });
   await page.evaluate(() => document.fonts?.ready);
+}
+
+/** Navigate to an admin route and wait for primary content (PH-S23). */
+export async function gotoAdminReady(
+  page: Page,
+  path: string,
+  contentSelector: string,
+): Promise<void> {
+  await page.goto(path);
+  await waitForAdminContentReady(page, contentSelector);
+}
+
+/** Accept the next native confirm/alert dialog (delete flows). */
+export function acceptNextDialog(page: Page): void {
+  page.once("dialog", (dialog) => dialog.accept());
 }
 
 /**

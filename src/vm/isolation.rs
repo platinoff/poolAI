@@ -286,6 +286,8 @@ impl FilesystemIsolator for PlatformFilesystemIsolator {
 }
 
 // Platform-specific implementations
+pub mod windows_plan;
+
 #[cfg(target_os = "linux")]
 pub mod linux;
 

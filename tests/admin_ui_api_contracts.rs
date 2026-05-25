@@ -877,6 +877,8 @@ async fn raid_admin_burst_metrics_json_shape() {
         for key in [
             "total_artifacts",
             "artifacts_in_burst",
+            "total_requests",
+            "burst_threshold_rps",
             "base_replication_factor",
             "max_replication_factor",
         ] {
@@ -917,6 +919,7 @@ async fn raid_admin_smallworld_metrics_json_shape() {
             "total_nodes",
             "avg_clustering_coefficient",
             "target_clustering_coefficient",
+            "base_replication_factor",
         ] {
             assert!(
                 m.contains_key(key),

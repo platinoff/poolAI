@@ -5,7 +5,7 @@
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
-| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm (+ **PH-S03** create/delete modal); **libs** (`#libraries-list`) |
+| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 

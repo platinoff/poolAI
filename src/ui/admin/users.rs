@@ -60,7 +60,7 @@ pub async fn admin_users() -> Html<String> {
     
     function showCreateUserModal() {
       const user = getUser();
-      if (!user || user.role !== 'Admin') {
+      if (!isAdmin()) {
         showNotification(T('err.insufficientAdmin', 'Insufficient permissions. Admin role required.'), 'error');
         return;
       }
@@ -70,7 +70,7 @@ pub async fn admin_users() -> Html<String> {
     async function handleCreateUser(event) {
       event.preventDefault();
       const user = getUser();
-      if (!user || user.role !== 'Admin') {
+      if (!isAdmin()) {
         showNotification(T('err.insufficientAdmin', 'Insufficient permissions. Admin role required.'), 'error');
         return;
       }
@@ -108,7 +108,7 @@ pub async fn admin_users() -> Html<String> {
     
     async function editUser(id) {
       const user = getUser();
-      if (!user || user.role !== 'Admin') {
+      if (!isAdmin()) {
         showNotification(T('err.insufficientAdmin', 'Insufficient permissions. Admin role required.'), 'error');
         return;
       }
@@ -128,7 +128,7 @@ pub async fn admin_users() -> Html<String> {
     async function handleEditUser(event) {
       event.preventDefault();
       const user = getUser();
-      if (!user || user.role !== 'Admin') {
+      if (!isAdmin()) {
         showNotification(T('err.insufficientAdmin', 'Insufficient permissions. Admin role required.'), 'error');
         return;
       }
@@ -188,7 +188,7 @@ pub async fn admin_users() -> Html<String> {
         return;
       }
       const user = getUser();
-      if (!user || user.role !== 'Admin') {
+      if (!isAdmin()) {
         showNotification(T('err.insufficientAdmin', 'Insufficient permissions. Admin role required.'), 'error');
         return;
       }
