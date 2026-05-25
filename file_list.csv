@@ -40,6 +40,7 @@
 .github/workflows/ci.yml
 .github/workflows/docs.yml
 .github/workflows/e2e.yml
+.github/workflows/update-visual-baselines.yml
 .github/workflows/release.yml
 .gitignore
 .vscode/settings.json

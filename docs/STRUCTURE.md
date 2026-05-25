@@ -1,6 +1,6 @@
 # Структура та таксономія документації PoolAI
 
-**Оновлено:** 2026-05-19 (Horizon S38 — архітектура `src/grid`, `src/job`, `src/memory`)  
+**Оновлено:** 2026-05-25 (§5.11 — 10 спринтів PH-S37…S46; PH-S37b docs sync)  
 **Джерело правди для порядку читання:** кроки **1–12** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md). **Legacy / stale плани:** [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md).
 
 ---
@@ -15,7 +15,7 @@
 | **`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`** | Покровий план Architect (P1–P6). |
 | **`docs/development/HANDOFF_NEW_SESSION.md`** | Старт нової сесії: гілка, тести, git-push. |
 | **`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`** | Витяг функціоналу (крок 11). |
-| **`docs/catalog/FUNCTION_MANAGEMENT.md`** | Керування функціоналом, беклог тікетів FM-* (крок 12). |
+| **`docs/catalog/FUNCTION_MANAGEMENT.md`** | Керування функціоналом, беклог FM-* та PH-S* (крок 12; **§5.11** — наступні 10 спринтів). |
 | **`.cursor/rules/functionality-management.mdc`** | Менеджер функціоналу: FM-*, охоплення docs за `STRUCTURE.md`. |
 | **`.cursor/rules/autonomous-orchestrator.mdc`** | Оркестратор авторозробки: субагенти, AUTO_RUN, push. |
 | **`.cursor/rules/documentation.md`** | Правила для агента: куди класти нові `.md`. |

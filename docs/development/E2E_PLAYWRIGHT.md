@@ -5,7 +5,7 @@
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
-| `admin.spec.ts` | tenants; monitoring; security; audit; raid; topology; workers; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
+| `admin.spec.ts` | tenants; monitoring; security (**PH-S27** rotation tab + OAuth2); audit; raid; topology; workers; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 
@@ -52,5 +52,8 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 - ~~visual regression (Playwright snapshots)~~ **✅ PH-S11** — [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)
 - ~~theme/i18n visual matrix~~ **✅ PH-S12**
 - ~~topology masked visual~~ **✅ PH-S13**
+- **PH-S37** — Linux visual baselines refresh (workflow `update-visual-baselines.yml`, merge PR) — [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)
+- **PH-S44** — required CI gate: visual + axe on UI PRs (`ci.yml`)
+- **PH-S45** — E2E stability: vm create modal (`admin.spec.ts`); axe `/ui/admin/audit` (`a11y.spec.ts`)
 
-**Last updated:** 2026-05-24 (PH-S03 VM admin write E2E).
+**Last updated:** 2026-05-25 (PH-S37b rotation tab; §5.11 backlog).

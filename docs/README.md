@@ -17,7 +17,7 @@
 9. **Інвентар** — кореневий [file_list.csv](../file_list.csv) (оновлюй також після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`); повний список: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](../.cursor/commands/git-push.md).
 11. **Витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення за доками та кодом).
-12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.1 — пріоритезовані наступні кроки**); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
+12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.1** / **§5.11** — наступні 10 PH-S*); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
 
 **Сталевий стан (декларація CI / збірки / модулів)** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md). Звіряти разом із кроком 12 (**§5.1**); операційний зріз — [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
 

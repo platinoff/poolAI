@@ -64,15 +64,17 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-05-24)
+### Next Focus (2026-05-25)
 
-**PH-S01…S14 закрито** (лише **PH-S01** Deferred, **PH-S02** BLOCKED). Єдиний беклог — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** / **§5.9**.
+**PH-S03…S34 закрито.** Канон черги коду — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **§5.11** (наступні **10 спринтів** PH-S37…S46).
 
-| Пріоритет | Фокус | Стан |
-|-----------|--------|------|
-| 1 | **a11y HC** — btn-primary contrast на admin (axe 13/16) | Open |
-| 2 | **FM-003** §4 LAN sign-off | **BLOCKED** (2 хости) |
-| 3 | **FM-041** Cloud SDK deep | **Deferred** |
+| # | Sprint | Фокус |
+|---|--------|--------|
+| 1 | **PH-S37** | Merge Linux visual PNG (Actions workflow) |
+| 2 | **PH-S44** | CI gate: visual + axe on UI PRs |
+| 3–10 | **PH-S39…S40** | VM limits, tables UX, ML UI, E2E fixes, job/on-chain, Solana program, macvlan, HW VM — див. §5.11 |
+
+**Ops (поза 10):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
 **Старт сесії:** [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
 

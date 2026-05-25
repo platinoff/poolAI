@@ -86,3 +86,5 @@
 
 - Devnet deploy `poolai-events.so` + оновити `program_id` у конфігу.
 - Batch / merkle виплати; звірка з `rewards` модулем core.
+
+**Спринт PH-S46** (§5.11 FM): on-chain program hardening + production devnet path — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.11, [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).

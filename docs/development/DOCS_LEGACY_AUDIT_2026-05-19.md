@@ -13,7 +13,7 @@
 | Крок | Файл | Роль |
 |------|------|------|
 | 12 | `catalog/FUNCTION_MANAGEMENT.md` §5.1 | Наступні кроки FM-* |
-| 12 | §5.3, §5.5 | «Не зроблено», прогрес % |
+| 12 | §5.3, §5.5, **§5.11** | «Не зроблено», прогрес %, **наступні 10 PH-S*** |
 | 3 | `development/NEXT_STEPS_ARCHITECT_2026-03-17.md` | P1–P6, 2 відкриті чекбокси (LAN BLOCKED, cloud-sdk Deferred) |
 | 4 | `development/HANDOFF_NEW_SESSION.md` | Операційний зріз сесії |
 | 7 | `development/AUTO_RUN_SESSION_2026-07-01.md` | Черга спринтів S21+ |
@@ -62,7 +62,7 @@
 | **FM-009/010**, **P6** | **Concept-only** |
 | **Layer C** | **100%** (S40; було 79% до Horizon S35–S40) |
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S37** (visual Linux CI); backlog **§5.10** PH-S35…S44 (legacy audit 2026-05-25).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S37** merge Linux PNG; канон черги **§5.11** (10 спринтів PH-S37…S46); §5.10 PH-S35…S44; ops PH-S35/S36 BLOCKED/Deferred (2026-05-25).
 
 ---
 

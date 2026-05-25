@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-24 (PH-S03…S06: VM write contracts, Raft wire/UI/harness; PH черга закрита).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-25 (PH-S37b: visual CI workflow, security rotation tab; §5.11 черга PH-S37…S46).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -59,8 +59,8 @@
 | **Cloud** | `cloud/` | Провайдери (AWS/Azure/GCP), Kubernetes manager, operator, autoscaling, load balancing (повна поведінка з `cloud-sdk`). |
 | **ML** | `ml/` | Оптимізація, AutoML, federated, pruning, pipeline, versioning, experiments, TurboQuant (`turboquant.rs`, формат TQ01). |
 | **Rewards** | `rewards/` | Система нагород / прогресу; процесовий `shared_reward_engine()` (`OnceLock<Arc<RewardSystem>>`), узгоджений із `AppState`. |
-| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth. **FM-045 ✅:** `design_tokens.css` + уніфіковані `admin-table` / `admin-form` / `adminRenderTable` / `adminFormFieldHtml` — [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md). **PH-S05:** `/ui/admin/raid` — `#raid-cluster-status` (`cluster_status` + `raft_status` з `GET /api/v1/raid/status`). |
-| **Observability** | `observability/` | HTTP trace spans; **FM-038** OTLP (`otel`); **FM-043** Prometheus scrape at **`GET /metrics`** (окремо від JSON `/api/v1/metrics`). |
+| **UI** | `ui/` | Вбудована веб-адмінка (дашборди, теми, доступність). **FM-012 ✅:** i18n **UA/EN**, `/ui/auth`, enterprise **admin**, Telegram OAuth. **FM-045 ✅:** `design_tokens.css` + уніфіковані `admin-table` / `admin-form` / `adminRenderTable` / `adminFormFieldHtml` — [`DESIGN_SYSTEM.md`](../development/DESIGN_SYSTEM.md). **PH-S05:** `/ui/admin/raid` — `#raid-cluster-status`. **PH-S24/S37b:** `/ui/admin/security` — вкладка **Secret rotation** (`#security-tab-rotation`); API `GET /api/v1/admin/secrets/rotation`, `POST /api/v1/admin/secrets/rotate`. **PH-S11…S13:** Playwright visual regression — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md), workflow [`update-visual-baselines.yml`](../../.github/workflows/update-visual-baselines.yml). |
+| **Observability** | `observability/` | HTTP trace spans; **FM-038** OTLP (`otel`); **FM-043** Prometheus scrape at **`GET /metrics`**; **`poolai_secret_rotations_total{kind,success}`** (PH-S24/S29, `record_secret_rotation`). |
 | **Services** | `services/` | `RaidService`, `RaidDistributedProtocolService`, `VmService`, `LibraryService`, `InstanceService`, `ChatCompletionService`, `SystemService`, `UiService` (каталог UI + делегування enterprise-дашбордів), `DiscoveryService`, `TopologyService`, `WorkerPoolService`, `RewardsService`, `EnterpriseService`, `CloudService`, `AdminService`, **`VirtualNodeTaskService`** (FM-016) — оркестрація для HTTP. |
 | **TGBot** | `tgbot/` | **FM-016++:** `coordinator` bridge + `poolai-telegram-bot` (`--features tgbot`); OAuth login — FM-012. |
 

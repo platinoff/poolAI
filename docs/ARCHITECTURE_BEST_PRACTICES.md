@@ -22,8 +22,8 @@
 | **Server / API / domains** | **Rust** 2021, `tokio`, `axum` | `src/`, `tests/` |
 | **Horizon wire + sidecar** | Rust modules + `crates/poolai-solana-adapter` | `src/grid`, `src/job`, `src/memory`, `crates/` |
 | **Admin UI** | Static HTML + **JavaScript** | `src/ui/` |
-| **E2E** | TypeScript / Playwright | `e2e/` |
-| **Ops** | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
+| **E2E** | TypeScript / Playwright | `e2e/` — smoke, admin, a11y (axe), visual (`VISUAL_REGRESSION_E2E.md`); Linux baselines via [`update-visual-baselines.yml`](../.github/workflows/update-visual-baselines.yml) (PH-S37) |
+| **Ops** | Bash (MSYS2) | `scripts/`, `bin/*.sh` — `e2e-playwright.sh`, `update-visual-baselines.sh` |
 
 **No Python in repo:** 0× `.py`; no `solana-sdk` in main; ML in `src/ml/`. Dev OpenAPI audit: `cargo run --bin poolai-openapi-gap-audit`. **Java:** not present in tree.
 
