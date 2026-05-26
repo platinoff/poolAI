@@ -1,11 +1,11 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-25 · **HEAD** (після PH-S41) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
+**Оновлено:** 2026-05-26 · **HEAD** (після PH-S41) · **VDT rules** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
 
 ---
 
 ```
-PoolAI — PH-S48 job RAID store.
+PoolAI — PH-S48 job RAID store ✅
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -27,11 +27,12 @@ cargo test-ci
 
 ## Стан
 - **PH-S03…S47, PH-S41, PH-S46, PH-S37/39/44/42/43/45/38:** ✅
-- **Черга §5.11:** PH-S48
+- **Черга §5.11:** поповнюється (research у `docs/`)
 - **BLOCKED:** PH-S35/S16 LAN · **Deferred:** PH-S36/S01 Cloud SDK (FM-041)
 
-## PH-S48 — рекомендована наступна сесія
-- Job store RAID-backed persistence (Architect deferred)
+## PH-S48 — завершено
+- Job store RAID-backed persistence (snapshot у RAID артефактах)
+- Наступна сесія: поповнити чергу §5.11 (research у `docs/`, якщо відкритих <3)
 
 ## Завершення сесії
 1. Закрити спринт у FM §5.11 + HANDOFF
@@ -42,9 +43,7 @@ cargo test-ci
 PH-S03…S47 · PH-S41 macvlan · PH-S46 Solana · повний test-ci --verbose без змін коду
 
 ## Черга §5.11
-| # | Sprint | Фокус |
-|---|--------|--------|
-| 1 | **PH-S48** | Job store RAID-backed |
+- Порожня (research для наступних PH-S* у `docs/`)
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```

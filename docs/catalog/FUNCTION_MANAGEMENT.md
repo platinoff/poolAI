@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-25 (PH-S41 ✅ macvlan Linux · §5.11 PH-S40…S48; FM-041 Deferred).
+**Оновлено:** 2026-05-26 (PH-S41 ✅ macvlan Linux · §5.11 PH-S40…S48; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -162,7 +162,7 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S46** Solana on-chain program hardening + devnet deploy | **§5.11** | **✅** — `wire/limits.rs`, deploy script, `anchor_mode` |
 | — | **PH-S41** macvlan network isolation (Linux) | **§5.11** | **✅** — `NetworkInterfaceMode`, netns move + cleanup |
 | 1 | **PH-S40** hardware VM isolation | **§5.10** | **✅** (HardwareVm best-effort isolation plans) |
-| 2 | **PH-S48** Job store RAID-backed persistence | Architect deferred | **Відкрито** |
+| 2 | **PH-S48** Job store RAID-backed persistence | Architect deferred | **✅** |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
@@ -227,7 +227,7 @@ FM-xxx (з таблиці нижче)
 | **PH-S43** | Monitoring / ML step metrics UI | UI_UX §monitoring, DIGEST §ML | **✅** |
 | **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **✅** — `e2e/package.json` `test:ci` + `ci.yml` paths-filter |
 
-**Наступна сесія (код/CI):** **PH-S48** (job RAID store). **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
+**Наступна сесія (код/CI):** PH-S48 ✅ завершено (job RAID store). Далі: поповніть чергу research у `docs/` (якщо потрібно). **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
 
 ### 5.11 Наступні 10 спринтів PH-S47…S46 (код, 2026-05-25)
 
@@ -248,7 +248,7 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S46** | Solana wire hardening + production devnet deploy path | §5.7, `SOLANA_ADAPTER_CONCEPT` §10 | **✅** |
 | — | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **✅** |
 | 1 | **PH-S40** | hardware VM isolation | §5.10, `vm/mod.rs` | **✅** |
-| 2 | **PH-S48** | Job store RAID-backed | Architect deferred | **Відкрито** |
+| 2 | **PH-S48** | Job store RAID-backed | Architect deferred | **✅** |
 
 **Поза чергою:** **PH-S35** LAN (**BLOCKED**) · **PH-S36** Cloud SDK (**Deferred**, FM-041).
 
@@ -363,7 +363,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S48** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** поповніть чергу research · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

@@ -1,14 +1,21 @@
-//! File-backed job store (post-S38). Set `POOLAI_JOB_DATA_DIR` (e.g. `data/jobs`) to persist
-//! across coordinator restarts; when unset, in-memory only (same as S38 stub).
+//! Job store persistence backends.
+//!
+//! - JSON file (`jobs.json`) by default
+//! - Optional SQLite (`jobs.db`) with `feature = "job-store-sqlite"` and `POOLAI_JOB_STORE=sqlite`
+//! - RAID-backed snapshot when `POOLAI_JOB_STORE=raid` (PH-S48)
+//!
+//! For JSON/SQLite, set `POOLAI_JOB_DATA_DIR` (e.g. `data/jobs`) to persist across restarts.
+//! For RAID, job snapshot is stored as a RAID artifact (logical name constant below).
 //!
 //! Default backend: JSON (`jobs.json`). With `feature = "job-store-sqlite"` and
 //! `POOLAI_JOB_STORE=sqlite`, uses `jobs.db` and migrates legacy `jobs.json` on first open.
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::{LazyLock, Mutex};
+use std::sync::{Arc, LazyLock, Mutex};
 
 use crate::core::error::AppError;
+use crate::raid::{self, RaidManager};
 use chrono::Utc;
 
 use crate::job::onchain::emit_job_completed_if_anchor;
@@ -19,6 +26,7 @@ pub(crate) const JOBS_FILE: &str = "jobs.json";
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum PersistBackend {
     Json,
+    Raid,
     #[cfg(feature = "job-store-sqlite")]
     Sqlite,
 }
@@ -42,20 +50,23 @@ impl JobStore {
         &STORE
     }
 
-    #[cfg(test)]
+    #[cfg(any(test, feature = "test-utils"))]
     pub fn open_for_test(data_dir: Option<PathBuf>) -> Self {
         Self::open(data_dir)
     }
 
     fn open(data_dir: Option<PathBuf>) -> Self {
         let backend = persist_backend_from_env();
-        let jobs = data_dir
-            .as_ref()
-            .map(|d| load_persisted_jobs(d, backend))
-            .transpose()
-            .ok()
-            .flatten()
-            .unwrap_or_default();
+        let jobs = match backend {
+            PersistBackend::Raid => load_jobs_from_raid(raid_manager_from_env()).ok(),
+            _ => data_dir
+                .as_ref()
+                .map(|d| load_persisted_jobs(d, backend))
+                .transpose()
+                .ok()
+                .flatten(),
+        }
+        .unwrap_or_default();
         Self {
             jobs: Mutex::new(jobs),
             data_dir,
@@ -195,20 +206,110 @@ impl JobStore {
     }
 
     fn persist(&self) -> Result<(), AppError> {
-        let Some(dir) = self.data_dir.as_ref() else {
-            return Ok(());
-        };
+        let backend = self.backend;
         let guard = self
             .jobs
             .lock()
             .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
-        persist_jobs(dir, self.backend, &guard)
-            .map_err(|e| AppError::InternalError(format!("persist jobs: {e}")))
+
+        match backend {
+            PersistBackend::Raid => persist_jobs_to_raid(raid_manager_from_env(), &guard),
+            PersistBackend::Json => {
+                let Some(dir) = self.data_dir.as_ref() else {
+                    return Ok(());
+                };
+                persist_jobs(dir, backend, &guard)
+            }
+            #[cfg(feature = "job-store-sqlite")]
+            PersistBackend::Sqlite => {
+                let Some(dir) = self.data_dir.as_ref() else {
+                    return Ok(());
+                };
+                persist_jobs(dir, backend, &guard)
+            }
+        }
+        .map_err(|e| AppError::InternalError(format!("persist jobs: {e}")))
     }
 }
 
 fn job_past_deadline(spec: &JobSpec, now: chrono::DateTime<Utc>) -> bool {
     spec.deadline.is_some_and(|d| d < now)
+}
+
+const RAID_JOBS_SNAPSHOT_NAME: &str = "poolai-jobs-snapshot";
+
+fn raid_manager_from_env() -> Arc<RaidManager> {
+    // Uses RAID module singleton; requires that `POOLAI_RAID_BASE_PATH` was set before first use.
+    raid::get_global_manager()
+}
+
+fn block_on_result<T, F>(fut: F) -> Result<T, String>
+where
+    F: std::future::Future<Output = Result<T, String>>,
+{
+    if let Ok(handle) = tokio::runtime::Handle::try_current() {
+        handle.block_on(fut)
+    } else {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .map_err(|e| e.to_string())?;
+        rt.block_on(fut)
+    }
+}
+
+fn load_jobs_from_raid(manager: Arc<RaidManager>) -> Result<Vec<JobRecord>, String> {
+    block_on_result(async move {
+        let artifacts = manager.list_artifacts().await;
+        let mut snapshots = artifacts
+            .into_iter()
+            .filter(|a| a.name == RAID_JOBS_SNAPSHOT_NAME)
+            .collect::<Vec<_>>();
+
+        if snapshots.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Pick the newest snapshot by timestamp.
+        snapshots.sort_by_key(|a| a.stored_at);
+        let latest = snapshots
+            .last()
+            .ok_or_else(|| "raid: missing latest snapshot".to_string())?;
+
+        let bytes = manager
+            .get_artifact(&latest.path)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let file: JobsFile =
+            serde_json::from_slice(&bytes).map_err(|e| format!("parse jobs snapshot: {e}"))?;
+        Ok(file.jobs)
+    })
+}
+
+fn persist_jobs_to_raid(manager: Arc<RaidManager>, jobs: &[JobRecord]) -> Result<(), String> {
+    block_on_result(async move {
+        let snapshot = JobsFile {
+            jobs: jobs.to_vec(),
+        };
+        let bytes =
+            serde_json::to_vec(&snapshot).map_err(|e| format!("serialize jobs snapshot: {e}"))?;
+
+        // Store new snapshot as a RAID artifact; then delete older snapshots with the same logical name.
+        let new_artifact = manager
+            .put_artifact(RAID_JOBS_SNAPSHOT_NAME, &bytes)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let artifacts = manager.list_artifacts().await;
+        for a in artifacts {
+            if a.name == RAID_JOBS_SNAPSHOT_NAME && a.id != new_artifact.id {
+                let _ = manager.delete_artifact(a.id).await;
+            }
+        }
+
+        Ok(())
+    })
 }
 
 pub fn data_dir_from_env() -> Option<PathBuf> {
@@ -219,9 +320,13 @@ pub fn data_dir_from_env() -> Option<PathBuf> {
 }
 
 fn persist_backend_from_env() -> PersistBackend {
-    let want_sqlite = std::env::var("POOLAI_JOB_STORE")
-        .map(|v| v.trim().eq_ignore_ascii_case("sqlite"))
-        .unwrap_or(false);
+    let want = std::env::var("POOLAI_JOB_STORE").unwrap_or_else(|_| "".to_string());
+    let want = want.trim();
+    if want.eq_ignore_ascii_case("raid") {
+        return PersistBackend::Raid;
+    }
+
+    let want_sqlite = want.eq_ignore_ascii_case("sqlite");
     #[cfg(feature = "job-store-sqlite")]
     {
         if want_sqlite {
@@ -242,6 +347,7 @@ fn load_persisted_jobs(dir: &Path, backend: PersistBackend) -> Result<Vec<JobRec
             let path = dir.join(JOBS_FILE);
             load_jobs_file(&path)
         }
+        PersistBackend::Raid => load_jobs_from_raid(raid_manager_from_env()),
         #[cfg(feature = "job-store-sqlite")]
         PersistBackend::Sqlite => super::store_sqlite::load(dir),
     }
@@ -256,6 +362,7 @@ fn persist_jobs(dir: &Path, backend: PersistBackend, jobs: &[JobRecord]) -> Resu
             };
             write_json_atomic(&path, &snapshot)
         }
+        PersistBackend::Raid => persist_jobs_to_raid(raid_manager_from_env(), jobs),
         #[cfg(feature = "job-store-sqlite")]
         PersistBackend::Sqlite => super::store_sqlite::persist(dir, jobs),
     }
