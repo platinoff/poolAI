@@ -68,6 +68,8 @@ cd /s/rust/poolAI
 bash bin/run-poolai.sh virtual-node
 # після ~50 с:
 bash bin/verify-dev-stand.sh
+# опційно RAID job persist (PH-S54): coordinator з raid store, потім:
+# VERIFY_RAID_JOB_STORE=1 bash bin/verify-dev-stand.sh
 bash bin/run-poolai.sh stop
 ```
 

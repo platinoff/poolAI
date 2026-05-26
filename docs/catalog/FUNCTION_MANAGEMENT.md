@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-26 (PH-S53 ✅ Admin jobs UI · §5.11 PH-S54…S61; FM-041 Deferred).
+**Оновлено:** 2026-05-26 (PH-S54 ✅ verify-dev-stand RAID step · §5.11 PH-S55…S61; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -244,7 +244,7 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S54** | `verify-dev-stand` optional RAID job store step | `bin/verify-dev-stand.sh`, PH-S48 | env-gated: create job, restart coordinator, assert persisted | відкрито |
+| 1 | **PH-S54** | `verify-dev-stand` optional RAID job store step | `bin/verify-dev-stand.sh`, PH-S48 | env-gated: create job, restart coordinator, assert persisted | **✅** |
 | 2 | **PH-S55** | `run-poolai` / LAN preset для RAID jobs | `RUN_LOCAL.md`, `bin/run-poolai.sh` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` | відкрито |
 | 3 | **PH-S56** | Grid ↔ job dispatch contract tests | `src/grid/dispatch.rs`, FM-020 | integration: grid result → job status transition | відкрито |
 | 4 | **PH-S57** | Linux VM isolation CI matrix + docs | `Cargo.toml` features, `README.md` | `vm-isolation-linux` у dev doc; when to enable on Linux host | відкрито |

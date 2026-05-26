@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # FM-003 / FM-016+++: health + virtual-node bootstrap checks for local dev stand.
+# PH-S54: optional RAID job store step (VERIFY_RAID_JOB_STORE=1, coordinator on raid backend).
 set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 COORD_PORT="${COORD_PORT:-8080}"
 WORKER_PORT="${WORKER_PORT:-9090}"
@@ -12,6 +15,9 @@ TASK_RETRIES="${VERIFY_TASK_RETRIES:-12}"
 TASK_SLEEP="${VERIFY_TASK_SLEEP:-5}"
 MIN_COMPLETED="${VERIFY_MIN_COMPLETED:-4}"
 VERIFY_ML_PIPELINE="${VERIFY_ML_PIPELINE:-1}"
+VERIFY_RAID_JOB_STORE="${VERIFY_RAID_JOB_STORE:-0}"
+HEALTH_RETRIES="${VERIFY_HEALTH_RETRIES:-45}"
+HEALTH_SLEEP="${VERIFY_HEALTH_SLEEP:-2}"
 
 COORD_URL="http://127.0.0.1:${COORD_PORT}"
 ML_DEMO_URL="${COORD_URL}/api/enterprise/ai-ml/pipeline/demo"
@@ -31,6 +37,139 @@ json_field() {
   local json="$1"
   local field="$2"
   echo "$json" | sed -n "s/.*\"${field}\":\s*\([0-9][0-9]*\).*/\1/p" | head -1
+}
+
+json_string_field() {
+  local json="$1"
+  local field="$2"
+  echo "$json" | sed -n "s/.*\"${field}\":\"\([^\"]*\)\".*/\1/p" | head -1
+}
+
+wait_coord_health() {
+  local attempt=0
+  while [[ "$attempt" -lt "$HEALTH_RETRIES" ]]; do
+    if curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/health" >/dev/null; then
+      return 0
+    fi
+    attempt=$((attempt + 1))
+    sleep "$HEALTH_SLEEP"
+  done
+  echo "FAIL coordinator health not ready after restart (${COORD_URL})"
+  return 1
+}
+
+resolve_poolai_bin() {
+  local p
+  for p in \
+    "${POOLAI_BIN:-}" \
+    "$ROOT/target/release/poolai.exe" \
+    "$ROOT/target/release/poolai" \
+    "$ROOT/target/debug/poolai.exe" \
+    "$ROOT/target/debug/poolai"; do
+    [[ -n "$p" && -x "$p" ]] && {
+      echo "$p"
+      return 0
+    }
+  done
+  return 1
+}
+
+kill_listener_on_port() {
+  local port="$1"
+  local pid=""
+  if command -v netstat >/dev/null 2>&1; then
+    pid="$(
+      netstat -ano 2>/dev/null \
+        | grep -E ":${port}[[:space:]]" \
+        | grep -Ei 'LISTEN' \
+        | awk '{print $NF}' \
+        | head -1
+    )"
+  fi
+  if [[ -z "$pid" || "$pid" == "0" ]]; then
+    return 0
+  fi
+  kill "$pid" 2>/dev/null || taskkill //PID "$pid" //F 2>/dev/null || true
+  local i
+  for ((i = 0; i < 10; i++)); do
+    kill -0 "$pid" 2>/dev/null || return 0
+    sleep 1
+  done
+}
+
+restart_coordinator() {
+  if [[ -n "${POOLAI_E2E_STAND_ROOT:-}" && -x "${POOLAI_E2E_STAND_ROOT}/restart.sh" ]]; then
+    bash "${POOLAI_E2E_STAND_ROOT}/restart.sh"
+    wait_coord_health
+    return
+  fi
+
+  local raid="${POOLAI_RAID_BASE_PATH:-$ROOT/data/dev/single/raid}"
+  local data="${POOLAI_DATA_PATH:-$ROOT/data/dev/single}"
+  local job_store="${POOLAI_JOB_STORE:-raid}"
+  local bin log
+  bin="$(resolve_poolai_bin)" || {
+    echo "FAIL restart: poolai binary not found (build or set POOLAI_BIN)"
+    return 1
+  }
+
+  kill_listener_on_port "$COORD_PORT"
+  sleep 2
+
+  log="${POOLAI_VERIFY_LOG:-$ROOT/data/dev/logs/verify-restart-${COORD_PORT}.log}"
+  mkdir -p "$(dirname "$log")"
+  echo "  ... restarting coordinator (job_store=${job_store}, raid=${raid})"
+  POOLAI_HTTP_PORT="$COORD_PORT" \
+    POOLAI_RAID_BASE_PATH="$raid" \
+    POOLAI_DATA_PATH="$data" \
+    POOLAI_JOB_STORE="$job_store" \
+    RUST_LOG="${RUST_LOG:-warn}" \
+    nohup "$bin" >"$log" 2>&1 &
+  wait_coord_health
+}
+
+verify_raid_job_store() {
+  local jobs_json backend job_json job_id detail_json got_id got_kind got_status
+
+  jobs_json="$(curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/jobs" || true)"
+  if [[ -z "$jobs_json" ]]; then
+    echo "FAIL RAID job store: GET /api/v1/jobs unavailable"
+    return 1
+  fi
+
+  backend="$(json_string_field "$jobs_json" "store_backend")"
+  if [[ "$backend" != "raid" ]]; then
+    echo "SKIP RAID job store -> store_backend=${backend:-?} (need raid; start with POOLAI_JOB_STORE=raid and POOLAI_RAID_BASE_PATH before poolai)"
+    return 0
+  fi
+  echo "OK  job store backend -> raid"
+
+  job_json="$(
+    curl -sf --max-time "$TIMEOUT" -X POST "${COORD_URL}/api/v1/jobs" \
+      -H "Content-Type: application/json" \
+      -d '{"kind":"inference","priority":7,"input_artifact_ids":["ph-s54-raid-smoke"]}' \
+      || true
+  )"
+  job_id="$(json_string_field "$job_json" "id")"
+  if [[ -z "$job_id" ]]; then
+    echo "FAIL RAID job store: POST /api/v1/jobs did not return id"
+    return 1
+  fi
+  echo "OK  RAID job create -> id=${job_id}"
+
+  restart_coordinator || return 1
+  echo "OK  coordinator restart -> health"
+
+  detail_json="$(curl -sf --max-time "$TIMEOUT" "${COORD_URL}/api/v1/jobs/${job_id}" || true)"
+  if [[ -z "$detail_json" ]] \
+    || ! echo "$detail_json" | grep -q "\"id\":\"${job_id}\"" \
+    || ! echo "$detail_json" | grep -q '"kind":"inference"' \
+    || ! echo "$detail_json" | grep -q '"status":"scheduled"'; then
+    echo "FAIL RAID job persist after restart (GET /jobs/${job_id})"
+    return 1
+  fi
+  echo "OK  RAID job persist -> GET /jobs/${job_id} (inference, scheduled)"
+  return 0
 }
 
 fail=0
@@ -110,8 +249,12 @@ if [[ "$VERIFY_ML_PIPELINE" == "1" ]]; then
   fi
 fi
 
+if [[ "$VERIFY_RAID_JOB_STORE" == "1" ]]; then
+  verify_raid_job_store || fail=1
+fi
+
 if [[ "$fail" -ne 0 ]]; then
   echo "Dev stand verification failed."
   exit 1
 fi
-echo "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled)."
+echo "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled + optional RAID job store)."

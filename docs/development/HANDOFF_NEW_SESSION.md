@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 (PH-S53 ✅ Admin jobs UI · §5.11 PH-S54…S61) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-26 (PH-S54 ✅ verify-dev-stand RAID job step · §5.11 PH-S55…S61) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -20,7 +20,8 @@
 **PH-S51 ✅:** Linux veth create on host → `unshare` → peer in netns; tracked cleanup on remove (`vm-isolation-linux`).
 **PH-S52 ✅:** Playwright `jobs_raid.spec.ts` (POST job → restart stand → GET); `POOLAI_JOB_STORE=raid` у `e2e-playwright.sh --start`; fix RAID persist `block_on` з HTTP handlers (`src/job/store.rs`).
 **PH-S53 ✅:** `/ui/admin/jobs` — таблиця задач, badge `json`/`sqlite`/`raid` з `GET /api/v1/jobs` (`store_backend`).
-**Черга:** §5.11 **PH-S54…S61** (8 відкритих); наступний код — **PH-S54**.
+**PH-S54 ✅:** `bin/verify-dev-stand.*` — `VERIFY_RAID_JOB_STORE=1`: POST job → restart coordinator → GET persisted (патерн PH-S52 / `job_store_raid_persistence`).
+**Черга:** §5.11 **PH-S55…S61** (7 відкритих); наступний код — **PH-S55**.
 
 ## 1. Канонічний порядок документації та планів
 
@@ -84,7 +85,7 @@
 |--------|-------------|
 | `bin/run-lan-nodes.ps1` / `.sh` | Два `poolai` на 8080+8081 |
 | `bin/run-virtual-node-dev.ps1` / `.sh` | Coordinator + `poolai-worker` |
-| `bin/verify-dev-stand.ps1` / `.sh` | Health + discovery + pool join + bootstrap tasks (>=4) + ML pipeline demo (PH-S17) |
+| `bin/verify-dev-stand.ps1` / `.sh` | Health + discovery + pool join + bootstrap tasks (>=4) + ML pipeline demo (PH-S17); опційно `VERIFY_RAID_JOB_STORE=1` — RAID job persist після restart (PH-S54) |
 | `bin/verify-lan-prep.ps1` / `.sh` | FM-027: dual-port or `POOLAI_NODE_*_URL` health + discovery peers |
 | `bin/capture-p2b-single-host-metrics.ps1` / `.sh` | FM-028: `run-lan-nodes` + health_load ×2 + TQ01 snapshot → `data/lan-stand/metrics-fm028-*.json` |
 

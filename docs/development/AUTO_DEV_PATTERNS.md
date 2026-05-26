@@ -288,6 +288,7 @@
 - **Де:** `bin/run-virtual-node-dev.sh`, `bin/verify-dev-stand.sh`
 - **Патерн:** coordinator :8080 + worker :9090; `POOLAI_VIRTUAL_NODE_DATA_DIR` under `data/lan-stand/virtual-node`
 - **Перевірка:** `bash bin/run-virtual-node-dev.sh`; `bash bin/verify-dev-stand.sh` (warmup 50s, discovery/pool/tasks>=4, optional ML demo `VERIFY_ML_PIPELINE=1`)
+- **PH-S54 RAID jobs (optional):** `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH` **до** старту coordinator; `VERIFY_RAID_JOB_STORE=1 bash bin/verify-dev-stand.sh` — POST `/api/v1/jobs` → restart (e2e `restart.sh` або dev inline) → GET persisted; SKIP якщо `store_backend` ≠ `raid`
 
 ### [Workers] Telegram bot → coordinator webhook
 - **Де:** `src/tgbot/coordinator.rs`, `src/bin/poolai-telegram-bot.rs`

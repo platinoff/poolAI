@@ -1,4 +1,5 @@
 # FM-003 / FM-016+++: health + virtual-node bootstrap checks for local dev stand.
+# PH-S54: optional RAID job store step (VERIFY_RAID_JOB_STORE=1).
 param(
     [int]$CoordinatorPort = 8080,
     [int]$WorkerPort = 9090,
@@ -9,12 +10,101 @@ param(
     [int]$TaskRetries = 12,
     [int]$TaskSleepSecs = 5,
     [int]$MinCompleted = 4,
-    [int]$VerifyMlPipeline = 1
+    [int]$VerifyMlPipeline = 1,
+    [int]$VerifyRaidJobStore = $(if ($env:VERIFY_RAID_JOB_STORE -eq "1") { 1 } else { 0 })
 )
 
 $ErrorActionPreference = "Continue"
+$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $CoordUrl = "http://127.0.0.1:$CoordinatorPort"
 $fail = 0
+
+function Wait-CoordHealth {
+    param([int]$Retries = 45, [int]$SleepSec = 2)
+    for ($i = 0; $i -lt $Retries; $i++) {
+        try {
+            Invoke-WebRequest -Uri "$CoordUrl/api/v1/health" -TimeoutSec $TimeoutSec -UseBasicParsing | Out-Null
+            return $true
+        } catch {
+            Start-Sleep -Seconds $SleepSec
+        }
+    }
+    return $false
+}
+
+function Get-PoolaiExe {
+    $candidates = @(
+        $env:POOLAI_BIN,
+        (Join-Path $RepoRoot "target\release\poolai.exe"),
+        (Join-Path $RepoRoot "target\debug\poolai.exe")
+    ) | Where-Object { $_ -and (Test-Path -LiteralPath $_) }
+    return $candidates | Select-Object -First 1
+}
+
+function Stop-ListenerOnPort {
+    param([int]$Port)
+    $lines = netstat -ano 2>$null | Select-String ":$Port\s" | Select-String "LISTEN"
+    if (-not $lines) { return }
+    $listenerPid = ($lines[0].ToString() -split '\s+')[-1]
+    if ($listenerPid -and $listenerPid -ne "0") {
+        Stop-Process -Id ([int]$listenerPid) -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Restart-Coordinator {
+    $standRoot = $env:POOLAI_E2E_STAND_ROOT
+    if ($standRoot -and (Test-Path -LiteralPath (Join-Path $standRoot "restart.sh"))) {
+        & (Join-Path $RepoRoot "bin\poolai-msys.ps1") -lc "bash '$standRoot/restart.sh'"
+        if (-not (Wait-CoordHealth)) { throw "health not ready after e2e restart" }
+        return
+    }
+    $raid = if ($env:POOLAI_RAID_BASE_PATH) { $env:POOLAI_RAID_BASE_PATH } else { Join-Path $RepoRoot "data\dev\single\raid" }
+    $data = if ($env:POOLAI_DATA_PATH) { $env:POOLAI_DATA_PATH } else { Join-Path $RepoRoot "data\dev\single" }
+    $jobStore = if ($env:POOLAI_JOB_STORE) { $env:POOLAI_JOB_STORE } else { "raid" }
+    $exe = Get-PoolaiExe
+    if (-not $exe) { throw "poolai.exe not found (build or set POOLAI_BIN)" }
+    Stop-ListenerOnPort -Port $CoordinatorPort
+    Start-Sleep -Seconds 2
+    $logDir = Join-Path $RepoRoot "data\dev\logs"
+    New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+    $log = Join-Path $logDir "verify-restart-$CoordinatorPort.log"
+    $env:POOLAI_HTTP_PORT = "$CoordinatorPort"
+    $env:POOLAI_RAID_BASE_PATH = $raid
+    $env:POOLAI_DATA_PATH = $data
+    $env:POOLAI_JOB_STORE = $jobStore
+    Write-Host "  ... restarting coordinator (job_store=$jobStore)" -ForegroundColor DarkGray
+    Start-Process -FilePath $exe -RedirectStandardOutput $log -RedirectStandardError $log -WindowStyle Hidden | Out-Null
+    if (-not (Wait-CoordHealth)) { throw "health not ready after dev restart" }
+}
+
+function Test-RaidJobStore {
+    try {
+        $list = Invoke-RestMethod -Uri "$CoordUrl/api/v1/jobs" -TimeoutSec $TimeoutSec
+        if ($list.store_backend -ne "raid") {
+            Write-Host "SKIP RAID job store -> store_backend=$($list.store_backend) (need raid + POOLAI_JOB_STORE=raid before start)" -ForegroundColor DarkYellow
+            return
+        }
+        Write-Host "OK  job store backend -> raid" -ForegroundColor Green
+        $body = @{
+            kind               = "inference"
+            priority           = 7
+            input_artifact_ids = @("ph-s54-raid-smoke")
+        } | ConvertTo-Json
+        $created = Invoke-RestMethod -Method Post -Uri "$CoordUrl/api/v1/jobs" -Body $body -ContentType "application/json" -TimeoutSec $TimeoutSec
+        if (-not $created.id) { throw "POST /jobs missing id" }
+        Write-Host "OK  RAID job create -> id=$($created.id)" -ForegroundColor Green
+        Restart-Coordinator
+        Write-Host "OK  coordinator restart -> health" -ForegroundColor Green
+        $detail = Invoke-RestMethod -Uri "$CoordUrl/api/v1/jobs/$($created.id)" -TimeoutSec $TimeoutSec
+        if ($detail.job.spec.id -ne $created.id -or $detail.job.spec.kind -ne "inference" -or $detail.job.status -ne "scheduled") {
+            throw "GET job mismatch after restart"
+        }
+        Write-Host "OK  RAID job persist -> GET /jobs/$($created.id) (inference, scheduled)" -ForegroundColor Green
+    } catch {
+        Write-Host "FAIL RAID job store -> $($_.Exception.Message)" -ForegroundColor Red
+        $script:fail = 1
+    }
+}
 
 function Test-Endpoint {
     param([string]$Name, [string]$Url, [switch]$Optional)
@@ -129,5 +219,9 @@ if ($VerifyMlPipeline -eq 1) {
     }
 }
 
+if ($VerifyRaidJobStore -eq 1) {
+    Test-RaidJobStore
+}
+
 if ($fail -ne 0) { exit 1 }
-Write-Host "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled)." -ForegroundColor Cyan
+Write-Host "Dev stand verification passed (health + virtual-node bootstrap + ML pipeline demo when enabled + optional RAID job store)." -ForegroundColor Cyan
