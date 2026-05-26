@@ -285,14 +285,18 @@ Then restart your terminal.
    ```
 
 5. **Run the application** — канон: [`docs/development/RUN_LOCAL.md`](docs/development/RUN_LOCAL.md)
+   ```powershell
+   # Windows PowerShell (без WSL)
+   cd S:\rust\poolAI
+   .\bin\run-poolai.ps1 build
+   .\bin\run-poolai.ps1 single -Background -SkipBuild
+   # Login http://127.0.0.1:8080/ui/login  →  admin / admin123
+   ```
    ```bash
-   # MSYS2 UCRT64 (рекомендовано на Windows)
-   export PATH="$HOME/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
-   export K8S_OPENAPI_ENABLED_VERSION=1.28
+   # MSYS2 UCRT64 (зовнішнє вікно; не голе "bash" — WSL stub)
+   export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
    cd /s/rust/poolAI
-
-   bash bin/run-poolai.sh build
-   bash bin/run-poolai.sh single    # http://127.0.0.1:8080/ui  admin/admin123
+   /usr/bin/bash bin/run-poolai.sh single --bg --skip-build
    ```
 
 ## 🚀 Usage
@@ -301,13 +305,14 @@ Then restart your terminal.
 
 **Єдиний лаунчер** (single / LAN / virtual-node / Docker):
 
-```bash
-bash bin/run-poolai.sh help
-bash bin/run-poolai.sh single
-bash bin/run-poolai.sh virtual-node
-bash bin/run-poolai.sh lan
-bash bin/run-poolai.sh stop
+```powershell
+.\bin\run-poolai.ps1 help
+.\bin\run-poolai.ps1 single -Background
+.\bin\run-poolai.ps1 stop
+.\bin\poolai-msys.ps1 bin/e2e-playwright.sh --start   # bash-скрипти з PS
 ```
+
+MSYS2: `/usr/bin/bash bin/run-poolai.sh …` — див. [`.cursor/commands/run-poolai.md`](.cursor/commands/run-poolai.md).
 
 Повний runbook: [`docs/development/RUN_LOCAL.md`](docs/development/RUN_LOCAL.md).
 

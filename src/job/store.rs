@@ -74,6 +74,16 @@ impl JobStore {
         }
     }
 
+    /// Active persistence backend label for admin UI / OpenAPI (`json`, `sqlite`, `raid`).
+    pub fn store_backend_label(&self) -> &'static str {
+        match self.backend {
+            PersistBackend::Json => "json",
+            PersistBackend::Raid => "raid",
+            #[cfg(feature = "job-store-sqlite")]
+            PersistBackend::Sqlite => "sqlite",
+        }
+    }
+
     pub fn list(&self) -> Result<Vec<JobRecord>, AppError> {
         let guard = self
             .jobs
@@ -245,16 +255,24 @@ fn raid_manager_from_env() -> Arc<RaidManager> {
 
 fn block_on_result<T, F>(fut: F) -> Result<T, String>
 where
-    F: std::future::Future<Output = Result<T, String>>,
+    F: std::future::Future<Output = Result<T, String>> + Send + 'static,
+    T: Send + 'static,
 {
-    if let Ok(handle) = tokio::runtime::Handle::try_current() {
-        handle.block_on(fut)
-    } else {
+    let run_on_runtime = |fut: F| -> Result<T, String> {
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
             .map_err(|e| e.to_string())?;
         rt.block_on(fut)
+    };
+
+    // `Handle::block_on` panics when called from an async worker thread (HTTP handlers).
+    if tokio::runtime::Handle::try_current().is_ok() {
+        std::thread::spawn(move || run_on_runtime(fut))
+            .join()
+            .map_err(|_| "raid io thread panicked".to_string())?
+    } else {
+        run_on_runtime(fut)
     }
 }
 
@@ -288,10 +306,9 @@ fn load_jobs_from_raid(manager: Arc<RaidManager>) -> Result<Vec<JobRecord>, Stri
 }
 
 fn persist_jobs_to_raid(manager: Arc<RaidManager>, jobs: &[JobRecord]) -> Result<(), String> {
+    let jobs = jobs.to_vec();
     block_on_result(async move {
-        let snapshot = JobsFile {
-            jobs: jobs.to_vec(),
-        };
+        let snapshot = JobsFile { jobs };
         let bytes =
             serde_json::to_vec(&snapshot).map_err(|e| format!("serialize jobs snapshot: {e}"))?;
 

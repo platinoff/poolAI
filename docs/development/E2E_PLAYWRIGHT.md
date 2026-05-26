@@ -5,9 +5,10 @@
 | Spec | Сценарії |
 |------|----------|
 | `smoke.spec.ts` | login → `/ui` → `/ui/admin/users` (`#users-list`) |
-| `admin.spec.ts` | tenants; monitoring; security (**PH-S27** rotation tab + OAuth2); audit; raid; topology; workers; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
+| `admin.spec.ts` | tenants; monitoring; security (**PH-S27** rotation tab + OAuth2); audit; raid; topology; workers; **jobs (PH-S53)**; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
+| `jobs_raid.spec.ts` | **PH-S52:** API smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start` |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
@@ -58,4 +59,6 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 - **PH-S44 ✅** — required CI gate: `test:ci` includes visual + axe on UI/e2e path changes (`ci.yml` paths-filter)
 - **PH-S45 ✅** — E2E stability: vm create via UI button + POST/DELETE wait (`admin.spec.ts`); axe `/ui/admin/audit` settle (`helpers.ts`); viewport 1920 for visual snapshots
 
-**Last updated:** 2026-05-25 (PH-S45 E2E stability; PH-S44 visual in test:ci).
+**PH-S52 ✅:** `jobs_raid` у `npm run test:ci`; `--start` виставляє `POOLAI_JOB_STORE=raid` + `restart.sh` у stand dir.
+
+**Last updated:** 2026-05-26 (PH-S52 jobs RAID persistence E2E).

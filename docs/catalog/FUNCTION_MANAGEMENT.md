@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-26 (PH-S51 ✅ VM Linux veth/netns · §5.11 PH-S52…S61; FM-041 Deferred).
+**Оновлено:** 2026-05-26 (PH-S53 ✅ Admin jobs UI · §5.11 PH-S54…S61; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -166,6 +166,8 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S49** Job store RAID ops/docs + §5.11 research | PH-S48 follow-up, DOCS_LEGACY | **✅** — HANDOFF/RUN_LOCAL; черга PH-S50…S59 |
 | — | **PH-S50** OpenAPI + DIGEST jobs / `POOLAI_JOB_STORE=raid` | OPENAPI_GAP, DIGEST | **✅** — `JobStoreBackend` schema; Jobs tag; gap-audit 0 |
 | 3 | **PH-S51** VM Linux isolation hardening | `vm/isolation/linux.rs` | **✅** — veth host→netns, tracked cleanup, unit + linux apply/remove test |
+| 4 | **PH-S52** E2E jobs + RAID persistence smoke | `e2e/`, `job/store.rs` | **✅** — `jobs_raid.spec.ts`; raid `block_on` fix; `test:ci` |
+| 5 | **PH-S53** Admin jobs UI + store badge | `src/ui/admin/jobs.rs` | **✅** — `/ui/admin/jobs`; `GET /jobs` → `store_backend` |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
@@ -238,20 +240,18 @@ FM-xxx (з таблиці нижче)
 
 **Джерела (пріоритет):** локальні failures → §5.10 → [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) → Architect / UI_UX / [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md).
 
-**Закрито (не в §5.11):** PH-S47…S51 ✅ (S51 — veth host/netns hardening + cleanup tracking).
+**Закрито (не в §5.11):** PH-S47…S53 ✅ (S53 — `/ui/admin/jobs` + `store_backend` in list API).
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S52** | E2E: job lifecycle + RAID persistence smoke | `e2e/`, `job_store_raid_persistence.rs` | Playwright або API helper: POST job → restart stand → GET job | відкрито |
-| 2 | **PH-S53** | Admin UX: jobs panel + store backend hint | DIGEST §Job, UI_QUALITY | `/ui/admin/jobs` (або секція): list jobs, badge `json`/`sqlite`/`raid` | відкрито |
-| 3 | **PH-S54** | `verify-dev-stand` optional RAID job store step | `bin/verify-dev-stand.sh`, PH-S48 | env-gated: create job, restart coordinator, assert persisted | відкрито |
-| 4 | **PH-S55** | `run-poolai` / LAN preset для RAID jobs | `RUN_LOCAL.md`, `bin/run-poolai.sh` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` | відкрито |
-| 5 | **PH-S56** | Grid ↔ job dispatch contract tests | `src/grid/dispatch.rs`, FM-020 | integration: grid result → job status transition | відкрито |
-| 6 | **PH-S57** | Linux VM isolation CI matrix + docs | `Cargo.toml` features, `README.md` | `vm-isolation-linux` у dev doc; when to enable on Linux host | відкрито |
-| 7 | **PH-S58** | JOB_LAYER + AUTO_DEV RAID store runbook | `JOB_LAYER_CONCEPT`, `AUTO_DEV_PATTERNS` | §persistence: json/sqlite/raid table + migrate notes | відкрито |
-| 8 | **PH-S59** | `RUN_PARAMETERS.md` POOLAI_JOB_* sync | `RUN_PARAMETERS.md`, HANDOFF §2a | повна таблиця `POOLAI_JOB_STORE` / `POOLAI_JOB_DATA_DIR` / RAID order | відкрито |
-| 9 | **PH-S60** | OpenAPI gap audit maintenance gate | `OPENAPI_GAP_AUDIT`, `ci.yml` | при нових `/api/v1/*` routes — оновлення yaml + audit у PR checklist | відкрито |
-| 10 | **PH-S61** | VM isolation docs (Linux veth/macvlan runbook) | `RUN_LOCAL.md`, DIGEST | when to use veth vs macvlan; `vm-isolation-linux` build flag | відкрито |
+| 1 | **PH-S54** | `verify-dev-stand` optional RAID job store step | `bin/verify-dev-stand.sh`, PH-S48 | env-gated: create job, restart coordinator, assert persisted | відкрито |
+| 2 | **PH-S55** | `run-poolai` / LAN preset для RAID jobs | `RUN_LOCAL.md`, `bin/run-poolai.sh` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` | відкрито |
+| 3 | **PH-S56** | Grid ↔ job dispatch contract tests | `src/grid/dispatch.rs`, FM-020 | integration: grid result → job status transition | відкрито |
+| 4 | **PH-S57** | Linux VM isolation CI matrix + docs | `Cargo.toml` features, `README.md` | `vm-isolation-linux` у dev doc; when to enable on Linux host | відкрито |
+| 5 | **PH-S58** | JOB_LAYER + AUTO_DEV RAID store runbook | `JOB_LAYER_CONCEPT`, `AUTO_DEV_PATTERNS` | §persistence: json/sqlite/raid table + migrate notes | відкрито |
+| 6 | **PH-S59** | `RUN_PARAMETERS.md` POOLAI_JOB_* sync | `RUN_PARAMETERS.md`, HANDOFF §2a | повна таблиця `POOLAI_JOB_STORE` / `POOLAI_JOB_DATA_DIR` / RAID order | відкрито |
+| 7 | **PH-S60** | OpenAPI gap audit maintenance gate | `OPENAPI_GAP_AUDIT`, `ci.yml` | при нових `/api/v1/*` routes — оновлення yaml + audit у PR checklist | відкрито |
+| 8 | **PH-S61** | VM isolation docs (Linux veth/macvlan runbook) | `RUN_LOCAL.md`, DIGEST | when to use veth vs macvlan; `vm-isolation-linux` build flag | відкрито |
 
 **Поза чергою:** **PH-S35** / **PH-S16** / **PH-S02** LAN (**BLOCKED**) · **PH-S36** / **PH-S01** / **PH-S15** Cloud SDK (**Deferred**, FM-041).
 

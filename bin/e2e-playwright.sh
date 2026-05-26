@@ -70,15 +70,47 @@ start_poolai() {
   export TEMP="${TEMP:-/tmp}"
   STAND_ROOT="/tmp/poolai-e2e-$$"
   mkdir -p "${STAND_ROOT}/raid" "${STAND_ROOT}/data"
+  export POOLAI_E2E_STAND_ROOT="${STAND_ROOT}"
+  export POOLAI_JOB_STORE="${POOLAI_JOB_STORE:-raid}"
   local bin
   bin="$(resolve_poolai_bin)"
-  echo "Starting poolai (${bin}) on port ${PORT}..."
+  cat >"${STAND_ROOT}/stand.env" <<EOF
+POOLAI_HTTP_PORT=${PORT}
+POOLAI_RAID_BASE_PATH=${STAND_ROOT}/raid
+POOLAI_DATA_PATH=${STAND_ROOT}/data
+POOLAI_JOB_STORE=${POOLAI_JOB_STORE}
+POOLAI_E2E_PROFILE=${POOLAI_E2E_PROFILE:-release}
+RUST_LOG=${RUST_LOG:-warn}
+K8S_OPENAPI_ENABLED_VERSION=${K8S_OPENAPI_ENABLED_VERSION}
+POOLAI_BIN=${bin}
+EOF
+  cat >"${STAND_ROOT}/restart.sh" <<'RESTART_EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+STAND_ROOT="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=/dev/null
+source "${STAND_ROOT}/stand.env"
+if [[ -f "${STAND_ROOT}/pid" ]]; then
+  old_pid="$(cat "${STAND_ROOT}/pid")"
+  if kill -0 "${old_pid}" 2>/dev/null; then
+    kill "${old_pid}" 2>/dev/null || true
+    wait "${old_pid}" 2>/dev/null || true
+  fi
+fi
+export POOLAI_HTTP_PORT POOLAI_RAID_BASE_PATH POOLAI_DATA_PATH POOLAI_JOB_STORE RUST_LOG K8S_OPENAPI_ENABLED_VERSION
+"${POOLAI_BIN}" >"${STAND_ROOT}/poolai.log" 2>&1 &
+echo $! >"${STAND_ROOT}/pid"
+RESTART_EOF
+  chmod +x "${STAND_ROOT}/restart.sh"
+  echo "Starting poolai (${bin}) on port ${PORT} (job store: ${POOLAI_JOB_STORE})..."
   POOLAI_HTTP_PORT="${PORT}" \
     POOLAI_RAID_BASE_PATH="${STAND_ROOT}/raid" \
     POOLAI_DATA_PATH="${STAND_ROOT}/data" \
+    POOLAI_JOB_STORE="${POOLAI_JOB_STORE}" \
     RUST_LOG="${RUST_LOG:-warn}" \
     "${bin}" >"${STAND_ROOT}/poolai.log" 2>&1 &
   POOLAI_PID=$!
+  echo "${POOLAI_PID}" >"${STAND_ROOT}/pid"
   wait_health 90
 }
 

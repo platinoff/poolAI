@@ -43,6 +43,7 @@ struct JobSummary {
 
 #[derive(Serialize)]
 struct JobsListResponse {
+    store_backend: &'static str,
     jobs: Vec<JobSummary>,
 }
 
@@ -88,7 +89,10 @@ async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListRespon
             vm_id: r.vm_id,
         })
         .collect();
-    Ok(Json(JobsListResponse { jobs }))
+    Ok(Json(JobsListResponse {
+        store_backend: store().store_backend_label(),
+        jobs,
+    }))
 }
 
 async fn create_job(

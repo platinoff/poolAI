@@ -1,4 +1,6 @@
-# PoolAI — локальний лаунчер (PowerShell). Документація: docs/development/RUN_LOCAL.md
+# PoolAI — локальний лаунчер (PowerShell, без WSL).
+# Документація: docs/development/RUN_LOCAL.md
+#Requires -Version 5.1
 param(
     [Parameter(Position = 0)]
     [ValidateSet("single", "lan", "virtual-node", "vn", "docker", "build", "stop", "status", "help")]
@@ -14,27 +16,65 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Set-Location $RepoRoot
 
-$env:PATH = "$env:USERPROFILE\.cargo\bin;C:\msys64\ucrt64\bin;C:\msys64\usr\bin;" + $env:PATH
+# Do not prepend MSYS to PATH here — breaks PowerShell `cargo` (GNU `link` vs MSVC).
+# Builds use poolai-msys.ps1 (GNU toolchain per rust-toolchain.toml).
 if (-not $env:K8S_OPENAPI_ENABLED_VERSION) { $env:K8S_OPENAPI_ENABLED_VERSION = "1.28" }
 if (-not $env:RUST_LOG) { $env:RUST_LOG = "info" }
 
+$MsysWrapper = Join-Path $PSScriptRoot "poolai-msys.ps1"
+
 function Show-Help {
     @"
-Usage: .\bin\run-poolai.ps1 [-Command] <name> [-Background] [-Port N] [-SkipBuild]
+PoolAI run (PowerShell) - no WSL, no bare 'bash' command.
 
-Commands: single (default), lan, virtual-node, docker, build, stop, status, help
+Usage:
+  .\bin\run-poolai.ps1 [-Command] <name> [-Background] [-Port N] [-SkipBuild]
+
+Commands:
+  single (default)  one coordinator on :8080
+  stop              kill poolai.exe / poolai-worker.exe
+  status            health on 8080, 8081, 9090
+  build             cargo build
+  lan, virtual-node, docker, help
+
 Examples:
-  .\bin\run-poolai.ps1 single
-  .\bin\run-poolai.ps1 virtual-node
-  .\bin\run-poolai.ps1 -Command stop
+  .\bin\run-poolai.ps1 build
+  .\bin\run-poolai.ps1 single -Background -SkipBuild
+  .\bin\run-poolai.ps1 stop
+  .\bin\run-poolai.ps1 status
+
+UI:     http://127.0.0.1:8080/ui/login  then  /ui/admin/jobs
+Login:  admin / admin123
+
+For bash scripts (e2e, verify-dev-stand, git):
+  .\bin\poolai-msys.ps1 bin/e2e-playwright.sh --start
 "@
 }
 
+function Get-PoolaiExe {
+    $candidates = @(
+        (Join-Path $RepoRoot "target\release\poolai.exe"),
+        (Join-Path $RepoRoot "target\debug\poolai.exe"),
+        (Join-Path $RepoRoot "target\x86_64-pc-windows-gnu\release\poolai.exe"),
+        (Join-Path $RepoRoot "target\x86_64-pc-windows-gnu\debug\poolai.exe")
+    )
+    foreach ($path in $candidates) {
+        if (Test-Path -LiteralPath $path) { return $path }
+    }
+    return $null
+}
+
 function Invoke-Build {
-    Write-Host "Building poolai (--features $Features)..." -ForegroundColor Cyan
-    & cargo build --features $Features
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    & cargo build --bin poolai-worker 2>$null
+    if (-not (Test-Path -LiteralPath $MsysWrapper)) {
+        throw "Missing poolai-msys.ps1. Install MSYS2 UCRT64 at C:\msys64"
+    }
+    Write-Host "Building poolai via MSYS2 GNU (features: $Features)..." -ForegroundColor Cyan
+    $buildCmd = 'cargo build --features ' + $Features + ' && (cargo build --bin poolai-worker 2>/dev/null || true)'
+    & $MsysWrapper -lc $buildCmd
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Hint: build in MSYS2 UCRT64: /usr/bin/bash bin/run-poolai.sh build" -ForegroundColor Yellow
+        exit $LASTEXITCODE
+    }
 }
 
 function Invoke-Stop {
@@ -62,22 +102,32 @@ function Invoke-Single {
 
     if (-not $SkipBuild) { Invoke-Build }
 
-    $exe = Join-Path $RepoRoot "target\debug\poolai.exe"
-    if (-not (Test-Path $exe)) { throw "Missing $exe — run build first" }
+    $exe = Get-PoolaiExe
+    if (-not $exe) {
+        throw "Missing poolai.exe. Run: .\bin\run-poolai.ps1 build"
+    }
 
     $env:POOLAI_HTTP_PORT = "$Port"
     $env:POOLAI_DATA_PATH = $data
     $env:POOLAI_RAID_BASE_PATH = $raid
 
     $url = "http://127.0.0.1:$Port"
-    Write-Host "PoolAI single — UI $url/ui  Admin $url/ui/admin  (admin / admin123)"
+    Write-Host "PoolAI single node"
+    Write-Host "  API:   $url/api/v1/health"
+    Write-Host "  Login: $url/ui/login"
+    Write-Host "  Admin: $url/ui/admin/jobs  (admin / admin123)"
+    Write-Host "  Data:  $data"
 
     if ($Background) {
         $log = Join-Path $logs "single-$Port.log"
-        Start-Process -FilePath $exe -RedirectStandardOutput $log -RedirectStandardError $log -NoNewWindow
+        $errLog = Join-Path $logs "single-$Port.err.log"
+        $proc = Start-Process -FilePath $exe -RedirectStandardOutput $log -RedirectStandardError $errLog -PassThru
+        Write-Host "Background PID $($proc.Id) - log: $log"
+        Write-Host "Stop: .\bin\run-poolai.ps1 stop"
         Start-Sleep -Seconds 3
         Invoke-Status
     } else {
+        Write-Host "Foreground (Ctrl+C to stop)..."
         & $exe
     }
 }

@@ -1,4 +1,5 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import { execFileSync } from "node:child_process";
+import { expect, type APIRequestContext, type Locator, type Page } from "@playwright/test";
 
 export const e2eUser = process.env.POOLAI_E2E_USER ?? "admin";
 export const e2ePassword = process.env.POOLAI_E2E_PASSWORD ?? "admin123";
@@ -175,4 +176,80 @@ export const TOPOLOGY_VISUAL_MASKS = [
 /** Mask live charts / dynamic regions before visual snapshots (PH-S11 / PH-S13). */
 export function visualMaskLocators(page: Page, selectors: string[]): Locator[] {
   return selectors.map((sel) => page.locator(sel));
+}
+
+export type JobSummary = {
+  id: string;
+  kind: string;
+  status: string;
+  created_at: string;
+};
+
+export type JobDetail = {
+  job: {
+    spec: { id: string; kind: string };
+    status: string;
+  };
+};
+
+const baseURL = process.env.POOLAI_BASE_URL ?? "http://127.0.0.1:8080";
+
+/** Wait until coordinator health endpoint responds (PH-S52 restart smoke). */
+export async function waitForCoordinatorHealth(
+  request: APIRequestContext,
+  timeoutMs = 90_000,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  let lastStatus = 0;
+  while (Date.now() < deadline) {
+    const res = await request.get("/api/v1/health");
+    lastStatus = res.status();
+    if (res.ok()) return;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  throw new Error(`health not ready (${lastStatus}) at ${baseURL}`);
+}
+
+/** POST /api/v1/jobs — returns created job summary (PH-S52). */
+export async function createJobViaApi(
+  request: APIRequestContext,
+  body: { kind?: string; priority?: number; input_artifact_ids?: string[] } = {},
+): Promise<JobSummary> {
+  const res = await request.post("/api/v1/jobs", {
+    data: {
+      kind: body.kind ?? "inference",
+      priority: body.priority ?? 5,
+      input_artifact_ids: body.input_artifact_ids ?? ["e2e-artifact-a"],
+    },
+  });
+  expect(res.status()).toBe(201);
+  return (await res.json()) as JobSummary;
+}
+
+/** GET /api/v1/jobs/{id} — job detail payload (PH-S52). */
+export async function getJobViaApi(
+  request: APIRequestContext,
+  id: string,
+): Promise<JobDetail> {
+  const res = await request.get(`/api/v1/jobs/${id}`);
+  expect(res.ok()).toBeTruthy();
+  return (await res.json()) as JobDetail;
+}
+
+/**
+ * Restart poolai started by `bin/e2e-playwright.sh --start`.
+ * Requires POOLAI_E2E_STAND_ROOT with generated restart.sh.
+ */
+export async function restartPoolaiE2eStand(
+  request: APIRequestContext,
+): Promise<void> {
+  const standRoot = process.env.POOLAI_E2E_STAND_ROOT;
+  if (!standRoot) {
+    throw new Error("POOLAI_E2E_STAND_ROOT is required to restart the e2e stand");
+  }
+  execFileSync("bash", [`${standRoot}/restart.sh`], {
+    stdio: "inherit",
+    env: process.env,
+  });
+  await waitForCoordinatorHealth(request);
 }

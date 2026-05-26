@@ -5196,7 +5196,12 @@ components:
 
     JobsListResponse:
       type: object
+      required:
+        - store_backend
+        - jobs
       properties:
+        store_backend:
+          $ref: '#/components/schemas/JobStoreBackend'
         jobs:
           type: array
           items:

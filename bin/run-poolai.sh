@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
-# PoolAI — єдиний локальний лаунчер (MSYS2 / Git Bash / WSL).
+# PoolAI — єдиний локальний лаунчер (MSYS2 UCRT64; не WSL / не Windows Store bash).
 # Документація: docs/development/RUN_LOCAL.md
+# Windows PowerShell: .\bin\run-poolai.ps1  або  .\bin\poolai-msys.ps1 bin/run-poolai.sh …
 set -euo pipefail
 
-export PATH="${HOME}/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:${PATH:-}"
+# MSYS2: /usr/bin/bash first — інакше `bash` може викликати WSL stub (немає дистрибутива).
+case "$(uname -s 2>/dev/null)" in
+  MINGW* | MSYS*)
+    export PATH="/usr/bin:/ucrt64/bin:${HOME}/.cargo/bin:${PATH:-}"
+    ;;
+  *)
+    export PATH="${HOME}/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:${PATH:-}"
+    ;;
+esac
+
+POOLAI_BASH="/usr/bin/bash"
+if [[ ! -x "$POOLAI_BASH" ]]; then
+  POOLAI_BASH="$(command -v bash 2>/dev/null || true)"
+fi
+[[ -n "$POOLAI_BASH" ]] || {
+  echo "bash not found; use MSYS2 UCRT64 or .\\bin\\run-poolai.ps1" >&2
+  exit 1
+}
 export K8S_OPENAPI_ENABLED_VERSION="${K8S_OPENAPI_ENABLED_VERSION:-1.28}"
 export RUST_LOG="${RUST_LOG:-info}"
 
@@ -17,7 +35,8 @@ BG=0
 
 usage() {
   cat <<'EOF'
-Usage: bash bin/run-poolai.sh <command> [options]
+Usage: /usr/bin/bash bin/run-poolai.sh <command> [options]
+       (PowerShell: .\bin\run-poolai.ps1 single -Background)
 
 Commands:
   single          One coordinator (default). UI: http://127.0.0.1:8080/ui
@@ -39,16 +58,18 @@ Environment:
   POOLAI_HTTP_PORT, POOLAI_DATA_PATH, POOLAI_RAID_BASE_PATH, RUST_LOG
 
 Examples:
-  bash bin/run-poolai.sh single
-  bash bin/run-poolai.sh single --bg
-  bash bin/run-poolai.sh virtual-node
-  bash bin/run-poolai.sh lan
-  bash bin/run-poolai.sh stop && bash bin/run-poolai.sh status
+  /usr/bin/bash bin/run-poolai.sh single
+  /usr/bin/bash bin/run-poolai.sh single --bg
+  .\bin\run-poolai.ps1 single -Background -SkipBuild   # PowerShell (no WSL)
 EOF
 }
 
 poolai_bin() {
-  if [[ -x "$ROOT/target/debug/poolai.exe" ]]; then
+  if [[ -x "$ROOT/target/release/poolai.exe" ]]; then
+    echo "$ROOT/target/release/poolai.exe"
+  elif [[ -x "$ROOT/target/release/poolai" ]]; then
+    echo "$ROOT/target/release/poolai"
+  elif [[ -x "$ROOT/target/debug/poolai.exe" ]]; then
     echo "$ROOT/target/debug/poolai.exe"
   elif [[ -x "$ROOT/target/debug/poolai" ]]; then
     echo "$ROOT/target/debug/poolai"
@@ -155,8 +176,8 @@ case "$CMD" in
   stop) cmd_stop ;;
   status) cmd_status "${*:-}" ;;
   single) cmd_single "$@" ;;
-  lan) exec bash "$ROOT/bin/run-lan-nodes.sh" "$@" ;;
-  virtual-node|vn) exec bash "$ROOT/bin/run-virtual-node-dev.sh" "$@" ;;
+  lan) exec "$POOLAI_BASH" "$ROOT/bin/run-lan-nodes.sh" "$@" ;;
+  virtual-node|vn) exec "$POOLAI_BASH" "$ROOT/bin/run-virtual-node-dev.sh" "$@" ;;
   docker) cmd_docker "$@" ;;
   *)
     echo "Unknown command: $CMD"

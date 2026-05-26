@@ -54,6 +54,10 @@ async fn jobs_list_json_shape() {
     let app = jobs_app();
     let (status, v) = request_json(&app, "GET", "/api/v1/jobs", None).await;
     assert_eq!(status, StatusCode::OK);
+    assert!(
+        v.get("store_backend").and_then(|x| x.as_str()).is_some(),
+        "list response missing store_backend: {v:?}"
+    );
     let jobs = v
         .get("jobs")
         .and_then(|x| x.as_array())

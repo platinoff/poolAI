@@ -120,6 +120,16 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     });
   });
 
+  test("jobs page loads list and store badge (PH-S53)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/jobs", "#jobs-list");
+    await expect(page.locator("#jobs-store-badge")).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.locator("#jobs-list .admin-table, #jobs-list .admin-empty-state, #jobs-list .muted").first(),
+    ).toBeVisible({ timeout: 20_000 });
+  });
+
   test("vm page loads instances container", async ({ page }) => {
     await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
     await expect(page.locator('[data-i18n="admin.vmadm.createBtn"]')).toBeVisible({

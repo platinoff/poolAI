@@ -54,4 +54,23 @@ fn job_store_persists_via_raid_snapshot_across_reload() {
     let store3 = JobStore::open_for_test(None);
     let reloaded = store3.get(&record.spec.id.0).expect("get").expect("row");
     assert_eq!(reloaded.status, JobStatus::Scheduled);
+
+    // Same RAID dir: persist path used from a blocking thread (HTTP handler shape).
+    let async_record = sample_record("job-raid-async");
+    let push_result = std::thread::spawn({
+        let async_record = async_record.clone();
+        move || -> Result<(), poolai::core::error::AppError> {
+            let store = JobStore::open_for_test(None);
+            store.push(async_record.clone())?;
+            store.update_status(&async_record.spec.id.0, JobStatus::Scheduled)?;
+            Ok(())
+        }
+    })
+    .join()
+    .expect("thread join");
+    push_result.expect("push from blocking thread");
+
+    let store4 = JobStore::open_for_test(None);
+    let async_loaded = store4.get("job-raid-async").expect("get").expect("row");
+    assert_eq!(async_loaded.status, JobStatus::Scheduled);
 }

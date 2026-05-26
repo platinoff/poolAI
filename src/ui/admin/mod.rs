@@ -29,11 +29,13 @@
 //! - `/ui/admin/raid` - RAID management
 //! - `/ui/admin/users` - User management
 //! - `/ui/admin/config` - System configuration
+//! - `/ui/admin/jobs` - Job queue and store backend (PH-S53)
 
 pub mod audit;
 pub mod config;
 pub mod dashboard;
 pub mod instances;
+pub mod jobs;
 pub mod libs;
 pub mod monitoring;
 pub mod raid;
@@ -57,6 +59,7 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route("/admin/monitoring", get(monitoring::admin_monitoring))
         .route("/admin/vm", get(vm::admin_vm))
         .route("/admin/workers", get(workers::admin_workers))
+        .route("/admin/jobs", get(jobs::admin_jobs))
         .route("/admin/libs", get(libs::admin_libs))
         .route("/admin/raid", get(raid::admin_raid))
         .route("/admin/instances", get(instances::admin_instances))
@@ -106,6 +109,7 @@ pub fn admin_layout(
         <a href="/ui/admin/monitoring" class="admin-nav-item" data-i18n="admin.nav.monitoring">Monitoring</a>
         <a href="/ui/admin/vm" class="admin-nav-item" data-i18n="admin.nav.vm">VM Instances</a>
         <a href="/ui/admin/workers" class="admin-nav-item" data-i18n="admin.nav.workers">Workers</a>
+        <a href="/ui/admin/jobs" class="admin-nav-item" data-i18n="admin.nav.jobs">Jobs</a>
         <a href="/ui/admin/libs" class="admin-nav-item" data-i18n="admin.nav.libs">Libraries</a>
         <a href="/ui/admin/raid" class="admin-nav-item" data-i18n="admin.nav.raid">RAID</a>
         <a href="/ui/admin/instances" class="admin-nav-item" data-i18n="admin.nav.instances">Model Instances</a>

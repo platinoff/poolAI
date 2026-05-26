@@ -33,7 +33,8 @@ alwaysApply: true
 | ❌ Не використовувати | ✅ Використовувати |
 |---------------------|-------------------|
 | PowerShell / cmd у Cursor для `git`, `cargo` | `C:\msys64\usr\bin\bash.exe -lc '…'` або зовнішнє вікно MSYS2 UCRT64 |
-| `&&` у PowerShell | `;` у PowerShell **або** один виклик `bash -lc 'cd /s/rust/poolAI && …'` |
+| `bash bin/…` у PowerShell (WSL stub) | **Run:** `.\bin\run-poolai.ps1` · **bash-скрипти:** `.\bin\poolai-msys.ps1 bin/…` · MSYS2: `/usr/bin/bash bin/…` |
+| `&&` у PowerShell | `;` у PowerShell **або** `.\bin\poolai-msys.ps1 -lc '…'` |
 | `git` з інтегрованого терміналу Cursor без потреби | Зовнішній MSYS2 для push (менше `index.lock`) |
 
 **PATH у bash (на початку блоку):**

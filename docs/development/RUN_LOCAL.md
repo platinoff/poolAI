@@ -1,38 +1,53 @@
 # Локальний запуск PoolAI
 
-**Канон:** один вхід — `bin/run-poolai.sh` (MSYS2) або `bin/run-poolai.ps1` (PowerShell).
+**Канон Windows:**
 
-**Не використовуй** вбудований термінал Cursor для `cargo`/`git` на Windows — [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md); для запуску достатньо **зовнішнього MSYS2 UCRT64** або PowerShell.
+| Що | Команда |
+|----|---------|
+| **Запуск / stop** (PowerShell) | `.\bin\run-poolai.ps1` |
+| **Bash-скрипти** з PowerShell | `.\bin\poolai-msys.ps1 …` |
+| **MSYS2 UCRT64** (зовнішнє вікно) | `/usr/bin/bash bin/run-poolai.sh …` |
+| **Git / cargo test-ci** | зовнішнє MSYS2 — [`.cursor/commands/git-push.md`](../../.cursor/commands/git-push.md) |
+
+**Не працює:** `bash bin/run-poolai.sh` у PowerShell або в MSYS2 з WSL-stub → *«WSL has no installed distributions»*. Див. [`.cursor/commands/run-poolai.md`](../../.cursor/commands/run-poolai.md).
 
 ---
 
-## Швидкий старт (один вузол — повний UI + Admin)
+## Швидкий старт — PowerShell (рекомендовано)
 
-```bash
-export PATH="$HOME/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
-export K8S_OPENAPI_ENABLED_VERSION=1.28
-cd /s/rust/poolAI
+```powershell
+cd S:\rust\poolAI
 
-bash bin/run-poolai.sh build    # перший раз
-bash bin/run-poolai.sh single   # foreground на :8080
+.\bin\run-poolai.ps1 build
+.\bin\run-poolai.ps1 single -Background -SkipBuild
+.\bin\run-poolai.ps1 status
+.\bin\run-poolai.ps1 stop
 ```
 
 | URL | Призначення |
 |-----|-------------|
-| http://127.0.0.1:8080/ui | Dashboard |
-| http://127.0.0.1:8080/ui/admin | Admin (потрібен `enterprise`) |
-| http://127.0.0.1:8080/ui/login | Вхід |
+| http://127.0.0.1:8080/ui/login | **Спочатку логін** |
+| http://127.0.0.1:8080/ui/admin/jobs | Jobs + badge store (`json`/`raid`) |
+| http://127.0.0.1:8080/ui/admin | Admin dashboard |
 | http://127.0.0.1:8080/api/v1/health | Health JSON |
 
-**Логін за замовчуванням:** `admin` / `admin123` (змінити перед продакшном).
+**Логін:** `admin` / `admin123`
 
-**Фоновий режим:**
+---
+
+## Швидкий старт — MSYS2 UCRT64 (зовнішнє вікно)
 
 ```bash
-bash bin/run-poolai.sh single --bg
-bash bin/run-poolai.sh status
-bash bin/run-poolai.sh stop
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export K8S_OPENAPI_ENABLED_VERSION=1.28
+cd /s/rust/poolAI
+
+/usr/bin/bash bin/run-poolai.sh build
+/usr/bin/bash bin/run-poolai.sh single --bg --skip-build
+/usr/bin/bash bin/run-poolai.sh stop
 ```
+
+**Не** пиши голе `bash` — використовуй `/usr/bin/bash` (інакше може викликатись WSL).
 
 ---
 
@@ -137,10 +152,17 @@ bash bin/run-poolai.sh single
 
 ## E2E / pa11y (окремо від сервера)
 
+```powershell
+# PowerShell:
+.\bin\e2e-playwright.ps1 -Start
+# або:
+.\bin\poolai-msys.ps1 bin/e2e-playwright.sh --start
+```
+
 ```bash
-# poolai вже на :8080 або:
-bash bin/e2e-playwright.sh --start
-bash bin/pa11y-ci.sh
+# MSYS2:
+/usr/bin/bash bin/e2e-playwright.sh --start
+/usr/bin/bash bin/pa11y-ci.sh
 ```
 
 ---
@@ -149,9 +171,12 @@ bash bin/pa11y-ci.sh
 
 | Симптом | Дія |
 |---------|-----|
-| `poolai.exe` не знайдено | `bash bin/run-poolai.sh build` |
-| Порт зайнятий | `bash bin/run-poolai.sh stop` або `--port 8082` |
-| OOM при тестах Windows | `cargo test-ci` з `-j 1` (див. README) |
+| WSL / «no installed distributions» на `bash` | PowerShell: `.\bin\run-poolai.ps1`; bash-скрипти: `.\bin\poolai-msys.ps1` або `/usr/bin/bash` у MSYS2 |
+| `link.exe` / `link: extra operand` у PowerShell `cargo` | Не `cargo` з PS — `.\bin\run-poolai.ps1 build` (MSYS2 GNU) або зовнішнє MSYS2 |
+| `poolai.exe` не знайдено | `.\bin\run-poolai.ps1 build` |
+| Порт зайнятий | `.\bin\run-poolai.ps1 stop` або `-Port 8082` |
+| `/ui/admin` порожній / редірект | Спочатку http://127.0.0.1:8080/ui/login (`admin` / `admin123`) |
+| OOM при тестах Windows | `.\bin\poolai-msys.ps1 -lc 'cargo test-ci'` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
-**Last updated:** 2026-05-26
+**Last updated:** 2026-05-26 (PowerShell / WSL bash fix)

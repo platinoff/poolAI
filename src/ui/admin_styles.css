@@ -302,6 +302,13 @@ body {
   color: var(--admin-text);
 }
 
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 /* Admin Grid */
 .admin-grid {
   display: grid;
