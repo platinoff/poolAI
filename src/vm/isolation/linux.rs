@@ -21,6 +21,16 @@ pub fn macvlan_link_name(process_id: u32, parent_interface: &str) -> String {
     format!("macvlan-poolai-{process_id}-{suffix}")
 }
 
+/// Stable veth device names for a parent interface label and process (host + netns peer).
+pub fn veth_link_names(process_id: u32, interface_label: &str) -> (String, String) {
+    let suffix: String = interface_label
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+        .collect();
+    let base = format!("veth-poolai-{process_id}-{suffix}");
+    (format!("{base}-h"), format!("{base}-n"))
+}
+
 /// Validate Linux macvlan mode string.
 pub fn validate_macvlan_mode(mode: Option<&str>) -> Result<&'static str, AppError> {
     let macvlan_mode = mode.unwrap_or("bridge");
@@ -135,6 +145,8 @@ impl NamespaceState {
 struct LinuxNetworkIsolationState {
     namespace_states: std::collections::HashMap<u32, NamespaceState>,
     macvlan_links: std::collections::HashMap<u32, Vec<String>>,
+    /// Host-side veth names (deleting host end removes the pair).
+    veth_host_links: std::collections::HashMap<u32, Vec<String>>,
 }
 
 /// Linux network isolator using network namespaces
@@ -150,6 +162,7 @@ impl LinuxNetworkIsolator {
             state: Mutex::new(LinuxNetworkIsolationState {
                 namespace_states: std::collections::HashMap::new(),
                 macvlan_links: std::collections::HashMap::new(),
+                veth_host_links: std::collections::HashMap::new(),
             }),
         }
     }
@@ -357,69 +370,105 @@ impl LinuxNetworkIsolator {
         ))
     }
 
-    /// Set up a veth pair for network interface access
-    ///
-    /// Creates a virtual ethernet pair connecting the network namespace
-    /// to the host network. This allows the isolated process to access
-    /// specific network interfaces.
+    /// Create a veth pair on the **host** network namespace (call before `unshare(CLONE_NEWNET)`).
     #[cfg(feature = "vm-isolation-linux")]
-    fn setup_veth_pair(interface: &str, process_id: u32) -> Result<(), AppError> {
-        // Generate unique names for veth pair
-        let veth_host = format!("veth-{}-host", process_id);
-        let veth_ns = format!("veth-{}-ns", process_id);
+    fn create_veth_pair_on_host(
+        interface_label: &str,
+        process_id: u32,
+    ) -> Result<(String, String), AppError> {
+        if process_id == 0 {
+            return Err(AppError::ValidationError(
+                "Invalid process ID: 0 for veth setup".to_string(),
+            ));
+        }
+        if interface_label.is_empty() {
+            return Err(AppError::ConfigError(
+                "Interface label cannot be empty for veth setup".to_string(),
+            ));
+        }
 
-        // Create veth pair
+        let (veth_host, veth_ns) = veth_link_names(process_id, interface_label);
         let output = Command::new("ip")
-            .args(&[
+            .args([
                 "link", "add", &veth_host, "type", "veth", "peer", "name", &veth_ns,
             ])
             .output()
             .map_err(|e| {
                 AppError::ConfigError(format!(
-                    "Failed to execute 'ip' command for veth pair creation (interface: {}, process: {}): {}. \
-                    Suggestion: Ensure 'iproute2' package is installed and you have sufficient privileges (CAP_NET_ADMIN or root). \
-                    Context: veth pairs are required to connect network namespaces to the host network.",
-                    interface, process_id, e
+                    "Failed to create veth pair for {interface_label} (process {process_id}): {e}. \
+                    Ensure iproute2 is installed and CAP_NET_ADMIN or root is available."
                 ))
             })?;
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             return Err(AppError::ConfigError(format!(
-                "Failed to create veth pair for interface '{}' (process {}): {}. \
-                Suggestion: Ensure 'ip' command is available, you have root privileges or CAP_NET_ADMIN, \
-                and the interface name is unique. Context: veth pairs are required for network interface access in isolated namespaces.",
-                interface, process_id, stderr
+                "Failed to create veth {veth_host} <-> {veth_ns}: {stderr}"
             )));
         }
 
-        // Move veth_ns to the network namespace
-        // Note: This requires the namespace to be already created
-        // In a real implementation, we would use setns or create the process in the namespace
+        Self::set_link_up(&veth_host)?;
         info!(
-            "Created veth pair {} <-> {} for interface {} (process {})",
-            veth_host, veth_ns, interface, process_id
+            "Created veth pair {veth_host} <-> {veth_ns} for {interface_label} (process {process_id})"
         );
+        Ok((veth_host, veth_ns))
+    }
 
-        // Future improvement: In a full implementation, we would:
-        // 1. Move veth_ns to the network namespace using setns(CLONE_NEWNET)
-        //    - This requires calling setns() syscall with the network namespace file descriptor
-        //    - After moving to namespace, all subsequent operations affect the isolated namespace
-        // 2. Configure IP addresses using 'ip addr add' command or libc socket operations
-        //    - Assign IP to veth_ns interface within the namespace
-        //    - Configure subnet and gateway if needed
-        // 3. Bring up the interfaces using 'ip link set up' or ioctl(SIOCSIFFLAGS)
-        // 4. Set up routing using 'ip route add' or netlink socket operations
-        //    - Configure default route if needed
-        //    - Add static routes for specific networks
+    /// Move the netns peer into the target process network namespace and bring it up.
+    #[cfg(feature = "vm-isolation-linux")]
+    fn activate_veth_in_netns(veth_ns: &str, netns_pid: u32) -> Result<(), AppError> {
+        let output = Command::new("ip")
+            .args(["link", "set", veth_ns, "netns", &netns_pid.to_string()])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to move veth peer {veth_ns} to netns of pid {netns_pid}: {e}"
+                ))
+            })?;
 
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::ConfigError(format!(
+                "Failed to move veth {veth_ns} to pid {netns_pid} netns: {stderr}"
+            )));
+        }
+
+        Self::set_link_up(veth_ns)
+    }
+
+    #[cfg(feature = "vm-isolation-linux")]
+    fn delete_veth_host_link(veth_host: &str) -> Result<(), AppError> {
+        let output = Command::new("ip")
+            .args(["link", "delete", veth_host])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to delete veth {veth_host}: {e}"))
+            })?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            warn!("Could not delete veth {veth_host}: {stderr}");
+        } else {
+            info!("Deleted veth host link {veth_host}");
+        }
         Ok(())
     }
 
+    #[cfg(feature = "vm-isolation-linux")]
+    fn cleanup_veth_host_links(names: &[String]) {
+        for host in names {
+            let _ = Self::delete_veth_host_link(host);
+        }
+    }
+
     #[cfg(not(feature = "vm-isolation-linux"))]
-    fn setup_veth_pair(_interface: &str, _process_id: u32) -> Result<(), AppError> {
-        // No-op when feature is not enabled
-        Ok(())
+    fn create_veth_pair_on_host(
+        _interface_label: &str,
+        _process_id: u32,
+    ) -> Result<(String, String), AppError> {
+        Err(AppError::ConfigError(
+            "Veth support requires 'vm-isolation-linux' feature".to_string(),
+        ))
     }
 
     /// Set up firewall rules for allowed ports
@@ -591,9 +640,40 @@ impl NetworkIsolator for LinuxNetworkIsolator {
                     Vec::new()
                 };
 
+            let mut pending_veths: Vec<(String, String)> =
+                if !use_macvlan && !config.allowed_interfaces.is_empty() {
+                    let mut pairs = Vec::with_capacity(config.allowed_interfaces.len());
+                    for interface in &config.allowed_interfaces {
+                        match Self::create_veth_pair_on_host(interface, process_id) {
+                            Ok(pair) => pairs.push(pair),
+                            Err(e) => {
+                                if config.strict {
+                                    Self::cleanup_veth_host_links(
+                                        &pairs.iter().map(|(h, _)| h.clone()).collect::<Vec<_>>(),
+                                    );
+                                    for name in &pending_macvlans {
+                                        let _ = Self::delete_macvlan_link(name);
+                                    }
+                                    return Err(e);
+                                }
+                                warn!("Veth create failed for {interface}: {e}");
+                            }
+                        }
+                    }
+                    pairs
+                } else {
+                    Vec::new()
+                };
+
             let mut namespace_state = match NamespaceState::save_current_namespaces() {
                 Ok(state) => state,
                 Err(e) => {
+                    Self::cleanup_veth_host_links(
+                        &pending_veths
+                            .iter()
+                            .map(|(h, _)| h.clone())
+                            .collect::<Vec<_>>(),
+                    );
                     for name in &pending_macvlans {
                         let _ = Self::delete_macvlan_link(name);
                     }
@@ -666,21 +746,20 @@ impl NetworkIsolator for LinuxNetworkIsolator {
                         }
                     }
 
-                    if !use_macvlan && !config.allowed_interfaces.is_empty() {
-                        for interface in &config.allowed_interfaces {
-                            match Self::setup_veth_pair(interface, process_id) {
-                                Ok(_) => info!(
-                                    "Successfully set up veth pair for interface {interface} in process {process_id}"
-                                ),
-                                Err(e) => {
-                                    let error_msg = format!(
-                                        "Failed to set up veth pair for interface {interface}: {e}"
-                                    );
-                                    if config.strict {
-                                        return Err(AppError::ConfigError(error_msg));
-                                    }
-                                    warn!("{error_msg}. Continuing without this interface.");
+                    let mut active_veth_hosts = Vec::new();
+                    for (veth_host, veth_ns) in pending_veths {
+                        match Self::activate_veth_in_netns(&veth_ns, current_pid) {
+                            Ok(_) => {
+                                info!("Activated veth {veth_ns} in netns for process {process_id}");
+                                active_veth_hosts.push(veth_host);
+                            }
+                            Err(e) => {
+                                let _ = Self::delete_veth_host_link(&veth_host);
+                                if config.strict {
+                                    Self::cleanup_veth_host_links(&active_veth_hosts);
+                                    return Err(e);
                                 }
+                                warn!("Failed to activate veth for process {process_id}: {e}");
                             }
                         }
                     }
@@ -708,9 +787,18 @@ impl NetworkIsolator for LinuxNetworkIsolator {
                         if !active_macvlans.is_empty() {
                             state.macvlan_links.insert(process_id, active_macvlans);
                         }
+                        if !active_veth_hosts.is_empty() {
+                            state.veth_host_links.insert(process_id, active_veth_hosts);
+                        }
                     }
                 }
                 Err(e) => {
+                    Self::cleanup_veth_host_links(
+                        &pending_veths
+                            .iter()
+                            .map(|(h, _)| h.clone())
+                            .collect::<Vec<_>>(),
+                    );
                     for name in &pending_macvlans {
                         let _ = Self::delete_macvlan_link(name);
                     }
@@ -751,8 +839,13 @@ impl NetworkIsolator for LinuxNetworkIsolator {
         #[cfg(feature = "vm-isolation-linux")]
         {
             let mut macvlan_links = Vec::new();
+            let mut veth_hosts = Vec::new();
             let namespace_state = if let Ok(mut state) = self.state.lock() {
                 macvlan_links = state.macvlan_links.remove(&process_id).unwrap_or_default();
+                veth_hosts = state
+                    .veth_host_links
+                    .remove(&process_id)
+                    .unwrap_or_default();
                 state.namespace_states.remove(&process_id)
             } else {
                 None
@@ -771,6 +864,8 @@ impl NetworkIsolator for LinuxNetworkIsolator {
             } else {
                 warn!("No namespace state found for process {process_id}; cannot restore netns");
             }
+
+            Self::cleanup_veth_host_links(&veth_hosts);
 
             for name in macvlan_links {
                 if let Err(e) = Self::delete_macvlan_link(&name) {
@@ -1195,8 +1290,8 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 }
 
 #[cfg(test)]
-mod macvlan_unit_tests {
-    use super::{macvlan_link_name, validate_macvlan_mode};
+mod linux_isolation_unit_tests {
+    use super::{macvlan_link_name, validate_macvlan_mode, veth_link_names};
 
     #[test]
     fn macvlan_link_name_includes_parent_suffix() {
@@ -1208,9 +1303,20 @@ mod macvlan_unit_tests {
     }
 
     #[test]
+    fn veth_link_names_are_stable_per_process_and_interface() {
+        let (host, ns) = veth_link_names(7, "eth0");
+        assert_eq!(host, "veth-poolai-7-eth0-h");
+        assert_eq!(ns, "veth-poolai-7-eth0-n");
+        let (host2, ns2) = veth_link_names(7, "eth0.1");
+        assert_eq!(host2, "veth-poolai-7-eth0-1-h");
+        assert_eq!(ns2, "veth-poolai-7-eth0-1-n");
+    }
+
+    #[test]
     fn validate_macvlan_mode_accepts_known_modes() {
         assert_eq!(validate_macvlan_mode(None).unwrap(), "bridge");
         assert_eq!(validate_macvlan_mode(Some("vepa")).unwrap(), "vepa");
+        assert_eq!(validate_macvlan_mode(Some("passthru")).unwrap(), "passthru");
     }
 
     #[test]

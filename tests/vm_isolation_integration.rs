@@ -57,11 +57,37 @@ async fn test_network_isolation_macvlan_config() {
 #[cfg(target_os = "linux")]
 #[test]
 fn test_macvlan_link_name_helper() {
-    use poolai::vm::linux::{macvlan_link_name, validate_macvlan_mode};
+    use poolai::vm::linux::{macvlan_link_name, validate_macvlan_mode, veth_link_names};
 
     assert_eq!(macvlan_link_name(7, "eth0"), "macvlan-poolai-7-eth0");
     assert_eq!(validate_macvlan_mode(None).unwrap(), "bridge");
     assert!(validate_macvlan_mode(Some("invalid")).is_err());
+    let (host, ns) = veth_link_names(7, "eth0");
+    assert!(host.ends_with("-h"));
+    assert!(ns.ends_with("-n"));
+}
+
+/// Round-trip apply/remove with loopback-only config (needs `vm-isolation-linux` + CAP_SYS_ADMIN).
+#[cfg(all(target_os = "linux", feature = "vm-isolation-linux"))]
+#[tokio::test]
+async fn test_network_isolation_apply_remove_loopback_linux() {
+    let isolator = PlatformNetworkIsolator::new();
+    let process_id = 90_001u32;
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allow_loopback: true,
+        strict: false,
+        ..Default::default()
+    };
+
+    let apply = isolator.apply_network_isolation(process_id, &config);
+    if apply.is_err() {
+        // Graceful skip on hosts without unshare privileges (e.g. CI without caps).
+        return;
+    }
+    assert!(isolator.remove_network_isolation(process_id).is_ok());
+    // Idempotent second remove
+    assert!(isolator.remove_network_isolation(process_id).is_ok());
 }
 
 #[tokio::test]

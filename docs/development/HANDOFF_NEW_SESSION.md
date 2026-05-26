@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 (PH-S50 ✅ OpenAPI/DIGEST jobs · §5.11 PH-S51…S60) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-26 (PH-S51 ✅ VM Linux veth/netns · §5.11 PH-S52…S61) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -17,7 +17,8 @@
 **PH-S48 ✅:** Job store RAID-backed persistence (snapshot у RAID артефактах).
 **PH-S49 ✅:** Research + ops/docs — `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH` (HANDOFF §2a, [`RUN_LOCAL.md`](./RUN_LOCAL.md)).
 **PH-S50 ✅:** OpenAPI `JobStoreBackend` + Jobs tag; DIGEST `src/job/`; `poolai-openapi-gap-audit` 0.
-**Черга:** §5.11 **PH-S51…S60** (10 відкритих); наступний код — **PH-S51**.
+**PH-S51 ✅:** Linux veth create on host → `unshare` → peer in netns; tracked cleanup on remove (`vm-isolation-linux`).
+**Черга:** §5.11 **PH-S52…S61** (10 відкритих); наступний код — **PH-S52**.
 
 ## 1. Канонічний порядок документації та планів
 
