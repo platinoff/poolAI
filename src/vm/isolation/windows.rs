@@ -141,6 +141,10 @@ impl NetworkIsolator for WindowsNetworkIsolator {
     fn is_supported(&self) -> bool {
         true
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 /// Windows filesystem isolator using AppContainer path plans.
@@ -255,5 +259,9 @@ impl FilesystemIsolator for WindowsFilesystemIsolator {
 
     fn is_supported(&self) -> bool {
         true
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }

@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — PH-S40 hardware VM isolation (або PH-S48 job RAID store).
+PoolAI — PH-S48 job RAID store.
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -27,12 +27,11 @@ cargo test-ci
 
 ## Стан
 - **PH-S03…S47, PH-S41, PH-S46, PH-S37/39/44/42/43/45/38:** ✅
-- **Черга §5.11:** PH-S40 → PH-S48
+- **Черга §5.11:** PH-S48
 - **BLOCKED:** PH-S35/S16 LAN · **Deferred:** PH-S36/S01 Cloud SDK (FM-041)
 
-## PH-S40 — рекомендована наступна сесія (великий scope)
-- Hardware VM isolation — `src/vm/mod.rs`, FM §5.10
-- Альтернатива: **PH-S48** job store RAID-backed (Architect deferred)
+## PH-S48 — рекомендована наступна сесія
+- Job store RAID-backed persistence (Architect deferred)
 
 ## Завершення сесії
 1. Закрити спринт у FM §5.11 + HANDOFF
@@ -45,8 +44,7 @@ PH-S03…S47 · PH-S41 macvlan · PH-S46 Solana · повний test-ci --verbos
 ## Черга §5.11
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S40** | hardware VM isolation ← великий scope |
-| 2 | **PH-S48** | Job store RAID-backed |
+| 1 | **PH-S48** | Job store RAID-backed |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```

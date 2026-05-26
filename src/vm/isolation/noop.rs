@@ -35,6 +35,10 @@ impl NetworkIsolator for NoopNetworkIsolator {
     fn is_supported(&self) -> bool {
         false
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 /// No-op filesystem isolator for unsupported platforms
@@ -63,5 +67,9 @@ impl FilesystemIsolator for NoopFilesystemIsolator {
 
     fn is_supported(&self) -> bool {
         false
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }

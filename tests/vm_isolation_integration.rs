@@ -9,7 +9,8 @@
 
 use poolai::vm::{
     FilesystemIsolationConfig, FilesystemIsolator, NetworkInterfaceMode, NetworkIsolationConfig,
-    NetworkIsolator, PlatformFilesystemIsolator, PlatformNetworkIsolator,
+    NetworkIsolator, PlatformFilesystemIsolator, PlatformNetworkIsolator, VmIsolation, VmManager,
+    VmResources,
 };
 
 #[tokio::test]
@@ -491,4 +492,36 @@ async fn test_windows_network_isolator_tracks_plan() {
     assert!(!state.firewall_rules.is_empty());
     isolator.remove_network_isolation(4242).unwrap();
     assert!(isolator.get_appcontainer_state(4242).is_none());
+}
+
+#[cfg(target_os = "windows")]
+#[tokio::test]
+async fn test_vm_manager_apply_isolation_hardware_vm_tracks_plans() {
+    let manager = VmManager::new();
+
+    let instance = manager
+        .create_instance(
+            "hw-vm".to_string(),
+            VmResources::default(),
+            VmIsolation::HardwareVm,
+        )
+        .await
+        .expect("instance created");
+
+    let process_id = 4243u32;
+    manager
+        .apply_isolation(process_id, instance.id)
+        .await
+        .expect("apply_isolation should succeed for HardwareVm");
+
+    let net_state = manager
+        .get_network_isolation_plan_state(process_id)
+        .expect("network plan stored");
+    assert_eq!(net_state.profile_name, "PoolAI-VM-4243");
+    assert!(!net_state.firewall_rules.is_empty());
+
+    let fs_state = manager
+        .get_filesystem_isolation_plan_state(process_id)
+        .expect("filesystem plan stored");
+    assert_eq!(fs_state.profile_name, "PoolAI-VM-4243");
 }

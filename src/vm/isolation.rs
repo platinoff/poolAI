@@ -5,6 +5,7 @@
 //! from the host system and from each other.
 
 use crate::core::error::AppError;
+use std::any::Any;
 use std::path::PathBuf;
 
 /// Network isolation configuration
@@ -214,6 +215,9 @@ pub trait NetworkIsolator: Send + Sync {
 
     /// Check if network isolation is supported on this platform
     fn is_supported(&self) -> bool;
+
+    /// Enable downcasting of `dyn NetworkIsolator` in tests/debug code.
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// Trait for filesystem isolation implementation
@@ -243,6 +247,9 @@ pub trait FilesystemIsolator: Send + Sync {
 
     /// Check if filesystem isolation is supported on this platform
     fn is_supported(&self) -> bool;
+
+    /// Enable downcasting of `dyn FilesystemIsolator` in tests/debug code.
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// Platform-agnostic network isolator
@@ -292,6 +299,20 @@ impl NetworkIsolator for PlatformNetworkIsolator {
     fn is_supported(&self) -> bool {
         self.inner.is_supported()
     }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+#[cfg(target_os = "windows")]
+impl PlatformNetworkIsolator {
+    pub fn get_appcontainer_state(
+        &self,
+        process_id: u32,
+    ) -> Option<crate::vm::isolation::windows_plan::AppContainerState> {
+        self.inner.get_appcontainer_state(process_id)
+    }
 }
 
 /// Platform-agnostic filesystem isolator
@@ -340,6 +361,20 @@ impl FilesystemIsolator for PlatformFilesystemIsolator {
 
     fn is_supported(&self) -> bool {
         self.inner.is_supported()
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+#[cfg(target_os = "windows")]
+impl PlatformFilesystemIsolator {
+    pub fn get_appcontainer_state(
+        &self,
+        process_id: u32,
+    ) -> Option<crate::vm::isolation::windows_plan::AppContainerState> {
+        self.inner.get_appcontainer_state(process_id)
     }
 }
 

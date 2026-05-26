@@ -796,6 +796,10 @@ impl NetworkIsolator for LinuxNetworkIsolator {
         // Network namespaces are supported on Linux
         true
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 #[cfg(feature = "vm-isolation-linux")]
@@ -1183,6 +1187,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
     fn is_supported(&self) -> bool {
         // chroot and mount namespaces are supported on Linux
         true
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }
 

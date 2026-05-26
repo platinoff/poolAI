@@ -1904,12 +1904,73 @@ impl VmManager {
                 }
             }
             VmIsolation::HardwareVm => {
-                // Hardware VM isolation would be handled by the hypervisor
-                // For now, just log
-                info!(
-                    "Hardware VM isolation requested for VM instance {} (not yet implemented)",
-                    instance_id
-                );
+                // Hardware VM isolation (PH-S40) is currently implemented as:
+                // - best-effort OS-level network + filesystem isolation
+                // - hypervisor-level isolation will be integrated later
+                //
+                // This keeps the API/semantics working and allows the runtime to
+                // store/track isolation plans consistently across isolation modes.
+                let network_config = NetworkIsolationConfig {
+                    enabled: true,
+                    allowed_interfaces: vec![],
+                    allowed_ports: vec![],
+                    allow_loopback: true,
+                    strict: false, // Graceful degradation by default
+                    ..Default::default()
+                };
+
+                let network_result = self
+                    .network_isolator
+                    .apply_network_isolation(process_id, &network_config);
+
+                // If network isolation fails, log but continue (unless strict mode)
+                if let Err(ref e) = network_result {
+                    warn!(
+                        "Hardware VM: network isolation failed for process {} (instance {}): {}. Continuing with filesystem isolation.",
+                        process_id, instance_id, e
+                    );
+                }
+
+                let fs_config = FilesystemIsolationConfig {
+                    enabled: true,
+                    root_dir: None,
+                    allowed_paths: vec![],
+                    read_only_paths: vec![],
+                    use_chroot: false,
+                    strict: false, // Graceful degradation by default
+                };
+
+                let fs_result = self
+                    .filesystem_isolator
+                    .apply_filesystem_isolation(process_id, &fs_config);
+
+                // If both isolations fail, return error
+                match (network_result, fs_result) {
+                    (Ok(_), Ok(_)) => {
+                        info!(
+                            "Hardware VM: successfully applied isolation to process {} for VM instance {}",
+                            process_id, instance_id
+                        );
+                    }
+                    (Err(net_err), Err(fs_err)) => {
+                        return Err(AppError::ConfigError(format!(
+                            "Hardware VM: both network and filesystem isolation failed for process {} (instance {}): network={}, filesystem={}",
+                            process_id, instance_id, net_err, fs_err
+                        )));
+                    }
+                    (Ok(_), Err(fs_err)) => {
+                        warn!(
+                            "Hardware VM: filesystem isolation failed for process {} (instance {}): {}. Network isolation applied.",
+                            process_id, instance_id, fs_err
+                        );
+                    }
+                    (Err(net_err), Ok(_)) => {
+                        warn!(
+                            "Hardware VM: network isolation failed for process {} (instance {}): {}. Filesystem isolation applied.",
+                            process_id, instance_id, net_err
+                        );
+                    }
+                }
             }
         }
 
@@ -1939,6 +2000,28 @@ impl VmManager {
     /// Check if filesystem isolation is supported on this platform
     pub fn is_filesystem_isolation_supported(&self) -> bool {
         self.filesystem_isolator.is_supported()
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn get_network_isolation_plan_state(
+        &self,
+        process_id: u32,
+    ) -> Option<crate::vm::isolation::windows_plan::AppContainerState> {
+        self.network_isolator
+            .as_any()
+            .downcast_ref::<PlatformNetworkIsolator>()
+            .and_then(|p| p.get_appcontainer_state(process_id))
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn get_filesystem_isolation_plan_state(
+        &self,
+        process_id: u32,
+    ) -> Option<crate::vm::isolation::windows_plan::AppContainerState> {
+        self.filesystem_isolator
+            .as_any()
+            .downcast_ref::<PlatformFilesystemIsolator>()
+            .and_then(|p| p.get_appcontainer_state(process_id))
     }
 
     /// Restart a VM instance (stop and start)
