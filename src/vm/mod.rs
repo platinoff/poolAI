@@ -78,12 +78,15 @@ pub use resources::{JobObjectState, WindowsJobObjectLimiter};
 mod isolation;
 pub use isolation::windows_plan;
 pub use isolation::{
-    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
-    PlatformFilesystemIsolator, PlatformNetworkIsolator,
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkInterfaceMode, NetworkIsolationConfig,
+    NetworkIsolator, PlatformFilesystemIsolator, PlatformNetworkIsolator,
 };
 
 #[cfg(target_os = "windows")]
 pub use isolation::windows::WindowsNetworkIsolator;
+
+#[cfg(target_os = "linux")]
+pub use isolation::linux;
 
 use crate::core::error::AppError;
 use crate::runtime::health::{HealthMonitor, HealthStatus};
@@ -1843,6 +1846,7 @@ impl VmManager {
                     allowed_ports: vec![],
                     allow_loopback: true,
                     strict: false, // Graceful degradation by default
+                    ..Default::default()
                 };
 
                 let network_result = self

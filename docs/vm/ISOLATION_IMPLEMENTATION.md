@@ -55,7 +55,7 @@ This document describes the approach and implementation plan for full VM isolati
 - ✅ Implemented loopback interface setup using `ip link set lo up`
 - ✅ Implemented bind mounts setup using `nix::mount::mount` with `MS_BIND` flag
 - ✅ Implemented read-only mounts using `MS_RDONLY` flag
-- 🔄 Network interface configuration (veth pairs, macvlan - planned)
+- ✅ Macvlan: `NetworkInterfaceMode::Macvlan`, host create → netns move → optional CIDR (PH-S41)
 - 🔄 Firewall rules setup (iptables/nftables - planned)
 - 🔄 Windows AppContainer implementation (planned)
 

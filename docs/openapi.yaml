@@ -5615,6 +5615,20 @@ components:
           type: boolean
           description: Allow loopback (`lo`) in the network namespace
           example: true
+        interface_mode:
+          type: string
+          enum: [veth, macvlan]
+          default: veth
+          description: Attach allowed interfaces via veth (default) or macvlan (Linux)
+        macvlan_mode:
+          type: string
+          description: Macvlan mode when interface_mode is macvlan
+          enum: [bridge, private, vepa, passthru]
+          example: bridge
+        macvlan_address:
+          type: string
+          description: Optional static CIDR for macvlan interfaces
+          example: "192.168.1.100/24"
         strict:
           type: boolean
           description: Fail if isolation cannot be applied (default false = graceful degradation)

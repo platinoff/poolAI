@@ -8,8 +8,8 @@
 //! - Isolation application (placeholder tests)
 
 use poolai::vm::{
-    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
-    PlatformFilesystemIsolator, PlatformNetworkIsolator,
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkInterfaceMode, NetworkIsolationConfig,
+    NetworkIsolator, PlatformFilesystemIsolator, PlatformNetworkIsolator,
 };
 
 #[tokio::test]
@@ -29,12 +29,38 @@ async fn test_network_isolation_config_custom() {
         allowed_ports: vec![80, 443, 8080],
         allow_loopback: false,
         strict: false,
+        ..Default::default()
     };
 
     assert!(config.enabled);
     assert_eq!(config.allowed_interfaces.len(), 2);
     assert_eq!(config.allowed_ports.len(), 3);
     assert!(!config.allow_loopback);
+    assert_eq!(config.interface_mode, NetworkInterfaceMode::Veth);
+}
+
+#[tokio::test]
+async fn test_network_isolation_macvlan_config() {
+    let config = NetworkIsolationConfig {
+        enabled: true,
+        allowed_interfaces: vec!["eth0".to_string()],
+        interface_mode: NetworkInterfaceMode::Macvlan,
+        macvlan_mode: Some("private".into()),
+        macvlan_address: Some("10.0.0.50/24".into()),
+        ..Default::default()
+    };
+    assert_eq!(config.interface_mode, NetworkInterfaceMode::Macvlan);
+    assert_eq!(config.macvlan_mode.as_deref(), Some("private"));
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn test_macvlan_link_name_helper() {
+    use poolai::vm::linux::{macvlan_link_name, validate_macvlan_mode};
+
+    assert_eq!(macvlan_link_name(7, "eth0"), "macvlan-poolai-7-eth0");
+    assert_eq!(validate_macvlan_mode(None).unwrap(), "bridge");
+    assert!(validate_macvlan_mode(Some("invalid")).is_err());
 }
 
 #[tokio::test]
@@ -58,6 +84,7 @@ async fn test_filesystem_isolation_config_custom() {
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
         strict: false,
+        ..Default::default()
     };
 
     assert!(config.enabled);
@@ -173,6 +200,7 @@ async fn test_network_isolation_apply_enabled() {
         allowed_ports: vec![80, 443],
         allow_loopback: true,
         strict: false,
+        ..Default::default()
     };
 
     // Should succeed (even if not fully implemented, placeholders return Ok)
@@ -193,6 +221,7 @@ async fn test_network_isolation_apply_invalid_config() {
         allowed_ports: vec![],
         allow_loopback: false,
         strict: false,
+        ..Default::default()
     };
 
     // Should fail validation
@@ -212,6 +241,7 @@ async fn test_network_isolation_apply_invalid_process_id() {
         allowed_ports: vec![80, 443],
         allow_loopback: true,
         strict: false,
+        ..Default::default()
     };
 
     // Should fail with invalid process ID
@@ -232,6 +262,7 @@ async fn test_filesystem_isolation_apply_invalid_process_id() {
         read_only_paths: vec![],
         use_chroot: true,
         strict: false,
+        ..Default::default()
     };
 
     // Should fail with invalid process ID
@@ -252,6 +283,7 @@ async fn test_filesystem_isolation_apply_chroot_without_root_dir() {
         read_only_paths: vec![],
         use_chroot: true, // Requires root_dir
         strict: false,
+        ..Default::default()
     };
 
     // Should fail validation
@@ -271,6 +303,7 @@ async fn test_network_isolation_graceful_degradation() {
         allowed_ports: vec![80, 443],
         allow_loopback: true,
         strict: false, // Graceful degradation enabled
+        ..Default::default()
     };
 
     // Should succeed even if system calls fail (graceful degradation)
@@ -293,6 +326,7 @@ async fn test_filesystem_isolation_graceful_degradation() {
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
         strict: false, // Graceful degradation enabled
+        ..Default::default()
     };
 
     // Should succeed even if system calls fail (graceful degradation)
@@ -312,6 +346,7 @@ async fn test_network_isolation_loopback_setup() {
         allowed_ports: vec![],
         allow_loopback: true, // Enable loopback
         strict: false,
+        ..Default::default()
     };
 
     // Should succeed with loopback enabled
@@ -333,6 +368,7 @@ async fn test_network_isolation_no_loopback() {
         allowed_ports: vec![80, 443],
         allow_loopback: false, // Disable loopback
         strict: false,
+        ..Default::default()
     };
 
     // Should succeed even without loopback (other interfaces allowed)
@@ -355,6 +391,7 @@ async fn test_filesystem_isolation_bind_mounts() {
         read_only_paths: vec![PathBuf::from("/tmp/test-readonly")],
         use_chroot: false,
         strict: false,
+        ..Default::default()
     };
 
     // Should succeed (either actually set up bind mounts or gracefully degrade)
@@ -381,6 +418,7 @@ async fn test_filesystem_isolation_read_only_mounts() {
         ],
         use_chroot: false,
         strict: false,
+        ..Default::default()
     };
 
     // Should succeed with read-only mounts
@@ -403,6 +441,7 @@ async fn test_filesystem_isolation_apply_enabled() {
         read_only_paths: vec![PathBuf::from("/tmp/readonly")],
         use_chroot: true,
         strict: false,
+        ..Default::default()
     };
 
     // Should succeed (even if not fully implemented, placeholders return Ok)
@@ -423,6 +462,7 @@ fn test_windows_plan_firewall_rules_from_config() {
         allowed_ports: vec![8080],
         allow_loopback: true,
         strict: false,
+        ..Default::default()
     };
     let rules = plan_firewall_rules(1001, &config);
     assert!(rules.len() >= 3);

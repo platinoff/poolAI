@@ -668,6 +668,13 @@
 - **Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1`
 - **FM:** FM-033 ✅
 
+### [VM] PH-S41 macvlan Linux network isolation
+- **Де:** `src/vm/isolation/linux.rs`, `NetworkIsolationConfig` (`interface_mode`, `macvlan_mode`, `macvlan_address`)
+- **Сигнал:** `NetworkInterfaceMode::Macvlan`, `create_macvlan_on_host` → `unshare(CLONE_NEWNET)` → `ip link set … netns`
+- **Патерн:** host-side macvlan create; move into process netns; `remove_network_isolation` deletes links + `setns` restore
+- **Перевірка:** `cargo test-ci`; Linux helpers `poolai::vm::linux::{macvlan_link_name, validate_macvlan_mode}`
+- **PH-S41** ✅
+
 ### [Solana] PH-S46 wire hardening + devnet deploy path
 - **Де:** `crates/poolai-solana-adapter/wire/limits.rs`, `src/wire_limits.rs`, `program/poolai-events/`, `scripts/deploy-poolai-events-devnet.sh`
 - **Сигнал:** `validate_envelope`, `anchor_mode` у RPC ack, `AdapterConfig::uses_custom_program`

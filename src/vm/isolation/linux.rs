@@ -5,10 +5,32 @@
 
 use crate::core::error::AppError;
 use crate::vm::isolation::{
-    FilesystemIsolationConfig, FilesystemIsolator, NetworkIsolationConfig, NetworkIsolator,
+    FilesystemIsolationConfig, FilesystemIsolator, NetworkInterfaceMode, NetworkIsolationConfig,
+    NetworkIsolator,
 };
 use std::path::PathBuf;
+use std::sync::Mutex;
 use tracing::{info, warn};
+
+/// Stable macvlan device name for a parent interface and process.
+pub fn macvlan_link_name(process_id: u32, parent_interface: &str) -> String {
+    let suffix: String = parent_interface
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+        .collect();
+    format!("macvlan-poolai-{process_id}-{suffix}")
+}
+
+/// Validate Linux macvlan mode string.
+pub fn validate_macvlan_mode(mode: Option<&str>) -> Result<&'static str, AppError> {
+    let macvlan_mode = mode.unwrap_or("bridge");
+    match macvlan_mode {
+        "bridge" | "private" | "vepa" | "passthru" => Ok(macvlan_mode),
+        other => Err(AppError::ConfigError(format!(
+            "Invalid macvlan mode: {other}. Valid modes: bridge, private, vepa, passthru"
+        ))),
+    }
+}
 
 #[cfg(feature = "vm-isolation-linux")]
 use nix::mount::{mount, MsFlags};
@@ -109,18 +131,26 @@ impl NamespaceState {
     }
 }
 
+#[cfg(feature = "vm-isolation-linux")]
+struct LinuxNetworkIsolationState {
+    namespace_states: std::collections::HashMap<u32, NamespaceState>,
+    macvlan_links: std::collections::HashMap<u32, Vec<String>>,
+}
+
 /// Linux network isolator using network namespaces
 pub struct LinuxNetworkIsolator {
-    /// Namespace state tracking for setns support
     #[cfg(feature = "vm-isolation-linux")]
-    namespace_states: std::collections::HashMap<u32, NamespaceState>,
+    state: Mutex<LinuxNetworkIsolationState>,
 }
 
 impl LinuxNetworkIsolator {
     pub fn new() -> Self {
         Self {
             #[cfg(feature = "vm-isolation-linux")]
-            namespace_states: std::collections::HashMap::new(),
+            state: Mutex::new(LinuxNetworkIsolationState {
+                namespace_states: std::collections::HashMap::new(),
+                macvlan_links: std::collections::HashMap::new(),
+            }),
         }
     }
 
@@ -159,199 +189,160 @@ impl LinuxNetworkIsolator {
         Ok(())
     }
 
-    /// Set up a macvlan interface for direct physical interface access
-    ///
-    /// Creates a macvlan interface to provide direct access to a physical
-    /// network interface with its own MAC address.
-    ///
-    /// Macvlan is useful when processes need direct access to the physical
-    /// network interface without going through a bridge or veth pair.
-    ///
-    /// # Arguments
-    ///
-    /// * `interface` - The physical interface name (e.g., "eth0")
-    /// * `process_id` - The process ID for unique naming
-    /// * `mode` - The macvlan mode (default: "bridge")
-    ///
-    /// # Returns
-    ///
-    /// Returns `Ok(())` on success, or an `AppError` if setup fails.
-    ///
-    /// # Future improvement
-    ///
-    /// Full implementation would involve:
-    /// 1. Creating a macvlan interface using `ip link add` command
-    ///    - Use: `ip link add <macvlan-name> link <parent-interface> type macvlan mode <mode>`
-    ///    - Example: `ip link add macvlan-poolai-1234 link eth0 type macvlan mode bridge`
-    ///    - Store the macvlan interface name for cleanup
-    /// 2. Moving the macvlan interface to the network namespace
-    ///    - Use `ip link set <macvlan-name> netns <namespace>` or `setns(CLONE_NEWNET)`
-    ///    - Requires the network namespace to be already created
-    /// 3. Bringing up the macvlan interface
-    ///    - Use: `ip link set <macvlan-name> up`
-    ///    - This can be done inside the namespace
-    /// 4. Configuring IP address (if needed)
-    ///    - Use: `ip addr add <ip-address>/<prefix> dev <macvlan-name>`
-    ///    - Example: `ip addr add 192.168.1.100/24 dev macvlan-poolai-1234`
-    ///
-    /// Macvlan modes:
-    /// - `bridge`: Default mode, allows communication between macvlan interfaces on same parent
-    /// - `private`: Prevents communication between macvlan interfaces on same parent
-    /// - `vepa`: Virtual Ethernet Port Aggregator, requires switch with hairpin mode
-    /// - `passthru`: Allows single macvlan per parent interface, passes all traffic
-    ///
-    /// This requires:
-    /// - Linux kernel 3.9+ (macvlan support)
-    /// - Parent interface must be in UP state
-    /// - CAP_NET_ADMIN capability or root privileges
-    /// - Network namespace already created
     #[cfg(feature = "vm-isolation-linux")]
-    fn setup_macvlan(interface: &str, process_id: u32, mode: Option<&str>) -> Result<(), AppError> {
-        // Validate interface name
+    fn ensure_parent_interface_up(interface: &str) -> Result<(), AppError> {
         if interface.is_empty() {
             return Err(AppError::ConfigError(
                 "Interface name cannot be empty for macvlan setup".to_string(),
             ));
         }
 
-        // Validate process ID
+        let check_output = Command::new("ip")
+            .args(["link", "show", interface])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to check parent interface {interface}: {e}. \
+                    Ensure iproute2 is installed."
+                ))
+            })?;
+
+        if !check_output.status.success() {
+            return Err(AppError::ConfigError(format!(
+                "Parent interface {interface} does not exist or is not accessible"
+            )));
+        }
+
+        let output_str = String::from_utf8_lossy(&check_output.stdout);
+        if !output_str.contains("state UP") && !output_str.contains("UP") {
+            warn!("Parent interface {interface} is not UP; macvlan may fail until it is raised");
+        }
+        Ok(())
+    }
+
+    /// Create macvlan link on the **host** namespace (before `unshare(CLONE_NEWNET)`).
+    #[cfg(feature = "vm-isolation-linux")]
+    fn create_macvlan_on_host(
+        parent_interface: &str,
+        process_id: u32,
+        mode: Option<&str>,
+    ) -> Result<String, AppError> {
         if process_id == 0 {
             return Err(AppError::ValidationError(
                 "Invalid process ID: 0 for macvlan setup".to_string(),
             ));
         }
 
-        // Default mode is "bridge" if not specified
-        let macvlan_mode = mode.unwrap_or("bridge");
+        let macvlan_mode = validate_macvlan_mode(mode)?;
+        Self::ensure_parent_interface_up(parent_interface)?;
+        let macvlan_name = macvlan_link_name(process_id, parent_interface);
 
-        // Validate mode
-        let valid_modes = ["bridge", "private", "vepa", "passthru"];
-        if !valid_modes.contains(&macvlan_mode) {
+        let create_output = Command::new("ip")
+            .args([
+                "link",
+                "add",
+                &macvlan_name,
+                "link",
+                parent_interface,
+                "type",
+                "macvlan",
+                "mode",
+                macvlan_mode,
+            ])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to create macvlan {macvlan_name} on {parent_interface}: {e}"
+                ))
+            })?;
+
+        if !create_output.status.success() {
+            let error_msg = String::from_utf8_lossy(&create_output.stderr);
             return Err(AppError::ConfigError(format!(
-                "Invalid macvlan mode: {}. Valid modes are: {:?}. \
-                Context: macvlan mode must be one of the supported Linux macvlan modes. \
-                Suggestion: Use 'bridge' for default behavior, or 'private' for isolation, or 'vepa' for VEPA mode, or 'passthru' for passthrough mode.",
-                macvlan_mode, valid_modes
+                "Failed to create macvlan {macvlan_name}: {error_msg}"
             )));
         }
 
-        // Generate unique name for macvlan interface
-        let macvlan_name = format!("macvlan-poolai-{}", process_id);
+        info!("Created macvlan {macvlan_name} on parent {parent_interface} (mode {macvlan_mode})");
+        Ok(macvlan_name)
+    }
 
-        #[cfg(feature = "vm-isolation-linux")]
-        {
-            // 1. Check if parent interface exists and is UP
-            let check_output = Command::new("ip")
-                .args(&["link", "show", interface])
-                .output()
-                .map_err(|e| {
-                    AppError::ConfigError(format!(
-                        "Failed to check parent interface {}: {}. \
-                        Context: Cannot verify parent interface for macvlan setup. \
-                        Suggestion: Ensure the interface exists and 'ip' command is available. \
-                        Error: {}",
-                        interface, e, e
-                    ))
-                })?;
+    /// Move a host macvlan link into the network namespace of `pid`.
+    #[cfg(feature = "vm-isolation-linux")]
+    fn move_macvlan_to_process_netns(macvlan_name: &str, pid: u32) -> Result<(), AppError> {
+        let output = Command::new("ip")
+            .args(["link", "set", macvlan_name, "netns", &pid.to_string()])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!(
+                    "Failed to move macvlan {macvlan_name} to netns of pid {pid}: {e}"
+                ))
+            })?;
 
-            if !check_output.status.success() {
-                return Err(AppError::ConfigError(format!(
-                    "Parent interface {} does not exist or is not accessible. \
-                    Context: macvlan requires a valid parent interface. \
-                    Suggestion: Verify the interface name and ensure it exists. \
-                    Interface: {}",
-                    interface, interface
-                )));
-            }
-
-            // Check if interface is UP (contains "state UP" in output)
-            let output_str = String::from_utf8_lossy(&check_output.stdout);
-            if !output_str.contains("state UP") && !output_str.contains("UP") {
-                warn!(
-                    "Parent interface {} is not in UP state. Macvlan may not work correctly. \
-                    Context: macvlan requires parent interface to be UP. \
-                    Suggestion: Bring up the interface using 'ip link set {} up' before creating macvlan.",
-                    interface, interface
-                );
-            }
-
-            // 2. Create macvlan interface using `ip link add` command
-            let create_output = Command::new("ip")
-                .args(&[
-                    "link", "add", &macvlan_name,
-                    "link", interface,
-                    "type", "macvlan",
-                    "mode", macvlan_mode,
-                ])
-                .output()
-                .map_err(|e| {
-                    AppError::ConfigError(format!(
-                        "Failed to create macvlan interface {}: {}. \
-                        Context: Cannot create macvlan interface on parent {}. \
-                        Suggestion: Ensure CAP_NET_ADMIN capability or root privileges, and Linux kernel 3.9+. \
-                        Error: {}",
-                        macvlan_name, e, interface, e
-                    ))
-                })?;
-
-            if !create_output.status.success() {
-                let error_msg = String::from_utf8_lossy(&create_output.stderr);
-                return Err(AppError::ConfigError(format!(
-                    "Failed to create macvlan interface {}: {}. \
-                    Context: 'ip link add' command failed. \
-                    Suggestion: Check kernel support (3.9+), CAP_NET_ADMIN, and parent interface state. \
-                    Error: {}",
-                    macvlan_name, error_msg, error_msg
-                )));
-            }
-
-            info!(
-                "Created macvlan interface {} on parent {} with mode {}",
-                macvlan_name, interface, macvlan_mode
-            );
-
-            // 3. Bring up the macvlan interface
-            let up_output = Command::new("ip")
-                .args(&["link", "set", &macvlan_name, "up"])
-                .output()
-                .map_err(|e| {
-                    AppError::ConfigError(format!(
-                        "Failed to bring up macvlan interface {}: {}. \
-                        Context: Cannot activate macvlan interface. \
-                        Suggestion: Ensure CAP_NET_ADMIN capability or root privileges. \
-                        Error: {}",
-                        macvlan_name, e, e
-                    ))
-                })?;
-
-            if !up_output.status.success() {
-                let error_msg = String::from_utf8_lossy(&up_output.stderr);
-                warn!(
-                    "Failed to bring up macvlan interface {}: {}. \
-                    Context: Interface created but could not be activated. \
-                    Suggestion: Check permissions and interface state. \
-                    Error: {}",
-                    macvlan_name, error_msg, error_msg
-                );
-            } else {
-                info!("Successfully brought up macvlan interface {}", macvlan_name);
-            }
-
-            // Note: Moving to namespace and IP configuration would be done separately
-            // when the namespace is created and process is started
-            // This is handled by the caller or in apply_network_isolation()
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::ConfigError(format!(
+                "Failed to move macvlan {macvlan_name} to pid {pid} netns: {stderr}"
+            )));
         }
+        Ok(())
+    }
 
-        #[cfg(not(feature = "vm-isolation-linux"))]
-        {
-            warn!(
-                "Macvlan setup requested for interface {} (process {}, mode: {}), but 'vm-isolation-linux' feature is not enabled. \
-                Context: macvlan support requires 'vm-isolation-linux' feature. \
-                Suggestion: Enable 'vm-isolation-linux' feature in Cargo.toml to enable macvlan support.",
-                interface, process_id, macvlan_mode
-            );
+    #[cfg(feature = "vm-isolation-linux")]
+    fn set_link_up(link_name: &str) -> Result<(), AppError> {
+        let output = Command::new("ip")
+            .args(["link", "set", link_name, "up"])
+            .output()
+            .map_err(|e| AppError::ConfigError(format!("Failed to bring up {link_name}: {e}")))?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::ConfigError(format!(
+                "Failed to bring up {link_name}: {stderr}"
+            )));
         }
+        Ok(())
+    }
 
+    #[cfg(feature = "vm-isolation-linux")]
+    fn assign_link_address(link_name: &str, cidr: &str) -> Result<(), AppError> {
+        let output = Command::new("ip")
+            .args(["addr", "add", cidr, "dev", link_name])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to assign {cidr} to {link_name}: {e}"))
+            })?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::ConfigError(format!(
+                "Failed to assign {cidr} to {link_name}: {stderr}"
+            )));
+        }
+        Ok(())
+    }
+
+    #[cfg(feature = "vm-isolation-linux")]
+    fn delete_macvlan_link(macvlan_name: &str) -> Result<(), AppError> {
+        let output = Command::new("ip")
+            .args(["link", "delete", macvlan_name])
+            .output()
+            .map_err(|e| {
+                AppError::ConfigError(format!("Failed to delete macvlan {macvlan_name}: {e}"))
+            })?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            warn!("Could not delete macvlan {macvlan_name}: {stderr}");
+        }
+        Ok(())
+    }
+
+    /// Host-side macvlan create + up (legacy helper; prefer `apply_network_isolation` flow).
+    #[cfg(feature = "vm-isolation-linux")]
+    fn setup_macvlan(interface: &str, process_id: u32, mode: Option<&str>) -> Result<(), AppError> {
+        let name = Self::create_macvlan_on_host(interface, process_id, mode)?;
+        Self::set_link_up(&name)?;
         Ok(())
     }
 
@@ -361,7 +352,6 @@ impl LinuxNetworkIsolator {
         _process_id: u32,
         _mode: Option<&str>,
     ) -> Result<(), AppError> {
-        // Without vm-isolation-linux feature, macvlan is not supported
         Err(AppError::ConfigError(
             "Macvlan support requires 'vm-isolation-linux' feature".to_string(),
         ))
@@ -579,107 +569,161 @@ impl NetworkIsolator for LinuxNetworkIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // Attempt to create network namespace
-            // Note: This requires root privileges or CAP_NET_ADMIN
+            let use_macvlan = config.interface_mode == NetworkInterfaceMode::Macvlan;
+            let mode = config.macvlan_mode.as_deref();
+
+            let pending_macvlans: Vec<String> =
+                if use_macvlan && !config.allowed_interfaces.is_empty() {
+                    let mut names = Vec::with_capacity(config.allowed_interfaces.len());
+                    for interface in &config.allowed_interfaces {
+                        match Self::create_macvlan_on_host(interface, process_id, mode) {
+                            Ok(name) => names.push(name),
+                            Err(e) => {
+                                if config.strict {
+                                    return Err(e);
+                                }
+                                warn!("Macvlan create failed for {interface}: {e}");
+                            }
+                        }
+                    }
+                    names
+                } else {
+                    Vec::new()
+                };
+
+            let mut namespace_state = match NamespaceState::save_current_namespaces() {
+                Ok(state) => state,
+                Err(e) => {
+                    for name in &pending_macvlans {
+                        let _ = Self::delete_macvlan_link(name);
+                    }
+                    if config.strict {
+                        return Err(e);
+                    }
+                    warn!("Could not save namespace state for process {process_id}: {e}");
+                    NamespaceState {
+                        original_net_ns: None,
+                        original_mnt_ns: None,
+                        created_net_ns: false,
+                        created_mnt_ns: false,
+                    }
+                }
+            };
+
             match unshare(CloneFlags::CLONE_NEWNET) {
                 Ok(_) => {
+                    namespace_state.created_net_ns = true;
                     info!(
                         "Successfully created network namespace for process {}",
                         process_id
                     );
 
-                    // Set up loopback interface if allowed
                     if config.allow_loopback {
                         match Self::setup_loopback_interface() {
-                            Ok(_) => {
-                                info!(
-                                    "Successfully set up loopback interface for process {}",
-                                    process_id
-                                );
-                            }
+                            Ok(_) => info!(
+                                "Successfully set up loopback interface for process {}",
+                                process_id
+                            ),
                             Err(e) => {
                                 let error_msg = format!(
-                                    "Failed to set up loopback interface for process {}: {}",
-                                    process_id, e
+                                    "Failed to set up loopback interface for process {process_id}: {e}"
                                 );
                                 if config.strict {
                                     return Err(AppError::ConfigError(error_msg));
-                                } else {
-                                    warn!("{}. Continuing without loopback.", error_msg);
                                 }
+                                warn!("{error_msg}. Continuing without loopback.");
                             }
                         }
                     }
 
-                    // Configure allowed interfaces using veth pairs or macvlan
-                    // Note: macvlan can be used by calling setup_macvlan() instead of setup_veth_pair()
-                    // when direct physical interface access is needed
-                    if !config.allowed_interfaces.is_empty() {
-                        for interface in &config.allowed_interfaces {
-                            // Default to veth pairs, but macvlan can be used if needed
-                            // To use macvlan, call: Self::setup_macvlan(interface, process_id, Some("bridge"))
-                            match Self::setup_veth_pair(interface, process_id) {
-                                Ok(_) => {
-                                    info!(
-                                        "Successfully set up veth pair for interface {} in process {}",
-                                        interface, process_id
-                                    );
+                    let current_pid = std::process::id();
+                    let mut active_macvlans = Vec::new();
+                    for name in pending_macvlans {
+                        match Self::move_macvlan_to_process_netns(&name, current_pid) {
+                            Ok(_) => {
+                                if let Err(e) = Self::set_link_up(&name) {
+                                    if config.strict {
+                                        return Err(e);
+                                    }
+                                    warn!("Failed to bring up macvlan {name}: {e}");
+                                } else if let Some(ref cidr) = config.macvlan_address {
+                                    if let Err(e) = Self::assign_link_address(&name, cidr) {
+                                        if config.strict {
+                                            return Err(e);
+                                        }
+                                        warn!("Failed to assign {cidr} to macvlan {name}: {e}");
+                                    }
                                 }
+                                active_macvlans.push(name);
+                            }
+                            Err(e) => {
+                                let _ = Self::delete_macvlan_link(&name);
+                                if config.strict {
+                                    return Err(e);
+                                }
+                                warn!("Failed to move macvlan {name} into netns: {e}");
+                            }
+                        }
+                    }
+
+                    if !use_macvlan && !config.allowed_interfaces.is_empty() {
+                        for interface in &config.allowed_interfaces {
+                            match Self::setup_veth_pair(interface, process_id) {
+                                Ok(_) => info!(
+                                    "Successfully set up veth pair for interface {interface} in process {process_id}"
+                                ),
                                 Err(e) => {
                                     let error_msg = format!(
-                                        "Failed to set up veth pair for interface {}: {}",
-                                        interface, e
+                                        "Failed to set up veth pair for interface {interface}: {e}"
                                     );
                                     if config.strict {
                                         return Err(AppError::ConfigError(error_msg));
-                                    } else {
-                                        warn!("{}. Continuing without this interface.", error_msg);
                                     }
+                                    warn!("{error_msg}. Continuing without this interface.");
                                 }
                             }
                         }
                     }
 
-                    // Set up firewall rules for allowed ports
                     if !config.allowed_ports.is_empty() {
                         match Self::setup_firewall_rules(&config.allowed_ports, process_id) {
-                            Ok(_) => {
-                                info!(
-                                    "Successfully set up firewall rules for ports {:?} in process {}",
-                                    config.allowed_ports, process_id
-                                );
-                            }
+                            Ok(_) => info!(
+                                "Successfully set up firewall rules for ports {:?} in process {}",
+                                config.allowed_ports, process_id
+                            ),
                             Err(e) => {
                                 let error_msg = format!(
-                                    "Failed to set up firewall rules for process {}: {}",
-                                    process_id, e
+                                    "Failed to set up firewall rules for process {process_id}: {e}"
                                 );
                                 if config.strict {
                                     return Err(AppError::ConfigError(error_msg));
-                                } else {
-                                    warn!("{}. Continuing without firewall rules.", error_msg);
                                 }
+                                warn!("{error_msg}. Continuing without firewall rules.");
                             }
+                        }
+                    }
+
+                    if let Ok(mut state) = self.state.lock() {
+                        state.namespace_states.insert(process_id, namespace_state);
+                        if !active_macvlans.is_empty() {
+                            state.macvlan_links.insert(process_id, active_macvlans);
                         }
                     }
                 }
                 Err(e) => {
-                    let error_msg = format!(
-                        "Failed to create network namespace for process {}: {}",
-                        process_id, e
-                    );
+                    for name in &pending_macvlans {
+                        let _ = Self::delete_macvlan_link(name);
+                    }
+                    let error_msg =
+                        format!("Failed to create network namespace for process {process_id}: {e}");
                     if config.strict {
                         return Err(AppError::ConfigError(format!(
-                            "{}. Isolation is required (strict mode enabled).",
-                            error_msg
+                            "{error_msg}. Isolation is required (strict mode enabled)."
                         )));
-                    } else {
-                        warn!(
-                            "{}. Isolation may not be fully applied (graceful degradation).",
-                            error_msg
-                        );
-                        // Continue with validation-only mode
                     }
+                    warn!(
+                        "{error_msg}. Isolation may not be fully applied (graceful degradation)."
+                    );
                 }
             }
         }
@@ -706,53 +750,34 @@ impl NetworkIsolator for LinuxNetworkIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // Get namespace state for this process
-            if let Some(namespace_state) = self.namespace_states.remove(&process_id) {
-                // 1. Restore original network namespace using setns
+            let mut macvlan_links = Vec::new();
+            let namespace_state = if let Ok(mut state) = self.state.lock() {
+                macvlan_links = state.macvlan_links.remove(&process_id).unwrap_or_default();
+                state.namespace_states.remove(&process_id)
+            } else {
+                None
+            };
+
+            if let Some(namespace_state) = namespace_state {
                 if namespace_state.created_net_ns {
                     if let Err(e) = namespace_state.restore_network_namespace() {
                         warn!(
-                            "Failed to restore original network namespace for process {}: {}. \
-                            Process may remain in isolated namespace.",
-                            process_id, e
+                            "Failed to restore original network namespace for process {process_id}: {e}"
                         );
                     } else {
-                        info!(
-                            "Successfully restored original network namespace for process {} using setns",
-                            process_id
-                        );
+                        info!("Restored original network namespace for process {process_id}");
                     }
                 }
-
-                // 2. Clean up network namespace if it was created by us
-                // Note: In a full implementation, we would:
-                // - Use 'ip netns delete namespace-name' to remove namespace
-                // - Only delete if we created it (tracked by created_net_ns flag)
-                // - Ensure namespace is empty before deletion (all processes moved out)
-                if namespace_state.created_net_ns {
-                    info!(
-                        "Network namespace cleanup for process {} (namespace was created by us, \
-                        but automatic deletion requires tracking namespace name and ensuring it's empty)",
-                        process_id
-                    );
-                }
-
-                // 3. Remove firewall rules using 'nft delete' or 'iptables -F' and 'iptables -X'
-                // Note: In a full implementation, we would:
-                // - Remove all rules from custom chains
-                // - Delete custom chains after removing references
-                // - Remove table if no longer needed
-                info!(
-                    "Firewall rules cleanup for process {} (automatic cleanup requires tracking \
-                    created rules and chains)",
-                    process_id
-                );
             } else {
-                warn!(
-                    "No namespace state found for process {}. \
-                    Cannot restore original namespace using setns.",
-                    process_id
-                );
+                warn!("No namespace state found for process {process_id}; cannot restore netns");
+            }
+
+            for name in macvlan_links {
+                if let Err(e) = Self::delete_macvlan_link(&name) {
+                    warn!("Macvlan cleanup for process {process_id} ({name}): {e}");
+                } else {
+                    info!("Deleted macvlan link {name} for process {process_id}");
+                }
             }
         }
 
@@ -773,18 +798,24 @@ impl NetworkIsolator for LinuxNetworkIsolator {
     }
 }
 
+#[cfg(feature = "vm-isolation-linux")]
+struct LinuxFilesystemIsolationState {
+    namespace_states: std::collections::HashMap<u32, NamespaceState>,
+}
+
 /// Linux filesystem isolator using chroot and bind mounts
 pub struct LinuxFilesystemIsolator {
-    /// Namespace state tracking for setns support
     #[cfg(feature = "vm-isolation-linux")]
-    namespace_states: std::collections::HashMap<u32, NamespaceState>,
+    state: Mutex<LinuxFilesystemIsolationState>,
 }
 
 impl LinuxFilesystemIsolator {
     pub fn new() -> Self {
         Self {
             #[cfg(feature = "vm-isolation-linux")]
-            namespace_states: std::collections::HashMap::new(),
+            state: Mutex::new(LinuxFilesystemIsolationState {
+                namespace_states: std::collections::HashMap::new(),
+            }),
         }
     }
 
@@ -921,7 +952,22 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // Create mount namespace for isolation
+            let mut namespace_state = match NamespaceState::save_current_namespaces() {
+                Ok(state) => state,
+                Err(e) => {
+                    if config.strict {
+                        return Err(e);
+                    }
+                    warn!("Could not save mount namespace state for process {process_id}: {e}");
+                    NamespaceState {
+                        original_net_ns: None,
+                        original_mnt_ns: None,
+                        created_net_ns: false,
+                        created_mnt_ns: false,
+                    }
+                }
+            };
+
             let mount_ns_result = unshare(CloneFlags::CLONE_NEWNS);
             match mount_ns_result {
                 Ok(_) => {
@@ -1022,6 +1068,10 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
                             }
                         }
                     }
+
+                    if let Ok(mut state) = self.state.lock() {
+                        state.namespace_states.insert(process_id, namespace_state);
+                    }
                 }
                 Err(e) => {
                     let error_msg = format!(
@@ -1066,8 +1116,13 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
 
         #[cfg(feature = "vm-isolation-linux")]
         {
-            // Get namespace state for this process
-            if let Some(namespace_state) = self.namespace_states.remove(&process_id) {
+            let namespace_state = if let Ok(mut state) = self.state.lock() {
+                state.namespace_states.remove(&process_id)
+            } else {
+                None
+            };
+
+            if let Some(namespace_state) = namespace_state {
                 // 1. Unmount bind mounts using umount2() with MNT_DETACH flag
                 // Note: In a full implementation, we would:
                 // - Track all mount points created during isolation
@@ -1128,5 +1183,30 @@ impl FilesystemIsolator for LinuxFilesystemIsolator {
     fn is_supported(&self) -> bool {
         // chroot and mount namespaces are supported on Linux
         true
+    }
+}
+
+#[cfg(test)]
+mod macvlan_unit_tests {
+    use super::{macvlan_link_name, validate_macvlan_mode};
+
+    #[test]
+    fn macvlan_link_name_includes_parent_suffix() {
+        assert_eq!(macvlan_link_name(42, "eth0"), "macvlan-poolai-42-eth0");
+        assert_eq!(
+            macvlan_link_name(1, "bond0.100"),
+            "macvlan-poolai-1-bond0-100"
+        );
+    }
+
+    #[test]
+    fn validate_macvlan_mode_accepts_known_modes() {
+        assert_eq!(validate_macvlan_mode(None).unwrap(), "bridge");
+        assert_eq!(validate_macvlan_mode(Some("vepa")).unwrap(), "vepa");
+    }
+
+    #[test]
+    fn validate_macvlan_mode_rejects_unknown() {
+        assert!(validate_macvlan_mode(Some("l2")).is_err());
     }
 }

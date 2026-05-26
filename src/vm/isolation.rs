@@ -32,6 +32,22 @@ use std::path::PathBuf;
 ///     strict: false,
 /// };
 /// ```
+/// How allowed parent interfaces are attached inside a Linux network namespace.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NetworkInterfaceMode {
+    /// Virtual ethernet pair (default).
+    Veth,
+    /// Macvlan on the parent interface (Linux `ip link … type macvlan`).
+    Macvlan,
+}
+
+impl Default for NetworkInterfaceMode {
+    fn default() -> Self {
+        Self::Veth
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct NetworkIsolationConfig {
     /// Whether to enable network isolation
@@ -51,6 +67,15 @@ pub struct NetworkIsolationConfig {
     /// the operation will log a warning and continue (graceful degradation).
     /// When `strict = true`, any failure will return an error.
     pub strict: bool,
+    /// Attach `allowed_interfaces` via macvlan instead of veth (Linux only).
+    #[serde(default)]
+    pub interface_mode: NetworkInterfaceMode,
+    /// Macvlan mode: `bridge` (default), `private`, `vepa`, or `passthru`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub macvlan_mode: Option<String>,
+    /// Optional static address for macvlan interfaces, e.g. `192.168.1.100/24`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub macvlan_address: Option<String>,
 }
 
 impl Default for NetworkIsolationConfig {
@@ -61,7 +86,40 @@ impl Default for NetworkIsolationConfig {
             allowed_ports: vec![],
             allow_loopback: true,
             strict: false,
+            interface_mode: NetworkInterfaceMode::default(),
+            macvlan_mode: None,
+            macvlan_address: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod network_config_tests {
+    use super::*;
+
+    #[test]
+    fn network_config_defaults_to_veth() {
+        let config = NetworkIsolationConfig::default();
+        assert_eq!(config.interface_mode, NetworkInterfaceMode::Veth);
+        assert!(config.macvlan_mode.is_none());
+    }
+
+    #[test]
+    fn network_config_macvlan_round_trip() {
+        let config = NetworkIsolationConfig {
+            enabled: true,
+            allowed_interfaces: vec!["eth0".into()],
+            allowed_ports: vec![],
+            allow_loopback: true,
+            strict: false,
+            interface_mode: NetworkInterfaceMode::Macvlan,
+            macvlan_mode: Some("private".into()),
+            macvlan_address: Some("10.0.0.50/24".into()),
+        };
+        let json = serde_json::to_string(&config).unwrap();
+        let back: NetworkIsolationConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.interface_mode, NetworkInterfaceMode::Macvlan);
+        assert_eq!(back.macvlan_mode.as_deref(), Some("private"));
     }
 }
 
