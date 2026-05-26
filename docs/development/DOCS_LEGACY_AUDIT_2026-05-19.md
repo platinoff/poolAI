@@ -62,7 +62,7 @@
 | **FM-009/010**, **P6** | **Concept-only** |
 | **Layer C** | **100%** (S40; було 79% до Horizon S35–S40) |
 
-**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S37** merge Linux PNG; канон черги **§5.11** (10 спринтів PH-S37…S46); §5.10 PH-S35…S44; ops PH-S35/S36 BLOCKED/Deferred (2026-05-25).
+**Наступна сесія:** [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md) — **PH-S51** VM Linux isolation; канон черги **§5.11** (**PH-S51…S60**); **PH-S49/S50** ✅ (2026-05-26).
 
 ---
 

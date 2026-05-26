@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-25 (PH-S37b: visual CI workflow, security rotation tab; §5.11 черга PH-S37…S46).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-26 (PH-S50: Jobs OpenAPI `JobStoreBackend`, DIGEST `src/job/`; §5.11 PH-S51…S60).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -119,7 +119,7 @@
 | Модуль / crate | Призначення | HTTP / wire |
 |----------------|-------------|-------------|
 | `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus | JSON; map ↔ discovery/RAID |
-| `src/job/` | `JobSpec`, `JobStatus`, lifecycle types | `POST/GET /api/v1/jobs` (stub) |
+| `src/job/` | `JobStore`, scheduler, lifecycle; persistence JSON / SQLite (`FM-029`) / RAID snapshot (`PH-S48`) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule` (FM-020…029) |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
 | `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |

@@ -109,7 +109,9 @@ bash bin/run-poolai.sh build
 |--------|-----------|------|
 | `POOLAI_HTTP_PORT` | poolai | Порт API/UI (default 8080) |
 | `POOLAI_DATA_PATH` | poolai | Каталог даних |
-| `POOLAI_RAID_BASE_PATH` | poolai | Сховище RAID-артефактів |
+| `POOLAI_RAID_BASE_PATH` | poolai | Сховище RAID-артефактів (обов’язково для `POOLAI_JOB_STORE=raid`) |
+| `POOLAI_JOB_DATA_DIR` | coordinator | JSON/SQLite jobs (`data/jobs` → `jobs.json` або `jobs.db`) |
+| `POOLAI_JOB_STORE` | coordinator | `sqlite` (feature `job-store-sqlite`), `raid` (snapshot у RAID), інакше JSON |
 | `POOLAI_CONFIG_PATH` | poolai | TOML (default `config.toml`) |
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні VN tasks/bindings |
 | `POOLAI_COORDINATOR_URL` | worker, bot | Base URL coordinator |
@@ -117,6 +119,19 @@ bash bin/run-poolai.sh build
 | `RUST_LOG` | усі | `info`, `debug`, … |
 
 Приклад конфігу: [`config.example.toml`](../../config.example.toml) → скопіювати в `config.toml`.
+
+### Job store: RAID snapshot (PH-S48 / PH-S49)
+
+Jobs зберігаються як RAID-артефакт (логічне ім’я у `src/job/store.rs`). **Порядок:** спочатку `POOLAI_RAID_BASE_PATH`, потім `POOLAI_JOB_STORE=raid`, потім старт coordinator.
+
+```bash
+export POOLAI_RAID_BASE_PATH="$PWD/data/dev/raid"
+export POOLAI_JOB_STORE=raid
+bash bin/run-poolai.sh single
+# POST /api/v1/jobs → restart → GET /api/v1/jobs/{id} має зберегти запис
+```
+
+Для LAN (`bash bin/run-poolai.sh lan`) — **різні** `POOLAI_RAID_BASE_PATH` на кожен вузол (див. [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md)). Тест: `tests/job_store_raid_persistence.rs` (`--features test-utils`).
 
 ---
 
@@ -139,4 +154,4 @@ bash bin/pa11y-ci.sh
 | OOM при тестах Windows | `cargo test-ci` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
-**Last updated:** 2026-05-19
+**Last updated:** 2026-05-26

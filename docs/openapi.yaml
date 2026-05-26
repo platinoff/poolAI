@@ -67,7 +67,9 @@ tags:
   - name: WebSocket
     description: Real-time WebSocket endpoints
   - name: Jobs
-    description: Job / mining layer HTTP stub (P6, FM-020+)
+    description: |
+      Job / mining layer (`src/network/api/jobs.rs`, `src/job/`): list, create, schedule tick, lifecycle PATCH (FM-020…029).
+      Persistence — `JobStoreBackend` schema; env `POOLAI_JOB_STORE`, `POOLAI_JOB_DATA_DIR`, `POOLAI_RAID_BASE_PATH` (PH-S48 RAID snapshot).
   - name: Memory
     description: AGI memory shard refs mapped to RAID artifacts (FM-022)
   - name: Grid
@@ -328,7 +330,7 @@ paths:
       tags:
         - Jobs
       summary: List jobs
-      description: In-process job store (`POOLAI_JOB_DATA_DIR`; JSON default or `POOLAI_JOB_STORE=sqlite` with `job-store-sqlite` feature).
+      description: Lists jobs from the in-process `JobStore`. Backend resolved at coordinator start — see `JobStoreBackend` and Jobs tag.
       operationId: listJobs
       responses:
         '200':
@@ -341,7 +343,7 @@ paths:
       tags:
         - Jobs
       summary: Submit a job
-      description: Creates job as `submitted`, then scheduler promotes to `scheduled` and binds to pool worker / running VM when available (FM-034).
+      description: Creates job as `submitted` and persists via `JobStore` (`JobStoreBackend`). Scheduler promotes to `scheduled` and binds pool worker / running VM when available (FM-034).
       operationId: createJob
       requestBody:
         required: true
@@ -368,7 +370,7 @@ paths:
       tags:
         - Jobs
       summary: Run scheduler tick
-      description: Promotes all `submitted` jobs to `scheduled` (priority descending) and binds to pool workers / running VM instances when available (FM-034). Idempotent for already scheduled rows.
+      description: Promotes all `submitted` jobs to `scheduled` (priority descending), binds pool workers / running VMs (FM-034), persists store updates (`JobStoreBackend`). Idempotent for already scheduled rows.
       operationId: scheduleJobs
       responses:
         '200':
@@ -389,6 +391,7 @@ paths:
       tags:
         - Jobs
       summary: Get job by id
+      description: Returns `JobRecord` from `JobStore` (see `JobStoreBackend`).
       operationId: getJob
       parameters:
         - name: id
@@ -413,7 +416,7 @@ paths:
       tags:
         - Jobs
       summary: Update job status
-      description: Lifecycle transition per JOB_LAYER_CONCEPT §2.2 (forward path + `failed` from non-terminal states).
+      description: Lifecycle transition per JOB_LAYER_CONCEPT §2.2 (forward path + `failed` from non-terminal states). Persists via `JobStore` (`JobStoreBackend`).
       operationId: patchJob
       parameters:
         - name: id
@@ -5146,6 +5149,18 @@ components:
         - embeddings
         - memory
         - system
+
+    JobStoreBackend:
+      type: string
+      enum:
+        - json
+        - sqlite
+        - raid
+      description: |
+        Coordinator job persistence mode (`src/job/store.rs`), resolved from env at first `JobStore::global()`:
+        - **json** — default; atomic `jobs.json` under `POOLAI_JOB_DATA_DIR` (or in-memory when unset)
+        - **sqlite** — `POOLAI_JOB_STORE=sqlite` and build feature `job-store-sqlite` → `jobs.db` (migrates legacy JSON on first open, FM-029)
+        - **raid** — `POOLAI_JOB_STORE=raid`; full snapshot as RAID logical artifact (PH-S48); requires `POOLAI_RAID_BASE_PATH` before RAID manager / job store init
 
     JobStatus:
       type: string

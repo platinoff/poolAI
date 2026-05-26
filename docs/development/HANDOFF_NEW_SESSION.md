@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 (PH-S41 ✅ macvlan Linux · §5.11 PH-S40/PH-S48) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-26 (PH-S50 ✅ OpenAPI/DIGEST jobs · §5.11 PH-S51…S60) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -15,7 +15,9 @@
 **Maintenance (2026-05-23):** `54543028` — PH-S07…S09 (FM-043 Prometheus, FM-044 TLS, FM-045 design system). **PH-S10 ✅** — `admin_charts.js` (line/sparkline charts, polling), `monitoring.rs` + `dashboard.rs` refactor, `DESIGN_SYSTEM.md`. **PH-S11 ✅** — Playwright visual regression (`e2e/tests/visual.spec.ts`, 11 baselines, [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)). **PH-S12 ✅** — theme (dark/light) + i18n (EN/UK) matrix (+12 snapshots; `admin_common.js` `poolaiApplyTheme`). **PH-S13 ✅** — topology admin masked SVG visual (`topology.png`, `TOPOLOGY_VISUAL_MASKS`; commit `d37210f7`). **PH-S14 ✅** — high-contrast admin theme (`poolaiNormalizeTheme`, HC CSS) + axe `color-contrast` E2E. **PH-S03 ✅** — `tests/vm_api_contracts.rs` (VM write lifecycle + RBAC); Playwright VM create/delete (`admin.spec.ts`). **PH-S04 ✅** — `tests/raft_wire_integration.rs` (`GET /api/v1/raid/status` + `AppState::raft_node`); `cargo test-raft-ci`. **PH-S05 ✅** — `/ui/admin/raid` `#raid-cluster-status`. **PH-S06 ✅** — `tests/raft_multi_node_harness.rs` + `raft_rpc` HTTP; `cargo test-raft-ci`. **PH-S01…S14 закрито** (лише S01 Deferred, S02 BLOCKED). **PH-S17…S24 ✅** (2026-05-24). **PH-S25…S34 ✅** (2026-05-24–25): `5f41a919` E2E stability; `476c5c20` secrets OpenAPI; `82d35fd3` metrics test. **PH-S47 ✅ (2026-05-25):** CI #1213 green на `0fe21bf1`. **PH-S37 ✅ infra:** workflow `update-visual-baselines.yml` (PNG on-demand). **PH-S44 ✅:** `test:ci` incl. visual + axe; paths-filter gates Playwright/Pa11y on UI PR. **PH-S39 ✅:** Windows Job Object post-spawn CPU/memory limits (`WindowsJobObjectLimiter`, `apply_limits_post_spawn`, `vm_windows_resource_limits_integration`). **PH-S42 ✅:** Admin tables UX — sort/filter/export toolbar, `adminEmptyStateHtml`, auto-init via `adminInitTablesIn` (`admin_common.js`, `admin_styles.css`). **PH-S43 ✅:** `/ui/admin/monitoring` ML pipeline step metrics panel (`poolaiRenderMlPipelineMetricsPanel`, Run ML Demo, sparklines from `step_results`). **PH-S45 ✅:** VM admin onclick globals (`showCreateVmModal`/`handleCreateVm` on `globalThis` — IIFE fix); Playwright VM create/delete waits POST/DELETE; axe audit settle in `waitForAdminAxeReady`; E2E viewport 1920 + visual baselines refresh. **PH-S38 ✅:** scheduler GPU/deadline hardening (`ScheduleOutcome.expired`, VM/worker GPU placement); core NDJSON on-chain epics (`POOLAI_ONCHAIN_EVENTS_DIR`, `src/job/domain_events.rs`, `onchain.rs`); grid peer bind + memory/seed events; `tests/job_onchain_events.rs`. **PH-S46 ✅:** Solana wire limits + devnet deploy path. **PH-S41 ✅:** `NetworkInterfaceMode` (`veth`/`macvlan`), macvlan create → `unshare` → `ip link set netns` → optional CIDR, cleanup on remove; OpenAPI `NetworkIsolationConfig` fields. **Черга:** §5.11 PH-S40 → PH-S48.
 
 **PH-S48 ✅:** Job store RAID-backed persistence (snapshot у RAID артефактах).
-**Черга:** §5.11 поповнюється research у `docs/` (якщо відкритих <3).
+**PH-S49 ✅:** Research + ops/docs — `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH` (HANDOFF §2a, [`RUN_LOCAL.md`](./RUN_LOCAL.md)).
+**PH-S50 ✅:** OpenAPI `JobStoreBackend` + Jobs tag; DIGEST `src/job/`; `poolai-openapi-gap-audit` 0.
+**Черга:** §5.11 **PH-S51…S60** (10 відкритих); наступний код — **PH-S51**.
 
 ## 1. Канонічний порядок документації та планів
 
@@ -49,7 +51,8 @@
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |
 | `POOLAI_JOB_DATA_DIR` | coordinator | Персистентні jobs (напр. `data/jobs`; default `jobs.json`) |
 | `POOLAI_ONCHAIN_EVENTS_DIR` | coordinator | NDJSON `events.ndjson` для sidecar (`JobCompleted` / memory epics; PH-S38) |
-| `POOLAI_JOB_STORE` | coordinator | `sqlite` — `jobs.db` (потрібен `--features job-store-sqlite`); інакше JSON |
+| `POOLAI_JOB_STORE` | coordinator | `sqlite` → `jobs.db` (`--features job-store-sqlite`); `raid` → snapshot у RAID (`POOLAI_RAID_BASE_PATH` **до** першого `JobStore::global()`); інакше JSON (`POOLAI_JOB_DATA_DIR` / `jobs.json`) |
+| `POOLAI_RAID_BASE_PATH` | coordinator | Каталог RAID-артефактів (обов’язково для `POOLAI_JOB_STORE=raid`; той самий шлях, що для `/api/v1/raid/*`) |
 | `POOLAI_MEMORY_DATA_DIR` | coordinator | Персистентні memory shards (напр. `data/memory`, `shards.json`) |
 | `POOLAI_MONITORING_DATA_DIR` | coordinator | Enterprise monitoring SQLite (`monitoring.db`: metrics, dashboards, alert_rules) |
 | `POOLAI_SOLANA_CONFIG` | sidecar | Шлях до TOML (default: bundled `config/devnet.toml`) |

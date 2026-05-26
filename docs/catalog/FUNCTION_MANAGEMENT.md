@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-26 (PH-S41 ✅ macvlan Linux · §5.11 PH-S40…S48; FM-041 Deferred).
+**Оновлено:** 2026-05-26 (PH-S50 ✅ OpenAPI/DIGEST jobs · §5.11 PH-S51…S60; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -162,7 +162,9 @@ FM-xxx (з таблиці нижче)
 | — | **PH-S46** Solana on-chain program hardening + devnet deploy | **§5.11** | **✅** — `wire/limits.rs`, deploy script, `anchor_mode` |
 | — | **PH-S41** macvlan network isolation (Linux) | **§5.11** | **✅** — `NetworkInterfaceMode`, netns move + cleanup |
 | 1 | **PH-S40** hardware VM isolation | **§5.10** | **✅** (HardwareVm best-effort isolation plans) |
-| 2 | **PH-S48** Job store RAID-backed persistence | Architect deferred | **✅** |
+| — | **PH-S48** Job store RAID-backed persistence | Architect deferred | **✅** |
+| — | **PH-S49** Job store RAID ops/docs + §5.11 research | PH-S48 follow-up, DOCS_LEGACY | **✅** — HANDOFF/RUN_LOCAL; черга PH-S50…S59 |
+| 3 | **PH-S50** OpenAPI + DIGEST jobs / `POOLAI_JOB_STORE=raid` | OPENAPI_GAP, DIGEST | **✅** — `JobStoreBackend` schema; Jobs tag; gap-audit 0 |
 
 **Закрито (не в черзі):** FM-001…040, FM-037…039, FM-042…045; Horizon S35–S40; **PH-S07…S12** ✅ (PH-S11–S12: Playwright visual + theme/i18n — [`VISUAL_REGRESSION_E2E.md`](../development/VISUAL_REGRESSION_E2E.md)).
 
@@ -227,30 +229,30 @@ FM-xxx (з таблиці нижче)
 | **PH-S43** | Monitoring / ML step metrics UI | UI_UX §monitoring, DIGEST §ML | **✅** |
 | **PH-S44** | E2E gate: visual + axe required on UI PRs | DOCS_LEGACY, `AUTO_RUN` a11y merge | **✅** — `e2e/package.json` `test:ci` + `ci.yml` paths-filter |
 
-**Наступна сесія (код/CI):** PH-S48 ✅ завершено (job RAID store). Далі: поповніть чергу research у `docs/` (якщо потрібно). **Не стартувати без інфра:** PH-S35, PH-S36 без запиту.
+**Наступна сесія (код/CI):** **PH-S51** (VM Linux isolation hardening). **Не стартувати без інфра:** PH-S35/S16/S02 LAN, PH-S36/S01/S15 Cloud SDK.
 
-### 5.11 Наступні 10 спринтів PH-S47…S46 (код, 2026-05-25)
+### 5.11 Наступні 10 спринтів PH-S51…S60 (код, 2026-05-26)
 
 **VDT / локальний CI:** одна сесія = один PH-S*; верифікація — `cargo test-ci` (+ scope: raft, openapi-gap, e2e). GitHub Actions — довідково. Правила — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc). Якщо відкритих <3 — research у `docs/` і доповнити чергу (**max 10**).
 
 **Джерела (пріоритет):** локальні failures → §5.10 → [`DOCS_LEGACY_AUDIT_2026-05-19.md`](../development/DOCS_LEGACY_AUDIT_2026-05-19.md) → Architect / UI_UX / [`E2E_PLAYWRIGHT.md`](../development/E2E_PLAYWRIGHT.md).
 
-| # | Sprint | Фокус | Джерело | Стан |
-|---|--------|--------|---------|------|
-| — | **PH-S47** | CI green; локально `cargo test-ci` + gap audit | `ci.yml`, tests | **✅** — CI #1213 (`0fe21bf1`) |
-| — | **PH-S37** | Linux visual baselines workflow | §5.10, `update-visual-baselines.yml` | **✅ infra** — on-demand PNG refresh |
-| — | **PH-S44** | CI gate: visual + axe on UI/e2e changes | §5.10, `ci.yml`, `e2e/package.json` | **✅** |
-| — | **PH-S39** | VM Windows CPU/memory limits post-spawn | §5.10, `vm/resources/windows.rs` | **✅** |
-| — | **PH-S42** | Admin tables UX (sort/filter/export, empty states) | §5.10, `UI_UX_IMPROVEMENTS_PLAN` §tables | **✅** |
-| — | **PH-S43** | Monitoring / ML step metrics admin UI | §5.10, DIGEST §ML, `admin/monitoring.rs` | **✅** |
-| — | **PH-S45** | E2E stability: VM create modal + axe `/ui/admin/audit` | `admin.spec.ts`, `a11y.spec.ts`, `vm.rs` globals | **✅** |
-| — | **PH-S38** | Job scheduler hardening + on-chain submit epics | §5.10, `src/job/` | **✅** |
-| — | **PH-S46** | Solana wire hardening + production devnet deploy path | §5.7, `SOLANA_ADAPTER_CONCEPT` §10 | **✅** |
-| — | **PH-S41** | macvlan network isolation (Linux) | §5.10, `vm/isolation/linux.rs` | **✅** |
-| 1 | **PH-S40** | hardware VM isolation | §5.10, `vm/mod.rs` | **✅** |
-| 2 | **PH-S48** | Job store RAID-backed | Architect deferred | **✅** |
+**Закрито (не в §5.11):** PH-S47…S50 ✅ (S50 — `JobStoreBackend`, DIGEST jobs, gap-audit 0).
 
-**Поза чергою:** **PH-S35** LAN (**BLOCKED**) · **PH-S36** Cloud SDK (**Deferred**, FM-041).
+| # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
+|---|--------|--------|---------|-------------------------|------|
+| 1 | **PH-S51** | VM Linux isolation hardening (veth apply, cgroup/netns cleanup) | `vm/isolation/linux.rs`, `vm_isolation_integration.rs` | feature `vm-isolation-linux`: apply+cleanup тести; macvlan edge cases | відкрито |
+| 2 | **PH-S52** | E2E: job lifecycle + RAID persistence smoke | `e2e/`, `job_store_raid_persistence.rs` | Playwright або API helper: POST job → restart stand → GET job | відкрито |
+| 3 | **PH-S53** | Admin UX: jobs panel + store backend hint | DIGEST §Job, UI_QUALITY | `/ui/admin/jobs` (або секція): list jobs, badge `json`/`sqlite`/`raid` | відкрито |
+| 4 | **PH-S54** | `verify-dev-stand` optional RAID job store step | `bin/verify-dev-stand.sh`, PH-S48 | env-gated: create job, restart coordinator, assert persisted | відкрито |
+| 5 | **PH-S55** | `run-poolai` / LAN preset для RAID jobs | `RUN_LOCAL.md`, `bin/run-poolai.sh` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` | відкрито |
+| 6 | **PH-S56** | Grid ↔ job dispatch contract tests | `src/grid/dispatch.rs`, FM-020 | integration: grid result → job status transition | відкрито |
+| 7 | **PH-S57** | Linux VM isolation CI matrix + docs | `Cargo.toml` features, `README.md` | `vm-isolation-linux` у dev doc; when to enable on Linux host | відкрито |
+| 8 | **PH-S58** | JOB_LAYER + AUTO_DEV RAID store runbook | `JOB_LAYER_CONCEPT`, `AUTO_DEV_PATTERNS` | §persistence: json/sqlite/raid table + migrate notes | відкрито |
+| 9 | **PH-S59** | `RUN_PARAMETERS.md` POOLAI_JOB_* sync | `RUN_PARAMETERS.md`, HANDOFF §2a | повна таблиця `POOLAI_JOB_STORE` / `POOLAI_JOB_DATA_DIR` / RAID order | відкрито |
+| 10 | **PH-S60** | OpenAPI gap audit maintenance gate | `OPENAPI_GAP_AUDIT`, `ci.yml` | при нових `/api/v1/*` routes — оновлення yaml + audit у PR checklist | відкрито |
+
+**Поза чергою:** **PH-S35** / **PH-S16** / **PH-S02** LAN (**BLOCKED**) · **PH-S36** / **PH-S01** / **PH-S15** Cloud SDK (**Deferred**, FM-041).
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 

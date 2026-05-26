@@ -41,4 +41,6 @@ rg '^  /users' docs/openapi.yaml
 rg '^  /raid/admin' docs/openapi.yaml
 ```
 
-**Наступний спринт:** **FM-033** Solana on-chain + devnet RPC (`NEXT_SESSION_PROMPT.md`). OpenAPI gap backlog **закрито** (FM-032 ✅).
+**PH-S50 (2026-05-26):** Jobs tag + `JobStoreBackend` schema (`json`/`sqlite`/`raid`); DIGEST `src/job/` не stub. Gap audit **0 missing**.
+
+**Наступний спринт:** **PH-S51** VM Linux isolation (`NEXT_SESSION_PROMPT.md`). OpenAPI route backlog **закрито** (FM-032 ✅).
