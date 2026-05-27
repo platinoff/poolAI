@@ -103,6 +103,7 @@ zip = { version = "7.0", default-features = false, features = ["deflate", "time"
 sha2 = "0.10"
 hmac = "0.12"
 hex = "0.4"
+ed25519-dalek = { version = "2.1", default-features = false, features = ["std"] }
 
 # SQLite database for enterprise monitoring persistence
 rusqlite = { version = "0.32", features = ["bundled"] }
@@ -187,6 +188,10 @@ mockito = "1.4"
 [[bin]]
 name = "poolai-openapi-gap-audit"
 path = "src/bin/poolai_openapi_gap_audit.rs"
+
+[[bin]]
+name = "poolai-verify-release"
+path = "src/bin/poolai_verify_release.rs"
 
 [[bin]]
 name = "poolai-p2b-tq01-snapshot"

@@ -32,7 +32,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 | **E2E** | TypeScript — `e2e/` |
 | **Ops** | `bin/` (launch/LAN/verify), `scripts/` (toolchain), MSYS2 — [`REPOSITORY_LAYOUT.md`](docs/development/REPOSITORY_LAYOUT.md) |
 
-**No Python** in the repository (0× `.py`; ML/TurboQuant — `src/ml/` on Rust). OpenAPI route audit: `cargo run --bin poolai-openapi-gap-audit`. Cursor agents: [`.cursor/rules/runtime-stack-policy.mdc`](.cursor/rules/runtime-stack-policy.mdc).
+**No Python** in the repository (0× `.py`; ML/TurboQuant — `src/ml/` on Rust). OpenAPI route audit: `cargo run --bin poolai-openapi-gap-audit`. Signed release verify (Galaxy §9.2): `cargo run --bin poolai-verify-release -- --manifest … --signature …`. Cursor agents: [`.cursor/rules/runtime-stack-policy.mdc`](.cursor/rules/runtime-stack-policy.mdc).
 
 1. **Кореневий [`README.md`](README.md)** (цей файл) — швидкий старт, збірка, CI, посилання нижче.
 2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).

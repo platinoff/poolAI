@@ -1,8 +1,8 @@
 {
-  "revision": 3,
+  "revision": 4,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S65",
-  "ui_version": 2,
+  "active_sprint": "PH-S67",
+  "ui_version": 3,
   "extension_policy": {
     ".md": {
       "sync_on": ["sprint_close", "handoff_update", "fm_5_11_update", "galaxy_grid_section_change"],
@@ -31,6 +31,20 @@
       "code_globs": ["src/network/api/virtual_nodes.rs", "src/network/api/workers.rs", "docs/openapi.yaml"],
       "extensions": [".rs", ".yaml", ".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
+    },
+    "verify_release_cli": {
+      "sprints": ["PH-S66"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/security/SECURITY_HARDENING.md"],
+      "code_globs": ["src/release/**", "src/bin/poolai_verify_release.rs"],
+      "extensions": [".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "Cargo.toml", "README.md"]
+    },
+    "digest_galaxy_modules": {
+      "sprints": ["PH-S67"],
+      "docs": ["docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"],
+      "code_globs": ["src/grid/**", "src/network/api/virtual_nodes.rs"],
+      "extensions": [".md", ".rs"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md"]
     },
     "galaxy_grid_code": {
       "sprints": ["PH-S58"],

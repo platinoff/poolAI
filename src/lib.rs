@@ -132,6 +132,7 @@ pub mod monitoring;
 pub mod observability;
 pub mod platform;
 pub mod pool;
+pub mod release;
 pub mod rewards;
 pub mod runtime;
 pub mod security;

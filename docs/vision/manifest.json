@@ -1,8 +1,8 @@
 {
-  "revision": 5,
+  "revision": 7,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S64",
-  "next_sprint": "PH-S65",
+  "last_sprint_closed": "PH-S66",
+  "next_sprint": "PH-S67",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -85,6 +85,20 @@
       "path": "src/services/virtual_node_telegram_binding_service.rs",
       "layer": "L3",
       "sprints": ["PH-S60"]
+    },
+    {
+      "id": "verify_release",
+      "label": "poolai-verify-release",
+      "path": "src/bin/poolai_verify_release.rs",
+      "layer": "L3",
+      "sprints": ["PH-S66"]
+    },
+    {
+      "id": "release_mod",
+      "label": "release/",
+      "path": "src/release/mod.rs",
+      "layer": "L3",
+      "sprints": ["PH-S66"]
     }
   ],
   "edges": [
@@ -98,6 +112,8 @@
     { "from": "galaxy_grid", "to": "grid_dispatch", "kind": "implements" },
     { "from": "galaxy_grid", "to": "virtual_nodes", "kind": "implements" },
     { "from": "galaxy_grid", "to": "telegram_bind", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "verify_release", "kind": "implements" },
+    { "from": "verify_release", "to": "release_mod", "kind": "implements" },
     { "from": "digest", "to": "fm", "kind": "catalog" }
   ]
 }

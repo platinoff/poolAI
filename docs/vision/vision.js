@@ -14,7 +14,11 @@
   const WATCH_INTERVAL_MS = 1500;
 
   let manifest = null;
+  let extensions = null;
+  let activeSprint = null;
+  let sprintPathSet = null;
   let selectedId = null;
+  let fullscreenPanel = null;
   let nodePositions = new Map();
   let watchState = null;
   let watchTimer = null;
@@ -47,6 +51,74 @@
     return manifest.nodes.find((n) => n.id === id);
   }
 
+  function sprintTokenMatches(token, sprint) {
+    if (!token || !sprint) return false;
+    if (token === sprint) return true;
+    if (token.endsWith("*")) {
+      return sprint.startsWith(token.slice(0, -1));
+    }
+    return false;
+  }
+
+  function nodeInActiveSprint(node) {
+    if (!activeSprint || !node) return false;
+    if (node.sprints && node.sprints.some((t) => sprintTokenMatches(t, activeSprint))) {
+      return true;
+    }
+    return sprintPathSet && sprintPathSet.has(node.path);
+  }
+
+  function globToRegExp(glob) {
+    const esc = glob.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+    const re = "^" + esc.replace(/\*\*/g, "§§").replace(/\*/g, "[^/]*").replace(/§§/g, ".*") + "$";
+    return new RegExp(re);
+  }
+
+  function pathMatchesGlob(path, glob) {
+    if (!glob) return false;
+    if (glob.endsWith("/**")) {
+      return path.startsWith(glob.slice(0, -3));
+    }
+    return globToRegExp(glob).test(path);
+  }
+
+  function buildSprintPathSet(ext, sprint) {
+    const paths = new Set();
+    if (!sprint) return paths;
+    if (ext) {
+      Object.values(ext.scopes || {}).forEach((scope) => {
+        if (!(scope.sprints || []).some((t) => sprintTokenMatches(t, sprint))) return;
+        (scope.docs || []).forEach((p) => paths.add(p.replace(/^\//, "")));
+        const globs = [...(scope.code_globs || []), ...(scope.also_update || [])];
+        manifest.nodes.forEach((n) => {
+          if (globs.some((g) => pathMatchesGlob(n.path, g))) paths.add(n.path);
+        });
+      });
+    }
+    manifest.nodes.forEach((n) => {
+      if (n.sprints && n.sprints.some((t) => sprintTokenMatches(t, sprint))) {
+        paths.add(n.path);
+      }
+    });
+    return paths;
+  }
+
+  function resolveActiveSprint(m, ext) {
+    return (ext && ext.active_sprint) || m.next_sprint || null;
+  }
+
+  function updateSidebarSprintPill() {
+    const pill = document.getElementById("sidebar-sprint");
+    if (!pill) return;
+    if (!activeSprint) {
+      pill.hidden = true;
+      return;
+    }
+    pill.hidden = false;
+    pill.textContent = activeSprint;
+    pill.title = "Files in scope for this sprint are highlighted";
+  }
+
   async function loadJson(name) {
     const r = await fetch(VISION_BASE + name + "?t=" + Date.now());
     if (!r.ok) throw new Error(name + " HTTP " + r.status);
@@ -75,6 +147,7 @@
           const n = val._node;
           const div = document.createElement("div");
           div.className = "tree-file";
+          if (nodeInActiveSprint(n)) div.classList.add("sprint-scope");
           div.dataset.id = n.id;
           div.dataset.path = n.path;
           div.innerHTML =
@@ -512,6 +585,63 @@
     }
   }
 
+  function setPanelFullscreen(panel, on) {
+    if (!panel) return;
+    const isPreview = panel.classList.contains("preview-panel");
+    if (on) {
+      document.querySelectorAll(".panel.panel-fullscreen").forEach((p) => {
+        p.classList.remove("panel-fullscreen");
+      });
+      document.querySelectorAll(".btn-panel-fs").forEach((b) => {
+        b.textContent = "⛶";
+        b.title = "Fullscreen (Esc)";
+      });
+      panel.classList.add("panel-fullscreen");
+      const btn = panel.querySelector(".btn-panel-fs");
+      if (btn) {
+        btn.textContent = "⤢";
+        btn.title = "Exit fullscreen (Esc)";
+      }
+      document.body.classList.add("panel-fs-active");
+      document.body.classList.toggle("panel-fs-preview", isPreview);
+      fullscreenPanel = panel;
+    } else {
+      panel.classList.remove("panel-fullscreen");
+      const btn = panel.querySelector(".btn-panel-fs");
+      if (btn) {
+        btn.textContent = "⛶";
+        btn.title = "Fullscreen (Esc)";
+      }
+      document.body.classList.remove("panel-fs-active", "panel-fs-preview");
+      fullscreenPanel = null;
+    }
+    if (panel.querySelector("#link-graph") && selectedId) {
+      const n = nodeById(selectedId);
+      if (n) renderLinkGraph(n);
+    }
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  function exitPanelFullscreen() {
+    if (fullscreenPanel) setPanelFullscreen(fullscreenPanel, false);
+  }
+
+  function initPanelFullscreen() {
+    document.querySelectorAll(".panel .btn-panel-fs").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const panel = btn.closest(".panel");
+        if (!panel) return;
+        const on = !panel.classList.contains("panel-fullscreen");
+        if (!on) exitPanelFullscreen();
+        else setPanelFullscreen(panel, true);
+      });
+    });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") exitPanelFullscreen();
+    });
+  }
+
   function selectNode(node) {
     selectedId = node.id;
     document.querySelectorAll(".tree-file").forEach((el) => {
@@ -578,7 +708,17 @@
 
   async function reloadAll(keepSelection) {
     const prevId = keepSelection ? selectedId : null;
+    const fsPanelId = fullscreenPanel && fullscreenPanel.dataset.panel;
     manifest = await loadJson("manifest.json");
+    try {
+      extensions = await loadJson("extensions.json");
+    } catch (_) {
+      extensions = null;
+    }
+    activeSprint = resolveActiveSprint(manifest, extensions);
+    sprintPathSet = buildSprintPathSet(extensions, activeSprint);
+    updateSidebarSprintPill();
+
     document.getElementById("meta-rev").innerHTML =
       "rev <strong>" +
       manifest.revision +
@@ -600,6 +740,11 @@
       manifest.nodes.find((n) => n.id === "galaxy_grid") ||
       manifest.nodes[0];
     if (target) selectNode(target);
+
+    if (fsPanelId) {
+      const panel = document.querySelector('.panel[data-panel="' + fsPanelId + '"]');
+      if (panel) setPanelFullscreen(panel, true);
+    }
   }
 
   async function pollWatch() {
@@ -669,6 +814,7 @@
   document.getElementById("btn-auto").addEventListener("click", toggleAutoReload);
 
   initStarfield();
+  initPanelFullscreen();
   reloadAll(false)
     .then(() => startAutoReload())
     .catch((err) => {

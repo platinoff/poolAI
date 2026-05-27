@@ -188,13 +188,15 @@ Security audits are automatically run in CI pipeline:
 **Review Checklist**:
 - [x] File integrity checks for library uploads
 - [x] Checksum verification
-- [ ] Signed releases
+- [x] Signed releases (Galaxy §9.2 — **`poolai-verify-release`**, PH-S66)
 - [ ] Dependency pinning
 
 **Recommendations**:
-- Add GPG signing for releases
+- Add GPG/minisign release pipeline in CI (verify via `cargo run --bin poolai-verify-release`)
 - Implement signed dependency verification
 - Add checksum verification for distributed artifacts
+
+**Implemented (PH-S66):** [`src/release/`](../../src/release/) + binary **`poolai-verify-release`** — ed25519 signature over raw manifest JSON, optional artifact SHA-256 vs manifest `artifacts[]`. Trust root: `maintainer_keys.json` (`key_id` → `public_key_hex`) or `--public-key-hex`. See [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §9.2.
 
 #### A09:2021 – Security Logging and Monitoring Failures
 

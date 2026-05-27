@@ -780,7 +780,7 @@ On-chain події потрібні, коли вони:
 
 | Артефакт | Підпис / attest | Перевірка на srvN |
 |----------|-----------------|-------------------|
-| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `poolai verify-release --artifact … --signature …` (майбутній CLI) |
+| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `cargo run --bin poolai-verify-release -- --manifest … --signature … [--artifact …]` (PH-S66) |
 | OCI image (`ghcr.io/…/poolai`) | cosign на digest | admission / `cosign verify` перед pull |
 | `config` bundle (default policies) | окремий підпис maintainer | порівняння з pinned `release_pubkey` |
 | SBOM (SPDX/CycloneDX) | hash у release manifest | supply-chain audit |
@@ -920,5 +920,5 @@ Signed capability documents (§6.6 roadmap) — наступний спринт;
 
 **Документи-орієнтири:** [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md) (signed releases checklist), [`DISTRIBUTED_RAID_PROTOCOL.md`](../DISTRIBUTED_RAID_PROTOCOL.md) §Versioning, OpenAPI `/api/v1/*`.
 
-**Код (майбутнє, поза PH-S63):** `poolai verify-release`, middleware `X-PoolAI-Protocol`, admin UI panel “Updates & compatibility”.
+**Код:** `poolai-verify-release` (PH-S66 ✅, `src/release/`). **Майбутнє:** middleware `X-PoolAI-Protocol`, admin UI panel “Updates & compatibility”.
 

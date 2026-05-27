@@ -34,7 +34,8 @@
 **Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (повний v1: ролі, fees, pricing, Telegram, lease, locality, verify, governance).
 
 **PH-S65 ✅:** `protocol_version` / `build_id` на `POST /api/v1/discovery/register-remote`; `src/grid/protocol_compat.rs` (Galaxy §9.3 matrix); відповіді `compat_status` + HTTP 403/426; `poolai-worker` шле wire fields; тести `protocol_compat` + `galaxy_protocol_register_integration`.
-**Черга:** §5.12 **PH-S66…S69** (4 відкритих); наступний код — **PH-S66** (`poolai verify-release` CLI).
+**PH-S66 ✅:** `poolai-verify-release` — ed25519 manifest + optional artifact SHA-256 (`src/release/`, `cargo run --bin poolai-verify-release`); unit tests; SECURITY_HARDENING ↔ Galaxy §9.2 cross-link.
+**Черга:** §5.12 **PH-S67…S69** (3 відкритих); наступний код — **PH-S67** (DIGEST Galaxy modules).
 
 ## 1. Канонічний порядок документації та планів
 

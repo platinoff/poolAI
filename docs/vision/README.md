@@ -9,8 +9,8 @@
 | [`vision.svg`](./vision.svg) | Статична ізометрична схема шарів L0–L3 (concept → ops → catalog → code) |
 | [`manifest.json`](./manifest.json) | Граф вузлів і ребер (machine-readable); джерело для HTML |
 | [`extensions.json`](./extensions.json) | Актуальність розширень і scope спринту (що синхронізувати) |
-| [`index.html`](./index.html) | **Galaxy UI** — starfield, інтерактивна карта з `manifest.json`, radial link graph, 3D layers, preview |
-| [`vision.css`](./vision.css) · [`vision.js`](./vision.js) | Стилі та логіка карти (клік по вузлах, підсвітка ребер) |
+| [`index.html`](./index.html) | **Galaxy UI** — starfield, інтерактивна карта з `manifest.json`, radial link graph, 3D layers, preview, fullscreen панелей |
+| [`vision.css`](./vision.css) · [`vision.js`](./vision.js) | Стилі та логіка карти (клік по вузлах, підсвітка ребер, scope спринту в Explorer, скролбари теми) |
 
 ## Як відкрити в Cursor / браузері
 

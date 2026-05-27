@@ -19,14 +19,14 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
         <button type="button" id="btn-sidebar2" title="Collapse">◀</button>
-        <span class="sidebar-title"><span>Explorer</span></span>
+        <span class="sidebar-title"><span>Explorer</span> <span class="sprint-pill" id="sidebar-sprint" hidden></span></span>
       </div>
       <div class="sidebar-body" id="file-tree"></div>
     </aside>
     <div class="main-col">
       <div class="diagram-row">
-        <section class="panel" aria-label="Layer stack">
-          <h2>Layers</h2>
+        <section class="panel" data-panel="layers" aria-label="Layer stack">
+          <h2><span>Layers</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
           <div class="panel-body" id="graph-3d">
             <div class="layer-stack" id="layer-stack"></div>
           </div>
@@ -37,8 +37,8 @@
             <span><i style="background: var(--L3)"></i> L3 Code</span>
           </div>
         </section>
-        <section class="panel" aria-label="Interactive map">
-          <h2>Galaxy map</h2>
+        <section class="panel" data-panel="map" aria-label="Interactive map">
+          <h2><span>Galaxy map</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
           <div class="panel-body map-wrap">
             <img
               class="galaxy-bg"
@@ -50,8 +50,8 @@
             <svg id="map-svg" viewBox="0 0 900 480" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
-        <section class="panel" aria-label="Links">
-          <h2>Links</h2>
+        <section class="panel" data-panel="links" aria-label="Links">
+          <h2><span>Links</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
           <div class="panel-body">
             <svg id="link-graph" aria-label="Neighbour graph"></svg>
             <ul class="links-list" id="links-list"></ul>
@@ -59,8 +59,8 @@
           </div>
         </section>
       </div>
-      <section class="panel preview-panel" aria-label="Document preview">
-        <h2>Preview</h2>
+      <section class="panel preview-panel" data-panel="preview" aria-label="Document preview">
+        <h2><span>Preview</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
         <div class="panel-body">
           <p id="doc-hint">Select a file in the sidebar or on the map.</p>
           <pre id="doc-preview"></pre>
