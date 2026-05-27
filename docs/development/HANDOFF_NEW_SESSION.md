@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S92 ✅ pricing providers env catalog; §5.12 PH-S93 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S93 ✅ admin updates & compatibility panel; §5.12 PH-S94 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -61,7 +61,8 @@
 **PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
 **PH-S91 ✅ (code):** `galaxy_pricing_oracle` — `galaxy_pricing_fresh_served` counter + `pricing_oracle_fresh_served` log on L1 fresh serves (`try_quote` + HTTP cache path); unit tests; не дублює PH-S83 stale metric; `cargo test-ci`.
 **PH-S92 ✅ (code):** `galaxy_pricing_oracle` — `POOLAI_GALAXY_PRICING_PROVIDERS` JSON allow-list parser (`GalaxyPricingProviderCatalog`), bundled US default, `from_env` wire; `matching_entries`; unit tests; без live HTTP fetch; `cargo test-ci`.
-**Черга:** §5.12 **PH-S93** (2 відкритих); наступний sprint — **PH-S93** (admin UI updates & compatibility panel).
+**PH-S93 ✅ (code):** `src/ui/admin/updates_compat.rs` — read-only `/ui/admin/updates-compat` (protocol version from `protocol_compat`, verify-release doc pointers, Galaxy §9.3 matrix link); i18n EN/UK; Playwright smoke (`admin.spec.ts`); `cargo test-ci` + `e2e npm run test:ci`.
+**Черга:** §5.12 **PH-S94** (1 відкритий); наступний sprint — **PH-S94** (job lease fields wire stub).
 
 ## 1. Канонічний порядок документації та планів
 

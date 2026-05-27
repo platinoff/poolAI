@@ -28,6 +28,10 @@ const ADMIN_AXE_PAGES: { path: string; waitFor: string }[] = [
   { path: "/ui/admin/vm", waitFor: "#vm-instances" },
   { path: "/ui/admin/workers", waitFor: "#workers-list" },
   { path: "/ui/admin/jobs", waitFor: "#jobs-list" },
+  {
+    path: "/ui/admin/updates-compat",
+    waitFor: "#updates-compat-panel",
+  },
   { path: "/ui/admin/libs", waitFor: "#libraries-list" },
   { path: "/ui/admin/raid", waitFor: "#raid-admin" },
 ];

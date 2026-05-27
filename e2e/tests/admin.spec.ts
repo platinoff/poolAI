@@ -130,6 +130,30 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible({ timeout: 20_000 });
   });
 
+  test("updates compatibility page shows protocol and doc blocks (PH-S93)", async ({
+    page,
+  }) => {
+    await gotoAdminReady(
+      page,
+      "/ui/admin/updates-compat",
+      "#updates-compat-panel",
+    );
+    await expect(page.locator("#updates-compat-protocol")).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(
+      page.locator("#updates-compat-coordinator-protocol"),
+    ).toBeVisible();
+    await expect(page.locator("#updates-compat-verify-release")).toBeVisible();
+    await expect(page.locator("#updates-compat-verify-cmd")).toContainText(
+      "poolai-verify-release",
+    );
+    await expect(page.locator("#updates-compat-matrix")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Galaxy §9\.3 compat matrix/i }),
+    ).toBeVisible();
+  });
+
   test("grid pricing page fetches snapshot query (PH-S82)", async ({ page }) => {
     await gotoAdminReady(page, "/ui/admin/grid-pricing", "#grid-pricing-panel");
     await expect(page.locator("#grid-pricing-form")).toBeVisible({

@@ -940,5 +940,5 @@ Signed capability documents (§6.6 roadmap) — наступний спринт;
 
 **Документи-орієнтири:** [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md) (signed releases checklist), [`DISTRIBUTED_RAID_PROTOCOL.md`](../DISTRIBUTED_RAID_PROTOCOL.md) §Versioning, OpenAPI `/api/v1/*`.
 
-**Код:** `poolai-verify-release` (PH-S66 ✅, `src/release/`). **Майбутнє:** middleware `X-PoolAI-Protocol`, admin UI panel “Updates & compatibility”.
+**Код:** `poolai-verify-release` (PH-S66 ✅, `src/release/`). **Admin UI (PH-S93 ✅):** read-only `/ui/admin/updates-compat` — protocol version, verify-release pointers, compat matrix link (без дублювання governance prose). **Майбутнє:** middleware `X-PoolAI-Protocol`.
 
