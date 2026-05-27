@@ -389,7 +389,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 |------------------|---------|------|
 | `POOLAI_GALAXY_PRICE_CACHE_TTL_SECS` | `300` | TTL свіжого кешу |
 | `POOLAI_GALAXY_PRICE_MAX_STALE_SECS` | `3600` | Межа stale-while-revalidate |
-| `POOLAI_GALAXY_PRICING_PROVIDERS` | bundled allow-list | JSON/TOML каталог US providers + endpoints |
+| `POOLAI_GALAXY_PRICING_PROVIDERS` | bundled allow-list | JSON каталог US providers + optional `endpoint` (PH-S92: parser + bundled default; без live HTTP fetch) |
 | `POOLAI_GALAXY_PRICING_FALLBACK_JSON` | — | L2 floor quotes per `task_profile` |
 | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | `0` | `1` = лише L2 |
 
@@ -397,11 +397,12 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 
 - Логи: `pricing_oracle_refresh_ok`, `pricing_oracle_refresh_fail`, `pricing_oracle_fresh_served`, `pricing_oracle_stale_served`, `pricing_oracle_outage`.
 - Метрики (реалізовано): `galaxy_pricing_fresh_served` (PH-S91), `galaxy_pricing_stale_served` (PH-S83), `galaxy_pricing_forced_fallback_total` (PH-S81).
+- Env catalog (PH-S92): `GalaxyPricingProviderCatalog` у `galaxy_pricing_oracle.rs` — `parse_pricing_providers_json`, `bundled_pricing_provider_catalog`, `pricing_provider_catalog_from_env`.
 - API metadata (PH-S89): `GET /api/v1/grid/pricing` → `l1_cache` on L1 hits (`cache_age_secs`, `cache_ttl_secs`, `max_stale_secs`, fresh/stale until timestamps).
 - Метрики (Prometheus, майбутнє): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
-**Rust reference (oracle + HTTP, PH-S68…S91):**
+**Rust reference (oracle + HTTP, PH-S68…S92):**
 
 | Модуль | Призначення |
 |--------|-------------|

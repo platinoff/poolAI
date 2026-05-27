@@ -137,7 +137,7 @@
 | **Grid map** | `src/grid/map.rs` | map ↔ `PeerInfo`, RAID `put_artifact`, memory shard bodies | `map` unit tests |
 | **Grid dispatch** | `src/grid/dispatch.rs` | `ingest_envelope` → `JobStore` / `MemoryShardStore`; epics `emit_memory_updated`, `emit_seed_provided`; schedule via `schedule_with_grid_peer` | `dispatch` unit tests |
 | **Galaxy fee split** | `src/grid/galaxy_fee_split.rs` | primary **0.1%** (10 bps) + secondary **1–5%** admin (floor bps); `GalaxyFeeSplit` lamports | unit tests; `cargo bench --bench galaxy_fee_split_benchmarks` |
-| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; metrics `galaxy_pricing_fresh_served`, `galaxy_pricing_stale_served`, `galaxy_pricing_forced_fallback_total` (PH-S81/S83/S91) | unit tests (`galaxy_pricing_oracle`) |
+| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; `POOLAI_GALAXY_PRICING_PROVIDERS` catalog (PH-S92); metrics fresh/stale/forced_fallback (PH-S81/S83/S91) | unit tests (`galaxy_pricing_oracle`) |
 | **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
 | **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |

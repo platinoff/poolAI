@@ -1,6 +1,7 @@
 //! Galaxy Grid pricing oracle stub (PH-S68): unit keys, `floor(market_min×0.9)` quote,
 //! cache TTL/SWR from `POOLAI_GALAXY_PRICE_*` env; L2 force-fallback ops wire (PH-S81);
-//! L1 stale-served metric (PH-S83); L1 fresh-served metric (PH-S91); L1 cache TTL metadata (PH-S89).
+//! L1 stale-served metric (PH-S83); L1 fresh-served metric (PH-S91); L1 cache TTL metadata (PH-S89);
+//! `POOLAI_GALAXY_PRICING_PROVIDERS` allow-list catalog stub (PH-S92).
 //! See `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.
 //!
 //! Oracle determines **gross quote** in micro-USD; settlement uses `galaxy_fee_split`.
@@ -61,6 +62,10 @@ static FRESH_SERVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 /// Example:
 /// `{"inference_blended_token":450000,"gpu_second":12000}`
 pub const ENV_FALLBACK_JSON: &str = "POOLAI_GALAXY_PRICING_FALLBACK_JSON";
+
+/// Env: JSON allow-list of US pricing providers + optional endpoints (§4.2.5).
+/// Array `[{...}]` or object `{"providers":[{...}]}` — see [`parse_pricing_providers_json`].
+pub const ENV_PRICING_PROVIDERS: &str = "POOLAI_GALAXY_PRICING_PROVIDERS";
 
 /// Billing unit keys shared by oracle and scheduling (§4.2.1).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -236,6 +241,183 @@ fn serve_l1_cache_quote(
     entry.quote
 }
 
+/// US provider row from env catalog or bundled allow-list (§4.2.1, PH-S92).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GalaxyPricingProviderEntry {
+    pub provider_id: String,
+    #[serde(default = "default_provider_region")]
+    pub region: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_profile: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub task_profiles: Vec<String>,
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub units: HashMap<String, u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub endpoint: Option<String>,
+    #[serde(default = "default_provider_enabled")]
+    pub enabled: bool,
+}
+
+fn default_provider_region() -> String {
+    "us".to_string()
+}
+
+fn default_provider_enabled() -> bool {
+    true
+}
+
+/// Parsed provider catalog (`POOLAI_GALAXY_PRICING_PROVIDERS` or bundled default).
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub struct GalaxyPricingProviderCatalog {
+    #[serde(default)]
+    pub providers: Vec<GalaxyPricingProviderEntry>,
+}
+
+impl GalaxyPricingProviderCatalog {
+    pub fn is_empty(&self) -> bool {
+        self.providers.is_empty()
+    }
+
+    /// Enabled US-region rows matching task/model filters (empty filter = wildcard).
+    pub fn matching_entries(
+        &self,
+        task_profile: &str,
+        model_profile: &str,
+    ) -> Vec<&GalaxyPricingProviderEntry> {
+        self.providers
+            .iter()
+            .filter(|p| {
+                p.enabled
+                    && p.region.eq_ignore_ascii_case("us")
+                    && provider_matches_profiles(p, task_profile, model_profile)
+            })
+            .collect()
+    }
+}
+
+fn provider_matches_profiles(
+    entry: &GalaxyPricingProviderEntry,
+    task_profile: &str,
+    model_profile: &str,
+) -> bool {
+    let task_ok =
+        entry.task_profiles.is_empty() || entry.task_profiles.iter().any(|t| t == task_profile);
+    let model_ok = entry
+        .model_profile
+        .as_deref()
+        .is_none_or(|m| m.is_empty() || m == model_profile);
+    task_ok && model_ok
+}
+
+fn normalize_provider_units(units: HashMap<String, u64>) -> HashMap<String, u64> {
+    let mut out = HashMap::new();
+    for (k, v) in units {
+        if GalaxyPriceUnitKey::from_str(&k).is_ok() && v > 0 {
+            out.insert(k, v);
+        }
+    }
+    out
+}
+
+fn sanitize_provider_entry(
+    mut entry: GalaxyPricingProviderEntry,
+) -> Option<GalaxyPricingProviderEntry> {
+    if !entry.enabled || entry.provider_id.trim().is_empty() {
+        return None;
+    }
+    entry.provider_id = entry.provider_id.trim().to_string();
+    entry.region = entry.region.trim().to_string();
+    if entry.region.is_empty() {
+        entry.region = default_provider_region();
+    }
+    entry.units = normalize_provider_units(entry.units);
+    if entry.units.is_empty() {
+        return None;
+    }
+    if let Some(endpoint) = entry.endpoint.as_mut() {
+        let trimmed = endpoint.trim();
+        if trimmed.is_empty() {
+            entry.endpoint = None;
+        } else {
+            *endpoint = trimmed.to_string();
+        }
+    }
+    Some(entry)
+}
+
+/// Parse `POOLAI_GALAXY_PRICING_PROVIDERS` JSON (array or `{"providers":[...]}`).
+pub fn parse_pricing_providers_json(raw: &str) -> GalaxyPricingProviderCatalog {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return GalaxyPricingProviderCatalog::default();
+    }
+    if let Ok(rows) = serde_json::from_str::<Vec<GalaxyPricingProviderEntry>>(trimmed) {
+        return catalog_from_rows(rows);
+    }
+    if let Ok(wrapped) = serde_json::from_str::<GalaxyPricingProviderCatalog>(trimmed) {
+        return catalog_from_rows(wrapped.providers);
+    }
+    GalaxyPricingProviderCatalog::default()
+}
+
+fn catalog_from_rows(rows: Vec<GalaxyPricingProviderEntry>) -> GalaxyPricingProviderCatalog {
+    let providers = rows
+        .into_iter()
+        .filter_map(sanitize_provider_entry)
+        .collect();
+    GalaxyPricingProviderCatalog { providers }
+}
+
+/// Bundled US allow-list used when env catalog is unset (§4.2.5).
+pub fn bundled_pricing_provider_catalog() -> GalaxyPricingProviderCatalog {
+    catalog_from_rows(vec![
+        GalaxyPricingProviderEntry {
+            provider_id: "openai_us".into(),
+            region: "us".into(),
+            model_profile: Some("gpt-4o-mini".into()),
+            task_profiles: vec!["inference:text".into()],
+            units: HashMap::from([(
+                GalaxyPriceUnitKey::InferenceBlendedToken
+                    .as_str()
+                    .to_string(),
+                500_000,
+            )]),
+            endpoint: None,
+            enabled: true,
+        },
+        GalaxyPricingProviderEntry {
+            provider_id: "anthropic_us".into(),
+            region: "us".into(),
+            model_profile: Some("gpt-4o-mini".into()),
+            task_profiles: vec!["inference:text".into()],
+            units: HashMap::from([(
+                GalaxyPriceUnitKey::InferenceBlendedToken
+                    .as_str()
+                    .to_string(),
+                600_000,
+            )]),
+            endpoint: None,
+            enabled: true,
+        },
+    ])
+}
+
+/// Env catalog when set and non-empty; otherwise [`bundled_pricing_provider_catalog`].
+pub fn pricing_provider_catalog_from_env() -> GalaxyPricingProviderCatalog {
+    match std::env::var(ENV_PRICING_PROVIDERS) {
+        Ok(raw) if !raw.trim().is_empty() => {
+            let parsed = parse_pricing_providers_json(&raw);
+            if parsed.is_empty() {
+                bundled_pricing_provider_catalog()
+            } else {
+                parsed
+            }
+        }
+        _ => bundled_pricing_provider_catalog(),
+    }
+}
+
 fn parse_fallback_json(raw: &str) -> HashMap<GalaxyPriceUnitKey, u64> {
     let parsed = serde_json::from_str::<HashMap<String, u64>>(raw);
     let mut out = HashMap::new();
@@ -371,6 +553,7 @@ pub struct GalaxyPricingOracle {
     config: GalaxyPricingConfig,
     cache: HashMap<GalaxyPricingCacheKey, GalaxyPricingCacheEntry>,
     fallback_quotes_usd_micro: HashMap<GalaxyPriceUnitKey, u64>,
+    provider_catalog: GalaxyPricingProviderCatalog,
 }
 
 impl GalaxyPricingOracle {
@@ -379,15 +562,26 @@ impl GalaxyPricingOracle {
             config,
             cache: HashMap::new(),
             fallback_quotes_usd_micro: HashMap::new(),
+            provider_catalog: GalaxyPricingProviderCatalog::default(),
         }
     }
 
     pub fn from_env() -> Self {
         let mut oracle = Self::new(GalaxyPricingConfig::from_env());
+        oracle.provider_catalog = pricing_provider_catalog_from_env();
         if let Ok(raw) = std::env::var(ENV_FALLBACK_JSON) {
             oracle.fallback_quotes_usd_micro = parse_fallback_json(&raw);
         }
         oracle
+    }
+
+    pub fn provider_catalog(&self) -> &GalaxyPricingProviderCatalog {
+        &self.provider_catalog
+    }
+
+    pub fn with_provider_catalog(mut self, provider_catalog: GalaxyPricingProviderCatalog) -> Self {
+        self.provider_catalog = provider_catalog;
+        self
     }
 
     pub fn with_l2_fallback_quotes(
@@ -894,5 +1088,101 @@ mod tests {
         let (cached, freshness) = oracle.lookup(1235, &key).expect("cached");
         assert_eq!(freshness, CacheFreshness::Fresh);
         assert_eq!(cached.quote.poolai_quote_usd_micro, 470_000);
+    }
+
+    #[test]
+    fn parse_pricing_providers_json_accepts_array_and_wrapped_object() {
+        let array = parse_pricing_providers_json(
+            r#"[
+              {"provider_id":"openai_us","region":"us","units":{"inference_blended_token":500000}},
+              {"provider_id":"disabled","enabled":false,"units":{"inference_blended_token":1}}
+            ]"#,
+        );
+        assert_eq!(array.providers.len(), 1);
+        assert_eq!(array.providers[0].provider_id, "openai_us");
+
+        let wrapped = parse_pricing_providers_json(
+            r#"{"providers":[
+              {"provider_id":"mistral_us","units":{"gpu_second":12000,"bad_unit":9}}
+            ]}"#,
+        );
+        assert_eq!(wrapped.providers.len(), 1);
+        assert_eq!(wrapped.providers[0].provider_id, "mistral_us");
+        assert_eq!(
+            wrapped.providers[0].units.get("gpu_second").copied(),
+            Some(12_000)
+        );
+        assert!(!wrapped.providers[0].units.contains_key("bad_unit"));
+    }
+
+    #[test]
+    fn bundled_catalog_has_us_openai_and_anthropic() {
+        let catalog = bundled_pricing_provider_catalog();
+        assert_eq!(catalog.providers.len(), 2);
+        let ids: Vec<_> = catalog
+            .providers
+            .iter()
+            .map(|p| p.provider_id.as_str())
+            .collect();
+        assert!(ids.contains(&"openai_us"));
+        assert!(ids.contains(&"anthropic_us"));
+    }
+
+    #[test]
+    fn catalog_matching_entries_filters_region_task_and_model() {
+        let catalog = GalaxyPricingProviderCatalog {
+            providers: vec![
+                GalaxyPricingProviderEntry {
+                    provider_id: "openai_us".into(),
+                    region: "us".into(),
+                    model_profile: Some("gpt-4o-mini".into()),
+                    task_profiles: vec!["inference:text".into()],
+                    units: HashMap::from([("inference_blended_token".into(), 500_000)]),
+                    endpoint: None,
+                    enabled: true,
+                },
+                GalaxyPricingProviderEntry {
+                    provider_id: "eu_only".into(),
+                    region: "eu".into(),
+                    model_profile: None,
+                    task_profiles: vec![],
+                    units: HashMap::from([("inference_blended_token".into(), 100_000)]),
+                    endpoint: None,
+                    enabled: true,
+                },
+            ],
+        };
+        let matched: Vec<_> = catalog
+            .matching_entries("inference:text", "gpt-4o-mini")
+            .into_iter()
+            .map(|p| p.provider_id.as_str())
+            .collect();
+        assert_eq!(matched, vec!["openai_us"]);
+    }
+
+    #[test]
+    fn from_env_loads_provider_catalog_when_env_set() {
+        const KEY: &str = ENV_PRICING_PROVIDERS;
+        std::env::set_var(
+            KEY,
+            r#"[{"provider_id":"custom_us","region":"us","units":{"job_flat":990000}}]"#,
+        );
+        let oracle = GalaxyPricingOracle::from_env();
+        std::env::remove_var(KEY);
+        assert_eq!(oracle.provider_catalog().providers.len(), 1);
+        assert_eq!(
+            oracle.provider_catalog().providers[0].provider_id,
+            "custom_us"
+        );
+    }
+
+    #[test]
+    fn pricing_provider_catalog_from_env_falls_back_to_bundled_on_invalid_json() {
+        const KEY: &str = ENV_PRICING_PROVIDERS;
+        std::env::set_var(KEY, "not-json");
+        let catalog = pricing_provider_catalog_from_env();
+        std::env::remove_var(KEY);
+        assert_eq!(catalog.providers.len(), 2);
+        assert_eq!(catalog.providers[0].provider_id, "openai_us");
     }
 }
