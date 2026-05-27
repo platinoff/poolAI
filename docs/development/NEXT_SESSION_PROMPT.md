@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — PH-S55 run-poolai RAID jobs preset
+PoolAI — PH-S55 run-poolai RAID jobs preset (Galaxy Grid queue sync)
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -26,7 +26,7 @@ cargo test-ci
 
 ## Стан
 - **PH-S03…S54:** ✅
-- **Черга §5.11:** PH-S55…S61 (7 відкритих)
+- **Черга §5.11:** PH-S55…S64 (10 відкритих; Galaxy Grid concept)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
 ## PH-S55 — наступна сесія
@@ -45,7 +45,7 @@ PH-S03…S54 · verify-dev-stand RAID step · admin jobs UI · jobs RAID E2E
 | # | Sprint | Фокус |
 |---|--------|--------|
 | 1 | **PH-S55** | run-poolai RAID preset |
-| 2–7 | **PH-S56…S61** | grid, CI docs, runbooks, RUN_PARAMETERS, openapi gate, VM isolation docs |
+| 2–10 | **PH-S56…S64** | Galaxy Grid: job lease/re-migrate, unified workers, fee split, pricing oracle, Telegram seats, locality seeds, verification, governance, docs sync |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```

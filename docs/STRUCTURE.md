@@ -1,6 +1,6 @@
 # Структура та таксономія документації PoolAI
 
-**Оновлено:** 2026-05-25 (§5.11 — 10 спринтів PH-S37…S46; PH-S37b docs sync)  
+**Оновлено:** 2026-05-26 (§5.11 — 10 спринтів PH-S55…S64; Galaxy Grid concept)  
 **Джерело правди для порядку читання:** кроки **1–12** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md). **Legacy / stale плани:** [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md).
 
 ---
