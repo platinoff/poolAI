@@ -149,6 +149,14 @@ Security audits run automatically on:
 - Monitor for issues
 - Document in security log
 
+### Governance Cross-Links (Galaxy)
+
+For signed advisory and update-policy handling, use canonical governance references:
+
+- Security advisories and key rotation: [`POOLAI_GALAXY_GRID.md` §9.6](../concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation)
+- Signed release verification model: [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63)
+- Security hardening operator pointers: [`SECURITY_HARDENING.md`](./SECURITY_HARDENING.md)
+
 ## Known Vulnerabilities
 
 ### Currently None
@@ -232,5 +240,5 @@ All licenses are documented in `LICENSE` file and dependency metadata.
 
 ---
 
-**Last Updated**: 2026-01-16  
-**Version**: 1.0 - Initial dependency security guide
+**Last Updated**: 2026-05-27  
+**Version**: 1.1 - Galaxy advisory/update-policy cross-links

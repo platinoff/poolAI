@@ -1,7 +1,7 @@
 {
-  "revision": 5,
+  "revision": 6,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S68",
+  "active_sprint": "PH-S75",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -38,6 +38,13 @@
       "code_globs": ["src/release/**", "src/bin/poolai_verify_release.rs"],
       "extensions": [".rs", ".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "Cargo.toml", "README.md"]
+    },
+    "security_governance_docs": {
+      "sprints": ["PH-S69", "PH-S71", "PH-S72", "PH-S73", "PH-S74", "PH-S75", "PH-S76", "PH-S77"],
+      "docs": ["docs/security/SECURITY_HARDENING.md", "docs/security/DEPENDENCY_SECURITY.md", "docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/release/**", "src/grid/protocol_compat.rs"],
+      "extensions": [".md", ".rs", ".json"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },
     "digest_galaxy_modules": {
       "sprints": ["PH-S67"],

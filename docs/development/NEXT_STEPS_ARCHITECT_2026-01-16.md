@@ -3,6 +3,16 @@
 
 ---
 
+> [!WARNING]
+> Legacy planning snapshot. Do not use this file as active sprint queue.
+>
+> Canonical planning sources:
+> - Active architect plan: [`NEXT_STEPS_ARCHITECT_2026-03-17.md`](./NEXT_STEPS_ARCHITECT_2026-03-17.md)
+> - Active sprint queue / status: [`FUNCTION_MANAGEMENT.md` §5.12](../catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-2026-05-27)
+> - Session handoff: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)
+>
+> Historical unchecked boxes below remain for audit context only and are not prioritized work items.
+
 ## 🎯 Поточний стан (2026-01-17, оновлено)
 
 **Проект**: PoolAI - Distributed AI Mining Pool Management System  

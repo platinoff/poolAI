@@ -196,7 +196,72 @@ Security audits are automatically run in CI pipeline:
 - Implement signed dependency verification
 - Add checksum verification for distributed artifacts
 
-**Implemented (PH-S66):** [`src/release/`](../../src/release/) + binary **`poolai-verify-release`** — ed25519 signature over raw manifest JSON, optional artifact SHA-256 vs manifest `artifacts[]`. Trust root: `maintainer_keys.json` (`key_id` → `public_key_hex`) or `--public-key-hex`. See [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §9.2.
+**Implemented (PH-S66):** [`src/release/`](../../src/release/) + binary **`poolai-verify-release`** — ed25519 signature over raw manifest JSON, optional artifact SHA-256 vs manifest `artifacts[]`. Trust root: `maintainer_keys.json` (`key_id` → `public_key_hex`) or `--public-key-hex`.
+
+#### Galaxy governance cross-links (PH-S69)
+
+Use these pointers instead of duplicating governance prose in this guide:
+
+- Signed release flow and trust model: [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63)
+- Protocol compatibility matrix and rollout constraints: [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix)
+- Runtime wire guardrails already implemented in code/docs: `protocol_version` + `build_id` registration checks (PH-S65) in [`FUNCTION_MANAGEMENT.md` §5.12](../catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-2026-05-27)
+- Verification CLI entrypoint: `cargo run --bin poolai-verify-release -- --manifest <path> --signature <path> [--artifact <path>]`
+
+#### Operator quickstart: verify signed release (PH-S71)
+
+Minimal verification sequence for operators before rollout:
+
+1. Prepare trust root (`maintainer_keys.json`) or pass a pinned key via `--public-key-hex`.
+2. Verify release manifest signature:
+   `cargo run --bin poolai-verify-release -- --manifest <release-manifest.json> --signature <release-manifest.sig>`
+3. Verify artifact integrity against manifest (recommended):
+   `cargo run --bin poolai-verify-release -- --manifest <release-manifest.json> --signature <release-manifest.sig> --artifact <poolai-binary-or-archive>`
+4. Roll out only after signature + artifact verification are both successful.
+
+For policy and compatibility constraints, use canonical references:
+- Signed release model: [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63)
+- Protocol compatibility matrix: [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix)
+
+#### Operator checklist: protocol compatibility triage (PH-S72)
+
+Use this quick checklist when worker registration fails because of protocol mismatch:
+
+1. Confirm worker sends expected wire fields (`protocol_version`, `build_id`) via discovery register flow (PH-S65 baseline).
+2. If coordinator returns HTTP `403` or `426`, treat it as compat negotiation failure and stop rollout for that worker build.
+3. Check returned `compat_status` and compare it with the active protocol window from Galaxy compat matrix (`§9.3`).
+4. Verify that the candidate build belongs to an approved signed release before retrying registration.
+5. Retry only after either worker build or coordinator protocol window is aligned.
+
+Canonical references for investigation:
+- Compatibility model and rollout constraints: [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix)
+- Wire implementation status (PH-S65): [`FUNCTION_MANAGEMENT.md` §5.12](../catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-2026-05-27)
+- Signed artifact verification flow: `poolai-verify-release` quickstart (section above)
+
+#### Protocol reject troubleshooting pointer (PH-S73)
+
+Use this escalation path for repeated registration rejects (`compat_status`, HTTP `403`/`426`):
+
+1. Verify signed build first (`poolai-verify-release` quickstart) to rule out untrusted artifact issues.
+2. Compare worker `protocol_version` against coordinator compatibility window (Galaxy §9.3 matrix).
+3. Confirm reject reason from `compat_status` and classify it as either worker upgrade needed or coordinator window update needed.
+4. Apply one controlled change at a time (worker build or coordinator protocol window), then retry registration.
+5. If reject persists, pause rollout and document the mismatch tuple (`build_id`, worker protocol, coordinator protocol window) for ops review.
+
+Fast links:
+- Signed release verify flow: section `Operator quickstart: verify signed release (PH-S71)` above
+- Compatibility model: [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix)
+- Wire baseline: [`FUNCTION_MANAGEMENT.md` §5.12 (PH-S65)](../catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-2026-05-27)
+
+#### Advisory and update-policy link hygiene (PH-S74)
+
+Use pointer-only links for operator actions around advisories and key updates:
+
+- Security advisory lifecycle and key rotation canon: [`POOLAI_GALAXY_GRID.md` §9.6](../concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation)
+- Signed releases and trust root context: [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63)
+- Protocol rollout constraints: [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix)
+- Dependency advisory workflow: [`DEPENDENCY_SECURITY.md`](./DEPENDENCY_SECURITY.md)
+
+Operator note: process signed advisory events (`CVE-*`, `key_transition`, `protocol_sunset`) through local change management; no remote-exec path is implied by advisory handling.
 
 #### A09:2021 – Security Logging and Monitoring Failures
 
@@ -469,5 +534,5 @@ openssl s_client -connect poolai.example.com:443 -showcerts
 
 ---
 
-**Last Updated**: 2026-01-16  
-**Version**: 1.0 - Initial security hardening guide
+**Last Updated**: 2026-05-27  
+**Version**: 1.5 - Advisory/update-policy link hygiene (PH-S74)

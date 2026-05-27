@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
-  <title id="title">PoolAI docs vision ù Galaxy Grid layered map</title>
-  <desc id="desc">Isometric L0ùL3 layers with Galaxy Grid at center. PH-S67 done, next PH-S68.</desc>
+  <title id="title">PoolAI docs vision - Galaxy Grid layered map</title>
+  <desc id="desc">Isometric L0-L3 layers with Galaxy Grid at center. PH-S74 done, next PH-S75.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#06080f"/>
@@ -55,7 +55,7 @@
   </g>
 
   <text x="600" y="42" text-anchor="middle" fill="#eef2ff" font-family="Segoe UI, system-ui, sans-serif" font-size="22" font-weight="600">PoolAI Galaxy docs vision</text>
-  <text x="600" y="68" text-anchor="middle" fill="#8b9cb8" font-family="Segoe UI, system-ui, sans-serif" font-size="13">L0 Concept ? L3 Code ù manifest-driven graph in browser</text>
+  <text x="600" y="68" text-anchor="middle" fill="#8b9cb8" font-family="Segoe UI, system-ui, sans-serif" font-size="13">L0 Concept -> L3 Code - manifest-driven graph in browser</text>
 
   <g transform="translate(180, 100)" filter="url(#shadow)">
     <path d="M0 100 L400 0 L800 100 L400 200 Z" fill="url(#planeL0)" stroke="#90b8f0" stroke-width="2"/>
@@ -107,5 +107,5 @@
     <text x="0" y="108" fill="#a78bfa">? implements / session-tracks</text>
   </g>
 
-  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S67 done ù next PH-S68 ù interactive map in index.html</text>
+  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S74 done - next PH-S75 - interactive map in index.html</text>
 </svg>

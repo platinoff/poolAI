@@ -37,7 +37,13 @@
 **PH-S66 ✅:** `poolai-verify-release` — ed25519 manifest + optional artifact SHA-256 (`src/release/`, `cargo run --bin poolai-verify-release`); unit tests; SECURITY_HARDENING ↔ Galaxy §9.2 cross-link.
 **PH-S67 ✅:** `FUNCTIONALITY_DIGEST` — zріз Galaxy Grid modules (`galaxy_fee_split`, `dispatch`, `protocol_compat`, virtual nodes API/services, `release/`); INDEX cross-link.
 **PH-S68 ✅:** `src/grid/galaxy_pricing_oracle.rs` — unit keys, `floor(market_min×0.9)`, TTL/SWR cache, `POOLAI_GALAXY_PRICE_*` env; unit tests; cross-link §4.2 + DIGEST.
-**Черга:** §5.12 **PH-S69** (1 відкритий); наступний код — **PH-S69** (SECURITY_HARDENING ↔ Galaxy §9).
+**PH-S69 ✅:** `docs/security/SECURITY_HARDENING.md` — Galaxy §9.2/§9.3 cross-links, `poolai-verify-release` verify flow pointer, без дублювання governance prose.
+**PH-S70 ✅:** `docs/development/NEXT_STEPS_ARCHITECT_2026-01-16.md` — legacy warning + canonical pointers (`NEXT_STEPS_ARCHITECT_2026-03-17`, FM §5.12, HANDOFF); historical unchecked boxes позначені як audit-only.
+**PH-S71 ✅:** `docs/security/SECURITY_HARDENING.md` — operator quickstart для `poolai-verify-release` (trust root + manifest + optional artifact verify), з посиланням на Galaxy §9.2/§9.3 без дублювання концепту.
+**PH-S72 ✅:** `docs/security/SECURITY_HARDENING.md` — protocol compatibility triage checklist (`compat_status`, HTTP 403/426), pointers на Galaxy §9.3 + PH-S65 wire baseline.
+**PH-S73 ✅:** `docs/security/SECURITY_HARDENING.md` — protocol reject troubleshooting pointer з escalation path (verify signed build → check protocol window → retry), mismatch tuple для ops review.
+**PH-S74 ✅:** `docs/security/SECURITY_HARDENING.md` + `docs/security/DEPENDENCY_SECURITY.md` — advisory/update-policy cross-links (Galaxy §9.6) без дублювання governance prose.
+**Черга:** §5.12 **PH-S75..PH-S77** (3 відкриті); наступний docs sprint — **PH-S75** (security hardening audit-event pointers).
 
 ## 1. Канонічний порядок документації та планів
 

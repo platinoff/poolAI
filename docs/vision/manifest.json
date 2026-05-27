@@ -1,8 +1,8 @@
 {
-  "revision": 8,
+  "revision": 9,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S67",
-  "next_sprint": "PH-S68",
+  "last_sprint_closed": "PH-S74",
+  "next_sprint": "PH-S75",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -50,7 +50,7 @@
       "label": "FUNCTION_MANAGEMENT",
       "path": "docs/catalog/FUNCTION_MANAGEMENT.md",
       "layer": "L2",
-      "sections": ["5.11"]
+      "sections": ["5.12"]
     },
     {
       "id": "digest",
@@ -100,6 +100,22 @@
       "path": "src/release/mod.rs",
       "layer": "L3",
       "sprints": ["PH-S66"]
+    },
+    {
+      "id": "security_hardening",
+      "label": "SECURITY_HARDENING",
+      "path": "docs/security/SECURITY_HARDENING.md",
+      "layer": "L1",
+      "sections": ["A08 integrity", "operator quickstart", "protocol triage", "advisory pointers"],
+      "sprints": ["PH-S69", "PH-S71", "PH-S72", "PH-S73", "PH-S74"]
+    },
+    {
+      "id": "dependency_security",
+      "label": "DEPENDENCY_SECURITY",
+      "path": "docs/security/DEPENDENCY_SECURITY.md",
+      "layer": "L1",
+      "sections": ["vulnerability response", "governance cross-links"],
+      "sprints": ["PH-S74"]
     }
   ],
   "edges": [
@@ -115,6 +131,8 @@
     { "from": "galaxy_grid", "to": "telegram_bind", "kind": "implements" },
     { "from": "galaxy_grid", "to": "verify_release", "kind": "implements" },
     { "from": "verify_release", "to": "release_mod", "kind": "implements" },
-    { "from": "digest", "to": "fm", "kind": "catalog" }
+    { "from": "digest", "to": "fm", "kind": "catalog" },
+    { "from": "galaxy_grid", "to": "security_hardening", "kind": "concept-ref" },
+    { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" }
   ]
 }

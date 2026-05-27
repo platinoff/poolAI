@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S68 ✅ pricing oracle stub · §5.12 PH-S69 відкритий; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S74 ✅ advisory link hygiene · §5.12 PH-S75..PH-S77 відкриті; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -269,7 +269,15 @@ FM-xxx (з таблиці нижче)
 | 2 | **PH-S66** | `poolai verify-release` CLI (signed manifest) | Galaxy §9.2, SECURITY_HARDENING | verify artifact + signature; unit tests | **✅** |
 | 3 | **PH-S67** | DIGEST: Galaxy Grid modules zріз | FUNCTIONALITY_DIGEST | `galaxy_fee_split`, grid dispatch, virtual nodes | **✅** |
 | 4 | **PH-S68** | Pricing oracle Rust stub (concept S59) | `POOLAI_GALAXY_GRID.md` §4.2 | unit keys + env `POOLAI_GALAXY_PRICE_*`; tests | **✅** |
-| 5 | **PH-S69** | SECURITY_HARDENING ↔ Galaxy §9 signed releases | `docs/security/` | checklist items linked; no duplicate prose | відкрито |
+| 5 | **PH-S69** | SECURITY_HARDENING ↔ Galaxy §9 signed releases | `docs/security/` | checklist items linked; no duplicate prose | **✅** |
+| 6 | **PH-S70** | Legacy architect checklist hygiene (canonical pointer) | `NEXT_STEPS_ARCHITECT_2026-01-16.md`, VDT §research | add stale/canonical note, avoid conflicting active queue | **✅** |
+| 7 | **PH-S71** | Signed release verification quickstart for operators | `SECURITY_HARDENING.md`, Galaxy §9.2 | short runbook pointer to `poolai-verify-release` usage | **✅** |
+| 8 | **PH-S72** | Protocol compatibility ops checklist links | Galaxy §9.3, FM PH-S65 | cross-link compat matrix + rollout guardrails in security docs | **✅** |
+| 9 | **PH-S73** | Protocol reject troubleshooting pointer (docs) | `SECURITY_HARDENING.md`, Galaxy §9.3 | short operator checklist for `compat_status`/403/426 triage links | **✅** |
+| 10 | **PH-S74** | Security docs link hygiene for release advisories | Galaxy §9.6, `docs/security/` | align cross-links to signed advisory/update policy sections | **✅** |
+| 11 | **PH-S75** | Security hardening audit-event pointers | Galaxy §9 audit events, `docs/security/` | add concise links for `release_verify_*` and negotiation reject event review | відкрито |
+| 12 | **PH-S76** | Release advisory operator actions pointer | Galaxy §9.6, `docs/security/SECURITY_HARDENING.md` | add short action list linked to signed advisory/update policy docs | відкрито |
+| 13 | **PH-S77** | Security docs canonical pointer cleanup | `docs/security/*`, FM §5.12 | normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
