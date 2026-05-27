@@ -48,7 +48,7 @@ alwaysApply: false
 ## Перегляд (людина / агент)
 
 - **Не** використовувати `S:/rust/poolAI/...` у Simple Browser (помилка *Unable to resolve resource*).
-- Запуск: **`.\bin\open-docs-vision.ps1`** → URL **`http://127.0.0.1:8765/index.html`** у Simple Browser (див. `.cursor/commands/open-docs-vision.md`).
+- Запуск: **`.\bin\open-docs-vision.ps1`** → URL **`http://127.0.0.1:8765/docs/vision/index.html`** у Simple Browser (див. `.cursor/commands/open-docs-vision.md`).
 - Кнопка **Reload manifest** — після `git pull` або локального коміту.
 - Чотири панелі: SVG · 3D layer stack · sprint extensions · doc preview.
 

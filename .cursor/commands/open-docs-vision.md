@@ -13,7 +13,7 @@ PowerShell у корені репо:
 У **Simple Browser** (`Ctrl+Shift+P` → *Simple Browser: Show*) вставте:
 
 ```text
-http://127.0.0.1:8765/index.html
+http://127.0.0.1:8765/docs/vision/index.html
 ```
 
 Не `S:/rust/...` — лише цей URL.

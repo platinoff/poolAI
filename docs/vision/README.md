@@ -28,7 +28,7 @@ PowerShell у корені репо:
 Потім **Simple Browser** → URL:
 
 ```text
-http://127.0.0.1:8765/index.html
+http://127.0.0.1:8765/docs/vision/index.html
 ```
 
 Деталі: [`.cursor/commands/open-docs-vision.md`](../../.cursor/commands/open-docs-vision.md).

@@ -1,4 +1,4 @@
-# PoolAI - open docs/vision in browser (workaround Cursor "Unable to resolve resource S:/...").
+# PoolAI - static server for docs/vision UI + repo files (md preview).
 # Usage: .\bin\open-docs-vision.ps1
 #        .\bin\open-docs-vision.ps1 -Port 8765 -NoBrowser
 #Requires -Version 5.1
@@ -14,7 +14,7 @@ if (-not (Test-Path (Join-Path $VisionDir "index.html"))) {
     throw "Not found: $VisionDir\index.html"
 }
 
-$Url = "http://127.0.0.1:$Port/index.html"
+$Url = "http://127.0.0.1:$Port/docs/vision/index.html"
 
 $existing = $null
 try {
@@ -31,8 +31,8 @@ if ($existing) {
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://127.0.0.1:$Port/")
 $listener.Start()
-Write-Host "Serving: $VisionDir"
-Write-Host "Cursor Simple Browser URL: $Url"
+Write-Host "Serving repo: $RepoRoot"
+Write-Host "Vision UI: $Url"
 Write-Host "Stop: Ctrl+C"
 
 if (-not $NoBrowser) { Start-Process $Url }
@@ -45,36 +45,52 @@ $mime = @{
     ".md"   = "text/plain; charset=utf-8"
     ".css"  = "text/css"
     ".js"   = "application/javascript"
+    ".txt"  = "text/plain; charset=utf-8"
+    ".rs"   = "text/plain; charset=utf-8"
+}
+
+function Send-Bytes($ctx, [byte[]]$bytes, [string]$contentType) {
+    if ($contentType) { $ctx.Response.ContentType = $contentType }
+    $ctx.Response.ContentLength64 = $bytes.Length
+    $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+    $ctx.Response.Close()
 }
 
 try {
     while ($listener.IsListening) {
         $ctx = $listener.GetContext()
-        $rel = $ctx.Request.Url.LocalPath.TrimStart("/")
-        if ([string]::IsNullOrWhiteSpace($rel)) { $rel = "index.html" }
-        $rel = $rel -replace "/", [IO.Path]::DirectorySeparatorChar
-        $file = Join-Path $VisionDir $rel
+        $path = $ctx.Request.Url.LocalPath.TrimStart("/").TrimEnd("/")
+
+        if ([string]::IsNullOrWhiteSpace($path)) {
+            $ctx.Response.StatusCode = 302
+            $ctx.Response.RedirectLocation = "/docs/vision/index.html"
+            $ctx.Response.Close()
+            continue
+        }
+
+        $rel = $path -replace "/", [IO.Path]::DirectorySeparatorChar
+        $file = Join-Path $RepoRoot $rel
         $file = [IO.Path]::GetFullPath($file)
-        $visionRoot = [IO.Path]::GetFullPath($VisionDir)
-        if (-not $file.StartsWith($visionRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        $repoFull = [IO.Path]::GetFullPath($RepoRoot)
+
+        if (-not $file.StartsWith($repoFull, [StringComparison]::OrdinalIgnoreCase)) {
             $ctx.Response.StatusCode = 403
             $ctx.Response.Close()
             continue
         }
+
         if (-not (Test-Path $file -PathType Leaf)) {
             $ctx.Response.StatusCode = 404
-            $msg = "404 " + $rel
-            $buf = [Text.Encoding]::UTF8.GetBytes($msg)
-            $ctx.Response.OutputStream.Write($buf, 0, $buf.Length)
-            $ctx.Response.Close()
+            $msg = [Text.Encoding]::UTF8.GetBytes("404 " + $path)
+            Send-Bytes $ctx $msg "text/plain; charset=utf-8"
             continue
         }
+
         $ext = [IO.Path]::GetExtension($file).ToLowerInvariant()
-        if ($mime.ContainsKey($ext)) { $ctx.Response.ContentType = $mime[$ext] }
+        $ctype = $null
+        if ($mime.ContainsKey($ext)) { $ctype = $mime[$ext] }
         $bytes = [IO.File]::ReadAllBytes($file)
-        $ctx.Response.ContentLength64 = $bytes.Length
-        $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
-        $ctx.Response.Close()
+        Send-Bytes $ctx $bytes $ctype
     }
 }
 finally {
