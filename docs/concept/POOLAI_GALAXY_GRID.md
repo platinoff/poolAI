@@ -452,31 +452,156 @@ Retry budget:
 
 ## 5. Seeds / shards / locality-aware placement
 
-### 5.1 Семантика seeds
+Узгоджено з [`POOLAI_MEMORY_LAYER.md`](./POOLAI_MEMORY_LAYER.md) (seed = нода з shard) і wire у `src/grid/` (`MemoryShard`, `emit_seed_provided` / `emit_memory_updated`).
 
-Для практичного контенту “seeds” у цьому документі — це узагальнений термін для локальних даних, які найчастіше потрібні worker’у:
+### 5.1 Семантика seeds (канон)
 
-- memory shards / seed-proфілі;
-- RAID artifacts (які інтерпретуються як потрібні дані/шари);
-- hot-layer cache (RAM/VRAM) конкретного профілю тасків.
+| Шар | Що це | Приклад ID / джерело |
+|-----|--------|----------------------|
+| **Memory shard** | логічний шар AGI-памʼяті (ембедінги, checkpoint) | `shard_id` у `MemoryShardStore`, `GET /api/v1/memory/shards` |
+| **RAID artifact** | фізичний носій / репліка shard | `artifact_id`, `POOLAI_RAID_BASE_PATH` |
+| **Hot layer** | копія shard у RAM/VRAM worker’а для low-latency read | локальний cache, не замінює RAID source of truth |
+| **Seed provider** | worker/srvN, що віддає shard іншим (`SeedProvided`) | `peer_id` + `seed_inventory` (концепт, §5.4) |
 
-### 5.2 Placement та мережеве збереження трафіку
+**Правило Galaxy Grid:** scheduler (§4.1) враховує `required_shard_ids` job’а + **де вже є hot/local replica**, перш ніж тягнути дані через WAN.
 
-Мета: “не тягнути” зайве по мережі між seed’ами.
+### 5.2 Locality placement (PH-S61, canonical)
 
-Рекомендована політика:
+**Мета:** *keep hot layers local* — виконувати job там, де потрібні шари вже в hot tier або в одному SmallWorld-кільці з низьким egress.
 
-- placement “гарячих” шарів ближче до worker’ів, які їх використовують найчастіше;
-- **авто-підхід через SmallWorld** (топологічно усвідомлена реплікація + short-path routing).
+**Placement score** (концепт, off-chain, coordinator):
 
-### 5.3 Prefetch: RAM vs VRAM
+```
+locality_score(worker, job) =
+    w_shard  × shard_local_hit(worker, job.required_shard_ids)
+  + w_lat    × latency_factor(worker.network_profile)
+  + w_hot    × hot_tier_hit_ratio(worker, job.task_profile)
+  - w_egress × estimated_cross_region_egress_mb(job)
+```
 
-Prefetch політика залежить від таску та worker’а:
+| Сигнал | Діапазон | Сенс |
+|--------|----------|------|
+| `shard_local_hit` | 0..1 | частка `required_shard_ids`, присутніх у `seed_inventory` worker’а |
+| `latency_factor` | 0..1 | `1 / (1 + latency_ms_p50/100)` з `network_profile` (§2.3) |
+| `hot_tier_hit_ratio` | 0..1 | частка required bytes уже в RAM/VRAM hot tier |
+| `estimated_cross_region_egress_mb` | ≥0 | штраф за pull з іншого `region` |
 
-- CPU worker: префетч у RAM;
-- GPU worker: префетч у VRAM (або GPU page-cache, якщо підтримується).
+**Політика вибору worker (разом із pricing §4.2):**
 
-Ключ: placement і префетч повинні бути “capability-driven”, а не статичними.
+1. Відфільтрувати за `capabilities` + `limits` + seat cap (§3.1).
+2. Сортувати за `locality_score` (desc), потім `pricing`, потім `queue_depth`.
+3. Якщо `shard_local_hit = 0` для всіх — **replicate-or-fetch**: SmallWorld short-path до найближчого seed provider, потім optional **re-migrate** job після prefetch (§4.3).
+
+**SmallWorld (high level):** реплікація shard за RAID-політикою; routing обирає peer з мінімальним hop-count + egress; деталі топології — RAID/SmallWorld docs, не дублювати тут.
+
+**Wire extension (worker DTO, концепт):**
+
+```json
+"seed_inventory": {
+  "shard_ids": ["w:emb-1", "w:ckpt-7"],
+  "hot_tier": {
+    "ram_bytes_used": 3221225472,
+    "vram_bytes_used": 0,
+    "profiles": ["inference:text"]
+  },
+  "local_replica_regions": ["eu-west"],
+  "last_inventory_at": "2026-05-27T10:00:00Z"
+}
+```
+
+### 5.3 Telemetry signals (PH-S61)
+
+Coordinator і worker збирають **locality telemetry** (агрегація per `srv_id`, `shard_id`, `worker_id`):
+
+| Signal | Тип | Хто емітить | Використання |
+|--------|-----|-------------|--------------|
+| `shard_access_count_1h` | counter | worker / seed provider | hot promotion, placement |
+| `shard_bytes_served_1h` | counter | seed provider | винагорода / capacity planning |
+| `shard_fetch_latency_ms_p50` | gauge | worker | SLA, re-migrate trigger |
+| `hot_tier_hit_ratio` | gauge 0..1 | worker | prefetch effectiveness |
+| `prefetch_queue_depth` | gauge | worker | backpressure |
+| `cross_region_egress_mb_1h` | counter | srvN egress | cost guardrail |
+| `local_replica_available` | bool per shard | discovery | avoid WAN pull |
+
+**Зв’язок з `network_profile`:** `latency_ms_p50`, `region`, `bandwidth_mbps` — вхідні для `latency_factor`; повний contract `network_profile` лишається TBD (§8), але **locality subset** вище — обов’язковий для PH-S61 scheduling.
+
+**Метрики (Prometheus, майбутнє):** `galaxy_shard_local_hit_ratio`, `galaxy_prefetch_bytes_total`, `galaxy_cross_region_egress_mb`.
+
+### 5.4 Keep hot layers local (PH-S61)
+
+**Hot tier** — LRU/LFU-кеш на worker’і поверх RAID source; не плутати з повною реплікою shard на диску.
+
+| Рівень | Носій | Коли |
+|--------|-------|------|
+| **L0 hot** | VRAM | GPU worker + `task_profile` з GPU inference |
+| **L1 hot** | RAM | CPU worker або staging перед GPU upload |
+| **L2 warm** | local disk / RAID mount | cold start, перший access |
+| **L3 remote** | інший seed provider | лише якщо нема local/SmallWorld replica |
+
+**Promotion (концепт):**
+
+```
+if shard_access_count_1h(shard, worker) >= promote_threshold
+   and hot_tier_bytes < hot_budget(worker):
+       promote shard → L0 or L1 (capability-driven)
+```
+
+**Demotion:** при `hot_tier_bytes > hot_budget` — evict найменш використовувані shard’и (LFU), залишити метадані в `seed_inventory` для discovery.
+
+**`hot_budget(worker)` (default fractions):**
+
+- RAM: `min(0.6 × memory_gb, manual_cap_ram_gb)` × 1 GiB
+- VRAM: `gpu_units × vram_gb_per_gpu × 0.75` (якщо `gpu_units > 0`)
+
+**Правило Grid:** не планувати job на worker з `hot_tier_hit_ratio = 0` для великого `required_shard_ids`, якщо інший worker має `hot_tier_hit_ratio > 0.8` і схожий `pricing` (±5%).
+
+### 5.5 Task-driven prefetch (PH-S61)
+
+Prefetch запускається **після admission job**, до `Running`, на основі job spec — не статичний cron.
+
+**Тригери:**
+
+| Trigger | Умова | Дія |
+|---------|-------|-----|
+| `job_admitted` | `job.required_shard_ids` non-empty | prefetch у чергу worker |
+| `co_access_graph` | історично shard A+B разом | speculative prefetch B при admit A |
+| `lease_acquired` | worker став `lease_owner` | пріоритетний prefetch перед execute |
+| `re_migrate` | новий owner, старий мав partial hot | delta-fetch missing shards |
+
+**Алгоритм (мінімум):**
+
+```
+for shard_id in job.required_shard_ids ordered by access_weight:
+    if shard_id in worker.seed_inventory.shard_ids and hot_hit(shard_id):
+        continue
+    enqueue_prefetch(shard_id, target_tier=ram|vram from capabilities)
+wait_prefetch(timeout=prefetch_deadline_ms)  // default 5_000–30_000 ms за профілем
+if not all_required_ready and policy.strict_locality:
+    fail job with reason prefetch-timeout OR re-migrate to better worker
+```
+
+**`access_weight`:** з Context Memory Monitoring / `shard_access_count_1h` (Memory Layer §4).
+
+**Strict vs best-effort:**
+
+| Mode | Поведінка |
+|------|-----------|
+| `strict_locality` | job не стартує без required hot/local |
+| `best_effort` (default) | старт з remote fetch + metric `hot_tier_hit_ratio` low |
+
+**Існуючий код (орієнтир):** `ingest_envelope` + `emit_seed_provided` (`src/grid/dispatch.rs`); memory HTTP `src/memory/` — PH-S61 лише політика, не новий модуль.
+
+### 5.6 Ops notes (coordinator / worker)
+
+| Змінна (концепт) | Default | Опис |
+|------------------|---------|------|
+| `POOLAI_GALAXY_LOCALITY_MODE` | `best_effort` | `strict_locality` \| `best_effort` |
+| `POOLAI_GALAXY_PREFETCH_DEADLINE_MS` | `15000` | max wait перед Running |
+| `POOLAI_GALAXY_HOT_PROMOTE_THRESHOLD` | `8` | accesses/1h для promotion |
+| `POOLAI_MEMORY_DATA_DIR` | `data/memory` | shard registry (наявне, FM-022) |
+| `POOLAI_RAID_BASE_PATH` | — | artifact plane для cold/warm fetch |
+
+**Логи:** `locality_placement_pick`, `prefetch_enqueued`, `prefetch_timeout`, `hot_promote`, `hot_evict`.
 
 ## 6. Security та верифікація (edge untrusted)
 
@@ -504,5 +629,5 @@ On-chain події потрібні, коли вони:
 3. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
 4. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
 
-> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind flow (§3.1–3.2).
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6).
 
