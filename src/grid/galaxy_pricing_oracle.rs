@@ -191,6 +191,13 @@ pub struct GalaxyPricingCacheEntry {
     pub quote: GalaxyPricingQuote,
 }
 
+/// L3 hard stop: no L1 cache (fresh/stale) and no L2 configured fallback (§4.2.4).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct GalaxyPricingUnavailable;
+
+/// Stable REST `error.code` for L3 responses (Galaxy §4.2.4).
+pub const PRICING_UNAVAILABLE_ERROR_CODE: &str = "pricing_unavailable";
+
 /// Cache age classification for TTL / SWR (§4.2.3).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CacheFreshness {
@@ -326,20 +333,36 @@ impl GalaxyPricingOracle {
         Some(quote)
     }
 
-    /// Lookup fresh/stale cache or refresh on miss/expired (§4.2.3 behaviour sketch).
+    /// Lookup fresh/stale cache, provider refresh, or L2 fallback (§4.2.3–4.2.4).
+    pub fn try_quote(
+        &mut self,
+        now_secs: u64,
+        key: GalaxyPricingCacheKey,
+        providers: &[MockProviderQuote],
+    ) -> Result<GalaxyPricingQuote, GalaxyPricingUnavailable> {
+        if self.config.force_fallback {
+            return self
+                .l2_fallback_quote(now_secs, key)
+                .ok_or(GalaxyPricingUnavailable);
+        }
+        if let Some((entry, freshness)) = self.lookup(now_secs, &key) {
+            if freshness == CacheFreshness::Fresh || freshness == CacheFreshness::Stale {
+                return Ok(entry.quote);
+            }
+        }
+        self.refresh_from_providers(now_secs, key.clone(), providers)
+            .or_else(|| self.l2_fallback_quote(now_secs, key))
+            .ok_or(GalaxyPricingUnavailable)
+    }
+
+    /// Convenience wrapper over [`Self::try_quote`].
     pub fn quote(
         &mut self,
         now_secs: u64,
         key: GalaxyPricingCacheKey,
         providers: &[MockProviderQuote],
     ) -> Option<GalaxyPricingQuote> {
-        if let Some((entry, freshness)) = self.lookup(now_secs, &key) {
-            if freshness == CacheFreshness::Fresh || freshness == CacheFreshness::Stale {
-                return Some(entry.quote);
-            }
-        }
-        self.refresh_from_providers(now_secs, key.clone(), providers)
-            .or_else(|| self.l2_fallback_quote(now_secs, key))
+        self.try_quote(now_secs, key, providers).ok()
     }
 }
 
@@ -498,6 +521,53 @@ mod tests {
         );
         assert_eq!(map.get(&GalaxyPriceUnitKey::GpuSecond).copied(), None);
         assert_eq!(map.len(), 1);
+    }
+
+    #[test]
+    fn try_quote_l3_when_no_l1_l2_or_providers() {
+        let oracle = GalaxyPricingOracle::new(GalaxyPricingConfig::default());
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "no-fallback".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        let mut oracle = oracle;
+        assert_eq!(
+            oracle.try_quote(100, key, &[]),
+            Err(GalaxyPricingUnavailable)
+        );
+    }
+
+    #[test]
+    fn try_quote_l3_when_force_fallback_without_l2_config() {
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: true,
+        });
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "forced-no-l2".into(),
+            unit_key: GalaxyPriceUnitKey::GpuSecond,
+        };
+        assert_eq!(oracle.try_quote(1, key, &[]), Err(GalaxyPricingUnavailable));
+    }
+
+    #[test]
+    fn try_quote_l1_stale_before_l3() {
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        });
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "stale-ok".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        oracle.refresh_from_providers(0, key.clone(), &mock_us_blended());
+        let quote = oracle.try_quote(400, key, &[]).expect("L1 stale");
+        assert_eq!(quote.poolai_quote_usd_micro, 450_000);
     }
 
     #[test]

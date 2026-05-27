@@ -529,12 +529,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Snapshot unavailable (cache miss and fallback not configured)
+        '503':
+          description: Pricing unavailable (L3 hard stop — no L1 cache and no L2 fallback)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: pricing_unavailable
+                  message: grid pricing unavailable; configure POOLAI_GALAXY_PRICING_FALLBACK_JSON
 
   /discovery/grid/envelope:
     post:

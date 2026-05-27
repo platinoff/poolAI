@@ -15,7 +15,7 @@ use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_pricing_oracle::{
     CacheFreshness, GalaxyPriceUnitKey, GalaxyPricingCacheKey, GalaxyPricingConfig,
-    GalaxyPricingOracle, GalaxyPricingQuote,
+    GalaxyPricingOracle, GalaxyPricingQuote, PRICING_UNAVAILABLE_ERROR_CODE,
 };
 use crate::grid::{ingest_envelope, GridEnvelope, GridIngestKind, GridIngestOutcome};
 use crate::job::{JobStatus, JobStore};
@@ -108,7 +108,16 @@ struct GridPricingSnapshotResponse {
 
 fn pricing_oracle() -> &'static Mutex<GalaxyPricingOracle> {
     static ORACLE: OnceLock<Mutex<GalaxyPricingOracle>> = OnceLock::new();
-    ORACLE.get_or_init(|| Mutex::new(GalaxyPricingOracle::from_env()))
+    ORACLE.get_or_init(|| {
+        #[cfg(test)]
+        {
+            Mutex::new(GalaxyPricingOracle::new(GalaxyPricingConfig::default()))
+        }
+        #[cfg(not(test))]
+        {
+            Mutex::new(GalaxyPricingOracle::from_env())
+        }
+    })
 }
 
 fn now_secs() -> Result<u64, HttpAppError> {
@@ -172,11 +181,14 @@ async fn get_grid_pricing_snapshot(
         }
     }
 
-    let quote = oracle.quote(now, cache_key, &[]).ok_or_else(|| {
-        AppError::ApiNotFound(
-            "grid pricing snapshot unavailable: cache miss and fallback quote not configured"
-                .to_string(),
-        )
+    let quote = oracle.try_quote(now, cache_key, &[]).map_err(|_| {
+        HttpAppError::new(AppError::RestError {
+            code: PRICING_UNAVAILABLE_ERROR_CODE,
+            message:
+                "grid pricing unavailable: no fresh or stale cache and L2 fallback not configured"
+                    .to_string(),
+        })
+        .with_status(StatusCode::SERVICE_UNAVAILABLE)
     })?;
     Ok((
         StatusCode::OK,
@@ -207,6 +219,16 @@ fn response_from_outcome(outcome: GridIngestOutcome) -> GridIngestResponse {
 mod tests {
     use super::*;
     use std::collections::HashMap;
+    use std::sync::{Mutex as StdMutex, OnceLock as StdOnceLock};
+
+    static PRICING_TEST_LOCK: StdOnceLock<StdMutex<()>> = StdOnceLock::new();
+
+    fn pricing_test_lock() -> std::sync::MutexGuard<'static, ()> {
+        PRICING_TEST_LOCK
+            .get_or_init(|| StdMutex::new(()))
+            .lock()
+            .expect("pricing test lock")
+    }
 
     fn reset_oracle(force_fallback: bool, fallback_quote: Option<u64>) {
         let mut fallback = HashMap::new();
@@ -222,19 +244,20 @@ mod tests {
         .with_l2_fallback_quotes(fallback);
     }
 
-    fn query(unit_key: &str) -> GridPricingSnapshotQuery {
+    fn query(unit_key: &str, model_profile: &str) -> GridPricingSnapshotQuery {
         GridPricingSnapshotQuery {
             task_profile: "inference:text".to_string(),
-            model_profile: "gpt-4o-mini".to_string(),
+            model_profile: model_profile.to_string(),
             unit_key: unit_key.to_string(),
         }
     }
 
     #[tokio::test]
     async fn grid_pricing_snapshot_rejects_invalid_unit_key() {
+        let _lock = pricing_test_lock();
         let res = get_grid_pricing_snapshot(
             State(ApiContext::default()),
-            Query(query("not_a_valid_unit")),
+            Query(query("not_a_valid_unit", "invalid-unit-test")),
         )
         .await;
         let err = res.expect_err("expected validation error");
@@ -242,23 +265,32 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn grid_pricing_snapshot_returns_not_found_without_cache_or_fallback() {
+    async fn grid_pricing_snapshot_returns_pricing_unavailable_without_cache_or_fallback() {
+        let _lock = pricing_test_lock();
         reset_oracle(false, None);
         let res = get_grid_pricing_snapshot(
             State(ApiContext::default()),
-            Query(query("inference_blended_token")),
+            Query(query("inference_blended_token", "l3-hard-stop-test")),
         )
         .await;
-        let err = res.expect_err("expected not found");
-        assert!(matches!(err.err, AppError::ApiNotFound(_)));
+        let err = res.expect_err("expected pricing unavailable");
+        assert!(matches!(
+            err.err,
+            AppError::RestError {
+                code: PRICING_UNAVAILABLE_ERROR_CODE,
+                ..
+            }
+        ));
+        assert_eq!(err.status_override, Some(StatusCode::SERVICE_UNAVAILABLE));
     }
 
     #[tokio::test]
     async fn grid_pricing_snapshot_uses_fallback_and_then_cache() {
+        let _lock = pricing_test_lock();
         reset_oracle(true, Some(470_000));
         let first = get_grid_pricing_snapshot(
             State(ApiContext::default()),
-            Query(query("inference_blended_token")),
+            Query(query("inference_blended_token", "l2-fallback-test")),
         )
         .await
         .expect("fallback snapshot")
@@ -269,7 +301,7 @@ mod tests {
 
         let second = get_grid_pricing_snapshot(
             State(ApiContext::default()),
-            Query(query("inference_blended_token")),
+            Query(query("inference_blended_token", "l2-fallback-test")),
         )
         .await
         .expect("cached snapshot")

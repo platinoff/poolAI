@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S77 ✅ security docs canonical pointer cleanup; §5.12 PH-S80 відкрито; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S80 ✅ pricing oracle L3 hard stop; §5.12 PH-S81 відкрито; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -280,7 +280,7 @@ FM-xxx (з таблиці нижче)
 | 13 | **PH-S77** | Security docs canonical pointer cleanup | `docs/security/*`, FM §5.12 | normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates | **✅** |
 | 14 | **PH-S78** | Grid pricing API snapshot wire (code) | Galaxy §4.2.3, future wire note | read-only `GET /api/v1/grid/pricing` (task/model/unit) wired to oracle cache/fallback path + endpoint tests + OpenAPI sync + gap-audit 0 | **✅** |
 | 15 | **PH-S79** | Grid pricing API env fallback wire fix (code) | `src/network/api/grid.rs`, Galaxy §4.2.4 | initialize API oracle via `GalaxyPricingOracle::from_env()` so `POOLAI_GALAXY_PRICING_FALLBACK_JSON` is applied on `/api/v1/grid/pricing`; `cargo test-ci` + openapi-gap 0 | **✅** |
-| 16 | **PH-S80** | Pricing oracle L3 hard stop (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | when L1+L2 unavailable return `503 pricing_unavailable` on new priced jobs/API; unit tests | відкрито |
+| 16 | **PH-S80** | Pricing oracle L3 hard stop (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | when L1+L2 unavailable return `503 pricing_unavailable` on new priced jobs/API; unit tests | **✅** |
 | 17 | **PH-S81** | Pricing oracle `FORCE_FALLBACK` env wire (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` always L2 path + log metric; unit tests | відкрито |
 | 18 | **PH-S82** | Admin UI grid pricing snapshot panel | Galaxy §4.2.3, `src/ui/` | `/ui/admin/*` read-only panel calling `GET /api/v1/grid/pricing`; Playwright smoke | відкрито |
 | 19 | **PH-S83** | Galaxy pricing stale-served metric (code) | Galaxy §4.2.4, observability | expose `galaxy_pricing_stale_served` counter on L1 stale path; unit or integration test | відкрито |
