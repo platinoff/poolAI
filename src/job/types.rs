@@ -140,6 +140,34 @@ impl JobRecord {
     }
 }
 
+/// PATCH `/api/v1/jobs/{id}` lease epoch validation (PH-S95, Galaxy §4.3.1 CAS stub).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PatchLeaseEpochError {
+    /// Client sent `lease_epoch` but the job row has no lease fields.
+    NoLeaseOnJob,
+    /// Epoch mismatch or lease expired at `now`.
+    Rejected,
+}
+
+/// When `provided` is `None`, validation passes (legacy PATCH without CAS).
+pub fn check_patch_lease_epoch(
+    record: &JobRecord,
+    provided: Option<u64>,
+    now: DateTime<Utc>,
+) -> Result<(), PatchLeaseEpochError> {
+    let Some(epoch) = provided else {
+        return Ok(());
+    };
+    if !record.has_lease_fields() {
+        return Err(PatchLeaseEpochError::NoLeaseOnJob);
+    }
+    if record.lease_epoch_matches(epoch, now) {
+        Ok(())
+    } else {
+        Err(PatchLeaseEpochError::Rejected)
+    }
+}
+
 #[cfg(test)]
 mod lease_tests {
     use super::*;
@@ -161,6 +189,47 @@ mod lease_tests {
         let record: JobRecord = serde_json::from_str(json).expect("parse legacy job");
         assert!(!record.has_lease_fields());
         assert!(!record.lease_active_at(Utc::now()));
+    }
+
+    #[test]
+    fn check_patch_lease_epoch_accepts_match_and_rejects_mismatch() {
+        let expires = Utc.with_ymd_and_hms(2026, 5, 27, 13, 0, 0).unwrap();
+        let before = expires - chrono::Duration::seconds(1);
+        let record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("lease-patch"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: Some("worker-a".into()),
+            lease_epoch: Some(5),
+            lease_expires_at: Some(expires),
+        };
+        assert!(check_patch_lease_epoch(&record, None, before).is_ok());
+        assert!(check_patch_lease_epoch(&record, Some(5), before).is_ok());
+        assert_eq!(
+            check_patch_lease_epoch(&record, Some(4), before),
+            Err(PatchLeaseEpochError::Rejected)
+        );
+        let legacy = JobRecord {
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+            ..record.clone()
+        };
+        assert_eq!(
+            check_patch_lease_epoch(&legacy, Some(1), before),
+            Err(PatchLeaseEpochError::NoLeaseOnJob)
+        );
     }
 
     #[test]

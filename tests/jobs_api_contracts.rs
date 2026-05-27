@@ -238,6 +238,76 @@ async fn jobs_create_with_optional_lease_fields_roundtrip() {
 }
 
 #[tokio::test]
+async fn jobs_patch_lease_epoch_cas_guard() {
+    let app = jobs_app();
+    let expires = "2026-12-31T23:59:59Z";
+
+    let (_, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({
+            "kind": "inference",
+            "lease_owner": "worker-cas",
+            "lease_epoch": 11,
+            "lease_expires_at": expires
+        })),
+    )
+    .await;
+    let id = created
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+
+    let (ok_status, _) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "executing", "lease_epoch": 11 })),
+    )
+    .await;
+    assert_eq!(ok_status, StatusCode::OK);
+
+    let (reject_status, reject_body) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "verifying", "lease_epoch": 10 })),
+    )
+    .await;
+    assert_eq!(reject_status, StatusCode::CONFLICT);
+    assert_eq!(
+        reject_body
+            .get("error")
+            .and_then(|e| e.get("code"))
+            .and_then(|c| c.as_str()),
+        Some("lease_epoch_rejected")
+    );
+
+    let (_, no_lease) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({ "kind": "training" })),
+    )
+    .await;
+    let plain_id = no_lease
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("plain job id")
+        .to_string();
+    let (bad_status, _) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{plain_id}"),
+        Some(json!({ "status": "executing", "lease_epoch": 1 })),
+    )
+    .await;
+    assert_eq!(bad_status, StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test]
 async fn jobs_get_unknown_returns_404() {
     let app = jobs_app();
     let (status, v) = request_json(

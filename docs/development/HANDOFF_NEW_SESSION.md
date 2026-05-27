@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S94 ✅ job lease fields wire stub; §5.12 — 0 відкритих, research) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S95 ✅ PATCH lease epoch CAS; §5.12 PH-S96…S97) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -63,7 +63,8 @@
 **PH-S92 ✅ (code):** `galaxy_pricing_oracle` — `POOLAI_GALAXY_PRICING_PROVIDERS` JSON allow-list parser (`GalaxyPricingProviderCatalog`), bundled US default, `from_env` wire; `matching_entries`; unit tests; без live HTTP fetch; `cargo test-ci`.
 **PH-S93 ✅ (code):** `src/ui/admin/updates_compat.rs` — read-only `/ui/admin/updates-compat` (protocol version from `protocol_compat`, verify-release doc pointers, Galaxy §9.3 matrix link); i18n EN/UK; Playwright smoke (`admin.spec.ts`); `cargo test-ci` + `e2e npm run test:ci`.
 **PH-S94 ✅ (code):** `JobRecord` optional `lease_owner` / `lease_epoch` / `lease_expires_at` (Galaxy §4.3.1); `lease_active_at` / `lease_epoch_matches` stubs; POST/GET `/api/v1/jobs` wire; OpenAPI sync; `tests/jobs_api_contracts.rs` + unit tests; backward compatible JSON/SQLite store.
-**Черга:** §5.12 **0 відкритих** — research: `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`, DOCS_LEGACY, `rg TODO|FIXME src/` → доповнити ≤10 PH-S* (VDT).
+**PH-S95 ✅ (code):** `check_patch_lease_epoch` + optional `lease_epoch` on `PATCH /api/v1/jobs/{id}`; HTTP `409 lease_epoch_rejected`; OpenAPI sync; contract tests; backward compatible when `lease_epoch` omitted.
+**Черга:** §5.12 **PH-S96** (перший відкритий) — admin jobs lease columns; **PH-S97** — lease TTL env stub.
 
 ## 1. Канонічний порядок документації та планів
 

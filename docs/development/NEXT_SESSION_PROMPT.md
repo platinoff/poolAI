@@ -5,13 +5,13 @@
 ---
 
 ```
-PoolAI — ітераційна сесія (VDT, research / §5.12 replenish)
+PoolAI — ітераційна сесія PH-S96 (VDT, один спринт)
 
 ## Ролі (VDT)
 | Роль | Хто | Дія |
 |------|-----|-----|
 | Власник / креативний директор | Людина | Пріоритети, BLOCKED/Deferred, push за бажанням |
-| Оркестратор | Ти (Composer) | Один PH-S*; Rust/docs; FM/HANDOFF/NEXT_SESSION; commit scope |
+| Оркестратор | Ти (Composer) | Один PH-S*; Rust/JS UI/docs; FM/HANDOFF/NEXT_SESSION; commit scope |
 | Субагенти | explore · shell · generalPurpose | docs search, cargo test-ci, один модуль |
 
 Оркестратор НЕ делегує: git push, закриття §5.12, оновлення цього prompt.
@@ -26,37 +26,37 @@ git fetch; git status -sb; git log -1 --oneline
 df -h /s | tail -1
 Прочитати: HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.12 · цей файл
 
-## Канон черги FM
-| Розділ | Зміст |
-|--------|--------|
-| §5.12 | PH-S* спринти (≤10 відкритих) |
-| NEXT_SESSION_PROMPT | Copy-paste старт сесії |
-
 ## Локальний CI (канон)
 cargo fmt --all
 K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci
-# після API: cargo run --bin poolai-openapi-gap-audit
+cd e2e && npm run test:ci   # після src/ui/
 
 ## Стан (2026-05-27)
-- HEAD: *(після PH-S94 commit)* — job lease fields wire stub
-- Закрито: PH-S03…S94 + PH-S76 + PH-S77 + PH-S90
-- §5.12: 0 відкритих → **research replenish** (≤10 rule)
+- HEAD: `c3355c06` — PH-S94 job lease fields wire stub
+- Закрито: PH-S03…S95 + PH-S76 + PH-S77 + PH-S90
+- Відкритий sprint: PH-S96 (перший у §5.12)
 - BLOCKED: PH-S35 / PH-S16 / PH-S02 (LAN)
 - Deferred: PH-S36 / PH-S01 / PH-S15 (Cloud SDK, FM-041)
 
-## Research — scope наступної сесії
-1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
-2. [`DOCS_LEGACY_AUDIT`](./DOCS_LEGACY_AUDIT_2026-05-19.md) §5.3
-3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first, ≤10 відкритих)
-4. Один новий PH-S* з черги після replenish — мінімальний scope
+## PH-S96 — scope цієї сесії
+1. `src/ui/admin/jobs.rs` — read-only колонки lease_owner / lease_epoch / lease_expires_at (Galaxy §4.3.1)
+2. i18n EN/UK; Playwright smoke в `e2e/tests/admin.spec.ts`
+3. FM §5.12 (PH-S96 → ✅) + HANDOFF + цей prompt (наступний PH-S97)
 
 ## Режим виконання
-1. Спочатку replenish §5.12 (якщо <3 відкритих), потім один PH-S*
-2. MSYS2 для git/cargo; commit лише scope спринту
-3. Push + самарі: що зроблено · тести · hash
+1. Взяти PH-S96 з черги (не повторювати закриті)
+2. Мінімальний scope; MSYS2 для git/cargo
+3. Commit лише файлів спринту
+4. Push + самарі: що зроблено · тести · hash · наступний PH-S97
 
 ## Не повторювати
-PH-S03…S94 · admin updates-compat · grid pricing oracle · job lease wire stub (PH-S94)
+PH-S03…S95 · PATCH lease CAS (PH-S95) · job lease wire stub (PH-S94) · admin updates-compat · grid pricing
+
+## Черга §5.12 — відкриті
+| # | Sprint | Фокус | Тип |
+|---|--------|--------|-----|
+| 1 | **PH-S96** | Admin jobs lease columns | ui + e2e |
+| 2 | **PH-S97** | Job lease TTL env default stub | code |
 
 Поза чергою: PH-S35/S16/S02 LAN · PH-S36/S01/S15 Cloud SDK
 ```

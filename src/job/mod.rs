@@ -28,4 +28,7 @@ pub use scheduler::{
     ScheduleOutcome, VmCandidate, WorkerCandidate,
 };
 pub use store::{data_dir_from_env, JobStore};
-pub use types::{JobId, JobKind, JobRecord, JobResources, JobScheduleBinding, JobSpec, JobStatus};
+pub use types::{
+    check_patch_lease_epoch, JobId, JobKind, JobRecord, JobResources, JobScheduleBinding, JobSpec,
+    JobStatus, PatchLeaseEpochError,
+};

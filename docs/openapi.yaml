@@ -5432,6 +5432,12 @@ components:
       properties:
         status:
           $ref: '#/components/schemas/JobStatus'
+        lease_epoch:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          description: Optional CAS guard — must match active lease_epoch when job has lease fields (PH-S95); omit for legacy PATCH
 
     ScheduleJobsResponse:
       type: object

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S94 ✅ job lease fields wire stub; §5.12 — 0 відкритих, research; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S95 ✅ PATCH lease epoch CAS; §5.12 PH-S96…S97 — 2 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -295,6 +295,9 @@ FM-xxx (з таблиці нижче)
 | 28 | **PH-S92** | Pricing providers env catalog stub (code) | Galaxy §4.2.5, `galaxy_pricing_oracle.rs` | parse `POOLAI_GALAXY_PRICING_PROVIDERS` allow-list JSON; no live HTTP fetch; unit tests | **✅** |
 | 29 | **PH-S93** | Admin UI updates & compatibility panel (code) | Galaxy §9.8, `src/ui/` | read-only `/ui/admin/updates-compat`: protocol version, verify-release pointer, compat matrix links; i18n EN/UK; Playwright smoke | **✅** |
 | 30 | **PH-S94** | Job lease fields wire stub (code) | Galaxy §4.3.1, `src/job/` | optional `lease_owner` / `lease_epoch` / `lease_expires_at` on `JobRecord` + POST/GET jobs API; backward compatible JSON/SQLite; unit + contract tests | **✅** |
+| 31 | **PH-S95** | PATCH jobs lease epoch CAS stub (code) | Galaxy §4.3.1, `src/job/`, `src/network/api/jobs.rs` | optional `lease_epoch` on PATCH; `409 lease_epoch_rejected` on mismatch; backward compatible omit; unit + contract tests | **✅** |
+| 32 | **PH-S96** | Admin jobs UI lease columns (code) | Galaxy §4.3.1, `src/ui/admin/jobs.rs` | read-only `lease_owner` / `lease_epoch` / `lease_expires_at` in jobs table; i18n EN/UK; Playwright smoke | відкрито |
+| 33 | **PH-S97** | Job lease TTL env default stub (code) | Galaxy §4.3.1, `src/job/` | `POOLAI_JOB_LEASE_TTL_SECS` parse + default; doc pointer; unit tests (no renew wire) | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 

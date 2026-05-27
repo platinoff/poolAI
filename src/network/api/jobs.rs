@@ -12,7 +12,8 @@ use serde::{Deserialize, Serialize};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::job::{
-    schedule_from_context, JobId, JobKind, JobRecord, JobResources, JobSpec, JobStatus, JobStore,
+    check_patch_lease_epoch, schedule_from_context, JobId, JobKind, JobRecord, JobResources,
+    JobSpec, JobStatus, JobStore, PatchLeaseEpochError,
 };
 use crate::network::api::common::HttpAppError;
 
@@ -76,6 +77,9 @@ struct ScheduleJobsResponse {
 #[derive(Deserialize)]
 struct PatchJobRequest {
     status: JobStatus,
+    /// Galaxy §4.3.1 CAS stub: must match active `lease_epoch` when job has lease fields (PH-S95).
+    #[serde(default)]
+    lease_epoch: Option<u64>,
 }
 
 fn store() -> &'static JobStore {
@@ -182,6 +186,24 @@ async fn patch_job(
     Path(id): Path<String>,
     Json(body): Json<PatchJobRequest>,
 ) -> Result<Json<JobDetailResponse>, HttpAppError> {
+    let existing = store()
+        .get(&id)?
+        .ok_or_else(|| HttpAppError::new(AppError::ApiNotFound(format!("job '{id}' not found"))))?;
+    let now = Utc::now();
+    if let Err(err) = check_patch_lease_epoch(&existing, body.lease_epoch, now) {
+        return Err(match err {
+            PatchLeaseEpochError::NoLeaseOnJob => HttpAppError::new(AppError::ValidationError(
+                "job has no lease fields; omit lease_epoch on PATCH".into(),
+            )),
+            PatchLeaseEpochError::Rejected => HttpAppError::new(AppError::RestError {
+                code: "lease_epoch_rejected",
+                message: format!(
+                    "lease_epoch does not match active lease for job '{id}' (Galaxy §4.3.1 CAS stub)"
+                ),
+            })
+            .with_status(StatusCode::CONFLICT),
+        });
+    }
     let job = store().update_status(&id, body.status)?;
     Ok(Json(JobDetailResponse { job }))
 }
