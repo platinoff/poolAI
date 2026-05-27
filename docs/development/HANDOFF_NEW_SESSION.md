@@ -36,7 +36,8 @@
 **PH-S65 ✅:** `protocol_version` / `build_id` на `POST /api/v1/discovery/register-remote`; `src/grid/protocol_compat.rs` (Galaxy §9.3 matrix); відповіді `compat_status` + HTTP 403/426; `poolai-worker` шле wire fields; тести `protocol_compat` + `galaxy_protocol_register_integration`.
 **PH-S66 ✅:** `poolai-verify-release` — ed25519 manifest + optional artifact SHA-256 (`src/release/`, `cargo run --bin poolai-verify-release`); unit tests; SECURITY_HARDENING ↔ Galaxy §9.2 cross-link.
 **PH-S67 ✅:** `FUNCTIONALITY_DIGEST` — zріз Galaxy Grid modules (`galaxy_fee_split`, `dispatch`, `protocol_compat`, virtual nodes API/services, `release/`); INDEX cross-link.
-**Черга:** §5.12 **PH-S68…S69** (2 відкритих); наступний код — **PH-S68** (pricing oracle Rust stub).
+**PH-S68 ✅:** `src/grid/galaxy_pricing_oracle.rs` — unit keys, `floor(market_min×0.9)`, TTL/SWR cache, `POOLAI_GALAXY_PRICE_*` env; unit tests; cross-link §4.2 + DIGEST.
+**Черга:** §5.12 **PH-S69** (1 відкритий); наступний код — **PH-S69** (SECURITY_HARDENING ↔ Galaxy §9).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -68,6 +69,9 @@
 | `POOLAI_PROTOCOL_VERSION` | worker | Galaxy wire protocol на register-remote (default `1.2`) |
 | `POOLAI_BUILD_ID` | worker | Build id на register-remote (default `CARGO_PKG_VERSION`) |
 | `POOLAI_COORDINATOR_PROTOCOL_VERSION` | coordinator | Coordinator protocol для compat matrix (default `1.2`) |
+| `POOLAI_GALAXY_PRICE_CACHE_TTL_SECS` | coordinator | Pricing oracle fresh TTL (default `300`; `galaxy_pricing_oracle`, §4.2) |
+| `POOLAI_GALAXY_PRICE_MAX_STALE_SECS` | coordinator | Pricing oracle stale window (default `3600`) |
+| `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | coordinator | `1` — skip live quote refresh (L2 stub flag) |
 | `POOLAI_TELEGRAM_ID` | worker | Telegram user id → `POST .../telegram/bind` після register |
 | `POOLAI_WORKER_CACHE_DIR` | worker | Локальний кеш probe-артефактів після успішного `raid_artifact_probe` |
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |

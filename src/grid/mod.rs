@@ -7,6 +7,7 @@
 pub mod dispatch;
 mod envelope;
 pub mod galaxy_fee_split;
+pub mod galaxy_pricing_oracle;
 mod map;
 pub mod protocol_compat;
 

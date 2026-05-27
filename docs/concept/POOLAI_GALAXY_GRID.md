@@ -388,9 +388,9 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 - Метрики (Prometheus, майбутнє): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
-**Реалізація (наступні спринти):** окремий модуль `src/grid/galaxy_pricing_oracle.rs` (не в scope PH-S59); PH-S59 — лише контракт і ops.
+**Rust reference (oracle stub, PH-S68):** `src/grid/galaxy_pricing_oracle.rs` — unit keys, `floor(market_min×0.9)`, cache TTL/SWR з `POOLAI_GALAXY_PRICE_*`; HTTP `GET /api/v1/grid/pricing` — майбутній спринт.
 
-**Rust reference (fee split, не oracle):** `src/grid/galaxy_fee_split.rs` — застосовується після визначення `gross`.
+**Rust reference (fee split):** `src/grid/galaxy_fee_split.rs` — застосовується після визначення `gross`.
 
 ### 4.3 Re-migrate policy
 
