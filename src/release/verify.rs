@@ -282,6 +282,55 @@ mod tests {
         assert!(matches!(err, VerifyReleaseError::BadSignature));
     }
 
+    /// Regenerate `tests/fixtures/release/dev/` (PH-S85). Run:
+    /// `cargo test --lib release::verify::tests::write_dev_release_fixtures -- --ignored --exact`
+    #[test]
+    #[ignore]
+    fn write_dev_release_fixtures() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/release/dev");
+        std::fs::create_dir_all(&root).unwrap();
+
+        let artifact_path = root.join("poolai-sample.bin");
+        std::fs::write(&artifact_path, b"poolai-test-artifact-v1").unwrap();
+        let hash = hex::encode(Sha256::digest(b"poolai-test-artifact-v1"));
+
+        let manifest = format!(
+            r#"{{
+  "version": "0.2.2-dev",
+  "git_tag": "v0.2.2-dev-fixture",
+  "protocol_min": "1.0",
+  "protocol_max": "1.2",
+  "artifacts": [
+    {{ "name": "poolai", "path": "poolai-sample.bin", "sha256": "{hash}" }}
+  ]
+}}
+"#
+        );
+        let manifest_path = root.join("release-manifest.json");
+        std::fs::write(&manifest_path, &manifest).unwrap();
+
+        let sig = test_signing_key().sign(manifest.as_bytes());
+        let envelope = serde_json::json!({
+            "algorithm": "ed25519",
+            "key_id": "poolai-dev",
+            "signature_hex": hex::encode(sig.to_bytes()),
+        });
+        std::fs::write(
+            root.join("release-manifest.json.sig"),
+            serde_json::to_vec_pretty(&envelope).unwrap(),
+        )
+        .unwrap();
+
+        std::fs::write(
+            root.join("maintainer_keys.json"),
+            format!(
+                r#"{{"maintainer_keys":[{{"key_id":"poolai-dev","public_key_hex":"{}"}}]}}"#,
+                test_public_hex()
+            ),
+        )
+        .unwrap();
+    }
+
     #[test]
     fn verify_release_artifact_hash_mismatch() {
         let dir = tempfile::tempdir().unwrap();

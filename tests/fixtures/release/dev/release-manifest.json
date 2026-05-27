@@ -1,0 +1,9 @@
+{
+  "version": "0.2.2-dev",
+  "git_tag": "v0.2.2-dev-fixture",
+  "protocol_min": "1.0",
+  "protocol_max": "1.2",
+  "artifacts": [
+    { "name": "poolai", "path": "poolai-sample.bin", "sha256": "0760178142324ac412c5801c5e0f9432d08d4a30d3968a7ecce51546b0b0715d" }
+  ]
+}

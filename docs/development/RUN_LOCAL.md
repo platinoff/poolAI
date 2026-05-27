@@ -136,6 +136,37 @@ bash bin/run-poolai.sh build
 
 Перевірка як CI: `cargo test-ci` (див. `bin/cargo-test.sh`, README).
 
+### Verify signed release (PH-S85, після `build`)
+
+Перевірка CLI **`poolai-verify-release`** на repo fixtures (dev key `poolai-dev`, не production):
+
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+cd /s/rust/poolAI
+FIX=tests/fixtures/release/dev
+
+cargo run --bin poolai-verify-release -- \
+  --manifest "$FIX/release-manifest.json" \
+  --signature "$FIX/release-manifest.json.sig" \
+  --trust-root "$FIX/maintainer_keys.json" \
+  --artifact "$FIX/poolai-sample.bin" \
+  --artifact-name poolai
+```
+
+PowerShell (після `.\bin\run-poolai.ps1 build`):
+
+```powershell
+$fix = "tests/fixtures/release/dev"
+cargo run --bin poolai-verify-release -- `
+  --manifest "$fix/release-manifest.json" `
+  --signature "$fix/release-manifest.json.sig" `
+  --trust-root "$fix/maintainer_keys.json" `
+  --artifact "$fix/poolai-sample.bin" `
+  --artifact-name poolai
+```
+
+Операторський quickstart і політика — [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md) (Galaxy §9.2 hub, без дублювання governance). Файли fixtures — [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md).
+
 ---
 
 ## Змінні середовища (часті)
@@ -199,4 +230,4 @@ bash bin/run-poolai.sh single
 | OOM при тестах Windows | `.\bin\poolai-msys.ps1 -lc 'cargo test-ci'` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
-**Last updated:** 2026-05-26 (PowerShell / WSL bash fix)
+**Last updated:** 2026-05-27 (PH-S85 verify-release dev fixtures pointer)

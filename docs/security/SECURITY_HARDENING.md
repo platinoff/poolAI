@@ -221,6 +221,37 @@ Minimal verification sequence before rollout (policy: [Galaxy §9.2](#galaxy-gov
    `cargo run --bin poolai-verify-release -- --manifest <release-manifest.json> --signature <release-manifest.sig> --artifact <poolai-binary-or-archive>`
 4. Roll out only after signature + artifact verification are both successful.
 
+#### Dev fixtures (PH-S85)
+
+Repo-local sample paths (ed25519 key **`poolai-dev`**, dev-only — **не** production trust root):
+
+| Path | Role |
+|------|------|
+| [`tests/fixtures/release/dev/maintainer_keys.json`](../../tests/fixtures/release/dev/maintainer_keys.json) | Trust root |
+| [`tests/fixtures/release/dev/release-manifest.json`](../../tests/fixtures/release/dev/release-manifest.json) | Manifest |
+| [`tests/fixtures/release/dev/release-manifest.json.sig`](../../tests/fixtures/release/dev/release-manifest.json.sig) | Signature envelope |
+| [`tests/fixtures/release/dev/poolai-sample.bin`](../../tests/fixtures/release/dev/poolai-sample.bin) | Sample artifact |
+
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+cd /s/rust/poolAI
+FIX=tests/fixtures/release/dev
+
+cargo run --bin poolai-verify-release -- \
+  --manifest "$FIX/release-manifest.json" \
+  --signature "$FIX/release-manifest.json.sig" \
+  --trust-root "$FIX/maintainer_keys.json"
+
+cargo run --bin poolai-verify-release -- \
+  --manifest "$FIX/release-manifest.json" \
+  --signature "$FIX/release-manifest.json.sig" \
+  --trust-root "$FIX/maintainer_keys.json" \
+  --artifact "$FIX/poolai-sample.bin" \
+  --artifact-name poolai
+```
+
+Локальний запуск coordinator після `run-poolai` build — [`RUN_LOCAL.md`](../development/RUN_LOCAL.md) § verify-release. Регенерація fixtures: `cargo test --lib release::verify::tests::write_dev_release_fixtures -- --ignored --exact` (див. [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md)).
+
 #### Operator checklist: protocol compatibility triage (PH-S72)
 
 When worker registration fails because of protocol mismatch (policy: [Galaxy §9.3](#galaxy-governance-canonical-pointers-ph-s69-ph-s77)):
@@ -525,4 +556,6 @@ openssl s_client -connect poolai.example.com:443 -showcerts
 ---
 
 **Last Updated**: 2026-05-27  
+**Version**: 1.8 - PH-S85 dev fixtures paths (`tests/fixtures/release/dev`); RUN_LOCAL verify-release pointer
+
 **Version**: 1.7 - Galaxy §9.2/§9.3/§9.6 canonical pointer hub (PH-S77); deduplicated PH-S71–S76 link blocks
