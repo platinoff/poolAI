@@ -33,7 +33,8 @@
 **PH-S64 ✅:** canonical pointers — README, `docs/README`, INDEX крок 5 + §1, STRUCTURE `concept/`; short pointer Galaxy Grid.
 **Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (повний v1: ролі, fees, pricing, Telegram, lease, locality, verify, governance).
 
-**Черга:** §5.12 **PH-S65…S69** (5 відкритих, research); наступний код — **PH-S65** (`protocol_version` wire).
+**PH-S65 ✅:** `protocol_version` / `build_id` на `POST /api/v1/discovery/register-remote`; `src/grid/protocol_compat.rs` (Galaxy §9.3 matrix); відповіді `compat_status` + HTTP 403/426; `poolai-worker` шле wire fields; тести `protocol_compat` + `galaxy_protocol_register_integration`.
+**Черга:** §5.12 **PH-S66…S69** (4 відкритих); наступний код — **PH-S66** (`poolai verify-release` CLI).
 
 ## 1. Канонічний порядок документації та планів
 
@@ -62,6 +63,9 @@
 | Змінна | Де | Призначення |
 |--------|-----|-------------|
 | `POOLAI_COORDINATOR_URL` | worker | Base URL coordinator (без trailing `/`) |
+| `POOLAI_PROTOCOL_VERSION` | worker | Galaxy wire protocol на register-remote (default `1.2`) |
+| `POOLAI_BUILD_ID` | worker | Build id на register-remote (default `CARGO_PKG_VERSION`) |
+| `POOLAI_COORDINATOR_PROTOCOL_VERSION` | coordinator | Coordinator protocol для compat matrix (default `1.2`) |
 | `POOLAI_TELEGRAM_ID` | worker | Telegram user id → `POST .../telegram/bind` після register |
 | `POOLAI_WORKER_CACHE_DIR` | worker | Локальний кеш probe-артефактів після успішного `raid_artifact_probe` |
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |

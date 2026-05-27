@@ -57,6 +57,7 @@ async fn register_remote_peer_lists_in_discovery_peers() {
     let v: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(v["peer_id"], "tg-worker-test");
     assert_eq!(v["registered"], true);
+    assert_eq!(v["compat_status"], "accepted");
 
     let peers_req = Request::builder()
         .uri("/api/v1/discovery/peers")

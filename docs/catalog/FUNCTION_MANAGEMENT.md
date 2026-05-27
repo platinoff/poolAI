@@ -265,7 +265,7 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S65** | Worker register: `protocol_version` + compat negotiation | Galaxy §9.3 | OpenAPI + handler; reject/upgrade response | відкрито |
+| 1 | **PH-S65** | Worker register: `protocol_version` + compat negotiation | Galaxy §9.3 | OpenAPI + handler; reject/upgrade response | **✅** |
 | 2 | **PH-S66** | `poolai verify-release` CLI (signed manifest) | Galaxy §9.2, SECURITY_HARDENING | verify artifact + signature; unit tests | відкрито |
 | 3 | **PH-S67** | DIGEST: Galaxy Grid modules zріз | FUNCTIONALITY_DIGEST | `galaxy_fee_split`, grid dispatch, virtual nodes | відкрито |
 | 4 | **PH-S68** | Pricing oracle Rust stub (concept S59) | `POOLAI_GALAXY_GRID.md` §4.2 | unit keys + env `POOLAI_GALAXY_PRICE_*`; tests | відкрито |

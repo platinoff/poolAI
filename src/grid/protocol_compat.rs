@@ -1,0 +1,218 @@
+//! Galaxy Grid worker ↔ coordinator protocol compatibility (§9.3, PH-S65).
+//!
+//! Negotiation on `POST /api/v1/discovery/register-remote` when `protocol_version` is set.
+//! Legacy clients without `protocol_version` are accepted for backward compatibility.
+
+use serde::{Deserialize, Serialize};
+
+/// Wire protocol label advertised by this coordinator build.
+pub const DEFAULT_COORDINATOR_PROTOCOL: &str = "1.2";
+
+/// Docs-only hint for workers that must upgrade (Galaxy §9.3).
+pub const MIN_COORDINATOR_VERSION_DOCS_URL: &str =
+    "https://github.com/platinoff/poolAI/blob/main/docs/concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CompatStatus {
+    Accepted,
+    UpgradeRequired,
+    Unsupported,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ProtocolNegotiation {
+    pub status: CompatStatus,
+    pub coordinator_protocol_version: String,
+    pub min_coordinator_version: String,
+    pub worker_protocol_version: Option<String>,
+}
+
+/// Parsed `major.minor` protocol tuple.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ProtocolVersion {
+    pub major: u8,
+    pub minor: u8,
+}
+
+impl ProtocolVersion {
+    pub fn parse(input: &str) -> Option<Self> {
+        let trimmed = input.trim();
+        if trimmed.is_empty() {
+            return None;
+        }
+        let core = trimmed.split_whitespace().next().unwrap_or(trimmed);
+        let version_part = core.split('-').next().unwrap_or(core);
+        let mut parts = version_part.split('.');
+        let major: u8 = parts.next()?.parse().ok()?;
+        if major != 1 {
+            return None;
+        }
+        let minor: u8 = parts
+            .next()
+            .unwrap_or("0")
+            .trim_end_matches('x')
+            .parse()
+            .ok()?;
+        Some(Self { major, minor })
+    }
+
+    pub fn label(self) -> String {
+        format!("{}.{}", self.major, self.minor)
+    }
+}
+
+fn coordinator_protocol_version() -> ProtocolVersion {
+    let raw = std::env::var("POOLAI_COORDINATOR_PROTOCOL_VERSION")
+        .unwrap_or_else(|_| DEFAULT_COORDINATOR_PROTOCOL.to_string());
+    ProtocolVersion::parse(&raw).unwrap_or(ProtocolVersion { major: 1, minor: 2 })
+}
+
+/// Compat matrix cell from Galaxy §9.3 (coordinator row, worker column).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum MatrixCell {
+    Full,
+    Limited,
+    Reject,
+}
+
+fn matrix_cell(coordinator: ProtocolVersion, worker: ProtocolVersion) -> MatrixCell {
+    if coordinator.major != 1 || worker.major != 1 {
+        return MatrixCell::Reject;
+    }
+    match (coordinator.minor, worker.minor) {
+        (0, 0) => MatrixCell::Full,
+        (0, 1) => MatrixCell::Limited,
+        (0, 2) => MatrixCell::Reject,
+        (1, 0) => MatrixCell::Limited,
+        (1, 1) => MatrixCell::Full,
+        (1, 2) => MatrixCell::Limited,
+        (2, 0) => MatrixCell::Reject,
+        (2, 1) => MatrixCell::Full,
+        (2, 2) => MatrixCell::Full,
+        _ => MatrixCell::Reject,
+    }
+}
+
+/// Negotiate worker `protocol_version` against an explicit coordinator version.
+pub fn negotiate_with_coordinator(
+    coordinator: ProtocolVersion,
+    protocol_version: Option<&str>,
+) -> ProtocolNegotiation {
+    let coordinator_label = coordinator.label();
+    let min_hint = coordinator_label.clone();
+
+    let Some(raw) = protocol_version.map(str::trim).filter(|s| !s.is_empty()) else {
+        return ProtocolNegotiation {
+            status: CompatStatus::Accepted,
+            coordinator_protocol_version: coordinator_label,
+            min_coordinator_version: min_hint,
+            worker_protocol_version: None,
+        };
+    };
+
+    let worker = match ProtocolVersion::parse(raw) {
+        Some(v) => v,
+        None => {
+            return ProtocolNegotiation {
+                status: CompatStatus::Unsupported,
+                coordinator_protocol_version: coordinator_label,
+                min_coordinator_version: min_hint,
+                worker_protocol_version: Some(raw.to_string()),
+            };
+        }
+    };
+
+    let status = match matrix_cell(coordinator, worker) {
+        MatrixCell::Full => CompatStatus::Accepted,
+        MatrixCell::Limited => CompatStatus::UpgradeRequired,
+        MatrixCell::Reject => CompatStatus::Unsupported,
+    };
+
+    ProtocolNegotiation {
+        status,
+        coordinator_protocol_version: coordinator_label,
+        min_coordinator_version: min_hint,
+        worker_protocol_version: Some(worker.label()),
+    }
+}
+
+/// Negotiate worker `protocol_version` against the coordinator matrix.
+///
+/// `protocol_version: None` — legacy client (FM-016); always accepted.
+pub fn negotiate(protocol_version: Option<&str>) -> ProtocolNegotiation {
+    negotiate_with_coordinator(coordinator_protocol_version(), protocol_version)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_protocol_versions() {
+        assert_eq!(
+            ProtocolVersion::parse("1.2.x"),
+            Some(ProtocolVersion { major: 1, minor: 2 })
+        );
+        assert_eq!(
+            ProtocolVersion::parse("1.0"),
+            Some(ProtocolVersion { major: 1, minor: 0 })
+        );
+        assert!(ProtocolVersion::parse("").is_none());
+        assert!(ProtocolVersion::parse("2.0").is_none());
+    }
+
+    #[test]
+    fn matrix_coordinator_1_2() {
+        let coord = ProtocolVersion { major: 1, minor: 2 };
+        assert_eq!(
+            matrix_cell(coord, ProtocolVersion { major: 1, minor: 2 }),
+            MatrixCell::Full
+        );
+        assert_eq!(
+            matrix_cell(coord, ProtocolVersion { major: 1, minor: 1 }),
+            MatrixCell::Full
+        );
+        assert_eq!(
+            matrix_cell(coord, ProtocolVersion { major: 1, minor: 0 }),
+            MatrixCell::Reject
+        );
+    }
+
+    #[test]
+    fn negotiate_legacy_missing_version() {
+        let n = negotiate(None);
+        assert_eq!(n.status, CompatStatus::Accepted);
+        assert!(n.worker_protocol_version.is_none());
+    }
+
+    #[test]
+    fn negotiate_on_1_2_coordinator() {
+        let coord = ProtocolVersion { major: 1, minor: 2 };
+        assert_eq!(
+            negotiate_with_coordinator(coord, Some("1.2")).status,
+            CompatStatus::Accepted
+        );
+        assert_eq!(
+            negotiate_with_coordinator(coord, Some("1.1")).status,
+            CompatStatus::Accepted
+        );
+        assert_eq!(
+            negotiate_with_coordinator(coord, Some("1.0")).status,
+            CompatStatus::Unsupported
+        );
+        assert_eq!(
+            negotiate_with_coordinator(coord, Some("not-a-version")).status,
+            CompatStatus::Unsupported
+        );
+    }
+
+    #[test]
+    fn negotiate_upgrade_required_when_limited() {
+        let coord = ProtocolVersion { major: 1, minor: 1 };
+        assert_eq!(
+            negotiate_with_coordinator(coord, Some("1.2")).status,
+            CompatStatus::UpgradeRequired
+        );
+    }
+}

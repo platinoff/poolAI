@@ -18,6 +18,7 @@ use std::collections::HashMap;
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
+use crate::grid::protocol_compat::{negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL};
 use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
 use crate::network::api::grid::ingest_grid_envelope_handler;
@@ -45,6 +46,14 @@ struct RegisterRemotePeerRequest {
     peer_id: String,
     address: String,
     port: u16,
+    /// Galaxy §9.3 wire protocol (`1.0`, `1.1`, `1.2.x`). Omitted = legacy accept.
+    #[serde(default)]
+    protocol_version: Option<String>,
+    /// Release / build identifier (optional signed-release pin, PH-S65).
+    #[serde(default)]
+    build_id: Option<String>,
+    #[serde(default)]
+    signature_fingerprint: Option<String>,
     #[serde(default)]
     capabilities: PeerCapabilities,
     #[serde(default)]
@@ -55,6 +64,11 @@ struct RegisterRemotePeerRequest {
 struct RegisterRemotePeerResponse {
     peer_id: String,
     registered: bool,
+    compat_status: CompatStatus,
+    coordinator_protocol_version: String,
+    min_coordinator_version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    worker_protocol_version: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -190,6 +204,21 @@ async fn register_handler(State(ctx): State<ApiContext>) -> impl IntoResponse {
     }
 }
 
+fn register_compat_response(
+    peer_id: String,
+    negotiation: &crate::grid::protocol_compat::ProtocolNegotiation,
+    registered: bool,
+) -> RegisterRemotePeerResponse {
+    RegisterRemotePeerResponse {
+        peer_id,
+        registered,
+        compat_status: negotiation.status,
+        coordinator_protocol_version: negotiation.coordinator_protocol_version.clone(),
+        min_coordinator_version: MIN_COORDINATOR_VERSION_DOCS_URL.to_string(),
+        worker_protocol_version: negotiation.worker_protocol_version.clone(),
+    }
+}
+
 /// POST /api/v1/discovery/register-remote — HTTP registration for virtual nodes (FM-016).
 async fn register_remote_handler(
     State(ctx): State<ApiContext>,
@@ -199,17 +228,40 @@ async fn register_remote_handler(
         return discovery_validation("register_remote", "peer_id must not be empty")
             .into_response();
     }
-    let is_virtual_node = payload.metadata.get("role").map(String::as_str) == Some("virtual_node");
-    let telegram_id = payload.metadata.get("telegram_id").cloned();
-    let telegram_chat_id = payload.metadata.get("telegram_chat_id").cloned();
+
+    let negotiation = negotiate(payload.protocol_version.as_deref());
     let peer_id = payload.peer_id.clone();
+
+    if negotiation.status == CompatStatus::Unsupported {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(register_compat_response(peer_id, &negotiation, false)),
+        )
+            .into_response();
+    }
+
+    let mut metadata = payload.metadata;
+    if let Some(build_id) = payload.build_id {
+        metadata.insert("build_id".to_string(), build_id);
+    }
+    if let Some(fp) = payload.signature_fingerprint {
+        metadata.insert("signature_fingerprint".to_string(), fp);
+    }
+    if let Some(worker_ver) = &negotiation.worker_protocol_version {
+        metadata.insert("protocol_version".to_string(), worker_ver.clone());
+    }
+
+    let is_virtual_node = metadata.get("role").map(String::as_str) == Some("virtual_node");
+    let telegram_id = metadata.get("telegram_id").cloned();
+    let telegram_chat_id = metadata.get("telegram_chat_id").cloned();
+
     match DiscoveryService::register_remote_peer(
         &ctx,
         peer_id.clone(),
         payload.address,
         payload.port,
         payload.capabilities,
-        payload.metadata,
+        metadata,
     )
     .await
     {
@@ -220,12 +272,13 @@ async fn register_remote_handler(
                     VirtualNodeTelegramBindingService::bind(&tg, telegram_chat_id, &peer_id);
                 }
             }
+            let status = match negotiation.status {
+                CompatStatus::UpgradeRequired => StatusCode::UPGRADE_REQUIRED,
+                _ => StatusCode::OK,
+            };
             (
-                StatusCode::OK,
-                Json(RegisterRemotePeerResponse {
-                    peer_id,
-                    registered: true,
-                }),
+                status,
+                Json(register_compat_response(peer_id, &negotiation, true)),
             )
                 .into_response()
         }

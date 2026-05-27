@@ -156,6 +156,15 @@ fn http_client() -> Result<reqwest::Client, String> {
         .map_err(|e| e.to_string())
 }
 
+fn worker_protocol_version() -> String {
+    std::env::var("POOLAI_PROTOCOL_VERSION")
+        .unwrap_or_else(|_| poolai::grid::DEFAULT_COORDINATOR_PROTOCOL.to_string())
+}
+
+fn worker_build_id() -> String {
+    std::env::var("POOLAI_BUILD_ID").unwrap_or_else(|_| env!("CARGO_PKG_VERSION").to_string())
+}
+
 fn registration_body(args: &Args) -> serde_json::Value {
     let mut metadata = HashMap::new();
     metadata.insert("channel".to_string(), args.channel.clone());
@@ -168,6 +177,8 @@ fn registration_body(args: &Args) -> serde_json::Value {
         "peer_id": args.worker_id,
         "address": args.advertise_address,
         "port": args.advertise_port,
+        "protocol_version": worker_protocol_version(),
+        "build_id": worker_build_id(),
         "capabilities": {
             "cpu_cores": num_cpus::get(),
             "memory_mb": args.max_memory_mb,

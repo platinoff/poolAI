@@ -839,7 +839,10 @@ paths:
       tags:
         - Discovery
       summary: Register a remote virtual node
-      description: HTTP registration for device workers (`metadata.role` = `virtual_node`). Queues bootstrap tasks.
+      description: |
+        HTTP registration for device workers (`metadata.role` = `virtual_node`). Queues bootstrap tasks.
+        Galaxy §9.3 — optional `protocol_version` / `build_id` trigger compat negotiation
+        (`compat_status`: `accepted` | `upgrade_required` | `unsupported`).
       operationId: registerRemotePeer
       requestBody:
         required: true
@@ -849,13 +852,25 @@ paths:
               $ref: '#/components/schemas/RegisterRemotePeerRequest'
       responses:
         '200':
-          description: Peer registered
+          description: Peer registered (full compatibility)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RegisterRemotePeerResponse'
         '400':
           description: Invalid request
+        '403':
+          description: Protocol unsupported (compat matrix reject)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterRemotePeerResponse'
+        '426':
+          description: Peer registered with limited compatibility (upgrade recommended)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterRemotePeerResponse'
 
   /discovery/heartbeat-remote:
     post:
@@ -6465,6 +6480,17 @@ components:
           type: string
         port:
           type: integer
+        protocol_version:
+          type: string
+          description: Galaxy wire protocol (`1.0`, `1.1`, `1.2.x`). Omitted = legacy accept.
+          example: "1.2"
+        build_id:
+          type: string
+          description: Release or build identifier (optional signed-release pin).
+          example: "0.2.2"
+        signature_fingerprint:
+          type: string
+          description: Optional signed artifact fingerprint (Galaxy §9.2).
         capabilities:
           type: object
         metadata:
@@ -6480,6 +6506,19 @@ components:
           type: string
         registered:
           type: boolean
+        compat_status:
+          type: string
+          enum: [accepted, upgrade_required, unsupported]
+          description: Galaxy §9.3 negotiation outcome
+        coordinator_protocol_version:
+          type: string
+          example: "1.2"
+        min_coordinator_version:
+          type: string
+          description: Docs URL or version hint when upgrade is required
+        worker_protocol_version:
+          type: string
+          nullable: true
 
     HeartbeatRemotePeerRequest:
       type: object

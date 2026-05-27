@@ -8,6 +8,7 @@ pub mod dispatch;
 mod envelope;
 pub mod galaxy_fee_split;
 mod map;
+pub mod protocol_compat;
 
 pub use dispatch::{ingest_envelope, GridIngestKind, GridIngestOutcome};
 pub use envelope::{
@@ -17,4 +18,8 @@ pub use envelope::{
 pub use map::{
     envelope_from_peer_info, envelope_from_put_artifact, memory_shard_from_put_artifact,
     peer_info_from_envelope, put_artifact_from_memory_shard,
+};
+pub use protocol_compat::{
+    negotiate, negotiate_with_coordinator, CompatStatus, ProtocolNegotiation, ProtocolVersion,
+    DEFAULT_COORDINATOR_PROTOCOL, MIN_COORDINATOR_VERSION_DOCS_URL,
 };
