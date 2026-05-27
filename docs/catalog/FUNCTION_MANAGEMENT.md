@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S81 ✅ pricing oracle FORCE_FALLBACK wire; §5.12 PH-S82 відкрито; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S82 ✅ Admin UI grid pricing panel; §5.12 PH-S83 відкрито; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -282,7 +282,7 @@ FM-xxx (з таблиці нижче)
 | 15 | **PH-S79** | Grid pricing API env fallback wire fix (code) | `src/network/api/grid.rs`, Galaxy §4.2.4 | initialize API oracle via `GalaxyPricingOracle::from_env()` so `POOLAI_GALAXY_PRICING_FALLBACK_JSON` is applied on `/api/v1/grid/pricing`; `cargo test-ci` + openapi-gap 0 | **✅** |
 | 16 | **PH-S80** | Pricing oracle L3 hard stop (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | when L1+L2 unavailable return `503 pricing_unavailable` on new priced jobs/API; unit tests | **✅** |
 | 17 | **PH-S81** | Pricing oracle `FORCE_FALLBACK` env wire (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` always L2 path + log metric; unit tests | **✅** |
-| 18 | **PH-S82** | Admin UI grid pricing snapshot panel | Galaxy §4.2.3, `src/ui/` | `/ui/admin/*` read-only panel calling `GET /api/v1/grid/pricing`; Playwright smoke | відкрито |
+| 18 | **PH-S82** | Admin UI grid pricing snapshot panel | Galaxy §4.2.3, `src/ui/` | `/ui/admin/*` read-only panel calling `GET /api/v1/grid/pricing`; Playwright smoke | **✅** |
 | 19 | **PH-S83** | Galaxy pricing stale-served metric (code) | Galaxy §4.2.4, observability | expose `galaxy_pricing_stale_served` counter on L1 stale path; unit or integration test | відкрито |
 | 20 | **PH-S84** | Galaxy §4.2.3 wire note sync (docs) | `POOLAI_GALAXY_GRID.md` | mark `GET /api/v1/grid/pricing` implemented (PH-S78/S79); remove stale «майбутній wire» | відкрито |
 | 21 | **PH-S85** | verify-release dev fixtures + RUN_LOCAL pointer (docs) | `SECURITY_HARDENING`, `RUN_LOCAL.md` | sample manifest/sig paths for local verify; no duplicate Galaxy prose | відкрито |

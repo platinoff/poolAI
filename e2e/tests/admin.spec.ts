@@ -130,6 +130,35 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible({ timeout: 20_000 });
   });
 
+  test("grid pricing page fetches snapshot query (PH-S82)", async ({ page }) => {
+    await gotoAdminReady(page, "/ui/admin/grid-pricing", "#grid-pricing-panel");
+    await expect(page.locator("#grid-pricing-form")).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.locator("#grid-pricing-task").fill("inference:text");
+    await page.locator("#grid-pricing-model").fill("e2e-default");
+    await page.locator("#grid-pricing-unit").selectOption("inference_blended_token");
+    const pricingRespP = page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/v1/grid/pricing") &&
+        res.request().method() === "GET" &&
+        res.url().includes("task_profile=inference%3Atext") &&
+        res.url().includes("model_profile=e2e-default") &&
+        res.url().includes("unit_key=inference_blended_token"),
+      { timeout: 20_000 },
+    );
+    await page.locator("#grid-pricing-fetch-btn").click();
+    const pricingResp = await pricingRespP;
+    expect([200, 503]).toContain(pricingResp.status());
+    await expect(
+      page
+        .locator(
+          "#grid-pricing-panel #grid-pricing-result, #grid-pricing-panel .admin-fetch-error",
+        )
+        .first(),
+    ).toBeVisible({ timeout: 15_000 });
+  });
+
   test("vm page loads instances container", async ({ page }) => {
     await gotoAdminReady(page, "/ui/admin/vm", "#vm-instances");
     await expect(page.locator('[data-i18n="admin.vmadm.createBtn"]')).toBeVisible({

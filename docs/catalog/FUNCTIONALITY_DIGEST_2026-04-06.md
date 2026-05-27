@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-05-27 (PH-S81: `galaxy_pricing_oracle` FORCE_FALLBACK log/metric; PH-S68 stub baseline; PH-S67 Galaxy Grid modules zріз).
+**Оновлено:** 2026-05-27 (PH-S82: Admin UI `/ui/admin/grid-pricing`; PH-S81 FORCE_FALLBACK; PH-S68 stub baseline).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
