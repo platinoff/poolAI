@@ -1,0 +1,45 @@
+{
+  "revision": 1,
+  "updated_at": "2026-05-27",
+  "active_sprint": "PH-S63",
+  "extension_policy": {
+    ".md": {
+      "sync_on": ["sprint_close", "handoff_update", "fm_5_11_update", "galaxy_grid_section_change"],
+      "vision_files": ["manifest.json", "vision.svg", "extensions.json"]
+    },
+    ".rs": {
+      "sync_on": ["src_in_sprint_scope", "cargo_toml_bin_bench"],
+      "vision_files": ["manifest.json"]
+    },
+    ".html": { "sync_on": ["manifest_or_extensions_change"], "vision_files": ["index.html"] },
+    ".json": { "sync_on": ["graph_change"], "vision_files": ["manifest.json", "extensions.json"] },
+    ".svg": { "sync_on": ["major_node_or_layer_change"], "vision_files": ["vision.svg"] },
+    ".mdc": { "sync_on": ["vision_rule_change"], "vision_files": [".cursor/rules/docs-vision.mdc"] }
+  },
+  "scopes": {
+    "galaxy_grid_concept": {
+      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S59", "PH-S60", "PH-S61", "PH-S62"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/grid/**", "src/network/api/virtual_nodes.rs", "src/services/virtual_node_telegram_binding_service.rs"],
+      "extensions": [".md", ".rs"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md"]
+    },
+    "galaxy_grid_code": {
+      "sprints": ["PH-S58"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/performance/BENCHMARKS.md"],
+      "code_globs": ["src/grid/galaxy_fee_split.rs", "benches/galaxy_fee_split_benchmarks.rs"],
+      "extensions": [".rs", ".md", ".toml"]
+    },
+    "docs_vision_meta": {
+      "sprints": ["PH-S63"],
+      "docs": ["docs/vision/**", ".cursor/rules/docs-vision.mdc"],
+      "extensions": [".svg", ".html", ".json", ".md", ".mdc"]
+    }
+  },
+  "browser_panels": [
+    { "id": "map", "title": "Isometric map", "source": "vision.svg" },
+    { "id": "graph", "title": "Graph (manifest)", "source": "manifest.json" },
+    { "id": "scope", "title": "Sprint extensions", "source": "extensions.json" },
+    { "id": "docs", "title": "Open doc", "source": "node_link" }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "revision": 1,
+  "updated_at": "2026-05-27",
+  "last_sprint_closed": "PH-S62",
+  "next_sprint": "PH-S63",
+  "layers": [
+    { "id": "L0", "name": "Concept", "z": 0 },
+    { "id": "L1", "name": "Operations", "z": 1 },
+    { "id": "L2", "name": "Catalog", "z": 2 },
+    { "id": "L3", "name": "Code", "z": 3 }
+  ],
+  "nodes": [
+    {
+      "id": "galaxy_grid",
+      "label": "POOLAI_GALAXY_GRID",
+      "path": "docs/concept/POOLAI_GALAXY_GRID.md",
+      "layer": "L0",
+      "sections": ["1-3 roles", "4 scheduling", "5 locality", "6 verify"],
+      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S58", "PH-S59", "PH-S60", "PH-S61", "PH-S62"]
+    },
+    {
+      "id": "memory_layer",
+      "label": "POOLAI_MEMORY_LAYER",
+      "path": "docs/concept/POOLAI_MEMORY_LAYER.md",
+      "layer": "L0",
+      "sprints": ["PH-S61"]
+    },
+    {
+      "id": "grid_node",
+      "label": "POOLAI_GRID_NODE",
+      "path": "docs/concept/POOLAI_GRID_NODE.md",
+      "layer": "L0"
+    },
+    {
+      "id": "handoff",
+      "label": "HANDOFF_NEW_SESSION",
+      "path": "docs/development/HANDOFF_NEW_SESSION.md",
+      "layer": "L1",
+      "sprints": ["PH-S*"]
+    },
+    {
+      "id": "next_session",
+      "label": "NEXT_SESSION_PROMPT",
+      "path": "docs/development/NEXT_SESSION_PROMPT.md",
+      "layer": "L1",
+      "sprints": ["PH-S*"]
+    },
+    {
+      "id": "fm",
+      "label": "FUNCTION_MANAGEMENT",
+      "path": "docs/catalog/FUNCTION_MANAGEMENT.md",
+      "layer": "L2",
+      "sections": ["5.11"]
+    },
+    {
+      "id": "digest",
+      "label": "FUNCTIONALITY_DIGEST",
+      "path": "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+      "layer": "L2"
+    },
+    {
+      "id": "galaxy_fee_split",
+      "label": "galaxy_fee_split.rs",
+      "path": "src/grid/galaxy_fee_split.rs",
+      "layer": "L3",
+      "sprints": ["PH-S58"]
+    },
+    {
+      "id": "grid_dispatch",
+      "label": "grid/dispatch.rs",
+      "path": "src/grid/dispatch.rs",
+      "layer": "L3",
+      "sprints": ["PH-S38", "PH-S61"]
+    },
+    {
+      "id": "virtual_nodes",
+      "label": "virtual_nodes API",
+      "path": "src/network/api/virtual_nodes.rs",
+      "layer": "L3",
+      "sprints": ["PH-S60", "FM-016"]
+    },
+    {
+      "id": "telegram_bind",
+      "label": "telegram_binding_service",
+      "path": "src/services/virtual_node_telegram_binding_service.rs",
+      "layer": "L3",
+      "sprints": ["PH-S60"]
+    }
+  ],
+  "edges": [
+    { "from": "galaxy_grid", "to": "memory_layer", "kind": "concept-ref" },
+    { "from": "galaxy_grid", "to": "grid_node", "kind": "concept-ref" },
+    { "from": "handoff", "to": "galaxy_grid", "kind": "session-tracks" },
+    { "from": "next_session", "to": "handoff", "kind": "mirror" },
+    { "from": "fm", "to": "handoff", "kind": "queue" },
+    { "from": "fm", "to": "galaxy_grid", "kind": "sprint-scope" },
+    { "from": "galaxy_grid", "to": "galaxy_fee_split", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "grid_dispatch", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "virtual_nodes", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "telegram_bind", "kind": "implements" },
+    { "from": "digest", "to": "fm", "kind": "catalog" }
+  ]
+}

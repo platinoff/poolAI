@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PoolAI docs vision</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --border: #2d3a4d;
+      --text: #e8eaed;
+      --muted: #9aa0a6;
+      --accent: #8ab4f8;
+      --L0: #2d4a6f;
+      --L1: #3d5a40;
+      --L2: #5a4a2d;
+      --L3: #5a2d4a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+    header .meta { color: var(--muted); font-size: 0.85rem; }
+    button, select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    button:hover { border-color: var(--accent); }
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8px;
+      padding: 8px;
+      height: calc(100vh - 56px);
+    }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      min-height: 280px;
+      overflow: hidden;
+    }
+    .panel h2 {
+      margin: 0;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+    }
+    .panel-body {
+      flex: 1;
+      overflow: auto;
+      padding: 8px;
+    }
+    .panel-body object, .panel-body img {
+      width: 100%;
+      height: 100%;
+      min-height: 240px;
+      object-fit: contain;
+    }
+    #graph-3d {
+      perspective: 900px;
+      min-height: 260px;
+    }
+    .layer-stack {
+      transform-style: preserve-3d;
+      transform: rotateX(52deg) rotateZ(-28deg);
+      margin: 40px auto;
+      width: 320px;
+      height: 200px;
+      position: relative;
+    }
+    .layer-plane {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 48px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .layer-plane:hover {
+      transform: translateZ(12px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .layer-plane[data-layer="L0"] { background: var(--L0); bottom: 120px; }
+    .layer-plane[data-layer="L1"] { background: var(--L1); bottom: 80px; }
+    .layer-plane[data-layer="L2"] { background: var(--L2); bottom: 40px; }
+    .layer-plane[data-layer="L3"] { background: var(--L3); bottom: 0; }
+    .node-list { list-style: none; padding: 0; margin: 0; }
+    .node-list li {
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      border-left: 3px solid var(--accent);
+      background: rgba(0,0,0,0.2);
+      font-size: 0.8rem;
+    }
+    .node-list a { color: var(--accent); text-decoration: none; }
+    .node-list a:hover { text-decoration: underline; }
+    .node-list .layer-tag {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-right: 6px;
+    }
+    .scope-block {
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 6px;
+    }
+    .scope-block h3 { margin: 0 0 6px; font-size: 0.85rem; color: var(--accent); }
+    .ext { color: var(--muted); font-family: ui-monospace, monospace; }
+    #doc-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      border: none;
+      background: #fff;
+      border-radius: 4px;
+    }
+    .error { color: #f28b82; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PoolAI docs vision</h1>
+    <span class="meta" id="meta-rev">loading…</span>
+    <button type="button" id="btn-reload">Reload manifest</button>
+    <select id="doc-select" aria-label="Open document">
+      <option value="">— open doc in panel —</option>
+    </select>
+  </header>
+  <main>
+    <section class="panel" aria-label="Isometric SVG map">
+      <h2>1 · Isometric map (vision.svg)</h2>
+      <div class="panel-body">
+        <object id="svg-object" data="vision.svg" type="image/svg+xml" title="PoolAI vision.svg">
+          <img src="vision.svg" alt="PoolAI documentation layers" />
+        </object>
+      </div>
+    </section>
+    <section class="panel" aria-label="3D layer graph">
+      <h2>2 · Layer stack (3D CSS + manifest)</h2>
+      <div class="panel-body" id="graph-3d">
+        <div class="layer-stack" id="layer-stack"></div>
+        <ul class="node-list" id="node-list"></ul>
+      </div>
+    </section>
+    <section class="panel" aria-label="Sprint extensions">
+      <h2>3 · Sprint scope &amp; extensions</h2>
+      <div class="panel-body" id="scope-panel"></div>
+    </section>
+    <section class="panel" aria-label="Document preview">
+      <h2>4 · Doc / path preview</h2>
+      <div class="panel-body">
+        <p class="meta" id="doc-hint">Оберіть вузол або документ. У Cursor: Simple Browser → цей файл; посилання відкривають <code>../concept/…</code></p>
+        <iframe id="doc-frame" title="Document preview" sandbox=""></iframe>
+      </div>
+    </section>
+  </main>
+  <script>
+    const REPO_ROOT = new URL("../../", window.location.href);
+
+    function repoUrl(relPath) {
+      return new URL(relPath.replace(/^\//, ""), REPO_ROOT).href;
+    }
+
+    async function loadJson(name) {
+      const url = name + "?t=" + Date.now();
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(name + " HTTP " + r.status);
+      return r.json();
+    }
+
+    function renderManifest(m) {
+      document.getElementById("meta-rev").textContent =
+        "rev " + m.revision + " · " + m.updated_at + " · last " + m.last_sprint_closed + " → next " + m.next_sprint;
+
+      const stack = document.getElementById("layer-stack");
+      stack.innerHTML = "";
+      (m.layers || []).slice().reverse().forEach((layer) => {
+        const el = document.createElement("div");
+        el.className = "layer-plane";
+        el.dataset.layer = layer.id;
+        el.textContent = layer.id + " · " + layer.name;
+        el.title = "Click to filter nodes";
+        el.addEventListener("click", () => filterLayer(layer.id));
+        stack.appendChild(el);
+      });
+
+      const list = document.getElementById("node-list");
+      list.innerHTML = "";
+      const select = document.getElementById("doc-select");
+      select.innerHTML = '<option value="">— open doc in panel —</option>';
+
+      (m.nodes || []).forEach((n) => {
+        const li = document.createElement("li");
+        li.dataset.layer = n.layer;
+        const a = document.createElement("a");
+        a.href = repoUrl(n.path);
+        a.textContent = n.label;
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          openDoc(n.path, n.label);
+        });
+        li.innerHTML = '<span class="layer-tag">' + n.layer + "</span>";
+        li.appendChild(a);
+        if (n.sprints && n.sprints.length) {
+          li.appendChild(document.createTextNode(" · " + n.sprints.join(", ")));
+        }
+        list.appendChild(li);
+
+        if (n.path && n.path.endsWith(".md")) {
+          const opt = document.createElement("option");
+          opt.value = n.path;
+          opt.textContent = n.label;
+          select.appendChild(opt);
+        }
+      });
+
+      document.getElementById("svg-object").data = "vision.svg?t=" + Date.now();
+    }
+
+    function filterLayer(layerId) {
+      document.querySelectorAll("#node-list li").forEach((li) => {
+        li.style.opacity = li.dataset.layer === layerId ? "1" : "0.35";
+      });
+    }
+
+    function renderExtensions(ext) {
+      const panel = document.getElementById("scope-panel");
+      panel.innerHTML = "";
+      const head = document.createElement("p");
+      head.className = "meta";
+      head.textContent = "active: " + ext.active_sprint + " · updated " + ext.updated_at;
+      panel.appendChild(head);
+
+      Object.entries(ext.scopes || {}).forEach(([key, scope]) => {
+        const block = document.createElement("div");
+        block.className = "scope-block";
+        block.innerHTML =
+          "<h3>" + key + "</h3>" +
+          "<div><strong>extensions:</strong> <span class=\"ext\">" + (scope.extensions || []).join(", ") + "</span></div>" +
+          "<div><strong>also_update:</strong> " + (scope.also_update || []).join(", ") + "</div>" +
+          "<div><strong>docs:</strong> " + (scope.docs || []).join("<br/>") + "</div>" +
+          "<div><strong>code:</strong> " + (scope.code_globs || []).join(", ") + "</div>";
+        panel.appendChild(block);
+      });
+    }
+
+    function openDoc(path, label) {
+      const hint = document.getElementById("doc-hint");
+      const frame = document.getElementById("doc-frame");
+      const url = repoUrl(path);
+      hint.textContent = label + " — " + path;
+      frame.removeAttribute("src");
+      frame.src = url;
+    }
+
+    document.getElementById("doc-select").addEventListener("change", (e) => {
+      const p = e.target.value;
+      if (p) openDoc(p, p);
+    });
+
+    async function reloadAll() {
+      try {
+        const [manifest, extensions] = await Promise.all([
+          loadJson("manifest.json"),
+          loadJson("extensions.json"),
+        ]);
+        renderManifest(manifest);
+        renderExtensions(extensions);
+      } catch (err) {
+        document.getElementById("meta-rev").innerHTML =
+          '<span class="error">' + err.message + " — відкрийте через file:// або локальний static server</span>";
+      }
+    }
+
+    document.getElementById("btn-reload").addEventListener("click", reloadAll);
+    reloadAll();
+  </script>
+</body>
+</html>

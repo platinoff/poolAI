@@ -25,6 +25,7 @@
 
 - **Де що лежить у `docs/`** — [STRUCTURE.md](./STRUCTURE.md) (каталоги, спадщина плоских `.md`, інвентар, тести vs doctests).
 - **Правила для AI/агента (Cursor)** — [`.cursor/rules/documentation.md`](../.cursor/rules/documentation.md); skill — [`.cursor/skills/poolai-documentation/SKILL.md`](../.cursor/skills/poolai-documentation/SKILL.md).
+- **Vision (карта доків, 3D-шари, спринт scope)** — [vision/README.md](./vision/README.md) · [`vision.svg`](./vision/vision.svg) · [інтерактив `index.html`](./vision/index.html) · правило [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
 
 ## Short pointers
 

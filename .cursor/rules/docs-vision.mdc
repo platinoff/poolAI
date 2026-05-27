@@ -1,0 +1,63 @@
+---
+description: PoolAI docs vision — vision.svg, manifest, extensions, browser map; iterative sync on PH-S* / FM / HANDOFF
+globs:
+  - docs/vision/**
+  - docs/concept/POOLAI_GALAXY_GRID.md
+  - docs/development/HANDOFF_NEW_SESSION.md
+  - docs/development/NEXT_SESSION_PROMPT.md
+  - docs/catalog/FUNCTION_MANAGEMENT.md
+alwaysApply: false
+---
+
+# Docs vision (PoolAI)
+
+Карта зв’язків документації та коду: **`docs/vision/`** · правило застосовується при зміні концепт-доків, HANDOFF, FM §5.11 або файлів у `docs/vision/`.
+
+## Канонічні артефакти
+
+| Файл | Коли оновлювати |
+|------|------------------|
+| `docs/vision/manifest.json` | новий doc/code вузол, ребро, закритий PH-S*, зміна `next_sprint` |
+| `docs/vision/extensions.json` | зміна scope спринту, globs, `extension_policy` |
+| `docs/vision/vision.svg` | новий **шар** або **центральний** concept-doc у схемі |
+| `docs/vision/index.html` | нова панель / зміна UX перегляду (рідко) |
+| `docs/vision/README.md` | зміна способу відкриття або структури каталогу |
+
+## Ітерація одного PH-S* (разом із VDT)
+
+Після закриття спринту в FM §5.11 + HANDOFF + NEXT_SESSION:
+
+1. **`manifest.json`:** `revision++`, `updated_at` (ISO date), `last_sprint_closed` = PH-S*, `next_sprint` = наступний з §5.11.
+2. Додати/оновити **nodes** для змінених `docs/` і `src/` (поля `path`, `layer`, `sprints[]`, `sections[]` за потреби).
+3. Додати **edges** `concept-ref` | `implements` | `session-tracks` | `sprint-scope`.
+4. **`extensions.json`:** `active_sprint` = наступний; у `scopes` — `docs`, `code_globs`, `extensions`, `also_update` для закритого спринту.
+5. **`vision.svg`:** оновити footer text (last sprint / next) якщо змінився зріз черги.
+6. **Не** дублювати повний текст концепту в vision — лише посилання та шари.
+
+## Актуальність extensions (етеншени)
+
+| Extension | Синхронізувати коли |
+|-----------|---------------------|
+| `.md` | HANDOFF, FM, NEXT_SESSION, concept § змінені в scope спринту |
+| `.rs` | файли з `code_globs` у `extensions.json` для активного scope |
+| `.json` | `manifest.json`, `extensions.json` після кроків вище |
+| `.svg` | major node/layer у схемі |
+| `.html` | зміна панелей `index.html` |
+| `.mdc` | це правило або VDT-посилання на vision |
+
+## Перегляд (людина / агент)
+
+- Відкрити **`docs/vision/index.html`** у Cursor Simple Browser після оновлення vision.
+- Кнопка **Reload manifest** — перевірка після `git pull` або локального коміту.
+- Чотири панелі: SVG · 3D layer stack · sprint extensions · doc preview.
+
+## Зв’язок з іншими правилами
+
+- [`.cursor/rules/virtual-development-team.mdc`](virtual-development-team.mdc) — один PH-S*; vision — **після** FM/HANDOFF.
+- [`.cursor/skills/poolai-documentation/SKILL.md`](../skills/poolai-documentation/SKILL.md) — кроки 1–12; vision — додаткова карта, не заміна INDEX.
+- [`.cursor/rules/documentation.md`](documentation.md) — нові docs лише під `docs/`.
+
+## Не робити
+
+- Не комітити `data/audit/`, `.commit-msg-*`, `target/` у scope vision.
+- Не видаляти вузли з `manifest.json` без архівної примітки в README (legacy → `archived: true` у майбутньому).

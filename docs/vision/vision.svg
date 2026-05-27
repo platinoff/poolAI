@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">PoolAI documentation vision  layered map</title>
+  <desc id="desc">Isometric-style layers: Concept, Operations, Catalog, Code. Galaxy Grid at center. Open docs/vision/index.html for live manifest.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1419"/>
+      <stop offset="100%" stop-color="#1a2332"/>
+    </linearGradient>
+    <linearGradient id="planeL0" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2d4a6f" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#1e3350" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="planeL1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d5a40" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#2a4030" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="planeL2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5a4a2d" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#403520" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="planeL3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5a2d4a" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#402030" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="6" stdDeviation="6" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#8ab4f8"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="820" fill="url(#bg)"/>
+  <text x="600" y="42" text-anchor="middle" fill="#e8eaed" font-family="Segoe UI, system-ui, sans-serif" font-size="22" font-weight="600">PoolAI docs vision (isometric layers)</text>
+  <text x="600" y="68" text-anchor="middle" fill="#9aa0a6" font-family="Segoe UI, system-ui, sans-serif" font-size="13">manifest: docs/vision/manifest.json · live UI: docs/vision/index.html · rule: .cursor/rules/docs-vision.mdc</text>
+
+  <!-- Isometric base grid -->
+  <g opacity="0.15" stroke="#4a5568" stroke-width="1">
+    <path d="M100 680 L600 480 L1100 680 L600 880 Z" fill="none"/>
+    <path d="M300 580 L600 480 L900 580" fill="none"/>
+    <path d="M300 780 L600 680 L900 780" fill="none"/>
+  </g>
+
+  <!-- Layer L3 Code (back / bottom in 3D stack visual) -->
+  <g transform="translate(80, 520)" filter="url(#shadow)">
+    <path d="M0 80 L420 0 L840 80 L420 160 Z" fill="url(#planeL3)" stroke="#c49ab0" stroke-width="1.5"/>
+    <text x="420" y="95" text-anchor="middle" fill="#f0d0e0" font-size="14" font-weight="600">L3 Code</text>
+    <rect x="120" y="35" width="200" height="36" rx="6" fill="#402030" stroke="#e8a0c8"/>
+    <text x="220" y="58" text-anchor="middle" fill="#fff" font-size="11">galaxy_fee_split.rs</text>
+    <rect x="340" y="50" width="180" height="36" rx="6" fill="#402030" stroke="#e8a0c8"/>
+    <text x="430" y="73" text-anchor="middle" fill="#fff" font-size="11">grid/dispatch.rs</text>
+    <rect x="500" y="35" width="200" height="36" rx="6" fill="#402030" stroke="#e8a0c8"/>
+    <text x="600" y="58" text-anchor="middle" fill="#fff" font-size="10">virtual_nodes API</text>
+  </g>
+
+  <!-- Layer L2 Catalog -->
+  <g transform="translate(120, 400)" filter="url(#shadow)">
+    <path d="M0 80 L380 0 L760 80 L380 160 Z" fill="url(#planeL2)" stroke="#c4b080" stroke-width="1.5"/>
+    <text x="380" y="95" text-anchor="middle" fill="#f0e8c0" font-size="14" font-weight="600">L2 Catalog</text>
+    <rect x="100" y="40" width="220" height="40" rx="6" fill="#403520" stroke="#e8d080"/>
+    <text x="210" y="65" text-anchor="middle" fill="#fff" font-size="11">FUNCTION_MANAGEMENT §5.11</text>
+    <rect x="360" y="45" width="200" height="36" rx="6" fill="#403520" stroke="#e8d080"/>
+    <text x="460" y="68" text-anchor="middle" fill="#fff" font-size="11">FUNCTIONALITY_DIGEST</text>
+  </g>
+
+  <!-- Layer L1 Operations -->
+  <g transform="translate(160, 280)" filter="url(#shadow)">
+    <path d="M0 80 L340 0 L680 80 L340 160 Z" fill="url(#planeL1)" stroke="#90c490" stroke-width="1.5"/>
+    <text x="340" y="95" text-anchor="middle" fill="#d0f0d0" font-size="14" font-weight="600">L1 Operations</text>
+    <rect x="80" y="42" width="200" height="38" rx="6" fill="#2a4030" stroke="#a0e0a0"/>
+    <text x="180" y="66" text-anchor="middle" fill="#fff" font-size="11">HANDOFF_NEW_SESSION</text>
+    <rect x="300" y="48" width="200" height="36" rx="6" fill="#2a4030" stroke="#a0e0a0"/>
+    <text x="400" y="70" text-anchor="middle" fill="#fff" font-size="11">NEXT_SESSION_PROMPT</text>
+  </g>
+
+  <!-- Layer L0 Concept (front / top) -->
+  <g transform="translate(200, 120)" filter="url(#shadow)">
+    <path d="M0 100 L400 0 L800 100 L400 200 Z" fill="url(#planeL0)" stroke="#80a8e0" stroke-width="2"/>
+    <text x="400" y="115" text-anchor="middle" fill="#c0d8ff" font-size="15" font-weight="700">L0 Concept</text>
+    <rect x="180" y="45" width="440" height="52" rx="8" fill="#1e3350" stroke="#8ab4f8" stroke-width="2"/>
+    <text x="400" y="72" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">POOLAI_GALAXY_GRID.md</text>
+    <text x="400" y="88" text-anchor="middle" fill="#a8c8f0" font-size="10">§1-6 fees · pricing · telegram · lease · locality · verify</text>
+    <rect x="40" y="130" width="160" height="34" rx="6" fill="#1e3350" stroke="#6a98d0"/>
+    <text x="120" y="151" text-anchor="middle" fill="#dde" font-size="10">MEMORY_LAYER</text>
+    <rect x="620" y="130" width="140" height="34" rx="6" fill="#1e3350" stroke="#6a98d0"/>
+    <text x="690" y="151" text-anchor="middle" fill="#dde" font-size="10">GRID_NODE</text>
+  </g>
+
+  <!-- Edges (conceptual flows) -->
+  <g fill="none" stroke="#8ab4f8" stroke-width="1.5" marker-end="url(#arrow)" opacity="0.75">
+    <path d="M600 220 Q 520 300 400 340"/>
+    <path d="M600 220 Q 680 300 720 340"/>
+    <path d="M600 220 L 600 400"/>
+    <path d="M600 400 L 600 520"/>
+    <path d="M720 360 Q 800 420 880 480"/>
+    <path d="M480 360 Q 400 420 320 480"/>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(40, 120)" font-family="Segoe UI, system-ui, sans-serif" font-size="11" fill="#9aa0a6">
+    <text x="0" y="0" fill="#e8eaed" font-weight="600">Legend</text>
+    <rect x="0" y="12" width="14" height="14" fill="url(#planeL0)" stroke="#80a8e0"/>
+    <text x="22" y="24">Concept docs</text>
+    <rect x="0" y="34" width="14" height="14" fill="url(#planeL1)" stroke="#90c490"/>
+    <text x="22" y="46">Session / ops</text>
+    <rect x="0" y="56" width="14" height="14" fill="url(#planeL2)" stroke="#c4b080"/>
+    <text x="22" y="68">FM / digest</text>
+    <rect x="0" y="78" width="14" height="14" fill="url(#planeL3)" stroke="#c49ab0"/>
+    <text x="22" y="90">Rust modules</text>
+    <text x="0" y="115" fill="#8ab4f8">’</text>
+    <text x="18" y="115">implements / tracks / sprint scope</text>
+  </g>
+
+  <g transform="translate(40, 760)" font-family="Segoe UI, system-ui, sans-serif" font-size="11" fill="#6a7a8a">
+    <text>Last sprint in manifest: PH-S62 · Next: PH-S63 · Rev 1</text>
+  </g>
+</svg>

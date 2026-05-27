@@ -52,6 +52,11 @@ description: >-
 - **`docs/development/AUTO_DEV_PATTERNS.md`** — реєстр конкретних патернів (оновлювати після P0/S6).
 - Правила: **`.cursor/rules/autonomous-orchestrator.mdc`** (субагенти `explore` / `shell`), **`.cursor/rules/functionality-management.mdc`** (охоплення docs за `STRUCTURE.md`).
 
+## Docs vision (карта зв’язків)
+
+- **`docs/vision/`** — [`vision.svg`](../../docs/vision/vision.svg), [`manifest.json`](../../docs/vision/manifest.json), [`extensions.json`](../../docs/vision/extensions.json), [`index.html`](../../docs/vision/index.html) (4 панелі в браузері / Cursor Simple Browser).
+- Після закриття **PH-S*** + оновлення HANDOFF / FM §5.11 — онови manifest + extensions; правило **`.cursor/rules/docs-vision.mdc`**.
+
 ## Правила для агента
 
 - Нові **плани / статус / концепт** — лише під `docs/` у відповідній підпапці (див. `.cursor/rules/documentation.md`).
