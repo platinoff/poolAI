@@ -80,6 +80,9 @@ fn ingest_job(
         created_at: Utc::now(),
         worker_id: None,
         vm_id: None,
+        lease_owner: None,
+        lease_epoch: None,
+        lease_expires_at: None,
     };
     jobs.push(record)?;
     schedule_with_grid_peer(jobs, source_peer_id)?;
@@ -153,6 +156,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         })
         .expect("push");
 

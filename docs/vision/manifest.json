@@ -1,8 +1,8 @@
 {
-  "revision": 12,
+  "revision": 13,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S92",
-  "next_sprint": "PH-S93",
+  "last_sprint_closed": "PH-S94",
+  "next_sprint": "research",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -116,6 +116,21 @@
       "layer": "L1",
       "sections": ["vulnerability response", "governance cross-links"],
       "sprints": ["PH-S74"]
+    },
+    {
+      "id": "job_types",
+      "label": "job/types.rs",
+      "path": "src/job/types.rs",
+      "layer": "L3",
+      "sprints": ["PH-S94"],
+      "sections": ["lease_owner", "lease_epoch", "lease_expires_at"]
+    },
+    {
+      "id": "admin_updates_compat",
+      "label": "updates_compat.rs",
+      "path": "src/ui/admin/updates_compat.rs",
+      "layer": "L3",
+      "sprints": ["PH-S93"]
     }
   ],
   "edges": [
@@ -133,6 +148,8 @@
     { "from": "verify_release", "to": "release_mod", "kind": "implements" },
     { "from": "digest", "to": "fm", "kind": "catalog" },
     { "from": "galaxy_grid", "to": "security_hardening", "kind": "concept-ref" },
-    { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" }
+    { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" },
+    { "from": "galaxy_grid", "to": "job_types", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "admin_updates_compat", "kind": "implements" }
   ]
 }

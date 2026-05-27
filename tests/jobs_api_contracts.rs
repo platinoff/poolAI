@@ -188,6 +188,56 @@ async fn jobs_patch_invalid_transition_returns_400() {
 }
 
 #[tokio::test]
+async fn jobs_create_with_optional_lease_fields_roundtrip() {
+    let app = jobs_app();
+    let expires = "2026-12-31T23:59:59Z";
+
+    let (create_status, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({
+            "kind": "inference",
+            "lease_owner": "worker-lease-e2e",
+            "lease_epoch": 7,
+            "lease_expires_at": expires
+        })),
+    )
+    .await;
+    assert_eq!(create_status, StatusCode::CREATED);
+    let summary = created.as_object().expect("create response");
+    assert_eq!(
+        summary.get("lease_owner").and_then(|x| x.as_str()),
+        Some("worker-lease-e2e")
+    );
+    assert_eq!(summary.get("lease_epoch").and_then(|x| x.as_u64()), Some(7));
+    assert_eq!(
+        summary.get("lease_expires_at").and_then(|x| x.as_str()),
+        Some(expires)
+    );
+
+    let id = summary
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+    let (_, detail) = request_json(&app, "GET", &format!("/api/v1/jobs/{id}"), None).await;
+    let job = detail
+        .get("job")
+        .and_then(|x| x.as_object())
+        .expect("job detail");
+    assert_eq!(
+        job.get("lease_owner").and_then(|x| x.as_str()),
+        Some("worker-lease-e2e")
+    );
+    assert_eq!(job.get("lease_epoch").and_then(|x| x.as_u64()), Some(7));
+    assert_eq!(
+        job.get("lease_expires_at").and_then(|x| x.as_str()),
+        Some(expires)
+    );
+}
+
+#[tokio::test]
 async fn jobs_get_unknown_returns_404() {
     let app = jobs_app();
     let (status, v) = request_json(

@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — ітераційна сесія PH-S94 (VDT, один спринт)
+PoolAI — ітераційна сесія (VDT, research / §5.12 replenish)
 
 ## Ролі (VDT)
 | Роль | Хто | Дія |
@@ -35,34 +35,28 @@ df -h /s | tail -1
 ## Локальний CI (канон)
 cargo fmt --all
 K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci
-# після API/UI: e2e npm run test:ci
+# після API: cargo run --bin poolai-openapi-gap-audit
 
 ## Стан (2026-05-27)
-- HEAD: *(після PH-S93 commit)* — admin updates & compatibility panel
-- Закрито: PH-S03…S93 + PH-S76 + PH-S77 + PH-S90
-- Відкритий sprint: PH-S94 (перший у §5.12)
+- HEAD: *(після PH-S94 commit)* — job lease fields wire stub
+- Закрито: PH-S03…S94 + PH-S76 + PH-S77 + PH-S90
+- §5.12: 0 відкритих → **research replenish** (≤10 rule)
 - BLOCKED: PH-S35 / PH-S16 / PH-S02 (LAN)
 - Deferred: PH-S36 / PH-S01 / PH-S15 (Cloud SDK, FM-041)
 
-## PH-S94 — scope цієї сесії
-1. `src/job/` — optional lease fields wire stub: `lease_owner`, `lease_epoch`, `lease_expires_at` (Galaxy §4.3.1)
-2. Backward compatible JSON/SQLite/RAID store paths; unit tests
-3. FM §5.12 (PH-S94 → ✅) + HANDOFF + цей prompt (наступний спринт з §5.12 або research)
+## Research — scope наступної сесії
+1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
+2. [`DOCS_LEGACY_AUDIT`](./DOCS_LEGACY_AUDIT_2026-05-19.md) §5.3
+3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first, ≤10 відкритих)
+4. Один новий PH-S* з черги після replenish — мінімальний scope
 
 ## Режим виконання
-1. Взяти PH-S94 з черги (не повторювати закриті)
-2. Мінімальний scope; MSYS2 для git/cargo
-3. Commit лише файлів спринту (без git add -A)
-4. Push (MSYS2) + самарі: що зроблено · тести · hash · наступний sprint
+1. Спочатку replenish §5.12 (якщо <3 відкритих), потім один PH-S*
+2. MSYS2 для git/cargo; commit лише scope спринту
+3. Push + самарі: що зроблено · тести · hash
 
 ## Не повторювати
-PH-S03…S93 + PH-S76 + PH-S77 + PH-S90 · admin updates-compat UI · grid pricing · pricing oracle metrics/catalog
-
-## Черга §5.12 — відкриті спринти
-| # | Sprint | Фокус | Джерело (концепт) | Тип |
-|---|--------|--------|-------------------|-----|
-| 1 | **PH-S94** | Job lease fields wire stub | §4.3.1 `lease_owner/epoch/expires_at` | code |
-| 2 | *(≤10 rule)* | — | — | — |
+PH-S03…S94 · admin updates-compat · grid pricing oracle · job lease wire stub (PH-S94)
 
 Поза чергою: PH-S35/S16/S02 LAN · PH-S36/S01/S15 Cloud SDK
 ```

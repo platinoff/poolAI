@@ -1,7 +1,7 @@
 {
-  "revision": 9,
+  "revision": 10,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S93",
+  "active_sprint": "research",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -70,6 +70,13 @@
       "sprints": ["PH-S63", "PH-S64"],
       "docs": ["docs/vision/**", ".cursor/rules/docs-vision.mdc"],
       "extensions": [".svg", ".html", ".json", ".md", ".mdc"]
+    },
+    "job_lease_wire_stub": {
+      "sprints": ["PH-S94"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/job/types.rs", "src/network/api/jobs.rs", "docs/openapi.yaml"],
+      "extensions": [".rs", ".yaml", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     }
   },
   "browser_panels": [

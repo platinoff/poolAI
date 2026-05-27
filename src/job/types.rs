@@ -107,4 +107,92 @@ pub struct JobRecord {
     /// Running VM instance assigned at schedule time (FM-034).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub vm_id: Option<String>,
+    /// Galaxy §4.3.1 lease holder (`srv` / worker id); unset for legacy rows (PH-S94).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lease_owner: Option<String>,
+    /// Monotonic lease generation; CAS on `job_id + lease_epoch` (PH-S94 stub).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lease_epoch: Option<u64>,
+    /// Lease expiry (RFC3339); worker must renew before this instant (PH-S94 stub).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lease_expires_at: Option<DateTime<Utc>>,
+}
+
+impl JobRecord {
+    /// True when all lease wire fields are present.
+    pub fn has_lease_fields(&self) -> bool {
+        self.lease_owner.is_some() && self.lease_epoch.is_some() && self.lease_expires_at.is_some()
+    }
+
+    /// Active lease at `now`: owner + epoch set and not expired (Galaxy §4.3.1 stub).
+    pub fn lease_active_at(&self, now: DateTime<Utc>) -> bool {
+        let Some(expires) = self.lease_expires_at else {
+            return false;
+        };
+        self.lease_owner.as_ref().is_some_and(|s| !s.is_empty())
+            && self.lease_epoch.is_some()
+            && now < expires
+    }
+
+    /// CAS helper stub: epoch matches and lease still active at `now`.
+    pub fn lease_epoch_matches(&self, epoch: u64, now: DateTime<Utc>) -> bool {
+        self.lease_epoch == Some(epoch) && self.lease_active_at(now)
+    }
+}
+
+#[cfg(test)]
+mod lease_tests {
+    use super::*;
+    use chrono::TimeZone;
+
+    #[test]
+    fn job_record_deserializes_without_lease_fields() {
+        let json = r#"{
+            "spec": {
+                "id": "legacy-1",
+                "kind": "inference",
+                "resources": {},
+                "priority": 0,
+                "input_artifact_ids": []
+            },
+            "status": "submitted",
+            "created_at": "2026-05-27T12:00:00Z"
+        }"#;
+        let record: JobRecord = serde_json::from_str(json).expect("parse legacy job");
+        assert!(!record.has_lease_fields());
+        assert!(!record.lease_active_at(Utc::now()));
+    }
+
+    #[test]
+    fn job_record_lease_roundtrip_and_active_window() {
+        let expires = Utc.with_ymd_and_hms(2026, 5, 27, 13, 0, 0).unwrap();
+        let record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("lease-1"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Submitted,
+            created_at: Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: Some("worker-a".into()),
+            lease_epoch: Some(3),
+            lease_expires_at: Some(expires),
+        };
+        let json = serde_json::to_string(&record).expect("serialize");
+        let back: JobRecord = serde_json::from_str(&json).expect("deserialize");
+        assert!(back.has_lease_fields());
+        let before = expires - chrono::Duration::seconds(1);
+        let after = expires + chrono::Duration::seconds(1);
+        assert!(back.lease_active_at(before));
+        assert!(!back.lease_active_at(after));
+        assert!(back.lease_epoch_matches(3, before));
+        assert!(!back.lease_epoch_matches(2, before));
+    }
 }

@@ -280,6 +280,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         }
     }
 

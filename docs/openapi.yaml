@@ -5257,6 +5257,21 @@ components:
           type: string
           nullable: true
           description: Running VM instance bound at schedule time (FM-034)
+        lease_owner:
+          type: string
+          nullable: true
+          description: Galaxy §4.3.1 lease holder (PH-S94)
+        lease_epoch:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          description: Monotonic lease generation (PH-S94)
+        lease_expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Lease expiry instant (PH-S94)
 
     JobsListResponse:
       type: object
@@ -5292,6 +5307,21 @@ components:
         verification_policy:
           type: string
           nullable: true
+        lease_owner:
+          type: string
+          nullable: true
+          description: Galaxy §4.3.1 lease holder (srv/worker id); optional wire stub (PH-S94)
+        lease_epoch:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          description: Monotonic lease generation for CAS on job_id + lease_epoch (PH-S94)
+        lease_expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Lease expiry; worker must renew before this instant (PH-S94)
 
     JobResources:
       type: object
@@ -5371,6 +5401,21 @@ components:
           type: string
           nullable: true
           description: Running VM instance bound at schedule time (FM-034)
+        lease_owner:
+          type: string
+          nullable: true
+          description: Galaxy §4.3.1 lease holder (PH-S94)
+        lease_epoch:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          description: Monotonic lease generation (PH-S94)
+        lease_expires_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Lease expiry instant (PH-S94)
 
     JobDetailResponse:
       type: object

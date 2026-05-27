@@ -424,6 +424,8 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 
 Для кожного job вводиться `lease_owner` (srv/worker), `lease_epoch` і `lease_expires_at`.
 
+**Wire stub (PH-S94 ✅):** optional поля на `JobRecord` + `POST/GET /api/v1/jobs` (`src/job/types.rs`, `src/network/api/jobs.rs`); CAS/renew/failover — майбутні спринти.
+
 - `lease_ttl`: базовий час володіння lease (наприклад 30-120 с, профільно за типом job).
 - `lease_renew_interval`: heartbeat/renew до `lease_ttl/3`.
 - `lease_epoch`: монотонний номер lease; новий власник отримує більший epoch.

@@ -441,6 +441,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         };
 
         {
@@ -475,6 +478,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         };
 
         {
@@ -508,6 +514,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         };
         store.push(record).expect("push");
         let err = store
@@ -539,6 +548,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         };
 
         {

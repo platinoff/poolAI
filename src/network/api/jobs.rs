@@ -6,7 +6,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
@@ -27,6 +27,13 @@ struct CreateJobRequest {
     input_artifact_ids: Vec<String>,
     #[serde(default)]
     verification_policy: Option<String>,
+    /// Galaxy §4.3.1 optional lease wire (PH-S94).
+    #[serde(default)]
+    lease_owner: Option<String>,
+    #[serde(default)]
+    lease_epoch: Option<u64>,
+    #[serde(default)]
+    lease_expires_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Serialize)]
@@ -39,6 +46,12 @@ struct JobSummary {
     worker_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     vm_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    lease_owner: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    lease_epoch: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    lease_expires_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Serialize)]
@@ -87,6 +100,9 @@ async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListRespon
             created_at: r.created_at.to_rfc3339(),
             worker_id: r.worker_id,
             vm_id: r.vm_id,
+            lease_owner: r.lease_owner,
+            lease_epoch: r.lease_epoch,
+            lease_expires_at: r.lease_expires_at,
         })
         .collect();
     Ok(Json(JobsListResponse {
@@ -116,6 +132,9 @@ async fn create_job(
         created_at: Utc::now(),
         worker_id: None,
         vm_id: None,
+        lease_owner: body.lease_owner,
+        lease_epoch: body.lease_epoch,
+        lease_expires_at: body.lease_expires_at,
     };
     store().push(record)?;
     schedule_from_context(&ctx, store()).await?;
@@ -129,6 +148,9 @@ async fn create_job(
         created_at: scheduled.created_at.to_rfc3339(),
         worker_id: scheduled.worker_id,
         vm_id: scheduled.vm_id,
+        lease_owner: scheduled.lease_owner,
+        lease_epoch: scheduled.lease_epoch,
+        lease_expires_at: scheduled.lease_expires_at,
     };
     Ok((StatusCode::CREATED, Json(summary)))
 }

@@ -162,6 +162,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: Some("worker-a".into()),
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         };
         emit_job_completed_if_anchor(&record);
 
@@ -204,6 +207,9 @@ mod tests {
             created_at: Utc::now(),
             worker_id: None,
             vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
         };
         emit_job_completed_if_anchor(&record);
     }
