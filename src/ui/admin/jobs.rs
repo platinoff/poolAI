@@ -1,4 +1,5 @@
 //! Job layer admin page (PH-S53) — list jobs + persistence backend badge.
+//! PH-S96: read-only Galaxy lease columns (`lease_owner`, `lease_epoch`, `lease_expires_at`).
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;
@@ -26,6 +27,11 @@ pub async fn admin_jobs() -> Html<String> {
       if (s === 'failed') return 'error';
       if (s === 'executing' || s === 'verifying') return 'warning';
       return '';
+    }
+
+    function formatLeaseCell(value) {
+      if (value === null || value === undefined || value === '') return '—';
+      return String(value);
     }
 
     async function loadJobs() {
@@ -58,6 +64,9 @@ pub async fn admin_jobs() -> Html<String> {
               <th>${escapeHtml(T('admin.jobs.col.created', 'Created'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.worker', 'Worker'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.vm', 'VM'))}</th>
+              <th>${escapeHtml(T('admin.jobs.col.leaseOwner', 'Lease owner'))}</th>
+              <th>${escapeHtml(T('admin.jobs.col.leaseEpoch', 'Lease epoch'))}</th>
+              <th>${escapeHtml(T('admin.jobs.col.leaseExpires', 'Lease expires'))}</th>
             </tr>
           </thead>
           <tbody>
@@ -72,6 +81,9 @@ pub async fn admin_jobs() -> Html<String> {
                 <td>${escapeHtml(String(j.created_at || ''))}</td>
                 <td>${escapeHtml(String(j.worker_id || '—'))}</td>
                 <td>${escapeHtml(String(j.vm_id || '—'))}</td>
+                <td><code>${escapeHtml(formatLeaseCell(j.lease_owner))}</code></td>
+                <td>${escapeHtml(formatLeaseCell(j.lease_epoch))}</td>
+                <td>${escapeHtml(formatLeaseCell(j.lease_expires_at))}</td>
               </tr>`;
             }).join('')}
           </tbody>
@@ -97,7 +109,7 @@ pub async fn admin_jobs() -> Html<String> {
             </div>
           </div>
           <p class="muted admin-hint" data-i18n="admin.jobs.hint">
-            Job queue from the coordinator store. Backend is set at startup via <code>POOLAI_JOB_STORE</code>.
+            Job queue from the coordinator store. Backend is set at startup via <code>POOLAI_JOB_STORE</code>. Lease columns are read-only (Galaxy §4.3.1, PH-S94/S95).
           </p>
           <div id="jobs-list"></div>
         </div>
@@ -113,4 +125,8 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("id=\"jobs-store-badge\""));
     assert!(html.contains("/api/v1/jobs"));
     assert!(html.contains("renderStoreBadge"));
+    assert!(html.contains("Lease owner"));
+    assert!(html.contains("lease_owner"));
+    assert!(html.contains("lease_epoch"));
+    assert!(html.contains("lease_expires_at"));
 }

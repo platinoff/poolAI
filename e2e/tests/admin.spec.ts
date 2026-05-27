@@ -130,6 +130,36 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible({ timeout: 20_000 });
   });
 
+  test("jobs page shows lease columns when present (PH-S96)", async ({
+    page,
+    request,
+  }) => {
+    const expires = "2026-12-31T23:59:59Z";
+    const createRes = await request.post("/api/v1/jobs", {
+      data: {
+        kind: "inference",
+        lease_owner: "e2e-lease-worker",
+        lease_epoch: 42,
+        lease_expires_at: expires,
+      },
+    });
+    expect(createRes.status()).toBe(201);
+
+    await gotoAdminReady(page, "/ui/admin/jobs", "#jobs-list");
+    await expect(
+      page.getByRole("columnheader", { name: /lease owner/i }),
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole("columnheader", { name: /lease epoch/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("columnheader", { name: /lease expires/i }),
+    ).toBeVisible();
+    await expect(page.locator("#jobs-list")).toContainText("e2e-lease-worker");
+    await expect(page.locator("#jobs-list")).toContainText("42");
+    await expect(page.locator("#jobs-list")).toContainText(expires);
+  });
+
   test("updates compatibility page shows protocol and doc blocks (PH-S93)", async ({
     page,
   }) => {
