@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S89 ✅ pricing L1 cache metadata; §5.12 PH-S91 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S91 ✅ pricing fresh-served metric; §5.12 PH-S92 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -59,7 +59,8 @@
 **PH-S88 ✅ (docs):** `docs/development/RELEASE_MANIFEST_SAMPLE.md` — operator manifest/sig/trust-root schema + verify copy-paste; cross-link `tests/fixtures/release/dev/` (PH-S85); Galaxy §9.2 pointer.
 **PH-S89 ✅ (code):** `galaxy_pricing_oracle` + `GET /api/v1/grid/pricing` — `l1_cache` TTL metadata (`cache_age_secs`, fresh/stale until) on L1 hits; `freshness` fresh/stale; unit tests; OpenAPI sync.
 **PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
-**Черга:** §5.12 **PH-S91** (4 відкритих); наступний sprint — **PH-S91** (pricing fresh-served metric).
+**PH-S91 ✅ (code):** `galaxy_pricing_oracle` — `galaxy_pricing_fresh_served` counter + `pricing_oracle_fresh_served` log on L1 fresh serves (`try_quote` + HTTP cache path); unit tests; не дублює PH-S83 stale metric; `cargo test-ci`.
+**Черга:** §5.12 **PH-S92** (3 відкритих); наступний sprint — **PH-S92** (pricing providers env catalog stub).
 
 ## 1. Канонічний порядок документації та планів
 

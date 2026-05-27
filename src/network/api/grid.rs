@@ -14,8 +14,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_pricing_oracle::{
-    cache_metadata, record_l1_stale_served, CacheFreshness, GalaxyPriceUnitKey,
-    GalaxyPricingCacheEntry, GalaxyPricingCacheKey, GalaxyPricingCacheMetadata,
+    cache_metadata, record_l1_fresh_served, record_l1_stale_served, CacheFreshness,
+    GalaxyPriceUnitKey, GalaxyPricingCacheEntry, GalaxyPricingCacheKey, GalaxyPricingCacheMetadata,
     GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingQuote, MockProviderQuote,
     PRICING_UNAVAILABLE_ERROR_CODE,
 };
@@ -158,8 +158,10 @@ fn cache_hit_response(
     config: &GalaxyPricingConfig,
     now_secs: u64,
 ) -> GridPricingSnapshotResponse {
-    if freshness == CacheFreshness::Stale {
-        record_l1_stale_served(entry.quote.unit_key);
+    match freshness {
+        CacheFreshness::Fresh => record_l1_fresh_served(entry.quote.unit_key),
+        CacheFreshness::Stale => record_l1_stale_served(entry.quote.unit_key),
+        CacheFreshness::Expired => {}
     }
     let l1_cache = Some(cache_metadata(now_secs, entry.quote.cached_at_secs, config));
     GridPricingSnapshotResponse {

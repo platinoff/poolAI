@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S89 ✅ pricing L1 cache TTL metadata; §5.12 PH-S91…S94 — 4 відкритих; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S91 ✅ pricing fresh-served metric; §5.12 PH-S92…S94 — 3 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -291,7 +291,7 @@ FM-xxx (з таблиці нижче)
 | 24 | **PH-S88** | Release manifest sample JSON (docs) | Galaxy §9.2, `docs/development/` | operator-facing minimal manifest example for `poolai-verify-release` | **✅** |
 | 25 | **PH-S89** | Pricing oracle L1 stale TTL metric (code) | Galaxy §4.2.3–4.2.4 | distinguish fresh vs stale cache hits in quote metadata or metrics; tests | **✅** |
 | 26 | **PH-S90** | Cursor rules: VDT agent roles + §5.12 sync | `.cursor/rules/`, `.cursor/README.md` | `poolai-agent-roles.mdc`; slim VDT; session-iteration globs; §5.11→§5.12; git-commit-msys | **✅** |
-| 27 | **PH-S91** | Pricing oracle fresh-served metric (code) | Galaxy §4.2.3/§4.2.5, `galaxy_pricing_oracle.rs` | `galaxy_pricing_fresh_served` counter + log on L1 fresh path; unit tests | відкрито |
+| 27 | **PH-S91** | Pricing oracle fresh-served metric (code) | Galaxy §4.2.3/§4.2.5, `galaxy_pricing_oracle.rs` | `galaxy_pricing_fresh_served` counter + log on L1 fresh path; unit tests | **✅** |
 | 28 | **PH-S92** | Pricing providers env catalog stub (code) | Galaxy §4.2.5, `galaxy_pricing_oracle.rs` | parse `POOLAI_GALAXY_PRICING_PROVIDERS` allow-list JSON; no live HTTP fetch; unit tests | відкрито |
 | 29 | **PH-S93** | Admin UI updates & compatibility panel (code) | Galaxy §9.8, `src/ui/` | read-only panel: protocol version, verify-release pointer, compat matrix links; Playwright smoke | відкрито |
 | 30 | **PH-S94** | Job lease fields wire stub (code) | Galaxy §4.3.1, `src/job/` | optional `lease_owner` / `lease_epoch` / `lease_expires_at` on job model; backward compatible; unit tests | відкрито |

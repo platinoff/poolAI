@@ -1,6 +1,6 @@
 //! Galaxy Grid pricing oracle stub (PH-S68): unit keys, `floor(market_min×0.9)` quote,
 //! cache TTL/SWR from `POOLAI_GALAXY_PRICE_*` env; L2 force-fallback ops wire (PH-S81);
-//! L1 stale-served metric (PH-S83); L1 cache TTL metadata (PH-S89).
+//! L1 stale-served metric (PH-S83); L1 fresh-served metric (PH-S91); L1 cache TTL metadata (PH-S89).
 //! See `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.
 //!
 //! Oracle determines **gross quote** in micro-USD; settlement uses `galaxy_fee_split`.
@@ -48,6 +48,14 @@ pub const STALE_SERVED_LOG_EVENT: &str = "pricing_oracle_stale_served";
 pub const METRIC_STALE_SERVED_TOTAL: &str = "galaxy_pricing_stale_served";
 
 static STALE_SERVED_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+/// Structured log event when L1 fresh cache is served (§4.2.5).
+pub const FRESH_SERVED_LOG_EVENT: &str = "pricing_oracle_fresh_served";
+
+/// In-process counter for L1 fresh cache serves (§4.2.5, PH-S91).
+pub const METRIC_FRESH_SERVED_TOTAL: &str = "galaxy_pricing_fresh_served";
+
+static FRESH_SERVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Env: JSON map for L2 fallback floor quotes in micro-USD (§4.2.4).
 /// Example:
@@ -163,6 +171,16 @@ pub fn reset_stale_served_total_for_test() {
     STALE_SERVED_TOTAL.store(0, Ordering::Relaxed);
 }
 
+/// Total L1 fresh cache quotes served since process start (ops/metrics snapshot).
+pub fn fresh_served_total() -> u64 {
+    FRESH_SERVED_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(test)]
+pub fn reset_fresh_served_total_for_test() {
+    FRESH_SERVED_TOTAL.store(0, Ordering::Relaxed);
+}
+
 fn record_forced_fallback(unit_key: GalaxyPriceUnitKey) {
     let total = FORCED_FALLBACK_TOTAL.fetch_add(1, Ordering::Relaxed) + 1;
     info!(
@@ -185,17 +203,35 @@ fn record_stale_served(unit_key: GalaxyPriceUnitKey) {
     );
 }
 
+fn record_fresh_served(unit_key: GalaxyPriceUnitKey) {
+    let total = FRESH_SERVED_TOTAL.fetch_add(1, Ordering::Relaxed) + 1;
+    info!(
+        event = FRESH_SERVED_LOG_EVENT,
+        unit_key = %unit_key,
+        metric = METRIC_FRESH_SERVED_TOTAL,
+        total,
+        "pricing oracle served L1 fresh cache"
+    );
+}
+
 /// Record L1 stale metric when serving from cache (oracle or HTTP snapshot path).
 pub fn record_l1_stale_served(unit_key: GalaxyPriceUnitKey) {
     record_stale_served(unit_key);
+}
+
+/// Record L1 fresh metric when serving from cache (oracle or HTTP snapshot path).
+pub fn record_l1_fresh_served(unit_key: GalaxyPriceUnitKey) {
+    record_fresh_served(unit_key);
 }
 
 fn serve_l1_cache_quote(
     entry: GalaxyPricingCacheEntry,
     freshness: CacheFreshness,
 ) -> GalaxyPricingQuote {
-    if freshness == CacheFreshness::Stale {
-        record_stale_served(entry.quote.unit_key);
+    match freshness {
+        CacheFreshness::Fresh => record_fresh_served(entry.quote.unit_key),
+        CacheFreshness::Stale => record_stale_served(entry.quote.unit_key),
+        CacheFreshness::Expired => {}
     }
     entry.quote
 }
@@ -484,6 +520,16 @@ impl GalaxyPricingOracle {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::{Mutex as StdMutex, OnceLock as StdOnceLock};
+
+    static METRIC_TEST_LOCK: StdOnceLock<StdMutex<()>> = StdOnceLock::new();
+
+    fn metric_test_lock() -> std::sync::MutexGuard<'static, ()> {
+        METRIC_TEST_LOCK
+            .get_or_init(|| StdMutex::new(()))
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+    }
 
     fn mock_us_blended() -> Vec<MockProviderQuote> {
         vec![
@@ -712,7 +758,9 @@ mod tests {
 
     #[test]
     fn try_quote_stale_served_increments_metric_not_fresh() {
+        let _lock = metric_test_lock();
         reset_stale_served_total_for_test();
+        reset_fresh_served_total_for_test();
         let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
             cache_ttl_secs: 300,
             max_stale_secs: 3600,
@@ -725,11 +773,17 @@ mod tests {
         };
         oracle.refresh_from_providers(0, key.clone(), &mock_us_blended());
         assert_eq!(stale_served_total(), 0);
+        assert_eq!(fresh_served_total(), 0);
 
         oracle
             .try_quote(400, key.clone(), &[])
             .expect("L1 stale serve");
         assert_eq!(stale_served_total(), 1);
+        assert_eq!(
+            fresh_served_total(),
+            0,
+            "stale must not increment fresh metric"
+        );
 
         oracle.try_quote(100, key, &[]).expect("L1 fresh serve");
         assert_eq!(
@@ -737,6 +791,44 @@ mod tests {
             1,
             "fresh cache must not increment stale metric"
         );
+        assert_eq!(fresh_served_total(), 1);
+    }
+
+    #[test]
+    fn try_quote_fresh_served_increments_metric_not_stale() {
+        let _lock = metric_test_lock();
+        reset_stale_served_total_for_test();
+        reset_fresh_served_total_for_test();
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        });
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "fresh-metric".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        oracle.refresh_from_providers(10_000, key.clone(), &mock_us_blended());
+        assert_eq!(fresh_served_total(), 0);
+
+        oracle
+            .try_quote(10_100, key.clone(), &[])
+            .expect("L1 fresh serve");
+        assert_eq!(fresh_served_total(), 1);
+        assert_eq!(
+            stale_served_total(),
+            0,
+            "fresh must not increment stale metric"
+        );
+
+        oracle.try_quote(10_400, key, &[]).expect("L1 stale serve");
+        assert_eq!(
+            fresh_served_total(),
+            1,
+            "stale must not increment fresh metric"
+        );
+        assert_eq!(stale_served_total(), 1);
     }
 
     #[test]
