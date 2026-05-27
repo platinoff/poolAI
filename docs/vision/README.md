@@ -13,12 +13,33 @@
 
 ## Як відкрити в Cursor / браузері
 
-1. **Cursor Simple Browser:** `Ctrl+Shift+P` → *Simple Browser: Show* → шлях до файлу:
-   `S:/rust/poolAI/docs/vision/index.html`
-2. **Зовнішній браузер:** відкрити `index.html` подвійним кліком (file://). Кнопка **Reload manifest** підтягує свіжі `manifest.json` / `extensions.json` після коміту.
-3. **Лише SVG:** `docs/vision/vision.svg` — вставка в README або перегляд у IDE.
+### Помилка `Unable to resolve resource S:/rust/poolAI/...`
 
-Панель 4 намагається завантажити `.md` у iframe; якщо браузер блокує file:// — відкривайте doc через посилання в списку вузлів (Cursor file link).
+Cursor Simple Browser **не** приймає абсолютний диск `S:/...`. Використовуйте **HTTP** або відносний шлях workspace.
+
+### Рекомендовано (4 панелі + manifest)
+
+PowerShell у корені репо:
+
+```powershell
+.\bin\open-docs-vision.ps1
+```
+
+Потім **Simple Browser** → URL:
+
+```text
+http://127.0.0.1:8765/index.html
+```
+
+Деталі: [`.cursor/commands/open-docs-vision.md`](../../.cursor/commands/open-docs-vision.md).
+
+### Альтернативи
+
+1. Відкрити `docs/vision/index.html` у табі редактора → Simple Browser → `./docs/vision/index.html`
+2. **Зовнішній браузер** — той самий `open-docs-vision.ps1`
+3. **Лише SVG** — `vision.svg` у IDE (без JS/manifest)
+
+Панель 4 (doc preview) працює найкраще через **localhost** (сервер вище), не через `file://`.
 
 ## Ітераційне оновлення (агент)
 

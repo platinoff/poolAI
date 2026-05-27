@@ -304,7 +304,10 @@
         renderExtensions(extensions);
       } catch (err) {
         document.getElementById("meta-rev").innerHTML =
-          '<span class="error">' + err.message + " — відкрийте через file:// або локальний static server</span>";
+          '<span class="error">' + err.message +
+          " — запустіть <code>.\\bin\\open-docs-vision.ps1</code> і відкрийте " +
+          '<a href="http://127.0.0.1:8765/index.html">http://127.0.0.1:8765/index.html</a> ' +
+          "(Cursor Simple Browser не відкриває S:/...)</span>";
       }
     }
 

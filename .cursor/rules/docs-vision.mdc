@@ -47,8 +47,9 @@ alwaysApply: false
 
 ## Перегляд (людина / агент)
 
-- Відкрити **`docs/vision/index.html`** у Cursor Simple Browser після оновлення vision.
-- Кнопка **Reload manifest** — перевірка після `git pull` або локального коміту.
+- **Не** використовувати `S:/rust/poolAI/...` у Simple Browser (помилка *Unable to resolve resource*).
+- Запуск: **`.\bin\open-docs-vision.ps1`** → URL **`http://127.0.0.1:8765/index.html`** у Simple Browser (див. `.cursor/commands/open-docs-vision.md`).
+- Кнопка **Reload manifest** — після `git pull` або локального коміту.
 - Чотири панелі: SVG · 3D layer stack · sprint extensions · doc preview.
 
 ## Зв’язок з іншими правилами
