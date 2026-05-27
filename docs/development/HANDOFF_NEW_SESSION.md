@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 (PH-S62 ✅ Galaxy Grid edge verification concept · §5.11 PH-S63…S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S63 ✅ Galaxy Grid governance concept · §5.11 PH-S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -29,9 +29,10 @@
 **PH-S60 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §3.1–3.2 — Telegram seats (`member_cap` / `bound_wallet_cap` / `session_cap`), `seat_limit`, wallet bind flow; ref `POST /api/v1/virtual-nodes/telegram/bind` (FM-016+).
 **PH-S61 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.6 — locality_score, telemetry signals, hot tiers (L0–L3), task-driven prefetch, `seed_inventory` DTO; ref Memory Layer + `src/grid/dispatch.rs`.
 **PH-S62 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §6.1–6.6 — untrusted `telegram_edge`: sampling, replay, K-of-M replication, `trust_score` settlement gate; ZK/TEE — roadmap only.
-**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (повний v1 concept: ролі, fees, pricing, Telegram, lease, locality, edge verify).
+**PH-S63 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §9 — open-source governance: signed releases, protocol compat matrix, opt-in update policies, без root super-admin; §8 TBD #4 закрито.
+**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (повний v1 concept: ролі, fees, pricing, Telegram, lease, locality, edge verify, governance).
 
-**Черга:** §5.11 **PH-S63…S64** (2 відкриті); наступний код — **PH-S63**.
+**Черга:** §5.11 **PH-S64** (1 відкритий); наступний — **PH-S64** (docs sync pointers).
 
 ## 1. Канонічний порядок документації та планів
 

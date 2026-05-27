@@ -1,11 +1,11 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 · **VDT** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
+**Оновлено:** 2026-05-27 · **VDT** [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
 
 ---
 
 ```
-PoolAI — PH-S63 Galaxy Grid open-source governance (concept)
+PoolAI — PH-S64 Galaxy Grid docs sync (canonical pointers)
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -22,30 +22,29 @@ HANDOFF · FM §5.11
 
 ## Локальний CI (канон)
 cargo fmt --all
-cargo test-ci
+cargo test-ci   # якщо зміни в src/; для чистих docs — опційно
 
 ## Стан
-- **PH-S03…S62:** ✅
-- **Черга §5.11:** PH-S63…S64 (2 відкриті; Galaxy Grid concept)
+- **PH-S03…S63:** ✅
+- **Черга §5.11:** PH-S64 (1 відкритий; Galaxy Grid docs sync)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
-## PH-S63 — наступна сесія
-1. `docs/concept/POOLAI_GALAXY_GRID.md` (або окремий governance doc): signed releases + protocol versioning
-2. Оновлення без «root супер-адміна»: підписи, compat matrix, opt-in auto-update (concept)
+## PH-S64 — наступна сесія
+1. Короткі посилання на `docs/concept/POOLAI_GALAXY_GRID.md` у README, `docs/README.md`, `docs/INDEX_2026-03-17.md`, `docs/STRUCTURE.md` (без розростання таблиць)
+2. Перевірити vision manifest після docs sync
 
 ## Завершення сесії
-1. FM §5.11 (PH-S63 → ✅) + HANDOFF
-2. Оновити цей NEXT_SESSION_PROMPT (PH-S64)
+1. FM §5.11 (PH-S64 → ✅) + HANDOFF
+2. Оновити цей NEXT_SESSION_PROMPT (research sprint / нова черга)
 3. git push (MSYS2) + самарі
 
 ## Не повторювати
-PH-S03…S62 · Galaxy Grid concept blocks (fee, pricing, Telegram, lease, locality, verify)
+PH-S03…S63 · Galaxy Grid concept blocks (fee, pricing, Telegram, lease, locality, verify, governance)
 
 ## Черга §5.11 (відкриті)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S63** | Governance + signed releases |
-| 2 | **PH-S64** | Docs sync (README/INDEX pointers) |
+| 1 | **PH-S64** | Docs sync — README/INDEX/STRUCTURE pointers |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```

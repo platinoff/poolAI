@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-26 (PH-S62 ✅ Galaxy Grid edge verification concept · §5.11 PH-S63…S64; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S63 ✅ Galaxy Grid governance concept · §5.11 PH-S64; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -252,7 +252,7 @@ FM-xxx (з таблиці нижче)
 | 6 | **PH-S60** | Telegram edge mining: seats + wallet binding (концепт) | FM-016, Galaxy | seats: members vs wallets vs sessions; `seat_limit`; wallet bind flow + FM-016 API ref | **✅** |
 | 7 | **PH-S61** | Seeds/locality: placement + prefetch RAM/VRAM policy (концепт) | Memory layer + SmallWorld | locality_score, telemetry table, hot tiers L0–L3, task-driven prefetch + ops env | **✅** |
 | 8 | **PH-S62** | Edge verification baseline (концепт) | Galaxy | trust tiers, sampling/replay/replication (K-of-M), trust_score settlement gate (без ZK) | **✅** |
-| 9 | **PH-S63** | Open source governance: signed releases + protocol versioning (docs) | Galaxy §6–8 | описати як оновлюватись без “root супер-адміна”: підписи/compat matrix/opt-in auto-update | відкрито |
+| 9 | **PH-S63** | Open source governance: signed releases + protocol versioning (docs) | Galaxy §9 | signed releases, compat matrix, opt-in update policies, без root super-admin | **✅** |
 | 10 | **PH-S64** | Docs sync: додати Galaxy Grid у canonical pointers (коротко) | README/INDEX/STRUCTURE | README/docs/README/INDEX узгоджені; без розростання таблиць | відкрито |
 
 **Поза чергою:** **PH-S35** / **PH-S16** / **PH-S02** LAN (**BLOCKED**) · **PH-S36** / **PH-S01** / **PH-S15** Cloud SDK (**Deferred**, FM-041).

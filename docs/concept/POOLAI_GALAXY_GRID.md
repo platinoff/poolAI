@@ -755,7 +755,170 @@ On-chain події потрібні, коли вони:
 1. **Network_profile contract**: набір метрик, формат зберігання і як SmallWorld їх споживає.
 2. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
 3. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
-4. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
 
-> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6).
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9).
+
+## 9. Open-source governance: signed releases та оновлення (PH-S63)
+
+**Мета:** федеративна Galaxy Grid **без глобального “root супер-адміна”**, який може віддалено керувати чужими srvN, читати їхні секрети або примусово оновлювати бінарники. Кожен **адмін srvN** — суверен над своїм кластером; мережа узгоджується через **підписані артефакти**, **версію протоколу** та **opt-in** політики оновлення.
+
+### 9.1 Принципи (trust model)
+
+| Принцип | Що означає |
+|---------|------------|
+| **Суверенітет srvN** | API keys, worker pool, billing, TLS — лише на хості адміна; немає backdoor “PoolAI root shell”. |
+| **Публічний код ≠ довіра до вузла** | Відкритий репозиторій не дає права змінювати чужий coordinator; лише локальний deploy з перевіреним артефактом. |
+| **Підпис > ім’я файлу** | Офіційний реліз = бінарій/контейнер + криптографічний підпис + SBOM (концепт). |
+| **Opt-in оновлення** | Auto-update **ніколи** не default для major; адмін явно обирає policy (§9.5). |
+| **Федерація ≠ адміністрування** | Discovery/peering (§2) не передає RBAC на чужий srvN. |
+
+**Заборонено в моделі Galaxy (концепт):** централізований обліковий запис з правом `POST /admin/*` на довільний `srv_id`; примусовий remote config без підпису та audit; “тихе” оновлення worker’ів на чужих машинах.
+
+### 9.2 Signed releases (канон PH-S63)
+
+**Артефакти релізу** (приклад набір для coordinator + worker + sidecar):
+
+| Артефакт | Підпис / attest | Перевірка на srvN |
+|----------|-----------------|-------------------|
+| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `poolai verify-release --artifact … --signature …` (майбутній CLI) |
+| OCI image (`ghcr.io/…/poolai`) | cosign на digest | admission / `cosign verify` перед pull |
+| `config` bundle (default policies) | окремий підпис maintainer | порівняння з pinned `release_pubkey` |
+| SBOM (SPDX/CycloneDX) | hash у release manifest | supply-chain audit |
+
+**Ключі підпису (концепт):**
+
+```
+release_manifest = {
+  version: "0.2.x",
+  git_tag: "v0.2.x",
+  artifacts: [{ name, sha256, sig_ref }],
+  protocol_min: "1.0",
+  protocol_max: "1.x"
+}
+maintainer_keys[]   // ed25519; ротація через signed key_transition bulletin
+```
+
+| Роль ключа | Хто тримає | Призначення |
+|------------|------------|-------------|
+| **Release signing** | core maintainers (offline/HSM) | підпис бінарів і manifest |
+| **Security advisory** | окремий ключ (може збігатись) | підпис CVE bulletins (§9.6) |
+| **srvN operator** | адмін хоста | **не** підписує офіційний реліз; лише pin / policy |
+
+**Перший запуск / pin:** адмін записує `POOLAI_RELEASE_TRUST_ROOT` (шлях до `maintainer_keys.json` або fingerprint) **до** першого `poolai` з мережі. Оновлення trust root — лише через підписаний `key_transition` (два ключа: old+new) або ручна зміна з audit log.
+
+**Зв’язок з наявним:** TLS для HTTP (FM-044) — транспорт; signed release — **цілісність** deploy. Обидва потрібні, не взаємозамінні.
+
+### 9.3 Protocol versioning та compat matrix
+
+Galaxy Grid використовує **шаровану** версійність (як RAID distributed — `docs/DISTRIBUTED_RAID_PROTOCOL.md` §Versioning):
+
+| Шар | Ідентифікатор | Правило сумісності |
+|-----|---------------|-------------------|
+| **HTTP API** | шлях `/api/v1/…` | breaking → новий prefix `/api/v2/…`; v1 підтримується N релізів |
+| **Wire headers** | `X-PoolAI-Protocol: 1.2` | coordinator відповідає `X-PoolAI-Protocol-Supported: 1.0,1.1,1.2` |
+| **Job / worker DTO** | `schema_version` у JSON body | minor +1 — additive fields; major — reject з `426 Upgrade Required` |
+| **Virtual node / Telegram bind** | FM-016 API version у OpenAPI tag | worker старіший за coordinator → degrade або block register |
+| **On-chain events** | `event_schema` у NDJSON (PH-S38) | sidecar ігнорує невідомі major; логує `schema_unsupported` |
+
+**Compat matrix (приклад, оновлюється з релізом):**
+
+| Coordinator ↓ / Worker → | `1.0.x` | `1.1.x` | `1.2.x` |
+|--------------------------|---------|---------|---------|
+| `1.0.x` | ✅ full | ⚠️ register only | ❌ |
+| `1.1.x` | ⚠️ jobs only | ✅ full | ⚠️ lease fields ignored |
+| `1.2.x` | ❌ | ✅ full | ✅ full |
+
+Легенда: **✅** — повна взаємодія; **⚠️** — обмежена (без нових полів lease/verify); **❌** — coordinator відхиляє handshake.
+
+**Negotiation flow (MVP):**
+
+1. Worker `POST /api/v1/workers/register` з `protocol_version`, `build_id`, `signature_fingerprint` (опційно).
+2. Coordinator перевіряє matrix + (опційно) allowlist signed `build_id`.
+3. Відповідь: `accepted` | `upgrade_required` | `unsupported` + `min_coordinator_version` URL (docs only, не auto-download без policy).
+
+**Не плутати:** semver **продукту** (`v0.2.x` git tag) ≠ **protocol** (`1.x`). Один git release може піднімати лише patch protocol.
+
+### 9.4 Оновлення без root super-admin
+
+```
+┌─────────────────┐     signed manifest      ┌──────────────────┐
+│ Release CDN /   │ ───────────────────────► │ Admin srvN       │
+│ GitHub Releases │     (verify signature)   │ (local policy)   │
+└─────────────────┘                          └────────┬─────────┘
+                                                        │
+                     opt-in apply                       ▼
+                                              ┌──────────────────┐
+                                              │ Rolling restart  │
+                                              │ workers/coord    │
+                                              │ (own machines)   │
+                                              └──────────────────┘
+```
+
+| Дія | Хто ініціює | Механізм |
+|------|-------------|----------|
+| Завантажити реліз | адмін srvN | `curl` / package manager / image pull + verify |
+| Застосувати на coordinator | адмін srvN | systemd / `run-poolai` / K8s rollout **на своєму** хості |
+| Оновити worker fleet | адмін srvN | той самий signed artifact; **не** push з чужого coordinator |
+| Повідомити про CVE | signed advisory | email/RSS + optional webhook; **без** remote exec |
+| Примусити оновлення в мережі | **ніхто** | немає глобального kill-switch |
+
+**Federation peers** бачать лише публічні метадані (`srv_id`, capacity, protocol range) — не config, не secrets, не admin JWT.
+
+### 9.5 Opt-in auto-update policies
+
+Політика задається **per srvN** (env або `config/update_policy.toml`):
+
+| Policy | Поведінка | Default? |
+|--------|-----------|----------|
+| `manual` | лише ручний deploy після verify | **✅ recommended** |
+| `notify` | перевіряє signed manifest; лог + UI banner; не застосовує | |
+| `auto_patch` | auto rolling restart лише якщо `protocol` **unchanged** і semver patch | opt-in |
+| `auto_minor` | те саме для minor product semver | рідко; audit |
+| `never` | ignore manifest channel (air-gap) | regulated env |
+
+**Guardrails (обов’язкові в моделі):**
+
+- Major protocol або product semver bump → **завжди** `manual` (навіть якщо policy `auto_patch`).
+- Downgrade заборонено без явного `--allow-downgrade` + audit event.
+- Telegram edge workers: default `manual` / notify через bot message; **не** silent auto-update desktop miner.
+- Два coordinator в LAN (FM-003): оновлювати вузли **послідовно** з перевіркою matrix (§9.3).
+
+**Env (концепт):**
+
+| Змінна | Default | Опис |
+|--------|---------|------|
+| `POOLAI_UPDATE_POLICY` | `manual` | `manual` \| `notify` \| `auto_patch` \| `auto_minor` \| `never` |
+| `POOLAI_RELEASE_MANIFEST_URL` | — | HTTPS URL signed manifest (опційно) |
+| `POOLAI_RELEASE_TRUST_ROOT` | bundled keys | path або fingerprint maintainer keys |
+| `POOLAI_UPDATE_CHECK_INTERVAL_SECS` | `86400` | для `notify` / auto policies |
+
+### 9.6 Security advisories та key rotation
+
+| Тип bulletin | Підпис | Дія адміна |
+|--------------|--------|------------|
+| `CVE-YYYY-NNNN` | security advisory key | прочитати; застосувати патч-кандидат з manifest |
+| `key_transition` | old + new release keys | оновити `POOLAI_RELEASE_TRUST_ROOT` до deadline |
+| `protocol_sunset` | release key | планувати upgrade до `min_coordinator_version` |
+
+**Audit events (локально на srvN):** `release_verify_ok|fail`, `update_policy_applied`, `protocol_negotiation_rejected`, `advisory_acknowledged`.
+
+**Roadmap (не PH-S63):** in-binary auto-updater daemon, central update registry з SLA, web-of-trust між srvN адмінами.
+
+### 9.7 Зв’язок з верифікацією edge (§6)
+
+| Механізм | Governance (§9) | Edge verify (§6) |
+|----------|-----------------|------------------|
+| Підпис | цілісність **релізу** coordinator/worker | цілісність **result** job |
+| Trust root | maintainer release keys | `trust_score` per `telegram_edge` |
+| Opt-in | update policy адміна | sampling rate policy |
+
+Signed capability documents (§6.6 roadmap) — наступний спринт; не дублюють release signing.
+
+### 9.8 Ops notes (PH-S63)
+
+**Метрики (концепт):** `poolai_release_verify_total`, `poolai_protocol_negotiation_rejected_total`, `poolai_update_notify_pending`.
+
+**Документи-орієнтири:** [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md) (signed releases checklist), [`DISTRIBUTED_RAID_PROTOCOL.md`](../DISTRIBUTED_RAID_PROTOCOL.md) §Versioning, OpenAPI `/api/v1/*`.
+
+**Код (майбутнє, поза PH-S63):** `poolai verify-release`, middleware `X-PoolAI-Protocol`, admin UI panel “Updates & compatibility”.
 
