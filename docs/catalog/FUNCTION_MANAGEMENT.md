@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S85 ✅ verify-release dev fixtures; §5.12 PH-S86…S94 — 8 відкритих; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S86 ✅ grid pricing E2E; §5.12 PH-S87…S94 — 7 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -286,7 +286,7 @@ FM-xxx (з таблиці нижче)
 | 19 | **PH-S83** | Galaxy pricing stale-served metric (code) | Galaxy §4.2.4, observability | expose `galaxy_pricing_stale_served` counter on L1 stale path; unit or integration test | **✅** |
 | 20 | **PH-S84** | Galaxy §4.2.3 wire note sync (docs) | `POOLAI_GALAXY_GRID.md` | mark `GET /api/v1/grid/pricing` implemented (PH-S78/S79); remove stale «майбутній wire» | **✅** |
 | 21 | **PH-S85** | verify-release dev fixtures + RUN_LOCAL pointer (docs) | `SECURITY_HARDENING`, `RUN_LOCAL.md` | sample manifest/sig paths for local verify; no duplicate Galaxy prose | **✅** |
-| 22 | **PH-S86** | Grid pricing E2E smoke | `e2e/`, PH-S78 API | Playwright hits `/api/v1/grid/pricing` with env fallback JSON on dev stand | відкрито |
+| 22 | **PH-S86** | Grid pricing E2E smoke | `e2e/`, PH-S78 API | Playwright hits `/api/v1/grid/pricing` with env fallback JSON on dev stand | **✅** |
 | 23 | **PH-S87** | INDEX security docs cross-link (docs) | `INDEX_2026-03-17.md`, `docs/security/` | step-8 security row links to Galaxy hub in SECURITY_HARDENING | відкрито |
 | 24 | **PH-S88** | Release manifest sample JSON (docs) | Galaxy §9.2, `docs/development/` | operator-facing minimal manifest example for `poolai-verify-release` | відкрито |
 | 25 | **PH-S89** | Pricing oracle L1 stale TTL metric (code) | Galaxy §4.2.3–4.2.4 | distinguish fresh vs stale cache hits in quote metadata or metrics; tests | відкрито |

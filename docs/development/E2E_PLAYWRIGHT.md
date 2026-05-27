@@ -9,6 +9,7 @@
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 | `jobs_raid.spec.ts` | **PH-S52:** API smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start` |
+| `grid_pricing.spec.ts` | **PH-S86:** API smoke — `GET /api/v1/grid/pricing` з `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (L2 fallback `470000` usd_micro); лише з `--start` |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
@@ -61,4 +62,6 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 
 **PH-S52 ✅:** `jobs_raid` у `npm run test:ci`; `--start` виставляє `POOLAI_JOB_STORE=raid` + `restart.sh` у stand dir.
 
-**Last updated:** 2026-05-26 (PH-S52 jobs RAID persistence E2E).
+**PH-S86 ✅:** `grid_pricing` у `npm run test:ci`; `--start` виставляє `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (default `{"inference_blended_token":470000}`).
+
+**Last updated:** 2026-05-27 (PH-S86 grid pricing API E2E).

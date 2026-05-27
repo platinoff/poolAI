@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "test:ci": "playwright test smoke admin a11y visual jobs_raid",
+    "test:ci": "playwright test smoke admin a11y visual jobs_raid grid_pricing",
     "test:headed": "playwright test --headed",
     "test:visual": "playwright test visual",
     "test:visual:update": "playwright test visual --update-snapshots"

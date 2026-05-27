@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S85 ✅ verify-release dev fixtures; §5.12 PH-S86 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S86 ✅ grid pricing E2E; §5.12 PH-S87 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -54,8 +54,9 @@
 **PH-S83 ✅ (code):** `galaxy_pricing_oracle` — `galaxy_pricing_stale_served` counter + `pricing_oracle_stale_served` log on L1 stale serves (`try_quote` + HTTP cache path); unit test; `cargo test-ci`.
 **PH-S84 ✅ (docs):** `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.3 — `GET /api/v1/grid/pricing` + `/ui/admin/grid-pricing` позначені implemented (PH-S78…S83); прибрано «майбутній wire»; Rust reference §4.2 оновлено.
 **PH-S85 ✅ (docs+fixtures):** `tests/fixtures/release/dev/` — sample manifest/sig/trust root + `poolai-sample.bin`; `SECURITY_HARDENING` + `RUN_LOCAL` verify-release pointer; Galaxy §9.2 cross-link; `cargo run --bin poolai-verify-release` OK на fixtures.
+**PH-S86 ✅ (e2e):** `e2e/tests/grid_pricing.spec.ts` — `GET /api/v1/grid/pricing` L2 fallback + cache + 400 invalid unit; `bin/e2e-playwright.sh --start` sets `POOLAI_GALAXY_PRICING_FALLBACK_JSON`; `npm run test:ci` includes `grid_pricing`.
 **PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
-**Черга:** §5.12 **PH-S86** (8 відкритих); наступний sprint — **PH-S86** (Grid pricing E2E smoke).
+**Черга:** §5.12 **PH-S87** (7 відкритих); наступний sprint — **PH-S87** (INDEX security cross-link).
 
 ## 1. Канонічний порядок документації та планів
 
