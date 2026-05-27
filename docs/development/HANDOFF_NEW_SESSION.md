@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S82 ✅ Admin UI grid pricing panel; §5.12 PH-S83 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S83 ✅ stale-served metric; §5.12 PH-S84 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -51,8 +51,9 @@
 **PH-S80 ✅ (code):** `galaxy_pricing_oracle::try_quote` L3 (`GalaxyPricingUnavailable`); `GET /api/v1/grid/pricing` → HTTP 503 `pricing_unavailable` when no L1 cache and no L2 fallback; OpenAPI 503; unit tests.
 **PH-S81 ✅ (code):** `galaxy_pricing_oracle` — `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` always L2 (`pricing_forced_fallback` log + `galaxy_pricing_forced_fallback_total` counter); API skips L1 provider cache when forced (serves cached L2); unit tests; `cargo test-ci`.
 **PH-S82 ✅ (code):** `src/ui/admin/grid_pricing.rs` — read-only `/ui/admin/grid-pricing` panel (`task_profile` / `model_profile` / `unit_key` → `GET /api/v1/grid/pricing`); i18n EN/UK; Playwright smoke (`admin.spec.ts`); `cargo test-ci`.
+**PH-S83 ✅ (code):** `galaxy_pricing_oracle` — `galaxy_pricing_stale_served` counter + `pricing_oracle_stale_served` log on L1 stale serves (`try_quote` + HTTP cache path); unit test; `cargo test-ci`.
 **PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
-**Черга:** §5.12 **PH-S83** (7 відкритих); наступний sprint — **PH-S83** (Galaxy pricing stale-served metric).
+**Черга:** §5.12 **PH-S84** (6 відкритих); наступний sprint — **PH-S84** (Galaxy §4.2.3 wire note sync).
 
 ## 1. Канонічний порядок документації та планів
 

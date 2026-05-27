@@ -14,8 +14,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_pricing_oracle::{
-    CacheFreshness, GalaxyPriceUnitKey, GalaxyPricingCacheKey, GalaxyPricingConfig,
-    GalaxyPricingOracle, GalaxyPricingQuote, PRICING_UNAVAILABLE_ERROR_CODE,
+    record_l1_stale_served, CacheFreshness, GalaxyPriceUnitKey, GalaxyPricingCacheKey,
+    GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingQuote, MockProviderQuote,
+    PRICING_UNAVAILABLE_ERROR_CODE,
 };
 use crate::grid::{ingest_envelope, GridEnvelope, GridIngestKind, GridIngestOutcome};
 use crate::job::{JobStatus, JobStore};
@@ -174,6 +175,9 @@ async fn get_grid_pricing_snapshot(
             true
         };
         if serve_cached {
+            if freshness == CacheFreshness::Stale {
+                record_l1_stale_served(entry.quote.unit_key);
+            }
             if let Some(freshness) = freshness_to_response(freshness) {
                 return Ok((
                     StatusCode::OK,
