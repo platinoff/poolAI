@@ -168,16 +168,23 @@ async fn get_grid_pricing_snapshot(
         .map_err(|_| AppError::InternalError("pricing oracle mutex poisoned".to_string()))?;
 
     if let Some((entry, freshness)) = oracle.lookup(now, &cache_key) {
-        if let Some(freshness) = freshness_to_response(freshness) {
-            return Ok((
-                StatusCode::OK,
-                Json(GridPricingSnapshotResponse {
-                    ok: true,
-                    source: GridPricingSnapshotSource::Cache,
-                    freshness,
-                    snapshot: snapshot_from_quote(entry.quote),
-                }),
-            ));
+        let serve_cached = if oracle.config().force_fallback {
+            entry.quote.provider_id_at_min == "fallback_l2_config"
+        } else {
+            true
+        };
+        if serve_cached {
+            if let Some(freshness) = freshness_to_response(freshness) {
+                return Ok((
+                    StatusCode::OK,
+                    Json(GridPricingSnapshotResponse {
+                        ok: true,
+                        source: GridPricingSnapshotSource::Cache,
+                        freshness,
+                        snapshot: snapshot_from_quote(entry.quote),
+                    }),
+                ));
+            }
         }
     }
 
@@ -218,6 +225,7 @@ fn response_from_outcome(outcome: GridIngestOutcome) -> GridIngestResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::grid::galaxy_pricing_oracle::MockProviderQuote;
     use std::collections::HashMap;
     use std::sync::{Mutex as StdMutex, OnceLock as StdOnceLock};
 
@@ -309,5 +317,61 @@ mod tests {
          .0;
         assert!(matches!(second.source, GridPricingSnapshotSource::Cache));
         assert_eq!(second.snapshot.poolai_quote_usd_micro, 470_000);
+    }
+
+    #[tokio::test]
+    async fn grid_pricing_snapshot_force_fallback_skips_l1_cache() {
+        let _lock = pricing_test_lock();
+        reset_oracle(false, None);
+        let mut fallback = HashMap::new();
+        fallback.insert(GalaxyPriceUnitKey::InferenceBlendedToken, 470_000);
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "force-skip-l1".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        {
+            let mut guard = pricing_oracle().lock().expect("pricing oracle lock");
+            *guard = GalaxyPricingOracle::new(GalaxyPricingConfig {
+                cache_ttl_secs: 300,
+                max_stale_secs: 3600,
+                force_fallback: false,
+            })
+            .with_l2_fallback_quotes(fallback);
+            let providers = [MockProviderQuote {
+                provider_id: "openai_us",
+                unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+                usd_micro: 500_000,
+                healthy: true,
+            }];
+            guard
+                .refresh_from_providers(0, key.clone(), &providers)
+                .expect("seed L1 cache");
+            guard.set_force_fallback_for_test(true);
+        }
+
+        let first = get_grid_pricing_snapshot(
+            State(ApiContext::default()),
+            Query(query("inference_blended_token", "force-skip-l1")),
+        )
+        .await
+        .expect("forced L2 snapshot")
+        .1
+         .0;
+        assert!(matches!(first.source, GridPricingSnapshotSource::Oracle));
+        assert_eq!(first.snapshot.poolai_quote_usd_micro, 470_000);
+
+        let second = get_grid_pricing_snapshot(
+            State(ApiContext::default()),
+            Query(query("inference_blended_token", "force-skip-l1")),
+        )
+        .await
+        .expect("cached L2 snapshot")
+        .1
+         .0;
+        assert!(matches!(second.source, GridPricingSnapshotSource::Cache));
+        assert_eq!(second.snapshot.poolai_quote_usd_micro, 470_000);
+        assert_eq!(second.snapshot.provider_id_at_min, "fallback_l2_config");
+        reset_oracle(false, None);
     }
 }

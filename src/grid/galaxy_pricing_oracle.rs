@@ -1,11 +1,14 @@
 //! Galaxy Grid pricing oracle stub (PH-S68): unit keys, `floor(market_min×0.9)` quote,
-//! cache TTL/SWR from `POOLAI_GALAXY_PRICE_*` env. See `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.
+//! cache TTL/SWR from `POOLAI_GALAXY_PRICE_*` env; L2 force-fallback ops wire (PH-S81).
+//! See `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.
 //!
 //! Oracle determines **gross quote** in micro-USD; settlement uses `galaxy_fee_split`.
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
+use std::sync::atomic::{AtomicU64, Ordering};
+use tracing::info;
 
 /// 1 USD = 1_000_000 micro-USD (§4.2.1).
 pub const USD_MICRO_PER_USD: u64 = 1_000_000;
@@ -26,8 +29,16 @@ pub const ENV_CACHE_TTL_SECS: &str = "POOLAI_GALAXY_PRICE_CACHE_TTL_SECS";
 /// Env: max age for stale-while-revalidate seconds.
 pub const ENV_MAX_STALE_SECS: &str = "POOLAI_GALAXY_PRICE_MAX_STALE_SECS";
 
-/// Env: `1` forces L2 fallback path (§4.2.4); stub records flag only.
+/// Env: `1` forces L2 fallback path (§4.2.4).
 pub const ENV_FORCE_FALLBACK: &str = "POOLAI_GALAXY_PRICING_FORCE_FALLBACK";
+
+/// Structured log event when ops override serves L2 (§4.2.4).
+pub const FORCED_FALLBACK_LOG_EVENT: &str = "pricing_forced_fallback";
+
+/// In-process counter name for forced L2 quotes (Prometheus wire — PH-S83+).
+pub const METRIC_FORCED_FALLBACK_TOTAL: &str = "galaxy_pricing_forced_fallback_total";
+
+static FORCED_FALLBACK_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Env: JSON map for L2 fallback floor quotes in micro-USD (§4.2.4).
 /// Example:
@@ -121,6 +132,27 @@ impl GalaxyPricingConfig {
 
 fn env_u64(name: &str) -> Option<u64> {
     std::env::var(name).ok().and_then(|v| v.trim().parse().ok())
+}
+
+/// Total forced L2 quotes served since process start (ops/metrics snapshot).
+pub fn forced_fallback_total() -> u64 {
+    FORCED_FALLBACK_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(test)]
+pub fn reset_forced_fallback_total_for_test() {
+    FORCED_FALLBACK_TOTAL.store(0, Ordering::Relaxed);
+}
+
+fn record_forced_fallback(unit_key: GalaxyPriceUnitKey) {
+    let total = FORCED_FALLBACK_TOTAL.fetch_add(1, Ordering::Relaxed) + 1;
+    info!(
+        event = FORCED_FALLBACK_LOG_EVENT,
+        unit_key = %unit_key,
+        metric = METRIC_FORCED_FALLBACK_TOTAL,
+        total,
+        "pricing oracle forced L2 fallback"
+    );
 }
 
 fn parse_fallback_json(raw: &str) -> HashMap<GalaxyPriceUnitKey, u64> {
@@ -343,6 +375,10 @@ impl GalaxyPricingOracle {
         if self.config.force_fallback {
             return self
                 .l2_fallback_quote(now_secs, key)
+                .map(|quote| {
+                    record_forced_fallback(quote.unit_key);
+                    quote
+                })
                 .ok_or(GalaxyPricingUnavailable);
         }
         if let Some((entry, freshness)) = self.lookup(now_secs, &key) {
@@ -363,6 +399,11 @@ impl GalaxyPricingOracle {
         providers: &[MockProviderQuote],
     ) -> Option<GalaxyPricingQuote> {
         self.try_quote(now_secs, key, providers).ok()
+    }
+
+    #[cfg(test)]
+    pub fn set_force_fallback_for_test(&mut self, force_fallback: bool) {
+        self.config.force_fallback = force_fallback;
     }
 }
 
@@ -571,7 +612,46 @@ mod tests {
     }
 
     #[test]
+    fn config_from_env_reads_force_fallback_flag() {
+        const KEY: &str = ENV_FORCE_FALLBACK;
+        std::env::set_var(KEY, "1");
+        let cfg = GalaxyPricingConfig::from_env();
+        std::env::remove_var(KEY);
+        assert!(cfg.force_fallback);
+    }
+
+    #[test]
+    fn try_quote_force_fallback_skips_l1_cache() {
+        reset_forced_fallback_total_for_test();
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "l1-should-be-skipped".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+
+        let mut fallback = HashMap::new();
+        fallback.insert(GalaxyPriceUnitKey::InferenceBlendedToken, 470_000);
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        })
+        .with_l2_fallback_quotes(fallback);
+        oracle
+            .refresh_from_providers(0, key.clone(), &mock_us_blended())
+            .expect("seed L1 cache");
+        oracle.set_force_fallback_for_test(true);
+
+        let quote = oracle
+            .try_quote(100, key, &mock_us_blended())
+            .expect("forced L2");
+        assert_eq!(quote.poolai_quote_usd_micro, 470_000);
+        assert_eq!(quote.provider_id_at_min, "fallback_l2_config");
+    }
+
+    #[test]
     fn quote_uses_l2_fallback_when_provider_refresh_unavailable() {
+        reset_forced_fallback_total_for_test();
         let mut fallback = HashMap::new();
         fallback.insert(GalaxyPriceUnitKey::InferenceBlendedToken, 470_000);
         let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {

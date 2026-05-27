@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-27 (PH-S75: `galaxy_pricing_oracle` L2 fallback; PH-S68 stub baseline; PH-S67 Galaxy Grid modules zріз).
+**Оновлено:** 2026-05-27 (PH-S81: `galaxy_pricing_oracle` FORCE_FALLBACK log/metric; PH-S68 stub baseline; PH-S67 Galaxy Grid modules zріз).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -137,7 +137,7 @@
 | **Grid map** | `src/grid/map.rs` | map ↔ `PeerInfo`, RAID `put_artifact`, memory shard bodies | `map` unit tests |
 | **Grid dispatch** | `src/grid/dispatch.rs` | `ingest_envelope` → `JobStore` / `MemoryShardStore`; epics `emit_memory_updated`, `emit_seed_provided`; schedule via `schedule_with_grid_peer` | `dispatch` unit tests |
 | **Galaxy fee split** | `src/grid/galaxy_fee_split.rs` | primary **0.1%** (10 bps) + secondary **1–5%** admin (floor bps); `GalaxyFeeSplit` lamports | unit tests; `cargo bench --bench galaxy_fee_split_benchmarks` |
-| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; `floor(market_min×0.9)` usd_micro; TTL/SWR cache (L1 stale); L2 configured fallback via `POOLAI_GALAXY_PRICING_FALLBACK_JSON`; `POOLAI_GALAXY_PRICE_*` env (§4.2) | unit tests (`galaxy_pricing_oracle`) |
+| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; `floor(market_min×0.9)` usd_micro; TTL/SWR cache (L1 stale); L2 configured fallback via `POOLAI_GALAXY_PRICING_FALLBACK_JSON`; `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` → L2-only + `pricing_forced_fallback` log/metric; `POOLAI_GALAXY_PRICE_*` env (§4.2) | unit tests (`galaxy_pricing_oracle`) |
 | **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
 | **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
@@ -155,7 +155,7 @@
 | `POOLAI_GALAXY_PRICE_CACHE_TTL_SECS` | coordinator | Pricing oracle fresh TTL (default `300`, §4.2) |
 | `POOLAI_GALAXY_PRICE_MAX_STALE_SECS` | coordinator | Pricing oracle stale-while-revalidate (default `3600`) |
 | `POOLAI_GALAXY_PRICING_FALLBACK_JSON` | coordinator | L2 fixed fallback quote map by unit key (usd_micro JSON) for provider outage |
-| `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | coordinator | `1` = skip live quote path (L2 stub flag) |
+| `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | coordinator | `1` = L2-only emergency mode (`pricing_forced_fallback` log; PH-S81) |
 
 **Не в коді (concept-only / наступні PH-S*):** pricing HTTP wire + provider fetch, in-process auto-updater, admin UI “Updates & compatibility”.
 

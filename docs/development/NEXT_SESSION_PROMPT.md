@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — ітераційна сесія PH-S81 (VDT, один спринт)
+PoolAI — ітераційна сесія PH-S82 (VDT, один спринт)
 
 ## Ролі (VDT)
 | Роль | Хто | Дія |
@@ -39,41 +39,41 @@ AUTO_RUN — лише за явним запитом (не підміняє §5.
 cargo fmt --all
 cargo test-ci
 cargo run --bin poolai-openapi-gap-audit   # після змін API
+cd e2e && npm run test:ci                  # після src/ui/ або e2e/
 
 ## Стан (2026-05-27)
-- HEAD: (після push PH-S90) — Cursor VDT agent roles + §5.12 sync
-- Закрито: PH-S03…S80 + PH-S76 + PH-S77 + PH-S90
-- Відкритий sprint: PH-S81 (перший у §5.12)
+- HEAD: (після PH-S81) — pricing oracle FORCE_FALLBACK wire
+- Закрито: PH-S03…S81 + PH-S76 + PH-S77 + PH-S90
+- Відкритий sprint: PH-S82 (перший у §5.12)
 - BLOCKED: PH-S35 / PH-S16 / PH-S02 (LAN)
 - Deferred: PH-S36 / PH-S01 / PH-S15 (Cloud SDK, FM-041)
 
-## PH-S81 — scope цієї сесії
-1. `src/grid/galaxy_pricing_oracle.rs` — `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` → завжди L2; log/metric
-2. HTTP `/api/v1/grid/pricing` — oracle `from_env()` у prod path
-3. Unit tests; `cargo test-ci`
-4. FM §5.12 (PH-S81 → ✅) + HANDOFF + цей prompt
+## PH-S82 — scope цієї сесії
+1. `src/ui/` — read-only admin panel для grid pricing snapshot (`GET /api/v1/grid/pricing`)
+2. Playwright smoke (task/model/unit query params)
+3. `cargo fmt` → `cargo test-ci` → `e2e npm run test:ci`
+4. FM §5.12 (PH-S82 → ✅) + HANDOFF + цей prompt
 
 ## Режим виконання
-1. Взяти PH-S81 з черги (не повторювати закриті)
+1. Взяти PH-S82 з черги (не повторювати закриті)
 2. Мінімальний scope; MSYS2 для git/cargo
 3. Commit лише файлів спринту (без git add -A)
 4. Push (MSYS2) + самарі: що зроблено · тести · hash · наступний PH-S*
 
 ## Не повторювати
-PH-S03…S80 + PH-S76 + PH-S77 + PH-S90 · L3 pricing_unavailable · Cursor rules refactor · security docs hub · pricing API wire/fallback · verify-release · protocol_version wire
+PH-S03…S81 + PH-S76 + PH-S77 + PH-S90 · FORCE_FALLBACK wire · L3 pricing_unavailable · Cursor rules refactor · security docs hub · pricing API wire/fallback · verify-release · protocol_version wire
 
 ## Черга §5.12 (відкриті)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | PH-S81 | FORCE_FALLBACK env wire |
-| 2 | PH-S82 | Admin UI grid pricing panel |
-| 3 | PH-S83 | stale-served metric |
-| 4 | PH-S84 | Galaxy §4.2.3 wire note |
-| 5 | PH-S85 | verify-release fixtures |
-| 6 | PH-S86 | Grid pricing E2E |
-| 7 | PH-S87 | INDEX security cross-link |
-| 8 | PH-S88 | Release manifest sample |
-| 9 | PH-S89 | L1 stale TTL metadata |
+| 1 | PH-S82 | Admin UI grid pricing panel |
+| 2 | PH-S83 | stale-served metric |
+| 3 | PH-S84 | Galaxy §4.2.3 wire note |
+| 4 | PH-S85 | verify-release fixtures |
+| 5 | PH-S86 | Grid pricing E2E |
+| 6 | PH-S87 | INDEX security cross-link |
+| 7 | PH-S88 | Release manifest sample |
+| 8 | PH-S89 | L1 stale TTL metadata |
 
 Поза чергою: PH-S35 LAN · PH-S36 Cloud SDK
 ```
