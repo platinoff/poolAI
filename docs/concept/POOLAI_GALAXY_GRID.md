@@ -605,12 +605,140 @@ if not all_required_ready and policy.strict_locality:
 
 ## 6. Security та верифікація (edge untrusted)
 
-Оскільки Telegram edge worker’и можуть бути “частково недовіреними”, має бути механізм:
+**Trust model (PH-S62):**
 
-- підтвердження capability (що worker реально може);
-- мінімальна верифікація результатів job (на старті — реплікація/перевірка вибіркових підзадач; далі — розширення).
+| `origin` | Довіра | Верифікація результатів |
+|----------|--------|-------------------------|
+| `local_srv` | висока (адмін srvN) | lease CAS (§4.3); опційний audit |
+| `cloud_provider` | середня (провайдер SLA) | sampling + metrics |
+| `telegram_edge` | **низька / untrusted** | **обов’язковий** baseline §6.2–6.4 |
 
-На рівні концепту: precise security model (ZK/attestation/TEEs/сигнатури) залишається TBD.
+Telegram edge desktop worker може бути скомпрометований, брехати про `capabilities` або підмінити output. Galaxy Grid **не** приймає фінальний result для settlement без проходження verification policy.
+
+**Поза scope PH-S62 (TBD пізніше):** ZK proofs, hardware TEE attestation, on-chain proof layer — лише roadmap (§6.6).
+
+### 6.1 Capability sanity (pre-admission)
+
+Перед `Leased` / `Running` coordinator перевіряє **заявлені** vs **спостережувані** можливості:
+
+| Check | Джерело | Fail action |
+|-------|---------|-------------|
+| Heartbeat + resource telemetry | worker `telemetry` (§2.3) | `worker_unhealthy` → re-migrate (§4.3.3) |
+| Task probe (MVP) | `raid_artifact_probe` task kind (FM-016++, `virtual_node_executor`) | downgrade trust / block GPU jobs |
+| Origin policy | `origin=telegram_edge` | вимагає verification tier ≥ `baseline` |
+
+**Не робити в PH-S62:** повний remote attestation GPU; достатньо probe + history score.
+
+### 6.2 Sampling verification (PH-S62, canonical)
+
+**Ідея:** для частки job’ів coordinator призначає **shadow check** — той самий input виконується на довіреному `local_srv` worker’і; порівнюється digest output.
+
+```
+sample_rate = f(trust_score(worker), task_profile, gross_usd_micro)
+if random() < sample_rate:
+    enqueue_verification_job(input_digest, primary_result_digest, checker_peer)
+```
+
+| Параметр | Default | Опис |
+|----------|---------|------|
+| `base_sample_rate_telegram` | `0.05` (5%) | мінімум для `telegram_edge` |
+| `elevated_sample_rate` | `0.20` | після `verification_fail` за 24h |
+| `max_sample_rate` | `0.50` | upper bound |
+
+**Порівняння:**
+
+- **Deterministic tasks** (probe, hash, fixed seed inference): `output_digest` має збігатись bit-exact.
+- **Non-deterministic** (LLM sampling): порівняння за `semantic_hash` / token-logprob band (концепт) або skip settlement до human review.
+
+**Результат:**
+
+| Verdict | Дія |
+|---------|-----|
+| `match` | accept primary result; `trust_score += delta` |
+| `mismatch` | reject result; `trust_score -= penalty`; optional ban window |
+| `checker_timeout` | retry once; інакше `verification_inconclusive` → elevated sample_rate |
+
+### 6.3 Replay verification (PH-S62)
+
+**Replay** — повторне виконання **того самого** job spec на іншому worker’і з frozen input artifact (з RAID / job store).
+
+Відмінність від sampling:
+
+| | Sampling | Replay |
+|---|----------|--------|
+| Коли | випадково, фоном | на `mismatch`, dispute, або high-value job |
+| Хто ініціює | coordinator policy | coordinator або admin |
+| Блокує settlement | ні (паралельно) | так, до verdict |
+
+**Flow:**
+
+1. Primary edge worker публікує `result` + `result_digest` + `lease_epoch` (§4.3.1 CAS).
+2. Coordinator ставить settlement у `pending_verification`.
+3. Replay worker (`local_srv` або другий edge з вищим trust) виконує з `input_artifact_id`.
+4. Verdict → `accepted` | `rejected` | `inconclusive`.
+
+**Wire (концепт):** `verification_id`, `primary_job_id`, `replay_job_id`, `verdict`, `observed_at`.
+
+### 6.4 Replication verification (N-of-M, PH-S62)
+
+Для high-value або `strict_verification` profile coordinator призначає **M parallel executors**, результат приймається лише при **кворумі**:
+
+```
+M = 3, K = 2   // 2-of-3 digest match
+digests = [d1, d2, d3]
+accept if count(d_i == mode(digests)) >= K
+```
+
+| Profile | M | K | Типові job |
+|---------|---|---|------------|
+| `replication_light` | 2 | 2 | mining probe, small batch |
+| `replication_standard` | 3 | 2 | inference з високим gross |
+| `replication_strict` | 3 | 3 | financial/settlement-critical |
+
+**Хто входить у пул:** ≥1 `local_srv` + edge лише якщо `trust_score ≥ threshold`; для `telegram_edge`-only пулів — **не** дозволяти `replication_strict`.
+
+**Cost guardrail:** replication множить compute — ліміт `max_replication_jobs_per_hour` per `srv_id`.
+
+### 6.5 Trust score та settlement gate (PH-S62)
+
+Кожен `peer_id` з `origin=telegram_edge` має **`trust_score`** (0..1000, default 500):
+
+| Подія | Δ score |
+|-------|---------|
+| `verification_match` | +10 |
+| `verification_mismatch` | −100 |
+| `lease_epoch_rejected` (bogus result) | −50 |
+| `worker_unhealthy` streak | −30 |
+
+**Settlement gate (разом із §1.2.1 fee split):**
+
+```
+if origin == telegram_edge and trust_score < min_trust_for_payout:
+    hold payout (pending_verification)
+elif verification_verdict == accepted:
+    apply galaxy_fee_split → payout_pubkey
+elif verdict == rejected:
+    no worker payout; audit event
+```
+
+**Інтеграція з lease:** навіть при `verification_inconclusive`, result **не** фіналізується без активного `lease_epoch` match (§4.3.1) — replay не скасовує at-most-once.
+
+### 6.6 Ops notes та roadmap
+
+| Змінна (концепт) | Default | Опис |
+|------------------|---------|------|
+| `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` | `0.05` | telegram_edge sampling |
+| `POOLAI_GALAXY_VERIFY_ELEVATED_RATE` | `0.20` | після fail |
+| `POOLAI_GALAXY_MIN_TRUST_PAYOUT` | `400` | мін. score для auto payout |
+| `POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR` | `100` | cost cap |
+
+**Метрики:** `galaxy_verification_sample_total`, `galaxy_verification_mismatch_total`, `galaxy_replay_pending`, `galaxy_trust_score`.
+
+**Логи / audit:** `verification_sample_enqueued`, `verification_mismatch`, `replay_verdict`, `replication_quorum_ok|fail`.
+
+**Roadmap (не PH-S62):** ZK / TEE attestation, signed capability documents, on-chain fraud proof — окремий спринт після стабільного baseline.
+
+**Код-орієнтири (наявне):** `complete_task` + lease CAS (концепт §4.3); `raid_artifact_probe` у `virtual_node_executor`; distributed RAID replication — FM-008 (інфра, не edge logic).
 
 ## 7. On-chain події, settlement та аудит
 
@@ -629,5 +757,5 @@ On-chain події потрібні, коли вони:
 3. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
 4. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
 
-> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6).
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6).
 

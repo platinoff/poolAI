@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — PH-S62 Galaxy Grid edge verification (concept)
+PoolAI — PH-S63 Galaxy Grid open-source governance (concept)
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -25,27 +25,27 @@ cargo fmt --all
 cargo test-ci
 
 ## Стан
-- **PH-S03…S61:** ✅
-- **Черга §5.11:** PH-S62…S64 (3 відкриті; Galaxy Grid concept)
+- **PH-S03…S62:** ✅
+- **Черга §5.11:** PH-S63…S64 (2 відкриті; Galaxy Grid concept)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
-## PH-S62 — наступна сесія
-1. `docs/concept/POOLAI_GALAXY_GRID.md`: edge verification baseline (untrusted telegram_edge)
-2. Sampling / replay / replication — без ZK (concept)
+## PH-S63 — наступна сесія
+1. `docs/concept/POOLAI_GALAXY_GRID.md` (або окремий governance doc): signed releases + protocol versioning
+2. Оновлення без «root супер-адміна»: підписи, compat matrix, opt-in auto-update (concept)
 
 ## Завершення сесії
-1. FM §5.11 (PH-S62 → ✅) + HANDOFF
-2. Оновити цей NEXT_SESSION_PROMPT (PH-S63)
+1. FM §5.11 (PH-S63 → ✅) + HANDOFF
+2. Оновити цей NEXT_SESSION_PROMPT (PH-S64)
 3. git push (MSYS2) + самарі
 
 ## Не повторювати
-PH-S03…S61 · fee split · pricing oracle · Telegram seats · seeds/locality · lease/re-migrate
+PH-S03…S62 · Galaxy Grid concept blocks (fee, pricing, Telegram, lease, locality, verify)
 
 ## Черга §5.11 (відкриті)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S62** | Edge verification baseline |
-| 2–3 | **PH-S63…S64** | Governance, docs sync |
+| 1 | **PH-S63** | Governance + signed releases |
+| 2 | **PH-S64** | Docs sync (README/INDEX pointers) |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```
