@@ -25,7 +25,9 @@ alwaysApply: false
 | `shell` | MSYS2 bash: `cargo test-ci`, git, бенч `poolai_health_load` |
 | `generalPurpose` | Ізольована фіча з acceptance criteria (один FM або один модуль) |
 
-**Не делегуй:** git push, оновлення §5.1 FM, фінальний Summary коміта — залишай собі.
+**Не делегуй:** git push, оновлення §5.1 / §5.12 FM, `NEXT_SESSION_PROMPT`, фінальний Summary коміта — залишай собі.
+
+**Ітераційні PH-S сесії:** канон черги — FM **§5.12** + `NEXT_SESSION_PROMPT` (не AUTO_RUN, якщо промпт не просить авторозробку).
 
 ## Черга спринтів
 

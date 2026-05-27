@@ -1,0 +1,56 @@
+---
+description: PoolAI VDT — спринти, локальний CI, staging, доки (разом з poolai-agent-roles)
+alwaysApply: true
+---
+
+# Віртуальна команда розробки (PoolAI VDT)
+
+Ролі агентів — [`poolai-agent-roles.mdc`](poolai-agent-roles.mdc). S0, MSYS2, commit — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc). Стек — [`runtime-stack-policy.mdc`](runtime-stack-policy.mdc).
+
+## Ітерація (один PH-S*)
+
+```mermaid
+flowchart LR
+  S0[S0 git+docs] --> Sprint[PH-S*]
+  Sprint --> Fmt[cargo fmt]
+  Fmt --> Test[cargo test-ci]
+  Test --> Docs[FM HANDOFF NEXT_SESSION]
+  Docs --> Push[git push + самарі]
+```
+
+| Крок | Дія |
+|------|-----|
+| S0 | `git fetch`; HANDOFF; FM **§5.12**; `df -h /s` |
+| Спринт | Один **PH-S*** з §5.12; scope лише файли спринту |
+| Тести | `cargo fmt --all` → `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`; Raft — `cargo test-raft-ci` за scope |
+| OpenAPI | Після API: `cargo run --bin poolai-openapi-gap-audit` (0) |
+| E2E | Після `src/ui/` / `e2e/`: `cd e2e && npm run test:ci` |
+| Доки | PH-S* → ✅ у FM §5.12 + HANDOFF + `NEXT_SESSION_PROMPT` |
+| Git | MSYS2, [`git-push.md`](../commands/git-push.md), [`git-commit-msys.mdc`](git-commit-msys.mdc) |
+
+## Локальний CI vs GitHub
+
+| Канон перед push | Ігнорувати для «готово» |
+|------------------|-------------------------|
+| `cargo test-ci` | `gh run` на GitHub |
+| `cargo test-raft-ci` (Raft scope) | Linux-only visual baselines |
+| `poolai-openapi-gap-audit` (API scope) | Pa11y у cloud без стенду |
+| `e2e` `npm run test:ci` (UI scope) | on-demand baseline workflow |
+
+## Research (черга PH-S* <3)
+
+1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
+2. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md)
+3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first)
+
+## Staging
+
+**Не** `git add -A`. Не стаджити: `data/audit/`, `.commit-msg-*`, `bin/commit-*.sh`, чужий шум з інших спринтів.
+
+**Канон черги:** FM [§5.12](../../docs/catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-galaxy-wire--ops-2026-05-27) + [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md).
+
+## Пов’язані правила
+
+- [`functionality-management.mdc`](functionality-management.mdc) — FM-менеджер (§5.1)
+- [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — AUTO_RUN
+- [`docs-vision.mdc`](docs-vision.mdc) — `docs/vision/` після FM/HANDOFF

@@ -11,7 +11,7 @@ alwaysApply: false
 
 # Docs vision (PoolAI)
 
-Карта зв’язків документації та коду: **`docs/vision/`** · правило застосовується при зміні концепт-доків, HANDOFF, FM §5.11 або файлів у `docs/vision/`.
+Карта зв’язків документації та коду: **`docs/vision/`** · правило застосовується при зміні концепт-доків, HANDOFF, FM §5.12 або файлів у `docs/vision/`.
 
 ## Канонічні артефакти
 
@@ -25,9 +25,9 @@ alwaysApply: false
 
 ## Ітерація одного PH-S* (разом із VDT)
 
-Після закриття спринту в FM §5.11 + HANDOFF + NEXT_SESSION:
+Після закриття спринту в FM §5.12 + HANDOFF + NEXT_SESSION:
 
-1. **`manifest.json`:** `revision++`, `updated_at` (ISO date), `last_sprint_closed` = PH-S*, `next_sprint` = наступний з §5.11.
+1. **`manifest.json`:** `revision++`, `updated_at` (ISO date), `last_sprint_closed` = PH-S*, `next_sprint` = наступний з §5.12.
 2. Додати/оновити **nodes** для змінених `docs/` і `src/` (поля `path`, `layer`, `sprints[]`, `sections[]` за потреби).
 3. Додати **edges** `concept-ref` | `implements` | `session-tracks` | `sprint-scope`.
 4. **`extensions.json`:** `active_sprint` = наступний; у `scopes` — `docs`, `code_globs`, `extensions`, `also_update` для закритого спринту.

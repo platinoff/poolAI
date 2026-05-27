@@ -1,56 +1,34 @@
-# Cursor Configuration Status Check
-## Оновлено: 2026-04-06
+# Cursor Configuration Status
 
-**Статус**: ✅ Конфігурація узгоджена з політикою «лише MSYS2 bash»; PowerShell-скриптів у `.cursor/` немає
+**Оновлено:** 2026-05-27
+
+**Статус:** ✅ VDT agent roles + §5.12 sync; slim `alwaysApply` (roles + VDT + runtime-stack)
 
 ---
 
-## 📋 Перевірка структури `.cursor/`
+## Always-on rules (~120 рядків сумарно)
 
-### ✅ Структура директорії
+- `poolai-agent-roles.mdc` — ролі, субагенти, §5.1 / §5.12
+- `virtual-development-team.mdc` — спринти, CI, staging
+- `runtime-stack-policy.mdc` — Rust, no Python
+
+## On-demand / globs
+
+- `poolai-session-iteration.mdc` — S0, MSYS2, commit
+- `git-commit-msys.mdc` — hook / Co-authored-by fix
+- `functionality-management.mdc`, `autonomous-orchestrator.mdc`, `docs-vision.mdc`
+
+## hooks.json
+
+`hooks: {}` — тести перед push вручну в MSYS2 ([`commands/git-push.md`](commands/git-push.md)).
+
+## Після змін у `.cursor/`
+
+```bash
+git add -f .cursor/rules/poolai-agent-roles.mdc .cursor/rules/virtual-development-team.mdc
+# … інші змінені шляхи під .cursor/
 ```
-.cursor/
-├── README.md                    ✅ Актуальний
-├── CHANGELOG.md                 ✅ Актуальний
-├── hooks.json                   ✅ version 1, `hooks`: {}
-├── rules/                       ✅ rust-architect, msys2-windows, тощо
-└── commands/                    ✅ check, test, git-push, …
-```
-
-(Каталог `hooks/` з `.ps1` **не** використовується — файл видалено 2026-04-06.)
 
 ---
 
-## ✅ Перевірка актуальності
-
-### 1. hooks.json
-- **Версія**: 1 ✅
-- **`hooks`**: порожній об’єкт — stop-hook **вимкнено** (перевірка тестів лише вручну в MSYS2 bash, див. `commands/git-push.md`, `commands/test.md`) ✅
-
-### 2. rules/rust.md
-- **Команди**: `cargo fmt`, `cargo clippy`, `cargo test` ✅
-- **Feature flags**: узгоджено з `Cargo.toml` ✅
-
-### 3. rules/project-structure.md
-- **Структура**: відповідає репо ✅
-- **Скрипти**: bash у `scripts/`, без нових `.ps1` ✅
-
-### 4. commands/
-- **git-push.md**: MSYS2 bash, `K8S_OPENAPI_ENABLED_VERSION`, `git add -f` для `.cursor/` ✅
-- **test.md**: CI parity у bash ✅
-
----
-
-## 📝 Рекомендації
-
-1. Локальні `cargo`/`git` — **зовнішній MSYS2 UCRT64** (див. `git-push.md`).
-2. Після змін у правилах — `git add -f .cursor/…` за потреби (частина шляхів під `.gitignore`).
-
----
-
-## ✅ Висновок
-
-Конфігурація `.cursor/` без PowerShell-хуків; тести перед push — за чеклістом у `git-push.md` / CI на GitHub.
-
-**Підготовлено**: Rust Architect  
-**Дата останнього зведення**: 2026-04-06
+**Наступна ітерація розробки:** `docs/development/NEXT_SESSION_PROMPT.md` (PH-S81+).

@@ -1,17 +1,19 @@
 # Check Command
 
-Run comprehensive code checks before committing.
+Run comprehensive code checks before committing (**MSYS2 bash**).
 
-Recommended sequence (run in **MSYS2 bash**):
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export K8S_OPENAPI_ENABLED_VERSION=1.28
+cd /s/rust/poolAI
+```
 
-1. `cargo fmt --all --check` (перевірка формату без змін)
-2. `cargo clippy --all-targets --all-features` (linting)
-3. `cargo check --all-targets --all-features` (компіляція)
-4. `cargo test --all-features` (повні тести)
-5. `cargo build --all-features` (збірка з features)
+Recommended sequence:
 
-If step `cargo fmt --all --check` fails:
-1. Run `cargo fmt --all`
-2. Re-run the checks from step 1.
+1. `cargo fmt --all --check` (or `cargo fmt --all` to fix)
+2. `cargo test-ci` (канон PoolAI; `.cargo/config.toml`)
+3. After API changes: `cargo run --bin poolai-openapi-gap-audit` (expect **0** missing)
+4. Optional: `cargo clippy --all-targets --all-features` (CI parity)
+5. After `src/ui/` or `e2e/`: `cd e2e && npm run test:ci`
 
 Return summary of results.

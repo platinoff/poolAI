@@ -20,6 +20,7 @@
 
 All project rules are organized in `.cursor/rules/`:
 
+- **`poolai-agent-roles.mdc`** - 👥 VDT ролі + субагенти + §5.1/§5.12 (always on)
 - **`runtime-stack-policy.mdc`** - ⛔ Rust-only runtime; block Python proposals (always on)
 - **`chat-context.md`** - 🧭 Стартовий контекст чату (при «налаштуйся» / подальша робота)
 - **`rust-architect.md`** - ⭐ Rust Architect workflow and concept file usage (READ FIRST)

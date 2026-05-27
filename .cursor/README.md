@@ -1,53 +1,32 @@
-# Cursor Agent Configuration
+# Cursor Agent Configuration (PoolAI)
 
-This directory contains configuration for Cursor's AI coding agent, following best practices from [Cursor's agent guide](https://cursor.com/blog/agent-best-practices).
+**Оновлено:** 2026-05-27
 
-## Structure
+## Rules (`rules/`)
 
-- `rules/` - Static context that applies to every conversation
-  - `runtime-stack-policy.mdc` - **alwaysApply:** Rust primary; no Python runtime
-  - `rust.md` - Rust coding standards and patterns
-  - `project-structure.md` - Project organization rules
-  - `documentation.md` - Docs layout, **canonical steps 1–11**, `docs/catalog/` digest; see also repo **`docs/STRUCTURE.md`**
-- `skills/` - Project Agent Skills (optional; discoverable in Cursor)
-  - `poolai-documentation/SKILL.md` - Documentation map + functionality digest (`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`)
-- `commands/` - Reusable workflows triggered with `/` in agent input
-  - `check.md` - Run comprehensive code checks
-  - `test.md` - Run tests
-  - `review.md` - Review code changes
-  - `fix-issue.md` - Fix a GitHub issue
-  - `pr.md` - Create a pull request
-- `plans/` - Saved implementation plans (created via Plan Mode)
-- `hooks.json` - Agent hooks (за замовчуванням порожній об’єкт `hooks`; без PowerShell-скриптів)
+| Файл | `alwaysApply` | Призначення |
+|------|---------------|-------------|
+| [`poolai-agent-roles.mdc`](rules/poolai-agent-roles.mdc) | ✅ | Ролі людини / оркестратора / субагентів; FM §5.1 vs §5.12 |
+| [`virtual-development-team.mdc`](rules/virtual-development-team.mdc) | ✅ | VDT: спринти, локальний CI, staging |
+| [`runtime-stack-policy.mdc`](rules/runtime-stack-policy.mdc) | ✅ | Rust-only; без Python |
+| [`poolai-session-iteration.mdc`](rules/poolai-session-iteration.mdc) | globs | S0, MSYS2, commit/push |
+| [`git-commit-msys.mdc`](rules/git-commit-msys.mdc) | globs | Hook, `amend-head-msg.sh` |
+| [`functionality-management.mdc`](rules/functionality-management.mdc) | on-demand | FM-менеджер |
+| [`autonomous-orchestrator.mdc`](rules/autonomous-orchestrator.mdc) | on-demand | AUTO_RUN |
+| [`docs-vision.mdc`](rules/docs-vision.mdc) | globs | `docs/vision/` sync |
 
-## Usage
+Повний список legacy `.md` — [`rules/.cursorrules`](rules/.cursorrules).
 
-### Rules
-Rules are automatically included in every agent conversation. They provide persistent instructions about:
-- Commands to run
-- Code patterns to follow
-- Pointers to canonical examples
+## Commands (`commands/`)
 
-### Commands
-Invoke commands with `/` prefix:
-- `/check` - Run cargo fmt, clippy, check, and test
-- `/test` - Run tests
-- `/review` - Review code changes
-- `/fix-issue <number>` - Fix a GitHub issue
-- `/pr` - Create a pull request
+- [`git-push.md`](commands/git-push.md) — MSYS2 commit + push (канон)
+- [`check.md`](commands/check.md) — `cargo test-ci` parity
+- [`test.md`](commands/test.md), [`review.md`](commands/review.md), [`pr.md`](commands/pr.md)
 
-### Plans
-Use Plan Mode (Shift+Tab) for complex features. Plans are saved here for:
-- Team documentation
-- Resuming interrupted work
-- Context for future agents
+## Skills
 
-## Best Practices
+- [`skills/poolai-documentation/SKILL.md`](skills/poolai-documentation/SKILL.md) — docs map 1–12
 
-1. **Start with plans** - Use Plan Mode for complex features
-2. **Let the agent find context** - Don't manually tag every file
-3. **Start new conversations** - When moving to different tasks
-4. **Use rules sparingly** - Only add rules when agent makes repeated mistakes
-5. **Review carefully** - AI-generated code needs review
+## Ітераційна сесія
 
-See [Cursor's agent best practices](https://cursor.com/blog/agent-best-practices) for more details.
+Старт: [`docs/development/NEXT_SESSION_PROMPT.md`](../docs/development/NEXT_SESSION_PROMPT.md) (copy-paste блок).

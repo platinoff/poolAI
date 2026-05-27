@@ -22,7 +22,9 @@
 | **Авторозробка (оркестратор)** | `docs/development/AUTO_RUN_SESSION_2026_POST_HORIZON.md` |
 | **Стек / no Python** | `.cursor/rules/runtime-stack-policy.mdc` |
 | **Патерни для автопрогону** | `docs/development/AUTO_DEV_PATTERNS.md` |
-| **FM / беклог (крок 12)** | `docs/catalog/FUNCTION_MANAGEMENT.md` §5.1 |
+| **FM / беклог (крок 12)** | `docs/catalog/FUNCTION_MANAGEMENT.md` §5.1 (FM-*) · §5.12 (PH-S*) |
+| **Промпт сесії** | `docs/development/NEXT_SESSION_PROMPT.md` |
+| **Ролі агентів** | `.cursor/rules/poolai-agent-roles.mdc` |
 | **Концепт (PRIMARY)** | `docs/concept/poolAI_concept_root.txt` |
 | **Статус** | `docs/status/STABLE_STATE_SUMMARY.md` |
 | **Architect-план** | `docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md` |
@@ -57,8 +59,8 @@
 
 ## Поточний стан і далі
 
-- **Post-Horizon:** FM-020…031 ✅; **наступна розробка:** **FM-032** (OpenAPI VM network) → FM-033…042 (§5.1 FM).  
-- **Ops BLOCKED:** FM-003 §4 LAN (2 хости). **Черга:** `FUNCTION_MANAGEMENT.md` §5.1, `NEXT_SESSION_PROMPT.md`.  
+- **Post-Horizon / Galaxy:** PH-S65+ ✅; **черга:** FM §5.12 (PH-S81…S89 відкриті).
+- **Ops BLOCKED:** FM-003 §4 LAN (2 хости). **Старт сесії:** `NEXT_SESSION_PROMPT.md` + HANDOFF.
 - **Тести (канон):** `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci` (не повний `cargo test` з doctests на Windows без потреби).  
 - **Не робити:** Python / `.py` у репо (0 файлів); OpenAPI audit — `cargo run --bin poolai-openapi-gap-audit`.  
 - **Пріоритети:** `FUNCTION_MANAGEMENT.md` §5.1 → Architect → HANDOFF.

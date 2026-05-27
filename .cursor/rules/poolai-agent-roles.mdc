@@ -1,0 +1,45 @@
+---
+description: PoolAI VDT — ролі людини, оркестратора та субагентів Cursor (завжди)
+alwaysApply: true
+---
+
+# Ролі агентів (PoolAI VDT)
+
+Застосовується на **кожній** ітераційній сесії разом з [`virtual-development-team.mdc`](virtual-development-team.mdc), [`runtime-stack-policy.mdc`](runtime-stack-policy.mdc), [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc).
+
+## Ролі
+
+| Роль | Хто | Відповідальність |
+|------|-----|------------------|
+| **Власник / креативний директор** | Людина | Візія, пріоритети, BLOCKED/Deferred, фінальний push за бажанням |
+| **Оркестратор** | Головний агент Cursor (Composer) | Один **PH-S*** за сесію, архітектура Rust, локальний CI, FM/HANDOFF/NEXT_SESSION, commit scope |
+| **Субагенти** | Task tool | Вузькі підзадачі; результат повертається оркестратору |
+
+## Субагенти Cursor (коли делегувати)
+
+| `subagent_type` | Коли |
+|-----------------|------|
+| `explore` | Пошук у `docs/`, `rg` по FM/PH-S*, карта маршрутів без повного читання репо |
+| `shell` | MSYS2: `cargo test-ci`, `git fetch`, один бенч, изольована команда |
+| `generalPurpose` | Один модуль / один FM з чіткими acceptance criteria |
+| `ci-investigator` | Розбір одного failed CI check (довідково, не блокує локальний канон) |
+| `cursor-guide` | Питання про Cursor IDE/CLI — не про код PoolAI |
+
+**Не делегувати оркестратору:** фінальний `git push`, закриття спринту в FM §5.12, оновлення `NEXT_SESSION_PROMPT.md`, amend після push.
+
+## Канон черги (FM)
+
+| Розділ FM | Зміст |
+|-----------|--------|
+| **§5.1** | Порядок **FM-*** (функціональні тікети) |
+| **§5.12** | Черга **PH-S*** (спринти; ≤10 відкритих) |
+| **HANDOFF** + **NEXT_SESSION_PROMPT** | Операційний зріз і copy-paste промпт сесії |
+
+**Ітераційна розробка:** промпт з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) → один **PH-S*** з §5.12.
+
+**AUTO_RUN:** лише за явним запитом або [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — не підміняє §5.12.
+
+## Поза чергою
+
+- **BLOCKED:** PH-S35 / PH-S16 / PH-S02 (LAN, 2 хости)
+- **Deferred:** PH-S36 / PH-S01 / PH-S15 (Cloud SDK, FM-041)

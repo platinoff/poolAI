@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S80 ✅ pricing oracle L3 hard stop; §5.12 PH-S81 відкрито) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S90 ✅ Cursor VDT agent roles; §5.12 PH-S81 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -49,6 +49,7 @@
 **PH-S76 ✅ (docs):** `docs/security/SECURITY_HARDENING.md` — added concise operator actions pointer for signed release advisories (`CVE-*`, `key_transition`, `protocol_sunset`) with canonical links to Galaxy §9.2/§9.3/§9.6 and dependency advisory flow.
 **PH-S77 ✅ (docs):** `docs/security/SECURITY_HARDENING.md` + `DEPENDENCY_SECURITY.md` — single Galaxy §9.2/§9.3/§9.6 canonical pointer hub; deduplicated PH-S71–S76 link blocks; bidirectional DEPENDENCY_SECURITY ↔ hub cross-link.
 **PH-S80 ✅ (code):** `galaxy_pricing_oracle::try_quote` L3 (`GalaxyPricingUnavailable`); `GET /api/v1/grid/pricing` → HTTP 503 `pricing_unavailable` when no L1 cache and no L2 fallback; OpenAPI 503; unit tests.
+**PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
 **Черга:** §5.12 **PH-S81** (9 відкритих); наступний sprint — **PH-S81** (pricing oracle FORCE_FALLBACK env wire).
 
 ## 1. Канонічний порядок документації та планів

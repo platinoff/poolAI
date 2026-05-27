@@ -1,0 +1,37 @@
+---
+description: PoolAI — git commit у MSYS2 (hook, Co-authored-by, amend-head-msg)
+globs: .cursor/commands/git-push.md
+alwaysApply: false
+---
+
+# Git commit (MSYS2)
+
+## Канон
+
+[`.cursor/commands/git-push.md`](../commands/git-push.md) — push лише зовнішній MSYS2 UCRT64.
+
+## Hook ламає subject
+
+Якщо `git log -1 --format=%B` показує лише `Co-authored-by:` без subject:
+
+```bash
+export GIT_EDITOR=true EDITOR=true
+git commit -m "type(scope): subject" -m "Summary:" -m "- …"
+```
+
+Або після невдалого commit:
+
+```bash
+bash bin/amend-head-msg.sh .commit-msg-<sprint>.txt
+```
+
+(`commit-tree` — обходить commit-msg hook.)
+
+## Перед push
+
+```bash
+git log -1 --format=%B
+git diff --cached --stat   # лише scope спринту
+```
+
+**Не** `git commit --amend` після push без явного запиту людини.
