@@ -57,12 +57,12 @@ worker    = gross − primary − secondary
 
 ### 1.3 Telegram-клієнт (mining worker edge)
 
-- Telegram-користувач підключає свої гаманці для винагороди в UI/аплікації (через tgbot).
+- Telegram-користувач підключає **payout wallet** (Solana pubkey) для винагороди — у чаті через tgbot або linked UI (§3.2).
 - Якщо в каналі підключені Telegram worker’и, то сукупна винагорода майнінгу розподіляється так:
   - primary dev fee = 0.1% завжди;
   - secondary fee (встановлена адміном srvN) — переходить адмінам srvN;
-  - решта винагороди — Telegram edge worker’у (або власнику worker-посесії).
-- Ліміт Telegram worker’ів для srvN: **не більше кількості worker-сеатів на каналі Telegram** (точну формулу seat’ів потрібно формалізувати в окремому документі).
+  - решта винагороди — на **payout wallet** власника активного seat/session (після `galaxy_fee_split`).
+- **Seat cap:** одночасно активних `origin=telegram_edge` worker’ів для `(srv_id, telegram_chat_id)` не більше **`seat_limit`** (§3.1).
 
 ### 1.4 Клієнт ШІ (споживач інференсу)
 
@@ -94,7 +94,7 @@ Worker’и мають:
 
 1. **Auto-pick** (залежно від навантаження srvN та/або власної внутрішньої метрики worker’а).
 2. **Manual cap**: адміністратор може задати, скільки ресурсів worker реально віддає гріду.
-3. **Telegram edge cap**: обмеження кількістю seats у Telegram каналі.
+3. **Telegram edge cap**: `active_telegram_edge_workers ≤ seat_limit` (§3.1; політика seats задається адміном каналу).
 
 Для CPU/GPU worker’ів авто-розкладка може відрізнятись, але контракт має бути однаковим: “скільки capacity доступно зараз”.
 
@@ -157,7 +157,111 @@ Telegram worker (desktop Win/Linux/Mac) має працювати як:
 - worker-агент в ізоляції (VM/containment під контролем PoolAI VM/Isolation layer);
 - з probros до ресурсів host’а (GPU пізніше, наразі CPU/RAM/Disk у режимі “cold mining” або без GPU passthrough).
 
-Усі параметри mining worker’а (wallets, винагорода, primary/secondary fee split) мають керуватись **всередині Telegram чату**, а tgbot — виступає керувальним оркестратором зв’язування.
+Усі параметри mining worker’а (payout wallet, seat, винагорода, fee split) мають керуватись **всередині Telegram чату**; tgbot — оркестратор UX і викликів coordinator API.
+
+### 3.1 Worker seats (PH-S60, canonical)
+
+**Seat** — право тримати **одного** одночасно активного `telegram_edge` worker’а в межах `(srv_id, telegram_chat_id)`.
+
+Три пов’язані, але **різні** лічильники (не плутати):
+
+| Поняття | Що рахує | Роль у Galaxy Grid |
+|---------|----------|-------------------|
+| **Channel members** | учасники Telegram-чату/каналу | верхня «соціальна» межа; lurker не споживає seat |
+| **Bound wallet** | унікальний `payout_pubkey`, прив’язаний до `telegram_user_id` у чаті | **білінгова ідентичність** для settlement |
+| **Active session** | worker з `origin=telegram_edge`, heartbeat OK, lease допускає job | **runtime** споживач seat |
+
+**Рекомендована політика (default `bound_wallet_session`):**
+
+```
+seat_limit = min(admin_max_seats, bound_wallets_count_in_chat)
+active_telegram_edge_workers ≤ seat_limit
+```
+
+- `admin_max_seats` — конфіг адміна srvN на канал (наприклад 10, 50, 100).
+- `bound_wallets_count_in_chat` — кількість **verified** payout wallets у scope чату (не всі members).
+- **1 bound wallet → 1 seat** у default policy (один користувач не тримає два concurrent edge worker’и на той самий payout).
+
+**Альтернативні політики** (адмін обирає на канал):
+
+| Policy ID | `seat_limit` | Коли використовувати |
+|-----------|--------------|----------------------|
+| `member_cap` | `min(admin_max_seats, member_count)` | простий MVP; слабкий anti-abuse |
+| `bound_wallet_cap` | `min(admin_max_seats, bound_wallets_count)` | **рекомендовано** для mining/payout |
+| `session_cap` | `admin_max_seats` (лише runtime) | коли wallets ще не зібрані; лише ліміт одночасних процесів |
+
+**Admission при перевищенні:** новий register/heartbeat `telegram_edge` → `409 seat_exhausted` (концепт); tgbot показує *«Усі seats зайняті; від’єднайте worker або збільште ліміт у адміна.»*
+
+**Wire sketch (coordinator state, концепт):**
+
+```json
+{
+  "srv_id": "srv_eu_1",
+  "telegram_chat_id": "-1001234567890",
+  "seat_policy": "bound_wallet_session",
+  "admin_max_seats": 32,
+  "bound_wallets_count": 12,
+  "seat_limit": 12,
+  "active_telegram_edge_workers": 5
+}
+```
+
+### 3.2 Wallet binding flow (PH-S60, minimal)
+
+Мета: зв’язати **`telegram_user_id` → `peer_id` (worker) → `payout_pubkey` (settlement)** у чаті, без окремого web-only onboarding.
+
+**Існуючий код (FM-016+):**
+
+- `POST /api/v1/virtual-nodes/telegram/bind` — `{ telegram_user_id, peer_id, chat_id? }` → `TelegramBinding` (`src/services/virtual_node_telegram_binding_service.rs`).
+- `poolai-worker` з `POOLAI_TELEGRAM_ID` викликає bind після register.
+- Discovery register може передати `metadata.telegram_id` / `telegram_chat_id`.
+
+**Розширення концепту (наступні спринти, не PH-S60 code):** `POST /api/v1/virtual-nodes/telegram/wallet` — `{ telegram_user_id, chat_id, payout_pubkey, chain: "solana" }`.
+
+#### Кроки UX (мінімальний flow)
+
+```mermaid
+sequenceDiagram
+  participant U as Telegram user
+  participant B as tgbot
+  participant C as Coordinator srvN
+  participant W as poolai-worker edge
+
+  U->>B: /start або Connect mining
+  B->>U: Підтвердити Telegram (OAuth/widget)
+  U->>B: Надіслати payout pubkey
+  B->>C: wallet bind (concept) + seat check
+  U->>W: Запустити worker
+  W->>C: discovery register + telegram/bind
+  C->>B: seat OK / seat_exhausted
+  B->>U: Mining ON
+```
+
+| Крок | Дія | Результат |
+|------|-----|-----------|
+| 1 | Користувач у **каналі srvN** → `/start` або inline **Connect mining** | `chat_id` + `telegram_user_id` відомі боту |
+| 2 | **Verify identity** — Telegram Login Widget / OAuth (`oauth2_telegram_*`) або trusted `from.id` у webhook | `telegram_user_id` підтверджено |
+| 3 | **Bind payout wallet** — pubkey (base58) або Connect wallet | `payout_pubkey` per `(srv_id, chat_id, telegram_user_id)` |
+| 4 | **Seat pre-check** — `bound_wallets_count < seat_limit` | інакше stop + повідомлення в чаті |
+| 5 | Запуск **edge worker** (`poolai-worker`, `POOLAI_TELEGRAM_ID`, `POOLAI_COORDINATOR_URL`) | register → `POST .../telegram/bind` |
+| 6 | Coordinator: `origin=telegram_edge`; fee split §1.2.1 | винагорода → `payout_pubkey` |
+
+**Правила безпеки (концепт):**
+
+- Pubkey **не** приймається з неверифікованого `from.id` у публічних групах без кроку 2.
+- Зміна `payout_pubkey` — re-verify + cooldown (наприклад 24h) або admin override.
+- Один `telegram_user_id` — один активний `peer_id` bind (re-bind перезаписує, старий peer offline).
+
+**tgbot команди (концепт):**
+
+| Команда | Дія |
+|---------|-----|
+| `/start` | welcome + seat policy hint |
+| `/wallet <pubkey>` | bind payout (після verify) |
+| `/status` | seat_limit, active workers, bound wallet |
+| `/stop` | unbind + graceful worker stop hint |
+
+**Env (worker, наявне):** `POOLAI_TELEGRAM_ID`, `POOLAI_COORDINATOR_URL` — див. `HANDOFF` §2a.
 
 ## 4. Grid scheduling, re-migration та pricing
 
@@ -395,11 +499,10 @@ On-chain події потрібні, коли вони:
 
 ## 8. Відкриті питання (TBD)
 
-1. **Telegram seats**: що саме лімітує кількість worker’ів (members, wallets, concurrent sessions).
-2. **Network_profile contract**: набір метрик, формат зберігання і як SmallWorld їх споживає.
-3. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
-4. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
-5. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
+1. **Network_profile contract**: набір метрик, формат зберігання і як SmallWorld їх споживає.
+2. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
+3. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
+4. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
 
-> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle unit/TTL/fallback (§4.2).
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind flow (§3.1–3.2).
 

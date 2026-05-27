@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 (PH-S59 ✅ Galaxy Grid pricing oracle concept · §5.11 PH-S60…S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-26 (PH-S60 ✅ Galaxy Grid Telegram seats + wallet bind · §5.11 PH-S61…S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -26,9 +26,10 @@
 **PH-S57 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` — unified worker DTO sketch (`origin`, `admin_id`, `capabilities`, `network_profile`, `limits`) + UI правила badges/filter/sort для local/cloud/telegram.
 **PH-S58 ✅:** `src/grid/galaxy_fee_split.rs` — primary 0.1% + secondary 1–5% payout (lamports, floor bps), UX hint constant, unit tests; `cargo bench --bench galaxy_fee_split_benchmarks`.
 **PH-S59 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §4.2 — pricing oracle: unit keys (tokens/GPU-sec/job flat), `floor(market_min×0.9)` US providers, cache TTL/SWR, L1–L3 fallback + ops env (`POOLAI_GALAXY_PRICE_*`).
-**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (ролі dev/admin/Telegram/AI клієнт, fee split, pricing oracle, Telegram bridge, lease/re-migrate, unified worker DTO, locality seeds).
+**PH-S60 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §3.1–3.2 — Telegram seats (`member_cap` / `bound_wallet_cap` / `session_cap`), `seat_limit`, wallet bind flow; ref `POST /api/v1/virtual-nodes/telegram/bind` (FM-016+).
+**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (ролі, fee split, pricing oracle, Telegram seats/wallets, lease/re-migrate, worker DTO, locality seeds).
 
-**Черга:** §5.11 **PH-S60…S64** (5 відкритих); наступний код — **PH-S60**.
+**Черга:** §5.11 **PH-S61…S64** (4 відкриті); наступний код — **PH-S61**.
 
 ## 1. Канонічний порядок документації та планів
 
