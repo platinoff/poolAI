@@ -14,7 +14,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_pricing_oracle::{
-    record_l1_stale_served, CacheFreshness, GalaxyPriceUnitKey, GalaxyPricingCacheKey,
+    cache_metadata, record_l1_stale_served, CacheFreshness, GalaxyPriceUnitKey,
+    GalaxyPricingCacheEntry, GalaxyPricingCacheKey, GalaxyPricingCacheMetadata,
     GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingQuote, MockProviderQuote,
     PRICING_UNAVAILABLE_ERROR_CODE,
 };
@@ -105,6 +106,9 @@ struct GridPricingSnapshotResponse {
     source: GridPricingSnapshotSource,
     freshness: GridPricingSnapshotFreshness,
     snapshot: GridPricingSnapshot,
+    /// L1 TTL windows when `source` is `cache` (PH-S89); omitted for oracle/L2 paths.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    l1_cache: Option<GalaxyPricingCacheMetadata>,
 }
 
 fn pricing_oracle() -> &'static Mutex<GalaxyPricingOracle> {
@@ -148,6 +152,25 @@ fn freshness_to_response(f: CacheFreshness) -> Option<GridPricingSnapshotFreshne
     }
 }
 
+fn cache_hit_response(
+    entry: GalaxyPricingCacheEntry,
+    freshness: CacheFreshness,
+    config: &GalaxyPricingConfig,
+    now_secs: u64,
+) -> GridPricingSnapshotResponse {
+    if freshness == CacheFreshness::Stale {
+        record_l1_stale_served(entry.quote.unit_key);
+    }
+    let l1_cache = Some(cache_metadata(now_secs, entry.quote.cached_at_secs, config));
+    GridPricingSnapshotResponse {
+        ok: true,
+        source: GridPricingSnapshotSource::Cache,
+        freshness: freshness_to_response(freshness).expect("fresh or stale"),
+        snapshot: snapshot_from_quote(entry.quote),
+        l1_cache,
+    }
+}
+
 async fn get_grid_pricing_snapshot(
     State(_ctx): State<ApiContext>,
     Query(query): Query<GridPricingSnapshotQuery>,
@@ -174,21 +197,11 @@ async fn get_grid_pricing_snapshot(
         } else {
             true
         };
-        if serve_cached {
-            if freshness == CacheFreshness::Stale {
-                record_l1_stale_served(entry.quote.unit_key);
-            }
-            if let Some(freshness) = freshness_to_response(freshness) {
-                return Ok((
-                    StatusCode::OK,
-                    Json(GridPricingSnapshotResponse {
-                        ok: true,
-                        source: GridPricingSnapshotSource::Cache,
-                        freshness,
-                        snapshot: snapshot_from_quote(entry.quote),
-                    }),
-                ));
-            }
+        if serve_cached && freshness_to_response(freshness).is_some() {
+            return Ok((
+                StatusCode::OK,
+                Json(cache_hit_response(entry, freshness, oracle.config(), now)),
+            ));
         }
     }
 
@@ -208,6 +221,7 @@ async fn get_grid_pricing_snapshot(
             source: GridPricingSnapshotSource::Oracle,
             freshness: GridPricingSnapshotFreshness::Fresh,
             snapshot: snapshot_from_quote(quote),
+            l1_cache: None,
         }),
     ))
 }
@@ -321,6 +335,75 @@ mod tests {
          .0;
         assert!(matches!(second.source, GridPricingSnapshotSource::Cache));
         assert_eq!(second.snapshot.poolai_quote_usd_micro, 470_000);
+        let meta = second.l1_cache.expect("L1 cache metadata on cache hit");
+        assert_eq!(meta.cache_ttl_secs, 300);
+        assert_eq!(meta.max_stale_secs, 3600);
+    }
+
+    #[tokio::test]
+    async fn grid_pricing_snapshot_l1_cache_metadata_fresh_vs_stale() {
+        let _lock = pricing_test_lock();
+        reset_oracle(false, None);
+        let model = "l1-metadata-test";
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: model.into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        let wall_now = now_secs().expect("clock");
+        let cached_at = wall_now.saturating_sub(500);
+        let providers = [MockProviderQuote {
+            provider_id: "openai_us",
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+            usd_micro: 500_000,
+            healthy: true,
+        }];
+        {
+            let mut guard = pricing_oracle().lock().expect("pricing oracle lock");
+            guard
+                .refresh_from_providers(cached_at, key.clone(), &providers)
+                .expect("seed cache");
+        }
+
+        let stale = get_grid_pricing_snapshot(
+            State(ApiContext::default()),
+            Query(query("inference_blended_token", model)),
+        )
+        .await
+        .expect("stale cache snapshot")
+        .1
+         .0;
+        assert!(matches!(
+            stale.freshness,
+            GridPricingSnapshotFreshness::Stale
+        ));
+        let stale_meta = stale.l1_cache.expect("stale metadata");
+        assert!(stale_meta.cache_age_secs >= 500);
+        assert!(stale_meta.cache_age_secs > stale_meta.cache_ttl_secs);
+        assert_eq!(stale_meta.cache_fresh_until_secs, cached_at + 300);
+
+        let fresh_cached_at = wall_now.saturating_sub(60);
+        {
+            let mut guard = pricing_oracle().lock().expect("pricing oracle lock");
+            guard
+                .refresh_from_providers(fresh_cached_at, key, &providers)
+                .expect("fresh seed");
+        }
+        let fresh = get_grid_pricing_snapshot(
+            State(ApiContext::default()),
+            Query(query("inference_blended_token", model)),
+        )
+        .await
+        .expect("fresh cache snapshot")
+        .1
+         .0;
+        assert!(matches!(
+            fresh.freshness,
+            GridPricingSnapshotFreshness::Fresh
+        ));
+        let fresh_meta = fresh.l1_cache.expect("fresh metadata");
+        assert!(fresh_meta.cache_age_secs <= fresh_meta.cache_ttl_secs);
+        assert!(fresh_meta.cache_stale_until_secs > wall_now);
     }
 
     #[tokio::test]

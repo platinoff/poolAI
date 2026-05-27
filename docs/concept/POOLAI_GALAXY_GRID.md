@@ -363,7 +363,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 | Handler | `src/network/api/grid.rs` (`get_grid_pricing_snapshot`) |
 | OpenAPI | [`docs/openapi.yaml`](../openapi.yaml) — `GET /grid/pricing` |
 | Admin UI | `GET /ui/admin/grid-pricing` — [`src/ui/admin/grid_pricing.rs`](../../src/ui/admin/grid_pricing.rs) (PH-S82) |
-| `200` | `source`: `cache` \| `oracle`; `freshness`: `fresh` \| `stale` (L1 SWR) |
+| `200` | `source`: `cache` \| `oracle`; `freshness`: `fresh` \| `stale` (L1 SWR); `l1_cache` TTL metadata (`cache_age_secs`, `cache_fresh_until_secs`, …) when `source=cache` (PH-S89) |
 | `503` | `pricing_unavailable` — L3 hard stop, немає L1 і L2 (PH-S80) |
 | L2-only ops | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` (PH-S81) |
 | Stale metric | `galaxy_pricing_stale_served` на L1 stale path (PH-S83) |
@@ -396,6 +396,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 
 - Логи: `pricing_oracle_refresh_ok`, `pricing_oracle_refresh_fail`, `pricing_oracle_stale_served`, `pricing_oracle_outage`.
 - Метрики (реалізовано): `galaxy_pricing_stale_served` (PH-S83), `galaxy_pricing_forced_fallback_total` (PH-S81).
+- API metadata (PH-S89): `GET /api/v1/grid/pricing` → `l1_cache` on L1 hits (`cache_age_secs`, `cache_ttl_secs`, `max_stale_secs`, fresh/stale until timestamps).
 - Метрики (Prometheus, майбутнє): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 

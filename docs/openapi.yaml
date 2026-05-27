@@ -5511,6 +5511,40 @@ components:
           format: int64
           minimum: 0
 
+    GridPricingCacheMetadata:
+      type: object
+      description: L1 cache TTL metadata when source is cache (PH-S89).
+      required:
+        - cache_age_secs
+        - cache_ttl_secs
+        - max_stale_secs
+        - cache_fresh_until_secs
+        - cache_stale_until_secs
+      properties:
+        cache_age_secs:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Seconds since cached_at_secs at serve time.
+        cache_ttl_secs:
+          type: integer
+          format: int64
+          minimum: 0
+        max_stale_secs:
+          type: integer
+          format: int64
+          minimum: 0
+        cache_fresh_until_secs:
+          type: integer
+          format: int64
+          minimum: 0
+          description: cached_at_secs + cache_ttl_secs
+        cache_stale_until_secs:
+          type: integer
+          format: int64
+          minimum: 0
+          description: cached_at_secs + max_stale_secs (SWR upper bound)
+
     GridPricingSnapshotResponse:
       type: object
       required:
@@ -5527,6 +5561,9 @@ components:
           $ref: '#/components/schemas/GridPricingSnapshotFreshness'
         snapshot:
           $ref: '#/components/schemas/GridPricingSnapshot'
+        l1_cache:
+          $ref: '#/components/schemas/GridPricingCacheMetadata'
+          description: Present when source is cache; omitted for oracle/L2 paths.
 
     MemoryShardRef:
       type: object

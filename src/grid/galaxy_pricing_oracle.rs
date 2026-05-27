@@ -1,6 +1,7 @@
 //! Galaxy Grid pricing oracle stub (PH-S68): unit keys, `floor(market_min×0.9)` quote,
 //! cache TTL/SWR from `POOLAI_GALAXY_PRICE_*` env; L2 force-fallback ops wire (PH-S81);
-//! L1 stale-served metric (PH-S83). See `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.
+//! L1 stale-served metric (PH-S83); L1 cache TTL metadata (PH-S89).
+//! See `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.
 //!
 //! Oracle determines **gross quote** in micro-USD; settlement uses `galaxy_fee_split`.
 
@@ -282,6 +283,35 @@ pub enum CacheFreshness {
     Expired,
 }
 
+/// L1 cache TTL metadata for API/ops (§4.2.3, PH-S89).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GalaxyPricingCacheMetadata {
+    /// `now_secs - cached_at_secs`
+    pub cache_age_secs: u64,
+    pub cache_ttl_secs: u64,
+    pub max_stale_secs: u64,
+    /// `cached_at_secs + cache_ttl_secs`
+    pub cache_fresh_until_secs: u64,
+    /// `cached_at_secs + max_stale_secs` (SWR upper bound)
+    pub cache_stale_until_secs: u64,
+}
+
+/// Build TTL metadata for an L1 cache hit (pairs with [`cache_freshness`]).
+pub fn cache_metadata(
+    now_secs: u64,
+    cached_at_secs: u64,
+    config: &GalaxyPricingConfig,
+) -> GalaxyPricingCacheMetadata {
+    let cache_age_secs = now_secs.saturating_sub(cached_at_secs);
+    GalaxyPricingCacheMetadata {
+        cache_age_secs,
+        cache_ttl_secs: config.cache_ttl_secs,
+        max_stale_secs: config.max_stale_secs,
+        cache_fresh_until_secs: cached_at_secs.saturating_add(config.cache_ttl_secs),
+        cache_stale_until_secs: cached_at_secs.saturating_add(config.max_stale_secs),
+    }
+}
+
 /// Classify cache entry age (pure; inject `now_secs` in tests).
 pub fn cache_freshness(
     now_secs: u64,
@@ -497,6 +527,31 @@ mod tests {
         assert_eq!(min, 500_000);
         assert_eq!(id, "openai_us");
         assert!(market_min_usd_micro(&providers, GalaxyPriceUnitKey::GpuSecond).is_none());
+    }
+
+    #[test]
+    fn cache_metadata_fresh_vs_stale_windows() {
+        let config = GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        };
+        let cached_at = 1_000u64;
+        let fresh_meta = cache_metadata(cached_at + 100, cached_at, &config);
+        assert_eq!(fresh_meta.cache_age_secs, 100);
+        assert_eq!(fresh_meta.cache_fresh_until_secs, 1_300);
+        assert_eq!(fresh_meta.cache_stale_until_secs, 4_600);
+        assert_eq!(
+            cache_freshness(cached_at + 100, cached_at, 300, 3600),
+            CacheFreshness::Fresh
+        );
+
+        let stale_meta = cache_metadata(cached_at + 500, cached_at, &config);
+        assert_eq!(stale_meta.cache_age_secs, 500);
+        assert_eq!(
+            cache_freshness(cached_at + 500, cached_at, 300, 3600),
+            CacheFreshness::Stale
+        );
     }
 
     #[test]
