@@ -1,6 +1,6 @@
 # Структура та таксономія документації PoolAI
 
-**Оновлено:** 2026-05-26 (§5.11 — 10 спринтів PH-S55…S64; Galaxy Grid concept)  
+**Оновлено:** 2026-05-27 (PH-S64 — Galaxy Grid у canonical pointers; §5.11 S55–S64 закрито)  
 **Джерело правди для порядку читання:** кроки **1–12** у кореневому [`README.md`](../README.md), [`docs/README.md`](./README.md) та [`INDEX_2026-03-17.md`](./INDEX_2026-03-17.md). **Legacy / stale плани:** [`development/DOCS_LEGACY_AUDIT_2026-05-19.md`](./development/DOCS_LEGACY_AUDIT_2026-05-19.md).
 
 ---
@@ -33,7 +33,7 @@ docs/
 ├── openapi.yaml           # OpenAPI (може відставати від коду)
 │
 ├── catalog/               # Зведення / дайджести / керування функціями (не плани й не статус)
-├── concept/               # Бачення продукту, Grid/Memory тощо
+├── concept/               # Бачення продукту; **Galaxy Grid** — `POOLAI_GALAXY_GRID.md` (федерація srvN, PH-S55–S63)
 ├── development/           # Плани, Architect, концепти протоколів (розробка)
 ├── status/               # Зрізи стану, стабільність, відсотки
 ├── performance/          # BENCHMARKS, PROFILING, TUNING

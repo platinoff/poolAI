@@ -1,8 +1,8 @@
 {
-  "revision": 3,
+  "revision": 4,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S63",
-  "next_sprint": "PH-S64",
+  "last_sprint_closed": "PH-S64",
+  "next_sprint": "PH-S65",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -16,7 +16,7 @@
       "path": "docs/concept/POOLAI_GALAXY_GRID.md",
       "layer": "L0",
       "sections": ["1-3 roles", "4 scheduling", "5 locality", "6 verify", "9 governance"],
-      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S58", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63"]
+      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S58", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63", "PH-S64"]
     },
     {
       "id": "memory_layer",

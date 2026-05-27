@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S63 ✅ Galaxy Grid governance concept · §5.11 PH-S64; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S64 ✅ Galaxy Grid docs sync · §5.11 S55–S64 закрито · §5.12 research; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -253,9 +253,23 @@ FM-xxx (з таблиці нижче)
 | 7 | **PH-S61** | Seeds/locality: placement + prefetch RAM/VRAM policy (концепт) | Memory layer + SmallWorld | locality_score, telemetry table, hot tiers L0–L3, task-driven prefetch + ops env | **✅** |
 | 8 | **PH-S62** | Edge verification baseline (концепт) | Galaxy | trust tiers, sampling/replay/replication (K-of-M), trust_score settlement gate (без ZK) | **✅** |
 | 9 | **PH-S63** | Open source governance: signed releases + protocol versioning (docs) | Galaxy §9 | signed releases, compat matrix, opt-in update policies, без root super-admin | **✅** |
-| 10 | **PH-S64** | Docs sync: додати Galaxy Grid у canonical pointers (коротко) | README/INDEX/STRUCTURE | README/docs/README/INDEX узгоджені; без розростання таблиць | відкрито |
+| 10 | **PH-S64** | Docs sync: додати Galaxy Grid у canonical pointers (коротко) | README/INDEX/STRUCTURE | README/docs/README/INDEX/STRUCTURE узгоджені; short pointer Galaxy Grid | **✅** |
+
+**Черга PH-S55…S64 закрита (2026-05-27).** Наступні спринти — **§5.12** (research).
 
 **Поза чергою:** **PH-S35** / **PH-S16** / **PH-S02** LAN (**BLOCKED**) · **PH-S36** / **PH-S01** / **PH-S15** Cloud SDK (**Deferred**, FM-041).
+
+### 5.12 Research backlog PH-S65+ (Galaxy wire / ops, 2026-05-27)
+
+**VDT:** якщо відкритих <3 — `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`, DOCS_LEGACY §5.3, `rg "TODO|FIXME" src/` → доповнити до **≤10** відкритих.
+
+| # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
+|---|--------|--------|---------|-------------------------|------|
+| 1 | **PH-S65** | Worker register: `protocol_version` + compat negotiation | Galaxy §9.3 | OpenAPI + handler; reject/upgrade response | відкрито |
+| 2 | **PH-S66** | `poolai verify-release` CLI (signed manifest) | Galaxy §9.2, SECURITY_HARDENING | verify artifact + signature; unit tests | відкрито |
+| 3 | **PH-S67** | DIGEST: Galaxy Grid modules zріз | FUNCTIONALITY_DIGEST | `galaxy_fee_split`, grid dispatch, virtual nodes | відкрито |
+| 4 | **PH-S68** | Pricing oracle Rust stub (concept S59) | `POOLAI_GALAXY_GRID.md` §4.2 | unit keys + env `POOLAI_GALAXY_PRICE_*`; tests | відкрито |
+| 5 | **PH-S69** | SECURITY_HARDENING ↔ Galaxy §9 signed releases | `docs/security/` | checklist items linked; no duplicate prose | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 

@@ -1,7 +1,7 @@
 {
-  "revision": 2,
+  "revision": 3,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S64",
+  "active_sprint": "PH-S65",
   "ui_version": 2,
   "extension_policy": {
     ".md": {
@@ -19,17 +19,18 @@
   },
   "scopes": {
     "galaxy_grid_concept": {
-      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63"],
+      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63", "PH-S64"],
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
       "code_globs": ["src/grid/**", "src/network/api/virtual_nodes.rs", "src/services/virtual_node_telegram_binding_service.rs"],
       "extensions": [".md", ".rs"],
-      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md"]
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "README.md", "docs/README.md", "docs/INDEX_2026-03-17.md", "docs/STRUCTURE.md"]
     },
-    "galaxy_grid_docs_sync": {
-      "sprints": ["PH-S64"],
-      "docs": ["README.md", "docs/README.md", "docs/INDEX_2026-03-17.md", "docs/STRUCTURE.md"],
-      "extensions": [".md"],
-      "also_update": ["docs/vision/manifest.json", "docs/vision/extensions.json"]
+    "galaxy_grid_protocol_wire": {
+      "sprints": ["PH-S65"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/network/api/virtual_nodes.rs", "src/network/api/workers.rs", "docs/openapi.yaml"],
+      "extensions": [".rs", ".yaml", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },
     "galaxy_grid_code": {
       "sprints": ["PH-S58"],

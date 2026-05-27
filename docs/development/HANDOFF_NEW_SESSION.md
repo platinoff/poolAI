@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S63 ✅ Galaxy Grid governance concept · §5.11 PH-S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S64 ✅ Galaxy Grid docs sync · §5.11 S55–S64 закрито · §5.12 research) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -30,9 +30,10 @@
 **PH-S61 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.6 — locality_score, telemetry signals, hot tiers (L0–L3), task-driven prefetch, `seed_inventory` DTO; ref Memory Layer + `src/grid/dispatch.rs`.
 **PH-S62 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §6.1–6.6 — untrusted `telegram_edge`: sampling, replay, K-of-M replication, `trust_score` settlement gate; ZK/TEE — roadmap only.
 **PH-S63 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §9 — open-source governance: signed releases, protocol compat matrix, opt-in update policies, без root super-admin; §8 TBD #4 закрито.
-**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (повний v1 concept: ролі, fees, pricing, Telegram, lease, locality, edge verify, governance).
+**PH-S64 ✅:** canonical pointers — README, `docs/README`, INDEX крок 5 + §1, STRUCTURE `concept/`; short pointer Galaxy Grid.
+**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (повний v1: ролі, fees, pricing, Telegram, lease, locality, verify, governance).
 
-**Черга:** §5.11 **PH-S64** (1 відкритий); наступний — **PH-S64** (docs sync pointers).
+**Черга:** §5.12 **PH-S65…S69** (5 відкритих, research); наступний код — **PH-S65** (`protocol_version` wire).
 
 ## 1. Канонічний порядок документації та планів
 

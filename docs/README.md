@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-05-24 (PH-S03…S06; post-PH maintenance)
+**Last updated:** 2026-05-27 (PH-S64 — Galaxy Grid canonical pointers)
 
 ## Canonical reading order
 
@@ -10,7 +10,7 @@
 2. **[INDEX_2026-03-17.md](./INDEX_2026-03-17.md)** — карта всього `docs/` (концепція, статус, ML, cloud, troubleshooting).
 3. **[development/NEXT_STEPS_ARCHITECT_2026-03-17.md](./development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, звірка з CI).
 4. **[development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії** (`main`, порядок доків, git-push, зріз зробленого, next steps).
-5. **Концепція** — [concept/poolAI_concept_root.txt](./concept/poolAI_concept_root.txt); Grid / Memory / Job / tokenization: `concept/POOLAI_GRID_NODE.md`, `concept/POOLAI_GALAXY_GRID.md`, `concept/POOLAI_MEMORY_LAYER.md`, [development/JOB_LAYER_CONCEPT_2026-03-17.md](./development/JOB_LAYER_CONCEPT_2026-03-17.md), [development/GRID_PROTOCOL_CONCEPT_2026-04-06.md](./development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md](./development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
+5. **Концепція** — [concept/poolAI_concept_root.txt](./concept/poolAI_concept_root.txt); Grid / Memory / Job / tokenization: [concept/POOLAI_GRID_NODE.md](./concept/POOLAI_GRID_NODE.md), **[concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md)** (федеративна мережа srvN), [concept/POOLAI_MEMORY_LAYER.md](./concept/POOLAI_MEMORY_LAYER.md), [development/JOB_LAYER_CONCEPT_2026-03-17.md](./development/JOB_LAYER_CONCEPT_2026-03-17.md), [development/GRID_PROTOCOL_CONCEPT_2026-04-06.md](./development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md](./development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md).
 6. **Архітектура** — [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md), [ARCHITECTURE_BEST_PRACTICES.md](./ARCHITECTURE_BEST_PRACTICES.md).
 7. **Продуктивність** — [performance/BENCHMARKS.md](./performance/BENCHMARKS.md), [performance/PROFILING.md](./performance/PROFILING.md); опційний workflow Criterion: [`.github/workflows/benchmarks.yml`](../.github/workflows/benchmarks.yml); HTTP health — **`poolai_health_load`** (опційно **`--json`**, див. `BENCHMARKS.md`).
 8. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (у т.ч. три кроки **`cargo clippy … -D warnings`** за feature-матрицями; див. [`STABLE_STATE_SUMMARY.md`](./status/STABLE_STATE_SUMMARY.md)).
@@ -29,6 +29,7 @@
 
 ## Short pointers
 
+- **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (ролі, lease, fees, Telegram edge, locality, verification, governance §9); код fee split — `src/grid/galaxy_fee_split.rs`.
 - **Каталог / витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (крок 11; оновлюй при змінах модулів або публічного API).
 - **Беклог і тікети** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (крок 12; **§5.1** — порядок наступних кроків за FM-*).
 - **Сталевий стан** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md).
