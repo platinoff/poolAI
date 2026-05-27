@@ -167,9 +167,9 @@
 | `POOLAI_GALAXY_PRICING_FALLBACK_JSON` | coordinator | L2 fixed fallback quote map by unit key (usd_micro JSON) for provider outage |
 | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | coordinator | `1` = L2-only emergency mode (`pricing_forced_fallback` log; PH-S81) |
 | `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92) |
-| `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | **PH-S97 (planned):** default lease TTL (Galaxy §4.3.1) |
+| `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | Default lease TTL seconds (default `90`; `JobLeaseConfig::from_env()`, PH-S97) |
 
-**Не в коді (concept-only / наступні PH-S*):** live pricing provider HTTP fetch; lease acquire/renew/failover; `Leased`/`Migrating` job status; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Не в коді (наступні PH-S98…S103):** lease acquire/renew/failover; `Leased`/`Migrating` job status; live pricing provider HTTP fetch; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 

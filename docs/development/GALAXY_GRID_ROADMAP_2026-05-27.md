@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-27 · **HEAD:** `40e91293` (PH-S96) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
+**Оновлено:** 2026-05-27 · **HEAD:** PH-S97 (lease TTL env) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,11 +10,11 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S97** — `POOLAI_JOB_LEASE_TTL_SECS` env stub |
-| **Закрито PH-S65…S96** | protocol, verify-release, pricing API/oracle, admin UI, job lease wire |
+| **Відкрито** | **PH-S98…S103** — lease acquire, renew, `Leased`, failover, live pricing, protocol middleware |
+| **Закрито PH-S65…S97** | protocol, verify-release, pricing API/oracle, admin UI, job lease wire + TTL env |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
-Після PH-S97 → **research replenish** (≤10 нових PH-S* у §5.12).
+Research replenish ✅ (2026-05-27): 6 нових PH-S* у FM §5.12.
 
 ---
 
@@ -47,24 +47,22 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Поля `lease_*` на `JobRecord` | PH-S94 | `src/job/types.rs`, POST/GET jobs |
 | PATCH CAS `lease_epoch` | PH-S95 | `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` |
 | Admin колонки | PH-S96 | `/ui/admin/jobs` |
-| TTL env | **PH-S97** (відкрито) | `POOLAI_JOB_LEASE_TTL_SECS` (planned) |
+| TTL env | PH-S97 ✅ | `POOLAI_JOB_LEASE_TTL_SECS` → `src/job/lease_config.rs` |
 
 **Ще не в коді:** acquire/renew, `Leased`/`Migrating` status, failover, re-migrate.
 
 ---
 
-## 3. Рекомендована черга після PH-S97 (research)
+## 3. Черга після PH-S97 (research replenish → §5.12)
 
-Пріоритет code-first (орієнтир, не затверджено в §5.12):
-
-| # | Тема | Джерело | Тип |
-|---|------|---------|-----|
-| 1 | Lease acquire при schedule / explicit API | §4.3.1 | code |
-| 2 | Lease renew / heartbeat | §4.3.1 | code |
-| 3 | `JobStatus::Leased` + lifecycle | §4.3.2 | code |
-| 4 | Failover / re-migrate | §4.3 | code |
-| 5 | Live pricing provider fetch | §4.2 | code |
-| 6 | `X-PoolAI-Protocol` middleware | §9.8 | code |
+| # | Sprint | Тема | Джерело |
+|---|--------|------|---------|
+| 1 | **PH-S98** | Lease acquire | §4.3.1 |
+| 2 | PH-S99 | Lease renew / heartbeat | §4.3.1 |
+| 3 | PH-S100 | `JobStatus::Leased` + lifecycle | §4.3.2 |
+| 4 | PH-S101 | Failover / re-migrate | §4.3 |
+| 5 | PH-S102 | Live pricing provider fetch | §4.2 |
+| 6 | PH-S103 | `X-PoolAI-Protocol` middleware | §9.8 |
 
 ---
 
@@ -89,7 +87,7 @@ flowchart LR
   B --> C[S78-S92 pricing]
   C --> D[S93-S96 governance UI + lease stub]
   D --> E[S97 TTL env]
-  E --> F[research PH-S98+]
+  E --> F[S98-S103 lease pricing protocol]
   F --> G[lease acquire renew failover]
 ```
 

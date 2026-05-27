@@ -1,7 +1,7 @@
 {
-  "revision": 11,
+  "revision": 12,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S97",
+  "active_sprint": "PH-S98",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -88,9 +88,16 @@
     "job_lease_ttl_env": {
       "sprints": ["PH-S97"],
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/job/types.rs", "src/job/mod.rs"],
+      "code_globs": ["src/job/lease_config.rs", "src/job/mod.rs"],
       "extensions": [".rs", ".md"],
-      "also_update": ["docs/development/HANDOFF_NEW_SESSION.md", "docs/catalog/FUNCTION_MANAGEMENT.md"]
+      "also_update": ["docs/development/HANDOFF_NEW_SESSION.md", "docs/catalog/FUNCTION_MANAGEMENT.md", "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"]
+    },
+    "job_lease_acquire": {
+      "sprints": ["PH-S98"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/job/**", "src/network/api/jobs.rs", "src/job/scheduler.rs"],
+      "extensions": [".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },
     "galaxy_grid_roadmap_doc": {
       "sprints": ["PH-S*"],

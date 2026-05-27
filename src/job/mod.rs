@@ -1,6 +1,7 @@
 //! Job / mining layer wire types (P6 / Horizon S38).
 
 mod domain_events;
+mod lease_config;
 mod lifecycle;
 mod map;
 mod onchain;
@@ -13,6 +14,7 @@ mod types;
 pub use domain_events::{
     DomainEvent, DomainEventEnvelope, JobCompletedEvent, MemoryUpdatedEvent, SeedProvidedEvent,
 };
+pub use lease_config::{JobLeaseConfig, DEFAULT_JOB_LEASE_TTL_SECS, ENV_JOB_LEASE_TTL_SECS};
 pub use lifecycle::allows_transition;
 pub use onchain::{
     emit_job_completed_if_anchor, emit_memory_updated, emit_seed_provided, events_dir_from_env,
