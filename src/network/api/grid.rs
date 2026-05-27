@@ -108,7 +108,7 @@ struct GridPricingSnapshotResponse {
 
 fn pricing_oracle() -> &'static Mutex<GalaxyPricingOracle> {
     static ORACLE: OnceLock<Mutex<GalaxyPricingOracle>> = OnceLock::new();
-    ORACLE.get_or_init(|| Mutex::new(GalaxyPricingOracle::new(GalaxyPricingConfig::from_env())))
+    ORACLE.get_or_init(|| Mutex::new(GalaxyPricingOracle::from_env()))
 }
 
 fn now_secs() -> Result<u64, HttpAppError> {

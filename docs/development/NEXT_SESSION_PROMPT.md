@@ -26,8 +26,8 @@ cargo test-ci
 cargo run --bin poolai-openapi-gap-audit   # після змін API
 
 ## Стан
-- HEAD: (після push PH-S78) — grid pricing API snapshot wire (`GET /api/v1/grid/pricing`)
-- **PH-S03…S78:** ✅
+- HEAD: (після push PH-S79) — grid pricing API env fallback wire fix (`GalaxyPricingOracle::from_env()`)
+- **PH-S03…S79:** ✅
 - **Черга §5.12:** PH-S76..PH-S77 (2 відкриті)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
@@ -46,7 +46,7 @@ DOCS_LEGACY_AUDIT §5.3 · rg "TODO|FIXME" src/ → FM §5.12
 3. git push (MSYS2) + самарі
 
 ## Не повторювати
-PH-S03…S78 · pricing oracle stub/L2/API snapshot wire · DIGEST Galaxy zріз · verify-release · protocol_version wire
+PH-S03…S79 · pricing oracle stub/L2/API snapshot wire/env fallback fix · DIGEST Galaxy zріз · verify-release · protocol_version wire
 
 ## Черга §5.12 (відкриті)
 | # | Sprint | Фокус |
