@@ -29,6 +29,11 @@ pub const ENV_MAX_STALE_SECS: &str = "POOLAI_GALAXY_PRICE_MAX_STALE_SECS";
 /// Env: `1` forces L2 fallback path (§4.2.4); stub records flag only.
 pub const ENV_FORCE_FALLBACK: &str = "POOLAI_GALAXY_PRICING_FORCE_FALLBACK";
 
+/// Env: JSON map for L2 fallback floor quotes in micro-USD (§4.2.4).
+/// Example:
+/// `{"inference_blended_token":450000,"gpu_second":12000}`
+pub const ENV_FALLBACK_JSON: &str = "POOLAI_GALAXY_PRICING_FALLBACK_JSON";
+
 /// Billing unit keys shared by oracle and scheduling (§4.2.1).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -118,6 +123,21 @@ fn env_u64(name: &str) -> Option<u64> {
     std::env::var(name).ok().and_then(|v| v.trim().parse().ok())
 }
 
+fn parse_fallback_json(raw: &str) -> HashMap<GalaxyPriceUnitKey, u64> {
+    let parsed = serde_json::from_str::<HashMap<String, u64>>(raw);
+    let mut out = HashMap::new();
+    if let Ok(map) = parsed {
+        for (k, v) in map {
+            if let Ok(unit_key) = GalaxyPriceUnitKey::from_str(&k) {
+                if v > 0 {
+                    out.insert(unit_key, v);
+                }
+            }
+        }
+    }
+    out
+}
+
 /// `floor(market_min_usd_micro × 0.9)` — integer safe (§4.2.2).
 #[inline]
 pub fn floor_poolai_quote_usd_micro(market_min_usd_micro: u64) -> u64 {
@@ -201,6 +221,7 @@ pub fn cache_freshness(
 pub struct GalaxyPricingOracle {
     config: GalaxyPricingConfig,
     cache: HashMap<GalaxyPricingCacheKey, GalaxyPricingCacheEntry>,
+    fallback_quotes_usd_micro: HashMap<GalaxyPriceUnitKey, u64>,
 }
 
 impl GalaxyPricingOracle {
@@ -208,11 +229,24 @@ impl GalaxyPricingOracle {
         Self {
             config,
             cache: HashMap::new(),
+            fallback_quotes_usd_micro: HashMap::new(),
         }
     }
 
     pub fn from_env() -> Self {
-        Self::new(GalaxyPricingConfig::from_env())
+        let mut oracle = Self::new(GalaxyPricingConfig::from_env());
+        if let Ok(raw) = std::env::var(ENV_FALLBACK_JSON) {
+            oracle.fallback_quotes_usd_micro = parse_fallback_json(&raw);
+        }
+        oracle
+    }
+
+    pub fn with_l2_fallback_quotes(
+        mut self,
+        fallback_quotes_usd_micro: HashMap<GalaxyPriceUnitKey, u64>,
+    ) -> Self {
+        self.fallback_quotes_usd_micro = fallback_quotes_usd_micro;
+        self
     }
 
     pub fn config(&self) -> &GalaxyPricingConfig {
@@ -267,6 +301,31 @@ impl GalaxyPricingOracle {
         Some(quote)
     }
 
+    /// L2 fallback fixed quote from config when providers are unavailable (§4.2.4).
+    fn l2_fallback_quote(
+        &mut self,
+        now_secs: u64,
+        key: GalaxyPricingCacheKey,
+    ) -> Option<GalaxyPricingQuote> {
+        let poolai_quote = *self.fallback_quotes_usd_micro.get(&key.unit_key)?;
+        let quote = GalaxyPricingQuote {
+            task_profile: key.task_profile.clone(),
+            model_profile: key.model_profile.clone(),
+            unit_key: key.unit_key,
+            market_min_usd_micro: poolai_quote,
+            poolai_quote_usd_micro: poolai_quote,
+            provider_id_at_min: "fallback_l2_config".to_string(),
+            cached_at_secs: now_secs,
+        };
+        self.cache.insert(
+            key,
+            GalaxyPricingCacheEntry {
+                quote: quote.clone(),
+            },
+        );
+        Some(quote)
+    }
+
     /// Lookup fresh/stale cache or refresh on miss/expired (§4.2.3 behaviour sketch).
     pub fn quote(
         &mut self,
@@ -279,7 +338,8 @@ impl GalaxyPricingOracle {
                 return Some(entry.quote);
             }
         }
-        self.refresh_from_providers(now_secs, key, providers)
+        self.refresh_from_providers(now_secs, key.clone(), providers)
+            .or_else(|| self.l2_fallback_quote(now_secs, key))
     }
 }
 
@@ -425,5 +485,44 @@ mod tests {
         assert_eq!(cfg.cache_ttl_secs, 300);
         assert_eq!(cfg.max_stale_secs, 3600);
         assert!(!cfg.force_fallback);
+    }
+
+    #[test]
+    fn parse_fallback_json_ignores_invalid_keys_and_zero_values() {
+        let map = parse_fallback_json(
+            r#"{"inference_blended_token":450000,"gpu_second":0,"unknown_key":777}"#,
+        );
+        assert_eq!(
+            map.get(&GalaxyPriceUnitKey::InferenceBlendedToken).copied(),
+            Some(450_000)
+        );
+        assert_eq!(map.get(&GalaxyPriceUnitKey::GpuSecond).copied(), None);
+        assert_eq!(map.len(), 1);
+    }
+
+    #[test]
+    fn quote_uses_l2_fallback_when_provider_refresh_unavailable() {
+        let mut fallback = HashMap::new();
+        fallback.insert(GalaxyPriceUnitKey::InferenceBlendedToken, 470_000);
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: true,
+        })
+        .with_l2_fallback_quotes(fallback);
+
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "fallback-profile".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+
+        let quote = oracle.quote(1234, key.clone(), &[]).expect("l2 fallback");
+        assert_eq!(quote.poolai_quote_usd_micro, 470_000);
+        assert_eq!(quote.provider_id_at_min, "fallback_l2_config");
+
+        let (cached, freshness) = oracle.lookup(1235, &key).expect("cached");
+        assert_eq!(freshness, CacheFreshness::Fresh);
+        assert_eq!(cached.quote.poolai_quote_usd_micro, 470_000);
     }
 }

@@ -43,7 +43,8 @@
 **PH-S72 ✅:** `docs/security/SECURITY_HARDENING.md` — protocol compatibility triage checklist (`compat_status`, HTTP 403/426), pointers на Galaxy §9.3 + PH-S65 wire baseline.
 **PH-S73 ✅:** `docs/security/SECURITY_HARDENING.md` — protocol reject troubleshooting pointer з escalation path (verify signed build → check protocol window → retry), mismatch tuple для ops review.
 **PH-S74 ✅:** `docs/security/SECURITY_HARDENING.md` + `docs/security/DEPENDENCY_SECURITY.md` — advisory/update-policy cross-links (Galaxy §9.6) без дублювання governance prose.
-**Черга:** §5.12 **PH-S75..PH-S77** (3 відкриті); наступний docs sprint — **PH-S75** (security hardening audit-event pointers).
+**PH-S75 ✅ (code):** `src/grid/galaxy_pricing_oracle.rs` — L2 configured fallback `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (unit-key usd_micro map), fallback quote path when provider refresh unavailable, unit tests for parser + quote fallback.
+**Черга:** §5.12 **PH-S76..PH-S78** (3 відкриті); наступний sprint — **PH-S78** (grid pricing API snapshot wire, code).
 
 ## 1. Канонічний порядок документації та планів
 

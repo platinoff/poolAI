@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — PH-S75 security audit-event pointers (research queue)
+PoolAI — PH-S78 grid pricing API snapshot wire (code queue)
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -27,31 +27,31 @@ cargo run --bin poolai-openapi-gap-audit   # після змін API
 
 ## Стан
 - HEAD: (після push PH-S68) — pricing oracle Rust stub
-- **PH-S03…S74:** ✅
-- **Черга §5.12:** PH-S75..PH-S77 (3 відкриті)
+- **PH-S03…S75:** ✅
+- **Черга §5.12:** PH-S76..PH-S78 (3 відкриті)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
-## PH-S75 — наступна сесія
-1. `docs/security/SECURITY_HARDENING.md` — додати concise pointers на audit events (`release_verify_ok|fail`, `protocol_negotiation_rejected`, `advisory_acknowledged`)
-2. Зв’язати події з operator triage flow (без нового prose-концепту)
-3. FM §5.12 + HANDOFF + `NEXT_SESSION_PROMPT` sync
+## PH-S78 — наступна сесія
+1. `src/network/api/grid.rs` — додати read-only snapshot endpoint `/api/v1/grid/pricing` (task/model/unit)
+2. Підключити до `galaxy_pricing_oracle` cache/fallback path, без дублювання settlement логіки
+3. Додати тести endpoint + sync `docs/openapi.yaml` + `poolai-openapi-gap-audit`
 
 ## Research (черга <3 — доповнити до ≤10 PH-S*)
 rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md
 DOCS_LEGACY_AUDIT §5.3 · rg "TODO|FIXME" src/ → FM §5.12
 
 ## Завершення сесії
-1. FM §5.12 (PH-S75 → ✅) + HANDOFF
+1. FM §5.12 (PH-S78 → ✅) + HANDOFF
 2. Оновити цей NEXT_SESSION_PROMPT
 3. git push (MSYS2) + самарі
 
 ## Не повторювати
-PH-S03…S74 · pricing oracle stub · DIGEST Galaxy zріз · verify-release · protocol_version wire
+PH-S03…S75 · pricing oracle stub + L2 fallback · DIGEST Galaxy zріз · verify-release · protocol_version wire
 
 ## Черга §5.12 (відкриті)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S75** | Security hardening audit-event pointers |
+| 1 | **PH-S78** | Grid pricing API snapshot wire (code) |
 | 2 | **PH-S76** | Release advisory operator actions pointer |
 | 3 | **PH-S77** | Security docs canonical pointer cleanup |
 

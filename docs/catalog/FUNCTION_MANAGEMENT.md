@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S74 ✅ advisory link hygiene · §5.12 PH-S75..PH-S77 відкриті; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S75 ✅ pricing oracle L2 fallback code; §5.12 PH-S76..PH-S78 відкриті; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -275,9 +275,10 @@ FM-xxx (з таблиці нижче)
 | 8 | **PH-S72** | Protocol compatibility ops checklist links | Galaxy §9.3, FM PH-S65 | cross-link compat matrix + rollout guardrails in security docs | **✅** |
 | 9 | **PH-S73** | Protocol reject troubleshooting pointer (docs) | `SECURITY_HARDENING.md`, Galaxy §9.3 | short operator checklist for `compat_status`/403/426 triage links | **✅** |
 | 10 | **PH-S74** | Security docs link hygiene for release advisories | Galaxy §9.6, `docs/security/` | align cross-links to signed advisory/update policy sections | **✅** |
-| 11 | **PH-S75** | Security hardening audit-event pointers | Galaxy §9 audit events, `docs/security/` | add concise links for `release_verify_*` and negotiation reject event review | відкрито |
+| 11 | **PH-S75** | Pricing oracle L2 configured fallback (code) | Galaxy §4.2.4, `src/grid/galaxy_pricing_oracle.rs` | add `POOLAI_GALAXY_PRICING_FALLBACK_JSON` parsing + fallback quote path + unit tests | **✅** |
 | 12 | **PH-S76** | Release advisory operator actions pointer | Galaxy §9.6, `docs/security/SECURITY_HARDENING.md` | add short action list linked to signed advisory/update policy docs | відкрито |
 | 13 | **PH-S77** | Security docs canonical pointer cleanup | `docs/security/*`, FM §5.12 | normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates | відкрито |
+| 14 | **PH-S78** | Grid pricing API snapshot wire (code) | Galaxy §4.2.3, future wire note | add read-only `/api/v1/grid/pricing` snapshot endpoint + tests + OpenAPI sync | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
