@@ -491,6 +491,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /grid/pricing:
+    get:
+      tags:
+        - Grid
+      summary: Get grid pricing snapshot
+      description: |
+        Read-only pricing snapshot for `(task_profile, model_profile, unit_key)`.
+        Uses in-process Galaxy pricing oracle cache first, then fallback quote path.
+      operationId: getGridPricingSnapshot
+      parameters:
+        - name: task_profile
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: model_profile
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: unit_key
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/GalaxyPriceUnitKey'
+      responses:
+        '200':
+          description: Pricing snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GridPricingSnapshotResponse'
+        '400':
+          description: Invalid query (for example unsupported unit_key)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Snapshot unavailable (cache miss and fallback not configured)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /discovery/grid/envelope:
     post:
       tags:
@@ -5408,6 +5453,76 @@ components:
           type: string
         peer_id:
           type: string
+
+    GalaxyPriceUnitKey:
+      type: string
+      enum:
+        - inference_input_token
+        - inference_output_token
+        - inference_blended_token
+        - gpu_second
+        - job_flat
+
+    GridPricingSnapshotSource:
+      type: string
+      enum:
+        - cache
+        - oracle
+
+    GridPricingSnapshotFreshness:
+      type: string
+      enum:
+        - fresh
+        - stale
+
+    GridPricingSnapshot:
+      type: object
+      required:
+        - task_profile
+        - model_profile
+        - unit_key
+        - market_min_usd_micro
+        - poolai_quote_usd_micro
+        - provider_id_at_min
+        - cached_at_secs
+      properties:
+        task_profile:
+          type: string
+        model_profile:
+          type: string
+        unit_key:
+          $ref: '#/components/schemas/GalaxyPriceUnitKey'
+        market_min_usd_micro:
+          type: integer
+          format: int64
+          minimum: 0
+        poolai_quote_usd_micro:
+          type: integer
+          format: int64
+          minimum: 0
+        provider_id_at_min:
+          type: string
+        cached_at_secs:
+          type: integer
+          format: int64
+          minimum: 0
+
+    GridPricingSnapshotResponse:
+      type: object
+      required:
+        - ok
+        - source
+        - freshness
+        - snapshot
+      properties:
+        ok:
+          type: boolean
+        source:
+          $ref: '#/components/schemas/GridPricingSnapshotSource'
+        freshness:
+          $ref: '#/components/schemas/GridPricingSnapshotFreshness'
+        snapshot:
+          $ref: '#/components/schemas/GridPricingSnapshot'
 
     MemoryShardRef:
       type: object

@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S64 ✅ Galaxy Grid docs sync · §5.11 S55–S64 закрито · §5.12 research) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S78 ✅ grid pricing API snapshot wire code; §5.12 PH-S76..PH-S77 відкриті) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -44,7 +44,8 @@
 **PH-S73 ✅:** `docs/security/SECURITY_HARDENING.md` — protocol reject troubleshooting pointer з escalation path (verify signed build → check protocol window → retry), mismatch tuple для ops review.
 **PH-S74 ✅:** `docs/security/SECURITY_HARDENING.md` + `docs/security/DEPENDENCY_SECURITY.md` — advisory/update-policy cross-links (Galaxy §9.6) без дублювання governance prose.
 **PH-S75 ✅ (code):** `src/grid/galaxy_pricing_oracle.rs` — L2 configured fallback `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (unit-key usd_micro map), fallback quote path when provider refresh unavailable, unit tests for parser + quote fallback.
-**Черга:** §5.12 **PH-S76..PH-S78** (3 відкриті); наступний sprint — **PH-S78** (grid pricing API snapshot wire, code).
+**PH-S78 ✅ (code):** `src/network/api/grid.rs` — read-only `GET /api/v1/grid/pricing` (task/model/unit), shared oracle cache+fallback snapshot path, endpoint tests; `docs/openapi.yaml` synced; `cargo run --bin poolai-openapi-gap-audit` → Total missing: 0.
+**Черга:** §5.12 **PH-S76..PH-S77** (2 відкриті); наступний sprint — **PH-S76** (release advisory operator actions pointer).
 
 ## 1. Канонічний порядок документації та планів
 
