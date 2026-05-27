@@ -149,13 +149,13 @@ Security audits run automatically on:
 - Monitor for issues
 - Document in security log
 
-### Governance Cross-Links (Galaxy)
+### Governance pointers (Galaxy §9.6)
 
-For signed advisory and update-policy handling, use canonical governance references:
+**Galaxy policy links** (§9.2 / §9.3 / §9.6) and operator runbooks (`poolai-verify-release`, protocol triage, release advisories) live in one hub — do not duplicate here:
 
-- Security advisories and key rotation: [`POOLAI_GALAXY_GRID.md` §9.6](../concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation)
-- Signed release verification model: [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63)
-- Security hardening operator pointers: [`SECURITY_HARDENING.md`](./SECURITY_HARDENING.md)
+[`SECURITY_HARDENING.md` — Galaxy governance canonical pointers](./SECURITY_HARDENING.md#galaxy-governance-canonical-pointers-ph-s69-ph-s77)
+
+This document owns: `cargo audit` / RustSec workflow, Dependabot, and the vulnerability response steps above.
 
 ## Known Vulnerabilities
 
@@ -241,4 +241,4 @@ All licenses are documented in `LICENSE` file and dependency metadata.
 ---
 
 **Last Updated**: 2026-05-27  
-**Version**: 1.1 - Galaxy advisory/update-policy cross-links
+**Version**: 1.2 - Pointer to SECURITY_HARDENING Galaxy hub (PH-S77); no duplicate §9.2/§9.6 prose

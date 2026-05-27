@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S76 ✅ release advisory operator actions pointer; §5.12 PH-S77 відкрито; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S77 ✅ security docs canonical pointer cleanup; §5.12 PH-S80 відкрито; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -277,9 +277,19 @@ FM-xxx (з таблиці нижче)
 | 10 | **PH-S74** | Security docs link hygiene for release advisories | Galaxy §9.6, `docs/security/` | align cross-links to signed advisory/update policy sections | **✅** |
 | 11 | **PH-S75** | Pricing oracle L2 configured fallback (code) | Galaxy §4.2.4, `src/grid/galaxy_pricing_oracle.rs` | add `POOLAI_GALAXY_PRICING_FALLBACK_JSON` parsing + fallback quote path + unit tests | **✅** |
 | 12 | **PH-S76** | Release advisory operator actions pointer | Galaxy §9.6, `docs/security/SECURITY_HARDENING.md` | add short action list linked to signed advisory/update policy docs | **✅** |
-| 13 | **PH-S77** | Security docs canonical pointer cleanup | `docs/security/*`, FM §5.12 | normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates | відкрито |
+| 13 | **PH-S77** | Security docs canonical pointer cleanup | `docs/security/*`, FM §5.12 | normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates | **✅** |
 | 14 | **PH-S78** | Grid pricing API snapshot wire (code) | Galaxy §4.2.3, future wire note | read-only `GET /api/v1/grid/pricing` (task/model/unit) wired to oracle cache/fallback path + endpoint tests + OpenAPI sync + gap-audit 0 | **✅** |
 | 15 | **PH-S79** | Grid pricing API env fallback wire fix (code) | `src/network/api/grid.rs`, Galaxy §4.2.4 | initialize API oracle via `GalaxyPricingOracle::from_env()` so `POOLAI_GALAXY_PRICING_FALLBACK_JSON` is applied on `/api/v1/grid/pricing`; `cargo test-ci` + openapi-gap 0 | **✅** |
+| 16 | **PH-S80** | Pricing oracle L3 hard stop (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | when L1+L2 unavailable return `503 pricing_unavailable` on new priced jobs/API; unit tests | відкрито |
+| 17 | **PH-S81** | Pricing oracle `FORCE_FALLBACK` env wire (code) | Galaxy §4.2.4, `galaxy_pricing_oracle.rs` | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` always L2 path + log metric; unit tests | відкрито |
+| 18 | **PH-S82** | Admin UI grid pricing snapshot panel | Galaxy §4.2.3, `src/ui/` | `/ui/admin/*` read-only panel calling `GET /api/v1/grid/pricing`; Playwright smoke | відкрито |
+| 19 | **PH-S83** | Galaxy pricing stale-served metric (code) | Galaxy §4.2.4, observability | expose `galaxy_pricing_stale_served` counter on L1 stale path; unit or integration test | відкрито |
+| 20 | **PH-S84** | Galaxy §4.2.3 wire note sync (docs) | `POOLAI_GALAXY_GRID.md` | mark `GET /api/v1/grid/pricing` implemented (PH-S78/S79); remove stale «майбутній wire» | відкрито |
+| 21 | **PH-S85** | verify-release dev fixtures + RUN_LOCAL pointer (docs) | `SECURITY_HARDENING`, `RUN_LOCAL.md` | sample manifest/sig paths for local verify; no duplicate Galaxy prose | відкрито |
+| 22 | **PH-S86** | Grid pricing E2E smoke | `e2e/`, PH-S78 API | Playwright hits `/api/v1/grid/pricing` with env fallback JSON on dev stand | відкрито |
+| 23 | **PH-S87** | INDEX security docs cross-link (docs) | `INDEX_2026-03-17.md`, `docs/security/` | step-8 security row links to Galaxy hub in SECURITY_HARDENING | відкрито |
+| 24 | **PH-S88** | Release manifest sample JSON (docs) | Galaxy §9.2, `docs/development/` | operator-facing minimal manifest example for `poolai-verify-release` | відкрито |
+| 25 | **PH-S89** | Pricing oracle L1 stale TTL metric (code) | Galaxy §4.2.3–4.2.4 | distinguish fresh vs stale cache hits in quote metadata or metrics; tests | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
