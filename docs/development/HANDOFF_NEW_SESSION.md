@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S83 ✅ stale-served metric; §5.12 PH-S84 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S85 ✅ verify-release dev fixtures; §5.12 PH-S86 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -52,8 +52,10 @@
 **PH-S81 ✅ (code):** `galaxy_pricing_oracle` — `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` always L2 (`pricing_forced_fallback` log + `galaxy_pricing_forced_fallback_total` counter); API skips L1 provider cache when forced (serves cached L2); unit tests; `cargo test-ci`.
 **PH-S82 ✅ (code):** `src/ui/admin/grid_pricing.rs` — read-only `/ui/admin/grid-pricing` panel (`task_profile` / `model_profile` / `unit_key` → `GET /api/v1/grid/pricing`); i18n EN/UK; Playwright smoke (`admin.spec.ts`); `cargo test-ci`.
 **PH-S83 ✅ (code):** `galaxy_pricing_oracle` — `galaxy_pricing_stale_served` counter + `pricing_oracle_stale_served` log on L1 stale serves (`try_quote` + HTTP cache path); unit test; `cargo test-ci`.
+**PH-S84 ✅ (docs):** `docs/concept/POOLAI_GALAXY_GRID.md` §4.2.3 — `GET /api/v1/grid/pricing` + `/ui/admin/grid-pricing` позначені implemented (PH-S78…S83); прибрано «майбутній wire»; Rust reference §4.2 оновлено.
+**PH-S85 ✅ (docs+fixtures):** `tests/fixtures/release/dev/` — sample manifest/sig/trust root + `poolai-sample.bin`; `SECURITY_HARDENING` + `RUN_LOCAL` verify-release pointer; Galaxy §9.2 cross-link; `cargo run --bin poolai-verify-release` OK на fixtures.
 **PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
-**Черга:** §5.12 **PH-S84** (6 відкритих); наступний sprint — **PH-S84** (Galaxy §4.2.3 wire note sync).
+**Черга:** §5.12 **PH-S86** (8 відкритих); наступний sprint — **PH-S86** (Grid pricing E2E smoke).
 
 ## 1. Канонічний порядок документації та планів
 

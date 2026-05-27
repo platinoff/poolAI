@@ -356,7 +356,17 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 2. **Hit (stale, &lt; max_stale):** повернути кеш + фоновий refresh (SWR).
 3. **Miss / expired stale:** синхронний refresh; при success — оновити кеш; при fail — fallback (§4.2.4).
 
-Майбутній wire (концепт): `GET /api/v1/grid/pricing?task_profile=…&model_profile=…` — read-only snapshot для admin UI і AI-клієнта.
+**HTTP wire (реалізовано, PH-S78…S83):** `GET /api/v1/grid/pricing?task_profile=…&model_profile=…&unit_key=…` — read-only snapshot для AI-клієнта та admin UI.
+
+| Аспект | Реалізація |
+|--------|------------|
+| Handler | `src/network/api/grid.rs` (`get_grid_pricing_snapshot`) |
+| OpenAPI | [`docs/openapi.yaml`](../openapi.yaml) — `GET /grid/pricing` |
+| Admin UI | `GET /ui/admin/grid-pricing` — [`src/ui/admin/grid_pricing.rs`](../../src/ui/admin/grid_pricing.rs) (PH-S82) |
+| `200` | `source`: `cache` \| `oracle`; `freshness`: `fresh` \| `stale` (L1 SWR) |
+| `503` | `pricing_unavailable` — L3 hard stop, немає L1 і L2 (PH-S80) |
+| L2-only ops | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` (PH-S81) |
+| Stale metric | `galaxy_pricing_stale_served` на L1 stale path (PH-S83) |
 
 #### 4.2.4 Fallback при outage
 
@@ -385,10 +395,17 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 **Спостережність:**
 
 - Логи: `pricing_oracle_refresh_ok`, `pricing_oracle_refresh_fail`, `pricing_oracle_stale_served`, `pricing_oracle_outage`.
+- Метрики (реалізовано): `galaxy_pricing_stale_served` (PH-S83), `galaxy_pricing_forced_fallback_total` (PH-S81).
 - Метрики (Prometheus, майбутнє): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
-**Rust reference (oracle stub, PH-S68):** `src/grid/galaxy_pricing_oracle.rs` — unit keys, `floor(market_min×0.9)`, cache TTL/SWR з `POOLAI_GALAXY_PRICE_*`; HTTP `GET /api/v1/grid/pricing` — майбутній спринт.
+**Rust reference (oracle + HTTP, PH-S68…S83):**
+
+| Модуль | Призначення |
+|--------|-------------|
+| [`src/grid/galaxy_pricing_oracle.rs`](../../src/grid/galaxy_pricing_oracle.rs) | unit keys, `floor(market_min×0.9)`, cache TTL/SWR (`POOLAI_GALAXY_PRICE_*`), L2 `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, L3 `GalaxyPricingUnavailable`, `FORCE_FALLBACK` |
+| [`src/network/api/grid.rs`](../../src/network/api/grid.rs) | `GET /api/v1/grid/pricing` — read-only snapshot (cache → oracle → 503) |
+| [`src/ui/admin/grid_pricing.rs`](../../src/ui/admin/grid_pricing.rs) | `GET /ui/admin/grid-pricing` — read-only panel (PH-S82) |
 
 **Rust reference (fee split):** `src/grid/galaxy_fee_split.rs` — застосовується після визначення `gross`.
 
@@ -780,7 +797,7 @@ On-chain події потрібні, коли вони:
 
 | Артефакт | Підпис / attest | Перевірка на srvN |
 |----------|-----------------|-------------------|
-| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `cargo run --bin poolai-verify-release -- --manifest … --signature … [--artifact …]` (PH-S66) |
+| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `cargo run --bin poolai-verify-release -- --manifest … --signature … [--artifact …]` (PH-S66); dev sample paths — [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md) (PH-S85) |
 | OCI image (`ghcr.io/…/poolai`) | cosign на digest | admission / `cosign verify` перед pull |
 | `config` bundle (default policies) | окремий підпис maintainer | порівняння з pinned `release_pubkey` |
 | SBOM (SPDX/CycloneDX) | hash у release manifest | supply-chain audit |
