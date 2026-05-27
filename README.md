@@ -4,6 +4,19 @@
 
 PoolAI is a comprehensive distributed system for managing AI mining pools with integration of generative models, GPU optimization, and automated resource management.
 
+## Galaxy docs vision (інтерактивна карта доків)
+
+Після серії спринтів **Galaxy Grid** (концепт у [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md)) у репо з’явилася **жива карта**: як пов’язані концепт, HANDOFF, FM і код (`galaxy_fee_split`, virtual nodes тощо).
+
+| Що | Де |
+|----|-----|
+| **Запуск** | PowerShell у корені: `.\bin\open-docs-vision.ps1` |
+| **URL** | `http://127.0.0.1:8765/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
+| **Панелі** | 3D-шари L0–L3 · інтерактивна Galaxy map · граф зв’язків · preview `.md` |
+| **Auto-reload** | Кнопка **Auto** (1.5 с): зміни `manifest.json` / docs оновлюють UI без F5 |
+
+Деталі: [`docs/vision/README.md`](docs/vision/README.md) · правило агента [`.cursor/rules/docs-vision.mdc`](.cursor/rules/docs-vision.mdc). Статична схема: [`docs/vision/vision.svg`](docs/vision/vision.svg).
+
 ## Documentation map (canonical order)
 
 Один порядок у всіх точках входу: [`docs/README.md`](docs/README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](docs/status/STABLE_STATE_SUMMARY.md), [`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md), [`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md), [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md), [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md).
@@ -25,7 +38,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
 3. **[`docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md`](docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md)** — план Rust Architect (P1–P6, TurboQuant, узгодження з CI).
 4. **[`docs/development/HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md)** — старт **нової сесії**: гілка `main`, порядок доків, git-push, зріз зробленого, наступні кроки.
-5. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job / tokenization: [`docs/concept/POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md), [`docs/concept/POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`docs/development/JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md), [`docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [`docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md). **Карта доків (vision):** [`docs/vision/index.html`](docs/vision/index.html) · [`docs/vision/vision.svg`](docs/vision/vision.svg).
+5. **Концепція** — [`docs/concept/poolAI_concept_root.txt`](docs/concept/poolAI_concept_root.txt); Grid / Memory / Job: [`POOLAI_GRID_NODE.md`](docs/concept/POOLAI_GRID_NODE.md), **[`POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md)** (федеративна мережа), [`POOLAI_MEMORY_LAYER.md`](docs/concept/POOLAI_MEMORY_LAYER.md), [`JOB_LAYER_CONCEPT_2026-03-17.md`](docs/development/JOB_LAYER_CONCEPT_2026-03-17.md), [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md), [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md). **Інтерактивна карта:** [Galaxy docs vision](#galaxy-docs-vision-інтерактивна-карта-доків) → [`docs/vision/index.html`](docs/vision/index.html).
 6. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
 7. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml); HTTP health load — in-tree **`poolai_health_load`** (опційно **`--json`** на stdout для baseline; див. `BENCHMARKS.md`).
 8. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).

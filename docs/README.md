@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-05-27 (PH-S64 — Galaxy Grid canonical pointers)
+**Last updated:** 2026-05-27 (Galaxy docs vision UI + auto-reload)
 
 ## Canonical reading order
 
@@ -25,10 +25,11 @@
 
 - **Де що лежить у `docs/`** — [STRUCTURE.md](./STRUCTURE.md) (каталоги, спадщина плоских `.md`, інвентар, тести vs doctests).
 - **Правила для AI/агента (Cursor)** — [`.cursor/rules/documentation.md`](../.cursor/rules/documentation.md); skill — [`.cursor/skills/poolai-documentation/SKILL.md`](../.cursor/skills/poolai-documentation/SKILL.md).
-- **Vision (карта доків, 3D-шари, спринт scope)** — [vision/README.md](./vision/README.md) · [`vision.svg`](./vision/vision.svg) · [інтерактив `index.html`](./vision/index.html) · правило [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
+- **Galaxy docs vision** — `.\bin\open-docs-vision.ps1` → [vision/index.html](http://127.0.0.1:8765/docs/vision/index.html) (інтерактивна map, 3D-шари, auto-reload **Auto**). Док: [vision/README.md](./vision/README.md) · [`.cursor/rules/docs-vision.mdc`](../.cursor/rules/docs-vision.mdc).
 
 ## Short pointers
 
+- **Galaxy docs vision (рекомендовано для огляду Galaxy Grid)** — [vision/index.html](./vision/index.html) + `manifest.json`; запуск `../bin/open-docs-vision.ps1`.
 - **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (ролі, lease, fees, Telegram edge, locality, verification, governance §9); код fee split — `src/grid/galaxy_fee_split.rs`.
 - **Каталог / витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (крок 11; оновлюй при змінах модулів або публічного API).
 - **Беклог і тікети** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (крок 12; **§5.1** — порядок наступних кроків за FM-*).

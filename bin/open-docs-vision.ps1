@@ -7,24 +7,157 @@ param(
     [switch]$NoBrowser
 )
 
-$ErrorActionPreference = "Stop"
-$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$VisionDir = Join-Path $RepoRoot "docs\vision"
-if (-not (Test-Path (Join-Path $VisionDir "index.html"))) {
+function GetMimeType {
+    param([string]$Extension)
+    $charsetSuffix = [string][char]59 + ' charset=utf-8'
+    if ($Extension -eq '.html') { return 'text/html' + $charsetSuffix }
+    if ($Extension -eq '.htm') { return 'text/html' + $charsetSuffix }
+    if ($Extension -eq '.json') { return 'application/json' + $charsetSuffix }
+    if ($Extension -eq '.svg') { return 'image/svg+xml' }
+    if ($Extension -eq '.md') { return 'text/plain' + $charsetSuffix }
+    if ($Extension -eq '.css') { return 'text/css' + $charsetSuffix }
+    if ($Extension -eq '.js') { return 'application/javascript' }
+    if ($Extension -eq '.txt') { return 'text/plain' + $charsetSuffix }
+    if ($Extension -eq '.rs') { return 'text/plain' + $charsetSuffix }
+    if ($Extension -eq '.png') { return 'image/png' }
+    return $null
+}
+
+function SendVisionBytes {
+    param($Context, $Body, $ContentType)
+    if ($ContentType) {
+        $Context.Response.ContentType = $ContentType
+    }
+    $Context.Response.ContentLength64 = $Body.Length
+    $Context.Response.OutputStream.Write($Body, 0, $Body.Length)
+    $Context.Response.Close()
+}
+
+function GetVisionWatchPayload {
+    param([string]$VisionDirectory)
+    $watchNames = @(
+        'manifest.json',
+        'extensions.json',
+        'index.html',
+        'vision.css',
+        'vision.js',
+        'vision.svg'
+    )
+    $bundleTicks = [long]0
+    $dataTicks = [long]0
+    foreach ($name in $watchNames) {
+        $filePath = Join-Path $VisionDirectory $name
+        if (-not (Test-Path -LiteralPath $filePath -PathType Leaf)) {
+            continue
+        }
+        $ticks = (Get-Item -LiteralPath $filePath).LastWriteTimeUtc.Ticks
+        if ($name -eq 'index.html' -or $name -eq 'vision.css' -or $name -eq 'vision.js') {
+            $bundleTicks += $ticks
+        }
+        else {
+            $dataTicks += $ticks
+        }
+    }
+    $revision = 0
+    $manifestPath = Join-Path $VisionDirectory 'manifest.json'
+    if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
+        try {
+            $manifestJson = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($null -ne $manifestJson.revision) {
+                $revision = [int]$manifestJson.revision
+            }
+        }
+        catch {
+            $revision = 0
+        }
+    }
+    $token = '{0}:{1}:{2}' -f $bundleTicks, $dataTicks, $revision
+    return @{
+        token    = $token
+        bundle   = [string]$bundleTicks
+        data     = [string]$dataTicks
+        revision = $revision
+    }
+}
+
+function StartVisionServerLoop {
+    param(
+        $HttpListener,
+        [string]$RepoRootPath,
+        [string]$VisionDirectory,
+        [string]$JsonContentType,
+        [string]$PlainContentType
+    )
+    while ($HttpListener.IsListening) {
+        $ctx = $HttpListener.GetContext()
+        $path = $ctx.Request.Url.LocalPath.TrimStart('/').TrimEnd('/')
+
+        if ($path -eq 'docs/vision/__watch') {
+            $payload = GetVisionWatchPayload -VisionDirectory $VisionDirectory
+            $json = $payload | ConvertTo-Json -Compress
+            $bytes = [Text.Encoding]::UTF8.GetBytes($json)
+            SendVisionBytes -Context $ctx -Body $bytes -ContentType $JsonContentType
+            continue
+        }
+
+        if ([string]::IsNullOrWhiteSpace($path)) {
+            $ctx.Response.StatusCode = 302
+            $ctx.Response.RedirectLocation = '/docs/vision/index.html'
+            $ctx.Response.Close()
+            continue
+        }
+
+        $rel = $path -replace '/', [IO.Path]::DirectorySeparatorChar
+        $file = Join-Path $RepoRootPath $rel
+        $file = [IO.Path]::GetFullPath($file)
+        $repoFull = [IO.Path]::GetFullPath($RepoRootPath)
+
+        if (-not $file.StartsWith($repoFull, [StringComparison]::OrdinalIgnoreCase)) {
+            $ctx.Response.StatusCode = 403
+            $ctx.Response.Close()
+            continue
+        }
+
+        if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+            $ctx.Response.StatusCode = 404
+            $msg = [Text.Encoding]::UTF8.GetBytes('404 ' + $path)
+            SendVisionBytes -Context $ctx -Body $msg -ContentType $PlainContentType
+            continue
+        }
+
+        $ext = [IO.Path]::GetExtension($file).ToLowerInvariant()
+        $ctype = GetMimeType -Extension $ext
+        $bytes = [IO.File]::ReadAllBytes($file)
+        SendVisionBytes -Context $ctx -Body $bytes -ContentType $ctype
+    }
+}
+
+$ErrorActionPreference = 'Stop'
+$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$VisionDir = Join-Path $RepoRoot 'docs\vision'
+if (-not (Test-Path (Join-Path $VisionDir 'index.html'))) {
     throw "Not found: $VisionDir\index.html"
 }
 
 $Url = "http://127.0.0.1:$Port/docs/vision/index.html"
+$JsonContentType = 'application/json' + [string][char]59 + ' charset=utf-8'
+$PlainContentType = 'text/plain' + [string][char]59 + ' charset=utf-8'
 
 $existing = $null
 try {
     $existing = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
-} catch { }
+}
+catch {
+    $existing = $null
+}
 
 if ($existing) {
     Write-Host "Port $Port already in use - docs-vision server may be running."
+    Write-Host 'For auto-reload (__watch), restart: stop the old process, then run this script again.'
     Write-Host "Simple Browser URL: $Url"
-    if (-not $NoBrowser) { Start-Process $Url }
+    if (-not $NoBrowser) {
+        Start-Process $Url
+    }
     exit 0
 }
 
@@ -33,65 +166,18 @@ $listener.Prefixes.Add("http://127.0.0.1:$Port/")
 $listener.Start()
 Write-Host "Serving repo: $RepoRoot"
 Write-Host "Vision UI: $Url"
-Write-Host "Stop: Ctrl+C"
+Write-Host 'Auto-reload: GET /docs/vision/__watch (toggle Auto in UI)'
+Write-Host 'Stop: Ctrl+C'
 
-if (-not $NoBrowser) { Start-Process $Url }
-
-$mime = @{
-    ".html" = "text/html; charset=utf-8"
-    ".htm"  = "text/html; charset=utf-8"
-    ".json" = "application/json; charset=utf-8"
-    ".svg"  = "image/svg+xml"
-    ".md"   = "text/plain; charset=utf-8"
-    ".css"  = "text/css"
-    ".js"   = "application/javascript"
-    ".txt"  = "text/plain; charset=utf-8"
-    ".rs"   = "text/plain; charset=utf-8"
-}
-
-function Send-Bytes($ctx, [byte[]]$bytes, [string]$contentType) {
-    if ($contentType) { $ctx.Response.ContentType = $contentType }
-    $ctx.Response.ContentLength64 = $bytes.Length
-    $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
-    $ctx.Response.Close()
+if (-not $NoBrowser) {
+    Start-Process $Url
 }
 
 try {
-    while ($listener.IsListening) {
-        $ctx = $listener.GetContext()
-        $path = $ctx.Request.Url.LocalPath.TrimStart("/").TrimEnd("/")
-
-        if ([string]::IsNullOrWhiteSpace($path)) {
-            $ctx.Response.StatusCode = 302
-            $ctx.Response.RedirectLocation = "/docs/vision/index.html"
-            $ctx.Response.Close()
-            continue
-        }
-
-        $rel = $path -replace "/", [IO.Path]::DirectorySeparatorChar
-        $file = Join-Path $RepoRoot $rel
-        $file = [IO.Path]::GetFullPath($file)
-        $repoFull = [IO.Path]::GetFullPath($RepoRoot)
-
-        if (-not $file.StartsWith($repoFull, [StringComparison]::OrdinalIgnoreCase)) {
-            $ctx.Response.StatusCode = 403
-            $ctx.Response.Close()
-            continue
-        }
-
-        if (-not (Test-Path $file -PathType Leaf)) {
-            $ctx.Response.StatusCode = 404
-            $msg = [Text.Encoding]::UTF8.GetBytes("404 " + $path)
-            Send-Bytes $ctx $msg "text/plain; charset=utf-8"
-            continue
-        }
-
-        $ext = [IO.Path]::GetExtension($file).ToLowerInvariant()
-        $ctype = $null
-        if ($mime.ContainsKey($ext)) { $ctype = $mime[$ext] }
-        $bytes = [IO.File]::ReadAllBytes($file)
-        Send-Bytes $ctx $bytes $ctype
-    }
+    StartVisionServerLoop -HttpListener $listener -RepoRootPath $RepoRoot -VisionDirectory $VisionDir -JsonContentType $JsonContentType -PlainContentType $PlainContentType
+}
+catch {
+    Write-Error $_
 }
 finally {
     $listener.Stop()

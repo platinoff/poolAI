@@ -4,491 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI docs vision</title>
-  <style>
-    :root {
-      --bg: #0f1419;
-      --panel: #1a2332;
-      --border: #2d3a4d;
-      --text: #e8eaed;
-      --muted: #9aa0a6;
-      --accent: #8ab4f8;
-      --sidebar-w: 260px;
-      --L0: #2d4a6f;
-      --L1: #3d5a40;
-      --L2: #5a4a2d;
-      --L3: #5a2d4a;
-      --ext-md: #58a6ff;
-      --ext-rs: #f0883e;
-      --ext-json: #3fb950;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    header {
-      flex: 0 0 auto;
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    header h1 { margin: 0; font-size: 0.95rem; }
-    header .meta { color: var(--muted); font-size: 0.72rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    button {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 0.75rem;
-    }
-    button:hover { border-color: var(--accent); }
-    .workspace {
-      flex: 1;
-      display: flex;
-      min-height: 0;
-    }
-    .sidebar {
-      width: var(--sidebar-w);
-      flex-shrink: 0;
-      border-right: 1px solid var(--border);
-      background: #131820;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      transition: width 0.2s;
-    }
-    body.sidebar-collapsed .sidebar { width: 36px; }
-    body.sidebar-collapsed .sidebar-body,
-    body.sidebar-collapsed .sidebar-title span { display: none; }
-    .sidebar-head {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 8px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
-    .sidebar-body {
-      flex: 1;
-      overflow: auto;
-      padding: 4px 0;
-      font-size: 0.78rem;
-    }
-    .tree-folder > summary,
-    .tree-file {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 8px 3px 6px;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .tree-folder > summary { list-style: none; color: var(--muted); font-weight: 600; }
-    .tree-folder > summary::-webkit-details-marker { display: none; }
-    .tree-folder > summary::before { content: "▸ "; }
-    .tree-folder[open] > summary::before { content: "▾ "; }
-    .tree-file { padding-left: 20px; }
-    .tree-file:hover { background: rgba(138,180,248,0.12); }
-    .tree-file.active { background: rgba(138,180,248,0.22); color: var(--accent); }
-    .ext-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    .ext-md { background: var(--ext-md); }
-    .ext-rs { background: var(--ext-rs); }
-    .ext-json { background: var(--ext-json); }
-    .ext-other { background: var(--muted); }
-    .main-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 0;
-      padding: 6px;
-      gap: 6px;
-    }
-    .diagram-row {
-      flex: 1;
-      display: grid;
-      grid-template-columns: minmax(140px, 28%) minmax(0, 1fr) minmax(160px, 26%);
-      gap: 6px;
-      min-height: 0;
-    }
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      overflow: hidden;
-    }
-    .panel h2 {
-      margin: 0;
-      padding: 5px 8px;
-      font-size: 0.72rem;
-      border-bottom: 1px solid var(--border);
-      background: rgba(0,0,0,0.2);
-    }
-    .panel-body { flex: 1; overflow: auto; padding: 6px; min-height: 0; }
-    #graph-3d {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      perspective: 600px;
-    }
-    .layer-stack {
-      transform-style: preserve-3d;
-      transform: rotateX(46deg) rotateZ(-22deg) scale(0.75);
-      width: 160px;
-      height: 100px;
-      position: relative;
-    }
-    .layer-plane {
-      position: absolute;
-      left: 0; right: 0;
-      height: 32px;
-      border-radius: 4px;
-      border: 1px solid rgba(255,255,255,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.6rem;
-      opacity: 0.45;
-      transition: opacity 0.2s, box-shadow 0.2s;
-    }
-    .layer-plane.highlight {
-      opacity: 1;
-      box-shadow: 0 0 12px var(--accent);
-      border-color: var(--accent);
-    }
-    .layer-plane[data-layer="L0"] { background: var(--L0); bottom: 72px; }
-    .layer-plane[data-layer="L1"] { background: var(--L1); bottom: 48px; }
-    .layer-plane[data-layer="L2"] { background: var(--L2); bottom: 24px; }
-    .layer-plane[data-layer="L3"] { background: var(--L3); bottom: 0; }
-    .map-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    }
-    .map-wrap img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      opacity: 0.35;
-      transition: opacity 0.25s;
-    }
-    .map-wrap img.map-active { opacity: 1; }
-    .map-overlay {
-      position: absolute;
-      inset: 8px;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-    }
-    .node-card {
-      background: rgba(0,0,0,0.75);
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 0.72rem;
-    }
-    .node-card .ext-tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 600;
-      font-size: 0.68rem;
-      margin-right: 6px;
-    }
-    .links-list { list-style: none; padding: 0; margin: 0; font-size: 0.7rem; }
-    .links-list li {
-      padding: 4px 6px;
-      margin-bottom: 4px;
-      border-radius: 4px;
-      background: rgba(0,0,0,0.25);
-      cursor: pointer;
-    }
-    .links-list li:hover { background: rgba(138,180,248,0.15); }
-    .links-list .kind { color: var(--muted); font-size: 0.65rem; }
-    .preview-panel { flex: 0 0 28vh; min-height: 120px; max-height: 36vh; }
-    #doc-hint { margin: 0 0 4px; font-size: 0.7rem; color: var(--muted); word-break: break-all; }
-    #doc-preview {
-      margin: 0;
-      font-family: ui-monospace, Consolas, monospace;
-      font-size: 0.68rem;
-      line-height: 1.35;
-      white-space: pre-wrap;
-      word-break: break-word;
-      color: #c9d1d9;
-    }
-    .error { color: #f28b82; font-size: 0.8rem; }
-  </style>
+  <link rel="stylesheet" href="vision.css" />
 </head>
 <body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
   <header>
     <button type="button" id="btn-sidebar" title="Toggle sidebar">☰</button>
-    <h1>PoolAI docs vision</h1>
+    <h1>PoolAI Galaxy docs vision</h1>
     <span class="meta" id="meta-rev">…</span>
-    <button type="button" id="btn-reload">Reload</button>
+    <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
+    <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
   </header>
   <div class="workspace">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
         <button type="button" id="btn-sidebar2" title="Collapse">◀</button>
-        <span class="sidebar-title"><span>Explorer (manifest)</span></span>
+        <span class="sidebar-title"><span>Explorer</span></span>
       </div>
       <div class="sidebar-body" id="file-tree"></div>
     </aside>
     <div class="main-col">
       <div class="diagram-row">
-        <section class="panel">
-          <h2>Layer</h2>
+        <section class="panel" aria-label="Layer stack">
+          <h2>Layers</h2>
           <div class="panel-body" id="graph-3d">
             <div class="layer-stack" id="layer-stack"></div>
           </div>
-        </section>
-        <section class="panel">
-          <h2>Map</h2>
-          <div class="panel-body map-wrap">
-            <img id="svg-img" src="vision.svg" alt="map" />
-            <div class="map-overlay">
-              <div class="node-card" id="node-card" hidden>
-                <span class="ext-tag" id="card-ext"></span>
-                <strong id="card-label"></strong>
-                <div id="card-layer" style="color:var(--muted);margin-top:4px"></div>
-              </div>
-            </div>
+          <div class="legend-bar" style="padding: 0 10px 8px">
+            <span><i style="background: var(--L0)"></i> L0 Concept</span>
+            <span><i style="background: var(--L1)"></i> L1 Ops</span>
+            <span><i style="background: var(--L2)"></i> L2 Catalog</span>
+            <span><i style="background: var(--L3)"></i> L3 Code</span>
           </div>
         </section>
-        <section class="panel">
+        <section class="panel" aria-label="Interactive map">
+          <h2>Galaxy map</h2>
+          <div class="panel-body map-wrap">
+            <img
+              class="galaxy-bg"
+              src="/PoolAIGalaxy.png"
+              alt=""
+              onerror="this.style.display='none'"
+            />
+            <span class="map-hint">click node · manifest graph</span>
+            <svg id="map-svg" viewBox="0 0 900 480" role="img" aria-label="Documentation graph"></svg>
+          </div>
+        </section>
+        <section class="panel" aria-label="Links">
           <h2>Links</h2>
           <div class="panel-body">
+            <svg id="link-graph" aria-label="Neighbour graph"></svg>
             <ul class="links-list" id="links-list"></ul>
+            <div class="sprint-chips" id="sprint-chips"></div>
           </div>
         </section>
       </div>
-      <section class="panel preview-panel">
+      <section class="panel preview-panel" aria-label="Document preview">
         <h2>Preview</h2>
         <div class="panel-body">
-          <p id="doc-hint">Select a file in the sidebar.</p>
+          <p id="doc-hint">Select a file in the sidebar or on the map.</p>
           <pre id="doc-preview"></pre>
         </div>
       </section>
     </div>
   </div>
-  <script>
-    const VISION_BASE = "/docs/vision/";
-    let manifest = null;
-    let nodesByPath = new Map();
-
-    function repoUrl(relPath) {
-      return "/" + relPath.replace(/^\//, "");
-    }
-
-    function fileExt(path) {
-      const m = path.match(/\.([a-z0-9]+)$/i);
-      return m ? m[1].toLowerCase() : "";
-    }
-
-    function extClass(path) {
-      const e = fileExt(path);
-      if (e === "md") return "ext-md";
-      if (e === "rs") return "ext-rs";
-      if (e === "json") return "ext-json";
-      return "ext-other";
-    }
-
-    function extLabel(path) {
-      const e = fileExt(path);
-      return e ? "." + e : "?";
-    }
-
-    async function loadJson(name) {
-      const r = await fetch(VISION_BASE + name + "?t=" + Date.now());
-      if (!r.ok) throw new Error(name + " HTTP " + r.status);
-      return r.json();
-    }
-
-    function buildTree(nodes) {
-      const root = {};
-      nodes.forEach((n) => {
-        const parts = n.path.split("/");
-        let cur = root;
-        parts.forEach((p, i) => {
-          if (!cur[p]) cur[p] = i === parts.length - 1 ? { _node: n } : {};
-          cur = cur[p];
-        });
-      });
-      return root;
-    }
-
-    function renderTree(obj, container, depth) {
-      Object.keys(obj).sort().forEach((key) => {
-        const val = obj[key];
-        if (val._node) {
-          const n = val._node;
-          const div = document.createElement("div");
-          div.className = "tree-file";
-          div.dataset.path = n.path;
-          div.innerHTML =
-            '<span class="ext-dot ' + extClass(n.path) + '"></span>' +
-            '<span>' + n.label + "</span>";
-          div.addEventListener("click", () => selectNode(n));
-          container.appendChild(div);
-          return;
-        }
-        const det = document.createElement("details");
-        det.className = "tree-folder";
-        det.open = depth < 2;
-        const sum = document.createElement("summary");
-        sum.textContent = key;
-        det.appendChild(sum);
-        const inner = document.createElement("div");
-        renderTree(val, inner, depth + 1);
-        det.appendChild(inner);
-        container.appendChild(det);
-      });
-    }
-
-    function renderLayers(m) {
-      const stack = document.getElementById("layer-stack");
-      stack.innerHTML = "";
-      (m.layers || []).slice().reverse().forEach((layer) => {
-        const el = document.createElement("div");
-        el.className = "layer-plane";
-        el.dataset.layer = layer.id;
-        el.textContent = layer.id + " " + layer.name;
-        stack.appendChild(el);
-      });
-    }
-
-    function highlightLayer(layerId) {
-      document.querySelectorAll(".layer-plane").forEach((el) => {
-        el.classList.toggle("highlight", el.dataset.layer === layerId);
-      });
-    }
-
-    function relatedEdges(nodeId) {
-      const out = [];
-      (manifest.edges || []).forEach((e) => {
-        if (e.from === nodeId) {
-          const t = manifest.nodes.find((n) => n.id === e.to);
-          if (t) out.push({ kind: e.kind, dir: "out", node: t });
-        }
-        if (e.to === nodeId) {
-          const t = manifest.nodes.find((n) => n.id === e.from);
-          if (t) out.push({ kind: e.kind, dir: "in", node: t });
-        }
-      });
-      return out;
-    }
-
-    function renderLinks(node) {
-      const ul = document.getElementById("links-list");
-      ul.innerHTML = "";
-      const links = relatedEdges(node.id);
-      if (!links.length) {
-        ul.innerHTML = "<li style='cursor:default;color:var(--muted)'>no manifest edges</li>";
-        return;
-      }
-      links.forEach((l) => {
-        const li = document.createElement("li");
-        li.innerHTML =
-          '<span class="kind">' + l.dir + " · " + l.kind + "</span><br/>" + l.node.label;
-        li.addEventListener("click", () => selectNode(l.node));
-        ul.appendChild(li);
-      });
-    }
-
-    function updateCard(node) {
-      const card = document.getElementById("node-card");
-      const ext = document.getElementById("card-ext");
-      const extName = extLabel(node.path);
-      ext.textContent = extName;
-      ext.className = "ext-tag " + extClass(node.path);
-      ext.style.background =
-        extName === ".md" ? "var(--ext-md)" : extName === ".rs" ? "var(--ext-rs)" : "var(--muted)";
-      document.getElementById("card-label").textContent = node.label;
-      document.getElementById("card-layer").textContent =
-        "layer " + node.layer + (node.sprints ? " · " + node.sprints.join(", ") : "");
-      card.hidden = false;
-      document.getElementById("svg-img").classList.add("map-active");
-    }
-
-    async function openDoc(node) {
-      const hint = document.getElementById("doc-hint");
-      const pre = document.getElementById("doc-preview");
-      hint.textContent = node.path;
-      pre.textContent = "loading…";
-      try {
-        const r = await fetch(repoUrl(node.path));
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        const text = await r.text();
-        const lines = text.split("\n");
-        pre.textContent =
-          lines.length > 100
-            ? lines.slice(0, 100).join("\n") + "\n\n… (" + lines.length + " lines)"
-            : text;
-      } catch (e) {
-        pre.textContent = "Error: " + e.message;
-      }
-    }
-
-    function selectNode(node) {
-      document.querySelectorAll(".tree-file").forEach((el) => {
-        el.classList.toggle("active", el.dataset.path === node.path);
-      });
-      highlightLayer(node.layer);
-      updateCard(node);
-      renderLinks(node);
-      openDoc(node);
-    }
-
-    async function reloadAll() {
-      manifest = await loadJson("manifest.json");
-      nodesByPath = new Map(manifest.nodes.map((n) => [n.path, n]));
-      document.getElementById("meta-rev").textContent =
-        "rev " + manifest.revision + " | " + manifest.last_sprint_closed + " -> " + manifest.next_sprint;
-      renderLayers(manifest);
-      const tree = document.getElementById("file-tree");
-      tree.innerHTML = "";
-      renderTree(buildTree(manifest.nodes), tree, 0);
-      document.getElementById("svg-img").src = VISION_BASE + "vision.svg?t=" + Date.now();
-      if (manifest.nodes.length) selectNode(manifest.nodes[0]);
-    }
-
-    function toggleSidebar() {
-      document.body.classList.toggle("sidebar-collapsed");
-    }
-
-    document.getElementById("btn-sidebar").addEventListener("click", toggleSidebar);
-    document.getElementById("btn-sidebar2").addEventListener("click", toggleSidebar);
-    document.getElementById("btn-reload").addEventListener("click", reloadAll);
-    reloadAll().catch((err) => {
-      document.getElementById("meta-rev").innerHTML =
-        '<span class="error">' + err.message + " — run open-docs-vision.ps1</span>";
-    });
-  </script>
+  <script src="vision.js"></script>
 </body>
 </html>
