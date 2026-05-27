@@ -202,6 +202,8 @@ Security audits are automatically run in CI pipeline:
 
 **Single source** for Galaxy §9.2 / §9.3 / §9.6 policy links in `docs/security/`. Operator runbooks below reference this hub — do not duplicate governance prose elsewhere in this file.
 
+**INDEX (PH-S87):** canonical [крок 8 (CI)](../INDEX_2026-03-17.md#0-канонічний-порядок-читання) · [§7 Monitoring / Security / CI](../INDEX_2026-03-17.md#7-monitoring--performance--security--ci) — [`INDEX_2026-03-17.md`](../INDEX_2026-03-17.md).
+
 | Topic | Galaxy (canon) | PoolAI ops |
 |-------|----------------|------------|
 | **§9.2** Signed releases | [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63) | `poolai-verify-release` (quickstart below); [`src/release/`](../../src/release/) |
@@ -556,6 +558,8 @@ openssl s_client -connect poolai.example.com:443 -showcerts
 ---
 
 **Last Updated**: 2026-05-27  
+**Version**: 1.9 - PH-S87 INDEX step-8 / §7 cross-link to this hub (bidirectional)
+
 **Version**: 1.8 - PH-S85 dev fixtures paths (`tests/fixtures/release/dev`); RUN_LOCAL verify-release pointer
 
 **Version**: 1.7 - Galaxy §9.2/§9.3/§9.6 canonical pointer hub (PH-S77); deduplicated PH-S71–S76 link blocks
