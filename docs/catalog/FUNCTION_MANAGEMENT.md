@@ -410,7 +410,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** поповніть чергу research · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S97** (останній у §5.12) · після закриття — research replenish · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

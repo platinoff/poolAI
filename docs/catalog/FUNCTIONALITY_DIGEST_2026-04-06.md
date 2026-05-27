@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-05-27 (PH-S82: Admin UI `/ui/admin/grid-pricing`; PH-S81 FORCE_FALLBACK; PH-S68 stub baseline).
+**Оновлено:** 2026-05-27 (PH-S96: admin jobs lease columns; PH-S94–S95 job lease wire + PATCH CAS; PH-S93 updates-compat; PH-S78–S92 pricing API/oracle).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -122,7 +122,7 @@
 | Модуль / crate | Призначення | HTTP / wire |
 |----------------|-------------|-------------|
 | `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus (див. **Galaxy Grid modules** нижче) | JSON; map ↔ discovery/RAID |
-| `src/job/` | `JobStore`, scheduler, lifecycle; persistence JSON / SQLite (`FM-029`) / RAID snapshot (`PH-S48`) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule` (FM-020…029) |
+| `src/job/` | `JobStore`, scheduler, lifecycle; persistence JSON / SQLite (`FM-029`) / RAID snapshot (`PH-S48`); optional `lease_owner` / `lease_epoch` / `lease_expires_at` (PH-S94); PATCH CAS `lease_epoch` (PH-S95) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule` (FM-020…029) |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
 | `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |
@@ -142,6 +142,16 @@
 | **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
 | **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
+| **Grid pricing API** | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (task/model/unit); oracle from `galaxy_pricing_oracle` (PH-S78…S83) | `grid.rs` + `galaxy_pricing_oracle` tests |
+| **Job lease wire** | `src/job/types.rs`, `src/network/api/jobs.rs` | optional lease fields; `check_patch_lease_epoch` → `409 lease_epoch_rejected` (PH-S94…S95) | `lease_tests`, `jobs_api_contracts` |
+
+**Admin UI (Galaxy ops, read-only):**
+
+| Сторінка | Шлях | Спринт |
+|----------|------|--------|
+| Grid pricing | `/ui/admin/grid-pricing` | PH-S82 |
+| Updates & compatibility | `/ui/admin/updates-compat` | PH-S93 |
+| Jobs + lease columns | `/ui/admin/jobs` | PH-S53, PH-S96 |
 
 **Env (Galaxy wire, орієнтир):**
 
@@ -156,8 +166,10 @@
 | `POOLAI_GALAXY_PRICE_MAX_STALE_SECS` | coordinator | Pricing oracle stale-while-revalidate (default `3600`) |
 | `POOLAI_GALAXY_PRICING_FALLBACK_JSON` | coordinator | L2 fixed fallback quote map by unit key (usd_micro JSON) for provider outage |
 | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | coordinator | `1` = L2-only emergency mode (`pricing_forced_fallback` log; PH-S81) |
+| `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92) |
+| `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | **PH-S97 (planned):** default lease TTL (Galaxy §4.3.1) |
 
-**Не в коді (concept-only / наступні PH-S*):** pricing HTTP wire + provider fetch, in-process auto-updater, admin UI “Updates & compatibility”.
+**Не в коді (concept-only / наступні PH-S*):** live pricing provider HTTP fetch; lease acquire/renew/failover; `Leased`/`Migrating` job status; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 

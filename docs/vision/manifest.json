@@ -1,5 +1,5 @@
 {
-  "revision": 15,
+  "revision": 16,
   "updated_at": "2026-05-27",
   "last_sprint_closed": "PH-S96",
   "next_sprint": "PH-S97",
@@ -122,8 +122,8 @@
       "label": "job/types.rs",
       "path": "src/job/types.rs",
       "layer": "L3",
-      "sprints": ["PH-S94"],
-      "sections": ["lease_owner", "lease_epoch", "lease_expires_at"]
+      "sprints": ["PH-S94", "PH-S95", "PH-S97"],
+      "sections": ["lease_owner", "lease_epoch", "lease_expires_at", "PATCH CAS"]
     },
     {
       "id": "admin_updates_compat",
@@ -131,6 +131,35 @@
       "path": "src/ui/admin/updates_compat.rs",
       "layer": "L3",
       "sprints": ["PH-S93"]
+    },
+    {
+      "id": "admin_jobs",
+      "label": "admin/jobs.rs",
+      "path": "src/ui/admin/jobs.rs",
+      "layer": "L3",
+      "sprints": ["PH-S53", "PH-S96"],
+      "sections": ["lease columns"]
+    },
+    {
+      "id": "admin_grid_pricing",
+      "label": "admin/grid_pricing.rs",
+      "path": "src/ui/admin/grid_pricing.rs",
+      "layer": "L3",
+      "sprints": ["PH-S82"]
+    },
+    {
+      "id": "grid_pricing_api",
+      "label": "api/grid.rs pricing",
+      "path": "src/network/api/grid.rs",
+      "layer": "L3",
+      "sprints": ["PH-S78", "PH-S79", "PH-S80", "PH-S81", "PH-S89"]
+    },
+    {
+      "id": "galaxy_roadmap",
+      "label": "GALAXY_GRID_ROADMAP",
+      "path": "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+      "layer": "L1",
+      "sprints": ["PH-S*"]
     }
   ],
   "edges": [
@@ -150,6 +179,11 @@
     { "from": "galaxy_grid", "to": "security_hardening", "kind": "concept-ref" },
     { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" },
     { "from": "galaxy_grid", "to": "job_types", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "admin_updates_compat", "kind": "implements" }
+    { "from": "galaxy_grid", "to": "admin_updates_compat", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "admin_jobs", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "admin_grid_pricing", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "grid_pricing_api", "kind": "implements" },
+    { "from": "handoff", "to": "galaxy_roadmap", "kind": "session-tracks" },
+    { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "revision": 10,
+  "revision": 11,
   "updated_at": "2026-05-27",
   "active_sprint": "PH-S97",
   "ui_version": 3,
@@ -72,11 +72,31 @@
       "extensions": [".svg", ".html", ".json", ".md", ".mdc"]
     },
     "job_lease_wire_stub": {
-      "sprints": ["PH-S94"],
+      "sprints": ["PH-S94", "PH-S95"],
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/job/types.rs", "src/network/api/jobs.rs", "docs/openapi.yaml"],
+      "code_globs": ["src/job/types.rs", "src/network/api/jobs.rs", "docs/openapi.yaml", "tests/jobs_api_contracts.rs"],
       "extensions": [".rs", ".yaml", ".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
+    },
+    "admin_jobs_lease_ui": {
+      "sprints": ["PH-S96"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/ui/admin/jobs.rs", "src/ui/i18n_core.js", "e2e/tests/admin.spec.ts"],
+      "extensions": [".rs", ".js", ".ts", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"]
+    },
+    "job_lease_ttl_env": {
+      "sprints": ["PH-S97"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["src/job/types.rs", "src/job/mod.rs"],
+      "extensions": [".rs", ".md"],
+      "also_update": ["docs/development/HANDOFF_NEW_SESSION.md", "docs/catalog/FUNCTION_MANAGEMENT.md"]
+    },
+    "galaxy_grid_roadmap_doc": {
+      "sprints": ["PH-S*"],
+      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md", "docs/INDEX_2026-03-17.md", "docs/development/README.md"],
+      "extensions": [".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     }
   },
   "browser_panels": [

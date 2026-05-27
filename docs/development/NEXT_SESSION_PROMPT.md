@@ -31,7 +31,7 @@ cargo fmt --all
 K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci
 
 ## Стан (2026-05-27)
-- HEAD: `c2a96e36` — PH-S95 PATCH lease epoch CAS
+- HEAD: `40e91293` — PH-S96 admin jobs lease columns
 - Закрито: PH-S03…S96 + PH-S76 + PH-S77 + PH-S90
 - Відкритий sprint: PH-S97 (останній у §5.12)
 - BLOCKED: PH-S35 / PH-S16 / PH-S02 (LAN)

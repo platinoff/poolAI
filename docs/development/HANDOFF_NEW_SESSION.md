@@ -67,6 +67,8 @@
 **PH-S96 ✅ (code):** `/ui/admin/jobs` — read-only lease columns (`lease_owner`, `lease_epoch`, `lease_expires_at`); i18n EN/UK; Playwright smoke (`admin.spec.ts`); `cargo test-ci` + e2e PH-S96.
 **Черга:** §5.12 **PH-S97** (1 відкритий) — job lease TTL env default stub.
 
+**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S97, фази, наступні орієнтири).
+
 ## 1. Канонічний порядок документації та планів
 
 Той самий список, що в кореневому [`README.md`](../../README.md) (*Documentation map*) і [`docs/README.md`](../README.md) (*Canonical reading order*), кроки **1–12**.
@@ -100,6 +102,9 @@
 | `POOLAI_GALAXY_PRICE_CACHE_TTL_SECS` | coordinator | Pricing oracle fresh TTL (default `300`; `galaxy_pricing_oracle`, §4.2) |
 | `POOLAI_GALAXY_PRICE_MAX_STALE_SECS` | coordinator | Pricing oracle stale window (default `3600`) |
 | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | coordinator | `1` — аварійний L2-only режим (`pricing_forced_fallback` log + metric; PH-S81) |
+| `POOLAI_GALAXY_PRICING_FALLBACK_JSON` | coordinator | L2 fixed quote map by unit key (usd_micro JSON); PH-S75/S78 |
+| `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92); no live HTTP fetch |
+| `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | **PH-S97 (planned):** default lease TTL seconds (Galaxy §4.3.1) |
 | `POOLAI_TELEGRAM_ID` | worker | Telegram user id → `POST .../telegram/bind` після register |
 | `POOLAI_WORKER_CACHE_DIR` | worker | Локальний кеш probe-артефактів після успішного `raid_artifact_probe` |
 | `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings (напр. `data/virtual_nodes`) |
