@@ -26,6 +26,7 @@ Benchmarks live under `benches/` and use [Criterion](https://github.com/bheisler
 | `cloud_benchmarks` | `cargo bench -j 1 --bench cloud_benchmarks --features cloud` | `CloudConfig::validate`, manager `initialize`/`shutdown` (default config). For kube OpenAPI alignment with CI, set **`K8S_OPENAPI_ENABLED_VERSION=1.28`** (see [`.github/workflows/benchmarks.yml`](../../.github/workflows/benchmarks.yml)). |
 | `service_layer_benchmarks` | `cargo bench -j 1 --bench service_layer_benchmarks --features test-utils` | `RaidService` list/quota/cluster_status over temp `RaidManager`. Same **`bench`** / MSVC workaround as other Criterion targets (see baseline note). |
 | `http_hotpath_benchmarks` | `cargo bench -j 1 --bench http_hotpath_benchmarks` | **FM-042:** `http_json_errors` (`api_error_response`, status map), `http_trace` (`make_http_span`). |
+| `galaxy_fee_split_benchmarks` | `cargo bench -j 1 --bench galaxy_fee_split_benchmarks` | **PH-S58:** `split_gross_payment` (1 SOL, secondary min/max bps). |
 | `sharding_benchmarks` | `cargo bench -j 1 --bench sharding_benchmarks` | FM-036: `tensor_shard_plan_build_4_nodes`, `shard_sync_bus/all_reduce_step_4_nodes`. |
 
 Use **`-j 1`** on memory-constrained hosts (e.g. Windows linking many binaries) to reduce parallel link pressure.

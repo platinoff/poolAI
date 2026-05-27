@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — PH-S55 run-poolai RAID jobs preset (Galaxy Grid queue sync)
+PoolAI — PH-S60 Galaxy Grid Telegram seats (concept)
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -25,27 +25,27 @@ cargo fmt --all
 cargo test-ci
 
 ## Стан
-- **PH-S03…S54:** ✅
-- **Черга §5.11:** PH-S55…S64 (10 відкритих; Galaxy Grid concept)
+- **PH-S03…S59:** ✅
+- **Черга §5.11:** PH-S60…S64 (5 відкритих; Galaxy Grid concept)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
-## PH-S55 — наступна сесія
-1. `bin/run-poolai.sh` / `.ps1`: preset або documented one-liner з `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH`
-2. `RUN_LOCAL.md` — single/lan quick start для RAID jobs
+## PH-S60 — наступна сесія
+1. `docs/concept/POOLAI_GALAXY_GRID.md`: Telegram edge mining — seats (members vs bound wallets vs sessions)
+2. Мінімальний flow привʼязки wallet у чаті (concept)
 
 ## Завершення сесії
-1. FM §5.11 (PH-S55 → ✅) + HANDOFF
-2. Оновити цей NEXT_SESSION_PROMPT (PH-S56)
+1. FM §5.11 (PH-S60 → ✅) + HANDOFF
+2. Оновити цей NEXT_SESSION_PROMPT (PH-S61)
 3. git push (MSYS2) + самарі
 
 ## Не повторювати
-PH-S03…S54 · verify-dev-stand RAID step · admin jobs UI · jobs RAID E2E
+PH-S03…S59 · fee split · pricing oracle · unified worker DTO · lease/re-migrate · run-poolai RAID preset
 
 ## Черга §5.11 (відкриті)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S55** | run-poolai RAID preset |
-| 2–10 | **PH-S56…S64** | Galaxy Grid: job lease/re-migrate, unified workers, fee split, pricing oracle, Telegram seats, locality seeds, verification, governance, docs sync |
+| 1 | **PH-S60** | Telegram seats + wallet binding |
+| 2–5 | **PH-S61…S64** | Locality seeds, verification, governance, docs sync |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```

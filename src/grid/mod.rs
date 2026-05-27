@@ -6,6 +6,7 @@
 
 pub mod dispatch;
 mod envelope;
+pub mod galaxy_fee_split;
 mod map;
 
 pub use dispatch::{ingest_envelope, GridIngestKind, GridIngestOutcome};

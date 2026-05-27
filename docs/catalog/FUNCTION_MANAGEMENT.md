@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-26 (PH-S54 ✅ verify-dev-stand RAID step · §5.11 PH-S55…S61; FM-041 Deferred).
+**Оновлено:** 2026-05-26 (PH-S59 ✅ Galaxy Grid pricing oracle concept · §5.11 PH-S60…S64; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -244,11 +244,11 @@ FM-xxx (з таблиці нижче)
 
 | # | Sprint | Фокус | Джерело | Acceptance (скорочено) | Стан |
 |---|--------|--------|---------|-------------------------|------|
-| 1 | **PH-S55** | `run-poolai` preset для RAID jobs (операторський quick start) | `RUN_LOCAL.md`, `bin/run-poolai.sh` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH`; без дублювання | відкрито |
-| 2 | **PH-S56** | Galaxy Grid: job lease + re-migrate policy (концепт) | `concept/POOLAI_GALAXY_GRID.md` | описати at-most-once (lease/TTL), умови re-migrate, мінімальні стани job | відкрито |
-| 3 | **PH-S57** | Galaxy Grid: unified worker entity (local/cloud/telegram) (концепт + DTO sketch) | `concept/POOLAI_GALAXY_GRID.md`, FM-016 | зафіксувати `origin`/`admin_id`/`capabilities`/`network_profile` поля; UI фільтри як labels | відкрито |
-| 4 | **PH-S58** | Fee split: primary 0.1% dev wallet + secondary 1–5% admin (концепт) | `concept/POOLAI_GALAXY_GRID.md`, Solana concept | описати payout формулу (SOL за compute), діапазон secondary, UX warning “менше краще” | відкрито |
-| 5 | **PH-S59** | Pricing oracle: -10% від min US providers (концепт + ops notes) | `concept/POOLAI_GALAXY_GRID.md` | визначити unit ціни (наприклад токени/сек/за job), кеш/TTL, fallback при outage | відкрито |
+| 1 | **PH-S55** | `run-poolai` preset для RAID jobs (операторський quick start) | `RUN_LOCAL.md`, `bin/run-poolai.sh`, `bin/run-poolai.ps1` | documented `single`/`lan` one-liner з `POOLAI_JOB_STORE=raid` + `POOLAI_RAID_BASE_PATH`; `single` preset (`--raid-jobs` / `-RaidJobs`) | **✅** |
+| 2 | **PH-S56** | Galaxy Grid: job lease + re-migrate policy (концепт) | `concept/POOLAI_GALAXY_GRID.md` | зафіксовано lease/TTL + `lease_epoch`, CAS по result, failover triggers, retry budget, мінімальна state-модель job | **✅** |
+| 3 | **PH-S57** | Galaxy Grid: unified worker entity (local/cloud/telegram) (концепт + DTO sketch) | `concept/POOLAI_GALAXY_GRID.md`, FM-016 | зафіксовано DTO sketch (`origin/admin_id/capabilities/network_profile/limits`) + мінімальні UI labels/filter/sort правила | **✅** |
+| 4 | **PH-S58** | Fee split: primary 0.1% dev wallet + secondary 1–5% admin (концепт) | `concept/POOLAI_GALAXY_GRID.md`, Solana concept | `src/grid/galaxy_fee_split.rs` + formula/docs + UX hint + unit tests + Criterion bench | **✅** |
+| 5 | **PH-S59** | Pricing oracle: -10% від min US providers (концепт + ops notes) | `concept/POOLAI_GALAXY_GRID.md` | unit keys (tokens/GPU-sec/job flat), `floor(min×0.9)`, кеш TTL/SWR, L1–L3 fallback + env ops | **✅** |
 | 6 | **PH-S60** | Telegram edge mining: seats + wallet binding (концепт) | FM-016, Galaxy | визначити “seats” (members vs bound wallets vs sessions) + мінімальний flow привʼязки | відкрито |
 | 7 | **PH-S61** | Seeds/locality: placement + prefetch RAM/VRAM policy (концепт) | Memory layer + SmallWorld | описати telemetry signals, “keep hot layers local”, task-driven prefetch | відкрито |
 | 8 | **PH-S62** | Edge verification baseline (концепт) | Galaxy | мінімальна верифікація для untrusted edge: sampling/replay/replication (без ZK) | відкрито |

@@ -118,7 +118,7 @@
 
 | Модуль / crate | Призначення | HTTP / wire |
 |----------------|-------------|-------------|
-| `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus | JSON; map ↔ discovery/RAID |
+| `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus; **PH-S58** `galaxy_fee_split` (primary 0.1% + secondary 1–5%) | JSON; map ↔ discovery/RAID |
 | `src/job/` | `JobStore`, scheduler, lifecycle; persistence JSON / SQLite (`FM-029`) / RAID snapshot (`PH-S48`) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule` (FM-020…029) |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |

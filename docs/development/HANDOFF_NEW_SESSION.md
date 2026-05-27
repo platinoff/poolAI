@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-26 (PH-S54 ✅ verify-dev-stand RAID job step · §5.11 PH-S55…S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-26 (PH-S59 ✅ Galaxy Grid pricing oracle concept · §5.11 PH-S60…S64 · Galaxy Grid concept) · VDT — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -21,9 +21,14 @@
 **PH-S52 ✅:** Playwright `jobs_raid.spec.ts` (POST job → restart stand → GET); `POOLAI_JOB_STORE=raid` у `e2e-playwright.sh --start`; fix RAID persist `block_on` з HTTP handlers (`src/job/store.rs`).
 **PH-S53 ✅:** `/ui/admin/jobs` — таблиця задач, badge `json`/`sqlite`/`raid` з `GET /api/v1/jobs` (`store_backend`).
 **PH-S54 ✅:** `bin/verify-dev-stand.*` — `VERIFY_RAID_JOB_STORE=1`: POST job → restart coordinator → GET persisted (патерн PH-S52 / `job_store_raid_persistence`).
-**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (ролі dev/admin/Telegram/AI клієнт, fee split 0.1% + secondary 1–5%, Telegram bridge до edge mining, re-migrate scheduling, locality seeds).
+**PH-S55 ✅:** `run-poolai` RAID jobs preset — `single` (`--raid-jobs` / `-RaidJobs`) + documented one-liner для `lan` з `POOLAI_JOB_STORE=raid` і `POOLAI_RAID_BASE_PATH` (`RUN_LOCAL.md`).
+**PH-S56 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` — lease/TTL (`lease_owner`, `lease_epoch`, `lease_expires_at`), at-most-once через CAS `job_id + lease_epoch`, failover triggers, retry budget, мінімальна state-модель (`Queued/Leased/Running/Migrating/Completed|Failed|Cancelled`).
+**PH-S57 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` — unified worker DTO sketch (`origin`, `admin_id`, `capabilities`, `network_profile`, `limits`) + UI правила badges/filter/sort для local/cloud/telegram.
+**PH-S58 ✅:** `src/grid/galaxy_fee_split.rs` — primary 0.1% + secondary 1–5% payout (lamports, floor bps), UX hint constant, unit tests; `cargo bench --bench galaxy_fee_split_benchmarks`.
+**PH-S59 ✅:** `docs/concept/POOLAI_GALAXY_GRID.md` §4.2 — pricing oracle: unit keys (tokens/GPU-sec/job flat), `floor(market_min×0.9)` US providers, cache TTL/SWR, L1–L3 fallback + ops env (`POOLAI_GALAXY_PRICE_*`).
+**Galaxy Grid (концепт):** `docs/concept/POOLAI_GALAXY_GRID.md` (ролі dev/admin/Telegram/AI клієнт, fee split, pricing oracle, Telegram bridge, lease/re-migrate, unified worker DTO, locality seeds).
 
-**Черга:** §5.11 **PH-S55…S64** (10 відкритих); наступний код — **PH-S55**.
+**Черга:** §5.11 **PH-S60…S64** (5 відкритих); наступний код — **PH-S60**.
 
 ## 1. Канонічний порядок документації та планів
 

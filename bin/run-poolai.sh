@@ -31,6 +31,7 @@ cd "$ROOT"
 FEATURES="${FEATURES:-enterprise,ml,cloud,test-utils}"
 PORT="${POOLAI_HTTP_PORT:-8080}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
+JOB_STORE="${POOLAI_JOB_STORE:-}"
 BG=0
 
 usage() {
@@ -52,6 +53,8 @@ Options (single):
   --bg            Run in background (logs under data/dev/logs/)
   --port N        HTTP port (default 8080)
   --skip-build    Skip cargo build
+  --raid-jobs     Preset POOLAI_JOB_STORE=raid + auto RAID path
+  --job-store X   Set POOLAI_JOB_STORE (json|sqlite|raid)
 
 Environment:
   FEATURES        Cargo features (default: enterprise,ml,cloud,test-utils)
@@ -114,6 +117,8 @@ cmd_single() {
       --bg) BG=1; shift ;;
       --port) PORT="$2"; shift 2 ;;
       --skip-build) SKIP_BUILD=1; shift ;;
+      --raid-jobs) JOB_STORE="raid"; shift ;;
+      --job-store) JOB_STORE="$2"; shift 2 ;;
       *) echo "Unknown option: $1"; usage; exit 1 ;;
     esac
   done
@@ -134,6 +139,9 @@ cmd_single() {
   export POOLAI_HTTP_PORT="$PORT"
   export POOLAI_DATA_PATH="$data"
   export POOLAI_RAID_BASE_PATH="$raid"
+  if [[ -n "$JOB_STORE" ]]; then
+    export POOLAI_JOB_STORE="$JOB_STORE"
+  fi
 
   local url="http://127.0.0.1:${PORT}"
   echo "PoolAI single node"
@@ -141,6 +149,10 @@ cmd_single() {
   echo "  UI:   ${url}/ui"
   echo "  Admin:${url}/ui/admin  (login admin / admin123)"
   echo "  Data: $data"
+  echo "  Job store: ${POOLAI_JOB_STORE:-json}"
+  if [[ "${POOLAI_JOB_STORE:-}" == "raid" ]]; then
+    echo "  RAID path: $POOLAI_RAID_BASE_PATH"
+  fi
 
   if [[ "$BG" == "1" ]]; then
     local log="$logs/single-${PORT}.log"

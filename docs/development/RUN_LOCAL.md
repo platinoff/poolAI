@@ -24,6 +24,16 @@ cd S:\rust\poolAI
 .\bin\run-poolai.ps1 stop
 ```
 
+### PH-S55: RAID jobs preset (single / lan one-liner)
+
+```powershell
+# single node + RAID job store preset
+.\bin\run-poolai.ps1 single -Background -SkipBuild -RaidJobs
+
+# lan: one-liner with explicit env (node 1; repeat with another RAID path for node 2)
+$env:POOLAI_RAID_BASE_PATH = "$PWD\data\dev\lan\node1\raid"; $env:POOLAI_JOB_STORE = "raid"; .\bin\run-poolai.ps1 lan
+```
+
 | URL | Призначення |
 |-----|-------------|
 | http://127.0.0.1:8080/ui/login | **Спочатку логін** |
@@ -47,6 +57,14 @@ cd /s/rust/poolAI
 /usr/bin/bash bin/run-poolai.sh stop
 ```
 
+```bash
+# single node + RAID job store preset
+/usr/bin/bash bin/run-poolai.sh single --bg --skip-build --raid-jobs
+
+# lan: one-liner with explicit env (node 1; repeat with another RAID path for node 2)
+POOLAI_RAID_BASE_PATH="$PWD/data/dev/lan/node1/raid" POOLAI_JOB_STORE=raid /usr/bin/bash bin/run-poolai.sh lan
+```
+
 **Не** пиши голе `bash` — використовуй `/usr/bin/bash` (інакше може викликатись WSL).
 
 ---
@@ -55,7 +73,7 @@ cd /s/rust/poolAI
 
 | Команда | Що піднімає | Коли використовувати |
 |---------|-------------|-------------------|
-| `single` | 1× `poolai` | Розробка UI, API, admin, ML enterprise |
+| `single` | 1× `poolai` | Розробка UI, API, admin, ML enterprise (`--raid-jobs` для job RAID preset) |
 | `lan` | 2+× `poolai` (8080, 8081, …) | Distributed RAID на одному ПК ([`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) §5) |
 | `virtual-node` | `poolai` + `poolai-worker` | FM-016: VN, tasks, pool join |
 | `docker` | Контейнер `poolai:latest` | Ізольований прогін без локального Rust |

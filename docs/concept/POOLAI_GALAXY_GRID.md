@@ -27,6 +27,34 @@
 - **Secondary fee = 1–5%** (рекомендація: чим менше — тим краща ринкова конкурентність).
 - При “без Telegram-пулу” адмін заробляє собі secondary fee, віддаючи job лише primary (0.1%) dev’у.
 
+#### 1.2.1 Payout formula (PH-S58, canonical)
+
+Усі суми в **atomic units** (наприклад SOL **lamports**). Відсотки — **floor** (округлення вниз), basis points `bps` (100% = 10_000 bps):
+
+| Fee | bps | Share |
+|-----|-----|-------|
+| Primary dev | 10 | 0.1% (fixed) |
+| Secondary admin | 100–500 | 1–5% (admin config) |
+| Worker / operator pool | remainder | gross − primary − secondary |
+
+```
+primary   = floor(gross × 10 / 10_000)
+secondary = floor(gross × secondary_bps / 10_000)   // secondary_bps ∈ [100, 500]
+worker    = gross − primary − secondary
+```
+
+**Приклад (1 SOL = 1_000_000_000 lamports, secondary = 1%):**
+
+- primary = 1_000_000 lamports (0.001 SOL)
+- secondary = 10_000_000 lamports (0.01 SOL)
+- worker pool = 989_000_000 lamports (0.989 SOL)
+
+**Приклад (1 SOL, secondary = 5%):** worker pool = 949_000_000 lamports (0.949 SOL).
+
+**UX rule (admin UI):** показувати hint *«Lower secondary fee (1–5%) improves market competitiveness; higher fee reduces worker payout.»* при зміні secondary fee.
+
+**Rust reference:** `src/grid/galaxy_fee_split.rs` — `split_gross_payment`, unit tests + `cargo bench --bench galaxy_fee_split_benchmarks`.
+
 ### 1.3 Telegram-клієнт (mining worker edge)
 
 - Telegram-користувач підключає свої гаманці для винагороди в UI/аплікації (через tgbot).
@@ -70,6 +98,58 @@ Worker’и мають:
 
 Для CPU/GPU worker’ів авто-розкладка може відрізнятись, але контракт має бути однаковим: “скільки capacity доступно зараз”.
 
+### 2.3 DTO sketch (discovery/grid) + UI labels
+
+Для уніфікації local/cloud/telegram worker пропонується єдиний wire DTO:
+
+```json
+{
+  "worker_id": "wrk_01H...",
+  "srv_id": "srv_eu_west_1",
+  "admin_id": "admin_42",
+  "origin": "local_srv",
+  "status": "online",
+  "capabilities": {
+    "cpu_cores": 8,
+    "gpu_units": 1,
+    "memory_gb": 32,
+    "disk_gb": 512,
+    "task_profiles": ["inference:text", "inference:vision"]
+  },
+  "network_profile": {
+    "region": "eu-west",
+    "latency_ms_p50": 24,
+    "bandwidth_mbps": 500,
+    "egress_policy": "vpn_proxy"
+  },
+  "limits": {
+    "max_concurrent_jobs": 4,
+    "max_gpu_jobs": 1,
+    "manual_cap_enabled": true
+  },
+  "telemetry": {
+    "queue_depth": 1,
+    "load_avg_1m": 0.42,
+    "last_heartbeat_at": "2026-05-26T23:00:00Z"
+  }
+}
+```
+
+Нормативні поля:
+
+- `origin`: `local_srv` | `cloud_provider` | `telegram_edge`.
+- `admin_id` + `srv_id`: ownership і білінг-маршрутизація.
+- `capabilities`: scheduler contract для підбору задач.
+- `network_profile`: routing/locality/SmallWorld сигнали.
+- `limits`: ручні або auto caps для admission control.
+
+Мінімальні правила UI (admin/ops панель):
+
+1. Показувати `origin` як badge (`local`, `cloud`, `telegram`) у списку worker-ів.
+2. Фільтри: `origin`, `region`, `gpu_units > 0`, `status`.
+3. Сортування за `latency_ms_p50` і `last_heartbeat_at` (дефолт для troubleshooting).
+4. Розкритий рядок worker-а: ownership (`admin_id`, `srv_id`) + caps (`max_concurrent_jobs`, `max_gpu_jobs`).
+
 ## 3. Telegram edge mining: worker як “VM-aware” isolated capacity
 
 Telegram worker (desktop Win/Linux/Mac) має працювати як:
@@ -92,12 +172,121 @@ Scheduling має враховувати:
 - locality (seed/memory shard placement та “де вже є потрібні шари”);
 - pricing.
 
-### 4.2 Pricing
+### 4.2 Pricing oracle (PH-S59, canonical)
 
-- Ціна job’а визначається як **найнижча ринкова ціна** серед обраних US-провайдерів (OpenAI/Grok/xAI/Mistral тощо), але:
-  - **PoolAI знижує її на 10%** від мінімуму.
+Galaxy Grid використовує **pricing oracle** — off-chain компонент coordinator/srvN, який:
 
-Реалізацію price oracle треба робити як окремий сервіс/механізм (качує, має fallback при відсутності котирувань).
+1. збирає публічні або адмін-конфігуровані **unit-ціни** US inference-провайдерів;
+2. обчислює **ринковий мінімум** по профілю задачі;
+3. публікує **PoolAI quote** = **−10%** від цього мінімуму (округлення вниз);
+4. кешує котирування з **TTL** і переходить на **fallback** при outage джерел.
+
+Oracle **не** замінює settlement (`galaxy_fee_split` / on-chain); він лише визначає **gross quote** для job до fee split.
+
+#### 4.2.1 Unit ціни (нормалізація)
+
+Білінг і scheduling мають спільний словник **unit keys**. Кожен provider quote нормалізується до цих ключів перед `min()`.
+
+| Unit key | Сенс | Типові job / capability |
+|----------|------|-------------------------|
+| `inference_input_token` | USD за 1M **input** токенів | `inference:text`, chat completion |
+| `inference_output_token` | USD за 1M **output** токенів | те саме (окремий output тариф) |
+| `inference_blended_token` | USD за 1M **blended** токенів (якщо провайдер не ділить in/out) | legacy/API без split |
+| `gpu_second` | USD за 1 GPU-секунду | `inference:vision`, GPU batch |
+| `job_flat` | фіксована ціна за job | короткі/sync задачі, cap на ризик |
+
+**Канонічний primary unit для порівняння US min:** `inference_blended_token` (або пара `input`+`output`, якщо обидва є в каталозі — тоді `effective = input + expected_output_ratio × output`).
+
+**Нормалізація валюти:** усі котирування oracle зберігає в **micro-USD** (`usd_micro`, 1 USD = 1_000_000 usd_micro) для цілочисельної арифметики; конвертація в lamports/SOL — на етапі settlement (курс окремо, поза scope oracle).
+
+**Приклад provider row (концепт):**
+
+```json
+{
+  "provider_id": "openai_us",
+  "region": "us",
+  "model_profile": "gpt-4o-mini",
+  "task_profiles": ["inference:text"],
+  "units": {
+    "inference_input_token": 150000,
+    "inference_output_token": 600000
+  },
+  "observed_at": "2026-05-26T12:00:00Z",
+  "source": "public_list_price"
+}
+```
+
+(`150000` usd_micro = $0.15 / 1M tokens.)
+
+#### 4.2.2 Формула: −10% від min US providers
+
+**US provider set** (конфігурований каталог, `region = us`):
+
+- OpenAI, Anthropic, xAI (Grok), Mistral, Google (US endpoints), інші з allow-list адміна гріду.
+- Провайдер **healthy**, якщо останній успішний fetch &lt; `provider_stale_after_secs` (default 600).
+
+Для заданого `task_profile` + `model_profile` (або default profile):
+
+```
+market_min_usd_micro = min(provider[i].normalized_unit_price)   // i ∈ US, healthy
+poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −10%, floor
+```
+
+**Приклад:** min blended = $0.50 / 1M → `market_min = 500_000` usd_micro → `poolai_quote = floor(500_000 × 0.9) = 450_000` ($0.45 / 1M).
+
+**Job gross (концепт):** coordinator оцінює expected units (tokens з request, GPU-seconds з capability) × `poolai_quote` → `gross_usd_micro` → далі `galaxy_fee_split` на atomic settlement units.
+
+#### 4.2.3 Кеш і TTL
+
+| Параметр | Default | Призначення |
+|----------|---------|-------------|
+| `cache_ttl_secs` | 300 | Свіжість entry; після TTL — async refresh |
+| `max_stale_secs` | 3600 | Stale-while-revalidate: віддавати застарілий кеш, поки refresh у flight |
+| `refresh_jitter_pct` | 10 | Розмазати refresh між srvN, щоб не DDoS-ити провайдерів |
+
+**Ключ кешу:** `(task_profile, model_profile, unit_key)` → `{ poolai_quote_usd_micro, market_min_usd_micro, provider_id_at_min, observed_at, cache_fresh_until }`.
+
+**Поведінка:**
+
+1. **Hit (fresh):** повернути кеш без мережі.
+2. **Hit (stale, &lt; max_stale):** повернути кеш + фоновий refresh (SWR).
+3. **Miss / expired stale:** синхронний refresh; при success — оновити кеш; при fail — fallback (§4.2.4).
+
+Майбутній wire (концепт): `GET /api/v1/grid/pricing?task_profile=…&model_profile=…` — read-only snapshot для admin UI і AI-клієнта.
+
+#### 4.2.4 Fallback при outage
+
+Якщо **усі** US джерела недоступні або quotes невалідні:
+
+| Рівень | Умова | Дія |
+|--------|-------|-----|
+| **L1 — stale cache** | є last-known-good, вік &lt; `max_stale_secs` | використати stale; metric `galaxy_pricing_stale_served` |
+| **L2 — configured floor** | `POOLAI_GALAXY_PRICING_FALLBACK_JSON` або per-profile floor у config | зафіксований `poolai_quote` (адмін оновлює вручну при довгому outage) |
+| **L3 — hard stop** | L1+L2 недоступні | **нові** priced jobs → `503 pricing_unavailable`; running jobs — без зміни gross; ops alert |
+
+**Операторський override:** `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` — завжди L2 (аварійний режим, логувати `pricing_forced_fallback`).
+
+**Не робити:** автоматично підвищувати ціну понад `market_min` під час outage (зберігаємо обіцянку −10% від останнього відомого min або L2 floor).
+
+#### 4.2.5 Ops notes (coordinator)
+
+| Змінна (концепт) | Default | Опис |
+|------------------|---------|------|
+| `POOLAI_GALAXY_PRICE_CACHE_TTL_SECS` | `300` | TTL свіжого кешу |
+| `POOLAI_GALAXY_PRICE_MAX_STALE_SECS` | `3600` | Межа stale-while-revalidate |
+| `POOLAI_GALAXY_PRICING_PROVIDERS` | bundled allow-list | JSON/TOML каталог US providers + endpoints |
+| `POOLAI_GALAXY_PRICING_FALLBACK_JSON` | — | L2 floor quotes per `task_profile` |
+| `POOLAI_GALAXY_PRICING_FORCE_FALLBACK` | `0` | `1` = лише L2 |
+
+**Спостережність:**
+
+- Логи: `pricing_oracle_refresh_ok`, `pricing_oracle_refresh_fail`, `pricing_oracle_stale_served`, `pricing_oracle_outage`.
+- Метрики (Prometheus, майбутнє): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
+- Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
+
+**Реалізація (наступні спринти):** окремий модуль `src/grid/galaxy_pricing_oracle.rs` (не в scope PH-S59); PH-S59 — лише контракт і ops.
+
+**Rust reference (fee split, не oracle):** `src/grid/galaxy_fee_split.rs` — застосовується після визначення `gross`.
 
 ### 4.3 Re-migrate policy
 
@@ -105,7 +294,57 @@ Scheduling має враховувати:
 
 - усі його worker’и зайняті,
 
-то job не чекає безкінечно; він **re-migrate** у той srvN, де з’явився вільний capacity (потрібен механізм job lease / at-most-once гарантії).
+то job не чекає безкінечно; він **re-migrate** у той srvN, де з’явився вільний capacity.
+
+#### 4.3.1 Job lease / TTL (at-most-once)
+
+Для кожного job вводиться `lease_owner` (srv/worker), `lease_epoch` і `lease_expires_at`.
+
+- `lease_ttl`: базовий час володіння lease (наприклад 30-120 с, профільно за типом job).
+- `lease_renew_interval`: heartbeat/renew до `lease_ttl/3`.
+- `lease_epoch`: монотонний номер lease; новий власник отримує більший epoch.
+
+Правило виконання:
+
+1. Worker може стартувати execution **лише** якщо має активний lease і локальний `lease_epoch` збігається з поточним в coordinator state.
+2. Будь-який старий lease (менший epoch або expired) не має права публікувати фінальний результат.
+3. Публікація result приймається тільки для активного lease-epoch (CAS-перевірка по `job_id + lease_epoch`).
+
+Це дає at-most-once на рівні “accepted result”, навіть якщо попередній worker ще живий мережево.
+
+#### 4.3.2 Мінімальна state-модель job
+
+Рекомендований мінімум:
+
+- `Submitted` -> `Queued`
+- `Leased` (owner + epoch + expires_at)
+- `Running`
+- `Completed` | `Failed` | `Cancelled`
+- `Migrating` (технічний перехід між lease owner)
+
+Дозволені переходи:
+
+- `Queued -> Leased` (первинний pick)
+- `Leased/Running -> Migrating -> Leased` (re-migrate на нового owner)
+- `Leased/Running -> Failed` (retry budget вичерпано або policy stop)
+- `Running -> Completed` (успішне завершення під актуальним epoch)
+
+#### 4.3.3 Failover trigger та retry budget
+
+Re-migrate запускається, якщо виконується хоча б один trigger:
+
+- `lease_expired` (немає renew до `lease_expires_at`);
+- `worker_unhealthy` (health-check fail N разів підряд);
+- `queue_starvation` (job занадто довго не стартував у `Leased`);
+- `capacity_preemption` (owner втратив необхідний capability профіль).
+
+Retry budget:
+
+- `max_migrations_per_job` (наприклад 3-5);
+- `max_total_runtime` (глобальний upper bound життєвого циклу job);
+- backoff policy між міграціями (linear/exponential з jitter).
+
+Після вичерпання budget job переводиться у `Failed` з reason-кодом (`lease-timeout`, `worker-unhealthy`, `budget-exhausted`).
 
 ## 5. Seeds / shards / locality-aware placement
 
@@ -156,10 +395,11 @@ On-chain події потрібні, коли вони:
 
 ## 8. Відкриті питання (TBD)
 
-1. **Job lease / at-most-once**: як гарантуємо, що re-migrate не спричинить double-exec.
-2. **Telegram seats**: що саме лімітує кількість worker’ів (members, wallets, concurrent sessions).
-3. **Network_profile contract**: набір метрик, формат зберігання і як SmallWorld їх споживає.
-4. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
-5. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
-6. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
+1. **Telegram seats**: що саме лімітує кількість worker’ів (members, wallets, concurrent sessions).
+2. **Network_profile contract**: набір метрик, формат зберігання і як SmallWorld їх споживає.
+3. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
+4. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
+5. **Super-admin governance**: політика безпеки/оновлень для відкритої мережі без “root доступу” до чужих srvN.
+
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle unit/TTL/fallback (§4.2).
 

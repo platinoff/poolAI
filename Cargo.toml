@@ -225,6 +225,10 @@ harness = false
 name = "http_hotpath_benchmarks"
 harness = false
 
+[[bench]]
+name = "galaxy_fee_split_benchmarks"
+harness = false
+
 [[test]]
 name = "distributed_raid_wire_integration"
 path = "tests/distributed_raid_wire_integration.rs"

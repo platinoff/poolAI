@@ -8,8 +8,11 @@ param(
 
     [switch]$Background,
     [switch]$SkipBuild,
+    [switch]$RaidJobs,
     [int]$Port = 8080,
-    [string]$Features = "enterprise,ml,cloud,test-utils"
+    [string]$Features = "enterprise,ml,cloud,test-utils",
+    [ValidateSet("json", "sqlite", "raid")]
+    [string]$JobStore = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,6 +32,7 @@ PoolAI run (PowerShell) - no WSL, no bare 'bash' command.
 
 Usage:
   .\bin\run-poolai.ps1 [-Command] <name> [-Background] [-Port N] [-SkipBuild]
+                       [-RaidJobs] [-JobStore json|sqlite|raid]
 
 Commands:
   single (default)  one coordinator on :8080
@@ -40,6 +44,7 @@ Commands:
 Examples:
   .\bin\run-poolai.ps1 build
   .\bin\run-poolai.ps1 single -Background -SkipBuild
+  .\bin\run-poolai.ps1 single -Background -SkipBuild -RaidJobs
   .\bin\run-poolai.ps1 stop
   .\bin\run-poolai.ps1 status
 
@@ -110,6 +115,12 @@ function Invoke-Single {
     $env:POOLAI_HTTP_PORT = "$Port"
     $env:POOLAI_DATA_PATH = $data
     $env:POOLAI_RAID_BASE_PATH = $raid
+    if ($RaidJobs) {
+        $JobStore = "raid"
+    }
+    if ($JobStore) {
+        $env:POOLAI_JOB_STORE = $JobStore
+    }
 
     $url = "http://127.0.0.1:$Port"
     Write-Host "PoolAI single node"
@@ -117,6 +128,11 @@ function Invoke-Single {
     Write-Host "  Login: $url/ui/login"
     Write-Host "  Admin: $url/ui/admin/jobs  (admin / admin123)"
     Write-Host "  Data:  $data"
+    $jobStoreLabel = if ($env:POOLAI_JOB_STORE) { $env:POOLAI_JOB_STORE } else { "json" }
+    Write-Host "  Job store: $jobStoreLabel"
+    if ($env:POOLAI_JOB_STORE -eq "raid") {
+        Write-Host "  RAID path: $env:POOLAI_RAID_BASE_PATH"
+    }
 
     if ($Background) {
         $log = Join-Path $logs "single-$Port.log"
