@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S79 ✅ grid pricing API env fallback wire fix; §5.12 PH-S76..PH-S77 відкриті; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S76 ✅ release advisory operator actions pointer; §5.12 PH-S77 відкрито; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -276,7 +276,7 @@ FM-xxx (з таблиці нижче)
 | 9 | **PH-S73** | Protocol reject troubleshooting pointer (docs) | `SECURITY_HARDENING.md`, Galaxy §9.3 | short operator checklist for `compat_status`/403/426 triage links | **✅** |
 | 10 | **PH-S74** | Security docs link hygiene for release advisories | Galaxy §9.6, `docs/security/` | align cross-links to signed advisory/update policy sections | **✅** |
 | 11 | **PH-S75** | Pricing oracle L2 configured fallback (code) | Galaxy §4.2.4, `src/grid/galaxy_pricing_oracle.rs` | add `POOLAI_GALAXY_PRICING_FALLBACK_JSON` parsing + fallback quote path + unit tests | **✅** |
-| 12 | **PH-S76** | Release advisory operator actions pointer | Galaxy §9.6, `docs/security/SECURITY_HARDENING.md` | add short action list linked to signed advisory/update policy docs | відкрито |
+| 12 | **PH-S76** | Release advisory operator actions pointer | Galaxy §9.6, `docs/security/SECURITY_HARDENING.md` | add short action list linked to signed advisory/update policy docs | **✅** |
 | 13 | **PH-S77** | Security docs canonical pointer cleanup | `docs/security/*`, FM §5.12 | normalize Galaxy §9.2/§9.3/§9.6 links and remove duplicates | відкрито |
 | 14 | **PH-S78** | Grid pricing API snapshot wire (code) | Galaxy §4.2.3, future wire note | read-only `GET /api/v1/grid/pricing` (task/model/unit) wired to oracle cache/fallback path + endpoint tests + OpenAPI sync + gap-audit 0 | **✅** |
 | 15 | **PH-S79** | Grid pricing API env fallback wire fix (code) | `src/network/api/grid.rs`, Galaxy §4.2.4 | initialize API oracle via `GalaxyPricingOracle::from_env()` so `POOLAI_GALAXY_PRICING_FALLBACK_JSON` is applied on `/api/v1/grid/pricing`; `cargo test-ci` + openapi-gap 0 | **✅** |

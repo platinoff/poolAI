@@ -263,6 +263,22 @@ Use pointer-only links for operator actions around advisories and key updates:
 
 Operator note: process signed advisory events (`CVE-*`, `key_transition`, `protocol_sunset`) through local change management; no remote-exec path is implied by advisory handling.
 
+#### Operator actions pointer for release advisories (PH-S76)
+
+Use this short action list when a signed release advisory is published:
+
+1. Validate advisory authenticity and release signature using `poolai-verify-release` (see quickstart above).
+2. Identify advisory class (`CVE-*`, `key_transition`, `protocol_sunset`) and map it to your rollout urgency.
+3. Apply update-policy decision (hold, staged rollout, or immediate patch) using the canonical governance pointers below.
+4. If protocol window changes are involved, run protocol compatibility triage before enabling new workers.
+5. Record the final decision and artifact hash in local change log for auditability.
+
+Canonical policy links:
+- Advisory lifecycle and key rotation: [`POOLAI_GALAXY_GRID.md` §9.6](../concept/POOLAI_GALAXY_GRID.md#96-security-advisories-та-key-rotation)
+- Signed release trust model: [`POOLAI_GALAXY_GRID.md` §9.2](../concept/POOLAI_GALAXY_GRID.md#92-signed-releases-канон-ph-s63)
+- Protocol compatibility rollout constraints: [`POOLAI_GALAXY_GRID.md` §9.3](../concept/POOLAI_GALAXY_GRID.md#93-protocol-versioning-та-compat-matrix)
+- Dependency advisory workflow: [`DEPENDENCY_SECURITY.md`](./DEPENDENCY_SECURITY.md)
+
 #### A09:2021 – Security Logging and Monitoring Failures
 
 **Current Implementation**:
@@ -535,4 +551,4 @@ openssl s_client -connect poolai.example.com:443 -showcerts
 ---
 
 **Last Updated**: 2026-05-27  
-**Version**: 1.5 - Advisory/update-policy link hygiene (PH-S74)
+**Version**: 1.6 - Release advisory operator actions pointer (PH-S76)
