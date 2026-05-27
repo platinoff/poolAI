@@ -1,8 +1,8 @@
 {
-  "revision": 7,
+  "revision": 8,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S66",
-  "next_sprint": "PH-S67",
+  "last_sprint_closed": "PH-S67",
+  "next_sprint": "PH-S68",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -56,7 +56,8 @@
       "id": "digest",
       "label": "FUNCTIONALITY_DIGEST",
       "path": "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
-      "layer": "L2"
+      "layer": "L2",
+      "sprints": ["PH-S67"]
     },
     {
       "id": "galaxy_fee_split",

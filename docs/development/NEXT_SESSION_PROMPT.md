@@ -5,7 +5,7 @@
 ---
 
 ```
-PoolAI — PH-S67 DIGEST Galaxy modules (research queue)
+PoolAI — PH-S68 pricing oracle Rust stub (research queue)
 
 ## Ролі (VDT)
 - Людина: власник / креативний директор — пріоритети, BLOCKED/Deferred
@@ -26,34 +26,33 @@ cargo test-ci
 cargo run --bin poolai-openapi-gap-audit   # після змін API
 
 ## Стан
-- HEAD: (після push PH-S66) — poolai-verify-release CLI
-- **PH-S03…S66:** ✅ (Galaxy Grid + verify-release)
-- **Черга §5.12:** PH-S67…S69 (3 відкритих)
+- HEAD: (після push PH-S67) — DIGEST Galaxy modules
+- **PH-S03…S67:** ✅
+- **Черга §5.12:** PH-S68…S69 (2 відкритих)
 - **BLOCKED:** PH-S35/S16/S02 LAN · **Deferred:** PH-S36/S01/S15 Cloud SDK (FM-041)
 
-## PH-S67 — наступна сесія
-1. FUNCTIONALITY_DIGEST — zріз Galaxy modules (`galaxy_fee_split`, grid dispatch, virtual nodes)
-2. Cross-links README / INDEX за потреби
-3. FM §5.12 + vision manifest node sync
+## PH-S68 — наступна сесія
+1. Pricing oracle Rust stub (Galaxy §4.2) — unit keys, `POOLAI_GALAXY_PRICE_*` env
+2. Unit tests (mock market min, floor 0.9×, cache TTL)
+3. Cross-link DIGEST + concept §4.2
 
 ## Research (якщо черга <3)
 rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md
 DOCS_LEGACY_AUDIT §5.3 · rg "TODO|FIXME" src/ → FM §5.12 до ≤10 PH-S*
 
 ## Завершення сесії
-1. FM §5.12 (PH-S67 → ✅) + HANDOFF
+1. FM §5.12 (PH-S68 → ✅) + HANDOFF
 2. Оновити цей NEXT_SESSION_PROMPT
 3. git push (MSYS2) + самарі
 
 ## Не повторювати
-PH-S03…S66 · verify-release CLI · protocol_version wire · Galaxy concept-only blocks
+PH-S03…S67 · DIGEST Galaxy zріз · verify-release · protocol_version wire
 
 ## Черга §5.12 (відкриті)
 | # | Sprint | Фокус |
 |---|--------|--------|
-| 1 | **PH-S67** | DIGEST Galaxy modules |
-| 2 | **PH-S68** | pricing oracle Rust stub |
-| 3 | **PH-S69** | SECURITY_HARDENING ↔ Galaxy §9 |
+| 1 | **PH-S68** | pricing oracle Rust stub |
+| 2 | **PH-S69** | SECURITY_HARDENING ↔ Galaxy §9 |
 
 **Поза чергою:** PH-S35 LAN · PH-S36 Cloud SDK
 ```

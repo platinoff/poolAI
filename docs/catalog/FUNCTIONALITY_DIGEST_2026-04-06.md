@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-26 (PH-S50: Jobs OpenAPI `JobStoreBackend`, DIGEST `src/job/`; §5.11 PH-S51…S60).
+**Версія репозиторію:** 0.2.2 (`Cargo.toml`). **Оновлено:** 2026-05-27 (PH-S67: Galaxy Grid modules zріз — `src/grid/*`, virtual nodes wire, `src/release/`; PH-S66 verify-release).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -37,7 +37,8 @@
 | Компонент | Опис |
 |-----------|------|
 | **`poolai` (default-run)** | Основний сервер: HTTP(S), UI, REST, WebSocket, інтеграція модулів. |
-| **`poolai-worker`** (`src/bin/poolai-worker.rs`) | **FM-016 ✅:** віртуальна нода на device — `POOLAI_COORDINATOR_URL`, реєстрація/heartbeat на coordinator, poll/complete tasks, bootstrap `ping` + `raid_health_check`, локальний `GET /health`. |
+| **`poolai-worker`** (`src/bin/poolai-worker.rs`) | **FM-016 ✅:** віртуальна нода на device — `POOLAI_COORDINATOR_URL`, реєстрація/heartbeat на coordinator, poll/complete tasks, bootstrap `ping` + `raid_health_check`, локальний `GET /health`. **PH-S65:** шле `protocol_version` / `build_id` на register-remote (`POOLAI_PROTOCOL_VERSION`, `POOLAI_BUILD_ID`). |
+| **`poolai-verify-release`** (`src/bin/poolai_verify_release.rs`) | **PH-S66 ✅:** перевірка підписаного release manifest (ed25519) + опційна SHA-256 artifact; `src/release/`; Galaxy §9.2 — [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md). |
 | **`poolai_health_load`** (`src/bin/poolai_health_load.rs`) | Дев-утиліта: навантажувальний **`GET /api/v1/health`** (Tokio + `reqwest`); опційно **`--json`** на stdout для baseline; див. `docs/performance/BENCHMARKS.md`. |
 
 ---
@@ -70,6 +71,7 @@
 
 - **REST під `/api/v1/`** — модульні роутери в `src/network/api/` (`system`, `workers`, `vm`, `raid`, `raid_admin`, `libraries`, `users`, `rewards`, `instances`, `completions`, `topology`, `discovery`, **`virtual_nodes`**, `ui`, `admin`, …). Див. `create_api_routes()` у `api/mod.rs`.
 - **FM-016 virtual nodes** — `POST /api/v1/discovery/register-remote`, `heartbeat-remote`, `GET /discovery/virtual-nodes`; `GET/POST /api/v1/virtual-nodes/{id}/tasks/*`, probe health; тести `discovery_remote_register_integration`, `virtual_node_tasks_integration`.
+- **PH-S65 Galaxy protocol** — `register-remote` з `protocol_version` / `build_id` → `src/grid/protocol_compat.rs` (`accepted` \| `upgrade_required` \| `unsupported`; HTTP 403/426); env `POOLAI_COORDINATOR_PROTOCOL_VERSION`, worker `POOLAI_PROTOCOL_VERSION`.
 - **FM-016+ Telegram** — `POST/GET/DELETE /api/v1/virtual-nodes/telegram/bind*`, `POST .../telegram/webhook` → task на bound `peer_id`; env: `POOLAI_VIRTUAL_NODE_DATA_DIR`, `POOLAI_TELEGRAM_WEBHOOK_SECRET`, worker `POOLAI_TELEGRAM_ID`.
 - **FM-016+++** — `POST /virtual-nodes/{id}/pool/join`; bootstrap tasks + `raid_artifact_probe`; worker `POOLAI_WORKER_CACHE_DIR`, health `cached_artifacts`; `bin/verify-dev-stand.*` e2e.
 - **RAID** — додаткові шляхи під `/raid/…` (артефакти, воркери, події, snapshot, GC, strategies, metrics, rebalance, health) через `raid.rs`; **`GET /api/v1/raid/status`** — `RaidStatusResponse` з опційним **`raft_status`** (role, term, leader_id).
@@ -108,6 +110,7 @@
 | Документ | Зміст |
 |----------|--------|
 | [`concept/poolAI_concept_root.txt`](../concept/poolAI_concept_root.txt) | Головна концепція PoolAI. |
+| [`concept/POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) | **Galaxy Grid** (федерація srvN): fees, lease, Telegram seats, locality, governance §9, compat matrix — канон продукту. |
 | [`concept/POOLAI_GRID_NODE.md`](../concept/POOLAI_GRID_NODE.md) | Вузол грида, ролі, модулі. |
 | [`concept/POOLAI_MEMORY_LAYER.md`](../concept/POOLAI_MEMORY_LAYER.md) | Memory layer, зв’язок RAID/ML. |
 | [`development/JOB_LAYER_CONCEPT_2026-03-17.md`](../development/JOB_LAYER_CONCEPT_2026-03-17.md) | Job / mining layer, життєвий цикл job. |
@@ -118,11 +121,38 @@
 
 | Модуль / crate | Призначення | HTTP / wire |
 |----------------|-------------|-------------|
-| `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus; **PH-S58** `galaxy_fee_split` (primary 0.1% + secondary 1–5%) | JSON; map ↔ discovery/RAID |
+| `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus (див. **Galaxy Grid modules** нижче) | JSON; map ↔ discovery/RAID |
 | `src/job/` | `JobStore`, scheduler, lifecycle; persistence JSON / SQLite (`FM-029`) / RAID snapshot (`PH-S48`) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule` (FM-020…029) |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
 | `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |
+
+### Galaxy Grid — модулі в коді (PH-S67, `src/grid/` + wire)
+
+Концепт: [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md). Протокол envelope: [`GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md).
+
+| Модуль | Шлях | Функція | Тести / утиліти |
+|--------|------|---------|-----------------|
+| **Grid envelope** | `src/grid/envelope.rs` | `GridEnvelope` v1, `GridMessage` (Job/Result/MemoryShard/PeerStatus), `validate()` | `envelope` unit tests |
+| **Grid map** | `src/grid/map.rs` | map ↔ `PeerInfo`, RAID `put_artifact`, memory shard bodies | `map` unit tests |
+| **Grid dispatch** | `src/grid/dispatch.rs` | `ingest_envelope` → `JobStore` / `MemoryShardStore`; epics `emit_memory_updated`, `emit_seed_provided`; schedule via `schedule_with_grid_peer` | `dispatch` unit tests |
+| **Galaxy fee split** | `src/grid/galaxy_fee_split.rs` | primary **0.1%** (10 bps) + secondary **1–5%** admin (floor bps); `GalaxyFeeSplit` lamports | unit tests; `cargo bench --bench galaxy_fee_split_benchmarks` |
+| **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
+| **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
+| **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
+| **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
+
+**Env (Galaxy wire, орієнтир):**
+
+| Змінна | Де | Призначення |
+|--------|-----|-------------|
+| `POOLAI_PROTOCOL_VERSION` | worker | Wire protocol на register-remote (default `1.2`) |
+| `POOLAI_BUILD_ID` | worker | Build id у register payload |
+| `POOLAI_COORDINATOR_PROTOCOL_VERSION` | coordinator | Рядок matrix для compat (default `1.2`) |
+| `POOLAI_VIRTUAL_NODE_DATA_DIR` | coordinator | Персистентні tasks/bindings |
+| `POOLAI_RELEASE_TRUST_ROOT` | ops | `maintainer_keys.json` для `poolai-verify-release` (концепт §9.2) |
+
+**Не в коді (concept-only / наступні PH-S*):** pricing oracle Rust (`PH-S68`), in-process auto-updater, admin UI “Updates & compatibility”.
 
 ---
 
