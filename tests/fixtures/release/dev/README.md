@@ -17,4 +17,6 @@ cargo test --lib release::verify::tests::write_dev_release_fixtures -- --ignored
 
 **Перевірка** — див. [`RUN_LOCAL.md`](../../../docs/development/RUN_LOCAL.md) та [`SECURITY_HARDENING.md`](../../../docs/security/SECURITY_HARDENING.md) (operator quickstart).
 
+**Manifest schema (operator sample):** [`RELEASE_MANIFEST_SAMPLE.md`](../../../docs/development/RELEASE_MANIFEST_SAMPLE.md) (PH-S88).
+
 Політика підписів — канон [`POOLAI_GALAXY_GRID.md`](../../../docs/concept/POOLAI_GALAXY_GRID.md) §9.2 (без дублювання тут).

@@ -252,7 +252,7 @@ cargo run --bin poolai-verify-release -- \
   --artifact-name poolai
 ```
 
-Локальний запуск coordinator після `run-poolai` build — [`RUN_LOCAL.md`](../development/RUN_LOCAL.md) § verify-release. Регенерація fixtures: `cargo test --lib release::verify::tests::write_dev_release_fixtures -- --ignored --exact` (див. [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md)).
+Локальний запуск coordinator після `run-poolai` build — [`RUN_LOCAL.md`](../development/RUN_LOCAL.md) § verify-release. Регенерація fixtures: `cargo test --lib release::verify::tests::write_dev_release_fixtures -- --ignored --exact` (див. [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md)). **Manifest schema (operator):** [`RELEASE_MANIFEST_SAMPLE.md`](../development/RELEASE_MANIFEST_SAMPLE.md) (PH-S88).
 
 #### Operator checklist: protocol compatibility triage (PH-S72)
 

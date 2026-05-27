@@ -797,7 +797,7 @@ On-chain події потрібні, коли вони:
 
 | Артефакт | Підпис / attest | Перевірка на srvN |
 |----------|-----------------|-------------------|
-| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `cargo run --bin poolai-verify-release -- --manifest … --signature … [--artifact …]` (PH-S66); dev sample paths — [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md) (PH-S85) |
+| `poolai` binary (Linux/Windows) | minisign / Sigstore cosign | `cargo run --bin poolai-verify-release -- --manifest … --signature … [--artifact …]` (PH-S66); dev fixtures — [`tests/fixtures/release/dev/README.md`](../../tests/fixtures/release/dev/README.md) (PH-S85); operator schema — [`RELEASE_MANIFEST_SAMPLE.md`](../development/RELEASE_MANIFEST_SAMPLE.md) (PH-S88) |
 | OCI image (`ghcr.io/…/poolai`) | cosign на digest | admission / `cosign verify` перед pull |
 | `config` bundle (default policies) | окремий підпис maintainer | порівняння з pinned `release_pubkey` |
 | SBOM (SPDX/CycloneDX) | hash у release manifest | supply-chain audit |

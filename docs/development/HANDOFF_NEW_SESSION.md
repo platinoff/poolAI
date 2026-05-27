@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S87 ✅ INDEX security hub cross-link; §5.12 PH-S88 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S88 ✅ release manifest sample doc; §5.12 PH-S89 відкрито) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -56,8 +56,9 @@
 **PH-S85 ✅ (docs+fixtures):** `tests/fixtures/release/dev/` — sample manifest/sig/trust root + `poolai-sample.bin`; `SECURITY_HARDENING` + `RUN_LOCAL` verify-release pointer; Galaxy §9.2 cross-link; `cargo run --bin poolai-verify-release` OK на fixtures.
 **PH-S86 ✅ (e2e):** `e2e/tests/grid_pricing.spec.ts` — `GET /api/v1/grid/pricing` L2 fallback + cache + 400 invalid unit; `bin/e2e-playwright.sh --start` sets `POOLAI_GALAXY_PRICING_FALLBACK_JSON`; `npm run test:ci` includes `grid_pricing`.
 **PH-S87 ✅ (docs):** `INDEX_2026-03-17.md` крок 8 + §7 security → `SECURITY_HARDENING` Galaxy hub; bidirectional INDEX pointer у hub (PH-S77); без дублювання governance prose.
+**PH-S88 ✅ (docs):** `docs/development/RELEASE_MANIFEST_SAMPLE.md` — operator manifest/sig/trust-root schema + verify copy-paste; cross-link `tests/fixtures/release/dev/` (PH-S85); Galaxy §9.2 pointer.
 **PH-S90 ✅ (ops):** `.cursor/rules/` — `poolai-agent-roles.mdc` (ролі + субагенти); slim VDT; `poolai-session-iteration` → globs; §5.12 sync; `git-commit-msys.mdc`; README/check оновлено.
-**Черга:** §5.12 **PH-S88** (6 відкритих); наступний sprint — **PH-S88** (Release manifest sample JSON).
+**Черга:** §5.12 **PH-S89** (5 відкритих); наступний sprint — **PH-S89** (L1 stale TTL metadata / metrics).
 
 ## 1. Канонічний порядок документації та планів
 
