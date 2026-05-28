@@ -82,6 +82,13 @@ struct PatchJobRequest {
     lease_epoch: Option<u64>,
 }
 
+#[derive(Deserialize, Default)]
+struct AcquireJobLeaseRequest {
+    /// Optional override; defaults to bound `worker_id` or `vm_id` (PH-S98).
+    #[serde(default)]
+    lease_owner: Option<String>,
+}
+
 fn store() -> &'static JobStore {
     JobStore::global()
 }
@@ -91,6 +98,7 @@ pub fn create_jobs_routes() -> Router<ApiContext> {
         .route("/jobs", get(list_jobs).post(create_job))
         .route("/jobs/schedule", post(schedule_jobs))
         .route("/jobs/{id}", get(get_job).patch(patch_job))
+        .route("/jobs/{id}/lease", post(acquire_job_lease))
 }
 
 async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListResponse>, HttpAppError> {
@@ -179,6 +187,25 @@ async fn get_job(
         .get(&id)?
         .ok_or_else(|| HttpAppError::new(AppError::ApiNotFound(format!("job '{id}' not found"))))?;
     Ok(Json(JobDetailResponse { job }))
+}
+
+async fn acquire_job_lease(
+    State(_ctx): State<ApiContext>,
+    Path(id): Path<String>,
+    Json(body): Json<AcquireJobLeaseRequest>,
+) -> Result<Json<JobDetailResponse>, HttpAppError> {
+    match store().acquire_lease(&id, body.lease_owner) {
+        Ok(job) => Ok(Json(JobDetailResponse { job })),
+        Err(AppError::RestError {
+            code: "lease_already_active",
+            message,
+        }) => Err(HttpAppError::new(AppError::RestError {
+            code: "lease_already_active",
+            message,
+        })
+        .with_status(StatusCode::CONFLICT)),
+        Err(e) => Err(HttpAppError::new(e)),
+    }
 }
 
 async fn patch_job(

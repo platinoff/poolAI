@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-27 · **HEAD:** PH-S97 (lease TTL env) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
+**Оновлено:** 2026-05-27 · **HEAD:** PH-S98 (lease acquire) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S98…S103** — lease acquire, renew, `Leased`, failover, live pricing, protocol middleware |
-| **Закрито PH-S65…S97** | protocol, verify-release, pricing API/oracle, admin UI, job lease wire + TTL env |
+| **Відкрито** | **PH-S99…S103** — renew, `Leased`, failover, live pricing, protocol middleware |
+| **Закрито PH-S65…S98** | protocol, verify-release, pricing API/oracle, admin UI, job lease wire + TTL + acquire |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 Research replenish ✅ (2026-05-27): 6 нових PH-S* у FM §5.12.
@@ -48,8 +48,9 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | PATCH CAS `lease_epoch` | PH-S95 | `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` |
 | Admin колонки | PH-S96 | `/ui/admin/jobs` |
 | TTL env | PH-S97 ✅ | `POOLAI_JOB_LEASE_TTL_SECS` → `src/job/lease_config.rs` |
+| Acquire | PH-S98 ✅ | scheduler + `POST /jobs/{id}/lease` → `src/job/lease_acquire.rs` |
 
-**Ще не в коді:** acquire/renew, `Leased`/`Migrating` status, failover, re-migrate.
+**Ще не в коді:** renew, `Leased`/`Migrating` status, failover, re-migrate.
 
 ---
 
@@ -57,8 +58,7 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S98** | Lease acquire | §4.3.1 |
-| 2 | PH-S99 | Lease renew / heartbeat | §4.3.1 |
+| 1 | **PH-S99** | Lease renew / heartbeat | §4.3.1 |
 | 3 | PH-S100 | `JobStatus::Leased` + lifecycle | §4.3.2 |
 | 4 | PH-S101 | Failover / re-migrate | §4.3 |
 | 5 | PH-S102 | Live pricing provider fetch | §4.2 |

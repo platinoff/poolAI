@@ -308,6 +308,62 @@ async fn jobs_patch_lease_epoch_cas_guard() {
 }
 
 #[tokio::test]
+async fn jobs_acquire_lease_explicit_api() {
+    let app = jobs_app();
+
+    let (_, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({ "kind": "inference" })),
+    )
+    .await;
+    let id = created
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+
+    let (acquire_status, acquired) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease"),
+        Some(json!({ "lease_owner": "worker-explicit" })),
+    )
+    .await;
+    assert_eq!(acquire_status, StatusCode::OK);
+    let job = acquired
+        .get("job")
+        .and_then(|x| x.as_object())
+        .expect("job detail");
+    assert_eq!(
+        job.get("lease_owner").and_then(|x| x.as_str()),
+        Some("worker-explicit")
+    );
+    assert_eq!(job.get("lease_epoch").and_then(|x| x.as_u64()), Some(1));
+    assert!(job
+        .get("lease_expires_at")
+        .and_then(|x| x.as_str())
+        .is_some());
+
+    let (conflict_status, conflict_body) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease"),
+        Some(json!({ "lease_owner": "worker-explicit" })),
+    )
+    .await;
+    assert_eq!(conflict_status, StatusCode::CONFLICT);
+    assert_eq!(
+        conflict_body
+            .get("error")
+            .and_then(|e| e.get("code"))
+            .and_then(|c| c.as_str()),
+        Some("lease_already_active")
+    );
+}
+
+#[tokio::test]
 async fn jobs_get_unknown_returns_404() {
     let app = jobs_app();
     let (status, v) = request_json(

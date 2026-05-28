@@ -18,8 +18,12 @@ use crate::core::error::AppError;
 use crate::raid::{self, RaidManager};
 use chrono::Utc;
 
+use crate::job::lease_acquire::{
+    acquire_lease_on_record, maybe_acquire_lease_on_schedule, resolve_lease_owner,
+    AcquireLeaseError,
+};
 use crate::job::onchain::emit_job_completed_if_anchor;
-use crate::job::{allows_transition, JobRecord, JobSpec, JobStatus};
+use crate::job::{allows_transition, JobLeaseConfig, JobRecord, JobSpec, JobStatus};
 
 pub(crate) const JOBS_FILE: &str = "jobs.json";
 
@@ -132,6 +136,48 @@ impl JobStore {
         Ok(row)
     }
 
+    /// PH-S98: explicit lease acquire (`POST /api/v1/jobs/{id}/lease`).
+    pub fn acquire_lease(
+        &self,
+        id: &str,
+        lease_owner: Option<String>,
+    ) -> Result<JobRecord, AppError> {
+        let now = Utc::now();
+        let updated = {
+            let mut guard = self
+                .jobs
+                .lock()
+                .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
+            let record = guard
+                .iter_mut()
+                .find(|r| r.spec.id.0 == id)
+                .ok_or_else(|| AppError::ApiNotFound(format!("job '{id}' not found")))?;
+            let owner = resolve_lease_owner(
+                lease_owner.as_deref(),
+                record.worker_id.as_deref(),
+                record.vm_id.as_deref(),
+            )
+            .ok_or_else(|| {
+                AppError::ValidationError(
+                    "lease_owner required when job has no worker_id or vm_id binding".into(),
+                )
+            })?;
+            let cfg = JobLeaseConfig::from_env();
+            acquire_lease_on_record(record, &owner, &cfg, now, true).map_err(|e| match e {
+                AcquireLeaseError::NoLeaseOwner => {
+                    AppError::ValidationError("lease_owner must be non-empty".into())
+                }
+                AcquireLeaseError::LeaseAlreadyActive => AppError::RestError {
+                    code: "lease_already_active",
+                    message: format!("job '{id}' already has an active lease (Galaxy §4.3.1)"),
+                },
+            })?;
+            record.clone()
+        };
+        self.persist()?;
+        Ok(updated)
+    }
+
     /// FM-021: update job status when lifecycle transition is valid; persists on success.
     pub fn update_status(&self, id: &str, status: JobStatus) -> Result<JobRecord, AppError> {
         let updated = {
@@ -206,6 +252,7 @@ impl JobStore {
                 }
                 guard[i].worker_id = binding.worker_id;
                 guard[i].vm_id = binding.vm_id;
+                maybe_acquire_lease_on_schedule(&mut guard[i], now);
             }
             (scheduled, bound_workers, bound_vms, expired)
         };

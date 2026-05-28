@@ -327,6 +327,9 @@ mod tests {
         let row = store.get("job-a").expect("get").expect("row");
         assert_eq!(row.worker_id.as_deref(), Some("idle"));
         assert!(row.vm_id.is_none());
+        assert!(row.has_lease_fields(), "PH-S98: schedule acquires lease");
+        assert_eq!(row.lease_owner.as_deref(), Some("idle"));
+        assert_eq!(row.lease_epoch, Some(1));
     }
 
     #[test]

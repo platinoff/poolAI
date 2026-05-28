@@ -1,8 +1,8 @@
 {
-  "revision": 17,
+  "revision": 18,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S97",
-  "next_sprint": "PH-S98",
+  "last_sprint_closed": "PH-S98",
+  "next_sprint": "PH-S99",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -132,6 +132,14 @@
       "layer": "L3",
       "sprints": ["PH-S97"],
       "sections": ["POOLAI_JOB_LEASE_TTL_SECS", "lease_ttl", "lease_renew_interval"]
+    },
+    {
+      "id": "job_lease_acquire",
+      "label": "job/lease_acquire.rs",
+      "path": "src/job/lease_acquire.rs",
+      "layer": "L3",
+      "sprints": ["PH-S98"],
+      "sections": ["POST /jobs/{id}/lease", "schedule acquire"]
     },
     {
       "id": "admin_updates_compat",

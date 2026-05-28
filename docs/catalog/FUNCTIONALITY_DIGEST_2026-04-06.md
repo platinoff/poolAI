@@ -169,7 +169,7 @@
 | `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92) |
 | `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | Default lease TTL seconds (default `90`; `JobLeaseConfig::from_env()`, PH-S97) |
 
-**Не в коді (наступні PH-S98…S103):** lease acquire/renew/failover; `Leased`/`Migrating` job status; live pricing provider HTTP fetch; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Не в коді (наступні PH-S99…S103):** lease renew/failover; `Leased`/`Migrating` job status; live pricing provider HTTP fetch; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 

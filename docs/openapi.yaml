@@ -456,6 +456,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /jobs/{id}/lease:
+    post:
+      tags:
+        - Jobs
+      summary: Acquire job lease
+      description: |
+        Galaxy §4.3.1 explicit lease acquire (PH-S98). Sets `lease_owner`, bumps `lease_epoch`,
+        and `lease_expires_at` from `POOLAI_JOB_LEASE_TTL_SECS` (`JobLeaseConfig`). Scheduler tick
+        also acquires when binding `worker_id`/`vm_id` without an active lease.
+      operationId: acquireJobLease
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcquireJobLeaseRequest'
+      responses:
+        '200':
+          description: Lease acquired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDetailResponse'
+        '400':
+          description: Missing lease owner when job has no worker/vm binding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Active lease already held (`lease_already_active`)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /grid/envelope:
     post:
       tags:
@@ -5424,6 +5478,14 @@ components:
       properties:
         job:
           $ref: '#/components/schemas/JobRecord'
+
+    AcquireJobLeaseRequest:
+      type: object
+      description: Optional lease holder override (PH-S98); defaults to bound worker_id or vm_id.
+      properties:
+        lease_owner:
+          type: string
+          description: Galaxy §4.3.1 lease holder (srv/worker id)
 
     PatchJobRequest:
       type: object

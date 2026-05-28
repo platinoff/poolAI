@@ -1,7 +1,7 @@
 {
-  "revision": 12,
+  "revision": 13,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S98",
+  "active_sprint": "PH-S99",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -95,7 +95,14 @@
     "job_lease_acquire": {
       "sprints": ["PH-S98"],
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
-      "code_globs": ["src/job/**", "src/network/api/jobs.rs", "src/job/scheduler.rs"],
+      "code_globs": ["src/job/lease_acquire.rs", "src/job/store.rs", "src/network/api/jobs.rs", "docs/openapi.yaml", "tests/jobs_api_contracts.rs"],
+      "extensions": [".rs", ".yaml", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
+    },
+    "job_lease_renew": {
+      "sprints": ["PH-S99"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
+      "code_globs": ["src/job/**", "src/network/api/jobs.rs"],
       "extensions": [".rs", ".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
     },

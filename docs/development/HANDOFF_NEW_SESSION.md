@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S97 ✅ job lease TTL env; §5.12 PH-S98) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S98 ✅ job lease acquire; §5.12 PH-S99) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -66,7 +66,8 @@
 **PH-S95 ✅ (code):** `check_patch_lease_epoch` + optional `lease_epoch` on `PATCH /api/v1/jobs/{id}`; HTTP `409 lease_epoch_rejected`; OpenAPI sync; contract tests; backward compatible when `lease_epoch` omitted.
 **PH-S96 ✅ (code):** `/ui/admin/jobs` — read-only lease columns (`lease_owner`, `lease_epoch`, `lease_expires_at`); i18n EN/UK; Playwright smoke (`admin.spec.ts`); `cargo test-ci` + e2e PH-S96.
 **PH-S97 ✅ (code):** `src/job/lease_config.rs` — `POOLAI_JOB_LEASE_TTL_SECS` (default `90`, Galaxy §4.3.1); `JobLeaseConfig::from_env()` + `lease_renew_interval_secs()` stub; unit tests; без renew/failover wire; `cargo test-ci`.
-**Черга:** §5.12 **PH-S98** (6 відкритих PH-S98…S103) — lease acquire → renew → `Leased` status → failover → live pricing fetch → protocol middleware.
+**PH-S98 ✅ (code):** `src/job/lease_acquire.rs` — lease acquire on scheduler bind + `POST /api/v1/jobs/{id}/lease`; `409 lease_already_active`; OpenAPI sync; unit + `jobs_api_contracts`; `cargo test-ci` + openapi-gap 0.
+**Черга:** §5.12 **PH-S99** (5 відкритих) — lease renew → `Leased` status → failover → live pricing fetch → protocol middleware.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S97, фази, наступні орієнтири).
 
