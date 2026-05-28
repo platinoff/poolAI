@@ -1,5 +1,5 @@
 //! Job layer admin page (PH-S53) — list jobs + persistence backend badge.
-//! PH-S96: read-only Galaxy lease columns (`lease_owner`, `lease_epoch`, `lease_expires_at`).
+//! PH-S96/PH-S105: read-only Galaxy lease columns + active/expired lease badge.
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;
@@ -34,6 +34,23 @@ pub async fn admin_jobs() -> Html<String> {
       return String(value);
     }
 
+    function leaseState(expiresAt) {
+      if (!expiresAt) return 'none';
+      const ts = Date.parse(String(expiresAt));
+      if (Number.isNaN(ts)) return 'none';
+      return Date.now() < ts ? 'active' : 'expired';
+    }
+
+    function leaseStateBadge(expiresAt) {
+      const state = leaseState(expiresAt);
+      if (state === 'none') return '—';
+      const cls = state === 'active' ? 'active' : 'warning';
+      const label = state === 'active'
+        ? T('admin.jobs.leaseState.active', 'Active')
+        : T('admin.jobs.leaseState.expired', 'Expired');
+      return '<span class="status-badge ' + cls + '">' + escapeHtml(label) + '</span>';
+    }
+
     async function loadJobs() {
       adminShowLoading('jobs-list', T('admin.jobs.loading', 'Loading jobs…'));
       try {
@@ -66,6 +83,7 @@ pub async fn admin_jobs() -> Html<String> {
               <th>${escapeHtml(T('admin.jobs.col.vm', 'VM'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.leaseOwner', 'Lease owner'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.leaseEpoch', 'Lease epoch'))}</th>
+              <th>${escapeHtml(T('admin.jobs.col.leaseState', 'Lease state'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.leaseExpires', 'Lease expires'))}</th>
             </tr>
           </thead>
@@ -83,6 +101,7 @@ pub async fn admin_jobs() -> Html<String> {
                 <td>${escapeHtml(String(j.vm_id || '—'))}</td>
                 <td><code>${escapeHtml(formatLeaseCell(j.lease_owner))}</code></td>
                 <td>${escapeHtml(formatLeaseCell(j.lease_epoch))}</td>
+                <td>${leaseStateBadge(j.lease_expires_at)}</td>
                 <td>${escapeHtml(formatLeaseCell(j.lease_expires_at))}</td>
               </tr>`;
             }).join('')}
@@ -109,7 +128,7 @@ pub async fn admin_jobs() -> Html<String> {
             </div>
           </div>
           <p class="muted admin-hint" data-i18n="admin.jobs.hint">
-            Job queue from the coordinator store. Backend is set at startup via <code>POOLAI_JOB_STORE</code>. Lease columns are read-only (Galaxy §4.3.1, PH-S94/S95).
+            Job queue from the coordinator store. Backend is set at startup via <code>POOLAI_JOB_STORE</code>. Lease columns are read-only and state badge is derived from <code>lease_expires_at</code> (Galaxy §4.3.1, PH-S94/S95/PH-S105).
           </p>
           <div id="jobs-list"></div>
         </div>
@@ -128,5 +147,6 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("Lease owner"));
     assert!(html.contains("lease_owner"));
     assert!(html.contains("lease_epoch"));
+    assert!(html.contains("leaseStateBadge"));
     assert!(html.contains("lease_expires_at"));
 }

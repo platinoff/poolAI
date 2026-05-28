@@ -1,8 +1,8 @@
 {
-  "revision": 24,
+  "revision": 25,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S104",
-  "next_sprint": "PH-S105",
+  "last_sprint_closed": "PH-S105",
+  "next_sprint": "PH-S106",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -193,8 +193,8 @@
       "label": "admin/jobs.rs",
       "path": "src/ui/admin/jobs.rs",
       "layer": "L3",
-      "sprints": ["PH-S53", "PH-S96"],
-      "sections": ["lease columns"]
+      "sprints": ["PH-S53", "PH-S96", "PH-S105"],
+      "sections": ["lease columns", "lease active/expired badge"]
     },
     {
       "id": "admin_grid_pricing",

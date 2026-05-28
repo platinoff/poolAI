@@ -1,7 +1,7 @@
 {
-  "revision": 15,
+  "revision": 16,
   "updated_at": "2026-05-28",
-  "active_sprint": "PH-S105",
+  "active_sprint": "PH-S106",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -79,7 +79,7 @@
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },
     "admin_jobs_lease_ui": {
-      "sprints": ["PH-S96"],
+      "sprints": ["PH-S96", "PH-S105"],
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md"],
       "code_globs": ["src/ui/admin/jobs.rs", "src/ui/i18n_core.js", "e2e/tests/admin.spec.ts"],
       "extensions": [".rs", ".js", ".ts", ".md"],

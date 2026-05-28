@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-28 (PH-S104 ✅ `JobStatus::Migrating` + lifecycle; §5.12 PH-S105…S109 — 5 відкритих; FM-041 Deferred).
+**Оновлено:** 2026-05-28 (PH-S105 ✅ admin jobs lease active/expired badge; §5.12 PH-S106…S109 — 4 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -305,7 +305,7 @@ FM-xxx (з таблиці нижче)
 | 38 | **PH-S102** | Live pricing provider HTTP fetch (code) | Galaxy §4.2.5 | L1 refresh from `POOLAI_GALAXY_PRICING_PROVIDERS` endpoints; `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; API integration + tests | **✅** |
 | 39 | **PH-S103** | `X-PoolAI-Protocol` middleware (code) | Galaxy §9.8 | middleware on selected wire routes (`/grid/*`, register/heartbeat remote, virtual-nodes); protocol headers + reject unsupported | **✅** |
 | 40 | **PH-S104** | `JobStatus::Migrating` + lifecycle (code) | Galaxy §4.3.2 | `Migrating` enum + lifecycle transitions (`Leased/Executing ↔ Migrating`); OpenAPI + contract tests | **✅** |
-| 41 | **PH-S105** | Admin jobs lease active/expired badge (code) | Galaxy §4.3.1, `src/ui/admin/jobs.rs` | read-only badge from `lease_expires_at`; i18n EN/UK; Playwright smoke | відкрито |
+| 41 | **PH-S105** | Admin jobs lease active/expired badge (code) | Galaxy §4.3.1, `src/ui/admin/jobs.rs` | read-only badge from `lease_expires_at`; i18n EN/UK; Playwright smoke | **✅** |
 | 42 | **PH-S106** | `poolai-worker` lease renew client stub (code) | Galaxy §4.3.1, `src/bin/poolai-worker.rs` | POST renew to coordinator when holding task lease; unit test; no full failover | відкрито |
 | 43 | **PH-S107** | Jobs lease E2E smoke (e2e) | `e2e/`, PH-S98–S99 API | Playwright acquire + renew path; `jobs_api` or extend `admin.spec.ts` | відкрито |
 | 44 | **PH-S108** | Grid ingest sets Leased on acquire (code) | `src/grid/dispatch.rs`, `src/job/` | after grid job ingest + schedule, status `leased` when lease active | відкрито |
@@ -422,7 +422,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S105** (Admin jobs lease active/expired badge) · черга **5** відкритих (PH-S105…S109) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S106** (`poolai-worker` lease renew client stub) · черга **4** відкритих (PH-S106…S109) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

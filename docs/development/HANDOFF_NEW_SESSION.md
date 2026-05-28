@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S104 ✅ `JobStatus::Migrating` + lifecycle; §5.12 PH-S105) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S105 ✅ admin jobs lease active/expired badge; §5.12 PH-S106) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -73,9 +73,10 @@
 **PH-S102 ✅ (code):** live pricing provider HTTP fetch (Galaxy §4.2.5): API `GET /api/v1/grid/pricing` on L1 miss fetches provider endpoints from `POOLAI_GALAXY_PRICING_PROVIDERS`; timeout via `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; tests for live HTTP path + timeout env parse; `cargo test-ci`.
 **PH-S103 ✅ (code):** middleware `X-PoolAI-Protocol` на selected wire routes (`/grid/*`, `register-remote`, `heartbeat-remote`, `virtual-nodes/*`) з negotiation через compat matrix (`src/grid/protocol_compat.rs`), response headers (`coordinator/compat/docs`) та reject unsupported (`403 protocol_unsupported`); unit tests; `cargo test-ci`.
 **PH-S104 ✅ (code):** `JobStatus::Migrating` у job wire/lifecycle (`src/job/types.rs`, `src/job/lifecycle.rs`): transitions `Leased/Executing ↔ Migrating`, backward compatible serde JSON; OpenAPI `JobStatus` enum sync + API contract test `jobs_patch_migrating_lifecycle_roundtrip`; `cargo test-ci`.
-**Черга:** §5.12 **PH-S105…S109** (5 відкритих) — admin badge → worker renew → e2e → grid docs sync.
+**PH-S105 ✅ (code):** `/ui/admin/jobs` lease state badge `active/expired` derived from `lease_expires_at`; i18n EN/UK keys in `src/ui/i18n_core.js`; Playwright admin smoke updated with lease-state assertions (`e2e/tests/admin.spec.ts`); `cargo test-ci` (e2e toolchain unavailable locally: `npm` missing in PATH).
+**Черга:** §5.12 **PH-S106…S109** (4 відкритих) — worker renew → e2e → grid docs sync.
 
-**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S104, фази, PH-S105…S109).
+**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S105, фази, PH-S106…S109).
 
 ## 1. Канонічний порядок документації та планів
 

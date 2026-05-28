@@ -153,11 +153,35 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
       page.getByRole("columnheader", { name: /lease epoch/i }),
     ).toBeVisible();
     await expect(
+      page.getByRole("columnheader", { name: /lease state/i }),
+    ).toBeVisible();
+    await expect(
       page.getByRole("columnheader", { name: /lease expires/i }),
     ).toBeVisible();
     await expect(page.locator("#jobs-list")).toContainText("e2e-lease-worker");
     await expect(page.locator("#jobs-list")).toContainText("42");
+    await expect(page.locator("#jobs-list")).toContainText("Active");
     await expect(page.locator("#jobs-list")).toContainText(expires);
+  });
+
+  test("jobs page shows expired lease badge (PH-S105)", async ({
+    page,
+    request,
+  }) => {
+    const expiredAt = "2020-01-01T00:00:00Z";
+    const createRes = await request.post("/api/v1/jobs", {
+      data: {
+        kind: "inference",
+        lease_owner: "e2e-lease-expired",
+        lease_epoch: 7,
+        lease_expires_at: expiredAt,
+      },
+    });
+    expect(createRes.status()).toBe(201);
+
+    await gotoAdminReady(page, "/ui/admin/jobs", "#jobs-list");
+    await expect(page.locator("#jobs-list")).toContainText("e2e-lease-expired");
+    await expect(page.locator("#jobs-list")).toContainText("Expired");
   });
 
   test("updates compatibility page shows protocol and doc blocks (PH-S93)", async ({

@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-28 · **HEAD:** PH-S104 (`JobStatus::Migrating` + lifecycle) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
+**Оновлено:** 2026-05-28 · **HEAD:** PH-S105 (admin jobs lease active/expired badge) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S105…S109** (5) — UI, worker renew, e2e, grid docs |
-| **Закрито PH-S65…S104** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI, lease wire + failover requeue stub + `Migrating` lifecycle |
+| **Відкрито** | **PH-S106…S109** (4) — worker renew, e2e, grid docs |
+| **Закрито PH-S65…S105** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI lease columns + active/expired badge, lease wire + failover requeue stub + `Migrating` lifecycle |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 Research replenish ✅ (2026-05-27): 6 нових PH-S* у FM §5.12.
@@ -56,20 +56,20 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Live provider HTTP fetch | PH-S102 ✅ | endpoint pull from provider catalog + timeout env |
 | `X-PoolAI-Protocol` middleware | PH-S103 ✅ | selected routes negotiation, protocol headers, unsupported reject |
 | `JobStatus::Migrating` | PH-S104 ✅ | lifecycle transitions `Leased/Executing ↔ Migrating`; OpenAPI + contract tests |
+| Admin lease active/expired badge | PH-S105 ✅ | `/ui/admin/jobs` lease-state badge from `lease_expires_at`; i18n + Playwright smoke updates |
 
-**Ще не в коді:** lease active/expired UI badge, worker renew client.
+**Ще не в коді:** worker renew client.
 
 ---
 
-## 3. Черга §5.12 (5 відкритих)
+## 3. Черга §5.12 (4 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S105** | Admin lease active/expired badge | §4.3.1 |
-| 2 | PH-S106 | Worker lease renew client | §4.3.1 |
-| 3 | PH-S107 | E2E lease acquire+renew | e2e |
-| 4 | PH-S108 | Grid ingest → Leased | §4.3 |
-| 5 | PH-S109 | §4.3 wire docs sync | docs |
+| 1 | **PH-S106** | Worker lease renew client | §4.3.1 |
+| 2 | PH-S107 | E2E lease acquire+renew | e2e |
+| 3 | PH-S108 | Grid ingest → Leased | §4.3 |
+| 4 | PH-S109 | §4.3 wire docs sync | docs |
 
 ---
 
