@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-05-27 (Galaxy docs vision UI + auto-reload)
+**Last updated:** 2026-05-27 (PH-S98 lease acquire sync; Galaxy docs vision)
 
 ## Canonical reading order
 
@@ -17,7 +17,7 @@
 9. **Інвентар** — кореневий [file_list.csv](../file_list.csv) (оновлюй також після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`); повний список: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](../.cursor/commands/git-push.md).
 11. **Витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення за доками та кодом).
-12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.1** / **§5.11** — наступні 10 PH-S*); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
+12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.12** — черга PH-S*); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
 
 **Сталевий стан (декларація CI / збірки / модулів)** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md). Звіряти разом із кроком 12 (**§5.1**); операційний зріз — [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
 
@@ -30,7 +30,7 @@
 ## Short pointers
 
 - **Galaxy docs vision (рекомендовано для огляду Galaxy Grid)** — [vision/index.html](./vision/index.html) + `manifest.json`; запуск `../bin/open-docs-vision.ps1`.
-- **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (ролі, lease, fees, Telegram edge, locality, verification, governance §9); код fee split — `src/grid/galaxy_fee_split.rs`.
+- **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (ролі, lease §4.3.1, fees, Telegram edge, locality, verification, governance §9); код: `src/grid/galaxy_fee_split.rs`, job lease — `src/job/lease_config.rs`, `src/job/lease_acquire.rs`.
 - **Каталог / витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (крок 11; оновлюй при змінах модулів або публічного API).
 - **Беклог і тікети** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (крок 12; **§5.1** — порядок наступних кроків за FM-*).
 - **Сталевий стан** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md).

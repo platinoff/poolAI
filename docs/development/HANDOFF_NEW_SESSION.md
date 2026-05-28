@@ -69,7 +69,7 @@
 **PH-S98 ✅ (code):** `src/job/lease_acquire.rs` — lease acquire on scheduler bind + `POST /api/v1/jobs/{id}/lease`; `409 lease_already_active`; OpenAPI sync; unit + `jobs_api_contracts`; `cargo test-ci` + openapi-gap 0.
 **Черга:** §5.12 **PH-S99** (5 відкритих) — lease renew → `Leased` status → failover → live pricing fetch → protocol middleware.
 
-**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S97, фази, наступні орієнтири).
+**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S98, фази, PH-S99…S103).
 
 ## 1. Канонічний порядок документації та планів
 

@@ -553,9 +553,13 @@ src/grid/dispatch.rs
 src/grid/envelope.rs
 src/grid/map.rs
 src/grid/mod.rs
+src/job/domain_events.rs
+src/job/lease_acquire.rs
+src/job/lease_config.rs
 src/job/lifecycle.rs
 src/job/map.rs
 src/job/mod.rs
+src/job/onchain.rs
 src/job/scheduler.rs
 src/job/store.rs
 src/job/store_sqlite.rs

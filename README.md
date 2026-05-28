@@ -51,7 +51,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Активна черга:** Post-Horizon **FM-020…031** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S98 ✅ (pricing, governance, job lease). **Активна черга:** FM **§5.12** — **PH-S99** (lease renew) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -79,15 +79,17 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-05-27)
 
-**PH-S03…S64 закрито** (Galaxy Grid concept S55–S64, див. [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md)). Канон черги — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.1** · **§5.11** · **§5.12** (research).
+**HEAD:** `dbfc3e4b` — PH-S98 job lease acquire (`src/job/lease_acquire.rs`, `POST /api/v1/jobs/{id}/lease`).
 
-**Наступна сесія:** research — доповнити §5.12 до ≤10 PH-S* ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md)).
+**Закрито:** PH-S03…S98 (Galaxy Grid: pricing oracle/API, signed releases, job lease wire + TTL + acquire). Концепт §4.3.1 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
+
+**Активна черга (FM §5.12):** **PH-S99** lease renew / heartbeat → PH-S100…S103 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
-**Старт сесії:** [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md).
+**Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) (§2a env, зокрема `POOLAI_JOB_LEASE_TTL_SECS`).
 
-**Нещодавно (PH-S03…S06):** VM write contracts + admin E2E; Raft `GET /api/v1/raid/status`, admin `#raid-cluster-status`, `raft_rpc` + multi-node harness — **`cargo test-raft-ci`**.
+**Нещодавно (job lease):** PH-S97 TTL env (`lease_config`) · PH-S98 acquire on scheduler bind + explicit API · PH-S96 admin lease columns · PH-S94–S95 wire + PATCH CAS.
 
 **Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 

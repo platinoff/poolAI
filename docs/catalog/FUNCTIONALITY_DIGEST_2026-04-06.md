@@ -1,6 +1,6 @@
 # PoolAI — витяг функціоналу (зведення за доками та кодом)
 
-**Оновлено:** 2026-05-27 (PH-S96: admin jobs lease columns; PH-S94–S95 job lease wire + PATCH CAS; PH-S93 updates-compat; PH-S78–S92 pricing API/oracle).
+**Оновлено:** 2026-05-27 (PH-S98: lease acquire; PH-S97 TTL env; PH-S96 admin lease columns; PH-S94–S95 wire + PATCH CAS; PH-S78–S92 pricing).
 
 Цей документ — **не автогенерація з коду**, а структурований **витяг можливостей** системи, узгоджений з кореневим [`README.md`](../../README.md), [`docs/status/STABLE_STATE_SUMMARY.md`](../status/STABLE_STATE_SUMMARY.md), [`docs/development/HANDOFF_NEW_SESSION.md`](../development/HANDOFF_NEW_SESSION.md), модулями `src/` та (частково) [`docs/openapi.yaml`](../openapi.yaml). Для повного переліку HTTP-шляхів див. роутери в `src/network/` — OpenAPI може відставати від фактичного API.
 
@@ -122,7 +122,7 @@
 | Модуль / crate | Призначення | HTTP / wire |
 |----------------|-------------|-------------|
 | `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus (див. **Galaxy Grid modules** нижче) | JSON; map ↔ discovery/RAID |
-| `src/job/` | `JobStore`, scheduler, lifecycle; persistence JSON / SQLite (`FM-029`) / RAID snapshot (`PH-S48`); optional `lease_owner` / `lease_epoch` / `lease_expires_at` (PH-S94); PATCH CAS `lease_epoch` (PH-S95) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule` (FM-020…029) |
+| `src/job/` | `JobStore`, scheduler, lifecycle; `lease_config` / `lease_acquire` (PH-S97–S98); persistence JSON / SQLite (`FM-029`) / RAID (`PH-S48`); optional lease fields (PH-S94); PATCH CAS (PH-S95) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule`, `POST /jobs/{id}/lease` (FM-020…029, PH-S98) |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
 | `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |
@@ -143,7 +143,7 @@
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
 | **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
 | **Grid pricing API** | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (task/model/unit); oracle from `galaxy_pricing_oracle` (PH-S78…S83) | `grid.rs` + `galaxy_pricing_oracle` tests |
-| **Job lease wire** | `src/job/types.rs`, `src/network/api/jobs.rs` | optional lease fields; `check_patch_lease_epoch` → `409 lease_epoch_rejected` (PH-S94…S95) | `lease_tests`, `jobs_api_contracts` |
+| **Job lease wire** | `src/job/types.rs`, `lease_config.rs`, `lease_acquire.rs`, `src/network/api/jobs.rs` | TTL env; acquire on schedule + `POST /jobs/{id}/lease`; PATCH CAS → `409 lease_epoch_rejected` (PH-S94…S98) | `lease_tests`, `jobs_api_contracts` |
 
 **Admin UI (Galaxy ops, read-only):**
 

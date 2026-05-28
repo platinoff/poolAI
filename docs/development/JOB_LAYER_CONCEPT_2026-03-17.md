@@ -74,7 +74,8 @@ PoolAI вже реалізує:
 |-----|--------|
 | `JobId`, `JobKind`, `JobSpec`, `JobStatus` | `src/job/` |
 | Grid map | `src/job/map.rs` ↔ `GridEnvelope` Job |
-| HTTP stub | `GET/POST /api/v1/jobs`, `GET /api/v1/jobs/{id}` — `src/network/api/jobs.rs` |
+| HTTP | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule`, `POST /jobs/{id}/lease` — `src/network/api/jobs.rs` |
+| Lease (Galaxy §4.3.1) | `lease_config.rs`, `lease_acquire.rs`, optional `lease_*` на `JobRecord` (PH-S94…S98) |
 
 ## 6. Наступні кроки
 
@@ -85,4 +86,6 @@ PoolAI вже реалізує:
 - [x] Персистентний job store (JSON file) — `POOLAI_JOB_DATA_DIR`, `src/job/store.rs` (2026-05-20).
 - [x] SQLite job store (optional `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, migrate JSON) — FM-029 (2026-05-20).
 - [x] On-chain submit epics (core NDJSON → sidecar schema v1) — `src/job/domain_events.rs`, `onchain.rs`, `POOLAI_ONCHAIN_EVENTS_DIR` (PH-S38, 2026-05-25).
+- [x] Job lease TTL env — `POOLAI_JOB_LEASE_TTL_SECS`, `JobLeaseConfig` (PH-S97, 2026-05-27).
+- [x] Lease acquire on schedule + `POST /api/v1/jobs/{id}/lease` (PH-S98, 2026-05-27); renew — PH-S99+.
 
