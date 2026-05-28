@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S108…S109** (2) — grid ingest, docs sync |
+| **Відкрито** | **PH-S109** (1) — §4.3 docs sync |
 | **Закрито PH-S65…S106** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI lease columns + active/expired badge, lease wire + worker renew stub + failover requeue + `Migrating` lifecycle |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -61,16 +61,16 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 
 | E2E lease acquire+renew | PH-S107 ✅ | `e2e/tests/jobs_lease.spec.ts` |
 
-**Ще не в коді:** grid ingest → `leased` (PH-S108); §4.3 docs sync (PH-S109).
+| Grid ingest → Leased | PH-S108 ✅ | `schedule_with_grid_peer` + lease on bind; `dispatch.rs` tests |
+**Ще не в коді:** §4.3 lease wire docs sync (PH-S109).
 
 ---
 
-## 3. Черга §5.12 (2 відкритих)
+## 3. Черга §5.12 (1 відкритий)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S108** | Grid ingest → Leased | §4.3 |
-| 2 | PH-S109 | §4.3 wire docs sync | docs |
+| 1 | **PH-S109** | §4.3 wire docs sync | docs |
 
 ---
 

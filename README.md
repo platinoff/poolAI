@@ -51,7 +51,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S107 ✅ (pricing, governance, job lease + E2E). **Активна черга:** FM **§5.12** — **PH-S108** (grid ingest → leased) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S108 ✅ (pricing, governance, job lease + E2E + grid ingest→leased). **Активна черга:** FM **§5.12** — **PH-S109** (§4.3 docs sync) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -79,9 +79,9 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-05-28)
 
-**Закрито:** PH-S03…S107 (Galaxy Grid: pricing oracle/API, signed releases, job lease wire + TTL + acquire/renew + E2E `jobs_lease.spec.ts`). Концепт §4.3.1 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
+**Закрито:** PH-S03…S108 (Galaxy Grid: pricing, job lease wire, E2E, grid ingest→`leased`). Концепт §4.3.1 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
 
-**Активна черга (FM §5.12):** **PH-S108** (grid ingest → `leased`) — 2 відкритих PH-S108…S109 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
+**Активна черга (FM §5.12):** **PH-S109** (§4.3 lease wire docs sync) — 1 відкритий; смуга PH-S100…S109 майже закрита ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

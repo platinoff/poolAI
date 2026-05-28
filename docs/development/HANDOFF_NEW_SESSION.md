@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S107 ✅ · §5.12 PH-S108) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S108 ✅ · HEAD `23ecac5a` PH-S107; §5.12 PH-S109) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -76,9 +76,10 @@
 **PH-S105 ✅ (code):** `/ui/admin/jobs` lease state badge `active/expired` derived from `lease_expires_at`; i18n EN/UK keys in `src/ui/i18n_core.js`; Playwright admin smoke updated with lease-state assertions (`e2e/tests/admin.spec.ts`); `cargo test-ci` (e2e toolchain unavailable locally: `npm` missing in PATH).
 **PH-S106 ✅ (code):** `src/bin/poolai-worker.rs` lease renew client stub: when task payload carries `job_id` + `lease_epoch`, worker issues `POST /api/v1/jobs/{id}/lease/renew`; includes payload parser helper and async HTTP renew stub unit tests; no full failover logic changes; `cargo test-ci`.
 **PH-S107 ✅ (e2e):** `e2e/tests/jobs_lease.spec.ts` — Playwright API smoke: `POST /api/v1/jobs/{id}/lease` (acquire → `leased`, epoch `1`) + `POST …/lease/renew` (extends `lease_expires_at`); 409 `lease_already_active` / `lease_epoch_rejected`; `npm run test:ci` includes `jobs_lease`; `bin/e2e-playwright.sh --start`.
-**Черга:** §5.12 **PH-S108…S109** (2 відкритих) — grid ingest → docs sync.
+**PH-S108 ✅ (code):** `src/grid/dispatch.rs` — grid `Job` ingest via `schedule_with_grid_peer`: source peer → `worker_id` + scheduler lease acquire → `JobStatus::Leased` with `lease_owner`/`lease_epoch`/`lease_expires_at`; without peer → `Scheduled` without lease; unit tests; `cargo test dispatch::tests`.
+**Черга:** §5.12 **PH-S109** (1 відкритий) — §4.3 lease wire docs sync.
 
-**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S107, фази, PH-S108…S109).
+**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S108, фаза docs PH-S109).
 
 ## 1. Канонічний порядок документації та планів
 

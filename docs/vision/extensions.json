@@ -1,7 +1,7 @@
 {
   "revision": 18,
   "updated_at": "2026-05-28",
-  "active_sprint": "PH-S108",
+  "active_sprint": "PH-S109",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -140,6 +140,13 @@
       "code_globs": ["src/bin/poolai-worker.rs"],
       "extensions": [".rs", ".md", ".json"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
+    },
+    "grid_ingest_leased": {
+      "sprints": ["PH-S108"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["src/grid/dispatch.rs", "src/job/scheduler.rs"],
+      "extensions": [".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md"]
     },
     "jobs_lease_e2e": {
       "sprints": ["PH-S107"],

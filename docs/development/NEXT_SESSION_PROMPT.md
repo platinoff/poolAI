@@ -1,97 +1,57 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 · **HEAD:** (PH-S107 ✅, pending commit) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) · [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)
+**Оновлено:** 2026-05-28 · **HEAD:** `23ecac5a` (PH-S107) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) · [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)
 
 ---
 
 ## Copy-paste для наступної сесії
 
 ```
-PoolAI — ітераційна сесія PH-S108 (VDT, один спринт)
+PoolAI — ітераційна сесія PH-S109 (VDT, один спринт)
 
-## Ролі (VDT)
-| Роль | Хто | Дія |
-|------|-----|-----|
-| Власник / креативний директор | Людина | Пріоритети, BLOCKED/Deferred, push за бажанням |
-| Оркестратор | Ти (Composer) | Один PH-S*; Rust/e2e/docs; FM/HANDOFF/NEXT_SESSION; commit scope |
-| Субагенти | explore · shell · generalPurpose | docs search, cargo test-ci, один модуль |
-
-Оркестратор НЕ делегує: git push, закриття §5.12, оновлення цього prompt.
+## Ролі (VDT) — як у PH-S107
 
 Правила: poolai-agent-roles.mdc · virtual-development-team.mdc · poolai-session-iteration.mdc · runtime-stack-policy.mdc
 
-## Режим ітерації (канон)
+## Режим ітерації
+- Один PH-S* · локальний CI перед push
+- Закриття: PH-S109 → ✅ FM §5.12 + HANDOFF + цей файл
+- Черга §5.12: **1** відкритий (PH-S109) — після закриття replenish (<10)
 
-- **Один PH-S* за сесію** — мінімальний scope; локальний CI перед push.
-- **Закриття спринту:** PH-S* → ✅ FM §5.12 + HANDOFF + цей файл (наступний PH-S*).
-- **Черга:** ≤10 відкритих PH-S* у §5.12 (зараз **2**: PH-S108…S109).
-
-## S0 (MSYS2 UCRT64 bash — обов’язково)
+## S0
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
 export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 git fetch; git status -sb; git log -1 --oneline
-df -h /s | tail -1
-Прочитати: HANDOFF_NEW_SESSION.md · FUNCTION_MANAGEMENT.md §5.12 · GALAXY_GRID_ROADMAP_2026-05-27.md · цей файл
+HANDOFF · FM §5.12 · GALAXY_GRID_ROADMAP · цей файл
 
-## Локальний CI (канон)
+## Локальний CI
 cargo fmt --all
 K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci
-cargo run --bin poolai-openapi-gap-audit   # після API
-cd e2e && npm run test:ci                # після e2e / src/ui/
+# docs-only: openapi-gap / e2e за потреби
 
 ## Стан (2026-05-28)
-- **HEAD:** (PH-S107 ✅ pending commit)
-- **Закрито:** PH-S03…S107 + PH-S76 + PH-S77 + PH-S90
-- **Відкритий sprint:** **PH-S108** (1 з 2 у §5.12)
-- **BLOCKED:** PH-S35 / PH-S16 / PH-S02 (LAN)
-- **Deferred:** PH-S36 / PH-S01 / PH-S15 (Cloud SDK, FM-041)
+- **Закрито:** PH-S03…S108 (смуга PH-S100…S109: 9✅ / 1 відкрито)
+- **Відкритий:** **PH-S109** — Galaxy §4.3 lease wire docs sync
+- **BLOCKED:** PH-S35/S16/S02 · **Deferred:** PH-S36/S01/S15
 
-## PH-S108 — scope цієї сесії
-1. `src/grid/dispatch.rs` + `src/job/` — після grid job ingest + schedule, status `leased` коли lease active
-2. Unit/integration tests; `cargo test-ci`
-3. FM §5.12 (PH-S108 → ✅) + HANDOFF + цей prompt + INDEX/README sync
-
-## Режим виконання
-1. Взяти PH-S108 з черги §5.12
-2. MSYS2 для git/cargo; staging лише scope спринту
-3. Commit + push + самарі
-4. Не починати PH-S109 у тій самій сесії
+## PH-S109 — scope
+1. `docs/concept/POOLAI_GALAXY_GRID.md` §4.3 — позначити implemented: Leased/Migrating, renew, grid ingest→leased, E2E (PH-S100…S108); без дублювання prose
+2. INDEX, DIGEST, README Next Focus, `GALAXY_GRID_ROADMAP` (смуга 10/10 ✅)
+3. FM §5.12 PH-S109 → ✅; HANDOFF; vision manifest
 
 ## Не повторювати
-PH-S03…S107 · TTL env · lease acquire/renew API · worker renew stub · `JobStatus::Leased`/`Migrating` · failover requeue stub · live pricing HTTP fetch · protocol middleware · admin lease columns/badge · PATCH lease CAS · jobs_lease E2E
+Код lease/E2E/grid ingest — уже в PH-S94…S108
 
-## Черга §5.12 — 2 відкритих
-| # | Sprint | Фокус | Тип |
-|---|--------|--------|-----|
-| 1 | **PH-S108** | Grid ingest → Leased on acquire | code |
-| 2 | PH-S109 | Galaxy §4.3 lease wire docs sync | docs |
-
-## Смуга PH-S100…S109 (10 спринтів Galaxy lease/protocol — орієнтир)
-| Sprint | Статус | Фокус |
-|--------|--------|--------|
-| PH-S100 | ✅ | `JobStatus::Leased` + lifecycle |
-| PH-S101 | ✅ | Failover requeue stub (expired leased → rebind) |
-| PH-S102 | ✅ | Live pricing provider HTTP fetch |
-| PH-S103 | ✅ | `X-PoolAI-Protocol` middleware |
-| PH-S104 | ✅ | `JobStatus::Migrating` + lifecycle |
-| PH-S105 | ✅ | Admin jobs lease active/expired badge |
-| PH-S106 | ✅ | `poolai-worker` lease renew client stub |
-| PH-S107 | ✅ | Jobs lease E2E acquire+renew |
-| **PH-S108** | **відкрито** | Grid ingest → `leased` on acquire |
-| PH-S109 | відкрито | §4.3 lease wire docs sync |
-
-Поза чергою: PH-S35/S16/S02 LAN · PH-S36/S01/S15 Cloud SDK
+## Після PH-S109
+Replenish §5.12 (code-first, ≤10 відкритих) — `rg "TODO|FIXME" src/`, GALAXY_GRID_ROADMAP
 ```
 
 ---
 
-## Короткий зріз (людина)
+## Короткий зріз
 
 | | |
 |---|---|
-| **Наступний спринт** | PH-S108 — Grid ingest → Leased on acquire |
-| **Після нього** | PH-S109 (§4.3 lease wire docs sync) |
-| **Канон черги** | [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 |
-| **Роадмеп** | [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) |
+| **Наступний** | PH-S109 — §4.3 lease wire docs sync (закриває смугу PH-S100…S109) |
 | **Handoff** | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) |

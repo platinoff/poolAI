@@ -1,4 +1,7 @@
 //! Grid envelope ingress — Job/Result/MemoryShard side effects (FM-023).
+//!
+//! Grid `Job` ingest schedules via [`schedule_with_grid_peer`](crate::job::schedule_with_grid_peer);
+//! when a source peer binds `worker_id`, scheduler lease acquire sets `JobStatus::Leased` (PH-S108).
 
 use chrono::Utc;
 
@@ -114,7 +117,7 @@ mod tests {
     use chrono::Utc;
 
     #[test]
-    fn ingest_job_creates_scheduled_row() {
+    fn ingest_job_with_peer_sets_leased_and_lease_fields() {
         let jobs = JobStore::open_for_test(None);
         let memory = MemoryShardStore::open_for_test(None);
         let env = GridEnvelope::new(
@@ -135,6 +138,42 @@ mod tests {
                 status: JobStatus::Leased,
             }
         );
+        let row = jobs.get("grid-job-1").expect("get").expect("row");
+        assert_eq!(row.status, JobStatus::Leased);
+        assert_eq!(row.worker_id.as_deref(), Some("peer-a"));
+        assert_eq!(row.lease_owner.as_deref(), Some("peer-a"));
+        assert_eq!(row.lease_epoch, Some(1));
+        assert!(row.lease_expires_at.is_some());
+    }
+
+    #[test]
+    fn ingest_job_without_peer_stays_scheduled_without_lease() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let env = GridEnvelope::new(
+            GridMessage::Job(GridJobBody {
+                job_id: "grid-job-no-peer".into(),
+                task_kind: "inference".into(),
+                verification_policy: None,
+                input_artifact_ids: vec![],
+                deadline: None,
+            }),
+            None,
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(
+            out.kind,
+            GridIngestKind::Job {
+                job_id: "grid-job-no-peer".into(),
+                status: JobStatus::Scheduled,
+            }
+        );
+        let row = jobs.get("grid-job-no-peer").expect("get").expect("row");
+        assert_eq!(row.status, JobStatus::Scheduled);
+        assert!(row.worker_id.is_none());
+        assert!(row.lease_owner.is_none());
+        assert!(row.lease_epoch.is_none());
+        assert!(row.lease_expires_at.is_none());
     }
 
     #[test]
