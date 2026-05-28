@@ -1,8 +1,8 @@
 {
-  "revision": 19,
+  "revision": 20,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S100",
-  "next_sprint": "PH-S101",
+  "last_sprint_closed": "PH-S101",
+  "next_sprint": "PH-S102",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -142,6 +142,22 @@
       "sections": ["POST /jobs/{id}/lease", "schedule acquire", "maybe_transition_to_leased"]
     },
     {
+      "id": "job_store",
+      "label": "job/store.rs",
+      "path": "src/job/store.rs",
+      "layer": "L3",
+      "sprints": ["PH-S48", "PH-S101"],
+      "sections": ["failover requeue stub", "promote_submitted_to_scheduled_with"]
+    },
+    {
+      "id": "job_scheduler",
+      "label": "job/scheduler.rs",
+      "path": "src/job/scheduler.rs",
+      "layer": "L3",
+      "sprints": ["PH-S38", "PH-S101"],
+      "sections": ["schedule_with_workers", "expired_leased_job_requeues_and_rebinds"]
+    },
+    {
       "id": "admin_updates_compat",
       "label": "updates_compat.rs",
       "path": "src/ui/admin/updates_compat.rs",
@@ -195,6 +211,8 @@
     { "from": "galaxy_grid", "to": "security_hardening", "kind": "concept-ref" },
     { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" },
     { "from": "galaxy_grid", "to": "job_types", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "job_store", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "job_scheduler", "kind": "implements" },
     { "from": "galaxy_grid", "to": "admin_updates_compat", "kind": "implements" },
     { "from": "galaxy_grid", "to": "admin_jobs", "kind": "implements" },
     { "from": "galaxy_grid", "to": "admin_grid_pricing", "kind": "implements" },

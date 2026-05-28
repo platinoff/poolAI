@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S100 ✅ JobStatus::Leased; §5.12 PH-S101…S109 — 9 відкритих; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S101 ✅ failover requeue stub; §5.12 PH-S102…S109 — 8 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -301,7 +301,7 @@ FM-xxx (з таблиці нижче)
 | 34 | **PH-S98** | Lease acquire at schedule / explicit API (code) | Galaxy §4.3.1, `src/job/lease_acquire.rs` | schedule + `POST /jobs/{id}/lease`; `JobLeaseConfig` TTL; OpenAPI; unit + contract tests | **✅** |
 | 35 | **PH-S99** | Lease renew / heartbeat wire (code) | Galaxy §4.3.1, `lease_acquire.rs` | `POST /jobs/{id}/lease/renew`; extends TTL; epoch CAS; OpenAPI; tests | **✅** |
 | 36 | **PH-S100** | `JobStatus::Leased` + lifecycle (code) | Galaxy §4.3.2 | `Leased` status + `allows_transition`; backward compatible JSON/SQLite; acquire → `Leased` | **✅** |
-| 37 | **PH-S101** | Failover / re-migrate stub (code) | Galaxy §4.3 | detect expired lease; coordinator re-assign sketch; tests | відкрито |
+| 37 | **PH-S101** | Failover / re-migrate stub (code) | Galaxy §4.3 | detect expired leased jobs; requeue + rebind sketch in scheduler/store; tests | **✅** |
 | 38 | **PH-S102** | Live pricing provider HTTP fetch (code) | Galaxy §4.2.5 | L1 refresh from `POOLAI_GALAXY_PRICING_PROVIDERS`; timeout + tests | відкрито |
 | 39 | **PH-S103** | `X-PoolAI-Protocol` middleware (code) | Galaxy §9.8 | header negotiation on selected routes; compat matrix link | відкрито |
 | 40 | **PH-S104** | `JobStatus::Migrating` + lifecycle (code) | Galaxy §4.3.2 | `Migrating` enum + `allows_transition`; backward compatible JSON | відкрито |
@@ -422,7 +422,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S101** (failover / re-migrate stub) · черга **9** відкритих (PH-S101…S109) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S102** (live pricing provider HTTP fetch) · черга **8** відкритих (PH-S102…S109) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

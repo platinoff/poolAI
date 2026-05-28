@@ -11,10 +11,10 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
-- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid (PH-S65…S98 ✅, PH-S99…S103 відкрито); синхрон з FM §5.12.
+- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid (PH-S65…S101 ✅, PH-S102…S109 відкрито); синхрон з FM §5.12.
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
-- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — поточний спринт **PH-S101**; §5.12 **9** відкритих PH-S101…S109; закрито PH-S03…S100; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md) §CI.
+- **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — поточний спринт **PH-S102**; §5.12 **8** відкритих PH-S102…S109; закрито PH-S03…S101; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md) §CI.
 - **[`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md)** · **[`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md)** · **[`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)** · **[`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md)** · **[`../security/TLS.md`](../security/TLS.md)** — PH-S07…S14 ✅; **PH-S03…S06** ✅ (VM, Raft); черга PH закрита — FM **§5.9**.
 - **[`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md)** — autoprogon S21–S34 ✅ (архів черги).
 - **[`DOCS_LEGACY_AUDIT_2026-05-19.md`](./DOCS_LEGACY_AUDIT_2026-05-19.md)** — менеджер функціоналу: stale docs, не повторювати архівні `[ ]`.

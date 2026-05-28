@@ -447,4 +447,30 @@ mod tests {
         assert_eq!(row.status, JobStatus::Leased);
         assert_eq!(row.worker_id.as_deref(), Some("peer-grid-a"));
     }
+
+    #[test]
+    fn expired_leased_job_requeues_and_rebinds() {
+        let store = JobStore::open_for_test(None);
+        let mut record = sample_record("leased-expired", 1);
+        record.status = JobStatus::Leased;
+        record.worker_id = Some("old-worker".into());
+        record.lease_owner = Some("old-worker".into());
+        record.lease_epoch = Some(7);
+        record.lease_expires_at = Some(Utc::now() - chrono::Duration::seconds(30));
+        store.push(record).expect("push");
+
+        let workers = vec![
+            worker("old-worker", 9, false),
+            worker("new-worker", 0, false),
+        ];
+        let outcome = schedule_with_workers(&store, &workers, &[]).expect("schedule");
+        assert_eq!(outcome.scheduled, 1);
+
+        let row = store.get("leased-expired").expect("get").expect("row");
+        assert_eq!(row.status, JobStatus::Leased);
+        assert_eq!(row.worker_id.as_deref(), Some("new-worker"));
+        assert_eq!(row.lease_owner.as_deref(), Some("new-worker"));
+        assert_eq!(row.lease_epoch, Some(8));
+        assert!(row.lease_expires_at.is_some());
+    }
 }

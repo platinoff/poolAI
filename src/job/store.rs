@@ -257,6 +257,25 @@ impl JobStore {
                 .jobs
                 .lock()
                 .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
+            // PH-S101 failover stub: lease expired in `Leased` state -> requeue for scheduler.
+            let now = Utc::now();
+            for record in guard.iter_mut() {
+                if record.status != JobStatus::Leased {
+                    continue;
+                }
+                let Some(expires_at) = record.lease_expires_at else {
+                    continue;
+                };
+                if now < expires_at {
+                    continue;
+                }
+                // Keep `lease_epoch` so next acquire bumps generation monotonically.
+                record.status = JobStatus::Submitted;
+                record.worker_id = None;
+                record.vm_id = None;
+                record.lease_owner = None;
+                record.lease_expires_at = None;
+            }
             let mut indices: Vec<usize> = guard
                 .iter()
                 .enumerate()
@@ -268,7 +287,6 @@ impl JobStore {
             let mut bound_workers = 0usize;
             let mut bound_vms = 0usize;
             let mut expired = 0usize;
-            let now = Utc::now();
             for i in indices {
                 if job_past_deadline(&guard[i].spec, now) {
                     guard[i].status = JobStatus::Failed;

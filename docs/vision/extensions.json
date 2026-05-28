@@ -1,7 +1,7 @@
 {
   "revision": 13,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S101",
+  "active_sprint": "PH-S102",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -105,6 +105,13 @@
       "code_globs": ["src/job/**", "src/network/api/jobs.rs"],
       "extensions": [".rs", ".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
+    },
+    "job_failover_stub": {
+      "sprints": ["PH-S101"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["src/job/store.rs", "src/job/scheduler.rs"],
+      "extensions": [".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },
     "galaxy_grid_roadmap_doc": {
       "sprints": ["PH-S*"],
