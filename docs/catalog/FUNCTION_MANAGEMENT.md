@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-28 (PH-S115 ✅ vision map L4/L5 + pan/zoom + folder edges; §5.12 — **10** відкритих PH-S112…S124; FM-041 Deferred).
+**Оновлено:** 2026-05-28 (PH-S116 ✅ worker renew ticker · PH-S117 ✅ grid Result lease E2E; §5.12 — **8** відкритих PH-S118…S124; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -312,12 +312,12 @@ FM-xxx (з таблиці нижче)
 | 45 | **PH-S109** | Galaxy §4.3 lease wire docs sync (docs) | `POOLAI_GALAXY_GRID.md`, INDEX, DIGEST | §4.3 table PH-S94…S108; смуга 10/10 ✅; roadmap replenish | **✅** |
 | 46 | **PH-S110** | Grid result ingest lease_epoch CAS (code) | `src/grid/dispatch.rs`, Galaxy §4.3.1 | `GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; `409 lease_epoch_rejected`; unit tests | **✅** |
 | 47 | **PH-S111** | Job lease renew interval env (code) | `src/job/lease_config.rs`, §4.3.1 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests | **✅** |
-| 48 | **PH-S112** | Grid Job envelope E2E smoke (e2e) | `e2e/`, PH-S108 | Playwright grid envelope Job → `leased` + lease fields | відкрито |
+| 48 | **PH-S112** | Grid Job envelope E2E smoke (e2e) | `e2e/`, PH-S108 | Playwright grid envelope Job → `leased` + lease fields | **✅** |
 | 49 | **PH-S113** | Vision L4/L5 workspace + lib layers (docs) | `docs/vision/`, manifest | `Cargo.toml` / `.cargo/config.toml` L5; `src/lib.rs` + crates L4; manifest nodes + edges | **✅** |
 | 50 | **PH-S114** | Vision map pan/zoom navigation (docs) | `docs/vision/vision.js` | wheel zoom, drag pan, +/- reset, dblclick focus node; map transform not browser zoom | **✅** |
 | 51 | **PH-S115** | Vision folder-colored edge routing (docs) | `docs/vision/vision.js` | orthogonal paths via folder hub; `edge-docs` / `edge-code` / `edge-toml` / `edge-mixed` | **✅** |
-| 52 | **PH-S116** | Worker periodic lease renew loop (code) | `src/bin/poolai-worker.rs`, PH-S111 | ticker from `JobLeaseConfig.lease_renew_interval_secs` while task active | відкрито |
-| 53 | **PH-S117** | Grid result lease_epoch E2E (e2e) | `e2e/`, PH-S110 | Playwright stale epoch → `409 lease_epoch_rejected` on grid Result | відкрито |
+| 52 | **PH-S116** | Worker periodic lease renew loop (code) | `src/bin/poolai-worker.rs`, PH-S111 | ticker from `JobLeaseConfig.lease_renew_interval_secs` while task active | **✅** |
+| 53 | **PH-S117** | Grid result lease_epoch E2E (e2e) | `e2e/`, PH-S110 | Playwright stale epoch → `409 lease_epoch_rejected` on grid Result | **✅** |
 | 54 | **PH-S118** | Jobs lease negative paths E2E (e2e) | `e2e/`, PH-S107 | 409/410 on wrong owner, expired lease, renew without acquire | відкрито |
 | 55 | **PH-S119** | Admin jobs lease column polish (code) | `src/ui/admin/jobs.rs` | `lease_epoch` + owner tooltip; i18n EN/UK | відкрито |
 | 56 | **PH-S120** | Solana adapter vision + digest crosslink (docs) | `docs/vision/`, DIGEST | `crates/poolai-solana-adapter` node edges; FM-033 pointer | відкрито |
@@ -326,7 +326,7 @@ FM-xxx (з таблиці нижче)
 | 59 | **PH-S123** | Grid pricing E2E negative fallback (e2e) | `e2e/tests/grid_pricing.spec.ts` | force fallback env → snapshot stable quote | відкрито |
 | 60 | **PH-S124** | OTel lease span attrs docs (docs) | FM-038, HANDOFF | span attributes for acquire/renew/reject paths | відкрито |
 
-**Відкритих у §5.12:** **10** (PH-S112, PH-S116…S124). Vision slice PH-S113…S115 **✅** (2026-05-28).
+**Відкритих у §5.12:** **8** (PH-S118…S124). Vision slice PH-S113…S115 **✅**; PH-S112–S117 lease wire/E2E **✅** (2026-05-28).
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -439,7 +439,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S112** (Grid Job envelope E2E) · черга **10** відкритих (PH-S112, PH-S116…S124) · vision PH-S113…S115 ✅ · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S118** (Jobs lease negative paths E2E) · черга **8** відкритих (PH-S118…S124) · vision PH-S113…S115 ✅ · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

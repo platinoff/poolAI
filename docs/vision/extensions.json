@@ -1,7 +1,7 @@
 {
-  "revision": 20,
+  "revision": 21,
   "updated_at": "2026-05-28",
-  "active_sprint": "PH-S112",
+  "active_sprint": "PH-S118",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -167,6 +167,27 @@
       "code_globs": ["e2e/tests/jobs_lease.spec.ts", "e2e/package.json"],
       "extensions": [".ts", ".json", ".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md", "docs/INDEX_2026-03-17.md", "README.md"]
+    },
+    "grid_job_lease_e2e": {
+      "sprints": ["PH-S112"],
+      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["e2e/tests/grid_job_lease.spec.ts", "e2e/package.json", "src/grid/dispatch.rs"],
+      "extensions": [".ts", ".json", ".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json"]
+    },
+    "worker_lease_renew_ticker": {
+      "sprints": ["PH-S116"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["src/bin/poolai-worker.rs", "src/job/lease_config.rs"],
+      "extensions": [".rs", ".md", ".json"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
+    },
+    "grid_result_lease_e2e": {
+      "sprints": ["PH-S117"],
+      "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["e2e/tests/grid_result_lease.spec.ts", "e2e/package.json", "src/grid/dispatch.rs"],
+      "extensions": [".ts", ".json", ".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json"]
     },
     "galaxy_grid_roadmap_doc": {
       "sprints": ["PH-S*"],

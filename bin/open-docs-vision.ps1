@@ -24,9 +24,13 @@ function GetMimeType {
 }
 
 function SendVisionBytes {
-    param($Context, $Body, $ContentType)
+    param($Context, $Body, $ContentType, [switch]$NoCache)
     if ($ContentType) {
         $Context.Response.ContentType = $ContentType
+    }
+    if ($NoCache) {
+        $Context.Response.Headers.Add('Cache-Control', 'no-cache, no-store, must-revalidate')
+        $Context.Response.Headers.Add('Pragma', 'no-cache')
     }
     $Context.Response.ContentLength64 = $Body.Length
     $Context.Response.OutputStream.Write($Body, 0, $Body.Length)
@@ -128,7 +132,8 @@ function StartVisionServerLoop {
         $ext = [IO.Path]::GetExtension($file).ToLowerInvariant()
         $ctype = GetMimeType -Extension $ext
         $bytes = [IO.File]::ReadAllBytes($file)
-        SendVisionBytes -Context $ctx -Body $bytes -ContentType $ctype
+        $noCache = $ext -in '.html', '.css', '.js', '.json', '.svg'
+        SendVisionBytes -Context $ctx -Body $bytes -ContentType $ctype -NoCache:$noCache
     }
 }
 
@@ -152,8 +157,8 @@ catch {
 }
 
 if ($existing) {
-    Write-Host "Port $Port already in use - docs-vision server may be running."
-    Write-Host 'For auto-reload (__watch), restart: stop the old process, then run this script again.'
+    Write-Host "Port $Port already in use - docs-vision server may be running (OLD bundle — CSS/title may be stale)."
+    Write-Host 'Restart: stop the process on this port, then run this script again (or hard-refresh Ctrl+Shift+R).'
     Write-Host "Simple Browser URL: $Url"
     if (-not $NoBrowser) {
         Start-Process $Url

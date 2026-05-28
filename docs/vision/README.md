@@ -83,6 +83,10 @@ http://127.0.0.1:8765/docs/vision/index.html
 |----------|-----|
 | **⊟ Folders** (увімкнено за замовч.) | папки з **≥5** файлами згортаються в один hub; **клік** — розгорнути, **dblclick** — розгорнути + zoom |
 | **◎ Sprint** | тьмяні вузли/ребра поза `active_sprint` з `extensions.json` |
+| **Layers (3D stack)** | клік по шару L0–L5 — підсвітка tier на Galaxy map; інші тьмяні; повторний клік або Esc — скинути |
+| **Вузол на map** | клік — повна назва у callout; pipeline-ребра до hub-файлів (`galaxy_grid`, `fm`, …) як сузір’я |
+| **Constellation layout** | файли в дузі/спіралі (не ряд); криві ребра між зірками |
+| **Galaxy wallpaper** | `vision2.png` у корені репо (`manifest.galaxy_background`, 15% opacity). **Не** `PoolAIGalaxy.png` — це схема шарів |
 | Кластер + сітка | ≤4 файли на шар — ряд; більше — сітка 2–3 колонки |
 | pan/zoom | навігація по великій карті |
 

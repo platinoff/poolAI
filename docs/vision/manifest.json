@@ -1,9 +1,10 @@
 {
-  "revision": 38,
+  "revision": 41,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S115",
-  "vision_ui_rev": 38,
-  "next_sprint": "PH-S112",
+  "last_sprint_closed": "PH-S117",
+  "vision_ui_rev": 48,
+  "galaxy_background": "vision2.png",
+  "next_sprint": "PH-S118",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -90,7 +91,21 @@
       "label": "grid/dispatch.rs",
       "path": "src/grid/dispatch.rs",
       "layer": "L3",
-      "sprints": ["PH-S38", "PH-S61", "PH-S100"]
+      "sprints": ["PH-S38", "PH-S61", "PH-S100", "PH-S108", "PH-S110", "PH-S112", "PH-S117"]
+    },
+    {
+      "id": "e2e_grid_job_lease",
+      "label": "grid_job_lease.spec.ts",
+      "path": "e2e/tests/grid_job_lease.spec.ts",
+      "layer": "L3",
+      "sprints": ["PH-S112"]
+    },
+    {
+      "id": "e2e_grid_result_lease",
+      "label": "grid_result_lease.spec.ts",
+      "path": "e2e/tests/grid_result_lease.spec.ts",
+      "layer": "L3",
+      "sprints": ["PH-S117"]
     },
     {
       "id": "virtual_nodes",
@@ -234,8 +249,8 @@
       "label": "bin/poolai-worker.rs",
       "path": "src/bin/poolai-worker.rs",
       "layer": "L3",
-      "sprints": ["FM-016", "PH-S65", "PH-S106"],
-      "sections": ["register/heartbeat", "task executor", "lease renew stub"]
+      "sprints": ["FM-016", "PH-S65", "PH-S106", "PH-S116"],
+      "sections": ["register/heartbeat", "task executor", "lease renew ticker"]
     },
     {
       "id": "galaxy_roadmap",
@@ -311,6 +326,9 @@
     { "from": "cargo_toml", "to": "lib_root", "kind": "workspace" },
     { "from": "cargo_config", "to": "cargo_toml", "kind": "workspace" },
     { "from": "lib_root", "to": "grid_dispatch", "kind": "crate" },
+    { "from": "grid_dispatch", "to": "e2e_grid_job_lease", "kind": "sprint-scope" },
+    { "from": "grid_dispatch", "to": "e2e_grid_result_lease", "kind": "sprint-scope" },
+    { "from": "poolai_worker", "to": "grid_dispatch", "kind": "implements" },
     { "from": "lib_root", "to": "job_types", "kind": "crate" },
     { "from": "cargo_toml", "to": "crate_solana", "kind": "workspace" },
     { "from": "fm", "to": "cargo_toml", "kind": "catalog" }

@@ -26,9 +26,22 @@
   let mapNavBound = false;
 
   const CLUSTER_COLLAPSE_MIN = 5;
+  const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+  const CONSTELLATION_HUB_IDS = new Set([
+    "galaxy_grid",
+    "fm",
+    "handoff",
+    "digest",
+    "docs_index",
+    "cargo_toml",
+    "next_session",
+    "dev_readme",
+  ]);
   const MAP_PREFS_KEY = "poolai-vision-map-prefs";
   let autoCollapseDense = true;
   let mapSprintFocus = false;
+  /** Layer id (L0–L5) highlighted on galaxy map after Layers panel click */
+  let mapLayerFocus = null;
   let expandedClusters = new Set();
   let clusterLabelPositions = [];
 
@@ -146,6 +159,29 @@
     );
   }
 
+  function mapNodeShortLabel(n, pos) {
+    if (pos.clusterHub) {
+      return clusterDisplayName(pos.cluster) + " (" + pos.clusterCount + ")";
+    }
+    const maxLen = pos.cluster && n.layer === "L3" ? 16 : 22;
+    return n.label.length > maxLen
+      ? n.label.slice(0, maxLen - 1) + "…"
+      : n.label;
+  }
+
+  function mapNodeFullLabel(n, pos) {
+    if (pos.clusterHub) {
+      return clusterDisplayName(pos.cluster) + " (" + pos.clusterCount + ")";
+    }
+    return n.label;
+  }
+
+  function nodeBaseRadius(id, hub) {
+    if (hub) return 13;
+    if (id === "galaxy_grid") return 14;
+    return 10;
+  }
+
   function folderCluster(path) {
     if (!path) return "other";
     const parts = path.split("/").filter(Boolean);
@@ -176,32 +212,6 @@
     return "other";
   }
 
-  function commonPathPrefix(a, b) {
-    if (!a || !b) return "";
-    const pa = a.split("/");
-    const pb = b.split("/");
-    const out = [];
-    for (let i = 0; i < pa.length && i < pb.length; i++) {
-      if (pa[i] !== pb[i]) break;
-      out.push(pa[i]);
-    }
-    return out.join("/");
-  }
-
-  function folderHubX(key) {
-    const s = key || "root";
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return 120 + (Math.abs(h) % 660);
-  }
-
-  function folderLaneY(kind, ay, by) {
-    if (kind === "docs") return LAYER_Y.L1 || (ay + by) / 2;
-    if (kind === "code") return LAYER_Y.L3 || (ay + by) / 2;
-    if (kind === "toml") return LAYER_Y.L5 || (ay + by) / 2;
-    return (ay + by) / 2;
-  }
-
   function edgeRouteKind(nodeA, nodeB) {
     const ka = pathKind(nodeA && nodeA.path);
     const kb = pathKind(nodeB && nodeB.path);
@@ -215,35 +225,97 @@
     return "mixed";
   }
 
-  function buildEdgePath(a, b, nodeA, nodeB) {
-    const prefix = commonPathPrefix(nodeA.path, nodeB.path);
-    const kind = edgeRouteKind(nodeA, nodeB);
-    const hubX = folderHubX(prefix || nodeA.path.split("/")[0]);
-    const laneY = folderLaneY(kind, a.y, b.y);
-    const y1 = a.y < b.y ? Math.min(a.y, laneY) : Math.max(a.y, laneY);
-    const y2 = b.y < a.y ? Math.min(b.y, laneY) : Math.max(b.y, laneY);
-    const midY = (y1 + y2) / 2;
+  function hashUnit(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return (Math.abs(h) % 10000) / 10000;
+  }
+
+  function nodeDegree(id) {
+    return (manifest.edges || []).filter(
+      (e) => e.from === id || e.to === id
+    ).length;
+  }
+
+  function edgeKey(a, b) {
+    return a < b ? a + "|" + b : b + "|" + a;
+  }
+
+  function buildAdjacency() {
+    const adj = new Map();
+    function link(a, b) {
+      if (!adj.has(a)) adj.set(a, []);
+      adj.get(a).push(b);
+    }
+    (manifest.edges || []).forEach((e) => {
+      link(e.from, e.to);
+      link(e.to, e.from);
+    });
+    return adj;
+  }
+
+  function pickClusterHub(nodes) {
+    for (let i = 0; i < nodes.length; i++) {
+      if (CONSTELLATION_HUB_IDS.has(nodes[i].id)) return nodes[i];
+    }
+    return nodes
+      .slice()
+      .sort((a, b) => nodeDegree(b.id) - nodeDegree(a.id))[0];
+  }
+
+  function constellationHubIds() {
+    return manifest.nodes
+      .filter((n) => CONSTELLATION_HUB_IDS.has(n.id) || nodeDegree(n.id) >= 4)
+      .map((n) => n.id);
+  }
+
+  function computeConstellationHighlight(fromId) {
+    const adj = buildAdjacency();
+    const hubs = constellationHubIds();
+    const parent = new Map([[fromId, null]]);
+    const visited = new Set([fromId]);
+    const queue = [fromId];
+    while (queue.length) {
+      const u = queue.shift();
+      (adj.get(u) || []).forEach((v) => {
+        if (visited.has(v)) return;
+        visited.add(v);
+        parent.set(v, u);
+        queue.push(v);
+      });
+    }
+    const litNodes = new Set([fromId]);
+    const litEdges = new Set();
+    hubs.forEach((hub) => {
+      if (!visited.has(hub)) return;
+      let cur = hub;
+      while (cur && cur !== fromId) {
+        const p = parent.get(cur);
+        if (!p) break;
+        litNodes.add(cur);
+        litNodes.add(p);
+        litEdges.add(edgeKey(p, cur));
+        cur = p;
+      }
+    });
+    (adj.get(fromId) || []).forEach((v) => {
+      litNodes.add(v);
+      litEdges.add(edgeKey(fromId, v));
+    });
+    return { nodes: litNodes, edges: litEdges };
+  }
+
+  function buildConstellationEdgePath(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const bend = Math.min(56, dist * 0.28) * (hashUnit(a.x + "," + b.y) > 0.5 ? 1 : -1);
+    const nx = -dy / dist;
+    const ny = dx / dist;
+    const mx = (a.x + b.x) / 2 + nx * bend;
+    const my = (a.y + b.y) / 2 + ny * bend;
     return (
-      "M" +
-      a.x +
-      "," +
-      a.y +
-      " L" +
-      a.x +
-      "," +
-      midY +
-      " L" +
-      hubX +
-      "," +
-      midY +
-      " L" +
-      hubX +
-      "," +
-      b.y +
-      " L" +
-      b.x +
-      "," +
-      b.y
+      "M" + a.x + "," + a.y + " Q" + mx + "," + my + " " + b.x + "," + b.y
     );
   }
 
@@ -521,28 +593,137 @@
         el.className = "layer-plane";
         el.dataset.layer = layer.id;
         el.textContent = layer.id + " · " + layer.name;
+        el.setAttribute("role", "button");
+        el.setAttribute("tabindex", "0");
+        el.title = "Click: highlight this tier on the galaxy map";
+        el.addEventListener("click", () => setMapLayerFocus(layer.id));
+        el.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            setMapLayerFocus(layer.id);
+          }
+        });
         stack.appendChild(el);
       });
+
+    const legend = document.getElementById("layer-legend");
+    if (legend) {
+      legend.innerHTML = "";
+      (m.layers || []).forEach((layer) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "legend-chip";
+        chip.dataset.layer = layer.id;
+        chip.title = "Click: highlight this tier on the galaxy map";
+        const swatch = document.createElement("i");
+        swatch.className = "legend-swatch legend-swatch-" + layer.id;
+        chip.appendChild(swatch);
+        chip.appendChild(
+          document.createTextNode(layer.id + " " + layer.name)
+        );
+        chip.addEventListener("click", () => setMapLayerFocus(layer.id));
+        chip.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            setMapLayerFocus(layer.id);
+          }
+        });
+        legend.appendChild(chip);
+      });
+    }
+
+    syncLayerStackHighlight();
+  }
+
+  function syncLayerStackHighlight() {
+    document.querySelectorAll(".layer-plane, .legend-chip").forEach((el) => {
+      const on = mapLayerFocus && el.dataset.layer === mapLayerFocus;
+      el.classList.toggle("highlight", on);
+      el.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function setMapLayerFocus(layerId) {
+    if (mapLayerFocus === layerId) {
+      mapLayerFocus = null;
+    } else {
+      mapLayerFocus = layerId;
+    }
+    syncLayerStackHighlight();
+    updateMapLayerFocus();
   }
 
   function highlightLayer(layerId) {
-    document.querySelectorAll(".layer-plane").forEach((el) => {
-      el.classList.toggle("highlight", el.dataset.layer === layerId);
+    mapLayerFocus = layerId || null;
+    syncLayerStackHighlight();
+    updateMapLayerFocus();
+  }
+
+  function updateMapLayerFocus() {
+    const focus = mapLayerFocus;
+    const svg = document.getElementById("map-svg");
+    if (!svg) return;
+    svg.classList.toggle("has-layer-focus", !!focus);
+
+    document
+      .querySelectorAll("#map-svg .plane, #map-svg .layer-tier-label")
+      .forEach((el) => {
+        const lid = el.dataset.layer;
+        if (!lid) return;
+        el.classList.toggle("layer-focus", !!focus && lid === focus);
+        el.classList.toggle("layer-dim", !!focus && lid !== focus);
+      });
+
+    document.querySelectorAll("#map-svg .cluster-label").forEach((el) => {
+      const lid = el.dataset.layer;
+      el.classList.toggle("layer-dim", !!focus && lid && lid !== focus);
+    });
+
+    document.querySelectorAll("#map-svg .node").forEach((el) => {
+      const n = nodeById(el.dataset.id);
+      const dim = !!focus && n && n.layer !== focus;
+      el.classList.toggle("layer-dim", dim);
+      el.classList.toggle("layer-focus", !!focus && n && n.layer === focus);
+    });
+
+    document.querySelectorAll("#map-svg .edge").forEach((el) => {
+      const a = nodeById(el.dataset.from);
+      const b = nodeById(el.dataset.to);
+      const dim =
+        !!focus && a && b && a.layer !== focus && b.layer !== focus;
+      el.classList.toggle("layer-dim", dim);
     });
   }
 
-  function layoutLayerRow(list, baseY, layer) {
-    const count = list.length;
-    const span = Math.min(MAP_W - 64, Math.max(140, count * 96));
-    const x0 = MAP_W / 2 - span / 2;
-    list.forEach((n, i) => {
-      const x =
-        count === 1 ? MAP_W / 2 : x0 + (i / Math.max(1, count - 1)) * span;
-      nodePositions.set(n.id, { x, y: baseY, layer });
+  function placeConstellationNode(n, cx, cy, i, layer, cluster, opts) {
+    if (i === 0) {
+      nodePositions.set(n.id, {
+        x: cx,
+        y: cy,
+        layer,
+        cluster,
+        clusterHub: !!(opts && opts.hub),
+        clusterCount: opts && opts.count,
+      });
+      return;
+    }
+    const angle = (i - 1) * GOLDEN_ANGLE + hashUnit(n.id) * 1.1;
+    const radius = 20 + Math.sqrt(i) * 22 + hashUnit(n.id + "r") * 16;
+    const x = cx + Math.cos(angle) * radius;
+    const y =
+      cy +
+      Math.sin(angle) * radius * 0.68 +
+      (hashUnit(n.id + "y") - 0.5) * 22;
+    nodePositions.set(n.id, {
+      x,
+      y,
+      layer,
+      cluster,
+      constellation: true,
     });
   }
 
-  function layoutLayerClusters(list, baseY, layer) {
+  function layoutLayerConstellation(list, baseY, layer) {
     const clusters = new Map();
     list.forEach((n) => {
       const key = folderCluster(n.path);
@@ -551,52 +732,43 @@
     });
 
     const clusterKeys = Array.from(clusters.keys()).sort();
-    const maxCols = layer === "L3" ? 3 : 4;
-    const cellW = layer === "L3" ? 78 : 68;
-    const cellH = 34;
-    const clusterGap = 28;
-    const clusterPad = 12;
-    const collapsedW = 64;
+    const nClusters = clusterKeys.length;
+    const arcSpan = Math.min(Math.PI * 0.92, Math.max(0.5, nClusters * 0.38));
 
-    const clusterLayouts = clusterKeys.map((key) => {
+    clusterKeys.forEach((key, ci) => {
       const nodes = clusters
         .get(key)
         .slice()
         .sort((a, b) => a.label.localeCompare(b.label));
       const collapsed = isClusterCollapsed(layer, key, nodes.length);
-      const cols = Math.min(maxCols, nodes.length);
-      const rows = Math.ceil(nodes.length / cols);
-      const w = collapsed ? collapsedW : cols * cellW + clusterPad * 2;
-      return { key, nodes, cols, rows, w, collapsed };
-    });
+      const t = nClusters === 1 ? 0.5 : ci / Math.max(1, nClusters - 1);
+      const angle = -arcSpan / 2 + t * arcSpan;
+      const cx = MAP_W / 2 + Math.sin(angle) * (MAP_W * 0.34);
+      const cy =
+        baseY +
+        Math.cos(angle) * 36 -
+        18 +
+        (hashUnit(key) - 0.5) * 14;
 
-    const totalW =
-      clusterLayouts.reduce((s, c) => s + c.w, 0) +
-      clusterGap * Math.max(0, clusterLayouts.length - 1);
-    let xCursor = MAP_W / 2 - totalW / 2;
-    clusterLabelPositions = [];
-
-    clusterLayouts.forEach((cl) => {
-      const cx = xCursor + cl.w / 2;
-      if (cl.collapsed) {
-        const hub = cl.nodes[0];
+      if (collapsed) {
+        const hub = pickClusterHub(nodes);
         const hubId = hub.id;
-        cl.nodes.forEach((n, i) => {
-          if (i === 0) {
+        nodes.forEach((n, i) => {
+          if (n.id === hubId) {
             nodePositions.set(n.id, {
               x: cx,
-              y: baseY,
+              y: cy,
               layer,
-              cluster: cl.key,
+              cluster: key,
               clusterHub: true,
-              clusterCount: cl.nodes.length,
+              clusterCount: nodes.length,
             });
           } else {
             nodePositions.set(n.id, {
               x: cx,
-              y: baseY,
+              y: cy,
               layer,
-              cluster: cl.key,
+              cluster: key,
               collapsedHidden: true,
               hubId,
             });
@@ -604,39 +776,63 @@
         });
         clusterLabelPositions.push({
           x: cx,
-          y: baseY - 22,
-          key: cl.key,
+          y: cy - 26,
+          key,
           layer,
           collapsed: true,
-          count: cl.nodes.length,
+          count: nodes.length,
         });
-      } else {
-        const topY = baseY - ((cl.rows - 1) / 2) * cellH;
-        if (cl.nodes.length > 1) {
-          clusterLabelPositions.push({
-            x: cx,
-            y: topY - 18,
-            key: cl.key,
-            layer,
-            collapsed: false,
-            count: cl.nodes.length,
-          });
-        }
-        cl.nodes.forEach((n, i) => {
-          const col = i % cl.cols;
-          const row = Math.floor(i / cl.cols);
-          const x = xCursor + clusterPad + col * cellW + cellW / 2;
-          const y = baseY + (row - (cl.rows - 1) / 2) * cellH;
-          nodePositions.set(n.id, {
-            x,
-            y,
-            layer,
-            cluster: cl.key,
-          });
+        return;
+      }
+
+      const hub = pickClusterHub(nodes);
+      const ordered = [hub].concat(nodes.filter((n) => n.id !== hub.id));
+      ordered.forEach((n, i) => {
+        placeConstellationNode(n, cx, cy, i, layer, key, {
+          hub: i === 0 && nodes.length >= CLUSTER_COLLAPSE_MIN,
+          count: nodes.length,
+        });
+      });
+      if (nodes.length > 1) {
+        const labelY =
+          cy -
+          24 -
+          Math.sqrt(nodes.length) * 8 -
+          Math.min(40, nodes.length * 2);
+        clusterLabelPositions.push({
+          x: cx,
+          y: labelY,
+          key,
+          layer,
+          collapsed: false,
+          count: nodes.length,
         });
       }
-      xCursor += cl.w + clusterGap;
     });
+  }
+
+  function nudgeConstellationApart() {
+    const ids = Array.from(nodePositions.keys());
+    for (let pass = 0; pass < 5; pass++) {
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          const pi = nodePositions.get(ids[i]);
+          const pj = nodePositions.get(ids[j]);
+          if (!pi || !pj || pi.collapsedHidden || pj.collapsedHidden) continue;
+          if (pi.layer !== pj.layer) continue;
+          const dx = pj.x - pi.x;
+          const dy = pj.y - pi.y;
+          const d = Math.hypot(dx, dy);
+          const minD = 32;
+          if (d >= minD || d < 0.5) continue;
+          const push = (minD - d) * 0.5;
+          pi.x -= (dx / d) * push;
+          pi.y -= (dy / d) * push;
+          pj.x += (dx / d) * push;
+          pj.y += (dy / d) * push;
+        }
+      }
+    }
   }
 
   function layoutNodes() {
@@ -648,14 +844,9 @@
       byLayer[n.layer].push(n);
     });
     Object.keys(byLayer).forEach((layer) => {
-      const list = byLayer[layer];
-      const baseY = LAYER_Y[layer] || 200;
-      if (list.length <= 4) {
-        layoutLayerRow(list, baseY, layer);
-      } else {
-        layoutLayerClusters(list, baseY, layer);
-      }
+      layoutLayerConstellation(byLayer[layer], LAYER_Y[layer] || 200, layer);
     });
+    nudgeConstellationApart();
   }
 
   function layerPlaneBounds(layer) {
@@ -781,8 +972,11 @@
       const path = document.createElementNS(ns, "path");
       path.setAttribute("d", planePath(bounds.cx, y, w, h));
       path.setAttribute("class", "plane plane-" + layer.id);
+      path.dataset.layer = layer.id;
       planes.appendChild(path);
       const label = document.createElementNS(ns, "text");
+      label.setAttribute("class", "layer-tier-label");
+      label.dataset.layer = layer.id;
       label.setAttribute("x", 28);
       label.setAttribute("y", y + 4);
       label.setAttribute("fill", "#6a7a8a");
@@ -804,7 +998,7 @@
       if (!a || !b) return;
       const routeKind = edgeRouteKind(nodeA, nodeB);
       const path = document.createElementNS(ns, "path");
-      path.setAttribute("d", buildEdgePath(a, b, nodeA, nodeB));
+      path.setAttribute("d", buildConstellationEdgePath(a, b));
       let edgeClass = "edge edge-" + routeKind;
       if (mapNodeDimmed(nodeA) && mapNodeDimmed(nodeB)) {
         edgeClass += " sprint-dim";
@@ -813,6 +1007,7 @@
       path.dataset.from = e.from;
       path.dataset.to = e.to;
       path.dataset.route = routeKind;
+      path.dataset.edgeKey = edgeKey(e.from, e.to);
       edgesG.appendChild(path);
     });
     world.appendChild(edgesG);
@@ -824,6 +1019,7 @@
       t.setAttribute("x", cl.x);
       t.setAttribute("y", cl.y);
       t.setAttribute("class", "cluster-label" + (cl.collapsed ? " collapsed" : ""));
+      t.dataset.layer = cl.layer;
       t.textContent =
         clusterDisplayName(cl.key) +
         (cl.count > 1 ? " · " + cl.count : "");
@@ -848,20 +1044,14 @@
       circle.setAttribute("cy", pos.y);
       circle.setAttribute("r", r);
       circle.setAttribute("fill", LAYER_COLORS[n.layer] || "#555");
+      const shortLabel = mapNodeShortLabel(n, pos);
+      const fullLabel = mapNodeFullLabel(n, pos);
+      g.dataset.shortLabel = shortLabel;
+      g.dataset.fullLabel = fullLabel;
       const text = document.createElementNS(ns, "text");
       text.setAttribute("x", pos.x);
       text.setAttribute("y", pos.y + r + 12);
-      let label;
-      if (pos.clusterHub) {
-        label = clusterDisplayName(pos.cluster) + " (" + pos.clusterCount + ")";
-      } else {
-        const maxLen = pos.cluster && n.layer === "L3" ? 16 : 22;
-        label =
-          n.label.length > maxLen
-            ? n.label.slice(0, maxLen - 1) + "…"
-            : n.label;
-      }
-      text.textContent = label;
+      text.textContent = shortLabel;
       if (n.layer === "L3" && pos.cluster && !pos.clusterHub) {
         text.setAttribute("font-size", "9");
       }
@@ -900,47 +1090,120 @@
     applyMapTransform();
     bindMapNavigation(svg);
     updateMapSelection();
+    updateMapLayerFocus();
+  }
+
+  function syncMapSelectionCallout() {
+    const world = document.querySelector("#map-svg #map-world");
+    if (!world) return;
+    const prev = world.querySelector("#map-selection-callout");
+    if (prev) prev.remove();
+    if (!selectedId) return;
+
+    const n = nodeById(selectedId);
+    const pos = nodePositions.get(selectedId);
+    if (!n || !pos) return;
+
+    const ns = "http://www.w3.org/2000/svg";
+    const hub = !!pos.clusterHub;
+    const r = nodeBaseRadius(selectedId, hub) + 4;
+    const caption = mapNodeFullLabel(n, pos);
+    const fontSize = 11;
+    const padX = 8;
+    const padY = 5;
+    const estW = Math.min(MAP_W - 48, Math.max(72, caption.length * (fontSize * 0.58)));
+    const estH = fontSize + padY * 2;
+    const cx = Math.min(MAP_W - 24 - estW / 2, Math.max(24 + estW / 2, pos.x));
+    const cy = pos.y - r - 10 - estH / 2;
+
+    const g = document.createElementNS(ns, "g");
+    g.setAttribute("id", "map-selection-callout");
+    g.setAttribute("class", "map-selection-callout");
+    g.setAttribute("pointer-events", "none");
+
+    const rect = document.createElementNS(ns, "rect");
+    rect.setAttribute("x", cx - estW / 2);
+    rect.setAttribute("y", cy - estH / 2);
+    rect.setAttribute("width", estW);
+    rect.setAttribute("height", estH);
+    rect.setAttribute("rx", 4);
+
+    const text = document.createElementNS(ns, "text");
+    text.setAttribute("x", cx);
+    text.setAttribute("y", cy + fontSize * 0.35);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("font-size", String(fontSize));
+    text.setAttribute("font-family", "Segoe UI, system-ui, sans-serif");
+    text.setAttribute("font-weight", "700");
+    text.textContent = caption;
+
+    g.appendChild(rect);
+    g.appendChild(text);
+    world.appendChild(g);
   }
 
   function updateMapSelection() {
+    const hasSel = !!selectedId;
+    const constellation = hasSel
+      ? computeConstellationHighlight(selectedId)
+      : null;
     document.querySelectorAll("#map-svg .node").forEach((el) => {
       const id = el.dataset.id;
       const isSel = id === selectedId;
-      const isLinked = isNodeLinked(id);
+      const onPipe =
+        constellation && constellation.nodes.has(id);
       el.classList.toggle("selected", isSel);
+      el.classList.toggle("constellation-lit", !!onPipe && !isSel);
       el.classList.toggle(
         "dim",
-        selectedId && !isSel && !isLinked && !el.classList.contains("sprint-dim")
+        hasSel &&
+          !isSel &&
+          !onPipe &&
+          !el.classList.contains("sprint-dim")
       );
+      const text = el.querySelector("text");
+      if (text) {
+        const shortL = el.dataset.shortLabel || "";
+        const fullL = el.dataset.fullLabel || shortL;
+        text.textContent = isSel ? fullL : shortL;
+        text.classList.toggle("label-full", isSel);
+        if (isSel) {
+          const pos = nodePositions.get(id);
+          const hub = el.classList.contains("cluster-hub");
+          const r = nodeBaseRadius(id, hub) + 4;
+          const ty = pos ? pos.y - r - 6 : parseFloat(text.getAttribute("y"));
+          text.setAttribute("y", ty);
+          text.setAttribute("opacity", "0");
+        } else {
+          const pos = nodePositions.get(id);
+          const hub = el.classList.contains("cluster-hub");
+          const r = nodeBaseRadius(id, hub);
+          if (pos) text.setAttribute("y", pos.y + r + 12);
+          text.removeAttribute("opacity");
+        }
+      }
       const c = el.querySelector("circle");
       const hub = el.classList.contains("cluster-hub");
-      if (c && isSel) {
-        c.setAttribute("r", id === "galaxy_grid" ? 18 : hub ? 16 : 14);
-      }
+      const baseR = nodeBaseRadius(id, hub);
+      if (c) c.setAttribute("r", isSel ? baseR + 4 : baseR);
+    });
+    document.querySelectorAll("#map-svg .cluster-label").forEach((el) => {
+      el.classList.toggle("selection-dim", hasSel);
     });
     document.querySelectorAll("#map-svg .edge").forEach((el) => {
       const from = el.dataset.from;
       const to = el.dataset.to;
+      const key = el.dataset.edgeKey || edgeKey(from, to);
+      const onPipe = constellation && constellation.edges.has(key);
       const hi = selectedId && (from === selectedId || to === selectedId);
-      el.classList.toggle("highlight", hi);
+      el.classList.toggle("highlight", hi && !onPipe);
+      el.classList.toggle("constellation-pipe", !!onPipe);
+      el.classList.toggle(
+        "selection-dim",
+        hasSel && !onPipe && !hi
+      );
     });
-  }
-
-  function isNodeLinked(id) {
-    if (!selectedId || id === selectedId) return id === selectedId;
-    if (
-      (manifest.edges || []).some(
-        (e) =>
-          (e.from === selectedId && e.to === id) ||
-          (e.to === selectedId && e.from === id)
-      )
-    ) {
-      return true;
-    }
-    const sel = nodeById(selectedId);
-    const tgt = nodeById(id);
-    if (!sel || !tgt || sel.layer !== tgt.layer) return false;
-    return folderCluster(sel.path) === folderCluster(tgt.path);
+    syncMapSelectionCallout();
   }
 
   function relatedEdges(nodeId) {
@@ -1139,6 +1402,7 @@
         btn.title = "Exit fullscreen (Esc)";
       }
       document.body.classList.add("panel-fs-active");
+      document.body.classList.remove("sidebar-overlay-open");
       document.body.classList.toggle("panel-fs-preview", isPreview);
       fullscreenPanel = panel;
     } else {
@@ -1148,7 +1412,11 @@
         btn.textContent = "⛶";
         btn.title = "Fullscreen (Esc)";
       }
-      document.body.classList.remove("panel-fs-active", "panel-fs-preview");
+      document.body.classList.remove(
+        "panel-fs-active",
+        "panel-fs-preview",
+        "sidebar-overlay-open"
+      );
       fullscreenPanel = null;
     }
     if (panel.querySelector("#link-graph") && selectedId) {
@@ -1174,7 +1442,19 @@
       });
     });
     document.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape") exitPanelFullscreen();
+      if (ev.key === "Escape") {
+        if (document.body.classList.contains("sidebar-overlay-open")) {
+          document.body.classList.remove("sidebar-overlay-open");
+          return;
+        }
+        if (mapLayerFocus) {
+          mapLayerFocus = null;
+          syncLayerStackHighlight();
+          updateMapLayerFocus();
+          return;
+        }
+        exitPanelFullscreen();
+      }
     });
   }
 
@@ -1189,6 +1469,45 @@
     renderLinkGraph(node);
     updateMapSelection();
     openDoc(node);
+  }
+
+  function galaxyBackgroundFile() {
+    const fromManifest =
+      manifest && manifest.galaxy_background
+        ? String(manifest.galaxy_background)
+        : "";
+    return fromManifest || "vision2.png";
+  }
+
+  function galaxyImageUrl() {
+    const file = galaxyBackgroundFile();
+    if (location.protocol === "file:") {
+      return new URL("../../" + file, location.href).href;
+    }
+    const origin = location.origin || "http://127.0.0.1:8765";
+    return origin + "/" + file.replace(/^\//, "");
+  }
+
+  function initGalaxyBackdrop() {
+    const url = galaxyImageUrl();
+    const file = galaxyBackgroundFile();
+    document.querySelectorAll(".galaxy-backdrop-img, .galaxy-bg").forEach((img) => {
+      if (img.dataset.galaxySrc === url) return;
+      img.dataset.galaxySrc = url;
+      img.src = url;
+      img.alt = "";
+      img.onerror = () => {
+        if (img.dataset.fallbackTried) return;
+        img.dataset.fallbackTried = "1";
+        console.warn(
+          "[vision] Galaxy background not found:",
+          file,
+          "— place",
+          file,
+          "in repo root (not PoolAIGalaxy.png — that is the layer schema)."
+        );
+      };
+    });
   }
 
   function initStarfield() {
@@ -1280,6 +1599,8 @@
       manifest.nodes[0];
     if (target) selectNode(target);
 
+    initGalaxyBackdrop();
+
     if (fsPanelId) {
       const panel = document.querySelector('.panel[data-panel="' + fsPanelId + '"]');
       if (panel) setPanelFullscreen(panel, true);
@@ -1344,7 +1665,29 @@
   }
 
   function toggleSidebar() {
+    if (document.body.classList.contains("panel-fs-active")) {
+      document.body.classList.toggle("sidebar-overlay-open");
+      return;
+    }
+    document.body.classList.remove("sidebar-overlay-open");
     document.body.classList.toggle("sidebar-collapsed");
+  }
+
+  function initSidebarOverlayBackdrop() {
+    let backdrop = document.getElementById("sidebar-overlay-backdrop");
+    const workspace = document.querySelector(".workspace");
+    if (!backdrop) {
+      backdrop = document.createElement("div");
+      backdrop.id = "sidebar-overlay-backdrop";
+      backdrop.className = "sidebar-overlay-backdrop";
+      backdrop.setAttribute("aria-hidden", "true");
+      backdrop.addEventListener("click", () => {
+        document.body.classList.remove("sidebar-overlay-open");
+      });
+    }
+    if (workspace && backdrop.parentElement !== workspace) {
+      workspace.insertBefore(backdrop, workspace.firstChild);
+    }
   }
 
   function syncMapToolbar() {
@@ -1389,8 +1732,10 @@
   document.getElementById("btn-reload").addEventListener("click", () => reloadAll(true));
   document.getElementById("btn-auto").addEventListener("click", toggleAutoReload);
 
+  initGalaxyBackdrop();
   initStarfield();
   initPanelFullscreen();
+  initSidebarOverlayBackdrop();
   loadMapPrefs();
   initMapToolbar();
   reloadAll(false)

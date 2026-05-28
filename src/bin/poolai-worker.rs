@@ -9,6 +9,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
+use poolai::job::JobLeaseConfig;
 use poolai::raid::protocol::ProtocolMessage;
 use poolai::workers::artifact_cache::{count_cached_probes, resolve_cache_dir, store_probe};
 use poolai::workers::raid_artifact_probe::{build_probe_message, probe_bytes, probe_logical_name};
@@ -326,6 +327,82 @@ fn lease_renew_target(payload: &serde_json::Value) -> Option<(String, u64)> {
     Some((job_id, lease_epoch))
 }
 
+fn lease_renew_interval_secs() -> u64 {
+    JobLeaseConfig::from_env().lease_renew_interval_secs()
+}
+
+fn lease_renew_error_stops_loop(err: &str) -> bool {
+    err.contains("409")
+        || err.contains("lease_epoch_rejected")
+        || err.contains("lease_already_active")
+        || err.contains("lease_not_found")
+}
+
+/// Periodic renew while a leased task runs (PH-S116; interval from `JobLeaseConfig`).
+async fn run_lease_renew_ticker(
+    client: reqwest::Client,
+    args: Args,
+    job_id: String,
+    lease_epoch: u64,
+    interval_secs: u64,
+) {
+    if interval_secs == 0 {
+        return;
+    }
+    let mut ticker = tokio::time::interval(Duration::from_secs(interval_secs));
+    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+    ticker.tick().await;
+    loop {
+        ticker.tick().await;
+        match renew_job_lease(&client, &args, &job_id, lease_epoch).await {
+            Ok(()) => info!(
+                "Lease heartbeat: job_id={}, lease_epoch={}",
+                job_id, lease_epoch
+            ),
+            Err(e) => {
+                if lease_renew_error_stops_loop(&e) {
+                    warn!("Lease renew loop stopped for {}: {}", job_id, e);
+                    break;
+                }
+                warn!("Lease renew failed for {} (will retry): {}", job_id, e);
+            }
+        }
+    }
+}
+
+struct LeaseRenewGuard {
+    ticker: Option<tokio::task::JoinHandle<()>>,
+}
+
+impl LeaseRenewGuard {
+    fn start(client: &reqwest::Client, args: &Args, job_id: &str, lease_epoch: u64) -> Self {
+        let interval = lease_renew_interval_secs();
+        let ticker = if interval > 0 {
+            let client = client.clone();
+            let args = args.clone();
+            let job_id = job_id.to_string();
+            Some(tokio::spawn(run_lease_renew_ticker(
+                client,
+                args,
+                job_id,
+                lease_epoch,
+                interval,
+            )))
+        } else {
+            None
+        };
+        Self { ticker }
+    }
+}
+
+impl Drop for LeaseRenewGuard {
+    fn drop(&mut self) {
+        if let Some(handle) = self.ticker.take() {
+            handle.abort();
+        }
+    }
+}
+
 async fn renew_job_lease(
     client: &reqwest::Client,
     args: &Args,
@@ -460,15 +537,24 @@ async fn execute_task(
     let task_type = task.task_type.as_str();
     let mut runtime = TaskRuntime::default();
 
-    if let Some((job_id, lease_epoch)) = lease_renew_target(&task.payload) {
-        match renew_job_lease(client, &rt.args, &job_id, lease_epoch).await {
-            Ok(()) => info!(
-                "Lease renewed: job_id={}, lease_epoch={}",
-                job_id, lease_epoch
-            ),
-            Err(e) => warn!("Lease renew stub failed for {}: {}", job_id, e),
+    let _lease_renew_guard = match lease_renew_target(&task.payload) {
+        Some((job_id, lease_epoch)) => {
+            match renew_job_lease(client, &rt.args, &job_id, lease_epoch).await {
+                Ok(()) => info!(
+                    "Lease renewed: job_id={}, lease_epoch={}",
+                    job_id, lease_epoch
+                ),
+                Err(e) => warn!("Initial lease renew failed for {}: {}", job_id, e),
+            }
+            Some(LeaseRenewGuard::start(
+                client,
+                &rt.args,
+                &job_id,
+                lease_epoch,
+            ))
         }
-    }
+        None => None,
+    };
 
     let run_raid_health = matches!(task_type, "raid_health_check")
         || (task_type == "telegram_command" && telegram_command_is(&task.payload, "/raid"));
@@ -513,6 +599,16 @@ mod tests {
             telegram_id: None,
             cache_dir: None,
         }
+    }
+
+    #[test]
+    fn lease_renew_error_stops_on_epoch_conflict() {
+        assert!(lease_renew_error_stops_loop(
+            "lease renew HTTP 409 Conflict: lease_epoch_rejected"
+        ));
+        assert!(!lease_renew_error_stops_loop(
+            "lease renew failed: connection refused"
+        ));
     }
 
     #[test]
@@ -569,6 +665,48 @@ mod tests {
         assert_eq!(got.0, "job-lease-1");
         assert_eq!(got.1.get("lease_epoch").and_then(|v| v.as_u64()), Some(11));
 
+        server.abort();
+    }
+
+    #[tokio::test]
+    async fn lease_renew_ticker_fires_while_active() {
+        let hits: Arc<AtomicU64> = Arc::new(AtomicU64::new(0));
+        let hits_route = hits.clone();
+        let app = Router::new().route(
+            "/api/v1/jobs/{id}/lease/renew",
+            post(move |Path(_id): Path<String>, Json(_body): Json<Value>| {
+                let hits_route = hits_route.clone();
+                async move {
+                    hits_route.fetch_add(1, Ordering::Relaxed);
+                    (StatusCode::OK, Json(serde_json::json!({ "ok": true })))
+                }
+            }),
+        );
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind");
+        let addr = listener.local_addr().expect("local addr");
+        let server = tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+
+        let client = http_client().expect("client");
+        let args = test_args(format!("http://{}", addr));
+        let handle = tokio::spawn(run_lease_renew_ticker(
+            client,
+            args,
+            "job-ticker".into(),
+            5,
+            1,
+        ));
+        sleep(Duration::from_millis(2_350)).await;
+        handle.abort();
+        let _ = handle.await;
+
+        assert!(
+            hits.load(Ordering::Relaxed) >= 2,
+            "expected periodic renews while task active"
+        );
         server.abort();
     }
 }

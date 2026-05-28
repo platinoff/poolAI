@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PoolAI docs vision</title>
-  <link rel="stylesheet" href="vision.css" />
+  <title>PooaI Galazy Starwalker Vision</title>
+  <link rel="stylesheet" href="vision.css?v=48" />
 </head>
 <body>
+  <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
+    <img class="galaxy-backdrop-img" src="" alt="" />
+  </div>
   <canvas id="starfield" aria-hidden="true"></canvas>
   <header>
-    <button type="button" id="btn-sidebar" title="Toggle sidebar">☰</button>
-    <h1>PoolAI Galaxy docs vision</h1>
+    <button type="button" id="btn-sidebar" title="Toggle Explorer (overlay in fullscreen)">☰</button>
+    <h1>PooaI Galazy Starwalker Vision</h1>
     <span class="meta" id="meta-rev">…</span>
     <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
     <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
@@ -30,24 +33,12 @@
           <div class="panel-body" id="graph-3d">
             <div class="layer-stack" id="layer-stack"></div>
           </div>
-          <div class="legend-bar" style="padding: 0 10px 8px">
-            <span><i style="background: var(--L0)"></i> L0 Concept</span>
-            <span><i style="background: var(--L1)"></i> L1 Ops</span>
-            <span><i style="background: var(--L2)"></i> L2 Catalog</span>
-            <span><i style="background: var(--L3)"></i> L3 Code</span>
-            <span><i style="background: var(--L4)"></i> L4 Libs</span>
-            <span><i style="background: var(--L5)"></i> L5 Workspace</span>
-          </div>
+          <div class="legend-bar" id="layer-legend" aria-label="Layer legend"></div>
         </section>
         <section class="panel" data-panel="map" aria-label="Interactive map">
           <h2><span>Galaxy map</span><button type="button" class="btn-panel-fs" title="Fullscreen (Esc)">⛶</button></h2>
           <div class="panel-body map-wrap">
-            <img
-              class="galaxy-bg"
-              src="/PoolAIGalaxy.png"
-              alt=""
-              onerror="this.style.display='none'"
-            />
+            <img class="galaxy-bg" src="" alt="" />
             <div class="map-toolbar" aria-label="Map filters">
               <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)">◎ Sprint</button>
               <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse folders with 5+ files">⊟ Folders</button>
@@ -57,7 +48,7 @@
               <button type="button" id="map-zoom-out" title="Zoom out">−</button>
               <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
             </div>
-            <span class="map-hint">wheel · drag · folder click expand</span>
+            <span class="map-hint">constellation · click pipelines · layers · zoom</span>
             <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
@@ -79,6 +70,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js"></script>
+  <script src="vision.js?v=48"></script>
 </body>
 </html>
