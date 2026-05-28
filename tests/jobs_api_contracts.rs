@@ -114,7 +114,10 @@ async fn jobs_create_get_and_patch_lifecycle() {
         .get("job")
         .and_then(|x| x.as_object())
         .expect("`job` object in detail");
-    assert_eq!(job.get("status").and_then(|s| s.as_str()), Some("scheduled"));
+    assert_eq!(
+        job.get("status").and_then(|s| s.as_str()),
+        Some("scheduled")
+    );
     let spec = job
         .get("spec")
         .and_then(|x| x.as_object())
