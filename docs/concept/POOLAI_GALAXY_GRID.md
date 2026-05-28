@@ -436,6 +436,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 | S105–S106 | Admin lease `active/expired` badge; `poolai-worker` renew client stub |
 | S107 | Playwright `jobs_lease.spec.ts` (acquire + renew + 409 paths) |
 | S108 | Grid `Job` ingest → `schedule_with_grid_peer` → `leased` + lease fields when peer binds |
+| S110 | Grid `Result` ingest: optional `lease_epoch` CAS → `409 lease_epoch_rejected` when mismatch/missing on leased job |
 
 *Pricing live fetch (PH-S102) і protocol middleware (PH-S103) — §4.2 / §9, не lease wire.*
 

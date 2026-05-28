@@ -52,7 +52,12 @@ pub fn http_status_for_app_error(err: &AppError) -> StatusCode {
         ApiNotFound(_) => StatusCode::NOT_FOUND,
         SubsystemUnavailable(_) => StatusCode::SERVICE_UNAVAILABLE,
         InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        RestError { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+        RestError { code, .. } => match *code {
+            "lease_already_active" | "lease_epoch_rejected" | "lease_expired" => {
+                StatusCode::CONFLICT
+            }
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        },
         TimeoutError(_) => StatusCode::GATEWAY_TIMEOUT,
         NetworkError(_) => StatusCode::BAD_GATEWAY,
         PoolError(_) | MonitoringError(_) | GpuError(_) | MemoryError(_) | ShutdownError(_) => {

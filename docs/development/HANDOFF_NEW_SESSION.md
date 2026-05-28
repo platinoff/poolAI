@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S109 ✅ · HEAD `347536be` PH-S108; §5.12 PH-S110) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S110 ✅ · HEAD `8090cd2b` PH-S109; §5.12 PH-S111) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -78,9 +78,10 @@
 **PH-S107 ✅ (e2e):** `e2e/tests/jobs_lease.spec.ts` — Playwright API smoke: `POST /api/v1/jobs/{id}/lease` (acquire → `leased`, epoch `1`) + `POST …/lease/renew` (extends `lease_expires_at`); 409 `lease_already_active` / `lease_epoch_rejected`; `npm run test:ci` includes `jobs_lease`; `bin/e2e-playwright.sh --start`.
 **PH-S108 ✅ (code):** `src/grid/dispatch.rs` — grid `Job` ingest via `schedule_with_grid_peer`: source peer → `worker_id` + scheduler lease acquire → `JobStatus::Leased` with `lease_owner`/`lease_epoch`/`lease_expires_at`; without peer → `Scheduled` without lease; unit tests; `cargo test dispatch::tests`.
 **PH-S109 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §4.3 — compact implemented table PH-S94…S108; §4.3.2 wire note; roadmap смуга PH-S100…S109 **10/10 ✅**; replenish PH-S110…S112 у FM §5.12.
-**Черга:** §5.12 **PH-S110…S112** (3 відкритих) — grid result lease CAS, renew-interval env, grid Job E2E.
+**PH-S110 ✅ (code):** `GridResultBody.lease_epoch` + `check_grid_result_lease_epoch` on grid `Result` ingest; `409 lease_epoch_rejected` when mismatch or missing on leased job; `http_status_for_app_error` maps lease RestError → 409; unit tests in `dispatch.rs` + `lease_tests`; `cargo test-ci`.
+**Черга:** §5.12 **PH-S111…S112** (2 відкритих) — renew-interval env, grid Job E2E.
 
-**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S109 ✅, post-lease PH-S110…S112).
+**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S110 ✅).
 
 ## 1. Канонічний порядок документації та планів
 

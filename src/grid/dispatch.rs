@@ -2,14 +2,16 @@
 //!
 //! Grid `Job` ingest schedules via [`schedule_with_grid_peer`](crate::job::schedule_with_grid_peer);
 //! when a source peer binds `worker_id`, scheduler lease acquire sets `JobStatus::Leased` (PH-S108).
+//! `Result` ingest validates `lease_epoch` CAS when the job row has active lease fields (PH-S110).
 
 use chrono::Utc;
 
 use crate::core::error::AppError;
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
-    emit_memory_updated, emit_seed_provided, job_spec_from_grid_job, job_status_from_grid_result,
-    memory_content_digest, schedule_with_grid_peer, JobRecord, JobStatus, JobStore,
+    check_grid_result_lease_epoch, emit_memory_updated, emit_seed_provided, job_spec_from_grid_job,
+    job_status_from_grid_result, memory_content_digest, schedule_with_grid_peer, JobRecord,
+    JobStatus, JobStore, PatchLeaseEpochError,
 };
 use crate::memory::{memory_shard_from_grid_body, MemoryShardStore};
 
@@ -101,8 +103,22 @@ fn ingest_job(
 }
 
 fn ingest_result(body: GridResultBody, jobs: &JobStore) -> Result<GridIngestOutcome, AppError> {
-    let status = job_status_from_grid_result(body.status);
     let job_id = body.job_id.clone();
+    let existing = jobs
+        .get(&job_id)?
+        .ok_or_else(|| AppError::ApiNotFound(format!("job '{job_id}' not found")))?;
+    let now = Utc::now();
+    if let Err(PatchLeaseEpochError::Rejected) =
+        check_grid_result_lease_epoch(&existing, body.lease_epoch, now)
+    {
+        return Err(AppError::RestError {
+            code: "lease_epoch_rejected",
+            message: format!(
+                "lease_epoch does not match active lease for job '{job_id}' (Galaxy §4.3.1 grid result CAS)"
+            ),
+        });
+    }
+    let status = job_status_from_grid_result(body.status);
     jobs.force_status(&job_id, status)?;
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result { job_id, status },
@@ -208,6 +224,7 @@ mod tests {
                 output_artifact_ids: vec!["out-1".into()],
                 proof: None,
                 metrics: None,
+                lease_epoch: None,
             }),
             None,
         );
@@ -219,6 +236,143 @@ mod tests {
                 status: JobStatus::Completed,
             }
         );
+    }
+
+    #[test]
+    fn ingest_result_accepts_matching_lease_epoch() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let now = Utc::now();
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-result-ok"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Leased,
+            created_at: now,
+            worker_id: Some("peer-r".into()),
+            vm_id: None,
+            lease_owner: Some("peer-r".into()),
+            lease_epoch: Some(3),
+            lease_expires_at: Some(now + chrono::Duration::seconds(90)),
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-result-ok".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec!["out-ok".into()],
+                proof: None,
+                metrics: None,
+                lease_epoch: Some(3),
+            }),
+            None,
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(
+            out.kind,
+            GridIngestKind::Result {
+                job_id: "grid-result-ok".into(),
+                status: JobStatus::Completed,
+            }
+        );
+    }
+
+    #[test]
+    fn ingest_result_rejects_lease_epoch_mismatch() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let now = Utc::now();
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-result-bad"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Leased,
+            created_at: now,
+            worker_id: Some("peer-r".into()),
+            vm_id: None,
+            lease_owner: Some("peer-r".into()),
+            lease_epoch: Some(5),
+            lease_expires_at: Some(now + chrono::Duration::seconds(90)),
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-result-bad".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: None,
+                lease_epoch: Some(4),
+            }),
+            None,
+        );
+        let err = ingest_envelope(env, &jobs, &memory).expect_err("reject");
+        match err {
+            AppError::RestError { code, .. } => assert_eq!(code, "lease_epoch_rejected"),
+            other => panic!("expected RestError, got {other:?}"),
+        }
+        let row = jobs.get("grid-result-bad").expect("get").expect("row");
+        assert_eq!(row.status, JobStatus::Leased);
+    }
+
+    #[test]
+    fn ingest_result_rejects_missing_lease_epoch_on_leased_job() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let now = Utc::now();
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-result-no-epoch"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Leased,
+            created_at: now,
+            worker_id: Some("peer-r".into()),
+            vm_id: None,
+            lease_owner: Some("peer-r".into()),
+            lease_epoch: Some(1),
+            lease_expires_at: Some(now + chrono::Duration::seconds(90)),
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-result-no-epoch".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: None,
+                lease_epoch: None,
+            }),
+            None,
+        );
+        let err = ingest_envelope(env, &jobs, &memory).expect_err("reject");
+        match err {
+            AppError::RestError { code, .. } => assert_eq!(code, "lease_epoch_rejected"),
+            other => panic!("expected RestError, got {other:?}"),
+        }
     }
 
     #[test]

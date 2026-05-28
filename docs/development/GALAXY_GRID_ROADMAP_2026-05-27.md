@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S110…S112** (3) — post-lease wire (див. FM §5.12) |
-| **Закрито PH-S65…S109** | pricing, governance, protocol, **lease wire MVP** (PH-S94…S108), E2E, grid ingest→`leased`, §4.3 docs sync |
+| **Відкрито** | **PH-S111…S112** (2) — renew-interval env, grid Job E2E |
+| **Закрито PH-S65…S110** | pricing, governance, protocol, lease wire MVP + grid result CAS (PH-S94…S110) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -65,17 +65,18 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Grid ingest → Leased | PH-S108 ✅ | `schedule_with_grid_peer` + lease on bind; `dispatch.rs` tests |
 | §4.3 docs sync | PH-S109 ✅ | `POOLAI_GALAXY_GRID.md` §4.3 table; смуга PH-S100…S109 закрита |
 
-**Post-MVP (черга §5.12):** grid result lease CAS, renew-interval env, grid Job E2E — PH-S110…S112.
+| Grid result lease CAS | PH-S110 ✅ | `GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; unit tests |
+
+**Post-MVP (черга §5.12):** renew-interval env, grid Job E2E — PH-S111…S112.
 
 ---
 
-## 3. Черга §5.12 (3 відкритих)
+## 3. Черга §5.12 (2 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S110** | Grid result ingest lease_epoch CAS | §4.3.1, `dispatch.rs` |
-| 2 | PH-S111 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` env | §4.3.1, `lease_config.rs` |
-| 3 | PH-S112 | Grid Job envelope E2E smoke | `e2e/`, PH-S108 |
+| 1 | **PH-S111** | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` env | §4.3.1, `lease_config.rs` |
+| 2 | PH-S112 | Grid Job envelope E2E smoke | `e2e/`, PH-S108 |
 
 ---
 

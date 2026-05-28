@@ -49,6 +49,7 @@ pub fn grid_result_from_status(
     job_id: &JobId,
     status: JobStatus,
     output_artifact_ids: Vec<String>,
+    lease_epoch: Option<u64>,
 ) -> GridResultBody {
     let grid_status = match status {
         JobStatus::Completed | JobStatus::Rewarded => GridResultStatus::Completed,
@@ -62,6 +63,7 @@ pub fn grid_result_from_status(
         output_artifact_ids,
         proof: None,
         metrics: None,
+        lease_epoch,
     }
 }
 

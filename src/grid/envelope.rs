@@ -75,6 +75,9 @@ pub struct GridResultBody {
     pub proof: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metrics: Option<serde_json::Value>,
+    /// Galaxy §4.3.1 CAS — must match active job lease when job has `lease_*` fields (PH-S110).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lease_epoch: Option<u64>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -193,6 +196,7 @@ mod tests {
                 output_artifact_ids: vec!["art-out".into()],
                 proof: None,
                 metrics: None,
+                lease_epoch: None,
             }),
             None,
         );

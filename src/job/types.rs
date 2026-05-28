@@ -153,6 +153,25 @@ pub enum PatchLeaseEpochError {
     Rejected,
 }
 
+/// Grid `Result` ingest: jobs with active lease require matching `lease_epoch` (PH-S110).
+pub fn check_grid_result_lease_epoch(
+    record: &JobRecord,
+    provided: Option<u64>,
+    now: DateTime<Utc>,
+) -> Result<(), PatchLeaseEpochError> {
+    if !record.has_lease_fields() {
+        return Ok(());
+    }
+    let Some(epoch) = provided else {
+        return Err(PatchLeaseEpochError::Rejected);
+    };
+    if record.lease_epoch_matches(epoch, now) {
+        Ok(())
+    } else {
+        Err(PatchLeaseEpochError::Rejected)
+    }
+}
+
 /// When `provided` is `None`, validation passes (legacy PATCH without CAS).
 pub fn check_patch_lease_epoch(
     record: &JobRecord,
@@ -213,6 +232,35 @@ mod lease_tests {
         let record: JobRecord = serde_json::from_str(json).expect("parse legacy job");
         assert!(!record.has_lease_fields());
         assert!(!record.lease_active_at(Utc::now()));
+    }
+
+    #[test]
+    fn check_grid_result_lease_epoch_requires_epoch_when_job_leased() {
+        let before = Utc.with_ymd_and_hms(2026, 5, 28, 12, 0, 0).unwrap();
+        let mut record = JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-cas"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Leased,
+            created_at: before,
+            worker_id: Some("peer-1".into()),
+            vm_id: None,
+            lease_owner: Some("peer-1".into()),
+            lease_epoch: Some(2),
+            lease_expires_at: Some(before + chrono::Duration::seconds(90)),
+        };
+        assert!(check_grid_result_lease_epoch(&record, Some(2), before).is_ok());
+        assert!(check_grid_result_lease_epoch(&record, None, before).is_err());
+        assert!(check_grid_result_lease_epoch(&record, Some(1), before).is_err());
+        record.lease_expires_at = Some(before - chrono::Duration::seconds(1));
+        assert!(check_grid_result_lease_epoch(&record, Some(2), before).is_err());
     }
 
     #[test]

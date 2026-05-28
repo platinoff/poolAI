@@ -36,6 +36,6 @@ pub use scheduler::{
 };
 pub use store::{data_dir_from_env, JobStore};
 pub use types::{
-    check_patch_lease_epoch, JobId, JobKind, JobRecord, JobResources, JobScheduleBinding, JobSpec,
-    JobStatus, PatchLeaseEpochError,
+    check_grid_result_lease_epoch, check_patch_lease_epoch, JobId, JobKind, JobRecord,
+    JobResources, JobScheduleBinding, JobSpec, JobStatus, PatchLeaseEpochError,
 };
