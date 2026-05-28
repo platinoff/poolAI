@@ -1,8 +1,8 @@
 {
-  "revision": 18,
+  "revision": 19,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S98",
-  "next_sprint": "PH-S100",
+  "last_sprint_closed": "PH-S100",
+  "next_sprint": "PH-S101",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -71,7 +71,7 @@
       "label": "grid/dispatch.rs",
       "path": "src/grid/dispatch.rs",
       "layer": "L3",
-      "sprints": ["PH-S38", "PH-S61"]
+      "sprints": ["PH-S38", "PH-S61", "PH-S100"]
     },
     {
       "id": "virtual_nodes",
@@ -122,8 +122,8 @@
       "label": "job/types.rs",
       "path": "src/job/types.rs",
       "layer": "L3",
-      "sprints": ["PH-S94", "PH-S95"],
-      "sections": ["lease_owner", "lease_epoch", "lease_expires_at", "PATCH CAS"]
+      "sprints": ["PH-S94", "PH-S95", "PH-S100"],
+      "sections": ["lease_owner", "lease_epoch", "lease_expires_at", "PATCH CAS", "JobStatus::Leased lifecycle"]
     },
     {
       "id": "job_lease_config",
@@ -138,8 +138,8 @@
       "label": "job/lease_acquire.rs",
       "path": "src/job/lease_acquire.rs",
       "layer": "L3",
-      "sprints": ["PH-S98"],
-      "sections": ["POST /jobs/{id}/lease", "schedule acquire"]
+      "sprints": ["PH-S98", "PH-S100"],
+      "sections": ["POST /jobs/{id}/lease", "schedule acquire", "maybe_transition_to_leased"]
     },
     {
       "id": "admin_updates_compat",

@@ -100,7 +100,7 @@ async fn jobs_create_get_and_patch_lifecycle() {
     assert_eq!(
         summary.get("status").and_then(|s| s.as_str()),
         Some("scheduled"),
-        "POST /jobs auto-schedules submitted → scheduled (FM-020)"
+        "POST /jobs auto-schedules submitted → scheduled (FM-020; Leased when worker+lease)"
     );
     let id = summary
         .get("id")
@@ -114,10 +114,7 @@ async fn jobs_create_get_and_patch_lifecycle() {
         .get("job")
         .and_then(|x| x.as_object())
         .expect("`job` object in detail");
-    assert_eq!(
-        job.get("status").and_then(|s| s.as_str()),
-        Some("scheduled")
-    );
+    assert_eq!(job.get("status").and_then(|s| s.as_str()), Some("scheduled"));
     let spec = job
         .get("spec")
         .and_then(|x| x.as_object())
@@ -336,6 +333,7 @@ async fn jobs_acquire_lease_explicit_api() {
         .get("job")
         .and_then(|x| x.as_object())
         .expect("job detail");
+    assert_eq!(job.get("status").and_then(|x| x.as_str()), Some("leased"));
     assert_eq!(
         job.get("lease_owner").and_then(|x| x.as_str()),
         Some("worker-explicit")

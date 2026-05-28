@@ -47,6 +47,8 @@ impl JobKind {
 pub enum JobStatus {
     Submitted,
     Scheduled,
+    /// Galaxy §4.3.2 — active lease holder (owner + epoch + expires_at); PH-S100.
+    Leased,
     Executing,
     Verifying,
     Rewarded,
@@ -172,6 +174,16 @@ pub fn check_patch_lease_epoch(
 mod lease_tests {
     use super::*;
     use chrono::TimeZone;
+
+    #[test]
+    fn job_status_deserializes_leased_from_json() {
+        let status: JobStatus = serde_json::from_str("\"leased\"").expect("leased");
+        assert_eq!(status, JobStatus::Leased);
+        assert_eq!(
+            serde_json::to_string(&status).expect("serialize"),
+            "\"leased\""
+        );
+    }
 
     #[test]
     fn job_record_deserializes_without_lease_fields() {

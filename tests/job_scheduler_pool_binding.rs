@@ -89,7 +89,7 @@ async fn create_job_binds_least_loaded_pool_worker() {
     assert_eq!(status, StatusCode::CREATED);
     assert_eq!(
         created.get("status").and_then(|s| s.as_str()),
-        Some("scheduled")
+        Some("leased")
     );
     let worker_id = created
         .get("worker_id")

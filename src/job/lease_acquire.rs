@@ -5,7 +5,7 @@
 
 use chrono::{DateTime, Duration, Utc};
 
-use crate::job::{JobLeaseConfig, JobRecord};
+use crate::job::{allows_transition, JobLeaseConfig, JobRecord, JobStatus};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AcquireLeaseError {
@@ -19,6 +19,13 @@ pub enum RenewLeaseError {
     NoLeaseOnJob,
     EpochRejected,
     LeaseExpired,
+}
+
+/// Set `Leased` when lifecycle allows (Galaxy §4.3.2; PH-S100).
+pub fn maybe_transition_to_leased(record: &mut JobRecord) {
+    if allows_transition(record.status, JobStatus::Leased) {
+        record.status = JobStatus::Leased;
+    }
 }
 
 /// Resolve lease holder: explicit body → bound `worker_id` → bound `vm_id`.
@@ -55,6 +62,7 @@ pub fn acquire_lease_on_record(
     record.lease_owner = Some(owner.to_string());
     record.lease_epoch = Some(next_epoch);
     record.lease_expires_at = Some(now + Duration::seconds(cfg.lease_ttl_secs as i64));
+    maybe_transition_to_leased(record);
     Ok(())
 }
 
@@ -123,6 +131,7 @@ mod tests {
         let cfg = JobLeaseConfig { lease_ttl_secs: 90 };
         let mut record = sample_record(Some("worker-a"));
         acquire_lease_on_record(&mut record, "worker-a", &cfg, now, true).expect("acquire");
+        assert_eq!(record.status, JobStatus::Leased);
         assert_eq!(record.lease_owner.as_deref(), Some("worker-a"));
         assert_eq!(record.lease_epoch, Some(1));
         assert_eq!(record.lease_expires_at, Some(now + Duration::seconds(90)));
@@ -157,9 +166,20 @@ mod tests {
         let now = Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap();
         let mut record = sample_record(Some("worker-b"));
         maybe_acquire_lease_on_schedule(&mut record, now);
+        assert_eq!(record.status, JobStatus::Leased);
         assert!(record.has_lease_fields());
         assert_eq!(record.lease_owner.as_deref(), Some("worker-b"));
         assert_eq!(record.lease_epoch, Some(1));
+    }
+
+    #[test]
+    fn acquire_on_submitted_transitions_to_leased() {
+        let now = Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap();
+        let cfg = JobLeaseConfig::default();
+        let mut record = sample_record(None);
+        record.status = JobStatus::Submitted;
+        acquire_lease_on_record(&mut record, "worker-x", &cfg, now, true).expect("acquire");
+        assert_eq!(record.status, JobStatus::Leased);
     }
 
     #[test]

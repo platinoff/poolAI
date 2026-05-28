@@ -132,7 +132,7 @@ mod tests {
             out.kind,
             GridIngestKind::Job {
                 job_id: "grid-job-1".into(),
-                status: JobStatus::Scheduled,
+                status: JobStatus::Leased,
             }
         );
     }

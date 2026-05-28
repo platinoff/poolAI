@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S99 ✅ lease renew; §5.12 PH-S100) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-27 (PH-S100 ✅ JobStatus::Leased; §5.12 PH-S101) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -68,7 +68,8 @@
 **PH-S97 ✅ (code):** `src/job/lease_config.rs` — `POOLAI_JOB_LEASE_TTL_SECS` (default `90`, Galaxy §4.3.1); `JobLeaseConfig::from_env()` + `lease_renew_interval_secs()` stub; unit tests; без renew/failover wire; `cargo test-ci`.
 **PH-S98 ✅ (code):** `src/job/lease_acquire.rs` — lease acquire on scheduler bind + `POST /api/v1/jobs/{id}/lease`; `409 lease_already_active`; OpenAPI sync; unit + `jobs_api_contracts`; `cargo test-ci` + openapi-gap 0.
 **PH-S99 ✅ (code):** `renew_lease_on_record` + `POST /api/v1/jobs/{id}/lease/renew`; `409 lease_epoch_rejected` / `lease_expired`; OpenAPI; unit + contract tests.
-**Черга:** §5.12 **PH-S100…S109** (10 відкритих, replenish 2026-05-27) — `Leased` → failover → pricing → protocol → `Migrating` → admin badge → worker renew → e2e → grid → docs sync.
+**PH-S100 ✅ (code):** `JobStatus::Leased` + `allows_transition` (Galaxy §4.3.2); `maybe_transition_to_leased` on lease acquire/schedule bind; OpenAPI `leased`; JSON/SQLite roundtrip; unit + contract + scheduler/grid tests; `cargo test-ci` + openapi-gap 0.
+**Черга:** §5.12 **PH-S101…S109** (9 відкритих) — failover → pricing HTTP → protocol → `Migrating` → admin badge → worker renew → e2e → grid docs sync.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S98, фази, PH-S99…S103).
 

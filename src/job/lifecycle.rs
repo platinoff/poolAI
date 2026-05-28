@@ -8,8 +8,19 @@ pub fn allows_transition(from: JobStatus, to: JobStatus) -> bool {
         return true;
     }
     match from {
-        JobStatus::Submitted => matches!(to, JobStatus::Scheduled | JobStatus::Failed),
-        JobStatus::Scheduled => matches!(to, JobStatus::Executing | JobStatus::Failed),
+        JobStatus::Submitted => {
+            matches!(
+                to,
+                JobStatus::Scheduled | JobStatus::Leased | JobStatus::Failed
+            )
+        }
+        JobStatus::Scheduled => {
+            matches!(
+                to,
+                JobStatus::Leased | JobStatus::Executing | JobStatus::Failed
+            )
+        }
+        JobStatus::Leased => matches!(to, JobStatus::Executing | JobStatus::Failed),
         JobStatus::Executing => matches!(to, JobStatus::Verifying | JobStatus::Failed),
         JobStatus::Verifying => {
             matches!(
@@ -32,6 +43,8 @@ mod tests {
             JobStatus::Submitted,
             JobStatus::Scheduled
         ));
+        assert!(allows_transition(JobStatus::Scheduled, JobStatus::Leased));
+        assert!(allows_transition(JobStatus::Leased, JobStatus::Executing));
         assert!(allows_transition(
             JobStatus::Scheduled,
             JobStatus::Executing
@@ -55,6 +68,7 @@ mod tests {
             JobStatus::Submitted,
             JobStatus::Executing
         ));
+        assert!(!allows_transition(JobStatus::Leased, JobStatus::Scheduled));
         assert!(!allows_transition(JobStatus::Completed, JobStatus::Failed));
         assert!(!allows_transition(JobStatus::Failed, JobStatus::Submitted));
     }

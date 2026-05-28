@@ -75,3 +75,4 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | error 112 / диск S: | `cargo clean` |
 | subject = `Co-authored-by:` | `git-commit-msys.mdc` |
 | Job scheduler | `src/job/scheduler.rs`, не `src/runtime/scheduler.rs` |
+| Редагування через `python` one-liner | Не використовувати Python у репо; застосовувати вбудовані редактори або канонічний Rust/bash flow |

@@ -138,6 +138,22 @@ mod tests {
     }
 
     #[test]
+    fn sqlite_roundtrip_leased_status() {
+        let tmp = TempDir::new().expect("tempdir");
+        let dir = tmp.path();
+        let mut record = sample_record("job-sqlite-leased");
+        record.status = JobStatus::Leased;
+        record.lease_owner = Some("worker-sqlite".into());
+        record.lease_epoch = Some(2);
+        record.lease_expires_at = Some(Utc::now() + chrono::Duration::seconds(90));
+
+        persist(dir, std::slice::from_ref(&record)).expect("persist");
+        let jobs = load(dir).expect("load");
+        assert_eq!(jobs[0].status, JobStatus::Leased);
+        assert_eq!(jobs[0].lease_epoch, Some(2));
+    }
+
+    #[test]
     fn sqlite_migrates_json_when_db_empty() {
         let tmp = TempDir::new().expect("tempdir");
         let dir = tmp.path();

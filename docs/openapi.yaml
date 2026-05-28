@@ -5338,6 +5338,7 @@ components:
       enum:
         - submitted
         - scheduled
+        - leased
         - executing
         - verifying
         - rewarded

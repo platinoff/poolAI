@@ -327,6 +327,7 @@ mod tests {
         let row = store.get("job-a").expect("get").expect("row");
         assert_eq!(row.worker_id.as_deref(), Some("idle"));
         assert!(row.vm_id.is_none());
+        assert_eq!(row.status, JobStatus::Leased, "PH-S100: lease → Leased");
         assert!(row.has_lease_fields(), "PH-S98: schedule acquires lease");
         assert_eq!(row.lease_owner.as_deref(), Some("idle"));
         assert_eq!(row.lease_epoch, Some(1));
@@ -359,7 +360,7 @@ mod tests {
 
         let reloaded = JobStore::open_for_test(Some(dir));
         let job = reloaded.get("job-1").expect("get").expect("row");
-        assert_eq!(job.status, JobStatus::Scheduled);
+        assert_eq!(job.status, JobStatus::Leased);
         assert_eq!(job.worker_id.as_deref(), Some("w1"));
     }
 
@@ -443,6 +444,7 @@ mod tests {
         let outcome = schedule_with_grid_peer(&store, Some("peer-grid-a")).expect("schedule");
         assert_eq!(outcome.bound_workers, 1);
         let row = store.get("grid-1").expect("get").expect("row");
+        assert_eq!(row.status, JobStatus::Leased);
         assert_eq!(row.worker_id.as_deref(), Some("peer-grid-a"));
     }
 }
