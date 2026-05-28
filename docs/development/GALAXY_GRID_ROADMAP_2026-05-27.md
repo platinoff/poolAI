@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-28 · **HEAD:** PH-S106 (`poolai-worker` lease renew client stub) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
+**Оновлено:** 2026-05-28 · **HEAD:** PH-S108 · **Смуга PH-S100…S109:** 10/10 ✅ (PH-S109 docs) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,11 +10,12 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S109** (1) — §4.3 docs sync |
-| **Закрито PH-S65…S106** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI lease columns + active/expired badge, lease wire + worker renew stub + failover requeue + `Migrating` lifecycle |
+| **Відкрито** | **PH-S110…S112** (3) — post-lease wire (див. FM §5.12) |
+| **Закрито PH-S65…S109** | pricing, governance, protocol, **lease wire MVP** (PH-S94…S108), E2E, grid ingest→`leased`, §4.3 docs sync |
+| **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
-Research replenish ✅ (2026-05-27): 6 нових PH-S* у FM §5.12.
+Research replenish ✅ (2026-05-28): PH-S110…S112 після закриття смуги lease/protocol.
 
 ---
 
@@ -40,7 +41,7 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Docs hub | `docs/security/SECURITY_HARDENING.md` |
 | Admin read-only | `/ui/admin/updates-compat` |
 
-### 2.3 Job lease (§4.3.1) — wire stub 🟡
+### 2.3 Job lease (§4.3) — wire MVP ✅
 
 | Компонент | Спринт | Де |
 |-----------|--------|-----|
@@ -62,15 +63,19 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | E2E lease acquire+renew | PH-S107 ✅ | `e2e/tests/jobs_lease.spec.ts` |
 
 | Grid ingest → Leased | PH-S108 ✅ | `schedule_with_grid_peer` + lease on bind; `dispatch.rs` tests |
-**Ще не в коді:** §4.3 lease wire docs sync (PH-S109).
+| §4.3 docs sync | PH-S109 ✅ | `POOLAI_GALAXY_GRID.md` §4.3 table; смуга PH-S100…S109 закрита |
+
+**Post-MVP (черга §5.12):** grid result lease CAS, renew-interval env, grid Job E2E — PH-S110…S112.
 
 ---
 
-## 3. Черга §5.12 (1 відкритий)
+## 3. Черга §5.12 (3 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S109** | §4.3 wire docs sync | docs |
+| 1 | **PH-S110** | Grid result ingest lease_epoch CAS | §4.3.1, `dispatch.rs` |
+| 2 | PH-S111 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` env | §4.3.1, `lease_config.rs` |
+| 3 | PH-S112 | Grid Job envelope E2E smoke | `e2e/`, PH-S108 |
 
 ---
 
@@ -96,7 +101,8 @@ flowchart LR
   C --> D[S93-S96 governance UI + lease stub]
   D --> E[S97 TTL env]
   E --> F[S98-S103 lease pricing protocol]
-  F --> G[lease acquire renew failover]
+  F --> G[S100-S109 lease MVP]
+  G --> H[S110+ post-lease wire]
 ```
 
 ---

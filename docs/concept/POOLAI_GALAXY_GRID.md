@@ -424,7 +424,20 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 
 Для кожного job вводиться `lease_owner` (srv/worker), `lease_epoch` і `lease_expires_at`.
 
-**Wire stub (PH-S94 ✅):** optional поля на `JobRecord` + `POST/GET /api/v1/jobs` (`src/job/types.rs`, `src/network/api/jobs.rs`). **PATCH CAS (PH-S95 ✅):** optional `lease_epoch` на `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` при mismatch. **Admin UI (PH-S96 ✅):** read-only lease columns на `/ui/admin/jobs`. **TTL env (PH-S97 ✅):** `POOLAI_JOB_LEASE_TTL_SECS` — default lease TTL (`JobLeaseConfig`, default `90` s; `src/job/lease_config.rs`). **Acquire (PH-S98 ✅):** scheduler bind + `POST /api/v1/jobs/{id}/lease` (`src/job/lease_acquire.rs`). **Renew (PH-S99 ✅):** `POST /api/v1/jobs/{id}/lease/renew` (epoch CAS, extends TTL). **Leased status (PH-S100 ✅):** `JobStatus::Leased` + lifecycle transitions (`allows_transition`), schedule/acquire path updates status to `leased`. **Failover stub (PH-S101 ✅):** expired `leased` rows are requeued and rebound by scheduler. **Live pricing fetch (PH-S102 ✅):** `GET /api/v1/grid/pricing` refresh path pulls provider endpoint quotes from `POOLAI_GALAXY_PRICING_PROVIDERS` with timeout env `POOLAI_GALAXY_PRICING_TIMEOUT_MS`. **Migrating lifecycle (PH-S104 ✅):** `JobStatus::Migrating` + transitions `Leased/Executing ↔ Migrating`, OpenAPI `JobStatus` sync, contract test coverage. **Lease state badge (PH-S105 ✅):** `/ui/admin/jobs` shows read-only `active/expired` badge from `lease_expires_at` (EN/UK i18n + Playwright smoke). **Worker renew stub (PH-S106 ✅):** `poolai-worker` renews active lease via `POST /api/v1/jobs/{id}/lease/renew` when task payload includes `job_id` + `lease_epoch`. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Implemented wire (PH-S94…S108 ✅, docs sync PH-S109):** coordinator job lease MVP — див. таблицю; роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+
+| PH-S | Що в коді |
+|------|-----------|
+| S94–S95 | `lease_*` на `JobRecord`; PATCH optional `lease_epoch` → `409 lease_epoch_rejected` |
+| S96–S97 | Admin lease columns; `POOLAI_JOB_LEASE_TTL_SECS` → `JobLeaseConfig` |
+| S98–S99 | Acquire: scheduler + `POST /jobs/{id}/lease`; renew: `POST …/lease/renew` |
+| S100–S101 | `JobStatus::Leased`; expired `leased` → requeue + scheduler rebind (stub) |
+| S104 | `JobStatus::Migrating`; transitions `Leased/Executing ↔ Migrating` |
+| S105–S106 | Admin lease `active/expired` badge; `poolai-worker` renew client stub |
+| S107 | Playwright `jobs_lease.spec.ts` (acquire + renew + 409 paths) |
+| S108 | Grid `Job` ingest → `schedule_with_grid_peer` → `leased` + lease fields when peer binds |
+
+*Pricing live fetch (PH-S102) і protocol middleware (PH-S103) — §4.2 / §9, не lease wire.*
 
 - `lease_ttl`: базовий час володіння lease (наприклад 30-120 с, профільно за типом job).
 - `lease_renew_interval`: heartbeat/renew до `lease_ttl/3`.
@@ -439,6 +452,8 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 Це дає at-most-once на рівні “accepted result”, навіть якщо попередній worker ще живий мережево.
 
 #### 4.3.2 Мінімальна state-модель job
+
+**Wire (PH-S100 ✅, PH-S104 ✅):** `JobStatus::Leased` і `JobStatus::Migrating` у `src/job/types.rs` + `src/job/lifecycle.rs`; OpenAPI `JobStatus`; `tests/jobs_api_contracts.rs`; grid ingest → `leased` (PH-S108).
 
 Рекомендований мінімум:
 

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-28 (PH-S108 ✅ grid ingest → Leased on peer schedule; §5.12 PH-S109 — 1 відкритий; FM-041 Deferred).
+**Оновлено:** 2026-05-28 (PH-S109 ✅ §4.3 lease wire docs sync; смуга PH-S100…S109 закрита; §5.12 PH-S110…S112 — 3 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -309,7 +309,10 @@ FM-xxx (з таблиці нижче)
 | 42 | **PH-S106** | `poolai-worker` lease renew client stub (code) | Galaxy §4.3.1, `src/bin/poolai-worker.rs` | POST renew to coordinator when payload has active `job_id` + `lease_epoch`; parser + HTTP renew stub tests; no full failover | **✅** |
 | 43 | **PH-S107** | Jobs lease E2E smoke (e2e) | `e2e/`, PH-S98–S99 API | Playwright acquire + renew path; `jobs_lease.spec.ts`; `npm run test:ci` | **✅** |
 | 44 | **PH-S108** | Grid ingest sets Leased on acquire (code) | `src/grid/dispatch.rs`, `src/job/` | grid Job ingest + `schedule_with_grid_peer` → `leased` + lease fields when peer binds; unit tests | **✅** |
-| 45 | **PH-S109** | Galaxy §4.3 lease wire docs sync (docs) | `POOLAI_GALAXY_GRID.md`, INDEX, DIGEST | mark Leased/Migrating/renew implemented steps; no duplicate prose | відкрито |
+| 45 | **PH-S109** | Galaxy §4.3 lease wire docs sync (docs) | `POOLAI_GALAXY_GRID.md`, INDEX, DIGEST | §4.3 table PH-S94…S108; смуга 10/10 ✅; roadmap replenish | **✅** |
+| 46 | **PH-S110** | Grid result ingest lease_epoch CAS (code) | `src/grid/dispatch.rs`, Galaxy §4.3.1 | reject/finalize grid Result when `lease_epoch` mismatch | відкрито |
+| 47 | **PH-S111** | Job lease renew interval env (code) | `src/job/lease_config.rs`, §4.3.1 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests | відкрито |
+| 48 | **PH-S112** | Grid Job envelope E2E smoke (e2e) | `e2e/`, PH-S108 | Playwright grid envelope Job → `leased` + lease fields | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -422,7 +425,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S109** (Galaxy §4.3 lease wire docs sync) · черга **1** відкритий (PH-S109) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S110** (Grid result ingest lease_epoch CAS) · черга **3** відкритих (PH-S110…S112) · смуга PH-S100…S109 **закрита** · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

@@ -1,22 +1,15 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 · **HEAD:** `23ecac5a` (PH-S107) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) · [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc)
+**Оновлено:** 2026-05-28 · **HEAD:** `347536be` (PH-S108) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) · [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc)
 
 ---
 
 ## Copy-paste для наступної сесії
 
 ```
-PoolAI — ітераційна сесія PH-S109 (VDT, один спринт)
+PoolAI — ітераційна сесія PH-S110 (VDT, один спринт)
 
-## Ролі (VDT) — як у PH-S107
-
-Правила: poolai-agent-roles.mdc · virtual-development-team.mdc · poolai-session-iteration.mdc · runtime-stack-policy.mdc
-
-## Режим ітерації
-- Один PH-S* · локальний CI перед push
-- Закриття: PH-S109 → ✅ FM §5.12 + HANDOFF + цей файл
-- Черга §5.12: **1** відкритий (PH-S109) — після закриття replenish (<10)
+Правила: poolai-agent-roles.mdc · virtual-development-team.mdc · poolai-session-iteration.mdc
 
 ## S0
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
@@ -28,23 +21,27 @@ HANDOFF · FM §5.12 · GALAXY_GRID_ROADMAP · цей файл
 ## Локальний CI
 cargo fmt --all
 K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci
-# docs-only: openapi-gap / e2e за потреби
+cargo run --bin poolai-openapi-gap-audit   # після API
 
-## Стан (2026-05-28)
-- **Закрито:** PH-S03…S108 (смуга PH-S100…S109: 9✅ / 1 відкрито)
-- **Відкритий:** **PH-S109** — Galaxy §4.3 lease wire docs sync
+## Стан
+- **Закрито:** PH-S03…S109 (смуга PH-S100…S109 — 10/10 ✅)
+- **Відкритий:** **PH-S110** (1 з 3)
 - **BLOCKED:** PH-S35/S16/S02 · **Deferred:** PH-S36/S01/S15
 
-## PH-S109 — scope
-1. `docs/concept/POOLAI_GALAXY_GRID.md` §4.3 — позначити implemented: Leased/Migrating, renew, grid ingest→leased, E2E (PH-S100…S108); без дублювання prose
-2. INDEX, DIGEST, README Next Focus, `GALAXY_GRID_ROADMAP` (смуга 10/10 ✅)
-3. FM §5.12 PH-S109 → ✅; HANDOFF; vision manifest
+## PH-S110 — scope
+1. `src/grid/dispatch.rs` — grid `Result` ingest: optional `lease_epoch` CAS vs job record → reject on mismatch
+2. Unit tests in `dispatch.rs` or integration test
+3. FM §5.12 + HANDOFF + цей prompt
 
 ## Не повторювати
-Код lease/E2E/grid ingest — уже в PH-S94…S108
+PH-S94…S109 lease wire MVP · jobs_lease E2E · grid ingest→leased docs
 
-## Після PH-S109
-Replenish §5.12 (code-first, ≤10 відкритих) — `rg "TODO|FIXME" src/`, GALAXY_GRID_ROADMAP
+## Черга §5.12 (3)
+| # | Sprint | Фокус |
+|---|--------|--------|
+| 1 | **PH-S110** | Grid result lease_epoch CAS |
+| 2 | PH-S111 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` env |
+| 3 | PH-S112 | Grid Job envelope E2E |
 ```
 
 ---
@@ -53,5 +50,5 @@ Replenish §5.12 (code-first, ≤10 відкритих) — `rg "TODO|FIXME" src
 
 | | |
 |---|---|
-| **Наступний** | PH-S109 — §4.3 lease wire docs sync (закриває смугу PH-S100…S109) |
+| **Наступний** | PH-S110 — Grid result ingest lease_epoch CAS |
 | **Handoff** | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) |
