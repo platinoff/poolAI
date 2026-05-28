@@ -6,11 +6,11 @@
 
 ---
 
-## 1. Стан черги §5.12 (2026-05-27)
+## 1. Стан черги §5.12 (2026-05-28)
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S107…S109** (3) — e2e, grid docs |
+| **Відкрито** | **PH-S108…S109** (2) — grid ingest, docs sync |
 | **Закрито PH-S65…S106** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI lease columns + active/expired badge, lease wire + worker renew stub + failover requeue + `Migrating` lifecycle |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -59,17 +59,18 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Admin lease active/expired badge | PH-S105 ✅ | `/ui/admin/jobs` lease-state badge from `lease_expires_at`; i18n + Playwright smoke updates |
 | Worker lease renew client stub | PH-S106 ✅ | `poolai-worker` calls `/api/v1/jobs/{id}/lease/renew` on task payload `job_id+lease_epoch` |
 
-**Ще не в коді:** lease acquire+renew e2e smoke.
+| E2E lease acquire+renew | PH-S107 ✅ | `e2e/tests/jobs_lease.spec.ts` |
+
+**Ще не в коді:** grid ingest → `leased` (PH-S108); §4.3 docs sync (PH-S109).
 
 ---
 
-## 3. Черга §5.12 (3 відкритих)
+## 3. Черга §5.12 (2 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S107** | E2E lease acquire+renew | e2e |
-| 2 | PH-S108 | Grid ingest → Leased | §4.3 |
-| 3 | PH-S109 | §4.3 wire docs sync | docs |
+| 1 | **PH-S108** | Grid ingest → Leased | §4.3 |
+| 2 | PH-S109 | §4.3 wire docs sync | docs |
 
 ---
 

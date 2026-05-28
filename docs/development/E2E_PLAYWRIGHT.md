@@ -10,6 +10,7 @@
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
 | `jobs_raid.spec.ts` | **PH-S52:** API smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start` |
 | `grid_pricing.spec.ts` | **PH-S86:** API smoke — `GET /api/v1/grid/pricing` з `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (L2 fallback `470000` usd_micro); лише з `--start` |
+| `jobs_lease.spec.ts` | **PH-S107:** API smoke — `POST /api/v1/jobs/{id}/lease` acquire + `POST …/lease/renew`; 409 `lease_already_active` / `lease_epoch_rejected`; лише з `--start` |
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 
@@ -64,4 +65,6 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 
 **PH-S86 ✅:** `grid_pricing` у `npm run test:ci`; `--start` виставляє `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (default `{"inference_blended_token":470000}`).
 
-**Last updated:** 2026-05-27 (PH-S86 grid pricing API E2E).
+**PH-S107 ✅:** `jobs_lease` у `npm run test:ci`; acquire → `leased` + epoch `1`; renew extends `lease_expires_at`; conflict paths mirror `tests/jobs_api_contracts.rs`.
+
+**Last updated:** 2026-05-28 (PH-S107 jobs lease API E2E).

@@ -51,7 +51,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S98 ✅ (pricing, governance, job lease). **Активна черга:** FM **§5.12** — **PH-S99** (lease renew) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S107 ✅ (pricing, governance, job lease + E2E). **Активна черга:** FM **§5.12** — **PH-S108** (grid ingest → leased) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -77,19 +77,17 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-05-27)
+### Next Focus (2026-05-28)
 
-**HEAD:** `ab51763b` — PH-S99 job lease renew (`POST /api/v1/jobs/{id}/lease/renew`).
+**Закрито:** PH-S03…S107 (Galaxy Grid: pricing oracle/API, signed releases, job lease wire + TTL + acquire/renew + E2E `jobs_lease.spec.ts`). Концепт §4.3.1 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
 
-**Закрито:** PH-S03…S98 (Galaxy Grid: pricing oracle/API, signed releases, job lease wire + TTL + acquire). Концепт §4.3.1 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
-
-**Активна черга (FM §5.12):** **PH-S100** (`JobStatus::Leased`) — 10 відкритих PH-S100…S109 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
+**Активна черга (FM §5.12):** **PH-S108** (grid ingest → `leased`) — 2 відкритих PH-S108…S109 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
 **Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) (§2a env, зокрема `POOLAI_JOB_LEASE_TTL_SECS`).
 
-**Нещодавно (job lease):** PH-S97 TTL env (`lease_config`) · PH-S98 acquire on scheduler bind + explicit API · PH-S96 admin lease columns · PH-S94–S95 wire + PATCH CAS.
+**Нещодавно (job lease):** PH-S107 E2E acquire+renew · PH-S106 worker renew stub · PH-S100–S105 lifecycle/middleware/admin badge.
 
 **Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 
