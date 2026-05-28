@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 · зріз після **PH-S121** · HEAD `263602d4` · vision manifest **rev 45**
+**Оновлено:** 2026-05-28 · зріз після **PH-S121** · HEAD `d0f8b935` · vision manifest **rev 45**
 
 Один спринт за раз — канон у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
 
@@ -19,7 +19,7 @@
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
 export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
-git fetch && git status -sb && git log -1 --oneline
+git fetch && git status -sb && git log -1 --oneline   # очікуємо d0f8b935 або новіший
 
 Прочитай коротко:
   docs/development/HANDOFF_NEW_SESSION.md
