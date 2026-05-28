@@ -14,9 +14,11 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_pricing_oracle::{
-    cache_metadata, record_l1_fresh_served, record_l1_stale_served, CacheFreshness,
-    GalaxyPriceUnitKey, GalaxyPricingCacheEntry, GalaxyPricingCacheKey, GalaxyPricingCacheMetadata,
-    GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingQuote, MockProviderQuote,
+    cache_metadata, fetch_live_provider_quotes, provider_http_timeout_ms_from_env,
+    record_l1_fresh_served, record_l1_stale_served, CacheFreshness, GalaxyPriceUnitKey,
+    GalaxyPricingCacheEntry, GalaxyPricingCacheKey, GalaxyPricingCacheMetadata,
+    GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingProviderCatalog,
+    GalaxyPricingProviderEntry, GalaxyPricingQuote, MockProviderQuote,
     PRICING_UNAVAILABLE_ERROR_CODE,
 };
 use crate::grid::{ingest_envelope, GridEnvelope, GridIngestKind, GridIngestOutcome};
@@ -189,12 +191,40 @@ async fn get_grid_pricing_snapshot(
         unit_key,
     };
     let now = now_secs()?;
+    let (config, provider_catalog) = {
+        let oracle = pricing_oracle()
+            .lock()
+            .map_err(|_| AppError::InternalError("pricing oracle mutex poisoned".to_string()))?;
+        if let Some((entry, freshness)) = oracle.lookup(now, &cache_key) {
+            let serve_cached = if oracle.config().force_fallback {
+                entry.quote.provider_id_at_min == "fallback_l2_config"
+            } else {
+                true
+            };
+            if serve_cached && freshness_to_response(freshness).is_some() {
+                return Ok((
+                    StatusCode::OK,
+                    Json(cache_hit_response(entry, freshness, oracle.config(), now)),
+                ));
+            }
+        }
+        (*oracle.config(), oracle.provider_catalog().clone())
+    };
+
+    let live_providers = fetch_live_provider_quotes(
+        &provider_catalog,
+        &cache_key.task_profile,
+        &cache_key.model_profile,
+        cache_key.unit_key,
+        provider_http_timeout_ms_from_env(),
+    )
+    .await;
+
     let mut oracle = pricing_oracle()
         .lock()
         .map_err(|_| AppError::InternalError("pricing oracle mutex poisoned".to_string()))?;
-
     if let Some((entry, freshness)) = oracle.lookup(now, &cache_key) {
-        let serve_cached = if oracle.config().force_fallback {
+        let serve_cached = if config.force_fallback {
             entry.quote.provider_id_at_min == "fallback_l2_config"
         } else {
             true
@@ -202,20 +232,22 @@ async fn get_grid_pricing_snapshot(
         if serve_cached && freshness_to_response(freshness).is_some() {
             return Ok((
                 StatusCode::OK,
-                Json(cache_hit_response(entry, freshness, oracle.config(), now)),
+                Json(cache_hit_response(entry, freshness, &config, now)),
             ));
         }
     }
 
-    let quote = oracle.try_quote(now, cache_key, &[]).map_err(|_| {
-        HttpAppError::new(AppError::RestError {
+    let quote = oracle
+        .try_quote(now, cache_key, &live_providers)
+        .map_err(|_| {
+            HttpAppError::new(AppError::RestError {
             code: PRICING_UNAVAILABLE_ERROR_CODE,
             message:
                 "grid pricing unavailable: no fresh or stale cache and L2 fallback not configured"
                     .to_string(),
         })
         .with_status(StatusCode::SERVICE_UNAVAILABLE)
-    })?;
+        })?;
     Ok((
         StatusCode::OK,
         Json(GridPricingSnapshotResponse {
@@ -246,8 +278,11 @@ fn response_from_outcome(outcome: GridIngestOutcome) -> GridIngestResponse {
 mod tests {
     use super::*;
     use crate::grid::galaxy_pricing_oracle::MockProviderQuote;
+    use axum::{routing::get, Router};
+    use serde_json::json;
     use std::collections::HashMap;
     use std::sync::{Mutex as StdMutex, OnceLock as StdOnceLock};
+    use tokio::net::TcpListener;
 
     static PRICING_TEST_LOCK: StdOnceLock<StdMutex<()>> = StdOnceLock::new();
 
@@ -270,6 +305,25 @@ mod tests {
             force_fallback,
         })
         .with_l2_fallback_quotes(fallback);
+    }
+
+    async fn spawn_provider_server(usd_micro: u64) -> String {
+        let app = Router::new().route(
+            "/quote",
+            get(move || async move {
+                Json(json!({
+                    "units": {
+                        "inference_blended_token": usd_micro
+                    }
+                }))
+            }),
+        );
+        let listener = TcpListener::bind("127.0.0.1:0").await.expect("bind");
+        let addr = listener.local_addr().expect("addr");
+        tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+        format!("http://{addr}/quote")
     }
 
     fn query(unit_key: &str, model_profile: &str) -> GridPricingSnapshotQuery {
@@ -355,7 +409,7 @@ mod tests {
         let wall_now = now_secs().expect("clock");
         let cached_at = wall_now.saturating_sub(500);
         let providers = [MockProviderQuote {
-            provider_id: "openai_us",
+            provider_id: "openai_us".into(),
             unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
             usd_micro: 500_000,
             healthy: true,
@@ -428,7 +482,7 @@ mod tests {
             })
             .with_l2_fallback_quotes(fallback);
             let providers = [MockProviderQuote {
-                provider_id: "openai_us",
+                provider_id: "openai_us".into(),
                 unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
                 usd_micro: 500_000,
                 healthy: true,
@@ -462,5 +516,44 @@ mod tests {
         assert_eq!(second.snapshot.poolai_quote_usd_micro, 470_000);
         assert_eq!(second.snapshot.provider_id_at_min, "fallback_l2_config");
         reset_oracle(false, None);
+    }
+
+    #[tokio::test]
+    async fn grid_pricing_snapshot_live_provider_http_refresh() {
+        let _lock = pricing_test_lock();
+        let endpoint = spawn_provider_server(500_000).await;
+        {
+            let mut guard = pricing_oracle().lock().expect("pricing oracle lock");
+            *guard = GalaxyPricingOracle::new(GalaxyPricingConfig {
+                cache_ttl_secs: 300,
+                max_stale_secs: 3600,
+                force_fallback: false,
+            })
+            .with_provider_catalog(GalaxyPricingProviderCatalog {
+                providers: vec![GalaxyPricingProviderEntry {
+                    provider_id: "live_openai_us".into(),
+                    region: "us".into(),
+                    model_profile: Some("live-http-model".into()),
+                    task_profiles: vec!["inference:text".into()],
+                    units: HashMap::from([("inference_blended_token".into(), 500_000)]),
+                    endpoint: Some(endpoint),
+                    enabled: true,
+                }],
+            });
+        }
+
+        let res = get_grid_pricing_snapshot(
+            State(ApiContext::default()),
+            Query(query("inference_blended_token", "live-http-model")),
+        )
+        .await
+        .expect("live http quote")
+        .1
+         .0;
+
+        assert!(matches!(res.source, GridPricingSnapshotSource::Oracle));
+        assert_eq!(res.snapshot.market_min_usd_micro, 500_000);
+        assert_eq!(res.snapshot.poolai_quote_usd_micro, 450_000);
+        assert_eq!(res.snapshot.provider_id_at_min, "live_openai_us");
     }
 }

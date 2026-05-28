@@ -1,7 +1,7 @@
 {
   "revision": 13,
   "updated_at": "2026-05-27",
-  "active_sprint": "PH-S102",
+  "active_sprint": "PH-S103",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -111,6 +111,13 @@
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
       "code_globs": ["src/job/store.rs", "src/job/scheduler.rs"],
       "extensions": [".rs", ".md"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
+    },
+    "pricing_live_fetch": {
+      "sprints": ["PH-S102"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["src/grid/galaxy_pricing_oracle.rs", "src/network/api/grid.rs"],
+      "extensions": [".rs", ".md", ".json"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },
     "galaxy_grid_roadmap_doc": {

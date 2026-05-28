@@ -1,8 +1,8 @@
 {
-  "revision": 20,
+  "revision": 22,
   "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S101",
-  "next_sprint": "PH-S102",
+  "last_sprint_closed": "PH-S102",
+  "next_sprint": "PH-S103",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -44,6 +44,22 @@
       "path": "docs/development/NEXT_SESSION_PROMPT.md",
       "layer": "L1",
       "sprints": ["PH-S*"]
+    },
+    {
+      "id": "docs_index",
+      "label": "INDEX_2026-03-17",
+      "path": "docs/INDEX_2026-03-17.md",
+      "layer": "L1",
+      "sections": ["canonical map", "§5.12 pointers"],
+      "sprints": ["PH-S64", "PH-S87", "PH-S101"]
+    },
+    {
+      "id": "dev_readme",
+      "label": "development/README",
+      "path": "docs/development/README.md",
+      "layer": "L1",
+      "sections": ["current sprint pointers", "handoff links"],
+      "sprints": ["PH-S64", "PH-S101"]
     },
     {
       "id": "fm",
@@ -184,7 +200,15 @@
       "label": "api/grid.rs pricing",
       "path": "src/network/api/grid.rs",
       "layer": "L3",
-      "sprints": ["PH-S78", "PH-S79", "PH-S80", "PH-S81", "PH-S89"]
+      "sprints": ["PH-S78", "PH-S79", "PH-S80", "PH-S81", "PH-S89", "PH-S102"]
+    },
+    {
+      "id": "pricing_oracle",
+      "label": "grid/galaxy_pricing_oracle.rs",
+      "path": "src/grid/galaxy_pricing_oracle.rs",
+      "layer": "L3",
+      "sprints": ["PH-S68", "PH-S75", "PH-S80", "PH-S81", "PH-S89", "PH-S92", "PH-S102"],
+      "sections": ["provider catalog", "live http fetch", "timeout env"]
     },
     {
       "id": "galaxy_roadmap",
@@ -199,6 +223,9 @@
     { "from": "galaxy_grid", "to": "grid_node", "kind": "concept-ref" },
     { "from": "handoff", "to": "galaxy_grid", "kind": "session-tracks" },
     { "from": "next_session", "to": "handoff", "kind": "mirror" },
+    { "from": "docs_index", "to": "fm", "kind": "catalog" },
+    { "from": "dev_readme", "to": "handoff", "kind": "session-tracks" },
+    { "from": "dev_readme", "to": "next_session", "kind": "session-tracks" },
     { "from": "fm", "to": "handoff", "kind": "queue" },
     { "from": "fm", "to": "galaxy_grid", "kind": "sprint-scope" },
     { "from": "galaxy_grid", "to": "galaxy_fee_split", "kind": "implements" },
@@ -217,6 +244,7 @@
     { "from": "galaxy_grid", "to": "admin_jobs", "kind": "implements" },
     { "from": "galaxy_grid", "to": "admin_grid_pricing", "kind": "implements" },
     { "from": "galaxy_grid", "to": "grid_pricing_api", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "pricing_oracle", "kind": "implements" },
     { "from": "handoff", "to": "galaxy_roadmap", "kind": "session-tracks" },
     { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" }
   ]

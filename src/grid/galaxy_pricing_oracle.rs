@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::Duration;
 use tracing::info;
 
 /// 1 USD = 1_000_000 micro-USD (§4.2.1).
@@ -66,6 +67,12 @@ pub const ENV_FALLBACK_JSON: &str = "POOLAI_GALAXY_PRICING_FALLBACK_JSON";
 /// Env: JSON allow-list of US pricing providers + optional endpoints (§4.2.5).
 /// Array `[{...}]` or object `{"providers":[{...}]}` — see [`parse_pricing_providers_json`].
 pub const ENV_PRICING_PROVIDERS: &str = "POOLAI_GALAXY_PRICING_PROVIDERS";
+
+/// Env: HTTP timeout for live provider fetch (PH-S102), milliseconds.
+pub const ENV_PROVIDER_HTTP_TIMEOUT_MS: &str = "POOLAI_GALAXY_PRICING_TIMEOUT_MS";
+
+/// Default timeout for provider HTTP calls (PH-S102).
+pub const DEFAULT_PROVIDER_HTTP_TIMEOUT_MS: u64 = 1500;
 
 /// Billing unit keys shared by oracle and scheduling (§4.2.1).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -418,6 +425,87 @@ pub fn pricing_provider_catalog_from_env() -> GalaxyPricingProviderCatalog {
     }
 }
 
+/// HTTP timeout for provider fetch path (PH-S102), milliseconds.
+pub fn provider_http_timeout_ms_from_env() -> u64 {
+    env_u64(ENV_PROVIDER_HTTP_TIMEOUT_MS).unwrap_or(DEFAULT_PROVIDER_HTTP_TIMEOUT_MS)
+}
+
+#[derive(Debug, Deserialize)]
+struct ProviderEndpointWrappedUnits {
+    #[serde(default)]
+    units: HashMap<String, u64>,
+}
+
+fn parse_live_units_map(raw: &str) -> Option<HashMap<String, u64>> {
+    if let Ok(wrapped) = serde_json::from_str::<ProviderEndpointWrappedUnits>(raw) {
+        if !wrapped.units.is_empty() {
+            return Some(wrapped.units);
+        }
+    }
+    serde_json::from_str::<HashMap<String, u64>>(raw).ok()
+}
+
+fn parse_live_units_map_bytes(raw: &[u8]) -> Option<HashMap<String, u64>> {
+    if let Ok(wrapped) = serde_json::from_slice::<ProviderEndpointWrappedUnits>(raw) {
+        if !wrapped.units.is_empty() {
+            return Some(wrapped.units);
+        }
+    }
+    serde_json::from_slice::<HashMap<String, u64>>(raw).ok()
+}
+
+/// PH-S102: live provider HTTP fetch for a single unit key.
+pub async fn fetch_live_provider_quotes(
+    catalog: &GalaxyPricingProviderCatalog,
+    task_profile: &str,
+    model_profile: &str,
+    unit_key: GalaxyPriceUnitKey,
+    timeout_ms: u64,
+) -> Vec<MockProviderQuote> {
+    let Ok(client) = reqwest::Client::builder()
+        .timeout(Duration::from_millis(timeout_ms))
+        .build()
+    else {
+        return Vec::new();
+    };
+    let mut out = Vec::new();
+    for entry in catalog.matching_entries(task_profile, model_profile) {
+        let Some(endpoint) = entry.endpoint.as_deref() else {
+            continue;
+        };
+        let url = format!(
+            "{endpoint}?task_profile={task_profile}&model_profile={model_profile}&unit_key={}",
+            unit_key.as_str()
+        );
+        let Ok(resp) = client.get(url).send().await else {
+            continue;
+        };
+        if !resp.status().is_success() {
+            continue;
+        }
+        let body = match resp.bytes().await {
+            Ok(bytes) => bytes,
+            Err(_) => continue,
+        };
+        let Some(units) = parse_live_units_map_bytes(body.as_ref()) else {
+            continue;
+        };
+        let Some(usd_micro) = units.get(unit_key.as_str()).copied() else {
+            continue;
+        };
+        if usd_micro == 0 {
+            continue;
+        }
+        out.push(MockProviderQuote {
+            provider_id: entry.provider_id.clone(),
+            unit_key,
+            usd_micro,
+            healthy: true,
+        });
+    }
+    out
+}
+
 fn parse_fallback_json(raw: &str) -> HashMap<GalaxyPriceUnitKey, u64> {
     let parsed = serde_json::from_str::<HashMap<String, u64>>(raw);
     let mut out = HashMap::new();
@@ -443,7 +531,7 @@ pub fn floor_poolai_quote_usd_micro(market_min_usd_micro: u64) -> u64 {
 /// Mock provider row for tests and future fetchers (§4.2.1 example JSON).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MockProviderQuote {
-    pub provider_id: &'static str,
+    pub provider_id: String,
     pub unit_key: GalaxyPriceUnitKey,
     pub usd_micro: u64,
     pub healthy: bool,
@@ -453,12 +541,12 @@ pub struct MockProviderQuote {
 pub fn market_min_usd_micro(
     providers: &[MockProviderQuote],
     unit_key: GalaxyPriceUnitKey,
-) -> Option<(u64, &'static str)> {
+) -> Option<(u64, String)> {
     providers
         .iter()
         .filter(|p| p.healthy && p.unit_key == unit_key && p.usd_micro > 0)
         .min_by_key(|p| p.usd_micro)
-        .map(|p| (p.usd_micro, p.provider_id))
+        .map(|p| (p.usd_micro, p.provider_id.clone()))
 }
 
 /// Published quote snapshot (cache value + lookup result).
@@ -728,19 +816,19 @@ mod tests {
     fn mock_us_blended() -> Vec<MockProviderQuote> {
         vec![
             MockProviderQuote {
-                provider_id: "openai_us",
+                provider_id: "openai_us".into(),
                 unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
                 usd_micro: 500_000,
                 healthy: true,
             },
             MockProviderQuote {
-                provider_id: "anthropic_us",
+                provider_id: "anthropic_us".into(),
                 unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
                 usd_micro: 600_000,
                 healthy: true,
             },
             MockProviderQuote {
-                provider_id: "stale_vendor",
+                provider_id: "stale_vendor".into(),
                 unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
                 usd_micro: 100_000,
                 healthy: false,
@@ -832,7 +920,7 @@ mod tests {
         assert_eq!(q1.poolai_quote_usd_micro, 450_000);
 
         let expensive = vec![MockProviderQuote {
-            provider_id: "cheap_now",
+            provider_id: "cheap_now".into(),
             unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
             usd_micro: 50_000,
             healthy: true,
@@ -860,7 +948,7 @@ mod tests {
         assert_eq!(stale, CacheFreshness::Stale);
 
         let cheap = vec![MockProviderQuote {
-            provider_id: "x",
+            provider_id: "x".into(),
             unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
             usd_micro: 100_000,
             healthy: true,
@@ -1032,6 +1120,18 @@ mod tests {
         let cfg = GalaxyPricingConfig::from_env();
         std::env::remove_var(KEY);
         assert!(cfg.force_fallback);
+    }
+
+    #[test]
+    fn provider_timeout_from_env_uses_override_or_default() {
+        std::env::remove_var(ENV_PROVIDER_HTTP_TIMEOUT_MS);
+        assert_eq!(
+            provider_http_timeout_ms_from_env(),
+            DEFAULT_PROVIDER_HTTP_TIMEOUT_MS
+        );
+        std::env::set_var(ENV_PROVIDER_HTTP_TIMEOUT_MS, "2500");
+        assert_eq!(provider_http_timeout_ms_from_env(), 2500);
+        std::env::remove_var(ENV_PROVIDER_HTTP_TIMEOUT_MS);
     }
 
     #[test]
