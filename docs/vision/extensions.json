@@ -1,7 +1,7 @@
 {
-  "revision": 16,
+  "revision": 17,
   "updated_at": "2026-05-28",
-  "active_sprint": "PH-S106",
+  "active_sprint": "PH-S107",
   "ui_version": 3,
   "extension_policy": {
     ".md": {
@@ -132,6 +132,13 @@
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
       "code_globs": ["src/job/types.rs", "src/job/lifecycle.rs", "src/network/api/jobs.rs", "tests/jobs_api_contracts.rs", "docs/openapi.yaml"],
       "extensions": [".rs", ".yaml", ".md", ".json"],
+      "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
+    },
+    "worker_lease_renew_stub": {
+      "sprints": ["PH-S106"],
+      "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
+      "code_globs": ["src/bin/poolai-worker.rs"],
+      "extensions": [".rs", ".md", ".json"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },
     "galaxy_grid_roadmap_doc": {

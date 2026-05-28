@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-28 · **HEAD:** PH-S105 (admin jobs lease active/expired badge) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
+**Оновлено:** 2026-05-28 · **HEAD:** PH-S106 (`poolai-worker` lease renew client stub) · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 · **Концепт:** [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S106…S109** (4) — worker renew, e2e, grid docs |
-| **Закрито PH-S65…S105** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI lease columns + active/expired badge, lease wire + failover requeue stub + `Migrating` lifecycle |
+| **Відкрито** | **PH-S107…S109** (3) — e2e, grid docs |
+| **Закрито PH-S65…S106** | protocol/register + protocol middleware, verify-release, pricing API/oracle + live provider HTTP fetch, admin UI lease columns + active/expired badge, lease wire + worker renew stub + failover requeue + `Migrating` lifecycle |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 Research replenish ✅ (2026-05-27): 6 нових PH-S* у FM §5.12.
@@ -57,19 +57,19 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | `X-PoolAI-Protocol` middleware | PH-S103 ✅ | selected routes negotiation, protocol headers, unsupported reject |
 | `JobStatus::Migrating` | PH-S104 ✅ | lifecycle transitions `Leased/Executing ↔ Migrating`; OpenAPI + contract tests |
 | Admin lease active/expired badge | PH-S105 ✅ | `/ui/admin/jobs` lease-state badge from `lease_expires_at`; i18n + Playwright smoke updates |
+| Worker lease renew client stub | PH-S106 ✅ | `poolai-worker` calls `/api/v1/jobs/{id}/lease/renew` on task payload `job_id+lease_epoch` |
 
-**Ще не в коді:** worker renew client.
+**Ще не в коді:** lease acquire+renew e2e smoke.
 
 ---
 
-## 3. Черга §5.12 (4 відкритих)
+## 3. Черга §5.12 (3 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S106** | Worker lease renew client | §4.3.1 |
-| 2 | PH-S107 | E2E lease acquire+renew | e2e |
-| 3 | PH-S108 | Grid ingest → Leased | §4.3 |
-| 4 | PH-S109 | §4.3 wire docs sync | docs |
+| 1 | **PH-S107** | E2E lease acquire+renew | e2e |
+| 2 | PH-S108 | Grid ingest → Leased | §4.3 |
+| 3 | PH-S109 | §4.3 wire docs sync | docs |
 
 ---
 

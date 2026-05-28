@@ -169,7 +169,7 @@
 | `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92) |
 | `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | Default lease TTL seconds (default `90`; `JobLeaseConfig::from_env()`, PH-S97) |
 
-**Pricing/lease wire (PH-S94…S105):** lease fields + acquire/renew + `Leased` + failover requeue stub; live provider HTTP fetch from `POOLAI_GALAXY_PRICING_PROVIDERS` endpoints with `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; protocol middleware on selected wire routes (`X-PoolAI-Protocol`); `JobStatus::Migrating` lifecycle transitions (`Leased/Executing ↔ Migrating`) with OpenAPI+contract coverage; admin jobs lease-state badge (`active/expired`) derived from `lease_expires_at` with i18n EN/UK + Playwright smoke updates. **Наступні PH-S106…S109:** worker renew client, lease E2E, grid docs sync. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Pricing/lease wire (PH-S94…S106):** lease fields + acquire/renew + `Leased` + failover requeue stub; live provider HTTP fetch from `POOLAI_GALAXY_PRICING_PROVIDERS` endpoints with `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; protocol middleware on selected wire routes (`X-PoolAI-Protocol`); `JobStatus::Migrating` lifecycle transitions (`Leased/Executing ↔ Migrating`) with OpenAPI+contract coverage; admin jobs lease-state badge (`active/expired`) derived from `lease_expires_at` with i18n EN/UK + Playwright smoke updates; `poolai-worker` lease renew client stub for payload `job_id + lease_epoch` to `/api/v1/jobs/{id}/lease/renew`. **Наступні PH-S107…S109:** lease E2E, grid docs sync. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 

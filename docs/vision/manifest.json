@@ -1,8 +1,8 @@
 {
-  "revision": 25,
+  "revision": 26,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S105",
-  "next_sprint": "PH-S106",
+  "last_sprint_closed": "PH-S106",
+  "next_sprint": "PH-S107",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -227,6 +227,14 @@
       "sections": ["X-PoolAI-Protocol negotiation", "selected routes", "reject unsupported"]
     },
     {
+      "id": "poolai_worker",
+      "label": "bin/poolai-worker.rs",
+      "path": "src/bin/poolai-worker.rs",
+      "layer": "L3",
+      "sprints": ["FM-016", "PH-S65", "PH-S106"],
+      "sections": ["register/heartbeat", "task executor", "lease renew stub"]
+    },
+    {
       "id": "galaxy_roadmap",
       "label": "GALAXY_GRID_ROADMAP",
       "path": "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
@@ -263,6 +271,7 @@
     { "from": "galaxy_grid", "to": "grid_pricing_api", "kind": "implements" },
     { "from": "galaxy_grid", "to": "pricing_oracle", "kind": "implements" },
     { "from": "galaxy_grid", "to": "protocol_middleware", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "poolai_worker", "kind": "implements" },
     { "from": "handoff", "to": "galaxy_roadmap", "kind": "session-tracks" },
     { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" }
   ]
