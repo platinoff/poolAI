@@ -1,5 +1,7 @@
 # Grid Protocol — концепт повідомлень (v1, 2026-04-06)
 
+> **Lease / worker heartbeat:** job lease CAS і `lease_epoch` на Grid `Result` — [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.3.1–§4.3.1.1 · карта — [`docs/vision/`](../vision/).
+
 > **Horizon (авторозробка):** реалізація **FM-009** — спринт **S36** у [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md) · [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md).
 
 ## 1. Мета

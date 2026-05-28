@@ -1,5 +1,7 @@
 # PoolAI Job / Mining Layer — Концепт (2026-03-17)
 
+> **Job lease (wire):** acquire / renew / release / 409 CAS — [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) §4.3.1; worker ticker — §4.3.1.1; env `POOLAI_JOB_LEASE_*` — `src/job/lease_config.rs`.
+
 ## 1. Мета
 
 PoolAI вже реалізує:

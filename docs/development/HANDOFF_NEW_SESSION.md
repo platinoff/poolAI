@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S119 ✅ admin jobs lease polish · §5.12 **6** відкритих PH-S120…S124 · vision rev 43) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S121 ✅ · docs-sync: README/INDEX/`file_list.csv`/humanized `NEXT_SESSION_PROMPT` · §5.12 **4** відкритих PH-S122…S124 · vision rev 45) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -86,11 +86,13 @@
 **PH-S117 ✅ (e2e):** `e2e/tests/grid_result_lease.spec.ts` — grid Job ingest → leased; stale `lease_epoch` on Result → `409 lease_epoch_rejected`; matching epoch → `completed`; `test:ci` includes `grid_result_lease`.
 **PH-S118 ✅ (e2e):** `jobs_lease.spec.ts` PH-S118 block — renew without acquire → `400`; expired TTL (`POOLAI_JOB_LEASE_TTL_SECS=2` on e2e stand) → `409 lease_expired`; wrong owner re-acquire → `409 lease_already_active`.
 **PH-S119 ✅ (code):** `/ui/admin/jobs` — `#epoch` display; `title` tooltips on lease owner/epoch + column headers; i18n EN/UK; `admin.spec.ts` tooltip/`#42` assertions; `cargo test-ci`.
-**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill (`manifest.git_head` + live `__watch.git_head`); manifest rev **43**; next **PH-S120**.
+**PH-S120 ✅ (docs):** `docs/vision/manifest.json` — Solana cluster (`solana_concept`, `job_onchain`, `job_domain_events`, `crate_solana`, `solana_events`, `solana_sidecar`, `solana_program`); DIGEST § Solana modules + FM-033 crosslink; `SOLANA_ADAPTER_CONCEPT` → vision pointer; manifest rev **44**.
+**PH-S121 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §4.3.1.1 — worker lease renew vs `heartbeat-remote`; env `POOLAI_JOB_LEASE_*`; task payload `job_id` + `lease_epoch`; `LeaseRenewGuard` ticker contract (PH-S116); DIGEST row; manifest rev **45**.
+**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S122**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **6** відкритих — **PH-S120** (Solana vision) + **PH-S121…S124** (docs/OpenAPI).
+**Черга:** §5.12 **4** відкритих — **PH-S122** (OpenAPI lease audit) + **PH-S123…S124** (e2e/docs).
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

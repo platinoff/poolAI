@@ -65,7 +65,7 @@ http://127.0.0.1:8765/docs/vision/index.html
 | L1 | Operations | HANDOFF, NEXT_SESSION_PROMPT |
 | L2 | Catalog | FUNCTION_MANAGEMENT, DIGEST |
 | L3 | Code | `src/grid/`, virtual_nodes API |
-| L4 | Lib roots | `src/lib.rs`, `crates/poolai-solana-adapter/` |
+| L4 | Lib roots | `src/lib.rs`, `crates/poolai-solana-adapter/` (PH-S120: events, sidecar, `poolai-events` BPF) |
 | L5 | Workspace | `Cargo.toml`, `.cargo/config.toml` (найнижчий шар на карті) |
 
 ## Galaxy map (навігація)

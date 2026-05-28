@@ -434,12 +434,65 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 | S98–S99 | Acquire: scheduler + `POST /jobs/{id}/lease`; renew: `POST …/lease/renew` |
 | S100–S101 | `JobStatus::Leased`; expired `leased` → requeue + scheduler rebind (stub) |
 | S104 | `JobStatus::Migrating`; transitions `Leased/Executing ↔ Migrating` |
-| S105–S106 | Admin lease `active/expired` badge; `poolai-worker` renew client stub |
+| S105–S106 | Admin lease `active/expired` badge; `poolai-worker` renew client (initial + HTTP stub) |
 | S107 | Playwright `jobs_lease.spec.ts` (acquire + renew + 409 paths) |
 | S108 | Grid `Job` ingest → `schedule_with_grid_peer` → `leased` + lease fields when peer binds |
 | S110 | Grid `Result` ingest: optional `lease_epoch` CAS → `409 lease_epoch_rejected` when mismatch/missing on leased job |
+| S116 | `poolai-worker` periodic lease renew ticker (`LeaseRenewGuard`) while task active |
+| S118 | E2E negative lease paths (`renew` w/o acquire, expired TTL, wrong owner) |
+| S119 | Admin jobs lease columns polish (`#epoch`, tooltips, i18n EN/UK) |
 
 *Pricing live fetch (PH-S102) і protocol middleware (PH-S103) — §4.2 / §9, не lease wire.*
+
+#### 4.3.1.1 Worker lease heartbeat (wire, PH-S116 / PH-S121)
+
+**Не плутати** з discovery heartbeat: `POST /api/v1/discovery/heartbeat-remote` — capacity/load для peer registry (§2.3). **Job lease heartbeat** — продовження `lease_expires_at` через `POST /api/v1/jobs/{id}/lease/renew` поки worker виконує задачу з активним lease.
+
+| Env (coordinator + worker) | Default | Призначення |
+|----------------------------|---------|-------------|
+| `POOLAI_JOB_LEASE_TTL_SECS` | `90` | TTL при acquire/renew; продовжує `lease_expires_at` |
+| `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` | `lease_ttl / 3` (cap ≤ TTL) | Інтервал ticker у worker; override PH-S111 |
+
+Обидва процеси читають [`JobLeaseConfig::from_env()`](../../src/job/lease_config.rs) — worker і coordinator мають узгоджені значення на одному стенді.
+
+**Task payload contract** (`virtual_nodes` task → `poolai-worker`):
+
+| Поле | Тип | Примітка |
+|------|-----|----------|
+| `job_id` | string | Job id для renew URL |
+| `lease_epoch` | u64 | CAS epoch (root) |
+| `lease.epoch` | u64 | Альтернатива (nested) |
+
+Якщо `job_id` + epoch відсутні — ticker **не** стартує (задача без job lease binding).
+
+**Runtime (`src/bin/poolai-worker.rs`, PH-S116):**
+
+1. На старті `execute_task`: один негайний `POST …/lease/renew` з поточним `lease_epoch`.
+2. `LeaseRenewGuard` — `tokio::interval(lease_renew_interval_secs)`; кожен tick → той самий renew.
+3. На drop guard (кінець задачі) — `abort()` фонового ticker.
+4. **409** / `lease_epoch_rejected` / `lease_already_active` / `lease_not_found` → loop **зупиняється** (warn log); інші помилки — retry на наступному tick.
+
+**HTTP wire:**
+
+```http
+POST /api/v1/jobs/{job_id}/lease/renew
+Content-Type: application/json
+
+{ "lease_epoch": <u64> }
+```
+
+→ `200` + оновлений `job.lease_expires_at` (epoch без змін); `409 lease_epoch_rejected` | `409 lease_expired` | `400` без попереднього acquire.
+
+**Ops:** e2e stand sets `POOLAI_JOB_LEASE_TTL_SECS=2` (`bin/e2e-playwright.sh`) для швидких expired-тестів (PH-S118).
+
+**Rust reference:**
+
+| Модуль | Роль |
+|--------|------|
+| [`src/job/lease_config.rs`](../../src/job/lease_config.rs) | TTL + renew interval env |
+| [`src/job/lease_acquire.rs`](../../src/job/lease_acquire.rs) | `renew_lease_on_record` (coordinator) |
+| [`src/network/api/jobs.rs`](../../src/network/api/jobs.rs) | `POST /jobs/{id}/lease/renew` handler |
+| [`src/bin/poolai-worker.rs`](../../src/bin/poolai-worker.rs) | `LeaseRenewGuard`, `run_lease_renew_ticker` |
 
 - `lease_ttl`: базовий час володіння lease (наприклад 30-120 с, профільно за типом job).
 - `lease_renew_interval`: heartbeat/renew до `lease_ttl/3`.
@@ -662,7 +715,8 @@ Telegram edge desktop worker може бути скомпрометований,
 
 | Check | Джерело | Fail action |
 |-------|---------|-------------|
-| Heartbeat + resource telemetry | worker `telemetry` (§2.3) | `worker_unhealthy` → re-migrate (§4.3.3) |
+| Discovery heartbeat + resource telemetry | `heartbeat-remote` (§2.3) | `worker_unhealthy` → re-migrate (§4.3.3) |
+| Job lease renew heartbeat | `poolai-worker` ticker (§4.3.1.1) | `lease_expired` якщо renew не встигає до TTL |
 | Task probe (MVP) | `raid_artifact_probe` task kind (FM-016++, `virtual_node_executor`) | downgrade trust / block GPU jobs |
 | Origin policy | `origin=telegram_edge` | вимагає verification tier ≥ `baseline` |
 

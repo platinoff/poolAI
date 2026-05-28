@@ -1,11 +1,11 @@
 {
-  "revision": 43,
+  "revision": 45,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S119",
-  "git_head": "fadf259f",
+  "last_sprint_closed": "PH-S121",
+  "git_head": "803ffaba",
   "vision_ui_rev": 49,
   "galaxy_background": "vision2.png",
-  "next_sprint": "PH-S120",
+  "next_sprint": "PH-S122",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -21,7 +21,7 @@
       "path": "docs/concept/POOLAI_GALAXY_GRID.md",
       "layer": "L0",
       "sections": ["1-3 roles", "4 scheduling", "5 locality", "6 verify", "9 governance"],
-      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S58", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63", "PH-S64"]
+      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S58", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63", "PH-S64", "PH-S121"]
     },
     {
       "id": "memory_layer",
@@ -257,8 +257,8 @@
       "label": "bin/poolai-worker.rs",
       "path": "src/bin/poolai-worker.rs",
       "layer": "L3",
-      "sprints": ["FM-016", "PH-S65", "PH-S106", "PH-S116"],
-      "sections": ["register/heartbeat", "task executor", "lease renew ticker"]
+      "sprints": ["FM-016", "PH-S65", "PH-S106", "PH-S116", "PH-S121"],
+      "sections": ["register/heartbeat", "task executor", "lease renew ticker", "§4.3.1.1 wire"]
     },
     {
       "id": "galaxy_roadmap",
@@ -276,11 +276,60 @@
       "sections": ["crate root", "pub mod re-exports"]
     },
     {
+      "id": "solana_concept",
+      "label": "SOLANA_ADAPTER_CONCEPT",
+      "path": "docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md",
+      "layer": "L1",
+      "sprints": ["PH-S120"],
+      "sections": ["FM-010", "FM-033", "core vs adapter"]
+    },
+    {
+      "id": "job_onchain",
+      "label": "job/onchain.rs",
+      "path": "src/job/onchain.rs",
+      "layer": "L3",
+      "sprints": ["PH-S38", "PH-S120"],
+      "sections": ["NDJSON epics", "POOLAI_ONCHAIN_EVENTS_DIR"]
+    },
+    {
+      "id": "job_domain_events",
+      "label": "job/domain_events.rs",
+      "path": "src/job/domain_events.rs",
+      "layer": "L3",
+      "sprints": ["PH-S38", "PH-S120"],
+      "sections": ["schema v1", "sidecar wire"]
+    },
+    {
       "id": "crate_solana",
       "label": "poolai-solana-adapter",
       "path": "crates/poolai-solana-adapter/Cargo.toml",
       "layer": "L4",
-      "sprints": ["PH-S120"]
+      "sprints": ["FM-010", "FM-024", "FM-033", "PH-S46", "PH-S120"],
+      "sections": ["workspace member", "no solana-sdk in poolai"]
+    },
+    {
+      "id": "solana_events",
+      "label": "adapter/events.rs",
+      "path": "crates/poolai-solana-adapter/src/events.rs",
+      "layer": "L4",
+      "sprints": ["FM-010", "PH-S120"],
+      "sections": ["JobCompleted", "SeedProvided", "MemoryUpdated"]
+    },
+    {
+      "id": "solana_sidecar",
+      "label": "bin/poolai-solana-adapter",
+      "path": "crates/poolai-solana-adapter/src/bin/poolai-solana-adapter.rs",
+      "layer": "L4",
+      "sprints": ["FM-024", "FM-033", "PH-S120"],
+      "sections": ["NDJSON stdin", "RPC ack stdout"]
+    },
+    {
+      "id": "solana_program",
+      "label": "poolai-events BPF",
+      "path": "crates/poolai-solana-adapter/program/poolai-events/Cargo.toml",
+      "layer": "L4",
+      "sprints": ["FM-033", "PH-S46", "PH-S120"],
+      "sections": ["PoolAiInstruction", "devnet deploy"]
     },
     {
       "id": "cargo_toml",
@@ -340,6 +389,18 @@
     { "from": "poolai_worker", "to": "grid_dispatch", "kind": "implements" },
     { "from": "lib_root", "to": "job_types", "kind": "crate" },
     { "from": "cargo_toml", "to": "crate_solana", "kind": "workspace" },
-    { "from": "fm", "to": "cargo_toml", "kind": "catalog" }
+    { "from": "fm", "to": "cargo_toml", "kind": "catalog" },
+    { "from": "digest", "to": "solana_concept", "kind": "catalog" },
+    { "from": "fm", "to": "solana_concept", "kind": "concept-ref" },
+    { "from": "solana_concept", "to": "crate_solana", "kind": "implements" },
+    { "from": "lib_root", "to": "job_domain_events", "kind": "crate" },
+    { "from": "lib_root", "to": "job_onchain", "kind": "crate" },
+    { "from": "job_domain_events", "to": "job_onchain", "kind": "implements" },
+    { "from": "job_onchain", "to": "solana_sidecar", "kind": "wire" },
+    { "from": "crate_solana", "to": "solana_events", "kind": "crate" },
+    { "from": "crate_solana", "to": "solana_sidecar", "kind": "crate" },
+    { "from": "crate_solana", "to": "solana_program", "kind": "crate" },
+    { "from": "galaxy_grid", "to": "job_onchain", "kind": "concept-ref" },
+    { "from": "handoff", "to": "solana_concept", "kind": "session-tracks" }
   ]
 }

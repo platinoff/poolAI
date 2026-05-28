@@ -116,6 +116,21 @@
 | [`development/JOB_LAYER_CONCEPT_2026-03-17.md`](../development/JOB_LAYER_CONCEPT_2026-03-17.md) | Job / mining layer, життєвий цикл job. |
 | [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md) | Grid protocol: типи повідомлень, Discovery/RAID/тести. |
 | [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) | Solana adapter: core vs on-chain, події Job/Memory. |
+| [`vision/manifest.json`](../vision/manifest.json) | **Galaxy map** — вузли `crate_solana`, `job_onchain`, sidecar/program (PH-S120); `bin/open-docs-vision.ps1`. |
+
+### Solana adapter — модулі (FM-010 / FM-024 / FM-033, PH-S120)
+
+Канон концепту: [`SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) · FM **FM-033** ✅ · карта: [`docs/vision/`](../vision/) (`solana_concept` → `crate_solana` → sidecar/program).
+
+| Модуль | Шлях | Функція | Wire |
+|--------|------|---------|------|
+| **Domain events (core)** | `src/job/domain_events.rs`, `src/job/onchain.rs` | NDJSON epics (`JobCompleted`, …); `POOLAI_ONCHAIN_EVENTS_DIR`; **без** `solana-sdk` у `poolai` | stdout/file → sidecar stdin |
+| **Adapter crate** | `crates/poolai-solana-adapter/` | Events v1, `SidecarProcessor`, mock RPC (FM-024), devnet submit (FM-033) | TOML config + env |
+| **Sidecar binary** | `poolai-solana-adapter` | NDJSON line in → RPC ack JSON out | `tail -f data/onchain/events.ndjson \| poolai-solana-adapter` |
+| **On-chain program** | `program/poolai-events/` | BPF `PoolAiInstruction` (Borsh); deploy via Solana CLI | devnet only |
+| **Wire limits** | `wire/limits.rs`, `src/wire_limits.rs` | Shared limits adapter + BPF (PH-S46) | — |
+
+**Перевірка:** `cargo test -p poolai-solana-adapter -p poolai-events -j 1` (не повний `test-ci`, якщо main `src/` не змінювався).
 
 ### Horizon wire-шар (код, S35–S38)
 
@@ -144,6 +159,7 @@
 | **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
 | **Grid pricing API** | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (task/model/unit); oracle from `galaxy_pricing_oracle` (PH-S78…S83) | `grid.rs` + `galaxy_pricing_oracle` tests |
 | **Job lease wire** | `src/job/types.rs`, `lease_config.rs`, `lease_acquire.rs`, `src/network/api/jobs.rs` | TTL env; acquire on schedule + `POST /jobs/{id}/lease`; PATCH CAS → `409 lease_epoch_rejected` (PH-S94…S98) | `lease_tests`, `jobs_api_contracts` |
+| **Worker lease ticker** | `src/bin/poolai-worker.rs` | `LeaseRenewGuard` → periodic `POST /jobs/{id}/lease/renew`; payload `job_id` + `lease_epoch`; env `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` (PH-S116, Galaxy §4.3.1.1) | `cargo test --bin poolai-worker` |
 
 **Admin UI (Galaxy ops, read-only):**
 
