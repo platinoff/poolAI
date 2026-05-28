@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S111 ✅ · HEAD `ea7b9957` PH-S110; §5.12 PH-S112) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S113…S115 ✅ vision rev 38 · §5.12 **10** відкритих PH-S112…S124) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -80,7 +80,10 @@
 **PH-S109 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §4.3 — compact implemented table PH-S94…S108; §4.3.2 wire note; roadmap смуга PH-S100…S109 **10/10 ✅**; replenish PH-S110…S112 у FM §5.12.
 **PH-S110 ✅ (code):** `GridResultBody.lease_epoch` + `check_grid_result_lease_epoch` on grid `Result` ingest; `409 lease_epoch_rejected` when mismatch or missing on leased job; `http_status_for_app_error` maps lease RestError → 409; unit tests in `dispatch.rs` + `lease_tests`; `cargo test-ci`.
 **PH-S111 ✅ (code):** `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` — optional renew interval override in `JobLeaseConfig::from_env()` (default `lease_ttl/3`, capped at TTL); HANDOFF §2a; unit tests; `cargo test-ci`.
-**Черга:** §5.12 **PH-S112** (1 відкритий) — grid Job envelope E2E.
+**PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
+**PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
+**PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
+**Черга:** §5.12 **10** відкритих — **PH-S112** (grid Job envelope E2E) + **PH-S116…S124** (lease worker ticker, E2E negatives, admin/UI/docs).
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

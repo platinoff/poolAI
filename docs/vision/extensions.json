@@ -1,8 +1,8 @@
 {
-  "revision": 19,
+  "revision": 20,
   "updated_at": "2026-05-28",
   "active_sprint": "PH-S112",
-  "ui_version": 3,
+  "ui_version": 4,
   "extension_policy": {
     ".md": {
       "sync_on": ["sprint_close", "handoff_update", "fm_5_11_update", "galaxy_grid_section_change"],

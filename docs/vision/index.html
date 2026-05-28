@@ -35,6 +35,8 @@
             <span><i style="background: var(--L1)"></i> L1 Ops</span>
             <span><i style="background: var(--L2)"></i> L2 Catalog</span>
             <span><i style="background: var(--L3)"></i> L3 Code</span>
+            <span><i style="background: var(--L4)"></i> L4 Libs</span>
+            <span><i style="background: var(--L5)"></i> L5 Workspace</span>
           </div>
         </section>
         <section class="panel" data-panel="map" aria-label="Interactive map">
@@ -46,8 +48,17 @@
               alt=""
               onerror="this.style.display='none'"
             />
-            <span class="map-hint">click node · manifest graph</span>
-            <svg id="map-svg" viewBox="0 0 900 480" role="img" aria-label="Documentation graph"></svg>
+            <div class="map-toolbar" aria-label="Map filters">
+              <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)">◎ Sprint</button>
+              <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse folders with 5+ files">⊟ Folders</button>
+            </div>
+            <div class="map-controls" aria-label="Map zoom">
+              <button type="button" id="map-zoom-in" title="Zoom in">+</button>
+              <button type="button" id="map-zoom-out" title="Zoom out">−</button>
+              <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
+            </div>
+            <span class="map-hint">wheel · drag · folder click expand</span>
+            <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
         <section class="panel" data-panel="links" aria-label="Links">

@@ -6,7 +6,7 @@
 
 | Файл | Призначення |
 |------|-------------|
-| [`vision.svg`](./vision.svg) | Статична ізометрична схема шарів L0–L3 (concept → ops → catalog → code) |
+| [`vision.svg`](./vision.svg) | Статична ізометрична схема шарів L0–L5 (concept → ops → catalog → code → libs → workspace) |
 | [`manifest.json`](./manifest.json) | Граф вузлів і ребер (machine-readable); джерело для HTML |
 | [`extensions.json`](./extensions.json) | Актуальність розширень і scope спринту (що синхронізувати) |
 | [`index.html`](./index.html) | **Galaxy UI** — starfield, інтерактивна карта з `manifest.json`, radial link graph, 3D layers, preview, fullscreen панелей |
@@ -63,3 +63,29 @@ http://127.0.0.1:8765/docs/vision/index.html
 | L1 | Operations | HANDOFF, NEXT_SESSION_PROMPT |
 | L2 | Catalog | FUNCTION_MANAGEMENT, DIGEST |
 | L3 | Code | `src/grid/`, virtual_nodes API |
+| L4 | Lib roots | `src/lib.rs`, `crates/poolai-solana-adapter/` |
+| L5 | Workspace | `Cargo.toml`, `.cargo/config.toml` (найнижчий шар на карті) |
+
+## Galaxy map (навігація)
+
+- **Колесо миші** — zoom у межах SVG (не масштаб сторінки браузера).
+- **Drag** по порожньому фону карти — pan.
+- **Подвійний клік** на вузол — focus/zoom на об’єкт.
+- Кнопки **+ / − / ⌂** — zoom in/out/reset.
+- Ребра: **зелений** docs, **рожевий** code, **бірюзовий** toml, **фіолетовий** mixed — ортогональний маршрут через «folder hub».
+- **Щільні шари (L3+):** вузли групуються за папкою (`src/grid/`, `src/job/`, …) у міні-сітку 2–3 ряди, а не в одну лінію.
+
+## Масштабування (великий репо)
+
+Карта **росте ітераційно** разом із PH-S*: у `manifest.json` додаються лише вузли/ребра поточного scope (доки + код спринту), а не весь `src/` одразу.
+
+| Механізм | Дія |
+|----------|-----|
+| **⊟ Folders** (увімкнено за замовч.) | папки з **≥5** файлами згортаються в один hub; **клік** — розгорнути, **dblclick** — розгорнути + zoom |
+| **◎ Sprint** | тьмяні вузли/ребра поза `active_sprint` з `extensions.json` |
+| Кластер + сітка | ≤4 файли на шар — ряд; більше — сітка 2–3 колонки |
+| pan/zoom | навігація по великій карті |
+
+Налаштування зберігаються в `localStorage` (`poolai-vision-map-prefs`).
+
+**Після кожного спринту:** `revision++`, нові `nodes`/`edges`, `extensions.json` → `active_sprint`. Див. `docs-vision.mdc`.

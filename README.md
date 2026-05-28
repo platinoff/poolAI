@@ -12,8 +12,9 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 |----|-----|
 | **Запуск** | PowerShell у корені: `.\bin\open-docs-vision.ps1` |
 | **URL** | `http://127.0.0.1:8765/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
-| **Панелі** | 3D-шари L0–L3 · інтерактивна Galaxy map · граф зв’язків · preview `.md` |
-| **Auto-reload** | Кнопка **Auto** (1.5 с): зміни `manifest.json` / docs оновлюють UI без F5 |
+| **Панелі** | 3D-шари **L0–L5** (concept → workspace TOML) · Galaxy map · граф зв’язків · preview |
+| **Map UX** | pan/zoom (тачпад ~6%/крок, кнопки 16%) · **⊟ Folders** (згортання 5+ файлів) · **◎ Sprint** |
+| **Auto-reload** | Кнопка **Auto** (1.5 с): `manifest.json` / `extensions.json` без F5 |
 
 Деталі: [`docs/vision/README.md`](docs/vision/README.md) · правило агента [`.cursor/rules/docs-vision.mdc`](.cursor/rules/docs-vision.mdc). Статична схема: [`docs/vision/vision.svg`](docs/vision/vision.svg).
 
@@ -42,7 +43,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 6. **Архітектура** — [`docs/ARCHITECTURE_REVIEW.md`](docs/ARCHITECTURE_REVIEW.md), [`docs/ARCHITECTURE_BEST_PRACTICES.md`](docs/ARCHITECTURE_BEST_PRACTICES.md).
 7. **Продуктивність** — [`docs/performance/BENCHMARKS.md`](docs/performance/BENCHMARKS.md), [`docs/performance/PROFILING.md`](docs/performance/PROFILING.md); опційні прогони Criterion: [`.github/workflows/benchmarks.yml`](.github/workflows/benchmarks.yml); HTTP health load — in-tree **`poolai_health_load`** (опційно **`--json`** на stdout для baseline; див. `BENCHMARKS.md`).
 8. **CI** — обов’язкові перевірки: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`); повний список файлів: `git ls-files`.
+9. **Інвентар** — [`file_list.csv`](file_list.csv) (ручний зріз; оновлюй після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`, **`docs/vision/`**); повний список: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](.cursor/commands/git-push.md) (MSYS2 bash, PATH, змінні для cloud-sdk).
 11. **Витяг функціоналу** — [`docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md`](docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення можливостей за доками та кодом; OpenAPI може бути неповним).
 12. **Керування функціоналом** — [`docs/catalog/FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) (індекс vs сталевий стан, прогалини, чернетки тікетів `FM-*`); правило агента — [`.cursor/rules/functionality-management.mdc`](.cursor/rules/functionality-management.mdc).
@@ -51,7 +52,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S109 ✅ (lease MVP + E2E + grid ingest + §4.3 docs). **Активна черга:** FM **§5.12** — **PH-S112** (grid Job envelope E2E) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S111 ✅ (lease MVP + grid CAS + renew interval env). **Vision:** PH-S113…S115 ✅ (`docs/vision/` rev 38). **Активна черга:** FM **§5.12** — **10** відкритих **PH-S112, PH-S116…S124** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -81,7 +82,7 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 **Закрито:** PH-S03…S109 (Galaxy Grid lease wire MVP, смуга PH-S100…S109 **10/10**). Концепт §4.3 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
 
-**Активна черга (FM §5.12):** **PH-S110…S112** (post-lease wire) — 3 відкритих ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
+**Активна черга (FM §5.12):** **10** відкритих — **PH-S112** (grid Job envelope E2E) + **PH-S116…S124**; закрито vision **PH-S113…S115** ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 

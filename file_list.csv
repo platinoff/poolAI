@@ -486,6 +486,14 @@ docs/troubleshooting/RUST_VERSION_ISSUE.md
 docs/UI_IMPROVEMENTS_PLAN.md
 docs/vm/ISOLATION_IMPLEMENTATION.md
 docs/WORKSPACE_CLEANUP.md
+docs/vision/extensions.json
+docs/vision/index.html
+docs/vision/manifest.json
+docs/vision/README.md
+docs/vision/vision.css
+docs/vision/vision.js
+docs/vision/vision.svg
+docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md
 e2e/package.json
 e2e/package-lock.json
 e2e/playwright.config.ts

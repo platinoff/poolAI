@@ -3,13 +3,34 @@
   "use strict";
 
   const VISION_BASE = "/docs/vision/";
-  const LAYER_Y = { L0: 95, L1: 195, L2: 295, L3: 395 };
+  const MAP_W = 900;
+  const MAP_H = 520;
+  const MAP_MIN_SCALE = 0.35;
+  const MAP_MAX_SCALE = 4;
+  /** Trackpad wheel: half of original fixed ±12% → ~6% max per event */
+  const MAP_WHEEL_SENSITIVITY = 0.00145;
+  const MAP_WHEEL_STEP_MIN = 0.943;
+  const MAP_WHEEL_STEP_MAX = 1.06;
+
+  let LAYER_Y = {};
   const LAYER_COLORS = {
     L0: "#3d6a9e",
     L1: "#3d6a4a",
     L2: "#8a7040",
     L3: "#8a4068",
+    L4: "#6a5088",
+    L5: "#4a6880",
   };
+
+  let mapView = { tx: 0, ty: 0, scale: 1 };
+  let mapNavBound = false;
+
+  const CLUSTER_COLLAPSE_MIN = 5;
+  const MAP_PREFS_KEY = "poolai-vision-map-prefs";
+  let autoCollapseDense = true;
+  let mapSprintFocus = false;
+  let expandedClusters = new Set();
+  let clusterLabelPositions = [];
 
   const WATCH_INTERVAL_MS = 1500;
 
@@ -39,7 +60,315 @@
     if (e === "md") return "ext-md";
     if (e === "rs") return "ext-rs";
     if (e === "json") return "ext-json";
+    if (e === "toml") return "ext-toml";
     return "ext-other";
+  }
+
+  function syncLayerGeometry(m) {
+    const ids = (m.layers || []).map((l) => l.id);
+    const top = 58;
+    const bottom = MAP_H - 48;
+    if (!ids.length) return;
+    ids.forEach((id, i) => {
+      LAYER_Y[id] =
+        ids.length === 1
+          ? (top + bottom) / 2
+          : top + (i / (ids.length - 1)) * (bottom - top);
+    });
+  }
+
+  function loadMapPrefs() {
+    try {
+      const raw = localStorage.getItem(MAP_PREFS_KEY);
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      if (typeof p.autoCollapseDense === "boolean") {
+        autoCollapseDense = p.autoCollapseDense;
+      }
+      if (typeof p.mapSprintFocus === "boolean") {
+        mapSprintFocus = p.mapSprintFocus;
+      }
+      expandedClusters = new Set(p.expandedClusters || []);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function saveMapPrefs() {
+    try {
+      localStorage.setItem(
+        MAP_PREFS_KEY,
+        JSON.stringify({
+          autoCollapseDense,
+          mapSprintFocus,
+          expandedClusters: Array.from(expandedClusters),
+        })
+      );
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function clusterStoreId(layer, key) {
+    return layer + "::" + key;
+  }
+
+  function isClusterCollapsed(layer, key, count) {
+    if (count < CLUSTER_COLLAPSE_MIN) return false;
+    if (!autoCollapseDense) return false;
+    return !expandedClusters.has(clusterStoreId(layer, key));
+  }
+
+  function toggleCluster(layer, key) {
+    const id = clusterStoreId(layer, key);
+    if (expandedClusters.has(id)) expandedClusters.delete(id);
+    else expandedClusters.add(id);
+    saveMapPrefs();
+    renderMap();
+  }
+
+  function clusterDisplayName(key) {
+    if (!key || key === "other") return "other";
+    const parts = key.split("/");
+    return parts.length > 2 ? parts.slice(-2).join("/") : key;
+  }
+
+  function mapPosForNode(nodeId) {
+    const p = nodePositions.get(nodeId);
+    if (!p) return null;
+    if (p.collapsedHidden && p.hubId) return nodePositions.get(p.hubId);
+    return p;
+  }
+
+  function mapNodeDimmed(node) {
+    return (
+      mapSprintFocus && activeSprint && !nodeInActiveSprint(node)
+    );
+  }
+
+  function folderCluster(path) {
+    if (!path) return "other";
+    const parts = path.split("/").filter(Boolean);
+    if (parts[0] === "docs" && parts.length >= 2) {
+      return parts.slice(0, 2).join("/");
+    }
+    if (parts[0] === "src" && parts.length >= 2) {
+      return parts[0] + "/" + parts[1];
+    }
+    if (parts[0] === "crates" && parts.length >= 2) {
+      return parts.slice(0, 2).join("/");
+    }
+    if (parts[0] === ".cargo") return ".cargo";
+    return parts[0] || "root";
+  }
+
+  function pathKind(path) {
+    if (!path) return "other";
+    if (path.startsWith("docs/")) return "docs";
+    if (
+      path.startsWith("src/") ||
+      path.startsWith("crates/") ||
+      /\.rs$/i.test(path)
+    ) {
+      return "code";
+    }
+    if (/\.toml$/i.test(path) || path.startsWith(".cargo/")) return "toml";
+    return "other";
+  }
+
+  function commonPathPrefix(a, b) {
+    if (!a || !b) return "";
+    const pa = a.split("/");
+    const pb = b.split("/");
+    const out = [];
+    for (let i = 0; i < pa.length && i < pb.length; i++) {
+      if (pa[i] !== pb[i]) break;
+      out.push(pa[i]);
+    }
+    return out.join("/");
+  }
+
+  function folderHubX(key) {
+    const s = key || "root";
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+    return 120 + (Math.abs(h) % 660);
+  }
+
+  function folderLaneY(kind, ay, by) {
+    if (kind === "docs") return LAYER_Y.L1 || (ay + by) / 2;
+    if (kind === "code") return LAYER_Y.L3 || (ay + by) / 2;
+    if (kind === "toml") return LAYER_Y.L5 || (ay + by) / 2;
+    return (ay + by) / 2;
+  }
+
+  function edgeRouteKind(nodeA, nodeB) {
+    const ka = pathKind(nodeA && nodeA.path);
+    const kb = pathKind(nodeB && nodeB.path);
+    if (ka === kb && ka !== "other") return ka;
+    if (ka === "docs" || kb === "docs") {
+      if (ka === "code" || kb === "code") return "mixed";
+      if (ka === "docs" || kb === "docs") return "docs";
+    }
+    if (ka === "code" || kb === "code") return "code";
+    if (ka === "toml" || kb === "toml") return "toml";
+    return "mixed";
+  }
+
+  function buildEdgePath(a, b, nodeA, nodeB) {
+    const prefix = commonPathPrefix(nodeA.path, nodeB.path);
+    const kind = edgeRouteKind(nodeA, nodeB);
+    const hubX = folderHubX(prefix || nodeA.path.split("/")[0]);
+    const laneY = folderLaneY(kind, a.y, b.y);
+    const y1 = a.y < b.y ? Math.min(a.y, laneY) : Math.max(a.y, laneY);
+    const y2 = b.y < a.y ? Math.min(b.y, laneY) : Math.max(b.y, laneY);
+    const midY = (y1 + y2) / 2;
+    return (
+      "M" +
+      a.x +
+      "," +
+      a.y +
+      " L" +
+      a.x +
+      "," +
+      midY +
+      " L" +
+      hubX +
+      "," +
+      midY +
+      " L" +
+      hubX +
+      "," +
+      b.y +
+      " L" +
+      b.x +
+      "," +
+      b.y
+    );
+  }
+
+  function applyMapTransform() {
+    const world = document.getElementById("map-world");
+    if (!world) return;
+    world.setAttribute(
+      "transform",
+      "translate(" +
+        mapView.tx +
+        "," +
+        mapView.ty +
+        ") scale(" +
+        mapView.scale +
+        ")"
+    );
+  }
+
+  function resetMapView() {
+    mapView = { tx: 0, ty: 0, scale: 1 };
+    applyMapTransform();
+  }
+
+  function normalizeWheelDelta(deltaY, deltaMode) {
+    if (deltaMode === 1) return deltaY * 18;
+    if (deltaMode === 2) return deltaY * 280;
+    return deltaY;
+  }
+
+  function wheelZoomFactor(deltaY, deltaMode) {
+    const dy = normalizeWheelDelta(deltaY, deltaMode);
+    let factor = Math.exp(-dy * MAP_WHEEL_SENSITIVITY);
+    return Math.min(
+      MAP_WHEEL_STEP_MAX,
+      Math.max(MAP_WHEEL_STEP_MIN, factor)
+    );
+  }
+
+  function zoomMapAt(sx, sy, factor) {
+    const ns = Math.min(
+      MAP_MAX_SCALE,
+      Math.max(MAP_MIN_SCALE, mapView.scale * factor)
+    );
+    const ratio = ns / mapView.scale;
+    mapView.tx = sx - ratio * (sx - mapView.tx);
+    mapView.ty = sy - ratio * (sy - mapView.ty);
+    mapView.scale = ns;
+    applyMapTransform();
+  }
+
+  function focusMapNode(node) {
+    const pos = nodePositions.get(node.id);
+    if (!pos) return;
+    mapView.scale = 1.65;
+    mapView.tx = MAP_W / 2 - pos.x * mapView.scale;
+    mapView.ty = MAP_H / 2 - pos.y * mapView.scale;
+    applyMapTransform();
+  }
+
+  function bindMapNavigation(svg) {
+    const wrap = svg.closest(".map-wrap");
+    if (!wrap || mapNavBound) return;
+    mapNavBound = true;
+
+    wrap.addEventListener(
+      "wheel",
+      (ev) => {
+        if (!ev.target.closest("#map-svg")) return;
+        ev.preventDefault();
+        const rect = svg.getBoundingClientRect();
+        const sx = ((ev.clientX - rect.left) / rect.width) * MAP_W;
+        const sy = ((ev.clientY - rect.top) / rect.height) * MAP_H;
+        zoomMapAt(sx, sy, wheelZoomFactor(ev.deltaY, ev.deltaMode));
+      },
+      { passive: false }
+    );
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    wrap.addEventListener("mousedown", (ev) => {
+      if (ev.button !== 0 || ev.target.closest(".node")) return;
+      dragging = true;
+      lastX = ev.clientX;
+      lastY = ev.clientY;
+      wrap.classList.add("map-panning");
+    });
+    window.addEventListener("mousemove", (ev) => {
+      if (!dragging) return;
+      const rect = svg.getBoundingClientRect();
+      const scaleX = MAP_W / rect.width;
+      const scaleY = MAP_H / rect.height;
+      mapView.tx += (ev.clientX - lastX) * scaleX;
+      mapView.ty += (ev.clientY - lastY) * scaleY;
+      lastX = ev.clientX;
+      lastY = ev.clientY;
+      applyMapTransform();
+    });
+    window.addEventListener("mouseup", () => {
+      dragging = false;
+      wrap.classList.remove("map-panning");
+    });
+
+    const zi = document.getElementById("map-zoom-in");
+    const zo = document.getElementById("map-zoom-out");
+    const zr = document.getElementById("map-zoom-reset");
+    if (zi) {
+      zi.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        zoomMapAt(MAP_W / 2, MAP_H / 2, 1.16);
+      });
+    }
+    if (zo) {
+      zo.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        zoomMapAt(MAP_W / 2, MAP_H / 2, 1 / 1.16);
+      });
+    }
+    if (zr) {
+      zr.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        resetMapView();
+      });
+    }
   }
 
   function extLabel(path) {
@@ -202,8 +531,117 @@
     });
   }
 
+  function layoutLayerRow(list, baseY, layer) {
+    const count = list.length;
+    const span = Math.min(MAP_W - 64, Math.max(140, count * 96));
+    const x0 = MAP_W / 2 - span / 2;
+    list.forEach((n, i) => {
+      const x =
+        count === 1 ? MAP_W / 2 : x0 + (i / Math.max(1, count - 1)) * span;
+      nodePositions.set(n.id, { x, y: baseY, layer });
+    });
+  }
+
+  function layoutLayerClusters(list, baseY, layer) {
+    const clusters = new Map();
+    list.forEach((n) => {
+      const key = folderCluster(n.path);
+      if (!clusters.has(key)) clusters.set(key, []);
+      clusters.get(key).push(n);
+    });
+
+    const clusterKeys = Array.from(clusters.keys()).sort();
+    const maxCols = layer === "L3" ? 3 : 4;
+    const cellW = layer === "L3" ? 78 : 68;
+    const cellH = 34;
+    const clusterGap = 28;
+    const clusterPad = 12;
+    const collapsedW = 64;
+
+    const clusterLayouts = clusterKeys.map((key) => {
+      const nodes = clusters
+        .get(key)
+        .slice()
+        .sort((a, b) => a.label.localeCompare(b.label));
+      const collapsed = isClusterCollapsed(layer, key, nodes.length);
+      const cols = Math.min(maxCols, nodes.length);
+      const rows = Math.ceil(nodes.length / cols);
+      const w = collapsed ? collapsedW : cols * cellW + clusterPad * 2;
+      return { key, nodes, cols, rows, w, collapsed };
+    });
+
+    const totalW =
+      clusterLayouts.reduce((s, c) => s + c.w, 0) +
+      clusterGap * Math.max(0, clusterLayouts.length - 1);
+    let xCursor = MAP_W / 2 - totalW / 2;
+    clusterLabelPositions = [];
+
+    clusterLayouts.forEach((cl) => {
+      const cx = xCursor + cl.w / 2;
+      if (cl.collapsed) {
+        const hub = cl.nodes[0];
+        const hubId = hub.id;
+        cl.nodes.forEach((n, i) => {
+          if (i === 0) {
+            nodePositions.set(n.id, {
+              x: cx,
+              y: baseY,
+              layer,
+              cluster: cl.key,
+              clusterHub: true,
+              clusterCount: cl.nodes.length,
+            });
+          } else {
+            nodePositions.set(n.id, {
+              x: cx,
+              y: baseY,
+              layer,
+              cluster: cl.key,
+              collapsedHidden: true,
+              hubId,
+            });
+          }
+        });
+        clusterLabelPositions.push({
+          x: cx,
+          y: baseY - 22,
+          key: cl.key,
+          layer,
+          collapsed: true,
+          count: cl.nodes.length,
+        });
+      } else {
+        const topY = baseY - ((cl.rows - 1) / 2) * cellH;
+        if (cl.nodes.length > 1) {
+          clusterLabelPositions.push({
+            x: cx,
+            y: topY - 18,
+            key: cl.key,
+            layer,
+            collapsed: false,
+            count: cl.nodes.length,
+          });
+        }
+        cl.nodes.forEach((n, i) => {
+          const col = i % cl.cols;
+          const row = Math.floor(i / cl.cols);
+          const x = xCursor + clusterPad + col * cellW + cellW / 2;
+          const y = baseY + (row - (cl.rows - 1) / 2) * cellH;
+          nodePositions.set(n.id, {
+            x,
+            y,
+            layer,
+            cluster: cl.key,
+          });
+        });
+      }
+      xCursor += cl.w + clusterGap;
+    });
+  }
+
   function layoutNodes() {
     nodePositions.clear();
+    clusterLabelPositions = [];
     const byLayer = {};
     manifest.nodes.forEach((n) => {
       if (!byLayer[n.layer]) byLayer[n.layer] = [];
@@ -211,16 +649,41 @@
     });
     Object.keys(byLayer).forEach((layer) => {
       const list = byLayer[layer];
-      const y = LAYER_Y[layer] || 200;
-      const count = list.length;
-      const span = Math.min(520, Math.max(120, count * 100));
-      const x0 = 450 - span / 2;
-      list.forEach((n, i) => {
-        const x =
-          count === 1 ? 450 : x0 + (i / Math.max(1, count - 1)) * span;
-        nodePositions.set(n.id, { x, y, layer });
-      });
+      const baseY = LAYER_Y[layer] || 200;
+      if (list.length <= 4) {
+        layoutLayerRow(list, baseY, layer);
+      } else {
+        layoutLayerClusters(list, baseY, layer);
+      }
     });
+  }
+
+  function layerPlaneBounds(layer) {
+    let minY = Infinity;
+    let maxY = -Infinity;
+    let minX = Infinity;
+    let maxX = -Infinity;
+    manifest.nodes.forEach((n) => {
+      if (n.layer !== layer) return;
+      const p = mapPosForNode(n.id);
+      if (!p || p.collapsedHidden) return;
+      minY = Math.min(minY, p.y);
+      maxY = Math.max(maxY, p.y);
+      minX = Math.min(minX, p.x);
+      maxX = Math.max(maxX, p.x);
+    });
+    if (minY === Infinity) {
+      const y = LAYER_Y[layer] || MAP_H / 2;
+      return { cx: MAP_W / 2, cy: y, w: 480, h: 44 };
+    }
+    const spreadY = maxY - minY;
+    const spreadX = maxX - minX;
+    return {
+      cx: (minX + maxX) / 2,
+      cy: (minY + maxY) / 2,
+      w: Math.min(MAP_W - 40, Math.max(420, spreadX + 120)),
+      h: Math.max(44, spreadY + 52),
+    };
   }
 
   function planePath(cx, cy, w, h) {
@@ -248,8 +711,10 @@
   }
 
   function renderMap() {
+    syncLayerGeometry(manifest);
     layoutNodes();
     const svg = document.getElementById("map-svg");
+    svg.setAttribute("viewBox", "0 0 " + MAP_W + " " + MAP_H);
     const ns = "http://www.w3.org/2000/svg";
 
     while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -272,6 +737,14 @@
         <stop offset="0%" stop-color="#5a2d4a" stop-opacity="0.4"/>
         <stop offset="100%" stop-color="#301820" stop-opacity="0.18"/>
       </linearGradient>
+      <linearGradient id="gradL4" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4a3d5a" stop-opacity="0.42"/>
+        <stop offset="100%" stop-color="#281830" stop-opacity="0.18"/>
+      </linearGradient>
+      <linearGradient id="gradL5" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2d4a5a" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#182830" stop-opacity="0.2"/>
+      </linearGradient>
       <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="2" result="b"/>
         <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -280,80 +753,96 @@
         <feGaussianBlur stdDeviation="4" result="b"/>
         <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
-      <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <marker id="arrow-docs" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L7,3 L0,6 Z" fill="#90c490"/>
+      </marker>
+      <marker id="arrow-code" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L7,3 L0,6 Z" fill="#c49ab0"/>
+      </marker>
+      <marker id="arrow-toml" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L7,3 L0,6 Z" fill="#7eb8c4"/>
+      </marker>
+      <marker id="arrow-mixed" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
         <path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/>
       </marker>
     `;
     svg.appendChild(defs);
 
+    const world = document.createElementNS(ns, "g");
+    world.setAttribute("id", "map-world");
+
     const planes = document.createElementNS(ns, "g");
     planes.setAttribute("class", "planes");
-    [
-      { layer: "L0", cx: 450, w: 520, h: 56 },
-      { layer: "L1", cx: 450, w: 480, h: 50 },
-      { layer: "L2", cx: 450, w: 500, h: 50 },
-      { layer: "L3", cx: 450, w: 540, h: 52 },
-    ].forEach((p) => {
+    (manifest.layers || []).forEach((layer) => {
+      const bounds = layerPlaneBounds(layer.id);
+      const y = bounds.cy;
+      const w = bounds.w;
+      const h = bounds.h;
       const path = document.createElementNS(ns, "path");
-      path.setAttribute("d", planePath(p.cx, LAYER_Y[p.layer], p.w, p.h));
-      path.setAttribute("class", "plane plane-" + p.layer);
+      path.setAttribute("d", planePath(bounds.cx, y, w, h));
+      path.setAttribute("class", "plane plane-" + layer.id);
       planes.appendChild(path);
       const label = document.createElementNS(ns, "text");
       label.setAttribute("x", 28);
-      label.setAttribute("y", LAYER_Y[p.layer] + 4);
+      label.setAttribute("y", y + 4);
       label.setAttribute("fill", "#6a7a8a");
       label.setAttribute("font-size", "9");
       label.setAttribute("font-family", "Segoe UI, system-ui, sans-serif");
-      label.textContent =
-        p.layer +
-        " " +
-        (manifest.layers.find((l) => l.id === p.layer) || {}).name;
+      label.textContent = layer.id + " " + layer.name;
       planes.appendChild(label);
     });
-    svg.appendChild(planes);
+    world.appendChild(planes);
 
     const edgesG = document.createElementNS(ns, "g");
     edgesG.setAttribute("class", "edges");
     (manifest.edges || []).forEach((e) => {
-      const a = nodePositions.get(e.from);
-      const b = nodePositions.get(e.to);
+      const nodeA = nodeById(e.from);
+      const nodeB = nodeById(e.to);
+      if (!nodeA || !nodeB) return;
+      const a = mapPosForNode(e.from);
+      const b = mapPosForNode(e.to);
       if (!a || !b) return;
+      const routeKind = edgeRouteKind(nodeA, nodeB);
       const path = document.createElementNS(ns, "path");
-      const midY = (a.y + b.y) / 2;
-      const d =
-        "M" +
-        a.x +
-        "," +
-        a.y +
-        " C" +
-        a.x +
-        "," +
-        midY +
-        " " +
-        b.x +
-        "," +
-        midY +
-        " " +
-        b.x +
-        "," +
-        b.y;
-      path.setAttribute("d", d);
-      path.setAttribute("class", "edge");
+      path.setAttribute("d", buildEdgePath(a, b, nodeA, nodeB));
+      let edgeClass = "edge edge-" + routeKind;
+      if (mapNodeDimmed(nodeA) && mapNodeDimmed(nodeB)) {
+        edgeClass += " sprint-dim";
+      }
+      path.setAttribute("class", edgeClass);
       path.dataset.from = e.from;
       path.dataset.to = e.to;
+      path.dataset.route = routeKind;
       edgesG.appendChild(path);
     });
-    svg.appendChild(edgesG);
+    world.appendChild(edgesG);
+
+    const clusterLabelsG = document.createElementNS(ns, "g");
+    clusterLabelsG.setAttribute("class", "cluster-labels");
+    clusterLabelPositions.forEach((cl) => {
+      const t = document.createElementNS(ns, "text");
+      t.setAttribute("x", cl.x);
+      t.setAttribute("y", cl.y);
+      t.setAttribute("class", "cluster-label" + (cl.collapsed ? " collapsed" : ""));
+      t.textContent =
+        clusterDisplayName(cl.key) +
+        (cl.count > 1 ? " · " + cl.count : "");
+      clusterLabelsG.appendChild(t);
+    });
+    world.appendChild(clusterLabelsG);
 
     const nodesG = document.createElementNS(ns, "g");
     nodesG.setAttribute("class", "nodes");
     manifest.nodes.forEach((n) => {
       const pos = nodePositions.get(n.id);
-      if (!pos) return;
+      if (!pos || pos.collapsedHidden) return;
       const g = document.createElementNS(ns, "g");
       g.setAttribute("class", "node");
+      if (pos.clusterHub) g.classList.add("cluster-hub");
+      if (mapNodeDimmed(n)) g.classList.add("sprint-dim");
       g.dataset.id = n.id;
-      const r = n.id === "galaxy_grid" ? 14 : 10;
+      if (pos.cluster) g.dataset.cluster = pos.cluster;
+      const r = pos.clusterHub ? 13 : n.id === "galaxy_grid" ? 14 : 10;
       const circle = document.createElementNS(ns, "circle");
       circle.setAttribute("cx", pos.x);
       circle.setAttribute("cy", pos.y);
@@ -362,20 +851,54 @@
       const text = document.createElementNS(ns, "text");
       text.setAttribute("x", pos.x);
       text.setAttribute("y", pos.y + r + 12);
-      const short =
-        n.label.length > 22 ? n.label.slice(0, 20) + "…" : n.label;
-      text.textContent = short;
+      let label;
+      if (pos.clusterHub) {
+        label = clusterDisplayName(pos.cluster) + " (" + pos.clusterCount + ")";
+      } else {
+        const maxLen = pos.cluster && n.layer === "L3" ? 16 : 22;
+        label =
+          n.label.length > maxLen
+            ? n.label.slice(0, maxLen - 1) + "…"
+            : n.label;
+      }
+      text.textContent = label;
+      if (n.layer === "L3" && pos.cluster && !pos.clusterHub) {
+        text.setAttribute("font-size", "9");
+      }
+      if (pos.clusterHub) {
+        text.setAttribute("font-size", "9");
+        text.setAttribute("font-weight", "700");
+      }
       g.appendChild(circle);
       g.appendChild(text);
+      if (pos.clusterHub) {
+        g.setAttribute("title", "Click: expand folder · Shift+click: open file");
+      }
       g.addEventListener("click", (ev) => {
         ev.stopPropagation();
+        if (pos.clusterHub && !ev.shiftKey) {
+          toggleCluster(n.layer, pos.cluster);
+          return;
+        }
+        selectNode(n);
+      });
+      g.addEventListener("dblclick", (ev) => {
+        ev.stopPropagation();
+        if (pos.clusterHub) {
+          expandedClusters.add(clusterStoreId(n.layer, pos.cluster));
+          saveMapPrefs();
+          renderMap();
+        }
+        focusMapNode(n);
         selectNode(n);
       });
       nodesG.appendChild(g);
     });
-    svg.appendChild(nodesG);
+    world.appendChild(nodesG);
+    svg.appendChild(world);
 
-    svg.addEventListener("click", () => {});
+    applyMapTransform();
+    bindMapNavigation(svg);
     updateMapSelection();
   }
 
@@ -385,26 +908,39 @@
       const isSel = id === selectedId;
       const isLinked = isNodeLinked(id);
       el.classList.toggle("selected", isSel);
-      el.classList.toggle("dim", selectedId && !isSel && !isLinked);
+      el.classList.toggle(
+        "dim",
+        selectedId && !isSel && !isLinked && !el.classList.contains("sprint-dim")
+      );
       const c = el.querySelector("circle");
-      if (c && isSel) c.setAttribute("r", id === "galaxy_grid" ? 18 : 14);
+      const hub = el.classList.contains("cluster-hub");
+      if (c && isSel) {
+        c.setAttribute("r", id === "galaxy_grid" ? 18 : hub ? 16 : 14);
+      }
     });
     document.querySelectorAll("#map-svg .edge").forEach((el) => {
       const from = el.dataset.from;
       const to = el.dataset.to;
-      const hi =
-        selectedId && (from === selectedId || to === selectedId);
+      const hi = selectedId && (from === selectedId || to === selectedId);
       el.classList.toggle("highlight", hi);
     });
   }
 
   function isNodeLinked(id) {
     if (!selectedId || id === selectedId) return id === selectedId;
-    return (manifest.edges || []).some(
-      (e) =>
-        (e.from === selectedId && e.to === id) ||
-        (e.to === selectedId && e.from === id)
-    );
+    if (
+      (manifest.edges || []).some(
+        (e) =>
+          (e.from === selectedId && e.to === id) ||
+          (e.to === selectedId && e.from === id)
+      )
+    ) {
+      return true;
+    }
+    const sel = nodeById(selectedId);
+    const tgt = nodeById(id);
+    if (!sel || !tgt || sel.layer !== tgt.layer) return false;
+    return folderCluster(sel.path) === folderCluster(tgt.path);
   }
 
   function relatedEdges(nodeId) {
@@ -680,7 +1216,8 @@
         if (s.a > 1) s.a = 0;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(200, 220, 255, " + (0.15 + s.a * 0.5) + ")";
+        ctx.fillStyle =
+          "rgba(200, 220, 255, " + (0.12 + s.a * 0.4) + ")";
         ctx.fill();
       });
       requestAnimationFrame(draw);
@@ -728,7 +1265,9 @@
       manifest.next_sprint +
       "</span>";
 
+    syncLayerGeometry(manifest);
     renderLayers(manifest);
+    syncMapToolbar();
     renderMap();
 
     const tree = document.getElementById("file-tree");
@@ -808,6 +1347,43 @@
     document.body.classList.toggle("sidebar-collapsed");
   }
 
+  function syncMapToolbar() {
+    const btnSprint = document.getElementById("btn-map-sprint");
+    const btnClusters = document.getElementById("btn-map-clusters");
+    if (btnSprint) btnSprint.classList.toggle("on", mapSprintFocus);
+    if (btnClusters) btnClusters.classList.toggle("on", autoCollapseDense);
+  }
+
+  function initMapToolbar() {
+    syncMapToolbar();
+    const btnSprint = document.getElementById("btn-map-sprint");
+    const btnClusters = document.getElementById("btn-map-clusters");
+    if (btnSprint) {
+      btnSprint.addEventListener("click", () => {
+        mapSprintFocus = !mapSprintFocus;
+        saveMapPrefs();
+        syncMapToolbar();
+        renderMap();
+      });
+    }
+    if (btnClusters) {
+      btnClusters.addEventListener("click", () => {
+        autoCollapseDense = !autoCollapseDense;
+        if (!autoCollapseDense) {
+          manifest.nodes.forEach((n) => {
+            const key = folderCluster(n.path);
+            expandedClusters.add(clusterStoreId(n.layer, key));
+          });
+        } else {
+          expandedClusters = new Set();
+        }
+        saveMapPrefs();
+        syncMapToolbar();
+        renderMap();
+      });
+    }
+  }
+
   document.getElementById("btn-sidebar").addEventListener("click", toggleSidebar);
   document.getElementById("btn-sidebar2").addEventListener("click", toggleSidebar);
   document.getElementById("btn-reload").addEventListener("click", () => reloadAll(true));
@@ -815,6 +1391,8 @@
 
   initStarfield();
   initPanelFullscreen();
+  loadMapPrefs();
+  initMapToolbar();
   reloadAll(false)
     .then(() => startAutoReload())
     .catch((err) => {

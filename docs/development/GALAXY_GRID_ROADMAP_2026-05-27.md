@@ -10,12 +10,12 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S112** (1) — grid Job envelope E2E |
+| **Відкрито** | **10** — PH-S112 + PH-S116…S124 (vision PH-S113…S115 ✅) |
 | **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
-Research replenish ✅ (2026-05-28): PH-S110…S112 після закриття смуги lease/protocol.
+Research replenish ✅ (2026-05-28): PH-S110…S124 після lease/protocol + vision slice PH-S113…S115.
 
 ---
 
@@ -69,15 +69,26 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 
 | Renew interval env | PH-S111 ✅ | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` → `JobLeaseConfig` |
 
-**Post-MVP (черга §5.12):** grid Job envelope E2E — PH-S112.
+**Post-MVP (черга §5.12):** PH-S112 grid E2E; PH-S116 worker renew ticker; PH-S117–S118 lease E2E negatives.
+
+**Vision (docs):** PH-S113…S115 ✅ — `docs/vision/` L4/L5 layers, pan/zoom map, folder-colored edges.
 
 ---
 
-## 3. Черга §5.12 (1 відкритий)
+## 3. Черга §5.12 (10 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
 | 1 | **PH-S112** | Grid Job envelope E2E smoke | `e2e/`, PH-S108 |
+| 2 | **PH-S116** | Worker periodic lease renew loop | `poolai-worker`, PH-S111 |
+| 3 | **PH-S117** | Grid result lease_epoch E2E | `e2e/`, PH-S110 |
+| 4 | **PH-S118** | Jobs lease negative paths E2E | `e2e/`, PH-S107 |
+| 5 | **PH-S119** | Admin jobs lease column polish | `src/ui/admin/jobs.rs` |
+| 6 | **PH-S120** | Solana adapter vision crosslink | `docs/vision/`, FM-033 |
+| 7 | **PH-S121** | Galaxy §4.3 worker heartbeat wire note | `POOLAI_GALAXY_GRID.md` |
+| 8 | **PH-S122** | OpenAPI jobs lease schemas audit | `openapi.yaml`, gap audit |
+| 9 | **PH-S123** | Grid pricing E2E negative fallback | `e2e/grid_pricing` |
+| 10 | **PH-S124** | OTel lease span attrs docs | FM-038 |
 
 ---
 

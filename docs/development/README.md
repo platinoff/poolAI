@@ -11,7 +11,7 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
-- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid (PH-S65…S109 ✅, PH-S110…S112 відкрито); синхрон з FM §5.12.
+- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid (PH-S65…S115 ✅, §5.12 **10** відкритих PH-S112…S124); синхрон з FM §5.12.
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
 - **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — поточний спринт **PH-S110**; §5.12 **3** відкритих; смуга PH-S100…S109 **10/10 ✅**; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md) §CI.

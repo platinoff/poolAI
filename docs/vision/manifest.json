@@ -1,13 +1,16 @@
 {
-  "revision": 29,
+  "revision": 38,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S111",
+  "last_sprint_closed": "PH-S115",
+  "vision_ui_rev": 38,
   "next_sprint": "PH-S112",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
     { "id": "L2", "name": "Catalog", "z": 2 },
-    { "id": "L3", "name": "Code", "z": 3 }
+    { "id": "L3", "name": "Code", "z": 3 },
+    { "id": "L4", "name": "Lib roots", "z": 4 },
+    { "id": "L5", "name": "Workspace", "z": 5 }
   ],
   "nodes": [
     {
@@ -240,6 +243,37 @@
       "path": "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
       "layer": "L1",
       "sprints": ["PH-S*"]
+    },
+    {
+      "id": "lib_root",
+      "label": "src/lib.rs",
+      "path": "src/lib.rs",
+      "layer": "L4",
+      "sprints": ["PH-S113"],
+      "sections": ["crate root", "pub mod re-exports"]
+    },
+    {
+      "id": "crate_solana",
+      "label": "poolai-solana-adapter",
+      "path": "crates/poolai-solana-adapter/Cargo.toml",
+      "layer": "L4",
+      "sprints": ["PH-S120"]
+    },
+    {
+      "id": "cargo_toml",
+      "label": "Cargo.toml",
+      "path": "Cargo.toml",
+      "layer": "L5",
+      "sprints": ["PH-S113"],
+      "sections": ["workspace", "features", "bins"]
+    },
+    {
+      "id": "cargo_config",
+      "label": ".cargo/config.toml",
+      "path": ".cargo/config.toml",
+      "layer": "L5",
+      "sprints": ["PH-S113"],
+      "sections": ["aliases", "test-ci"]
     }
   ],
   "edges": [
@@ -273,6 +307,12 @@
     { "from": "galaxy_grid", "to": "protocol_middleware", "kind": "implements" },
     { "from": "galaxy_grid", "to": "poolai_worker", "kind": "implements" },
     { "from": "handoff", "to": "galaxy_roadmap", "kind": "session-tracks" },
-    { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" }
+    { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" },
+    { "from": "cargo_toml", "to": "lib_root", "kind": "workspace" },
+    { "from": "cargo_config", "to": "cargo_toml", "kind": "workspace" },
+    { "from": "lib_root", "to": "grid_dispatch", "kind": "crate" },
+    { "from": "lib_root", "to": "job_types", "kind": "crate" },
+    { "from": "cargo_toml", "to": "crate_solana", "kind": "workspace" },
+    { "from": "fm", "to": "cargo_toml", "kind": "catalog" }
   ]
 }
