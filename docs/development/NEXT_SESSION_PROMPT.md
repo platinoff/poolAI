@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 · зріз після **PH-S121** · HEAD `803ffaba` · vision manifest **rev 45**
+**Оновлено:** 2026-05-28 · зріз після **PH-S121** · HEAD `263602d4` · vision manifest **rev 45**
 
 Один спринт за раз — канон у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
 
