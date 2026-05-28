@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S98 ✅ job lease acquire; §5.12 PH-S99…S103; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S99 ✅ lease renew; §5.12 PH-S100…S103; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -299,7 +299,7 @@ FM-xxx (з таблиці нижче)
 | 32 | **PH-S96** | Admin jobs UI lease columns (code) | Galaxy §4.3.1, `src/ui/admin/jobs.rs` | read-only `lease_owner` / `lease_epoch` / `lease_expires_at` in jobs table; i18n EN/UK; Playwright smoke (`admin.spec.ts`) | **✅** |
 | 33 | **PH-S97** | Job lease TTL env default stub (code) | Galaxy §4.3.1, `src/job/lease_config.rs` | `POOLAI_JOB_LEASE_TTL_SECS` parse + default 90s; HANDOFF §2a; unit tests (no renew wire) | **✅** |
 | 34 | **PH-S98** | Lease acquire at schedule / explicit API (code) | Galaxy §4.3.1, `src/job/lease_acquire.rs` | schedule + `POST /jobs/{id}/lease`; `JobLeaseConfig` TTL; OpenAPI; unit + contract tests | **✅** |
-| 35 | **PH-S99** | Lease renew / heartbeat wire (code) | Galaxy §4.3.1 | renew extends `lease_expires_at`; epoch CAS; no failover | відкрито |
+| 35 | **PH-S99** | Lease renew / heartbeat wire (code) | Galaxy §4.3.1, `lease_acquire.rs` | `POST /jobs/{id}/lease/renew`; extends TTL; epoch CAS; OpenAPI; tests | **✅** |
 | 36 | **PH-S100** | `JobStatus::Leased` + lifecycle (code) | Galaxy §4.3.2 | `Leased` status + `allows_transition`; backward compatible JSON | відкрито |
 | 37 | **PH-S101** | Failover / re-migrate stub (code) | Galaxy §4.3 | detect expired lease; coordinator re-assign sketch; tests | відкрито |
 | 38 | **PH-S102** | Live pricing provider HTTP fetch (code) | Galaxy §4.2.5 | L1 refresh from `POOLAI_GALAXY_PRICING_PROVIDERS`; timeout + tests | відкрито |
@@ -416,7 +416,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S99** (lease renew) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S100** (`JobStatus::Leased`) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

@@ -1,7 +1,7 @@
 //! Job lease acquire (PH-S98, Galaxy §4.3.1).
 //!
 //! Populates `lease_owner` / `lease_epoch` / `lease_expires_at` from `JobLeaseConfig`.
-//! Renew/failover — PH-S99+.
+//! Renew (PH-S99) extends `lease_expires_at` with epoch CAS; failover — PH-S101+.
 
 use chrono::{DateTime, Duration, Utc};
 
@@ -11,6 +11,14 @@ use crate::job::{JobLeaseConfig, JobRecord};
 pub enum AcquireLeaseError {
     NoLeaseOwner,
     LeaseAlreadyActive,
+}
+
+/// Renew/heartbeat validation errors (PH-S99).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RenewLeaseError {
+    NoLeaseOnJob,
+    EpochRejected,
+    LeaseExpired,
 }
 
 /// Resolve lease holder: explicit body → bound `worker_id` → bound `vm_id`.
@@ -46,6 +54,26 @@ pub fn acquire_lease_on_record(
     let next_epoch = record.lease_epoch.unwrap_or(0).saturating_add(1);
     record.lease_owner = Some(owner.to_string());
     record.lease_epoch = Some(next_epoch);
+    record.lease_expires_at = Some(now + Duration::seconds(cfg.lease_ttl_secs as i64));
+    Ok(())
+}
+
+/// Extend active lease TTL; `lease_epoch` must match (Galaxy §4.3.1 heartbeat).
+pub fn renew_lease_on_record(
+    record: &mut JobRecord,
+    epoch: u64,
+    cfg: &JobLeaseConfig,
+    now: DateTime<Utc>,
+) -> Result<(), RenewLeaseError> {
+    if !record.has_lease_fields() {
+        return Err(RenewLeaseError::NoLeaseOnJob);
+    }
+    if record.lease_epoch != Some(epoch) {
+        return Err(RenewLeaseError::EpochRejected);
+    }
+    if !record.lease_active_at(now) {
+        return Err(RenewLeaseError::LeaseExpired);
+    }
     record.lease_expires_at = Some(now + Duration::seconds(cfg.lease_ttl_secs as i64));
     Ok(())
 }
@@ -132,5 +160,39 @@ mod tests {
         assert!(record.has_lease_fields());
         assert_eq!(record.lease_owner.as_deref(), Some("worker-b"));
         assert_eq!(record.lease_epoch, Some(1));
+    }
+
+    #[test]
+    fn renew_extends_expiry_when_epoch_matches() {
+        let now = Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap();
+        let cfg = JobLeaseConfig { lease_ttl_secs: 60 };
+        let mut record = sample_record(Some("worker-a"));
+        acquire_lease_on_record(&mut record, "worker-a", &cfg, now, true).expect("acquire");
+        let before_expires = record.lease_expires_at;
+        let renew_at = now + Duration::seconds(30);
+        renew_lease_on_record(&mut record, 1, &cfg, renew_at).expect("renew");
+        assert_eq!(
+            record.lease_expires_at,
+            Some(renew_at + Duration::seconds(60))
+        );
+        assert_ne!(record.lease_expires_at, before_expires);
+        assert!(record.lease_active_at(renew_at));
+    }
+
+    #[test]
+    fn renew_rejects_epoch_mismatch_or_expired() {
+        let now = Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap();
+        let cfg = JobLeaseConfig::default();
+        let mut record = sample_record(Some("worker-a"));
+        acquire_lease_on_record(&mut record, "worker-a", &cfg, now, true).expect("acquire");
+        assert_eq!(
+            renew_lease_on_record(&mut record, 0, &cfg, now),
+            Err(RenewLeaseError::EpochRejected)
+        );
+        let expired_at = now + Duration::seconds(120);
+        assert_eq!(
+            renew_lease_on_record(&mut record, 1, &cfg, expired_at),
+            Err(RenewLeaseError::LeaseExpired)
+        );
     }
 }

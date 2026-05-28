@@ -16,8 +16,8 @@ pub use domain_events::{
     DomainEvent, DomainEventEnvelope, JobCompletedEvent, MemoryUpdatedEvent, SeedProvidedEvent,
 };
 pub use lease_acquire::{
-    acquire_lease_on_record, maybe_acquire_lease_on_schedule, resolve_lease_owner,
-    AcquireLeaseError,
+    acquire_lease_on_record, maybe_acquire_lease_on_schedule, renew_lease_on_record,
+    resolve_lease_owner, AcquireLeaseError, RenewLeaseError,
 };
 pub use lease_config::{JobLeaseConfig, DEFAULT_JOB_LEASE_TTL_SECS, ENV_JOB_LEASE_TTL_SECS};
 pub use lifecycle::allows_transition;

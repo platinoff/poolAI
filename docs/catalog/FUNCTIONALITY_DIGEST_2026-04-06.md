@@ -122,7 +122,7 @@
 | Модуль / crate | Призначення | HTTP / wire |
 |----------------|-------------|-------------|
 | `src/grid/` | `GridEnvelope` v1 — Job, Result, MemoryShard, PeerStatus (див. **Galaxy Grid modules** нижче) | JSON; map ↔ discovery/RAID |
-| `src/job/` | `JobStore`, scheduler, lifecycle; `lease_config` / `lease_acquire` (PH-S97–S98); persistence JSON / SQLite (`FM-029`) / RAID (`PH-S48`); optional lease fields (PH-S94); PATCH CAS (PH-S95) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule`, `POST /jobs/{id}/lease` (FM-020…029, PH-S98) |
+| `src/job/` | `JobStore`, scheduler, lifecycle; `lease_config` / `lease_acquire` (PH-S97–S99); persistence JSON / SQLite (`FM-029`) / RAID (`PH-S48`); optional lease fields (PH-S94); PATCH CAS (PH-S95) | `GET/POST /api/v1/jobs`, `GET/PATCH /jobs/{id}`, `POST /jobs/schedule`, `POST /jobs/{id}/lease`, `POST /jobs/{id}/lease/renew` |
 | `src/memory/` | `MemoryShardRef` — shards поверх RAID | Grid `memory_shard` |
 | `src/ml/turboquant.rs` | TurboQuant + optional `turboquant-simd` | ML pipeline Quantization |
 | `crates/poolai-solana-adapter/` | Events v1, sidecar, mock RPC (FM-024), `poolai-events` + devnet submit (FM-033) | Solana deps лише в sidecar crate |
@@ -169,7 +169,7 @@
 | `POOLAI_GALAXY_PRICING_PROVIDERS` | coordinator | JSON allow-list provider catalog (PH-S92) |
 | `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | Default lease TTL seconds (default `90`; `JobLeaseConfig::from_env()`, PH-S97) |
 
-**Не в коді (наступні PH-S99…S103):** lease renew/failover; `Leased`/`Migrating` job status; live pricing provider HTTP fetch; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Не в коді (наступні PH-S100…S103):** failover; `Leased`/`Migrating` job status; live pricing provider HTTP fetch; `X-PoolAI-Protocol` middleware. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 

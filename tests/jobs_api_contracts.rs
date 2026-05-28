@@ -364,6 +364,67 @@ async fn jobs_acquire_lease_explicit_api() {
 }
 
 #[tokio::test]
+async fn jobs_renew_lease_extends_expiry() {
+    let app = jobs_app();
+
+    let (_, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({ "kind": "inference" })),
+    )
+    .await;
+    let id = created
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+
+    let (_, acquired) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease"),
+        Some(json!({ "lease_owner": "worker-renew" })),
+    )
+    .await;
+    let epoch = acquired
+        .get("job")
+        .and_then(|j| j.get("lease_epoch"))
+        .and_then(|x| x.as_u64())
+        .expect("lease_epoch");
+    let expires_before = acquired
+        .get("job")
+        .and_then(|j| j.get("lease_expires_at"))
+        .and_then(|x| x.as_str())
+        .expect("lease_expires_at")
+        .to_string();
+
+    let (renew_status, renewed) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease/renew"),
+        Some(json!({ "lease_epoch": epoch })),
+    )
+    .await;
+    assert_eq!(renew_status, StatusCode::OK);
+    let expires_after = renewed
+        .get("job")
+        .and_then(|j| j.get("lease_expires_at"))
+        .and_then(|x| x.as_str())
+        .expect("renewed expires");
+    assert_ne!(expires_after, expires_before);
+
+    let (reject_status, _) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease/renew"),
+        Some(json!({ "lease_epoch": epoch.saturating_sub(1) })),
+    )
+    .await;
+    assert_eq!(reject_status, StatusCode::CONFLICT);
+}
+
+#[tokio::test]
 async fn jobs_get_unknown_returns_404() {
     let app = jobs_app();
     let (status, v) = request_json(

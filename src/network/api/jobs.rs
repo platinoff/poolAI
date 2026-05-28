@@ -89,6 +89,11 @@ struct AcquireJobLeaseRequest {
     lease_owner: Option<String>,
 }
 
+#[derive(Deserialize)]
+struct RenewJobLeaseRequest {
+    lease_epoch: u64,
+}
+
 fn store() -> &'static JobStore {
     JobStore::global()
 }
@@ -99,6 +104,7 @@ pub fn create_jobs_routes() -> Router<ApiContext> {
         .route("/jobs/schedule", post(schedule_jobs))
         .route("/jobs/{id}", get(get_job).patch(patch_job))
         .route("/jobs/{id}/lease", post(acquire_job_lease))
+        .route("/jobs/{id}/lease/renew", post(renew_job_lease))
 }
 
 async fn list_jobs(State(_ctx): State<ApiContext>) -> Result<Json<JobsListResponse>, HttpAppError> {
@@ -201,6 +207,33 @@ async fn acquire_job_lease(
             message,
         }) => Err(HttpAppError::new(AppError::RestError {
             code: "lease_already_active",
+            message,
+        })
+        .with_status(StatusCode::CONFLICT)),
+        Err(e) => Err(HttpAppError::new(e)),
+    }
+}
+
+async fn renew_job_lease(
+    State(_ctx): State<ApiContext>,
+    Path(id): Path<String>,
+    Json(body): Json<RenewJobLeaseRequest>,
+) -> Result<Json<JobDetailResponse>, HttpAppError> {
+    match store().renew_lease(&id, body.lease_epoch) {
+        Ok(job) => Ok(Json(JobDetailResponse { job })),
+        Err(AppError::RestError {
+            code: "lease_epoch_rejected",
+            message,
+        }) => Err(HttpAppError::new(AppError::RestError {
+            code: "lease_epoch_rejected",
+            message,
+        })
+        .with_status(StatusCode::CONFLICT)),
+        Err(AppError::RestError {
+            code: "lease_expired",
+            message,
+        }) => Err(HttpAppError::new(AppError::RestError {
+            code: "lease_expired",
             message,
         })
         .with_status(StatusCode::CONFLICT)),

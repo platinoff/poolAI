@@ -510,6 +510,59 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /jobs/{id}/lease/renew:
+    post:
+      tags:
+        - Jobs
+      summary: Renew job lease (heartbeat)
+      description: |
+        Galaxy §4.3.1 lease renew (PH-S99). Extends `lease_expires_at` when `lease_epoch` matches
+        and lease is still active; uses `POOLAI_JOB_LEASE_TTL_SECS` (`JobLeaseConfig`).
+      operationId: renewJobLease
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewJobLeaseRequest'
+      responses:
+        '200':
+          description: Lease renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDetailResponse'
+        '400':
+          description: Job has no lease fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Epoch mismatch or lease expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /grid/envelope:
     post:
       tags:
@@ -5486,6 +5539,17 @@ components:
         lease_owner:
           type: string
           description: Galaxy §4.3.1 lease holder (srv/worker id)
+
+    RenewJobLeaseRequest:
+      type: object
+      required:
+        - lease_epoch
+      properties:
+        lease_epoch:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Must match active lease epoch (PH-S99 heartbeat)
 
     PatchJobRequest:
       type: object

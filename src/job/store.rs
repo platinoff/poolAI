@@ -19,8 +19,8 @@ use crate::raid::{self, RaidManager};
 use chrono::Utc;
 
 use crate::job::lease_acquire::{
-    acquire_lease_on_record, maybe_acquire_lease_on_schedule, resolve_lease_owner,
-    AcquireLeaseError,
+    acquire_lease_on_record, maybe_acquire_lease_on_schedule, renew_lease_on_record,
+    resolve_lease_owner, AcquireLeaseError, RenewLeaseError,
 };
 use crate::job::onchain::emit_job_completed_if_anchor;
 use crate::job::{allows_transition, JobLeaseConfig, JobRecord, JobSpec, JobStatus};
@@ -170,6 +170,40 @@ impl JobStore {
                 AcquireLeaseError::LeaseAlreadyActive => AppError::RestError {
                     code: "lease_already_active",
                     message: format!("job '{id}' already has an active lease (Galaxy §4.3.1)"),
+                },
+            })?;
+            record.clone()
+        };
+        self.persist()?;
+        Ok(updated)
+    }
+
+    /// PH-S99: lease renew / heartbeat (`POST /api/v1/jobs/{id}/lease/renew`).
+    pub fn renew_lease(&self, id: &str, lease_epoch: u64) -> Result<JobRecord, AppError> {
+        let now = Utc::now();
+        let updated = {
+            let mut guard = self
+                .jobs
+                .lock()
+                .map_err(|_| AppError::InternalError("job store lock poisoned".into()))?;
+            let record = guard
+                .iter_mut()
+                .find(|r| r.spec.id.0 == id)
+                .ok_or_else(|| AppError::ApiNotFound(format!("job '{id}' not found")))?;
+            let cfg = JobLeaseConfig::from_env();
+            renew_lease_on_record(record, lease_epoch, &cfg, now).map_err(|e| match e {
+                RenewLeaseError::NoLeaseOnJob => {
+                    AppError::ValidationError("job has no lease fields; acquire lease first".into())
+                }
+                RenewLeaseError::EpochRejected => AppError::RestError {
+                    code: "lease_epoch_rejected",
+                    message: format!(
+                        "lease_epoch does not match active lease for job '{id}' (Galaxy §4.3.1)"
+                    ),
+                },
+                RenewLeaseError::LeaseExpired => AppError::RestError {
+                    code: "lease_expired",
+                    message: format!("lease expired for job '{id}' (Galaxy §4.3.1)"),
                 },
             })?;
             record.clone()

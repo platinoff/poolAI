@@ -424,7 +424,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 
 Для кожного job вводиться `lease_owner` (srv/worker), `lease_epoch` і `lease_expires_at`.
 
-**Wire stub (PH-S94 ✅):** optional поля на `JobRecord` + `POST/GET /api/v1/jobs` (`src/job/types.rs`, `src/network/api/jobs.rs`). **PATCH CAS (PH-S95 ✅):** optional `lease_epoch` на `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` при mismatch. **Admin UI (PH-S96 ✅):** read-only lease columns на `/ui/admin/jobs`. **TTL env (PH-S97 ✅):** `POOLAI_JOB_LEASE_TTL_SECS` — default lease TTL (`JobLeaseConfig`, default `90` s; `src/job/lease_config.rs`). **Acquire (PH-S98 ✅):** scheduler bind + `POST /api/v1/jobs/{id}/lease` (`src/job/lease_acquire.rs`). Renew/failover — PH-S99+. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Wire stub (PH-S94 ✅):** optional поля на `JobRecord` + `POST/GET /api/v1/jobs` (`src/job/types.rs`, `src/network/api/jobs.rs`). **PATCH CAS (PH-S95 ✅):** optional `lease_epoch` на `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` при mismatch. **Admin UI (PH-S96 ✅):** read-only lease columns на `/ui/admin/jobs`. **TTL env (PH-S97 ✅):** `POOLAI_JOB_LEASE_TTL_SECS` — default lease TTL (`JobLeaseConfig`, default `90` s; `src/job/lease_config.rs`). **Acquire (PH-S98 ✅):** scheduler bind + `POST /api/v1/jobs/{id}/lease` (`src/job/lease_acquire.rs`). **Renew (PH-S99 ✅):** `POST /api/v1/jobs/{id}/lease/renew` (epoch CAS, extends TTL). Failover — PH-S101+. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 - `lease_ttl`: базовий час володіння lease (наприклад 30-120 с, профільно за типом job).
 - `lease_renew_interval`: heartbeat/renew до `lease_ttl/3`.
