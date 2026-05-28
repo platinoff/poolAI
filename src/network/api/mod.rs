@@ -25,6 +25,7 @@ pub mod instances;
 pub mod jobs;
 pub mod libraries;
 pub mod memory;
+mod protocol_middleware;
 #[cfg(feature = "raft")]
 pub mod raft_rpc;
 pub mod raid;
@@ -43,7 +44,7 @@ pub mod workers;
 pub use common::check_permission;
 
 use crate::core::state::ApiContext;
-use axum::Router;
+use axum::{middleware, Router};
 
 /// Create API routes
 ///
@@ -70,6 +71,9 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(completions::create_completions_routes())
         .merge(topology::create_topology_routes())
         .merge(ui::create_ui_routes())
+        .layer(middleware::from_fn(
+            protocol_middleware::protocol_header_middleware,
+        ))
 }
 
 // Legacy routes function removed - all handlers migrated to modules ✅
