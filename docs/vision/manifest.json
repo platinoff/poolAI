@@ -1,8 +1,8 @@
 {
   "revision": 29,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S110",
-  "next_sprint": "PH-S111",
+  "last_sprint_closed": "PH-S111",
+  "next_sprint": "PH-S112",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },

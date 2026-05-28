@@ -19,7 +19,10 @@ pub use lease_acquire::{
     acquire_lease_on_record, maybe_acquire_lease_on_schedule, maybe_transition_to_leased,
     renew_lease_on_record, resolve_lease_owner, AcquireLeaseError, RenewLeaseError,
 };
-pub use lease_config::{JobLeaseConfig, DEFAULT_JOB_LEASE_TTL_SECS, ENV_JOB_LEASE_TTL_SECS};
+pub use lease_config::{
+    JobLeaseConfig, DEFAULT_JOB_LEASE_TTL_SECS, ENV_JOB_LEASE_RENEW_INTERVAL_SECS,
+    ENV_JOB_LEASE_TTL_SECS,
+};
 pub use lifecycle::allows_transition;
 pub use onchain::{
     emit_job_completed_if_anchor, emit_memory_updated, emit_seed_provided, events_dir_from_env,

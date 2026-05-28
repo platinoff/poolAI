@@ -87,5 +87,6 @@ PoolAI вже реалізує:
 - [x] SQLite job store (optional `job-store-sqlite`, `POOLAI_JOB_STORE=sqlite`, migrate JSON) — FM-029 (2026-05-20).
 - [x] On-chain submit epics (core NDJSON → sidecar schema v1) — `src/job/domain_events.rs`, `onchain.rs`, `POOLAI_ONCHAIN_EVENTS_DIR` (PH-S38, 2026-05-25).
 - [x] Job lease TTL env — `POOLAI_JOB_LEASE_TTL_SECS`, `JobLeaseConfig` (PH-S97, 2026-05-27).
+- [x] Job lease renew interval env — `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` (PH-S111, 2026-05-28).
 - [x] Lease acquire on schedule + `POST /api/v1/jobs/{id}/lease` (PH-S98, 2026-05-27); renew — PH-S99+.
 

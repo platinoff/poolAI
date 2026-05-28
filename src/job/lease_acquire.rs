@@ -128,7 +128,10 @@ mod tests {
     #[test]
     fn acquire_sets_epoch_and_expiry() {
         let now = Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap();
-        let cfg = JobLeaseConfig { lease_ttl_secs: 90 };
+        let cfg = JobLeaseConfig {
+            lease_ttl_secs: 90,
+            lease_renew_interval_secs: 30,
+        };
         let mut record = sample_record(Some("worker-a"));
         acquire_lease_on_record(&mut record, "worker-a", &cfg, now, true).expect("acquire");
         assert_eq!(record.status, JobStatus::Leased);
@@ -185,7 +188,10 @@ mod tests {
     #[test]
     fn renew_extends_expiry_when_epoch_matches() {
         let now = Utc.with_ymd_and_hms(2026, 5, 27, 12, 0, 0).unwrap();
-        let cfg = JobLeaseConfig { lease_ttl_secs: 60 };
+        let cfg = JobLeaseConfig {
+            lease_ttl_secs: 60,
+            lease_renew_interval_secs: 20,
+        };
         let mut record = sample_record(Some("worker-a"));
         acquire_lease_on_record(&mut record, "worker-a", &cfg, now, true).expect("acquire");
         let before_expires = record.lease_expires_at;

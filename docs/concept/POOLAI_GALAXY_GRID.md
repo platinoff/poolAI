@@ -430,6 +430,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 |------|-----------|
 | S94–S95 | `lease_*` на `JobRecord`; PATCH optional `lease_epoch` → `409 lease_epoch_rejected` |
 | S96–S97 | Admin lease columns; `POOLAI_JOB_LEASE_TTL_SECS` → `JobLeaseConfig` |
+| S111 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional renew interval (default `lease_ttl/3`, capped at TTL) |
 | S98–S99 | Acquire: scheduler + `POST /jobs/{id}/lease`; renew: `POST …/lease/renew` |
 | S100–S101 | `JobStatus::Leased`; expired `leased` → requeue + scheduler rebind (stub) |
 | S104 | `JobStatus::Migrating`; transitions `Leased/Executing ↔ Migrating` |

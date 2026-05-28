@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-28 (PH-S110 ✅ grid result lease_epoch CAS; §5.12 PH-S111…S112 — 2 відкритих; FM-041 Deferred).
+**Оновлено:** 2026-05-28 (PH-S111 ✅ lease renew interval env; §5.12 PH-S112 — 1 відкритий; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -311,7 +311,7 @@ FM-xxx (з таблиці нижче)
 | 44 | **PH-S108** | Grid ingest sets Leased on acquire (code) | `src/grid/dispatch.rs`, `src/job/` | grid Job ingest + `schedule_with_grid_peer` → `leased` + lease fields when peer binds; unit tests | **✅** |
 | 45 | **PH-S109** | Galaxy §4.3 lease wire docs sync (docs) | `POOLAI_GALAXY_GRID.md`, INDEX, DIGEST | §4.3 table PH-S94…S108; смуга 10/10 ✅; roadmap replenish | **✅** |
 | 46 | **PH-S110** | Grid result ingest lease_epoch CAS (code) | `src/grid/dispatch.rs`, Galaxy §4.3.1 | `GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; `409 lease_epoch_rejected`; unit tests | **✅** |
-| 47 | **PH-S111** | Job lease renew interval env (code) | `src/job/lease_config.rs`, §4.3.1 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests | відкрито |
+| 47 | **PH-S111** | Job lease renew interval env (code) | `src/job/lease_config.rs`, §4.3.1 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` optional override; unit tests | **✅** |
 | 48 | **PH-S112** | Grid Job envelope E2E smoke (e2e) | `e2e/`, PH-S108 | Playwright grid envelope Job → `leased` + lease fields | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
@@ -425,7 +425,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S111** (`POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` env) · черга **2** відкритих (PH-S111…S112) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S112** (Grid Job envelope E2E) · черга **1** відкритий (PH-S112) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
