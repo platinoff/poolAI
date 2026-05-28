@@ -424,7 +424,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 
 Для кожного job вводиться `lease_owner` (srv/worker), `lease_epoch` і `lease_expires_at`.
 
-**Wire stub (PH-S94 ✅):** optional поля на `JobRecord` + `POST/GET /api/v1/jobs` (`src/job/types.rs`, `src/network/api/jobs.rs`). **PATCH CAS (PH-S95 ✅):** optional `lease_epoch` на `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` при mismatch. **Admin UI (PH-S96 ✅):** read-only lease columns на `/ui/admin/jobs`. **TTL env (PH-S97 ✅):** `POOLAI_JOB_LEASE_TTL_SECS` — default lease TTL (`JobLeaseConfig`, default `90` s; `src/job/lease_config.rs`). **Acquire (PH-S98 ✅):** scheduler bind + `POST /api/v1/jobs/{id}/lease` (`src/job/lease_acquire.rs`). **Renew (PH-S99 ✅):** `POST /api/v1/jobs/{id}/lease/renew` (epoch CAS, extends TTL). **Leased status (PH-S100 ✅):** `JobStatus::Leased` + lifecycle transitions (`allows_transition`), schedule/acquire path updates status to `leased`. **Failover stub (PH-S101 ✅):** expired `leased` rows are requeued and rebound by scheduler; full `Migrating` wire — PH-S104+. **Live pricing fetch (PH-S102 ✅):** `GET /api/v1/grid/pricing` refresh path pulls provider endpoint quotes from `POOLAI_GALAXY_PRICING_PROVIDERS` with timeout env `POOLAI_GALAXY_PRICING_TIMEOUT_MS`. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Wire stub (PH-S94 ✅):** optional поля на `JobRecord` + `POST/GET /api/v1/jobs` (`src/job/types.rs`, `src/network/api/jobs.rs`). **PATCH CAS (PH-S95 ✅):** optional `lease_epoch` на `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` при mismatch. **Admin UI (PH-S96 ✅):** read-only lease columns на `/ui/admin/jobs`. **TTL env (PH-S97 ✅):** `POOLAI_JOB_LEASE_TTL_SECS` — default lease TTL (`JobLeaseConfig`, default `90` s; `src/job/lease_config.rs`). **Acquire (PH-S98 ✅):** scheduler bind + `POST /api/v1/jobs/{id}/lease` (`src/job/lease_acquire.rs`). **Renew (PH-S99 ✅):** `POST /api/v1/jobs/{id}/lease/renew` (epoch CAS, extends TTL). **Leased status (PH-S100 ✅):** `JobStatus::Leased` + lifecycle transitions (`allows_transition`), schedule/acquire path updates status to `leased`. **Failover stub (PH-S101 ✅):** expired `leased` rows are requeued and rebound by scheduler. **Live pricing fetch (PH-S102 ✅):** `GET /api/v1/grid/pricing` refresh path pulls provider endpoint quotes from `POOLAI_GALAXY_PRICING_PROVIDERS` with timeout env `POOLAI_GALAXY_PRICING_TIMEOUT_MS`. **Migrating lifecycle (PH-S104 ✅):** `JobStatus::Migrating` + transitions `Leased/Executing ↔ Migrating`, OpenAPI `JobStatus` sync, contract test coverage. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 - `lease_ttl`: базовий час володіння lease (наприклад 30-120 с, профільно за типом job).
 - `lease_renew_interval`: heartbeat/renew до `lease_ttl/3`.
@@ -837,7 +837,7 @@ Galaxy Grid використовує **шаровану** версійність
 | Шар | Ідентифікатор | Правило сумісності |
 |-----|---------------|-------------------|
 | **HTTP API** | шлях `/api/v1/…` | breaking → новий prefix `/api/v2/…`; v1 підтримується N релізів |
-| **Wire headers** | `X-PoolAI-Protocol: 1.2` | coordinator відповідає `X-PoolAI-Protocol-Supported: 1.0,1.1,1.2` |
+| **Wire headers** | `X-PoolAI-Protocol: 1.2` | middleware додає `X-PoolAI-Protocol-{Coordinator,Compat,Docs}`; unsupported → `403 protocol_unsupported` |
 | **Job / worker DTO** | `schema_version` у JSON body | minor +1 — additive fields; major — reject з `426 Upgrade Required` |
 | **Virtual node / Telegram bind** | FM-016 API version у OpenAPI tag | worker старіший за coordinator → degrade або block register |
 | **On-chain events** | `event_schema` у NDJSON (PH-S38) | sidecar ігнорує невідомі major; логує `schema_unsupported` |
@@ -942,5 +942,5 @@ Signed capability documents (§6.6 roadmap) — наступний спринт;
 
 **Документи-орієнтири:** [`SECURITY_HARDENING.md`](../security/SECURITY_HARDENING.md) (signed releases checklist), [`DISTRIBUTED_RAID_PROTOCOL.md`](../DISTRIBUTED_RAID_PROTOCOL.md) §Versioning, OpenAPI `/api/v1/*`.
 
-**Код:** `poolai-verify-release` (PH-S66 ✅, `src/release/`). **Admin UI (PH-S93 ✅):** read-only `/ui/admin/updates-compat` — protocol version, verify-release pointers, compat matrix link (без дублювання governance prose). **Майбутнє:** middleware `X-PoolAI-Protocol`.
+**Код:** `poolai-verify-release` (PH-S66 ✅, `src/release/`). **Admin UI (PH-S93 ✅):** read-only `/ui/admin/updates-compat` — protocol version, verify-release pointers, compat matrix link (без дублювання governance prose). **Middleware (PH-S103 ✅):** `X-PoolAI-Protocol` negotiation на selected wire routes.
 

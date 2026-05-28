@@ -188,6 +188,71 @@ async fn jobs_patch_invalid_transition_returns_400() {
 }
 
 #[tokio::test]
+async fn jobs_patch_migrating_lifecycle_roundtrip() {
+    let app = jobs_app();
+
+    let (_, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({ "kind": "inference" })),
+    )
+    .await;
+    let id = created
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+
+    let (_, acquired) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease"),
+        Some(json!({ "lease_owner": "worker-migrate" })),
+    )
+    .await;
+    assert_eq!(
+        acquired
+            .get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("leased")
+    );
+
+    let (migrating_status, migrating_body) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "migrating" })),
+    )
+    .await;
+    assert_eq!(migrating_status, StatusCode::OK);
+    assert_eq!(
+        migrating_body
+            .get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("migrating")
+    );
+
+    let (executing_status, executing_body) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "executing" })),
+    )
+    .await;
+    assert_eq!(executing_status, StatusCode::OK);
+    assert_eq!(
+        executing_body
+            .get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("executing")
+    );
+}
+
+#[tokio::test]
 async fn jobs_create_with_optional_lease_fields_roundtrip() {
     let app = jobs_app();
     let expires = "2026-12-31T23:59:59Z";

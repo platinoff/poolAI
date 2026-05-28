@@ -20,8 +20,20 @@ pub fn allows_transition(from: JobStatus, to: JobStatus) -> bool {
                 JobStatus::Leased | JobStatus::Executing | JobStatus::Failed
             )
         }
-        JobStatus::Leased => matches!(to, JobStatus::Executing | JobStatus::Failed),
-        JobStatus::Executing => matches!(to, JobStatus::Verifying | JobStatus::Failed),
+        JobStatus::Leased => matches!(
+            to,
+            JobStatus::Migrating | JobStatus::Executing | JobStatus::Failed
+        ),
+        JobStatus::Migrating => {
+            matches!(
+                to,
+                JobStatus::Leased | JobStatus::Executing | JobStatus::Failed
+            )
+        }
+        JobStatus::Executing => matches!(
+            to,
+            JobStatus::Migrating | JobStatus::Verifying | JobStatus::Failed
+        ),
         JobStatus::Verifying => {
             matches!(
                 to,
@@ -44,7 +56,17 @@ mod tests {
             JobStatus::Scheduled
         ));
         assert!(allows_transition(JobStatus::Scheduled, JobStatus::Leased));
+        assert!(allows_transition(JobStatus::Leased, JobStatus::Migrating));
+        assert!(allows_transition(JobStatus::Migrating, JobStatus::Leased));
+        assert!(allows_transition(
+            JobStatus::Migrating,
+            JobStatus::Executing
+        ));
         assert!(allows_transition(JobStatus::Leased, JobStatus::Executing));
+        assert!(allows_transition(
+            JobStatus::Executing,
+            JobStatus::Migrating
+        ));
         assert!(allows_transition(
             JobStatus::Scheduled,
             JobStatus::Executing
@@ -67,6 +89,14 @@ mod tests {
         assert!(!allows_transition(
             JobStatus::Submitted,
             JobStatus::Executing
+        ));
+        assert!(!allows_transition(
+            JobStatus::Submitted,
+            JobStatus::Migrating
+        ));
+        assert!(!allows_transition(
+            JobStatus::Migrating,
+            JobStatus::Submitted
         ));
         assert!(!allows_transition(JobStatus::Leased, JobStatus::Scheduled));
         assert!(!allows_transition(JobStatus::Completed, JobStatus::Failed));

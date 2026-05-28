@@ -5339,6 +5339,7 @@ components:
         - submitted
         - scheduled
         - leased
+        - migrating
         - executing
         - verifying
         - rewarded

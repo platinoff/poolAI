@@ -49,6 +49,8 @@ pub enum JobStatus {
     Scheduled,
     /// Galaxy §4.3.2 — active lease holder (owner + epoch + expires_at); PH-S100.
     Leased,
+    /// Galaxy §4.3.2 — transitional state while lease/work is moved to another worker (PH-S104).
+    Migrating,
     Executing,
     Verifying,
     Rewarded,
@@ -182,6 +184,16 @@ mod lease_tests {
         assert_eq!(
             serde_json::to_string(&status).expect("serialize"),
             "\"leased\""
+        );
+    }
+
+    #[test]
+    fn job_status_deserializes_migrating_from_json() {
+        let status: JobStatus = serde_json::from_str("\"migrating\"").expect("migrating");
+        assert_eq!(status, JobStatus::Migrating);
+        assert_eq!(
+            serde_json::to_string(&status).expect("serialize"),
+            "\"migrating\""
         );
     }
 

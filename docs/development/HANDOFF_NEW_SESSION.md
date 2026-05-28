@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-27 (PH-S102 ✅ live pricing provider HTTP fetch; §5.12 PH-S103) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S104 ✅ `JobStatus::Migrating` + lifecycle; §5.12 PH-S105) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -71,9 +71,11 @@
 **PH-S100 ✅ (code):** `JobStatus::Leased` + `allows_transition` (Galaxy §4.3.2); `maybe_transition_to_leased` on lease acquire/schedule bind; OpenAPI `leased`; JSON/SQLite roundtrip; unit + contract + scheduler/grid tests; `cargo test-ci` + openapi-gap 0.
 **PH-S101 ✅ (code):** failover / re-migrate stub: expired `Leased` jobs are requeued to `Submitted` and rebound by scheduler (clears stale owner/binding, preserves `lease_epoch` monotonic bump); unit tests in `scheduler.rs`; `cargo test-ci`.
 **PH-S102 ✅ (code):** live pricing provider HTTP fetch (Galaxy §4.2.5): API `GET /api/v1/grid/pricing` on L1 miss fetches provider endpoints from `POOLAI_GALAXY_PRICING_PROVIDERS`; timeout via `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; tests for live HTTP path + timeout env parse; `cargo test-ci`.
-**Черга:** §5.12 **PH-S103…S109** (7 відкритих) — protocol → `Migrating` → admin badge → worker renew → e2e → grid docs sync.
+**PH-S103 ✅ (code):** middleware `X-PoolAI-Protocol` на selected wire routes (`/grid/*`, `register-remote`, `heartbeat-remote`, `virtual-nodes/*`) з negotiation через compat matrix (`src/grid/protocol_compat.rs`), response headers (`coordinator/compat/docs`) та reject unsupported (`403 protocol_unsupported`); unit tests; `cargo test-ci`.
+**PH-S104 ✅ (code):** `JobStatus::Migrating` у job wire/lifecycle (`src/job/types.rs`, `src/job/lifecycle.rs`): transitions `Leased/Executing ↔ Migrating`, backward compatible serde JSON; OpenAPI `JobStatus` enum sync + API contract test `jobs_patch_migrating_lifecycle_roundtrip`; `cargo test-ci`.
+**Черга:** §5.12 **PH-S105…S109** (5 відкритих) — admin badge → worker renew → e2e → grid docs sync.
 
-**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S102, фази, PH-S103…S109).
+**Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (стан PH-S65…S104, фази, PH-S105…S109).
 
 ## 1. Канонічний порядок документації та планів
 

@@ -1,8 +1,8 @@
 {
-  "revision": 22,
-  "updated_at": "2026-05-27",
-  "last_sprint_closed": "PH-S102",
-  "next_sprint": "PH-S103",
+  "revision": 24,
+  "updated_at": "2026-05-28",
+  "last_sprint_closed": "PH-S104",
+  "next_sprint": "PH-S105",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -138,8 +138,16 @@
       "label": "job/types.rs",
       "path": "src/job/types.rs",
       "layer": "L3",
-      "sprints": ["PH-S94", "PH-S95", "PH-S100"],
-      "sections": ["lease_owner", "lease_epoch", "lease_expires_at", "PATCH CAS", "JobStatus::Leased lifecycle"]
+      "sprints": ["PH-S94", "PH-S95", "PH-S100", "PH-S104"],
+      "sections": ["lease_owner", "lease_epoch", "lease_expires_at", "PATCH CAS", "JobStatus::Leased/Migrating lifecycle"]
+    },
+    {
+      "id": "job_lifecycle",
+      "label": "job/lifecycle.rs",
+      "path": "src/job/lifecycle.rs",
+      "layer": "L3",
+      "sprints": ["FM-021", "PH-S100", "PH-S104"],
+      "sections": ["allows_transition", "Leased/Executing <-> Migrating"]
     },
     {
       "id": "job_lease_config",
@@ -211,6 +219,14 @@
       "sections": ["provider catalog", "live http fetch", "timeout env"]
     },
     {
+      "id": "protocol_middleware",
+      "label": "api/protocol_middleware.rs",
+      "path": "src/network/api/protocol_middleware.rs",
+      "layer": "L3",
+      "sprints": ["PH-S103"],
+      "sections": ["X-PoolAI-Protocol negotiation", "selected routes", "reject unsupported"]
+    },
+    {
       "id": "galaxy_roadmap",
       "label": "GALAXY_GRID_ROADMAP",
       "path": "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
@@ -238,6 +254,7 @@
     { "from": "galaxy_grid", "to": "security_hardening", "kind": "concept-ref" },
     { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" },
     { "from": "galaxy_grid", "to": "job_types", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "job_lifecycle", "kind": "implements" },
     { "from": "galaxy_grid", "to": "job_store", "kind": "implements" },
     { "from": "galaxy_grid", "to": "job_scheduler", "kind": "implements" },
     { "from": "galaxy_grid", "to": "admin_updates_compat", "kind": "implements" },
@@ -245,6 +262,7 @@
     { "from": "galaxy_grid", "to": "admin_grid_pricing", "kind": "implements" },
     { "from": "galaxy_grid", "to": "grid_pricing_api", "kind": "implements" },
     { "from": "galaxy_grid", "to": "pricing_oracle", "kind": "implements" },
+    { "from": "galaxy_grid", "to": "protocol_middleware", "kind": "implements" },
     { "from": "handoff", "to": "galaxy_roadmap", "kind": "session-tracks" },
     { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" }
   ]
