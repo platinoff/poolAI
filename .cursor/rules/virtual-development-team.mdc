@@ -46,7 +46,7 @@ flowchart LR
 
 ## Staging
 
-**Не** `git add -A`. Не стаджити: `data/audit/`, `.commit-msg-*`, `bin/commit-*.sh`, чужий шум з інших спринтів.
+**Не** `git add -A`. Не стаджити: `data/audit/`, `comitmsg/*.txt`, `bin/commit-*.sh`, чужий шум з інших спринтів.
 
 **Канон черги:** FM [§5.12](../../docs/catalog/FUNCTION_MANAGEMENT.md#512-research-backlog-ph-s65-galaxy-wire--ops-2026-05-27) + [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md).
 

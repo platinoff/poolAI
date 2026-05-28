@@ -1,5 +1,5 @@
 //! Job layer admin page (PH-S53) — list jobs + persistence backend badge.
-//! PH-S96/PH-S105: read-only Galaxy lease columns + active/expired lease badge.
+//! PH-S96/PH-S105/PH-S119: read-only Galaxy lease columns, tooltips, `#epoch` display.
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;
@@ -32,6 +32,50 @@ pub async fn admin_jobs() -> Html<String> {
     function formatLeaseCell(value) {
       if (value === null || value === undefined || value === '') return '—';
       return String(value);
+    }
+
+    function thLease(colKey, labelKey, tipKey) {
+      const label = T(labelKey, colKey);
+      const tip = T(tipKey, '');
+      const titleAttr = tip ? ' title="' + escapeHtml(tip) + '"' : '';
+      return '<th' + titleAttr + '>' + escapeHtml(label) + '</th>';
+    }
+
+    function leaseOwnerCell(owner) {
+      if (owner === null || owner === undefined || owner === '') {
+        return '<span class="muted">—</span>';
+      }
+      const text = String(owner);
+      const tip = T(
+        'admin.jobs.tooltip.leaseOwner',
+        'Galaxy §4.3.1: worker or peer id holding the active lease (acquire/renew CAS owner).',
+      );
+      return (
+        '<code class="lease-owner-cell" title="' +
+        escapeHtml(tip) +
+        '">' +
+        escapeHtml(text) +
+        '</code>'
+      );
+    }
+
+    function leaseEpochCell(epoch) {
+      if (epoch === null || epoch === undefined || epoch === '') {
+        return '<span class="muted">—</span>';
+      }
+      const n = Number(epoch);
+      const display = Number.isFinite(n) ? '#' + String(n) : String(epoch);
+      const tip = T(
+        'admin.jobs.tooltip.leaseEpoch',
+        'Monotonic CAS generation; PATCH, renew, and grid result must match this epoch.',
+      );
+      return (
+        '<span class="lease-epoch-cell" title="' +
+        escapeHtml(tip) +
+        '">' +
+        escapeHtml(display) +
+        '</span>'
+      );
     }
 
     function leaseState(expiresAt) {
@@ -81,10 +125,10 @@ pub async fn admin_jobs() -> Html<String> {
               <th>${escapeHtml(T('admin.jobs.col.created', 'Created'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.worker', 'Worker'))}</th>
               <th>${escapeHtml(T('admin.jobs.col.vm', 'VM'))}</th>
-              <th>${escapeHtml(T('admin.jobs.col.leaseOwner', 'Lease owner'))}</th>
-              <th>${escapeHtml(T('admin.jobs.col.leaseEpoch', 'Lease epoch'))}</th>
-              <th>${escapeHtml(T('admin.jobs.col.leaseState', 'Lease state'))}</th>
-              <th>${escapeHtml(T('admin.jobs.col.leaseExpires', 'Lease expires'))}</th>
+              ${thLease('Lease owner', 'admin.jobs.col.leaseOwner', 'admin.jobs.tooltip.leaseOwnerCol')}
+              ${thLease('Lease epoch', 'admin.jobs.col.leaseEpoch', 'admin.jobs.tooltip.leaseEpochCol')}
+              ${thLease('Lease state', 'admin.jobs.col.leaseState', 'admin.jobs.tooltip.leaseStateCol')}
+              ${thLease('Lease expires', 'admin.jobs.col.leaseExpires', 'admin.jobs.tooltip.leaseExpiresCol')}
             </tr>
           </thead>
           <tbody>
@@ -99,8 +143,8 @@ pub async fn admin_jobs() -> Html<String> {
                 <td>${escapeHtml(String(j.created_at || ''))}</td>
                 <td>${escapeHtml(String(j.worker_id || '—'))}</td>
                 <td>${escapeHtml(String(j.vm_id || '—'))}</td>
-                <td><code>${escapeHtml(formatLeaseCell(j.lease_owner))}</code></td>
-                <td>${escapeHtml(formatLeaseCell(j.lease_epoch))}</td>
+                <td>${leaseOwnerCell(j.lease_owner)}</td>
+                <td>${leaseEpochCell(j.lease_epoch)}</td>
                 <td>${leaseStateBadge(j.lease_expires_at)}</td>
                 <td>${escapeHtml(formatLeaseCell(j.lease_expires_at))}</td>
               </tr>`;
@@ -128,7 +172,7 @@ pub async fn admin_jobs() -> Html<String> {
             </div>
           </div>
           <p class="muted admin-hint" data-i18n="admin.jobs.hint">
-            Job queue from the coordinator store. Backend is set at startup via <code>POOLAI_JOB_STORE</code>. Lease columns are read-only and state badge is derived from <code>lease_expires_at</code> (Galaxy §4.3.1, PH-S94/S95/PH-S105).
+            Job queue from the coordinator store. Backend is set at startup via <code>POOLAI_JOB_STORE</code>. Lease columns are read-only; hover owner/epoch for Galaxy §4.3.1 CAS hints (PH-S119).
           </p>
           <div id="jobs-list"></div>
         </div>
@@ -149,4 +193,7 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("lease_epoch"));
     assert!(html.contains("leaseStateBadge"));
     assert!(html.contains("lease_expires_at"));
+    assert!(html.contains("leaseOwnerCell"));
+    assert!(html.contains("leaseEpochCell"));
+    assert!(html.contains("admin.jobs.tooltip.leaseEpoch"));
 }

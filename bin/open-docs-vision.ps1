@@ -37,8 +37,32 @@ function SendVisionBytes {
     $Context.Response.Close()
 }
 
+function Get-GitHeadShort {
+    param([string]$RepoRootPath)
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        return ''
+    }
+    try {
+        Push-Location -LiteralPath $RepoRootPath
+        $hash = (& git rev-parse --short HEAD 2>$null)
+        if ($hash) {
+            return "$hash".Trim()
+        }
+    }
+    catch {
+        return ''
+    }
+    finally {
+        Pop-Location
+    }
+    return ''
+}
+
 function GetVisionWatchPayload {
-    param([string]$VisionDirectory)
+    param(
+        [string]$VisionDirectory,
+        [string]$RepoRootPath
+    )
     $watchNames = @(
         'manifest.json',
         'extensions.json',
@@ -75,12 +99,14 @@ function GetVisionWatchPayload {
             $revision = 0
         }
     }
-    $token = '{0}:{1}:{2}' -f $bundleTicks, $dataTicks, $revision
+    $gitHead = Get-GitHeadShort -RepoRootPath $RepoRootPath
+    $token = '{0}:{1}:{2}:{3}' -f $bundleTicks, $dataTicks, $revision, $gitHead
     return @{
         token    = $token
         bundle   = [string]$bundleTicks
         data     = [string]$dataTicks
         revision = $revision
+        git_head = $gitHead
     }
 }
 
@@ -97,7 +123,7 @@ function StartVisionServerLoop {
         $path = $ctx.Request.Url.LocalPath.TrimStart('/').TrimEnd('/')
 
         if ($path -eq 'docs/vision/__watch') {
-            $payload = GetVisionWatchPayload -VisionDirectory $VisionDirectory
+            $payload = GetVisionWatchPayload -VisionDirectory $VisionDirectory -RepoRootPath $RepoRootPath
             $json = $payload | ConvertTo-Json -Compress
             $bytes = [Text.Encoding]::UTF8.GetBytes($json)
             SendVisionBytes -Context $ctx -Body $bytes -ContentType $JsonContentType
@@ -171,7 +197,7 @@ $listener.Prefixes.Add("http://127.0.0.1:$Port/")
 $listener.Start()
 Write-Host "Serving repo: $RepoRoot"
 Write-Host "Vision UI: $Url"
-Write-Host 'Auto-reload: GET /docs/vision/__watch (toggle Auto in UI)'
+Write-Host 'Auto-reload: GET /docs/vision/__watch (manifest rev + git HEAD; toggle Auto in UI)'
 Write-Host 'Stop: Ctrl+C'
 
 if (-not $NoBrowser) {

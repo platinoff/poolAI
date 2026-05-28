@@ -1,10 +1,11 @@
 {
-  "revision": 41,
+  "revision": 43,
   "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S117",
-  "vision_ui_rev": 48,
+  "last_sprint_closed": "PH-S119",
+  "git_head": "fadf259f",
+  "vision_ui_rev": 49,
   "galaxy_background": "vision2.png",
-  "next_sprint": "PH-S118",
+  "next_sprint": "PH-S120",
   "layers": [
     { "id": "L0", "name": "Concept", "z": 0 },
     { "id": "L1", "name": "Operations", "z": 1 },
@@ -106,6 +107,13 @@
       "path": "e2e/tests/grid_result_lease.spec.ts",
       "layer": "L3",
       "sprints": ["PH-S117"]
+    },
+    {
+      "id": "e2e_jobs_lease",
+      "label": "jobs_lease.spec.ts",
+      "path": "e2e/tests/jobs_lease.spec.ts",
+      "layer": "L3",
+      "sprints": ["PH-S107", "PH-S118"]
     },
     {
       "id": "virtual_nodes",
@@ -211,8 +219,8 @@
       "label": "admin/jobs.rs",
       "path": "src/ui/admin/jobs.rs",
       "layer": "L3",
-      "sprints": ["PH-S53", "PH-S96", "PH-S105"],
-      "sections": ["lease columns", "lease active/expired badge"]
+      "sprints": ["PH-S53", "PH-S96", "PH-S105", "PH-S119"],
+      "sections": ["lease columns", "lease active/expired badge", "epoch tooltips"]
     },
     {
       "id": "admin_grid_pricing",
@@ -328,6 +336,7 @@
     { "from": "lib_root", "to": "grid_dispatch", "kind": "crate" },
     { "from": "grid_dispatch", "to": "e2e_grid_job_lease", "kind": "sprint-scope" },
     { "from": "grid_dispatch", "to": "e2e_grid_result_lease", "kind": "sprint-scope" },
+    { "from": "job_types", "to": "e2e_jobs_lease", "kind": "sprint-scope" },
     { "from": "poolai_worker", "to": "grid_dispatch", "kind": "implements" },
     { "from": "lib_root", "to": "job_types", "kind": "crate" },
     { "from": "cargo_toml", "to": "crate_solana", "kind": "workspace" },

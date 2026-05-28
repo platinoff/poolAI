@@ -60,7 +60,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 
 1. `cargo fmt --all` → `cargo test-ci` (+ `poolai-openapi-gap-audit` після API; `e2e` після `src/ui/`).
 2. Staging лише файлів спринту (`git diff --cached --stat`).
-3. Commit (MSYS2; якщо subject = `Co-authored-by:` — `bin/amend-head-msg.sh` + `.commit-msg-ph-sNN.txt`).
+3. Commit (MSYS2; якщо subject = `Co-authored-by:` — `bin/amend-head-msg.sh` + `comitmsg/.commit-msg-ph-sNN.txt`).
 4. `git push origin main` + короткий самарі в чат.
 5. Оновити FM §5.12, HANDOFF, `NEXT_SESSION_PROMPT` (крок 12 + операційний зріз).
 

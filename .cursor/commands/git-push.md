@@ -103,7 +103,18 @@ git commit -m "feat(ml): extend pipeline step scheduling" \
   -m "- Нотатки: PATH з ~/.cargo/bin; target на S: при потребі cargo clean"
 ```
 
-Не роби `git add -A` / `git add .` без потреби — легко підхопити `data/audit/*.log.gz` або зайві артефакти.
+Не роби `git add -A` / `git add .` без потреби — легко підхопити `data/audit/*.log.gz`, `comitmsg/*.txt` або зайві артефакти.
+
+### 3d. Hook лишає лише `Co-authored-by:`
+
+Чернетки subject — у [`comitmsg/`](../../comitmsg/README.md) (не комітити `.txt` звідти). Після `git commit`:
+
+```bash
+export GIT_EDITOR=true
+bash bin/amend-head-msg.sh comitmsg/.commit-msg-ph-sNN.txt
+```
+
+(`commit-tree` обходить commit-msg hook; `amend-head-msg` приймає basename і шукає файл у `comitmsg/`.)
 
 ### 3b. Короткий самарі після успішного push (для чату / PR)
 

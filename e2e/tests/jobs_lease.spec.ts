@@ -110,3 +110,66 @@ test.describe("Jobs lease API smoke (PH-S107)", () => {
     expect(err.error?.code).toBe("lease_epoch_rejected");
   });
 });
+
+test.describe("Jobs lease negative paths (PH-S118)", () => {
+  test.skip(
+    !standRoot,
+    "requires bin/e2e-playwright.sh --start (POOLAI_E2E_STAND_ROOT)",
+  );
+
+  test("renew without acquire returns 400 validation", async ({ request }) => {
+    const created = await createUnboundJob(
+      request,
+      "ph-s118-renew-no-acquire",
+    );
+
+    const renew = await request.post(
+      `/api/v1/jobs/${created.id}/lease/renew`,
+      { data: { lease_epoch: 1 } },
+    );
+    expect(renew.status()).toBe(400);
+    const err = await renew.json();
+    const msg = String(err.error?.message || err.message || "");
+    expect(msg).toMatch(/acquire lease/i);
+  });
+
+  test("renew after lease TTL returns 409 lease_expired", async ({
+    request,
+  }) => {
+    const created = await createUnboundJob(request, "ph-s118-lease-expired");
+
+    const acquired = await request.post(`/api/v1/jobs/${created.id}/lease`, {
+      data: { lease_owner: "e2e-worker-expired" },
+    });
+    expect(acquired.status()).toBe(200);
+    const epoch = (await acquired.json()).job.lease_epoch as number;
+
+    await new Promise((r) => setTimeout(r, 2600));
+
+    const expired = await request.post(
+      `/api/v1/jobs/${created.id}/lease/renew`,
+      { data: { lease_epoch: epoch } },
+    );
+    expect(expired.status()).toBe(409);
+    const err = await expired.json();
+    expect(err.error?.code).toBe("lease_expired");
+  });
+
+  test("second acquire by different owner returns 409 lease_already_active", async ({
+    request,
+  }) => {
+    const created = await createUnboundJob(request, "ph-s118-wrong-owner");
+
+    const first = await request.post(`/api/v1/jobs/${created.id}/lease`, {
+      data: { lease_owner: "e2e-owner-a" },
+    });
+    expect(first.status()).toBe(200);
+
+    const second = await request.post(`/api/v1/jobs/${created.id}/lease`, {
+      data: { lease_owner: "e2e-owner-b" },
+    });
+    expect(second.status()).toBe(409);
+    const err = await second.json();
+    expect(err.error?.code).toBe("lease_already_active");
+  });
+});

@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **8** — PH-S118…S124 (vision PH-S113…S115 ✅; PH-S112–S117 ✅) |
+| **Відкрито** | **6** — PH-S120…S124 (vision PH-S113…S115 ✅; PH-S112–S119 ✅) |
 | **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -72,24 +72,24 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Worker renew ticker loop | PH-S116 ✅ | `LeaseRenewGuard` + interval from `JobLeaseConfig` |
 | Grid Job envelope E2E | PH-S112 ✅ | `grid_job_lease.spec.ts` |
 | Grid result lease E2E | PH-S117 ✅ | `grid_result_lease.spec.ts` |
+| Jobs lease negative E2E | PH-S118 ✅ | `jobs_lease.spec.ts` PH-S118 block; e2e TTL=2s |
+| Admin jobs lease polish | PH-S119 ✅ | `#epoch`, owner/epoch tooltips, i18n EN/UK |
 
-**Post-MVP (черга §5.12):** PH-S118 jobs lease negative E2E; PH-S119–S124 admin/docs/OpenAPI.
+**Post-MVP (черга §5.12):** PH-S120 Solana vision; PH-S121–S124 docs/OpenAPI.
 
 **Vision (docs):** PH-S113…S115 ✅ — `docs/vision/` L4/L5 layers, pan/zoom map, folder-colored edges.
 
 ---
 
-## 3. Черга §5.12 (8 відкритих)
+## 3. Черга §5.12 (6 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S118** | Jobs lease negative paths E2E | `e2e/`, PH-S107 |
-| 2 | **PH-S119** | Admin jobs lease column polish | `src/ui/admin/jobs.rs` |
-| 3 | **PH-S120** | Solana adapter vision crosslink | `docs/vision/`, FM-033 |
-| 4 | **PH-S121** | Galaxy §4.3 worker heartbeat wire note | `POOLAI_GALAXY_GRID.md` |
-| 5 | **PH-S122** | OpenAPI jobs lease schemas audit | `openapi.yaml`, gap audit |
-| 6 | **PH-S123** | Grid pricing E2E negative fallback | `e2e/grid_pricing` |
-| 7 | **PH-S124** | OTel lease span attrs docs | FM-038 |
+| 1 | **PH-S120** | Solana adapter vision crosslink | `docs/vision/`, FM-033 |
+| 2 | **PH-S121** | Galaxy §4.3 worker heartbeat wire note | `POOLAI_GALAXY_GRID.md` |
+| 3 | **PH-S122** | OpenAPI jobs lease schemas audit | `openapi.yaml`, gap audit |
+| 4 | **PH-S123** | Grid pricing E2E negative fallback | `e2e/grid_pricing` |
+| 5 | **PH-S124** | OTel lease span attrs docs | FM-038 |
 
 ---
 

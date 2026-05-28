@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S116 ✅ worker renew ticker · PH-S117 ✅ grid Result lease E2E · §5.12 **8** відкритих PH-S118…S124 · vision rev 41) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-28 (PH-S119 ✅ admin jobs lease polish · §5.12 **6** відкритих PH-S120…S124 · vision rev 43) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -84,10 +84,13 @@
 **PH-S112 ✅ (e2e):** `e2e/tests/grid_job_lease.spec.ts` — `POST /api/v1/grid/envelope` Job + `source_peer_id` → ingest `leased` + `lease_owner`/`lease_epoch`/`lease_expires_at`; without peer → `scheduled` without lease; `e2e/package.json` `test:ci` includes `grid_job_lease`.
 **PH-S116 ✅ (code):** `src/bin/poolai-worker.rs` — `LeaseRenewGuard` + `run_lease_renew_ticker` from `JobLeaseConfig.lease_renew_interval_secs` while task carries `job_id` + `lease_epoch`; wiremock unit tests (`lease_renew_ticker_fires_while_active`, epoch conflict stop); `cargo test --bin poolai-worker`.
 **PH-S117 ✅ (e2e):** `e2e/tests/grid_result_lease.spec.ts` — grid Job ingest → leased; stale `lease_epoch` on Result → `409 lease_epoch_rejected`; matching epoch → `completed`; `test:ci` includes `grid_result_lease`.
+**PH-S118 ✅ (e2e):** `jobs_lease.spec.ts` PH-S118 block — renew without acquire → `400`; expired TTL (`POOLAI_JOB_LEASE_TTL_SECS=2` on e2e stand) → `409 lease_expired`; wrong owner re-acquire → `409 lease_already_active`.
+**PH-S119 ✅ (code):** `/ui/admin/jobs` — `#epoch` display; `title` tooltips on lease owner/epoch + column headers; i18n EN/UK; `admin.spec.ts` tooltip/`#42` assertions; `cargo test-ci`.
+**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill (`manifest.git_head` + live `__watch.git_head`); manifest rev **43**; next **PH-S120**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **8** відкритих — **PH-S118** (jobs lease negative E2E) + **PH-S119…S124** (admin/UI/docs).
+**Черга:** §5.12 **6** відкритих — **PH-S120** (Solana vision) + **PH-S121…S124** (docs/OpenAPI).
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
@@ -211,4 +214,4 @@ Runbook: [`LAN_BENCHMARK_RUNBOOK.md`](../performance/LAN_BENCHMARK_RUNBOOK.md) �
 4. Оркестратор: `autonomous-orchestrator.mdc`; бенч — лише за scope спринту (`BENCHMARKS.md`, `poolai_health_load`).
 5. **Не в обсязі:** FM-003 §4 LAN (2 хости); mainnet Solana; native Azure Compute SDK crate.
 6. **Push:** MSYS2 UCRT64, [`git-push.md`](../../.cursor/commands/git-push.md); код у коміті → Summary + самарі в чат.
-7. **Не в git:** `data/audit/*.log*`, `data/dev/`, `.commit-msg-*.txt`, `bin/commit-*.sh`, `target/`.
+7. **Не в git:** `data/audit/*.log*`, `data/dev/`, `comitmsg/*.txt` (чернетки commit-msg; див. `comitmsg/README.md`), `bin/commit-*.sh`, `target/`.

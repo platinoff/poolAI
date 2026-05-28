@@ -21,6 +21,7 @@ poolAI/
 │   ├── bin/          ← cargo binaries only
 │   └── ui/           ← Admin UI (JS)
 ├── bin/              ← dev/launch ops (.sh / .ps1)
+├── comitmsg/         ← локальні чернетки commit message (.txt, gitignored)
 ├── scripts/          ← toolchain & deploy helpers
 ├── tests/            ← integration tests
 ├── crates/           ← workspace members
@@ -37,6 +38,7 @@ poolAI/
 | API, сервіси, ML, RAID | `src/` |
 | Новий CLI/tool на Rust | `src/bin/` + `Cargo.toml` `[[bin]]` |
 | Запуск стенду, verify, метрики ops | **`bin/`** |
+| Чернетка subject для `commit-tree` / PH-S* push | **`comitmsg/`** (див. [`comitmsg/README.md`](../../comitmsg/README.md)) |
 | MSYS, PATH, gcc, старий git-push shell | **`scripts/`** |
 | HTTP/JSON контракт проти API | `tests/` (`admin_ui_api_contracts.rs`, `vm_api_contracts.rs`, `distributed_raid_wire_integration.rs`, …) |
 | Raft wire + multi-node harness (`feature raft`) | `tests/raft_wire_integration.rs`, `tests/raft_multi_node_harness.rs` — **`cargo test-raft-ci`** |

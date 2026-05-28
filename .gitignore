@@ -35,6 +35,9 @@ data/monitoring/
 
 # Legacy one-off commit message drafts (do not commit)
 docs/development/.commit-msg-*.txt
+.commit-msg-*.txt
+comitmsg/*
+!comitmsg/README.md
 
 # OS files
 .DS_Store

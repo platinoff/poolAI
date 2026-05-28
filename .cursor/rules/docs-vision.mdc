@@ -60,5 +60,5 @@ alwaysApply: false
 
 ## Не робити
 
-- Не комітити `data/audit/`, `.commit-msg-*`, `target/` у scope vision.
+- Не комітити `data/audit/`, `comitmsg/*.txt`, `target/` у scope vision.
 - Не видаляти вузли з `manifest.json` без архівної примітки в README (legacy → `archived: true` у майбутньому).

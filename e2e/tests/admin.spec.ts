@@ -159,7 +159,15 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
       page.getByRole("columnheader", { name: /lease expires/i }),
     ).toBeVisible();
     await expect(page.locator("#jobs-list")).toContainText("e2e-lease-worker");
-    await expect(page.locator("#jobs-list")).toContainText("42");
+    await expect(page.locator("#jobs-list .lease-epoch-cell")).toContainText("#42");
+    await expect(page.locator("#jobs-list .lease-owner-cell")).toHaveAttribute(
+      "title",
+      /Galaxy|lease|CAS/i,
+    );
+    await expect(page.locator("#jobs-list .lease-epoch-cell")).toHaveAttribute(
+      "title",
+      /epoch|CAS|renew/i,
+    );
     await expect(page.locator("#jobs-list")).toContainText("Active");
     await expect(page.locator("#jobs-list")).toContainText(expires);
   });

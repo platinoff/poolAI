@@ -22,7 +22,7 @@ git commit -m "type(scope): subject" -m "Summary:" -m "- …"
 Або після невдалого commit:
 
 ```bash
-bash bin/amend-head-msg.sh .commit-msg-<sprint>.txt
+bash bin/amend-head-msg.sh comitmsg/.commit-msg-<sprint>.txt
 ```
 
 (`commit-tree` — обходить commit-msg hook.)

@@ -128,6 +128,31 @@ header .meta {
   white-space: nowrap;
 }
 
+.meta-trail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.commit-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+  letter-spacing: 0.03em;
+}
+
+.commit-pill[hidden] {
+  display: none;
+}
+
 .sprint-pill {
   display: inline-block;
   padding: 2px 8px;
@@ -137,7 +162,6 @@ header .meta {
   background: rgba(167, 139, 250, 0.2);
   border: 1px solid rgba(167, 139, 250, 0.4);
   color: #d4c4ff;
-  margin-left: 6px;
 }
 
 button {

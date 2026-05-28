@@ -58,6 +58,8 @@
   let watchTimer = null;
   let autoReloadEnabled = true;
   let reloadInFlight = false;
+  /** Live git HEAD from __watch (falls back to manifest.git_head). */
+  let headerGitHead = null;
 
   function repoUrl(relPath) {
     return "/" + relPath.replace(/^\//, "");
@@ -1562,6 +1564,55 @@
     showAutoToast._t = setTimeout(() => el.classList.remove("show"), 2200);
   }
 
+  function resolveHeaderGitHead(manifest, watchGitHead) {
+    const fromWatch =
+      watchGitHead && String(watchGitHead).trim()
+        ? String(watchGitHead).trim()
+        : null;
+    if (fromWatch) return fromWatch;
+    const fromManifest =
+      manifest && manifest.git_head && String(manifest.git_head).trim()
+        ? String(manifest.git_head).trim()
+        : null;
+    return fromManifest;
+  }
+
+  function updateHeaderMeta(manifest, watchGitHead) {
+    if (!manifest) return;
+    if (watchGitHead !== undefined) {
+      const live = watchGitHead && String(watchGitHead).trim();
+      if (live) headerGitHead = live;
+    }
+    const displayGit =
+      headerGitHead || resolveHeaderGitHead(manifest, null) || null;
+
+    const revEl = document.getElementById("meta-rev");
+    const trailEl = document.getElementById("meta-trail");
+    if (!revEl || !trailEl) return;
+
+    let revHtml =
+      "rev <strong>" + escapeHtml(String(manifest.revision)) + "</strong>";
+    if (manifest.last_sprint_closed) {
+      revHtml += " · " + escapeHtml(String(manifest.last_sprint_closed));
+    }
+    revEl.innerHTML = revHtml;
+
+    let trailHtml = "";
+    if (displayGit) {
+      trailHtml +=
+        '<span class="commit-pill" title="git HEAD (short)">' +
+        escapeHtml(displayGit) +
+        "</span>";
+    }
+    if (manifest.next_sprint) {
+      trailHtml +=
+        '<span class="sprint-pill" title="Next sprint (FM §5.12)">→ ' +
+        escapeHtml(String(manifest.next_sprint)) +
+        "</span>";
+    }
+    trailEl.innerHTML = trailHtml;
+  }
+
   async function reloadAll(keepSelection) {
     const prevId = keepSelection ? selectedId : null;
     const fsPanelId = fullscreenPanel && fullscreenPanel.dataset.panel;
@@ -1575,14 +1626,7 @@
     sprintPathSet = buildSprintPathSet(extensions, activeSprint);
     updateSidebarSprintPill();
 
-    document.getElementById("meta-rev").innerHTML =
-      "rev <strong>" +
-      manifest.revision +
-      "</strong> · " +
-      manifest.last_sprint_closed +
-      ' <span class="sprint-pill">→ ' +
-      manifest.next_sprint +
-      "</span>";
+    updateHeaderMeta(manifest, headerGitHead);
 
     syncLayerGeometry(manifest);
     renderLayers(manifest);
@@ -1615,13 +1659,24 @@
       const w = await r.json();
       if (!watchState) {
         watchState = w;
+        if (manifest && w.git_head) {
+          updateHeaderMeta(manifest, w.git_head);
+        }
         return;
       }
       if (w.token === watchState.token) return;
 
       const bundleChanged = w.bundle !== watchState.bundle;
+      const gitChanged =
+        w.git_head && watchState.git_head && w.git_head !== watchState.git_head;
       const prev = watchState;
       watchState = w;
+
+      if (gitChanged && manifest) {
+        updateHeaderMeta(manifest, w.git_head);
+        showAutoToast("HEAD → " + w.git_head);
+      }
+
       reloadInFlight = true;
 
       if (bundleChanged) {

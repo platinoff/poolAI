@@ -53,7 +53,9 @@ http://127.0.0.1:8765/docs/vision/index.html
 3. За потреби — підпис у `vision.svg` (footer: last sprint / next).
 4. Перевірити `index.html` → **Auto** (кожні 1.5s) або Reload.
 
-**Auto-reload:** кнопка **Auto** у шапці; сервер `GET /docs/vision/__watch` — зміни `manifest.json` / `extensions.json` оновлюють граф без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
+**Auto-reload:** кнопка **Auto** у шапці; сервер `GET /docs/vision/__watch` — зміни `manifest.json` / `extensions.json` оновлюють граф без F5; **`git_head`** (короткий hash) оновлює cyan pill у шапці без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
+
+**Шапка:** `rev N · PH-S*` (закритий спринт) · **git HEAD** pill · `→ PH-S*` (наступний з `manifest.next_sprint`).
 
 ## Шари (канон)
 

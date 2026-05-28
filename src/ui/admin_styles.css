@@ -499,6 +499,23 @@ button.btn.btn-danger:focus-visible,
   padding: var(--spacing-2) var(--spacing-3);
 }
 
+.admin-table .lease-owner-cell,
+.admin-table .lease-epoch-cell {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table .lease-epoch-cell {
+  font-weight: 600;
+  color: var(--accent-2, #a78bfa);
+}
+
+.admin-table th[title],
+.admin-table .lease-owner-cell[title],
+.admin-table .lease-epoch-cell[title] {
+  cursor: help;
+}
+
 .admin-table tbody tr:hover {
   background: var(--surface-secondary);
 }
