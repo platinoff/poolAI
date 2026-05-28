@@ -1,7 +1,7 @@
 {
-  "revision": 25,
+  "revision": 26,
   "updated_at": "2026-05-28",
-  "active_sprint": "PH-S122",
+  "active_sprint": "PH-S123",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -207,6 +207,21 @@
         "docs/development/HANDOFF_NEW_SESSION.md",
         "docs/development/NEXT_SESSION_PROMPT.md",
         "docs/vision/manifest.json"
+      ]
+    },
+    "openapi_lease_schemas_audit": {
+      "sprints": ["PH-S122"],
+      "docs": ["docs/openapi.yaml", "docs/development/OPENAPI_GAP_AUDIT_2026-05-19.md"],
+      "code_globs": ["src/bin/poolai_openapi_gap_audit.rs", "src/bin/poolai_vision_sync.rs", "src/grid/envelope.rs", "src/network/api/jobs.rs"],
+      "extensions": [".yaml", ".rs", ".md"],
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "bin/open-docs-vision.ps1"
       ]
     },
     "solana_adapter_vision": {

@@ -48,6 +48,7 @@ fn collect_routes(network_dir: &Path) -> BTreeSet<String> {
         let Ok(text) = fs::read_to_string(path) else {
             return;
         };
+        let text = strip_cfg_test_modules(&text);
         for route in extract_route_literals(&text) {
             routes.insert(route);
         }
@@ -67,6 +68,49 @@ fn walk_rs(dir: &Path, file_fn: &mut dyn FnMut(&Path)) {
             file_fn(&path);
         }
     }
+}
+
+/// Drop `#[cfg(test)] mod … { … }` blocks so unit-test routers are not audited as public API.
+fn strip_cfg_test_modules(source: &str) -> String {
+    let mut out = String::with_capacity(source.len());
+    let mut rest = source;
+    while let Some(marker) = rest.find("#[cfg(test)]") {
+        out.push_str(&rest[..marker]);
+        let after_marker = &rest[marker..];
+        let Some(mod_idx) = after_marker.find("mod ") else {
+            out.push_str(after_marker);
+            break;
+        };
+        let after_mod = &after_marker[mod_idx..];
+        let Some(open_brace) = after_mod.find('{') else {
+            out.push_str(after_marker);
+            break;
+        };
+        let brace_start = marker + mod_idx + open_brace;
+        let bytes = rest.as_bytes();
+        let mut depth = 0usize;
+        let mut i = brace_start;
+        while i < bytes.len() {
+            match bytes[i] {
+                b'{' => depth += 1,
+                b'}' => {
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        rest = &rest[i + 1..];
+                        break;
+                    }
+                }
+                _ => {}
+            }
+            i += 1;
+        }
+        if depth != 0 {
+            out.push_str(after_marker);
+            break;
+        }
+    }
+    out.push_str(rest);
+    out
 }
 
 /// Match `.route("…")` / `.route( "…" )` string literals (same as legacy audit script).
@@ -222,5 +266,26 @@ mod tests {
         assert!(is_ignored("/raft/vote"));
         assert!(is_ignored("/raft/append-entries"));
         assert!(!is_ignored("/api/v1/health"));
+    }
+
+    #[test]
+    fn strip_cfg_test_modules_drops_test_routes() {
+        let src = r#"
+pub fn routes() -> Router {
+    Router::new().route("/api/v1/grid/envelope", post(handler))
+}
+
+#[cfg(test)]
+mod tests {
+    fn mock() {
+        Router::new().route("/quote", get(|| async {}));
+    }
+}
+"#;
+        let stripped = strip_cfg_test_modules(src);
+        assert_eq!(
+            extract_route_literals(&stripped),
+            vec!["/api/v1/grid/envelope".to_string()]
+        );
     }
 }

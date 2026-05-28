@@ -58,6 +58,31 @@ function Get-GitHeadShort {
     return ''
 }
 
+function Invoke-VisionManifestSync {
+    param([string]$RepoRootPath)
+    $syncExe = Join-Path $RepoRootPath 'target\debug\poolai-vision-sync.exe'
+    $syncRelease = Join-Path $RepoRootPath 'target\release\poolai-vision-sync.exe'
+    $bin = if (Test-Path -LiteralPath $syncExe) { $syncExe }
+           elseif (Test-Path -LiteralPath $syncRelease) { $syncRelease }
+           else { $null }
+    try {
+        Push-Location -LiteralPath $RepoRootPath
+        if ($bin) {
+            & $bin
+        }
+        else {
+            $env:PATH = "$env:USERPROFILE\.cargo\bin;C:\msys64\ucrt64\bin;C:\msys64\usr\bin;" + $env:PATH
+            cargo run --quiet --bin poolai-vision-sync
+        }
+    }
+    catch {
+        Write-Host "vision sync skipped: $_"
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 function GetVisionWatchPayload {
     param(
         [string]$VisionDirectory,
@@ -130,6 +155,15 @@ function StartVisionServerLoop {
             continue
         }
 
+        if ($path -eq 'docs/vision/__sync') {
+            Invoke-VisionManifestSync -RepoRootPath $RepoRootPath
+            $payload = GetVisionWatchPayload -VisionDirectory $VisionDirectory -RepoRootPath $RepoRootPath
+            $json = $payload | ConvertTo-Json -Compress
+            $bytes = [Text.Encoding]::UTF8.GetBytes($json)
+            SendVisionBytes -Context $ctx -Body $bytes -ContentType $JsonContentType
+            continue
+        }
+
         if ([string]::IsNullOrWhiteSpace($path)) {
             $ctx.Response.StatusCode = 302
             $ctx.Response.RedirectLocation = '/docs/vision/index.html'
@@ -194,10 +228,12 @@ if ($existing) {
 
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://127.0.0.1:$Port/")
+Write-Host 'Vision sync: indexing git-tracked files into manifest.json …'
+Invoke-VisionManifestSync -RepoRootPath $RepoRoot
 $listener.Start()
 Write-Host "Serving repo: $RepoRoot"
 Write-Host "Vision UI: $Url"
-Write-Host 'Auto-reload: GET /docs/vision/__watch (manifest rev + git HEAD; toggle Auto in UI)'
+Write-Host 'Auto-reload: GET /docs/vision/__watch · manual sync: GET /docs/vision/__sync'
 Write-Host 'Stop: Ctrl+C'
 
 if (-not $NoBrowser) {

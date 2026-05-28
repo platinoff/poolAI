@@ -478,6 +478,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AcquireJobLeaseRequest'
+            example:
+              lease_owner: worker-a
       responses:
         '200':
           description: Lease acquired
@@ -485,6 +487,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobDetailResponse'
+              example:
+                job:
+                  spec:
+                    id: job-lease-example
+                    kind: inference
+                    priority: 5
+                    resources: {}
+                    input_artifact_ids: [artifact-1]
+                  status: leased
+                  created_at: '2026-05-28T12:00:00Z'
+                  lease_owner: worker-a
+                  lease_epoch: 1
+                  lease_expires_at: '2026-05-28T12:05:00Z'
         '400':
           description: Missing lease owner when job has no worker/vm binding
           content:
@@ -503,6 +518,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: lease_already_active
+                  message: active lease already held for job 'job-lease-example' (Galaxy §4.3.1)
         '500':
           description: Internal error
           content:
@@ -531,6 +550,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RenewJobLeaseRequest'
+            example:
+              lease_epoch: 1
       responses:
         '200':
           description: Lease renewed
@@ -538,6 +559,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JobDetailResponse'
+              example:
+                job:
+                  spec:
+                    id: job-lease-example
+                    kind: inference
+                    priority: 5
+                    resources: {}
+                    input_artifact_ids: [artifact-1]
+                  status: leased
+                  created_at: '2026-05-28T12:00:00Z'
+                  lease_owner: worker-a
+                  lease_epoch: 1
+                  lease_expires_at: '2026-05-28T12:10:00Z'
         '400':
           description: Job has no lease fields
           content:
@@ -551,11 +585,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Epoch mismatch or lease expired
+          description: Epoch mismatch or lease expired (`lease_epoch_rejected`, `lease_expired`)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                lease_epoch_rejected:
+                  summary: Stale lease_epoch on renew
+                  value:
+                    error:
+                      code: lease_epoch_rejected
+                      message: lease_epoch does not match active lease for job 'job-lease-example' (Galaxy §4.3.1)
+                lease_expired:
+                  summary: Lease TTL elapsed
+                  value:
+                    error:
+                      code: lease_expired
+                      message: lease expired for job 'job-lease-example' (Galaxy §4.3.1)
         '500':
           description: Internal error
           content:
@@ -570,7 +617,8 @@ paths:
       summary: Ingest Grid envelope v1
       description: |
         Dispatches `GridEnvelope` by `type`: `job` → job store + scheduler;
-        `result` → job status update; `memory_shard` → memory store; `peer_status` → ack only.
+        `result` → job status update (optional `lease_epoch` CAS when job is leased, PH-S110);
+        `memory_shard` → memory store; `peer_status` → ack only.
       operationId: ingestGridEnvelope
       requestBody:
         required: true
@@ -578,6 +626,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/GridEnvelope'
+            examples:
+              result_with_lease_epoch:
+                summary: Result with matching lease_epoch (PH-S110 CAS)
+                value:
+                  v: 1
+                  sent_at: '2026-05-28T12:01:00Z'
+                  type: result
+                  job_id: job-grid-lease-1
+                  status: completed
+                  output_artifact_ids: [out-artifact-1]
+                  lease_epoch: 2
       responses:
         '200':
           description: Envelope processed
@@ -597,6 +656,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Lease epoch CAS rejected on result ingest (`lease_epoch_rejected`, PH-S110)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: lease_epoch_rejected
+                  message: lease_epoch does not match active lease for job 'job-grid-lease-1' (Galaxy §4.3.1)
 
   /grid/pricing:
     get:
@@ -670,6 +739,12 @@ paths:
                 $ref: '#/components/schemas/GridIngestResponse'
         '400':
           description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Lease epoch CAS rejected on result ingest (`lease_epoch_rejected`, PH-S110)
           content:
             application/json:
               schema:
@@ -5588,8 +5663,25 @@ components:
           description: Count of submitted jobs past deadline marked failed (PH-S38)
 
     GridEnvelope:
+      description: |
+        Grid wire container v1 (`src/grid/envelope.rs`). Message body fields depend on `type`
+        (serde externally tagged + flattened into the root object).
+      oneOf:
+        - allOf:
+            - $ref: '#/components/schemas/GridEnvelopeHeader'
+            - $ref: '#/components/schemas/GridJobBody'
+        - allOf:
+            - $ref: '#/components/schemas/GridEnvelopeHeader'
+            - $ref: '#/components/schemas/GridResultBody'
+        - allOf:
+            - $ref: '#/components/schemas/GridEnvelopeHeader'
+            - $ref: '#/components/schemas/GridMemoryShardBody'
+        - allOf:
+            - $ref: '#/components/schemas/GridEnvelopeHeader'
+            - $ref: '#/components/schemas/GridPeerStatusBody'
+
+    GridEnvelopeHeader:
       type: object
-      description: Grid wire container v1 (`src/grid/envelope.rs`)
       required:
         - v
         - type
@@ -5604,14 +5696,143 @@ components:
         source_peer_id:
           type: string
           nullable: true
+
+    GridJobBody:
+      type: object
+      required:
+        - type
+        - job_id
+        - task_kind
+      properties:
         type:
           type: string
-          enum:
-            - job
-            - result
-            - memory_shard
-            - peer_status
-      additionalProperties: true
+          enum: [job]
+        job_id:
+          type: string
+        task_kind:
+          type: string
+          description: Task kind (`inference`, `training`, `memory`, `system`, …)
+        verification_policy:
+          type: string
+          nullable: true
+        input_artifact_ids:
+          type: array
+          items:
+            type: string
+        deadline:
+          type: string
+          format: date-time
+          nullable: true
+
+    GridResultBody:
+      type: object
+      description: Grid job execution result (PH-S110 lease_epoch CAS on leased jobs)
+      required:
+        - type
+        - job_id
+        - status
+      properties:
+        type:
+          type: string
+          enum: [result]
+        job_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/GridResultStatus'
+        output_artifact_ids:
+          type: array
+          items:
+            type: string
+        proof:
+          type: string
+          nullable: true
+        metrics:
+          type: object
+          nullable: true
+          additionalProperties: true
+        lease_epoch:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          description: |
+            Galaxy §4.3.1 CAS — must match active `lease_epoch` when job has lease fields (PH-S110);
+            omit only for jobs without lease. Mismatch or missing epoch on leased job → `409 lease_epoch_rejected`.
+
+    GridResultStatus:
+      type: string
+      enum:
+        - completed
+        - failed
+        - verified
+
+    GridMemoryShardBody:
+      type: object
+      required:
+        - type
+        - shard_id
+        - artifact_id
+        - version
+      properties:
+        type:
+          type: string
+          enum: [memory_shard]
+        shard_id:
+          type: string
+        artifact_id:
+          type: string
+        version:
+          type: string
+        raid_logical_name:
+          type: string
+          nullable: true
+        seed_hints:
+          type: array
+          items:
+            type: string
+          nullable: true
+
+    GridPeerStatusBody:
+      type: object
+      required:
+        - type
+        - peer_id
+        - address
+        - port
+        - last_seen
+        - cpu_cores
+        - memory_mb
+      properties:
+        type:
+          type: string
+          enum: [peer_status]
+        peer_id:
+          type: string
+        address:
+          type: string
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
+        last_seen:
+          type: string
+          format: date-time
+        cpu_cores:
+          type: integer
+          minimum: 0
+        memory_mb:
+          type: integer
+          minimum: 0
+        gpu_devices:
+          type: array
+          items:
+            type: integer
+        current_load:
+          type: number
+          format: float
+        role:
+          type: string
+          nullable: true
 
     GridIngestResponse:
       type: object

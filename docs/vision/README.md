@@ -55,6 +55,8 @@ http://127.0.0.1:8765/docs/vision/index.html
 
 **Auto-reload:** кнопка **Auto** у шапці; сервер `GET /docs/vision/__watch` — зміни `manifest.json` / `extensions.json` оновлюють граф без F5; **`git_head`** (короткий hash) оновлює cyan pill у шапці без F5; зміни `index.html` / `vision.css` / `vision.js` — повне перезавантаження сторінки.
 
+**Auto-sync (інкрементальна карта):** `cargo run --bin poolai-vision-sync` або `GET /docs/vision/__sync` — додає нові/змінені git-tracked файли (`docs/`, `src/`, `e2e/`, …) у `manifest.json` з ребрами до hub-вузлів (`galaxy_grid`, `fm`, `handoff`, …). `open-docs-vision.ps1` викликає sync при старті; **Reload manifest** у UI — теж через `__sync`.
+
 **Шапка:** `rev N · PH-S*` (закритий спринт) · **git HEAD** pill · `→ PH-S*` (наступний з `manifest.next_sprint`).
 
 ## Шари (канон)

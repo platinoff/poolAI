@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **4** — PH-S122…S124 (vision PH-S113…S115 ✅; PH-S112–S121 ✅) |
+| **Відкрито** | **3** — PH-S123…S124 (vision PH-S113…S115 ✅; PH-S112–S122 ✅) |
 | **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -76,20 +76,20 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Admin jobs lease polish | PH-S119 ✅ | `#epoch`, owner/epoch tooltips, i18n EN/UK |
 | Solana adapter vision | PH-S120 ✅ | manifest Solana cluster; DIGEST §; FM-033 crosslink |
 | Worker lease heartbeat docs | PH-S121 ✅ | Galaxy §4.3.1.1; discovery vs job renew; `LeaseRenewGuard` |
+| OpenAPI lease schemas audit | PH-S122 ✅ | `GridResultBody.lease_epoch`; jobs lease examples; gap audit 0 |
 
-**Post-MVP (черга §5.12):** PH-S122 OpenAPI audit; PH-S123–S124 e2e/docs.
+**Post-MVP (черга §5.12):** PH-S123–S124 e2e/docs.
 
 **Vision (docs):** PH-S113…S115 ✅ — `docs/vision/` L4/L5 layers, pan/zoom map, folder-colored edges.
 
 ---
 
-## 3. Черга §5.12 (4 відкритих)
+## 3. Черга §5.12 (3 відкритих)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S122** | OpenAPI jobs/grid lease schemas audit | `openapi.yaml`, gap audit |
-| 2 | **PH-S123** | Grid pricing E2E negative fallback | `e2e/grid_pricing` |
-| 3 | **PH-S124** | OTel lease span attrs docs | FM-038 |
+| 1 | **PH-S123** | Grid pricing E2E negative fallback | `e2e/grid_pricing` |
+| 2 | **PH-S124** | OTel lease span attrs docs | FM-038 |
 
 ---
 

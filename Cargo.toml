@@ -190,6 +190,10 @@ name = "poolai-openapi-gap-audit"
 path = "src/bin/poolai_openapi_gap_audit.rs"
 
 [[bin]]
+name = "poolai-vision-sync"
+path = "src/bin/poolai_vision_sync.rs"
+
+[[bin]]
 name = "poolai-verify-release"
 path = "src/bin/poolai_verify_release.rs"
 

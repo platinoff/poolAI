@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
-  <title id="title">PooaI Galazy Starwalker Vision</title>
+  <title id="title">PoolAI Galaxy Starwalker Vision</title>
   <desc id="desc">Isometric L0-L3 layers with Galaxy Grid at center. PH-S74 done, next PH-S75.</desc>
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -54,7 +54,7 @@
     <circle cx="400" cy="60" r="0.7"/><circle cx="700" cy="680" r="1.1"/>
   </g>
 
-  <text x="600" y="42" text-anchor="middle" fill="#eef2ff" font-family="Segoe UI, system-ui, sans-serif" font-size="22" font-weight="600">PooaI Galazy Starwalker Vision</text>
+  <text x="600" y="42" text-anchor="middle" fill="#eef2ff" font-family="Segoe UI, system-ui, sans-serif" font-size="22" font-weight="600">PoolAI Galaxy Starwalker Vision</text>
   <text x="600" y="68" text-anchor="middle" fill="#8b9cb8" font-family="Segoe UI, system-ui, sans-serif" font-size="13">L0 Concept -> L3 Code - manifest-driven graph in browser</text>
 
   <g transform="translate(180, 100)" filter="url(#shadow)">
@@ -107,5 +107,5 @@
     <text x="0" y="108" fill="#a78bfa">? implements / session-tracks</text>
   </g>
 
-  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S98 done - next PH-S99 lease renew - interactive map in index.html</text>
+  <text x="600" y="738" text-anchor="middle" fill="#6a7a9a" font-family="Segoe UI, system-ui, sans-serif" font-size="12">PH-S122 done - next PH-S123 grid pricing E2E - interactive map in index.html</text>
 </svg>

@@ -1616,6 +1616,11 @@
   async function reloadAll(keepSelection) {
     const prevId = keepSelection ? selectedId : null;
     const fsPanelId = fullscreenPanel && fullscreenPanel.dataset.panel;
+    try {
+      await fetch(VISION_BASE + "__sync?t=" + Date.now());
+    } catch (_) {
+      /* sync optional when server has no __sync route */
+    }
     manifest = await loadJson("manifest.json");
     try {
       extensions = await loadJson("extensions.json");

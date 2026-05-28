@@ -1,406 +1,6328 @@
 {
-  "revision": 45,
-  "updated_at": "2026-05-28",
-  "last_sprint_closed": "PH-S121",
-  "git_head": "0d70e6c6",
-  "vision_ui_rev": 49,
-  "galaxy_background": "vision2.png",
-  "next_sprint": "PH-S122",
-  "layers": [
-    { "id": "L0", "name": "Concept", "z": 0 },
-    { "id": "L1", "name": "Operations", "z": 1 },
-    { "id": "L2", "name": "Catalog", "z": 2 },
-    { "id": "L3", "name": "Code", "z": 3 },
-    { "id": "L4", "name": "Lib roots", "z": 4 },
-    { "id": "L5", "name": "Workspace", "z": 5 }
+  "auto_sync_at": "2026-05-28",
+  "edges": [
+    {
+      "from": "galaxy_grid",
+      "kind": "concept-ref",
+      "to": "memory_layer"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "concept-ref",
+      "to": "grid_node"
+    },
+    {
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "galaxy_grid"
+    },
+    {
+      "from": "next_session",
+      "kind": "mirror",
+      "to": "handoff"
+    },
+    {
+      "from": "docs_index",
+      "kind": "catalog",
+      "to": "fm"
+    },
+    {
+      "from": "dev_readme",
+      "kind": "session-tracks",
+      "to": "handoff"
+    },
+    {
+      "from": "dev_readme",
+      "kind": "session-tracks",
+      "to": "next_session"
+    },
+    {
+      "from": "fm",
+      "kind": "queue",
+      "to": "handoff"
+    },
+    {
+      "from": "fm",
+      "kind": "sprint-scope",
+      "to": "galaxy_grid"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "galaxy_fee_split"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "grid_dispatch"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "virtual_nodes"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "telegram_bind"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "verify_release"
+    },
+    {
+      "from": "verify_release",
+      "kind": "implements",
+      "to": "release_mod"
+    },
+    {
+      "from": "digest",
+      "kind": "catalog",
+      "to": "fm"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "concept-ref",
+      "to": "security_hardening"
+    },
+    {
+      "from": "security_hardening",
+      "kind": "concept-ref",
+      "to": "dependency_security"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_types"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_lifecycle"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_store"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_scheduler"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "admin_updates_compat"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "admin_jobs"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "admin_grid_pricing"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "grid_pricing_api"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "pricing_oracle"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "protocol_middleware"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "poolai_worker"
+    },
+    {
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "galaxy_roadmap"
+    },
+    {
+      "from": "fm",
+      "kind": "queue",
+      "to": "galaxy_roadmap"
+    },
+    {
+      "from": "cargo_toml",
+      "kind": "workspace",
+      "to": "lib_root"
+    },
+    {
+      "from": "cargo_config",
+      "kind": "workspace",
+      "to": "cargo_toml"
+    },
+    {
+      "from": "lib_root",
+      "kind": "crate",
+      "to": "grid_dispatch"
+    },
+    {
+      "from": "grid_dispatch",
+      "kind": "sprint-scope",
+      "to": "e2e_grid_job_lease"
+    },
+    {
+      "from": "grid_dispatch",
+      "kind": "sprint-scope",
+      "to": "e2e_grid_result_lease"
+    },
+    {
+      "from": "job_types",
+      "kind": "sprint-scope",
+      "to": "e2e_jobs_lease"
+    },
+    {
+      "from": "poolai_worker",
+      "kind": "implements",
+      "to": "grid_dispatch"
+    },
+    {
+      "from": "lib_root",
+      "kind": "crate",
+      "to": "job_types"
+    },
+    {
+      "from": "cargo_toml",
+      "kind": "workspace",
+      "to": "crate_solana"
+    },
+    {
+      "from": "fm",
+      "kind": "catalog",
+      "to": "cargo_toml"
+    },
+    {
+      "from": "digest",
+      "kind": "catalog",
+      "to": "solana_concept"
+    },
+    {
+      "from": "fm",
+      "kind": "concept-ref",
+      "to": "solana_concept"
+    },
+    {
+      "from": "solana_concept",
+      "kind": "implements",
+      "to": "crate_solana"
+    },
+    {
+      "from": "lib_root",
+      "kind": "crate",
+      "to": "job_domain_events"
+    },
+    {
+      "from": "lib_root",
+      "kind": "crate",
+      "to": "job_onchain"
+    },
+    {
+      "from": "job_domain_events",
+      "kind": "implements",
+      "to": "job_onchain"
+    },
+    {
+      "from": "job_onchain",
+      "kind": "wire",
+      "to": "solana_sidecar"
+    },
+    {
+      "from": "crate_solana",
+      "kind": "crate",
+      "to": "solana_events"
+    },
+    {
+      "from": "crate_solana",
+      "kind": "crate",
+      "to": "solana_sidecar"
+    },
+    {
+      "from": "crate_solana",
+      "kind": "crate",
+      "to": "solana_program"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "concept-ref",
+      "to": "job_onchain"
+    },
+    {
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "solana_concept"
+    },
+    {
+      "auto_synced": true,
+      "from": "cargo_toml",
+      "kind": "workspace",
+      "to": "cargo_config"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crate_solana"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_README_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_config_devnet_toml"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_program_README_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_program_poolai_events_src_lib_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_config_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_instruction_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_lib_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_rpc_devnet_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_rpc_mock_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_sidecar_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_src_wire_limits_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_solana_adapter_wire_limits_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "fm",
+      "kind": "catalog",
+      "to": "digest"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "digest"
+    },
+    {
+      "auto_synced": true,
+      "from": "fm",
+      "kind": "catalog",
+      "to": "fm"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "fm"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "concept-ref",
+      "to": "docs_concept_CONCEPT_UPDATE_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "concept-ref",
+      "to": "galaxy_grid"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ADMIN_A11Y_RUNBOOK_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ADMIN_UI_FIELD_AUDIT_2026_05_23_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ADMIN_UI_JSON_CONTRACTS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ARCHITECT_PLAN_EXO_INTEGRATION_2026_01_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ARCHITECT_SUMMARY_2026_01_16_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ARCHITECT_SUMMARY_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ARCHITECT_UPDATE_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_DEV_PATTERNS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_16_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_18_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_20_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_22_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_23_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_24_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_25_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_26_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_27_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_28_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_29_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_30_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_05_31_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_01_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_02_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_03_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_04_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_05_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_06_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_07_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_08_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_09_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_10_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_11_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_12_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_13_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_14_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_15_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_16_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_18_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_20_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_22_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_23_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_24_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_25_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_26_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_27_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_28_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_29_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_06_30_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_07_01_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_HORIZON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AUTO_RUN_SESSION_2026_POST_HORIZON_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_AZURE_TOKEN_ENHANCEMENT_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CI_FAILURES_ANALYSIS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CI_FIXES_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CLEANUP_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CLOUD_SDK_CI_VERIFICATION_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CLOUD_SDK_PROGRESS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CLOUD_SDK_SETUP_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_COMPLETED_TASKS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CONCEPT_IMPLEMENTATION_CHECKLIST_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CONCEPT_PENDING_FEATURES_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURRENT_DEVELOPMENT_STATUS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_AGENT_SETUP_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_CONNECTION_ERROR_FIX_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_PERFORMANCE_OPTIMIZATION_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_CURSOR_SETTINGS_ANALYSIS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_DEPENDENCY_UPDATE_LOG_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_DEPENDENCY_UPDATE_REPORT_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_DESIGN_SYSTEM_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_DEVELOPMENT_PLAN_UPDATED_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_DEVELOPMENT_UPDATE_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_DOCS_LEGACY_AUDIT_2026_05_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_E2E_PLAYWRIGHT_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_EASIEST_TASKS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ENTERPRISE_FEATURES_COMPLETE_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_ENVIRONMENT_AND_CURSOR_UPDATES_2026_05_05_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_FIXES_APPLIED_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_FUTURE_DEVELOPMENT_ROADMAP_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_GIT_COMMITS_SUMMARY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_GRID_PROTOCOL_CONCEPT_2026_04_06_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "handoff"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_HORIZON_TO_100_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_JOB_LAYER_CONCEPT_2026_03_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_MONITORING_PERSISTENCE_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_MSYS2_CARGO_SETUP_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NATIVECOMMANDERROR_ANALYSIS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_DEVELOPMENT_PHASE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "next_session"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_2025_12_30_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_2025_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_2026_01_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_2026_01_18_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_ARCHITECT_2026_01_16_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_ARCHITECT_2026_01_22_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_ARCHITECT_2026_03_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_CURRENT_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_RELEVANT_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_SUMMARY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_NEXT_STEPS_UPDATED_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_OPENAPI_GAP_AUDIT_2026_05_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_OPENTELEMETRY_TRACING_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PERFORMANCE_OPTIMIZATION_PLAN_2026_03_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PRE_PUSH_HOOK_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PRIORITIES_COMPLETE_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PRIORITY_1_1_COMPLETION_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PRIORITY_1_2_STATUS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PROJECT_FILES_INVENTORY_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PROMETHEUS_METRICS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_PROMETHEUS_SECURITY_ALERTS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RAID_ADMIN_METRICS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "dev_readme"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RELEASE_MANIFEST_SAMPLE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_REPOSITORY_LAYOUT_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUN_LOCAL_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_ARCHITECT_FINAL_SUMMARY_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_ARCHITECT_NEXT_STEPS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_ARCHITECT_STATUS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_ARCHITECT_STATUS_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_ARCHITECT_SUMMARY_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_STATUS_UPDATE_2026_01_09_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_STATUS_UPDATE_2026_01_16_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_STATUS_UPDATE_2026_01_17_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_STATUS_UPDATE_2026_01_17_FINAL_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TERMINAL_SETUP_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TEST_CONFIGURATION_STATUS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TEST_FIXES_COMPLETE_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TEST_FIXES_SUMMARY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TEST_TIMEOUT_RESEARCH_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TLS_SECURITY_ANALYSIS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TLS_TESTING_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TLS_UPGRADE_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TLS_UPGRADE_STATUS_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_TODAY_WORK_SUMMARY_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UI_ADMIN_GAP_AND_UPGRADE_PLAN_2026_04_06_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UI_BUGFIXES_AND_OAUTH_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UI_QUALITY_AND_E2E_PLAN_2026_04_06_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UI_UX_IMPROVEMENTS_PLAN_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UI_UX_MONITORING_IMPROVEMENTS_2026_01_21_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UPDATED_DEVELOPMENT_PLAN_2025_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_UPDATE_PLAN_2025_12_30_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_VERIFICATION_AFTER_RESTART_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_VISUAL_REGRESSION_E2E_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_WINDOWS_ENVIRONMENT_STATUS_2026_01_19_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "fm",
+      "kind": "catalog",
+      "to": "openapi_yaml"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "openapi_yaml"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_README_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_vision_vision_js"
+    },
+    {
+      "auto_synced": true,
+      "from": "grid_dispatch",
+      "kind": "sprint-scope",
+      "to": "e2e_tests_grid_pricing_spec_ts"
+    },
+    {
+      "auto_synced": true,
+      "from": "poolai_worker",
+      "kind": "implements",
+      "to": "poolai_worker"
+    },
+    {
+      "auto_synced": true,
+      "from": "fm",
+      "kind": "catalog",
+      "to": "src_bin_poolai_openapi_gap_audit_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_envelope_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_map_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_protocol_compat_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_domain_events"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_lease_acquire"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "job_lease_config"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_job_map_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_job_store_sqlite_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "grid_pricing_api",
+      "kind": "implements",
+      "to": "grid_pricing_api"
+    },
+    {
+      "auto_synced": true,
+      "from": "job_types",
+      "kind": "implements",
+      "to": "src_network_api_jobs_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "job_types",
+      "kind": "sprint-scope",
+      "to": "tests_jobs_api_contracts_rs"
+    }
   ],
+  "galaxy_background": "vision2.png",
+  "git_head": "0d70e6c6",
+  "last_sprint_closed": "PH-S122",
+  "layers": [
+    {
+      "id": "L0",
+      "name": "Concept",
+      "z": 0
+    },
+    {
+      "id": "L1",
+      "name": "Operations",
+      "z": 1
+    },
+    {
+      "id": "L2",
+      "name": "Catalog",
+      "z": 2
+    },
+    {
+      "id": "L3",
+      "name": "Code",
+      "z": 3
+    },
+    {
+      "id": "L4",
+      "name": "Lib roots",
+      "z": 4
+    },
+    {
+      "id": "L5",
+      "name": "Workspace",
+      "z": 5
+    }
+  ],
+  "next_sprint": "PH-S123",
   "nodes": [
     {
       "id": "galaxy_grid",
       "label": "POOLAI_GALAXY_GRID",
-      "path": "docs/concept/POOLAI_GALAXY_GRID.md",
       "layer": "L0",
-      "sections": ["1-3 roles", "4 scheduling", "5 locality", "6 verify", "9 governance"],
-      "sprints": ["PH-S55", "PH-S56", "PH-S57", "PH-S58", "PH-S59", "PH-S60", "PH-S61", "PH-S62", "PH-S63", "PH-S64", "PH-S121"]
+      "path": "docs/concept/POOLAI_GALAXY_GRID.md",
+      "sections": [
+        "1-3 roles",
+        "4 scheduling",
+        "5 locality",
+        "6 verify",
+        "9 governance"
+      ],
+      "sprints": [
+        "PH-S55",
+        "PH-S56",
+        "PH-S57",
+        "PH-S58",
+        "PH-S59",
+        "PH-S60",
+        "PH-S61",
+        "PH-S62",
+        "PH-S63",
+        "PH-S64",
+        "PH-S121"
+      ]
     },
     {
       "id": "memory_layer",
       "label": "POOLAI_MEMORY_LAYER",
-      "path": "docs/concept/POOLAI_MEMORY_LAYER.md",
       "layer": "L0",
-      "sprints": ["PH-S61"]
+      "path": "docs/concept/POOLAI_MEMORY_LAYER.md",
+      "sprints": [
+        "PH-S61"
+      ]
     },
     {
       "id": "grid_node",
       "label": "POOLAI_GRID_NODE",
-      "path": "docs/concept/POOLAI_GRID_NODE.md",
-      "layer": "L0"
+      "layer": "L0",
+      "path": "docs/concept/POOLAI_GRID_NODE.md"
     },
     {
       "id": "handoff",
       "label": "HANDOFF_NEW_SESSION",
-      "path": "docs/development/HANDOFF_NEW_SESSION.md",
       "layer": "L1",
-      "sprints": ["PH-S*"]
+      "path": "docs/development/HANDOFF_NEW_SESSION.md",
+      "sprints": [
+        "PH-S*"
+      ]
     },
     {
       "id": "next_session",
       "label": "NEXT_SESSION_PROMPT",
-      "path": "docs/development/NEXT_SESSION_PROMPT.md",
       "layer": "L1",
-      "sprints": ["PH-S*"]
+      "path": "docs/development/NEXT_SESSION_PROMPT.md",
+      "sprints": [
+        "PH-S*"
+      ]
     },
     {
       "id": "docs_index",
       "label": "INDEX_2026-03-17",
-      "path": "docs/INDEX_2026-03-17.md",
       "layer": "L1",
-      "sections": ["canonical map", "§5.12 pointers"],
-      "sprints": ["PH-S64", "PH-S87", "PH-S101"]
+      "path": "docs/INDEX_2026-03-17.md",
+      "sections": [
+        "canonical map",
+        "§5.12 pointers"
+      ],
+      "sprints": [
+        "PH-S64",
+        "PH-S87",
+        "PH-S101"
+      ]
     },
     {
       "id": "dev_readme",
       "label": "development/README",
-      "path": "docs/development/README.md",
       "layer": "L1",
-      "sections": ["current sprint pointers", "handoff links"],
-      "sprints": ["PH-S64", "PH-S101"]
+      "path": "docs/development/README.md",
+      "sections": [
+        "current sprint pointers",
+        "handoff links"
+      ],
+      "sprints": [
+        "PH-S64",
+        "PH-S101"
+      ]
     },
     {
       "id": "fm",
       "label": "FUNCTION_MANAGEMENT",
-      "path": "docs/catalog/FUNCTION_MANAGEMENT.md",
       "layer": "L2",
-      "sections": ["5.12"]
+      "path": "docs/catalog/FUNCTION_MANAGEMENT.md",
+      "sections": [
+        "5.12"
+      ]
     },
     {
       "id": "digest",
       "label": "FUNCTIONALITY_DIGEST",
-      "path": "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
       "layer": "L2",
-      "sprints": ["PH-S67"]
+      "path": "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md",
+      "sprints": [
+        "PH-S67"
+      ]
     },
     {
       "id": "galaxy_fee_split",
       "label": "galaxy_fee_split.rs",
-      "path": "src/grid/galaxy_fee_split.rs",
       "layer": "L3",
-      "sprints": ["PH-S58"]
+      "path": "src/grid/galaxy_fee_split.rs",
+      "sprints": [
+        "PH-S58"
+      ]
     },
     {
       "id": "grid_dispatch",
       "label": "grid/dispatch.rs",
-      "path": "src/grid/dispatch.rs",
       "layer": "L3",
-      "sprints": ["PH-S38", "PH-S61", "PH-S100", "PH-S108", "PH-S110", "PH-S112", "PH-S117"]
+      "path": "src/grid/dispatch.rs",
+      "sprints": [
+        "PH-S38",
+        "PH-S61",
+        "PH-S100",
+        "PH-S108",
+        "PH-S110",
+        "PH-S112",
+        "PH-S117",
+        "PH-S122"
+      ]
+    },
+    {
+      "id": "openapi_yaml",
+      "label": "openapi.yaml",
+      "layer": "L2",
+      "path": "docs/openapi.yaml",
+      "sections": [
+        "GridResultBody.lease_epoch",
+        "jobs lease acquire/renew/409 examples"
+      ],
+      "sprints": [
+        "PH-S94",
+        "PH-S95",
+        "PH-S98",
+        "PH-S99",
+        "PH-S104",
+        "PH-S110",
+        "PH-S122"
+      ]
     },
     {
       "id": "e2e_grid_job_lease",
       "label": "grid_job_lease.spec.ts",
-      "path": "e2e/tests/grid_job_lease.spec.ts",
       "layer": "L3",
-      "sprints": ["PH-S112"]
+      "path": "e2e/tests/grid_job_lease.spec.ts",
+      "sprints": [
+        "PH-S112"
+      ]
     },
     {
       "id": "e2e_grid_result_lease",
       "label": "grid_result_lease.spec.ts",
-      "path": "e2e/tests/grid_result_lease.spec.ts",
       "layer": "L3",
-      "sprints": ["PH-S117"]
+      "path": "e2e/tests/grid_result_lease.spec.ts",
+      "sprints": [
+        "PH-S117"
+      ]
     },
     {
       "id": "e2e_jobs_lease",
       "label": "jobs_lease.spec.ts",
-      "path": "e2e/tests/jobs_lease.spec.ts",
       "layer": "L3",
-      "sprints": ["PH-S107", "PH-S118"]
+      "path": "e2e/tests/jobs_lease.spec.ts",
+      "sprints": [
+        "PH-S107",
+        "PH-S118"
+      ]
     },
     {
       "id": "virtual_nodes",
       "label": "virtual_nodes API",
-      "path": "src/network/api/virtual_nodes.rs",
       "layer": "L3",
-      "sprints": ["PH-S60", "FM-016"]
+      "path": "src/network/api/virtual_nodes.rs",
+      "sprints": [
+        "PH-S60",
+        "FM-016"
+      ]
     },
     {
       "id": "telegram_bind",
       "label": "telegram_binding_service",
-      "path": "src/services/virtual_node_telegram_binding_service.rs",
       "layer": "L3",
-      "sprints": ["PH-S60"]
+      "path": "src/services/virtual_node_telegram_binding_service.rs",
+      "sprints": [
+        "PH-S60"
+      ]
     },
     {
       "id": "verify_release",
       "label": "poolai-verify-release",
-      "path": "src/bin/poolai_verify_release.rs",
       "layer": "L3",
-      "sprints": ["PH-S66"]
+      "path": "src/bin/poolai_verify_release.rs",
+      "sprints": [
+        "PH-S66"
+      ]
     },
     {
       "id": "release_mod",
       "label": "release/",
-      "path": "src/release/mod.rs",
       "layer": "L3",
-      "sprints": ["PH-S66"]
+      "path": "src/release/mod.rs",
+      "sprints": [
+        "PH-S66"
+      ]
     },
     {
       "id": "security_hardening",
       "label": "SECURITY_HARDENING",
-      "path": "docs/security/SECURITY_HARDENING.md",
       "layer": "L1",
-      "sections": ["A08 integrity", "operator quickstart", "protocol triage", "advisory pointers"],
-      "sprints": ["PH-S69", "PH-S71", "PH-S72", "PH-S73", "PH-S74"]
+      "path": "docs/security/SECURITY_HARDENING.md",
+      "sections": [
+        "A08 integrity",
+        "operator quickstart",
+        "protocol triage",
+        "advisory pointers"
+      ],
+      "sprints": [
+        "PH-S69",
+        "PH-S71",
+        "PH-S72",
+        "PH-S73",
+        "PH-S74"
+      ]
     },
     {
       "id": "dependency_security",
       "label": "DEPENDENCY_SECURITY",
-      "path": "docs/security/DEPENDENCY_SECURITY.md",
       "layer": "L1",
-      "sections": ["vulnerability response", "governance cross-links"],
-      "sprints": ["PH-S74"]
+      "path": "docs/security/DEPENDENCY_SECURITY.md",
+      "sections": [
+        "vulnerability response",
+        "governance cross-links"
+      ],
+      "sprints": [
+        "PH-S74"
+      ]
     },
     {
       "id": "job_types",
       "label": "job/types.rs",
-      "path": "src/job/types.rs",
       "layer": "L3",
-      "sprints": ["PH-S94", "PH-S95", "PH-S100", "PH-S104"],
-      "sections": ["lease_owner", "lease_epoch", "lease_expires_at", "PATCH CAS", "JobStatus::Leased/Migrating lifecycle"]
+      "path": "src/job/types.rs",
+      "sections": [
+        "lease_owner",
+        "lease_epoch",
+        "lease_expires_at",
+        "PATCH CAS",
+        "JobStatus::Leased/Migrating lifecycle"
+      ],
+      "sprints": [
+        "PH-S94",
+        "PH-S95",
+        "PH-S100",
+        "PH-S104"
+      ]
     },
     {
       "id": "job_lifecycle",
       "label": "job/lifecycle.rs",
-      "path": "src/job/lifecycle.rs",
       "layer": "L3",
-      "sprints": ["FM-021", "PH-S100", "PH-S104"],
-      "sections": ["allows_transition", "Leased/Executing <-> Migrating"]
+      "path": "src/job/lifecycle.rs",
+      "sections": [
+        "allows_transition",
+        "Leased/Executing <-> Migrating"
+      ],
+      "sprints": [
+        "FM-021",
+        "PH-S100",
+        "PH-S104"
+      ]
     },
     {
       "id": "job_lease_config",
       "label": "job/lease_config.rs",
-      "path": "src/job/lease_config.rs",
       "layer": "L3",
-      "sprints": ["PH-S97"],
-      "sections": ["POOLAI_JOB_LEASE_TTL_SECS", "lease_ttl", "lease_renew_interval"]
+      "path": "src/job/lease_config.rs",
+      "sections": [
+        "POOLAI_JOB_LEASE_TTL_SECS",
+        "lease_ttl",
+        "lease_renew_interval"
+      ],
+      "sprints": [
+        "PH-S97"
+      ]
     },
     {
       "id": "job_lease_acquire",
       "label": "job/lease_acquire.rs",
-      "path": "src/job/lease_acquire.rs",
       "layer": "L3",
-      "sprints": ["PH-S98", "PH-S100"],
-      "sections": ["POST /jobs/{id}/lease", "schedule acquire", "maybe_transition_to_leased"]
+      "path": "src/job/lease_acquire.rs",
+      "sections": [
+        "POST /jobs/{id}/lease",
+        "schedule acquire",
+        "maybe_transition_to_leased"
+      ],
+      "sprints": [
+        "PH-S98",
+        "PH-S100"
+      ]
     },
     {
       "id": "job_store",
       "label": "job/store.rs",
-      "path": "src/job/store.rs",
       "layer": "L3",
-      "sprints": ["PH-S48", "PH-S101"],
-      "sections": ["failover requeue stub", "promote_submitted_to_scheduled_with"]
+      "path": "src/job/store.rs",
+      "sections": [
+        "failover requeue stub",
+        "promote_submitted_to_scheduled_with"
+      ],
+      "sprints": [
+        "PH-S48",
+        "PH-S101"
+      ]
     },
     {
       "id": "job_scheduler",
       "label": "job/scheduler.rs",
-      "path": "src/job/scheduler.rs",
       "layer": "L3",
-      "sprints": ["PH-S38", "PH-S101"],
-      "sections": ["schedule_with_workers", "expired_leased_job_requeues_and_rebinds"]
+      "path": "src/job/scheduler.rs",
+      "sections": [
+        "schedule_with_workers",
+        "expired_leased_job_requeues_and_rebinds"
+      ],
+      "sprints": [
+        "PH-S38",
+        "PH-S101"
+      ]
     },
     {
       "id": "admin_updates_compat",
       "label": "updates_compat.rs",
-      "path": "src/ui/admin/updates_compat.rs",
       "layer": "L3",
-      "sprints": ["PH-S93"]
+      "path": "src/ui/admin/updates_compat.rs",
+      "sprints": [
+        "PH-S93"
+      ]
     },
     {
       "id": "admin_jobs",
       "label": "admin/jobs.rs",
-      "path": "src/ui/admin/jobs.rs",
       "layer": "L3",
-      "sprints": ["PH-S53", "PH-S96", "PH-S105", "PH-S119"],
-      "sections": ["lease columns", "lease active/expired badge", "epoch tooltips"]
+      "path": "src/ui/admin/jobs.rs",
+      "sections": [
+        "lease columns",
+        "lease active/expired badge",
+        "epoch tooltips"
+      ],
+      "sprints": [
+        "PH-S53",
+        "PH-S96",
+        "PH-S105",
+        "PH-S119"
+      ]
     },
     {
       "id": "admin_grid_pricing",
       "label": "admin/grid_pricing.rs",
-      "path": "src/ui/admin/grid_pricing.rs",
       "layer": "L3",
-      "sprints": ["PH-S82"]
+      "path": "src/ui/admin/grid_pricing.rs",
+      "sprints": [
+        "PH-S82"
+      ]
     },
     {
       "id": "grid_pricing_api",
       "label": "api/grid.rs pricing",
-      "path": "src/network/api/grid.rs",
       "layer": "L3",
-      "sprints": ["PH-S78", "PH-S79", "PH-S80", "PH-S81", "PH-S89", "PH-S102"]
+      "path": "src/network/api/grid.rs",
+      "sprints": [
+        "PH-S78",
+        "PH-S79",
+        "PH-S80",
+        "PH-S81",
+        "PH-S89",
+        "PH-S102"
+      ]
     },
     {
       "id": "pricing_oracle",
       "label": "grid/galaxy_pricing_oracle.rs",
-      "path": "src/grid/galaxy_pricing_oracle.rs",
       "layer": "L3",
-      "sprints": ["PH-S68", "PH-S75", "PH-S80", "PH-S81", "PH-S89", "PH-S92", "PH-S102"],
-      "sections": ["provider catalog", "live http fetch", "timeout env"]
+      "path": "src/grid/galaxy_pricing_oracle.rs",
+      "sections": [
+        "provider catalog",
+        "live http fetch",
+        "timeout env"
+      ],
+      "sprints": [
+        "PH-S68",
+        "PH-S75",
+        "PH-S80",
+        "PH-S81",
+        "PH-S89",
+        "PH-S92",
+        "PH-S102"
+      ]
     },
     {
       "id": "protocol_middleware",
       "label": "api/protocol_middleware.rs",
-      "path": "src/network/api/protocol_middleware.rs",
       "layer": "L3",
-      "sprints": ["PH-S103"],
-      "sections": ["X-PoolAI-Protocol negotiation", "selected routes", "reject unsupported"]
+      "path": "src/network/api/protocol_middleware.rs",
+      "sections": [
+        "X-PoolAI-Protocol negotiation",
+        "selected routes",
+        "reject unsupported"
+      ],
+      "sprints": [
+        "PH-S103"
+      ]
     },
     {
       "id": "poolai_worker",
       "label": "bin/poolai-worker.rs",
-      "path": "src/bin/poolai-worker.rs",
       "layer": "L3",
-      "sprints": ["FM-016", "PH-S65", "PH-S106", "PH-S116", "PH-S121"],
-      "sections": ["register/heartbeat", "task executor", "lease renew ticker", "§4.3.1.1 wire"]
+      "path": "src/bin/poolai-worker.rs",
+      "sections": [
+        "register/heartbeat",
+        "task executor",
+        "lease renew ticker",
+        "§4.3.1.1 wire"
+      ],
+      "sprints": [
+        "FM-016",
+        "PH-S65",
+        "PH-S106",
+        "PH-S116",
+        "PH-S121"
+      ]
     },
     {
       "id": "galaxy_roadmap",
       "label": "GALAXY_GRID_ROADMAP",
-      "path": "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
       "layer": "L1",
-      "sprints": ["PH-S*"]
+      "path": "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+      "sprints": [
+        "PH-S*"
+      ]
     },
     {
       "id": "lib_root",
       "label": "src/lib.rs",
-      "path": "src/lib.rs",
       "layer": "L4",
-      "sprints": ["PH-S113"],
-      "sections": ["crate root", "pub mod re-exports"]
+      "path": "src/lib.rs",
+      "sections": [
+        "crate root",
+        "pub mod re-exports"
+      ],
+      "sprints": [
+        "PH-S113"
+      ]
     },
     {
       "id": "solana_concept",
       "label": "SOLANA_ADAPTER_CONCEPT",
-      "path": "docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md",
       "layer": "L1",
-      "sprints": ["PH-S120"],
-      "sections": ["FM-010", "FM-033", "core vs adapter"]
+      "path": "docs/development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md",
+      "sections": [
+        "FM-010",
+        "FM-033",
+        "core vs adapter"
+      ],
+      "sprints": [
+        "PH-S120"
+      ]
     },
     {
       "id": "job_onchain",
       "label": "job/onchain.rs",
-      "path": "src/job/onchain.rs",
       "layer": "L3",
-      "sprints": ["PH-S38", "PH-S120"],
-      "sections": ["NDJSON epics", "POOLAI_ONCHAIN_EVENTS_DIR"]
+      "path": "src/job/onchain.rs",
+      "sections": [
+        "NDJSON epics",
+        "POOLAI_ONCHAIN_EVENTS_DIR"
+      ],
+      "sprints": [
+        "PH-S38",
+        "PH-S120"
+      ]
     },
     {
       "id": "job_domain_events",
       "label": "job/domain_events.rs",
-      "path": "src/job/domain_events.rs",
       "layer": "L3",
-      "sprints": ["PH-S38", "PH-S120"],
-      "sections": ["schema v1", "sidecar wire"]
+      "path": "src/job/domain_events.rs",
+      "sections": [
+        "schema v1",
+        "sidecar wire"
+      ],
+      "sprints": [
+        "PH-S38",
+        "PH-S120"
+      ]
     },
     {
       "id": "crate_solana",
       "label": "poolai-solana-adapter",
-      "path": "crates/poolai-solana-adapter/Cargo.toml",
       "layer": "L4",
-      "sprints": ["FM-010", "FM-024", "FM-033", "PH-S46", "PH-S120"],
-      "sections": ["workspace member", "no solana-sdk in poolai"]
+      "path": "crates/poolai-solana-adapter/Cargo.toml",
+      "sections": [
+        "workspace member",
+        "no solana-sdk in poolai"
+      ],
+      "sprints": [
+        "FM-010",
+        "FM-024",
+        "FM-033",
+        "PH-S46",
+        "PH-S120"
+      ]
     },
     {
       "id": "solana_events",
       "label": "adapter/events.rs",
-      "path": "crates/poolai-solana-adapter/src/events.rs",
       "layer": "L4",
-      "sprints": ["FM-010", "PH-S120"],
-      "sections": ["JobCompleted", "SeedProvided", "MemoryUpdated"]
+      "path": "crates/poolai-solana-adapter/src/events.rs",
+      "sections": [
+        "JobCompleted",
+        "SeedProvided",
+        "MemoryUpdated"
+      ],
+      "sprints": [
+        "FM-010",
+        "PH-S120"
+      ]
     },
     {
       "id": "solana_sidecar",
       "label": "bin/poolai-solana-adapter",
-      "path": "crates/poolai-solana-adapter/src/bin/poolai-solana-adapter.rs",
       "layer": "L4",
-      "sprints": ["FM-024", "FM-033", "PH-S120"],
-      "sections": ["NDJSON stdin", "RPC ack stdout"]
+      "path": "crates/poolai-solana-adapter/src/bin/poolai-solana-adapter.rs",
+      "sections": [
+        "NDJSON stdin",
+        "RPC ack stdout"
+      ],
+      "sprints": [
+        "FM-024",
+        "FM-033",
+        "PH-S120"
+      ]
     },
     {
       "id": "solana_program",
       "label": "poolai-events BPF",
-      "path": "crates/poolai-solana-adapter/program/poolai-events/Cargo.toml",
       "layer": "L4",
-      "sprints": ["FM-033", "PH-S46", "PH-S120"],
-      "sections": ["PoolAiInstruction", "devnet deploy"]
+      "path": "crates/poolai-solana-adapter/program/poolai-events/Cargo.toml",
+      "sections": [
+        "PoolAiInstruction",
+        "devnet deploy"
+      ],
+      "sprints": [
+        "FM-033",
+        "PH-S46",
+        "PH-S120"
+      ]
     },
     {
       "id": "cargo_toml",
       "label": "Cargo.toml",
-      "path": "Cargo.toml",
       "layer": "L5",
-      "sprints": ["PH-S113"],
-      "sections": ["workspace", "features", "bins"]
+      "path": "Cargo.toml",
+      "sections": [
+        "workspace",
+        "features",
+        "bins"
+      ],
+      "sprints": [
+        "PH-S113"
+      ]
     },
     {
       "id": "cargo_config",
       "label": ".cargo/config.toml",
-      "path": ".cargo/config.toml",
       "layer": "L5",
-      "sprints": ["PH-S113"],
-      "sections": ["aliases", "test-ci"]
+      "path": ".cargo/config.toml",
+      "sections": [
+        "aliases",
+        "test-ci"
+      ],
+      "sprints": [
+        "PH-S113"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_ai_assistant_md",
+      "label": "ai-assistant.md",
+      "layer": "L3",
+      "path": ".cursor/rules/ai-assistant.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_chat_context_md",
+      "label": "chat-context.md",
+      "layer": "L3",
+      "path": ".cursor/rules/chat-context.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_documentation_md",
+      "label": "documentation.md",
+      "layer": "L3",
+      "path": ".cursor/rules/documentation.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_git_workflow_md",
+      "label": "git-workflow.md",
+      "layer": "L3",
+      "path": ".cursor/rules/git-workflow.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_msys2_windows_md",
+      "label": "msys2-windows.md",
+      "layer": "L3",
+      "path": ".cursor/rules/msys2-windows.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_project_structure_md",
+      "label": "project-structure.md",
+      "layer": "L3",
+      "path": ".cursor/rules/project-structure.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_rust_architect_md",
+      "label": "rust-architect.md",
+      "layer": "L3",
+      "path": ".cursor/rules/rust-architect.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_rust_md",
+      "label": "rust.md",
+      "layer": "L3",
+      "path": ".cursor/rules/rust.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_rules_scripts_md",
+      "label": "scripts.md",
+      "layer": "L3",
+      "path": ".cursor/rules/scripts.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "_cursor_skills_poolai_documentation_SKILL_md",
+      "label": "SKILL.md",
+      "layer": "L3",
+      "path": ".cursor/skills/poolai-documentation/SKILL.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_README_md",
+      "label": "README.md",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_config_devnet_toml",
+      "label": "devnet.toml",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/config/devnet.toml"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_program_README_md",
+      "label": "README.md",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/program/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_program_poolai_events_src_lib_rs",
+      "label": "lib.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/program/poolai-events/src/lib.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_config_rs",
+      "label": "config.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/config.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_instruction_rs",
+      "label": "instruction.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/instruction.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_lib_rs",
+      "label": "lib.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/lib.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_rpc_devnet_rs",
+      "label": "devnet.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/rpc/devnet.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_rpc_mock_rs",
+      "label": "mock.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/rpc/mock.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_sidecar_rs",
+      "label": "sidecar.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/sidecar.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_src_wire_limits_rs",
+      "label": "wire_limits.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/src/wire_limits.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_solana_adapter_wire_limits_rs",
+      "label": "limits.rs",
+      "layer": "L4",
+      "path": "crates/poolai-solana-adapter/wire/limits.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ADMIN_PANEL_ACCESS_md",
+      "label": "ADMIN_PANEL_ACCESS.md",
+      "layer": "L2",
+      "path": "docs/ADMIN_PANEL_ACCESS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ADR_001_DISTRIBUTED_RAID_md",
+      "label": "ADR_001_DISTRIBUTED_RAID.md",
+      "layer": "L2",
+      "path": "docs/ADR_001_DISTRIBUTED_RAID.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ARCHITECTURE_BEST_PRACTICES_md",
+      "label": "ARCHITECTURE_BEST_PRACTICES.md",
+      "layer": "L2",
+      "path": "docs/ARCHITECTURE_BEST_PRACTICES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ARCHITECTURE_REVIEW_md",
+      "label": "ARCHITECTURE_REVIEW.md",
+      "layer": "L2",
+      "path": "docs/ARCHITECTURE_REVIEW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ARCHITECTURE_REVIEW_2025_md",
+      "label": "ARCHITECTURE_REVIEW_2025.md",
+      "layer": "L2",
+      "path": "docs/ARCHITECTURE_REVIEW_2025.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ARCHITECTURE_UPDATE_2026_01_22_md",
+      "label": "ARCHITECTURE_UPDATE_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/ARCHITECTURE_UPDATE_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_AUTOMATION_COMPLETE_md",
+      "label": "AUTOMATION_COMPLETE.md",
+      "layer": "L2",
+      "path": "docs/AUTOMATION_COMPLETE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_AUTOMATION_REVIEW_md",
+      "label": "AUTOMATION_REVIEW.md",
+      "layer": "L2",
+      "path": "docs/AUTOMATION_REVIEW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_AUTONOMOUS_DEVELOPMENT_FINAL_SUMMARY_2026_01_22_md",
+      "label": "AUTONOMOUS_DEVELOPMENT_FINAL_SUMMARY_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/AUTONOMOUS_DEVELOPMENT_FINAL_SUMMARY_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_AUTONOMOUS_DEVELOPMENT_SUMMARY_2026_01_22_md",
+      "label": "AUTONOMOUS_DEVELOPMENT_SUMMARY_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/AUTONOMOUS_DEVELOPMENT_SUMMARY_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_AUTONOMOUS_SESSION_COMPLETE_2026_01_22_md",
+      "label": "AUTONOMOUS_SESSION_COMPLETE_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/AUTONOMOUS_SESSION_COMPLETE_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_AUTO_PUSH_EXECUTION_md",
+      "label": "AUTO_PUSH_EXECUTION.md",
+      "layer": "L2",
+      "path": "docs/AUTO_PUSH_EXECUTION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_BUILD_HTTPS_md",
+      "label": "BUILD_HTTPS.md",
+      "layer": "L2",
+      "path": "docs/BUILD_HTTPS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CHANGELOG_md",
+      "label": "CHANGELOG.md",
+      "layer": "L2",
+      "path": "docs/CHANGELOG.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CHAT_SUMMARY_2026_01_22_md",
+      "label": "CHAT_SUMMARY_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/CHAT_SUMMARY_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CHECK_SYSTEM_NOW_md",
+      "label": "CHECK_SYSTEM_NOW.md",
+      "layer": "L2",
+      "path": "docs/CHECK_SYSTEM_NOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CONTEXT_SNAPSHOT_2026_03_04_md",
+      "label": "CONTEXT_SNAPSHOT_2026-03-04.md",
+      "layer": "L2",
+      "path": "docs/CONTEXT_SNAPSHOT_2026-03-04.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CURSOR_AND_NEXT_STEPS_VERIFICATION_2026_03_04_md",
+      "label": "CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md",
+      "layer": "L2",
+      "path": "docs/CURSOR_AND_NEXT_STEPS_VERIFICATION_2026-03-04.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CURSOR_DEVELOPMENT_GUIDE_md",
+      "label": "CURSOR_DEVELOPMENT_GUIDE.md",
+      "layer": "L2",
+      "path": "docs/CURSOR_DEVELOPMENT_GUIDE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_CURSOR_WORKFLOW_md",
+      "label": "CURSOR_WORKFLOW.md",
+      "layer": "L2",
+      "path": "docs/CURSOR_WORKFLOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_DEVELOPMENT_ROADMAP_md",
+      "label": "DEVELOPMENT_ROADMAP.md",
+      "layer": "L2",
+      "path": "docs/DEVELOPMENT_ROADMAP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_DEVELOPMENT_SESSION_SUMMARY_2026_01_22_md",
+      "label": "DEVELOPMENT_SESSION_SUMMARY_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/DEVELOPMENT_SESSION_SUMMARY_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_DISTRIBUTED_RAID_PROTOCOL_md",
+      "label": "DISTRIBUTED_RAID_PROTOCOL.md",
+      "layer": "L2",
+      "path": "docs/DISTRIBUTED_RAID_PROTOCOL.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_DOCUMENTATION_ADAPTATION_SUMMARY_2026_01_22_md",
+      "label": "DOCUMENTATION_ADAPTATION_SUMMARY_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/DOCUMENTATION_ADAPTATION_SUMMARY_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_DOCUMENTATION_CLEANUP_PLAN_2026_01_22_md",
+      "label": "DOCUMENTATION_CLEANUP_PLAN_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/DOCUMENTATION_CLEANUP_PLAN_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_DOCUMENTATION_CLEANUP_SUMMARY_md",
+      "label": "DOCUMENTATION_CLEANUP_SUMMARY.md",
+      "layer": "L2",
+      "path": "docs/DOCUMENTATION_CLEANUP_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_EXECUTE_NOW_md",
+      "label": "EXECUTE_NOW.md",
+      "layer": "L2",
+      "path": "docs/EXECUTE_NOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_FEATURES_COMMANDS_md",
+      "label": "FEATURES_COMMANDS.md",
+      "layer": "L2",
+      "path": "docs/FEATURES_COMMANDS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_FILE_CLEANUP_NOTES_md",
+      "label": "FILE_CLEANUP_NOTES.md",
+      "layer": "L2",
+      "path": "docs/FILE_CLEANUP_NOTES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_FINAL_PUSH_READY_md",
+      "label": "FINAL_PUSH_READY.md",
+      "layer": "L2",
+      "path": "docs/FINAL_PUSH_READY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_FINAL_SUMMARY_2026_01_22_md",
+      "label": "FINAL_SUMMARY_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/FINAL_SUMMARY_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_FIX_AND_PUSH_NOW_md",
+      "label": "FIX_AND_PUSH_NOW.md",
+      "layer": "L2",
+      "path": "docs/FIX_AND_PUSH_NOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_FIX_AUTH_AND_PUSH_md",
+      "label": "FIX_AUTH_AND_PUSH.md",
+      "layer": "L2",
+      "path": "docs/FIX_AUTH_AND_PUSH.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_GIT_COMMIT_GUIDELINES_md",
+      "label": "GIT_COMMIT_GUIDELINES.md",
+      "layer": "L2",
+      "path": "docs/GIT_COMMIT_GUIDELINES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_GIT_PUSH_NOW_2026_01_22_md",
+      "label": "GIT_PUSH_NOW_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/GIT_PUSH_NOW_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_GIT_WORKFLOW_2026_01_22_md",
+      "label": "GIT_WORKFLOW_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/GIT_WORKFLOW_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_HOW_TO_RUN_md",
+      "label": "HOW_TO_RUN.md",
+      "layer": "L2",
+      "path": "docs/HOW_TO_RUN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_NEXT_STEPS_AFTER_PUSH_2026_01_22_md",
+      "label": "NEXT_STEPS_AFTER_PUSH_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/NEXT_STEPS_AFTER_PUSH_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_PROJECT_STRUCTURE_md",
+      "label": "PROJECT_STRUCTURE.md",
+      "layer": "L2",
+      "path": "docs/PROJECT_STRUCTURE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_PUSH_AND_DEPENDABOT_PREREQUISITE_2026_03_04_md",
+      "label": "PUSH_AND_DEPENDABOT_PREREQUISITE_2026-03-04.md",
+      "layer": "L2",
+      "path": "docs/PUSH_AND_DEPENDABOT_PREREQUISITE_2026-03-04.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_QUICK_START_md",
+      "label": "QUICK_START.md",
+      "layer": "L2",
+      "path": "docs/QUICK_START.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_QUICK_START_ENTERPRISE_md",
+      "label": "QUICK_START_ENTERPRISE.md",
+      "layer": "L2",
+      "path": "docs/QUICK_START_ENTERPRISE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RAFT_LIBRARY_EVALUATION_md",
+      "label": "RAFT_LIBRARY_EVALUATION.md",
+      "layer": "L2",
+      "path": "docs/RAFT_LIBRARY_EVALUATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_README_md",
+      "label": "README.md",
+      "layer": "L2",
+      "path": "docs/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RELEASE_NOTES_v0_1_0_md",
+      "label": "RELEASE_NOTES_v0.1.0.md",
+      "layer": "L2",
+      "path": "docs/RELEASE_NOTES_v0.1.0.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RELEASE_NOTES_v0_2_0_md",
+      "label": "RELEASE_NOTES_v0.2.0.md",
+      "layer": "L2",
+      "path": "docs/RELEASE_NOTES_v0.2.0.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ROOT_CLEANUP_md",
+      "label": "ROOT_CLEANUP.md",
+      "layer": "L2",
+      "path": "docs/ROOT_CLEANUP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ROOT_CLEANUP_2026_01_22_md",
+      "label": "ROOT_CLEANUP_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/ROOT_CLEANUP_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RUN_PARAMETERS_md",
+      "label": "RUN_PARAMETERS.md",
+      "layer": "L2",
+      "path": "docs/RUN_PARAMETERS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RUST_ARCHITECT_FINAL_COMMANDS_md",
+      "label": "RUST_ARCHITECT_FINAL_COMMANDS.md",
+      "layer": "L2",
+      "path": "docs/RUST_ARCHITECT_FINAL_COMMANDS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RUST_ARCHITECT_ITERATIVE_PLAN_2026_01_22_md",
+      "label": "RUST_ARCHITECT_ITERATIVE_PLAN_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/RUST_ARCHITECT_ITERATIVE_PLAN_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RUST_BOOK_ALIGNMENT_md",
+      "label": "RUST_BOOK_ALIGNMENT.md",
+      "layer": "L2",
+      "path": "docs/RUST_BOOK_ALIGNMENT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_RUST_UPDATE_SUMMARY_md",
+      "label": "RUST_UPDATE_SUMMARY.md",
+      "layer": "L2",
+      "path": "docs/RUST_UPDATE_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_SCRIPTS_ORGANIZATION_md",
+      "label": "SCRIPTS_ORGANIZATION.md",
+      "layer": "L2",
+      "path": "docs/SCRIPTS_ORGANIZATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_SECURITY_md",
+      "label": "SECURITY.md",
+      "layer": "L2",
+      "path": "docs/SECURITY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_STRUCTURE_md",
+      "label": "STRUCTURE.md",
+      "layer": "L2",
+      "path": "docs/STRUCTURE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_STRUCTURE_VERIFICATION_md",
+      "label": "STRUCTURE_VERIFICATION.md",
+      "layer": "L2",
+      "path": "docs/STRUCTURE_VERIFICATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_SYSTEM_CHECK_REPORT_md",
+      "label": "SYSTEM_CHECK_REPORT.md",
+      "layer": "L2",
+      "path": "docs/SYSTEM_CHECK_REPORT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_UI_IMPROVEMENTS_PLAN_md",
+      "label": "UI_IMPROVEMENTS_PLAN.md",
+      "layer": "L2",
+      "path": "docs/UI_IMPROVEMENTS_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_WORKSPACE_CLEANUP_md",
+      "label": "WORKSPACE_CLEANUP.md",
+      "layer": "L2",
+      "path": "docs/WORKSPACE_CLEANUP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_cloud_CLOUD_SDK_STATUS_md",
+      "label": "CLOUD_SDK_STATUS.md",
+      "layer": "L2",
+      "path": "docs/cloud/CLOUD_SDK_STATUS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_concept_CONCEPT_UPDATE_2026_01_19_md",
+      "label": "CONCEPT_UPDATE_2026-01-19.md",
+      "layer": "L0",
+      "path": "docs/concept/CONCEPT_UPDATE_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_configuration_PRODUCTION_md",
+      "label": "PRODUCTION.md",
+      "layer": "L2",
+      "path": "docs/configuration/PRODUCTION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_BARE_METAL_md",
+      "label": "BARE_METAL.md",
+      "layer": "L2",
+      "path": "docs/deployment/BARE_METAL.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_DEPLOYMENT_TESTING_CHECKLIST_md",
+      "label": "DEPLOYMENT_TESTING_CHECKLIST.md",
+      "layer": "L2",
+      "path": "docs/deployment/DEPLOYMENT_TESTING_CHECKLIST.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_DEPLOYMENT_TESTING_RESULTS_md",
+      "label": "DEPLOYMENT_TESTING_RESULTS.md",
+      "layer": "L2",
+      "path": "docs/deployment/DEPLOYMENT_TESTING_RESULTS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_DOCKER_md",
+      "label": "DOCKER.md",
+      "layer": "L2",
+      "path": "docs/deployment/DOCKER.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_KUBERNETES_md",
+      "label": "KUBERNETES.md",
+      "layer": "L2",
+      "path": "docs/deployment/KUBERNETES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_crds_README_md",
+      "label": "README.md",
+      "layer": "L2",
+      "path": "docs/deployment/crds/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_crds_poolai_tenant_crd_yaml",
+      "label": "poolai-tenant-crd.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/crds/poolai-tenant-crd.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_crds_poolai_vm_crd_yaml",
+      "label": "poolai-vm-crd.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/crds/poolai-vm-crd.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_crds_poolai_worker_crd_yaml",
+      "label": "poolai-worker-crd.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/crds/poolai-worker-crd.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_Chart_yaml",
+      "label": "Chart.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/helm/Chart.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_README_md",
+      "label": "README.md",
+      "layer": "L2",
+      "path": "docs/deployment/helm/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_templates_crds_yaml",
+      "label": "crds.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/helm/templates/crds.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_templates_deployment_yaml",
+      "label": "deployment.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/helm/templates/deployment.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_templates_service_yaml",
+      "label": "service.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/helm/templates/service.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_templates_serviceaccount_yaml",
+      "label": "serviceaccount.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/helm/templates/serviceaccount.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_deployment_helm_values_yaml",
+      "label": "values.yaml",
+      "layer": "L2",
+      "path": "docs/deployment/helm/values.yaml"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ADMIN_A11Y_RUNBOOK_md",
+      "label": "ADMIN_A11Y_RUNBOOK.md",
+      "layer": "L1",
+      "path": "docs/development/ADMIN_A11Y_RUNBOOK.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ADMIN_UI_FIELD_AUDIT_2026_05_23_md",
+      "label": "ADMIN_UI_FIELD_AUDIT_2026-05-23.md",
+      "layer": "L1",
+      "path": "docs/development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ADMIN_UI_JSON_CONTRACTS_md",
+      "label": "ADMIN_UI_JSON_CONTRACTS.md",
+      "layer": "L1",
+      "path": "docs/development/ADMIN_UI_JSON_CONTRACTS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ARCHITECT_PLAN_EXO_INTEGRATION_2026_01_17_md",
+      "label": "ARCHITECT_PLAN_EXO_INTEGRATION_2026-01-17.md",
+      "layer": "L1",
+      "path": "docs/development/ARCHITECT_PLAN_EXO_INTEGRATION_2026-01-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ARCHITECT_SUMMARY_2026_01_16_md",
+      "label": "ARCHITECT_SUMMARY_2026-01-16.md",
+      "layer": "L1",
+      "path": "docs/development/ARCHITECT_SUMMARY_2026-01-16.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ARCHITECT_SUMMARY_2026_01_21_md",
+      "label": "ARCHITECT_SUMMARY_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/ARCHITECT_SUMMARY_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ARCHITECT_UPDATE_2026_01_21_md",
+      "label": "ARCHITECT_UPDATE_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/ARCHITECT_UPDATE_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_DEV_PATTERNS_md",
+      "label": "AUTO_DEV_PATTERNS.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_DEV_PATTERNS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_16_md",
+      "label": "AUTO_RUN_SESSION_2026-05-16.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-16.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_17_md",
+      "label": "AUTO_RUN_SESSION_2026-05-17.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_18_md",
+      "label": "AUTO_RUN_SESSION_2026-05-18.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-18.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_19_md",
+      "label": "AUTO_RUN_SESSION_2026-05-19.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_20_md",
+      "label": "AUTO_RUN_SESSION_2026-05-20.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-20.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_21_md",
+      "label": "AUTO_RUN_SESSION_2026-05-21.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_22_md",
+      "label": "AUTO_RUN_SESSION_2026-05-22.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_23_md",
+      "label": "AUTO_RUN_SESSION_2026-05-23.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-23.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_24_md",
+      "label": "AUTO_RUN_SESSION_2026-05-24.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-24.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_25_md",
+      "label": "AUTO_RUN_SESSION_2026-05-25.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-25.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_26_md",
+      "label": "AUTO_RUN_SESSION_2026-05-26.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-26.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_27_md",
+      "label": "AUTO_RUN_SESSION_2026-05-27.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-27.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_28_md",
+      "label": "AUTO_RUN_SESSION_2026-05-28.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-28.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_29_md",
+      "label": "AUTO_RUN_SESSION_2026-05-29.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-29.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_30_md",
+      "label": "AUTO_RUN_SESSION_2026-05-30.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-30.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_05_31_md",
+      "label": "AUTO_RUN_SESSION_2026-05-31.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-05-31.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_01_md",
+      "label": "AUTO_RUN_SESSION_2026-06-01.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-01.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_02_md",
+      "label": "AUTO_RUN_SESSION_2026-06-02.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-02.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_03_md",
+      "label": "AUTO_RUN_SESSION_2026-06-03.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-03.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_04_md",
+      "label": "AUTO_RUN_SESSION_2026-06-04.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-04.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_05_md",
+      "label": "AUTO_RUN_SESSION_2026-06-05.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-05.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_06_md",
+      "label": "AUTO_RUN_SESSION_2026-06-06.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-06.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_07_md",
+      "label": "AUTO_RUN_SESSION_2026-06-07.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-07.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_08_md",
+      "label": "AUTO_RUN_SESSION_2026-06-08.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-08.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_09_md",
+      "label": "AUTO_RUN_SESSION_2026-06-09.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-09.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_10_md",
+      "label": "AUTO_RUN_SESSION_2026-06-10.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-10.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_11_md",
+      "label": "AUTO_RUN_SESSION_2026-06-11.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-11.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_12_md",
+      "label": "AUTO_RUN_SESSION_2026-06-12.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-12.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_13_md",
+      "label": "AUTO_RUN_SESSION_2026-06-13.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-13.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_14_md",
+      "label": "AUTO_RUN_SESSION_2026-06-14.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-14.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_15_md",
+      "label": "AUTO_RUN_SESSION_2026-06-15.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-15.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_16_md",
+      "label": "AUTO_RUN_SESSION_2026-06-16.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-16.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_17_md",
+      "label": "AUTO_RUN_SESSION_2026-06-17.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_18_md",
+      "label": "AUTO_RUN_SESSION_2026-06-18.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-18.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_19_md",
+      "label": "AUTO_RUN_SESSION_2026-06-19.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_20_md",
+      "label": "AUTO_RUN_SESSION_2026-06-20.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-20.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_21_md",
+      "label": "AUTO_RUN_SESSION_2026-06-21.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_22_md",
+      "label": "AUTO_RUN_SESSION_2026-06-22.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_23_md",
+      "label": "AUTO_RUN_SESSION_2026-06-23.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-23.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_24_md",
+      "label": "AUTO_RUN_SESSION_2026-06-24.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-24.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_25_md",
+      "label": "AUTO_RUN_SESSION_2026-06-25.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-25.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_26_md",
+      "label": "AUTO_RUN_SESSION_2026-06-26.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-26.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_27_md",
+      "label": "AUTO_RUN_SESSION_2026-06-27.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-27.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_28_md",
+      "label": "AUTO_RUN_SESSION_2026-06-28.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-28.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_29_md",
+      "label": "AUTO_RUN_SESSION_2026-06-29.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-29.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_06_30_md",
+      "label": "AUTO_RUN_SESSION_2026-06-30.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-06-30.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_07_01_md",
+      "label": "AUTO_RUN_SESSION_2026-07-01.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026-07-01.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_HORIZON_md",
+      "label": "AUTO_RUN_SESSION_2026_HORIZON.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026_HORIZON.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AUTO_RUN_SESSION_2026_POST_HORIZON_md",
+      "label": "AUTO_RUN_SESSION_2026_POST_HORIZON.md",
+      "layer": "L1",
+      "path": "docs/development/AUTO_RUN_SESSION_2026_POST_HORIZON.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_AZURE_TOKEN_ENHANCEMENT_2026_01_19_md",
+      "label": "AZURE_TOKEN_ENHANCEMENT_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/AZURE_TOKEN_ENHANCEMENT_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CI_FAILURES_ANALYSIS_md",
+      "label": "CI_FAILURES_ANALYSIS.md",
+      "layer": "L1",
+      "path": "docs/development/CI_FAILURES_ANALYSIS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CI_FIXES_2026_01_19_md",
+      "label": "CI_FIXES_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/CI_FIXES_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CLEANUP_2026_01_19_md",
+      "label": "CLEANUP_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/CLEANUP_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CLOUD_SDK_CI_VERIFICATION_PLAN_md",
+      "label": "CLOUD_SDK_CI_VERIFICATION_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/CLOUD_SDK_CI_VERIFICATION_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CLOUD_SDK_PROGRESS_2026_01_19_md",
+      "label": "CLOUD_SDK_PROGRESS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/CLOUD_SDK_PROGRESS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CLOUD_SDK_SETUP_md",
+      "label": "CLOUD_SDK_SETUP.md",
+      "layer": "L1",
+      "path": "docs/development/CLOUD_SDK_SETUP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_COMPLETED_TASKS_2026_01_19_md",
+      "label": "COMPLETED_TASKS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/COMPLETED_TASKS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CONCEPT_IMPLEMENTATION_CHECKLIST_md",
+      "label": "CONCEPT_IMPLEMENTATION_CHECKLIST.md",
+      "layer": "L1",
+      "path": "docs/development/CONCEPT_IMPLEMENTATION_CHECKLIST.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CONCEPT_PENDING_FEATURES_md",
+      "label": "CONCEPT_PENDING_FEATURES.md",
+      "layer": "L1",
+      "path": "docs/development/CONCEPT_PENDING_FEATURES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURRENT_DEVELOPMENT_STATUS_2026_01_19_md",
+      "label": "CURRENT_DEVELOPMENT_STATUS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/CURRENT_DEVELOPMENT_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_AGENT_SETUP_md",
+      "label": "CURSOR_AGENT_SETUP.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_AGENT_SETUP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_CONNECTION_ERROR_FIX_md",
+      "label": "CURSOR_CONNECTION_ERROR_FIX.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_CONNECTION_ERROR_FIX.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_PERFORMANCE_OPTIMIZATION_2026_01_19_md",
+      "label": "CURSOR_PERFORMANCE_OPTIMIZATION_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_PERFORMANCE_OPTIMIZATION_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_CURSOR_SETTINGS_ANALYSIS_md",
+      "label": "CURSOR_SETTINGS_ANALYSIS.md",
+      "layer": "L1",
+      "path": "docs/development/CURSOR_SETTINGS_ANALYSIS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_DEPENDENCY_UPDATE_LOG_md",
+      "label": "DEPENDENCY_UPDATE_LOG.md",
+      "layer": "L1",
+      "path": "docs/development/DEPENDENCY_UPDATE_LOG.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_DEPENDENCY_UPDATE_REPORT_md",
+      "label": "DEPENDENCY_UPDATE_REPORT.md",
+      "layer": "L1",
+      "path": "docs/development/DEPENDENCY_UPDATE_REPORT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_DESIGN_SYSTEM_md",
+      "label": "DESIGN_SYSTEM.md",
+      "layer": "L1",
+      "path": "docs/development/DESIGN_SYSTEM.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_DEVELOPMENT_PLAN_UPDATED_md",
+      "label": "DEVELOPMENT_PLAN_UPDATED.md",
+      "layer": "L1",
+      "path": "docs/development/DEVELOPMENT_PLAN_UPDATED.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_DEVELOPMENT_UPDATE_2026_01_19_md",
+      "label": "DEVELOPMENT_UPDATE_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/DEVELOPMENT_UPDATE_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_DOCS_LEGACY_AUDIT_2026_05_19_md",
+      "label": "DOCS_LEGACY_AUDIT_2026-05-19.md",
+      "layer": "L1",
+      "path": "docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_E2E_PLAYWRIGHT_md",
+      "label": "E2E_PLAYWRIGHT.md",
+      "layer": "L1",
+      "path": "docs/development/E2E_PLAYWRIGHT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_EASIEST_TASKS_md",
+      "label": "EASIEST_TASKS.md",
+      "layer": "L1",
+      "path": "docs/development/EASIEST_TASKS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ENTERPRISE_FEATURES_COMPLETE_2026_01_19_md",
+      "label": "ENTERPRISE_FEATURES_COMPLETE_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/ENTERPRISE_FEATURES_COMPLETE_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_ENVIRONMENT_AND_CURSOR_UPDATES_2026_05_05_md",
+      "label": "ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md",
+      "layer": "L1",
+      "path": "docs/development/ENVIRONMENT_AND_CURSOR_UPDATES_2026-05-05.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_FIXES_APPLIED_2026_01_19_md",
+      "label": "FIXES_APPLIED_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/FIXES_APPLIED_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_FUTURE_DEVELOPMENT_ROADMAP_md",
+      "label": "FUTURE_DEVELOPMENT_ROADMAP.md",
+      "layer": "L1",
+      "path": "docs/development/FUTURE_DEVELOPMENT_ROADMAP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_GIT_COMMITS_SUMMARY_md",
+      "label": "GIT_COMMITS_SUMMARY.md",
+      "layer": "L1",
+      "path": "docs/development/GIT_COMMITS_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_GRID_PROTOCOL_CONCEPT_2026_04_06_md",
+      "label": "GRID_PROTOCOL_CONCEPT_2026-04-06.md",
+      "layer": "L1",
+      "path": "docs/development/GRID_PROTOCOL_CONCEPT_2026-04-06.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_HORIZON_TO_100_PLAN_md",
+      "label": "HORIZON_TO_100_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/HORIZON_TO_100_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_JOB_LAYER_CONCEPT_2026_03_17_md",
+      "label": "JOB_LAYER_CONCEPT_2026-03-17.md",
+      "layer": "L1",
+      "path": "docs/development/JOB_LAYER_CONCEPT_2026-03-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_MONITORING_PERSISTENCE_PLAN_md",
+      "label": "MONITORING_PERSISTENCE_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/MONITORING_PERSISTENCE_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_MSYS2_CARGO_SETUP_md",
+      "label": "MSYS2_CARGO_SETUP.md",
+      "layer": "L1",
+      "path": "docs/development/MSYS2_CARGO_SETUP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NATIVECOMMANDERROR_ANALYSIS_2026_01_19_md",
+      "label": "NATIVECOMMANDERROR_ANALYSIS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/NATIVECOMMANDERROR_ANALYSIS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_DEVELOPMENT_PHASE_md",
+      "label": "NEXT_DEVELOPMENT_PHASE.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_DEVELOPMENT_PHASE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_2025_12_30_md",
+      "label": "NEXT_STEPS_2025-12-30.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_2025-12-30.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_2025_md",
+      "label": "NEXT_STEPS_2025.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_2025.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_2026_01_17_md",
+      "label": "NEXT_STEPS_2026-01-17.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_2026-01-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_2026_01_18_md",
+      "label": "NEXT_STEPS_2026-01-18.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_2026-01-18.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_2026_01_19_md",
+      "label": "NEXT_STEPS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_2026_01_21_md",
+      "label": "NEXT_STEPS_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_ARCHITECT_2026_01_16_md",
+      "label": "NEXT_STEPS_ARCHITECT_2026-01-16.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_ARCHITECT_2026-01-16.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_ARCHITECT_2026_01_22_md",
+      "label": "NEXT_STEPS_ARCHITECT_2026-01-22.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_ARCHITECT_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_ARCHITECT_2026_03_17_md",
+      "label": "NEXT_STEPS_ARCHITECT_2026-03-17.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_ARCHITECT_2026-03-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_CURRENT_md",
+      "label": "NEXT_STEPS_CURRENT.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_CURRENT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_PLAN_md",
+      "label": "NEXT_STEPS_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_RELEVANT_2026_01_19_md",
+      "label": "NEXT_STEPS_RELEVANT_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_RELEVANT_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_SUMMARY_md",
+      "label": "NEXT_STEPS_SUMMARY.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_NEXT_STEPS_UPDATED_2026_01_19_md",
+      "label": "NEXT_STEPS_UPDATED_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/NEXT_STEPS_UPDATED_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_OPENAPI_GAP_AUDIT_2026_05_19_md",
+      "label": "OPENAPI_GAP_AUDIT_2026-05-19.md",
+      "layer": "L1",
+      "path": "docs/development/OPENAPI_GAP_AUDIT_2026-05-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_OPENTELEMETRY_TRACING_md",
+      "label": "OPENTELEMETRY_TRACING.md",
+      "layer": "L1",
+      "path": "docs/development/OPENTELEMETRY_TRACING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PERFORMANCE_OPTIMIZATION_PLAN_2026_03_17_md",
+      "label": "PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md",
+      "layer": "L1",
+      "path": "docs/development/PERFORMANCE_OPTIMIZATION_PLAN_2026-03-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PRE_PUSH_HOOK_md",
+      "label": "PRE_PUSH_HOOK.md",
+      "layer": "L1",
+      "path": "docs/development/PRE_PUSH_HOOK.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PRIORITIES_COMPLETE_2026_01_19_md",
+      "label": "PRIORITIES_COMPLETE_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/PRIORITIES_COMPLETE_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PRIORITY_1_1_COMPLETION_2026_01_19_md",
+      "label": "PRIORITY_1_1_COMPLETION_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/PRIORITY_1_1_COMPLETION_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PRIORITY_1_2_STATUS_2026_01_19_md",
+      "label": "PRIORITY_1_2_STATUS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/PRIORITY_1_2_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PROJECT_FILES_INVENTORY_2026_01_19_md",
+      "label": "PROJECT_FILES_INVENTORY_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/PROJECT_FILES_INVENTORY_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PROMETHEUS_METRICS_md",
+      "label": "PROMETHEUS_METRICS.md",
+      "layer": "L1",
+      "path": "docs/development/PROMETHEUS_METRICS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_PROMETHEUS_SECURITY_ALERTS_md",
+      "label": "PROMETHEUS_SECURITY_ALERTS.md",
+      "layer": "L1",
+      "path": "docs/development/PROMETHEUS_SECURITY_ALERTS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RAID_ADMIN_METRICS_md",
+      "label": "RAID_ADMIN_METRICS.md",
+      "layer": "L1",
+      "path": "docs/development/RAID_ADMIN_METRICS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RELEASE_MANIFEST_SAMPLE_md",
+      "label": "RELEASE_MANIFEST_SAMPLE.md",
+      "layer": "L1",
+      "path": "docs/development/RELEASE_MANIFEST_SAMPLE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_REPOSITORY_LAYOUT_md",
+      "label": "REPOSITORY_LAYOUT.md",
+      "layer": "L1",
+      "path": "docs/development/REPOSITORY_LAYOUT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUN_LOCAL_md",
+      "label": "RUN_LOCAL.md",
+      "layer": "L1",
+      "path": "docs/development/RUN_LOCAL.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_ARCHITECT_FINAL_SUMMARY_2026_01_21_md",
+      "label": "RUST_ARCHITECT_FINAL_SUMMARY_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_ARCHITECT_FINAL_SUMMARY_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_ARCHITECT_NEXT_STEPS_2026_01_19_md",
+      "label": "RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_ARCHITECT_NEXT_STEPS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_ARCHITECT_STATUS_2026_01_19_md",
+      "label": "RUST_ARCHITECT_STATUS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_ARCHITECT_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_ARCHITECT_STATUS_2026_01_21_md",
+      "label": "RUST_ARCHITECT_STATUS_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_ARCHITECT_STATUS_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_ARCHITECT_SUMMARY_2026_01_21_md",
+      "label": "RUST_ARCHITECT_SUMMARY_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_ARCHITECT_SUMMARY_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_STATUS_UPDATE_2026_01_09_md",
+      "label": "STATUS_UPDATE_2026-01-09.md",
+      "layer": "L1",
+      "path": "docs/development/STATUS_UPDATE_2026-01-09.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_STATUS_UPDATE_2026_01_16_md",
+      "label": "STATUS_UPDATE_2026-01-16.md",
+      "layer": "L1",
+      "path": "docs/development/STATUS_UPDATE_2026-01-16.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_STATUS_UPDATE_2026_01_17_md",
+      "label": "STATUS_UPDATE_2026-01-17.md",
+      "layer": "L1",
+      "path": "docs/development/STATUS_UPDATE_2026-01-17.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_STATUS_UPDATE_2026_01_17_FINAL_md",
+      "label": "STATUS_UPDATE_2026-01-17_FINAL.md",
+      "layer": "L1",
+      "path": "docs/development/STATUS_UPDATE_2026-01-17_FINAL.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TERMINAL_SETUP_md",
+      "label": "TERMINAL_SETUP.md",
+      "layer": "L1",
+      "path": "docs/development/TERMINAL_SETUP.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TEST_CONFIGURATION_STATUS_2026_01_19_md",
+      "label": "TEST_CONFIGURATION_STATUS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/TEST_CONFIGURATION_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TEST_FIXES_COMPLETE_md",
+      "label": "TEST_FIXES_COMPLETE.md",
+      "layer": "L1",
+      "path": "docs/development/TEST_FIXES_COMPLETE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TEST_FIXES_SUMMARY_md",
+      "label": "TEST_FIXES_SUMMARY.md",
+      "layer": "L1",
+      "path": "docs/development/TEST_FIXES_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TEST_TIMEOUT_RESEARCH_2026_01_19_md",
+      "label": "TEST_TIMEOUT_RESEARCH_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/TEST_TIMEOUT_RESEARCH_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TLS_SECURITY_ANALYSIS_md",
+      "label": "TLS_SECURITY_ANALYSIS.md",
+      "layer": "L1",
+      "path": "docs/development/TLS_SECURITY_ANALYSIS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TLS_TESTING_PLAN_md",
+      "label": "TLS_TESTING_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/TLS_TESTING_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TLS_UPGRADE_PLAN_md",
+      "label": "TLS_UPGRADE_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/TLS_UPGRADE_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TLS_UPGRADE_STATUS_md",
+      "label": "TLS_UPGRADE_STATUS.md",
+      "layer": "L1",
+      "path": "docs/development/TLS_UPGRADE_STATUS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_TODAY_WORK_SUMMARY_md",
+      "label": "TODAY_WORK_SUMMARY.md",
+      "layer": "L1",
+      "path": "docs/development/TODAY_WORK_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UI_ADMIN_GAP_AND_UPGRADE_PLAN_2026_04_06_md",
+      "label": "UI_ADMIN_GAP_AND_UPGRADE_PLAN_2026-04-06.md",
+      "layer": "L1",
+      "path": "docs/development/UI_ADMIN_GAP_AND_UPGRADE_PLAN_2026-04-06.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UI_BUGFIXES_AND_OAUTH_PLAN_md",
+      "label": "UI_BUGFIXES_AND_OAUTH_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/UI_BUGFIXES_AND_OAUTH_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UI_QUALITY_AND_E2E_PLAN_2026_04_06_md",
+      "label": "UI_QUALITY_AND_E2E_PLAN_2026-04-06.md",
+      "layer": "L1",
+      "path": "docs/development/UI_QUALITY_AND_E2E_PLAN_2026-04-06.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UI_UX_IMPROVEMENTS_PLAN_md",
+      "label": "UI_UX_IMPROVEMENTS_PLAN.md",
+      "layer": "L1",
+      "path": "docs/development/UI_UX_IMPROVEMENTS_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UI_UX_MONITORING_IMPROVEMENTS_2026_01_21_md",
+      "label": "UI_UX_MONITORING_IMPROVEMENTS_2026-01-21.md",
+      "layer": "L1",
+      "path": "docs/development/UI_UX_MONITORING_IMPROVEMENTS_2026-01-21.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UPDATED_DEVELOPMENT_PLAN_2025_md",
+      "label": "UPDATED_DEVELOPMENT_PLAN_2025.md",
+      "layer": "L1",
+      "path": "docs/development/UPDATED_DEVELOPMENT_PLAN_2025.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_UPDATE_PLAN_2025_12_30_md",
+      "label": "UPDATE_PLAN_2025-12-30.md",
+      "layer": "L1",
+      "path": "docs/development/UPDATE_PLAN_2025-12-30.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_VERIFICATION_AFTER_RESTART_2026_01_19_md",
+      "label": "VERIFICATION_AFTER_RESTART_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/VERIFICATION_AFTER_RESTART_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_VISUAL_REGRESSION_E2E_md",
+      "label": "VISUAL_REGRESSION_E2E.md",
+      "layer": "L1",
+      "path": "docs/development/VISUAL_REGRESSION_E2E.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_WINDOWS_ENVIRONMENT_STATUS_2026_01_19_md",
+      "label": "WINDOWS_ENVIRONMENT_STATUS_2026-01-19.md",
+      "layer": "L1",
+      "path": "docs/development/WINDOWS_ENVIRONMENT_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_migration_MIGRATION_md",
+      "label": "MIGRATION.md",
+      "layer": "L2",
+      "path": "docs/migration/MIGRATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_AUTOML_md",
+      "label": "AUTOML.md",
+      "layer": "L2",
+      "path": "docs/ml/AUTOML.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_EXPERIMENT_TRACKING_md",
+      "label": "EXPERIMENT_TRACKING.md",
+      "layer": "L2",
+      "path": "docs/ml/EXPERIMENT_TRACKING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_FEDERATED_LEARNING_md",
+      "label": "FEDERATED_LEARNING.md",
+      "layer": "L2",
+      "path": "docs/ml/FEDERATED_LEARNING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_MODEL_VERSIONING_md",
+      "label": "MODEL_VERSIONING.md",
+      "layer": "L2",
+      "path": "docs/ml/MODEL_VERSIONING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_PIPELINE_MANAGEMENT_md",
+      "label": "PIPELINE_MANAGEMENT.md",
+      "layer": "L2",
+      "path": "docs/ml/PIPELINE_MANAGEMENT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_PRUNING_STRATEGIES_md",
+      "label": "PRUNING_STRATEGIES.md",
+      "layer": "L2",
+      "path": "docs/ml/PRUNING_STRATEGIES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_ml_TURBOQUANT_INTEGRATION_md",
+      "label": "TURBOQUANT_INTEGRATION.md",
+      "layer": "L2",
+      "path": "docs/ml/TURBOQUANT_INTEGRATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_monitoring_ALERTS_md",
+      "label": "ALERTS.md",
+      "layer": "L2",
+      "path": "docs/monitoring/ALERTS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_monitoring_CONTEXT_MEMORY_md",
+      "label": "CONTEXT_MEMORY.md",
+      "layer": "L2",
+      "path": "docs/monitoring/CONTEXT_MEMORY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_monitoring_GRAFANA_md",
+      "label": "GRAFANA.md",
+      "layer": "L2",
+      "path": "docs/monitoring/GRAFANA.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_monitoring_PROMETHEUS_md",
+      "label": "PROMETHEUS.md",
+      "layer": "L2",
+      "path": "docs/monitoring/PROMETHEUS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_performance_BENCHMARKS_md",
+      "label": "BENCHMARKS.md",
+      "layer": "L2",
+      "path": "docs/performance/BENCHMARKS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_performance_LAN_BENCHMARK_RUNBOOK_md",
+      "label": "LAN_BENCHMARK_RUNBOOK.md",
+      "layer": "L2",
+      "path": "docs/performance/LAN_BENCHMARK_RUNBOOK.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_performance_LAN_SIGNOFF_CHECKLIST_md",
+      "label": "LAN_SIGNOFF_CHECKLIST.md",
+      "layer": "L2",
+      "path": "docs/performance/LAN_SIGNOFF_CHECKLIST.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_performance_PROFILING_md",
+      "label": "PROFILING.md",
+      "layer": "L2",
+      "path": "docs/performance/PROFILING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_performance_TUNING_md",
+      "label": "TUNING.md",
+      "layer": "L2",
+      "path": "docs/performance/TUNING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_runtime_INSTANCE_LIBRARY_LOADING_md",
+      "label": "INSTANCE_LIBRARY_LOADING.md",
+      "layer": "L2",
+      "path": "docs/runtime/INSTANCE_LIBRARY_LOADING.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_security_BEST_PRACTICES_md",
+      "label": "BEST_PRACTICES.md",
+      "layer": "L2",
+      "path": "docs/security/BEST_PRACTICES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_security_CERTIFICATE_MANAGEMENT_md",
+      "label": "CERTIFICATE_MANAGEMENT.md",
+      "layer": "L2",
+      "path": "docs/security/CERTIFICATE_MANAGEMENT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_security_OWASP_TOP10_CHECKLIST_md",
+      "label": "OWASP_TOP10_CHECKLIST.md",
+      "layer": "L2",
+      "path": "docs/security/OWASP_TOP10_CHECKLIST.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_security_PEN_TEST_CHECKLIST_md",
+      "label": "PEN_TEST_CHECKLIST.md",
+      "layer": "L2",
+      "path": "docs/security/PEN_TEST_CHECKLIST.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_security_SECRETS_MANAGEMENT_md",
+      "label": "SECRETS_MANAGEMENT.md",
+      "layer": "L2",
+      "path": "docs/security/SECRETS_MANAGEMENT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_security_TLS_md",
+      "label": "TLS.md",
+      "layer": "L2",
+      "path": "docs/security/TLS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_ADMIN_PANEL_STATUS_md",
+      "label": "ADMIN_PANEL_STATUS.md",
+      "layer": "L2",
+      "path": "docs/status/ADMIN_PANEL_STATUS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_ARCHITECTURAL_ANALYSIS_2025_md",
+      "label": "ARCHITECTURAL_ANALYSIS_2025.md",
+      "layer": "L2",
+      "path": "docs/status/ARCHITECTURAL_ANALYSIS_2025.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_AUTOML_IMPLEMENTATION_2026_01_22_md",
+      "label": "AUTOML_IMPLEMENTATION_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/AUTOML_IMPLEMENTATION_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_BUTTON_FUNCTIONS_AUDIT_2026_01_19_md",
+      "label": "BUTTON_FUNCTIONS_AUDIT_2026-01-19.md",
+      "layer": "L2",
+      "path": "docs/status/BUTTON_FUNCTIONS_AUDIT_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_CONTEXT_MEMORY_IMPLEMENTATION_2026_01_22_md",
+      "label": "CONTEXT_MEMORY_IMPLEMENTATION_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/CONTEXT_MEMORY_IMPLEMENTATION_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_CURRENT_STATE_VERIFICATION_2026_01_19_md",
+      "label": "CURRENT_STATE_VERIFICATION_2026-01-19.md",
+      "layer": "L2",
+      "path": "docs/status/CURRENT_STATE_VERIFICATION_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_CURRENT_STATUS_md",
+      "label": "CURRENT_STATUS.md",
+      "layer": "L2",
+      "path": "docs/status/CURRENT_STATUS.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_DEVELOPMENT_PROGRESS_2026_05_19_md",
+      "label": "DEVELOPMENT_PROGRESS_2026-05-19.md",
+      "layer": "L2",
+      "path": "docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_DEVELOPMENT_STATUS_2025_md",
+      "label": "DEVELOPMENT_STATUS_2025.md",
+      "layer": "L2",
+      "path": "docs/status/DEVELOPMENT_STATUS_2025.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_FEDERATED_LEARNING_IMPLEMENTATION_2026_01_22_md",
+      "label": "FEDERATED_LEARNING_IMPLEMENTATION_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/FEDERATED_LEARNING_IMPLEMENTATION_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_FINAL_VALIDATION_REPORT_md",
+      "label": "FINAL_VALIDATION_REPORT.md",
+      "layer": "L2",
+      "path": "docs/status/FINAL_VALIDATION_REPORT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_IMPROVEMENTS_2026_md",
+      "label": "IMPROVEMENTS_2026.md",
+      "layer": "L2",
+      "path": "docs/status/IMPROVEMENTS_2026.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_MODULE_STATUS_2026_md",
+      "label": "MODULE_STATUS_2026.md",
+      "layer": "L2",
+      "path": "docs/status/MODULE_STATUS_2026.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_PERCENTAGE_PLAN_md",
+      "label": "PERCENTAGE_PLAN.md",
+      "layer": "L2",
+      "path": "docs/status/PERCENTAGE_PLAN.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_PROGRESS_REPORT_md",
+      "label": "PROGRESS_REPORT.md",
+      "layer": "L2",
+      "path": "docs/status/PROGRESS_REPORT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_PROGRESS_SUMMARY_2025_md",
+      "label": "PROGRESS_SUMMARY_2025.md",
+      "layer": "L2",
+      "path": "docs/status/PROGRESS_SUMMARY_2025.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_PROJECT_STATUS_2026_01_19_md",
+      "label": "PROJECT_STATUS_2026-01-19.md",
+      "layer": "L2",
+      "path": "docs/status/PROJECT_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_PROJECT_STATUS_REPORT_2026_01_19_md",
+      "label": "PROJECT_STATUS_REPORT_2026-01-19.md",
+      "layer": "L2",
+      "path": "docs/status/PROJECT_STATUS_REPORT_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_PRUNING_STRATEGIES_IMPLEMENTATION_2026_01_22_md",
+      "label": "PRUNING_STRATEGIES_IMPLEMENTATION_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/PRUNING_STRATEGIES_IMPLEMENTATION_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_README_md",
+      "label": "README.md",
+      "layer": "L2",
+      "path": "docs/status/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_RELEASE_READINESS_REPORT_md",
+      "label": "RELEASE_READINESS_REPORT.md",
+      "layer": "L2",
+      "path": "docs/status/RELEASE_READINESS_REPORT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_RUST_ARCHITECT_UPDATE_2026_01_22_md",
+      "label": "RUST_ARCHITECT_UPDATE_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/RUST_ARCHITECT_UPDATE_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_STABLE_STATE_SUMMARY_md",
+      "label": "STABLE_STATE_SUMMARY.md",
+      "layer": "L2",
+      "path": "docs/status/STABLE_STATE_SUMMARY.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_STABLE_STATE_UPDATE_2026_01_19_md",
+      "label": "STABLE_STATE_UPDATE_2026-01-19.md",
+      "layer": "L2",
+      "path": "docs/status/STABLE_STATE_UPDATE_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_STAGE_4_4_AI_ML_COMPLETE_2026_01_22_md",
+      "label": "STAGE_4_4_AI_ML_COMPLETE_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/STAGE_4_4_AI_ML_COMPLETE_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_STAGE_4_4_AI_ML_FULLY_COMPLETE_2026_01_22_md",
+      "label": "STAGE_4_4_AI_ML_FULLY_COMPLETE_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/status/STAGE_4_4_AI_ML_FULLY_COMPLETE_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_UI_UX_STATUS_2026_01_19_md",
+      "label": "UI_UX_STATUS_2026-01-19.md",
+      "layer": "L2",
+      "path": "docs/status/UI_UX_STATUS_2026-01-19.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_status_UI_UX_VALIDATION_REPORT_md",
+      "label": "UI_UX_VALIDATION_REPORT.md",
+      "layer": "L2",
+      "path": "docs/status/UI_UX_VALIDATION_REPORT.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_AVAST_FALSE_POSITIVE_md",
+      "label": "AVAST_FALSE_POSITIVE.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/AVAST_FALSE_POSITIVE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_BUILD_ACCESS_DENIED_md",
+      "label": "BUILD_ACCESS_DENIED.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/BUILD_ACCESS_DENIED.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_COMMON_ISSUES_md",
+      "label": "COMMON_ISSUES.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/COMMON_ISSUES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_CURSOR_CHAT_EMPTY_RESPONSES_md",
+      "label": "CURSOR_CHAT_EMPTY_RESPONSES.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/CURSOR_CHAT_EMPTY_RESPONSES.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_DLLTOOL_FIX_md",
+      "label": "DLLTOOL_FIX.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/DLLTOOL_FIX.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_GCC_DLLTOOL_NOT_FOUND_md",
+      "label": "GCC_DLLTOOL_NOT_FOUND.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/GCC_DLLTOOL_NOT_FOUND.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_GIT_AUTH_FIX_md",
+      "label": "GIT_AUTH_FIX.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/GIT_AUTH_FIX.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_GIT_COMMANDS_NOW_md",
+      "label": "GIT_COMMANDS_NOW.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/GIT_COMMANDS_NOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_GIT_INDEX_LOCK_FIX_md",
+      "label": "GIT_INDEX_LOCK_FIX.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/GIT_INDEX_LOCK_FIX.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_GIT_PUSH_FAILED_md",
+      "label": "GIT_PUSH_FAILED.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/GIT_PUSH_FAILED.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_PUSH_FIX_NOW_md",
+      "label": "PUSH_FIX_NOW.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/PUSH_FIX_NOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_PUSH_NOW_md",
+      "label": "PUSH_NOW.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/PUSH_NOW.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_QUICK_FIX_MSYS2_md",
+      "label": "QUICK_FIX_MSYS2.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/QUICK_FIX_MSYS2.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_QUICK_PUSH_md",
+      "label": "QUICK_PUSH.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/QUICK_PUSH.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_RUST_VERSION_FIX_2026_01_22_md",
+      "label": "RUST_VERSION_FIX_2026-01-22.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/RUST_VERSION_FIX_2026-01-22.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_troubleshooting_RUST_VERSION_ISSUE_md",
+      "label": "RUST_VERSION_ISSUE.md",
+      "layer": "L2",
+      "path": "docs/troubleshooting/RUST_VERSION_ISSUE.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_README_md",
+      "label": "README.md",
+      "layer": "L1",
+      "path": "docs/vision/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vision_vision_js",
+      "label": "vision.js",
+      "layer": "L1",
+      "path": "docs/vision/vision.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_vm_ISOLATION_IMPLEMENTATION_md",
+      "label": "ISOLATION_IMPLEMENTATION.md",
+      "layer": "L2",
+      "path": "docs/vm/ISOLATION_IMPLEMENTATION.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_global_d_ts",
+      "label": "global.d.ts",
+      "layer": "L3",
+      "path": "e2e/global.d.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_playwright_config_ts",
+      "label": "playwright.config.ts",
+      "layer": "L3",
+      "path": "e2e/playwright.config.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_a11y_spec_ts",
+      "label": "a11y.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/a11y.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_admin_spec_ts",
+      "label": "admin.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/admin.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_grid_pricing_spec_ts",
+      "label": "grid_pricing.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/grid_pricing.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_helpers_ts",
+      "label": "helpers.ts",
+      "layer": "L3",
+      "path": "e2e/tests/helpers.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_jobs_raid_spec_ts",
+      "label": "jobs_raid.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/jobs_raid.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_smoke_spec_ts",
+      "label": "smoke.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/smoke.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_tests_visual_spec_ts",
+      "label": "visual.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/visual.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_telegram_bot_rs",
+      "label": "poolai-telegram-bot.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai-telegram-bot.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_health_load_rs",
+      "label": "poolai_health_load.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_health_load.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_openapi_gap_audit_rs",
+      "label": "poolai_openapi_gap_audit.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_openapi_gap_audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_p2b_tq01_snapshot_rs",
+      "label": "poolai_p2b_tq01_snapshot.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_p2b_tq01_snapshot.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_autoscaling_rs",
+      "label": "autoscaling.rs",
+      "layer": "L3",
+      "path": "src/cloud/autoscaling.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_kubernetes_rs",
+      "label": "kubernetes.rs",
+      "layer": "L3",
+      "path": "src/cloud/kubernetes.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_loadbalancing_rs",
+      "label": "loadbalancing.rs",
+      "layer": "L3",
+      "path": "src/cloud/loadbalancing.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_operator_rs",
+      "label": "operator.rs",
+      "layer": "L3",
+      "path": "src/cloud/operator.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_providers_aws_rs",
+      "label": "aws.rs",
+      "layer": "L3",
+      "path": "src/cloud/providers/aws.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_providers_azure_rs",
+      "label": "azure.rs",
+      "layer": "L3",
+      "path": "src/cloud/providers/azure.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_cloud_providers_gcp_rs",
+      "label": "gcp.rs",
+      "layer": "L3",
+      "path": "src/cloud/providers/gcp.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_config_rs",
+      "label": "config.rs",
+      "layer": "L3",
+      "path": "src/core/config.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_dev_stand_rs",
+      "label": "dev_stand.rs",
+      "layer": "L3",
+      "path": "src/core/dev_stand.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_discovery_handle_rs",
+      "label": "discovery_handle.rs",
+      "layer": "L3",
+      "path": "src/core/discovery_handle.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_discovery_types_rs",
+      "label": "discovery_types.rs",
+      "layer": "L3",
+      "path": "src/core/discovery_types.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_error_rs",
+      "label": "error.rs",
+      "layer": "L3",
+      "path": "src/core/error.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_model_interface_rs",
+      "label": "model_interface.rs",
+      "layer": "L3",
+      "path": "src/core/model_interface.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_oauth2_pending_rs",
+      "label": "oauth2_pending.rs",
+      "layer": "L3",
+      "path": "src/core/oauth2_pending.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_state_rs",
+      "label": "state.rs",
+      "layer": "L3",
+      "path": "src/core/state.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_user_manager_rs",
+      "label": "user_manager.rs",
+      "layer": "L3",
+      "path": "src/core/user_manager.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_core_ws_manager_rs",
+      "label": "ws_manager.rs",
+      "layer": "L3",
+      "path": "src/core/ws_manager.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_enterprise_audit_rs",
+      "label": "audit.rs",
+      "layer": "L3",
+      "path": "src/enterprise/audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_enterprise_monitoring_rs",
+      "label": "monitoring.rs",
+      "layer": "L3",
+      "path": "src/enterprise/monitoring.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_enterprise_multi_tenancy_rs",
+      "label": "multi_tenancy.rs",
+      "layer": "L3",
+      "path": "src/enterprise/multi_tenancy.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_enterprise_security_rs",
+      "label": "security.rs",
+      "layer": "L3",
+      "path": "src/enterprise/security.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_envelope_rs",
+      "label": "envelope.rs",
+      "layer": "L3",
+      "path": "src/grid/envelope.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_map_rs",
+      "label": "map.rs",
+      "layer": "L3",
+      "path": "src/grid/map.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_protocol_compat_rs",
+      "label": "protocol_compat.rs",
+      "layer": "L3",
+      "path": "src/grid/protocol_compat.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_job_map_rs",
+      "label": "map.rs",
+      "layer": "L3",
+      "path": "src/job/map.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_job_store_sqlite_rs",
+      "label": "store_sqlite.rs",
+      "layer": "L3",
+      "path": "src/job/store_sqlite.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_constraints_rs",
+      "label": "constraints.rs",
+      "layer": "L3",
+      "path": "src/libs/constraints.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_dependencies_rs",
+      "label": "dependencies.rs",
+      "layer": "L3",
+      "path": "src/libs/dependencies.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_download_rs",
+      "label": "download.rs",
+      "layer": "L3",
+      "path": "src/libs/download.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_integration_rs",
+      "label": "integration.rs",
+      "layer": "L3",
+      "path": "src/libs/integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_manager_rs",
+      "label": "manager.rs",
+      "layer": "L3",
+      "path": "src/libs/manager.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_manifest_rs",
+      "label": "manifest.rs",
+      "layer": "L3",
+      "path": "src/libs/manifest.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_registry_rs",
+      "label": "registry.rs",
+      "layer": "L3",
+      "path": "src/libs/registry.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_libs_versioning_rs",
+      "label": "versioning.rs",
+      "layer": "L3",
+      "path": "src/libs/versioning.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_main_rs",
+      "label": "main.rs",
+      "layer": "L3",
+      "path": "src/main.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_memory_map_rs",
+      "label": "map.rs",
+      "layer": "L3",
+      "path": "src/memory/map.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_memory_store_rs",
+      "label": "store.rs",
+      "layer": "L3",
+      "path": "src/memory/store.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_memory_types_rs",
+      "label": "types.rs",
+      "layer": "L3",
+      "path": "src/memory/types.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_automl_rs",
+      "label": "automl.rs",
+      "layer": "L3",
+      "path": "src/ml/automl.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_experiments_rs",
+      "label": "experiments.rs",
+      "layer": "L3",
+      "path": "src/ml/experiments.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_federated_rs",
+      "label": "federated.rs",
+      "layer": "L3",
+      "path": "src/ml/federated.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_optimization_rs",
+      "label": "optimization.rs",
+      "layer": "L3",
+      "path": "src/ml/optimization.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_pipeline_rs",
+      "label": "pipeline.rs",
+      "layer": "L3",
+      "path": "src/ml/pipeline.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_turboquant_rs",
+      "label": "turboquant.rs",
+      "layer": "L3",
+      "path": "src/ml/turboquant.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ml_versioning_rs",
+      "label": "versioning.rs",
+      "layer": "L3",
+      "path": "src/ml/versioning.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_monitoring_context_memory_rs",
+      "label": "context_memory.rs",
+      "layer": "L3",
+      "path": "src/monitoring/context_memory.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_monitoring_metrics_rs",
+      "label": "metrics.rs",
+      "layer": "L3",
+      "path": "src/monitoring/metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_admin_rs",
+      "label": "admin.rs",
+      "layer": "L3",
+      "path": "src/network/api/admin.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_ai_ml_rs",
+      "label": "ai_ml.rs",
+      "layer": "L3",
+      "path": "src/network/api/ai_ml.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_common_rs",
+      "label": "common.rs",
+      "layer": "L3",
+      "path": "src/network/api/common.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_completions_rs",
+      "label": "completions.rs",
+      "layer": "L3",
+      "path": "src/network/api/completions.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_discovery_rs",
+      "label": "discovery.rs",
+      "layer": "L3",
+      "path": "src/network/api/discovery.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_instances_rs",
+      "label": "instances.rs",
+      "layer": "L3",
+      "path": "src/network/api/instances.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_jobs_rs",
+      "label": "jobs.rs",
+      "layer": "L3",
+      "path": "src/network/api/jobs.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_libraries_rs",
+      "label": "libraries.rs",
+      "layer": "L3",
+      "path": "src/network/api/libraries.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_memory_rs",
+      "label": "memory.rs",
+      "layer": "L3",
+      "path": "src/network/api/memory.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_raft_rpc_rs",
+      "label": "raft_rpc.rs",
+      "layer": "L3",
+      "path": "src/network/api/raft_rpc.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_raid_rs",
+      "label": "raid.rs",
+      "layer": "L3",
+      "path": "src/network/api/raid.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_raid_admin_rs",
+      "label": "raid_admin.rs",
+      "layer": "L3",
+      "path": "src/network/api/raid_admin.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_raid_http_rs",
+      "label": "raid_http.rs",
+      "layer": "L3",
+      "path": "src/network/api/raid_http.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_rewards_rs",
+      "label": "rewards.rs",
+      "layer": "L3",
+      "path": "src/network/api/rewards.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_system_rs",
+      "label": "system.rs",
+      "layer": "L3",
+      "path": "src/network/api/system.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_system_status_html_rs",
+      "label": "system_status_html.rs",
+      "layer": "L3",
+      "path": "src/network/api/system_status_html.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_topology_rs",
+      "label": "topology.rs",
+      "layer": "L3",
+      "path": "src/network/api/topology.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_ui_rs",
+      "label": "ui.rs",
+      "layer": "L3",
+      "path": "src/network/api/ui.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_users_rs",
+      "label": "users.rs",
+      "layer": "L3",
+      "path": "src/network/api/users.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_vm_rs",
+      "label": "vm.rs",
+      "layer": "L3",
+      "path": "src/network/api/vm.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_workers_rs",
+      "label": "workers.rs",
+      "layer": "L3",
+      "path": "src/network/api/workers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_auth_rs",
+      "label": "auth.rs",
+      "layer": "L3",
+      "path": "src/network/auth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_discovery_rs",
+      "label": "discovery.rs",
+      "layer": "L3",
+      "path": "src/network/discovery.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_enterprise_api_audit_rs",
+      "label": "audit.rs",
+      "layer": "L3",
+      "path": "src/network/enterprise_api/audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_enterprise_api_monitoring_rs",
+      "label": "monitoring.rs",
+      "layer": "L3",
+      "path": "src/network/enterprise_api/monitoring.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_enterprise_api_oauth_rs",
+      "label": "oauth.rs",
+      "layer": "L3",
+      "path": "src/network/enterprise_api/oauth.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_enterprise_api_saml_rs",
+      "label": "saml.rs",
+      "layer": "L3",
+      "path": "src/network/enterprise_api/saml.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_enterprise_api_security_rs",
+      "label": "security.rs",
+      "layer": "L3",
+      "path": "src/network/enterprise_api/security.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_enterprise_api_tenants_rs",
+      "label": "tenants.rs",
+      "layer": "L3",
+      "path": "src/network/enterprise_api/tenants.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_json_errors_rs",
+      "label": "json_errors.rs",
+      "layer": "L3",
+      "path": "src/network/json_errors.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_raid_distributed_handlers_rs",
+      "label": "raid_distributed_handlers.rs",
+      "layer": "L3",
+      "path": "src/network/raid_distributed_handlers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_rate_limit_rs",
+      "label": "rate_limit.rs",
+      "layer": "L3",
+      "path": "src/network/rate_limit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_security_headers_rs",
+      "label": "security_headers.rs",
+      "layer": "L3",
+      "path": "src/network/security_headers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_tls_config_rs",
+      "label": "tls_config.rs",
+      "layer": "L3",
+      "path": "src/network/tls_config.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_validation_rs",
+      "label": "validation.rs",
+      "layer": "L3",
+      "path": "src/network/validation.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_ws_rs",
+      "label": "ws.rs",
+      "layer": "L3",
+      "path": "src/network/ws.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_observability_http_trace_rs",
+      "label": "http_trace.rs",
+      "layer": "L3",
+      "path": "src/observability/http_trace.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_observability_prometheus_export_rs",
+      "label": "prometheus_export.rs",
+      "layer": "L3",
+      "path": "src/observability/prometheus_export.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_observability_tracing_init_rs",
+      "label": "tracing_init.rs",
+      "layer": "L3",
+      "path": "src/observability/tracing_init.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_platform_linux_rs",
+      "label": "linux.rs",
+      "layer": "L3",
+      "path": "src/platform/linux.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_platform_windows_rs",
+      "label": "windows.rs",
+      "layer": "L3",
+      "path": "src/platform/windows.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_pool_discovery_integration_rs",
+      "label": "discovery_integration.rs",
+      "layer": "L3",
+      "path": "src/pool/discovery_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_pool_placement_rs",
+      "label": "placement.rs",
+      "layer": "L3",
+      "path": "src/pool/placement.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_pool_topology_rs",
+      "label": "topology.rs",
+      "layer": "L3",
+      "path": "src/pool/topology.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_pool_worker_rs",
+      "label": "worker.rs",
+      "layer": "L3",
+      "path": "src/pool/worker.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_admin_rs",
+      "label": "admin.rs",
+      "layer": "L3",
+      "path": "src/raid/admin.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_burst_raid_rs",
+      "label": "burst_raid.rs",
+      "layer": "L3",
+      "path": "src/raid/burst_raid.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_circuit_breaker_rs",
+      "label": "circuit_breaker.rs",
+      "layer": "L3",
+      "path": "src/raid/circuit_breaker.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_client_rs",
+      "label": "client.rs",
+      "layer": "L3",
+      "path": "src/raid/client.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_events_rs",
+      "label": "events.rs",
+      "layer": "L3",
+      "path": "src/raid/events.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_manifest_rs",
+      "label": "manifest.rs",
+      "layer": "L3",
+      "path": "src/raid/manifest.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_protocol_rs",
+      "label": "protocol.rs",
+      "layer": "L3",
+      "path": "src/raid/protocol.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_raft_rs",
+      "label": "raft.rs",
+      "layer": "L3",
+      "path": "src/raid/raft.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_raft_transport_rs",
+      "label": "raft_transport.rs",
+      "layer": "L3",
+      "path": "src/raid/raft_transport.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_replication_rs",
+      "label": "replication.rs",
+      "layer": "L3",
+      "path": "src/raid/replication.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_raid_small_world_rs",
+      "label": "small_world.rs",
+      "layer": "L3",
+      "path": "src/raid/small_world.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_release_error_rs",
+      "label": "error.rs",
+      "layer": "L3",
+      "path": "src/release/error.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_release_manifest_rs",
+      "label": "manifest.rs",
+      "layer": "L3",
+      "path": "src/release/manifest.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_release_trust_rs",
+      "label": "trust.rs",
+      "layer": "L3",
+      "path": "src/release/trust.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_release_verify_rs",
+      "label": "verify.rs",
+      "layer": "L3",
+      "path": "src/release/verify.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_cache_rs",
+      "label": "cache.rs",
+      "layer": "L3",
+      "path": "src/runtime/cache.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_health_rs",
+      "label": "health.rs",
+      "layer": "L3",
+      "path": "src/runtime/health.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_instance_rs",
+      "label": "instance.rs",
+      "layer": "L3",
+      "path": "src/runtime/instance.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_memory_pool_rs",
+      "label": "memory_pool.rs",
+      "layer": "L3",
+      "path": "src/runtime/memory_pool.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_model_loader_rs",
+      "label": "model_loader.rs",
+      "layer": "L3",
+      "path": "src/runtime/model_loader.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_orchestrator_rs",
+      "label": "orchestrator.rs",
+      "layer": "L3",
+      "path": "src/runtime/orchestrator.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_process_rs",
+      "label": "process.rs",
+      "layer": "L3",
+      "path": "src/runtime/process.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_queue_rs",
+      "label": "queue.rs",
+      "layer": "L3",
+      "path": "src/runtime/queue.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_scheduler_rs",
+      "label": "scheduler.rs",
+      "layer": "L3",
+      "path": "src/runtime/scheduler.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_sharding_rs",
+      "label": "sharding.rs",
+      "layer": "L3",
+      "path": "src/runtime/sharding.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_storage_rs",
+      "label": "storage.rs",
+      "layer": "L3",
+      "path": "src/runtime/storage.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_runtime_worker_rs",
+      "label": "worker.rs",
+      "layer": "L3",
+      "path": "src/runtime/worker.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_security_jwt_secrets_rs",
+      "label": "jwt_secrets.rs",
+      "layer": "L3",
+      "path": "src/security/jwt_secrets.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_security_secret_rotation_rs",
+      "label": "secret_rotation.rs",
+      "layer": "L3",
+      "path": "src/security/secret_rotation.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_admin_service_rs",
+      "label": "admin_service.rs",
+      "layer": "L3",
+      "path": "src/services/admin_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_chat_completion_service_rs",
+      "label": "chat_completion_service.rs",
+      "layer": "L3",
+      "path": "src/services/chat_completion_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_cloud_service_rs",
+      "label": "cloud_service.rs",
+      "layer": "L3",
+      "path": "src/services/cloud_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_discovery_service_rs",
+      "label": "discovery_service.rs",
+      "layer": "L3",
+      "path": "src/services/discovery_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_enterprise_service_rs",
+      "label": "enterprise_service.rs",
+      "layer": "L3",
+      "path": "src/services/enterprise_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_instance_service_rs",
+      "label": "instance_service.rs",
+      "layer": "L3",
+      "path": "src/services/instance_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_library_service_rs",
+      "label": "library_service.rs",
+      "layer": "L3",
+      "path": "src/services/library_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_raid_distributed_protocol_service_rs",
+      "label": "raid_distributed_protocol_service.rs",
+      "layer": "L3",
+      "path": "src/services/raid_distributed_protocol_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_raid_service_rs",
+      "label": "raid_service.rs",
+      "layer": "L3",
+      "path": "src/services/raid_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_rewards_service_rs",
+      "label": "rewards_service.rs",
+      "layer": "L3",
+      "path": "src/services/rewards_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_system_service_rs",
+      "label": "system_service.rs",
+      "layer": "L3",
+      "path": "src/services/system_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_topology_service_rs",
+      "label": "topology_service.rs",
+      "layer": "L3",
+      "path": "src/services/topology_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_ui_service_rs",
+      "label": "ui_service.rs",
+      "layer": "L3",
+      "path": "src/services/ui_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_virtual_node_store_rs",
+      "label": "virtual_node_store.rs",
+      "layer": "L3",
+      "path": "src/services/virtual_node_store.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_virtual_node_task_service_rs",
+      "label": "virtual_node_task_service.rs",
+      "layer": "L3",
+      "path": "src/services/virtual_node_task_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_vm_service_rs",
+      "label": "vm_service.rs",
+      "layer": "L3",
+      "path": "src/services/vm_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_services_worker_pool_service_rs",
+      "label": "worker_pool_service.rs",
+      "layer": "L3",
+      "path": "src/services/worker_pool_service.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_tgbot_coordinator_rs",
+      "label": "coordinator.rs",
+      "layer": "L3",
+      "path": "src/tgbot/coordinator.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_tgbot_runtime_rs",
+      "label": "runtime.rs",
+      "layer": "L3",
+      "path": "src/tgbot/runtime.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_audit_rs",
+      "label": "audit.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/audit.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_config_rs",
+      "label": "config.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/config.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_dashboard_rs",
+      "label": "dashboard.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/dashboard.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_instances_rs",
+      "label": "instances.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/instances.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_libs_rs",
+      "label": "libs.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/libs.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_monitoring_rs",
+      "label": "monitoring.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/monitoring.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_raid_rs",
+      "label": "raid.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/raid.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_security_rs",
+      "label": "security.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/security.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_tenants_rs",
+      "label": "tenants.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/tenants.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_topology_rs",
+      "label": "topology.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/topology.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_users_rs",
+      "label": "users.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/users.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_vm_rs",
+      "label": "vm.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/vm.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_workers_rs",
+      "label": "workers.rs",
+      "layer": "L3",
+      "path": "src/ui/admin/workers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_charts_js",
+      "label": "admin_charts.js",
+      "layer": "L3",
+      "path": "src/ui/admin_charts.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_common_js",
+      "label": "admin_common.js",
+      "layer": "L3",
+      "path": "src/ui/admin_common.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_components_rs",
+      "label": "components.rs",
+      "layer": "L3",
+      "path": "src/ui/components.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_i18n_core_js",
+      "label": "i18n_core.js",
+      "layer": "L3",
+      "path": "src/ui/i18n_core.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_themes_rs",
+      "label": "themes.rs",
+      "layer": "L3",
+      "path": "src/ui/themes.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_topology_graph_js",
+      "label": "topology_graph.js",
+      "layer": "L3",
+      "path": "src/ui/topology_graph.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_version_rs",
+      "label": "version.rs",
+      "layer": "L3",
+      "path": "src/version.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_isolation_rs",
+      "label": "isolation.rs",
+      "layer": "L3",
+      "path": "src/vm/isolation.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_isolation_linux_rs",
+      "label": "linux.rs",
+      "layer": "L3",
+      "path": "src/vm/isolation/linux.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_isolation_noop_rs",
+      "label": "noop.rs",
+      "layer": "L3",
+      "path": "src/vm/isolation/noop.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_isolation_windows_rs",
+      "label": "windows.rs",
+      "layer": "L3",
+      "path": "src/vm/isolation/windows.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_isolation_windows_native_rs",
+      "label": "windows_native.rs",
+      "layer": "L3",
+      "path": "src/vm/isolation/windows_native.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_isolation_windows_plan_rs",
+      "label": "windows_plan.rs",
+      "layer": "L3",
+      "path": "src/vm/isolation/windows_plan.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_resources_rs",
+      "label": "resources.rs",
+      "layer": "L3",
+      "path": "src/vm/resources.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_resources_linux_rs",
+      "label": "linux.rs",
+      "layer": "L3",
+      "path": "src/vm/resources/linux.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_vm_resources_windows_rs",
+      "label": "windows.rs",
+      "layer": "L3",
+      "path": "src/vm/resources/windows.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_workers_artifact_cache_rs",
+      "label": "artifact_cache.rs",
+      "layer": "L3",
+      "path": "src/workers/artifact_cache.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_workers_raid_artifact_probe_rs",
+      "label": "raid_artifact_probe.rs",
+      "layer": "L3",
+      "path": "src/workers/raid_artifact_probe.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_workers_virtual_node_executor_rs",
+      "label": "virtual_node_executor.rs",
+      "layer": "L3",
+      "path": "src/workers/virtual_node_executor.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_admin_ui_api_contracts_rs",
+      "label": "admin_ui_api_contracts.rs",
+      "layer": "L3",
+      "path": "tests/admin_ui_api_contracts.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_appstate_http_injection_integration_rs",
+      "label": "appstate_http_injection_integration.rs",
+      "layer": "L3",
+      "path": "tests/appstate_http_injection_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_circuit_breaker_integration_rs",
+      "label": "circuit_breaker_integration.rs",
+      "layer": "L3",
+      "path": "tests/circuit_breaker_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_autoscaling_rs",
+      "label": "cloud_autoscaling.rs",
+      "layer": "L3",
+      "path": "tests/cloud_autoscaling.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_config_validation_rs",
+      "label": "cloud_config_validation.rs",
+      "layer": "L3",
+      "path": "tests/cloud_config_validation.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_integration_rs",
+      "label": "cloud_integration.rs",
+      "layer": "L3",
+      "path": "tests/cloud_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_kubernetes_rs",
+      "label": "cloud_kubernetes.rs",
+      "layer": "L3",
+      "path": "tests/cloud_kubernetes.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_loadbalancing_rs",
+      "label": "cloud_loadbalancing.rs",
+      "layer": "L3",
+      "path": "tests/cloud_loadbalancing.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_mock_integration_rs",
+      "label": "cloud_mock_integration.rs",
+      "layer": "L3",
+      "path": "tests/cloud_mock_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_operator_rs",
+      "label": "cloud_operator.rs",
+      "layer": "L3",
+      "path": "tests/cloud_operator.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_cloud_providers_rs",
+      "label": "cloud_providers.rs",
+      "layer": "L3",
+      "path": "tests/cloud_providers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_context_memory_integration_rs",
+      "label": "context_memory_integration.rs",
+      "layer": "L3",
+      "path": "tests/context_memory_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_core_error_handling_tests_rs",
+      "label": "core_error_handling_tests.rs",
+      "layer": "L3",
+      "path": "tests/core_error_handling_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_core_model_interface_integration_rs",
+      "label": "core_model_interface_integration.rs",
+      "layer": "L3",
+      "path": "tests/core_model_interface_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_core_state_integration_rs",
+      "label": "core_state_integration.rs",
+      "layer": "L3",
+      "path": "tests/core_state_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_deployment_integration_rs",
+      "label": "deployment_integration.rs",
+      "layer": "L3",
+      "path": "tests/deployment_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_discovery_remote_register_integration_rs",
+      "label": "discovery_remote_register_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_remote_register_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_distributed_raid_wire_integration_rs",
+      "label": "distributed_raid_wire_integration.rs",
+      "layer": "L3",
+      "path": "tests/distributed_raid_wire_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_distributed_replication_tests_rs",
+      "label": "distributed_replication_tests.rs",
+      "layer": "L3",
+      "path": "tests/distributed_replication_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_enterprise_audit_integration_rs",
+      "label": "enterprise_audit_integration.rs",
+      "layer": "L3",
+      "path": "tests/enterprise_audit_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_enterprise_monitoring_integration_rs",
+      "label": "enterprise_monitoring_integration.rs",
+      "layer": "L3",
+      "path": "tests/enterprise_monitoring_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_enterprise_monitoring_sqlite_integration_rs",
+      "label": "enterprise_monitoring_sqlite_integration.rs",
+      "layer": "L3",
+      "path": "tests/enterprise_monitoring_sqlite_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_enterprise_security_integration_rs",
+      "label": "enterprise_security_integration.rs",
+      "layer": "L3",
+      "path": "tests/enterprise_security_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_enterprise_tenant_integration_rs",
+      "label": "enterprise_tenant_integration.rs",
+      "layer": "L3",
+      "path": "tests/enterprise_tenant_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_event_sourcing_integration_rs",
+      "label": "event_sourcing_integration.rs",
+      "layer": "L3",
+      "path": "tests/event_sourcing_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_failure_scenario_tests_rs",
+      "label": "failure_scenario_tests.rs",
+      "layer": "L3",
+      "path": "tests/failure_scenario_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_fixtures_release_dev_README_md",
+      "label": "README.md",
+      "layer": "L3",
+      "path": "tests/fixtures/release/dev/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_protocol_register_integration_rs",
+      "label": "galaxy_protocol_register_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_protocol_register_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_network_scalability_tests_rs",
+      "label": "grid_network_scalability_tests.rs",
+      "layer": "L3",
+      "path": "tests/grid_network_scalability_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_integration_cloud_aws_tests_rs",
+      "label": "aws_tests.rs",
+      "layer": "L3",
+      "path": "tests/integration/cloud/aws_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_integration_cloud_azure_tests_rs",
+      "label": "azure_tests.rs",
+      "layer": "L3",
+      "path": "tests/integration/cloud/azure_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_integration_cloud_edge_cases_tests_rs",
+      "label": "edge_cases_tests.rs",
+      "layer": "L3",
+      "path": "tests/integration/cloud/edge_cases_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_integration_cloud_gcp_tests_rs",
+      "label": "gcp_tests.rs",
+      "layer": "L3",
+      "path": "tests/integration/cloud/gcp_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_integration_cloud_mock_servers_rs",
+      "label": "mock_servers.rs",
+      "layer": "L3",
+      "path": "tests/integration/cloud/mock_servers.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_integration_cloud_token_acquisition_tests_rs",
+      "label": "token_acquisition_tests.rs",
+      "layer": "L3",
+      "path": "tests/integration/cloud/token_acquisition_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_job_onchain_events_rs",
+      "label": "job_onchain_events.rs",
+      "layer": "L3",
+      "path": "tests/job_onchain_events.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_job_scheduler_pool_binding_rs",
+      "label": "job_scheduler_pool_binding.rs",
+      "layer": "L3",
+      "path": "tests/job_scheduler_pool_binding.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_job_store_raid_persistence_rs",
+      "label": "job_store_raid_persistence.rs",
+      "layer": "L3",
+      "path": "tests/job_store_raid_persistence.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_jobs_api_contracts_rs",
+      "label": "jobs_api_contracts.rs",
+      "layer": "L3",
+      "path": "tests/jobs_api_contracts.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_libs_constraints_integration_rs",
+      "label": "libs_constraints_integration.rs",
+      "layer": "L3",
+      "path": "tests/libs_constraints_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_libs_dependencies_integration_rs",
+      "label": "libs_dependencies_integration.rs",
+      "layer": "L3",
+      "path": "tests/libs_dependencies_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_libs_integration_rs",
+      "label": "libs_integration.rs",
+      "layer": "L3",
+      "path": "tests/libs_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_load_tests_rs",
+      "label": "load_tests.rs",
+      "layer": "L3",
+      "path": "tests/load_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ml_automl_integration_rs",
+      "label": "ml_automl_integration.rs",
+      "layer": "L3",
+      "path": "tests/ml_automl_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ml_experiments_integration_rs",
+      "label": "ml_experiments_integration.rs",
+      "layer": "L3",
+      "path": "tests/ml_experiments_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ml_federated_integration_rs",
+      "label": "ml_federated_integration.rs",
+      "layer": "L3",
+      "path": "tests/ml_federated_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ml_pipeline_integration_rs",
+      "label": "ml_pipeline_integration.rs",
+      "layer": "L3",
+      "path": "tests/ml_pipeline_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ml_pruning_integration_rs",
+      "label": "ml_pruning_integration.rs",
+      "layer": "L3",
+      "path": "tests/ml_pruning_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ml_versioning_integration_rs",
+      "label": "ml_versioning_integration.rs",
+      "layer": "L3",
+      "path": "tests/ml_versioning_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_monitoring_metrics_integration_rs",
+      "label": "monitoring_metrics_integration.rs",
+      "layer": "L3",
+      "path": "tests/monitoring_metrics_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_network_api_integration_rs",
+      "label": "network_api_integration.rs",
+      "layer": "L3",
+      "path": "tests/network_api_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_network_auth_integration_rs",
+      "label": "network_auth_integration.rs",
+      "layer": "L3",
+      "path": "tests/network_auth_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_network_ws_integration_rs",
+      "label": "network_ws_integration.rs",
+      "layer": "L3",
+      "path": "tests/network_ws_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_observability_otel_rs",
+      "label": "observability_otel.rs",
+      "layer": "L3",
+      "path": "tests/observability_otel.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_observability_prometheus_rs",
+      "label": "observability_prometheus.rs",
+      "layer": "L3",
+      "path": "tests/observability_prometheus.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_pa11y_ci_script_rs",
+      "label": "pa11y_ci_script.rs",
+      "layer": "L3",
+      "path": "tests/pa11y_ci_script.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_platform_integration_rs",
+      "label": "platform_integration.rs",
+      "layer": "L3",
+      "path": "tests/platform_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_pool_worker_tests_rs",
+      "label": "pool_worker_tests.rs",
+      "layer": "L3",
+      "path": "tests/pool_worker_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raft_integration_rs",
+      "label": "raft_integration.rs",
+      "layer": "L3",
+      "path": "tests/raft_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raft_membership_log_rs",
+      "label": "raft_membership_log.rs",
+      "layer": "L3",
+      "path": "tests/raft_membership_log.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raft_multi_node_harness_rs",
+      "label": "raft_multi_node_harness.rs",
+      "layer": "L3",
+      "path": "tests/raft_multi_node_harness.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raft_wire_integration_rs",
+      "label": "raft_wire_integration.rs",
+      "layer": "L3",
+      "path": "tests/raft_wire_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_admin_api_integration_rs",
+      "label": "raid_admin_api_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_admin_api_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_admin_integration_rs",
+      "label": "raid_admin_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_admin_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_burst_integration_rs",
+      "label": "raid_burst_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_burst_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_cross_strategy_rs",
+      "label": "raid_cross_strategy.rs",
+      "layer": "L3",
+      "path": "tests/raid_cross_strategy.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_integration_rs",
+      "label": "raid_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_libs_integration_rs",
+      "label": "raid_libs_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_libs_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_protocol_integration_rs",
+      "label": "raid_protocol_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_protocol_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_small_world_integration_rs",
+      "label": "raid_small_world_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_small_world_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_raid_smallworld_integration_rs",
+      "label": "raid_smallworld_integration.rs",
+      "layer": "L3",
+      "path": "tests/raid_smallworld_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_replication_benchmarks_rs",
+      "label": "replication_benchmarks.rs",
+      "layer": "L3",
+      "path": "tests/replication_benchmarks.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_rewards_integration_rs",
+      "label": "rewards_integration.rs",
+      "layer": "L3",
+      "path": "tests/rewards_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_health_integration_rs",
+      "label": "runtime_health_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_health_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_instance_integration_rs",
+      "label": "runtime_instance_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_instance_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_instance_library_integration_rs",
+      "label": "runtime_instance_library_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_instance_library_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_integration_rs",
+      "label": "runtime_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_model_loader_integration_rs",
+      "label": "runtime_model_loader_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_model_loader_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_orchestrator_integration_rs",
+      "label": "runtime_orchestrator_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_orchestrator_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_process_integration_rs",
+      "label": "runtime_process_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_process_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_queue_integration_rs",
+      "label": "runtime_queue_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_queue_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_runtime_worker_integration_rs",
+      "label": "runtime_worker_integration.rs",
+      "layer": "L3",
+      "path": "tests/runtime_worker_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_saml_auth_flow_integration_rs",
+      "label": "saml_auth_flow_integration.rs",
+      "layer": "L3",
+      "path": "tests/saml_auth_flow_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_secret_rotation_integration_rs",
+      "label": "secret_rotation_integration.rs",
+      "layer": "L3",
+      "path": "tests/secret_rotation_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_security_headers_integration_rs",
+      "label": "security_headers_integration.rs",
+      "layer": "L3",
+      "path": "tests/security_headers_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_security_integration_rs",
+      "label": "security_integration.rs",
+      "layer": "L3",
+      "path": "tests/security_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_sharding_tests_rs",
+      "label": "sharding_tests.rs",
+      "layer": "L3",
+      "path": "tests/sharding_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_telegram_oauth_callback_integration_rs",
+      "label": "telegram_oauth_callback_integration.rs",
+      "layer": "L3",
+      "path": "tests/telegram_oauth_callback_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_tgbot_coordinator_bridge_integration_rs",
+      "label": "tgbot_coordinator_bridge_integration.rs",
+      "layer": "L3",
+      "path": "tests/tgbot_coordinator_bridge_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_tgbot_integration_rs",
+      "label": "tgbot_integration.rs",
+      "layer": "L3",
+      "path": "tests/tgbot_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_tls_https_integration_rs",
+      "label": "tls_https_integration.rs",
+      "layer": "L3",
+      "path": "tests/tls_https_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ui_components_integration_rs",
+      "label": "ui_components_integration.rs",
+      "layer": "L3",
+      "path": "tests/ui_components_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_ui_write_operations_integration_rs",
+      "label": "ui_write_operations_integration.rs",
+      "layer": "L3",
+      "path": "tests/ui_write_operations_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_virtual_node_pool_join_integration_rs",
+      "label": "virtual_node_pool_join_integration.rs",
+      "layer": "L3",
+      "path": "tests/virtual_node_pool_join_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_virtual_node_tasks_integration_rs",
+      "label": "virtual_node_tasks_integration.rs",
+      "layer": "L3",
+      "path": "tests/virtual_node_tasks_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_virtual_node_telegram_binding_integration_rs",
+      "label": "virtual_node_telegram_binding_integration.rs",
+      "layer": "L3",
+      "path": "tests/virtual_node_telegram_binding_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_api_contracts_rs",
+      "label": "vm_api_contracts.rs",
+      "layer": "L3",
+      "path": "tests/vm_api_contracts.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_auto_recovery_tests_rs",
+      "label": "vm_auto_recovery_tests.rs",
+      "layer": "L3",
+      "path": "tests/vm_auto_recovery_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_health_integration_rs",
+      "label": "vm_health_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_health_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_integration_rs",
+      "label": "vm_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_isolation_integration_rs",
+      "label": "vm_isolation_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_isolation_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_linux_resource_limits_integration_rs",
+      "label": "vm_linux_resource_limits_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_linux_resource_limits_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_resource_limits_integration_rs",
+      "label": "vm_resource_limits_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_resource_limits_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_resource_monitoring_tests_rs",
+      "label": "vm_resource_monitoring_tests.rs",
+      "layer": "L3",
+      "path": "tests/vm_resource_monitoring_tests.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_windows_resource_limits_integration_rs",
+      "label": "vm_windows_resource_limits_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_windows_resource_limits_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_vm_write_operations_integration_rs",
+      "label": "vm_write_operations_integration.rs",
+      "layer": "L3",
+      "path": "tests/vm_write_operations_integration.rs"
     }
   ],
-  "edges": [
-    { "from": "galaxy_grid", "to": "memory_layer", "kind": "concept-ref" },
-    { "from": "galaxy_grid", "to": "grid_node", "kind": "concept-ref" },
-    { "from": "handoff", "to": "galaxy_grid", "kind": "session-tracks" },
-    { "from": "next_session", "to": "handoff", "kind": "mirror" },
-    { "from": "docs_index", "to": "fm", "kind": "catalog" },
-    { "from": "dev_readme", "to": "handoff", "kind": "session-tracks" },
-    { "from": "dev_readme", "to": "next_session", "kind": "session-tracks" },
-    { "from": "fm", "to": "handoff", "kind": "queue" },
-    { "from": "fm", "to": "galaxy_grid", "kind": "sprint-scope" },
-    { "from": "galaxy_grid", "to": "galaxy_fee_split", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "grid_dispatch", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "virtual_nodes", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "telegram_bind", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "verify_release", "kind": "implements" },
-    { "from": "verify_release", "to": "release_mod", "kind": "implements" },
-    { "from": "digest", "to": "fm", "kind": "catalog" },
-    { "from": "galaxy_grid", "to": "security_hardening", "kind": "concept-ref" },
-    { "from": "security_hardening", "to": "dependency_security", "kind": "concept-ref" },
-    { "from": "galaxy_grid", "to": "job_types", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "job_lifecycle", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "job_store", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "job_scheduler", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "admin_updates_compat", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "admin_jobs", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "admin_grid_pricing", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "grid_pricing_api", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "pricing_oracle", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "protocol_middleware", "kind": "implements" },
-    { "from": "galaxy_grid", "to": "poolai_worker", "kind": "implements" },
-    { "from": "handoff", "to": "galaxy_roadmap", "kind": "session-tracks" },
-    { "from": "fm", "to": "galaxy_roadmap", "kind": "queue" },
-    { "from": "cargo_toml", "to": "lib_root", "kind": "workspace" },
-    { "from": "cargo_config", "to": "cargo_toml", "kind": "workspace" },
-    { "from": "lib_root", "to": "grid_dispatch", "kind": "crate" },
-    { "from": "grid_dispatch", "to": "e2e_grid_job_lease", "kind": "sprint-scope" },
-    { "from": "grid_dispatch", "to": "e2e_grid_result_lease", "kind": "sprint-scope" },
-    { "from": "job_types", "to": "e2e_jobs_lease", "kind": "sprint-scope" },
-    { "from": "poolai_worker", "to": "grid_dispatch", "kind": "implements" },
-    { "from": "lib_root", "to": "job_types", "kind": "crate" },
-    { "from": "cargo_toml", "to": "crate_solana", "kind": "workspace" },
-    { "from": "fm", "to": "cargo_toml", "kind": "catalog" },
-    { "from": "digest", "to": "solana_concept", "kind": "catalog" },
-    { "from": "fm", "to": "solana_concept", "kind": "concept-ref" },
-    { "from": "solana_concept", "to": "crate_solana", "kind": "implements" },
-    { "from": "lib_root", "to": "job_domain_events", "kind": "crate" },
-    { "from": "lib_root", "to": "job_onchain", "kind": "crate" },
-    { "from": "job_domain_events", "to": "job_onchain", "kind": "implements" },
-    { "from": "job_onchain", "to": "solana_sidecar", "kind": "wire" },
-    { "from": "crate_solana", "to": "solana_events", "kind": "crate" },
-    { "from": "crate_solana", "to": "solana_sidecar", "kind": "crate" },
-    { "from": "crate_solana", "to": "solana_program", "kind": "crate" },
-    { "from": "galaxy_grid", "to": "job_onchain", "kind": "concept-ref" },
-    { "from": "handoff", "to": "solana_concept", "kind": "session-tracks" }
-  ]
+  "revision": 47,
+  "updated_at": "2026-05-28",
+  "vision_ui_rev": 49
 }
