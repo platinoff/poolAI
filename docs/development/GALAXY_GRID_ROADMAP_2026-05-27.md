@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **PH-S99…S103** — renew, `Leased`, failover, live pricing, protocol middleware |
-| **Закрито PH-S65…S98** | protocol, verify-release, pricing API/oracle, admin UI, job lease wire + TTL + acquire |
+| **Відкрито** | **PH-S100…S109** (10) — `Leased`/`Migrating`, failover, pricing fetch, protocol, UI, worker renew, e2e, grid, docs |
+| **Закрито PH-S65…S99** | protocol, verify-release, pricing API/oracle, admin UI, job lease wire + TTL + acquire + renew |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 Research replenish ✅ (2026-05-27): 6 нових PH-S* у FM §5.12.
@@ -50,19 +50,26 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | TTL env | PH-S97 ✅ | `POOLAI_JOB_LEASE_TTL_SECS` → `src/job/lease_config.rs` |
 | Acquire | PH-S98 ✅ | scheduler + `POST /jobs/{id}/lease` → `src/job/lease_acquire.rs` |
 
-**Ще не в коді:** renew, `Leased`/`Migrating` status, failover, re-migrate.
+| Renew | PH-S99 ✅ | `POST /jobs/{id}/lease/renew` |
+
+**Ще не в коді:** `Leased`/`Migrating` status, failover, re-migrate, live pricing HTTP, protocol middleware.
 
 ---
 
-## 3. Черга після PH-S97 (research replenish → §5.12)
+## 3. Черга §5.12 (10 відкритих, replenish 2026-05-27)
 
 | # | Sprint | Тема | Джерело |
 |---|--------|------|---------|
-| 1 | **PH-S99** | Lease renew / heartbeat | §4.3.1 |
-| 3 | PH-S100 | `JobStatus::Leased` + lifecycle | §4.3.2 |
-| 4 | PH-S101 | Failover / re-migrate | §4.3 |
-| 5 | PH-S102 | Live pricing provider fetch | §4.2 |
-| 6 | PH-S103 | `X-PoolAI-Protocol` middleware | §9.8 |
+| 1 | **PH-S100** | `JobStatus::Leased` + lifecycle | §4.3.2 |
+| 2 | PH-S101 | Failover / re-migrate | §4.3 |
+| 3 | PH-S102 | Live pricing provider fetch | §4.2.5 |
+| 4 | PH-S103 | `X-PoolAI-Protocol` middleware | §9.8 |
+| 5 | PH-S104 | `JobStatus::Migrating` + lifecycle | §4.3.2 |
+| 6 | PH-S105 | Admin lease active/expired badge | §4.3.1 |
+| 7 | PH-S106 | Worker lease renew client | §4.3.1 |
+| 8 | PH-S107 | E2E lease acquire+renew | e2e |
+| 9 | PH-S108 | Grid ingest → Leased | §4.3 |
+| 10 | PH-S109 | §4.3 wire docs sync | docs |
 
 ---
 

@@ -37,11 +37,12 @@ flowchart LR
 | `poolai-openapi-gap-audit` (API scope) | Pa11y у cloud без стенду |
 | `e2e` `npm run test:ci` (UI scope) | on-demand baseline workflow |
 
-## Research (черга PH-S* <3)
+## Research (черга PH-S* <10 відкритих)
 
 1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
 2. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md)
 3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first)
+4. Приклад багатоспринтової смуги + docs-sync — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
 
 ## Staging
 

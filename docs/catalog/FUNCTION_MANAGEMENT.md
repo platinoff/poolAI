@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-27 (PH-S99 ✅ lease renew; §5.12 PH-S100…S103; FM-041 Deferred).
+**Оновлено:** 2026-05-27 (PH-S99 ✅ lease renew; §5.12 replenish PH-S100…S109 — 10 відкритих; FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -304,6 +304,12 @@ FM-xxx (з таблиці нижче)
 | 37 | **PH-S101** | Failover / re-migrate stub (code) | Galaxy §4.3 | detect expired lease; coordinator re-assign sketch; tests | відкрито |
 | 38 | **PH-S102** | Live pricing provider HTTP fetch (code) | Galaxy §4.2.5 | L1 refresh from `POOLAI_GALAXY_PRICING_PROVIDERS`; timeout + tests | відкрито |
 | 39 | **PH-S103** | `X-PoolAI-Protocol` middleware (code) | Galaxy §9.8 | header negotiation on selected routes; compat matrix link | відкрито |
+| 40 | **PH-S104** | `JobStatus::Migrating` + lifecycle (code) | Galaxy §4.3.2 | `Migrating` enum + `allows_transition`; backward compatible JSON | відкрито |
+| 41 | **PH-S105** | Admin jobs lease active/expired badge (code) | Galaxy §4.3.1, `src/ui/admin/jobs.rs` | read-only badge from `lease_expires_at`; i18n EN/UK; Playwright smoke | відкрито |
+| 42 | **PH-S106** | `poolai-worker` lease renew client stub (code) | Galaxy §4.3.1, `src/bin/poolai-worker.rs` | POST renew to coordinator when holding task lease; unit test; no full failover | відкрито |
+| 43 | **PH-S107** | Jobs lease E2E smoke (e2e) | `e2e/`, PH-S98–S99 API | Playwright acquire + renew path; `jobs_api` or extend `admin.spec.ts` | відкрито |
+| 44 | **PH-S108** | Grid ingest sets Leased on acquire (code) | `src/grid/dispatch.rs`, `src/job/` | after grid job ingest + schedule, status `leased` when lease active | відкрито |
+| 45 | **PH-S109** | Galaxy §4.3 lease wire docs sync (docs) | `POOLAI_GALAXY_GRID.md`, INDEX, DIGEST | mark Leased/Migrating/renew implemented steps; no duplicate prose | відкрито |
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -416,7 +422,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S100** (`JobStatus::Leased`) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S100** (`JobStatus::Leased`) · черга **10** відкритих (PH-S100…S109) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

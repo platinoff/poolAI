@@ -79,11 +79,11 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 
 ### Next Focus (2026-05-27)
 
-**HEAD:** `dbfc3e4b` — PH-S98 job lease acquire (`src/job/lease_acquire.rs`, `POST /api/v1/jobs/{id}/lease`).
+**HEAD:** `ab51763b` — PH-S99 job lease renew (`POST /api/v1/jobs/{id}/lease/renew`).
 
 **Закрито:** PH-S03…S98 (Galaxy Grid: pricing oracle/API, signed releases, job lease wire + TTL + acquire). Концепт §4.3.1 — [`docs/concept/POOLAI_GALAXY_GRID.md`](docs/concept/POOLAI_GALAXY_GRID.md).
 
-**Активна черга (FM §5.12):** **PH-S99** lease renew / heartbeat → PH-S100…S103 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
+**Активна черга (FM §5.12):** **PH-S100** (`JobStatus::Leased`) — 10 відкритих PH-S100…S109 ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
