@@ -77,10 +77,11 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Solana adapter vision | PH-S120 ✅ | manifest Solana cluster; DIGEST §; FM-033 crosslink |
 | Worker lease heartbeat docs | PH-S121 ✅ | Galaxy §4.3.1.1; discovery vs job renew; `LeaseRenewGuard` |
 | OpenAPI lease schemas audit | PH-S122 ✅ | `GridResultBody.lease_epoch`; jobs lease examples; gap audit 0 |
+| Vision Eco + click perf | PH-S125 ✅ | Eco GPU mode; instant select; fullscreen Layers/Types; toolbar layout |
 
 **Post-MVP (черга §5.12):** PH-S123–S124 e2e/docs.
 
-**Vision (docs):** PH-S113…S115 ✅ — `docs/vision/` L4/L5 layers, pan/zoom map, folder-colored edges.
+**Vision (docs):** PH-S113…S115 ✅ · PH-S125 ✅ — Eco/perf, filter dock, dense-map UX (`docs/vision/` rev 49).
 
 ---
 

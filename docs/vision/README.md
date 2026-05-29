@@ -85,8 +85,12 @@ http://127.0.0.1:8765/docs/vision/index.html
 
 | Механізм | Дія |
 |----------|-----|
-| **⊟ Folders** (увімкнено за замовч.) | папки з **≥5** файлами згортаються в один hub; **клік** — розгорнути, **dblclick** — розгорнути + zoom |
+| **⊟ Folders** (увімкнено за замовч.) | папки з **≥3** файлами (≥2 при >120 вузлів на шар) згортаються в hub; **клік** — розгорнути |
+| **Galaxy map filters** | **Layers** (L0–L5) + **Types** (md/rs/ts/…) chips — toggle підсвітку; **Shift+layer** = solo; **Esc** = скинути фільтри |
+| **Fullscreen map** | dock Layers/Types розгортається зверху; Sprint/Folders — знизу ліворуч |
 | **◎ Sprint** | тьмяні вузли/ребра поза `active_sprint` з `extensions.json` |
+| **Eco / FX** | кнопка **Eco** у шапці — low GPU (starfield off, без blur/glow); **FX** — повні ефекти; auto ON на карті 600+ вузлів |
+| **Клік по вузлу** | миттєва підсвітка (без повного re-render); preview файлу — async fetch |
 | **Layers (3D stack)** | клік по шару L0–L5 — підсвітка tier на Galaxy map; інші тьмяні; повторний клік або Esc — скинути |
 | **Вузол на map** | клік — повна назва у callout; pipeline-ребра до hub-файлів (`galaxy_grid`, `fm`, …) як сузір’я |
 | **Constellation layout** | файли в дузі/спіралі (не ряд); криві ребра між зірками |

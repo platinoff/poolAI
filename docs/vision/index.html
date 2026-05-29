@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PoolAI Galaxy Starwalker Vision</title>
-  <link rel="stylesheet" href="vision.css?v=49" />
+  <link rel="stylesheet" href="vision.css?v=53" />
 </head>
 <body>
   <div id="galaxy-backdrop" class="galaxy-backdrop" aria-hidden="true">
@@ -16,6 +16,7 @@
     <h1>PoolAI Galaxy Starwalker Vision</h1>
     <span class="meta" id="meta-rev">…</span>
     <span class="meta-trail" id="meta-trail" aria-label="Git HEAD and next sprint"></span>
+    <button type="button" id="btn-eco" class="btn-eco on" title="Eco ON — low GPU">Eco</button>
     <button type="button" id="btn-auto" class="btn-auto on" title="Auto-reload when vision files change">Auto</button>
     <button type="button" id="btn-reload" title="Reload manifest.json">↻ Reload</button>
   </header>
@@ -42,14 +43,24 @@
             <img class="galaxy-bg" src="" alt="" />
             <div class="map-toolbar" aria-label="Map filters">
               <button type="button" id="btn-map-sprint" class="btn-map-toggle" title="Dim nodes outside active sprint (PH-S*)">◎ Sprint</button>
-              <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse folders with 5+ files">⊟ Folders</button>
+              <button type="button" id="btn-map-clusters" class="btn-map-toggle on" title="Collapse dense folders">⊟ Folders</button>
+            </div>
+            <div class="map-filter-dock" id="map-filter-dock" aria-label="Layer and file-type filters">
+              <div class="map-filter-group" data-group="layers">
+                <span class="map-filter-label">Layers</span>
+                <div class="map-filter-chips" id="map-layer-chips"></div>
+              </div>
+              <div class="map-filter-group" data-group="ext">
+                <span class="map-filter-label">Types</span>
+                <div class="map-filter-chips" id="map-ext-chips"></div>
+              </div>
             </div>
             <div class="map-controls" aria-label="Map zoom">
               <button type="button" id="map-zoom-in" title="Zoom in">+</button>
               <button type="button" id="map-zoom-out" title="Zoom out">−</button>
               <button type="button" id="map-zoom-reset" title="Reset view">⌂</button>
             </div>
-            <span class="map-hint">constellation · click pipelines · layers · zoom</span>
+            <span class="map-hint">Eco=GPU save · Layers/Types · Shift+layer solo · Esc reset</span>
             <svg id="map-svg" viewBox="0 0 900 520" role="img" aria-label="Documentation graph"></svg>
           </div>
         </section>
@@ -71,6 +82,6 @@
       </section>
     </div>
   </div>
-  <script src="vision.js?v=49"></script>
+  <script src="vision.js?v=53"></script>
 </body>
 </html>

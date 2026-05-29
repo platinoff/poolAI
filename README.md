@@ -13,8 +13,8 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 | **Запуск** | PowerShell у корені: `.\bin\open-docs-vision.ps1` |
 | **URL** | `http://127.0.0.1:8765/docs/vision/index.html` (Cursor Simple Browser — лише localhost, не `S:/…`) |
 | **Панелі** | 3D-шари **L0–L5** (concept → workspace TOML) · Galaxy map · граф зв’язків · preview |
-| **Map UX** | pan/zoom (тачпад ~6%/крок, кнопки 16%) · **⊟ Folders** (згортання 5+ файлів) · **◎ Sprint** |
-| **Auto-reload** | Кнопка **Auto** (1.5 с): `manifest.json` / `extensions.json` без F5 |
+| **Map UX** | pan/zoom · **Eco** (GPU save) · **Layers/Types** filters · **⊟ Folders** · **◎ Sprint** |
+| **Auto-reload** | **Auto** (1.5 s eco / 4 s): manifest без F5 · **Reload** → `__sync` нових файлів |
 
 Деталі: [`docs/vision/README.md`](docs/vision/README.md) · правило агента [`.cursor/rules/docs-vision.mdc`](.cursor/rules/docs-vision.mdc). Статична схема: [`docs/vision/vision.svg`](docs/vision/vision.svg).
 
@@ -52,7 +52,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S121 ✅ (lease MVP, grid CAS, worker ticker, E2E negatives, admin lease UI). **Vision:** PH-S113…S115 ✅ + Solana cluster PH-S120 (`docs/vision/` rev 45). **Активна черга:** FM **§5.12** — **4** відкритих **PH-S122…S124** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S121 ✅ (lease MVP, grid CAS, worker ticker, E2E negatives, admin lease UI). **Vision:** PH-S113…S115 ✅ + PH-S125 Eco/perf (UI v53, manifest rev 49). **Активна черга:** FM **§5.12** — **3** відкритих **PH-S123…S124** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md). Зріз: [`DEVELOPMENT_PROGRESS_2026-05-19.md`](docs/status/DEVELOPMENT_PROGRESS_2026-05-19.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 

@@ -116,7 +116,7 @@
 | [`development/JOB_LAYER_CONCEPT_2026-03-17.md`](../development/JOB_LAYER_CONCEPT_2026-03-17.md) | Job / mining layer, життєвий цикл job. |
 | [`development/GRID_PROTOCOL_CONCEPT_2026-04-06.md`](../development/GRID_PROTOCOL_CONCEPT_2026-04-06.md) | Grid protocol: типи повідомлень, Discovery/RAID/тести. |
 | [`development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md`](../development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) | Solana adapter: core vs on-chain, події Job/Memory. |
-| [`vision/manifest.json`](../vision/manifest.json) | **Galaxy map** — вузли `crate_solana`, `job_onchain`, sidecar/program (PH-S120); `bin/open-docs-vision.ps1`. |
+| [`vision/manifest.json`](../vision/manifest.json) | **Galaxy map** — вузли `crate_solana`, `job_onchain`, sidecar/program (PH-S120); **Eco/perf UI** PH-S125; `bin/open-docs-vision.ps1`. |
 
 ### Solana adapter — модулі (FM-010 / FM-024 / FM-033, PH-S120)
 
