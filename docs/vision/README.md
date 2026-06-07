@@ -59,6 +59,8 @@ http://127.0.0.1:8765/docs/vision/index.html
 
 **Шапка:** `rev N · PH-S*` (закритий спринт) · **git HEAD** pill · `→ PH-S*` (наступний з `manifest.next_sprint`).
 
+**Next-scope ring (UI rev 54+):** вузли з `sprints[]`, що містять `next_sprint`, — бірюзове кільце на карті + accent у дереві (разом з **◎ Sprint** dim/focus).
+
 ## Шари (канон)
 
 | ID | Шар | Приклади |

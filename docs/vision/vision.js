@@ -72,6 +72,7 @@
   let manifest = null;
   let extensions = null;
   let activeSprint = null;
+  let nextSprint = null;
   let sprintPathSet = null;
   let selectedId = null;
   let fullscreenPanel = null;
@@ -839,6 +840,11 @@
     return sprintPathSet && sprintPathSet.has(node.path);
   }
 
+  function nodeInNextSprint(node) {
+    if (!nextSprint || !node) return false;
+    return !!(node.sprints && node.sprints.some((t) => sprintTokenMatches(t, nextSprint)));
+  }
+
   function globToRegExp(glob) {
     const esc = glob.replace(/[.+^${}()|[\]\\]/g, "\\$&");
     const re = "^" + esc.replace(/\*\*/g, "§§").replace(/\*/g, "[^/]*").replace(/§§/g, ".*") + "$";
@@ -919,6 +925,7 @@
           const div = document.createElement("div");
           div.className = "tree-file";
           if (nodeInActiveSprint(n)) div.classList.add("sprint-scope");
+          if (nodeInNextSprint(n)) div.classList.add("sprint-next");
           div.dataset.id = n.id;
           div.dataset.path = n.path;
           div.innerHTML =
@@ -1561,6 +1568,7 @@
       if (pos.clusterHub) g.classList.add("cluster-hub");
       if (nodeIsAutoSynced(n)) g.classList.add("auto-leaf");
       if (mapNodeDimmed(n)) g.classList.add("sprint-dim");
+      if (nodeInNextSprint(n)) g.classList.add("sprint-next");
       g.dataset.id = n.id;
       if (pos.cluster) g.dataset.cluster = pos.cluster;
       const r = nodeRenderRadius(n, pos);
@@ -2228,6 +2236,7 @@
       extensions = null;
     }
     activeSprint = resolveActiveSprint(manifest, extensions);
+    nextSprint = manifest.next_sprint || null;
     sprintPathSet = buildSprintPathSet(extensions, activeSprint);
     rebuildManifestIndexes();
     updateSidebarSprintPill();

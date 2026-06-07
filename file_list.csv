@@ -1592,6 +1592,7 @@
 ./src/grid/dispatch.rs
 ./src/grid/envelope.rs
 ./src/grid/galaxy_fee_split.rs
+./src/grid/galaxy_locality.rs
 ./src/grid/galaxy_pricing_oracle.rs
 ./src/grid/map.rs
 ./src/grid/mod.rs
@@ -1676,6 +1677,7 @@
 ./src/network/validation.rs
 ./src/network/ws.rs
 ./src/observability/http_trace.rs
+./src/observability/lease_trace.rs
 ./src/observability/mod.rs
 ./src/observability/prometheus_export.rs
 ./src/observability/tracing_init.rs

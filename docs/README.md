@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-05-28 (PH-S121 §4.3.1.1 docs sync; §5.12 — **4** відкритих PH-S122…S124; vision rev 45)
+**Last updated:** 2026-06-07 (PH-S128 locality_score stub; §5.12 — **9** відкритих PH-S129…S134; vision rev 56)
 
 ## Canonical reading order
 
@@ -29,8 +29,8 @@
 
 ## Short pointers
 
-- **Galaxy docs vision (рекомендовано)** — [vision/index.html](./vision/index.html) + `manifest.json` (rev 45, git HEAD pill, Solana cluster PH-S120); `../bin/open-docs-vision.ps1`.
-- **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (§4.3.1 lease, **§4.3.1.1** worker heartbeat, fees, Telegram, governance §9); код: `src/grid/`, `src/job/lease_*`, `src/bin/poolai-worker.rs`.
+- **Galaxy docs vision (рекомендовано)** — [vision/index.html](./vision/index.html) + `manifest.json` (rev 56, git HEAD pill); `../bin/open-docs-vision.ps1`.
+- **Galaxy Grid (концепт)** — [concept/POOLAI_GALAXY_GRID.md](./concept/POOLAI_GALAXY_GRID.md) (§4.2 pricing + `/metrics`, §4.3 lease + OTel spans, §5.2 locality_score); код: `src/grid/galaxy_locality.rs`, `src/grid/`, `src/job/lease_*`.
 - **Solana adapter** — [development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md](./development/SOLANA_ADAPTER_CONCEPT_2026-04-06.md) · `crates/poolai-solana-adapter/` (FM-033; без `solana-sdk` у main).
 - **Commit-msg чернетки** — `comitmsg/README.md` (не комітити `comitmsg/*.txt`).
 - **Каталог / витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (крок 11; оновлюй при змінах модулів або публічного API).

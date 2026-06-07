@@ -368,6 +368,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 | L2-only ops | `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` (PH-S81) |
 | Stale metric | `galaxy_pricing_stale_served` на L1 stale path (PH-S83) |
 | Fresh metric | `galaxy_pricing_fresh_served` на L1 fresh path (PH-S91) |
+| Prometheus scrape | `GET /metrics` gauges `galaxy_pricing_fresh_served`, `galaxy_pricing_stale_served`, `galaxy_pricing_forced_fallback_total` (PH-S127) |
 
 #### 4.2.4 Fallback при outage
 
@@ -396,10 +397,10 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 **Спостережність:**
 
 - Логи: `pricing_oracle_refresh_ok`, `pricing_oracle_refresh_fail`, `pricing_oracle_fresh_served`, `pricing_oracle_stale_served`, `pricing_oracle_outage`.
-- Метрики (реалізовано): `galaxy_pricing_fresh_served` (PH-S91), `galaxy_pricing_stale_served` (PH-S83), `galaxy_pricing_forced_fallback_total` (PH-S81).
+- Метрики (in-process + Prometheus, PH-S81/S83/S91/S127): `galaxy_pricing_fresh_served`, `galaxy_pricing_stale_served`, `galaxy_pricing_forced_fallback_total` — atomics у `galaxy_pricing_oracle.rs`; gauges на `GET /metrics` через [`prometheus_export.rs`](../../src/observability/prometheus_export.rs) (`refresh_galaxy_pricing_gauges`).
 - Env catalog (PH-S92): `GalaxyPricingProviderCatalog` у `galaxy_pricing_oracle.rs` — `parse_pricing_providers_json`, `bundled_pricing_provider_catalog`, `pricing_provider_catalog_from_env`.
 - API metadata (PH-S89): `GET /api/v1/grid/pricing` → `l1_cache` on L1 hits (`cache_age_secs`, `cache_ttl_secs`, `max_stale_secs`, fresh/stale until timestamps).
-- Метрики (Prometheus, майбутнє): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
+- Метрики (Prometheus, roadmap): `galaxy_pricing_cache_age_seconds`, `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
 **Rust reference (oracle + HTTP, PH-S68…S92):**
@@ -441,6 +442,9 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 | S116 | `poolai-worker` periodic lease renew ticker (`LeaseRenewGuard`) while task active |
 | S118 | E2E negative lease paths (`renew` w/o acquire, expired TTL, wrong owner) |
 | S119 | Admin jobs lease columns polish (`#epoch`, tooltips, i18n EN/UK) |
+| S124 | OTel lease span attrs docs — [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md) § Job lease spans |
+| S126 | OTel lease span instrumentation — `src/observability/lease_trace.rs` (`job.lease.acquire` / `renew` / `reject`) |
+| S127 | Pricing oracle Prometheus export — `galaxy_pricing_*_served` + `forced_fallback_total` on `GET /metrics` |
 
 *Pricing live fetch (PH-S102) і protocol middleware (PH-S103) — §4.2 / §9, не lease wire.*
 
@@ -583,6 +587,8 @@ locality_score(worker, job) =
 1. Відфільтрувати за `capabilities` + `limits` + seat cap (§3.1).
 2. Сортувати за `locality_score` (desc), потім `pricing`, потім `queue_depth`.
 3. Якщо `shard_local_hit = 0` для всіх — **replicate-or-fetch**: SmallWorld short-path до найближчого seed provider, потім optional **re-migrate** job після prefetch (§4.3).
+
+**Rust reference (PH-S128):** `src/grid/galaxy_locality.rs` — `locality_score`, `rank_workers_by_locality`, unit tests; scheduler stub only (no prefetch wire).
 
 **SmallWorld (high level):** реплікація shard за RAID-політикою; routing обирає peer з мінімальним hop-count + egress; деталі топології — RAID/SmallWorld docs, не дублювати тут.
 

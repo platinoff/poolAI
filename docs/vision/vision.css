@@ -417,6 +417,17 @@ body.sidebar-collapsed .sidebar-title span { display: none; }
   border-left-color: var(--accent);
 }
 
+.tree-file.sprint-next:not(.sprint-scope) {
+  border-left: 2px solid rgba(34, 211, 238, 0.45);
+  margin-left: 2px;
+  padding-left: 20px;
+}
+
+#map-svg .node.sprint-next circle {
+  stroke: rgba(34, 211, 238, 0.85);
+  stroke-width: 2.2;
+}
+
 .ext-dot {
   width: 9px;
   height: 9px;

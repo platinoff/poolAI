@@ -152,7 +152,7 @@
 | **Grid map** | `src/grid/map.rs` | map ↔ `PeerInfo`, RAID `put_artifact`, memory shard bodies | `map` unit tests |
 | **Grid dispatch** | `src/grid/dispatch.rs` | `ingest_envelope` → `JobStore` / `MemoryShardStore`; epics `emit_memory_updated`, `emit_seed_provided`; schedule via `schedule_with_grid_peer` | `dispatch` unit tests |
 | **Galaxy fee split** | `src/grid/galaxy_fee_split.rs` | primary **0.1%** (10 bps) + secondary **1–5%** admin (floor bps); `GalaxyFeeSplit` lamports | unit tests; `cargo bench --bench galaxy_fee_split_benchmarks` |
-| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; `POOLAI_GALAXY_PRICING_PROVIDERS` catalog (PH-S92); metrics fresh/stale/forced_fallback (PH-S81/S83/S91) | unit tests (`galaxy_pricing_oracle`) |
+| **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; `POOLAI_GALAXY_PRICING_PROVIDERS` catalog (PH-S92); in-process metrics fresh/stale/forced_fallback (PH-S81/S83/S91); Prometheus gauges on `GET /metrics` (PH-S127) | unit tests (`galaxy_pricing_oracle`) |
 | **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
 | **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
@@ -160,6 +160,8 @@
 | **Grid pricing API** | `src/network/api/grid.rs` | `GET /api/v1/grid/pricing` (task/model/unit); oracle from `galaxy_pricing_oracle` (PH-S78…S83) | `grid.rs` + `galaxy_pricing_oracle` tests |
 | **Job lease wire** | `src/job/types.rs`, `lease_config.rs`, `lease_acquire.rs`, `src/network/api/jobs.rs` | TTL env; acquire on schedule + `POST /jobs/{id}/lease`; PATCH CAS → `409 lease_epoch_rejected` (PH-S94…S98) | `lease_tests`, `jobs_api_contracts` |
 | **Worker lease ticker** | `src/bin/poolai-worker.rs` | `LeaseRenewGuard` → periodic `POST /jobs/{id}/lease/renew`; payload `job_id` + `lease_epoch`; env `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` (PH-S116, Galaxy §4.3.1.1) | `cargo test --bin poolai-worker` |
+| **OTel lease spans** | `src/observability/lease_trace.rs` | `job.lease.acquire` / `renew` / `reject` + `job.lease.*` attrs; wired store/jobs/grid/dispatch (PH-S126); contract PH-S124 | `observability_otel` (`--features otel`) |
+| **Prometheus export** | `src/observability/prometheus_export.rs` | `GET /metrics` pull model (FM-043); galaxy pricing gauges mirror oracle atomics (PH-S127) | `observability_prometheus` tests |
 
 **Admin UI (Galaxy ops, read-only):**
 
@@ -186,14 +188,14 @@
 | `POOLAI_JOB_LEASE_TTL_SECS` | coordinator | Default lease TTL seconds (default `90`; `JobLeaseConfig::from_env()`, PH-S97) |
 | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` | coordinator | Optional renew interval override (default `ttl/3`, capped at TTL; PH-S111) |
 
-**Pricing/lease wire (PH-S94…S107):** lease fields + acquire/renew + `Leased` + failover requeue stub; live provider HTTP fetch from `POOLAI_GALAXY_PRICING_PROVIDERS` endpoints with `POOLAI_GALAXY_PRICING_TIMEOUT_MS`; protocol middleware on selected wire routes (`X-PoolAI-Protocol`); `JobStatus::Migrating` lifecycle transitions (`Leased/Executing ↔ Migrating`) with OpenAPI+contract coverage; admin jobs lease-state badge (`active/expired`) derived from `lease_expires_at` with i18n EN/UK + Playwright smoke updates; `poolai-worker` lease renew client stub for payload `job_id + lease_epoch` to `/api/v1/jobs/{id}/lease/renew`; Playwright `jobs_lease.spec.ts` (acquire → `leased`, renew extends TTL, 409 conflicts). **Grid ingest (PH-S108):** `ingest_envelope` Job path → `schedule_with_grid_peer` → `Leased` + lease fields when `source_peer_id` binds worker. **Grid result CAS (PH-S110):** `GridResultBody.lease_epoch` on envelope `Result`; reject when mismatch/missing on leased job. **Docs (PH-S109):** §4.3 implemented table; смуга PH-S100…S109 закрита. **Наступні PH-S111…S112:** renew-interval env, grid Job E2E. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Pricing/lease wire (PH-S94…S127):** lease MVP + grid CAS + worker ticker + E2E negatives (PH-S107…S118); renew-interval env (PH-S111); OTel lease span contract + instrumentation (PH-S124/S126); pricing oracle Prometheus gauges (PH-S127). **Locality (PH-S128):** `src/grid/galaxy_locality.rs` — `locality_score(worker, task)` pure fn + `rank_workers_by_locality` scheduler stub (Galaxy §5.1–5.2); unit tests; no prefetch wire. **Наступні §5.12:** PH-S129…S134 — prefetch/trust/wallet/E2E gaps. Роадмеп: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ---
 
 ## Безпека та спостережуваність (за доками)
 
 - JWT, HTTPS (**FM-044** TLS 1.3 + cert reload), RBAC, rate limiting, security headers — [`security/TLS.md`](../security/TLS.md), кореневий README.
-- **FM-043** Prometheus pull — [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md); **FM-038** OTLP — [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md).
+- **FM-043** Prometheus pull — [`PROMETHEUS_METRICS.md`](../development/PROMETHEUS_METRICS.md) (galaxy pricing gauges PH-S127); **FM-038** OTLP — [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md) (job lease spans PH-S124/S126).
 - Audit, алерти, метрики enterprise — `enterprise/` + `POOLAI_MONITORING_DATA_DIR` (FM-030).
 
 ---

@@ -49,6 +49,11 @@
     {
       "from": "galaxy_grid",
       "kind": "implements",
+      "to": "galaxy_locality"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
       "to": "galaxy_fee_split"
     },
     {
@@ -135,6 +140,21 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "pricing_oracle"
+    },
+    {
+      "from": "pricing_oracle",
+      "kind": "implements",
+      "to": "src_observability_prometheus_export_rs"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_observability_lease_trace_rs"
+    },
+    {
+      "from": "docs_development_OPENTELEMETRY_TRACING_md",
+      "kind": "implements",
+      "to": "src_observability_lease_trace_rs"
     },
     {
       "from": "galaxy_grid",
@@ -1415,7 +1435,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S127",
+  "last_sprint_closed": "PH-S128",
   "layers": [
     {
       "id": "L0",
@@ -1448,7 +1468,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S128",
+  "next_sprint": "PH-S129",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1838,6 +1858,20 @@
       ]
     },
     {
+      "id": "galaxy_locality",
+      "label": "grid/galaxy_locality.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_locality.rs",
+      "sections": [
+        "locality_score",
+        "rank_workers_by_locality",
+        "scheduler stub"
+      ],
+      "sprints": [
+        "PH-S128"
+      ]
+    },
+    {
       "id": "pricing_oracle",
       "label": "grid/galaxy_pricing_oracle.rs",
       "layer": "L3",
@@ -1854,7 +1888,8 @@
         "PH-S81",
         "PH-S89",
         "PH-S92",
-        "PH-S102"
+        "PH-S102",
+        "PH-S127"
       ]
     },
     {
@@ -3560,7 +3595,11 @@
       "id": "docs_development_PROMETHEUS_METRICS_md",
       "label": "PROMETHEUS_METRICS.md",
       "layer": "L1",
-      "path": "docs/development/PROMETHEUS_METRICS.md"
+      "path": "docs/development/PROMETHEUS_METRICS.md",
+      "sprints": [
+        "PH-S07",
+        "PH-S127"
+      ]
     },
     {
       "auto_synced": true,
@@ -4985,7 +5024,15 @@
       "id": "src_observability_prometheus_export_rs",
       "label": "prometheus_export.rs",
       "layer": "L3",
-      "path": "src/observability/prometheus_export.rs"
+      "path": "src/observability/prometheus_export.rs",
+      "sections": [
+        "GET /metrics",
+        "galaxy-pricing-gauges"
+      ],
+      "sprints": [
+        "PH-S07",
+        "PH-S127"
+      ]
     },
     {
       "auto_synced": true,
@@ -6350,10 +6397,17 @@
       "id": "src_observability_lease_trace_rs",
       "label": "lease_trace.rs",
       "layer": "L3",
-      "path": "src/observability/lease_trace.rs"
+      "path": "src/observability/lease_trace.rs",
+      "sections": [
+        "job.lease.acquire",
+        "job.lease.reject"
+      ],
+      "sprints": [
+        "PH-S126"
+      ]
     }
   ],
-  "revision": 54,
-  "updated_at": "2026-05-29",
-  "vision_ui_rev": 53
+  "revision": 56,
+  "updated_at": "2026-06-07",
+  "vision_ui_rev": 54
 }

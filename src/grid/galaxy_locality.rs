@@ -1,0 +1,280 @@
+//! Galaxy Grid locality placement stub (PH-S128): `locality_score(worker, task)` pure fn
+//! and scheduler ranking stub per `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.2.
+//! No prefetch wire (PH-S129).
+
+/// Network profile subset used for locality (full contract TBD Galaxy §8).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LocalityNetworkProfile {
+    pub region: String,
+    pub latency_ms_p50: u32,
+}
+
+/// Hot tier cache on a worker (concept §5.4).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct LocalityHotTier {
+    pub ram_bytes_used: u64,
+    pub vram_bytes_used: u64,
+    pub profiles: Vec<String>,
+}
+
+/// Worker seed inventory subset (concept §5.2 wire extension).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct LocalitySeedInventory {
+    pub shard_ids: Vec<String>,
+    pub hot_tier: LocalityHotTier,
+    pub local_replica_regions: Vec<String>,
+}
+
+/// Worker inputs for locality scoring (off-chain coordinator stub).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LocalityWorker {
+    pub worker_id: String,
+    pub seed_inventory: LocalitySeedInventory,
+    pub network_profile: LocalityNetworkProfile,
+}
+
+/// Task / job inputs for locality scoring.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LocalityTask {
+    pub required_shard_ids: Vec<String>,
+    pub task_profile: String,
+    /// Job-level WAN egress estimate in MB (concept §5.2).
+    pub estimated_cross_region_egress_mb: f64,
+    /// Source region for cross-region penalty; when absent, egress term is 0.
+    pub source_region: Option<String>,
+}
+
+/// Tunable weights for the placement score (concept §5.2).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct LocalityWeights {
+    pub w_shard: f64,
+    pub w_lat: f64,
+    pub w_hot: f64,
+    pub w_egress: f64,
+}
+
+/// Default weights aligned with Galaxy §5.2 signal priorities.
+pub const DEFAULT_LOCALITY_WEIGHTS: LocalityWeights = LocalityWeights {
+    w_shard: 0.40,
+    w_lat: 0.30,
+    w_hot: 0.30,
+    w_egress: 0.01,
+};
+
+/// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
+#[derive(Debug, Clone, PartialEq)]
+pub struct LocalityRankedWorker {
+    pub worker_id: String,
+    pub score: f64,
+}
+
+/// Fraction of `required_shard_ids` present in worker inventory (0..=1).
+#[inline]
+pub fn shard_local_hit(inventory_shard_ids: &[String], required_shard_ids: &[String]) -> f64 {
+    if required_shard_ids.is_empty() {
+        return 1.0;
+    }
+    let hits = required_shard_ids
+        .iter()
+        .filter(|id| inventory_shard_ids.contains(id))
+        .count();
+    hits as f64 / required_shard_ids.len() as f64
+}
+
+/// `1 / (1 + latency_ms_p50/100)` from `network_profile` (concept §5.2).
+#[inline]
+pub fn latency_factor(latency_ms_p50: u32) -> f64 {
+    1.0 / (1.0 + f64::from(latency_ms_p50) / 100.0)
+}
+
+/// Hot tier effectiveness: blend shard presence and task profile match (0..=1).
+pub fn hot_tier_hit_ratio(inventory: &LocalitySeedInventory, task: &LocalityTask) -> f64 {
+    let shard = shard_local_hit(&inventory.shard_ids, &task.required_shard_ids);
+    let profile_ok = inventory.hot_tier.profiles.is_empty()
+        || inventory.hot_tier.profiles.contains(&task.task_profile);
+    let profile = if profile_ok { 1.0 } else { 0.0 };
+    (shard + profile) / 2.0
+}
+
+/// Cross-region egress MB applied to the score (0 when local replica or same region).
+pub fn effective_cross_region_egress_mb(worker: &LocalityWorker, task: &LocalityTask) -> f64 {
+    if shard_local_hit(&worker.seed_inventory.shard_ids, &task.required_shard_ids) >= 1.0 {
+        return 0.0;
+    }
+    let Some(source) = task.source_region.as_deref() else {
+        return 0.0;
+    };
+    if worker.network_profile.region == source {
+        return 0.0;
+    }
+    if worker
+        .seed_inventory
+        .local_replica_regions
+        .iter()
+        .any(|r| r == source)
+    {
+        return 0.0;
+    }
+    task.estimated_cross_region_egress_mb.max(0.0)
+}
+
+/// Placement score (concept §5.2):
+/// `w_shard×shard_local_hit + w_lat×latency_factor + w_hot×hot_tier_hit − w_egress×egress_mb`.
+pub fn locality_score(
+    worker: &LocalityWorker,
+    task: &LocalityTask,
+    weights: &LocalityWeights,
+) -> f64 {
+    let shard = shard_local_hit(&worker.seed_inventory.shard_ids, &task.required_shard_ids);
+    let lat = latency_factor(worker.network_profile.latency_ms_p50);
+    let hot = hot_tier_hit_ratio(&worker.seed_inventory, task);
+    let egress = effective_cross_region_egress_mb(worker, task);
+
+    weights.w_shard * shard + weights.w_lat * lat + weights.w_hot * hot - weights.w_egress * egress
+}
+
+/// Scheduler stub: sort workers by `locality_score` desc, then `worker_id` asc.
+pub fn rank_workers_by_locality(
+    workers: &[LocalityWorker],
+    task: &LocalityTask,
+) -> Vec<LocalityRankedWorker> {
+    rank_workers_by_locality_with_weights(workers, task, &DEFAULT_LOCALITY_WEIGHTS)
+}
+
+/// Same as [`rank_workers_by_locality`] with explicit weights.
+pub fn rank_workers_by_locality_with_weights(
+    workers: &[LocalityWorker],
+    task: &LocalityTask,
+    weights: &LocalityWeights,
+) -> Vec<LocalityRankedWorker> {
+    let mut ranked: Vec<LocalityRankedWorker> = workers
+        .iter()
+        .map(|w| LocalityRankedWorker {
+            worker_id: w.worker_id.clone(),
+            score: locality_score(w, task, weights),
+        })
+        .collect();
+    ranked.sort_by(|a, b| {
+        b.score
+            .partial_cmp(&a.score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| a.worker_id.cmp(&b.worker_id))
+    });
+    ranked
+}
+
+/// Pick highest-scoring worker (scheduler stub only — no prefetch / lease wire).
+pub fn pick_best_worker_by_locality<'a>(
+    workers: &'a [LocalityWorker],
+    task: &LocalityTask,
+) -> Option<&'a LocalityWorker> {
+    let ranked = rank_workers_by_locality(workers, task);
+    let best_id = ranked.first()?.worker_id.as_str();
+    workers.iter().find(|w| w.worker_id == best_id)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn worker(id: &str, region: &str, latency: u32, shards: &[&str]) -> LocalityWorker {
+        LocalityWorker {
+            worker_id: id.into(),
+            seed_inventory: LocalitySeedInventory {
+                shard_ids: shards.iter().map(|s| (*s).to_string()).collect(),
+                hot_tier: LocalityHotTier {
+                    ram_bytes_used: 1,
+                    vram_bytes_used: 0,
+                    profiles: vec!["inference:text".into()],
+                },
+                local_replica_regions: vec![region.into()],
+            },
+            network_profile: LocalityNetworkProfile {
+                region: region.into(),
+                latency_ms_p50: latency,
+            },
+        }
+    }
+
+    fn task(shards: &[&str], profile: &str, egress_mb: f64, source: Option<&str>) -> LocalityTask {
+        LocalityTask {
+            required_shard_ids: shards.iter().map(|s| (*s).to_string()).collect(),
+            task_profile: profile.into(),
+            estimated_cross_region_egress_mb: egress_mb,
+            source_region: source.map(str::to_string),
+        }
+    }
+
+    #[test]
+    fn shard_local_hit_empty_required_is_one() {
+        assert_eq!(shard_local_hit(&[], &[]), 1.0);
+        assert_eq!(shard_local_hit(&["a".into()], &[]), 1.0);
+    }
+
+    #[test]
+    fn shard_local_hit_partial_and_full() {
+        let inv = vec!["w:emb-1".into(), "w:ckpt-7".into()];
+        assert!(
+            (shard_local_hit(&inv, &["w:emb-1".into(), "w:missing".into()]) - 0.5).abs()
+                < f64::EPSILON
+        );
+        assert!(
+            (shard_local_hit(&inv, &["w:emb-1".into(), "w:ckpt-7".into()]) - 1.0).abs()
+                < f64::EPSILON
+        );
+    }
+
+    #[test]
+    fn latency_factor_decreases_with_latency() {
+        let low = latency_factor(10);
+        let high = latency_factor(200);
+        assert!(low > high);
+        assert!((latency_factor(0) - 1.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn locality_score_prefers_local_shards_and_low_latency() {
+        let job = task(&["w:emb-1"], "inference:text", 100.0, Some("eu-west"));
+        let local = worker("local", "eu-west", 20, &["w:emb-1"]);
+        let remote = worker("remote", "us-east", 150, &[]);
+        let local_score = locality_score(&local, &job, &DEFAULT_LOCALITY_WEIGHTS);
+        let remote_score = locality_score(&remote, &job, &DEFAULT_LOCALITY_WEIGHTS);
+        assert!(local_score > remote_score);
+    }
+
+    #[test]
+    fn rank_workers_by_locality_orders_desc_then_id() {
+        let job = task(&["w:emb-1"], "inference:text", 0.0, None);
+        let w1 = worker("b-worker", "eu-west", 50, &["w:emb-1"]);
+        let w2 = worker("a-worker", "eu-west", 50, &["w:emb-1"]);
+        let ranked = rank_workers_by_locality(&[w1, w2], &job);
+        assert_eq!(ranked.len(), 2);
+        assert!(ranked[0].score >= ranked[1].score);
+        assert_eq!(ranked[0].worker_id, "a-worker");
+        assert_eq!(ranked[1].worker_id, "b-worker");
+    }
+
+    #[test]
+    fn pick_best_worker_by_locality_returns_top() {
+        let job = task(&["w:emb-1"], "inference:text", 50.0, Some("eu-west"));
+        let good = worker("good", "eu-west", 10, &["w:emb-1"]);
+        let bad = worker("bad", "ap-south", 300, &[]);
+        let workers = [bad, good];
+        let picked = pick_best_worker_by_locality(&workers, &job).expect("pick");
+        assert_eq!(picked.worker_id, "good");
+    }
+
+    #[test]
+    fn cross_region_egress_zero_when_same_region() {
+        let w = worker("w1", "eu-west", 40, &[]);
+        let job = task(&["w:emb-1"], "inference:text", 200.0, Some("eu-west"));
+        assert!((effective_cross_region_egress_mb(&w, &job) - 0.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn cross_region_egress_applies_when_remote() {
+        let w = worker("w1", "us-east", 40, &[]);
+        let job = task(&["w:emb-1"], "inference:text", 200.0, Some("eu-west"));
+        assert!((effective_cross_region_egress_mb(&w, &job) - 200.0).abs() < f64::EPSILON);
+    }
+}
