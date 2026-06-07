@@ -1,6 +1,6 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-05-29 · зріз після **PH-S124** + FM replenish · vision manifest **rev 52**
+**Оновлено:** 2026-05-29 · зріз після **PH-S126** + FM replenish · vision manifest **rev 53**
 
 Один спринт за раз — канон у [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
 
@@ -9,7 +9,7 @@
 ## Copy-paste для агента (наступна сесія)
 
 ```
-Привіт! Продовжуємо PoolAI ітераційно — спринт PH-S126 (один PH-S*, VDT).
+Привіт! Продовжуємо PoolAI ітераційно — спринт PH-S127 (один PH-S*, VDT).
 
 Перед кодом — правила:
   poolai-agent-roles.mdc · poolai-session-iteration.mdc · virtual-development-team.mdc
@@ -24,20 +24,18 @@ git fetch && git status -sb && git log -1 --oneline
 Прочитай коротко:
   docs/development/HANDOFF_NEW_SESSION.md
   docs/catalog/FUNCTION_MANAGEMENT.md  (§5.12 — 10 відкритих)
-  docs/development/OPENTELEMETRY_TRACING.md  (§ Job lease spans — PH-S124 contract)
-  docs/concept/POOLAI_GALAXY_GRID.md   (§4.3 lease)
+  docs/development/PROMETHEUS_METRICS.md
+  docs/concept/POOLAI_GALAXY_GRID.md   (§4.2 metrics)
   docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md
   docs/development/NEXT_SESSION_PROMPT.md
-  docs/vision/  (manifest rev 52, active_sprint → PH-S126)
+  docs/vision/  (manifest rev 53, active_sprint → PH-S127)
 
-─── Локальний CI (після otel code scope) ───
+─── Локальний CI (після prometheus scope) ───
 cargo fmt --all
 K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci
-cargo test --test observability_otel --features otel
 
 ─── Черга §5.12: 10 відкритих (FM replenish 2026-05-29) ───
-  PH-S126  OTel lease span instrumentation (code)         ← наступний
-  PH-S127  Pricing oracle Prometheus export
+  PH-S127  Pricing oracle Prometheus export (code)        ← наступний
   PH-S128  Locality score scheduler stub
   PH-S129  Seed inventory + prefetch policy stub
   PH-S130  Edge trust_score settlement gate stub
@@ -46,21 +44,15 @@ cargo test --test observability_otel --features otel
   PH-S133  Job Migrating lifecycle E2E
   PH-S134  Protocol middleware E2E smoke
 
-Не повторювати (закрито): PH-S03…S125, PH-S123 grid pricing E2E, PH-S124 OTel lease span attrs docs.
+Не повторювати (закрито): PH-S03…S126, PH-S124 OTel lease docs, PH-S126 OTel lease spans.
 BLOCKED: PH-S35/S16/S02 (LAN) · Deferred: PH-S36/S01/S15 (Cloud SDK).
 
-─── PH-S126 — що зробити ───
-1. src/observability/lease_trace.rs — span builders per OPENTELEMETRY_TRACING.md § Job lease spans.
-2. Wire spans: acquire/renew/reject in src/job/, jobs API, grid dispatch (feature otel).
-3. tests/observability_otel.rs — assert span names/attrs on acquire + lease_epoch_rejected.
-4. FM §5.12 PH-S126 → ✅; HANDOFF; vision manifest revision++.
+─── PH-S127 — що зробити ───
+1. galaxy_pricing_oracle + prometheus_export: export galaxy_pricing_*_served + forced_fallback_total on GET /metrics.
+2. Unit test for metric names/values; cargo test-ci (prometheus feature).
+3. FM §5.12 PH-S127 → ✅; HANDOFF; vision manifest revision++.
 
-Контекст FM-менеджер (gap analysis):
-  Galaxy §4.3 lease MVP ✅ · §4.2 pricing MVP ✅ · §9 governance MVP ✅
-  Gaps → PH-S127…S134: pricing /metrics, §5 locality/prefetch stubs,
-  §6 trust_score, §3.2 wallet API, §8 network_profile docs, E2E migrating + protocol.
-
-Vision: rev 52 · comitmsg/ для commit-msg чернеток.
+Vision: rev 53 · comitmsg/ для commit-msg чернеток.
 Git: не git add -A; не data/audit/, comitmsg/*.txt, bin/commit-*.sh.
 Push — лише зовнішній MSYS2 за git-push.md.
 ```
@@ -71,9 +63,9 @@ Push — лише зовнішній MSYS2 за git-push.md.
 
 | | |
 |--|--|
-| **Наступний спринт** | PH-S126 — OTel lease span instrumentation |
-| **Відкритих у §5.12** | **10** (PH-S126…S134) |
-| **Останні закриті** | PH-S124 (OTel lease span attrs docs) · PH-S123 (grid pricing force-fallback E2E) |
+| **Наступний спринт** | PH-S127 — Pricing oracle Prometheus export |
+| **Відкритих у §5.12** | **10** (PH-S127…S134) |
+| **Останні закриті** | PH-S126 (OTel lease span instrumentation) · PH-S124 (OTel lease span attrs docs) |
 | **Handoff** | [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) |
 | **FM** | [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) |
 | **Концепт Galaxy** | [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) |

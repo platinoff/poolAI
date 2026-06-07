@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-29 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S126…S134)
+**Оновлено:** 2026-05-29 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S127…S134)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S126…S134 (replenish 2026-05-29) |
+| **Відкрито** | **10** — PH-S127…S134 (replenish 2026-05-29) |
 | **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -79,8 +79,9 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | OpenAPI lease schemas audit | PH-S122 ✅ | `GridResultBody.lease_epoch`; jobs lease examples; gap audit 0 |
 | Vision Eco + click perf | PH-S125 ✅ | Eco GPU mode; instant select; fullscreen Layers/Types; toolbar layout |
 | OTel lease span attrs docs | PH-S124 ✅ | [`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md) § Job lease spans (`job.lease.*`) |
+| OTel lease span instrumentation | PH-S126 ✅ | `src/observability/lease_trace.rs`; store/jobs/grid/dispatch wire |
 
-**Post-MVP (черга §5.12):** PH-S126…S134 — OTel lease instrumentation, pricing `/metrics`, Galaxy §5/§6 stubs, wallet API, E2E gaps.
+**Post-MVP (черга §5.12):** PH-S127…S134 — pricing `/metrics`, Galaxy §5/§6 stubs, wallet API, E2E gaps.
 
 **Vision (docs):** PH-S113…S115 ✅ · PH-S125 ✅ — Eco/perf, filter dock, dense-map UX (`docs/vision/` rev 49).
 
@@ -91,7 +92,7 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | # | Sprint | Тема | Джерело | Стан |
 |---|--------|------|---------|------|
 | 1 | **PH-S124** | OTel lease span attrs docs | FM-038 | **✅** |
-| 2 | **PH-S126** | OTel lease span instrumentation | FM-038, jobs API | відкрито |
+| 2 | **PH-S126** | OTel lease span instrumentation | FM-038, jobs API | **✅** |
 | 3 | **PH-S127** | Pricing oracle Prometheus export | Galaxy §4.2, FM-043 | відкрито |
 | 4 | **PH-S128** | Locality score scheduler stub | Galaxy §5.1–5.2 | відкрито |
 | 5 | **PH-S129** | Seed inventory + prefetch stub | Galaxy §5.5 | відкрито |

@@ -7,12 +7,17 @@
 //! - Feature `prometheus`: `GET /metrics` text exposition (complements OTLP, not a duplicate).
 
 mod http_trace;
+pub mod lease_trace;
 mod tracing_init;
 
 #[cfg(feature = "prometheus")]
 pub mod prometheus_export;
 
 pub use http_trace::{apply_http_trace, make_http_span};
+pub use lease_trace::{
+    trace_acquire_success, trace_lease_reject, trace_renew_success, LeaseOperation, LeaseOutcome,
+    LeaseSource,
+};
 pub use tracing_init::{init_tracing, OtelGuard};
 
 #[cfg(feature = "prometheus")]

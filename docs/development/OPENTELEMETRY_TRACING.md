@@ -1,6 +1,6 @@
 # OpenTelemetry tracing (FM-038)
 
-**Status:** HTTP spans via `tower-http` TraceLayer; OTLP export with feature `otel`. Job lease span attribute contract documented (PH-S124); instrumentation — PH-S126.
+**Status:** HTTP spans via `tower-http` TraceLayer; OTLP export with feature `otel`. Job lease spans instrumented (PH-S124 contract, PH-S126 code).
 
 ## HTTP middleware
 
@@ -42,7 +42,7 @@ Code: `src/observability/` (`tracing_init.rs`, `http_trace.rs`).
 
 ## Job lease spans (Galaxy §4.3.1, PH-S124 → PH-S126)
 
-**Contract (PH-S124 ✅):** attribute names and outcomes for coordinator job lease acquire, renew, and reject paths. **Implementation (PH-S126):** `tracing` spans in `src/job/`, `src/observability/`, wired from HTTP handlers and internal call sites (`feature = otel`).
+**Contract (PH-S124 ✅):** attribute names and outcomes for coordinator job lease acquire, renew, and reject paths. **Implementation (PH-S126 ✅):** `src/observability/lease_trace.rs` — `tracing` spans wired from `JobStore` acquire/renew, scheduler bind, grid result CAS, PATCH CAS (`feature = otel` for OTLP export).
 
 Lease spans are **child spans** of the active `http.request` span on API routes, or standalone spans when lease logic runs inside the scheduler or grid ingest (no HTTP parent).
 
@@ -119,10 +119,17 @@ http.request  http.method=POST  http.route=/api/v1/jobs/{id}/lease/renew
        job.lease.reject.code=lease_epoch_rejected  http.status_code=409
 ```
 
-### PH-S126 implementation notes
+### Implementation (`lease_trace.rs`, PH-S126)
 
-- Helper module: `src/observability/lease_trace.rs` (planned) — `#[cfg(feature = "otel")]` span builders; no-op stubs without `otel`.
-- Tests: extend `tests/observability_otel.rs` — assert span names/attrs on acquire success + `lease_epoch_rejected` (in-memory subscriber or OTel SDK test exporter).
-- Do **not** duplicate Prometheus lease counters here; FM-043 `/metrics` is separate (PH-S127 pricing oracle export).
+| Call site | Functions |
+|-----------|-----------|
+| `JobStore::acquire_lease` / `renew_lease` | `trace_acquire_success`, `trace_renew_success`, `trace_lease_reject` (`source=api`) |
+| `maybe_acquire_lease_on_schedule` | `trace_acquire_success` (`source=scheduler`) |
+| `dispatch::ingest_result` | `trace_lease_reject` (`grid_result_cas`, `source=grid_ingest`) |
+| `PATCH /jobs/{id}` lease epoch CAS | `trace_lease_reject` (`patch_cas`, `source=api`) |
 
-**Last updated:** 2026-05-29 (PH-S124 lease span attrs contract; FM-038, Galaxy §4.3.1).
+Tests: `src/observability/lease_trace.rs` unit tests + `tests/observability_otel.rs` (`cargo test --test observability_otel --features otel`).
+
+Do **not** duplicate Prometheus lease counters here; FM-043 `/metrics` pricing export is PH-S127.
+
+**Last updated:** 2026-05-29 (PH-S124 contract + PH-S126 instrumentation; FM-038, Galaxy §4.3.1).

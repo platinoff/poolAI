@@ -16,6 +16,9 @@ use crate::job::{
     JobSpec, JobStatus, JobStore, PatchLeaseEpochError,
 };
 use crate::network::api::common::HttpAppError;
+use crate::observability::lease_trace::{
+    trace_lease_reject, LeaseOperation, LeaseOutcome, LeaseSource,
+};
 
 #[derive(Deserialize)]
 struct CreateJobRequest {
@@ -255,13 +258,25 @@ async fn patch_job(
             PatchLeaseEpochError::NoLeaseOnJob => HttpAppError::new(AppError::ValidationError(
                 "job has no lease fields; omit lease_epoch on PATCH".into(),
             )),
-            PatchLeaseEpochError::Rejected => HttpAppError::new(AppError::RestError {
-                code: "lease_epoch_rejected",
-                message: format!(
-                    "lease_epoch does not match active lease for job '{id}' (Galaxy §4.3.1 CAS stub)"
-                ),
-            })
-            .with_status(StatusCode::CONFLICT),
+            PatchLeaseEpochError::Rejected => {
+                trace_lease_reject(
+                    &id,
+                    LeaseOperation::PatchCas,
+                    LeaseSource::Api,
+                    LeaseOutcome::Rejected,
+                    "lease_epoch_rejected",
+                    existing.lease_epoch,
+                    body.lease_epoch,
+                    Some(409),
+                );
+                HttpAppError::new(AppError::RestError {
+                    code: "lease_epoch_rejected",
+                    message: format!(
+                        "lease_epoch does not match active lease for job '{id}' (Galaxy §4.3.1 CAS stub)"
+                    ),
+                })
+                .with_status(StatusCode::CONFLICT)
+            }
         });
     }
     let job = store().update_status(&id, body.status)?;

@@ -24,6 +24,10 @@ use crate::job::lease_acquire::{
 };
 use crate::job::onchain::emit_job_completed_if_anchor;
 use crate::job::{allows_transition, JobLeaseConfig, JobRecord, JobSpec, JobStatus};
+use crate::observability::lease_trace::{
+    trace_acquire_success, trace_lease_reject, trace_renew_success, LeaseOperation, LeaseOutcome,
+    LeaseSource,
+};
 
 pub(crate) const JOBS_FILE: &str = "jobs.json";
 
@@ -163,16 +167,34 @@ impl JobStore {
                 )
             })?;
             let cfg = JobLeaseConfig::from_env();
-            acquire_lease_on_record(record, &owner, &cfg, now, true).map_err(|e| match e {
-                AcquireLeaseError::NoLeaseOwner => {
-                    AppError::ValidationError("lease_owner must be non-empty".into())
+            match acquire_lease_on_record(record, &owner, &cfg, now, true) {
+                Ok(()) => {
+                    let row = record.clone();
+                    trace_acquire_success(&row, LeaseSource::Api, cfg.lease_ttl_secs);
+                    row
                 }
-                AcquireLeaseError::LeaseAlreadyActive => AppError::RestError {
-                    code: "lease_already_active",
-                    message: format!("job '{id}' already has an active lease (Galaxy §4.3.1)"),
-                },
-            })?;
-            record.clone()
+                Err(AcquireLeaseError::NoLeaseOwner) => {
+                    return Err(AppError::ValidationError(
+                        "lease_owner must be non-empty".into(),
+                    ));
+                }
+                Err(AcquireLeaseError::LeaseAlreadyActive) => {
+                    trace_lease_reject(
+                        id,
+                        LeaseOperation::Acquire,
+                        LeaseSource::Api,
+                        LeaseOutcome::AlreadyActive,
+                        "lease_already_active",
+                        record.lease_epoch,
+                        None,
+                        Some(409),
+                    );
+                    return Err(AppError::RestError {
+                        code: "lease_already_active",
+                        message: format!("job '{id}' already has an active lease (Galaxy §4.3.1)"),
+                    });
+                }
+            }
         };
         self.persist()?;
         Ok(updated)
@@ -191,22 +213,62 @@ impl JobStore {
                 .find(|r| r.spec.id.0 == id)
                 .ok_or_else(|| AppError::ApiNotFound(format!("job '{id}' not found")))?;
             let cfg = JobLeaseConfig::from_env();
-            renew_lease_on_record(record, lease_epoch, &cfg, now).map_err(|e| match e {
-                RenewLeaseError::NoLeaseOnJob => {
-                    AppError::ValidationError("job has no lease fields; acquire lease first".into())
+            match renew_lease_on_record(record, lease_epoch, &cfg, now) {
+                Ok(()) => {
+                    let row = record.clone();
+                    trace_renew_success(&row, LeaseSource::Api, lease_epoch, cfg.lease_ttl_secs);
+                    row
                 }
-                RenewLeaseError::EpochRejected => AppError::RestError {
-                    code: "lease_epoch_rejected",
-                    message: format!(
-                        "lease_epoch does not match active lease for job '{id}' (Galaxy §4.3.1)"
-                    ),
-                },
-                RenewLeaseError::LeaseExpired => AppError::RestError {
-                    code: "lease_expired",
-                    message: format!("lease expired for job '{id}' (Galaxy §4.3.1)"),
-                },
-            })?;
-            record.clone()
+                Err(RenewLeaseError::NoLeaseOnJob) => {
+                    trace_lease_reject(
+                        id,
+                        LeaseOperation::Renew,
+                        LeaseSource::Api,
+                        LeaseOutcome::NoLease,
+                        "no_lease_on_job",
+                        None,
+                        Some(lease_epoch),
+                        Some(400),
+                    );
+                    return Err(AppError::ValidationError(
+                        "job has no lease fields; acquire lease first".into(),
+                    ));
+                }
+                Err(RenewLeaseError::EpochRejected) => {
+                    trace_lease_reject(
+                        id,
+                        LeaseOperation::Renew,
+                        LeaseSource::Api,
+                        LeaseOutcome::Rejected,
+                        "lease_epoch_rejected",
+                        record.lease_epoch,
+                        Some(lease_epoch),
+                        Some(409),
+                    );
+                    return Err(AppError::RestError {
+                        code: "lease_epoch_rejected",
+                        message: format!(
+                            "lease_epoch does not match active lease for job '{id}' (Galaxy §4.3.1)"
+                        ),
+                    });
+                }
+                Err(RenewLeaseError::LeaseExpired) => {
+                    trace_lease_reject(
+                        id,
+                        LeaseOperation::Renew,
+                        LeaseSource::Api,
+                        LeaseOutcome::Expired,
+                        "lease_expired",
+                        record.lease_epoch,
+                        Some(lease_epoch),
+                        Some(409),
+                    );
+                    return Err(AppError::RestError {
+                        code: "lease_expired",
+                        message: format!("lease expired for job '{id}' (Galaxy §4.3.1)"),
+                    });
+                }
+            }
         };
         self.persist()?;
         Ok(updated)

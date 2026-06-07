@@ -6,6 +6,7 @@
 use chrono::{DateTime, Duration, Utc};
 
 use crate::job::{allows_transition, JobLeaseConfig, JobRecord, JobStatus};
+use crate::observability::lease_trace::{trace_acquire_success, LeaseSource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AcquireLeaseError {
@@ -94,7 +95,10 @@ pub fn maybe_acquire_lease_on_schedule(record: &mut JobRecord, now: DateTime<Utc
         return;
     };
     let cfg = JobLeaseConfig::from_env();
-    let _ = acquire_lease_on_record(record, &owner, &cfg, now, false);
+    let had_active = record.has_lease_fields() && record.lease_active_at(now);
+    if acquire_lease_on_record(record, &owner, &cfg, now, false).is_ok() && !had_active {
+        trace_acquire_success(record, LeaseSource::Scheduler, cfg.lease_ttl_secs);
+    }
 }
 
 #[cfg(test)]

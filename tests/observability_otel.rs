@@ -42,3 +42,22 @@ fn init_tracing_without_otlp_endpoint_skips_export() {
     let guard = poolai::observability::init_tracing();
     assert!(!guard.export_enabled());
 }
+
+#[test]
+fn lease_reject_span_contract_name() {
+    use poolai::observability::lease_trace::{
+        trace_lease_reject, LeaseOperation, LeaseOutcome, LeaseSource,
+    };
+    let span = tracing::info_span!("otel-lease-reject-test");
+    let _guard = span.enter();
+    trace_lease_reject(
+        "job-otel-1",
+        LeaseOperation::Renew,
+        LeaseSource::Api,
+        LeaseOutcome::Rejected,
+        "lease_epoch_rejected",
+        Some(1),
+        Some(0),
+        Some(409),
+    );
+}

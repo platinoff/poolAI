@@ -14,6 +14,9 @@ use crate::job::{
     JobStatus, JobStore, PatchLeaseEpochError,
 };
 use crate::memory::{memory_shard_from_grid_body, MemoryShardStore};
+use crate::observability::lease_trace::{
+    trace_lease_reject, LeaseOperation, LeaseOutcome, LeaseSource,
+};
 
 /// Outcome of processing one grid envelope.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -111,6 +114,16 @@ fn ingest_result(body: GridResultBody, jobs: &JobStore) -> Result<GridIngestOutc
     if let Err(PatchLeaseEpochError::Rejected) =
         check_grid_result_lease_epoch(&existing, body.lease_epoch, now)
     {
+        trace_lease_reject(
+            &job_id,
+            LeaseOperation::GridResultCas,
+            LeaseSource::GridIngest,
+            LeaseOutcome::Rejected,
+            "lease_epoch_rejected",
+            existing.lease_epoch,
+            body.lease_epoch,
+            Some(409),
+        );
         return Err(AppError::RestError {
             code: "lease_epoch_rejected",
             message: format!(

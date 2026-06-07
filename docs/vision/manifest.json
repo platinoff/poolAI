@@ -1415,7 +1415,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S124",
+  "last_sprint_closed": "PH-S126",
   "layers": [
     {
       "id": "L0",
@@ -1448,7 +1448,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S126",
+  "next_sprint": "PH-S127",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6338,7 +6338,7 @@
       "path": "src/bin/poolai_vision_sync.rs"
     }
   ],
-  "revision": 52,
+  "revision": 53,
   "updated_at": "2026-05-29",
   "vision_ui_rev": 53
 }
