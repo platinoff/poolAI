@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-05-28 · **HEAD:** `0d70e6c6` · **Смуга PH-S100…S109:** 10/10 ✅ · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12
+**Оновлено:** 2026-05-29 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S126…S134)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,12 +10,12 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **3** — PH-S123…S124 (vision PH-S113…S115 ✅; PH-S112–S122 ✅) |
+| **Відкрито** | **10** — PH-S126…S134 (replenish 2026-05-29) |
 | **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
-Research replenish ✅ (2026-05-28): PH-S110…S124 після lease/protocol + vision slice PH-S113…S115.
+Research replenish ✅ (2026-05-29): PH-S126…S134 — OTel lease spans, pricing `/metrics`, §5 locality/prefetch, §6 trust, §3.2 wallet, §8 network_profile, E2E migrating/protocol.
 
 ---
 
@@ -78,19 +78,28 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Worker lease heartbeat docs | PH-S121 ✅ | Galaxy §4.3.1.1; discovery vs job renew; `LeaseRenewGuard` |
 | OpenAPI lease schemas audit | PH-S122 ✅ | `GridResultBody.lease_epoch`; jobs lease examples; gap audit 0 |
 | Vision Eco + click perf | PH-S125 ✅ | Eco GPU mode; instant select; fullscreen Layers/Types; toolbar layout |
+| OTel lease span attrs docs | PH-S124 ✅ | [`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md) § Job lease spans (`job.lease.*`) |
 
-**Post-MVP (черга §5.12):** PH-S123–S124 e2e/docs.
+**Post-MVP (черга §5.12):** PH-S126…S134 — OTel lease instrumentation, pricing `/metrics`, Galaxy §5/§6 stubs, wallet API, E2E gaps.
 
 **Vision (docs):** PH-S113…S115 ✅ · PH-S125 ✅ — Eco/perf, filter dock, dense-map UX (`docs/vision/` rev 49).
 
 ---
 
-## 3. Черга §5.12 (3 відкритих)
+## 3. Черга §5.12 (10 відкритих, 2026-05-29)
 
-| # | Sprint | Тема | Джерело |
-|---|--------|------|---------|
-| 1 | **PH-S123** | Grid pricing E2E negative fallback | `e2e/grid_pricing` |
-| 2 | **PH-S124** | OTel lease span attrs docs | FM-038 |
+| # | Sprint | Тема | Джерело | Стан |
+|---|--------|------|---------|------|
+| 1 | **PH-S124** | OTel lease span attrs docs | FM-038 | **✅** |
+| 2 | **PH-S126** | OTel lease span instrumentation | FM-038, jobs API | відкрито |
+| 3 | **PH-S127** | Pricing oracle Prometheus export | Galaxy §4.2, FM-043 | відкрито |
+| 4 | **PH-S128** | Locality score scheduler stub | Galaxy §5.1–5.2 | відкрито |
+| 5 | **PH-S129** | Seed inventory + prefetch stub | Galaxy §5.5 | відкрито |
+| 6 | **PH-S130** | Edge trust_score gate stub | Galaxy §6.5 | відкрито |
+| 7 | **PH-S131** | Telegram wallet bind API stub | Galaxy §3.2 | відкрито |
+| 8 | **PH-S132** | network_profile contract docs | Galaxy §8 TBD | відкрито |
+| 9 | **PH-S133** | Job Migrating lifecycle E2E | PH-S104 | відкрито |
+| 10 | **PH-S134** | Protocol middleware E2E smoke | PH-S103 | відкрито |
 
 ---
 

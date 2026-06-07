@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-05-28 (PH-S125 ✅ vision Eco/perf + map UX · §5.12 **3** відкритих PH-S123…S124; FM-041 Deferred).
+**Оновлено:** 2026-05-29 (PH-S124 ✅ · FM replenish **10** відкритих PH-S126…S134 · vision rev 52) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -134,7 +134,7 @@ FM-xxx (з таблиці нижче)
 | FM-035 | Runtime / ML | Real model loading (libtorch/onnx path, not metadata-only) | **Implemented ✅** | `src/runtime/model_loader.rs`, `instance.rs` (`LoadedModelHandle`, SHA256 fingerprint) |
 | FM-036 | Runtime | Tensor / pipeline parallelism (`sharding`, inter-worker sync) | **Implemented ✅** | `src/runtime/sharding.rs`, `tests/sharding_tests.rs`, `benches/sharding_benchmarks.rs`; `pool/placement.rs` uses `tensor_placement_from_nodes` |
 | FM-037 | UI | Cluster topology graph (SVG force layout + latency heatmap) | **Implemented ✅** | `src/ui/topology_graph.js`, `admin/topology.rs`; Playwright topology graph |
-| FM-038 | Observability | OpenTelemetry distributed tracing | **Implemented ✅** | `src/observability/`, feature `otel`, [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md) |
+| FM-038 | Observability | OpenTelemetry distributed tracing | **Implemented ✅** | `src/observability/`, feature `otel`, [`OPENTELEMETRY_TRACING.md`](../development/OPENTELEMETRY_TRACING.md) (HTTP spans; job lease span attrs PH-S124, instrumentation PH-S126) |
 | FM-039 | CI / E2E | Playwright admin suite у `ci.yml` (`workflow_call`) | **Implemented ✅** | `ci.yml` `playwright-admin` → `e2e.yml` (paths-filter `ui`/`e2e`) |
 | FM-040 | UI / QA | Admin field audit (усі `admin/*.rs` vs handlers) | **Implemented ✅** | [`ADMIN_UI_FIELD_AUDIT_2026-05-23.md`](../development/ADMIN_UI_FIELD_AUDIT_2026-05-23.md); +5 contract tests (31 total) |
 | FM-041 | Cloud | SDK hardening (GCP SA JWT, Azure OAuth refresh, IT suites) | **Deferred** | post FM-006 REST; `CLOUD_SDK_PROGRESS_2026-01-19` |
@@ -323,11 +323,20 @@ FM-xxx (з таблиці нижче)
 | 56 | **PH-S120** | Solana adapter vision + digest crosslink (docs) | `docs/vision/`, DIGEST | manifest nodes/edges; DIGEST § Solana modules; FM-033 crosslink | **✅** |
 | 57 | **PH-S121** | Galaxy §4.3 worker heartbeat wire note (docs) | `POOLAI_GALAXY_GRID.md` | §4.3.1.1 worker lease renew vs discovery heartbeat; env + payload + `LeaseRenewGuard` | **✅** |
 | 58 | **PH-S122** | OpenAPI jobs lease schemas audit (docs) | `docs/openapi.yaml`, gap audit | `lease_epoch` on grid result body + examples; gap audit 0 | **✅** |
-| 59 | **PH-S123** | Grid pricing E2E negative fallback (e2e) | `e2e/tests/grid_pricing.spec.ts` | force fallback env → snapshot stable quote | відкрито |
-| 60 | **PH-S124** | OTel lease span attrs docs (docs) | FM-038, HANDOFF | span attributes for acquire/renew/reject paths | відкрито |
+| 59 | **PH-S123** | Grid pricing E2E negative fallback (e2e) | `e2e/tests/grid_pricing.spec.ts` | force fallback env → snapshot stable quote | **✅** |
+| 60 | **PH-S124** | OTel lease span attrs docs (docs) | FM-038, HANDOFF | span attributes for acquire/renew/reject paths | **✅** |
 | 61 | **PH-S125** | Vision Galaxy map Eco + click perf (docs) | `docs/vision/` | Eco GPU mode; instant select (no full re-render); Layers/Types fullscreen dock; bottom toolbar layout | **✅** |
+| 62 | **PH-S126** | OTel lease span instrumentation (code) | FM-038, `src/job/`, `src/observability/` | spans on acquire/renew/reject (`job.lease.*` attrs); `cargo test --features otel`; cross-link OPENTELEMETRY_TRACING | відкрито |
+| 63 | **PH-S127** | Pricing oracle Prometheus export (code) | Galaxy §4.2, `galaxy_pricing_oracle.rs`, FM-043 | export `galaxy_pricing_*_served` + `forced_fallback_total` on `GET /metrics`; unit test | відкрито |
+| 64 | **PH-S128** | Locality score scheduler stub (code) | Galaxy §5.1–5.2, `src/grid/` | `locality_score(worker, task)` pure fn + unit tests; no prefetch wire | відкрито |
+| 65 | **PH-S129** | Seed inventory + prefetch policy stub (code) | Galaxy §5.5, `src/grid/dispatch.rs` | `SeedInventoryEntry` DTO + noop prefetch hook; unit tests | відкрито |
+| 66 | **PH-S130** | Edge trust_score settlement gate stub (code) | Galaxy §6.5, `src/grid/` | `trust_score` 0–100 gate sketch on grid result path; unit tests | відкрито |
+| 67 | **PH-S131** | Telegram wallet bind API stub (code) | Galaxy §3.2, `virtual_nodes.rs` | `POST /api/v1/virtual-nodes/telegram/wallet` stub + OpenAPI; contract test | відкрито |
+| 68 | **PH-S132** | network_profile contract docs (docs) | Galaxy §8 TBD #1 | §8.1 schema for `network_profile`; DIGEST row; locality subset cross-link | відкрито |
+| 69 | **PH-S133** | Job Migrating lifecycle E2E (e2e) | PH-S104, `e2e/` | Playwright PATCH `migrating` ↔ `executing` roundtrip; `npm run test:ci` | відкрито |
+| 70 | **PH-S134** | Protocol middleware E2E smoke (e2e) | PH-S103, `e2e/` | Playwright register-remote with `X-PoolAI-Protocol`; unsupported → 403 | відкрито |
 
-**Відкритих у §5.12:** **3** (PH-S123…S124). Vision slice PH-S113…S115 **✅**; PH-S112–S122 **✅**; PH-S125 vision UX **✅** (2026-05-28).
+**Відкритих у §5.12:** **10** (PH-S126…S134). **Replenish (2026-05-29):** FM-менеджер — Galaxy §4.2 metrics, §5 locality/prefetch, §6 trust, §3.2 wallet, §8 network_profile, FM-038 OTel lease spans, E2E gaps PH-S104/S103. Vision PH-S113…S115 **✅**; PH-S112–S124 **✅**; PH-S125 **✅**.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -440,7 +449,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S123** (Grid pricing E2E negative fallback) · черга **3** відкритих (PH-S123…S124) · vision PH-S125 ✅ (Eco/perf) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S126** (OTel lease span instrumentation) · черга **10** відкритих (PH-S126…S134) · vision rev 52 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

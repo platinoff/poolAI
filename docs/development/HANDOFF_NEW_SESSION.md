@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-05-28 (PH-S125 ✅ · §5.12 **3** відкритих PH-S123…S124 · vision rev 49) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-05-29 (PH-S124 ✅ · FM replenish **10** відкритих PH-S126…S134 · vision rev 52) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -90,11 +90,13 @@
 **PH-S121 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §4.3.1.1 — worker lease renew vs `heartbeat-remote`; env `POOLAI_JOB_LEASE_*`; task payload `job_id` + `lease_epoch`; `LeaseRenewGuard` ticker contract (PH-S116); DIGEST row; manifest rev **45**.
 **PH-S122 ✅ (docs):** `docs/openapi.yaml` — `GridResultBody.lease_epoch` (PH-S110 CAS); jobs lease acquire/renew/409 examples; grid envelope `409 lease_epoch_rejected`; gap audit ignores `#[cfg(test)]` routes; `poolai-vision-sync` auto-indexes git-tracked files into manifest; title **PoolAI Galaxy**; manifest rev **47**.
 **PH-S125 ✅ (docs):** `docs/vision/` — **Eco** GPU mode (starfield off, no blur/glow on dense map); instant node select (manifest index cache, event delegation, no `renderMap` on click); Layers/Types filter dock in fullscreen; bottom toolbar layout (Sprint/Folders left, zoom right); manifest rev **49** · UI cache **v53**.
-**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S123**.
+**PH-S123 ✅ (e2e):** `e2e/tests/grid_pricing.spec.ts` — `POOLAI_GALAXY_PRICING_FORCE_FALLBACK=1` via `stand.env` patch + restart: stable L2 snapshot, live provider skipped, `503 pricing_unavailable` without L2; `bin/e2e-playwright.sh` exports force-fallback/providers env; quoted JSON in `stand.env` for bash `source`.
+**PH-S124 ✅ (docs):** [`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md) — job lease span attribute contract (`job.lease.acquire` / `renew` / `reject`, `job.lease.*` attrs, reject codes); HANDOFF §2a cross-link; FM-038 → PH-S126 instrumentation.
+**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S126** · replenish **PH-S127…S134**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **3** відкритих — **PH-S123** (Grid pricing E2E negative) + **PH-S124** (OTel lease docs).
+**Черга:** §5.12 **10** відкритих — **PH-S126** (наступний) … **PH-S134**. FM replenish 2026-05-29: Galaxy §4.2 metrics, §5 locality, §6 trust, §3.2 wallet, §8 network_profile, FM-038 OTel, E2E PH-S104/S103.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
@@ -151,6 +153,7 @@
 | `POOLAI_SOLANA_PROGRAM_ID` | sidecar | Deployed `poolai-events` program id (інакше Memo fallback) |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | coordinator | OTLP HTTP collector URL (feature `otel`; export off if unset) |
 | `OTEL_SERVICE_NAME` | coordinator | OTel `service.name` (default `poolai`) |
+| *(OTel lease spans)* | coordinator | Span attrs contract: [`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md) § Job lease spans (`job.lease.*`; PH-S124 docs, PH-S126 code) |
 | *(build)* `prometheus` feature | coordinator | Enables `GET /metrics` Prometheus text scrape (FM-043; included in `cargo test-ci`) |
 | `HTTPS_CERT_PATH` / `HTTPS_KEY_PATH` | coordinator | PEM paths when `https.enabled` (FM-044) |
 | `HTTPS_CERT_RELOAD_SECS` | coordinator | Optional hot reload interval for TLS certificates |

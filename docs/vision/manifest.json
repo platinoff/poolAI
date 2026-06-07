@@ -1,5 +1,5 @@
 {
-  "auto_sync_at": "2026-05-28",
+  "auto_sync_at": "2026-05-29",
   "edges": [
     {
       "from": "galaxy_grid",
@@ -1415,7 +1415,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S125",
+  "last_sprint_closed": "PH-S124",
   "layers": [
     {
       "id": "L0",
@@ -1448,7 +1448,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S123",
+  "next_sprint": "PH-S126",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -3504,7 +3504,9 @@
       "id": "docs_development_OPENTELEMETRY_TRACING_md",
       "label": "OPENTELEMETRY_TRACING.md",
       "layer": "L1",
-      "path": "docs/development/OPENTELEMETRY_TRACING.md"
+      "path": "docs/development/OPENTELEMETRY_TRACING.md",
+      "sprints": ["PH-S124", "PH-S126"],
+      "sections": ["job-lease-spans"]
     },
     {
       "auto_synced": true,
@@ -4323,7 +4325,8 @@
       "id": "e2e_tests_grid_pricing_spec_ts",
       "label": "grid_pricing.spec.ts",
       "layer": "L3",
-      "path": "e2e/tests/grid_pricing.spec.ts"
+      "path": "e2e/tests/grid_pricing.spec.ts",
+      "sprints": ["PH-S86", "PH-S123"]
     },
     {
       "auto_synced": true,
@@ -6335,7 +6338,7 @@
       "path": "src/bin/poolai_vision_sync.rs"
     }
   ],
-  "revision": 49,
-  "updated_at": "2026-05-28",
+  "revision": 52,
+  "updated_at": "2026-05-29",
   "vision_ui_rev": 53
 }

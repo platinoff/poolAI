@@ -1,7 +1,7 @@
 {
-  "revision": 27,
-  "updated_at": "2026-05-28",
-  "active_sprint": "PH-S123",
+  "revision": 30,
+  "updated_at": "2026-05-29",
+  "active_sprint": "PH-S126",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -222,6 +222,45 @@
         "docs/vision/manifest.json",
         "docs/vision/extensions.json",
         "bin/open-docs-vision.ps1"
+      ]
+    },
+    "grid_pricing_e2e_force_fallback": {
+      "sprints": ["PH-S123"],
+      "docs": ["docs/development/E2E_PLAYWRIGHT.md"],
+      "code_globs": ["e2e/tests/grid_pricing.spec.ts", "e2e/tests/helpers.ts", "bin/e2e-playwright.sh"],
+      "extensions": [".ts", ".sh", ".md"],
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json"
+      ]
+    },
+    "fm_replenish_post_galaxy_mvp": {
+      "sprints": ["PH-S124", "PH-S126", "PH-S127", "PH-S128", "PH-S129", "PH-S130", "PH-S131", "PH-S132", "PH-S133", "PH-S134"],
+      "docs": [
+        "docs/concept/POOLAI_GALAXY_GRID.md",
+        "docs/development/OPENTELEMETRY_TRACING.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/catalog/FUNCTIONALITY_DIGEST_2026-04-06.md"
+      ],
+      "code_globs": [
+        "src/job/**",
+        "src/grid/**",
+        "src/observability/**",
+        "src/network/api/virtual_nodes.rs",
+        "e2e/tests/**"
+      ],
+      "extensions": [".md", ".rs", ".ts"],
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "README.md"
       ]
     },
     "solana_adapter_vision": {
