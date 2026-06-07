@@ -46,6 +46,9 @@ scrape_configs:
 | `poolai_http_request_duration_seconds` | histogram | HTTP middleware (`method`) |
 | `poolai_monitoring_alert_rules` | gauge | Enterprise `MonitoringManager` (feature `enterprise`) |
 | `poolai_monitoring_dashboards` | gauge | Enterprise dashboards count |
+| `galaxy_pricing_fresh_served` | gauge | Galaxy pricing oracle L1 fresh serves (PH-S127) |
+| `galaxy_pricing_stale_served` | gauge | Galaxy pricing oracle L1 stale serves (PH-S127) |
+| `galaxy_pricing_forced_fallback_total` | gauge | Galaxy pricing oracle forced L2 quotes (PH-S127) |
 | `process_*` | various | `prometheus` process collector when available |
 
 JSON metrics for the admin UI remain at **`GET /api/v1/metrics`** — different contract.
@@ -60,4 +63,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-05-23 (PH-S07).
+**Last updated:** 2026-05-29 (PH-S127 galaxy pricing oracle gauges).

@@ -38,7 +38,7 @@ pub const ENV_FORCE_FALLBACK: &str = "POOLAI_GALAXY_PRICING_FORCE_FALLBACK";
 /// Structured log event when ops override serves L2 (§4.2.4).
 pub const FORCED_FALLBACK_LOG_EVENT: &str = "pricing_forced_fallback";
 
-/// In-process counter name for forced L2 quotes (Prometheus wire — future).
+/// In-process counter name for forced L2 quotes (mirrored on `GET /metrics`, PH-S127).
 pub const METRIC_FORCED_FALLBACK_TOTAL: &str = "galaxy_pricing_forced_fallback_total";
 
 static FORCED_FALLBACK_TOTAL: AtomicU64 = AtomicU64::new(0);
@@ -191,6 +191,21 @@ pub fn fresh_served_total() -> u64 {
 #[cfg(test)]
 pub fn reset_fresh_served_total_for_test() {
     FRESH_SERVED_TOTAL.store(0, Ordering::Relaxed);
+}
+
+#[cfg(test)]
+pub fn bump_fresh_served_for_test() {
+    record_fresh_served(GalaxyPriceUnitKey::InferenceBlendedToken);
+}
+
+#[cfg(test)]
+pub fn bump_stale_served_for_test() {
+    record_stale_served(GalaxyPriceUnitKey::InferenceBlendedToken);
+}
+
+#[cfg(test)]
+pub fn bump_forced_fallback_for_test() {
+    record_forced_fallback(GalaxyPriceUnitKey::InferenceBlendedToken);
 }
 
 fn record_forced_fallback(unit_key: GalaxyPriceUnitKey) {

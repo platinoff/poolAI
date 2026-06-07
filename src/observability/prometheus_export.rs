@@ -17,6 +17,10 @@ use prometheus::{
 use std::sync::OnceLock;
 
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_pricing_oracle::{
+    forced_fallback_total, fresh_served_total, stale_served_total, METRIC_FORCED_FALLBACK_TOTAL,
+    METRIC_FRESH_SERVED_TOTAL, METRIC_STALE_SERVED_TOTAL,
+};
 
 /// Lazily initialized Prometheus registry and metric handles.
 pub struct PoolAiPrometheus {
@@ -32,6 +36,9 @@ pub struct PoolAiPrometheus {
     monitoring_alert_rules: IntGauge,
     #[cfg(feature = "enterprise")]
     monitoring_dashboards: IntGauge,
+    galaxy_pricing_fresh_served: IntGauge,
+    galaxy_pricing_stale_served: IntGauge,
+    galaxy_pricing_forced_fallback_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -146,6 +153,33 @@ fn build_prometheus() -> PoolAiPrometheus {
         g
     };
 
+    let galaxy_pricing_fresh_served = IntGauge::with_opts(Opts::new(
+        METRIC_FRESH_SERVED_TOTAL,
+        "Galaxy pricing oracle L1 fresh cache serves (PH-S127)",
+    ))
+    .expect(METRIC_FRESH_SERVED_TOTAL);
+    registry
+        .register(Box::new(galaxy_pricing_fresh_served.clone()))
+        .expect("register galaxy_pricing_fresh_served");
+
+    let galaxy_pricing_stale_served = IntGauge::with_opts(Opts::new(
+        METRIC_STALE_SERVED_TOTAL,
+        "Galaxy pricing oracle L1 stale cache serves (PH-S127)",
+    ))
+    .expect(METRIC_STALE_SERVED_TOTAL);
+    registry
+        .register(Box::new(galaxy_pricing_stale_served.clone()))
+        .expect("register galaxy_pricing_stale_served");
+
+    let galaxy_pricing_forced_fallback_total = IntGauge::with_opts(Opts::new(
+        METRIC_FORCED_FALLBACK_TOTAL,
+        "Galaxy pricing oracle forced L2 fallback quotes (PH-S127)",
+    ))
+    .expect(METRIC_FORCED_FALLBACK_TOTAL);
+    registry
+        .register(Box::new(galaxy_pricing_forced_fallback_total.clone()))
+        .expect("register galaxy_pricing_forced_fallback_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -165,7 +199,21 @@ fn build_prometheus() -> PoolAiPrometheus {
         monitoring_alert_rules,
         #[cfg(feature = "enterprise")]
         monitoring_dashboards,
+        galaxy_pricing_fresh_served,
+        galaxy_pricing_stale_served,
+        galaxy_pricing_forced_fallback_total,
     }
+}
+
+/// Mirror in-process oracle counters into Prometheus gauges (scrape snapshot).
+pub fn refresh_galaxy_pricing_gauges() {
+    let prom = init_prometheus();
+    prom.galaxy_pricing_fresh_served
+        .set(fresh_served_total() as i64);
+    prom.galaxy_pricing_stale_served
+        .set(stale_served_total() as i64);
+    prom.galaxy_pricing_forced_fallback_total
+        .set(forced_fallback_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
@@ -192,6 +240,7 @@ pub fn record_http_request(method: &str, status: u16, duration_secs: f64) {
 /// Refresh gauges from live application state before encoding the registry.
 pub async fn refresh_scrape_gauges(ctx: &ApiContext) {
     let prom = init_prometheus();
+    refresh_galaxy_pricing_gauges();
     prom.uptime_seconds
         .set(crate::version::get_uptime_seconds() as i64);
     prom.build_info.set(1);
@@ -286,5 +335,36 @@ mod tests {
         let body = encode_metrics_text().expect("encode");
         assert!(body.contains(r#"method="GET""#) || body.contains("method=\"GET\""));
         assert!(body.contains("poolai_http_requests_total"));
+    }
+
+    #[test]
+    fn encode_contains_galaxy_pricing_oracle_metrics() {
+        init_prometheus();
+        refresh_galaxy_pricing_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_FRESH_SERVED_TOTAL));
+        assert!(body.contains(METRIC_STALE_SERVED_TOTAL));
+        assert!(body.contains(METRIC_FORCED_FALLBACK_TOTAL));
+    }
+
+    #[test]
+    fn galaxy_pricing_gauges_reflect_oracle_counters() {
+        use crate::grid::galaxy_pricing_oracle::{
+            bump_forced_fallback_for_test, bump_fresh_served_for_test, bump_stale_served_for_test,
+            reset_forced_fallback_total_for_test, reset_fresh_served_total_for_test,
+            reset_stale_served_total_for_test,
+        };
+        reset_fresh_served_total_for_test();
+        reset_stale_served_total_for_test();
+        reset_forced_fallback_total_for_test();
+        bump_fresh_served_for_test();
+        bump_stale_served_for_test();
+        bump_forced_fallback_for_test();
+        bump_forced_fallback_for_test();
+        refresh_galaxy_pricing_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_FRESH_SERVED_TOTAL} 1")));
+        assert!(body.contains(&format!("{METRIC_STALE_SERVED_TOTAL} 1")));
+        assert!(body.contains(&format!("{METRIC_FORCED_FALLBACK_TOTAL} 2")));
     }
 }
