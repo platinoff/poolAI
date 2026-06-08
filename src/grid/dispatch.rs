@@ -3,8 +3,10 @@
 //! Grid `Job` ingest schedules via [`schedule_with_grid_peer`](crate::job::schedule_with_grid_peer);
 //! when a source peer binds `worker_id`, scheduler lease acquire sets `JobStatus::Leased` (PH-S108).
 //! `Result` ingest validates `lease_epoch` CAS when the job row has active lease fields (PH-S110).
+//! Seed inventory + task-driven prefetch policy stub (PH-S129, Galaxy §5.5).
 
 use chrono::Utc;
+use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
@@ -17,6 +19,121 @@ use crate::memory::{memory_shard_from_grid_body, MemoryShardStore};
 use crate::observability::lease_trace::{
     trace_lease_reject, LeaseOperation, LeaseOutcome, LeaseSource,
 };
+
+/// Worker seed inventory wire DTO (Galaxy §5.2 / §5.5).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub struct SeedInventoryEntry {
+    #[serde(default)]
+    pub shard_ids: Vec<String>,
+    #[serde(default)]
+    pub hot_tier: SeedInventoryHotTier,
+    #[serde(default)]
+    pub local_replica_regions: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_inventory_at: Option<String>,
+}
+
+/// Hot tier subset inside [`SeedInventoryEntry`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub struct SeedInventoryHotTier {
+    #[serde(default)]
+    pub ram_bytes_used: u64,
+    #[serde(default)]
+    pub vram_bytes_used: u64,
+    #[serde(default)]
+    pub profiles: Vec<String>,
+}
+
+/// Prefetch destination tier (concept §5.5).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PrefetchTargetTier {
+    Ram,
+    Vram,
+}
+
+/// Prefetch trigger (concept §5.5 table).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrefetchTrigger {
+    JobAdmitted,
+    LeaseAcquired,
+    ReMigrate,
+}
+
+/// Locality / prefetch strictness (concept §5.5, §5.6).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum PrefetchPolicyMode {
+    #[default]
+    BestEffort,
+    StrictLocality,
+}
+
+/// Default max wait before Running (`POOLAI_GALAXY_PREFETCH_DEADLINE_MS`, §5.6).
+pub const DEFAULT_PREFETCH_DEADLINE_MS: u64 = 15_000;
+
+/// Env: prefetch wait deadline milliseconds (§5.6).
+pub const ENV_PREFETCH_DEADLINE_MS: &str = "POOLAI_GALAXY_PREFETCH_DEADLINE_MS";
+
+/// Env: `strict_locality` | `best_effort` (§5.6).
+pub const ENV_LOCALITY_MODE: &str = "POOLAI_GALAXY_LOCALITY_MODE";
+
+/// One shard scheduled for prefetch.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PrefetchPlanItem {
+    pub shard_id: String,
+    pub target_tier: PrefetchTargetTier,
+}
+
+/// Planned prefetch work (no wire enqueue in PH-S129).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PrefetchPlan {
+    pub items: Vec<PrefetchPlanItem>,
+    pub trigger: PrefetchTrigger,
+    pub deadline_ms: u64,
+    pub mode: PrefetchPolicyMode,
+}
+
+/// Whether `shard_id` is present and hot tier has active bytes (stub §5.5).
+#[inline]
+pub fn hot_hit(inventory: &SeedInventoryEntry, shard_id: &str) -> bool {
+    inventory.shard_ids.iter().any(|id| id == shard_id)
+        && (inventory.hot_tier.ram_bytes_used > 0 || inventory.hot_tier.vram_bytes_used > 0)
+}
+
+/// Task-driven prefetch plan: skip shards already hot; pick RAM/VRAM tier from capabilities.
+pub fn plan_prefetch(
+    inventory: &SeedInventoryEntry,
+    required_shard_ids: &[String],
+    trigger: PrefetchTrigger,
+    gpu_capable: bool,
+    mode: PrefetchPolicyMode,
+) -> PrefetchPlan {
+    let target_tier = if gpu_capable {
+        PrefetchTargetTier::Vram
+    } else {
+        PrefetchTargetTier::Ram
+    };
+    let items = required_shard_ids
+        .iter()
+        .filter(|shard_id| !hot_hit(inventory, shard_id))
+        .map(|shard_id| PrefetchPlanItem {
+            shard_id: shard_id.clone(),
+            target_tier,
+        })
+        .collect();
+    PrefetchPlan {
+        items,
+        trigger,
+        deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+        mode,
+    }
+}
+
+/// No-op prefetch hook (PH-S129): returns planned item count; no enqueue/wait wire.
+#[inline]
+pub fn noop_prefetch_hook(plan: &PrefetchPlan) -> usize {
+    plan.items.len()
+}
 
 /// Outcome of processing one grid envelope.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -411,5 +528,83 @@ mod tests {
         );
         let shard = memory.get("w:1").expect("get").expect("row");
         assert_eq!(shard.artifact_id, "art-1");
+    }
+
+    #[test]
+    fn seed_inventory_entry_roundtrip_json() {
+        let entry = SeedInventoryEntry {
+            shard_ids: vec!["w:emb-1".into()],
+            hot_tier: SeedInventoryHotTier {
+                ram_bytes_used: 1024,
+                vram_bytes_used: 0,
+                profiles: vec!["inference:text".into()],
+            },
+            local_replica_regions: vec!["eu-west".into()],
+            last_inventory_at: Some("2026-05-27T10:00:00Z".into()),
+        };
+        let json = serde_json::to_string(&entry).expect("serialize");
+        let back: SeedInventoryEntry = serde_json::from_str(&json).expect("deserialize");
+        assert_eq!(entry, back);
+    }
+
+    #[test]
+    fn plan_prefetch_skips_hot_shards() {
+        let inventory = SeedInventoryEntry {
+            shard_ids: vec!["w:emb-1".into(), "w:ckpt-7".into()],
+            hot_tier: SeedInventoryHotTier {
+                ram_bytes_used: 4096,
+                vram_bytes_used: 0,
+                profiles: vec!["inference:text".into()],
+            },
+            ..Default::default()
+        };
+        let required = vec!["w:emb-1".into(), "w:missing".into()];
+        let plan = plan_prefetch(
+            &inventory,
+            &required,
+            PrefetchTrigger::JobAdmitted,
+            false,
+            PrefetchPolicyMode::BestEffort,
+        );
+        assert_eq!(plan.items.len(), 1);
+        assert_eq!(plan.items[0].shard_id, "w:missing");
+        assert_eq!(plan.items[0].target_tier, PrefetchTargetTier::Ram);
+        assert_eq!(plan.trigger, PrefetchTrigger::JobAdmitted);
+        assert_eq!(plan.deadline_ms, DEFAULT_PREFETCH_DEADLINE_MS);
+    }
+
+    #[test]
+    fn plan_prefetch_gpu_uses_vram_tier() {
+        let inventory = SeedInventoryEntry::default();
+        let required = vec!["w:gpu-1".into()];
+        let plan = plan_prefetch(
+            &inventory,
+            &required,
+            PrefetchTrigger::LeaseAcquired,
+            true,
+            PrefetchPolicyMode::StrictLocality,
+        );
+        assert_eq!(plan.items[0].target_tier, PrefetchTargetTier::Vram);
+        assert_eq!(plan.mode, PrefetchPolicyMode::StrictLocality);
+    }
+
+    #[test]
+    fn noop_prefetch_hook_returns_planned_count() {
+        let plan = PrefetchPlan {
+            items: vec![
+                PrefetchPlanItem {
+                    shard_id: "a".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+                PrefetchPlanItem {
+                    shard_id: "b".into(),
+                    target_tier: PrefetchTargetTier::Ram,
+                },
+            ],
+            trigger: PrefetchTrigger::ReMigrate,
+            deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+            mode: PrefetchPolicyMode::BestEffort,
+        };
+        assert_eq!(noop_prefetch_hook(&plan), 2);
     }
 }

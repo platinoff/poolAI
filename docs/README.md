@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-07 (PH-S128 locality_score stub; §5.12 — **9** відкритих PH-S129…S134; vision rev 56)
+**Last updated:** 2026-06-07 (PH-S129 prefetch stub; §5.12 — **8** відкритих PH-S130…S134; vision rev 57)
 
 ## Canonical reading order
 

@@ -95,11 +95,12 @@
 **PH-S126 ✅ (code):** `src/observability/lease_trace.rs` — `trace_acquire_success` / `trace_renew_success` / `trace_lease_reject`; wired `JobStore` acquire/renew, scheduler bind, grid result CAS, PATCH CAS; `tests/observability_otel.rs`; `cargo test-ci` + `cargo test --test observability_otel --features otel`.
 **PH-S127 ✅ (code):** `prometheus_export.rs` — `galaxy_pricing_fresh_served` / `stale_served` / `forced_fallback_total` gauges on `GET /metrics` (mirror oracle atomics); [`PROMETHEUS_METRICS.md`](./PROMETHEUS_METRICS.md); unit tests; `cargo test-ci`.
 **PH-S128 ✅ (code):** `src/grid/galaxy_locality.rs` — `locality_score(worker, task)` pure fn (Galaxy §5.1–5.2), `rank_workers_by_locality` / `pick_best_worker_by_locality` scheduler stub; unit tests; no prefetch wire; `cargo test-ci`.
-**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S129** · replenish **PH-S130…S134**.
+**PH-S129 ✅ (code):** `src/grid/dispatch.rs` — `SeedInventoryEntry` DTO + `plan_prefetch` / `noop_prefetch_hook` policy stub (Galaxy §5.5); unit tests; no live enqueue wire; `cargo test-ci`.
+**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S130** · replenish **PH-S131…S134**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **9** відкритих — **PH-S129** (наступний) … **PH-S134**. FM replenish 2026-05-29: Galaxy §5 prefetch, §6 trust, §3.2 wallet, §8 network_profile, E2E PH-S104/S103.
+**Черга:** §5.12 **8** відкритих — **PH-S130** (наступний) … **PH-S134**. FM replenish 2026-05-29: Galaxy §6 trust, §3.2 wallet, §8 network_profile, E2E PH-S104/S103.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

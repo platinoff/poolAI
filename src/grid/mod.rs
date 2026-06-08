@@ -12,7 +12,10 @@ pub mod galaxy_pricing_oracle;
 mod map;
 pub mod protocol_compat;
 
-pub use dispatch::{ingest_envelope, GridIngestKind, GridIngestOutcome};
+pub use dispatch::{
+    ingest_envelope, noop_prefetch_hook, plan_prefetch, GridIngestKind, GridIngestOutcome,
+    PrefetchPlan, PrefetchPolicyMode, PrefetchTrigger, SeedInventoryEntry,
+};
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,
     GridPeerStatusBody, GridResultBody, GridResultStatus, GRID_ENVELOPE_VERSION,

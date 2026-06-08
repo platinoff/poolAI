@@ -1435,7 +1435,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S128",
+  "last_sprint_closed": "PH-S129",
   "layers": [
     {
       "id": "L0",
@@ -1468,7 +1468,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S129",
+  "next_sprint": "PH-S130",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1590,6 +1590,10 @@
       "label": "grid/dispatch.rs",
       "layer": "L3",
       "path": "src/grid/dispatch.rs",
+      "sections": [
+        "seed inventory DTO",
+        "prefetch policy stub"
+      ],
       "sprints": [
         "PH-S38",
         "PH-S61",
@@ -1598,7 +1602,8 @@
         "PH-S110",
         "PH-S112",
         "PH-S117",
-        "PH-S122"
+        "PH-S122",
+        "PH-S129"
       ]
     },
     {
@@ -6407,7 +6412,7 @@
       ]
     }
   ],
-  "revision": 56,
+  "revision": 57,
   "updated_at": "2026-06-07",
   "vision_ui_rev": 54
 }
