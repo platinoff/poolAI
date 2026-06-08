@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-08 (PH-S131 ✅ · FM **6** відкритих PH-S132…S134 · vision rev 59) · FM-041 Deferred).
+**Оновлено:** 2026-06-08 (PH-S132 ✅ · FM **5** відкритих PH-S133…S134 · vision rev 60) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -332,11 +332,11 @@ FM-xxx (з таблиці нижче)
 | 65 | **PH-S129** | Seed inventory + prefetch policy stub (code) | Galaxy §5.5, `src/grid/dispatch.rs` | `SeedInventoryEntry` DTO + noop prefetch hook; unit tests | **✅** |
 | 66 | **PH-S130** | Edge trust_score settlement gate stub (code) | Galaxy §6.5, `src/grid/` | `trust_score` 0–100 gate sketch on grid result path; unit tests | **✅** |
 | 67 | **PH-S131** | Telegram wallet bind API stub (code) | Galaxy §3.2, `virtual_nodes.rs` | `POST /api/v1/virtual-nodes/telegram/wallet` stub + OpenAPI; contract test | **✅** |
-| 68 | **PH-S132** | network_profile contract docs (docs) | Galaxy §8 TBD #1 | §8.1 schema for `network_profile`; DIGEST row; locality subset cross-link | відкрито |
+| 68 | **PH-S132** | network_profile contract docs (docs) | Galaxy §8 TBD #1 | §8.1 schema for `network_profile`; DIGEST row; locality subset cross-link | **✅** |
 | 69 | **PH-S133** | Job Migrating lifecycle E2E (e2e) | PH-S104, `e2e/` | Playwright PATCH `migrating` ↔ `executing` roundtrip; `npm run test:ci` | відкрито |
 | 70 | **PH-S134** | Protocol middleware E2E smoke (e2e) | PH-S103, `e2e/` | Playwright register-remote with `X-PoolAI-Protocol`; unsupported → 403 | відкрито |
 
-**Відкритих у §5.12:** **6** (PH-S132…S134). **Replenish (2026-05-29):** FM-менеджер — Galaxy §4.2 metrics, §5 locality/prefetch, §6 trust, §3.2 wallet, §8 network_profile, FM-038 OTel lease spans, E2E gaps PH-S104/S103. Vision PH-S113…S115 **✅**; PH-S112–S129 **✅**; PH-S125 **✅**.
+**Відкритих у §5.12:** **5** (PH-S133…S134). **Replenish (2026-05-29):** FM-менеджер — Galaxy §4.2 metrics, §5 locality/prefetch, §6 trust, §3.2 wallet, §8 network_profile, FM-038 OTel lease spans, E2E gaps PH-S104/S103. Vision PH-S113…S115 **✅**; PH-S112–S129 **✅**; PH-S125 **✅**.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -449,7 +449,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S132** (network_profile contract docs) · черга **6** відкритих (PH-S132…S134) · vision rev 59 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
+**Наступна сесія:** **PH-S133** (Job Migrating lifecycle E2E) · черга **5** відкритих (PH-S133…S134) · vision rev 60 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md) · роадмеп [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../development/GALAXY_GRID_ROADMAP_2026-05-27.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

@@ -1445,7 +1445,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S131",
+  "last_sprint_closed": "PH-S132",
   "layers": [
     {
       "id": "L0",
@@ -1478,7 +1478,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S132",
+  "next_sprint": "PH-S133",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1490,6 +1490,7 @@
         "4 scheduling",
         "5 locality",
         "6 verify",
+        "8.1 network_profile",
         "9 governance"
       ],
       "sprints": [
@@ -1503,7 +1504,8 @@
         "PH-S62",
         "PH-S63",
         "PH-S64",
-        "PH-S121"
+        "PH-S121",
+        "PH-S132"
       ]
     },
     {
@@ -1896,10 +1898,12 @@
       "sections": [
         "locality_score",
         "rank_workers_by_locality",
-        "scheduler stub"
+        "scheduler stub",
+        "LocalityNetworkProfile §8.1 subset"
       ],
       "sprints": [
-        "PH-S128"
+        "PH-S128",
+        "PH-S132"
       ]
     },
     {
@@ -6452,7 +6456,7 @@
       ]
     }
   ],
-  "revision": 59,
+  "revision": 60,
   "updated_at": "2026-06-08",
   "vision_ui_rev": 54
 }

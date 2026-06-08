@@ -2,7 +2,7 @@
 //! and scheduler ranking stub per `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.2.
 //! No prefetch wire (PH-S129).
 
-/// Network profile subset used for locality (full contract TBD Galaxy §8).
+/// Network profile locality subset (Galaxy §8.1; full wire adds bandwidth/egress/topology).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LocalityNetworkProfile {
     pub region: String,

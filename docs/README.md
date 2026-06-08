@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-08 (PH-S131 wallet bind stub; §5.12 — **6** відкритих PH-S132…S134; vision rev 59)
+**Last updated:** 2026-06-08 (PH-S132 network_profile §8.1; §5.12 — **5** відкритих PH-S133…S134; vision rev 60)
 
 ## Canonical reading order
 

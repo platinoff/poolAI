@@ -140,7 +140,7 @@ Worker’и мають:
 - `origin`: `local_srv` | `cloud_provider` | `telegram_edge`.
 - `admin_id` + `srv_id`: ownership і білінг-маршрутизація.
 - `capabilities`: scheduler contract для підбору задач.
-- `network_profile`: routing/locality/SmallWorld сигнали.
+- `network_profile`: routing/locality/SmallWorld сигнали (нормативна схема — §8.1).
 - `limits`: ручні або auto caps для admission control.
 
 Мінімальні правила UI (admin/ops панель):
@@ -621,7 +621,7 @@ Coordinator і worker збирають **locality telemetry** (агрегаці�
 | `cross_region_egress_mb_1h` | counter | srvN egress | cost guardrail |
 | `local_replica_available` | bool per shard | discovery | avoid WAN pull |
 
-**Зв’язок з `network_profile`:** `latency_ms_p50`, `region`, `bandwidth_mbps` — вхідні для `latency_factor`; повний contract `network_profile` лишається TBD (§8), але **locality subset** вище — обов’язковий для PH-S61 scheduling.
+**Зв’язок з `network_profile`:** `latency_ms_p50`, `region`, `bandwidth_mbps` — вхідні для `latency_factor`; нормативний wire contract — **§8.1**; **locality subset** (`region`, `latency_ms_p50`) — обов’язковий для PH-S61/PH-S128 scheduling (`src/grid/galaxy_locality.rs`).
 
 **Метрики (Prometheus, майбутнє):** `galaxy_shard_local_hit_ratio`, `galaxy_prefetch_bytes_total`, `galaxy_cross_region_egress_mb`.
 
@@ -851,11 +851,63 @@ On-chain події потрібні, коли вони:
 
 ## 8. Відкриті питання (TBD)
 
-1. **Network_profile contract**: набір метрик, формат зберігання і як SmallWorld їх споживає.
-2. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
-3. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
+### 8.1 `network_profile` wire contract (PH-S132 ✅)
 
-> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9).
+**Мета:** єдиний JSON-об’єкт на unified worker DTO (§2.3) для routing, locality placement (§5.2) і SmallWorld egress guardrails. Off-chain coordinator; discovery/register-remote може передавати subset у `metadata.network_profile` до повного DTO wire.
+
+**Нормативна схема (worker DTO / discovery extension):**
+
+```json
+{
+  "region": "eu-west",
+  "latency_ms_p50": 24,
+  "latency_ms_p95": 48,
+  "bandwidth_mbps": 500,
+  "egress_policy": "vpn_proxy",
+  "topology_ring": "smallworld-3",
+  "white_ip_only": false,
+  "last_measured_at": "2026-06-08T00:00:00Z"
+}
+```
+
+| Поле | Тип | Обов’язкове | Сенс |
+|------|-----|-------------|------|
+| `region` | string | **так** (locality subset) | Логічний регіон для cross-region egress penalty (§5.2); формат `a-z0-9-`, 2–32 chars |
+| `latency_ms_p50` | u32 | **так** (locality subset) | Медіанна RTT coordinator↔worker (ms); вхід `latency_factor` |
+| `latency_ms_p95` | u32 | ні | Tail latency для SLA / re-migrate trigger |
+| `bandwidth_mbps` | u32 | ні | Оцінка uplink (Mbps); prefetch backpressure (§5.5) |
+| `egress_policy` | enum | ні | `direct` \| `vpn_proxy` \| `white_ip` \| `lan_only` — WAN egress клас |
+| `topology_ring` | string | ні | SmallWorld ring id (hop-count routing); порожнє = unknown |
+| `white_ip_only` | bool | ні | Admission hint: worker приймає job лише з allow-listed peers |
+| `last_measured_at` | ISO-8601 | ні | Freshness probe; stale >24h → coordinator may re-measure |
+
+**`egress_policy` (нормативно):**
+
+| Значення | WAN egress | Типовий `origin` |
+|----------|------------|------------------|
+| `direct` | публічний інтернет | `cloud_provider` |
+| `vpn_proxy` | через VPN/proxy gateway | `local_srv`, `telegram_edge` |
+| `white_ip_only` | лише pinned peers | hardened `local_srv` |
+| `lan_only` | без WAN (LAN FM-003) | dev stand, blocked multi-host |
+
+**Locality subset (PH-S128 implemented):** мінімальний wire для `locality_score` — лише `region` + `latency_ms_p50`. Rust mirror: `LocalityNetworkProfile` у `src/grid/galaxy_locality.rs`. Решта полів — advisory для prefetch/SmallWorld; не блокує PH-S128 stub.
+
+**SmallWorld consumption (high level, не дублювати RAID docs):**
+
+1. **Hop routing:** `topology_ring` + `region` → short-path до seed provider з мінімальним hop-count.
+2. **Egress guardrail:** `egress_policy` + `bandwidth_mbps` → чи дозволений cross-region shard pull (§5.2 re-migrate).
+3. **Stale profile:** якщо `last_measured_at` відсутній або >24h — coordinator знижує пріоритет worker у `rank_workers_by_locality` (майбутній wire; не PH-S132).
+
+**Зберігання:** in-memory на discovery peer row + optional JSON у worker heartbeat metadata; повна персистенція — майбутній спринт (не PH-S132).
+
+**Код-орієнтири:** §2.3 worker DTO sketch · §5.2 `latency_factor` · `src/grid/galaxy_locality.rs` (`locality_score`, `rank_workers_by_locality`).
+
+### 8.2 Відкриті питання (залишок)
+
+1. **Primary/secondary fee settlement**: точний механізм payout (on-chain чи офлайн batch).
+2. **Telegram “VM probros” на старте**: що входить у MVP для cold mining (CPU/RAM/Disk) і як мігруємо до GPU passthrough пізніше.
+
+> **Закрито в концепті:** job lease / re-migrate (§4.3), unified worker DTO (§2.3), fee split (§1.2.1), pricing oracle (§4.2), Telegram seats + wallet bind (§3.1–3.2), seeds/locality + prefetch (§5.1–5.6), edge verification baseline (§6.1–6.6), open-source governance без root super-admin (§9), **network_profile contract (§8.1, PH-S132)**.
 
 ## 9. Open-source governance: signed releases та оновлення (PH-S63)
 

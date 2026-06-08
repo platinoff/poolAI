@@ -98,11 +98,12 @@
 **PH-S129 ✅ (code):** `src/grid/dispatch.rs` — `SeedInventoryEntry` DTO + `plan_prefetch` / `noop_prefetch_hook` policy stub (Galaxy §5.5); unit tests; no live enqueue wire; `cargo test-ci`.
 **PH-S130 ✅ (code):** `src/grid/galaxy_trust_score.rs` + `dispatch.rs` result path — `trust_score` 0–100 settlement gate stub (Galaxy §6.5): `PayoutEligible` / `PayoutHeld` / `NotApplicable`; optional `metrics.trust_score` on grid result; unit tests; no payout wire; `cargo test-ci`.
 **PH-S131 ✅ (code):** `virtual_node_telegram_wallet_service.rs` + `POST /api/v1/virtual-nodes/telegram/wallet` — payout pubkey bind stub (Galaxy §3.2); OpenAPI sync; `virtual_node_telegram_binding_integration` contract tests; `poolai-openapi-gap-audit` 0; no on-chain wire; `cargo test-ci`.
-**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S132** · replenish **PH-S133…S134**.
+**PH-S132 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §8.1 — `network_profile` wire contract (`region`, `latency_ms_p50`, `bandwidth_mbps`, `egress_policy`, SmallWorld consumption); TBD #1 closed; DIGEST row; cross-link `galaxy_locality.rs` `LocalityNetworkProfile`.
+**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S133** · replenish **PH-S134**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **6** відкритих — **PH-S132** (наступний) … **PH-S134**. FM replenish 2026-05-29: Galaxy §8 network_profile, E2E PH-S104/S103.
+**Черга:** §5.12 **5** відкритих — **PH-S133** (наступний) … **PH-S134**. FM replenish 2026-05-29: E2E PH-S104/S103.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
