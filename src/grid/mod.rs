@@ -9,6 +9,7 @@ mod envelope;
 pub mod galaxy_fee_split;
 pub mod galaxy_locality;
 pub mod galaxy_pricing_oracle;
+pub mod galaxy_trust_score;
 mod map;
 pub mod protocol_compat;
 

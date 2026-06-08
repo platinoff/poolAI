@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-07 (PH-S129 prefetch stub; §5.12 — **8** відкритих PH-S130…S134; vision rev 57)
+**Last updated:** 2026-06-08 (PH-S130 trust gate stub; §5.12 — **7** відкритих PH-S131…S134; vision rev 58)
 
 ## Canonical reading order
 

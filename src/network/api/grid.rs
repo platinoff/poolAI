@@ -263,9 +263,11 @@ async fn get_grid_pricing_snapshot(
 fn response_from_outcome(outcome: GridIngestOutcome) -> GridIngestResponse {
     let kind = match outcome.kind {
         GridIngestKind::Job { job_id, status } => GridIngestResponseKind::Job { job_id, status },
-        GridIngestKind::Result { job_id, status } => {
-            GridIngestResponseKind::Result { job_id, status }
-        }
+        GridIngestKind::Result {
+            job_id,
+            status,
+            settlement_gate: _,
+        } => GridIngestResponseKind::Result { job_id, status },
         GridIngestKind::MemoryShard { shard_id } => {
             GridIngestResponseKind::MemoryShard { shard_id }
         }

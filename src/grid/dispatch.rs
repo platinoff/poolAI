@@ -3,12 +3,17 @@
 //! Grid `Job` ingest schedules via [`schedule_with_grid_peer`](crate::job::schedule_with_grid_peer);
 //! when a source peer binds `worker_id`, scheduler lease acquire sets `JobStatus::Leased` (PH-S108).
 //! `Result` ingest validates `lease_epoch` CAS when the job row has active lease fields (PH-S110).
+//! Edge `trust_score` settlement gate stub on result path (PH-S130, Galaxy §6.5).
 //! Seed inventory + task-driven prefetch policy stub (PH-S129, Galaxy §5.5).
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
+use crate::grid::galaxy_trust_score::{
+    clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
+    TrustScoreGateConfig,
+};
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
     check_grid_result_lease_epoch, emit_memory_updated, emit_seed_provided, job_spec_from_grid_job,
@@ -138,10 +143,21 @@ pub fn noop_prefetch_hook(plan: &PrefetchPlan) -> usize {
 /// Outcome of processing one grid envelope.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GridIngestKind {
-    Job { job_id: String, status: JobStatus },
-    Result { job_id: String, status: JobStatus },
-    MemoryShard { shard_id: String },
-    PeerStatus { peer_id: String },
+    Job {
+        job_id: String,
+        status: JobStatus,
+    },
+    Result {
+        job_id: String,
+        status: JobStatus,
+        settlement_gate: SettlementGateVerdict,
+    },
+    MemoryShard {
+        shard_id: String,
+    },
+    PeerStatus {
+        peer_id: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -158,7 +174,7 @@ pub fn ingest_envelope(
         .map_err(|e: GridEnvelopeError| AppError::ValidationError(e.to_string()))?;
     match env.msg {
         GridMessage::Job(body) => ingest_job(body, env.source_peer_id.as_deref(), jobs),
-        GridMessage::Result(body) => ingest_result(body, jobs),
+        GridMessage::Result(body) => ingest_result(body, env.source_peer_id.as_deref(), jobs),
         GridMessage::MemoryShard(body) => {
             let shard = memory_shard_from_grid_body(&body);
             let shard_id = shard.shard_id.0.clone();
@@ -222,7 +238,11 @@ fn ingest_job(
     })
 }
 
-fn ingest_result(body: GridResultBody, jobs: &JobStore) -> Result<GridIngestOutcome, AppError> {
+fn ingest_result(
+    body: GridResultBody,
+    source_peer_id: Option<&str>,
+    jobs: &JobStore,
+) -> Result<GridIngestOutcome, AppError> {
     let job_id = body.job_id.clone();
     let existing = jobs
         .get(&job_id)?
@@ -250,14 +270,33 @@ fn ingest_result(body: GridResultBody, jobs: &JobStore) -> Result<GridIngestOutc
     }
     let status = job_status_from_grid_result(body.status);
     jobs.force_status(&job_id, status)?;
+    let trust_score = trust_score_from_result_metrics(body.metrics.as_ref());
+    let settlement_gate = evaluate_result_settlement_gate(
+        source_peer_id,
+        trust_score,
+        &TrustScoreGateConfig::default_stub(),
+    );
     Ok(GridIngestOutcome {
-        kind: GridIngestKind::Result { job_id, status },
+        kind: GridIngestKind::Result {
+            job_id,
+            status,
+            settlement_gate,
+        },
     })
+}
+
+/// Optional `trust_score` on grid result metrics (PH-S130 stub wire).
+fn trust_score_from_result_metrics(metrics: Option<&serde_json::Value>) -> Option<TrustScore> {
+    metrics
+        .and_then(|m| m.get("trust_score"))
+        .and_then(|v| v.as_u64())
+        .map(|v| clamp_trust_score(v as u16))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::grid::galaxy_trust_score::SettlementGateVerdict;
     use crate::grid::{GridEnvelope, GridJobBody, GridMessage, GridResultStatus};
     use crate::job::{JobId, JobKind, JobSpec, JobStatus};
     use chrono::Utc;
@@ -364,6 +403,7 @@ mod tests {
             GridIngestKind::Result {
                 job_id: "grid-job-2".into(),
                 status: JobStatus::Completed,
+                settlement_gate: SettlementGateVerdict::NotApplicable,
             }
         );
     }
@@ -411,6 +451,7 @@ mod tests {
             GridIngestKind::Result {
                 job_id: "grid-result-ok".into(),
                 status: JobStatus::Completed,
+                settlement_gate: SettlementGateVerdict::NotApplicable,
             }
         );
     }
@@ -586,6 +627,100 @@ mod tests {
         );
         assert_eq!(plan.items[0].target_tier, PrefetchTargetTier::Vram);
         assert_eq!(plan.mode, PrefetchPolicyMode::StrictLocality);
+    }
+
+    #[test]
+    fn ingest_result_telegram_edge_default_trust_eligible() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-trust-ok"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-trust-ok".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: None,
+                lease_epoch: None,
+            }),
+            Some("tg-edge-1".into()),
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(
+            out.kind,
+            GridIngestKind::Result {
+                job_id: "grid-trust-ok".into(),
+                status: JobStatus::Completed,
+                settlement_gate: SettlementGateVerdict::PayoutEligible,
+            }
+        );
+    }
+
+    #[test]
+    fn ingest_result_telegram_edge_low_trust_holds_payout() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-trust-low"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-trust-low".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: Some(serde_json::json!({ "trust_score": 15 })),
+                lease_epoch: None,
+            }),
+            Some("tg-edge-low".into()),
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(
+            out.kind,
+            GridIngestKind::Result {
+                job_id: "grid-trust-low".into(),
+                status: JobStatus::Completed,
+                settlement_gate: SettlementGateVerdict::PayoutHeld,
+            }
+        );
     }
 
     #[test]

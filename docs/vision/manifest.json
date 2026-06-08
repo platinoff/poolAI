@@ -54,6 +54,11 @@
     {
       "from": "galaxy_grid",
       "kind": "implements",
+      "to": "galaxy_trust_score"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
       "to": "galaxy_fee_split"
     },
     {
@@ -1435,7 +1440,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S129",
+  "last_sprint_closed": "PH-S130",
   "layers": [
     {
       "id": "L0",
@@ -1468,7 +1473,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S130",
+  "next_sprint": "PH-S131",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1592,7 +1597,8 @@
       "path": "src/grid/dispatch.rs",
       "sections": [
         "seed inventory DTO",
-        "prefetch policy stub"
+        "prefetch policy stub",
+        "trust_score settlement gate"
       ],
       "sprints": [
         "PH-S38",
@@ -1603,7 +1609,8 @@
         "PH-S112",
         "PH-S117",
         "PH-S122",
-        "PH-S129"
+        "PH-S129",
+        "PH-S130"
       ]
     },
     {
@@ -1874,6 +1881,20 @@
       ],
       "sprints": [
         "PH-S128"
+      ]
+    },
+    {
+      "id": "galaxy_trust_score",
+      "label": "grid/galaxy_trust_score.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_trust_score.rs",
+      "sections": [
+        "trust_score 0-100",
+        "settlement gate verdict",
+        "telegram_edge origin stub"
+      ],
+      "sprints": [
+        "PH-S130"
       ]
     },
     {
@@ -6412,7 +6433,7 @@
       ]
     }
   ],
-  "revision": 57,
-  "updated_at": "2026-06-07",
+  "revision": 58,
+  "updated_at": "2026-06-08",
   "vision_ui_rev": 54
 }

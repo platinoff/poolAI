@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-07 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**8** відкритих PH-S130…S134)
+**Оновлено:** 2026-06-08 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**7** відкритих PH-S131…S134)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,7 +10,7 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **8** — PH-S130…S134 (replenish 2026-05-29) |
+| **Відкрито** | **7** — PH-S131…S134 (replenish 2026-05-29) |
 | **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
 | **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
@@ -97,7 +97,7 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | 3 | **PH-S127** | Pricing oracle Prometheus export | Galaxy §4.2, FM-043 | **✅** |
 | 4 | **PH-S128** | Locality score scheduler stub | Galaxy §5.1–5.2 | **✅** |
 | 5 | **PH-S129** | Seed inventory + prefetch stub | Galaxy §5.5 | **✅** |
-| 6 | **PH-S130** | Edge trust_score gate stub | Galaxy §6.5 | відкрито |
+| 6 | **PH-S130** | Edge trust_score gate stub | Galaxy §6.5 | **✅** |
 | 7 | **PH-S131** | Telegram wallet bind API stub | Galaxy §3.2 | відкрито |
 | 8 | **PH-S132** | network_profile contract docs | Galaxy §8 TBD | відкрито |
 | 9 | **PH-S133** | Job Migrating lifecycle E2E | PH-S104 | відкрито |
