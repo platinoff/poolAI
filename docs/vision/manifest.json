@@ -79,6 +79,11 @@
     {
       "from": "galaxy_grid",
       "kind": "implements",
+      "to": "telegram_wallet"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
       "to": "verify_release"
     },
     {
@@ -1440,7 +1445,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "25c75abe",
-  "last_sprint_closed": "PH-S130",
+  "last_sprint_closed": "PH-S131",
   "layers": [
     {
       "id": "L0",
@@ -1473,7 +1478,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S131",
+  "next_sprint": "PH-S132",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1667,7 +1672,8 @@
       "path": "src/network/api/virtual_nodes.rs",
       "sprints": [
         "PH-S60",
-        "FM-016"
+        "FM-016",
+        "PH-S131"
       ]
     },
     {
@@ -1677,6 +1683,19 @@
       "path": "src/services/virtual_node_telegram_binding_service.rs",
       "sprints": [
         "PH-S60"
+      ]
+    },
+    {
+      "id": "telegram_wallet",
+      "label": "telegram_wallet_service",
+      "layer": "L3",
+      "path": "src/services/virtual_node_telegram_wallet_service.rs",
+      "sections": [
+        "payout_pubkey bind stub",
+        "solana chain validation"
+      ],
+      "sprints": [
+        "PH-S131"
       ]
     },
     {
@@ -6433,7 +6452,7 @@
       ]
     }
   ],
-  "revision": 58,
+  "revision": 59,
   "updated_at": "2026-06-08",
   "vision_ui_rev": 54
 }

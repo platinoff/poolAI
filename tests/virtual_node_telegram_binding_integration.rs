@@ -9,12 +9,14 @@ use poolai::network::api::create_api_routes;
 use poolai::network::discovery::{DiscoveryConfig, DiscoveryService};
 use poolai::services::virtual_node_task_service::VirtualNodeTaskService;
 use poolai::services::virtual_node_telegram_binding_service::VirtualNodeTelegramBindingService;
+use poolai::services::virtual_node_telegram_wallet_service::VirtualNodeTelegramWalletService;
 use serde_json::Value;
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use std::sync::{Arc, Mutex};
 use tower::ServiceExt;
 
 static WEBHOOK_SECRET_ENV_LOCK: Mutex<()> = Mutex::new(());
+static TELEGRAM_WALLET_TEST_LOCK: Mutex<()> = Mutex::new(());
 
 struct WebhookSecretEnvGuard {
     _lock: std::sync::MutexGuard<'static, ()>,
@@ -193,4 +195,62 @@ async fn telegram_webhook_truncates_oversized_message_text() {
 
     VirtualNodeTelegramBindingService::clear_all();
     VirtualNodeTaskService::clear_peer(peer);
+}
+
+#[tokio::test]
+async fn telegram_wallet_bind_stub_creates_verified_binding() {
+    let _lock = TELEGRAM_WALLET_TEST_LOCK.lock().unwrap();
+    VirtualNodeTelegramWalletService::clear_all();
+    let app = app_with_discovery().await;
+    let pubkey = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
+
+    let bind = Request::builder()
+        .method("POST")
+        .uri("/api/v1/virtual-nodes/telegram/wallet")
+        .header("content-type", "application/json")
+        .body(Body::from(format!(
+            r#"{{
+                "telegram_user_id": "wallet-user-1",
+                "chat_id": "-1001234567890",
+                "payout_pubkey": "{pubkey}",
+                "chain": "solana"
+            }}"#
+        )))
+        .unwrap();
+    let res = app.oneshot(bind).await.unwrap();
+    assert_eq!(res.status(), StatusCode::OK);
+    let body = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["wallet"]["telegram_user_id"], "wallet-user-1");
+    assert_eq!(v["wallet"]["payout_pubkey"], pubkey);
+    assert_eq!(v["wallet"]["chain"], "solana");
+    assert_eq!(v["wallet"]["verified"], true);
+
+    let row = VirtualNodeTelegramWalletService::lookup("wallet-user-1").expect("stored");
+    assert_eq!(row.payout_pubkey, pubkey);
+    VirtualNodeTelegramWalletService::clear_all();
+}
+
+#[tokio::test]
+async fn telegram_wallet_bind_rejects_invalid_pubkey() {
+    let _lock = TELEGRAM_WALLET_TEST_LOCK.lock().unwrap();
+    VirtualNodeTelegramWalletService::clear_all();
+    let app = app_with_discovery().await;
+
+    let bind = Request::builder()
+        .method("POST")
+        .uri("/api/v1/virtual-nodes/telegram/wallet")
+        .header("content-type", "application/json")
+        .body(Body::from(
+            r#"{
+                "telegram_user_id": "wallet-user-2",
+                "chat_id": "-10099",
+                "payout_pubkey": "not-valid!",
+                "chain": "solana"
+            }"#,
+        ))
+        .unwrap();
+    let res = app.oneshot(bind).await.unwrap();
+    assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+    VirtualNodeTelegramWalletService::clear_all();
 }

@@ -1274,6 +1274,34 @@ paths:
         '503':
           description: Pool not initialized
 
+  /virtual-nodes/telegram/wallet:
+    post:
+      tags:
+        - VirtualNodes
+      summary: Bind Telegram payout wallet (stub)
+      description: Galaxy §3.2 — links telegram_user_id to payout_pubkey for settlement identity. Stub only; no on-chain verification wire (PH-S131).
+      operationId: bindTelegramWallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindTelegramWalletRequest'
+            example:
+              telegram_user_id: "9001"
+              chat_id: "-1001234567890"
+              payout_pubkey: "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
+              chain: solana
+      responses:
+        '200':
+          description: Wallet binding created (stub verified=true)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindTelegramWalletResponse'
+        '400':
+          description: Invalid request (empty fields, unsupported chain, invalid pubkey)
+
   /virtual-nodes/telegram/bind:
     post:
       tags:
@@ -7215,6 +7243,48 @@ components:
         chat_id:
           type: string
           nullable: true
+
+    TelegramWalletBinding:
+      type: object
+      properties:
+        telegram_user_id:
+          type: string
+        chat_id:
+          type: string
+        payout_pubkey:
+          type: string
+        chain:
+          type: string
+          example: solana
+        verified:
+          type: boolean
+          description: Stub always true until on-chain verify wire
+        bound_at:
+          type: string
+          format: date-time
+
+    BindTelegramWalletRequest:
+      type: object
+      required:
+        - telegram_user_id
+        - chat_id
+        - payout_pubkey
+      properties:
+        telegram_user_id:
+          type: string
+        chat_id:
+          type: string
+        payout_pubkey:
+          type: string
+        chain:
+          type: string
+          default: solana
+
+    BindTelegramWalletResponse:
+      type: object
+      properties:
+        wallet:
+          $ref: '#/components/schemas/TelegramWalletBinding'
 
     TelegramWebhookUpdate:
       type: object

@@ -22,6 +22,9 @@ use crate::services::virtual_node_task_service::{VirtualNodeTask, VirtualNodeTas
 use crate::services::virtual_node_telegram_binding_service::{
     TelegramBinding, VirtualNodeTelegramBindingService,
 };
+use crate::services::virtual_node_telegram_wallet_service::{
+    TelegramWalletBinding, VirtualNodeTelegramWalletService,
+};
 use crate::services::worker_pool_service::{AddWorkerError, CreateWorkerInput, WorkerPoolService};
 
 #[derive(Serialize)]
@@ -77,6 +80,20 @@ struct BindTelegramResponse {
 #[derive(Serialize)]
 struct TelegramBindingsListResponse {
     bindings: Vec<TelegramBinding>,
+}
+
+#[derive(Deserialize)]
+struct BindTelegramWalletRequest {
+    telegram_user_id: String,
+    chat_id: String,
+    payout_pubkey: String,
+    #[serde(default)]
+    chain: Option<String>,
+}
+
+#[derive(Serialize)]
+struct BindTelegramWalletResponse {
+    wallet: TelegramWalletBinding,
 }
 
 #[derive(Deserialize)]
@@ -144,6 +161,10 @@ pub fn create_virtual_node_routes() -> Router<ApiContext> {
             get(task_status_handler),
         )
         .route("/virtual-nodes/telegram/bind", post(bind_telegram_handler))
+        .route(
+            "/virtual-nodes/telegram/wallet",
+            post(bind_telegram_wallet_handler),
+        )
         .route(
             "/virtual-nodes/telegram/bindings",
             get(list_telegram_bindings_handler),
@@ -268,6 +289,20 @@ async fn task_status_handler(Path(peer_id): Path<String>) -> impl IntoResponse {
             completed,
         }),
     )
+}
+
+async fn bind_telegram_wallet_handler(
+    Json(body): Json<BindTelegramWalletRequest>,
+) -> impl IntoResponse {
+    match VirtualNodeTelegramWalletService::bind(
+        &body.telegram_user_id,
+        &body.chat_id,
+        &body.payout_pubkey,
+        body.chain.as_deref(),
+    ) {
+        Ok(wallet) => (StatusCode::OK, Json(BindTelegramWalletResponse { wallet })).into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, e.as_status_message()).into_response(),
+    }
 }
 
 async fn bind_telegram_handler(Json(body): Json<BindTelegramRequest>) -> impl IntoResponse {

@@ -21,5 +21,6 @@ pub mod ui_service;
 pub mod virtual_node_store;
 pub mod virtual_node_task_service;
 pub mod virtual_node_telegram_binding_service;
+pub mod virtual_node_telegram_wallet_service;
 pub mod vm_service;
 pub mod worker_pool_service;
