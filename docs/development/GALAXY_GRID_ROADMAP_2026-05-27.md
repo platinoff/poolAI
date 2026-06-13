@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S142…S150)
+**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S143…S150)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S142…S150 (Galaxy wire S142 + Rust ratio S143…S150) |
-| **Закрито PH-S128…S141** | locality, prefetch, trust, wallet, migrating badge UI, network_profile register-remote |
+| **Відкрито** | **10** — PH-S143…S150 (Rust ratio band) |
+| **Закрито PH-S128…S142** | Galaxy wire complete (locality, trust, verify env, wallet, migrating UI, network_profile) |
 | **Після S150** | replenish §5.12 (≤10) · ratio target **90–95%** |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -56,18 +56,17 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Locality score + rank integration | PH-S128, S138 | `galaxy_locality.rs`, `tests/galaxy_locality_rank_integration.rs` |
 | Prefetch policy stub + env | PH-S129, S136 | `dispatch.rs` |
 | Trust gate + metrics | PH-S130, S137 | `galaxy_trust_score.rs` |
-| Wallet bind POST + GET | PH-S131, S135, S139 | `virtual_node_telegram_wallet_service.rs`; Rust integration канон |
-| network_profile §8.1 docs + register-remote | PH-S132, S140 | `POOLAI_GALAXY_GRID.md`, `galaxy_network_profile.rs`, `discovery.rs` |
+| Verify sampling env | PH-S142 | `galaxy_verify_sampling.rs` |
 
-**Відкрито §5.12:** PH-S142 verify sample rate env.
+**Відкрито §5.12:** PH-S143…S150 Rust ratio band (див. FM §5.12).
 
 ---
 
-## 3. Черга §5.12 (3 відкритих)
+## 3. Черга §5.12 (Galaxy wire закрито; ratio band)
 
-| # | Sprint | Тема | Acceptance (Rust-first) | Стан |
-|---|--------|------|---------------------------|------|
-| 1 | **PH-S142** | Verification sample rate env stub | `POOLAI_GALAXY_VERIFY_*` parser; unit tests | відкрито |
+| # | Sprint | Тема | Acceptance | Стан |
+|---|--------|------|------------|------|
+| — | **PH-S143…S150** | Rust ratio 90–95% | див. FM §5.12 + [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) | відкрито |
 
 ---
 

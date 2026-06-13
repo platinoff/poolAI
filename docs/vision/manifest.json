@@ -54,7 +54,7 @@
     {
       "from": "galaxy_grid",
       "kind": "implements",
-      "to": "galaxy_network_profile"
+      "to": "galaxy_verify_sampling"
     },
     {
       "from": "galaxy_network_profile",
@@ -1472,11 +1472,17 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "docs_development_RUST_RATIO_STRATEGY_2026_06_13_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "galaxy_network_profile"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S141",
+  "last_sprint_closed": "PH-S142",
   "layers": [
     {
       "id": "L0",
@@ -1509,7 +1515,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S142",
+  "next_sprint": "PH-S143",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1994,6 +2000,19 @@
       ],
       "sprints": [
         "PH-S130"
+      ]
+    },
+    {
+      "id": "galaxy_verify_sampling",
+      "label": "grid/galaxy_verify_sampling.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_verify_sampling.rs",
+      "sections": [
+        "VERIFY_BASE_SAMPLE_RATE env",
+        "telegram_edge sampling stub"
+      ],
+      "sprints": [
+        "PH-S142"
       ]
     },
     {
@@ -6561,7 +6580,7 @@
       "path": "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md"
     }
   ],
-  "revision": 72,
+  "revision": 74,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

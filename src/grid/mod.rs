@@ -11,6 +11,7 @@ pub mod galaxy_locality;
 pub mod galaxy_network_profile;
 pub mod galaxy_pricing_oracle;
 pub mod galaxy_trust_score;
+pub mod galaxy_verify_sampling;
 mod map;
 pub mod protocol_compat;
 
@@ -26,6 +27,10 @@ pub use envelope::{
 pub use galaxy_network_profile::{
     normalize_register_metadata, parse_network_profile_value, GalaxyEgressPolicy,
     GalaxyNetworkProfile, NetworkProfileParseError,
+};
+pub use galaxy_verify_sampling::{
+    parse_verify_base_sample_rate, VerifySamplingConfig, DEFAULT_VERIFY_BASE_SAMPLE_RATE,
+    ENV_VERIFY_BASE_SAMPLE_RATE,
 };
 pub use map::{
     envelope_from_peer_info, envelope_from_put_artifact, memory_shard_from_put_artifact,
