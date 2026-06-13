@@ -1554,7 +1554,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S148",
+  "last_sprint_closed": "PH-S150",
   "layers": [
     {
       "id": "L0",
@@ -1587,7 +1587,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S150",
+  "next_sprint": "PH-S151",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4791,7 +4791,8 @@
       "layer": "L3",
       "path": "src/bin/poolai_loc_audit.rs",
       "sprints": [
-        "PH-S143"
+        "PH-S143",
+        "PH-S150"
       ]
     },
     {
@@ -6902,7 +6903,7 @@
       "path": "crates/poolai-ui-wasm/README.md"
     }
   ],
-  "revision": 81,
+  "revision": 82,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

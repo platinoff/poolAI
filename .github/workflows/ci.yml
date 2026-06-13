@@ -198,6 +198,37 @@ jobs:
       - name: Axum routes vs docs/openapi.yaml
         run: cargo run --bin poolai-openapi-gap-audit
 
+  rust-ratio-audit:
+    name: Rust LOC ratio advisory (PH-S150)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        timeout-minutes: 5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-rust-ratio-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-ratio-
+
+      - name: Product code Rust share (advisory)
+        run: >
+          cargo run --bin poolai-loc-audit --
+          --warn-below 0.88
+          --target 0.93
+          --stretch 0.96
+          --advisory
+
   pa11y-contract:
     name: Pa11y script contract
     runs-on: ubuntu-latest

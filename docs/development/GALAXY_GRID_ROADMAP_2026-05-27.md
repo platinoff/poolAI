@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S150…S159)
+**Оновлено:** 2026-06-13 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**9** відкритих PH-S151…S159)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S150…S159 (ratio stretch **96%** spirit) |
-| **Закрито PH-S128…S148** | Galaxy wire + ratio band A–D (audit, API→Rust, ui-core/wasm, slim e2e) |
+| **Відкрито** | **9** — PH-S151…S159 (ratio stretch **96%** spirit) |
+| **Закрито PH-S128…S150** | Galaxy wire + ratio band A–E (audit, API→Rust, ui-core/wasm, slim e2e, CI advisory) |
 | **Після S159** | replenish §5.12 (≤10) · formal 90–95%, stretch **96%** |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -58,12 +58,12 @@
 
 ---
 
-## 3. Черга §5.12 (ratio stretch band PH-S150…S159)
+## 3. Черга §5.12 (ratio stretch band PH-S151…S159)
 
 | # | Sprint | Тема | Ratio / acceptance |
 |---|--------|------|-------------------|
-| 1 | **PH-S150** | CI ratio advisory | warn <88%; target 93%; spirit 96% |
-| 2 | **PH-S151** | wasm grid-pricing wiring | slim JS; Playwright smoke |
+| — | **PH-S150** ✅ | CI ratio advisory | CI `rust-ratio-audit`; **92.00%** |
+| 1 | **PH-S151** | wasm grid-pricing wiring | slim JS; Playwright smoke |
 | 3 | **PH-S152** | wasm jobs lease display | slim `admin_common.js` |
 | 4 | **PH-S153** | admin_common → Rust/wasm | −≥400 LOC JS |
 | 5 | **PH-S154** | Admin i18n subset Rust | slim `i18n_core.js` |
@@ -86,9 +86,9 @@
 | Audit + dedupe | PH-S143…S145 | baseline + API→Rust |
 | Portable UI core | PH-S146…S147 | ui-core + wasm POC |
 | Slim browser E2E | PH-S148 | browser-only `test:ci` |
-| Gate + stretch | PH-S150…S159 | CI advisory → **96% spirit** |
+| Gate + stretch | PH-S150 ✅…S159 | CI advisory → **96% spirit** |
 
-**Baseline:** **91.99%** · [`rust_ratio.json`](./rust_ratio.json).
+**Baseline:** **92.00%** · [`rust_ratio.json`](./rust_ratio.json).
 
 ---
 

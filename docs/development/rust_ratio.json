@@ -1,16 +1,23 @@
 {
   "generated_at": "2026-06-13",
-  "sprint": "PH-S148",
-  "target_band_min": 0.9,
-  "target_band_max": 0.95,
-  "warn_min": 0.88,
-  "rust_loc": 107442,
+  "sprint": "PH-S150",
+  "formal_band_min": 0.9,
+  "formal_band_max": 0.95,
+  "warn_below": 0.88,
+  "target_ratio": 0.93,
+  "stretch_spirit": 0.96,
+  "advisory_mode": false,
+  "min_ratio": 0.91,
+  "rust_loc": 107656,
   "non_rust_product_loc": 9361,
-  "product_loc_total": 116803,
-  "rust_ratio": 0.9198565105348322,
-  "rust_ratio_pct": 91.98565105348322,
-  "in_target_band": true,
+  "product_loc_total": 117017,
+  "rust_ratio": 0.9200030764760676,
+  "rust_ratio_pct": 92.00030764760676,
+  "in_formal_band": true,
   "below_warn_threshold": false,
+  "below_target": true,
+  "below_stretch_spirit": true,
+  "meets_min_ratio": true,
   "by_category": {
     "e2e_ts": {
       "files": 8,
@@ -34,7 +41,7 @@
     },
     "rust_src": {
       "files": 229,
-      "loc": 82695
+      "loc": 82909
     },
     "rust_tests": {
       "files": 112,
@@ -51,6 +58,7 @@
   },
   "notes": [
     "Denominator: product code only (strategy §1); docs/yaml/png excluded",
-    "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets"
+    "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
+    "PH-S150: CI --advisory warns below warn_below; stretch spirit documented via --stretch"
   ]
 }

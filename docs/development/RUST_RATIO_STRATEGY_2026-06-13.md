@@ -14,9 +14,9 @@
 | **Non-Rust (допустимо)** | **5–10%** | `src/ui/*.js` (glue), `e2e/*.ts` (лише browser), `bin/*.sh` (ops) |
 | **Поза ratio** | docs, `.md`, CI yaml, snapshots PNG | не входять у знаменник «коду продукту» |
 
-**Орієнтовний зріз (2026-06-13, PH-S148):** **`91.99%`** Rust LOC (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). Non-Rust «шум»: **`i18n_core.js`** (~2k LOC), **`admin_common.js`**, **`admin_charts.js`**, browser-only `e2e/tests/`, ops shell.
+**Орієнтовний зріз (2026-06-13, PH-S150):** **`92.00%`** Rust LOC (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). Non-Rust «шум»: **`i18n_core.js`** (~2k LOC), **`admin_common.js`**, **`admin_charts.js`**, browser-only `e2e/tests/`, ops shell.
 
-**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S150…S159 gates.
+**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S151…S159 gates. CI advisory (PH-S150): `cargo run --bin poolai-loc-audit -- --warn-below 0.88 --target 0.93 --stretch 0.96 --advisory`.
 
 ---
 
@@ -82,7 +82,7 @@ flowchart TB
 | **B — dedupe** | §5.13 PH-S144…S145 | перенести legacy API Playwright → Rust; HTTP stand smoke bin | +3–5% |
 | **C — UI core** | PH-S146…S147 | shared Rust crate + wasm32 POC для admin helpers | +2–4% |
 | **D — slim e2e** | PH-S148 | `e2e/` лише smoke/admin/a11y/visual; прибрати API specs з `test:ci` | +1–2% |
-| **E — gate** | PH-S150 | CI advisory якщо ratio <88%; target 93% | стабільно 90–95% |
+| **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins | **→96% spirit** |
 
 **Черга §5.12 (10 відкритих):** PH-S150…S159 — replenish після S159.
@@ -99,7 +99,7 @@ flowchart TB
 | 4 | **PH-S146** | `crates/poolai-ui-core` stub | shared validators/formatters з admin JS винесені в Rust crate + unit tests | **✅** |
 | 5 | **PH-S147** | wasm32 admin core POC | один panel helper compiled to wasm; docs portability §2 | **✅** |
 | 6 | **PH-S148** | Slim `e2e/` | `test:ci` без API patterns; ratio ≥90% | **✅** |
-| 7 | **PH-S150** | Ratio CI advisory | CI warn <88%; target 93%; stretch spirit **96%** | відкрито |
+| 7 | **PH-S150** | Ratio CI advisory | CI `rust-ratio-audit`; `--warn-below 0.88` `--target 0.93` `--stretch 0.96` `--advisory`; **92.00%** | **✅** |
 | 8 | **PH-S151** | wasm grid-pricing wiring | admin panel → wasm formatters | відкрито |
 | 9 | **PH-S152** | wasm jobs lease display | jobs admin wasm lease labels | відкрито |
 | 10 | **PH-S153** | admin_common slim | api_error/format/table → Rust/wasm | відкрито |
