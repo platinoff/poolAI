@@ -1,12 +1,12 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 · PH-S137 ✅ · vision **rev 66**
+**Оновлено:** 2026-06-13 · PH-S138 ✅ · vision **rev 67**
 
-| **← наступний** | **PH-S138** — Locality rank integration test |
-| **Відкритих** | **5** (PH-S138…S142) |
+| **← наступний** | **PH-S139** — Telegram wallet bind E2E |
+| **Відкритих** | **4** (PH-S139…S142) |
 
 ```
-PoolAI — спринт PH-S138 (одin PH-S*, VDT).
-PH-S138: tests/ multi-worker rank_workers_by_locality fixture; cargo test-ci
+PoolAI — спринт PH-S139 (одin PH-S*, VDT).
+PH-S139: e2e/tests — Playwright POST wallet OK + invalid pubkey 400; npm run test:ci
 FM/HANDOFF/NEXT_SESSION/vision revision++
 ```

@@ -1455,7 +1455,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S136",
+  "last_sprint_closed": "PH-S138",
   "layers": [
     {
       "id": "L0",
@@ -1488,7 +1488,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S137",
+  "next_sprint": "PH-S139",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6486,7 +6486,7 @@
       ]
     }
   ],
-  "revision": 66,
+  "revision": 67,
   "updated_at": "2026-06-13",
   "git_head": "da3be9b4",
   "vision_ui_rev": 54
