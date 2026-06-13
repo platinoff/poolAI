@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 (PH-S135 ✅ · §5.12 **7** відкритих PH-S136…S142) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc). — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-13 (PH-S136 ✅ · §5.12 **6** відкритих PH-S137…S142) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc). — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -101,13 +101,13 @@
 **PH-S132 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §8.1 — `network_profile` wire contract (`region`, `latency_ms_p50`, `bandwidth_mbps`, `egress_policy`, SmallWorld consumption); TBD #1 closed; DIGEST row; cross-link `galaxy_locality.rs` `LocalityNetworkProfile`.
 **PH-S133 ✅ (e2e):** `e2e/tests/jobs_migrating.spec.ts` — Playwright PATCH `leased → migrating → executing` + `executing ↔ migrating` roundtrip (PH-S104 wire); `npm run test:ci` includes `jobs_migrating`; contract `jobs_patch_migrating_lifecycle_roundtrip` unchanged.
 **PH-S134 ✅ (e2e):** `e2e/tests/protocol_middleware.spec.ts` — Playwright `POST /discovery/register-remote` with `X-PoolAI-Protocol` (1.2 → compat headers; 1.0 → 403 `protocol_unsupported`); `npm run test:ci` includes `protocol_middleware`; без змін compat matrix wire.
-**PH-S135 ✅ (code):** `GET /api/v1/virtual-nodes/telegram/wallets/{telegram_user_id}` — read-only wallet lookup (Galaxy §3.2); OpenAPI `getTelegramWallet`; integration tests `telegram_wallet_get_lookup_*`; `poolai-openapi-gap-audit` 0.
-**Vision ✅:** next **PH-S136** · replenish **PH-S137…S142**.
+**PH-S136 ✅ (code):** `PrefetchPolicyConfig::from_env()` in `dispatch.rs` — `POOLAI_GALAXY_LOCALITY_MODE` (`strict_locality`|`best_effort`) + `POOLAI_GALAXY_PREFETCH_DEADLINE_MS`; `plan_prefetch` uses config deadline/mode; unit tests; no enqueue wire.
+**Vision ✅:** next **PH-S137**.
 **Research replenish (2026-06-08):** §5.12 **2→10** — code-first + tests: E2E migrating/protocol (S133–S134), wallet GET + E2E (S135/S139), prefetch/trust/verify env stubs (S136/S137/S142), locality rank integration (S138), network_profile register-remote (S140), admin migrating badge (S141). Концепт-горизонт: Galaxy §8.2 settlement/telegram VM · §5.3/§6 Prometheus metrics — post-S142.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **7** відкритих — **PH-S136** (наступний) … **PH-S142**. Wallet GET lookup ✅ (PH-S135).
+**Черга:** §5.12 **6** відкритих — **PH-S137** (наступний) … **PH-S142**. Prefetch env stub ✅ (PH-S136).
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

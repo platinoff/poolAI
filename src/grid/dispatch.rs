@@ -1,10 +1,10 @@
-//! Grid envelope ingress — Job/Result/MemoryShard side effects (FM-023).
+//! Grid envelope ingress ? Job/Result/MemoryShard side effects (FM-023).
 //!
 //! Grid `Job` ingest schedules via [`schedule_with_grid_peer`](crate::job::schedule_with_grid_peer);
 //! when a source peer binds `worker_id`, scheduler lease acquire sets `JobStatus::Leased` (PH-S108).
 //! `Result` ingest validates `lease_epoch` CAS when the job row has active lease fields (PH-S110).
-//! Edge `trust_score` settlement gate stub on result path (PH-S130, Galaxy §6.5).
-//! Seed inventory + task-driven prefetch policy stub (PH-S129, Galaxy §5.5).
+//! Edge `trust_score` settlement gate stub on result path (PH-S130, Galaxy ?6.5).
+//! Seed inventory + task-driven prefetch policy stub (PH-S129, Galaxy ?5.5).
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -25,7 +25,7 @@ use crate::observability::lease_trace::{
     trace_lease_reject, LeaseOperation, LeaseOutcome, LeaseSource,
 };
 
-/// Worker seed inventory wire DTO (Galaxy §5.2 / §5.5).
+/// Worker seed inventory wire DTO (Galaxy ?5.2 / ?5.5).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub struct SeedInventoryEntry {
     #[serde(default)]
@@ -49,7 +49,7 @@ pub struct SeedInventoryHotTier {
     pub profiles: Vec<String>,
 }
 
-/// Prefetch destination tier (concept §5.5).
+/// Prefetch destination tier (concept ?5.5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum PrefetchTargetTier {
@@ -57,7 +57,7 @@ pub enum PrefetchTargetTier {
     Vram,
 }
 
-/// Prefetch trigger (concept §5.5 table).
+/// Prefetch trigger (concept ?5.5 table).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrefetchTrigger {
     JobAdmitted,
@@ -65,7 +65,7 @@ pub enum PrefetchTrigger {
     ReMigrate,
 }
 
-/// Locality / prefetch strictness (concept §5.5, §5.6).
+/// Locality / prefetch strictness (concept ?5.5, ?5.6).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum PrefetchPolicyMode {
     #[default]
@@ -73,14 +73,61 @@ pub enum PrefetchPolicyMode {
     StrictLocality,
 }
 
-/// Default max wait before Running (`POOLAI_GALAXY_PREFETCH_DEADLINE_MS`, §5.6).
+/// Default max wait before Running (`POOLAI_GALAXY_PREFETCH_DEADLINE_MS`, ?5.6).
 pub const DEFAULT_PREFETCH_DEADLINE_MS: u64 = 15_000;
 
-/// Env: prefetch wait deadline milliseconds (§5.6).
+/// Env: prefetch wait deadline milliseconds (?5.6).
 pub const ENV_PREFETCH_DEADLINE_MS: &str = "POOLAI_GALAXY_PREFETCH_DEADLINE_MS";
 
-/// Env: `strict_locality` | `best_effort` (§5.6).
+/// Env: `strict_locality` | `best_effort` (?5.6).
 pub const ENV_LOCALITY_MODE: &str = "POOLAI_GALAXY_LOCALITY_MODE";
+
+/// Coordinator prefetch policy from environment (PH-S136, Galaxy ?5.6).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PrefetchPolicyConfig {
+    pub mode: PrefetchPolicyMode,
+    pub prefetch_deadline_ms: u64,
+}
+
+impl Default for PrefetchPolicyConfig {
+    fn default() -> Self {
+        Self {
+            mode: PrefetchPolicyMode::default(),
+            prefetch_deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+        }
+    }
+}
+
+impl PrefetchPolicyConfig {
+    pub fn from_env() -> Self {
+        Self {
+            mode: prefetch_policy_mode_from_env(),
+            prefetch_deadline_ms: env_u64(ENV_PREFETCH_DEADLINE_MS)
+                .filter(|&v| v > 0)
+                .unwrap_or(DEFAULT_PREFETCH_DEADLINE_MS),
+        }
+    }
+}
+
+/// Parse `POOLAI_GALAXY_LOCALITY_MODE` (`strict_locality` | `best_effort`).
+pub fn parse_prefetch_policy_mode(raw: &str) -> PrefetchPolicyMode {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "strict_locality" | "strict" => PrefetchPolicyMode::StrictLocality,
+        "best_effort" | "best-effort" => PrefetchPolicyMode::BestEffort,
+        _ => PrefetchPolicyMode::BestEffort,
+    }
+}
+
+fn prefetch_policy_mode_from_env() -> PrefetchPolicyMode {
+    std::env::var(ENV_LOCALITY_MODE)
+        .ok()
+        .map(|v| parse_prefetch_policy_mode(&v))
+        .unwrap_or_default()
+}
+
+fn env_u64(name: &str) -> Option<u64> {
+    std::env::var(name).ok().and_then(|v| v.trim().parse().ok())
+}
 
 /// One shard scheduled for prefetch.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -98,7 +145,7 @@ pub struct PrefetchPlan {
     pub mode: PrefetchPolicyMode,
 }
 
-/// Whether `shard_id` is present and hot tier has active bytes (stub §5.5).
+/// Whether `shard_id` is present and hot tier has active bytes (stub ?5.5).
 #[inline]
 pub fn hot_hit(inventory: &SeedInventoryEntry, shard_id: &str) -> bool {
     inventory.shard_ids.iter().any(|id| id == shard_id)
@@ -111,7 +158,7 @@ pub fn plan_prefetch(
     required_shard_ids: &[String],
     trigger: PrefetchTrigger,
     gpu_capable: bool,
-    mode: PrefetchPolicyMode,
+    config: &PrefetchPolicyConfig,
 ) -> PrefetchPlan {
     let target_tier = if gpu_capable {
         PrefetchTargetTier::Vram
@@ -129,8 +176,8 @@ pub fn plan_prefetch(
     PrefetchPlan {
         items,
         trigger,
-        deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
-        mode,
+        deadline_ms: config.prefetch_deadline_ms,
+        mode: config.mode,
     }
 }
 
@@ -264,7 +311,7 @@ fn ingest_result(
         return Err(AppError::RestError {
             code: "lease_epoch_rejected",
             message: format!(
-                "lease_epoch does not match active lease for job '{job_id}' (Galaxy §4.3.1 grid result CAS)"
+                "lease_epoch does not match active lease for job '{job_id}' (Galaxy ?4.3.1 grid result CAS)"
             ),
         });
     }
@@ -605,7 +652,7 @@ mod tests {
             &required,
             PrefetchTrigger::JobAdmitted,
             false,
-            PrefetchPolicyMode::BestEffort,
+            &PrefetchPolicyConfig::default(),
         );
         assert_eq!(plan.items.len(), 1);
         assert_eq!(plan.items[0].shard_id, "w:missing");
@@ -618,12 +665,16 @@ mod tests {
     fn plan_prefetch_gpu_uses_vram_tier() {
         let inventory = SeedInventoryEntry::default();
         let required = vec!["w:gpu-1".into()];
+        let config = PrefetchPolicyConfig {
+            mode: PrefetchPolicyMode::StrictLocality,
+            prefetch_deadline_ms: DEFAULT_PREFETCH_DEADLINE_MS,
+        };
         let plan = plan_prefetch(
             &inventory,
             &required,
             PrefetchTrigger::LeaseAcquired,
             true,
-            PrefetchPolicyMode::StrictLocality,
+            &config,
         );
         assert_eq!(plan.items[0].target_tier, PrefetchTargetTier::Vram);
         assert_eq!(plan.mode, PrefetchPolicyMode::StrictLocality);
@@ -741,5 +792,74 @@ mod tests {
             mode: PrefetchPolicyMode::BestEffort,
         };
         assert_eq!(noop_prefetch_hook(&plan), 2);
+    }
+
+    #[test]
+    fn parse_prefetch_policy_mode_accepts_aliases() {
+        assert_eq!(
+            parse_prefetch_policy_mode("strict_locality"),
+            PrefetchPolicyMode::StrictLocality
+        );
+        assert_eq!(
+            parse_prefetch_policy_mode("best_effort"),
+            PrefetchPolicyMode::BestEffort
+        );
+        assert_eq!(
+            parse_prefetch_policy_mode("unknown"),
+            PrefetchPolicyMode::BestEffort
+        );
+    }
+
+    #[test]
+    fn prefetch_policy_config_from_env_reads_locality_and_deadline() {
+        use std::sync::{Mutex, MutexGuard};
+
+        static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+        fn lock() -> MutexGuard<'static, ()> {
+            ENV_LOCK.lock().unwrap_or_else(|e| e.into_inner())
+        }
+
+        fn clear() {
+            std::env::remove_var(ENV_LOCALITY_MODE);
+            std::env::remove_var(ENV_PREFETCH_DEADLINE_MS);
+        }
+
+        let _guard = lock();
+        clear();
+        assert_eq!(
+            PrefetchPolicyConfig::from_env().mode,
+            PrefetchPolicyMode::BestEffort
+        );
+
+        std::env::set_var(ENV_LOCALITY_MODE, "strict_locality");
+        std::env::set_var(ENV_PREFETCH_DEADLINE_MS, "30000");
+        let cfg = PrefetchPolicyConfig::from_env();
+        assert_eq!(cfg.mode, PrefetchPolicyMode::StrictLocality);
+        assert_eq!(cfg.prefetch_deadline_ms, 30_000);
+
+        std::env::set_var(ENV_PREFETCH_DEADLINE_MS, "0");
+        assert_eq!(
+            PrefetchPolicyConfig::from_env().prefetch_deadline_ms,
+            DEFAULT_PREFETCH_DEADLINE_MS
+        );
+
+        clear();
+    }
+
+    #[test]
+    fn plan_prefetch_uses_config_deadline() {
+        let cfg = PrefetchPolicyConfig {
+            mode: PrefetchPolicyMode::BestEffort,
+            prefetch_deadline_ms: 42_000,
+        };
+        let plan = plan_prefetch(
+            &SeedInventoryEntry::default(),
+            &["w:x".into()],
+            PrefetchTrigger::JobAdmitted,
+            false,
+            &cfg,
+        );
+        assert_eq!(plan.deadline_ms, 42_000);
     }
 }

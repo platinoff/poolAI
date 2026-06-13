@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-13 (PH-S135 ✅ · §5.12 **7** відкритих PH-S136…S142 · vision rev 64 · HEAD pending) · FM-041 Deferred).
+**Оновлено:** 2026-06-13 (PH-S136 ✅ · §5.12 **6** відкритих PH-S137…S142 · vision rev 65) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -336,7 +336,7 @@ FM-xxx (з таблиці нижче)
 | 69 | **PH-S133** | Job Migrating lifecycle E2E (e2e) | PH-S104, `e2e/` | Playwright PATCH `migrating` ↔ `executing` roundtrip; `npm run test:ci` | **✅** |
 | 70 | **PH-S134** | Protocol middleware E2E smoke (e2e) | PH-S103, `e2e/` | Playwright register-remote with `X-PoolAI-Protocol`; unsupported → 403 | **✅** |
 | 71 | **PH-S135** | Telegram wallet GET lookup API (code) | Galaxy §3.2, PH-S131 | `GET /api/v1/virtual-nodes/telegram/wallets/{telegram_user_id}`; OpenAPI; integration test | **✅** |
-| 72 | **PH-S136** | Prefetch policy env wire stub (code) | Galaxy §5.6, `dispatch.rs` | `PrefetchPolicyMode` + `POOLAI_GALAXY_*` from_env; unit tests; no enqueue wire | відкрито |
+| 72 | **PH-S136** | Prefetch policy env wire stub (code) | Galaxy §5.6, `dispatch.rs` | `PrefetchPolicyMode` + `POOLAI_GALAXY_*` from_env; unit tests; no enqueue wire | **✅** |
 | 73 | **PH-S137** | Trust gate settlement metrics stub (code) | Galaxy §6.5, `galaxy_trust_score.rs` | Prometheus counters `payout_held` / `payout_eligible`; unit test | відкрито |
 | 74 | **PH-S138** | Locality rank integration test (tests) | PH-S128, `galaxy_locality.rs` | `tests/` multi-worker `rank_workers_by_locality` fixture; `cargo test-ci` | відкрито |
 | 75 | **PH-S139** | Telegram wallet bind E2E (e2e) | PH-S131, `e2e/` | Playwright POST wallet OK + invalid pubkey 400; `npm run test:ci` | відкрито |
@@ -344,7 +344,7 @@ FM-xxx (з таблиці нижче)
 | 77 | **PH-S141** | Admin jobs migrating badge UI (code) | PH-S104, `jobs.rs` | `migrating` status badge + i18n EN/UK; Playwright smoke; `test:ci` | відкрито |
 | 78 | **PH-S142** | Verification sample rate env stub (code) | Galaxy §6.1, `src/grid/` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser + unit tests; no live sampling wire | відкрито |
 
-**Відкритих у §5.12:** **7** (PH-S136…S142). **Закрито смуга:** PH-S128…S135 ✅. Vision rev 64.
+**Відкритих у §5.12:** **6** (PH-S137…S142). **Закрито смуга:** PH-S128…S136 ✅. Vision rev 65.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -457,7 +457,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S136** (Prefetch policy env wire stub) · черга **7** відкритих (PH-S136…S142) · vision rev 64 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S137** (Trust gate settlement metrics stub) · черга **6** відкритих · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
