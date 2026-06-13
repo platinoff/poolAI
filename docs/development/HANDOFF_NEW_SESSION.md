@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 (PH-S144 ✅ · §5.12 **9** відкритих PH-S145…S150 · rust_ratio **91.91%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-13 (PH-S145 ✅ · §5.12 **8** відкритих PH-S146…S150 · rust_ratio **91.91%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -106,13 +106,13 @@
 **PH-S140 ✅ (code):** `src/grid/galaxy_network_profile.rs` — parse `metadata.network_profile` on `POST /api/v1/discovery/register-remote` (object or JSON string); canonical JSON in peer metadata; `400` on invalid region/schema; `tests/discovery_network_profile_integration.rs`; `cargo test-ci`.
 **PH-S141 ✅ (code):** `/ui/admin/jobs` — `migrating` status badge (`warning` class, i18n EN/UK, tooltip PH-S104); Playwright admin smoke (`admin.spec.ts` PH-S141); `cargo test-ci` + e2e.
 **PH-S142 ✅ (code):** `src/grid/galaxy_verify_sampling.rs` — `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser (`0.0..=1.0`, default `0.05`); `VerifySamplingConfig::from_env()`; unit tests; no live sampling wire; `cargo test-ci`.
-**PH-S144 ✅ (tests):** legacy Playwright API-smoke (`jobs_lease`, `jobs_migrating`, `protocol_middleware`, `telegram_wallet`, `grid_pricing`, `grid_job_lease`, `grid_result_lease`) → Rust `tests/grid_pricing_integration.rs`, `grid_envelope_lease_integration.rs`, `protocol_middleware_integration.rs` + `jobs_api_contracts.rs` gaps; archived `e2e/archive/api-smoke/`; `e2e/package.json` `test:ci` browser + `jobs_raid` only; **rust_ratio 91.91%**; `cargo test-ci`.
-**Vision ✅:** next **PH-S145**.
+**PH-S145 ✅ (code):** `src/bin/poolai_http_stand_smoke.rs` — Rust HTTP stand smoke (`reqwest`, `POOLAI_BASE_URL`, optional `--raid` + `POOLAI_E2E_STAND_ROOT`); mirrors archived Playwright API smokes; [`RUN_LOCAL.md`](./RUN_LOCAL.md); `cargo test-ci`.
+**Vision ✅:** next **PH-S146**.
 **Research replenish (2026-06-08):** §5.12 **2→10** — code-first + tests: E2E migrating/protocol (S133–S134), wallet GET + E2E (S135/S139), prefetch/trust/verify env stubs (S136/S137/S142), locality rank integration (S138), network_profile register-remote (S140), admin migrating badge (S141). Концепт-горизонт: Galaxy §8.2 settlement/telegram VM · §5.3/§6 Prometheus metrics — post-S142.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **9** відкритих — **PH-S145** (наступний) … **PH-S150**. Rust ratio band — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **91.91%**.
+**Черга:** §5.12 **8** відкритих — **PH-S146** (наступний) … **PH-S150**. Rust ratio band — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **91.91%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

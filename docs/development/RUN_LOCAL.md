@@ -201,6 +201,33 @@ bash bin/run-poolai.sh single
 
 ---
 
+## HTTP stand smoke (Rust, PH-S145)
+
+API wire перевірки проти **live** coordinator без Playwright (канон для stand; CI без stand — `cargo test-ci` + `tests/*_integration.rs`).
+
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export POOLAI_BASE_URL=http://127.0.0.1:8080
+
+# Coordinator уже на :8080 (run-poolai single --bg)
+cargo run --bin poolai-http-stand-smoke
+
+# Після bin/e2e-playwright.sh --start (POOLAI_GALAXY_PRICING_FALLBACK_JSON у stand.env):
+export POOLAI_E2E_STAND_ROOT=/tmp/poolai-e2e-NNN   # шлях з логу --start
+cargo run --bin poolai-http-stand-smoke -- --raid
+
+# JSON звіт на stdout:
+cargo run --bin poolai-http-stand-smoke -- --json
+```
+
+| Env | Призначення |
+|-----|-------------|
+| `POOLAI_BASE_URL` | Base URL stand (default `http://127.0.0.1:8080`) |
+| `POOLAI_E2E_STAND_ROOT` | Каталог e2e stand з `restart.sh` (для `--raid`) |
+| `POOLAI_STAND_SMOKE_RAID=1` | Альтернатива прапорцю `--raid` |
+
+---
+
 ## E2E / pa11y (окремо від сервера)
 
 ```powershell
@@ -230,4 +257,4 @@ bash bin/run-poolai.sh single
 | OOM при тестах Windows | `.\bin\poolai-msys.ps1 -lc 'cargo test-ci'` з `-j 1` (див. README) |
 | Admin 404 / порожній API | Запуск з `enterprise` (лаунчер робить це за замовчуванням) |
 
-**Last updated:** 2026-05-27 (PH-S85 verify-release dev fixtures pointer)
+**Last updated:** 2026-06-13 (PH-S145 poolai-http-stand-smoke)

@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-13 (PH-S144 ✅ · §5.12 **9** відкритих PH-S145…S150 · vision rev 75 · **rust_ratio 91.91%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-13 (PH-S145 ✅ · §5.12 **8** відкритих PH-S146…S150 · vision rev 76 · **rust_ratio 91.91%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -345,13 +345,13 @@ FM-xxx (з таблиці нижче)
 | 78 | **PH-S142** | Verification sample rate env stub (code) | Galaxy §6.1, `src/grid/` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser + unit tests; no live sampling wire | **✅** |
 | 79 | **PH-S143** | LOC ratio baseline audit (code) | [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) | `poolai-loc-audit` bin + `rust_ratio.json` (**91.48%**); FM sync | **✅** |
 | 80 | **PH-S144** | Playwright API → Rust migration (tests) | PH-S133…S139 legacy e2e | API specs → `tests/*_integration.rs`; `cargo test-ci`; no new TS API specs | **✅** |
-| 81 | **PH-S145** | `poolai-http-stand-smoke` bin (code) | PH-S144, stand env | Rust HTTP stand smoke bin; doc in RUN_LOCAL | відкрито |
+| 81 | **PH-S145** | `poolai-http-stand-smoke` bin (code) | PH-S144, stand env | Rust HTTP stand smoke bin; doc in RUN_LOCAL | **✅** |
 | 82 | **PH-S146** | `poolai-ui-core` shared crate (code) | `src/ui/`, ratio strategy | validators/formatters з admin JS → crate + unit tests | відкрито |
 | 83 | **PH-S147** | wasm32 admin core POC (code) | PH-S146, portability | one wasm module + portability §2 docs sync | відкрито |
 | 84 | **PH-S148** | Slim `e2e/` browser-only (e2e) | PH-S144 | `test:ci` без API TS patterns; ratio ≥90% | відкрито |
 | 85 | **PH-S150** | Ratio CI advisory (ops) | PH-S143 audit | CI step warn if Rust share <88%; target 90% | відкрито |
 
-**Відкритих у §5.12:** **9** (PH-S145…S150 Rust ratio band). **Закрито смуга:** PH-S128…S144 ✅. Vision rev 75. **Baseline:** rust_ratio **91.91%** ([`rust_ratio.json`](../development/rust_ratio.json)).
+**Відкритих у §5.12:** **8** (PH-S146…S150 Rust ratio band). **Закрито смуга:** PH-S128…S145 ✅. Vision rev 76. **Baseline:** rust_ratio **91.91%** ([`rust_ratio.json`](../development/rust_ratio.json)).
 
 **Rust ratio 90–95%:** канон [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) · **одна сесія = один PH-S*** · replenish після S150.
 
@@ -472,7 +472,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S145** · черга **9** відкритих PH-S145…S150 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S146** · черга **8** відкритих PH-S146…S150 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

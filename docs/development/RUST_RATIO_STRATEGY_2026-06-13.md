@@ -2,7 +2,7 @@
 
 **Оновлено:** 2026-06-13 · **Канон:** FM **§5.13** · правила [`.cursor/rules/runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc), [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc)
 
-**Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%**, щоб платформа (координатор, worker, API, валідація, тести) **збиралась і перевірялась через `cargo`** на будь-якій ОС/архітектурі без обов’язкового Node на edge-пристрої.
+**Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%**, щоб платформа (координатор, worker, API, валідація, тести) **збиралась і перевірялась через `cargo`** на будь-якій ОС/архітектурі без обов'язкового Node на edge-пристрої.
 
 ---
 
@@ -86,7 +86,7 @@ flowchart TB
 |---|--------|--------|------------|
 | 1 | **PH-S143** | LOC ratio baseline audit | `cargo run --bin poolai-loc-audit`; [`rust_ratio.json`](./rust_ratio.json) **91.48%**; FM оновлено | **✅** |
 | 2 | **PH-S144** | Playwright API → Rust migration | `jobs_lease`, `grid_*`, `protocol_middleware`, `telegram_wallet`, `jobs_migrating` покриті integration; Playwright specs archived або deleted | **✅** |
-| 3 | **PH-S145** | `poolai-http-stand-smoke` bin (Rust) | `reqwest` + stand env; замінює TS API suite в CI |
+| 3 | **PH-S145** | `poolai-http-stand-smoke` bin (Rust) | `reqwest` + stand env; RUN_LOCAL doc; `--raid` + `POOLAI_E2E_STAND_ROOT` | **✅** |
 | 4 | **PH-S146** | `crates/poolai-ui-core` stub | shared validators/formatters з admin JS винесені в Rust crate + unit tests |
 | 5 | **PH-S147** | wasm32 admin core POC | один panel helper compiled to wasm; docs portability §2 |
 | 6 | **PH-S148** | Slim `e2e/` | `test:ci` без API patterns; ratio ≥90% |
@@ -105,7 +105,7 @@ flowchart TB
 
 ---
 
-## 7. Пов’язані документи
+## 7. Пов'язані документи
 
 | Документ | Роль |
 |----------|------|

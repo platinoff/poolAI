@@ -1482,7 +1482,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S144",
+  "last_sprint_closed": "PH-S145",
   "layers": [
     {
       "id": "L0",
@@ -1515,7 +1515,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S145",
+  "next_sprint": "PH-S146",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4571,6 +4571,16 @@
     },
     {
       "auto_synced": true,
+      "id": "src_bin_poolai_http_stand_smoke_rs",
+      "label": "poolai_http_stand_smoke.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_http_stand_smoke.rs",
+      "sprints": [
+        "PH-S145"
+      ]
+    },
+    {
+      "auto_synced": true,
       "id": "src_bin_poolai_loc_audit_rs",
       "label": "poolai_loc_audit.rs",
       "layer": "L3",
@@ -6622,9 +6632,65 @@
         "PH-S143",
         "PH-S144"
       ]
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_README_md",
+      "label": "README.md",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_grid_job_lease_spec_ts",
+      "label": "grid_job_lease.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/grid_job_lease.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_grid_pricing_spec_ts",
+      "label": "grid_pricing.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/grid_pricing.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_grid_result_lease_spec_ts",
+      "label": "grid_result_lease.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/grid_result_lease.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_jobs_lease_spec_ts",
+      "label": "jobs_lease.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/jobs_lease.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_jobs_migrating_spec_ts",
+      "label": "jobs_migrating.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/jobs_migrating.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_protocol_middleware_spec_ts",
+      "label": "protocol_middleware.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/protocol_middleware.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "e2e_archive_api_smoke_telegram_wallet_spec_ts",
+      "label": "telegram_wallet.spec.ts",
+      "layer": "L3",
+      "path": "e2e/archive/api-smoke/telegram_wallet.spec.ts"
     }
   ],
-  "revision": 75,
+  "revision": 76,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }
