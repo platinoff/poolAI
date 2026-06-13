@@ -192,6 +192,38 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     await expect(page.locator("#jobs-list")).toContainText("Expired");
   });
 
+  test("jobs page shows migrating status badge (PH-S141)", async ({
+    page,
+    request,
+  }) => {
+    const createRes = await request.post("/api/v1/jobs", {
+      data: { kind: "inference" },
+    });
+    expect(createRes.status()).toBe(201);
+    const created = (await createRes.json()) as { id: string };
+
+    const leaseRes = await request.post(
+      `/api/v1/jobs/${created.id}/lease`,
+      { data: { lease_owner: "e2e-migrate-badge" } },
+    );
+    expect(leaseRes.status()).toBe(200);
+
+    const patchRes = await request.patch(`/api/v1/jobs/${created.id}`, {
+      data: { status: "migrating" },
+    });
+    expect(patchRes.status()).toBe(200);
+
+    await gotoAdminReady(page, "/ui/admin/jobs", "#jobs-list");
+    const row = page.locator("#jobs-list").getByRole("row").filter({
+      hasText: created.id,
+    });
+    await expect(row).toBeVisible({ timeout: 15_000 });
+    const badge = row.locator('[data-job-status="migrating"]');
+    await expect(badge).toBeVisible();
+    await expect(badge).toContainText("Migrating");
+    await expect(badge).toHaveAttribute("title", /re-migrate|handoff|PH-S104/i);
+  });
+
   test("updates compatibility page shows protocol and doc blocks (PH-S93)", async ({
     page,
   }) => {

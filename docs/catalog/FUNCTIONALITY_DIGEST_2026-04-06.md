@@ -170,7 +170,7 @@
 |----------|------|--------|
 | Grid pricing | `/ui/admin/grid-pricing` | PH-S82 |
 | Updates & compatibility | `/ui/admin/updates-compat` | PH-S93 |
-| Jobs + lease columns | `/ui/admin/jobs` | PH-S53, PH-S96 |
+| Jobs + lease columns | `/ui/admin/jobs` | PH-S53, PH-S96, PH-S105, PH-S141 |
 
 **Env (Galaxy wire, орієнтир):**
 

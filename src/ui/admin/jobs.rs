@@ -1,5 +1,6 @@
 //! Job layer admin page (PH-S53) — list jobs + persistence backend badge.
 //! PH-S96/PH-S105/PH-S119: read-only Galaxy lease columns, tooltips, `#epoch` display.
+//! PH-S141: `migrating` status badge + i18n EN/UK.
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;
@@ -25,8 +26,35 @@ pub async fn admin_jobs() -> Html<String> {
       const s = String(status || '').toLowerCase();
       if (s === 'completed' || s === 'rewarded') return 'active';
       if (s === 'failed') return 'error';
-      if (s === 'executing' || s === 'verifying') return 'warning';
+      if (s === 'executing' || s === 'verifying' || s === 'migrating') return 'warning';
       return '';
+    }
+
+    function statusBadgeLabel(status) {
+      const s = String(status || '').toLowerCase();
+      if (s === 'migrating') {
+        return T('admin.jobs.status.migrating', 'Migrating');
+      }
+      return String(status || '');
+    }
+
+    function statusBadge(status) {
+      const s = String(status || '').toLowerCase();
+      const cls = statusBadgeClass(status);
+      const label = statusBadgeLabel(status);
+      let titleAttr = '';
+      if (s === 'migrating') {
+        const tip = T(
+          'admin.jobs.tooltip.statusMigrating',
+          'Galaxy re-migrate: worker handoff in progress (PH-S104).',
+        );
+        titleAttr = ' title="' + escapeHtml(tip) + '" data-job-status="migrating"';
+      }
+      return (
+        '<span class="status-badge ' + cls + '"' + titleAttr + '>' +
+        escapeHtml(label) +
+        '</span>'
+      );
     }
 
     function formatLeaseCell(value) {
@@ -139,7 +167,7 @@ pub async fn admin_jobs() -> Html<String> {
               <tr>
                 <td><code>${escapeHtml(String(id))}</code></td>
                 <td>${escapeHtml(String(j.kind || ''))}</td>
-                <td><span class="status-badge ${statusBadgeClass(status)}">${escapeHtml(String(status))}</span></td>
+                <td>${statusBadge(status)}</td>
                 <td>${escapeHtml(String(j.created_at || ''))}</td>
                 <td>${escapeHtml(String(j.worker_id || '—'))}</td>
                 <td>${escapeHtml(String(j.vm_id || '—'))}</td>
@@ -196,4 +224,7 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("leaseOwnerCell"));
     assert!(html.contains("leaseEpochCell"));
     assert!(html.contains("admin.jobs.tooltip.leaseEpoch"));
+    assert!(html.contains("statusBadge"));
+    assert!(html.contains("admin.jobs.status.migrating"));
+    assert!(html.contains("data-job-status=\"migrating\""));
 }

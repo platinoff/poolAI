@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-13 (§5.12 **10** відкритих PH-S141…S150 · Rust ratio band)
+**Last updated:** 2026-06-13 (§5.12 **10** відкритих PH-S142…S150 · Rust ratio band)
 
 ## Canonical reading order
 

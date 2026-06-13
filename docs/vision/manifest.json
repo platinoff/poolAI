@@ -1476,7 +1476,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S140",
+  "last_sprint_closed": "PH-S141",
   "layers": [
     {
       "id": "L0",
@@ -1509,7 +1509,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S141",
+  "next_sprint": "PH-S142",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1932,13 +1932,15 @@
       "sections": [
         "lease columns",
         "lease active/expired badge",
-        "epoch tooltips"
+        "epoch tooltips",
+        "migrating status badge"
       ],
       "sprints": [
         "PH-S53",
         "PH-S96",
         "PH-S105",
-        "PH-S119"
+        "PH-S119",
+        "PH-S141"
       ]
     },
     {
@@ -6559,7 +6561,7 @@
       "path": "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md"
     }
   ],
-  "revision": 71,
+  "revision": 72,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }
