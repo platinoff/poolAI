@@ -19,15 +19,17 @@
 
 | Layer | Technology | Location |
 |-------|------------|----------|
-| **Server / API / domains** | **Rust** 2021, `tokio`, `axum` | `src/`, `tests/` |
+| **Server / API / domains** | **Rust** 2021, `tokio`, `axum` | `src/`, `tests/`, `crates/` |
 | **Horizon wire + sidecar** | Rust modules + `crates/poolai-solana-adapter` | `src/grid`, `src/job`, `src/memory`, `crates/` |
-| **Admin UI** | Static HTML + **JavaScript** | `src/ui/` |
-| **E2E** | TypeScript / Playwright | `e2e/` — smoke, admin, a11y (axe), visual (`VISUAL_REGRESSION_E2E.md`); Linux baselines via [`update-visual-baselines.yml`](../.github/workflows/update-visual-baselines.yml) (PH-S37) |
-| **Ops** | Bash (MSYS2) | `scripts/`, `bin/*.sh` — `e2e-playwright.sh`, `update-visual-baselines.sh` |
+| **Target codebase ratio** | **90–95% Rust** (product code) | [`RUST_RATIO_STRATEGY_2026-06-13.md`](development/RUST_RATIO_STRATEGY_2026-06-13.md) |
+| **Admin UI** | Static HTML + **JavaScript** glue; **wasm32 horizon** (PH-S147) | `src/ui/` |
+| **API / wire tests** | **Rust** integration + contracts | `tests/*_integration.rs`, `cargo test-ci` |
+| **Browser E2E only** | TypeScript / Playwright (smoke, admin, axe, visual) | `e2e/` — не дублювати API Rust tests |
+| **Ops** | Bash (MSYS2) | `scripts/`, `bin/*.sh` |
 
 **No Python in repo:** 0× `.py`; no `solana-sdk` in main; ML in `src/ml/`. Dev OpenAPI audit: `cargo run --bin poolai-openapi-gap-audit`. **Java:** not present in tree.
 
-**Agent policy:** `.cursor/rules/runtime-stack-policy.mdc`. ML quantization: `src/ml/turboquant.rs` (Rust); see `docs/ml/TURBOQUANT_INTEGRATION.md`.
+**Agent policy:** `.cursor/rules/runtime-stack-policy.mdc`, `.cursor/rules/poolai-testing-policy.mdc`. ML quantization: `src/ml/turboquant.rs` (Rust); see `docs/ml/TURBOQUANT_INTEGRATION.md`.
 
 ---
 

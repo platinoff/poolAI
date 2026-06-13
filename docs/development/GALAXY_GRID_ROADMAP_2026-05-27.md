@@ -1,21 +1,19 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**8** відкритих PH-S135…S142)
+**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S140…S150)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
 ---
 
-## 1. Стан черги §5.12 (2026-06-08)
+## 1. Стан черги §5.12 (2026-06-13)
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **8** — PH-S135…S142 (replenish 2026-06-08) |
-| **Закрито PH-S65…S132** | pricing, governance, protocol, lease wire, locality/prefetch/trust/wallet/network_profile |
-| **Смуга PH-S128…S132** | **5/5 ✅** (2026-06-08) |
+| **Відкрито** | **10** — PH-S140…S150 (Galaxy wire S140…S142 + Rust ratio S143…S150) |
+| **Закрито PH-S128…S139** | locality, prefetch, trust metrics, wallet GET/E2E, migrating/protocol E2E |
+| **Після S150** | replenish §5.12 (≤10) · ratio target **90–95%** |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
-
-Research replenish ✅ (2026-06-08): PH-S135…S142 — code-first stubs/tests (wallet GET, prefetch/trust/verify env, locality integration, network_profile register-remote, admin migrating UI).
 
 ---
 
@@ -28,7 +26,7 @@ Research replenish ✅ (2026-06-08): PH-S135…S142 — code-first stubs/tests (
 | `GET /api/v1/grid/pricing` | `src/network/api/grid.rs` |
 | Oracle L1/L2/L3, metrics | `src/grid/galaxy_pricing_oracle.rs` |
 | Admin read-only | `/ui/admin/grid-pricing` |
-| E2E | `e2e/tests/grid_pricing.spec.ts` |
+| Wire tests (канон) | `tests/` + `cargo test-ci`; legacy `e2e/tests/grid_pricing.spec.ts` → §5.13 PH-S144 |
 
 Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GALAXY_PRICING_FORCE_FALLBACK`, `POOLAI_GALAXY_PRICING_PROVIDERS`.
 
@@ -47,48 +45,46 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 |-----------|--------|-----|
 | Поля `lease_*` на `JobRecord` | PH-S94 | `src/job/types.rs`, POST/GET jobs |
 | PATCH CAS `lease_epoch` | PH-S95 | `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` |
-| `JobStatus::Migrating` | PH-S104 ✅ | lifecycle + contract test `jobs_patch_migrating_lifecycle_roundtrip` + E2E `jobs_migrating.spec.ts` (PH-S133) |
+| `JobStatus::Migrating` | PH-S104 ✅ | lifecycle + contract test + legacy E2E PH-S133 |
 | Grid result lease CAS | PH-S110 ✅ | `GridResultBody.lease_epoch` |
-| E2E lease suite | PH-S107…S118 ✅ | `jobs_lease`, `grid_job_lease`, `grid_result_lease` |
+| Lease wire tests | PH-S107…S118 ✅ | Rust contracts + legacy Playwright → §5.13 |
 
 ### 2.4 Galaxy stubs (§5–§8) — MVP ✅
 
 | Компонент | Спринт | Де |
 |-----------|--------|-----|
-| Locality score | PH-S128 | `galaxy_locality.rs` |
-| Prefetch policy stub | PH-S129 | `dispatch.rs` |
-| Trust gate stub | PH-S130 | `galaxy_trust_score.rs` |
-| Wallet bind POST | PH-S131 | `virtual_node_telegram_wallet_service.rs` |
-| network_profile §8.1 | PH-S132 | `POOLAI_GALAXY_GRID.md` |
+| Locality score + rank integration | PH-S128, S138 | `galaxy_locality.rs`, `tests/galaxy_locality_rank_integration.rs` |
+| Prefetch policy stub + env | PH-S129, S136 | `dispatch.rs` |
+| Trust gate + metrics | PH-S130, S137 | `galaxy_trust_score.rs` |
+| Wallet bind POST + GET | PH-S131, S135, S139 | `virtual_node_telegram_wallet_service.rs`; Rust integration канон |
+| network_profile §8.1 docs | PH-S132 | `POOLAI_GALAXY_GRID.md` |
 
-**Post-MVP (черга §5.12):** PH-S135…S142 — stubs/tests (див. §3).
-
----
-
-## 3. Черга §5.12 (8 відкритих, 2026-06-13)
-
-| # | Sprint | Тема | Джерело | Стан |
-|---|--------|------|---------|------|
-| 1 | **PH-S135** | Telegram wallet GET lookup API | Galaxy §3.2 | відкрито |
-| 2 | **PH-S136** | Prefetch policy env wire stub | Galaxy §5.6 | відкрито |
-| 3 | **PH-S137** | Trust gate settlement metrics stub | Galaxy §6.5 | відкрито |
-| 4 | **PH-S138** | Locality rank integration test | PH-S128 | відкрито |
-| 5 | **PH-S139** | Telegram wallet bind E2E | PH-S131 | відкрито |
-| 6 | **PH-S140** | network_profile register-remote stub | Galaxy §8.1 | відкрито |
-| 7 | **PH-S141** | Admin jobs migrating badge UI | PH-S104 | відкрито |
-| 8 | **PH-S142** | Verification sample rate env stub | Galaxy §6.1 | відкрито |
-| — | **PH-S133** | Job Migrating lifecycle E2E | PH-S104 | **✅** |
-| — | **PH-S134** | Protocol middleware E2E smoke | PH-S103 | **✅** |
+**Відкрито §5.12:** PH-S140 register-remote `network_profile` · PH-S141 admin migrating badge · PH-S142 verify sample rate env.
 
 ---
 
-## 4. Research горизонт (після S142)
+## 3. Черга §5.12 (3 відкритих)
 
-| Джерело | Прогалина |
-|---------|-----------|
-| Galaxy §8.2 | fee settlement wire · Telegram VM probros MVP |
-| Galaxy §5.3 / §6 | `galaxy_shard_*`, `galaxy_verification_*` Prometheus |
-| Architect | LAN replication benchmarks — **BLOCKED** (2 хости) |
+| # | Sprint | Тема | Acceptance (Rust-first) | Стан |
+|---|--------|------|---------------------------|------|
+| 1 | **PH-S140** | network_profile register-remote stub | parse `metadata.network_profile`; **`tests/` integration** | відкрито |
+| 2 | **PH-S141** | Admin jobs migrating badge UI | badge + i18n; Playwright **admin smoke only** | відкрито |
+| 3 | **PH-S142** | Verification sample rate env stub | `POOLAI_GALAXY_VERIFY_*` parser; unit tests | відкрито |
+
+---
+
+## 4. Rust ratio 90–95% (§5.13, після S142)
+
+| Фаза | Sprints | Результат |
+|------|---------|-----------|
+| Audit baseline | PH-S143 | ratio report |
+| Dedupe API tests | PH-S144, S145 | Playwright API → Rust; `poolai-http-stand-smoke` |
+| Portable UI core | PH-S146, S147 | shared Rust crate + wasm32 POC |
+| Slim browser E2E | PH-S148, S150 | `e2e/` UI-only; CI ratio gate |
+
+Повна таблиця — FM **§5.13** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
+
+**Research горизонт (Galaxy wire):** §8.2 settlement · §5.3/§6 Prometheus — **після** ratio фази B або паралельно як Rust-only stubs.
 
 ---
 
@@ -100,7 +96,7 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 cargo fmt --all && cargo test-ci
 cargo run --bin poolai-openapi-gap-audit   # після API
-cd e2e && npm run test:ci                  # після src/ui/ або e2e/
+bash bin/e2e-playwright.sh --start         # лише src/ui/ або axe/visual scope
 ```
 
 ---
@@ -109,7 +105,8 @@ cd e2e && npm run test:ci                  # після src/ui/ або e2e/
 
 | Документ | Роль |
 |----------|------|
-| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 | Таблиця PH-S* |
+| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12, §5.13 | Таблиця PH-S* |
+| [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) | 90–95% + portability |
 | [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) | Витяг модулів |
-| [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) | Концепт §8.1 network_profile |
-| [`docs/vision/index.html`](../vision/index.html) | Візуальна карта (localhost:8765) |
+| [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) | Концепт |
+| [`docs/vision/index.html`](../vision/index.html) | Візуальна карта |

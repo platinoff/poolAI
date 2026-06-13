@@ -7,13 +7,16 @@ alwaysApply: true
 
 **Застосовується завжди.** Ігноруй застарілі згадки Python у `docs/archive/`, старих планах і чужих сесіях — канон нижче.
 
+**Ціль codebase:** **90–95% Rust** у product code (`src/`, `tests/`, `crates/`, `src/bin/`). Стратегія — [`docs/development/RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
+
 ## Канонічний стек
 
 | Шар | Технологія | Де |
 |-----|------------|-----|
 | **Runtime / API / ML / RAID / VM / tools** | **Rust** (`edition 2021`, `tokio`) | `src/`, `tests/`, `crates/`, `cargo run --bin …` |
-| **Admin UI** | HTML + CSS + **JavaScript** (vanilla) | `src/ui/` |
-| **E2E** | TypeScript / Playwright | `e2e/` |
+| **Admin UI** | HTML + CSS + **JavaScript** (vanilla); WASM — лише горизонт (див. testing policy) | `src/ui/` |
+| **API / wire verification** | **Rust** integration + contract tests | `tests/*_integration.rs`, `cargo test-ci` |
+| **Browser E2E (UI only)** | TypeScript / Playwright | `e2e/` — DOM, axe, visual; **не** дублювати API-only Rust tests |
 | **Ops / CI** | Bash — dev launch **`bin/`**, toolchain **`scripts/`** (див. `REPOSITORY_LAYOUT.md`) | MSYS2 UCRT64 |
 | **Workspace sidecar** | Rust crate (без `solana-sdk` у main) | `crates/poolai-solana-adapter/` |
 
@@ -35,12 +38,15 @@ alwaysApply: true
 
 ## Поведінка агента
 
-1. **Нові фічі** — Rust (або JS/TS для UI/e2e).
-2. **`rg '\.py$|python3|pytest'`** у репо — не додавати; архівні docs не канон.
-3. **OpenAPI gap audit** — `cargo run --bin poolai-openapi-gap-audit` (див. `OPENAPI_GAP_AUDIT_2026-05-19.md`).
-4. **Концепт:** `docs/concept/CONCEPT_UPDATE_2026-01-19.md`, `docs/ml/TURBOQUANT_INTEGRATION.md` — лише Rust.
+1. **Нові фічі** — Rust (або JS для UI glue; Playwright лише browser scope).
+2. **API/wire acceptance** — `tests/` Rust (`cargo test-ci`); див. [`poolai-testing-policy.mdc`](poolai-testing-policy.mdc).
+3. **`rg '\.py$|python3|pytest'`** у репо — не додавати; архівні docs не канон.
+4. **OpenAPI gap audit** — `cargo run --bin poolai-openapi-gap-audit` (див. `OPENAPI_GAP_AUDIT_2026-05-19.md`).
+5. **Концепт:** `docs/concept/CONCEPT_UPDATE_2026-01-19.md`, `docs/ml/TURBOQUANT_INTEGRATION.md` — лише Rust.
 
 ## Пов’язані правила
+
+- [`poolai-testing-policy.mdc`](poolai-testing-policy.mdc) — Rust-first pyramid, Playwright vs integration, MSYS2 PATH
 
 - `.cursor/rules/project-structure.md` — каталоги
 - `.cursor/rules/rust.md` — стиль Rust

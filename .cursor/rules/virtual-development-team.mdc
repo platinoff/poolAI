@@ -24,7 +24,8 @@ flowchart LR
 | Спринт | Один **PH-S*** з §5.12; scope лише файли спринту |
 | Тести | `cargo fmt --all` → `K8S_OPENAPI_ENABLED_VERSION=1.28 cargo test-ci`; Raft — `cargo test-raft-ci` за scope |
 | OpenAPI | Після API: `cargo run --bin poolai-openapi-gap-audit` (0) |
-| E2E | Після `src/ui/` / `e2e/`: `cd e2e && npm run test:ci` |
+| E2E (UI) | Лише scope `src/ui/` / axe / visual: `export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"` → `bash bin/e2e-playwright.sh --start` |
+| API wire | **Rust** `tests/*_integration.rs` — канон; Playwright API-smoke — legacy, не дублювати ([`poolai-testing-policy.mdc`](poolai-testing-policy.mdc)) |
 | Доки | PH-S* → ✅ у FM §5.12 + HANDOFF + `NEXT_SESSION_PROMPT` |
 | Git | MSYS2, [`git-push.md`](../commands/git-push.md), [`git-commit-msys.mdc`](git-commit-msys.mdc) |
 
@@ -35,14 +36,16 @@ flowchart LR
 | `cargo test-ci` | `gh run` на GitHub |
 | `cargo test-raft-ci` (Raft scope) | Linux-only visual baselines |
 | `poolai-openapi-gap-audit` (API scope) | Pa11y у cloud без стенду |
-| `e2e` `npm run test:ci` (UI scope) | on-demand baseline workflow |
+| `bash bin/e2e-playwright.sh --start` (лише UI / `src/ui/` / axe / visual) | on-demand baseline workflow |
+| API-only спринт без UI | Playwright skip без stand — не блокує push якщо `cargo test-ci` green |
 
 ## Research (черга PH-S* <10 відкритих)
 
 1. `rg "\- \[ \]" docs/development/NEXT_STEPS_ARCHITECT_*.md`
 2. [`DOCS_LEGACY_AUDIT`](../../docs/development/DOCS_LEGACY_AUDIT_2026-05-19.md)
-3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first)
-4. Приклад багатоспринтової смуги + docs-sync — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
+3. `rg "TODO|FIXME" src/` → нові PH-S* у FM §5.12 (code-first, **Rust integration** для API)
+4. Після закриття §5.12 смуги — replenish з **§5.13** ([`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md))
+5. Приклад багатоспринтової смуги + docs-sync — [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc) § «Приклад ітерації (PH-S97…S99)»
 
 ## Staging
 
@@ -55,3 +58,4 @@ flowchart LR
 - [`functionality-management.mdc`](functionality-management.mdc) — FM-менеджер (§5.1)
 - [`autonomous-orchestrator.mdc`](autonomous-orchestrator.mdc) — AUTO_RUN
 - [`docs-vision.mdc`](docs-vision.mdc) — `docs/vision/` після FM/HANDOFF
+- [`poolai-testing-policy.mdc`](poolai-testing-policy.mdc) — Rust-first tests vs Playwright

@@ -29,6 +29,16 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI || cd "S:/rust/poolAI"
 ```
 
+## Тести (Rust-first)
+
+Див. [`poolai-testing-policy.mdc`](poolai-testing-policy.mdc).
+
+| Scope | Команда |
+|-------|---------|
+| API / grid / job / telegram wire | `cargo fmt --all` → `cargo test-ci` (+ openapi-gap після API) |
+| Admin UI / axe / visual | + `bash bin/e2e-playwright.sh --start` (PATH **обов’язково** з `/ucrt64/bin`) |
+| Новий PH-S* API-only | `tests/*_integration.rs`, **не** новий Playwright spec |
+
 ## Shell
 
 | ❌ | ✅ |
@@ -64,7 +74,7 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 4. `git push origin main` + короткий самарі в чат.
 5. Оновити FM §5.12, HANDOFF, `NEXT_SESSION_PROMPT` (крок 12 + операційний зріз).
 
-**Research replenish:** коли відкритих PH-S* у §5.12 **< 10** — додати code-first рядки (орієнтир: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), `rg "TODO|FIXME" src/`), тримати **≤ 10** відкритих.
+**Research replenish:** коли відкритих PH-S* у §5.12 **< 10** — додати code-first **Rust** рядки (орієнтир: [`GALAXY_GRID_ROADMAP_2026-05-27.md`](../../docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md), `rg "TODO|FIXME" src/`), тримати **≤ 10** відкритих. Після S142 — **§5.13** ratio track.
 
 **Не повторювати в наступних спринтах:** вже закриті acceptance з FM (блок «Не повторювати» у `NEXT_SESSION_PROMPT`).
 
@@ -76,3 +86,6 @@ cd /s/rust/poolAI || cd "S:/rust/poolAI"
 | subject = `Co-authored-by:` | `git-commit-msys.mdc` |
 | Job scheduler | `src/job/scheduler.rs`, не `src/runtime/scheduler.rs` |
 | Редагування через `python` one-liner | Не використовувати Python у репо; застосовувати вбудовані редактори або канонічний Rust/bash flow |
+| `npm: command not found` у MSYS2 | `export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"` |
+| `Could not determine Node.js install directory` | MSYS2: `pacman -S mingw-w64-ucrt-x86_64-nodejs`; перевір `node.exe` у `/ucrt64/bin/` |
+| API-only спринт — чи потрібен Playwright? | Ні — Rust integration test; Playwright лише UI scope |

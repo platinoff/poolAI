@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-08 (research replenish · §5.12 **10** відкритих PH-S133…S142; vision rev 61)
+**Last updated:** 2026-06-13 (§5.12 **10** відкритих PH-S140…S150 · Rust ratio band)
 
 ## Canonical reading order
 
@@ -17,7 +17,9 @@
 9. **Інвентар** — кореневий [file_list.csv](../file_list.csv) (оновлюй також після змін у `src/services/`, `src/network/`, `.github/workflows/`, `.cursor/`, `docs/catalog/`); повний список: `git ls-files`.
 10. **Git push (Windows)** — [`.cursor/commands/git-push.md`](../.cursor/commands/git-push.md).
 11. **Витяг функціоналу** — [catalog/FUNCTIONALITY_DIGEST_2026-04-06.md](./catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) (зведення за доками та кодом).
-12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.12** — черга PH-S*); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
+12. **Керування функціоналом** — [catalog/FUNCTION_MANAGEMENT.md](./catalog/FUNCTION_MANAGEMENT.md) (звірка зі сталевим станом, прогалини, тікети `FM-*`, **§5.12** — черга PH-S*, **§5.13** — Rust ratio); правило Cursor — [`.cursor/rules/functionality-management.mdc`](../.cursor/rules/functionality-management.mdc).
+
+**Rust ratio 90–95%:** [development/RUST_RATIO_STRATEGY_2026-06-13.md](./development/RUST_RATIO_STRATEGY_2026-06-13.md) · testing [`.cursor/rules/poolai-testing-policy.mdc`](../.cursor/rules/poolai-testing-policy.mdc).
 
 **Сталевий стан (декларація CI / збірки / модулів)** — [status/STABLE_STATE_SUMMARY.md](./status/STABLE_STATE_SUMMARY.md). Звіряти разом із кроком 12 (**§5.1**); операційний зріз — [development/HANDOFF_NEW_SESSION.md](./development/HANDOFF_NEW_SESSION.md).
 

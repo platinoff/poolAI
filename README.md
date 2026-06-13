@@ -28,12 +28,14 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 | Layer | Stack |
 |-------|--------|
-| **Product** | **Rust** — `src/`, `tests/`, `crates/` |
-| **Admin UI** | HTML + JavaScript — `src/ui/` |
-| **E2E** | TypeScript — `e2e/` |
-| **Ops** | `bin/` (launch/LAN/verify), `scripts/` (toolchain), MSYS2 — [`REPOSITORY_LAYOUT.md`](docs/development/REPOSITORY_LAYOUT.md) |
+| **Product (target 90–95%)** | **Rust** — `src/`, `tests/`, `crates/`, `src/bin/` |
+| **Admin UI** | HTML + JS glue; **wasm32** shared logic (horizon) — `src/ui/` |
+| **Browser regression only** | Playwright — `e2e/` (smoke, admin, axe, visual) |
+| **Ops** | `bin/` (launch/LAN/verify), `scripts/` (toolchain), MSYS2 |
 
-**No Python** in the repository (0× `.py`; ML/TurboQuant — `src/ml/` on Rust). OpenAPI route audit: `cargo run --bin poolai-openapi-gap-audit`. Signed release verify (Galaxy §9.2): `cargo run --bin poolai-verify-release -- --manifest … --signature …`. Cursor agents: [`.cursor/rules/runtime-stack-policy.mdc`](.cursor/rules/runtime-stack-policy.mdc).
+**Strategy:** [`docs/development/RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) · testing [`.cursor/rules/poolai-testing-policy.mdc`](.cursor/rules/poolai-testing-policy.mdc).
+
+**No Python** in the repository (0× `.py`; ML/TurboQuant — `src/ml/` on Rust). OpenAPI route audit: `cargo run --bin poolai-openapi-gap-audit`. Cursor agents: [`.cursor/rules/runtime-stack-policy.mdc`](.cursor/rules/runtime-stack-policy.mdc).
 
 1. **Кореневий [`README.md`](README.md)** (цей файл) — швидкий старт, збірка, CI, посилання нижче.
 2. **[`docs/INDEX_2026-03-17.md`](docs/INDEX_2026-03-17.md)** — карта всього каталогу `docs/` (концепція, статус, ML, cloud, troubleshooting).
@@ -52,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S132 ✅. **Vision:** manifest rev 61. **Активна черга:** FM **§5.12** — **10** відкритих **PH-S133…S142** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **autoprogon (A+B) — 100%** (S34); **Horizon Layer C — 100%** (S35–S40). **Galaxy Grid wire:** PH-S65…S139 ✅. **Vision:** manifest rev 69. **Активна черга:** FM **§5.12** — **10** відкритих **PH-S140…S150** (Galaxy wire + Rust ratio 90–95%) — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 

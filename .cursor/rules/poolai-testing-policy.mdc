@@ -1,0 +1,67 @@
+---
+description: PoolAI testing — Rust-first pyramid; Playwright лише UI; WASM horizon; MSYS2 PATH
+globs: "{src/**,tests/**,crates/**,e2e/**,bin/e2e-playwright.sh}"
+alwaysApply: false
+---
+
+# Testing policy (PoolAI, Rust-first)
+
+**Застосовується разом з** [`runtime-stack-policy.mdc`](runtime-stack-policy.mdc) та [`virtual-development-team.mdc`](virtual-development-team.mdc).
+
+**Ціль codebase 90–95% Rust:** [`docs/development/RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) · FM **§5.13** (після PH-S142).
+
+## Піраміда (канон)
+
+| Рівень | Технологія | Коли | Локальний канон |
+|--------|------------|------|------------------|
+| Unit | Rust `#[cfg(test)]`, `tests/*.rs` mod tests | pure fn, parsers, lifecycle | `cargo test-ci` |
+| API / contract / wire | Rust **`tests/*_integration.rs`**, `tests/*_contracts.rs` | HTTP маршрути, OpenAPI, grid/job/telegram API | `cargo test-ci` + `poolai-openapi-gap-audit` |
+| Browser / DOM / a11y / visual | **Playwright** (`e2e/tests/*.spec.ts`) | `src/ui/`, login, axe, snapshots, admin panels | `bash bin/e2e-playwright.sh --start` |
+
+**Правило для нових PH-S* (code-first):**
+
+- **API-only** acceptance (POST/GET/PATCH, 4xx, JSON) → **Rust integration/contract test** у `tests/`, **не** новий Playwright spec.
+- **Playwright** — лише якщо acceptance вимагає **браузер** (DOM, i18n/theme, axe, visual, admin click-flow).
+- Існуючі Playwright API-smoke (`jobs_lease`, `protocol_middleware`, `telegram_wallet`, …) — **legacy**; не дублювати новими TS-файлами; при рефакторингу scope — переносити в Rust, Playwright лишати для UI-regression там де вже є.
+
+## WebAssembly — не заміна Playwright
+
+| WASM (wasm32) | Playwright |
+|---------------|------------|
+| Спільна **бізнес-логіка** Rust ↔ браузер (майбутній горизонт admin UI) | **Автоматизація браузера**: рендер HTML, CSS, a11y, snapshots |
+| Компіляція модулів (`wasm-bindgen` / UI framework) — окремий **FM-*** або PH-S* за явним запитом | Потрібен поки admin UI — HTML + JS glue у `src/ui/` |
+
+**Не пропонувати:** «замінити E2E на WASM» — WASM не виконує HTTP проти live stand і не замінює axe/visual.
+
+**Rust-first UI (поточний канон):** логіка координатора/API/validation — `src/` + `tests/`; `src/ui/` — thin vanilla JS; спільні правила не копіювати в TS для API-only перевірок.
+
+## MSYS2: npm / Playwright
+
+Node/npm — **`/ucrt64/bin`** (MSYS2 UCRT64). Без цього шляху `npm: command not found` у bash.
+
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+cd /s/rust/poolAI || cd "S:/rust/poolAI"
+bash bin/e2e-playwright.sh --start   # API smoke + UI; встановлює node_modules
+```
+
+**Агент / VDT:**
+
+| Scope спринту | Перед push |
+|---------------|------------|
+| `src/`, `tests/` без `src/ui/` | `cargo fmt --all` → `cargo test-ci` (+ openapi-gap за API) — **достатньо** |
+| `src/ui/` або зміни `e2e/` | + `bash bin/e2e-playwright.sh --start` (PATH з `/ucrt64/bin`) |
+| API-only PH-S* з legacy Playwright | Rust test — **канон**; Playwright skip без stand не блокує push якщо `cargo test-ci` green |
+
+**Node/npm зламаний у MSYS2** (`node.exe` missing, `Could not determine Node.js install directory`): `pacman -S mingw-w64-ucrt-x86_64-nodejs` у UCRT64; до ремонту — API scope закривати лише `cargo test-ci`.
+
+## Заборонено (як Python у runtime-stack)
+
+- Нові **API-only** Playwright specs замість Rust integration tests.
+- `pytest`, Python harness, Node scripts поза `e2e/` для продуктових перевірок.
+- PowerShell `npm` / `git` / `cargo` — MSYS2 bash (див. [`poolai-session-iteration.mdc`](poolai-session-iteration.mdc)).
+
+## Пов’язані доки
+
+- [`docs/development/E2E_PLAYWRIGHT.md`](../../docs/development/E2E_PLAYWRIGHT.md) — UI/browser E2E
+- [`docs/development/RUN_LOCAL.md`](../../docs/development/RUN_LOCAL.md) — stand + env

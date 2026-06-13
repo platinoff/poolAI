@@ -11,7 +11,8 @@
 
 ### Нова сесія / передача контексту
 - **[`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md)** — порядок документації, гілка `main`, посилання на `git-push`, короткий стан P2 і наступні кроки.
-- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid (PH-S65…S121 ✅, §5.12 **4** відкритих PH-S122…S124); синхрон з FM §5.12.
+- **[`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md)** — **ціль 90–95% Rust** + portability (wasm horizon); FM **§5.13** PH-S143…S150.
+- **[`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md)** — роадмеп Galaxy Grid; §5.12 **3** відкритих PH-S140…S142; sync FM.
 - **[`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md)** — **поточна фаза:** Horizon Layer C → 100% (S35–S40).
 - **[`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md)** — методика доведення проєкту до 100%.
 - **[`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)** — **humanized copy-paste** для агента; наступний спринт **PH-S122**; §5.12 **4** відкритих; [`OPENAPI_GAP_AUDIT_2026-05-19.md`](./OPENAPI_GAP_AUDIT_2026-05-19.md).

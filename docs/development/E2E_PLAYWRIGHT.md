@@ -1,5 +1,7 @@
 # Playwright E2E smoke (S23 / S27 / S29 / PH-S11)
 
+**Rust-first policy:** API/wire acceptance — **`tests/*_integration.rs` + `cargo test-ci`** (канон). Playwright — **лише browser/UI** (DOM, axe, visual, admin flows). Див. [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc). Legacy API-smoke specs нижче залишаються до поступового переносу в Rust.
+
 **Status:** Smoke + admin (повний P1 surface) + axe + **visual regression** (`smoke.spec.ts`, `admin.spec.ts`, `a11y.spec.ts`, `visual.spec.ts`).
 
 | Spec | Сценарії |
@@ -19,7 +21,7 @@
 Потрібні: Node.js 20+, `npm`, зібраний `poolai` (`enterprise` features).
 
 ```bash
-export PATH="$HOME/.cargo/bin:/c/msys64/ucrt64/bin:/c/msys64/usr/bin:$PATH"
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
 export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 

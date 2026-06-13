@@ -33,6 +33,7 @@ alwaysApply: true
 |-----------|--------|
 | **§5.1** | Порядок **FM-*** (функціональні тікети) |
 | **§5.12** | Черга **PH-S*** (спринти; ≤10 відкритих) |
+| **§5.13** | Rust ratio **90–95%** (після S142; PH-S143…S150) — [`RUST_RATIO_STRATEGY_2026-06-13.md`](../../docs/development/RUST_RATIO_STRATEGY_2026-06-13.md) |
 | **HANDOFF** + **NEXT_SESSION_PROMPT** | Операційний зріз і copy-paste промпт сесії |
 
 **Ітераційна розробка:** промпт з [`NEXT_SESSION_PROMPT.md`](../../docs/development/NEXT_SESSION_PROMPT.md) → один **PH-S*** з §5.12.

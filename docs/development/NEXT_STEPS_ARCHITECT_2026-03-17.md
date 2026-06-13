@@ -12,7 +12,7 @@
 - **Мета цього плану**: довести до кінця **архітектурні покращення**, які вже згадані в документації (Global State, Service Layer, Error Context, Performance profiling), щоб:
   - спростити підтримку великого коду,
   - покращити тестованість,
-  - узгодити структуру з типовою 100% Rust/Axum архітектурою.
+  - узгодити структуру з типовою **100% Rust runtime / 90–95% product codebase** архітектурою ([`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md)).
 
 ---
 
@@ -29,6 +29,7 @@
 | **5** | **Priority 4** | Hot-path профілювання, **бенчмарки** (Criterion тощо); **`poolai_health_load`** з **`--json`** на stdout для baseline / ref-хост (2026-04-06). Далі вручну: рядки таблиці **`BENCHMARKS.md`**, LAN P2b на стенді. |
 | **6** | **Priority 5** | **Закрито (концепт):** архівні плани + інвентар TODO у `src/`; optional `cloud-sdk` доробки окремо. |
 | **7** | **Priority 6** | Grid / Job / Memory / Solana — **концепти** ✅ + **wire код** S35–S38 (`src/grid`, `src/job`, `src/memory`, adapter crate); on-chain RPC — майбутнє. |
+| **8** | **Priority 8** | **Rust codebase ratio 90–95%** + portability — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md), FM **§5.13** (PH-S143…S150): API tests у `tests/`, slim Playwright, `poolai-ui-core` + wasm32 horizon. |
 
 *Опційно паралельно з 1–2*: **`cargo clippy` з `-D warnings` за матрицями `.github/workflows/ci.yml`** (без default features, `jwt,https`, `cloud,cloud-sdk`) — **закрито на `main` (2026-04-10)**. Далі: стабілізація **`cargo test --all-features`** на Windows (GNU toolchain / розбиття тестів) — не блокує рядок 1–3, але зменшує фрикцію CI.
 

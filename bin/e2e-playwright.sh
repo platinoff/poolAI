@@ -131,7 +131,7 @@ for arg in "$@"; do
 done
 
 if [[ "$DO_START" == true ]]; then
-  export PATH="${HOME}/.cargo/bin:/usr/bin:${PATH}"
+  export PATH="${HOME}/.cargo/bin:/ucrt64/bin:/usr/bin:${PATH}"
   E2E_PROFILE="release"
   if [[ "${CI:-}" == "true" ]]; then
     E2E_PROFILE="debug"
@@ -149,6 +149,7 @@ if ! curl -sf --max-time 2 "${POOLAI_BASE_URL}/api/v1/health" >/dev/null; then
 fi
 
 cd "${ROOT}/e2e"
+export PATH="/ucrt64/bin:${HOME}/.cargo/bin:/usr/bin:${PATH}"
 if [[ ! -d node_modules/@playwright/test ]]; then
   echo "Installing e2e dependencies..."
   npm install
