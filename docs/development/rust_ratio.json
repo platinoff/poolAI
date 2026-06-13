@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-06-13",
-  "sprint": "PH-S152",
+  "sprint": "PH-S153",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.88,
@@ -8,11 +8,11 @@
   "stretch_spirit": 0.96,
   "advisory_mode": false,
   "min_ratio": 0.91,
-  "rust_loc": 107725,
-  "non_rust_product_loc": 9377,
-  "product_loc_total": 117102,
-  "rust_ratio": 0.9199245102560161,
-  "rust_ratio_pct": 91.99245102560161,
+  "rust_loc": 107902,
+  "non_rust_product_loc": 9002,
+  "product_loc_total": 116904,
+  "rust_ratio": 0.9229966468213234,
+  "rust_ratio_pct": 92.29966468213235,
   "in_formal_band": true,
   "below_warn_threshold": false,
   "below_target": true,
@@ -21,7 +21,7 @@
   "by_category": {
     "e2e_ts": {
       "files": 8,
-      "loc": 1008
+      "loc": 1018
     },
     "ops_ps1": {
       "files": 16,
@@ -37,11 +37,11 @@
     },
     "rust_crates": {
       "files": 20,
-      "loc": 2436
+      "loc": 2515
     },
     "rust_src": {
-      "files": 229,
-      "loc": 82978
+      "files": 230,
+      "loc": 83076
     },
     "rust_tests": {
       "files": 112,
@@ -53,13 +53,13 @@
     },
     "ui_js": {
       "files": 4,
-      "loc": 3924
+      "loc": 3539
     }
   },
   "notes": [
     "Denominator: product code only (strategy §1); docs/yaml/png excluded",
     "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
-    "PH-S152: shared POOLAI_UI_WASM_MODULE; jobs leaseStateLabel via wasm",
+    "PH-S153: poolai-ui-core/table + wasm; admin_common.js −426 LOC",
     "PH-S150: CI --advisory warns below warn_below; stretch spirit documented via --stretch"
   ]
 }

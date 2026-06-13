@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 (PH-S152 ✅ · §5.12 **7** відкритих PH-S153…S159 · rust_ratio **91.99%** · stretch **96%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-13 (PH-S153 ✅ · §5.12 **6** відкритих PH-S154…S159 · rust_ratio **92.30%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -113,12 +113,12 @@
 **PH-S150 ✅ (ops/code):** `poolai-loc-audit` — CLI `--warn-below` / `--target` / `--stretch` / `--advisory` / `--min-ratio`; CI job `rust-ratio-audit` (`.github/workflows/ci.yml`); GitHub `::warning::` below 88%; `rust_ratio.json` **92.00%** ≥91%; stretch spirit **96%** documented.
 **PH-S151 ✅ (code/e2e):** `/ui/admin/grid-pricing` → `poolai-ui-wasm` module (`formatUsdMicro`, `formatUnixSecs`); static `/ui/wasm/*` via `src/ui/wasm_static.rs`; JS fallback when wasm absent; `e2e-playwright.sh --start` builds wasm when `wasm-bindgen` present; Playwright admin smoke PH-S151.
 **PH-S152 ✅ (code/e2e):** shared `POOLAI_UI_WASM_MODULE` in `src/ui/admin/mod.rs`; `/ui/admin/jobs` lease badges via wasm `leaseStateLabel` + thin JS fallback; grid-pricing migrated to `window.poolaiUiWasm`; Playwright admin smoke PH-S152; `cargo test-ci`.
-**Vision ✅:** next **PH-S153**.
-**Research replenish (2026-06-13):** §5.12 **1→10** — ratio stretch band PH-S150…S159 (CI advisory → wasm wiring → slim JS/i18n/charts → Rust e2e/stand bins → **96%** gate). Baseline **91.99%**; spirit **96%**.
+**PH-S153 ✅ (code):** `crates/poolai-ui-core/src/table.rs` + wasm exports (`escapeHtml`, `apiError*`, `formatFetchError`, table HTML/CSV/JSON/sort/filter); `admin_common.js` **−426 LOC** (879 lines); theme/modal → `admin_theme.js` / `admin_modal_a11y.js`; wasm bootstrap on all admin pages; **rust_ratio 92.30%**.
+**Vision ✅:** next **PH-S154**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **7** відкритих — **PH-S153** (наступний) … **PH-S159**. Ratio stretch band — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **91.99%** · spirit **96%**.
+**Черга:** §5.12 **6** відкритих — **PH-S154** (наступний) … **PH-S159**. Ratio stretch band — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **92.30%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

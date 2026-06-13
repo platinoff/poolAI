@@ -9,109 +9,6 @@ function poolaiT(key, enFallback) {
   return enFallback !== undefined ? enFallback : key;
 }
 
-/** PH-S12 / PH-S14: dark + light + high-contrast tokens (aligned with themes.rs). */
-const POOLAI_UI_THEMES = {
-  dark: {
-    bg: '#0f1216',
-    surface: '#171b22',
-    surfaceSecondary: '#1e2329',
-    text: '#e8e8e8',
-    textMuted: '#a8b0bf',
-    border: '#262b36',
-    primary: '#67e480',
-    primaryHover: '#50fa7b',
-    secondary: '#6272a4',
-    secondaryHover: '#7a8bc4',
-    danger: '#c62828',
-    dangerHover: '#e53935',
-    warning: '#ffb86c',
-    info: '#8be9fd',
-    success: '#50fa7b',
-    link: '#77c7ff',
-    linkHover: '#8bd5ff',
-  },
-  light: {
-    bg: '#ffffff',
-    surface: '#f5f5f5',
-    surfaceSecondary: '#e8e8e8',
-    text: '#1a1a1a',
-    textMuted: '#666666',
-    border: '#d0d0d0',
-    primary: '#00a86b',
-    primaryHover: '#00c47a',
-    secondary: '#6c757d',
-    secondaryHover: '#5a6268',
-    danger: '#dc3545',
-    dangerHover: '#c82333',
-    warning: '#ffc107',
-    info: '#17a2b8',
-    success: '#28a745',
-    link: '#007bff',
-    linkHover: '#0056b3',
-  },
-  'high-contrast': {
-    bg: '#000000',
-    surface: '#1a1a1a',
-    surfaceSecondary: '#000000',
-    text: '#ffffff',
-    textMuted: '#e0e0e0',
-    border: '#ffffff',
-    primary: '#00ff00',
-    primaryHover: '#00cc00',
-    secondary: '#ffff00',
-    secondaryHover: '#cccc00',
-    danger: '#ff0000',
-    dangerHover: '#cc0000',
-    warning: '#ffff00',
-    info: '#00ffff',
-    success: '#00ff00',
-    link: '#00aaff',
-    linkHover: '#0088cc',
-  },
-};
-
-function poolaiNormalizeTheme(name) {
-  if (name === 'light' || name === 'high-contrast') return name;
-  return 'dark';
-}
-
-function poolaiApplyTheme(themeName) {
-  const normalized = poolaiNormalizeTheme(themeName);
-  const theme = POOLAI_UI_THEMES[normalized] || POOLAI_UI_THEMES.dark;
-  const root = document.documentElement;
-  root.style.setProperty('--bg', theme.bg);
-  root.style.setProperty('--surface', theme.surface);
-  root.style.setProperty('--surface-secondary', theme.surfaceSecondary);
-  root.style.setProperty('--text', theme.text);
-  root.style.setProperty('--text-muted', theme.textMuted);
-  root.style.setProperty('--border', theme.border);
-  root.style.setProperty('--primary', theme.primary);
-  root.style.setProperty('--primary-hover', theme.primaryHover);
-  root.style.setProperty('--secondary', theme.secondary);
-  root.style.setProperty('--secondary-hover', theme.secondaryHover);
-  root.style.setProperty('--danger', theme.danger);
-  root.style.setProperty('--danger-hover', theme.dangerHover);
-  root.style.setProperty('--warning', theme.warning);
-  root.style.setProperty('--info', theme.info);
-  root.style.setProperty('--success', theme.success);
-  root.style.setProperty('--link', theme.link);
-  root.style.setProperty('--link-hover', theme.linkHover);
-  root.dataset.poolaiTheme = normalized;
-}
-
-function poolaiInitThemeFromStorage() {
-  let name = 'dark';
-  try {
-    name = localStorage.getItem('poolai_theme') || 'dark';
-  } catch (e) {
-    name = 'dark';
-  }
-  poolaiApplyTheme(poolaiNormalizeTheme(name));
-}
-
-window.poolaiApplyTheme = poolaiApplyTheme;
-window.poolaiInitThemeFromStorage = poolaiInitThemeFromStorage;
-window.poolaiNormalizeTheme = poolaiNormalizeTheme;
 
 // API base URL
 const API_BASE = '/api/v1';
@@ -119,8 +16,18 @@ const API_BASE = '/api/v1';
 // Enterprise API base URL
 const ENTERPRISE_API_BASE = '/api/enterprise';
 
+function poolaiUiWasmCall(name) {
+  const w = window.poolaiUiWasm;
+  return w && w.ready && typeof w[name] === 'function' ? w[name] : null;
+}
+
 /** Parse API error body: legacy flat `error` string or `{ error: { code, message } }`. */
 function apiErrorMessageFromBody(payload) {
+  const fn = poolaiUiWasmCall('apiErrorMessageFromBody');
+  if (fn) {
+    const msg = fn(JSON.stringify(payload || {}));
+    return msg || null;
+  }
   if (!payload || typeof payload !== 'object') return null;
   const e = payload.error;
   if (typeof e === 'string') return e;
@@ -130,6 +37,8 @@ function apiErrorMessageFromBody(payload) {
 }
 
 function apiErrorDetailFromBody(payload) {
+  const fn = poolaiUiWasmCall('apiErrorDetailFromBody');
+  if (fn) return fn(JSON.stringify(payload || {}));
   const message = apiErrorMessageFromBody(payload);
   let code = null;
   let hint = null;
@@ -144,42 +53,31 @@ function apiErrorDetailFromBody(payload) {
 
 function hintFor503(code, message) {
   if (code === 'RAID_MANAGER_UNAVAILABLE') {
-    return poolaiT(
-      'err.hint503.raid',
-      'RAID manager is not initialized on this server.',
-    );
+    return poolaiT('err.hint503.raid', 'RAID manager is not initialized on this server.');
   }
   const m = message || '';
-  if (/library/i.test(m))
-    return poolaiT('err.hint503.library', 'Library subsystem may not be initialized.');
+  if (/library/i.test(m)) return poolaiT('err.hint503.library', 'Library subsystem may not be initialized.');
   if (/\bvm\b/i.test(m)) return poolaiT('err.hint503.vm', 'VM manager may not be attached.');
   return poolaiT('err.hint503.generic', 'A subsystem may still be starting or unavailable.');
 }
 
 function formatFetchError(status, url, payload) {
+  const fn = poolaiUiWasmCall('formatFetchError');
+  if (fn) return fn(status, url || '', JSON.stringify(payload || {}));
   const { message, code, hint } = apiErrorDetailFromBody(payload);
-  const base = message || ('HTTP ' + status);
+  const base = message || 'HTTP ' + status;
   let extra = hint || '';
-  if (status === 403 && !extra) {
-    extra = poolaiT(
-      'err.hint403',
-      'You may need Admin or Operator role, or sign in again.',
-    );
-  }
-  if (status === 503 && !extra) {
-    extra = hintFor503(code, base);
-  }
+  if (status === 403 && !extra) extra = poolaiT('err.hint403', 'You may need Admin or Operator role, or sign in again.');
+  if (status === 503 && !extra) extra = hintFor503(code, base);
   if (status === 404 && url && url.indexOf('/api/enterprise') !== -1 && !extra) {
-    extra = poolaiT(
-      'err.hint404.enterprise',
-      'Build and run the server with the enterprise feature for this API.',
-    );
+    extra = poolaiT('err.hint404.enterprise', 'Build and run the server with the enterprise feature for this API.');
   }
-  if (extra) return base + ' — ' + extra;
-  return base;
+  return extra ? base + ' — ' + extra : base;
 }
 
 function escapeHtml(s) {
+  const fn = poolaiUiWasmCall('escapeHtml');
+  if (fn) return fn(String(s));
   return String(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -387,247 +285,6 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// Modal system — FM-019: overlay, aria-modal, focus trap, Esc (admin users/security + dynamic)
-const MODAL_FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
-const ADMIN_DYNAMIC_MODAL_ID = 'adminDynamicModal';
-
-let activeModal = null;
-let activeOverlay = null;
-let previousActiveElement = null;
-
-function getModalFocusableElements(modal) {
-  return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)).filter(
-    (el) => el.offsetParent !== null || el === document.activeElement,
-  );
-}
-
-function focusInitialModalElement(modal) {
-  const focusable = getModalFocusableElements(modal);
-  if (focusable.length > 0) {
-    focusable[0].focus();
-    return;
-  }
-  if (!modal.hasAttribute('tabindex')) {
-    modal.setAttribute('tabindex', '-1');
-  }
-  modal.focus();
-}
-
-function attachModalA11y(modal) {
-  modal.removeEventListener('keydown', trapModalFocus);
-  modal.removeEventListener('focusin', keepFocusInModal);
-  modal.addEventListener('keydown', trapModalFocus);
-  modal.addEventListener('focusin', keepFocusInModal);
-  document.removeEventListener('keydown', handleModalEscape);
-  document.addEventListener('keydown', handleModalEscape);
-}
-
-function detachModalA11y(modal) {
-  if (modal) {
-    modal.removeEventListener('keydown', trapModalFocus);
-    modal.removeEventListener('focusin', keepFocusInModal);
-  }
-  document.removeEventListener('keydown', handleModalEscape);
-}
-
-/** Static modal by id, or dynamic: showModal(title, htmlContent) for instances/topology. */
-function showModal(modalIdOrTitle, optionalContent) {
-  if (typeof optionalContent === 'string') {
-    showModalContent(modalIdOrTitle, optionalContent);
-    return;
-  }
-  const modalId = modalIdOrTitle;
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    console.warn('Modal not found:', modalId);
-    return;
-  }
-
-  if (activeModal && activeModal !== modal) {
-    detachModalA11y(activeModal);
-    activeModal.setAttribute('aria-hidden', 'true');
-    activeModal.setAttribute('aria-modal', 'false');
-  }
-
-  previousActiveElement = document.activeElement;
-
-  let overlay = modal.closest('.modal-overlay');
-  if (!overlay) {
-    overlay = createModalOverlay(modal);
-  }
-
-  modal.setAttribute('aria-hidden', 'false');
-  modal.setAttribute('aria-modal', 'true');
-  overlay.classList.add('active');
-  activeModal = modal;
-  activeOverlay = overlay;
-  document.body.style.overflow = 'hidden';
-
-  attachModalA11y(modal);
-  setTimeout(() => {
-    focusInitialModalElement(modal);
-    adminEnhanceFormA11y(modal);
-  }, 100);
-}
-
-function hideModal(modalId) {
-  const id = modalId || (activeModal && activeModal.id);
-  if (!id) return;
-  const modal = document.getElementById(id);
-  if (!modal) {
-    console.warn('Modal not found:', id);
-    return;
-  }
-
-  modal.setAttribute('aria-hidden', 'true');
-  modal.setAttribute('aria-modal', 'false');
-
-  const overlay = modal.closest('.modal-overlay');
-  if (overlay) {
-    overlay.classList.remove('active');
-  }
-
-  detachModalA11y(modal);
-
-  if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
-    previousActiveElement.focus();
-  }
-  previousActiveElement = null;
-  activeModal = null;
-  activeOverlay = null;
-  document.body.style.overflow = '';
-}
-
-function ensureAdminDynamicModal() {
-  let modal = document.getElementById(ADMIN_DYNAMIC_MODAL_ID);
-  if (modal) return modal;
-  modal = document.createElement('div');
-  modal.id = ADMIN_DYNAMIC_MODAL_ID;
-  modal.className = 'modal';
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-labelledby', 'adminDynamicModalTitle');
-  modal.setAttribute('aria-modal', 'false');
-  modal.setAttribute('aria-hidden', 'true');
-  modal.innerHTML =
-    '<div class="modal-content">' +
-    '<div class="modal-header">' +
-    '<h3 id="adminDynamicModalTitle"></h3>' +
-    '<button type="button" class="modal-close" data-i18n-aria="ui.closeDialogAria" onclick="hideModal(\'' +
-    ADMIN_DYNAMIC_MODAL_ID +
-    '\')">&times;</button>' +
-    '</div>' +
-    '<div id="adminDynamicModalBody" class="modal-body"></div>' +
-    '</div>';
-  document.body.appendChild(modal);
-  return modal;
-}
-
-function showModalContent(title, bodyHtml) {
-  ensureAdminDynamicModal();
-  const titleEl = document.getElementById('adminDynamicModalTitle');
-  const bodyEl = document.getElementById('adminDynamicModalBody');
-  if (titleEl) titleEl.textContent = title;
-  if (bodyEl) bodyEl.innerHTML = bodyHtml;
-  adminEnhanceFormA11y(modal);
-  showModal(ADMIN_DYNAMIC_MODAL_ID);
-}
-
-function createModalOverlay(modal) {
-  let overlay = document.getElementById('modal-overlay-global');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'modal-overlay-global';
-    overlay.className = 'modal-overlay';
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay && activeModal) {
-        hideModal(activeModal.id);
-      }
-    });
-  }
-  if (modal.parentElement !== overlay) {
-    overlay.appendChild(modal);
-  }
-  return overlay;
-}
-
-function keepFocusInModal(e) {
-  if (!activeModal || activeModal.contains(e.target)) return;
-  const focusable = getModalFocusableElements(activeModal);
-  if (focusable.length > 0) {
-    focusable[0].focus();
-  } else {
-    focusInitialModalElement(activeModal);
-  }
-}
-
-function trapModalFocus(e) {
-  if (!activeModal || e.key !== 'Tab') return;
-
-  const focusable = getModalFocusableElements(activeModal);
-  if (focusable.length === 0) {
-    e.preventDefault();
-    focusInitialModalElement(activeModal);
-    return;
-  }
-
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  const active = document.activeElement;
-  const inside = activeModal.contains(active);
-
-  if (e.shiftKey) {
-    if (!inside || active === first) {
-      e.preventDefault();
-      last.focus();
-    }
-  } else if (!inside || active === last) {
-    e.preventDefault();
-    first.focus();
-  }
-}
-
-function handleModalEscape(e) {
-  if (e.key === 'Escape' && activeModal) {
-    e.preventDefault();
-    hideModal(activeModal.id);
-  }
-}
-
-/** FM-019: sync aria-selected / aria-labelledby after tab change (security, config). */
-function adminSyncTabA11y(tablist) {
-  if (!tablist) return;
-  const panelId = tablist.querySelector('.tab[aria-controls]')?.getAttribute('aria-controls');
-  const panel = panelId ? document.getElementById(panelId) : null;
-  tablist.querySelectorAll('.tab').forEach((tab) => {
-    const selected = tab.classList.contains('active');
-    tab.setAttribute('aria-selected', selected ? 'true' : 'false');
-    tab.setAttribute('tabindex', selected ? '0' : '-1');
-    if (selected && panel && tab.id) {
-      panel.setAttribute('aria-labelledby', tab.id);
-    }
-  });
-}
-
-function initTabs() {
-  document.querySelectorAll('.admin-tabs').forEach((tablist) => {
-    const section = tablist.closest('.admin-section');
-    if (!section) return;
-    const panel = section.querySelector('#security-content, #config-content');
-    if (!panel || !panel.id) return;
-    if (!tablist.getAttribute('role')) tablist.setAttribute('role', 'tablist');
-    panel.setAttribute('role', 'tabpanel');
-    tablist.querySelectorAll('.tab').forEach((tab) => {
-      if (!tab.id && tab.dataset.tab) {
-        tab.id = panel.id + '-tab-' + tab.dataset.tab;
-      }
-      if (!tab.getAttribute('role')) tab.setAttribute('role', 'tab');
-      if (!tab.getAttribute('aria-controls')) tab.setAttribute('aria-controls', panel.id);
-    });
-    adminSyncTabA11y(tablist);
-  });
-}
 
 /** FM-019: scope on th, aria-label from section heading for dynamic admin tables. */
 function adminEnhanceTablesA11y(root) {
@@ -670,10 +327,6 @@ function adminApplyDesignSystem(root) {
   });
 }
 
-function adminEscapeRegex(str) {
-  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function adminTableDataRows(table) {
   const tbody = table.querySelector('tbody');
   if (!tbody) return [];
@@ -686,43 +339,40 @@ function adminFilterTable(table, query, options) {
   const opts = options || {};
   const tbody = table.querySelector('tbody');
   if (!tbody) return 0;
-
   const rows = adminTableDataRows(table);
   let visibleCount = 0;
   const highlightMatches = opts.highlightMatches !== false;
   const matchColumns = opts.matchColumns || null;
-  const q = (query || '').toLowerCase().trim();
+  const q = (query || '').trim();
+  const matchFn = poolaiUiWasmCall('rowMatchesQuery');
+  const highlightFn = poolaiUiWasmCall('highlightQueryHtml');
 
   rows.forEach((row) => {
-    let matches;
+    let rowText = row.textContent || '';
     if (matchColumns && Array.isArray(matchColumns)) {
-      const rowText = Array.from(row.cells)
+      rowText = Array.from(row.cells)
         .filter((cell, index) => matchColumns.includes(index))
         .map((cell) => cell.textContent)
-        .join(' ')
-        .toLowerCase();
-      matches = !q || rowText.includes(q);
-    } else {
-      matches = !q || row.textContent.toLowerCase().includes(q);
+        .join(' ');
     }
+    const matches = matchFn
+      ? matchFn(rowText, q)
+      : !q || rowText.toLowerCase().includes(q.toLowerCase());
 
     if (matches) {
       row.style.display = '';
       row.setAttribute('aria-hidden', 'false');
       visibleCount++;
-
       if (highlightMatches && q) {
         row.querySelectorAll('td').forEach((cell) => {
           const originalText = cell.dataset.originalText || cell.textContent;
-          if (!cell.dataset.originalText) {
-            cell.dataset.originalText = cell.textContent;
-          }
-          const regex = new RegExp('(' + adminEscapeRegex(q) + ')', 'gi');
-          const highlighted = originalText.replace(
-            regex,
-            '<mark class="admin-table-highlight">$1</mark>',
-          );
-          cell.innerHTML = highlighted;
+          if (!cell.dataset.originalText) cell.dataset.originalText = cell.textContent;
+          cell.innerHTML = highlightFn
+            ? highlightFn(originalText, q)
+            : originalText.replace(
+                new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'),
+                '<mark class="admin-table-highlight">$1</mark>',
+              );
         });
       } else {
         row.querySelectorAll('td').forEach((cell) => {
@@ -759,7 +409,6 @@ function adminFilterTable(table, query, options) {
   } else if (noResultsRow) {
     noResultsRow.style.display = 'none';
   }
-
   return visibleCount;
 }
 
@@ -789,33 +438,25 @@ function adminUpdateTableSearchStatus(table, visibleCount, totalCount, query) {
 function adminSortTable(table, columnIndex, ascending) {
   const tbody = table.querySelector('tbody');
   if (!tbody) return;
-
   const rows = adminTableDataRows(table);
   const isNumeric = rows.every((row) => {
     const cell = row.cells[columnIndex];
     return cell && !isNaN(parseFloat(cell.textContent));
   });
-
+  const cmpFn = poolaiUiWasmCall('compareSortValues');
   rows.sort((a, b) => {
     const aCell = a.cells[columnIndex];
     const bCell = b.cells[columnIndex];
     if (!aCell || !bCell) return 0;
-
-    const aValue = isNumeric
-      ? parseFloat(aCell.textContent)
-      : aCell.textContent.trim().toLowerCase();
-    const bValue = isNumeric
-      ? parseFloat(bCell.textContent)
-      : bCell.textContent.trim().toLowerCase();
-
+    if (cmpFn) return cmpFn(aCell.textContent, bCell.textContent, isNumeric, ascending);
+    const aValue = isNumeric ? parseFloat(aCell.textContent) : aCell.textContent.trim().toLowerCase();
+    const bValue = isNumeric ? parseFloat(bCell.textContent) : bCell.textContent.trim().toLowerCase();
     if (aValue < bValue) return ascending ? -1 : 1;
     if (aValue > bValue) return ascending ? 1 : -1;
     return 0;
   });
-
   rows.forEach((row) => row.remove());
   rows.forEach((row) => tbody.appendChild(row));
-
   table.querySelectorAll('thead th').forEach((header, index) => {
     if (index === columnIndex) {
       header.setAttribute('data-sort', ascending ? 'asc' : 'desc');
@@ -875,18 +516,15 @@ function adminTableVisibleRows(table) {
 }
 
 function adminExportTableCsv(table, filename) {
-  const headers = Array.from(table.querySelectorAll('thead th')).map((th) =>
-    th.textContent.trim(),
-  );
+  const headers = Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim());
   const rows = adminTableVisibleRows(table).map((row) =>
-    Array.from(row.cells).map((cell) => {
-      const text = cell.dataset.originalText || cell.textContent.trim();
-      if (/[",\n]/.test(text)) return '"' + text.replace(/"/g, '""') + '"';
-      return text;
-    }),
+    Array.from(row.cells).map((cell) => cell.dataset.originalText || cell.textContent.trim()),
   );
-  const lines = [headers.join(',')].concat(rows.map((r) => r.join(',')));
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const buildFn = poolaiUiWasmCall('buildTableCsv');
+  const csv = buildFn
+    ? buildFn(JSON.stringify(headers), JSON.stringify(rows))
+    : [headers.join(',')].concat(rows.map((r) => r.join(','))).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -897,20 +535,25 @@ function adminExportTableCsv(table, filename) {
 }
 
 function adminExportTableJson(table, filename) {
-  const headers = Array.from(table.querySelectorAll('thead th')).map((th) =>
-    th.textContent.trim(),
+  const headers = Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim());
+  const rows = adminTableVisibleRows(table).map((row) =>
+    Array.from(row.cells).map((cell) => cell.dataset.originalText || cell.textContent.trim()),
   );
-  const data = adminTableVisibleRows(table).map((row) => {
-    const obj = {};
-    headers.forEach((h, i) => {
-      const cell = row.cells[i];
-      obj[h] = cell ? (cell.dataset.originalText || cell.textContent.trim()) : '';
-    });
-    return obj;
-  });
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: 'application/json;charset=utf-8',
-  });
+  const buildFn = poolaiUiWasmCall('buildTableJson');
+  const json = buildFn
+    ? buildFn(JSON.stringify(headers), JSON.stringify(rows))
+    : JSON.stringify(
+        rows.map((row) => {
+          const obj = {};
+          headers.forEach((h, i) => {
+            obj[h] = row[i] || '';
+          });
+          return obj;
+        }),
+        null,
+        2,
+      );
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -1060,6 +703,58 @@ function adminInitTablesIn(root) {
   });
 }
 
+/** PH-S42 / PH-S153: empty state via poolai-ui-wasm when ready. */
+function adminEmptyStateHtml(message, options) {
+  const opts = options || {};
+  const fn = poolaiUiWasmCall('emptyStateHtml');
+  const msg = message || poolaiT('admin.table.empty', 'No data to display');
+  if (fn) {
+    return fn(msg, opts.hint || '', opts.icon || '📋', opts.actionHtml || '');
+  }
+  return (
+    '<div class="admin-empty-state" role="status"><div class="admin-empty-state-icon" aria-hidden="true">' +
+    (opts.icon || '📋') +
+    '</div><p class="admin-empty-state-title">' +
+    escapeHtml(msg) +
+    '</p></div>'
+  );
+}
+
+/** PH-S09 / PH-S42 / PH-S153: table HTML via poolai-ui-wasm when ready. */
+function adminRenderTable(headers, rows, options) {
+  const fn = poolaiUiWasmCall('renderTableHtml');
+  if (fn) {
+    return fn(JSON.stringify(headers || []), JSON.stringify(rows || []), JSON.stringify(options || {}));
+  }
+  if (!rows || rows.length === 0) {
+    return adminEmptyStateHtml(
+      (options || {}).emptyMessage || poolaiT('admin.table.empty', 'No data to display'),
+      (options || {}).emptyOptions,
+    );
+  }
+  return '<div class="admin-table-container"><table class="admin-table admin-table--striped"><tbody><tr><td>' +
+    escapeHtml(String(rows.length)) +
+    ' rows</td></tr></tbody></table></div>';
+}
+
+/** PH-S09 / PH-S153: form field markup via poolai-ui-wasm when ready. */
+function adminFormFieldHtml(spec) {
+  const fn = poolaiUiWasmCall('formFieldHtml');
+  const id = (spec && spec.id) || 'fld_' + Math.random().toString(36).slice(2, 11);
+  if (fn) return fn(JSON.stringify(spec || {}), id);
+  return (
+    '<div class="form-group"><label for="' +
+    id +
+    '">' +
+    escapeHtml((spec && spec.label) || '') +
+    '</label><input type="text" id="' +
+    id +
+    '" name="' +
+    escapeHtml((spec && spec.name) || id) +
+    '" /></div>'
+  );
+}
+
 window.adminEmptyStateHtml = adminEmptyStateHtml;
 window.adminFilterTable = adminFilterTable;
 window.adminSortTable = adminSortTable;
@@ -1069,127 +764,6 @@ window.adminEnhanceAdminTable = adminEnhanceAdminTable;
 window.adminInitTablesIn = adminInitTablesIn;
 window.adminExportTableCsv = adminExportTableCsv;
 window.adminExportTableJson = adminExportTableJson;
-
-/** PH-S42: canonical empty state for admin lists/tables. */
-function adminEmptyStateHtml(message, options) {
-  const opts = options || {};
-  const title = escapeHtml(message || poolaiT('admin.table.empty', 'No data to display'));
-  const hint = opts.hint
-    ? '<p class="admin-empty-state-hint">' + escapeHtml(opts.hint) + '</p>'
-    : '';
-  const action = opts.actionHtml
-    ? '<div class="admin-empty-state-action">' + opts.actionHtml + '</div>'
-    : '';
-  return (
-    '<div class="admin-empty-state" role="status">' +
-    '<div class="admin-empty-state-icon" aria-hidden="true">' +
-    (opts.icon || '📋') +
-    '</div>' +
-    '<p class="admin-empty-state-title">' +
-    title +
-    '</p>' +
-    hint +
-    action +
-    '</div>'
-  );
-}
-
-/** PH-S09 / PH-S42: build a striped data table from header labels and row cell HTML. */
-function adminRenderTable(headers, rows, options) {
-  const opts = options || {};
-  if (!rows || rows.length === 0) {
-    return adminEmptyStateHtml(
-      opts.emptyMessage || poolaiT('admin.table.empty', 'No data to display'),
-      opts.emptyOptions,
-    );
-  }
-  const cols = (headers || []).map((h) =>
-    typeof h === 'string' ? { label: h } : h,
-  );
-  let html = '<div class="admin-table-container"><table class="admin-table admin-table--striped">';
-  html += '<thead><tr>';
-  cols.forEach((c) => {
-    const noSort = c.noSort ? ' data-no-sort="1"' : '';
-    const cls = c.actions ? ' class="admin-table-actions-col"' : '';
-    html += '<th scope="col"' + noSort + cls + '>' + escapeHtml(c.label || '') + '</th>';
-  });
-  html += '</tr></thead><tbody>';
-  (rows || []).forEach((row) => {
-    html += '<tr>';
-    (row || []).forEach((cell) => {
-      html += '<td>' + (cell == null ? '' : cell) + '</td>';
-    });
-    html += '</tr>';
-  });
-  html += '</tbody></table></div>';
-  return html;
-}
-
-/** PH-S09: one labeled field using design-system form-group markup. */
-function adminFormFieldHtml(spec) {
-  const id =
-    spec.id ||
-    'fld_' + Math.random().toString(36).slice(2, 11);
-  const name = escapeHtml(spec.name || id);
-  const required = spec.required
-    ? ' required aria-required="true"'
-    : '';
-  let label =
-    '<label for="' +
-    id +
-    '">' +
-    escapeHtml(spec.label || '');
-  if (spec.required) {
-    label += ' <span class="required" aria-hidden="true">*</span>';
-  }
-  label += '</label>';
-
-  let control = '';
-  if (spec.type === 'select') {
-    control =
-      '<select id="' +
-      id +
-      '" name="' +
-      name +
-      '"' +
-      required +
-      '>';
-    (spec.options || []).forEach((o) => {
-      control +=
-        '<option value="' +
-        escapeHtml(o.value) +
-        '">' +
-        escapeHtml(o.label) +
-        '</option>';
-    });
-    control += '</select>';
-  } else if (spec.type === 'textarea') {
-    control =
-      '<textarea id="' +
-      id +
-      '" name="' +
-      name +
-      '"' +
-      required +
-      '></textarea>';
-  } else {
-    control =
-      '<input type="' +
-      escapeHtml(spec.type || 'text') +
-      '" id="' +
-      id +
-      '" name="' +
-      name +
-      '"' +
-      required;
-    if (spec.placeholder) {
-      control +=
-        ' placeholder="' + escapeHtml(spec.placeholder) + '"';
-    }
-    control += ' />';
-  }
-  return '<div class="form-group">' + label + control + '</div>';
-}
 
 function adminObserveDynamicA11y() {
   const root = document.getElementById('admin_main_content');

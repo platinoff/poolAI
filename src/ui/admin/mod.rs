@@ -77,10 +77,21 @@ pub fn create_admin_routes() -> Router<ApiContext> {
         .route("/admin/config", get(config::admin_config))
 }
 
-/// Shared ES module bootstrap for `poolai-ui-wasm` (PH-S152).
+/// Shared ES module bootstrap for `poolai-ui-wasm` (PH-S152/S153).
 pub const POOLAI_UI_WASM_MODULE: &str = r#"
-import init, { formatUsdMicro, formatUnixSecs, leaseStateLabel, poolaiUiWasmVersion } from '/ui/wasm/poolai_ui_wasm.js';
-window.poolaiUiWasm = { ready: false, failed: false, formatUsdMicro, formatUnixSecs, leaseStateLabel };
+import init, {
+  formatUsdMicro, formatUnixSecs, leaseStateLabel, poolaiUiWasmVersion,
+  escapeHtml, apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
+  emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
+  compareSortValues, rowMatchesQuery, highlightQueryHtml,
+} from '/ui/wasm/poolai_ui_wasm.js';
+window.poolaiUiWasm = {
+  ready: false, failed: false,
+  formatUsdMicro, formatUnixSecs, leaseStateLabel,
+  escapeHtml, apiErrorMessageFromBody, apiErrorDetailFromBody, formatFetchError,
+  emptyStateHtml, renderTableHtml, formFieldHtml, buildTableCsv, buildTableJson,
+  compareSortValues, rowMatchesQuery, highlightQueryHtml,
+};
 try {
   await init();
   window.poolaiUiWasm.ready = true;
@@ -99,7 +110,13 @@ pub fn admin_layout(
     body_html: &str,
     script_js: &str,
 ) -> Html<String> {
-    admin_layout_with_module_script(title_i18n_key, title_fallback, body_html, "", script_js)
+    admin_layout_with_module_script(
+        title_i18n_key,
+        title_fallback,
+        body_html,
+        POOLAI_UI_WASM_MODULE,
+        script_js,
+    )
 }
 
 /// Like [`admin_layout`] but inserts a `<script type="module">` before the page IIFE (PH-S151 wasm wiring).
@@ -115,7 +132,9 @@ pub fn admin_layout_with_module_script(
         include_str!("../admin_styles.css"),
     );
     let i18n_js = include_str!("../i18n_core.js");
+    let theme_js = include_str!("../admin_theme.js");
     let common_js = include_str!("../admin_common.js");
+    let modal_js = include_str!("../admin_modal_a11y.js");
     let charts_js = include_str!("../admin_charts.js");
     let module_block = if module_script.is_empty() {
         String::new()
@@ -184,7 +203,9 @@ pub fn admin_layout_with_module_script(
   <div id="admin-aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
   
   <script>{i18n_js}</script>
+  <script>{theme_js}</script>
   <script>{common_js}</script>
+  <script>{modal_js}</script>
   <script>{charts_js}</script>
   {module_block}
   <script>
@@ -263,7 +284,10 @@ fn admin_layout_includes_charts_script() {
 
 #[test]
 fn admin_common_fm019_modal_a11y_helpers() {
-    let js = include_str!("../admin_common.js");
+    let js = concat!(
+        include_str!("../admin_common.js"),
+        include_str!("../admin_modal_a11y.js"),
+    );
     assert!(js.contains("function keepFocusInModal"));
     assert!(js.contains("function showModalContent"));
     assert!(js.contains("ADMIN_DYNAMIC_MODAL_ID"));
@@ -293,7 +317,7 @@ fn admin_common_ph_s42_table_ux_helpers() {
 
 #[test]
 fn admin_common_ph_s14_high_contrast_theme() {
-    let js = include_str!("../admin_common.js");
+    let js = include_str!("../admin_theme.js");
     assert!(js.contains("'high-contrast'"));
     assert!(js.contains("function poolaiNormalizeTheme"));
     assert!(js.contains("POOLAI_UI_THEMES['high-contrast']") || js.contains("'high-contrast': {"));

@@ -3,7 +3,7 @@
 //! PH-S141: `migrating` status badge + i18n EN/UK.
 //! PH-S152: lease state badge via shared `poolai-ui-wasm` `leaseStateLabel`; thin JS fallback.
 
-use crate::ui::admin::{admin_layout_with_module_script, POOLAI_UI_WASM_MODULE};
+use crate::ui::admin::admin_layout;
 use axum::response::Html;
 
 /// Jobs management page (`/ui/admin/jobs`).
@@ -205,7 +205,7 @@ pub async fn admin_jobs() -> Html<String> {
     }
     "#;
 
-    admin_layout_with_module_script(
+    admin_layout(
         "admin.page.jobs",
         "Jobs",
         r#"
@@ -223,7 +223,6 @@ pub async fn admin_jobs() -> Html<String> {
           <div id="jobs-list"></div>
         </div>
         "#,
-        POOLAI_UI_WASM_MODULE,
         script,
     )
 }

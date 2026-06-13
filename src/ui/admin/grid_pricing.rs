@@ -1,7 +1,7 @@
 //! Galaxy Grid pricing snapshot admin page (PH-S82) — read-only `GET /api/v1/grid/pricing`.
 //! PH-S151/PH-S152: USD/time formatters via shared `poolai-ui-wasm` bootstrap; thin JS fallback otherwise.
 
-use crate::ui::admin::{admin_layout_with_module_script, POOLAI_UI_WASM_MODULE};
+use crate::ui::admin::admin_layout;
 use axum::response::Html;
 
 /// Grid pricing snapshot page (`/ui/admin/grid-pricing`).
@@ -118,7 +118,7 @@ pub async fn admin_grid_pricing() -> Html<String> {
     }
     "#;
 
-    admin_layout_with_module_script(
+    admin_layout(
         "admin.page.gridPricing",
         "Grid pricing",
         r#"
@@ -155,7 +155,6 @@ pub async fn admin_grid_pricing() -> Html<String> {
           <div id="grid-pricing-panel" class="grid-pricing-panel"></div>
         </div>
         "#,
-        POOLAI_UI_WASM_MODULE,
         script,
     )
 }

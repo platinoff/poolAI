@@ -1554,7 +1554,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S152",
+  "last_sprint_closed": "PH-S153",
   "layers": [
     {
       "id": "L0",
@@ -1587,7 +1587,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S153",
+  "next_sprint": "PH-S154",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6915,7 +6915,7 @@
       "path": "src/ui/wasm_static.rs"
     }
   ],
-  "revision": 85,
+  "revision": 86,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

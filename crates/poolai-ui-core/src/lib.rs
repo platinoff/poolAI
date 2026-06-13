@@ -8,4 +8,5 @@ pub mod format;
 pub mod lease;
 pub mod ml;
 pub mod pricing;
+pub mod table;
 pub mod validate;
