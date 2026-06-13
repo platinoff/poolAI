@@ -1,12 +1,12 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 · PH-S136 ✅ · vision **rev 65**
+**Оновлено:** 2026-06-13 · PH-S137 ✅ · vision **rev 66**
 
-| **← наступний** | **PH-S137** — Trust gate settlement metrics stub |
-| **Відкритих** | **6** (PH-S137…S142) |
+| **← наступний** | **PH-S138** — Locality rank integration test |
+| **Відкритих** | **5** (PH-S138…S142) |
 
 ```
-PoolAI — спринт PH-S137 (одin PH-S*, VDT).
-PH-S137: Prometheus counters payout_held/payout_eligible in galaxy_trust_score.rs; unit test; cargo test-ci
+PoolAI — спринт PH-S138 (одin PH-S*, VDT).
+PH-S138: tests/ multi-worker rank_workers_by_locality fixture; cargo test-ci
 FM/HANDOFF/NEXT_SESSION/vision revision++
 ```

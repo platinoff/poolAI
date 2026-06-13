@@ -1,7 +1,9 @@
 //! Galaxy Grid edge `trust_score` settlement gate stub (PH-S130).
 //!
 //! Pure gate sketch on the grid result path per `docs/concept/POOLAI_GALAXY_GRID.md` §6.5.
-//! No payout or settlement wire.
+//! Settlement verdict counters mirrored on `GET /metrics` (PH-S137). No payout wire.
+
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Worker origin subset for settlement gate (Galaxy §3.2 / §6.5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,6 +34,15 @@ pub const DEFAULT_MIN_TRUST_FOR_PAYOUT: TrustScore = 40;
 
 /// Env: minimum `trust_score` (0..=100) for auto payout on `telegram_edge` results.
 pub const ENV_MIN_TRUST_PAYOUT: &str = "POOLAI_GALAXY_MIN_TRUST_PAYOUT";
+
+/// In-process counter for edge results eligible for payout stub (mirrored on `GET /metrics`, PH-S137).
+pub const METRIC_PAYOUT_ELIGIBLE_TOTAL: &str = "galaxy_trust_payout_eligible_total";
+
+/// In-process counter for edge results held pending verification (PH-S137).
+pub const METRIC_PAYOUT_HELD_TOTAL: &str = "galaxy_trust_payout_held_total";
+
+static PAYOUT_ELIGIBLE_TOTAL: AtomicU64 = AtomicU64::new(0);
+static PAYOUT_HELD_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Gate configuration (env-backed stub).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -105,7 +116,38 @@ pub fn evaluate_result_settlement_gate(
 ) -> SettlementGateVerdict {
     let origin = infer_worker_origin(source_peer_id);
     let score = trust_score.unwrap_or(DEFAULT_TRUST_SCORE);
-    evaluate_settlement_gate(origin, score, config)
+    let verdict = evaluate_settlement_gate(origin, score, config);
+    record_settlement_gate_verdict(verdict);
+    verdict
+}
+
+/// Record settlement gate verdict for Prometheus scrape (grid result path only).
+pub fn record_settlement_gate_verdict(verdict: SettlementGateVerdict) {
+    match verdict {
+        SettlementGateVerdict::PayoutEligible => {
+            PAYOUT_ELIGIBLE_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
+        SettlementGateVerdict::PayoutHeld => {
+            PAYOUT_HELD_TOTAL.fetch_add(1, Ordering::Relaxed);
+        }
+        SettlementGateVerdict::NotApplicable => {}
+    }
+}
+
+/// Total edge payout-eligible grid results since process start.
+pub fn payout_eligible_total() -> u64 {
+    PAYOUT_ELIGIBLE_TOTAL.load(Ordering::Relaxed)
+}
+
+/// Total edge payout-held grid results since process start.
+pub fn payout_held_total() -> u64 {
+    PAYOUT_HELD_TOTAL.load(Ordering::Relaxed)
+}
+
+#[cfg(test)]
+pub fn reset_settlement_gate_metrics_for_test() {
+    PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
+    PAYOUT_HELD_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -166,14 +208,33 @@ mod tests {
 
     #[test]
     fn evaluate_result_settlement_gate_uses_default_score() {
+        reset_settlement_gate_metrics_for_test();
         let cfg = TrustScoreGateConfig::default_stub();
         assert_eq!(
             evaluate_result_settlement_gate(Some("tg-low"), None, &cfg),
             SettlementGateVerdict::PayoutEligible
         );
+        assert_eq!(payout_eligible_total(), 1);
+        assert_eq!(payout_held_total(), 0);
+
         assert_eq!(
             evaluate_result_settlement_gate(Some("tg-low"), Some(10), &cfg),
             SettlementGateVerdict::PayoutHeld
         );
+        assert_eq!(payout_eligible_total(), 1);
+        assert_eq!(payout_held_total(), 1);
+        reset_settlement_gate_metrics_for_test();
+    }
+
+    #[test]
+    fn record_settlement_gate_verdict_increments_counters() {
+        reset_settlement_gate_metrics_for_test();
+        record_settlement_gate_verdict(SettlementGateVerdict::PayoutEligible);
+        record_settlement_gate_verdict(SettlementGateVerdict::PayoutEligible);
+        record_settlement_gate_verdict(SettlementGateVerdict::PayoutHeld);
+        record_settlement_gate_verdict(SettlementGateVerdict::NotApplicable);
+        assert_eq!(payout_eligible_total(), 2);
+        assert_eq!(payout_held_total(), 1);
+        reset_settlement_gate_metrics_for_test();
     }
 }

@@ -21,6 +21,10 @@ use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, stale_served_total, METRIC_FORCED_FALLBACK_TOTAL,
     METRIC_FRESH_SERVED_TOTAL, METRIC_STALE_SERVED_TOTAL,
 };
+use crate::grid::galaxy_trust_score::{
+    payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
+    METRIC_PAYOUT_HELD_TOTAL,
+};
 
 /// Lazily initialized Prometheus registry and metric handles.
 pub struct PoolAiPrometheus {
@@ -39,6 +43,8 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_fresh_served: IntGauge,
     galaxy_pricing_stale_served: IntGauge,
     galaxy_pricing_forced_fallback_total: IntGauge,
+    galaxy_trust_payout_eligible_total: IntGauge,
+    galaxy_trust_payout_held_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -180,6 +186,24 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_pricing_forced_fallback_total.clone()))
         .expect("register galaxy_pricing_forced_fallback_total");
 
+    let galaxy_trust_payout_eligible_total = IntGauge::with_opts(Opts::new(
+        METRIC_PAYOUT_ELIGIBLE_TOTAL,
+        "Galaxy trust gate edge results eligible for payout stub (PH-S137)",
+    ))
+    .expect(METRIC_PAYOUT_ELIGIBLE_TOTAL);
+    registry
+        .register(Box::new(galaxy_trust_payout_eligible_total.clone()))
+        .expect("register galaxy_trust_payout_eligible_total");
+
+    let galaxy_trust_payout_held_total = IntGauge::with_opts(Opts::new(
+        METRIC_PAYOUT_HELD_TOTAL,
+        "Galaxy trust gate edge results held pending verification (PH-S137)",
+    ))
+    .expect(METRIC_PAYOUT_HELD_TOTAL);
+    registry
+        .register(Box::new(galaxy_trust_payout_held_total.clone()))
+        .expect("register galaxy_trust_payout_held_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -202,6 +226,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_fresh_served,
         galaxy_pricing_stale_served,
         galaxy_pricing_forced_fallback_total,
+        galaxy_trust_payout_eligible_total,
+        galaxy_trust_payout_held_total,
     }
 }
 
@@ -214,6 +240,15 @@ pub fn refresh_galaxy_pricing_gauges() {
         .set(stale_served_total() as i64);
     prom.galaxy_pricing_forced_fallback_total
         .set(forced_fallback_total() as i64);
+}
+
+/// Mirror in-process trust gate counters into Prometheus gauges (scrape snapshot).
+pub fn refresh_galaxy_trust_gauges() {
+    let prom = init_prometheus();
+    prom.galaxy_trust_payout_eligible_total
+        .set(payout_eligible_total() as i64);
+    prom.galaxy_trust_payout_held_total
+        .set(payout_held_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
@@ -241,6 +276,7 @@ pub fn record_http_request(method: &str, status: u16, duration_secs: f64) {
 pub async fn refresh_scrape_gauges(ctx: &ApiContext) {
     let prom = init_prometheus();
     refresh_galaxy_pricing_gauges();
+    refresh_galaxy_trust_gauges();
     prom.uptime_seconds
         .set(crate::version::get_uptime_seconds() as i64);
     prom.build_info.set(1);
@@ -366,5 +402,31 @@ mod tests {
         assert!(body.contains(&format!("{METRIC_FRESH_SERVED_TOTAL} 1")));
         assert!(body.contains(&format!("{METRIC_STALE_SERVED_TOTAL} 1")));
         assert!(body.contains(&format!("{METRIC_FORCED_FALLBACK_TOTAL} 2")));
+    }
+
+    #[test]
+    fn encode_contains_galaxy_trust_settlement_metrics() {
+        init_prometheus();
+        refresh_galaxy_trust_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_PAYOUT_ELIGIBLE_TOTAL));
+        assert!(body.contains(METRIC_PAYOUT_HELD_TOTAL));
+    }
+
+    #[test]
+    fn galaxy_trust_gauges_reflect_settlement_counters() {
+        use crate::grid::galaxy_trust_score::{
+            record_settlement_gate_verdict, reset_settlement_gate_metrics_for_test,
+            SettlementGateVerdict,
+        };
+        reset_settlement_gate_metrics_for_test();
+        record_settlement_gate_verdict(SettlementGateVerdict::PayoutEligible);
+        record_settlement_gate_verdict(SettlementGateVerdict::PayoutHeld);
+        record_settlement_gate_verdict(SettlementGateVerdict::PayoutHeld);
+        refresh_galaxy_trust_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_PAYOUT_ELIGIBLE_TOTAL} 1")));
+        assert!(body.contains(&format!("{METRIC_PAYOUT_HELD_TOTAL} 2")));
+        reset_settlement_gate_metrics_for_test();
     }
 }
