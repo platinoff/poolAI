@@ -132,6 +132,9 @@ pub fn classify_product_path(path: &str) -> ProductCategory {
     if p.starts_with("src/ui/") && p.ends_with(".css") {
         return ProductCategory::UiCss;
     }
+    if p.starts_with("e2e/archive/") {
+        return ProductCategory::Ignored;
+    }
     if p.starts_with("e2e/") && (p.ends_with(".ts") || p.ends_with(".tsx")) {
         return ProductCategory::E2eTs;
     }
@@ -158,6 +161,9 @@ pub fn build_report(root: &Path, files: &[String]) -> Result<RustRatioReport, St
             continue;
         }
         let abs = root.join(rel);
+        if !abs.is_file() {
+            continue;
+        }
         let loc = count_non_blank_lines(&abs).map_err(|e| format!("{rel}: {e}"))?;
         let entry = by_cat
             .entry(category)

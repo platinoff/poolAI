@@ -1482,7 +1482,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S143",
+  "last_sprint_closed": "PH-S144",
   "layers": [
     {
       "id": "L0",
@@ -1515,7 +1515,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S144",
+  "next_sprint": "PH-S145",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6001,6 +6001,26 @@
     },
     {
       "auto_synced": true,
+      "id": "tests_grid_envelope_lease_integration_rs",
+      "label": "grid_envelope_lease_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_envelope_lease_integration.rs",
+      "sprints": [
+        "PH-S144"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_grid_pricing_integration_rs",
+      "label": "grid_pricing_integration.rs",
+      "layer": "L3",
+      "path": "tests/grid_pricing_integration.rs",
+      "sprints": [
+        "PH-S144"
+      ]
+    },
+    {
+      "auto_synced": true,
       "id": "tests_grid_network_scalability_tests_rs",
       "label": "grid_network_scalability_tests.rs",
       "layer": "L3",
@@ -6194,6 +6214,16 @@
       "label": "pa11y_ci_script.rs",
       "layer": "L3",
       "path": "tests/pa11y_ci_script.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_protocol_middleware_integration_rs",
+      "label": "protocol_middleware_integration.rs",
+      "layer": "L3",
+      "path": "tests/protocol_middleware_integration.rs",
+      "sprints": [
+        "PH-S144"
+      ]
     },
     {
       "auto_synced": true,
@@ -6589,11 +6619,12 @@
       "layer": "L1",
       "path": "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
       "sprints": [
-        "PH-S143"
+        "PH-S143",
+        "PH-S144"
       ]
     }
   ],
-  "revision": 74,
+  "revision": 75,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

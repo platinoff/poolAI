@@ -1,6 +1,6 @@
 # Playwright E2E smoke (S23 / S27 / S29 / PH-S11)
 
-**Rust-first policy:** API/wire acceptance — **`tests/*_integration.rs` + `cargo test-ci`** (канон). Playwright — **лише browser/UI** (DOM, axe, visual, admin flows). Див. [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc). Legacy API-smoke specs нижче залишаються до поступового переносу в Rust.
+**Rust-first policy:** API/wire acceptance — **`tests/*_integration.rs` + `cargo test-ci`** (канон). Playwright — **лише browser/UI** (DOM, axe, visual, admin flows). Див. [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc). **PH-S144 ✅:** legacy API-smoke specs archived у [`e2e/archive/api-smoke/`](../e2e/archive/api-smoke/README.md); канон — Rust integration tests.
 
 **Status:** Smoke + admin (повний P1 surface) + axe + **visual regression** (`smoke.spec.ts`, `admin.spec.ts`, `a11y.spec.ts`, `visual.spec.ts`).
 
@@ -10,9 +10,9 @@
 | `admin.spec.ts` | tenants; monitoring; security (**PH-S27** rotation tab + OAuth2); audit; raid; topology; workers; **jobs (PH-S53)**; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
-| `jobs_raid.spec.ts` | **PH-S52:** API smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start` |
-| `grid_pricing.spec.ts` | **PH-S86:** API smoke — `GET /api/v1/grid/pricing` з `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (L2 fallback `470000` usd_micro); лише з `--start` |
-| `jobs_lease.spec.ts` | **PH-S107:** API smoke — `POST /api/v1/jobs/{id}/lease` acquire + `POST …/lease/renew`; 409 `lease_already_active` / `lease_epoch_rejected`; лише з `--start` |
+| `jobs_raid.spec.ts` | **PH-S52:** API smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start` (залишається до PH-S145) |
+
+**Rust integration (PH-S144, замість archived Playwright API specs):** `tests/jobs_api_contracts.rs`, `tests/grid_pricing_integration.rs`, `tests/grid_envelope_lease_integration.rs`, `tests/protocol_middleware_integration.rs`, `tests/virtual_node_telegram_binding_integration.rs`.
 
 Спільний логін: `e2e/tests/helpers.ts` (`loginAsAdmin`).
 

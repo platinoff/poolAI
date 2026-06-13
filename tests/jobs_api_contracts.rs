@@ -491,6 +491,120 @@ async fn jobs_renew_lease_extends_expiry() {
 }
 
 #[tokio::test]
+async fn jobs_renew_without_acquire_returns_400() {
+    let app = jobs_app();
+
+    let (_, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({ "kind": "inference" })),
+    )
+    .await;
+    let id = created
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+
+    let (status, err_body) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease/renew"),
+        Some(json!({ "lease_epoch": 1 })),
+    )
+    .await;
+    assert_eq!(status, StatusCode::BAD_REQUEST);
+    let msg = err_body
+        .get("error")
+        .and_then(|e| e.get("message"))
+        .and_then(|m| m.as_str())
+        .or_else(|| err_body.get("message").and_then(|m| m.as_str()))
+        .unwrap_or("");
+    assert!(msg.to_ascii_lowercase().contains("acquire lease"));
+}
+
+#[tokio::test]
+async fn jobs_patch_executing_migrating_roundtrip() {
+    let app = jobs_app();
+
+    let (_, created) = request_json(
+        &app,
+        "POST",
+        "/api/v1/jobs",
+        Some(json!({ "kind": "inference" })),
+    )
+    .await;
+    let id = created
+        .get("id")
+        .and_then(|x| x.as_str())
+        .expect("job id")
+        .to_string();
+
+    let (_, acquired) = request_json(
+        &app,
+        "POST",
+        &format!("/api/v1/jobs/{id}/lease"),
+        Some(json!({ "lease_owner": "worker-migrate-b" })),
+    )
+    .await;
+    assert_eq!(
+        acquired
+            .get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("leased")
+    );
+
+    let (to_migrating_status, to_migrating) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "migrating" })),
+    )
+    .await;
+    assert_eq!(to_migrating_status, StatusCode::OK);
+
+    let (to_executing_status, to_executing) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "executing" })),
+    )
+    .await;
+    assert_eq!(to_executing_status, StatusCode::OK);
+    assert_eq!(
+        to_executing
+            .get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("executing")
+    );
+
+    let (back_status, back) = request_json(
+        &app,
+        "PATCH",
+        &format!("/api/v1/jobs/{id}"),
+        Some(json!({ "status": "migrating" })),
+    )
+    .await;
+    assert_eq!(back_status, StatusCode::OK);
+    assert_eq!(
+        back.get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("migrating")
+    );
+    assert_eq!(
+        to_migrating
+            .get("job")
+            .and_then(|j| j.get("status"))
+            .and_then(|s| s.as_str()),
+        Some("migrating")
+    );
+}
+
+#[tokio::test]
 async fn jobs_get_unknown_returns_404() {
     let app = jobs_app();
     let (status, v) = request_json(

@@ -276,6 +276,23 @@ fn response_from_outcome(outcome: GridIngestOutcome) -> GridIngestResponse {
     GridIngestResponse { ok: true, kind }
 }
 
+/// Reset pricing oracle for HTTP integration tests (PH-S144).
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_pricing_oracle_for_tests(force_fallback: bool, fallback_quote_micro: Option<u64>) {
+    use std::collections::HashMap;
+    let mut fallback = HashMap::new();
+    if let Some(v) = fallback_quote_micro {
+        fallback.insert(GalaxyPriceUnitKey::InferenceBlendedToken, v);
+    }
+    let mut guard = pricing_oracle().lock().expect("pricing oracle lock");
+    *guard = GalaxyPricingOracle::new(GalaxyPricingConfig {
+        cache_ttl_secs: 300,
+        max_stale_secs: 3600,
+        force_fallback,
+    })
+    .with_l2_fallback_quotes(fallback);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
