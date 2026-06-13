@@ -1482,7 +1482,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S142",
+  "last_sprint_closed": "PH-S143",
   "layers": [
     {
       "id": "L0",
@@ -1515,7 +1515,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S143",
+  "next_sprint": "PH-S144",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4571,6 +4571,16 @@
     },
     {
       "auto_synced": true,
+      "id": "src_bin_poolai_loc_audit_rs",
+      "label": "poolai_loc_audit.rs",
+      "layer": "L3",
+      "path": "src/bin/poolai_loc_audit.rs",
+      "sprints": [
+        "PH-S143"
+      ]
+    },
+    {
+      "auto_synced": true,
       "id": "src_bin_poolai_p2b_tq01_snapshot_rs",
       "label": "poolai_p2b_tq01_snapshot.rs",
       "layer": "L3",
@@ -6577,7 +6587,10 @@
       "id": "docs_development_RUST_RATIO_STRATEGY_2026_06_13_md",
       "label": "RUST_RATIO_STRATEGY_2026-06-13.md",
       "layer": "L1",
-      "path": "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md"
+      "path": "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
+      "sprints": [
+        "PH-S143"
+      ]
     }
   ],
   "revision": 74,

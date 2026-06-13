@@ -14,9 +14,9 @@
 | **Non-Rust (допустимо)** | **5–10%** | `src/ui/*.js` (glue), `e2e/*.ts` (лише browser), `bin/*.sh` (ops) |
 | **Поза ratio** | docs, `.md`, CI yaml, snapshots PNG | не входять у знаменник «коду продукту» |
 
-**Орієнтовний зріз (2026-06):** Rust домінує в runtime; основний «шум» ratio — **legacy Playwright API-smoke** у `e2e/tests/` (дублюють `tests/*_integration.rs`) + **vanilla JS** admin panels.
+**Орієнтовний зріз (2026-06-13, PH-S143):** **`91.48%`** Rust LOC у product code (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). GitHub Languages bar ~**91.4%** Rust (heuristic). Основний «шум» ratio — **legacy Playwright API-smoke** у `e2e/tests/` + **vanilla JS** admin panels.
 
-**Майбутній audit (PH-S143):** `cargo run --bin poolai-loc-audit` або скрипт у `scripts/` — звіт `rust_ratio.json` для FM §5.13.
+**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S150 gate.
 
 ---
 
@@ -84,8 +84,8 @@ flowchart TB
 
 | # | Sprint | Фокус | Acceptance |
 |---|--------|--------|------------|
-| 1 | **PH-S143** | LOC ratio baseline audit | Rust bin або script; звіт у `docs/development/`; FM оновлено |
-| 2 | **PH-S144** | Playwright API → Rust migration | `jobs_lease`, `grid_*`, `protocol_middleware`, `telegram_wallet`, `jobs_migrating` покриті integration; Playwright specs archived або deleted |
+| 1 | **PH-S143** | LOC ratio baseline audit | `cargo run --bin poolai-loc-audit`; [`rust_ratio.json`](./rust_ratio.json) **91.48%**; FM оновлено | **✅** |
+| 2 | **PH-S144** | Playwright API → Rust migration | `jobs_lease`, `grid_*`, `protocol_middleware`, `telegram_wallet`, `jobs_migrating` покриті integration; Playwright specs archived або deleted | відкрито |
 | 3 | **PH-S145** | `poolai-http-stand-smoke` bin (Rust) | `reqwest` + stand env; замінює TS API suite в CI |
 | 4 | **PH-S146** | `crates/poolai-ui-core` stub | shared validators/formatters з admin JS винесені в Rust crate + unit tests |
 | 5 | **PH-S147** | wasm32 admin core POC | один panel helper compiled to wasm; docs portability §2 |

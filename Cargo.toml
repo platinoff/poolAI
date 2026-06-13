@@ -186,6 +186,10 @@ k8s-openapi = { version = "0.24", features = ["v1_28"] }
 mockito = "1.4"
 
 [[bin]]
+name = "poolai-loc-audit"
+path = "src/bin/poolai_loc_audit.rs"
+
+[[bin]]
 name = "poolai-openapi-gap-audit"
 path = "src/bin/poolai_openapi_gap_audit.rs"
 

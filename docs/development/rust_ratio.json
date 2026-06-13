@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-06-13",
+  "sprint": "PH-S143",
+  "target_band_min": 0.9,
+  "target_band_max": 0.95,
+  "warn_min": 0.88,
+  "rust_loc": 105311,
+  "non_rust_product_loc": 9812,
+  "product_loc_total": 115123,
+  "rust_ratio": 0.9147694205328214,
+  "rust_ratio_pct": 91.47694205328214,
+  "in_target_band": true,
+  "below_warn_threshold": false,
+  "by_category": {
+    "e2e_ts": {
+      "files": 15,
+      "loc": 1496
+    },
+    "ops_ps1": {
+      "files": 16,
+      "loc": 1282
+    },
+    "ops_shell": {
+      "files": 31,
+      "loc": 1993
+    },
+    "rust_benches": {
+      "files": 7,
+      "loc": 608
+    },
+    "rust_crates": {
+      "files": 12,
+      "loc": 1682
+    },
+    "rust_src": {
+      "files": 227,
+      "loc": 81810
+    },
+    "rust_tests": {
+      "files": 109,
+      "loc": 21211
+    },
+    "ui_css": {
+      "files": 2,
+      "loc": 1117
+    },
+    "ui_js": {
+      "files": 4,
+      "loc": 3924
+    }
+  },
+  "notes": [
+    "Denominator: product code only (strategy §1); docs/yaml/png excluded",
+    "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets"
+  ]
+}
