@@ -37,6 +37,8 @@ mod admin;
 #[cfg(feature = "enterprise")]
 pub use admin::create_admin_routes;
 
+mod wasm_static;
+
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use axum::{response::Html, routing::get, Router};
@@ -78,6 +80,8 @@ pub fn create_ui_routes() -> Router<ApiContext> {
         .route("/libs", get(libs_page))
         .route("/vm", get(vm_page))
         .route("/raid", get(raid_page));
+
+    let router = router.merge(wasm_static::ui_wasm_routes());
 
     // Add admin routes if enterprise feature is enabled
     #[cfg(feature = "enterprise")]

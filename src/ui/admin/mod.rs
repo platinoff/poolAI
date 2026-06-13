@@ -84,6 +84,17 @@ pub fn admin_layout(
     body_html: &str,
     script_js: &str,
 ) -> Html<String> {
+    admin_layout_with_module_script(title_i18n_key, title_fallback, body_html, "", script_js)
+}
+
+/// Like [`admin_layout`] but inserts a `<script type="module">` before the page IIFE (PH-S151 wasm wiring).
+pub fn admin_layout_with_module_script(
+    title_i18n_key: &str,
+    title_fallback: &str,
+    body_html: &str,
+    module_script: &str,
+    script_js: &str,
+) -> Html<String> {
     let base_css = concat!(
         include_str!("../design_tokens.css"),
         include_str!("../admin_styles.css"),
@@ -91,6 +102,15 @@ pub fn admin_layout(
     let i18n_js = include_str!("../i18n_core.js");
     let common_js = include_str!("../admin_common.js");
     let charts_js = include_str!("../admin_charts.js");
+    let module_block = if module_script.is_empty() {
+        String::new()
+    } else {
+        format!(
+            r#"<script type="module">
+{module_script}
+</script>"#
+        )
+    };
 
     let html = format!(
         r#"<!DOCTYPE html>
@@ -151,6 +171,7 @@ pub fn admin_layout(
   <script>{i18n_js}</script>
   <script>{common_js}</script>
   <script>{charts_js}</script>
+  {module_block}
   <script>
     (function() {{
       function adminSyncDocTitle() {{
@@ -189,6 +210,7 @@ pub fn admin_layout(
         i18n_js = i18n_js,
         common_js = common_js,
         charts_js = charts_js,
+        module_block = module_block,
         script = script_js
     );
 

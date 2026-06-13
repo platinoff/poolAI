@@ -32,7 +32,7 @@ pub fn lease_state_label_wasm(expires_at: &str, now_rfc3339: &str) -> String {
 /// POC version string for smoke checks in browser devtools.
 #[wasm_bindgen(js_name = poolaiUiWasmVersion)]
 pub fn poolai_ui_wasm_version() -> String {
-    "poolai-ui-wasm/0.1.0-ph-s147".to_string()
+    "poolai-ui-wasm/0.1.0-ph-s151".to_string()
 }
 
 fn empty_as_none(s: &str) -> Option<&str> {

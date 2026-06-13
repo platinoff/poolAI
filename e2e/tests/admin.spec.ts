@@ -248,7 +248,9 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible();
   });
 
-  test("grid pricing page fetches snapshot query (PH-S82)", async ({ page }) => {
+  test("grid pricing page fetches snapshot query (PH-S82, PH-S151 wasm)", async ({
+    page,
+  }) => {
     await gotoAdminReady(page, "/ui/admin/grid-pricing", "#grid-pricing-panel");
     await expect(page.locator("#grid-pricing-form")).toBeVisible({
       timeout: 15_000,
@@ -275,6 +277,16 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
         )
         .first(),
     ).toBeVisible({ timeout: 15_000 });
+    await page.waitForFunction(
+      () => {
+        const wasm = document.documentElement.dataset.poolaiUiWasm;
+        const failed = (window as Window & { poolaiGridPricingWasm?: { failed?: boolean } })
+          .poolaiGridPricingWasm?.failed;
+        return Boolean(wasm?.includes("poolai-ui-wasm")) || Boolean(failed);
+      },
+      undefined,
+      { timeout: 10_000 },
+    );
   });
 
   test("vm page loads instances container", async ({ page }) => {

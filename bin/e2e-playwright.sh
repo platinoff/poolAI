@@ -70,6 +70,10 @@ start_poolai() {
   export K8S_OPENAPI_ENABLED_VERSION="${K8S_OPENAPI_ENABLED_VERSION:-1.28}"
   export TMPDIR="${TMPDIR:-/tmp}"
   export TEMP="${TEMP:-/tmp}"
+  if command -v wasm-bindgen >/dev/null 2>&1; then
+    echo "==> PH-S151: build poolai-ui-wasm for grid-pricing panel"
+    bash "$ROOT/bin/build-ui-wasm.sh" || echo "WARN: poolai-ui-wasm build skipped"
+  fi
   STAND_ROOT="/tmp/poolai-e2e-$$"
   mkdir -p "${STAND_ROOT}/raid" "${STAND_ROOT}/data"
   export POOLAI_E2E_STAND_ROOT="${STAND_ROOT}"

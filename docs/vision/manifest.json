@@ -1554,7 +1554,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S150",
+  "last_sprint_closed": "PH-S151",
   "layers": [
     {
       "id": "L0",
@@ -1587,7 +1587,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S151",
+  "next_sprint": "PH-S152",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6903,7 +6903,7 @@
       "path": "crates/poolai-ui-wasm/README.md"
     }
   ],
-  "revision": 82,
+  "revision": 83,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

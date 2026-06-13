@@ -1,7 +1,22 @@
 //! Galaxy Grid pricing snapshot admin page (PH-S82) — read-only `GET /api/v1/grid/pricing`.
+//! PH-S151: USD/time formatters via `poolai-ui-wasm` when built; thin JS fallback otherwise.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::admin_layout_with_module_script;
 use axum::response::Html;
+
+const GRID_PRICING_WASM_MODULE: &str = r#"
+import init, { formatUsdMicro, formatUnixSecs, poolaiUiWasmVersion } from '/ui/wasm/poolai_ui_wasm.js';
+window.poolaiGridPricingWasm = { ready: false, failed: false, formatUsdMicro, formatUnixSecs };
+try {
+  await init();
+  window.poolaiGridPricingWasm.ready = true;
+  document.documentElement.dataset.poolaiUiWasm = poolaiUiWasmVersion();
+} catch (err) {
+  window.poolaiGridPricingWasm.failed = true;
+  console.warn('poolai-ui-wasm init failed', err);
+}
+window.dispatchEvent(new Event('poolai-grid-pricing-wasm'));
+"#;
 
 /// Grid pricing snapshot page (`/ui/admin/grid-pricing`).
 pub async fn admin_grid_pricing() -> Html<String> {
@@ -25,13 +40,13 @@ pub async fn admin_grid_pricing() -> Html<String> {
       return '/api/v1/grid/pricing?' + qs.toString();
     }
 
-    function formatUsdMicro(usdMicro) {
+    function formatUsdMicroFallback(usdMicro) {
       const n = Number(usdMicro);
       if (!Number.isFinite(n)) return '—';
       return (n / 1000000).toFixed(6) + ' USD';
     }
 
-    function formatUnixSecs(secs) {
+    function formatUnixSecsFallback(secs) {
       const n = Number(secs);
       if (!Number.isFinite(n) || n <= 0) return '—';
       try {
@@ -39,6 +54,22 @@ pub async fn admin_grid_pricing() -> Html<String> {
       } catch (_) {
         return String(secs);
       }
+    }
+
+    function formatUsdMicro(usdMicro) {
+      const wasm = window.poolaiGridPricingWasm;
+      if (wasm && wasm.ready && typeof wasm.formatUsdMicro === 'function') {
+        return wasm.formatUsdMicro(Number(usdMicro));
+      }
+      return formatUsdMicroFallback(usdMicro);
+    }
+
+    function formatUnixSecs(secs) {
+      const wasm = window.poolaiGridPricingWasm;
+      if (wasm && wasm.ready && typeof wasm.formatUnixSecs === 'function') {
+        return wasm.formatUnixSecs(Number(secs));
+      }
+      return formatUnixSecsFallback(secs);
     }
 
     function renderGridPricingSnapshot(data) {
@@ -99,10 +130,19 @@ pub async fn admin_grid_pricing() -> Html<String> {
       loadGridPricingSnapshot();
     });
 
-    loadGridPricingSnapshot();
+    function startGridPricingPage() {
+      loadGridPricingSnapshot();
+    }
+
+    if (window.poolaiGridPricingWasm && (window.poolaiGridPricingWasm.ready || window.poolaiGridPricingWasm.failed)) {
+      startGridPricingPage();
+    } else {
+      window.addEventListener('poolai-grid-pricing-wasm', startGridPricingPage, { once: true });
+      setTimeout(startGridPricingPage, 2500);
+    }
     "#;
 
-    admin_layout(
+    admin_layout_with_module_script(
         "admin.page.gridPricing",
         "Grid pricing",
         r#"
@@ -139,6 +179,7 @@ pub async fn admin_grid_pricing() -> Html<String> {
           <div id="grid-pricing-panel" class="grid-pricing-panel"></div>
         </div>
         "#,
+        GRID_PRICING_WASM_MODULE,
         script,
     )
 }
@@ -152,4 +193,14 @@ async fn admin_grid_pricing_page_includes_form_and_api() {
     assert!(html.contains("/api/v1/grid/pricing"));
     assert!(html.contains("loadGridPricingSnapshot"));
     assert!(html.contains("inference_blended_token"));
+}
+
+#[tokio::test]
+async fn admin_grid_pricing_page_wires_poolai_ui_wasm_module() {
+    let html = admin_grid_pricing().await.0;
+    assert!(html.contains("type=\"module\""));
+    assert!(html.contains("/ui/wasm/poolai_ui_wasm.js"));
+    assert!(html.contains("poolaiGridPricingWasm"));
+    assert!(html.contains("poolai-grid-pricing-wasm"));
+    assert!(html.contains("formatUsdMicroFallback"));
 }
