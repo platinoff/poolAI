@@ -166,6 +166,10 @@ pub fn create_virtual_node_routes() -> Router<ApiContext> {
             post(bind_telegram_wallet_handler),
         )
         .route(
+            "/virtual-nodes/telegram/wallets/{telegram_user_id}",
+            get(get_telegram_wallet_handler),
+        )
+        .route(
             "/virtual-nodes/telegram/bindings",
             get(list_telegram_bindings_handler),
         )
@@ -302,6 +306,15 @@ async fn bind_telegram_wallet_handler(
     ) {
         Ok(wallet) => (StatusCode::OK, Json(BindTelegramWalletResponse { wallet })).into_response(),
         Err(e) => (StatusCode::BAD_REQUEST, e.as_status_message()).into_response(),
+    }
+}
+
+async fn get_telegram_wallet_handler(Path(telegram_user_id): Path<String>) -> impl IntoResponse {
+    match VirtualNodeTelegramWalletService::lookup(&telegram_user_id) {
+        Some(wallet) => {
+            (StatusCode::OK, Json(BindTelegramWalletResponse { wallet })).into_response()
+        }
+        None => StatusCode::NOT_FOUND.into_response(),
     }
 }
 

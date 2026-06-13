@@ -1302,6 +1302,29 @@ paths:
         '400':
           description: Invalid request (empty fields, unsupported chain, invalid pubkey)
 
+  /virtual-nodes/telegram/wallets/{telegram_user_id}:
+    get:
+      tags:
+        - VirtualNodes
+      summary: Lookup Telegram payout wallet binding
+      description: Galaxy §3.2 — read-only lookup by telegram_user_id (PH-S135). Returns 404 when unbound.
+      operationId: getTelegramWallet
+      parameters:
+        - name: telegram_user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Wallet binding found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindTelegramWalletResponse'
+        '404':
+          description: No wallet binding for telegram_user_id
+
   /virtual-nodes/telegram/bind:
     post:
       tags:

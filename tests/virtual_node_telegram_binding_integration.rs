@@ -254,3 +254,58 @@ async fn telegram_wallet_bind_rejects_invalid_pubkey() {
     assert_eq!(res.status(), StatusCode::BAD_REQUEST);
     VirtualNodeTelegramWalletService::clear_all();
 }
+
+#[tokio::test]
+async fn telegram_wallet_get_lookup_returns_bound_wallet() {
+    let _lock = TELEGRAM_WALLET_TEST_LOCK.lock().unwrap();
+    VirtualNodeTelegramWalletService::clear_all();
+    let app = app_with_discovery().await;
+    let pubkey = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";
+
+    let bind = Request::builder()
+        .method("POST")
+        .uri("/api/v1/virtual-nodes/telegram/wallet")
+        .header("content-type", "application/json")
+        .body(Body::from(format!(
+            r#"{{
+                "telegram_user_id": "wallet-get-1",
+                "chat_id": "-1001234567890",
+                "payout_pubkey": "{pubkey}",
+                "chain": "solana"
+            }}"#
+        )))
+        .unwrap();
+    let bind_res = app.clone().oneshot(bind).await.unwrap();
+    assert_eq!(bind_res.status(), StatusCode::OK);
+
+    let lookup = Request::builder()
+        .method("GET")
+        .uri("/api/v1/virtual-nodes/telegram/wallets/wallet-get-1")
+        .body(Body::empty())
+        .unwrap();
+    let lookup_res = app.clone().oneshot(lookup).await.unwrap();
+    assert_eq!(lookup_res.status(), StatusCode::OK);
+    let body = to_bytes(lookup_res.into_body(), usize::MAX).await.unwrap();
+    let v: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(v["wallet"]["telegram_user_id"], "wallet-get-1");
+    assert_eq!(v["wallet"]["payout_pubkey"], pubkey);
+
+    VirtualNodeTelegramWalletService::clear_all();
+}
+
+#[tokio::test]
+async fn telegram_wallet_get_lookup_missing_returns_404() {
+    let _lock = TELEGRAM_WALLET_TEST_LOCK.lock().unwrap();
+    VirtualNodeTelegramWalletService::clear_all();
+    let app = app_with_discovery().await;
+
+    let lookup = Request::builder()
+        .method("GET")
+        .uri("/api/v1/virtual-nodes/telegram/wallets/no-such-user")
+        .body(Body::empty())
+        .unwrap();
+    let res = app.oneshot(lookup).await.unwrap();
+    assert_eq!(res.status(), StatusCode::NOT_FOUND);
+
+    VirtualNodeTelegramWalletService::clear_all();
+}
