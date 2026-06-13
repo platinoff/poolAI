@@ -217,6 +217,11 @@
       "to": "e2e_jobs_lease"
     },
     {
+      "from": "job_lifecycle",
+      "kind": "sprint-scope",
+      "to": "e2e_jobs_migrating"
+    },
+    {
       "from": "poolai_worker",
       "kind": "implements",
       "to": "grid_dispatch"
@@ -1445,7 +1450,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S132",
+  "last_sprint_closed": "PH-S133",
   "layers": [
     {
       "id": "L0",
@@ -1478,7 +1483,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S133",
+  "next_sprint": "PH-S134",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1668,6 +1673,15 @@
       ]
     },
     {
+      "id": "e2e_jobs_migrating",
+      "label": "jobs_migrating.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/jobs_migrating.spec.ts",
+      "sprints": [
+        "PH-S133"
+      ]
+    },
+    {
       "id": "virtual_nodes",
       "label": "virtual_nodes API",
       "layer": "L3",
@@ -1781,7 +1795,8 @@
       "sprints": [
         "FM-021",
         "PH-S100",
-        "PH-S104"
+        "PH-S104",
+        "PH-S133"
       ]
     },
     {
@@ -6456,8 +6471,8 @@
       ]
     }
   ],
-  "revision": 61,
-  "updated_at": "2026-06-08",
+  "revision": 62,
+  "updated_at": "2026-06-13",
   "git_head": "da3be9b4",
   "vision_ui_rev": 54
 }
