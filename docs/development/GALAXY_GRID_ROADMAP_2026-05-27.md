@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S143…S150)
+**Оновлено:** 2026-06-13 · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S150…S159)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,9 +10,9 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S143…S150 (Rust ratio band) |
-| **Закрито PH-S128…S142** | Galaxy wire complete (locality, trust, verify env, wallet, migrating UI, network_profile) |
-| **Після S150** | replenish §5.12 (≤10) · ratio target **90–95%** |
+| **Відкрито** | **10** — PH-S150…S159 (ratio stretch **96%** spirit) |
+| **Закрито PH-S128…S148** | Galaxy wire + ratio band A–D (audit, API→Rust, ui-core/wasm, slim e2e) |
+| **Після S159** | replenish §5.12 (≤10) · formal 90–95%, stretch **96%** |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
 ---
@@ -26,9 +26,7 @@
 | `GET /api/v1/grid/pricing` | `src/network/api/grid.rs` |
 | Oracle L1/L2/L3, metrics | `src/grid/galaxy_pricing_oracle.rs` |
 | Admin read-only | `/ui/admin/grid-pricing` |
-| Wire tests (канон) | `tests/` + `cargo test-ci`; legacy `e2e/tests/grid_pricing.spec.ts` → §5.13 PH-S144 |
-
-Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GALAXY_PRICING_FORCE_FALLBACK`, `POOLAI_GALAXY_PRICING_PROVIDERS`.
+| Wire tests (канон) | `tests/` + `cargo test-ci`; legacy Playwright → `e2e/archive/api-smoke/` |
 
 ### 2.2 Governance (§9) — ops MVP ✅
 
@@ -45,43 +43,52 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 |-----------|--------|-----|
 | Поля `lease_*` на `JobRecord` | PH-S94 | `src/job/types.rs`, POST/GET jobs |
 | PATCH CAS `lease_epoch` | PH-S95 | `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` |
-| `JobStatus::Migrating` | PH-S104 ✅ | lifecycle + contract test + legacy E2E PH-S133 |
+| `JobStatus::Migrating` | PH-S104 ✅ | lifecycle + contract test |
 | Grid result lease CAS | PH-S110 ✅ | `GridResultBody.lease_epoch` |
-| Lease wire tests | PH-S107…S118 ✅ | Rust contracts + legacy Playwright → §5.13 |
+| Lease wire tests | PH-S107…S118 ✅ | Rust contracts |
 
 ### 2.4 Galaxy stubs (§5–§8) — MVP ✅
 
 | Компонент | Спринт | Де |
 |-----------|--------|-----|
-| Locality score + rank integration | PH-S128, S138 | `galaxy_locality.rs`, `tests/galaxy_locality_rank_integration.rs` |
+| Locality score + rank integration | PH-S128, S138 | `galaxy_locality.rs` |
 | Prefetch policy stub + env | PH-S129, S136 | `dispatch.rs` |
 | Trust gate + metrics | PH-S130, S137 | `galaxy_trust_score.rs` |
 | Verify sampling env | PH-S142 | `galaxy_verify_sampling.rs` |
 
-**Відкрито §5.12:** PH-S143…S150 Rust ratio band (див. FM §5.12).
+---
+
+## 3. Черга §5.12 (ratio stretch band PH-S150…S159)
+
+| # | Sprint | Тема | Ratio / acceptance |
+|---|--------|------|-------------------|
+| 1 | **PH-S150** | CI ratio advisory | warn <88%; target 93%; spirit 96% |
+| 2 | **PH-S151** | wasm grid-pricing wiring | slim JS; Playwright smoke |
+| 3 | **PH-S152** | wasm jobs lease display | slim `admin_common.js` |
+| 4 | **PH-S153** | admin_common → Rust/wasm | −≥400 LOC JS |
+| 5 | **PH-S154** | Admin i18n subset Rust | slim `i18n_core.js` |
+| 6 | **PH-S155** | ML charts → wasm | canvas glue only |
+| 7 | **PH-S156** | jobs_raid → Rust smoke | drop from `test:ci` |
+| 8 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` |
+| 9 | **PH-S158** | `poolai-e2e-stand` bin | slim shell |
+| 10 | **PH-S159** | **96%** stretch gate | warn 93%; replenish |
+
+Повна таблиця — FM **§5.12** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
+
+**Research горизонт (Galaxy wire):** §8.2 settlement · §5.3/§6 Prometheus — **після** ratio stretch S159 або Rust-only stubs.
 
 ---
 
-## 3. Черга §5.12 (Galaxy wire закрито; ratio band)
-
-| # | Sprint | Тема | Acceptance | Стан |
-|---|--------|------|------------|------|
-| — | **PH-S143…S150** | Rust ratio 90–95% | див. FM §5.12 + [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) | відкрито |
-
----
-
-## 4. Rust ratio 90–95% (§5.13, після S142)
+## 4. Rust ratio (§5.13)
 
 | Фаза | Sprints | Результат |
 |------|---------|-----------|
-| Audit baseline | PH-S143 | ratio report |
-| Dedupe API tests | PH-S144, S145 | Playwright API → Rust; `poolai-http-stand-smoke` |
-| Portable UI core | PH-S146, S147 | shared Rust crate + wasm32 POC |
-| Slim browser E2E | PH-S148, S150 | `e2e/` UI-only; CI ratio gate |
+| Audit + dedupe | PH-S143…S145 | baseline + API→Rust |
+| Portable UI core | PH-S146…S147 | ui-core + wasm POC |
+| Slim browser E2E | PH-S148 | browser-only `test:ci` |
+| Gate + stretch | PH-S150…S159 | CI advisory → **96% spirit** |
 
-Повна таблиця — FM **§5.13** · [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
-
-**Research горизонт (Galaxy wire):** §8.2 settlement · §5.3/§6 Prometheus — **після** ratio фази B або паралельно як Rust-only stubs.
+**Baseline:** **91.99%** · [`rust_ratio.json`](./rust_ratio.json).
 
 ---
 
@@ -93,17 +100,16 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 cargo fmt --all && cargo test-ci
 cargo run --bin poolai-openapi-gap-audit   # після API
+cargo run --bin poolai-loc-audit           # ratio gate
 bash bin/e2e-playwright.sh --start         # лише src/ui/ або axe/visual scope
 ```
 
 ---
 
-## 6. Пов’язані документи
+## 6. Пов'язані документи
 
 | Документ | Роль |
 |----------|------|
-| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12, §5.13 | Таблиця PH-S* |
-| [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) | 90–95% + portability |
-| [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) | Витяг модулів |
-| [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) | Концепт |
-| [`docs/vision/index.html`](../vision/index.html) | Візуальна карта |
+| [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) | концепт v1 |
+| [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 | єдина черга PH-S* |
+| [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) | ratio 90–95% + **96% stretch** |

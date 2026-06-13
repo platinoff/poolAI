@@ -1532,11 +1532,29 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_core_src_validate_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_wasm_Cargo_toml"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_wasm_README_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_wasm_src_lib_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S147",
+  "last_sprint_closed": "PH-S148",
   "layers": [
     {
       "id": "L0",
@@ -1569,7 +1587,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S148",
+  "next_sprint": "PH-S150",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -3535,7 +3553,10 @@
       "id": "docs_development_E2E_PLAYWRIGHT_md",
       "label": "E2E_PLAYWRIGHT.md",
       "layer": "L1",
-      "path": "docs/development/E2E_PLAYWRIGHT.md"
+      "path": "docs/development/E2E_PLAYWRIGHT.md",
+      "sprints": [
+        "PH-S148"
+      ]
     },
     {
       "auto_synced": true,
@@ -4763,6 +4784,9 @@
         "PH-S147"
       ]
     },
+    {
+      "auto_synced": true,
+      "id": "src_bin_poolai_loc_audit_rs",
       "label": "poolai_loc_audit.rs",
       "layer": "L3",
       "path": "src/bin/poolai_loc_audit.rs",
@@ -6869,9 +6893,16 @@
       "label": "telegram_wallet.spec.ts",
       "layer": "L3",
       "path": "e2e/archive/api-smoke/telegram_wallet.spec.ts"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_wasm_README_md",
+      "label": "README.md",
+      "layer": "L4",
+      "path": "crates/poolai-ui-wasm/README.md"
     }
   ],
-  "revision": 78,
+  "revision": 81,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

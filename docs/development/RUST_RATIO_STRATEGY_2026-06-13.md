@@ -2,7 +2,7 @@
 
 **Оновлено:** 2026-06-13 · **Канон:** FM **§5.13** · правила [`.cursor/rules/runtime-stack-policy.mdc`](../../.cursor/rules/runtime-stack-policy.mdc), [`.cursor/rules/poolai-testing-policy.mdc`](../../.cursor/rules/poolai-testing-policy.mdc)
 
-**Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%**, щоб платформа (координатор, worker, API, валідація, тести) **збиралась і перевірялась через `cargo`** на будь-якій ОС/архітектурі без обов'язкового Node на edge-пристрої.
+**Мета:** зростання частки **Rust** у виконуваному коді репозиторію до **90–95%** (формально), **96% stretch spirit** (орієнтир replenish PH-S150…S159) — платформа збирається і перевіряється через **`cargo`** без обов'язкового Node на edge.
 
 ---
 
@@ -10,13 +10,13 @@
 
 | Показник | Ціль | Коментар |
 |----------|------|----------|
-| **Rust LOC share** | **90–95%** | `src/`, `tests/`, `crates/`, `src/bin/` |
+| **Rust LOC share** | **90–95%** (formal) · **96% stretch** | `src/`, `tests/`, `crates/`, `src/bin/` |
 | **Non-Rust (допустимо)** | **5–10%** | `src/ui/*.js` (glue), `e2e/*.ts` (лише browser), `bin/*.sh` (ops) |
 | **Поза ratio** | docs, `.md`, CI yaml, snapshots PNG | не входять у знаменник «коду продукту» |
 
-**Орієнтовний зріз (2026-06-13, PH-S144):** **`91.91%`** Rust LOC у product code (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). GitHub Languages bar ~**91.9%** Rust (heuristic). Основний «шум» ratio — **vanilla JS** admin panels + **browser-only** `e2e/tests/` (legacy API-smoke archived PH-S144).
+**Орієнтовний зріз (2026-06-13, PH-S148):** **`91.99%`** Rust LOC (`cargo run --bin poolai-loc-audit` → [`rust_ratio.json`](./rust_ratio.json)). Non-Rust «шум»: **`i18n_core.js`** (~2k LOC), **`admin_common.js`**, **`admin_charts.js`**, browser-only `e2e/tests/`, ops shell.
 
-**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S150 gate.
+**Audit:** `cargo run --bin poolai-loc-audit` — звіт `docs/development/rust_ratio.json` для FM §5.13 / PH-S150…S159 gates.
 
 ---
 
@@ -82,13 +82,14 @@ flowchart TB
 | **B — dedupe** | §5.13 PH-S144…S145 | перенести legacy API Playwright → Rust; HTTP stand smoke bin | +3–5% |
 | **C — UI core** | PH-S146…S147 | shared Rust crate + wasm32 POC для admin helpers | +2–4% |
 | **D — slim e2e** | PH-S148 | `e2e/` лише smoke/admin/a11y/visual; прибрати API specs з `test:ci` | +1–2% |
-| **E — gate** | PH-S150 | CI advisory якщо ratio <88%; target 90% | стабільно 90–95% |
+| **E — gate** | PH-S150 | CI advisory якщо ratio <88%; target 93% | стабільно 90–95% |
+| **F — stretch 96%** | PH-S151…S159 | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins | **→96% spirit** |
 
-**Черга §5.12 (3 відкритих)** закривається **до** старту §5.13 — без змішування scope.
+**Черга §5.12 (10 відкритих):** PH-S150…S159 — replenish після S159.
 
 ---
 
-## 5. FM §5.13 — черга після PH-S142
+## 5. FM §5.13 — черга PH-S143…S159
 
 | # | Sprint | Фокус | Acceptance |
 |---|--------|--------|------------|
@@ -97,10 +98,19 @@ flowchart TB
 | 3 | **PH-S145** | `poolai-http-stand-smoke` bin (Rust) | `reqwest` + stand env; RUN_LOCAL doc; `--raid` + `POOLAI_E2E_STAND_ROOT` | **✅** |
 | 4 | **PH-S146** | `crates/poolai-ui-core` stub | shared validators/formatters з admin JS винесені в Rust crate + unit tests | **✅** |
 | 5 | **PH-S147** | wasm32 admin core POC | один panel helper compiled to wasm; docs portability §2 | **✅** |
-| 6 | **PH-S148** | Slim `e2e/` | `test:ci` без API patterns; ratio ≥90% |
-| 7 | **PH-S150** | Ratio CI advisory | workflow крок або bin exit 1 якщо <88% (warn), target 90% |
+| 6 | **PH-S148** | Slim `e2e/` | `test:ci` без API patterns; ratio ≥90% | **✅** |
+| 7 | **PH-S150** | Ratio CI advisory | CI warn <88%; target 93%; stretch spirit **96%** | відкрито |
+| 8 | **PH-S151** | wasm grid-pricing wiring | admin panel → wasm formatters | відкрито |
+| 9 | **PH-S152** | wasm jobs lease display | jobs admin wasm lease labels | відкрито |
+| 10 | **PH-S153** | admin_common slim | api_error/format/table → Rust/wasm | відкрито |
+| 11 | **PH-S154** | Admin i18n subset Rust | slim `i18n_core.js` admin keys | відкрито |
+| 12 | **PH-S155** | ML charts → wasm | admin_charts canvas-only glue | відкрито |
+| 13 | **PH-S156** | jobs_raid → Rust smoke | drop `jobs_raid` from `test:ci` | відкрито |
+| 14 | **PH-S157** | topology SVG Rust | slim `topology_graph.js` | відкрито |
+| 15 | **PH-S158** | `poolai-e2e-stand` bin | Rust stand lifecycle; slim shell | відкрито |
+| 16 | **PH-S159** | Ratio **96%** stretch gate | warn 93%; stretch 96%; replenish next band | відкрито |
 
-*(PH-S149 — portable deploy matrix docs — можна в PH-S147 docs-sync.)*
+*(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 
 ---
 

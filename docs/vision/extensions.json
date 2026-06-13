@@ -1,7 +1,7 @@
 {
-  "revision": 39,
+  "revision": 41,
   "updated_at": "2026-06-13",
-  "active_sprint": "PH-S148",
+  "active_sprint": "PH-S150",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -296,6 +296,38 @@
       "docs": ["docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md", "docs/INDEX_2026-03-17.md", "docs/development/README.md"],
       "extensions": [".md"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md"]
+    },
+    "rust_ratio_stretch_band": {
+      "sprints": ["PH-S150", "PH-S151", "PH-S152", "PH-S153", "PH-S154", "PH-S155", "PH-S156", "PH-S157", "PH-S158", "PH-S159"],
+      "docs": [
+        "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md",
+        "docs/development/rust_ratio.json",
+        "docs/development/E2E_PLAYWRIGHT.md",
+        "docs/development/RUN_LOCAL.md"
+      ],
+      "code_globs": [
+        "src/bin/poolai_loc_audit.rs",
+        "crates/poolai-ui-core/**",
+        "crates/poolai-ui-wasm/**",
+        "src/ui/admin/**",
+        "src/ui/admin_common.js",
+        "src/ui/i18n_core.js",
+        "src/ui/admin_charts.js",
+        "src/ui/topology_graph.js",
+        "e2e/package.json",
+        "bin/e2e-playwright.sh",
+        ".github/workflows/ci.yml"
+      ],
+      "extensions": [".md", ".rs", ".js", ".json", ".yml", ".sh"],
+      "also_update": [
+        "docs/catalog/FUNCTION_MANAGEMENT.md",
+        "docs/development/HANDOFF_NEW_SESSION.md",
+        "docs/development/NEXT_SESSION_PROMPT.md",
+        "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md",
+        "docs/vision/manifest.json",
+        "docs/vision/extensions.json",
+        "docs/vision/vision.svg"
+      ]
     }
   },
   "browser_panels": [

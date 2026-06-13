@@ -10,7 +10,7 @@
 | `admin.spec.ts` | tenants; monitoring; security (**PH-S27** rotation tab + OAuth2); audit; raid; topology; workers; **jobs (PH-S53)**; vm (+ **PH-S03** create/delete); **libs**; **PH-S23** dashboard, users (+ modal), config tabs, instances list, topology refresh |
 | `a11y.spec.ts` | axe: `/ui/login`, `/ui/admin/users` (critical/serious = 0); **PH-S14:** high-contrast `color-contrast` on login + admin |
 | `visual.spec.ts` | **PH-S11:** login + 10 admin routes; **PH-S12:** theme × i18n matrix (+12); **PH-S13:** topology masked SVG (`topology.png`); див. [`VISUAL_REGRESSION_E2E.md`](./VISUAL_REGRESSION_E2E.md) |
-| `jobs_raid.spec.ts` | **PH-S52:** API smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start` (залишається до PH-S145) |
+| `jobs_raid.spec.ts` | **PH-S52 / PH-S148:** stand-restart smoke — `POST /api/v1/jobs` → restart coordinator (`POOLAI_E2E_STAND_ROOT`) → `GET /jobs/{id}`; лише з `bash bin/e2e-playwright.sh --start`; API wire канон — `tests/job_store_raid_persistence` + `poolai-http-stand-smoke` |
 
 **Rust integration (PH-S144, замість archived Playwright API specs):** `tests/jobs_api_contracts.rs`, `tests/grid_pricing_integration.rs`, `tests/grid_envelope_lease_integration.rs`, `tests/protocol_middleware_integration.rs`, `tests/virtual_node_telegram_binding_integration.rs`.
 
@@ -30,7 +30,7 @@ bash bin/e2e-playwright.sh
 
 # Варіант B: збірка + старт + тести
 bash bin/e2e-playwright.sh --start
-# GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y+visual, PH-S44 gate).
+# GitHub Actions (CI=true): debug, `CARGO_BUILD_JOBS=1`, features без `ml`; `npm run test:ci` (smoke+admin+a11y+visual+jobs_raid — browser-only gate, PH-S44/PH-S148).
 # Windows + AV: виключення для `target/` і `~/.cargo`; локально `export CARGO_BUILD_JOBS=1` перед `--start`.
 
 # PH-S11: оновити visual baselines
@@ -65,8 +65,10 @@ bash bin/e2e-playwright.sh --start --update-snapshots
 
 **PH-S52 ✅:** `jobs_raid` у `npm run test:ci`; `--start` виставляє `POOLAI_JOB_STORE=raid` + `restart.sh` у stand dir.
 
-**PH-S86 ✅:** `grid_pricing` у `npm run test:ci`; `--start` виставляє `POOLAI_GALAXY_PRICING_FALLBACK_JSON` (default `{"inference_blended_token":470000}`).
+**PH-S86 ✅ (archived):** `grid_pricing.spec.ts` → `e2e/archive/api-smoke/`; канон — `tests/grid_pricing_integration.rs` (PH-S144).
 
-**PH-S107 ✅:** `jobs_lease` у `npm run test:ci`; acquire → `leased` + epoch `1`; renew extends `lease_expires_at`; conflict paths mirror `tests/jobs_api_contracts.rs`.
+**PH-S107 ✅ (archived):** `jobs_lease.spec.ts` → `e2e/archive/api-smoke/`; канон — `tests/jobs_api_contracts.rs` (PH-S144).
 
-**Last updated:** 2026-05-28 (PH-S107 jobs lease API E2E).
+**PH-S148 ✅:** `npm run test:ci` — лише `smoke admin a11y visual jobs_raid` (browser/UI + stand-restart smoke); API-only TS patterns не повертаються з archive.
+
+**Last updated:** 2026-06-13 (PH-S148 slim browser-only `test:ci`).

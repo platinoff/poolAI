@@ -1,14 +1,14 @@
 {
   "generated_at": "2026-06-13",
-  "sprint": "PH-S147",
+  "sprint": "PH-S148",
   "target_band_min": 0.9,
   "target_band_max": 0.95,
   "warn_min": 0.88,
-  "rust_loc": 106688,
-  "non_rust_product_loc": 9312,
-  "product_loc_total": 116000,
-  "rust_ratio": 0.9197241379310345,
-  "rust_ratio_pct": 91.97241379310344,
+  "rust_loc": 107442,
+  "non_rust_product_loc": 9361,
+  "product_loc_total": 116803,
+  "rust_ratio": 0.9198565105348322,
+  "rust_ratio_pct": 91.98565105348322,
   "in_target_band": true,
   "below_warn_threshold": false,
   "by_category": {
@@ -21,16 +21,16 @@
       "loc": 1282
     },
     "ops_shell": {
-      "files": 31,
-      "loc": 1993
+      "files": 32,
+      "loc": 2042
     },
     "rust_benches": {
       "files": 7,
       "loc": 608
     },
     "rust_crates": {
-      "files": 12,
-      "loc": 1682
+      "files": 20,
+      "loc": 2436
     },
     "rust_src": {
       "files": 229,

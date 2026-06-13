@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 (PH-S147 ✅ · §5.12 **6** відкритих PH-S148…S150 · rust_ratio **91.97%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-13 (PH-S148 ✅ · §5.12 **10** відкритих PH-S150…S159 · rust_ratio **91.99%** · stretch **96%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -109,12 +109,13 @@
 **PH-S145 ✅ (code):** `src/bin/poolai_http_stand_smoke.rs` — Rust HTTP stand smoke (`reqwest`, `POOLAI_BASE_URL`, optional `--raid` + `POOLAI_E2E_STAND_ROOT`); mirrors archived Playwright API smokes; [`RUN_LOCAL.md`](./RUN_LOCAL.md); `cargo test-ci`.
 **PH-S146 ✅ (code):** `crates/poolai-ui-core` — shared admin validators/formatters (lease, pricing, api_error, format, validate, ml) з parity до `src/ui` JS; 16 unit tests; workspace member; `cargo test -p poolai-ui-core` + `cargo test-ci`.
 **PH-S147 ✅ (code):** `crates/poolai-ui-wasm` — wasm32 POC (`formatUsdMicro`, `formatUnixSecs`, `leaseStateLabel`); `bash bin/build-ui-wasm.sh` → `src/ui/wasm/`; `.cargo/config.toml` wasm rustflags fix; [`RUN_LOCAL.md`](./RUN_LOCAL.md) + [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) §2.
+**PH-S148 ✅ (e2e/docs):** `e2e/package.json` `test:ci` — лише `smoke admin a11y visual jobs_raid` (browser-only; API specs archived у PH-S144); [`E2E_PLAYWRIGHT.md`](./E2E_PLAYWRIGHT.md) sync; `docs/vision/manifest.json` JSON fix (`poolai_loc_audit` node); `cargo run --bin poolai-loc-audit` **91.99%** ≥90%; archived api-smoke не повертаються.
 **Vision ✅:** next **PH-S146**.
-**Research replenish (2026-06-08):** §5.12 **2→10** — code-first + tests: E2E migrating/protocol (S133–S134), wallet GET + E2E (S135/S139), prefetch/trust/verify env stubs (S136/S137/S142), locality rank integration (S138), network_profile register-remote (S140), admin migrating badge (S141). Концепт-горизонт: Galaxy §8.2 settlement/telegram VM · §5.3/§6 Prometheus metrics — post-S142.
+**Research replenish (2026-06-13):** §5.12 **1→10** — ratio stretch band PH-S150…S159 (CI advisory → wasm wiring → slim JS/i18n/charts → Rust e2e/stand bins → **96%** gate). Baseline **91.99%**; spirit **96%**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **8** відкритих — **PH-S146** (наступний) … **PH-S150**. Rust ratio band — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **91.91%**.
+**Черга:** §5.12 **10** відкритих — **PH-S150** (наступний) … **PH-S159**. Ratio stretch band — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) · baseline **91.99%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
