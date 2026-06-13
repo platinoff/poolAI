@@ -1,21 +1,21 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-08 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**5** відкритих PH-S133…S134)
+**Оновлено:** 2026-06-08 · **HEAD:** `da3be9b4` · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S133…S142)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
 ---
 
-## 1. Стан черги §5.12 (2026-05-28)
+## 1. Стан черги §5.12 (2026-06-08)
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **5** — PH-S133…S134 (replenish 2026-05-29) |
-| **Закрито PH-S65…S111** | pricing, governance, protocol, lease wire MVP + renew interval env (PH-S94…S111) |
-| **Смуга PH-S100…S109** | **10/10 ✅** (2026-05-28) |
+| **Відкрито** | **10** — PH-S133…S142 (replenish 2026-06-08) |
+| **Закрито PH-S65…S132** | pricing, governance, protocol, lease wire, locality/prefetch/trust/wallet/network_profile |
+| **Смуга PH-S128…S132** | **5/5 ✅** (2026-06-08) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
-Research replenish ✅ (2026-05-29): PH-S126…S134 — OTel lease spans, pricing `/metrics`, §5 locality/prefetch, §6 trust, §3.2 wallet, §8 network_profile, E2E migrating/protocol.
+Research replenish ✅ (2026-06-08): PH-S133…S142 — E2E gaps + code-first stubs/tests (wallet GET, prefetch/trust/verify env, locality integration, network_profile register-remote, admin migrating UI).
 
 ---
 
@@ -47,65 +47,52 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 |-----------|--------|-----|
 | Поля `lease_*` на `JobRecord` | PH-S94 | `src/job/types.rs`, POST/GET jobs |
 | PATCH CAS `lease_epoch` | PH-S95 | `PATCH /api/v1/jobs/{id}` → `409 lease_epoch_rejected` |
-| Admin колонки | PH-S96 | `/ui/admin/jobs` |
-| TTL env | PH-S97 ✅ | `POOLAI_JOB_LEASE_TTL_SECS` → `src/job/lease_config.rs` |
-| Acquire | PH-S98 ✅ | scheduler + `POST /jobs/{id}/lease` → `src/job/lease_acquire.rs` |
+| `JobStatus::Migrating` | PH-S104 ✅ | lifecycle + contract test `jobs_patch_migrating_lifecycle_roundtrip` |
+| Grid result lease CAS | PH-S110 ✅ | `GridResultBody.lease_epoch` |
+| E2E lease suite | PH-S107…S118 ✅ | `jobs_lease`, `grid_job_lease`, `grid_result_lease` |
 
-| Renew | PH-S99 ✅ | `POST /jobs/{id}/lease/renew` |
-| `JobStatus::Leased` | PH-S100 ✅ | `allows_transition`, acquire/schedule → `leased` |
-| Failover requeue stub | PH-S101 ✅ | expired `leased` → `submitted` → scheduler rebind |
-| Live provider HTTP fetch | PH-S102 ✅ | endpoint pull from provider catalog + timeout env |
-| `X-PoolAI-Protocol` middleware | PH-S103 ✅ | selected routes negotiation, protocol headers, unsupported reject |
-| `JobStatus::Migrating` | PH-S104 ✅ | lifecycle transitions `Leased/Executing ↔ Migrating`; OpenAPI + contract tests |
-| Admin lease active/expired badge | PH-S105 ✅ | `/ui/admin/jobs` lease-state badge from `lease_expires_at`; i18n + Playwright smoke updates |
-| Worker lease renew client stub | PH-S106 ✅ | `poolai-worker` calls `/api/v1/jobs/{id}/lease/renew` on task payload `job_id+lease_epoch` |
+### 2.4 Galaxy stubs (§5–§8) — MVP ✅
 
-| E2E lease acquire+renew | PH-S107 ✅ | `e2e/tests/jobs_lease.spec.ts` |
+| Компонент | Спринт | Де |
+|-----------|--------|-----|
+| Locality score | PH-S128 | `galaxy_locality.rs` |
+| Prefetch policy stub | PH-S129 | `dispatch.rs` |
+| Trust gate stub | PH-S130 | `galaxy_trust_score.rs` |
+| Wallet bind POST | PH-S131 | `virtual_node_telegram_wallet_service.rs` |
+| network_profile §8.1 | PH-S132 | `POOLAI_GALAXY_GRID.md` |
 
-| Grid ingest → Leased | PH-S108 ✅ | `schedule_with_grid_peer` + lease on bind; `dispatch.rs` tests |
-| §4.3 docs sync | PH-S109 ✅ | `POOLAI_GALAXY_GRID.md` §4.3 table; смуга PH-S100…S109 закрита |
-
-| Grid result lease CAS | PH-S110 ✅ | `GridResultBody.lease_epoch`; `check_grid_result_lease_epoch`; unit tests |
-
-| Renew interval env | PH-S111 ✅ | `POOLAI_JOB_LEASE_RENEW_INTERVAL_SECS` → `JobLeaseConfig` |
-
-| Worker renew ticker loop | PH-S116 ✅ | `LeaseRenewGuard` + interval from `JobLeaseConfig` |
-| Grid Job envelope E2E | PH-S112 ✅ | `grid_job_lease.spec.ts` |
-| Grid result lease E2E | PH-S117 ✅ | `grid_result_lease.spec.ts` |
-| Jobs lease negative E2E | PH-S118 ✅ | `jobs_lease.spec.ts` PH-S118 block; e2e TTL=2s |
-| Admin jobs lease polish | PH-S119 ✅ | `#epoch`, owner/epoch tooltips, i18n EN/UK |
-| Solana adapter vision | PH-S120 ✅ | manifest Solana cluster; DIGEST §; FM-033 crosslink |
-| Worker lease heartbeat docs | PH-S121 ✅ | Galaxy §4.3.1.1; discovery vs job renew; `LeaseRenewGuard` |
-| OpenAPI lease schemas audit | PH-S122 ✅ | `GridResultBody.lease_epoch`; jobs lease examples; gap audit 0 |
-| Vision Eco + click perf | PH-S125 ✅ | Eco GPU mode; instant select; fullscreen Layers/Types; toolbar layout |
-| OTel lease span attrs docs | PH-S124 ✅ | [`OPENTELEMETRY_TRACING.md`](./OPENTELEMETRY_TRACING.md) § Job lease spans (`job.lease.*`) |
-| OTel lease span instrumentation | PH-S126 ✅ | `src/observability/lease_trace.rs`; store/jobs/grid/dispatch wire |
-| Pricing oracle Prometheus export | PH-S127 ✅ | `galaxy_pricing_*_served` + `forced_fallback_total` on `GET /metrics` |
-
-**Post-MVP (черга §5.12):** PH-S128…S134 — Galaxy §5/§6 stubs, wallet API, E2E gaps.
-
-**Vision (docs):** PH-S113…S115 ✅ · PH-S125 ✅ — Eco/perf, filter dock, dense-map UX (`docs/vision/` rev 49).
+**Post-MVP (черга §5.12):** PH-S133…S142 — E2E + stubs/tests (див. §3).
 
 ---
 
-## 3. Черга §5.12 (10 відкритих, 2026-05-29)
+## 3. Черга §5.12 (10 відкритих, 2026-06-08)
 
 | # | Sprint | Тема | Джерело | Стан |
 |---|--------|------|---------|------|
-| 1 | **PH-S124** | OTel lease span attrs docs | FM-038 | **✅** |
-| 2 | **PH-S126** | OTel lease span instrumentation | FM-038, jobs API | **✅** |
-| 3 | **PH-S127** | Pricing oracle Prometheus export | Galaxy §4.2, FM-043 | **✅** |
-| 4 | **PH-S128** | Locality score scheduler stub | Galaxy §5.1–5.2 | **✅** |
-| 5 | **PH-S129** | Seed inventory + prefetch stub | Galaxy §5.5 | **✅** |
-| 6 | **PH-S130** | Edge trust_score gate stub | Galaxy §6.5 | **✅** |
-| 7 | **PH-S131** | Telegram wallet bind API stub | Galaxy §3.2 | **✅** |
-| 8 | **PH-S132** | network_profile contract docs | Galaxy §8.1 | **✅** |
-| 9 | **PH-S133** | Job Migrating lifecycle E2E | PH-S104 | відкрито |
-| 10 | **PH-S134** | Protocol middleware E2E smoke | PH-S103 | відкрито |
+| 1 | **PH-S133** | Job Migrating lifecycle E2E | PH-S104 | відкрито |
+| 2 | **PH-S134** | Protocol middleware E2E smoke | PH-S103 | відкрито |
+| 3 | **PH-S135** | Telegram wallet GET lookup API | Galaxy §3.2 | відкрито |
+| 4 | **PH-S136** | Prefetch policy env wire stub | Galaxy §5.6 | відкрито |
+| 5 | **PH-S137** | Trust gate settlement metrics stub | Galaxy §6.5 | відкрито |
+| 6 | **PH-S138** | Locality rank integration test | PH-S128 | відкрито |
+| 7 | **PH-S139** | Telegram wallet bind E2E | PH-S131 | відкрито |
+| 8 | **PH-S140** | network_profile register-remote stub | Galaxy §8.1 | відкрито |
+| 9 | **PH-S141** | Admin jobs migrating badge UI | PH-S104 | відкрито |
+| 10 | **PH-S142** | Verification sample rate env stub | Galaxy §6.1 | відкрито |
 
 ---
 
-## 4. Локальний CI (канон)
+## 4. Research горизонт (після S142)
+
+| Джерело | Прогалина |
+|---------|-----------|
+| Galaxy §8.2 | fee settlement wire · Telegram VM probros MVP |
+| Galaxy §5.3 / §6 | `galaxy_shard_*`, `galaxy_verification_*` Prometheus |
+| Architect | LAN replication benchmarks — **BLOCKED** (2 хости) |
+
+---
+
+## 5. Локальний CI (канон)
 
 ```bash
 export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
@@ -113,22 +100,7 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 cd /s/rust/poolAI
 cargo fmt --all && cargo test-ci
 cargo run --bin poolai-openapi-gap-audit   # після API
-cd e2e && npm run test:ci                  # після src/ui/
-```
-
----
-
-## 5. Діаграма фаз
-
-```mermaid
-flowchart LR
-  A[S55-S64 concept] --> B[S65-S77 wire security]
-  B --> C[S78-S92 pricing]
-  C --> D[S93-S96 governance UI + lease stub]
-  D --> E[S97 TTL env]
-  E --> F[S98-S103 lease pricing protocol]
-  F --> G[S100-S109 lease MVP]
-  G --> H[S110+ post-lease wire]
+cd e2e && npm run test:ci                  # після src/ui/ або e2e/
 ```
 
 ---
@@ -139,4 +111,5 @@ flowchart LR
 |----------|------|
 | [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 | Таблиця PH-S* |
 | [`FUNCTIONALITY_DIGEST_2026-04-06.md`](../catalog/FUNCTIONALITY_DIGEST_2026-04-06.md) | Витяг модулів |
+| [`POOLAI_GALAXY_GRID.md`](../concept/POOLAI_GALAXY_GRID.md) | Концепт §8.1 network_profile |
 | [`docs/vision/index.html`](../vision/index.html) | Візуальна карта (localhost:8765) |

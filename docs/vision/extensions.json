@@ -1,5 +1,5 @@
 {
-  "revision": 34,
+  "revision": 35,
   "updated_at": "2026-06-08",
   "active_sprint": "PH-S133",
   "ui_version": 4,
@@ -239,7 +239,7 @@
       ]
     },
     "fm_replenish_post_galaxy_mvp": {
-      "sprints": ["PH-S124", "PH-S126", "PH-S127", "PH-S128", "PH-S129", "PH-S130", "PH-S131", "PH-S132", "PH-S133", "PH-S134"],
+      "sprints": ["PH-S124", "PH-S126", "PH-S127", "PH-S128", "PH-S129", "PH-S130", "PH-S131", "PH-S132", "PH-S133", "PH-S134", "PH-S135", "PH-S136", "PH-S137", "PH-S138", "PH-S139", "PH-S140", "PH-S141", "PH-S142"],
       "docs": [
         "docs/concept/POOLAI_GALAXY_GRID.md",
         "docs/development/OPENTELEMETRY_TRACING.md",

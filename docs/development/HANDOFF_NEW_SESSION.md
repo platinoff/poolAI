@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-07 (PH-S129 ✅ · docs-sync DIGEST/FM/NEXT_SESSION · vision rev 57) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-08 (PH-S132 ✅ · research replenish · §5.12 **10** відкритих PH-S133…S142) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -99,11 +99,12 @@
 **PH-S130 ✅ (code):** `src/grid/galaxy_trust_score.rs` + `dispatch.rs` result path — `trust_score` 0–100 settlement gate stub (Galaxy §6.5): `PayoutEligible` / `PayoutHeld` / `NotApplicable`; optional `metrics.trust_score` on grid result; unit tests; no payout wire; `cargo test-ci`.
 **PH-S131 ✅ (code):** `virtual_node_telegram_wallet_service.rs` + `POST /api/v1/virtual-nodes/telegram/wallet` — payout pubkey bind stub (Galaxy §3.2); OpenAPI sync; `virtual_node_telegram_binding_integration` contract tests; `poolai-openapi-gap-audit` 0; no on-chain wire; `cargo test-ci`.
 **PH-S132 ✅ (docs):** `POOLAI_GALAXY_GRID.md` §8.1 — `network_profile` wire contract (`region`, `latency_ms_p50`, `bandwidth_mbps`, `egress_policy`, SmallWorld consumption); TBD #1 closed; DIGEST row; cross-link `galaxy_locality.rs` `LocalityNetworkProfile`.
-**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S133** · replenish **PH-S134**.
+**Vision ✅:** header `meta-trail` — cyan **git HEAD** pill; next **PH-S133** · replenish **PH-S135…S142** (2026-06-08 research).
+**Research replenish (2026-06-08):** §5.12 **2→10** — code-first + tests: E2E migrating/protocol (S133–S134), wallet GET + E2E (S135/S139), prefetch/trust/verify env stubs (S136/S137/S142), locality rank integration (S138), network_profile register-remote (S140), admin migrating badge (S141). Концепт-горизонт: Galaxy §8.2 settlement/telegram VM · §5.3/§6 Prometheus metrics — post-S142.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **5** відкритих — **PH-S133** (наступний) … **PH-S134**. FM replenish 2026-05-29: E2E PH-S104/S103.
+**Черга:** §5.12 **10** відкритих — **PH-S133** (наступний) … **PH-S142**. `src/` TODO/FIXME — порожньо (2026-06-08). Contract `jobs_patch_migrating_lifecycle_roundtrip` ✅; E2E gap → PH-S133.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

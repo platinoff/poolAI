@@ -1,6 +1,6 @@
 # PoolAI documentation
 
-**Last updated:** 2026-06-08 (PH-S132 network_profile §8.1; §5.12 — **5** відкритих PH-S133…S134; vision rev 60)
+**Last updated:** 2026-06-08 (research replenish · §5.12 **10** відкритих PH-S133…S142; vision rev 61)
 
 ## Canonical reading order
 

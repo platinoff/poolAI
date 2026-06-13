@@ -1444,7 +1444,7 @@
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "25c75abe",
+  "git_head": "da3be9b4",
   "last_sprint_closed": "PH-S132",
   "layers": [
     {
@@ -6456,7 +6456,8 @@
       ]
     }
   ],
-  "revision": 60,
+  "revision": 61,
   "updated_at": "2026-06-08",
+  "git_head": "da3be9b4",
   "vision_ui_rev": 54
 }
