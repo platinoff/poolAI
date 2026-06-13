@@ -1,12 +1,12 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 · PH-S138 ✅ · vision **rev 67**
+**Оновлено:** 2026-06-13 · PH-S139 ✅ · vision **rev 69**
 
-| **← наступний** | **PH-S139** — Telegram wallet bind E2E |
-| **Відкритих** | **4** (PH-S139…S142) |
+| **← наступний** | **PH-S140** — network_profile register-remote stub |
+| **Відкритих** | **3** (PH-S140…S142) |
 
 ```
-PoolAI — спринт PH-S139 (одin PH-S*, VDT).
-PH-S139: e2e/tests — Playwright POST wallet OK + invalid pubkey 400; npm run test:ci
+PoolAI — спринт PH-S140 (одin PH-S*, VDT).
+PH-S140: discovery register-remote — parse metadata.network_profile; contract/integration test
 FM/HANDOFF/NEXT_SESSION/vision revision++
 ```

@@ -167,6 +167,11 @@
       "to": "src_observability_lease_trace_rs"
     },
     {
+      "from": "virtual_nodes",
+      "kind": "sprint-scope",
+      "to": "e2e_telegram_wallet"
+    },
+    {
       "from": "protocol_middleware",
       "kind": "sprint-scope",
       "to": "e2e_protocol_middleware"
@@ -1455,7 +1460,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S138",
+  "last_sprint_closed": "PH-S139",
   "layers": [
     {
       "id": "L0",
@@ -1488,7 +1493,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S139",
+  "next_sprint": "PH-S140",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1684,6 +1689,15 @@
       "path": "e2e/tests/jobs_migrating.spec.ts",
       "sprints": [
         "PH-S133"
+      ]
+    },
+    {
+      "id": "e2e_telegram_wallet",
+      "label": "telegram_wallet.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/telegram_wallet.spec.ts",
+      "sprints": [
+        "PH-S139"
       ]
     },
     {
@@ -6484,10 +6498,16 @@
       "sprints": [
         "PH-S126"
       ]
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_locality_rank_integration_rs",
+      "label": "galaxy_locality_rank_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_locality_rank_integration.rs"
     }
   ],
-  "revision": 67,
+  "revision": 69,
   "updated_at": "2026-06-13",
-  "git_head": "da3be9b4",
   "vision_ui_rev": 54
 }

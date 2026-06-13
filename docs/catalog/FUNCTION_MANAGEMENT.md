@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-13 (PH-S138 ✅ · §5.12 **4** відкритих PH-S139…S142 · vision rev 67) · FM-041 Deferred).
+**Оновлено:** 2026-06-13 (PH-S139 ✅ · §5.12 **3** відкритих PH-S140…S142 · vision rev 69) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -339,12 +339,12 @@ FM-xxx (з таблиці нижче)
 | 72 | **PH-S136** | Prefetch policy env wire stub (code) | Galaxy §5.6, `dispatch.rs` | `PrefetchPolicyMode` + `POOLAI_GALAXY_*` from_env; unit tests; no enqueue wire | **✅** |
 | 73 | **PH-S137** | Trust gate settlement metrics stub (code) | Galaxy §6.5, `galaxy_trust_score.rs` | Prometheus counters `payout_held` / `payout_eligible`; unit test | **✅** |
 | 74 | **PH-S138** | Locality rank integration test (tests) | PH-S128, `galaxy_locality.rs` | `tests/` multi-worker `rank_workers_by_locality` fixture; `cargo test-ci` | **✅** |
-| 75 | **PH-S139** | Telegram wallet bind E2E (e2e) | PH-S131, `e2e/` | Playwright POST wallet OK + invalid pubkey 400; `npm run test:ci` | відкрито |
+| 75 | **PH-S139** | Telegram wallet bind E2E (e2e) | PH-S131, `e2e/` | Playwright POST wallet OK + invalid pubkey 400; `npm run test:ci` | **✅** |
 | 76 | **PH-S140** | network_profile register-remote stub (code) | Galaxy §8.1, discovery | parse `metadata.network_profile` on register-remote; contract/integration test | відкрито |
 | 77 | **PH-S141** | Admin jobs migrating badge UI (code) | PH-S104, `jobs.rs` | `migrating` status badge + i18n EN/UK; Playwright smoke; `test:ci` | відкрито |
 | 78 | **PH-S142** | Verification sample rate env stub (code) | Galaxy §6.1, `src/grid/` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser + unit tests; no live sampling wire | відкрито |
 
-**Відкритих у §5.12:** **4** (PH-S139…S142). **Закрито смуга:** PH-S128…S138 ✅. Vision rev 67.
+**Відкритих у §5.12:** **3** (PH-S140…S142). **Закрито смуга:** PH-S128…S139 ✅. Vision rev 69.
 
 ### 5.3 Звірка «не зроблено» (менеджер функціоналу, 2026-05-18)
 
@@ -457,7 +457,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S139** (Telegram wallet bind E2E) · черга **4** відкритих · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S140** (network_profile register-remote stub) · черга **3** відкритих · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
