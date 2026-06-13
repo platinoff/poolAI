@@ -13,11 +13,13 @@ use axum::{
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::HashMap;
 
 use crate::core::discovery_types::{PeerCapabilities, PeerInfo};
 use crate::core::error::{AppError, ErrorContext};
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_network_profile::normalize_register_metadata;
 use crate::grid::protocol_compat::{negotiate, CompatStatus, MIN_COORDINATOR_VERSION_DOCS_URL};
 use crate::grid::GridEnvelope;
 use crate::network::api::common::HttpAppError;
@@ -57,7 +59,7 @@ struct RegisterRemotePeerRequest {
     #[serde(default)]
     capabilities: PeerCapabilities,
     #[serde(default)]
-    metadata: HashMap<String, String>,
+    metadata: HashMap<String, Value>,
 }
 
 #[derive(Serialize)]
@@ -240,7 +242,12 @@ async fn register_remote_handler(
             .into_response();
     }
 
-    let mut metadata = payload.metadata;
+    let mut metadata = match normalize_register_metadata(payload.metadata) {
+        Ok(m) => m,
+        Err(e) => {
+            return discovery_validation("register_remote", e.message).into_response();
+        }
+    };
     if let Some(build_id) = payload.build_id {
         metadata.insert("build_id".to_string(), build_id);
     }

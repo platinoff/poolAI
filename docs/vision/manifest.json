@@ -54,6 +54,16 @@
     {
       "from": "galaxy_grid",
       "kind": "implements",
+      "to": "galaxy_network_profile"
+    },
+    {
+      "from": "galaxy_network_profile",
+      "kind": "implements",
+      "to": "src_network_api_discovery_rs"
+    },
+    {
+      "from": "galaxy_grid",
+      "kind": "implements",
       "to": "galaxy_trust_score"
     },
     {
@@ -1456,11 +1466,17 @@
       "from": "handoff",
       "kind": "session-tracks",
       "to": "src_bin_poolai_vision_sync_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "handoff",
+      "kind": "session-tracks",
+      "to": "docs_development_RUST_RATIO_STRATEGY_2026_06_13_md"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S139",
+  "last_sprint_closed": "PH-S140",
   "layers": [
     {
       "id": "L0",
@@ -1493,7 +1509,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S140",
+  "next_sprint": "PH-S141",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1520,7 +1536,22 @@
         "PH-S63",
         "PH-S64",
         "PH-S121",
-        "PH-S132"
+        "PH-S132",
+        "PH-S140"
+      ]
+    },
+    {
+      "id": "galaxy_network_profile",
+      "label": "grid/galaxy_network_profile.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_network_profile.rs",
+      "sections": [
+        "network_profile parse",
+        "metadata.network_profile",
+        "Galaxy §8.1 wire"
+      ],
+      "sprints": [
+        "PH-S140"
       ]
     },
     {
@@ -4886,7 +4917,12 @@
       "id": "src_network_api_discovery_rs",
       "label": "discovery.rs",
       "layer": "L3",
-      "path": "src/network/api/discovery.rs"
+      "path": "src/network/api/discovery.rs",
+      "sprints": [
+        "PH-S65",
+        "PH-S103",
+        "PH-S140"
+      ]
     },
     {
       "auto_synced": true,
@@ -6505,9 +6541,25 @@
       "label": "galaxy_locality_rank_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_locality_rank_integration.rs"
+    },
+    {
+      "id": "tests_discovery_network_profile_integration_rs",
+      "label": "discovery_network_profile_integration.rs",
+      "layer": "L3",
+      "path": "tests/discovery_network_profile_integration.rs",
+      "sprints": [
+        "PH-S140"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "docs_development_RUST_RATIO_STRATEGY_2026_06_13_md",
+      "label": "RUST_RATIO_STRATEGY_2026-06-13.md",
+      "layer": "L1",
+      "path": "docs/development/RUST_RATIO_STRATEGY_2026-06-13.md"
     }
   ],
-  "revision": 69,
+  "revision": 71,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

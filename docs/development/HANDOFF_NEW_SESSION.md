@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 (PH-S139 ✅ · §5.12 **10** відкритих PH-S140…S150 · Rust ratio 90–95%) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc). — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-13 (PH-S140 ✅ · §5.12 **10** відкритих PH-S141…S150 · Rust ratio 90–95%) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc). — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -103,12 +103,13 @@
 **PH-S134 ✅ (e2e):** `e2e/tests/protocol_middleware.spec.ts` — Playwright `POST /discovery/register-remote` with `X-PoolAI-Protocol` (1.2 → compat headers; 1.0 → 403 `protocol_unsupported`); `npm run test:ci` includes `protocol_middleware`; без змін compat matrix wire.
 **PH-S138 ✅ (tests):** `tests/galaxy_locality_rank_integration.rs` — multi-worker fixture (`eu-primary` / `us-replica` / `ap-empty`); `rank_workers_by_locality` + `pick_best_worker_by_locality` ordering; tie-break + latency vs inventory cases; `cargo test --test galaxy_locality_rank_integration`.
 **PH-S139 ✅ (e2e):** `e2e/tests/telegram_wallet.spec.ts` — Playwright `POST /api/v1/virtual-nodes/telegram/wallet` verified bind + invalid pubkey → 400 (PH-S131 wire); `npm run test:ci` includes `telegram_wallet`; без нового wallet API wire.
-**Vision ✅:** next **PH-S140**.
+**PH-S140 ✅ (code):** `src/grid/galaxy_network_profile.rs` — parse `metadata.network_profile` on `POST /api/v1/discovery/register-remote` (object or JSON string); canonical JSON in peer metadata; `400` on invalid region/schema; `tests/discovery_network_profile_integration.rs`; `cargo test-ci`.
+**Vision ✅:** next **PH-S141**.
 **Research replenish (2026-06-08):** §5.12 **2→10** — code-first + tests: E2E migrating/protocol (S133–S134), wallet GET + E2E (S135/S139), prefetch/trust/verify env stubs (S136/S137/S142), locality rank integration (S138), network_profile register-remote (S140), admin migrating badge (S141). Концепт-горизонт: Galaxy §8.2 settlement/telegram VM · §5.3/§6 Prometheus metrics — post-S142.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **10** відкритих — **PH-S140** (наступний) … **PH-S150**. Смуга: Galaxy wire (S140…S142) + Rust ratio (S143…S150) — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
+**Черга:** §5.12 **10** відкритих — **PH-S141** (наступний) … **PH-S150**. Смуга: Galaxy wire (S141…S142) + Rust ratio (S143…S150) — [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md).
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 

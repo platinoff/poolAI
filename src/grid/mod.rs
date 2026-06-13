@@ -8,6 +8,7 @@ pub mod dispatch;
 mod envelope;
 pub mod galaxy_fee_split;
 pub mod galaxy_locality;
+pub mod galaxy_network_profile;
 pub mod galaxy_pricing_oracle;
 pub mod galaxy_trust_score;
 mod map;
@@ -21,6 +22,10 @@ pub use dispatch::{
 pub use envelope::{
     GridEnvelope, GridEnvelopeError, GridJobBody, GridMemoryShardBody, GridMessage,
     GridPeerStatusBody, GridResultBody, GridResultStatus, GRID_ENVELOPE_VERSION,
+};
+pub use galaxy_network_profile::{
+    normalize_register_metadata, parse_network_profile_value, GalaxyEgressPolicy,
+    GalaxyNetworkProfile, NetworkProfileParseError,
 };
 pub use map::{
     envelope_from_peer_info, envelope_from_put_artifact, memory_shard_from_put_artifact,

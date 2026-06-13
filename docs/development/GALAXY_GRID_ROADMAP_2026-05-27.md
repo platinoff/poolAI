@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S140…S150)
+**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**10** відкритих PH-S141…S150)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,8 +10,8 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **10** — PH-S140…S150 (Galaxy wire S140…S142 + Rust ratio S143…S150) |
-| **Закрито PH-S128…S139** | locality, prefetch, trust metrics, wallet GET/E2E, migrating/protocol E2E |
+| **Відкрито** | **10** — PH-S141…S150 (Galaxy wire S141…S142 + Rust ratio S143…S150) |
+| **Закрито PH-S128…S140** | locality, prefetch, trust metrics, wallet GET/E2E, migrating/protocol E2E, network_profile register-remote |
 | **Після S150** | replenish §5.12 (≤10) · ratio target **90–95%** |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
@@ -57,9 +57,9 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Prefetch policy stub + env | PH-S129, S136 | `dispatch.rs` |
 | Trust gate + metrics | PH-S130, S137 | `galaxy_trust_score.rs` |
 | Wallet bind POST + GET | PH-S131, S135, S139 | `virtual_node_telegram_wallet_service.rs`; Rust integration канон |
-| network_profile §8.1 docs | PH-S132 | `POOLAI_GALAXY_GRID.md` |
+| network_profile §8.1 docs + register-remote | PH-S132, S140 | `POOLAI_GALAXY_GRID.md`, `galaxy_network_profile.rs`, `discovery.rs` |
 
-**Відкрито §5.12:** PH-S140 register-remote `network_profile` · PH-S141 admin migrating badge · PH-S142 verify sample rate env.
+**Відкрито §5.12:** PH-S141 admin migrating badge · PH-S142 verify sample rate env.
 
 ---
 
@@ -67,9 +67,8 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 
 | # | Sprint | Тема | Acceptance (Rust-first) | Стан |
 |---|--------|------|---------------------------|------|
-| 1 | **PH-S140** | network_profile register-remote stub | parse `metadata.network_profile`; **`tests/` integration** | відкрито |
-| 2 | **PH-S141** | Admin jobs migrating badge UI | badge + i18n; Playwright **admin smoke only** | відкрито |
-| 3 | **PH-S142** | Verification sample rate env stub | `POOLAI_GALAXY_VERIFY_*` parser; unit tests | відкрито |
+| 1 | **PH-S141** | Admin jobs migrating badge UI | badge + i18n; Playwright **admin smoke only** | відкрито |
+| 2 | **PH-S142** | Verification sample rate env stub | `POOLAI_GALAXY_VERIFY_*` parser; unit tests | відкрито |
 
 ---
 

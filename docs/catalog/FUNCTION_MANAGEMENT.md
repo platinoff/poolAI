@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-13 (PH-S139 ✅ · §5.12 **10** відкритих PH-S140…S150 · vision rev 69 · Rust ratio band) · FM-041 Deferred).
+**Оновлено:** 2026-06-13 (PH-S140 ✅ · §5.12 **10** відкритих PH-S141…S150 · vision rev 71 · Rust ratio band) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -340,7 +340,7 @@ FM-xxx (з таблиці нижче)
 | 73 | **PH-S137** | Trust gate settlement metrics stub (code) | Galaxy §6.5, `galaxy_trust_score.rs` | Prometheus counters `payout_held` / `payout_eligible`; unit test | **✅** |
 | 74 | **PH-S138** | Locality rank integration test (tests) | PH-S128, `galaxy_locality.rs` | `tests/` multi-worker `rank_workers_by_locality` fixture; `cargo test-ci` | **✅** |
 | 75 | **PH-S139** | Telegram wallet bind E2E (e2e) | PH-S131, `e2e/` | Playwright POST wallet OK + invalid pubkey 400; `npm run test:ci` | **✅** |
-| 76 | **PH-S140** | network_profile register-remote stub (code) | Galaxy §8.1, discovery | parse `metadata.network_profile`; **Rust integration test**; no new Playwright | відкрито |
+| 76 | **PH-S140** | network_profile register-remote stub (code) | Galaxy §8.1, discovery | parse `metadata.network_profile`; **Rust integration test**; no new Playwright | **✅** |
 | 77 | **PH-S141** | Admin jobs migrating badge UI (code) | PH-S104, `jobs.rs` | `migrating` status badge + i18n EN/UK; Playwright smoke; `test:ci` | відкрито |
 | 78 | **PH-S142** | Verification sample rate env stub (code) | Galaxy §6.1, `src/grid/` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser + unit tests; no live sampling wire | відкрито |
 | 79 | **PH-S143** | LOC ratio baseline audit (code) | [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) | Rust bin/script + ratio report; FM sync | відкрито |
@@ -351,7 +351,7 @@ FM-xxx (з таблиці нижче)
 | 84 | **PH-S148** | Slim `e2e/` browser-only (e2e) | PH-S144 | `test:ci` без API TS patterns; ratio ≥90% | відкрито |
 | 85 | **PH-S150** | Ratio CI advisory (ops) | PH-S143 audit | CI step warn if Rust share <88%; target 90% | відкрито |
 
-**Відкритих у §5.12:** **10** (PH-S140…S142 Galaxy wire · **PH-S143…S150** Rust ratio band). **Закрито смуга:** PH-S128…S139 ✅. Vision rev 69.
+**Відкритих у §5.12:** **10** (PH-S141…S142 Galaxy wire · **PH-S143…S150** Rust ratio band). **Закрито смуга:** PH-S128…S140 ✅. Vision rev 71.
 
 **Rust ratio 90–95%:** канон [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md) · **одна сесія = один PH-S*** · replenish після S150.
 
@@ -472,7 +472,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S140** · черга **10** відкритих PH-S140…S150 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S141** · черга **10** відкритих PH-S141…S150 · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 
