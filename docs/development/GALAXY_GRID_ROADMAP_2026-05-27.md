@@ -1,6 +1,6 @@
 # Galaxy Grid — роадмеп розробки (PoolAI)
 
-**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**9** відкритих PH-S134…S142)
+**Оновлено:** 2026-06-13 · **HEAD:** pending · **Канон черги:** [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12 (**8** відкритих PH-S135…S142)
 
 Операційний зріз сесій: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) · старт наступної: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md)
 
@@ -10,12 +10,12 @@
 
 | Стан | Sprint |
 |------|--------|
-| **Відкрито** | **9** — PH-S134…S142 (replenish 2026-06-08) |
+| **Відкрито** | **8** — PH-S135…S142 (replenish 2026-06-08) |
 | **Закрито PH-S65…S132** | pricing, governance, protocol, lease wire, locality/prefetch/trust/wallet/network_profile |
 | **Смуга PH-S128…S132** | **5/5 ✅** (2026-06-08) |
 | **Поза чергою** | PH-S35/S16/S02 (LAN BLOCKED) · PH-S36/S01/S15 (Cloud SDK Deferred) |
 
-Research replenish ✅ (2026-06-08): PH-S134…S142 — E2E gaps + code-first stubs/tests (protocol middleware, wallet GET, prefetch/trust/verify env, locality integration, network_profile register-remote, admin migrating UI).
+Research replenish ✅ (2026-06-08): PH-S135…S142 — code-first stubs/tests (wallet GET, prefetch/trust/verify env, locality integration, network_profile register-remote, admin migrating UI).
 
 ---
 
@@ -61,24 +61,24 @@ Env: `POOLAI_GALAXY_PRICE_*`, `POOLAI_GALAXY_PRICING_FALLBACK_JSON`, `POOLAI_GAL
 | Wallet bind POST | PH-S131 | `virtual_node_telegram_wallet_service.rs` |
 | network_profile §8.1 | PH-S132 | `POOLAI_GALAXY_GRID.md` |
 
-**Post-MVP (черга §5.12):** PH-S134…S142 — E2E + stubs/tests (див. §3).
+**Post-MVP (черга §5.12):** PH-S135…S142 — stubs/tests (див. §3).
 
 ---
 
-## 3. Черга §5.12 (9 відкритих, 2026-06-13)
+## 3. Черга §5.12 (8 відкритих, 2026-06-13)
 
 | # | Sprint | Тема | Джерело | Стан |
 |---|--------|------|---------|------|
-| 1 | **PH-S134** | Protocol middleware E2E smoke | PH-S103 | відкрито |
-| 2 | **PH-S135** | Telegram wallet GET lookup API | Galaxy §3.2 | відкрито |
-| 3 | **PH-S136** | Prefetch policy env wire stub | Galaxy §5.6 | відкрито |
-| 4 | **PH-S137** | Trust gate settlement metrics stub | Galaxy §6.5 | відкрито |
-| 5 | **PH-S138** | Locality rank integration test | PH-S128 | відкрито |
-| 6 | **PH-S139** | Telegram wallet bind E2E | PH-S131 | відкрито |
-| 7 | **PH-S140** | network_profile register-remote stub | Galaxy §8.1 | відкрито |
-| 8 | **PH-S141** | Admin jobs migrating badge UI | PH-S104 | відкрито |
-| 9 | **PH-S142** | Verification sample rate env stub | Galaxy §6.1 | відкрито |
+| 1 | **PH-S135** | Telegram wallet GET lookup API | Galaxy §3.2 | відкрито |
+| 2 | **PH-S136** | Prefetch policy env wire stub | Galaxy §5.6 | відкрито |
+| 3 | **PH-S137** | Trust gate settlement metrics stub | Galaxy §6.5 | відкрито |
+| 4 | **PH-S138** | Locality rank integration test | PH-S128 | відкрито |
+| 5 | **PH-S139** | Telegram wallet bind E2E | PH-S131 | відкрито |
+| 6 | **PH-S140** | network_profile register-remote stub | Galaxy §8.1 | відкрито |
+| 7 | **PH-S141** | Admin jobs migrating badge UI | PH-S104 | відкрито |
+| 8 | **PH-S142** | Verification sample rate env stub | Galaxy §6.1 | відкрито |
 | — | **PH-S133** | Job Migrating lifecycle E2E | PH-S104 | **✅** |
+| — | **PH-S134** | Protocol middleware E2E smoke | PH-S103 | **✅** |
 
 ---
 

@@ -1,7 +1,7 @@
 {
-  "revision": 36,
+  "revision": 37,
   "updated_at": "2026-06-13",
-  "active_sprint": "PH-S134",
+  "active_sprint": "PH-S135",
   "ui_version": 4,
   "extension_policy": {
     ".md": {
@@ -121,9 +121,9 @@
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },
     "protocol_header_middleware": {
-      "sprints": ["PH-S103"],
+      "sprints": ["PH-S103", "PH-S134"],
       "docs": ["docs/concept/POOLAI_GALAXY_GRID.md", "docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md"],
-      "code_globs": ["src/network/api/protocol_middleware.rs", "src/network/api/mod.rs", "src/grid/protocol_compat.rs"],
+      "code_globs": ["src/network/api/protocol_middleware.rs", "src/network/api/mod.rs", "src/grid/protocol_compat.rs", "e2e/tests/protocol_middleware.spec.ts", "e2e/package.json"],
       "extensions": [".rs", ".md", ".json"],
       "also_update": ["docs/catalog/FUNCTION_MANAGEMENT.md", "docs/development/HANDOFF_NEW_SESSION.md", "docs/development/NEXT_SESSION_PROMPT.md", "docs/vision/manifest.json", "docs/vision/extensions.json"]
     },

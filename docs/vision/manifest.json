@@ -167,6 +167,11 @@
       "to": "src_observability_lease_trace_rs"
     },
     {
+      "from": "protocol_middleware",
+      "kind": "sprint-scope",
+      "to": "e2e_protocol_middleware"
+    },
+    {
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "protocol_middleware"
@@ -1450,7 +1455,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S133",
+  "last_sprint_closed": "PH-S134",
   "layers": [
     {
       "id": "L0",
@@ -1483,7 +1488,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S134",
+  "next_sprint": "PH-S135",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -1679,6 +1684,15 @@
       "path": "e2e/tests/jobs_migrating.spec.ts",
       "sprints": [
         "PH-S133"
+      ]
+    },
+    {
+      "id": "e2e_protocol_middleware",
+      "label": "protocol_middleware.spec.ts",
+      "layer": "L3",
+      "path": "e2e/tests/protocol_middleware.spec.ts",
+      "sprints": [
+        "PH-S134"
       ]
     },
     {
@@ -1967,7 +1981,8 @@
         "reject unsupported"
       ],
       "sprints": [
-        "PH-S103"
+        "PH-S103",
+        "PH-S134"
       ]
     },
     {
@@ -6471,7 +6486,7 @@
       ]
     }
   ],
-  "revision": 62,
+  "revision": 63,
   "updated_at": "2026-06-13",
   "git_head": "da3be9b4",
   "vision_ui_rev": 54
