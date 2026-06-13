@@ -27,11 +27,19 @@
 | **Coordinator / worker / tools** | Rust binaries | Linux, Windows, macOS; ARM/x86; без JVM/Python |
 | **HTTP API + business rules** | Rust `src/` | будь-який клієнт (curl, mobile, bot) |
 | **Admin UI (поточний)** | HTML + thin JS | будь-який браузер; Node **не** на production host |
-| **Admin UI (горизонт PH-S147+)** | **wasm32** modules з shared Rust crate | той самий UI logic на desktop/tablet/embedded browser |
+| **Admin UI (wasm POC PH-S147 ✅)** | **`crates/poolai-ui-wasm`** → `src/ui/wasm/` via `bash bin/build-ui-wasm.sh` | grid-pricing + lease helpers; shared logic з `poolai-ui-core` |
+| **Admin UI (горизонт)** | повне підключення wasm у admin panels | post-POC; thin JS лишається DOM glue |
 | **Перевірка якості** | **`cargo test-ci`** | dev/CI на будь-якій машині з Rust toolchain |
 | **Browser regression** | Playwright (мінімум) | лише CI/dev з Node; не на edge nodes |
 
 **Принцип:** нові можливості — **Rust-first**; JS/TS — лише те, що браузер не отримує з WASM/DOM glue; Node — лише harness для axe/visual/admin smoke.
+
+**Portable deploy (PH-S149 sync, коротко):**
+
+| Surface | Coordinator / worker | Admin UI | Перевірка без Node |
+|---------|----------------------|----------|-------------------|
+| Linux / Windows dev | `cargo build --release` | HTML + JS; wasm via `bash bin/build-ui-wasm.sh` | `cargo test-ci`, `poolai-http-stand-smoke` |
+| Edge node | Rust binary only | static UI (optional wasm) | curl / Rust smoke bins |
 
 ---
 
@@ -88,7 +96,7 @@ flowchart TB
 | 2 | **PH-S144** | Playwright API → Rust migration | `jobs_lease`, `grid_*`, `protocol_middleware`, `telegram_wallet`, `jobs_migrating` покриті integration; Playwright specs archived або deleted | **✅** |
 | 3 | **PH-S145** | `poolai-http-stand-smoke` bin (Rust) | `reqwest` + stand env; RUN_LOCAL doc; `--raid` + `POOLAI_E2E_STAND_ROOT` | **✅** |
 | 4 | **PH-S146** | `crates/poolai-ui-core` stub | shared validators/formatters з admin JS винесені в Rust crate + unit tests | **✅** |
-| 5 | **PH-S147** | wasm32 admin core POC | один panel helper compiled to wasm; docs portability §2 |
+| 5 | **PH-S147** | wasm32 admin core POC | один panel helper compiled to wasm; docs portability §2 | **✅** |
 | 6 | **PH-S148** | Slim `e2e/` | `test:ci` без API patterns; ratio ≥90% |
 | 7 | **PH-S150** | Ratio CI advisory | workflow крок або bin exit 1 якщо <88% (warn), target 90% |
 

@@ -1536,7 +1536,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S146",
+  "last_sprint_closed": "PH-S147",
   "layers": [
     {
       "id": "L0",
@@ -1569,7 +1569,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S147",
+  "next_sprint": "PH-S148",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4725,7 +4725,44 @@
     },
     {
       "auto_synced": true,
-      "id": "src_bin_poolai_loc_audit_rs",
+      "id": "crates_poolai_ui_wasm_Cargo_toml",
+      "label": "poolai-ui-wasm Cargo.toml",
+      "layer": "L3",
+      "path": "crates/poolai-ui-wasm/Cargo.toml",
+      "sprints": [
+        "PH-S147"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_wasm_src_lib_rs",
+      "label": "poolai-ui-wasm lib.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-wasm/src/lib.rs",
+      "sprints": [
+        "PH-S147"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "bin_build_ui_wasm_sh",
+      "label": "build-ui-wasm.sh",
+      "layer": "L1",
+      "path": "bin/build-ui-wasm.sh",
+      "sprints": [
+        "PH-S147"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_wasm_README_md",
+      "label": "ui/wasm README",
+      "layer": "L3",
+      "path": "src/ui/wasm/README.md",
+      "sprints": [
+        "PH-S147"
+      ]
+    },
       "label": "poolai_loc_audit.rs",
       "layer": "L3",
       "path": "src/bin/poolai_loc_audit.rs",

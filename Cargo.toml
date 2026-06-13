@@ -5,6 +5,7 @@ members = [
     "crates/poolai-solana-adapter",
     "crates/poolai-solana-adapter/program/poolai-events",
     "crates/poolai-ui-core",
+    "crates/poolai-ui-wasm",
 ]
 
 [package]

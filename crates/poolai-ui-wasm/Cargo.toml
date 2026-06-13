@@ -1,0 +1,17 @@
+[package]
+name = "poolai-ui-wasm"
+version = "0.1.0"
+edition = "2021"
+authors = ["PoolAI Team"]
+description = "wasm32 POC for poolai-ui-core admin helpers (PH-S147 grid-pricing panel)"
+license = "MIT"
+repository = "https://github.com/poolai/poolai"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+poolai-ui-core = { path = "../poolai-ui-core" }
+wasm-bindgen = "0.2"

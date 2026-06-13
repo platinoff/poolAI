@@ -2,7 +2,7 @@
 
 Shared validators and formatters extracted from PoolAI admin UI JavaScript (`src/ui/admin_common.js`, `admin/jobs.rs`, `grid_pricing.rs`, `admin_charts.js`).
 
-**PH-S146:** Rust crate + unit tests. **PH-S147:** optional `wasm32` POC wiring.
+**PH-S146:** Rust crate + unit tests. **PH-S147 ✅:** `crates/poolai-ui-wasm` — build with `bash bin/build-ui-wasm.sh`.
 
 ## Modules
 

@@ -228,6 +228,23 @@ cargo run --bin poolai-http-stand-smoke -- --json
 
 ---
 
+## Admin UI WASM POC (PH-S147)
+
+Grid-pricing / lease helpers з [`crates/poolai-ui-core`](../../crates/poolai-ui-core) → [`crates/poolai-ui-wasm`](../../crates/poolai-ui-wasm) для браузера.
+
+```bash
+export PATH="$HOME/.cargo/bin:/ucrt64/bin:/usr/bin:$PATH"
+export RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu   # MSYS2 UCRT64
+
+# Потрібно: rustup target add wasm32-unknown-unknown
+#           cargo install wasm-bindgen-cli --version 0.2.108
+bash bin/build-ui-wasm.sh
+```
+
+Артефакти: `src/ui/wasm/poolai_ui_wasm_bg.wasm` + `poolai_ui_wasm.js` (gitignored; див. [`RUST_RATIO_STRATEGY_2026-06-13.md`](./RUST_RATIO_STRATEGY_2026-06-13.md) §2).
+
+---
+
 ## E2E / pa11y (окремо від сервера)
 
 ```powershell

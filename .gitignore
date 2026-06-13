@@ -55,3 +55,8 @@ target/
 # Alternate CARGO_TARGET_DIR from local test runs (e.g. FM-007)
 target-fm007-test/
 **/*.pdb
+
+# PH-S147: wasm-bindgen output (build via bin/build-ui-wasm.sh)
+src/ui/wasm/poolai_ui_wasm.js
+src/ui/wasm/poolai_ui_wasm_bg.wasm
+src/ui/wasm/poolai_ui_wasm_bg.wasm.d.ts

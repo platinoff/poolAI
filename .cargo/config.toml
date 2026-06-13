@@ -1,6 +1,6 @@
 [build]
 target-dir = "target"
-rustflags = ["-C", "link-arg=-Wl,-rpath,/home/rust/libtorch/lib"]
+# Per-target rustflags below; avoid global flags (breaks wasm32-unknown-unknown link).
 
 [target.x86_64-unknown-linux-gnu]
 rustflags = ["-C", "link-arg=-Wl,-rpath,/home/rust/libtorch/lib"]
@@ -10,6 +10,9 @@ rustflags = ["-C", "target-feature=+crt-static"]
 
 [target.x86_64-pc-windows-gnu]
 linker = "x86_64-w64-mingw32-gcc"
+
+[target.wasm32-unknown-unknown]
+rustflags = []
 
 [env]
 # MSYS2 path for dlltool.exe and other MinGW tools (Windows)
