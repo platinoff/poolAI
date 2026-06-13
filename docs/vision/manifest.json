@@ -6901,9 +6901,16 @@
       "label": "README.md",
       "layer": "L4",
       "path": "crates/poolai-ui-wasm/README.md"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_wasm_static_rs",
+      "label": "wasm_static.rs",
+      "layer": "L3",
+      "path": "src/ui/wasm_static.rs"
     }
   ],
-  "revision": 83,
+  "revision": 84,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }
