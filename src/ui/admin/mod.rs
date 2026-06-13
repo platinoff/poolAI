@@ -136,6 +136,7 @@ pub fn admin_layout_with_module_script(
     let common_js = include_str!("../admin_common.js");
     let modal_js = include_str!("../admin_modal_a11y.js");
     let charts_js = include_str!("../admin_charts.js");
+    let i18n_patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     let module_block = if module_script.is_empty() {
         String::new()
     } else {
@@ -202,6 +203,7 @@ pub fn admin_layout_with_module_script(
   </div>
   <div id="admin-aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
   
+  <script>{i18n_patch}</script>
   <script>{i18n_js}</script>
   <script>{theme_js}</script>
   <script>{common_js}</script>
@@ -243,6 +245,7 @@ pub fn admin_layout_with_module_script(
         skip_admin_nav_href = "#admin_nav",
         base_css = base_css,
         body = body_html,
+        i18n_patch = i18n_patch,
         i18n_js = i18n_js,
         common_js = common_js,
         charts_js = charts_js,
@@ -251,6 +254,14 @@ pub fn admin_layout_with_module_script(
     );
 
     Html(html)
+}
+
+#[test]
+fn admin_layout_injects_rust_i18n_patch_ph_s154() {
+    let patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    assert!(patch.contains("window.__poolaiAdminI18nRust="));
+    assert!(patch.contains(r#""admin.jobs.leaseState.active""#));
+    assert!(patch.contains(r#""admin.gridPricing.section""#));
 }
 
 #[test]

@@ -1550,11 +1550,23 @@
       "from": "crate_solana",
       "kind": "implements",
       "to": "crates_poolai_ui_wasm_src_lib_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_table_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_i18n_rs"
     }
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S153",
+  "last_sprint_closed": "PH-S154",
   "layers": [
     {
       "id": "L0",
@@ -1587,7 +1599,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S154",
+  "next_sprint": "PH-S155",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -6913,9 +6925,38 @@
       "label": "wasm_static.rs",
       "layer": "L3",
       "path": "src/ui/wasm_static.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_table_rs",
+      "label": "table.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/table.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_i18n_rs",
+      "label": "i18n.rs",
+      "layer": "L4",
+      "path": "crates/poolai-ui-core/src/i18n.rs",
+      "sprints": ["PH-S154"]
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_modal_a11y_js",
+      "label": "admin_modal_a11y.js",
+      "layer": "L3",
+      "path": "src/ui/admin_modal_a11y.js"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_ui_admin_theme_js",
+      "label": "admin_theme.js",
+      "layer": "L3",
+      "path": "src/ui/admin_theme.js"
     }
   ],
-  "revision": 86,
+  "revision": 87,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

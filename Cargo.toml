@@ -160,6 +160,9 @@ tracing-opentelemetry = { version = "0.29", optional = true }
 # PH-S07 / FM-043: Prometheus text exposition at GET /metrics
 prometheus = { version = "0.14", optional = true, features = ["process"] }
 
+# PH-S154: admin jobs/grid-pricing i18n subset (injected in admin_layout)
+poolai-ui-core = { path = "crates/poolai-ui-core" }
+
 # Windows API (only on Windows) - commented out for now
 # Full Windows Job Objects implementation requires proper Windows API integration
 # [target.'cfg(windows)'.dependencies]

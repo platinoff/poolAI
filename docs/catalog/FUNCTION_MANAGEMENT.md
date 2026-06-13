@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-13 (PH-S153 ✅ · §5.12 **6** відкритих PH-S154…S159 · vision rev **86** · **rust_ratio 92.30%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-13 (PH-S154 ✅ · §5.12 **5** відкритих PH-S155…S159 · rust_ratio **92.15%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -353,14 +353,14 @@ FM-xxx (з таблиці нижче)
 | 86 | **PH-S151** | wasm grid-pricing panel wiring (code) | PH-S147 | `/ui/admin/grid-pricing` → wasm formatters; `/ui/wasm/*` static; Playwright smoke | **✅** |
 | 87 | **PH-S152** | wasm jobs lease display (code) | PH-S151, `jobs.rs` | admin jobs panel: wasm `leaseStateLabel`; shared `POOLAI_UI_WASM_MODULE`; Playwright smoke | **✅** |
 | 88 | **PH-S153** | `poolai-ui-core` → admin_common slim (code) | PH-S146 | `api_error`, `format`, table helpers → Rust/wasm; −≥400 LOC JS | **✅** |
-| 89 | **PH-S154** | Admin i18n subset in Rust (code) | PH-S153 | grid-pricing + jobs lease EN/UK keys у Rust templates; slim `i18n_core.js` admin block | відкрито |
+| 89 | **PH-S154** | Admin i18n subset in Rust (code) | PH-S153 | grid-pricing + jobs lease EN/UK keys у Rust templates; slim `i18n_core.js` admin block | **✅** |
 | 90 | **PH-S155** | ML charts data → Rust/wasm (code) | PH-S146 `ml` | `admin_charts.js` — лише canvas glue; metrics parse у wasm | відкрито |
 | 91 | **PH-S156** | `jobs_raid` e2e → Rust stand smoke (tests) | PH-S145 | `poolai-http-stand-smoke --raid-restart`; прибрати `jobs_raid` з `test:ci` | відкрито |
 | 92 | **PH-S157** | topology SVG from Rust (code) | `topology.rs` | masked topology data з Rust; slim `topology_graph.js` | відкрито |
 | 93 | **PH-S158** | `poolai-e2e-stand` Rust bin (code) | PH-S145 | stand start/restart/env у Rust bin; slim `bin/e2e-playwright.sh` | відкрито |
 | 94 | **PH-S159** | Ratio **96%** stretch CI gate (ops) | PH-S150…S158 | `poolai-loc-audit` warn **93%**, stretch **96%**; FM replenish next band | відкрито |
 
-**Відкритих у §5.12:** **6** (PH-S154…S159). **Закрито смуга:** PH-S128…S153 ✅. Vision rev 86. **Baseline:** rust_ratio **92.30%** → **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
+**Відкритих у §5.12:** **5** (PH-S155…S159). **Закрито смуга:** PH-S128…S154 ✅. Vision rev 87. **Baseline:** rust_ratio **92.15%** → **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
 **Rust ratio:** формальна смуга **90–95%**; **spirit 96%** — кожен PH-S* зменшує JS/TS/shell або переносить логіку в Rust/wasm; replenish після S159.
 
@@ -481,7 +481,7 @@ FM-xxx (з таблиці нижче)
 
 **Поза autoprogon:** FM-003 §4 LAN (**BLOCKED**).
 
-**Наступна сесія:** **PH-S154** · черга **6** відкритих (PH-S154…S159) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S155** · черга **5** відкритих (PH-S155…S159) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

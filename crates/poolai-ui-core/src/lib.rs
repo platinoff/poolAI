@@ -5,6 +5,7 @@
 
 pub mod api_error;
 pub mod format;
+pub mod i18n;
 pub mod lease;
 pub mod ml;
 pub mod pricing;

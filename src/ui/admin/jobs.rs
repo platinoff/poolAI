@@ -2,6 +2,7 @@
 //! PH-S96/PH-S105/PH-S119: read-only Galaxy lease columns, tooltips, `#epoch` display.
 //! PH-S141: `migrating` status badge + i18n EN/UK.
 //! PH-S152: lease state badge via shared `poolai-ui-wasm` `leaseStateLabel`; thin JS fallback.
+//! PH-S154: EN/UK lease + table i18n in `poolai-ui-core::i18n` (injected via admin_layout).
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;
@@ -225,6 +226,13 @@ pub async fn admin_jobs() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_jobs_page_includes_rust_i18n_patch_ph_s154() {
+    let html = admin_jobs().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.jobs.leaseState.active""#));
 }
 
 #[tokio::test]

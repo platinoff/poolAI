@@ -1,5 +1,6 @@
 //! Galaxy Grid pricing snapshot admin page (PH-S82) — read-only `GET /api/v1/grid/pricing`.
 //! PH-S151/PH-S152: USD/time formatters via shared `poolai-ui-wasm` bootstrap; thin JS fallback otherwise.
+//! PH-S154: EN/UK i18n subset in `poolai-ui-core::i18n` (injected via admin_layout).
 
 use crate::ui::admin::admin_layout;
 use axum::response::Html;
@@ -157,6 +158,13 @@ pub async fn admin_grid_pricing() -> Html<String> {
         "#,
         script,
     )
+}
+
+#[tokio::test]
+async fn admin_grid_pricing_page_includes_rust_i18n_patch_ph_s154() {
+    let html = admin_grid_pricing().await.0;
+    assert!(html.contains("window.__poolaiAdminI18nRust="));
+    assert!(html.contains(r#""admin.gridPricing.section""#));
 }
 
 #[tokio::test]
