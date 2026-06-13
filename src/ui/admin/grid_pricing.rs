@@ -1,22 +1,8 @@
 //! Galaxy Grid pricing snapshot admin page (PH-S82) — read-only `GET /api/v1/grid/pricing`.
-//! PH-S151: USD/time formatters via `poolai-ui-wasm` when built; thin JS fallback otherwise.
+//! PH-S151/PH-S152: USD/time formatters via shared `poolai-ui-wasm` bootstrap; thin JS fallback otherwise.
 
-use crate::ui::admin::admin_layout_with_module_script;
+use crate::ui::admin::{admin_layout_with_module_script, POOLAI_UI_WASM_MODULE};
 use axum::response::Html;
-
-const GRID_PRICING_WASM_MODULE: &str = r#"
-import init, { formatUsdMicro, formatUnixSecs, poolaiUiWasmVersion } from '/ui/wasm/poolai_ui_wasm.js';
-window.poolaiGridPricingWasm = { ready: false, failed: false, formatUsdMicro, formatUnixSecs };
-try {
-  await init();
-  window.poolaiGridPricingWasm.ready = true;
-  document.documentElement.dataset.poolaiUiWasm = poolaiUiWasmVersion();
-} catch (err) {
-  window.poolaiGridPricingWasm.failed = true;
-  console.warn('poolai-ui-wasm init failed', err);
-}
-window.dispatchEvent(new Event('poolai-grid-pricing-wasm'));
-"#;
 
 /// Grid pricing snapshot page (`/ui/admin/grid-pricing`).
 pub async fn admin_grid_pricing() -> Html<String> {
@@ -57,7 +43,7 @@ pub async fn admin_grid_pricing() -> Html<String> {
     }
 
     function formatUsdMicro(usdMicro) {
-      const wasm = window.poolaiGridPricingWasm;
+      const wasm = window.poolaiUiWasm;
       if (wasm && wasm.ready && typeof wasm.formatUsdMicro === 'function') {
         return wasm.formatUsdMicro(Number(usdMicro));
       }
@@ -65,7 +51,7 @@ pub async fn admin_grid_pricing() -> Html<String> {
     }
 
     function formatUnixSecs(secs) {
-      const wasm = window.poolaiGridPricingWasm;
+      const wasm = window.poolaiUiWasm;
       if (wasm && wasm.ready && typeof wasm.formatUnixSecs === 'function') {
         return wasm.formatUnixSecs(Number(secs));
       }
@@ -78,44 +64,34 @@ pub async fn admin_grid_pricing() -> Html<String> {
       const snap = data.snapshot || {};
       const source = String(data.source || '—');
       const freshness = String(data.freshness || '—');
+      const task = String(snap.task_profile || '—');
+      const model = String(snap.model_profile || '—');
+      const unit = String(snap.unit_key || '—');
+      const usdMicro = snap.usd_micro;
+      const updatedAt = snap.updated_at;
       el.innerHTML =
-        '<div class="admin-card" id="grid-pricing-result">' +
-        '<h3>' + escapeHtml(T('admin.gridPricing.resultTitle', 'Pricing snapshot')) + '</h3>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.source', 'Source')) + '</span>' +
-        '<span class="stat-value"><code>' + escapeHtml(source) + '</code></span></div>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.freshness', 'Freshness')) + '</span>' +
-        '<span class="stat-value"><code>' + escapeHtml(freshness) + '</code></span></div>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.unitKey', 'Unit key')) + '</span>' +
-        '<span class="stat-value"><code>' + escapeHtml(String(snap.unit_key || '')) + '</code></span></div>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.marketMin', 'Market min (μUSD)')) + '</span>' +
-        '<span class="stat-value">' + escapeHtml(String(snap.market_min_usd_micro ?? '—')) +
-        ' <span class="muted">(' + escapeHtml(formatUsdMicro(snap.market_min_usd_micro)) + ')</span></span></div>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.poolaiQuote', 'PoolAI quote (μUSD)')) + '</span>' +
-        '<span class="stat-value">' + escapeHtml(String(snap.poolai_quote_usd_micro ?? '—')) +
-        ' <span class="muted">(' + escapeHtml(formatUsdMicro(snap.poolai_quote_usd_micro)) + ')</span></span></div>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.provider', 'Provider at min')) + '</span>' +
-        '<span class="stat-value"><code>' + escapeHtml(String(snap.provider_id_at_min || '—')) + '</code></span></div>' +
-        '<div class="stat-item"><span class="stat-label">' +
-        escapeHtml(T('admin.gridPricing.col.cachedAt', 'Cached at')) + '</span>' +
-        '<span class="stat-value">' + escapeHtml(formatUnixSecs(snap.cached_at_secs)) + '</span></div>' +
-        '</div>';
+        '<div id="grid-pricing-result" class="admin-card">' +
+        '<h3>' + escapeHtml(T('admin.gridPricing.result', 'Pricing snapshot')) + '</h3>' +
+        '<dl class="admin-dl">' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.task', 'Task profile')) + '</dt>' +
+        '<dd><code>' + escapeHtml(task) + '</code></dd>' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.model', 'Model profile')) + '</dt>' +
+        '<dd><code>' + escapeHtml(model) + '</code></dd>' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.unit', 'Unit key')) + '</dt>' +
+        '<dd><code>' + escapeHtml(unit) + '</code></dd>' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.price', 'Price (USD)')) + '</dt>' +
+        '<dd>' + escapeHtml(formatUsdMicro(usdMicro)) + '</dd>' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.updated', 'Updated at')) + '</dt>' +
+        '<dd>' + escapeHtml(formatUnixSecs(updatedAt)) + '</dd>' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.source', 'Source')) + '</dt>' +
+        '<dd>' + escapeHtml(source) + '</dd>' +
+        '<dt>' + escapeHtml(T('admin.gridPricing.col.freshness', 'Freshness')) + '</dt>' +
+        '<dd>' + escapeHtml(freshness) + '</dd>' +
+        '</dl></div>';
     }
 
     async function loadGridPricingSnapshot() {
-      const panel = document.getElementById('grid-pricing-panel');
-      if (!panel) return;
-      const p = gridPricingQueryParams();
-      if (!p.task || !p.model) {
-        adminShowInlineError('grid-pricing-panel', T('admin.gridPricing.errParams', 'Task and model profile are required.'));
-        return;
-      }
-      adminShowLoading('grid-pricing-panel', T('admin.gridPricing.loading', 'Loading pricing snapshot…'));
+      adminShowLoading('grid-pricing-panel', T('admin.gridPricing.loading', 'Loading pricing…'));
       try {
         const data = await fetchJson(gridPricingApiUrl());
         renderGridPricingSnapshot(data);
@@ -134,10 +110,10 @@ pub async fn admin_grid_pricing() -> Html<String> {
       loadGridPricingSnapshot();
     }
 
-    if (window.poolaiGridPricingWasm && (window.poolaiGridPricingWasm.ready || window.poolaiGridPricingWasm.failed)) {
+    if (window.poolaiUiWasm && (window.poolaiUiWasm.ready || window.poolaiUiWasm.failed)) {
       startGridPricingPage();
     } else {
-      window.addEventListener('poolai-grid-pricing-wasm', startGridPricingPage, { once: true });
+      window.addEventListener('poolai-ui-wasm-ready', startGridPricingPage, { once: true });
       setTimeout(startGridPricingPage, 2500);
     }
     "#;
@@ -179,7 +155,7 @@ pub async fn admin_grid_pricing() -> Html<String> {
           <div id="grid-pricing-panel" class="grid-pricing-panel"></div>
         </div>
         "#,
-        GRID_PRICING_WASM_MODULE,
+        POOLAI_UI_WASM_MODULE,
         script,
     )
 }
@@ -200,7 +176,7 @@ async fn admin_grid_pricing_page_wires_poolai_ui_wasm_module() {
     let html = admin_grid_pricing().await.0;
     assert!(html.contains("type=\"module\""));
     assert!(html.contains("/ui/wasm/poolai_ui_wasm.js"));
-    assert!(html.contains("poolaiGridPricingWasm"));
-    assert!(html.contains("poolai-grid-pricing-wasm"));
+    assert!(html.contains("window.poolaiUiWasm"));
+    assert!(html.contains("poolai-ui-wasm-ready"));
     assert!(html.contains("formatUsdMicroFallback"));
 }

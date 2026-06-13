@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-06-13",
-  "sprint": "PH-S150",
+  "sprint": "PH-S152",
   "formal_band_min": 0.9,
   "formal_band_max": 0.95,
   "warn_below": 0.88,
@@ -59,6 +59,7 @@
   "notes": [
     "Denominator: product code only (strategy §1); docs/yaml/png excluded",
     "GitHub Languages bar is heuristic; this report uses git-tracked LOC buckets",
+    "PH-S152: shared POOLAI_UI_WASM_MODULE; jobs leaseStateLabel via wasm",
     "PH-S150: CI --advisory warns below warn_below; stretch spirit documented via --stretch"
   ]
 }

@@ -101,7 +101,7 @@ flowchart TB
 | 6 | **PH-S148** | Slim `e2e/` | `test:ci` без API patterns; ratio ≥90% | **✅** |
 | 7 | **PH-S150** | Ratio CI advisory | CI `rust-ratio-audit`; `--warn-below 0.88` `--target 0.93` `--stretch 0.96` `--advisory`; **92.00%** | **✅** |
 | 8 | **PH-S151** | wasm grid-pricing wiring | `/ui/wasm/*` + grid-pricing module; Playwright smoke | **✅** |
-| 9 | **PH-S152** | wasm jobs lease display | jobs admin wasm lease labels | відкрито |
+| 9 | **PH-S152** | wasm jobs lease display | shared `POOLAI_UI_WASM_MODULE`; jobs `leaseStateLabel`; Playwright smoke | **✅** |
 | 10 | **PH-S153** | admin_common slim | api_error/format/table → Rust/wasm | відкрито |
 | 11 | **PH-S154** | Admin i18n subset Rust | slim `i18n_core.js` admin keys | відкрито |
 | 12 | **PH-S155** | ML charts → wasm | admin_charts canvas-only glue | відкрито |

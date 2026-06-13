@@ -1,8 +1,9 @@
 //! Job layer admin page (PH-S53) — list jobs + persistence backend badge.
 //! PH-S96/PH-S105/PH-S119: read-only Galaxy lease columns, tooltips, `#epoch` display.
 //! PH-S141: `migrating` status badge + i18n EN/UK.
+//! PH-S152: lease state badge via shared `poolai-ui-wasm` `leaseStateLabel`; thin JS fallback.
 
-use crate::ui::admin::admin_layout;
+use crate::ui::admin::{admin_layout_with_module_script, POOLAI_UI_WASM_MODULE};
 use axum::response::Html;
 
 /// Jobs management page (`/ui/admin/jobs`).
@@ -106,15 +107,23 @@ pub async fn admin_jobs() -> Html<String> {
       );
     }
 
-    function leaseState(expiresAt) {
+    function leaseStateFallback(expiresAt) {
       if (!expiresAt) return 'none';
       const ts = Date.parse(String(expiresAt));
       if (Number.isNaN(ts)) return 'none';
       return Date.now() < ts ? 'active' : 'expired';
     }
 
+    function leaseStateKey(expiresAt) {
+      const wasm = window.poolaiUiWasm;
+      if (wasm && wasm.ready && typeof wasm.leaseStateLabel === 'function') {
+        return wasm.leaseStateLabel(String(expiresAt || ''), new Date().toISOString());
+      }
+      return leaseStateFallback(expiresAt);
+    }
+
     function leaseStateBadge(expiresAt) {
-      const state = leaseState(expiresAt);
+      const state = leaseStateKey(expiresAt);
       if (state === 'none') return '—';
       const cls = state === 'active' ? 'active' : 'warning';
       const label = state === 'active'
@@ -183,11 +192,20 @@ pub async fn admin_jobs() -> Html<String> {
       if (typeof adminInitTablesIn === 'function') adminInitTablesIn(el);
     }
 
-    loadJobs();
-    setInterval(loadJobs, 10000);
+    function startJobsPage() {
+      loadJobs();
+      setInterval(loadJobs, 10000);
+    }
+
+    if (window.poolaiUiWasm && (window.poolaiUiWasm.ready || window.poolaiUiWasm.failed)) {
+      startJobsPage();
+    } else {
+      window.addEventListener('poolai-ui-wasm-ready', startJobsPage, { once: true });
+      setTimeout(startJobsPage, 2500);
+    }
     "#;
 
-    admin_layout(
+    admin_layout_with_module_script(
         "admin.page.jobs",
         "Jobs",
         r#"
@@ -205,6 +223,7 @@ pub async fn admin_jobs() -> Html<String> {
           <div id="jobs-list"></div>
         </div>
         "#,
+        POOLAI_UI_WASM_MODULE,
         script,
     )
 }
@@ -220,6 +239,10 @@ async fn admin_jobs_page_includes_store_badge_and_list() {
     assert!(html.contains("lease_owner"));
     assert!(html.contains("lease_epoch"));
     assert!(html.contains("leaseStateBadge"));
+    assert!(html.contains("leaseStateKey"));
+    assert!(html.contains("leaseStateFallback"));
+    assert!(html.contains("poolai-ui-wasm-ready"));
+    assert!(html.contains("leaseStateLabel"));
     assert!(html.contains("lease_expires_at"));
     assert!(html.contains("leaseOwnerCell"));
     assert!(html.contains("leaseEpochCell"));

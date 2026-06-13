@@ -1554,7 +1554,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "3e1b4a28",
-  "last_sprint_closed": "PH-S151",
+  "last_sprint_closed": "PH-S152",
   "layers": [
     {
       "id": "L0",
@@ -1587,7 +1587,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S152",
+  "next_sprint": "PH-S153",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -2018,7 +2018,8 @@
         "PH-S96",
         "PH-S105",
         "PH-S119",
-        "PH-S141"
+        "PH-S141",
+        "PH-S152"
       ]
     },
     {
@@ -2027,7 +2028,9 @@
       "layer": "L3",
       "path": "src/ui/admin/grid_pricing.rs",
       "sprints": [
-        "PH-S82"
+        "PH-S82",
+        "PH-S151",
+        "PH-S152"
       ]
     },
     {
@@ -4761,7 +4764,9 @@
       "layer": "L3",
       "path": "crates/poolai-ui-wasm/src/lib.rs",
       "sprints": [
-        "PH-S147"
+        "PH-S147",
+        "PH-S151",
+        "PH-S152"
       ]
     },
     {
@@ -6910,7 +6915,7 @@
       "path": "src/ui/wasm_static.rs"
     }
   ],
-  "revision": 84,
+  "revision": 85,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

@@ -130,7 +130,7 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible({ timeout: 20_000 });
   });
 
-  test("jobs page shows lease columns when present (PH-S96)", async ({
+  test("jobs page shows lease columns when present (PH-S96, PH-S152 wasm)", async ({
     page,
     request,
   }) => {
@@ -170,9 +170,19 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     );
     await expect(page.locator("#jobs-list")).toContainText("Active");
     await expect(page.locator("#jobs-list")).toContainText(expires);
+    await page.waitForFunction(
+      () => {
+        const wasm = document.documentElement.dataset.poolaiUiWasm;
+        const failed = (window as Window & { poolaiUiWasm?: { failed?: boolean } })
+          .poolaiUiWasm?.failed;
+        return Boolean(wasm?.includes("poolai-ui-wasm")) || Boolean(failed);
+      },
+      undefined,
+      { timeout: 10_000 },
+    );
   });
 
-  test("jobs page shows expired lease badge (PH-S105)", async ({
+  test("jobs page shows expired lease badge (PH-S105, PH-S152 wasm)", async ({
     page,
     request,
   }) => {
@@ -248,7 +258,7 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     ).toBeVisible();
   });
 
-  test("grid pricing page fetches snapshot query (PH-S82, PH-S151 wasm)", async ({
+  test("grid pricing page fetches snapshot query (PH-S82, PH-S151/PH-S152 wasm)", async ({
     page,
   }) => {
     await gotoAdminReady(page, "/ui/admin/grid-pricing", "#grid-pricing-panel");
@@ -280,8 +290,8 @@ test.describe("PoolAI admin E2E (S27–S34, PH-S23)", () => {
     await page.waitForFunction(
       () => {
         const wasm = document.documentElement.dataset.poolaiUiWasm;
-        const failed = (window as Window & { poolaiGridPricingWasm?: { failed?: boolean } })
-          .poolaiGridPricingWasm?.failed;
+        const failed = (window as Window & { poolaiUiWasm?: { failed?: boolean } })
+          .poolaiUiWasm?.failed;
         return Boolean(wasm?.includes("poolai-ui-wasm")) || Boolean(failed);
       },
       undefined,
