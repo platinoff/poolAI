@@ -1,0 +1,14 @@
+[package]
+name = "poolai-ui-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["PoolAI Team"]
+description = "Shared admin UI validators and formatters (PH-S146) — parity with src/ui admin JS"
+license = "MIT"
+repository = "https://github.com/poolai/poolai"
+publish = false
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

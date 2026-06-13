@@ -1478,11 +1478,65 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "galaxy_network_profile"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_Cargo_toml"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_README_md"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_api_error_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_format_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_lease_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_lib_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_ml_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_pricing_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_validate_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "da3be9b4",
-  "last_sprint_closed": "PH-S145",
+  "git_head": "3e1b4a28",
+  "last_sprint_closed": "PH-S146",
   "layers": [
     {
       "id": "L0",
@@ -1515,7 +1569,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S146",
+  "next_sprint": "PH-S147",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -4581,6 +4635,96 @@
     },
     {
       "auto_synced": true,
+      "id": "crates_poolai_ui_core_Cargo_toml",
+      "label": "poolai-ui-core Cargo.toml",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/Cargo.toml",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_README_md",
+      "label": "poolai-ui-core README",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/README.md",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_lib_rs",
+      "label": "poolai-ui-core lib.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/lib.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_lease_rs",
+      "label": "lease.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/lease.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_pricing_rs",
+      "label": "pricing.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/pricing.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_api_error_rs",
+      "label": "api_error.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/api_error.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_format_rs",
+      "label": "format.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/format.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_validate_rs",
+      "label": "validate.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/validate.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_src_ml_rs",
+      "label": "ml.rs",
+      "layer": "L3",
+      "path": "crates/poolai-ui-core/src/ml.rs",
+      "sprints": [
+        "PH-S146"
+      ]
+    },
+    {
+      "auto_synced": true,
       "id": "src_bin_poolai_loc_audit_rs",
       "label": "poolai_loc_audit.rs",
       "layer": "L3",
@@ -6690,7 +6834,7 @@
       "path": "e2e/archive/api-smoke/telegram_wallet.spec.ts"
     }
   ],
-  "revision": 76,
+  "revision": 78,
   "updated_at": "2026-06-13",
   "vision_ui_rev": 54
 }

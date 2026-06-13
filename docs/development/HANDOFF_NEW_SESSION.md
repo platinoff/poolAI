@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-13 (PH-S145 ✅ · §5.12 **8** відкритих PH-S146…S150 · rust_ratio **91.91%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
+**Оновлено:** 2026-06-13 (PH-S146 ✅ · §5.12 **7** відкритих PH-S147…S150 · rust_ratio **91.97%**) · VDT — [`.cursor/rules/poolai-agent-roles.mdc`](../../.cursor/rules/poolai-agent-roles.mdc) — [`.cursor/rules/virtual-development-team.mdc`](../../.cursor/rules/virtual-development-team.mdc) · ітерація — [`.cursor/rules/poolai-session-iteration.mdc`](../../.cursor/rules/poolai-session-iteration.mdc).
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -107,6 +107,7 @@
 **PH-S141 ✅ (code):** `/ui/admin/jobs` — `migrating` status badge (`warning` class, i18n EN/UK, tooltip PH-S104); Playwright admin smoke (`admin.spec.ts` PH-S141); `cargo test-ci` + e2e.
 **PH-S142 ✅ (code):** `src/grid/galaxy_verify_sampling.rs` — `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` parser (`0.0..=1.0`, default `0.05`); `VerifySamplingConfig::from_env()`; unit tests; no live sampling wire; `cargo test-ci`.
 **PH-S145 ✅ (code):** `src/bin/poolai_http_stand_smoke.rs` — Rust HTTP stand smoke (`reqwest`, `POOLAI_BASE_URL`, optional `--raid` + `POOLAI_E2E_STAND_ROOT`); mirrors archived Playwright API smokes; [`RUN_LOCAL.md`](./RUN_LOCAL.md); `cargo test-ci`.
+**PH-S146 ✅ (code):** `crates/poolai-ui-core` — shared admin validators/formatters (lease, pricing, api_error, format, validate, ml) з parity до `src/ui` JS; 16 unit tests; workspace member; `cargo test -p poolai-ui-core` + `cargo test-ci`.
 **Vision ✅:** next **PH-S146**.
 **Research replenish (2026-06-08):** §5.12 **2→10** — code-first + tests: E2E migrating/protocol (S133–S134), wallet GET + E2E (S135/S139), prefetch/trust/verify env stubs (S136/S137/S142), locality rank integration (S138), network_profile register-remote (S140), admin migrating badge (S141). Концепт-горизонт: Galaxy §8.2 settlement/telegram VM · §5.3/§6 Prometheus metrics — post-S142.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.

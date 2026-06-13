@@ -3581,6 +3581,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "poolai-ui-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "potential_utf"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
