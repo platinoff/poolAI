@@ -23,8 +23,9 @@ use crate::grid::galaxy_prefetch_metrics::{
     METRIC_PREFETCH_PLAN_TOTAL,
 };
 use crate::grid::galaxy_pricing_oracle::{
-    forced_fallback_total, fresh_served_total, stale_served_total, METRIC_FORCED_FALLBACK_TOTAL,
-    METRIC_FRESH_SERVED_TOTAL, METRIC_STALE_SERVED_TOTAL,
+    forced_fallback_total, fresh_served_total, pricing_cache_age_seconds, stale_served_total,
+    METRIC_CACHE_AGE_SECONDS, METRIC_FORCED_FALLBACK_TOTAL, METRIC_FRESH_SERVED_TOTAL,
+    METRIC_STALE_SERVED_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
     payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
@@ -48,6 +49,7 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_fresh_served: IntGauge,
     galaxy_pricing_stale_served: IntGauge,
     galaxy_pricing_forced_fallback_total: IntGauge,
+    galaxy_pricing_cache_age_seconds: IntGauge,
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
@@ -194,6 +196,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_pricing_forced_fallback_total.clone()))
         .expect("register galaxy_pricing_forced_fallback_total");
 
+    let galaxy_pricing_cache_age_seconds = IntGauge::with_opts(Opts::new(
+        METRIC_CACHE_AGE_SECONDS,
+        "Galaxy pricing L1 cache age seconds last observed (PH-S168)",
+    ))
+    .expect(METRIC_CACHE_AGE_SECONDS);
+    registry
+        .register(Box::new(galaxy_pricing_cache_age_seconds.clone()))
+        .expect("register galaxy_pricing_cache_age_seconds");
+
     let galaxy_trust_payout_eligible_total = IntGauge::with_opts(Opts::new(
         METRIC_PAYOUT_ELIGIBLE_TOTAL,
         "Galaxy trust gate edge results eligible for payout stub (PH-S137)",
@@ -261,6 +272,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_fresh_served,
         galaxy_pricing_stale_served,
         galaxy_pricing_forced_fallback_total,
+        galaxy_pricing_cache_age_seconds,
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
         galaxy_prefetch_plan_total,
@@ -278,6 +290,8 @@ pub fn refresh_galaxy_pricing_gauges() {
         .set(stale_served_total() as i64);
     prom.galaxy_pricing_forced_fallback_total
         .set(forced_fallback_total() as i64);
+    prom.galaxy_pricing_cache_age_seconds
+        .set(pricing_cache_age_seconds() as i64);
 }
 
 /// Mirror in-process trust gate counters into Prometheus gauges (scrape snapshot).
@@ -431,6 +445,21 @@ mod tests {
         assert!(body.contains(METRIC_FRESH_SERVED_TOTAL));
         assert!(body.contains(METRIC_STALE_SERVED_TOTAL));
         assert!(body.contains(METRIC_FORCED_FALLBACK_TOTAL));
+        assert!(body.contains(METRIC_CACHE_AGE_SECONDS));
+    }
+
+    #[test]
+    fn galaxy_pricing_cache_age_gauge_reflects_observation() {
+        use crate::grid::galaxy_pricing_oracle::{
+            observe_l1_cache_age_secs, reset_pricing_cache_age_for_test,
+        };
+        reset_pricing_cache_age_for_test();
+        init_prometheus();
+        observe_l1_cache_age_secs(600);
+        refresh_galaxy_pricing_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_CACHE_AGE_SECONDS} 600")));
+        reset_pricing_cache_age_for_test();
     }
 
     #[test]

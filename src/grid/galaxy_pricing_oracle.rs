@@ -57,7 +57,12 @@ pub const FRESH_SERVED_LOG_EVENT: &str = "pricing_oracle_fresh_served";
 /// In-process counter for L1 fresh cache serves (§4.2.5, PH-S91).
 pub const METRIC_FRESH_SERVED_TOTAL: &str = "galaxy_pricing_fresh_served";
 
+/// Latest observed L1 cache age in seconds (§4.2.3, PH-S168 `/metrics` gauge).
+pub const METRIC_CACHE_AGE_SECONDS: &str = "galaxy_pricing_cache_age_seconds";
+
 static FRESH_SERVED_TOTAL: AtomicU64 = AtomicU64::new(0);
+
+static L1_CACHE_AGE_OBSERVED_SECS: AtomicU64 = AtomicU64::new(0);
 
 /// Env: JSON map for L2 fallback floor quotes in micro-USD (§4.2.4).
 /// Example:
@@ -249,6 +254,21 @@ pub fn record_l1_stale_served(unit_key: GalaxyPriceUnitKey) {
 /// Record L1 fresh metric when serving from cache (oracle or HTTP snapshot path).
 pub fn record_l1_fresh_served(unit_key: GalaxyPriceUnitKey) {
     record_fresh_served(unit_key);
+}
+
+/// Observe L1 cache age for Prometheus gauge (PH-S168).
+pub fn observe_l1_cache_age_secs(age_secs: u64) {
+    L1_CACHE_AGE_OBSERVED_SECS.store(age_secs, Ordering::Relaxed);
+}
+
+/// Latest observed L1 cache age since process start (mirrored on `GET /metrics`).
+pub fn pricing_cache_age_seconds() -> u64 {
+    L1_CACHE_AGE_OBSERVED_SECS.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_pricing_cache_age_for_test() {
+    L1_CACHE_AGE_OBSERVED_SECS.store(0, Ordering::Relaxed);
 }
 
 fn serve_l1_cache_quote(
@@ -790,6 +810,7 @@ impl GalaxyPricingOracle {
         }
         if let Some((entry, freshness)) = self.lookup(now_secs, &key) {
             if freshness == CacheFreshness::Fresh || freshness == CacheFreshness::Stale {
+                observe_l1_cache_age_secs(now_secs.saturating_sub(entry.quote.cached_at_secs));
                 return Ok(serve_l1_cache_quote(entry, freshness));
             }
         }
@@ -1089,6 +1110,25 @@ mod tests {
             "fresh cache must not increment stale metric"
         );
         assert_eq!(fresh_served_total(), 1);
+    }
+
+    #[test]
+    fn try_quote_observes_l1_cache_age_ph_s168() {
+        reset_pricing_cache_age_for_test();
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        });
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "cache-age".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        oracle.refresh_from_providers(1_000, key.clone(), &mock_us_blended());
+        oracle.try_quote(1_600, key, &[]).expect("stale L1");
+        assert_eq!(pricing_cache_age_seconds(), 600);
+        reset_pricing_cache_age_for_test();
     }
 
     #[test]

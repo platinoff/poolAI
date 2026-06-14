@@ -14,12 +14,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::core::error::AppError;
 use crate::core::state::ApiContext;
 use crate::grid::galaxy_pricing_oracle::{
-    cache_metadata, fetch_live_provider_quotes, provider_http_timeout_ms_from_env,
-    record_l1_fresh_served, record_l1_stale_served, CacheFreshness, GalaxyPriceUnitKey,
-    GalaxyPricingCacheEntry, GalaxyPricingCacheKey, GalaxyPricingCacheMetadata,
-    GalaxyPricingConfig, GalaxyPricingOracle, GalaxyPricingProviderCatalog,
-    GalaxyPricingProviderEntry, GalaxyPricingQuote, MockProviderQuote,
-    PRICING_UNAVAILABLE_ERROR_CODE,
+    cache_metadata, fetch_live_provider_quotes, observe_l1_cache_age_secs,
+    provider_http_timeout_ms_from_env, record_l1_fresh_served, record_l1_stale_served,
+    CacheFreshness, GalaxyPriceUnitKey, GalaxyPricingCacheEntry, GalaxyPricingCacheKey,
+    GalaxyPricingCacheMetadata, GalaxyPricingConfig, GalaxyPricingOracle,
+    GalaxyPricingProviderCatalog, GalaxyPricingProviderEntry, GalaxyPricingQuote,
+    MockProviderQuote, PRICING_UNAVAILABLE_ERROR_CODE,
 };
 use crate::grid::{ingest_envelope, GridEnvelope, GridIngestKind, GridIngestOutcome};
 use crate::job::{JobStatus, JobStore};
@@ -166,6 +166,9 @@ fn cache_hit_response(
         CacheFreshness::Expired => {}
     }
     let l1_cache = Some(cache_metadata(now_secs, entry.quote.cached_at_secs, config));
+    if let Some(ref meta) = l1_cache {
+        observe_l1_cache_age_secs(meta.cache_age_secs);
+    }
     GridPricingSnapshotResponse {
         ok: true,
         source: GridPricingSnapshotSource::Cache,
@@ -420,6 +423,7 @@ mod tests {
     async fn grid_pricing_snapshot_l1_cache_metadata_fresh_vs_stale() {
         let _lock = pricing_test_lock();
         reset_oracle(false, None);
+        crate::grid::galaxy_pricing_oracle::reset_pricing_cache_age_for_test();
         let model = "l1-metadata-test";
         let key = GalaxyPricingCacheKey {
             task_profile: "inference:text".into(),
@@ -457,6 +461,10 @@ mod tests {
         assert!(stale_meta.cache_age_secs >= 500);
         assert!(stale_meta.cache_age_secs > stale_meta.cache_ttl_secs);
         assert_eq!(stale_meta.cache_fresh_until_secs, cached_at + 300);
+        assert!(
+            crate::grid::galaxy_pricing_oracle::pricing_cache_age_seconds() >= 500,
+            "PH-S168: L1 stale hit observes cache age"
+        );
 
         let fresh_cached_at = wall_now.saturating_sub(60);
         {
