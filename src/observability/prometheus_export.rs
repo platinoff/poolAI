@@ -17,6 +17,11 @@ use prometheus::{
 use std::sync::OnceLock;
 
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_prefetch_metrics::{
+    prefetch_hot_skip_total, prefetch_plan_total, prefetch_planned_shards_total,
+    METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
+    METRIC_PREFETCH_PLAN_TOTAL,
+};
 use crate::grid::galaxy_pricing_oracle::{
     forced_fallback_total, fresh_served_total, stale_served_total, METRIC_FORCED_FALLBACK_TOTAL,
     METRIC_FRESH_SERVED_TOTAL, METRIC_STALE_SERVED_TOTAL,
@@ -45,6 +50,9 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_forced_fallback_total: IntGauge,
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
+    galaxy_prefetch_plan_total: IntGauge,
+    galaxy_prefetch_planned_shards_total: IntGauge,
+    galaxy_prefetch_hot_skip_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -204,6 +212,33 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_trust_payout_held_total.clone()))
         .expect("register galaxy_trust_payout_held_total");
 
+    let galaxy_prefetch_plan_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_PLAN_TOTAL,
+        "Galaxy prefetch plans computed (PH-S167)",
+    ))
+    .expect(METRIC_PREFETCH_PLAN_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_plan_total.clone()))
+        .expect("register galaxy_prefetch_plan_total");
+
+    let galaxy_prefetch_planned_shards_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
+        "Galaxy prefetch shards scheduled in plans (PH-S167)",
+    ))
+    .expect(METRIC_PREFETCH_PLANNED_SHARDS_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_planned_shards_total.clone()))
+        .expect("register galaxy_prefetch_planned_shards_total");
+
+    let galaxy_prefetch_hot_skip_total = IntGauge::with_opts(Opts::new(
+        METRIC_PREFETCH_HOT_SKIP_TOTAL,
+        "Galaxy prefetch shards skipped as already hot (PH-S167)",
+    ))
+    .expect(METRIC_PREFETCH_HOT_SKIP_TOTAL);
+    registry
+        .register(Box::new(galaxy_prefetch_hot_skip_total.clone()))
+        .expect("register galaxy_prefetch_hot_skip_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -228,6 +263,9 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_forced_fallback_total,
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
+        galaxy_prefetch_plan_total,
+        galaxy_prefetch_planned_shards_total,
+        galaxy_prefetch_hot_skip_total,
     }
 }
 
@@ -249,6 +287,17 @@ pub fn refresh_galaxy_trust_gauges() {
         .set(payout_eligible_total() as i64);
     prom.galaxy_trust_payout_held_total
         .set(payout_held_total() as i64);
+}
+
+/// Mirror in-process prefetch plan counters into Prometheus gauges (scrape snapshot).
+pub fn refresh_galaxy_prefetch_gauges() {
+    let prom = init_prometheus();
+    prom.galaxy_prefetch_plan_total
+        .set(prefetch_plan_total() as i64);
+    prom.galaxy_prefetch_planned_shards_total
+        .set(prefetch_planned_shards_total() as i64);
+    prom.galaxy_prefetch_hot_skip_total
+        .set(prefetch_hot_skip_total() as i64);
 }
 
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
@@ -277,6 +326,7 @@ pub async fn refresh_scrape_gauges(ctx: &ApiContext) {
     let prom = init_prometheus();
     refresh_galaxy_pricing_gauges();
     refresh_galaxy_trust_gauges();
+    refresh_galaxy_prefetch_gauges();
     prom.uptime_seconds
         .set(crate::version::get_uptime_seconds() as i64);
     prom.build_info.set(1);
@@ -428,5 +478,30 @@ mod tests {
         assert!(body.contains(&format!("{METRIC_PAYOUT_ELIGIBLE_TOTAL} 1")));
         assert!(body.contains(&format!("{METRIC_PAYOUT_HELD_TOTAL} 2")));
         reset_settlement_gate_metrics_for_test();
+    }
+
+    #[test]
+    fn encode_contains_galaxy_prefetch_metrics() {
+        init_prometheus();
+        refresh_galaxy_prefetch_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_PREFETCH_PLAN_TOTAL));
+        assert!(body.contains(METRIC_PREFETCH_PLANNED_SHARDS_TOTAL));
+        assert!(body.contains(METRIC_PREFETCH_HOT_SKIP_TOTAL));
+    }
+
+    #[test]
+    fn galaxy_prefetch_gauges_reflect_plan_counters() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            record_prefetch_plan, reset_prefetch_metrics_for_test,
+        };
+        reset_prefetch_metrics_for_test();
+        record_prefetch_plan(2, 1);
+        refresh_galaxy_prefetch_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_PREFETCH_PLAN_TOTAL} 1")));
+        assert!(body.contains(&format!("{METRIC_PREFETCH_PLANNED_SHARDS_TOTAL} 1")));
+        assert!(body.contains(&format!("{METRIC_PREFETCH_HOT_SKIP_TOTAL} 1")));
+        reset_prefetch_metrics_for_test();
     }
 }

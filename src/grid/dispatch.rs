@@ -11,6 +11,7 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
+use crate::grid::galaxy_prefetch_metrics::record_prefetch_plan;
 use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
     TrustScoreGateConfig,
@@ -169,7 +170,7 @@ pub fn plan_prefetch(
     } else {
         PrefetchTargetTier::Ram
     };
-    let items = required_shard_ids
+    let items: Vec<PrefetchPlanItem> = required_shard_ids
         .iter()
         .filter(|shard_id| !hot_hit(inventory, shard_id))
         .map(|shard_id| PrefetchPlanItem {
@@ -177,6 +178,7 @@ pub fn plan_prefetch(
             target_tier,
         })
         .collect();
+    record_prefetch_plan(required_shard_ids.len(), items.len());
     PrefetchPlan {
         items,
         trigger,
@@ -669,6 +671,35 @@ mod tests {
         assert_eq!(plan.items[0].target_tier, PrefetchTargetTier::Ram);
         assert_eq!(plan.trigger, PrefetchTrigger::JobAdmitted);
         assert_eq!(plan.deadline_ms, DEFAULT_PREFETCH_DEADLINE_MS);
+    }
+
+    #[test]
+    fn plan_prefetch_records_metrics_ph_s167() {
+        use crate::grid::galaxy_prefetch_metrics::{
+            prefetch_hot_skip_total, prefetch_plan_total, prefetch_planned_shards_total,
+            reset_prefetch_metrics_for_test,
+        };
+        reset_prefetch_metrics_for_test();
+        let inventory = SeedInventoryEntry {
+            shard_ids: vec!["w:hot".into()],
+            hot_tier: SeedInventoryHotTier {
+                ram_bytes_used: 1024,
+                vram_bytes_used: 0,
+                profiles: vec![],
+            },
+            ..Default::default()
+        };
+        let _ = plan_prefetch(
+            &inventory,
+            &["w:hot".into(), "w:cold".into()],
+            PrefetchTrigger::LeaseAcquired,
+            false,
+            &PrefetchPolicyConfig::default(),
+        );
+        assert_eq!(prefetch_plan_total(), 1);
+        assert_eq!(prefetch_planned_shards_total(), 1);
+        assert_eq!(prefetch_hot_skip_total(), 1);
+        reset_prefetch_metrics_for_test();
     }
 
     #[test]

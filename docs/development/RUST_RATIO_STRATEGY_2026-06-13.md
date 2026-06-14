@@ -85,7 +85,7 @@ flowchart TB
 | **E — gate** | PH-S150 ✅ | CI advisory якщо ratio <88%; target 93%; stretch 96% spirit | стабільно 90–95% |
 | **F — stretch 96%** | PH-S151…S159 ✅ | wasm wiring, slim JS/i18n/charts, Rust stand/e2e bins; CI warn **93%** | **→96% spirit** |
 
-**Черга §5.12 (10 відкритих):** PH-S167…S171 — post-S166 replenish; replenish після S171.
+**Черга §5.12 (10 відкритих):** PH-S168…S172 — post-S167 replenish; replenish після S172.
 
 ---
 
@@ -116,11 +116,12 @@ flowchart TB
 | 21 | **PH-S164** | Verify sampling env apply | `galaxy_verify_sampling` HTTP stub | ✅ |
 | 22 | **PH-S165** | Ratio **96%** hold gate | CI `--min-ratio 0.95` advisory; target **95%**; replenish post-S165 | **✅** |
 | 23 | **PH-S166** | Design tokens CSS → Rust | `design_tokens.rs`; slim CSS `:root` | **✅** |
-| 24 | **PH-S167** | Galaxy prefetch metrics stub | Prometheus on `plan_prefetch` | відкрито |
+| 24 | **PH-S167** | Galaxy prefetch metrics stub | Prometheus on `plan_prefetch` | **✅** |
 | 25 | **PH-S168** | Galaxy pricing cache age /metrics | `galaxy_pricing_cache_age_seconds` gauge | відкрито |
 | 26 | **PH-S169** | Locality stale profile penalty | `galaxy_locality.rs` stub | відкрито |
 | 27 | **PH-S170** | Galaxy settlement pending_verification stub | §6.4 grid result path | відкрито |
 | 28 | **PH-S171** | Galaxy replication strict tier stub | §6.3 config stub | відкрито |
+| 29 | **PH-S172** | Galaxy pricing provider catalog metrics stub | §4.2 provider hits | відкрито |
 
 *(PH-S149 — portable deploy matrix docs — закрито sync у PH-S147 §2.)*
 
