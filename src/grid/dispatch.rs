@@ -13,6 +13,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::error::AppError;
 use crate::grid::galaxy_prefetch_metrics::record_prefetch_plan;
+use crate::grid::galaxy_replication::{
+    replication_tier_from_policy, ReplicationTierConfig, REPLICATION_STANDARD, REPLICATION_STRICT,
+};
 use crate::grid::galaxy_settlement::{resolve_settlement_status, SettlementStatus};
 use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
@@ -201,6 +204,7 @@ pub enum GridIngestKind {
     Job {
         job_id: String,
         status: JobStatus,
+        replication_tier: ReplicationTierConfig,
     },
     Result {
         job_id: String,
@@ -291,6 +295,7 @@ fn ingest_job(
         kind: GridIngestKind::Job {
             job_id,
             status: row.status,
+            replication_tier: replication_tier_from_policy(body.verification_policy.as_deref()),
         },
     })
 }
@@ -384,6 +389,7 @@ mod tests {
             GridIngestKind::Job {
                 job_id: "grid-job-1".into(),
                 status: JobStatus::Leased,
+                replication_tier: REPLICATION_STANDARD,
             }
         );
         let row = jobs.get("grid-job-1").expect("get").expect("row");
@@ -414,6 +420,7 @@ mod tests {
             GridIngestKind::Job {
                 job_id: "grid-job-no-peer".into(),
                 status: JobStatus::Scheduled,
+                replication_tier: REPLICATION_STANDARD,
             }
         );
         let row = jobs.get("grid-job-no-peer").expect("get").expect("row");
@@ -422,6 +429,29 @@ mod tests {
         assert!(row.lease_owner.is_none());
         assert!(row.lease_epoch.is_none());
         assert!(row.lease_expires_at.is_none());
+    }
+
+    #[test]
+    fn ingest_job_resolves_replication_strict_tier_ph_s171() {
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        let env = GridEnvelope::new(
+            GridMessage::Job(GridJobBody {
+                job_id: "grid-job-strict".into(),
+                task_kind: "inference".into(),
+                verification_policy: Some("replication_strict".into()),
+                input_artifact_ids: vec![],
+                deadline: None,
+            }),
+            None,
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        match out.kind {
+            GridIngestKind::Job {
+                replication_tier, ..
+            } => assert_eq!(replication_tier, REPLICATION_STRICT),
+            other => panic!("expected Job kind, got {other:?}"),
+        }
     }
 
     #[test]
