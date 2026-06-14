@@ -1,6 +1,6 @@
 # Керування функціоналом PoolAI (індекс, прогалини, тікети)
 
-**Оновлено:** 2026-06-14 (PH-S177 ✅ · §5.12 **5** відкритих PH-S178…S182 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
+**Оновлено:** 2026-06-14 (PH-S177 ✅ · §5.12 **10** відкритих PH-S178…S187 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · FM-041 Deferred).
 
 **Зріз комітів (червень 2026):** FM-017/018 ✅; **FM-019 baseline** ✅ (modals, forms, tabs, tables, [`ADMIN_A11Y_RUNBOOK.md`](../development/ADMIN_A11Y_RUNBOOK.md)); pushes `02ea146`…`31266be9` на `main`.
 
@@ -382,12 +382,17 @@ FM-xxx (з таблиці нижче)
 | 115 | **PH-S180** | Galaxy verification match metrics stub (code) | Galaxy §6.2 | `galaxy_verification_match_total` counter on grid result path; unit tests | відкрито |
 | 116 | **PH-S181** | Galaxy pricing market min usd_micro metrics stub (code) | PH-S89, Galaxy §4.2 | `galaxy_pricing_market_min_usd_micro` gauge stub; unit tests | відкрито |
 | 117 | **PH-S182** | Galaxy trust score metrics stub (code) | Galaxy §6.2 | `galaxy_trust_score` gauge on grid result path; unit tests | відкрито |
+| 118 | **PH-S183** | Galaxy shard local hit ratio metrics stub (code) | Galaxy §5.3 | `galaxy_shard_local_hit_ratio` gauge on locality rank stub; unit tests | відкрито |
+| 119 | **PH-S184** | Galaxy prefetch bytes total metrics stub (code) | Galaxy §5.5 PH-S129 | `galaxy_prefetch_bytes_total` counter on `plan_prefetch`; unit tests | відкрито |
+| 120 | **PH-S185** | Galaxy cross region egress mb metrics stub (code) | Galaxy §5.3 | `galaxy_cross_region_egress_mb` gauge stub on rank/prefetch path; unit tests | відкрито |
+| 121 | **PH-S186** | Galaxy verification sample scheduled /metrics export (code) | PH-S164, Galaxy §6.2 | `galaxy_verification_sample_scheduled_total` on `GET /metrics`; unit tests | відкрито |
+| 122 | **PH-S187** | Galaxy settlement cleared total metrics stub (code) | PH-S170, Galaxy §6.4 | `galaxy_settlement_cleared_total` counter on grid result Cleared path; unit tests | відкрито |
 
-**Відкритих у §5.12:** **5** (PH-S178…S182). **Закрито смуга:** PH-S128…S177 ✅. Vision rev **113**.
+**Відкритих у §5.12:** **10** (PH-S178…S187). **Закрито смуга:** PH-S128…S177 ✅. Vision rev **114**.
 
-**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; PH-S178…S182 post-S177 replenish; replenish після S182.
+**Rust ratio:** формальна смуга **90–95%**; **hold 95%** — PH-S165 ✅; PH-S178…S187 post-S177 replenish; replenish після S187.
 
-**Наступна сесія:** **PH-S178** · черга **5** відкритих (PH-S178…S182) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S178** · черга **10** відкритих (PH-S178…S187) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.13 Rust ratio band (дзеркало §5.12 PH-S150…S169)
 
@@ -508,7 +513,7 @@ FM-xxx (з таблиці нижче)
 
 **Baseline:** rust_ratio **92.68%** → **hold 95%** · **stretch spirit 96%** ([`rust_ratio.json`](../development/rust_ratio.json), [`RUST_RATIO_STRATEGY_2026-06-13.md`](../development/RUST_RATIO_STRATEGY_2026-06-13.md)).
 
-**Наступна сесія:** **PH-S178** · черга **5** відкритих (PH-S178…S182) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
+**Наступна сесія:** **PH-S178** · черга **10** відкритих (PH-S178…S187) · [`NEXT_SESSION_PROMPT.md`](../development/NEXT_SESSION_PROMPT.md).
 
 ### 5.7 Post-Horizon backlog (2026-05-20)
 

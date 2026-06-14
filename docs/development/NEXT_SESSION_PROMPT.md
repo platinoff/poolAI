@@ -1,14 +1,14 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 · PH-S177 ✅ · vision **rev 113** · **5** відкритих (PH-S178…S182) · **hold 95%** · **stretch spirit 96%**
+**Оновлено:** 2026-06-14 · PH-S177 ✅ · docs-sync replenish · vision **rev 114** · **10** відкритих (PH-S178…S187) · **hold 95%** · **stretch spirit 96%**
 
 | **← наступний** | **PH-S178** — Galaxy settlement pending_verification metrics stub |
-| **Відкритих** | **5** (PH-S178…S182) |
-| **VDT** | один PH-S* = 1 commit |
+| **Відкритих** | **10** (PH-S178…S187) |
+| **VDT** | один PH-S* = 1 commit (code) + docs sync |
 
 ---
 
-## Зріз §5.12 (5 відкритих: PH-S178…S182)
+## Зріз §5.12 (10 відкритих: PH-S178…S187)
 
 ### Закрито недавно ✅
 
@@ -18,7 +18,7 @@
 | PH-S176 | Galaxy replay pending metrics stub | mismatch → `galaxy_replay_pending` gauge |
 | PH-S175 | Galaxy verification mismatch metrics stub | `verification_verdict: mismatch` → `/metrics` |
 
-### Відкрито — replenish (PH-S178…S182)
+### Відкрито — replenish (PH-S178…S187)
 
 | # | Sprint | Scope |
 |---|--------|-------|
@@ -27,6 +27,11 @@
 | 3 | **PH-S180** | Galaxy verification match metrics stub |
 | 4 | **PH-S181** | Galaxy pricing market min usd_micro metrics stub |
 | 5 | **PH-S182** | Galaxy trust score metrics stub |
+| 6 | **PH-S183** | Galaxy shard local hit ratio metrics stub |
+| 7 | **PH-S184** | Galaxy prefetch bytes total metrics stub |
+| 8 | **PH-S185** | Galaxy cross region egress mb metrics stub |
+| 9 | **PH-S186** | Galaxy verification sample scheduled /metrics export |
+| 10 | **PH-S187** | Galaxy settlement cleared total metrics stub |
 
 ---
 
