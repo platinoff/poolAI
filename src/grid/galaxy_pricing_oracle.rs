@@ -516,22 +516,30 @@ pub async fn fetch_live_provider_quotes(
             unit_key.as_str()
         );
         let Ok(resp) = client.get(url).send().await else {
+            crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
             continue;
         };
         if !resp.status().is_success() {
+            crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
             continue;
         }
         let body = match resp.bytes().await {
             Ok(bytes) => bytes,
-            Err(_) => continue,
+            Err(_) => {
+                crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
+                continue;
+            }
         };
         let Some(units) = parse_live_units_map_bytes(body.as_ref()) else {
+            crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
             continue;
         };
         let Some(usd_micro) = units.get(unit_key.as_str()).copied() else {
+            crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
             continue;
         };
         if usd_micro == 0 {
+            crate::grid::galaxy_pricing_provider_metrics::record_provider_fetch_error();
             continue;
         }
         out.push(MockProviderQuote {
@@ -1342,5 +1350,40 @@ mod tests {
         std::env::remove_var(KEY);
         assert_eq!(catalog.providers.len(), 2);
         assert_eq!(catalog.providers[0].provider_id, "openai_us");
+    }
+
+    #[tokio::test]
+    async fn fetch_live_provider_quotes_records_errors_on_unreachable_endpoint_ph_s173() {
+        use crate::grid::galaxy_pricing_provider_metrics::{
+            provider_errors_total, reset_provider_catalog_metrics_for_test,
+        };
+        use std::collections::HashMap;
+
+        reset_provider_catalog_metrics_for_test();
+        let catalog = GalaxyPricingProviderCatalog {
+            providers: vec![GalaxyPricingProviderEntry {
+                provider_id: "bad_live".into(),
+                region: "us".into(),
+                model_profile: Some("fail-model".into()),
+                task_profiles: vec!["inference:text".into()],
+                units: HashMap::from([(
+                    GalaxyPriceUnitKey::InferenceBlendedToken.as_str().into(),
+                    500_000,
+                )]),
+                endpoint: Some("http://127.0.0.1:1/unreachable".into()),
+                enabled: true,
+            }],
+        };
+        let quotes = fetch_live_provider_quotes(
+            &catalog,
+            "inference:text",
+            "fail-model",
+            GalaxyPriceUnitKey::InferenceBlendedToken,
+            500,
+        )
+        .await;
+        assert!(quotes.is_empty());
+        assert_eq!(provider_errors_total(), 1);
+        reset_provider_catalog_metrics_for_test();
     }
 }

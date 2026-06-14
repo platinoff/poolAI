@@ -28,8 +28,9 @@ use crate::grid::galaxy_pricing_oracle::{
     METRIC_STALE_SERVED_TOTAL,
 };
 use crate::grid::galaxy_pricing_provider_metrics::{
-    provider_catalog_hits_total, provider_catalog_lookups_total,
+    provider_catalog_hits_total, provider_catalog_lookups_total, provider_errors_total,
     METRIC_PROVIDER_CATALOG_HITS_TOTAL, METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
+    METRIC_PROVIDER_ERRORS_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
     payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
@@ -56,6 +57,7 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_cache_age_seconds: IntGauge,
     galaxy_pricing_provider_catalog_lookups_total: IntGauge,
     galaxy_pricing_provider_catalog_hits_total: IntGauge,
+    galaxy_pricing_provider_errors_total: IntGauge,
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
@@ -231,6 +233,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_pricing_provider_catalog_hits_total.clone()))
         .expect("register galaxy_pricing_provider_catalog_hits_total");
 
+    let galaxy_pricing_provider_errors_total = IntGauge::with_opts(Opts::new(
+        METRIC_PROVIDER_ERRORS_TOTAL,
+        "Galaxy pricing live provider HTTP fetch failures (PH-S173)",
+    ))
+    .expect(METRIC_PROVIDER_ERRORS_TOTAL);
+    registry
+        .register(Box::new(galaxy_pricing_provider_errors_total.clone()))
+        .expect("register galaxy_pricing_provider_errors_total");
+
     let galaxy_trust_payout_eligible_total = IntGauge::with_opts(Opts::new(
         METRIC_PAYOUT_ELIGIBLE_TOTAL,
         "Galaxy trust gate edge results eligible for payout stub (PH-S137)",
@@ -301,6 +312,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_cache_age_seconds,
         galaxy_pricing_provider_catalog_lookups_total,
         galaxy_pricing_provider_catalog_hits_total,
+        galaxy_pricing_provider_errors_total,
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
         galaxy_prefetch_plan_total,
@@ -324,6 +336,8 @@ pub fn refresh_galaxy_pricing_gauges() {
         .set(provider_catalog_lookups_total() as i64);
     prom.galaxy_pricing_provider_catalog_hits_total
         .set(provider_catalog_hits_total() as i64);
+    prom.galaxy_pricing_provider_errors_total
+        .set(provider_errors_total() as i64);
 }
 
 /// Mirror in-process trust gate counters into Prometheus gauges (scrape snapshot).
@@ -480,6 +494,22 @@ mod tests {
         assert!(body.contains(METRIC_CACHE_AGE_SECONDS));
         assert!(body.contains(METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL));
         assert!(body.contains(METRIC_PROVIDER_CATALOG_HITS_TOTAL));
+        assert!(body.contains(METRIC_PROVIDER_ERRORS_TOTAL));
+    }
+
+    #[test]
+    fn galaxy_pricing_provider_errors_gauge_reflects_fetch_fail_ph_s173() {
+        use crate::grid::galaxy_pricing_provider_metrics::{
+            record_provider_fetch_error, reset_provider_catalog_metrics_for_test,
+        };
+
+        reset_provider_catalog_metrics_for_test();
+        init_prometheus();
+        record_provider_fetch_error();
+        refresh_galaxy_pricing_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_PROVIDER_ERRORS_TOTAL} 1")));
+        reset_provider_catalog_metrics_for_test();
     }
 
     #[test]

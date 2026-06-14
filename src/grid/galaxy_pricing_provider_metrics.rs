@@ -1,6 +1,7 @@
-//! Galaxy pricing provider catalog metrics stub (PH-S172, §4.2.5).
+//! Galaxy pricing provider catalog metrics (PH-S172, PH-S173, §4.2.5).
 //!
-//! Counters when [`GalaxyPricingProviderCatalog::matching_entries`] resolves allow-list hits.
+//! Counters when [`GalaxyPricingProviderCatalog::matching_entries`] resolves allow-list hits
+//! and when live provider HTTP fetch fails in [`fetch_live_provider_quotes`].
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -11,8 +12,12 @@ pub const METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL: &str =
 /// Matching provider rows returned across lookups (sum of hit counts).
 pub const METRIC_PROVIDER_CATALOG_HITS_TOTAL: &str = "galaxy_pricing_provider_catalog_hits_total";
 
+/// Live provider HTTP fetch failures (network, non-2xx, parse, missing unit) — PH-S173.
+pub const METRIC_PROVIDER_ERRORS_TOTAL: &str = "galaxy_pricing_provider_errors_total";
+
 static LOOKUPS_TOTAL: AtomicU64 = AtomicU64::new(0);
 static HITS_TOTAL: AtomicU64 = AtomicU64::new(0);
+static ERRORS_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 /// Record one catalog lookup and how many providers matched the allow-list filters.
 pub fn record_provider_catalog_lookup(matching_count: usize) {
@@ -28,10 +33,20 @@ pub fn provider_catalog_hits_total() -> u64 {
     HITS_TOTAL.load(Ordering::Relaxed)
 }
 
+/// Record one failed live provider fetch attempt for a catalog entry.
+pub fn record_provider_fetch_error() {
+    ERRORS_TOTAL.fetch_add(1, Ordering::Relaxed);
+}
+
+pub fn provider_errors_total() -> u64 {
+    ERRORS_TOTAL.load(Ordering::Relaxed)
+}
+
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_provider_catalog_metrics_for_test() {
     LOOKUPS_TOTAL.store(0, Ordering::Relaxed);
     HITS_TOTAL.store(0, Ordering::Relaxed);
+    ERRORS_TOTAL.store(0, Ordering::Relaxed);
 }
 
 #[cfg(test)]
@@ -45,6 +60,15 @@ mod tests {
         record_provider_catalog_lookup(0);
         assert_eq!(provider_catalog_lookups_total(), 2);
         assert_eq!(provider_catalog_hits_total(), 2);
+        reset_provider_catalog_metrics_for_test();
+    }
+
+    #[test]
+    fn record_provider_fetch_error_increments_counter_ph_s173() {
+        reset_provider_catalog_metrics_for_test();
+        record_provider_fetch_error();
+        record_provider_fetch_error();
+        assert_eq!(provider_errors_total(), 2);
         reset_provider_catalog_metrics_for_test();
     }
 }
