@@ -1,12 +1,14 @@
 //! Galaxy Grid locality placement stub (PH-S128): `locality_score(worker, task)` pure fn
 //! and scheduler ranking stub per `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.2.
-//! No prefetch wire (PH-S129).
+//! Stale `network_profile` penalty stub (PH-S169, §8.1). No prefetch wire (PH-S129).
 
 /// Network profile locality subset (Galaxy §8.1; full wire adds bandwidth/egress/topology).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LocalityNetworkProfile {
     pub region: String,
     pub latency_ms_p50: u32,
+    /// Seconds since `last_measured_at`; `None` = missing freshness probe (stale, §8.1).
+    pub profile_age_secs: Option<u64>,
 }
 
 /// Hot tier cache on a worker (concept §5.4).
@@ -60,6 +62,12 @@ pub const DEFAULT_LOCALITY_WEIGHTS: LocalityWeights = LocalityWeights {
     w_hot: 0.30,
     w_egress: 0.01,
 };
+
+/// Stale `network_profile` threshold (Galaxy §8.1): >24h since `last_measured_at`.
+pub const DEFAULT_STALE_PROFILE_MAX_AGE_SECS: u64 = 86_400;
+
+/// Score deduction when profile freshness is missing or older than [`DEFAULT_STALE_PROFILE_MAX_AGE_SECS`].
+pub const DEFAULT_STALE_PROFILE_PENALTY: f64 = 0.05;
 
 /// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
 #[derive(Debug, Clone, PartialEq)]
@@ -118,8 +126,23 @@ pub fn effective_cross_region_egress_mb(worker: &LocalityWorker, task: &Locality
     task.estimated_cross_region_egress_mb.max(0.0)
 }
 
+/// Penalty subtracted from `locality_score` when `profile_age_secs` is missing or exceeds `max_age_secs`
+/// (Galaxy §8.1 stale profile stub, PH-S169).
+#[inline]
+pub fn stale_network_profile_penalty(
+    profile_age_secs: Option<u64>,
+    max_age_secs: u64,
+    max_penalty: f64,
+) -> f64 {
+    match profile_age_secs {
+        None => max_penalty,
+        Some(age) if age > max_age_secs => max_penalty,
+        Some(_) => 0.0,
+    }
+}
+
 /// Placement score (concept §5.2):
-/// `w_shard×shard_local_hit + w_lat×latency_factor + w_hot×hot_tier_hit − w_egress×egress_mb`.
+/// `w_shard×shard_local_hit + w_lat×latency_factor + w_hot×hot_tier_hit − w_egress×egress_mb − stale_penalty`.
 pub fn locality_score(
     worker: &LocalityWorker,
     task: &LocalityTask,
@@ -129,8 +152,15 @@ pub fn locality_score(
     let lat = latency_factor(worker.network_profile.latency_ms_p50);
     let hot = hot_tier_hit_ratio(&worker.seed_inventory, task);
     let egress = effective_cross_region_egress_mb(worker, task);
+    let stale = stale_network_profile_penalty(
+        worker.network_profile.profile_age_secs,
+        DEFAULT_STALE_PROFILE_MAX_AGE_SECS,
+        DEFAULT_STALE_PROFILE_PENALTY,
+    );
 
-    weights.w_shard * shard + weights.w_lat * lat + weights.w_hot * hot - weights.w_egress * egress
+    weights.w_shard * shard + weights.w_lat * lat + weights.w_hot * hot
+        - weights.w_egress * egress
+        - stale
 }
 
 /// Scheduler stub: sort workers by `locality_score` desc, then `worker_id` asc.
@@ -178,6 +208,16 @@ mod tests {
     use super::*;
 
     fn worker(id: &str, region: &str, latency: u32, shards: &[&str]) -> LocalityWorker {
+        worker_with_profile_age(id, region, latency, shards, Some(0))
+    }
+
+    fn worker_with_profile_age(
+        id: &str,
+        region: &str,
+        latency: u32,
+        shards: &[&str],
+        profile_age_secs: Option<u64>,
+    ) -> LocalityWorker {
         LocalityWorker {
             worker_id: id.into(),
             seed_inventory: LocalitySeedInventory {
@@ -192,6 +232,7 @@ mod tests {
             network_profile: LocalityNetworkProfile {
                 region: region.into(),
                 latency_ms_p50: latency,
+                profile_age_secs,
             },
         }
     }
@@ -276,5 +317,58 @@ mod tests {
         let w = worker("w1", "us-east", 40, &[]);
         let job = task(&["w:emb-1"], "inference:text", 200.0, Some("eu-west"));
         assert!((effective_cross_region_egress_mb(&w, &job) - 200.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn stale_network_profile_penalty_missing_or_old() {
+        assert!(
+            (stale_network_profile_penalty(None, DEFAULT_STALE_PROFILE_MAX_AGE_SECS, 0.05) - 0.05)
+                .abs()
+                < f64::EPSILON
+        );
+        assert!(
+            (stale_network_profile_penalty(
+                Some(DEFAULT_STALE_PROFILE_MAX_AGE_SECS + 1),
+                DEFAULT_STALE_PROFILE_MAX_AGE_SECS,
+                0.05,
+            ) - 0.05)
+                .abs()
+                < f64::EPSILON
+        );
+        assert!(
+            (stale_network_profile_penalty(
+                Some(DEFAULT_STALE_PROFILE_MAX_AGE_SECS),
+                DEFAULT_STALE_PROFILE_MAX_AGE_SECS,
+                0.05,
+            ) - 0.0)
+                .abs()
+                < f64::EPSILON
+        );
+        assert!(
+            (stale_network_profile_penalty(Some(0), DEFAULT_STALE_PROFILE_MAX_AGE_SECS, 0.05)
+                - 0.0)
+                .abs()
+                < f64::EPSILON
+        );
+    }
+
+    #[test]
+    fn locality_score_applies_stale_profile_penalty_ph_s169() {
+        let job = task(&["w:emb-1"], "inference:text", 0.0, None);
+        let fresh = worker_with_profile_age("fresh", "eu-west", 20, &["w:emb-1"], Some(3600));
+        let stale = worker_with_profile_age("stale", "eu-west", 20, &["w:emb-1"], None);
+        let fresh_score = locality_score(&fresh, &job, &DEFAULT_LOCALITY_WEIGHTS);
+        let stale_score = locality_score(&stale, &job, &DEFAULT_LOCALITY_WEIGHTS);
+        assert!((fresh_score - stale_score - DEFAULT_STALE_PROFILE_PENALTY).abs() < f64::EPSILON);
+        assert!(fresh_score > stale_score);
+    }
+
+    #[test]
+    fn rank_workers_by_locality_deprioritizes_stale_profile_ph_s169() {
+        let job = task(&["w:emb-1"], "inference:text", 0.0, None);
+        let fresh = worker_with_profile_age("fresh", "eu-west", 20, &["w:emb-1"], Some(0));
+        let stale = worker_with_profile_age("stale", "eu-west", 20, &["w:emb-1"], None);
+        let ranked = rank_workers_by_locality(&[stale, fresh], &job);
+        assert_eq!(ranked.first().map(|r| r.worker_id.as_str()), Some("fresh"));
     }
 }

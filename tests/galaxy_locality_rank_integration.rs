@@ -30,6 +30,7 @@ mod fixture {
             network_profile: LocalityNetworkProfile {
                 region: region.into(),
                 latency_ms_p50: latency_ms,
+                profile_age_secs: Some(0),
             },
         }
     }
