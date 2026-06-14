@@ -1641,7 +1641,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S163",
+  "next_sprint": "PH-S164",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -2128,7 +2128,9 @@
         "telegram_edge origin stub"
       ],
       "sprints": [
-        "PH-S130"
+        "PH-S130",
+        "PH-S137",
+        "PH-S163"
       ]
     },
     {
@@ -7064,7 +7066,7 @@
       ]
     }
   ],
-  "revision": 97,
+  "revision": 98,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

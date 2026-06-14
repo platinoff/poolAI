@@ -1,7 +1,7 @@
 //! Galaxy Grid edge `trust_score` settlement gate stub (PH-S130).
 //!
 //! Pure gate sketch on the grid result path per `docs/concept/POOLAI_GALAXY_GRID.md` §6.5.
-//! Settlement verdict counters mirrored on `GET /metrics` (PH-S137). No payout wire.
+//! Settlement verdict counters mirrored on `GET /metrics` (PH-S137 stub; PH-S163 grid result wire).
 
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -144,7 +144,7 @@ pub fn payout_held_total() -> u64 {
     PAYOUT_HELD_TOTAL.load(Ordering::Relaxed)
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-utils"))]
 pub fn reset_settlement_gate_metrics_for_test() {
     PAYOUT_ELIGIBLE_TOTAL.store(0, Ordering::Relaxed);
     PAYOUT_HELD_TOTAL.store(0, Ordering::Relaxed);

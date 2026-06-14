@@ -321,7 +321,7 @@ fn ingest_result(
     let settlement_gate = evaluate_result_settlement_gate(
         source_peer_id,
         trust_score,
-        &TrustScoreGateConfig::default_stub(),
+        &TrustScoreGateConfig::from_env(),
     );
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {
@@ -772,6 +772,61 @@ mod tests {
                 settlement_gate: SettlementGateVerdict::PayoutHeld,
             }
         );
+    }
+
+    #[test]
+    fn ingest_result_wire_updates_trust_settlement_metrics() {
+        use crate::grid::galaxy_trust_score::{
+            payout_eligible_total, payout_held_total, reset_settlement_gate_metrics_for_test,
+        };
+
+        reset_settlement_gate_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+
+        for (job_id, trust) in [
+            ("grid-trust-m-eligible", None),
+            ("grid-trust-m-held", Some(10u64)),
+        ] {
+            jobs.push(JobRecord {
+                spec: JobSpec {
+                    id: JobId::new(job_id),
+                    kind: JobKind::Inference,
+                    resources: Default::default(),
+                    priority: 0,
+                    max_duration_secs: None,
+                    input_artifact_ids: vec![],
+                    verification_policy: None,
+                    deadline: None,
+                },
+                status: JobStatus::Scheduled,
+                created_at: Utc::now(),
+                worker_id: None,
+                vm_id: None,
+                lease_owner: None,
+                lease_epoch: None,
+                lease_expires_at: None,
+            })
+            .expect("push");
+
+            let metrics = trust.map(|score| serde_json::json!({ "trust_score": score }));
+            let env = GridEnvelope::new(
+                GridMessage::Result(crate::grid::GridResultBody {
+                    job_id: job_id.into(),
+                    status: GridResultStatus::Completed,
+                    output_artifact_ids: vec![],
+                    proof: None,
+                    metrics,
+                    lease_epoch: None,
+                }),
+                Some(format!("tg-{job_id}")),
+            );
+            ingest_envelope(env, &jobs, &memory).expect("ingest");
+        }
+
+        assert_eq!(payout_eligible_total(), 1);
+        assert_eq!(payout_held_total(), 1);
+        reset_settlement_gate_metrics_for_test();
     }
 
     #[test]

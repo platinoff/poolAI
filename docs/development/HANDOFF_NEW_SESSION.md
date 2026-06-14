@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 (PH-S162 ✅ · §5.12 **7** відкритих PH-S163…S169 · rust_ratio **92.45%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-14 (PH-S163 ✅ · §5.12 **6** відкритих PH-S164…S169 · rust_ratio **92.45%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -123,11 +123,12 @@
 **PH-S160 ✅ (code):** `poolai-ui-core/theme.rs` — `normalize_theme` + token map; `admin_layout` injects `window.__poolaiAdminThemesRust`; wasm `normalizeTheme`; `admin_theme.js` **−29 LOC** (DOM glue only); `cargo test-ci`.
 **PH-S161 ✅ (code):** `poolai-ui-core/modal.rs` — focus-trap `trap_tab_action`, dynamic modal HTML; wasm `trapTabAction`; `__poolaiAdminModalRust` patch; slim `admin_modal_a11y.js`; `cargo test-ci`.
 **PH-S162 ✅ (code):** `poolai-ui-core/i18n.rs` — auth + dashboard shell EN/UK (92 keys); `window.__poolaiAuthDashI18nRust` on login + dashboard layout + admin layout; slim `i18n_core.js` auth/dash block; `cargo test-ci`.
-**Vision ✅:** next **PH-S163** · **7** відкритих (PH-S163…S169) · rev **97**.
+**PH-S163 ✅ (code):** `dispatch.rs` — `TrustScoreGateConfig::from_env()` on grid result ingest; `tests/galaxy_trust_metrics_integration.rs` HTTP envelope → `/metrics` scrape; `cargo test-ci`.
+**Vision ✅:** next **PH-S164** · **6** відкритих (PH-S164…S169) · rev **98**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **7** відкритих — **PH-S163** (наступний) … **PH-S169**. Maintain S163…S165 · replenish S166…S169 · baseline **92.45%** · spirit **96%**.
+**Черга:** §5.12 **6** відкритих — **PH-S164** (наступний) … **PH-S169**. Maintain S164…S165 · replenish S166…S169 · baseline **92.45%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
