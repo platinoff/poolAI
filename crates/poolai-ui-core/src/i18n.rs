@@ -1,7 +1,7 @@
-//! Admin i18n subset for jobs + grid-pricing (PH-S154).
+//! UI i18n subsets moved from `i18n_core.js` (PH-S154 admin jobs/grid; PH-S162 auth/dash shell).
 //!
-//! EN/UK strings are injected on admin pages via `window.__poolaiAdminI18nRust`
-//! before `i18n_core.js` loads. Parity: `src/ui/admin/jobs.rs`, `grid_pricing.rs`.
+//! Admin jobs/grid: `window.__poolaiAdminI18nRust` on admin layout (PH-S154).
+//! Auth + dashboard shell: `window.__poolaiAuthDashI18nRust` on login, dashboard layout, admin layout (PH-S162).
 
 use std::collections::BTreeMap;
 
@@ -170,6 +170,218 @@ pub const ADMIN_JOBS_GRID_UK: &[I18nRow<'_>] = &[
     ("admin.gridPricing.col.freshness", "Свіжість"),
 ];
 
+/// English auth keys (login, OAuth, bootstrap banner, lang toggle).
+pub const AUTH_SHELL_EN: &[I18nRow<'_>] = &[
+    ("auth.pageTitle", "Login - PoolAI"),
+    ("auth.cardTitle", "Login"),
+    ("auth.username", "Username"),
+    ("auth.password", "Password"),
+    ("auth.submit", "Login"),
+    ("auth.loggingIn", "Logging in…"),
+    ("auth.loginFailed", "Login failed"),
+    ("auth.oauthStartFail", "Failed to start OAuth2 login: "),
+    ("auth.oauthFail", "OAuth2 authentication failed: "),
+    ("auth.oauthTokenFail", "Failed to process OAuth2 token: "),
+    ("auth.signInWithAria", "Sign in with {provider}"),
+    ("auth.oauthOr", "Or sign in with:"),
+    ("auth.providerTelegram", "Telegram"),
+    ("auth.telegramPageTitle", "Telegram sign-in"),
+    ("auth.telegramSignIn", "Sign in with Telegram"),
+    ("auth.telegramCloseHint", "You can close this page after signing in."),
+    ("auth.testAccounts", "Test accounts:"),
+    ("auth.testAdmin", "Admin: admin / admin123"),
+    ("auth.testOperator", "Operator: operator / op123"),
+    ("auth.testViewer", "Viewer: viewer / view123"),
+    (
+        "auth.bootstrapLine1",
+        "First launch: you are signed in as the built-in administrator. Login: admin — password: admin123.",
+    ),
+    (
+        "auth.bootstrapLine2",
+        "Change the password in Admin → Users, or continue with the default and update it anytime in settings.",
+    ),
+    ("auth.bootstrapUsersLink", "Admin → Users"),
+    ("auth.bootstrapDismiss", "Got it"),
+    ("auth.lang.en", "EN"),
+    ("auth.lang.uk", "UA"),
+];
+
+/// Ukrainian auth keys.
+pub const AUTH_SHELL_UK: &[I18nRow<'_>] = &[
+    ("auth.pageTitle", "Вхід - PoolAI"),
+    ("auth.cardTitle", "Вхід"),
+    ("auth.username", "Користувач"),
+    ("auth.password", "Пароль"),
+    ("auth.submit", "Увійти"),
+    ("auth.loggingIn", "Вхід…"),
+    ("auth.loginFailed", "Не вдалося увійти"),
+    ("auth.oauthStartFail", "Не вдалося розпочати OAuth2: "),
+    ("auth.oauthFail", "Помилка OAuth2: "),
+    ("auth.oauthTokenFail", "Не вдалося обробити токен OAuth2: "),
+    ("auth.signInWithAria", "Увійти через {provider}"),
+    ("auth.oauthOr", "Або увійдіть через:"),
+    ("auth.providerTelegram", "Telegram"),
+    ("auth.telegramPageTitle", "Вхід через Telegram"),
+    ("auth.telegramSignIn", "Увійдіть через Telegram"),
+    ("auth.telegramCloseHint", "Після входу цю сторінку можна закрити."),
+    ("auth.testAccounts", "Тестові обліковки:"),
+    ("auth.testAdmin", "Адмін: admin / admin123"),
+    ("auth.testOperator", "Оператор: operator / op123"),
+    ("auth.testViewer", "Глядач: viewer / view123"),
+    (
+        "auth.bootstrapLine1",
+        "Перший запуск: ви увійшли як вбудований адміністратор. Логін: admin — пароль: admin123.",
+    ),
+    (
+        "auth.bootstrapLine2",
+        "Змініть пароль у Адмінка → Користувачі або продовжуйте зі штатним паролем і оновіть його будь-коли в налаштуваннях.",
+    ),
+    ("auth.bootstrapUsersLink", "Адмінка → Користувачі"),
+    ("auth.bootstrapDismiss", "Зрозуміло"),
+    ("auth.lang.en", "EN"),
+    ("auth.lang.uk", "UA"),
+];
+
+/// English dashboard shell keys (nav, theme, search, titles).
+pub const DASH_SHELL_EN: &[I18nRow<'_>] = &[
+    ("dash.brand", "PoolAI UI"),
+    ("dash.subtitle", "Dashboard with write operations (Stage 3)"),
+    ("dash.skipMain", "Skip to main content"),
+    ("dash.skipNav", "Skip to navigation"),
+    ("dash.nav.home", "Home"),
+    ("dash.nav.status", "Status"),
+    ("dash.nav.health", "Health"),
+    ("dash.nav.metrics", "Metrics"),
+    ("dash.nav.workers", "Workers"),
+    ("dash.nav.libs", "Libs"),
+    ("dash.nav.vm", "VM"),
+    ("dash.nav.raid", "RAID"),
+    ("dash.nav.admin", "Admin"),
+    ("dash.aria.admin", "Enterprise admin panel"),
+    ("dash.aria.mainNav", "Main navigation"),
+    ("dash.aria.home", "Home page"),
+    ("dash.aria.status", "System status"),
+    ("dash.aria.health", "Health check"),
+    ("dash.aria.metrics", "System metrics"),
+    ("dash.aria.workers", "Worker management"),
+    ("dash.aria.libs", "Library management"),
+    ("dash.aria.vm", "VM instance management"),
+    ("dash.aria.raid", "RAID artifact management"),
+    ("dash.aria.mobileNav", "Mobile navigation"),
+    ("dash.aria.openMenu", "Open navigation menu"),
+    ("dash.aria.closeMenu", "Close navigation menu"),
+    ("dash.menuTitle", "Menu"),
+    ("dash.themeLabel", "Theme:"),
+    ("dash.aria.theme", "Select theme"),
+    ("dash.themeOptDark", "🌙 Dark"),
+    ("dash.themeOptLight", "☀️ Light"),
+    ("dash.themeOptHC", "🔆 High Contrast"),
+    ("dash.login", "Login"),
+    ("dash.logout", "Logout"),
+    (
+        "dash.pageAutoRefresh",
+        "Auto-refresh is enabled (5s). Write operations are available for authenticated users with appropriate permissions.",
+    ),
+    ("dash.title.home", "Home"),
+    ("dash.title.status", "Status"),
+    ("dash.title.health", "Health"),
+    ("dash.title.metrics", "Metrics"),
+    ("dash.title.workers", "Workers"),
+    ("dash.title.libraries", "Libraries"),
+    ("dash.title.vm", "VM Instances"),
+    ("dash.title.raid", "RAID"),
+    ("dash.updatedPrefix", "Updated:"),
+    ("dash.search.title", "Search"),
+    ("dash.search.closeAria", "Close search dialog"),
+    ("dash.search.placeholder", "Search pages, workers, artifacts..."),
+    ("dash.search.inputAria", "Search input"),
+    ("dash.search.category.page", "Page"),
+    ("dash.search.item.home", "Home"),
+    ("dash.search.item.status", "Status"),
+    ("dash.search.item.health", "Health"),
+    ("dash.search.item.metrics", "Metrics"),
+    ("dash.search.item.workers", "Workers"),
+    ("dash.search.item.libs", "Libraries"),
+    ("dash.search.item.vm", "VM Instances"),
+    ("dash.search.item.raid", "RAID"),
+    ("dash.search.typeToSearch", "Type to search..."),
+    ("dash.search.noResults", "No results found"),
+    ("dash.search.resultsAria", "Search results"),
+    ("dash.search.oneResult", "1 result found"),
+    ("dash.search.manyResults", "{count} results found"),
+    ("dash.search.resultsWithCount", "Search results: {status}"),
+];
+
+/// Ukrainian dashboard shell keys.
+pub const DASH_SHELL_UK: &[I18nRow<'_>] = &[
+    ("dash.brand", "PoolAI UI"),
+    ("dash.subtitle", "Панель з операціями запису (етап 3)"),
+    ("dash.skipMain", "Перейти до основного вмісту"),
+    ("dash.skipNav", "Перейти до навігації"),
+    ("dash.nav.home", "Головна"),
+    ("dash.nav.status", "Статус"),
+    ("dash.nav.health", "Здоров\u{2019}я"),
+    ("dash.nav.metrics", "Метрики"),
+    ("dash.nav.workers", "Воркери"),
+    ("dash.nav.libs", "Бібліотеки"),
+    ("dash.nav.vm", "VM"),
+    ("dash.nav.raid", "RAID"),
+    ("dash.nav.admin", "Адмінка"),
+    ("dash.aria.admin", "Панель адміністратора (enterprise)"),
+    ("dash.aria.mainNav", "Головна навігація"),
+    ("dash.aria.home", "Головна сторінка"),
+    ("dash.aria.status", "Статус системи"),
+    ("dash.aria.health", "Перевірка здоров\u{2019}я"),
+    ("dash.aria.metrics", "Метрики системи"),
+    ("dash.aria.workers", "Керування воркерами"),
+    ("dash.aria.libs", "Керування бібліотеками"),
+    ("dash.aria.vm", "Керування інстансами VM"),
+    ("dash.aria.raid", "Керування артефактами RAID"),
+    ("dash.aria.mobileNav", "Мобільна навігація"),
+    ("dash.aria.openMenu", "Відкрити меню навігації"),
+    ("dash.aria.closeMenu", "Закрити меню навігації"),
+    ("dash.menuTitle", "Меню"),
+    ("dash.themeLabel", "Тема:"),
+    ("dash.aria.theme", "Обрати тему"),
+    ("dash.themeOptDark", "🌙 Темна"),
+    ("dash.themeOptLight", "☀️ Світла"),
+    ("dash.themeOptHC", "🔆 Високий контраст"),
+    ("dash.login", "Увійти"),
+    ("dash.logout", "Вийти"),
+    (
+        "dash.pageAutoRefresh",
+        "Автооновлення кожні 5 с. Операції запису доступні автентифікованим користувачам з відповідними правами.",
+    ),
+    ("dash.title.home", "Головна"),
+    ("dash.title.status", "Статус"),
+    ("dash.title.health", "Здоров\u{2019}я"),
+    ("dash.title.metrics", "Метрики"),
+    ("dash.title.workers", "Воркери"),
+    ("dash.title.libraries", "Бібліотеки"),
+    ("dash.title.vm", "Інстанси VM"),
+    ("dash.title.raid", "RAID"),
+    ("dash.updatedPrefix", "Оновлено:"),
+    ("dash.search.title", "Пошук"),
+    ("dash.search.closeAria", "Закрити діалог пошуку"),
+    ("dash.search.placeholder", "Пошук сторінок, воркерів, артефактів..."),
+    ("dash.search.inputAria", "Поле пошуку"),
+    ("dash.search.category.page", "Сторінка"),
+    ("dash.search.item.home", "Головна"),
+    ("dash.search.item.status", "Статус"),
+    ("dash.search.item.health", "Здоров\u{02BC}я"),
+    ("dash.search.item.metrics", "Метрики"),
+    ("dash.search.item.workers", "Воркери"),
+    ("dash.search.item.libs", "Бібліотеки"),
+    ("dash.search.item.vm", "Інстанси VM"),
+    ("dash.search.item.raid", "RAID"),
+    ("dash.search.typeToSearch", "Введіть запит для пошуку..."),
+    ("dash.search.noResults", "Нічого не знайдено"),
+    ("dash.search.resultsAria", "Результати пошуку"),
+    ("dash.search.oneResult", "Знайдено 1 результат"),
+    ("dash.search.manyResults", "Знайдено результатів: {count}"),
+    ("dash.search.resultsWithCount", "Результати пошуку: {status}"),
+];
+
 fn rows_to_map(rows: &[I18nRow<'_>]) -> BTreeMap<String, String> {
     rows.iter()
         .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
@@ -194,6 +406,39 @@ pub fn admin_jobs_grid_patch_script() -> String {
     format!(
         "window.__poolaiAdminI18nRust={};",
         admin_jobs_grid_patch_json()
+    )
+}
+
+fn merge_rows(map: &mut BTreeMap<String, String>, rows: &[I18nRow<'_>]) {
+    for (k, v) in rows {
+        map.insert((*k).to_string(), (*v).to_string());
+    }
+}
+
+/// `{"en":{...},"uk":{...}}` patch for auth + dashboard shell keys (PH-S162).
+pub fn auth_dash_shell_patch() -> BTreeMap<String, BTreeMap<String, String>> {
+    let mut en = BTreeMap::new();
+    merge_rows(&mut en, AUTH_SHELL_EN);
+    merge_rows(&mut en, DASH_SHELL_EN);
+    let mut uk = BTreeMap::new();
+    merge_rows(&mut uk, AUTH_SHELL_UK);
+    merge_rows(&mut uk, DASH_SHELL_UK);
+    let mut root = BTreeMap::new();
+    root.insert("en".into(), en);
+    root.insert("uk".into(), uk);
+    root
+}
+
+/// JSON literal assigned to `window.__poolaiAuthDashI18nRust`.
+pub fn auth_dash_shell_patch_json() -> String {
+    serde_json::to_string(&auth_dash_shell_patch()).expect("auth/dash i18n patch serializes")
+}
+
+/// Inline script for login, dashboard layout, and admin layout (auth bootstrap + lang toggle).
+pub fn auth_dash_shell_patch_script() -> String {
+    format!(
+        "window.__poolaiAuthDashI18nRust={};",
+        auth_dash_shell_patch_json()
     )
 }
 
@@ -248,5 +493,31 @@ mod tests {
             Some("Протермінований")
         );
         assert_eq!(t_en("admin.gridPricing.result"), Some("Pricing snapshot"));
+    }
+
+    #[test]
+    fn auth_dash_patch_has_matching_en_uk_key_counts() {
+        assert_eq!(AUTH_SHELL_EN.len(), AUTH_SHELL_UK.len());
+        assert_eq!(DASH_SHELL_EN.len(), DASH_SHELL_UK.len());
+        let patch = auth_dash_shell_patch();
+        let expected = AUTH_SHELL_EN.len() + DASH_SHELL_EN.len();
+        assert_eq!(patch["en"].len(), expected);
+        assert_eq!(patch["uk"].len(), expected);
+    }
+
+    #[test]
+    fn auth_dash_patch_json_contains_auth_and_dash_keys() {
+        let json = auth_dash_shell_patch_json();
+        assert!(json.contains(r#""auth.pageTitle""#));
+        assert!(json.contains(r#""auth.bootstrapDismiss""#));
+        assert!(json.contains(r#""dash.nav.workers""#));
+        assert!(json.contains(r#""dash.search.manyResults""#));
+    }
+
+    #[test]
+    fn auth_dash_script_assigns_window_patch() {
+        let script = auth_dash_shell_patch_script();
+        assert!(script.starts_with("window.__poolaiAuthDashI18nRust="));
+        assert!(script.ends_with(';'));
     }
 }

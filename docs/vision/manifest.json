@@ -1641,7 +1641,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S162",
+  "next_sprint": "PH-S163",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -5989,7 +5989,11 @@
       "id": "src_ui_i18n_core_js",
       "label": "i18n_core.js",
       "layer": "L3",
-      "path": "src/ui/i18n_core.js"
+      "path": "src/ui/i18n_core.js",
+      "sprints": [
+        "PH-S154",
+        "PH-S162"
+      ]
     },
     {
       "auto_synced": true,
@@ -7013,7 +7017,8 @@
       "layer": "L4",
       "path": "crates/poolai-ui-core/src/i18n.rs",
       "sprints": [
-        "PH-S154"
+        "PH-S154",
+        "PH-S162"
       ]
     },
     {
@@ -7059,7 +7064,7 @@
       ]
     }
   ],
-  "revision": 96,
+  "revision": 97,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

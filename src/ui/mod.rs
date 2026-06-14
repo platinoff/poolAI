@@ -731,6 +731,7 @@ fn layout(
     let nav_admin_mobile = "";
 
     let i18n_js = include_str!("i18n_core.js");
+    let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     let i18n_boot = r#"
 (function(){
   if (typeof PoolAiI18n !== 'undefined') {
@@ -744,7 +745,10 @@ fn layout(
     if (typeof dashMarkCurrentNav === 'function') dashMarkCurrentNav();
   });
 })();"#;
-    let full_script = format!("{}\n{}\n{}", i18n_js, script_js, i18n_boot);
+    let full_script = format!(
+        "{}\n{}\n{}\n{}",
+        auth_dash_patch, i18n_js, script_js, i18n_boot
+    );
 
     let html = format!(
         r#"<!DOCTYPE html>
@@ -3751,6 +3755,7 @@ async fn login_page() -> Html<String> {
     "#;
 
     let i18n_js = include_str!("i18n_core.js");
+    let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     let html = format!(
         r#"<!DOCTYPE html>
 <html lang="en">
@@ -3795,6 +3800,7 @@ async fn login_page() -> Html<String> {
     </div>
   </div>
   <script>
+    {auth_dash_patch}
     {i18n_js}
     {common_js}
     {login_js}
@@ -3821,6 +3827,7 @@ async fn login_page() -> Html<String> {
 </html>"#,
         css = BASE_CSS,
         skip_auth_href = "#auth_main",
+        auth_dash_patch = auth_dash_patch,
         i18n_js = i18n_js,
         common_js = common_js(),
         login_js = login_js
@@ -5164,6 +5171,15 @@ async fn raid_page() -> Html<String> {
 "#,
         &format!("{}\n{}", common_js(), raid_js),
     )
+}
+
+#[test]
+fn dashboard_layout_injects_rust_auth_dash_i18n_patch_ph_s162() {
+    let patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    assert!(patch.contains("window.__poolaiAuthDashI18nRust="));
+    let html = layout("dash.title.workers", "Workers", "<p>body</p>", "");
+    assert!(html.0.contains("window.__poolaiAuthDashI18nRust="));
+    assert!(html.0.contains(r#""auth.lang.en""#) || html.0.contains("auth.lang.en"));
 }
 
 #[test]

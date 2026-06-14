@@ -143,6 +143,7 @@ pub fn admin_layout_with_module_script(
     let modal_js = include_str!("../admin_modal_a11y.js");
     let charts_js = include_str!("../admin_charts.js");
     let i18n_patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
+    let auth_dash_patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
     let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
     let module_block = if module_script.is_empty() {
@@ -212,6 +213,7 @@ pub fn admin_layout_with_module_script(
   <div id="admin-aria-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
   
   <script>{i18n_patch}</script>
+  <script>{auth_dash_patch}</script>
   <script>{theme_patch}</script>
   <script>{modal_patch}</script>
   <script>{i18n_js}</script>
@@ -256,6 +258,7 @@ pub fn admin_layout_with_module_script(
         base_css = base_css,
         body = body_html,
         i18n_patch = i18n_patch,
+        auth_dash_patch = auth_dash_patch,
         theme_patch = theme_patch,
         modal_patch = modal_patch,
         i18n_js = i18n_js,
@@ -284,6 +287,16 @@ fn admin_layout_injects_rust_i18n_patch_ph_s154() {
     assert!(patch.contains("window.__poolaiAdminI18nRust="));
     assert!(patch.contains(r#""admin.jobs.leaseState.active""#));
     assert!(patch.contains(r#""admin.gridPricing.section""#));
+}
+
+#[test]
+fn admin_layout_injects_rust_auth_dash_i18n_patch_ph_s162() {
+    let patch = poolai_ui_core::i18n::auth_dash_shell_patch_script();
+    assert!(patch.contains("window.__poolaiAuthDashI18nRust="));
+    assert!(patch.contains(r#""auth.pageTitle""#));
+    assert!(patch.contains(r#""dash.nav.home""#));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains("window.__poolaiAuthDashI18nRust="));
 }
 
 #[test]

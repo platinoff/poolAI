@@ -1,40 +1,39 @@
 # Промпт наступної сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 · PH-S161 ✅ · vision **rev 95** · **8** відкритих (PH-S162…S169) · **stretch spirit 96%**
+**Оновлено:** 2026-06-14 · PH-S162 ✅ · vision **rev 97** · **7** відкритих (PH-S163…S169) · **stretch spirit 96%**
 
-| **← наступний** | **PH-S162** — Auth i18n subset Rust |
-| **Відкритих** | **8** (PH-S162…S169) |
+| **← наступний** | **PH-S163** — Galaxy trust metrics wire |
+| **Відкритих** | **7** (PH-S163…S169) |
 | **VDT** | один PH-S* = 1 commit |
 
 ---
 
-## Зріз §5.12 (8 відкритих: maintain S162…S165 + replenish S166…S169)
+## Зріз §5.12 (7 відкритих: maintain S163…S165 + replenish S166…S169)
 
 ### Закрито недавно ✅
 
 | Sprint | Scope | Зріз |
 |--------|-------|------|
+| PH-S162 | Auth i18n subset Rust | `i18n.rs` auth+dash shell; `__poolaiAuthDashI18nRust`; slim `i18n_core.js` |
 | PH-S161 | Admin modal a11y → wasm | `modal.rs` + wasm `trapTabAction`; slim `admin_modal_a11y.js` |
 | PH-S160 | Admin theme → Rust | `theme.rs` + wasm `normalizeTheme` |
-| PH-S159 | Ratio **96%** stretch CI gate | CI `--warn-below 0.93` |
 
-### Відкрито — maintain (PH-S162…S165)
+### Відкрито — maintain (PH-S163…S165)
 
 | # | Sprint | Scope |
 |---|--------|-------|
-| 1 | **PH-S162** | Auth i18n subset Rust |
-| 2 | **PH-S163** | Galaxy trust metrics wire |
-| 3 | **PH-S164** | Verify sampling apply |
-| 4 | **PH-S165** | **96%** hold gate |
+| 1 | **PH-S163** | Galaxy trust metrics wire |
+| 2 | **PH-S164** | Verify sampling apply |
+| 3 | **PH-S165** | **96%** hold gate |
 
 ### Відкрито — replenish (PH-S166…S169)
 
 | # | Sprint | Scope |
 |---|--------|-------|
-| 5 | **PH-S166** | Design tokens CSS → Rust |
-| 6 | **PH-S167** | Galaxy prefetch metrics stub |
-| 7 | **PH-S168** | Galaxy pricing cache age /metrics |
-| 8 | **PH-S169** | Locality stale profile penalty stub |
+| 4 | **PH-S166** | Design tokens CSS → Rust |
+| 5 | **PH-S167** | Galaxy prefetch metrics stub |
+| 6 | **PH-S168** | Galaxy pricing cache age /metrics |
+| 7 | **PH-S169** | Locality stale profile penalty stub |
 
 ---
 
@@ -51,22 +50,22 @@ export K8S_OPENAPI_ENABLED_VERSION=1.28
 
 ---
 
-## PH-S162 — scope
+## PH-S163 — scope
 
-- login/dashboard shell keys у `i18n.rs`; slim `i18n_core.js` auth block
+- trust gate Prometheus на grid result path (Galaxy §6.5)
 - Acceptance: `cargo test-ci`; FM/HANDOFF/NEXT/vision; push
 
 ---
 
-## Copy-paste — PH-S162
+## Copy-paste — PH-S163
 
 ```
-PoolAI — спринт PH-S162 (один PH-S*, VDT ітераційно).
+PoolAI — спринт PH-S163 (один PH-S*, VDT ітераційно).
 HANDOFF: docs/development/HANDOFF_NEW_SESSION.md
 FM §5.12: docs/catalog/FUNCTION_MANAGEMENT.md
 
-Спринт PH-S162 — Auth i18n subset Rust
-Scope: login/dashboard shell keys у poolai-ui-core/i18n.rs; slim i18n_core.js auth block
+Спринт PH-S163 — Galaxy trust metrics wire
+Scope: trust gate Prometheus на grid result path; unit tests
 
 Acceptance: cargo fmt; cargo test-ci; FM/HANDOFF/NEXT/vision; git push main
 ```
