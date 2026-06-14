@@ -60,9 +60,13 @@ pub const METRIC_FRESH_SERVED_TOTAL: &str = "galaxy_pricing_fresh_served";
 /// Latest observed L1 cache age in seconds (§4.2.3, PH-S168 `/metrics` gauge).
 pub const METRIC_CACHE_AGE_SECONDS: &str = "galaxy_pricing_cache_age_seconds";
 
+/// Last served PoolAI quote in micro-USD (§4.2, PH-S174 `/metrics` gauge).
+pub const METRIC_QUOTE_USD_MICRO: &str = "galaxy_pricing_quote_usd_micro";
+
 static FRESH_SERVED_TOTAL: AtomicU64 = AtomicU64::new(0);
 
 static L1_CACHE_AGE_OBSERVED_SECS: AtomicU64 = AtomicU64::new(0);
+static LAST_QUOTE_USD_MICRO: AtomicU64 = AtomicU64::new(0);
 
 /// Env: JSON map for L2 fallback floor quotes in micro-USD (§4.2.4).
 /// Example:
@@ -269,6 +273,21 @@ pub fn pricing_cache_age_seconds() -> u64 {
 #[cfg(any(test, feature = "test-utils"))]
 pub fn reset_pricing_cache_age_for_test() {
     L1_CACHE_AGE_OBSERVED_SECS.store(0, Ordering::Relaxed);
+}
+
+/// Observe last served quote for Prometheus gauge (PH-S174).
+pub fn observe_last_quote_usd_micro(usd_micro: u64) {
+    LAST_QUOTE_USD_MICRO.store(usd_micro, Ordering::Relaxed);
+}
+
+/// Last served PoolAI quote in micro-USD since process start (mirrored on `GET /metrics`).
+pub fn last_quote_usd_micro() -> u64 {
+    LAST_QUOTE_USD_MICRO.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_quote_usd_micro_for_test() {
+    LAST_QUOTE_USD_MICRO.store(0, Ordering::Relaxed);
 }
 
 fn serve_l1_cache_quote(
@@ -811,23 +830,27 @@ impl GalaxyPricingOracle {
         providers: &[MockProviderQuote],
     ) -> Result<GalaxyPricingQuote, GalaxyPricingUnavailable> {
         if self.config.force_fallback {
-            return self
+            let quote = self
                 .l2_fallback_quote(now_secs, key)
-                .map(|quote| {
-                    record_forced_fallback(quote.unit_key);
-                    quote
-                })
-                .ok_or(GalaxyPricingUnavailable);
+                .ok_or(GalaxyPricingUnavailable)?;
+            record_forced_fallback(quote.unit_key);
+            observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+            return Ok(quote);
         }
         if let Some((entry, freshness)) = self.lookup(now_secs, &key) {
             if freshness == CacheFreshness::Fresh || freshness == CacheFreshness::Stale {
                 observe_l1_cache_age_secs(now_secs.saturating_sub(entry.quote.cached_at_secs));
-                return Ok(serve_l1_cache_quote(entry, freshness));
+                let quote = serve_l1_cache_quote(entry, freshness);
+                observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+                return Ok(quote);
             }
         }
-        self.refresh_from_providers(now_secs, key.clone(), providers)
+        let quote = self
+            .refresh_from_providers(now_secs, key.clone(), providers)
             .or_else(|| self.l2_fallback_quote(now_secs, key))
-            .ok_or(GalaxyPricingUnavailable)
+            .ok_or(GalaxyPricingUnavailable)?;
+        observe_last_quote_usd_micro(quote.poolai_quote_usd_micro);
+        Ok(quote)
     }
 
     /// Convenience wrapper over [`Self::try_quote`].
@@ -1140,6 +1163,27 @@ mod tests {
         oracle.try_quote(1_600, key, &[]).expect("stale L1");
         assert_eq!(pricing_cache_age_seconds(), 600);
         reset_pricing_cache_age_for_test();
+    }
+
+    #[test]
+    fn try_quote_observes_last_quote_usd_micro_ph_s174() {
+        reset_last_quote_usd_micro_for_test();
+        let mut oracle = GalaxyPricingOracle::new(GalaxyPricingConfig {
+            cache_ttl_secs: 300,
+            max_stale_secs: 3600,
+            force_fallback: false,
+        });
+        let key = GalaxyPricingCacheKey {
+            task_profile: "inference:text".into(),
+            model_profile: "quote-metric".into(),
+            unit_key: GalaxyPriceUnitKey::InferenceBlendedToken,
+        };
+        assert_eq!(last_quote_usd_micro(), 0);
+        oracle
+            .try_quote(10_000, key, &mock_us_blended())
+            .expect("provider refresh quote");
+        assert_eq!(last_quote_usd_micro(), 450_000);
+        reset_last_quote_usd_micro_for_test();
     }
 
     #[test]
