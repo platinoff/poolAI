@@ -327,14 +327,17 @@ impl GalaxyPricingProviderCatalog {
         task_profile: &str,
         model_profile: &str,
     ) -> Vec<&GalaxyPricingProviderEntry> {
-        self.providers
+        let matched: Vec<_> = self
+            .providers
             .iter()
             .filter(|p| {
                 p.enabled
                     && p.region.eq_ignore_ascii_case("us")
                     && provider_matches_profiles(p, task_profile, model_profile)
             })
-            .collect()
+            .collect();
+        crate::grid::galaxy_pricing_provider_metrics::record_provider_catalog_lookup(matched.len());
+        matched
     }
 }
 

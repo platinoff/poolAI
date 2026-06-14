@@ -27,6 +27,10 @@ use crate::grid::galaxy_pricing_oracle::{
     METRIC_CACHE_AGE_SECONDS, METRIC_FORCED_FALLBACK_TOTAL, METRIC_FRESH_SERVED_TOTAL,
     METRIC_STALE_SERVED_TOTAL,
 };
+use crate::grid::galaxy_pricing_provider_metrics::{
+    provider_catalog_hits_total, provider_catalog_lookups_total,
+    METRIC_PROVIDER_CATALOG_HITS_TOTAL, METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
+};
 use crate::grid::galaxy_trust_score::{
     payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
     METRIC_PAYOUT_HELD_TOTAL,
@@ -50,6 +54,8 @@ pub struct PoolAiPrometheus {
     galaxy_pricing_stale_served: IntGauge,
     galaxy_pricing_forced_fallback_total: IntGauge,
     galaxy_pricing_cache_age_seconds: IntGauge,
+    galaxy_pricing_provider_catalog_lookups_total: IntGauge,
+    galaxy_pricing_provider_catalog_hits_total: IntGauge,
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
@@ -205,6 +211,26 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_pricing_cache_age_seconds.clone()))
         .expect("register galaxy_pricing_cache_age_seconds");
 
+    let galaxy_pricing_provider_catalog_lookups_total = IntGauge::with_opts(Opts::new(
+        METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL,
+        "Galaxy pricing provider catalog allow-list lookups (PH-S172)",
+    ))
+    .expect(METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL);
+    registry
+        .register(Box::new(
+            galaxy_pricing_provider_catalog_lookups_total.clone(),
+        ))
+        .expect("register galaxy_pricing_provider_catalog_lookups_total");
+
+    let galaxy_pricing_provider_catalog_hits_total = IntGauge::with_opts(Opts::new(
+        METRIC_PROVIDER_CATALOG_HITS_TOTAL,
+        "Galaxy pricing provider catalog allow-list hits (PH-S172)",
+    ))
+    .expect(METRIC_PROVIDER_CATALOG_HITS_TOTAL);
+    registry
+        .register(Box::new(galaxy_pricing_provider_catalog_hits_total.clone()))
+        .expect("register galaxy_pricing_provider_catalog_hits_total");
+
     let galaxy_trust_payout_eligible_total = IntGauge::with_opts(Opts::new(
         METRIC_PAYOUT_ELIGIBLE_TOTAL,
         "Galaxy trust gate edge results eligible for payout stub (PH-S137)",
@@ -273,6 +299,8 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_pricing_stale_served,
         galaxy_pricing_forced_fallback_total,
         galaxy_pricing_cache_age_seconds,
+        galaxy_pricing_provider_catalog_lookups_total,
+        galaxy_pricing_provider_catalog_hits_total,
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
         galaxy_prefetch_plan_total,
@@ -292,6 +320,10 @@ pub fn refresh_galaxy_pricing_gauges() {
         .set(forced_fallback_total() as i64);
     prom.galaxy_pricing_cache_age_seconds
         .set(pricing_cache_age_seconds() as i64);
+    prom.galaxy_pricing_provider_catalog_lookups_total
+        .set(provider_catalog_lookups_total() as i64);
+    prom.galaxy_pricing_provider_catalog_hits_total
+        .set(provider_catalog_hits_total() as i64);
 }
 
 /// Mirror in-process trust gate counters into Prometheus gauges (scrape snapshot).
@@ -446,6 +478,24 @@ mod tests {
         assert!(body.contains(METRIC_STALE_SERVED_TOTAL));
         assert!(body.contains(METRIC_FORCED_FALLBACK_TOTAL));
         assert!(body.contains(METRIC_CACHE_AGE_SECONDS));
+        assert!(body.contains(METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL));
+        assert!(body.contains(METRIC_PROVIDER_CATALOG_HITS_TOTAL));
+    }
+
+    #[test]
+    fn galaxy_pricing_provider_catalog_gauges_reflect_hits_ph_s172() {
+        use crate::grid::galaxy_pricing_oracle::bundled_pricing_provider_catalog;
+        use crate::grid::galaxy_pricing_provider_metrics::reset_provider_catalog_metrics_for_test;
+
+        reset_provider_catalog_metrics_for_test();
+        init_prometheus();
+        let catalog = bundled_pricing_provider_catalog();
+        let _ = catalog.matching_entries("inference:text", "gpt-4o-mini");
+        refresh_galaxy_pricing_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_PROVIDER_CATALOG_LOOKUPS_TOTAL} 1")));
+        assert!(body.contains(METRIC_PROVIDER_CATALOG_HITS_TOTAL));
+        reset_provider_catalog_metrics_for_test();
     }
 
     #[test]
