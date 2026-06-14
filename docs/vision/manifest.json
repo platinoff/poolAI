@@ -1641,7 +1641,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S164",
+  "next_sprint": "PH-S165",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -2143,7 +2143,8 @@
         "telegram_edge sampling stub"
       ],
       "sprints": [
-        "PH-S142"
+        "PH-S142",
+        "PH-S164"
       ]
     },
     {

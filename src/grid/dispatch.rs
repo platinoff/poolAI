@@ -4,6 +4,7 @@
 //! when a source peer binds `worker_id`, scheduler lease acquire sets `JobStatus::Leased` (PH-S108).
 //! `Result` ingest validates `lease_epoch` CAS when the job row has active lease fields (PH-S110).
 //! Edge `trust_score` settlement gate stub on result path (PH-S130, Galaxy ?6.5).
+//! Verification sampling stub on result path (PH-S164, Galaxy ?6.2).
 //! Seed inventory + task-driven prefetch policy stub (PH-S129, Galaxy ?5.5).
 
 use chrono::Utc;
@@ -13,6 +14,9 @@ use crate::core::error::AppError;
 use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
     TrustScoreGateConfig,
+};
+use crate::grid::galaxy_verify_sampling::{
+    evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
 };
 use crate::grid::{GridEnvelope, GridEnvelopeError, GridMessage, GridResultBody};
 use crate::job::{
@@ -198,6 +202,7 @@ pub enum GridIngestKind {
         job_id: String,
         status: JobStatus,
         settlement_gate: SettlementGateVerdict,
+        verification_sample: VerifySamplingVerdict,
     },
     MemoryShard {
         shard_id: String,
@@ -323,11 +328,14 @@ fn ingest_result(
         trust_score,
         &TrustScoreGateConfig::from_env(),
     );
+    let verification_sample =
+        evaluate_result_verify_sampling(source_peer_id, &job_id, &VerifySamplingConfig::from_env());
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {
             job_id,
             status,
             settlement_gate,
+            verification_sample,
         },
     })
 }
@@ -451,6 +459,7 @@ mod tests {
                 job_id: "grid-job-2".into(),
                 status: JobStatus::Completed,
                 settlement_gate: SettlementGateVerdict::NotApplicable,
+                verification_sample: VerifySamplingVerdict::NotApplicable,
             }
         );
     }
@@ -499,6 +508,7 @@ mod tests {
                 job_id: "grid-result-ok".into(),
                 status: JobStatus::Completed,
                 settlement_gate: SettlementGateVerdict::NotApplicable,
+                verification_sample: VerifySamplingVerdict::NotApplicable,
             }
         );
     }
@@ -717,12 +727,22 @@ mod tests {
             Some("tg-edge-1".into()),
         );
         let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        let cfg = VerifySamplingConfig::default_stub();
+        let expected_sample = if crate::grid::galaxy_verify_sampling::deterministic_sample_selected(
+            "grid-trust-ok",
+            cfg.base_sample_rate,
+        ) {
+            VerifySamplingVerdict::SampleScheduled
+        } else {
+            VerifySamplingVerdict::NotSelected
+        };
         assert_eq!(
             out.kind,
             GridIngestKind::Result {
                 job_id: "grid-trust-ok".into(),
                 status: JobStatus::Completed,
                 settlement_gate: SettlementGateVerdict::PayoutEligible,
+                verification_sample: expected_sample,
             }
         );
     }
@@ -764,14 +784,84 @@ mod tests {
             Some("tg-edge-low".into()),
         );
         let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        let cfg = VerifySamplingConfig::default_stub();
+        let expected_sample = if crate::grid::galaxy_verify_sampling::deterministic_sample_selected(
+            "grid-trust-low",
+            cfg.base_sample_rate,
+        ) {
+            VerifySamplingVerdict::SampleScheduled
+        } else {
+            VerifySamplingVerdict::NotSelected
+        };
         assert_eq!(
             out.kind,
             GridIngestKind::Result {
                 job_id: "grid-trust-low".into(),
                 status: JobStatus::Completed,
                 settlement_gate: SettlementGateVerdict::PayoutHeld,
+                verification_sample: expected_sample,
             }
         );
+    }
+
+    #[test]
+    fn ingest_result_wire_applies_verify_sampling_from_env() {
+        use crate::grid::galaxy_verify_sampling::{
+            reset_verify_sampling_metrics_for_test, verify_sample_scheduled_total,
+        };
+
+        reset_verify_sampling_metrics_for_test();
+        std::env::set_var(
+            crate::grid::galaxy_verify_sampling::ENV_VERIFY_BASE_SAMPLE_RATE,
+            "1",
+        );
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-verify-wire"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-verify-wire".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: None,
+                lease_epoch: None,
+            }),
+            Some("tg-verify".into()),
+        );
+        let out = ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(
+            out.kind,
+            GridIngestKind::Result {
+                job_id: "grid-verify-wire".into(),
+                status: JobStatus::Completed,
+                settlement_gate: SettlementGateVerdict::PayoutEligible,
+                verification_sample: VerifySamplingVerdict::SampleScheduled,
+            }
+        );
+        assert_eq!(verify_sample_scheduled_total(), 1);
+        std::env::remove_var(crate::grid::galaxy_verify_sampling::ENV_VERIFY_BASE_SAMPLE_RATE);
+        reset_verify_sampling_metrics_for_test();
     }
 
     #[test]

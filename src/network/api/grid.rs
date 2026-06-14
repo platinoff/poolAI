@@ -267,6 +267,7 @@ fn response_from_outcome(outcome: GridIngestOutcome) -> GridIngestResponse {
             job_id,
             status,
             settlement_gate: _,
+            verification_sample: _,
         } => GridIngestResponseKind::Result { job_id, status },
         GridIngestKind::MemoryShard { shard_id } => {
             GridIngestResponseKind::MemoryShard { shard_id }

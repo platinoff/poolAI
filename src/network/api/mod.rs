@@ -37,6 +37,7 @@ mod system_status_html;
 pub mod topology;
 pub mod ui;
 pub mod users;
+mod verify_sampling_middleware;
 pub mod virtual_nodes;
 pub mod vm;
 pub mod workers;
@@ -73,6 +74,9 @@ pub fn create_api_routes() -> Router<ApiContext> {
         .merge(ui::create_ui_routes())
         .layer(middleware::from_fn(
             protocol_middleware::protocol_header_middleware,
+        ))
+        .layer(middleware::from_fn(
+            verify_sampling_middleware::verify_sampling_middleware,
         ))
 }
 

@@ -113,7 +113,7 @@ flowchart TB
 | 18 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` | **✅** |
 | 19 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth block | ✅ |
 | 20 | **PH-S163** | Galaxy trust metrics wire | Prometheus on grid result path | ✅ |
-| 21 | **PH-S164** | Verify sampling env apply | `galaxy_verify_sampling` HTTP stub | відкрито |
+| 21 | **PH-S164** | Verify sampling env apply | `galaxy_verify_sampling` HTTP stub | ✅ |
 | 22 | **PH-S165** | Ratio **96%** hold gate | CI `--min-ratio 0.95`; replenish next band | відкрито |
 | 23 | **PH-S166** | Design tokens CSS → Rust | slim `design_tokens.css` / `admin_styles.css` | відкрито |
 | 24 | **PH-S167** | Galaxy prefetch metrics stub | Prometheus on `plan_prefetch` | відкрито |

@@ -155,7 +155,7 @@
 | **Pricing oracle (stub + L2 fallback)** | `src/grid/galaxy_pricing_oracle.rs` | unit keys; TTL/SWR cache (L1 fresh/stale); L2 fallback + FORCE_FALLBACK; `POOLAI_GALAXY_PRICING_PROVIDERS` catalog (PH-S92); in-process metrics fresh/stale/forced_fallback (PH-S81/S83/S91); Prometheus gauges on `GET /metrics` (PH-S127) | unit tests (`galaxy_pricing_oracle`) |
 | **Protocol compat** | `src/grid/protocol_compat.rs` | matrix coordinator↔worker `1.x`; `negotiate()` на register-remote; `CompatStatus` + docs URL | unit tests; `tests/discovery_remote_register_integration.rs` |
 | **Network profile** | `src/grid/galaxy_network_profile.rs`, `discovery.rs` | parse `metadata.network_profile` on register-remote (§8.1); canonical JSON in peer metadata | unit tests; `tests/discovery_network_profile_integration.rs` (PH-S140) |
-| **Verify sampling** | `src/grid/galaxy_verify_sampling.rs` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` (§6.6, default `0.05`); `VerifySamplingConfig::from_env()` (PH-S142) | unit tests |
+| **Verify sampling** | `src/grid/galaxy_verify_sampling.rs`, `verify_sampling_middleware.rs` | `POOLAI_GALAXY_VERIFY_BASE_SAMPLE_RATE` (§6.2, default `0.05`); middleware header + result ingest stub (PH-S142/S164) | unit + integration tests |
 | **Virtual nodes API** | `src/network/api/virtual_nodes.rs`, `discovery.rs` | register-remote/heartbeat, tasks, Telegram bind/webhook, pool join | `virtual_node_*_integration` |
 | **Virtual node services** | `src/services/virtual_node_task_service.rs`, `virtual_node_telegram_binding_service.rs` | task queue, Telegram seat bind (FM-016+) | integration tests |
 | **Signed release** | `src/release/`, `poolai-verify-release` | ed25519 manifest verify + artifact SHA-256 (PH-S66) | `release::verify` unit tests |
