@@ -25,7 +25,9 @@ use crate::grid::galaxy_replication::{
 };
 use crate::grid::galaxy_replication_metrics::evaluate_job_replication_strict;
 use crate::grid::galaxy_settlement::{resolve_settlement_status, SettlementStatus};
-use crate::grid::galaxy_settlement_metrics::evaluate_result_settlement_pending_verification;
+use crate::grid::galaxy_settlement_metrics::{
+    evaluate_result_settlement_cleared, evaluate_result_settlement_pending_verification,
+};
 use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
     TrustScoreGateConfig,
@@ -374,6 +376,7 @@ fn ingest_result(
     );
     let settlement_status = resolve_settlement_status(settlement_gate, verification_sample);
     evaluate_result_settlement_pending_verification(settlement_status);
+    evaluate_result_settlement_cleared(settlement_status);
     evaluate_result_replay_pending(body.metrics.as_ref(), settlement_status);
     Ok(GridIngestOutcome {
         kind: GridIngestKind::Result {
@@ -1310,6 +1313,57 @@ mod tests {
         ingest_envelope(env, &jobs, &memory).expect("ingest");
         assert_eq!(settlement_pending_verification_total(), 1);
         reset_settlement_pending_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_result_wire_records_settlement_cleared_metric_ph_s187() {
+        use crate::grid::galaxy_settlement_metrics::{
+            reset_settlement_metrics_for_test, settlement_cleared_total,
+            settlement_metrics_test_lock,
+        };
+        use crate::grid::galaxy_verify_sampling::ENV_VERIFY_BASE_SAMPLE_RATE;
+
+        let _lock = settlement_metrics_test_lock();
+        reset_settlement_metrics_for_test();
+        std::env::set_var(ENV_VERIFY_BASE_SAMPLE_RATE, "0");
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-settle-cleared-metric"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-settle-cleared-metric".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: Some(serde_json::json!({ "trust_score": 80 })),
+                lease_epoch: None,
+            }),
+            Some("tg-edge".into()),
+        );
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(settlement_cleared_total(), 1);
+        std::env::remove_var(ENV_VERIFY_BASE_SAMPLE_RATE);
+        reset_settlement_metrics_for_test();
     }
 
     #[test]

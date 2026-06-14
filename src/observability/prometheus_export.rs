@@ -42,7 +42,8 @@ use crate::grid::galaxy_replication_metrics::{
     replication_strict_total, METRIC_REPLICATION_STRICT_TOTAL,
 };
 use crate::grid::galaxy_settlement_metrics::{
-    settlement_pending_verification_total, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
+    settlement_cleared_total, settlement_pending_verification_total,
+    METRIC_SETTLEMENT_CLEARED_TOTAL, METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL,
 };
 use crate::grid::galaxy_trust_score::{
     last_trust_score, payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
@@ -95,6 +96,7 @@ pub struct PoolAiPrometheus {
     galaxy_verification_sample_scheduled_total: IntGauge,
     galaxy_replay_pending: IntGauge,
     galaxy_settlement_pending_verification_total: IntGauge,
+    galaxy_settlement_cleared_total: IntGauge,
     galaxy_replication_strict_total: IntGauge,
 }
 
@@ -430,6 +432,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         ))
         .expect("register galaxy_settlement_pending_verification_total");
 
+    let galaxy_settlement_cleared_total = IntGauge::with_opts(Opts::new(
+        METRIC_SETTLEMENT_CLEARED_TOTAL,
+        "Galaxy settlement cleared on grid result path (PH-S187)",
+    ))
+    .expect(METRIC_SETTLEMENT_CLEARED_TOTAL);
+    registry
+        .register(Box::new(galaxy_settlement_cleared_total.clone()))
+        .expect("register galaxy_settlement_cleared_total");
+
     let galaxy_replication_strict_total = IntGauge::with_opts(Opts::new(
         METRIC_REPLICATION_STRICT_TOTAL,
         "Galaxy replication strict tier grid job ingests (PH-S179)",
@@ -482,6 +493,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_verification_sample_scheduled_total,
         galaxy_replay_pending,
         galaxy_settlement_pending_verification_total,
+        galaxy_settlement_cleared_total,
         galaxy_replication_strict_total,
     }
 }
@@ -555,6 +567,8 @@ pub fn refresh_galaxy_verification_gauges() {
     prom.galaxy_replay_pending.set(replay_pending() as i64);
     prom.galaxy_settlement_pending_verification_total
         .set(settlement_pending_verification_total() as i64);
+    prom.galaxy_settlement_cleared_total
+        .set(settlement_cleared_total() as i64);
 }
 
 /// Mirror in-process replication tier counters into Prometheus gauges (scrape snapshot).
@@ -1017,6 +1031,22 @@ mod tests {
         assert!(body.contains(METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL));
         assert!(body.contains(&format!("{METRIC_SETTLEMENT_PENDING_VERIFICATION_TOTAL} 1")));
         reset_settlement_pending_verification_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_settlement_cleared_gauge_reflects_counter_ph_s187() {
+        use crate::grid::galaxy_settlement_metrics::{
+            record_settlement_cleared, reset_settlement_cleared_metrics_for_test,
+        };
+
+        reset_settlement_cleared_metrics_for_test();
+        init_prometheus();
+        record_settlement_cleared();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_SETTLEMENT_CLEARED_TOTAL));
+        assert!(body.contains(&format!("{METRIC_SETTLEMENT_CLEARED_TOTAL} 1")));
+        reset_settlement_cleared_metrics_for_test();
     }
 
     #[test]

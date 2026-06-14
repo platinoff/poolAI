@@ -1716,7 +1716,7 @@
   ],
   "galaxy_background": "vision2.png",
   "git_head": "76f6dd3d",
-  "last_sprint_closed": "PH-S186",
+  "last_sprint_closed": "PH-S187",
   "layers": [
     {
       "id": "L0",
@@ -1749,7 +1749,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S187",
+  "next_sprint": "PH-S188",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7340,7 +7340,7 @@
       "label": "galaxy_settlement_metrics.rs",
       "layer": "L3",
       "path": "src/grid/galaxy_settlement_metrics.rs",
-      "sprints": ["PH-S178"]
+      "sprints": ["PH-S178", "PH-S187"]
     },
     {
       "auto_synced": true,
@@ -7349,6 +7349,14 @@
       "layer": "L3",
       "path": "tests/galaxy_settlement_pending_verification_integration.rs",
       "sprints": ["PH-S178"]
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_settlement_cleared_integration_rs",
+      "label": "galaxy_settlement_cleared_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_settlement_cleared_integration.rs",
+      "sprints": ["PH-S187"]
     },
     {
       "auto_synced": true,
@@ -7383,7 +7391,7 @@
       "sprints": ["PH-S181"]
     }
   ],
-  "revision": 123,
+  "revision": 124,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }

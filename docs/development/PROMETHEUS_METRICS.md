@@ -65,9 +65,10 @@ scrape_configs:
 | `galaxy_verification_match_total` | gauge | Galaxy verification digest matches on grid result path (PH-S180) |
 | `galaxy_replay_pending` | gauge | Galaxy replay verifications pending coordinator verdict (PH-S176) |
 | `galaxy_settlement_pending_verification_total` | gauge | Galaxy settlement holds pending verification on grid result path (PH-S178) |
+| `galaxy_settlement_cleared_total` | gauge | Galaxy settlement cleared on grid result path (PH-S187) |
 | `galaxy_replication_strict_total` | gauge | Galaxy replication strict tier grid job ingests (PH-S179) |
 
-**Queued (FM §5.12 PH-S187):** settlement cleared — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12. Vision UX band PH-S188…S191 — окремо в FM §5.12.
+**Queued (FM §5.12 PH-S188…S191):** vision UX band — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |

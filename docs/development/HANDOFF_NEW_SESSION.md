@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 (PH-S186 ✅ · §5.12 **5** відкритих PH-S187…S191 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-14 (PH-S187 ✅ · §5.12 **4** відкритих PH-S188…S191 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -145,13 +145,14 @@
 **PH-S182 ✅ (code):** `galaxy_trust_score.rs` — `galaxy_trust_score` gauge on grid result ingest (`observe_last_trust_score`); `/metrics` via `refresh_galaxy_trust_gauges`; extended `tests/galaxy_trust_metrics_integration.rs`; `cargo test-ci`.
 **PH-S183 ✅ (code):** `galaxy_locality.rs` — `galaxy_shard_local_hit_ratio` gauge on `rank_workers_by_locality` top worker; `/metrics` via `refresh_galaxy_locality_gauges`; `tests/galaxy_shard_local_hit_ratio_integration.rs`; `cargo test-ci`.
 **PH-S184 ✅ (code):** `galaxy_prefetch_metrics.rs` — `galaxy_prefetch_bytes_total` counter on `plan_prefetch`; `/metrics` via `refresh_galaxy_prefetch_gauges`; extended `tests/galaxy_prefetch_metrics_integration.rs`; `cargo test-ci`.
+**PH-S187 ✅ (code):** `galaxy_settlement_metrics.rs` + `dispatch.rs` — `galaxy_settlement_cleared_total` on Cleared path; `/metrics` via `refresh_galaxy_verification_gauges`; `tests/galaxy_settlement_cleared_integration.rs`; `cargo test-ci`.
+**Vision ✅:** next **PH-S188** · **4** відкритих (vision UX S188…S191) · rev **124**.
 **PH-S186 ✅ (code):** `prometheus_export.rs` — `galaxy_verification_sample_scheduled_total` IntGauge mirrored from PH-S164 stub via `refresh_galaxy_verification_gauges`; `tests/galaxy_verification_sample_scheduled_integration.rs`; `cargo test-ci`.
-**Vision ✅:** next **PH-S187** · **5** відкритих (PH-S187 metrics + vision UX S188…S191) · rev **123**.
 **PH-S185 ✅ (code):** `galaxy_locality.rs` + `dispatch.rs` — `galaxy_cross_region_egress_mb` gauge on rank/prefetch path; `/metrics` via `refresh_galaxy_locality_gauges`; `tests/galaxy_cross_region_egress_mb_integration.rs`; `cargo test-ci`.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **5** відкритих — **PH-S187** (наступний) … **PH-S191**. Metrics S187 · Vision UX S188…S191 · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Черга:** §5.12 **4** відкритих — **PH-S188** (наступний) … **PH-S191**. Vision UX S188…S191 · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
