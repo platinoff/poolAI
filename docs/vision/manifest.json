@@ -1592,10 +1592,22 @@
       "from": "src_bin_poolai_e2e_stand_rs",
       "kind": "implements",
       "to": "src_bin_poolai_http_stand_smoke_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_modal_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "crate_solana",
+      "kind": "implements",
+      "to": "crates_poolai_ui_core_src_theme_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "0c5a550f",
+  "git_head": "606f34e0",
   "last_sprint_closed": "PH-S161",
   "layers": [
     {
@@ -4710,8 +4722,11 @@
         "PH-S158"
       ]
     },
+    {
+      "auto_synced": true,
+      "id": "crates_poolai_ui_core_Cargo_toml",
       "label": "poolai-ui-core Cargo.toml",
-      "layer": "L3",
+      "layer": "L4",
       "path": "crates/poolai-ui-core/Cargo.toml",
       "sprints": [
         "PH-S146"
@@ -6997,7 +7012,9 @@
       "label": "i18n.rs",
       "layer": "L4",
       "path": "crates/poolai-ui-core/src/i18n.rs",
-      "sprints": ["PH-S154"]
+      "sprints": [
+        "PH-S154"
+      ]
     },
     {
       "auto_synced": true,
@@ -7005,7 +7022,9 @@
       "label": "theme.rs",
       "layer": "L4",
       "path": "crates/poolai-ui-core/src/theme.rs",
-      "sprints": ["PH-S160"]
+      "sprints": [
+        "PH-S160"
+      ]
     },
     {
       "auto_synced": true,
@@ -7013,7 +7032,9 @@
       "label": "modal.rs",
       "layer": "L4",
       "path": "crates/poolai-ui-core/src/modal.rs",
-      "sprints": ["PH-S161"]
+      "sprints": [
+        "PH-S161"
+      ]
     },
     {
       "auto_synced": true,
@@ -7021,7 +7042,10 @@
       "label": "admin_modal_a11y.js",
       "layer": "L3",
       "path": "src/ui/admin_modal_a11y.js",
-      "sprints": ["PH-S153", "PH-S161"]
+      "sprints": [
+        "PH-S153",
+        "PH-S161"
+      ]
     },
     {
       "auto_synced": true,
@@ -7035,7 +7059,7 @@
       ]
     }
   ],
-  "revision": 95,
+  "revision": 96,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
