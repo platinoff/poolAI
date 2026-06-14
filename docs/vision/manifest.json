@@ -1607,7 +1607,7 @@
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "9efe587b",
+  "git_head": "2ce67aba",
   "last_sprint_closed": "PH-S161",
   "layers": [
     {
@@ -7064,9 +7064,16 @@
         "PH-S153",
         "PH-S160"
       ]
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_trust_metrics_integration_rs",
+      "label": "galaxy_trust_metrics_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_trust_metrics_integration.rs"
     }
   ],
-  "revision": 98,
+  "revision": 99,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
