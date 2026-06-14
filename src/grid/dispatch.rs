@@ -21,6 +21,7 @@ use crate::grid::galaxy_trust_score::{
     clamp_trust_score, evaluate_result_settlement_gate, SettlementGateVerdict, TrustScore,
     TrustScoreGateConfig,
 };
+use crate::grid::galaxy_verification_metrics::evaluate_result_verification_mismatch;
 use crate::grid::galaxy_verify_sampling::{
     evaluate_result_verify_sampling, VerifySamplingConfig, VerifySamplingVerdict,
 };
@@ -333,6 +334,7 @@ fn ingest_result(
     let status = job_status_from_grid_result(body.status);
     jobs.force_status(&job_id, status)?;
     let trust_score = trust_score_from_result_metrics(body.metrics.as_ref());
+    evaluate_result_verification_mismatch(body.metrics.as_ref());
     let settlement_gate = evaluate_result_settlement_gate(
         source_peer_id,
         trust_score,
@@ -992,6 +994,54 @@ mod tests {
         assert_eq!(payout_eligible_total(), 1);
         assert_eq!(payout_held_total(), 1);
         reset_settlement_gate_metrics_for_test();
+    }
+
+    #[test]
+    fn ingest_result_wire_records_verification_mismatch_metric_ph_s175() {
+        use crate::grid::galaxy_verification_metrics::{
+            reset_verification_mismatch_metrics_for_test, verification_mismatch_total,
+        };
+
+        reset_verification_mismatch_metrics_for_test();
+        let jobs = JobStore::open_for_test(None);
+        let memory = MemoryShardStore::open_for_test(None);
+        jobs.push(JobRecord {
+            spec: JobSpec {
+                id: JobId::new("grid-verify-mismatch"),
+                kind: JobKind::Inference,
+                resources: Default::default(),
+                priority: 0,
+                max_duration_secs: None,
+                input_artifact_ids: vec![],
+                verification_policy: None,
+                deadline: None,
+            },
+            status: JobStatus::Scheduled,
+            created_at: Utc::now(),
+            worker_id: None,
+            vm_id: None,
+            lease_owner: None,
+            lease_epoch: None,
+            lease_expires_at: None,
+        })
+        .expect("push");
+
+        let env = GridEnvelope::new(
+            GridMessage::Result(crate::grid::GridResultBody {
+                job_id: "grid-verify-mismatch".into(),
+                status: GridResultStatus::Completed,
+                output_artifact_ids: vec![],
+                proof: None,
+                metrics: Some(serde_json::json!({
+                    "verification_verdict": "mismatch"
+                })),
+                lease_epoch: None,
+            }),
+            Some("tg-edge".into()),
+        );
+        ingest_envelope(env, &jobs, &memory).expect("ingest");
+        assert_eq!(verification_mismatch_total(), 1);
+        reset_verification_mismatch_metrics_for_test();
     }
 
     #[test]

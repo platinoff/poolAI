@@ -36,6 +36,9 @@ use crate::grid::galaxy_trust_score::{
     payout_eligible_total, payout_held_total, METRIC_PAYOUT_ELIGIBLE_TOTAL,
     METRIC_PAYOUT_HELD_TOTAL,
 };
+use crate::grid::galaxy_verification_metrics::{
+    verification_mismatch_total, METRIC_VERIFICATION_MISMATCH_TOTAL,
+};
 
 /// Lazily initialized Prometheus registry and metric handles.
 pub struct PoolAiPrometheus {
@@ -64,6 +67,7 @@ pub struct PoolAiPrometheus {
     galaxy_prefetch_plan_total: IntGauge,
     galaxy_prefetch_planned_shards_total: IntGauge,
     galaxy_prefetch_hot_skip_total: IntGauge,
+    galaxy_verification_mismatch_total: IntGauge,
 }
 
 static PROMETHEUS: OnceLock<PoolAiPrometheus> = OnceLock::new();
@@ -297,6 +301,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_prefetch_hot_skip_total.clone()))
         .expect("register galaxy_prefetch_hot_skip_total");
 
+    let galaxy_verification_mismatch_total = IntGauge::with_opts(Opts::new(
+        METRIC_VERIFICATION_MISMATCH_TOTAL,
+        "Galaxy verification digest mismatches on grid result path (PH-S175)",
+    ))
+    .expect(METRIC_VERIFICATION_MISMATCH_TOTAL);
+    registry
+        .register(Box::new(galaxy_verification_mismatch_total.clone()))
+        .expect("register galaxy_verification_mismatch_total");
+
     #[cfg(target_os = "linux")]
     {
         let collector = prometheus::process_collector::ProcessCollector::for_self();
@@ -329,6 +342,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_prefetch_plan_total,
         galaxy_prefetch_planned_shards_total,
         galaxy_prefetch_hot_skip_total,
+        galaxy_verification_mismatch_total,
     }
 }
 
@@ -373,6 +387,13 @@ pub fn refresh_galaxy_prefetch_gauges() {
         .set(prefetch_hot_skip_total() as i64);
 }
 
+/// Mirror in-process verification counters into Prometheus gauges (scrape snapshot).
+pub fn refresh_galaxy_verification_gauges() {
+    let prom = init_prometheus();
+    prom.galaxy_verification_mismatch_total
+        .set(verification_mismatch_total() as i64);
+}
+
 /// Record a secret rotation attempt (called from `security::secret_rotation`).
 pub fn record_secret_rotation(kind: &str, success: bool) {
     let prom = init_prometheus();
@@ -400,6 +421,7 @@ pub async fn refresh_scrape_gauges(ctx: &ApiContext) {
     refresh_galaxy_pricing_gauges();
     refresh_galaxy_trust_gauges();
     refresh_galaxy_prefetch_gauges();
+    refresh_galaxy_verification_gauges();
     prom.uptime_seconds
         .set(crate::version::get_uptime_seconds() as i64);
     prom.build_info.set(1);
@@ -641,5 +663,21 @@ mod tests {
         assert!(body.contains(&format!("{METRIC_PREFETCH_PLANNED_SHARDS_TOTAL} 1")));
         assert!(body.contains(&format!("{METRIC_PREFETCH_HOT_SKIP_TOTAL} 1")));
         reset_prefetch_metrics_for_test();
+    }
+
+    #[test]
+    fn galaxy_verification_mismatch_gauge_reflects_counter_ph_s175() {
+        use crate::grid::galaxy_verification_metrics::{
+            record_verification_mismatch, reset_verification_mismatch_metrics_for_test,
+        };
+
+        reset_verification_mismatch_metrics_for_test();
+        init_prometheus();
+        record_verification_mismatch();
+        refresh_galaxy_verification_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_VERIFICATION_MISMATCH_TOTAL));
+        assert!(body.contains(&format!("{METRIC_VERIFICATION_MISMATCH_TOTAL} 1")));
+        reset_verification_mismatch_metrics_for_test();
     }
 }
