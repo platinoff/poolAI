@@ -17,6 +17,7 @@ use prometheus::{
 use std::sync::OnceLock;
 
 use crate::core::state::ApiContext;
+use crate::grid::galaxy_locality::{last_shard_local_hit_ratio_bps, METRIC_SHARD_LOCAL_HIT_RATIO};
 use crate::grid::galaxy_prefetch_metrics::{
     prefetch_hot_skip_total, prefetch_plan_total, prefetch_planned_shards_total,
     METRIC_PREFETCH_HOT_SKIP_TOTAL, METRIC_PREFETCH_PLANNED_SHARDS_TOTAL,
@@ -76,6 +77,7 @@ pub struct PoolAiPrometheus {
     galaxy_trust_payout_eligible_total: IntGauge,
     galaxy_trust_payout_held_total: IntGauge,
     galaxy_trust_score: IntGauge,
+    galaxy_shard_local_hit_ratio: IntGauge,
     galaxy_prefetch_plan_total: IntGauge,
     galaxy_prefetch_planned_shards_total: IntGauge,
     galaxy_prefetch_hot_skip_total: IntGauge,
@@ -309,6 +311,15 @@ fn build_prometheus() -> PoolAiPrometheus {
         .register(Box::new(galaxy_trust_score.clone()))
         .expect("register galaxy_trust_score");
 
+    let galaxy_shard_local_hit_ratio = IntGauge::with_opts(Opts::new(
+        METRIC_SHARD_LOCAL_HIT_RATIO,
+        "Galaxy last observed top-ranked shard local hit ratio basis points 0-10000 (PH-S183)",
+    ))
+    .expect(METRIC_SHARD_LOCAL_HIT_RATIO);
+    registry
+        .register(Box::new(galaxy_shard_local_hit_ratio.clone()))
+        .expect("register galaxy_shard_local_hit_ratio");
+
     let galaxy_prefetch_plan_total = IntGauge::with_opts(Opts::new(
         METRIC_PREFETCH_PLAN_TOTAL,
         "Galaxy prefetch plans computed (PH-S167)",
@@ -423,6 +434,7 @@ fn build_prometheus() -> PoolAiPrometheus {
         galaxy_trust_payout_eligible_total,
         galaxy_trust_payout_held_total,
         galaxy_trust_score,
+        galaxy_shard_local_hit_ratio,
         galaxy_prefetch_plan_total,
         galaxy_prefetch_planned_shards_total,
         galaxy_prefetch_hot_skip_total,
@@ -466,6 +478,13 @@ pub fn refresh_galaxy_trust_gauges() {
     prom.galaxy_trust_payout_held_total
         .set(payout_held_total() as i64);
     prom.galaxy_trust_score.set(last_trust_score() as i64);
+}
+
+/// Mirror in-process locality rank counters into Prometheus gauges (scrape snapshot).
+pub fn refresh_galaxy_locality_gauges() {
+    let prom = init_prometheus();
+    prom.galaxy_shard_local_hit_ratio
+        .set(last_shard_local_hit_ratio_bps() as i64);
 }
 
 /// Mirror in-process prefetch plan counters into Prometheus gauges (scrape snapshot).
@@ -526,6 +545,7 @@ pub async fn refresh_scrape_gauges(ctx: &ApiContext) {
     let prom = init_prometheus();
     refresh_galaxy_pricing_gauges();
     refresh_galaxy_trust_gauges();
+    refresh_galaxy_locality_gauges();
     refresh_galaxy_prefetch_gauges();
     refresh_galaxy_verification_gauges();
     refresh_galaxy_replication_gauges();
@@ -759,6 +779,28 @@ mod tests {
         let body = encode_metrics_text().expect("encode");
         assert!(body.contains(&format!("{METRIC_TRUST_SCORE} 63")));
         reset_last_trust_score_for_test();
+    }
+
+    #[test]
+    fn encode_contains_galaxy_locality_metrics() {
+        init_prometheus();
+        refresh_galaxy_locality_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(METRIC_SHARD_LOCAL_HIT_RATIO));
+    }
+
+    #[test]
+    fn galaxy_shard_local_hit_ratio_gauge_reflects_last_observed() {
+        use crate::grid::galaxy_locality::{
+            observe_last_shard_local_hit_ratio, reset_last_shard_local_hit_ratio_for_test,
+        };
+        reset_last_shard_local_hit_ratio_for_test();
+        observe_last_shard_local_hit_ratio(0.75);
+        init_prometheus();
+        refresh_galaxy_locality_gauges();
+        let body = encode_metrics_text().expect("encode");
+        assert!(body.contains(&format!("{METRIC_SHARD_LOCAL_HIT_RATIO} 7500")));
+        reset_last_shard_local_hit_ratio_for_test();
     }
 
     #[test]

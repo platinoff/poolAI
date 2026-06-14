@@ -1,6 +1,9 @@
 //! Galaxy Grid locality placement stub (PH-S128): `locality_score(worker, task)` pure fn
 //! and scheduler ranking stub per `docs/concept/POOLAI_GALAXY_GRID.md` §5.1–5.2.
 //! Stale `network_profile` penalty stub (PH-S169, §8.1). No prefetch wire (PH-S129).
+//! Last observed `shard_local_hit_ratio` gauge on rank path (PH-S183).
+
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Network profile locality subset (Galaxy §8.1; full wire adds bandwidth/egress/topology).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -68,6 +71,11 @@ pub const DEFAULT_STALE_PROFILE_MAX_AGE_SECS: u64 = 86_400;
 
 /// Score deduction when profile freshness is missing or older than [`DEFAULT_STALE_PROFILE_MAX_AGE_SECS`].
 pub const DEFAULT_STALE_PROFILE_PENALTY: f64 = 0.05;
+
+/// Last observed shard local hit ratio in basis points 0..=10_000 (PH-S183 `/metrics` gauge).
+pub const METRIC_SHARD_LOCAL_HIT_RATIO: &str = "galaxy_shard_local_hit_ratio";
+
+static LAST_SHARD_LOCAL_HIT_RATIO_BPS: AtomicU64 = AtomicU64::new(0);
 
 /// Ranked worker for scheduler stub (locality first; pricing/queue_depth — future wire).
 #[derive(Debug, Clone, PartialEq)]
@@ -190,7 +198,32 @@ pub fn rank_workers_by_locality_with_weights(
             .unwrap_or(std::cmp::Ordering::Equal)
             .then_with(|| a.worker_id.cmp(&b.worker_id))
     });
+    if let Some(best) = ranked.first() {
+        if let Some(worker) = workers.iter().find(|w| w.worker_id == best.worker_id) {
+            observe_last_shard_local_hit_ratio(shard_local_hit(
+                &worker.seed_inventory.shard_ids,
+                &task.required_shard_ids,
+            ));
+        }
+    }
     ranked
+}
+
+/// Observe last top-ranked worker shard local hit ratio for Prometheus gauge (PH-S183).
+pub fn observe_last_shard_local_hit_ratio(ratio: f64) {
+    let clamped = ratio.clamp(0.0, 1.0);
+    let bps = (clamped * 10_000.0).round() as u64;
+    LAST_SHARD_LOCAL_HIT_RATIO_BPS.store(bps.min(10_000), Ordering::Relaxed);
+}
+
+/// Last observed shard local hit ratio in basis points (10_000 = 1.0) since process start.
+pub fn last_shard_local_hit_ratio_bps() -> u64 {
+    LAST_SHARD_LOCAL_HIT_RATIO_BPS.load(Ordering::Relaxed)
+}
+
+#[cfg(any(test, feature = "test-utils"))]
+pub fn reset_last_shard_local_hit_ratio_for_test() {
+    LAST_SHARD_LOCAL_HIT_RATIO_BPS.store(0, Ordering::Relaxed);
 }
 
 /// Pick highest-scoring worker (scheduler stub only — no prefetch / lease wire).
@@ -370,5 +403,16 @@ mod tests {
         let stale = worker_with_profile_age("stale", "eu-west", 20, &["w:emb-1"], None);
         let ranked = rank_workers_by_locality(&[stale, fresh], &job);
         assert_eq!(ranked.first().map(|r| r.worker_id.as_str()), Some("fresh"));
+    }
+
+    #[test]
+    fn rank_workers_by_locality_observes_top_shard_local_hit_ratio_ph_s183() {
+        reset_last_shard_local_hit_ratio_for_test();
+        let job = task(&["w:emb-1", "w:ckpt-7"], "inference:text", 0.0, None);
+        let full = worker("full", "eu-west", 20, &["w:emb-1", "w:ckpt-7"]);
+        let partial = worker("partial", "eu-west", 20, &["w:emb-1"]);
+        let _ = rank_workers_by_locality(&[partial, full], &job);
+        assert_eq!(last_shard_local_hit_ratio_bps(), 10_000);
+        reset_last_shard_local_hit_ratio_for_test();
     }
 }

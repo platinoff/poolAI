@@ -1,6 +1,6 @@
 # Передача контексту новій сесії (PoolAI)
 
-**Оновлено:** 2026-06-14 (PH-S182 ✅ · §5.12 **9** відкритих PH-S183…S191 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
+**Оновлено:** 2026-06-14 (PH-S183 ✅ · §5.12 **8** відкритих PH-S184…S191 · rust_ratio **92.78%** · hold **95%** · stretch **96%**) · VDT
 
 **Autoprogon:** [`AUTO_RUN_SESSION_2026-07-01.md`](./AUTO_RUN_SESSION_2026-07-01.md) S21–S34 ✅. **Horizon:** [`AUTO_RUN_SESSION_2026_HORIZON.md`](./AUTO_RUN_SESSION_2026_HORIZON.md) · [`HORIZON_TO_100_PLAN.md`](./HORIZON_TO_100_PLAN.md).
 
@@ -143,11 +143,12 @@
 **PH-S180 ✅ (code):** `galaxy_verification_metrics.rs` — `galaxy_verification_match_total` on grid result `verification_verdict: match`; `/metrics` via `refresh_galaxy_verification_gauges`; `tests/galaxy_verification_match_integration.rs`; `cargo test-ci`.
 **PH-S181 ✅ (code):** `galaxy_pricing_oracle.rs` — `galaxy_pricing_market_min_usd_micro` gauge on `try_quote`; `/metrics` via `refresh_galaxy_pricing_gauges`; `tests/galaxy_pricing_market_min_usd_micro_integration.rs`; `cargo test-ci`.
 **PH-S182 ✅ (code):** `galaxy_trust_score.rs` — `galaxy_trust_score` gauge on grid result ingest (`observe_last_trust_score`); `/metrics` via `refresh_galaxy_trust_gauges`; extended `tests/galaxy_trust_metrics_integration.rs`; `cargo test-ci`.
-**Vision ✅:** next **PH-S183** · **9** відкритих (PH-S183…S191: metrics S183…S187 + vision UX S188…S191) · rev **119**.
+**PH-S183 ✅ (code):** `galaxy_locality.rs` — `galaxy_shard_local_hit_ratio` gauge on `rank_workers_by_locality` top worker; `/metrics` via `refresh_galaxy_locality_gauges`; `tests/galaxy_shard_local_hit_ratio_integration.rs`; `cargo test-ci`.
+**Vision ✅:** next **PH-S184** · **8** відкритих (PH-S184…S187 metrics + vision UX S188…S191) · rev **120**.
 **PH-S113 ✅ (docs):** `docs/vision/` — L4 Lib roots + L5 Workspace; nodes `Cargo.toml`, `.cargo/config.toml`, `src/lib.rs`, `poolai-solana-adapter`.
 **PH-S114 ✅ (docs):** Galaxy map pan/zoom — `#map-world` transform; wheel ~6%/крок (тачпад), кнопки 16%; drag pan; dblclick focus.
 **PH-S115 ✅ (docs):** folder-colored edges + cluster layout (сітка за `src/*/`); **⊟ Folders** collapse (5+); **◎ Sprint** dim; manifest **rev 38**; `file_list.csv` + README/INDEX sync.
-**Черга:** §5.12 **9** відкритих — **PH-S183** (наступний) … **PH-S191**. Metrics S183…S187 · Vision UX S188…S191 · baseline **92.78%** · hold **95%** · spirit **96%**.
+**Черга:** §5.12 **8** відкритих — **PH-S184** (наступний) … **PH-S191**. Metrics S184…S187 · Vision UX S188…S191 · baseline **92.78%** · hold **95%** · spirit **96%**.
 
 **Роадмеп Galaxy Grid:** [`GALAXY_GRID_ROADMAP_2026-05-27.md`](./GALAXY_GRID_ROADMAP_2026-05-27.md) (PH-S65…S111 ✅).
 
