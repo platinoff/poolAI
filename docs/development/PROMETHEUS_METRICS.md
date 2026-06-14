@@ -57,6 +57,8 @@ scrape_configs:
 | `galaxy_verification_mismatch_total` | gauge | Galaxy verification digest mismatches on grid result path (PH-S175) |
 | `galaxy_verification_sample_total` | gauge | Galaxy verification samples scheduled on grid result path (PH-S177) |
 | `galaxy_replay_pending` | gauge | Galaxy replay verifications pending coordinator verdict (PH-S176) |
+
+**Queued (FM §5.12 PH-S178…S187):** settlement pending/cleared, replication strict, verification match, pricing market min, trust score, locality/prefetch egress metrics — див. [`FUNCTION_MANAGEMENT.md`](../catalog/FUNCTION_MANAGEMENT.md) §5.12.
 | `galaxy_trust_payout_eligible_total` | gauge | Galaxy trust gate edge payout-eligible results (PH-S137 stub; PH-S163 grid wire) |
 | `galaxy_trust_payout_held_total` | gauge | Galaxy trust gate edge payout-held results (PH-S137 stub; PH-S163 grid wire) |
 | `process_*` | various | `prometheus` process collector when available |
@@ -73,4 +75,4 @@ Prometheus alert rules live in your monitoring stack (Prometheus / Alertmanager 
 - [`../performance/BENCHMARKS.md`](../performance/BENCHMARKS.md) — load baselines
 - [`../performance/PROFILING.md`](../performance/PROFILING.md) — hot-path profiling
 
-**Last updated:** 2026-06-14 (PH-S177 verification sample total metric).
+**Last updated:** 2026-06-14 (docs-sync replenish §5.12 → 10 open PH-S178…S187).

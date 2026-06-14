@@ -54,7 +54,7 @@ PoolAI is a comprehensive distributed system for managing AI mining pools with i
 
 **Версія в репозиторії:** `0.2.2` (див. `Cargo.toml`). **Робоча гілка:** `main`.
 
-Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S157 ✅. **Rust ratio baseline:** **92.33%**. **Vision:** manifest rev **91**. **Активна черга:** FM **§5.12** — **10** відкритих **PH-S158…S165** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
+Зрілий **MVP і модулі Stage 1–3** здані й покриті тестами; **Galaxy Grid wire:** PH-S65…S177 ✅. **Rust ratio baseline:** **92.78%** (hold **95%**). **Vision:** manifest rev **114**. **Активна черга:** FM **§5.12** — **10** відкритих **PH-S178…S187** — [`docs/development/NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md), [`RUST_RATIO_STRATEGY_2026-06-13.md`](docs/development/RUST_RATIO_STRATEGY_2026-06-13.md).
 
 **Репозиторій:** [github.com/platinoff/poolAI](https://github.com/platinoff/poolAI)
 
@@ -80,17 +80,17 @@ For a detailed status view see `docs/status/STABLE_STATE_SUMMARY.md`. Documentat
 - `cargo test --all-features` — на **Windows MSVC** можливі каскадні помилки компіляції тестів і/або `STATUS_STACK_BUFFER_OVERRUN` у `rustc` через обсяг фіч (cloud-sdk тощо); для повного матрицю краще **GNU toolchain** з `rust-toolchain.toml` або **Linux CI**. Інтеграційні тести ML прунінгу та SAML узгоджені з поточною семантикою `PruningResult` / унікальними іменами SAML-провайдерів.
 - **Архітектурні інкременти (`main`, 2026-04–05)**: **`RaidService`** + **`VirtualNode*`** services (**FM-016** ✅); ML pipeline + **TurboQuant**; **P3 / FM-005** — `json_errors.rs`, **`HttpAppError`/`RestError`** по REST, **`raid*`**, **`enterprise_api/`**, auth/WS/rate-limit ✅; **OpenAPI** enterprise sync (S14–S20); бінарі **`poolai-worker`**, **`poolai-telegram-bot`**, **`poolai_health_load`**; dev stand — `bin/verify-dev-stand.*`, `core::dev_stand`; ML-тести — **`[[test]]` + `required-features = ["ml"]`**; P2b wire — `tests/distributed_raid_wire_integration.rs`.
 
-### Next Focus (2026-06-07)
+### Next Focus (2026-06-14)
 
-**Закрито:** PH-S03…S129 (Galaxy lease + OTel spans + pricing `/metrics` + locality/prefetch stubs).
+**Закрито:** PH-S128…S177 (Galaxy metrics band: pricing, verification, replay, sample total).
 
-**Активна черга (FM §5.12):** **10** відкритих — **PH-S158…S165** ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
+**Активна черга (FM §5.12):** **10** відкритих — **PH-S178…S187** ([`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · [`GALAXY_GRID_ROADMAP_2026-05-27.md`](docs/development/GALAXY_GRID_ROADMAP_2026-05-27.md)).
 
 **Ops (поза чергою):** **FM-003** LAN §4 **BLOCKED** (2 хости) · **FM-041** Cloud SDK **Deferred**.
 
 **Старт сесії:** [`HANDOFF_NEW_SESSION.md`](docs/development/HANDOFF_NEW_SESSION.md) · copy-paste — [`NEXT_SESSION_PROMPT.md`](docs/development/NEXT_SESSION_PROMPT.md) · карта — [`docs/vision/`](docs/vision/) (`.\bin\open-docs-vision.ps1`).
 
-**Нещодавно:** PH-S129 SeedInventory + prefetch stub · PH-S128 locality_score · PH-S127 pricing `/metrics` · PH-S126 lease_trace.
+**Нещодавно:** PH-S177 verification sample total · PH-S176 replay pending · PH-S175 verification mismatch · PH-S174 pricing quote gauge.
 
 **Звірка «не зроблено»:** [`FUNCTION_MANAGEMENT.md`](docs/catalog/FUNCTION_MANAGEMENT.md) **§5.3**.
 

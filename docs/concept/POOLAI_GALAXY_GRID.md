@@ -400,7 +400,7 @@ poolai_quote_usd_micro = floor(market_min_usd_micro × 9_000 / 10_000)   // −1
 - Метрики (in-process + Prometheus, PH-S81/S83/S91/S127/S168): `galaxy_pricing_fresh_served`, `galaxy_pricing_stale_served`, `galaxy_pricing_forced_fallback_total`, `galaxy_pricing_cache_age_seconds` — atomics у `galaxy_pricing_oracle.rs`; gauges на `GET /metrics` через [`prometheus_export.rs`](../../src/observability/prometheus_export.rs) (`refresh_galaxy_pricing_gauges`).
 - Env catalog (PH-S92): `GalaxyPricingProviderCatalog` у `galaxy_pricing_oracle.rs` — `parse_pricing_providers_json`, `bundled_pricing_provider_catalog`, `pricing_provider_catalog_from_env`.
 - API metadata (PH-S89): `GET /api/v1/grid/pricing` → `l1_cache` on L1 hits (`cache_age_secs`, `cache_ttl_secs`, `max_stale_secs`, fresh/stale until timestamps).
-- Метрики (Prometheus, roadmap): `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`.
+- Метрики (Prometheus, roadmap): `galaxy_pricing_provider_errors_total`, `galaxy_pricing_quote_usd_micro`, `galaxy_pricing_market_min_usd_micro` (PH-S181 queue).
 - Alert: усі providers fail &gt; 15 хв **і** L2 не заданий → сторінка ops.
 
 **Rust reference (oracle + HTTP, PH-S68…S92):**
@@ -623,7 +623,7 @@ Coordinator і worker збирають **locality telemetry** (агрегаці�
 
 **Зв’язок з `network_profile`:** `latency_ms_p50`, `region`, `bandwidth_mbps` — вхідні для `latency_factor`; нормативний wire contract — **§8.1**; **locality subset** (`region`, `latency_ms_p50`) — обов’язковий для PH-S61/PH-S128 scheduling (`src/grid/galaxy_locality.rs`).
 
-**Метрики (Prometheus, майбутнє):** `galaxy_shard_local_hit_ratio`, `galaxy_prefetch_bytes_total`, `galaxy_cross_region_egress_mb`.
+**Метрики (Prometheus, майбутнє → §5.12 PH-S183…S185):** `galaxy_shard_local_hit_ratio`, `galaxy_prefetch_bytes_total`, `galaxy_cross_region_egress_mb`.
 
 ### 5.4 Keep hot layers local (PH-S61)
 
@@ -831,7 +831,18 @@ elif verdict == rejected:
 | `POOLAI_GALAXY_MIN_TRUST_PAYOUT` | `400` | мін. score для auto payout |
 | `POOLAI_GALAXY_REPLICATION_MAX_PER_HOUR` | `100` | cost cap |
 
-**Метрики:** `galaxy_verification_sample_total`, `galaxy_verification_mismatch_total`, `galaxy_replay_pending`, `galaxy_trust_score`.
+**Метрики (§6.2–6.4, FM §5.12):**
+
+| Метрика | Статус | Sprint |
+|---------|--------|--------|
+| `galaxy_verification_sample_total` | ✅ `/metrics` | PH-S177 |
+| `galaxy_verification_mismatch_total` | ✅ `/metrics` | PH-S175 |
+| `galaxy_replay_pending` | ✅ `/metrics` | PH-S176 |
+| `galaxy_trust_score` | черга | PH-S182 |
+| `galaxy_verification_sample_scheduled_total` | in-process (PH-S164); `/metrics` черга | PH-S186 |
+| `galaxy_settlement_pending_verification_total` | черга | PH-S178 |
+| `galaxy_settlement_cleared_total` | черга | PH-S187 |
+| `galaxy_verification_match_total` | черга | PH-S180 |
 
 **Логи / audit:** `verification_sample_enqueued`, `verification_mismatch`, `replay_verdict`, `replication_quorum_ok|fail`.
 

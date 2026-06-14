@@ -1679,7 +1679,7 @@
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "c4ec3244",
+  "git_head": "365c0bc6",
   "last_sprint_closed": "PH-S177",
   "layers": [
     {
@@ -7265,7 +7265,7 @@
       "path": "tests/galaxy_verification_sample_integration.rs"
     }
   ],
-  "revision": 113,
+  "revision": 114,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
