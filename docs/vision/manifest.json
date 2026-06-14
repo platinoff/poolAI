@@ -1646,11 +1646,23 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "tests_galaxy_pricing_quote_usd_micro_integration_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "src_grid_galaxy_verification_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "tests_galaxy_verification_mismatch_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "774a85b2",
-  "last_sprint_closed": "PH-S174",
+  "git_head": "fb867493",
+  "last_sprint_closed": "PH-S175",
   "layers": [
     {
       "id": "L0",
@@ -1683,7 +1695,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S175",
+  "next_sprint": "PH-S176",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7198,9 +7210,23 @@
       "label": "galaxy_pricing_quote_usd_micro_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_pricing_quote_usd_micro_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_grid_galaxy_verification_metrics_rs",
+      "label": "galaxy_verification_metrics.rs",
+      "layer": "L3",
+      "path": "src/grid/galaxy_verification_metrics.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_verification_mismatch_integration_rs",
+      "label": "galaxy_verification_mismatch_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_verification_mismatch_integration.rs"
     }
   ],
-  "revision": 110,
+  "revision": 111,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
