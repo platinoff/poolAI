@@ -8,6 +8,7 @@ pub mod format;
 pub mod i18n;
 pub mod lease;
 pub mod ml;
+pub mod modal;
 pub mod pricing;
 pub mod table;
 pub mod theme;

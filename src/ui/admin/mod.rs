@@ -86,6 +86,7 @@ import init, {
   compareSortValues, rowMatchesQuery, highlightQueryHtml,
   parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
   flattenMlStepRows, collectMlSparklineSeries, normalizeTheme,
+  trapTabAction, modalFocusableSelector, adminDynamicModalHtml,
 } from '/ui/wasm/poolai_ui_wasm.js';
 window.poolaiUiWasm = {
   ready: false, failed: false,
@@ -95,6 +96,7 @@ window.poolaiUiWasm = {
   compareSortValues, rowMatchesQuery, highlightQueryHtml,
   parseMlNumeric, formatMlMetricSummary, metricPointValues, chartScale,
   flattenMlStepRows, collectMlSparklineSeries, normalizeTheme,
+  trapTabAction, modalFocusableSelector, adminDynamicModalHtml,
 };
 try {
   await init();
@@ -142,6 +144,7 @@ pub fn admin_layout_with_module_script(
     let charts_js = include_str!("../admin_charts.js");
     let i18n_patch = poolai_ui_core::i18n::admin_jobs_grid_patch_script();
     let theme_patch = poolai_ui_core::theme::admin_theme_patch_script();
+    let modal_patch = poolai_ui_core::modal::admin_modal_patch_script();
     let module_block = if module_script.is_empty() {
         String::new()
     } else {
@@ -210,6 +213,7 @@ pub fn admin_layout_with_module_script(
   
   <script>{i18n_patch}</script>
   <script>{theme_patch}</script>
+  <script>{modal_patch}</script>
   <script>{i18n_js}</script>
   <script>{theme_js}</script>
   <script>{common_js}</script>
@@ -253,6 +257,7 @@ pub fn admin_layout_with_module_script(
         body = body_html,
         i18n_patch = i18n_patch,
         theme_patch = theme_patch,
+        modal_patch = modal_patch,
         i18n_js = i18n_js,
         common_js = common_js,
         charts_js = charts_js,
@@ -322,13 +327,25 @@ fn admin_common_fm019_modal_a11y_helpers() {
     assert!(js.contains("function showModalContent"));
     assert!(js.contains("ADMIN_DYNAMIC_MODAL_ID"));
     assert!(js.contains("function handleModalEscape"));
-    assert!(js.contains("function adminEnhanceFormA11y"));
     assert!(js.contains("function adminSyncTabA11y"));
+    assert!(js.contains("__poolaiAdminModalRust"));
+    assert!(js.contains("function poolaiTrapTabAction"));
+    assert!(js.contains("function adminEnhanceFormA11y"));
     assert!(js.contains("function adminEnhanceTablesA11y"));
     assert!(js.contains("function adminObserveDynamicA11y"));
     assert!(js.contains("function adminApplyDesignSystem"));
     assert!(js.contains("function adminRenderTable"));
     assert!(js.contains("function adminFormFieldHtml"));
+}
+
+#[test]
+fn admin_layout_injects_rust_modal_patch_ph_s161() {
+    let patch = poolai_ui_core::modal::admin_modal_patch_script();
+    assert!(patch.contains("window.__poolaiAdminModalRust="));
+    assert!(patch.contains("focusable_selector"));
+    assert!(patch.contains("adminDynamicModal"));
+    let html = admin_layout("admin.test.page", "Test", "<p>body</p>", "");
+    assert!(html.0.contains("window.__poolaiAdminModalRust="));
 }
 
 #[test]

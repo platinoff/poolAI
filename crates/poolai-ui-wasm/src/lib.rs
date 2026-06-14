@@ -10,6 +10,7 @@ use poolai_ui_core::ml::{
     chart_scale, collect_ml_sparkline_series, flatten_ml_step_rows, format_ml_metric_summary,
     metric_point_values, parse_ml_numeric,
 };
+use poolai_ui_core::modal::{admin_dynamic_modal_html, trap_tab_action, MODAL_FOCUSABLE_SELECTOR};
 use poolai_ui_core::pricing::{format_unix_secs, format_usd_micro};
 use poolai_ui_core::table::{
     build_csv, build_json_export, compare_sort_values, empty_state_html, form_field_html,
@@ -35,6 +36,36 @@ pub fn format_unix_secs_wasm(secs: f64) -> String {
 #[wasm_bindgen(js_name = normalizeTheme)]
 pub fn normalize_theme_wasm(name: &str) -> String {
     normalize_theme(name).to_string()
+}
+
+/// Modal focus-trap tab action: `none` | `first` | `last` | `root`.
+#[wasm_bindgen(js_name = trapTabAction)]
+pub fn trap_tab_action_wasm(
+    shift_key: bool,
+    focusable_count: u32,
+    active_inside: bool,
+    active_is_first: bool,
+    active_is_last: bool,
+) -> String {
+    trap_tab_action(
+        shift_key,
+        focusable_count as usize,
+        active_inside,
+        active_is_first,
+        active_is_last,
+    )
+    .as_str()
+    .to_string()
+}
+
+#[wasm_bindgen(js_name = modalFocusableSelector)]
+pub fn modal_focusable_selector_wasm() -> String {
+    MODAL_FOCUSABLE_SELECTOR.to_string()
+}
+
+#[wasm_bindgen(js_name = adminDynamicModalHtml)]
+pub fn admin_dynamic_modal_html_wasm() -> String {
+    admin_dynamic_modal_html()
 }
 
 /// Jobs lease badge: returns `"active"`, `"expired"`, or `"none"`.
@@ -170,7 +201,7 @@ pub fn collect_ml_sparkline_series_wasm(rows_json: &str) -> JsValue {
 /// POC version string for smoke checks in browser devtools.
 #[wasm_bindgen(js_name = poolaiUiWasmVersion)]
 pub fn poolai_ui_wasm_version() -> String {
-    "poolai-ui-wasm/0.1.0-ph-s160".to_string()
+    "poolai-ui-wasm/0.1.0-ph-s161".to_string()
 }
 
 fn empty_as_none(s: &str) -> Option<&str> {
@@ -211,6 +242,17 @@ mod tests {
             "2024-06-13T12:00:00Z"
         );
         assert_eq!(escape_html_wasm("a<b>"), "a&lt;b&gt;");
+    }
+
+    #[test]
+    fn trap_tab_action_wasm_matches_core() {
+        assert_eq!(trap_tab_action_wasm(false, 2, true, false, true), "first");
+        assert_eq!(trap_tab_action_wasm(true, 0, false, false, false), "root");
+    }
+
+    #[test]
+    fn modal_wasm_html_has_dynamic_id() {
+        assert!(admin_dynamic_modal_html_wasm().contains("adminDynamicModal"));
     }
 
     #[test]

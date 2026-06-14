@@ -110,7 +110,7 @@ flowchart TB
 | 15 | **PH-S158** | `poolai-e2e-stand` bin | Rust stand lifecycle; slim shell | **✅** |
 | 16 | **PH-S159** | Ratio **96%** stretch gate | warn 93%; stretch 96%; replenish post-S159 | **✅** |
 | 17 | **PH-S160** | Admin theme → Rust | slim `admin_theme.js` | **✅** |
-| 18 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` | відкрито |
+| 18 | **PH-S161** | Admin modal a11y → wasm | slim `admin_modal_a11y.js` | **✅** |
 | 19 | **PH-S162** | Auth i18n subset Rust | slim `i18n_core.js` auth block | відкрито |
 | 20 | **PH-S163** | Galaxy trust metrics wire | Prometheus on grid result path | відкрито |
 | 21 | **PH-S164** | Verify sampling env apply | `galaxy_verify_sampling` HTTP stub | відкрито |
