@@ -1607,7 +1607,7 @@
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "2ce67aba",
+  "git_head": "c5c707a6",
   "last_sprint_closed": "PH-S161",
   "layers": [
     {
@@ -7072,9 +7072,23 @@
       "label": "galaxy_trust_metrics_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_trust_metrics_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "src_network_api_verify_sampling_middleware_rs",
+      "label": "verify_sampling_middleware.rs",
+      "layer": "L3",
+      "path": "src/network/api/verify_sampling_middleware.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_verify_sampling_integration_rs",
+      "label": "galaxy_verify_sampling_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_verify_sampling_integration.rs"
     }
   ],
-  "revision": 99,
+  "revision": 100,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
