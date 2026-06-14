@@ -1634,11 +1634,17 @@
       "from": "galaxy_grid",
       "kind": "implements",
       "to": "src_grid_galaxy_pricing_provider_metrics_rs"
+    },
+    {
+      "auto_synced": true,
+      "from": "galaxy_grid",
+      "kind": "implements",
+      "to": "tests_galaxy_pricing_provider_errors_integration_rs"
     }
   ],
   "galaxy_background": "vision2.png",
-  "git_head": "31c872ae",
-  "last_sprint_closed": "PH-S167",
+  "git_head": "113c5aca",
+  "last_sprint_closed": "PH-S173",
   "layers": [
     {
       "id": "L0",
@@ -1671,7 +1677,7 @@
       "z": 5
     }
   ],
-  "next_sprint": "PH-S173",
+  "next_sprint": "PH-S174",
   "nodes": [
     {
       "id": "galaxy_grid",
@@ -7172,9 +7178,16 @@
       "label": "galaxy_pricing_provider_catalog_metrics_integration.rs",
       "layer": "L3",
       "path": "tests/galaxy_pricing_provider_catalog_metrics_integration.rs"
+    },
+    {
+      "auto_synced": true,
+      "id": "tests_galaxy_pricing_provider_errors_integration_rs",
+      "label": "galaxy_pricing_provider_errors_integration.rs",
+      "layer": "L3",
+      "path": "tests/galaxy_pricing_provider_errors_integration.rs"
     }
   ],
-  "revision": 108,
+  "revision": 109,
   "updated_at": "2026-06-14",
   "vision_ui_rev": 54
 }
